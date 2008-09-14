@@ -79,14 +79,6 @@ PlatformScrollbar::~PlatformScrollbar() {
   g_object_unref(G_OBJECT(gtkWidget()));
 }
 
-int PlatformScrollbar::width() const {
-  return Widget::width();
-}
-
-int PlatformScrollbar::height() const {
-  return Widget::height();
-}
-
 void PlatformScrollbar::setEnabled(bool enabled) {
   Widget::setEnabled(enabled);
 }

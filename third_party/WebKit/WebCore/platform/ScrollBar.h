@@ -70,8 +70,6 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
 
   bool scroll(ScrollDirection, ScrollGranularity, float multiplier = 1.0f);
 
-  virtual int width() const = 0;
-  virtual int height() const = 0;
   virtual void setRect(const IntRect&) = 0;
   virtual void setEnabled(bool) = 0;
   virtual void paint(GraphicsContext*, const IntRect& damageRect) = 0;

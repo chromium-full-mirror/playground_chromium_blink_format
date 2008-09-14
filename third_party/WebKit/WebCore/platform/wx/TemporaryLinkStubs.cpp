@@ -206,14 +206,6 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
 PlatformScrollbar::~PlatformScrollbar() {
   notImplemented();
 }
-int PlatformScrollbar::width() const {
-  notImplemented();
-  return 0;
-}
-int PlatformScrollbar::height() const {
-  notImplemented();
-  return 0;
-}
 void PlatformScrollbar::setEnabled(bool) {
   notImplemented();
 }
