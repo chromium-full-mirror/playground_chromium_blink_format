@@ -766,6 +766,15 @@ void CodeBlock::dump(ExecState* exec,
              jumpTarget(begin, it, offset));
       break;
     }
+    case op_loop_if_lesseq: {
+      int r0 = (++it)->u.operand;
+      int r1 = (++it)->u.operand;
+      int offset = (++it)->u.operand;
+      printf("[%4d] loop_if_lesseq\t %s, %s, %d(->%d)\n", location,
+             registerName(r0).c_str(), registerName(r1).c_str(), offset,
+             jumpTarget(begin, it, offset));
+      break;
+    }
     case op_switch_imm: {
       int tableIndex = (++it)->u.operand;
       int defaultTarget = (++it)->u.operand;

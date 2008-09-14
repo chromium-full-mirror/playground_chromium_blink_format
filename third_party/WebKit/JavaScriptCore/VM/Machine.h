@@ -159,6 +159,7 @@ class Machine {
   static JSValue* SFX_CALL cti_op_add(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_pre_inc(CTI_ARGS);
   static int SFX_CALL cti_op_loop_if_less(CTI_ARGS);
+  static int SFX_CALL cti_op_loop_if_lesseq(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_new_object(CTI_ARGS);
   static void SFX_CALL cti_op_put_by_id(CTI_ARGS);
   static void SFX_CALL cti_op_put_by_id_second(CTI_ARGS);
