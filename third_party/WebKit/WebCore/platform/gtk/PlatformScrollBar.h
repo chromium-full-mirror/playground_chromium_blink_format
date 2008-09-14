@@ -42,7 +42,6 @@ class PlatformScrollbar : public Scrollbar {
   }
   virtual ~PlatformScrollbar();
 
-  virtual void paint(GraphicsContext*, const IntRect& damageRect);
   virtual void setFrameGeometry(const IntRect&);
 
  protected:

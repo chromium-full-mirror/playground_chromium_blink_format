@@ -40,8 +40,6 @@ class PlatformScrollbar : public Scrollbar {
   }
   virtual ~PlatformScrollbar();
 
-  virtual void paint(GraphicsContext*, const IntRect& damageRect);
-
  protected:
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();

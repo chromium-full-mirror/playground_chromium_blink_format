@@ -206,9 +206,6 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
 PlatformScrollbar::~PlatformScrollbar() {
   notImplemented();
 }
-void PlatformScrollbar::paint(GraphicsContext*, const IntRect& damageRect) {
-  notImplemented();
-}
 void PlatformScrollbar::updateThumbPosition() {
   notImplemented();
 }

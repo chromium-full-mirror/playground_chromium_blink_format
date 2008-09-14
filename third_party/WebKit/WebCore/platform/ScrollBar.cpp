@@ -26,6 +26,7 @@
 #include "config.h"
 #include "ScrollBar.h"
 
+#include "GraphicsContext.h"
 #include "ScrollbarClient.h"
 #include "ScrollbarTheme.h"
 
@@ -134,6 +135,19 @@ bool Scrollbar::scroll(ScrollDirection direction,
   // return true even if the integer value did not change so that scroll event
   // gets eaten
   return true;
+}
+
+void Scrollbar::paint(GraphicsContext* context, const IntRect& damageRect) {
+  if (context->updatingControlTints() && theme()->supportsControlTints()) {
+    invalidate();
+    return;
+  }
+
+  if (context->paintingDisabled() || !frameGeometry().intersects(damageRect))
+    return;
+
+  if (!theme()->paint(this, context, damageRect))
+    Widget::paint(context, damageRect);
 }
 
 void Scrollbar::autoscrollTimerFired(Timer<Scrollbar>*) {
