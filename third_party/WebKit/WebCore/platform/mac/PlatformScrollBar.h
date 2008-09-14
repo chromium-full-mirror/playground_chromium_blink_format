@@ -54,7 +54,6 @@ class PlatformScrollbar : public Scrollbar {
                     ScrollbarOrientation,
                     ScrollbarControlSize);
 
-  virtual void setRect(const IntRect&);
   virtual void paint(GraphicsContext*, const IntRect& damageRect);
 
   virtual void updateThumbPosition();
