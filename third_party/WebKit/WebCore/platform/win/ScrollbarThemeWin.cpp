@@ -144,6 +144,10 @@ void ScrollbarThemeWin::themeChanged() {
     CloseThemeData(scrollbarTheme);
 }
 
+bool ScrollbarThemeWin::invalidateOnMouseEnterExit() {
+  return runningOnVista;
+}
+
 bool ScrollbarThemeWin::hasThumb(Scrollbar* scrollbar) {
   return thumbLength(scrollbar) > 0;
 }

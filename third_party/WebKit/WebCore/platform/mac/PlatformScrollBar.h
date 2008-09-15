@@ -49,6 +49,15 @@ class PlatformScrollbar : public Scrollbar {
 
   bool scrollbarHit(NSScrollerPart);
 
+  virtual bool handleMouseMoveEvent(const PlatformMouseEvent&) { return false; }
+  virtual bool handleMouseOutEvent(const PlatformMouseEvent&) { return false; }
+  virtual bool handleMousePressEvent(const PlatformMouseEvent&) {
+    return false;
+  }
+  virtual bool handleMouseReleaseEvent(const PlatformMouseEvent&) {
+    return false;
+  }
+
  private:
   PlatformScrollbar(ScrollbarClient*,
                     ScrollbarOrientation,

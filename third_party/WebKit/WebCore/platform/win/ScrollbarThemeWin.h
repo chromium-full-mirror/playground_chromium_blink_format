@@ -39,6 +39,8 @@ class ScrollbarThemeWin : public ScrollbarThemeComposite {
 
   virtual void themeChanged();
 
+  virtual bool invalidateOnMouseEnterExit();
+
  protected:
   virtual bool hasButtons(Scrollbar*) { return true; }
   virtual bool hasThumb(Scrollbar*);

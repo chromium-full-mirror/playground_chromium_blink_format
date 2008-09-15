@@ -32,6 +32,7 @@
 namespace WebCore {
 
 class GraphicsContext;
+class PlatformMouseEvent;
 class Scrollbar;
 
 class ScrollbarTheme {
@@ -43,6 +44,9 @@ class ScrollbarTheme {
                      const IntRect& damageRect) {
     return false;
   }
+  virtual ScrollbarPart hitTest(Scrollbar*, const PlatformMouseEvent&) {
+    return NoPart;
+  }
 
   virtual int scrollbarThickness(ScrollbarControlSize = RegularScrollbar) {
     return 0;
@@ -51,6 +55,20 @@ class ScrollbarTheme {
   virtual bool supportsControlTints() const { return false; }
 
   virtual void themeChanged() {}
+
+  virtual bool invalidateOnMouseEnterExit() { return false; }
+  virtual void invalidatePart(Scrollbar*, ScrollbarPart) {}
+
+  virtual bool shouldCenterOnThumb(Scrollbar*, const PlatformMouseEvent&) {
+    return false;
+  }
+  virtual void centerOnThumb(Scrollbar*, const PlatformMouseEvent&) {}
+  virtual int thumbPosition(Scrollbar*) { return 0; }
+  virtual int thumbLength(Scrollbar*) { return 0; }
+  virtual int trackLength(Scrollbar*) { return 0; }
+
+  virtual double initialAutoscrollTimerDelay() { return 0.25; }
+  virtual double autoscrollTimerDelay() { return 0.05; }
 
   static ScrollbarTheme*
   nativeTheme();  // Must be implemented to return the correct theme subclass.
