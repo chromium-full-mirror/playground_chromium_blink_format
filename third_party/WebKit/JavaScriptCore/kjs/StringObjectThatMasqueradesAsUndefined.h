@@ -30,6 +30,8 @@ namespace JSC {
 // WebCore uses this to make style.filter undetectable
 class StringObjectThatMasqueradesAsUndefined : public StringObject {
  public:
+  StringObjectThatMasqueradesAsUndefined(VPtrStealingHackType type)
+      : StringObject(type) {}
   StringObjectThatMasqueradesAsUndefined(ExecState* exec,
                                          JSObject* prototype,
                                          const UString& string)

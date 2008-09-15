@@ -329,6 +329,11 @@ class Machine {
     return !JSImmediate::isImmediate(v) &&
            v->asCell()->vptr() == m_jsStringVptr;
   }
+  bool doesMasqueradesAsUndefined(JSValue* v) {
+    return !JSImmediate::isImmediate(v) &&
+           v->asCell()->vptr() ==
+               m_jsStringObjectThatMasqueradesAsUndefinedVptr;
+  }
 
   void tryCacheGetByID(ExecState*,
                        CodeBlock*,
@@ -378,6 +383,7 @@ class Machine {
 
   void* m_jsArrayVptr;
   void* m_jsStringVptr;
+  void* m_jsStringObjectThatMasqueradesAsUndefinedVptr;
   void* m_jsFunctionVptr;
 
 #if HAVE(COMPUTED_GOTO)
