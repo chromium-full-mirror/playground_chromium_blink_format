@@ -50,11 +50,6 @@ ImplicitAnimation::ImplicitAnimation(const Animation* transition,
 ImplicitAnimation::~ImplicitAnimation() {
   ASSERT(!m_fromStyle && !m_toStyle);
 
-  // If we were waiting for an end event, we need to finish the animation to
-  // make sure no old
-  // animations stick around in the lower levels
-  ASSERT(!waitingForEndEvent() || !m_object);
-
   // Do the cleanup here instead of in the base class so the specialized methods
   // get called
   if (!postActive())
