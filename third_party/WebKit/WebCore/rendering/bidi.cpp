@@ -48,10 +48,10 @@ const unsigned cMaxLineDepth = 200;
 
 class InlineIterator {
  public:
-  InlineIterator() : block(0), obj(0), pos(0) {}
+  InlineIterator() : block(0), obj(0), pos(0), nextBreakablePosition(-1) {}
 
   InlineIterator(RenderBlock* b, RenderObject* o, unsigned p)
-      : block(b), obj(o), pos(p) {}
+      : block(b), obj(o), pos(p), nextBreakablePosition(-1) {}
 
   void increment(InlineBidiResolver* resolver = 0);
   bool atEnd() const;
@@ -62,6 +62,7 @@ class InlineIterator {
   RenderBlock* block;
   RenderObject* obj;
   unsigned pos;
+  int nextBreakablePosition;
 };
 
 // Midpoint globals.  The goal is not to do any allocation when dealing with
@@ -270,10 +271,12 @@ inline void InlineIterator::increment(InlineBidiResolver* resolver) {
     if (pos >= static_cast<RenderText*>(obj)->textLength()) {
       obj = bidiNext(block, obj, resolver);
       pos = 0;
+      nextBreakablePosition = -1;
     }
   } else {
     obj = bidiNext(block, obj, resolver);
     pos = 0;
+    nextBreakablePosition = -1;
   }
 }
 
@@ -1736,6 +1739,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
   RenderObject* o = resolver.position().obj;
   RenderObject* last = o;
   unsigned pos = resolver.position().pos;
+  int nextBreakable = resolver.position().nextBreakablePosition;
   bool atStart = true;
 
   bool prevLineBrokeCleanly = previousLineBrokeCleanly;
@@ -1776,6 +1780,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
       if (w + tmpW <= width) {
         lBreak.obj = o;
         lBreak.pos = 0;
+        lBreak.nextBreakablePosition = -1;
         lBreak.increment();
 
         // A <br> always breaks a line, so don't let the line be collapsed
@@ -1884,6 +1889,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
         tmpW = 0;
         lBreak.obj = o;
         lBreak.pos = 0;
+        lBreak.nextBreakablePosition = -1;
       }
 
       if (ignoringSpaces)
@@ -1928,7 +1934,6 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
 
       int wrapW = tmpW + inlineWidth(o, !appliedStartWidth, true);
       int charWidth = 0;
-      int nextBreakable = -1;
       bool breakNBSP = autoWrap && o->style()->nbspMode() == SPACE;
       // Auto-wrapping text should wrap in the middle of a word only if it could
       // not wrap before the word,
@@ -1944,6 +1949,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
         tmpW = 0;
         lBreak.obj = o;
         lBreak.pos = 0;
+        lBreak.nextBreakablePosition = -1;
         ASSERT(!len);
       }
 
@@ -2069,6 +2075,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
                 lineWasTooWide = true;
                 lBreak.obj = o;
                 lBreak.pos = pos;
+                lBreak.nextBreakablePosition = nextBreakable;
                 skipTrailingWhitespace(lBreak);
               }
             }
@@ -2107,6 +2114,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
             }
             lBreak.obj = o;
             lBreak.pos = pos;
+            lBreak.nextBreakablePosition = nextBreakable;
             lBreak.increment();
             previousLineBrokeCleanly = true;
             return lBreak;
@@ -2118,6 +2126,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
             tmpW = 0;
             lBreak.obj = o;
             lBreak.pos = pos;
+            lBreak.nextBreakablePosition = nextBreakable;
             // Auto-wrapping text should not wrap in the middle of a word once
             // it has had an
             // opportunity to break after a word.
@@ -2129,6 +2138,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
             // adding the end width forces a break.
             lBreak.obj = o;
             lBreak.pos = pos;
+            lBreak.nextBreakablePosition = nextBreakable;
             midWordBreak &= (breakWords || breakAll);
           }
 
@@ -2169,6 +2179,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
           if (autoWrap && o->style()->breakOnlyAfterWhiteSpace()) {
             lBreak.obj = o;
             lBreak.pos = pos;
+            lBreak.nextBreakablePosition = nextBreakable;
           }
         }
 
@@ -2224,6 +2235,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
             tmpW = 0;
             lBreak.obj = next;
             lBreak.pos = 0;
+            lBreak.nextBreakablePosition = -1;
           }
         }
       }
@@ -2258,10 +2270,12 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
         tmpW = 0;
         lBreak.obj = next;
         lBreak.pos = 0;
+        lBreak.nextBreakablePosition = -1;
       }
     }
 
     o = next;
+    nextBreakable = -1;
 
     // Clear out our character space bool, since inline <pre>s don't collapse
     // whitespace
@@ -2276,6 +2290,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
   if (w + tmpW <= width || lastWS == NOWRAP) {
     lBreak.obj = 0;
     lBreak.pos = 0;
+    lBreak.nextBreakablePosition = -1;
   }
 
 end:
@@ -2290,6 +2305,7 @@ end:
       } else {
         lBreak.obj = last;
         lBreak.pos = last->isText() ? last->length() : 0;
+        lBreak.nextBreakablePosition = -1;
       }
     } else if (lBreak.obj) {
       if (last != o && !last->isListMarker()) {
@@ -2297,12 +2313,14 @@ end:
         // word (except for list markers)
         lBreak.obj = o;
         lBreak.pos = 0;
+        lBreak.nextBreakablePosition = -1;
       } else {
         // Don't ever break in the middle of a word if we can help it.
         // There's no room at all. We just have to be on this line,
         // even though we'll spill out.
         lBreak.obj = o;
         lBreak.pos = pos;
+        lBreak.nextBreakablePosition = -1;
       }
     }
   }
