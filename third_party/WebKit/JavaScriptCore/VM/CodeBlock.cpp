@@ -302,7 +302,7 @@ void CodeBlock::dump(ExecState* exec) const {
     printf("\nStructureIDs:\n");
     size_t i = 0;
     do {
-      printStructureIDs(&instructions[structureIDInstructions[i]]);
+      printStructureIDs(&instructions[structureIDInstructions[i].opcodeIndex]);
       ++i;
     } while (i < structureIDInstructions.size());
   }
@@ -980,13 +980,11 @@ void CodeBlock::dump(ExecState* exec,
 
 CodeBlock::~CodeBlock() {
   size_t size = structureIDInstructions.size();
-  for (size_t i = 0; i < size; ++i)
-    derefStructureIDs(&instructions[structureIDInstructions[i]]);
-
-  size = structureIDAccessStubs.size();
-  for (size_t i = 0; i < size; ++i)
-    fastFree(structureIDAccessStubs[i]);
-
+  for (size_t i = 0; i < size; ++i) {
+    derefStructureIDs(&instructions[structureIDInstructions[i].opcodeIndex]);
+    if (structureIDInstructions[i].stubRoutine)
+      fastFree(structureIDInstructions[i].stubRoutine);
+  }
 #if ENABLE(CTI)
   if (ctiCode)
     fastFree(ctiCode);
