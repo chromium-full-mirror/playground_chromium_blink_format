@@ -62,6 +62,9 @@ class RefCounted : Noncopyable {
 
   int refCount() const { return m_refCount; }
 
+ protected:
+  ~RefCounted() {}
+
  private:
   int m_refCount;
 #ifndef NDEBUG
