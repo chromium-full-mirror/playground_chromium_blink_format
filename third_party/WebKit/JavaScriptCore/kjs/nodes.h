@@ -1573,6 +1573,7 @@ class EqualNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual OpcodeID opcode() const JSC_FAST_CALL { return op_eq; }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const { return PrecEquality; }
@@ -1607,6 +1608,7 @@ class StrictEqualNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual OpcodeID opcode() const JSC_FAST_CALL { return op_stricteq; }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const { return PrecEquality; }
