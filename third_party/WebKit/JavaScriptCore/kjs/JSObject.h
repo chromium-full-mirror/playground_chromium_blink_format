@@ -441,6 +441,7 @@ inline void JSObject::putDirect(const Identifier& propertyName,
     m_structureID->propertyMap().put(propertyName, value, attributes,
                                      checkReadOnly, this, slot,
                                      m_propertyStorage);
+    m_structureID->clearEnumerationCache();
     return;
   }
 

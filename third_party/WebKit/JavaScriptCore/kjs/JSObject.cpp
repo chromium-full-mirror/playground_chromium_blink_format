@@ -508,6 +508,7 @@ JSGlobalObject* JSObject::toGlobalObject(ExecState*) const {
 void JSObject::removeDirect(const Identifier& propertyName) {
   if (m_structureID->isDictionary()) {
     m_structureID->propertyMap().remove(propertyName, m_propertyStorage);
+    m_structureID->clearEnumerationCache();
     return;
   }
 

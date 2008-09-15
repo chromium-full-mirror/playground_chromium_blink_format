@@ -133,6 +133,8 @@ class StructureID : public RefCounted<StructureID> {
                            StructureID* newStructureID,
                            JSObject* slotBase);
 
+  void clearEnumerationCache() { m_cachedPropertyNameArray.clear(); }
+
  private:
   typedef std::pair<RefPtr<UString::Rep>, unsigned> TransitionTableKey;
   typedef HashMap<TransitionTableKey,
