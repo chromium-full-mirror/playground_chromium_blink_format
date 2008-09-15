@@ -454,7 +454,7 @@ bool JSObject::getPropertyAttributes(ExecState* exec,
 
 void JSObject::getPropertyNames(ExecState* exec,
                                 PropertyNameArray& propertyNames) {
-  m_structureID->propertyMap().getEnumerablePropertyNames(propertyNames);
+  m_structureID->getEnumerablePropertyNames(propertyNames);
 
   // Add properties from the static hashtables of properties
   for (const ClassInfo* info = classInfo(); info; info = info->parentClass) {
