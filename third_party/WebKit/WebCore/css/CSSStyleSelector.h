@@ -224,9 +224,7 @@ class CSSStyleSelector : Noncopyable {
 
   class SelectorChecker : public Noncopyable {
    public:
-    SelectorChecker(Document*,
-                    bool strictParsing,
-                    bool collectRulesOnly = true);
+    SelectorChecker(Document*, bool strictParsing);
 
     bool checkSelector(CSSSelector*, Element*) const;
     SelectorMatch checkSelector(CSSSelector*,
