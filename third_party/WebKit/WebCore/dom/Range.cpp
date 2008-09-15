@@ -435,17 +435,17 @@ short Range::compareBoundaryPoints(CompareHow how,
                                    sourceRange->m_start.container(),
                                    sourceRange->m_start.offset());
     case START_TO_END:
-      return compareBoundaryPoints(m_start.container(), m_start.offset(),
-                                   sourceRange->m_end.container(),
-                                   sourceRange->m_end.offset());
+      return compareBoundaryPoints(m_end.container(), m_end.offset(),
+                                   sourceRange->m_start.container(),
+                                   sourceRange->m_start.offset());
     case END_TO_END:
       return compareBoundaryPoints(m_end.container(), m_end.offset(),
                                    sourceRange->m_end.container(),
                                    sourceRange->m_end.offset());
     case END_TO_START:
-      return compareBoundaryPoints(m_end.container(), m_end.offset(),
-                                   sourceRange->m_start.container(),
-                                   sourceRange->m_start.offset());
+      return compareBoundaryPoints(m_start.container(), m_start.offset(),
+                                   sourceRange->m_end.container(),
+                                   sourceRange->m_end.offset());
   }
 
   ec = SYNTAX_ERR;
