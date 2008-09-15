@@ -66,6 +66,14 @@ Scrollbar::Scrollbar(ScrollbarClient* client,
       m_overlapsResizer(false) {
   if (!m_theme)
     m_theme = ScrollbarTheme::nativeTheme();
+
+  // FIXME: This is ugly and would not be necessary if we fix cross-platform
+  // code to actually query for
+  // scrollbar thickness and use it when sizing scrollbars (rather than leaving
+  // one dimension of the scrollbar
+  // alone when sizing).
+  int thickness = m_theme->scrollbarThickness(controlSize);
+  Widget::setFrameGeometry(IntRect(0, 0, thickness, thickness));
 }
 
 Scrollbar::~Scrollbar() {
@@ -141,6 +149,14 @@ bool Scrollbar::scroll(ScrollDirection direction,
   return true;
 }
 
+void Scrollbar::updateThumbPosition() {
+  theme()->invalidateParts(this, ForwardTrackPart | BackTrackPart | ThumbPart);
+}
+
+void Scrollbar::updateThumbProportion() {
+  theme()->invalidateParts(this, ForwardTrackPart | BackTrackPart | ThumbPart);
+}
+
 void Scrollbar::paint(GraphicsContext* context, const IntRect& damageRect) {
   if (context->updatingControlTints() && theme()->supportsControlTints()) {
     invalidate();
@@ -167,7 +183,8 @@ void Scrollbar::autoscrollPressedPart(double delay) {
   // Handle the track.
   if ((m_pressedPart == BackTrackPart || m_pressedPart == ForwardTrackPart) &&
       thumbUnderMouse()) {
-    invalidatePart(m_pressedPart);
+    invalidatePart(m_pressedPart);  // FIXME: Switch to the theme API once
+                                    // PlatformScrollbarSafari/Qt are converted.
     m_hoveredPart = ThumbPart;
     return;
   }
@@ -186,7 +203,8 @@ void Scrollbar::startTimerIfNeeded(double delay) {
   // with us.
   if ((m_pressedPart == BackTrackPart || m_pressedPart == ForwardTrackPart) &&
       thumbUnderMouse()) {
-    invalidatePart(m_pressedPart);
+    invalidatePart(m_pressedPart);  // FIXME: Switch to the theme API once
+                                    // PlatformScrollbarSafari/Qt are converted.
     m_hoveredPart = ThumbPart;
     return;
   }

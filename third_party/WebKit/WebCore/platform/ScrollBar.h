@@ -106,8 +106,8 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   ScrollbarTheme* theme() const { return m_theme; }
 
  protected:
-  virtual void updateThumbPosition() = 0;
-  virtual void updateThumbProportion() = 0;
+  virtual void updateThumbPosition();
+  virtual void updateThumbProportion();
 
   // FIXME: This two methods will not need to be virtual eventually.
   virtual void invalidatePart(ScrollbarPart part) {}
