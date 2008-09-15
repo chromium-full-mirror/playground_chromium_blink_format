@@ -101,7 +101,6 @@ class RegisterFile : Noncopyable {
     ReturnValueRegister,
     ArgumentStartRegister,
     ArgumentCount,
-    CalledAsConstructor,
     Callee,
     OptionalCalleeActivation,
     CTIReturnEIP,

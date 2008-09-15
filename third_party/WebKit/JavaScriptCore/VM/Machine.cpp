@@ -470,7 +470,6 @@ ALWAYS_INLINE void Machine::initializeCallFrame(Register* callFrame,
                                                 int returnValueRegister,
                                                 int argv,
                                                 int argc,
-                                                int calledAsConstructor,
                                                 JSValue* function) {
   callFrame[RegisterFile::CallerCodeBlock] = codeBlock;
   callFrame[RegisterFile::ReturnVPC] = vPC + 1;
@@ -482,7 +481,6 @@ ALWAYS_INLINE void Machine::initializeCallFrame(Register* callFrame,
              // object)
   callFrame[RegisterFile::ArgumentCount] =
       argc;  // original argument count (for the sake of the "arguments" object)
-  callFrame[RegisterFile::CalledAsConstructor] = calledAsConstructor;
   callFrame[RegisterFile::Callee] = function;
   callFrame[RegisterFile::OptionalCalleeActivation] = nullJSValue;
 }
@@ -718,8 +716,6 @@ void Machine::dumpRegisters(const CodeBlock* codeBlock,
   printf("[ArgumentStartRegister]    | %10p | %10p \n", it, (*it).v());
   ++it;
   printf("[ArgumentCount]            | %10p | %10p \n", it, (*it).v());
-  ++it;
-  printf("[CalledAsConstructor]      | %10p | %10p \n", it, (*it).v());
   ++it;
   printf("[Callee]                   | %10p | %10p \n", it, (*it).v());
   ++it;
@@ -959,7 +955,7 @@ JSValue* Machine::execute(ProgramNode* programNode,
   Register* callFrame = m_registerFile.base() + oldSize;
 
   // a 0 codeBlock indicates a built-in caller
-  initializeCallFrame(callFrame, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  initializeCallFrame(callFrame, 0, 0, 0, 0, 0, 0, 0, 0);
 
   Register* r =
       callFrame + RegisterFile::CallFrameHeaderSize + codeBlock->numVars;
@@ -1036,8 +1032,7 @@ JSValue* Machine::execute(FunctionBodyNode* functionBodyNode,
     (*++dst) = *it;
 
   // a 0 codeBlock indicates a built-in caller
-  initializeCallFrame(callFrame, 0, 0, 0, callFrame, 0, argv, argc, 0,
-                      function);
+  initializeCallFrame(callFrame, 0, 0, 0, callFrame, 0, argv, argc, function);
 
   CodeBlock* newCodeBlock = &functionBodyNode->byteCode(scopeChain);
   Register* r = slideRegisterWindowForCall(exec, newCodeBlock, &m_registerFile,
@@ -1136,7 +1131,7 @@ JSValue* Machine::execute(EvalNode* evalNode,
   Register* callFrame = m_registerFile.base() + registerOffset;
 
   // a 0 codeBlock indicates a built-in caller
-  initializeCallFrame(callFrame, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  initializeCallFrame(callFrame, 0, 0, 0, 0, 0, 0, 0, 0);
 
   Register* r =
       callFrame + RegisterFile::CallFrameHeaderSize + codeBlock->numVars;
@@ -3482,7 +3477,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
       Register* callFrame = r + firstArg - RegisterFile::CallFrameHeaderSize;
       initializeCallFrame(callFrame, codeBlock, vPC, scopeChain, r, dst,
-                          firstArg, argCount, 0, v);
+                          firstArg, argCount, v);
       exec->m_callFrame = callFrame;
 
       if (callType == CallTypeJS) {
@@ -3578,12 +3573,6 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         scopeChain->deref();
 
       JSValue* returnValue = r[result].jsValue(exec);
-      if (callFrame[RegisterFile::CalledAsConstructor].i() &&
-          !returnValue->isObject()) {
-        JSValue* thisObject =
-            callFrame[RegisterFile::CallFrameHeaderSize].jsValue(exec);
-        returnValue = thisObject;
-      }
 
       codeBlock = callFrame[RegisterFile::CallerCodeBlock].codeBlock();
       if (!codeBlock)
@@ -3651,7 +3640,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
         Register* callFrame = r + firstArg - RegisterFile::CallFrameHeaderSize;
         initializeCallFrame(callFrame, codeBlock, vPC, scopeChain, r, dst,
-                            firstArg, argCount, 1, constructor);
+                            firstArg, argCount, constructor);
         exec->m_callFrame = callFrame;
 
         r = slideRegisterWindowForCall(exec, newCodeBlock, registerFile,
@@ -3695,6 +3684,26 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       exceptionValue =
           createNotAConstructorError(exec, constrVal, vPC, codeBlock);
       goto vm_throw;
+    }
+    BEGIN_OPCODE(op_construct_verify) {
+      /* construct_verify dst(r) override(r)
+
+         Verifies that register dst holds an object. If not, moves
+         the object in register override to register dst.
+      */
+
+      int dst = vPC[1].u.operand;
+      ;
+      if (LIKELY(r[dst].jsValue(exec)->isObject())) {
+        vPC += 3;
+        NEXT_OPCODE;
+      }
+
+      int override = vPC[2].u.operand;
+      r[dst] = r[override];
+
+      vPC += 3;
+      NEXT_OPCODE;
     }
     BEGIN_OPCODE(op_push_scope) {
       /* push_scope scope(r)
@@ -4669,7 +4678,7 @@ void* Machine::cti_op_call_JSFunction(CTI_ARGS) {
 
   Register* callFrame = r + firstArg - RegisterFile::CallFrameHeaderSize;
   machine->initializeCallFrame(callFrame, codeBlock, ARG_instr5, scopeChain, r,
-                               0 /*dst*/, firstArg, argCount, 0, funcVal);
+                               0 /*dst*/, firstArg, argCount, funcVal);
   exec->m_callFrame = callFrame;
 
   r = slideRegisterWindowForCall(exec, newCodeBlock, registerFile, registerBase,
@@ -4712,7 +4721,7 @@ JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
     Register* oldCallFrame = exec->m_callFrame;
     Register* callFrame = r + firstArg - RegisterFile::CallFrameHeaderSize;
     machine->initializeCallFrame(callFrame, codeBlock, ARG_instr5, scopeChain,
-                                 r, 0 /*dst*/, firstArg, argCount, 0, funcVal);
+                                 r, 0 /*dst*/, firstArg, argCount, funcVal);
     exec->m_callFrame = callFrame;
 
     if (*ARG_profilerReference)
@@ -4768,14 +4777,6 @@ JSValue* Machine::cti_op_ret(CTI_ARGS) {
   if (codeBlock->needsFullScopeChain)
     scopeChain->deref();
 
-  JSValue* returnValue = ARG_src1;
-  if (callFrame[RegisterFile::CalledAsConstructor].i() &&
-      !returnValue->isObject()) {
-    JSValue* thisObject =
-        callFrame[RegisterFile::CallFrameHeaderSize].jsValue(exec);
-    returnValue = thisObject;
-  }
-
   codeBlock = callFrame[RegisterFile::CallerCodeBlock].codeBlock();
   if (codeBlock) {
     machine->setScopeChain(
@@ -4790,7 +4791,7 @@ JSValue* Machine::cti_op_ret(CTI_ARGS) {
   ARG_setCodeBlock(codeBlock);
   ARG_setR(r);
 
-  return returnValue;
+  return ARG_src1;
 }
 
 JSValue* Machine::cti_op_new_array(CTI_ARGS) {
@@ -4873,7 +4874,7 @@ void* Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
 
   Register* callFrame = r + firstArg - RegisterFile::CallFrameHeaderSize;
   machine->initializeCallFrame(callFrame, codeBlock, ARG_instr4, scopeChain, r,
-                               0 /*dst*/, firstArg, argCount, 1, constructor);
+                               0 /*dst*/, firstArg, argCount, constructor);
   exec->m_callFrame = callFrame;
 
   r = slideRegisterWindowForCall(exec, newCodeBlock, registerFile, registerBase,
@@ -4892,6 +4893,18 @@ void* Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
   ARG_setCodeBlock(codeBlock);
   ARG_setR(r);
   return codeBlock->ctiCode;
+}
+
+void Machine::cti_op_construct_verify(CTI_ARGS) {
+  ExecState* exec = ARG_exec;
+  Register* r = ARG_r;
+  int dst = ARG_int1;
+
+  if (LIKELY(r[dst].jsValue(exec)->isObject()))
+    return;
+
+  int override = ARG_int2;
+  r[dst] = r[override];
 }
 
 JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
@@ -4918,8 +4931,7 @@ JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
     Register* oldCallFrame = exec->m_callFrame;
     Register* callFrame = r + firstArg - RegisterFile::CallFrameHeaderSize;
     machine->initializeCallFrame(callFrame, codeBlock, ARG_instr5, scopeChain,
-                                 r, 0 /*dst*/, firstArg, argCount, 1,
-                                 constrVal);
+                                 r, 0 /*dst*/, firstArg, argCount, constrVal);
     exec->m_callFrame = callFrame;
 
     if (*ARG_profilerReference)

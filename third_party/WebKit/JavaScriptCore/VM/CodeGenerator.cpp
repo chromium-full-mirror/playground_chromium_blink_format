@@ -1149,9 +1149,8 @@ RegisterID* CodeGenerator::emitCall(OpcodeID opcodeID,
                                           // instruction stream, to avoid an
                                           // explicit instruction for copying or
                                           // loading it.
-  instructions().append(argv.size() ? argv[0]->index()
-                                    : m_temporaries.size());  // argv
-  instructions().append(argv.size());                         // argc
+  instructions().append(argv[0]->index());  // argv
+  instructions().append(argv.size());       // argc
   return dst;
 }
 
@@ -1196,9 +1195,13 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
   instructions().append(dst->index());
   instructions().append(func->index());
   instructions().append(funcProto->index());
-  instructions().append(argv.size() ? argv[0]->index()
-                                    : m_temporaries.size());  // argv
-  instructions().append(argv.size());                         // argc
+  instructions().append(argv[0]->index());  // argv
+  instructions().append(argv.size());       // argc
+
+  emitOpcode(op_construct_verify);
+  instructions().append(dst->index());
+  instructions().append(argv[0]->index());
+
   return dst;
 }
 

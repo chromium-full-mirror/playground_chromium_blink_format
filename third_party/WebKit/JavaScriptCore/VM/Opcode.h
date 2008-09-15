@@ -76,7 +76,8 @@ namespace JSC {
                                                       macro(op_new_func) macro(op_new_func_exp) macro(           \
                                                           op_call) macro(op_call_eval) macro(op_ret)             \
                                                                                                                  \
-                                                          macro(op_construct)                                    \
+                                                          macro(                                                 \
+                                                              op_construct) macro(op_construct_verify)           \
                                                                                                                  \
                                                               macro(op_get_pnames) macro(                        \
                                                                   op_next_pname)                                 \
