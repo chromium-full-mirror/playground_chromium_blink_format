@@ -152,7 +152,7 @@ PassRefPtr<QtInstance> QtInstance::getQtInstance(
       return instance;
   }
 
-  RefPtr<QtInstance> ret = adoptRef(new QtInstance(o, rootObject));
+  RefPtr<QtInstance> ret = QtInstance::create(o, rootObject);
   cachedInstances.insert(o, ret.get());
 
   return ret.release();
@@ -162,11 +162,13 @@ RuntimeObjectImp* QtInstance::getRuntimeObject(
     ExecState* exec,
     PassRefPtr<QtInstance> instance) {
   JSLock lock(false);
+  QtInstance* qtInstance = instance.get();
   RuntimeObjectImp* ret =
-      static_cast<RuntimeObjectImp*>(cachedObjects.value(instance.get()));
+      static_cast<RuntimeObjectImp*>(cachedObjects.value(qtInstance));
   if (!ret) {
     ret = new (exec) QtRuntimeObjectImp(exec, instance);
-    cachedObjects.insert(instance.get(), ret);
+    cachedObjects.insert(qtInstance, ret);
+    ret = static_cast<RuntimeObjectImp*>(cachedObjects.value(qtInstance));
   }
   return ret;
 }

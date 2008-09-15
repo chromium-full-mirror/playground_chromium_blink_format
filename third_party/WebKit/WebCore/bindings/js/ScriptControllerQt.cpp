@@ -56,7 +56,8 @@ ScriptController::createScriptInstanceForWidget(WebCore::Widget* widget) {
   QWidget* nativeWidget = widget->nativeWidget();
   if (!nativeWidget)
     return 0;
-  return JSC::Bindings::QtInstance::create(nativeWidget, bindingRootObject());
+  return JSC::Bindings::QtInstance::getQtInstance(nativeWidget,
+                                                  bindingRootObject());
 }
 }
 // vim: ts=4 sw=4 et
