@@ -607,12 +607,6 @@ IntRect PlatformScrollbar::windowClipRect() const {
     clipRect.intersect(m_client->windowClipRect());
   return clipRect;
 }
-
-void PlatformScrollbar::paintGripper(HDC hdc, const IntRect& rect) const {}
-
-IntRect PlatformScrollbar::gripperRect(const IntRect& thumbRect) const {
-  return IntRect();
-}
 }
 
 #endif  // USE(SAFARI_THEME)

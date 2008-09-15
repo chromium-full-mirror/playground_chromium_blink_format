@@ -53,7 +53,7 @@ class ScrollbarTheme {
   virtual void themeChanged() {}
 
   static ScrollbarTheme*
-  nativeTheme();  // Must be implemented by the theme subclass.
+  nativeTheme();  // Must be implemented to return the correct theme subclass.
 };
 }
 #endif
