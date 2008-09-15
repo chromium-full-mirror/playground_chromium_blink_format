@@ -145,7 +145,7 @@ void ScrollbarThemeWin::themeChanged() {
 }
 
 bool ScrollbarThemeWin::invalidateOnMouseEnterExit() {
-  return runningOnVista;
+  return runningVista;
 }
 
 bool ScrollbarThemeWin::hasThumb(Scrollbar* scrollbar) {
