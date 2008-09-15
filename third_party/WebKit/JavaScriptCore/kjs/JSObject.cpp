@@ -408,8 +408,7 @@ bool JSObject::implementsHasInstance() const {
   return false;
 }
 
-bool JSObject::hasInstance(ExecState* exec, JSValue* value) {
-  JSValue* proto = get(exec, exec->propertyNames().prototype);
+bool JSObject::hasInstance(ExecState* exec, JSValue* value, JSValue* proto) {
   if (!proto->isObject()) {
     throwError(
         exec, TypeError,

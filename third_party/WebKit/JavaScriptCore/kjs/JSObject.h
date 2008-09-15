@@ -123,7 +123,7 @@ class JSObject : public JSCell {
   virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const;
 
   virtual bool implementsHasInstance() const;
-  virtual bool hasInstance(ExecState*, JSValue*);
+  virtual bool hasInstance(ExecState*, JSValue*, JSValue* prototypeProperty);
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 

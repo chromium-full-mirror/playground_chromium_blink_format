@@ -316,7 +316,9 @@ bool JSCallbackObject<Base>::implementsHasInstance() const {
 }
 
 template <class Base>
-bool JSCallbackObject<Base>::hasInstance(ExecState* exec, JSValue* value) {
+bool JSCallbackObject<Base>::hasInstance(ExecState* exec,
+                                         JSValue* value,
+                                         JSValue*) {
   JSContextRef execRef = toRef(exec);
   JSObjectRef thisRef = toRef(this);
 

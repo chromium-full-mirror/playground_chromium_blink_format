@@ -2275,10 +2275,14 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       NEXT_OPCODE;
     }
     BEGIN_OPCODE(op_instanceof) {
-      /* instanceof dst(r) value(r) constructor(r)
+      /* instanceof dst(r) value(r) constructor(r) constructorProto(r)
 
          Tests whether register value is an instance of register
-         constructor, and puts the boolean result in register dst.
+         constructor, and puts the boolean result in register
+         dst. Register constructorProto must contain the "prototype"
+         property (not the actual prototype) of the object in
+         register constructor. This lookup is separated so that
+         polymorphic inline caching can apply.
 
          Raises an exception if register constructor is not an
          object.
@@ -2286,6 +2290,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       int dst = (++vPC)->u.operand;
       int value = (++vPC)->u.operand;
       int base = (++vPC)->u.operand;
+      int baseProto = (++vPC)->u.operand;
 
       JSValue* baseVal = r[base].jsValue(exec);
 
@@ -2295,7 +2300,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       JSObject* baseObj = static_cast<JSObject*>(baseVal);
       r[dst] =
           jsBoolean(baseObj->implementsHasInstance()
-                        ? baseObj->hasInstance(exec, r[value].jsValue(exec))
+                        ? baseObj->hasInstance(exec, r[value].jsValue(exec),
+                                               r[baseProto].jsValue(exec))
                         : false);
 
       ++vPC;
@@ -4560,9 +4566,11 @@ JSValue* Machine::cti_op_instanceof(CTI_ARGS) {
   }
 
   JSObject* baseObj = static_cast<JSObject*>(baseVal);
-  JSValue* result = jsBoolean(baseObj->implementsHasInstance()
-                                  ? baseObj->hasInstance(exec, ARG_src1)
-                                  : false);
+  JSValue* basePrototype = ARG_src3;
+  JSValue* result =
+      jsBoolean(baseObj->implementsHasInstance()
+                    ? baseObj->hasInstance(exec, ARG_src1, basePrototype)
+                    : false);
   VM_CHECK_EXCEPTION_AT_END();
   return result;
 }

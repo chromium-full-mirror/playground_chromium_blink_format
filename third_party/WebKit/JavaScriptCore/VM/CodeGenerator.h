@@ -294,9 +294,8 @@ class CodeGenerator {
 
   RegisterID* emitInstanceOf(RegisterID* dst,
                              RegisterID* value,
-                             RegisterID* base) {
-    return emitBinaryOp(op_instanceof, dst, value, base);
-  }
+                             RegisterID* base,
+                             RegisterID* basePrototype);
   RegisterID* emitTypeOf(RegisterID* dst, RegisterID* src) {
     return emitUnaryOp(op_typeof, dst, src);
   }
