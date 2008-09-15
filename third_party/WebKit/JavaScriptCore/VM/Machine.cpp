@@ -3592,7 +3592,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       NEXT_OPCODE;
     }
     BEGIN_OPCODE(op_construct) {
-      /* construct dst(r) constr(r) firstArg(r) argCount(n)
+      /* construct dst(r) constr(r) constrProto(r) firstArg(r) argCount(n)
 
          Invoke register "constr" as a constructor. For JS
          functions, the calling convention is exactly as for the
@@ -3600,10 +3600,15 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
          created Object. For native constructors, a null "this"
          value is passed. In either case, the firstArg and argCount
          registers are interpreted as for the "call" opcode.
+
+         Register constrProto must contain the prototype property of
+         register constsr. This is to enable polymorphic inline
+         caching of this lookup.
       */
 
       int dst = (++vPC)->u.operand;
       int constr = (++vPC)->u.operand;
+      int constrProto = (++vPC)->u.operand;
       int firstArg = (++vPC)->u.operand;
       int argCount = (++vPC)->u.operand;
 
@@ -3621,7 +3626,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
           (*enabledProfilerReference)->willExecute(exec, constructor);
 
         JSObject* prototype;
-        JSValue* p = constructor->get(exec, exec->propertyNames().prototype);
+        JSValue* p = r[constrProto].jsValue(exec);
         if (p->isObject())
           prototype = static_cast<JSObject*>(p);
         else
@@ -4825,8 +4830,9 @@ void* Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
   Register* registerBase = registerFile->base();
 
   JSValue* constrVal = ARG_src1;
-  int firstArg = ARG_int2;
-  int argCount = ARG_int3;
+  JSValue* constrProtoVal = ARG_src2;
+  int firstArg = ARG_int3;
+  int argCount = ARG_int4;
 
   ConstructData constructData;
 #ifndef NDEBUG
@@ -4834,7 +4840,7 @@ void* Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
 #endif
       constrVal->getConstructData(constructData);
 
-  // Removing this line of code causes a measurable regression on squirrelfish.
+  // Removing this line of code causes a measurable regression on sunspider.
   JSObject* constructor = static_cast<JSObject*>(constrVal);
 
   ASSERT(constructType == ConstructTypeJS);
@@ -4843,7 +4849,7 @@ void* Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
     (*ARG_profilerReference)->willExecute(exec, constructor);
 
   JSObject* prototype;
-  JSValue* p = constructor->get(exec, exec->propertyNames().prototype);
+  JSValue* p = constrProtoVal;
   if (p->isObject())
     prototype = static_cast<JSObject*>(p);
   else
@@ -4884,8 +4890,8 @@ JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
   Register* r = ARG_r;
 
   JSValue* constrVal = ARG_src1;
-  int firstArg = ARG_int2;
-  int argCount = ARG_int3;
+  int firstArg = ARG_int3;
+  int argCount = ARG_int4;
 
   ConstructData constructData;
   ConstructType constructType = constrVal->getConstructData(constructData);

@@ -1170,6 +1170,11 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
   // op_construct will read "func" before writing out the call frame, so this
   // is safe.
 
+  RefPtr<RegisterID> protectFunc = func;
+
+  // Reserve space for prototype
+  RefPtr<RegisterID> funcProto = newTemporary();
+
   // Reserve space for call frame.
   Vector<RefPtr<RegisterID>, RegisterFile::CallFrameHeaderSize> callFrame;
   for (int i = 0; i < RegisterFile::CallFrameHeaderSize; ++i)
@@ -1185,9 +1190,12 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
     emitNode(argv.last().get(), n);
   }
 
+  emitGetById(funcProto.get(), func, globalExec()->propertyNames().prototype);
+
   emitOpcode(op_construct);
   instructions().append(dst->index());
   instructions().append(func->index());
+  instructions().append(funcProto->index());
   instructions().append(argv.size() ? argv[0]->index()
                                     : m_temporaries.size());  // argv
   instructions().append(argv.size());                         // argc
