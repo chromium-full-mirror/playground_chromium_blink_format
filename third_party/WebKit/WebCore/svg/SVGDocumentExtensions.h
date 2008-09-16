@@ -48,10 +48,6 @@ class SVGDocumentExtensions {
   SVGDocumentExtensions(Document*);
   ~SVGDocumentExtensions();
 
-  PassRefPtr<EventListener> createSVGEventListener(const String& functionName,
-                                                   const String& code,
-                                                   Node*);
-
   void addTimeContainer(SVGSVGElement*);
   void removeTimeContainer(SVGSVGElement*);
 

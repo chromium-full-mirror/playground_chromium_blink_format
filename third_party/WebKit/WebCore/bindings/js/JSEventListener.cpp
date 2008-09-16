@@ -108,7 +108,7 @@ void JSAbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
     else {
       if (!retval->isUndefinedOrNull() && event->storesResultAsString())
         event->storeResult(retval->toString(exec));
-      if (m_isHTML) {
+      if (m_isAttachedToEventTargetNode) {
         bool retvalbool;
         if (retval->getBoolean(retvalbool) && !retvalbool)
           event->preventDefault();
@@ -120,20 +120,24 @@ void JSAbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
   }
 }
 
-bool JSAbstractEventListener::isHTMLEventListener() const {
-  return m_isHTML;
+bool JSAbstractEventListener::isAttachedToEventTargetNode() const {
+  return m_isAttachedToEventTargetNode;
 }
 
 // -------------------------------------------------------------------------
 
-JSUnprotectedEventListener::JSUnprotectedEventListener(JSObject* listener,
-                                                       JSDOMWindow* window,
-                                                       bool isHTML)
-    : JSAbstractEventListener(isHTML), m_listener(listener), m_window(window) {
+JSUnprotectedEventListener::JSUnprotectedEventListener(
+    JSObject* listener,
+    JSDOMWindow* window,
+    bool isAttachedToEventTargetNode)
+    : JSAbstractEventListener(isAttachedToEventTargetNode),
+      m_listener(listener),
+      m_window(window) {
   if (m_listener) {
     JSDOMWindow::UnprotectedListenersMap& listeners =
-        isHTML ? window->jsUnprotectedHTMLEventListeners()
-               : window->jsUnprotectedEventListeners();
+        isAttachedToEventTargetNode
+            ? window->jsUnprotectedEventListenersAttachedToEventTargetNodes()
+            : window->jsUnprotectedEventListeners();
     listeners.set(m_listener, this);
   }
 }
@@ -141,8 +145,9 @@ JSUnprotectedEventListener::JSUnprotectedEventListener(JSObject* listener,
 JSUnprotectedEventListener::~JSUnprotectedEventListener() {
   if (m_listener && m_window) {
     JSDOMWindow::UnprotectedListenersMap& listeners =
-        isHTMLEventListener() ? m_window->jsUnprotectedHTMLEventListeners()
-                              : m_window->jsUnprotectedEventListeners();
+        isAttachedToEventTargetNode()
+            ? m_window->jsUnprotectedEventListenersAttachedToEventTargetNodes()
+            : m_window->jsUnprotectedEventListeners();
     listeners.remove(m_listener);
   }
 }
@@ -172,12 +177,15 @@ static WTF::RefCountedLeakCounter eventListenerCounter("EventListener");
 
 JSEventListener::JSEventListener(JSObject* listener,
                                  JSDOMWindow* window,
-                                 bool isHTML)
-    : JSAbstractEventListener(isHTML), m_listener(listener), m_window(window) {
+                                 bool isAttachedToEventTargetNode)
+    : JSAbstractEventListener(isAttachedToEventTargetNode),
+      m_listener(listener),
+      m_window(window) {
   if (m_listener) {
     JSDOMWindow::ListenersMap& listeners =
-        isHTML ? m_window->jsHTMLEventListeners()
-               : m_window->jsEventListeners();
+        isAttachedToEventTargetNode
+            ? m_window->jsEventListenersAttachedToEventTargetNodes()
+            : m_window->jsEventListeners();
     listeners.set(m_listener, this);
   }
 #ifndef NDEBUG
@@ -188,8 +196,9 @@ JSEventListener::JSEventListener(JSObject* listener,
 JSEventListener::~JSEventListener() {
   if (m_listener && m_window) {
     JSDOMWindow::ListenersMap& listeners =
-        isHTMLEventListener() ? m_window->jsHTMLEventListeners()
-                              : m_window->jsEventListeners();
+        isAttachedToEventTargetNode()
+            ? m_window->jsEventListenersAttachedToEventTargetNodes()
+            : m_window->jsEventListeners();
     listeners.remove(m_listener);
   }
 #ifndef NDEBUG
@@ -211,7 +220,8 @@ void JSEventListener::clearWindow() {
 
 // -------------------------------------------------------------------------
 
-JSLazyEventListener::JSLazyEventListener(const String& functionName,
+JSLazyEventListener::JSLazyEventListener(LazyEventListenerType type,
+                                         const String& functionName,
                                          const String& code,
                                          JSDOMWindow* window,
                                          Node* node,
@@ -221,7 +231,8 @@ JSLazyEventListener::JSLazyEventListener(const String& functionName,
       m_code(code),
       m_parsed(false),
       m_lineNumber(lineNumber),
-      m_originalNode(node) {
+      m_originalNode(node),
+      m_type(type) {
   // We don't retain the original node because we assume it
   // will stay alive as long as this handler object is around
   // and we need to avoid a reference cycle. If JS transfers
@@ -241,10 +252,25 @@ JSObject* JSLazyEventListener::listenerObj() const {
   return m_listener;
 }
 
-JSValue* JSLazyEventListener::eventParameterName() const {
-  static ProtectedPtr<JSValue> eventString =
-      jsNontrivialString(window()->globalExec(), "event");
-  return eventString.get();
+// Helper function
+inline JSValue* eventParameterName(
+    JSLazyEventListener::LazyEventListenerType type,
+    ExecState* exec) {
+  switch (type) {
+    case JSLazyEventListener::HTMLLazyEventListener: {
+      static ProtectedPtr<JSValue> htmlEventString = jsString(exec, "event");
+      return htmlEventString.get();
+    }
+#if ENABLE(SVG)
+    case JSLazyEventListener::SVGLazyEventListener: {
+      static ProtectedPtr<JSValue> svgEventString = jsString(exec, "evt");
+      return svgEventString.get();
+    }
+#endif
+    default:
+      ASSERT_NOT_REACHED();
+      return jsUndefined();
+  }
 }
 
 void JSLazyEventListener::parseCode() const {
@@ -264,7 +290,7 @@ void JSLazyEventListener::parseCode() const {
 
   ArgList args;
   UString sourceURL(frame->loader()->url().string());
-  args.append(eventParameterName());
+  args.append(eventParameterName(m_type, exec));
   args.append(jsString(exec, m_code));
 
   // FIXME: Passing the document's URL to construct is not always correct, since
@@ -301,8 +327,9 @@ void JSLazyEventListener::parseCode() const {
 
   if (m_listener) {
     JSDOMWindow::ListenersMap& listeners =
-        isHTMLEventListener() ? window()->jsHTMLEventListeners()
-                              : window()->jsEventListeners();
+        isAttachedToEventTargetNode()
+            ? window()->jsEventListenersAttachedToEventTargetNodes()
+            : window()->jsEventListeners();
     listeners.set(m_listener, const_cast<JSLazyEventListener*>(this));
   }
 }
@@ -310,7 +337,7 @@ void JSLazyEventListener::parseCode() const {
 JSValue* getNodeEventListener(EventTargetNode* n,
                               const AtomicString& eventType) {
   if (JSAbstractEventListener* listener = static_cast<JSAbstractEventListener*>(
-          n->getHTMLEventListener(eventType))) {
+          n->eventListenerForType(eventType))) {
     if (JSValue* obj = listener->listenerObj())
       return obj;
   }

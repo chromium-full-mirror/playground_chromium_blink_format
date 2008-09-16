@@ -1729,8 +1729,8 @@ bool EventHandler::canMouseDownStartSelect(Node* node) {
 
   for (RenderObject* curr = node->renderer(); curr; curr = curr->parent())
     if (Node* node = curr->element())
-      return EventTargetNodeCast(node)->dispatchHTMLEvent(selectstartEvent,
-                                                          true, true);
+      return EventTargetNodeCast(node)->dispatchEventForType(selectstartEvent,
+                                                             true, true);
 
   return true;
 }
@@ -1741,8 +1741,8 @@ bool EventHandler::canMouseDragExtendSelect(Node* node) {
 
   for (RenderObject* curr = node->renderer(); curr; curr = curr->parent())
     if (Node* node = curr->element())
-      return EventTargetNodeCast(node)->dispatchHTMLEvent(selectstartEvent,
-                                                          true, true);
+      return EventTargetNodeCast(node)->dispatchEventForType(selectstartEvent,
+                                                             true, true);
 
   return true;
 }

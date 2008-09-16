@@ -149,9 +149,6 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   bool isOutermostSVG() const;
 
  private:
-  void addSVGWindowEventListener(const AtomicString& eventType,
-                                 const Attribute* attr);
-
   ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement,
                                  SVGNames::svgTagString,
                                  SVGNames::xAttrString,

@@ -118,7 +118,6 @@ class SVGElement : public StyledElement {
   }
 
  private:
-  void addSVGEventListener(const AtomicString& eventType, const Attribute*);
   virtual bool haveLoadedRequiredResources();
 
   Node* m_shadowParent;

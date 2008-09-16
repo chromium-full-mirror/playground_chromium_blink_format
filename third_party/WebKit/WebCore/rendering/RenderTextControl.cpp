@@ -978,7 +978,7 @@ void RenderTextControl::selectionChanged(bool userTriggered) {
                                                             selectionEnd());
   if (Frame* frame = document()->frame())
     if (frame->selection()->isRange() && userTriggered)
-      element->dispatchHTMLEvent(selectEvent, true, false);
+      element->dispatchEventForType(selectEvent, true, false);
 }
 
 void RenderTextControl::autoscroll() {
