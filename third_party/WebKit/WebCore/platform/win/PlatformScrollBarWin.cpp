@@ -25,28 +25,19 @@
  */
 
 #include "config.h"
-
-#if !USE(SAFARI_THEME)
-
 #include "PlatformScrollBar.h"
 
-#include "EventHandler.h"
 #include "FrameView.h"
-#include "Frame.h"
-#include "GraphicsContext.h"
-#include "IntRect.h"
-#include "PlatformMouseEvent.h"
-#include "SoftLinking.h"
-#include "RenderThemeWin.h"
+#include "ScrollbarClient.h"
+#include "ScrollbarTheme.h"
 
 namespace WebCore {
 
 PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
                                      ScrollbarOrientation orientation,
-                                     ScrollbarControlSize size)
-    : Scrollbar(client, orientation, size) {}
-
-PlatformScrollbar::~PlatformScrollbar() {}
+                                     ScrollbarControlSize size,
+                                     ScrollbarTheme* theme)
+    : Scrollbar(client, orientation, size, theme) {}
 
 void PlatformScrollbar::setFrameGeometry(const IntRect& rect) {
   // Get our window resizer rect and see if we overlap.  Adjust to avoid the
@@ -100,5 +91,3 @@ IntRect PlatformScrollbar::windowClipRect() const {
   return clipRect;
 }
 }
-
-#endif

@@ -55,10 +55,11 @@ class ScrollbarThemeComposite : public ScrollbarTheme {
                           const IntRect& track,
                           IntRect& startTrack,
                           IntRect& thumb,
-                          IntRect& endTrack) = 0;
+                          IntRect& endTrack);
 
-  // Assume the track is a single piece by default.
   virtual bool trackIsSinglePiece() { return true; }
+
+  virtual int minimumThumbLength(Scrollbar*);
 
   virtual void paintTrack(GraphicsContext*,
                           Scrollbar*,
