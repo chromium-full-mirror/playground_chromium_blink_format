@@ -396,6 +396,7 @@ class CTI {
   void emitPutArgConstant(unsigned value, unsigned offset);
   void emitPutResult(unsigned dst, X86Assembler::RegisterID from = X86::eax);
 
+  void emitPutCTIParam(void* value, unsigned name);
   void emitPutCTIParam(X86Assembler::RegisterID from, unsigned name);
   void emitGetCTIParam(unsigned name, X86Assembler::RegisterID to);
 
