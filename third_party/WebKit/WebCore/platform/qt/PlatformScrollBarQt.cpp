@@ -50,13 +50,13 @@ static QString tr(const char* text) {
 
 namespace WebCore {
 
-PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client, ScrollbarOrientation orientation, ScrollbarControlSize size
-    : Scrollbar(client, orientation, size)
-{
-}
+PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
+                                     ScrollbarOrientation orientation,
+                                     ScrollbarControlSize size)
+    : Scrollbar(client, orientation, size) {}
 
-bool PlatformScrollbar::handleContextMenuEvent(const PlatformMouseEvent& event)
-{
+bool PlatformScrollbar::handleContextMenuEvent(
+    const PlatformMouseEvent& event) {
 #ifndef QT_NO_CONTEXTMENU
   bool horizontal = (m_orientation == HorizontalScrollbar);
 
@@ -105,8 +105,7 @@ bool PlatformScrollbar::handleContextMenuEvent(const PlatformMouseEvent& event)
   return true;
 }
 
-void PlatformScrollbar::invalidate()
-{
+void PlatformScrollbar::invalidate() {
   // Get the root widget.
   ScrollView* outermostView = topLevel();
   if (!outermostView)
