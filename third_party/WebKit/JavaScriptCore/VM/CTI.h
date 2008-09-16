@@ -408,10 +408,10 @@ class CTI {
   JSValue* getConstantImmediateNumericArg(unsigned src);
   unsigned getDeTaggedConstantImmediate(JSValue* imm);
 
-  void CTI::emitJumpSlowCaseIfIsJSCell(X86Assembler::RegisterID reg,
-                                       unsigned opcodeIndex);
-  void CTI::emitJumpSlowCaseIfNotJSCell(X86Assembler::RegisterID reg,
-                                        unsigned opcodeIndex);
+  void emitJumpSlowCaseIfIsJSCell(X86Assembler::RegisterID reg,
+                                  unsigned opcodeIndex);
+  void emitJumpSlowCaseIfNotJSCell(X86Assembler::RegisterID reg,
+                                   unsigned opcodeIndex);
   void emitJumpSlowCaseIfNotImm(X86Assembler::RegisterID, unsigned opcodeIndex);
   void emitJumpSlowCaseIfNotImms(X86Assembler::RegisterID,
                                  X86Assembler::RegisterID,
