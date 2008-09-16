@@ -565,9 +565,6 @@ bool WebChromeClient::paintCustomScrollbar(GraphicsContext* context,
 
   WebScrollBarControlSize webSize;
   switch (size) {
-    case MiniScrollbar:
-      webSize = WebMiniScrollbar;
-      break;
     case SmallScrollbar:
       webSize = WebSmallScrollbar;
       break;
