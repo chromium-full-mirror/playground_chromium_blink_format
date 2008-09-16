@@ -97,6 +97,7 @@ typedef enum { WebCFMExecutableType, WebMachOExecutableType } WebExecutableType;
 - (NPP_GetValueProcPtr)NPP_GetValue;
 - (NPP_SetValueProcPtr)NPP_SetValue;
 - (NPP_PrintProcPtr)NPP_Print;
+- (NPPluginFuncs*)pluginFuncs;
 
 @end
 #endif
