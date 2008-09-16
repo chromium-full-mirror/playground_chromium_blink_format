@@ -29,6 +29,7 @@ class JSValue;
 
 bool equal(ExecState*, JSValue*, JSValue*);
 bool strictEqual(JSValue*, JSValue*);
+bool strictEqualSlowCase(JSValue*, JSValue*);
 JSValue* throwOutOfMemoryError(ExecState*);
 }
 

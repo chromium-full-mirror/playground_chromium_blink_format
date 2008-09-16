@@ -177,6 +177,11 @@ class JSImmediate {
            TagMask;
   }
 
+  static ALWAYS_INLINE bool areBothImmediate(const JSValue* v1,
+                                             const JSValue* v2) {
+    return isImmediate(v1) & isImmediate(v2);
+  }
+
   static ALWAYS_INLINE bool areBothImmediateNumbers(const JSValue* v1,
                                                     const JSValue* v2) {
     return reinterpret_cast<uintptr_t>(v1) & reinterpret_cast<uintptr_t>(v2) &
