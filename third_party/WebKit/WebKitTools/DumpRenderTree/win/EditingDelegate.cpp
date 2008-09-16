@@ -120,7 +120,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::shouldBeginEditingInDOMRange(
     return E_POINTER;
   }
 
-  if (::layoutTestController->dumpEditingCallbacks() && !done)
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done)
     _tprintf(TEXT("EDITING DELEGATE: shouldBeginEditingInDOMRange:%s\n"),
              dump(range));
 
@@ -137,7 +137,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::shouldEndEditingInDOMRange(
     return E_POINTER;
   }
 
-  if (::layoutTestController->dumpEditingCallbacks() && !done)
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done)
     _tprintf(TEXT("EDITING DELEGATE: shouldEndEditingInDOMRange:%s\n"),
              dump(range));
 
@@ -155,7 +155,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::shouldInsertNode(
       TEXT("WebViewInsertActionDropped"),
   };
 
-  if (::layoutTestController->dumpEditingCallbacks() && !done)
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done)
     _tprintf(TEXT("EDITING DELEGATE: shouldInsertNode:%s replacingDOMRange:%s "
                   "givenAction:%s\n"),
              dumpPath(node), dump(range), insertactionstring[action]);
@@ -179,7 +179,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::shouldInsertText(
       TEXT("WebViewInsertActionDropped"),
   };
 
-  if (::layoutTestController->dumpEditingCallbacks() && !done)
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done)
     _tprintf(TEXT("EDITING DELEGATE: shouldInsertText:%s replacingDOMRange:%s "
                   "givenAction:%s\n"),
              text ? text : TEXT(""), dump(range), insertactionstring[action]);
@@ -197,7 +197,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::shouldDeleteDOMRange(
     return E_POINTER;
   }
 
-  if (::layoutTestController->dumpEditingCallbacks() && !done)
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done)
     _tprintf(TEXT("EDITING DELEGATE: shouldDeleteDOMRange:%s\n"), dump(range));
 
   *result = m_acceptsEditing;
@@ -220,7 +220,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::shouldChangeSelectedDOMRange(
                                      TEXT("NSSelectionAffinityDownstream")};
   static LPCTSTR boolstring[] = {TEXT("FALSE"), TEXT("TRUE")};
 
-  if (::layoutTestController->dumpEditingCallbacks() && !done)
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done)
     _tprintf(TEXT("EDITING DELEGATE: shouldChangeSelectedDOMRange:%s "
                   "toDOMRange:%s affinity:%s stillSelecting:%s\n"),
              dump(currentRange), dump(proposedRange),
@@ -240,7 +240,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::shouldApplyStyle(
     return E_POINTER;
   }
 
-  if (::layoutTestController->dumpEditingCallbacks() && !done)
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done)
     _tprintf(
         TEXT("EDITING DELEGATE: shouldApplyStyle:%s toElementsInDOMRange:%s\n"),
         TEXT("'style description'") /*[[style description] UTF8String]*/,
@@ -260,7 +260,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::shouldChangeTypingStyle(
     return E_POINTER;
   }
 
-  if (::layoutTestController->dumpEditingCallbacks() && !done)
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done)
     _tprintf(TEXT("EDITING DELEGATE: shouldChangeTypingStyle:%s toStyle:%s\n"),
              TEXT("'currentStyle description'"),
              TEXT("'proposedStyle description'"));
@@ -278,7 +278,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::doPlatformCommand(
     return E_POINTER;
   }
 
-  if (::layoutTestController->dumpEditingCallbacks() && !done)
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done)
     _tprintf(TEXT("EDITING DELEGATE: doPlatformCommand:%s\n"),
              command ? command : TEXT(""));
 
@@ -288,7 +288,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::doPlatformCommand(
 
 HRESULT STDMETHODCALLTYPE EditingDelegate::webViewDidBeginEditing(
     /* [in] */ IWebNotification* notification) {
-  if (::layoutTestController->dumpEditingCallbacks() && !done) {
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done) {
     BSTR name;
     notification->name(&name);
     _tprintf(TEXT("EDITING DELEGATE: webViewDidBeginEditing:%s\n"),
@@ -300,7 +300,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::webViewDidBeginEditing(
 
 HRESULT STDMETHODCALLTYPE EditingDelegate::webViewDidChange(
     /* [in] */ IWebNotification* notification) {
-  if (::layoutTestController->dumpEditingCallbacks() && !done) {
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done) {
     BSTR name;
     notification->name(&name);
     _tprintf(TEXT("EDITING DELEGATE: webViewDidBeginEditing:%s\n"),
@@ -312,7 +312,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::webViewDidChange(
 
 HRESULT STDMETHODCALLTYPE EditingDelegate::webViewDidEndEditing(
     /* [in] */ IWebNotification* notification) {
-  if (::layoutTestController->dumpEditingCallbacks() && !done) {
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done) {
     BSTR name;
     notification->name(&name);
     _tprintf(TEXT("EDITING DELEGATE: webViewDidEndEditing:%s\n"),
@@ -324,7 +324,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::webViewDidEndEditing(
 
 HRESULT STDMETHODCALLTYPE EditingDelegate::webViewDidChangeTypingStyle(
     /* [in] */ IWebNotification* notification) {
-  if (::layoutTestController->dumpEditingCallbacks() && !done) {
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done) {
     BSTR name;
     notification->name(&name);
     _tprintf(TEXT("EDITING DELEGATE: webViewDidChangeTypingStyle:%s\n"),
@@ -336,7 +336,7 @@ HRESULT STDMETHODCALLTYPE EditingDelegate::webViewDidChangeTypingStyle(
 
 HRESULT STDMETHODCALLTYPE EditingDelegate::webViewDidChangeSelection(
     /* [in] */ IWebNotification* notification) {
-  if (::layoutTestController->dumpEditingCallbacks() && !done) {
+  if (::gLayoutTestController->dumpEditingCallbacks() && !done) {
     BSTR name;
     notification->name(&name);
     _tprintf(TEXT("EDITING DELEGATE: webViewDidChangeSelection:%s\n"),
