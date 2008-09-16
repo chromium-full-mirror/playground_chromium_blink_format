@@ -178,6 +178,7 @@ class Machine {
   static JSValue* SFX_CALL cti_op_ret(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_new_array(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_resolve(CTI_ARGS);
+  static JSValue* SFX_CALL cti_op_resolve_global(CTI_ARGS);
   static void* SFX_CALL cti_op_construct_JSConstruct(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_construct_NotJSConstruct(CTI_ARGS);
   static void SFX_CALL cti_op_construct_verify(CTI_ARGS);
