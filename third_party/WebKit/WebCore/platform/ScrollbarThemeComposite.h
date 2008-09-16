@@ -41,6 +41,7 @@ class ScrollbarThemeComposite : public ScrollbarTheme {
 
   virtual int thumbPosition(Scrollbar*);
   virtual int thumbLength(Scrollbar*);
+  virtual int trackPosition(Scrollbar*);
   virtual int trackLength(Scrollbar*);
 
  protected:

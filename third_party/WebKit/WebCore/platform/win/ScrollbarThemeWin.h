@@ -51,6 +51,8 @@ class ScrollbarThemeWin : public ScrollbarThemeComposite {
 
   virtual bool trackIsSinglePiece() { return false; }
 
+  virtual bool shouldCenterOnThumb(Scrollbar*, const PlatformMouseEvent&);
+
   virtual void paintTrack(GraphicsContext*,
                           Scrollbar*,
                           const IntRect&,

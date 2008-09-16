@@ -263,6 +263,12 @@ int ScrollbarThemeComposite::minimumThumbLength(Scrollbar* scrollbar) {
   return scrollbarThickness(scrollbar->controlSize());
 }
 
+int ScrollbarThemeComposite::trackPosition(Scrollbar* scrollbar) {
+  return (scrollbar->orientation() == HorizontalScrollbar)
+             ? trackRect(scrollbar).x()
+             : trackRect(scrollbar).y();
+}
+
 int ScrollbarThemeComposite::trackLength(Scrollbar* scrollbar) {
   return (scrollbar->orientation() == HorizontalScrollbar)
              ? trackRect(scrollbar).width()

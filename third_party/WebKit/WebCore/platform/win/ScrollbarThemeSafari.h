@@ -50,6 +50,8 @@ class ScrollbarThemeSafari : public ScrollbarThemeComposite {
 
   virtual int minimumThumbLength(Scrollbar*);
 
+  virtual bool shouldCenterOnThumb(Scrollbar*, const PlatformMouseEvent&);
+
   virtual void paintTrack(GraphicsContext*,
                           Scrollbar*,
                           const IntRect&,
