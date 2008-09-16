@@ -80,6 +80,11 @@ void RenderBox::setStyle(RenderStyle* newStyle) {
 
   RenderObject::setStyle(newStyle);
 
+  if (needsLayout() && oldStyle &&
+      (oldStyle->height().isPercent() || oldStyle->minHeight().isPercent() ||
+       oldStyle->maxHeight().isPercent()))
+    RenderBlock::removePercentHeightDescendant(this);
+
   // The root and the RenderView always paint their backgrounds/borders.
   if (isRoot() || isRenderView())
     setHasBoxDecorations(true);
@@ -187,6 +192,11 @@ void RenderBox::destroy() {
   // This must be done before we destroy the RenderObject.
   if (m_layer)
     m_layer->clearClipRect();
+
+  if (style() &&
+      (style()->height().isPercent() || style()->minHeight().isPercent() ||
+       style()->maxHeight().isPercent()))
+    RenderBlock::removePercentHeightDescendant(this);
 
   RenderObject::destroy();
 }
@@ -1716,8 +1726,10 @@ int RenderBox::calcPercentageHeight(const Length& height) {
     // if the containing
     // block has an auto height.
     while (!cb->isRenderView() && !cb->isBody() && !cb->isTableCell() &&
-           !cb->isPositioned() && cb->style()->height().isAuto())
+           !cb->isPositioned() && cb->style()->height().isAuto()) {
       cb = cb->containingBlock();
+      cb->addPercentHeightDescendant(this);
+    }
   }
 
   // A positioned element that specified both top/bottom or that specifies
@@ -1842,6 +1854,12 @@ int RenderBox::calcReplacedHeightUsing(Length height) const {
       return calcContentBoxHeight(height.value());
     case Percent: {
       RenderObject* cb = isPositioned() ? container() : containingBlock();
+      while (cb->isAnonymous()) {
+        cb = cb->containingBlock();
+        static_cast<RenderBlock*>(cb)->addPercentHeightDescendant(
+            const_cast<RenderBox*>(this));
+      }
+
       if (cb->isPositioned() && cb->style()->height().isAuto() &&
           !(cb->style()->top().isAuto() || cb->style()->bottom().isAuto())) {
         ASSERT(cb->isRenderBlock());

@@ -143,6 +143,9 @@ class RenderBlock : public RenderFlow {
   void removePositionedObject(RenderObject*);
   virtual void removePositionedObjects(RenderBlock*);
 
+  void addPercentHeightDescendant(RenderBox*);
+  static void removePercentHeightDescendant(RenderBox*);
+
   virtual void positionListMarker() {}
 
   virtual void borderFitAdjust(int& x, int& w)
