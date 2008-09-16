@@ -102,13 +102,13 @@ void dumpWebViewAsPixelsAndCompareWithExpected(
   RetainPtr<CGContextRef> context = getBitmapContextFromWebView();
 
 #if PLATFORM(MAC)
-  if (layoutTestController->testRepaint())
+  if (gLayoutTestController->testRepaint())
     repaintWebView(context.get(),
-                   layoutTestController->testRepaintSweepHorizontally());
+                   gLayoutTestController->testRepaintSweepHorizontally());
   else
     paintWebView(context.get());
 
-  if (layoutTestController->dumpSelectionRect())
+  if (gLayoutTestController->dumpSelectionRect())
     drawSelectionRect(context.get(), getSelectionRect());
 #endif
 

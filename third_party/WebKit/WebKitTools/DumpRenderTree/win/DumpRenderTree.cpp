@@ -98,7 +98,7 @@ COMPtr<ResourceLoadDelegate> sharedResourceLoadDelegate;
 IWebFrame* frame;
 HWND webViewWindow;
 
-LayoutTestController* layoutTestController = 0;
+LayoutTestController* gLayoutTestController = 0;
 CFRunLoopTimerRef waitToDumpWatchdog = 0;
 
 const unsigned maxViewWidth = 800;
@@ -290,7 +290,7 @@ void dumpFrameScrollPosition(IWebFrame* frame) {
            (double)scrollPosition.cy);
   }
 
-  if (::layoutTestController->dumpChildFrameScrollPositions()) {
+  if (::gLayoutTestController->dumpChildFrameScrollPositions()) {
     COMPtr<IEnumVARIANT> enumKids;
     if (FAILED(frame->childFrames(&enumKids)))
       return;
@@ -346,7 +346,7 @@ static wstring dumpFramesAsText(IWebFrame* frame) {
 
   SysFreeString(innerText);
 
-  if (::layoutTestController->dumpChildFramesAsText()) {
+  if (::gLayoutTestController->dumpChildFramesAsText()) {
     COMPtr<IEnumVARIANT> enumKids;
     if (FAILED(frame->childFrames(&enumKids)))
       return L"";
@@ -550,8 +550,8 @@ void dump() {
     if (SUCCEEDED(dataSource->response(&response)) && response) {
       BSTR mimeType;
       if (SUCCEEDED(response->MIMEType(&mimeType)))
-        ::layoutTestController->setDumpAsText(
-            ::layoutTestController->dumpAsText() |
+        ::gLayoutTestController->setDumpAsText(
+            ::gLayoutTestController->dumpAsText() |
             !_tcscmp(mimeType, TEXT("text/plain")));
       SysFreeString(mimeType);
     }
@@ -560,7 +560,7 @@ void dump() {
   BSTR resultString = 0;
 
   if (dumpTree) {
-    if (::layoutTestController->dumpAsText()) {
+    if (::gLayoutTestController->dumpAsText()) {
       ::InvalidateRect(webViewWindow, 0, TRUE);
       ::SendMessage(webViewWindow, WM_PAINT, 0, 0);
       wstring result = dumpFramesAsText(frame);
@@ -589,7 +589,7 @@ void dump() {
 
     if (!resultString)
       printf("ERROR: nil result from %s",
-             ::layoutTestController->dumpAsText()
+             ::gLayoutTestController->dumpAsText()
                  ? "IDOMElement::innerText"
                  : "IFrameViewPrivate::renderTreeAsExternalRepresentation");
     else {
@@ -601,10 +601,10 @@ void dump() {
                             bufferSize + 1, 0, 0);
       fwrite(buffer, 1, bufferSize, stdout);
       free(buffer);
-      if (!::layoutTestController->dumpAsText())
+      if (!::gLayoutTestController->dumpAsText())
         dumpFrameScrollPosition(frame);
     }
-    if (::layoutTestController->dumpBackForwardList())
+    if (::gLayoutTestController->dumpBackForwardList())
       dumpBackForwardListForAllWindows();
   }
 
@@ -616,9 +616,9 @@ void dump() {
   }
 
   if (dumpPixels) {
-    if (layoutTestController->dumpAsText() ||
-        layoutTestController->dumpDOMAsWebArchive() ||
-        layoutTestController->dumpSourceAsWebArchive())
+    if (gLayoutTestController->dumpAsText() ||
+        gLayoutTestController->dumpDOMAsWebArchive() ||
+        gLayoutTestController->dumpSourceAsWebArchive())
       printf("#EOF\n");
     else
       dumpWebViewAsPixelsAndCompareWithExpected(currentTest, dumpAllPixels);
@@ -712,12 +712,12 @@ static void runTest(const char* pathOrURL) {
 
   currentTest = pathOrURL;
 
-  ::layoutTestController = new LayoutTestController(false, false);
+  ::gLayoutTestController = new LayoutTestController(false, false);
   done = false;
   topLoadingFrame = 0;
 
   if (shouldLogFrameLoadDelegates(pathOrURL))
-    layoutTestController->setDumpFrameLoadCallbacks(true);
+    gLayoutTestController->setDumpFrameLoadCallbacks(true);
 
   COMPtr<IWebHistory> history(Create, CLSID_WebHistory);
   if (history)
@@ -767,7 +767,7 @@ static void runTest(const char* pathOrURL) {
 
   frame->stopLoading();
 
-  if (::layoutTestController->closeRemainingWindowsWhenComplete()) {
+  if (::gLayoutTestController->closeRemainingWindowsWhenComplete()) {
     Vector<HWND> windows = openWindows();
     unsigned size = windows.size();
     for (unsigned i = 0; i < size; i++) {
@@ -783,7 +783,7 @@ static void runTest(const char* pathOrURL) {
 
 exit:
   SysFreeString(urlBStr);
-  delete ::layoutTestController;
+  delete ::gLayoutTestController;
 
   return;
 }
