@@ -1822,8 +1822,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         r[dst] = jsBoolean(reinterpret_cast<intptr_t>(src1) ==
                            reinterpret_cast<intptr_t>(src2));
       else if (JSImmediate::isEitherImmediate(src1, src2) &
-               src1 != JSImmediate::zeroImmediate() &
-               src2 != JSImmediate::zeroImmediate())
+               (src1 != JSImmediate::zeroImmediate()) &
+               (src2 != JSImmediate::zeroImmediate()))
         r[dst] = jsBoolean(false);
       else
         r[dst] = jsBoolean(strictEqualSlowCase(src1, src2));
@@ -1846,8 +1846,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         r[dst] = jsBoolean(reinterpret_cast<intptr_t>(src1) !=
                            reinterpret_cast<intptr_t>(src2));
       else if (JSImmediate::isEitherImmediate(src1, src2) &
-               src1 != JSImmediate::zeroImmediate() &
-               src2 != JSImmediate::zeroImmediate())
+               (src1 != JSImmediate::zeroImmediate()) &
+               (src2 != JSImmediate::zeroImmediate()))
         r[dst] = jsBoolean(true);
       else
         r[dst] = jsBoolean(!strictEqualSlowCase(src1, src2));
@@ -5689,7 +5689,7 @@ JSValue* Machine::cti_op_stricteq(CTI_ARGS) {
     return jsBoolean(reinterpret_cast<intptr_t>(src1) ==
                      reinterpret_cast<intptr_t>(src2));
   if (JSImmediate::isEitherImmediate(src1, src2) &
-      src1 != JSImmediate::from(0) & src2 != JSImmediate::from(0))
+      (src1 != JSImmediate::from(0)) & (src2 != JSImmediate::from(0)))
     return jsBoolean(false);
 
   ExecState* exec = ARG_exec;
@@ -5706,7 +5706,7 @@ JSValue* Machine::cti_op_nstricteq(CTI_ARGS) {
     return jsBoolean(reinterpret_cast<intptr_t>(src1) !=
                      reinterpret_cast<intptr_t>(src2));
   if (JSImmediate::isEitherImmediate(src1, src2) &
-      src1 != JSImmediate::from(0) & src2 != JSImmediate::from(0))
+      (src1 != JSImmediate::from(0)) & (src2 != JSImmediate::from(0)))
     return jsBoolean(true);
 
   ExecState* exec = ARG_exec;
