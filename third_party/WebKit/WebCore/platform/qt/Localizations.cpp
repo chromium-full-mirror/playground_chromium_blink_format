@@ -302,6 +302,14 @@ String AXHeadingText() {
   return String();
 }
 
+string AXDefinitionListTermText() {
+  return String();
+}
+
+string AXDefinitionListDefinitionText() {
+  return String();
+}
+
 String AXButtonActionVerb() {
   return String();
 }

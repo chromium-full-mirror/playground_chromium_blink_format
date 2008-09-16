@@ -232,6 +232,12 @@ String WebCore::AXHeadingText() {
   return String(LPCTSTR_UI_STRING(
       "heading", "accessibility role description for headings"));
 }
+String WebCore::AXDefinitionListTermText() {
+  return String(LPCTSTR_UI_STRING("term", "term word of a definition"));
+}
+String WebCore::AXDefinitionListDefinitionText() {
+  return String(LPCTSTR_UI_STRING("definition", "definition phrase"));
+}
 String WebCore::AXButtonActionVerb() {
   return String(LPCTSTR_UI_STRING("press",
                                   "Verb stating the action that will occur "

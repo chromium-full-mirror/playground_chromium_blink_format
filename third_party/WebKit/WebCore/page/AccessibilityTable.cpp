@@ -51,7 +51,7 @@ using namespace HTMLNames;
 
 AccessibilityTable::AccessibilityTable(RenderObject* renderer)
     : AccessibilityRenderObject(renderer), m_headerContainer(0) {
-// AXTables should be in SnowLeopard only
+// AXTables should not appear in tiger or leopard, on the mac
 #if PLATFORM(MAC) && \
     (defined(BUILDING_ON_TIGER) || defined(BUILDING_ON_LEOPARD))
   m_isAccessibilityTable = false;
