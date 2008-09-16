@@ -304,12 +304,12 @@ static bool NEVER_INLINE resolve(ExecState* exec,
   return false;
 }
 
-static bool NEVER_INLINE resolve_skip(ExecState* exec,
-                                      Instruction* vPC,
-                                      Register* r,
-                                      ScopeChainNode* scopeChain,
-                                      CodeBlock* codeBlock,
-                                      JSValue*& exceptionValue) {
+static bool NEVER_INLINE resolveSkip(ExecState* exec,
+                                     Instruction* vPC,
+                                     Register* r,
+                                     ScopeChainNode* scopeChain,
+                                     CodeBlock* codeBlock,
+                                     JSValue*& exceptionValue) {
   int dst = (vPC + 1)->u.operand;
   int property = (vPC + 2)->u.operand;
   int skip = (vPC + 3)->u.operand + codeBlock->needsFullScopeChain;
@@ -2499,8 +2499,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
        scope chain skipping the top 'skip' levels, and writes the resulting
        value to register dst. If the property is not found, raises an exception.
        */
-      if (UNLIKELY(!resolve_skip(exec, vPC, r, scopeChain, codeBlock,
-                                 exceptionValue)))
+      if (UNLIKELY(!resolveSkip(exec, vPC, r, scopeChain, codeBlock,
+                                exceptionValue)))
         goto vm_throw;
 
       vPC += 4;
