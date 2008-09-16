@@ -904,9 +904,9 @@ void CTI::privateCompileMainPass() {
       case op_ret: {
         // Check for an activation - if there is one, jump to the hook below.
         m_jit.cmpl_i32m(
-            0, -((m_codeBlock->numLocals + RegisterFile::CallFrameHeaderSize -
-                  RegisterFile::OptionalCalleeActivation) *
-                 sizeof(Register)),
+            0, -(m_codeBlock->numLocals + RegisterFile::CallFrameHeaderSize -
+                 RegisterFile::OptionalCalleeActivation) *
+                   sizeof(Register),
             X86::edi);
         X86Assembler::JmpSrc activation = m_jit.emitUnlinkedJne();
         X86Assembler::JmpDst activated = m_jit.label();
@@ -928,9 +928,9 @@ void CTI::privateCompileMainPass() {
         // JSFunction).
         emitGetArg(instruction[i + 1].u.operand, X86::eax);
         m_jit.movl_mr(
-            -((m_codeBlock->numLocals + RegisterFile::CallFrameHeaderSize -
-               RegisterFile::CallerScopeChain) *
-              sizeof(Register)),
+            -(m_codeBlock->numLocals + RegisterFile::CallFrameHeaderSize -
+              RegisterFile::CallerScopeChain) *
+                sizeof(Register),
             X86::edi, X86::edx);
         // Restore the machine return addess from the callframe, roll the
         // callframe back to the caller callframe,
