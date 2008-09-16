@@ -189,6 +189,9 @@ class LayoutTestController {
   bool globalFlag() const { return m_globalFlag; }
   void setGlobalFlag(bool globalFlag) { m_globalFlag = globalFlag; }
 
+  JSObjectRef jsObject() const { return m_selfJSObject; }
+  void setJSObject(JSObjectRef obj) { m_selfJSObject = obj; }
+
  private:
   bool m_dumpAsText;
   bool m_dumpAsPDF;
@@ -216,6 +219,8 @@ class LayoutTestController {
   bool m_windowIsKey;
 
   bool m_globalFlag;
+
+  JSObjectRef m_selfJSObject;
 
   static JSClassRef getJSClass();
   static JSStaticValue* staticValues();

@@ -60,7 +60,8 @@ LayoutTestController::LayoutTestController(
       m_testRepaintSweepHorizontally(testRepaintSweepHorizontallyDefault),
       m_waitToDump(false),
       m_windowIsKey(true),
-      m_globalFlag(false) {}
+      m_globalFlag(false),
+      m_selfJSObject(0) {}
 
 // Static Functions
 
@@ -501,8 +502,15 @@ static JSValueRef notifyDoneCallback(JSContextRef context,
   // May be able to be made platform independant by using shared WorkQueue
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->notifyDone();
-
+  if (controller)
+    controller->notifyDone();
+  else {
+    const char* msg =
+        "FAIL: Null layoutTestController in notifyDone(). Did a test call "
+        "notifyDone() twice?\n";
+    fprintf(stderr, msg);
+    fprintf(stdout, msg);
+  }
   return JSValueMakeUndefined(context);
 }
 
@@ -941,6 +949,13 @@ static bool setGlobalFlagCallback(JSContextRef context,
   return true;
 }
 
+static void layoutTestControllerObjectFinalize(JSObjectRef object) {
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(object));
+  if (controller)
+    controller->setJSObject(0);
+}
+
 // Object Creation
 
 void LayoutTestController::makeWindowObject(JSContextRef context,
@@ -948,11 +963,9 @@ void LayoutTestController::makeWindowObject(JSContextRef context,
                                             JSValueRef* exception) {
   JSRetainPtr<JSStringRef> layoutTestContollerStr(
       Adopt, JSStringCreateWithUTF8CString("layoutTestController"));
-  JSValueRef layoutTestContollerObject =
-      JSObjectMake(context, getJSClass(), this);
+  setJSObject(JSObjectMake(context, getJSClass(), this));
   JSObjectSetProperty(
-      context, windowObject, layoutTestContollerStr.get(),
-      layoutTestContollerObject,
+      context, windowObject, layoutTestContollerStr.get(), jsObject(),
       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete, exception);
 }
 
@@ -969,7 +982,7 @@ JSClassRef LayoutTestController::getJSClass() {
                                          staticValues,
                                          staticFunctions,
                                          0,
-                                         0,
+                                         layoutTestControllerObjectFinalize,
                                          0,
                                          0,
                                          0,
