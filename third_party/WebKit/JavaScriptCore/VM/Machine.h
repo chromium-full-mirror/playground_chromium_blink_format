@@ -247,6 +247,9 @@ class Machine {
   static JSValue* SFX_CALL cti_op_neq_null(CTI_ARGS);
 
   static void* SFX_CALL cti_vm_throw(CTI_ARGS);
+  static void* SFX_CALL cti_vm_compile(CTI_ARGS);
+  static void SFX_CALL cti_vm_updateScopeChain(CTI_ARGS);
+
 #endif  // ENABLE(CTI)
 
   // Default number of ticks before a timeout check should be done.
