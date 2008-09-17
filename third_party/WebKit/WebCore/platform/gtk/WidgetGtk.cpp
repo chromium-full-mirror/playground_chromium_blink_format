@@ -42,31 +42,27 @@ namespace WebCore {
 
 class WidgetPrivate {
  public:
-  GtkWidget* widget;
   WidgetClient* client;
   IntRect frameRect;
 
   GtkWidget* containingWindow;
   bool suppressInvalidation;
   GdkCursor* cursor;
-
-  GdkDrawable* gdkDrawable() const { return widget ? widget->window : 0; }
 };
 
 Widget::Widget() : data(new WidgetPrivate) {
   init();
-  data->widget = 0;
   data->containingWindow = 0;
   data->suppressInvalidation = false;
   data->cursor = 0;
 }
 
-GtkWidget* Widget::gtkWidget() const {
-  return data->widget;
-}
-
-void Widget::setGtkWidget(GtkWidget* widget) {
-  data->widget = widget;
+Widget::Widget(PlatformWidget widget) : data(new WidgetPrivate) {
+  init();
+  m_widget = widget;
+  data->containingWindow = 0;
+  data->suppressInvalidation = false;
+  data->cursor = 0;
 }
 
 Widget::~Widget() {
@@ -99,12 +95,16 @@ void Widget::setFrameGeometry(const IntRect& r) {
 }
 
 void Widget::setFocus() {
-  gtk_widget_grab_focus(gtkWidget() ? gtkWidget()
-                                    : GTK_WIDGET(containingWindow()));
+  gtk_widget_grab_focus(platformWidget() ? platformWidget()
+                                         : GTK_WIDGET(containingWindow()));
 }
 
 Cursor Widget::cursor() {
   return Cursor(data->cursor);
+}
+
+static GdkDrawable* gdkDrawable(PlatformWidget widget) {
+  return widget ? widget->window : 0;
 }
 
 void Widget::setCursor(const Cursor& cursor) {
@@ -119,35 +119,35 @@ void Widget::setCursor(const Cursor& cursor) {
   if (pcur == data->cursor)
     return;
 
-  gdk_window_set_cursor(data->gdkDrawable()
-                            ? GDK_WINDOW(data->gdkDrawable())
+  gdk_window_set_cursor(gdkDrawable(platformWidget())
+                            ? GDK_WINDOW(gdkDrawable(platformWidget()))
                             : GTK_WIDGET(containingWindow())->window,
                         pcur);
   data->cursor = pcur;
 }
 
 void Widget::show() {
-  if (!gtkWidget())
+  if (!platformWidget())
     return;
-  gtk_widget_show(gtkWidget());
+  gtk_widget_show(platformWidget());
 }
 
 void Widget::hide() {
-  if (!gtkWidget())
+  if (!platformWidget())
     return;
-  gtk_widget_hide(gtkWidget());
+  gtk_widget_hide(platformWidget());
 }
 
 void Widget::setEnabled(bool shouldEnable) {
-  if (!gtkWidget())
+  if (!platformWidget())
     return;
-  gtk_widget_set_sensitive(gtkWidget(), shouldEnable);
+  gtk_widget_set_sensitive(platformWidget(), shouldEnable);
 }
 
 bool Widget::isEnabled() const {
-  if (!gtkWidget())
+  if (!platformWidget())
     return false;
-  return GTK_WIDGET_IS_SENSITIVE(gtkWidget());
+  return GTK_WIDGET_IS_SENSITIVE(platformWidget());
 }
 
 void Widget::removeFromParent() {
@@ -163,13 +163,13 @@ void Widget::removeFromParent() {
  * translation.
  */
 void Widget::paint(GraphicsContext* context, const IntRect&) {
-  if (!gtkWidget())
+  if (!platformWidget())
     return;
 
   if (!context->gdkExposeEvent())
     return;
 
-  GtkWidget* widget = gtkWidget();
+  GtkWidget* widget = platformWidget();
   ASSERT(GTK_WIDGET_NO_WINDOW(widget));
 
   GdkEvent* event = gdk_event_new(GDK_EXPOSE);

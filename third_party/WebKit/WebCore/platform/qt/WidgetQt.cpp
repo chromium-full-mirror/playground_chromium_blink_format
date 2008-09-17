@@ -59,7 +59,6 @@ struct WidgetPrivate {
       : m_client(0),
         enabled(true),
         suppressInvalidation(false),
-        m_widget(0),
         isNPAPIPlugin(0) {}
   ~WidgetPrivate() {}
 
@@ -69,11 +68,15 @@ struct WidgetPrivate {
   bool suppressInvalidation;
   bool isNPAPIPlugin;
   IntRect m_geometry;
-  QWidget* m_widget;  // for plugins
 };
 
-Widget::Widget() : data(new WidgetPrivate()) {
+Widget::Widget() : data(new WidgetPrivate) {
   init();
+}
+
+Widget::Widget(QWidget* widget) : data(new WidgetPrivate) {
+  init();
+  m_widget = widget;
 }
 
 Widget::~Widget() {
@@ -96,8 +99,8 @@ IntRect Widget::frameGeometry() const {
 
 void Widget::setFrameGeometry(const IntRect& r) {
   data->m_geometry = r;
-  if (data->m_widget)
-    data->m_widget->setGeometry(
+  if (platformWidget())
+    platformWidget()->setGeometry(
         convertToContainingWindow(IntRect(0, 0, r.width(), r.height())));
 }
 
@@ -111,21 +114,13 @@ void Widget::setCursor(const Cursor& cursor) {
 }
 
 void Widget::show() {
-  if (data->m_widget)
-    data->m_widget->show();
+  if (platformWidget())
+    platformWidget()->show();
 }
 
 void Widget::hide() {
-  if (data->m_widget)
-    data->m_widget->hide();
-}
-
-QWidget* Widget::nativeWidget() const {
-  return data->m_widget;
-}
-
-void Widget::setNativeWidget(QWidget* widget) {
-  data->m_widget = widget;
+  if (platformWidget())
+    platformWidget()->hide();
 }
 
 bool Widget::isNPAPIPlugin() const {
@@ -139,14 +134,14 @@ void Widget::setIsNPAPIPlugin(bool is) {
 void Widget::paint(GraphicsContext*, const IntRect& rect) {}
 
 bool Widget::isEnabled() const {
-  if (data->m_widget)
-    return data->m_widget->isEnabled();
+  if (platformWidget())
+    return platformWidget()->isEnabled();
   return data->enabled;
 }
 
 void Widget::setEnabled(bool e) {
-  if (data->m_widget)
-    data->m_widget->setEnabled(e);
+  if (platformWidget())
+    platformWidget()->setEnabled(e);
 
   if (e != data->enabled) {
     data->enabled = e;
@@ -174,8 +169,8 @@ void Widget::invalidateRect(const IntRect& r) {
   if (data->suppressInvalidation)
     return;
 
-  if (data->m_widget) {  // plugins
-    data->m_widget->update(r);
+  if (platformWidget()) {  // plugins
+    platformWidget()->update(r);
     return;
   }
 
@@ -222,13 +217,13 @@ QWidget* Widget::containingWindow() const {
     return 0;
 
   if (!topLevel->isFrameView())
-    return data->m_widget;
+    return platformWidget();
 
   QWebFrame* frame =
       QWebFramePrivate::kit(static_cast<FrameView*>(topLevel)->frame());
   QWidget* view = frame->page()->view();
 
-  return view ? view : data->m_widget;
+  return view ? view : platformWidget();
 }
 
 void Widget::geometryChanged() const {}

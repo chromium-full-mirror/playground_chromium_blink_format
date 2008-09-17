@@ -45,7 +45,6 @@ class WidgetPrivate {
   HWND containingWindow;
   IntRect frameRect;
   bool enabled;
-  Widget* capturingChild;
   bool suppressInvalidation;
 };
 
@@ -54,7 +53,15 @@ Widget::Widget() : data(new WidgetPrivate) {
   data->client = 0;
   data->containingWindow = 0;
   data->enabled = true;
-  data->capturingChild = 0;
+  data->suppressInvalidation = false;
+}
+
+Widget::Widget(PlatformWidget widget) : data(new WidgetPrivate) {
+  init();
+  m_widget = widget;
+  data->client = 0;
+  data->containingWindow = 0;
+  data->enabled = true;
   data->suppressInvalidation = false;
 }
 
