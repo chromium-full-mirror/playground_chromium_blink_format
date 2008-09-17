@@ -442,8 +442,7 @@ void PluginView::init() {
   }
 
   if (m_needsXEmbed) {
-    platformPluginWidget() = new QX11EmbedContainer(containingWindow());
-    setPlatformWidget(platformPluginWidget());
+    setPlatformWidget(new QX11EmbedContainer(containingWindow()));
     setIsNPAPIPlugin(true);
   } else {
     notImplemented();
