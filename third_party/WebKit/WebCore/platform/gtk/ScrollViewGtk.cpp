@@ -328,6 +328,9 @@ void ScrollView::updateContents(const IntRect& updateRect, bool now) {
 void ScrollView::update() {
   ASSERT(containingWindow());
 
+  if (!containingWindow() || !GTK_WIDGET_REALIZED(containingWindow()))
+    return;
+
   GdkRectangle rect = frameGeometry();
   gdk_window_invalidate_rect(GTK_WIDGET(containingWindow())->window, &rect,
                              true);
