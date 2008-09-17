@@ -82,6 +82,9 @@ class Widget {
   Widget();
   virtual ~Widget();
 
+  void init();  // Must be called by all Widget constructors to initialize
+                // cross-platform data.
+
   virtual void setEnabled(bool);
   virtual bool isEnabled() const;
 
@@ -110,6 +113,16 @@ class Widget {
 
   virtual void show();
   virtual void hide();
+  bool isSelfVisible() const {
+    return m_selfVisible;
+  }  // Whether or not we have been explicitly marked as visible or not.
+  bool isParentVisible() const {
+    return m_parentVisible;
+  }  // Whether or not our parent is visible.
+  bool isVisible() const {
+    return m_selfVisible && m_parentVisible;
+  }  // Whether or not we are actually visible.
+  virtual void setParentVisible(bool visible) { m_parentVisible = visible; }
 
   void setIsSelected(bool);
 
@@ -120,6 +133,8 @@ class Widget {
   virtual bool isPluginView() const { return false; }
 
   virtual void removeFromParent();
+  virtual void setParent(ScrollView* view);
+  ScrollView* parent() const { return m_parent; }
 
   // This method is used by plugins on all platforms to obtain a clip rect that
   // includes clips set by WebCore,
@@ -135,13 +150,7 @@ class Widget {
   PlatformWidget containingWindow() const;
 
 #if PLATFORM(WIN)
-  virtual void setParent(ScrollView*);
-  ScrollView* parent() const;
-
-  virtual void attachToWindow() {}
-  virtual void detachFromWindow() {}
-
-  virtual void geometryChanged() const {};
+  virtual void geometryChanged() const {}
 
   IntRect convertToContainingWindow(const IntRect&) const;
   IntPoint convertToContainingWindow(const IntPoint&) const;
@@ -152,13 +161,9 @@ class Widget {
 
   bool suppressInvalidation() const;
   void setSuppressInvalidation(bool);
-
 #endif
 
 #if PLATFORM(GTK)
-  virtual void setParent(ScrollView*);
-  ScrollView* parent() const;
-
   virtual void geometryChanged() const;
 
   IntRect convertToContainingWindow(const IntRect&) const;
@@ -184,8 +189,6 @@ class Widget {
   void setIsNPAPIPlugin(bool);
   bool isNPAPIPlugin() const;
 
-  virtual void setParent(ScrollView*);
-  ScrollView* parent() const;
   virtual void geometryChanged() const;
   ScrollView* topLevel() const;
 
@@ -218,8 +221,6 @@ class Widget {
   // viewless widgets.
   IntPoint convertFromContainingWindow(const IntPoint&) const;
   IntRect convertToContainingWindow(const IntRect&) const;
-  ScrollView* parent() const { return 0; }
-  virtual void setParent(ScrollView*) {}
 #endif
 
 #if PLATFORM(WX)
@@ -229,6 +230,9 @@ class Widget {
 #endif
 
  private:
+  ScrollView* m_parent;
+  bool m_selfVisible;
+  bool m_parentVisible;
   WidgetPrivate* data;
 };
 

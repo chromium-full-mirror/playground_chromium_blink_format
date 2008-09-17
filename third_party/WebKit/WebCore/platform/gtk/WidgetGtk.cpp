@@ -46,7 +46,6 @@ class WidgetPrivate {
   WidgetClient* client;
   IntRect frameRect;
 
-  ScrollView* parent;
   GtkWidget* containingWindow;
   bool suppressInvalidation;
   GdkCursor* cursor;
@@ -55,8 +54,8 @@ class WidgetPrivate {
 };
 
 Widget::Widget() : data(new WidgetPrivate) {
+  init();
   data->widget = 0;
-  data->parent = 0;
   data->containingWindow = 0;
   data->suppressInvalidation = false;
   data->cursor = 0;
@@ -97,14 +96,6 @@ IntRect Widget::frameGeometry() const {
 
 void Widget::setFrameGeometry(const IntRect& r) {
   data->frameRect = r;
-}
-
-void Widget::setParent(ScrollView* v) {
-  data->parent = v;
-}
-
-ScrollView* Widget::parent() const {
-  return data->parent;
 }
 
 void Widget::setFocus() {

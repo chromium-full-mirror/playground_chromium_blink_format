@@ -187,15 +187,12 @@ class ScrollView : public Widget {
  public:
   virtual void themeChanged();
 
-  virtual void attachToWindow();
-  virtual void detachFromWindow();
-  bool isAttachedToWindow() const;
-
   void printPanScrollIcon(const IntPoint&);
   void removePanScrollIcon();
 
   virtual void show();
   virtual void hide();
+  virtual void setParentVisible(bool);
 
   void setAllowsScrolling(bool);
   bool allowsScrolling() const;

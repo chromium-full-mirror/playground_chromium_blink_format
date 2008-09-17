@@ -43,6 +43,7 @@ class WidgetPrivate {
 };
 
 Widget::Widget() : data(new WidgetPrivate) {
+  init();
   data->nativeWindow = 0;
   data->client = 0;
 }

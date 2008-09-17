@@ -564,8 +564,6 @@ PluginView::PluginView(Frame* parentFrame,
       m_paramValues(0),
       m_isWindowed(true),
       m_isTransparent(false),
-      m_isVisible(false),
-      m_attachedToWindow(false),
       m_haveInitialized(false)
 #if PLATFORM(GTK) || defined(Q_WS_X11)
       ,

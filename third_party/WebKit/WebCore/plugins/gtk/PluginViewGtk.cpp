@@ -122,18 +122,18 @@ void PluginView::setFocus() {
 }
 
 void PluginView::show() {
-  m_isVisible = true;
+  setSelfVisible(true);
 
-  if (m_attachedToWindow && m_window)
+  if (isParentVisible() && m_window)
     gtk_widget_show(m_window);
 
   Widget::show();
 }
 
 void PluginView::hide() {
-  m_isVisible = false;
+  setSelfVisible(false);
 
-  if (m_attachedToWindow && m_window)
+  if (isParentVisible() && m_window)
     gtk_widget_hide(m_window);
 
   Widget::hide();
@@ -236,22 +236,18 @@ void PluginView::setNPWindowRect(const IntRect& rect) {
   }
 }
 
-void PluginView::attachToWindow() {
-  if (m_attachedToWindow)
+void PluginView::setParentVisible(bool visible) {
+  if (isParentVisible() == visible)
     return;
 
-  m_attachedToWindow = true;
-  if (m_isVisible && m_window)
-    gtk_widget_show(m_window);
-}
+  Widget::setParentVisible(visible);
 
-void PluginView::detachFromWindow() {
-  if (!m_attachedToWindow)
-    return;
-
-  if (m_isVisible && m_window)
-    gtk_widget_hide(m_window);
-  m_attachedToWindow = false;
+  if (isSelfVisible() && m_window) {
+    if (visible)
+      gtk_widget_show(m_window);
+    else
+      gtk_widget_hide(m_window);
+  }
 }
 
 void PluginView::stop() {

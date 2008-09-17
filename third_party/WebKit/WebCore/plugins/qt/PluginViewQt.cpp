@@ -110,18 +110,18 @@ void PluginView::setFocus() {
 }
 
 void PluginView::show() {
-  m_isVisible = true;
+  setSelfVisible(true);
 
-  if (m_attachedToWindow && m_window)
+  if (isParentVisible() && m_window)
     m_window->setVisible(true);
 
   Widget::show();
 }
 
 void PluginView::hide() {
-  m_isVisible = false;
+  setSelfVisible(false);
 
-  if (m_attachedToWindow && m_window)
+  if (isParentVisible() && m_window)
     m_window->setVisible(false);
 
   Widget::hide();
@@ -195,22 +195,14 @@ void PluginView::setNPWindowRect(const IntRect& rect) {
   }
 }
 
-void PluginView::attachToWindow() {
-  if (m_attachedToWindow)
+void PluginView::setParentVisible(bool visible) {
+  if (isAncestorVisible() == visible)
     return;
 
-  m_attachedToWindow = true;
-  if (m_isVisible && m_window)
-    m_window->setVisible(true);
-}
+  Widget::setParentVisible(visible);
 
-void PluginView::detachFromWindow() {
-  if (!m_attachedToWindow)
-    return;
-
-  if (m_isVisible && m_window)
-    m_window->setVisible(false);
-  m_attachedToWindow = false;
+  if (isSelfVisible() && m_window)
+    m_window->setVisible(visible);
 }
 
 void PluginView::stop() {

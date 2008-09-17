@@ -179,9 +179,6 @@ class PluginView : public Widget, private PluginStreamClient {
   virtual void handleEvent(Event*);
   virtual void setParent(ScrollView*);
 
-  virtual void attachToWindow();
-  virtual void detachFromWindow();
-
   virtual bool isPluginView() const { return true; }
 
 #if PLATFORM(WIN_OS) && !PLATFORM(WX) && ENABLE(NETSCAPE_PLUGIN_API)
