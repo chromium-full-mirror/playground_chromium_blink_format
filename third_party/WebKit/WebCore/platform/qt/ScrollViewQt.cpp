@@ -68,7 +68,7 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
   ScrollViewPrivate(ScrollView* view)
       : m_view(view),
         m_hasStaticBackground(false),
-        m_nativeWidgets(0),
+        m_platformWidgets(0),
         m_scrollbarsSuppressed(false),
         m_inUpdateScrollbars(false),
         m_scrollbarsAvoidingResizer(0),
@@ -93,7 +93,7 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
   IntSize m_scrollOffset;
   IntSize m_contentsSize;
   bool m_hasStaticBackground;
-  int m_nativeWidgets;
+  int m_platformWidgets;
   bool m_scrollbarsSuppressed;
   bool m_inUpdateScrollbars;
   int m_scrollbarsAvoidingResizer;
@@ -159,7 +159,7 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
   IntRect updateRect = clipRect;
   updateRect.intersect(scrollViewRect);
 
-  if (!m_hasStaticBackground && !m_view->topLevel()->hasNativeWidgets()) {
+  if (!m_hasStaticBackground && !m_view->topLevel()->hasplatformWidgets()) {
     m_view->scrollBackingStore(-scrollDelta.width(), -scrollDelta.height(),
                                scrollViewRect, clipRect);
   } else {
@@ -210,7 +210,7 @@ void ScrollView::updateContents(const IntRect& rect, bool now) {
 }
 
 void ScrollView::update() {
-  QWidget* native = nativeWidget();
+  QWidget* native = platformWidget();
   if (native) {
     native->update();
     return;
@@ -621,13 +621,13 @@ void ScrollView::addChild(Widget* child) {
   child->setParent(this);
   m_data->m_children.add(child);
 
-  if (child->nativeWidget())
-    topLevel()->incrementNativeWidgetCount();
+  if (child->platformWidget())
+    topLevel()->incrementplatformWidgetCount();
 }
 
 void ScrollView::removeChild(Widget* child) {
-  if (child->nativeWidget())
-    topLevel()->decrementNativeWidgetCount();
+  if (child->platformWidget())
+    topLevel()->decrementplatformWidgetCount();
 
   child->setParent(0);
   child->hide();
@@ -814,16 +814,16 @@ void ScrollView::updateBackingStore() {
   page->chrome()->updateBackingStore();
 }
 
-void ScrollView::incrementNativeWidgetCount() {
-  ++m_data->m_nativeWidgets;
+void ScrollView::incrementplatformWidgetCount() {
+  ++m_data->m_platformWidgets;
 }
 
-void ScrollView::decrementNativeWidgetCount() {
-  --m_data->m_nativeWidgets;
+void ScrollView::decrementplatformWidgetCount() {
+  --m_data->m_platformWidgets;
 }
 
-bool ScrollView::hasNativeWidgets() const {
-  return m_data->m_nativeWidgets != 0;
+bool ScrollView::hasplatformWidgets() const {
+  return m_data->m_platformWidgets != 0;
 }
 }
 
