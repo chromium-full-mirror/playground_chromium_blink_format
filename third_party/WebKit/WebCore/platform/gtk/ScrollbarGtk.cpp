@@ -68,7 +68,7 @@ ScrollbarGtk::ScrollbarGtk(ScrollbarClient* client,
   setGtkWidget(GTK_WIDGET(scrollBar));
 
   /*
-   * assign a sane default width and height to the ScrollBar, otherwise
+   * assign a sane default width and height to the Scrollbar, otherwise
    * we will end up with a 0 width scrollbar.
    */
   resize(ScrollbarTheme::nativeTheme()->scrollbarThickness(),
