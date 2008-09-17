@@ -813,6 +813,9 @@ void DOMWindow::moveBy(float x, float y) const {
   if (!page)
     return;
 
+  if (m_frame != page->mainFrame())
+    return;
+
   FloatRect fr = page->chrome()->windowRect();
   FloatRect update = fr;
   update.move(x, y);
@@ -830,6 +833,9 @@ void DOMWindow::moveTo(float x, float y) const {
   if (!page)
     return;
 
+  if (m_frame != page->mainFrame())
+    return;
+
   FloatRect fr = page->chrome()->windowRect();
   FloatRect sr = screenAvailableRect(page->mainFrame()->view());
   fr.setLocation(sr.location());
@@ -845,11 +851,11 @@ void DOMWindow::resizeBy(float x, float y) const {
   if (!m_frame)
     return;
 
-  if (m_frame->isDisconnected())
-    return;
-
   Page* page = m_frame->page();
   if (!page)
+    return;
+
+  if (m_frame != page->mainFrame())
     return;
 
   FloatRect fr = page->chrome()->windowRect();
@@ -863,11 +869,11 @@ void DOMWindow::resizeTo(float width, float height) const {
   if (!m_frame)
     return;
 
-  if (m_frame->isDisconnected())
-    return;
-
   Page* page = m_frame->page();
   if (!page)
+    return;
+
+  if (m_frame != page->mainFrame())
     return;
 
   FloatRect fr = page->chrome()->windowRect();
