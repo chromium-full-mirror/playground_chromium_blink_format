@@ -840,9 +840,9 @@ void PluginView::init() {
 
     HWND parentWindowHandle = windowHandleForPlatformWidget(
         m_parentFrame->view()->containingWindow());
-    platformPluginWidget() =
-        ::CreateWindowEx(0, kWebPluginViewdowClassName, 0, flags, 0, 0, 0, 0,
-                         parentWindowHandle, 0, Page::instanceHandle(), 0);
+    setPlatformWidget(::CreateWindowEx(0, kWebPluginViewdowClassName, 0, flags,
+                                       0, 0, 0, 0, parentWindowHandle, 0,
+                                       Page::instanceHandle(), 0));
 
     // Calling SetWindowLongPtrA here makes the window proc ASCII, which is
     // required by at least
