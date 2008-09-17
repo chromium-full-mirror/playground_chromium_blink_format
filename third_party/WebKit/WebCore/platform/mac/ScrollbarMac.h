@@ -27,6 +27,9 @@
 #define ScrollbarMac_h
 
 #include "Scrollbar.h"
+
+#if USE(NSSCROLLER)
+
 #include <wtf/PassRefPtr.h>
 
 #ifdef __OBJC__
@@ -62,5 +65,7 @@ class ScrollbarMac : public Scrollbar {
   virtual void updateThumbProportion();
 };
 }
+
+#endif
 
 #endif  // ScrollbarMac_h
