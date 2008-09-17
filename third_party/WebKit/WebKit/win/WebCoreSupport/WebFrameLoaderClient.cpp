@@ -521,7 +521,7 @@ void WebFrameLoaderClient::transitionToCommittedForNewPage() {
   bool isMainFrame = frame == page->mainFrame();
 
   if (isMainFrame && frame->view())
-    frame->view()->detachFromWindow();
+    frame->view()->setParentVisible(false);
 
   frame->setView(0);
 
@@ -547,7 +547,7 @@ void WebFrameLoaderClient::transitionToCommittedForNewPage() {
     frameView->setContainingWindow(viewWindow);
 
   if (isMainFrame)
-    frameView->attachToWindow();
+    frameView->setParentVisible(true);
 
   if (frame->ownerRenderer())
     frame->ownerRenderer()->setWidget(frameView);
