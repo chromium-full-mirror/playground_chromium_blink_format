@@ -176,6 +176,11 @@ class ScrollView : public Widget {
 
  private:
   virtual void setParent(ScrollView*);
+#else
+ public:
+  IntRect windowResizerRect() { return IntRect(); }
+  bool resizerOverlapsContent() const { return false; }
+  void adjustOverlappingScrollbarCount(int overlapDelta) {}
 #endif
 
 #if PLATFORM(WIN)

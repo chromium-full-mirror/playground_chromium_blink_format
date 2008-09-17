@@ -46,12 +46,6 @@ class PlatformScrollbar : public Scrollbar {
                     ScrollbarOrientation,
                     ScrollbarControlSize,
                     ScrollbarTheme* = 0);
-
-  virtual void setParent(ScrollView*);
-
-  virtual void setFrameGeometry(const IntRect&);
-
-  virtual IntRect windowClipRect() const;
 };
 }
 
