@@ -1091,8 +1091,9 @@ JSValue* Machine::execute(FunctionBodyNode* functionBodyNode,
       CTI::execute(newCodeBlock->ctiCode, &newExec, &m_registerFile, r,
                    scopeChain, newCodeBlock, exception);
 #else
-  setScopeChain(scopeChain, scopeChainForCall(exec, functionBodyNode,
-                                              newCodeBlock, scopeChain, r));
+  setScopeChain(
+      &newExec, scopeChain,
+      scopeChainForCall(exec, functionBodyNode, newCodeBlock, scopeChain, r));
   JSValue* result = privateExecute(Normal, &newExec, &m_registerFile, r,
                                    scopeChain, newCodeBlock, exception);
 #endif
