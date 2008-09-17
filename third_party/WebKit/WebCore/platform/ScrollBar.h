@@ -111,9 +111,7 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   // FIXME: This is misplaced.  Normal hit testing should be used to populate a
   // correct
   // context menu.  There's no reason why the scrollbar should have to do it.
-  virtual bool handleContextMenuEvent(const PlatformMouseEvent& event) {
-    return false;
-  }
+  virtual bool handleContextMenuEvent(const PlatformMouseEvent& event);
 #endif
 
   ScrollbarTheme* theme() const { return m_theme; }
@@ -132,6 +130,8 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   void autoscrollPressedPart(double delay);
   ScrollDirection pressedPartScrollDirection();
   ScrollGranularity pressedPartScrollGranularity();
+
+  void moveThumb(int pos);
 
   ScrollbarClient* m_client;
   ScrollbarOrientation m_orientation;
