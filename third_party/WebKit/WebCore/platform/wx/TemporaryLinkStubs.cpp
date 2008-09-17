@@ -65,7 +65,6 @@
 #include "Path.h"
 #include "PlatformMenuDescription.h"
 #include "PlatformMouseEvent.h"
-#include "PlatformScrollBar.h"
 #include "PopupMenu.h"
 #include "RenderTheme.h"
 #include "ResourceHandle.h"
@@ -194,22 +193,6 @@ void Image::drawPattern(GraphicsContext*,
                         const FloatPoint& phase,
                         CompositeOperator,
                         const FloatRect& destRect) {
-  notImplemented();
-}
-
-PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
-                                     ScrollbarOrientation orientation,
-                                     ScrollbarControlSize controlSize)
-    : Scrollbar(client, orientation, controlSize) {
-  notImplemented();
-}
-PlatformScrollbar::~PlatformScrollbar() {
-  notImplemented();
-}
-void PlatformScrollbar::updateThumbPosition() {
-  notImplemented();
-}
-void PlatformScrollbar::updateThumbProportion() {
   notImplemented();
 }
 

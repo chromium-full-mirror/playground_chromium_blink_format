@@ -18,7 +18,7 @@
  */
 
 #include "config.h"
-#include "PlatformScrollBar.h"
+#include "ScrollbarGtk.h"
 
 #include "IntRect.h"
 #include "GraphicsContext.h"
@@ -31,9 +31,16 @@
 
 using namespace WebCore;
 
+PassRefPtr<Scrollbar> Scrollbar::createNativeScrollbar(
+    ScrollbarClient* client,
+    ScrollbarOrientation orientation,
+    ScrollbarControlSize size) {
+  return adoptRef(new ScrollbarGtk(client, orientation, size));
+}
+
 static gboolean gtkScrollEventCallback(GtkWidget* widget,
                                        GdkEventScroll* event,
-                                       PlatformScrollbar*) {
+                                       ScrollbarGtk*) {
   /* Scroll only if our parent rejects the scroll event. The rationale for
    * this is that we want the main frame to scroll when we move the mouse
    * wheel over a child scrollbar in most cases. */
@@ -41,9 +48,9 @@ static gboolean gtkScrollEventCallback(GtkWidget* widget,
                           reinterpret_cast<GdkEvent*>(event));
 }
 
-PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
-                                     ScrollbarOrientation orientation,
-                                     ScrollbarControlSize controlSize)
+ScrollbarGtk::ScrollbarGtk(ScrollbarClient* client,
+                           ScrollbarOrientation orientation,
+                           ScrollbarControlSize controlSize)
     : Scrollbar(client, orientation, controlSize),
       m_adjustment(
           GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))) {
@@ -54,7 +61,7 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
   gtk_widget_show(GTK_WIDGET(scrollBar));
   g_object_ref(G_OBJECT(scrollBar));
   g_signal_connect(G_OBJECT(scrollBar), "value-changed",
-                   G_CALLBACK(PlatformScrollbar::gtkValueChanged), this);
+                   G_CALLBACK(ScrollbarGtk::gtkValueChanged), this);
   g_signal_connect(G_OBJECT(scrollBar), "scroll-event",
                    G_CALLBACK(gtkScrollEventCallback), this);
 
@@ -68,26 +75,25 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
          ScrollbarTheme::nativeTheme()->scrollbarThickness());
 }
 
-PlatformScrollbar::~PlatformScrollbar() {
+ScrollbarGtk::~ScrollbarGtk() {
   /*
    * the Widget does not take over ownership.
    */
   g_signal_handlers_disconnect_by_func(
-      G_OBJECT(gtkWidget()), (gpointer)PlatformScrollbar::gtkValueChanged,
-      this);
+      G_OBJECT(gtkWidget()), (gpointer)ScrollbarGtk::gtkValueChanged, this);
   g_signal_handlers_disconnect_by_func(G_OBJECT(gtkWidget()),
                                        (gpointer)gtkScrollEventCallback, this);
   g_object_unref(G_OBJECT(gtkWidget()));
 }
 
-void PlatformScrollbar::updateThumbPosition() {
+void ScrollbarGtk::updateThumbPosition() {
   if (m_adjustment->value != m_currentPos) {
     m_adjustment->value = m_currentPos;
     gtk_adjustment_value_changed(m_adjustment);
   }
 }
 
-void PlatformScrollbar::updateThumbProportion() {
+void ScrollbarGtk::updateThumbProportion() {
   m_adjustment->step_increment = m_lineStep;
   m_adjustment->page_increment = m_pageStep;
   m_adjustment->page_size = m_visibleSize;
@@ -95,12 +101,12 @@ void PlatformScrollbar::updateThumbProportion() {
   gtk_adjustment_changed(m_adjustment);
 }
 
-void PlatformScrollbar::setFrameGeometry(const IntRect& rect) {
+void ScrollbarGtk::setFrameGeometry(const IntRect& rect) {
   Widget::setFrameGeometry(rect);
   geometryChanged();
 }
 
-void PlatformScrollbar::geometryChanged() {
+void ScrollbarGtk::geometryChanged() {
   if (!parent())
     return;
 
@@ -119,8 +125,7 @@ void PlatformScrollbar::geometryChanged() {
   gtk_widget_size_allocate(gtkWidget(), &allocation);
 }
 
-void PlatformScrollbar::gtkValueChanged(GtkAdjustment*,
-                                        PlatformScrollbar* that) {
+void ScrollbarGtk::gtkValueChanged(GtkAdjustment*, ScrollbarGtk* that) {
   that->setValue(
       static_cast<int>(gtk_adjustment_get_value(that->m_adjustment)));
 }
