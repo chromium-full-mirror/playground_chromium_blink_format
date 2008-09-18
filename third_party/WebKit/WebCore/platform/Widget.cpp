@@ -49,6 +49,15 @@ void Widget::setParent(ScrollView* view) {
     setParentVisible(true);
 }
 
+const ScrollView* Widget::root() const {
+  const Widget* top = this;
+  while (top->parent())
+    top = top->parent();
+  if (top->isFrameView())
+    return static_cast<const ScrollView*>(top);
+  return 0;
+}
+
 #if !PLATFORM(MAC)
 void Widget::releasePlatformWidget() {}
 

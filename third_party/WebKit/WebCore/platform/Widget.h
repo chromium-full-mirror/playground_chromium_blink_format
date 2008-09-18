@@ -32,10 +32,13 @@
 #if PLATFORM(MAC)
 #ifdef __OBJC__
 @class NSView;
+@class NSWindow;
 #else
 class NSView;
+class NSWindow;
 #endif
 typedef NSView* PlatformWidget;
+typedef NSWindow* PlatformWindow;
 #endif
 
 #if PLATFORM(WIN)
@@ -61,6 +64,10 @@ typedef QWidget* PlatformWidget;
 #if PLATFORM(WX)
 class wxWindow;
 typedef wxWindow* PlatformWidget;
+#endif
+
+#if !PLATFORM(MAC)
+typedef PlatformWidget PlatformWindow;
 #endif
 
 #include "IntPoint.h"
@@ -162,6 +169,7 @@ class Widget {
   virtual void removeFromParent();
   virtual void setParent(ScrollView* view);
   ScrollView* parent() const { return m_parent; }
+  const ScrollView* root() const;
 
   // This method is used by plugins on all platforms to obtain a clip rect that
   // includes clips set by WebCore,
@@ -173,8 +181,12 @@ class Widget {
 
   virtual void handleEvent(Event*) {}
 
-  void setContainingWindow(PlatformWidget);
-  PlatformWidget containingWindow() const;
+  // The containing window is used as the coordinate space for event handling.
+  PlatformWindow containingWindow() const;
+  void setContainingWindow(PlatformWindow window) {
+    m_containingWindow = window;
+  }  // This method is only used by platforms that can't easily get back to
+     // their containing window.
 
 #if PLATFORM(WIN)
   virtual void geometryChanged() const {}
@@ -203,7 +215,6 @@ class Widget {
   bool isNPAPIPlugin() const;
 
   virtual void geometryChanged() const;
-  ScrollView* topLevel() const;
 
   IntRect convertToContainingWindow(const IntRect&) const;
   IntPoint convertToContainingWindow(const IntPoint&) const;
@@ -241,7 +252,10 @@ class Widget {
   PlatformWidget m_widget;
   bool m_selfVisible;
   bool m_parentVisible;
-  IntRect m_frame;
+
+  IntRect m_frame;                    // Not used when a native widget exists.
+  PlatformWindow m_containingWindow;  // Not used when a native widget exists.
+
   WidgetPrivate* data;
 };
 
