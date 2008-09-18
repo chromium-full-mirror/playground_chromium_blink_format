@@ -45,15 +45,15 @@ JSValue* createUndefinedVariableError(ExecState*,
                                       const Instruction*,
                                       CodeBlock*);
 JSNotAnObjectErrorStub* createNotAnObjectErrorStub(ExecState*, bool isNull);
-JSValue* createInvalidParamError(ExecState*,
-                                 const char* op,
-                                 JSValue*,
-                                 const Instruction*,
-                                 CodeBlock*);
-JSValue* createNotAConstructorError(ExecState*,
-                                    JSValue*,
-                                    const Instruction*,
-                                    CodeBlock*);
+JSObject* createInvalidParamError(ExecState*,
+                                  const char* op,
+                                  JSValue*,
+                                  const Instruction*,
+                                  CodeBlock*);
+JSObject* createNotAConstructorError(ExecState*,
+                                     JSValue*,
+                                     const Instruction*,
+                                     CodeBlock*);
 JSValue* createNotAFunctionError(ExecState*,
                                  JSValue*,
                                  const Instruction*,

@@ -504,6 +504,18 @@ static bool NEVER_INLINE resolveBaseAndFunc(ExecState* exec,
   return false;
 }
 
+#if HAVE(COMPUTED_GOTO)
+Opcode Machine::s_opcodeTable[numOpcodeIDs];
+#endif
+
+Opcode Machine::getOpcode(OpcodeID id) {
+#if HAVE(COMPUTED_GOTO)
+  return s_opcodeTable[id];
+#else
+  return id;
+#endif
+}
+
 ALWAYS_INLINE void Machine::initializeCallFrame(Register* callFrame,
                                                 CodeBlock* codeBlock,
                                                 Instruction* vPC,
@@ -1595,7 +1607,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
   // here because our labels are only in scope inside this function.
   if (flag == InitializeAndReturn) {
 #if HAVE(COMPUTED_GOTO)
-#define ADD_OPCODE(id) m_opcodeTable[id] = &&id;
+#define ADD_OPCODE(id) s_opcodeTable[id] = &&id;
     FOR_EACH_OPCODE_ID(ADD_OPCODE);
 #undef ADD_OPCODE
 

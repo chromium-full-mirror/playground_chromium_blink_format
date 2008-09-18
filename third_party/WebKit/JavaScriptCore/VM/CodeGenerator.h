@@ -369,7 +369,12 @@ class CodeGenerator {
   }
   RegisterID* emitEnd(RegisterID* src) { return emitUnaryNoDstOp(op_end, src); }
 
-  RegisterID* emitConstruct(RegisterID* dst, RegisterID* func, ArgumentsNode*);
+  RegisterID* emitConstruct(RegisterID* dst,
+                            RegisterID* func,
+                            ArgumentsNode*,
+                            unsigned divot,
+                            unsigned startOffset,
+                            unsigned endOffset);
 
   PassRefPtr<LabelID> emitLabel(LabelID*);
   PassRefPtr<LabelID> emitJump(LabelID* target);

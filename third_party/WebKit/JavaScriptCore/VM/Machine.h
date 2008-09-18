@@ -75,13 +75,7 @@ class Machine {
 
   RegisterFile& registerFile() { return m_registerFile; }
 
-  Opcode getOpcode(OpcodeID id) {
-#if HAVE(COMPUTED_GOTO)
-    return m_opcodeTable[id];
-#else
-    return id;
-#endif
-  }
+  static Opcode getOpcode(OpcodeID id);
 
   OpcodeID getOpcodeID(Opcode opcode) {
 #if HAVE(COMPUTED_GOTO)
@@ -386,7 +380,8 @@ class Machine {
   void* m_jsFunctionVptr;
 
 #if HAVE(COMPUTED_GOTO)
-  Opcode m_opcodeTable[numOpcodeIDs];  // Maps OpcodeID => Opcode for compiling
+  static Opcode
+      s_opcodeTable[numOpcodeIDs];  // Maps OpcodeID => Opcode for compiling
   HashMap<Opcode, OpcodeID>
       m_opcodeIDTable;  // Maps Opcode => OpcodeID for decompiling
 #endif

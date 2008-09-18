@@ -1180,7 +1180,10 @@ RegisterID* CodeGenerator::emitUnaryNoDstOp(OpcodeID opcode, RegisterID* src) {
 
 RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
                                          RegisterID* func,
-                                         ArgumentsNode* argumentsNode) {
+                                         ArgumentsNode* argumentsNode,
+                                         unsigned divot,
+                                         unsigned startOffset,
+                                         unsigned endOffset) {
   ASSERT(func->refCount());
 
   // Reserve space for prototype
@@ -1201,8 +1204,10 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
     emitNode(argv.last().get(), n);
   }
 
+  emitExpressionInfo(divot, startOffset, endOffset);
   emitGetById(funcProto.get(), func, globalExec()->propertyNames().prototype);
 
+  emitExpressionInfo(divot, startOffset, endOffset);
   emitOpcode(op_construct);
   instructions().append(dst->index());
   instructions().append(func->index());
