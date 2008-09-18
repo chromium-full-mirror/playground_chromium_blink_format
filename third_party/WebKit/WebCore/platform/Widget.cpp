@@ -49,52 +49,9 @@ void Widget::setParent(ScrollView* view) {
     setParentVisible(true);
 }
 
-void Widget::resize(int w, int h) {
-  setFrameGeometry(IntRect(x(), y(), w, h));
-}
-
-int Widget::x() const {
-  return frameGeometry().x();
-}
-
-int Widget::y() const {
-  return frameGeometry().y();
-}
-
-int Widget::width() const {
-  return frameGeometry().width();
-}
-
-int Widget::height() const {
-  return frameGeometry().height();
-}
-
-IntSize Widget::size() const {
-  return frameGeometry().size();
-}
-
-void Widget::resize(const IntSize& s) {
-  resize(s.width(), s.height());
-}
-
-IntPoint Widget::pos() const {
-  return frameGeometry().location();
-}
-
-void Widget::move(int x, int y) {
-  setFrameGeometry(IntRect(x, y, width(), height()));
-}
-
-void Widget::move(const IntPoint& p) {
-  move(p.x(), p.y());
-}
-
-bool Widget::isFrameView() const {
-  return false;
-}
-
-IntRect Widget::windowClipRect() const {
-  return IntRect();
+void Widget::setFrameGeometry(const IntRect& frame) {
+  m_frame = frame;
+  updatePlatformWidgetFrameGeometry();
 }
 
 #if !PLATFORM(MAC)
