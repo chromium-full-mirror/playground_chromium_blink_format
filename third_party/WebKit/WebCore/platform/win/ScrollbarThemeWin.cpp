@@ -218,7 +218,7 @@ void ScrollbarThemeWin::paintTrack(GraphicsContext* context,
     part = start ? SP_TRACKSTARTVERT : SP_TRACKENDVERT;
 
   int state;
-  if (!scrollbar->isEnabled())
+  if (!scrollbar->enabled())
     state = TS_DISABLED;
   else if ((scrollbar->hoveredPart() == BackTrackPart && start) ||
            (scrollbar->hoveredPart() == ForwardTrackPart && !start))
@@ -275,7 +275,7 @@ void ScrollbarThemeWin::paintButton(GraphicsContext* context,
     xpState = start ? TS_UP_BUTTON : TS_DOWN_BUTTON;
   classicState = xpState / 4;
 
-  if (!scrollbar->isEnabled()) {
+  if (!scrollbar->enabled()) {
     xpState += TS_DISABLED;
     classicState |= DFCS_INACTIVE;
   } else if ((scrollbar->hoveredPart() == BackButtonPart && start) ||
@@ -323,7 +323,7 @@ static void paintGripper(Scrollbar* scrollbar, HDC hdc, const IntRect& rect) {
     return;  // Classic look has no gripper.
 
   int state;
-  if (!scrollbar->isEnabled())
+  if (!scrollbar->enabled())
     state = TS_DISABLED;
   else if (scrollbar->pressedPart() == ThumbPart)
     state = TS_ACTIVE;  // Thumb always stays active once pressed.
@@ -346,7 +346,7 @@ void ScrollbarThemeWin::paintThumb(GraphicsContext* context,
   checkAndInitScrollbarTheme();
 
   int state;
-  if (!scrollbar->isEnabled())
+  if (!scrollbar->enabled())
     state = TS_DISABLED;
   else if (scrollbar->pressedPart() == ThumbPart)
     state = TS_ACTIVE;  // Thumb always stays active once pressed.

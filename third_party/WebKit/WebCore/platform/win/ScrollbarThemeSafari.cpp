@@ -111,7 +111,7 @@ int ScrollbarThemeSafari::scrollbarThickness(ScrollbarControlSize controlSize) {
 }
 
 bool ScrollbarThemeSafari::hasButtons(Scrollbar* scrollbar) {
-  return scrollbar->isEnabled() &&
+  return scrollbar->enabled() &&
          (scrollbar->orientation() == HorizontalScrollbar
               ? scrollbar->width()
               : scrollbar->height()) >=
@@ -120,7 +120,7 @@ bool ScrollbarThemeSafari::hasButtons(Scrollbar* scrollbar) {
 }
 
 bool ScrollbarThemeSafari::hasThumb(Scrollbar* scrollbar) {
-  return scrollbar->isEnabled() &&
+  return scrollbar->enabled() &&
          (scrollbar->orientation() == HorizontalScrollbar
               ? scrollbar->width()
               : scrollbar->height()) >=
