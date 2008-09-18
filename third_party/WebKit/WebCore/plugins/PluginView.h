@@ -250,7 +250,7 @@ class PluginView : public Widget, private PluginStreamClient {
 #ifndef NP_NO_CARBON
   bool dispatchNPEvent(NPEvent&);
 #endif
-  virtual void updatePlatformWidgetFrameGeometry() const;
+  void updatePluginWidget() const;
   void paintMissingPluginIcon(GraphicsContext*, const IntRect&);
 
   void handleKeyboardEvent(KeyboardEvent*);

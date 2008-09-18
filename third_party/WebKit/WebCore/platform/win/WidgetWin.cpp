@@ -178,6 +178,12 @@ void Widget::setFocus() {}
 
 void Widget::setIsSelected(bool) {}
 
-void Widget::updatePlatformWidgetFrameGeometry() const {}
+IntRect Widget::frameGeometry() const {
+  return m_frame;
+}
+
+void Widget::setFrameGeometry(const IntRect& rect) {
+  m_frame = rect;
+}
 
 }  // namespace WebCore

@@ -49,11 +49,6 @@ void Widget::setParent(ScrollView* view) {
     setParentVisible(true);
 }
 
-void Widget::setFrameGeometry(const IntRect& frame) {
-  m_frame = frame;
-  updatePlatformWidgetFrameGeometry();
-}
-
 #if !PLATFORM(MAC)
 void Widget::releasePlatformWidget() {}
 
