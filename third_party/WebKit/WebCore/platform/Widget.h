@@ -185,9 +185,6 @@ class Widget {
 
   virtual IntPoint convertChildToSelf(const Widget*, const IntPoint&) const;
   virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
-
-  bool suppressInvalidation() const;
-  void setSuppressInvalidation(bool);
 #endif
 
 #if PLATFORM(GTK)
@@ -199,9 +196,6 @@ class Widget {
 
   virtual IntPoint convertChildToSelf(const Widget*, const IntPoint&) const;
   virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
-
-  bool suppressInvalidation() const;
-  void setSuppressInvalidation(bool);
 #endif
 
 #if PLATFORM(QT)
@@ -217,9 +211,6 @@ class Widget {
 
   virtual IntPoint convertChildToSelf(const Widget*, const IntPoint&) const;
   virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
-
-  bool suppressInvalidation() const;
-  void setSuppressInvalidation(bool);
 #endif
 
 #if PLATFORM(MAC)

@@ -127,6 +127,11 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   virtual void setFrameGeometry(const IntRect&);
   virtual IntRect windowClipRect() const;
 
+  virtual void invalidateRect(const IntRect&);
+
+  bool suppressInvalidation() const { return m_suppressInvalidation; }
+  void setSuppressInvalidation(bool s) { m_suppressInvalidation = s; }
+
  protected:
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();
@@ -160,6 +165,8 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
 
   Timer<Scrollbar> m_scrollTimer;
   bool m_overlapsResizer;
+
+  bool m_suppressInvalidation;
 };
 }
 

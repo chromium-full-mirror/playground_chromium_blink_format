@@ -73,7 +73,8 @@ Scrollbar::Scrollbar(ScrollbarClient* client,
       m_pressedPos(0),
       m_enabled(true),
       m_scrollTimer(this, &Scrollbar::autoscrollTimerFired),
-      m_overlapsResizer(false) {
+      m_overlapsResizer(false),
+      m_suppressInvalidation(false) {
   if (!m_theme)
     m_theme = ScrollbarTheme::nativeTheme();
 
@@ -432,5 +433,11 @@ IntRect Scrollbar::windowClipRect() const {
     clipRect.intersect(m_client->windowClipRect());
 
   return clipRect;
+}
+
+void Scrollbar::invalidateRect(const IntRect& rect) {
+  if (suppressInvalidation())
+    return;
+  invalidateRect(rect);
 }
 }

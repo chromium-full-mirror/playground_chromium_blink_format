@@ -41,20 +41,17 @@ namespace WebCore {
 class WidgetPrivate {
  public:
   HWND containingWindow;
-  bool suppressInvalidation;
 };
 
 Widget::Widget() : data(new WidgetPrivate) {
   init();
   data->containingWindow = 0;
-  data->suppressInvalidation = false;
 }
 
 Widget::Widget(PlatformWidget widget) : data(new WidgetPrivate) {
   init();
   m_widget = widget;
   data->containingWindow = 0;
-  data->suppressInvalidation = false;
 }
 
 Widget::~Widget() {
@@ -131,18 +128,7 @@ IntPoint Widget::convertSelfToChild(const Widget* child,
 
 void Widget::paint(GraphicsContext*, const IntRect&) {}
 
-bool Widget::suppressInvalidation() const {
-  return data->suppressInvalidation;
-}
-
-void Widget::setSuppressInvalidation(bool suppress) {
-  data->suppressInvalidation = suppress;
-}
-
 void Widget::invalidateRect(const IntRect& r) {
-  if (data->suppressInvalidation)
-    return;
-
   if (!parent()) {
     RECT rect = r;
     ::InvalidateRect(containingWindow(), &rect, false);
