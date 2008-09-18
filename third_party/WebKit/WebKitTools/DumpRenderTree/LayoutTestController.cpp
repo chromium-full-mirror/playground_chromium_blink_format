@@ -60,8 +60,7 @@ LayoutTestController::LayoutTestController(
       m_testRepaintSweepHorizontally(testRepaintSweepHorizontallyDefault),
       m_waitToDump(false),
       m_windowIsKey(true),
-      m_globalFlag(false),
-      m_selfJSObject(0) {}
+      m_globalFlag(false) {}
 
 // Static Functions
 
@@ -502,15 +501,7 @@ static JSValueRef notifyDoneCallback(JSContextRef context,
   // May be able to be made platform independant by using shared WorkQueue
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  if (controller)
-    controller->notifyDone();
-  else {
-    const char* msg =
-        "FAIL: Null layoutTestController in notifyDone(). Did a test call "
-        "notifyDone() twice?\n";
-    fprintf(stderr, "%s", msg);
-    fprintf(stdout, "%s", msg);
-  }
+  controller->notifyDone();
   return JSValueMakeUndefined(context);
 }
 
@@ -952,8 +943,7 @@ static bool setGlobalFlagCallback(JSContextRef context,
 static void layoutTestControllerObjectFinalize(JSObjectRef object) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(object));
-  if (controller)
-    controller->setJSObject(0);
+  controller->deref();
 }
 
 // Object Creation
@@ -963,9 +953,12 @@ void LayoutTestController::makeWindowObject(JSContextRef context,
                                             JSValueRef* exception) {
   JSRetainPtr<JSStringRef> layoutTestContollerStr(
       Adopt, JSStringCreateWithUTF8CString("layoutTestController"));
-  setJSObject(JSObjectMake(context, getJSClass(), this));
+  ref();
+  JSValueRef layoutTestContollerObject =
+      JSObjectMake(context, getJSClass(), this);
   JSObjectSetProperty(
-      context, windowObject, layoutTestContollerStr.get(), jsObject(),
+      context, windowObject, layoutTestContollerStr.get(),
+      layoutTestContollerObject,
       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete, exception);
 }
 
