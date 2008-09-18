@@ -237,7 +237,7 @@ class Widget {
 #endif
 
  protected:
-  virtual void updatePlatformWidgetFrameGeometry();
+  virtual void updatePlatformWidgetFrameGeometry() const;
 
  private:
   void init();  // Must be called by all Widget constructors to initialize
