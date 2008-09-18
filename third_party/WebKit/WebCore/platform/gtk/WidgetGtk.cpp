@@ -42,8 +42,6 @@ namespace WebCore {
 
 class WidgetPrivate {
  public:
-  IntRect frameRect;
-
   GtkWidget* containingWindow;
   bool suppressInvalidation;
   GdkCursor* cursor;
@@ -75,14 +73,6 @@ void Widget::setContainingWindow(PlatformWidget containingWindow) {
 
 PlatformWidget Widget::containingWindow() const {
   return data->containingWindow;
-}
-
-IntRect Widget::frameGeometry() const {
-  return data->frameRect;
-}
-
-void Widget::setFrameGeometry(const IntRect& r) {
-  data->frameRect = r;
 }
 
 void Widget::setFocus() {
@@ -248,4 +238,6 @@ void Widget::setSuppressInvalidation(bool suppress) {
 }
 
 void Widget::geometryChanged() const {}
+
+void Widget::updatePlatformWidgetFrameGeometry() const {}
 }

@@ -53,13 +53,6 @@ Widget::~Widget() {
   delete data;
 }
 
-IntRect Widget::frameGeometry() const {
-  if (platformWidget())
-    return IntRect(platformWidget()->GetRect());
-
-  return IntRect();
-}
-
 void Widget::setFocus() {
   if (platformWidget())
     platformWidget()->SetFocus();
@@ -80,9 +73,9 @@ void Widget::hide() {
     platformWidget()->Hide();
 }
 
-void Widget::setFrameGeometry(const IntRect& rect) {
+void Widget::updatePlatformWidgetFrameGeometry() const {
   if (platformWidget())
-    platformWidget()->SetSize(rect);
+    platformWidget()->SetSize(frameGeometry());
 }
 
 void Widget::invalidate() {

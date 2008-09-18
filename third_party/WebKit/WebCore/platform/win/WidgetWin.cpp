@@ -178,6 +178,6 @@ void Widget::setFocus() {}
 
 void Widget::setIsSelected(bool) {}
 
-void Widget::updatePlatformWidgetFrameGeometry() {}
+void Widget::updatePlatformWidgetFrameGeometry() const {}
 
 }  // namespace WebCore
