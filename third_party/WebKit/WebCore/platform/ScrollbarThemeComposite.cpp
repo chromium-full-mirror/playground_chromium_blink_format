@@ -106,7 +106,7 @@ bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
       ScrollbarControlState s = 0;
       if (scrollbar->client()->isActive())
         s |= ActiveScrollbarState;
-      if (scrollbar->isEnabled())
+      if (scrollbar->enabled())
         s |= EnabledScrollbarState;
       if (scrollbar->pressedPart() != NoPart)
         s |= PressedScrollbarState;
@@ -150,7 +150,7 @@ bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
 ScrollbarPart ScrollbarThemeComposite::hitTest(Scrollbar* scrollbar,
                                                const PlatformMouseEvent& evt) {
   ScrollbarPart result = NoPart;
-  if (!scrollbar->isEnabled())
+  if (!scrollbar->enabled())
     return result;
 
   IntPoint mousePosition = scrollbar->convertFromContainingWindow(evt.pos());
@@ -238,7 +238,7 @@ void ScrollbarThemeComposite::splitTrack(Scrollbar* scrollbar,
 }
 
 int ScrollbarThemeComposite::thumbPosition(Scrollbar* scrollbar) {
-  if (scrollbar->isEnabled())
+  if (scrollbar->enabled())
     return scrollbar->currentPos() *
            (trackLength(scrollbar) - thumbLength(scrollbar)) /
            scrollbar->maximum();
@@ -246,7 +246,7 @@ int ScrollbarThemeComposite::thumbPosition(Scrollbar* scrollbar) {
 }
 
 int ScrollbarThemeComposite::thumbLength(Scrollbar* scrollbar) {
-  if (!scrollbar->isEnabled())
+  if (!scrollbar->enabled())
     return 0;
 
   float proportion = (float)scrollbar->visibleSize() / scrollbar->totalSize();
