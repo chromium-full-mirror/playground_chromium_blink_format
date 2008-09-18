@@ -59,7 +59,6 @@ struct WidgetPrivate {
 
   bool suppressInvalidation;
   bool isNPAPIPlugin;
-  IntRect m_geometry;
 };
 
 Widget::Widget() : data(new WidgetPrivate) {
@@ -77,15 +76,11 @@ Widget::~Widget() {
   data = 0;
 }
 
-IntRect Widget::frameGeometry() const {
-  return data->m_geometry;
-}
-
-void Widget::setFrameGeometry(const IntRect& r) {
-  data->m_geometry = r;
-  if (platformWidget())
-    platformWidget()->setGeometry(
-        convertToContainingWindow(IntRect(0, 0, r.width(), r.height())));
+void Widget::updatePlatformWidgetFrameGeometry() {
+  if (!platformWidget())
+    return;
+  platformWidget()->setGeometry(
+      convertToContainingWindow(IntRect(0, 0, width(), height())));
 }
 
 void Widget::setFocus() {}
