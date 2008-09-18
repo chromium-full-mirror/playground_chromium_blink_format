@@ -38,12 +38,10 @@ namespace WebCore {
 class WidgetPrivate {
  public:
   Font font;
-  WidgetClient* client;
 };
 
 Widget::Widget() : data(new WidgetPrivate) {
   init();
-  data->client = 0;
 }
 
 Widget::Widget(PlatformWidget widget) : data(new WidgetPrivate) {
@@ -53,14 +51,6 @@ Widget::Widget(PlatformWidget widget) : data(new WidgetPrivate) {
 
 Widget::~Widget() {
   delete data;
-}
-
-void Widget::setClient(WidgetClient* c) {
-  data->client = c;
-}
-
-WidgetClient* Widget::client() const {
-  return data->client;
 }
 
 IntRect Widget::frameGeometry() const {

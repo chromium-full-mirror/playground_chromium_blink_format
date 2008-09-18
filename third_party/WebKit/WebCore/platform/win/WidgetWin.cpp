@@ -33,7 +33,6 @@
 #include "FrameWin.h"
 #include "IntRect.h"
 #include "FrameView.h"
-#include "WidgetClient.h"
 #include <winsock2.h>
 #include <windows.h>
 
@@ -41,7 +40,6 @@ namespace WebCore {
 
 class WidgetPrivate {
  public:
-  WidgetClient* client;
   HWND containingWindow;
   IntRect frameRect;
   bool suppressInvalidation;
@@ -49,7 +47,6 @@ class WidgetPrivate {
 
 Widget::Widget() : data(new WidgetPrivate) {
   init();
-  data->client = 0;
   data->containingWindow = 0;
   data->suppressInvalidation = false;
 }
@@ -57,7 +54,6 @@ Widget::Widget() : data(new WidgetPrivate) {
 Widget::Widget(PlatformWidget widget) : data(new WidgetPrivate) {
   init();
   m_widget = widget;
-  data->client = 0;
   data->containingWindow = 0;
   data->suppressInvalidation = false;
 }
@@ -73,14 +69,6 @@ void Widget::setContainingWindow(HWND containingWindow) {
 
 HWND Widget::containingWindow() const {
   return data->containingWindow;
-}
-
-void Widget::setClient(WidgetClient* c) {
-  data->client = c;
-}
-
-WidgetClient* Widget::client() const {
-  return data->client;
 }
 
 IntRect Widget::frameGeometry() const {
