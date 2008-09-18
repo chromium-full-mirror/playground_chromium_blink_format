@@ -71,6 +71,7 @@ Scrollbar::Scrollbar(ScrollbarClient* client,
       m_hoveredPart(NoPart),
       m_pressedPart(NoPart),
       m_pressedPos(0),
+      m_enabled(true),
       m_scrollTimer(this, &Scrollbar::autoscrollTimerFired),
       m_overlapsResizer(false) {
   if (!m_theme)
@@ -414,6 +415,13 @@ void Scrollbar::setParent(ScrollView* parentView) {
   if (!parentView && m_overlapsResizer && parent() && parent()->isFrameView())
     parent()->adjustOverlappingScrollbarCount(-1);
   Widget::setParent(parentView);
+}
+
+void Scrollbar::setEnabled(bool e) {
+  if (m_enabled == e)
+    return;
+  m_enabled = e;
+  invalidate();
 }
 
 IntRect Scrollbar::windowClipRect() const {

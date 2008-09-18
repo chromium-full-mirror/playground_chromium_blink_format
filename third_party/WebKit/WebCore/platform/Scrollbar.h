@@ -96,6 +96,9 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
 
   virtual void paint(GraphicsContext*, const IntRect& damageRect);
 
+  bool enabled() const { return m_enabled; }
+  virtual void setEnabled(bool e);
+
   // These methods are used for platform scrollbars to give :hover feedback.
   // They will not get called
   // when the mouse went down in a scrollbar, since it is assumed the scrollbar
@@ -152,6 +155,9 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   ScrollbarPart m_hoveredPart;
   ScrollbarPart m_pressedPart;
   int m_pressedPos;
+
+  bool m_enabled;
+
   Timer<Scrollbar> m_scrollTimer;
   bool m_overlapsResizer;
 };

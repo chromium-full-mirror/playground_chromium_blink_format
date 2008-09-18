@@ -56,15 +56,11 @@ namespace WebCore {
 
 struct WidgetPrivate {
   WidgetPrivate()
-      : m_client(0),
-        enabled(true),
-        suppressInvalidation(false),
-        isNPAPIPlugin(0) {}
+      : m_client(0), suppressInvalidation(false), isNPAPIPlugin(0) {}
   ~WidgetPrivate() {}
 
   WidgetClient* m_client;
 
-  bool enabled;
   bool suppressInvalidation;
   bool isNPAPIPlugin;
   IntRect m_geometry;
@@ -132,22 +128,6 @@ void Widget::setIsNPAPIPlugin(bool is) {
 }
 
 void Widget::paint(GraphicsContext*, const IntRect& rect) {}
-
-bool Widget::isEnabled() const {
-  if (platformWidget())
-    return platformWidget()->isEnabled();
-  return data->enabled;
-}
-
-void Widget::setEnabled(bool e) {
-  if (platformWidget())
-    platformWidget()->setEnabled(e);
-
-  if (e != data->enabled) {
-    data->enabled = e;
-    invalidate();
-  }
-}
 
 void Widget::setIsSelected(bool) {
   notImplemented();

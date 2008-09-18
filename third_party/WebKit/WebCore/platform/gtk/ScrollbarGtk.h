@@ -50,6 +50,8 @@ class ScrollbarGtk : public Scrollbar {
     return false;
   }
 
+  virtual void setEnabled(bool);
+
  protected:
   ScrollbarGtk(ScrollbarClient*, ScrollbarOrientation, ScrollbarControlSize);
 

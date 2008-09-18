@@ -44,7 +44,6 @@ class WidgetPrivate {
   WidgetClient* client;
   HWND containingWindow;
   IntRect frameRect;
-  bool enabled;
   bool suppressInvalidation;
 };
 
@@ -52,7 +51,6 @@ Widget::Widget() : data(new WidgetPrivate) {
   init();
   data->client = 0;
   data->containingWindow = 0;
-  data->enabled = true;
   data->suppressInvalidation = false;
 }
 
@@ -61,7 +59,6 @@ Widget::Widget(PlatformWidget widget) : data(new WidgetPrivate) {
   m_widget = widget;
   data->client = 0;
   data->containingWindow = 0;
-  data->enabled = true;
   data->suppressInvalidation = false;
 }
 
@@ -154,17 +151,6 @@ IntPoint Widget::convertSelfToChild(const Widget* child,
 }
 
 void Widget::paint(GraphicsContext*, const IntRect&) {}
-
-bool Widget::isEnabled() const {
-  return data->enabled;
-}
-
-void Widget::setEnabled(bool e) {
-  if (e != data->enabled) {
-    data->enabled = e;
-    invalidate();
-  }
-}
 
 bool Widget::suppressInvalidation() const {
   return data->suppressInvalidation;

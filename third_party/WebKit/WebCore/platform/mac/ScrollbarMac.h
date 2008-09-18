@@ -49,6 +49,8 @@ class ScrollbarMac : public Scrollbar {
 
   bool scrollbarHit(NSScrollerPart);
 
+  virtual void setEnabled(bool);
+
   virtual bool handleMouseMoveEvent(const PlatformMouseEvent&) { return false; }
   virtual bool handleMouseOutEvent(const PlatformMouseEvent&) { return false; }
   virtual bool handleMousePressEvent(const PlatformMouseEvent&) {
