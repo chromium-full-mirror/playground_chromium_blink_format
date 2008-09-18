@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include "AnimationBase.h"
+
 #include "AnimationController.h"
 #include "CSSPropertyNames.h"
 #include "CString.h"
@@ -36,8 +37,10 @@
 #include "EventNames.h"
 #include "FloatConversion.h"
 #include "Frame.h"
+#include "IdentityTransformOperation.h"
 #include "ImplicitAnimation.h"
 #include "KeyframeAnimation.h"
+#include "MatrixTransformOperation.h"
 #include "RenderObject.h"
 #include "RenderStyle.h"
 #include "SystemTime.h"
@@ -52,7 +55,7 @@ static const double cAnimationTimerDelay = 0.025;
 // animation, the more precision we need in the timing function result to avoid
 // ugly discontinuities.
 static inline double solveEpsilon(double duration) {
-  return 1. / (200. * duration);
+  return 1.0 / (200.0 * duration);
 }
 
 static inline double solveCubicBezierFunction(double p1x,
