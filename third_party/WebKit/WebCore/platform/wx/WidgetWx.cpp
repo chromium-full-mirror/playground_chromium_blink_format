@@ -85,11 +85,6 @@ void Widget::setFrameGeometry(const IntRect& rect) {
   m_frame = rect;
 }
 
-void Widget::invalidate() {
-  if (platformWidget())
-    platformWidget()->Refresh();
-}
-
 void Widget::invalidateRect(const IntRect& r) {
   if (platformWidget())
     platformWidget()->RefreshRect(r);
