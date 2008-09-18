@@ -183,7 +183,6 @@ class Machine {
   static JSValue* SFX_CALL cti_op_resolve_global(CTI_ARGS);
   static void* SFX_CALL cti_op_construct_JSConstruct(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_construct_NotJSConstruct(CTI_ARGS);
-  static void SFX_CALL cti_op_construct_verify(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_get_by_val(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_resolve_func(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_sub(CTI_ARGS);
