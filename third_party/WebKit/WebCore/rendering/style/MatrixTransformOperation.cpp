@@ -22,6 +22,8 @@
 #include "config.h"
 #include "MatrixTransformOperation.h"
 
+#include <algorithm>
+
 namespace WebCore {
 
 PassRefPtr<TransformOperation> MatrixTransformOperation::blend(
