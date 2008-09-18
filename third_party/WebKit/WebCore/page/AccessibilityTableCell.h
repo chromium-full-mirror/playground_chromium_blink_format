@@ -41,8 +41,8 @@ class AccessibilityTableCell : public AccessibilityRenderObject {
   static PassRefPtr<AccessibilityTableCell> create(RenderObject*);
   virtual ~AccessibilityTableCell();
 
-  virtual bool isTableCell() const { return true; };
-  virtual AccessibilityRole roleValue() const { return CellRole; };
+  virtual bool isTableCell() const;
+  virtual AccessibilityRole roleValue() const;
 
   virtual bool accessibilityIsIgnored() const;
 

@@ -48,12 +48,29 @@ PassRefPtr<AccessibilityTableCell> AccessibilityTableCell::create(
 }
 
 bool AccessibilityTableCell::accessibilityIsIgnored() const {
+  if (!isTableCell())
+    return AccessibilityRenderObject::accessibilityIsIgnored();
+
+  return false;
+}
+
+bool AccessibilityTableCell::isTableCell() const {
   if (!m_renderer)
-    return true;
+    return false;
 
   AccessibilityObject* renderTable =
       axObjectCache()->get(static_cast<RenderTableCell*>(m_renderer)->table());
-  return renderTable->accessibilityIsIgnored();
+  if (!renderTable->isDataTable())
+    return false;
+
+  return true;
+}
+
+AccessibilityRole AccessibilityTableCell::roleValue() const {
+  if (!isTableCell())
+    return AccessibilityRenderObject::roleValue();
+
+  return CellRole;
 }
 
 void AccessibilityTableCell::rowIndexRange(pair<int, int>& rowRange) {
