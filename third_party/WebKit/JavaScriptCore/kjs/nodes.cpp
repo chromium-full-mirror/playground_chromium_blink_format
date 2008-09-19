@@ -253,12 +253,8 @@ RegisterID* NumberNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 RegisterID* StringNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   if (dst == ignoredResult())
     return 0;
-
-  // We atomize constant strings, in case they're later used in property lookup.
   return generator.emitLoad(
-      dst,
-      jsOwnedString(generator.globalExec(),
-                    Identifier(generator.globalExec(), m_value).ustring()));
+      dst, jsOwnedString(generator.globalExec(), m_value.ustring()));
 }
 
 // ------------------------------ RegExpNode -----------------------------------
@@ -1680,7 +1676,8 @@ static void processClauseList(ClauseListNode* list,
         typeForTable = SwitchNeither;
         break;
       }
-      UString& value = static_cast<StringNode*>(clauseExpression)->value();
+      const UString& value =
+          static_cast<StringNode*>(clauseExpression)->value().ustring();
       if (singleCharacterSwitch &= value.size() == 1) {
         int32_t intVal = value.rep()->data()[0];
         if (intVal < min_num)
