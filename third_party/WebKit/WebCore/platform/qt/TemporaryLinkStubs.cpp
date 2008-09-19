@@ -33,6 +33,7 @@
 #include "config.h"
 
 #include "AXObjectCache.h"
+#include "DNS.h"
 #include "CString.h"
 #include "CachedResource.h"
 #include "CookieJar.h"
@@ -173,6 +174,10 @@ float userIdleTime() {
 PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
   notImplemented();
   return 0;
+}
+
+void prefetchDNS(const String& hostname) {
+  notImplemented();
 }
 }
 

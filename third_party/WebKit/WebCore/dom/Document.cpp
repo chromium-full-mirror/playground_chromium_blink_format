@@ -374,6 +374,7 @@ Document::Document(Frame* frame, bool isXHTML)
   m_overMinimumLayoutThreshold = false;
 
   initSecurityContext();
+  initDNSPrefetch();
 
   static int docID = 0;
   m_docID = docID++;
@@ -1994,6 +1995,8 @@ void Document::processHttpEquiv(const String& equiv, const String& content) {
       static_cast<HTMLDocument*>(this)->setCookie(content);
   } else if (equalIgnoringCase(equiv, "content-language"))
     setContentLanguage(content);
+  else if (equalIgnoringCase(equiv, "x-dns-prefetch-control"))
+    parseDNSPrefetchControlHeader(content);
 }
 
 MouseEventWithHitTestResults Document::prepareMouseEvent(
@@ -4070,6 +4073,7 @@ void Document::initSecurityContext() {
 
 void Document::setSecurityOrigin(SecurityOrigin* securityOrigin) {
   m_securityOrigin = securityOrigin;
+  initDNSPrefetch();
 }
 
 void Document::updateFocusAppearanceSoon() {
@@ -4355,6 +4359,28 @@ HTMLCanvasElement* Document::getCSSCanvasElement(const String& name) {
     m_cssCanvasElements.set(name, result);
   }
   return result.get();
+}
+
+void Document::initDNSPrefetch() {
+  m_haveExplicitlyDisabledDNSPrefetch = false;
+  m_isDNSPrefetchEnabled = securityOrigin()->protocol() == "http";
+
+  // Inherit DNS prefetch opt-out from parent frame
+  if (Document* parent = parentDocument()) {
+    if (!parent->isDNSPrefetchEnabled())
+      m_isDNSPrefetchEnabled = false;
+  }
+}
+
+void Document::parseDNSPrefetchControlHeader(const String& dnsPrefetchControl) {
+  if (equalIgnoringCase(dnsPrefetchControl, "on") &&
+      !m_haveExplicitlyDisabledDNSPrefetch) {
+    m_isDNSPrefetchEnabled = true;
+    return;
+  }
+
+  m_isDNSPrefetchEnabled = false;
+  m_haveExplicitlyDisabledDNSPrefetch = true;
 }
 
 }  // namespace WebCore

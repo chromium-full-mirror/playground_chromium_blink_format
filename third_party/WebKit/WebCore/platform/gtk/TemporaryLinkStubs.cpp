@@ -28,6 +28,7 @@
 #include "config.h"
 
 #include "AXObjectCache.h"
+#include "DNS.h"
 #include "Editor.h"
 #include "FrameView.h"
 #include "FTPDirectoryDocument.h"
@@ -88,5 +89,9 @@ String KURL::fileSystemPath() const {
 PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
   notImplemented();
   return 0;
+}
+
+void prefetchDNS(const String& hostname) {
+  notImplemented();
 }
 }

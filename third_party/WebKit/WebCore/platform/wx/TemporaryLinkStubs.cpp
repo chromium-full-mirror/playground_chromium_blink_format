@@ -39,6 +39,7 @@
 #include "ContextMenuItem.h"
 #include "CookieJar.h"
 #include "Cursor.h"
+#include "DNS.h"
 #include "DocumentFragment.h"
 #include "DocumentLoader.h"
 #include "DragController.h"
@@ -357,5 +358,9 @@ String KURL::fileSystemPath() const {
 PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
   notImplemented();
   return 0;
+}
+
+void prefetchDNS(const String& hostname) {
+  notImplemented();
 }
 }

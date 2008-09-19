@@ -1001,6 +1001,13 @@ void FrameLoader::begin(const KURL& url,
   document->docLoader()->setAutoLoadImages(
       settings && settings->loadsImagesAutomatically());
 
+  if (m_documentLoader) {
+    String dnsPrefetchControl =
+        m_documentLoader->response().httpHeaderField("X-DNS-Prefetch-Control");
+    if (!dnsPrefetchControl.isEmpty())
+      document->parseDNSPrefetchControlHeader(dnsPrefetchControl);
+  }
+
 #if FRAME_LOADS_USER_STYLESHEET
   KURL userStyleSheet = settings ? settings->userStyleSheetLocation() : KURL();
   if (!userStyleSheet.isEmpty())

@@ -892,6 +892,10 @@ class Document : public ContainerNode {
                                                 int height);
   HTMLCanvasElement* getCSSCanvasElement(const String& name);
 
+  bool isDNSPrefetchEnabled() const { return m_isDNSPrefetchEnabled; }
+  void initDNSPrefetch();
+  void parseDNSPrefetchControlHeader(const String&);
+
  protected:
   Document(Frame*, bool isXHTML);
 
@@ -1006,6 +1010,9 @@ class Document : public ContainerNode {
   bool m_usesFirstLineRules;
   bool m_usesFirstLetterRules;
   bool m_gotoAnchorNeededAfterStylesheetsLoad;
+
+  bool m_isDNSPrefetchEnabled;
+  bool m_haveExplicitlyDisabledDNSPrefetch;
 
   String m_title;
   bool m_titleSetExplicitly;

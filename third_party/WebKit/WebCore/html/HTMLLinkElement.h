@@ -98,7 +98,8 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
   static void tokenizeRelAttribute(const AtomicString& value,
                                    bool& stylesheet,
                                    bool& alternate,
-                                   bool& icon);
+                                   bool& icon,
+                                   bool& dnsPrefetch);
 
   virtual void getSubresourceAttributeStrings(Vector<String>&) const;
 
@@ -118,6 +119,7 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
   bool m_alternate;
   bool m_isStyleSheet;
   bool m_isIcon;
+  bool m_isDNSPrefetch;
   bool m_createdByParser;
 };
 
