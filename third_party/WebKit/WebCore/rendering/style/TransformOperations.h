@@ -31,7 +31,7 @@
 
 namespace WebCore {
 
-class TransformOperations : public Vector<RefPtr<TransformOperation>> {
+class TransformOperations {
  public:
   TransformOperations(bool makeIdentity = false);
 
@@ -39,8 +39,13 @@ class TransformOperations : public Vector<RefPtr<TransformOperation>> {
   bool operator!=(const TransformOperations& o) const { return !(*this == o); }
 
   void apply(const IntSize& sz, AffineTransform& t) const {
-    for (unsigned i = 0; i < size(); ++i)
-      at(i)->apply(t, sz);
+    for (unsigned i = 0; i < m_operations.size(); ++i)
+      m_operations[i]->apply(t, sz);
+  }
+
+  Vector<RefPtr<TransformOperation>>& operations() { return m_operations; }
+  const Vector<RefPtr<TransformOperation>>& operations() const {
+    return m_operations;
   }
 
  private:

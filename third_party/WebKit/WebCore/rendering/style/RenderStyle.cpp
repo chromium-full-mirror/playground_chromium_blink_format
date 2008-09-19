@@ -700,12 +700,13 @@ void RenderStyle::applyTransform(AffineTransform& transform,
   // transform-origin is irrelevant
   // in that case.
   bool applyTransformOrigin = false;
-  unsigned s = rareNonInheritedData->m_transform->m_operations.size();
+  unsigned s =
+      rareNonInheritedData->m_transform->m_operations.operations().size();
   unsigned i;
   if (includeTransformOrigin) {
     for (i = 0; i < s; i++) {
       TransformOperation::OperationType type =
-          rareNonInheritedData->m_transform->m_operations[i]
+          rareNonInheritedData->m_transform->m_operations.operations()[i]
               ->getOperationType();
       if (type != TransformOperation::TRANSLATE_X &&
           type != TransformOperation::TRANSLATE_Y &&
@@ -722,8 +723,8 @@ void RenderStyle::applyTransform(AffineTransform& transform,
         transformOriginY().calcFloatValue(borderBoxSize.height()));
 
   for (i = 0; i < s; i++)
-    rareNonInheritedData->m_transform->m_operations[i]->apply(transform,
-                                                              borderBoxSize);
+    rareNonInheritedData->m_transform->m_operations.operations()[i]->apply(
+        transform, borderBoxSize);
 
   if (applyTransformOrigin)
     transform.translate(
@@ -811,7 +812,7 @@ void RenderStyle::adjustAnimations() {
 
   // get rid of empty transitions and anything beyond them
   for (size_t i = 0; i < animationList->size(); ++i) {
-    if ((*animationList)[i]->isEmpty()) {
+    if (animationList->animation(i)->isEmpty()) {
       animationList->resize(i);
       break;
     }
@@ -833,7 +834,7 @@ void RenderStyle::adjustTransitions() {
 
   // get rid of empty transitions and anything beyond them
   for (size_t i = 0; i < transitionList->size(); ++i) {
-    if ((*transitionList)[i]->isEmpty()) {
+    if (transitionList->animation(i)->isEmpty()) {
       transitionList->resize(i);
       break;
     }
@@ -851,8 +852,8 @@ void RenderStyle::adjustTransitions() {
   // but the lists tend to be very short, so it is probably ok
   for (size_t i = 0; i < transitionList->size(); ++i) {
     for (size_t j = i + 1; j < transitionList->size(); ++j) {
-      if ((*transitionList)[i]->property() ==
-          (*transitionList)[j]->property()) {
+      if (transitionList->animation(i)->property() ==
+          transitionList->animation(j)->property()) {
         // toss i
         transitionList->remove(i);
         j = i;
@@ -876,7 +877,7 @@ AnimationList* RenderStyle::accessTransitions() {
 const Animation* RenderStyle::transitionForProperty(int property) {
   if (transitions()) {
     for (size_t i = 0; i < transitions()->size(); ++i) {
-      const Animation* p = (*transitions())[i].get();
+      const Animation* p = transitions()->animation(i);
       if (p->property() == cAnimateAll || p->property() == property) {
         return p;
       }

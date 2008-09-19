@@ -880,7 +880,8 @@ class RenderStyle {
     return rareNonInheritedData->m_transform->m_y;
   }
   bool hasTransform() const {
-    return !rareNonInheritedData->m_transform->m_operations.isEmpty();
+    return !rareNonInheritedData->m_transform->m_operations.operations()
+                .isEmpty();
   }
   void applyTransform(AffineTransform&,
                       const IntSize& borderBoxSize,
