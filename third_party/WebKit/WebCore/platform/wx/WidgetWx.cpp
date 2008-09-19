@@ -34,13 +34,8 @@
 
 namespace WebCore {
 
-Widget::Widget() {
-  init();
-}
-
 Widget::Widget(PlatformWidget widget) {
-  init();
-  m_widget = widget;
+  init(widget);
 }
 
 Widget::~Widget() {}

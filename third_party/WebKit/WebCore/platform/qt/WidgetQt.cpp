@@ -53,13 +53,8 @@
 
 namespace WebCore {
 
-Widget::Widget() {
-  init();
-}
-
 Widget::Widget(QWidget* widget) {
-  init();
-  m_widget = widget;
+  init(widget);
 }
 
 Widget::~Widget() {
