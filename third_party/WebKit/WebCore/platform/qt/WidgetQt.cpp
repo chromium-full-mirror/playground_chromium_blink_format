@@ -53,26 +53,17 @@
 
 namespace WebCore {
 
-struct WidgetPrivate {
-  WidgetPrivate() : isNPAPIPlugin(0) {}
-  ~WidgetPrivate() {}
-
-  bool isNPAPIPlugin;
-};
-
-Widget::Widget() : data(new WidgetPrivate) {
+Widget::Widget() {
   init();
 }
 
-Widget::Widget(QWidget* widget) : data(new WidgetPrivate) {
+Widget::Widget(QWidget* widget) {
   init();
   m_widget = widget;
 }
 
 Widget::~Widget() {
   Q_ASSERT(!parent());
-  delete data;
-  data = 0;
 }
 
 IntRect Widget::frameGeometry() const {
@@ -103,14 +94,6 @@ void Widget::show() {
 void Widget::hide() {
   if (platformWidget())
     platformWidget()->hide();
-}
-
-bool Widget::isNPAPIPlugin() const {
-  return data->isNPAPIPlugin;
-}
-
-void Widget::setIsNPAPIPlugin(bool is) {
-  data->isNPAPIPlugin = is;
 }
 
 void Widget::paint(GraphicsContext*, const IntRect& rect) {}

@@ -28,30 +28,22 @@
 #include "Cursor.h"
 #include "GraphicsContext.h"
 #include "IntRect.h"
-#include "Font.h"
 
 #include <wx/defs.h>
 #include <wx/scrolwin.h>
 
 namespace WebCore {
 
-class WidgetPrivate {
- public:
-  Font font;
-};
-
-Widget::Widget() : data(new WidgetPrivate) {
+Widget::Widget() {
   init();
 }
 
-Widget::Widget(PlatformWidget widget) : data(new WidgetPrivate) {
+Widget::Widget(PlatformWidget widget) {
   init();
   m_widget = widget;
 }
 
-Widget::~Widget() {
-  delete data;
-}
+Widget::~Widget() {}
 
 void Widget::setFocus() {
   if (platformWidget())

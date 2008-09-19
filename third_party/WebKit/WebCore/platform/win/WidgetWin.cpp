@@ -38,15 +38,11 @@
 
 namespace WebCore {
 
-class WidgetPrivate {
- public:
-};
-
-Widget::Widget() : data(0) {
+Widget::Widget() {
   init();
 }
 
-Widget::Widget(PlatformWidget widget) : data(0) {
+Widget::Widget(PlatformWidget widget) {
   init();
   m_widget = widget;
 }

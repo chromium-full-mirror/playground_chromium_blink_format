@@ -569,6 +569,10 @@ PluginView::PluginView(Frame* parentFrame,
       ,
       m_needsXEmbed(false)
 #endif
+#if PLATFORM(QT)
+      ,
+      m_isNPAPIPlugin(false)
+#endif
 #if PLATFORM(WIN_OS) && !PLATFORM(WX) && ENABLE(NETSCAPE_PLUGIN_API)
       ,
       m_pluginWndProc(0),
