@@ -39,14 +39,13 @@ namespace WebCore {
 static void markDOMObjectWrapper(void* object) {
   if (!object)
     return;
-  DOMObject* wrapper = ScriptInterpreter::getDOMObject(object);
+  DOMObject* wrapper = getCachedDOMObjectWrapper(object);
   if (!wrapper || wrapper->marked())
     return;
   wrapper->mark();
 }
 
 void JSDOMWindow::mark() {
-  Base::mark();
   markDOMObjectWrapper(impl()->optionalConsole());
   markDOMObjectWrapper(impl()->optionalHistory());
   markDOMObjectWrapper(impl()->optionalLocationbar());
@@ -66,6 +65,12 @@ void JSDOMWindow::mark() {
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   markDOMObjectWrapper(impl()->optionalApplicationCache());
 #endif
+
+  JSDOMStructureMap::iterator end = structures().end();
+  for (JSDOMStructureMap::iterator it = structures().begin(); it != end; ++it)
+    it->second->mark();
+
+  Base::mark();
 }
 
 bool JSDOMWindow::deleteProperty(ExecState* exec,

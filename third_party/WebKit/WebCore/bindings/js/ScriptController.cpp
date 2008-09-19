@@ -181,7 +181,7 @@ void ScriptController::finishedWithEvent(Event* event) {
   // forgotten
   // by the DOM implementation and so does not need to be cached still by the
   // interpreter
-  ScriptInterpreter::forgetDOMObject(event);
+  forgetDOMObject(event);
 }
 
 void ScriptController::initScript() {

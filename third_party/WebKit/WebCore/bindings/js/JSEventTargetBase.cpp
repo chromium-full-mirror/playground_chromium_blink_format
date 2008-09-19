@@ -189,9 +189,11 @@ JSValue* jsEventTargetDispatchEvent(ExecState* exec,
                                                eventTarget))
     return throwError(exec, TypeError);
 
-  DOMExceptionTranslator exception(exec);
-  return jsBoolean(
-      eventTarget->dispatchEvent(toEvent(args.at(exec, 0)), exception));
+  ExceptionCode ec = 0;
+  JSValue* result =
+      jsBoolean(eventTarget->dispatchEvent(toEvent(args.at(exec, 0)), ec));
+  setDOMException(exec, ec);
+  return result;
 }
 
 const AtomicString& eventNameForPropertyToken(int token) {
@@ -300,7 +302,7 @@ JSValue* toJS(ExecState* exec, EventTarget* target) {
   if (XMLHttpRequest* xhr = target->toXMLHttpRequest())
     // XMLHttpRequest is always created via JS, so we don't need to use
     // cacheDOMObject() here.
-    return ScriptInterpreter::getDOMObject(xhr);
+    return getCachedDOMObjectWrapper(xhr);
 
   if (XMLHttpRequestUpload* upload = target->toXMLHttpRequestUpload())
     return toJS(exec, upload);
@@ -309,7 +311,7 @@ JSValue* toJS(ExecState* exec, EventTarget* target) {
   if (DOMApplicationCache* cache = target->toDOMApplicationCache())
     // DOMApplicationCache is always created via JS, so we don't need to use
     // cacheDOMObject() here.
-    return ScriptInterpreter::getDOMObject(cache);
+    return getCachedDOMObjectWrapper(cache);
 #endif
 
   // There are two kinds of EventTargets: EventTargetNode and XMLHttpRequest.

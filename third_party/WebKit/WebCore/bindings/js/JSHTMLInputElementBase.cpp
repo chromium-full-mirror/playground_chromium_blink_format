@@ -52,8 +52,6 @@ DontDelete|Function 2
 @end
 */
 
-JSC_IMPLEMENT_PROTOTYPE("HTMLInputElementBase", JSHTMLInputElementBasePrototype)
-
 // SetSelectionRange is implemented on the class instead of on the prototype
 // to make it easier to enable/disable lookup of the function based on input
 // type.
@@ -72,9 +70,9 @@ const ClassInfo JSHTMLInputElementBase::s_info = {
     "HTMLInputElementBase", &JSHTMLElement::s_info,
     &JSHTMLInputElementBaseTable, 0};
 
-JSHTMLInputElementBase::JSHTMLInputElementBase(JSC::JSObject* prototype,
+JSHTMLInputElementBase::JSHTMLInputElementBase(JSC::StructureID* structure,
                                                PassRefPtr<HTMLInputElement> e)
-    : JSHTMLElement(prototype, e.get()) {}
+    : JSHTMLElement(structure, e.get()) {}
 
 bool JSHTMLInputElementBase::getOwnPropertySlot(ExecState* exec,
                                                 const Identifier& propertyName,

@@ -45,7 +45,7 @@ void JSXMLHttpRequestUpload::mark() {
   Base::mark();
 
   if (XMLHttpRequest* xmlHttpRequest = m_impl->associatedXMLHttpRequest()) {
-    DOMObject* wrapper = ScriptInterpreter::getDOMObject(xmlHttpRequest);
+    DOMObject* wrapper = getCachedDOMObjectWrapper(xmlHttpRequest);
     if (wrapper && !wrapper->marked())
       wrapper->mark();
   }

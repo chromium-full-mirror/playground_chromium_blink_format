@@ -34,8 +34,8 @@ class HTMLCollection;
 
 class JSHTMLAllCollection : public JSHTMLCollection {
  public:
-  JSHTMLAllCollection(JSC::JSObject* prototype, HTMLCollection* collection)
-      : JSHTMLCollection(prototype, collection) {}
+  JSHTMLAllCollection(JSC::StructureID* structure, HTMLCollection* collection)
+      : JSHTMLCollection(structure, collection) {}
 
   virtual bool toBoolean(JSC::ExecState*) const { return false; }
   virtual bool masqueradeAsUndefined() const { return true; }

@@ -47,10 +47,7 @@ static JSObject* constructXMLHttpRequest(ExecState* exec,
                                          const ArgList&) {
   RefPtr<XMLHttpRequest> xmlHttpRequest = XMLHttpRequest::create(
       static_cast<JSXMLHttpRequestConstructor*>(constructor)->document());
-  JSXMLHttpRequest* result = new (exec) JSXMLHttpRequest(
-      JSXMLHttpRequestPrototype::self(exec), xmlHttpRequest.get());
-  ScriptInterpreter::putDOMObject(xmlHttpRequest.get(), result);
-  return result;
+  return CREATE_DOM_OBJECT_WRAPPER(exec, XMLHttpRequest, xmlHttpRequest.get());
 }
 
 ConstructType JSXMLHttpRequestConstructor::getConstructData(
