@@ -198,7 +198,6 @@ class Widget {
   static void beforeMouseDown(NSView*, Widget*);
   static void afterMouseDown(NSView*, Widget*);
 
-  void addToSuperview(NSView* superview);
   void removeFromSuperview();
 #endif
 
