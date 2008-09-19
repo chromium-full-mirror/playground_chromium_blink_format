@@ -61,6 +61,14 @@ enum ScrollbarPart {
   AllParts = 0xffffffff,
 };
 
+enum ScrollbarButtonsPlacement {
+  ScrollbarButtonsNone,
+  ScrollbarButtonsSingle,
+  ScrollbarButtonsDoubleStart,
+  ScrollbarButtonsDoubleEnd,
+  ScrollbarButtonsDoubleBoth
+};
+
 typedef unsigned ScrollbarControlPartMask;
 }
 

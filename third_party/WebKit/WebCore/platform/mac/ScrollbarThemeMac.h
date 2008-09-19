@@ -43,6 +43,8 @@ class ScrollbarThemeMac : public ScrollbarThemeComposite {
   virtual double initialAutoscrollTimerDelay();
   virtual double autoscrollTimerDelay();
 
+  virtual ScrollbarButtonsPlacement buttonsPlacement() const;
+
  protected:
   virtual bool hasButtons(Scrollbar*);
   virtual bool hasThumb(Scrollbar*);
