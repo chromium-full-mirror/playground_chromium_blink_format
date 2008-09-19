@@ -157,8 +157,6 @@ QWidget* Widget::containingWindow() const {
   QWidget* view = frame->page()->view();
   return view ? view : platformWidget();
 }
-
-void Widget::geometryChanged() const {}
 }
 
 // vim: ts=4 sw=4 et
