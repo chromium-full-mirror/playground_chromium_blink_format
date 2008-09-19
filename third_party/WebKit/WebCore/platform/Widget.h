@@ -169,7 +169,7 @@ class Widget {
   virtual void removeFromParent();
   virtual void setParent(ScrollView* view);
   ScrollView* parent() const { return m_parent; }
-  const ScrollView* root() const;
+  ScrollView* root() const;
 
   // This method is used by plugins on all platforms to obtain a clip rect that
   // includes clips set by WebCore,
@@ -187,13 +187,12 @@ class Widget {
     m_containingWindow = window;
   }  // This method is only used by platforms that can't easily get back to
      // their containing window.
-
-#if PLATFORM(WIN)
-  virtual void geometryChanged() const {}
-
   IntRect convertToContainingWindow(const IntRect&) const;
   IntPoint convertToContainingWindow(const IntPoint&) const;
   IntPoint convertFromContainingWindow(const IntPoint&) const;
+
+#if PLATFORM(WIN)
+  virtual void geometryChanged() const {}
 
   virtual IntPoint convertChildToSelf(const Widget*, const IntPoint&) const;
   virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
@@ -216,10 +215,6 @@ class Widget {
 
   virtual void geometryChanged() const;
 
-  IntRect convertToContainingWindow(const IntRect&) const;
-  IntPoint convertToContainingWindow(const IntPoint&) const;
-  IntPoint convertFromContainingWindow(const IntPoint&) const;
-
   virtual IntPoint convertChildToSelf(const Widget*, const IntPoint&) const;
   virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
 #endif
@@ -233,11 +228,6 @@ class Widget {
   void addToSuperview(NSView* superview);
   void removeFromSuperview();
   IntPoint convertToScreenCoordinate(NSView*, const IntPoint&);
-
-  // FIXME: Will need to implement these methods once we actually start doing
-  // viewless widgets.
-  IntPoint convertFromContainingWindow(const IntPoint&) const;
-  IntRect convertToContainingWindow(const IntRect&) const;
 #endif
 
  private:
