@@ -102,7 +102,7 @@ class SimpleFontData : public FontData {
   NSFont* getNSFont() const { return m_font.font(); }
 #if USE(CORE_TEXT)
   CTFontRef getCTFont() const;
-  CFDictionaryRef getCFStringAttributes(bool ltr) const;
+  CFDictionaryRef getCFStringAttributes() const;
 #endif
 #if USE(ATSUI)
   void checkShapesArabic() const;
@@ -191,7 +191,7 @@ class SimpleFontData : public FontData {
 #endif
 #if USE(CORE_TEXT)
   mutable RetainPtr<CTFontRef> m_CTFont;
-  mutable RetainPtr<CFDictionaryRef> m_CFStringAttributes[2];
+  mutable RetainPtr<CFDictionaryRef> m_CFStringAttributes;
 #endif
 #endif
 

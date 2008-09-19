@@ -43,16 +43,16 @@ FloatRect Font::selectionRectForComplexText(const TextRun& run,
                                             int h,
                                             int from,
                                             int to) const {
-  CoreTextController it(this, run);
-  it.advance(from);
-  float beforeWidth = it.runWidthSoFar();
-  it.advance(to);
-  float afterWidth = it.runWidthSoFar();
+  CoreTextController controller(this, run);
+  controller.advance(from);
+  float beforeWidth = controller.runWidthSoFar();
+  controller.advance(to);
+  float afterWidth = controller.runWidthSoFar();
 
   // Using roundf() rather than ceilf() for the right edge as a compromise to
   // ensure correct caret positioning
   if (run.rtl()) {
-    float totalWidth = it.totalWidth();
+    float totalWidth = controller.totalWidth();
     return FloatRect(
         point.x() + floorf(totalWidth - afterWidth), point.y(),
         roundf(totalWidth - beforeWidth) - floorf(totalWidth - afterWidth), h);
@@ -97,7 +97,7 @@ void Font::drawComplexText(GraphicsContext* context,
 }
 
 float Font::floatWidthForComplexText(const TextRun& run) const {
-  CoreTextController controller(this, run);
+  CoreTextController controller(this, run, true);
   return controller.totalWidth();
 }
 
