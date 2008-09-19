@@ -37,6 +37,7 @@ class RenderFieldset : public RenderBlock {
   RenderFieldset(HTMLFormControlElement*);
 
   virtual const char* renderName() const { return "RenderFieldSet"; }
+  virtual bool isFieldset() const { return true; }
 
   virtual RenderObject* layoutLegend(bool relayoutChildren);
 
@@ -48,6 +49,8 @@ class RenderFieldset : public RenderBlock {
     return style()->height().isAuto();
   }
   virtual bool stretchesToMinIntrinsicWidth() const { return true; }
+
+  RenderObject* findLegend() const;
 
  private:
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
@@ -61,7 +64,6 @@ class RenderFieldset : public RenderBlock {
                               int lx,
                               int lw,
                               int lb);
-  RenderObject* findLegend() const;
 };
 
 }  // namespace WebCore

@@ -211,6 +211,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool isTableRow() const { return false; };
   virtual bool isTableColumn() const { return false; };
   virtual bool isTableCell() const { return false; };
+  virtual bool isFieldset() const { return false; };
 
   virtual bool isChecked() const { return false; };
   virtual bool isEnabled() const { return false; };
