@@ -2910,6 +2910,12 @@ HRESULT STDMETHODCALLTYPE WebView::executeCoreCommandByName(BSTR bName,
   return S_OK;
 }
 
+HRESULT STDMETHODCALLTYPE WebView::clearMainFrameName() {
+  m_page->mainFrame()->tree()->clearName();
+
+  return S_OK;
+}
+
 HRESULT STDMETHODCALLTYPE WebView::markAllMatchesForText(BSTR str,
                                                          BOOL caseSensitive,
                                                          BOOL highlight,

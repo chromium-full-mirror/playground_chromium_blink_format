@@ -47,6 +47,10 @@ void FrameTree::setName(const AtomicString& name) {
   m_name = parent()->tree()->uniqueChildName(name);
 }
 
+void FrameTree::clearName() {
+  m_name = AtomicString();
+}
+
 Frame* FrameTree::parent(bool checkForDisconnectedFrame) const {
   if (checkForDisconnectedFrame && m_thisFrame->isDisconnected())
     return 0;

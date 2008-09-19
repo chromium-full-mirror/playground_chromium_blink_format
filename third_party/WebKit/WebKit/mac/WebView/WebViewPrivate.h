@@ -420,6 +420,7 @@ backforward list.
 
 // SPI for DumpRenderTree
 - (void)_executeCoreCommandByName:(NSString*)name value:(NSString*)value;
+- (void)_clearMainFrameName;
 
 - (void)_setCustomHTMLTokenizerTimeDelay:(double)timeDelay;
 - (void)_setCustomHTMLTokenizerChunkSize:(int)chunkSize;

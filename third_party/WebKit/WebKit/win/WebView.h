@@ -599,6 +599,8 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE executeCoreCommandByName(BSTR name,
                                                              BSTR value);
 
+  virtual HRESULT STDMETHODCALLTYPE clearMainFrameName();
+
   virtual HRESULT STDMETHODCALLTYPE markAllMatchesForText(BSTR search,
                                                           BOOL caseSensitive,
                                                           BOOL highlight,

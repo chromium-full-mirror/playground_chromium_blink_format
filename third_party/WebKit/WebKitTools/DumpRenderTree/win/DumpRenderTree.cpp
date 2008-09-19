@@ -683,6 +683,8 @@ static void resetWebViewToConsistentStateBeforeTesting() {
           reinterpret_cast<OLE_HANDLE*>(&viewWindow))) &&
       viewWindow)
     SetFocus(viewWindow);
+
+  webViewPrivate->clearMainFrameName();
 }
 
 static void runTest(const char* pathOrURL) {
