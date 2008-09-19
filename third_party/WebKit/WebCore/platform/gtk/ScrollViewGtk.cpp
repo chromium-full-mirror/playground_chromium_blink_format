@@ -706,20 +706,8 @@ Scrollbar* ScrollView::scrollbarUnderMouse(
   return 0;
 }
 
-IntPoint ScrollView::convertChildToSelf(const Widget* child,
-                                        const IntPoint& point) const {
-  IntPoint newPoint = point;
-  if (child != m_data->hBar && child != m_data->vBar)
-    newPoint = point - scrollOffset();
-  return Widget::convertChildToSelf(child, newPoint);
-}
-
-IntPoint ScrollView::convertSelfToChild(const Widget* child,
-                                        const IntPoint& point) const {
-  IntPoint newPoint = point;
-  if (child != m_data->hBar && child != m_data->vBar)
-    newPoint = point + scrollOffset();
-  return Widget::convertSelfToChild(child, newPoint);
+bool ScrollView::isScrollViewScrollbar(const Widget* child) const {
+  return m_data->m_hBar == child || m_data->m_vBar == child;
 }
 
 void ScrollView::paint(GraphicsContext* context, const IntRect& rect) {

@@ -193,20 +193,10 @@ class Widget {
 
 #if PLATFORM(WIN)
   virtual void geometryChanged() const {}
-
-  virtual IntPoint convertChildToSelf(const Widget*, const IntPoint&) const;
-  virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
 #endif
 
 #if PLATFORM(GTK)
   virtual void geometryChanged() const;
-
-  IntRect convertToContainingWindow(const IntRect&) const;
-  IntPoint convertToContainingWindow(const IntPoint&) const;
-  IntPoint convertFromContainingWindow(const IntPoint&) const;
-
-  virtual IntPoint convertChildToSelf(const Widget*, const IntPoint&) const;
-  virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
 #endif
 
 #if PLATFORM(QT)
@@ -214,9 +204,6 @@ class Widget {
   bool isNPAPIPlugin() const;
 
   virtual void geometryChanged() const;
-
-  virtual IntPoint convertChildToSelf(const Widget*, const IntPoint&) const;
-  virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
 #endif
 
 #if PLATFORM(MAC)
