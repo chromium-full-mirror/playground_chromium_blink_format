@@ -139,10 +139,10 @@ class JSGlobalObject : public JSVariableObject {
   }
 
  protected:
-  JSGlobalObject(JSObject* prototype,
-                 JSGlobalObjectData* d,
+  JSGlobalObject(PassRefPtr<StructureID> structure,
+                 JSGlobalObjectData* data,
                  JSObject* globalThisValue)
-      : JSVariableObject(prototype, d) {
+      : JSVariableObject(structure, data) {
     init(globalThisValue);
   }
 

@@ -41,9 +41,6 @@ class JSInspectedObjectWrapper : public JSQuarantinedObjectWrapper {
  private:
   JSInspectedObjectWrapper(JSC::ExecState* unwrappedExec,
                            JSC::JSObject* unwrappedObject,
-                           JSC::JSObject* wrappedPrototype);
-  JSInspectedObjectWrapper(JSC::ExecState* unwrappedExec,
-                           JSC::JSObject* unwrappedObject,
                            PassRefPtr<JSC::StructureID>);
 
   virtual bool allowsGetProperty() const { return true; }

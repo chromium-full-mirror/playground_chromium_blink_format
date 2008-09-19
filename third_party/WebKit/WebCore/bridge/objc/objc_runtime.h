@@ -28,8 +28,7 @@
 
 #include "objc_header.h"
 #include "runtime.h"
-#include <CoreFoundation/CoreFoundation.h>
-#include <kjs/JSObject.h>
+#include <kjs/JSGlobalObject.h>
 #include <wtf/RetainPtr.h>
 
 namespace JSC {
@@ -103,13 +102,17 @@ class ObjcArray : public Array {
 
 class ObjcFallbackObjectImp : public JSObject {
  public:
-  ObjcFallbackObjectImp(ExecState* exec,
+  ObjcFallbackObjectImp(ExecState*,
                         ObjcInstance*,
                         const Identifier& propertyName);
 
-  static const ClassInfo info;
+  static const ClassInfo s_info;
 
   const Identifier& propertyName() const { return _item; }
+
+  static ObjectPrototype* createPrototype(ExecState* exec) {
+    return exec->lexicalGlobalObject()->objectPrototype();
+  }
 
  private:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
@@ -123,7 +126,7 @@ class ObjcFallbackObjectImp : public JSObject {
 
   virtual bool toBoolean(ExecState*) const;
 
-  virtual const ClassInfo* classInfo() const { return &info; }
+  virtual const ClassInfo* classInfo() const { return &s_info; }
 
   RefPtr<ObjcInstance> _instance;
   Identifier _item;

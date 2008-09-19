@@ -27,7 +27,7 @@
 #define KJS_RUNTIME_OBJECT_H
 
 #include "runtime.h"
-#include <kjs/JSObject.h>
+#include <kjs/JSGlobalObject.h>
 
 namespace JSC {
 
@@ -54,14 +54,14 @@ class RuntimeObjectImp : public JSObject {
 
   static const ClassInfo s_info;
 
- protected:
-  friend class Bindings::Instance;
-  RuntimeObjectImp(ExecState* exec,
-                   PassRefPtr<Bindings::Instance>);  // Only allow Instances and
-                                                     // derived classes to
-                                                     // create us
+  static ObjectPrototype* createPrototype(ExecState* exec) {
+    return exec->lexicalGlobalObject()->objectPrototype();
+  }
 
  private:
+  friend class Bindings::Instance;
+  RuntimeObjectImp(ExecState*, PassRefPtr<Bindings::Instance>);
+
   virtual const ClassInfo* classInfo() const { return &s_info; }
 
   static JSValue* fallbackObjectGetter(ExecState*,

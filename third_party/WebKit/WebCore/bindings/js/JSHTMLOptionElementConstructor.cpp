@@ -37,7 +37,8 @@ const ClassInfo JSHTMLOptionElementConstructor::s_info = {"OptionConstructor",
 JSHTMLOptionElementConstructor::JSHTMLOptionElementConstructor(
     ExecState* exec,
     Document* document)
-    : DOMObject(exec->lexicalGlobalObject()->objectPrototype()),
+    : DOMObject(
+          StructureID::create(exec->lexicalGlobalObject()->objectPrototype())),
       m_document(document) {
   putDirect(exec->propertyNames().length, jsNumber(exec, 4),
             ReadOnly | DontDelete | DontEnum);

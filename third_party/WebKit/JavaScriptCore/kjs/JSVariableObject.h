@@ -97,11 +97,6 @@ class JSVariableObject : public JSObject {
         d(data)  // Subclass owns this pointer.
   {}
 
-  JSVariableObject(JSObject* prototype, JSVariableObjectData* data)
-      : JSObject(prototype),
-        d(data)  // Subclass owns this pointer.
-  {}
-
   void copyRegisterArray(Register* src, size_t count);
   void setRegisterArray(Register* registerArray, size_t count);
 
