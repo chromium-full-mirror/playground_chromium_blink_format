@@ -35,14 +35,6 @@ namespace WebCore {
 
 static RenderStyle* defaultStyle;
 
-static inline bool operator!=(const CounterContent& a,
-                              const CounterContent& b) {
-  return a.identifier() != b.identifier() || a.listStyle() != b.listStyle() ||
-         a.separator() != b.separator();
-}
-
-// ----------------------------------------------------------
-
 void* RenderStyle::operator new(size_t sz, RenderArena* renderArena) throw() {
   return renderArena->allocate(sz);
 }
@@ -893,4 +885,5 @@ void RenderStyle::setBlendedFontSize(int size) {
   setFontDescription(desc);
   font().update(font().fontSelector());
 }
-}
+
+}  // namespace WebCore

@@ -152,7 +152,7 @@ class RenderStyle {
   void operator delete(void* ptr, size_t sz);
 
  private:
-  void arenaDelete(RenderArena* arena);
+  void arenaDelete(RenderArena*);
 
  protected:
   // !START SYNC!: Keep this in sync with the copy constructor in
@@ -570,17 +570,23 @@ class RenderStyle {
     // Nowrap and pre don't automatically wrap.
     return ws != NOWRAP && ws != PRE;
   }
+
   bool autoWrap() const { return autoWrap(whiteSpace()); }
+
   static bool preserveNewline(EWhiteSpace ws) {
     // Normal and nowrap do not preserve newlines.
     return ws != NORMAL && ws != NOWRAP;
   }
+
   bool preserveNewline() const { return preserveNewline(whiteSpace()); }
+
   static bool collapseWhiteSpace(EWhiteSpace ws) {
     // Pre and prewrap do not collapse whitespace.
     return ws != PRE && ws != PRE_WRAP;
   }
+
   bool collapseWhiteSpace() const { return collapseWhiteSpace(whiteSpace()); }
+
   bool isCollapsibleWhiteSpace(UChar c) const {
     switch (c) {
       case ' ':
@@ -591,9 +597,11 @@ class RenderStyle {
     }
     return false;
   }
+
   bool breakOnlyAfterWhiteSpace() const {
     return whiteSpace() == PRE_WRAP || khtmlLineBreak() == AFTER_WHITE_SPACE;
   }
+
   bool breakWords() const {
     return wordBreak() == BreakWordBreak || wordWrap() == BreakWordWrap;
   }
@@ -728,11 +736,13 @@ class RenderStyle {
 #if ENABLE(XBL)
   BindingURI* bindingURIs() const { return rareNonInheritedData->bindingURI; }
 #endif
+
   int outlineOffset() const {
     if (background->m_outline.style() == BNONE)
       return 0;
     return background->m_outline._offset;
   }
+
   ShadowData* textShadow() const { return rareInheritedData->textShadow; }
   const Color& textStrokeColor() const {
     return rareInheritedData->textStrokeColor;
@@ -950,6 +960,7 @@ class RenderStyle {
   void setDashboardRegions(Vector<StyleDashboardRegion> regions) {
     SET_VAR(rareNonInheritedData, m_dashboardRegions, regions);
   }
+
   void setDashboardRegion(int type,
                           const String& label,
                           Length t,
@@ -1022,6 +1033,7 @@ class RenderStyle {
   void setBorderBottomRightRadius(const IntSize& s) {
     SET_VAR(surround, border.bottomRight, s)
   }
+
   void setBorderRadius(const IntSize& s) {
     setBorderTopLeftRadius(s);
     setBorderTopRightRadius(s);
@@ -1068,10 +1080,12 @@ class RenderStyle {
   void setOutlineWidth(unsigned short v) {
     SET_VAR(background, m_outline.width, v)
   }
+
   void setOutlineStyle(EBorderStyle v, bool isAuto = false) {
     SET_VAR(background, m_outline.m_style, v)
     SET_VAR(background, m_outline._auto, isAuto)
   }
+
   void setOutlineColor(const Color& v) {
     SET_VAR(background, m_outline.color, v)
   }
@@ -1140,6 +1154,7 @@ class RenderStyle {
   void inheritBackgroundLayers(const FillLayer& parent) {
     background.access()->m_background = parent;
   }
+
   void adjustBackgroundLayers() {
     if (backgroundLayers()->next()) {
       accessBackgroundLayers()->cullEmptyLayers();
@@ -1153,12 +1168,14 @@ class RenderStyle {
   void inheritMaskLayers(const FillLayer& parent) {
     rareNonInheritedData.access()->m_mask = parent;
   }
+
   void adjustMaskLayers() {
     if (maskLayers()->next()) {
       accessMaskLayers()->cullEmptyLayers();
       accessMaskLayers()->fillUnsetProperties();
     }
   }
+
   void setMaskBoxImage(const NinePieceImage& b) {
     SET_VAR(rareNonInheritedData, m_maskBoxImage, b)
   }
