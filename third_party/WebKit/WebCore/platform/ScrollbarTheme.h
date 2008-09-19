@@ -52,6 +52,10 @@ class ScrollbarTheme {
     return 0;
   }
 
+  virtual ScrollbarButtonsPlacement buttonsPlacement() const {
+    return ScrollbarButtonsSingle;
+  }
+
   virtual bool supportsControlTints() const { return false; }
 
   virtual void themeChanged() {}
@@ -59,16 +63,20 @@ class ScrollbarTheme {
   virtual bool invalidateOnMouseEnterExit() { return false; }
 
   void invalidateParts(Scrollbar* scrollbar, ScrollbarControlPartMask mask) {
-    if (mask & BackButtonPart)
-      invalidatePart(scrollbar, BackButtonPart);
+    if (mask & BackButtonStartPart)
+      invalidatePart(scrollbar, BackButtonStartPart);
+    if (mask & ForwardButtonStartPart)
+      invalidatePart(scrollbar, ForwardButtonStartPart);
     if (mask & BackTrackPart)
       invalidatePart(scrollbar, BackTrackPart);
     if (mask & ThumbPart)
       invalidatePart(scrollbar, ThumbPart);
     if (mask & ForwardTrackPart)
       invalidatePart(scrollbar, ForwardTrackPart);
-    if (mask & ForwardButtonPart)
-      invalidatePart(scrollbar, ForwardButtonPart);
+    if (mask & BackButtonEndPart)
+      invalidatePart(scrollbar, BackButtonEndPart);
+    if (mask & ForwardButtonEndPart)
+      invalidatePart(scrollbar, ForwardButtonEndPart);
   }
 
   virtual void invalidatePart(Scrollbar*, ScrollbarPart) {}
