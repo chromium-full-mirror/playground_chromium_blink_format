@@ -934,7 +934,7 @@ void Position::getInlineBoxAndOffset(EAffinity affinity,
           break;
         inlineBox = tertiaryBox;
       }
-      caretOffset = !inlineBox->caretLeftmostOffset();
+      caretOffset = inlineBox->caretLeftmostOffset();
     }
   } else {
     InlineBox* nextBox = inlineBox->nextLeafChild();
