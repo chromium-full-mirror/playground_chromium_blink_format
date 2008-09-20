@@ -50,7 +50,7 @@ static InstanceJSObjectMap cachedObjects;
 // Derived RuntimeObject
 class QtRuntimeObjectImp : public RuntimeObjectImp {
  public:
-  QtRuntimeObjectImp(ExecState* exec, PassRefPtr<Instance>);
+  QtRuntimeObjectImp(ExecState*, PassRefPtr<StructureID>, PassRefPtr<Instance>);
   ~QtRuntimeObjectImp();
   virtual void invalidate();
 
@@ -70,8 +70,9 @@ class QtRuntimeObjectImp : public RuntimeObjectImp {
 };
 
 QtRuntimeObjectImp::QtRuntimeObjectImp(ExecState* exec,
+                                       PassRefPtr<StructureID> structure,
                                        PassRefPtr<Instance> instance)
-    : RuntimeObjectImp(exec, instance) {}
+    : RuntimeObjectImp(exec, structure, instance) {}
 
 QtRuntimeObjectImp::~QtRuntimeObjectImp() {
   removeFromCache();
@@ -166,7 +167,8 @@ RuntimeObjectImp* QtInstance::getRuntimeObject(
   RuntimeObjectImp* ret =
       static_cast<RuntimeObjectImp*>(cachedObjects.value(qtInstance));
   if (!ret) {
-    ret = new (exec) QtRuntimeObjectImp(exec, instance);
+    ret = new (exec) QtRuntimeObjectImp(
+        exec, getDOMStructure<QtRuntimeObjectImp>(exec), instance);
     cachedObjects.insert(qtInstance, ret);
     ret = static_cast<RuntimeObjectImp*>(cachedObjects.value(qtInstance));
   }

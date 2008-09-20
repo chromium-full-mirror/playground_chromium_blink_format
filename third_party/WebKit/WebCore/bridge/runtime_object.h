@@ -58,6 +58,11 @@ class RuntimeObjectImp : public JSObject {
     return exec->lexicalGlobalObject()->objectPrototype();
   }
 
+ protected:
+  RuntimeObjectImp(ExecState*,
+                   PassRefPtr<StructureID>,
+                   PassRefPtr<Bindings::Instance>);
+
  private:
   friend class Bindings::Instance;
   RuntimeObjectImp(ExecState*, PassRefPtr<Bindings::Instance>);
