@@ -36,7 +36,7 @@ SVGLocatable::SVGLocatable() {}
 
 SVGLocatable::~SVGLocatable() {}
 
-SVGElement* SVGLocatable::nearestViewportElement(const SVGStyledElement* e) {
+SVGElement* SVGLocatable::nearestViewportElement(const SVGElement* e) {
   Node* n = e->parentNode();
   while (n && !n->isDocumentNode()) {
     if (n->hasTagName(SVGNames::svgTag) || n->hasTagName(SVGNames::symbolTag) ||
@@ -53,7 +53,7 @@ SVGElement* SVGLocatable::nearestViewportElement(const SVGStyledElement* e) {
   return 0;
 }
 
-SVGElement* SVGLocatable::farthestViewportElement(const SVGStyledElement* e) {
+SVGElement* SVGLocatable::farthestViewportElement(const SVGElement* e) {
   // FIXME : likely this will be always the <svg> farthest away.
   // If we have a different implementation of documentElement(), one
   // that give the documentElement() of the svg fragment, it could be
@@ -77,7 +77,7 @@ SVGElement* SVGLocatable::farthestViewportElement(const SVGStyledElement* e) {
 
 // Spec:
 // http://www.w3.org/TR/2005/WD-SVGMobile12-20050413/svgudom.html#svg::SVGLocatable
-FloatRect SVGLocatable::getBBox(const SVGStyledElement* e) {
+FloatRect SVGLocatable::getBBox(const SVGElement* e) {
   FloatRect bboxRect;
 
   e->document()->updateLayoutIgnorePendingStylesheets();
