@@ -45,8 +45,12 @@ class ScrollbarThemeWin : public ScrollbarThemeComposite {
   virtual bool hasButtons(Scrollbar*) { return true; }
   virtual bool hasThumb(Scrollbar*);
 
-  virtual IntRect backButtonRect(Scrollbar*, bool painting = false);
-  virtual IntRect forwardButtonRect(Scrollbar*, bool painting = false);
+  virtual IntRect backButtonRect(Scrollbar*,
+                                 ScrollbarPart,
+                                 bool painting = false);
+  virtual IntRect forwardButtonRect(Scrollbar*,
+                                    ScrollbarPart,
+                                    bool painting = false);
   virtual IntRect trackRect(Scrollbar*, bool painting = false);
 
   virtual bool trackIsSinglePiece() { return false; }
@@ -60,7 +64,7 @@ class ScrollbarThemeWin : public ScrollbarThemeComposite {
   virtual void paintButton(GraphicsContext*,
                            Scrollbar*,
                            const IntRect&,
-                           ScrollbarControlPartMask);
+                           ScrollbarPart);
   virtual void paintThumb(GraphicsContext*, Scrollbar*, const IntRect&);
 };
 }

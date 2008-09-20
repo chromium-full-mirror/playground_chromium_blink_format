@@ -51,8 +51,12 @@ class ScrollbarThemeComposite : public ScrollbarTheme {
   virtual bool hasButtons(Scrollbar*) = 0;
   virtual bool hasThumb(Scrollbar*) = 0;
 
-  virtual IntRect backButtonRect(Scrollbar*, bool painting = false) = 0;
-  virtual IntRect forwardButtonRect(Scrollbar*, bool painting = false) = 0;
+  virtual IntRect backButtonRect(Scrollbar*,
+                                 ScrollbarPart,
+                                 bool painting = false) = 0;
+  virtual IntRect forwardButtonRect(Scrollbar*,
+                                    ScrollbarPart,
+                                    bool painting = false) = 0;
   virtual IntRect trackRect(Scrollbar*, bool painting = false) = 0;
 
   virtual void splitTrack(Scrollbar*,
@@ -72,7 +76,7 @@ class ScrollbarThemeComposite : public ScrollbarTheme {
   virtual void paintButton(GraphicsContext*,
                            Scrollbar*,
                            const IntRect&,
-                           ScrollbarControlPartMask) = 0;
+                           ScrollbarPart) = 0;
   virtual void paintThumb(GraphicsContext*, Scrollbar*, const IntRect&) = 0;
 };
 }

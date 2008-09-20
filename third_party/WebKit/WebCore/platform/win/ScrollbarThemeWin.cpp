@@ -153,7 +153,13 @@ bool ScrollbarThemeWin::hasThumb(Scrollbar* scrollbar) {
   return thumbLength(scrollbar) > 0;
 }
 
-IntRect ScrollbarThemeWin::backButtonRect(Scrollbar* scrollbar, bool) {
+IntRect ScrollbarThemeWin::backButtonRect(Scrollbar* scrollbar,
+                                          ScrollbarPart part,
+                                          bool) {
+  // Windows just has single arrows.
+  if (part == BackButtonEndPart)
+    return IntRect();
+
   // Our desired rect is essentially 17x17.
 
   // Our actual rect will shrink to half the available space when
@@ -170,7 +176,13 @@ IntRect ScrollbarThemeWin::backButtonRect(Scrollbar* scrollbar, bool) {
                                                      : thickness);
 }
 
-IntRect ScrollbarThemeWin::forwardButtonRect(Scrollbar* scrollbar, bool) {
+IntRect ScrollbarThemeWin::forwardButtonRect(Scrollbar* scrollbar,
+                                             ScrollbarPart part,
+                                             bool) {
+  // Windows just has single arrows.
+  if (part == ForwardButtonStartPart)
+    return IntRect();
+
   // Our desired rect is essentially 17x17.
 
   // Our actual rect will shrink to half the available space when
@@ -263,10 +275,10 @@ void ScrollbarThemeWin::paintTrack(GraphicsContext* context,
 void ScrollbarThemeWin::paintButton(GraphicsContext* context,
                                     Scrollbar* scrollbar,
                                     const IntRect& rect,
-                                    ScrollbarControlPartMask mask) {
+                                    ScrollbarPart part) {
   checkAndInitScrollbarTheme();
 
-  bool start = mask & BackButtonPart;
+  bool start = (part == BackButtonPart);
   int xpState = 0;
   int classicState = 0;
   if (scrollbar->orientation() == HorizontalScrollbar)

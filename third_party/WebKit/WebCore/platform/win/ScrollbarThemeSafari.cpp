@@ -149,8 +149,14 @@ static IntRect buttonRepaintRect(const IntRect& buttonRect,
 }
 
 IntRect ScrollbarThemeSafari::backButtonRect(Scrollbar* scrollbar,
+                                             ScrollbarPart part,
                                              bool painting) {
   IntRect result;
+
+  // Windows just has single arrows.
+  if (part == BackButtonEndPart)
+    return result;
+
   int thickness = scrollbarThickness(scrollbar->controlSize());
   if (scrollbar->orientation() == HorizontalScrollbar)
     result = IntRect(scrollbar->x(), scrollbar->y(),
@@ -165,8 +171,14 @@ IntRect ScrollbarThemeSafari::backButtonRect(Scrollbar* scrollbar,
 }
 
 IntRect ScrollbarThemeSafari::forwardButtonRect(Scrollbar* scrollbar,
+                                                ScrollbarPart part,
                                                 bool painting) {
   IntRect result;
+
+  // Windows just has single arrows.
+  if (part == ForwardButtonStartPart)
+    return result;
+
   int thickness = scrollbarThickness(scrollbar->controlSize());
   if (scrollbar->orientation() == HorizontalScrollbar)
     result = IntRect(scrollbar->x() + scrollbar->width() -
@@ -255,7 +267,7 @@ void ScrollbarThemeSafari::paintTrack(GraphicsContext* graphicsContext,
 void ScrollbarThemeSafari::paintButton(GraphicsContext* graphicsContext,
                                        Scrollbar* scrollbar,
                                        const IntRect& buttonRect,
-                                       ScrollbarControlPartMask mask) {
+                                       ScrollbarPart part) {
   if (!SafariThemeLibrary())
     return;
   NSControlSize size = scrollbar->controlSize() == SmallScrollbar
@@ -268,12 +280,12 @@ void ScrollbarThemeSafari::paintButton(GraphicsContext* graphicsContext,
     state |= EnabledState;
   if (scrollbar->pressedPart() & mask)
     state |= PressedState;
-  if (mask & BackButtonPart)
+  if (part == BackButtonPart)
     paintThemePart(scrollbar->orientation() == VerticalScrollbar
                        ? ScrollUpArrowPart
                        : ScrollLeftArrowPart,
                    graphicsContext->platformContext(), buttonRect, size, state);
-  if (mask & ForwardButtonPart)
+  if (part == ForwardButtonPart)
     paintThemePart(scrollbar->orientation() == VerticalScrollbar
                        ? ScrollDownArrowPart
                        : ScrollRightArrowPart,
