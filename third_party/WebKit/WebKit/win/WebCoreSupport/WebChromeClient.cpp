@@ -531,7 +531,8 @@ bool WebChromeClient::paintCustomScrollbar(GraphicsContext* context,
     return false;
 
   WebScrollbarControlPartMask webParts = WebNoScrollPart;
-  if (parts & BackButtonPart)
+  if (parts &
+      BackButtonStartPart)  // FIXME: Hyatt, what about BackButtonEndPart?
     webParts |= WebBackButtonPart;
   if (parts & BackTrackPart)
     webParts |= WebBackTrackPart;
@@ -539,12 +540,13 @@ bool WebChromeClient::paintCustomScrollbar(GraphicsContext* context,
     webParts |= WebThumbPart;
   if (parts & ForwardTrackPart)
     webParts |= WebForwardTrackPart;
-  if (parts & ForwardButtonPart)
+  if (parts &
+      ForwardButtonStartPart)  // FIXME: Hyatt, what about ForwardButtonEndPart?
     webParts |= WebForwardButtonPart;
 
   WebScrollbarControlPart webPressedPart = WebNoScrollPart;
   switch (pressedPart) {
-    case BackButtonPart:
+    case BackButtonStartPart:  // FIXME: Hyatt, what about BackButtonEndPart?
       webPressedPart = WebBackButtonPart;
       break;
     case BackTrackPart:
@@ -556,7 +558,8 @@ bool WebChromeClient::paintCustomScrollbar(GraphicsContext* context,
     case ForwardTrackPart:
       webPressedPart = WebForwardTrackPart;
       break;
-    case ForwardButtonPart:
+    case ForwardButtonStartPart:  // FIXME: Hyatt, what about
+                                  // ForwardButtonEndPart?
       webPressedPart = WebForwardButtonPart;
       break;
     default:
