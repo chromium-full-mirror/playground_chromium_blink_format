@@ -61,10 +61,11 @@ bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
   IntRect backButtonPaintRect;
   IntRect forwardButtonPaintRect;
   if (hasButtons(scrollbar)) {
-    backButtonPaintRect = backButtonRect(scrollbar, true);
+    backButtonPaintRect = backButtonRect(scrollbar, BackButtonStartPart, true);
     if (damageRect.intersects(backButtonPaintRect))
       scrollMask |= BackButtonStartPart;
-    forwardButtonPaintRect = forwardButtonRect(scrollbar, true);
+    forwardButtonPaintRect =
+        forwardButtonRect(scrollbar, ForwardButtonEndPart, true);
     if (damageRect.intersects(forwardButtonPaintRect))
       scrollMask |= ForwardButtonEndPart;
   }
