@@ -154,5 +154,10 @@ void GetTextExtent(const wxFont& font,
   if (width)
     *width = FixedToInt(textAfter - textBefore);
 
+#if SIZEOF_WCHAR_T == 4
+  free(ubuf);
+#endif
+
   ::ATSUDisposeTextLayout(atsuLayout);
+  ::ATSUDisposeStyle((ATSUStyle)ATSUIStyle);
 }
