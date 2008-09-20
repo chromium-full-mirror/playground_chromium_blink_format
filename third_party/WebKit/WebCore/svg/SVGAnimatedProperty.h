@@ -451,9 +451,7 @@ SVGAnimatedProperty<OwnerTypeArg, AnimatedTypeArg, TagName, PropertyName>::
     baseValue() const {
   const OwnerElement* ownerElement = this->ownerElement();
   SVGDocumentExtensions* extensions =
-      (ownerElement->document()
-           ? ownerElement->document()->accessSVGExtensions()
-           : 0);
+      ownerElement->accessDocumentSVGExtensions();
   if (extensions &&
       extensions->hasBaseValue<DecoratedType>(ownerElement,
                                               m_attributeIdentifier))
@@ -471,9 +469,7 @@ void SVGAnimatedProperty<OwnerTypeArg, AnimatedTypeArg, TagName, PropertyName>::
     setBaseValue(typename SVGAnimatedProperty::DecoratedType newValue) {
   const OwnerElement* ownerElement = this->ownerElement();
   SVGDocumentExtensions* extensions =
-      (ownerElement->document()
-           ? ownerElement->document()->accessSVGExtensions()
-           : 0);
+      ownerElement->accessDocumentSVGExtensions();
   if (extensions &&
       extensions->hasBaseValue<DecoratedType>(ownerElement,
                                               m_attributeIdentifier)) {
@@ -524,9 +520,7 @@ void SVGAnimatedProperty<OwnerTypeArg, AnimatedTypeArg, TagName, PropertyName>::
     startAnimation() const {
   const OwnerElement* ownerElement = this->ownerElement();
   SVGDocumentExtensions* extensions =
-      (ownerElement->document()
-           ? ownerElement->document()->accessSVGExtensions()
-           : 0);
+      ownerElement->accessDocumentSVGExtensions();
   if (extensions) {
     ASSERT(!extensions->hasBaseValue<DecoratedType>(ownerElement,
                                                     m_attributeIdentifier));
@@ -543,9 +537,7 @@ void SVGAnimatedProperty<OwnerTypeArg, AnimatedTypeArg, TagName, PropertyName>::
     stopAnimation() {
   const OwnerElement* ownerElement = this->ownerElement();
   SVGDocumentExtensions* extensions =
-      (ownerElement->document()
-           ? ownerElement->document()->accessSVGExtensions()
-           : 0);
+      ownerElement->accessDocumentSVGExtensions();
   if (extensions) {
     ASSERT(extensions->hasBaseValue<DecoratedType>(ownerElement,
                                                    m_attributeIdentifier));

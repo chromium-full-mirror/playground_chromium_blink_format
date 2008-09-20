@@ -3,6 +3,7 @@
    <zimmermann@kde.org>
                   2004, 2005, 2006, 2008 Rob Buis <buis@kde.org>
     Copyright (C) 2008 Apple Inc. All rights reserved.
+    Copyright (C) 2008 Alp Toker <alp@atoker.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -103,6 +104,12 @@ SVGElement* SVGElement::viewportElement() const {
   }
 
   return 0;
+}
+
+SVGDocumentExtensions* SVGElement::accessDocumentSVGExtensions() const {
+  // This function is provided for use by SVGAnimatedProperty to avoid
+  // global inclusion of Document.h in SVG code.
+  return document() ? document()->accessSVGExtensions() : 0;
 }
 
 void SVGElement::parseMappedAttribute(MappedAttribute* attr) {
