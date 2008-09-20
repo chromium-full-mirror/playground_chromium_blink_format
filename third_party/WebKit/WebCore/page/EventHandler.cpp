@@ -49,6 +49,7 @@
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
 #include "Image.h"
+#include "InspectorController.h"
 #include "KeyboardEvent.h"
 #include "MouseEvent.h"
 #include "MouseEventWithHitTestResults.h"
@@ -1047,6 +1048,14 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   }
 
   m_mousePressNode = mev.targetNode();
+
+  InspectorController* inspector = m_frame->page()->inspectorController();
+  if (inspector && inspector->enabled() &&
+      inspector->searchingForNodeInPage()) {
+    inspector->handleMousePressOnNode(m_mousePressNode.get());
+    invalidateClick();
+    return true;
+  }
 
   Frame* subframe = subframeForTargetNode(mev.targetNode());
   if (subframe && passMousePressEventToSubframe(mev, subframe)) {

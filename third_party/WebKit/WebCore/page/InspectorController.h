@@ -49,6 +49,7 @@ namespace WebCore {
 class Database;
 class DocumentLoader;
 class GraphicsContext;
+class HitTestResult;
 class InspectorClient;
 class JavaScriptCallFrame;
 class Node;
@@ -135,6 +136,11 @@ class InspectorController : JavaScriptDebugListener {
 
   void setAttachedWindow(bool);
   void setAttachedWindowHeight(unsigned height);
+
+  void toggleSearchForNodeInPage();
+  bool searchingForNodeInPage() { return m_searchingForNode; };
+  void mouseDidMoveOverElement(const HitTestResult&, unsigned modifierFlags);
+  void handleMousePressOnNode(Node*);
 
   JSContextRef scriptContext() const { return m_scriptContext; };
   void setScriptContext(JSContextRef context) { m_scriptContext = context; };
@@ -312,6 +318,7 @@ class InspectorController : JavaScriptDebugListener {
   long long m_nextIdentifier;
   RefPtr<Node> m_highlightedNode;
   unsigned m_groupLevel;
+  bool m_searchingForNode;
 };
 
 }  // namespace WebCore
