@@ -72,6 +72,8 @@ class ScriptElementData : private CachedResourceClient {
   Element* element() const { return m_element; }
   bool createdByParser() const { return m_createdByParser; }
   void setCreatedByParser(bool value) { m_createdByParser = value; }
+  bool haveFiredLoadEvent() const { return m_firedLoad; }
+  void setHaveFiredLoadEvent(bool firedLoad) { m_firedLoad = firedLoad; }
 
   void requestScript(const String& sourceUrl);
   void evaluateScript(const String& sourceUrl, const String& content);
@@ -86,6 +88,7 @@ class ScriptElementData : private CachedResourceClient {
   CachedResourceHandle<CachedScript> m_cachedScript;
   bool m_createdByParser;
   bool m_evaluated;
+  bool m_firedLoad;
 };
 }
 
