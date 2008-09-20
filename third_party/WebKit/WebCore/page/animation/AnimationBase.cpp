@@ -235,6 +235,9 @@ class PropertyWrapperGetter : public PropertyWrapperBase {
       : PropertyWrapperBase(prop), m_getter(getter) {}
 
   virtual bool equals(const RenderStyle* a, const RenderStyle* b) const {
+    // If one style is null and the other is non-null return false.
+    if ((!a || !b) && b != a)
+      return false;
     return (a->*m_getter)() == (b->*m_getter)();
   }
 
