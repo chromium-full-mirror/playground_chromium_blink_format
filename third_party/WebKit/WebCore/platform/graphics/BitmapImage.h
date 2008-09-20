@@ -68,15 +68,13 @@ class Timer;
 // ================================================
 
 struct FrameData : Noncopyable {
-  FrameData()
-      : m_frame(0), m_isComplete(false), m_duration(0), m_hasAlpha(true) {}
+  FrameData() : m_frame(0), m_duration(0), m_hasAlpha(true) {}
 
   ~FrameData() { clear(); }
 
   void clear();
 
   NativeImagePtr m_frame;
-  bool m_isComplete;
   float m_duration;
   bool m_hasAlpha;
 };
@@ -163,7 +161,6 @@ class BitmapImage : public Image {
   size_t currentFrame() const { return m_currentFrame; }
   size_t frameCount();
   NativeImagePtr frameAtIndex(size_t);
-  bool frameIsCompleteAtIndex(size_t);
   float frameDurationAtIndex(size_t);
   bool frameHasAlphaAtIndex(size_t);
 
