@@ -105,7 +105,7 @@ bool EditorClientWx::isEditable() {
 
   if (frame) {
     wxWebView* webKitWin =
-        dynamic_cast<wxWebView*>(frame->view()->nativeWindow());
+        dynamic_cast<wxWebView*>(frame->view()->platformWidget());
     if (webKitWin)
       return webKitWin->IsEditable();
   }

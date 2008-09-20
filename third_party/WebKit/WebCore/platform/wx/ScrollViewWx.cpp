@@ -36,6 +36,7 @@
 #include <stdio.h>
 
 #include <wx/defs.h>
+#include <wx/scrolbar.h>
 #include <wx/scrolwin.h>
 #include <wx/event.h>
 
@@ -136,8 +137,8 @@ ScrollView::ScrollView() {
   m_data = new ScrollViewPrivate(this);
 }
 
-void ScrollView::setNativeWindow(wxWindow* win) {
-  Widget::setNativeWindow(win);
+void ScrollView::setPlatformWidget(wxWindow* win) {
+  Widget::setPlatformWidget(win);
   m_data->bindEvents(win);
 }
 
@@ -149,7 +150,7 @@ void ScrollView::updateContents(const IntRect& updateRect, bool now) {
   // we need to convert coordinates to scrolled position
   wxRect contentsRect = updateRect;
   contentsRect.Offset(-contentsX(), -contentsY());
-  wxWindow* win = nativeWindow();
+  wxWindow* win = platformWidget();
   if (win) {
     win->RefreshRect(contentsRect, true);
     if (now)
@@ -158,14 +159,14 @@ void ScrollView::updateContents(const IntRect& updateRect, bool now) {
 }
 
 void ScrollView::update() {
-  wxWindow* win = nativeWindow();
+  wxWindow* win = platformWidget();
   if (win)
     win->Update();
 }
 
 int ScrollView::visibleWidth() const {
   int width = 0;
-  wxWindow* win = nativeWindow();
+  wxWindow* win = platformWidget();
   if (win)
     win->GetClientSize(&width, NULL);
 
@@ -175,7 +176,7 @@ int ScrollView::visibleWidth() const {
 
 int ScrollView::visibleHeight() const {
   int height = 0;
-  wxWindow* win = nativeWindow();
+  wxWindow* win = platformWidget();
   if (win)
     win->GetClientSize(NULL, &height);
 
@@ -194,7 +195,7 @@ void ScrollView::setContentsPos(int newX, int newY) {
 }
 
 void ScrollView::scrollBy(int dx, int dy) {
-  wxWindow* win = nativeWindow();
+  wxWindow* win = platformWidget();
   if (!win)
     return;
 
@@ -232,7 +233,7 @@ void ScrollView::scrollBy(int dx, int dy) {
 }
 
 void ScrollView::resizeContents(int w, int h) {
-  wxWindow* win = nativeWindow();
+  wxWindow* win = platformWidget();
   if (win) {
     win->SetVirtualSize(w, h);
     adjustScrollbars();
@@ -251,7 +252,7 @@ int ScrollView::contentsY() const {
 
 int ScrollView::contentsWidth() const {
   int width = 0;
-  wxWindow* win = nativeWindow();
+  wxWindow* win = platformWidget();
   if (win)
     win->GetVirtualSize(&width, NULL);
   ASSERT(width >= 0);
@@ -260,7 +261,7 @@ int ScrollView::contentsWidth() const {
 
 int ScrollView::contentsHeight() const {
   int height = 0;
-  wxWindow* win = nativeWindow();
+  wxWindow* win = platformWidget();
   if (win)
     win->GetVirtualSize(NULL, &height);
   ASSERT(height >= 0);
@@ -273,12 +274,19 @@ FloatRect ScrollView::visibleContentRectConsideringExternalScrollers() const {
   return visibleContentRect();
 }
 
+bool ScrollView::isScrollViewScrollbar(const Widget* child) const {
+  wxWindow* win = child->platformWidget();
+  if (!win)
+    return false;
+  return win->IsKindOf(CLASSINFO(wxScrollBar));
+}
+
 IntSize ScrollView::scrollOffset() const {
   return IntSize(contentsX(), contentsY());
 }
 
 void ScrollView::adjustScrollbars(int x, int y, bool refresh) {
-  wxWindow* win = nativeWindow();
+  wxWindow* win = platformWidget();
   if (!win)
     return;
 
@@ -396,7 +404,7 @@ bool ScrollView::inWindow() const {
   // NB: This is called from RenderObject::willRenderImage
   // and really seems to be more of a "is the window in a valid state" test,
   // despite the API name.
-  return nativeWindow() != NULL;
+  return platformWidget() != NULL;
 }
 
 void ScrollView::wheelEvent(PlatformWheelEvent& e) {
@@ -425,12 +433,12 @@ void ScrollView::addChild(Widget* widget) {
 void ScrollView::removeChild(Widget* widget) {
   m_data->m_children.remove(widget);
 
-  if (nativeWindow() && widget->nativeWindow()) {
-    nativeWindow()->RemoveChild(widget->nativeWindow());
+  if (platformWidget() && widget->platformWidget()) {
+    platformWidget()->RemoveChild(widget->platformWidget());
     // FIXME: Is this the right place to do deletion? I see
     // detachFromParent2/3/4, initiated by FrameLoader::detachFromParent,
     // but I'm not sure if it's better to handle there or not.
-    widget->nativeWindow()->Destroy();
+    widget->platformWidget()->Destroy();
   }
 }
 

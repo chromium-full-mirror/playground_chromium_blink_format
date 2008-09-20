@@ -795,7 +795,7 @@ void FrameLoaderClientWx::transitionToCommittedForNewPage() {
   frameView->deref();  // FrameViews are created with a ref count of 1. Release
                        // this ref since we've assigned it to frame.
 
-  frameView->setNativeWindow(m_webView);
+  frameView->setPlatformWidget(m_webView);
 
   if (m_frame->ownerRenderer())
     m_frame->ownerRenderer()->setWidget(frameView);
