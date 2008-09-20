@@ -302,6 +302,7 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
       m_nextVar(-1),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
+  emitOpcode(op_initialise_locals);
   codeBlock->globalData = m_globalData;
 
   m_codeBlock->numConstants = functionBody->neededConstants();
@@ -355,6 +356,7 @@ CodeGenerator::CodeGenerator(EvalNode* evalNode,
       m_continueDepth(0),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
+  emitOpcode(op_initialise_locals);
   codeBlock->globalData = m_globalData;
 
   m_codeBlock->numConstants = evalNode->neededConstants();

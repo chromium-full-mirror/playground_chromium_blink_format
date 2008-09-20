@@ -590,12 +590,12 @@ ALWAYS_INLINE Register* slideRegisterWindowForCall(ExecState* exec,
       *(it + shift) = *it;
   }
 
-  // initialize local variable slots
-  for (Register* it = r - newCodeBlock->numVars; it != r; ++it)
-    (*it) = jsUndefined();
-
-  for (size_t i = 0; i < newCodeBlock->constantRegisters.size(); ++i)
-    r[i] = newCodeBlock->constantRegisters[i];
+// initialize local variable slots
+#if ENABLE(CTI)
+  if (!newCodeBlock->ctiCode)
+#endif
+  {
+  }
 
   return r;
 }
@@ -3661,6 +3661,16 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       int dst = callFrame[RegisterFile::ReturnValueRegister].i();
       r[dst] = returnValue;
 
+      NEXT_OPCODE;
+    }
+    BEGIN_OPCODE(op_initialise_locals) {
+      for (Register* it =
+               r - codeBlock->numVars + (codeBlock->codeType == EvalCode);
+           it < r; ++it)
+        (*it) = jsUndefined();
+      for (size_t i = 0; i < codeBlock->constantRegisters.size(); ++i)
+        r[i] = codeBlock->constantRegisters[i];
+      ++vPC;
       NEXT_OPCODE;
     }
     BEGIN_OPCODE(op_construct) {

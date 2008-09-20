@@ -390,6 +390,10 @@ void CodeBlock::dump(ExecState* exec,
                      Vector<Instruction>::const_iterator& it) const {
   int location = it - begin;
   switch (exec->machine()->getOpcodeID(it->u.opcode)) {
+    case op_initialise_locals: {
+      printf("[%4d] initialise_locals\n", location);
+      break;
+    }
     case op_unexpected_load: {
       int r0 = (++it)->u.operand;
       int k0 = (++it)->u.operand;
