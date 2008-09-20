@@ -40,6 +40,7 @@ namespace JSC {
 
 class JSValue;
 class PropertyNameArray;
+class PropertyNameArrayData;
 class StructureIDChain;
 
 struct TransitionTableHash {
@@ -116,6 +117,7 @@ class StructureID : public RefCounted<StructureID> {
 
   StructureID* previousID() const { return m_previous.get(); }
 
+  StructureIDChain* createCachedPrototypeChain();
   void setCachedPrototypeChain(
       PassRefPtr<StructureIDChain> cachedPrototypeChain) {
     m_cachedPrototypeChain = cachedPrototypeChain;
@@ -127,13 +129,12 @@ class StructureID : public RefCounted<StructureID> {
   const PropertyMap& propertyMap() const { return m_propertyMap; }
   PropertyMap& propertyMap() { return m_propertyMap; }
 
-  void getEnumerablePropertyNames(PropertyNameArray&) const;
+  void getEnumerablePropertyNames(ExecState*, PropertyNameArray&, JSObject*);
+  void clearEnumerationCache();
 
   static void transitionTo(StructureID* oldStructureID,
                            StructureID* newStructureID,
                            JSObject* slotBase);
-
-  void clearEnumerationCache() { m_cachedPropertyNameArray.clear(); }
 
  private:
   typedef std::pair<RefPtr<UString::Rep>, unsigned> TransitionTableKey;
@@ -160,7 +161,7 @@ class StructureID : public RefCounted<StructureID> {
   size_t m_transitionCount;
   TransitionTable m_transitionTable;
 
-  mutable Vector<UString::Rep*> m_cachedPropertyNameArray;
+  RefPtr<PropertyNameArrayData> m_cachedPropertyNameArrayData;
 
   PropertyMap m_propertyMap;
 };
