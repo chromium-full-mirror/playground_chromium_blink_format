@@ -86,8 +86,8 @@ class ImplicitAnimation : public AnimationBase {
                       // the transitioning property
 
   // The two styles that we are blending.
-  RenderStyle* m_fromStyle;
-  RenderStyle* m_toStyle;
+  const RenderStyle* m_fromStyle;
+  const RenderStyle* m_toStyle;
 };
 
 }  // namespace WebCore

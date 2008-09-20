@@ -43,13 +43,20 @@ class KeyframeAnimation : public AnimationBase {
   KeyframeAnimation(const Animation* animation,
                     RenderObject* renderer,
                     int index,
-                    CompositeAnimation* compAnim)
+                    CompositeAnimation* compAnim,
+                    const RenderStyle* unanimatedStyle)
       : AnimationBase(animation, renderer, compAnim),
         m_keyframes(animation->keyframeList()),
         m_name(animation->name()),
-        m_index(index) {
+        m_index(index),
+        m_unanimatedStyle(0) {
     // Set the transform animation list
     validateTransformFunctionList();
+
+    if (unanimatedStyle) {
+      const_cast<RenderStyle*>(unanimatedStyle)->ref();
+      m_unanimatedStyle = unanimatedStyle;
+    }
   }
 
   virtual ~KeyframeAnimation();
@@ -66,6 +73,10 @@ class KeyframeAnimation : public AnimationBase {
   void setIndex(int i) { m_index = i; }
 
   virtual bool shouldFireEvents() const { return true; }
+
+  bool hasAnimationForProperty(int property) const;
+
+  const RenderStyle* unanimatedStyle() const { return m_unanimatedStyle; }
 
  protected:
   virtual void onAnimationStart(double elapsedTime);
@@ -89,6 +100,9 @@ class KeyframeAnimation : public AnimationBase {
   AtomicString m_name;
   // The order in which this animation appears in the animation-name style.
   int m_index;
+
+  // The style just before we started animation
+  const RenderStyle* m_unanimatedStyle;
 };
 
 }  // namespace WebCore
