@@ -5687,13 +5687,11 @@ JSValue* Machine::cti_op_stricteq(CTI_ARGS) {
     return jsBoolean(reinterpret_cast<intptr_t>(src1) ==
                      reinterpret_cast<intptr_t>(src2));
   if (JSImmediate::isEitherImmediate(src1, src2) &
-      (src1 != JSImmediate::from(0)) & (src2 != JSImmediate::from(0)))
+      (src1 != JSImmediate::zeroImmediate()) &
+      (src2 != JSImmediate::zeroImmediate()))
     return jsBoolean(false);
 
-  ExecState* exec = ARG_exec;
-  JSValue* result = jsBoolean(strictEqualSlowCase(src1, src2));
-  VM_CHECK_EXCEPTION_AT_END();
-  return result;
+  return jsBoolean(strictEqualSlowCaseInline(src1, src2));
 }
 
 JSValue* Machine::cti_op_nstricteq(CTI_ARGS) {
@@ -5704,13 +5702,11 @@ JSValue* Machine::cti_op_nstricteq(CTI_ARGS) {
     return jsBoolean(reinterpret_cast<intptr_t>(src1) !=
                      reinterpret_cast<intptr_t>(src2));
   if (JSImmediate::isEitherImmediate(src1, src2) &
-      (src1 != JSImmediate::from(0)) & (src2 != JSImmediate::from(0)))
+      (src1 != JSImmediate::zeroImmediate()) &
+      (src2 != JSImmediate::zeroImmediate()))
     return jsBoolean(true);
 
-  ExecState* exec = ARG_exec;
-  JSValue* result = jsBoolean(!strictEqualSlowCase(src1, src2));
-  VM_CHECK_EXCEPTION_AT_END();
-  return result;
+  return jsBoolean(!strictEqualSlowCaseInline(src1, src2));
 }
 
 JSValue* Machine::cti_op_to_jsnumber(CTI_ARGS) {
