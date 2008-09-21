@@ -769,9 +769,6 @@ JSValue* convertQVariantToValue(ExecState* exec,
     QRegExp re = variant.value<QRegExp>();
 
     if (re.isValid()) {
-      RegExpConstructor* regExpObj = static_cast<RegExpConstructor*>(
-          exec->lexicalGlobalObject()->regExpConstructor());
-
       UString uflags;
       if (re.caseSensitivity() == Qt::CaseInsensitive)
         uflags = "i";  // ### Can't do g or m
@@ -781,7 +778,7 @@ JSValue* convertQVariantToValue(ExecState* exec,
       RefPtr<JSC::RegExp> regExp = JSC::RegExp::create(exec, pattern, uflags);
       if (regExp->isValid())
         return new (exec) RegExpObject(
-            exec->lexicalGlobalObject()->regExpPrototype(), regExp.release());
+            exec->lexicalGlobalObject()->regExpStructure(), regExp.release());
       else
         return jsNull();
     }
@@ -815,7 +812,7 @@ JSValue* convertQVariantToValue(ExecState* exec,
         JSC::gregorianDateTimeToMS(dt, time.msec(), /*inputIsUTC*/ false);
 
     DateInstance* instance =
-        new (exec) DateInstance(exec->lexicalGlobalObject()->datePrototype());
+        new (exec) DateInstance(exec->lexicalGlobalObject()->dateStructure());
     instance->setInternalValue(jsNumber(exec, trunc(ms)));
     return instance;
   }
@@ -834,8 +831,7 @@ JSValue* convertQVariantToValue(ExecState* exec,
 
   if (type == QMetaType::QVariantMap) {
     // create a new object, and stuff properties into it
-    JSObject* ret =
-        new (exec) JSObject(exec->lexicalGlobalObject()->objectPrototype());
+    JSObject* ret = constructEmptyObject(exec);
     QVariantMap map = variant.value<QVariantMap>();
     QVariantMap::const_iterator i = map.constBegin();
     while (i != map.constEnd()) {
@@ -893,14 +889,13 @@ JSValue* convertQVariantToValue(ExecState* exec,
 #define QW_D(Class) Class##Data* d = d_func()
 #define QW_DS(Class, Instance) Class##Data* d = Instance->d_func()
 
+const ClassInfo QtRuntimeMethod::s_info = {"QtRuntimeMethod", 0, 0, 0};
+
 QtRuntimeMethod::QtRuntimeMethod(QtRuntimeMethodData* dd,
                                  ExecState* exec,
                                  const Identifier& ident,
                                  PassRefPtr<QtInstance> inst)
-    : InternalFunction(exec,
-                       static_cast<FunctionPrototype*>(
-                           exec->lexicalGlobalObject()->functionPrototype()),
-                       ident),
+    : InternalFunction(exec, getDOMStructure<QtRuntimeMethod>(exec), ident),
       d_ptr(dd) {
   QW_D(QtRuntimeMethod);
   d->m_instance = inst;
