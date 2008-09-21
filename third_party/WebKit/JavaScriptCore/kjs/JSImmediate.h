@@ -321,6 +321,8 @@ class JSImmediate {
   static ALWAYS_INLINE uintptr_t rawValue(const JSValue* v) {
     return reinterpret_cast<uintptr_t>(v);
   }
+
+  static double nonInlineNaN();
 };
 
 ALWAYS_INLINE JSValue* JSImmediate::trueImmediate() {
@@ -438,13 +440,14 @@ ALWAYS_INLINE int32_t JSImmediate::getTruncatedInt32(const JSValue* v) {
 
 ALWAYS_INLINE double JSImmediate::toDouble(const JSValue* v) {
   ASSERT(isImmediate(v));
+  int i;
   if (isNumber(v))
-    return intValue(v);
-  if (rawValue(v) == (FullTagTypeBool | ExtendedPayloadBitBoolValue))
-    return 1.0;
-  if (rawValue(v) != FullTagTypeUndefined)
-    return 0.0;
-  return std::numeric_limits<double>::quiet_NaN();
+    i = intValue(v);
+  else if (rawValue(v) == FullTagTypeUndefined)
+    return nonInlineNaN();
+  else
+    i = rawValue(v) >> ExtendedPayloadShift;
+  return i;
 }
 
 ALWAYS_INLINE bool JSImmediate::getUInt32(const JSValue* v, uint32_t& i) {

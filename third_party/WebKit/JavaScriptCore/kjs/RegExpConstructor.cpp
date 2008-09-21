@@ -77,9 +77,9 @@ struct RegExpConstructorPrivate {
 };
 
 RegExpConstructor::RegExpConstructor(ExecState* exec,
-                                     FunctionPrototype* functionPrototype,
+                                     PassRefPtr<StructureID> structure,
                                      RegExpPrototype* regExpPrototype)
-    : InternalFunction(exec, functionPrototype, Identifier(exec, "RegExp")),
+    : InternalFunction(exec, structure, Identifier(exec, "RegExp")),
       d(new RegExpConstructorPrivate) {
   // ECMA 15.10.5.1 RegExp.prototype
   putDirect(exec->propertyNames().prototype, regExpPrototype,
@@ -175,7 +175,7 @@ class RegExpMatchesArray : public JSArray {
 
 RegExpMatchesArray::RegExpMatchesArray(ExecState* exec,
                                        RegExpConstructorPrivate* data)
-    : JSArray(exec->lexicalGlobalObject()->arrayPrototype(),
+    : JSArray(exec->lexicalGlobalObject()->regExpMatchesArrayStructure(),
               data->lastNumSubPatterns + 1) {
   RegExpConstructorPrivate* d = new RegExpConstructorPrivate;
   d->input = data->lastInput;
@@ -349,7 +349,7 @@ static JSObject* constructRegExp(ExecState* exec, const ArgList& args) {
     return throwError(
         exec, SyntaxError,
         UString("Invalid regular expression: ").append(regExp->errorMessage()));
-  return new (exec) RegExpObject(exec->lexicalGlobalObject()->regExpPrototype(),
+  return new (exec) RegExpObject(exec->lexicalGlobalObject()->regExpStructure(),
                                  regExp.release());
 }
 

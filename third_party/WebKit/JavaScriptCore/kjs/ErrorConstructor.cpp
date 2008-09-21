@@ -24,7 +24,6 @@
 
 #include "ErrorInstance.h"
 #include "ErrorPrototype.h"
-#include "FunctionPrototype.h"
 #include "JSGlobalObject.h"
 #include "JSString.h"
 
@@ -33,11 +32,11 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(ErrorConstructor);
 
 ErrorConstructor::ErrorConstructor(ExecState* exec,
-                                   FunctionPrototype* functionPrototype,
+                                   PassRefPtr<StructureID> structure,
                                    ErrorPrototype* errorPrototype)
     : InternalFunction(
           exec,
-          functionPrototype,
+          structure,
           Identifier(exec, errorPrototype->classInfo()->className)) {
   // ECMA 15.11.3.1 Error.prototype
   putDirect(exec->propertyNames().prototype, errorPrototype,
@@ -49,7 +48,7 @@ ErrorConstructor::ErrorConstructor(ExecState* exec,
 // ECMA 15.9.3
 static ErrorInstance* constructError(ExecState* exec, const ArgList& args) {
   ErrorInstance* obj =
-      new (exec) ErrorInstance(exec->lexicalGlobalObject()->errorPrototype());
+      new (exec) ErrorInstance(exec->lexicalGlobalObject()->errorStructure());
   if (!args.at(exec, 0)->isUndefined())
     obj->putDirect(exec->propertyNames().message,
                    jsString(exec, args.at(exec, 0)->toString(exec)));

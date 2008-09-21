@@ -26,7 +26,6 @@
 #include "config.h"
 #include "PrototypeFunction.h"
 
-#include "FunctionPrototype.h"
 #include "JSGlobalObject.h"
 #include <wtf/Assertions.h>
 
@@ -38,21 +37,24 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
                                      int length,
                                      const Identifier& name,
                                      NativeFunction function)
-    : InternalFunction(exec,
-                       exec->lexicalGlobalObject()->functionPrototype(),
-                       name),
+    : InternalFunction(
+          exec,
+          exec->lexicalGlobalObject()->prototypeFunctionStructure(),
+          name),
       m_function(function) {
   ASSERT_ARG(function, function);
   putDirect(exec->propertyNames().length, jsNumber(exec, length),
             DontDelete | ReadOnly | DontEnum);
 }
 
-PrototypeFunction::PrototypeFunction(ExecState* exec,
-                                     FunctionPrototype* functionPrototype,
-                                     int length,
-                                     const Identifier& name,
-                                     NativeFunction function)
-    : InternalFunction(exec, functionPrototype, name), m_function(function) {
+PrototypeFunction::PrototypeFunction(
+    ExecState* exec,
+    PassRefPtr<StructureID> prototypeFunctionStructure,
+    int length,
+    const Identifier& name,
+    NativeFunction function)
+    : InternalFunction(exec, prototypeFunctionStructure, name),
+      m_function(function) {
   ASSERT_ARG(function, function);
   putDirect(exec->propertyNames().length, jsNumber(exec, length),
             DontDelete | ReadOnly | DontEnum);

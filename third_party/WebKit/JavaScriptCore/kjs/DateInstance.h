@@ -26,13 +26,11 @@
 
 namespace JSC {
 
-class FunctionPrototype;
-class ObjectPrototype;
 struct GregorianDateTime;
 
 class DateInstance : public JSWrapperObject {
  public:
-  DateInstance(JSObject* prototype);
+  explicit DateInstance(PassRefPtr<StructureID>);
   virtual ~DateInstance();
 
   double internalNumber() const {

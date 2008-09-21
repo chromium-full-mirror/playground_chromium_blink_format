@@ -160,8 +160,8 @@ JSArray::JSArray(PassRefPtr<StructureID> structureID) : JSObject(structureID) {
   checkConsistency();
 }
 
-JSArray::JSArray(JSObject* prototype, unsigned initialLength)
-    : JSObject(prototype) {
+JSArray::JSArray(PassRefPtr<StructureID> structure, unsigned initialLength)
+    : JSObject(structure) {
   unsigned initialCapacity = min(initialLength, MIN_SPARSE_ARRAY_INDEX);
 
   m_storage = static_cast<ArrayStorage*>(
@@ -175,8 +175,10 @@ JSArray::JSArray(JSObject* prototype, unsigned initialLength)
   checkConsistency();
 }
 
-JSArray::JSArray(ExecState* exec, JSObject* prototype, const ArgList& list)
-    : JSObject(prototype) {
+JSArray::JSArray(ExecState* exec,
+                 PassRefPtr<StructureID> structure,
+                 const ArgList& list)
+    : JSObject(structure) {
   unsigned length = list.size();
 
   m_fastAccessCutoff = length;
@@ -958,24 +960,24 @@ void JSArray::checkConsistency(ConsistencyCheckType type) {
 #endif
 
 JSArray* constructEmptyArray(ExecState* exec) {
-  return new (exec) JSArray(exec->lexicalGlobalObject()->arrayPrototype(), 0);
+  return new (exec) JSArray(exec->lexicalGlobalObject()->arrayStructure());
 }
 
 JSArray* constructEmptyArray(ExecState* exec, unsigned initialLength) {
   return new (exec)
-      JSArray(exec->lexicalGlobalObject()->arrayPrototype(), initialLength);
+      JSArray(exec->lexicalGlobalObject()->arrayStructure(), initialLength);
 }
 
 JSArray* constructArray(ExecState* exec, JSValue* singleItemValue) {
   ArgList values;
   values.append(singleItemValue);
   return new (exec)
-      JSArray(exec, exec->lexicalGlobalObject()->arrayPrototype(), values);
+      JSArray(exec, exec->lexicalGlobalObject()->arrayStructure(), values);
 }
 
 JSArray* constructArray(ExecState* exec, const ArgList& values) {
   return new (exec)
-      JSArray(exec, exec->lexicalGlobalObject()->arrayPrototype(), values);
+      JSArray(exec, exec->lexicalGlobalObject()->arrayStructure(), values);
 }
 
 }  // namespace JSC

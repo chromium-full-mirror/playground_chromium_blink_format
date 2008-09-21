@@ -52,25 +52,26 @@ static JSValue* dateNow(ExecState*, JSObject*, JSValue*, const ArgList&);
 static JSValue* dateUTC(ExecState*, JSObject*, JSValue*, const ArgList&);
 
 DateConstructor::DateConstructor(ExecState* exec,
-                                 FunctionPrototype* functionPrototype,
+                                 PassRefPtr<StructureID> structure,
+                                 StructureID* prototypeFunctionStructure,
                                  DatePrototype* datePrototype)
     : InternalFunction(
           exec,
-          functionPrototype,
+          structure,
           Identifier(exec, datePrototype->classInfo()->className)) {
   putDirect(exec->propertyNames().prototype, datePrototype,
             DontEnum | DontDelete | ReadOnly);
 
   putDirectFunction(exec, new (exec) PrototypeFunction(
-                              exec, functionPrototype, 1,
+                              exec, prototypeFunctionStructure, 1,
                               exec->propertyNames().parse, dateParse),
                     DontEnum);
   putDirectFunction(
-      exec, new (exec) PrototypeFunction(exec, functionPrototype, 7,
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 7,
                                          exec->propertyNames().UTC, dateUTC),
       DontEnum);
   putDirectFunction(
-      exec, new (exec) PrototypeFunction(exec, functionPrototype, 0,
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().now, dateNow),
       DontEnum);
 
@@ -122,10 +123,10 @@ static JSObject* constructDate(ExecState* exec,
     }
   }
 
-  DateInstance* ret =
-      new (exec) DateInstance(exec->lexicalGlobalObject()->datePrototype());
-  ret->setInternalValue(jsNumber(exec, timeClip(value)));
-  return ret;
+  DateInstance* result =
+      new (exec) DateInstance(exec->lexicalGlobalObject()->dateStructure());
+  result->setInternalValue(jsNumber(exec, timeClip(value)));
+  return result;
 }
 
 ConstructType DateConstructor::getConstructData(ConstructData& constructData) {

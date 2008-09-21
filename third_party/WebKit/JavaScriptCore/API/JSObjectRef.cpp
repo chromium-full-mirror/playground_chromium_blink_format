@@ -71,14 +71,15 @@ JSObjectRef JSObjectMake(JSContextRef ctx, JSClassRef jsClass, void* data) {
   if (!jsClass)
     return toRef(new (exec) JSObject(
         exec->lexicalGlobalObject()
-            ->objectPrototype()));  // slightly more efficient
+            ->emptyObjectStructure()));  // slightly more efficient
 
-  JSObject* jsPrototype = jsClass->prototype(exec);
-  if (!jsPrototype)
-    jsPrototype = exec->lexicalGlobalObject()->objectPrototype();
+  JSCallbackObject<JSObject>* object = new (exec) JSCallbackObject<JSObject>(
+      exec, exec->lexicalGlobalObject()->callbackObjectStructure(), jsClass,
+      data);
+  if (JSObject* prototype = jsClass->prototype(exec))
+    object->setPrototype(prototype);
 
-  return toRef(
-      new (exec) JSCallbackObject<JSObject>(exec, jsClass, jsPrototype, data));
+  return toRef(object);
 }
 
 JSObjectRef JSObjectMakeFunctionWithCallback(
@@ -107,8 +108,9 @@ JSObjectRef JSObjectMakeConstructor(
                              ? jsClass->prototype(exec)
                              : exec->dynamicGlobalObject()->objectPrototype();
 
-  JSCallbackConstructor* constructor =
-      new (exec) JSCallbackConstructor(exec, jsClass, callAsConstructor);
+  JSCallbackConstructor* constructor = new (exec) JSCallbackConstructor(
+      exec->lexicalGlobalObject()->callbackConstructorStructure(), jsClass,
+      callAsConstructor);
   constructor->putDirect(exec->propertyNames().prototype, jsPrototype,
                          DontEnum | DontDelete | ReadOnly);
   return toRef(constructor);

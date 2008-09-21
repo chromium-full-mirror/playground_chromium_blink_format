@@ -29,8 +29,8 @@ namespace JSC {
 
 class StringObject : public JSWrapperObject {
  public:
-  StringObject(ExecState*, JSObject* prototype);
-  StringObject(ExecState*, JSObject* prototype, const UString&);
+  StringObject(ExecState*, PassRefPtr<StructureID>);
+  StringObject(ExecState*, PassRefPtr<StructureID>, const UString&);
 
   static StringObject* create(ExecState*, JSString*);
 
@@ -56,7 +56,7 @@ class StringObject : public JSWrapperObject {
   }
 
  protected:
-  StringObject(JSObject* prototype, JSString*);
+  StringObject(PassRefPtr<StructureID>, JSString*);
 
  private:
   virtual UString toString(ExecState*) const;

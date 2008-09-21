@@ -45,7 +45,7 @@ JSCallbackFunction::JSCallbackFunction(ExecState* exec,
                                        JSObjectCallAsFunctionCallback callback,
                                        const Identifier& name)
     : InternalFunction(exec,
-                       exec->lexicalGlobalObject()->functionPrototype(),
+                       exec->lexicalGlobalObject()->callbackFunctionStructure(),
                        name),
       m_callback(callback) {}
 

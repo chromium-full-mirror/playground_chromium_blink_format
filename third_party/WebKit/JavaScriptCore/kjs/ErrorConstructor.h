@@ -27,11 +27,10 @@
 namespace JSC {
 
 class ErrorPrototype;
-class FunctionPrototype;
 
 class ErrorConstructor : public InternalFunction {
  public:
-  ErrorConstructor(ExecState*, FunctionPrototype*, ErrorPrototype*);
+  ErrorConstructor(ExecState*, PassRefPtr<StructureID>, ErrorPrototype*);
 
  private:
   virtual ConstructType getConstructData(ConstructData&);

@@ -26,12 +26,13 @@
 
 namespace JSC {
 
-class FunctionPrototype;
 class ObjectPrototype;
 
 class ErrorPrototype : public ErrorInstance {
  public:
-  ErrorPrototype(ExecState*, ObjectPrototype*, FunctionPrototype*);
+  ErrorPrototype(ExecState*,
+                 PassRefPtr<StructureID>,
+                 StructureID* prototypeFunctionStructure);
 };
 
 }  // namespace JSC

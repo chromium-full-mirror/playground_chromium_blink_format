@@ -23,9 +23,7 @@
 #include "NumberPrototype.h"
 
 #include "Error.h"
-#include "FunctionPrototype.h"
 #include "JSString.h"
-#include "ObjectPrototype.h"
 #include "PrototypeFunction.h"
 #include "dtoa.h"
 #include "operations.h"
@@ -65,41 +63,41 @@ static JSValue* numberProtoFuncToPrecision(ExecState*,
 // ECMA 15.7.4
 
 NumberPrototype::NumberPrototype(ExecState* exec,
-                                 ObjectPrototype* objectPrototype,
-                                 FunctionPrototype* functionPrototype)
-    : NumberObject(objectPrototype) {
+                                 PassRefPtr<StructureID> structure,
+                                 StructureID* prototypeFunctionStructure)
+    : NumberObject(structure) {
   setInternalValue(jsNumber(exec, 0));
 
   // The constructor will be added later, after NumberConstructor has been
   // constructed
 
-  putDirectFunction(exec,
-                    new (exec) PrototypeFunction(exec, functionPrototype, 1,
-                                                 exec->propertyNames().toString,
-                                                 numberProtoFuncToString),
-                    DontEnum);
   putDirectFunction(
-      exec, new (exec) PrototypeFunction(exec, functionPrototype, 0,
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
+                                         exec->propertyNames().toString,
+                                         numberProtoFuncToString),
+      DontEnum);
+  putDirectFunction(
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().toLocaleString,
                                          numberProtoFuncToLocaleString),
       DontEnum);
-  putDirectFunction(exec,
-                    new (exec) PrototypeFunction(exec, functionPrototype, 0,
-                                                 exec->propertyNames().valueOf,
-                                                 numberProtoFuncValueOf),
-                    DontEnum);
-  putDirectFunction(exec,
-                    new (exec) PrototypeFunction(exec, functionPrototype, 1,
-                                                 exec->propertyNames().toFixed,
-                                                 numberProtoFuncToFixed),
-                    DontEnum);
   putDirectFunction(
-      exec, new (exec) PrototypeFunction(exec, functionPrototype, 1,
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
+                                         exec->propertyNames().valueOf,
+                                         numberProtoFuncValueOf),
+      DontEnum);
+  putDirectFunction(
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
+                                         exec->propertyNames().toFixed,
+                                         numberProtoFuncToFixed),
+      DontEnum);
+  putDirectFunction(
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().toExponential,
                                          numberProtoFuncToExponential),
       DontEnum);
   putDirectFunction(
-      exec, new (exec) PrototypeFunction(exec, functionPrototype, 1,
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().toPrecision,
                                          numberProtoFuncToPrecision),
       DontEnum);

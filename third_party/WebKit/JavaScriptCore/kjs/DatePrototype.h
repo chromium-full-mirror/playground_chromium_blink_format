@@ -30,7 +30,7 @@ class ObjectPrototype;
 
 class DatePrototype : public DateInstance {
  public:
-  DatePrototype(ExecState*, ObjectPrototype*);
+  DatePrototype(ExecState*, PassRefPtr<StructureID>);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
 

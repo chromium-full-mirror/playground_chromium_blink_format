@@ -211,8 +211,8 @@ const ClassInfo StringPrototype::info = {"String", &StringObject::info, 0,
 
 // ECMA 15.5.4
 StringPrototype::StringPrototype(ExecState* exec,
-                                 ObjectPrototype* objectPrototype)
-    : StringObject(exec, objectPrototype) {
+                                 PassRefPtr<StructureID> structure)
+    : StringObject(exec, structure) {
   // The constructor will be added later, after StringConstructor has been built
   putDirect(exec->propertyNames().length, jsNumber(exec, 0),
             DontDelete | ReadOnly | DontEnum);

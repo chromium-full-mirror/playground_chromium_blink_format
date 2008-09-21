@@ -37,8 +37,8 @@ struct DateInstance::Cache {
 
 const ClassInfo DateInstance::info = {"Date", 0, 0, 0};
 
-DateInstance::DateInstance(JSObject* prototype)
-    : JSWrapperObject(prototype), m_cache(0) {}
+DateInstance::DateInstance(PassRefPtr<StructureID> structure)
+    : JSWrapperObject(structure), m_cache(0) {}
 
 DateInstance::~DateInstance() {
   delete m_cache;

@@ -30,11 +30,11 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(BooleanConstructor);
 
 BooleanConstructor::BooleanConstructor(ExecState* exec,
-                                       FunctionPrototype* functionPrototype,
+                                       PassRefPtr<StructureID> structure,
                                        BooleanPrototype* booleanPrototype)
     : InternalFunction(
           exec,
-          functionPrototype,
+          structure,
           Identifier(exec, booleanPrototype->classInfo()->className)) {
   putDirect(exec->propertyNames().prototype, booleanPrototype,
             DontEnum | DontDelete | ReadOnly);
@@ -46,8 +46,8 @@ BooleanConstructor::BooleanConstructor(ExecState* exec,
 
 // ECMA 15.6.2
 JSObject* constructBoolean(ExecState* exec, const ArgList& args) {
-  BooleanObject* obj =
-      new (exec) BooleanObject(exec->lexicalGlobalObject()->booleanPrototype());
+  BooleanObject* obj = new (exec)
+      BooleanObject(exec->lexicalGlobalObject()->booleanObjectStructure());
   obj->setInternalValue(jsBoolean(args.at(exec, 0)->toBoolean(exec)));
   return obj;
 }
@@ -79,8 +79,8 @@ CallType BooleanConstructor::getCallData(CallData& callData) {
 
 JSObject* constructBooleanFromImmediateBoolean(ExecState* exec,
                                                JSValue* immediateBooleanValue) {
-  BooleanObject* obj =
-      new (exec) BooleanObject(exec->lexicalGlobalObject()->booleanPrototype());
+  BooleanObject* obj = new (exec)
+      BooleanObject(exec->lexicalGlobalObject()->booleanObjectStructure());
   obj->setInternalValue(immediateBooleanValue);
   return obj;
 }

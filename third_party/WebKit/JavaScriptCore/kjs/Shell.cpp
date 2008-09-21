@@ -173,36 +173,37 @@ GlobalObject::GlobalObject(JSGlobalData* globalData,
     : JSGlobalObject(globalData) {
   putDirectFunction(globalExec(),
                     new (globalExec()) PrototypeFunction(
-                        globalExec(), functionPrototype(), 1,
+                        globalExec(), prototypeFunctionStructure(), 1,
                         Identifier(globalExec(), "debug"), functionDebug));
   putDirectFunction(globalExec(),
                     new (globalExec()) PrototypeFunction(
-                        globalExec(), functionPrototype(), 1,
+                        globalExec(), prototypeFunctionStructure(), 1,
                         Identifier(globalExec(), "print"), functionPrint));
   putDirectFunction(globalExec(),
                     new (globalExec()) PrototypeFunction(
-                        globalExec(), functionPrototype(), 0,
+                        globalExec(), prototypeFunctionStructure(), 0,
                         Identifier(globalExec(), "quit"), functionQuit));
   putDirectFunction(globalExec(),
                     new (globalExec()) PrototypeFunction(
-                        globalExec(), functionPrototype(), 0,
+                        globalExec(), prototypeFunctionStructure(), 0,
                         Identifier(globalExec(), "gc"), functionGC));
   putDirectFunction(globalExec(),
                     new (globalExec()) PrototypeFunction(
-                        globalExec(), functionPrototype(), 1,
+                        globalExec(), prototypeFunctionStructure(), 1,
                         Identifier(globalExec(), "version"), functionVersion));
   putDirectFunction(globalExec(),
                     new (globalExec()) PrototypeFunction(
-                        globalExec(), functionPrototype(), 1,
+                        globalExec(), prototypeFunctionStructure(), 1,
                         Identifier(globalExec(), "run"), functionRun));
   putDirectFunction(globalExec(),
                     new (globalExec()) PrototypeFunction(
-                        globalExec(), functionPrototype(), 1,
+                        globalExec(), prototypeFunctionStructure(), 1,
                         Identifier(globalExec(), "load"), functionLoad));
-  putDirectFunction(globalExec(), new (globalExec()) PrototypeFunction(
-                                      globalExec(), functionPrototype(), 0,
-                                      Identifier(globalExec(), "readline"),
-                                      functionReadline));
+  putDirectFunction(
+      globalExec(),
+      new (globalExec()) PrototypeFunction(
+          globalExec(), prototypeFunctionStructure(), 0,
+          Identifier(globalExec(), "readline"), functionReadline));
 
   JSObject* array = constructEmptyArray(globalExec());
   for (size_t i = 0; i < arguments.size(); ++i)

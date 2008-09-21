@@ -25,7 +25,6 @@
 #include "ArrayConstructor.h"
 
 #include "ArrayPrototype.h"
-#include "FunctionPrototype.h"
 #include "JSArray.h"
 #include "lookup.h"
 
@@ -34,11 +33,11 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(ArrayConstructor);
 
 ArrayConstructor::ArrayConstructor(ExecState* exec,
-                                   FunctionPrototype* functionPrototype,
+                                   PassRefPtr<StructureID> structure,
                                    ArrayPrototype* arrayPrototype)
     : InternalFunction(
           exec,
-          functionPrototype,
+          structure,
           Identifier(exec, arrayPrototype->classInfo()->className)) {
   // ECMA 15.4.3.1 Array.prototype
   putDirect(exec->propertyNames().prototype, arrayPrototype,
@@ -57,12 +56,12 @@ static JSObject* constructArrayWithSizeQuirk(ExecState* exec,
     if (n != args.at(exec, 0)->toNumber(exec))
       return throwError(exec, RangeError,
                         "Array size is not a small enough positive integer.");
-    return new (exec) JSArray(exec->lexicalGlobalObject()->arrayPrototype(), n);
+    return new (exec) JSArray(exec->lexicalGlobalObject()->arrayStructure(), n);
   }
 
   // otherwise the array is constructed with the arguments in it
   return new (exec)
-      JSArray(exec, exec->lexicalGlobalObject()->arrayPrototype(), args);
+      JSArray(exec, exec->lexicalGlobalObject()->arrayStructure(), args);
 }
 
 static JSObject* constructWithArrayConstructor(ExecState* exec,

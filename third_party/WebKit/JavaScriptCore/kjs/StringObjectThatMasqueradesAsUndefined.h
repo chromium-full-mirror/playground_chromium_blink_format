@@ -31,9 +31,9 @@ namespace JSC {
 class StringObjectThatMasqueradesAsUndefined : public StringObject {
  public:
   StringObjectThatMasqueradesAsUndefined(ExecState* exec,
-                                         JSObject* prototype,
+                                         PassRefPtr<StructureID> structure,
                                          const UString& string)
-      : StringObject(exec, prototype, string) {}
+      : StringObject(exec, structure, string) {}
 
   virtual bool masqueradeAsUndefined() const { return true; }
   virtual bool toBoolean(ExecState*) const { return false; }

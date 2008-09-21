@@ -26,17 +26,9 @@
 
 namespace JSC {
 
-class FunctionPrototype;
-
-/**
- * @internal
- *
- * The initial value of Object.prototype (and thus all objects created
- * with the Object constructor
- */
 class ObjectPrototype : public JSObject {
  public:
-  ObjectPrototype(ExecState*, FunctionPrototype*);
+  ObjectPrototype(ExecState*, StructureID* prototypeFunctionStructure);
 };
 
 JSValue* objectProtoFuncToString(ExecState*,

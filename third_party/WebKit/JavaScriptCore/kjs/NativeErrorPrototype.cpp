@@ -31,10 +31,10 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(NativeErrorPrototype);
 
 NativeErrorPrototype::NativeErrorPrototype(ExecState* exec,
-                                           ErrorPrototype* errorPrototype,
+                                           PassRefPtr<StructureID> structure,
                                            const UString& name,
                                            const UString& message)
-    : JSObject(errorPrototype) {
+    : JSObject(structure) {
   putDirect(exec->propertyNames().name, jsString(exec, name), 0);
   putDirect(exec->propertyNames().message, jsString(exec, message), 0);
 }

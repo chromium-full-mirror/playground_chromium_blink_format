@@ -41,7 +41,7 @@ class JSCell : public JSValue {
   friend class CTI;
 
  private:
-  JSCell(StructureID*);
+  explicit JSCell(StructureID*);
   virtual ~JSCell();
 
  public:

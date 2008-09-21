@@ -33,7 +33,7 @@ class PrototypeFunction : public InternalFunction {
  public:
   PrototypeFunction(ExecState*, int length, const Identifier&, NativeFunction);
   PrototypeFunction(ExecState*,
-                    FunctionPrototype*,
+                    PassRefPtr<StructureID>,
                     int length,
                     const Identifier&,
                     NativeFunction);

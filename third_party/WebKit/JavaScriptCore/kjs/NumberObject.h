@@ -30,7 +30,7 @@ class JSNumberCell;
 
 class NumberObject : public JSWrapperObject {
  public:
-  NumberObject(JSObject* prototype);
+  explicit NumberObject(PassRefPtr<StructureID>);
 
   static const ClassInfo info;
 

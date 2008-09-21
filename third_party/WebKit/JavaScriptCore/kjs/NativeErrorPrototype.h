@@ -26,13 +26,10 @@
 
 namespace JSC {
 
-class ErrorPrototype;
-class UString;
-
 class NativeErrorPrototype : public JSObject {
  public:
   NativeErrorPrototype(ExecState*,
-                       ErrorPrototype*,
+                       PassRefPtr<StructureID>,
                        const UString& name,
                        const UString& message);
 };

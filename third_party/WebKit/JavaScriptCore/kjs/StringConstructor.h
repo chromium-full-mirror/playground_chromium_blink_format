@@ -26,12 +26,14 @@
 
 namespace JSC {
 
-class FunctionPrototype;
 class StringPrototype;
 
 class StringConstructor : public InternalFunction {
  public:
-  StringConstructor(ExecState*, FunctionPrototype*, StringPrototype*);
+  StringConstructor(ExecState*,
+                    PassRefPtr<StructureID>,
+                    StructureID* prototypeFunctionStructure,
+                    StringPrototype*);
 
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);

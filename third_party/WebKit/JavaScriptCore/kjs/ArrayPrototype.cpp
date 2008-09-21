@@ -148,8 +148,8 @@ const ClassInfo ArrayPrototype::info = {"Array", &JSArray::info, 0,
 */
 
 // ECMA 15.4.4
-ArrayPrototype::ArrayPrototype(ExecState*, ObjectPrototype* objectPrototype)
-    : JSArray(objectPrototype, 0) {}
+ArrayPrototype::ArrayPrototype(PassRefPtr<StructureID> structure)
+    : JSArray(structure) {}
 
 bool ArrayPrototype::getOwnPropertySlot(ExecState* exec,
                                         const Identifier& propertyName,

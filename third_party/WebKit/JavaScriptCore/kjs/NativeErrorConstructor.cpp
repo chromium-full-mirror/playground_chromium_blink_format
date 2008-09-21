@@ -23,7 +23,6 @@
 #include "NativeErrorConstructor.h"
 
 #include "ErrorInstance.h"
-#include "FunctionPrototype.h"
 #include "JSFunction.h"
 #include "NativeErrorPrototype.h"
 
@@ -36,24 +35,24 @@ const ClassInfo NativeErrorConstructor::info = {"Function",
 
 NativeErrorConstructor::NativeErrorConstructor(
     ExecState* exec,
-    FunctionPrototype* functionPrototype,
+    PassRefPtr<StructureID> structure,
     NativeErrorPrototype* nativeErrorPrototype)
     : InternalFunction(
           exec,
-          functionPrototype,
+          structure,
           Identifier(exec,
                      nativeErrorPrototype->getDirect(exec->propertyNames().name)
                          ->getString())),
-      m_proto(nativeErrorPrototype) {
+      m_errorStructure(StructureID::create(nativeErrorPrototype)) {
   putDirect(exec->propertyNames().length, jsNumber(exec, 1),
             DontDelete | ReadOnly | DontEnum);  // ECMA 15.11.7.5
-  putDirect(exec->propertyNames().prototype, m_proto,
+  putDirect(exec->propertyNames().prototype, nativeErrorPrototype,
             DontDelete | ReadOnly | DontEnum);
 }
 
 ErrorInstance* NativeErrorConstructor::construct(ExecState* exec,
                                                  const ArgList& args) {
-  ErrorInstance* object = new (exec) ErrorInstance(m_proto);
+  ErrorInstance* object = new (exec) ErrorInstance(m_errorStructure);
   if (!args.at(exec, 0)->isUndefined())
     object->putDirect(exec->propertyNames().message,
                       jsString(exec, args.at(exec, 0)->toString(exec)));
@@ -84,12 +83,6 @@ static JSValue* callNativeErrorConstructor(ExecState* exec,
 CallType NativeErrorConstructor::getCallData(CallData& callData) {
   callData.native.function = callNativeErrorConstructor;
   return CallTypeHost;
-}
-
-void NativeErrorConstructor::mark() {
-  JSObject::mark();
-  if (m_proto && !m_proto->marked())
-    m_proto->mark();
 }
 
 }  // namespace JSC

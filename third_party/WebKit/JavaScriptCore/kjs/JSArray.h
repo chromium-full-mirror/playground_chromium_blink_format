@@ -42,9 +42,9 @@ class JSArray : public JSObject {
   friend class CTI;
 
  public:
-  JSArray(PassRefPtr<StructureID>);
-  JSArray(JSObject* prototype, unsigned initialLength);
-  JSArray(ExecState* exec, JSObject* prototype, const ArgList& initialValues);
+  explicit JSArray(PassRefPtr<StructureID>);
+  JSArray(PassRefPtr<StructureID>, unsigned initialLength);
+  JSArray(ExecState*, PassRefPtr<StructureID>, const ArgList& initialValues);
   virtual ~JSArray();
 
   virtual bool getOwnPropertySlot(ExecState*,

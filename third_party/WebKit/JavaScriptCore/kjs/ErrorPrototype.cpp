@@ -22,7 +22,6 @@
 #include "config.h"
 #include "ErrorPrototype.h"
 
-#include "FunctionPrototype.h"
 #include "JSString.h"
 #include "ObjectPrototype.h"
 #include "PrototypeFunction.h"
@@ -39,9 +38,9 @@ static JSValue* errorProtoFuncToString(ExecState*,
 
 // ECMA 15.9.4
 ErrorPrototype::ErrorPrototype(ExecState* exec,
-                               ObjectPrototype* objectPrototype,
-                               FunctionPrototype* functionPrototype)
-    : ErrorInstance(objectPrototype) {
+                               PassRefPtr<StructureID> structure,
+                               StructureID* prototypeFunctionStructure)
+    : ErrorInstance(structure) {
   // The constructor will be added later in ErrorConstructor's constructor
 
   putDirect(exec->propertyNames().name, jsNontrivialString(exec, "Error"),
@@ -49,11 +48,11 @@ ErrorPrototype::ErrorPrototype(ExecState* exec,
   putDirect(exec->propertyNames().message,
             jsNontrivialString(exec, "Unknown error"), DontEnum);
 
-  putDirectFunction(exec,
-                    new (exec) PrototypeFunction(exec, functionPrototype, 0,
-                                                 exec->propertyNames().toString,
-                                                 errorProtoFuncToString),
-                    DontEnum);
+  putDirectFunction(
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
+                                         exec->propertyNames().toString,
+                                         errorProtoFuncToString),
+      DontEnum);
 }
 
 JSValue* errorProtoFuncToString(ExecState* exec,

@@ -22,7 +22,6 @@
 #include "config.h"
 #include "StringConstructor.h"
 
-#include "FunctionPrototype.h"
 #include "JSGlobalObject.h"
 #include "PrototypeFunction.h"
 #include "StringPrototype.h"
@@ -51,11 +50,12 @@ static JSValue* stringFromCharCode(ExecState* exec,
 ASSERT_CLASS_FITS_IN_CELL(StringConstructor);
 
 StringConstructor::StringConstructor(ExecState* exec,
-                                     FunctionPrototype* functionPrototype,
+                                     PassRefPtr<StructureID> structure,
+                                     StructureID* prototypeFunctionStructure,
                                      StringPrototype* stringPrototype)
     : InternalFunction(
           exec,
-          functionPrototype,
+          structure,
           Identifier(exec, stringPrototype->classInfo()->className)) {
   // ECMA 15.5.3.1 String.prototype
   putDirect(exec->propertyNames().prototype, stringPrototype,
@@ -63,7 +63,7 @@ StringConstructor::StringConstructor(ExecState* exec,
 
   // ECMA 15.5.3.2 fromCharCode()
   putDirectFunction(
-      exec, new (exec) PrototypeFunction(exec, functionPrototype, 1,
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().fromCharCode,
                                          stringFromCharCode),
       DontEnum);
@@ -77,11 +77,12 @@ StringConstructor::StringConstructor(ExecState* exec,
 static JSObject* constructWithStringConstructor(ExecState* exec,
                                                 JSObject*,
                                                 const ArgList& args) {
-  JSObject* prototype = exec->lexicalGlobalObject()->stringPrototype();
   if (args.isEmpty())
-    return new (exec) StringObject(exec, prototype);
+    return new (exec) StringObject(
+        exec, exec->lexicalGlobalObject()->stringObjectStructure());
   return new (exec)
-      StringObject(exec, prototype, args.at(exec, 0)->toString(exec));
+      StringObject(exec, exec->lexicalGlobalObject()->stringObjectStructure(),
+                   args.at(exec, 0)->toString(exec));
 }
 
 ConstructType StringConstructor::getConstructData(
