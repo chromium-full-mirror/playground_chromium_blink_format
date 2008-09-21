@@ -739,6 +739,11 @@ void GraphicsContext::setLineCap(LineCap cap) {
   }
 }
 
+void GraphicsContext::setLineDash(const DashArray& dashes, float dashOffset) {
+  CGContextSetLineDash(platformContext(), dashOffset, dashes.data(),
+                       dashes.size());
+}
+
 void GraphicsContext::setLineJoin(LineJoin join) {
   if (paintingDisabled())
     return;
