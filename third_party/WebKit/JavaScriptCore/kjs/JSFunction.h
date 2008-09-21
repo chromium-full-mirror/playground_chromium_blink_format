@@ -61,6 +61,8 @@ class JSFunction : public InternalFunction {
   // due to a later parameter with the same name.
   const Identifier& getParameterName(int index);
 
+  unsigned numParameters() const { return m_body->parameters().size(); }
+
   void setScope(const ScopeChain& scopeChain) { m_scopeChain = scopeChain; }
   ScopeChain& scope() { return m_scopeChain; }
 

@@ -35,6 +35,7 @@
 
 namespace JSC {
 
+class Arguments;
 class Register;
 
 class JSActivation : public JSVariableObject {
@@ -49,7 +50,20 @@ class JSActivation : public JSVariableObject {
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
 
+  inline void uncheckedSymbolTableGet(int index, PropertySlot& slot) {
+    slot.setRegisterSlot(&registerAt(index));
+  }
+
+  inline JSValue* uncheckedSymbolTableGetValue(int index) {
+    return registerAt(index).getJSValue();
+  }
+
   virtual void put(ExecState*, const Identifier&, JSValue*, PutPropertySlot&);
+
+  inline void uncheckedSymbolTablePut(int index, JSValue* value) {
+    registerAt(index) = value;
+  }
+
   virtual void putWithAttributes(ExecState*,
                                  const Identifier&,
                                  JSValue*,
@@ -75,14 +89,14 @@ class JSActivation : public JSVariableObject {
 
     RefPtr<FunctionBodyNode>
         functionBody;  // Owns the symbol table and code block
-    JSObject* argumentsObject;
+    Arguments* argumentsObject;
   };
 
   static JSValue* argumentsGetter(ExecState*,
                                   const Identifier&,
                                   const PropertySlot&);
   NEVER_INLINE PropertySlot::GetValueFunc getArgumentsGetter();
-  NEVER_INLINE JSObject* createArgumentsObject(ExecState*);
+  NEVER_INLINE Arguments* createArgumentsObject(ExecState*);
 
   JSActivationData* d() const {
     return static_cast<JSActivationData*>(JSVariableObject::d);
