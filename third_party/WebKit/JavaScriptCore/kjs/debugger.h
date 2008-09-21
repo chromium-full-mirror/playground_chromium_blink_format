@@ -24,16 +24,12 @@
 #define Debugger_h
 
 #include "protect.h"
-#include <wtf/HashSet.h>
 
 namespace JSC {
 
-class ArgList;
 class DebuggerCallFrame;
 class ExecState;
 class JSGlobalObject;
-class JSObject;
-class JSValue;
 class SourceProvider;
 class UString;
 
@@ -48,7 +44,7 @@ class Debugger {
   virtual void sourceParsed(ExecState*,
                             int sourceId,
                             const UString& sourceURL,
-                            const SourceProvider& source,
+                            const SourceProvider&,
                             int startingLineNumber,
                             int errorLine,
                             const UString& errorMsg) = 0;
