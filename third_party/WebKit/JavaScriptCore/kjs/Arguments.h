@@ -41,6 +41,7 @@ class Arguments : public JSObject {
             JSActivation*,
             int firstArgumentIndex,
             Register* argv);
+  ~Arguments();
 
   virtual void mark();
 
