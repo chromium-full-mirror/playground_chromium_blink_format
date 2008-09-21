@@ -428,6 +428,8 @@ class CTI {
                                        unsigned opcodeIndex);
   void emitFastArithIntToImmNoCheck(X86Assembler::RegisterID);
 
+  void emitTagAsBoolImmediate(X86Assembler::RegisterID reg);
+
   void emitDebugExceptionCheck();
 
   X86Assembler::JmpSrc emitCall(unsigned opcodeIndex, CTIHelper_j);
