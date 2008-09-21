@@ -44,6 +44,10 @@ class GraphicsContext;
 CGAffineTransform CGAffineTransformMakeMapBetweenRects(CGRect source,
                                                        CGRect dest);
 
+void applyStrokeStyleToContext(GraphicsContext*,
+                               RenderStyle*,
+                               const RenderObject*);
+
 CGContextRef scratchContext();
 FloatRect strokeBoundingBox(const Path& path,
                             RenderStyle*,
