@@ -66,6 +66,9 @@ class JSArray : public JSObject {
   void sort(ExecState*);
   void sort(ExecState*, JSValue* compareFunction, CallType, const CallData&);
 
+  void push(ExecState*, JSValue*);
+  JSValue* pop();
+
   bool canGetIndex(unsigned i) { return i < m_fastAccessCutoff; }
   JSValue* getIndex(unsigned i) {
     ASSERT(canGetIndex(i));
