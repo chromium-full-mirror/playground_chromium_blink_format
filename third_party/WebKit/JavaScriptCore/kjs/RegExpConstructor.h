@@ -88,6 +88,8 @@ class RegExpConstructor : public InternalFunction {
   OwnPtr<RegExpConstructorPrivate> d;
 };
 
+JSObject* constructRegExp(ExecState*, const ArgList&);
+
 }  // namespace JSC
 
 #endif  // RegExpConstructor_h

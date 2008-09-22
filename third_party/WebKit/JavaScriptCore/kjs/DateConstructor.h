@@ -40,6 +40,8 @@ class DateConstructor : public InternalFunction {
   virtual CallType getCallData(CallData&);
 };
 
+JSObject* constructDate(ExecState*, const ArgList&);
+
 }  // namespace JSC
 
 #endif  // DateConstructor_h

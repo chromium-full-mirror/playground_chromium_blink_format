@@ -278,7 +278,7 @@ void RegExpConstructor::putValueProperty(ExecState* exec,
 }
 
 // ECMA 15.10.4
-static JSObject* constructRegExp(ExecState* exec, const ArgList& args) {
+JSObject* constructRegExp(ExecState* exec, const ArgList& args) {
   JSValue* arg0 = args.at(exec, 0);
   JSValue* arg1 = args.at(exec, 1);
 

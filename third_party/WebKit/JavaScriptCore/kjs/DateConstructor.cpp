@@ -80,9 +80,7 @@ DateConstructor::DateConstructor(ExecState* exec,
 }
 
 // ECMA 15.9.3
-static JSObject* constructDate(ExecState* exec,
-                               JSObject*,
-                               const ArgList& args) {
+JSObject* constructDate(ExecState* exec, const ArgList& args) {
   int numArgs = args.size();
 
   double value;
@@ -129,8 +127,14 @@ static JSObject* constructDate(ExecState* exec,
   return result;
 }
 
+static JSObject* constructWithDateConstructor(ExecState* exec,
+                                              JSObject*,
+                                              const ArgList& args) {
+  return constructDate(exec, args);
+}
+
 ConstructType DateConstructor::getConstructData(ConstructData& constructData) {
-  constructData.native.function = constructDate;
+  constructData.native.function = constructWithDateConstructor;
   return ConstructTypeHost;
 }
 
