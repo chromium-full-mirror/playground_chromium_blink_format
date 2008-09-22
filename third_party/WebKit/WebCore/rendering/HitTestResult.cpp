@@ -40,7 +40,8 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HitTestResult::HitTestResult(const IntPoint& point) : m_point(point) {}
+HitTestResult::HitTestResult(const IntPoint& point)
+    : m_point(point), m_isOverWidget(false) {}
 
 HitTestResult::HitTestResult(const HitTestResult& other)
     : m_innerNode(other.innerNode()),
@@ -48,7 +49,8 @@ HitTestResult::HitTestResult(const HitTestResult& other)
       m_point(other.point()),
       m_localPoint(other.localPoint()),
       m_innerURLElement(other.URLElement()),
-      m_scrollbar(other.scrollbar()) {}
+      m_scrollbar(other.scrollbar()),
+      m_isOverWidget(other.isOverWidget()) {}
 
 HitTestResult::~HitTestResult() {}
 
@@ -59,6 +61,7 @@ HitTestResult& HitTestResult::operator=(const HitTestResult& other) {
   m_localPoint = other.localPoint();
   m_innerURLElement = other.URLElement();
   m_scrollbar = other.scrollbar();
+  m_isOverWidget = other.isOverWidget();
   return *this;
 }
 
