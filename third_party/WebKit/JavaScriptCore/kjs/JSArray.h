@@ -81,6 +81,8 @@ class JSArray : public JSObject {
     return m_storage->m_vector[i] = v;
   }
 
+  void fillArgList(ExecState*, ArgList&);
+
  protected:
   virtual void put(ExecState*,
                    const Identifier& propertyName,

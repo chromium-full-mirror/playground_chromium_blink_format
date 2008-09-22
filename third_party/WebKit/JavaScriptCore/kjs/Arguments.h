@@ -48,6 +48,8 @@ class Arguments : public JSObject {
 
   virtual void mark();
 
+  void fillArgList(ExecState*, ArgList&);
+
  private:
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier& propertyName,
