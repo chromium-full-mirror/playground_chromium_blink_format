@@ -153,14 +153,19 @@ void RenderView::paint(PaintInfo& paintInfo, int tx, int ty) {
 }
 
 void RenderView::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
-  // Check to see if we are enclosed by a transparent layer.  If so, we cannot
-  // blit
-  // when scrolling, and we need to use slow repaints.
+  // Check to see if we are enclosed by a layer that requires complex painting
+  // rules.  If so, we cannot blit
+  // when scrolling, and we need to use slow repaints.  Examples of layers that
+  // require this are transparent layers,
+  // layers with reflections, or transformed layers.
+  // FIXME: This needs to be dynamic.  We should be able to go back to blitting
+  // if we ever stop being inside
+  // a transform, transparency layer, etc.
   Element* elt;
   for (elt = document()->ownerElement(); view() && elt && elt->renderer();
        elt = elt->document()->ownerElement()) {
     RenderLayer* layer = elt->renderer()->enclosingLayer();
-    if (layer->isTransparent() || layer->transparentAncestor()) {
+    if (layer->requiresSlowRepaints()) {
       frameView()->setUseSlowRepaints();
       break;
     }
@@ -176,7 +181,9 @@ void RenderView::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
   // root document,
   // since iframes/frames with no background in the child document should show
   // the parent's background.
-  if (view()->isTransparent())
+  if (view()->isTransparent())  // FIXME: This needs to be dynamic.  We should
+                                // be able to go back to blitting if we ever
+                                // stop being transparent.
     frameView()
         ->setUseSlowRepaints();  // The parent must show behind the child.
   else {
@@ -203,7 +210,7 @@ void RenderView::repaintViewRectangle(const IntRect& ur, bool immediate) {
   // or even invisible.
   Element* elt = document()->ownerElement();
   if (!elt)
-    m_frameView->repaintRectangle(ur, immediate);
+    m_frameView->repaintContentRectangle(ur, immediate);
   else if (RenderObject* obj = elt->renderer()) {
     IntRect vr = viewRect();
     IntRect r = intersection(ur, vr);
@@ -413,9 +420,9 @@ void RenderView::setSelection(RenderObject* start,
         oldInfo->state() != newInfo->state() ||
         (m_selectionStart == obj && oldStartPos != m_selectionStartPos) ||
         (m_selectionEnd == obj && oldEndPos != m_selectionEndPos)) {
-      m_frameView->updateContents(oldInfo->rect());
+      repaintViewRectangle(oldInfo->rect());
       if (newInfo) {
-        m_frameView->updateContents(newInfo->rect());
+        repaintViewRectangle(newInfo->rect());
         newSelectedObjects.remove(obj);
         delete newInfo;
       }
@@ -429,7 +436,7 @@ void RenderView::setSelection(RenderObject* start,
   for (SelectedObjectMap::iterator i = newSelectedObjects.begin();
        i != newObjectsEnd; ++i) {
     SelectionInfo* newInfo = i->second;
-    m_frameView->updateContents(newInfo->rect());
+    repaintViewRectangle(newInfo->rect());
     delete newInfo;
   }
 
@@ -442,9 +449,9 @@ void RenderView::setSelection(RenderObject* start,
     BlockSelectionInfo* oldInfo = i->second;
     if (!newInfo || oldInfo->rects() != newInfo->rects() ||
         oldInfo->state() != newInfo->state()) {
-      m_frameView->updateContents(oldInfo->rects());
+      repaintViewRectangle(oldInfo->rects());
       if (newInfo) {
-        m_frameView->updateContents(newInfo->rects());
+        repaintViewRectangle(newInfo->rects());
         newSelectedBlocks.remove(block);
         delete newInfo;
       }
@@ -458,7 +465,7 @@ void RenderView::setSelection(RenderObject* start,
   for (SelectedBlockMap::iterator i = newSelectedBlocks.begin();
        i != newBlocksEnd; ++i) {
     BlockSelectionInfo* newInfo = i->second;
-    m_frameView->updateContents(newInfo->rects());
+    repaintViewRectangle(newInfo->rects());
     delete newInfo;
   }
 }

@@ -91,9 +91,6 @@ class ScrollView : public Widget {
   void removeChild(Widget*);
 
   virtual void resizeContents(int w, int h);
-  void updateContents(const IntRect&, bool now = false);
-  void updateWindowRect(const IntRect&, bool now = false);
-  void update();
 
   // Event coordinates are assumed to be in the coordinate space of a window
   // that contains
@@ -148,6 +145,11 @@ class ScrollView : public Widget {
   IntRect contentsToScreen(const IntRect&) const;
   IntPoint screenToContents(const IntPoint&) const;
 #endif
+
+ protected:
+  void updateContents(const IntRect&, bool now = false);
+  void updateWindowRect(const IntRect&, bool now = false);
+  void update();
 
 #if PLATFORM(MAC) && defined __OBJC__
  public:
