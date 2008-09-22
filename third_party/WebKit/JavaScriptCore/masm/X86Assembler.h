@@ -168,6 +168,7 @@ class X86Assembler {
     OP_GROUP1A_Ev = 0x8F,
     OP_CDQ = 0x99,
     OP_SETE = 0x94,
+    OP_SETNE = 0x95,
     OP_GROUP2_EvIb = 0xC1,
     OP_RET = 0xC3,
     OP_GROUP11_EvIz = 0xC7,
@@ -347,6 +348,14 @@ class X86Assembler {
 
   void setz_r(RegisterID dst) { sete_r(dst); }
 
+  void setne_r(RegisterID dst) {
+    m_buffer->putByte(OP_2BYTE_ESCAPE);
+    m_buffer->putByte(OP_SETNE);
+    m_buffer->putByte(MODRM(3, 0, dst));
+  }
+
+  void setnz_r(RegisterID dst) { setne_r(dst); }
+
   void orl_rr(RegisterID src, RegisterID dst) {
     m_buffer->putByte(OP_OR_EvGv);
     emitModRm_rr(src, dst);
@@ -391,6 +400,18 @@ class X86Assembler {
     m_buffer->putByteUnchecked(OP_GROUP3_EvIz);
     emitModRm_opr_Unchecked(GROUP3_OP_TEST, dst);
     m_buffer->putIntUnchecked(imm);
+  }
+
+  void testl_i32m(int imm, RegisterID dst) {
+    m_buffer->putByte(OP_GROUP3_EvIz);
+    emitModRm_opm(GROUP3_OP_TEST, dst);
+    m_buffer->putInt(imm);
+  }
+
+  void testl_i32m(int imm, int offset, RegisterID dst) {
+    m_buffer->putByte(OP_GROUP3_EvIz);
+    emitModRm_opm(GROUP3_OP_TEST, dst, offset);
+    m_buffer->putInt(imm);
   }
 
   void testl_rr(RegisterID src, RegisterID dst) {

@@ -59,9 +59,7 @@ struct Instruction;
  * JSObject.
  */
 class JSValue : Noncopyable {
-  friend class JSCell;   // so it can derive from this class
-  friend class Heap;     // so it can call asCell()
-  friend class Machine;  // so it can call asCell()
+  friend class JSCell;  // so it can derive from this class
  private:
   JSValue();
   virtual ~JSValue();
@@ -154,6 +152,9 @@ class JSValue : Noncopyable {
 
   JSValue* getJSNumber();  // 0 if this is not a JSNumber or number object
 
+  JSCell* asCell();
+  const JSCell* asCell() const;
+
  private:
   bool getPropertySlot(ExecState*,
                        const Identifier& propertyName,
@@ -161,10 +162,6 @@ class JSValue : Noncopyable {
   bool getPropertySlot(ExecState*, unsigned propertyName, PropertySlot&);
   int32_t toInt32SlowCase(ExecState*, bool& ok) const;
   uint32_t toUInt32SlowCase(ExecState*, bool& ok) const;
-
-  // Implementation details.
-  JSCell* asCell();
-  const JSCell* asCell() const;
 };
 
 inline JSValue::JSValue() {}

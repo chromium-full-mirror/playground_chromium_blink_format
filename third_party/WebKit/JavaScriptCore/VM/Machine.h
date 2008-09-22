@@ -236,8 +236,6 @@ class Machine {
   static void SFX_CALL cti_op_put_setter(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_new_error(CTI_ARGS);
   static void SFX_CALL cti_op_debug(CTI_ARGS);
-  static JSValue* SFX_CALL cti_op_eq_null(CTI_ARGS);
-  static JSValue* SFX_CALL cti_op_neq_null(CTI_ARGS);
 
   static void* SFX_CALL cti_vm_throw(CTI_ARGS);
   static void* SFX_CALL cti_vm_compile(CTI_ARGS);

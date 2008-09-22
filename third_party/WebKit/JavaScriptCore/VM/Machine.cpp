@@ -249,7 +249,10 @@ static JSValue* jsTypeStringForValue(ExecState* exec, JSValue* v) {
   if (v->isObject()) {
     // Return "undefined" for objects that should be treated
     // as null when doing comparisons.
-    if (static_cast<JSObject*>(v)->masqueradeAsUndefined())
+    if (static_cast<JSObject*>(v)
+            ->structureID()
+            ->typeInfo()
+            .masqueradesAsUndefined())
       return jsNontrivialString(exec, "undefined");
     CallData callData;
     if (static_cast<JSObject*>(v)->getCallData(callData) != CallTypeNone)
@@ -266,7 +269,10 @@ static bool jsIsObjectType(JSValue* v) {
   if (type == NumberType || type == StringType)
     return false;
   if (type == ObjectType) {
-    if (static_cast<JSObject*>(v)->masqueradeAsUndefined())
+    if (static_cast<JSObject*>(v)
+            ->structureID()
+            ->typeInfo()
+            .masqueradesAsUndefined())
       return false;
     CallData callData;
     if (static_cast<JSObject*>(v)->getCallData(callData) != CallTypeNone)
@@ -1785,8 +1791,9 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         NEXT_OPCODE;
       }
 
-      r[dst] = jsBoolean(!JSImmediate::isImmediate(src) &&
-                         static_cast<JSCell*>(src)->masqueradeAsUndefined());
+      r[dst] = jsBoolean(
+          !JSImmediate::isImmediate(src) &&
+          src->asCell()->structureID()->typeInfo().masqueradesAsUndefined());
       ++vPC;
       NEXT_OPCODE;
     }
@@ -1827,7 +1834,11 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       }
 
       r[dst] = jsBoolean(JSImmediate::isImmediate(src) ||
-                         !static_cast<JSCell*>(src)->masqueradeAsUndefined());
+                         !static_cast<JSCell*>(src)
+                              ->asCell()
+                              ->structureID()
+                              ->typeInfo()
+                              .masqueradesAsUndefined());
       ++vPC;
       NEXT_OPCODE;
     }
@@ -2400,9 +2411,12 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       int dst = (++vPC)->u.operand;
       int src = (++vPC)->u.operand;
       JSValue* v = r[src].jsValue(exec);
-      r[dst] = jsBoolean(v->isUndefined() ||
-                         (v->isObject() &&
-                          static_cast<JSObject*>(v)->masqueradeAsUndefined()));
+      r[dst] = jsBoolean(JSImmediate::isImmediate(v)
+                             ? v->isUndefined()
+                             : v->asCell()
+                                   ->structureID()
+                                   ->typeInfo()
+                                   .masqueradesAsUndefined());
 
       ++vPC;
       NEXT_OPCODE;
@@ -5653,8 +5667,9 @@ JSValue* Machine::cti_op_typeof(CTI_ARGS) {
 JSValue* Machine::cti_op_is_undefined(CTI_ARGS) {
   JSValue* v = ARG_src1;
   return jsBoolean(
-      v->isUndefined() ||
-      (v->isObject() && static_cast<JSObject*>(v)->masqueradeAsUndefined()));
+      JSImmediate::isImmediate(v)
+          ? v->isUndefined()
+          : v->asCell()->structureID()->typeInfo().masqueradesAsUndefined());
 }
 
 JSValue* Machine::cti_op_is_boolean(CTI_ARGS) {
@@ -5887,24 +5902,6 @@ void Machine::cti_op_debug(CTI_ARGS) {
   exec->machine()->debug(exec, codeBlock, scopeChain, r,
                          static_cast<DebugHookID>(debugHookID), firstLine,
                          lastLine);
-}
-
-JSValue* Machine::cti_op_eq_null(CTI_ARGS) {
-  JSValue* src = ARG_src1;
-  if (src->isUndefinedOrNull())
-    return jsBoolean(true);
-
-  return jsBoolean(!JSImmediate::isImmediate(src) &&
-                   static_cast<JSCell*>(src)->masqueradeAsUndefined());
-}
-
-JSValue* Machine::cti_op_neq_null(CTI_ARGS) {
-  JSValue* src = ARG_src1;
-  if (src->isUndefinedOrNull())
-    return jsBoolean(false);
-
-  return jsBoolean(JSImmediate::isImmediate(src) ||
-                   !static_cast<JSCell*>(src)->masqueradeAsUndefined());
 }
 
 void* Machine::cti_vm_throw(CTI_ARGS) {

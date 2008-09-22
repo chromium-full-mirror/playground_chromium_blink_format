@@ -26,6 +26,7 @@
 #ifndef JSHTMLAllCollection_h
 #define JSHTMLAllCollection_h
 
+#include "HTMLCollection.h"
 #include "JSHTMLCollection.h"
 
 namespace WebCore {
@@ -38,8 +39,15 @@ class JSHTMLAllCollection : public JSHTMLCollection {
                       PassRefPtr<HTMLCollection> collection)
       : JSHTMLCollection(structure, collection) {}
 
+  static PassRefPtr<JSC::StructureID> createStructureID(JSC::JSValue* proto) {
+    return JSC::StructureID::create(
+        proto, JSC::TypeInfo(JSC::ObjectType, JSC::MasqueradesAsUndefined));
+  }
+
+  static const JSC::ClassInfo s_info;
+
+ private:
   virtual bool toBoolean(JSC::ExecState*) const { return false; }
-  virtual bool masqueradeAsUndefined() const { return true; }
 };
 
 }  // namespace WebCore
