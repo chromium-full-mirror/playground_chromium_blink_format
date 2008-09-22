@@ -46,6 +46,10 @@ class JSNamedNodesCollection : public DOMObject {
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
   static const JSC::ClassInfo s_info;
 
+  static JSC::ObjectPrototype* createPrototype(JSC::ExecState* exec) {
+    return exec->lexicalGlobalObject()->objectPrototype();
+  }
+
  private:
   static JSC::JSValue* lengthGetter(JSC::ExecState*,
                                     const JSC::Identifier&,

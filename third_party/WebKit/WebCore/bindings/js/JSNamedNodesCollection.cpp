@@ -46,8 +46,7 @@ const ClassInfo JSNamedNodesCollection::s_info = {"Collection", 0, 0, 0};
 JSNamedNodesCollection::JSNamedNodesCollection(
     ExecState* exec,
     const Vector<RefPtr<Node>>& nodes)
-    : DOMObject(
-          StructureID::create(exec->lexicalGlobalObject()->objectPrototype())),
+    : DOMObject(getDOMStructure<JSNamedNodesCollection>(exec)),
       m_nodes(new Vector<RefPtr<Node>>(nodes)) {}
 
 JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,
