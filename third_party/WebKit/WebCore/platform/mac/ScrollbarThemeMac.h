@@ -36,6 +36,10 @@ class ScrollbarThemeMac : public ScrollbarThemeComposite {
   ScrollbarThemeMac();
   virtual ~ScrollbarThemeMac();
 
+  virtual bool paint(Scrollbar*,
+                     GraphicsContext* context,
+                     const IntRect& damageRect);
+
   virtual int scrollbarThickness(ScrollbarControlSize = RegularScrollbar);
 
   virtual bool supportsControlTints() const { return true; }
@@ -60,16 +64,6 @@ class ScrollbarThemeMac : public ScrollbarThemeComposite {
   virtual int minimumThumbLength(Scrollbar*);
 
   virtual bool shouldCenterOnThumb(Scrollbar*, const PlatformMouseEvent&);
-
-  virtual void paintTrack(GraphicsContext*,
-                          Scrollbar*,
-                          const IntRect&,
-                          ScrollbarControlPartMask);
-  virtual void paintButton(GraphicsContext*,
-                           Scrollbar*,
-                           const IntRect&,
-                           ScrollbarPart);
-  virtual void paintThumb(GraphicsContext*, Scrollbar*, const IntRect&);
 };
 }
 

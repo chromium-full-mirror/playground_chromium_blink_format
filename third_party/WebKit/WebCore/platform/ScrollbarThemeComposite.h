@@ -33,11 +33,10 @@ namespace WebCore {
 
 class ScrollbarThemeComposite : public ScrollbarTheme {
  public:
-#if !USE(NSSCROLLER)
   virtual bool paint(Scrollbar*,
                      GraphicsContext* context,
                      const IntRect& damageRect);
-#endif
+
   virtual ScrollbarPart hitTest(Scrollbar*, const PlatformMouseEvent&);
 
   virtual void invalidatePart(Scrollbar*, ScrollbarPart);
@@ -72,12 +71,12 @@ class ScrollbarThemeComposite : public ScrollbarTheme {
   virtual void paintTrack(GraphicsContext*,
                           Scrollbar*,
                           const IntRect&,
-                          ScrollbarControlPartMask) = 0;
+                          ScrollbarControlPartMask) {}
   virtual void paintButton(GraphicsContext*,
                            Scrollbar*,
                            const IntRect&,
-                           ScrollbarPart) = 0;
-  virtual void paintThumb(GraphicsContext*, Scrollbar*, const IntRect&) = 0;
+                           ScrollbarPart) {}
+  virtual void paintThumb(GraphicsContext*, Scrollbar*, const IntRect&) {}
 };
 }
 #endif

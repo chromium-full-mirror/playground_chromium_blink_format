@@ -51,7 +51,6 @@ static Page* pageForScrollView(ScrollView* view) {
 }
 #endif
 
-#if !USE(NSSCROLLER)
 bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
                                     GraphicsContext* graphicsContext,
                                     const IntRect& damageRect) {
@@ -168,7 +167,6 @@ bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
 
   return true;
 }
-#endif
 
 ScrollbarPart ScrollbarThemeComposite::hitTest(Scrollbar* scrollbar,
                                                const PlatformMouseEvent& evt) {
