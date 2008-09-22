@@ -149,6 +149,8 @@ class ScrollView : public Widget {
  protected:
   void updateContents(const IntRect&, bool now = false);
   void updateWindowRect(const IntRect&, bool now = false);
+
+ public:
   void update();
 
 #if PLATFORM(MAC) && defined __OBJC__
