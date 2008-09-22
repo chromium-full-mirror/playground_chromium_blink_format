@@ -45,8 +45,9 @@ JSEventTargetNode::JSEventTargetNode(PassRefPtr<StructureID> structure,
     : JSNode(structure, node) {}
 
 JSObject* JSEventTargetNode::createPrototype(ExecState* exec) {
-  return new (exec) JSEventTargetNodePrototype(
-      JSC::StructureID::create(JSNodePrototype::self(exec)));
+  return new (exec)
+      JSEventTargetNodePrototype(JSEventTargetNodePrototype::createStructureID(
+          JSNodePrototype::self(exec)));
 }
 
 void JSEventTargetNode::setListener(ExecState* exec,

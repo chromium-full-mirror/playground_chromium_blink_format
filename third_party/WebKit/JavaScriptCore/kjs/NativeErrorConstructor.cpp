@@ -43,7 +43,7 @@ NativeErrorConstructor::NativeErrorConstructor(
           Identifier(exec,
                      nativeErrorPrototype->getDirect(exec->propertyNames().name)
                          ->getString())),
-      m_errorStructure(StructureID::create(nativeErrorPrototype)) {
+      m_errorStructure(ErrorInstance::createStructureID(nativeErrorPrototype)) {
   putDirect(exec->propertyNames().length, jsNumber(exec, 1),
             DontDelete | ReadOnly | DontEnum);  // ECMA 15.11.7.5
   putDirect(exec->propertyNames().prototype, nativeErrorPrototype,

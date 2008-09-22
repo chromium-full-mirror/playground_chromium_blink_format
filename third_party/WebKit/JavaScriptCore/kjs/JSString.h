@@ -86,6 +86,10 @@ class JSString : public JSCell {
   }
   JSString* getIndex(ExecState*, unsigned);
 
+  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
+    return StructureID::create(proto, TypeInfo(StringType));
+  }
+
  private:
   enum VPtrStealingHackType { VPtrStealingHack };
   JSString(VPtrStealingHackType) : JSCell(0) {}

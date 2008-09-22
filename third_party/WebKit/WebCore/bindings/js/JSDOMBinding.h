@@ -65,9 +65,9 @@ void updateDOMNodeDocument(Node*, Document* oldDocument, Document* newDocument);
 void markDOMNodesForDocument(Document*);
 
 JSC::StructureID* getCachedDOMStructure(JSC::ExecState*, const JSC::ClassInfo*);
-JSC::StructureID* createDOMStructure(JSC::ExecState*,
-                                     const JSC::ClassInfo*,
-                                     JSC::JSObject* prototype);
+JSC::StructureID* cacheDOMStructure(JSC::ExecState*,
+                                    PassRefPtr<JSC::StructureID>,
+                                    const JSC::ClassInfo*);
 
 JSC::JSObject* getCachedDOMConstructor(JSC::ExecState*, const JSC::ClassInfo*);
 void cacheDOMConstructor(JSC::ExecState*,
@@ -79,8 +79,9 @@ inline JSC::StructureID* getDOMStructure(JSC::ExecState* exec) {
   if (JSC::StructureID* structure =
           getCachedDOMStructure(exec, &WrapperClass::s_info))
     return structure;
-  return createDOMStructure(exec, &WrapperClass::s_info,
-                            WrapperClass::createPrototype(exec));
+  return cacheDOMStructure(exec, WrapperClass::createStructureID(
+                                     WrapperClass::createPrototype(exec)),
+                           &WrapperClass::s_info);
 }
 template <class WrapperClass>
 inline JSC::JSObject* getDOMPrototype(JSC::ExecState* exec) {

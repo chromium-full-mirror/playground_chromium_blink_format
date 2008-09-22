@@ -365,13 +365,13 @@ inline JSGlobalObject* ScopeChainNode::globalObject() const {
 }
 
 inline JSValue* StructureID::prototypeForLookup(ExecState* exec) {
-  if (m_type == ObjectType)
+  if (typeInfo().type() == ObjectType)
     return m_prototype;
 
-  if (m_type == StringType)
+  if (typeInfo().type() == StringType)
     return exec->lexicalGlobalObject()->stringPrototype();
 
-  ASSERT(m_type == NumberType);
+  ASSERT(typeInfo().type() == NumberType);
   return exec->lexicalGlobalObject()->numberPrototype();
 }
 

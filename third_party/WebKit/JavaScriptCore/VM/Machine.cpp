@@ -262,7 +262,7 @@ static bool jsIsObjectType(JSValue* v) {
   if (JSImmediate::isImmediate(v))
     return v->isNull();
 
-  JSType type = static_cast<JSCell*>(v)->structureID()->type();
+  JSType type = static_cast<JSCell*>(v)->structureID()->typeInfo().type();
   if (type == NumberType || type == StringType)
     return false;
   if (type == ObjectType) {
@@ -700,7 +700,8 @@ Machine::Machine()
   // stack.
   void* storage = fastMalloc(sizeof(CollectorBlock));
 
-  JSArray* jsArray = new (storage) JSArray(StructureID::create(jsNull()));
+  JSArray* jsArray =
+      new (storage) JSArray(JSArray::createStructureID(jsNull()));
   m_jsArrayVptr = jsArray->vptr();
   static_cast<JSCell*>(jsArray)->~JSCell();
 
@@ -709,7 +710,7 @@ Machine::Machine()
   static_cast<JSCell*>(jsString)->~JSCell();
 
   JSFunction* jsFunction =
-      new (storage) JSFunction(StructureID::create(jsNull()));
+      new (storage) JSFunction(JSFunction::createStructureID(jsNull()));
   m_jsFunctionVptr = jsFunction->vptr();
   static_cast<JSCell*>(jsFunction)->~JSCell();
 

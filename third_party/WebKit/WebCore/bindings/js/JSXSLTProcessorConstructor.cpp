@@ -43,8 +43,8 @@ const ClassInfo JSXSLTProcessorConstructor::s_info = {"XSLTProcessorConsructor",
                                                       0, 0, 0};
 
 JSXSLTProcessorConstructor::JSXSLTProcessorConstructor(ExecState* exec)
-    : DOMObject(
-          StructureID::create(exec->lexicalGlobalObject()->objectPrototype())) {
+    : DOMObject(JSXSLTProcessorConstructor::createStructureID(
+          exec->lexicalGlobalObject()->objectPrototype())) {
   putDirect(exec->propertyNames().prototype,
             JSXSLTProcessorPrototype::self(exec), None);
 }

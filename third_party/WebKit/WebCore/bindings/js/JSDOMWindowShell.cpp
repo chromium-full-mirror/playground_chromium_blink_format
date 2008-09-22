@@ -44,15 +44,16 @@ ASSERT_CLASS_FITS_IN_CELL(JSDOMWindowShell)
 const ClassInfo JSDOMWindowShell::s_info = {"JSDOMWindowShell", 0, 0, 0};
 
 JSDOMWindowShell::JSDOMWindowShell(PassRefPtr<DOMWindow> window)
-    : Base(StructureID::create(jsNull())), m_window(0) {
+    : Base(JSDOMWindowShell::createStructureID(jsNull())), m_window(0) {
   setWindow(window);
 }
 
 JSDOMWindowShell::~JSDOMWindowShell() {}
 
 void JSDOMWindowShell::setWindow(PassRefPtr<DOMWindow> window) {
-  RefPtr<StructureID> prototypeStructure = StructureID::create(jsNull());
-  RefPtr<StructureID> structure = StructureID::create(
+  RefPtr<StructureID> prototypeStructure =
+      JSDOMWindowPrototype::createStructureID(jsNull());
+  RefPtr<StructureID> structure = JSDOMWindow::createStructureID(
       new JSDOMWindowPrototype(prototypeStructure.release()));
   setWindow(new (JSDOMWindow::commonJSGlobalData())
                 JSDOMWindow(structure.release(), window, this));

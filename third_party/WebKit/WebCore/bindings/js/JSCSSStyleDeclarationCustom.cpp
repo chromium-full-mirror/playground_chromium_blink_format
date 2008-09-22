@@ -157,8 +157,8 @@ JSValue* JSCSSStyleDeclaration::nameGetter(ExecState* exec,
   // IE 'filter' attribute.
   if (propertyName == "filter")
     return new (exec) StringObjectThatMasqueradesAsUndefined(
-        exec,
-        StructureID::create(exec->lexicalGlobalObject()->stringPrototype()),
+        exec, StringObjectThatMasqueradesAsUndefined::createStructureID(
+                  exec->lexicalGlobalObject()->stringPrototype()),
         thisObj->impl()->getPropertyValue(prop));
 
   return jsString(exec, thisObj->impl()->getPropertyValue(prop));

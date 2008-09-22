@@ -70,6 +70,10 @@ class JSNumberCell : public JSCell {
 #endif
   }
 
+  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
+    return StructureID::create(proto, TypeInfo(NumberType));
+  }
+
  private:
   JSNumberCell(ExecState* exec, double value)
       : JSCell(exec->globalData().numberStructureID.get()), m_value(value) {}
