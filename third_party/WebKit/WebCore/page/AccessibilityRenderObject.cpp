@@ -1286,6 +1286,7 @@ void AccessibilityRenderObject::setSelectedTextRange(
     RenderTextControl* textControl =
         static_cast<RenderTextControl*>(m_renderer);
     textControl->setSelectionRange(range.start, range.start + range.length);
+    return;
   }
 
   Document* document = m_renderer->document();
