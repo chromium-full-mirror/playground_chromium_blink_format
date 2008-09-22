@@ -38,6 +38,11 @@ class InternalFunction : public JSObject {
 
   const UString& name(ExecState*);
 
+  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
+    return StructureID::create(proto,
+                               TypeInfo(ObjectType, ImplementsHasInstance));
+  }
+
  protected:
   InternalFunction(PassRefPtr<StructureID> structure) : JSObject(structure) {}
   InternalFunction(ExecState*);
@@ -45,7 +50,6 @@ class InternalFunction : public JSObject {
 
  private:
   virtual CallType getCallData(CallData&) = 0;
-  virtual bool implementsHasInstance() const;
 };
 
 }  // namespace JSC

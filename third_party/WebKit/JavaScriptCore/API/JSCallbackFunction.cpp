@@ -49,12 +49,6 @@ JSCallbackFunction::JSCallbackFunction(ExecState* exec,
                        name),
       m_callback(callback) {}
 
-// InternalFunction mish-mashes constructor and function behavior -- we should
-// refactor the code so this override isn't necessary
-bool JSCallbackFunction::implementsHasInstance() const {
-  return false;
-}
-
 JSValue* JSCallbackFunction::call(ExecState* exec,
                                   JSObject* functionObject,
                                   JSValue* thisValue,
