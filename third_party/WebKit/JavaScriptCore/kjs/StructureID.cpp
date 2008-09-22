@@ -133,7 +133,7 @@ PassRefPtr<StructureID> StructureID::addPropertyTransition(
     PutPropertySlot& slot,
     PropertyStorage& propertyStorage) {
   ASSERT(!structureID->m_isDictionary);
-  ASSERT(structureID->m_type == ObjectType);
+  ASSERT(structureID->typeInfo().type() == ObjectType);
 
   if (StructureID* existingTransition = structureID->m_transitionTable.get(
           make_pair(propertyName.ustring().rep(), attributes))) {
@@ -226,7 +226,7 @@ StructureID::~StructureID() {
 }
 
 StructureIDChain* StructureID::createCachedPrototypeChain() {
-  ASSERT(m_type == ObjectType);
+  ASSERT(typeInfo().type() == ObjectType);
   ASSERT(!m_cachedPrototypeChain);
 
   JSValue* prototype = storedPrototype();
