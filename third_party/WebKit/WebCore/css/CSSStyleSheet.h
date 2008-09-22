@@ -85,8 +85,9 @@ class CSSStyleSheet : public StyleSheet {
   virtual bool isLoading();
 
   virtual void checkLoaded();
-  DocLoader* docLoader();
+
   Document* doc() { return m_doc; }
+
   const String& charset() const { return m_charset; }
 
   bool loadCompleted() const { return m_loadCompleted; }
