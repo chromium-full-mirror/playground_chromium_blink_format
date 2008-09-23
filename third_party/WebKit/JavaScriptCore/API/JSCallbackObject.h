@@ -49,8 +49,9 @@ class JSCallbackObject : public Base {
   bool inherits(JSClassRef) const;
 
   static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
-    return StructureID::create(proto,
-                               TypeInfo(ObjectType, ImplementsHasInstance));
+    return StructureID::create(
+        proto,
+        TypeInfo(ObjectType, ImplementsHasInstance | OverridesHasInstance));
   }
 
  private:

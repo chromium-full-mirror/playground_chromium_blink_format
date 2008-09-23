@@ -48,7 +48,8 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
 
   static PassRefPtr<JSC::StructureID> createStructureID(JSC::JSValue* proto) {
     return JSC::StructureID::create(
-        proto, JSC::TypeInfo(JSC::ObjectType, JSC::ImplementsHasInstance));
+        proto, JSC::TypeInfo(JSC::ObjectType, JSC::ImplementsHasInstance |
+                                                  JSC::OverridesHasInstance));
   }
 
  protected:
