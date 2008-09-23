@@ -128,7 +128,7 @@ void Arguments::fillArgList(ExecState* exec, ArgList& args) {
       args.append(d->activation->uncheckedSymbolTableGetValue(
           d->firstArgumentIndex + i));
     for (; i < d->numArguments; ++i)
-      args.append(get(exec, i));
+      args.append(d->extraArguments[i - d->numParameters].getJSValue());
     return;
   }
 
