@@ -964,6 +964,13 @@ void InlineTextBox::paintCompositionUnderline(
   if (underline.thick && m_height - m_baseline >= 2)
     lineThickness = 2;
 
+  // We need to have some space between underlines of subsequent clauses,
+  // because some input methods do not use different underline styles for those.
+  // We make each line shorter, which has a harmless side effect of shortening
+  // the first and last clauses, too.
+  start += 1;
+  width -= 2;
+
   ctx->setStrokeColor(underline.color);
   ctx->setStrokeThickness(lineThickness);
   ctx->drawLineForText(IntPoint(tx + start, ty + m_height - lineThickness),
