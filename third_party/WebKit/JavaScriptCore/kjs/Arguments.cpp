@@ -38,7 +38,7 @@ ASSERT_CLASS_FITS_IN_CELL(Arguments);
 
 const ClassInfo Arguments::info = {"Arguments", 0, 0, 0};
 
-struct ArgumentsData {
+struct ArgumentsData : Noncopyable {
   ArgumentsData(JSActivation* activation,
                 unsigned numParameters,
                 unsigned firstArgumentIndex,
@@ -46,14 +46,16 @@ struct ArgumentsData {
       : activation(activation),
         numParameters(numParameters),
         firstArgumentIndex(firstArgumentIndex),
-        numArguments(numArguments) {}
+        numArguments(numArguments),
+        extraArguments(0) {}
 
   JSActivation* activation;
   unsigned numParameters;
   unsigned firstArgumentIndex;
   unsigned numArguments;
-  OwnArrayPtr<JSValue*> extraArguments;
+  Register* extraArguments;
   OwnArrayPtr<bool> deletedArguments;
+  Register extraArgumentsFixedBuffer[4];
 };
 
 // ECMA 10.1.8
@@ -75,14 +77,22 @@ Arguments::Arguments(ExecState* exec,
 
   if (d->numArguments > d->numParameters) {
     unsigned numExtraArguments = d->numArguments - d->numParameters;
-    JSValue** extraArguments = new JSValue*[numExtraArguments];
+    Register* extraArguments;
+    if (numExtraArguments >
+        sizeof(d->extraArgumentsFixedBuffer) / sizeof(Register))
+      extraArguments = new Register[numExtraArguments];
+    else
+      extraArguments = d->extraArgumentsFixedBuffer;
     for (unsigned i = 0; i < numExtraArguments; ++i)
-      extraArguments[i] = argv[d->numParameters + i].getJSValue();
-    d->extraArguments.set(extraArguments);
+      extraArguments[i] = argv[d->numParameters + i];
+    d->extraArguments = extraArguments;
   }
 }
 
-Arguments::~Arguments() {}
+Arguments::~Arguments() {
+  if (d->extraArguments != d->extraArgumentsFixedBuffer)
+    delete[] d->extraArguments;
+}
 
 void Arguments::mark() {
   JSObject::mark();
@@ -90,8 +100,8 @@ void Arguments::mark() {
   if (d->extraArguments) {
     unsigned numExtraArguments = d->numArguments - d->numParameters;
     for (unsigned i = 0; i < numExtraArguments; ++i) {
-      if (!d->extraArguments[i]->marked())
-        d->extraArguments[i]->mark();
+      if (!d->extraArguments[i].marked())
+        d->extraArguments[i].mark();
     }
   }
 
@@ -100,7 +110,12 @@ void Arguments::mark() {
 }
 
 void Arguments::fillArgList(ExecState* exec, ArgList& args) {
-  if (!d->deletedArguments) {
+  if (LIKELY(!d->deletedArguments)) {
+    if (LIKELY(!d->numParameters)) {
+      args.initialize(d->extraArguments, d->numArguments);
+      return;
+    }
+
     if (d->numParameters == d->numArguments) {
       args.initialize(&d->activation->registerAt(d->firstArgumentIndex),
                       d->numArguments);
@@ -113,7 +128,7 @@ void Arguments::fillArgList(ExecState* exec, ArgList& args) {
       args.append(d->activation->uncheckedSymbolTableGetValue(
           d->firstArgumentIndex + i));
     for (; i < d->numArguments; ++i)
-      args.append(d->extraArguments[i - d->numParameters]);
+      args.append(get(exec, i));
     return;
   }
 
@@ -128,7 +143,7 @@ void Arguments::fillArgList(ExecState* exec, ArgList& args) {
   }
   for (; i < d->numArguments; ++i) {
     if (!d->deletedArguments[i])
-      args.append(d->extraArguments[i - d->numParameters]);
+      args.append(d->extraArguments[i - d->numParameters].getJSValue());
     else
       args.append(get(exec, i));
   }
@@ -142,7 +157,7 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
     if (i < d->numParameters)
       d->activation->uncheckedSymbolTableGet(d->firstArgumentIndex + i, slot);
     else
-      slot.setValueSlot(&d->extraArguments[i - d->numParameters]);
+      slot.setValue(d->extraArguments[i - d->numParameters].getJSValue());
     return true;
   }
 
@@ -160,7 +175,7 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
     if (i < d->numParameters)
       d->activation->uncheckedSymbolTableGet(d->firstArgumentIndex + i, slot);
     else
-      slot.setValueSlot(&d->extraArguments[i - d->numParameters]);
+      slot.setValue(d->extraArguments[i - d->numParameters].getJSValue());
     return true;
   }
 
