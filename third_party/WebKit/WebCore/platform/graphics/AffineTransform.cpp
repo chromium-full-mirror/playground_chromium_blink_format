@@ -130,8 +130,7 @@ AffineTransform& AffineTransform::skewY(double angle) {
 }
 
 AffineTransform& makeMapBetweenRects(const FloatRect& source,
-                                     const FloatRect& dest);
-{
+                                     const FloatRect& dest) {
   AffineTransform transform;
   transform.translate(dest.x() - source.x(), dest.y() - source.y());
   transform.scale(dest.width() / source.width(),
