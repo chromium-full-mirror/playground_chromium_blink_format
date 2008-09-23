@@ -2033,7 +2033,8 @@ FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
                 funcStack,
                 usesEval,
                 needsClosure,
-                numConstants) {}
+                numConstants),
+      m_refCount(0) {}
 
 void FunctionBodyNode::mark() {
   if (m_code)

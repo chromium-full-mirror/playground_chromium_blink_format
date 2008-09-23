@@ -2521,6 +2521,20 @@ class FunctionBodyNode : public ScopeNode {
     return UString("{") + m_source.toString() + UString("}");
   }
 
+  // These objects are ref/deref'd a lot in the scope chain, so this is a faster
+  // ref/deref.
+  // If the virtual machine changes so this doesn't happen as much we can change
+  // back.
+  void ref() {
+    if (++m_refCount == 1)
+      ScopeNode::ref();
+  }
+  void deref() {
+    ASSERT(m_refCount);
+    if (!--m_refCount)
+      ScopeNode::deref();
+  }
+
  protected:
   FunctionBodyNode(JSGlobalData*,
                    SourceElements*,
@@ -2537,6 +2551,7 @@ class FunctionBodyNode : public ScopeNode {
   SymbolTable m_symbolTable;
   OwnPtr<CodeBlock> m_code;
   SourceRange m_source;
+  unsigned m_refCount;
 };
 
 class FuncExprNode : public ExpressionNode {
