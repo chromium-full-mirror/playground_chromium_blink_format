@@ -387,6 +387,10 @@ class CTI {
   void compileOpCall(Instruction* instruction,
                      unsigned i,
                      CompileOpCallType type = OpCallNormal);
+  enum CompileOpStrictEqType { OpStrictEq, OpNStrictEq };
+  void compileOpStrictEq(Instruction* instruction,
+                         unsigned i,
+                         CompileOpStrictEqType type);
 
   void emitGetArg(unsigned src, X86Assembler::RegisterID dst);
   void emitGetPutArg(unsigned src,
