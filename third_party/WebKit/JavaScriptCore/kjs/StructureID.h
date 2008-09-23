@@ -186,6 +186,8 @@ class StructureIDChain : public RefCounted<StructureIDChain> {
   OwnArrayPtr<RefPtr<StructureID>> m_vector;
 };
 
+bool structureIDChainsAreEqual(StructureIDChain*, StructureIDChain*);
+
 }  // namespace JSC
 
 #endif  // StructureID_h

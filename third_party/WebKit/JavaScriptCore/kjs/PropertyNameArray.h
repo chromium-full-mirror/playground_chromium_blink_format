@@ -38,7 +38,15 @@ class PropertyNameArrayData : public RefCounted<PropertyNameArrayData> {
     return adoptRef(new PropertyNameArrayData);
   }
 
+  const_iterator begin() const { return m_propertyNameVector.begin(); }
+  const_iterator end() const { return m_propertyNameVector.end(); }
+
   PropertyNameVector& propertyNameVector() { return m_propertyNameVector; }
+
+  void setCachedStructureID(PassRefPtr<StructureID> structureID) {
+    m_cachedStructureID = structureID;
+  }
+  StructureID* cachedStructureID() const { return m_cachedStructureID.get(); }
 
   void setCachedPrototypeChain(
       PassRefPtr<StructureIDChain> cachedPrototypeChain) {
@@ -48,19 +56,16 @@ class PropertyNameArrayData : public RefCounted<PropertyNameArrayData> {
     return m_cachedPrototypeChain.get();
   }
 
-  const_iterator begin() const { return m_propertyNameVector.begin(); }
-  const_iterator end() const { return m_propertyNameVector.end(); }
-
  private:
   PropertyNameArrayData() {}
 
   PropertyNameVector m_propertyNameVector;
+  RefPtr<StructureID> m_cachedStructureID;
   RefPtr<StructureIDChain> m_cachedPrototypeChain;
 };
 
 class PropertyNameArray {
  public:
-  typedef Identifier ValueType;
   typedef PropertyNameArrayData::const_iterator const_iterator;
 
   PropertyNameArray(JSGlobalData* globalData)
