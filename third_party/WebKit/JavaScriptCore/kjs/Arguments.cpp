@@ -42,20 +42,29 @@ struct ArgumentsData : Noncopyable {
   ArgumentsData(JSActivation* activation,
                 unsigned numParameters,
                 unsigned firstArgumentIndex,
-                unsigned numArguments)
+                unsigned numArguments,
+                JSFunction* callee)
       : activation(activation),
         numParameters(numParameters),
         firstArgumentIndex(firstArgumentIndex),
         numArguments(numArguments),
-        extraArguments(0) {}
+        extraArguments(0),
+        callee(callee),
+        overrodeLength(false),
+        overrodeCallee(false) {}
 
   JSActivation* activation;
+
   unsigned numParameters;
   unsigned firstArgumentIndex;
   unsigned numArguments;
   Register* extraArguments;
   OwnArrayPtr<bool> deletedArguments;
   Register extraArgumentsFixedBuffer[4];
+
+  JSFunction* callee;
+  bool overrodeLength : 1;
+  bool overrodeCallee : 1;
 };
 
 // ECMA 10.1.8
@@ -69,11 +78,9 @@ Arguments::Arguments(ExecState* exec,
       d(new ArgumentsData(activation,
                           function->numParameters(),
                           firstArgumentIndex,
-                          argc)) {
+                          argc,
+                          function)) {
   ASSERT(activation);
-
-  putDirect(exec->propertyNames().callee, function, DontEnum);
-  putDirect(exec->propertyNames().length, jsNumber(exec, argc), DontEnum);
 
   if (d->numArguments > d->numParameters) {
     unsigned numExtraArguments = d->numArguments - d->numParameters;
@@ -104,6 +111,9 @@ void Arguments::mark() {
         d->extraArguments[i].mark();
     }
   }
+
+  if (!d->callee->marked())
+    d->callee->mark();
 
   if (!d->activation->marked())
     d->activation->mark();
@@ -179,6 +189,18 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
+  if (propertyName == exec->propertyNames().length &&
+      LIKELY(!d->overrodeLength)) {
+    slot.setValue(jsNumber(exec, d->numArguments));
+    return true;
+  }
+
+  if (propertyName == exec->propertyNames().callee &&
+      LIKELY(!d->overrodeCallee)) {
+    slot.setValue(d->callee);
+    return true;
+  }
+
   return JSObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
@@ -213,6 +235,18 @@ void Arguments::put(ExecState* exec,
     return;
   }
 
+  if (propertyName == exec->propertyNames().length && !d->overrodeLength) {
+    d->overrodeLength = true;
+    putDirect(propertyName, value, DontEnum);
+    return;
+  }
+
+  if (propertyName == exec->propertyNames().callee && !d->overrodeCallee) {
+    d->overrodeCallee = true;
+    putDirect(propertyName, value, DontEnum);
+    return;
+  }
+
   JSObject::put(exec, propertyName, value, slot);
 }
 
@@ -244,6 +278,16 @@ bool Arguments::deleteProperty(ExecState* exec,
       d->deletedArguments[i] = true;
       return true;
     }
+  }
+
+  if (propertyName == exec->propertyNames().length && !d->overrodeLength) {
+    d->overrodeLength = true;
+    return true;
+  }
+
+  if (propertyName == exec->propertyNames().callee && !d->overrodeCallee) {
+    d->overrodeCallee = true;
+    return true;
   }
 
   return JSObject::deleteProperty(exec, propertyName);
