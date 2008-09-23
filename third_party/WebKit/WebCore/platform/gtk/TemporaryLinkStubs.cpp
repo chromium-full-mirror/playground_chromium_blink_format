@@ -32,10 +32,8 @@
 #include "Editor.h"
 #include "FrameView.h"
 #include "FTPDirectoryDocument.h"
-#include "KURL.h"
 #include "NotImplemented.h"
 #include "PluginView.h"
-#include "SharedBuffer.h"
 #include <float.h>
 
 using namespace WebCore;
@@ -80,16 +78,6 @@ float userIdleTime() {
   return FLT_MAX;
 }  // return an arbitrarily high userIdleTime so that releasing pages from the
    // page cache isn't postponed
-
-String KURL::fileSystemPath() const {
-  notImplemented();
-  return String();
-}
-
-PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
-  notImplemented();
-  return 0;
-}
 
 void prefetchDNS(const String& hostname) {
   notImplemented();
