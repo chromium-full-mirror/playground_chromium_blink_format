@@ -238,6 +238,7 @@ class StatementNode : public Node {
   virtual bool isEmptyStatement() const JSC_FAST_CALL { return false; }
 
   virtual bool isBlock() const JSC_FAST_CALL { return false; }
+  virtual bool isDoWhile() const JSC_FAST_CALL { return false; }
 
  protected:
   LabelStack m_labelStack;
@@ -2130,6 +2131,8 @@ class DoWhileNode : public StatementNode {
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
+
+  virtual bool isDoWhile() const JSC_FAST_CALL { return true; }
 
  private:
   RefPtr<StatementNode> m_statement;
