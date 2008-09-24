@@ -45,10 +45,6 @@ class PlatformMouseEvent;
 #define LINE_STEP 40
 #define PAGE_KEEP 40
 
-#if PLATFORM(MAC)
-#define WTF_USE_NSSCROLLER 1
-#endif
-
 class Scrollbar : public Widget, public RefCounted<Scrollbar> {
  protected:
   Scrollbar(ScrollbarClient*,
@@ -60,8 +56,8 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   virtual ~Scrollbar();
 
   // Must be implemented by platforms that can't simply use the Scrollbar base
-  // class.  Right now those two platforms
-  // are Mac and GTK.
+  // class.  Right now the only platform that is not using the base class is
+  // GTK.
   static PassRefPtr<Scrollbar> createNativeScrollbar(
       ScrollbarClient* client,
       ScrollbarOrientation orientation,
