@@ -30,6 +30,13 @@ namespace WebCore {
 
 typedef void (*NodeCallback)(Node*);
 
+namespace Private {
+template <class GenericNode, class GenericNodeContainer>
+void addChildNodesToDeletionQueue(GenericNode*& head,
+                                  GenericNode*& tail,
+                                  GenericNodeContainer* container);
+};
+
 class ContainerNode : public EventTargetNode {
  public:
   ContainerNode(Document*, bool isElement = false);
@@ -83,6 +90,16 @@ class ContainerNode : public EventTargetNode {
   static void suspendPostAttachCallbacks();
   static void resumePostAttachCallbacks();
 
+  template <class GenericNode, class GenericNodeContainer>
+  friend void appendChildToContainer(GenericNode* child,
+                                     GenericNodeContainer* container);
+
+  template <class GenericNode, class GenericNodeContainer>
+  friend void Private::addChildNodesToDeletionQueue(
+      GenericNode*& head,
+      GenericNode*& tail,
+      GenericNodeContainer* container);
+
   void setFirstChild(Node* child) { m_firstChild = child; }
   void setLastChild(Node* child) { m_lastChild = child; }
 
@@ -91,10 +108,6 @@ class ContainerNode : public EventTargetNode {
 
   virtual Node* virtualFirstChild() const;
   virtual Node* virtualLastChild() const;
-
-  static void addChildNodesToDeletionQueue(Node*& head,
-                                           Node*& tail,
-                                           ContainerNode*);
 
   bool getUpperLeftCorner(int& x, int& y) const;
   bool getLowerRightCorner(int& x, int& y) const;
