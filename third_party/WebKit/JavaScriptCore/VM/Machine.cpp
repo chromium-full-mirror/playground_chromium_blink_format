@@ -708,6 +708,7 @@ Machine::Machine()
       m_timeExecuting(0),
       m_timeoutCheckCount(0),
       m_ticksUntilNextTimeoutCheck(initialTickCountThreshold) {
+  initTimeout();
   privateExecute(InitializeAndReturn);
 
   // Bizarrely, calling fastMalloc here is faster than allocating space on the
