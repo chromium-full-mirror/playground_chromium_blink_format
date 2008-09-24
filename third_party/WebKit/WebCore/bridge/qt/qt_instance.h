@@ -47,14 +47,11 @@ class QtInstance : public Instance {
   virtual JSValue* valueOf(ExecState* exec) const;
   virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const;
 
-  virtual CallType getCallData(CallData&);
-
   virtual void mark();  // This isn't inherited
 
   virtual JSValue* invokeMethod(ExecState* exec,
                                 const MethodList& method,
                                 const ArgList& args);
-  virtual JSValue* invokeDefaultMethod(ExecState* exec, const ArgList& args);
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
@@ -86,7 +83,6 @@ class QtInstance : public Instance {
   mutable QHash<QString, QtField*> m_fields;
   mutable QSet<JSValue*> m_children;
   mutable QtRuntimeMetaMethod* m_defaultMethod;
-  mutable int m_defaultMethodIndex;
 };
 
 }  // namespace Bindings
