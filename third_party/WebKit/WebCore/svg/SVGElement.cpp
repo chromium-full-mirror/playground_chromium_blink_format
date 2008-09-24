@@ -112,6 +112,22 @@ SVGDocumentExtensions* SVGElement::accessDocumentSVGExtensions() const {
   return document() ? document()->accessSVGExtensions() : 0;
 }
 
+void SVGElement::mapInstanceToElement(SVGElementInstance* instance) {
+  ASSERT(instance);
+  ASSERT(!m_elementInstances.contains(instance));
+  m_elementInstances.add(instance);
+}
+
+void SVGElement::removeInstanceMapping(SVGElementInstance* instance) {
+  ASSERT(instance);
+  ASSERT(m_elementInstances.contains(instance));
+  m_elementInstances.remove(instance);
+}
+
+HashSet<SVGElementInstance*> SVGElement::instancesForElement() const {
+  return m_elementInstances;
+}
+
 void SVGElement::parseMappedAttribute(MappedAttribute* attr) {
   // standard events
   if (attr->name() == onloadAttr)

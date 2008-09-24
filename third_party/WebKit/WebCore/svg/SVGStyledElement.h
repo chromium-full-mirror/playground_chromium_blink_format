@@ -81,8 +81,6 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
                                  String,
                                  ClassName,
                                  className)
-
-  void updateElementInstance(SVGDocumentExtensions*) const;
 };
 
 }  // namespace WebCore
