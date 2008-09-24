@@ -2370,7 +2370,7 @@ void RenderObject::setStyle(RenderStyle* style) {
            m_style->zIndex() != style->zIndex() ||
            m_style->visibility() != style->visibility()) &&
           hasLayer()) {
-        layer()->stackingContext()->dirtyZOrderLists();
+        layer()->dirtyStackingContextZOrderLists();
         if (m_style->hasAutoZIndex() != style->hasAutoZIndex() ||
             m_style->visibility() != style->visibility())
           layer()->dirtyZOrderLists();

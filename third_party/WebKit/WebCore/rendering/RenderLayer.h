@@ -290,6 +290,7 @@ class RenderLayer : public ScrollbarClient {
   }
 
   void dirtyZOrderLists();
+  void dirtyStackingContextZOrderLists();
   void updateZOrderLists();
   Vector<RenderLayer*>* posZOrderList() const { return m_posZOrderList; }
   Vector<RenderLayer*>* negZOrderList() const { return m_negZOrderList; }
