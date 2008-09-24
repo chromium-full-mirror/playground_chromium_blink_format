@@ -615,6 +615,7 @@ class Document : public ContainerNode {
   void addListenerType(ListenerType listenerType) {
     m_listenerTypes = m_listenerTypes | listenerType;
   }
+  void addListenerTypeIfNeeded(const AtomicString& eventType);
 
   CSSStyleDeclaration* getOverrideStyle(Element*, const String& pseudoElt);
 

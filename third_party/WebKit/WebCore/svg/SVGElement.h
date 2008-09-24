@@ -33,7 +33,6 @@ namespace WebCore {
 class AffineTransform;
 class Document;
 class SVGDocumentExtensions;
-class SVGPreserveAspectRatio;
 class SVGSVGElement;
 
 class SVGElement : public StyledElement {
@@ -85,9 +84,6 @@ class SVGElement : public StyledElement {
   void sendSVGLoadEventIfPossible(bool sendParentLoadEvents = false);
 
   virtual AffineTransform* supplementalTransform() { return 0; }
-  virtual bool dispatchEvent(PassRefPtr<Event> e,
-                             ExceptionCode& ec,
-                             bool tempEvent = false);
 
   virtual void updateAnimatedSVGAttribute(const String&) const;
   virtual void setSynchronizedSVGAttributes(bool) const;

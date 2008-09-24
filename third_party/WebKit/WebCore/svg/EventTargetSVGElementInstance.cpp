@@ -73,7 +73,7 @@ bool EventTargetSVGElementInstance::dispatchEvent(PassRefPtr<Event> e,
   evt->setTarget(this);
 
   RefPtr<FrameView> view = node->document()->view();
-  return dispatchGenericEvent(node, evt.release(), ec, tempEvent);
+  return node->dispatchGenericEvent(evt.release(), ec, tempEvent);
 }
 
 }  // namespace WebCore
