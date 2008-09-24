@@ -112,7 +112,7 @@ class EventTargetNode : public Node, public EventTarget {
                                      double elapsedTime);
   bool dispatchGenericEvent(PassRefPtr<Event>, ExceptionCode&, bool tempEvent);
 
-  void handleLocalEvents(Event*, bool useCapture);
+  virtual void handleLocalEvents(Event*, bool useCapture);
 
   virtual void dispatchFocusEvent();
   virtual void dispatchBlurEvent();
