@@ -77,12 +77,10 @@ class CSSPrimitiveValue : public CSSValue {
     CSS_PARSER_OPERATOR = 103,
     CSS_PARSER_INTEGER = 104,
     CSS_PARSER_VARIABLE_FUNCTION_SYNTAX = 105,
-    CSS_PARSER_VARIABLE_EQUALS_SYNTAX = 106,
-    CSS_PARSER_VARIABLE_DOLLAR_SYNTAX = 107,
-    CSS_PARSER_HEXCOLOR = 108,
+    CSS_PARSER_HEXCOLOR = 106,
 
     // This is used internally for unknown identifiers
-    CSS_PARSER_IDENTIFIER = 109
+    CSS_PARSER_IDENTIFIER = 107
   };
 
   static PassRefPtr<CSSPrimitiveValue> createIdentifier(int ident) {
@@ -110,9 +108,7 @@ class CSSPrimitiveValue : public CSSValue {
   unsigned short primitiveType() const { return m_type; }
 
   bool isVariable() const {
-    return m_type == CSS_PARSER_VARIABLE_FUNCTION_SYNTAX ||
-           m_type == CSS_PARSER_VARIABLE_EQUALS_SYNTAX ||
-           m_type == CSS_PARSER_VARIABLE_DOLLAR_SYNTAX;
+    return m_type == CSS_PARSER_VARIABLE_FUNCTION_SYNTAX;
   }
 
   /*
