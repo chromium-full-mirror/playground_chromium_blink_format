@@ -35,9 +35,7 @@ class JSStaticScopeObject : public JSVariableObject {
   using JSVariableObject::JSVariableObjectData;
   struct JSStaticScopeObjectData : public JSVariableObjectData {
     JSStaticScopeObjectData()
-        : JSVariableObjectData(&symbolTable, &registerStore + 1) {
-      registerArraySize = 1;
-    }
+        : JSVariableObjectData(&symbolTable, &registerStore + 1) {}
     SymbolTable symbolTable;
     Register registerStore;
   };
