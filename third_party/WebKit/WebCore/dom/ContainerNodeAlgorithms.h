@@ -31,16 +31,16 @@ class Node;
 namespace Private {
 
 template <class GenericNode, class GenericNodeContainer>
-static void addChildNodesToDeletionQueue(GenericNode*& head,
-                                         GenericNode*& tail,
-                                         GenericNodeContainer* container);
+void addChildNodesToDeletionQueue(GenericNode*& head,
+                                  GenericNode*& tail,
+                                  GenericNodeContainer* container);
 };
 
 // Helper functions for TreeShared-derived classes, which have a 'Node' style
 // interface
 // This applies to 'ContainerNode' and 'SVGElementInstance'
 template <class GenericNode, class GenericNodeContainer>
-static void removeAllChildrenInContainer(GenericNodeContainer* container) {
+void removeAllChildrenInContainer(GenericNodeContainer* container) {
   // List of nodes to be deleted.
   GenericNode* head = 0;
   GenericNode* tail = 0;
@@ -69,8 +69,8 @@ static void removeAllChildrenInContainer(GenericNodeContainer* container) {
 }
 
 template <class GenericNode, class GenericNodeContainer>
-static void appendChildToContainer(GenericNode* child,
-                                   GenericNodeContainer* container) {
+void appendChildToContainer(GenericNode* child,
+                            GenericNodeContainer* container) {
   child->setParent(container);
 
   GenericNode* lastChild = container->lastChild();
@@ -113,9 +113,9 @@ struct ShouldDispatchRemovalNotification<Node> {
 };
 
 template <class GenericNode, class GenericNodeContainer>
-static void addChildNodesToDeletionQueue(GenericNode*& head,
-                                         GenericNode*& tail,
-                                         GenericNodeContainer* container) {
+void addChildNodesToDeletionQueue(GenericNode*& head,
+                                  GenericNode*& tail,
+                                  GenericNodeContainer* container) {
   // We have to tell all children that their parent has died.
   GenericNode* next = 0;
   for (GenericNode* n = container->firstChild(); n != 0; n = next) {
