@@ -156,6 +156,10 @@ double AccessibilityUIElement::maxValue() {
   return 0;
 }
 
+bool AccessibilityUIElement::supportsPressAction() {
+  return false;
+}
+
 int AccessibilityUIElement::insertionPointLineNumber() {
   return 0;
 }
