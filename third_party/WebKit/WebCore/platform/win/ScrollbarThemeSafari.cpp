@@ -215,20 +215,15 @@ IntRect ScrollbarThemeSafari::trackRect(Scrollbar* scrollbar, bool painting) {
   IntRect result;
   int thickness = scrollbarThickness(scrollbar->controlSize());
   if (scrollbar->orientation() == HorizontalScrollbar)
-    result = IntRect(
+    return IntRect(
         scrollbar->x() + cButtonLength[scrollbar->controlSize()],
         scrollbar->y(),
         scrollbar->width() - 2 * cButtonLength[scrollbar->controlSize()],
         thickness);
-  result = IntRect(
+  return IntRect(
       scrollbar->x(), scrollbar->y() + cButtonLength[scrollbar->controlSize()],
       thickness,
       scrollbar->height() - 2 * cButtonLength[scrollbar->controlSize()]);
-
-  if (painting)
-    return trackRepaintRect(result, scrollbar->orientation(),
-                            scrollbar->controlSize());
-  return result;
 }
 
 int ScrollbarThemeSafari::minimumThumbLength(Scrollbar* scrollbar) {
