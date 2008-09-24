@@ -136,7 +136,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual Element* actionElement() const;
   Element* mouseButtonListener() const;
   FrameView* frameViewIfRenderView() const;
-  virtual HTMLAnchorElement* anchorElement() const;
+  virtual Element* anchorElement() const;
   AccessibilityObject* menuForMenuButton() const;
   AccessibilityObject* menuButtonForMenu() const;
 

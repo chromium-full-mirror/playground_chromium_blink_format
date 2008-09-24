@@ -50,7 +50,7 @@ class AccessibilityImageMapLink : public AccessibilityObject {
   virtual bool accessibilityIsIgnored() const { return false; }
 
   virtual AccessibilityObject* parentObject() const;
-  virtual HTMLAnchorElement* anchorElement() const;
+  virtual Element* anchorElement() const;
   virtual bool isLink() const { return true; }
   virtual String title() const;
   virtual String accessibilityDescription() const;

@@ -57,7 +57,7 @@ AccessibilityObject* AccessibilityImageMapLink::parentObject() const {
       m_mapElement->renderer());
 }
 
-HTMLAnchorElement* AccessibilityImageMapLink::anchorElement() const {
+Element* AccessibilityImageMapLink::anchorElement() const {
   return m_areaElement;
 }
 
