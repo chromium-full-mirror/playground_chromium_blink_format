@@ -39,7 +39,7 @@ class RegisterID : Noncopyable {
  public:
   RegisterID()
       : m_refCount(0),
-        m_isConstant(false)
+        m_isTemporary(false)
 #ifndef NDEBUG
         ,
         m_didSetIndex(false)
@@ -50,7 +50,7 @@ class RegisterID : Noncopyable {
   explicit RegisterID(int index)
       : m_refCount(0),
         m_index(index),
-        m_isConstant(false)
+        m_isTemporary(false)
 #ifndef NDEBUG
         ,
         m_didSetIndex(true)
@@ -66,14 +66,14 @@ class RegisterID : Noncopyable {
     m_index = index;
   }
 
-  void makeConstant() { m_isConstant = true; }
+  void setTemporary() { m_isTemporary = true; }
 
   int index() const {
     ASSERT(m_didSetIndex);
     return m_index;
   }
 
-  bool isTemporary() { return m_index >= 0 && !m_isConstant; }
+  bool isTemporary() { return m_isTemporary; }
 
   void ref() { ++m_refCount; }
 
@@ -87,7 +87,7 @@ class RegisterID : Noncopyable {
  private:
   int m_refCount;
   int m_index;
-  bool m_isConstant;
+  bool m_isTemporary;
 #ifndef NDEBUG
   bool m_didSetIndex;
 #endif

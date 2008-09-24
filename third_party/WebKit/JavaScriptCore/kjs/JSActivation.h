@@ -45,6 +45,8 @@ class JSActivation : public JSVariableObject {
   JSActivation(ExecState* exec, PassRefPtr<FunctionBodyNode>, Register*);
   virtual ~JSActivation();
 
+  virtual void mark();
+
   virtual bool isActivationObject() const;
   virtual bool isDynamicScope() const;
 
@@ -71,8 +73,6 @@ class JSActivation : public JSVariableObject {
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
 
   virtual JSObject* toThisObject(ExecState*) const;
-
-  virtual void mark();
 
   void copyRegisters();
 

@@ -104,10 +104,7 @@ class Machine {
                    ExecState* exec,
                    JSObject* thisObj,
                    ScopeChainNode* scopeChain,
-                   JSValue** exception) {
-    return execute(evalNode, exec, thisObj, m_registerFile.size(), scopeChain,
-                   exception);
-  }
+                   JSValue** exception);
 
   JSValue* retrieveArguments(ExecState*, JSFunction*) const;
   JSValue* retrieveCaller(ExecState*, InternalFunction*) const;
@@ -119,6 +116,7 @@ class Machine {
 
   void getArgumentsData(Register* callFrame,
                         JSFunction*&,
+                        int& firstParameterIndex,
                         Register*& argv,
                         int& argc);
   void setTimeoutTime(unsigned timeoutTime) { m_timeoutTime = timeoutTime; }
@@ -273,15 +271,14 @@ class Machine {
                    ScopeChainNode*,
                    JSValue** exception);
 
-  ALWAYS_INLINE void initializeCallFrame(Register* callFrame,
-                                         CodeBlock*,
-                                         Instruction*,
-                                         ScopeChainNode*,
-                                         Register* r,
-                                         int returnValueRegister,
-                                         int argv,
-                                         int argc,
-                                         JSValue* function);
+  ALWAYS_INLINE static void initializeCallFrame(Register* callFrame,
+                                                CodeBlock*,
+                                                Instruction*,
+                                                ScopeChainNode*,
+                                                Register* r,
+                                                int returnValueRegister,
+                                                int argc,
+                                                JSValue* function);
 
   ALWAYS_INLINE void setScopeChain(ExecState* exec,
                                    ScopeChainNode*&,

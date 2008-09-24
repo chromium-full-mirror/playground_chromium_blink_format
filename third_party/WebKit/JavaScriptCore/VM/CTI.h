@@ -79,6 +79,7 @@
 #define ARG_src2 ((JSValue*)((ARGS)[2]))
 #define ARG_src3 ((JSValue*)((ARGS)[3]))
 #define ARG_src4 ((JSValue*)((ARGS)[4]))
+#define ARG_src5 ((JSValue*)((ARGS)[5]))
 #define ARG_id1 ((Identifier*)((ARGS)[1]))
 #define ARG_id2 ((Identifier*)((ARGS)[2]))
 #define ARG_id3 ((Identifier*)((ARGS)[3]))
@@ -87,6 +88,7 @@
 #define ARG_int2 ((int)((ARGS)[2]))
 #define ARG_int3 ((int)((ARGS)[3]))
 #define ARG_int4 ((int)((ARGS)[4]))
+#define ARG_int5 ((int)((ARGS)[5]))
 #define ARG_func1 ((FuncDeclNode*)((ARGS)[1]))
 #define ARG_funcexp1 ((FuncExprNode*)((ARGS)[1]))
 #define ARG_registers1 ((Register*)((ARGS)[1]))
@@ -97,6 +99,7 @@
 #define ARG_instr3 ((Instruction*)((ARGS)[3]))
 #define ARG_instr4 ((Instruction*)((ARGS)[4]))
 #define ARG_instr5 ((Instruction*)((ARGS)[5]))
+#define ARG_instr6 ((Instruction*)((ARGS)[6]))
 
 #define CTI_RETURN_ADDRESS ((ARGS)[-1])
 
@@ -142,6 +145,9 @@ struct CallRecord {
 
   CallRecord(X86Assembler::JmpSrc f, CTIHelper_b t, unsigned i)
       : from(f), to((void*)t), opcodeIndex(i) {}
+
+  CallRecord(X86Assembler::JmpSrc f, unsigned i)
+      : from(f), to(0), opcodeIndex(i) {}
 };
 
 struct JmpTable {
@@ -354,6 +360,10 @@ class CTI {
 
  private:
   CTI(Machine*, ExecState*, CodeBlock*);
+
+  bool isConstant(int src);
+  JSValue* CTI::getConstant(ExecState*, int src);
+
   void privateCompileMainPass();
   void privateCompileLinkPass();
   void privateCompileSlowCases();
@@ -400,7 +410,7 @@ class CTI {
   void emitPutArgConstant(unsigned value, unsigned offset);
   void emitPutResult(unsigned dst, X86Assembler::RegisterID from = X86::eax);
 
-  void emitInitialiseRegister(unsigned dst);
+  void emitInitRegister(unsigned dst);
 
   void emitPutCTIParam(void* value, unsigned name);
   void emitPutCTIParam(X86Assembler::RegisterID from, unsigned name);
@@ -437,6 +447,7 @@ class CTI {
 
   void emitDebugExceptionCheck();
 
+  X86Assembler::JmpSrc emitCall(unsigned opcodeIndex, X86::RegisterID);
   X86Assembler::JmpSrc emitCall(unsigned opcodeIndex, CTIHelper_j);
   X86Assembler::JmpSrc emitCall(unsigned opcodeIndex, CTIHelper_p);
   X86Assembler::JmpSrc emitCall(unsigned opcodeIndex, CTIHelper_b);

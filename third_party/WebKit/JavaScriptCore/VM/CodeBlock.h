@@ -192,10 +192,10 @@ struct CodeBlock {
         ctiCode(0)
 #endif
         ,
-        numTemporaries(0),
+        numCalleeRegisters(0),
+        numConstants(0),
         numVars(0),
         numParameters(0),
-        numLocals(0),
         needsFullScopeChain(ownerNode_->usesEval() ||
                             ownerNode_->needsClosure()),
         usesEval(ownerNode_->usesEval()),
@@ -229,15 +229,10 @@ struct CodeBlock {
 
   StructureStubInfo& getStubInfo(void* returnAddress) {
     // FIXME: would a binary chop be faster here?
-    for (unsigned i = 0; i < structureIDInstructions.size(); ++i) {
+    for (unsigned i = 0;; ++i) {
       if (structureIDInstructions[i].callReturnLocation == returnAddress)
         return structureIDInstructions[i];
     }
-
-    ASSERT_NOT_REACHED();
-    // keep the compiler happy.
-    static StructureStubInfo duff(0);
-    return duff;
   }
 
   ScopeNode* ownerNode;
@@ -246,11 +241,15 @@ struct CodeBlock {
   void* ctiCode;
 #endif
 
+  int numCalleeRegisters;
+
+  // NOTE: numConstants holds the number of constant registers allocated
+  // by the code generator, not the number of constant registers used.
+  // (Duplicate constants are uniqued during code generation, and spare
+  // constant registers may be allocated.)
   int numConstants;
-  int numTemporaries;
   int numVars;
   int numParameters;
-  int numLocals;
   int thisRegister;
   bool needsFullScopeChain;
   bool usesEval;

@@ -51,12 +51,60 @@ JSActivation::~JSActivation() {
   delete d();
 }
 
+void JSActivation::mark() {
+  Base::mark();
+
+  if (d()->argumentsObject)
+    d()->argumentsObject->mark();
+
+  Register* registerArray = d()->registerArray.get();
+  if (!registerArray)
+    return;
+
+  size_t numParametersMinusThis =
+      d()->functionBody->generatedByteCode().numParameters - 1;
+
+  size_t i = 0;
+  size_t count = numParametersMinusThis;
+  for (; i < count; ++i) {
+    Register& r = registerArray[i];
+    if (!r.marked())
+      r.mark();
+  }
+
+  size_t numVars = d()->functionBody->generatedByteCode().numVars;
+
+  // Skip the call frame, which sits between the parameters and vars.
+  i += RegisterFile::CallFrameHeaderSize;
+  count += RegisterFile::CallFrameHeaderSize + numVars;
+
+  for (; i < count; ++i) {
+    Register& r = registerArray[i];
+    if (!r.marked())
+      r.mark();
+  }
+}
+
 void JSActivation::copyRegisters() {
-  int numLocals = d()->functionBody->generatedByteCode().numLocals;
+  ASSERT(!d()->registerArray);
+  ASSERT(!d()->registerArraySize);
+
+  size_t numParametersMinusThis =
+      d()->functionBody->generatedByteCode().numParameters - 1;
+  size_t numVars = d()->functionBody->generatedByteCode().numVars;
+  size_t numLocals = numVars + numParametersMinusThis;
+
   if (!numLocals)
     return;
 
-  copyRegisterArray(d()->registers - numLocals, numLocals);
+  int registerOffset =
+      numParametersMinusThis + RegisterFile::CallFrameHeaderSize;
+  size_t registerArraySize = numLocals + RegisterFile::CallFrameHeaderSize;
+
+  Register* registerArray =
+      copyRegisterArray(d()->registers - registerOffset, registerArraySize);
+  setRegisters(registerArray + registerOffset, registerArray,
+               registerArraySize);
 }
 
 bool JSActivation::getOwnPropertySlot(ExecState* exec,
@@ -129,13 +177,6 @@ JSObject* JSActivation::toThisObject(ExecState* exec) const {
   return exec->globalThisValue();
 }
 
-void JSActivation::mark() {
-  Base::mark();
-
-  if (d()->argumentsObject)
-    d()->argumentsObject->mark();
-}
-
 bool JSActivation::isActivationObject() const {
   return true;
 }
@@ -162,19 +203,15 @@ PropertySlot::GetValueFunc JSActivation::getArgumentsGetter() {
 }
 
 Arguments* JSActivation::createArgumentsObject(ExecState* exec) {
-  Register* callFrame = d()->registers -
-                        d()->functionBody->generatedByteCode().numLocals -
-                        RegisterFile::CallFrameHeaderSize;
-
   JSFunction* function;
   Register* argv;
   int argc;
-  exec->machine()->getArgumentsData(callFrame, function, argv, argc);
+  int firstParameterIndex;
+  exec->machine()->getArgumentsData(d()->registers, function,
+                                    firstParameterIndex, argv, argc);
 
-  int firstArgumentIndex =
-      -d()->functionBody->generatedByteCode().numLocals + 1;
   return new (exec)
-      Arguments(exec, function, this, firstArgumentIndex, argv, argc);
+      Arguments(exec, function, this, firstParameterIndex, argv, argc);
 }
 
 }  // namespace JSC

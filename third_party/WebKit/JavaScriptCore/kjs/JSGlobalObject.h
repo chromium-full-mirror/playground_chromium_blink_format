@@ -155,6 +155,8 @@ class JSGlobalObject : public JSVariableObject {
  public:
   virtual ~JSGlobalObject();
 
+  virtual void mark();
+
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier&,
@@ -271,8 +273,6 @@ class JSGlobalObject : public JSVariableObject {
 
   ScopeChain& globalScopeChain() { return d()->globalScopeChain; }
 
-  virtual void mark();
-
   virtual bool isGlobalObject() const { return true; }
   virtual JSGlobalObject* toGlobalObject(ExecState*) const;
 
@@ -323,14 +323,15 @@ class JSGlobalObject : public JSVariableObject {
 
 inline void JSGlobalObject::addStaticGlobals(GlobalPropertyInfo* globals,
                                              int count) {
-  size_t registerArraySize = d()->registerArraySize;
-  Register* registerArray = new Register[registerArraySize + count];
+  size_t oldSize = d()->registerArraySize;
+  size_t newSize = oldSize + count;
+  Register* registerArray = new Register[newSize];
   if (d()->registerArray)
     memcpy(registerArray + count, d()->registerArray.get(),
-           registerArraySize * sizeof(Register));
-  setRegisterArray(registerArray, registerArraySize + count);
+           oldSize * sizeof(Register));
+  setRegisters(registerArray + newSize, registerArray, newSize);
 
-  for (int i = 0, index = -static_cast<int>(registerArraySize) - 1; i < count;
+  for (int i = 0, index = -static_cast<int>(oldSize) - 1; i < count;
        ++i, --index) {
     GlobalPropertyInfo& global = globals[i];
     ASSERT(global.attributes & DontDelete);

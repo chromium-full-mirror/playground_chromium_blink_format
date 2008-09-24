@@ -49,11 +49,11 @@ class JSStaticScopeObject : public JSVariableObject {
                       unsigned attributes)
       : JSVariableObject(exec->globalData().nullProtoStructureID,
                          new JSStaticScopeObjectData()) {
-    JSStaticScopeObjectData* data = static_cast<JSStaticScopeObjectData*>(d);
-    data->registerStore = value;
+    d()->registerStore = value;
     symbolTable().add(ident.ustring().rep(), SymbolTableEntry(-1, attributes));
   }
   virtual ~JSStaticScopeObject();
+  virtual void mark();
   bool isDynamicScope() const;
   virtual JSObject* toThisObject(ExecState*) const;
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
@@ -66,6 +66,11 @@ class JSStaticScopeObject : public JSVariableObject {
                          const Identifier&,
                          JSValue*,
                          unsigned attributes);
+
+ private:
+  JSStaticScopeObjectData* d() {
+    return static_cast<JSStaticScopeObjectData*>(JSVariableObject::d);
+  }
 };
 }
 

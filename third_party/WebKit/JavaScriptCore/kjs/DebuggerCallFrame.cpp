@@ -36,24 +36,19 @@
 
 namespace JSC {
 
-Register* DebuggerCallFrame::callFrame() const {
-  return m_registers - m_codeBlock->numLocals -
-         RegisterFile::CallFrameHeaderSize;
-}
-
 const UString* DebuggerCallFrame::functionName() const {
   if (!m_codeBlock)
     return 0;
 
   JSFunction* function =
-      static_cast<JSFunction*>(callFrame()[RegisterFile::Callee].getJSValue());
+      static_cast<JSFunction*>(m_registers[RegisterFile::Callee].getJSValue());
   if (!function)
     return 0;
   return &function->name(m_exec);
 }
 
 DebuggerCallFrame::Type DebuggerCallFrame::type() const {
-  if (callFrame()[RegisterFile::Callee].getJSValue())
+  if (m_registers[RegisterFile::Callee].getJSValue())
     return FunctionType;
 
   return ProgramType;
