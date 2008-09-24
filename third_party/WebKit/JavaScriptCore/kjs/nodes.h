@@ -238,7 +238,7 @@ class StatementNode : public Node {
   virtual bool isEmptyStatement() const JSC_FAST_CALL { return false; }
 
   virtual bool isBlock() const JSC_FAST_CALL { return false; }
-  virtual bool isDoWhile() const JSC_FAST_CALL { return false; }
+  virtual bool isLoop() const JSC_FAST_CALL { return false; }
 
  protected:
   LabelStack m_labelStack;
@@ -2132,7 +2132,7 @@ class DoWhileNode : public StatementNode {
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
 
-  virtual bool isDoWhile() const JSC_FAST_CALL { return true; }
+  virtual bool isLoop() const JSC_FAST_CALL { return true; }
 
  private:
   RefPtr<StatementNode> m_statement;
@@ -2149,6 +2149,8 @@ class WhileNode : public StatementNode {
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
+
+  virtual bool isLoop() const JSC_FAST_CALL { return true; }
 
  private:
   RefPtr<ExpressionNode> m_expr;
@@ -2175,6 +2177,8 @@ class ForNode : public StatementNode {
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
 
+  virtual bool isLoop() const JSC_FAST_CALL { return true; }
+
  private:
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -2198,6 +2202,8 @@ class ForInNode : public StatementNode, public ThrowableExpressionData {
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
+
+  virtual bool isLoop() const JSC_FAST_CALL { return true; }
 
  private:
   Identifier m_ident;
