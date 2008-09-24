@@ -74,6 +74,8 @@ Scrollbar::Scrollbar(ScrollbarClient* client,
   if (!m_theme)
     m_theme = ScrollbarTheme::nativeTheme();
 
+  m_theme->registerScrollbar(this);
+
   // FIXME: This is ugly and would not be necessary if we fix cross-platform
   // code to actually query for
   // scrollbar thickness and use it when sizing scrollbars (rather than leaving
@@ -85,6 +87,8 @@ Scrollbar::Scrollbar(ScrollbarClient* client,
 
 Scrollbar::~Scrollbar() {
   stopTimerIfNeeded();
+
+  m_theme->unregisterScrollbar(this);
 }
 
 bool Scrollbar::setValue(int v) {

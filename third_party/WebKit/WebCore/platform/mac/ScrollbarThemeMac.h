@@ -49,6 +49,11 @@ class ScrollbarThemeMac : public ScrollbarThemeComposite {
 
   virtual ScrollbarButtonsPlacement buttonsPlacement() const;
 
+#if !USE(NSSCROLLER)
+  virtual void registerScrollbar(Scrollbar*);
+  virtual void unregisterScrollbar(Scrollbar*);
+#endif
+
  protected:
   virtual bool hasButtons(Scrollbar*);
   virtual bool hasThumb(Scrollbar*);
@@ -64,6 +69,9 @@ class ScrollbarThemeMac : public ScrollbarThemeComposite {
   virtual int minimumThumbLength(Scrollbar*);
 
   virtual bool shouldCenterOnThumb(Scrollbar*, const PlatformMouseEvent&);
+
+ public:
+  void preferencesChanged();
 };
 }
 
