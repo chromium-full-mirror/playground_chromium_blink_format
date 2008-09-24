@@ -25,6 +25,7 @@
 
 #include "config.h"
 #include "JSBase.h"
+#include "JSBasePrivate.h"
 
 #include "APICast.h"
 #include "completion.h"
@@ -116,4 +117,12 @@ void JSGarbageCollect(JSContextRef ctx) {
   // FIXME: Perhaps we should trigger a second mark and sweep
   // once the garbage collector is done if this is called when
   // the collector is busy.
+}
+
+void JSReportExtraMemoryCost(JSContextRef ctx, size_t size) {
+  ExecState* exec = toJS(ctx);
+  exec->globalData().heap->registerThread();
+  JSLock lock(exec);
+
+  exec->globalData().heap->reportExtraMemoryCost(size);
 }
