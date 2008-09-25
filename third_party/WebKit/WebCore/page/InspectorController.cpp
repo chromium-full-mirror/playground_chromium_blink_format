@@ -1285,6 +1285,7 @@ void InspectorController::addConsoleMessage(ExecState* exec,
 
   if (m_previousMessage && m_previousMessage->isEqual(exec, consoleMessage)) {
     ++m_previousMessage->repeatCount;
+    delete consoleMessage;
   } else {
     m_previousMessage = consoleMessage;
     m_consoleMessages.append(consoleMessage);
