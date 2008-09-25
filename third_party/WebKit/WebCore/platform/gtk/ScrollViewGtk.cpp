@@ -72,7 +72,6 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
  public:
   ScrollViewPrivate(ScrollView* _view)
       : view(_view),
-        hasStaticBackground(false),
         scrollbarsSuppressed(false),
         vScrollbarMode(ScrollbarAuto),
         hScrollbarMode(ScrollbarAuto),
@@ -111,7 +110,6 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
   static void adjustmentChanged(GtkAdjustment*, gpointer);
 
   ScrollView* view;
-  bool hasStaticBackground;
   bool scrollbarsSuppressed;
   ScrollbarMode vScrollbarMode;
   ScrollbarMode hScrollbarMode;
@@ -185,7 +183,7 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
 
   // FIXME update here?
 
-  if (!hasStaticBackground)  // The main frame can just blit the WebView window
+  if (canBlitOnScroll())  // The main frame can just blit the WebView window
     // FIXME: Find a way to blit subframes without blitting overlapping content
     view->scrollBackingStore(-scrollDelta.width(), -scrollDelta.height(),
                              scrollViewRect, clipRect);
@@ -258,7 +256,9 @@ bool ScrollView::ScrollViewPrivate::isActive() const {
   return page && page->focusController()->isActive();
 }
 
-ScrollView::ScrollView() : m_data(new ScrollViewPrivate(this)) {}
+ScrollView::ScrollView() : m_data(new ScrollViewPrivate(this)) {
+  init();
+}
 
 ScrollView::~ScrollView() {
   delete m_data;
@@ -447,10 +447,6 @@ void ScrollView::setScrollbarsMode(ScrollbarMode newMode) {
   updateScrollbars(m_data->scrollOffset);
 }
 
-void ScrollView::setStaticBackground(bool flag) {
-  m_data->hasStaticBackground = flag;
-}
-
 void ScrollView::setFrameGeometry(const IntRect& newGeometry) {
   ASSERT(isFrameView());
   IntRect oldGeometry = frameGeometry();
@@ -467,13 +463,13 @@ void ScrollView::setFrameGeometry(const IntRect& newGeometry) {
   geometryChanged();
 }
 
-void ScrollView::addChildPlatformWidget(Widget* child) {
+void ScrollView::platformAddChild(Widget* child) {
   if (!GTK_IS_SOCKET(child->platformWidget()))
     gtk_container_add(GTK_CONTAINER(containingWindow()),
                       child->platformWidget());
 }
 
-void ScrollView::removeChildPlatformWidget(Widget* child) {
+void ScrollView::platformRemoveChild(Widget* child) {
   if (GTK_WIDGET(containingWindow()) ==
       GTK_WIDGET(child->platformWidget())->parent)
     gtk_container_remove(GTK_CONTAINER(containingWindow()),

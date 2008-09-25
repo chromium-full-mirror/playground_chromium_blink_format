@@ -70,7 +70,6 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
  public:
   ScrollViewPrivate(ScrollView* view)
       : m_view(view),
-        m_hasStaticBackground(false),
         m_scrollbarsSuppressed(false),
         m_inUpdateScrollbars(false),
         m_scrollbarsAvoidingResizer(0),
@@ -99,7 +98,6 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
   ScrollView* m_view;
   IntSize m_scrollOffset;
   IntSize m_contentsSize;
-  bool m_hasStaticBackground;
   bool m_scrollbarsSuppressed;
   bool m_inUpdateScrollbars;
   int m_scrollbarsAvoidingResizer;
@@ -188,8 +186,7 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
     m_view->updateWindowRect(panScrollIconDirtyRect);
   }
 
-  if (!m_hasStaticBackground)  // The main frame can just blit the WebView
-                               // window
+  if (canBlitOnScroll())  // The main frame can just blit the WebView window
     // FIXME: Find a way to blit subframes without blitting overlapping content
     m_view->scrollBackingStore(-scrollDelta.width(), -scrollDelta.height(),
                                scrollViewRect, clipRect);
@@ -239,15 +236,17 @@ bool ScrollView::ScrollViewPrivate::isActive() const {
   return page && page->focusController()->isActive();
 }
 
-ScrollView::ScrollView() : m_data(new ScrollViewPrivate(this)) {}
+ScrollView::ScrollView() : m_data(new ScrollViewPrivate(this)) {
+  init();
+}
 
 ScrollView::~ScrollView() {
   delete m_data;
 }
 
-void ScrollView::addChildPlatformWidget(Widget*) {}
+void ScrollView::platformAddChild(Widget*) {}
 
-void ScrollView::removeChildPlatformWidget(Widget*) {}
+void ScrollView::platformRemoveChild(Widget*) {}
 
 void ScrollView::updateContents(const IntRect& rect, bool now) {
   if (rect.isEmpty())
@@ -448,10 +447,6 @@ void ScrollView::setScrollbarsMode(ScrollbarMode newMode) {
     m_data->m_hScrollbarMode = m_data->m_vScrollbarMode = newMode;
     updateScrollbars(m_data->m_scrollOffset);
   }
-}
-
-void ScrollView::setStaticBackground(bool flag) {
-  m_data->m_hasStaticBackground = flag;
 }
 
 void ScrollView::updateScrollbars(const IntSize& desiredOffset) {

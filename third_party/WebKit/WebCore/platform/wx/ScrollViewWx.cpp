@@ -49,7 +49,6 @@ class ScrollView::ScrollViewPrivate : public wxEvtHandler {
   ScrollViewPrivate(ScrollView* scrollView)
       : wxEvtHandler(),
         m_scrollView(scrollView),
-        hasStaticBackground(false),
         suppressScrollbars(false),
         vScrollbarMode(ScrollbarAuto),
         hScrollbarMode(ScrollbarAuto),
@@ -125,7 +124,6 @@ class ScrollView::ScrollViewPrivate : public wxEvtHandler {
 
   ScrollView* m_scrollView;
 
-  bool hasStaticBackground;
   bool suppressScrollbars;
   ScrollbarMode vScrollbarMode;
   ScrollbarMode hScrollbarMode;
@@ -134,6 +132,7 @@ class ScrollView::ScrollViewPrivate : public wxEvtHandler {
 
 ScrollView::ScrollView() {
   m_data = new ScrollViewPrivate(this);
+  init();
 }
 
 void ScrollView::setPlatformWidget(wxWindow* win) {
@@ -223,10 +222,10 @@ void ScrollView::scrollBy(int dx, int dy) {
 
   wxPoint delta(orig - newScrollOffset);
 
-  if (m_data->hasStaticBackground)
-    win->Refresh();
-  else
+  if (canBlitOnScroll())
     win->ScrollWindow(delta.x, delta.y);
+  else
+    win->Refresh();
 
   adjustScrollbars();
 }
@@ -382,10 +381,6 @@ void ScrollView::setVScrollbarMode(ScrollbarMode newMode) {
   }
 }
 
-void ScrollView::setStaticBackground(bool flag) {
-  m_data->hasStaticBackground = flag;
-}
-
 void ScrollView::suppressScrollbars(bool suppressed, bool repaintOnSuppress) {
   if (m_data->suppressScrollbars != suppressed)
     m_data->suppressScrollbars = suppressed;
@@ -420,14 +415,14 @@ void ScrollView::wheelEvent(PlatformWheelEvent& e) {
 }
 
 // used for subframes support
-void ScrollView::addChildPlatformWidget(Widget* widget) {
+void ScrollView::platformAddChild(Widget* widget) {
   // NB: In all cases I'm aware of,
   // by the time this is called the ScrollView is already a child
   // of its parent Widget by wx port APIs, so I don't think
   // we need to do anything here.
 }
 
-void ScrollView::removeChildPlatformWidget(Widget* widget) {
+void ScrollView::platformRemoveChild(Widget* widget) {
   if (platformWidget()) {
     platformWidget()->RemoveChild(widget->platformWidget());
     // FIXME: Is this the right place to do deletion? I see

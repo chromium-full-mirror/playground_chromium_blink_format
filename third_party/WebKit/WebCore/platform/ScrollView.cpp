@@ -28,6 +28,12 @@
 
 namespace WebCore {
 
+void ScrollView::init() {
+  m_canBlitOnScroll = true;
+  if (platformWidget())
+    platformSetCanBlitOnScroll();
+}
+
 void ScrollView::addChild(Widget* child) {
   ASSERT(child != this && !child->parent());
   child->setParent(this);
@@ -36,7 +42,7 @@ void ScrollView::addChild(Widget* child) {
     child->setContainingWindow(containingWindow());
     return;
   }
-  addChildPlatformWidget(child);
+  platformAddChild(child);
 }
 
 void ScrollView::removeChild(Widget* child) {
@@ -44,6 +50,18 @@ void ScrollView::removeChild(Widget* child) {
   child->setParent(0);
   m_children.remove(child);
   if (child->platformWidget())
-    removeChildPlatformWidget(child);
+    platformRemoveChild(child);
 }
+
+void ScrollView::setCanBlitOnScroll(bool b) {
+  if (m_canBlitOnScroll == b)
+    return;
+  m_canBlitOnScroll = b;
+  if (platformWidget())
+    platformSetCanBlitOnScroll();
+}
+
+#if !PLATFORM(MAC)
+void ScrollView::platformSetCanBlitOnScroll() {}
+#endif
 }

@@ -63,6 +63,9 @@ class ScrollView : public Widget {
   void addChild(Widget*);
   void removeChild(Widget*);
 
+  void setCanBlitOnScroll(bool);
+  bool canBlitOnScroll() const { return m_canBlitOnScroll; }
+
   int visibleWidth() const;
   int visibleHeight() const;
   FloatRect visibleContentRect() const;
@@ -105,8 +108,6 @@ class ScrollView : public Widget {
   IntPoint contentsToWindow(const IntPoint&) const;
   IntRect windowToContents(const IntRect&) const;
   IntRect contentsToWindow(const IntRect&) const;
-
-  void setStaticBackground(bool);
 
   bool inWindow() const;
   virtual bool shouldUpdateWhileOffscreen() const = 0;
@@ -158,9 +159,13 @@ class ScrollView : public Widget {
 
  private:
   HashSet<Widget*> m_children;
+  bool m_canBlitOnScroll;
 
-  void addChildPlatformWidget(Widget*);
-  void removeChildPlatformWidget(Widget*);
+  void init();
+
+  void platformAddChild(Widget*);
+  void platformRemoveChild(Widget*);
+  void platformSetCanBlitOnScroll();
 
 #if PLATFORM(MAC) && defined __OBJC__
  public:
