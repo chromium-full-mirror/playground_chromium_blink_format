@@ -2951,8 +2951,7 @@ WebView::rectsForTextMatches(IEnumTextMatches** pmatches) {
   WebCore::Frame* frame = m_page->mainFrame();
   do {
     if (Document* document = frame->document()) {
-      IntRect visibleRect =
-          enclosingIntRect(frame->view()->visibleContentRect());
+      IntRect visibleRect = frame->view()->visibleContentRect();
       Vector<IntRect> frameRects =
           document->renderedRectsForMarkers(DocumentMarker::TextMatch);
       IntPoint frameOffset(-frame->view()->scrollOffset().width(),

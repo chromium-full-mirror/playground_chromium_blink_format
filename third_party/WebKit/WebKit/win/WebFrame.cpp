@@ -1952,7 +1952,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::frameBounds(
   if (!view)
     return E_FAIL;
 
-  FloatRect bounds = view->visibleContentRectConsideringExternalScrollers();
+  FloatRect bounds = view->visibleContentRect(true);
   result->bottom = (LONG)bounds.height();
   result->right = (LONG)bounds.width();
   return S_OK;
