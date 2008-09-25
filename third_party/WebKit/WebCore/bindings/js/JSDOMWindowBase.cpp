@@ -689,7 +689,7 @@ bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
           return false;
       }
       if (allowsAccessFrom(exec))
-        slot.setStaticEntry(this, entry, staticFunctionGetter);
+        setUpStaticFunctionSlot(exec, entry, this, propertyName, slot);
       else
         slot.setUndefined();
     } else
