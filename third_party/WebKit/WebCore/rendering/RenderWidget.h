@@ -68,7 +68,7 @@ class RenderWidget : public RenderReplaced {
                            HitTestAction);
 
  private:
-  void resizeWidget(Widget*, int w, int h);
+  void setWidgetGeometry(const IntRect&);
 
   virtual void deleteWidget();
 
