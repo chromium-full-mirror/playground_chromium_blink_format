@@ -82,6 +82,6 @@ void ScrollView::platformSetCanBlitOnScroll() {}
 #endif
 
 #if !PLATFORM(MAC) && !PLATFORM(WX)
-IntRect ScrollView::platformVisibleContentRect(bool) {}
+IntRect ScrollView::platformVisibleContentRect(bool) const {}
 #endif
 }
