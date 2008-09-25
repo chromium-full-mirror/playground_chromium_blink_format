@@ -85,6 +85,7 @@ class HTMLMapElement;
 class ImageLoader;
 class IntPoint;
 class JSNode;
+class MessagePort;
 class MouseEventWithHitTestResults;
 class NodeFilter;
 class NodeIterator;
@@ -893,6 +894,11 @@ class Document : public ContainerNode {
                                                 int height);
   HTMLCanvasElement* getCSSCanvasElement(const String& name);
 
+  void processMessagePortMessagesSoon();
+  void dispatchMessagePortEvents();
+  void createdMessagePort(MessagePort*);
+  void destroyedMessagePort(MessagePort*);
+
   bool isDNSPrefetchEnabled() const { return m_isDNSPrefetchEnabled; }
   void initDNSPrefetch();
   void parseDNSPrefetchControlHeader(const String&);
@@ -1064,6 +1070,9 @@ class Document : public ContainerNode {
   bool m_xmlStandalone;
 
   String m_contentLanguage;
+
+  bool m_firedMessagePortTimer;
+  HashSet<MessagePort*> m_messagePorts;
 
  public:
   bool inPageCache();

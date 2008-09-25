@@ -46,6 +46,7 @@
 #include "JSHTMLCollection.h"
 #include "JSHTMLOptionElementConstructor.h"
 #include "JSImageConstructor.h"
+#include "JSMessageChannelConstructor.h"
 #include "JSNode.h"
 #include "JSXMLHttpRequestConstructor.h"
 #include "Logging.h"
@@ -235,6 +236,7 @@ DontDelete
 # -- Constructors --
   Audio                 WebCore::JSDOMWindowBase::Audio              DontDelete
   Image                 WebCore::JSDOMWindowBase::Image              DontDelete
+  MessageChannel        WebCore::JSDOMWindowBase::MessageChannel     DontDelete
   Option                WebCore::JSDOMWindowBase::Option             DontDelete
   XMLHttpRequest        WebCore::JSDOMWindowBase::XMLHttpRequest     DontDelete
   XSLTProcessor         WebCore::JSDOMWindowBase::XSLTProcessor      DontDelete
@@ -534,6 +536,11 @@ JSValue* JSDOMWindowBase::getValueProperty(ExecState* exec, int token) const {
       // new object every
       // time
       return new (exec) JSImageConstructor(exec, impl()->frame()->document());
+    case MessageChannel:
+      if (!allowsAccessFrom(exec))
+        return jsUndefined();
+      return new (exec)
+          JSMessageChannelConstructor(exec, impl()->frame()->document());
     case Option:
       if (!allowsAccessFrom(exec))
         return jsUndefined();

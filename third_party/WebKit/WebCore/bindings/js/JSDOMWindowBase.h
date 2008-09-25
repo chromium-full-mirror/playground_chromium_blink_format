@@ -201,6 +201,7 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
     // Constructors
     Audio,
     Image,
+    MessageChannel,
     Option,
     XMLHttpRequest,
     XSLTProcessor

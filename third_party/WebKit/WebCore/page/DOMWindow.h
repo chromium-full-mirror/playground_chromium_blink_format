@@ -47,6 +47,7 @@ class FloatRect;
 class Frame;
 class History;
 class Location;
+class MessagePort;
 class Navigator;
 class PostMessageTimer;
 class Screen;
@@ -197,6 +198,7 @@ class DOMWindow : public RefCounted<DOMWindow> {
 #endif
 
   void postMessage(const String& message,
+                   MessagePort*,
                    const String& targetOrigin,
                    DOMWindow* source,
                    ExceptionCode&);

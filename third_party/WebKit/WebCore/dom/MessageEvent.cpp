@@ -40,12 +40,14 @@ MessageEvent::MessageEvent() {}
 MessageEvent::MessageEvent(const String& data,
                            const String& origin,
                            const String& lastEventId,
-                           PassRefPtr<DOMWindow> source)
+                           PassRefPtr<DOMWindow> source,
+                           PassRefPtr<MessagePort> messagePort)
     : Event(messageEvent, false, true),
       m_data(data),
       m_origin(origin),
       m_lastEventId(lastEventId),
-      m_source(source) {}
+      m_source(source),
+      m_messagePort(messagePort) {}
 
 MessageEvent::~MessageEvent() {}
 
@@ -55,7 +57,8 @@ void MessageEvent::initMessageEvent(const AtomicString& type,
                                     const String& data,
                                     const String& origin,
                                     const String& lastEventId,
-                                    DOMWindow* source) {
+                                    DOMWindow* source,
+                                    MessagePort* messagePort) {
   if (dispatched())
     return;
 
@@ -65,6 +68,7 @@ void MessageEvent::initMessageEvent(const AtomicString& type,
   m_origin = origin;
   m_lastEventId = lastEventId;
   m_source = source;
+  m_messagePort = messagePort;
 }
 
 bool MessageEvent::isMessageEvent() const {

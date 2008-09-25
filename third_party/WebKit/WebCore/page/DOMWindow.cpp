@@ -332,6 +332,7 @@ Storage* DOMWindow::localStorage() const {
 #endif
 
 void DOMWindow::postMessage(const String& message,
+                            MessagePort* messagePort,
                             const String& targetOrigin,
                             DOMWindow* source,
                             ExceptionCode& ec) {
@@ -349,6 +350,12 @@ void DOMWindow::postMessage(const String& message,
     }
   }
 
+  RefPtr<MessagePort> newMessagePort;
+  if (messagePort)
+    newMessagePort = messagePort->clone(document(), ec);
+  if (ec)
+    return;
+
   // Capture the source of the message.  We need to do this synchronously
   // in order to capture the source of the message correctly.
   Document* sourceDocument = source->document();
@@ -358,7 +365,8 @@ void DOMWindow::postMessage(const String& message,
 
   // Schedule the message.
   PostMessageTimer* timer = new PostMessageTimer(
-      this, MessageEvent::create(message, sourceOrigin, "", source),
+      this,
+      MessageEvent::create(message, sourceOrigin, "", source, newMessagePort),
       target.get());
   timer->startOneShot(0);
 }
