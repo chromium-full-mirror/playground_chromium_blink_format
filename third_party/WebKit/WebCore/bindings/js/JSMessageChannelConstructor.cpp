@@ -26,6 +26,7 @@
 #include "config.h"
 #include "JSMessageChannelConstructor.h"
 
+#include "Document.h"
 #include "JSMessageChannel.h"
 #include "MessageChannel.h"
 
@@ -45,6 +46,8 @@ JSMessageChannelConstructor::JSMessageChannelConstructor(ExecState* exec,
             JSMessageChannelPrototype::self(exec), None);
 }
 
+JSMessageChannelConstructor::~JSMessageChannelConstructor() {}
+
 ConstructType JSMessageChannelConstructor::getConstructData(
     ConstructData& constructData) {
   constructData.native.function = construct;
@@ -54,10 +57,10 @@ ConstructType JSMessageChannelConstructor::getConstructData(
 JSObject* JSMessageChannelConstructor::construct(ExecState* exec,
                                                  JSObject* constructor,
                                                  const ArgList&) {
-  return static_cast<JSObject*>(toJS(
-      exec,
-      MessageChannel::create(
-          static_cast<JSMessageChannelConstructor*>(constructor)->m_document)));
+  return static_cast<JSObject*>(
+      toJS(exec, MessageChannel::create(
+                     static_cast<JSMessageChannelConstructor*>(constructor)
+                         ->m_document.get())));
 }
 
 }  // namespace WebCore
