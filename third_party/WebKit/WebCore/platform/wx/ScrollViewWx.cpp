@@ -125,7 +125,6 @@ class ScrollView::ScrollViewPrivate : public wxEvtHandler {
 
   ScrollView* m_scrollView;
 
-  HashSet<Widget*> m_children;
   bool hasStaticBackground;
   bool suppressScrollbars;
   ScrollbarMode vScrollbarMode;
@@ -421,29 +420,21 @@ void ScrollView::wheelEvent(PlatformWheelEvent& e) {
 }
 
 // used for subframes support
-void ScrollView::addChild(Widget* widget) {
-  m_data->m_children.add(widget);
-
+void ScrollView::addChildPlatformWidget(Widget* widget) {
   // NB: In all cases I'm aware of,
   // by the time this is called the ScrollView is already a child
   // of its parent Widget by wx port APIs, so I don't think
   // we need to do anything here.
 }
 
-void ScrollView::removeChild(Widget* widget) {
-  m_data->m_children.remove(widget);
-
-  if (platformWidget() && widget->platformWidget()) {
+void ScrollView::removeChildPlatformWidget(Widget* widget) {
+  if (platformWidget()) {
     platformWidget()->RemoveChild(widget->platformWidget());
     // FIXME: Is this the right place to do deletion? I see
     // detachFromParent2/3/4, initiated by FrameLoader::detachFromParent,
     // but I'm not sure if it's better to handle there or not.
     widget->platformWidget()->Destroy();
   }
-}
-
-HashSet<Widget*>* ScrollView::children() {
-  return &(m_data->m_children);
 }
 
 void ScrollView::scrollRectIntoViewRecursively(const IntRect& rect) {

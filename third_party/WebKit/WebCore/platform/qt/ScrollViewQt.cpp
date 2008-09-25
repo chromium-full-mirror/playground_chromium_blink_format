@@ -101,7 +101,6 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
   ScrollbarMode m_hScrollbarMode;
   RefPtr<Scrollbar> m_vBar;
   RefPtr<Scrollbar> m_hBar;
-  HashSet<Widget*> m_children;
 };
 
 void ScrollView::ScrollViewPrivate::setHasHorizontalScrollbar(bool hasBar) {
@@ -265,13 +264,9 @@ void ScrollView::setFrameGeometry(const IntRect& newGeometry) {
   geometryChanged();
 }
 
-HashSet<Widget*>* ScrollView::children() {
-  return &(m_data->m_children);
-}
-
 void ScrollView::geometryChanged() const {
-  HashSet<Widget*>::const_iterator end = m_data->m_children.end();
-  for (HashSet<Widget*>::const_iterator current = m_data->m_children.begin();
+  HashSet<Widget*>::const_iterator end = m_children.end();
+  for (HashSet<Widget*>::const_iterator current = m_children.begin();
        current != end; ++current)
     (*current)->geometryChanged();
 
@@ -605,21 +600,12 @@ Scrollbar* ScrollView::scrollbarUnderMouse(
   return 0;
 }
 
-void ScrollView::addChild(Widget* child) {
-  child->setParent(this);
-  m_data->m_children.add(child);
-
-  if (child->platformWidget())
-    root()->incrementNativeWidgetCount();
+void ScrollView::addChildPlatformWidget(Widget* child) {
+  root()->incrementNativeWidgetCount();
 }
 
-void ScrollView::removeChild(Widget* child) {
-  if (child->platformWidget())
-    root()->decrementNativeWidgetCount();
-
-  child->setParent(0);
-  child->hide();
-  m_data->m_children.remove(child);
+void ScrollView::removeChildPlatformWidget(Widget* child) {
+  root()->decrementNativeWidgetCount();
 }
 
 static void drawScrollbarCorner(GraphicsContext* context, const IntRect& rect) {

@@ -165,7 +165,7 @@ class Widget {
   virtual bool isFrameView() const { return false; }
   virtual bool isPluginView() const { return false; }
 
-  virtual void removeFromParent();
+  void removeFromParent();
   virtual void setParent(ScrollView* view);
   ScrollView* parent() const { return m_parent; }
   ScrollView* root() const;

@@ -29,6 +29,7 @@
 #include "IntRect.h"
 #include "ScrollTypes.h"
 #include "Widget.h"
+
 #include <wtf/HashSet.h>
 
 #if PLATFORM(MAC) && defined __OBJC__
@@ -57,6 +58,10 @@ class ScrollView : public Widget {
  public:
   ScrollView();
   ~ScrollView();
+
+  const HashSet<Widget*>* children() const { return &m_children; }
+  void addChild(Widget*);
+  void removeChild(Widget*);
 
   int visibleWidth() const;
   int visibleHeight() const;
@@ -87,8 +92,6 @@ class ScrollView : public Widget {
   ScrollbarMode hScrollbarMode() const;
 
   bool isScrollable();
-  void addChild(Widget*);
-  void removeChild(Widget*);
 
   virtual void resizeContents(int w, int h);
 
@@ -153,6 +156,12 @@ class ScrollView : public Widget {
  public:
   void update();
 
+ private:
+  HashSet<Widget*> m_children;
+
+  void addChildPlatformWidget(Widget*);
+  void removeChildPlatformWidget(Widget*);
+
 #if PLATFORM(MAC) && defined __OBJC__
  public:
   NSView* documentView() const;
@@ -162,9 +171,6 @@ class ScrollView : public Widget {
 #endif
 
 #if !PLATFORM(MAC)
- public:
-  HashSet<Widget*>* children();
-
  private:
   IntSize maximumScroll() const;
 #endif

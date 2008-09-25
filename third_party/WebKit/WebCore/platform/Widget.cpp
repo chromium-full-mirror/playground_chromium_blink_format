@@ -61,6 +61,11 @@ ScrollView* Widget::root() const {
   return 0;
 }
 
+void Widget::removeFromParent() {
+  if (parent())
+    parent()->removeChild(this);
+}
+
 #if !PLATFORM(MAC)
 
 IntRect Widget::convertToContainingWindow(const IntRect& rect) const {

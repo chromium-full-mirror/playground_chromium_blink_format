@@ -108,7 +108,6 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
   RefPtr<Scrollbar> m_vBar;
   RefPtr<Scrollbar> m_hBar;
   HRGN m_dirtyRegion;
-  HashSet<Widget*> m_children;
   IntPoint m_panScrollIconPoint;
   bool m_drawPanScrollIcon;
 };
@@ -245,6 +244,10 @@ ScrollView::ScrollView() : m_data(new ScrollViewPrivate(this)) {}
 ScrollView::~ScrollView() {
   delete m_data;
 }
+
+void ScrollView::addChildPlatformWidget(PlatformWidget) {}
+
+void ScrollView::removeChildPlatformWidget(PlatformWidget) {}
 
 void ScrollView::updateContents(const IntRect& rect, bool now) {
   if (rect.isEmpty())
@@ -606,17 +609,6 @@ Scrollbar* ScrollView::scrollbarUnderMouse(
   return 0;
 }
 
-void ScrollView::addChild(Widget* child) {
-  child->setParent(this);
-  child->setContainingWindow(containingWindow());
-  m_data->m_children.add(child);
-}
-
-void ScrollView::removeChild(Widget* child) {
-  child->setParent(0);
-  m_data->m_children.remove(child);
-}
-
 void ScrollView::printPanScrollIcon(const IntPoint& iconPosition) {
   m_data->m_drawPanScrollIcon = true;
   m_data->m_panScrollIconPoint =
@@ -744,13 +736,9 @@ void ScrollView::wheelEvent(PlatformWheelEvent& e) {
   }
 }
 
-HashSet<Widget*>* ScrollView::children() {
-  return &(m_data->m_children);
-}
-
 void ScrollView::geometryChanged() const {
-  HashSet<Widget*>::const_iterator end = m_data->m_children.end();
-  for (HashSet<Widget*>::const_iterator current = m_data->m_children.begin();
+  HashSet<Widget*>::const_iterator end = m_children.end();
+  for (HashSet<Widget*>::const_iterator current = m_children.begin();
        current != end; ++current)
     (*current)->geometryChanged();
 }
@@ -811,9 +799,8 @@ void ScrollView::setParentVisible(bool visible) {
   Widget::setParentVisible(visible);
 
   if (isVisible()) {
-    HashSet<Widget*>::iterator end = m_data->m_children.end();
-    for (HashSet<Widget*>::iterator it = m_data->m_children.begin(); it != end;
-         ++it)
+    HashSet<Widget*>::iterator end = m_children.end();
+    for (HashSet<Widget*>::iterator it = m_children.begin(); it != end; ++it)
       (*it)->setParentVisible(visible);
   }
 }
@@ -822,9 +809,8 @@ void ScrollView::show() {
   if (!isSelfVisible()) {
     setSelfVisible(true);
     if (isParentVisible()) {
-      HashSet<Widget*>::iterator end = m_data->m_children.end();
-      for (HashSet<Widget*>::iterator it = m_data->m_children.begin();
-           it != end; ++it)
+      HashSet<Widget*>::iterator end = m_children.end();
+      for (HashSet<Widget*>::iterator it = m_children.begin(); it != end; ++it)
         (*it)->setParentVisible(true);
     }
   }
@@ -835,9 +821,8 @@ void ScrollView::show() {
 void ScrollView::hide() {
   if (isSelfVisible()) {
     if (isParentVisible()) {
-      HashSet<Widget*>::iterator end = m_data->m_children.end();
-      for (HashSet<Widget*>::iterator it = m_data->m_children.begin();
-           it != end; ++it)
+      HashSet<Widget*>::iterator end = m_children.end();
+      for (HashSet<Widget*>::iterator it = m_children.begin(); it != end; ++it)
         (*it)->setParentVisible(false);
     }
     setSelfVisible(false);
