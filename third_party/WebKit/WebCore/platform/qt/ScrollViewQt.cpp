@@ -156,7 +156,7 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
   IntRect updateRect = clipRect;
   updateRect.intersect(scrollViewRect);
 
-  if (canBlitOnScroll() && !m_view->root()->hasNativeWidgets()) {
+  if (m_view->canBlitOnScroll() && !m_view->root()->hasNativeWidgets()) {
     m_view->scrollBackingStore(-scrollDelta.width(), -scrollDelta.height(),
                                scrollViewRect, clipRect);
   } else {
