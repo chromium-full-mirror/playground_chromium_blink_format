@@ -921,7 +921,7 @@ void RenderLayer::scrollRectToVisible(const IntRect& rect,
     if (frameView) {
       if (m_object->document() && m_object->document()->ownerElement() &&
           m_object->document()->ownerElement()->renderer()) {
-        IntRect viewRect = enclosingIntRect(frameView->visibleContentRect());
+        IntRect viewRect = frameView->visibleContentRect();
         IntRect r = getRectToExpose(viewRect, rect, alignX, alignY);
 
         xOffset = r.x();
@@ -936,8 +936,7 @@ void RenderLayer::scrollRectToVisible(const IntRect& rect,
         newRect.setX(rect.x() - frameView->contentsX() + frameView->x());
         newRect.setY(rect.y() - frameView->contentsY() + frameView->y());
       } else {
-        IntRect viewRect = enclosingIntRect(
-            frameView->visibleContentRectConsideringExternalScrollers());
+        IntRect viewRect = frameView->visibleContentRect(true);
         IntRect r = getRectToExpose(viewRect, rect, alignX, alignY);
 
         // If this is the outermost view that RenderLayer needs to scroll, then
@@ -1893,7 +1892,7 @@ static inline IntRect frameVisibleRect(RenderObject* renderer) {
   if (!frameView)
     return IntRect();
 
-  return enclosingIntRect(frameView->visibleContentRect());
+  return frameView->visibleContentRect();
 }
 
 bool RenderLayer::hitTest(const HitTestRequest& request,
