@@ -53,12 +53,10 @@ CSSStyleSheet::CSSStyleSheet(CSSRule* ownerRule,
                              const String& href,
                              const String& charset)
     : StyleSheet(ownerRule, href),
+      m_doc(0),
       m_namespaces(0),
       m_charset(charset),
-      m_loadCompleted(false) {
-  CSSStyleSheet* parentSheet = ownerRule ? ownerRule->parentStyleSheet() : 0;
-  m_doc = parentSheet ? parentSheet->doc() : 0;
-}
+      m_loadCompleted(false) {}
 
 CSSStyleSheet::~CSSStyleSheet() {
   delete m_namespaces;
@@ -179,6 +177,14 @@ void CSSStyleSheet::checkLoaded() {
   if (parent())
     parent()->checkLoaded();
   m_loadCompleted = ownerNode() ? ownerNode()->sheetLoaded() : true;
+}
+
+DocLoader* CSSStyleSheet::docLoader() {
+  if (!m_doc)  // doc is 0 for the user- and default-sheet!
+    return 0;
+
+  // ### remove? (clients just use sheet->doc()->docLoader())
+  return m_doc->docLoader();
 }
 
 void CSSStyleSheet::styleSheetChanged() {
