@@ -186,7 +186,8 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
     m_view->updateWindowRect(panScrollIconDirtyRect);
   }
 
-  if (canBlitOnScroll())  // The main frame can just blit the WebView window
+  if (m_view->canBlitOnScroll())  // The main frame can just blit the WebView
+                                  // window
     // FIXME: Find a way to blit subframes without blitting overlapping content
     m_view->scrollBackingStore(-scrollDelta.width(), -scrollDelta.height(),
                                scrollViewRect, clipRect);
@@ -633,7 +634,7 @@ void ScrollView::paint(GraphicsContext* context, const IntRect& rect) {
   context->translate(-contentsX(), -contentsY());
   documentDirtyRect.move(contentsX(), contentsY());
 
-  context->clip(enclosingIntRect(visibleContentRect()));
+  context->clip(visibleContentRect());
 
   const FrameView* frameView = static_cast<const FrameView*>(this);
   frameView->frame()->paint(context, documentDirtyRect);
