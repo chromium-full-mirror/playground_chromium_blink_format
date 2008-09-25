@@ -1309,7 +1309,8 @@ PassRefPtr<Element> Node::querySelector(const String& selectors,
       p.m_defaultNamespace = defaultNamespace;
   }
 
-  std::auto_ptr<CSSSelector> querySelector = p.parseSelector(selectors);
+  std::auto_ptr<CSSSelector> querySelector =
+      p.parseSelector(selectors, document());
   if (!querySelector.get()) {
     ec = SYNTAX_ERR;
     return 0;
@@ -1375,7 +1376,8 @@ PassRefPtr<NodeList> Node::querySelectorAll(const String& selectors,
       p.m_defaultNamespace = defaultNamespace;
   }
 
-  std::auto_ptr<CSSSelector> querySelector = p.parseSelector(selectors);
+  std::auto_ptr<CSSSelector> querySelector =
+      p.parseSelector(selectors, document());
 
   if (!querySelector.get()) {
     ec = SYNTAX_ERR;

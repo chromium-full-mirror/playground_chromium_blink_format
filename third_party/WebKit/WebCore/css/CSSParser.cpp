@@ -310,8 +310,9 @@ bool CSSParser::parseColor(CSSMutableStyleDeclaration* declaration,
           m_parsedProperties[0]->m_id == CSSPropertyColor);
 }
 
-std::auto_ptr<CSSSelector> CSSParser::parseSelector(const String& string) {
-  RefPtr<CSSStyleSheet> dummyStyleSheet = CSSStyleSheet::create();
+std::auto_ptr<CSSSelector> CSSParser::parseSelector(const String& string,
+                                                    Document* doc) {
+  RefPtr<CSSStyleSheet> dummyStyleSheet = CSSStyleSheet::create(doc);
 
   m_styleSheet = dummyStyleSheet.get();
 

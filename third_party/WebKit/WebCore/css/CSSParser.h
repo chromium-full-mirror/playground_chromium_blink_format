@@ -133,7 +133,7 @@ class CSSParser {
                           bool parseAlpha);
   PassRefPtr<CSSPrimitiveValue> parseColor(CSSParserValue* = 0);
   bool parseColorFromValue(CSSParserValue*, RGBA32&, bool = false);
-  std::auto_ptr<CSSSelector> parseSelector(const String&);
+  std::auto_ptr<CSSSelector> parseSelector(const String&, Document* doc = 0);
 
   static bool parseColor(const String&, RGBA32& rgb, bool strict);
 
