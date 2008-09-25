@@ -97,9 +97,10 @@ void WebNodeHighlight::show() {
   if (!m_overlay) {
     registerOverlayClass();
 
-    m_overlay = ::CreateWindowEx(WS_EX_LAYERED | WS_EX_TOOLWINDOW,
-                                 kOverlayWindowClassName, 0, WS_POPUP, 0, 0, 0,
-                                 0, m_inspectedWebViewWindow, 0, 0, 0);
+    m_overlay =
+        ::CreateWindowEx(WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT,
+                         kOverlayWindowClassName, 0, WS_POPUP, 0, 0, 0, 0,
+                         m_inspectedWebViewWindow, 0, 0, 0);
     if (!m_overlay)
       return;
 
