@@ -1105,7 +1105,7 @@ void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
       page->inspectorController()->addMessageToConsole(
           JSMessageSource, LogMessageLevel,
           "XHR finished loading: \"" + m_url + "\".", m_lastSendLineNumber,
-          m_doc->url());
+          m_lastSendURL);
     }
   }
 
