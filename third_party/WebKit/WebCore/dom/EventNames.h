@@ -63,8 +63,8 @@ namespace EventNames {
                                                           macro(timeupdate) macro(                      \
                                                               volumechange) macro(waiting)              \
                                                                                                         \
-                                                              macro(begin) macro(                       \
-                                                                  progress) macro(stalled)              \
+                                                              macro(progress) macro(                    \
+                                                                  stalled)                              \
                                                                                                         \
                                                                   macro(                                \
                                                                       webkitAnimationEnd)               \
