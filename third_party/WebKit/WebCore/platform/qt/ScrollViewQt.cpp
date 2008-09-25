@@ -668,10 +668,10 @@ void ScrollView::wheelEvent(PlatformWheelEvent& e) {
                                 e.altKey(), e.metaKey(), 0);
   Scrollbar* scrollBar = scrollbarUnderMouse(mouseEvent);
 
-  if (scrollBar && scrollBar == verticalScrollBar()) {
+  if (scrollBar && scrollBar == verticalScrollbar()) {
     deltaY = (deltaY == 0 ? deltaX : deltaY);
     deltaX = 0;
-  } else if (scrollBar && scrollBar == horizontalScrollBar()) {
+  } else if (scrollBar && scrollBar == horizontalScrollbar()) {
     deltaX = (deltaX == 0 ? deltaY : deltaX);
     deltaY = 0;
   }
