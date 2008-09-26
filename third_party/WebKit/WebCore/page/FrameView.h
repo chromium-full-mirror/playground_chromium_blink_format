@@ -166,8 +166,6 @@ class FrameView : public ScrollView {
 
   virtual bool isFrameView() const;
 
-  bool scrollTo(const IntRect&);
-
   bool useSlowRepaints() const;
 
   void applyOverflowToViewport(RenderObject*,
