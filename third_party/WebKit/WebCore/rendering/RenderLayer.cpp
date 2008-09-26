@@ -933,8 +933,8 @@ void RenderLayer::scrollRectToVisible(const IntRect& rect,
         frameView->setContentsPos(xOffset, yOffset);
         parentLayer =
             m_object->document()->ownerElement()->renderer()->enclosingLayer();
-        newRect.setX(rect.x() - frameView->contentsX() + frameView->x());
-        newRect.setY(rect.y() - frameView->contentsY() + frameView->y());
+        newRect.setX(rect.x() - frameView->scrollX() + frameView->x());
+        newRect.setY(rect.y() - frameView->scrollY() + frameView->y());
       } else {
         IntRect viewRect = frameView->visibleContentRect(true);
         IntRect r = getRectToExpose(viewRect, rect, alignX, alignY);
@@ -2132,8 +2132,8 @@ void RenderLayer::calculateClipRects(const RenderLayer* rootLayer) {
     RenderView* view = renderer()->view();
     ASSERT(view);
     if (view && fixed && rootLayer->renderer() == view) {
-      x -= view->frameView()->contentsX();
-      y -= view->frameView()->contentsY();
+      x -= view->frameView()->scrollX();
+      y -= view->frameView()->scrollY();
     }
 
     if (m_object->hasOverflowClip()) {
@@ -2181,8 +2181,8 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
     RenderView* view = renderer()->view();
     ASSERT(view);
     if (view && parent()->clipRects()->fixed() && rootLayer->renderer() == view)
-      backgroundRect.move(view->frameView()->contentsX(),
-                          view->frameView()->contentsY());
+      backgroundRect.move(view->frameView()->scrollX(),
+                          view->frameView()->scrollY());
 
     backgroundRect.intersect(paintDirtyRect);
   } else

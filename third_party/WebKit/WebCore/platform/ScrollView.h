@@ -48,6 +48,10 @@ typedef struct HRGN__* HRGN;
 class wxScrollWinEvent;
 #endif
 
+// DANGER WILL ROBINSON! THIS FILE IS UNDERGOING HEAVY REFACTORING.
+// Everything is changing!
+// Port authors should wait until this refactoring is complete before attempting
+// to implement this interface.
 namespace WebCore {
 
 class PlatformWheelEvent;
@@ -68,15 +72,22 @@ class ScrollView : public Widget {
   void setCanBlitOnScroll(bool);
   bool canBlitOnScroll() const { return m_canBlitOnScroll; }
 
+  IntRect visibleContentRect(bool includeScrollbars = false) const;
   int visibleWidth() const { return visibleContentRect().width(); }
   int visibleHeight() const { return visibleContentRect().height(); }
-  IntRect visibleContentRect(bool includeScrollbars = false) const;
 
-  int contentsWidth() const;
-  int contentsHeight() const;
-  int contentsX() const;
-  int contentsY() const;
-  IntSize scrollOffset() const;
+  IntPoint scrollPosition() const { return visibleContentRect().location(); }
+  IntSize scrollOffset() const {
+    return visibleContentRect().location() - IntPoint();
+  }  // Gets the scrolled position as an IntSize. Convenient for adding to other
+     // sizes.
+  int scrollX() const { return scrollPosition().x(); }
+  int scrollY() const { return scrollPosition().y(); }
+
+  IntSize contentsSize() const;
+  int contentsWidth() const { return contentsSize().width(); }
+  int contentsHeight() const { return contentsSize().height(); }
+
   void scrollBy(int dx, int dy);
   virtual void scrollRectIntoViewRecursively(const IntRect&);
 
@@ -161,6 +172,10 @@ class ScrollView : public Widget {
  private:
   HashSet<Widget*> m_children;
   bool m_canBlitOnScroll;
+  IntSize m_scrollOffset;  // FIXME: Would rather store this as a position, but
+                           // we will wait to make this change until more code
+                           // is shared.
+  IntSize m_contentsSize;
 
   void init();
 
@@ -168,6 +183,7 @@ class ScrollView : public Widget {
   void platformRemoveChild(Widget*);
   void platformSetCanBlitOnScroll();
   IntRect platformVisibleContentRect(bool includeScrollbars) const;
+  IntSize platformContentsSize() const;
 
 #if PLATFORM(MAC) && defined __OBJC__
  public:
@@ -184,6 +200,8 @@ class ScrollView : public Widget {
 
   class ScrollViewPrivate;
   ScrollViewPrivate* m_data;
+
+  friend class ScrollViewPrivate;  // FIXME: Temporary.
 
 #if !PLATFORM(MAC) && !PLATFORM(WX)
  public:

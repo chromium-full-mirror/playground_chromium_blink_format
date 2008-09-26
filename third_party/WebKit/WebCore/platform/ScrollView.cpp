@@ -68,13 +68,20 @@ void ScrollView::setCanBlitOnScroll(bool b) {
 IntRect ScrollView::visibleContentRect(bool includeScrollbars) const {
   if (platformWidget())
     return platformVisibleContentRect(includeScrollbars);
-  return IntRect(contentsX(), contentsY(),
-                 max(0, width() - (verticalScrollbar() && includeScrollbars
-                                       ? verticalScrollbar()->width()
-                                       : 0)),
-                 max(0, height() - (horizontalScrollbar() && includeScrollbars
-                                        ? horizontalScrollbar()->height()
-                                        : 0)));
+  return IntRect(
+      IntPoint(m_scrollOffset.width(), m_scrollOffset.height()),
+      IntSize(max(0, width() - (verticalScrollbar() && includeScrollbars
+                                    ? verticalScrollbar()->width()
+                                    : 0)),
+              max(0, height() - (horizontalScrollbar() && includeScrollbars
+                                     ? horizontalScrollbar()->height()
+                                     : 0))));
+}
+
+IntSize ScrollView::contentsSize() const {
+  if (platformWidget())
+    return platformContentsSize();
+  return m_contentsSize;
 }
 
 #if !PLATFORM(MAC)
@@ -84,6 +91,10 @@ void ScrollView::platformSetCanBlitOnScroll() {}
 #if !PLATFORM(MAC) && !PLATFORM(WX)
 IntRect ScrollView::platformVisibleContentRect(bool) const {
   return IntRect();
+}
+
+IntSize ScrollView::platformContentsSize() const {
+  return IntSize();
 }
 #endif
 }
