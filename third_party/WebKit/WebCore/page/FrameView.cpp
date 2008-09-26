@@ -202,8 +202,7 @@ void FrameView::resetScrollbars() {
   // floor.
   d->m_firstLayout = true;
   suppressScrollbars(true);
-  ScrollView::setVScrollbarMode(d->m_vmode);
-  ScrollView::setHScrollbarMode(d->m_hmode);
+  setScrollbarModes(d->m_hmode, d->m_vmode);
   suppressScrollbars(false);
 }
 
@@ -232,7 +231,9 @@ void FrameView::initScrollbars() {
   if (!d->m_needToInitScrollbars)
     return;
   d->m_needToInitScrollbars = false;
-  setScrollbarsMode(hScrollbarMode());
+  d->m_hmode = horizontalScrollbarMode();
+  d->m_vmode = verticalScrollbarMode();
+  setScrollbarModes(d->m_hmode, d->m_vmode);
 }
 
 void FrameView::setMarginWidth(int w) {
@@ -434,8 +435,8 @@ void FrameView::layout(bool allowSubtree) {
 
   if (!subtree) {
     // Now set our scrollbar state for the layout.
-    ScrollbarMode currentHMode = hScrollbarMode();
-    ScrollbarMode currentVMode = vScrollbarMode();
+    ScrollbarMode currentHMode = horizontalScrollbarMode();
+    ScrollbarMode currentVMode = verticalScrollbarMode();
 
     if (d->m_firstLayout || (hMode != currentHMode || vMode != currentVMode)) {
       suppressScrollbars(true);
@@ -447,25 +448,17 @@ void FrameView::layout(bool allowSubtree) {
 
         // Set the initial vMode to AlwaysOn if we're auto.
         if (vMode == ScrollbarAuto)
-          ScrollView::setVScrollbarMode(ScrollbarAlwaysOn);  // This causes a
-                                                             // vertical
-                                                             // scrollbar to
-                                                             // appear.
+          setVerticalScrollbarMode(ScrollbarAlwaysOn);  // This causes a
+                                                        // vertical scrollbar to
+                                                        // appear.
         // Set the initial hMode to AlwaysOff if we're auto.
         if (hMode == ScrollbarAuto)
-          ScrollView::setHScrollbarMode(ScrollbarAlwaysOff);  // This causes a
-                                                              // horizontal
-                                                              // scrollbar to
-                                                              // disappear.
+          setHorizontalScrollbarMode(ScrollbarAlwaysOff);  // This causes a
+                                                           // horizontal
+                                                           // scrollbar to
+                                                           // disappear.
       }
-
-      if (hMode == vMode)
-        ScrollView::setScrollbarsMode(hMode);
-      else {
-        ScrollView::setHScrollbarMode(hMode);
-        ScrollView::setVScrollbarMode(vMode);
-      }
-
+      setScrollbarModes(hMode, vMode);
       suppressScrollbars(false, true);
     }
 
@@ -593,23 +586,6 @@ void FrameView::removeSlowRepaintObject() {
   d->m_slowRepaintObjectCount--;
   if (!d->m_slowRepaintObjectCount)
     setCanBlitOnScroll(!d->m_useSlowRepaints);
-}
-
-void FrameView::setScrollbarsMode(ScrollbarMode mode) {
-  d->m_vmode = mode;
-  d->m_hmode = mode;
-
-  ScrollView::setScrollbarsMode(mode);
-}
-
-void FrameView::setVScrollbarMode(ScrollbarMode mode) {
-  d->m_vmode = mode;
-  ScrollView::setVScrollbarMode(mode);
-}
-
-void FrameView::setHScrollbarMode(ScrollbarMode mode) {
-  d->m_hmode = mode;
-  ScrollView::setHScrollbarMode(mode);
 }
 
 void FrameView::restoreScrollbar() {

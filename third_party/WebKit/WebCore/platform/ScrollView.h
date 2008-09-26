@@ -27,6 +27,7 @@
 #define ScrollView_h
 
 #include "IntRect.h"
+#include "Scrollbar.h"
 #include "ScrollTypes.h"
 #include "Widget.h"
 
@@ -70,8 +71,40 @@ class ScrollView : public Widget {
   // If the scroll view does not use a native widget, then it will have
   // cross-platform Scrollbars.  These methods
   // can be used to obtain those scrollbars.
-  Scrollbar* horizontalScrollbar() const;
-  Scrollbar* verticalScrollbar() const;
+  Scrollbar* horizontalScrollbar() const { return m_horizontalScrollbar.get(); }
+  Scrollbar* verticalScrollbar() const { return m_verticalScrollbar.get(); }
+  bool isScrollViewScrollbar(const Widget* child) const {
+    return horizontalScrollbar() == child || verticalScrollbar() == child;
+  }
+
+  // Methods for setting and retrieving the scrolling mode in each axis
+  // (horizontal/vertical).  The mode has values of
+  // AlwaysOff, AlwaysOn, and Auto.  AlwaysOff means never show a scrollbar,
+  // AlwaysOn means always show a scrollbar.
+  // Auto means show a scrollbar only when one is needed.
+  // Note that for platforms with native widgets, these modes are considered
+  // advisory.  In other words the underlying native
+  // widget may choose not to honor the requested modes.
+  void setScrollbarModes(ScrollbarMode horizontalMode,
+                         ScrollbarMode verticalMode);
+  void setHorizontalScrollbarMode(ScrollbarMode mode) {
+    setScrollbarModes(mode, verticalScrollbarMode());
+  }
+  void setVerticalScrollbarMode(ScrollbarMode mode) {
+    setScrollbarModes(horizontalScrollbarMode(), mode);
+  }
+  void scrollbarModes(ScrollbarMode& horizontalMode,
+                      ScrollbarMode& verticalMode) const;
+  ScrollbarMode horizontalScrollbarMode() const {
+    ScrollbarMode horizontal, vertical;
+    scrollbarModes(horizontal, vertical);
+    return horizontal;
+  }
+  ScrollbarMode verticalScrollbarMode() const {
+    ScrollbarMode horizontal, vertical;
+    scrollbarModes(horizontal, vertical);
+    return vertical;
+  }
 
   // Whether or not a scroll view will blit visible contents when it is
   // scrolled.  Blitting is disabled in situations
@@ -118,20 +151,9 @@ class ScrollView : public Widget {
   }
   void scrollRectIntoViewRecursively(const IntRect&);
 
-  virtual void setVScrollbarMode(ScrollbarMode);
-  virtual void setHScrollbarMode(ScrollbarMode);
-
-  // Set the mode for both scrollbars at once.
-  virtual void setScrollbarsMode(ScrollbarMode);
-
   // This gives us a means of blocking painting on our scrollbars until the
   // first layout has occurred.
   void suppressScrollbars(bool suppressed, bool repaintOnUnsuppress = false);
-
-  ScrollbarMode vScrollbarMode() const;
-  ScrollbarMode hScrollbarMode() const;
-
-  bool isScrollable();
 
   // Event coordinates are assumed to be in the coordinate space of a window
   // that contains
@@ -178,8 +200,6 @@ class ScrollView : public Widget {
     return newPoint;
   }
 
-  bool isScrollViewScrollbar(const Widget*) const;
-
 #if HAVE(ACCESSIBILITY)
   IntRect contentsToScreen(const IntRect&) const;
   IntPoint screenToContents(const IntPoint&) const;
@@ -193,6 +213,11 @@ class ScrollView : public Widget {
   void update();
 
  private:
+  RefPtr<Scrollbar> m_horizontalScrollbar;
+  RefPtr<Scrollbar> m_verticalScrollbar;
+  ScrollbarMode m_horizontalScrollbarMode;
+  ScrollbarMode m_verticalScrollbarMode;
+
   HashSet<Widget*> m_children;
   bool m_canBlitOnScroll;
   IntSize m_scrollOffset;  // FIXME: Would rather store this as a position, but
@@ -204,6 +229,9 @@ class ScrollView : public Widget {
 
   void platformAddChild(Widget*);
   void platformRemoveChild(Widget*);
+  void platformSetScrollbarModes();
+  void platformScrollbarModes(ScrollbarMode& horizontal,
+                              ScrollbarMode& vertical) const;
   void platformSetCanBlitOnScroll();
   IntRect platformVisibleContentRect(bool includeScrollbars) const;
   IntSize platformContentsSize() const;

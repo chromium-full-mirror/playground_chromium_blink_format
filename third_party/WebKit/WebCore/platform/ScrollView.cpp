@@ -34,6 +34,7 @@ namespace WebCore {
 
 void ScrollView::init() {
   m_canBlitOnScroll = true;
+  m_horizontalScrollbarMode = m_verticalScrollbarMode = ScrollbarAuto;
   if (platformWidget())
     platformSetCanBlitOnScroll();
 }
@@ -55,6 +56,26 @@ void ScrollView::removeChild(Widget* child) {
   m_children.remove(child);
   if (child->platformWidget())
     platformRemoveChild(child);
+}
+
+void ScrollView::setScrollbarModes(ScrollbarMode horizontalMode,
+                                   ScrollbarMode verticalMode) {
+  m_horizontalScrollbarMode = horizontalMode;
+  m_verticalScrollbarMode = verticalMode;
+  if (platformWidget())
+    platformSetScrollbarModes();
+  else
+    updateScrollbars(scrollOffset());
+}
+
+void ScrollView::scrollbarModes(ScrollbarMode& horizontalMode,
+                                ScrollbarMode& verticalMode) const {
+  if (platformWidget()) {
+    platformScrollbarModes(horizontalMode, verticalMode);
+    return;
+  }
+  horizontalMode = m_horizontalScrollbarMode;
+  verticalMode = m_verticalScrollbarMode;
 }
 
 void ScrollView::setCanBlitOnScroll(bool b) {
@@ -116,6 +137,11 @@ void ScrollView::platformSetCanBlitOnScroll() {}
 #endif
 
 #if !PLATFORM(MAC) && !PLATFORM(WX)
+void ScrollView::platformSetScrollbarModes() {}
+
+void ScrollView::platformScrollbarModes(ScrollbarMode& horizontal,
+                                        ScrollbarMode& vertical) const {}
+
 IntRect ScrollView::platformVisibleContentRect(bool) const {
   return IntRect();
 }
