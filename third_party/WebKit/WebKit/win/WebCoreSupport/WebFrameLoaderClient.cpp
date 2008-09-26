@@ -578,7 +578,7 @@ PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
       ownerElement->hasTagName(iframeTag)) {
     HTMLFrameElement* frameElt = static_cast<HTMLFrameElement*>(ownerElement);
     if (frameElt->scrollingMode() == ScrollbarAlwaysOff)
-      result->view()->setScrollbarsMode(ScrollbarAlwaysOff);
+      result->view()->setScrollbarModes(ScrollbarAlwaysOff, ScrollbarAlwaysOff);
     int marginWidth = frameElt->getMarginWidth();
     int marginHeight = frameElt->getMarginHeight();
     if (marginWidth != -1)
