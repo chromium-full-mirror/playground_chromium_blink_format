@@ -395,8 +395,13 @@ void EditorClientQt::handleKeyboardEvent(KeyboardEvent* event) {
         return;
       default:
         if (kevent->type() != PlatformKeyboardEvent::KeyDown &&
-            !kevent->ctrlKey() && !kevent->altKey() &&
-            !kevent->text().isEmpty()) {
+            !kevent->ctrlKey()
+#ifndef Q_WS_MAC
+            // We need to exclude checking for Alt because it is just a
+            // different Shift
+            && !kevent->altKey()
+#endif
+            && !kevent->text().isEmpty()) {
           frame->editor()->insertText(kevent->text(), event);
         } else if (kevent->ctrlKey()) {
           switch (kevent->windowsVirtualKeyCode()) {
