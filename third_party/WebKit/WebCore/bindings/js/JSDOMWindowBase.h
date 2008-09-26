@@ -160,7 +160,7 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
   void clearAllTimeouts();
 
   JSDOMStructureMap& structures() { return d()->structures; }
-  JSDOMConstructorMap& constructors() { return d()->constructors; }
+  JSDOMConstructorMap& constructors() const { return d()->constructors; }
 
   enum {
     // Attributes
