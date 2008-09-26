@@ -3183,26 +3183,28 @@ void Document::setInPageCache(bool flag) {
   }
 }
 
-void Document::willSaveToCache() {
-  HashSet<Element*>::iterator end = m_pageCacheCallbackElements.end();
-  for (HashSet<Element*>::iterator i = m_pageCacheCallbackElements.begin();
+void Document::documentWillBecomeInactive() {
+  HashSet<Element*>::iterator end = m_documentActivationCallbackElements.end();
+  for (HashSet<Element*>::iterator i =
+           m_documentActivationCallbackElements.begin();
        i != end; ++i)
-    (*i)->willSaveToCache();
+    (*i)->documentWillBecomeInactive();
 }
 
-void Document::didRestoreFromCache() {
-  HashSet<Element*>::iterator end = m_pageCacheCallbackElements.end();
-  for (HashSet<Element*>::iterator i = m_pageCacheCallbackElements.begin();
+void Document::documentDidBecomeActive() {
+  HashSet<Element*>::iterator end = m_documentActivationCallbackElements.end();
+  for (HashSet<Element*>::iterator i =
+           m_documentActivationCallbackElements.begin();
        i != end; ++i)
-    (*i)->didRestoreFromCache();
+    (*i)->documentDidBecomeActive();
 }
 
-void Document::registerForCacheCallbacks(Element* e) {
-  m_pageCacheCallbackElements.add(e);
+void Document::registerForDocumentActivationCallbacks(Element* e) {
+  m_documentActivationCallbackElements.add(e);
 }
 
-void Document::unregisterForCacheCallbacks(Element* e) {
-  m_pageCacheCallbackElements.remove(e);
+void Document::unregisterForDocumentActivationCallbacks(Element* e) {
+  m_documentActivationCallbackElements.remove(e);
 }
 
 void Document::setShouldCreateRenderers(bool f) {

@@ -121,7 +121,7 @@ class HTMLFormElement : public HTMLElement {
 
   CheckedRadioButtons& checkedRadioButtons() { return m_checkedRadioButtons; }
 
-  virtual void didRestoreFromCache();
+  virtual void documentDidBecomeActive();
 
  protected:
   virtual void willMoveToNewOwnerDocument();

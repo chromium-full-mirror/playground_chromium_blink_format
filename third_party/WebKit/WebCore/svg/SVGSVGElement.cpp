@@ -70,11 +70,11 @@ SVGSVGElement::SVGSVGElement(const QualifiedName& tagName, Document* doc)
       m_viewSpec(0),
       m_containerSize(300, 150),
       m_hasSetContainerSize(false) {
-  doc->registerForCacheCallbacks(this);
+  doc->registerForDocumentActivationCallbacks(this);
 }
 
 SVGSVGElement::~SVGSVGElement() {
-  document()->unregisterForCacheCallbacks(this);
+  document()->unregisterForDocumentActivationCallbacks(this);
   // There are cases where removedFromDocument() is not called.
   // see ContainerNode::removeAllChildren, called by it's destructor.
   document()->accessSVGExtensions()->removeTimeContainer(this);
@@ -481,11 +481,11 @@ void SVGSVGElement::inheritViewAttributes(SVGViewElement* viewElement) {
   renderer()->setNeedsLayout(true);
 }
 
-void SVGSVGElement::willSaveToCache() {
+void SVGSVGElement::documentWillBecomeInactive() {
   pauseAnimations();
 }
 
-void SVGSVGElement::willRestoreFromCache() {
+void SVGSVGElement::documentDidBecomeActive() {
   unpauseAnimations();
 }
 }

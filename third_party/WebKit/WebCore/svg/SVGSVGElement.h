@@ -174,8 +174,8 @@ class SVGSVGElement : public SVGStyledLocatableElement,
                                  Height,
                                  height)
 
-  virtual void willSaveToCache();
-  virtual void willRestoreFromCache();
+  virtual void documentWillBecomeInactive();
+  virtual void documentDidBecomeActive();
 
   bool m_useCurrentView;
   RefPtr<SMILTimeContainer> m_timeContainer;

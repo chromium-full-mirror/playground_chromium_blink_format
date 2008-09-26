@@ -80,7 +80,7 @@ HTMLFormElement::HTMLFormElement(Document* doc)
 
 HTMLFormElement::~HTMLFormElement() {
   if (!m_autocomplete)
-    document()->unregisterForCacheCallbacks(this);
+    document()->unregisterForDocumentActivationCallbacks(this);
 
   delete m_elementAliases;
   delete collectionInfo;
@@ -562,9 +562,9 @@ void HTMLFormElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == autocompleteAttr) {
     m_autocomplete = !equalIgnoringCase(attr->value(), "off");
     if (!m_autocomplete)
-      document()->registerForCacheCallbacks(this);
+      document()->registerForDocumentActivationCallbacks(this);
     else
-      document()->unregisterForCacheCallbacks(this);
+      document()->unregisterForDocumentActivationCallbacks(this);
   } else if (attr->name() == onsubmitAttr)
     setEventListenerForTypeAndAttribute(submitEvent, attr);
   else if (attr->name() == onresetAttr)
@@ -721,7 +721,7 @@ void HTMLFormElement::getNamedElements(const AtomicString& name,
         static_cast<HTMLFormControlElement*>(namedItems.first().get()), name);
 }
 
-void HTMLFormElement::didRestoreFromCache() {
+void HTMLFormElement::documentDidBecomeActive() {
   ASSERT(!m_autocomplete);
 
   for (unsigned i = 0; i < formElements.size(); ++i)
@@ -730,12 +730,12 @@ void HTMLFormElement::didRestoreFromCache() {
 
 void HTMLFormElement::willMoveToNewOwnerDocument() {
   if (!m_autocomplete)
-    document()->unregisterForCacheCallbacks(this);
+    document()->unregisterForDocumentActivationCallbacks(this);
 }
 
 void HTMLFormElement::didMoveToNewOwnerDocument() {
   if (m_autocomplete)
-    document()->registerForCacheCallbacks(this);
+    document()->registerForDocumentActivationCallbacks(this);
 }
 
 void HTMLFormElement::CheckedRadioButtons::addButton(

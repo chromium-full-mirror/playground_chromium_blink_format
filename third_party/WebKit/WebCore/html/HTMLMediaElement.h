@@ -65,7 +65,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   // Pauses playback without changing any states or generating events
   void setPausedInternal(bool);
 
-  bool inPageCache() const { return m_inPageCache; }
+  bool inActiveDocument() const { return m_inActiveDocument; }
 
   // DOM API
   // error state
@@ -143,8 +143,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   float getTimeOffsetAttribute(const QualifiedName&, float valueOnError) const;
   void setTimeOffsetAttribute(const QualifiedName&, float value);
 
-  virtual void willSaveToCache();
-  virtual void didRestoreFromCache();
+  virtual void documentWillBecomeInactive();
+  virtual void documentDidBecomeActive();
 
   void initAndDispatchProgressEvent(const AtomicString& eventName);
   void dispatchEventAsync(const AtomicString& eventName);
@@ -210,7 +210,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   unsigned m_terminateLoadBelowNestingLevel;
 
   bool m_pausedInternal;
-  bool m_inPageCache;
+  bool m_inActiveDocument;
 
   OwnPtr<MediaPlayer> m_player;
 };
