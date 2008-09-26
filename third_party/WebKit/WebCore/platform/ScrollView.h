@@ -109,7 +109,9 @@ class ScrollView : public Widget {
   int scrollX() const { return scrollPosition().x(); }
   int scrollY() const { return scrollPosition().y(); }
 
-  // Methods for scrolling the view.
+  // Methods for scrolling the view.  setScrollPosition is the only method that
+  // really scrolls the view.  The other two methods are helper functions
+  // that ultimately end up calling setScrollPosition.
   void setScrollPosition(const IntPoint&);
   void scrollBy(const IntSize& s) {
     return setScrollPosition(scrollPosition() + s);
