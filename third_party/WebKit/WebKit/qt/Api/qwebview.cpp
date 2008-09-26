@@ -173,6 +173,9 @@ QWebView::QWebView(QWidget* parent) : QWidget(parent) {
     Destroys the web view.
 */
 QWebView::~QWebView() {
+  if (d->page)
+    d->page->d->view = 0;
+
   if (d->page && d->page->parent() == this)
     delete d->page;
   delete d;
