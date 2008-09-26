@@ -1299,6 +1299,7 @@ void InspectorController::clearConsoleMessages() {
   deleteAllValues(m_consoleMessages);
   m_consoleMessages.clear();
   m_previousMessage = 0;
+  m_groupLevel = 0;
 }
 
 void InspectorController::toggleRecordButton(bool isProfiling) {
@@ -2293,9 +2294,7 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
   if (loader->frame() == m_inspectedPage->mainFrame()) {
     m_client->inspectedURLChanged(loader->url().string());
 
-    deleteAllValues(m_consoleMessages);
-    m_consoleMessages.clear();
-    m_groupLevel = 0;
+    clearConsoleMessages();
 
     m_times.clear();
     m_counts.clear();
