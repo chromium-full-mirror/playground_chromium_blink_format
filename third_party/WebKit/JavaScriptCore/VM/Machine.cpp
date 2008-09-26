@@ -1132,9 +1132,7 @@ JSValue* Machine::execute(FunctionBodyNode* functionBodyNode,
       CTI::execute(newCodeBlock->ctiCode, &newExec, &m_registerFile, r,
                    scopeChain, newCodeBlock, exception);
 #else
-  setScopeChain(
-      &newExec, scopeChain,
-      scopeChainForCall(exec, functionBodyNode, newCodeBlock, scopeChain, r));
+  setScopeChain(&newExec, scopeChain, scopeChain);
   JSValue* result = privateExecute(Normal, &newExec, &m_registerFile, r,
                                    scopeChain, newCodeBlock, exception);
 #endif
@@ -3618,9 +3616,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
               ->willExecute(exec, static_cast<JSObject*>(v));
 
         codeBlock = newCodeBlock;
-        setScopeChain(exec, scopeChain,
-                      scopeChainForCall(exec, functionBodyNode, codeBlock,
-                                        callDataScopeChain, r));
+        setScopeChain(exec, scopeChain, callDataScopeChain);
         vPC = codeBlock->instructions.begin();
 
 #if DUMP_OPCODE_STATS
@@ -3723,6 +3719,24 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       ++vPC;
       NEXT_OPCODE;
     }
+    BEGIN_OPCODE(op_init_activation) {
+      size_t i = 0;
+
+      for (size_t count = codeBlock->numVars; i < count; ++i)
+        r[i] = jsUndefined();
+
+      for (size_t count = codeBlock->constantRegisters.size(), j = 0; j < count;
+           ++i, ++j)
+        r[i] = codeBlock->constantRegisters[j];
+
+      JSActivation* activation = new (exec) JSActivation(
+          exec, static_cast<FunctionBodyNode*>(codeBlock->ownerNode), r);
+      r[RegisterFile::OptionalCalleeActivation] = activation;
+      setScopeChain(exec, scopeChain, scopeChain->copy()->push(activation));
+
+      ++vPC;
+      NEXT_OPCODE;
+    }
     BEGIN_OPCODE(op_construct) {
       /* construct dst(r) constr(r) constrProto(r) firstArg(r) argCount(n)
          registerOffset(n)
@@ -3788,9 +3802,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
               ->didExecute(exec, static_cast<JSObject*>(v));
 
         codeBlock = newCodeBlock;
-        setScopeChain(exec, scopeChain,
-                      scopeChainForCall(exec, functionBodyNode, codeBlock,
-                                        callDataScopeChain, r));
+        setScopeChain(exec, scopeChain, callDataScopeChain);
         vPC = codeBlock->instructions.begin();
 
 #if DUMP_OPCODE_STATS
@@ -4881,16 +4893,17 @@ void* Machine::cti_vm_compile(CTI_ARGS) {
   return codeBlock->ctiCode;
 }
 
-void Machine::cti_vm_updateScopeChain(CTI_ARGS) {
+void Machine::cti_op_push_activation(CTI_ARGS) {
   ExecState* exec = ARG_exec;
   CodeBlock* codeBlock = ARG_codeBlock;
   ScopeChainNode* scopeChain = ARG_scopeChain;
+  Register* r = ARG_r;
 
-  exec->machine()->setScopeChain(
-      exec, scopeChain, scopeChainForCall(exec, static_cast<FunctionBodyNode*>(
-                                                    codeBlock->ownerNode),
-                                          codeBlock, scopeChain, ARG_r));
+  JSActivation* activation = new (exec) JSActivation(
+      exec, static_cast<FunctionBodyNode*>(codeBlock->ownerNode), r);
+  r[RegisterFile::OptionalCalleeActivation] = activation;
 
+  setScopeChain(exec, scopeChain, scopeChain->copy()->push(activation));
   ARG_setScopeChain(scopeChain);
 }
 

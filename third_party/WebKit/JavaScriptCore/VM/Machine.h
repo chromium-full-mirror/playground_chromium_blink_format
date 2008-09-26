@@ -241,7 +241,7 @@ class Machine {
 
   static void* SFX_CALL cti_vm_throw(CTI_ARGS);
   static void* SFX_CALL cti_vm_compile(CTI_ARGS);
-  static void SFX_CALL cti_vm_updateScopeChain(CTI_ARGS);
+  static void SFX_CALL cti_op_push_activation(CTI_ARGS);
 
 #endif  // ENABLE(CTI)
 
@@ -284,9 +284,9 @@ class Machine {
                                                 int argc,
                                                 JSValue* function);
 
-  ALWAYS_INLINE void setScopeChain(ExecState* exec,
-                                   ScopeChainNode*&,
-                                   ScopeChainNode*);
+  ALWAYS_INLINE static void setScopeChain(ExecState* exec,
+                                          ScopeChainNode*&,
+                                          ScopeChainNode*);
   NEVER_INLINE void debug(ExecState*,
                           const CodeBlock*,
                           ScopeChainNode*,

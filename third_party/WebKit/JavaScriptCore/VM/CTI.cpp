@@ -1930,6 +1930,20 @@ void CTI::privateCompileMainPass() {
         i += 1;
         break;
       }
+      case op_init_activation: {
+        emitCall(i, Machine::cti_op_push_activation);
+
+        // Even though CTI doesn't use them, we initialize our constant
+        // registers to zap stale pointers, to avoid unnecessarily prolonging
+        // object lifetime and increasing GC pressure.
+        size_t count =
+            m_codeBlock->numVars + m_codeBlock->constantRegisters.size();
+        for (size_t j = 0; j < count; ++j)
+          emitInitRegister(j);
+
+        i += 1;
+        break;
+      }
       case op_get_array_length:
       case op_get_by_id_chain:
       case op_get_by_id_generic:
@@ -2478,14 +2492,6 @@ void CTI::privateCompile() {
   emitGetCTIParam(CTI_ARGS_r, X86::edi);  // edi := r
   emitPutToCallFrameHeader(X86::ecx, RegisterFile::ReturnPC);
 
-  // Lazy copy of the scopeChain
-  X86Assembler::JmpSrc callToUpdateScopeChain;
-  if ((m_codeBlock->codeType == FunctionCode) &&
-      m_codeBlock->needsFullScopeChain) {
-    m_jit.emitRestoreArgumentReference();
-    callToUpdateScopeChain = m_jit.emitCall();
-  }
-
   privateCompileMainPass();
   privateCompileLinkPass();
   privateCompileSlowCases();
@@ -2556,11 +2562,6 @@ void CTI::privateCompile() {
     m_codeBlock->ctiReturnAddressVPCMap.add(
         m_jit.getRelocatedAddress(code, iter->from), iter->opcodeIndex);
   }
-
-  if ((m_codeBlock->codeType == FunctionCode) &&
-      m_codeBlock->needsFullScopeChain)
-    X86Assembler::link(code, callToUpdateScopeChain,
-                       (void*)Machine::cti_vm_updateScopeChain);
 
   // Link absolute addresses for jsr
   for (Vector<JSRInfo>::iterator iter = m_jsrSites.begin();
