@@ -57,8 +57,10 @@ using namespace EventNames;
 
 static HashSet<EventTargetNode*>* gNodesDispatchingSimulatedClicks = 0;
 
-EventTargetNode::EventTargetNode(Document* doc, bool isElement)
-    : Node(doc, isElement), m_regdListeners(0) {}
+EventTargetNode::EventTargetNode(Document* doc,
+                                 bool isElement,
+                                 bool isContainer)
+    : Node(doc, isElement, isContainer), m_regdListeners(0) {}
 
 EventTargetNode::~EventTargetNode() {
   if (m_regdListeners && !m_regdListeners->isEmpty() && !inDocument())

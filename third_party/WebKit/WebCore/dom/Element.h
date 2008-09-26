@@ -224,13 +224,6 @@ class Element : public ContainerNode {
   unsigned childElementCount() const;
 
  private:
-  bool hasRareData() const { return m_hasRareData; }
-  void setHasRareData(bool b = true) { m_hasRareData = b; }
-
-  ElementRareData* rareData();
-  const ElementRareData* rareData() const;
-  ElementRareData* createRareData();
-
   virtual void createAttributeMap() const;
 
   virtual void updateStyleAttribute() const {}
@@ -246,8 +239,13 @@ class Element : public ContainerNode {
 
  private:
   QualifiedName m_tagName;
+  virtual NodeRareData* createRareData();
 
  protected:
+  ElementRareData* rareData();
+  const ElementRareData* rareData() const;
+  ElementRareData* ensureRareData();
+
   mutable RefPtr<NamedAttrMap> namedAttrMap;
 
   // These two bits are really used by the StyledElement subclass, but they are
@@ -265,7 +263,6 @@ class Element : public ContainerNode {
 
  private:
   bool m_parsingChildrenFinished : 1;
-  bool m_hasRareData : 1;
 };
 
 }  // namespace

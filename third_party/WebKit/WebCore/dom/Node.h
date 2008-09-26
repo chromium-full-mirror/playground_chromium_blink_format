@@ -56,8 +56,7 @@ class RenderArena;
 class RenderObject;
 class RenderStyle;
 class StringBuilder;
-
-struct NodeListsNodeData;
+class NodeRareData;
 
 typedef int ExceptionCode;
 
@@ -105,7 +104,7 @@ class Node : public TreeShared<Node> {
   enum StyleChange { NoChange, NoInherit, Inherit, Detach, Force };
   static StyleChange diff(RenderStyle*, RenderStyle*);
 
-  Node(Document*, bool isElement = false);
+  Node(Document*, bool isElement = false, bool isContainer = false);
   virtual ~Node();
 
   // DOM methods & attributes for Node
@@ -122,8 +121,12 @@ class Node : public TreeShared<Node> {
   Node* previousSibling() const { return m_previous; }
   Node* nextSibling() const { return m_next; }
   virtual PassRefPtr<NodeList> childNodes();
-  Node* firstChild() const { return virtualFirstChild(); }
-  Node* lastChild() const { return virtualLastChild(); }
+  Node* firstChild() const {
+    return isContainerNode() ? containerFirstChild() : 0;
+  }
+  Node* lastChild() const {
+    return isContainerNode() ? containerLastChild() : 0;
+  }
   virtual bool hasAttributes() const;
   virtual NamedAttrMap* attributes() const;
 
@@ -175,6 +178,7 @@ class Node : public TreeShared<Node> {
   // Other methods (not part of DOM)
 
   bool isElementNode() const { return m_isElement; }
+  bool isContainerNode() const { return m_isContainer; }
   virtual bool isHTMLElement() const { return false; }
 
 #if ENABLE(SVG)
@@ -283,7 +287,7 @@ class Node : public TreeShared<Node> {
   bool inActiveChain() const { return m_inActiveChain; }
   bool inDetach() const { return m_inDetach; }
   bool hovered() const { return m_hovered; }
-  bool focused() const { return m_focused; }
+  bool focused() const { return hasRareData() ? rareDataFocused() : false; }
   bool attached() const { return m_attached; }
   void setAttached(bool b = true) { m_attached = b; }
   bool changed() const { return m_styleChange != NoStyleChange; }
@@ -306,11 +310,11 @@ class Node : public TreeShared<Node> {
   void lazyAttach();
   virtual bool canLazyAttach();
 
-  virtual void setFocus(bool b = true) { m_focused = b; }
+  virtual void setFocus(bool b = true);
   virtual void setActive(bool b = true, bool pause = false) { m_active = b; }
   virtual void setHovered(bool b = true) { m_hovered = b; }
 
-  virtual short tabIndex() const { return m_tabIndex; }
+  virtual short tabIndex() const;
 
   /**
    * Whether this node can receive the keyboard focus.
@@ -365,8 +369,12 @@ class Node : public TreeShared<Node> {
 
   bool isReadOnlyNode() const { return nodeType() == ENTITY_REFERENCE_NODE; }
   virtual bool childTypeAllowed(NodeType) { return false; }
-  virtual unsigned childNodeCount() const;
-  virtual Node* childNode(unsigned index) const;
+  unsigned childNodeCount() const {
+    return isContainerNode() ? containerChildNodeCount() : 0;
+  }
+  Node* childNode(unsigned index) const {
+    return isContainerNode() ? containerChildNode(index) : 0;
+  }
 
   /**
    * Does a pre-order traversal of the tree to find the node next node after
@@ -574,22 +582,29 @@ class Node : public TreeShared<Node> {
   virtual void didMoveToNewOwnerDocument() {}
 
   virtual void getSubresourceAttributeStrings(Vector<String>&) const {}
-  void setTabIndexExplicitly(short i) {
-    m_tabIndex = i;
-    m_tabIndexSetExplicitly = true;
-  }
+  void setTabIndexExplicitly(short i);
+
+  bool hasRareData() const { return m_hasRareData; }
+
+  NodeRareData* rareData();
+  const NodeRareData* rareData() const;
+  NodeRareData* ensureRareData();
+
+  virtual bool virtualHasTagName(const QualifiedName&) const;
 
  private:
+  virtual NodeRareData* createRareData();
+  Node* containerChildNode(unsigned index) const;
+  unsigned containerChildNodeCount() const;
+  Node* containerFirstChild() const;
+  Node* containerLastChild() const;
+  bool rareDataFocused() const;
   virtual RenderStyle* nonRendererRenderStyle() const;
 
   DocPtr<Document> m_document;
   Node* m_previous;
   Node* m_next;
   RenderObject* m_renderer;
-
-  OwnPtr<NodeListsNodeData> m_nodeLists;
-
-  short m_tabIndex;
 
   // make sure we don't use more than 16 bits here -- adding more would increase
   // the size of all Nodes
@@ -601,25 +616,20 @@ class Node : public TreeShared<Node> {
   bool m_hasChangedChild : 1;
   bool m_inDocument : 1;
   bool m_isLink : 1;
-  bool m_focused : 1;
   bool m_active : 1;
   bool m_hovered : 1;
   bool m_inActiveChain : 1;
   bool m_inDetach : 1;
   bool m_inSubtreeMark : 1;
-  bool m_tabIndexSetExplicitly : 1;
+  bool m_hasRareData : 1;
   const bool m_isElement : 1;
+  const bool m_isContainer : 1;
   // no bits left
 
   Element* ancestorElement() const;
 
   void appendTextContent(bool convertBRsToNewlines, StringBuilder&) const;
-
-  virtual Node* virtualFirstChild() const;
-  virtual Node* virtualLastChild() const;
-  virtual bool virtualHasTagName(const QualifiedName&) const;
 };
-
 }  // namespace
 
 #ifndef NDEBUG

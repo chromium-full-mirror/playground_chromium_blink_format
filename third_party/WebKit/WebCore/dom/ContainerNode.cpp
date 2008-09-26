@@ -51,7 +51,7 @@ static NodeCallbackQueue* s_postAttachCallbackQueue = 0;
 static size_t s_attachDepth = 0;
 
 ContainerNode::ContainerNode(Document* doc, bool isElement)
-    : EventTargetNode(doc, isElement), m_firstChild(0), m_lastChild(0) {}
+    : EventTargetNode(doc, isElement, true), m_firstChild(0), m_lastChild(0) {}
 
 void ContainerNode::removeAllChildren() {
   removeAllChildrenInContainer<Node, ContainerNode>(this);
@@ -59,14 +59,6 @@ void ContainerNode::removeAllChildren() {
 
 ContainerNode::~ContainerNode() {
   removeAllChildren();
-}
-
-Node* ContainerNode::virtualFirstChild() const {
-  return m_firstChild;
-}
-
-Node* ContainerNode::virtualLastChild() const {
-  return m_lastChild;
 }
 
 bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
