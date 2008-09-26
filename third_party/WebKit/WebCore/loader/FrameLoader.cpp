@@ -1019,7 +1019,7 @@ void FrameLoader::begin(const KURL& url,
   document->implicitOpen();
 
   if (m_frame->view())
-    m_frame->view()->resizeContents(0, 0);
+    m_frame->view()->setContentsSize(IntSize());
 
 #if USE(LOW_BANDWIDTH_DISPLAY)
   // Low bandwidth display is a first pass display without external resources

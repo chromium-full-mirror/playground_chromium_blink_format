@@ -219,12 +219,9 @@ void ScrollView::setScrollPosition(const IntPoint& scrollPoint) {
   adjustScrollbars();
 }
 
-void ScrollView::resizeContents(int w, int h) {
-  wxWindow* win = platformWidget();
-  if (win) {
-    win->SetVirtualSize(w, h);
-    adjustScrollbars();
-  }
+void ScrollView::platformSetContentsSize(const IntSize& newSize) {
+  win->SetVirtualSize(newSize.width(), newSize.height());
+  adjustScrollbars();
 }
 
 Scrollbar* ScrollView::horizontalScrollbar() const {

@@ -250,7 +250,7 @@ void FrameView::adjustViewSize() {
   RenderView* root = m_frame->contentRenderer();
   if (!root)
     return;
-  resizeContents(root->overflowWidth(), root->overflowHeight());
+  setContentsSize(IntSize(root->overflowWidth(), root->overflowHeight()));
 }
 
 void FrameView::applyOverflowToViewport(RenderObject* o,
