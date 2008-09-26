@@ -70,10 +70,10 @@ IntRect ScrollView::visibleContentRect(bool includeScrollbars) const {
     return platformVisibleContentRect(includeScrollbars);
   return IntRect(
       IntPoint(m_scrollOffset.width(), m_scrollOffset.height()),
-      IntSize(max(0, width() - (verticalScrollbar() && includeScrollbars
+      IntSize(max(0, width() - (verticalScrollbar() && !includeScrollbars
                                     ? verticalScrollbar()->width()
                                     : 0)),
-              max(0, height() - (horizontalScrollbar() && includeScrollbars
+              max(0, height() - (horizontalScrollbar() && !includeScrollbars
                                      ? horizontalScrollbar()->height()
                                      : 0))));
 }
