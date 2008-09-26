@@ -123,5 +123,7 @@ IntRect ScrollView::platformVisibleContentRect(bool) const {
 IntSize ScrollView::platformContentsSize() const {
   return IntSize();
 }
+
+void ScrollView::platformSetContentsSize() {}
 #endif
 }
