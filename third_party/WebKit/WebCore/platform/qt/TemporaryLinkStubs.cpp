@@ -171,11 +171,6 @@ float userIdleTime() {
    // page cache isn't postponed
 #endif
 
-PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
-  notImplemented();
-  return 0;
-}
-
 void prefetchDNS(const String& hostname) {
   notImplemented();
 }
