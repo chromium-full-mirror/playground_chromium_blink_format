@@ -780,7 +780,7 @@ void RenderLayer::scrollByRecursively(int xDelta, int yDelta) {
         frame->eventHandler()->updateAutoscrollRenderer();
     }
   } else if (m_object->view()->frameView())
-    m_object->view()->frameView()->scrollBy(xDelta, yDelta);
+    m_object->view()->frameView()->scrollBy(IntSize(xDelta, yDelta));
 }
 
 void RenderLayer::scrollOffset(int& x, int& y) {
@@ -930,7 +930,7 @@ void RenderLayer::scrollRectToVisible(const IntRect& rect,
         xOffset = max(0, min(frameView->contentsWidth(), xOffset));
         yOffset = max(0, min(frameView->contentsHeight(), yOffset));
 
-        frameView->setContentsPos(xOffset, yOffset);
+        frameView->setScrollPosition(IntPoint(xOffset, yOffset));
         parentLayer =
             m_object->document()->ownerElement()->renderer()->enclosingLayer();
         newRect.setX(rect.x() - frameView->scrollX() + frameView->x());

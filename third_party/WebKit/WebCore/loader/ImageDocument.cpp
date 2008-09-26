@@ -233,7 +233,7 @@ void ImageDocument::imageClicked(int x, int y) {
     int scrollY =
         static_cast<int>(y / scale - (float)frame()->view()->height() / 2);
 
-    frame()->view()->setContentsPos(scrollX, scrollY);
+    frame()->view()->setScrollPosition(IntPoint(scrollX, scrollY));
   }
 }
 

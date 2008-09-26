@@ -120,7 +120,7 @@ class FrameView : public ScrollView {
                                  bool clipToLayerContents) const;
 
   virtual void scrollRectIntoViewRecursively(const IntRect&);
-  virtual void setContentsPos(int x, int y);
+  virtual void setScrollPosition(const IntPoint&);
 
   String mediaType() const;
   void setMediaType(const String&);
