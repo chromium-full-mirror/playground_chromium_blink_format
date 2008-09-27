@@ -69,7 +69,7 @@ class SVGPaintServerPattern : public SVGPaintServer {
                      const RenderObject*,
                      SVGPaintTargetType,
                      bool isPaintingText) const;
-#if PLATFORM(CG)
+#if PLATFORM(CG) || PLATFORM(QT)
   virtual void teardown(GraphicsContext*&,
                         const RenderObject*,
                         SVGPaintTargetType,
