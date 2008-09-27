@@ -277,8 +277,8 @@ void ScrollView::invalidateScrollbars() {
   }
 }
 
-bool ScrollView::inWindow() const {
-  return true;
+bool ScrollView::isOffscreen() const {
+  return false;
 }
 
 void ScrollView::updateScrollbars(const IntSize& desiredOffset) {

@@ -374,9 +374,8 @@ void ScrollView::platformRemoveChild(Widget* child) {
                          child->platformWidget());
 }
 
-bool ScrollView::inWindow() const {
-  notImplemented();
-  return true;
+bool ScrollView::isOffscreen() const {
+  return false;
 }
 
 void ScrollView::wheelEvent(PlatformWheelEvent& e) {
