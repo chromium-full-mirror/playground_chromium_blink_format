@@ -1,7 +1,6 @@
 /*
     Copyright (C) 2006 Nikolas Zimmermann <wildfox@kde.org>
-
-    This file is part of the KDE project
+    Copyright (C) 2008 Dirk Schulze <vbs85@gmx.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,58 +23,58 @@
 #if ENABLE(SVG)
 #include "SVGPaintServerPattern.h"
 
+#include "AffineTransform.h"
+#include "GraphicsContext.h"
+#include "ImageBuffer.h"
+#include "Pattern.h"
+#include "RenderObject.h"
+#include "SVGPatternElement.h"
+
+#include <QPainter>
+#include <QPainterPath>
+
 namespace WebCore {
 
 bool SVGPaintServerPattern::setup(GraphicsContext*& context,
                                   const RenderObject* object,
                                   SVGPaintTargetType type,
                                   bool isPaintingText) const {
-  // FIXME: Reactivate old pattern code
+  QPainter* painter(context ? context->platformContext() : 0);
+  Q_ASSERT(painter);
 
-  /*
-      QPainter* painter(context ? context->platformContext() : 0);
-      Q_ASSERT(painter);
+  QPainterPath* path(context ? context->currentPath() : 0);
+  Q_ASSERT(path);
 
-      QPainterPath* _path = static_cast<QPainterPath*>(qtContext->path());
-      Q_ASSERT(_path != 0);
+  RenderStyle* style = object ? object->style() : 0;
+  const SVGRenderStyle* svgStyle = object ? object->style()->svgStyle() : 0;
 
-      RenderStyle* renderStyle = object->style();
+  FloatRect targetRect = object->relativeBBox(false);
+  m_ownerElement->buildPattern(targetRect);
 
-      painter->setPen(Qt::NoPen);
-      painter->setBrush(Qt::NoBrush);
-      QImage* patternimage = new QImage(tile()->bits(), tile()->width(),
-     tile()->height(), QImage::Format_ARGB32_Premultiplied);
-      patternimage->setAlphaBuffer(true);
-      if (type & APPLY_TO_FILL) {
-          //QColor c = color();
-          //c.setAlphaF(style->fillPainter()->opacity() * style->opacity() *
-     opacity());
-          KRenderingFillPainter fillPainter =
-     KSVGPainterFactory::fillPainter(renderStyle, object);
-          QBrush brush(QPixmap::fromImage(*patternimage));
-          _path->setFillRule(fillPainter.fillRule() == RULE_EVENODD ?
-     Qt::OddEvenFill : Qt::WindingFill);
-          painter->setBrush(brush);
-      }
-      if (type & APPLY_TO_STROKE) {
-          //QColor c = color();
-          //c.setAlphaF(style->strokePainter()->opacity() * style->opacity() *
-     opacity());
-          KRenderingStrokePainter strokePainter =
-     KSVGPainterFactory::strokePainter(renderStyle, object);
+  if (!tile())
+    return false;
 
-          QPen pen;
-          QBrush brush(QPixmap::fromImage(*patternimage));
+  RefPtr<Pattern> pattern = Pattern::create(tile()->image(), true, true);
 
-          setPenProperties(strokePainter, pen);
-          pen.setBrush(brush);
-          painter->setPen(pen);
-      }
+  painter->setPen(Qt::NoPen);
+  painter->setBrush(Qt::NoBrush);
 
-      painter->drawPath(*_path);
+  AffineTransform affine;
+  affine.translate(patternBoundaries().x(), patternBoundaries().y());
+  affine.multiply(patternTransform());
 
-      delete patternimage;
-  */
+  QBrush brush(pattern->createPlatformPattern(affine));
+  if ((type & ApplyToFillTargetType) && svgStyle->hasFill()) {
+    painter->setBrush(brush);
+    context->setFillRule(svgStyle->fillRule());
+  }
+
+  if ((type & ApplyToStrokeTargetType) && svgStyle->hasStroke()) {
+    QPen pen;
+    pen.setBrush(brush);
+    painter->setPen(pen);
+    applyStrokeStyleToContext(context, style, object);
+  }
 
   return true;
 }
