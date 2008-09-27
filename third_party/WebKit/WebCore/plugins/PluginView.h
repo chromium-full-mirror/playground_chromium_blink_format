@@ -170,7 +170,7 @@ class PluginView : public Widget, private PluginStreamClient {
 
   // Widget functions
   virtual void setFrameRect(const IntRect&);
-  virtual void geometryChanged() const;
+  virtual void frameRectsChanged() const;
   virtual void setFocus();
   virtual void show();
   virtual void hide();

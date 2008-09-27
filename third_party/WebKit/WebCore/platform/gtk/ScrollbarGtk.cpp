@@ -104,10 +104,10 @@ void ScrollbarGtk::updateThumbProportion() {
 
 void ScrollbarGtk::setFrameRect(const IntRect& rect) {
   Widget::setFrameRect(rect);
-  geometryChanged();
+  frameRectsChanged();
 }
 
-void ScrollbarGtk::geometryChanged() {
+void ScrollbarGtk::frameRectsChanged() {
   if (!parent())
     return;
 

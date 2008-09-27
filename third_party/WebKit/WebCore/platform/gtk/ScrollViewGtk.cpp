@@ -65,7 +65,7 @@ class ScrollViewScrollbar : public ScrollbarGtk {
                       ScrollbarOrientation,
                       ScrollbarControlSize);
 
-  virtual void geometryChanged() const;
+  virtual void frameRectsChanged() const;
 };
 
 class ScrollView::ScrollViewPrivate : public ScrollbarClient {
@@ -121,7 +121,7 @@ ScrollViewScrollbar::ScrollViewScrollbar(ScrollbarClient* client,
                                          ScrollbarControlSize size)
     : ScrollbarGtk(client, orientation, size) {}
 
-void ScrollViewScrollbar::geometryChanged() const {
+void ScrollViewScrollbar::frameRectsChanged() const {
   if (!parent())
     return;
 
@@ -187,7 +187,7 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
     view->updateBackingStore();
   }
 
-  view->geometryChanged();
+  view->frameRectsChanged();
 
   // Now update the window (which should do nothing but a blit of the backing
   // store's updateRect and so should
@@ -357,7 +357,7 @@ void ScrollView::setFrameRect(const IntRect& newGeometry) {
     static_cast<FrameView*>(this)->setNeedsLayout();
   }
 
-  geometryChanged();
+  frameRectsChanged();
 }
 
 void ScrollView::platformAddChild(Widget* child) {
@@ -542,7 +542,7 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
 
   if (oldHasVertical != (m_verticalScrollbar != 0) ||
       oldHasHorizontal != (m_horizontalScrollbar != 0))
-    geometryChanged();
+    frameRectsChanged();
 
   // See if our offset has changed in a situation where we might not have
   // scrollbars.
@@ -640,11 +640,11 @@ void ScrollView::paint(GraphicsContext* context, const IntRect& rect) {
  * update children but nor our scrollbars. They should not scroll when
  * we scroll our content.
  */
-void ScrollView::geometryChanged() const {
+void ScrollView::frameRectsChanged() const {
   HashSet<Widget*>::const_iterator end = m_children.end();
   for (HashSet<Widget*>::const_iterator current = m_children.begin();
        current != end; ++current)
-    (*current)->geometryChanged();
+    (*current)->frameRectsChanged();
 }
 
 bool ScrollView::scroll(ScrollDirection direction,

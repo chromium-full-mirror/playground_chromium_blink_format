@@ -157,7 +157,7 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
     m_view->updateBackingStore();
   }
 
-  m_view->geometryChanged();
+  m_view->frameRectsChanged();
 }
 
 IntRect ScrollView::ScrollViewPrivate::windowClipRect() const {
@@ -224,14 +224,14 @@ void ScrollView::setFrameRect(const IntRect& newGeometry) {
     static_cast<FrameView*>(this)->setNeedsLayout();
   }
 
-  geometryChanged();
+  frameRectsChanged();
 }
 
-void ScrollView::geometryChanged() const {
+void ScrollView::frameRectsChanged() const {
   HashSet<Widget*>::const_iterator end = m_children.end();
   for (HashSet<Widget*>::const_iterator current = m_children.begin();
        current != end; ++current)
-    (*current)->geometryChanged();
+    (*current)->frameRectsChanged();
 
   const_cast<ScrollView*>(this)->invalidateScrollbars();
 }
@@ -433,7 +433,7 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
 
   if (oldHasVertical != (m_verticalScrollbar != 0) ||
       oldHasHorizontal != (m_horizontalScrollbar != 0))
-    geometryChanged();
+    frameRectsChanged();
 
   // See if our offset has changed in a situation where we might not have
   // scrollbars.

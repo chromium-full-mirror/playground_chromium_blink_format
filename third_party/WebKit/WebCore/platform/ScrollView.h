@@ -262,7 +262,7 @@ class ScrollView : public Widget {
  public:
   virtual void paint(GraphicsContext*, const IntRect&);
 
-  virtual void geometryChanged() const;
+  virtual void frameRectsChanged() const;
   virtual void setFrameRect(const IntRect&);
 
   void addToDirtyRegion(const IntRect&);
