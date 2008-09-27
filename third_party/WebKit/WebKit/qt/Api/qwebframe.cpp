@@ -681,7 +681,7 @@ void QWebFrame::render(QPainter* painter) {
 
   GraphicsContext ctx(painter);
   WebCore::FrameView* view = d->frame->view();
-  view->paint(&ctx, view->frameGeometry());
+  view->paint(&ctx, view->frameRect());
 }
 
 /*!
@@ -725,7 +725,7 @@ QPoint QWebFrame::pos() const {
   if (!d->frame->view())
     return QPoint();
 
-  return d->frame->view()->frameGeometry().topLeft();
+  return d->frame->view()->frameRect().topLeft();
 }
 
 /*!
@@ -734,7 +734,7 @@ QPoint QWebFrame::pos() const {
 QRect QWebFrame::geometry() const {
   if (!d->frame->view())
     return QRect();
-  return d->frame->view()->frameGeometry();
+  return d->frame->view()->frameRect();
 }
 
 /*!
