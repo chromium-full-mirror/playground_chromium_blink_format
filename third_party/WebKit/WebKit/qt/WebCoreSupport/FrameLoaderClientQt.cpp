@@ -221,10 +221,10 @@ void FrameLoaderClientQt::transitionToCommittedForNewPage() {
   if (m_webFrame->d->marginHeight != -1)
     frameView->setMarginHeight(m_webFrame->d->marginHeight);
   if (m_webFrame->d->horizontalScrollBarPolicy != Qt::ScrollBarAsNeeded)
-    frameView->setHScrollbarMode(
+    frameView->setHorizontalScrollbarMode(
         (ScrollbarMode)m_webFrame->d->horizontalScrollBarPolicy);
   if (m_webFrame->d->verticalScrollBarPolicy != Qt::ScrollBarAsNeeded)
-    frameView->setVScrollbarMode(
+    frameView->setVerticalScrollbarMode(
         (ScrollbarMode)m_webFrame->d->verticalScrollBarPolicy);
 
   m_frame->setView(frameView);
