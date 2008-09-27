@@ -2011,8 +2011,8 @@ RegisterID* EvalNode::emitCode(CodeGenerator& generator, RegisterID*) {
   return 0;
 }
 
-void EvalNode::generateCode(ScopeChainNode* sc) {
-  ScopeChain scopeChain(sc);
+void EvalNode::generateCode(ScopeChainNode* scopeChainNode) {
+  ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   SymbolTable symbolTable;
@@ -2082,8 +2082,8 @@ FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
                               usesEval, needsClosure, numConstants);
 }
 
-void FunctionBodyNode::generateCode(ScopeChainNode* sc) {
-  ScopeChain scopeChain(sc);
+void FunctionBodyNode::generateCode(ScopeChainNode* scopeChainNode) {
+  ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   ASSERT(m_source.sourceProvider());
@@ -2118,8 +2118,8 @@ RegisterID* ProgramNode::emitCode(CodeGenerator& generator, RegisterID*) {
   return 0;
 }
 
-void ProgramNode::generateCode(ScopeChainNode* sc) {
-  ScopeChain scopeChain(sc);
+void ProgramNode::generateCode(ScopeChainNode* scopeChainNode) {
+  ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   ASSERT(m_sourceProvider);
