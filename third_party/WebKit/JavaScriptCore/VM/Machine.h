@@ -266,7 +266,6 @@ class Machine {
   enum ExecutionFlag { Normal, InitializeAndReturn };
 
   NEVER_INLINE JSValue* callEval(ExecState* exec,
-                                 CodeBlock* callingCodeBlock,
                                  JSObject* thisObj,
                                  ScopeChainNode* scopeChain,
                                  RegisterFile*,
@@ -294,12 +293,39 @@ class Machine {
                                           ScopeChainNode*&,
                                           ScopeChainNode*);
   NEVER_INLINE void debug(ExecState*,
-                          const CodeBlock*,
                           ScopeChainNode*,
                           Register*,
                           DebugHookID,
                           int firstLine,
                           int lastLine);
+
+  NEVER_INLINE bool resolve(ExecState* exec,
+                            Instruction* vPC,
+                            Register* r,
+                            ScopeChainNode* scopeChain,
+                            JSValue*& exceptionValue);
+  NEVER_INLINE bool resolveSkip(ExecState* exec,
+                                Instruction* vPC,
+                                Register* r,
+                                ScopeChainNode* scopeChain,
+                                JSValue*& exceptionValue);
+  NEVER_INLINE bool resolveGlobal(ExecState* exec,
+                                  Instruction* vPC,
+                                  Register* r,
+                                  JSValue*& exceptionValue);
+  NEVER_INLINE void resolveBase(ExecState* exec,
+                                Instruction* vPC,
+                                Register* r,
+                                ScopeChainNode* scopeChain);
+  NEVER_INLINE bool resolveBaseAndProperty(ExecState* exec,
+                                           Instruction* vPC,
+                                           Register* r,
+                                           ScopeChainNode* scopeChain,
+                                           JSValue*& exceptionValue);
+  NEVER_INLINE ScopeChainNode* createExceptionScope(ExecState* exec,
+                                                    const Instruction* vPC,
+                                                    Register* r,
+                                                    ScopeChainNode* scopeChain);
 
   NEVER_INLINE bool unwindCallFrame(ExecState*,
                                     JSValue*,
@@ -310,10 +336,14 @@ class Machine {
   NEVER_INLINE Instruction* throwException(ExecState*,
                                            JSValue*&,
                                            const Instruction*,
-                                           CodeBlock*&,
                                            ScopeChainNode*&,
                                            Register*&,
                                            bool);
+  NEVER_INLINE bool resolveBaseAndFunc(ExecState* exec,
+                                       Instruction* vPC,
+                                       Register* r,
+                                       ScopeChainNode* scopeChain,
+                                       JSValue*& exceptionValue);
 
   Register* callFrame(ExecState*, InternalFunction*) const;
 
@@ -322,14 +352,10 @@ class Machine {
                           RegisterFile* = 0,
                           Register* = 0,
                           ScopeChainNode* = 0,
-                          CodeBlock* = 0,
                           JSValue** exception = 0);
 
-  void dumpCallFrame(const CodeBlock*,
-                     ScopeChainNode*,
-                     RegisterFile*,
-                     const Register*);
-  void dumpRegisters(const CodeBlock*, RegisterFile*, const Register*);
+  void dumpCallFrame(ScopeChainNode*, const RegisterFile*, const Register*);
+  void dumpRegisters(const RegisterFile*, const Register*);
 
   JSValue* checkTimeout(JSGlobalObject*);
   void resetTimeoutCheck();
