@@ -157,7 +157,7 @@ HRESULT STDMETHODCALLTYPE WebScrollBar::paint(
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebScrollBar::frameGeometry(
+HRESULT STDMETHODCALLTYPE WebScrollBar::frameRect(
     /* [retval][out] */ RECT* bounds) {
   if (!bounds)
     return E_POINTER;
