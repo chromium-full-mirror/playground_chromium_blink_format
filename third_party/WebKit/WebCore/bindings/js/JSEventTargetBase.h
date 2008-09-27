@@ -122,14 +122,12 @@
   JS_EVENT_LISTENER_FOR_EACH_LISTENER(specificEventTarget,   \
                                       EVENT_LISTENER_SETTER)
 
-namespace JSC {
-extern const struct JSC::HashTable JSEventTargetPrototypeTable;
-}
-
 namespace WebCore {
 
 class AtomicString;
 class EventTarget;
+
+extern const struct JSC::HashTable JSEventTargetPrototypeTable;
 
 // The idea here is that classes like JSEventTargetNode and
 // JSEventTargetSVGElementInstance
@@ -148,13 +146,13 @@ class JSEventTargetBasePrototype : public JSC::JSObject {
                                   const JSC::Identifier& propertyName,
                                   JSC::PropertySlot& slot) {
     return JSC::getStaticFunctionSlot<JSC::JSObject>(
-        exec, &JSC::JSEventTargetPrototypeTable, this, propertyName, slot);
+        exec, &JSEventTargetPrototypeTable, this, propertyName, slot);
   }
 
   virtual const JSC::ClassInfo* classInfo() const {
     static const JSC::ClassInfo s_classInfo = {
         JSSpecificEventTarget::prototypeClassName(), 0,
-        &JSC::JSEventTargetPrototypeTable, 0};
+        &JSEventTargetPrototypeTable, 0};
     return &s_classInfo;
   }
 };
