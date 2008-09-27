@@ -339,9 +339,8 @@ NPError PluginView::load(const FrameLoadRequest& frameLoadRequest,
     if (!targetFrameName.isNull() &&
         m_parentFrame->tree()->find(targetFrameName) != m_parentFrame)
       return NPERR_INVALID_PARAM;
-  } else {
-    if (!FrameLoader::canLoad(URL, String(), m_parentFrame->document()))
-      return NPERR_GENERIC_ERROR;
+  } else if (!FrameLoader::canLoad(url, String(), m_parentFrame->document())) {
+    return NPERR_GENERIC_ERROR;
   }
 
   PluginRequest* request = new PluginRequest(frameLoadRequest, sendNotification,
