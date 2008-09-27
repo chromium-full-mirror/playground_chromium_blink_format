@@ -117,6 +117,7 @@ class SimpleJumpTable;
 class StringJumpTable;
 class StructureIDChain;
 struct Instruction;
+struct OperandTypes;
 
 typedef JSValue* (*CTIHelper_j)(CTI_ARGS);
 typedef JSPropertyNameIterator* (*CTIHelper_p)(CTI_ARGS);
@@ -401,6 +402,27 @@ class CTI {
   void compileOpStrictEq(Instruction* instruction,
                          unsigned i,
                          CompileOpStrictEqType type);
+  void putDoubleResultToJSNumberCellOrJSImmediate(
+      X86::XMMRegisterID xmmSource,
+      X86::RegisterID jsNumberCell,
+      unsigned dst,
+      X86Assembler::JmpSrc* wroteJSNumberCell,
+      X86::XMMRegisterID tempXmm,
+      X86::RegisterID tempReg1,
+      X86::RegisterID tempReg2);
+  void compileBinaryArithOp(OpcodeID,
+                            unsigned dst,
+                            unsigned src1,
+                            unsigned src2,
+                            OperandTypes opi,
+                            unsigned i);
+  void compileBinaryArithOpSlowCase(OpcodeID,
+                                    Vector<SlowCaseEntry>::iterator& iter,
+                                    unsigned dst,
+                                    unsigned src1,
+                                    unsigned src2,
+                                    OperandTypes opi,
+                                    unsigned i);
 
   void emitGetArg(unsigned src, X86Assembler::RegisterID dst);
   void emitGetPutArg(unsigned src,

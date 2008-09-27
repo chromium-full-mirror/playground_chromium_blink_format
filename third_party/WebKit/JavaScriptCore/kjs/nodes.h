@@ -33,6 +33,7 @@
 #include "LabelStack.h"
 #include "Opcode.h"
 #include "RegisterID.h"
+#include "ResultType.h"
 #include "SourceRange.h"
 #include "SymbolTable.h"
 #include "regexp.h"
@@ -192,17 +193,15 @@ class Node : public ParserRefCounted {
   virtual bool needsParensIfLeftmost() const { return false; }
 
  protected:
-  Node(JSGlobalData*, JSType) JSC_FAST_CALL;  // used by ExpressionNode
-
-  int m_line : 28;
-  unsigned m_expectedReturnType : 3;  // JSType
+  int m_line;
 };
 
 class ExpressionNode : public Node {
  public:
-  ExpressionNode(JSGlobalData* globalData) JSC_FAST_CALL : Node(globalData) {}
-  ExpressionNode(JSGlobalData* globalData, JSType expectedReturn) JSC_FAST_CALL
-      : Node(globalData, expectedReturn) {}
+  ExpressionNode(JSGlobalData* globalData,
+                 ResultType resultDesc = ResultType::unknown()) JSC_FAST_CALL
+      : Node(globalData),
+        m_resultDesc(resultDesc) {}
 
   virtual bool isNumber() const JSC_FAST_CALL { return false; }
   virtual bool isString() const JSC_FAST_CALL { return false; }
@@ -213,12 +212,13 @@ class ExpressionNode : public Node {
   virtual bool isBracketAccessorNode() const JSC_FAST_CALL { return false; }
   virtual bool isDotAccessorNode() const JSC_FAST_CALL { return false; }
 
-  JSType expectedReturnType() const JSC_FAST_CALL {
-    return static_cast<JSType>(m_expectedReturnType);
-  }
+  ResultType resultDescriptor() const JSC_FAST_CALL { return m_resultDesc; }
 
   // This needs to be in public in order to compile using GCC 3.x
   typedef enum { EvalOperator, FunctionCall } CallerType;
+
+ private:
+  ResultType m_resultDesc;
 };
 
 class StatementNode : public Node {
@@ -250,7 +250,7 @@ class StatementNode : public Node {
 class NullNode : public ExpressionNode {
  public:
   NullNode(JSGlobalData* globalData) JSC_FAST_CALL
-      : ExpressionNode(globalData, NullType) {}
+      : ExpressionNode(globalData, ResultType::nullType()) {}
 
   virtual bool isNull() const JSC_FAST_CALL { return true; }
 
@@ -263,7 +263,7 @@ class NullNode : public ExpressionNode {
 class BooleanNode : public ExpressionNode {
  public:
   BooleanNode(JSGlobalData* globalData, bool value) JSC_FAST_CALL
-      : ExpressionNode(globalData, BooleanType),
+      : ExpressionNode(globalData, ResultType::boolean()),
         m_value(value) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
@@ -279,7 +279,7 @@ class BooleanNode : public ExpressionNode {
 class NumberNode : public ExpressionNode {
  public:
   NumberNode(JSGlobalData* globalData, double v) JSC_FAST_CALL
-      : ExpressionNode(globalData, NumberType),
+      : ExpressionNode(globalData, ResultType::constNumber()),
         m_double(v) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
@@ -321,7 +321,7 @@ class ImmediateNumberNode : public NumberNode {
 class StringNode : public ExpressionNode {
  public:
   StringNode(JSGlobalData* globalData, const Identifier& v) JSC_FAST_CALL
-      : ExpressionNode(globalData, StringType),
+      : ExpressionNode(globalData, ResultType::string()),
         m_value(v) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
@@ -876,7 +876,9 @@ class PrePostResolveNode : public ExpressionNode,
                      unsigned divot,
                      unsigned startOffset,
                      unsigned endOffset) JSC_FAST_CALL
-      : ExpressionNode(globalData, NumberType),
+      : ExpressionNode(globalData,
+                       ResultType::constNumber())  // could be reusable for pre?
+        ,
         ThrowableExpressionData(divot, startOffset, endOffset),
         m_ident(ident) {}
 
@@ -1080,7 +1082,7 @@ class TypeOfResolveNode : public ExpressionNode {
  public:
   TypeOfResolveNode(JSGlobalData* globalData,
                     const Identifier& ident) JSC_FAST_CALL
-      : ExpressionNode(globalData, StringType),
+      : ExpressionNode(globalData, ResultType::string()),
         m_ident(ident) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
@@ -1098,7 +1100,7 @@ class TypeOfResolveNode : public ExpressionNode {
 class TypeOfValueNode : public ExpressionNode {
  public:
   TypeOfValueNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
-      : ExpressionNode(globalData, StringType),
+      : ExpressionNode(globalData, ResultType::string()),
         m_expr(expr) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
@@ -1209,7 +1211,7 @@ class UnaryOpNode : public ExpressionNode {
   UnaryOpNode(JSGlobalData* globalData, ExpressionNode* expr)
       : ExpressionNode(globalData), m_expr(expr) {}
 
-  UnaryOpNode(JSGlobalData* globalData, JSType type, ExpressionNode* expr)
+  UnaryOpNode(JSGlobalData* globalData, ResultType type, ExpressionNode* expr)
       : ExpressionNode(globalData, type), m_expr(expr) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
@@ -1222,7 +1224,7 @@ class UnaryOpNode : public ExpressionNode {
 class UnaryPlusNode : public UnaryOpNode {
  public:
   UnaryPlusNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
-      : UnaryOpNode(globalData, NumberType, expr) {}
+      : UnaryOpNode(globalData, ResultType::constNumber(), expr) {}
 
   virtual OpcodeID opcode() const JSC_FAST_CALL { return op_to_jsnumber; }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1232,7 +1234,7 @@ class UnaryPlusNode : public UnaryOpNode {
 class NegateNode : public UnaryOpNode {
  public:
   NegateNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
-      : UnaryOpNode(globalData, NumberType, expr) {}
+      : UnaryOpNode(globalData, ResultType::reusableNumber(), expr) {}
 
   virtual OpcodeID opcode() const JSC_FAST_CALL { return op_negate; }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1242,7 +1244,7 @@ class NegateNode : public UnaryOpNode {
 class BitwiseNotNode : public UnaryOpNode {
  public:
   BitwiseNotNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
-      : UnaryOpNode(globalData, NumberType, expr) {}
+      : UnaryOpNode(globalData, ResultType::reusableNumber(), expr) {}
 
   virtual OpcodeID opcode() const JSC_FAST_CALL { return op_bitnot; }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1252,7 +1254,7 @@ class BitwiseNotNode : public UnaryOpNode {
 class LogicalNotNode : public UnaryOpNode {
  public:
   LogicalNotNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
-      : UnaryOpNode(globalData, BooleanType, expr) {}
+      : UnaryOpNode(globalData, ResultType::boolean(), expr) {}
 
   virtual OpcodeID opcode() const JSC_FAST_CALL { return op_not; }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1271,7 +1273,7 @@ class BinaryOpNode : public ExpressionNode {
         m_rightHasAssignments(rightHasAssignments) {}
 
   BinaryOpNode(JSGlobalData* globalData,
-               JSType type,
+               ResultType type,
                ExpressionNode* expr1,
                ExpressionNode* expr2,
                bool rightHasAssignments)
@@ -1301,7 +1303,7 @@ class ReverseBinaryOpNode : public ExpressionNode {
         m_rightHasAssignments(rightHasAssignments) {}
 
   ReverseBinaryOpNode(JSGlobalData* globalData,
-                      JSType type,
+                      ResultType type,
                       ExpressionNode* expr1,
                       ExpressionNode* expr2,
                       bool rightHasAssignments)
@@ -1326,7 +1328,7 @@ class MultNode : public BinaryOpNode {
            ExpressionNode* expr2,
            bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     NumberType,
+                     ResultType::reusableNumber(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1343,7 +1345,7 @@ class DivNode : public BinaryOpNode {
           ExpressionNode* expr2,
           bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     NumberType,
+                     ResultType::reusableNumber(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1360,7 +1362,7 @@ class ModNode : public BinaryOpNode {
           ExpressionNode* expr2,
           bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     NumberType,
+                     ResultType::reusableNumber(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1376,7 +1378,12 @@ class AddNode : public BinaryOpNode {
           ExpressionNode* expr1,
           ExpressionNode* expr2,
           bool rightHasAssignments) JSC_FAST_CALL
-      : BinaryOpNode(globalData, expr1, expr2, rightHasAssignments) {}
+      : BinaryOpNode(globalData,
+                     ResultType::forAdd(expr1->resultDescriptor(),
+                                        expr2->resultDescriptor()),
+                     expr1,
+                     expr2,
+                     rightHasAssignments) {}
 
   virtual OpcodeID opcode() const JSC_FAST_CALL { return op_add; }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1389,7 +1396,11 @@ class SubNode : public BinaryOpNode {
           ExpressionNode* expr1,
           ExpressionNode* expr2,
           bool rightHasAssignments) JSC_FAST_CALL
-      : BinaryOpNode(globalData, expr1, expr2, rightHasAssignments) {}
+      : BinaryOpNode(globalData,
+                     ResultType::reusableNumber(),
+                     expr1,
+                     expr2,
+                     rightHasAssignments) {}
 
   virtual OpcodeID opcode() const JSC_FAST_CALL { return op_sub; }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1403,7 +1414,7 @@ class LeftShiftNode : public BinaryOpNode {
                 ExpressionNode* expr2,
                 bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     NumberType,
+                     ResultType::reusableNumber(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1420,7 +1431,7 @@ class RightShiftNode : public BinaryOpNode {
                  ExpressionNode* expr2,
                  bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     NumberType,
+                     ResultType::reusableNumber(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1437,7 +1448,7 @@ class UnsignedRightShiftNode : public BinaryOpNode {
                          ExpressionNode* expr2,
                          bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     NumberType,
+                     ResultType::reusableNumber(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1454,7 +1465,7 @@ class LessNode : public BinaryOpNode {
            ExpressionNode* expr2,
            bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     BooleanType,
+                     ResultType::boolean(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1471,7 +1482,7 @@ class GreaterNode : public ReverseBinaryOpNode {
               ExpressionNode* expr2,
               bool rightHasAssignments) JSC_FAST_CALL
       : ReverseBinaryOpNode(globalData,
-                            BooleanType,
+                            ResultType::boolean(),
                             expr1,
                             expr2,
                             rightHasAssignments) {}
@@ -1488,7 +1499,7 @@ class LessEqNode : public BinaryOpNode {
              ExpressionNode* expr2,
              bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     BooleanType,
+                     ResultType::boolean(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1505,7 +1516,7 @@ class GreaterEqNode : public ReverseBinaryOpNode {
                 ExpressionNode* expr2,
                 bool rightHasAssignments) JSC_FAST_CALL
       : ReverseBinaryOpNode(globalData,
-                            BooleanType,
+                            ResultType::boolean(),
                             expr1,
                             expr2,
                             rightHasAssignments) {}
@@ -1519,7 +1530,7 @@ class ThrowableBinaryOpNode : public BinaryOpNode,
                               public ThrowableExpressionData {
  public:
   ThrowableBinaryOpNode(JSGlobalData* globalData,
-                        JSType type,
+                        ResultType type,
                         ExpressionNode* expr1,
                         ExpressionNode* expr2,
                         bool rightHasAssignments) JSC_FAST_CALL
@@ -1539,7 +1550,7 @@ class InstanceOfNode : public ThrowableBinaryOpNode {
                  ExpressionNode* expr2,
                  bool rightHasAssignments) JSC_FAST_CALL
       : ThrowableBinaryOpNode(globalData,
-                              BooleanType,
+                              ResultType::boolean(),
                               expr1,
                               expr2,
                               rightHasAssignments) {}
@@ -1571,7 +1582,7 @@ class EqualNode : public BinaryOpNode {
             ExpressionNode* expr2,
             bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     BooleanType,
+                     ResultType::boolean(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1589,7 +1600,7 @@ class NotEqualNode : public BinaryOpNode {
                ExpressionNode* expr2,
                bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     BooleanType,
+                     ResultType::boolean(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1606,7 +1617,7 @@ class StrictEqualNode : public BinaryOpNode {
                   ExpressionNode* expr2,
                   bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     BooleanType,
+                     ResultType::boolean(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1624,7 +1635,7 @@ class NotStrictEqualNode : public BinaryOpNode {
                      ExpressionNode* expr2,
                      bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     BooleanType,
+                     ResultType::boolean(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1641,7 +1652,7 @@ class BitAndNode : public BinaryOpNode {
              ExpressionNode* expr2,
              bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     NumberType,
+                     ResultType::reusableNumber(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1658,7 +1669,7 @@ class BitOrNode : public BinaryOpNode {
             ExpressionNode* expr2,
             bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     NumberType,
+                     ResultType::reusableNumber(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1675,7 +1686,7 @@ class BitXOrNode : public BinaryOpNode {
              ExpressionNode* expr2,
              bool rightHasAssignments) JSC_FAST_CALL
       : BinaryOpNode(globalData,
-                     NumberType,
+                     ResultType::reusableNumber(),
                      expr1,
                      expr2,
                      rightHasAssignments) {}
@@ -1694,7 +1705,7 @@ class LogicalOpNode : public ExpressionNode {
                 ExpressionNode* expr1,
                 ExpressionNode* expr2,
                 LogicalOperator oper) JSC_FAST_CALL
-      : ExpressionNode(globalData, BooleanType),
+      : ExpressionNode(globalData, ResultType::boolean()),
         m_expr1(expr1),
         m_expr2(expr2),
         m_operator(oper) {}

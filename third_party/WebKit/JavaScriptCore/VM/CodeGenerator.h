@@ -267,7 +267,8 @@ class CodeGenerator {
   RegisterID* emitBinaryOp(OpcodeID,
                            RegisterID* dst,
                            RegisterID* src1,
-                           RegisterID* src2);
+                           RegisterID* src2,
+                           OperandTypes);
   RegisterID* emitEqualityOp(OpcodeID,
                              RegisterID* dst,
                              RegisterID* src1,
@@ -300,7 +301,7 @@ class CodeGenerator {
     return emitUnaryOp(op_typeof, dst, src);
   }
   RegisterID* emitIn(RegisterID* dst, RegisterID* property, RegisterID* base) {
-    return emitBinaryOp(op_in, dst, property, base);
+    return emitBinaryOp(op_in, dst, property, base, OperandTypes());
   }
 
   RegisterID* emitResolve(RegisterID* dst, const Identifier& property);
