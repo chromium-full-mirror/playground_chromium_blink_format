@@ -67,6 +67,11 @@ JSValue* JSConsole::dirxml(ExecState* exec, const ArgList& arguments) {
   return jsUndefined();
 }
 
+JSValue* JSConsole::trace(ExecState* exec, const ArgList&) {
+  impl()->trace(exec);
+  return jsUndefined();
+}
+
 JSValue* JSConsole::assertCondition(ExecState* exec, const ArgList& arguments) {
   ArgList messageParameters;
   arguments.getSlice(1, messageParameters);
