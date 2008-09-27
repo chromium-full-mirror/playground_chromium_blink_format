@@ -108,10 +108,10 @@ RenderWidget::~RenderWidget() {
 }
 
 void RenderWidget::setWidgetGeometry(const IntRect& frame) {
-  if (element() && m_widget->frameGeometry() != frame) {
+  if (element() && m_widget->frameRect() != frame) {
     RenderArena* arena = ref();
     RefPtr<Node> protectedElement(element());
-    m_widget->setFrameGeometry(frame);
+    m_widget->setFrameRect(frame);
     deref(arena);
   }
 }
@@ -227,7 +227,7 @@ void RenderWidget::updateWidgetPosition() {
       m_height - borderTop() - borderBottom() - paddingTop() - paddingBottom();
 
   IntRect newBounds(x, y, width, height);
-  IntRect oldBounds(m_widget->frameGeometry());
+  IntRect oldBounds(m_widget->frameRect());
   if (newBounds != oldBounds) {
     // The widget changed positions.  Update the frame geometry.
     if (checkForRepaintDuringLayout()) {
@@ -240,7 +240,7 @@ void RenderWidget::updateWidgetPosition() {
 
     RenderArena* arena = ref();
     element()->ref();
-    m_widget->setFrameGeometry(newBounds);
+    m_widget->setFrameRect(newBounds);
     element()->deref();
     deref(arena);
   }

@@ -369,8 +369,7 @@ void PopupMenu::invalidateItem(int index) {
   damageRect.setY(m_itemHeight * (index - m_scrollOffset));
   damageRect.setHeight(m_itemHeight);
   if (m_scrollbar)
-    damageRect.setWidth(damageRect.width() -
-                        m_scrollbar->frameGeometry().width());
+    damageRect.setWidth(damageRect.width() - m_scrollbar->frameRect().width());
 
   RECT r = damageRect;
   ::InvalidateRect(m_popup, &r, TRUE);
@@ -585,12 +584,12 @@ void PopupMenu::valueChanged(Scrollbar* scrollBar) {
 
   IntRect listRect = clientRect();
   if (m_scrollbar)
-    listRect.setWidth(listRect.width() - m_scrollbar->frameGeometry().width());
+    listRect.setWidth(listRect.width() - m_scrollbar->frameRect().width());
   RECT r = listRect;
   ::ScrollWindowEx(m_popup, 0, scrolledLines * m_itemHeight, &r, 0, 0, 0,
                    flags);
   if (m_scrollbar) {
-    r = m_scrollbar->frameGeometry();
+    r = m_scrollbar->frameRect();
     ::InvalidateRect(m_popup, &r, TRUE);
   }
   ::UpdateWindow(m_popup);
@@ -640,7 +639,7 @@ static LRESULT CALLBACK PopupWndProc(HWND hWnd,
     case WM_SIZE:
       if (popup && popup->scrollbar()) {
         IntSize size(LOWORD(lParam), HIWORD(lParam));
-        popup->scrollbar()->setFrameGeometry(
+        popup->scrollbar()->setFrameRect(
             IntRect(size.width() - popup->scrollbar()->width(), 0,
                     popup->scrollbar()->width(), size.height()));
 
@@ -748,7 +747,7 @@ static LRESULT CALLBACK PopupWndProc(HWND hWnd,
       if (popup) {
         IntPoint mousePoint(MAKEPOINTS(lParam));
         if (popup->scrollbar()) {
-          IntRect scrollBarRect = popup->scrollbar()->frameGeometry();
+          IntRect scrollBarRect = popup->scrollbar()->frameRect();
           if (popup->scrollbarCapturingMouse() ||
               scrollBarRect.contains(mousePoint)) {
             // Put the point into coordinates relative to the scroll bar
@@ -785,7 +784,7 @@ static LRESULT CALLBACK PopupWndProc(HWND hWnd,
         ::SetCapture(popup->popupHandle());
         IntPoint mousePoint(MAKEPOINTS(lParam));
         if (popup->scrollbar()) {
-          IntRect scrollBarRect = popup->scrollbar()->frameGeometry();
+          IntRect scrollBarRect = popup->scrollbar()->frameRect();
           if (scrollBarRect.contains(mousePoint)) {
             // Put the point into coordinates relative to the scroll bar
             mousePoint.move(-scrollBarRect.x(), -scrollBarRect.y());
@@ -806,7 +805,7 @@ static LRESULT CALLBACK PopupWndProc(HWND hWnd,
         IntPoint mousePoint(MAKEPOINTS(lParam));
         if (popup->scrollbar()) {
           ::ReleaseCapture();
-          IntRect scrollBarRect = popup->scrollbar()->frameGeometry();
+          IntRect scrollBarRect = popup->scrollbar()->frameRect();
           if (popup->scrollbarCapturingMouse() ||
               scrollBarRect.contains(mousePoint)) {
             popup->setScrollbarCapturingMouse(false);

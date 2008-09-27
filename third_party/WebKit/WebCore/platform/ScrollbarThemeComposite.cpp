@@ -125,8 +125,8 @@ bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
       if (scrollbar->pressedPart() != NoPart)
         s |= PressedScrollbarState;
       if (page->chrome()->client()->paintCustomScrollbar(
-              graphicsContext, scrollbar->frameGeometry(),
-              scrollbar->controlSize(), s, scrollbar->pressedPart(),
+              graphicsContext, scrollbar->frameRect(), scrollbar->controlSize(),
+              s, scrollbar->pressedPart(),
               scrollbar->orientation() == VerticalScrollbar, value, proportion,
               scrollMask))
         return true;

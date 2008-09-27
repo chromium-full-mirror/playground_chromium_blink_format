@@ -158,7 +158,7 @@ FrameView::FrameView(Frame* frame)
 FrameView::FrameView(Frame* frame, const IntSize& initialSize)
     : m_refCount(1), m_frame(frame), d(new FrameViewPrivate(this)) {
   init();
-  Widget::setFrameGeometry(
+  Widget::setFrameRect(
       IntRect(x(), y(), initialSize.width(), initialSize.height()));
   show();
 }
@@ -1018,7 +1018,7 @@ void FrameView::updateControlTints() {
     GraphicsContext context(noContext);
     context.setUpdatingControlTints(true);
 #if !PLATFORM(MAC)
-    ScrollView::paint(&context, frameGeometry());
+    ScrollView::paint(&context, frameRect());
 #else
     m_frame->paint(&context, visibleContentRect());
 #endif

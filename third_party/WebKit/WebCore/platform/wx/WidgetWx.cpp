@@ -60,13 +60,13 @@ void Widget::hide() {
     platformWidget()->Hide();
 }
 
-IntRect Widget::frameGeometry() const {
+IntRect Widget::frameRect() const {
   if (platformWidget())
     return platformWidget()->GetRect();
   return m_frame;
 }
 
-void Widget::setFrameGeometry(const IntRect& rect) {
+void Widget::setFrameRect(const IntRect& rect) {
   if (platformWidget())
     platformWidget()->SetSize(rect);
   m_frame = rect;

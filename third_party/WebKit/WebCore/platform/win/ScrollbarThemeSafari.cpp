@@ -210,7 +210,7 @@ static IntRect trackRepaintRect(const IntRect& trackRect,
 
 IntRect ScrollbarThemeSafari::trackRect(Scrollbar* scrollbar, bool painting) {
   if (painting || !hasButtons(scrollbar))
-    return scrollbar->frameGeometry();
+    return scrollbar->frameRect();
 
   IntRect result;
   int thickness = scrollbarThickness(scrollbar->controlSize());

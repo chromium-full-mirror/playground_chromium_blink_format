@@ -105,11 +105,11 @@ void Widget::setFocus() {}
 
 void Widget::setIsSelected(bool) {}
 
-IntRect Widget::frameGeometry() const {
+IntRect Widget::frameRect() const {
   return m_frame;
 }
 
-void Widget::setFrameGeometry(const IntRect& rect) {
+void Widget::setFrameRect(const IntRect& rect) {
   m_frame = rect;
 }
 
