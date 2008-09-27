@@ -44,8 +44,8 @@ bool JSHTMLInputElement::customGetOwnPropertySlot(
       JSHTMLInputElementPrototype::s_info.propHashTable(exec)->entry(
           exec, propertyName);
   if (entry) {
-    if (entry->attributes & Function) {
-      if (entry->functionValue ==
+    if (entry->attributes() & Function) {
+      if (entry->function() ==
           jsHTMLInputElementPrototypeFunctionSetSelectionRange) {
         slot.setUndefined();
         return true;

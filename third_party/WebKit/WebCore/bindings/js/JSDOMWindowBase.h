@@ -73,7 +73,6 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   const JSC::Identifier&,
                                   JSC::PropertySlot&);
-  JSC::JSValue* getValueProperty(JSC::ExecState*, int token) const;
   virtual void put(JSC::ExecState*,
                    const JSC::Identifier& propertyName,
                    JSC::JSValue*,
@@ -162,50 +161,11 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
   JSDOMStructureMap& structures() { return d()->structures; }
   JSDOMConstructorMap& constructors() const { return d()->constructors; }
 
-  enum {
-    // Attributes
-    Crypto,
-    Event_,
-
-    // Event Listeners
-    Onabort,
-    Onblur,
-    Onchange,
-    Onclick,
-    Ondblclick,
-    Onerror,
-    Onfocus,
-    Onkeydown,
-    Onkeypress,
-    Onkeyup,
-    Onload,
-    Onmousedown,
-    Onmousemove,
-    Onmouseout,
-    Onmouseover,
-    Onmouseup,
-    OnWindowMouseWheel,
-    Onreset,
-    Onresize,
-    Onscroll,
-    Onsearch,
-    Onselect,
-    Onsubmit,
-    Onunload,
-    Onbeforeunload,
-    OnWebKitAnimationStart,
-    OnWebKitAnimationIteration,
-    OnWebKitAnimationEnd,
-    OnWebKitTransitionEnd,
-
-    // Constructors
-    Audio,
-    Image,
-    MessageChannel,
-    Option,
-    XMLHttpRequest,
-    XSLTProcessor
-  };
+  JSC::JSValue* getListener(JSC::ExecState*,
+                            const AtomicString& eventType) const;
+  void setListener(JSC::ExecState*,
+                   const AtomicString& eventType,
+                   JSC::JSValue* function);
 
  private:
   struct JSDOMWindowBaseData : public JSGlobalObjectData {
@@ -230,12 +190,6 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
     JSDOMStructureMap structures;
     JSDOMConstructorMap constructors;
   };
-
-  JSC::JSValue* getListener(JSC::ExecState*,
-                            const AtomicString& eventType) const;
-  void setListener(JSC::ExecState*,
-                   const AtomicString& eventType,
-                   JSC::JSValue* function);
 
   static JSC::JSValue* childFrameGetter(JSC::ExecState*,
                                         const JSC::Identifier&,

@@ -319,14 +319,6 @@ void printErrorMessageForFrame(Frame* frame, const String& message) {
     window->printErrorMessage(message);
 }
 
-JSValue* nonCachingStaticFunctionGetter(ExecState* exec,
-                                        const Identifier& propertyName,
-                                        const PropertySlot& slot) {
-  const HashEntry* entry = slot.staticEntry();
-  return new (exec) PrototypeFunction(exec, entry->length, propertyName,
-                                      entry->functionValue);
-}
-
 JSValue* objectToStringFunctionGetter(ExecState* exec,
                                       const Identifier& propertyName,
                                       const PropertySlot&) {

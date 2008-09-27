@@ -216,10 +216,6 @@ bool checkNodeSecurity(JSC::ExecState*, Node*);
 bool allowsAccessFromFrame(JSC::ExecState*, Frame*);
 bool allowsAccessFromFrame(JSC::ExecState*, Frame*, String& message);
 void printErrorMessageForFrame(Frame*, const String& message);
-JSC::JSValue* nonCachingStaticFunctionGetter(
-    JSC::ExecState*,
-    const JSC::Identifier& propertyName,
-    const JSC::PropertySlot&);
 JSC::JSValue* objectToStringFunctionGetter(JSC::ExecState*,
                                            const JSC::Identifier& propertyName,
                                            const JSC::PropertySlot&);
