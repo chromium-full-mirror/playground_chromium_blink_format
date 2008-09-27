@@ -305,9 +305,6 @@ class ScrollView : public Widget {
   virtual void show();
   virtual void hide();
   virtual void setParentVisible(bool);
-
-  void setAllowsScrolling(bool);
-  bool allowsScrolling() const;
 #endif
 
 #if PLATFORM(QT)
