@@ -80,8 +80,6 @@ CachedResource::~CachedResource() {
   m_deleted = true;
 #endif
 
-  ASSERT(cache()->resourceForURL(url()) != this);
-
   if (m_resourceToRevalidate)
     m_resourceToRevalidate->m_isBeingRevalidated = false;
 
