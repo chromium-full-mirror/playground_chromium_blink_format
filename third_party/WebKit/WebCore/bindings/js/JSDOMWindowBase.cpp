@@ -73,8 +73,6 @@
 
 using namespace JSC;
 
-namespace WebCore {
-
 static JSValue* windowProtoFuncAToB(ExecState*,
                                     JSObject*,
                                     JSValue*,
@@ -271,7 +269,6 @@ static JSValue* jsDOMWindowBaseXSLTProcessor(ExecState*,
                                              const Identifier&,
                                              const PropertySlot&);
 static void setJSDOMWindowBaseXSLTProcessor(ExecState*, JSObject*, JSValue*);
-}
 
 #include "JSDOMWindowBase.lut.h"
 
@@ -682,6 +679,10 @@ static JSObject* getDOMConstructor(JSC::ExecState* exec,
   return constructor;
 }
 
+}  // namespace WebCore
+
+using namespace WebCore;
+
 JSValue* jsDOMWindowBaseCrypto(ExecState*,
                                const Identifier&,
                                const PropertySlot&) {
@@ -1023,6 +1024,8 @@ JSValue* jsDOMWindowBaseOnWebKitTransitionEnd(ExecState* exec,
       ->getListener(exec, webkitTransitionEndEvent);
 }
 
+namespace WebCore {
+
 JSValue* JSDOMWindowBase::childFrameGetter(ExecState* exec,
                                            const Identifier& propertyName,
                                            const PropertySlot& slot) {
@@ -1164,6 +1167,10 @@ void JSDOMWindowBase::put(ExecState* exec,
   if (allowsAccessFrom(exec))
     Base::put(exec, propertyName, value, slot);
 }
+
+}  // namespace WebCore
+
+using namespace WebCore;
 
 void setJSDOMWindowBaseOnabort(ExecState* exec,
                                JSObject* baseObject,
@@ -1425,6 +1432,8 @@ void setJSDOMWindowBaseXSLTProcessor(ExecState*, JSObject*, JSValue*) {
   ASSERT_NOT_REACHED();
 }
 
+namespace WebCore {
+
 String JSDOMWindowBase::crossDomainAccessErrorMessage(
     const JSGlobalObject* other) const {
   KURL originURL = asJSDOMWindow(other)->impl()->url();
@@ -1609,6 +1618,10 @@ JSGlobalData* JSDOMWindowBase::commonJSGlobalData() {
   static JSGlobalData* globalData = JSGlobalData::create().releaseRef();
   return globalData;
 }
+
+}  // namespace WebCore
+
+using namespace WebCore;
 
 JSValue* windowProtoFuncAToB(ExecState* exec,
                              JSObject*,
@@ -1899,6 +1912,8 @@ JSValue* windowProtoFuncNotImplemented(ExecState* exec,
     return throwError(exec, TypeError);
   return jsUndefined();
 }
+
+namespace WebCore {
 
 void JSDOMWindowBase::setReturnValueSlot(JSValue** slot) {
   d()->returnValueSlot = slot;

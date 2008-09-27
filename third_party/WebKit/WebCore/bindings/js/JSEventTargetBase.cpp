@@ -42,8 +42,6 @@
 
 using namespace JSC;
 
-namespace WebCore {
-
 static JSValue* jsEventTargetAddEventListener(ExecState*,
                                               JSObject*,
                                               JSValue*,
@@ -56,7 +54,6 @@ static JSValue* jsEventTargetDispatchEvent(ExecState*,
                                            JSObject*,
                                            JSValue*,
                                            const ArgList&);
-}
 
 #include "JSEventTargetBase.lut.h"
 
@@ -102,11 +99,15 @@ static inline bool retrieveEventTargetAndCorrespondingNode(
   return false;
 }
 
+}  // namespace WebCore
+
+using namespace WebCore;
+
 JSValue* jsEventTargetAddEventListener(ExecState* exec,
                                        JSObject*,
                                        JSValue* thisValue,
                                        const ArgList& args) {
-  Node* eventNode = 0;
+  WebCore::Node* eventNode = 0;
   EventTarget* eventTarget = 0;
   if (!retrieveEventTargetAndCorrespondingNode(exec, thisValue, eventNode,
                                                eventTarget))
@@ -130,7 +131,7 @@ JSValue* jsEventTargetRemoveEventListener(ExecState* exec,
                                           JSObject*,
                                           JSValue* thisValue,
                                           const ArgList& args) {
-  Node* eventNode = 0;
+  WebCore::Node* eventNode = 0;
   EventTarget* eventTarget = 0;
   if (!retrieveEventTargetAndCorrespondingNode(exec, thisValue, eventNode,
                                                eventTarget))
@@ -152,7 +153,7 @@ JSValue* jsEventTargetDispatchEvent(ExecState* exec,
                                     JSObject*,
                                     JSValue* thisValue,
                                     const ArgList& args) {
-  Node* eventNode = 0;
+  WebCore::Node* eventNode = 0;
   EventTarget* eventTarget = 0;
   if (!retrieveEventTargetAndCorrespondingNode(exec, thisValue, eventNode,
                                                eventTarget))
@@ -164,6 +165,8 @@ JSValue* jsEventTargetDispatchEvent(ExecState* exec,
   setDOMException(exec, ec);
   return result;
 }
+
+namespace WebCore {
 
 JSValue* toJS(ExecState* exec, EventTarget* target) {
   if (!target)

@@ -35,11 +35,9 @@
 
 using namespace JSC;
 
-namespace WebCore {
+using namespace WebCore::EventNames;
 
-using namespace EventNames;
-
-ASSERT_CLASS_FITS_IN_CELL(JSEventTargetSVGElementInstance)
+ASSERT_CLASS_FITS_IN_CELL(WebCore::JSEventTargetSVGElementInstance)
 
 static JSValue* jsEventTargetSVGElementInstanceOnAbort(ExecState*,
                                                        const Identifier&,
@@ -332,9 +330,9 @@ onunload      jsEventTargetSVGElementInstanceOnUnload       DontDelete|DontEnum
 @end
 */
 
-DECLARE_JS_EVENT_LISTENERS(EventTargetSVGElementInstance)
+using namespace WebCore;
 
-}  // namespace WebCore
+DECLARE_JS_EVENT_LISTENERS(EventTargetSVGElementInstance)
 
 #include "JSEventTargetSVGElementInstance.lut.h"
 
