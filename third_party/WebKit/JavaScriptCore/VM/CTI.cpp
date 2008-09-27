@@ -120,7 +120,6 @@ __declspec(naked) JSValue* ctiTrampoline(void* code,
                                          RegisterFile* registerFile,
                                          Register* r,
                                          ScopeChainNode* scopeChain,
-                                         CodeBlock* codeBlock,
                                          JSValue** exception,
                                          Profiler**) {
   __asm {
