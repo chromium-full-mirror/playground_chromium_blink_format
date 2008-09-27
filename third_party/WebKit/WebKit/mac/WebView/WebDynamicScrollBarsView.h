@@ -47,5 +47,6 @@ extern const int WebCoreScrollbarAlwaysOn;
   BOOL suppressScrollers;
   BOOL inUpdateScrollers;
 }
-- (void)setAllowsHorizontalScrolling:(BOOL)flag;
+- (void)setAllowsHorizontalScrolling:
+    (BOOL)flag;  // This method is used by Safari, so it cannot be removed.
 @end

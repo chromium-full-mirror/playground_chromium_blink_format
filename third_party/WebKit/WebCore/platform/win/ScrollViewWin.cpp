@@ -90,9 +90,6 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
 
   void scrollBackingStore(const IntSize& scrollDelta);
 
-  void setAllowsScrolling(bool);
-  bool allowsScrolling() const;
-
   ScrollView* m_view;
   bool m_scrollbarsSuppressed;
   bool m_inUpdateScrollbars;
@@ -198,26 +195,6 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
   // store's updateRect and so should
   // be very fast).
   ::UpdateWindow(containingWindowHandle);
-}
-
-void ScrollView::ScrollViewPrivate::setAllowsScrolling(bool flag) {
-  if (flag && m_view->m_verticalScrollbarMode == ScrollbarAlwaysOff)
-    m_view->m_verticalScrollbarMode = ScrollbarAuto;
-  else if (!flag)
-    m_view->m_verticalScrollbarMode = ScrollbarAlwaysOff;
-
-  if (flag && m_view->m_horizontalScrollbarMode == ScrollbarAlwaysOff)
-    m_view->m_horizontalScrollbarMode = ScrollbarAuto;
-  else if (!flag)
-    m_view->m_horizontalScrollbarMode = ScrollbarAlwaysOff;
-
-  m_view->updateScrollbars(m_view->m_scrollOffset);
-}
-
-bool ScrollView::ScrollViewPrivate::allowsScrolling() const {
-  // Return YES if either horizontal or vertical scrolling is allowed.
-  return m_view->m_horizontalScrollbarMode != ScrollbarAlwaysOff ||
-         m_view->m_verticalScrollbarMode != ScrollbarAlwaysOff;
 }
 
 IntRect ScrollView::ScrollViewPrivate::windowClipRect() const {
@@ -601,7 +578,7 @@ void ScrollView::themeChanged() {
 }
 
 void ScrollView::wheelEvent(PlatformWheelEvent& e) {
-  if (!m_data->allowsScrolling())
+  if (!allowsScrolling())
     return;
 
   // Determine how much we want to scroll.  If we can move at all, we will
@@ -745,14 +722,6 @@ void ScrollView::updateBackingStore() {
   if (!page)
     return;
   page->chrome()->updateBackingStore();
-}
-
-void ScrollView::setAllowsScrolling(bool flag) {
-  m_data->setAllowsScrolling(flag);
-}
-
-bool ScrollView::allowsScrolling() const {
-  return m_data->allowsScrolling();
 }
 
 bool ScrollView::inWindow() const {

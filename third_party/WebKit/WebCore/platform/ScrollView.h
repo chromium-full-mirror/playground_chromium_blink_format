@@ -105,6 +105,11 @@ class ScrollView : public Widget {
     scrollbarModes(horizontal, vertical);
     return vertical;
   }
+  virtual void setAllowsScrolling(bool flag);
+  bool allowsScrolling() const {
+    return horizontalScrollbarMode() != ScrollbarAlwaysOff ||
+           verticalScrollbarMode() != ScrollbarAlwaysOff;
+  }
 
   // Whether or not a scroll view will blit visible contents when it is
   // scrolled.  Blitting is disabled in situations

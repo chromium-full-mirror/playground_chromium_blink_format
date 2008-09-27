@@ -77,6 +77,8 @@ class FrameView : public ScrollView {
   void setMarginWidth(int);
   void setMarginHeight(int);
 
+  virtual void setAllowsScrolling(bool);
+
   void layout(bool allowSubtree = true);
   bool didFirstLayout() const;
   void layoutTimerFired(Timer<FrameView>*);

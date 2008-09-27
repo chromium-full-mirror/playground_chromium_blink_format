@@ -78,6 +78,25 @@ void ScrollView::scrollbarModes(ScrollbarMode& horizontalMode,
   verticalMode = m_verticalScrollbarMode;
 }
 
+void ScrollView::setAllowsScrolling(bool canScroll) {
+  ScrollbarMode newHorizontalMode;
+  ScrollbarMode newVerticalMode;
+
+  scrollbarModes(newHorizontalMode, newVerticalMode);
+
+  if (canScroll && newVerticalMode == ScrollbarAlwaysOff)
+    newVerticalMode = ScrollbarAuto;
+  else if (!canScroll)
+    newVerticalMode = ScrollbarAlwaysOff;
+
+  if (canScroll && newHorizontalMode == ScrollbarAlwaysOff)
+    newHorizontalMode = ScrollbarAuto;
+  else if (!canScroll)
+    newHorizontalMode = ScrollbarAlwaysOff;
+
+  setScrollbarModes(newHorizontalMode, newVerticalMode);
+}
+
 void ScrollView::setCanBlitOnScroll(bool b) {
   if (m_canBlitOnScroll == b)
     return;
