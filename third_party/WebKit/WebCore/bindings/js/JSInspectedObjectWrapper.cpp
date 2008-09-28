@@ -66,10 +66,11 @@ JSValue* JSInspectedObjectWrapper::wrap(ExecState* unwrappedExec,
   if (prototype->isNull())
     return new (unwrappedExec) JSInspectedObjectWrapper(
         unwrappedExec, unwrappedObject,
-        unwrappedExec->globalData().nullProtoStructureID);
+        JSQuarantinedObjectWrapper::createStructureID(jsNull()));
   return new (unwrappedExec) JSInspectedObjectWrapper(
       unwrappedExec, unwrappedObject,
-      static_cast<JSObject*>(wrap(unwrappedExec, prototype))->inheritorID());
+      JSQuarantinedObjectWrapper::createStructureID(
+          static_cast<JSObject*>(wrap(unwrappedExec, prototype))));
 }
 
 JSInspectedObjectWrapper::JSInspectedObjectWrapper(
