@@ -166,7 +166,15 @@ static void appendBigEndianStringToEOTHeader(Vector<UInt8, 512>& eotHeader,
   dst[i] = 0;
 }
 
-bool getEOTHeader(SharedBuffer* fontData, Vector<UInt8, 512>& eotHeader) {
+bool getEOTHeader(SharedBuffer* fontData,
+                  Vector<UInt8, 512>& eotHeader,
+                  size_t& overlayDst,
+                  size_t& overlaySrc,
+                  size_t& overlayLength) {
+  overlayDst = 0;
+  overlaySrc = 0;
+  overlayLength = 0;
+
   size_t dataLength = fontData->size();
   const char* data = fontData->data();
 
@@ -310,6 +318,15 @@ bool getEOTHeader(SharedBuffer* fontData, Vector<UInt8, 512>& eotHeader) {
                                    subfamilyNameLength);
   appendBigEndianStringToEOTHeader(eotHeader, versionString,
                                    versionStringLength);
+
+  // If possible, ensure that the family name is a prefix of the full name.
+  if (fullNameLength >= familyNameLength &&
+      memcmp(familyName, fullName, familyNameLength)) {
+    overlaySrc = reinterpret_cast<const char*>(fullName) - data;
+    overlayDst = reinterpret_cast<const char*>(familyName) - data;
+    overlayLength = familyNameLength;
+  }
+
   appendBigEndianStringToEOTHeader(eotHeader, fullName, fullNameLength);
 
   unsigned short padding = 0;
