@@ -63,6 +63,7 @@
 #include "HitTestResult.h"
 #include "WindowFeatures.h"
 #include "LocalizedStrings.h"
+#include "kjs/InitializeThreading.h"
 
 #include <QApplication>
 #include <QBasicTimer>
@@ -210,6 +211,7 @@ QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
     : q(qq), view(0), viewportSize(QSize(0, 0)) {
   WebCore::InitializeLoggingChannelsIfNecessary();
   WebCore::PageGroup::setShouldTrackVisitedLinks(true);
+  JSC::initializeThreading();
 
   chromeClient = new ChromeClientQt(q);
   contextMenuClient = new ContextMenuClientQt();
