@@ -2953,7 +2953,7 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
       // ifdef it to fix correctness issues on Tiger documented in
       // <rdar://problem/5441823>.
       if (m_frame->view())
-        m_frame->view()->suppressScrollbars(true);
+        m_frame->view()->setScrollbarsSuppressed(true);
 #endif
       m_client->transitionToCommittedForNewPage();
       break;

@@ -158,7 +158,9 @@ class ScrollView : public Widget {
 
   // This gives us a means of blocking painting on our scrollbars until the
   // first layout has occurred.
-  void suppressScrollbars(bool suppressed, bool repaintOnUnsuppress = false);
+  void setScrollbarsSuppressed(bool suppressed,
+                               bool repaintOnUnsuppress = false);
+  bool scrollbarsSuppressed() const { return m_scrollbarsSuppressed; }
 
   // Event coordinates are assumed to be in the coordinate space of a window
   // that contains
@@ -176,6 +178,15 @@ class ScrollView : public Widget {
   // we know that we are either not in a window right now or if that window is
   // not visible.
   bool isOffscreen() const;
+
+  // These methods are used to enable scrollbars to avoid window resizer
+  // controls that overlap the scroll view.  This happens on Mac
+  // for example.
+  virtual IntRect windowResizerRect() const { return IntRect(); }
+  bool containsScrollbarsAvoidingResizer() const;
+  void adjustScrollbarsAvoidingResizerCount(int overlapDelta);
+  virtual void setParent(
+      ScrollView*);  // Overridden to update the overlapping scrollbar count.
 
   // For platforms that need to hit test scrollbars from within the engine's
   // event handlers (like Win32).
@@ -233,6 +244,9 @@ class ScrollView : public Widget {
                            // is shared.
   IntSize m_contentsSize;
 
+  int m_scrollbarsAvoidingResizer;
+  bool m_scrollbarsSuppressed;
+
   void init();
 
   void platformAddChild(Widget*);
@@ -244,6 +258,7 @@ class ScrollView : public Widget {
   IntRect platformVisibleContentRect(bool includeScrollbars) const;
   IntSize platformContentsSize() const;
   void platformSetContentsSize();
+  void platformSetScrollbarsSuppressed(bool repaintOnUnsuppress);
 
 #if PLATFORM(MAC) && defined __OBJC__
  public:
@@ -253,10 +268,14 @@ class ScrollView : public Widget {
   NSScrollView<WebCoreFrameScrollView>* scrollView() const;
 #endif
 
+// FIXME: ScrollViewPrivate will eventually be completely gone.  It's already
+// gone on Mac.
+#if !PLATFORM(MAC)
   class ScrollViewPrivate;
   ScrollViewPrivate* m_data;
 
   friend class ScrollViewPrivate;  // FIXME: Temporary.
+#endif
 
 #if !PLATFORM(MAC) && !PLATFORM(WX)
  public:
@@ -278,21 +297,6 @@ class ScrollView : public Widget {
   void updateScrollbars(const IntSize& desiredOffset) {}  // FIXME: Temporary.
 #endif
 
-#if PLATFORM(WIN) || PLATFORM(QT) || PLATFORM(MAC)
- public:
-  IntRect windowResizerRect();
-  bool resizerOverlapsContent() const;
-  void adjustOverlappingScrollbarCount(int overlapDelta);
-
- private:
-  virtual void setParent(ScrollView*);
-#else
- public:
-  IntRect windowResizerRect() { return IntRect(); }
-  bool resizerOverlapsContent() const { return false; }
-  void adjustOverlappingScrollbarCount(int overlapDelta) {}
-#endif
-
 #if PLATFORM(WIN)
  public:
   virtual void themeChanged();
@@ -310,7 +314,6 @@ class ScrollView : public Widget {
   void incrementNativeWidgetCount();
   void decrementNativeWidgetCount();
   bool hasNativeWidgets() const;
-  void invalidateScrollbars();
 #endif
 
 #if PLATFORM(GTK)

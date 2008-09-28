@@ -201,9 +201,9 @@ void FrameView::resetScrollbars() {
   // Reset the document's scrollbars back to our defaults before we yield the
   // floor.
   d->m_firstLayout = true;
-  suppressScrollbars(true);
+  setScrollbarsSuppressed(true);
   setScrollbarModes(d->m_hmode, d->m_vmode);
-  suppressScrollbars(false);
+  setScrollbarsSuppressed(false);
 }
 
 void FrameView::init() {
@@ -220,7 +220,7 @@ void FrameView::clear() {
     if (RenderPart* renderer = m_frame->ownerRenderer())
       renderer->viewCleared();
 
-  suppressScrollbars(true);
+  setScrollbarsSuppressed(true);
 }
 
 bool FrameView::didFirstLayout() const {
@@ -444,7 +444,7 @@ void FrameView::layout(bool allowSubtree) {
     ScrollbarMode currentVMode = verticalScrollbarMode();
 
     if (d->m_firstLayout || (hMode != currentHMode || vMode != currentVMode)) {
-      suppressScrollbars(true);
+      setScrollbarsSuppressed(true);
       if (d->m_firstLayout) {
         d->m_firstLayout = false;
         d->m_firstLayoutCallbackPending = true;
@@ -464,7 +464,7 @@ void FrameView::layout(bool allowSubtree) {
                                                            // disappear.
       }
       setScrollbarModes(hMode, vMode);
-      suppressScrollbars(false, true);
+      setScrollbarsSuppressed(false, true);
     }
 
     IntSize oldSize = m_size;
@@ -594,7 +594,7 @@ void FrameView::removeSlowRepaintObject() {
 }
 
 void FrameView::restoreScrollbar() {
-  suppressScrollbars(false);
+  setScrollbarsSuppressed(false);
 }
 
 void FrameView::scrollRectIntoViewRecursively(const IntRect& r) {
@@ -977,6 +977,13 @@ IntRect FrameView::windowClipRectForLayer(const RenderLayer* layer,
     clipRect = layer->selfClipRect();
   clipRect = contentsToWindow(clipRect);
   return intersection(clipRect, windowClipRect());
+}
+
+IntRect FrameView::windowResizerRect() const {
+  Page* page = frame() ? frame()->page() : 0;
+  if (!page)
+    return IntRect();
+  return page->chrome()->windowResizerRect();
 }
 
 #if ENABLE(DASHBOARD_SUPPORT)

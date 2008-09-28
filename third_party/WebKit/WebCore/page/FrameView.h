@@ -117,6 +117,8 @@ class FrameView : public ScrollView {
   IntRect windowClipRectForLayer(const RenderLayer*,
                                  bool clipToLayerContents) const;
 
+  virtual IntRect windowResizerRect() const;
+
   virtual void scrollRectIntoViewRecursively(const IntRect&);
   virtual void setScrollPosition(const IntPoint&);
 

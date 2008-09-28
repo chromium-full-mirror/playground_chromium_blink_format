@@ -385,7 +385,7 @@ void Scrollbar::setFrameRect(const IntRect& rect) {
   // overlap
   // if necessary.
   IntRect adjustedRect(rect);
-  if (parent() && parent()->isFrameView()) {
+  if (parent()) {
     bool overlapsResizer = false;
     ScrollView* view = parent();
     IntRect resizerRect =
@@ -408,7 +408,7 @@ void Scrollbar::setFrameRect(const IntRect& rect) {
 
     if (overlapsResizer != m_overlapsResizer) {
       m_overlapsResizer = overlapsResizer;
-      view->adjustOverlappingScrollbarCount(m_overlapsResizer ? 1 : -1);
+      view->adjustScrollbarsAvoidingResizerCount(m_overlapsResizer ? 1 : -1);
     }
   }
 
@@ -416,8 +416,8 @@ void Scrollbar::setFrameRect(const IntRect& rect) {
 }
 
 void Scrollbar::setParent(ScrollView* parentView) {
-  if (!parentView && m_overlapsResizer && parent() && parent()->isFrameView())
-    parent()->adjustOverlappingScrollbarCount(-1);
+  if (!parentView && m_overlapsResizer && parent())
+    parent()->adjustScrollbarsAvoidingResizerCount(-1);
   Widget::setParent(parentView);
 }
 
