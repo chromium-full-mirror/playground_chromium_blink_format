@@ -256,7 +256,7 @@ static int verticalScrollDistance(Frame* frame) {
         renderer->isTextArea()))
     return 0;
   int height = renderer->clientHeight();
-  return max((height + 1) / 2, height - PAGE_KEEP);
+  return max((height + 1) / 2, height - cAmountToKeepWhenPaging);
 }
 
 static RefPtr<Range> unionDOMRanges(Range* a, Range* b) {
