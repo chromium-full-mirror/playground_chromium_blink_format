@@ -43,7 +43,7 @@ class NameNodeList : public DynamicNodeList {
  private:
   NameNodeList(PassRefPtr<Node> rootNode, const String& name, Caches*);
 
-  virtual bool nodeMatches(Node*) const;
+  virtual bool nodeMatches(Element*) const;
 
   AtomicString m_nodeName;
 };

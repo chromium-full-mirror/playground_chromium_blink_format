@@ -38,9 +38,7 @@ TagNodeList::TagNodeList(PassRefPtr<Node> rootNode,
   ASSERT(m_namespaceURI.isNull() || !m_namespaceURI.isEmpty());
 }
 
-bool TagNodeList::nodeMatches(Node* testNode) const {
-  ASSERT(testNode->isElementNode());
-
+bool TagNodeList::nodeMatches(Element* testNode) const {
   if (m_namespaceURI != starAtom && m_namespaceURI != testNode->namespaceURI())
     return false;
 

@@ -36,9 +36,8 @@ NameNodeList::NameNodeList(PassRefPtr<Node> rootNode,
                            DynamicNodeList::Caches* caches)
     : DynamicNodeList(rootNode, caches), m_nodeName(name) {}
 
-bool NameNodeList::nodeMatches(Node* testNode) const {
-  ASSERT(testNode->isElementNode());
-  return static_cast<Element*>(testNode)->getAttribute(nameAttr) == m_nodeName;
+bool NameNodeList::nodeMatches(Element* testNode) const {
+  return testNode->getAttribute(nameAttr) == m_nodeName;
 }
 
 }  // namespace WebCore

@@ -120,14 +120,10 @@ class Element : public ContainerNode {
     return m_tagName.localName() == other.localName();
   }
 
-  virtual const AtomicString& localName() const {
-    return m_tagName.localName();
-  }
-  virtual const AtomicString& prefix() const { return m_tagName.prefix(); }
-  virtual void setPrefix(const AtomicString& _prefix, ExceptionCode&);
-  virtual const AtomicString& namespaceURI() const {
-    return m_tagName.namespaceURI();
-  }
+  const AtomicString& localName() const { return m_tagName.localName(); }
+  const AtomicString& prefix() const { return m_tagName.prefix(); }
+  virtual void setPrefix(const AtomicString&, ExceptionCode&);
+  const AtomicString& namespaceURI() const { return m_tagName.namespaceURI(); }
 
   virtual KURL baseURI() const;
 
@@ -166,7 +162,7 @@ class Element : public ContainerNode {
 
   virtual void attach();
   virtual void detach();
-  virtual RenderStyle* styleForRenderer(RenderObject* parent);
+  RenderStyle* styleForRenderer(RenderObject* parent);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange = NoChange);
 
@@ -235,9 +231,12 @@ class Element : public ContainerNode {
   void updateFocusAppearanceSoonAfterAttach();
   void cancelFocusAppearanceUpdate();
 
-  virtual bool virtualHasTagName(const QualifiedName&) const;
+  virtual const AtomicString& virtualPrefix() const { return prefix(); }
+  virtual const AtomicString& virtualLocalName() const { return localName(); }
+  virtual const AtomicString& virtualNamespaceURI() const {
+    return namespaceURI();
+  }
 
- private:
   QualifiedName m_tagName;
   virtual NodeRareData* createRareData();
 
@@ -263,6 +262,18 @@ class Element : public ContainerNode {
  private:
   bool m_parsingChildrenFinished : 1;
 };
+
+inline bool Node::hasTagName(const QualifiedName& name) const {
+  return isElementNode() && static_cast<const Element*>(this)->hasTagName(name);
+}
+
+inline bool Node::hasAttributes() const {
+  return isElementNode() && static_cast<const Element*>(this)->hasAttributes();
+}
+
+inline NamedAttrMap* Node::attributes() const {
+  return isElementNode() ? static_cast<const Element*>(this)->attributes() : 0;
+}
 
 }  // namespace
 

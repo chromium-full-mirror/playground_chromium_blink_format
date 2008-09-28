@@ -490,7 +490,7 @@ bool HTMLParser::handleError(Node* n,
   // handling.
   if (current->isHTMLElement()) {
     HTMLElement* h = static_cast<HTMLElement*>(current);
-    const AtomicString& currentTagName = current->localName();
+    const AtomicString& currentTagName = h->localName();
     if (h->hasLocalName(htmlTag)) {
       HTMLElement* elt = n->isHTMLElement() ? static_cast<HTMLElement*>(n) : 0;
       if (elt &&

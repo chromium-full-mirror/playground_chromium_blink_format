@@ -43,7 +43,7 @@ class TagNodeList : public DynamicNodeList {
               const AtomicString& namespaceURI,
               const AtomicString& localName);
 
-  virtual bool nodeMatches(Node*) const;
+  virtual bool nodeMatches(Element*) const;
 
   AtomicString m_namespaceURI;
   AtomicString m_localName;

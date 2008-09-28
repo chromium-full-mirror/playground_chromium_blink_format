@@ -109,9 +109,7 @@ class Node : public TreeShared<Node> {
 
   // DOM methods & attributes for Node
 
-  bool hasTagName(const QualifiedName& name) const {
-    return virtualHasTagName(name);
-  }
+  bool hasTagName(const QualifiedName&) const;
   virtual String nodeName() const = 0;
   virtual String nodeValue() const;
   virtual void setNodeValue(const String&, ExceptionCode&);
@@ -127,8 +125,8 @@ class Node : public TreeShared<Node> {
   Node* lastChild() const {
     return isContainerNode() ? containerLastChild() : 0;
   }
-  virtual bool hasAttributes() const;
-  virtual NamedAttrMap* attributes() const;
+  bool hasAttributes() const;
+  NamedAttrMap* attributes() const;
 
   virtual KURL baseURI() const;
 
@@ -152,12 +150,12 @@ class Node : public TreeShared<Node> {
                            ExceptionCode&,
                            bool shouldLazyAttach = false);
 
-  virtual void remove(ExceptionCode&);
+  void remove(ExceptionCode&);
   bool hasChildNodes() const { return firstChild(); }
   virtual PassRefPtr<Node> cloneNode(bool deep) = 0;
-  virtual const AtomicString& localName() const;
-  virtual const AtomicString& namespaceURI() const;
-  virtual const AtomicString& prefix() const;
+  const AtomicString& localName() const { return virtualLocalName(); }
+  const AtomicString& namespaceURI() const { return virtualNamespaceURI(); }
+  const AtomicString& prefix() const { return virtualPrefix(); }
   virtual void setPrefix(const AtomicString&, ExceptionCode&);
   void normalize();
 
@@ -182,12 +180,10 @@ class Node : public TreeShared<Node> {
   virtual bool isHTMLElement() const { return false; }
 
 #if ENABLE(SVG)
-  virtual
+  virtual bool isSVGElement() const { return false; }
+#else
+  static bool isSVGElement() { return false; }
 #endif
-      bool
-      isSVGElement() const {
-    return false;
-  }
 
   virtual bool isStyledElement() const { return false; }
   virtual bool isFrameOwnerElement() const { return false; }
@@ -195,7 +191,7 @@ class Node : public TreeShared<Node> {
   virtual bool isTextNode() const { return false; }
   virtual bool isCommentNode() const { return false; }
   virtual bool isCharacterDataNode() const { return false; }
-  virtual bool isDocumentNode() const { return false; }
+  bool isDocumentNode() const;
   virtual bool isEventTargetNode() const { return false; }
   virtual bool isShadowNode() const { return false; }
   virtual Node* shadowParentNode() { return 0; }
@@ -208,12 +204,6 @@ class Node : public TreeShared<Node> {
 
   bool isBlockFlow() const;
   bool isBlockFlowOrBlockTable() const;
-
-  // Used by <form> elements to indicate a malformed state of some kind,
-  // typically
-  // used to keep from applying the bottom margin of the form.
-  virtual bool isMalformed() { return false; }
-  virtual void setMalformed(bool malformed) {}
 
   // These low-level calls give the caller responsibility for maintaining the
   // integrity of the tree.
@@ -311,7 +301,9 @@ class Node : public TreeShared<Node> {
   virtual bool canLazyAttach();
 
   virtual void setFocus(bool b = true);
-  virtual void setActive(bool b = true, bool pause = false) { m_active = b; }
+  virtual void setActive(bool b = true, bool /*pause*/ = false) {
+    m_active = b;
+  }
   virtual void setHovered(bool b = true) { m_hovered = b; }
 
   virtual short tabIndex() const;
@@ -472,7 +464,7 @@ class Node : public TreeShared<Node> {
 
   virtual void willRemove();
   void createRendererIfNeeded();
-  virtual RenderStyle* styleForRenderer(RenderObject* parent);
+  RenderStyle* styleForRenderer(RenderObject* parent);
   virtual bool rendererIsNeeded(RenderStyle*);
 #if ENABLE(SVG)
   virtual bool childShouldCreateRenderer(Node*) const { return true; }
@@ -582,14 +574,12 @@ class Node : public TreeShared<Node> {
   virtual void didMoveToNewOwnerDocument() {}
 
   virtual void getSubresourceAttributeStrings(Vector<String>&) const {}
-  void setTabIndexExplicitly(short i);
+  void setTabIndexExplicitly(short);
 
   bool hasRareData() const { return m_hasRareData; }
 
   NodeRareData* rareData() const;
   NodeRareData* ensureRareData();
-
-  virtual bool virtualHasTagName(const QualifiedName&) const;
 
  private:
   virtual NodeRareData* createRareData();
@@ -598,7 +588,12 @@ class Node : public TreeShared<Node> {
   Node* containerFirstChild() const;
   Node* containerLastChild() const;
   bool rareDataFocused() const;
+
   virtual RenderStyle* nonRendererRenderStyle() const;
+
+  virtual const AtomicString& virtualPrefix() const;
+  virtual const AtomicString& virtualLocalName() const;
+  virtual const AtomicString& virtualNamespaceURI() const;
 
   DocPtr<Document> m_document;
   Node* m_previous;

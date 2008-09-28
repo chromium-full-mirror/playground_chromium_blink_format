@@ -41,7 +41,7 @@ ClassNodeList::ClassNodeList(PassRefPtr<Node> rootNode,
     : DynamicNodeList(rootNode, caches),
       m_classNames(classNames, m_rootNode->document()->inCompatMode()) {}
 
-bool ClassNodeList::nodeMatches(Node* testNode) const {
+bool ClassNodeList::nodeMatches(Element* testNode) const {
   if (!testNode->hasClass())
     return false;
   if (!m_classNames.size())

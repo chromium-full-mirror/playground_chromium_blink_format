@@ -46,7 +46,7 @@ class ClassNodeList : public DynamicNodeList {
  private:
   ClassNodeList(PassRefPtr<Node> rootNode, const String& classNames, Caches*);
 
-  virtual bool nodeMatches(Node*) const;
+  virtual bool nodeMatches(Element*) const;
 
   ClassNames m_classNames;
 };

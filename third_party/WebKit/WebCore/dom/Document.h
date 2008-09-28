@@ -313,7 +313,6 @@ class Document : public ContainerNode {
   virtual NodeType nodeType() const;
 
   // Other methods (not part of DOM)
-  virtual bool isDocumentNode() const { return true; }
   virtual bool isHTMLDocument() const { return false; }
   virtual bool isImageDocument() const { return false; }
 #if ENABLE(SVG)
@@ -1228,6 +1227,10 @@ class Document : public ContainerNode {
 inline bool Document::hasElementWithId(AtomicStringImpl* id) const {
   ASSERT(id);
   return m_elementsById.contains(id) || m_duplicateIds.contains(id);
+}
+
+inline bool Node::isDocumentNode() const {
+  return this == m_document.get();
 }
 
 }  // namespace WebCore
