@@ -64,12 +64,12 @@ class PlatformWheelEvent {
   const IntPoint& pos() const { return m_position; }
   const IntPoint& globalPos() const { return m_globalPosition; }
 
-  float deltaX(bool withScrollSensibilityFactor = true) const {
-    return (withScrollSensibilityFactor ? m_deltaX * m_charsToScrollPerDelta
+  float deltaX(bool withScrollSensitivityFactor = true) const {
+    return (withScrollSensitivityFactor ? m_deltaX * m_charsToScrollPerDelta
                                         : m_deltaX);
   }
-  float deltaY(bool withScrollSensibilityFactor = true) const {
-    return (withScrollSensibilityFactor ? m_deltaY * m_linesToScrollPerDelta
+  float deltaY(bool withScrollSensitivityFactor = true) const {
+    return (withScrollSensitivityFactor ? m_deltaY * m_linesToScrollPerDelta
                                         : m_deltaY);
   }
 
