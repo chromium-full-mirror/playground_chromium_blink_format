@@ -53,6 +53,7 @@ typedef WebCore::Page WebCorePage;
 
 @class WebBasePluginPackage;
 @class WebDownload;
+@class WebNodeHighlight;
 
 @interface WebView (WebViewEditingExtras)
 - (BOOL)_interceptEditingKeyEvent:(WebCoreKeyboardEvent*)event
@@ -128,6 +129,9 @@ typedef WebCore::Page WebCorePage;
 - (WebBasePluginPackage*)_pluginForMIMEType:(NSString*)MIMEType;
 - (WebBasePluginPackage*)_pluginForExtension:(NSString*)extension;
 - (BOOL)_isMIMETypeRegisteredAsPlugin:(NSString*)MIMEType;
+
+- (void)setCurrentNodeHighlight:(WebNodeHighlight*)nodeHighlight;
+- (WebNodeHighlight*)currentNodeHighlight;
 
 - (void)addPluginInstanceView:(NSView*)view;
 - (void)removePluginInstanceView:(NSView*)view;
