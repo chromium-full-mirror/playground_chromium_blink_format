@@ -26,6 +26,7 @@
 #include "config.h"
 #include "ScrollView.h"
 
+#include "PlatformMouseEvent.h"
 #include "Scrollbar.h"
 
 using std::max;
@@ -243,6 +244,21 @@ void ScrollView::setScrollbarsSuppressed(bool suppressed,
         invalidateRect(vCorner);
     }
   }
+}
+
+Scrollbar* ScrollView::scrollbarUnderMouse(
+    const PlatformMouseEvent& mouseEvent) {
+  if (platformWidget())
+    return 0;
+
+  IntPoint viewPoint = convertFromContainingWindow(mouseEvent.pos());
+  if (m_horizontalScrollbar &&
+      m_horizontalScrollbar->frameRect().contains(viewPoint))
+    return m_horizontalScrollbar.get();
+  if (m_verticalScrollbar &&
+      m_verticalScrollbar->frameRect().contains(viewPoint))
+    return m_verticalScrollbar.get();
+  return 0;
 }
 
 #if !PLATFORM(MAC)

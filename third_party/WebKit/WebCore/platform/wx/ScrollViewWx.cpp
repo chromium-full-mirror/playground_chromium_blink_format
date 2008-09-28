@@ -340,11 +340,4 @@ void ScrollView::platformRemoveChild(Widget* widget) {
     widget->platformWidget()->Destroy();
   }
 }
-
-Scrollbar* ScrollView::scrollbarUnderMouse(
-    const PlatformMouseEvent& mouseEvent) {
-  // AFAICT this is only used for platforms that provide
-  // feedback when mouse is hovered over.
-  return 0;
-}
 }
