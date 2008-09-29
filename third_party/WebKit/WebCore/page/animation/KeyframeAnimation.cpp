@@ -67,6 +67,10 @@ KeyframeAnimation::~KeyframeAnimation() {
   // get called
   if (!postActive())
     updateStateMachine(AnimationStateInputEndAnimation, -1);
+
+  if (m_unanimatedStyle)
+    const_cast<RenderStyle*>(m_unanimatedStyle)
+        ->deref(renderer()->renderArena());
 }
 
 void KeyframeAnimation::animate(CompositeAnimation* animation,
