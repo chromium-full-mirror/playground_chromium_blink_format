@@ -33,7 +33,6 @@
 #include "CSSPropertyNames.h"
 #include "ImplicitAnimation.h"
 #include "KeyframeAnimation.h"
-#include "KeyframeList.h"
 #include "RenderObject.h"
 #include "RenderStyle.h"
 
@@ -171,8 +170,7 @@ void CompositeAnimation::updateKeyframeAnimations(
         keyframeAnim->setAnimation(anim);
         keyframeAnim->setIndex(i);
       } else if ((anim->duration() || anim->delay()) &&
-                 anim->iterationCount() && anim->keyframeList() &&
-                 !anim->keyframeList()->isEmpty()) {
+                 anim->iterationCount()) {
         keyframeAnim = new KeyframeAnimation(
             const_cast<Animation*>(anim), renderer, i, this,
             currentStyle ? currentStyle : targetStyle);

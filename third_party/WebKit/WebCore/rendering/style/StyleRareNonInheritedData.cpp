@@ -23,7 +23,6 @@
 #include "StyleRareNonInheritedData.h"
 
 #include "CSSStyleSelector.h"
-#include "KeyframeList.h"
 #include "RenderStyle.h"
 
 namespace WebCore {
@@ -139,19 +138,6 @@ bool StyleRareNonInheritedData::reflectionDataEquivalent(
     return *m_boxReflect == *o.m_boxReflect;
   }
   return true;
-}
-
-void StyleRareNonInheritedData::updateKeyframes(
-    const CSSStyleSelector* styleSelector) {
-  if (m_animations) {
-    for (size_t i = 0; i < m_animations->size(); ++i) {
-      if (m_animations->animation(i)->isValidAnimation()) {
-        RefPtr<KeyframeList> keyframe =
-            styleSelector->findKeyframeRule(m_animations->animation(i)->name());
-        m_animations->animation(i)->setAnimationKeyframe(keyframe);
-      }
-    }
-  }
 }
 
 bool StyleRareNonInheritedData::animationDataEquivalent(

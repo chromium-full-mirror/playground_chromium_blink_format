@@ -1432,10 +1432,6 @@ class RenderStyle {
   }
   void adjustAnimations();
   void adjustTransitions();
-  void updateKeyframes(const CSSStyleSelector* styleSelector) {
-    if (rareNonInheritedData.get())
-      rareNonInheritedData.access()->updateKeyframes(styleSelector);
-  }
 
   void setLineClamp(int c) { SET_VAR(rareNonInheritedData, lineClamp, c); }
   void setTextSizeAdjust(bool b) {

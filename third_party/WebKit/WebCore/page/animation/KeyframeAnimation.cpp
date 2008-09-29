@@ -30,12 +30,37 @@
 #include "KeyframeAnimation.h"
 
 #include "CSSPropertyNames.h"
+#include "CSSStyleSelector.h"
 #include "CompositeAnimation.h"
 #include "EventNames.h"
 #include "RenderObject.h"
 #include "SystemTime.h"
 
 namespace WebCore {
+
+KeyframeAnimation::KeyframeAnimation(const Animation* animation,
+                                     RenderObject* renderer,
+                                     int index,
+                                     CompositeAnimation* compAnim,
+                                     const RenderStyle* unanimatedStyle)
+    : AnimationBase(animation, renderer, compAnim),
+      m_keyframes(renderer, animation->name()),
+      m_index(index),
+      m_unanimatedStyle(0) {
+  // Set the transform animation list
+  validateTransformFunctionList();
+
+  if (unanimatedStyle) {
+    const_cast<RenderStyle*>(unanimatedStyle)->ref();
+    m_unanimatedStyle = unanimatedStyle;
+  }
+
+  // Get the keyframe RenderStyles
+  if (m_object && m_object->element() && m_object->element()->isElementNode())
+    m_object->document()->styleSelector()->keyframeStylesForAnimation(
+        static_cast<Element*>(m_object->element()), unanimatedStyle,
+        m_keyframes);
+}
 
 KeyframeAnimation::~KeyframeAnimation() {
   // Do the cleanup here instead of in the base class so the specialized methods
@@ -94,24 +119,22 @@ void KeyframeAnimation::animate(CompositeAnimation* animation,
   RenderStyle* toStyle = 0;
   double scale = 1;
   double offset = 0;
-  if (m_keyframes.get()) {
-    Vector<KeyframeValue>::const_iterator end = m_keyframes->endKeyframes();
-    for (Vector<KeyframeValue>::const_iterator it =
-             m_keyframes->beginKeyframes();
-         it != end; ++it) {
-      if (t < it->key) {
-        // The first key should always be 0, so we should never succeed on the
-        // first key
-        if (!fromStyle)
-          break;
-        scale = 1.0 / (it->key - offset);
-        toStyle = const_cast<RenderStyle*>(&(it->style));
+  Vector<KeyframeValue>::const_iterator endKeyframes =
+      m_keyframes.endKeyframes();
+  for (Vector<KeyframeValue>::const_iterator it = m_keyframes.beginKeyframes();
+       it != endKeyframes; ++it) {
+    if (t < it->key) {
+      // The first key should always be 0, so we should never succeed on the
+      // first key
+      if (!fromStyle)
         break;
-      }
-
-      offset = it->key;
-      fromStyle = const_cast<RenderStyle*>(&(it->style));
+      scale = 1.0 / (it->key - offset);
+      toStyle = it->style;
+      break;
     }
+
+    offset = it->key;
+    fromStyle = it->style;
   }
 
   // If either style is 0 we have an invalid case, just stop the animation.
@@ -131,17 +154,17 @@ void KeyframeAnimation::animate(CompositeAnimation* animation,
 
   double prog = progress(scale, offset, timingFunction);
 
-  HashSet<int>::const_iterator end = m_keyframes->endProperties();
-  for (HashSet<int>::const_iterator it = m_keyframes->beginProperties();
-       it != end; ++it) {
+  HashSet<int>::const_iterator endProperties = m_keyframes.endProperties();
+  for (HashSet<int>::const_iterator it = m_keyframes.beginProperties();
+       it != endProperties; ++it) {
     if (blendProperties(this, *it, animatedStyle, fromStyle, toStyle, prog))
       setAnimating();
   }
 }
 
 bool KeyframeAnimation::hasAnimationForProperty(int property) const {
-  HashSet<int>::const_iterator end = m_keyframes->endProperties();
-  for (HashSet<int>::const_iterator it = m_keyframes->beginProperties();
+  HashSet<int>::const_iterator end = m_keyframes.endProperties();
+  for (HashSet<int>::const_iterator it = m_keyframes.beginProperties();
        it != end; ++it) {
     if (*it == property)
       return true;
@@ -192,8 +215,9 @@ bool KeyframeAnimation::sendAnimationEvent(const AtomicString& eventType,
   if (shouldSendEventForListener(listenerType)) {
     if (Element* element = elementForEventDispatch()) {
       m_waitingForEndEvent = true;
-      m_animationEventDispatcher.startTimer(element, m_name, -1, true,
-                                            eventType, elapsedTime);
+      m_animationEventDispatcher.startTimer(element,
+                                            m_keyframes.animationName(), -1,
+                                            true, eventType, elapsedTime);
       return true;  // Did dispatch an event
     }
   }
@@ -204,23 +228,23 @@ bool KeyframeAnimation::sendAnimationEvent(const AtomicString& eventType,
 void KeyframeAnimation::overrideAnimations() {
   // This will override implicit animations that match the properties in the
   // keyframe animation
-  HashSet<int>::const_iterator end = m_keyframes->endProperties();
-  for (HashSet<int>::const_iterator it = m_keyframes->beginProperties();
+  HashSet<int>::const_iterator end = m_keyframes.endProperties();
+  for (HashSet<int>::const_iterator it = m_keyframes.beginProperties();
        it != end; ++it)
     compositeAnimation()->overrideImplicitAnimations(*it);
 }
 
 void KeyframeAnimation::resumeOverriddenAnimations() {
   // This will resume overridden implicit animations
-  HashSet<int>::const_iterator end = m_keyframes->endProperties();
-  for (HashSet<int>::const_iterator it = m_keyframes->beginProperties();
+  HashSet<int>::const_iterator end = m_keyframes.endProperties();
+  for (HashSet<int>::const_iterator it = m_keyframes.beginProperties();
        it != end; ++it)
     compositeAnimation()->resumeOverriddenImplicitAnimations(*it);
 }
 
 bool KeyframeAnimation::affectsProperty(int property) const {
-  HashSet<int>::const_iterator end = m_keyframes->endProperties();
-  for (HashSet<int>::const_iterator it = m_keyframes->beginProperties();
+  HashSet<int>::const_iterator end = m_keyframes.endProperties();
+  for (HashSet<int>::const_iterator it = m_keyframes.beginProperties();
        it != end; ++it) {
     if (*it == property)
       return true;
@@ -231,20 +255,20 @@ bool KeyframeAnimation::affectsProperty(int property) const {
 void KeyframeAnimation::validateTransformFunctionList() {
   m_transformFunctionListValid = false;
 
-  if (!m_keyframes.get() || m_keyframes->size() < 2 ||
-      !m_keyframes->containsProperty(CSSPropertyWebkitTransform))
+  if (m_keyframes.size() < 2 ||
+      !m_keyframes.containsProperty(CSSPropertyWebkitTransform))
     return;
 
-  Vector<KeyframeValue>::const_iterator end = m_keyframes->endKeyframes();
+  Vector<KeyframeValue>::const_iterator end = m_keyframes.endKeyframes();
 
   // Empty transforms match anything, so find the first non-empty entry as the
   // reference
   size_t firstIndex = 0;
   Vector<KeyframeValue>::const_iterator firstIt = end;
 
-  for (Vector<KeyframeValue>::const_iterator it = m_keyframes->beginKeyframes();
+  for (Vector<KeyframeValue>::const_iterator it = m_keyframes.beginKeyframes();
        it != end; ++it, ++firstIndex) {
-    if (it->style.transform().operations().size() > 0) {
+    if (it->style->transform().operations().size() > 0) {
       firstIt = it;
       break;
     }
@@ -253,12 +277,12 @@ void KeyframeAnimation::validateTransformFunctionList() {
   if (firstIt == end)
     return;
 
-  const TransformOperations* firstVal = &firstIt->style.transform();
+  const TransformOperations* firstVal = &firstIt->style->transform();
 
   // See if the keyframes are valid
   for (Vector<KeyframeValue>::const_iterator it = firstIt + 1; it != end;
        ++it) {
-    const TransformOperations* val = &it->style.transform();
+    const TransformOperations* val = &it->style->transform();
 
     // A null transform matches anything
     if (val->operations().isEmpty())
