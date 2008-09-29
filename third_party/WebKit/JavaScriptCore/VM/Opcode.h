@@ -40,7 +40,7 @@ namespace JSC {
 #define DUMP_OPCODE_STATS 0
 
 #define FOR_EACH_OPCODE_ID(macro)                                                                                         \
-  macro(op_init) macro(op_init_activation)                                                                                \
+  macro(op_init) macro(op_init_activation) macro(op_init_arguments)                                                       \
                                                                                                                           \
       macro(op_unexpected_load) macro(op_new_object) macro(                                                               \
           op_new_array) macro(op_new_regexp) macro(op_mov)                                                                \

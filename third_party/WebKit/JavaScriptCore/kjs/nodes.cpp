@@ -1934,12 +1934,14 @@ ScopeNode::ScopeNode(JSGlobalData* globalData,
                      FunctionStack* funcStack,
                      bool usesEval,
                      bool needsClosure,
+                     bool usesArguments,
                      int numConstants)
     : BlockNode(globalData, children),
       m_sourceURL(globalData->parser->sourceURL()),
       m_sourceId(globalData->parser->sourceId()),
       m_usesEval(usesEval),
       m_needsClosure(needsClosure),
+      m_usesArguments(usesArguments),
       m_numConstants(numConstants) {
   if (varStack)
     m_varStack = *varStack;
@@ -1958,6 +1960,7 @@ ProgramNode::ProgramNode(JSGlobalData* globalData,
                          SourceProvider* sourceProvider,
                          bool usesEval,
                          bool needsClosure,
+                         bool usesArguments,
                          int numConstants)
     : ScopeNode(globalData,
                 children,
@@ -1965,6 +1968,7 @@ ProgramNode::ProgramNode(JSGlobalData* globalData,
                 funcStack,
                 usesEval,
                 needsClosure,
+                usesArguments,
                 numConstants),
       m_sourceProvider(sourceProvider) {}
 
@@ -1975,9 +1979,11 @@ ProgramNode* ProgramNode::create(JSGlobalData* globalData,
                                  SourceProvider* sourceProvider,
                                  bool usesEval,
                                  bool needsClosure,
+                                 bool usesArguments,
                                  int numConstants) {
   return new ProgramNode(globalData, children, varStack, funcStack,
-                         sourceProvider, usesEval, needsClosure, numConstants);
+                         sourceProvider, usesEval, needsClosure, usesArguments,
+                         numConstants);
 }
 
 // ------------------------------ EvalNode -----------------------------
@@ -1989,6 +1995,7 @@ EvalNode::EvalNode(JSGlobalData* globalData,
                    SourceProvider* sourceProvider,
                    bool usesEval,
                    bool needsClosure,
+                   bool usesArguments,
                    int numConstants)
     : ScopeNode(globalData,
                 children,
@@ -1996,6 +2003,7 @@ EvalNode::EvalNode(JSGlobalData* globalData,
                 funcStack,
                 usesEval,
                 needsClosure,
+                usesArguments,
                 numConstants),
       m_sourceProvider(sourceProvider) {}
 
@@ -2031,9 +2039,10 @@ EvalNode* EvalNode::create(JSGlobalData* globalData,
                            SourceProvider* sourceProvider,
                            bool usesEval,
                            bool needsClosure,
+                           bool usesArguments,
                            int numConstants) {
   return new EvalNode(globalData, children, varStack, funcStack, sourceProvider,
-                      usesEval, needsClosure, numConstants);
+                      usesEval, needsClosure, usesArguments, numConstants);
 }
 
 // ------------------------------ FunctionBodyNode -----------------------------
@@ -2044,6 +2053,7 @@ FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
                                    FunctionStack* funcStack,
                                    bool usesEval,
                                    bool needsClosure,
+                                   bool usesArguments,
                                    int numConstants)
     : ScopeNode(globalData,
                 children,
@@ -2051,6 +2061,7 @@ FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
                 funcStack,
                 usesEval,
                 needsClosure,
+                usesArguments,
                 numConstants),
       m_refCount(0) {}
 
@@ -2065,9 +2076,11 @@ FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
                                            FunctionStack* funcStack,
                                            bool usesEval,
                                            bool needsClosure,
+                                           bool usesArguments,
                                            int numConstants) {
   return new FunctionBodyNode(globalData, children, varStack, funcStack,
-                              usesEval, needsClosure, numConstants);
+                              usesEval, needsClosure, usesArguments,
+                              numConstants);
 }
 
 FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
@@ -2077,9 +2090,11 @@ FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
                                            SourceProvider*,
                                            bool usesEval,
                                            bool needsClosure,
+                                           bool usesArguments,
                                            int numConstants) {
   return new FunctionBodyNode(globalData, children, varStack, funcStack,
-                              usesEval, needsClosure, numConstants);
+                              usesEval, needsClosure, usesArguments,
+                              numConstants);
 }
 
 void FunctionBodyNode::generateCode(ScopeChainNode* scopeChainNode) {

@@ -90,6 +90,7 @@ void Parser::didFinishParsing(
     ParserRefCountedData<DeclarationStacks::FunctionStack>* funcStack,
     bool usesEval,
     bool needsClosure,
+    bool usesArguments,
     int lastLine,
     int numConstants) {
   m_sourceElements = sourceElements;
@@ -97,6 +98,7 @@ void Parser::didFinishParsing(
   m_funcDeclarations = funcStack;
   m_usesEval = usesEval;
   m_needsClosure = needsClosure;
+  m_usesArguments = usesArguments;
   m_lastLine = lastLine;
   m_numConstants = numConstants;
 }
