@@ -357,6 +357,8 @@ void ScrollView::platformSetContentsSize() {}
 
 void ScrollView::platformSetScrollPosition(const IntPoint&) {}
 
-bool platformScroll(ScrollDirection, ScrollGranularity) {}
+bool ScrollView::platformScroll(ScrollDirection, ScrollGranularity) {
+  return true;
+}
 #endif
 }
