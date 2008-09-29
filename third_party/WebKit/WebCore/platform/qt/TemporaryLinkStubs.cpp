@@ -124,13 +124,10 @@ void PluginView::paint(GraphicsContext*, const IntRect&) {
 void PluginView::setParent(ScrollView* view) {
   Widget::setParent(view);
 }
-void PluginView::attachToWindow() {
+void PluginView::setParentVisible(bool) {
   notImplemented();
 }
-void PluginView::detachFromWindow() {
-  notImplemented();
-}
-void PluginView::updateWindow() const {
+void PluginView::updatePluginWidget() const {
   notImplemented();
 }
 void PluginView::handleKeyboardEvent(KeyboardEvent*) {
