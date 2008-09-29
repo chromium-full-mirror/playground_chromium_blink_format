@@ -145,7 +145,7 @@ class FrameLoader : Noncopyable
   FrameLoader(Frame*, FrameLoaderClient*);
   ~FrameLoader();
 
-  void init();
+  void init(bool shouldCreateEmptyDocument = true);
 
   Frame* frame() const { return m_frame; }
 
@@ -208,6 +208,8 @@ class FrameLoader : Noncopyable
             const String& frameName);  // Called by WebPluginController
 
   void loadArchive(PassRefPtr<Archive> archive);
+
+  void fakeLoad(SharedBuffer* data, const char* MIMEType);
 
   // Returns true for any non-local URL. If Document parameter is supplied, its
   // local load policy dictates,
@@ -581,6 +583,8 @@ class FrameLoader : Noncopyable
   void startIconLoader();
 
   void applyUserAgent(ResourceRequest& request);
+
+  static PassRefPtr<Frame> createDummyFrame(Document* = 0);
 
  private:
   PassRefPtr<HistoryItem> createHistoryItem(bool useOriginal);
