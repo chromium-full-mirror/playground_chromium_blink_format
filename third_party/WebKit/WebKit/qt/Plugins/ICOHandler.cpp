@@ -33,7 +33,7 @@ inline QDataStream& operator>>(QDataStream& s, IcoHeader& h) {
 }
 
 // Based on qt_read_dib et al. from qimage.cpp
-// (c) 1992-2002 Trolltech AS.
+// (c) 1992-2002 Nokia Corporation and/or its subsidiary(-ies).
 struct BMP_INFOHDR {
   static const quint32 Size = 40;
   quint32 biSize;      // size of this struct
