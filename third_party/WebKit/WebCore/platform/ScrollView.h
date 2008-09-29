@@ -156,6 +156,9 @@ class ScrollView : public Widget {
   }
   void scrollRectIntoViewRecursively(const IntRect&);
 
+  // This method scrolls by lines, pages or pixels.
+  bool scroll(ScrollDirection, ScrollGranularity);
+
   // This gives us a means of blocking painting on our scrollbars until the
   // first layout has occurred.
   void setScrollbarsSuppressed(bool suppressed,
@@ -202,8 +205,6 @@ class ScrollView : public Widget {
   // platforms
   // (like Windows), we need this method in order to do the scroll ourselves.
   void wheelEvent(PlatformWheelEvent&);
-
-  bool scroll(ScrollDirection, ScrollGranularity);
 
   IntPoint convertChildToSelf(const Widget* child,
                               const IntPoint& point) const {
@@ -262,6 +263,8 @@ class ScrollView : public Widget {
   IntRect platformVisibleContentRect(bool includeScrollbars) const;
   IntSize platformContentsSize() const;
   void platformSetContentsSize();
+  void platformSetScrollPosition(const IntPoint&);
+  bool platformScroll(ScrollDirection, ScrollGranularity);
   void platformSetScrollbarsSuppressed(bool repaintOnUnsuppress);
 
 #if PLATFORM(MAC) && defined __OBJC__

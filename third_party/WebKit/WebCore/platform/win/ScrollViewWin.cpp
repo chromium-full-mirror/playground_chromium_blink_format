@@ -230,16 +230,6 @@ void ScrollView::update() {
   ::UpdateWindow(containingWindow());
 }
 
-void ScrollView::setScrollPosition(const IntPoint& scrollPoint) {
-  IntPoint newScrollPosition = scrollPoint.shrunkTo(maximumScrollPosition());
-  newScrollPosition.clampNegativeToZero();
-
-  if (newScrollPosition == scrollPosition())
-    return;
-
-  updateScrollbars(IntSize(newScrollPosition.x(), newScrollPosition.y()));
-}
-
 void ScrollView::setFrameRect(const IntRect& newGeometry) {
   IntRect oldGeometry = frameRect();
   Widget::setFrameRect(newGeometry);
@@ -507,18 +497,6 @@ void ScrollView::themeChanged() {
   ScrollbarTheme::nativeTheme()->themeChanged();
   theme()->themeChanged();
   invalidate();
-}
-
-bool ScrollView::scroll(ScrollDirection direction,
-                        ScrollGranularity granularity) {
-  if (direction == ScrollUp || direction == ScrollDown) {
-    if (m_verticalScrollbar)
-      return m_verticalScrollbar->scroll(direction, granularity);
-  } else {
-    if (m_horizontalScrollbar)
-      return m_horizontalScrollbar->scroll(direction, granularity);
-  }
-  return false;
 }
 
 void ScrollView::setParentVisible(bool visible) {

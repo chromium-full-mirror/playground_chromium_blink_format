@@ -179,10 +179,8 @@ IntSize ScrollView::platformContentsSize() const {
   return IntSize(width, height);
 }
 
-void ScrollView::setScrollPosition(const IntPoint& scrollPoint) {
+void ScrollView::platformSetScrollPosition(const IntPoint& scrollPoint) {
   wxWindow* win = platformWidget();
-  if (!win)
-    return;
 
   wxPoint scrollOffset = m_data->viewStart;
   wxPoint orig(scrollOffset);
@@ -215,6 +213,11 @@ void ScrollView::setScrollPosition(const IntPoint& scrollPoint) {
     win->Refresh();
 
   adjustScrollbars();
+}
+
+bool ScrollView::platformScroll(ScrollDirection, ScrollGranularity) {
+  notImplemented();
+  return true;
 }
 
 void ScrollView::platformSetContentsSize() {

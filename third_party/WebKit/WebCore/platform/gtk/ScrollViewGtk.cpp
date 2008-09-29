@@ -602,18 +602,6 @@ void ScrollView::paint(GraphicsContext* context, const IntRect& rect) {
   }
 }
 
-bool ScrollView::scroll(ScrollDirection direction,
-                        ScrollGranularity granularity) {
-  if (direction == ScrollUp || direction == ScrollDown) {
-    if (m_verticalScrollbar)
-      return m_verticalScrollbar->scroll(direction, granularity);
-  } else {
-    if (m_horizontalScrollbar)
-      return m_horizontalScrollbar->scroll(direction, granularity);
-  }
-  return false;
-}
-
 void ScrollView::addToDirtyRegion(const IntRect& containingWindowRect) {
   ASSERT(isFrameView());
   const FrameView* frameView = static_cast<const FrameView*>(this);
