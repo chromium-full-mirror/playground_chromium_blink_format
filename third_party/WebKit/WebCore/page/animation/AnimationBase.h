@@ -45,6 +45,7 @@ class KeyframeAnimation;
 class Node;
 class RenderObject;
 class RenderStyle;
+class TimingFunction;
 
 class AnimationTimerBase {
  public:
@@ -223,7 +224,7 @@ class AnimationBase : public Noncopyable {
   void setAnimating(bool inAnimating = true) { m_animating = inAnimating; }
   bool animating() const { return m_animating; }
 
-  double progress(double scale, double offset) const;
+  double progress(double scale, double offset, const TimingFunction*) const;
 
   virtual void animate(CompositeAnimation*,
                        RenderObject*,

@@ -944,7 +944,9 @@ void AnimationBase::updatePlayState(bool run) {
                        -1);
 }
 
-double AnimationBase::progress(double scale, double offset) const {
+double AnimationBase::progress(double scale,
+                               double offset,
+                               const TimingFunction* tf) const {
   if (preActive())
     return 0;
 
@@ -974,14 +976,16 @@ double AnimationBase::progress(double scale, double offset) const {
   if (scale != 1 || offset)
     fractionalTime = (fractionalTime - offset) * scale;
 
-  if (m_animation->timingFunction().type() == LinearTimingFunction)
+  if (!tf)
+    tf = &m_animation->timingFunction();
+
+  if (tf->type() == LinearTimingFunction)
     return fractionalTime;
 
   // Cubic bezier.
-  double result = solveCubicBezierFunction(
-      m_animation->timingFunction().x1(), m_animation->timingFunction().y1(),
-      m_animation->timingFunction().x2(), m_animation->timingFunction().y2(),
-      fractionalTime, m_animation->duration());
+  double result =
+      solveCubicBezierFunction(tf->x1(), tf->y1(), tf->x2(), tf->y2(),
+                               fractionalTime, m_animation->duration());
   return result;
 }
 
