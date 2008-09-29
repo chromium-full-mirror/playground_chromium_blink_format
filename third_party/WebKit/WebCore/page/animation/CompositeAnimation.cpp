@@ -89,7 +89,9 @@ void CompositeAnimation::updateTransitions(RenderObject* renderer,
       // test
       // against the unanimated style here, but we "override" the transition
       // later.
-      const KeyframeAnimation* kfAnim = getAnimationForProperty(prop);
+      const KeyframeAnimation* keyframeAnim = getAnimationForProperty(prop);
+      const RenderStyle* fromStyle =
+          keyframeAnim ? keyframeAnim->unanimatedStyle() : currentStyle;
 
       // See if there is a current transition for this prop
       ImplicitAnimation* implAnim = m_transitions.get(prop);
@@ -98,22 +100,19 @@ void CompositeAnimation::updateTransitions(RenderObject* renderer,
       if (implAnim) {
         // There is one, has our target changed?
         if (!implAnim->isTargetPropertyEqual(prop, targetStyle)) {
-          implAnim->reset(renderer);
           delete implAnim;
           m_transitions.remove(prop);
           equal = false;
         }
       } else {
         // See if we need to start a new transition
-        equal = AnimationBase::propertiesEqual(
-            prop, kfAnim ? kfAnim->unanimatedStyle() : currentStyle,
-            targetStyle);
+        equal = AnimationBase::propertiesEqual(prop, fromStyle, targetStyle);
       }
 
       if (!equal) {
         // Add the new transition
         ImplicitAnimation* animation = new ImplicitAnimation(
-            const_cast<Animation*>(anim), prop, renderer, this);
+            const_cast<Animation*>(anim), prop, renderer, this, fromStyle);
         m_transitions.set(prop, animation);
       }
 
@@ -154,25 +153,26 @@ void CompositeAnimation::updateKeyframeAnimations(
         continue;
 
       // See if there is a current animation for this name
-      KeyframeAnimation* kfAnim = getKeyframeAnimation(anim->name());
+      KeyframeAnimation* keyframeAnim = getKeyframeAnimation(anim->name());
 
-      if (kfAnim) {
+      if (keyframeAnim) {
         // There is one so it is still active
 
         // Animations match, but play states may differ. update if needed
-        kfAnim->updatePlayState(anim->playState() == AnimPlayStatePlaying);
+        keyframeAnim->updatePlayState(anim->playState() ==
+                                      AnimPlayStatePlaying);
 
         // Set the saved animation to this new one, just in case the play state
         // has changed
-        kfAnim->setAnimation(anim);
-        kfAnim->setIndex(i);
+        keyframeAnim->setAnimation(anim);
+        keyframeAnim->setIndex(i);
       } else if ((anim->duration() || anim->delay()) &&
                  anim->iterationCount() && anim->keyframeList() &&
                  !anim->keyframeList()->isEmpty()) {
-        kfAnim = new KeyframeAnimation(
+        keyframeAnim = new KeyframeAnimation(
             const_cast<Animation*>(anim), renderer, i, this,
             currentStyle ? currentStyle : targetStyle);
-        m_keyframeAnimations.set(kfAnim->name().impl(), kfAnim);
+        m_keyframeAnimations.set(keyframeAnim->name().impl(), keyframeAnim);
       }
     }
   }
@@ -182,16 +182,17 @@ void CompositeAnimation::updateKeyframeAnimations(
   kfend = m_keyframeAnimations.end();
   for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
        it != kfend; ++it) {
-    KeyframeAnimation* kfAnim = it->second;
-    if (kfAnim->index() < 0)
-      animsToBeRemoved.append(kfAnim->name().impl());
+    KeyframeAnimation* keyframeAnim = it->second;
+    if (keyframeAnim->index() < 0)
+      animsToBeRemoved.append(keyframeAnim->name().impl());
   }
 
   // Now remove the animations from the list
   for (size_t j = 0; j < animsToBeRemoved.size(); ++j) {
-    KeyframeAnimation* kfAnim = m_keyframeAnimations.get(animsToBeRemoved[j]);
+    KeyframeAnimation* keyframeAnim =
+        m_keyframeAnimations.get(animsToBeRemoved[j]);
     m_keyframeAnimations.remove(animsToBeRemoved[j]);
-    delete kfAnim;
+    delete keyframeAnim;
   }
 }
 
@@ -304,12 +305,7 @@ const KeyframeAnimation* CompositeAnimation::getAnimationForProperty(
 
 void CompositeAnimation::resetTransitions(RenderObject* renderer) {
   CSSPropertyTransitionsMap::const_iterator end = m_transitions.end();
-  for (CSSPropertyTransitionsMap::const_iterator it = m_transitions.begin();
-       it != end; ++it) {
-    ImplicitAnimation* transition = it->second;
-    transition->reset(renderer);
-    delete transition;
-  }
+  deleteAllValues(m_transitions);
   m_transitions.clear();
 }
 
@@ -339,10 +335,8 @@ void CompositeAnimation::cleanupFinishedAnimations(RenderObject* renderer) {
   // Delete them
   size_t finishedTransitionCount = finishedTransitions.size();
   for (size_t i = 0; i < finishedTransitionCount; ++i) {
-    if (ImplicitAnimation* anim = m_transitions.take(finishedTransitions[i])) {
-      anim->reset(renderer);
+    if (ImplicitAnimation* anim = m_transitions.take(finishedTransitions[i]))
       delete anim;
-    }
   }
 
   // Make a list of animations to be deleted
@@ -362,10 +356,8 @@ void CompositeAnimation::cleanupFinishedAnimations(RenderObject* renderer) {
   size_t finishedAnimationCount = finishedAnimations.size();
   for (size_t i = 0; i < finishedAnimationCount; ++i) {
     if (KeyframeAnimation* anim =
-            m_keyframeAnimations.take(finishedAnimations[i])) {
-      anim->reset(renderer);
+            m_keyframeAnimations.take(finishedAnimations[i]))
       delete anim;
-    }
   }
 }
 

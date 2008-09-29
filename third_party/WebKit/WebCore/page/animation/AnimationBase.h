@@ -231,9 +231,6 @@ class AnimationBase : public Noncopyable {
                        const RenderStyle* currentStyle,
                        const RenderStyle* targetStyle,
                        RenderStyle*& animatedStyle) {}
-  virtual void reset(RenderObject*,
-                     const RenderStyle* from = 0,
-                     const RenderStyle* to = 0) {}
 
   virtual bool shouldFireEvents() const { return false; }
 
