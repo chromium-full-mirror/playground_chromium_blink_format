@@ -161,6 +161,8 @@ class RenderThemeWin : public RenderTheme {
                                    RenderStyle* style,
                                    Element*) const {}
 
+  static void setWebKitIsBeingUnloaded();
+
  private:
   void addIntrinsicMargins(RenderStyle*) const;
   void close();

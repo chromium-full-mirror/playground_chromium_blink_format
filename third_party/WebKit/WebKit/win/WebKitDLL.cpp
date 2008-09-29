@@ -36,6 +36,7 @@
 #include <WebCore/LocalStorage.h>
 #include <WebCore/Page.h>
 #include <WebCore/PageGroup.h>
+#include <WebCore/RenderThemeWin.h>
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/Widget.h>
 #include <wtf/Vector.h>
@@ -63,6 +64,9 @@ DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID /*lpReserved*/) {
       return TRUE;
 
     case DLL_PROCESS_DETACH:
+      WebCore::RenderThemeWin::setWebKitIsBeingUnloaded();
+      break;
+
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
       break;
