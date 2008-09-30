@@ -120,7 +120,7 @@ JSGlobalObject::~JSGlobalObject() {
   delete d();
 }
 
-void JSGlobalObject::init(JSObject* thisValue) {
+void JSGlobalObject::init() {
   ASSERT(JSLock::currentThreadIsHoldingLock());
 
   d()->globalData = Heap::heap(this)->globalData();
@@ -136,9 +136,8 @@ void JSGlobalObject::init(JSObject* thisValue) {
   d()->recursion = 0;
   d()->debugger = 0;
 
-  d()->globalExec.set(
-      new ExecState(this, thisValue,
-                    d()->globalCallFrame + RegisterFile::CallFrameHeaderSize));
+  d()->globalExec.set(new ExecState(
+      this, d()->globalCallFrame + RegisterFile::CallFrameHeaderSize));
 
   d()->profileGroup = 0;
 

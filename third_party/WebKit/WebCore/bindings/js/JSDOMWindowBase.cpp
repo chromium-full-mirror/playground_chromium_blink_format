@@ -237,9 +237,7 @@ JSDOMWindowBase::JSDOMWindowBaseData::JSDOMWindowBaseData(
 JSDOMWindowBase::JSDOMWindowBase(PassRefPtr<StructureID> structure,
                                  PassRefPtr<DOMWindow> window,
                                  JSDOMWindowShell* shell)
-    : JSGlobalObject(structure,
-                     new JSDOMWindowBaseData(window, this, shell),
-                     shell) {
+    : JSGlobalObject(structure, new JSDOMWindowBaseData(window, this, shell)) {
   // Time in milliseconds before the script timeout handler kicks in.
   setTimeoutTime(10000);
 
