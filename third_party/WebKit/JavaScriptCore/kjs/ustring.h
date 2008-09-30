@@ -259,7 +259,6 @@ class UString {
   size_t cost() const;
 
  private:
-  static size_t expandedSize(size_t size, size_t otherSize);
   int usedCapacity() const;
   int usedPreCapacity() const;
   void expandCapacity(int requiredLength);
@@ -272,6 +271,9 @@ class UString {
   friend PassRefPtr<Rep> concatenate(Rep*, Rep*);  // returns 0 if out of memory
 };
 PassRefPtr<UString::Rep> concatenate(UString::Rep*, UString::Rep*);
+PassRefPtr<UString::Rep> concatenate(UString::Rep*, int);
+PassRefPtr<UString::Rep> concatenate(UString::Rep*, double);
+
 bool operator==(const UString&, const UString&);
 
 inline bool operator!=(const UString& s1, const UString& s2) {
