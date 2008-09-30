@@ -41,6 +41,7 @@ struct NodeFeatureInfo {
   int m_numConstants;
 };
 
+typedef NodeFeatureInfo<FuncDeclNode*> FuncDeclNodeInfo;
 typedef NodeFeatureInfo<FuncExprNode*> FuncExprNodeInfo;
 typedef NodeFeatureInfo<ExpressionNode*> ExpressionNodeInfo;
 typedef NodeFeatureInfo<ArgumentsNode*> ArgumentsNodeInfo;
@@ -66,6 +67,7 @@ typedef NodeDeclarationInfo<SourceElements*> SourceElementsInfo;
 typedef NodeDeclarationInfo<ClauseList> ClauseListInfo;
 typedef NodeDeclarationInfo<ExpressionNode*> VarDeclListInfo;
 typedef NodeDeclarationInfo<ConstDeclList> ConstDeclListInfo;
+typedef NodeDeclarationInfo<ParameterList> ParameterListInfo;
 
 }  // namespace JSC
 
