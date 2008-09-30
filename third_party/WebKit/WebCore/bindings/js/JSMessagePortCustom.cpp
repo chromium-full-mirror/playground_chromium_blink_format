@@ -55,8 +55,7 @@ JSValue* JSMessagePort::addEventListener(ExecState* exec, const ArgList& args) {
   if (!window)
     return jsUndefined();
   RefPtr<JSUnprotectedEventListener> listener =
-      window->findOrCreateJSUnprotectedEventListener(exec, args.at(exec, 1),
-                                                     true);
+      window->findOrCreateJSUnprotectedEventListener(exec, args.at(exec, 1));
   if (!listener)
     return jsUndefined();
   impl()->addEventListener(args.at(exec, 0)->toString(exec), listener.release(),
@@ -73,7 +72,7 @@ JSValue* JSMessagePort::removeEventListener(ExecState* exec,
   if (!window)
     return jsUndefined();
   JSUnprotectedEventListener* listener =
-      window->findJSUnprotectedEventListener(exec, args.at(exec, 1), true);
+      window->findJSUnprotectedEventListener(exec, args.at(exec, 1));
   if (!listener)
     return jsUndefined();
   impl()->removeEventListener(args.at(exec, 0)->toString(exec), listener,
@@ -98,7 +97,7 @@ void JSMessagePort::setOnmessage(ExecState* exec, JSValue* value) {
   if (!window)
     return;
   impl()->setOnMessageListener(
-      window->findOrCreateJSUnprotectedEventListener(exec, value, true));
+      window->findOrCreateJSUnprotectedEventListener(exec, value));
 }
 
 JSValue* JSMessagePort::onmessage(ExecState*) const {
@@ -117,7 +116,7 @@ void JSMessagePort::setOnclose(ExecState* exec, JSValue* value) {
   if (!window)
     return;
   impl()->setOnCloseListener(
-      window->findOrCreateJSUnprotectedEventListener(exec, value, true));
+      window->findOrCreateJSUnprotectedEventListener(exec, value));
 }
 
 JSValue* JSMessagePort::onclose(ExecState*) const {
