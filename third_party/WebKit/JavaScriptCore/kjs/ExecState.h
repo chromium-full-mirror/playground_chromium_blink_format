@@ -118,8 +118,6 @@ class ExecState : Noncopyable {
 #endif
   JSGlobalData* m_globalData;
 
-  // These values are controlled by the machine.
-  ExecState* m_prev;
   Register* m_callFrame;  // The most recent call frame.
 };
 
