@@ -374,11 +374,11 @@ typedef enum {
 #ifndef NP_NO_CARBON
   ,
   NPNVsupportsCarbonBool =
-      2003 /* TRUE if the browser supports the Carbon event model */
+      3000 /* TRUE if the browser supports the Carbon event model */
 #endif
   ,
   NPNVsupportsCocoaBool =
-      2004 /* TRUE if the browser supports the Cocoa event model */
+      3001 /* TRUE if the browser supports the Cocoa event model */
 
   ,
   NPNVbrowserTextInputFuncs = 1002 /* The browser text input vtable */
