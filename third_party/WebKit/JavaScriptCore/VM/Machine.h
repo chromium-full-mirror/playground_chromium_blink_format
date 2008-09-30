@@ -120,6 +120,13 @@ class Machine {
                           UString& sourceURL,
                           JSValue*& function) const;
 
+  static ScopeChainNode* scopeChain(const Register* r) {
+    return r[RegisterFile::ScopeChain].scopeChain();
+  }
+  static CodeBlock* codeBlock(const Register* r) {
+    return r[RegisterFile::CodeBlock].codeBlock();
+  }
+
   void getArgumentsData(Register* callFrame,
                         JSFunction*&,
                         int& firstParameterIndex,
@@ -263,6 +270,15 @@ class Machine {
            v->asCell()->vptr() == m_jsStringVptr;
   }
 
+  ALWAYS_INLINE static void initializeCallFrame(Register* callFrame,
+                                                CodeBlock*,
+                                                Instruction*,
+                                                ScopeChainNode*,
+                                                Register* r,
+                                                int returnValueRegister,
+                                                int argc,
+                                                JSValue* function);
+
  private:
   enum ExecutionFlag { Normal, InitializeAndReturn };
 
@@ -281,20 +297,7 @@ class Machine {
                    ScopeChainNode*,
                    JSValue** exception);
 
-  ALWAYS_INLINE static void initializeCallFrame(Register* callFrame,
-                                                CodeBlock*,
-                                                Instruction*,
-                                                ScopeChainNode*,
-                                                Register* r,
-                                                int returnValueRegister,
-                                                int argc,
-                                                JSValue* function);
-
-  ALWAYS_INLINE static void setScopeChain(ExecState* exec,
-                                          ScopeChainNode*&,
-                                          ScopeChainNode*);
   NEVER_INLINE void debug(ExecState*,
-                          ScopeChainNode*,
                           Register*,
                           DebugHookID,
                           int firstLine,
@@ -303,47 +306,37 @@ class Machine {
   NEVER_INLINE bool resolve(ExecState* exec,
                             Instruction* vPC,
                             Register* r,
-                            ScopeChainNode* scopeChain,
                             JSValue*& exceptionValue);
   NEVER_INLINE bool resolveSkip(ExecState* exec,
                                 Instruction* vPC,
                                 Register* r,
-                                ScopeChainNode* scopeChain,
                                 JSValue*& exceptionValue);
   NEVER_INLINE bool resolveGlobal(ExecState* exec,
                                   Instruction* vPC,
                                   Register* r,
                                   JSValue*& exceptionValue);
-  NEVER_INLINE void resolveBase(ExecState* exec,
-                                Instruction* vPC,
-                                Register* r,
-                                ScopeChainNode* scopeChain);
+  NEVER_INLINE void resolveBase(ExecState* exec, Instruction* vPC, Register* r);
   NEVER_INLINE bool resolveBaseAndProperty(ExecState* exec,
                                            Instruction* vPC,
                                            Register* r,
-                                           ScopeChainNode* scopeChain,
                                            JSValue*& exceptionValue);
   NEVER_INLINE ScopeChainNode* createExceptionScope(ExecState* exec,
                                                     const Instruction* vPC,
-                                                    Register* r,
-                                                    ScopeChainNode* scopeChain);
+                                                    Register* r);
 
   NEVER_INLINE bool unwindCallFrame(ExecState*,
                                     JSValue*,
                                     const Instruction*&,
                                     CodeBlock*&,
-                                    ScopeChainNode*&,
                                     Register*&);
   NEVER_INLINE Instruction* throwException(ExecState*,
                                            JSValue*&,
                                            const Instruction*,
-                                           ScopeChainNode*&,
                                            Register*&,
                                            bool);
   NEVER_INLINE bool resolveBaseAndFunc(ExecState* exec,
                                        Instruction* vPC,
                                        Register* r,
-                                       ScopeChainNode* scopeChain,
                                        JSValue*& exceptionValue);
 
   Register* callFrame(ExecState*, InternalFunction*) const;
@@ -352,10 +345,9 @@ class Machine {
                           ExecState* = 0,
                           RegisterFile* = 0,
                           Register* = 0,
-                          ScopeChainNode* = 0,
                           JSValue** exception = 0);
 
-  void dumpCallFrame(ScopeChainNode*, const RegisterFile*, const Register*);
+  void dumpCallFrame(const RegisterFile*, const Register*);
   void dumpRegisters(const RegisterFile*, const Register*);
 
   JSValue* checkTimeout(JSGlobalObject*);
@@ -417,6 +409,26 @@ class Machine {
       m_opcodeIDTable;  // Maps Opcode => OpcodeID for decompiling
 #endif
 };
+
+ALWAYS_INLINE void Machine::initializeCallFrame(Register* callFrame,
+                                                CodeBlock* codeBlock,
+                                                Instruction* vPC,
+                                                ScopeChainNode* scopeChain,
+                                                Register* r,
+                                                int returnValueRegister,
+                                                int argc,
+                                                JSValue* function) {
+  callFrame[RegisterFile::CodeBlock] = codeBlock;
+  callFrame[RegisterFile::ScopeChain] = scopeChain;
+  callFrame[RegisterFile::CallerRegisters] = r;
+  callFrame[RegisterFile::ReturnPC] = vPC;
+  callFrame[RegisterFile::ReturnValueRegister] = returnValueRegister;
+  callFrame[RegisterFile::ArgumentCount] =
+      argc;  // original argument count (for the sake of the "arguments" object)
+  callFrame[RegisterFile::Callee] = function;
+  callFrame[RegisterFile::OptionalCalleeActivation] = nullJSValue;
+  callFrame[RegisterFile::OptionalCalleeArguments] = nullJSValue;
+}
 
 }  // namespace JSC
 

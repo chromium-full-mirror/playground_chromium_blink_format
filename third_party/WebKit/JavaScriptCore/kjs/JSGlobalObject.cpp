@@ -137,7 +137,8 @@ void JSGlobalObject::init(JSObject* thisValue) {
   d()->debugger = 0;
 
   d()->globalExec.set(
-      new ExecState(this, thisValue, d()->globalScopeChain.node()));
+      new ExecState(this, thisValue,
+                    d()->globalCallFrame + RegisterFile::CallFrameHeaderSize));
 
   d()->profileGroup = 0;
 

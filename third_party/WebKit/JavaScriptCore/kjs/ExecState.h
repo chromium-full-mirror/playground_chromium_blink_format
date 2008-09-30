@@ -24,6 +24,7 @@
 #define ExecState_h
 
 #include "JSGlobalData.h"
+#include "Machine.h"
 #include "ScopeChain.h"
 
 namespace JSC {
@@ -53,9 +54,7 @@ class ExecState : Noncopyable {
   friend class DebuggerCallFrame;
 
  public:
-  ExecState(JSGlobalObject*,
-            JSObject* globalThisValue,
-            ScopeChainNode* globalScopeChain);
+  ExecState(JSGlobalObject*, JSObject* globalThisValue, Register* callFrame);
 
   // Global object in which execution began.
   JSGlobalObject* dynamicGlobalObject() const { return m_globalObject; }
@@ -63,10 +62,12 @@ class ExecState : Noncopyable {
   // Global object in which the current script was defined. (Can differ
   // from dynamicGlobalObject() during function calls across frames.)
   JSGlobalObject* lexicalGlobalObject() const {
-    return m_scopeChain->globalObject();
+    return Machine::scopeChain(m_callFrame)->globalObject();
   }
 
-  JSObject* globalThisValue() const { return m_scopeChain->globalThisObject(); }
+  JSObject* globalThisValue() const {
+    return Machine::scopeChain(m_callFrame)->globalThisObject();
+  }
 
   // Exception propogation.
   void setException(JSValue* exception) { m_exception = exception; }
@@ -117,7 +118,7 @@ class ExecState : Noncopyable {
   // Default constructor required for gcc 3.
   ExecState() {}
 
-  ExecState(ExecState*, RegisterFile*, ScopeChainNode*, Register* callFrame);
+  ExecState(ExecState*, RegisterFile*, Register* callFrame);
 
   bool isGlobalObject(JSObject*) const;
 
@@ -133,7 +134,6 @@ class ExecState : Noncopyable {
   // These values are controlled by the machine.
   ExecState* m_prev;
   RegisterFile* m_registerFile;
-  ScopeChainNode* m_scopeChain;
   Register* m_callFrame;  // The most recent call frame.
 };
 

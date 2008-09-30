@@ -74,7 +74,11 @@ class JSGlobalObject : public JSVariableObject {
           stringPrototype(0),
           numberPrototype(0),
           datePrototype(0),
-          regExpPrototype(0) {}
+          regExpPrototype(0) {
+      Machine::initializeCallFrame(
+          globalCallFrame + RegisterFile::CallFrameHeaderSize, 0, 0,
+          globalScopeChain.node(), 0, 0, 0, 0);
+    }
 
     virtual ~JSGlobalObjectData() {}
 
@@ -86,6 +90,7 @@ class JSGlobalObject : public JSVariableObject {
     Debugger* debugger;
 
     ScopeChain globalScopeChain;
+    Register globalCallFrame[RegisterFile::CallFrameHeaderSize];
     OwnPtr<ExecState> globalExec;
 
     int recursion;
