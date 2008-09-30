@@ -171,21 +171,6 @@ ScrollView::~ScrollView() {
   delete m_data;
 }
 
-void ScrollView::updateContents(const IntRect& rect, bool now) {
-  if (rect.isEmpty())
-    return;
-
-  IntPoint windowPoint = contentsToWindow(rect.location());
-  IntRect containingWindowRect = rect;
-  containingWindowRect.setLocation(windowPoint);
-
-  // Cache the dirty spot.
-  addToDirtyRegion(containingWindowRect);
-
-  if (now)
-    updateBackingStore();
-}
-
 void ScrollView::update() {
   QWidget* native = platformWidget();
   if (native) {

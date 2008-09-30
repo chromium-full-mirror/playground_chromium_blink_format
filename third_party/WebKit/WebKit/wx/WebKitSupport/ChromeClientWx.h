@@ -105,6 +105,10 @@ class ChromeClientWx : public ChromeClient {
                                   const IntRect& clipRect);
   virtual void updateBackingStore();
 
+  virtual void repaint(const IntRect&,
+                       bool contentChanged,
+                       bool immediate = false);
+
   virtual void mouseDidMoveOverElement(const HitTestResult&,
                                        unsigned modifierFlags);
 

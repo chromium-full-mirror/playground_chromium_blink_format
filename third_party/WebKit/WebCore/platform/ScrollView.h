@@ -55,6 +55,7 @@ class wxScrollWinEvent;
 // to implement this interface.
 namespace WebCore {
 
+class HostWindow;
 class PlatformWheelEvent;
 class Scrollbar;
 
@@ -62,6 +63,11 @@ class ScrollView : public Widget {
  public:
   ScrollView();
   ~ScrollView();
+
+  // The window thats hosts the ScrollView.  The ScrollView will communicate
+  // scrolls and repaints to the
+  // host window in the window's coordinate space.
+  virtual HostWindow* hostWindow() const = 0;
 
   // Methods for child manipulation and inspection.
   const HashSet<Widget*>* children() const { return &m_children; }
@@ -230,7 +236,7 @@ class ScrollView : public Widget {
 #endif
 
  protected:
-  void updateContents(const IntRect&, bool now = false);
+  virtual void repaintContentRectangle(const IntRect&, bool now = false);
   void updateWindowRect(const IntRect&, bool now = false);
 
  public:
@@ -266,6 +272,7 @@ class ScrollView : public Widget {
   void platformSetScrollPosition(const IntPoint&);
   bool platformScroll(ScrollDirection, ScrollGranularity);
   void platformSetScrollbarsSuppressed(bool repaintOnUnsuppress);
+  void platformRepaintContentRectangle(const IntRect&, bool now);
 
 #if PLATFORM(MAC) && defined __OBJC__
  public:

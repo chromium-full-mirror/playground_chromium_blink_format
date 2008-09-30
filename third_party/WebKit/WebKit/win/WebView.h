@@ -728,6 +728,9 @@ class WebView : public IWebView,
                           HDC,
                           bool backingStoreCompletelyDirty);
   void deleteBackingStore();
+  void repaint(const WebCore::IntRect&,
+               bool contentChanged,
+               bool immediate = false);
   void frameRect(RECT* rect);
   void closeWindow();
   void closeWindowSoon();

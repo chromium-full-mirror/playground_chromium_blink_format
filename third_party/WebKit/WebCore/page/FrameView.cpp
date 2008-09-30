@@ -615,6 +615,13 @@ void FrameView::setScrollPosition(const IntPoint& scrollPoint) {
   d->m_inProgrammaticScroll = wasInProgrammaticScroll;
 }
 
+HostWindow* FrameView::hostWindow() const {
+  Page* page = frame() ? frame()->page() : 0;
+  if (!page)
+    return 0;
+  return page->chrome();
+}
+
 const unsigned cRepaintRectUnionThreshold = 25;
 
 void FrameView::repaintContentRectangle(const IntRect& r, bool immediate) {
@@ -637,7 +644,7 @@ void FrameView::repaintContentRectangle(const IntRect& r, bool immediate) {
   if (!immediate && isOffscreen() && !shouldUpdateWhileOffscreen())
     return;
 
-  updateContents(r, immediate);
+  ScrollView::repaintContentRectangle(r, immediate);
 }
 
 void FrameView::beginDeferredRepaints() {

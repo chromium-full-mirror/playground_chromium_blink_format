@@ -97,6 +97,10 @@ class ChromeClient : public WebCore::ChromeClient {
                                   const WebCore::IntRect& clipRect);
   virtual void updateBackingStore();
 
+  virtual void repaint(const WebCore::IntRect&,
+                       bool contentChanged,
+                       bool immediate = false);
+
   virtual void mouseDidMoveOverElement(const WebCore::HitTestResult&,
                                        unsigned modifierFlags);
 
