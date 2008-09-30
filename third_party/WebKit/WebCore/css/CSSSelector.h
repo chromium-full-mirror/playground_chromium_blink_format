@@ -134,6 +134,7 @@ class CSSSelector {
     PseudoEnabled,
     PseudoFullPageMedia,
     PseudoDisabled,
+    PseudoInputPlaceholderMode,
     PseudoReadOnly,
     PseudoReadWrite,
     PseudoIndeterminate,

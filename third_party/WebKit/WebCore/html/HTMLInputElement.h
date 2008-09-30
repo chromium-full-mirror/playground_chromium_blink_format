@@ -216,6 +216,10 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
 
   virtual bool willValidate() const;
 
+  bool placeholderShouldBeVisible() const {
+    return m_placeholderShouldBeVisible;
+  }
+
  protected:
   virtual void willMoveToNewOwnerDocument();
   virtual void didMoveToNewOwnerDocument();
@@ -231,6 +235,8 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
   bool needsActivationCallback();
   void registerForActivationCallbackIfNeeded();
   void unregisterForActivationCallbackIfNeeded();
+
+  void updatePlaceholderVisibility();
 
   String m_value;
   String m_originalValue;
@@ -255,6 +261,7 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
   AutoCompleteSetting m_autocomplete : 2;
   bool m_autofilled : 1;
   bool m_inited : 1;
+  bool m_placeholderShouldBeVisible : 1;
 
   int cachedSelStart;
   int cachedSelEnd;

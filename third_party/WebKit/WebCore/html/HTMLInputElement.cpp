@@ -125,6 +125,7 @@ void HTMLInputElement::init() {
   m_autocomplete = Uninitialized;
   m_inited = false;
   m_autofilled = false;
+  m_placeholderShouldBeVisible = false;
 
   xPos = 0;
   yPos = 0;
@@ -238,6 +239,7 @@ bool HTMLInputElement::shouldUseInputMethod() const {
 void HTMLInputElement::dispatchFocusEvent() {
   if (isTextField()) {
     setAutofilled(false);
+    updatePlaceholderVisibility();
     if (inputType() == PASSWORD && document()->frame())
       document()->setUseSecureKeyboardEntryWhenActive(true);
   }
@@ -246,6 +248,7 @@ void HTMLInputElement::dispatchFocusEvent() {
 
 void HTMLInputElement::dispatchBlurEvent() {
   if (isTextField() && document()->frame()) {
+    updatePlaceholderVisibility();
     if (inputType() == PASSWORD)
       document()->setUseSecureKeyboardEntryWhenActive(false);
     document()->frame()->textFieldDidEndEditing(this);
@@ -671,9 +674,11 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
       attach();
     }
     setChanged();
-  } else if (attr->name() == autosaveAttr || attr->name() == incrementalAttr ||
-             attr->name() == placeholderAttr || attr->name() == minAttr ||
-             attr->name() == maxAttr || attr->name() == precisionAttr) {
+  } else if (attr->name() == placeholderAttr)
+    updatePlaceholderVisibility();
+  else if (attr->name() == autosaveAttr || attr->name() == incrementalAttr ||
+           attr->name() == minAttr || attr->name() == maxAttr ||
+           attr->name() == precisionAttr) {
     setChanged();
   } else
     HTMLFormControlElementWithState::parseMappedAttribute(attr);
@@ -963,6 +968,8 @@ void HTMLInputElement::setValue(const String& value) {
   if (inputType() == FILE && !value.isEmpty())
     return;
 
+  updatePlaceholderVisibility();
+
   setValueMatchesRenderer(false);
   if (storesValueSeparateFromAttribute()) {
     if (inputType() == FILE)
@@ -992,6 +999,8 @@ void HTMLInputElement::setValue(const String& value) {
 void HTMLInputElement::setValueFromRenderer(const String& value) {
   // Renderer and our event handler are responsible for constraining values.
   ASSERT(value == constrainValue(value) || constrainValue(value).isEmpty());
+
+  updatePlaceholderVisibility();
 
   if (inputType() == FILE) {
     m_fileList->clear();
@@ -1531,6 +1540,17 @@ void HTMLInputElement::registerForActivationCallbackIfNeeded() {
 void HTMLInputElement::unregisterForActivationCallbackIfNeeded() {
   if (!needsActivationCallback())
     document()->unregisterForDocumentActivationCallbacks(this);
+}
+
+void HTMLInputElement::updatePlaceholderVisibility() {
+  bool oldPlaceholderShouldBeVisible = m_placeholderShouldBeVisible;
+
+  m_placeholderShouldBeVisible = value().isEmpty() &&
+                                 document()->focusedNode() != this &&
+                                 !getAttribute(placeholderAttr).isEmpty();
+
+  if (oldPlaceholderShouldBeVisible != m_placeholderShouldBeVisible)
+    setChanged();
 }
 
 String HTMLInputElement::constrainValue(const String& proposedValue,
