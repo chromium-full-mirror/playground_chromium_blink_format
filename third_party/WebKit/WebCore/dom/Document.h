@@ -902,10 +902,6 @@ class Document : public ContainerNode {
   void initDNSPrefetch();
   void parseDNSPrefetchControlHeader(const String&);
 
-  // Changing the Document frame should not occur under normal conditions.
-  // Currently only createDummyFrame requires it.
-  void setFrame(Frame* frame) { m_frame = frame; }
-
  protected:
   Document(Frame*, bool isXHTML);
 
