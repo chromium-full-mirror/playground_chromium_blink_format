@@ -239,9 +239,6 @@ class ScrollView : public Widget {
   virtual void repaintContentRectangle(const IntRect&, bool now = false);
   void updateWindowRect(const IntRect&, bool now = false);
 
- public:
-  void update();
-
  private:
   RefPtr<Scrollbar> m_horizontalScrollbar;
   RefPtr<Scrollbar> m_verticalScrollbar;
