@@ -84,7 +84,7 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
                      const JSC::ArgList& args,
                      int t,
                      bool singleShot);
-  void clearTimeout(int timerId, bool delAction = true);
+  void removeTimeout(int timerId, bool delAction = true);
 
   void pauseTimeouts(OwnPtr<PausedTimeouts>&);
   void resumeTimeouts(OwnPtr<PausedTimeouts>&);
