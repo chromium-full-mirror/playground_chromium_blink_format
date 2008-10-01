@@ -26,22 +26,21 @@
 #ifndef ScrollbarTheme_h
 #define ScrollbarTheme_h
 
+#include "GraphicsContext.h"
 #include "IntRect.h"
 #include "ScrollTypes.h"
 
 namespace WebCore {
 
-class GraphicsContext;
 class PlatformMouseEvent;
 class Scrollbar;
+class ScrollView;
 
 class ScrollbarTheme {
  public:
   virtual ~ScrollbarTheme(){};
 
-  virtual bool paint(Scrollbar*,
-                     GraphicsContext* context,
-                     const IntRect& damageRect) {
+  virtual bool paint(Scrollbar*, GraphicsContext*, const IntRect& damageRect) {
     return false;
   }
   virtual ScrollbarPart hitTest(Scrollbar*, const PlatformMouseEvent&) {
@@ -80,6 +79,12 @@ class ScrollbarTheme {
   }
 
   virtual void invalidatePart(Scrollbar*, ScrollbarPart) {}
+
+  virtual void paintScrollCorner(ScrollView*,
+                                 GraphicsContext* context,
+                                 const IntRect& cornerRect) {
+    context->fillRect(cornerRect, Color::white);
+  }
 
   virtual bool shouldCenterOnThumb(Scrollbar*, const PlatformMouseEvent&) {
     return false;

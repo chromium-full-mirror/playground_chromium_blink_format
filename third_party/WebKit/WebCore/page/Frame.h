@@ -172,14 +172,6 @@ class Frame : public RefCounted<Frame> {
   // === to be moved into FrameView
 
  public:
-  void paint(GraphicsContext*, const IntRect&);
-  void setPaintRestriction(PaintRestriction);
-  bool isPainting() const;
-
-  static double currentPaintTimeStamp() {
-    return s_currentPaintTimeStamp;
-  }  // returns 0 if not painting
-
   void forceLayout(bool allowSubtree = false);
   void forceLayoutWithPageWidthRange(float minPageWidth,
                                      float maxPageWidth,
@@ -204,10 +196,6 @@ class Frame : public RefCounted<Frame> {
 
   bool prohibitsScrolling() const;
   void setProhibitsScrolling(const bool);
-
- private:
-  static double s_currentPaintTimeStamp;  // used for detecting decoded resource
-                                          // thrash in the cache
 
   // === to be moved into Chrome
 

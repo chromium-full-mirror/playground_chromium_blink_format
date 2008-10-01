@@ -150,7 +150,7 @@ void SVGImage::draw(GraphicsContext* context,
 
   if (m_frame->view()->needsLayout())
     m_frame->view()->layout();
-  m_frame->paint(context, enclosingIntRect(srcRect));
+  m_frame->view()->paint(context, enclosingIntRect(srcRect));
 
   if (compositeOp != CompositeSourceOver)
     context->endTransparencyLayer();

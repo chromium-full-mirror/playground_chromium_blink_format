@@ -85,12 +85,8 @@ class FramePrivate {
 
   Timer<Frame> m_lifeSupportTimer;
 
-  RefPtr<Node> m_elementToDraw;
-  PaintRestriction m_paintRestriction;
-
   bool m_caretVisible;
   bool m_caretPaint;
-  bool m_isPainting;
 
   bool m_highlightTextMatches;
   bool m_inViewSourceMode;

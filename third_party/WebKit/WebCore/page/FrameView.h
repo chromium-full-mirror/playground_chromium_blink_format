@@ -25,8 +25,9 @@
 #ifndef FrameView_h
 #define FrameView_h
 
-#include "ScrollView.h"
 #include "IntSize.h"
+#include "RenderLayer.h"
+#include "ScrollView.h"
 #include <wtf/Forward.h>
 #include <wtf/OwnPtr.h>
 
@@ -155,6 +156,15 @@ class FrameView : public ScrollView {
   void addWidgetToUpdate(RenderPartObject*);
   void removeWidgetToUpdate(RenderPartObject*);
 
+  virtual void paintContents(GraphicsContext*, const IntRect& damageRect);
+  void setPaintRestriction(PaintRestriction);
+  bool isPainting() const;
+  void setNodeToDraw(Node*);
+
+  static double currentPaintTimeStamp() {
+    return sCurrentPaintTimeStamp;
+  }  // returns 0 if not painting
+
 // FIXME: This function should be used by all platforms, but currently depends
 // on ScrollView::children,
 // which not all platforms have. Once FrameView and ScrollView are merged, this
@@ -180,6 +190,9 @@ class FrameView : public ScrollView {
   void performPostLayoutTasks();
 
   virtual void repaintContentRectangle(const IntRect&, bool immediate);
+
+  static double sCurrentPaintTimeStamp;  // used for detecting decoded resource
+                                         // thrash in the cache
 
   unsigned m_refCount;
   IntSize m_size;

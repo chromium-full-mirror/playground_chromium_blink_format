@@ -51,9 +51,9 @@ static void drawRectIntoContext(IntRect rect,
 }
 
 HBITMAP imageFromSelection(Frame* frame, bool forceBlackText) {
-  frame->setPaintRestriction(forceBlackText
-                                 ? PaintRestrictionSelectionOnlyBlackText
-                                 : PaintRestrictionSelectionOnly);
+  frame->view()->setPaintRestriction(
+      forceBlackText ? PaintRestrictionSelectionOnlyBlackText
+                     : PaintRestrictionSelectionOnly);
   FloatRect fr = frame->selectionRect();
   IntRect ir(static_cast<int>(fr.x()), static_cast<int>(fr.y()),
              static_cast<int>(fr.width()), static_cast<int>(fr.height()));
@@ -83,7 +83,7 @@ HBITMAP imageFromSelection(Frame* frame, bool forceBlackText) {
   SelectObject(hdc, hbmpOld);
   DeleteDC(hdc);
 
-  frame->setPaintRestriction(PaintRestrictionNone);
+  frame->view()->setPaintRestriction(PaintRestrictionNone);
 
   return hbmp;
 }
