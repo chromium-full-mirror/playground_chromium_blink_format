@@ -80,6 +80,14 @@ void Chrome::repaint(const IntRect& windowRect,
   m_client->repaint(windowRect, contentChanged, immediate);
 }
 
+IntPoint Chrome::screenToWindow(const IntPoint& point) const {
+  return m_client->screenToWindow(point);
+}
+
+IntRect Chrome::windowToScreen(const IntRect& rect) const {
+  return m_client->windowToScreen(rect);
+}
+
 void Chrome::setWindowRect(const FloatRect& rect) const {
   m_client->setWindowRect(rect);
 }

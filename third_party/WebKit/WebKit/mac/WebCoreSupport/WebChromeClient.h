@@ -106,6 +106,8 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void repaint(const WebCore::IntRect&,
                        bool contentChanged,
                        bool immediate = false);
+  virtual WebCore::IntPoint screenToWindow(const WebCore::IntPoint&) const;
+  virtual WebCore::IntRect windowToScreen(const WebCore::IntRect&) const;
 
   virtual void setStatusbarText(const WebCore::String&);
 

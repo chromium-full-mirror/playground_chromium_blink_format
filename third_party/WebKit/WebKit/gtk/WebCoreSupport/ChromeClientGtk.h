@@ -100,6 +100,8 @@ class ChromeClient : public WebCore::ChromeClient {
   virtual void repaint(const WebCore::IntRect&,
                        bool contentChanged,
                        bool immediate = false);
+  virtual IntPoint screenToWindow(const WebCore::IntPoint&) const;
+  virtual IntRect windowToScreen(const WebCore::IntRect&) const;
 
   virtual void mouseDidMoveOverElement(const WebCore::HitTestResult&,
                                        unsigned modifierFlags);

@@ -257,7 +257,7 @@ IntRect ChromeClientQt::windowResizerRect() const {
   return IntRect();
 }
 
-void ChromeClientQt::repaint(const WebCore::IntRect& windowRect,
+void ChromeClientQt::repaint(const IntRect& windowRect,
                              bool contentChanged,
                              bool) {
   // No double buffer, so only update the QWidget if content changed.
@@ -275,6 +275,16 @@ void ChromeClientQt::repaint(const WebCore::IntRect& windowRect,
   // FIXME: There is no "immediate" support.  This should be done always
   // whenever the flag
   // is set.
+}
+
+IntRect ChromeClientQt::windowToScreen(const IntRect& rect) const {
+  notImplemented();
+  return rect;
+}
+
+IntPoint ChromeClientQt::screenToWindow(const IntPoint& point) const {
+  notImplemented();
+  return point;
 }
 
 void ChromeClientQt::addToDirtyRegion(const IntRect& r) {
