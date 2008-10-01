@@ -108,6 +108,7 @@ class RegisterFile : Noncopyable {
   };
 
   enum { ProgramCodeThisRegister = -CallFrameHeaderSize - 1 };
+  enum { ArgumentsRegister = 0 };
 
   enum { DefaultCapacity = 2 * 1024 * 1024 / sizeof(Register) };
   enum { DefaultMaxGlobals = 8 * 1024 };

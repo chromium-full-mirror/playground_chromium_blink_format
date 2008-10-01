@@ -38,64 +38,6 @@ ASSERT_CLASS_FITS_IN_CELL(Arguments);
 
 const ClassInfo Arguments::info = {"Arguments", 0, 0, 0};
 
-struct ArgumentsData : Noncopyable {
-  ArgumentsData(JSActivation* activation,
-                unsigned numParameters,
-                int firstParameterIndex,
-                unsigned numArguments,
-                JSFunction* callee)
-      : activation(activation),
-        numParameters(numParameters),
-        firstParameterIndex(firstParameterIndex),
-        numArguments(numArguments),
-        extraArguments(0),
-        callee(callee),
-        overrodeLength(false),
-        overrodeCallee(false) {}
-
-  JSActivation* activation;
-
-  unsigned numParameters;
-  int firstParameterIndex;
-  unsigned numArguments;
-  Register* extraArguments;
-  OwnArrayPtr<bool> deletedArguments;
-  Register extraArgumentsFixedBuffer[4];
-
-  JSFunction* callee;
-  bool overrodeLength : 1;
-  bool overrodeCallee : 1;
-};
-
-// ECMA 10.1.8
-Arguments::Arguments(ExecState* exec,
-                     JSFunction* function,
-                     JSActivation* activation,
-                     int firstParameterIndex,
-                     Register* argv,
-                     int argc)
-    : JSObject(exec->lexicalGlobalObject()->argumentsStructure()),
-      d(new ArgumentsData(activation,
-                          function->numParameters(),
-                          firstParameterIndex,
-                          argc,
-                          function)) {
-  ASSERT(activation);
-
-  if (d->numArguments > d->numParameters) {
-    unsigned numExtraArguments = d->numArguments - d->numParameters;
-    Register* extraArguments;
-    if (numExtraArguments >
-        sizeof(d->extraArgumentsFixedBuffer) / sizeof(Register))
-      extraArguments = new Register[numExtraArguments];
-    else
-      extraArguments = d->extraArgumentsFixedBuffer;
-    for (unsigned i = 0; i < numExtraArguments; ++i)
-      extraArguments[i] = argv[d->numParameters + i];
-    d->extraArguments = extraArguments;
-  }
-}
-
 Arguments::~Arguments() {
   if (d->extraArguments != d->extraArgumentsFixedBuffer)
     delete[] d->extraArguments;
@@ -103,6 +45,11 @@ Arguments::~Arguments() {
 
 void Arguments::mark() {
   JSObject::mark();
+
+  for (unsigned i = 0; i < d->numParameters; ++i) {
+    if (!d->registers[i].marked())
+      d->registers[i].mark();
+  }
 
   if (d->extraArguments) {
     unsigned numExtraArguments = d->numArguments - d->numParameters;
@@ -115,7 +62,7 @@ void Arguments::mark() {
   if (!d->callee->marked())
     d->callee->mark();
 
-  if (!d->activation->marked())
+  if (d->activation && !d->activation->marked())
     d->activation->mark();
 }
 
@@ -127,18 +74,16 @@ void Arguments::fillArgList(ExecState* exec, ArgList& args) {
     }
 
     if (d->numParameters == d->numArguments) {
-      args.initialize(&d->activation->registerAt(d->firstParameterIndex),
-                      d->numArguments);
+      args.initialize(&d->registers[d->firstParameterIndex], d->numArguments);
       return;
     }
 
     unsigned parametersLength = min(d->numParameters, d->numArguments);
     unsigned i = 0;
     for (; i < parametersLength; ++i)
-      args.append(d->activation->uncheckedSymbolTableGetValue(
-          d->firstParameterIndex + i));
+      args.append(d->registers[d->firstParameterIndex + i].jsValue(exec));
     for (; i < d->numArguments; ++i)
-      args.append(d->extraArguments[i - d->numParameters].getJSValue());
+      args.append(d->extraArguments[i - d->numParameters].jsValue(exec));
     return;
   }
 
@@ -146,14 +91,13 @@ void Arguments::fillArgList(ExecState* exec, ArgList& args) {
   unsigned i = 0;
   for (; i < parametersLength; ++i) {
     if (!d->deletedArguments[i])
-      args.append(d->activation->uncheckedSymbolTableGetValue(
-          d->firstParameterIndex + i));
+      args.append(d->registers[d->firstParameterIndex + i].jsValue(exec));
     else
       args.append(get(exec, i));
   }
   for (; i < d->numArguments; ++i) {
     if (!d->deletedArguments[i])
-      args.append(d->extraArguments[i - d->numParameters].getJSValue());
+      args.append(d->extraArguments[i - d->numParameters].jsValue(exec));
     else
       args.append(get(exec, i));
   }
@@ -165,9 +109,9 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
   if (i < d->numArguments &&
       (!d->deletedArguments || !d->deletedArguments[i])) {
     if (i < d->numParameters)
-      d->activation->uncheckedSymbolTableGet(d->firstParameterIndex + i, slot);
+      slot.setRegisterSlot(&d->registers[d->firstParameterIndex + i]);
     else
-      slot.setValue(d->extraArguments[i - d->numParameters].getJSValue());
+      slot.setValue(d->extraArguments[i - d->numParameters].jsValue(exec));
     return true;
   }
 
@@ -183,9 +127,9 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
   if (isArrayIndex && i < d->numArguments &&
       (!d->deletedArguments || !d->deletedArguments[i])) {
     if (i < d->numParameters)
-      d->activation->uncheckedSymbolTableGet(d->firstParameterIndex + i, slot);
+      slot.setRegisterSlot(&d->registers[d->firstParameterIndex + i]);
     else
-      slot.setValue(d->extraArguments[i - d->numParameters].getJSValue());
+      slot.setValue(d->extraArguments[i - d->numParameters].jsValue(exec));
     return true;
   }
 
@@ -211,7 +155,7 @@ void Arguments::put(ExecState* exec,
   if (i < d->numArguments &&
       (!d->deletedArguments || !d->deletedArguments[i])) {
     if (i < d->numParameters)
-      d->activation->uncheckedSymbolTablePut(d->firstParameterIndex + i, value);
+      d->registers[d->firstParameterIndex + i] = value;
     else
       d->extraArguments[i - d->numParameters] = value;
     return;
@@ -229,7 +173,7 @@ void Arguments::put(ExecState* exec,
   if (isArrayIndex && i < d->numArguments &&
       (!d->deletedArguments || !d->deletedArguments[i])) {
     if (i < d->numParameters)
-      d->activation->uncheckedSymbolTablePut(d->firstParameterIndex + i, value);
+      d->registers[d->firstParameterIndex + i] = value;
     else
       d->extraArguments[i - d->numParameters] = value;
     return;
