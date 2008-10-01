@@ -2754,17 +2754,6 @@ class SwitchNode : public StatementNode {
   RefPtr<CaseBlockNode> m_block;
 };
 
-class BreakpointCheckStatement : public StatementNode {
- public:
-  BreakpointCheckStatement(JSGlobalData*,
-                           PassRefPtr<StatementNode>) JSC_FAST_CALL;
-
-  virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
-
- private:
-  RefPtr<StatementNode> m_statement;
-};
-
 struct ElementList {
   ElementNode* head;
   ElementNode* tail;
