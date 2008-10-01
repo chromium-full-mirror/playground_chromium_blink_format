@@ -49,15 +49,15 @@ class HTMLViewSourceDocument : public HTMLDocument {
   HTMLViewSourceDocument(Frame*, const String& mimeType);
 
   void createContainingTable();
-  PassRefPtr<Element> addSpanWithClassName(const String&);
+  Element* addSpanWithClassName(const String&);
   void addLine(const String& className);
   void addText(const String& text, const String& className);
-  PassRefPtr<Element> addLink(const String& url, bool isAnchor);
+  Element* addLink(const String& url, bool isAnchor);
 
   String m_type;
-  RefPtr<Element> m_current;
-  RefPtr<Element> m_tbody;
-  RefPtr<Element> m_td;
+  Element* m_current;
+  Element* m_tbody;
+  Element* m_td;
 };
 }
 

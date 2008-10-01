@@ -45,7 +45,11 @@ using namespace HTMLNames;
 
 HTMLViewSourceDocument::HTMLViewSourceDocument(Frame* frame,
                                                const String& mimeType)
-    : HTMLDocument(frame), m_type(mimeType) {}
+    : HTMLDocument(frame),
+      m_type(mimeType),
+      m_current(0),
+      m_tbody(0),
+      m_td(0) {}
 
 Tokenizer* HTMLViewSourceDocument::createTokenizer() {
   if (implementation()->isTextMIMEType(m_type))
@@ -184,20 +188,19 @@ void HTMLViewSourceDocument::addViewSourceDoctypeToken(
   addText(text, "webkit-html-doctype");
 }
 
-PassRefPtr<Element> HTMLViewSourceDocument::addSpanWithClassName(
-    const String& className) {
+Element* HTMLViewSourceDocument::addSpanWithClassName(const String& className) {
   if (m_current == m_tbody) {
     addLine(className);
     return m_current;
   }
 
-  RefPtr<Element> span = new HTMLElement(spanTag, this);
+  Element* span = new HTMLElement(spanTag, this);
   RefPtr<NamedMappedAttrMap> attrs = NamedMappedAttrMap::create();
   attrs->insertAttribute(MappedAttribute::create(classAttr, className), true);
   span->setAttributeMap(attrs.release());
   m_current->addChild(span);
   span->attach();
-  return span.release();
+  return span;
 }
 
 void HTMLViewSourceDocument::addLine(const String& className) {
@@ -208,7 +211,7 @@ void HTMLViewSourceDocument::addLine(const String& className) {
 
   // Create a cell that will hold the line number (it is generated in the
   // stylesheet using counters).
-  RefPtr<Element> td = new HTMLTableCellElement(tdTag, this);
+  Element* td = new HTMLTableCellElement(tdTag, this);
   RefPtr<NamedMappedAttrMap> attrs = NamedMappedAttrMap::create();
   attrs->insertAttribute(
       MappedAttribute::create(classAttr, "webkit-line-number"), true);
@@ -272,13 +275,12 @@ void HTMLViewSourceDocument::addText(const String& text,
     m_current = m_tbody;
 }
 
-PassRefPtr<Element> HTMLViewSourceDocument::addLink(const String& url,
-                                                    bool isAnchor) {
+Element* HTMLViewSourceDocument::addLink(const String& url, bool isAnchor) {
   if (m_current == m_tbody)
     addLine("webkit-html-tag");
 
   // Now create a link for the attribute value instead of a span.
-  RefPtr<Element> anchor = new HTMLAnchorElement(aTag, this);
+  Element* anchor = new HTMLAnchorElement(aTag, this);
   RefPtr<NamedMappedAttrMap> attrs = NamedMappedAttrMap::create();
   const char* classValue;
   if (isAnchor)
@@ -291,6 +293,6 @@ PassRefPtr<Element> HTMLViewSourceDocument::addLink(const String& url,
   anchor->setAttributeMap(attrs.release());
   m_current->addChild(anchor);
   anchor->attach();
-  return anchor.release();
+  return anchor;
 }
 }
