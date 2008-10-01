@@ -266,10 +266,10 @@ void ChromeClientQt::repaint(const WebCore::IntRect& windowRect,
     if (view) {
       QRect rect(windowRect);
       rect = rect.intersected(QRect(QPoint(0, 0), m_webPage->viewportSize()));
-      if (!r.isEmpty())
-        view->update(r);
+      if (!windowRect.isEmpty())
+        view->update(windowRect);
     } else
-      emit m_webPage->repaintRequested(r);
+      emit m_webPage->repaintRequested(windowRect);
   }
 
   // FIXME: There is no "immediate" support.  This should be done always
