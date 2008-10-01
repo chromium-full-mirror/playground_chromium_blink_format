@@ -307,10 +307,6 @@ void ScrollView::platformRemoveChild(Widget* child) {
                          child->platformWidget());
 }
 
-bool ScrollView::isOffscreen() const {
-  return false;
-}
-
 void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
   // Don't allow re-entrancy into this function.
   if (m_data->inUpdateScrollbars)
