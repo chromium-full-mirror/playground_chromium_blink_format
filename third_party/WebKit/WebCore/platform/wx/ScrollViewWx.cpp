@@ -118,7 +118,6 @@ class ScrollView::ScrollViewPrivate : public wxEvtHandler {
       return e.Skip();
 
     m_scrollView->setScrollPosition(IntPoint(pos.x, pos.y));
-    m_scrollView->update();
   }
 
   ScrollView* m_scrollView;
