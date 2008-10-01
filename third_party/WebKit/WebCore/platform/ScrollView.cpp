@@ -89,7 +89,7 @@ void ScrollView::scrollbarModes(ScrollbarMode& horizontalMode,
   verticalMode = m_verticalScrollbarMode;
 }
 
-void ScrollView::setAllowsScrolling(bool canScroll) {
+void ScrollView::setCanHaveScrollbars(bool canScroll) {
   ScrollbarMode newHorizontalMode;
   ScrollbarMode newVerticalMode;
 
@@ -312,7 +312,9 @@ Scrollbar* ScrollView::scrollbarUnderMouse(
 }
 
 void ScrollView::wheelEvent(PlatformWheelEvent& e) {
-  if (!allowsScrolling() || platformWidget())
+  // We don't allow mouse wheeling to happen in a ScrollView that has had its
+  // scrollbars explicitly disabled.
+  if (!canHaveScrollbars() || platformWidget())
     return;
 
   // Determine how much we want to scroll.  If we can move at all, we will

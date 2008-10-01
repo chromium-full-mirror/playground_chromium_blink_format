@@ -801,7 +801,7 @@ void FrameLoaderClient::transitionToCommittedForNewPage() {
       ownerElement->hasTagName(HTMLNames::iframeTag)) {
     HTMLFrameElement* frameElt = static_cast<HTMLFrameElement*>(ownerElement);
     if (frameElt->scrollingMode() == ScrollbarAlwaysOff)
-      frameView->setAllowsScrolling(false);
+      frameView->setCanHaveScrollbars(false);
     int marginWidth = frameElt->getMarginWidth();
     int marginHeight = frameElt->getMarginHeight();
     if (marginWidth != -1)

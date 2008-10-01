@@ -255,8 +255,8 @@ void FrameView::setMarginHeight(int h) {
   m_margins.setHeight(h);
 }
 
-void FrameView::setAllowsScrolling(bool canScroll) {
-  ScrollView::setAllowsScrolling(canScroll);
+void FrameView::setCanHaveScrollbars(bool canScroll) {
+  ScrollView::setCanHaveScrollbars(canScroll);
   scrollbarModes(d->m_hmode, d->m_vmode);
 }
 
