@@ -744,7 +744,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return CSSPrimitiveValue::create(maxHeight);
     }
     case CSSPropertyMaxWidth: {
-      const Length& maxWidth = style->maxHeight();
+      const Length& maxWidth = style->maxWidth();
       if (maxWidth.isFixed() && maxWidth.value() == undefinedLength)
         return CSSPrimitiveValue::createIdentifier(CSSValueNone);
       return CSSPrimitiveValue::create(maxWidth);
