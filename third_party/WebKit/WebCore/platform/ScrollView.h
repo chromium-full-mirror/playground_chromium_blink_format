@@ -201,6 +201,10 @@ class ScrollView : public Widget {
   // ancestor changes).
   virtual void frameRectsChanged() const;
 
+  // Widget override to update our scrollbars and notify our contents of the
+  // resize.
+  virtual void setFrameRect(const IntRect&);
+
   // For platforms that need to hit test scrollbars from within the engine's
   // event handlers (like Win32).
   Scrollbar* scrollbarUnderMouse(const PlatformMouseEvent& mouseEvent);
@@ -298,8 +302,6 @@ class ScrollView : public Widget {
 
 #if !PLATFORM(MAC) && !PLATFORM(WX)
  public:
-  virtual void setFrameRect(const IntRect&);
-
   void addToDirtyRegion(const IntRect&);
   void scrollBackingStore(int dx,
                           int dy,
