@@ -90,7 +90,6 @@ class FramePrivate {
 
   bool m_highlightTextMatches;
   bool m_inViewSourceMode;
-  bool m_prohibitsScrolling;
   bool m_needsReapplyStyles;
   bool m_isDisconnected;
   bool m_excludeFromTextSearch;

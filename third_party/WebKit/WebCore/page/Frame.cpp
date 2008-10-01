@@ -1645,14 +1645,6 @@ String Frame::documentTypeString() const {
   return String();
 }
 
-bool Frame::prohibitsScrolling() const {
-  return d->m_prohibitsScrolling;
-}
-
-void Frame::setProhibitsScrolling(bool prohibit) {
-  d->m_prohibitsScrolling = prohibit;
-}
-
 void Frame::focusWindow() {
   if (!page())
     return;
@@ -1820,7 +1812,6 @@ FramePrivate::FramePrivate(Page* page,
       m_caretPaint(true),
       m_highlightTextMatches(false),
       m_inViewSourceMode(false),
-      m_prohibitsScrolling(false),
       m_needsReapplyStyles(false),
       m_isDisconnected(false),
       m_excludeFromTextSearch(false)

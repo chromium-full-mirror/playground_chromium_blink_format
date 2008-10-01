@@ -194,9 +194,6 @@ class Frame : public RefCounted<Frame> {
     return shouldApplyTextZoom() ? zoomFactor() : 1.0f;
   }
 
-  bool prohibitsScrolling() const;
-  void setProhibitsScrolling(const bool);
-
   // === to be moved into Chrome
 
  public:
