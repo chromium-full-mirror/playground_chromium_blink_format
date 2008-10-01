@@ -36,6 +36,8 @@ class EventTargetSVGElementInstance : public SVGElementInstance,
 
   virtual bool isEventTargetSVGElementInstance() const { return true; }
 
+  virtual Frame* associatedFrame() const;
+
   virtual EventTargetNode* toNode() { return shadowTreeElement(); }
   virtual EventTargetSVGElementInstance* toSVGElementInstance() { return this; }
 

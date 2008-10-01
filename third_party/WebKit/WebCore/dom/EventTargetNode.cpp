@@ -70,6 +70,10 @@ EventTargetNode::~EventTargetNode() {
   m_regdListeners = 0;
 }
 
+Frame* EventTargetNode::associatedFrame() const {
+  return document()->frame();
+}
+
 void EventTargetNode::insertedIntoDocument() {
   if (m_regdListeners && !m_regdListeners->isEmpty())
     document()->unregisterDisconnectedNodeWithEventListeners(this);

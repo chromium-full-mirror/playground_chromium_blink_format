@@ -54,6 +54,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   virtual XMLHttpRequest* toXMLHttpRequest() { return this; }
 
+  Frame* associatedFrame() const;
+
   static void detachRequests(Document*);
   static void cancelRequests(Document*);
 
@@ -93,41 +95,37 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   XMLHttpRequestUpload* upload();
   XMLHttpRequestUpload* optionalUpload() const { return m_upload.get(); }
 
-  void setOnReadyStateChangeListener(PassRefPtr<EventListener> eventListener) {
+  void setOnreadystatechange(PassRefPtr<EventListener> eventListener) {
     m_onReadyStateChangeListener = eventListener;
   }
-  EventListener* onReadyStateChangeListener() const {
+  EventListener* onreadystatechange() const {
     return m_onReadyStateChangeListener.get();
   }
 
-  void setOnAbortListener(PassRefPtr<EventListener> eventListener) {
+  void setOnabort(PassRefPtr<EventListener> eventListener) {
     m_onAbortListener = eventListener;
   }
-  EventListener* onAbortListener() const { return m_onAbortListener.get(); }
+  EventListener* onabort() const { return m_onAbortListener.get(); }
 
-  void setOnErrorListener(PassRefPtr<EventListener> eventListener) {
+  void setOnerror(PassRefPtr<EventListener> eventListener) {
     m_onErrorListener = eventListener;
   }
-  EventListener* onErrorListener() const { return m_onErrorListener.get(); }
+  EventListener* onerror() const { return m_onErrorListener.get(); }
 
-  void setOnLoadListener(PassRefPtr<EventListener> eventListener) {
+  void setOnload(PassRefPtr<EventListener> eventListener) {
     m_onLoadListener = eventListener;
   }
-  EventListener* onLoadListener() const { return m_onLoadListener.get(); }
+  EventListener* onload() const { return m_onLoadListener.get(); }
 
-  void setOnLoadStartListener(PassRefPtr<EventListener> eventListener) {
+  void setOnloadstart(PassRefPtr<EventListener> eventListener) {
     m_onLoadStartListener = eventListener;
   }
-  EventListener* onLoadStartListener() const {
-    return m_onLoadStartListener.get();
-  }
+  EventListener* onloadstart() const { return m_onLoadStartListener.get(); }
 
-  void setOnProgressListener(PassRefPtr<EventListener> eventListener) {
+  void setOnprogress(PassRefPtr<EventListener> eventListener) {
     m_onProgressListener = eventListener;
   }
-  EventListener* onProgressListener() const {
-    return m_onProgressListener.get();
-  }
+  EventListener* onprogress() const { return m_onProgressListener.get(); }
 
   typedef Vector<RefPtr<EventListener>> ListenerVector;
   typedef HashMap<AtomicStringImpl*, ListenerVector> EventListenersMap;

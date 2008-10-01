@@ -42,7 +42,7 @@ namespace WebCore {
 
 JSValue* JSEventTargetNode::addEventListener(ExecState* exec,
                                              const ArgList& args) {
-  Frame* frame = impl()->document()->frame();
+  Frame* frame = impl()->associatedFrame();
   if (!frame)
     return jsUndefined();
 
@@ -58,7 +58,7 @@ JSValue* JSEventTargetNode::addEventListener(ExecState* exec,
 
 JSValue* JSEventTargetNode::removeEventListener(ExecState* exec,
                                                 const ArgList& args) {
-  Frame* frame = impl()->document()->frame();
+  Frame* frame = impl()->associatedFrame();
   if (!frame)
     return jsUndefined();
 
@@ -70,19 +70,9 @@ JSValue* JSEventTargetNode::removeEventListener(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* JSEventTargetNode::dispatchEvent(ExecState* exec,
-                                          const ArgList& args) {
-  ExceptionCode ec = 0;
-  JSValue* result =
-      jsBoolean(impl()->dispatchEvent(toEvent(args.at(exec, 0)), ec));
-  setDOMException(exec, ec);
-  return result;
-}
-
 JSValue* JSEventTargetNode::getListener(ExecState* exec,
                                         const AtomicString& eventType) const {
-  EventListener* listener =
-      EventTargetNodeCast(impl())->eventListenerForType(eventType);
+  EventListener* listener = impl()->eventListenerForType(eventType);
   JSEventListener* jsListener = static_cast<JSEventListener*>(listener);
   if (jsListener && jsListener->listenerObj())
     return jsListener->listenerObj();
@@ -93,11 +83,12 @@ JSValue* JSEventTargetNode::getListener(ExecState* exec,
 void JSEventTargetNode::setListener(ExecState* exec,
                                     const AtomicString& eventType,
                                     JSValue* func) {
-  Frame* frame = impl()->document()->frame();
-  if (frame)
-    EventTargetNodeCast(impl())->setEventListenerForType(
-        eventType,
-        toJSDOMWindow(frame)->findOrCreateJSEventListener(exec, func, true));
+  Frame* frame = impl()->associatedFrame();
+  if (!frame)
+    return;
+  impl()->setEventListenerForType(
+      eventType,
+      toJSDOMWindow(frame)->findOrCreateJSEventListener(exec, func, true));
 }
 
 void JSEventTargetNode::pushEventHandlerScope(ExecState*, ScopeChain&) const {}

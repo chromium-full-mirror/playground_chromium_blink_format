@@ -42,6 +42,7 @@ namespace WebCore {
 class AtomicStringImpl;
 class Document;
 class Event;
+class Frame;
 class String;
 
 class MessagePort : public RefCounted<MessagePort>, public EventTarget {
@@ -68,7 +69,10 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
 
   void contextDestroyed() { m_document = 0; }
   Document* document() { return m_document; }
+
   virtual MessagePort* toMessagePort() { return this; }
+
+  virtual Frame* associatedFrame() const;
 
   void dispatchMessages();
   void queueCloseEvent();
@@ -91,15 +95,15 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   using RefCounted<MessagePort>::ref;
   using RefCounted<MessagePort>::deref;
 
-  void setOnMessageListener(PassRefPtr<EventListener> eventListener) {
+  void setOnmessage(PassRefPtr<EventListener> eventListener) {
     m_onMessageListener = eventListener;
   }
-  EventListener* onMessageListener() const { return m_onMessageListener.get(); }
+  EventListener* onmessage() const { return m_onMessageListener.get(); }
 
-  void setOnCloseListener(PassRefPtr<EventListener> eventListener) {
+  void setOnclose(PassRefPtr<EventListener> eventListener) {
     m_onCloseListener = eventListener;
   }
-  EventListener* onCloseListener() const { return m_onCloseListener.get(); }
+  EventListener* onclose() const { return m_onCloseListener.get(); }
 
  private:
   MessagePort(Document*);

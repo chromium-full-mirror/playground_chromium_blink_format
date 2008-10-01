@@ -41,6 +41,7 @@ class DOMApplicationCache;
 class Event;
 class EventListener;
 class EventTargetNode;
+class Frame;
 class MessagePort;
 class RegisteredEventListener;
 class SVGElementInstance;
@@ -66,6 +67,8 @@ class EventTarget {
 #if ENABLE(SVG)
   virtual SVGElementInstance* toSVGElementInstance();
 #endif
+
+  virtual Frame* associatedFrame() const = 0;
 
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,

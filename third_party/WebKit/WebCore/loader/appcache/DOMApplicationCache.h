@@ -87,52 +87,42 @@ class DOMApplicationCache : public RefCounted<DOMApplicationCache>,
   using RefCounted<DOMApplicationCache>::ref;
   using RefCounted<DOMApplicationCache>::deref;
 
-  void setOnCheckingListener(PassRefPtr<EventListener> eventListener) {
+  void setOnchecking(PassRefPtr<EventListener> eventListener) {
     m_onCheckingListener = eventListener;
   }
-  EventListener* onCheckingListener() const {
-    return m_onCheckingListener.get();
-  }
+  EventListener* onchecking() const { return m_onCheckingListener.get(); }
 
-  void setOnErrorListener(PassRefPtr<EventListener> eventListener) {
+  void setOnerror(PassRefPtr<EventListener> eventListener) {
     m_onErrorListener = eventListener;
   }
-  EventListener* onErrorListener() const { return m_onErrorListener.get(); }
+  EventListener* onerror() const { return m_onErrorListener.get(); }
 
-  void setOnNoUpdateListener(PassRefPtr<EventListener> eventListener) {
+  void setOnnoupdate(PassRefPtr<EventListener> eventListener) {
     m_onNoUpdateListener = eventListener;
   }
-  EventListener* onNoUpdateListener() const {
-    return m_onNoUpdateListener.get();
-  }
+  EventListener* onnoupdate() const { return m_onNoUpdateListener.get(); }
 
-  void setOnDownloadingListener(PassRefPtr<EventListener> eventListener) {
+  void setOndownloading(PassRefPtr<EventListener> eventListener) {
     m_onDownloadingListener = eventListener;
   }
-  EventListener* onDownloadingListener() const {
-    return m_onDownloadingListener.get();
-  }
+  EventListener* ondownloading() const { return m_onDownloadingListener.get(); }
 
-  void setOnProgressListener(PassRefPtr<EventListener> eventListener) {
+  void setOnprogress(PassRefPtr<EventListener> eventListener) {
     m_onProgressListener = eventListener;
   }
-  EventListener* onProgressListener() const {
-    return m_onProgressListener.get();
-  }
+  EventListener* onprogress() const { return m_onProgressListener.get(); }
 
-  void setOnUpdateReadyListener(PassRefPtr<EventListener> eventListener) {
+  void setOnupdateready(PassRefPtr<EventListener> eventListener) {
     m_onUpdateReadyListener = eventListener;
   }
-  EventListener* onUpdateReadyListener() const {
-    return m_onUpdateReadyListener.get();
-  }
+  EventListener* onupdateready() const { return m_onUpdateReadyListener.get(); }
 
-  void setOnCachedListener(PassRefPtr<EventListener> eventListener) {
+  void setOncached(PassRefPtr<EventListener> eventListener) {
     m_onCachedListener = eventListener;
   }
-  EventListener* onCachedListener() const { return m_onCachedListener.get(); }
+  EventListener* oncached() const { return m_onCachedListener.get(); }
 
-  Frame* frame() const { return m_frame; }
+  Frame* associatedFrame() const { return m_frame; }
   DOMApplicationCache* toDOMApplicationCache() { return this; }
 
   void callCheckingListener();

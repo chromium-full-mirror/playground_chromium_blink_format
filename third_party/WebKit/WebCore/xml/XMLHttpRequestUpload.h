@@ -37,6 +37,7 @@
 namespace WebCore {
 
 class AtomicStringImpl;
+class Frame;
 class XMLHttpRequest;
 
 class XMLHttpRequestUpload : public RefCounted<XMLHttpRequestUpload>,
@@ -52,40 +53,38 @@ class XMLHttpRequestUpload : public RefCounted<XMLHttpRequestUpload>,
   XMLHttpRequest* associatedXMLHttpRequest() const { return m_xmlHttpRequest; }
   void disconnectXMLHttpRequest() { m_xmlHttpRequest = 0; }
 
+  Frame* associatedFrame() const;
+
   void dispatchAbortEvent();
   void dispatchErrorEvent();
   void dispatchLoadEvent();
   void dispatchLoadStartEvent();
   void dispatchProgressEvent(long long bytesSent, long long totalBytesToBeSent);
 
-  void setOnAbortListener(PassRefPtr<EventListener> eventListener) {
+  void setOnabort(PassRefPtr<EventListener> eventListener) {
     m_onAbortListener = eventListener;
   }
-  EventListener* onAbortListener() const { return m_onAbortListener.get(); }
+  EventListener* onabort() const { return m_onAbortListener.get(); }
 
-  void setOnErrorListener(PassRefPtr<EventListener> eventListener) {
+  void setOnerror(PassRefPtr<EventListener> eventListener) {
     m_onErrorListener = eventListener;
   }
-  EventListener* onErrorListener() const { return m_onErrorListener.get(); }
+  EventListener* onerror() const { return m_onErrorListener.get(); }
 
-  void setOnLoadListener(PassRefPtr<EventListener> eventListener) {
+  void setOnload(PassRefPtr<EventListener> eventListener) {
     m_onLoadListener = eventListener;
   }
-  EventListener* onLoadListener() const { return m_onLoadListener.get(); }
+  EventListener* onload() const { return m_onLoadListener.get(); }
 
-  void setOnLoadStartListener(PassRefPtr<EventListener> eventListener) {
+  void setOnloadstart(PassRefPtr<EventListener> eventListener) {
     m_onLoadStartListener = eventListener;
   }
-  EventListener* onLoadStartListener() const {
-    return m_onLoadStartListener.get();
-  }
+  EventListener* onloadstart() const { return m_onLoadStartListener.get(); }
 
-  void setOnProgressListener(PassRefPtr<EventListener> eventListener) {
+  void setOnprogress(PassRefPtr<EventListener> eventListener) {
     m_onProgressListener = eventListener;
   }
-  EventListener* onProgressListener() const {
-    return m_onProgressListener.get();
-  }
+  EventListener* onprogress() const { return m_onProgressListener.get(); }
 
   typedef Vector<RefPtr<EventListener>> ListenerVector;
   typedef HashMap<AtomicStringImpl*, ListenerVector> EventListenersMap;
