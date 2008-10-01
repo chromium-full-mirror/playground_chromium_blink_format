@@ -1230,7 +1230,6 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
       blockElem->parentNode()->removeChild(blockElem, ec);
 
     Node* newNodePtr = 0;
-    ASSERT(finished || blockElem->firstChild());
     if (blockElem->firstChild()) {
       // Step 2: Clone |residualElem|.
       RefPtr<Node> newNode = residualElem->cloneNode(
@@ -1254,7 +1253,8 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
       // the document, so no
       // attachment can occur yet.
       blockElem->appendChild(newNode.release(), ec);
-    }
+    } else
+      finished = true;
 
     // Step 5: Reparent |blockElem|.  Now the full attachment of the fixed up
     // tree takes place.
