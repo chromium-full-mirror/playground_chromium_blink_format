@@ -33,6 +33,12 @@ const FeatureInfo EvalFeature = 1 << 0;
 const FeatureInfo ClosureFeature = 1 << 1;
 const FeatureInfo AssignFeature = 1 << 2;
 const FeatureInfo ArgumentsFeature = 1 << 3;
+const FeatureInfo WithFeature = 1 << 4;
+const FeatureInfo CatchFeature = 1 << 5;
+const FeatureInfo ThisFeature = 1 << 6;
+const FeatureInfo AllFeatures = EvalFeature | ClosureFeature | AssignFeature |
+                                ArgumentsFeature | WithFeature | CatchFeature |
+                                ThisFeature;
 
 template <typename T>
 struct NodeFeatureInfo {
