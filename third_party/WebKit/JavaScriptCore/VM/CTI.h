@@ -218,6 +218,11 @@ class CTI {
   // offset.
   static const int repatchGetByIdDefaultOffset = 256;
 
+#if USE(CTI_ARGUMENT)
+  static const int ctiArgumentInitSize = 4;
+#else
+  static const int ctiArgumentInitSize = 0;
+#endif
   // These architecture specific value are used to enable repatching - see
   // comment on op_put_by_id.
   static const int repatchOffsetPutByIdStructureID = 19;
@@ -227,7 +232,7 @@ class CTI {
   static const int repatchOffsetGetByIdStructureID = 19;
   static const int repatchOffsetGetByIdBranchToSlowCase = 25;
   static const int repatchOffsetGetByIdPropertyMapOffset = 34;
-  static const int repatchOffsetGetByIdSlowCaseCall = 17;
+  static const int repatchOffsetGetByIdSlowCaseCall = 17 + ctiArgumentInitSize;
 
  public:
   static void compile(Machine* machine, ExecState* exec, CodeBlock* codeBlock) {

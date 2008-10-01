@@ -302,6 +302,7 @@ void CTI::printOpcodeOperandTypes(unsigned src1, unsigned src2) {
 
 ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCall(unsigned opcodeIndex,
                                                  X86::RegisterID r) {
+  m_jit.emitRestoreArgumentReference();
   X86Assembler::JmpSrc call = m_jit.emitCall(r);
   m_calls.append(CallRecord(call, opcodeIndex));
   emitDebugExceptionCheck();
@@ -314,6 +315,7 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCall(unsigned opcodeIndex,
 #if ENABLE(SAMPLING_TOOL)
   m_jit.movl_i32m(1, &inCalledCode);
 #endif
+  m_jit.emitRestoreArgumentReference();
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
   emitDebugExceptionCheck();
@@ -329,6 +331,7 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCall(unsigned opcodeIndex,
 #if ENABLE(SAMPLING_TOOL)
   m_jit.movl_i32m(1, &inCalledCode);
 #endif
+  m_jit.emitRestoreArgumentReference();
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
   emitDebugExceptionCheck();
@@ -344,6 +347,7 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCall(unsigned opcodeIndex,
 #if ENABLE(SAMPLING_TOOL)
   m_jit.movl_i32m(1, &inCalledCode);
 #endif
+  m_jit.emitRestoreArgumentReference();
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
   emitDebugExceptionCheck();
@@ -359,6 +363,7 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCall(unsigned opcodeIndex,
 #if ENABLE(SAMPLING_TOOL)
   m_jit.movl_i32m(1, &inCalledCode);
 #endif
+  m_jit.emitRestoreArgumentReference();
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
   emitDebugExceptionCheck();
@@ -374,6 +379,7 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCall(unsigned opcodeIndex,
 #if ENABLE(SAMPLING_TOOL)
   m_jit.movl_i32m(1, &inCalledCode);
 #endif
+  m_jit.emitRestoreArgumentReference();
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
   emitDebugExceptionCheck();
@@ -520,7 +526,6 @@ void CTI::compileOpCall(Instruction* instruction,
   if (type == OpCallEval) {
     emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
     emitCall(i, Machine::cti_op_call_eval);
-    m_jit.emitRestoreArgumentReference();
 
     emitGetCTIParam(CTI_ARGS_r, X86::edi);  // edi := r
 
@@ -907,7 +912,6 @@ void CTI::privateCompileMainPass() {
 
     ASSERT_WITH_MESSAGE(m_machine->isOpcode(instruction[i].u.opcode),
                         "privateCompileMainPass gone bad @ %d", i);
-    m_jit.emitRestoreArgumentReference();
     switch (m_machine->getOpcodeID(instruction[i].u.opcode)) {
       case op_mov: {
         unsigned src = instruction[i + 2].u.operand;
@@ -2225,7 +2229,6 @@ void CTI::privateCompileSlowCases() {
   for (Vector<SlowCaseEntry>::iterator iter = m_slowCases.begin();
        iter != m_slowCases.end(); ++iter) {
     unsigned i = iter->to;
-    m_jit.emitRestoreArgumentReference();
     switch (m_machine->getOpcodeID(instruction[i].u.opcode)) {
       case op_add: {
         unsigned dst = instruction[i + 1].u.operand;
@@ -2709,7 +2712,6 @@ void CTI::privateCompileSlowCases() {
       case op_call_eval:
       case op_construct: {
         m_jit.link(iter->from, m_jit.label());
-        m_jit.emitRestoreArgumentReference();
 
         // We jump to this slow case if the ctiCode for the codeBlock has not
         // yet been generated; compile it now.
