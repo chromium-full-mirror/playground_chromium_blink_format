@@ -23,9 +23,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GetEOTHeader_h
-#define GetEOTHeader_h
+#ifndef OpenTypeUtilities_h
+#define OpenTypeUtilities_h
 
+#include "PlatformString.h"
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -37,7 +38,8 @@ bool getEOTHeader(SharedBuffer* fontData,
                   size_t& overlayDst,
                   size_t& overlaySrc,
                   size_t& overlayLength);
+HANDLE renameAndActivateFont(SharedBuffer*, const String&);
 
 }  // namespace WebCore
 
-#endif  // GetEOTHeader_h
+#endif  // OpenTypeUtilities_h
