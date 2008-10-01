@@ -242,6 +242,12 @@ class ScrollView : public Widget {
   // the scrollbars.
   virtual void paint(GraphicsContext*, const IntRect&);
 
+  // Widget overrides to ensure that our children's visibility status is kept up
+  // to date when we get shown and hidden.
+  virtual void show();
+  virtual void hide();
+  virtual void setParentVisible(bool);
+
  protected:
   virtual void repaintContentRectangle(const IntRect&, bool now = false);
   virtual void paintContents(GraphicsContext*, const IntRect& damageRect) = 0;
@@ -324,10 +330,6 @@ class ScrollView : public Widget {
 
   void printPanScrollIcon(const IntPoint&);
   void removePanScrollIcon();
-
-  virtual void show();
-  virtual void hide();
-  virtual void setParentVisible(bool);
 #endif
 
 #if PLATFORM(QT)
