@@ -145,7 +145,7 @@ class WRECGenerator {
                                     JmpSrc success,
                                     JmpSrc fail);
 
-  void gernerateDisjunction(JmpSrcVector& successes, JmpSrcVector& failures);
+  void generateDisjunction(JmpSrcVector& successes, JmpSrcVector& failures);
   void terminateDisjunction(JmpSrcVector& successes);
 
  private:
