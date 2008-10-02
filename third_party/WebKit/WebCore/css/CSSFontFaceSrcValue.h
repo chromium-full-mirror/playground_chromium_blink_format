@@ -59,7 +59,7 @@ class CSSFontFaceSrcValue : public CSSValue {
   bool isSVGFontFaceSrc() const;
 
   SVGFontFaceElement* svgFontFaceElement() const {
-    return m_svgFontFaceElement.get();
+    return m_svgFontFaceElement;
   }
   void setSVGFontFaceElement(SVGFontFaceElement* element) {
     m_svgFontFaceElement = element;
@@ -70,14 +70,21 @@ class CSSFontFaceSrcValue : public CSSValue {
 
  private:
   CSSFontFaceSrcValue(const String& resource, bool local)
-      : m_resource(resource), m_isLocal(local) {}
+      : m_resource(resource),
+        m_isLocal(local)
+#if ENABLE(SVG_FONTS)
+        ,
+        m_svgFontFaceElement(0)
+#endif
+  {
+  }
 
   String m_resource;
   String m_format;
   bool m_isLocal;
 
 #if ENABLE(SVG_FONTS)
-  RefPtr<SVGFontFaceElement> m_svgFontFaceElement;
+  SVGFontFaceElement* m_svgFontFaceElement;
 #endif
 };
 }

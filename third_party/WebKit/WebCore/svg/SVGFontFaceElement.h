@@ -42,6 +42,8 @@ class SVGFontFaceElement : public SVGElement {
                                Node* afterChange = 0,
                                int childCountDelta = 0);
   virtual void insertedIntoDocument();
+  virtual void willMoveToNewOwnerDocument();
+  virtual void didMoveToNewOwnerDocument();
 
   unsigned unitsPerEm() const;
   int xHeight() const;
@@ -57,6 +59,7 @@ class SVGFontFaceElement : public SVGElement {
 
   SVGFontElement* associatedFontElement() const { return m_fontElement; }
   void rebuildFontFace();
+  void removeFromMappedElementSheet();
 
  private:
   RefPtr<CSSFontFaceRule> m_fontFaceRule;

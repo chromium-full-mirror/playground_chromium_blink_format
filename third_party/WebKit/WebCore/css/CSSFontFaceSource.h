@@ -66,7 +66,7 @@ class CSSFontFaceSource : public CachedResourceClient {
 
 #if ENABLE(SVG_FONTS)
   SVGFontFaceElement* svgFontFaceElement() const {
-    return m_svgFontFaceElement.get();
+    return m_svgFontFaceElement;
   }
   void setSVGFontFaceElement(SVGFontFaceElement* element) {
     m_svgFontFaceElement = element;
@@ -82,7 +82,7 @@ class CSSFontFaceSource : public CachedResourceClient {
       m_fontDataTable;  // The hash key is composed of size synthetic styles.
 
 #if ENABLE(SVG_FONTS)
-  RefPtr<SVGFontFaceElement> m_svgFontFaceElement;
+  SVGFontFaceElement* m_svgFontFaceElement;
   RefPtr<SVGFontElement> m_externalSVGFontElement;
 #endif
 };

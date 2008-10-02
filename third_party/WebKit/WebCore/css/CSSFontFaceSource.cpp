@@ -46,7 +46,14 @@
 namespace WebCore {
 
 CSSFontFaceSource::CSSFontFaceSource(const String& str, CachedFont* font)
-    : m_string(str), m_font(font), m_face(0) {
+    : m_string(str),
+      m_font(font),
+      m_face(0)
+#if ENABLE(SVG_FONTS)
+      ,
+      m_svgFontFaceElement(0)
+#endif
+{
   if (m_font)
     m_font->addClient(this);
 }
@@ -179,7 +186,7 @@ SimpleFontData* CSSFontFaceSource::getFontData(
 #if ENABLE(SVG_FONTS)
       // In-Document SVG Fonts
       if (m_svgFontFaceElement) {
-        SVGFontData* svgFontData = new SVGFontData(m_svgFontFaceElement.get());
+        SVGFontData* svgFontData = new SVGFontData(m_svgFontFaceElement);
         fontData.set(new SimpleFontData(
             FontPlatformData(fontDescription.computedPixelSize(), syntheticBold,
                              syntheticItalic),
