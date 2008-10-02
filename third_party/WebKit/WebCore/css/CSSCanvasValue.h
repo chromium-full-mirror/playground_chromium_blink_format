@@ -49,7 +49,7 @@ class CSSCanvasValue : public CSSImageGeneratorValue, private CanvasObserver {
   void setName(const String& name) { m_name = name; }
 
  private:
-  CSSCanvasValue() {}
+  CSSCanvasValue() : m_element(0) {}
 
   virtual void canvasChanged(HTMLCanvasElement* element,
                              const FloatRect& changedRect);
@@ -59,7 +59,8 @@ class CSSCanvasValue : public CSSImageGeneratorValue, private CanvasObserver {
 
   // The name of the canvas.
   String m_name;
-  RefPtr<HTMLCanvasElement> m_element;
+  // The document supplies the element and owns it.
+  HTMLCanvasElement* m_element;
 };
 
 }  // namespace WebCore
