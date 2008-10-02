@@ -1180,7 +1180,7 @@ void RenderLayer::valueChanged(Scrollbar*) {
     scrollToOffset(newX, newY, false);
 }
 
-IntRect RenderLayer::windowClipRect() const {
+IntRect RenderLayer::windowClipRect(const Scrollbar*) const {
   RenderView* view = renderer()->view();
   ASSERT(view);
   FrameView* frameView = view->frameView();

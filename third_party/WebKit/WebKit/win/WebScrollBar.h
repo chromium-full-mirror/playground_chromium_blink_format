@@ -118,7 +118,7 @@ class WebScrollBar : public IWebScrollBarPrivate, ScrollbarClient {
  protected:
   // ScrollbarClient
   virtual void valueChanged(Scrollbar*);
-  virtual IntRect windowClipRect() const;
+  virtual IntRect windowClipRect(const Scrollbar*) const;
 
   // FIXME: We should provide a way to set this value.
   virtual bool isActive() const { return true; }

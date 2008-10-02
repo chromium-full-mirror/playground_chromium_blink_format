@@ -52,6 +52,8 @@ class ScrollbarGtk : public Scrollbar {
 
   virtual void setEnabled(bool);
 
+  virtual void frameRectsChanged() const;
+
  protected:
   ScrollbarGtk(ScrollbarClient*, ScrollbarOrientation, ScrollbarControlSize);
 
