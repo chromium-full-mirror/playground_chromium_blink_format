@@ -418,6 +418,8 @@ ALWAYS_INLINE void Machine::initializeCallFrame(Register* callFrame,
                                                 int returnValueRegister,
                                                 int argc,
                                                 JSValue* function) {
+  ASSERT(r);  // use makeHostCallFramePointer(0) to create a host call frame
+              // sentinel.
   callFrame[RegisterFile::CodeBlock] = codeBlock;
   callFrame[RegisterFile::ScopeChain] = scopeChain;
   callFrame[RegisterFile::CallerRegisters] = r;
@@ -428,6 +430,22 @@ ALWAYS_INLINE void Machine::initializeCallFrame(Register* callFrame,
   callFrame[RegisterFile::Callee] = function;
   callFrame[RegisterFile::OptionalCalleeActivation] = nullJSValue;
   callFrame[RegisterFile::OptionalCalleeArguments] = nullJSValue;
+}
+
+static const intptr_t HostCallFrameMask = 1;
+
+static inline Register* makeHostCallFramePointer(Register* callFrame) {
+  return reinterpret_cast<Register*>(reinterpret_cast<intptr_t>(callFrame) |
+                                     HostCallFrameMask);
+}
+
+static inline bool isHostCallFrame(Register* callFrame) {
+  return reinterpret_cast<intptr_t>(callFrame) & HostCallFrameMask;
+}
+
+static inline Register* stripHostCallFrameBit(Register* callFrame) {
+  return reinterpret_cast<Register*>(reinterpret_cast<intptr_t>(callFrame) &
+                                     ~HostCallFrameMask);
 }
 
 }  // namespace JSC
