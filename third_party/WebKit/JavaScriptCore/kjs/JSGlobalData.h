@@ -46,6 +46,7 @@ class CommonIdentifiers;
 class Heap;
 class IdentifierTable;
 class JSGlobalObject;
+class JSObject;
 class Lexer;
 class Machine;
 class Parser;
@@ -86,7 +87,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   SmallStrings smallStrings;
 
-  HashMap<OpaqueJSClass*, OpaqueJSClassContextData*>* opaqueJSClassData;
+  HashMap<OpaqueJSClass*, OpaqueJSClassContextData*> opaqueJSClassData;
 
   HashSet<ParserRefCounted*>* newParserObjects;
   HashCountedSet<ParserRefCounted*>* parserObjectExtraRefCounts;
@@ -97,6 +98,8 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   JSGlobalObject* head;
 
   bool isSharedInstance;
+
+  HashSet<JSObject*> arrayVisitedElements;
 
  private:
   JSGlobalData(bool isShared = false);

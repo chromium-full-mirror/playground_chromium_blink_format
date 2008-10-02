@@ -137,10 +137,6 @@ class JSGlobalObject : public JSVariableObject {
     RefPtr<JSGlobalData> globalData;
 
     HashSet<ProgramCodeBlock*> codeBlocks;
-
-    OwnPtr<HashSet<JSObject*>> arrayVisitedElements;  // Global data shared by
-                                                      // array prototype
-                                                      // functions.
   };
 
  public:
@@ -289,12 +285,6 @@ class JSGlobalObject : public JSVariableObject {
   virtual bool allowsAccessFrom(const JSGlobalObject*) const { return true; }
 
   virtual bool isDynamicScope() const;
-
-  HashSet<JSObject*>& arrayVisitedElements() {
-    if (!d()->arrayVisitedElements)
-      d()->arrayVisitedElements.set(new HashSet<JSObject*>);
-    return *d()->arrayVisitedElements;
-  }
 
   HashSet<ProgramCodeBlock*>& codeBlocks() { return d()->codeBlocks; }
 
