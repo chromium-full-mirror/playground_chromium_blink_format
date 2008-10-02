@@ -654,7 +654,7 @@ void WebView::repaint(const WebCore::IntRect& windowRect,
     addToDirtyRegion(windowRect);
   if (immediate) {
     if (repaintContentOnly)
-      updateBackingStore();
+      updateBackingStore(core(topLevelFrame())->view());
     else
       ::UpdateWindow(m_viewWindow);
   }
@@ -1902,8 +1902,8 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
         theme()->themeChanged();
         ScrollbarTheme::nativeTheme()->themeChanged();
         RECT windowRect;
-        ::GetClientRect(m_viewWindow, &windowRect);
-        ::InvalidateRect(m_viewWindow, &windowRect, false);
+        ::GetClientRect(hWnd, &windowRect);
+        ::InvalidateRect(hWnd, &windowRect, false);
       }
       break;
     case WM_MOUSEACTIVATE:
