@@ -48,7 +48,6 @@
 #include "XMLHttpRequest.h"
 #include "XMLHttpRequestException.h"
 #include <kjs/PrototypeFunction.h>
-#include <wtf/ThreadSpecific.h>
 
 #if ENABLE(SVG)
 #include "JSSVGException.h"
@@ -60,8 +59,12 @@
 #include "XPathException.h"
 #endif
 
-using namespace JSC;
+#if ENABLE(WORKERS)
+#include <wtf/ThreadSpecific.h>
 using namespace WTF;
+#endif
+
+using namespace JSC;
 
 namespace WebCore {
 
@@ -88,8 +91,13 @@ static inline void removeWrappers(const JSWrapperCache&) {}
 #else
 
 static HashSet<DOMObject*>& wrapperSet() {
+#if ENABLE(WORKERS)
   static ThreadSpecific<HashSet<DOMObject*>> staticWrapperSet;
   return *staticWrapperSet;
+#else
+  static HashSet<DOMObject*> staticWrapperSet;
+  return staticWrapperSet;
+#endif
 }
 
 static void addWrapper(DOMObject* wrapper) {
