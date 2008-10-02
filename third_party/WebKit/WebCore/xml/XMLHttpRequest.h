@@ -56,6 +56,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   Frame* associatedFrame() const;
 
+  bool hasPendingActivity() { return m_pendingActivity; }
   static void detachRequests(Document*);
   static void cancelRequests(Document*);
 
@@ -223,6 +224,9 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   void dispatchLoadStartEvent();
   void dispatchProgressEvent(long long expectedLength);
 
+  void setPendingActivity();
+  void unsetPendingActivity();
+
   Document* m_doc;
 
   RefPtr<EventListener> m_onReadyStateChangeListener;
@@ -274,6 +278,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   bool m_sameOriginRequest;
   bool m_allowAccess;
   bool m_inPreflight;
+
+  unsigned m_pendingActivity;
 
   // Used for onprogress tracking
   long long m_receivedLength;

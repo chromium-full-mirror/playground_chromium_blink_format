@@ -90,7 +90,8 @@ JSGlobalData::JSGlobalData(bool isShared)
       lexer(new Lexer(this)),
       parser(new Parser),
       head(0),
-      isSharedInstance(isShared) {
+      isSharedInstance(isShared),
+      clientData(0) {
 }
 
 JSGlobalData::~JSGlobalData() {
@@ -132,6 +133,8 @@ JSGlobalData::~JSGlobalData() {
 
   delete newParserObjects;
   delete parserObjectExtraRefCounts;
+
+  delete clientData;
 }
 
 PassRefPtr<JSGlobalData> JSGlobalData::create() {
@@ -154,4 +157,6 @@ JSGlobalData*& JSGlobalData::sharedInstanceInternal() {
   static JSGlobalData* sharedInstance;
   return sharedInstance;
 }
+
+JSGlobalData::ClientData::~ClientData() {}
 }

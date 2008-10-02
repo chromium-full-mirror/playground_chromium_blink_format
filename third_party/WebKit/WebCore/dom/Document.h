@@ -103,6 +103,7 @@ class Text;
 class TextResourceDecoder;
 class Tokenizer;
 class TreeWalker;
+class XMLHttpRequest;
 
 #if ENABLE(SVG)
 class SVGDocumentExtensions;
@@ -897,6 +898,13 @@ class Document : public ContainerNode {
   void dispatchMessagePortEvents();
   void createdMessagePort(MessagePort*);
   void destroyedMessagePort(MessagePort*);
+  const HashSet<MessagePort*>& messagePorts() const { return m_messagePorts; }
+
+  void createdXMLHttpRequest(XMLHttpRequest*);
+  void destroyedXMLHttpRequest(XMLHttpRequest*);
+  const HashSet<XMLHttpRequest*>& xmlHttpRequests() const {
+    return m_xmlHttpRequests;
+  }
 
   bool isDNSPrefetchEnabled() const { return m_isDNSPrefetchEnabled; }
   void initDNSPrefetch();
@@ -1072,6 +1080,8 @@ class Document : public ContainerNode {
 
   bool m_firedMessagePortTimer;
   HashSet<MessagePort*> m_messagePorts;
+
+  HashSet<XMLHttpRequest*> m_xmlHttpRequests;
 
  public:
   bool inPageCache();

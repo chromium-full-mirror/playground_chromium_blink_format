@@ -27,6 +27,10 @@
 #include <kjs/lookup.h>
 #include <wtf/Noncopyable.h>
 
+namespace JSC {
+class JSGlobalData;
+}
+
 namespace WebCore {
 
 class Document;
@@ -53,9 +57,11 @@ class DOMObject : public JSC::JSObject {
 #endif
 };
 
-DOMObject* getCachedDOMObjectWrapper(void* objectHandle);
-void cacheDOMObjectWrapper(void* objectHandle, DOMObject* wrapper);
-void forgetDOMObject(void* objectHandle);
+DOMObject* getCachedDOMObjectWrapper(JSC::JSGlobalData&, void* objectHandle);
+void cacheDOMObjectWrapper(JSC::JSGlobalData&,
+                           void* objectHandle,
+                           DOMObject* wrapper);
+void forgetDOMObject(JSC::JSGlobalData&, void* objectHandle);
 
 JSNode* getCachedDOMNodeWrapper(Document*, Node*);
 void cacheDOMNodeWrapper(Document*, Node*, JSNode* wrapper);
@@ -63,6 +69,7 @@ void forgetDOMNode(Document*, Node*);
 void forgetAllDOMNodesForDocument(Document*);
 void updateDOMNodeDocument(Node*, Document* oldDocument, Document* newDocument);
 void markDOMNodesForDocument(Document*);
+void markActiveObjectsForDocument(JSC::JSGlobalData&, Document*);
 
 JSC::StructureID* getCachedDOMStructure(JSC::ExecState*, const JSC::ClassInfo*);
 JSC::StructureID* cacheDOMStructure(JSC::ExecState*,
@@ -104,10 +111,10 @@ template <class WrapperClass, class DOMClass>
 inline DOMObject* createDOMObjectWrapper(JSC::ExecState* exec,
                                          DOMClass* object) {
   ASSERT(object);
-  ASSERT(!getCachedDOMObjectWrapper(object));
+  ASSERT(!getCachedDOMObjectWrapper(exec->globalData(), object));
   WrapperClass* wrapper =
       new (exec) WrapperClass(getDOMStructure<WrapperClass>(exec), object);
-  cacheDOMObjectWrapper(object, wrapper);
+  cacheDOMObjectWrapper(exec->globalData(), object, wrapper);
   return wrapper;
 }
 template <class WrapperClass, class DOMClass>
@@ -115,7 +122,8 @@ inline JSC::JSValue* getDOMObjectWrapper(JSC::ExecState* exec,
                                          DOMClass* object) {
   if (!object)
     return JSC::jsNull();
-  if (DOMObject* wrapper = getCachedDOMObjectWrapper(object))
+  if (DOMObject* wrapper =
+          getCachedDOMObjectWrapper(exec->globalData(), object))
     return wrapper;
   return createDOMObjectWrapper<WrapperClass>(exec, object);
 }
@@ -129,10 +137,10 @@ inline DOMObject* createDOMObjectWrapper(JSC::ExecState* exec,
                                          DOMClass* object,
                                          SVGElement* context) {
   ASSERT(object);
-  ASSERT(!getCachedDOMObjectWrapper(object));
+  ASSERT(!getCachedDOMObjectWrapper(exec->globalData(), object));
   WrapperClass* wrapper = new (exec)
       WrapperClass(getDOMStructure<WrapperClass>(exec), object, context);
-  cacheDOMObjectWrapper(object, wrapper);
+  cacheDOMObjectWrapper(exec->globalData(), object, wrapper);
   return wrapper;
 }
 template <class WrapperClass, class DOMClass>
@@ -141,7 +149,8 @@ inline JSC::JSValue* getDOMObjectWrapper(JSC::ExecState* exec,
                                          SVGElement* context) {
   if (!object)
     return JSC::jsNull();
-  if (DOMObject* wrapper = getCachedDOMObjectWrapper(object))
+  if (DOMObject* wrapper =
+          getCachedDOMObjectWrapper(exec->globalData(), object))
     return wrapper;
   return createDOMObjectWrapper<WrapperClass>(exec, object, context);
 }

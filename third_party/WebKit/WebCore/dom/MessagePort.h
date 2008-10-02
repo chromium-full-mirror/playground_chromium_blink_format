@@ -74,9 +74,8 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
 
   virtual Frame* associatedFrame() const;
 
-  void dispatchMessages();
   void queueCloseEvent();
-  void dispatchCloseEvent();
+  void dispatchMessages();
 
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,
@@ -95,6 +94,8 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   using RefCounted<MessagePort>::ref;
   using RefCounted<MessagePort>::deref;
 
+  bool hasPendingActivity() { return m_pendingActivity; }
+
   void setOnmessage(PassRefPtr<EventListener> eventListener) {
     m_onMessageListener = eventListener;
   }
@@ -106,10 +107,17 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   EventListener* onclose() const { return m_onCloseListener.get(); }
 
  private:
+  friend class CloseMessagePortTimer;
+
   MessagePort(Document*);
 
   virtual void refEventTarget() { ref(); }
   virtual void derefEventTarget() { deref(); }
+
+  void dispatchCloseEvent();
+
+  void setPendingActivity();
+  void unsetPendingActivity();
 
   MessagePort* m_entangledPort;
   MessageQueue<RefPtr<Event>> m_messageQueue;
@@ -122,6 +130,8 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   RefPtr<EventListener> m_onCloseListener;
 
   EventListenersMap m_eventListeners;
+
+  unsigned m_pendingActivity;
 };
 
 }  // namespace WebCore
