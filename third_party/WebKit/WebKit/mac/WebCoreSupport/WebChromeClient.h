@@ -97,15 +97,14 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual WebCore::IntRect windowResizerRect() const;
   virtual void addToDirtyRegion(const WebCore::IntRect&);
-  virtual void scrollBackingStore(int dx,
-                                  int dy,
-                                  const WebCore::IntRect& scrollViewRect,
-                                  const WebCore::IntRect& clipRect);
-  virtual void updateBackingStore();
 
   virtual void repaint(const WebCore::IntRect&,
                        bool contentChanged,
-                       bool immediate = false);
+                       bool immediate = false,
+                       bool repaintContentOnly = false);
+  virtual void scroll(const WebCore::IntSize& scrollDelta,
+                      const WebCore::IntRect& rectToScroll,
+                      const WebCore::IntRect& clipRect);
   virtual WebCore::IntPoint screenToWindow(const WebCore::IntPoint&) const;
   virtual WebCore::IntRect windowToScreen(const WebCore::IntRect&) const;
 

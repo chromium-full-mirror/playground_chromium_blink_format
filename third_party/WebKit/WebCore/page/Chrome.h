@@ -55,7 +55,11 @@ class Chrome : public HostWindow {
   // HostWindow methods.
   virtual void repaint(const IntRect&,
                        bool contentChanged,
-                       bool immediate = false);
+                       bool immediate = false,
+                       bool repaintContentOnly = false);
+  virtual void scroll(const IntSize& scrollDelta,
+                      const IntRect& rectToScroll,
+                      const IntRect& clipRect);
   virtual IntPoint screenToWindow(const IntPoint&) const;
   virtual IntRect windowToScreen(const IntRect&) const;
 
@@ -111,11 +115,6 @@ class Chrome : public HostWindow {
 
   IntRect windowResizerRect() const;
   void addToDirtyRegion(const IntRect&);
-  void scrollBackingStore(int dx,
-                          int dy,
-                          const IntRect& scrollViewRect,
-                          const IntRect& clipRect);
-  void updateBackingStore();
 
   void mouseDidMoveOverElement(const HitTestResult&, unsigned modifierFlags);
 

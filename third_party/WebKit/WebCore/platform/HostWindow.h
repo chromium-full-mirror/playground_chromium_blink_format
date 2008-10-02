@@ -46,7 +46,11 @@ class HostWindow : Noncopyable {
   // of unchanged content is being requested).
   virtual void repaint(const IntRect&,
                        bool contentChanged,
-                       bool immediate = false) = 0;
+                       bool immediate = false,
+                       bool repaintContentOnly = false) = 0;
+  virtual void scroll(const IntSize& scrollDelta,
+                      const IntRect& rectToScroll,
+                      const IntRect& clipRect) = 0;
 
   // The paint method just causes a synchronous update of the window to happen
   // for platforms that need it (Windows).

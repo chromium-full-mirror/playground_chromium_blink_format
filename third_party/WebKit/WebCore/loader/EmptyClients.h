@@ -135,7 +135,11 @@ class EmptyChromeClient : public ChromeClient {
 
   virtual void repaint(const IntRect&,
                        bool contentChanged,
-                       bool immediate = false) {}
+                       bool immediate = false,
+                       bool repaintContentOnly = false) {}
+  virtual void scroll(const IntSize& scrollDelta,
+                      const IntRect& rectToScroll,
+                      const IntRect& clipRect) {}
   virtual IntPoint screenToWindow(const IntPoint& p) const { return p; }
   virtual IntRect windowToScreen(const IntRect& r) const { return r; }
 

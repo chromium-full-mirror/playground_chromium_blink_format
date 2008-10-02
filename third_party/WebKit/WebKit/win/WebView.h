@@ -725,12 +725,13 @@ class WebView : public IWebView,
                           const WebCore::IntRect& scrollViewRect,
                           const WebCore::IntRect& clipRect);
   void updateBackingStore(WebCore::FrameView*,
-                          HDC,
-                          bool backingStoreCompletelyDirty);
+                          HDC = 0,
+                          bool backingStoreCompletelyDirty = false);
   void deleteBackingStore();
   void repaint(const WebCore::IntRect&,
                bool contentChanged,
-               bool immediate = false);
+               bool immediate = false,
+               bool repaintContentOnly = false);
   void frameRect(RECT* rect);
   void closeWindow();
   void closeWindowSoon();
