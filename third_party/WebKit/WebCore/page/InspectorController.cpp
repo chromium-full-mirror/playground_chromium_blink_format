@@ -94,7 +94,7 @@ static JSRetainPtr<JSStringRef> jsStringRef(const char* str) {
   return JSRetainPtr<JSStringRef>(Adopt, JSStringCreateWithUTF8CString(str));
 }
 
-static JSRetainPtr<JSStringRef> jsStringRef(const SourceProvider& str) {
+static JSRetainPtr<JSStringRef> jsStringRef(const SourceCode& str) {
   return JSRetainPtr<JSStringRef>(
       Adopt, JSStringCreateWithCharacters(str.data(), str.length()));
 }
@@ -2672,11 +2672,13 @@ void InspectorController::stepOutOfFunctionInDebugger() {
   JavaScriptDebugServer::shared().stepOutOfFunction();
 }
 
-void InspectorController::addBreakpoint(int sourceID, unsigned lineNumber) {
+void InspectorController::addBreakpoint(intptr_t sourceID,
+                                        unsigned lineNumber) {
   JavaScriptDebugServer::shared().addBreakpoint(sourceID, lineNumber);
 }
 
-void InspectorController::removeBreakpoint(int sourceID, unsigned lineNumber) {
+void InspectorController::removeBreakpoint(intptr_t sourceID,
+                                           unsigned lineNumber) {
   JavaScriptDebugServer::shared().removeBreakpoint(sourceID, lineNumber);
 }
 
@@ -2879,45 +2881,40 @@ bool InspectorController::handleException(JSContextRef context,
 // JavaScriptDebugListener functions
 
 void InspectorController::didParseSource(ExecState* exec,
-                                         const SourceProvider& source,
-                                         int startingLineNumber,
-                                         const UString& sourceURL,
-                                         int sourceID) {
-  JSValueRef sourceIDValue = JSValueMakeNumber(m_scriptContext, sourceID);
-  JSValueRef sourceURLValue =
-      JSValueMakeString(m_scriptContext, jsStringRef(sourceURL).get());
+                                         const SourceCode& source) {
+  JSValueRef sourceIDValue =
+      JSValueMakeNumber(m_scriptContext, source.provider()->asID());
+  JSValueRef sourceURLValue = JSValueMakeString(
+      m_scriptContext, jsStringRef(source.provider()->url()).get());
   JSValueRef sourceValue =
       JSValueMakeString(m_scriptContext, jsStringRef(source).get());
-  JSValueRef startingLineNumberValue =
-      JSValueMakeNumber(m_scriptContext, startingLineNumber);
+  JSValueRef firstLineValue =
+      JSValueMakeNumber(m_scriptContext, source.firstLine());
 
   JSValueRef exception = 0;
   JSValueRef arguments[] = {sourceIDValue, sourceURLValue, sourceValue,
-                            startingLineNumberValue};
+                            firstLineValue};
   callFunction(m_scriptContext, m_scriptObject, "parsedScriptSource", 4,
                arguments, exception);
 }
 
 void InspectorController::failedToParseSource(ExecState* exec,
-                                              const SourceProvider& source,
-                                              int startingLineNumber,
-                                              const UString& sourceURL,
+                                              const SourceCode& source,
                                               int errorLine,
                                               const UString& errorMessage) {
-  JSValueRef sourceURLValue =
-      JSValueMakeString(m_scriptContext, jsStringRef(sourceURL).get());
+  JSValueRef sourceURLValue = JSValueMakeString(
+      m_scriptContext, jsStringRef(source.provider()->url()).get());
   JSValueRef sourceValue =
       JSValueMakeString(m_scriptContext, jsStringRef(source.data()).get());
-  JSValueRef startingLineNumberValue =
-      JSValueMakeNumber(m_scriptContext, startingLineNumber);
+  JSValueRef firstLineValue =
+      JSValueMakeNumber(m_scriptContext, source.firstLine());
   JSValueRef errorLineValue = JSValueMakeNumber(m_scriptContext, errorLine);
   JSValueRef errorMessageValue =
       JSValueMakeString(m_scriptContext, jsStringRef(errorMessage).get());
 
   JSValueRef exception = 0;
-  JSValueRef arguments[] = {sourceURLValue, sourceValue,
-                            startingLineNumberValue, errorLineValue,
-                            errorMessageValue};
+  JSValueRef arguments[] = {sourceURLValue, sourceValue, firstLineValue,
+                            errorLineValue, errorMessageValue};
   callFunction(m_scriptContext, m_scriptObject, "failedToParseScriptSource", 5,
                arguments, exception);
 }

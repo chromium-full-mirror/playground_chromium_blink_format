@@ -1915,6 +1915,7 @@ RegisterID* TryNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 // ------------------------------ ScopeNode -----------------------------
 
 ScopeNode::ScopeNode(JSGlobalData* globalData,
+                     const SourceCode& source,
                      SourceElements* children,
                      VarStack* varStack,
                      FunctionStack* funcStack,
@@ -1923,8 +1924,7 @@ ScopeNode::ScopeNode(JSGlobalData* globalData,
                      bool usesArguments,
                      int numConstants)
     : BlockNode(globalData, children),
-      m_sourceURL(globalData->parser->sourceURL()),
-      m_sourceId(globalData->parser->sourceId()),
+      m_source(source),
       m_usesEval(usesEval),
       m_needsClosure(needsClosure),
       m_usesArguments(usesArguments),
@@ -1943,33 +1943,32 @@ ProgramNode::ProgramNode(JSGlobalData* globalData,
                          SourceElements* children,
                          VarStack* varStack,
                          FunctionStack* funcStack,
-                         SourceProvider* sourceProvider,
+                         const SourceCode& source,
                          bool usesEval,
                          bool needsClosure,
                          bool usesArguments,
                          int numConstants)
     : ScopeNode(globalData,
+                source,
                 children,
                 varStack,
                 funcStack,
                 usesEval,
                 needsClosure,
                 usesArguments,
-                numConstants),
-      m_sourceProvider(sourceProvider) {}
+                numConstants) {}
 
 ProgramNode* ProgramNode::create(JSGlobalData* globalData,
                                  SourceElements* children,
                                  VarStack* varStack,
                                  FunctionStack* funcStack,
-                                 SourceProvider* sourceProvider,
+                                 const SourceCode& source,
                                  bool usesEval,
                                  bool needsClosure,
                                  bool usesArguments,
                                  int numConstants) {
-  return new ProgramNode(globalData, children, varStack, funcStack,
-                         sourceProvider, usesEval, needsClosure, usesArguments,
-                         numConstants);
+  return new ProgramNode(globalData, children, varStack, funcStack, source,
+                         usesEval, needsClosure, usesArguments, numConstants);
 }
 
 // ------------------------------ EvalNode -----------------------------
@@ -1978,20 +1977,20 @@ EvalNode::EvalNode(JSGlobalData* globalData,
                    SourceElements* children,
                    VarStack* varStack,
                    FunctionStack* funcStack,
-                   SourceProvider* sourceProvider,
+                   const SourceCode& source,
                    bool usesEval,
                    bool needsClosure,
                    bool usesArguments,
                    int numConstants)
     : ScopeNode(globalData,
+                source,
                 children,
                 varStack,
                 funcStack,
                 usesEval,
                 needsClosure,
                 usesArguments,
-                numConstants),
-      m_sourceProvider(sourceProvider) {}
+                numConstants) {}
 
 RegisterID* EvalNode::emitCode(CodeGenerator& generator, RegisterID*) {
   generator.emitDebugHook(WillExecuteProgram, firstLine(), lastLine());
@@ -2010,8 +2009,7 @@ void EvalNode::generateCode(ScopeChainNode* scopeChainNode) {
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   SymbolTable symbolTable;
-  ASSERT(m_sourceProvider);
-  m_code.set(new EvalCodeBlock(this, globalObject, m_sourceProvider));
+  m_code.set(new EvalCodeBlock(this, globalObject, source().provider()));
 
   CodeGenerator generator(this, globalObject->debugger(), scopeChain,
                           &symbolTable, m_code.get());
@@ -2022,12 +2020,12 @@ EvalNode* EvalNode::create(JSGlobalData* globalData,
                            SourceElements* children,
                            VarStack* varStack,
                            FunctionStack* funcStack,
-                           SourceProvider* sourceProvider,
+                           const SourceCode& source,
                            bool usesEval,
                            bool needsClosure,
                            bool usesArguments,
                            int numConstants) {
-  return new EvalNode(globalData, children, varStack, funcStack, sourceProvider,
+  return new EvalNode(globalData, children, varStack, funcStack, source,
                       usesEval, needsClosure, usesArguments, numConstants);
 }
 
@@ -2042,6 +2040,7 @@ FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
                                    bool usesArguments,
                                    int numConstants)
     : ScopeNode(globalData,
+                SourceCode(),
                 children,
                 varStack,
                 funcStack,
@@ -2049,7 +2048,31 @@ FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
                 needsClosure,
                 usesArguments,
                 numConstants),
+      m_parameters(0),
       m_refCount(0) {}
+
+FunctionBodyNode::~FunctionBodyNode() {
+  if (m_parameters)
+    fastFree(m_parameters);
+}
+
+void FunctionBodyNode::finishParsing(const SourceCode& source,
+                                     ParameterNode* firstParameter) {
+  Vector<Identifier> parameters;
+  for (ParameterNode* parameter = firstParameter; parameter;
+       parameter = parameter->nextParam())
+    parameters.append(parameter->ident());
+  size_t count = parameters.size();
+  finishParsing(source, parameters.releaseBuffer(), count);
+}
+
+void FunctionBodyNode::finishParsing(const SourceCode& source,
+                                     Identifier* parameters,
+                                     size_t parameterCount) {
+  setSource(source);
+  m_parameters = parameters;
+  m_parameterCount = parameterCount;
+}
 
 void FunctionBodyNode::mark() {
   if (m_code)
@@ -2073,7 +2096,7 @@ FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
                                            SourceElements* children,
                                            VarStack* varStack,
                                            FunctionStack* funcStack,
-                                           SourceProvider*,
+                                           const SourceCode&,
                                            bool usesEval,
                                            bool needsClosure,
                                            bool usesArguments,
@@ -2087,9 +2110,8 @@ void FunctionBodyNode::generateCode(ScopeChainNode* scopeChainNode) {
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
-  ASSERT(m_source.sourceProvider());
-  m_code.set(new CodeBlock(this, FunctionCode, m_source.sourceProvider(),
-                           m_source.startOffset()));
+  m_code.set(new CodeBlock(this, FunctionCode, source().provider(),
+                           source().startOffset()));
 
   CodeGenerator generator(this, globalObject->debugger(), scopeChain,
                           &m_symbolTable, m_code.get());
@@ -2123,9 +2145,8 @@ void ProgramNode::generateCode(ScopeChainNode* scopeChainNode) {
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
-  ASSERT(m_sourceProvider);
-  m_code.set(
-      new ProgramCodeBlock(this, GlobalCode, globalObject, m_sourceProvider));
+  m_code.set(new ProgramCodeBlock(this, GlobalCode, globalObject,
+                                  source().provider()));
 
   CodeGenerator generator(this, globalObject->debugger(), scopeChain,
                           &globalObject->symbolTable(), m_code.get(),
@@ -2135,22 +2156,16 @@ void ProgramNode::generateCode(ScopeChainNode* scopeChainNode) {
 
 UString FunctionBodyNode::paramString() const {
   UString s("");
-  size_t count = m_parameters.size();
-  for (size_t pos = 0; pos < count; ++pos) {
+  for (size_t pos = 0; pos < m_parameterCount; ++pos) {
     if (!s.isEmpty())
       s += ", ";
-    s += m_parameters[pos].ustring();
+    s += parameters()[pos].ustring();
   }
 
   return s;
 }
 
 // ------------------------------ FuncDeclNode ---------------------------------
-
-void FuncDeclNode::addParams() {
-  for (ParameterNode* p = m_parameter.get(); p; p = p->nextParam())
-    m_body->parameters().append(p->ident());
-}
 
 JSFunction* FuncDeclNode::makeFunction(ExecState* exec,
                                        ScopeChainNode* scopeChain) {
@@ -2197,12 +2212,6 @@ JSFunction* FuncExprNode::makeFunction(ExecState* exec,
   }
 
   return func;
-}
-
-// ECMA 13
-void FuncExprNode::addParams() {
-  for (ParameterNode* p = m_parameter.get(); p; p = p->nextParam())
-    m_body->parameters().append(p->ident());
 }
 
 }  // namespace JSC

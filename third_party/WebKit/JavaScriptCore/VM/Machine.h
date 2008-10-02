@@ -116,7 +116,7 @@ class Machine {
   JSValue* retrieveCaller(ExecState*, InternalFunction*) const;
   void retrieveLastCaller(ExecState* exec,
                           int& lineNumber,
-                          int& sourceId,
+                          intptr_t& sourceID,
                           UString& sourceURL,
                           JSValue*& function) const;
 

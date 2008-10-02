@@ -54,7 +54,7 @@ class Error {
                           ErrorType,
                           const UString& message,
                           int lineNumber,
-                          int sourceId,
+                          intptr_t sourceID,
                           const UString& sourceURL);
   static JSObject* create(ExecState*, ErrorType, const char* message);
 };
@@ -63,7 +63,7 @@ JSObject* throwError(ExecState*,
                      ErrorType,
                      const UString& message,
                      int lineNumber,
-                     int sourceId,
+                     intptr_t sourceID,
                      const UString& sourceURL);
 JSObject* throwError(ExecState*, ErrorType, const UString& message);
 JSObject* throwError(ExecState*, ErrorType, const char* message);

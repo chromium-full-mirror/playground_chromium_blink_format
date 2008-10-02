@@ -97,7 +97,7 @@ JSValue* createUndefinedVariableError(ExecState* exec,
   UString message = "Can't find variable: ";
   message.append(ident.ustring());
   JSObject* exception = Error::create(exec, ReferenceError, message, line,
-                                      codeBlock->ownerNode->sourceId(),
+                                      codeBlock->ownerNode->sourceID(),
                                       codeBlock->ownerNode->sourceURL());
   exception->putWithAttributes(
       exec, Identifier(exec, expressionBeginOffsetPropertyName),
@@ -184,7 +184,7 @@ JSObject* createInvalidParamError(ExecState* exec,
       createErrorMessage(exec, codeBlock, line, divotPoint,
                          divotPoint + endOffset, value, message);
   JSObject* exception = Error::create(exec, TypeError, errorMessage, line,
-                                      codeBlock->ownerNode->sourceId(),
+                                      codeBlock->ownerNode->sourceID(),
                                       codeBlock->ownerNode->sourceURL());
   exception->putWithAttributes(
       exec, Identifier(exec, expressionBeginOffsetPropertyName),
@@ -219,7 +219,7 @@ JSObject* createNotAConstructorError(ExecState* exec,
       createErrorMessage(exec, codeBlock, line, startPoint, divotPoint, value,
                          "not a constructor");
   JSObject* exception = Error::create(exec, TypeError, errorMessage, line,
-                                      codeBlock->ownerNode->sourceId(),
+                                      codeBlock->ownerNode->sourceID(),
                                       codeBlock->ownerNode->sourceURL());
   exception->putWithAttributes(
       exec, Identifier(exec, expressionBeginOffsetPropertyName),
@@ -246,7 +246,7 @@ JSValue* createNotAFunctionError(ExecState* exec,
       createErrorMessage(exec, codeBlock, line, divotPoint - startOffset,
                          divotPoint, value, "not a function");
   JSObject* exception = Error::create(exec, TypeError, errorMessage, line,
-                                      codeBlock->ownerNode->sourceId(),
+                                      codeBlock->ownerNode->sourceID(),
                                       codeBlock->ownerNode->sourceURL());
   exception->putWithAttributes(
       exec, Identifier(exec, expressionBeginOffsetPropertyName),
@@ -286,7 +286,7 @@ JSObject* createNotAnObjectError(ExecState* exec,
       exec, codeBlock, line, divotPoint - startOffset, divotPoint,
       error->isNull() ? jsNull() : jsUndefined(), "not an object");
   JSObject* exception = Error::create(exec, TypeError, errorMessage, line,
-                                      codeBlock->ownerNode->sourceId(),
+                                      codeBlock->ownerNode->sourceID(),
                                       codeBlock->ownerNode->sourceURL());
   exception->putWithAttributes(
       exec, Identifier(exec, expressionBeginOffsetPropertyName),

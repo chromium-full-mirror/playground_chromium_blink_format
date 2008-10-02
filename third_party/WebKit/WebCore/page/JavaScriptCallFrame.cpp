@@ -41,7 +41,7 @@ namespace WebCore {
 JavaScriptCallFrame::JavaScriptCallFrame(
     const DebuggerCallFrame& debuggerCallFrame,
     PassRefPtr<JavaScriptCallFrame> caller,
-    int sourceID,
+    intptr_t sourceID,
     int line)
     : m_debuggerCallFrame(debuggerCallFrame),
       m_caller(caller),

@@ -40,7 +40,7 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
   static PassRefPtr<JavaScriptCallFrame> create(
       const JSC::DebuggerCallFrame& debuggerCallFrame,
       PassRefPtr<JavaScriptCallFrame> caller,
-      int sourceID,
+      intptr_t sourceID,
       int line) {
     return adoptRef(
         new JavaScriptCallFrame(debuggerCallFrame, caller, sourceID, line));
@@ -51,10 +51,10 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
 
   JavaScriptCallFrame* caller();
 
-  int sourceIdentifier() const { return m_sourceID; }
+  intptr_t sourceID() const { return m_sourceID; }
   int line() const { return m_line; }
   void update(const JSC::DebuggerCallFrame& debuggerCallFrame,
-              int sourceID,
+              intptr_t sourceID,
               int line) {
     m_debuggerCallFrame = debuggerCallFrame;
     m_line = line;
@@ -72,7 +72,7 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
  private:
   JavaScriptCallFrame(const JSC::DebuggerCallFrame&,
                       PassRefPtr<JavaScriptCallFrame> caller,
-                      int sourceID,
+                      intptr_t sourceID,
                       int line);
 
   JSC::DebuggerCallFrame m_debuggerCallFrame;

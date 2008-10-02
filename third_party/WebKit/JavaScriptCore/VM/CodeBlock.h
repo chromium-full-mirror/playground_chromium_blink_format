@@ -151,21 +151,20 @@ class EvalCodeCache {
       evalNode = cacheMap.get(evalSource.rep());
 
     if (!evalNode) {
-      int sourceId;
       int errLine;
       UString errMsg;
 
-      evalNode = exec->parser()->parse<EvalNode>(
-          exec, UString(), 1, UStringSourceProvider::create(evalSource),
-          &sourceId, &errLine, &errMsg);
+      SourceCode source = makeSource(evalSource);
+      evalNode =
+          exec->parser()->parse<EvalNode>(exec, source, &errLine, &errMsg);
       if (evalNode) {
         if (evalSource.size() < maxCacheableSourceLength &&
             (*scopeChain->begin())->isVariableObject() &&
             cacheMap.size() < maxCacheEntries)
           cacheMap.set(evalSource.rep(), evalNode);
       } else {
-        exceptionValue =
-            Error::create(exec, SyntaxError, errMsg, errLine, sourceId, NULL);
+        exceptionValue = Error::create(exec, SyntaxError, errMsg, errLine,
+                                       source.provider()->asID(), NULL);
         return 0;
       }
     }
@@ -202,6 +201,7 @@ struct CodeBlock {
         codeType(codeType_),
         source(source_),
         sourceOffset(sourceOffset_) {
+    ASSERT(source);
   }
 
   ~CodeBlock();

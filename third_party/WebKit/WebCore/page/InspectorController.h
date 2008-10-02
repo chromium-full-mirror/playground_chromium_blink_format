@@ -199,8 +199,8 @@ class InspectorController : JavaScriptDebugListener {
 
   JavaScriptCallFrame* currentCallFrame() const;
 
-  void addBreakpoint(int sourceID, unsigned lineNumber);
-  void removeBreakpoint(int sourceID, unsigned lineNumber);
+  void addBreakpoint(intptr_t sourceID, unsigned lineNumber);
+  void removeBreakpoint(intptr_t sourceID, unsigned lineNumber);
 
   bool pauseOnExceptions();
   void setPauseOnExceptions(bool pause);
@@ -279,15 +279,9 @@ class InspectorController : JavaScriptDebugListener {
 
   void showWindow();
 
-  virtual void didParseSource(JSC::ExecState*,
-                              const JSC::SourceProvider& source,
-                              int startingLineNumber,
-                              const JSC::UString& sourceURL,
-                              int sourceID);
+  virtual void didParseSource(JSC::ExecState*, const JSC::SourceCode&);
   virtual void failedToParseSource(JSC::ExecState*,
-                                   const JSC::SourceProvider& source,
-                                   int startingLineNumber,
-                                   const JSC::UString& sourceURL,
+                                   const JSC::SourceCode&,
                                    int errorLine,
                                    const JSC::UString& errorMessage);
   virtual void didPause();

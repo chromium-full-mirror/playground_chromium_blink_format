@@ -52,32 +52,29 @@ class WebScriptDebugger : public JSC::Debugger {
   WebScriptDebugger(JSC::JSGlobalObject*);
 
   virtual void sourceParsed(JSC::ExecState*,
-                            int sourceID,
-                            const JSC::UString& sourceURL,
-                            const JSC::SourceProvider& source,
-                            int lineNumber,
+                            const JSC::SourceCode&,
                             int errorLine,
                             const JSC::UString& errorMsg);
   virtual void callEvent(const JSC::DebuggerCallFrame&,
-                         int sourceID,
+                         intptr_t sourceID,
                          int lineNumber);
   virtual void atStatement(const JSC::DebuggerCallFrame&,
-                           int sourceID,
+                           intptr_t sourceID,
                            int lineNumber);
   virtual void returnEvent(const JSC::DebuggerCallFrame&,
-                           int sourceID,
+                           intptr_t sourceID,
                            int lineNumber);
   virtual void exception(const JSC::DebuggerCallFrame&,
-                         int sourceID,
+                         intptr_t sourceID,
                          int lineNumber);
   virtual void willExecuteProgram(const JSC::DebuggerCallFrame&,
-                                  int sourceId,
+                                  intptr_t sourceID,
                                   int lineno);
   virtual void didExecuteProgram(const JSC::DebuggerCallFrame&,
-                                 int sourceId,
+                                 intptr_t sourceID,
                                  int lineno);
   virtual void didReachBreakpoint(const JSC::DebuggerCallFrame&,
-                                  int sourceId,
+                                  intptr_t sourceID,
                                   int lineno);
 
  private:

@@ -48,15 +48,14 @@ class Parser : Noncopyable {
  public:
   template <class ParsedNode>
   PassRefPtr<ParsedNode> parse(ExecState*,
-                               const UString& sourceURL,
-                               int startingLineNumber,
-                               PassRefPtr<SourceProvider> source,
-                               int* sourceId = 0,
+                               PassRefPtr<SourceProvider>,
                                int* errLine = 0,
                                UString* errMsg = 0);
-
-  UString sourceURL() const { return m_sourceURL; }
-  int sourceId() const { return m_sourceId; }
+  template <class ParsedNode>
+  PassRefPtr<ParsedNode> parse(ExecState*,
+                               const SourceCode&,
+                               int* errLine = 0,
+                               UString* errMsg = 0);
 
   void didFinishParsing(SourceElements*,
                         ParserRefCountedData<DeclarationStacks::VarStack>*,
@@ -69,18 +68,10 @@ class Parser : Noncopyable {
 
  private:
   friend class JSGlobalData;
-  Parser();
 
-  void parse(ExecState*,
-             const UString& sourceURL,
-             int startingLineNumber,
-             PassRefPtr<SourceProvider> source,
-             int* sourceId,
-             int* errLine,
-             UString* errMsg);
+  void parse(ExecState*, int* errLine, UString* errMsg);
 
-  UString m_sourceURL;
-  int m_sourceId;
+  const SourceCode* m_source;
   RefPtr<SourceElements> m_sourceElements;
   RefPtr<ParserRefCountedData<DeclarationStacks::VarStack>> m_varDeclarations;
   RefPtr<ParserRefCountedData<DeclarationStacks::FunctionStack>>
@@ -94,30 +85,26 @@ class Parser : Noncopyable {
 
 template <class ParsedNode>
 PassRefPtr<ParsedNode> Parser::parse(ExecState* exec,
-                                     const UString& sourceURL,
-                                     int startingLineNumber,
-                                     PassRefPtr<SourceProvider> source,
-                                     int* sourceId,
+                                     const SourceCode& source,
                                      int* errLine,
                                      UString* errMsg) {
-  m_sourceURL = sourceURL;
-  RefPtr<SourceProvider> sourceProvider = source;
-  parse(exec, sourceURL, startingLineNumber, sourceProvider.get(), sourceId,
-        errLine, errMsg);
-  if (!m_sourceElements) {
-    m_sourceURL = UString();
-    return 0;
+  m_source = &source;
+  parse(exec, errLine, errMsg);
+  RefPtr<ParsedNode> result;
+  if (m_sourceElements) {
+    result = ParsedNode::create(
+        &exec->globalData(), m_sourceElements.get(),
+        m_varDeclarations ? &m_varDeclarations->data : 0,
+        m_funcDeclarations ? &m_funcDeclarations->data : 0, *m_source,
+        m_usesEval, m_needsClosure, m_usesArguments, m_numConstants);
+    result->setLoc(m_source->firstLine(), m_lastLine);
   }
-  RefPtr<ParsedNode> node = ParsedNode::create(
-      &exec->globalData(), m_sourceElements.release().get(),
-      m_varDeclarations ? &m_varDeclarations->data : 0,
-      m_funcDeclarations ? &m_funcDeclarations->data : 0, sourceProvider.get(),
-      m_usesEval, m_needsClosure, m_usesArguments, m_numConstants);
+
+  m_source = 0;
+  m_sourceElements = 0;
   m_varDeclarations = 0;
   m_funcDeclarations = 0;
-  m_sourceURL = UString();
-  node->setLoc(startingLineNumber, m_lastLine);
-  return node.release();
+  return result.release();
 }
 
 }  // namespace JSC

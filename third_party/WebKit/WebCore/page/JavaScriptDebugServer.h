@@ -59,9 +59,9 @@ class JavaScriptDebugServer : JSC::Debugger {
   void addListener(JavaScriptDebugListener*, Page*);
   void removeListener(JavaScriptDebugListener*, Page*);
 
-  void addBreakpoint(int sourceID, unsigned lineNumber);
-  void removeBreakpoint(int sourceID, unsigned lineNumber);
-  bool hasBreakpoint(int sourceID, unsigned lineNumber) const;
+  void addBreakpoint(intptr_t sourceID, unsigned lineNumber);
+  void removeBreakpoint(intptr_t sourceID, unsigned lineNumber);
+  bool hasBreakpoint(intptr_t sourceID, unsigned lineNumber) const;
   void clearBreakpoints();
 
   bool pauseOnExceptions() const { return m_pauseOnExceptions; }
@@ -98,32 +98,29 @@ class JavaScriptDebugServer : JSC::Debugger {
   void pauseIfNeeded(Page*);
 
   virtual void sourceParsed(JSC::ExecState*,
-                            int sourceID,
-                            const JSC::UString& sourceURL,
-                            const JSC::SourceProvider& source,
-                            int startingLineNumber,
+                            const JSC::SourceCode&,
                             int errorLine,
                             const JSC::UString& errorMsg);
   virtual void callEvent(const JSC::DebuggerCallFrame&,
-                         int sourceID,
+                         intptr_t sourceID,
                          int lineNumber);
   virtual void atStatement(const JSC::DebuggerCallFrame&,
-                           int sourceID,
+                           intptr_t sourceID,
                            int firstLine);
   virtual void returnEvent(const JSC::DebuggerCallFrame&,
-                           int sourceID,
+                           intptr_t sourceID,
                            int lineNumber);
   virtual void exception(const JSC::DebuggerCallFrame&,
-                         int sourceID,
+                         intptr_t sourceID,
                          int lineNumber);
   virtual void willExecuteProgram(const JSC::DebuggerCallFrame&,
-                                  int sourceId,
+                                  intptr_t sourceID,
                                   int lineno);
   virtual void didExecuteProgram(const JSC::DebuggerCallFrame&,
-                                 int sourceId,
+                                 intptr_t sourceID,
                                  int lineno);
   virtual void didReachBreakpoint(const JSC::DebuggerCallFrame&,
-                                  int sourceId,
+                                  intptr_t sourceID,
                                   int lineno);
 
   typedef HashMap<Page*, ListenerSet*> PageListenersMap;
@@ -137,7 +134,7 @@ class JavaScriptDebugServer : JSC::Debugger {
   JavaScriptCallFrame* m_pauseOnCallFrame;
   RefPtr<JavaScriptCallFrame> m_currentCallFrame;
   HashMap<RefPtr<Frame>, PausedTimeouts*> m_pausedTimeouts;
-  HashMap<int, HashSet<unsigned>*> m_breakpoints;
+  HashMap<intptr_t, HashSet<unsigned>*> m_breakpoints;
 };
 
 }  // namespace WebCore

@@ -2385,6 +2385,7 @@ class ParameterNode : public Node {
 class ScopeNode : public BlockNode {
  public:
   ScopeNode(JSGlobalData*,
+            const SourceCode&,
             SourceElements*,
             VarStack*,
             FunctionStack*,
@@ -2393,9 +2394,14 @@ class ScopeNode : public BlockNode {
             bool usesArguments,
             int numConstants) JSC_FAST_CALL;
 
-  int sourceId() const JSC_FAST_CALL { return m_sourceId; }
-  const UString& sourceURL() const JSC_FAST_CALL { return m_sourceURL; }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
+
+  void setSource(const SourceCode& source) { m_source = source; }
+  const SourceCode& source() const { return m_source; }
+  const UString& sourceURL() const JSC_FAST_CALL {
+    return m_source.provider()->url();
+  }
+  intptr_t sourceID() const { return m_source.provider()->asID(); }
 
   bool usesEval() const { return m_usesEval; }
   bool needsClosure() const { return m_needsClosure; }
@@ -2416,8 +2422,7 @@ class ScopeNode : public BlockNode {
   FunctionStack m_functionStack;
 
  private:
-  UString m_sourceURL;
-  int m_sourceId;
+  SourceCode m_source;
   bool m_usesEval;
   bool m_needsClosure;
   bool m_usesArguments;
@@ -2430,7 +2435,7 @@ class ProgramNode : public ScopeNode {
                              SourceElements*,
                              VarStack*,
                              FunctionStack*,
-                             SourceProvider*,
+                             const SourceCode&,
                              bool usesEval,
                              bool needsClosure,
                              bool usesArguments,
@@ -2447,7 +2452,7 @@ class ProgramNode : public ScopeNode {
               SourceElements*,
               VarStack*,
               FunctionStack*,
-              SourceProvider*,
+              const SourceCode&,
               bool usesEval,
               bool needsClosure,
               bool usesArguments,
@@ -2463,8 +2468,6 @@ class ProgramNode : public ScopeNode {
                                      // in m_functionStack. (Recorded to avoid
                                      // double lookup.)
 
-  RefPtr<SourceProvider> m_sourceProvider;
-
   OwnPtr<ProgramCodeBlock> m_code;
 };
 
@@ -2474,7 +2477,7 @@ class EvalNode : public ScopeNode {
                           SourceElements*,
                           VarStack*,
                           FunctionStack*,
-                          SourceProvider*,
+                          const SourceCode&,
                           bool usesEval,
                           bool needsClosure,
                           bool usesArguments,
@@ -2491,7 +2494,7 @@ class EvalNode : public ScopeNode {
            SourceElements*,
            VarStack*,
            FunctionStack*,
-           SourceProvider*,
+           const SourceCode&,
            bool usesEval,
            bool needsClosure,
            bool usesArguments,
@@ -2499,8 +2502,6 @@ class EvalNode : public ScopeNode {
 
   void generateCode(ScopeChainNode*) JSC_FAST_CALL;
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
-
-  RefPtr<SourceProvider> m_sourceProvider;
 
   OwnPtr<EvalCodeBlock> m_code;
 };
@@ -2511,7 +2512,7 @@ class FunctionBodyNode : public ScopeNode {
                                   SourceElements*,
                                   VarStack*,
                                   FunctionStack*,
-                                  SourceProvider*,
+                                  const SourceCode&,
                                   bool usesEval,
                                   bool needsClosure,
                                   bool usesArguments,
@@ -2524,8 +2525,10 @@ class FunctionBodyNode : public ScopeNode {
                                   bool needsClosure,
                                   bool usesArguments,
                                   int numConstants) JSC_FAST_CALL;
+  ~FunctionBodyNode();
 
-  Vector<Identifier>& parameters() JSC_FAST_CALL { return m_parameters; }
+  const Identifier* parameters() const JSC_FAST_CALL { return m_parameters; }
+  size_t parameterCount() { return m_parameterCount; }
   UString paramString() const JSC_FAST_CALL;
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
@@ -2546,9 +2549,13 @@ class FunctionBodyNode : public ScopeNode {
 
   void mark();
 
-  void setSource(const SourceRange& source) { m_source = source; }
+  void finishParsing(const SourceCode&, ParameterNode*);
+  void finishParsing(const SourceCode&,
+                     Identifier* parameters,
+                     size_t parameterCount);
+
   UString toSourceString() const JSC_FAST_CALL {
-    return UString("{") + m_source.toString() + UString("}");
+    return UString("{") + source().toString() + UString("}");
   }
 
   // These objects are ref/deref'd a lot in the scope chain, so this is a faster
@@ -2578,10 +2585,10 @@ class FunctionBodyNode : public ScopeNode {
  private:
   void generateCode(ScopeChainNode*) JSC_FAST_CALL;
 
-  Vector<Identifier> m_parameters;
+  Identifier* m_parameters;
+  size_t m_parameterCount;
   SymbolTable m_symbolTable;
   OwnPtr<CodeBlock> m_code;
-  SourceRange m_source;
   unsigned m_refCount;
 };
 
@@ -2590,14 +2597,13 @@ class FuncExprNode : public ExpressionNode {
   FuncExprNode(JSGlobalData* globalData,
                const Identifier& ident,
                FunctionBodyNode* body,
-               const SourceRange& source,
+               const SourceCode& source,
                ParameterNode* parameter = 0) JSC_FAST_CALL
       : ExpressionNode(globalData),
         m_ident(ident),
         m_parameter(parameter),
         m_body(body) {
-    addParams();
-    m_body->setSource(source);
+    m_body->finishParsing(source, m_parameter.get());
   }
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
@@ -2609,8 +2615,6 @@ class FuncExprNode : public ExpressionNode {
   FunctionBodyNode* body() { return m_body.get(); }
 
  private:
-  void addParams() JSC_FAST_CALL;
-
   // Used for streamTo
   friend class PropertyNode;
   Identifier m_ident;
@@ -2623,14 +2627,13 @@ class FuncDeclNode : public StatementNode {
   FuncDeclNode(JSGlobalData* globalData,
                const Identifier& ident,
                FunctionBodyNode* body,
-               const SourceRange& source,
+               const SourceCode& source,
                ParameterNode* parameter = 0) JSC_FAST_CALL
       : StatementNode(globalData),
         m_ident(ident),
         m_parameter(parameter),
         m_body(body) {
-    addParams();
-    m_body->setSource(source);
+    m_body->finishParsing(source, m_parameter.get());
   }
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
@@ -2643,8 +2646,6 @@ class FuncDeclNode : public StatementNode {
   FunctionBodyNode* body() { return m_body.get(); }
 
  private:
-  void addParams() JSC_FAST_CALL;
-
   RefPtr<ParameterNode> m_parameter;
   RefPtr<FunctionBodyNode> m_body;
 };

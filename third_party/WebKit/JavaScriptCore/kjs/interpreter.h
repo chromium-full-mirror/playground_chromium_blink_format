@@ -32,7 +32,7 @@ class Completion;
 class ExecState;
 class JSValue;
 class ScopeChain;
-class SourceProvider;
+class SourceCode;
 class UString;
 
 class Interpreter {
@@ -44,14 +44,7 @@ class Interpreter {
    * @return A normal completion if there were no syntax errors in the code,
    * otherwise a throw completion with the syntax error as its value.
    */
-  static Completion checkSyntax(ExecState*,
-                                const UString& sourceURL,
-                                int startingLineNumber,
-                                const UString& code);
-  static Completion checkSyntax(ExecState*,
-                                const UString& sourceURL,
-                                int startingLineNumber,
-                                PassRefPtr<SourceProvider> source);
+  static Completion checkSyntax(ExecState*, const SourceCode&);
 
   /**
    * Evaluates the supplied ECMAScript code.
@@ -70,15 +63,7 @@ class Interpreter {
    */
   static Completion evaluate(ExecState*,
                              ScopeChain&,
-                             const UString& sourceURL,
-                             int startingLineNumber,
-                             const UString& code,
-                             JSValue* thisV = 0);
-  static Completion evaluate(ExecState*,
-                             ScopeChain&,
-                             const UString& sourceURL,
-                             int startingLineNumber,
-                             PassRefPtr<SourceProvider>,
+                             const SourceCode&,
                              JSValue* thisV = 0);
 
   static bool shouldPrintExceptions();

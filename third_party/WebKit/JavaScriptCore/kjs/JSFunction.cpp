@@ -91,7 +91,7 @@ JSValue* JSFunction::lengthGetter(ExecState* exec,
                                   const Identifier&,
                                   const PropertySlot& slot) {
   JSFunction* thisObj = static_cast<JSFunction*>(slot.slotBase());
-  return jsNumber(exec, thisObj->m_body->parameters().size());
+  return jsNumber(exec, thisObj->m_body->parameterCount());
 }
 
 bool JSFunction::getOwnPropertySlot(ExecState* exec,
@@ -141,9 +141,9 @@ bool JSFunction::deleteProperty(ExecState* exec,
  * function f2(x, x): getParameterName(0) --> null
  */
 const Identifier& JSFunction::getParameterName(int index) {
-  Vector<Identifier>& parameters = m_body->parameters();
+  const Identifier* parameters = m_body->parameters();
 
-  if (static_cast<size_t>(index) >= m_body->parameters().size())
+  if (static_cast<size_t>(index) >= m_body->parameterCount())
     return m_scopeChain.globalObject()
         ->globalData()
         ->propertyNames->nullIdentifier;
@@ -151,7 +151,7 @@ const Identifier& JSFunction::getParameterName(int index) {
   const Identifier& name = parameters[index];
 
   // Are there any subsequent parameters with the same name?
-  size_t size = parameters.size();
+  size_t size = m_body->parameterCount();
   for (size_t i = index + 1; i < size; ++i) {
     if (parameters[i] == name)
       return m_scopeChain.globalObject()

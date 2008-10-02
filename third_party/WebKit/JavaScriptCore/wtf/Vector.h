@@ -854,7 +854,6 @@ inline T* Vector<T, inlineCapacity>::releaseBuffer() {
     buffer = static_cast<T*>(fastMalloc(bytes));
     memcpy(buffer, data(), bytes);
   }
-  ASSERT(buffer);
   m_size = 0;
   return buffer;
 }

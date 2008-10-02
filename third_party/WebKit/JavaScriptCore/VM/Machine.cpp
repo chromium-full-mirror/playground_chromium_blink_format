@@ -859,11 +859,11 @@ NEVER_INLINE bool Machine::unwindCallFrame(ExecState* exec,
                                         codeBlock, scopeChain, r,
                                         exceptionValue);
     if (r[RegisterFile::Callee].jsValue(exec))
-      debugger->returnEvent(debuggerCallFrame, codeBlock->ownerNode->sourceId(),
+      debugger->returnEvent(debuggerCallFrame, codeBlock->ownerNode->sourceID(),
                             codeBlock->ownerNode->lastLine());
     else
       debugger->didExecuteProgram(debuggerCallFrame,
-                                  codeBlock->ownerNode->sourceId(),
+                                  codeBlock->ownerNode->sourceID(),
                                   codeBlock->ownerNode->lastLine());
   }
 
@@ -954,7 +954,7 @@ NEVER_INLINE Instruction* Machine::throwException(ExecState* exec,
               ReadOnly | DontDelete);
         exception->putWithAttributes(
             exec, Identifier(exec, "sourceId"),
-            jsNumber(exec, codeBlock->ownerNode->sourceId()),
+            jsNumber(exec, codeBlock->ownerNode->sourceID()),
             ReadOnly | DontDelete);
         exception->putWithAttributes(
             exec, Identifier(exec, "sourceURL"),
@@ -977,7 +977,7 @@ NEVER_INLINE Instruction* Machine::throwException(ExecState* exec,
     DebuggerCallFrame debuggerCallFrame(exec, exec->dynamicGlobalObject(),
                                         codeBlock, scopeChain, r,
                                         exceptionValue);
-    debugger->exception(debuggerCallFrame, codeBlock->ownerNode->sourceId(),
+    debugger->exception(debuggerCallFrame, codeBlock->ownerNode->sourceID(),
                         codeBlock->lineNumberForVPC(vPC));
   }
 
@@ -1260,28 +1260,28 @@ NEVER_INLINE void Machine::debug(ExecState* exec,
 
   switch (debugHookID) {
     case DidEnterCallFrame:
-      debugger->callEvent(debuggerCallFrame, codeBlock->ownerNode->sourceId(),
+      debugger->callEvent(debuggerCallFrame, codeBlock->ownerNode->sourceID(),
                           firstLine);
       return;
     case WillLeaveCallFrame:
-      debugger->returnEvent(debuggerCallFrame, codeBlock->ownerNode->sourceId(),
+      debugger->returnEvent(debuggerCallFrame, codeBlock->ownerNode->sourceID(),
                             lastLine);
       return;
     case WillExecuteStatement:
-      debugger->atStatement(debuggerCallFrame, codeBlock->ownerNode->sourceId(),
+      debugger->atStatement(debuggerCallFrame, codeBlock->ownerNode->sourceID(),
                             firstLine);
       return;
     case WillExecuteProgram:
       debugger->willExecuteProgram(debuggerCallFrame,
-                                   codeBlock->ownerNode->sourceId(), firstLine);
+                                   codeBlock->ownerNode->sourceID(), firstLine);
       return;
     case DidExecuteProgram:
       debugger->didExecuteProgram(debuggerCallFrame,
-                                  codeBlock->ownerNode->sourceId(), lastLine);
+                                  codeBlock->ownerNode->sourceID(), lastLine);
       return;
     case DidReachBreakpoint:
       debugger->didReachBreakpoint(debuggerCallFrame,
-                                   codeBlock->ownerNode->sourceId(), lastLine);
+                                   codeBlock->ownerNode->sourceID(), lastLine);
       return;
   }
 }
@@ -4051,7 +4051,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       r[dst] = Error::create(
           exec, (ErrorType)type,
           codeBlock->unexpectedConstants[message]->toString(exec),
-          codeBlock->lineNumberForVPC(vPC), codeBlock->ownerNode->sourceId(),
+          codeBlock->lineNumberForVPC(vPC), codeBlock->ownerNode->sourceID(),
           codeBlock->ownerNode->sourceURL());
 
       ++vPC;
@@ -4237,7 +4237,7 @@ JSValue* Machine::retrieveCaller(ExecState* exec,
 
 void Machine::retrieveLastCaller(ExecState* exec,
                                  int& lineNumber,
-                                 int& sourceId,
+                                 intptr_t& sourceID,
                                  UString& sourceURL,
                                  JSValue*& function) const {
   function = 0;
@@ -4255,7 +4255,7 @@ void Machine::retrieveLastCaller(ExecState* exec,
 
   Instruction* vPC = vPCForPC(callerCodeBlock, r[RegisterFile::ReturnPC].v());
   lineNumber = callerCodeBlock->lineNumberForVPC(vPC - 1);
-  sourceId = callerCodeBlock->ownerNode->sourceId();
+  sourceID = callerCodeBlock->ownerNode->sourceID();
   sourceURL = callerCodeBlock->ownerNode->sourceURL();
 
   JSValue* caller = callerR[RegisterFile::Callee].getJSValue();
@@ -6032,7 +6032,7 @@ JSValue* Machine::cti_op_new_error(CTI_ARGS) {
 
   return Error::create(
       exec, static_cast<ErrorType>(type), message->toString(exec), lineNumber,
-      codeBlock->ownerNode->sourceId(), codeBlock->ownerNode->sourceURL());
+      codeBlock->ownerNode->sourceID(), codeBlock->ownerNode->sourceURL());
 }
 
 void Machine::cti_op_debug(CTI_ARGS) {

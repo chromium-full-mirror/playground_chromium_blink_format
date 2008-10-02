@@ -29,14 +29,15 @@
 #ifndef StringSourceProvider_h
 #define StringSourceProvider_h
 
-#include <kjs/SourceProvider.h>
+#include <kjs/SourceRange.h>
 
 namespace WebCore {
 
 class StringSourceProvider : public JSC::SourceProvider {
  public:
-  static PassRefPtr<StringSourceProvider> create(const String& source) {
-    return adoptRef(new StringSourceProvider(source));
+  static PassRefPtr<StringSourceProvider> create(const String& source,
+                                                 const String& url) {
+    return adoptRef(new StringSourceProvider(source, url));
   }
 
   JSC::UString getRange(int start, int end) const {
@@ -46,9 +47,17 @@ class StringSourceProvider : public JSC::SourceProvider {
   int length() const { return m_source.length(); }
 
  private:
-  StringSourceProvider(const String& source) : m_source(source) {}
+  StringSourceProvider(const String& source, const String& url)
+      : SourceProvider(url), m_source(source) {}
+
   String m_source;
 };
+
+inline JSC::SourceCode makeSource(const String& source,
+                                  const JSC::UString& url = JSC::UString(),
+                                  int firstLine = 1) {
+  return JSC::SourceCode(StringSourceProvider::create(source, url), firstLine);
+}
 }
 
 #endif

@@ -98,7 +98,7 @@ inline void Arguments::init(ExecState* exec, Register* callFrame) {
   exec->machine()->getArgumentsData(callFrame, callee, firstParameterIndex,
                                     argv, numArguments);
 
-  d->numParameters = callee->numParameters();
+  d->numParameters = callee->m_body->parameterCount();
   d->firstParameterIndex = firstParameterIndex;
   d->numArguments = numArguments;
 

@@ -30,6 +30,7 @@
 #include "APICast.h"
 #include "completion.h"
 #include "OpaqueJSString.h"
+#include "SourceRange.h"
 #include <kjs/ExecState.h>
 #include <kjs/InitializeThreading.h>
 #include <kjs/interpreter.h>
@@ -53,9 +54,10 @@ JSValueRef JSEvaluateScript(JSContextRef ctx,
 
   // Interpreter::evaluate sets "this" to the global object if it is NULL
   JSGlobalObject* globalObject = exec->dynamicGlobalObject();
+  SourceCode source =
+      makeSource(script->ustring(), sourceURL->ustring(), startingLineNumber);
   Completion completion = Interpreter::evaluate(
-      globalObject->globalExec(), globalObject->globalScopeChain(),
-      sourceURL->ustring(), startingLineNumber, script->ustring(),
+      globalObject->globalExec(), globalObject->globalScopeChain(), source,
       jsThisObject);
 
   if (completion.complType() == Throw) {
@@ -80,9 +82,10 @@ bool JSCheckScriptSyntax(JSContextRef ctx,
   exec->globalData().heap->registerThread();
   JSLock lock(exec);
 
+  SourceCode source =
+      makeSource(script->ustring(), sourceURL->ustring(), startingLineNumber);
   Completion completion = Interpreter::checkSyntax(
-      exec->dynamicGlobalObject()->globalExec(), sourceURL->ustring(),
-      startingLineNumber, script->ustring());
+      exec->dynamicGlobalObject()->globalExec(), source);
   if (completion.complType() == Throw) {
     if (exception)
       *exception = toRef(completion.value());
