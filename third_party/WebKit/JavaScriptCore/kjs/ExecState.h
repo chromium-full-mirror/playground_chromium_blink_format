@@ -100,7 +100,7 @@ class ExecState : Noncopyable {
     return exec->m_globalData->stringTable;
   }
 
-  Heap* heap() const { return m_globalData->heap; }
+  Heap* heap() const { return &m_globalData->heap; }
 
  private:
   // Default constructor required for gcc 3.

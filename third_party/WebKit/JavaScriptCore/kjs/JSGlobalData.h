@@ -30,10 +30,9 @@
 #define JSGlobalData_h
 
 #include <wtf/Forward.h>
-#include <wtf/HashCountedSet.h>
 #include <wtf/HashMap.h>
-#include <wtf/HashSet.h>
 #include <wtf/RefCounted.h>
+#include "collector.h"
 #include "SmallStrings.h"
 
 struct OpaqueJSClass;
@@ -64,7 +63,6 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   ~JSGlobalData();
 
   Machine* machine;
-  Heap* heap;
 
   const HashTable* arrayTable;
   const HashTable* dateTable;
@@ -106,6 +104,8 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   ClientData* clientData;
 
   HashSet<JSObject*> arrayVisitedElements;
+
+  Heap heap;
 
  private:
   JSGlobalData(bool isShared = false);

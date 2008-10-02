@@ -93,7 +93,7 @@ HRESULT STDMETHODCALLTYPE WebCoreStatistics::javaScriptObjectsCount(
     return E_POINTER;
 
   JSLock lock(false);
-  *count = (UINT)JSDOMWindow::commonJSGlobalData()->heap->size();
+  *count = (UINT)JSDOMWindow::commonJSGlobalData()->heap.size();
   return S_OK;
 }
 
@@ -103,7 +103,7 @@ HRESULT STDMETHODCALLTYPE WebCoreStatistics::javaScriptGlobalObjectsCount(
     return E_POINTER;
 
   JSLock lock(false);
-  *count = (UINT)JSDOMWindow::commonJSGlobalData()->heap->globalObjectCount();
+  *count = (UINT)JSDOMWindow::commonJSGlobalData()->heap.globalObjectCount();
   return S_OK;
 }
 
@@ -113,8 +113,7 @@ HRESULT STDMETHODCALLTYPE WebCoreStatistics::javaScriptProtectedObjectsCount(
     return E_POINTER;
 
   JSLock lock(false);
-  *count =
-      (UINT)JSDOMWindow::commonJSGlobalData()->heap->protectedObjectCount();
+  *count = (UINT)JSDOMWindow::commonJSGlobalData()->heap.protectedObjectCount();
   return S_OK;
 }
 
@@ -126,7 +125,7 @@ WebCoreStatistics::javaScriptProtectedGlobalObjectsCount(
 
   JSLock lock(false);
   *count = (UINT)JSDOMWindow::commonJSGlobalData()
-               ->heap->protectedGlobalObjectCount();
+               ->heap.protectedGlobalObjectCount();
   return S_OK;
 }
 
@@ -135,7 +134,7 @@ WebCoreStatistics::javaScriptProtectedObjectTypeCounts(
     /* [retval][out] */ IPropertyBag2** typeNamesAndCounts) {
   JSLock lock(false);
   OwnPtr<HashCountedSet<const char*>> jsObjectTypeNames(
-      JSDOMWindow::commonJSGlobalData()->heap->protectedObjectTypeCounts());
+      JSDOMWindow::commonJSGlobalData()->heap.protectedObjectTypeCounts());
   typedef HashCountedSet<const char*>::const_iterator Iterator;
   Iterator end = jsObjectTypeNames->end();
   HashMap<String, int> typeCountMap;

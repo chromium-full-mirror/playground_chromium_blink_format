@@ -57,8 +57,7 @@ extern const HashTable regExpConstructorTable;
 extern const HashTable stringTable;
 
 JSGlobalData::JSGlobalData(bool isShared)
-    : machine(new Machine),
-      heap(new Heap(this))
+    : machine(new Machine)
 #if ENABLE(JSC_MULTIPLE_THREADS)
       ,
       arrayTable(new HashTable(JSC::arrayTable)),
@@ -91,16 +90,16 @@ JSGlobalData::JSGlobalData(bool isShared)
       parser(new Parser),
       head(0),
       isSharedInstance(isShared),
-      clientData(0) {
+      clientData(0),
+      heap(this) {
 }
 
 JSGlobalData::~JSGlobalData() {
-  delete heap;
+  heap.destroy();
   delete machine;
 #ifndef NDEBUG
   // Zeroing out to make the behavior more predictable when someone attempts to
   // use a deleted instance.
-  heap = 0;
   machine = 0;
 #endif
 
