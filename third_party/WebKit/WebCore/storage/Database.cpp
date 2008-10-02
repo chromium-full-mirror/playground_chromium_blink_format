@@ -97,7 +97,8 @@ PassRefPtr<Database> Database::openDatabase(Document* document,
     return 0;
   }
 
-  RefPtr<Database> database = new Database(document, name, expectedVersion);
+  RefPtr<Database> database =
+      adoptRef(new Database(document, name, expectedVersion));
 
   if (!database->openAndVerifyVersion(e)) {
     LOG(StorageAPI,
