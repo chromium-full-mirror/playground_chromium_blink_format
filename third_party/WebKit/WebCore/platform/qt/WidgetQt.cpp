@@ -103,25 +103,26 @@ void Widget::invalidateRect(const IntRect& r) {
     return;
   }
 
-  if (!parent()) {
-    if (isFrameView())
-      static_cast<FrameView*>(this)->addToDirtyRegion(r);
-    return;
-  }
+#if 0
+    if (!parent()) {
+        if (isFrameView())
+            static_cast<FrameView*>(this)->addToDirtyRegion(r);
+        return;
+    }
 
-  // Get the root widget.
-  ScrollView* outermostView = root();
-  if (!outermostView)
-    return;
+    // Get the root widget.
+    ScrollView* outermostView = root();
+    if (!outermostView)
+        return;
 
-  IntRect windowRect = convertToContainingWindow(r);
+    IntRect windowRect = convertToContainingWindow(r);
 
-  // Get our clip rect and intersect with it to ensure we don't invalidate too
-  // much.
-  IntRect clipRect = windowClipRect();
-  windowRect.intersect(clipRect);
+    // Get our clip rect and intersect with it to ensure we don't invalidate too much.
+    IntRect clipRect = windowClipRect();
+    windowRect.intersect(clipRect);
 
-  outermostView->addToDirtyRegion(windowRect);
+    outermostView->addToDirtyRegion(windowRect);
+#endif
 }
 
 QWidget* Widget::containingWindow() const {
