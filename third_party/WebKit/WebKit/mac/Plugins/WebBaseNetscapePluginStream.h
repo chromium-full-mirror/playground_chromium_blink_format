@@ -31,8 +31,9 @@
 
 #import <WebKit/npfunctions.h>
 #import <WebKit/WebPlugInStreamLoaderDelegate.h>
-#import <wtf/RefCounted.h>
 #import <wtf/PassRefPtr.h>
+#import <wtf/RefCounted.h>
+#import <wtf/RefPtr.h>
 #import <wtf/RetainPtr.h>
 
 namespace WebCore {
@@ -44,12 +45,16 @@ class WebNetscapePlugInStreamLoaderClient;
 
 @class WebBaseNetscapePluginView;
 @class NSURLResponse;
+@class WebBaseNetscapePluginStream;
 
 class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
  public:
-  static PassRefPtr<WebNetscapePluginStream> create() {
-    return adoptRef(new WebNetscapePluginStream);
+  static PassRefPtr<WebNetscapePluginStream> create(
+      WebBaseNetscapePluginStream* stream) {
+    return adoptRef(new WebNetscapePluginStream(stream));
   }
+
+  void setPlugin(NPP);
 
   // FIXME: These should all be private once WebBaseNetscapePluginStream is
   // history...
@@ -79,8 +84,11 @@ class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
   NSURLRequest* m_request;
   NPPluginFuncs* m_pluginFuncs;
 
+  // FIXME: Remove this once it's not needed anymore.
+  WebBaseNetscapePluginStream* m_pluginStream;
+
  private:
-  WebNetscapePluginStream()
+  WebNetscapePluginStream(WebBaseNetscapePluginStream* stream)
       : m_plugin(0),
         m_transferMode(0),
         m_offset(0),
@@ -95,14 +103,15 @@ class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
         m_loader(0),
         m_client(0),
         m_request(0),
-        m_pluginFuncs(0) {
+        m_pluginFuncs(0),
+        m_pluginStream(stream) {
     memset(&m_stream, 0, sizeof(NPStream));
   }
 };
 
 @interface WebBaseNetscapePluginStream
     : NSObject<WebPlugInStreamLoaderDelegate> {
-  WebNetscapePluginStream* _impl;
+  RefPtr<WebNetscapePluginStream> _impl;
 }
 
 + (NPP)ownerForStream:(NPStream*)stream;
@@ -123,10 +132,9 @@ class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
         sendNotification:(BOOL)flag;
 
 - (void)setRequestURL:(NSURL*)theRequestURL;
-- (void)setResponseURL:(NSURL*)theResponseURL;
+
 - (void)setPlugin:(NPP)thePlugin;
 
-- (uint16)transferMode;
 - (NPP)plugin;
 
 - (void)startStreamResponseURL:(NSURL*)theResponseURL
