@@ -62,6 +62,7 @@ class Chrome : public HostWindow {
                       const IntRect& clipRect);
   virtual IntPoint screenToWindow(const IntPoint&) const;
   virtual IntRect windowToScreen(const IntRect&) const;
+  virtual PlatformWidget platformWindow() const;
 
   void setWindowRect(const FloatRect&) const;
   FloatRect windowRect() const;

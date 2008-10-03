@@ -109,6 +109,7 @@ class WebChromeClient : public WebCore::ChromeClient {
                       const WebCore::IntRect& clipRect);
   virtual WebCore::IntPoint screenToWindow(const WebCore::IntPoint& p) const;
   virtual WebCore::IntRect windowToScreen(const WebCore::IntRect& r) const;
+  virtual PlatformWidget platformWindow() const;
 
   virtual void addToDirtyRegion(const WebCore::IntRect&);
 

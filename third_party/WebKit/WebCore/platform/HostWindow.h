@@ -28,6 +28,7 @@
 
 #include <wtf/Noncopyable.h>
 #include "IntRect.h"
+#include "Widget.h"
 
 namespace WebCore {
 
@@ -59,6 +60,9 @@ class HostWindow : Noncopyable {
   // Methods for doing coordinate conversions to and from screen coordinates.
   virtual IntPoint screenToWindow(const IntPoint&) const = 0;
   virtual IntRect windowToScreen(const IntRect&) const = 0;
+
+  // Method for retrieving the native window.
+  virtual PlatformWidget platformWindow() const = 0;
 };
 
 }  // namespace WebCore
