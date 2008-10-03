@@ -284,7 +284,7 @@ void Scrollbar::moveThumb(int pos) {
   }
 }
 
-bool Scrollbar::handleMouseMoveEvent(const PlatformMouseEvent& evt) {
+bool Scrollbar::mouseMoved(const PlatformMouseEvent& evt) {
   if (m_pressedPart == ThumbPart) {
     moveThumb(m_orientation == HorizontalScrollbar
                   ? convertFromContainingWindow(evt.pos()).x()
@@ -325,7 +325,7 @@ bool Scrollbar::handleMouseMoveEvent(const PlatformMouseEvent& evt) {
   return true;
 }
 
-bool Scrollbar::handleMouseOutEvent(const PlatformMouseEvent& event) {
+bool Scrollbar::mouseExited() {
   if (theme()->invalidateOnMouseEnterExit())
     invalidate();  // Just invalidate the whole scrollbar, since the buttons at
                    // either end change anyway.
@@ -335,7 +335,7 @@ bool Scrollbar::handleMouseOutEvent(const PlatformMouseEvent& event) {
   return true;
 }
 
-bool Scrollbar::handleMouseReleaseEvent(const PlatformMouseEvent& event) {
+bool Scrollbar::mouseUp() {
   theme()->invalidatePart(this, m_pressedPart);
   m_pressedPart = NoPart;
   m_pressedPos = 0;
@@ -348,7 +348,7 @@ bool Scrollbar::handleMouseReleaseEvent(const PlatformMouseEvent& event) {
   return true;
 }
 
-bool Scrollbar::handleMousePressEvent(const PlatformMouseEvent& evt) {
+bool Scrollbar::mouseDown(const PlatformMouseEvent& evt) {
   // Early exit for right click
   if (evt.button() == RightButton)
     return true;  // FIXME: Handled as context menu by Qt right now.  Should
@@ -432,5 +432,9 @@ void Scrollbar::invalidateRect(const IntRect& rect) {
   if (suppressInvalidation())
     return;
   m_client->invalidateScrollbarRect(this, rect);
+}
+
+PlatformMouseEvent Scrollbar::transformEvent(const PlatformMouseEvent& event) {
+  return event;
 }
 }

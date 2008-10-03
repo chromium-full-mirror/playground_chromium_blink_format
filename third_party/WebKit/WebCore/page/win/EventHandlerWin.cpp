@@ -84,14 +84,6 @@ bool EventHandler::passWheelEventToWidget(PlatformWheelEvent& wheelEvent,
       ->handleWheelEvent(wheelEvent);
 }
 
-bool EventHandler::passMousePressEventToScrollbar(
-    MouseEventWithHitTestResults& mev,
-    Scrollbar* scrollbar) {
-  if (!scrollbar || !scrollbar->enabled())
-    return false;
-  return scrollbar->handleMousePressEvent(mev.event());
-}
-
 bool EventHandler::tabsToAllControls(KeyboardEvent*) const {
   return true;
 }

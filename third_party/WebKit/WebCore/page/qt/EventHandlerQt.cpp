@@ -134,12 +134,4 @@ bool EventHandler::passMouseReleaseEventToSubframe(
   subframe->eventHandler()->handleMouseReleaseEvent(mev.event());
   return true;
 }
-
-bool EventHandler::passMousePressEventToScrollbar(
-    MouseEventWithHitTestResults& mev,
-    Scrollbar* scrollbar) {
-  if (!scrollbar || !scrollbar->enabled())
-    return false;
-  return scrollbar->handleMousePressEvent(mev.event());
-}
 }
