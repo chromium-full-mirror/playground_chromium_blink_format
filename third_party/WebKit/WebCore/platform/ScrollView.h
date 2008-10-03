@@ -178,6 +178,10 @@ class ScrollView : public Widget, public ScrollbarClient {
   // This method scrolls by lines, pages or pixels.
   bool scroll(ScrollDirection, ScrollGranularity);
 
+  // Scroll the actual contents of the view (either blitting or invalidating as
+  // needed).
+  void scrollContents(const IntSize& scrollDelta);
+
   // This gives us a means of blocking painting on our scrollbars until the
   // first layout has occurred.
   void setScrollbarsSuppressed(bool suppressed,
@@ -301,10 +305,6 @@ class ScrollView : public Widget, public ScrollbarClient {
   // view.
   void updateScrollbars(const IntSize& desiredOffset);
 
-  // Scroll the actual contents of the view (either blitting or invalidating as
-  // needed).
-  void scrollContents(const IntSize& scrollDelta);
-
   // These methods are used to create/destroy scrollbars.
   void setHasHorizontalScrollbar(bool);
   void setHasVerticalScrollbar(bool);
@@ -327,6 +327,8 @@ class ScrollView : public Widget, public ScrollbarClient {
   bool platformIsOffscreen() const;
   bool platformHandleHorizontalAdjustment(const IntSize&);
   bool platformHandleVerticalAdjustment(const IntSize&);
+  bool platformHasHorizontalAdjustment() const;
+  bool platformHasVerticalAdjustment() const;
 
 #if PLATFORM(MAC) && defined __OBJC__
  public:
@@ -334,14 +336,6 @@ class ScrollView : public Widget, public ScrollbarClient {
 
  private:
   NSScrollView<WebCoreFrameScrollView>* scrollView() const;
-#endif
-
-#if !PLATFORM(MAC) && !PLATFORM(WIN) && !PLATFORM(QT)
-  // FIXME: ScrollViewPrivate will eventually be completely gone.
-  class ScrollViewPrivate;
-  ScrollViewPrivate* m_data;
-
-  friend class ScrollViewPrivate;  // FIXME: Temporary.
 #endif
 
 #if !PLATFORM(MAC) && !PLATFORM(WX)
@@ -362,6 +356,9 @@ class ScrollView : public Widget, public ScrollbarClient {
 #if PLATFORM(GTK)
  public:
   void setGtkAdjustments(GtkAdjustment* hadj, GtkAdjustment* vadj);
+  GtkAdjustment* m_horizontalAdjustment;
+  GtkAdjustment* m_verticalAdjustment;
+  void setScrollOffset(const IntSize& offset) { m_scrollOffset = offset; }
 #endif
 
 #if PLATFORM(WX)
@@ -370,6 +367,8 @@ class ScrollView : public Widget, public ScrollbarClient {
 
  private:
   void adjustScrollbars(int x = -1, int y = -1, bool refresh = true);
+  class ScrollViewPrivate;
+  ScrollViewPrivate* m_data;
 #endif
 
 };  // class ScrollView
