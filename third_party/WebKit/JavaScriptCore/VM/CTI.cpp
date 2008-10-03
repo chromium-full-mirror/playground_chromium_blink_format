@@ -129,7 +129,8 @@ __declspec(naked) JSValue* ctiTrampoline(void* code,
                                          RegisterFile* registerFile,
                                          Register* r,
                                          JSValue** exception,
-                                         Profiler**) {
+                                         Profiler**,
+                                         JSGlobalData*) {
   __asm {
             push esi;
             push edi;
