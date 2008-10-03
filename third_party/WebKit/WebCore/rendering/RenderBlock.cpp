@@ -160,10 +160,10 @@ RenderBlock::~RenderBlock() {
   }
 }
 
-void RenderBlock::setStyle(RenderStyle* _style) {
-  setReplaced(_style->isDisplayReplacedType());
+void RenderBlock::setStyle(RenderStyle* newStyle) {
+  setReplaced(newStyle->isDisplayReplacedType());
 
-  RenderFlow::setStyle(_style);
+  RenderFlow::setStyle(newStyle);
 
   // FIXME: We could save this call when the change only affected non-inherited
   // properties
