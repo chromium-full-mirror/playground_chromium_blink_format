@@ -309,6 +309,8 @@ class ScrollView : public Widget, public ScrollbarClient {
   void setHasHorizontalScrollbar(bool);
   void setHasVerticalScrollbar(bool);
 
+  void platformInit();
+  void platformDestroy();
   void platformAddChild(Widget*);
   void platformRemoveChild(Widget*);
   void platformSetScrollbarModes();

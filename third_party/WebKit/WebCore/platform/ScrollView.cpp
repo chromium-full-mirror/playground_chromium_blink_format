@@ -37,19 +37,22 @@ using std::max;
 
 namespace WebCore {
 
-void ScrollView::init() {
-  m_prohibitsScrolling = false;
-  m_canBlitOnScroll = true;
-  m_horizontalScrollbarMode = m_verticalScrollbarMode = ScrollbarAuto;
+ScrollView::ScrollView()
+    : m_horizontalScrollbarMode(ScrollbarAuto),
+      m_verticalScrollbarMode(ScrollbarAuto),
+      m_prohibitsScrolling(false),
+      m_canBlitOnScroll(true),
+      m_scrollbarsAvoidingResizer(0),
+      m_scrollbarsSuppressed(false),
+      m_inUpdateScrollbars(false),
+      m_drawPanScrollIcon(false) {
+  platformInit();
   if (platformWidget())
     platformSetCanBlitOnScroll();
-  m_scrollbarsAvoidingResizer = 0;
-  m_scrollbarsSuppressed = false;
-  m_inUpdateScrollbars = false;
-  m_drawPanScrollIcon = false;
 }
 
-void ScrollView::destroy() {
+ScrollView::~ScrollView() {
+  platformDestroy();
   setHasHorizontalScrollbar(false);
   setHasVerticalScrollbar(false);
 }
@@ -776,6 +779,18 @@ void ScrollView::removePanScrollIcon() {
                                 IntSize(panIconSizeLength, panIconSizeLength)),
                         true, true);
 }
+
+#if !PLATFORM(WX) && !PLATFORM(GTK) && !PLATFORM(QT)
+void ScrollView::platformInit() {}
+
+void ScrollView::platformDestroy() {}
+#endif
+
+#if !PLATFORM(WX) && !PLATFORM(GTK) && !PLATFORM(QT) && !PLATFORM(MAC)
+void ScrollView::platformAddChild(Widget*) {}
+
+void ScrollView::platformRemoveChild(Widget*) {}
+#endif
 
 #if !PLATFORM(MAC)
 void ScrollView::platformSetCanBlitOnScroll() {}

@@ -34,14 +34,11 @@
 
 namespace WebCore {
 
-ScrollView::ScrollView() {
-  init();
+void ScrollView::platformInit() {
   m_widgetsThatPreventBlitting = 0;
 }
 
-ScrollView::~ScrollView() {
-  destroy();
-}
+void ScrollView::platformDestroy() {}
 
 void ScrollView::platformAddChild(Widget* child) {
   root()->m_widgetsThatPreventBlitting++;

@@ -68,14 +68,12 @@ static void adjustmentChanged(GtkAdjustment* adjustment, gpointer _that) {
   that->scrollContents(scrollDelta);
 }
 
-ScrollView::ScrollView() {
-  init();
+void ScrollView::platformInit() {
   m_horizontalAdjustment = 0;
   m_verticalAdjustment = 0;
 }
 
-ScrollView::~ScrollView() {
-  destroy();
+void ScrollView::platformDestroy() {
   if (m_horizontalAdjustment) {
     g_signal_handlers_disconnect_by_func(G_OBJECT(m_horizontalAdjustment),
                                          (gpointer)adjustmentChanged, this);
