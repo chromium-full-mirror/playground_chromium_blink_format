@@ -336,7 +336,7 @@ class ScrollView : public Widget, public ScrollbarClient {
   NSScrollView<WebCoreFrameScrollView>* scrollView() const;
 #endif
 
-#if !PLATFORM(MAC) && !PLATFORM(WIN)
+#if !PLATFORM(MAC) && !PLATFORM(WIN) && !PLATFORM(QT)
   // FIXME: ScrollViewPrivate will eventually be completely gone.
   class ScrollViewPrivate;
   ScrollViewPrivate* m_data;
