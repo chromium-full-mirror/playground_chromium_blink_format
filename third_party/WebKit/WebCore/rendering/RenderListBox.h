@@ -91,7 +91,7 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   virtual void panScroll(const IntPoint&);
 
   int scrollToward(
-      const IntPoint&);  // Returns the new index or -1 if no scroll occured
+      const IntPoint&);  // Returns the new index or -1 if no scroll occurred
 
   virtual int verticalScrollbarWidth() const;
   virtual int scrollLeft() const;
@@ -104,7 +104,7 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
  private:
   // ScrollbarClient interface.
   virtual void valueChanged(Scrollbar*);
-  virtual IntRect windowClipRect(const Scrollbar*) const;
+  virtual void invalidateScrollbarRect(Scrollbar*, const IntRect&);
   virtual bool isActive() const;
 
   int itemHeight() const;
@@ -113,7 +113,7 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   int numVisibleItems() const;
   int numItems() const;
   int listHeight() const;
-  void paintScrollbar(PaintInfo&);
+  void paintScrollbar(PaintInfo&, int tx, int ty);
   void paintItemForeground(PaintInfo&, int tx, int ty, int listIndex);
   void paintItemBackground(PaintInfo&, int tx, int ty, int listIndex);
   void scrollToRevealSelection();

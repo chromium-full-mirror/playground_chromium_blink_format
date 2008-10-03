@@ -428,19 +428,9 @@ void Scrollbar::setEnabled(bool e) {
   invalidate();
 }
 
-IntRect Scrollbar::windowClipRect() const {
-  IntRect clipRect(0, 0, width(), height());
-
-  clipRect = convertToContainingWindow(clipRect);
-  if (m_client)
-    clipRect.intersect(m_client->windowClipRect(this));
-
-  return clipRect;
-}
-
 void Scrollbar::invalidateRect(const IntRect& rect) {
   if (suppressInvalidation())
     return;
-  Widget::invalidateRect(rect);
+  m_client->invalidateScrollbarRect(this, rect);
 }
 }

@@ -747,6 +747,16 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
   }
 }
 
+void PluginView::invalidateRect(const IntRect& rect) {
+  if (m_isWindowed) {
+    RECT invalidRect = rect;
+    ::InvalidateRect(platformPluginWidget(), &invalidRect, false);
+    return;
+  }
+
+  invalidateWindowlessPluginRect(rect);
+}
+
 void PluginView::invalidateRect(NPRect* rect) {
   if (!rect) {
     invalidate();
@@ -765,7 +775,7 @@ void PluginView::invalidateRect(NPRect* rect) {
       if (!m_invalidateTimer.isActive())
         m_invalidateTimer.startOneShot(0.001);
     } else
-      Widget::invalidateRect(r);
+      invalidateRect(r);
   }
 }
 
@@ -782,7 +792,7 @@ void PluginView::invalidateRegion(NPRegion region) {
 
   IntRect rect(IntPoint(r.left, r.top),
                IntSize(r.right - r.left, r.bottom - r.top));
-  Widget::invalidateRect(rect);
+  invalidateRect(rect);
 }
 
 void PluginView::forceRedraw() {

@@ -122,7 +122,6 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
 
   virtual void setParent(ScrollView*);
   virtual void setFrameRect(const IntRect&);
-  virtual IntRect windowClipRect() const;
 
   virtual void invalidateRect(const IntRect&);
 

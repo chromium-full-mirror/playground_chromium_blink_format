@@ -595,8 +595,12 @@ void PopupMenu::valueChanged(Scrollbar* scrollBar) {
   ::UpdateWindow(m_popup);
 }
 
-IntRect PopupMenu::windowClipRect(const Scrollbar*) const {
-  return m_windowRect;
+void PopupMenu::invalidateScrollbarRect(Scrollbar* scrollbar,
+                                        const IntRect& rect) {
+  IntRect scrollRect = rect;
+  scrollRect.move(scrollbar->x(), scrollbar->y());
+  RECT r = scrollRect;
+  ::InvalidateRect(m_popup, &r, false);
 }
 
 static ATOM registerPopup() {
