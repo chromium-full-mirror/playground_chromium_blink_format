@@ -124,6 +124,7 @@ class WebScrollBar : public IWebScrollBarPrivate, ScrollbarClient {
   virtual bool isActive() const { return true; }
 
   ULONG m_refCount;
+  HWND m_containingWindow;
   RefPtr<WebCore::Scrollbar> m_scrollBar;
   COMPtr<IWebScrollBarDelegatePrivate> m_delegate;
 };

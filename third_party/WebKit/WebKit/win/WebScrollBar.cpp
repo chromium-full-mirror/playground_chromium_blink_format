@@ -40,7 +40,7 @@ using namespace WebCore;
 // WebScrollBar
 // ---------------------------------------------------------------------
 
-WebScrollBar::WebScrollBar() : m_refCount(0) {
+WebScrollBar::WebScrollBar() : m_refCount(0), m_containingWindow(0) {
   gClassCount++;
   gClassNameCount.add("WebScrollBar");
 }
@@ -100,7 +100,7 @@ HRESULT STDMETHODCALLTYPE WebScrollBar::init(
                                                  webCoreControlSize);
   if (!m_scrollBar)
     return E_FAIL;
-  m_scrollBar->setContainingWindow((HWND)(ULONG64)containingWindow);
+  m_containingWindow = (HWND)(ULONG64)containingWindow;
   return S_OK;
 }
 
@@ -248,7 +248,6 @@ void WebScrollBar::valueChanged(Scrollbar* scrollBar) {
 }
 
 void WebScrollBar::invalidateScrollbarRect(Scrollbar*, const IntRect& rect) {
-  HWND sbContainingWindow = m_scrollBar->containingWindow();
   RECT r = rect;
-  ::InvalidateRect(sbContainingWindow, &r, false);
+  ::InvalidateRect(m_containingWindow, &r, false);
 }
