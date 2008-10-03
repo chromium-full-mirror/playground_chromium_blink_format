@@ -244,7 +244,7 @@ IntRect ChromeClient::windowResizerRect() const {
 void ChromeClient::repaint(const IntRect& windowRect,
                            bool,
                            bool immediate,
-                           bool) {
+                           bool repaintContentOnly) {
   if (!m_webView || repaintContentOnly)
     return;
 
