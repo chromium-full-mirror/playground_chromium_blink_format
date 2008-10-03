@@ -104,7 +104,6 @@ class ChromeClientQt : public ChromeClient {
 
   virtual bool tabsToLinks() const;
   virtual IntRect windowResizerRect() const;
-  virtual void addToDirtyRegion(const IntRect&);
 
   virtual void repaint(const IntRect&,
                        bool contentChanged,
