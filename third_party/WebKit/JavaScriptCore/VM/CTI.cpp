@@ -42,22 +42,31 @@ using namespace std;
 namespace JSC {
 
 #if PLATFORM(MAC)
-bool isSSE3Present() {
-  struct SSE3Check {
-    SSE3Check() {
-      int hasSSE3 = 0;
-      size_t length = sizeof(hasSSE3);
-      int error = sysctlbyname("hw.optional.sse3", &hasSSE3, &length, NULL, 0);
-      present = hasSSE3 && !error;
+bool isSSE2Present() {
+  return true;  // All X86 Macs are guaranteed to support at least SSE2
+}
+#else COMPILER(MSVC)
+bool isSSE2Present() {
+  static const int SSE2FeatureBit = 1 << 26;
+  struct SSE2Check {
+    SSE2Check() {
+      int flags;
+#if COMPILER(MSVC)
+      _asm {
+                mov eax, 1  // cpuid function 1 gives us the standard feature set
+                cpuid;
+                mov flags, edx;
+      }
+#else
+      flags = 0;
+// FIXME: Add GCC code to do above asm
+#endif
+      present = (flags & SSE2FeatureBit) != 0;
     }
     bool present;
   };
-  static SSE3Check check;
+  static SSE2Check check;
   return check.present;
-}
-#else
-bool isSSE3Present() {
-  return false;
 }
 #endif
 
@@ -714,7 +723,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
   emitGetArg(src1, X86::eax);
   emitGetArg(src2, X86::edx);
 
-  if (types.second().isReusable() && isSSE3Present()) {
+  if (types.second().isReusable() && isSSE2Present()) {
     ASSERT(types.second().mightBeNumber());
 
     // Check op2 is a number
@@ -766,7 +775,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
     //     overflows.
     m_jit.link(op2imm, m_jit.label());
     emitJumpSlowCaseIfNotImmNum(X86::eax, i);
-  } else if (types.first().isReusable() && isSSE3Present()) {
+  } else if (types.first().isReusable() && isSSE2Present()) {
     ASSERT(types.first().mightBeNumber());
 
     // Check op1 is a number
@@ -842,10 +851,10 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
   }
   emitPutResult(dst);
 
-  if (types.second().isReusable() && isSSE3Present()) {
+  if (types.second().isReusable() && isSSE2Present()) {
     m_jit.link(wasJSNumberCell2, m_jit.label());
     m_jit.link(wasJSNumberCell2b, m_jit.label());
-  } else if (types.first().isReusable() && isSSE3Present()) {
+  } else if (types.first().isReusable() && isSSE2Present()) {
     m_jit.link(wasJSNumberCell1, m_jit.label());
     m_jit.link(wasJSNumberCell1b, m_jit.label());
   }
@@ -860,7 +869,7 @@ void CTI::compileBinaryArithOpSlowCase(OpcodeID opcodeID,
                                        unsigned i) {
   X86Assembler::JmpDst here = m_jit.label();
   m_jit.link(iter->from, here);
-  if (types.second().isReusable() && isSSE3Present()) {
+  if (types.second().isReusable() && isSSE2Present()) {
     if (!types.first().definitelyIsNumber()) {
       m_jit.link((++iter)->from, here);
       m_jit.link((++iter)->from, here);
@@ -870,7 +879,7 @@ void CTI::compileBinaryArithOpSlowCase(OpcodeID opcodeID,
       m_jit.link((++iter)->from, here);
     }
     m_jit.link((++iter)->from, here);
-  } else if (types.first().isReusable() && isSSE3Present()) {
+  } else if (types.first().isReusable() && isSSE2Present()) {
     if (!types.first().definitelyIsNumber()) {
       m_jit.link((++iter)->from, here);
       m_jit.link((++iter)->from, here);
