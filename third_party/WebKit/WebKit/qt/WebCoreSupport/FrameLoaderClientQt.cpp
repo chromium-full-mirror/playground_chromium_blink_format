@@ -1005,7 +1005,10 @@ const unsigned numqStyleSheetProperties =
 class QtPluginWidget : public Widget {
  public:
   QtPluginWidget(QWidget* w = 0) : Widget(w) {}
-  void invalidateRect(const IntRect&) { notImplemented(); }
+  virtual void invalidateRect(const IntRect& r) {
+    if (platformWidget())
+      platformWidget()->update(r);
+  }
 };
 
 Widget* FrameLoaderClientQt::createPlugin(const IntSize& pluginSize,
