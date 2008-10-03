@@ -149,7 +149,7 @@ void RenderWidget::layout() {
   setNeedsLayout(false);
 }
 
-void RenderWidget::setStyle(RenderStyle* newStyle) {
+void RenderWidget::setStyle(const RenderStyle* newStyle) {
   RenderReplaced::setStyle(newStyle);
   if (m_widget) {
     if (style()->visibility() != VISIBLE)

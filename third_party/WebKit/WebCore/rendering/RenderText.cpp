@@ -85,7 +85,7 @@ bool RenderText::isWordBreak() const {
   return false;
 }
 
-void RenderText::setStyle(RenderStyle* newStyle) {
+void RenderText::setStyle(const RenderStyle* newStyle) {
   RenderStyle* oldStyle = style();
   if (oldStyle == newStyle)
     return;

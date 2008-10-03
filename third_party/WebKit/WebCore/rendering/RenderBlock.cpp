@@ -160,7 +160,7 @@ RenderBlock::~RenderBlock() {
   }
 }
 
-void RenderBlock::setStyle(RenderStyle* newStyle) {
+void RenderBlock::setStyle(const RenderStyle* newStyle) {
   setReplaced(newStyle->isDisplayReplacedType());
 
   RenderFlow::setStyle(newStyle);

@@ -50,7 +50,7 @@ class RenderTableRow : public RenderContainer {
     return static_cast<RenderTable*>(parent()->parent());
   }
 
-  virtual void setStyle(RenderStyle*);
+  virtual void setStyle(const RenderStyle*);
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
   virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const {
     return 0;

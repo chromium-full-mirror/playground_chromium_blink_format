@@ -36,7 +36,7 @@ RenderInline::RenderInline(Node* node) : RenderFlow(node) {}
 
 RenderInline::~RenderInline() {}
 
-void RenderInline::setStyle(RenderStyle* newStyle) {
+void RenderInline::setStyle(const RenderStyle* newStyle) {
   RenderFlow::setStyle(newStyle);
   setInline(true);
   setHasReflection(false);

@@ -2347,7 +2347,7 @@ void RenderObject::setAnimatableStyle(RenderStyle* style) {
   setStyle(style);
 }
 
-void RenderObject::setStyle(RenderStyle* style) {
+void RenderObject::setStyle(const RenderStyle* style) {
   if (m_style == style)
     return;
 
@@ -2515,7 +2515,9 @@ void RenderObject::setStyle(RenderStyle* style) {
   }
 
   RenderStyle* oldStyle = m_style;
-  m_style = style;
+  m_style = const_cast<RenderStyle*>(style);
+  if (m_style)
+    m_style->ref();
 
   updateFillImages(oldStyle ? oldStyle->backgroundLayers() : 0,
                    m_style ? m_style->backgroundLayers() : 0);
@@ -2527,11 +2529,10 @@ void RenderObject::setStyle(RenderStyle* style) {
   updateImage(oldStyle ? oldStyle->maskBoxImage().image() : 0,
               m_style ? m_style->maskBoxImage().image() : 0);
 
-  if (m_style)
-    m_style->ref();
-
-  if (oldStyle)
+  if (oldStyle) {
     oldStyle->deref(renderArena());
+    oldStyle = 0;
+  }
 
   setHasBoxDecorations(m_style->hasBorder() || m_style->hasBackground() ||
                        m_style->hasAppearance() || m_style->boxShadow());

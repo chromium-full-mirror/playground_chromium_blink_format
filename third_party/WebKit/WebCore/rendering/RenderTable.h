@@ -66,7 +66,7 @@ class RenderTable : public RenderBlock {
 
   virtual bool isTable() const { return true; }
 
-  virtual void setStyle(RenderStyle*);
+  virtual void setStyle(const RenderStyle*);
 
   virtual bool avoidsFloats() const { return true; }
 

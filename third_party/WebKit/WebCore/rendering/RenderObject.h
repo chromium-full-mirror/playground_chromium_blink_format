@@ -687,7 +687,7 @@ class RenderObject : public CachedResourceClient {
   void setAnimatableStyle(RenderStyle*);
 
   // Set the style of the object and update the state of the object accordingly.
-  virtual void setStyle(RenderStyle*);
+  virtual void setStyle(const RenderStyle*);
 
   // Updates only the local style ptr of the object.  Does not update the state
   // of the object,

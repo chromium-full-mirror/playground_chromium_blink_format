@@ -87,7 +87,7 @@ RenderListBox::~RenderListBox() {
   }
 }
 
-void RenderListBox::setStyle(RenderStyle* style) {
+void RenderListBox::setStyle(const RenderStyle* style) {
   RenderBlock::setStyle(style);
   setReplaced(isInline());
 }

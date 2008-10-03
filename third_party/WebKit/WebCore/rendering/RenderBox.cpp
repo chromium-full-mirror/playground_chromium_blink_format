@@ -70,7 +70,7 @@ RenderBox::RenderBox(Node* node)
       m_layer(0),
       m_inlineBoxWrapper(0) {}
 
-void RenderBox::setStyle(RenderStyle* newStyle) {
+void RenderBox::setStyle(const RenderStyle* newStyle) {
   bool wasFloating = isFloating();
   bool hadOverflowClip = hasOverflowClip();
 

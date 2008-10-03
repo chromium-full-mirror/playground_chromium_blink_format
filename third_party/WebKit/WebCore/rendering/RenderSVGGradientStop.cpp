@@ -38,7 +38,7 @@ RenderSVGGradientStop::RenderSVGGradientStop(SVGStopElement* element)
 
 RenderSVGGradientStop::~RenderSVGGradientStop() {}
 
-void RenderSVGGradientStop::setStyle(RenderStyle* style) {
+void RenderSVGGradientStop::setStyle(const RenderStyle* style) {
   RenderObject::setStyle(style);
 
   // <stop> elements should only be allowed to make renderers under gradient

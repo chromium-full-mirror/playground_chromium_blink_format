@@ -37,7 +37,7 @@ class RenderWidget : public RenderReplaced {
 
   virtual bool isWidget() const { return true; }
 
-  virtual void setStyle(RenderStyle*);
+  virtual void setStyle(const RenderStyle*);
 
   virtual void paint(PaintInfo&, int tx, int ty);
 

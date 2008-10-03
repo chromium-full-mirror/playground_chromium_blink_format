@@ -129,7 +129,7 @@ class RenderBlock : public RenderFlow {
 
   virtual void repaintOverhangingFloats(bool paintAllDescendants);
 
-  virtual void setStyle(RenderStyle*);
+  virtual void setStyle(const RenderStyle*);
 
   virtual void layout();
   virtual void layoutBlock(bool relayoutChildren);

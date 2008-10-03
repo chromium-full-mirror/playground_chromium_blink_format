@@ -39,7 +39,7 @@ class RenderListItem : public RenderBlock {
 
   virtual void destroy();
 
-  virtual void setStyle(RenderStyle*);
+  virtual void setStyle(const RenderStyle*);
 
   int value() const {
     if (!m_isValueUpToDate)

@@ -56,7 +56,7 @@ class RenderInline : public RenderFlow {
                  RenderObject* newChild,
                  RenderFlow* oldCont);
 
-  virtual void setStyle(RenderStyle*);
+  virtual void setStyle(const RenderStyle*);
 
   virtual void layout() {}  // Do nothing for layout()
 
