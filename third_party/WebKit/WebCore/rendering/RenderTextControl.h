@@ -111,6 +111,7 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
   void stopSearchEventTimer();
 
   bool placeholderIsVisible() const { return m_placeholderVisible; }
+  void updatePlaceholderVisibility();
 
   virtual void capsLockStateMayHaveChanged();
 

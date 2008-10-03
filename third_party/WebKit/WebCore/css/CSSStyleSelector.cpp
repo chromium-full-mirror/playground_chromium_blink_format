@@ -2407,11 +2407,6 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
           // that are non-"hidden" controls.
           return !e->isEnabled();
         break;
-      case CSSSelector::PseudoInputPlaceholderMode:
-        if (e && e->hasTagName(inputTag))
-          return static_cast<HTMLInputElement*>(e)
-              ->placeholderShouldBeVisible();
-        break;
       case CSSSelector::PseudoReadOnly:
         return e && e->isTextControl() && e->isReadOnlyControl();
       case CSSSelector::PseudoReadWrite:
@@ -2506,6 +2501,9 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
         return true;
       case CSSSelector::PseudoFileUploadButton:
         dynamicPseudo = RenderStyle::FILE_UPLOAD_BUTTON;
+        return true;
+      case CSSSelector::PseudoInputPlaceholder:
+        dynamicPseudo = RenderStyle::INPUT_PLACEHOLDER;
         return true;
       case CSSSelector::PseudoSliderThumb:
         dynamicPseudo = RenderStyle::SLIDER_THUMB;
