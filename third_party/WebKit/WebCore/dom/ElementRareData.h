@@ -52,4 +52,4 @@ inline void ElementRareData::resetComputedStyle(Element* element) {
   m_computedStyle = 0;
 }
 }
-#endif ElementRareData_h
+#endif  // ElementRareData_h
