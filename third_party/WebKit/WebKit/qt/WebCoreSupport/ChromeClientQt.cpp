@@ -299,7 +299,7 @@ IntPoint ChromeClientQt::screenToWindow(const IntPoint& point) const {
   return point;
 }
 
-PlatformWidget WebChromeClient::platformWindow() const {
+PlatformWidget ChromeClientQt::platformWindow() const {
   return m_webPage->view();
 }
 
