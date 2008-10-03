@@ -69,7 +69,7 @@ DontEnum|DontDelete|ReadOnly
 NumberConstructor::NumberConstructor(ExecState* exec,
                                      PassRefPtr<StructureID> structure,
                                      NumberPrototype* numberPrototype)
-    : InternalFunction(exec,
+    : InternalFunction(&exec->globalData(),
                        structure,
                        Identifier(exec, numberPrototype->info.className)) {
   // Number.Prototype

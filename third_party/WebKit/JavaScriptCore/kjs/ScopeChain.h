@@ -31,11 +31,21 @@ class ScopeChainIterator;
 
 class ScopeChainNode {
  public:
-  ScopeChainNode(ScopeChainNode* n, JSObject* o, JSObject* gt)
-      : next(n), object(o), globalThis(gt), refCount(1) {}
+  ScopeChainNode(ScopeChainNode* next,
+                 JSObject* object,
+                 JSGlobalData* globalData,
+                 JSObject* globalThis)
+      : next(next),
+        object(object),
+        globalData(globalData),
+        globalThis(globalThis),
+        refCount(1) {
+    ASSERT(globalData);
+  }
 
   ScopeChainNode* next;
   JSObject* object;
+  JSGlobalData* globalData;
   JSObject* globalThis;
   int refCount;
 
@@ -74,7 +84,7 @@ class ScopeChainNode {
 
 inline ScopeChainNode* ScopeChainNode::push(JSObject* o) {
   ASSERT(o);
-  return new ScopeChainNode(this, o, globalThis);
+  return new ScopeChainNode(this, o, globalData, globalThis);
 }
 
 inline ScopeChainNode* ScopeChainNode::pop() {
@@ -147,8 +157,8 @@ class ScopeChain {
  public:
   ScopeChain(NoScopeChain) : m_node(0) {}
 
-  ScopeChain(JSObject* o, JSObject* globalThis)
-      : m_node(new ScopeChainNode(0, o, globalThis)) {}
+  ScopeChain(JSObject* o, JSGlobalData* globalData, JSObject* globalThis)
+      : m_node(new ScopeChainNode(0, o, globalData, globalThis)) {}
 
   ScopeChain(const ScopeChain& c) : m_node(c.m_node->copy()) {}
 

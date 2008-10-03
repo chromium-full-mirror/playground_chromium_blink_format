@@ -43,6 +43,8 @@ struct Instruction;
 
 class JSNumberCell : public JSCell {
   friend class CTI;
+  friend JSValue* jsNumberCell(JSGlobalData*, double);
+  friend JSValue* jsNaN(JSGlobalData*);
   friend JSValue* jsNumberCell(ExecState*, double);
   friend JSValue* jsNaN(ExecState*);
 
@@ -71,11 +73,22 @@ class JSNumberCell : public JSCell {
 #endif
   }
 
+  void* operator new(size_t size, JSGlobalData* globalData) {
+#ifdef JAVASCRIPTCORE_BUILDING_ALL_IN_ONE_FILE
+    return globalData->heap.inlineAllocateNumber(size);
+#else
+    return globalData->heap.allocateNumber(size);
+#endif
+  }
+
   static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
     return StructureID::create(proto, TypeInfo(NumberType));
   }
 
  private:
+  JSNumberCell(JSGlobalData* globalData, double value)
+      : JSCell(globalData->numberStructureID.get()), m_value(value) {}
+
   JSNumberCell(ExecState* exec, double value)
       : JSCell(exec->globalData().numberStructureID.get()), m_value(value) {}
 
@@ -95,6 +108,16 @@ JSValue* jsNaN(ExecState*);
 ALWAYS_INLINE JSValue* jsNumber(ExecState* exec, double d) {
   JSValue* v = JSImmediate::from(d);
   return v ? v : jsNumberCell(exec, d);
+}
+
+ALWAYS_INLINE JSValue* jsNumber(ExecState* exec, short i) {
+  JSValue* v = JSImmediate::from(i);
+  return v ? v : jsNumberCell(exec, i);
+}
+
+ALWAYS_INLINE JSValue* jsNumber(ExecState* exec, unsigned short i) {
+  JSValue* v = JSImmediate::from(i);
+  return v ? v : jsNumberCell(exec, i);
 }
 
 ALWAYS_INLINE JSValue* jsNumber(ExecState* exec, int i) {
@@ -125,6 +148,52 @@ ALWAYS_INLINE JSValue* jsNumber(ExecState* exec, long long i) {
 ALWAYS_INLINE JSValue* jsNumber(ExecState* exec, unsigned long long i) {
   JSValue* v = JSImmediate::from(i);
   return v ? v : jsNumberCell(exec, static_cast<double>(i));
+}
+
+ALWAYS_INLINE JSValue* jsNumber(JSGlobalData* globalData, double d) {
+  JSValue* v = JSImmediate::from(d);
+  return v ? v : jsNumberCell(globalData, d);
+}
+
+ALWAYS_INLINE JSValue* jsNumber(JSGlobalData* globalData, short i) {
+  JSValue* v = JSImmediate::from(i);
+  return v ? v : jsNumberCell(globalData, i);
+}
+
+ALWAYS_INLINE JSValue* jsNumber(JSGlobalData* globalData, unsigned short i) {
+  JSValue* v = JSImmediate::from(i);
+  return v ? v : jsNumberCell(globalData, i);
+}
+
+ALWAYS_INLINE JSValue* jsNumber(JSGlobalData* globalData, int i) {
+  JSValue* v = JSImmediate::from(i);
+  return v ? v : jsNumberCell(globalData, i);
+}
+
+ALWAYS_INLINE JSValue* jsNumber(JSGlobalData* globalData, unsigned i) {
+  JSValue* v = JSImmediate::from(i);
+  return v ? v : jsNumberCell(globalData, i);
+}
+
+ALWAYS_INLINE JSValue* jsNumber(JSGlobalData* globalData, long i) {
+  JSValue* v = JSImmediate::from(i);
+  return v ? v : jsNumberCell(globalData, i);
+}
+
+ALWAYS_INLINE JSValue* jsNumber(JSGlobalData* globalData, unsigned long i) {
+  JSValue* v = JSImmediate::from(i);
+  return v ? v : jsNumberCell(globalData, i);
+}
+
+ALWAYS_INLINE JSValue* jsNumber(JSGlobalData* globalData, long long i) {
+  JSValue* v = JSImmediate::from(i);
+  return v ? v : jsNumberCell(globalData, static_cast<double>(i));
+}
+
+ALWAYS_INLINE JSValue* jsNumber(JSGlobalData* globalData,
+                                unsigned long long i) {
+  JSValue* v = JSImmediate::from(i);
+  return v ? v : jsNumberCell(globalData, static_cast<double>(i));
 }
 
 // --- JSValue inlines ----------------------------

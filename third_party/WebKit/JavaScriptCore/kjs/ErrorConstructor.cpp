@@ -34,7 +34,7 @@ ErrorConstructor::ErrorConstructor(ExecState* exec,
                                    PassRefPtr<StructureID> structure,
                                    ErrorPrototype* errorPrototype)
     : InternalFunction(
-          exec,
+          &exec->globalData(),
           structure,
           Identifier(exec, errorPrototype->classInfo()->className)) {
   // ECMA 15.11.3.1 Error.prototype

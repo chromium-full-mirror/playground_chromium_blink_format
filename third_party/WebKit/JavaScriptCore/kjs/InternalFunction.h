@@ -45,8 +45,8 @@ class InternalFunction : public JSObject {
 
  protected:
   InternalFunction(PassRefPtr<StructureID> structure) : JSObject(structure) {}
-  InternalFunction(ExecState*);
-  InternalFunction(ExecState*, PassRefPtr<StructureID>, const Identifier&);
+  InternalFunction(JSGlobalData*);
+  InternalFunction(JSGlobalData*, PassRefPtr<StructureID>, const Identifier&);
 
  private:
   virtual CallType getCallData(CallData&) = 0;

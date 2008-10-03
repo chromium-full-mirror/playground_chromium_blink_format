@@ -44,7 +44,7 @@ const ClassInfo JSCallbackFunction::info = {"CallbackFunction",
 JSCallbackFunction::JSCallbackFunction(ExecState* exec,
                                        JSObjectCallAsFunctionCallback callback,
                                        const Identifier& name)
-    : InternalFunction(exec,
+    : InternalFunction(&exec->globalData(),
                        exec->lexicalGlobalObject()->callbackFunctionStructure(),
                        name),
       m_callback(callback) {}

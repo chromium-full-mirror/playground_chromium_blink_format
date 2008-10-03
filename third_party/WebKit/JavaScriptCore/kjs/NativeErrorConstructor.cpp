@@ -38,7 +38,7 @@ NativeErrorConstructor::NativeErrorConstructor(
     PassRefPtr<StructureID> structure,
     NativeErrorPrototype* nativeErrorPrototype)
     : InternalFunction(
-          exec,
+          &exec->globalData(),
           structure,
           Identifier(exec,
                      nativeErrorPrototype->getDirect(exec->propertyNames().name)

@@ -40,7 +40,7 @@ FunctionConstructor::FunctionConstructor(ExecState* exec,
                                          PassRefPtr<StructureID> structure,
                                          FunctionPrototype* functionPrototype)
     : InternalFunction(
-          exec,
+          &exec->globalData(),
           structure,
           Identifier(exec, functionPrototype->classInfo()->className)) {
   putDirect(exec->propertyNames().prototype, functionPrototype,
@@ -142,7 +142,9 @@ JSObject* constructFunction(ExecState* exec,
   size_t count = parameters.size();
   functionBody->finishParsing(source, parameters.releaseBuffer(), count);
 
-  ScopeChain scopeChain(exec->lexicalGlobalObject(), exec->globalThisValue());
+  JSGlobalObject* globalObject = exec->lexicalGlobalObject();
+  ScopeChain scopeChain(globalObject, globalObject->globalData(),
+                        exec->globalThisValue());
   JSFunction* function = new (exec)
       JSFunction(exec, functionName, functionBody.get(), scopeChain.node());
 

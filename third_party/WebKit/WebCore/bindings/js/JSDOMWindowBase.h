@@ -163,9 +163,7 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
 
  private:
   struct JSDOMWindowBaseData : public JSGlobalObjectData {
-    JSDOMWindowBaseData(PassRefPtr<DOMWindow>,
-                        JSDOMWindowBase*,
-                        JSDOMWindowShell*);
+    JSDOMWindowBaseData(PassRefPtr<DOMWindow>, JSDOMWindowShell*);
 
     RefPtr<DOMWindow> impl;
 

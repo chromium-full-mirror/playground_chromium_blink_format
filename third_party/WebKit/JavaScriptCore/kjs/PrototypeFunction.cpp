@@ -38,7 +38,7 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
                                      const Identifier& name,
                                      NativeFunction function)
     : InternalFunction(
-          exec,
+          &exec->globalData(),
           exec->lexicalGlobalObject()->prototypeFunctionStructure(),
           name),
       m_function(function) {
@@ -53,7 +53,7 @@ PrototypeFunction::PrototypeFunction(
     int length,
     const Identifier& name,
     NativeFunction function)
-    : InternalFunction(exec, prototypeFunctionStructure, name),
+    : InternalFunction(&exec->globalData(), prototypeFunctionStructure, name),
       m_function(function) {
   ASSERT_ARG(function, function);
   putDirect(exec->propertyNames().length, jsNumber(exec, length),

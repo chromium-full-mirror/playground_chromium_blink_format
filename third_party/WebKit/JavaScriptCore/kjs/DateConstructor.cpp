@@ -56,7 +56,7 @@ DateConstructor::DateConstructor(ExecState* exec,
                                  StructureID* prototypeFunctionStructure,
                                  DatePrototype* datePrototype)
     : InternalFunction(
-          exec,
+          &exec->globalData(),
           structure,
           Identifier(exec, datePrototype->classInfo()->className)) {
   putDirect(exec->propertyNames().prototype, datePrototype,

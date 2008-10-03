@@ -67,7 +67,7 @@ JSValue* DebuggerCallFrame::evaluate(const UString& script,
   if (!m_codeBlock)
     return 0;
 
-  ExecState newExec(m_scopeChain->globalObject(), m_registers);
+  ExecState newExec(m_registers);
 
   int errLine;
   UString errMsg;

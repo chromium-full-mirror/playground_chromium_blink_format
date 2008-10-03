@@ -54,7 +54,7 @@ StringConstructor::StringConstructor(ExecState* exec,
                                      StructureID* prototypeFunctionStructure,
                                      StringPrototype* stringPrototype)
     : InternalFunction(
-          exec,
+          &exec->globalData(),
           structure,
           Identifier(exec, stringPrototype->classInfo()->className)) {
   // ECMA 15.5.3.1 String.prototype

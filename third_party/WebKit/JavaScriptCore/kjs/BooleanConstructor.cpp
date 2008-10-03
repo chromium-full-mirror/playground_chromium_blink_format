@@ -33,7 +33,7 @@ BooleanConstructor::BooleanConstructor(ExecState* exec,
                                        PassRefPtr<StructureID> structure,
                                        BooleanPrototype* booleanPrototype)
     : InternalFunction(
-          exec,
+          &exec->globalData(),
           structure,
           Identifier(exec, booleanPrototype->classInfo()->className)) {
   putDirect(exec->propertyNames().prototype, booleanPrototype,

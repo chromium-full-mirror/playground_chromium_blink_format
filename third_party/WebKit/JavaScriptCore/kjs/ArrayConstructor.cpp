@@ -36,7 +36,7 @@ ArrayConstructor::ArrayConstructor(ExecState* exec,
                                    PassRefPtr<StructureID> structure,
                                    ArrayPrototype* arrayPrototype)
     : InternalFunction(
-          exec,
+          &exec->globalData(),
           structure,
           Identifier(exec, arrayPrototype->classInfo()->className)) {
   // ECMA 15.4.3.1 Array.prototype

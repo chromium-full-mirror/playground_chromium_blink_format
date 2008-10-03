@@ -199,18 +199,13 @@ DontDelete|Function 0
 
 JSDOMWindowBase::JSDOMWindowBaseData::JSDOMWindowBaseData(
     PassRefPtr<DOMWindow> window,
-    JSDOMWindowBase* jsWindow,
     JSDOMWindowShell* shell)
-    : JSGlobalObjectData(jsWindow, shell),
-      impl(window),
-      evt(0),
-      returnValueSlot(0),
-      shell(shell) {}
+    : impl(window), evt(0), returnValueSlot(0), shell(shell) {}
 
 JSDOMWindowBase::JSDOMWindowBase(PassRefPtr<StructureID> structure,
                                  PassRefPtr<DOMWindow> window,
                                  JSDOMWindowShell* shell)
-    : JSGlobalObject(structure, new JSDOMWindowBaseData(window, this, shell)) {
+    : JSGlobalObject(structure, new JSDOMWindowBaseData(window, shell), shell) {
   // Time in milliseconds before the script timeout handler kicks in.
   setTimeoutTime(10000);
 

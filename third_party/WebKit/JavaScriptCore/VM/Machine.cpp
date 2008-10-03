@@ -1021,7 +1021,7 @@ JSValue* Machine::execute(ProgramNode* programNode,
   if (codeBlock->needsFullScopeChain)
     scopeChain = scopeChain->copy();
 
-  ExecState newExec(exec, r);
+  ExecState newExec(r);
 
   Profiler** profiler = Profiler::enabledProfilerReference();
   if (*profiler)
@@ -1032,8 +1032,8 @@ JSValue* Machine::execute(ProgramNode* programNode,
 #if ENABLE(CTI)
   if (!codeBlock->ctiCode)
     CTI::compile(this, exec, codeBlock);
-  JSValue* result =
-      CTI::execute(codeBlock->ctiCode, &newExec, &m_registerFile, r, exception);
+  JSValue* result = CTI::execute(codeBlock->ctiCode, &newExec, &m_registerFile,
+                                 r, &newExec.globalData(), exception);
 #else
   JSValue* result =
       privateExecute(Normal, &newExec, &m_registerFile, r, exception);
@@ -1096,7 +1096,7 @@ JSValue* Machine::execute(FunctionBodyNode* functionBodyNode,
                       makeHostCallFramePointer(exec->m_callFrame), 0, argc,
                       function);
 
-  ExecState newExec(exec, r);
+  ExecState newExec(r);
 
   Profiler** profiler = Profiler::enabledProfilerReference();
   if (*profiler)
@@ -1106,8 +1106,8 @@ JSValue* Machine::execute(FunctionBodyNode* functionBodyNode,
 #if ENABLE(CTI)
   if (!codeBlock->ctiCode)
     CTI::compile(this, exec, codeBlock);
-  JSValue* result =
-      CTI::execute(codeBlock->ctiCode, &newExec, &m_registerFile, r, exception);
+  JSValue* result = CTI::execute(codeBlock->ctiCode, &newExec, &m_registerFile,
+                                 r, &newExec.globalData(), exception);
 #else
   JSValue* result =
       privateExecute(Normal, &newExec, &m_registerFile, r, exception);
@@ -1200,7 +1200,7 @@ JSValue* Machine::execute(EvalNode* evalNode,
   if (codeBlock->needsFullScopeChain)
     scopeChain = scopeChain->copy();
 
-  ExecState newExec(exec, r);
+  ExecState newExec(r);
 
   Profiler** profiler = Profiler::enabledProfilerReference();
   if (*profiler)
@@ -1210,8 +1210,8 @@ JSValue* Machine::execute(EvalNode* evalNode,
 #if ENABLE(CTI)
   if (!codeBlock->ctiCode)
     CTI::compile(this, exec, codeBlock);
-  JSValue* result =
-      CTI::execute(codeBlock->ctiCode, &newExec, &m_registerFile, r, exception);
+  JSValue* result = CTI::execute(codeBlock->ctiCode, &newExec, &m_registerFile,
+                                 r, &newExec.globalData(), exception);
 #else
   JSValue* result =
       privateExecute(Normal, &newExec, &m_registerFile, r, exception);
@@ -3084,7 +3084,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
             result = jsArray->JSArray::get(exec, i);
         } else if (isJSString(baseValue) &&
                    static_cast<JSString*>(baseValue)->canGetIndex(i))
-          result = static_cast<JSString*>(baseValue)->getIndex(exec, i);
+          result = static_cast<JSString*>(baseValue)->getIndex(
+              &exec->globalData(), i);
         else
           result = baseValue->get(exec, i);
       } else {
@@ -4247,6 +4248,14 @@ void Machine::retrieveLastCaller(ExecState* exec,
   function = caller;
 }
 
+const Register* Machine::firstCallFrame(const Register* callFrame) {
+  const Register* first = 0;
+  for (const Register* frame = callFrame; frame;
+       frame = stripHostCallFrameBit(frame[RegisterFile::CallerRegisters].r()))
+    first = frame;
+  return first;
+}
+
 Register* Machine::callFrame(ExecState* exec,
                              InternalFunction* function) const {
   for (Register* r = exec->m_callFrame; r;
@@ -4578,13 +4587,14 @@ JSValue* Machine::cti_op_add(CTI_ARGS) {
   JSValue* v1 = ARG_src1;
   JSValue* v2 = ARG_src2;
 
-  ExecState* exec = ARG_exec;
   double left;
   double right = 0.0;
 
   bool rightIsNumber = fastIsNumber(v2, right);
   if (rightIsNumber && fastIsNumber(v1, left))
-    return jsNumber(exec, left + right);
+    return jsNumber(ARG_globalData, left + right);
+
+  ExecState* exec = ARG_exec;
 
   bool leftIsString = v1->isString();
   if (leftIsString && v2->isString()) {
@@ -4597,7 +4607,7 @@ JSValue* Machine::cti_op_add(CTI_ARGS) {
       return result;
     }
 
-    return jsString(exec, value.release());
+    return jsString(ARG_globalData, value.release());
   }
 
   if (rightIsNumber & leftIsString) {
@@ -4612,7 +4622,7 @@ JSValue* Machine::cti_op_add(CTI_ARGS) {
       VM_CHECK_EXCEPTION_AT_END();
       return result;
     }
-    return jsString(exec, value.release());
+    return jsString(ARG_globalData, value.release());
   }
 
   // All other cases are pretty uncommon
@@ -4633,7 +4643,7 @@ JSValue* Machine::cti_op_pre_inc(CTI_ARGS) {
 void Machine::cti_timeout_check(CTI_ARGS) {
   ExecState* exec = ARG_exec;
 
-  if (exec->machine()->checkTimeout(exec->dynamicGlobalObject()))
+  if (ARG_globalData->machine->checkTimeout(exec->dynamicGlobalObject()))
     exec->setException(createInterruptedExecutionException(exec));
 
   VM_CHECK_EXCEPTION_AT_END();
@@ -4686,8 +4696,8 @@ void Machine::cti_op_put_by_id_second(CTI_ARGS) {
   baseValue->put(exec, ident, ARG_src3, slot);
 
   Register* r = ARG_r;
-  exec->machine()->tryCTICachePutByID(exec, codeBlock(r), CTI_RETURN_ADDRESS,
-                                      baseValue, slot);
+  ARG_globalData->machine->tryCTICachePutByID(
+      exec, codeBlock(r), CTI_RETURN_ADDRESS, baseValue, slot);
 
   VM_CHECK_EXCEPTION_AT_END();
 }
@@ -4741,8 +4751,8 @@ JSValue* Machine::cti_op_get_by_id_second(CTI_ARGS) {
   JSValue* result = baseValue->get(exec, ident, slot);
 
   Register* r = ARG_r;
-  exec->machine()->tryCTICacheGetByID(exec, codeBlock(r), CTI_RETURN_ADDRESS,
-                                      baseValue, ident, slot);
+  ARG_globalData->machine->tryCTICacheGetByID(
+      exec, codeBlock(r), CTI_RETURN_ADDRESS, baseValue, ident, slot);
 
   VM_CHECK_EXCEPTION_AT_END();
   return result;
@@ -4838,20 +4848,19 @@ JSValue* Machine::cti_op_del_by_id(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_mul(CTI_ARGS) {
-  ExecState* exec = ARG_exec;
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
   double left;
   double right;
   if (fastIsNumber(src1, left) && fastIsNumber(src2, right))
-    return jsNumber(exec, left * right);
-  else {
-    JSValue* result =
-        jsNumber(exec, src1->toNumber(exec) * src2->toNumber(exec));
-    VM_CHECK_EXCEPTION_AT_END();
-    return result;
-  }
+    return jsNumber(ARG_globalData, left * right);
+
+  ExecState* exec = ARG_exec;
+  JSValue* result =
+      jsNumber(ARG_globalData, src1->toNumber(exec) * src2->toNumber(exec));
+  VM_CHECK_EXCEPTION_AT_END();
+  return result;
 }
 
 JSValue* Machine::cti_op_new_func(CTI_ARGS) {
@@ -4916,7 +4925,7 @@ void* Machine::cti_vm_compile(CTI_ARGS) {
   CodeBlock* codeBlock = Machine::codeBlock(r);
 
   if (!codeBlock->ctiCode)
-    CTI::compile(exec->machine(), exec, codeBlock);
+    CTI::compile(ARG_globalData->machine, exec, codeBlock);
 
   return codeBlock->ctiCode;
 }
@@ -5170,7 +5179,7 @@ JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
 
 JSValue* Machine::cti_op_get_by_val(CTI_ARGS) {
   ExecState* exec = ARG_exec;
-  Machine* machine = exec->machine();
+  Machine* machine = ARG_globalData->machine;
 
   JSValue* baseValue = ARG_src1;
   JSValue* subscript = ARG_src2;
@@ -5188,7 +5197,7 @@ JSValue* Machine::cti_op_get_by_val(CTI_ARGS) {
         result = jsArray->JSArray::get(exec, i);
     } else if (machine->isJSString(baseValue) &&
                static_cast<JSString*>(baseValue)->canGetIndex(i))
-      result = static_cast<JSString*>(baseValue)->getIndex(exec, i);
+      result = static_cast<JSString*>(baseValue)->getIndex(ARG_globalData, i);
     else
       result = baseValue->get(exec, i);
   } else {
@@ -5255,19 +5264,18 @@ JSValue* Machine::cti_op_sub(CTI_ARGS) {
   double left;
   double right;
   if (fastIsNumber(src1, left) && fastIsNumber(src2, right))
-    return jsNumber(ARG_exec, left - right);
-  else {
-    ExecState* exec = ARG_exec;
-    JSValue* result =
-        jsNumber(exec, src1->toNumber(exec) - src2->toNumber(exec));
-    VM_CHECK_EXCEPTION_AT_END();
-    return result;
-  }
+    return jsNumber(ARG_globalData, left - right);
+
+  ExecState* exec = ARG_exec;
+  JSValue* result =
+      jsNumber(ARG_globalData, src1->toNumber(exec) - src2->toNumber(exec));
+  VM_CHECK_EXCEPTION_AT_END();
+  return result;
 }
 
 void Machine::cti_op_put_by_val(CTI_ARGS) {
   ExecState* exec = ARG_exec;
-  Machine* machine = exec->machine();
+  Machine* machine = ARG_globalData->machine;
 
   JSValue* baseValue = ARG_src1;
   JSValue* subscript = ARG_src2;
@@ -5304,7 +5312,7 @@ void Machine::cti_op_put_by_val_array(CTI_ARGS) {
   int i = ARG_int2;
   JSValue* value = ARG_src3;
 
-  ASSERT(exec->machine()->isJSArray(baseValue));
+  ASSERT(ARG_globalData->machine->isJSArray(baseValue));
 
   if (LIKELY(i >= 0))
     static_cast<JSArray*>(baseValue)->JSArray::put(exec, i, value);
@@ -5341,16 +5349,14 @@ int Machine::cti_op_loop_if_true(CTI_ARGS) {
 JSValue* Machine::cti_op_negate(CTI_ARGS) {
   JSValue* src = ARG_src1;
 
-  ExecState* exec = ARG_exec;
-
   double v;
   if (fastIsNumber(src, v))
-    return jsNumber(exec, -v);
-  else {
-    JSValue* result = jsNumber(exec, -src->toNumber(exec));
-    VM_CHECK_EXCEPTION_AT_END();
-    return result;
-  }
+    return jsNumber(ARG_globalData, -v);
+
+  ExecState* exec = ARG_exec;
+  JSValue* result = jsNumber(ARG_globalData, -src->toNumber(exec));
+  VM_CHECK_EXCEPTION_AT_END();
+  return result;
 }
 
 JSValue* Machine::cti_op_resolve_base(CTI_ARGS) {
@@ -5424,27 +5430,26 @@ JSValue* Machine::cti_op_resolve_global(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_div(CTI_ARGS) {
-  ExecState* exec = ARG_exec;
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
   double left;
   double right;
   if (fastIsNumber(src1, left) && fastIsNumber(src2, right))
-    return jsNumber(exec, left / right);
-  else {
-    JSValue* result =
-        jsNumber(exec, src1->toNumber(exec) / src2->toNumber(exec));
-    VM_CHECK_EXCEPTION_AT_END();
-    return result;
-  }
+    return jsNumber(ARG_globalData, left / right);
+
+  ExecState* exec = ARG_exec;
+  JSValue* result =
+      jsNumber(ARG_globalData, src1->toNumber(exec) / src2->toNumber(exec));
+  VM_CHECK_EXCEPTION_AT_END();
+  return result;
 }
 
 JSValue* Machine::cti_op_pre_dec(CTI_ARGS) {
   JSValue* v = ARG_src1;
 
   ExecState* exec = ARG_exec;
-  JSValue* result = jsNumber(exec, v->toNumber(exec) - 1);
+  JSValue* result = jsNumber(ARG_globalData, v->toNumber(exec) - 1);
   VM_CHECK_EXCEPTION_AT_END();
   return result;
 }
@@ -5486,7 +5491,7 @@ JSValue* Machine::cti_op_post_inc(CTI_ARGS) {
 
   JSValue* number = v->toJSNumber(exec);
   VM_CHECK_EXCEPTION(JSValue*);
-  ARG_set2ndResult(jsNumber(exec, number->uncheckedGetNumber() + 1));
+  ARG_set2ndResult(jsNumber(ARG_globalData, number->uncheckedGetNumber() + 1));
   return number;
 }
 
@@ -5506,71 +5511,65 @@ JSValue* Machine::cti_op_lshift(CTI_ARGS) {
   JSValue* val = ARG_src1;
   JSValue* shift = ARG_src2;
 
-  ExecState* exec = ARG_exec;
-
   int32_t left;
   uint32_t right;
   if (JSImmediate::areBothImmediateNumbers(val, shift))
-    return jsNumber(exec,
+    return jsNumber(ARG_globalData,
                     JSImmediate::getTruncatedInt32(val)
                         << (JSImmediate::getTruncatedUInt32(shift) & 0x1f));
-  else if (fastToInt32(val, left) && fastToUInt32(shift, right))
-    return jsNumber(exec, left << (right & 0x1f));
-  else {
-    JSValue* result =
-        jsNumber(exec, (val->toInt32(exec)) << (shift->toUInt32(exec) & 0x1f));
-    VM_CHECK_EXCEPTION_AT_END();
-    return result;
-  }
+  if (fastToInt32(val, left) && fastToUInt32(shift, right))
+    return jsNumber(ARG_globalData, left << (right & 0x1f));
+
+  ExecState* exec = ARG_exec;
+  JSValue* result = jsNumber(
+      ARG_globalData, (val->toInt32(exec)) << (shift->toUInt32(exec) & 0x1f));
+  VM_CHECK_EXCEPTION_AT_END();
+  return result;
 }
 
 JSValue* Machine::cti_op_bitand(CTI_ARGS) {
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
-  ExecState* exec = ARG_exec;
-
   int32_t left;
   int32_t right;
   if (fastToInt32(src1, left) && fastToInt32(src2, right))
-    return jsNumber(exec, left & right);
-  else {
-    JSValue* result = jsNumber(exec, src1->toInt32(exec) & src2->toInt32(exec));
-    VM_CHECK_EXCEPTION_AT_END();
-    return result;
-  }
+    return jsNumber(ARG_globalData, left & right);
+
+  ExecState* exec = ARG_exec;
+  JSValue* result =
+      jsNumber(ARG_globalData, src1->toInt32(exec) & src2->toInt32(exec));
+  VM_CHECK_EXCEPTION_AT_END();
+  return result;
 }
 
 JSValue* Machine::cti_op_rshift(CTI_ARGS) {
   JSValue* val = ARG_src1;
   JSValue* shift = ARG_src2;
 
-  ExecState* exec = ARG_exec;
-
   int32_t left;
   uint32_t right;
   if (JSImmediate::areBothImmediateNumbers(val, shift))
     return JSImmediate::rightShiftImmediateNumbers(val, shift);
-  else if (fastToInt32(val, left) && fastToUInt32(shift, right))
-    return jsNumber(exec, left >> (right & 0x1f));
-  else {
-    JSValue* result =
-        jsNumber(exec, (val->toInt32(exec)) >> (shift->toUInt32(exec) & 0x1f));
-    VM_CHECK_EXCEPTION_AT_END();
-    return result;
-  }
+  if (fastToInt32(val, left) && fastToUInt32(shift, right))
+    return jsNumber(ARG_globalData, left >> (right & 0x1f));
+
+  ExecState* exec = ARG_exec;
+  JSValue* result = jsNumber(
+      ARG_globalData, (val->toInt32(exec)) >> (shift->toUInt32(exec) & 0x1f));
+  VM_CHECK_EXCEPTION_AT_END();
+  return result;
 }
 
 JSValue* Machine::cti_op_bitnot(CTI_ARGS) {
   JSValue* src = ARG_src1;
 
-  ExecState* exec = ARG_exec;
-
   int value;
   if (fastToInt32(src, value))
-    return jsNumber(exec, ~value);
+    return jsNumber(ARG_globalData, ~value);
 
-  JSValue* result = jsNumber(exec, ~src->toInt32(exec));
+  ExecState* exec = ARG_exec;
+  JSValue* result = jsNumber(ARG_globalData, ~src->toInt32(exec));
   VM_CHECK_EXCEPTION_AT_END();
   return result;
 }
@@ -5621,7 +5620,8 @@ JSValue* Machine::cti_op_mod(CTI_ARGS) {
 
   ExecState* exec = ARG_exec;
   double d = dividendValue->toNumber(exec);
-  JSValue* result = jsNumber(exec, fmod(d, divisorValue->toNumber(exec)));
+  JSValue* result =
+      jsNumber(ARG_globalData, fmod(d, divisorValue->toNumber(exec)));
   VM_CHECK_EXCEPTION_AT_END();
   return result;
 }
@@ -5653,7 +5653,7 @@ JSValue* Machine::cti_op_post_dec(CTI_ARGS) {
   JSValue* number = v->toJSNumber(exec);
   VM_CHECK_EXCEPTION(JSValue*);
 
-  ARG_set2ndResult(jsNumber(exec, number->uncheckedGetNumber() - 1));
+  ARG_set2ndResult(jsNumber(ARG_globalData, number->uncheckedGetNumber() - 1));
   return number;
 }
 
@@ -5668,7 +5668,8 @@ JSValue* Machine::cti_op_urshift(CTI_ARGS) {
     return JSImmediate::rightShiftImmediateNumbers(val, shift);
   else {
     JSValue* result =
-        jsNumber(exec, (val->toUInt32(exec)) >> (shift->toUInt32(exec) & 0x1f));
+        jsNumber(ARG_globalData,
+                 (val->toUInt32(exec)) >> (shift->toUInt32(exec) & 0x1f));
     VM_CHECK_EXCEPTION_AT_END();
     return result;
   }
@@ -5680,7 +5681,8 @@ JSValue* Machine::cti_op_bitxor(CTI_ARGS) {
 
   ExecState* exec = ARG_exec;
 
-  JSValue* result = jsNumber(exec, src1->toInt32(exec) ^ src2->toInt32(exec));
+  JSValue* result =
+      jsNumber(ARG_globalData, src1->toInt32(exec) ^ src2->toInt32(exec));
   VM_CHECK_EXCEPTION_AT_END();
   return result;
 }
@@ -5696,7 +5698,8 @@ JSValue* Machine::cti_op_bitor(CTI_ARGS) {
 
   ExecState* exec = ARG_exec;
 
-  JSValue* result = jsNumber(exec, src1->toInt32(exec) | src2->toInt32(exec));
+  JSValue* result =
+      jsNumber(ARG_globalData, src1->toInt32(exec) | src2->toInt32(exec));
   VM_CHECK_EXCEPTION_AT_END();
   return result;
 }
@@ -5708,7 +5711,7 @@ JSValue* Machine::cti_op_call_eval(CTI_ARGS) {
   CodeBlock* codeBlock = Machine::codeBlock(r);
   ScopeChainNode* scopeChain = Machine::scopeChain(r);
 
-  Machine* machine = exec->machine();
+  Machine* machine = ARG_globalData->machine;
 
   JSValue* funcVal = ARG_src1;
   int registerOffset = ARG_int2;
@@ -5740,7 +5743,7 @@ void* Machine::cti_op_throw(CTI_ARGS) {
   unsigned vPCIndex = codeBlock->ctiReturnAddressVPCMap.get(CTI_RETURN_ADDRESS);
 
   JSValue* exceptionValue = ARG_src1;
-  Instruction* handlerVPC = ARG_exec->machine()->throwException(
+  Instruction* handlerVPC = ARG_globalData->machine->throwException(
       exec, exceptionValue, codeBlock->instructions.begin() + vPCIndex, r,
       true);
 
@@ -5809,7 +5812,7 @@ JSValue* Machine::cti_op_is_number(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_is_string(CTI_ARGS) {
-  return jsBoolean(ARG_exec->machine()->isJSString(ARG_src1));
+  return jsBoolean(ARG_globalData->machine->isJSString(ARG_src1));
 }
 
 JSValue* Machine::cti_op_is_object(CTI_ARGS) {
@@ -6021,8 +6024,8 @@ void Machine::cti_op_debug(CTI_ARGS) {
   int firstLine = ARG_int2;
   int lastLine = ARG_int3;
 
-  exec->machine()->debug(exec, r, static_cast<DebugHookID>(debugHookID),
-                         firstLine, lastLine);
+  ARG_globalData->machine->debug(exec, r, static_cast<DebugHookID>(debugHookID),
+                                 firstLine, lastLine);
 }
 
 void* Machine::cti_vm_throw(CTI_ARGS) {
@@ -6038,7 +6041,7 @@ void* Machine::cti_vm_throw(CTI_ARGS) {
 
   JSValue* exceptionValue = exec->exception();
 
-  Instruction* handlerVPC = ARG_exec->machine()->throwException(
+  Instruction* handlerVPC = ARG_globalData->machine->throwException(
       exec, exceptionValue, codeBlock->instructions.begin() + vPCIndex, r,
       false);
 
