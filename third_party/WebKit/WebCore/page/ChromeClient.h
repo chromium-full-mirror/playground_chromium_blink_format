@@ -117,10 +117,6 @@ class ChromeClient {
 
   virtual IntRect windowResizerRect() const = 0;
 
-  // This method is deprecated and will be removed once all of the callers have
-  // been eliminated.
-  virtual void addToDirtyRegion(const IntRect&) = 0;
-
   // Methods used by HostWindow.
   virtual void repaint(const IntRect&,
                        bool contentChanged,

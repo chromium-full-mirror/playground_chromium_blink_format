@@ -338,11 +338,6 @@ class ScrollView : public Widget, public ScrollbarClient {
   NSScrollView<WebCoreFrameScrollView>* scrollView() const;
 #endif
 
-#if !PLATFORM(MAC) && !PLATFORM(WX)
- public:
-  void addToDirtyRegion(const IntRect&);
-#endif
-
 #if PLATFORM(QT)
  private:
   bool rootPreventsBlitting() const {

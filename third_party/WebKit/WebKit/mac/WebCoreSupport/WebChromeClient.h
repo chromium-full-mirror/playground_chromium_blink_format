@@ -96,7 +96,6 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual bool tabsToLinks() const;
 
   virtual WebCore::IntRect windowResizerRect() const;
-  virtual void addToDirtyRegion(const WebCore::IntRect&);
 
   virtual void repaint(const WebCore::IntRect&,
                        bool contentChanged,

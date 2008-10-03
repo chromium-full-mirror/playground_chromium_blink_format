@@ -264,10 +264,6 @@ IntPoint ChromeClientWx::screenToWindow(const IntPoint& point) const {
   return point;
 }
 
-void ChromeClientWx::addToDirtyRegion(const IntRect&) {
-  notImplemented();
-}
-
 void ChromeClientWx::scrollBackingStore(int dx,
                                         int dy,
                                         const IntRect& scrollViewRect,
