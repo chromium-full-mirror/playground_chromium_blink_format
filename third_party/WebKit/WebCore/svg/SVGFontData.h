@@ -32,7 +32,7 @@ class SVGFontData {
   virtual ~SVGFontData();
 
   SVGFontFaceElement* svgFontFaceElement() const {
-    return m_svgFontFaceElement.get();
+    return m_svgFontFaceElement;
   }
 
   float horizontalOriginX() const { return m_horizontalOriginX; }
@@ -44,7 +44,16 @@ class SVGFontData {
   float verticalAdvanceY() const { return m_verticalAdvanceY; }
 
  private:
-  RefPtr<SVGFontFaceElement> m_svgFontFaceElement;
+  // Ths SVGFontFaceElement is kept alive --
+  // 1) in the external font case: by the CSSFontFaceSource, which holds a
+  // reference to the external SVG document
+  //    containing the element;
+  // 2) in the in-document font case: by virtue of being in the document tree
+  // and making sure that when it is removed
+  //    from the document, it removes the @font-face rule it owns from the
+  //    document's mapped element sheet and forces
+  //    a style update.
+  SVGFontFaceElement* m_svgFontFaceElement;
 
   float m_horizontalOriginX;
   float m_horizontalOriginY;

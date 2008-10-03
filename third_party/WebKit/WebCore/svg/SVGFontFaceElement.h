@@ -1,6 +1,7 @@
 /*
    Copyright (C) 2007 Eric Seidel <eric@webkit.org>
    Copyright (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
+   Copyright (C) 2008 Apple Inc. All rights reserved.
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -42,8 +43,7 @@ class SVGFontFaceElement : public SVGElement {
                                Node* afterChange = 0,
                                int childCountDelta = 0);
   virtual void insertedIntoDocument();
-  virtual void willMoveToNewOwnerDocument();
-  virtual void didMoveToNewOwnerDocument();
+  virtual void removedFromDocument();
 
   unsigned unitsPerEm() const;
   int xHeight() const;
