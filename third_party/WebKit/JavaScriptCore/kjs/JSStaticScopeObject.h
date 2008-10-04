@@ -45,7 +45,7 @@ class JSStaticScopeObject : public JSVariableObject {
                       const Identifier& ident,
                       JSValue* value,
                       unsigned attributes)
-      : JSVariableObject(exec->globalData().nullProtoStructureID,
+      : JSVariableObject(exec->globalData().staticScopeStructureID,
                          new JSStaticScopeObjectData()) {
     d()->registerStore = value;
     symbolTable().add(ident.ustring().rep(), SymbolTableEntry(-1, attributes));
@@ -64,6 +64,11 @@ class JSStaticScopeObject : public JSVariableObject {
                          const Identifier&,
                          JSValue*,
                          unsigned attributes);
+
+  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
+    return StructureID::create(proto,
+                               TypeInfo(ObjectType, NeedsThisConversion));
+  }
 
  private:
   JSStaticScopeObjectData* d() {

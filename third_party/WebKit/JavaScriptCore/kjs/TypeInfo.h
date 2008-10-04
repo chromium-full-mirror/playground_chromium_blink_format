@@ -35,6 +35,7 @@ namespace JSC {
 static const unsigned MasqueradesAsUndefined = 1;
 static const unsigned ImplementsHasInstance = 1 << 1;
 static const unsigned OverridesHasInstance = 1 << 2;
+static const unsigned NeedsThisConversion = 1 << 3;
 
 class TypeInfo {
   friend class CTI;
@@ -49,6 +50,7 @@ class TypeInfo {
   }
   bool implementsHasInstance() const { return m_flags & ImplementsHasInstance; }
   bool overridesHasInstance() const { return m_flags & OverridesHasInstance; }
+  bool needsThisConversion() const { return m_flags & NeedsThisConversion; }
 
   unsigned flags() const { return m_flags; }
 

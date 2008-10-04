@@ -2419,6 +2419,7 @@ class ScopeNode : public BlockNode {
   bool containsClosures() const { return m_features & ClosureFeature; }
   bool usesArguments() const { return m_features & ArgumentsFeature; }
   void setUsesArguments() { m_features |= ArgumentsFeature; }
+  bool usesThis() const { return m_features & ThisFeature; }
 
   VarStack& varStack() { return m_varStack; }
   FunctionStack& functionStack() { return m_functionStack; }

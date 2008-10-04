@@ -73,6 +73,8 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   const HashTable* stringTable;
 
   RefPtr<StructureID> nullProtoStructureID;
+  RefPtr<StructureID> activationStructureID;
+  RefPtr<StructureID> staticScopeStructureID;
   RefPtr<StructureID> stringStructureID;
   RefPtr<StructureID> numberStructureID;
 

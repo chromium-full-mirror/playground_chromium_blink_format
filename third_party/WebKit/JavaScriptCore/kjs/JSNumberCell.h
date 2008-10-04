@@ -82,7 +82,8 @@ class JSNumberCell : public JSCell {
   }
 
   static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
-    return StructureID::create(proto, TypeInfo(NumberType));
+    return StructureID::create(proto,
+                               TypeInfo(NumberType, NeedsThisConversion));
   }
 
  private:

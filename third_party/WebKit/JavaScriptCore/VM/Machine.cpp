@@ -3676,7 +3676,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
       NEXT_OPCODE;
     }
-    BEGIN_OPCODE(op_init) {
+    BEGIN_OPCODE(op_enter) {
       size_t i = 0;
       CodeBlock* codeBlock = this->codeBlock(r);
 
@@ -3690,7 +3690,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       ++vPC;
       NEXT_OPCODE;
     }
-    BEGIN_OPCODE(op_init_activation) {
+    BEGIN_OPCODE(op_enter_with_activation) {
       size_t i = 0;
       CodeBlock* codeBlock = this->codeBlock(r);
 
@@ -3705,6 +3705,15 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
           exec, static_cast<FunctionBodyNode*>(codeBlock->ownerNode), r);
       r[RegisterFile::OptionalCalleeActivation] = activation;
       r[RegisterFile::ScopeChain] = scopeChain(r)->copy()->push(activation);
+
+      ++vPC;
+      NEXT_OPCODE;
+    }
+    BEGIN_OPCODE(op_convert_this) {
+      int thisRegister = (++vPC)->u.operand;
+      JSValue* thisVal = r[thisRegister].getJSValue();
+      if (thisVal->needsThisConversion())
+        r[thisRegister] = thisVal->toThisObject(exec);
 
       ++vPC;
       NEXT_OPCODE;
@@ -4575,6 +4584,15 @@ NEVER_INLINE void Machine::tryCTICacheGetByID(ExecState* exec,
       doSetReturnAddressVMThrowTrampoline(&CTI_RETURN_ADDRESS); \
     }                                                           \
   } while (0)
+
+JSValue* Machine::cti_op_convert_this(CTI_ARGS) {
+  JSValue* v1 = ARG_src1;
+  ExecState* exec = ARG_exec;
+
+  JSObject* result = v1->toThisObject(exec);
+  VM_CHECK_EXCEPTION_AT_END();
+  return result;
+}
 
 void Machine::cti_op_end(CTI_ARGS) {
   Register* r = ARG_r;

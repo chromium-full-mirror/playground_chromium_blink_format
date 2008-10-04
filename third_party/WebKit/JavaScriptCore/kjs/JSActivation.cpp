@@ -42,7 +42,7 @@ const ClassInfo JSActivation::info = {"JSActivation", 0, 0, 0};
 JSActivation::JSActivation(ExecState* exec,
                            PassRefPtr<FunctionBodyNode> functionBody,
                            Register* registers)
-    : Base(exec->globalData().nullProtoStructureID,
+    : Base(exec->globalData().activationStructureID,
            new JSActivationData(functionBody, registers)) {}
 
 JSActivation::~JSActivation() {
