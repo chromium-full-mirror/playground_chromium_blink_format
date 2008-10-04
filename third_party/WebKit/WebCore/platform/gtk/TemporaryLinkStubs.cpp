@@ -64,9 +64,8 @@ Color WebCore::focusRingColor() {
 void WebCore::setFocusRingColorChangeFunction(void (*)()) {}
 
 namespace WebCore {
-Vector<String> supportedKeySizes() {
+void getSupportedKeySizes(Vector<String>&) {
   notImplemented();
-  return Vector<String>();
 }
 String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
                                          const String& challengeString,

@@ -25,7 +25,6 @@
 
 #include "config.h"
 
-#include "CachedPage.h"
 #include "NotImplemented.h"
 #include "SSLKeyGenerator.h"
 
@@ -36,8 +35,8 @@ String signedPublicKeyAndChallengeString(unsigned, const String&, const KURL&) {
   notImplemented();
   return String();
 }
-Vector<String> supportedKeySizes() {
+void getSupportedKeySizes(Vector<String>&) {
   notImplemented();
-  return Vector<String>();
 }
-}
+
+}  // namespace WebCore

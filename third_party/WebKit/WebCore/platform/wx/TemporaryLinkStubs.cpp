@@ -332,9 +332,8 @@ float userIdleTime() {
   return FLT_MAX;
 }  // return an arbitrarily high userIdleTime so that releasing pages from the
    // page cache isn't postponed
-Vector<String> supportedKeySizes() {
+void getSupportedKeySizes(Vector<String>&) {
   notImplemented();
-  return Vector<String>();
 }
 String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
                                          const String& challengeString,
