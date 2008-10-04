@@ -42,7 +42,7 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
   };
   JSC::ExecState* unwrappedExecState() const;
 
-  bool allowsUnwrappedAccessFrom(const JSC::ExecState*) const;
+  bool allowsUnwrappedAccessFrom(JSC::ExecState*) const;
 
   static const JSC::ClassInfo s_info;
 
