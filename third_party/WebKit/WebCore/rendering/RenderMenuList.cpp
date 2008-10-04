@@ -320,13 +320,15 @@ bool RenderMenuList::itemIsEnabled(unsigned listIndex) const {
   return element->isEnabled() && groupEnabled;
 }
 
-RenderStyle* RenderMenuList::itemStyle(unsigned listIndex) const {
+PopupMenuStyle RenderMenuList::itemStyle(unsigned listIndex) const {
   HTMLSelectElement* select = static_cast<HTMLSelectElement*>(node());
   HTMLElement* element = select->listItems()[listIndex];
 
   RenderStyle* style = element->renderStyle() ? element->renderStyle()
                                               : element->computedStyle();
-  return style ? style : clientStyle();
+  return style ? PopupMenuStyle(style->color(), itemBackgroundColor(listIndex),
+                                style->font(), style->visibility() == VISIBLE)
+               : menuStyle();
 }
 
 Color RenderMenuList::itemBackgroundColor(unsigned listIndex) const {
@@ -351,12 +353,14 @@ Color RenderMenuList::itemBackgroundColor(unsigned listIndex) const {
   return Color(Color::white).blend(backgroundColor);
 }
 
-RenderStyle* RenderMenuList::clientStyle() const {
-  return m_innerBlock ? m_innerBlock->style() : style();
+PopupMenuStyle RenderMenuList::menuStyle() const {
+  RenderStyle* s = m_innerBlock ? m_innerBlock->style() : style();
+  return PopupMenuStyle(s->color(), s->backgroundColor(), s->font(),
+                        s->visibility() == VISIBLE);
 }
 
-Document* RenderMenuList::clientDocument() const {
-  return document();
+HostWindow* RenderMenuList::hostWindow() const {
+  return document()->view()->hostWindow();
 }
 
 int RenderMenuList::clientInsetLeft() const {

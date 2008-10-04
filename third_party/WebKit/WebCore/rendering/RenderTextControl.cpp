@@ -30,6 +30,7 @@
 #include "EventNames.h"
 #include "FontSelector.h"
 #include "Frame.h"
+#include "FrameView.h"
 #include "HTMLBRElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
@@ -1139,20 +1140,17 @@ bool RenderTextControl::itemIsEnabled(unsigned listIndex) const {
   return true;
 }
 
-RenderStyle* RenderTextControl::itemStyle(unsigned listIndex) const {
-  return style();
+PopupMenuStyle RenderTextControl::itemStyle(unsigned listIndex) const {
+  return menuStyle();
 }
 
-Color RenderTextControl::itemBackgroundColor(unsigned listIndex) const {
-  return style()->backgroundColor();
+PopupMenuStyle RenderTextControl::menuStyle() const {
+  return PopupMenuStyle(style()->color(), style()->backgroundColor(),
+                        style()->font(), style()->visibility() == VISIBLE);
 }
 
-RenderStyle* RenderTextControl::clientStyle() const {
-  return style();
-}
-
-Document* RenderTextControl::clientDocument() const {
-  return document();
+HostWindow* RenderTextControl::hostWindow() const {
+  return document()->view()->hostWindow();
 }
 
 int RenderTextControl::clientInsetLeft() const {
