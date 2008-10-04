@@ -53,8 +53,8 @@ InternalFunction::InternalFunction(JSGlobalData* globalData,
             DontDelete | ReadOnly | DontEnum);
 }
 
-const UString& InternalFunction::name(ExecState* exec) {
-  JSValue* v = getDirect(exec->propertyNames().name);
+const UString& InternalFunction::name(JSGlobalData* globalData) {
+  JSValue* v = getDirect(globalData->propertyNames->name);
   ASSERT(v->isString());
   return static_cast<JSString*>(v)->value();
 }

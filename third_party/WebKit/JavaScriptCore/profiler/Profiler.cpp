@@ -44,7 +44,7 @@ static const char* GlobalCodeExecution = "(program)";
 static const char* AnonymousFunction = "(anonymous function)";
 static unsigned ProfilesUID = 0;
 
-static CallIdentifier createCallIdentifierFromFunctionImp(ExecState*,
+static CallIdentifier createCallIdentifierFromFunctionImp(JSGlobalData*,
                                                           JSFunction*);
 
 Profiler* Profiler::s_sharedProfiler = 0;
@@ -110,9 +110,10 @@ static inline void dispatchFunctionToProfiles(
 void Profiler::willExecute(ExecState* exec, JSObject* calledFunction) {
   ASSERT(!m_currentProfiles.isEmpty());
 
-  dispatchFunctionToProfiles(m_currentProfiles, &ProfileGenerator::willExecute,
-                             createCallIdentifier(exec, calledFunction, "", 0),
-                             exec->lexicalGlobalObject()->profileGroup());
+  dispatchFunctionToProfiles(
+      m_currentProfiles, &ProfileGenerator::willExecute,
+      createCallIdentifier(&exec->globalData(), calledFunction, "", 0),
+      exec->lexicalGlobalObject()->profileGroup());
 }
 
 void Profiler::willExecute(ExecState* exec,
@@ -120,8 +121,8 @@ void Profiler::willExecute(ExecState* exec,
                            int startingLineNumber) {
   ASSERT(!m_currentProfiles.isEmpty());
 
-  CallIdentifier callIdentifier =
-      createCallIdentifier(exec, 0, sourceURL, startingLineNumber);
+  CallIdentifier callIdentifier = createCallIdentifier(
+      &exec->globalData(), 0, sourceURL, startingLineNumber);
 
   dispatchFunctionToProfiles(m_currentProfiles, &ProfileGenerator::willExecute,
                              callIdentifier,
@@ -131,9 +132,10 @@ void Profiler::willExecute(ExecState* exec,
 void Profiler::didExecute(ExecState* exec, JSObject* calledFunction) {
   ASSERT(!m_currentProfiles.isEmpty());
 
-  dispatchFunctionToProfiles(m_currentProfiles, &ProfileGenerator::didExecute,
-                             createCallIdentifier(exec, calledFunction, "", 0),
-                             exec->lexicalGlobalObject()->profileGroup());
+  dispatchFunctionToProfiles(
+      m_currentProfiles, &ProfileGenerator::didExecute,
+      createCallIdentifier(&exec->globalData(), calledFunction, "", 0),
+      exec->lexicalGlobalObject()->profileGroup());
 }
 
 void Profiler::didExecute(ExecState* exec,
@@ -143,11 +145,12 @@ void Profiler::didExecute(ExecState* exec,
 
   dispatchFunctionToProfiles(
       m_currentProfiles, &ProfileGenerator::didExecute,
-      createCallIdentifier(exec, 0, sourceURL, startingLineNumber),
+      createCallIdentifier(&exec->globalData(), 0, sourceURL,
+                           startingLineNumber),
       exec->lexicalGlobalObject()->profileGroup());
 }
 
-CallIdentifier Profiler::createCallIdentifier(ExecState* exec,
+CallIdentifier Profiler::createCallIdentifier(JSGlobalData* globalData,
                                               JSObject* calledFunction,
                                               const UString& defaultSourceURL,
                                               int defaultLineNumber) {
@@ -157,19 +160,19 @@ CallIdentifier Profiler::createCallIdentifier(ExecState* exec,
 
   if (calledFunction->inherits(&JSFunction::info))
     return createCallIdentifierFromFunctionImp(
-        exec, static_cast<JSFunction*>(calledFunction));
+        globalData, static_cast<JSFunction*>(calledFunction));
   if (calledFunction->inherits(&InternalFunction::info))
     return CallIdentifier(
-        static_cast<InternalFunction*>(calledFunction)->name(exec),
+        static_cast<InternalFunction*>(calledFunction)->name(globalData),
         defaultSourceURL, defaultLineNumber);
 
   UString name = "(" + calledFunction->className() + " object)";
   return CallIdentifier(name, defaultSourceURL, defaultLineNumber);
 }
 
-CallIdentifier createCallIdentifierFromFunctionImp(ExecState* exec,
+CallIdentifier createCallIdentifierFromFunctionImp(JSGlobalData* globalData,
                                                    JSFunction* function) {
-  const UString& name = function->name(exec);
+  const UString& name = function->name(globalData);
   return CallIdentifier(name.isEmpty() ? AnonymousFunction : name,
                         function->m_body->sourceURL(),
                         function->m_body->lineNo());

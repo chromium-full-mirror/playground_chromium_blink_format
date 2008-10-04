@@ -141,9 +141,6 @@ void JSGlobalObject::init(JSObject* thisValue) {
   d()->recursion = 0;
   d()->debugger = 0;
 
-  d()->globalExec.set(
-      new ExecState(d()->globalCallFrame + RegisterFile::CallFrameHeaderSize));
-
   d()->profileGroup = 0;
 
   reset(prototype());
@@ -202,7 +199,7 @@ static inline JSObject* lastInPrototypeChain(JSObject* object) {
 }
 
 void JSGlobalObject::reset(JSValue* prototype) {
-  ExecState* exec = d()->globalExec.get();
+  ExecState* exec = JSGlobalObject::globalExec();
 
   // Prototypes
 
@@ -482,8 +479,6 @@ void JSGlobalObject::mark() {
   if (registerFile.globalObject() == this)
     registerFile.markGlobals(&globalData()->heap);
 
-  markIfNeeded(d()->globalExec->exception());
-
   markIfNeeded(d()->regExpConstructor);
   markIfNeeded(d()->errorConstructor);
   markIfNeeded(d()->evalErrorConstructor);
@@ -526,7 +521,8 @@ JSGlobalObject* JSGlobalObject::toGlobalObject(ExecState*) const {
 }
 
 ExecState* JSGlobalObject::globalExec() {
-  return d()->globalExec.get();
+  return CallFrame::create(d()->globalCallFrame +
+                           RegisterFile::CallFrameHeaderSize);
 }
 
 bool JSGlobalObject::isDynamicScope() const {

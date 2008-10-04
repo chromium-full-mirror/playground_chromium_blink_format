@@ -87,7 +87,6 @@ class JSGlobalObject : public JSVariableObject {
 
     ScopeChain globalScopeChain;
     Register globalCallFrame[RegisterFile::CallFrameHeaderSize];
-    OwnPtr<ExecState> globalExec;
 
     int recursion;
 

@@ -52,22 +52,22 @@
 #define CTI_ARGS_2ndResult 0x08
 
 #define CTI_ARGS_code 0x0C
-#define CTI_ARGS_exec 0x0D
-#define CTI_ARGS_registerFile 0x0E
-#define CTI_ARGS_r 0x0F
-#define CTI_ARGS_exception 0x10
-#define CTI_ARGS_profilerReference 0x11
-#define CTI_ARGS_globalData 0x12
-#define ARG_exec ((ExecState*)(ARGS)[CTI_ARGS_exec])
+#define CTI_ARGS_registerFile 0x0D
+#define CTI_ARGS_r 0x0E
+#define CTI_ARGS_exception 0x0F
+#define CTI_ARGS_profilerReference 0x10
+#define CTI_ARGS_globalData 0x11
 #define ARG_registerFile ((RegisterFile*)(ARGS)[CTI_ARGS_registerFile])
 #define ARG_r ((Register*)(ARGS)[CTI_ARGS_r])
 #define ARG_exception ((JSValue**)(ARGS)[CTI_ARGS_exception])
 #define ARG_profilerReference ((Profiler**)(ARGS)[CTI_ARGS_profilerReference])
 #define ARG_globalData ((JSGlobalData*)(ARGS)[CTI_ARGS_globalData])
 
-#define ARG_setR(newR) (*(volatile Register**)&(ARGS)[CTI_ARGS_r] = newR)
+#define ARG_exec CallFrame::create(ARG_r)
+
+#define ARG_setR(newR) (*(Register**)&(ARGS)[CTI_ARGS_r] = newR)
 #define ARG_set2ndResult(new2ndResult) \
-  (*(volatile JSValue**)&(ARGS)[CTI_ARGS_2ndResult] = new2ndResult)
+  (*(JSValue**)&(ARGS)[CTI_ARGS_2ndResult] = new2ndResult)
 
 #define ARG_src1 ((JSValue*)((ARGS)[1]))
 #define ARG_src2 ((JSValue*)((ARGS)[2]))
@@ -201,7 +201,6 @@ struct StructureStubCompilationInfo {
 
 extern "C" {
 JSValue* ctiTrampoline(void* code,
-                       ExecState*,
                        RegisterFile*,
                        Register* callFrame,
                        JSValue** exception,
@@ -342,13 +341,12 @@ class CTI {
   }
 
   inline static JSValue* execute(void* code,
-                                 ExecState* exec,
                                  RegisterFile* registerFile,
                                  Register* r,
                                  JSGlobalData* globalData,
                                  JSValue** exception) {
     JSValue* value =
-        ctiTrampoline(code, exec, registerFile, r, exception,
+        ctiTrampoline(code, registerFile, r, exception,
                       Profiler::enabledProfilerReference(), globalData);
 #if ENABLE(SAMPLING_TOOL)
     currentOpcodeID = static_cast<OpcodeID>(-1);
@@ -463,8 +461,6 @@ class CTI {
   void emitFastArithIntToImmNoCheck(X86Assembler::RegisterID);
 
   void emitTagAsBoolImmediate(X86Assembler::RegisterID reg);
-
-  void emitDebugExceptionCheck();
 
   X86Assembler::JmpSrc emitCall(unsigned opcodeIndex, X86::RegisterID);
   X86Assembler::JmpSrc emitCall(unsigned opcodeIndex, CTIHelper_j);

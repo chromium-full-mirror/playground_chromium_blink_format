@@ -59,7 +59,8 @@ extern const HashTable regExpConstructorTable;
 extern const HashTable stringTable;
 
 JSGlobalData::JSGlobalData(bool isShared)
-    : machine(new Machine)
+    : machine(new Machine),
+      exception(0)
 #if ENABLE(JSC_MULTIPLE_THREADS)
       ,
       arrayTable(new HashTable(JSC::arrayTable)),
