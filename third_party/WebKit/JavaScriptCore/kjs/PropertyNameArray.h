@@ -43,10 +43,10 @@ class PropertyNameArrayData : public RefCounted<PropertyNameArrayData> {
 
   PropertyNameVector& propertyNameVector() { return m_propertyNameVector; }
 
-  void setCachedStructureID(PassRefPtr<StructureID> structureID) {
+  void setCachedStructureID(StructureID* structureID) {
     m_cachedStructureID = structureID;
   }
-  StructureID* cachedStructureID() const { return m_cachedStructureID.get(); }
+  StructureID* cachedStructureID() const { return m_cachedStructureID; }
 
   void setCachedPrototypeChain(
       PassRefPtr<StructureIDChain> cachedPrototypeChain) {
@@ -57,10 +57,10 @@ class PropertyNameArrayData : public RefCounted<PropertyNameArrayData> {
   }
 
  private:
-  PropertyNameArrayData() {}
+  PropertyNameArrayData() : m_cachedStructureID(0) {}
 
   PropertyNameVector m_propertyNameVector;
-  RefPtr<StructureID> m_cachedStructureID;
+  StructureID* m_cachedStructureID;
   RefPtr<StructureIDChain> m_cachedPrototypeChain;
 };
 
