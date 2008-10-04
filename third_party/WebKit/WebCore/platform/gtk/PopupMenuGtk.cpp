@@ -28,6 +28,7 @@
 
 #include "CString.h"
 #include "FrameView.h"
+#include "HostWindow.h"
 #include "NotImplemented.h"
 #include "PlatformString.h"
 #include <gtk/gtk.h>
@@ -59,7 +60,8 @@ void PopupMenu::show(const IntRect& rect, FrameView* view, int index) {
                           reinterpret_cast<GtkCallback>(menuRemoveItem), this);
 
   int x, y;
-  gdk_window_get_origin(GTK_WIDGET(view->containingWindow())->window, &x, &y);
+  gdk_window_get_origin(
+      GTK_WIDGET(view->hostWindow()->platformWindow())->window, &x, &y);
   m_menuPosition = view->contentsToWindow(rect.location());
   m_menuPosition =
       IntPoint(m_menuPosition.x() + x, m_menuPosition.y() + y + rect.height());

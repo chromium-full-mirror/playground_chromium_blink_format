@@ -30,6 +30,7 @@
 #include "CString.h"
 #include "Document.h"
 #include "FrameView.h"
+#include "HostWindow.h"
 #include "Icon.h"
 #include "LocalizedStrings.h"
 #include "StringTruncator.h"
@@ -62,8 +63,8 @@ void FileChooser::openFileChooser(Document* document) {
     return;
 
   GtkWidget* dialog = gtk_file_chooser_dialog_new(
-      _("Upload File"),
-      GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(view->containingWindow()))),
+      _("Upload File"), GTK_WINDOW(gtk_widget_get_toplevel(
+                            GTK_WIDGET(view->hostWindow()->platformWindow()))),
       GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
       GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 
