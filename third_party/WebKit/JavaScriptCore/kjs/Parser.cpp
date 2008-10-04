@@ -69,17 +69,13 @@ void Parser::didFinishParsing(
     SourceElements* sourceElements,
     ParserRefCountedData<DeclarationStacks::VarStack>* varStack,
     ParserRefCountedData<DeclarationStacks::FunctionStack>* funcStack,
-    bool usesEval,
-    bool needsClosure,
-    bool usesArguments,
+    CodeFeatures features,
     int lastLine,
     int numConstants) {
   m_sourceElements = sourceElements;
   m_varDeclarations = varStack;
   m_funcDeclarations = funcStack;
-  m_usesEval = usesEval;
-  m_needsClosure = needsClosure;
-  m_usesArguments = usesArguments;
+  m_features = features;
   m_lastLine = lastLine;
   m_numConstants = numConstants;
 }

@@ -1919,15 +1919,11 @@ ScopeNode::ScopeNode(JSGlobalData* globalData,
                      SourceElements* children,
                      VarStack* varStack,
                      FunctionStack* funcStack,
-                     bool usesEval,
-                     bool needsClosure,
-                     bool usesArguments,
+                     CodeFeatures features,
                      int numConstants)
     : BlockNode(globalData, children),
       m_source(source),
-      m_usesEval(usesEval),
-      m_needsClosure(needsClosure),
-      m_usesArguments(usesArguments),
+      m_features(features),
       m_numConstants(numConstants) {
   if (varStack)
     m_varStack = *varStack;
@@ -1944,18 +1940,14 @@ ProgramNode::ProgramNode(JSGlobalData* globalData,
                          VarStack* varStack,
                          FunctionStack* funcStack,
                          const SourceCode& source,
-                         bool usesEval,
-                         bool needsClosure,
-                         bool usesArguments,
+                         CodeFeatures features,
                          int numConstants)
     : ScopeNode(globalData,
                 source,
                 children,
                 varStack,
                 funcStack,
-                usesEval,
-                needsClosure,
-                usesArguments,
+                features,
                 numConstants) {}
 
 ProgramNode* ProgramNode::create(JSGlobalData* globalData,
@@ -1963,12 +1955,10 @@ ProgramNode* ProgramNode::create(JSGlobalData* globalData,
                                  VarStack* varStack,
                                  FunctionStack* funcStack,
                                  const SourceCode& source,
-                                 bool usesEval,
-                                 bool needsClosure,
-                                 bool usesArguments,
+                                 CodeFeatures features,
                                  int numConstants) {
   return new ProgramNode(globalData, children, varStack, funcStack, source,
-                         usesEval, needsClosure, usesArguments, numConstants);
+                         features, numConstants);
 }
 
 // ------------------------------ EvalNode -----------------------------
@@ -1978,18 +1968,14 @@ EvalNode::EvalNode(JSGlobalData* globalData,
                    VarStack* varStack,
                    FunctionStack* funcStack,
                    const SourceCode& source,
-                   bool usesEval,
-                   bool needsClosure,
-                   bool usesArguments,
+                   CodeFeatures features,
                    int numConstants)
     : ScopeNode(globalData,
                 source,
                 children,
                 varStack,
                 funcStack,
-                usesEval,
-                needsClosure,
-                usesArguments,
+                features,
                 numConstants) {}
 
 RegisterID* EvalNode::emitCode(CodeGenerator& generator, RegisterID*) {
@@ -2021,12 +2007,10 @@ EvalNode* EvalNode::create(JSGlobalData* globalData,
                            VarStack* varStack,
                            FunctionStack* funcStack,
                            const SourceCode& source,
-                           bool usesEval,
-                           bool needsClosure,
-                           bool usesArguments,
+                           CodeFeatures features,
                            int numConstants) {
   return new EvalNode(globalData, children, varStack, funcStack, source,
-                      usesEval, needsClosure, usesArguments, numConstants);
+                      features, numConstants);
 }
 
 // ------------------------------ FunctionBodyNode -----------------------------
@@ -2035,18 +2019,14 @@ FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
                                    SourceElements* children,
                                    VarStack* varStack,
                                    FunctionStack* funcStack,
-                                   bool usesEval,
-                                   bool needsClosure,
-                                   bool usesArguments,
+                                   CodeFeatures features,
                                    int numConstants)
     : ScopeNode(globalData,
                 SourceCode(),
                 children,
                 varStack,
                 funcStack,
-                usesEval,
-                needsClosure,
-                usesArguments,
+                features,
                 numConstants),
       m_parameters(0),
       m_refCount(0) {}
@@ -2083,13 +2063,10 @@ FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
                                            SourceElements* children,
                                            VarStack* varStack,
                                            FunctionStack* funcStack,
-                                           bool usesEval,
-                                           bool needsClosure,
-                                           bool usesArguments,
+                                           CodeFeatures features,
                                            int numConstants) {
   return new FunctionBodyNode(globalData, children, varStack, funcStack,
-                              usesEval, needsClosure, usesArguments,
-                              numConstants);
+                              features, numConstants);
 }
 
 FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
@@ -2097,13 +2074,10 @@ FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
                                            VarStack* varStack,
                                            FunctionStack* funcStack,
                                            const SourceCode&,
-                                           bool usesEval,
-                                           bool needsClosure,
-                                           bool usesArguments,
+                                           CodeFeatures features,
                                            int numConstants) {
   return new FunctionBodyNode(globalData, children, varStack, funcStack,
-                              usesEval, needsClosure, usesArguments,
-                              numConstants);
+                              features, numConstants);
 }
 
 void FunctionBodyNode::generateCode(ScopeChainNode* scopeChainNode) {

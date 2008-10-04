@@ -61,6 +61,20 @@ class ProgramCodeBlock;
 class PropertyListNode;
 class SourceStream;
 
+typedef unsigned int CodeFeatures;
+
+const CodeFeatures NoFeatures = 0;
+const CodeFeatures EvalFeature = 1 << 0;
+const CodeFeatures ClosureFeature = 1 << 1;
+const CodeFeatures AssignFeature = 1 << 2;
+const CodeFeatures ArgumentsFeature = 1 << 3;
+const CodeFeatures WithFeature = 1 << 4;
+const CodeFeatures CatchFeature = 1 << 5;
+const CodeFeatures ThisFeature = 1 << 6;
+const CodeFeatures AllFeatures = EvalFeature | ClosureFeature | AssignFeature |
+                                 ArgumentsFeature | WithFeature | CatchFeature |
+                                 ThisFeature;
+
 enum Operator {
   OpEqual,
   OpPlusEq,
@@ -2389,9 +2403,7 @@ class ScopeNode : public BlockNode {
             SourceElements*,
             VarStack*,
             FunctionStack*,
-            bool usesEval,
-            bool needsClosure,
-            bool usesArguments,
+            CodeFeatures,
             int numConstants) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -2403,10 +2415,10 @@ class ScopeNode : public BlockNode {
   }
   intptr_t sourceID() const { return m_source.provider()->asID(); }
 
-  bool usesEval() const { return m_usesEval; }
-  bool needsClosure() const { return m_needsClosure; }
-  bool usesArguments() const { return m_usesArguments; }
-  void setUsesArguments(bool usesArguments) { m_usesArguments = usesArguments; }
+  bool usesEval() const { return m_features & EvalFeature; }
+  bool containsClosures() const { return m_features & ClosureFeature; }
+  bool usesArguments() const { return m_features & ArgumentsFeature; }
+  void setUsesArguments() { m_features |= ArgumentsFeature; }
 
   VarStack& varStack() { return m_varStack; }
   FunctionStack& functionStack() { return m_functionStack; }
@@ -2423,9 +2435,7 @@ class ScopeNode : public BlockNode {
 
  private:
   SourceCode m_source;
-  bool m_usesEval;
-  bool m_needsClosure;
-  bool m_usesArguments;
+  CodeFeatures m_features;
   int m_numConstants;
 };
 
@@ -2436,9 +2446,7 @@ class ProgramNode : public ScopeNode {
                              VarStack*,
                              FunctionStack*,
                              const SourceCode&,
-                             bool usesEval,
-                             bool needsClosure,
-                             bool usesArguments,
+                             CodeFeatures,
                              int numConstants) JSC_FAST_CALL;
 
   ProgramCodeBlock& byteCode(ScopeChainNode* scopeChain) JSC_FAST_CALL {
@@ -2453,9 +2461,7 @@ class ProgramNode : public ScopeNode {
               VarStack*,
               FunctionStack*,
               const SourceCode&,
-              bool usesEval,
-              bool needsClosure,
-              bool usesArguments,
+              CodeFeatures,
               int numConstants) JSC_FAST_CALL;
 
   void generateCode(ScopeChainNode*) JSC_FAST_CALL;
@@ -2478,9 +2484,7 @@ class EvalNode : public ScopeNode {
                           VarStack*,
                           FunctionStack*,
                           const SourceCode&,
-                          bool usesEval,
-                          bool needsClosure,
-                          bool usesArguments,
+                          CodeFeatures,
                           int numConstants) JSC_FAST_CALL;
 
   EvalCodeBlock& byteCode(ScopeChainNode* scopeChain) JSC_FAST_CALL {
@@ -2495,9 +2499,7 @@ class EvalNode : public ScopeNode {
            VarStack*,
            FunctionStack*,
            const SourceCode&,
-           bool usesEval,
-           bool needsClosure,
-           bool usesArguments,
+           CodeFeatures,
            int numConstants) JSC_FAST_CALL;
 
   void generateCode(ScopeChainNode*) JSC_FAST_CALL;
@@ -2513,17 +2515,13 @@ class FunctionBodyNode : public ScopeNode {
                                   VarStack*,
                                   FunctionStack*,
                                   const SourceCode&,
-                                  bool usesEval,
-                                  bool needsClosure,
-                                  bool usesArguments,
+                                  CodeFeatures,
                                   int numConstants) JSC_FAST_CALL;
   static FunctionBodyNode* create(JSGlobalData*,
                                   SourceElements*,
                                   VarStack*,
                                   FunctionStack*,
-                                  bool usesEval,
-                                  bool needsClosure,
-                                  bool usesArguments,
+                                  CodeFeatures,
                                   int numConstants) JSC_FAST_CALL;
   ~FunctionBodyNode();
 
@@ -2577,9 +2575,7 @@ class FunctionBodyNode : public ScopeNode {
                    SourceElements*,
                    VarStack*,
                    FunctionStack*,
-                   bool usesEval,
-                   bool needsClosure,
-                   bool usesArguments,
+                   CodeFeatures,
                    int numConstants) JSC_FAST_CALL;
 
  private:

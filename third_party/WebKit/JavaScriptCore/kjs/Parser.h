@@ -60,9 +60,7 @@ class Parser : Noncopyable {
   void didFinishParsing(SourceElements*,
                         ParserRefCountedData<DeclarationStacks::VarStack>*,
                         ParserRefCountedData<DeclarationStacks::FunctionStack>*,
-                        bool usesEval,
-                        bool needsClosure,
-                        bool usesArguments,
+                        CodeFeatures features,
                         int lastLine,
                         int numConstants);
 
@@ -76,9 +74,7 @@ class Parser : Noncopyable {
   RefPtr<ParserRefCountedData<DeclarationStacks::VarStack>> m_varDeclarations;
   RefPtr<ParserRefCountedData<DeclarationStacks::FunctionStack>>
       m_funcDeclarations;
-  bool m_usesEval;
-  bool m_needsClosure;
-  bool m_usesArguments;
+  CodeFeatures m_features;
   int m_lastLine;
   int m_numConstants;
 };
@@ -92,11 +88,11 @@ PassRefPtr<ParsedNode> Parser::parse(ExecState* exec,
   parse(exec, errLine, errMsg);
   RefPtr<ParsedNode> result;
   if (m_sourceElements) {
-    result = ParsedNode::create(
-        &exec->globalData(), m_sourceElements.get(),
-        m_varDeclarations ? &m_varDeclarations->data : 0,
-        m_funcDeclarations ? &m_funcDeclarations->data : 0, *m_source,
-        m_usesEval, m_needsClosure, m_usesArguments, m_numConstants);
+    result =
+        ParsedNode::create(&exec->globalData(), m_sourceElements.get(),
+                           m_varDeclarations ? &m_varDeclarations->data : 0,
+                           m_funcDeclarations ? &m_funcDeclarations->data : 0,
+                           *m_source, m_features, m_numConstants);
     result->setLoc(m_source->firstLine(), m_lastLine);
   }
 
