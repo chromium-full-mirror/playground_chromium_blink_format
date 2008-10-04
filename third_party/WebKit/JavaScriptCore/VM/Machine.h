@@ -130,7 +130,7 @@ class Machine {
 
   void getArgumentsData(Register* callFrame,
                         JSFunction*&,
-                        int& firstParameterIndex,
+                        ptrdiff_t& firstParameterIndex,
                         Register*& argv,
                         int& argc);
   void setTimeoutTime(unsigned timeoutTime) { m_timeoutTime = timeoutTime; }

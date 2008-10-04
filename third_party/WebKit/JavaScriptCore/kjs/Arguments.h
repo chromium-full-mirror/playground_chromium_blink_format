@@ -35,7 +35,7 @@ struct ArgumentsData : Noncopyable {
   JSActivation* activation;
 
   unsigned numParameters;
-  int firstParameterIndex;
+  ptrdiff_t firstParameterIndex;
   unsigned numArguments;
 
   Register* registers;
@@ -92,7 +92,7 @@ class Arguments : public JSObject {
 
 inline void Arguments::init(ExecState* exec, Register* callFrame) {
   JSFunction* callee;
-  int firstParameterIndex;
+  ptrdiff_t firstParameterIndex;
   Register* argv;
   int numArguments;
   exec->machine()->getArgumentsData(callFrame, callee, firstParameterIndex,

@@ -4267,7 +4267,7 @@ Register* Machine::callFrame(ExecState* exec,
 
 void Machine::getArgumentsData(Register* callFrame,
                                JSFunction*& function,
-                               int& firstParameterIndex,
+                               ptrdiff_t& firstParameterIndex,
                                Register*& argv,
                                int& argc) {
   function =
