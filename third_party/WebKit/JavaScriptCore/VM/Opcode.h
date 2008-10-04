@@ -41,7 +41,7 @@ namespace JSC {
 
 #define FOR_EACH_OPCODE_ID(macro)                                                                                         \
   macro(op_enter) macro(op_enter_with_activation) macro(                                                                  \
-      op_init_arguments) macro(op_convert_this)                                                                           \
+      op_create_arguments) macro(op_convert_this)                                                                         \
                                                                                                                           \
       macro(op_unexpected_load) macro(op_new_object) macro(                                                               \
           op_new_array) macro(op_new_regexp) macro(op_mov)                                                                \
