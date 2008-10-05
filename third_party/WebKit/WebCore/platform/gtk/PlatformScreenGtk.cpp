@@ -51,7 +51,7 @@ int screenDepth(Widget* widget) {
     return 24;
 
   GdkVisual* visual = gdk_drawable_get_visual(GDK_DRAWABLE(
-      GTK_WIDGET(widget->root()->hostWindow()->platformWindow()->window)));
+      GTK_WIDGET(widget->root()->hostWindow()->platformWindow())->window));
   return visual->depth;
 }
 
