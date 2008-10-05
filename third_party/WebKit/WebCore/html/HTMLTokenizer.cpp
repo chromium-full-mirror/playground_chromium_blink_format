@@ -320,7 +320,7 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
   ASSERT(state.inXmp() + state.inTextArea() + state.inTitle() +
              state.inStyle() + state.inScript() + state.inIFrame() ==
          1);
-  if (state.inScript())
+  if (state.inScript() && !scriptStartLineno)
     scriptStartLineno = m_lineNumber + 1;  // Script line numbers are 1 based.
 
   if (state.inComment())
@@ -427,6 +427,11 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
 HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
   // We are inside a <script>
   bool doScriptExec = false;
+  int startLine = scriptStartLineno;
+
+  // Reset scriptStartLineno to indicate that we've finished parsing the current
+  // script element
+  scriptStartLineno = 0;
 
   // (Bugzilla 3837) Scripts following a frameset element should not execute or,
   // in the case of extern scripts, even load.
@@ -518,7 +523,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
       else
         prependingSrc = src;
       setSrc(SegmentedString());
-      state = scriptExecution(scriptString, state, String(), scriptStartLineno);
+      state = scriptExecution(scriptString, state, String(), startLine);
     }
   }
 
