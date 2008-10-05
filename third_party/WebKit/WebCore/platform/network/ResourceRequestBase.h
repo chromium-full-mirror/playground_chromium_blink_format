@@ -84,6 +84,12 @@ class ResourceRequestBase {
   }
   void clearHTTPReferrer() { m_httpHeaderFields.remove("Referer"); }
 
+  String httpOrigin() const { return httpHeaderField("Origin"); }
+  void setHTTPOrigin(const String& httpOrigin) {
+    setHTTPHeaderField("Origin", httpOrigin);
+  }
+  void clearHTTPOrigin() { m_httpHeaderFields.remove("Origin"); }
+
   String httpUserAgent() const { return httpHeaderField("User-Agent"); }
   void setHTTPUserAgent(const String& httpUserAgent) {
     setHTTPHeaderField("User-Agent", httpUserAgent);

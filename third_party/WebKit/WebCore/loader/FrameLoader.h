@@ -246,6 +246,7 @@ class FrameLoader : Noncopyable
   bool isReloading() const;
   String referrer() const;
   String outgoingReferrer() const;
+  String outgoingOrigin() const;
   void loadEmptyDocumentSynchronously();
 
   DocumentLoader* activeDocumentLoader() const;
@@ -350,6 +351,7 @@ class FrameLoader : Noncopyable
   void addExtraFieldsToRequest(ResourceRequest&,
                                bool isMainResource,
                                bool alwaysFromRequest);
+  static void addHTTPOriginIfNeeded(ResourceRequest&, String origin);
 
   FrameLoaderClient* client() const;
 

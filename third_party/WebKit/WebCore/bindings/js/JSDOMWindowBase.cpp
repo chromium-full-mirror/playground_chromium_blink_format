@@ -310,6 +310,8 @@ static Frame* createWindow(ExecState* exec,
   ResourceRequest request;
 
   request.setHTTPReferrer(activeFrame->loader()->outgoingReferrer());
+  FrameLoader::addHTTPOriginIfNeeded(request,
+                                     activeFrame->loader()->outgoingOrigin());
   FrameLoadRequest frameRequest(request, frameName);
 
   // FIXME: It's much better for client API if a new window starts with a URL,
