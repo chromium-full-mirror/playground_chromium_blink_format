@@ -37,10 +37,6 @@
 #include <wtf/AlwaysInline.h>
 #include <wtf/Vector.h>
 
-#if ENABLE(SAMPLING_TOOL)
-#include "SamplingTool.h"
-#endif
-
 #if COMPILER(MSVC)
 #define CTI_ARGS void** args
 #define ARGS (args)
@@ -234,7 +230,11 @@ class CTI {
   static const int repatchOffsetGetByIdStructureID = 19;
   static const int repatchOffsetGetByIdBranchToSlowCase = 25;
   static const int repatchOffsetGetByIdPropertyMapOffset = 34;
+#if ENABLE(SAMPLING_TOOL)
+  static const int repatchOffsetGetByIdSlowCaseCall = 27 + ctiArgumentInitSize;
+#else
   static const int repatchOffsetGetByIdSlowCaseCall = 17 + ctiArgumentInitSize;
+#endif
 
  public:
   static void compile(Machine* machine, ExecState* exec, CodeBlock* codeBlock) {
@@ -345,13 +345,8 @@ class CTI {
                                  Register* r,
                                  JSGlobalData* globalData,
                                  JSValue** exception) {
-    JSValue* value =
-        ctiTrampoline(code, registerFile, r, exception,
-                      Profiler::enabledProfilerReference(), globalData);
-#if ENABLE(SAMPLING_TOOL)
-    currentOpcodeID = static_cast<OpcodeID>(-1);
-#endif
-    return value;
+    return ctiTrampoline(code, registerFile, r, exception,
+                         Profiler::enabledProfilerReference(), globalData);
   }
 
  private:

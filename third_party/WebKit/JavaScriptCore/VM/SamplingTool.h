@@ -97,6 +97,9 @@ class SamplingTool {
   void privateExecuteReturned() {
     m_recordedCodeBlock = 0;
     m_recordedVPC = 0;
+#if ENABLE(SAMPLING_TOOL)
+    currentOpcodeID = static_cast<OpcodeID>(-1);
+#endif
   }
 
   void callingHostFunction() {
@@ -135,7 +138,7 @@ class SamplingTool {
   m_sampler->privateExecuteReturned()
 #define MACHINE_SAMPLING_callingHostFunction() m_sampler->callingHostFunction()
 #define CTI_MACHINE_SAMPLING_callingHostFunction() \
-  machine->m_sampler->callingHostFunction()
+  ARG_globalData->machine->m_sampler->callingHostFunction()
 #else
 #define SCOPENODE_SAMPLING_notifyOfScope(sampler)
 #define MACHINE_SAMPLING_sample(codeBlock, vPC)
