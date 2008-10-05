@@ -137,17 +137,7 @@ void CodeGenerator::setDumpsGeneratedCode(bool dumpsGeneratedCode) {
 void CodeGenerator::generate() {
   m_codeBlock->thisRegister = m_thisRegister.index();
 
-  if (m_shouldEmitDebugHooks)
-    m_codeBlock->needsFullScopeChain = true;
-
   m_scopeNode->emitCode(*this);
-
-  if (m_codeType == FunctionCode && m_codeBlock->needsFullScopeChain) {
-    ASSERT(globalData()->machine->getOpcodeID(
-               m_codeBlock->instructions[0].u.opcode) == op_enter);
-    m_codeBlock->instructions[0] =
-        globalData()->machine->getOpcode(op_enter_with_activation);
-  }
 
 #ifndef NDEBUG
   if (s_dumpsGeneratedCode) {
@@ -234,6 +224,9 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
       m_nextGlobal(-1),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
+  if (m_shouldEmitDebugHooks)
+    m_codeBlock->needsFullScopeChain = true;
+
   emitOpcode(op_enter);
   codeBlock->globalData = m_globalData;
 
@@ -323,7 +316,14 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
       m_continueDepth(0),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
-  emitOpcode(op_enter);
+  if (m_shouldEmitDebugHooks)
+    m_codeBlock->needsFullScopeChain = true;
+
+  if (m_codeBlock->needsFullScopeChain)
+    emitOpcode(op_enter_with_activation);
+  else
+    emitOpcode(op_enter);
+
   codeBlock->globalData = m_globalData;
 
   bool usesArguments = functionBody->usesArguments();
@@ -385,6 +385,9 @@ CodeGenerator::CodeGenerator(EvalNode* evalNode,
       m_continueDepth(0),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
+  if (m_shouldEmitDebugHooks)
+    m_codeBlock->needsFullScopeChain = true;
+
   emitOpcode(op_enter);
   codeBlock->globalData = m_globalData;
   m_codeBlock->numParameters = 1;  // Allocate space for "this"
@@ -1277,7 +1280,6 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
 }
 
 RegisterID* CodeGenerator::emitPushScope(RegisterID* scope) {
-  m_codeBlock->needsFullScopeChain = true;
   ControlFlowContext context;
   context.isFinallyBlock = false;
   m_scopeContextStack.append(context);
@@ -1500,7 +1502,6 @@ void CodeGenerator::emitSubroutineReturn(RegisterID* retAddrSrc) {
 void CodeGenerator::emitPushNewScope(RegisterID* dst,
                                      Identifier& property,
                                      RegisterID* value) {
-  m_codeBlock->needsFullScopeChain = true;
   ControlFlowContext context;
   context.isFinallyBlock = false;
   m_scopeContextStack.append(context);

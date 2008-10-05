@@ -2420,6 +2420,10 @@ class ScopeNode : public BlockNode {
   bool usesArguments() const { return m_features & ArgumentsFeature; }
   void setUsesArguments() { m_features |= ArgumentsFeature; }
   bool usesThis() const { return m_features & ThisFeature; }
+  bool needsActivation() const {
+    return m_features &
+           (EvalFeature | ClosureFeature | WithFeature | CatchFeature);
+  }
 
   VarStack& varStack() { return m_varStack; }
   FunctionStack& functionStack() { return m_functionStack; }
