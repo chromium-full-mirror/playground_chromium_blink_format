@@ -182,6 +182,9 @@ FrameView::~FrameView() {
   }
 
   resetScrollbars();
+  setHasHorizontalScrollbar(false);  // Remove native scrollbars now before we
+                                     // lose the connection to the HostWindow.
+  setHasVerticalScrollbar(false);
 
   ASSERT(m_refCount == 0);
   ASSERT(d->m_scheduledEvents.isEmpty());
