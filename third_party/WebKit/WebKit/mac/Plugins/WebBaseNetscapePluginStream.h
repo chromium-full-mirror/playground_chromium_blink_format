@@ -160,6 +160,7 @@ class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
 - (void)cancelLoadWithError:(NSError*)error;
 
 - (void)start;
+- (void)stop;
 
 @end
 #endif
