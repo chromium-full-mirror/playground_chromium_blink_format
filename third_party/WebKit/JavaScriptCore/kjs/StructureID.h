@@ -134,6 +134,11 @@ class StructureID : public RefCounted<StructureID> {
   const PropertyMap& propertyMap() const { return m_propertyMap; }
   PropertyMap& propertyMap() { return m_propertyMap; }
 
+  void setCachedTransistionOffset(size_t offset) {
+    m_cachedTransistionOffset = offset;
+  }
+  size_t cachedTransistionOffset() const { return m_cachedTransistionOffset; }
+
   void getEnumerablePropertyNames(ExecState*, PropertyNameArray&, JSObject*);
   void clearEnumerationCache();
 
@@ -170,6 +175,8 @@ class StructureID : public RefCounted<StructureID> {
   RefPtr<PropertyNameArrayData> m_cachedPropertyNameArrayData;
 
   PropertyMap m_propertyMap;
+
+  size_t m_cachedTransistionOffset;
 };
 
 class StructureIDChain : public RefCounted<StructureIDChain> {
