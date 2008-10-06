@@ -326,7 +326,7 @@ class Machine {
                                                     const Instruction* vPC,
                                                     Register* r);
 
-  NEVER_INLINE bool unwindCallFrame(ExecState*,
+  NEVER_INLINE bool unwindCallFrame(ExecState*&,
                                     JSValue*,
                                     const Instruction*&,
                                     CodeBlock*&,
