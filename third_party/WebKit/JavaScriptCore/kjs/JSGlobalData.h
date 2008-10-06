@@ -101,6 +101,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   Parser* parser;
 
   JSGlobalObject* head;
+  JSGlobalObject* dynamicGlobalObject;
 
   bool isSharedInstance;
 

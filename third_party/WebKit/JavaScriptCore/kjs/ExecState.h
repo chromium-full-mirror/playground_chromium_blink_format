@@ -45,9 +45,7 @@ class ExecState : private Register, Noncopyable {
   Register* registers() { return this; }
 
   // Global object in which execution began.
-  JSGlobalObject* dynamicGlobalObject() {
-    return Machine::scopeChain(Machine::firstCallFrame(this))->globalObject();
-  }
+  JSGlobalObject* dynamicGlobalObject();
 
   // Global object in which the currently executing code was defined.
   // Differs from dynamicGlobalObject() during function calls across web browser

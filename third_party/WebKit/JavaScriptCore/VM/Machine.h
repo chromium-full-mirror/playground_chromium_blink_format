@@ -120,7 +120,6 @@ class Machine {
                           UString& sourceURL,
                           JSValue*& function) const;
 
-  static const Register* firstCallFrame(const Register* callFrame);
   static ScopeChainNode* scopeChain(const Register* r) {
     return r[RegisterFile::ScopeChain].scopeChain();
   }
