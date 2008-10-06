@@ -74,6 +74,12 @@ class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
   void deliverDataToFile(NSData* data);
   void deliverData();
 
+  void startStream(NSURL*,
+                   long long expectedContentLength,
+                   NSDate* lastModifiedDate,
+                   NSString* mimeType,
+                   NSData* headers);
+
   NSError* pluginCancelledConnectionError() const;
 
   RetainPtr<NSMutableData> m_deliveryData;
@@ -151,16 +157,9 @@ class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
 
 - (NPP)plugin;
 
-- (void)startStreamResponseURL:(NSURL*)theResponseURL
-         expectedContentLength:(long long)expectedContentLength
-              lastModifiedDate:(NSDate*)lastModifiedDate
-                      MIMEType:(NSString*)MIMEType
-                       headers:(NSData*)theHeaders;
-
 - (void)cancelLoadWithError:(NSError*)error;
 
 - (void)start;
-- (void)stop;
 
 @end
 #endif
