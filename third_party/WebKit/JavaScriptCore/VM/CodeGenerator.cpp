@@ -1228,6 +1228,15 @@ RegisterID* CodeGenerator::emitCall(OpcodeID opcodeID,
   return dst;
 }
 
+RegisterID* CodeGenerator::emitReturn(RegisterID* src) {
+  if (m_codeBlock->needsFullScopeChain)
+    emitOpcode(op_tear_off_activation);
+  else if (m_codeBlock->usesArguments)
+    emitOpcode(op_tear_off_arguments);
+
+  return emitUnaryNoDstOp(op_ret, src);
+}
+
 RegisterID* CodeGenerator::emitUnaryNoDstOp(OpcodeID opcode, RegisterID* src) {
   emitOpcode(opcode);
   instructions().append(src->index());

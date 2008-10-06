@@ -365,9 +365,7 @@ class CodeGenerator {
                            unsigned startOffset,
                            unsigned endOffset);
 
-  RegisterID* emitReturn(RegisterID* src) {
-    return emitUnaryNoDstOp(op_ret, src);
-  }
+  RegisterID* emitReturn(RegisterID* src);
   RegisterID* emitEnd(RegisterID* src) { return emitUnaryNoDstOp(op_end, src); }
 
   RegisterID* emitConstruct(RegisterID* dst,

@@ -32,8 +32,6 @@
 namespace JSC {
 
 struct ArgumentsData : Noncopyable {
-  JSActivation* activation;
-
   unsigned numParameters;
   ptrdiff_t firstParameterIndex;
   unsigned numArguments;
@@ -53,7 +51,6 @@ struct ArgumentsData : Noncopyable {
 class Arguments : public JSObject {
  public:
   Arguments(ExecState*, Register* callFrame);
-  Arguments(ExecState*, JSActivation*);
   virtual ~Arguments();
 
   static const ClassInfo info;
@@ -63,6 +60,7 @@ class Arguments : public JSObject {
   void fillArgList(ExecState*, ArgList&);
 
   void copyRegisters();
+  bool isTornOff() const { return d->registerArray; }
   void setRegisters(Register* registers) { d->registers = registers; }
 
  private:
@@ -90,7 +88,9 @@ class Arguments : public JSObject {
   OwnPtr<ArgumentsData> d;
 };
 
-inline void Arguments::init(ExecState* exec, Register* callFrame) {
+inline Arguments::Arguments(ExecState* exec, Register* callFrame)
+    : JSObject(exec->lexicalGlobalObject()->argumentsStructure()),
+      d(new ArgumentsData) {
   JSFunction* callee;
   ptrdiff_t firstParameterIndex;
   Register* argv;
@@ -125,24 +125,8 @@ inline void Arguments::init(ExecState* exec, Register* callFrame) {
   d->overrodeCallee = false;
 }
 
-inline Arguments::Arguments(ExecState* exec, Register* callFrame)
-    : JSObject(exec->lexicalGlobalObject()->argumentsStructure()),
-      d(new ArgumentsData) {
-  d->activation = 0;
-  init(exec, callFrame);
-}
-
-inline Arguments::Arguments(ExecState* exec, JSActivation* activation)
-    : JSObject(exec->lexicalGlobalObject()->argumentsStructure()),
-      d(new ArgumentsData) {
-  ASSERT(activation);
-  d->activation = activation;
-  init(exec, &activation->registerAt(0));
-}
-
 inline void Arguments::copyRegisters() {
-  ASSERT(!d->activation);
-  ASSERT(!d->registerArray);
+  ASSERT(!isTornOff());
 
   if (!d->numParameters)
     return;
@@ -159,7 +143,7 @@ inline void Arguments::copyRegisters() {
 
 // This JSActivation function is defined here so it can get at
 // Arguments::setRegisters.
-inline void JSActivation::copyRegisters(JSValue* arguments) {
+inline void JSActivation::copyRegisters(Arguments* arguments) {
   ASSERT(!d()->registerArray);
 
   size_t numParametersMinusThis =
@@ -177,11 +161,9 @@ inline void JSActivation::copyRegisters(JSValue* arguments) {
   Register* registerArray =
       copyRegisterArray(d()->registers - registerOffset, registerArraySize);
   setRegisters(registerArray + registerOffset, registerArray);
-  if (arguments) {
-    ASSERT(arguments->isObject(&Arguments::info));
+  if (arguments && !arguments->isTornOff())
     static_cast<Arguments*>(arguments)->setRegisters(registerArray +
                                                      registerOffset);
-  }
 }
 
 }  // namespace JSC

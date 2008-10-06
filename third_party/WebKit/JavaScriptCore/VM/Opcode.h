@@ -77,30 +77,32 @@ namespace JSC {
                                                           op_switch_char) macro(op_switch_string)                         \
                                                                                                                           \
                                                           macro(op_new_func) macro(op_new_func_exp) macro(                \
-                                                              op_call) macro(op_call_eval) macro(op_ret)                  \
+                                                              op_call) macro(op_call_eval)                                \
+                                                              macro(op_tear_off_activation) macro(                        \
+                                                                  op_tear_off_arguments) macro(op_ret)                    \
                                                                                                                           \
-                                                              macro(                                                      \
-                                                                  op_construct) macro(op_construct_verify)                \
+                                                                  macro(                                                  \
+                                                                      op_construct) macro(op_construct_verify)            \
                                                                                                                           \
-                                                                  macro(op_get_pnames) macro(                             \
-                                                                      op_next_pname)                                      \
+                                                                      macro(op_get_pnames) macro(                         \
+                                                                          op_next_pname)                                  \
                                                                                                                           \
-                                                                      macro(op_push_scope) macro(                         \
-                                                                          op_pop_scope) macro(op_push_new_scope)          \
+                                                                          macro(op_push_scope) macro(                     \
+                                                                              op_pop_scope) macro(op_push_new_scope)      \
                                                                                                                           \
-                                                                          macro(                                          \
-                                                                              op_catch) macro(op_throw)                   \
                                                                               macro(                                      \
-                                                                                  op_new_error)                           \
+                                                                                  op_catch) macro(op_throw)               \
+                                                                                  macro(                                  \
+                                                                                      op_new_error)                       \
                                                                                                                           \
-                                                                                  macro(op_jsr) macro(                    \
-                                                                                      op_sret)                            \
-                                                                                                                          \
-                                                                                      macro(                              \
-                                                                                          op_debug)                       \
+                                                                                      macro(op_jsr) macro(                \
+                                                                                          op_sret)                        \
                                                                                                                           \
                                                                                           macro(                          \
-                                                                                              op_end)  // end must be the last opcode in the list
+                                                                                              op_debug)                   \
+                                                                                                                          \
+                                                                                              macro(                      \
+                                                                                                  op_end)  // end must be the last opcode in the list
 
 #define OPCODE_ID_ENUM(opcode) opcode,
 typedef enum { FOR_EACH_OPCODE_ID(OPCODE_ID_ENUM) } OpcodeID;
