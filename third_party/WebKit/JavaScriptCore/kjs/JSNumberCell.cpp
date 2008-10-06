@@ -40,6 +40,10 @@ bool JSNumberCell::getPrimitiveNumber(ExecState*,
   return true;
 }
 
+bool JSNumberCell::toBoolean(ExecState*) const {
+  return m_value < 0.0 || m_value > 0.0;  // false for NaN
+}
+
 double JSNumberCell::toNumber(ExecState*) const {
   return m_value;
 }

@@ -378,10 +378,11 @@ void setRegExpConstructorInput(ExecState* exec,
   static_cast<RegExpConstructor*>(baseObject)->setInput(value->toString(exec));
 }
 
-void setRegExpConstructorMultiline(ExecState*,
+void setRegExpConstructorMultiline(ExecState* exec,
                                    JSObject* baseObject,
                                    JSValue* value) {
-  static_cast<RegExpConstructor*>(baseObject)->setMultiline(value->toBoolean());
+  static_cast<RegExpConstructor*>(baseObject)
+      ->setMultiline(value->toBoolean(exec));
 }
 
 // ECMA 15.10.4

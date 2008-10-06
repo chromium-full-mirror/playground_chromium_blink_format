@@ -182,7 +182,7 @@ CFTypeRef KJSValueToCFTypeInternal(JSValue* inValue,
   JSLock lock(true);
 
   if (inValue->isBoolean()) {
-    result = inValue->toBoolean() ? kCFBooleanTrue : kCFBooleanFalse;
+    result = inValue->toBoolean(exec) ? kCFBooleanTrue : kCFBooleanFalse;
     RetainCFType(result);
     return result;
   }

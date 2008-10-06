@@ -151,15 +151,15 @@ JSValue* regExpProtoFuncToString(ExecState* exec,
   result.append('/');
   if (static_cast<RegExpObject*>(thisValue)
           ->get(exec, exec->propertyNames().global)
-          ->toBoolean())
+          ->toBoolean(exec))
     result.append('g');
   if (static_cast<RegExpObject*>(thisValue)
           ->get(exec, exec->propertyNames().ignoreCase)
-          ->toBoolean())
+          ->toBoolean(exec))
     result.append('i');
   if (static_cast<RegExpObject*>(thisValue)
           ->get(exec, exec->propertyNames().multiline)
-          ->toBoolean())
+          ->toBoolean(exec))
     result.append('m');
   return jsNontrivialString(exec, result);
 }

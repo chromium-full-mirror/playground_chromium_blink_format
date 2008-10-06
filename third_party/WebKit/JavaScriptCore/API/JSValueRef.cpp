@@ -186,8 +186,10 @@ JSValueRef JSValueMakeString(JSContextRef ctx, JSStringRef string) {
   return toRef(jsString(exec, string->ustring()));
 }
 
-bool JSValueToBoolean(JSContextRef, JSValueRef value) {
-  return toJS(value)->toBoolean();
+bool JSValueToBoolean(JSContextRef ctx, JSValueRef value) {
+  ExecState* exec = toJS(ctx);
+  JSValue* jsValue = toJS(value);
+  return jsValue->toBoolean(exec);
 }
 
 double JSValueToNumber(JSContextRef ctx,
