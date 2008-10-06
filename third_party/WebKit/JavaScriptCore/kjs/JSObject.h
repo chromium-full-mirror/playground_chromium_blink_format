@@ -29,6 +29,7 @@
 #include "CommonIdentifiers.h"
 #include "ExecState.h"
 #include "JSNumberCell.h"
+#include "JSString.h"
 #include "PropertyMap.h"
 #include "PropertySlot.h"
 #include "PutPropertySlot.h"
@@ -128,7 +129,7 @@ class JSObject : public JSCell {
   virtual JSValue* toPrimitive(ExecState*,
                                PreferredPrimitiveType = NoPreference) const;
   virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*& value);
-  virtual bool toBoolean(ExecState*) const;
+  bool toBoolean() const { return true; }
   virtual double toNumber(ExecState*) const;
   virtual UString toString(ExecState*) const;
   virtual JSObject* toObject(ExecState*) const;
@@ -281,6 +282,16 @@ inline bool JSCell::isObject(const ClassInfo* info) const {
       return true;
   }
   return false;
+}
+
+inline bool JSCell::toBoolean() const {
+  JSType type = structureID()->typeInfo().type();
+  if (type == NumberType)
+    return static_cast<const JSNumberCell*>(this)->toBoolean();
+  if (type == ObjectType)
+    return static_cast<const JSObject*>(this)->toBoolean();
+  ASSERT(type == StringType);
+  return static_cast<const JSString*>(this)->toBoolean();
 }
 
 // this method is here to be after the inline declaration of JSCell::isObject

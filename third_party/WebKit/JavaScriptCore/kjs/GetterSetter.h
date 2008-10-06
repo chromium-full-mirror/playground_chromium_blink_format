@@ -48,7 +48,7 @@ class GetterSetter : public JSCell {
 
   virtual JSValue* toPrimitive(ExecState*, PreferredPrimitiveType) const;
   virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*& value);
-  virtual bool toBoolean(ExecState*) const;
+  bool toBoolean(ExecState*) const;
   virtual double toNumber(ExecState*) const;
   virtual UString toString(ExecState*) const;
   virtual JSObject* toObject(ExecState*) const;

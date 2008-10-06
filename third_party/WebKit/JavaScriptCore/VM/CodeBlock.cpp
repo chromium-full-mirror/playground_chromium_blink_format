@@ -905,15 +905,11 @@ void CodeBlock::dump(ExecState* exec,
       break;
     }
     case op_tear_off_activation: {
-      int r0 = (++it)->u.operand;
-      printf("[%4d] tear_off_activation\t %s\n", location,
-             registerName(r0).c_str());
+      printf("[%4d] tear_off_activation\n", location);
       break;
     }
     case op_tear_off_arguments: {
-      int r0 = (++it)->u.operand;
-      printf("[%4d] tear_off_arguments\t %s\n", location,
-             registerName(r0).c_str());
+      printf("[%4d] tear_off_arguments\n", location);
       break;
     }
     case op_ret: {

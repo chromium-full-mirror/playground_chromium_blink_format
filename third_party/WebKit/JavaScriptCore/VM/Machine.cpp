@@ -2350,8 +2350,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       */
       int dst = (++vPC)->u.operand;
       int src = (++vPC)->u.operand;
-      JSValue* result = jsBoolean(!r[src].jsValue(exec)->toBoolean(exec));
-      VM_CHECK_EXCEPTION();
+      JSValue* result = jsBoolean(!r[src].jsValue(exec)->toBoolean());
       r[dst] = result;
 
       ++vPC;
@@ -3253,7 +3252,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
        */
       int cond = (++vPC)->u.operand;
       int target = (++vPC)->u.operand;
-      if (r[cond].jsValue(exec)->toBoolean(exec)) {
+      if (r[cond].jsValue(exec)->toBoolean()) {
         vPC += target;
         CHECK_FOR_TIMEOUT();
         NEXT_OPCODE;
@@ -3270,7 +3269,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       */
       int cond = (++vPC)->u.operand;
       int target = (++vPC)->u.operand;
-      if (r[cond].jsValue(exec)->toBoolean(exec)) {
+      if (r[cond].jsValue(exec)->toBoolean()) {
         vPC += target;
         NEXT_OPCODE;
       }
@@ -3286,7 +3285,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       */
       int cond = (++vPC)->u.operand;
       int target = (++vPC)->u.operand;
-      if (!r[cond].jsValue(exec)->toBoolean(exec)) {
+      if (!r[cond].jsValue(exec)->toBoolean()) {
         vPC += target;
         NEXT_OPCODE;
       }
@@ -5377,11 +5376,7 @@ JSValue* Machine::cti_op_lesseq(CTI_ARGS) {
 int Machine::cti_op_loop_if_true(CTI_ARGS) {
   JSValue* src1 = ARG_src1;
 
-  ExecState* exec = ARG_exec;
-
-  bool result = src1->toBoolean(exec);
-  VM_CHECK_EXCEPTION_AT_END();
-  return result;
+  return src1->toBoolean();
 }
 
 JSValue* Machine::cti_op_negate(CTI_ARGS) {
@@ -5499,23 +5494,11 @@ int Machine::cti_op_jless(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_not(CTI_ARGS) {
-  JSValue* src = ARG_src1;
-
-  ExecState* exec = ARG_exec;
-
-  JSValue* result = jsBoolean(!src->toBoolean(exec));
-  VM_CHECK_EXCEPTION_AT_END();
-  return result;
+  return jsBoolean(!ARG_src1->toBoolean());
 }
 
 int SFX_CALL Machine::cti_op_jtrue(CTI_ARGS) {
-  JSValue* src1 = ARG_src1;
-
-  ExecState* exec = ARG_exec;
-
-  bool result = src1->toBoolean(exec);
-  VM_CHECK_EXCEPTION_AT_END();
-  return result;
+  return ARG_src1->toBoolean();
 }
 
 JSValue* Machine::cti_op_post_inc(CTI_ARGS) {

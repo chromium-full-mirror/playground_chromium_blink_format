@@ -48,7 +48,7 @@ BooleanConstructor::BooleanConstructor(ExecState* exec,
 JSObject* constructBoolean(ExecState* exec, const ArgList& args) {
   BooleanObject* obj = new (exec)
       BooleanObject(exec->lexicalGlobalObject()->booleanObjectStructure());
-  obj->setInternalValue(jsBoolean(args.at(exec, 0)->toBoolean(exec)));
+  obj->setInternalValue(jsBoolean(args.at(exec, 0)->toBoolean()));
   return obj;
 }
 
@@ -69,7 +69,7 @@ static JSValue* callBooleanConstructor(ExecState* exec,
                                        JSObject*,
                                        JSValue*,
                                        const ArgList& args) {
-  return jsBoolean(args.at(exec, 0)->toBoolean(exec));
+  return jsBoolean(args.at(exec, 0)->toBoolean());
 }
 
 CallType BooleanConstructor::getCallData(CallData& callData) {

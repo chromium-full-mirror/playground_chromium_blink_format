@@ -108,13 +108,14 @@ class JSString : public JSCell {
                                TypeInfo(StringType, NeedsThisConversion));
   }
 
+  bool toBoolean() const { return !m_value.isEmpty(); }
+
  private:
   enum VPtrStealingHackType { VPtrStealingHack };
   JSString(VPtrStealingHackType) : JSCell(0) {}
 
   virtual JSValue* toPrimitive(ExecState*, PreferredPrimitiveType) const;
   virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*& value);
-  virtual bool toBoolean(ExecState*) const;
   virtual double toNumber(ExecState*) const;
   virtual JSObject* toObject(ExecState*) const;
   virtual UString toString(ExecState*) const;
