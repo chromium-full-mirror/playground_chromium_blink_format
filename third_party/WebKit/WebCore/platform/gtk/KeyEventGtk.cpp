@@ -513,6 +513,7 @@ PlatformKeyboardEvent::PlatformKeyboardEvent(GdkEventKey* event)
       m_keyIdentifier(keyIdentifierForGdkKeyCode(event->keyval)),
       m_autoRepeat(false),
       m_windowsVirtualKeyCode(windowsKeyCodeForKeyEvent(event->keyval)),
+      m_nativeVirtualKeyCode(event->keyval),
       m_isKeypad(event->keyval >= GDK_KP_Space && event->keyval <= GDK_KP_9),
       m_shiftKey((event->state & GDK_SHIFT_MASK) ||
                  (event->keyval == GDK_3270_BackTab)),
