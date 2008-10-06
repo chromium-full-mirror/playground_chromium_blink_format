@@ -29,9 +29,10 @@
 #if ENABLE(NETSCAPE_PLUGIN_API)
 #import <Foundation/Foundation.h>
 
+#import <WebCore/Timer.h>
+#import <WebCore/NetscapePlugInStreamLoader.h>
 #import <WebKit/npfunctions.h>
 #import <WebKit/WebPlugInStreamLoaderDelegate.h>
-#import <WebCore/Timer.h>
 #import <wtf/PassRefPtr.h>
 #import <wtf/RefCounted.h>
 #import <wtf/RefPtr.h>
@@ -48,12 +49,15 @@ class WebNetscapePlugInStreamLoaderClient;
 @class NSURLResponse;
 @class WebBaseNetscapePluginStream;
 
-class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
+class WebNetscapePluginStream
+    : public RefCounted<WebNetscapePluginStream>,
+      private WebCore::NetscapePlugInStreamLoaderClient {
  public:
   static PassRefPtr<WebNetscapePluginStream> create(
       WebBaseNetscapePluginStream* stream) {
     return adoptRef(new WebNetscapePluginStream(stream));
   }
+  virtual ~WebNetscapePluginStream() {}
 
   void setPlugin(NPP);
 
@@ -81,6 +85,17 @@ class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
                    NSData* headers);
 
   NSError* pluginCancelledConnectionError() const;
+
+  // NetscapePlugInStreamLoaderClient methods.
+  void didReceiveResponse(WebCore::NetscapePlugInStreamLoader*,
+                          const WebCore::ResourceResponse&);
+  void didReceiveData(WebCore::NetscapePlugInStreamLoader*,
+                      const char* bytes,
+                      int length);
+  void didFail(WebCore::NetscapePlugInStreamLoader*,
+               const WebCore::ResourceError&);
+  void didFinishLoading(WebCore::NetscapePlugInStreamLoader*);
+  bool wantsAllStreams() const;
 
   RetainPtr<NSMutableData> m_deliveryData;
   RetainPtr<NSURL> m_requestURL;
