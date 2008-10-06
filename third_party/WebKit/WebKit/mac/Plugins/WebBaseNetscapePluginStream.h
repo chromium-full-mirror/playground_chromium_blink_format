@@ -57,7 +57,12 @@ class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
 
   void setPlugin(NPP);
 
+  static NPP ownerForStream(NPStream*);
+
   static NPReason reasonForError(NSError*);
+  NSError* errorForReason(NPReason) const;
+
+  void cancelLoadAndDestroyStreamWithError(NSError*);
 
   // FIXME: These should all be private once WebBaseNetscapePluginStream is
   // history...
@@ -66,6 +71,10 @@ class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
   void cancelLoadWithError(NSError*);
   void destroyStreamWithError(NSError*);
   void destroyStreamWithReason(NPReason);
+  void deliverDataToFile(NSData* data);
+  void deliverData();
+
+  NSError* pluginCancelledConnectionError() const;
 
   RetainPtr<NSMutableData> m_deliveryData;
   RetainPtr<NSURL> m_requestURL;
@@ -126,8 +135,6 @@ class WebNetscapePluginStream : public RefCounted<WebNetscapePluginStream> {
     : NSObject<WebPlugInStreamLoaderDelegate> {
   RefPtr<WebNetscapePluginStream> _impl;
 }
-
-+ (NPP)ownerForStream:(NPStream*)stream;
 
 - (NSError*)errorForReason:(NPReason)theReason;
 
