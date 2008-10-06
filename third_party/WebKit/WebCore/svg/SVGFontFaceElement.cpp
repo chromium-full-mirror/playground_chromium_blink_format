@@ -131,7 +131,7 @@ void SVGFontFaceElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 unsigned SVGFontFaceElement::unitsPerEm() const {
-  AtomicString value(getAttribute(units_per_emAttr));
+  const AtomicString& value = getAttribute(units_per_emAttr);
   if (value.isEmpty())
     return 1000;
 
@@ -139,11 +139,7 @@ unsigned SVGFontFaceElement::unitsPerEm() const {
 }
 
 int SVGFontFaceElement::xHeight() const {
-  AtomicString value(getAttribute(x_heightAttr));
-  if (value.isEmpty())
-    return 0;
-
-  return static_cast<int>(ceilf(value.toFloat()));
+  return static_cast<int>(ceilf(getAttribute(x_heightAttr).toFloat()));
 }
 
 float SVGFontFaceElement::horizontalOriginX() const {
@@ -156,11 +152,7 @@ float SVGFontFaceElement::horizontalOriginX() const {
   // glyphs in the font.)
   // If the attribute is not specified, the effect is as if a value of "0" were
   // specified.
-  AtomicString value(m_fontElement->getAttribute(horiz_origin_xAttr));
-  if (value.isEmpty())
-    return 0.0f;
-
-  return value.toFloat();
+  return m_fontElement->getAttribute(horiz_origin_xAttr).toFloat();
 }
 
 float SVGFontFaceElement::horizontalOriginY() const {
@@ -173,11 +165,7 @@ float SVGFontFaceElement::horizontalOriginY() const {
   // glyphs in the font.)
   // If the attribute is not specified, the effect is as if a value of "0" were
   // specified.
-  AtomicString value(m_fontElement->getAttribute(horiz_origin_yAttr));
-  if (value.isEmpty())
-    return 0.0f;
-
-  return value.toFloat();
+  return m_fontElement->getAttribute(horiz_origin_yAttr).toFloat();
 }
 
 float SVGFontFaceElement::horizontalAdvanceX() const {
@@ -189,11 +177,7 @@ float SVGFontFaceElement::horizontalAdvanceX() const {
   // widths are required to be non-negative, even if the glyph is typically
   // rendered right-to-left,
   // as in Hebrew and Arabic scripts.
-  AtomicString value(m_fontElement->getAttribute(horiz_adv_xAttr));
-  if (value.isEmpty())
-    return 0.0f;
-
-  return value.toFloat();
+  return m_fontElement->getAttribute(horiz_adv_xAttr).toFloat();
 }
 
 float SVGFontFaceElement::verticalOriginX() const {
@@ -205,7 +189,7 @@ float SVGFontFaceElement::verticalOriginX() const {
   // drawing vertically oriented text. If the attribute is not specified, the
   // effect is as if the attribute
   // were set to half of the effective value of attribute horiz-adv-x.
-  AtomicString value(m_fontElement->getAttribute(vert_origin_xAttr));
+  const AtomicString& value = m_fontElement->getAttribute(vert_origin_xAttr);
   if (value.isEmpty())
     return horizontalAdvanceX() / 2.0f;
 
@@ -221,7 +205,7 @@ float SVGFontFaceElement::verticalOriginY() const {
   // drawing vertically oriented text. If the attribute is not specified, the
   // effect is as if the attribute
   // were set to the position specified by the font's ascent attribute.
-  AtomicString value(m_fontElement->getAttribute(vert_origin_yAttr));
+  const AtomicString& value = m_fontElement->getAttribute(vert_origin_yAttr);
   if (value.isEmpty())
     return ascent();
 
@@ -236,7 +220,7 @@ float SVGFontFaceElement::verticalAdvanceY() const {
   // orientation. If the attribute is
   // not specified, the effect is as if a value equivalent of one em were
   // specified (see units-per-em).
-  AtomicString value(m_fontElement->getAttribute(vert_adv_yAttr));
+  const AtomicString& value = m_fontElement->getAttribute(vert_adv_yAttr);
   if (value.isEmpty())
     return 1.0f;
 
@@ -244,9 +228,6 @@ float SVGFontFaceElement::verticalAdvanceY() const {
 }
 
 int SVGFontFaceElement::ascent() const {
-  if (!m_fontElement)
-    return 0.0f;
-
   // Spec: Same syntax and semantics as the 'ascent' descriptor within an
   // @font-face rule. The maximum
   // unaccented height of the font within the font coordinate system. If the
@@ -254,40 +235,45 @@ int SVGFontFaceElement::ascent() const {
   // the effect is as if the attribute were set to the difference between the
   // units-per-em value and the
   // vert-origin-y value for the corresponding font.
-  AtomicString value(m_fontElement->getAttribute(ascentAttr));
-  if (!value.isEmpty())
-    return static_cast<int>(ceilf(value.toFloat()));
+  const AtomicString& ascentValue = getAttribute(ascentAttr);
+  if (!ascentValue.isEmpty())
+    return static_cast<int>(ceilf(ascentValue.toFloat()));
 
-  value = m_fontElement->getAttribute(vert_origin_yAttr);
-  if (!value.isEmpty())
-    return static_cast<int>(unitsPerEm()) -
-           static_cast<int>(ceilf(value.toFloat()));
+  if (m_fontElement) {
+    const AtomicString& vertOriginY =
+        m_fontElement->getAttribute(vert_origin_yAttr);
+    if (!vertOriginY.isEmpty())
+      return static_cast<int>(unitsPerEm()) -
+             static_cast<int>(ceilf(vertOriginY.toFloat()));
+  }
 
   // Match Batiks default value
   return static_cast<int>(ceilf(unitsPerEm() * 0.8f));
 }
 
 int SVGFontFaceElement::descent() const {
-  if (!m_fontElement)
-    return 0.0f;
-
   // Spec: Same syntax and semantics as the 'descent' descriptor within an
   // @font-face rule. The maximum
   // unaccented depth of the font within the font coordinate system. If the
   // attribute is not specified,
   // the effect is as if the attribute were set to the vert-origin-y value for
   // the corresponding font.
-  AtomicString value(m_fontElement->getAttribute(descentAttr));
-  if (!value.isEmpty()) {
-    // Some testcases use a negative descent value, where a positive was meant
-    // to be used :(
-    int descent = static_cast<int>(ceilf(value.toFloat()));
+  const AtomicString& descentValue = getAttribute(descentAttr);
+  if (!descentValue.isEmpty()) {
+    // 14 different W3C SVG 1.1 testcases use a negative descent value,
+    // where a positive was meant to be used  Including:
+    // animate-elem-24-t.svg, fonts-elem-01-t.svg, fonts-elem-02-t.svg (and 11
+    // others)
+    int descent = static_cast<int>(ceilf(descentValue.toFloat()));
     return descent < 0 ? -descent : descent;
   }
 
-  value = m_fontElement->getAttribute(vert_origin_yAttr);
-  if (!value.isEmpty())
-    return static_cast<int>(ceilf(value.toFloat()));
+  if (m_fontElement) {
+    const AtomicString& vertOriginY =
+        m_fontElement->getAttribute(vert_origin_yAttr);
+    if (!vertOriginY.isEmpty())
+      return static_cast<int>(ceilf(vertOriginY.toFloat()));
+  }
 
   // Match Batiks default value
   return static_cast<int>(ceilf(unitsPerEm() * 0.2f));
