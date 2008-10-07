@@ -76,8 +76,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   void setFrame(QWebFrame* webFrame, Frame* frame);
   QWebFrame* webFrame() const;
 
-  virtual bool hasWebView() const;    // mainly for assertions
-  virtual bool hasFrameView() const;  // ditto
+  virtual bool hasWebView() const;  // mainly for assertions
 
   virtual void makeRepresentation(DocumentLoader*);
   virtual void forceLayout();
