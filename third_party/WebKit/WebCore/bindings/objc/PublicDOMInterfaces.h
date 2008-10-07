@@ -148,7 +148,7 @@
                         pseudoElement:(NSString*)pseudoElement
                            authorOnly:(BOOL)authorOnly;
 - (DOMNodeList*)getElementsByName:(NSString*)elementName;
-#ifdef ENABLE_XPATH
+#if ENABLE_XPATH
 - (DOMXPathExpression*)createExpression:(NSString*)
                              expression:(id<DOMXPathNSResolver>)resolver;
 - (DOMXPathExpression*)createExpression:(NSString*)expression
