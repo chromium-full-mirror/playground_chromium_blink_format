@@ -60,8 +60,7 @@ class FrameLoaderClientWx : public FrameLoaderClient,
   virtual void ref();
   virtual void deref();
 
-  virtual bool hasWebView() const;    // mainly for assertions
-  virtual bool hasFrameView() const;  // ditto
+  virtual bool hasWebView() const;  // mainly for assertions
 
   virtual bool hasBackForwardList() const;
   virtual void resetBackForwardList();

@@ -99,11 +99,6 @@ bool FrameLoaderClientWx::hasWebView() const {
   return true;
 }
 
-bool FrameLoaderClientWx::hasFrameView() const {
-  notImplemented();
-  return true;
-}
-
 bool FrameLoaderClientWx::hasBackForwardList() const {
   notImplemented();
   return true;

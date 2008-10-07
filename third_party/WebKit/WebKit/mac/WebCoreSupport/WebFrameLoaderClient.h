@@ -60,8 +60,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   void receivedPolicyDecison(WebCore::PolicyAction);
 
  private:
-  virtual bool hasWebView() const;    // mainly for assertions
-  virtual bool hasFrameView() const;  // ditto
+  virtual bool hasWebView() const;  // mainly for assertions
 
   virtual void makeRepresentation(WebCore::DocumentLoader*);
   virtual bool hasHTMLView() const;

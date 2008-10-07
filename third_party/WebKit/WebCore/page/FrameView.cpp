@@ -37,6 +37,7 @@
 #include "FrameLoaderClient.h"
 #include "GraphicsContext.h"
 #include "HTMLDocument.h"
+#include "HTMLFrameElement.h"
 #include "HTMLFrameSetElement.h"
 #include "HTMLNames.h"
 #include "OverflowEvent.h"
@@ -164,7 +165,6 @@ FrameView::FrameView(Frame* frame)
   show();
 }
 
-#if !PLATFORM(MAC)
 FrameView::FrameView(Frame* frame, const IntSize& initialSize)
     : m_refCount(1), m_frame(frame), d(new FrameViewPrivate(this)) {
   init();
@@ -172,7 +172,6 @@ FrameView::FrameView(Frame* frame, const IntSize& initialSize)
       IntRect(x(), y(), initialSize.width(), initialSize.height()));
   show();
 }
-#endif
 
 FrameView::~FrameView() {
   if (d->m_postLayoutTasksTimer.isActive()) {
@@ -222,6 +221,22 @@ void FrameView::resetScrollbars() {
 void FrameView::init() {
   m_margins = IntSize(-1, -1);  // undefined
   m_size = IntSize();
+
+  // Propagate the marginwidth/height and scrolling modes to the view.
+  Element* ownerElement =
+      m_frame && m_frame->document() ? m_frame->document()->ownerElement() : 0;
+  if (ownerElement && (ownerElement->hasTagName(frameTag) ||
+                       ownerElement->hasTagName(iframeTag))) {
+    HTMLFrameElement* frameElt = static_cast<HTMLFrameElement*>(ownerElement);
+    if (frameElt->scrollingMode() == ScrollbarAlwaysOff)
+      setCanHaveScrollbars(false);
+    int marginWidth = frameElt->getMarginWidth();
+    int marginHeight = frameElt->getMarginHeight();
+    if (marginWidth != -1)
+      setMarginWidth(marginWidth);
+    if (marginHeight != -1)
+      setMarginHeight(marginHeight);
+  }
 }
 
 void FrameView::clear() {
@@ -1169,7 +1184,6 @@ void FrameView::setNodeToDraw(Node* node) {
   d->m_nodeToDraw = node;
 }
 
-#if PLATFORM(WIN) || PLATFORM(GTK) || PLATFORM(QT)
 void FrameView::layoutIfNeededRecursive() {
   // We have to crawl our entire tree looking for any FrameViews that need
   // layout and make sure they are up to date.
@@ -1194,5 +1208,4 @@ void FrameView::layoutIfNeededRecursive() {
     if ((*current)->isFrameView())
       static_cast<FrameView*>(*current)->layoutIfNeededRecursive();
 }
-#endif
 }

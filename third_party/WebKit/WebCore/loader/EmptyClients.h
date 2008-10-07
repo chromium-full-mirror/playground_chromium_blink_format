@@ -159,8 +159,7 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual ~EmptyFrameLoaderClient() {}
   virtual void frameLoaderDestroyed() {}
 
-  virtual bool hasWebView() const { return true; }    // mainly for assertions
-  virtual bool hasFrameView() const { return true; }  // ditto
+  virtual bool hasWebView() const { return true; }  // mainly for assertions
 
   virtual void makeRepresentation(DocumentLoader*) {}
   virtual void forceLayout() {}
