@@ -136,7 +136,7 @@ void JSObject::put(ExecState* exec,
   }
 
   unsigned attributes;
-  if ((m_structureID->propertyMap().get(propertyName, attributes) !=
+  if ((m_structureID->propertyMap().getOffset(propertyName, attributes) !=
        WTF::notFound) &&
       attributes & ReadOnly)
     return;
@@ -206,7 +206,7 @@ bool JSObject::hasProperty(ExecState* exec, unsigned propertyName) const {
 // ECMA 8.6.2.5
 bool JSObject::deleteProperty(ExecState* exec, const Identifier& propertyName) {
   unsigned attributes;
-  if (m_structureID->propertyMap().get(propertyName, attributes) !=
+  if (m_structureID->propertyMap().getOffset(propertyName, attributes) !=
       WTF::notFound) {
     if ((attributes & DontDelete))
       return false;
@@ -434,7 +434,7 @@ bool JSObject::propertyIsEnumerable(ExecState* exec,
 bool JSObject::getPropertyAttributes(ExecState* exec,
                                      const Identifier& propertyName,
                                      unsigned& attributes) const {
-  if (m_structureID->propertyMap().get(propertyName, attributes) !=
+  if (m_structureID->propertyMap().getOffset(propertyName, attributes) !=
       WTF::notFound)
     return true;
 
@@ -484,21 +484,15 @@ JSGlobalObject* JSObject::toGlobalObject(ExecState*) const {
 }
 
 void JSObject::removeDirect(const Identifier& propertyName) {
-  size_t offset;
   if (m_structureID->isDictionary()) {
-    offset = m_structureID->propertyMap().remove(propertyName);
-    if (offset != WTF::notFound) {
-      m_propertyStorage[offset] = jsUndefined();
-      m_structureID->clearEnumerationCache();
-    }
+    m_structureID->propertyMap().remove(propertyName, m_propertyStorage);
+    m_structureID->clearEnumerationCache();
     return;
   }
 
   RefPtr<StructureID> structureID =
       StructureID::toDictionaryTransition(m_structureID);
-  offset = structureID->propertyMap().remove(propertyName);
-  if (offset != WTF::notFound)
-    m_propertyStorage[offset] = jsUndefined();
+  structureID->propertyMap().remove(propertyName, m_propertyStorage);
   setStructureID(structureID.release());
 }
 
@@ -524,8 +518,6 @@ StructureID* JSObject::createInheritorID() {
 }
 
 void JSObject::allocatePropertyStorage(size_t oldSize, size_t newSize) {
-  ASSERT(newSize > oldSize);
-
   JSValue** oldPropertStorage = m_propertyStorage;
   m_propertyStorage = new JSValue*[newSize];
 

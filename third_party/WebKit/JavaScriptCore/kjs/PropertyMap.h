@@ -42,12 +42,10 @@ typedef JSValue** PropertyStorage;
 
 struct PropertyMapEntry {
   UString::Rep* key;
-  unsigned offset;
   unsigned attributes;
   unsigned index;
 
-  PropertyMapEntry(UString::Rep* k, int a)
-      : key(k), offset(0), attributes(a), index(0) {}
+  PropertyMapEntry(UString::Rep* k, int a) : key(k), attributes(a), index(0) {}
 };
 
 // lastIndexUsed is an ever-increasing index used to identify the order items
@@ -91,10 +89,17 @@ class PropertyMap {
 
   bool isEmpty() { return !m_table; }
 
-  size_t get(const Identifier& propertyName);
-  size_t get(const Identifier& propertyName, unsigned& attributes);
-  size_t put(const Identifier& propertyName, unsigned attributes);
-  size_t remove(const Identifier& propertyName);
+  size_t put(const Identifier& propertyName,
+             JSValue*,
+             unsigned attributes,
+             bool checkReadOnly,
+             JSObject* slotBase,
+             PutPropertySlot&,
+             PropertyStorage&);
+  void remove(const Identifier& propertyName, PropertyStorage&);
+
+  size_t getOffset(const Identifier& propertyName);
+  size_t getOffset(const Identifier& propertyName, unsigned& attributes);
 
   void getEnumerablePropertyNames(PropertyNameArray&) const;
 
@@ -112,23 +117,22 @@ class PropertyMap {
   typedef PropertyMapEntry Entry;
   typedef PropertyMapHashTable Table;
 
-  void expand();
-  void rehash();
-  void rehash(unsigned newTableSize);
-  void createTable();
+  void expand(PropertyStorage&);
+  void rehash(PropertyStorage&);
+  void rehash(unsigned newTableSize, PropertyStorage&);
+  void createTable(PropertyStorage&);
 
-  void insert(const Entry&);
+  void insert(const Entry&, JSValue*, PropertyStorage&);
 
-  void checkConsistency();
+  void checkConsistency(PropertyStorage&);
 
   Table* m_table;
-  Vector<unsigned> m_deletedOffsets;
   bool m_getterSetterFlag : 1;
 };
 
 inline PropertyMap::PropertyMap() : m_table(0), m_getterSetterFlag(false) {}
 
-inline size_t PropertyMap::get(const Identifier& propertyName) {
+inline size_t PropertyMap::getOffset(const Identifier& propertyName) {
   ASSERT(!propertyName.isNull());
 
   if (!m_table)
@@ -147,7 +151,7 @@ inline size_t PropertyMap::get(const Identifier& propertyName) {
     return WTF::notFound;
 
   if (rep == m_table->entries()[entryIndex - 1].key)
-    return m_table->entries()[entryIndex - 1].offset;
+    return entryIndex - 2;
 
 #if DUMP_PROPERTYMAP_STATS
   ++numCollisions;
@@ -167,7 +171,7 @@ inline size_t PropertyMap::get(const Identifier& propertyName) {
       return WTF::notFound;
 
     if (rep == m_table->entries()[entryIndex - 1].key)
-      return m_table->entries()[entryIndex - 1].offset;
+      return entryIndex - 2;
   }
 }
 

@@ -2977,6 +2977,11 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
           }
 
           baseObject->transitionTo(newStructureID);
+          if (oldStructureID->propertyMap().storageSize() ==
+              JSObject::inlineStorageCapacity)
+            baseObject->allocatePropertyStorage(
+                oldStructureID->propertyMap().storageSize(),
+                oldStructureID->propertyMap().size());
 
           int value = vPC[3].u.operand;
           unsigned offset = vPC[7].u.operand;
