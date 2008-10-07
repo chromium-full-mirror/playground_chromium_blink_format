@@ -31,6 +31,7 @@
 #include "GraphicsContext.h"
 #include "PlatformMouseEvent.h"
 #include "Scrollbar.h"
+#include "ScrollView.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -123,6 +124,11 @@ static QStyleOptionSlider* styleOptionSlider(Scrollbar* scrollbar) {
 bool ScrollbarThemeQt::paint(Scrollbar* scrollbar,
                              GraphicsContext* graphicsContext,
                              const IntRect& damageRect) {
+  if (graphicsContext->updatingControlTints()) {
+    scrollbar->invalidateRect(damageRect);
+    return false;
+  }
+
   QStyleOptionSlider* opt = styleOptionSlider(scrollbar);
   QRect clip = opt->rect.intersected(damageRect);
 
@@ -214,9 +220,14 @@ int ScrollbarThemeQt::trackLength(Scrollbar* scrollbar) {
                                                          : track.height();
 }
 
-void ScrollbarThemeQt::paintScrollCorner(ScrollView*,
+void ScrollbarThemeQt::paintScrollCorner(ScrollView* scrollView,
                                          GraphicsContext* context,
                                          const IntRect& rect) {
+  if (context->updatingControlTints()) {
+    scrollView->invalidateRect(rect);
+    return;
+  }
+
 #if QT_VERSION < 0x040500
   context->fillRect(
       rect, QApplication::palette().color(QPalette::Normal, QPalette::Window));
