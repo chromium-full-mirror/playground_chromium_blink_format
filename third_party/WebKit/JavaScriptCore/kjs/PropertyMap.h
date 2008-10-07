@@ -96,9 +96,6 @@ class PropertyMap {
 
   void getEnumerablePropertyNames(PropertyNameArray&) const;
 
-  bool hasGetterSetterProperties() const { return m_getterSetterFlag; }
-  void setHasGetterSetterProperties(bool f) { m_getterSetterFlag = f; }
-
   bool isEmpty() { return !m_table; }
   unsigned storageSize() const {
     return m_table ? m_table->keyCount + m_deletedOffsets.size() : 0;

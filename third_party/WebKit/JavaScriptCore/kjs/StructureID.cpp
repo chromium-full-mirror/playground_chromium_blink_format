@@ -39,6 +39,7 @@ namespace JSC {
 StructureID::StructureID(JSValue* prototype, const TypeInfo& typeInfo)
     : m_typeInfo(typeInfo),
       m_isDictionary(false),
+      m_hasGetterSetterProperties(false),
       m_prototype(prototype),
       m_cachedPrototypeChain(0),
       m_previous(0),
@@ -146,6 +147,8 @@ PassRefPtr<StructureID> StructureID::addPropertyTransition(
   transition->m_propertyMap = structureID->m_propertyMap;
   transition->m_propertyStorageCapacity =
       structureID->m_propertyStorageCapacity;
+  transition->m_hasGetterSetterProperties =
+      structureID->m_hasGetterSetterProperties;
 
   offset = transition->m_propertyMap.put(propertyName, attributes);
   if (transition->m_propertyMap.storageSize() >
@@ -169,6 +172,8 @@ PassRefPtr<StructureID> StructureID::toDictionaryTransition(
   transition->m_propertyMap = structureID->m_propertyMap;
   transition->m_propertyStorageCapacity =
       structureID->m_propertyStorageCapacity;
+  transition->m_hasGetterSetterProperties =
+      structureID->m_hasGetterSetterProperties;
   return transition.release();
 }
 
@@ -191,6 +196,8 @@ PassRefPtr<StructureID> StructureID::changePrototypeTransition(
   transition->m_propertyMap = structureID->m_propertyMap;
   transition->m_propertyStorageCapacity =
       structureID->m_propertyStorageCapacity;
+  transition->m_hasGetterSetterProperties =
+      structureID->m_hasGetterSetterProperties;
   return transition.release();
 }
 
@@ -202,6 +209,8 @@ PassRefPtr<StructureID> StructureID::getterSetterTransition(
   transition->m_propertyMap = structureID->m_propertyMap;
   transition->m_propertyStorageCapacity =
       structureID->m_propertyStorageCapacity;
+  transition->m_hasGetterSetterProperties =
+      transition->m_hasGetterSetterProperties;
   return transition.release();
 }
 

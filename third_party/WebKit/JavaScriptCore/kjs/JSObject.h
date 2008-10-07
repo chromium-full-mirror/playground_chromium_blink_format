@@ -170,7 +170,7 @@ class JSObject : public JSCell {
   void removeDirect(const Identifier& propertyName);
   bool hasCustomProperties() { return !m_structureID->propertyMap().isEmpty(); }
   bool hasGetterSetterProperties() {
-    return m_structureID->propertyMap().hasGetterSetterProperties();
+    return m_structureID->hasGetterSetterProperties();
   }
 
   void putDirect(const Identifier& propertyName,
@@ -355,7 +355,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlotForWrite(
     bool& slotIsWriteable) {
   unsigned attributes;
   if (JSValue** location = getDirectLocation(propertyName, attributes)) {
-    if (m_structureID->propertyMap().hasGetterSetterProperties() &&
+    if (m_structureID->hasGetterSetterProperties() &&
         location[0]->isGetterSetter()) {
       slotIsWriteable = false;
       fillGetterPropertySlot(slot, location);
@@ -385,7 +385,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlot(ExecState* exec,
                                                 const Identifier& propertyName,
                                                 PropertySlot& slot) {
   if (JSValue** location = getDirectLocation(propertyName)) {
-    if (m_structureID->propertyMap().hasGetterSetterProperties() &&
+    if (m_structureID->hasGetterSetterProperties() &&
         location[0]->isGetterSetter())
       fillGetterPropertySlot(slot, location);
     else

@@ -142,6 +142,11 @@ class StructureID : public RefCounted<StructureID> {
   void getEnumerablePropertyNames(ExecState*, PropertyNameArray&, JSObject*);
   void clearEnumerationCache();
 
+  bool hasGetterSetterProperties() const { return m_hasGetterSetterProperties; }
+  void setHasGetterSetterProperties(bool hasGetterSetterProperties) {
+    m_hasGetterSetterProperties = hasGetterSetterProperties;
+  }
+
  private:
   typedef std::pair<RefPtr<UString::Rep>, unsigned> TransitionTableKey;
   typedef HashMap<TransitionTableKey,
@@ -157,6 +162,8 @@ class StructureID : public RefCounted<StructureID> {
   TypeInfo m_typeInfo;
 
   bool m_isDictionary;
+
+  bool m_hasGetterSetterProperties;
 
   JSValue* m_prototype;
   RefPtr<StructureIDChain> m_cachedPrototypeChain;
