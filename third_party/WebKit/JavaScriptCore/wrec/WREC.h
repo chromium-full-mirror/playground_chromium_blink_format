@@ -137,7 +137,7 @@ class WRECGenerator {
     inverted_assertion
   };  // order is relied on in generateParentheses()
   JmpSrc generateParentheses(ParenthesesType type);
-  JmpSrc gererateParenthesesResetTrampoline(JmpSrcVector& newFailures,
+  JmpSrc generateParenthesesResetTrampoline(JmpSrcVector& newFailures,
                                             unsigned subpatternIdBefore,
                                             unsigned subpatternIdAfter);
   void generateParenthesesNonGreedy(JmpSrcVector& failures,

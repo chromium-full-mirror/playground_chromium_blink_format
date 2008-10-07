@@ -592,7 +592,7 @@ void WRECGenerator::generateParenthesesNonGreedy(JmpSrcVector& failures,
   failures.append(fail);
 }
 
-WRECGenerator::JmpSrc WRECGenerator::gererateParenthesesResetTrampoline(
+WRECGenerator::JmpSrc WRECGenerator::generateParenthesesResetTrampoline(
     JmpSrcVector& newFailures,
     unsigned subpatternIdBefore,
     unsigned subpatternIdAfter) {
