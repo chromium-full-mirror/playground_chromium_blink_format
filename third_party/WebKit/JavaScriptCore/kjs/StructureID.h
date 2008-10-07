@@ -94,11 +94,8 @@ class StructureID : public RefCounted<StructureID> {
   static PassRefPtr<StructureID> addPropertyTransition(
       StructureID*,
       const Identifier& propertyName,
-      JSValue*,
       unsigned attributes,
-      JSObject* slotBase,
-      PutPropertySlot&,
-      PropertyStorage&);
+      size_t& offset);
   static PassRefPtr<StructureID> getterSetterTransition(StructureID*);
   static PassRefPtr<StructureID> toDictionaryTransition(StructureID*);
   static PassRefPtr<StructureID> fromDictionaryTransition(StructureID*);
@@ -139,12 +136,11 @@ class StructureID : public RefCounted<StructureID> {
   }
   size_t cachedTransistionOffset() const { return m_cachedTransistionOffset; }
 
+  void growPropertyStorageCapacity();
+  size_t propertyStorageCapacity() const { return m_propertyStorageCapacity; }
+
   void getEnumerablePropertyNames(ExecState*, PropertyNameArray&, JSObject*);
   void clearEnumerationCache();
-
-  static void transitionTo(StructureID* oldStructureID,
-                           StructureID* newStructureID,
-                           JSObject* slotBase);
 
  private:
   typedef std::pair<RefPtr<UString::Rep>, unsigned> TransitionTableKey;
@@ -175,6 +171,7 @@ class StructureID : public RefCounted<StructureID> {
   RefPtr<PropertyNameArrayData> m_cachedPropertyNameArrayData;
 
   PropertyMap m_propertyMap;
+  size_t m_propertyStorageCapacity;
 
   size_t m_cachedTransistionOffset;
 };
