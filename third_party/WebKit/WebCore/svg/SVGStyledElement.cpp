@@ -188,6 +188,9 @@ bool SVGStyledElement::isKnownAttribute(const QualifiedName& attrName) {
 void SVGStyledElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGElement::svgAttributeChanged(attrName);
 
+  if (attrName == HTMLNames::classAttr)
+    classAttributeChanged(className());
+
   // If we're the child of a resource element, be sure to invalidate it.
   invalidateResourcesInAncestorChain();
 
