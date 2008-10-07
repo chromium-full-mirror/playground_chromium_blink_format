@@ -148,6 +148,22 @@
                         pseudoElement:(NSString*)pseudoElement
                            authorOnly:(BOOL)authorOnly;
 - (DOMNodeList*)getElementsByName:(NSString*)elementName;
+- (DOMNodeIterator*)createNodeIterator:(DOMNode*)root
+                            whatToShow:(unsigned)whatToShow
+                                filter:(id<DOMNodeFilter>)filter
+                expandEntityReferences:(BOOL)expandEntityReferences;
+- (DOMTreeWalker*)createTreeWalker:(DOMNode*)root
+                        whatToShow:(unsigned)whatToShow
+                            filter:(id<DOMNodeFilter>)filter
+            expandEntityReferences:(BOOL)expandEntityReferences;
+- (DOMNodeIterator*)createNodeIterator:(DOMNode*)
+                                  root:(unsigned)
+                            whatToShow:(id<DOMNodeFilter>)
+                                filter:(BOOL)expandEntityReferences;
+- (DOMTreeWalker*)createTreeWalker:(DOMNode*)
+                              root:(unsigned)
+                        whatToShow:(id<DOMNodeFilter>)
+                            filter:(BOOL)expandEntityReferences;
 #if ENABLE_XPATH
 - (DOMXPathExpression*)createExpression:(NSString*)
                              expression:(id<DOMXPathNSResolver>)resolver;
