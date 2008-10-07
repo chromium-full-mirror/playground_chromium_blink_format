@@ -762,8 +762,6 @@ void Machine::dumpRegisters(const RegisterFile* registerFile,
   ++it;
   printf("[Callee]                   | %10p | %10p \n", it, (*it).v());
   ++it;
-  printf("[OptionalCalleeActivation] | %10p | %10p \n", it, (*it).v());
-  ++it;
   printf("[OptionalCalleeArguments]  | %10p | %10p \n", it, (*it).v());
   ++it;
   printf("----------------------------------------------------\n");
@@ -850,17 +848,19 @@ NEVER_INLINE bool Machine::unwindCallFrame(ExecState*& exec,
                            codeBlock->ownerNode->lineNo());
   }
 
-  if (oldCodeBlock->needsFullScopeChain)
-    scopeChain->deref();
-
   // If this call frame created an activation or an 'arguments' object, tear it
   // off.
-  if (JSActivation* activation = static_cast<JSActivation*>(
-          r[RegisterFile::OptionalCalleeActivation].getJSValue())) {
+  if (oldCodeBlock->codeType == FunctionCode &&
+      oldCodeBlock->needsFullScopeChain) {
+    while (!scopeChain->object->isObject(&JSActivation::info))
+      scopeChain = scopeChain->pop();
+    JSActivation* activation = static_cast<JSActivation*>(scopeChain->object);
     ASSERT(activation->isObject(&JSActivation::info));
+
     Arguments* arguments = static_cast<Arguments*>(
         r[RegisterFile::OptionalCalleeArguments].getJSValue());
     ASSERT(!arguments || arguments->isObject(&Arguments::info));
+
     activation->copyRegisters(arguments);
   } else if (Arguments* arguments = static_cast<Arguments*>(
                  r[RegisterFile::OptionalCalleeArguments].getJSValue())) {
@@ -868,6 +868,9 @@ NEVER_INLINE bool Machine::unwindCallFrame(ExecState*& exec,
     if (!arguments->isTornOff())
       arguments->copyRegisters();
   }
+
+  if (oldCodeBlock->needsFullScopeChain)
+    scopeChain->deref();
 
   void* returnPC = r[RegisterFile::ReturnPC].v();
   r = r[RegisterFile::CallerRegisters].r();
@@ -3646,8 +3649,9 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       goto vm_throw;
     }
     BEGIN_OPCODE(op_tear_off_activation) {
-      JSActivation* activation = static_cast<JSActivation*>(
-          r[RegisterFile::OptionalCalleeActivation].getJSValue());
+      int src = (++vPC)->u.operand;
+      JSActivation* activation =
+          static_cast<JSActivation*>(r[src].getJSValue());
       ASSERT(codeBlock(r)->needsFullScopeChain);
       ASSERT(activation->isObject(&JSActivation::info));
 
@@ -3728,14 +3732,13 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       NEXT_OPCODE;
     }
     BEGIN_OPCODE(op_enter_with_activation) {
-      /* enter_with_activation
+      /* enter_with_activation dst(r)
 
          Initializes local variables to undefined, fills constant
          registers with their values, creates an activation object,
-         and places the new activation both in the activation slot
-         in the call frame and at the top of the scope chain. If the
-         code block does not require an activation, enter should be
-         used instead.
+         and places the new activation both in dst and at the top
+         of the scope chain. If the code block does not require an
+         activation, enter should be used instead.
 
          This opcode should only be used at the beginning of a code
          block.
@@ -3751,9 +3754,10 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
            ++i, ++j)
         r[i] = codeBlock->constantRegisters[j];
 
+      int dst = (++vPC)->u.operand;
       JSActivation* activation = new (globalData) JSActivation(
           exec, static_cast<FunctionBodyNode*>(codeBlock->ownerNode), r);
-      r[RegisterFile::OptionalCalleeActivation] = activation;
+      r[dst] = activation;
       r[RegisterFile::ScopeChain] = scopeChain(r)->copy()->push(activation);
 
       ++vPC;
@@ -4961,7 +4965,6 @@ void* Machine::cti_op_call_JSFunction(CTI_ARGS) {
                                               // the sake of the "arguments"
                                               // object)
   r[RegisterFile::Callee] = ARG_src1;
-  r[RegisterFile::OptionalCalleeActivation] = nullJSValue;
   r[RegisterFile::OptionalCalleeArguments] = nullJSValue;
 
   ARG_setR(r);
@@ -4979,7 +4982,7 @@ void* Machine::cti_vm_compile(CTI_ARGS) {
   return codeBlock->ctiCode;
 }
 
-void Machine::cti_op_push_activation(CTI_ARGS) {
+JSValue* Machine::cti_op_push_activation(CTI_ARGS) {
   ExecState* exec = ARG_exec;
   Register* r = ARG_r;
   CodeBlock* codeBlock = Machine::codeBlock(r);
@@ -4987,8 +4990,8 @@ void Machine::cti_op_push_activation(CTI_ARGS) {
 
   JSActivation* activation = new (ARG_globalData) JSActivation(
       exec, static_cast<FunctionBodyNode*>(codeBlock->ownerNode), r);
-  r[RegisterFile::OptionalCalleeActivation] = activation;
   r[RegisterFile::ScopeChain] = scopeChain->copy()->push(activation);
+  return activation;
 }
 
 JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
@@ -5051,8 +5054,7 @@ void Machine::cti_op_create_arguments(CTI_ARGS) {
 void Machine::cti_op_tear_off_activation(CTI_ARGS) {
   Register* r = ARG_r;
 
-  JSActivation* activation = static_cast<JSActivation*>(
-      r[RegisterFile::OptionalCalleeActivation].getJSValue());
+  JSActivation* activation = static_cast<JSActivation*>(ARG_src1);
   ASSERT(codeBlock(r)->needsFullScopeChain);
   ASSERT(activation->isObject(&JSActivation::info));
 
@@ -5172,7 +5174,6 @@ void* Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
                                               // the sake of the "arguments"
                                               // object)
   r[RegisterFile::Callee] = constructor;
-  r[RegisterFile::OptionalCalleeActivation] = nullJSValue;
   r[RegisterFile::OptionalCalleeArguments] = nullJSValue;
 
   ARG_setR(r);

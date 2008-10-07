@@ -392,7 +392,9 @@ void CodeBlock::dump(ExecState* exec,
       break;
     }
     case op_enter_with_activation: {
-      printf("[%4d] enter_with_activation\n", location);
+      int r0 = (++it)->u.operand;
+      printf("[%4d] enter_with_activation %s\n", location,
+             registerName(r0).c_str());
       break;
     }
     case op_create_arguments: {
@@ -911,9 +913,7 @@ void CodeBlock::dump(ExecState* exec,
       break;
     }
     case op_tear_off_arguments: {
-      int r0 = (++it)->u.operand;
-      printf("[%4d] tear_off_arguments\t %s\n", location,
-             registerName(r0).c_str());
+      printf("[%4d] tear_off_arguments\n", location);
       break;
     }
     case op_ret: {

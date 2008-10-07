@@ -257,7 +257,7 @@ class Machine {
 
   static void* SFX_CALL cti_vm_throw(CTI_ARGS);
   static void* SFX_CALL cti_vm_compile(CTI_ARGS);
-  static void SFX_CALL cti_op_push_activation(CTI_ARGS);
+  static JSValue* SFX_CALL cti_op_push_activation(CTI_ARGS);
 
 #endif  // ENABLE(CTI)
 
@@ -429,7 +429,6 @@ ALWAYS_INLINE void Machine::initializeCallFrame(Register* callFrame,
   callFrame[RegisterFile::ArgumentCount] =
       argc;  // original argument count (for the sake of the "arguments" object)
   callFrame[RegisterFile::Callee] = function;
-  callFrame[RegisterFile::OptionalCalleeActivation] = nullJSValue;
   callFrame[RegisterFile::OptionalCalleeArguments] = nullJSValue;
 }
 
