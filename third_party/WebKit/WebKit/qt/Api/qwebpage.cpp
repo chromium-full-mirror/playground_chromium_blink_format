@@ -606,9 +606,13 @@ void QWebPagePrivate::contextMenuEvent(QContextMenuEvent* ev) {
     ownership is transferred to the caller.
  */
 QMenu* QWebPage::createStandardContextMenu() {
+#ifndef QT_NO_CONTEXTMENU
   QMenu* menu = d->currentContextMenu;
   d->currentContextMenu = 0;
   return menu;
+#else
+  return 0;
+#endif
 }
 
 #ifndef QT_NO_WHEELEVENT
