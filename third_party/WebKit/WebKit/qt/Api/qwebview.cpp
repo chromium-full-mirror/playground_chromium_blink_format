@@ -750,15 +750,17 @@ void QWebView::keyReleaseEvent(QKeyEvent* ev) {
 void QWebView::focusInEvent(QFocusEvent* ev) {
   if (d->page)
     d->page->event(ev);
-  QWidget::focusInEvent(ev);
+  else
+    QWidget::focusInEvent(ev);
 }
 
 /*! \reimp
 */
 void QWebView::focusOutEvent(QFocusEvent* ev) {
-  QWidget::focusOutEvent(ev);
   if (d->page)
     d->page->event(ev);
+  else
+    QWidget::focusOutEvent(ev);
 }
 
 /*! \reimp
