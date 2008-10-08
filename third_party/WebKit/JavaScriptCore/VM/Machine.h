@@ -156,11 +156,6 @@ class Machine {
   SamplingTool* m_sampler;
 
 #if ENABLE(CTI)
-#if COMPILER(MSVC)
-#define SFX_CALL __cdecl
-#else
-#define SFX_CALL
-#endif
 
   static void SFX_CALL cti_timeout_check(CTI_ARGS);
 

@@ -128,7 +128,7 @@ __declspec(naked) JSValue* ctiTrampoline(void* code,
             push edi;
             sub esp, 0x24;
             mov esi, 512;
-            mov [esp], esp;
+            mov ecx, esp;
             mov edi, [esp + 0x38];
             call [esp + 0x30];
             add esp, 0x24;
@@ -140,7 +140,7 @@ __declspec(naked) JSValue* ctiTrampoline(void* code,
 
 __declspec(naked) void ctiVMThrowTrampoline() {
   __asm {
-            mov [esp], esp;
+            mov ecx, esp;
             call JSC::Machine::cti_vm_throw;
             add esp, 0x24;
             pop edi;
@@ -3117,10 +3117,10 @@ void CTI::privateCompilePutByIdReplace(StructureID* structureID,
 
 extern "C" {
 
-static JSValue* SFX_CALL transitionObject(StructureID* newStructureID,
-                                          size_t cachedOffset,
-                                          JSObject* baseObject,
-                                          JSValue* value) {
+static JSValue* transitionObject(StructureID* newStructureID,
+                                 size_t cachedOffset,
+                                 JSObject* baseObject,
+                                 JSValue* value) {
   baseObject->transitionTo(newStructureID);
   baseObject->putDirectOffset(cachedOffset, value);
   return baseObject;
@@ -3209,11 +3209,20 @@ void CTI::privateCompilePutByIdTransition(StructureID* oldStructureID,
     m_jit.addl_i32r(4 * sizeof(void*), X86::esp);
   }
   m_jit.ret();
+
+  X86Assembler::JmpSrc failureJump;
+  if (failureCases.size()) {
+    for (unsigned i = 0; i < failureCases.size(); ++i)
+      m_jit.link(failureCases[i], m_jit.label());
+    m_jit.emitRestoreArgumentReferenceForTrampoline();
+    failureJump = m_jit.emitUnlinkedJmp();
+  }
+
   void* code = m_jit.copy();
   ASSERT(code);
 
-  for (unsigned i = 0; i < failureCases.size(); ++i)
-    X86Assembler::link(code, failureCases[i],
+  if (failureCases.size())
+    X86Assembler::link(code, failureJump,
                        reinterpret_cast<void*>(Machine::cti_op_put_by_id_fail));
 
   if (transitionWillNeedStorageRealloc(oldStructureID, newStructureID))
@@ -3357,10 +3366,14 @@ void CTI::privateCompilePatchGetArrayLength(void* returnAddress) {
   m_jit.movl_mr(OBJECT_OFFSET(ArrayStorage, m_length), X86::ecx, X86::ecx);
 
   m_jit.addl_rr(X86::ecx, X86::ecx);
-  X86Assembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJo();
+  X86Assembler::JmpSrc failureClobberedECX = m_jit.emitUnlinkedJo();
   m_jit.addl_i8r(1, X86::ecx);
 
   X86Assembler::JmpSrc success = m_jit.emitUnlinkedJmp();
+
+  m_jit.link(failureClobberedECX, m_jit.label());
+  m_jit.emitRestoreArgumentReference();
+  X86Assembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJmp();
 
   void* code = m_jit.copy();
   ASSERT(code);

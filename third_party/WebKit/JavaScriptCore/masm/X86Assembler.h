@@ -911,10 +911,25 @@ class X86Assembler {
     movl_mr(12, X86::esp, X86::ecx);
   }
 
-  void emitRestoreArgumentReference() { movl_rm(X86::esp, 0, X86::esp); }
+  void emitRestoreArgumentReference() {
+#if USE(FAST_CALL_CTI_ARGUMENT)
+    movl_rr(X86::esp, X86::ecx);
+#else
+    movl_rm(X86::esp, 0, X86::esp);
+#endif
+  }
+
+  void emitRestoreArgumentReferenceForTrampoline() {
+#if USE(FAST_CALL_CTI_ARGUMENT)
+    movl_rr(X86::esp, X86::ecx);
+    addl_i32r(4, X86::ecx);
+#else
+#endif
+  }
 #else
   void emitConvertToFastCall(){};
   void emitRestoreArgumentReference(){};
+  void emitRestoreArgumentReferenceForTrampoline(){};
 #endif
 
  private:
