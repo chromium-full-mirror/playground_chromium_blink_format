@@ -44,7 +44,6 @@ namespace JSC {
 
 class CodeBlock;
 class EvalNode;
-class ExecState;
 class FunctionBodyNode;
 class Instruction;
 class InternalFunction;
@@ -95,39 +94,32 @@ class Machine {
   bool isOpcode(Opcode opcode);
 
   JSValue* execute(ProgramNode*,
-                   ExecState*,
+                   CallFrame*,
                    ScopeChainNode*,
                    JSObject* thisObj,
                    JSValue** exception);
   JSValue* execute(FunctionBodyNode*,
-                   ExecState*,
+                   CallFrame*,
                    JSFunction*,
                    JSObject* thisObj,
                    const ArgList& args,
                    ScopeChainNode*,
                    JSValue** exception);
   JSValue* execute(EvalNode* evalNode,
-                   ExecState* exec,
+                   CallFrame* exec,
                    JSObject* thisObj,
                    ScopeChainNode* scopeChain,
                    JSValue** exception);
 
-  JSValue* retrieveArguments(ExecState*, JSFunction*) const;
-  JSValue* retrieveCaller(ExecState*, InternalFunction*) const;
-  void retrieveLastCaller(ExecState* exec,
+  JSValue* retrieveArguments(CallFrame*, JSFunction*) const;
+  JSValue* retrieveCaller(CallFrame*, InternalFunction*) const;
+  void retrieveLastCaller(CallFrame*,
                           int& lineNumber,
                           intptr_t& sourceID,
                           UString& sourceURL,
                           JSValue*& function) const;
 
-  static ScopeChainNode* scopeChain(const Register* r) {
-    return r[RegisterFile::ScopeChain].scopeChain();
-  }
-  static CodeBlock* codeBlock(const Register* r) {
-    return r[RegisterFile::CodeBlock].codeBlock();
-  }
-
-  void getArgumentsData(Register* callFrame,
+  void getArgumentsData(CallFrame*,
                         JSFunction*&,
                         ptrdiff_t& firstParameterIndex,
                         Register*& argv,
@@ -267,117 +259,100 @@ class Machine {
            v->asCell()->vptr() == m_jsStringVptr;
   }
 
-  ALWAYS_INLINE static void initializeCallFrame(Register* callFrame,
-                                                CodeBlock*,
-                                                Instruction*,
-                                                ScopeChainNode*,
-                                                Register* r,
-                                                int returnValueRegister,
-                                                int argc,
-                                                JSValue* function);
-
  private:
   enum ExecutionFlag { Normal, InitializeAndReturn };
 
-  NEVER_INLINE JSValue* callEval(ExecState* exec,
-                                 JSObject* thisObj,
-                                 ScopeChainNode* scopeChain,
+  NEVER_INLINE JSValue* callEval(CallFrame*,
+                                 JSObject* thisObject,
+                                 ScopeChainNode*,
                                  RegisterFile*,
-                                 Register* r,
                                  int argv,
                                  int argc,
                                  JSValue*& exceptionValue);
   JSValue* execute(EvalNode*,
-                   ExecState*,
-                   JSObject* thisObj,
+                   CallFrame*,
+                   JSObject* thisObject,
                    int registerOffset,
                    ScopeChainNode*,
                    JSValue** exception);
 
-  NEVER_INLINE void debug(ExecState*,
-                          Register*,
-                          DebugHookID,
-                          int firstLine,
-                          int lastLine);
+  NEVER_INLINE void debug(CallFrame*, DebugHookID, int firstLine, int lastLine);
 
-  NEVER_INLINE bool resolve(ExecState* exec,
-                            Instruction* vPC,
-                            Register* r,
-                            JSValue*& exceptionValue);
-  NEVER_INLINE bool resolveSkip(ExecState* exec,
-                                Instruction* vPC,
-                                Register* r,
+  NEVER_INLINE bool resolve(CallFrame*, Instruction*, JSValue*& exceptionValue);
+  NEVER_INLINE bool resolveSkip(CallFrame*,
+                                Instruction*,
                                 JSValue*& exceptionValue);
-  NEVER_INLINE bool resolveGlobal(ExecState* exec,
-                                  Instruction* vPC,
-                                  Register* r,
+  NEVER_INLINE bool resolveGlobal(CallFrame*,
+                                  Instruction*,
                                   JSValue*& exceptionValue);
-  NEVER_INLINE void resolveBase(ExecState* exec, Instruction* vPC, Register* r);
-  NEVER_INLINE bool resolveBaseAndProperty(ExecState* exec,
-                                           Instruction* vPC,
-                                           Register* r,
+  NEVER_INLINE void resolveBase(CallFrame*, Instruction* vPC);
+  NEVER_INLINE bool resolveBaseAndProperty(CallFrame*,
+                                           Instruction*,
                                            JSValue*& exceptionValue);
-  NEVER_INLINE ScopeChainNode* createExceptionScope(ExecState* exec,
-                                                    const Instruction* vPC,
-                                                    Register* r);
+  NEVER_INLINE ScopeChainNode* createExceptionScope(CallFrame*,
+                                                    const Instruction* vPC);
 
-  NEVER_INLINE bool unwindCallFrame(ExecState*&,
+  NEVER_INLINE bool unwindCallFrame(CallFrame*&,
                                     JSValue*,
                                     const Instruction*&,
-                                    CodeBlock*&,
-                                    Register*&);
-  NEVER_INLINE Instruction* throwException(ExecState*,
+                                    CodeBlock*&);
+  NEVER_INLINE Instruction* throwException(CallFrame*&,
                                            JSValue*&,
                                            const Instruction*,
-                                           Register*&,
                                            bool);
-  NEVER_INLINE bool resolveBaseAndFunc(ExecState* exec,
-                                       Instruction* vPC,
-                                       Register* r,
+  NEVER_INLINE bool resolveBaseAndFunc(CallFrame*,
+                                       Instruction*,
                                        JSValue*& exceptionValue);
 
-  Register* callFrame(ExecState*, InternalFunction*) const;
+  static ALWAYS_INLINE CallFrame* slideRegisterWindowForCall(
+      CodeBlock*,
+      RegisterFile*,
+      CallFrame*,
+      size_t registerOffset,
+      int argc);
+
+  static CallFrame* findFunctionCallFrame(CallFrame*, InternalFunction*);
 
   JSValue* privateExecute(ExecutionFlag,
                           RegisterFile*,
-                          Register*,
+                          CallFrame*,
                           JSValue** exception);
 
-  void dumpCallFrame(const RegisterFile*, const Register*);
-  void dumpRegisters(const RegisterFile*, const Register*);
+  void dumpCallFrame(const RegisterFile*, CallFrame*);
+  void dumpRegisters(const RegisterFile*, CallFrame*);
 
   JSValue* checkTimeout(JSGlobalObject*);
   void resetTimeoutCheck();
 
-  void tryCacheGetByID(ExecState*,
+  void tryCacheGetByID(CallFrame*,
                        CodeBlock*,
-                       Instruction* vPC,
+                       Instruction*,
                        JSValue* baseValue,
                        const Identifier& propertyName,
                        const PropertySlot&);
   void uncacheGetByID(CodeBlock*, Instruction* vPC);
-  void tryCachePutByID(ExecState* exec,
+  void tryCachePutByID(CallFrame*,
                        CodeBlock*,
-                       Instruction* vPC,
+                       Instruction*,
                        JSValue* baseValue,
                        const PutPropertySlot&);
   void uncachePutByID(CodeBlock*, Instruction* vPC);
 
 #if ENABLE(CTI)
-  void tryCTICacheGetByID(ExecState*,
+  void tryCTICacheGetByID(CallFrame*,
                           CodeBlock*,
                           void* returnAddress,
                           JSValue* baseValue,
                           const Identifier& propertyName,
                           const PropertySlot&);
-  void tryCTICachePutByID(ExecState*,
+  void tryCTICachePutByID(CallFrame*,
                           CodeBlock*,
                           void* returnAddress,
                           JSValue* baseValue,
                           const PutPropertySlot&);
 
-  void* getCTIArrayLengthTrampoline(ExecState*, CodeBlock*);
-  void* getCTIStringLengthTrampoline(ExecState*, CodeBlock*);
+  void* getCTIArrayLengthTrampoline(CallFrame*, CodeBlock*);
+  void* getCTIStringLengthTrampoline(CallFrame*, CodeBlock*);
 
   void* m_ctiArrayLengthTrampoline;
   void* m_ctiStringLengthTrampoline;
@@ -405,43 +380,6 @@ class Machine {
       m_opcodeIDTable;  // Maps Opcode => OpcodeID for decompiling
 #endif
 };
-
-ALWAYS_INLINE void Machine::initializeCallFrame(Register* callFrame,
-                                                CodeBlock* codeBlock,
-                                                Instruction* vPC,
-                                                ScopeChainNode* scopeChain,
-                                                Register* r,
-                                                int returnValueRegister,
-                                                int argc,
-                                                JSValue* function) {
-  ASSERT(r);  // use makeHostCallFramePointer(0) to create a host call frame
-              // sentinel.
-  callFrame[RegisterFile::CodeBlock] = codeBlock;
-  callFrame[RegisterFile::ScopeChain] = scopeChain;
-  callFrame[RegisterFile::CallerRegisters] = r;
-  callFrame[RegisterFile::ReturnPC] = vPC;
-  callFrame[RegisterFile::ReturnValueRegister] = returnValueRegister;
-  callFrame[RegisterFile::ArgumentCount] =
-      argc;  // original argument count (for the sake of the "arguments" object)
-  callFrame[RegisterFile::Callee] = function;
-  callFrame[RegisterFile::OptionalCalleeArguments] = nullJSValue;
-}
-
-const intptr_t HostCallFrameMask = 1;
-
-inline Register* makeHostCallFramePointer(Register* callFrame) {
-  return reinterpret_cast<Register*>(reinterpret_cast<intptr_t>(callFrame) |
-                                     HostCallFrameMask);
-}
-
-inline bool isHostCallFrame(Register* callFrame) {
-  return reinterpret_cast<intptr_t>(callFrame) & HostCallFrameMask;
-}
-
-inline Register* stripHostCallFrameBit(Register* callFrame) {
-  return reinterpret_cast<Register*>(reinterpret_cast<intptr_t>(callFrame) &
-                                     ~HostCallFrameMask);
-}
 
 }  // namespace JSC
 

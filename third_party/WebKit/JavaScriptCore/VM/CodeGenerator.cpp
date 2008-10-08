@@ -741,12 +741,12 @@ RegisterID* CodeGenerator::emitEqualityOp(OpcodeID opcode,
         static_cast<unsigned>(src2->index()) <
             m_codeBlock->constantRegisters.size() &&
         m_codeBlock->constantRegisters[src2->index()]
-            .jsValue(globalExec())
+            .jsValue(m_scopeChain->globalObject()->globalExec())
             ->isString()) {
       const UString& value =
           static_cast<JSString*>(
               m_codeBlock->constantRegisters[src2->index()].jsValue(
-                  globalExec()))
+                  m_scopeChain->globalObject()->globalExec()))
               ->value();
       if (value == "undefined") {
         rewindUnaryOp();
@@ -810,10 +810,10 @@ RegisterID* CodeGenerator::emitLoad(RegisterID* dst, double number) {
   // Later we can do the extra work to handle that like the other cases.
   if (number == HashTraits<double>::emptyValue() ||
       HashTraits<double>::isDeletedValue(number))
-    return emitLoad(dst, jsNumber(globalExec(), number));
+    return emitLoad(dst, jsNumber(globalData(), number));
   JSValue*& valueInMap = m_numberMap.add(number, 0).first->second;
   if (!valueInMap)
-    valueInMap = jsNumber(globalExec(), number);
+    valueInMap = jsNumber(globalData(), number);
   return emitLoad(dst, valueInMap);
 }
 
@@ -822,7 +822,7 @@ RegisterID* CodeGenerator::emitLoad(RegisterID* dst,
   JSString*& valueInMap =
       m_stringMap.add(identifier.ustring().rep(), 0).first->second;
   if (!valueInMap)
-    valueInMap = jsOwnedString(globalExec(), identifier.ustring());
+    valueInMap = jsOwnedString(globalData(), identifier.ustring());
   return emitLoad(dst, valueInMap);
 }
 
@@ -843,7 +843,7 @@ RegisterID* CodeGenerator::emitUnexpectedLoad(RegisterID* dst, bool b) {
 RegisterID* CodeGenerator::emitUnexpectedLoad(RegisterID* dst, double d) {
   emitOpcode(op_unexpected_load);
   instructions().append(dst->index());
-  instructions().append(addUnexpectedConstant(jsNumber(globalExec(), d)));
+  instructions().append(addUnexpectedConstant(jsNumber(globalData(), d)));
   return dst;
 }
 
@@ -1260,7 +1260,7 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
   // Load prototype.
   emitExpressionInfo(divot, startOffset, endOffset);
   RefPtr<RegisterID> funcProto = newTemporary();
-  emitGetById(funcProto.get(), func, globalExec()->propertyNames().prototype);
+  emitGetById(funcProto.get(), func, globalData()->propertyNames->prototype);
 
   // Generate code for arguments.
   Vector<RefPtr<RegisterID>, 16> argv;

@@ -45,8 +45,8 @@ Completion Interpreter::checkSyntax(ExecState* exec, const SourceCode& source) {
   int errLine;
   UString errMsg;
 
-  RefPtr<ProgramNode> progNode =
-      exec->parser()->parse<ProgramNode>(exec, source, &errLine, &errMsg);
+  RefPtr<ProgramNode> progNode = exec->globalData().parser->parse<ProgramNode>(
+      exec, source, &errLine, &errMsg);
   if (!progNode)
     return Completion(Throw, Error::create(exec, SyntaxError, errMsg, errLine,
                                            source.provider()->asID(),
@@ -63,7 +63,8 @@ Completion Interpreter::evaluate(ExecState* exec,
   int errLine;
   UString errMsg;
   RefPtr<ProgramNode> programNode =
-      exec->parser()->parse<ProgramNode>(exec, source, &errLine, &errMsg);
+      exec->globalData().parser->parse<ProgramNode>(exec, source, &errLine,
+                                                    &errMsg);
 
   if (!programNode)
     return Completion(Throw, Error::create(exec, SyntaxError, errMsg, errLine,
