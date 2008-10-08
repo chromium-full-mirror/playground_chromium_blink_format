@@ -101,8 +101,7 @@ JSObject* constructFunction(ExecState* exec,
   UString errMsg;
   SourceCode source = makeSource(body, sourceURL, lineNumber);
   RefPtr<FunctionBodyNode> functionBody =
-      exec->globalData().parser->parse<FunctionBodyNode>(exec, source, &errLine,
-                                                         &errMsg);
+      exec->parser()->parse<FunctionBodyNode>(exec, source, &errLine, &errMsg);
 
   // No program node == syntax error - throw a syntax error
   if (!functionBody)

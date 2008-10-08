@@ -166,7 +166,7 @@ RegisterID* ThrowableExpressionData::emitThrowError(CodeGenerator& generator,
                                                     const char* msg) {
   generator.emitExpressionInfo(m_divot, m_startOffset, m_endOffset);
   RegisterID* exception = generator.emitNewError(
-      generator.newTemporary(), e, jsString(generator.globalData(), msg));
+      generator.newTemporary(), e, jsString(generator.globalExec(), msg));
   generator.emitThrow(exception);
   return exception;
 }
@@ -179,7 +179,7 @@ RegisterID* ThrowableExpressionData::emitThrowError(CodeGenerator& generator,
   substitute(message, label.ustring());
   generator.emitExpressionInfo(m_divot, m_startOffset, m_endOffset);
   RegisterID* exception = generator.emitNewError(
-      generator.newTemporary(), e, jsString(generator.globalData(), message));
+      generator.newTemporary(), e, jsString(generator.globalExec(), message));
   generator.emitThrow(exception);
   return exception;
 }
@@ -240,7 +240,7 @@ RegisterID* StringNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 
 RegisterID* RegExpNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   RefPtr<RegExp> regExp =
-      RegExp::create(generator.globalData(), m_pattern, m_flags);
+      RegExp::create(generator.globalExec(), m_pattern, m_flags);
   if (!regExp->isValid())
     return emitThrowError(
         generator, SyntaxError,
@@ -307,7 +307,7 @@ RegisterID* ArrayNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 
   if (m_elision) {
     RegisterID* value = generator.emitLoad(
-        0, jsNumber(generator.globalData(), m_elision + length));
+        0, jsNumber(generator.globalExec(), m_elision + length));
     generator.emitPutById(array.get(), generator.propertyNames().length, value);
   }
 
@@ -890,7 +890,7 @@ RegisterID* InstanceOfNode::emitCode(CodeGenerator& generator,
   generator.emitExpressionInfo(m_divot, m_startOffset, m_endOffset);
   RegisterID* src2Prototype =
       generator.emitGetById(generator.newTemporary(), src2.get(),
-                            generator.globalData()->propertyNames->prototype);
+                            generator.globalExec()->propertyNames().prototype);
 
   generator.emitExpressionInfo(m_divot, m_startOffset, m_endOffset);
   return generator.emitInstanceOf(generator.finalDestination(dst, src1.get()),
