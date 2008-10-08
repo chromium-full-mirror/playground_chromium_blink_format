@@ -860,12 +860,16 @@ void PluginView::init() {
     setPlatformWidget(window);
 #endif
 
-    // Calling SetWindowLongPtrA here makes the window proc ASCII, which is
-    // required by at least
-    // the Shockwave Director plug-in.
+// Calling SetWindowLongPtrA here makes the window proc ASCII, which is required
+// by at least
+// the Shockwave Director plug-in.
+#if PLATFORM(WIN_OS) && PLATFORM(X86_64) && COMPILER(MSVC)
+    ::SetWindowLongPtrA(platformPluginWidget(), GWLP_WNDPROC,
+                        (LONG_PTR)DefWindowProcA);
+#else
     ::SetWindowLongPtrA(platformPluginWidget(), GWL_WNDPROC,
                         (LONG)DefWindowProcA);
-
+#endif
     SetProp(platformPluginWidget(), kWebPluginViewProperty, this);
 
     m_npWindow.type = NPWindowTypeWindow;
