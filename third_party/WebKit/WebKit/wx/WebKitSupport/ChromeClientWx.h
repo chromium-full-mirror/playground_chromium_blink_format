@@ -98,7 +98,6 @@ class ChromeClientWx : public ChromeClient {
   virtual bool tabsToLinks() const;
 
   virtual IntRect windowResizerRect() const;
-  virtual void addToDirtyRegion(const IntRect&);
   virtual void scrollBackingStore(int dx,
                                   int dy,
                                   const IntRect& scrollViewRect,
@@ -107,7 +106,11 @@ class ChromeClientWx : public ChromeClient {
 
   virtual void repaint(const IntRect&,
                        bool contentChanged,
-                       bool immediate = false);
+                       bool immediate = false,
+                       bool repaintContentOnly = false);
+  virtual void scroll(const IntSize& scrollDelta,
+                      const IntRect& rectToScroll,
+                      const IntRect& clipRect);
   virtual IntPoint screenToWindow(const IntPoint&) const;
   virtual IntRect windowToScreen(const IntRect&) const;
   virtual PlatformWidget platformWindow() const;

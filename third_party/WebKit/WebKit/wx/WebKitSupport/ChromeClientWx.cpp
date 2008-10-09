@@ -250,8 +250,19 @@ IntRect ChromeClientWx::windowResizerRect() const {
   return IntRect();
 }
 
-void ChromeClientWx::repaint(const WebCore::IntRect&, bool, bool) {
-  notImplemented();
+void ChromeClientWx::repaint(const IntRect& rect,
+                             bool contentChanged,
+                             bool immediate,
+                             bool repaintContentOnly) {
+  if (!m_webView)
+    return;
+
+  if (contentChanged)
+    m_webView->RefreshRect(rect);
+
+  if (immediate) {
+    m_webView->Update();
+  }
 }
 
 IntRect ChromeClientWx::windowToScreen(const IntRect& rect) const {
@@ -295,6 +306,10 @@ void ChromeClientWx::print(Frame*) {
 }
 
 void ChromeClientWx::exceededDatabaseQuota(Frame*, const String&) {
+  notImplemented();
+}
+
+void ChromeClientWx::scroll(const IntSize&, const IntRect&, const IntRect&) {
   notImplemented();
 }
 }
