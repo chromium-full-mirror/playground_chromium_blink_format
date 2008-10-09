@@ -35,12 +35,9 @@ class JSRGBColor : public DOMObject {
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   const JSC::Identifier&,
                                   JSC::PropertySlot&);
-  JSC::JSValue* getValueProperty(JSC::ExecState*, int token) const;
 
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
   static const JSC::ClassInfo s_info;
-
-  enum { Red, Green, Blue };
 
   unsigned impl() const { return m_color; }
 
