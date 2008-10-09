@@ -127,7 +127,7 @@ extern "C" {
 
 __declspec(naked) JSValue* ctiTrampoline(void* code,
                                          RegisterFile*,
-                                         Register*,
+                                         CallFrame*,
                                          JSValue** exception,
                                          Profiler**,
                                          JSGlobalData*) {
