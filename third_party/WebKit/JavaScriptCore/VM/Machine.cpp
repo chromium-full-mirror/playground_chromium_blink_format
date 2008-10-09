@@ -3677,7 +3677,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
             newCallFrame, static_cast<JSFunction*>(v), thisValue, args);
         VM_CHECK_EXCEPTION();
 
-        newCallFrame[dst] = returnValue;
+        callFrame[dst] = returnValue;
 
         if (*enabledProfilerReference)
           (*enabledProfilerReference)
