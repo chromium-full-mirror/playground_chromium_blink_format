@@ -47,19 +47,18 @@
 
 #define CTI_ARGS_code 0x0C
 #define CTI_ARGS_registerFile 0x0D
-#define CTI_ARGS_r 0x0E
+#define CTI_ARGS_callFrame 0x0E
 #define CTI_ARGS_exception 0x0F
 #define CTI_ARGS_profilerReference 0x10
 #define CTI_ARGS_globalData 0x11
 #define ARG_registerFile ((RegisterFile*)(ARGS)[CTI_ARGS_registerFile])
-#define ARG_r ((Register*)(ARGS)[CTI_ARGS_r])
+#define ARG_callFrame ((CallFrame*)(ARGS)[CTI_ARGS_callFrame])
 #define ARG_exception ((JSValue**)(ARGS)[CTI_ARGS_exception])
 #define ARG_profilerReference ((Profiler**)(ARGS)[CTI_ARGS_profilerReference])
 #define ARG_globalData ((JSGlobalData*)(ARGS)[CTI_ARGS_globalData])
 
-#define ARG_exec CallFrame::create(ARG_r)
-
-#define ARG_setR(newR) (*(Register**)&(ARGS)[CTI_ARGS_r] = newR)
+#define ARG_setCallFrame(newCallFrame) \
+  (*(CallFrame**)&(ARGS)[CTI_ARGS_callFrame] = (newCallFrame))
 
 #define ARG_src1 ((JSValue*)((ARGS)[1]))
 #define ARG_src2 ((JSValue*)((ARGS)[2]))
@@ -92,7 +91,6 @@
 namespace JSC {
 
 class CodeBlock;
-class ExecState;
 class JSPropertyNameIterator;
 class JSValue;
 class Machine;
@@ -215,7 +213,7 @@ struct StructureStubCompilationInfo {
 extern "C" {
 JSValue* ctiTrampoline(void* code,
                        RegisterFile*,
-                       Register* callFrame,
+                       CallFrame*,
                        JSValue** exception,
                        Profiler**,
                        JSGlobalData*);
@@ -256,13 +254,15 @@ class CTI {
 #endif
 
  public:
-  static void compile(Machine* machine, ExecState* exec, CodeBlock* codeBlock) {
-    CTI cti(machine, exec, codeBlock);
+  static void compile(Machine* machine,
+                      CallFrame* callFrame,
+                      CodeBlock* codeBlock) {
+    CTI cti(machine, callFrame, codeBlock);
     cti.privateCompile();
   }
 
 #if ENABLE(WREC)
-  static void* compileRegExp(ExecState* exec,
+  static void* compileRegExp(Machine*,
                              const UString& pattern,
                              unsigned* numSubpatterns_ptr,
                              const char** error_ptr,
@@ -271,74 +271,74 @@ class CTI {
 #endif
 
   static void compileGetByIdSelf(Machine* machine,
-                                 ExecState* exec,
+                                 CallFrame* callFrame,
                                  CodeBlock* codeBlock,
                                  StructureID* structureID,
                                  size_t cachedOffset,
                                  void* returnAddress) {
-    CTI cti(machine, exec, codeBlock);
+    CTI cti(machine, callFrame, codeBlock);
     cti.privateCompileGetByIdSelf(structureID, cachedOffset, returnAddress);
   }
 
   static void compileGetByIdProto(Machine* machine,
-                                  ExecState* exec,
+                                  CallFrame* callFrame,
                                   CodeBlock* codeBlock,
                                   StructureID* structureID,
                                   StructureID* prototypeStructureID,
                                   size_t cachedOffset,
                                   void* returnAddress) {
-    CTI cti(machine, exec, codeBlock);
+    CTI cti(machine, callFrame, codeBlock);
     cti.privateCompileGetByIdProto(structureID, prototypeStructureID,
                                    cachedOffset, returnAddress);
   }
 
   static void compileGetByIdChain(Machine* machine,
-                                  ExecState* exec,
+                                  CallFrame* callFrame,
                                   CodeBlock* codeBlock,
                                   StructureID* structureID,
                                   StructureIDChain* chain,
                                   size_t count,
                                   size_t cachedOffset,
                                   void* returnAddress) {
-    CTI cti(machine, exec, codeBlock);
+    CTI cti(machine, callFrame, codeBlock);
     cti.privateCompileGetByIdChain(structureID, chain, count, cachedOffset,
                                    returnAddress);
   }
 
   static void compilePutByIdReplace(Machine* machine,
-                                    ExecState* exec,
+                                    CallFrame* callFrame,
                                     CodeBlock* codeBlock,
                                     StructureID* structureID,
                                     size_t cachedOffset,
                                     void* returnAddress) {
-    CTI cti(machine, exec, codeBlock);
+    CTI cti(machine, callFrame, codeBlock);
     cti.privateCompilePutByIdReplace(structureID, cachedOffset, returnAddress);
   }
 
   static void compilePutByIdTransition(Machine* machine,
-                                       ExecState* exec,
+                                       CallFrame* callFrame,
                                        CodeBlock* codeBlock,
                                        StructureID* oldStructureID,
                                        StructureID* newStructureID,
                                        size_t cachedOffset,
                                        StructureIDChain* sIDC,
                                        void* returnAddress) {
-    CTI cti(machine, exec, codeBlock);
+    CTI cti(machine, callFrame, codeBlock);
     cti.privateCompilePutByIdTransition(oldStructureID, newStructureID,
                                         cachedOffset, sIDC, returnAddress);
   }
 
   static void* compileArrayLengthTrampoline(Machine* machine,
-                                            ExecState* exec,
+                                            CallFrame* callFrame,
                                             CodeBlock* codeBlock) {
-    CTI cti(machine, exec, codeBlock);
+    CTI cti(machine, callFrame, codeBlock);
     return cti.privateCompileArrayLengthTrampoline();
   }
 
   static void* compileStringLengthTrampoline(Machine* machine,
-                                             ExecState* exec,
+                                             CallFrame* callFrame,
                                              CodeBlock* codeBlock) {
-    CTI cti(machine, exec, codeBlock);
+    CTI cti(machine, callFrame, codeBlock);
     return cti.privateCompileStringLengthTrampoline();
   }
 
@@ -352,27 +352,27 @@ class CTI {
                                   void* returnAddress);
 
   static void compilePatchGetArrayLength(Machine* machine,
-                                         ExecState* exec,
+                                         CallFrame* callFrame,
                                          CodeBlock* codeBlock,
                                          void* returnAddress) {
-    CTI cti(machine, exec, codeBlock);
+    CTI cti(machine, callFrame, codeBlock);
     return cti.privateCompilePatchGetArrayLength(returnAddress);
   }
 
   inline static JSValue* execute(void* code,
                                  RegisterFile* registerFile,
-                                 Register* r,
+                                 CallFrame* callFrame,
                                  JSGlobalData* globalData,
                                  JSValue** exception) {
-    return ctiTrampoline(code, registerFile, r, exception,
+    return ctiTrampoline(code, registerFile, callFrame, exception,
                          Profiler::enabledProfilerReference(), globalData);
   }
 
  private:
-  CTI(Machine*, ExecState*, CodeBlock*);
+  CTI(Machine*, CallFrame*, CodeBlock*);
 
   bool isConstant(int src);
-  JSValue* getConstant(ExecState*, int src);
+  JSValue* getConstant(CallFrame*, int src);
 
   void privateCompileMainPass();
   void privateCompileLinkPass();
@@ -499,7 +499,7 @@ class CTI {
 
   X86Assembler m_jit;
   Machine* m_machine;
-  ExecState* m_exec;
+  CallFrame* m_callFrame;
   CodeBlock* m_codeBlock;
 
   Vector<CallRecord> m_calls;

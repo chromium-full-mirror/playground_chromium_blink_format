@@ -44,7 +44,7 @@ class JSActivation : public JSVariableObject {
   typedef JSVariableObject Base;
 
  public:
-  JSActivation(ExecState*, PassRefPtr<FunctionBodyNode>, Register*);
+  JSActivation(CallFrame*, PassRefPtr<FunctionBodyNode>);
   virtual ~JSActivation();
 
   virtual void mark();

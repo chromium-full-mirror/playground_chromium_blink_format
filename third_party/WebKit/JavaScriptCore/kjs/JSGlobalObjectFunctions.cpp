@@ -300,8 +300,8 @@ JSValue* globalFuncEval(ExecState* exec,
   UString errMsg;
 
   SourceCode source = makeSource(s);
-  RefPtr<EvalNode> evalNode =
-      exec->parser()->parse<EvalNode>(exec, source, &errLine, &errMsg);
+  RefPtr<EvalNode> evalNode = exec->globalData().parser->parse<EvalNode>(
+      exec, source, &errLine, &errMsg);
 
   if (!evalNode)
     return throwError(exec, SyntaxError, errMsg, errLine,

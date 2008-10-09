@@ -66,9 +66,9 @@ class JSVariableObject : public JSObject {
   // without increasing their own size (since there's a hard limit on the
   // size of a JSCell).
   struct JSVariableObjectData {
-    JSVariableObjectData(SymbolTable* symbolTable_, Register* registers_)
-        : symbolTable(symbolTable_), registers(registers_) {
-      ASSERT(symbolTable_);
+    JSVariableObjectData(SymbolTable* symbolTable, Register* registers)
+        : symbolTable(symbolTable), registers(registers) {
+      ASSERT(symbolTable);
     }
 
     SymbolTable* symbolTable;  // Maps name -> offset from "r" in register file.
