@@ -616,11 +616,10 @@ void dump() {
   }
 
   if (dumpPixels) {
-    if (gLayoutTestController->dumpAsText() ||
-        gLayoutTestController->dumpDOMAsWebArchive() ||
-        gLayoutTestController->dumpSourceAsWebArchive())
-      else dumpWebViewAsPixelsAndCompareWithExpected(currentTest,
-                                                     dumpAllPixels);
+    if (!gLayoutTestController->dumpAsText() &&
+        !gLayoutTestController->dumpDOMAsWebArchive() &&
+        !gLayoutTestController->dumpSourceAsWebArchive())
+      dumpWebViewAsPixelsAndCompareWithExpected(currentTest, dumpAllPixels);
   }
 
   printf("#EOF\n");  // terminate the (possibly empty) pixels block
