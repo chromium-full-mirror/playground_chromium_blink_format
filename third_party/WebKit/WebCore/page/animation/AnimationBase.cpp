@@ -732,7 +732,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         setChanged(m_object->element());
         m_object->animation()->startUpdateRenderingDispatcher();
       } else {
-        ASSERT(running());
+        ASSERT(!paused());
         // We're waiting for the start timer to fire and we got a pause. Cancel
         // the timer, pause and wait
         m_pauseTime = currentTime();
@@ -765,7 +765,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         } else
           m_waitedForResponse = true;
       } else {
-        ASSERT(running());
+        ASSERT(!paused());
         // We're waiting for the a notification that the style has been setup.
         // If we're asked to wait
         // at this point, the style must have been processed, so we can deal
@@ -844,7 +844,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
       break;
     case AnimationStatePausedWaitTimer:
       ASSERT(input == AnimationStateInputPlayStateRunnning);
-      ASSERT(!running());
+      ASSERT(paused());
       // Update the times
       m_startTime += currentTime() - m_pauseTime;
       m_pauseTime = -1;
@@ -863,7 +863,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
       // AnimationStatePausedRun, we will notice
       // that we have already set the startTime and will ignore it.
       ASSERT(input == AnimationStateInputPlayStateRunnning);
-      ASSERT(!running());
+      ASSERT(paused());
       // Update the times
       if (m_animState == AnimationStatePausedRun)
         m_startTime += currentTime() - m_pauseTime;
