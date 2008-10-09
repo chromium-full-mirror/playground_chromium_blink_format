@@ -32,6 +32,8 @@
 namespace JSC {
 
 struct ArgumentsData : Noncopyable {
+  JSActivation* activation;
+
   unsigned numParameters;
   ptrdiff_t firstParameterIndex;
   unsigned numArguments;
@@ -61,7 +63,10 @@ class Arguments : public JSObject {
 
   void copyRegisters();
   bool isTornOff() const { return d->registerArray; }
-  void setRegisters(Register* registers) { d->registers = registers; }
+  void setActivation(JSActivation* activation) {
+    d->activation = activation;
+    d->registers = &activation->registerAt(0);
+  }
 
  private:
   virtual bool getOwnPropertySlot(ExecState*,
@@ -102,6 +107,7 @@ inline Arguments::Arguments(CallFrame* callFrame)
   d->firstParameterIndex = firstParameterIndex;
   d->numArguments = numArguments;
 
+  d->activation = 0;
   d->registers = callFrame->registers();
 
   Register* extraArguments;
@@ -162,8 +168,7 @@ inline void JSActivation::copyRegisters(Arguments* arguments) {
       copyRegisterArray(d()->registers - registerOffset, registerArraySize);
   setRegisters(registerArray + registerOffset, registerArray);
   if (arguments && !arguments->isTornOff())
-    static_cast<Arguments*>(arguments)->setRegisters(registerArray +
-                                                     registerOffset);
+    static_cast<Arguments*>(arguments)->setActivation(this);
 }
 
 }  // namespace JSC
