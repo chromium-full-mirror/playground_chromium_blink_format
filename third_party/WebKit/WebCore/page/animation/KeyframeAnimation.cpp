@@ -47,9 +47,6 @@ KeyframeAnimation::KeyframeAnimation(const Animation* animation,
       m_keyframes(renderer, animation->name()),
       m_index(index),
       m_unanimatedStyle(0) {
-  // Set the transform animation list
-  validateTransformFunctionList();
-
   if (unanimatedStyle) {
     const_cast<RenderStyle*>(unanimatedStyle)->ref();
     m_unanimatedStyle = unanimatedStyle;
@@ -60,6 +57,10 @@ KeyframeAnimation::KeyframeAnimation(const Animation* animation,
     m_object->document()->styleSelector()->keyframeStylesForAnimation(
         static_cast<Element*>(m_object->element()), unanimatedStyle,
         m_keyframes);
+
+  // Update the m_transformFunctionListValid flag based on whether the function
+  // lists in the keyframes match.
+  validateTransformFunctionList();
 }
 
 KeyframeAnimation::~KeyframeAnimation() {
