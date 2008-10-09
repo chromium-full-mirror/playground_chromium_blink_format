@@ -70,6 +70,7 @@ class SVGUseElement : public SVGStyledTransformableElement,
   virtual Path toClipPath() const;
 
   static void removeDisallowedElementsFromSubtree(Node* element);
+  SVGElementInstance* instanceForShadowTreeElement(Node* element) const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -101,9 +102,6 @@ class SVGUseElement : public SVGStyledTransformableElement,
                                  height)
 
  private:
-  friend class SVGElement;
-  SVGElementInstance* instanceForShadowTreeElement(Node* element) const;
-
   // Instance tree handling
   void buildInstanceTree(SVGElement* target,
                          SVGElementInstance* targetInstance,
@@ -131,12 +129,13 @@ class SVGUseElement : public SVGStyledTransformableElement,
   void associateInstancesWithShadowTreeElements(
       Node* target,
       SVGElementInstance* targetInstance);
-
   SVGElementInstance* instanceForShadowTreeElement(
       Node* element,
       SVGElementInstance* instance) const;
+
   void transferUseAttributesToReplacedElement(SVGElement* from,
                                               SVGElement* to) const;
+  void transferEventListenersToShadowTree(SVGElementInstance* target);
 
   RefPtr<SVGElement> m_shadowTreeRootElement;
   RefPtr<SVGElementInstance> m_targetElementInstance;

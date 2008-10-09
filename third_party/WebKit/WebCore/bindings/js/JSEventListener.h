@@ -106,6 +106,8 @@ class JSLazyEventListener : public JSEventListener {
 #endif
   };
 
+  virtual bool wasCreatedFromMarkup() const { return true; }
+
   static PassRefPtr<JSLazyEventListener> create(LazyEventListenerType type,
                                                 const String& functionName,
                                                 const String& code,
