@@ -510,12 +510,14 @@ void GraphicsContext::fillPath() {
       fillPathWithFillRule(context, fillRule());
       break;
     case GradientColorSpace:
+      CGContextSaveGState(context);
       if (fillRule() == RULE_EVENODD)
         CGContextEOClip(context);
       else
         CGContextClip(context);
       CGContextDrawShading(context,
                            m_common->state.fillGradient->platformGradient());
+      CGContextRestoreGState(context);
       break;
   }
 }
@@ -535,10 +537,12 @@ void GraphicsContext::strokePath() {
       CGContextStrokePath(context);
       break;
     case GradientColorSpace:
+      CGContextSaveGState(context);
       CGContextReplacePathWithStrokedPath(context);
       CGContextClip(context);
       CGContextDrawShading(context,
                            m_common->state.strokeGradient->platformGradient());
+      CGContextRestoreGState(context);
       break;
   }
 }
@@ -546,19 +550,22 @@ void GraphicsContext::strokePath() {
 void GraphicsContext::fillRect(const FloatRect& rect) {
   if (paintingDisabled())
     return;
+  CGContextRef context = platformContext();
   switch (m_common->state.fillColorSpace) {
     case SolidColorSpace:
       if (fillColor().alpha())
-        CGContextFillRect(platformContext(), rect);
+        CGContextFillRect(context, rect);
       break;
     case PatternColorSpace:
       applyFillPattern(this, m_common->state.fillPattern.get());
-      CGContextFillRect(platformContext(), rect);
+      CGContextFillRect(context, rect);
       break;
     case GradientColorSpace:
-      clip(rect);
-      CGContextDrawShading(platformContext(),
+      CGContextSaveGState(context);
+      CGContextClipToRect(context, rect);
+      CGContextDrawShading(context,
                            m_common->state.fillGradient->platformGradient());
+      CGContextRestoreGState(context);
       break;
   }
 }
