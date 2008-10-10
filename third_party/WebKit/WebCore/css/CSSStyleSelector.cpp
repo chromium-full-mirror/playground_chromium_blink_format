@@ -2611,6 +2611,7 @@ bool CSSStyleSelector::SelectorChecker::checkScrollbarPseudoClass(
     CSSSelector* sel,
     RenderStyle::PseudoId& dynamicPseudo) const {
   RenderScrollbar* scrollbar = RenderScrollbar::scrollbarForStyleResolve();
+  ScrollbarPart part = RenderScrollbar::partForStyleResolve();
 
   ASSERT(sel->m_match == CSSSelector::PseudoClass && scrollbar);
   switch (sel->pseudoType()) {
@@ -2622,6 +2623,16 @@ bool CSSStyleSelector::SelectorChecker::checkScrollbarPseudoClass(
       return scrollbar->orientation() == HorizontalScrollbar;
     case CSSSelector::PseudoVertical:
       return scrollbar->orientation() == VerticalScrollbar;
+    case CSSSelector::PseudoDecrement:
+      return part == BackButtonStartPart || part == BackButtonEndPart ||
+             part == BackTrackPart;
+    case CSSSelector::PseudoIncrement:
+      return part == ForwardButtonStartPart || part == ForwardButtonEndPart ||
+             part == ForwardTrackPart;
+    case CSSSelector::PseudoStart:
+      return part == BackButtonStartPart || part == ForwardButtonStartPart;
+    case CSSSelector::PseudoEnd:
+      return part == BackButtonEndPart || part == ForwardButtonEndPart;
     case CSSSelector::PseudoWindowInactive:
       return !scrollbar->isWindowActive();
     default:
