@@ -118,10 +118,9 @@ class PropertyMap {
 
   Table* m_table;
   Vector<unsigned> m_deletedOffsets;
-  bool m_getterSetterFlag : 1;
 };
 
-inline PropertyMap::PropertyMap() : m_table(0), m_getterSetterFlag(false) {}
+inline PropertyMap::PropertyMap() : m_table(0) {}
 
 inline size_t PropertyMap::get(const Identifier& propertyName) {
   ASSERT(!propertyName.isNull());

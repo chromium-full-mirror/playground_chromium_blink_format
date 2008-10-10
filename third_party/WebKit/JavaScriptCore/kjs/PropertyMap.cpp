@@ -95,7 +95,6 @@ PropertyMap& PropertyMap::operator=(const PropertyMap& other) {
   }
 
   m_deletedOffsets = other.m_deletedOffsets;
-  m_getterSetterFlag = other.m_getterSetterFlag;
   return *this;
 }
 
