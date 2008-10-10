@@ -130,6 +130,20 @@ bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
   // Paint the scrollbar background (only used by custom CSS scrollbars).
   paintScrollbarBackground(graphicsContext, scrollbar);
 
+  // Paint the back and forward buttons.
+  if (scrollMask & BackButtonStartPart)
+    paintButton(graphicsContext, scrollbar, backButtonStartPaintRect,
+                BackButtonStartPart);
+  if (scrollMask & BackButtonEndPart)
+    paintButton(graphicsContext, scrollbar, backButtonEndPaintRect,
+                BackButtonEndPart);
+  if (scrollMask & ForwardButtonStartPart)
+    paintButton(graphicsContext, scrollbar, forwardButtonStartPaintRect,
+                ForwardButtonStartPart);
+  if (scrollMask & ForwardButtonEndPart)
+    paintButton(graphicsContext, scrollbar, forwardButtonEndPaintRect,
+                ForwardButtonEndPart);
+
   // Paint the track background.
   if ((scrollMask & ForwardTrackPart) || (scrollMask & BackTrackPart) ||
       (scrollMask && ThumbPart))
@@ -144,20 +158,6 @@ bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
       paintTrackPiece(graphicsContext, scrollbar, endTrackRect,
                       ForwardTrackPart);
   }
-
-  // Paint the back and forward buttons.
-  if (scrollMask & BackButtonStartPart)
-    paintButton(graphicsContext, scrollbar, backButtonStartPaintRect,
-                BackButtonStartPart);
-  if (scrollMask & BackButtonEndPart)
-    paintButton(graphicsContext, scrollbar, backButtonEndPaintRect,
-                BackButtonEndPart);
-  if (scrollMask & ForwardButtonStartPart)
-    paintButton(graphicsContext, scrollbar, forwardButtonStartPaintRect,
-                ForwardButtonStartPart);
-  if (scrollMask & ForwardButtonEndPart)
-    paintButton(graphicsContext, scrollbar, forwardButtonEndPaintRect,
-                ForwardButtonEndPart);
 
   // Paint the thumb.
   if (scrollMask & ThumbPart)
@@ -174,7 +174,20 @@ ScrollbarPart ScrollbarThemeComposite::hitTest(Scrollbar* scrollbar,
 
   IntPoint mousePosition = scrollbar->convertFromContainingWindow(evt.pos());
   mousePosition.move(scrollbar->x(), scrollbar->y());
-  if (backButtonRect(scrollbar, BackButtonStartPart).contains(mousePosition))
+  IntRect track = trackRect(scrollbar);
+  if (track.contains(mousePosition)) {
+    IntRect beforeThumbRect;
+    IntRect thumbRect;
+    IntRect afterThumbRect;
+    splitTrack(scrollbar, track, beforeThumbRect, thumbRect, afterThumbRect);
+    if (beforeThumbRect.contains(mousePosition))
+      result = BackTrackPart;
+    else if (thumbRect.contains(mousePosition))
+      result = ThumbPart;
+    else
+      result = ForwardTrackPart;
+  } else if (backButtonRect(scrollbar, BackButtonStartPart)
+                 .contains(mousePosition))
     result = BackButtonStartPart;
   else if (backButtonRect(scrollbar, BackButtonEndPart).contains(mousePosition))
     result = BackButtonEndPart;
@@ -184,21 +197,6 @@ ScrollbarPart ScrollbarThemeComposite::hitTest(Scrollbar* scrollbar,
   else if (forwardButtonRect(scrollbar, ForwardButtonEndPart)
                .contains(mousePosition))
     result = ForwardButtonEndPart;
-  else {
-    IntRect track = trackRect(scrollbar);
-    if (track.contains(mousePosition)) {
-      IntRect beforeThumbRect;
-      IntRect thumbRect;
-      IntRect afterThumbRect;
-      splitTrack(scrollbar, track, beforeThumbRect, thumbRect, afterThumbRect);
-      if (beforeThumbRect.contains(mousePosition))
-        result = BackTrackPart;
-      else if (thumbRect.contains(mousePosition))
-        result = ThumbPart;
-      else
-        result = ForwardTrackPart;
-    }
-  }
   return result;
 }
 

@@ -90,6 +90,14 @@ void RenderScrollbarPart::computeScrollbarWidth() {
           ? width
           : calcScrollbarThicknessUsing(style()->maxWidth(), visibleSize);
   m_width = max(minWidth, min(maxWidth, width));
+
+  // Allow the track pieces to have negative margins so that they can overlap
+  // buttons. This is required to emulate the
+  // Aqua look in CSS.
+  if (m_part == TrackBGPart) {
+    m_marginLeft = min(0, style()->marginLeft().calcMinValue(visibleSize));
+    m_marginRight = min(0, style()->marginRight().calcMinValue(visibleSize));
+  }
 }
 
 void RenderScrollbarPart::computeScrollbarHeight() {
@@ -104,6 +112,14 @@ void RenderScrollbarPart::computeScrollbarHeight() {
           ? height
           : calcScrollbarThicknessUsing(style()->maxHeight(), visibleSize);
   m_height = max(minHeight, min(maxHeight, height));
+
+  // Allow the track pieces to have negative margins so that they can overlap
+  // buttons. This is required to emulate the
+  // Aqua look in CSS.
+  if (m_part == TrackBGPart) {
+    m_marginTop = min(0, style()->marginTop().calcMinValue(visibleSize));
+    m_marginBottom = min(0, style()->marginBottom().calcMinValue(visibleSize));
+  }
 }
 
 void RenderScrollbarPart::calcPrefWidths() {
