@@ -251,7 +251,7 @@
 */
 - (void)webView:(WebView*)webView
     windowScriptObjectAvailable:(WebScriptObject*)windowScriptObject
-    WEBKIT_CATEGORY_METHOD_ANNOTATION(
+    WEBKIT_OBJC_METHOD_ANNOTATION(
         AVAILABLE_WEBKIT_VERSION_1_3_AND_LATER_BUT_DEPRECATED_IN_WEBKIT_VERSION_3_0);
 
 @end
