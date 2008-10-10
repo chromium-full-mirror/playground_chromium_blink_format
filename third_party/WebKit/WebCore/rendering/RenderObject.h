@@ -440,7 +440,8 @@ class RenderObject : public CachedResourceClient {
 
  public:
   RenderStyle* getPseudoStyle(RenderStyle::PseudoId,
-                              RenderStyle* parentStyle = 0) const;
+                              RenderStyle* parentStyle = 0,
+                              bool useCachedStyle = true) const;
 
   void updateDragState(bool dragOn);
 

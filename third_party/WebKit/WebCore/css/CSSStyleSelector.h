@@ -239,6 +239,8 @@ class CSSStyleSelector : Noncopyable {
                           RenderStyle*,
                           RenderStyle* elementParentStyle) const;
     PseudoState checkPseudoState(Element*, bool checkVisited = true) const;
+    bool checkScrollbarPseudoClass(CSSSelector*,
+                                   RenderStyle::PseudoId& dynamicPseudo) const;
 
     void allVisitedStateChanged();
     void visitedStateChanged(unsigned visitedHash);
