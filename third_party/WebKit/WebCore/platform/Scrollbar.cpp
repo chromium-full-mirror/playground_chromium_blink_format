@@ -202,7 +202,7 @@ void Scrollbar::autoscrollPressedPart(double delay) {
   if ((m_pressedPart == BackTrackPart || m_pressedPart == ForwardTrackPart) &&
       thumbUnderMouse(this)) {
     theme()->invalidatePart(this, m_pressedPart);
-    m_hoveredPart = ThumbPart;
+    setHoveredPart(ThumbPart);
     return;
   }
 
@@ -221,7 +221,7 @@ void Scrollbar::startTimerIfNeeded(double delay) {
   if ((m_pressedPart == BackTrackPart || m_pressedPart == ForwardTrackPart) &&
       thumbUnderMouse(this)) {
     theme()->invalidatePart(this, m_pressedPart);
-    m_hoveredPart = ThumbPart;
+    setHoveredPart(ThumbPart);
     return;
   }
 
@@ -284,6 +284,29 @@ void Scrollbar::moveThumb(int pos) {
   }
 }
 
+void Scrollbar::setHoveredPart(ScrollbarPart part) {
+  if (part == m_hoveredPart)
+    return;
+
+  if ((m_hoveredPart == NoPart || part == NoPart) &&
+      theme()->invalidateOnMouseEnterExit())
+    invalidate();  // Just invalidate the whole scrollbar, since the buttons at
+                   // either end change anyway.
+  else if (m_pressedPart == NoPart) {
+    theme()->invalidatePart(this, part);
+    theme()->invalidatePart(this, m_hoveredPart);
+  }
+  m_hoveredPart = part;
+}
+
+void Scrollbar::setPressedPart(ScrollbarPart part) {
+  if (m_pressedPart != NoPart)
+    theme()->invalidatePart(this, m_pressedPart);
+  m_pressedPart = part;
+  if (m_pressedPart != NoPart)
+    theme()->invalidatePart(this, m_pressedPart);
+}
+
 bool Scrollbar::mouseMoved(const PlatformMouseEvent& evt) {
   if (m_pressedPart == ThumbPart) {
     moveThumb(m_orientation == HorizontalScrollbar
@@ -299,10 +322,6 @@ bool Scrollbar::mouseMoved(const PlatformMouseEvent& evt) {
 
   ScrollbarPart part = theme()->hitTest(this, evt);
   if (part != m_hoveredPart) {
-    if (m_hoveredPart == NoPart && theme()->invalidateOnMouseEnterExit())
-      invalidate();  // Just invalidate the whole scrollbar, since the buttons
-                     // at either end change anyway.
-
     if (m_pressedPart != NoPart) {
       if (part == m_pressedPart) {
         // The mouse is moving back over the pressed part.  We
@@ -315,29 +334,21 @@ bool Scrollbar::mouseMoved(const PlatformMouseEvent& evt) {
         stopTimerIfNeeded();
         theme()->invalidatePart(this, m_pressedPart);
       }
-    } else {
-      theme()->invalidatePart(this, part);
-      theme()->invalidatePart(this, m_hoveredPart);
     }
-    m_hoveredPart = part;
+
+    setHoveredPart(part);
   }
 
   return true;
 }
 
 bool Scrollbar::mouseExited() {
-  if (theme()->invalidateOnMouseEnterExit())
-    invalidate();  // Just invalidate the whole scrollbar, since the buttons at
-                   // either end change anyway.
-  else
-    theme()->invalidatePart(this, m_hoveredPart);
-  m_hoveredPart = NoPart;
+  setHoveredPart(NoPart);
   return true;
 }
 
 bool Scrollbar::mouseUp() {
-  theme()->invalidatePart(this, m_pressedPart);
-  m_pressedPart = NoPart;
+  setPressedPart(NoPart);
   m_pressedPos = 0;
   stopTimerIfNeeded();
 
@@ -355,13 +366,14 @@ bool Scrollbar::mouseDown(const PlatformMouseEvent& evt) {
                   // just avoid even calling this method on a right click
                   // though.
 
-  m_pressedPart = theme()->hitTest(this, evt);
+  setPressedPart(theme()->hitTest(this, evt));
   int pressedPos = (orientation() == HorizontalScrollbar
                         ? convertFromContainingWindow(evt.pos()).x()
                         : convertFromContainingWindow(evt.pos()).y());
 
   if (theme()->shouldCenterOnThumb(this, evt)) {
-    m_hoveredPart = m_pressedPart = ThumbPart;
+    setHoveredPart(ThumbPart);
+    setPressedPart(ThumbPart);
     int thumbLen = theme()->thumbLength(this);
     int desiredPos = pressedPos - thumbLen / 2;
     // Set the pressed position to the top of the thumb so that when we do the
@@ -375,7 +387,6 @@ bool Scrollbar::mouseDown(const PlatformMouseEvent& evt) {
 
   m_pressedPos = pressedPos;
 
-  theme()->invalidatePart(this, m_pressedPart);
   autoscrollPressedPart(theme()->initialAutoscrollTimerDelay());
   return true;
 }

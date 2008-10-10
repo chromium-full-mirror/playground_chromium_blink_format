@@ -56,6 +56,9 @@ class RenderScrollbar : public Scrollbar {
 
   virtual void paint(GraphicsContext*, const IntRect& damageRect);
 
+  virtual void setHoveredPart(ScrollbarPart);
+  virtual void setPressedPart(ScrollbarPart);
+
   void updateScrollbarParts(RenderStyle* = 0, bool destroy = false);
 
   static ScrollbarPart partForStyleResolve();
@@ -74,9 +77,8 @@ class RenderScrollbar : public Scrollbar {
  private:
   RenderStyle* getScrollbarPseudoStyle(ScrollbarPart, RenderStyle::PseudoId);
   void updateScrollbarPart(ScrollbarPart,
-                           RenderStyle::PseudoId,
-                           RenderStyle*,
-                           bool destroy);
+                           RenderStyle* = 0,
+                           bool destroy = false);
 
   RenderObject* m_owner;
   HashMap<unsigned, RenderScrollbarPart*> m_parts;
