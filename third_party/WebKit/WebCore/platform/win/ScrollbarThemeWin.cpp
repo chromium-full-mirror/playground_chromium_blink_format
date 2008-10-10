@@ -219,10 +219,10 @@ IntRect ScrollbarThemeWin::trackRect(Scrollbar* scrollbar, bool) {
 void ScrollbarThemeWin::paintTrack(GraphicsContext* context,
                                    Scrollbar* scrollbar,
                                    const IntRect& rect,
-                                   ScrollbarControlPartMask mask) {
+                                   ScrollbarPart partType) {
   checkAndInitScrollbarTheme();
 
-  bool start = mask & BackTrackPart;
+  bool start = partType == BackTrackPart;
   int part;
   if (scrollbar->orientation() == HorizontalScrollbar)
     part = start ? SP_TRACKSTARTHOR : SP_TRACKENDHOR;

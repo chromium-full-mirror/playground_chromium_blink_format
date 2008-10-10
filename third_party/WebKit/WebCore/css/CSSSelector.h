@@ -153,6 +153,7 @@ class CSSSelector {
     PseudoScrollbarHorizontal,
     PseudoScrollbarThumb,
     PseudoScrollbarTrack,
+    PseudoScrollbarTrackPiece,
     PseudoScrollbarVertical,
     PseudoSelection,
     PseudoFileUploadButton,

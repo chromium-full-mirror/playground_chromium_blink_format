@@ -65,6 +65,7 @@
 #include "RenderInline.h"
 #include "RenderMarquee.h"
 #include "RenderReplica.h"
+#include "RenderScrollbar.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "ScaleTransformOperation.h"
@@ -1201,8 +1202,14 @@ void RenderLayer::invalidateScrollbarRect(Scrollbar* scrollbar,
 
 PassRefPtr<Scrollbar> RenderLayer::createScrollbar(
     ScrollbarOrientation orientation) {
-  RefPtr<Scrollbar> widget =
-      Scrollbar::createNativeScrollbar(this, orientation, RegularScrollbar);
+  RefPtr<Scrollbar> widget;
+  RenderStyle* style = renderer()->getPseudoStyle(RenderStyle::SCROLLBAR);
+  if (style)
+    widget = RenderScrollbar::createCustomScrollbar(this, orientation, style,
+                                                    renderer());
+  else
+    widget =
+        Scrollbar::createNativeScrollbar(this, orientation, RegularScrollbar);
   m_object->document()->view()->addChild(widget.get());
   return widget.release();
 }
@@ -2603,6 +2610,13 @@ void RenderLayer::styleChanged(RenderStyle* oldStyle) {
       createReflection();
     updateReflectionStyle();
   }
+
+  // FIXME: Need to detect a swap from custom to native scrollbars (and vice
+  // versa).
+  if (m_hBar)
+    m_hBar->styleChanged();
+  if (m_vBar)
+    m_vBar->styleChanged();
 }
 
 RenderLayer* RenderLayer::reflectionLayer() const {

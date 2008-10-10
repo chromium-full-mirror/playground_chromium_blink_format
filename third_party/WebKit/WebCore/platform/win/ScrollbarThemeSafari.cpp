@@ -235,10 +235,10 @@ bool ScrollbarThemeSafari::shouldCenterOnThumb(Scrollbar*,
   return evt.shiftKey() && evt.button() == LeftButton;
 }
 
-void ScrollbarThemeSafari::paintTrack(GraphicsContext* graphicsContext,
-                                      Scrollbar* scrollbar,
-                                      const IntRect& trackRect,
-                                      ScrollbarControlPartMask) {
+void ScrollbarThemeSafari::paintTrackBackground(
+    GraphicsContext* graphicsContext,
+    Scrollbar* scrollbar,
+    const IntRect& trackRect) {
   if (!SafariThemeLibrary())
     return;
   NSControlSize size = scrollbar->controlSize() == SmallScrollbar
