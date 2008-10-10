@@ -62,7 +62,6 @@ class KeyframeAnimation : public AnimationBase {
 
   virtual bool shouldFireEvents() const { return true; }
 
-  bool hasKeyframes() const { return m_keyframes.size() >= 2; }
   bool hasAnimationForProperty(int property) const;
 
   const RenderStyle* unanimatedStyle() const { return m_unanimatedStyle; }
