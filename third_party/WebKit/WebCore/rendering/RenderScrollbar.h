@@ -54,6 +54,8 @@ class RenderScrollbar : public Scrollbar {
   virtual void setParent(ScrollView*);
   virtual void setEnabled(bool);
 
+  virtual void paint(GraphicsContext*, const IntRect& damageRect);
+
   void updateScrollbarParts(RenderStyle* = 0, bool destroy = false);
 
   static ScrollbarPart partForStyleResolve();
