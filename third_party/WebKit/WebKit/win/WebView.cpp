@@ -630,14 +630,19 @@ void WebView::close() {
       static_cast<IWebPreferences*>(m_preferences.get()));
 
   BSTR identifier = 0;
-  if (SUCCEEDED(m_preferences->identifier(&identifier)))
-    WebPreferences::removeReferenceForIdentifier(identifier);
-  if (identifier)
-    SysFreeString(identifier);
+  m_preferences->identifier(&identifier);
 
   COMPtr<WebPreferences> preferences = m_preferences;
   m_preferences = 0;
   preferences->didRemoveFromWebView();
+  // Make sure we release the reference, since
+  // WebPreferences::removeReferenceForIdentifier will check for last reference
+  // to WebPreferences
+  preferences = 0;
+  if (identifier) {
+    WebPreferences::removeReferenceForIdentifier(identifier);
+    SysFreeString(identifier);
+  }
 
   deleteBackingStore();
 }
@@ -2759,19 +2764,19 @@ HRESULT STDMETHODCALLTYPE WebView::setPreferences(
   nc->removeObserver(this, WebPreferences::webPreferencesChangedNotification(),
                      static_cast<IWebPreferences*>(m_preferences.get()));
 
-  BSTR identifierBSTR = 0;
-  HRESULT hr = oldPrefs->identifier(&identifierBSTR);
+  BSTR identifier = 0;
+  oldPrefs->identifier(&identifier);
   oldPrefs->didRemoveFromWebView();
   oldPrefs = 0;  // Make sure we release the reference, since
                  // WebPreferences::removeReferenceForIdentifier will check for
                  // last reference to WebPreferences
-  if (SUCCEEDED(hr)) {
-    BString identifier;
-    identifier.adoptBSTR(identifierBSTR);
-    WebPreferences::removeReferenceForIdentifier(identifier);
-  }
 
   m_preferences = webPrefs;
+
+  if (identifier) {
+    WebPreferences::removeReferenceForIdentifier(identifier);
+    SysFreeString(identifier);
+  }
 
   nc->addObserver(this, WebPreferences::webPreferencesChangedNotification(),
                   static_cast<IWebPreferences*>(m_preferences.get()));
