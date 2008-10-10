@@ -47,7 +47,6 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
   virtual void calcHeight();
   virtual void calcPrefWidths();
   virtual void removeLeftoverAnonymousBlock(RenderBlock*) {}
-  virtual void setStyle(const RenderStyle*);
   virtual void updateFromElement();
   virtual bool canHaveChildren() const { return false; }
   virtual int baselinePosition(bool firstLine, bool isRootLineBox) const;
@@ -114,6 +113,9 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
   void updatePlaceholderVisibility();
 
   virtual void capsLockStateMayHaveChanged();
+
+ protected:
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
  private:
   // PopupMenuClient methods

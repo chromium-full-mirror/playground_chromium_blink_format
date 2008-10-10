@@ -645,18 +645,6 @@ class RenderObject : public CachedResourceClient {
   void collectDashboardRegions(Vector<DashboardRegionValue>&);
 #endif
 
-  // Used to signal a specific subrect within an object that must be repainted
-  // after
-  // layout is complete.
-  struct RepaintInfo {
-    RepaintInfo(RenderObject* object = 0,
-                const IntRect& repaintRect = IntRect())
-        : m_object(object), m_repaintRect(repaintRect) {}
-
-    RenderObject* m_object;
-    IntRect m_repaintRect;
-  };
-
   bool hitTest(const HitTestRequest&,
                HitTestResult&,
                const IntPoint&,
@@ -1135,6 +1123,11 @@ class RenderObject : public CachedResourceClient {
   AnimationController* animation() const;
 
  protected:
+  // Overrides should call the superclass at the end
+  virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
+  // Overrides should call the superclass at the start
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+
   virtual void printBoxDecorations(GraphicsContext*,
                                    int /*x*/,
                                    int /*y*/,
@@ -1193,6 +1186,10 @@ class RenderObject : public CachedResourceClient {
  public:
   bool m_hasCounterNodeMap : 1;
   bool m_everHadLayout : 1;
+
+ private:
+  // Store state between styleWillChange and styleDidChange
+  static bool s_affectsParentBlock;
 };
 
 }  // namespace WebCore

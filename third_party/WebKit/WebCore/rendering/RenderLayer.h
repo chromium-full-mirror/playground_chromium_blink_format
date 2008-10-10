@@ -170,7 +170,7 @@ class RenderLayer : public ScrollbarClient {
 
   void repaintIncludingDescendants();
 
-  void styleChanged(RenderStyle*);
+  void styleChanged(RenderStyle::Diff, const RenderStyle*);
 
   RenderMarquee* marquee() const { return m_marquee; }
   void suspendMarquees();

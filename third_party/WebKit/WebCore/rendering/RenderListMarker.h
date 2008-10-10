@@ -42,8 +42,6 @@ class RenderListMarker : public RenderBox {
 
   virtual bool isListMarker() const { return true; }
 
-  virtual void setStyle(const RenderStyle*);
-
   virtual void paint(PaintInfo&, int tx, int ty);
 
   virtual void layout();
@@ -69,6 +67,10 @@ class RenderListMarker : public RenderBox {
   virtual bool canBeSelectionLeaf() const { return true; }
 
   void updateMargins();
+
+ protected:
+  virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
  private:
   IntRect getRelativeMarkerRect();

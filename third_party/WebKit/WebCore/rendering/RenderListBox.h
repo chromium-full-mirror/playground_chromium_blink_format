@@ -47,7 +47,6 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
 
   virtual bool isListBox() const { return true; }
 
-  virtual void setStyle(const RenderStyle*);
   virtual void updateFromElement();
 
   virtual bool canHaveChildren() const { return false; }
@@ -100,6 +99,9 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   virtual int scrollHeight() const;
   virtual void setScrollLeft(int);
   virtual void setScrollTop(int);
+
+ protected:
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
  private:
   // ScrollbarClient interface.

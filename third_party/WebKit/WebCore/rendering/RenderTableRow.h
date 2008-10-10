@@ -50,7 +50,6 @@ class RenderTableRow : public RenderContainer {
     return static_cast<RenderTable*>(parent()->parent());
   }
 
-  virtual void setStyle(const RenderStyle*);
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
   virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const {
     return 0;
@@ -71,6 +70,9 @@ class RenderTableRow : public RenderContainer {
 
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void imageChanged(WrappedImagePtr);
+
+ protected:
+  virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
 };
 
 }  // namespace WebCore

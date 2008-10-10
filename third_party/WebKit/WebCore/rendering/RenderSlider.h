@@ -41,7 +41,6 @@ class RenderSlider : public RenderBlock {
 
   virtual int baselinePosition(bool, bool) const;
   virtual void calcPrefWidths();
-  virtual void setStyle(const RenderStyle*);
   virtual void layout();
   virtual void updateFromElement();
 
@@ -58,6 +57,9 @@ class RenderSlider : public RenderBlock {
 
   void forwardEvent(Event*);
   bool inDragMode() const;
+
+ protected:
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
  private:
   RenderStyle* createThumbStyle(const RenderStyle* parentStyle,

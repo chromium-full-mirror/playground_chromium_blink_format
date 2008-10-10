@@ -55,6 +55,9 @@ using namespace HTMLNames;
 typedef WTF::HashMap<const RenderBox*, int> OverrideSizeMap;
 static OverrideSizeMap* gOverrideSizeMap = 0;
 
+bool RenderBox::s_wasFloating = false;
+bool RenderBox::s_hadOverflowClip = false;
+
 RenderBox::RenderBox(Node* node)
     : RenderObject(node),
       m_width(0),
@@ -70,15 +73,38 @@ RenderBox::RenderBox(Node* node)
       m_layer(0),
       m_inlineBoxWrapper(0) {}
 
-void RenderBox::setStyle(const RenderStyle* newStyle) {
-  bool wasFloating = isFloating();
-  bool hadOverflowClip = hasOverflowClip();
+RenderBox::~RenderBox() {}
 
-  RenderStyle* oldStyle = style();
-  if (oldStyle)
-    oldStyle->ref();
+void RenderBox::destroy() {
+  // A lot of the code in this function is just pasted into
+  // RenderWidget::destroy. If anything in this function changes,
+  // be sure to fix RenderWidget::destroy() as well.
+  if (hasOverrideSize())
+    gOverrideSizeMap->remove(this);
 
-  RenderObject::setStyle(newStyle);
+  // This must be done before we destroy the RenderObject.
+  if (m_layer)
+    m_layer->clearClipRect();
+
+  if (style() &&
+      (style()->height().isPercent() || style()->minHeight().isPercent() ||
+       style()->maxHeight().isPercent()))
+    RenderBlock::removePercentHeightDescendant(this);
+
+  RenderObject::destroy();
+}
+
+void RenderBox::styleWillChange(RenderStyle::Diff diff,
+                                const RenderStyle* newStyle) {
+  s_wasFloating = isFloating();
+  s_hadOverflowClip = hasOverflowClip();
+
+  RenderObject::styleWillChange(diff, newStyle);
+}
+
+void RenderBox::styleDidChange(RenderStyle::Diff diff,
+                               const RenderStyle* oldStyle) {
+  RenderObject::styleDidChange(diff, oldStyle);
 
   if (needsLayout() && oldStyle &&
       (oldStyle->height().isPercent() || oldStyle->minHeight().isPercent() ||
@@ -89,9 +115,9 @@ void RenderBox::setStyle(const RenderStyle* newStyle) {
   if (isRoot() || isRenderView())
     setHasBoxDecorations(true);
 
-  setInline(newStyle->isDisplayInlineType());
+  setInline(style()->isDisplayInlineType());
 
-  switch (newStyle->position()) {
+  switch (style()->position()) {
     case AbsolutePosition:
     case FixedPosition:
       setPositioned(true);
@@ -99,11 +125,12 @@ void RenderBox::setStyle(const RenderStyle* newStyle) {
     default:
       setPositioned(false);
 
-      if (newStyle->isFloating())
+      if (style()->isFloating())
         setFloating(true);
 
-      if (newStyle->position() == RelativePosition)
+      if (style()->position() == RelativePosition)
         setRelPositioned(true);
+      break;
   }
 
   // We also handle <body> and <html>, whose overflow applies to the viewport.
@@ -112,20 +139,20 @@ void RenderBox::setStyle(const RenderStyle* newStyle) {
     // Check for overflow clip.
     // It's sufficient to just check one direction, since it's illegal to have
     // visible on only one overflow value.
-    if (newStyle->overflowX() != OVISIBLE) {
-      if (!hadOverflowClip)
+    if (style()->overflowX() != OVISIBLE) {
+      if (!s_hadOverflowClip)
         // Erase the overflow
         repaint();
       setHasOverflowClip();
     }
   }
 
-  setHasTransform(newStyle->hasTransform());
-  setHasReflection(newStyle->boxReflect());
+  setHasTransform(style()->hasTransform());
+  setHasReflection(style()->boxReflect());
 
   if (requiresLayer()) {
     if (!m_layer) {
-      if (wasFloating && isFloating())
+      if (s_wasFloating && isFloating())
         setChildNeedsLayout(true);
       m_layer = new (renderArena()) RenderLayer(this);
       setHasLayer(true);
@@ -143,7 +170,7 @@ void RenderBox::setStyle(const RenderStyle* newStyle) {
                              // out the bit.
     setHasReflection(false);
     layer->removeOnlyThisLayer();
-    if (wasFloating && isFloating())
+    if (s_wasFloating && isFloating())
       setChildNeedsLayout(true);
   }
 
@@ -165,40 +192,16 @@ void RenderBox::setStyle(const RenderStyle* newStyle) {
   }
 
   if (m_layer)
-    m_layer->styleChanged(oldStyle);
+    m_layer->styleChanged(diff, oldStyle);
 
   // Set the text color if we're the body.
   if (isBody())
-    document()->setTextColor(newStyle->color());
+    document()->setTextColor(style()->color());
 
   if (style()->outlineWidth() > 0 &&
       style()->outlineSize() > maximalOutlineSize(PaintPhaseOutline))
     static_cast<RenderView*>(document()->renderer())
         ->setMaximalOutlineSize(style()->outlineSize());
-
-  if (oldStyle)
-    oldStyle->deref(renderArena());
-}
-
-RenderBox::~RenderBox() {}
-
-void RenderBox::destroy() {
-  // A lot of the code in this function is just pasted into
-  // RenderWidget::destroy. If anything in this function changes,
-  // be sure to fix RenderWidget::destroy() as well.
-  if (hasOverrideSize())
-    gOverrideSizeMap->remove(this);
-
-  // This must be done before we destroy the RenderObject.
-  if (m_layer)
-    m_layer->clearClipRect();
-
-  if (style() &&
-      (style()->height().isPercent() || style()->minHeight().isPercent() ||
-       style()->maxHeight().isPercent()))
-    RenderBlock::removePercentHeightDescendant(this);
-
-  RenderObject::destroy();
 }
 
 int RenderBox::minPrefWidth() const {

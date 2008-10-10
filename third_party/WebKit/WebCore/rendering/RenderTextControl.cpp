@@ -114,21 +114,22 @@ RenderTextControl::~RenderTextControl() {
     m_innerText->detach();
 }
 
-void RenderTextControl::setStyle(const RenderStyle* style) {
-  RenderBlock::setStyle(style);
+void RenderTextControl::styleDidChange(RenderStyle::Diff diff,
+                                       const RenderStyle* oldStyle) {
+  RenderBlock::styleDidChange(diff, oldStyle);
   if (m_innerBlock) {
     // We may have set the width and the height in the old style in layout().
     // Reset them now to avoid
     // getting a spurious layout hint.
     m_innerBlock->renderer()->style()->setHeight(Length());
     m_innerBlock->renderer()->style()->setWidth(Length());
-    m_innerBlock->renderer()->setStyle(createInnerBlockStyle(style));
+    m_innerBlock->renderer()->setStyle(createInnerBlockStyle(style()));
   }
 
   if (m_innerText) {
     RenderBlock* textBlockRenderer =
         static_cast<RenderBlock*>(m_innerText->renderer());
-    RenderStyle* textBlockStyle = createInnerTextStyle(style);
+    RenderStyle* textBlockStyle = createInnerTextStyle(style());
     // We may have set the width and the height in the old style in layout().
     // Reset them now to avoid
     // getting a spurious layout hint.
@@ -142,10 +143,10 @@ void RenderTextControl::setStyle(const RenderStyle* style) {
     }
   }
   if (m_resultsButton && m_resultsButton->renderer())
-    m_resultsButton->renderer()->setStyle(createResultsButtonStyle(style));
+    m_resultsButton->renderer()->setStyle(createResultsButtonStyle(style()));
 
   if (m_cancelButton && m_cancelButton->renderer())
-    m_cancelButton->renderer()->setStyle(createCancelButtonStyle(style));
+    m_cancelButton->renderer()->setStyle(createCancelButtonStyle(style()));
 
   setHasOverflowClip(false);
   setReplaced(isInline());

@@ -39,8 +39,6 @@ class RenderListItem : public RenderBlock {
 
   virtual void destroy();
 
-  virtual void setStyle(const RenderStyle*);
-
   int value() const {
     if (!m_isValueUpToDate)
       updateValueNow();
@@ -65,6 +63,9 @@ class RenderListItem : public RenderBlock {
   bool notInList() const { return m_notInList; }
 
   const String& markerText() const;
+
+ protected:
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
  private:
   void updateMarkerLocation();

@@ -169,12 +169,13 @@ void RenderSlider::calcPrefWidths() {
   setPrefWidthsDirty(false);
 }
 
-void RenderSlider::setStyle(const RenderStyle* newStyle) {
-  RenderBlock::setStyle(newStyle);
+void RenderSlider::styleDidChange(RenderStyle::Diff diff,
+                                  const RenderStyle* oldStyle) {
+  RenderBlock::styleDidChange(diff, oldStyle);
 
   if (m_thumb) {
     RenderStyle* thumbStyle =
-        createThumbStyle(newStyle, m_thumb->renderer()->style());
+        createThumbStyle(style(), m_thumb->renderer()->style());
     m_thumb->renderer()->setStyle(thumbStyle);
   }
 

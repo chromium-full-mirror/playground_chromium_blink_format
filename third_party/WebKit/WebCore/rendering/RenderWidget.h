@@ -37,8 +37,6 @@ class RenderWidget : public RenderReplaced {
 
   virtual bool isWidget() const { return true; }
 
-  virtual void setStyle(const RenderStyle*);
-
   virtual void paint(PaintInfo&, int tx, int ty);
 
   virtual void destroy();
@@ -66,6 +64,9 @@ class RenderWidget : public RenderReplaced {
                            int tx,
                            int ty,
                            HitTestAction);
+
+ protected:
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
  private:
   void setWidgetGeometry(const IntRect&);

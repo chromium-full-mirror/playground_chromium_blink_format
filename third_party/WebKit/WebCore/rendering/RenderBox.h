@@ -36,7 +36,6 @@ class RenderBox : public RenderObject {
 
   virtual const char* renderName() const { return "RenderBox"; }
 
-  virtual void setStyle(const RenderStyle*);
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
@@ -210,6 +209,9 @@ class RenderBox : public RenderObject {
   virtual IntRect maskClipRect();
 
  protected:
+  virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+
   void paintFillLayer(const PaintInfo&,
                       const Color&,
                       const FillLayer*,
@@ -334,6 +336,11 @@ class RenderBox : public RenderObject {
 
   // For inline replaced elements, the inline box that owns us.
   InlineBox* m_inlineBoxWrapper;
+
+ private:
+  // Used to store state between styleWillChange and styleDidChange
+  static bool s_wasFloating;
+  static bool s_hadOverflowClip;
 };
 
 }  // namespace WebCore

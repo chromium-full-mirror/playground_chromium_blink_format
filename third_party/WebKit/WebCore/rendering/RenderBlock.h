@@ -129,8 +129,6 @@ class RenderBlock : public RenderFlow {
 
   virtual void repaintOverhangingFloats(bool paintAllDescendants);
 
-  virtual void setStyle(const RenderStyle*);
-
   virtual void layout();
   virtual void layoutBlock(bool relayoutChildren);
   void layoutBlockChildren(bool relayoutChildren, int& maxFloatBottom);
@@ -452,6 +450,9 @@ class RenderBlock : public RenderFlow {
   void markLinesDirtyInVerticalRange(int top, int bottom);
 
  protected:
+  virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+
   void newLine(EClear);
   virtual bool hasLineIfEmpty() const;
   bool layoutOnlyPositionedObjects();

@@ -40,7 +40,9 @@ class RenderSVGGradientStop : public RenderObject {
   virtual const char* renderName() const { return "RenderSVGGradientStop"; }
 
   virtual void layout();
-  virtual void setStyle(const RenderStyle*);
+
+ protected:
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
  private:
   SVGGradientElement* gradientElement() const;

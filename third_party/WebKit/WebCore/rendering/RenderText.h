@@ -44,8 +44,6 @@ class RenderText : public RenderObject {
 
   virtual PassRefPtr<StringImpl> originalText() const;
 
-  virtual void setStyle(const RenderStyle*);
-
   void extractTextBox(InlineTextBox*);
   void attachTextBox(InlineTextBox*);
   void removeTextBox(InlineTextBox*);
@@ -173,6 +171,8 @@ class RenderText : public RenderObject {
   void checkConsistency() const;
 
  protected:
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+
   virtual void setTextInternal(PassRefPtr<StringImpl>);
   virtual void calcPrefWidths(int leadWidth);
   virtual UChar previousCharacter();

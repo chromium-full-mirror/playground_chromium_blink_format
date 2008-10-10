@@ -41,7 +41,6 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
 
   virtual const char* renderName() const { return "RenderFileUploadControl"; }
 
-  virtual void setStyle(const RenderStyle*);
   virtual void updateFromElement();
   virtual void calcPrefWidths();
   virtual void paintObject(PaintInfo&, int tx, int ty);
@@ -54,6 +53,9 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
 
   String buttonValue();
   String fileTextValue();
+
+ protected:
+  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
  private:
   int maxFilenameWidth() const;
