@@ -69,6 +69,7 @@
 #include "Pair.h"
 #include "Rect.h"
 #include "RenderScrollbar.h"
+#include "RenderScrollbarTheme.h"
 #include "RenderTheme.h"
 #include "RotateTransformOperation.h"
 #include "ScaleTransformOperation.h"
@@ -2654,6 +2655,17 @@ bool CSSStyleSelector::SelectorChecker::checkScrollbarPseudoClass(
       return part == BackButtonStartPart || part == ForwardButtonStartPart;
     case CSSSelector::PseudoEnd:
       return part == BackButtonEndPart || part == ForwardButtonEndPart;
+    case CSSSelector::PseudoScrollbarButtonDouble: {
+      ScrollbarButtonsPlacement buttonsPlacement =
+          scrollbar->theme()->buttonsPlacement();
+      if (part == BackButtonStartPart || part == ForwardButtonStartPart)
+        return buttonsPlacement == ScrollbarButtonsDoubleStart ||
+               buttonsPlacement == ScrollbarButtonsDoubleBoth;
+      if (part == BackButtonEndPart || part == ForwardButtonEndPart)
+        return buttonsPlacement == ScrollbarButtonsDoubleEnd ||
+               buttonsPlacement == ScrollbarButtonsDoubleBoth;
+      return false;
+    }
     case CSSSelector::PseudoWindowInactive:
       return !scrollbar->isWindowActive();
     default:

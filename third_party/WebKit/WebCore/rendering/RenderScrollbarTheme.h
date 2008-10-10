@@ -43,7 +43,7 @@ class RenderScrollbarTheme : public ScrollbarThemeComposite {
   }
 
   virtual ScrollbarButtonsPlacement buttonsPlacement() const {
-    return ScrollbarButtonsDoubleBoth;
+    return ScrollbarTheme::nativeTheme()->buttonsPlacement();
   }
 
   virtual bool supportsControlTints() const { return true; }

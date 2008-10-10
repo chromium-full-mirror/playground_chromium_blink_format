@@ -147,6 +147,7 @@ class CSSSelector {
     PseudoScrollbar,
     PseudoScrollbarBack,
     PseudoScrollbarButton,
+    PseudoScrollbarButtonDouble,
     PseudoScrollbarCorner,
     PseudoScrollbarForward,
     PseudoScrollbarThumb,

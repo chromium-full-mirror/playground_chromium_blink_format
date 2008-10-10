@@ -1194,9 +1194,9 @@ void RenderLayer::invalidateScrollbarRect(Scrollbar* scrollbar,
         renderer()->width() - renderer()->borderRight() - scrollbar->width(),
         renderer()->borderTop());
   else
-    scrollRect.move(
-        renderer()->height() - renderer()->borderBottom() - scrollbar->height(),
-        renderer()->borderLeft());
+    scrollRect.move(renderer()->borderLeft(), renderer()->height() -
+                                                  renderer()->borderBottom() -
+                                                  scrollbar->height());
   renderer()->repaintRectangle(scrollRect);
 }
 
