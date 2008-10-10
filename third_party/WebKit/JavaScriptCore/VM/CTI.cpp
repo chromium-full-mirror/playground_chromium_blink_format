@@ -81,45 +81,40 @@ COMPILE_ASSERT(CTI_ARGS_callFrame == 0xE, CTI_ARGS_callFrame_is_E);
 
 #if COMPILER(GCC) && PLATFORM(X86)
 
-asm(".globl _ctiTrampoline"
-    "\n"
-    "_ctiTrampoline:"
-    "\n"
-    "pushl %esi"
-    "\n"
-    "pushl %edi"
-    "\n"
-    "subl $0x24, %esp"
-    "\n"
-    "movl $512, %esi"
-    "\n"
-    "movl 0x38(%esp), %edi"
-    "\n"  // Ox38 = 0x0E * 4, 0x0E = CTI_ARGS_callFrame (see assertion above)
-    "call *0x30(%esp)"
-    "\n"  // Ox30 = 0x0C * 4, 0x0C = CTI_ARGS_code (see assertion above)
-    "addl $0x24, %esp"
-    "\n"
-    "popl %edi"
-    "\n"
-    "popl %esi"
-    "\n"
-    "ret"
-    "\n");
+#if PLATFORM(DARWIN)
+#define SYMBOL_STRING(name) "_" #name
+#else
+#define SYMBOL_STRING(name) #name
+#endif
 
-asm(".globl _ctiVMThrowTrampoline"
-    "\n"
-    "_ctiVMThrowTrampoline:"
-    "\n"
-    "call __ZN3JSC7Machine12cti_vm_throwEPv"
-    "\n"
-    "addl $0x24, %esp"
-    "\n"
-    "popl %edi"
-    "\n"
-    "popl %esi"
-    "\n"
-    "ret"
-    "\n");
+asm(
+".globl " SYMBOL_STRING(ctiTrampoline) "\n"
+SYMBOL_STRING(ctiTrampoline) ":" "\n"
+    "pushl %esi" "\n"
+    "pushl %edi" "\n"
+    "subl $0x24, %esp" "\n"
+    "movl $512, %esi" "\n"
+    "movl 0x38(%esp), %edi" "\n" // Ox38 = 0x0E * 4, 0x0E = CTI_ARGS_callFrame (see assertion above)
+    "call *0x30(%esp)" "\n" // Ox30 = 0x0C * 4, 0x0C = CTI_ARGS_code (see assertion above)
+    "addl $0x24, %esp" "\n"
+    "popl %edi" "\n"
+    "popl %esi" "\n"
+    "ret" "\n"
+);
+
+asm(
+".globl " SYMBOL_STRING(ctiVMThrowTrampoline) "\n"
+SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
+#if USE(CTI_ARGUMENT)
+    "call " SYMBOL_STRING(_ZN3JSC7Machine12cti_vm_throwEPPv) "\n"
+#else
+    "call " SYMBOL_STRING(_ZN3JSC7Machine12cti_vm_throwEPv) "\n"
+#endif
+    "addl $0x24, %esp" "\n"
+    "popl %edi" "\n"
+    "popl %esi" "\n"
+    "ret" "\n"
+);
 
 #elif COMPILER(MSVC)
 

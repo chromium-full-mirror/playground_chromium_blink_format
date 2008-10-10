@@ -25,7 +25,6 @@
 #include "ustring.h"
 #include <wtf/Forward.h>
 #include <wtf/RefCounted.h>
-#include <wrec/WREC.h>
 
 struct JSRegExp;
 
@@ -70,7 +69,8 @@ class RegExp : public RefCounted<RegExp> {
   unsigned m_numSubpatterns;
 
 #if ENABLE(WREC)
-  WRECFunction m_wrecFunction;
+  // Called as a WRECFunction
+  void* m_wrecFunction;
 #endif
 };
 
