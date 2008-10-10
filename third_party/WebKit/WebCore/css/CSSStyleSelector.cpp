@@ -2599,6 +2599,9 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
       case CSSSelector::PseudoScrollbarTrackPiece:
         dynamicPseudo = RenderStyle::SCROLLBAR_TRACK_PIECE;
         return true;
+      case CSSSelector::PseudoResizer:
+        dynamicPseudo = RenderStyle::RESIZER;
+        return true;
       case CSSSelector::PseudoUnknown:
       case CSSSelector::PseudoNotParsed:
       default:

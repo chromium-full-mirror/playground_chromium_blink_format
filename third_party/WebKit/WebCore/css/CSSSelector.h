@@ -143,6 +143,7 @@ class CSSSelector {
     PseudoAfter,
     PseudoLang,
     PseudoNot,
+    PseudoResizer,
     PseudoRoot,
     PseudoScrollbar,
     PseudoScrollbarBack,
