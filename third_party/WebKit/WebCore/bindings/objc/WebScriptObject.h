@@ -255,7 +255,8 @@
     @discussion Use this method to bridge between the WebScriptObject and
     JavaScriptCore APIs.
 */
-- (JSObjectRef)JSObject AVAILABLE_WEBKIT_VERSION_3_0_AND_LATER;
+- (JSObjectRef)JSObject
+    WEBKIT_OBJC_METHOD_ANNOTATION(AVAILABLE_WEBKIT_VERSION_3_0_AND_LATER);
 
 /*!
     @method callWebScriptMethod:withArguments:
