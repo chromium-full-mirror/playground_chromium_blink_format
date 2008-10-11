@@ -304,6 +304,9 @@ backforward list.
 
 + (NSString*)_decodeData:(NSData*)data;
 
++ (void)_setAlwaysUsesComplexTextCodePath:(BOOL)f;
+// This is the old name of the above method. Needed for Safari versions that
+// call it.
 + (void)_setAlwaysUseATSU:(BOOL)f;
 
 - (NSCachedURLResponse*)_cachedResponseForURL:(NSURL*)URL;

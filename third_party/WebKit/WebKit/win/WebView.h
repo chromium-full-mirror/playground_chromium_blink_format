@@ -693,6 +693,12 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE defersCallbacks(
       /* [out, retval] */ BOOL* defersCallbacks);
 
+  virtual HRESULT STDMETHODCALLTYPE setAlwaysUsesComplexTextCodePath(
+      /* [in] */ BOOL complex);
+
+  virtual HRESULT STDMETHODCALLTYPE alwaysUsesComplexTextCodePath(
+      /* [out, retval] */ BOOL* complex);
+
   // WebView
   WebCore::Page* page();
   bool handleMouseEvent(UINT, WPARAM, LPARAM);
