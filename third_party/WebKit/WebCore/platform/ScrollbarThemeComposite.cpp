@@ -180,10 +180,10 @@ ScrollbarPart ScrollbarThemeComposite::hitTest(Scrollbar* scrollbar,
     IntRect thumbRect;
     IntRect afterThumbRect;
     splitTrack(scrollbar, track, beforeThumbRect, thumbRect, afterThumbRect);
-    if (beforeThumbRect.contains(mousePosition))
-      result = BackTrackPart;
-    else if (thumbRect.contains(mousePosition))
+    if (thumbRect.contains(mousePosition))
       result = ThumbPart;
+    else if (beforeThumbRect.contains(mousePosition))
+      result = BackTrackPart;
     else
       result = ForwardTrackPart;
   } else if (backButtonRect(scrollbar, BackButtonStartPart)
@@ -252,19 +252,20 @@ void ScrollbarThemeComposite::splitTrack(Scrollbar* scrollbar,
                         trackRect.y() + (trackRect.height() - thickness) / 2,
                         thumbLength(scrollbar), thickness);
     beforeThumbRect =
-        IntRect(trackRect.x(), trackRect.y(), thumbPos, trackRect.height());
-    afterThumbRect =
-        IntRect(thumbRect.x() + thumbRect.width(), trackRect.y(),
-                trackRect.right() - thumbRect.right(), trackRect.height());
+        IntRect(trackRect.x(), trackRect.y(), thumbPos + thumbRect.width() / 2,
+                trackRect.height());
+    afterThumbRect = IntRect(
+        trackRect.x() + beforeThumbRect.width(), trackRect.y(),
+        trackRect.right() - beforeThumbRect.right(), trackRect.height());
   } else {
     thumbRect =
         IntRect(trackRect.x() + (trackRect.width() - thickness) / 2,
                 trackRect.y() + thumbPos, thickness, thumbLength(scrollbar));
-    beforeThumbRect =
-        IntRect(trackRect.x(), trackRect.y(), trackRect.width(), thumbPos);
-    afterThumbRect =
-        IntRect(trackRect.x(), thumbRect.y() + thumbRect.height(),
-                trackRect.width(), trackRect.bottom() - thumbRect.bottom());
+    beforeThumbRect = IntRect(trackRect.x(), trackRect.y(), trackRect.width(),
+                              thumbPos + thumbRect.height() / 2);
+    afterThumbRect = IntRect(
+        trackRect.x(), thumbRect.y() + beforeThumbRect.height(),
+        trackRect.width(), trackRect.bottom() - beforeThumbRect.bottom());
   }
 }
 
