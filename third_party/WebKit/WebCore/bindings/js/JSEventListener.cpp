@@ -258,15 +258,11 @@ inline JSValue* eventParameterName(
     JSLazyEventListener::LazyEventListenerType type,
     ExecState* exec) {
   switch (type) {
-    case JSLazyEventListener::HTMLLazyEventListener: {
-      static ProtectedPtr<JSValue> htmlEventString = jsString(exec, "event");
-      return htmlEventString.get();
-    }
+    case JSLazyEventListener::HTMLLazyEventListener:
+      return jsNontrivialString(exec, "event");
 #if ENABLE(SVG)
-    case JSLazyEventListener::SVGLazyEventListener: {
-      static ProtectedPtr<JSValue> svgEventString = jsString(exec, "evt");
-      return svgEventString.get();
-    }
+    case JSLazyEventListener::SVGLazyEventListener:
+      return jsNontrivialString(exec, "evt");
 #endif
     default:
       ASSERT_NOT_REACHED();
