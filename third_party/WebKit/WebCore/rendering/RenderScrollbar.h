@@ -38,16 +38,12 @@ class RenderStyle;
 
 class RenderScrollbar : public Scrollbar {
  protected:
-  RenderScrollbar(ScrollbarClient*,
-                  ScrollbarOrientation,
-                  RenderStyle*,
-                  RenderObject*);
+  RenderScrollbar(ScrollbarClient*, ScrollbarOrientation, RenderObject*);
 
  public:
   friend class Scrollbar;
   static PassRefPtr<Scrollbar> createCustomScrollbar(ScrollbarClient*,
                                                      ScrollbarOrientation,
-                                                     RenderStyle*,
                                                      RenderObject*);
   virtual ~RenderScrollbar();
 
@@ -59,7 +55,7 @@ class RenderScrollbar : public Scrollbar {
   virtual void setHoveredPart(ScrollbarPart);
   virtual void setPressedPart(ScrollbarPart);
 
-  void updateScrollbarParts(RenderStyle* = 0, bool destroy = false);
+  void updateScrollbarParts(bool destroy = false);
 
   static ScrollbarPart partForStyleResolve();
   static RenderScrollbar* scrollbarForStyleResolve();
@@ -77,9 +73,7 @@ class RenderScrollbar : public Scrollbar {
 
  private:
   RenderStyle* getScrollbarPseudoStyle(ScrollbarPart, RenderStyle::PseudoId);
-  void updateScrollbarPart(ScrollbarPart,
-                           RenderStyle* = 0,
-                           bool destroy = false);
+  void updateScrollbarPart(ScrollbarPart, bool destroy = false);
 
   RenderObject* m_owner;
   HashMap<unsigned, RenderScrollbarPart*> m_parts;

@@ -117,6 +117,7 @@ class RenderStyle {
     AFTER,
     SELECTION,
     FIRST_LINE_INHERITED,
+    SCROLLBAR,
     FILE_UPLOAD_BUTTON,
     INPUT_PLACEHOLDER,
     SLIDER_THUMB,
@@ -132,7 +133,6 @@ class RenderStyle {
     MEDIA_CONTROLS_SEEK_BACK_BUTTON,
     MEDIA_CONTROLS_SEEK_FORWARD_BUTTON,
     MEDIA_CONTROLS_FULLSCREEN_BUTTON,
-    SCROLLBAR,
     SCROLLBAR_THUMB,
     SCROLLBAR_BUTTON,
     SCROLLBAR_TRACK,
@@ -255,7 +255,7 @@ class RenderStyle {
     bool _affectedByHover : 1;
     bool _affectedByActive : 1;
     bool _affectedByDrag : 1;
-    unsigned _pseudoBits : 6;
+    unsigned _pseudoBits : 7;
     unsigned _unicodeBidi : 2;  // EUnicodeBidi
   } noninherited_flags;
 

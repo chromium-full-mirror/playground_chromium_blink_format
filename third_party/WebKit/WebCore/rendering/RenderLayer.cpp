@@ -1211,13 +1211,14 @@ void RenderLayer::invalidateScrollbarRect(Scrollbar* scrollbar,
 PassRefPtr<Scrollbar> RenderLayer::createScrollbar(
     ScrollbarOrientation orientation) {
   RefPtr<Scrollbar> widget;
-  RenderStyle* style =
-      m_object->node()->shadowAncestorNode()->renderer()->getPseudoStyle(
-          RenderStyle::SCROLLBAR);
-  if (style)
+  bool hasCustomScrollbarStyle = m_object->node()
+                                     ->shadowAncestorNode()
+                                     ->renderer()
+                                     ->style()
+                                     ->hasPseudoStyle(RenderStyle::SCROLLBAR);
+  if (hasCustomScrollbarStyle)
     widget = RenderScrollbar::createCustomScrollbar(
-        this, orientation, style,
-        m_object->node()->shadowAncestorNode()->renderer());
+        this, orientation, m_object->node()->shadowAncestorNode()->renderer());
   else
     widget =
         Scrollbar::createNativeScrollbar(this, orientation, RegularScrollbar);
