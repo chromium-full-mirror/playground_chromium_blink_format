@@ -68,6 +68,7 @@ class RenderScrollbar : public Scrollbar {
 
   IntRect buttonRect(ScrollbarPart);
   IntRect trackRect(int startLength, int endLength);
+  IntRect trackPieceRectWithMargins(ScrollbarPart, const IntRect&);
 
   int minimumThumbLength();
 

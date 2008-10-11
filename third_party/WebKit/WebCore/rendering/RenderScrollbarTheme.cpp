@@ -92,6 +92,13 @@ IntRect RenderScrollbarTheme::trackRect(Scrollbar* scrollbar, bool) {
                                                              endLength);
 }
 
+IntRect RenderScrollbarTheme::adjustTrackPieceRect(Scrollbar* scrollbar,
+                                                   ScrollbarPart part,
+                                                   const IntRect& rect) {
+  return static_cast<RenderScrollbar*>(scrollbar)->trackPieceRectWithMargins(
+      part, rect);
+}
+
 void RenderScrollbarTheme::paintScrollCorner(ScrollView*,
                                              GraphicsContext* context,
                                              const IntRect& cornerRect) {

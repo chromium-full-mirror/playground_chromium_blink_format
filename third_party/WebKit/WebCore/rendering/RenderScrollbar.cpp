@@ -303,6 +303,27 @@ IntRect RenderScrollbar::trackRect(int startLength, int endLength) {
   return IntRect(x(), y() + startLength, width(), height() - totalLength);
 }
 
+IntRect RenderScrollbar::trackPieceRectWithMargins(ScrollbarPart partType,
+                                                   const IntRect& oldRect) {
+  RenderScrollbarPart* partRenderer = m_parts.get(partType);
+  if (!partRenderer)
+    return oldRect;
+
+  partRenderer->layout();
+
+  IntRect rect = oldRect;
+  if (orientation() == HorizontalScrollbar) {
+    rect.setX(rect.x() + partRenderer->marginLeft());
+    rect.setWidth(rect.width() -
+                  (partRenderer->marginLeft() + partRenderer->marginRight()));
+  } else {
+    rect.setY(rect.y() + partRenderer->marginTop());
+    rect.setHeight(rect.height() -
+                   (partRenderer->marginTop() + partRenderer->marginBottom()));
+  }
+  return rect;
+}
+
 int RenderScrollbar::minimumThumbLength() {
   RenderScrollbarPart* partRenderer = m_parts.get(ThumbPart);
   if (!partRenderer)

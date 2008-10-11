@@ -104,6 +104,10 @@ class RenderScrollbarTheme : public ScrollbarThemeComposite {
                            const IntRect&,
                            ScrollbarPart);
   virtual void paintThumb(GraphicsContext*, Scrollbar*, const IntRect&);
+
+  virtual IntRect adjustTrackPieceRect(Scrollbar*,
+                                       ScrollbarPart,
+                                       const IntRect&);
 };
 
 }  // namespace WebCore
