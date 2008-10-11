@@ -363,7 +363,7 @@ void Cache::pruneDeadResources() {
     while (current) {
       CachedResource* prev = current->m_prevInAllResourcesList;
       if (!current->hasClients() && !current->isPreloaded()) {
-        remove(current);
+        evict(current);
         // If remove() caused pruneDeadResources() to be re-entered, bail out.
         // This can happen when removing an
         // SVG CachedImage that has subresources.
@@ -399,7 +399,7 @@ void Cache::setCapacities(unsigned minDeadBytes,
   prune();
 }
 
-void Cache::remove(CachedResource* resource) {
+void Cache::evict(CachedResource* resource) {
   // The resource may have already been removed by someone other than our
   // caller,
   // who needed a fresh copy for a reload. See
