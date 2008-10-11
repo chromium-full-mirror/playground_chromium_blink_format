@@ -69,11 +69,14 @@ class PropertyNameArray {
   typedef PropertyNameArrayData::const_iterator const_iterator;
 
   PropertyNameArray(JSGlobalData* globalData)
-      : m_data(PropertyNameArrayData::create()), m_globalData(globalData) {}
+      : m_data(PropertyNameArrayData::create()),
+        m_globalData(globalData),
+        m_cacheable(true) {}
 
   PropertyNameArray(ExecState* exec)
       : m_data(PropertyNameArrayData::create()),
-        m_globalData(&exec->globalData()) {}
+        m_globalData(&exec->globalData()),
+        m_cacheable(true) {}
 
   JSGlobalData* globalData() { return m_globalData; }
 
@@ -98,12 +101,16 @@ class PropertyNameArray {
 
   PassRefPtr<PropertyNameArrayData> releaseData() { return m_data.release(); }
 
+  void setCacheable(bool cacheable) { m_cacheable = cacheable; }
+  bool cacheable() const { return m_cacheable; }
+
  private:
   typedef HashSet<UString::Rep*, PtrHash<UString::Rep*>> IdentifierSet;
 
   RefPtr<PropertyNameArrayData> m_data;
   IdentifierSet m_set;
   JSGlobalData* m_globalData;
+  bool m_cacheable;
 };
 
 }  // namespace JSC
