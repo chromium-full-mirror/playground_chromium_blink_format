@@ -145,12 +145,10 @@ bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
                 ForwardButtonEndPart);
 
   // Paint the track background.
-  if ((scrollMask & ForwardTrackPart) || (scrollMask & BackTrackPart) ||
-      (scrollMask && ThumbPart))
+  if ((scrollMask & ForwardTrackPart) || (scrollMask & BackTrackPart)) {
     paintTrackBackground(graphicsContext, scrollbar, trackPaintRect);
 
-  // Paint the track pieces above and below the thumb.
-  if ((scrollMask & ForwardTrackPart) || (scrollMask & BackTrackPart)) {
+    // Paint the track pieces above and below the thumb.
     if (scrollMask & BackTrackPart)
       paintTrackPiece(graphicsContext, scrollbar, startTrackRect,
                       BackTrackPart);
@@ -264,7 +262,7 @@ void ScrollbarThemeComposite::splitTrack(Scrollbar* scrollbar,
     beforeThumbRect = IntRect(trackRect.x(), trackRect.y(), trackRect.width(),
                               thumbPos + thumbRect.height() / 2);
     afterThumbRect = IntRect(
-        trackRect.x(), thumbRect.y() + beforeThumbRect.height(),
+        trackRect.x(), trackRect.y() + beforeThumbRect.height(),
         trackRect.width(), trackRect.bottom() - beforeThumbRect.bottom());
   }
 }
