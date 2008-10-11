@@ -139,8 +139,6 @@ class JSLazyEventListener : public JSEventListener {
   LazyEventListenerType m_type;
 };
 
-JSC::JSValue* getNodeEventListener(Node*, const AtomicString& eventType);
-
 }  // namespace WebCore
 
 #endif  // JSEventListener_h
