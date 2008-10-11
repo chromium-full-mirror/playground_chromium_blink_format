@@ -145,13 +145,9 @@ static inline TransformOperations blendFunc(const AnimationBase* anim,
     unsigned size = max(fromSize, toSize);
     for (unsigned i = 0; i < size; i++) {
       RefPtr<TransformOperation> fromOp =
-          (i < fromSize && !from.operations()[i]->isIdentity())
-              ? from.operations()[i].get()
-              : 0;
+          (i < fromSize) ? from.operations()[i].get() : 0;
       RefPtr<TransformOperation> toOp =
-          (i < toSize && !to.operations()[i]->isIdentity())
-              ? to.operations()[i].get()
-              : 0;
+          (i < toSize) ? to.operations()[i].get() : 0;
       RefPtr<TransformOperation> blendedOp =
           toOp ? toOp->blend(fromOp.get(), progress)
                : (fromOp ? fromOp->blend(0, progress, true) : 0);
