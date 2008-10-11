@@ -138,6 +138,13 @@ void RenderScrollbarPart::styleDidChange(RenderStyle::Diff diff,
   setPositioned(false);
   setFloating(false);
   setHasOverflowClip(false);
+  if (oldStyle && m_scrollbar && m_part != NoPart)
+    m_scrollbar->theme()->invalidatePart(m_scrollbar, m_part);
+}
+
+void RenderScrollbarPart::imageChanged(WrappedImagePtr) {
+  if (m_scrollbar && m_part != NoPart)
+    m_scrollbar->theme()->invalidatePart(m_scrollbar, m_part);
 }
 
 void RenderScrollbarPart::paintIntoRect(GraphicsContext* graphicsContext,
