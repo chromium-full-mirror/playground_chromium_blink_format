@@ -59,7 +59,7 @@ void PluginView::invalidateRegion(NPRegion) {
 }
 
 Color WebCore::focusRingColor() {
-  return 0xFF0000FF;
+  return Color();
 }
 void WebCore::setFocusRingColorChangeFunction(void (*)()) {}
 
