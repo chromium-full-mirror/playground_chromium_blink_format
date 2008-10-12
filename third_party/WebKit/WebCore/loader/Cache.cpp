@@ -213,14 +213,14 @@ void Cache::revalidateResource(CachedResource* resource, DocLoader* docLoader) {
   if (resource->resourceToRevalidate())
     return;
   if (!resource->canUseCacheValidator()) {
-    remove(resource);
+    evict(resource);
     return;
   }
   const String& url = resource->url();
   CachedResource* newResource =
       createResource(resource->type(), KURL(url), resource->encoding());
   newResource->setResourceToRevalidate(resource);
-  remove(resource);
+  evict(resource);
   m_resources.set(url, newResource);
   newResource->setInCache(true);
   resourceAccessed(newResource);
@@ -234,7 +234,7 @@ void Cache::revalidationSucceeded(CachedResource* revalidatingResource,
   ASSERT(!resource->inCache());
   ASSERT(resource->isLoaded());
 
-  remove(revalidatingResource);
+  evict(revalidatingResource);
 
   ASSERT(!m_resources.get(resource->url()));
   m_resources.set(resource->url(), resource);
@@ -364,7 +364,7 @@ void Cache::pruneDeadResources() {
       CachedResource* prev = current->m_prevInAllResourcesList;
       if (!current->hasClients() && !current->isPreloaded()) {
         evict(current);
-        // If remove() caused pruneDeadResources() to be re-entered, bail out.
+        // If evict() caused pruneDeadResources() to be re-entered, bail out.
         // This can happen when removing an
         // SVG CachedImage that has subresources.
         if (!m_inPruneDeadResources)
@@ -714,7 +714,7 @@ void Cache::setDisabled(bool disabled) {
     CachedResourceMap::iterator i = m_resources.begin();
     if (i == m_resources.end())
       break;
-    remove(i->second);
+    evict(i->second);
   }
 }
 
