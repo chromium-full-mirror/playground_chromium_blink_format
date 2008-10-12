@@ -1,5 +1,4 @@
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 2006 George Staikos <staikos@kde.org>
  *  Copyright (C) 2006 Alexey Proskuryakov <ap@nypop.com>
  *
@@ -176,6 +175,7 @@ enum CharCategory {
 };
 
 #if QT_VERSION >= 0x040300
+
 // FIXME: handle surrogates correctly in all methods
 
 inline UChar32 toLower(UChar32 ch) {
@@ -511,4 +511,3 @@ inline CharCategory category(UChar32 c) {
 }
 
 #endif
-// vim: ts=2 sw=2 et

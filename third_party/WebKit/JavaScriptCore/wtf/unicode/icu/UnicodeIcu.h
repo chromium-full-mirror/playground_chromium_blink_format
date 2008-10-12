@@ -1,8 +1,7 @@
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 2006 George Staikos <staikos@kde.org>
  *  Copyright (C) 2006 Alexey Proskuryakov <ap@nypop.com>
- *  Copyright (C) 2007 Apple Computer, Inc. All rights reserved.
+ *  Copyright (C) 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -24,11 +23,10 @@
 #ifndef KJS_UNICODE_ICU_H
 #define KJS_UNICODE_ICU_H
 
+#include <stdlib.h>
 #include <unicode/uchar.h>
 #include <unicode/ustring.h>
 #include <unicode/utf16.h>
-
-#include <stdlib.h>
 
 namespace WTF {
 namespace Unicode {
@@ -217,4 +215,3 @@ inline int umemcasecmp(const UChar* a, const UChar* b, int len) {
 }
 
 #endif
-// vim: ts=2 sw=2 et
