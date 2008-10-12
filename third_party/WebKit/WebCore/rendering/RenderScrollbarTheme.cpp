@@ -92,11 +92,24 @@ IntRect RenderScrollbarTheme::trackRect(Scrollbar* scrollbar, bool) {
                                                              endLength);
 }
 
-IntRect RenderScrollbarTheme::adjustTrackPieceRect(Scrollbar* scrollbar,
-                                                   ScrollbarPart part,
-                                                   const IntRect& rect) {
-  return static_cast<RenderScrollbar*>(scrollbar)->trackPieceRectWithMargins(
-      part, rect);
+IntRect RenderScrollbarTheme::constrainTrackRectToTrackPieces(
+    Scrollbar* scrollbar,
+    const IntRect& rect) {
+  IntRect backRect =
+      static_cast<RenderScrollbar*>(scrollbar)->trackPieceRectWithMargins(
+          BackTrackPart, rect);
+  IntRect forwardRect =
+      static_cast<RenderScrollbar*>(scrollbar)->trackPieceRectWithMargins(
+          ForwardTrackPart, rect);
+  IntRect result = rect;
+  if (scrollbar->orientation() == HorizontalScrollbar) {
+    result.setX(backRect.x());
+    result.setWidth(forwardRect.right() - backRect.x());
+  } else {
+    result.setY(backRect.y());
+    result.setHeight(forwardRect.bottom() - backRect.y());
+  }
+  return result;
 }
 
 void RenderScrollbarTheme::paintScrollCorner(ScrollView*,

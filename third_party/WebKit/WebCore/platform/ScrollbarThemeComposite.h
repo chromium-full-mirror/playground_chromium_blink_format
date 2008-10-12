@@ -83,17 +83,10 @@ class ScrollbarThemeComposite : public ScrollbarTheme {
                            ScrollbarPart) {}
   virtual void paintThumb(GraphicsContext*, Scrollbar*, const IntRect&) {}
 
-  virtual IntRect adjustTrackPieceRect(Scrollbar*,
-                                       ScrollbarPart,
-                                       const IntRect& rect) {
+  virtual IntRect constrainTrackRectToTrackPieces(Scrollbar*,
+                                                  const IntRect& rect) {
     return rect;
   }
-
- private:
-  void trackPieceRects(Scrollbar* scrollbar,
-                       const IntRect& trackRect,
-                       IntRect& beforeThumbRect,
-                       IntRect& afterThumbRect);
 };
 }
 #endif

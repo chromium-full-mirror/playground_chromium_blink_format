@@ -1288,14 +1288,29 @@ IntSize RenderLayer::offsetFromResizeCorner(const IntPoint& p) const {
   return p - IntPoint(x, y);
 }
 
-static IntRect scrollCornerRect(RenderObject* renderer,
-                                const IntRect& absBounds) {
-  int resizerThickness = ScrollbarTheme::nativeTheme()->scrollbarThickness();
-  return IntRect(absBounds.right() - resizerThickness -
-                     renderer->style()->borderRightWidth(),
-                 absBounds.bottom() - resizerThickness -
-                     renderer->style()->borderBottomWidth(),
-                 resizerThickness, resizerThickness);
+static IntRect scrollCornerRect(RenderLayer* layer, const IntRect& absBounds) {
+  int nativeThickness = ScrollbarTheme::nativeTheme()->scrollbarThickness();
+  int horizontalThickness;
+  int verticalThickness;
+  if (!layer->verticalScrollbar() && !layer->horizontalScrollbar()) {
+    horizontalThickness = nativeThickness;
+    verticalThickness = nativeThickness;
+  } else if (layer->verticalScrollbar() && !layer->horizontalScrollbar()) {
+    horizontalThickness = layer->verticalScrollbar()->width();
+    verticalThickness = horizontalThickness;
+  } else if (layer->horizontalScrollbar() && !layer->verticalScrollbar()) {
+    verticalThickness = layer->horizontalScrollbar()->height();
+    horizontalThickness = verticalThickness;
+  } else {
+    horizontalThickness = layer->verticalScrollbar()->width();
+    verticalThickness = layer->horizontalScrollbar()->height();
+  }
+
+  return IntRect(absBounds.right() - horizontalThickness -
+                     layer->renderer()->style()->borderRightWidth(),
+                 absBounds.bottom() - verticalThickness -
+                     layer->renderer()->style()->borderBottomWidth(),
+                 horizontalThickness, verticalThickness);
 }
 
 void RenderLayer::positionOverflowControls(int tx, int ty) {
@@ -1307,7 +1322,7 @@ void RenderLayer::positionOverflowControls(int tx, int ty) {
 
   IntRect resizeControlRect;
   if (m_object->style()->resize() != RESIZE_NONE)
-    resizeControlRect = scrollCornerRect(m_object, absBounds);
+    resizeControlRect = scrollCornerRect(this, absBounds);
 
   int resizeControlSize = max(resizeControlRect.height(), 0);
   if (m_vBar)
@@ -1551,7 +1566,7 @@ void RenderLayer::paintOverflowControls(GraphicsContext* context,
 
   if (m_object->style()->resize() != RESIZE_NONE) {
     IntRect absBounds(tx, ty, m_object->width(), m_object->height());
-    IntRect scrollCorner = scrollCornerRect(m_object, absBounds);
+    IntRect scrollCorner = scrollCornerRect(this, absBounds);
     if (!scrollCorner.intersects(damageRect))
       return;
     paintResizer(context, scrollCorner);
@@ -1608,7 +1623,7 @@ bool RenderLayer::isPointInResizeControl(const IntPoint& point) {
   int y = 0;
   convertToLayerCoords(root(), x, y);
   IntRect absBounds(x, y, m_object->width(), m_object->height());
-  return scrollCornerRect(m_object, absBounds).contains(point);
+  return scrollCornerRect(this, absBounds).contains(point);
 }
 
 bool RenderLayer::hitTestOverflowControls(HitTestResult& result) {
@@ -1623,7 +1638,7 @@ bool RenderLayer::hitTestOverflowControls(HitTestResult& result) {
 
   IntRect resizeControlRect;
   if (renderer()->style()->resize() != RESIZE_NONE) {
-    resizeControlRect = scrollCornerRect(renderer(), absBounds);
+    resizeControlRect = scrollCornerRect(this, absBounds);
     if (resizeControlRect.contains(result.point()))
       return true;
   }
