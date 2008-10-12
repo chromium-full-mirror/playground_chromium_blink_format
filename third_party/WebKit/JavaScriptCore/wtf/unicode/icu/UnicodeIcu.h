@@ -173,20 +173,12 @@ inline bool isArabicChar(UChar32 c) {
   return ublock_getCode(c) == UBLOCK_ARABIC;
 }
 
-inline bool isFormatChar(UChar32 c) {
-  return u_charType(c) == U_FORMAT_CHAR;
-}
-
 inline bool isSeparatorSpace(UChar32 c) {
   return u_charType(c) == U_SPACE_SEPARATOR;
 }
 
 inline bool isPrintableChar(UChar32 c) {
   return !!u_isprint(c);
-}
-
-inline bool isDigit(UChar32 c) {
-  return !!u_isdigit(c);
 }
 
 inline bool isPunct(UChar32 c) {
@@ -207,10 +199,6 @@ inline Direction direction(UChar32 c) {
 
 inline bool isLower(UChar32 c) {
   return !!u_islower(c);
-}
-
-inline int digitValue(UChar32 c) {
-  return u_charDigitValue(c);
 }
 
 inline uint8_t combiningClass(UChar32 c) {
