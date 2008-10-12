@@ -28,6 +28,8 @@
 
 namespace WebCore {
 
+class String;
+
 const int undefinedLength = -1;
 const int percentScaleFactor = 128;
 
@@ -229,6 +231,9 @@ struct LengthSize {
 
   LengthSize(const Length& w, const Length& h) : width(w), height(h) {}
 };
+
+Length* newCoordsArray(const String&, int& len);
+Length* newLengthArray(const String&, int& len);
 
 }  // namespace WebCore
 
