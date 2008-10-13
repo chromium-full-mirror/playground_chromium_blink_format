@@ -60,6 +60,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   static JSGlobalData& sharedInstance();
 
   static PassRefPtr<JSGlobalData> create();
+  static PassRefPtr<JSGlobalData> createLeaked();
   ~JSGlobalData();
 
   Machine* machine;

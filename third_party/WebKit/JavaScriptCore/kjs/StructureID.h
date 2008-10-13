@@ -89,6 +89,9 @@ class StructureID : public RefCounted<StructureID> {
     return adoptRef(new StructureID(prototype, typeInfo));
   }
 
+  static void startIgnoringLeaks();
+  static void stopIgnoringLeaks();
+
   static PassRefPtr<StructureID> changePrototypeTransition(StructureID*,
                                                            JSValue* prototype);
   static PassRefPtr<StructureID> addPropertyTransition(
