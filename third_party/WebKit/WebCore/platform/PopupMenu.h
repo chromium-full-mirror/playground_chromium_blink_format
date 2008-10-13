@@ -150,6 +150,7 @@ class PopupMenu : public RefCounted<PopupMenu>
   virtual void valueChanged(Scrollbar*);
   virtual void invalidateScrollbarRect(Scrollbar*, const IntRect&);
   virtual bool isActive() const { return true; }
+  virtual bool scrollbarCornerPresent() const { return false; }
 
   void calculatePositionAndSize(const IntRect&, FrameView*);
   void invalidateItem(int index);
