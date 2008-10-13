@@ -712,6 +712,11 @@ class RenderObject : public CachedResourceClient {
   virtual void setPos(int /*xPos*/, int /*yPos*/) {}
   virtual void setWidth(int /*width*/) {}
   virtual void setHeight(int /*height*/) {}
+  virtual void setRect(const IntRect& rect) {
+    setPos(rect.x(), rect.y());
+    setWidth(rect.width());
+    setHeight(rect.height());
+  }
 
   virtual int xPos() const { return 0; }
   virtual int yPos() const { return 0; }
