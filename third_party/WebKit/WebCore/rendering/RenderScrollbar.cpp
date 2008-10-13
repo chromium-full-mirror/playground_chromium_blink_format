@@ -44,9 +44,7 @@ RenderScrollbar::RenderScrollbar(ScrollbarClient* client,
                 orientation,
                 RegularScrollbar,
                 RenderScrollbarTheme::renderScrollbarTheme()),
-      m_owner(renderer) {
-  updateScrollbarParts();
-}
+      m_owner(renderer) {}
 
 RenderScrollbar::~RenderScrollbar() {
   ASSERT(m_parts.isEmpty());

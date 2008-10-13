@@ -1301,6 +1301,8 @@ void RenderLayer::setHasHorizontalScrollbar(bool hasScrollbar) {
 
   // Destroying or creating one bar can cause our scrollbar corner to come and
   // go.  We need to update the opposite scrollbar's style.
+  if (m_hBar)
+    m_hBar->styleChanged();
   if (m_vBar)
     m_vBar->styleChanged();
 
@@ -1324,6 +1326,8 @@ void RenderLayer::setHasVerticalScrollbar(bool hasScrollbar) {
   // go.  We need to update the opposite scrollbar's style.
   if (m_hBar)
     m_hBar->styleChanged();
+  if (m_vBar)
+    m_vBar->styleChanged();
 
 #if ENABLE(DASHBOARD_SUPPORT)
   // Force an update since we know the scrollbars have changed things.
