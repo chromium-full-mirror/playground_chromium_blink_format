@@ -142,30 +142,26 @@ bool isMainThread() {
 
 Mutex::Mutex() : m_mutex(g_mutex_new()) {}
 
-Mutex::~Mutex() {
-  g_mutex_free(m_mutex);
-}
+Mutex::~Mutex() {}
 
 void Mutex::lock() {
-  g_mutex_lock(m_mutex);
+  g_mutex_lock(m_mutex.get());
 }
 
 bool Mutex::tryLock() {
-  return g_mutex_trylock(m_mutex);
+  return g_mutex_trylock(m_mutex.get());
 }
 
 void Mutex::unlock() {
-  g_mutex_unlock(m_mutex);
+  g_mutex_unlock(m_mutex.get());
 }
 
 ThreadCondition::ThreadCondition() : m_condition(g_cond_new()) {}
 
-ThreadCondition::~ThreadCondition() {
-  g_cond_free(m_condition);
-}
+ThreadCondition::~ThreadCondition() {}
 
 void ThreadCondition::wait(Mutex& mutex) {
-  g_cond_wait(m_condition, mutex.impl());
+  g_cond_wait(m_condition.get(), mutex.impl().get());
 }
 
 bool ThreadCondition::timedWait(Mutex& mutex, double interval) {
@@ -188,14 +184,14 @@ bool ThreadCondition::timedWait(Mutex& mutex, double interval) {
     targetTime.tv_sec++;
   }
 
-  return g_cond_timed_wait(m_condition, mutex.impl(), &targetTime);
+  return g_cond_timed_wait(m_condition.get(), mutex.impl().get(), &targetTime);
 }
 
 void ThreadCondition::signal() {
-  g_cond_signal(m_condition);
+  g_cond_signal(m_condition.get());
 }
 
 void ThreadCondition::broadcast() {
-  g_cond_broadcast(m_condition);
+  g_cond_broadcast(m_condition.get());
 }
 }
