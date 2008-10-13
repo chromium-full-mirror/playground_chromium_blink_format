@@ -113,6 +113,10 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   }  // We don't support resize on list boxes yet.  If we did this would have to
      // change.
 
+  void setHasVerticalScrollbar(bool hasScrollbar);
+  PassRefPtr<Scrollbar> createScrollbar();
+  void destroyScrollbar();
+
   int itemHeight() const;
   void valueChanged(unsigned listIndex);
   int size() const;
