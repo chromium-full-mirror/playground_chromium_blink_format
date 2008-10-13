@@ -1584,6 +1584,11 @@ void RenderLayer::paintScrollCorner(GraphicsContext* context,
   if (!absRect.intersects(damageRect))
     return;
 
+  if (context->updatingControlTints()) {
+    updateScrollCornerStyle();
+    return;
+  }
+
   if (m_scrollCorner) {
     m_scrollCorner->paintIntoRect(context, tx, ty, absRect);
     return;
@@ -1596,11 +1601,19 @@ void RenderLayer::paintResizer(GraphicsContext* context,
                                int tx,
                                int ty,
                                const IntRect& damageRect) {
+  if (m_object->style()->resize() == RESIZE_NONE)
+    return;
+
   IntRect cornerRect = resizerCornerRect(this, m_object->borderBox());
   IntRect absRect = IntRect(cornerRect.x() + tx, cornerRect.y() + ty,
                             cornerRect.width(), cornerRect.height());
   if (!absRect.intersects(damageRect))
     return;
+
+  if (context->updatingControlTints()) {
+    updateResizerStyle();
+    return;
+  }
 
   if (m_resizer) {
     m_resizer->paintIntoRect(context, tx, ty, absRect);
@@ -2682,7 +2695,11 @@ void RenderLayer::styleChanged(RenderStyle::Diff, const RenderStyle* oldStyle) {
   if (m_vBar)
     m_vBar->styleChanged();
 
-  // Update our scroll corner style.
+  updateScrollCornerStyle();
+  updateResizerStyle();
+}
+
+void RenderLayer::updateScrollCornerStyle() {
   RenderObject* actualRenderer =
       m_object->node()->isElementNode()
           ? m_object->node()->shadowAncestorNode()->renderer()
@@ -2690,7 +2707,7 @@ void RenderLayer::styleChanged(RenderStyle::Diff, const RenderStyle* oldStyle) {
   RenderStyle* corner =
       m_object->hasOverflowClip()
           ? actualRenderer->getPseudoStyle(RenderStyle::SCROLLBAR_CORNER,
-                                           actualRenderer->style())
+                                           actualRenderer->style(), false)
           : 0;
   if (corner) {
     if (!m_scrollCorner) {
@@ -2703,12 +2720,17 @@ void RenderLayer::styleChanged(RenderStyle::Diff, const RenderStyle* oldStyle) {
     m_scrollCorner->destroy();
     m_scrollCorner = 0;
   }
+}
 
-  // Update our scroll corner resizer style.
+void RenderLayer::updateResizerStyle() {
+  RenderObject* actualRenderer =
+      m_object->node()->isElementNode()
+          ? m_object->node()->shadowAncestorNode()->renderer()
+          : m_object;
   RenderStyle* resizer =
       m_object->hasOverflowClip()
           ? actualRenderer->getPseudoStyle(RenderStyle::RESIZER,
-                                           actualRenderer->style())
+                                           actualRenderer->style(), false)
           : 0;
   if (resizer) {
     if (!m_resizer) {

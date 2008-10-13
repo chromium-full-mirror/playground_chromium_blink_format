@@ -74,8 +74,10 @@ void RenderScrollbar::styleChanged() {
 
 void RenderScrollbar::paint(GraphicsContext* context,
                             const IntRect& damageRect) {
-  if (context->updatingControlTints())
+  if (context->updatingControlTints()) {
     updateScrollbarParts();
+    return;
+  }
   Scrollbar::paint(context, damageRect);
 }
 
