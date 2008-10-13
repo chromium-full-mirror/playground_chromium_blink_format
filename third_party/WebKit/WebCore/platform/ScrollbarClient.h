@@ -40,6 +40,8 @@ class ScrollbarClient {
   virtual void invalidateScrollbarRect(Scrollbar*, const IntRect&) = 0;
 
   virtual bool isActive() const = 0;
+
+  virtual bool scrollbarCornerPresent() const = 0;
 };
 }
 #endif

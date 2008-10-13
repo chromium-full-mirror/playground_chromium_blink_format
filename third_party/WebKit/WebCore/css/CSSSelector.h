@@ -154,6 +154,7 @@ class CSSSelector {
     PseudoScrollbarTrack,
     PseudoScrollbarTrackPiece,
     PseudoWindowInactive,
+    PseudoCornerPresent,
     PseudoDecrement,
     PseudoIncrement,
     PseudoHorizontal,

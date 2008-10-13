@@ -2705,6 +2705,8 @@ bool CSSStyleSelector::SelectorChecker::checkScrollbarPseudoClass(
                buttonsPlacement == ScrollbarButtonsDoubleStart;
       return false;
     }
+    case CSSSelector::PseudoCornerPresent:
+      return scrollbar->client()->scrollbarCornerPresent();
     default:
       return false;
   }

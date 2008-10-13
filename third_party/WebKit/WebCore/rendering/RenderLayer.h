@@ -243,8 +243,8 @@ class RenderLayer : public ScrollbarClient {
   PassRefPtr<Scrollbar> createScrollbar(ScrollbarOrientation);
   void destroyScrollbar(ScrollbarOrientation);
 
-  Scrollbar* horizontalScrollbar() { return m_hBar.get(); }
-  Scrollbar* verticalScrollbar() { return m_vBar.get(); }
+  Scrollbar* horizontalScrollbar() const { return m_hBar.get(); }
+  Scrollbar* verticalScrollbar() const { return m_vBar.get(); }
 
   int verticalScrollbarWidth() const;
   int horizontalScrollbarHeight() const;
@@ -412,6 +412,7 @@ class RenderLayer : public ScrollbarClient {
   virtual void valueChanged(Scrollbar*);
   virtual void invalidateScrollbarRect(Scrollbar*, const IntRect&);
   virtual bool isActive() const;
+  virtual bool scrollbarCornerPresent() const;
 
   void updateOverflowStatus(bool horizontalOverflow, bool verticalOverflow);
 
