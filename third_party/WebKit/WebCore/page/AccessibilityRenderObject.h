@@ -171,7 +171,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual const String& actionVerb() const;
   virtual Widget* widget() const;
   virtual Widget* widgetForAttachmentView() const;
-  virtual void getDocumentLinks(AccessibilityChildrenVector&) const;
+  virtual void getDocumentLinks(AccessibilityChildrenVector&);
   virtual FrameView* documentFrameView() const;
 
   virtual const AccessibilityChildrenVector& children();
@@ -232,6 +232,8 @@ class AccessibilityRenderObject : public AccessibilityObject {
   void addRadioButtonGroupMembers(
       AccessibilityChildrenVector& linkedUIElements) const;
   AccessibilityObject* internalLinkElement() const;
+  AccessibilityObject* accessibilityParentForImageMap(
+      HTMLMapElement* map) const;
 };
 
 }  // namespace WebCore

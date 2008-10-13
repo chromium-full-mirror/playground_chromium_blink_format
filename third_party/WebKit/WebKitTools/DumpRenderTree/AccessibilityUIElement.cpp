@@ -57,6 +57,18 @@ static JSValueRef attributesOfLinkedUIElementsCallback(
   return JSValueMakeString(context, linkedUIDescription.get());
 }
 
+static JSValueRef attributesOfDocumentLinksCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  JSRetainPtr<JSStringRef> linkedUIDescription(
+      Adopt, toAXElement(thisObject)->attributesOfDocumentLinks());
+  return JSValueMakeString(context, linkedUIDescription.get());
+}
+
 static JSValueRef attributesOfChildrenCallback(JSContextRef context,
                                                JSObjectRef function,
                                                JSObjectRef thisObject,
@@ -397,6 +409,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"allAttributes", allAttributesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"attributesOfLinkedUIElements", attributesOfLinkedUIElementsCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"attributesOfDocumentLinks", attributesOfDocumentLinksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"attributesOfChildren", attributesOfChildrenCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

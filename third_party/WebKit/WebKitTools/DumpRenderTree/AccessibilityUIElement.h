@@ -61,6 +61,7 @@ class AccessibilityUIElement {
       const AccessibilityUIElement&);
 
   void getLinkedUIElements(Vector<AccessibilityUIElement>&);
+  void getDocumentLinks(Vector<AccessibilityUIElement>&);
   void getChildren(Vector<AccessibilityUIElement>&);
   AccessibilityUIElement getChildAtIndex(unsigned);
   AccessibilityUIElement titleUIElement();
@@ -68,6 +69,7 @@ class AccessibilityUIElement {
   // Methods - platform-independent implementations
   JSStringRef allAttributes();
   JSStringRef attributesOfLinkedUIElements();
+  JSStringRef attributesOfDocumentLinks();
   JSStringRef attributesOfChildren();
   JSStringRef parameterizedAttributeNames();
 
