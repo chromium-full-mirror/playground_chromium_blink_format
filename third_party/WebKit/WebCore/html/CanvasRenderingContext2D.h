@@ -235,13 +235,15 @@ class CanvasRenderingContext2D : Noncopyable {
   PassRefPtr<CanvasGradient> createLinearGradient(float x0,
                                                   float y0,
                                                   float x1,
-                                                  float y1);
+                                                  float y1,
+                                                  ExceptionCode&);
   PassRefPtr<CanvasGradient> createRadialGradient(float x0,
                                                   float y0,
                                                   float r0,
                                                   float x1,
                                                   float y1,
-                                                  float r1);
+                                                  float r1,
+                                                  ExceptionCode&);
   PassRefPtr<CanvasPattern> createPattern(HTMLImageElement*,
                                           const String& repetitionType,
                                           ExceptionCode&);
