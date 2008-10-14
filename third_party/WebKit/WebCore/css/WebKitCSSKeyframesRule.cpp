@@ -79,7 +79,6 @@ const WebKitCSSKeyframeRule* WebKitCSSKeyframesRule::item(
 
 void WebKitCSSKeyframesRule::append(WebKitCSSKeyframeRule* rule) {
   m_lstCSSRules.get()->append(rule);
-  stylesheet()->styleSheetChanged();
 }
 
 void WebKitCSSKeyframesRule::insertRule(const String& rule) {
@@ -91,10 +90,8 @@ void WebKitCSSKeyframesRule::insertRule(const String& rule) {
 
 void WebKitCSSKeyframesRule::deleteRule(const String& s) {
   int i = findRuleIndex(s);
-  if (i >= 0) {
+  if (i >= 0)
     m_lstCSSRules.get()->deleteRule(i);
-    stylesheet()->styleSheetChanged();
-  }
 }
 
 WebKitCSSKeyframeRule* WebKitCSSKeyframesRule::findRule(const String& s) {
