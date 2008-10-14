@@ -95,9 +95,6 @@ bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
       scrollMask |= BackTrackPart;
     if (damageRect.intersects(endTrackRect))
       scrollMask |= ForwardTrackPart;
-  } else if (damageRect.intersects(trackPaintRect)) {
-    scrollMask |= BackTrackPart;
-    scrollMask |= ForwardTrackPart;
   }
 
 #if PLATFORM(WIN)

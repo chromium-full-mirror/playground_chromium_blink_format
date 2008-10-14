@@ -216,6 +216,15 @@ IntRect ScrollbarThemeWin::trackRect(Scrollbar* scrollbar, bool) {
                  scrollbar->height() - 2 * thickness);
 }
 
+void ScrollbarThemeWin::paintTrackBackground(GraphicsContext* context,
+                                             Scrollbar* scrollbar,
+                                             const IntRect& rect) {
+  // Just assume a forward track part.  We only paint the track as a single
+  // piece when there is no thumb.
+  if (!hasThumb(scrollbar))
+    paintTrackPiece(context, scrollbar, rect, ForwardTrackPart);
+}
+
 void ScrollbarThemeWin::paintTrackPiece(GraphicsContext* context,
                                         Scrollbar* scrollbar,
                                         const IntRect& rect,
