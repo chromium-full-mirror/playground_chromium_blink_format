@@ -137,7 +137,7 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   bool suppressInvalidation() const { return m_suppressInvalidation; }
   void setSuppressInvalidation(bool s) { m_suppressInvalidation = s; }
 
-  virtual void styleChanged() { invalidate(); }
+  virtual void styleChanged() {}
 
  protected:
   virtual void updateThumbPosition();
