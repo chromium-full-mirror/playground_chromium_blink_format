@@ -100,6 +100,8 @@ static QStyleOptionSlider* styleOptionSlider(Scrollbar* scrollbar) {
   opt.orientation = (scrollbar->orientation() == VerticalScrollbar)
                         ? Qt::Vertical
                         : Qt::Horizontal;
+  if (scrollbar->orientation() == HorizontalScrollbar)
+    opt.state |= QStyle::State_Horizontal;
   opt.sliderValue = scrollbar->value();
   opt.sliderPosition = opt.sliderValue;
   opt.pageStep = scrollbar->visibleSize();
