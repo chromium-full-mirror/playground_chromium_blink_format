@@ -30,6 +30,7 @@
 
 #include "GraphicsContext.h"
 #include "PlatformMouseEvent.h"
+#include "RenderThemeQt.h"
 #include "Scrollbar.h"
 #include "ScrollView.h"
 
@@ -129,27 +130,26 @@ bool ScrollbarThemeQt::paint(Scrollbar* scrollbar,
     return false;
   }
 
+  StylePainter p(graphicsContext);
+  if (!p.isValid())
+    return true;
+
   QStyleOptionSlider* opt = styleOptionSlider(scrollbar);
-  QRect clip = opt->rect.intersected(damageRect);
+  p.painter->setClipRect(opt->rect.intersected(damageRect));
 
-  QPainter* p = graphicsContext->platformContext();
-  p->save();
-  p->setClipRect(clip);
-
-  const QPoint topLeft = opt->rect.topLeft();
 #ifdef Q_WS_MAC
-  QApplication::style()->drawComplexControl(QStyle::CC_ScrollBar, opt, p, 0);
+  p.drawComplexControl(QStyle::CC_ScrollBar, *opt);
 #else
-  p->translate(topLeft);
+  const QPoint topLeft = opt->rect.topLeft();
+  p.painter->translate(topLeft);
   opt->rect.moveTo(QPoint(0, 0));
 
   // The QStyle expects the background to be already filled
-  p->fillRect(opt->rect, opt->palette.background());
+  p.painter->fillRect(opt->rect, opt->palette.background());
 
-  QApplication::style()->drawComplexControl(QStyle::CC_ScrollBar, opt, p, 0);
+  p.drawComplexControl(QStyle::CC_ScrollBar, *opt);
   opt->rect.moveTo(topLeft);
 #endif
-  p->restore();
 
   return true;
 }

@@ -203,6 +203,7 @@ class RenderThemeQt : public RenderTheme {
 class StylePainter {
  public:
   explicit StylePainter(const RenderObject::PaintInfo& paintInfo);
+  explicit StylePainter(GraphicsContext* context);
   ~StylePainter();
 
   bool isValid() const { return painter && style; }
@@ -223,6 +224,8 @@ class StylePainter {
   }
 
  private:
+  void init(GraphicsContext* context);
+
   QBrush oldBrush;
   bool oldAntialiasing;
 
