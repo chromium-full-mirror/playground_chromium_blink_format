@@ -183,6 +183,7 @@ class Machine {
 #if ENABLE(CTI)
 
   static void SFX_CALL cti_timeout_check(CTI_ARGS);
+  static void SFX_CALL cti_register_file_check(CTI_ARGS);
 
   static JSValue* SFX_CALL cti_op_convert_this(CTI_ARGS);
   static void SFX_CALL cti_op_end(CTI_ARGS);
