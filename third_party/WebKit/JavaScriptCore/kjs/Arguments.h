@@ -69,6 +69,11 @@ class Arguments : public JSObject {
   }
 
  private:
+  void getArgumentsData(CallFrame*,
+                        JSFunction*&,
+                        ptrdiff_t& firstParameterIndex,
+                        Register*& argv,
+                        int& argc);
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier& propertyName,
                                   PropertySlot&);
@@ -93,6 +98,29 @@ class Arguments : public JSObject {
   OwnPtr<ArgumentsData> d;
 };
 
+ALWAYS_INLINE void Arguments::getArgumentsData(CallFrame* callFrame,
+                                               JSFunction*& function,
+                                               ptrdiff_t& firstParameterIndex,
+                                               Register*& argv,
+                                               int& argc) {
+  function = callFrame->callee();
+
+  CodeBlock* codeBlock = &function->m_body->generatedByteCode();
+  int numParameters = codeBlock->numParameters;
+  argc = callFrame->argumentCount();
+
+  if (argc <= numParameters)
+    argv = callFrame->registers() - RegisterFile::CallFrameHeaderSize -
+           numParameters + 1;  // + 1 to skip "this"
+  else
+    argv = callFrame->registers() - RegisterFile::CallFrameHeaderSize -
+           numParameters - argc + 1;  // + 1 to skip "this"
+
+  argc -= 1;  // - 1 to skip "this"
+  firstParameterIndex = -RegisterFile::CallFrameHeaderSize - numParameters +
+                        1;  // + 1 to skip "this"
+}
+
 inline Arguments::Arguments(CallFrame* callFrame)
     : JSObject(callFrame->lexicalGlobalObject()->argumentsStructure()),
       d(new ArgumentsData) {
@@ -100,8 +128,7 @@ inline Arguments::Arguments(CallFrame* callFrame)
   ptrdiff_t firstParameterIndex;
   Register* argv;
   int numArguments;
-  callFrame->machine()->getArgumentsData(callFrame, callee, firstParameterIndex,
-                                         argv, numArguments);
+  getArgumentsData(callFrame, callee, firstParameterIndex, argv, numArguments);
 
   d->numParameters = callee->m_body->parameterCount();
   d->firstParameterIndex = firstParameterIndex;
