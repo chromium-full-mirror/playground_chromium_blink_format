@@ -936,25 +936,12 @@ class X86Assembler {
   void emitConvertToFastCall() {}
 #endif
 
-#if USE(CTI_ARGUMENT)
-  void emitRestoreArgumentReference() {
-#if USE(FAST_CALL_CTI_ARGUMENT)
-    movl_rr(X86::esp, X86::ecx);
-#else
-    movl_rm(X86::esp, 0, X86::esp);
-#endif
-  }
+  void emitRestoreArgumentReference() { movl_rr(X86::esp, X86::ecx); }
 
   void emitRestoreArgumentReferenceForTrampoline() {
-#if USE(FAST_CALL_CTI_ARGUMENT)
     movl_rr(X86::esp, X86::ecx);
     addl_i32r(4, X86::ecx);
-#endif
   }
-#else
-  void emitRestoreArgumentReference() {}
-  void emitRestoreArgumentReferenceForTrampoline() {}
-#endif
 
  private:
   void emitModRm_rr(RegisterID reg, RegisterID rm) {
