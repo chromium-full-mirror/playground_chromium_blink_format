@@ -60,27 +60,14 @@ extern const HashTable stringTable;
 
 JSGlobalData::JSGlobalData(bool isShared)
     : machine(new Machine),
-      exception(0)
-#if ENABLE(JSC_MULTIPLE_THREADS)
-      ,
+      exception(0),
       arrayTable(new HashTable(JSC::arrayTable)),
       dateTable(new HashTable(JSC::dateTable)),
       mathTable(new HashTable(JSC::mathTable)),
       numberTable(new HashTable(JSC::numberTable)),
       regExpTable(new HashTable(JSC::regExpTable)),
       regExpConstructorTable(new HashTable(JSC::regExpConstructorTable)),
-      stringTable(new HashTable(JSC::stringTable))
-#else
-      ,
-      arrayTable(&JSC::arrayTable),
-      dateTable(&JSC::dateTable),
-      mathTable(&JSC::mathTable),
-      numberTable(&JSC::numberTable),
-      regExpTable(&JSC::regExpTable),
-      regExpConstructorTable(&JSC::regExpConstructorTable),
-      stringTable(&JSC::stringTable)
-#endif
-      ,
+      stringTable(new HashTable(JSC::stringTable)),
       nullProtoStructureID(JSObject::createStructureID(jsNull())),
       activationStructureID(JSActivation::createStructureID(jsNull())),
       staticScopeStructureID(JSStaticScopeObject::createStructureID(jsNull())),
@@ -97,8 +84,7 @@ JSGlobalData::JSGlobalData(bool isShared)
       dynamicGlobalObject(0),
       isSharedInstance(isShared),
       clientData(0),
-      heap(this) {
-}
+      heap(this) {}
 
 JSGlobalData::~JSGlobalData() {
   // By the time this is destroyed, heap.destroy() must already have been
@@ -111,7 +97,6 @@ JSGlobalData::~JSGlobalData() {
   machine = 0;
 #endif
 
-#if ENABLE(JSC_MULTIPLE_THREADS)
   arrayTable->deleteTable();
   dateTable->deleteTable();
   mathTable->deleteTable();
@@ -126,7 +111,6 @@ JSGlobalData::~JSGlobalData() {
   delete regExpTable;
   delete regExpConstructorTable;
   delete stringTable;
-#endif
 
   delete parser;
   delete lexer;
