@@ -136,6 +136,7 @@ bool ScrollbarThemeQt::paint(Scrollbar* scrollbar,
   if (!p.isValid())
     return true;
 
+  p.painter->save();
   QStyleOptionSlider* opt = styleOptionSlider(scrollbar);
   p.painter->setClipRect(opt->rect.intersected(damageRect));
 
@@ -152,6 +153,7 @@ bool ScrollbarThemeQt::paint(Scrollbar* scrollbar,
   p.drawComplexControl(QStyle::CC_ScrollBar, *opt);
   opt->rect.moveTo(topLeft);
 #endif
+  p.painter->restore();
 
   return true;
 }
@@ -234,10 +236,13 @@ void ScrollbarThemeQt::paintScrollCorner(ScrollView* scrollView,
   context->fillRect(
       rect, QApplication::palette().color(QPalette::Normal, QPalette::Window));
 #else
+  StylePainter p(context);
+  if (!p.isValid())
+    return;
+
   QStyleOption option;
   option.rect = rect;
-  QApplication::style()->drawPrimitive(QStyle::PE_PanelScrollAreaCorner,
-                                       &option, context->platformContext(), 0);
+  p.drawPrimitive(QStyle::PE_PanelScrollAreaCorner, option);
 #endif
 }
 }
