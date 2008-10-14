@@ -134,12 +134,27 @@ void RenderBox::styleDidChange(RenderStyle::Diff diff,
   }
 
   // We also handle <body> and <html>, whose overflow applies to the viewport.
-  if (!isRoot() && (!isBody() || !document()->isHTMLDocument()) &&
-      (isRenderBlock() || isTableRow() || isTableSection())) {
+  if (!isRoot() && (isRenderBlock() || isTableRow() || isTableSection()) &&
+      style()->overflowX() != OVISIBLE) {
+    bool boxHasOverflowClip = true;
+    if (isBody()) {
+      // Overflow on the body can propagate to the viewport under the following
+      // conditions.
+      // (1) The root element is <html>.
+      // (2) We are the primary <body> (can be checked by looking at
+      // document.body).
+      // (3) The root element has visible overflow.
+      if (document()->documentElement()->hasTagName(htmlTag) &&
+          document()->body() == element() &&
+          document()->documentElement()->renderer()->style()->overflowX() ==
+              OVISIBLE)
+        boxHasOverflowClip = false;
+    }
+
     // Check for overflow clip.
     // It's sufficient to just check one direction, since it's illegal to have
     // visible on only one overflow value.
-    if (style()->overflowX() != OVISIBLE) {
+    if (boxHasOverflowClip) {
       if (!s_hadOverflowClip)
         // Erase the overflow
         repaint();
@@ -339,7 +354,8 @@ void RenderBox::paint(PaintInfo& paintInfo, int tx, int ty) {
 void RenderBox::paintRootBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
   const FillLayer* bgLayer = style()->backgroundLayers();
   Color bgColor = style()->backgroundColor();
-  if (document()->isHTMLDocument() && !style()->hasBackground()) {
+  if (!style()->hasBackground() && element() &&
+      element()->hasTagName(HTMLNames::htmlTag)) {
     // Locate the <body> element using the DOM.  This is easier than trying
     // to crawl around a render tree with potential :before/:after content and
     // anonymous blocks created by inline <body> tags etc.  We can locate the
@@ -429,7 +445,7 @@ void RenderBox::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
     // independent of the body.  Go through the DOM to get to the root element's
     // render object,
     // since the root could be inline and wrapped in an anonymous block.
-    if (!isBody() || !document()->isHTMLDocument() ||
+    if (!isBody() ||
         document()->documentElement()->renderer()->style()->hasBackground())
       paintFillLayers(paintInfo, style()->backgroundColor(),
                       style()->backgroundLayers(), my, mh, tx, ty, w, h);
@@ -638,13 +654,12 @@ bool RenderBox::repaintLayerRectsForImage(WrappedImagePtr image,
       // if we haven't already
       if (!layerRenderer) {
         bool drawingRootBackground =
-            drawingBackground &&
-            (isRoot() || (isBody() && document()->isHTMLDocument() &&
-                          !document()
-                               ->documentElement()
-                               ->renderer()
-                               ->style()
-                               ->hasBackground()));
+            drawingBackground && (isRoot() || (isBody() &&
+                                               !document()
+                                                    ->documentElement()
+                                                    ->renderer()
+                                                    ->style()
+                                                    ->hasBackground()));
         if (drawingRootBackground) {
           layerRenderer = view();
 
