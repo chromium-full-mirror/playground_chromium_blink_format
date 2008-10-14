@@ -1,11 +1,5 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
- * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
- *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
- *           (C) 2006 Alexey Proskuryakov (ap@nypop.com)
+ * Copyright (C) 2005, 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -87,11 +81,6 @@ void FormDataList::appendString(const String& s) {
   CString cstr = fixLineBreaks(
       m_encoding.encode(s.characters(), s.length(), EntitiesForUnencodables));
   m_list.append(cstr);
-}
-
-void FormDataList::appendFile(const String& key, const String& filename) {
-  appendString(key);
-  m_list.append(filename);
 }
 
 }  // namespace
