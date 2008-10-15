@@ -3,6 +3,7 @@
  * Copyright (C) 2006 Michael Emmel mike.emmel@gmail.com
  * Copyright (C) 2007 Alp Toker <alp.toker@collabora.co.uk>
  * Copyright (C) 2007 Holger Hans Peter Freyther
+ * Copyright (C) 2008 Collabora Ltd.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -101,6 +102,14 @@ size_t FormDataStream::read(void* ptr,
   }
 
   return sent;
+}
+
+bool FormDataStream::hasMoreElements() const {
+  Vector<FormDataElement> elements;
+  if (m_resourceHandle->request().httpBody())
+    elements = m_resourceHandle->request().httpBody()->elements();
+
+  return m_formDataElementIndex < elements.size();
 }
 
 }  // namespace WebCore
