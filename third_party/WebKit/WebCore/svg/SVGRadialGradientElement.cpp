@@ -117,8 +117,7 @@ RadialGradientAttributes SVGRadialGradientElement::collectGradientProperties()
   while (current) {
     if (!attributes.hasSpreadMethod() &&
         current->hasAttribute(SVGNames::spreadMethodAttr))
-      attributes.setSpreadMethod(
-          (SVGGradientSpreadMethod)current->spreadMethod());
+      attributes.setSpreadMethod((GradientSpreadMethod)current->spreadMethod());
 
     if (!attributes.hasBoundingBoxMode() &&
         current->hasAttribute(SVGNames::gradientUnitsAttr))

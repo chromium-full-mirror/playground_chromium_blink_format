@@ -169,6 +169,14 @@ void GraphicsContext::setFillRule(WindRule fillRule) {
   m_common->state.fillRule = fillRule;
 }
 
+GradientSpreadMethod GraphicsContext::spreadMethod() const {
+  return m_common->state.spreadMethod;
+}
+
+void GraphicsContext::setSpreadMethod(GradientSpreadMethod spreadMethod) {
+  m_common->state.spreadMethod = spreadMethod;
+}
+
 void GraphicsContext::setFillColor(const Color& color) {
   m_common->state.fillColorSpace = SolidColorSpace;
   m_common->state.fillColor = color;

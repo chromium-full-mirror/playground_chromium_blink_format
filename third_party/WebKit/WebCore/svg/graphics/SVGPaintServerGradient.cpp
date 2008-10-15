@@ -33,15 +33,15 @@
 
 namespace WebCore {
 
-TextStream& operator<<(TextStream& ts, SVGGradientSpreadMethod m) {
+TextStream& operator<<(TextStream& ts, GradientSpreadMethod m) {
   switch (m) {
-    case SPREADMETHOD_PAD:
+    case SpreadMethodPad:
       ts << "PAD";
       break;
-    case SPREADMETHOD_REPEAT:
+    case SpreadMethodRepeat:
       ts << "REPEAT";
       break;
-    case SPREADMETHOD_REFLECT:
+    case SpreadMethodReflect:
       ts << "REFLECT";
       break;
   }
@@ -62,7 +62,7 @@ TextStream& operator<<(TextStream& ts, const Vector<SVGGradientStop>& l) {
 }
 
 SVGPaintServerGradient::SVGPaintServerGradient(const SVGGradientElement* owner)
-    : m_spreadMethod(SPREADMETHOD_PAD),
+    : m_spreadMethod(SpreadMethodPad),
       m_boundingBoxMode(true),
       m_ownerElement(owner)
 #if PLATFORM(CG)
@@ -91,12 +91,12 @@ void SVGPaintServerGradient::setGradientStops(
   m_stops = stops;
 }
 
-SVGGradientSpreadMethod SVGPaintServerGradient::spreadMethod() const {
+GradientSpreadMethod SVGPaintServerGradient::spreadMethod() const {
   return m_spreadMethod;
 }
 
 void SVGPaintServerGradient::setGradientSpreadMethod(
-    const SVGGradientSpreadMethod& method) {
+    const GradientSpreadMethod& method) {
   m_spreadMethod = method;
 }
 
@@ -125,7 +125,7 @@ TextStream& SVGPaintServerGradient::externalRepresentation(
 
   // abstract, don't stream type
   ts << "[stops=" << gradientStops() << "]";
-  if (spreadMethod() != SPREADMETHOD_PAD)
+  if (spreadMethod() != SpreadMethodPad)
     ts << "[method=" << spreadMethod() << "]";
   if (!boundingBoxMode())
     ts << " [bounding box mode=" << boundingBoxMode() << "]";

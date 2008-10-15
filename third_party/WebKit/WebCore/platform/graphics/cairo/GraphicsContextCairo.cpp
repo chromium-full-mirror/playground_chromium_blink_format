@@ -78,6 +78,26 @@ static inline void fillRectSourceOver(cairo_t* cr,
   cairo_fill(cr);
 }
 
+static inline cairo_pattern_t* applySpreadMethod(
+    cairo_pattern_t* pattern,
+    GradientSpreadMethod spreadMethod) {
+  switch (spreadMethod) {
+    case SpreadMethodPad:
+      cairo_pattern_set_extend(pattern, CAIRO_EXTEND_PAD);
+      break;
+    case SpreadMethodReflect:
+      cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REFLECT);
+      break;
+    case SpreadMethodRepeat:
+      cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
+      break;
+    default:
+      cairo_pattern_set_extend(pattern, CAIRO_EXTEND_NONE);
+      break;
+  }
+  return pattern;
+}
+
 GraphicsContext::GraphicsContext(PlatformGraphicsContext* cr)
     : m_common(createGraphicsContextPrivate()),
       m_data(new GraphicsContextPlatformPrivate) {
@@ -448,8 +468,10 @@ void GraphicsContext::fillPath() {
       cairo_paint_with_alpha(cr, m_data->globalAlpha);
       break;
     case GradientColorSpace:
-      cairo_set_source(cr,
-                       m_common->state.fillGradient.get()->platformGradient());
+      cairo_pattern_t* pattern =
+          m_common->state.fillGradient.get()->platformGradient();
+      pattern = applySpreadMethod(pattern, spreadMethod());
+      cairo_set_source(cr, pattern);
       cairo_clip(cr);
       cairo_paint_with_alpha(cr, m_data->globalAlpha);
       break;
@@ -487,8 +509,10 @@ void GraphicsContext::strokePath() {
       cairo_stroke(cr);
       break;
     case GradientColorSpace:
-      cairo_set_source(
-          cr, m_common->state.strokeGradient.get()->platformGradient());
+      cairo_pattern_t* pattern =
+          m_common->state.strokeGradient.get()->platformGradient();
+      pattern = applySpreadMethod(pattern, spreadMethod());
+      cairo_set_source(cr, pattern);
       if (m_data->globalAlpha < 1.0f) {
         cairo_push_group(cr);
         cairo_paint_with_alpha(cr, m_data->globalAlpha);
