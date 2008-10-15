@@ -121,6 +121,8 @@ RenderStyle* RenderScrollbar::getScrollbarPseudoStyle(
   s_styleResolveScrollbar = this;
   RenderStyle* result =
       m_owner->getPseudoStyle(pseudoId, m_owner->style(), false);
+  if (result)
+    result->ref();
   s_styleResolvePart = NoPart;
   s_styleResolveScrollbar = 0;
   return result;
@@ -231,6 +233,9 @@ void RenderScrollbar::updateScrollbarPart(ScrollbarPart partType,
 
   if (partRenderer)
     partRenderer->setStyle(partStyle);
+
+  if (partStyle)
+    partStyle->deref(m_owner->renderArena());
 }
 
 void RenderScrollbar::paintPart(GraphicsContext* graphicsContext,
