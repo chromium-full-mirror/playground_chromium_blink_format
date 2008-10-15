@@ -73,6 +73,7 @@ class TextIterator {
   const UChar* characters() const { return m_textCharacters; }
 
   PassRefPtr<Range> range() const;
+  Node* node() const;
 
   static int rangeLength(const Range*, bool spacesForReplacedElements = false);
   static PassRefPtr<Range> rangeFromLocationAndLength(
