@@ -44,7 +44,10 @@
 #include "ScrollView.h"
 #include "Widget.h"
 #include "ScriptController.h"
+#include <kjs/CollectorHeapIterator.h>
 #include <kjs/DebuggerCallFrame.h>
+#include <kjs/JSLock.h>
+#include <kjs/Parser.h>
 #include <wtf/MainThread.h>
 #include <wtf/UnusedParam.h>
 
@@ -65,7 +68,8 @@ JavaScriptDebugServer::JavaScriptDebugServer()
       m_pauseOnNextStatement(false),
       m_paused(false),
       m_doneProcessingDebuggerEvents(true),
-      m_pauseOnCallFrame(0) {}
+      m_pauseOnCallFrame(0),
+      m_recompileTimer(this, &JavaScriptDebugServer::recompileAllJSFunctions) {}
 
 JavaScriptDebugServer::~JavaScriptDebugServer() {
   deleteAllValues(m_pageListenersMap);
@@ -75,17 +79,15 @@ JavaScriptDebugServer::~JavaScriptDebugServer() {
 
 void JavaScriptDebugServer::addListener(JavaScriptDebugListener* listener) {
   if (!hasListeners())
-    Page::setDebuggerForAllPages(this);
+    willAddFirstListener();
 
   m_listeners.add(listener);
 }
 
 void JavaScriptDebugServer::removeListener(JavaScriptDebugListener* listener) {
   m_listeners.remove(listener);
-  if (!hasListeners()) {
-    Page::setDebuggerForAllPages(0);
-    m_doneProcessingDebuggerEvents = true;
-  }
+  if (!hasListeners())
+    didRemoveLastListener();
 }
 
 void JavaScriptDebugServer::addListener(JavaScriptDebugListener* listener,
@@ -93,7 +95,7 @@ void JavaScriptDebugServer::addListener(JavaScriptDebugListener* listener,
   ASSERT_ARG(page, page);
 
   if (!hasListeners())
-    Page::setDebuggerForAllPages(this);
+    willAddFirstListener();
 
   pair<PageListenersMap::iterator, bool> result =
       m_pageListenersMap.add(page, 0);
@@ -113,18 +115,14 @@ void JavaScriptDebugServer::removeListener(JavaScriptDebugListener* listener,
     return;
 
   ListenerSet* listeners = it->second;
-
   listeners->remove(listener);
-
   if (listeners->isEmpty()) {
     m_pageListenersMap.remove(it);
     delete listeners;
   }
 
-  if (!hasListeners()) {
-    Page::setDebuggerForAllPages(0);
-    m_doneProcessingDebuggerEvents = true;
-  }
+  if (!hasListeners())
+    didRemoveLastListener();
 }
 
 void JavaScriptDebugServer::pageCreated(Page* page) {
@@ -529,6 +527,76 @@ void JavaScriptDebugServer::didReachBreakpoint(
   m_pauseOnNextStatement = true;
   m_currentCallFrame->update(debuggerCallFrame, sourceID, lineNumber);
   pauseIfNeeded(toPage(debuggerCallFrame.dynamicGlobalObject()));
+}
+
+void JavaScriptDebugServer::recompileAllJSFunctions(
+    Timer<JavaScriptDebugServer>*) {
+  JSLock lock(false);
+  JSGlobalData* globalData = JSDOMWindow::commonJSGlobalData();
+
+  // If JavaScript is running, it's not safe to recompile, since we'll end
+  // up throwing away code that is live on the stack.
+  ASSERT(!globalData->dynamicGlobalObject);
+  if (globalData->dynamicGlobalObject)
+    return;
+
+  Vector<ProtectedPtr<JSFunction>> functions;
+  Heap::iterator heapEnd = globalData->heap.primaryHeapEnd();
+  for (Heap::iterator it = globalData->heap.primaryHeapBegin(); it != heapEnd;
+       ++it) {
+    if ((*it)->isObject(&JSFunction::info))
+      functions.append(static_cast<JSFunction*>(*it));
+  }
+
+  typedef HashMap<RefPtr<FunctionBodyNode>, RefPtr<FunctionBodyNode>>
+      FunctionBodyMap;
+  typedef HashSet<SourceProvider*> SourceProviderSet;
+
+  FunctionBodyMap functionBodies;
+  SourceProviderSet sourceProviders;
+
+  size_t size = functions.size();
+  for (size_t i = 0; i < size; ++i) {
+    JSFunction* function = functions[i];
+
+    FunctionBodyNode* oldBody = function->m_body.get();
+    pair<FunctionBodyMap::iterator, bool> result =
+        functionBodies.add(oldBody, 0);
+    if (!result.second) {
+      function->m_body = result.first->second;
+      continue;
+    }
+
+    ExecState* exec =
+        function->scope().globalObject()->JSGlobalObject::globalExec();
+    const SourceCode& sourceCode = oldBody->source();
+
+    RefPtr<FunctionBodyNode> newBody =
+        globalData->parser->parse<FunctionBodyNode>(exec, 0, sourceCode);
+    ASSERT(newBody);
+    newBody->finishParsing(oldBody->copyParameters(),
+                           oldBody->parameterCount());
+
+    result.first->second = newBody;
+    function->m_body = newBody.release();
+
+    if (hasListeners()) {
+      SourceProvider* provider = sourceCode.provider();
+      if (sourceProviders.add(provider).second)
+        sourceParsed(exec, SourceCode(provider), -1, 0);
+    }
+  }
+}
+
+void JavaScriptDebugServer::willAddFirstListener() {
+  Page::setDebuggerForAllPages(this);
+  m_recompileTimer.startOneShot(0);
+}
+
+void JavaScriptDebugServer::didRemoveLastListener() {
+  Page::setDebuggerForAllPages(0);
+  m_doneProcessingDebuggerEvents = true;
+  m_recompileTimer.startOneShot(0);
 }
 
 }  // namespace WebCore

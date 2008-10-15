@@ -61,6 +61,7 @@ class SourceCode {
     return m_provider->getRange(m_startChar, m_endChar);
   }
 
+  bool isNull() const { return !m_provider; }
   SourceProvider* provider() const { return m_provider.get(); }
   int firstLine() const { return m_firstLine; }
   int startOffset() const { return m_startChar; }

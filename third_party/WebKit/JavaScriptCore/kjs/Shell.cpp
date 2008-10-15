@@ -349,7 +349,8 @@ static bool prettyPrintScript(ExecState* exec,
   UString errMsg;
   RefPtr<ProgramNode> programNode =
       exec->globalData().parser->parse<ProgramNode>(
-          exec, makeSource(script.data(), fileName), &errLine, &errMsg);
+          exec, exec->dynamicGlobalObject()->debugger(),
+          makeSource(script.data(), fileName), &errLine, &errMsg);
   if (!programNode) {
     fprintf(stderr, "%s:%d: %s.\n", fileName.UTF8String().c_str(), errLine,
             errMsg.UTF8String().c_str());

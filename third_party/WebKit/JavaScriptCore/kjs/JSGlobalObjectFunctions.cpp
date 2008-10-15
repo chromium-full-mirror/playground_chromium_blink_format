@@ -301,7 +301,7 @@ JSValue* globalFuncEval(ExecState* exec,
 
   SourceCode source = makeSource(s);
   RefPtr<EvalNode> evalNode = exec->globalData().parser->parse<EvalNode>(
-      exec, source, &errLine, &errMsg);
+      exec, exec->dynamicGlobalObject()->debugger(), source, &errLine, &errMsg);
 
   if (!evalNode)
     return throwError(exec, SyntaxError, errMsg, errLine,

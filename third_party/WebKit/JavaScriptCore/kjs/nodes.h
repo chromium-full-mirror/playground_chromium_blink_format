@@ -2404,7 +2404,6 @@ class ScopeNode : public BlockNode {
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
 
-  void setSource(const SourceCode& source) { m_source = source; }
   const SourceCode& source() const { return m_source; }
   const UString& sourceURL() const JSC_FAST_CALL {
     return m_source.provider()->url();
@@ -2430,6 +2429,8 @@ class ScopeNode : public BlockNode {
   }
 
  protected:
+  void setSource(const SourceCode& source) { m_source = source; }
+
   VarStack m_varStack;
   FunctionStack m_functionStack;
 
@@ -2526,8 +2527,9 @@ class FunctionBodyNode : public ScopeNode {
   ~FunctionBodyNode();
 
   const Identifier* parameters() const JSC_FAST_CALL { return m_parameters; }
-  size_t parameterCount() { return m_parameterCount; }
+  size_t parameterCount() const { return m_parameterCount; }
   UString paramString() const JSC_FAST_CALL;
+  Identifier* copyParameters();
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
@@ -2548,9 +2550,7 @@ class FunctionBodyNode : public ScopeNode {
   void mark();
 
   void finishParsing(const SourceCode&, ParameterNode*);
-  void finishParsing(const SourceCode&,
-                     Identifier* parameters,
-                     size_t parameterCount);
+  void finishParsing(Identifier* parameters, size_t parameterCount);
 
   UString toSourceString() const JSC_FAST_CALL {
     return UString("{") + source().toString() + UString("}");
@@ -2575,6 +2575,7 @@ class FunctionBodyNode : public ScopeNode {
                    SourceElements*,
                    VarStack*,
                    FunctionStack*,
+                   const SourceCode&,
                    CodeFeatures,
                    int numConstants) JSC_FAST_CALL;
 

@@ -2001,16 +2001,18 @@ FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
                                    SourceElements* children,
                                    VarStack* varStack,
                                    FunctionStack* funcStack,
+                                   const SourceCode& sourceCode,
                                    CodeFeatures features,
                                    int numConstants)
     : ScopeNode(globalData,
-                SourceCode(),
+                sourceCode,
                 children,
                 varStack,
                 funcStack,
                 features,
                 numConstants),
       m_parameters(0),
+      m_parameterCount(0),
       m_refCount(0) {}
 
 FunctionBodyNode::~FunctionBodyNode() {
@@ -2025,13 +2027,14 @@ void FunctionBodyNode::finishParsing(const SourceCode& source,
        parameter = parameter->nextParam())
     parameters.append(parameter->ident());
   size_t count = parameters.size();
-  finishParsing(source, parameters.releaseBuffer(), count);
+
+  setSource(source);
+  finishParsing(parameters.releaseBuffer(), count);
 }
 
-void FunctionBodyNode::finishParsing(const SourceCode& source,
-                                     Identifier* parameters,
+void FunctionBodyNode::finishParsing(Identifier* parameters,
                                      size_t parameterCount) {
-  setSource(source);
+  ASSERT(!source().isNull());
   m_parameters = parameters;
   m_parameterCount = parameterCount;
 }
@@ -2048,18 +2051,18 @@ FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
                                            CodeFeatures features,
                                            int numConstants) {
   return new FunctionBodyNode(globalData, children, varStack, funcStack,
-                              features, numConstants);
+                              SourceCode(), features, numConstants);
 }
 
 FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
                                            SourceElements* children,
                                            VarStack* varStack,
                                            FunctionStack* funcStack,
-                                           const SourceCode&,
+                                           const SourceCode& sourceCode,
                                            CodeFeatures features,
                                            int numConstants) {
   return new FunctionBodyNode(globalData, children, varStack, funcStack,
-                              features, numConstants);
+                              sourceCode, features, numConstants);
 }
 
 void FunctionBodyNode::generateCode(ScopeChainNode* scopeChainNode) {
@@ -2119,6 +2122,14 @@ UString FunctionBodyNode::paramString() const {
   }
 
   return s;
+}
+
+Identifier* FunctionBodyNode::copyParameters() {
+  Identifier* parameters = static_cast<Identifier*>(
+      fastMalloc(m_parameterCount * sizeof(Identifier)));
+  VectorCopier<false, Identifier>::uninitializedCopy(
+      m_parameters, m_parameters + m_parameterCount, parameters);
+  return parameters;
 }
 
 // ------------------------------ FuncDeclNode ---------------------------------

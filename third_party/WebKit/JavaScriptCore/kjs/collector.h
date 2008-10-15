@@ -48,6 +48,10 @@ class JSGlobalData;
 class JSValue;
 
 enum OperationInProgress { NoOperation, Allocation, Collection };
+enum HeapType { PrimaryHeap, NumberHeap };
+
+template <HeapType>
+class CollectorHeapIterator;
 
 struct CollectorHeap {
   CollectorBlock** blocks;
@@ -65,7 +69,7 @@ struct CollectorHeap {
 class Heap : Noncopyable {
  public:
   class Thread;
-  enum HeapType { PrimaryHeap, NumberHeap };
+  typedef CollectorHeapIterator<PrimaryHeap> iterator;
 
   void destroy();
 
@@ -117,10 +121,14 @@ class Heap : Noncopyable {
   JSGlobalData* globalData() const { return m_globalData; }
   static bool isNumber(JSCell*);
 
+  // Iterators for the object heap.
+  iterator primaryHeapBegin();
+  iterator primaryHeapEnd();
+
  private:
-  template <Heap::HeapType heapType>
+  template <HeapType heapType>
   void* heapAllocate(size_t);
-  template <Heap::HeapType heapType>
+  template <HeapType heapType>
   size_t sweep();
   static const CollectorBlock* cellBlock(const JSCell*);
   static CollectorBlock* cellBlock(JSCell*);
@@ -231,7 +239,7 @@ class CollectorBlock {
   CollectorCell* freeList;
   CollectorBitmap marked;
   Heap* heap;
-  Heap::HeapType type;
+  HeapType type;
 };
 
 class SmallCellCollectorBlock {
@@ -241,7 +249,28 @@ class SmallCellCollectorBlock {
   SmallCollectorCell* freeList;
   CollectorBitmap marked;
   Heap* heap;
-  Heap::HeapType type;
+  HeapType type;
+};
+
+template <HeapType heapType>
+struct HeapConstants;
+
+template <>
+struct HeapConstants<PrimaryHeap> {
+  static const size_t cellSize = CELL_SIZE;
+  static const size_t cellsPerBlock = CELLS_PER_BLOCK;
+  static const size_t bitmapShift = 0;
+  typedef CollectorCell Cell;
+  typedef CollectorBlock Block;
+};
+
+template <>
+struct HeapConstants<NumberHeap> {
+  static const size_t cellSize = SMALL_CELL_SIZE;
+  static const size_t cellsPerBlock = SMALL_CELLS_PER_BLOCK;
+  static const size_t bitmapShift = 1;
+  typedef SmallCollectorCell Cell;
+  typedef SmallCellCollectorBlock Block;
 };
 
 inline bool Heap::isNumber(JSCell* cell) {

@@ -157,8 +157,9 @@ class EvalCodeCache {
       UString errMsg;
 
       SourceCode source = makeSource(evalSource);
-      evalNode = exec->globalData().parser->parse<EvalNode>(exec, source,
-                                                            &errLine, &errMsg);
+      evalNode = exec->globalData().parser->parse<EvalNode>(
+          exec, exec->dynamicGlobalObject()->debugger(), source, &errLine,
+          &errMsg);
       if (evalNode) {
         if (evalSource.size() < maxCacheableSourceLength &&
             (*scopeChain->begin())->isVariableObject() &&
