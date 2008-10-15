@@ -257,8 +257,7 @@ backforward list.
 */
 + (NSString*)suggestedFileExtensionForMIMEType:(NSString*)MIMEType;
 
-+ (NSString*)_standardUserAgentWithApplicationName:(NSString*)applicationName
-                                  andWebKitVersion:(NSString*)version;
++ (NSString*)_standardUserAgentWithApplicationName:(NSString*)applicationName;
 
 // May well become public
 - (void)_setFormDelegate:(id<WebFormDelegate>)delegate;
