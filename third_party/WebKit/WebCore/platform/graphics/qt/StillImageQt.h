@@ -40,7 +40,8 @@ class StillImage : public Image {
 
   // FIXME: StillImages are underreporting decoded sizes and will be unable
   // to prune because these functions are not implemented yet.
-  virtual void destroyDecodedData(bool incremental = false) {}
+  virtual void destroyDecodedData(bool incremental = false,
+                                  bool preserveNearbyFrames = false) {}
   virtual unsigned decodedSize() const { return 0; }
 
   virtual IntSize size() const;
