@@ -148,7 +148,7 @@ class PlatformMouseEvent {
   PlatformMouseEvent(const wxMouseEvent&, const wxPoint& globalPoint);
 #endif
 
- private:
+ protected:
   IntPoint m_position;
   IntPoint m_globalPosition;
   MouseButton m_button;
