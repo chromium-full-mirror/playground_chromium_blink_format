@@ -70,6 +70,7 @@ void forgetAllDOMNodesForDocument(Document*);
 void updateDOMNodeDocument(Node*, Document* oldDocument, Document* newDocument);
 void markDOMNodesForDocument(Document*);
 void markActiveObjectsForDocument(JSC::JSGlobalData&, Document*);
+void markCrossHeapDependentObjectsForDocument(JSC::JSGlobalData&, Document*);
 
 JSC::StructureID* getCachedDOMStructure(JSC::ExecState*, const JSC::ClassInfo*);
 JSC::StructureID* cacheDOMStructure(JSC::ExecState*,

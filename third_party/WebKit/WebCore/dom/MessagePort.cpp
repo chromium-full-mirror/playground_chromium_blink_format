@@ -62,7 +62,8 @@ MessagePort::MessagePort(Document* document)
     : m_entangledPort(0),
       m_queueIsOpen(false),
       m_document(document),
-      m_pendingActivity(0) {
+      m_pendingActivity(0),
+      m_jsWrapperIsInaccessible(false) {
   document->createdMessagePort(this);
 }
 

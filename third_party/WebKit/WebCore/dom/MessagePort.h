@@ -33,8 +33,8 @@
 #include <wtf/HashMap.h>
 #include <wtf/MessageQueue.h>
 #include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
+#include <wtf/Threading.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -45,7 +45,7 @@ class Event;
 class Frame;
 class String;
 
-class MessagePort : public RefCounted<MessagePort>, public EventTarget {
+class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
  public:
   static PassRefPtr<MessagePort> create(Document* document) {
     return adoptRef(new MessagePort(document));
@@ -91,8 +91,8 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   typedef HashMap<AtomicStringImpl*, ListenerVector> EventListenersMap;
   EventListenersMap& eventListeners() { return m_eventListeners; }
 
-  using RefCounted<MessagePort>::ref;
-  using RefCounted<MessagePort>::deref;
+  using ThreadSafeShared<MessagePort>::ref;
+  using ThreadSafeShared<MessagePort>::deref;
 
   bool hasPendingActivity() { return m_pendingActivity; }
 
@@ -105,6 +105,9 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
     m_onCloseListener = eventListener;
   }
   EventListener* onclose() const { return m_onCloseListener.get(); }
+
+  void setJSWrapperIsInaccessible() { m_jsWrapperIsInaccessible = true; }
+  bool jsWrapperIsInaccessible() const { return m_jsWrapperIsInaccessible; }
 
  private:
   friend class CloseMessagePortTimer;
@@ -132,6 +135,7 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   EventListenersMap m_eventListeners;
 
   unsigned m_pendingActivity;
+  bool m_jsWrapperIsInaccessible;
 };
 
 }  // namespace WebCore

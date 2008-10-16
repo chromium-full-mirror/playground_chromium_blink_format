@@ -70,6 +70,8 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
 
   void disconnectFrame();
 
+  virtual void markCrossHeapDependentObjects();
+
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   const JSC::Identifier&,
                                   JSC::PropertySlot&);
