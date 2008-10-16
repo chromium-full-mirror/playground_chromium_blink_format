@@ -128,7 +128,7 @@ static int depth(CodeBlock* codeBlock, ScopeChain& sc) {
 // in JSValue.h).
 // FIXME: There's no need to have a "slow" version of this. All versions should
 // be fast.
-static bool fastIsNumber(JSValue* value, double& arg) {
+static ALWAYS_INLINE bool fastIsNumber(JSValue* value, double& arg) {
   if (JSImmediate::isNumber(value))
     arg = JSImmediate::getTruncatedInt32(value);
   else if (Heap::isNumber(static_cast<JSCell*>(value)))
