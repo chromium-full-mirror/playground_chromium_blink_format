@@ -38,6 +38,8 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
+#define DUMP_STRUCTURE_ID_STATISTICS 0
+
 namespace JSC {
 
 class JSValue;
@@ -91,6 +93,10 @@ class StructureID : public RefCounted<StructureID> {
 
   static void startIgnoringLeaks();
   static void stopIgnoringLeaks();
+
+#if DUMP_STRUCTURE_ID_STATISTICS
+  static void dumpStatistics();
+#endif
 
   static PassRefPtr<StructureID> changePrototypeTransition(StructureID*,
                                                            JSValue* prototype);
