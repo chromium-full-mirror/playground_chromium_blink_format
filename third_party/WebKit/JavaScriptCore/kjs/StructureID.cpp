@@ -109,7 +109,6 @@ StructureID::StructureID(JSValue* prototype, const TypeInfo& typeInfo)
 StructureID::~StructureID() {
   if (m_previous) {
     if (m_previous->m_usingSingleTransitionSlot) {
-      m_previous->m_transitions.singleTransition->deref();
       m_previous->m_transitions.singleTransition = 0;
     } else {
       ASSERT(m_previous->m_transitions.table->contains(
@@ -122,10 +121,7 @@ StructureID::~StructureID() {
   if (m_cachedPropertyNameArrayData)
     m_cachedPropertyNameArrayData->setCachedStructureID(0);
 
-  if (m_usingSingleTransitionSlot) {
-    if (m_transitions.singleTransition)
-      m_transitions.singleTransition->deref();
-  } else
+  if (!m_usingSingleTransitionSlot)
     delete m_transitions.table;
 
 #ifndef NDEBUG
@@ -282,7 +278,6 @@ PassRefPtr<StructureID> StructureID::addPropertyTransition(
   if (structureID->m_usingSingleTransitionSlot) {
     if (!structureID->m_transitions.singleTransition) {
       structureID->m_transitions.singleTransition = transition.get();
-      transition->ref();
       return transition.release();
     }
 
@@ -294,7 +289,6 @@ PassRefPtr<StructureID> StructureID::addPropertyTransition(
     transitionTable->add(make_pair(existingTransition->m_nameInPrevious,
                                    existingTransition->m_attributesInPrevious),
                          existingTransition);
-    existingTransition->deref();
   }
   structureID->m_transitions.table->add(
       make_pair(propertyName.ustring().rep(), attributes), transition.get());
