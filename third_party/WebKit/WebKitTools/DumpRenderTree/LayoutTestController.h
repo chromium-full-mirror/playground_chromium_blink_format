@@ -66,6 +66,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void setPrivateBrowsingEnabled(bool flag);
   void setPopupBlockingEnabled(bool flag);
   void setTabKeyCyclesThroughElements(bool cycles);
+  void setSmartInsertDeleteEnabled(bool flag);
   void setUseDashboardCompatibilityMode(bool flag);
   void setUserStyleSheetEnabled(bool flag);
   void setUserStyleSheetLocation(JSStringRef path);
