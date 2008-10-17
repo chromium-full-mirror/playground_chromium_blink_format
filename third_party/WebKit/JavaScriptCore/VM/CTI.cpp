@@ -3383,8 +3383,9 @@ void CTI::patchGetByIdSelf(CodeBlock* codeBlock,
   // cti_op_get_by_id_generic.
   // Should probably go to Machine::cti_op_get_by_id_fail, but that doesn't do
   // anything interesting right now.
-  ctiRepatchCallByReturnAddress(returnAddress,
-                                (void*)(Machine::cti_op_get_by_id_generic));
+  ctiRepatchCallByReturnAddress(
+      returnAddress,
+      reinterpret_cast<void*>(Machine::cti_op_get_by_id_generic));
 
   // Repatch the offset into the propoerty map to load from, then repatch the
   // StructureID to look for.
@@ -3407,8 +3408,9 @@ void CTI::patchPutByIdReplace(CodeBlock* codeBlock,
   // cti_op_put_by_id_generic.
   // Should probably go to Machine::cti_op_put_by_id_fail, but that doesn't do
   // anything interesting right now.
-  ctiRepatchCallByReturnAddress(returnAddress,
-                                (void*)(Machine::cti_op_put_by_id_generic));
+  ctiRepatchCallByReturnAddress(
+      returnAddress,
+      reinterpret_cast<void*>(Machine::cti_op_put_by_id_generic));
 
   // Repatch the offset into the propoerty map to load from, then repatch the
   // StructureID to look for.
