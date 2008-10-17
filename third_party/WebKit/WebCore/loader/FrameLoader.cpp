@@ -665,7 +665,7 @@ void FrameLoader::stopLoading(bool sendUnload) {
     if (DocLoader* docLoader = doc->docLoader())
       cache()->loader()->cancelRequests(docLoader);
 
-    XMLHttpRequest::cancelRequests(doc);
+    doc->stopActiveDOMObjects();
 
 #if ENABLE(DATABASE)
     doc->stopDatabases();

@@ -21,6 +21,7 @@
 #ifndef XMLHttpRequest_h
 #define XMLHttpRequest_h
 
+#include "ActiveDOMObject.h"
 #include "EventListener.h"
 #include "EventTarget.h"
 #include "FormData.h"
@@ -36,7 +37,8 @@ class TextResourceDecoder;
 
 class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
                        public EventTarget,
-                       private SubresourceLoaderClient {
+                       private SubresourceLoaderClient,
+                       public ActiveDOMObject {
  public:
   static PassRefPtr<XMLHttpRequest> create(Document* document) {
     return adoptRef(new XMLHttpRequest(document));
@@ -56,9 +58,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   Frame* associatedFrame() const;
 
-  bool hasPendingActivity() { return m_pendingActivity; }
-  static void detachRequests(Document*);
-  static void cancelRequests(Document*);
+  virtual void contextDestroyed();
+  virtual void stop();
 
   String statusText(ExceptionCode&) const;
   int status(ExceptionCode&) const;
@@ -144,8 +145,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
                              bool tempEvent = false);
   EventListenersMap& eventListeners() { return m_eventListeners; }
 
-  Document* document() const { return m_doc; }
-
   using RefCounted<XMLHttpRequest>::ref;
   using RefCounted<XMLHttpRequest>::deref;
 
@@ -224,11 +223,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   void dispatchLoadStartEvent();
   void dispatchProgressEvent(long long expectedLength);
 
-  void setPendingActivity();
-  void unsetPendingActivity();
-
-  Document* m_doc;
-
   RefPtr<EventListener> m_onReadyStateChangeListener;
   RefPtr<EventListener> m_onAbortListener;
   RefPtr<EventListener> m_onErrorListener;
@@ -278,8 +272,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   bool m_sameOriginRequest;
   bool m_allowAccess;
   bool m_inPreflight;
-
-  unsigned m_pendingActivity;
 
   // Used for onprogress tracking
   long long m_receivedLength;

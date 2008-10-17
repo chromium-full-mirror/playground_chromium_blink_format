@@ -172,7 +172,7 @@ static bool isValidHeaderValue(const String& name) {
 }
 
 XMLHttpRequest::XMLHttpRequest(Document* doc)
-    : m_doc(doc),
+    : ActiveDOMObject(doc, this),
       m_async(true),
       m_includeCredentials(false),
       m_state(UNSENT),
@@ -183,25 +183,20 @@ XMLHttpRequest::XMLHttpRequest(Document* doc)
       m_uploadComplete(false),
       m_sameOriginRequest(true),
       m_inPreflight(false),
-      m_pendingActivity(0),
       m_receivedLength(0),
       m_lastSendLineNumber(0) {
-  ASSERT(m_doc);
-  m_doc->createdXMLHttpRequest(this);
+  ASSERT(document());
 }
 
 XMLHttpRequest::~XMLHttpRequest() {
-  if (m_doc)
-    m_doc->destroyedXMLHttpRequest(this);
-
   if (m_upload)
     m_upload->disconnectXMLHttpRequest();
 }
 
 Frame* XMLHttpRequest::associatedFrame() const {
-  if (!m_doc)
+  if (!document())
     return 0;
-  return m_doc->frame();
+  return document()->frame();
 }
 
 XMLHttpRequest::State XMLHttpRequest::readyState() const {
@@ -221,7 +216,7 @@ Document* XMLHttpRequest::responseXML() const {
       // The W3C spec requires this.
       m_responseXML = 0;
     } else {
-      m_responseXML = m_doc->implementation()->createDocument(0);
+      m_responseXML = document()->implementation()->createDocument(0);
       m_responseXML->open();
       m_responseXML->setURL(m_url);
       // FIXME: set Last-Modified and cookies (currently, those are only
@@ -309,7 +304,7 @@ void XMLHttpRequest::changeState(State newState) {
 }
 
 void XMLHttpRequest::callReadyStateChangeListener() {
-  if (!m_doc || !m_doc->frame())
+  if (!document() || !document()->frame())
     return;
 
   dispatchReadyStateChangeEvent();
@@ -400,7 +395,7 @@ void XMLHttpRequest::open(const String& method,
 }
 
 bool XMLHttpRequest::initSend(ExceptionCode& ec) {
-  if (!m_doc)
+  if (!document())
     return false;
 
   if (m_state != OPENED || m_loader) {
@@ -427,7 +422,7 @@ void XMLHttpRequest::send(Document* document, ExceptionCode& ec) {
     String contentType = getRequestHeader("Content-Type");
     if (contentType.isEmpty()) {
 #if ENABLE(DASHBOARD_SUPPORT)
-      Settings* settings = m_doc->settings();
+      Settings* settings = document->settings();
       if (settings && settings->usesDashboardBackwardCompatibilityMode())
         setRequestHeaderInternal("Content-Type",
                                  "application/x-www-form-urlencoded");
@@ -463,7 +458,7 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
     String contentType = getRequestHeader("Content-Type");
     if (contentType.isEmpty()) {
 #if ENABLE(DASHBOARD_SUPPORT)
-      Settings* settings = m_doc->settings();
+      Settings* settings = document()->settings();
       if (settings && settings->usesDashboardBackwardCompatibilityMode())
         setRequestHeaderInternal("Content-Type",
                                  "application/x-www-form-urlencoded");
@@ -503,7 +498,7 @@ void XMLHttpRequest::createRequest(ExceptionCode& ec) {
       m_upload->dispatchLoadStartEvent();
   }
 
-  m_sameOriginRequest = m_doc->securityOrigin()->canRequest(m_url);
+  m_sameOriginRequest = document()->securityOrigin()->canRequest(m_url);
 
   if (!m_sameOriginRequest) {
     makeCrossSiteAccessRequest(ec);
@@ -566,7 +561,7 @@ void XMLHttpRequest::makeSimpleCrossSiteAccessRequest(ExceptionCode& ec) {
   ResourceRequest request(url);
   request.setHTTPMethod(m_method);
   request.setAllowHTTPCookies(m_includeCredentials);
-  request.setHTTPOrigin(m_doc->securityOrigin()->toHTTPOrigin());
+  request.setHTTPOrigin(document()->securityOrigin()->toHTTPOrigin());
 
   if (m_requestHeaders.size() > 0)
     request.addHTTPHeaderFields(m_requestHeaders);
@@ -601,7 +596,7 @@ static bool canSkipPrelight(PreflightResultCache::iterator cacheIt,
 
 void XMLHttpRequest::makeCrossSiteAccessRequestWithPreflight(
     ExceptionCode& ec) {
-  String origin = m_doc->securityOrigin()->toHTTPOrigin();
+  String origin = document()->securityOrigin()->toHTTPOrigin();
   KURL url = m_url;
   url.setUser(String());
   url.setPass(String());
@@ -692,7 +687,7 @@ void XMLHttpRequest::handleAsynchronousPreflightResult() {
   ResourceRequest request(url);
   request.setHTTPMethod(m_method);
   request.setAllowHTTPCookies(m_includeCredentials);
-  request.setHTTPOrigin(m_doc->securityOrigin()->toHTTPOrigin());
+  request.setHTTPOrigin(document()->securityOrigin()->toHTTPOrigin());
 
   if (m_requestHeaders.size() > 0)
     request.addHTTPHeaderFields(m_requestHeaders);
@@ -712,8 +707,8 @@ void XMLHttpRequest::loadRequestSynchronously(ResourceRequest& request,
   ResourceError error;
   ResourceResponse response;
 
-  if (m_doc->frame())
-    m_identifier = m_doc->frame()->loader()->loadResourceSynchronously(
+  if (document()->frame())
+    m_identifier = document()->frame()->loader()->loadResourceSynchronously(
         request, error, response, data);
 
   m_loader = 0;
@@ -748,15 +743,15 @@ void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
   // not providing a MIME type
   // for local files otherwise, <rdar://problem/5671813>.
   bool sendResourceLoadCallbacks = !m_inPreflight;
-  m_loader = SubresourceLoader::create(m_doc->frame(), this, request, false,
-                                       sendResourceLoadCallbacks,
+  m_loader = SubresourceLoader::create(document()->frame(), this, request,
+                                       false, sendResourceLoadCallbacks,
                                        request.url().isLocalFile());
 
   if (m_loader) {
     // Neither this object nor the JavaScript wrapper should be deleted while
     // a request is in progress because we need to keep the listeners alive,
     // and they are referenced by the JavaScript wrapper.
-    setPendingActivity();
+    setPendingActivity(this);
   }
 }
 
@@ -857,13 +852,13 @@ void XMLHttpRequest::dropProtection() {
   // can't be recouped until the load is done, so only
   // report the extra cost at that point.
 
-  JSDOMWindow* window = toJSDOMWindow(m_doc->frame());
+  JSDOMWindow* window = toJSDOMWindow(document()->frame());
   JSC::JSValue* wrapper =
       getCachedDOMObjectWrapper(*window->globalData(), this);
   if (wrapper)
     JSC::Heap::heap(wrapper)->reportExtraMemoryCost(m_responseText.size() * 2);
 
-  unsetPendingActivity();
+  unsetPendingActivity(this);
 }
 
 void XMLHttpRequest::overrideMimeType(const String& override) {
@@ -875,7 +870,7 @@ void XMLHttpRequest::setRequestHeader(const String& name,
                                       ExceptionCode& ec) {
   if (m_state != OPENED || m_loader) {
 #if ENABLE(DASHBOARD_SUPPORT)
-    Settings* settings = m_doc ? m_doc->settings() : 0;
+    Settings* settings = document() ? document()->settings() : 0;
     if (settings && settings->usesDashboardBackwardCompatibilityMode())
       return;
 #endif
@@ -890,10 +885,10 @@ void XMLHttpRequest::setRequestHeader(const String& name,
   }
 
   // A privileged script (e.g. a Dashboard widget) can set any headers.
-  if (!m_doc->securityOrigin()->canLoadLocalResources() &&
+  if (!document()->securityOrigin()->canLoadLocalResources() &&
       !isSafeRequestHeader(name)) {
-    if (m_doc && m_doc->frame())
-      m_doc->frame()->domWindow()->console()->addMessage(
+    if (document() && document()->frame())
+      document()->frame()->domWindow()->console()->addMessage(
           JSMessageSource, ErrorMessageLevel,
           "Refused to set unsafe header \"" + name + "\"", 1, String());
     return;
@@ -1008,7 +1003,7 @@ void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
                                             const ResourceResponse& response,
                                             ExceptionCode& ec) {
   if (m_sameOriginRequest &&
-      !m_doc->securityOrigin()->canRequest(response.url())) {
+      !document()->securityOrigin()->canRequest(response.url())) {
     abort();
     return;
   }
@@ -1061,7 +1056,7 @@ void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
       m_responseText += m_decoder->flush();
   }
 
-  if (Frame* frame = m_doc->frame()) {
+  if (Frame* frame = document()->frame()) {
     if (Page* page = frame->page()) {
       page->inspectorController()->resourceRetrievedByXMLHttpRequest(
           m_loader ? m_loader->identifier() : m_identifier, m_responseText);
@@ -1090,9 +1085,8 @@ void XMLHttpRequest::didFinishLoadingPreflight(SubresourceLoader* loader) {
   if (m_async)
     handleAsynchronousPreflightResult();
 
-  if (m_loader) {
-    unsetPendingActivity();
-  }
+  if (m_loader)
+    unsetPendingActivity(this);
 }
 
 void XMLHttpRequest::willSendRequest(SubresourceLoader*,
@@ -1100,7 +1094,7 @@ void XMLHttpRequest::willSendRequest(SubresourceLoader*,
                                      const ResourceResponse& redirectResponse) {
   // FIXME: This needs to be fixed to follow the redirect correctly even for
   // cross-domain requests.
-  if (!m_doc->securityOrigin()->canRequest(request.url())) {
+  if (!document()->securityOrigin()->canRequest(request.url())) {
     internalAbort();
     networkError();
   }
@@ -1132,7 +1126,7 @@ bool XMLHttpRequest::accessControlCheck(const ResourceResponse& response) {
 
   RefPtr<SecurityOrigin> accessControlOrigin =
       SecurityOrigin::create(accessControlOriginURL);
-  if (!accessControlOrigin->isSameSchemeHostPort(m_doc->securityOrigin()))
+  if (!accessControlOrigin->isSameSchemeHostPort(document()->securityOrigin()))
     return false;
 
   if (m_includeCredentials) {
@@ -1240,7 +1234,7 @@ void XMLHttpRequest::didReceiveResponsePreflight(
           response.httpHeaderField("Access-Control-Max-Age"), expiryDelta))
     expiryDelta = 5;
 
-  appendPreflightResultCacheEntry(m_doc->securityOrigin()->toHTTPOrigin(),
+  appendPreflightResultCacheEntry(document()->securityOrigin()->toHTTPOrigin(),
                                   m_url, expiryDelta, m_includeCredentials,
                                   methods.release(), headers.release());
 }
@@ -1365,35 +1359,13 @@ void XMLHttpRequest::dispatchProgressEvent(long long expectedLength) {
       static_cast<unsigned>(expectedLength));
 }
 
-void XMLHttpRequest::cancelRequests(Document* m_doc) {
-  const HashSet<XMLHttpRequest*>& requests = m_doc->xmlHttpRequests();
-  Vector<XMLHttpRequest*> copy;
-  copyToVector(requests, copy);
-
-  unsigned numRequests = copy.size();
-  for (unsigned i = 0; i != numRequests; ++i)
-    copy[i]->internalAbort();
+void XMLHttpRequest::stop() {
+  internalAbort();
 }
 
-void XMLHttpRequest::detachRequests(Document* m_doc) {
-  const HashSet<XMLHttpRequest*>& requests = m_doc->xmlHttpRequests();
-  HashSet<XMLHttpRequest*>::const_iterator end = requests.end();
-  for (HashSet<XMLHttpRequest*>::const_iterator it = requests.begin();
-       it != end; ++it) {
-    (*it)->m_doc = 0;
-    (*it)->internalAbort();
-  }
-}
-
-void XMLHttpRequest::setPendingActivity() {
-  ref();
-  ++m_pendingActivity;
-}
-
-void XMLHttpRequest::unsetPendingActivity() {
-  ASSERT(m_pendingActivity > 0);
-  --m_pendingActivity;
-  deref();
+void XMLHttpRequest::contextDestroyed() {
+  ActiveDOMObject::contextDestroyed();
+  internalAbort();
 }
 
 }  // namespace WebCore
