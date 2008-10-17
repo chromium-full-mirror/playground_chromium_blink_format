@@ -68,56 +68,58 @@ static JSValue* objectProtoFuncToLocaleString(ExecState*,
                                               const ArgList&);
 
 ObjectPrototype::ObjectPrototype(ExecState* exec,
+                                 PassRefPtr<StructureID> stucture,
                                  StructureID* prototypeFunctionStructure)
-    : JSObject(exec->globalData().nullProtoStructureID) {
-  putDirectFunction(
+    : JSObject(stucture) {
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().toString,
                                          objectProtoFuncToString),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().toLocaleString,
                                          objectProtoFuncToLocaleString),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().valueOf,
                                          objectProtoFuncValueOf),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().hasOwnProperty,
                                          objectProtoFuncHasOwnProperty),
       DontEnum);
-  putDirectFunction(exec, new (exec) PrototypeFunction(
-                              exec, prototypeFunctionStructure, 1,
-                              exec->propertyNames().propertyIsEnumerable,
-                              objectProtoFuncPropertyIsEnumerable),
-                    DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
+      exec,
+      new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
+                                   exec->propertyNames().propertyIsEnumerable,
+                                   objectProtoFuncPropertyIsEnumerable),
+      DontEnum);
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().isPrototypeOf,
                                          objectProtoFuncIsPrototypeOf),
       DontEnum);
 
   // Mozilla extensions
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 2,
                                          exec->propertyNames().__defineGetter__,
                                          objectProtoFuncDefineGetter),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 2,
                                          exec->propertyNames().__defineSetter__,
                                          objectProtoFuncDefineSetter),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().__lookupGetter__,
                                          objectProtoFuncLookupGetter),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().__lookupSetter__,
                                          objectProtoFuncLookupSetter),

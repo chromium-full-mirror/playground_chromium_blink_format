@@ -508,6 +508,13 @@ void JSObject::putDirectFunction(ExecState* exec,
             attr);
 }
 
+void JSObject::putDirectFunctionWithoutTransition(ExecState* exec,
+                                                  InternalFunction* function,
+                                                  unsigned attr) {
+  putDirectWithoutTransition(
+      Identifier(exec, function->name(&exec->globalData())), function, attr);
+}
+
 NEVER_INLINE void JSObject::fillGetterPropertySlot(PropertySlot& slot,
                                                    JSValue** location) {
   if (JSObject* getterFunction =

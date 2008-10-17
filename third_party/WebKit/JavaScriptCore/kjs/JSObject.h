@@ -184,6 +184,12 @@ class JSObject : public JSCell {
   void putDirectFunction(ExecState* exec,
                          InternalFunction* function,
                          unsigned attr = 0);
+  void putDirectWithoutTransition(const Identifier& propertyName,
+                                  JSValue* value,
+                                  unsigned attr);
+  void putDirectFunctionWithoutTransition(ExecState* exec,
+                                          InternalFunction* function,
+                                          unsigned attr);
 
   // Fast access to known property offsets.
   JSValue* getDirectOffset(size_t offset) { return m_propertyStorage[offset]; }
@@ -468,6 +474,18 @@ inline void JSObject::putDirect(const Identifier& propertyName,
   slot.setNewProperty(this, offset);
   slot.setWasTransition(true);
   setStructureID(structureID.release());
+}
+
+inline void JSObject::putDirectWithoutTransition(const Identifier& propertyName,
+                                                 JSValue* value,
+                                                 unsigned attributes) {
+  size_t currentCapacity = m_structureID->propertyStorageCapacity();
+  size_t offset =
+      m_structureID->addPropertyWithoutTransition(propertyName, attributes);
+  if (currentCapacity != m_structureID->propertyStorageCapacity())
+    allocatePropertyStorage(currentCapacity,
+                            m_structureID->propertyStorageCapacity());
+  m_propertyStorage[offset] = value;
 }
 
 inline void JSObject::transitionTo(StructureID* newStructureID) {

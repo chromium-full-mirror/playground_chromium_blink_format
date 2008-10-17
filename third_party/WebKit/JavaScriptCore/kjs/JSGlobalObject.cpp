@@ -211,8 +211,10 @@ void JSGlobalObject::reset(JSValue* prototype) {
       PrototypeFunction::createStructureID(d()->functionPrototype);
   d()->functionPrototype->addFunctionProperties(
       exec, d()->prototypeFunctionStructure.get());
-  d()->objectPrototype =
-      new (exec) ObjectPrototype(exec, d()->prototypeFunctionStructure.get());
+
+  d()->objectPrototype = new (exec)
+      ObjectPrototype(exec, ObjectPrototype::createStructureID(jsNull()),
+                      d()->prototypeFunctionStructure.get());
   d()->emptyObjectStructure = d()->objectPrototype->inheritorID();
   d()->functionPrototype->setPrototype(d()->objectPrototype);
   d()->argumentsStructure = Arguments::createStructureID(d()->objectPrototype);
@@ -319,8 +321,9 @@ void JSGlobalObject::reset(JSValue* prototype) {
   d()->functionPrototype->putDirect(exec->propertyNames().constructor,
                                     functionConstructor, DontEnum);
 
-  d()->objectPrototype->putDirect(exec->propertyNames().constructor,
-                                  objectConstructor, DontEnum);
+  d()->objectPrototype->putDirectWithoutTransition(
+      exec->propertyNames().constructor, objectConstructor, DontEnum);
+
   d()->functionPrototype->putDirect(exec->propertyNames().constructor,
                                     functionConstructor, DontEnum);
   d()->arrayPrototype->putDirect(exec->propertyNames().constructor,
