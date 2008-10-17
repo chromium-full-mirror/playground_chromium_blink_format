@@ -122,6 +122,9 @@ using std::max;
 static HMODULE accessibilityLib;
 static HashSet<WebView*> pendingDeleteBackingStoreSet;
 
+static String osVersion();
+static String webKitVersion();
+
 WebView* kit(Page* page) {
   return page
              ? static_cast<WebChromeClient*>(page->chrome()->client())
@@ -1040,6 +1043,15 @@ bool WebView::canHandleRequest(const WebCore::ResourceRequest& request) {
 #else
   return true;
 #endif
+}
+
+String WebView::standardUserAgentWithApplicationName(
+    const String& applicationName) {
+  return String::format(
+      "Mozilla/5.0 (Windows; U; %s; %s) AppleWebKit/%s (KHTML, like Gecko)%s%s",
+      osVersion().latin1().data(), defaultLanguage().latin1().data(),
+      webKitVersion().latin1().data(), (applicationName.length() ? " " : ""),
+      applicationName.latin1().data());
 }
 
 Page* WebView::page() {
@@ -2077,13 +2089,8 @@ const String& WebView::userAgentForKURL(const KURL&) {
     return m_userAgentCustom;
 
   if (!m_userAgentStandard.length())
-    m_userAgentStandard = String::format(
-        "Mozilla/5.0 (Windows; U; %s; %s) AppleWebKit/%s (KHTML, like "
-        "Gecko)%s%s",
-        osVersion().latin1().data(), defaultLanguage().latin1().data(),
-        webKitVersion().latin1().data(),
-        (m_applicationName.length() ? " " : ""),
-        m_applicationName.latin1().data());
+    m_userAgentStandard =
+        WebView::standardUserAgentWithApplicationName(m_applicationName);
   return m_userAgentStandard;
 }
 
@@ -4385,6 +4392,29 @@ HRESULT STDMETHODCALLTYPE WebView::canHandleRequest(IWebURLRequest* request,
     return hr;
 
   *result = !!canHandleRequest(requestImpl->resourceRequest());
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebView::standardUserAgentWithApplicationName(BSTR applicationName,
+                                              BSTR* groupName) {
+  if (!groupName) {
+    ASSERT_NOT_REACHED();
+    return E_POINTER;
+  }
+
+  *groupName;
+
+  if (!applicationName) {
+    ASSERT_NOT_REACHED();
+    return E_POINTER;
+  }
+
+  BString applicationNameBString(applicationName);
+  *groupName = BString(standardUserAgentWithApplicationName(
+                           String(applicationNameBString,
+                                  SysStringLen(applicationNameBString))))
+                   .release();
   return S_OK;
 }
 
