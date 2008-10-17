@@ -811,8 +811,7 @@ void SVGUseElement::attachShadowTree() {
   // Inspired by RenderTextControl::createSubtreeIfNeeded().
   if (renderer()->canHaveChildren() &&
       childShouldCreateRenderer(m_shadowTreeRootElement.get())) {
-    RefPtr<RenderStyle> style =
-        m_shadowTreeRootElement->styleForRenderer(renderer());
+    RefPtr<RenderStyle> style = m_shadowTreeRootElement->styleForRenderer();
 
     if (m_shadowTreeRootElement->rendererIsNeeded(style.get())) {
       m_shadowTreeRootElement->setRenderer(

@@ -153,8 +153,7 @@ Vector<SVGGradientStop> SVGGradientElement::buildStops() const {
         // pservers-grad-19-b.svg
         if (!gradientStyle)
           gradientStyle =
-              const_cast<SVGGradientElement*>(this)->styleForRenderer(
-                  parent()->renderer());
+              const_cast<SVGGradientElement*>(this)->styleForRenderer();
 
         RefPtr<RenderStyle> stopStyle = stop->resolveStyle(gradientStyle.get());
 

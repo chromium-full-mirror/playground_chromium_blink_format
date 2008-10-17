@@ -54,7 +54,7 @@ bool HTMLOptionElement::checkDTD(const Node* newChild) {
 
 void HTMLOptionElement::attach() {
   if (parentNode()->renderStyle())
-    setRenderStyle(styleForRenderer(0));
+    setRenderStyle(styleForRenderer());
   HTMLFormControlElement::attach();
 }
 

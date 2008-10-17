@@ -994,7 +994,7 @@ void Node::createRendererIfNeeded() {
       && parent->childShouldCreateRenderer(this)
 #endif
           ) {
-    RefPtr<RenderStyle> style = styleForRenderer(parentRenderer);
+    RefPtr<RenderStyle> style = styleForRenderer();
     if (rendererIsNeeded(style.get())) {
       if (RenderObject* r =
               createRenderer(document()->renderArena(), style.get())) {
@@ -1002,7 +1002,7 @@ void Node::createRendererIfNeeded() {
           r->destroy();
         else {
           setRenderer(r);
-          renderer()->setAnimatableStyle(style);
+          renderer()->setAnimatableStyle(style.release());
           parentRenderer->addChild(renderer(), nextRenderer());
         }
       }
@@ -1010,11 +1010,13 @@ void Node::createRendererIfNeeded() {
   }
 }
 
-PassRefPtr<RenderStyle> Node::styleForRenderer(RenderObject* parent) {
+PassRefPtr<RenderStyle> Node::styleForRenderer() {
   if (isElementNode())
     return document()->styleSelector()->styleForElement(
         static_cast<Element*>(this));
-  return parent->style();
+  return parentNode() && parentNode()->renderer()
+             ? parentNode()->renderer()->style()
+             : 0;
 }
 
 bool Node::rendererIsNeeded(RenderStyle* style) {

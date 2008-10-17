@@ -162,7 +162,6 @@ class Element : public ContainerNode {
 
   virtual void attach();
   virtual void detach();
-  PassRefPtr<RenderStyle> styleForRenderer(RenderObject* parent);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange = NoChange);
 
