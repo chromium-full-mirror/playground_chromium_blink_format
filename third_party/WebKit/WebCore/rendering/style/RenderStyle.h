@@ -65,6 +65,7 @@
 #include "StyleTransformData.h"
 #include "StyleVisualData.h"
 #include "TextDirection.h"
+#include "ThemeTypes.h"
 #include "TimingFunction.h"
 #include "TransformOperations.h"
 #include <wtf/OwnPtr.h>
@@ -378,7 +379,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   bool hasFixedBackgroundImage() const {
     return background->m_background.hasFixedImage();
   }
-  bool hasAppearance() const { return appearance() != NoAppearance; }
+  bool hasAppearance() const { return appearance() != NoControlPart; }
 
   bool visuallyOrdered() const { return inherited_flags._visuallyOrdered; }
   void setVisuallyOrdered(bool b) { inherited_flags._visuallyOrdered = b; }
@@ -743,8 +744,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return rareInheritedData->textFillColor;
   }
   float opacity() const { return rareNonInheritedData->opacity; }
-  EAppearance appearance() const {
-    return static_cast<EAppearance>(rareNonInheritedData->m_appearance);
+  ControlPart appearance() const {
+    return static_cast<ControlPart>(rareNonInheritedData->m_appearance);
   }
   EBoxAlignment boxAlign() const {
     return static_cast<EBoxAlignment>(rareNonInheritedData->flexibleBox->align);
@@ -1270,7 +1271,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     SET_VAR(rareInheritedData, textFillColor, c)
   }
   void setOpacity(float f) { SET_VAR(rareNonInheritedData, opacity, f); }
-  void setAppearance(EAppearance a) {
+  void setAppearance(ControlPart a) {
     SET_VAR(rareNonInheritedData, m_appearance, a);
   }
   void setBoxAlign(EBoxAlignment a) {
@@ -1634,7 +1635,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   static const AtomicString& initialHighlight() { return nullAtom; }
   static EBorderFit initialBorderFit() { return BorderFitBorder; }
   static EResize initialResize() { return RESIZE_NONE; }
-  static EAppearance initialAppearance() { return NoAppearance; }
+  static ControlPart initialAppearance() { return NoControlPart; }
   static bool initialVisuallyOrdered() { return false; }
   static float initialTextStrokeWidth() { return 0; }
   static unsigned short initialColumnCount() { return 1; }

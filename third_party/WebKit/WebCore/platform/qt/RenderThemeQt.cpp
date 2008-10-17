@@ -139,8 +139,8 @@ bool RenderThemeQt::supportsFocusRing(const RenderStyle* style) const {
 }
 
 int RenderThemeQt::baselinePosition(const RenderObject* o) const {
-  if (o->style()->appearance() == CheckboxAppearance ||
-      o->style()->appearance() == RadioAppearance)
+  if (o->style()->appearance() == CheckboxPart ||
+      o->style()->appearance() == RadioPart)
     return o->marginTop() + o->height() - 2;  // Same as in old khtml
   return RenderTheme::baselinePosition(o);
 }
@@ -150,7 +150,7 @@ bool RenderThemeQt::controlSupportsTints(const RenderObject* o) const {
     return false;
 
   // Checkboxes only have tint when checked.
-  if (o->style()->appearance() == CheckboxAppearance)
+  if (o->style()->appearance() == CheckboxPart)
     return isChecked(o);
 
   // For now assume other controls have tint if enabled.
@@ -183,20 +183,20 @@ static QRect inflateButtonRect(const QRect& originalRect) {
 
 void RenderThemeQt::adjustRepaintRect(const RenderObject* o, IntRect& r) {
   switch (o->style()->appearance()) {
-    case CheckboxAppearance: {
+    case CheckboxPart: {
       break;
     }
-    case RadioAppearance: {
+    case RadioPart: {
       break;
     }
-    case PushButtonAppearance:
-    case ButtonAppearance: {
+    case PushButtonPart:
+    case ButtonPart: {
       QRect inflatedRect = inflateButtonRect(r);
       r = IntRect(inflatedRect.x(), inflatedRect.y(), inflatedRect.width(),
                   inflatedRect.height());
       break;
     }
-    case MenulistAppearance: {
+    case MenulistPart: {
       break;
     }
     default:
@@ -208,9 +208,9 @@ bool RenderThemeQt::isControlStyled(const RenderStyle* style,
                                     const BorderData& border,
                                     const FillLayer& background,
                                     const Color& backgroundColor) const {
-  if (style->appearance() == TextFieldAppearance ||
-      style->appearance() == TextAreaAppearance ||
-      style->appearance() == ListboxAppearance) {
+  if (style->appearance() == TextFieldPart ||
+      style->appearance() == TextAreaPart ||
+      style->appearance() == ListboxPart) {
     return style->border() != border;
   }
 
@@ -259,7 +259,7 @@ static void computeSizeBasedOnStyle(RenderStyle* renderStyle) {
   QStyle* applicationStyle = QApplication::style();
 
   switch (renderStyle->appearance()) {
-    case CheckboxAppearance: {
+    case CheckboxPart: {
       QStyleOption styleOption;
       styleOption.state |= QStyle::State_Small;
       int checkBoxWidth = applicationStyle->pixelMetric(
@@ -267,7 +267,7 @@ static void computeSizeBasedOnStyle(RenderStyle* renderStyle) {
       size = QSize(checkBoxWidth, checkBoxWidth);
       break;
     }
-    case RadioAppearance: {
+    case RadioPart: {
       QStyleOption styleOption;
       styleOption.state |= QStyle::State_Small;
       int radioWidth = applicationStyle->pixelMetric(
@@ -275,8 +275,8 @@ static void computeSizeBasedOnStyle(RenderStyle* renderStyle) {
       size = QSize(radioWidth, radioWidth);
       break;
     }
-    case PushButtonAppearance:
-    case ButtonAppearance: {
+    case PushButtonPart:
+    case ButtonPart: {
       QStyleOptionButton styleOption;
       styleOption.state |= QStyle::State_Small;
       QSize contentSize =
@@ -297,7 +297,7 @@ static void computeSizeBasedOnStyle(RenderStyle* renderStyle) {
 
       break;
     }
-    case MenulistAppearance: {
+    case MenulistPart: {
       QStyleOptionComboBox styleOption;
       styleOption.state |= QStyle::State_Small;
       int contentHeight = qMax(fm.lineSpacing(), 14) + 2;
@@ -306,7 +306,7 @@ static void computeSizeBasedOnStyle(RenderStyle* renderStyle) {
       size.setHeight(menuListSize.height());
       break;
     }
-    case TextFieldAppearance: {
+    case TextFieldPart: {
       const int verticalMargin = 1;
       const int horizontalMargin = 2;
       int h = qMax(fm.lineSpacing(), 14) + 2 * verticalMargin;
@@ -441,13 +441,13 @@ bool RenderThemeQt::paintButton(RenderObject* o,
   option.rect = r;
   option.state |= QStyle::State_Small;
 
-  EAppearance appearance = applyTheme(option, o);
-  if (appearance == PushButtonAppearance || appearance == ButtonAppearance) {
+  ControlPart appearance = applyTheme(option, o);
+  if (appearance == PushButtonPart || appearance == ButtonPart) {
     option.rect = inflateButtonRect(option.rect);
     p.drawControl(QStyle::CE_PushButton, option);
-  } else if (appearance == RadioAppearance) {
+  } else if (appearance == RadioPart) {
     p.drawControl(QStyle::CE_RadioButton, option);
-  } else if (appearance == CheckboxAppearance) {
+  } else if (appearance == CheckboxPart) {
     p.drawControl(QStyle::CE_CheckBox, option);
   }
 
@@ -479,10 +479,9 @@ bool RenderThemeQt::paintTextField(RenderObject* o,
   panel.features = QStyleOptionFrameV2::None;
 
   // Get the correct theme data for a text field
-  EAppearance appearance = applyTheme(panel, o);
-  if (appearance != TextFieldAppearance &&
-      appearance != SearchFieldAppearance && appearance != TextAreaAppearance &&
-      appearance != ListboxAppearance)
+  ControlPart appearance = applyTheme(panel, o);
+  if (appearance != TextFieldPart && appearance != SearchFieldPart &&
+      appearance != TextAreaPart && appearance != ListboxPart)
     return true;
 
   // Now paint the text field.
@@ -545,7 +544,7 @@ bool RenderThemeQt::paintMenuList(RenderObject* o,
   QStyleOptionComboBox opt;
   if (p.widget)
     opt.initFrom(p.widget);
-  EAppearance appearance = applyTheme(opt, o);
+  ControlPart appearance = applyTheme(opt, o);
 
   const QPoint topLeft = r.topLeft();
   p.painter->translate(topLeft);
@@ -677,23 +676,23 @@ bool RenderThemeQt::paintSearchFieldResultsDecoration(
   return RenderTheme::paintSearchFieldResultsDecoration(o, pi, r);
 }
 
-bool RenderThemeQt::supportsFocus(EAppearance appearance) const {
+bool RenderThemeQt::supportsFocus(ControlPart appearance) const {
   switch (appearance) {
-    case PushButtonAppearance:
-    case ButtonAppearance:
-    case TextFieldAppearance:
-    case TextAreaAppearance:
-    case ListboxAppearance:
-    case MenulistAppearance:
-    case RadioAppearance:
-    case CheckboxAppearance:
+    case PushButtonPart:
+    case ButtonPart:
+    case TextFieldPart:
+    case TextAreaPart:
+    case ListboxPart:
+    case MenulistPart:
+    case RadioPart:
+    case CheckboxPart:
       return true;
     default:  // No for all others...
       return false;
   }
 }
 
-EAppearance RenderThemeQt::applyTheme(QStyleOption& option,
+ControlPart RenderThemeQt::applyTheme(QStyleOption& option,
                                       RenderObject* o) const {
   // Default bits: no focus, no mouse over
   option.state &= ~(QStyle::State_HasFocus | QStyle::State_MouseOver);
@@ -711,32 +710,26 @@ EAppearance RenderThemeQt::applyTheme(QStyleOption& option,
   if (isHovered(o))
     option.state |= QStyle::State_MouseOver;
 
-  EAppearance result = o->style()->appearance();
+  ControlPart result = o->style()->appearance();
 
   switch (result) {
-    case PushButtonAppearance:
-    case SquareButtonAppearance:
-    case ButtonAppearance:
-    case ButtonBevelAppearance:
-    case ListItemAppearance:
-    case MenulistButtonAppearance:
-    case ScrollbarButtonLeftAppearance:
-    case ScrollbarButtonRightAppearance:
-    case ScrollbarTrackHorizontalAppearance:
-    case ScrollbarTrackVerticalAppearance:
-    case ScrollbarThumbHorizontalAppearance:
-    case ScrollbarThumbVerticalAppearance:
-    case SearchFieldResultsButtonAppearance:
-    case SearchFieldCancelButtonAppearance: {
+    case PushButtonPart:
+    case SquareButtonPart:
+    case ButtonPart:
+    case ButtonBevelPart:
+    case ListItemPart:
+    case MenulistButtonPart:
+    case SearchFieldResultsButtonPart:
+    case SearchFieldCancelButtonPart: {
       if (isPressed(o))
         option.state |= QStyle::State_Sunken;
-      else if (result == PushButtonAppearance)
+      else if (result == PushButtonPart)
         option.state |= QStyle::State_Raised;
       break;
     }
   }
 
-  if (result == RadioAppearance || result == CheckboxAppearance)
+  if (result == RadioPart || result == CheckboxPart)
     option.state |= (isChecked(o) ? QStyle::State_On : QStyle::State_Off);
 
   // If the webview has a custom palette, use it
@@ -953,7 +946,7 @@ bool RenderThemeQt::paintMediaSliderThumb(
 #endif
 
 void RenderThemeQt::adjustSliderThumbSize(RenderObject* o) const {
-  if (o->style()->appearance() == MediaSliderThumbAppearance) {
+  if (o->style()->appearance() == MediaSliderThumbPart) {
     RenderStyle* parentStyle = o->parent()->style();
     Q_ASSERT(parentStyle);
 

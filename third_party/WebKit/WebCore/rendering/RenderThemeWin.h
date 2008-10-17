@@ -173,7 +173,7 @@ class RenderThemeWin : public RenderTheme {
   unsigned determineSliderThumbState(RenderObject*);
   unsigned determineButtonState(RenderObject*);
 
-  bool supportsFocus(EAppearance);
+  bool supportsFocus(ControlPart);
 
   ThemeData getThemeData(RenderObject*);
   ThemeData getClassicThemeData(RenderObject* o);
