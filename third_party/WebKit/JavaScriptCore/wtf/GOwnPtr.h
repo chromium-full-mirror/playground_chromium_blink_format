@@ -29,27 +29,27 @@
 
 namespace WTF {
 template <typename T>
-inline void freeOwnedPtr(T* ptr) {
+inline void freeOwnedGPtr(T* ptr) {
   g_free(reinterpret_cast<void*>(ptr));
 }
 template <>
-void freeOwnedPtr<GError>(GError*);
+void freeOwnedGPtr<GError>(GError*);
 template <>
-void freeOwnedPtr<GList>(GList*);
+void freeOwnedGPtr<GList>(GList*);
 template <>
-void freeOwnedPtr<GCond>(GCond*);
+void freeOwnedGPtr<GCond>(GCond*);
 template <>
-void freeOwnedPtr<GMutex>(GMutex*);
+void freeOwnedGPtr<GMutex>(GMutex*);
 template <>
-void freeOwnedPtr<GPatternSpec>(GPatternSpec*);
+void freeOwnedGPtr<GPatternSpec>(GPatternSpec*);
 template <>
-void freeOwnedPtr<GDir>(GDir*);
+void freeOwnedGPtr<GDir>(GDir*);
 
 template <typename T>
 class GOwnPtr : Noncopyable {
  public:
   explicit GOwnPtr(T* ptr = 0) : m_ptr(ptr) {}
-  ~GOwnPtr() { freeOwnedPtr(m_ptr); }
+  ~GOwnPtr() { freeOwnedGPtr(m_ptr); }
 
   T* get() const { return m_ptr; }
   T* release() {
@@ -57,15 +57,18 @@ class GOwnPtr : Noncopyable {
     m_ptr = 0;
     return ptr;
   }
-  T*& rawPtr() { return m_ptr; }
+  T*& outPtr() {
+    ASSERT(!m_ptr);
+    return m_ptr;
+  }
 
   void set(T* ptr) {
     ASSERT(!ptr || m_ptr != ptr);
-    freeOwnedPtr(m_ptr);
+    freeOwnedGPtr(m_ptr);
     m_ptr = ptr;
   }
   void clear() {
-    freeOwnedPtr(m_ptr);
+    freeOwnedGPtr(m_ptr);
     m_ptr = 0;
   }
 
