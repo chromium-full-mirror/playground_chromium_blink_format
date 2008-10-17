@@ -46,7 +46,8 @@ RenderFlow::~RenderFlow() {
 
 #endif
 
-RenderFlow* RenderFlow::createAnonymousFlow(Document* doc, RenderStyle* style) {
+RenderFlow* RenderFlow::createAnonymousFlow(Document* doc,
+                                            PassRefPtr<RenderStyle> style) {
   RenderFlow* result;
   if (style->display() == INLINE)
     result = new (doc->renderArena()) RenderInline(doc);

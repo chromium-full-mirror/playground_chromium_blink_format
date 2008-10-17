@@ -38,27 +38,16 @@ ImplicitAnimation::ImplicitAnimation(const Animation* transition,
                                      int animatingProperty,
                                      RenderObject* renderer,
                                      CompositeAnimation* compAnim,
-                                     const RenderStyle* fromStyle)
+                                     RenderStyle* fromStyle)
     : AnimationBase(transition, renderer, compAnim),
       m_transitionProperty(transition->property()),
       m_animatingProperty(animatingProperty),
       m_overridden(false),
-      m_fromStyle(0),
-      m_toStyle(0) {
+      m_fromStyle(fromStyle) {
   ASSERT(animatingProperty != cAnimateAll);
-  if (fromStyle) {
-    m_fromStyle = fromStyle;
-    const_cast<RenderStyle*>(m_fromStyle)->ref();
-  }
 }
 
 ImplicitAnimation::~ImplicitAnimation() {
-  // Get rid of style refs
-  if (m_fromStyle)
-    const_cast<RenderStyle*>(m_fromStyle)->deref(renderer()->renderArena());
-  if (m_toStyle)
-    const_cast<RenderStyle*>(m_toStyle)->deref(renderer()->renderArena());
-
   // Do the cleanup here instead of in the base class so the specialized methods
   // get called
   if (!postActive())
@@ -72,9 +61,9 @@ bool ImplicitAnimation::shouldSendEventForListener(
 
 void ImplicitAnimation::animate(CompositeAnimation* animation,
                                 RenderObject* renderer,
-                                const RenderStyle* currentStyle,
-                                const RenderStyle* targetStyle,
-                                RenderStyle*& animatedStyle) {
+                                RenderStyle* currentStyle,
+                                RenderStyle* targetStyle,
+                                RefPtr<RenderStyle>& animatedStyle) {
   if (paused())
     return;
 
@@ -91,10 +80,10 @@ void ImplicitAnimation::animate(CompositeAnimation* animation,
   // Run a cycle of animation.
   // We know we will need a new render style, so make one if needed
   if (!animatedStyle)
-    animatedStyle = new (renderer->renderArena()) RenderStyle(*targetStyle);
+    animatedStyle = RenderStyle::clone(targetStyle);
 
-  if (blendProperties(this, m_animatingProperty, animatedStyle, m_fromStyle,
-                      m_toStyle, progress(1, 0, 0)))
+  if (blendProperties(this, m_animatingProperty, animatedStyle.get(),
+                      m_fromStyle.get(), m_toStyle.get(), progress(1, 0, 0)))
     setAnimating();
 }
 
@@ -147,16 +136,11 @@ bool ImplicitAnimation::sendTransitionEvent(const AtomicString& eventType,
   return false;  // Didn't dispatch an event
 }
 
-void ImplicitAnimation::reset(const RenderStyle* to) {
+void ImplicitAnimation::reset(RenderStyle* to) {
   ASSERT(to);
   ASSERT(m_fromStyle);
 
-  if (m_toStyle)
-    const_cast<RenderStyle*>(m_toStyle)->deref(renderer()->renderArena());
-
-  m_toStyle = to;  // It is read-only, other than the ref
-  if (m_toStyle)
-    const_cast<RenderStyle*>(m_toStyle)->ref();
+  m_toStyle = to;
 
   // Restart the transition
   if (m_fromStyle && m_toStyle)
@@ -182,12 +166,12 @@ bool ImplicitAnimation::affectsProperty(int property) const {
 
 bool ImplicitAnimation::isTargetPropertyEqual(int prop,
                                               const RenderStyle* targetStyle) {
-  return propertiesEqual(prop, m_toStyle, targetStyle);
+  return propertiesEqual(prop, m_toStyle.get(), targetStyle);
 }
 
 void ImplicitAnimation::blendPropertyValueInStyle(int prop,
                                                   RenderStyle* currentStyle) {
-  blendProperties(this, prop, currentStyle, m_fromStyle, m_toStyle,
+  blendProperties(this, prop, currentStyle, m_fromStyle.get(), m_toStyle.get(),
                   progress(1, 0, 0));
 }
 

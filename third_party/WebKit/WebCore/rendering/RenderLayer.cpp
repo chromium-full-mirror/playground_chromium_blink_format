@@ -2724,10 +2724,10 @@ void RenderLayer::updateScrollCornerStyle() {
       m_object->node()->isElementNode()
           ? m_object->node()->shadowAncestorNode()->renderer()
           : m_object;
-  RenderStyle* corner =
+  RefPtr<RenderStyle> corner =
       m_object->hasOverflowClip()
-          ? actualRenderer->getPseudoStyle(RenderStyle::SCROLLBAR_CORNER,
-                                           actualRenderer->style(), false)
+          ? actualRenderer->getUncachedPseudoStyle(
+                RenderStyle::SCROLLBAR_CORNER, actualRenderer->style())
           : 0;
   if (corner) {
     if (!m_scrollCorner) {
@@ -2735,7 +2735,7 @@ void RenderLayer::updateScrollCornerStyle() {
           RenderScrollbarPart(m_object->document());
       m_scrollCorner->setParent(m_object);
     }
-    m_scrollCorner->setStyle(corner);
+    m_scrollCorner->setStyle(corner.release());
   } else if (m_scrollCorner) {
     m_scrollCorner->destroy();
     m_scrollCorner = 0;
@@ -2747,10 +2747,10 @@ void RenderLayer::updateResizerStyle() {
       m_object->node()->isElementNode()
           ? m_object->node()->shadowAncestorNode()->renderer()
           : m_object;
-  RenderStyle* resizer =
+  RefPtr<RenderStyle> resizer =
       m_object->hasOverflowClip()
-          ? actualRenderer->getPseudoStyle(RenderStyle::RESIZER,
-                                           actualRenderer->style(), false)
+          ? actualRenderer->getUncachedPseudoStyle(RenderStyle::RESIZER,
+                                                   actualRenderer->style())
           : 0;
   if (resizer) {
     if (!m_resizer) {
@@ -2758,7 +2758,7 @@ void RenderLayer::updateResizerStyle() {
           RenderScrollbarPart(m_object->document());
       m_resizer->setParent(m_object);
     }
-    m_resizer->setStyle(resizer);
+    m_resizer->setStyle(resizer.release());
   } else if (m_resizer) {
     m_resizer->destroy();
     m_resizer = 0;
@@ -2777,7 +2777,7 @@ void RenderLayer::createReflection() {
 }
 
 void RenderLayer::updateReflectionStyle() {
-  RenderStyle* newStyle = new (renderer()->renderArena()) RenderStyle();
+  RefPtr<RenderStyle> newStyle = RenderStyle::create();
   newStyle->inheritFrom(renderer()->style());
 
   // Map in our transform.
@@ -2829,7 +2829,7 @@ void RenderLayer::updateReflectionStyle() {
   // Map in our mask.
   newStyle->setMaskBoxImage(renderer()->style()->boxReflect()->mask());
 
-  m_reflection->setStyle(newStyle);
+  m_reflection->setStyle(newStyle.release());
 }
 
 void RenderLayer::suspendMarquees() {

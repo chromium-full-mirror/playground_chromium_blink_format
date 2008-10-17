@@ -217,10 +217,10 @@ void RenderTable::addChild(RenderObject* child, RenderObject* beforeChild) {
     beforeChild = 0;
   RenderTableSection* section =
       new (renderArena()) RenderTableSection(document() /* anonymous */);
-  RenderStyle* newStyle = new (renderArena()) RenderStyle();
+  RefPtr<RenderStyle> newStyle = RenderStyle::create();
   newStyle->inheritFrom(style());
   newStyle->setDisplay(TABLE_ROW_GROUP);
-  section->setStyle(newStyle);
+  section->setStyle(newStyle.release());
   addChild(section, beforeChild);
   section->addChild(child);
 }

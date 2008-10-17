@@ -45,7 +45,7 @@ class KeyframeAnimation : public AnimationBase {
       RenderObject* renderer,
       int index,
       CompositeAnimation* compositeAnimation,
-      const RenderStyle* unanimatedStyle) {
+      RenderStyle* unanimatedStyle) {
     return adoptRef(new KeyframeAnimation(animation, renderer, index,
                                           compositeAnimation, unanimatedStyle));
   };
@@ -54,7 +54,7 @@ class KeyframeAnimation : public AnimationBase {
                        RenderObject*,
                        const RenderStyle* currentStyle,
                        const RenderStyle* targetStyle,
-                       RenderStyle*& animatedStyle);
+                       RefPtr<RenderStyle>& animatedStyle);
 
   const AtomicString& name() const { return m_keyframes.animationName(); }
   int index() const { return m_index; }
@@ -64,7 +64,7 @@ class KeyframeAnimation : public AnimationBase {
 
   bool hasAnimationForProperty(int property) const;
 
-  const RenderStyle* unanimatedStyle() const { return m_unanimatedStyle; }
+  RenderStyle* unanimatedStyle() const { return m_unanimatedStyle.get(); }
 
  protected:
   virtual void onAnimationStart(double elapsedTime);
@@ -87,7 +87,7 @@ class KeyframeAnimation : public AnimationBase {
                     RenderObject*,
                     int index,
                     CompositeAnimation*,
-                    const RenderStyle* unanimatedStyle);
+                    RenderStyle* unanimatedStyle);
   virtual ~KeyframeAnimation();
 
   // The keyframes that we are blending.
@@ -97,7 +97,7 @@ class KeyframeAnimation : public AnimationBase {
   int m_index;
 
   // The style just before we started animation
-  const RenderStyle* m_unanimatedStyle;
+  RefPtr<RenderStyle> m_unanimatedStyle;
 };
 
 }  // namespace WebCore

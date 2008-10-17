@@ -2219,7 +2219,7 @@ void RenderObject::showTreeForThis() const {
 Color RenderObject::selectionBackgroundColor() const {
   Color color;
   if (style()->userSelect() != SELECT_NONE) {
-    RenderStyle* pseudoStyle = getPseudoStyle(RenderStyle::SELECTION);
+    RenderStyle* pseudoStyle = getCachedPseudoStyle(RenderStyle::SELECTION);
     if (pseudoStyle && pseudoStyle->backgroundColor().isValid())
       color = pseudoStyle->backgroundColor().blendWithWhite();
     else
@@ -2236,7 +2236,7 @@ Color RenderObject::selectionForegroundColor() const {
   if (style()->userSelect() == SELECT_NONE)
     return color;
 
-  if (RenderStyle* pseudoStyle = getPseudoStyle(RenderStyle::SELECTION)) {
+  if (RenderStyle* pseudoStyle = getCachedPseudoStyle(RenderStyle::SELECTION)) {
     color = pseudoStyle->textFillColor();
     if (!color.isValid())
       color = pseudoStyle->color();
@@ -2297,13 +2297,13 @@ void RenderObject::selectionStartEnd(int& spos, int& epos) const {
 }
 
 RenderBlock* RenderObject::createAnonymousBlock() {
-  RenderStyle* newStyle = new (renderArena()) RenderStyle();
-  newStyle->inheritFrom(m_style);
+  RefPtr<RenderStyle> newStyle = RenderStyle::create();
+  newStyle->inheritFrom(m_style.get());
   newStyle->setDisplay(BLOCK);
 
   RenderBlock* newBox =
       new (renderArena()) RenderBlock(document() /* anonymous box */);
-  newBox->setStyle(newStyle);
+  newBox->setStyle(newStyle.release());
   return newBox;
 }
 
@@ -2342,31 +2342,29 @@ void RenderObject::handleDynamicFloatPositionChange() {
   }
 }
 
-void RenderObject::setAnimatableStyle(RenderStyle* style) {
+void RenderObject::setAnimatableStyle(PassRefPtr<RenderStyle> style) {
   if (!isText() && style)
-    style = animation()->updateAnimations(this, style);
-
-  setStyle(style);
+    setStyle(animation()->updateAnimations(this, style.get()));
+  else
+    setStyle(style);
 }
 
-void RenderObject::setStyle(const RenderStyle* style) {
+void RenderObject::setStyle(PassRefPtr<RenderStyle> style) {
   if (m_style == style)
     return;
 
   RenderStyle::Diff diff = RenderStyle::Equal;
   if (m_style)
-    diff = m_style->diff(style);
+    diff = m_style->diff(style.get());
 
   // If we have no layer(), just treat a RepaintLayer hint as a normal Repaint.
   if (diff == RenderStyle::RepaintLayer && !hasLayer())
     diff = RenderStyle::Repaint;
 
-  styleWillChange(diff, style);
+  styleWillChange(diff, style.get());
 
-  RenderStyle* oldStyle = m_style;
-  m_style = const_cast<RenderStyle*>(style);
-  if (m_style)
-    m_style->ref();
+  RefPtr<RenderStyle> oldStyle = m_style.release();
+  m_style = style;
 
   updateFillImages(oldStyle ? oldStyle->backgroundLayers() : 0,
                    m_style ? m_style->backgroundLayers() : 0);
@@ -2378,21 +2376,11 @@ void RenderObject::setStyle(const RenderStyle* style) {
   updateImage(oldStyle ? oldStyle->maskBoxImage().image() : 0,
               m_style ? m_style->maskBoxImage().image() : 0);
 
-  styleDidChange(diff, oldStyle);
-
-  if (oldStyle) {
-    oldStyle->deref(renderArena());
-  }
+  styleDidChange(diff, oldStyle.get());
 }
 
-void RenderObject::setStyleInternal(RenderStyle* style) {
-  if (m_style == style)
-    return;
-  if (m_style)
-    m_style->deref(renderArena());
+void RenderObject::setStyleInternal(PassRefPtr<RenderStyle> style) {
   m_style = style;
-  if (m_style)
-    m_style->ref();
 }
 
 void RenderObject::styleWillChange(RenderStyle::Diff diff,
@@ -2804,8 +2792,6 @@ void RenderObject::arenaDelete(RenderArena* arena, void* base) {
 
     if (StyleImage* maskBoxImage = m_style->maskBoxImage().image())
       maskBoxImage->removeClient(this);
-
-    m_style->deref(arena);
   }
 
 #ifndef NDEBUG
@@ -3033,29 +3019,48 @@ void RenderObject::deleteLineBoxWrapper() {}
 
 RenderStyle* RenderObject::firstLineStyle() const {
   if (!document()->usesFirstLineRules())
-    return m_style;
+    return m_style.get();
 
-  RenderStyle* s = m_style;
+  RenderStyle* s = m_style.get();
   const RenderObject* obj = isText() ? parent() : this;
   if (obj->isBlockFlow()) {
     RenderBlock* firstLineBlock = obj->firstLineBlock();
     if (firstLineBlock)
-      s = firstLineBlock->getPseudoStyle(RenderStyle::FIRST_LINE, style());
+      s = firstLineBlock->getCachedPseudoStyle(RenderStyle::FIRST_LINE,
+                                               style());
   } else if (!obj->isAnonymous() && obj->isInlineFlow()) {
     RenderStyle* parentStyle = obj->parent()->firstLineStyle();
     if (parentStyle != obj->parent()->style()) {
       // A first-line style is in effect. We need to cache a first-line style
       // for ourselves.
       style()->setHasPseudoStyle(RenderStyle::FIRST_LINE_INHERITED);
-      s = obj->getPseudoStyle(RenderStyle::FIRST_LINE_INHERITED, parentStyle);
+      s = obj->getCachedPseudoStyle(RenderStyle::FIRST_LINE_INHERITED,
+                                    parentStyle);
     }
   }
   return s;
 }
 
-RenderStyle* RenderObject::getPseudoStyle(RenderStyle::PseudoId pseudo,
-                                          RenderStyle* parentStyle,
-                                          bool useCachedStyle) const {
+RenderStyle* RenderObject::getCachedPseudoStyle(
+    RenderStyle::PseudoId pseudo,
+    RenderStyle* parentStyle) const {
+  if (pseudo < RenderStyle::FIRST_INTERNAL_PSEUDOID &&
+      !style()->hasPseudoStyle(pseudo))
+    return 0;
+
+  RenderStyle* cachedStyle = style()->getCachedPseudoStyle(pseudo);
+  if (cachedStyle)
+    return cachedStyle;
+
+  RefPtr<RenderStyle> result = getUncachedPseudoStyle(pseudo, parentStyle);
+  if (result)
+    return style()->addCachedPseudoStyle(result.release());
+  return 0;
+}
+
+PassRefPtr<RenderStyle> RenderObject::getUncachedPseudoStyle(
+    RenderStyle::PseudoId pseudo,
+    RenderStyle* parentStyle) const {
   if (pseudo < RenderStyle::FIRST_INTERNAL_PSEUDOID &&
       !style()->hasPseudoStyle(pseudo))
     return 0;
@@ -3063,16 +3068,13 @@ RenderStyle* RenderObject::getPseudoStyle(RenderStyle::PseudoId pseudo,
   if (!parentStyle)
     parentStyle = style();
 
-  RenderStyle* result = useCachedStyle ? style()->getPseudoStyle(pseudo) : 0;
-  if (result)
-    return result;
-
   Node* node = element();
   while (node && !node->isElementNode())
     node = node->parentNode();
   if (!node)
     return 0;
 
+  RefPtr<RenderStyle> result;
   if (pseudo == RenderStyle::FIRST_LINE_INHERITED) {
     result = document()->styleSelector()->styleForElement(
         static_cast<Element*>(node), parentStyle, false);
@@ -3080,11 +3082,7 @@ RenderStyle* RenderObject::getPseudoStyle(RenderStyle::PseudoId pseudo,
   } else
     result = document()->styleSelector()->pseudoStyleForElement(
         pseudo, static_cast<Element*>(node), parentStyle);
-  if (result && useCachedStyle) {
-    style()->addPseudoStyle(result);
-    result->deref(document()->renderArena());
-  }
-  return result;
+  return result.release();
 }
 
 static Color decorationColor(RenderStyle* style) {

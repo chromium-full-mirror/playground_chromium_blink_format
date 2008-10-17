@@ -62,7 +62,7 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
 
   // Centralized place to force a manual style resolution. Hacky but needed for
   // now.
-  RenderStyle* resolveStyle(RenderStyle* parentStyle);
+  PassRefPtr<RenderStyle> resolveStyle(RenderStyle* parentStyle);
 
   void invalidateResourcesInAncestorChain() const;
   virtual void detach();

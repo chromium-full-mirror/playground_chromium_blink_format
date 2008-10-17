@@ -419,7 +419,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
     }
 
     if (RenderStyle* pseudoStyle =
-            object()->getPseudoStyle(RenderStyle::SELECTION)) {
+            object()->getCachedPseudoStyle(RenderStyle::SELECTION)) {
       ShadowData* shadow =
           paintInfo.forceBlackText ? 0 : pseudoStyle->textShadow();
       if (shadow != selectionShadow) {

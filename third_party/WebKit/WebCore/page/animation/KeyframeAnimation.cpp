@@ -42,16 +42,11 @@ KeyframeAnimation::KeyframeAnimation(const Animation* animation,
                                      RenderObject* renderer,
                                      int index,
                                      CompositeAnimation* compAnim,
-                                     const RenderStyle* unanimatedStyle)
+                                     RenderStyle* unanimatedStyle)
     : AnimationBase(animation, renderer, compAnim),
       m_keyframes(renderer, animation->name()),
       m_index(index),
-      m_unanimatedStyle(0) {
-  if (unanimatedStyle) {
-    const_cast<RenderStyle*>(unanimatedStyle)->ref();
-    m_unanimatedStyle = unanimatedStyle;
-  }
-
+      m_unanimatedStyle(unanimatedStyle) {
   // Get the keyframe RenderStyles
   if (m_object && m_object->element() && m_object->element()->isElementNode())
     m_object->document()->styleSelector()->keyframeStylesForAnimation(
@@ -68,17 +63,13 @@ KeyframeAnimation::~KeyframeAnimation() {
   // get called
   if (!postActive())
     updateStateMachine(AnimationStateInputEndAnimation, -1);
-
-  if (m_unanimatedStyle)
-    const_cast<RenderStyle*>(m_unanimatedStyle)
-        ->deref(renderer()->renderArena());
 }
 
 void KeyframeAnimation::animate(CompositeAnimation* animation,
                                 RenderObject* renderer,
                                 const RenderStyle* currentStyle,
                                 const RenderStyle* targetStyle,
-                                RenderStyle*& animatedStyle) {
+                                RefPtr<RenderStyle>& animatedStyle) {
   // If we have not yet started, we will not have a valid start time, so just
   // start the animation if needed.
   if (isNew() && m_animation->playState() == AnimPlayStatePlaying)
@@ -120,26 +111,26 @@ void KeyframeAnimation::animate(CompositeAnimation* animation,
   if (m_animation->direction() && (i & 1))
     t = 1 - t;
 
-  RenderStyle* fromStyle = 0;
-  RenderStyle* toStyle = 0;
+  const RenderStyle* fromStyle = 0;
+  const RenderStyle* toStyle = 0;
   double scale = 1;
   double offset = 0;
   Vector<KeyframeValue>::const_iterator endKeyframes =
       m_keyframes.endKeyframes();
   for (Vector<KeyframeValue>::const_iterator it = m_keyframes.beginKeyframes();
        it != endKeyframes; ++it) {
-    if (t < it->key) {
+    if (t < it->key()) {
       // The first key should always be 0, so we should never succeed on the
       // first key
       if (!fromStyle)
         break;
-      scale = 1.0 / (it->key - offset);
-      toStyle = it->style;
+      scale = 1.0 / (it->key() - offset);
+      toStyle = it->style();
       break;
     }
 
-    offset = it->key;
-    fromStyle = it->style;
+    offset = it->key();
+    fromStyle = it->style();
   }
 
   // If either style is 0 we have an invalid case, just stop the animation.
@@ -151,7 +142,7 @@ void KeyframeAnimation::animate(CompositeAnimation* animation,
   // Run a cycle of animation.
   // We know we will need a new render style, so make one if needed.
   if (!animatedStyle)
-    animatedStyle = new (renderer->renderArena()) RenderStyle(*targetStyle);
+    animatedStyle = RenderStyle::clone(targetStyle);
 
   const TimingFunction* timingFunction = 0;
   if (fromStyle->animations() && fromStyle->animations()->size() > 0)
@@ -162,7 +153,8 @@ void KeyframeAnimation::animate(CompositeAnimation* animation,
   HashSet<int>::const_iterator endProperties = m_keyframes.endProperties();
   for (HashSet<int>::const_iterator it = m_keyframes.beginProperties();
        it != endProperties; ++it) {
-    if (blendProperties(this, *it, animatedStyle, fromStyle, toStyle, prog))
+    if (blendProperties(this, *it, animatedStyle.get(), fromStyle, toStyle,
+                        prog))
       setAnimating();
   }
 }
@@ -289,7 +281,7 @@ void KeyframeAnimation::validateTransformFunctionList() {
 
   for (Vector<KeyframeValue>::const_iterator it = m_keyframes.beginKeyframes();
        it != end; ++it, ++firstIndex) {
-    if (it->style->transform().operations().size() > 0) {
+    if (it->style()->transform().operations().size() > 0) {
       firstIt = it;
       break;
     }
@@ -298,12 +290,12 @@ void KeyframeAnimation::validateTransformFunctionList() {
   if (firstIt == end)
     return;
 
-  const TransformOperations* firstVal = &firstIt->style->transform();
+  const TransformOperations* firstVal = &firstIt->style()->transform();
 
   // See if the keyframes are valid
   for (Vector<KeyframeValue>::const_iterator it = firstIt + 1; it != end;
        ++it) {
-    const TransformOperations* val = &it->style->transform();
+    const TransformOperations* val = &it->style()->transform();
 
     // A null transform matches anything
     if (val->operations().isEmpty())

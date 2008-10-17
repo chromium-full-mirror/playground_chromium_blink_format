@@ -49,9 +49,9 @@ class CompositeAnimationPrivate {
 
   ~CompositeAnimationPrivate();
 
-  RenderStyle* animate(RenderObject*,
-                       const RenderStyle* currentStyle,
-                       RenderStyle* targetStyle);
+  PassRefPtr<RenderStyle> animate(RenderObject*,
+                                  RenderStyle* currentStyle,
+                                  RenderStyle* targetStyle);
 
   void setAnimating(bool);
   bool isAnimating() const;
@@ -81,10 +81,10 @@ class CompositeAnimationPrivate {
 
  protected:
   void updateTransitions(RenderObject*,
-                         const RenderStyle* currentStyle,
+                         RenderStyle* currentStyle,
                          RenderStyle* targetStyle);
   void updateKeyframeAnimations(RenderObject*,
-                                const RenderStyle* currentStyle,
+                                RenderStyle* currentStyle,
                                 RenderStyle* targetStyle);
 
  private:
@@ -105,10 +105,9 @@ CompositeAnimationPrivate::~CompositeAnimationPrivate() {
   m_keyframeAnimations.clear();
 }
 
-void CompositeAnimationPrivate::updateTransitions(
-    RenderObject* renderer,
-    const RenderStyle* currentStyle,
-    RenderStyle* targetStyle) {
+void CompositeAnimationPrivate::updateTransitions(RenderObject* renderer,
+                                                  RenderStyle* currentStyle,
+                                                  RenderStyle* targetStyle) {
   // If currentStyle is null, we don't do transitions
   if (!currentStyle || !targetStyle->transitions())
     return;
@@ -147,7 +146,7 @@ void CompositeAnimationPrivate::updateTransitions(
       // against the unanimated style here, but we "override" the transition
       // later.
       const KeyframeAnimation* keyframeAnim = getAnimationForProperty(prop);
-      const RenderStyle* fromStyle =
+      RenderStyle* fromStyle =
           keyframeAnim ? keyframeAnim->unanimatedStyle() : currentStyle;
 
       // See if there is a current transition for this prop
@@ -189,7 +188,7 @@ void CompositeAnimationPrivate::updateTransitions(
 
 void CompositeAnimationPrivate::updateKeyframeAnimations(
     RenderObject* renderer,
-    const RenderStyle* currentStyle,
+    RenderStyle* currentStyle,
     RenderStyle* targetStyle) {
   // Nothing to do if we don't have any animations, and didn't have any before
   if (m_keyframeAnimations.isEmpty() && !targetStyle->hasAnimations())
@@ -257,10 +256,11 @@ void CompositeAnimationPrivate::updateKeyframeAnimations(
     m_keyframeAnimations.remove(animsToBeRemoved[j]);
 }
 
-RenderStyle* CompositeAnimationPrivate::animate(RenderObject* renderer,
-                                                const RenderStyle* currentStyle,
-                                                RenderStyle* targetStyle) {
-  RenderStyle* resultStyle = 0;
+PassRefPtr<RenderStyle> CompositeAnimationPrivate::animate(
+    RenderObject* renderer,
+    RenderStyle* currentStyle,
+    RenderStyle* targetStyle) {
+  RefPtr<RenderStyle> resultStyle;
 
   // Update animations first so we can see if any transitions are overridden
   updateKeyframeAnimations(renderer, currentStyle, targetStyle);
@@ -301,7 +301,7 @@ RenderStyle* CompositeAnimationPrivate::animate(RenderObject* renderer,
 
   cleanupFinishedAnimations(renderer);
 
-  return resultStyle ? resultStyle : targetStyle;
+  return resultStyle ? resultStyle.release() : targetStyle;
 }
 
 // "animating" means that something is running that requires the timer to keep
@@ -577,9 +577,9 @@ CompositeAnimation::~CompositeAnimation() {
   delete m_data;
 }
 
-RenderStyle* CompositeAnimation::animate(RenderObject* renderer,
-                                         const RenderStyle* currentStyle,
-                                         RenderStyle* targetStyle) {
+PassRefPtr<RenderStyle> CompositeAnimation::animate(RenderObject* renderer,
+                                                    RenderStyle* currentStyle,
+                                                    RenderStyle* targetStyle) {
   return m_data->animate(renderer, currentStyle, targetStyle);
 }
 

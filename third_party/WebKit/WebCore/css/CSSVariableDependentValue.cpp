@@ -31,7 +31,7 @@
 namespace WebCore {
 
 CSSVariableDependentValue::CSSVariableDependentValue(
-    const PassRefPtr<CSSValueList>& list)
+    PassRefPtr<CSSValueList> list)
     : m_list(list) {}
 
 CSSVariableDependentValue::~CSSVariableDependentValue() {}

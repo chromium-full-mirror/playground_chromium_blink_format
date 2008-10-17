@@ -193,7 +193,7 @@ class AnimationBase : public RefCounted<AnimationBase> {
                        RenderObject*,
                        const RenderStyle* currentStyle,
                        const RenderStyle* targetStyle,
-                       RenderStyle*& animatedStyle) {}
+                       RefPtr<RenderStyle>& animatedStyle) {}
 
   virtual bool shouldFireEvents() const { return false; }
 

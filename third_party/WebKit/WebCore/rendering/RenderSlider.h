@@ -62,8 +62,8 @@ class RenderSlider : public RenderBlock {
   virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
  private:
-  RenderStyle* createThumbStyle(const RenderStyle* parentStyle,
-                                const RenderStyle* oldStyle = 0);
+  PassRefPtr<RenderStyle> createThumbStyle(const RenderStyle* parentStyle,
+                                           const RenderStyle* oldStyle = 0);
   int trackSize();
 
   RefPtr<HTMLSliderThumbElement> m_thumb;

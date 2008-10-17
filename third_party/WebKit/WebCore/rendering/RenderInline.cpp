@@ -99,13 +99,13 @@ void RenderInline::addChildToFlow(RenderObject* newChild,
     // |newChild|.  We then make that block box a continuation of this inline.
     // We take all of
     // the children after |beforeChild| and put them in a clone of this object.
-    RenderStyle* newStyle = new (renderArena()) RenderStyle();
+    RefPtr<RenderStyle> newStyle = RenderStyle::create();
     newStyle->inheritFrom(style());
     newStyle->setDisplay(BLOCK);
 
     RenderBlock* newBox =
         new (renderArena()) RenderBlock(document() /* anonymous box */);
-    newBox->setStyle(newStyle);
+    newBox->setStyle(newStyle.release());
     RenderFlow* oldContinuation = continuation();
     setContinuation(newBox);
 

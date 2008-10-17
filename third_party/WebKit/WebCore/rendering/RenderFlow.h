@@ -66,7 +66,7 @@ class RenderFlow : public RenderContainer {
                               RenderObject* beforeChild) = 0;
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
 
-  static RenderFlow* createAnonymousFlow(Document*, RenderStyle*);
+  static RenderFlow* createAnonymousFlow(Document*, PassRefPtr<RenderStyle>);
 
   void extractLineBox(InlineFlowBox*);
   void attachLineBox(InlineFlowBox*);

@@ -233,8 +233,9 @@ void AnimationController::cancelAnimations(RenderObject* renderer) {
   }
 }
 
-RenderStyle* AnimationController::updateAnimations(RenderObject* renderer,
-                                                   RenderStyle* newStyle) {
+PassRefPtr<RenderStyle> AnimationController::updateAnimations(
+    RenderObject* renderer,
+    RenderStyle* newStyle) {
   // Don't do anything if we're in the cache
   if (!renderer->document() || renderer->document()->inPageCache())
     return newStyle;
@@ -244,8 +245,6 @@ RenderStyle* AnimationController::updateAnimations(RenderObject* renderer,
   if ((!oldStyle || (!oldStyle->animations() && !oldStyle->transitions())) &&
       (!newStyle->animations() && !newStyle->transitions()))
     return newStyle;
-
-  RenderStyle* blendedStyle = newStyle;
 
   // Fetch our current set of implicit animations from a hashtable.  We then
   // compare them
@@ -259,7 +258,8 @@ RenderStyle* AnimationController::updateAnimations(RenderObject* renderer,
 
   CompositeAnimation* rendererAnimations =
       m_data->accessCompositeAnimation(renderer);
-  blendedStyle = rendererAnimations->animate(renderer, oldStyle, newStyle);
+  RefPtr<RenderStyle> blendedStyle =
+      rendererAnimations->animate(renderer, oldStyle, newStyle);
 
   m_data->updateAnimationTimer();
 
@@ -272,7 +272,7 @@ RenderStyle* AnimationController::updateAnimations(RenderObject* renderer,
         (blendedStyle->opacity() < 1.0f || blendedStyle->hasTransform()))
       blendedStyle->setZIndex(0);
   }
-  return blendedStyle;
+  return blendedStyle.release();
 }
 
 void AnimationController::setAnimationStartTime(RenderObject* renderer,

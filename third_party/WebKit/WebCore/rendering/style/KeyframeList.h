@@ -28,6 +28,7 @@
 #include "AtomicString.h"
 #include <wtf/Vector.h>
 #include <wtf/HashSet.h>
+#include <wtf/RefPtr.h>
 
 namespace WebCore {
 
@@ -36,10 +37,13 @@ class RenderStyle;
 
 class KeyframeValue {
  public:
-  KeyframeValue() : key(-1), style(0) {}
+  KeyframeValue() : m_key(-1) {}
 
-  float key;
-  RenderStyle* style;
+  float key() const { return m_key; }
+  const RenderStyle* style() const { return m_style.get(); }
+
+  float m_key;
+  RefPtr<RenderStyle> m_style;
 };
 
 class KeyframeList {
@@ -56,7 +60,7 @@ class KeyframeList {
 
   const AtomicString& animationName() const { return m_animationName; }
 
-  void insert(float key, RenderStyle* style);
+  void insert(float key, PassRefPtr<RenderStyle> style);
 
   void addProperty(int prop) { m_properties.add(prop); }
   bool containsProperty(int prop) const { return m_properties.contains(prop); }

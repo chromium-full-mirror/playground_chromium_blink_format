@@ -175,10 +175,10 @@ void RenderBlock::styleDidChange(RenderStyle::Diff diff,
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {
     if (child->isAnonymousBlock()) {
-      RenderStyle* newStyle = new (renderArena()) RenderStyle();
+      RefPtr<RenderStyle> newStyle = RenderStyle::create();
       newStyle->inheritFrom(style());
       newStyle->setDisplay(BLOCK);
-      child->setStyle(newStyle);
+      child->setStyle(newStyle.release());
     }
   }
 
@@ -4901,7 +4901,7 @@ void RenderBlock::updateFirstLetter() {
   // just want
   // to update it.
   if (currChild->style()->styleType() == RenderStyle::FIRST_LETTER) {
-    RenderStyle* pseudo = firstLetterBlock->getPseudoStyle(
+    RenderStyle* pseudo = firstLetterBlock->getCachedPseudoStyle(
         RenderStyle::FIRST_LETTER, firstLetterContainer->firstLineStyle());
     currChild->setStyle(pseudo);
     for (RenderObject* genChild = currChild->firstChild(); genChild;
@@ -4923,7 +4923,7 @@ void RenderBlock::updateFirstLetter() {
 
     // Create our pseudo style now that we have our firstLetterContainer
     // determined.
-    RenderStyle* pseudoStyle = firstLetterBlock->getPseudoStyle(
+    RenderStyle* pseudoStyle = firstLetterBlock->getCachedPseudoStyle(
         RenderStyle::FIRST_LETTER, firstLetterContainer->firstLineStyle());
 
     // Force inline display (except for floating first-letters)
@@ -4972,9 +4972,9 @@ void RenderBlock::updateFirstLetter() {
       // construct text fragment for the first letter
       RenderTextFragment* letter = new (renderArena())
           RenderTextFragment(remainingText->node(), oldText.get(), 0, length);
-      RenderStyle* newStyle = new (renderArena()) RenderStyle();
+      RefPtr<RenderStyle> newStyle = RenderStyle::create();
       newStyle->inheritFrom(pseudoStyle);
-      letter->setStyle(newStyle);
+      letter->setStyle(newStyle.release());
       firstLetter->addChild(letter);
 
       textObj->destroy();

@@ -173,26 +173,24 @@ void RenderSlider::styleDidChange(RenderStyle::Diff diff,
                                   const RenderStyle* oldStyle) {
   RenderBlock::styleDidChange(diff, oldStyle);
 
-  if (m_thumb) {
-    RenderStyle* thumbStyle =
-        createThumbStyle(style(), m_thumb->renderer()->style());
-    m_thumb->renderer()->setStyle(thumbStyle);
-  }
+  if (m_thumb)
+    m_thumb->renderer()->setStyle(
+        createThumbStyle(style(), m_thumb->renderer()->style()));
 
   setReplaced(isInline());
 }
 
-RenderStyle* RenderSlider::createThumbStyle(const RenderStyle* parentStyle,
-                                            const RenderStyle* oldStyle) {
-  RenderStyle* style;
-
-  RenderStyle* pseudoStyle = getPseudoStyle(RenderStyle::SLIDER_THUMB);
+PassRefPtr<RenderStyle> RenderSlider::createThumbStyle(
+    const RenderStyle* parentStyle,
+    const RenderStyle* oldStyle) {
+  RefPtr<RenderStyle> style;
+  RenderStyle* pseudoStyle = getCachedPseudoStyle(RenderStyle::SLIDER_THUMB);
   if (pseudoStyle)
     // We may be sharing style with another slider, but we must not share the
     // thumb style.
-    style = new (renderArena()) RenderStyle(*pseudoStyle);
+    style = RenderStyle::clone(pseudoStyle);
   else
-    style = new (renderArena()) RenderStyle();
+    style = RenderStyle::create();
 
   if (parentStyle)
     style->inheritFrom(parentStyle);
@@ -211,7 +209,7 @@ RenderStyle* RenderSlider::createThumbStyle(const RenderStyle* parentStyle,
   else if (parentStyle->appearance() == MediaSliderAppearance)
     style->setAppearance(MediaSliderThumbAppearance);
 
-  return style;
+  return style.release();
 }
 
 void RenderSlider::layout() {
@@ -256,9 +254,10 @@ void RenderSlider::layout() {
 void RenderSlider::updateFromElement() {
   if (!m_thumb) {
     m_thumb = new HTMLSliderThumbElement(document(), node());
-    RenderStyle* thumbStyle = createThumbStyle(style());
-    m_thumb->setRenderer(m_thumb->createRenderer(renderArena(), thumbStyle));
-    m_thumb->renderer()->setStyle(thumbStyle);
+    RefPtr<RenderStyle> thumbStyle = createThumbStyle(style());
+    m_thumb->setRenderer(
+        m_thumb->createRenderer(renderArena(), thumbStyle.get()));
+    m_thumb->renderer()->setStyle(thumbStyle.release());
     m_thumb->setAttached();
     m_thumb->setInDocument(true);
     addChild(m_thumb->renderer());

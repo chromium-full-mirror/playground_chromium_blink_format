@@ -74,7 +74,7 @@ TextControlInnerElement::TextControlInnerElement(Document* doc,
     : HTMLDivElement(doc), m_shadowParent(shadowParent) {}
 
 void TextControlInnerElement::attachInnerElement(Node* parent,
-                                                 RenderStyle* style,
+                                                 PassRefPtr<RenderStyle> style,
                                                  RenderArena* arena) {
   // When adding these elements, create the renderer & style first before adding
   // to the DOM.
@@ -82,7 +82,7 @@ void TextControlInnerElement::attachInnerElement(Node* parent,
   // up our layout.
 
   // Create the renderer with the specified style
-  RenderObject* renderer = createRenderer(arena, style);
+  RenderObject* renderer = createRenderer(arena, style.get());
   if (renderer) {
     setRenderer(renderer);
     renderer->setStyle(style);

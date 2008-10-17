@@ -53,19 +53,13 @@ bool HTMLOptionElement::checkDTD(const Node* newChild) {
 }
 
 void HTMLOptionElement::attach() {
-  if (parentNode()->renderStyle()) {
-    RenderStyle* style = styleForRenderer(0);
-    setRenderStyle(style);
-    style->deref(document()->renderArena());
-  }
+  if (parentNode()->renderStyle())
+    setRenderStyle(styleForRenderer(0));
   HTMLFormControlElement::attach();
 }
 
 void HTMLOptionElement::detach() {
-  if (m_style) {
-    m_style->deref(document()->renderArena());
-    m_style = 0;
-  }
+  m_style.clear();
   HTMLFormControlElement::detach();
 }
 
@@ -219,17 +213,12 @@ void HTMLOptionElement::setLabel(const String& value) {
   setAttribute(labelAttr, value);
 }
 
-void HTMLOptionElement::setRenderStyle(RenderStyle* newStyle) {
-  RenderStyle* oldStyle = m_style;
+void HTMLOptionElement::setRenderStyle(PassRefPtr<RenderStyle> newStyle) {
   m_style = newStyle;
-  if (newStyle)
-    newStyle->ref();
-  if (oldStyle)
-    oldStyle->deref(document()->renderArena());
 }
 
 RenderStyle* HTMLOptionElement::nonRendererRenderStyle() const {
-  return m_style;
+  return m_style.get();
 }
 
 String HTMLOptionElement::optionText() {

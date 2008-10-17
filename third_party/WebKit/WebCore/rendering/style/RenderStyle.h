@@ -100,11 +100,10 @@ class CSSStyleSelector;
 class CSSValueList;
 class CachedImage;
 class Pair;
-class RenderArena;
 class StringImpl;
 class StyleImage;
 
-class RenderStyle {
+class RenderStyle : public RefCounted<RenderStyle> {
   friend class CSSStyleSelector;
 
  public:
@@ -141,26 +140,6 @@ class RenderStyle {
     RESIZER
   };
   static const int FIRST_INTERNAL_PSEUDOID = FILE_UPLOAD_BUTTON;
-
-  void ref() { m_ref++; }
-  void deref(RenderArena* arena) {
-    if (m_ref)
-      m_ref--;
-    if (!m_ref)
-      arenaDelete(arena);
-  }
-  bool hasOneRef() { return m_ref == 1; }
-  int refCount() const { return m_ref; }
-
-  // Overloaded new operator.  Derived classes must override operator new
-  // in order to allocate out of the RenderArena.
-  void* operator new(size_t sz, RenderArena* renderArena) throw();
-
-  // Overridden to prevent the normal delete from being called.
-  void operator delete(void* ptr, size_t sz);
-
- private:
-  void arenaDelete(RenderArena*);
 
  protected:
   // !START SYNC!: Keep this in sync with the copy constructor in
@@ -271,7 +250,7 @@ class RenderStyle {
   DataRef<StyleInheritedData> inherited;
 
   // list of associated pseudo styles
-  RenderStyle* pseudoStyle;
+  RefPtr<RenderStyle> m_cachedPseudoStyle;
 
   unsigned m_pseudoState : 3;  // PseudoState
   bool m_affectedByAttributeSelectors : 1;
@@ -293,8 +272,6 @@ class RenderStyle {
   bool m_firstChildState : 1;
   bool m_lastChildState : 1;
   unsigned m_childIndex : 18;  // Plenty of bits to cache an index.
-
-  int m_ref;
 
 #if ENABLE(SVG)
   DataRef<SVGRenderStyle> m_svgStyle;
@@ -340,11 +317,16 @@ class RenderStyle {
     noninherited_flags._unicodeBidi = initialUnicodeBidi();
   }
 
- public:
+ protected:
   RenderStyle();
   // used to create the default style.
   RenderStyle(bool);
   RenderStyle(const RenderStyle&);
+
+ public:
+  static PassRefPtr<RenderStyle> create();
+  static PassRefPtr<RenderStyle> createDefaultStyle();
+  static PassRefPtr<RenderStyle> clone(const RenderStyle*);
 
   ~RenderStyle();
 
@@ -357,8 +339,8 @@ class RenderStyle {
     noninherited_flags._styleType = styleType;
   }
 
-  RenderStyle* getPseudoStyle(PseudoId pi);
-  void addPseudoStyle(RenderStyle* pseudo);
+  RenderStyle* getCachedPseudoStyle(PseudoId);
+  RenderStyle* addCachedPseudoStyle(PassRefPtr<RenderStyle>);
 
   bool affectedByHoverRules() const {
     return noninherited_flags._affectedByHover;
@@ -381,6 +363,7 @@ class RenderStyle {
   }
 
   bool operator==(const RenderStyle& other) const;
+  bool operator!=(const RenderStyle& other) const { return !(*this == other); }
   bool isFloating() const { return !(noninherited_flags._floating == FNONE); }
   bool hasMargin() const { return surround->margin.nonZero(); }
   bool hasBorder() const { return surround->border.hasBorder(); }
@@ -1313,7 +1296,7 @@ class RenderStyle {
     SET_VAR(rareNonInheritedData.access()->flexibleBox, pack, p);
   }
   void setBoxShadow(ShadowData* val, bool add = false);
-  void setBoxReflect(const PassRefPtr<StyleReflection>& reflect) {
+  void setBoxReflect(PassRefPtr<StyleReflection> reflect) {
     if (rareNonInheritedData->m_boxReflect != reflect)
       rareNonInheritedData.access()->m_boxReflect = reflect;
   }

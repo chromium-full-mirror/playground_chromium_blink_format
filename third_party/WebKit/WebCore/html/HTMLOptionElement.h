@@ -47,7 +47,7 @@ class HTMLOptionElement : public HTMLFormControlElement {
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
   virtual void attach();
   virtual void detach();
-  virtual void setRenderStyle(RenderStyle*);
+  virtual void setRenderStyle(PassRefPtr<RenderStyle>);
 
   virtual const AtomicString& type() const;
 
@@ -89,7 +89,7 @@ class HTMLOptionElement : public HTMLFormControlElement {
 
   String m_value;
   bool m_selected;
-  RenderStyle* m_style;
+  RefPtr<RenderStyle> m_style;
 };
 
 }  // namespace

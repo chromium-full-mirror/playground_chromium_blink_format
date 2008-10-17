@@ -114,15 +114,13 @@ ScrollbarPart RenderScrollbar::partForStyleResolve() {
   return s_styleResolvePart;
 }
 
-RenderStyle* RenderScrollbar::getScrollbarPseudoStyle(
+PassRefPtr<RenderStyle> RenderScrollbar::getScrollbarPseudoStyle(
     ScrollbarPart partType,
     RenderStyle::PseudoId pseudoId) {
   s_styleResolvePart = partType;
   s_styleResolveScrollbar = this;
-  RenderStyle* result =
-      m_owner->getPseudoStyle(pseudoId, m_owner->style(), false);
-  if (result)
-    result->ref();
+  RefPtr<RenderStyle> result =
+      m_owner->getUncachedPseudoStyle(pseudoId, m_owner->style());
   s_styleResolvePart = NoPart;
   s_styleResolveScrollbar = 0;
   return result;
@@ -184,7 +182,7 @@ void RenderScrollbar::updateScrollbarPart(ScrollbarPart partType,
   if (partType == NoPart)
     return;
 
-  RenderStyle* partStyle =
+  RefPtr<RenderStyle> partStyle =
       !destroy
           ? getScrollbarPseudoStyle(partType, pseudoForScrollbarPart(partType))
           : 0;
@@ -232,10 +230,7 @@ void RenderScrollbar::updateScrollbarPart(ScrollbarPart partType,
   }
 
   if (partRenderer)
-    partRenderer->setStyle(partStyle);
-
-  if (partStyle)
-    partStyle->deref(m_owner->renderArena());
+    partRenderer->setStyle(partStyle.release());
 }
 
 void RenderScrollbar::paintPart(GraphicsContext* graphicsContext,

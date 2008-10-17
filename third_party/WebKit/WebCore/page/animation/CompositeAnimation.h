@@ -49,9 +49,9 @@ class CompositeAnimation : public Noncopyable {
   CompositeAnimation(AnimationController* animationController);
   ~CompositeAnimation();
 
-  RenderStyle* animate(RenderObject*,
-                       const RenderStyle* currentStyle,
-                       RenderStyle* targetStyle);
+  PassRefPtr<RenderStyle> animate(RenderObject*,
+                                  RenderStyle* currentStyle,
+                                  RenderStyle* targetStyle);
   bool isAnimating() const;
 
   void setWaitingForStyleAvailable(bool);

@@ -97,22 +97,22 @@ SVGResource* SVGClipPathElement::canvasResource() {
 
   bool bbox = clipPathUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
 
-  RenderStyle* clipPathStyle = styleForRenderer(
+  RefPtr<RenderStyle> clipPathStyle = styleForRenderer(
       parent()->renderer());  // FIXME: Manual style resolution is a hack
   for (Node* n = firstChild(); n; n = n->nextSibling()) {
     if (n->isSVGElement() &&
         static_cast<SVGElement*>(n)->isStyledTransformable()) {
       SVGStyledTransformableElement* styled =
           static_cast<SVGStyledTransformableElement*>(n);
-      RenderStyle* pathStyle =
-          document()->styleSelector()->styleForElement(styled, clipPathStyle);
+      RefPtr<RenderStyle> pathStyle =
+          document()->styleSelector()->styleForElement(styled,
+                                                       clipPathStyle.get());
       if (pathStyle->display() != NONE) {
         Path pathData = styled->toClipPath();
         if (!pathData.isEmpty())
           m_clipper->addClipData(pathData, pathStyle->svgStyle()->clipRule(),
                                  bbox);
       }
-      pathStyle->deref(document()->renderArena());
     }
   }
   if (m_clipper->clipData().isEmpty()) {
@@ -120,7 +120,6 @@ SVGResource* SVGClipPathElement::canvasResource() {
     pathData.addRect(FloatRect());
     m_clipper->addClipData(pathData, RULE_EVENODD, bbox);
   }
-  clipPathStyle->deref(document()->renderArena());
   return m_clipper.get();
 }
 }

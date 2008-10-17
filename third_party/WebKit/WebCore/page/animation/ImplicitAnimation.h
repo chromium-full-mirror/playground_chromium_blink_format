@@ -44,7 +44,7 @@ class ImplicitAnimation : public AnimationBase {
       int animatingProperty,
       RenderObject* renderer,
       CompositeAnimation* compositeAnimation,
-      const RenderStyle* fromStyle) {
+      RenderStyle* fromStyle) {
     return adoptRef(new ImplicitAnimation(
         animation, animatingProperty, renderer, compositeAnimation, fromStyle));
   };
@@ -56,10 +56,10 @@ class ImplicitAnimation : public AnimationBase {
 
   virtual void animate(CompositeAnimation*,
                        RenderObject*,
-                       const RenderStyle* currentStyle,
-                       const RenderStyle* targetStyle,
-                       RenderStyle*& animatedStyle);
-  virtual void reset(const RenderStyle* to);
+                       RenderStyle* currentStyle,
+                       RenderStyle* targetStyle,
+                       RefPtr<RenderStyle>& animatedStyle);
+  virtual void reset(RenderStyle* to);
 
   void setOverridden(bool);
   virtual bool overridden() const { return m_overridden; }
@@ -85,7 +85,7 @@ class ImplicitAnimation : public AnimationBase {
                     int animatingProperty,
                     RenderObject*,
                     CompositeAnimation*,
-                    const RenderStyle* fromStyle);
+                    RenderStyle* fromStyle);
   virtual ~ImplicitAnimation();
 
   int m_transitionProperty;  // Transition property as specified in the
@@ -95,8 +95,8 @@ class ImplicitAnimation : public AnimationBase {
                       // the transitioning property
 
   // The two styles that we are blending.
-  const RenderStyle* m_fromStyle;
-  const RenderStyle* m_toStyle;
+  RefPtr<RenderStyle> m_fromStyle;
+  RefPtr<RenderStyle> m_toStyle;
 };
 
 }  // namespace WebCore

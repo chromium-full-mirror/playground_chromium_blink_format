@@ -73,7 +73,8 @@ class RenderScrollbar : public Scrollbar {
   int minimumThumbLength();
 
  private:
-  RenderStyle* getScrollbarPseudoStyle(ScrollbarPart, RenderStyle::PseudoId);
+  PassRefPtr<RenderStyle> getScrollbarPseudoStyle(ScrollbarPart,
+                                                  RenderStyle::PseudoId);
   void updateScrollbarPart(ScrollbarPart, bool destroy = false);
 
   RenderObject* m_owner;

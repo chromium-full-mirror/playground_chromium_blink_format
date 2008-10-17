@@ -55,8 +55,7 @@ MediaControlShadowRootElement::MediaControlShadowRootElement(
     Document* doc,
     HTMLMediaElement* mediaElement)
     : HTMLDivElement(doc), m_mediaElement(mediaElement) {
-  RenderStyle* rootStyle =
-      new (mediaElement->renderer()->renderArena()) RenderStyle();
+  RefPtr<RenderStyle> rootStyle = RenderStyle::create();
   rootStyle->inheritFrom(mediaElement->renderer()->style());
   rootStyle->setDisplay(BLOCK);
   rootStyle->setPosition(RelativePosition);
@@ -64,7 +63,7 @@ MediaControlShadowRootElement::MediaControlShadowRootElement(
       new (mediaElement->renderer()->renderArena())
           RenderMediaControlShadowRoot(this);
   renderer->setParent(mediaElement->renderer());
-  renderer->setStyle(rootStyle);
+  renderer->setStyle(rootStyle.release());
   setRenderer(renderer);
   setAttached();
   setInDocument(true);
@@ -79,7 +78,7 @@ MediaControlInputElement::MediaControlInputElement(
     HTMLMediaElement* mediaElement)
     : HTMLInputElement(doc), m_mediaElement(mediaElement) {
   setInputType(type);
-  RenderStyle* style = m_mediaElement->renderer()->getPseudoStyle(pseudo);
+  RenderStyle* style = m_mediaElement->renderer()->getCachedPseudoStyle(pseudo);
   RenderObject* renderer =
       createRenderer(m_mediaElement->renderer()->renderArena(), style);
   if (renderer) {
