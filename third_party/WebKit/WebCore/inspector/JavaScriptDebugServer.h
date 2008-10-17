@@ -89,6 +89,7 @@ class JavaScriptDebugServer : JSC::Debugger {
   bool hasListeners() const {
     return !m_listeners.isEmpty() || !m_pageListenersMap.isEmpty();
   }
+  bool hasGlobalListeners() const { return !m_listeners.isEmpty(); }
   bool hasListenersInterestedInPage(Page*);
 
   void setJavaScriptPaused(const PageGroup&, bool paused);
@@ -125,7 +126,8 @@ class JavaScriptDebugServer : JSC::Debugger {
                                   intptr_t sourceID,
                                   int lineno);
 
-  void willAddFirstListener();
+  void didAddListener(Page*);
+  void didRemoveListener(Page*);
   void didRemoveLastListener();
 
   typedef HashMap<Page*, ListenerSet*> PageListenersMap;

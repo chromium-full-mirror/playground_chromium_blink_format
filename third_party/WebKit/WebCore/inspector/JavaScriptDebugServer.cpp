@@ -78,36 +78,42 @@ JavaScriptDebugServer::~JavaScriptDebugServer() {
 }
 
 void JavaScriptDebugServer::addListener(JavaScriptDebugListener* listener) {
-  if (!hasListeners())
-    willAddFirstListener();
+  ASSERT_ARG(listener, listener);
 
   m_listeners.add(listener);
+
+  didAddListener(0);
 }
 
 void JavaScriptDebugServer::removeListener(JavaScriptDebugListener* listener) {
+  ASSERT_ARG(listener, listener);
+
   m_listeners.remove(listener);
+
+  didRemoveListener(0);
   if (!hasListeners())
     didRemoveLastListener();
 }
 
 void JavaScriptDebugServer::addListener(JavaScriptDebugListener* listener,
                                         Page* page) {
+  ASSERT_ARG(listener, listener);
   ASSERT_ARG(page, page);
-
-  if (!hasListeners())
-    willAddFirstListener();
 
   pair<PageListenersMap::iterator, bool> result =
       m_pageListenersMap.add(page, 0);
   if (result.second)
     result.first->second = new ListenerSet;
-  ListenerSet* listeners = result.first->second;
 
+  ListenerSet* listeners = result.first->second;
   listeners->add(listener);
+
+  didAddListener(page);
 }
 
 void JavaScriptDebugServer::removeListener(JavaScriptDebugListener* listener,
                                            Page* page) {
+  ASSERT_ARG(listener, listener);
   ASSERT_ARG(page, page);
 
   PageListenersMap::iterator it = m_pageListenersMap.find(page);
@@ -121,21 +127,23 @@ void JavaScriptDebugServer::removeListener(JavaScriptDebugListener* listener,
     delete listeners;
   }
 
+  didRemoveListener(page);
   if (!hasListeners())
     didRemoveLastListener();
 }
 
 void JavaScriptDebugServer::pageCreated(Page* page) {
-  if (!hasListeners())
-    return;
+  ASSERT_ARG(page, page);
 
+  if (!hasListenersInterestedInPage(page))
+    return;
   page->setDebugger(this);
 }
 
 bool JavaScriptDebugServer::hasListenersInterestedInPage(Page* page) {
   ASSERT_ARG(page, page);
 
-  if (!m_listeners.isEmpty())
+  if (hasGlobalListeners())
     return true;
 
   return m_pageListenersMap.contains(page);
@@ -271,7 +279,7 @@ void JavaScriptDebugServer::sourceParsed(ExecState* exec,
 
   bool isError = errorLine != -1;
 
-  if (!m_listeners.isEmpty()) {
+  if (hasGlobalListeners()) {
     if (isError)
       dispatchFailedToParseSource(m_listeners, exec, source, errorLine,
                                   errorMessage);
@@ -311,6 +319,7 @@ void JavaScriptDebugServer::dispatchFunctionToListeners(
   ASSERT(hasListeners());
 
   WebCore::dispatchFunctionToListeners(m_listeners, callback);
+
   if (ListenerSet* pageListeners = m_pageListenersMap.get(page)) {
     ASSERT(!pageListeners->isEmpty());
     WebCore::dispatchFunctionToListeners(*pageListeners, callback);
@@ -588,13 +597,26 @@ void JavaScriptDebugServer::recompileAllJSFunctions(
   }
 }
 
-void JavaScriptDebugServer::willAddFirstListener() {
-  Page::setDebuggerForAllPages(this);
+void JavaScriptDebugServer::didAddListener(Page* page) {
   m_recompileTimer.startOneShot(0);
+
+  if (page)
+    page->setDebugger(this);
+  else
+    Page::setDebuggerForAllPages(this);
+}
+
+void JavaScriptDebugServer::didRemoveListener(Page* page) {
+  if (hasGlobalListeners() || (page && hasListenersInterestedInPage(page)))
+    return;
+
+  if (page)
+    page->setDebugger(0);
+  else
+    Page::setDebuggerForAllPages(0);
 }
 
 void JavaScriptDebugServer::didRemoveLastListener() {
-  Page::setDebuggerForAllPages(0);
   m_doneProcessingDebuggerEvents = true;
   m_recompileTimer.startOneShot(0);
 }
