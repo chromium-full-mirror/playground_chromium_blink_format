@@ -4377,12 +4377,6 @@ CallFrame* Machine::findFunctionCallFrame(CallFrame* callFrame,
 
 #if ENABLE(CTI)
 
-NEVER_INLINE static void doSetReturnAddressVMThrowTrampoline(
-    void** returnAddress) {
-  ctiSetReturnAddress(returnAddress,
-                      reinterpret_cast<void*>(ctiVMThrowTrampoline));
-}
-
 NEVER_INLINE void Machine::tryCTICachePutByID(CallFrame* callFrame,
                                               CodeBlock* codeBlock,
                                               void* returnAddress,
@@ -4630,6 +4624,51 @@ NEVER_INLINE void Machine::tryCTICacheGetByID(CallFrame* callFrame,
                            count, slot.cachedOffset(), returnAddress);
 }
 
+NEVER_INLINE static void doSetReturnAddress(void** returnAddress,
+                                            void* address) {
+  ctiSetReturnAddress(returnAddress, address);
+}
+
+#ifndef NDEBUG
+extern "C" {
+
+static void jscGeneratedNativeCode() {
+  // when executing a CTI function (which might do an allocation), we hack the
+  // return address
+  // to pretend to be executing this function, to keep stack logging tools from
+  // blowing out
+  // memory
+}
+}
+
+struct StackHack {
+  ALWAYS_INLINE StackHack(void** location) {
+    returnAddressLocation = location;
+    savedReturnAddress = *returnAddressLocation;
+    doSetReturnAddress(returnAddressLocation,
+                       reinterpret_cast<void*>(jscGeneratedNativeCode));
+  }
+  ALWAYS_INLINE ~StackHack() {
+    doSetReturnAddress(returnAddressLocation, savedReturnAddress);
+  }
+
+  void** returnAddressLocation;
+  void* savedReturnAddress;
+};
+
+#define CTI_STACK_HACK() StackHack stackHack(&CTI_RETURN_ADDRESS_SLOT)
+#define CTI_SET_RETURN_ADDRESS(addr) stackHack.savedReturnAddress = addr
+#define CTI_RETURN_ADDRESS stackHack.savedReturnAddress
+
+#else
+
+#define CTI_STACK_HACK() (void)0
+#define CTI_SET_RETURN_ADDRESS(addr) \
+  doSetReturnAddress(&CTI_RETURN_ADDRESS_SLOT, addr);
+#define CTI_RETURN_ADDRESS CTI_RETURN_ADDRESS_SLOT
+
+#endif
+
 #define VM_THROW_EXCEPTION()     \
   do {                           \
     VM_THROW_EXCEPTION_AT_END(); \
@@ -4643,11 +4682,11 @@ NEVER_INLINE void Machine::tryCTICacheGetByID(CallFrame* callFrame,
     };                           \
     return pair;                 \
   } while (0)
-#define VM_THROW_EXCEPTION_AT_END()                           \
-  do {                                                        \
-    ASSERT(ARG_globalData->exception);                        \
-    ARG_globalData->throwReturnAddress = CTI_RETURN_ADDRESS;  \
-    doSetReturnAddressVMThrowTrampoline(&CTI_RETURN_ADDRESS); \
+#define VM_THROW_EXCEPTION_AT_END()                                        \
+  do {                                                                     \
+    ASSERT(ARG_globalData->exception);                                     \
+    ARG_globalData->throwReturnAddress = CTI_RETURN_ADDRESS;               \
+    CTI_SET_RETURN_ADDRESS(reinterpret_cast<void*>(ctiVMThrowTrampoline)); \
   } while (0)
 
 #define VM_CHECK_EXCEPTION()                      \
@@ -4682,6 +4721,8 @@ NEVER_INLINE void Machine::tryCTICacheGetByID(CallFrame* callFrame,
   } while (0)
 
 JSValue* Machine::cti_op_convert_this(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* v1 = ARG_src1;
   CallFrame* callFrame = ARG_callFrame;
 
@@ -4691,12 +4732,16 @@ JSValue* Machine::cti_op_convert_this(CTI_ARGS) {
 }
 
 void Machine::cti_op_end(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   ScopeChainNode* scopeChain = ARG_callFrame->scopeChain();
   ASSERT(scopeChain->refCount > 1);
   scopeChain->deref();
 }
 
 JSValue* Machine::cti_op_add(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* v1 = ARG_src1;
   JSValue* v2 = ARG_src2;
 
@@ -4743,6 +4788,8 @@ JSValue* Machine::cti_op_add(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_pre_inc(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* v = ARG_src1;
 
   CallFrame* callFrame = ARG_callFrame;
@@ -4752,6 +4799,8 @@ JSValue* Machine::cti_op_pre_inc(CTI_ARGS) {
 }
 
 void Machine::cti_timeout_check(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   if (ARG_globalData->machine->checkTimeout(
           ARG_callFrame->dynamicGlobalObject())) {
     ARG_globalData->exception =
@@ -4761,6 +4810,8 @@ void Machine::cti_timeout_check(CTI_ARGS) {
 }
 
 void Machine::cti_register_file_check(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   CodeBlock* codeBlock = callFrame->codeBlock();
   RegisterFile* registerFile = ARG_registerFile;
@@ -4771,11 +4822,13 @@ void Machine::cti_register_file_check(CTI_ARGS) {
     ARG_globalData->exception = createStackOverflowError(callerFrame);
     ASSERT(ARG_globalData->exception);
     ARG_globalData->throwReturnAddress = callFrame->returnPC();
-    doSetReturnAddressVMThrowTrampoline(&CTI_RETURN_ADDRESS);
+    CTI_SET_RETURN_ADDRESS(reinterpret_cast<void*>(ctiVMThrowTrampoline));
   }
 }
 
 int Machine::cti_op_loop_if_less(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
   CallFrame* callFrame = ARG_callFrame;
@@ -4786,6 +4839,8 @@ int Machine::cti_op_loop_if_less(CTI_ARGS) {
 }
 
 int Machine::cti_op_loop_if_lesseq(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
   CallFrame* callFrame = ARG_callFrame;
@@ -4796,11 +4851,15 @@ int Machine::cti_op_loop_if_lesseq(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_new_object(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return constructEmptyObject(ARG_callFrame);
   ;
 }
 
 void Machine::cti_op_put_by_id(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   Identifier& ident = *ARG_id2;
 
@@ -4814,6 +4873,8 @@ void Machine::cti_op_put_by_id(CTI_ARGS) {
 }
 
 void Machine::cti_op_put_by_id_second(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   PutPropertySlot slot;
   ARG_src1->put(ARG_callFrame, *ARG_id2, ARG_src3, slot);
   ARG_globalData->machine->tryCTICachePutByID(
@@ -4823,12 +4884,16 @@ void Machine::cti_op_put_by_id_second(CTI_ARGS) {
 }
 
 void Machine::cti_op_put_by_id_generic(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   PutPropertySlot slot;
   ARG_src1->put(ARG_callFrame, *ARG_id2, ARG_src3, slot);
   VM_CHECK_EXCEPTION_AT_END();
 }
 
 void Machine::cti_op_put_by_id_fail(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   Identifier& ident = *ARG_id2;
 
@@ -4844,6 +4909,8 @@ void Machine::cti_op_put_by_id_fail(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_get_by_id(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   Identifier& ident = *ARG_id2;
 
@@ -4859,6 +4926,8 @@ JSValue* Machine::cti_op_get_by_id(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_get_by_id_second(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   Identifier& ident = *ARG_id2;
 
@@ -4875,6 +4944,8 @@ JSValue* Machine::cti_op_get_by_id_second(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_get_by_id_generic(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   Identifier& ident = *ARG_id2;
 
@@ -4887,6 +4958,8 @@ JSValue* Machine::cti_op_get_by_id_generic(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_get_by_id_fail(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   Identifier& ident = *ARG_id2;
 
@@ -4904,6 +4977,8 @@ JSValue* Machine::cti_op_get_by_id_fail(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_instanceof(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   JSValue* value = ARG_src1;
   JSValue* baseVal = ARG_src2;
@@ -4953,6 +5028,8 @@ JSValue* Machine::cti_op_instanceof(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_del_by_id(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   Identifier& ident = *ARG_id2;
 
@@ -4964,6 +5041,8 @@ JSValue* Machine::cti_op_del_by_id(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_mul(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
@@ -4980,16 +5059,22 @@ JSValue* Machine::cti_op_mul(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_new_func(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return ARG_func1->makeFunction(ARG_callFrame, ARG_callFrame->scopeChain());
 }
 
 void Machine::cti_op_call_profiler(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   ASSERT(*ARG_profilerReference);
   (*ARG_profilerReference)
       ->willExecute(ARG_callFrame, static_cast<JSFunction*>(ARG_src1));
 }
 
 VoidPtrPair Machine::cti_op_call_JSFunction(CTI_ARGS) {
+  CTI_STACK_HACK();
+
 #ifndef NDEBUG
   CallData callData;
   ASSERT(ARG_src1->getCallData(callData) == CallTypeJS);
@@ -5039,6 +5124,8 @@ VoidPtrPair Machine::cti_op_call_JSFunction(CTI_ARGS) {
 }
 
 void* Machine::cti_vm_lazyLinkCall(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   Machine* machine = ARG_globalData->machine;
   CallFrame* callFrame = CallFrame::create(ARG_callFrame);
   CallFrame* callerCallFrame = callFrame->callerFrame();
@@ -5057,6 +5144,8 @@ void* Machine::cti_vm_lazyLinkCall(CTI_ARGS) {
 }
 
 void* Machine::cti_vm_compile(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CodeBlock* codeBlock = ARG_callFrame->codeBlock();
   if (!codeBlock->ctiCode)
     CTI::compile(ARG_globalData->machine, ARG_callFrame, codeBlock);
@@ -5064,6 +5153,8 @@ void* Machine::cti_vm_compile(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_push_activation(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSActivation* activation = new (ARG_globalData) JSActivation(
       ARG_callFrame,
       static_cast<FunctionBodyNode*>(ARG_callFrame->codeBlock()->ownerNode));
@@ -5073,6 +5164,8 @@ JSValue* Machine::cti_op_push_activation(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* funcVal = ARG_src1;
 
   CallData callData;
@@ -5123,12 +5216,16 @@ JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
 }
 
 void Machine::cti_op_create_arguments(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   Arguments* arguments = new (ARG_globalData) Arguments(ARG_callFrame);
   ARG_callFrame->setCalleeArguments(arguments);
   ARG_callFrame[RegisterFile::ArgumentsRegister] = arguments;
 }
 
 void Machine::cti_op_tear_off_activation(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   ASSERT(ARG_callFrame->codeBlock()->needsFullScopeChain);
   ASSERT(ARG_src1->isObject(&JSActivation::info));
   static_cast<JSActivation*>(ARG_src1)->copyRegisters(
@@ -5136,27 +5233,37 @@ void Machine::cti_op_tear_off_activation(CTI_ARGS) {
 }
 
 void Machine::cti_op_tear_off_arguments(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   ASSERT(ARG_callFrame->codeBlock()->usesArguments &&
          !ARG_callFrame->codeBlock()->needsFullScopeChain);
   ARG_callFrame->optionalCalleeArguments()->copyRegisters();
 }
 
 void Machine::cti_op_ret_profiler(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   ASSERT(*ARG_profilerReference);
   (*ARG_profilerReference)->didExecute(ARG_callFrame, ARG_callFrame->callee());
 }
 
 void Machine::cti_op_ret_scopeChain(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   ASSERT(ARG_callFrame->codeBlock()->needsFullScopeChain);
   ARG_callFrame->scopeChain()->deref();
 }
 
 JSValue* Machine::cti_op_new_array(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   ArgList argList(ARG_registers1, ARG_int2);
   return constructArray(ARG_callFrame, argList);
 }
 
 JSValue* Machine::cti_op_resolve(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   ScopeChainNode* scopeChain = callFrame->scopeChain();
 
@@ -5184,6 +5291,8 @@ JSValue* Machine::cti_op_resolve(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_construct_JSConstructFast(CTI_ARGS) {
+  CTI_STACK_HACK();
+
 #ifndef NDEBUG
   ConstructData constructData;
   ASSERT(static_cast<JSFunction*>(ARG_src1)->getConstructData(constructData) ==
@@ -5202,6 +5311,8 @@ JSValue* Machine::cti_op_construct_JSConstructFast(CTI_ARGS) {
 }
 
 VoidPtrPair Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
 
   JSFunction* constructor = static_cast<JSFunction*>(ARG_src1);
@@ -5263,6 +5374,8 @@ VoidPtrPair Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
 
   JSValue* constrVal = ARG_src1;
@@ -5300,6 +5413,8 @@ JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_get_by_val(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   Machine* machine = ARG_globalData->machine;
 
@@ -5332,6 +5447,8 @@ JSValue* Machine::cti_op_get_by_val(CTI_ARGS) {
 }
 
 VoidPtrPair Machine::cti_op_resolve_func(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   ScopeChainNode* scopeChain = callFrame->scopeChain();
 
@@ -5377,6 +5494,8 @@ VoidPtrPair Machine::cti_op_resolve_func(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_sub(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
@@ -5393,6 +5512,8 @@ JSValue* Machine::cti_op_sub(CTI_ARGS) {
 }
 
 void Machine::cti_op_put_by_val(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   Machine* machine = ARG_globalData->machine;
 
@@ -5425,6 +5546,8 @@ void Machine::cti_op_put_by_val(CTI_ARGS) {
 }
 
 void Machine::cti_op_put_by_val_array(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
 
   JSValue* baseValue = ARG_src1;
@@ -5449,6 +5572,8 @@ void Machine::cti_op_put_by_val_array(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_lesseq(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   JSValue* result = jsBoolean(jsLessEq(callFrame, ARG_src1, ARG_src2));
   VM_CHECK_EXCEPTION_AT_END();
@@ -5456,6 +5581,8 @@ JSValue* Machine::cti_op_lesseq(CTI_ARGS) {
 }
 
 int Machine::cti_op_loop_if_true(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5466,6 +5593,8 @@ int Machine::cti_op_loop_if_true(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_negate(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src = ARG_src1;
 
   double v;
@@ -5479,11 +5608,15 @@ JSValue* Machine::cti_op_negate(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_resolve_base(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return inlineResolveBase(ARG_callFrame, *ARG_id1,
                            ARG_callFrame->scopeChain());
 }
 
 JSValue* Machine::cti_op_resolve_skip(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   ScopeChainNode* scopeChain = callFrame->scopeChain();
 
@@ -5516,6 +5649,8 @@ JSValue* Machine::cti_op_resolve_skip(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_resolve_global(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   JSGlobalObject* globalObject = static_cast<JSGlobalObject*>(ARG_src1);
   Identifier& ident = *ARG_id2;
@@ -5544,6 +5679,8 @@ JSValue* Machine::cti_op_resolve_global(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_div(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
@@ -5560,6 +5697,8 @@ JSValue* Machine::cti_op_div(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_pre_dec(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* v = ARG_src1;
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5569,6 +5708,8 @@ JSValue* Machine::cti_op_pre_dec(CTI_ARGS) {
 }
 
 int Machine::cti_op_jless(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
   CallFrame* callFrame = ARG_callFrame;
@@ -5579,6 +5720,8 @@ int Machine::cti_op_jless(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_not(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src = ARG_src1;
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5589,6 +5732,8 @@ JSValue* Machine::cti_op_not(CTI_ARGS) {
 }
 
 int SFX_CALL Machine::cti_op_jtrue(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5599,6 +5744,8 @@ int SFX_CALL Machine::cti_op_jtrue(CTI_ARGS) {
 }
 
 VoidPtrPair Machine::cti_op_post_inc(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* v = ARG_src1;
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5612,6 +5759,8 @@ VoidPtrPair Machine::cti_op_post_inc(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_eq(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
@@ -5624,6 +5773,8 @@ JSValue* Machine::cti_op_eq(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_lshift(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* val = ARG_src1;
   JSValue* shift = ARG_src2;
 
@@ -5645,6 +5796,8 @@ JSValue* Machine::cti_op_lshift(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_bitand(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
@@ -5661,6 +5814,8 @@ JSValue* Machine::cti_op_bitand(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_rshift(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* val = ARG_src1;
   JSValue* shift = ARG_src2;
 
@@ -5680,6 +5835,8 @@ JSValue* Machine::cti_op_rshift(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_bitnot(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src = ARG_src1;
 
   int value;
@@ -5693,6 +5850,8 @@ JSValue* Machine::cti_op_bitnot(CTI_ARGS) {
 }
 
 VoidPtrPair Machine::cti_op_resolve_with_base(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   ScopeChainNode* scopeChain = callFrame->scopeChain();
 
@@ -5727,10 +5886,14 @@ VoidPtrPair Machine::cti_op_resolve_with_base(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_new_func_exp(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return ARG_funcexp1->makeFunction(ARG_callFrame, ARG_callFrame->scopeChain());
 }
 
 JSValue* Machine::cti_op_mod(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* dividendValue = ARG_src1;
   JSValue* divisorValue = ARG_src2;
 
@@ -5743,6 +5906,8 @@ JSValue* Machine::cti_op_mod(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_less(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   JSValue* result = jsBoolean(jsLess(callFrame, ARG_src1, ARG_src2));
   VM_CHECK_EXCEPTION_AT_END();
@@ -5750,6 +5915,8 @@ JSValue* Machine::cti_op_less(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_neq(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
@@ -5762,6 +5929,8 @@ JSValue* Machine::cti_op_neq(CTI_ARGS) {
 }
 
 VoidPtrPair Machine::cti_op_post_dec(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* v = ARG_src1;
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5775,6 +5944,8 @@ VoidPtrPair Machine::cti_op_post_dec(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_urshift(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* val = ARG_src1;
   JSValue* shift = ARG_src2;
 
@@ -5793,6 +5964,8 @@ JSValue* Machine::cti_op_urshift(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_bitxor(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
@@ -5805,11 +5978,15 @@ JSValue* Machine::cti_op_bitxor(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_new_regexp(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return new (ARG_globalData) RegExpObject(
       ARG_callFrame->lexicalGlobalObject()->regExpStructure(), ARG_regexp1);
 }
 
 JSValue* Machine::cti_op_bitor(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
@@ -5822,6 +5999,8 @@ JSValue* Machine::cti_op_bitor(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_call_eval(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   RegisterFile* registerFile = ARG_registerFile;
   CodeBlock* codeBlock = callFrame->codeBlock();
@@ -5851,6 +6030,8 @@ JSValue* Machine::cti_op_call_eval(CTI_ARGS) {
 }
 
 void* Machine::cti_op_throw(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   CodeBlock* codeBlock = callFrame->codeBlock();
 
@@ -5873,15 +6054,19 @@ void* Machine::cti_op_throw(CTI_ARGS) {
   void* catchRoutine =
       callFrame->codeBlock()->nativeExceptionCodeForHandlerVPC(handlerVPC);
   ASSERT(catchRoutine);
-  ctiSetReturnAddress(&CTI_RETURN_ADDRESS, catchRoutine);
+  CTI_SET_RETURN_ADDRESS(catchRoutine);
   return exceptionValue;
 }
 
 JSPropertyNameIterator* Machine::cti_op_get_pnames(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return JSPropertyNameIterator::create(ARG_callFrame, ARG_src1);
 }
 
 JSValue* Machine::cti_op_next_pname(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSPropertyNameIterator* it = ARG_pni1;
   JSValue* temp = it->next(ARG_callFrame);
   if (!temp)
@@ -5890,20 +6075,28 @@ JSValue* Machine::cti_op_next_pname(CTI_ARGS) {
 }
 
 void Machine::cti_op_push_scope(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSObject* o = ARG_src1->toObject(ARG_callFrame);
   VM_CHECK_EXCEPTION_VOID();
   ARG_callFrame->setScopeChain(ARG_callFrame->scopeChain()->push(o));
 }
 
 void Machine::cti_op_pop_scope(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   ARG_callFrame->setScopeChain(ARG_callFrame->scopeChain()->pop());
 }
 
 JSValue* Machine::cti_op_typeof(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return jsTypeStringForValue(ARG_callFrame, ARG_src1);
 }
 
 JSValue* Machine::cti_op_is_undefined(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* v = ARG_src1;
   return jsBoolean(
       JSImmediate::isImmediate(v)
@@ -5912,26 +6105,38 @@ JSValue* Machine::cti_op_is_undefined(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_is_boolean(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return jsBoolean(ARG_src1->isBoolean());
 }
 
 JSValue* Machine::cti_op_is_number(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return jsBoolean(ARG_src1->isNumber());
 }
 
 JSValue* Machine::cti_op_is_string(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return jsBoolean(ARG_globalData->machine->isJSString(ARG_src1));
 }
 
 JSValue* Machine::cti_op_is_object(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return jsBoolean(jsIsObjectType(ARG_src1));
 }
 
 JSValue* Machine::cti_op_is_function(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   return jsBoolean(jsIsFunctionType(ARG_src1));
 }
 
 JSValue* Machine::cti_op_stricteq(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
@@ -5945,6 +6150,8 @@ JSValue* Machine::cti_op_stricteq(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_nstricteq(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src1 = ARG_src1;
   JSValue* src2 = ARG_src2;
 
@@ -5958,6 +6165,8 @@ JSValue* Machine::cti_op_nstricteq(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_to_jsnumber(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* src = ARG_src1;
   CallFrame* callFrame = ARG_callFrame;
 
@@ -5967,6 +6176,8 @@ JSValue* Machine::cti_op_to_jsnumber(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_in(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   JSValue* baseVal = ARG_src2;
 
@@ -5995,6 +6206,8 @@ JSValue* Machine::cti_op_in(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_push_new_scope(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSObject* scope = new (ARG_globalData)
       JSStaticScopeObject(ARG_callFrame, *ARG_id1, ARG_src2, DontDelete);
 
@@ -6004,6 +6217,8 @@ JSValue* Machine::cti_op_push_new_scope(CTI_ARGS) {
 }
 
 void Machine::cti_op_jmp_scopes(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   unsigned count = ARG_int1;
   CallFrame* callFrame = ARG_callFrame;
 
@@ -6014,6 +6229,8 @@ void Machine::cti_op_jmp_scopes(CTI_ARGS) {
 }
 
 void Machine::cti_op_put_by_index(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   unsigned property = ARG_int2;
 
@@ -6021,6 +6238,8 @@ void Machine::cti_op_put_by_index(CTI_ARGS) {
 }
 
 void* Machine::cti_op_switch_imm(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* scrutinee = ARG_src1;
   unsigned tableIndex = ARG_int2;
   CallFrame* callFrame = ARG_callFrame;
@@ -6035,6 +6254,8 @@ void* Machine::cti_op_switch_imm(CTI_ARGS) {
 }
 
 void* Machine::cti_op_switch_char(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* scrutinee = ARG_src1;
   unsigned tableIndex = ARG_int2;
   CallFrame* callFrame = ARG_callFrame;
@@ -6053,6 +6274,8 @@ void* Machine::cti_op_switch_char(CTI_ARGS) {
 }
 
 void* Machine::cti_op_switch_string(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   JSValue* scrutinee = ARG_src1;
   unsigned tableIndex = ARG_int2;
   CallFrame* callFrame = ARG_callFrame;
@@ -6069,6 +6292,8 @@ void* Machine::cti_op_switch_string(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_del_by_val(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
 
   JSValue* baseValue = ARG_src1;
@@ -6091,6 +6316,8 @@ JSValue* Machine::cti_op_del_by_val(CTI_ARGS) {
 }
 
 void Machine::cti_op_put_getter(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
 
   ASSERT(ARG_src1->isObject());
@@ -6101,6 +6328,8 @@ void Machine::cti_op_put_getter(CTI_ARGS) {
 }
 
 void Machine::cti_op_put_setter(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
 
   ASSERT(ARG_src1->isObject());
@@ -6111,6 +6340,8 @@ void Machine::cti_op_put_setter(CTI_ARGS) {
 }
 
 JSValue* Machine::cti_op_new_error(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   CodeBlock* codeBlock = callFrame->codeBlock();
   unsigned type = ARG_int1;
@@ -6124,6 +6355,8 @@ JSValue* Machine::cti_op_new_error(CTI_ARGS) {
 }
 
 void Machine::cti_op_debug(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
 
   int debugHookID = ARG_int1;
@@ -6135,6 +6368,8 @@ void Machine::cti_op_debug(CTI_ARGS) {
 }
 
 void* Machine::cti_vm_throw(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   CallFrame* callFrame = ARG_callFrame;
   CodeBlock* codeBlock = callFrame->codeBlock();
 
@@ -6160,7 +6395,7 @@ void* Machine::cti_vm_throw(CTI_ARGS) {
   void* catchRoutine =
       callFrame->codeBlock()->nativeExceptionCodeForHandlerVPC(handlerVPC);
   ASSERT(catchRoutine);
-  ctiSetReturnAddress(&CTI_RETURN_ADDRESS, catchRoutine);
+  CTI_SET_RETURN_ADDRESS(catchRoutine);
   return exceptionValue;
 }
 
