@@ -5976,7 +5976,7 @@ JSValue* Machine::cti_op_call_eval(CTI_ARGS) {
         registerOffset - RegisterFile::CallFrameHeaderSize - argCount, argCount,
         exceptionValue);
     if (UNLIKELY(exceptionValue != noValue())) {
-      ARG_globalData->exception = exceptionValue();
+      ARG_globalData->exception = exceptionValue;
       VM_THROW_EXCEPTION_AT_END();
     }
     return result;
