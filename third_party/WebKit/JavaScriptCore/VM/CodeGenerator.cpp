@@ -1217,6 +1217,7 @@ RegisterID* CodeGenerator::emitCall(OpcodeID opcodeID,
     callFrame.append(newTemporary());
 
   emitExpressionInfo(divot, startOffset, endOffset);
+  m_codeBlock->structureIDInstructions.append(instructions().size());
   emitOpcode(opcodeID);
   instructions().append(dst->index());
   instructions().append(func->index());
@@ -1278,6 +1279,7 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
     callFrame.append(newTemporary());
 
   emitExpressionInfo(divot, startOffset, endOffset);
+  m_codeBlock->structureIDInstructions.append(instructions().size());
   emitOpcode(op_construct);
   instructions().append(dst->index());
   instructions().append(func->index());

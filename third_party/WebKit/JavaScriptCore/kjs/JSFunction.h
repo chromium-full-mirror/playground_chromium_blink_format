@@ -47,6 +47,7 @@ class JSFunction : public InternalFunction {
 
  public:
   JSFunction(ExecState*, const Identifier&, FunctionBodyNode*, ScopeChainNode*);
+  ~JSFunction();
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*,

@@ -26,6 +26,7 @@
 #include "config.h"
 #include "JSFunction.h"
 
+#include "CodeBlock.h"
 #include "CommonIdentifiers.h"
 #include "ExecState.h"
 #include "FunctionPrototype.h"
@@ -54,6 +55,19 @@ JSFunction::JSFunction(ExecState* exec,
            name),
       m_body(body),
       m_scopeChain(scopeChainNode) {}
+
+JSFunction::~JSFunction() {
+#if ENABLE(CTI)
+  // JIT code for other functions may have had calls linked directly to the code
+  // for this function; these links
+  // are based on a check for the this pointer value for this JSFunction - which
+  // will no longer be valid once
+  // this memory is freed and may be reused (potentially for another, different
+  // JSFunction).
+  if (m_body.get() && m_body->isGenerated())
+    m_body->generatedByteCode().unlinkCallers();
+#endif
+}
 
 void JSFunction::mark() {
   Base::mark();
