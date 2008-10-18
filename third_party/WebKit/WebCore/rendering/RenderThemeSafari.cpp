@@ -394,8 +394,9 @@ bool RenderThemeSafari::paintCheckbox(RenderObject* o,
 
   IntRect inflatedRect = inflateRect(r, checkboxSizes()[controlSize],
                                      checkboxMargins(controlSize));
-  paintThemePart(CheckboxPart, paintInfo.context->platformContext(),
-                 inflatedRect, controlSize, determineState(o));
+  paintThemePart(SafariTheme::CheckboxPart,
+                 paintInfo.context->platformContext(), inflatedRect,
+                 controlSize, determineState(o));
 
   return false;
 }
@@ -568,7 +569,7 @@ bool RenderThemeSafari::paintButton(RenderObject* o,
   ThemePart part;
   if (r.height() <= buttonSizes()[NSRegularControlSize].height()) {
     // Push button
-    part = PushButtonPart;
+    part = SafariTheme::PushButtonPart;
 
     IntSize size = buttonSizes()[controlSize];
     size.setWidth(r.width());
@@ -583,7 +584,7 @@ bool RenderThemeSafari::paintButton(RenderObject* o,
     // Now inflate it to account for the shadow.
     inflatedRect = inflateRect(inflatedRect, size, buttonMargins(controlSize));
   } else
-    part = SquareButtonPart;
+    part = SafariTheme::SquareButtonPart;
 
   paintThemePart(part, paintInfo.context->platformContext(), inflatedRect,
                  controlSize, determineState(o));
@@ -595,8 +596,9 @@ bool RenderThemeSafari::paintTextField(RenderObject* o,
                                        const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
-  paintThemePart(TextFieldPart, paintInfo.context->platformContext(), r,
-                 (NSControlSize)0, determineState(o) & ~FocusedState);
+  paintThemePart(SafariTheme::TextFieldPart,
+                 paintInfo.context->platformContext(), r, (NSControlSize)0,
+                 determineState(o) & ~FocusedState);
   return false;
 }
 
@@ -628,8 +630,9 @@ bool RenderThemeSafari::paintTextArea(RenderObject* o,
                                       const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
-  paintThemePart(TextAreaPart, paintInfo.context->platformContext(), r,
-                 (NSControlSize)0, determineState(o) & ~FocusedState);
+  paintThemePart(SafariTheme::TextAreaPart,
+                 paintInfo.context->platformContext(), r, (NSControlSize)0,
+                 determineState(o) & ~FocusedState);
   return false;
 }
 
@@ -1072,7 +1075,8 @@ bool RenderThemeSafari::paintSearchField(
     const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
-  paintThemePart(SearchFieldPart, paintInfo.context->platformContext(), r,
+  paintThemePart(SafariTheme::SearchFieldPart,
+                 paintInfo.context->platformContext(), r,
                  controlSizeFromRect(r, searchFieldSizes()), determineState(o));
   return false;
 }
@@ -1135,7 +1139,7 @@ bool RenderThemeSafari::paintSearchFieldCancelButton(
 
   IntRect searchRect = renderer->absoluteBoundingBoxRect();
 
-  paintThemePart(SearchFieldCancelButtonPart,
+  paintThemePart(SafariTheme::SearchFieldCancelButtonPart,
                  paintInfo.context->platformContext(), searchRect,
                  controlSizeFromRect(searchRect, searchFieldSizes()),
                  determineState(o));
@@ -1202,7 +1206,7 @@ bool RenderThemeSafari::paintSearchFieldResultsDecoration(
 
   IntRect searchRect = renderer->absoluteBoundingBoxRect();
 
-  paintThemePart(SearchFieldResultsDecorationPart,
+  paintThemePart(SafariTheme::SearchFieldResultsDecorationPart,
                  paintInfo.context->platformContext(), searchRect,
                  controlSizeFromRect(searchRect, searchFieldSizes()),
                  determineState(o));
@@ -1232,7 +1236,7 @@ bool RenderThemeSafari::paintSearchFieldResultsButton(
 
   IntRect searchRect = renderer->absoluteBoundingBoxRect();
 
-  paintThemePart(SearchFieldResultsButtonPart,
+  paintThemePart(SafariTheme::SearchFieldResultsButtonPart,
                  paintInfo.context->platformContext(), searchRect,
                  controlSizeFromRect(searchRect, searchFieldSizes()),
                  determineState(o));
