@@ -186,7 +186,7 @@ class RenderThemeQt : public RenderTheme {
  private:
   bool supportsFocus(ControlPart) const;
 
-  EAppearance applyTheme(QStyleOption&, RenderObject*) const;
+  ControlPart applyTheme(QStyleOption&, RenderObject*) const;
 
   void setButtonPadding(RenderStyle*) const;
   void setPopupPadding(RenderStyle*) const;
