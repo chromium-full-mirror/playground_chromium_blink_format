@@ -126,7 +126,7 @@ void JSObject::put(ExecState* exec,
   // Check if there are any setters or getters in the prototype chain
   JSValue* prototype;
   for (JSObject* obj = this; !obj->structureID()->hasGetterSetterProperties();
-       obj = static_cast<JSObject*>(prototype)) {
+       obj = asObject(prototype)) {
     prototype = obj->prototype();
     if (prototype->isNull()) {
       putDirect(propertyName, value, 0, true, slot);
@@ -140,10 +140,10 @@ void JSObject::put(ExecState* exec,
       attributes & ReadOnly)
     return;
 
-  for (JSObject* obj = this;; obj = static_cast<JSObject*>(prototype)) {
+  for (JSObject* obj = this;; obj = asObject(prototype)) {
     if (JSValue* gs = obj->getDirect(propertyName)) {
       if (gs->isGetterSetter()) {
-        JSObject* setterFunc = static_cast<GetterSetter*>(gs)->setter();
+        JSObject* setterFunc = asGetterSetter(gs)->setter();
         if (!setterFunc) {
           throwSetterError(exec);
           return;
@@ -254,7 +254,7 @@ static ALWAYS_INLINE JSValue* callDefaultValueFunction(
   if (exec->hadException())
     return exec->exception();
   if (result->isObject())
-    return 0;
+    return noValue();
   return result;
 }
 
@@ -311,8 +311,7 @@ void JSObject::defineGetter(ExecState* exec,
   JSValue* object = getDirect(propertyName);
   if (object && object->isGetterSetter()) {
     ASSERT(m_structureID->hasGetterSetterProperties());
-    GetterSetter* getterSetter = static_cast<GetterSetter*>(object);
-    getterSetter->setGetter(getterFunction);
+    asGetterSetter(object)->setGetter(getterFunction);
     return;
   }
 
@@ -341,8 +340,7 @@ void JSObject::defineSetter(ExecState* exec,
   JSValue* object = getDirect(propertyName);
   if (object && object->isGetterSetter()) {
     ASSERT(m_structureID->hasGetterSetterProperties());
-    GetterSetter* getterSetter = static_cast<GetterSetter*>(object);
-    getterSetter->setSetter(setterFunction);
+    asGetterSetter(object)->setSetter(setterFunction);
     return;
   }
 
@@ -372,7 +370,7 @@ JSValue* JSObject::lookupGetter(ExecState*, const Identifier& propertyName) {
     if (value) {
       if (!value->isGetterSetter())
         return jsUndefined();
-      JSObject* functionObject = static_cast<GetterSetter*>(value)->getter();
+      JSObject* functionObject = asGetterSetter(value)->getter();
       if (!functionObject)
         return jsUndefined();
       return functionObject;
@@ -380,7 +378,7 @@ JSValue* JSObject::lookupGetter(ExecState*, const Identifier& propertyName) {
 
     if (!object->prototype() || !object->prototype()->isObject())
       return jsUndefined();
-    object = static_cast<JSObject*>(object->prototype());
+    object = asObject(object->prototype());
   }
 }
 
@@ -391,7 +389,7 @@ JSValue* JSObject::lookupSetter(ExecState*, const Identifier& propertyName) {
     if (value) {
       if (!value->isGetterSetter())
         return jsUndefined();
-      JSObject* functionObject = static_cast<GetterSetter*>(value)->setter();
+      JSObject* functionObject = asGetterSetter(value)->setter();
       if (!functionObject)
         return jsUndefined();
       return functionObject;
@@ -399,7 +397,7 @@ JSValue* JSObject::lookupSetter(ExecState*, const Identifier& propertyName) {
 
     if (!object->prototype() || !object->prototype()->isObject())
       return jsUndefined();
-    object = static_cast<JSObject*>(object->prototype());
+    object = asObject(object->prototype());
   }
 }
 
@@ -414,7 +412,7 @@ bool JSObject::hasInstance(ExecState* exec, JSValue* value, JSValue* proto) {
   if (!value->isObject())
     return false;
 
-  JSObject* object = static_cast<JSObject*>(value);
+  JSObject* object = asObject(value);
   while ((object = object->prototype()->getObject())) {
     if (object == proto)
       return true;
@@ -517,8 +515,7 @@ void JSObject::putDirectFunctionWithoutTransition(ExecState* exec,
 
 NEVER_INLINE void JSObject::fillGetterPropertySlot(PropertySlot& slot,
                                                    JSValue** location) {
-  if (JSObject* getterFunction =
-          static_cast<GetterSetter*>(*location)->getter())
+  if (JSObject* getterFunction = asGetterSetter(*location)->getter())
     slot.setGetterSlot(getterFunction);
   else
     slot.setUndefined();

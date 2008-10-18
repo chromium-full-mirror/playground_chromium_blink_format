@@ -134,6 +134,13 @@ class JSString : public JSCell {
   UString m_value;
 };
 
+JSString* asString(JSValue*);
+
+inline JSString* asString(JSValue* value) {
+  ASSERT(asCell(value)->isString());
+  return static_cast<JSString*>(asCell(value));
+}
+
 inline JSString* jsEmptyString(JSGlobalData* globalData) {
   return globalData->smallStrings.emptyString(globalData);
 }
@@ -236,8 +243,8 @@ ALWAYS_INLINE bool JSString::getStringPropertySlot(ExecState* exec,
 // --- JSValue inlines ----------------------------
 
 inline JSString* JSValue::toThisJSString(ExecState* exec) {
-  return JSImmediate::isImmediate(this)
-             ? jsString(exec, JSImmediate::toString(this))
+  return JSImmediate::isImmediate(asValue())
+             ? jsString(exec, JSImmediate::toString(asValue()))
              : asCell()->toThisJSString(exec);
 }
 

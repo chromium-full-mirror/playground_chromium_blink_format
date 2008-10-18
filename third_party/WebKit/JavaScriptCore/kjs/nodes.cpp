@@ -425,7 +425,7 @@ RegisterID* FunctionCallResolveNode::emitCode(CodeGenerator& generator,
 
   int index = 0;
   size_t depth = 0;
-  JSValue* globalObject = 0;
+  JSObject* globalObject = 0;
   if (generator.findScopedProperty(m_ident, index, depth, false,
                                    globalObject) &&
       index != missingSymbolMarker()) {
@@ -509,7 +509,7 @@ RegisterID* PostfixResolveNode::emitCode(CodeGenerator& generator,
 
   int index = 0;
   size_t depth = 0;
-  JSValue* globalObject = 0;
+  JSObject* globalObject = 0;
   if (generator.findScopedProperty(m_ident, index, depth, true, globalObject) &&
       index != missingSymbolMarker()) {
     RefPtr<RegisterID> value = generator.emitGetScopedVar(
@@ -731,7 +731,7 @@ RegisterID* PrefixResolveNode::emitCode(CodeGenerator& generator,
 
   int index = 0;
   size_t depth = 0;
-  JSValue* globalObject = 0;
+  JSObject* globalObject = 0;
   if (generator.findScopedProperty(m_ident, index, depth, false,
                                    globalObject) &&
       index != missingSymbolMarker()) {
@@ -1022,7 +1022,7 @@ RegisterID* ReadModifyResolveNode::emitCode(CodeGenerator& generator,
 
   int index = 0;
   size_t depth = 0;
-  JSValue* globalObject = 0;
+  JSObject* globalObject = 0;
   if (generator.findScopedProperty(m_ident, index, depth, true, globalObject) &&
       index != missingSymbolMarker()) {
     RefPtr<RegisterID> src1 = generator.emitGetScopedVar(
@@ -1065,7 +1065,7 @@ RegisterID* AssignResolveNode::emitCode(CodeGenerator& generator,
 
   int index = 0;
   size_t depth = 0;
-  JSValue* globalObject = 0;
+  JSObject* globalObject = 0;
   if (generator.findScopedProperty(m_ident, index, depth, true, globalObject) &&
       index != missingSymbolMarker()) {
     if (dst == ignoredResult())

@@ -524,7 +524,7 @@ JSValue* dateProtoFuncToString(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
@@ -543,7 +543,7 @@ JSValue* dateProtoFuncToUTCString(ExecState* exec,
 
   const bool utc = true;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
@@ -563,7 +563,7 @@ JSValue* dateProtoFuncToDateString(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
@@ -582,7 +582,7 @@ JSValue* dateProtoFuncToTimeString(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
@@ -599,7 +599,7 @@ JSValue* dateProtoFuncToLocaleString(ExecState* exec,
   if (!thisValue->isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
@@ -626,7 +626,7 @@ JSValue* dateProtoFuncToLocaleDateString(ExecState* exec,
   if (!thisValue->isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
@@ -653,7 +653,7 @@ JSValue* dateProtoFuncToLocaleTimeString(ExecState* exec,
   if (!thisValue->isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
@@ -680,7 +680,7 @@ JSValue* dateProtoFuncValueOf(ExecState* exec,
   if (!thisValue->isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -695,7 +695,7 @@ JSValue* dateProtoFuncGetTime(ExecState* exec,
   if (!thisValue->isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -712,7 +712,7 @@ JSValue* dateProtoFuncGetFullYear(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -731,7 +731,7 @@ JSValue* dateProtoFuncGetUTCFullYear(ExecState* exec,
 
   const bool utc = true;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -750,7 +750,7 @@ JSValue* dateProtoFuncToGMTString(ExecState* exec,
 
   const bool utc = true;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
@@ -770,7 +770,7 @@ JSValue* dateProtoFuncGetMonth(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -789,7 +789,7 @@ JSValue* dateProtoFuncGetUTCMonth(ExecState* exec,
 
   const bool utc = true;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -808,7 +808,7 @@ JSValue* dateProtoFuncGetDate(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -827,7 +827,7 @@ JSValue* dateProtoFuncGetUTCDate(ExecState* exec,
 
   const bool utc = true;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -846,7 +846,7 @@ JSValue* dateProtoFuncGetDay(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -865,7 +865,7 @@ JSValue* dateProtoFuncGetUTCDay(ExecState* exec,
 
   const bool utc = true;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -884,7 +884,7 @@ JSValue* dateProtoFuncGetHours(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -903,7 +903,7 @@ JSValue* dateProtoFuncGetUTCHours(ExecState* exec,
 
   const bool utc = true;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -922,7 +922,7 @@ JSValue* dateProtoFuncGetMinutes(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -941,7 +941,7 @@ JSValue* dateProtoFuncGetUTCMinutes(ExecState* exec,
 
   const bool utc = true;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -960,7 +960,7 @@ JSValue* dateProtoFuncGetSeconds(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -979,7 +979,7 @@ JSValue* dateProtoFuncGetUTCSeconds(ExecState* exec,
 
   const bool utc = true;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -996,7 +996,7 @@ JSValue* dateProtoFuncGetMilliSeconds(ExecState* exec,
   if (!thisValue->isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -1013,7 +1013,7 @@ JSValue* dateProtoFuncGetUTCMilliseconds(ExecState* exec,
   if (!thisValue->isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -1032,7 +1032,7 @@ JSValue* dateProtoFuncGetTimezoneOffset(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);
@@ -1049,7 +1049,7 @@ JSValue* dateProtoFuncSetTime(ExecState* exec,
   if (!thisValue->isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
 
   double milli = timeClip(args.at(exec, 0)->toNumber(exec));
   JSValue* result = jsNumber(exec, milli);
@@ -1065,7 +1065,7 @@ static JSValue* setNewValueFromTimeArgs(ExecState* exec,
   if (!thisValue->isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
 
   if (args.isEmpty() || isnan(milli)) {
@@ -1099,7 +1099,7 @@ static JSValue* setNewValueFromDateArgs(ExecState* exec,
   if (!thisValue->isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   if (args.isEmpty()) {
     JSValue* result = jsNaN(exec);
     thisDateObj->setInternalValue(result);
@@ -1252,7 +1252,7 @@ JSValue* dateProtoFuncSetYear(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   if (args.isEmpty()) {
     JSValue* result = jsNaN(exec);
     thisDateObj->setInternalValue(result);
@@ -1296,7 +1296,7 @@ JSValue* dateProtoFuncGetYear(ExecState* exec,
 
   const bool utc = false;
 
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
+  DateInstance* thisDateObj = asDateInstance(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
     return jsNaN(exec);

@@ -143,7 +143,7 @@ class JSObject : public JSCell {
   // This get function only looks at the property map.
   JSValue* getDirect(const Identifier& propertyName) const {
     size_t offset = m_structureID->propertyMap().get(propertyName);
-    return offset != WTF::notFound ? m_propertyStorage[offset] : 0;
+    return offset != WTF::notFound ? m_propertyStorage[offset] : noValue();
   }
 
   JSValue** getDirectLocation(const Identifier& propertyName) {
@@ -243,7 +243,14 @@ class JSObject : public JSCell {
   JSValue* m_inlineStorage[inlineStorageCapacity];
 };
 
+JSObject* asObject(JSValue*);
+
 JSObject* constructEmptyObject(ExecState*);
+
+inline JSObject* asObject(JSValue* value) {
+  ASSERT(asCell(value)->isObject());
+  return static_cast<JSObject*>(asCell(value));
+}
 
 inline JSObject::JSObject(PassRefPtr<StructureID> structureID)
     : JSCell(structureID.releaseRef())  // ~JSObject balances this ref()
@@ -294,12 +301,12 @@ inline bool JSCell::isObject(const ClassInfo* info) const {
 
 // this method is here to be after the inline declaration of JSCell::isObject
 inline bool JSValue::isObject(const ClassInfo* classInfo) const {
-  return !JSImmediate::isImmediate(this) && asCell()->isObject(classInfo);
+  return !JSImmediate::isImmediate(asValue()) && asCell()->isObject(classInfo);
 }
 
 inline JSValue* JSObject::get(ExecState* exec,
                               const Identifier& propertyName) const {
-  PropertySlot slot(const_cast<JSObject*>(this));
+  PropertySlot slot(this);
   if (const_cast<JSObject*>(this)->getPropertySlot(exec, propertyName, slot))
     return slot.getValue(exec, propertyName);
 
@@ -307,7 +314,7 @@ inline JSValue* JSObject::get(ExecState* exec,
 }
 
 inline JSValue* JSObject::get(ExecState* exec, unsigned propertyName) const {
-  PropertySlot slot(const_cast<JSObject*>(this));
+  PropertySlot slot(this);
   if (const_cast<JSObject*>(this)->getPropertySlot(exec, propertyName, slot))
     return slot.getValue(exec, propertyName);
 
@@ -329,7 +336,7 @@ inline bool JSObject::getPropertySlot(ExecState* exec,
     if (!prototype->isObject())
       return false;
 
-    object = static_cast<JSObject*>(prototype);
+    object = asObject(prototype);
   }
 }
 
@@ -346,7 +353,7 @@ inline bool JSObject::getPropertySlot(ExecState* exec,
     if (!prototype->isObject())
       break;
 
-    object = static_cast<JSObject*>(prototype);
+    object = asObject(prototype);
   }
 
   return false;
@@ -505,20 +512,20 @@ inline JSValue* JSObject::toPrimitive(
 
 inline JSValue* JSValue::get(ExecState* exec,
                              const Identifier& propertyName) const {
-  PropertySlot slot(const_cast<JSValue*>(this));
+  PropertySlot slot(this);
   return get(exec, propertyName, slot);
 }
 
 inline JSValue* JSValue::get(ExecState* exec,
                              const Identifier& propertyName,
                              PropertySlot& slot) const {
-  if (UNLIKELY(JSImmediate::isImmediate(this))) {
-    JSObject* prototype = JSImmediate::prototype(this, exec);
+  if (UNLIKELY(JSImmediate::isImmediate(asValue()))) {
+    JSObject* prototype = JSImmediate::prototype(asValue(), exec);
     if (!prototype->getPropertySlot(exec, propertyName, slot))
       return jsUndefined();
     return slot.getValue(exec, propertyName);
   }
-  JSCell* cell = static_cast<JSCell*>(const_cast<JSValue*>(this));
+  JSCell* cell = asCell();
   while (true) {
     if (cell->getOwnPropertySlot(exec, propertyName, slot))
       return slot.getValue(exec, propertyName);
@@ -526,20 +533,20 @@ inline JSValue* JSValue::get(ExecState* exec,
     JSValue* prototype = static_cast<JSObject*>(cell)->prototype();
     if (!prototype->isObject())
       return jsUndefined();
-    cell = static_cast<JSCell*>(prototype);
+    cell = asObject(prototype);
   }
 }
 
 inline JSValue* JSValue::get(ExecState* exec, unsigned propertyName) const {
-  PropertySlot slot(const_cast<JSValue*>(this));
+  PropertySlot slot(this);
   return get(exec, propertyName, slot);
 }
 
 inline JSValue* JSValue::get(ExecState* exec,
                              unsigned propertyName,
                              PropertySlot& slot) const {
-  if (UNLIKELY(JSImmediate::isImmediate(this))) {
-    JSObject* prototype = JSImmediate::prototype(this, exec);
+  if (UNLIKELY(JSImmediate::isImmediate(asValue()))) {
+    JSObject* prototype = JSImmediate::prototype(asValue(), exec);
     if (!prototype->getPropertySlot(exec, propertyName, slot))
       return jsUndefined();
     return slot.getValue(exec, propertyName);
@@ -552,7 +559,7 @@ inline JSValue* JSValue::get(ExecState* exec,
     JSValue* prototype = static_cast<JSObject*>(cell)->prototype();
     if (!prototype->isObject())
       return jsUndefined();
-    cell = static_cast<JSCell*>(prototype);
+    cell = prototype->asCell();
   }
 }
 
@@ -560,8 +567,9 @@ inline void JSValue::put(ExecState* exec,
                          const Identifier& propertyName,
                          JSValue* value,
                          PutPropertySlot& slot) {
-  if (UNLIKELY(JSImmediate::isImmediate(this))) {
-    JSImmediate::toObject(this, exec)->put(exec, propertyName, value, slot);
+  if (UNLIKELY(JSImmediate::isImmediate(asValue()))) {
+    JSImmediate::toObject(asValue(), exec)
+        ->put(exec, propertyName, value, slot);
     return;
   }
   asCell()->put(exec, propertyName, value, slot);
@@ -570,8 +578,8 @@ inline void JSValue::put(ExecState* exec,
 inline void JSValue::put(ExecState* exec,
                          unsigned propertyName,
                          JSValue* value) {
-  if (UNLIKELY(JSImmediate::isImmediate(this))) {
-    JSImmediate::toObject(this, exec)->put(exec, propertyName, value);
+  if (UNLIKELY(JSImmediate::isImmediate(asValue()))) {
+    JSImmediate::toObject(asValue(), exec)->put(exec, propertyName, value);
     return;
   }
   asCell()->put(exec, propertyName, value);
@@ -581,14 +589,14 @@ ALWAYS_INLINE void JSObject::allocatePropertyStorageInline(size_t oldSize,
                                                            size_t newSize) {
   ASSERT(newSize > oldSize);
 
-  JSValue** oldPropertStorage = m_propertyStorage;
+  JSValue** oldPropertyStorage = m_propertyStorage;
   m_propertyStorage = new JSValue*[newSize];
 
   for (unsigned i = 0; i < oldSize; ++i)
-    m_propertyStorage[i] = oldPropertStorage[i];
+    m_propertyStorage[i] = oldPropertyStorage[i];
 
-  if (oldPropertStorage != m_inlineStorage)
-    delete[] oldPropertStorage;
+  if (oldPropertyStorage != m_inlineStorage)
+    delete[] oldPropertyStorage;
 }
 
 }  // namespace JSC

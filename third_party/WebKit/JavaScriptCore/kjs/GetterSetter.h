@@ -57,6 +57,13 @@ class GetterSetter : public JSCell {
   JSObject* m_setter;
 };
 
+GetterSetter* asGetterSetter(JSValue*);
+
+inline GetterSetter* asGetterSetter(JSValue* value) {
+  ASSERT(asCell(value)->isGetterSetter());
+  return static_cast<GetterSetter*>(asCell(value));
+}
+
 }  // namespace JSC
 
 #endif  // GetterSetter_h

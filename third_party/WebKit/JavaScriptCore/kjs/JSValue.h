@@ -47,8 +47,11 @@ class JSString;
 class PropertySlot;
 class PutPropertySlot;
 class StructureID;
+
 struct ClassInfo;
 struct Instruction;
+
+enum PreferredPrimitiveType { NoPreference, PreferNumber, PreferString };
 
 /**
  * JSValue is the base type for all primitives (Undefined, Null, Boolean,
@@ -96,7 +99,6 @@ class JSValue : Noncopyable {
   bool getTruncatedUInt32(uint32_t&) const;
 
   // Basic conversions.
-  enum PreferredPrimitiveType { NoPreference, PreferNumber, PreferString };
   JSValue* toPrimitive(ExecState*, PreferredPrimitiveType = NoPreference) const;
   bool getPrimitiveNumber(ExecState*, double& number, JSValue*&);
 
@@ -153,8 +155,9 @@ class JSValue : Noncopyable {
 
   JSValue* getJSNumber();  // 0 if this is not a JSNumber or number object
 
-  JSCell* asCell();
-  const JSCell* asCell() const;
+  JSValue* asValue() const;
+
+  JSCell* asCell() const;
 
  private:
   bool getPropertySlot(ExecState*,
@@ -169,25 +172,29 @@ inline JSValue::JSValue() {}
 
 inline JSValue::~JSValue() {}
 
+inline JSValue* JSValue::asValue() const {
+  return const_cast<JSValue*>(this);
+}
+
 inline bool JSValue::isUndefined() const {
-  return this == jsUndefined();
+  return asValue() == jsUndefined();
 }
 
 inline bool JSValue::isNull() const {
-  return this == jsNull();
+  return asValue() == jsNull();
 }
 
 inline bool JSValue::isUndefinedOrNull() const {
-  return JSImmediate::isUndefinedOrNull(this);
+  return JSImmediate::isUndefinedOrNull(asValue());
 }
 
 inline bool JSValue::isBoolean() const {
-  return JSImmediate::isBoolean(this);
+  return JSImmediate::isBoolean(asValue());
 }
 
 inline bool JSValue::getBoolean(bool& v) const {
-  if (JSImmediate::isBoolean(this)) {
-    v = JSImmediate::toBoolean(this);
+  if (JSImmediate::isBoolean(asValue())) {
+    v = JSImmediate::toBoolean(asValue());
     return true;
   }
 
@@ -195,7 +202,7 @@ inline bool JSValue::getBoolean(bool& v) const {
 }
 
 inline bool JSValue::getBoolean() const {
-  return this == jsBoolean(true);
+  return asValue() == jsBoolean(true);
 }
 
 ALWAYS_INLINE int32_t JSValue::toInt32(ExecState* exec) const {

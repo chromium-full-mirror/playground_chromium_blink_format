@@ -101,6 +101,13 @@ class Arguments : public JSObject {
   OwnPtr<ArgumentsData> d;
 };
 
+Arguments* asArguments(JSValue*);
+
+inline Arguments* asArguments(JSValue* value) {
+  ASSERT(asObject(value)->inherits(&Arguments::info));
+  return static_cast<Arguments*>(asObject(value));
+}
+
 ALWAYS_INLINE void Arguments::getArgumentsData(CallFrame* callFrame,
                                                JSFunction*& function,
                                                ptrdiff_t& firstParameterIndex,

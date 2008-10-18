@@ -40,14 +40,11 @@ class ExecState;
 class JSActivation;
 class JSFunction;
 class JSPropertyNameIterator;
-class JSValue;
 class ScopeChainNode;
 
 struct Instruction;
 
 typedef ExecState CallFrame;
-
-static JSValue* const nullJSValue = 0;
 
 class Register {
  public:
@@ -137,7 +134,7 @@ class Register {
 ALWAYS_INLINE Register::Register() {
 #ifndef NDEBUG
   SET_TYPE(EmptyType);
-  *this = nullJSValue;
+  *this = noValue();
 #endif
 }
 

@@ -317,7 +317,7 @@ JSValue* stringProtoFuncReplace(ExecState* exec,
     replacementString = replacement->toString(exec);
 
   if (pattern->isObject(&RegExpObject::info)) {
-    RegExp* reg = static_cast<RegExpObject*>(pattern)->regExp();
+    RegExp* reg = asRegExpObject(pattern)->regExp();
     bool global = reg->global();
 
     RegExpConstructor* regExpObj =
@@ -424,7 +424,7 @@ JSValue* stringProtoFuncToString(ExecState* exec,
     return thisValue;
 
   if (thisValue->isObject(&StringObject::info))
-    return static_cast<StringObject*>(thisValue)->internalValue();
+    return asStringObject(thisValue)->internalValue();
 
   return throwError(exec, TypeError);
 }
@@ -527,9 +527,8 @@ JSValue* stringProtoFuncMatch(ExecState* exec,
   UString u = s;
   RefPtr<RegExp> reg;
   RegExpObject* imp = 0;
-  if (a0->isObject() &&
-      static_cast<JSObject*>(a0)->inherits(&RegExpObject::info))
-    reg = static_cast<RegExpObject*>(a0)->regExp();
+  if (a0->isObject(&RegExpObject::info))
+    reg = asRegExpObject(a0)->regExp();
   else {
     /*
      *  ECMA 15.5.4.12 String.prototype.search (regexp)
@@ -581,9 +580,8 @@ JSValue* stringProtoFuncSearch(ExecState* exec,
 
   UString u = s;
   RefPtr<RegExp> reg;
-  if (a0->isObject() &&
-      static_cast<JSObject*>(a0)->inherits(&RegExpObject::info))
-    reg = static_cast<RegExpObject*>(a0)->regExp();
+  if (a0->isObject(&RegExpObject::info))
+    reg = asRegExpObject(a0)->regExp();
   else {
     /*
      *  ECMA 15.5.4.12 String.prototype.search (regexp)
@@ -640,9 +638,8 @@ JSValue* stringProtoFuncSplit(ExecState* exec,
   unsigned i = 0;
   int p0 = 0;
   unsigned limit = a1->isUndefined() ? 0xFFFFFFFFU : a1->toUInt32(exec);
-  if (a0->isObject() &&
-      static_cast<JSObject*>(a0)->inherits(&RegExpObject::info)) {
-    RegExp* reg = static_cast<RegExpObject*>(a0)->regExp();
+  if (a0->isObject(&RegExpObject::info)) {
+    RegExp* reg = asRegExpObject(a0)->regExp();
     if (s.isEmpty() && reg->match(s, 0) >= 0) {
       // empty string matched by regexp -> empty array
       return result;

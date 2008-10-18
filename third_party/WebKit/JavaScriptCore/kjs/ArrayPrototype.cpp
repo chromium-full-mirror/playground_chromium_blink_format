@@ -164,7 +164,7 @@ bool ArrayPrototype::getOwnPropertySlot(ExecState* exec,
 static JSValue* getProperty(ExecState* exec, JSObject* obj, unsigned index) {
   PropertySlot slot(obj);
   if (!obj->getPropertySlot(exec, index, slot))
-    return 0;
+    return noValue();
   return slot.getValue(exec, index);
 }
 
@@ -182,7 +182,7 @@ JSValue* arrayProtoFuncToString(ExecState* exec,
                                 const ArgList&) {
   if (!thisValue->isObject(&JSArray::info))
     return throwError(exec, TypeError);
-  JSObject* thisObj = static_cast<JSArray*>(thisValue);
+  JSObject* thisObj = asArray(thisValue);
 
   HashSet<JSObject*>& arrayVisitedElements =
       exec->globalData().arrayVisitedElements;
@@ -232,7 +232,7 @@ JSValue* arrayProtoFuncToLocaleString(ExecState* exec,
                                       const ArgList&) {
   if (!thisValue->isObject(&JSArray::info))
     return throwError(exec, TypeError);
-  JSObject* thisObj = static_cast<JSArray*>(thisValue);
+  JSObject* thisObj = asArray(thisValue);
 
   HashSet<JSObject*>& arrayVisitedElements =
       exec->globalData().arrayVisitedElements;
@@ -352,7 +352,7 @@ JSValue* arrayProtoFuncConcat(ExecState* exec,
   ArgList::const_iterator end = args.end();
   while (1) {
     if (curArg->isObject(&JSArray::info)) {
-      JSArray* curArray = static_cast<JSArray*>(curArg);
+      JSArray* curArray = asArray(curArg);
       unsigned length = curArray->length();
       for (unsigned k = 0; k < length; ++k) {
         if (JSValue* v = getProperty(exec, curArray, k))
@@ -377,10 +377,10 @@ JSValue* arrayProtoFuncPop(ExecState* exec,
                            JSValue* thisValue,
                            const ArgList&) {
   if (exec->machine()->isJSArray(thisValue))
-    return static_cast<JSArray*>(thisValue)->pop();
+    return asArray(thisValue)->pop();
 
   JSObject* thisObj = thisValue->toThisObject(exec);
-  JSValue* result = 0;
+  JSValue* result;
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   if (length == 0) {
@@ -401,7 +401,7 @@ JSValue* arrayProtoFuncPush(ExecState* exec,
                             JSValue* thisValue,
                             const ArgList& args) {
   if (exec->machine()->isJSArray(thisValue) && args.size() == 1) {
-    JSArray* array = static_cast<JSArray*>(thisValue);
+    JSArray* array = asArray(thisValue);
     array->push(exec, args.begin()->jsValue(exec));
     return jsNumber(exec, array->length());
   }
@@ -449,7 +449,7 @@ JSValue* arrayProtoFuncShift(ExecState* exec,
                              JSValue* thisValue,
                              const ArgList&) {
   JSObject* thisObj = thisValue->toThisObject(exec);
-  JSValue* result = 0;
+  JSValue* result;
 
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
@@ -533,9 +533,9 @@ JSValue* arrayProtoFuncSort(ExecState* exec,
 
   if (thisObj->classInfo() == &JSArray::info) {
     if (callType != CallTypeNone)
-      static_cast<JSArray*>(thisObj)->sort(exec, function, callType, callData);
+      asArray(thisObj)->sort(exec, function, callType, callData);
     else
-      static_cast<JSArray*>(thisObj)->sort(exec);
+      asArray(thisObj)->sort(exec);
     return thisObj;
   }
 

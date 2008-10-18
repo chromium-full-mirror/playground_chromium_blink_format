@@ -93,7 +93,7 @@ inline JSPropertyNameIterator* JSPropertyNameIterator::create(ExecState* exec,
 
 inline JSValue* JSPropertyNameIterator::next(ExecState* exec) {
   if (m_position == m_end)
-    return 0;
+    return noValue();
 
   if (m_data->cachedStructureID() == m_object->structureID() &&
       structureIDChainsAreEqual(
@@ -107,7 +107,7 @@ inline JSValue* JSPropertyNameIterator::next(ExecState* exec) {
     m_position++;
   } while (m_position != m_end);
 
-  return 0;
+  return noValue();
 }
 
 }  // namespace JSC

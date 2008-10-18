@@ -123,7 +123,7 @@ class CodeGenerator {
                           int& index,
                           size_t& depth,
                           bool forWriting,
-                          JSValue*& globalObject);
+                          JSObject*& globalObject);
 
   // Returns the register storing "this"
   RegisterID* thisRegister() { return &m_thisRegister; }
@@ -437,6 +437,7 @@ class CodeGenerator {
   PassRefPtr<LabelID> emitComplexJumpScopes(LabelID* target,
                                             ControlFlowContext* topScope,
                                             ControlFlowContext* bottomScope);
+
   struct JSValueHashTraits : HashTraits<JSValue*> {
     static void constructDeletedValue(JSValue*& slot) {
       slot = JSImmediate::impossibleValue();
@@ -446,10 +447,7 @@ class CodeGenerator {
     }
   };
 
-  typedef HashMap<JSValue*,
-                  unsigned,
-                  DefaultHash<JSValue*>::Hash,
-                  JSValueHashTraits>
+  typedef HashMap<JSValue*, unsigned, PtrHash<JSValue*>, JSValueHashTraits>
       JSValueMap;
 
   struct IdentifierMapIndexHashTraits {

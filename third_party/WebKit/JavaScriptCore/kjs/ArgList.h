@@ -31,8 +31,6 @@
 
 namespace JSC {
 
-class JSValue;
-
 class ArgList : Noncopyable {
  private:
   static const unsigned inlineCapacity = 8;

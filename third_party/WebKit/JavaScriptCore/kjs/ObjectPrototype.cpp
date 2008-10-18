@@ -154,14 +154,14 @@ JSValue* objectProtoFuncIsPrototypeOf(ExecState* exec,
   if (!args.at(exec, 0)->isObject())
     return jsBoolean(false);
 
-  JSValue* v = static_cast<JSObject*>(args.at(exec, 0))->prototype();
+  JSValue* v = asObject(args.at(exec, 0))->prototype();
 
   while (true) {
     if (!v->isObject())
       return jsBoolean(false);
     if (thisObj == v)
       return jsBoolean(true);
-    v = static_cast<JSObject*>(v)->prototype();
+    v = asObject(v)->prototype();
   }
 }
 
@@ -174,7 +174,7 @@ JSValue* objectProtoFuncDefineGetter(ExecState* exec,
     return throwError(exec, SyntaxError, "invalid getter usage");
   thisValue->toThisObject(exec)->defineGetter(
       exec, Identifier(exec, args.at(exec, 0)->toString(exec)),
-      static_cast<JSObject*>(args.at(exec, 1)));
+      asObject(args.at(exec, 1)));
   return jsUndefined();
 }
 
@@ -187,7 +187,7 @@ JSValue* objectProtoFuncDefineSetter(ExecState* exec,
     return throwError(exec, SyntaxError, "invalid setter usage");
   thisValue->toThisObject(exec)->defineSetter(
       exec, Identifier(exec, args.at(exec, 0)->toString(exec)),
-      static_cast<JSObject*>(args.at(exec, 1)));
+      asObject(args.at(exec, 1)));
   return jsUndefined();
 }
 

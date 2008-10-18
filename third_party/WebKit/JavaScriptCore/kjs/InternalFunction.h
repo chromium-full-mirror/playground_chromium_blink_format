@@ -52,6 +52,13 @@ class InternalFunction : public JSObject {
   virtual CallType getCallData(CallData&) = 0;
 };
 
+InternalFunction* asInternalFunction(JSValue*);
+
+inline InternalFunction* asInternalFunction(JSValue* value) {
+  ASSERT(asObject(value)->inherits(&InternalFunction::info));
+  return static_cast<InternalFunction*>(asObject(value));
+}
+
 }  // namespace JSC
 
 #endif  // InternalFunction_h

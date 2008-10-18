@@ -77,7 +77,7 @@ class ExecState : private Register {
   // any time soon.
 
   void setException(JSValue* exception) { globalData().exception = exception; }
-  void clearException() { globalData().exception = 0; }
+  void clearException() { globalData().exception = noValue(); }
   JSValue* exception() const { return globalData().exception; }
   JSValue** exceptionSlot() { return &globalData().exception; }
   bool hadException() const { return !!globalData().exception; }

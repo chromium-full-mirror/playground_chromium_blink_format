@@ -73,7 +73,14 @@ class RegExpConstructor : public InternalFunction {
   OwnPtr<RegExpConstructorPrivate> d;
 };
 
+RegExpConstructor* asRegExpConstructor(JSValue*);
+
 JSObject* constructRegExp(ExecState*, const ArgList&);
+
+inline RegExpConstructor* asRegExpConstructor(JSValue* value) {
+  ASSERT(asObject(value)->inherits(&RegExpConstructor::info));
+  return static_cast<RegExpConstructor*>(asObject(value));
+}
 
 }  // namespace JSC
 

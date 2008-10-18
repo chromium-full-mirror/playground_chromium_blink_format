@@ -193,7 +193,7 @@ void JSGlobalObject::defineSetter(ExecState* exec,
 static inline JSObject* lastInPrototypeChain(JSObject* object) {
   JSObject* o = object;
   while (o->prototype()->isObject())
-    o = static_cast<JSObject*>(o->prototype());
+    o = asObject(o->prototype());
   return o;
 }
 

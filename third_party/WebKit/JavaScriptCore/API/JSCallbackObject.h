@@ -78,6 +78,8 @@ class JSCallbackObject : public Base {
 
   void init(ExecState*);
 
+  static JSCallbackObject* asCallbackObject(JSValue*);
+
   static JSValue* call(ExecState*,
                        JSObject* functionObject,
                        JSValue* thisValue,
