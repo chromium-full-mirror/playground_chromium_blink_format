@@ -2312,7 +2312,9 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_create_arguments: {
-        emitCTICall(i, Machine::cti_op_create_arguments);
+        emitCTICall(i, (m_codeBlock->numParameters == 1)
+                           ? Machine::cti_op_create_arguments_no_params
+                           : Machine::cti_op_create_arguments);
         i += 1;
         break;
       }
