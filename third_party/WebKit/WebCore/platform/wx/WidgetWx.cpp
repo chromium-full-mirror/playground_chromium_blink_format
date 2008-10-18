@@ -77,9 +77,5 @@ void Widget::invalidateRect(const IntRect& r) {
     platformWidget()->RefreshRect(r);
 }
 
-void Widget::paint(GraphicsContext*, const IntRect& r) {
-  invalidateRect(r);
-  if (platformWidget())
-    platformWidget()->Update();
-}
+void Widget::paint(GraphicsContext*, const IntRect& r) {}
 }

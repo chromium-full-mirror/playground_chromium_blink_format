@@ -359,9 +359,9 @@ class ScrollView : public Widget, public ScrollbarClient {
 #if PLATFORM(WX)
  public:
   virtual void setPlatformWidget(wxWindow*);
+  void adjustScrollbars(int x = -1, int y = -1, bool refresh = true);
 
  private:
-  void adjustScrollbars(int x = -1, int y = -1, bool refresh = true);
   class ScrollViewPrivate;
   ScrollViewPrivate* m_data;
 #endif
