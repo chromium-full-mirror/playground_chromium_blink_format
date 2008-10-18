@@ -53,10 +53,7 @@ JSFunction::JSFunction(ExecState* exec,
            exec->lexicalGlobalObject()->functionStructure(),
            name),
       m_body(body),
-      m_scopeChain(scopeChainNode) {
-  ASSERT(exec->globalData().parser->parse<FunctionBodyNode>(exec, 0,
-                                                            body->source()));
-}
+      m_scopeChain(scopeChainNode) {}
 
 void JSFunction::mark() {
   Base::mark();
