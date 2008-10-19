@@ -148,6 +148,13 @@ class Cache : Noncopyable {
     pruneLiveResources();
   }
 
+  void setDeadDecodedDataDeletionInterval(double interval) {
+    m_deadDecodedDataDeletionInterval = interval;
+  }
+  double deadDecodedDataDeletionInterval() const {
+    return m_deadDecodedDataDeletionInterval;
+  }
+
   // Remove an existing cache entry from both the resource map and from the LRU
   // list.
   void remove(CachedResource* resource) { evict(resource); }
@@ -207,6 +214,7 @@ class Cache : Noncopyable {
   unsigned m_capacity;
   unsigned m_minDeadCapacity;
   unsigned m_maxDeadCapacity;
+  double m_deadDecodedDataDeletionInterval;
 
   unsigned m_liveSize;  // The number of bytes currently consumed by "live"
                         // resources in the cache.

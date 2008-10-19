@@ -398,6 +398,7 @@ void WebView::setCacheModel(WebCacheModel cacheModel) {
   unsigned cacheTotalCapacity = 0;
   unsigned cacheMinDeadCapacity = 0;
   unsigned cacheMaxDeadCapacity = 0;
+  double deadDecodedDataDeletionInterval = 0;
 
   unsigned pageCacheCapacity = 0;
 
@@ -517,6 +518,8 @@ void WebView::setCacheModel(WebCacheModel cacheModel) {
       // can prove that the overall system gain would justify the regression.
       cacheMaxDeadCapacity = max(24u, cacheMaxDeadCapacity);
 
+      deadDecodedDataDeletionInterval = 60;
+
       // Foundation memory cache capacity (in bytes)
       // (These values are small because WebCore does most caching itself.)
       if (memSize >= 1024)
@@ -554,6 +557,7 @@ void WebView::setCacheModel(WebCacheModel cacheModel) {
 
   cache()->setCapacities(cacheMinDeadCapacity, cacheMaxDeadCapacity,
                          cacheTotalCapacity);
+  cache()->setDeadDecodedDataDeletionInterval(deadDecodedDataDeletionInterval);
   pageCache()->setCapacity(pageCacheCapacity);
 
   CFURLCacheSetMemoryCapacity(cfurlSharedCache, cfurlCacheMemoryCapacity);
