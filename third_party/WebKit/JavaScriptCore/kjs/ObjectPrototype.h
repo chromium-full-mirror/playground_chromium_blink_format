@@ -33,10 +33,10 @@ class ObjectPrototype : public JSObject {
                   StructureID* prototypeFunctionStructure);
 };
 
-JSValue* objectProtoFuncToString(ExecState*,
-                                 JSObject*,
-                                 JSValue*,
-                                 const ArgList&);
+JSValuePtr objectProtoFuncToString(ExecState*,
+                                   JSObject*,
+                                   JSValuePtr,
+                                   const ArgList&);
 
 }  // namespace JSC
 

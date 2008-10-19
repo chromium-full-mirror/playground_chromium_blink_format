@@ -65,7 +65,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   Machine* machine;
 
-  JSValue* exception;
+  JSValuePtr exception;
 #if ENABLE(CTI)
   void* throwReturnAddress;
 #endif

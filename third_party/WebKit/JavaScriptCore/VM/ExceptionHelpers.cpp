@@ -55,40 +55,40 @@ class InterruptedExecutionError : public JSObject {
   virtual bool isWatchdogException() const { return true; }
 };
 
-JSValue* createInterruptedExecutionException(JSGlobalData* globalData) {
+JSValuePtr createInterruptedExecutionException(JSGlobalData* globalData) {
   return new (globalData) InterruptedExecutionError(globalData);
 }
 
-JSValue* createError(ExecState* exec, ErrorType e, const char* msg) {
+JSValuePtr createError(ExecState* exec, ErrorType e, const char* msg) {
   return Error::create(exec, e, msg, -1, -1, 0);
 }
 
-JSValue* createError(ExecState* exec,
-                     ErrorType e,
-                     const char* msg,
-                     const Identifier& label) {
+JSValuePtr createError(ExecState* exec,
+                       ErrorType e,
+                       const char* msg,
+                       const Identifier& label) {
   UString message = msg;
   substitute(message, label.ustring());
   return Error::create(exec, e, message, -1, -1, 0);
 }
 
-JSValue* createError(ExecState* exec,
-                     ErrorType e,
-                     const char* msg,
-                     JSValue* v) {
+JSValuePtr createError(ExecState* exec,
+                       ErrorType e,
+                       const char* msg,
+                       JSValuePtr v) {
   UString message = msg;
   substitute(message, v->toString(exec));
   return Error::create(exec, e, message, -1, -1, 0);
 }
 
-JSValue* createStackOverflowError(ExecState* exec) {
+JSValuePtr createStackOverflowError(ExecState* exec) {
   return createError(exec, RangeError, "Maximum call stack size exceeded.");
 }
 
-JSValue* createUndefinedVariableError(ExecState* exec,
-                                      const Identifier& ident,
-                                      const Instruction* vPC,
-                                      CodeBlock* codeBlock) {
+JSValuePtr createUndefinedVariableError(ExecState* exec,
+                                        const Identifier& ident,
+                                        const Instruction* vPC,
+                                        CodeBlock* codeBlock) {
   int startOffset = 0;
   int endOffset = 0;
   int divotPoint = 0;
@@ -118,7 +118,7 @@ static UString createErrorMessage(ExecState* exec,
                                   int,
                                   int expressionStart,
                                   int expressionStop,
-                                  JSValue* value,
+                                  JSValuePtr value,
                                   UString error) {
   if (!expressionStop || expressionStart > codeBlock->source->length()) {
     UString errorText = value->toString(exec);
@@ -168,7 +168,7 @@ static UString createErrorMessage(ExecState* exec,
 
 JSObject* createInvalidParamError(ExecState* exec,
                                   const char* op,
-                                  JSValue* value,
+                                  JSValuePtr value,
                                   const Instruction* vPC,
                                   CodeBlock* codeBlock) {
   UString message = "not a valid argument for '";
@@ -199,7 +199,7 @@ JSObject* createInvalidParamError(ExecState* exec,
 }
 
 JSObject* createNotAConstructorError(ExecState* exec,
-                                     JSValue* value,
+                                     JSValuePtr value,
                                      const Instruction* vPC,
                                      CodeBlock* codeBlock) {
   int startOffset = 0;
@@ -233,10 +233,10 @@ JSObject* createNotAConstructorError(ExecState* exec,
   return exception;
 }
 
-JSValue* createNotAFunctionError(ExecState* exec,
-                                 JSValue* value,
-                                 const Instruction* vPC,
-                                 CodeBlock* codeBlock) {
+JSValuePtr createNotAFunctionError(ExecState* exec,
+                                   JSValuePtr value,
+                                   const Instruction* vPC,
+                                   CodeBlock* codeBlock) {
   int startOffset = 0;
   int endOffset = 0;
   int divotPoint = 0;

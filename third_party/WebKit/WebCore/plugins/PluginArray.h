@@ -37,7 +37,7 @@ class Frame;
 class PluginData;
 
 // FIXME: Generated JSPluginArray.cpp doesn't include JSPlugin.h for toJS
-JSC::JSValue* toJS(JSC::ExecState*, Plugin*);
+JSC::JSValuePtr toJS(JSC::ExecState*, Plugin*);
 
 class PluginArray : public RefCounted<PluginArray> {
  public:

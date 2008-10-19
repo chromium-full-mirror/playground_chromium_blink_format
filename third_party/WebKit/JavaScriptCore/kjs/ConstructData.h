@@ -53,7 +53,7 @@ union ConstructData {
 };
 
 JSObject* construct(ExecState*,
-                    JSValue* constructor,
+                    JSValuePtr constructor,
                     ConstructType,
                     const ConstructData&,
                     const ArgList&);

@@ -49,7 +49,7 @@ class JSRGBColor : public DOMObject {
   unsigned m_color;
 };
 
-JSC::JSValue* getJSRGBColor(JSC::ExecState*, unsigned color);
+JSC::JSValuePtr getJSRGBColor(JSC::ExecState*, unsigned color);
 
 }  // namespace WebCore
 

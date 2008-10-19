@@ -33,9 +33,9 @@ bool JSPluginArray::canGetItemsForName(ExecState*,
   return pluginArray->canGetItemsForName(propertyName);
 }
 
-JSValue* JSPluginArray::nameGetter(ExecState* exec,
-                                   const Identifier& propertyName,
-                                   const PropertySlot& slot) {
+JSValuePtr JSPluginArray::nameGetter(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     const PropertySlot& slot) {
   JSPluginArray* thisObj = static_cast<JSPluginArray*>(slot.slotBase());
   return toJS(exec, thisObj->impl()->nameGetter(propertyName));
 }

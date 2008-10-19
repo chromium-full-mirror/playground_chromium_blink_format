@@ -62,9 +62,10 @@ void RuntimeObjectImp::invalidate() {
   instance = 0;
 }
 
-JSValue* RuntimeObjectImp::fallbackObjectGetter(ExecState* exec,
-                                                const Identifier& propertyName,
-                                                const PropertySlot& slot) {
+JSValuePtr RuntimeObjectImp::fallbackObjectGetter(
+    ExecState* exec,
+    const Identifier& propertyName,
+    const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
   RefPtr<Instance> instance = thisObj->instance;
 
@@ -74,16 +75,17 @@ JSValue* RuntimeObjectImp::fallbackObjectGetter(ExecState* exec,
   instance->begin();
 
   Class* aClass = instance->getClass();
-  JSValue* result = aClass->fallbackObject(exec, instance.get(), propertyName);
+  JSValuePtr result =
+      aClass->fallbackObject(exec, instance.get(), propertyName);
 
   instance->end();
 
   return result;
 }
 
-JSValue* RuntimeObjectImp::fieldGetter(ExecState* exec,
-                                       const Identifier& propertyName,
-                                       const PropertySlot& slot) {
+JSValuePtr RuntimeObjectImp::fieldGetter(ExecState* exec,
+                                         const Identifier& propertyName,
+                                         const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
   RefPtr<Instance> instance = thisObj->instance;
 
@@ -101,9 +103,9 @@ JSValue* RuntimeObjectImp::fieldGetter(ExecState* exec,
   return result;
 }
 
-JSValue* RuntimeObjectImp::methodGetter(ExecState* exec,
-                                        const Identifier& propertyName,
-                                        const PropertySlot& slot) {
+JSValuePtr RuntimeObjectImp::methodGetter(ExecState* exec,
+                                          const Identifier& propertyName,
+                                          const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
   RefPtr<Instance> instance = thisObj->instance;
 
@@ -114,7 +116,7 @@ JSValue* RuntimeObjectImp::methodGetter(ExecState* exec,
 
   Class* aClass = instance->getClass();
   MethodList methodList = aClass->methodsNamed(propertyName, instance.get());
-  JSValue* result = new (exec) RuntimeMethod(exec, propertyName, methodList);
+  JSValuePtr result = new (exec) RuntimeMethod(exec, propertyName, methodList);
 
   instance->end();
 
@@ -172,7 +174,7 @@ bool RuntimeObjectImp::getOwnPropertySlot(ExecState* exec,
 
 void RuntimeObjectImp::put(ExecState* exec,
                            const Identifier& propertyName,
-                           JSValue* value,
+                           JSValuePtr value,
                            PutPropertySlot&) {
   if (!instance) {
     throwInvalidAccessError(exec);
@@ -198,26 +200,26 @@ bool RuntimeObjectImp::deleteProperty(ExecState*, const Identifier&) {
   return false;
 }
 
-JSValue* RuntimeObjectImp::defaultValue(ExecState* exec,
-                                        PreferredPrimitiveType hint) const {
+JSValuePtr RuntimeObjectImp::defaultValue(ExecState* exec,
+                                          PreferredPrimitiveType hint) const {
   if (!instance)
     return throwInvalidAccessError(exec);
 
   RefPtr<Instance> protector(instance);
   instance->begin();
-  JSValue* result = instance->defaultValue(exec, hint);
+  JSValuePtr result = instance->defaultValue(exec, hint);
   instance->end();
   return result;
 }
 
-static JSValue* callRuntimeObject(ExecState* exec,
-                                  JSObject* function,
-                                  JSValue*,
-                                  const ArgList& args) {
+static JSValuePtr callRuntimeObject(ExecState* exec,
+                                    JSObject* function,
+                                    JSValuePtr,
+                                    const ArgList& args) {
   RefPtr<Instance> instance(
       static_cast<RuntimeObjectImp*>(function)->getInternalInstance());
   instance->begin();
-  JSValue* result = instance->invokeDefaultMethod(exec, args);
+  JSValuePtr result = instance->invokeDefaultMethod(exec, args);
   instance->end();
   return result;
 }

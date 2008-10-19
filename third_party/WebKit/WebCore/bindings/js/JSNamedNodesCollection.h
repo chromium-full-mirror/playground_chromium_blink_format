@@ -51,12 +51,12 @@ class JSNamedNodesCollection : public DOMObject {
   }
 
  private:
-  static JSC::JSValue* lengthGetter(JSC::ExecState*,
-                                    const JSC::Identifier&,
-                                    const JSC::PropertySlot&);
-  static JSC::JSValue* indexGetter(JSC::ExecState*,
-                                   const JSC::Identifier&,
-                                   const JSC::PropertySlot&);
+  static JSC::JSValuePtr lengthGetter(JSC::ExecState*,
+                                      const JSC::Identifier&,
+                                      const JSC::PropertySlot&);
+  static JSC::JSValuePtr indexGetter(JSC::ExecState*,
+                                     const JSC::Identifier&,
+                                     const JSC::PropertySlot&);
 
   OwnPtr<Vector<RefPtr<Node>>> m_nodes;
 };

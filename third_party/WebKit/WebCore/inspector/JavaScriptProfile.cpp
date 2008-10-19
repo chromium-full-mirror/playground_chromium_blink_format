@@ -41,7 +41,7 @@ namespace WebCore {
 
 // Cache
 
-typedef HashMap<Profile*, JSValue*> ProfileMap;
+typedef HashMap<Profile*, JSValuePtr> ProfileMap;
 
 static ProfileMap& profileCache() {
   static ProfileMap staticProfiles;
@@ -345,11 +345,11 @@ JSClassRef ProfileClass() {
   return profileClass;
 }
 
-JSValue* toJS(ExecState* exec, Profile* profile) {
+JSValuePtr toJS(ExecState* exec, Profile* profile) {
   if (!profile)
     return jsNull();
 
-  JSValue* profileWrapper = profileCache().get(profile);
+  JSValuePtr profileWrapper = profileCache().get(profile);
   if (profileWrapper)
     return profileWrapper;
 

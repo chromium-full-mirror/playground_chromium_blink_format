@@ -33,7 +33,7 @@ class NumberConstructor : public InternalFunction {
   NumberConstructor(ExecState*, PassRefPtr<StructureID>, NumberPrototype*);
 
   bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState*, int token) const;
+  JSValuePtr getValueProperty(ExecState*, int token) const;
 
   static const ClassInfo info;
 

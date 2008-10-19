@@ -41,7 +41,7 @@ class JSCallbackFunction : public InternalFunction {
 
   // InternalFunction mish-mashes constructor and function behavior -- we should
   // refactor the code so this override isn't necessary
-  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr proto) {
     return StructureID::create(proto, TypeInfo(ObjectType));
   }
 
@@ -49,7 +49,7 @@ class JSCallbackFunction : public InternalFunction {
   virtual CallType getCallData(CallData&);
   virtual const ClassInfo* classInfo() const { return &info; }
 
-  static JSValue* call(ExecState*, JSObject*, JSValue*, const ArgList&);
+  static JSValuePtr call(ExecState*, JSObject*, JSValuePtr, const ArgList&);
 
   JSObjectCallAsFunctionCallback m_callback;
 };

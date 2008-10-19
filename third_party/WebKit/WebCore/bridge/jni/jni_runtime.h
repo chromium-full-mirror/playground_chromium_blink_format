@@ -170,10 +170,10 @@ class JavaArray : public Array {
 
   jobject javaArray() const { return _array->_instance; }
 
-  static JSValue* convertJObjectToArray(ExecState* exec,
-                                        jobject anObject,
-                                        const char* type,
-                                        PassRefPtr<RootObject>);
+  static JSValuePtr convertJObjectToArray(ExecState* exec,
+                                          jobject anObject,
+                                          const char* type,
+                                          PassRefPtr<RootObject>);
 
  private:
   RefPtr<JObjectWrapper> _array;

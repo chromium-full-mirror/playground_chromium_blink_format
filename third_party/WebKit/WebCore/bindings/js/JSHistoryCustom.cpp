@@ -37,23 +37,23 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSValue* nonCachingStaticBackFunctionGetter(ExecState* exec,
-                                            const Identifier& propertyName,
-                                            const PropertySlot& slot) {
+JSValuePtr nonCachingStaticBackFunctionGetter(ExecState* exec,
+                                              const Identifier& propertyName,
+                                              const PropertySlot& slot) {
   return new (exec)
       PrototypeFunction(exec, 0, propertyName, jsHistoryPrototypeFunctionBack);
 }
 
-JSValue* nonCachingStaticForwardFunctionGetter(ExecState* exec,
-                                               const Identifier& propertyName,
-                                               const PropertySlot& slot) {
+JSValuePtr nonCachingStaticForwardFunctionGetter(ExecState* exec,
+                                                 const Identifier& propertyName,
+                                                 const PropertySlot& slot) {
   return new (exec) PrototypeFunction(exec, 0, propertyName,
                                       jsHistoryPrototypeFunctionForward);
 }
 
-JSValue* nonCachingStaticGoFunctionGetter(ExecState* exec,
-                                          const Identifier& propertyName,
-                                          const PropertySlot& slot) {
+JSValuePtr nonCachingStaticGoFunctionGetter(ExecState* exec,
+                                            const Identifier& propertyName,
+                                            const PropertySlot& slot) {
   return new (exec)
       PrototypeFunction(exec, 1, propertyName, jsHistoryPrototypeFunctionGo);
 }
@@ -104,7 +104,7 @@ bool JSHistory::customGetOwnPropertySlot(ExecState* exec,
 
 bool JSHistory::customPut(ExecState* exec,
                           const Identifier& propertyName,
-                          JSValue* value,
+                          JSValuePtr value,
                           PutPropertySlot&) {
   // Only allow putting by frames in the same origin.
   if (!allowsAccessFromFrame(exec, impl()->frame()))

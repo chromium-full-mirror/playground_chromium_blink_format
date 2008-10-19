@@ -45,9 +45,9 @@ class RuntimeMethod : public InternalFunction {
   }
 
  private:
-  static JSValue* lengthGetter(ExecState*,
-                               const Identifier&,
-                               const PropertySlot&);
+  static JSValuePtr lengthGetter(ExecState*,
+                                 const Identifier&,
+                                 const PropertySlot&);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual CallType getCallData(CallData&);
 

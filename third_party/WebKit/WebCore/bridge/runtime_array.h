@@ -59,12 +59,12 @@ class RuntimeArray : public JSObject {
   }
 
  private:
-  static JSValue* lengthGetter(ExecState*,
-                               const Identifier&,
-                               const PropertySlot&);
-  static JSValue* indexGetter(ExecState*,
-                              const Identifier&,
-                              const PropertySlot&);
+  static JSValuePtr lengthGetter(ExecState*,
+                                 const Identifier&,
+                                 const PropertySlot&);
+  static JSValuePtr indexGetter(ExecState*,
+                                const Identifier&,
+                                const PropertySlot&);
 
   OwnPtr<Bindings::Array> _array;
 };

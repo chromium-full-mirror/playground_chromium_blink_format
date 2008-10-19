@@ -29,12 +29,12 @@
 namespace JSC {
 
 // ECMA 11.9.3
-bool equal(ExecState*, JSValue*, JSValue*);
-bool equalSlowCase(ExecState*, JSValue*, JSValue*);
+bool equal(ExecState*, JSValuePtr, JSValuePtr);
+bool equalSlowCase(ExecState*, JSValuePtr, JSValuePtr);
 
 ALWAYS_INLINE bool equalSlowCaseInline(ExecState* exec,
-                                       JSValue* v1,
-                                       JSValue* v2) {
+                                       JSValuePtr v1,
+                                       JSValuePtr v2) {
   ASSERT(!JSImmediate::areBothImmediateNumbers(v1, v2));
 
   do {
@@ -63,7 +63,7 @@ ALWAYS_INLINE bool equalSlowCaseInline(ExecState* exec,
     if (v1->isObject()) {
       if (v2->isObject())
         return v1 == v2;
-      JSValue* p1 = v1->toPrimitive(exec);
+      JSValuePtr p1 = v1->toPrimitive(exec);
       if (exec->hadException())
         return false;
       v1 = p1;
@@ -73,7 +73,7 @@ ALWAYS_INLINE bool equalSlowCaseInline(ExecState* exec,
     }
 
     if (v2->isObject()) {
-      JSValue* p2 = v2->toPrimitive(exec);
+      JSValuePtr p2 = v2->toPrimitive(exec);
       if (exec->hadException())
         return false;
       v2 = p2;
@@ -102,10 +102,10 @@ ALWAYS_INLINE bool equalSlowCaseInline(ExecState* exec,
   } while (true);
 }
 
-bool strictEqual(JSValue*, JSValue*);
-bool strictEqualSlowCase(JSValue*, JSValue*);
+bool strictEqual(JSValuePtr, JSValuePtr);
+bool strictEqualSlowCase(JSValuePtr, JSValuePtr);
 
-inline bool strictEqualSlowCaseInline(JSValue* v1, JSValue* v2) {
+inline bool strictEqualSlowCaseInline(JSValuePtr v1, JSValuePtr v2) {
   ASSERT(!JSImmediate::areBothImmediate(v1, v2));
 
   if (JSImmediate::isEitherImmediate(v1, v2)) {
@@ -133,7 +133,7 @@ inline bool strictEqualSlowCaseInline(JSValue* v1, JSValue* v2) {
   return v1 == v2;
 }
 
-JSValue* throwOutOfMemoryError(ExecState*);
+JSValuePtr throwOutOfMemoryError(ExecState*);
 }
 
 #endif

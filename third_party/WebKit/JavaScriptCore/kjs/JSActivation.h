@@ -53,11 +53,11 @@ class JSActivation : public JSVariableObject {
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
 
-  virtual void put(ExecState*, const Identifier&, JSValue*, PutPropertySlot&);
+  virtual void put(ExecState*, const Identifier&, JSValuePtr, PutPropertySlot&);
 
   virtual void putWithAttributes(ExecState*,
                                  const Identifier&,
-                                 JSValue*,
+                                 JSValuePtr,
                                  unsigned attributes);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
 
@@ -68,7 +68,7 @@ class JSActivation : public JSVariableObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr proto) {
     return StructureID::create(proto,
                                TypeInfo(ObjectType, NeedsThisConversion));
   }
@@ -83,9 +83,9 @@ class JSActivation : public JSVariableObject {
     RefPtr<FunctionBodyNode> functionBody;
   };
 
-  static JSValue* argumentsGetter(ExecState*,
-                                  const Identifier&,
-                                  const PropertySlot&);
+  static JSValuePtr argumentsGetter(ExecState*,
+                                    const Identifier&,
+                                    const PropertySlot&);
   NEVER_INLINE PropertySlot::GetValueFunc getArgumentsGetter();
 
   JSActivationData* d() const {
@@ -93,9 +93,9 @@ class JSActivation : public JSVariableObject {
   }
 };
 
-JSActivation* asActivation(JSValue*);
+JSActivation* asActivation(JSValuePtr);
 
-inline JSActivation* asActivation(JSValue* value) {
+inline JSActivation* asActivation(JSValuePtr value) {
   ASSERT(asObject(value)->inherits(&JSActivation::info));
   return static_cast<JSActivation*>(asObject(value));
 }

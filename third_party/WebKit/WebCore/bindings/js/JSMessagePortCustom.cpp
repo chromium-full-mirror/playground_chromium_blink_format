@@ -70,8 +70,8 @@ void JSMessagePort::mark() {
   }
 }
 
-JSValue* JSMessagePort::startConversation(ExecState* exec,
-                                          const ArgList& args) {
+JSValuePtr JSMessagePort::startConversation(ExecState* exec,
+                                            const ArgList& args) {
   DOMWindow* window = asJSDOMWindow(exec->lexicalGlobalObject())->impl();
   const UString& message = args.at(exec, 0)->toString(exec);
 
@@ -79,7 +79,8 @@ JSValue* JSMessagePort::startConversation(ExecState* exec,
               impl()->startConversation(window->document(), message).get());
 }
 
-JSValue* JSMessagePort::addEventListener(ExecState* exec, const ArgList& args) {
+JSValuePtr JSMessagePort::addEventListener(ExecState* exec,
+                                           const ArgList& args) {
   Frame* frame = impl()->associatedFrame();
   if (!frame)
     return jsUndefined();
@@ -93,8 +94,8 @@ JSValue* JSMessagePort::addEventListener(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValue* JSMessagePort::removeEventListener(ExecState* exec,
-                                            const ArgList& args) {
+JSValuePtr JSMessagePort::removeEventListener(ExecState* exec,
+                                              const ArgList& args) {
   Frame* frame = impl()->associatedFrame();
   if (!frame)
     return jsUndefined();
@@ -108,7 +109,7 @@ JSValue* JSMessagePort::removeEventListener(ExecState* exec,
   return jsUndefined();
 }
 
-void JSMessagePort::setOnmessage(ExecState* exec, JSValue* value) {
+void JSMessagePort::setOnmessage(ExecState* exec, JSValuePtr value) {
   Frame* frame = impl()->associatedFrame();
   if (!frame)
     return;
@@ -117,7 +118,7 @@ void JSMessagePort::setOnmessage(ExecState* exec, JSValue* value) {
                                                                    value));
 }
 
-JSValue* JSMessagePort::onmessage(ExecState*) const {
+JSValuePtr JSMessagePort::onmessage(ExecState*) const {
   if (JSUnprotectedEventListener* listener =
           static_cast<JSUnprotectedEventListener*>(impl()->onmessage()))
     if (JSObject* listenerObj = listener->listenerObj())
@@ -125,7 +126,7 @@ JSValue* JSMessagePort::onmessage(ExecState*) const {
   return jsNull();
 }
 
-void JSMessagePort::setOnclose(ExecState* exec, JSValue* value) {
+void JSMessagePort::setOnclose(ExecState* exec, JSValuePtr value) {
   Frame* frame = impl()->associatedFrame();
   if (!frame)
     return;
@@ -134,7 +135,7 @@ void JSMessagePort::setOnclose(ExecState* exec, JSValue* value) {
                                                                    value));
 }
 
-JSValue* JSMessagePort::onclose(ExecState*) const {
+JSValuePtr JSMessagePort::onclose(ExecState*) const {
   if (JSUnprotectedEventListener* listener =
           static_cast<JSUnprotectedEventListener*>(impl()->onclose()))
     if (JSObject* listenerObj = listener->listenerObj())

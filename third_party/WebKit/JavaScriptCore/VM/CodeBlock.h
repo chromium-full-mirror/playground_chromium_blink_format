@@ -164,7 +164,7 @@ class EvalCodeCache {
   PassRefPtr<EvalNode> get(ExecState* exec,
                            const UString& evalSource,
                            ScopeChainNode* scopeChain,
-                           JSValue*& exceptionValue) {
+                           JSValuePtr& exceptionValue) {
     RefPtr<EvalNode> evalNode;
 
     if (evalSource.size() < maxCacheableSourceLength &&
@@ -311,7 +311,7 @@ struct CodeBlock {
   Vector<RefPtr<FuncDeclNode>> functions;
   Vector<RefPtr<FuncExprNode>> functionExpressions;
   Vector<Register> constantRegisters;
-  Vector<JSValue*> unexpectedConstants;
+  Vector<JSValuePtr> unexpectedConstants;
   Vector<RefPtr<RegExp>> regexps;
   Vector<HandlerInfo> exceptionHandlers;
   Vector<ExpressionRangeInfo> expressionInfo;

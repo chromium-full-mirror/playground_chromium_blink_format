@@ -39,7 +39,7 @@ using namespace JSC;
 namespace WebCore {
 
 ScheduledAction::ScheduledAction(ExecState* exec,
-                                 JSValue* function,
+                                 JSValuePtr function,
                                  const ArgList& args)
     : m_function(function) {
   ArgList::const_iterator end = args.end();

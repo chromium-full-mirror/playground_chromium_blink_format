@@ -32,7 +32,7 @@ namespace WebCore {
 
 class JSQuarantinedObjectWrapper : public JSC::JSObject {
  public:
-  static JSQuarantinedObjectWrapper* asWrapper(JSC::JSValue*);
+  static JSQuarantinedObjectWrapper* asWrapper(JSC::JSValuePtr);
 
   virtual ~JSQuarantinedObjectWrapper();
 
@@ -46,7 +46,7 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
 
   static const JSC::ClassInfo s_info;
 
-  static PassRefPtr<JSC::StructureID> createStructureID(JSC::JSValue* proto) {
+  static PassRefPtr<JSC::StructureID> createStructureID(JSC::JSValuePtr proto) {
     return JSC::StructureID::create(
         proto, JSC::TypeInfo(JSC::ObjectType, JSC::ImplementsHasInstance |
                                                   JSC::OverridesHasInstance));
@@ -69,9 +69,9 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
 
   virtual void put(JSC::ExecState*,
                    const JSC::Identifier&,
-                   JSC::JSValue*,
+                   JSC::JSValuePtr,
                    JSC::PutPropertySlot&);
-  virtual void put(JSC::ExecState*, unsigned, JSC::JSValue*);
+  virtual void put(JSC::ExecState*, unsigned, JSC::JSValuePtr);
 
   virtual bool deleteProperty(JSC::ExecState*, const JSC::Identifier&);
   virtual bool deleteProperty(JSC::ExecState*, unsigned);
@@ -79,7 +79,9 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
   virtual JSC::CallType getCallData(JSC::CallData&);
   virtual JSC::ConstructType getConstructData(JSC::ConstructData&);
 
-  virtual bool hasInstance(JSC::ExecState*, JSC::JSValue*, JSC::JSValue* proto);
+  virtual bool hasInstance(JSC::ExecState*,
+                           JSC::JSValuePtr,
+                           JSC::JSValuePtr proto);
 
   virtual void getPropertyNames(JSC::ExecState*, JSC::PropertyNameArray&);
 
@@ -95,23 +97,23 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
   virtual bool allowsCallAsFunction() const { return false; }
   virtual bool allowsGetPropertyNames() const { return false; }
 
-  virtual JSC::JSValue* prepareIncomingValue(
+  virtual JSC::JSValuePtr prepareIncomingValue(
       JSC::ExecState* unwrappedExec,
-      JSC::JSValue* unwrappedValue) const = 0;
-  virtual JSC::JSValue* wrapOutgoingValue(
+      JSC::JSValuePtr unwrappedValue) const = 0;
+  virtual JSC::JSValuePtr wrapOutgoingValue(
       JSC::ExecState* unwrappedExec,
-      JSC::JSValue* unwrappedValue) const = 0;
+      JSC::JSValuePtr unwrappedValue) const = 0;
 
-  static JSC::JSValue* cachedValueGetter(JSC::ExecState*,
-                                         const JSC::Identifier&,
-                                         const JSC::PropertySlot&);
+  static JSC::JSValuePtr cachedValueGetter(JSC::ExecState*,
+                                           const JSC::Identifier&,
+                                           const JSC::PropertySlot&);
 
   void transferExceptionToExecState(JSC::ExecState*) const;
 
-  static JSC::JSValue* call(JSC::ExecState*,
-                            JSC::JSObject* function,
-                            JSC::JSValue* thisValue,
-                            const JSC::ArgList&);
+  static JSC::JSValuePtr call(JSC::ExecState*,
+                              JSC::JSObject* function,
+                              JSC::JSValuePtr thisValue,
+                              const JSC::ArgList&);
   static JSC::JSObject* construct(JSC::ExecState*,
                                   JSC::JSObject*,
                                   const JSC::ArgList&);

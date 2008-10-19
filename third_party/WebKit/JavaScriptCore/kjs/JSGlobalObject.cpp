@@ -78,7 +78,7 @@ static const int initialTickCountThreshold = 255;
 // Preferred number of milliseconds between each timeout check
 static const int preferredScriptCheckTimeInterval = 1000;
 
-static inline void markIfNeeded(JSValue* v) {
+static inline void markIfNeeded(JSValuePtr v) {
   if (v && !v->marked())
     v->mark();
 }
@@ -147,7 +147,7 @@ void JSGlobalObject::init(JSObject* thisValue) {
 
 void JSGlobalObject::put(ExecState* exec,
                          const Identifier& propertyName,
-                         JSValue* value,
+                         JSValuePtr value,
                          PutPropertySlot& slot) {
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
@@ -158,18 +158,18 @@ void JSGlobalObject::put(ExecState* exec,
 
 void JSGlobalObject::putWithAttributes(ExecState* exec,
                                        const Identifier& propertyName,
-                                       JSValue* value,
+                                       JSValuePtr value,
                                        unsigned attributes) {
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
   if (symbolTablePutWithAttributes(propertyName, value, attributes))
     return;
 
-  JSValue* valueBefore = getDirect(propertyName);
+  JSValuePtr valueBefore = getDirect(propertyName);
   PutPropertySlot slot;
   JSVariableObject::put(exec, propertyName, value, slot);
   if (!valueBefore) {
-    if (JSValue* valueAfter = getDirect(propertyName))
+    if (JSValuePtr valueAfter = getDirect(propertyName))
       putDirect(propertyName, valueAfter, attributes);
   }
 }
@@ -197,7 +197,7 @@ static inline JSObject* lastInPrototypeChain(JSObject* object) {
   return o;
 }
 
-void JSGlobalObject::reset(JSValue* prototype) {
+void JSGlobalObject::reset(JSValuePtr prototype) {
   ExecState* exec = JSGlobalObject::globalExec();
 
   // Prototypes
@@ -272,25 +272,25 @@ void JSGlobalObject::reset(JSValue* prototype) {
 
   // Constructors
 
-  JSValue* objectConstructor = new (exec) ObjectConstructor(
+  JSValuePtr objectConstructor = new (exec) ObjectConstructor(
       exec, ObjectConstructor::createStructureID(d()->functionPrototype),
       d()->objectPrototype);
-  JSValue* functionConstructor = new (exec) FunctionConstructor(
+  JSValuePtr functionConstructor = new (exec) FunctionConstructor(
       exec, FunctionConstructor::createStructureID(d()->functionPrototype),
       d()->functionPrototype);
-  JSValue* arrayConstructor = new (exec) ArrayConstructor(
+  JSValuePtr arrayConstructor = new (exec) ArrayConstructor(
       exec, ArrayConstructor::createStructureID(d()->functionPrototype),
       d()->arrayPrototype);
-  JSValue* stringConstructor = new (exec) StringConstructor(
+  JSValuePtr stringConstructor = new (exec) StringConstructor(
       exec, StringConstructor::createStructureID(d()->functionPrototype),
       d()->prototypeFunctionStructure.get(), d()->stringPrototype);
-  JSValue* booleanConstructor = new (exec) BooleanConstructor(
+  JSValuePtr booleanConstructor = new (exec) BooleanConstructor(
       exec, BooleanConstructor::createStructureID(d()->functionPrototype),
       d()->booleanPrototype);
-  JSValue* numberConstructor = new (exec) NumberConstructor(
+  JSValuePtr numberConstructor = new (exec) NumberConstructor(
       exec, NumberConstructor::createStructureID(d()->functionPrototype),
       d()->numberPrototype);
-  JSValue* dateConstructor = new (exec) DateConstructor(
+  JSValuePtr dateConstructor = new (exec) DateConstructor(
       exec, DateConstructor::createStructureID(d()->functionPrototype),
       d()->prototypeFunctionStructure.get(), d()->datePrototype);
 
@@ -452,7 +452,7 @@ void JSGlobalObject::reset(JSValue* prototype) {
 }
 
 // Set prototype, and also insert the object prototype at the end of the chain.
-void JSGlobalObject::resetPrototype(JSValue* prototype) {
+void JSGlobalObject::resetPrototype(JSValuePtr prototype) {
   setPrototype(prototype);
   lastInPrototypeChain(this)->setPrototype(d()->objectPrototype);
 }

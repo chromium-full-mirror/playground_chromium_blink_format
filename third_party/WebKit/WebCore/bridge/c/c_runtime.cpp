@@ -51,8 +51,8 @@ const char* CField::name() const {
   return i->isString ? i->value.string : 0;
 }
 
-JSValue* CField::valueFromInstance(ExecState* exec,
-                                   const Instance* inst) const {
+JSValuePtr CField::valueFromInstance(ExecState* exec,
+                                     const Instance* inst) const {
   const CInstance* instance = static_cast<const CInstance*>(inst);
   NPObject* obj = instance->getObject();
   if (obj->_class->getProperty) {
@@ -65,7 +65,7 @@ JSValue* CField::valueFromInstance(ExecState* exec,
       result = obj->_class->getProperty(obj, _fieldIdentifier, &property);
     }
     if (result) {
-      JSValue* result =
+      JSValuePtr result =
           convertNPVariantToValue(exec, &property, instance->rootObject());
       _NPN_ReleaseVariantValue(&property);
       return result;

@@ -47,7 +47,7 @@
 
 #define ARG_callFrame static_cast<CallFrame*>(ARGS[CTI_ARGS_callFrame])
 #define ARG_registerFile static_cast<RegisterFile*>(ARGS[CTI_ARGS_registerFile])
-#define ARG_exception static_cast<JSValue**>(ARGS[CTI_ARGS_exception])
+#define ARG_exception static_cast<JSValuePtr*>(ARGS[CTI_ARGS_exception])
 #define ARG_profilerReference \
   static_cast<Profiler**>(ARGS[CTI_ARGS_profilerReference])
 #define ARG_globalData static_cast<JSGlobalData*>(ARGS[CTI_ARGS_globalData])
@@ -55,11 +55,11 @@
 #define ARG_setCallFrame(newCallFrame) \
   (ARGS[CTI_ARGS_callFrame] = (newCallFrame))
 
-#define ARG_src1 static_cast<JSValue*>(ARGS[1])
-#define ARG_src2 static_cast<JSValue*>(ARGS[2])
-#define ARG_src3 static_cast<JSValue*>(ARGS[3])
-#define ARG_src4 static_cast<JSValue*>(ARGS[4])
-#define ARG_src5 static_cast<JSValue*>(ARGS[5])
+#define ARG_src1 static_cast<JSValuePtr>(ARGS[1])
+#define ARG_src2 static_cast<JSValuePtr>(ARGS[2])
+#define ARG_src3 static_cast<JSValuePtr>(ARGS[3])
+#define ARG_src4 static_cast<JSValuePtr>(ARGS[4])
+#define ARG_src5 static_cast<JSValuePtr>(ARGS[5])
 #define ARG_id1 static_cast<Identifier*>(ARGS[1])
 #define ARG_id2 static_cast<Identifier*>(ARGS[2])
 #define ARG_id3 static_cast<Identifier*>(ARGS[3])
@@ -101,7 +101,7 @@ struct Instruction;
 struct OperandTypes;
 struct StructureStubInfo;
 
-typedef JSValue*(SFX_CALL* CTIHelper_j)(CTI_ARGS);
+typedef JSValuePtr(SFX_CALL* CTIHelper_j)(CTI_ARGS);
 typedef JSPropertyNameIterator*(SFX_CALL* CTIHelper_p)(CTI_ARGS);
 typedef void(SFX_CALL* CTIHelper_v)(CTI_ARGS);
 typedef void*(SFX_CALL* CTIHelper_s)(CTI_ARGS);
@@ -194,12 +194,12 @@ struct StructureStubCompilationInfo {
 };
 
 extern "C" {
-JSValue* ctiTrampoline(void* code,
-                       RegisterFile*,
-                       CallFrame*,
-                       JSValue** exception,
-                       Profiler**,
-                       JSGlobalData*);
+JSValuePtr ctiTrampoline(void* code,
+                         RegisterFile*,
+                         CallFrame*,
+                         JSValuePtr* exception,
+                         Profiler**,
+                         JSGlobalData*);
 void ctiVMThrowTrampoline();
 };
 
@@ -353,11 +353,11 @@ class CTI {
                        int callerArgCount);
   static void unlinkCall(StructureStubInfo*);
 
-  inline static JSValue* execute(void* code,
-                                 RegisterFile* registerFile,
-                                 CallFrame* callFrame,
-                                 JSGlobalData* globalData,
-                                 JSValue** exception) {
+  inline static JSValuePtr execute(void* code,
+                                   RegisterFile* registerFile,
+                                   CallFrame* callFrame,
+                                   JSGlobalData* globalData,
+                                   JSValuePtr* exception) {
     return ctiTrampoline(code, registerFile, callFrame, exception,
                          Profiler::enabledProfilerReference(), globalData);
   }
@@ -365,10 +365,10 @@ class CTI {
  private:
   CTI(Machine*, CallFrame*, CodeBlock*);
 
-  static uintptr_t asInteger(JSValue*);
+  static uintptr_t asInteger(JSValuePtr);
 
   bool isConstant(int src);
-  JSValue* getConstant(CallFrame*, int src);
+  JSValuePtr getConstant(CallFrame*, int src);
 
   void privateCompileMainPass();
   void privateCompileLinkPass();
@@ -453,8 +453,8 @@ class CTI {
   void emitGetFromCallFrameHeader(RegisterFile::CallFrameHeaderEntry entry,
                                   X86Assembler::RegisterID to);
 
-  JSValue* getConstantImmediateNumericArg(unsigned src);
-  unsigned getDeTaggedConstantImmediate(JSValue* imm);
+  JSValuePtr getConstantImmediateNumericArg(unsigned src);
+  unsigned getDeTaggedConstantImmediate(JSValuePtr imm);
 
   void emitJumpSlowCaseIfIsJSCell(X86Assembler::RegisterID reg,
                                   unsigned opcodeIndex);

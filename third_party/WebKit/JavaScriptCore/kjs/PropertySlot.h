@@ -43,15 +43,15 @@ class PropertySlot {
   }
 
   explicit PropertySlot(const JSValue* base)
-      : m_slotBase(const_cast<JSValue*>(base)), m_offset(WTF::notFound) {
+      : m_slotBase(const_cast<JSValuePtr>(base)), m_offset(WTF::notFound) {
     clearValue();
   }
 
-  typedef JSValue* (*GetValueFunc)(ExecState*,
-                                   const Identifier&,
-                                   const PropertySlot&);
+  typedef JSValuePtr (*GetValueFunc)(ExecState*,
+                                     const Identifier&,
+                                     const PropertySlot&);
 
-  JSValue* getValue(ExecState* exec, const Identifier& propertyName) const {
+  JSValuePtr getValue(ExecState* exec, const Identifier& propertyName) const {
     if (m_getValue == JSC_VALUE_SLOT_MARKER)
       return *m_data.valueSlot;
     if (m_getValue == JSC_REGISTER_SLOT_MARKER)
@@ -59,7 +59,7 @@ class PropertySlot {
     return m_getValue(exec, propertyName, *this);
   }
 
-  JSValue* getValue(ExecState* exec, unsigned propertyName) const {
+  JSValuePtr getValue(ExecState* exec, unsigned propertyName) const {
     if (m_getValue == JSC_VALUE_SLOT_MARKER)
       return *m_data.valueSlot;
     if (m_getValue == JSC_REGISTER_SLOT_MARKER)
@@ -73,7 +73,7 @@ class PropertySlot {
     return m_offset;
   }
 
-  void putValue(JSValue* value) {
+  void putValue(JSValuePtr value) {
     if (m_getValue == JSC_VALUE_SLOT_MARKER) {
       *m_data.valueSlot = value;
       return;
@@ -82,21 +82,21 @@ class PropertySlot {
     *m_data.registerSlot = value;
   }
 
-  void setValueSlot(JSValue** valueSlot) {
+  void setValueSlot(JSValuePtr* valueSlot) {
     ASSERT(valueSlot);
     m_getValue = JSC_VALUE_SLOT_MARKER;
     clearBase();
     m_data.valueSlot = valueSlot;
   }
 
-  void setValueSlot(JSValue* slotBase, JSValue** valueSlot) {
+  void setValueSlot(JSValuePtr slotBase, JSValuePtr* valueSlot) {
     ASSERT(valueSlot);
     m_getValue = JSC_VALUE_SLOT_MARKER;
     m_slotBase = slotBase;
     m_data.valueSlot = valueSlot;
   }
 
-  void setValueSlot(JSValue* slotBase, JSValue** valueSlot, size_t offset) {
+  void setValueSlot(JSValuePtr slotBase, JSValuePtr* valueSlot, size_t offset) {
     ASSERT(valueSlot);
     m_getValue = JSC_VALUE_SLOT_MARKER;
     m_slotBase = slotBase;
@@ -104,7 +104,7 @@ class PropertySlot {
     m_offset = offset;
   }
 
-  void setValue(JSValue* value) {
+  void setValue(JSValuePtr value) {
     ASSERT(value);
     m_getValue = JSC_VALUE_SLOT_MARKER;
     clearBase();
@@ -119,14 +119,14 @@ class PropertySlot {
     m_data.registerSlot = registerSlot;
   }
 
-  void setCustom(JSValue* slotBase, GetValueFunc getValue) {
+  void setCustom(JSValuePtr slotBase, GetValueFunc getValue) {
     ASSERT(slotBase);
     ASSERT(getValue);
     m_getValue = getValue;
     m_slotBase = slotBase;
   }
 
-  void setCustomIndex(JSValue* slotBase,
+  void setCustomIndex(JSValuePtr slotBase,
                       unsigned index,
                       GetValueFunc getValue) {
     ASSERT(slotBase);
@@ -147,12 +147,12 @@ class PropertySlot {
     setValue(jsUndefined());
   }
 
-  JSValue* slotBase() const {
+  JSValuePtr slotBase() const {
     ASSERT(m_slotBase);
     return m_slotBase;
   }
 
-  void setBase(JSValue* base) {
+  void setBase(JSValuePtr base) {
     ASSERT(m_slotBase);
     ASSERT(base);
     m_slotBase = base;
@@ -173,21 +173,21 @@ class PropertySlot {
   unsigned index() const { return m_data.index; }
 
  private:
-  static JSValue* functionGetter(ExecState*,
-                                 const Identifier&,
-                                 const PropertySlot&);
+  static JSValuePtr functionGetter(ExecState*,
+                                   const Identifier&,
+                                   const PropertySlot&);
 
   GetValueFunc m_getValue;
 
-  JSValue* m_slotBase;
+  JSValuePtr m_slotBase;
   union {
     JSObject* getterFunc;
-    JSValue** valueSlot;
+    JSValuePtr* valueSlot;
     Register* registerSlot;
     unsigned index;
   } m_data;
 
-  JSValue* m_value;
+  JSValuePtr m_value;
 
   size_t m_offset;
 };

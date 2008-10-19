@@ -66,7 +66,7 @@ void ProfileGenerator::addParentForConsoleStart(ExecState* exec) {
   int lineNumber;
   intptr_t sourceID;
   UString sourceURL;
-  JSValue* function;
+  JSValuePtr function;
 
   exec->machine()->retrieveLastCaller(exec, lineNumber, sourceID, sourceURL,
                                       function);

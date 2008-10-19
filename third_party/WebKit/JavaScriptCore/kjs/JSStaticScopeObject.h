@@ -43,7 +43,7 @@ class JSStaticScopeObject : public JSVariableObject {
  public:
   JSStaticScopeObject(ExecState* exec,
                       const Identifier& ident,
-                      JSValue* value,
+                      JSValuePtr value,
                       unsigned attributes)
       : JSVariableObject(exec->globalData().staticScopeStructureID,
                          new JSStaticScopeObjectData()) {
@@ -59,13 +59,13 @@ class JSStaticScopeObject : public JSVariableObject {
                                   const Identifier&,
                                   PropertySlot&,
                                   bool& slotIsWriteable);
-  virtual void put(ExecState*, const Identifier&, JSValue*, PutPropertySlot&);
+  virtual void put(ExecState*, const Identifier&, JSValuePtr, PutPropertySlot&);
   void putWithAttributes(ExecState*,
                          const Identifier&,
-                         JSValue*,
+                         JSValuePtr,
                          unsigned attributes);
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr proto) {
     return StructureID::create(proto,
                                TypeInfo(ObjectType, NeedsThisConversion));
   }

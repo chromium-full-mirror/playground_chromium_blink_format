@@ -42,9 +42,9 @@ bool JSHTMLFormElement::canGetItemsForName(ExecState* exec,
   return namedItems.size();
 }
 
-JSValue* JSHTMLFormElement::nameGetter(ExecState* exec,
-                                       const Identifier& propertyName,
-                                       const PropertySlot& slot) {
+JSValuePtr JSHTMLFormElement::nameGetter(ExecState* exec,
+                                         const Identifier& propertyName,
+                                         const PropertySlot& slot) {
   HTMLFormElement* form = static_cast<HTMLFormElement*>(
       static_cast<JSHTMLElement*>(slot.slotBase())->impl());
 

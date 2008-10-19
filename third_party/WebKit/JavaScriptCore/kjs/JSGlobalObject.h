@@ -162,10 +162,10 @@ class JSGlobalObject : public JSVariableObject {
                                   const Identifier&,
                                   PropertySlot&,
                                   bool& slotIsWriteable);
-  virtual void put(ExecState*, const Identifier&, JSValue*, PutPropertySlot&);
+  virtual void put(ExecState*, const Identifier&, JSValuePtr, PutPropertySlot&);
   virtual void putWithAttributes(ExecState*,
                                  const Identifier& propertyName,
-                                 JSValue* value,
+                                 JSValuePtr value,
                                  unsigned attributes);
 
   virtual void defineGetter(ExecState*,
@@ -289,7 +289,7 @@ class JSGlobalObject : public JSVariableObject {
   void copyGlobalsFrom(RegisterFile&);
   void copyGlobalsTo(RegisterFile&);
 
-  void resetPrototype(JSValue* prototype);
+  void resetPrototype(JSValuePtr prototype);
 
   JSGlobalData* globalData() { return d()->globalData.get(); }
   JSGlobalObjectData* d() const {
@@ -298,11 +298,11 @@ class JSGlobalObject : public JSVariableObject {
 
  protected:
   struct GlobalPropertyInfo {
-    GlobalPropertyInfo(const Identifier& i, JSValue* v, unsigned a)
+    GlobalPropertyInfo(const Identifier& i, JSValuePtr v, unsigned a)
         : identifier(i), value(v), attributes(a) {}
 
     const Identifier identifier;
-    JSValue* value;
+    JSValuePtr value;
     unsigned attributes;
   };
   void addStaticGlobals(GlobalPropertyInfo*, int count);
@@ -310,16 +310,16 @@ class JSGlobalObject : public JSVariableObject {
  private:
   // FIXME: Fold reset into init.
   void init(JSObject* thisValue);
-  void reset(JSValue* prototype);
+  void reset(JSValuePtr prototype);
 
   void setRegisters(Register* registers, Register* registerArray, size_t count);
 
   void* operator new(size_t);  // can only be allocated with JSGlobalData
 };
 
-JSGlobalObject* asGlobalObject(JSValue*);
+JSGlobalObject* asGlobalObject(JSValuePtr);
 
-inline JSGlobalObject* asGlobalObject(JSValue* value) {
+inline JSGlobalObject* asGlobalObject(JSValuePtr value) {
   ASSERT(asObject(value)->isGlobalObject());
   return static_cast<JSGlobalObject*>(asObject(value));
 }
@@ -373,7 +373,7 @@ inline JSGlobalObject* ScopeChainNode::globalObject() const {
   return asGlobalObject(bottom());
 }
 
-inline JSValue* StructureID::prototypeForLookup(ExecState* exec) {
+inline JSValuePtr StructureID::prototypeForLookup(ExecState* exec) {
   if (typeInfo().type() == ObjectType)
     return m_prototype;
 

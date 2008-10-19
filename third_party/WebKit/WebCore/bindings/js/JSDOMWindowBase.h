@@ -77,12 +77,12 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
                                   JSC::PropertySlot&);
   virtual void put(JSC::ExecState*,
                    const JSC::Identifier& propertyName,
-                   JSC::JSValue*,
+                   JSC::JSValuePtr,
                    JSC::PutPropertySlot&);
 
   int installTimeout(const JSC::UString& handler, int t, bool singleShot);
   int installTimeout(JSC::ExecState*,
-                     JSC::JSValue* function,
+                     JSC::JSValuePtr function,
                      const JSC::ArgList& args,
                      int t,
                      bool singleShot);
@@ -94,28 +94,28 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
   void timerFired(DOMWindowTimer*);
 
   // Finds a wrapper of a JS EventListener, returns 0 if no existing one.
-  JSEventListener* findJSEventListener(JSC::JSValue*,
+  JSEventListener* findJSEventListener(JSC::JSValuePtr,
                                        bool attachedToEventTargetNode = false);
 
   // Finds or creates a wrapper of a JS EventListener. JS EventListener object
   // is GC-protected.
   PassRefPtr<JSEventListener> findOrCreateJSEventListener(
       JSC::ExecState*,
-      JSC::JSValue*,
+      JSC::JSValuePtr,
       bool attachedToEventTargetNode = false);
 
   // Finds a wrapper of a GC-unprotected JS EventListener, returns 0 if no
   // existing one.
   JSUnprotectedEventListener* findJSUnprotectedEventListener(
       JSC::ExecState*,
-      JSC::JSValue*,
+      JSC::JSValuePtr,
       bool attachedToEventTargetNode = false);
 
   // Finds or creates a wrapper of a JS EventListener. JS EventListener object
   // is *NOT* GC-protected.
   PassRefPtr<JSUnprotectedEventListener> findOrCreateJSUnprotectedEventListener(
       JSC::ExecState*,
-      JSC::JSValue*,
+      JSC::JSValuePtr,
       bool attachedToEventTargetNode = false);
 
   void clear();
@@ -124,7 +124,7 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
   Event* currentEvent();
 
   // Set a place to put a dialog return value when the window is cleared.
-  void setReturnValueSlot(JSC::JSValue** slot);
+  void setReturnValueSlot(JSC::JSValuePtr* slot);
 
   typedef HashMap<JSC::JSObject*, JSEventListener*> ListenersMap;
   typedef HashMap<JSC::JSObject*, JSUnprotectedEventListener*>
@@ -175,7 +175,7 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
     JSDOMWindowBase::UnprotectedListenersMap
         jsUnprotectedEventListenersAttachedToEventTargetNodes;
     Event* evt;
-    JSC::JSValue** returnValueSlot;
+    JSC::JSValuePtr* returnValueSlot;
     JSDOMWindowShell* shell;
 
     typedef HashMap<int, DOMWindowTimer*> TimeoutsMap;
@@ -185,15 +185,15 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
     JSDOMConstructorMap constructors;
   };
 
-  static JSC::JSValue* childFrameGetter(JSC::ExecState*,
-                                        const JSC::Identifier&,
-                                        const JSC::PropertySlot&);
-  static JSC::JSValue* indexGetter(JSC::ExecState*,
-                                   const JSC::Identifier&,
-                                   const JSC::PropertySlot&);
-  static JSC::JSValue* namedItemGetter(JSC::ExecState*,
-                                       const JSC::Identifier&,
-                                       const JSC::PropertySlot&);
+  static JSC::JSValuePtr childFrameGetter(JSC::ExecState*,
+                                          const JSC::Identifier&,
+                                          const JSC::PropertySlot&);
+  static JSC::JSValuePtr indexGetter(JSC::ExecState*,
+                                     const JSC::Identifier&,
+                                     const JSC::PropertySlot&);
+  static JSC::JSValuePtr namedItemGetter(JSC::ExecState*,
+                                         const JSC::Identifier&,
+                                         const JSC::PropertySlot&);
 
   void clearHelperObjectProperties();
   int installTimeout(ScheduledAction*, int interval, bool singleShot);
@@ -207,11 +207,11 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
 };
 
 // Returns a JSDOMWindow or jsNull()
-JSC::JSValue* toJS(JSC::ExecState*, DOMWindow*);
+JSC::JSValuePtr toJS(JSC::ExecState*, DOMWindow*);
 
 // Returns JSDOMWindow or 0
 JSDOMWindow* toJSDOMWindow(Frame*);
-JSDOMWindow* toJSDOMWindow(JSC::JSValue*);
+JSDOMWindow* toJSDOMWindow(JSC::JSValuePtr);
 
 }  // namespace WebCore
 

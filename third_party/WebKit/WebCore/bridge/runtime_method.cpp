@@ -74,10 +74,10 @@ bool RuntimeMethod::getOwnPropertySlot(ExecState* exec,
   return InternalFunction::getOwnPropertySlot(exec, propertyName, slot);
 }
 
-static JSValue* callRuntimeMethod(ExecState* exec,
-                                  JSObject* function,
-                                  JSValue* thisValue,
-                                  const ArgList& args) {
+static JSValuePtr callRuntimeMethod(ExecState* exec,
+                                    JSObject* function,
+                                    JSValuePtr thisValue,
+                                    const ArgList& args) {
   RuntimeMethod* method = static_cast<RuntimeMethod*>(function);
 
   if (method->methods()->isEmpty())
@@ -90,7 +90,7 @@ static JSValue* callRuntimeMethod(ExecState* exec,
   } else {
     // If thisObj is the DOM object for a plugin, get the corresponding
     // runtime object from the DOM object.
-    JSValue* value =
+    JSValuePtr value =
         thisValue->get(exec, Identifier(exec, "__apple_runtime_object"));
     if (value->isObject(&RuntimeObjectImp::s_info))
       imp = static_cast<RuntimeObjectImp*>(value);
@@ -103,7 +103,7 @@ static JSValue* callRuntimeMethod(ExecState* exec,
     return RuntimeObjectImp::throwInvalidAccessError(exec);
 
   instance->begin();
-  JSValue* result = instance->invokeMethod(exec, *method->methods(), args);
+  JSValuePtr result = instance->invokeMethod(exec, *method->methods(), args);
   instance->end();
   return result;
 }

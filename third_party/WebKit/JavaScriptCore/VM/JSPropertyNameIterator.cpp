@@ -35,15 +35,15 @@ ASSERT_CLASS_FITS_IN_CELL(JSPropertyNameIterator);
 
 JSPropertyNameIterator::~JSPropertyNameIterator() {}
 
-JSValue* JSPropertyNameIterator::toPrimitive(ExecState*,
-                                             PreferredPrimitiveType) const {
+JSValuePtr JSPropertyNameIterator::toPrimitive(ExecState*,
+                                               PreferredPrimitiveType) const {
   ASSERT_NOT_REACHED();
   return noValue();
 }
 
 bool JSPropertyNameIterator::getPrimitiveNumber(ExecState*,
                                                 double&,
-                                                JSValue*&) {
+                                                JSValuePtr&) {
   ASSERT_NOT_REACHED();
   return false;
 }

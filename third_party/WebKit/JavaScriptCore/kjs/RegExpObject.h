@@ -38,15 +38,15 @@ class RegExpObject : public JSObject {
   void setLastIndex(double lastIndex) { d->lastIndex = lastIndex; }
   double lastIndex() const { return d->lastIndex; }
 
-  JSValue* test(ExecState*, const ArgList&);
-  JSValue* exec(ExecState*, const ArgList&);
+  JSValuePtr test(ExecState*, const ArgList&);
+  JSValuePtr exec(ExecState*, const ArgList&);
 
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier& propertyName,
                                   PropertySlot&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue*,
+                   JSValuePtr,
                    PutPropertySlot&);
 
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -68,9 +68,9 @@ class RegExpObject : public JSObject {
   OwnPtr<RegExpObjectData> d;
 };
 
-RegExpObject* asRegExpObject(JSValue*);
+RegExpObject* asRegExpObject(JSValuePtr);
 
-inline RegExpObject* asRegExpObject(JSValue* value) {
+inline RegExpObject* asRegExpObject(JSValuePtr value) {
   ASSERT(asObject(value)->inherits(&RegExpObject::info));
   return static_cast<RegExpObject*>(asObject(value));
 }

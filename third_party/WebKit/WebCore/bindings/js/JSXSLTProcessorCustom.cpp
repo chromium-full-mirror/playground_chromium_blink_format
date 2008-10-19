@@ -46,9 +46,9 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSValue* JSXSLTProcessor::importStylesheet(ExecState* exec,
-                                           const ArgList& args) {
-  JSValue* nodeVal = args.at(exec, 0);
+JSValuePtr JSXSLTProcessor::importStylesheet(ExecState* exec,
+                                             const ArgList& args) {
+  JSValuePtr nodeVal = args.at(exec, 0);
   if (nodeVal->isObject(&JSNode::s_info)) {
     JSNode* node = static_cast<JSNode*>(nodeVal);
     impl()->importStylesheet(node->impl());
@@ -58,10 +58,10 @@ JSValue* JSXSLTProcessor::importStylesheet(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* JSXSLTProcessor::transformToFragment(ExecState* exec,
-                                              const ArgList& args) {
-  JSValue* nodeVal = args.at(exec, 0);
-  JSValue* docVal = args.at(exec, 1);
+JSValuePtr JSXSLTProcessor::transformToFragment(ExecState* exec,
+                                                const ArgList& args) {
+  JSValuePtr nodeVal = args.at(exec, 0);
+  JSValuePtr docVal = args.at(exec, 1);
   if (nodeVal->isObject(&JSNode::s_info) &&
       docVal->isObject(&JSDocument::s_info)) {
     WebCore::Node* node = static_cast<JSNode*>(nodeVal)->impl();
@@ -73,9 +73,9 @@ JSValue* JSXSLTProcessor::transformToFragment(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* JSXSLTProcessor::transformToDocument(ExecState* exec,
-                                              const ArgList& args) {
-  JSValue* nodeVal = args.at(exec, 0);
+JSValuePtr JSXSLTProcessor::transformToDocument(ExecState* exec,
+                                                const ArgList& args) {
+  JSValuePtr nodeVal = args.at(exec, 0);
   if (nodeVal->isObject(&JSNode::s_info)) {
     JSNode* node = static_cast<JSNode*>(nodeVal);
     RefPtr<Document> resultDocument = impl()->transformToDocument(node->impl());
@@ -87,7 +87,7 @@ JSValue* JSXSLTProcessor::transformToDocument(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* JSXSLTProcessor::setParameter(ExecState* exec, const ArgList& args) {
+JSValuePtr JSXSLTProcessor::setParameter(ExecState* exec, const ArgList& args) {
   if (args.at(exec, 1)->isUndefinedOrNull() ||
       args.at(exec, 2)->isUndefinedOrNull())
     return jsUndefined();  // Throw exception?
@@ -98,7 +98,7 @@ JSValue* JSXSLTProcessor::setParameter(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValue* JSXSLTProcessor::getParameter(ExecState* exec, const ArgList& args) {
+JSValuePtr JSXSLTProcessor::getParameter(ExecState* exec, const ArgList& args) {
   if (args.at(exec, 1)->isUndefinedOrNull())
     return jsUndefined();
   String namespaceURI = args.at(exec, 0)->toString(exec);
@@ -107,8 +107,8 @@ JSValue* JSXSLTProcessor::getParameter(ExecState* exec, const ArgList& args) {
   return jsStringOrUndefined(exec, value);
 }
 
-JSValue* JSXSLTProcessor::removeParameter(ExecState* exec,
-                                          const ArgList& args) {
+JSValuePtr JSXSLTProcessor::removeParameter(ExecState* exec,
+                                            const ArgList& args) {
   if (args.at(exec, 1)->isUndefinedOrNull())
     return jsUndefined();
   String namespaceURI = args.at(exec, 0)->toString(exec);

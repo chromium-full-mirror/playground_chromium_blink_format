@@ -39,7 +39,7 @@ class JSHTMLAllCollection : public JSHTMLCollection {
                       PassRefPtr<HTMLCollection> collection)
       : JSHTMLCollection(structure, collection) {}
 
-  static PassRefPtr<JSC::StructureID> createStructureID(JSC::JSValue* proto) {
+  static PassRefPtr<JSC::StructureID> createStructureID(JSC::JSValuePtr proto) {
     return JSC::StructureID::create(
         proto, JSC::TypeInfo(JSC::ObjectType, JSC::MasqueradesAsUndefined));
   }

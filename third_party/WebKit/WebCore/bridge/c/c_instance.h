@@ -50,8 +50,8 @@ class CInstance : public Instance {
 
   virtual Class* getClass() const;
 
-  virtual JSValue* valueOf(ExecState*) const;
-  virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const;
+  virtual JSValuePtr valueOf(ExecState*) const;
+  virtual JSValuePtr defaultValue(ExecState*, PreferredPrimitiveType) const;
 
   virtual JSValue* invokeMethod(ExecState* exec,
                                 const MethodList& method,
@@ -60,9 +60,9 @@ class CInstance : public Instance {
   virtual JSValue* invokeDefaultMethod(ExecState* exec, const ArgList& args);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
-  JSValue* stringValue(ExecState*) const;
-  JSValue* numberValue(ExecState*) const;
-  JSValue* booleanValue() const;
+  JSValuePtr stringValue(ExecState*) const;
+  JSValuePtr numberValue(ExecState*) const;
+  JSValuePtr booleanValue() const;
 
   NPObject* getObject() const { return _object; }
 

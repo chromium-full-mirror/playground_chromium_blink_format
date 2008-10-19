@@ -98,7 +98,7 @@ class Console : public RefCounted<Console> {
   void group(JSC::ExecState*, const JSC::ArgList&);
   void groupEnd();
 
-  void reportException(JSC::ExecState*, JSC::JSValue*);
+  void reportException(JSC::ExecState*, JSC::JSValuePtr);
   void reportCurrentException(JSC::ExecState*);
 #endif
  private:

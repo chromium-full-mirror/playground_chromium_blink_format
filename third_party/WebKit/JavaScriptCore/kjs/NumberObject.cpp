@@ -34,7 +34,7 @@ const ClassInfo NumberObject::info = {"Number", 0, 0, 0};
 NumberObject::NumberObject(PassRefPtr<StructureID> structure)
     : JSWrapperObject(structure) {}
 
-JSValue* NumberObject::getJSNumber() {
+JSValuePtr NumberObject::getJSNumber() {
   return internalValue();
 }
 
@@ -46,7 +46,7 @@ NumberObject* constructNumber(ExecState* exec, JSNumberCell* number) {
 }
 
 NumberObject* constructNumberFromImmediateNumber(ExecState* exec,
-                                                 JSValue* value) {
+                                                 JSValuePtr value) {
   NumberObject* object = new (exec)
       NumberObject(exec->lexicalGlobalObject()->numberObjectStructure());
   object->setInternalValue(value);

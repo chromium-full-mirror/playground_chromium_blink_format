@@ -49,17 +49,17 @@ JSNamedNodesCollection::JSNamedNodesCollection(
     : DOMObject(getDOMStructure<JSNamedNodesCollection>(exec)),
       m_nodes(new Vector<RefPtr<Node>>(nodes)) {}
 
-JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,
-                                              const Identifier& propertyName,
-                                              const PropertySlot& slot) {
+JSValuePtr JSNamedNodesCollection::lengthGetter(ExecState* exec,
+                                                const Identifier& propertyName,
+                                                const PropertySlot& slot) {
   JSNamedNodesCollection* thisObj =
       static_cast<JSNamedNodesCollection*>(slot.slotBase());
   return jsNumber(exec, thisObj->m_nodes->size());
 }
 
-JSValue* JSNamedNodesCollection::indexGetter(ExecState* exec,
-                                             const Identifier& propertyName,
-                                             const PropertySlot& slot) {
+JSValuePtr JSNamedNodesCollection::indexGetter(ExecState* exec,
+                                               const Identifier& propertyName,
+                                               const PropertySlot& slot) {
   JSNamedNodesCollection* thisObj =
       static_cast<JSNamedNodesCollection*>(slot.slotBase());
   return toJS(exec, (*thisObj->m_nodes)[slot.index()].get());

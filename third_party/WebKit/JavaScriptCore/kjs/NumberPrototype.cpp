@@ -35,30 +35,30 @@ namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(NumberPrototype);
 
-static JSValue* numberProtoFuncToString(ExecState*,
-                                        JSObject*,
-                                        JSValue*,
-                                        const ArgList&);
-static JSValue* numberProtoFuncToLocaleString(ExecState*,
-                                              JSObject*,
-                                              JSValue*,
-                                              const ArgList&);
-static JSValue* numberProtoFuncValueOf(ExecState*,
-                                       JSObject*,
-                                       JSValue*,
-                                       const ArgList&);
-static JSValue* numberProtoFuncToFixed(ExecState*,
-                                       JSObject*,
-                                       JSValue*,
-                                       const ArgList&);
-static JSValue* numberProtoFuncToExponential(ExecState*,
+static JSValuePtr numberProtoFuncToString(ExecState*,
+                                          JSObject*,
+                                          JSValuePtr,
+                                          const ArgList&);
+static JSValuePtr numberProtoFuncToLocaleString(ExecState*,
+                                                JSObject*,
+                                                JSValuePtr,
+                                                const ArgList&);
+static JSValuePtr numberProtoFuncValueOf(ExecState*,
+                                         JSObject*,
+                                         JSValuePtr,
+                                         const ArgList&);
+static JSValuePtr numberProtoFuncToFixed(ExecState*,
+                                         JSObject*,
+                                         JSValuePtr,
+                                         const ArgList&);
+static JSValuePtr numberProtoFuncToExponential(ExecState*,
+                                               JSObject*,
+                                               JSValuePtr,
+                                               const ArgList&);
+static JSValuePtr numberProtoFuncToPrecision(ExecState*,
                                              JSObject*,
-                                             JSValue*,
+                                             JSValuePtr,
                                              const ArgList&);
-static JSValue* numberProtoFuncToPrecision(ExecState*,
-                                           JSObject*,
-                                           JSValue*,
-                                           const ArgList&);
 
 // ECMA 15.7.4
 
@@ -174,11 +174,11 @@ static double intPow10(int e) {
   return static_cast<double>(result);
 }
 
-JSValue* numberProtoFuncToString(ExecState* exec,
-                                 JSObject*,
-                                 JSValue* thisValue,
-                                 const ArgList& args) {
-  JSValue* v = thisValue->getJSNumber();
+JSValuePtr numberProtoFuncToString(ExecState* exec,
+                                   JSObject*,
+                                   JSValuePtr thisValue,
+                                   const ArgList& args) {
+  JSValuePtr v = thisValue->getJSNumber();
   if (!v)
     return throwError(exec, TypeError);
 
@@ -241,39 +241,39 @@ JSValue* numberProtoFuncToString(ExecState* exec,
   return jsString(exec, startOfResultString);
 }
 
-JSValue* numberProtoFuncToLocaleString(ExecState* exec,
-                                       JSObject*,
-                                       JSValue* thisValue,
-                                       const ArgList&) {
+JSValuePtr numberProtoFuncToLocaleString(ExecState* exec,
+                                         JSObject*,
+                                         JSValuePtr thisValue,
+                                         const ArgList&) {
   // FIXME: Not implemented yet.
 
-  JSValue* v = thisValue->getJSNumber();
+  JSValuePtr v = thisValue->getJSNumber();
   if (!v)
     return throwError(exec, TypeError);
 
   return jsString(exec, v->toString(exec));
 }
 
-JSValue* numberProtoFuncValueOf(ExecState* exec,
-                                JSObject*,
-                                JSValue* thisValue,
-                                const ArgList&) {
-  JSValue* v = thisValue->getJSNumber();
+JSValuePtr numberProtoFuncValueOf(ExecState* exec,
+                                  JSObject*,
+                                  JSValuePtr thisValue,
+                                  const ArgList&) {
+  JSValuePtr v = thisValue->getJSNumber();
   if (!v)
     return throwError(exec, TypeError);
 
   return v;
 }
 
-JSValue* numberProtoFuncToFixed(ExecState* exec,
-                                JSObject*,
-                                JSValue* thisValue,
-                                const ArgList& args) {
-  JSValue* v = thisValue->getJSNumber();
+JSValuePtr numberProtoFuncToFixed(ExecState* exec,
+                                  JSObject*,
+                                  JSValuePtr thisValue,
+                                  const ArgList& args) {
+  JSValuePtr v = thisValue->getJSNumber();
   if (!v)
     return throwError(exec, TypeError);
 
-  JSValue* fractionDigits = args.at(exec, 0);
+  JSValuePtr fractionDigits = args.at(exec, 0);
   double df = fractionDigits->toInteger(exec);
   if (!(df >= 0 && df <= 20))
     return throwError(exec, RangeError,
@@ -355,11 +355,11 @@ static void exponentialPartToString(char* buf, int& i, int decimalPoint) {
   buf[i++] = static_cast<char>('0' + exponential % 10);
 }
 
-JSValue* numberProtoFuncToExponential(ExecState* exec,
-                                      JSObject*,
-                                      JSValue* thisValue,
-                                      const ArgList& args) {
-  JSValue* v = thisValue->getJSNumber();
+JSValuePtr numberProtoFuncToExponential(ExecState* exec,
+                                        JSObject*,
+                                        JSValuePtr thisValue,
+                                        const ArgList& args) {
+  JSValuePtr v = thisValue->getJSNumber();
   if (!v)
     return throwError(exec, TypeError);
 
@@ -368,7 +368,7 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
   if (isnan(x) || isinf(x))
     return jsString(exec, UString::from(x));
 
-  JSValue* fractionalDigitsValue = args.at(exec, 0);
+  JSValuePtr fractionalDigitsValue = args.at(exec, 0);
   double df = fractionalDigitsValue->toInteger(exec);
   if (!(df >= 0 && df <= 20))
     return throwError(exec, RangeError,
@@ -430,11 +430,11 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
   return jsString(exec, buf);
 }
 
-JSValue* numberProtoFuncToPrecision(ExecState* exec,
-                                    JSObject*,
-                                    JSValue* thisValue,
-                                    const ArgList& args) {
-  JSValue* v = thisValue->getJSNumber();
+JSValuePtr numberProtoFuncToPrecision(ExecState* exec,
+                                      JSObject*,
+                                      JSValuePtr thisValue,
+                                      const ArgList& args) {
+  JSValuePtr v = thisValue->getJSNumber();
   if (!v)
     return throwError(exec, TypeError);
 

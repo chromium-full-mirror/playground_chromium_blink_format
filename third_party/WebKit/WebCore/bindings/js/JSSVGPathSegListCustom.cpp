@@ -35,7 +35,7 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSValue* JSSVGPathSegList::clear(ExecState* exec, const ArgList& args) {
+JSValuePtr JSSVGPathSegList::clear(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
 
   SVGPathSegList* imp = static_cast<SVGPathSegList*>(impl());
@@ -47,7 +47,7 @@ JSValue* JSSVGPathSegList::clear(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValue* JSSVGPathSegList::initialize(ExecState* exec, const ArgList& args) {
+JSValuePtr JSSVGPathSegList::initialize(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   SVGPathSeg* newItem = toSVGPathSeg(args.at(exec, 0));
 
@@ -55,14 +55,14 @@ JSValue* JSSVGPathSegList::initialize(ExecState* exec, const ArgList& args) {
 
   SVGPathSeg* obj = WTF::getPtr(imp->initialize(newItem, ec));
 
-  JSC::JSValue* result = toJS(exec, obj, m_context.get());
+  JSC::JSValuePtr result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
   m_context->svgAttributeChanged(imp->associatedAttributeName());
   return result;
 }
 
-JSValue* JSSVGPathSegList::getItem(ExecState* exec, const ArgList& args) {
+JSValuePtr JSSVGPathSegList::getItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
 
   bool indexOk;
@@ -75,13 +75,13 @@ JSValue* JSSVGPathSegList::getItem(ExecState* exec, const ArgList& args) {
   SVGPathSegList* imp = static_cast<SVGPathSegList*>(impl());
   SVGPathSeg* obj = WTF::getPtr(imp->getItem(index, ec));
 
-  JSC::JSValue* result = toJS(exec, obj, m_context.get());
+  JSC::JSValuePtr result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
   return result;
 }
 
-JSValue* JSSVGPathSegList::insertItemBefore(ExecState* exec,
-                                            const ArgList& args) {
+JSValuePtr JSSVGPathSegList::insertItemBefore(ExecState* exec,
+                                              const ArgList& args) {
   ExceptionCode ec = 0;
   SVGPathSeg* newItem = toSVGPathSeg(args.at(exec, 0));
 
@@ -94,7 +94,7 @@ JSValue* JSSVGPathSegList::insertItemBefore(ExecState* exec,
 
   SVGPathSegList* imp = static_cast<SVGPathSegList*>(impl());
 
-  JSC::JSValue* result =
+  JSC::JSValuePtr result =
       toJS(exec, WTF::getPtr(imp->insertItemBefore(newItem, index, ec)),
            m_context.get());
   setDOMException(exec, ec);
@@ -103,7 +103,7 @@ JSValue* JSSVGPathSegList::insertItemBefore(ExecState* exec,
   return result;
 }
 
-JSValue* JSSVGPathSegList::replaceItem(ExecState* exec, const ArgList& args) {
+JSValuePtr JSSVGPathSegList::replaceItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   SVGPathSeg* newItem = toSVGPathSeg(args.at(exec, 0));
 
@@ -116,7 +116,7 @@ JSValue* JSSVGPathSegList::replaceItem(ExecState* exec, const ArgList& args) {
 
   SVGPathSegList* imp = static_cast<SVGPathSegList*>(impl());
 
-  JSC::JSValue* result = toJS(
+  JSC::JSValuePtr result = toJS(
       exec, WTF::getPtr(imp->replaceItem(newItem, index, ec)), m_context.get());
   setDOMException(exec, ec);
 
@@ -124,7 +124,7 @@ JSValue* JSSVGPathSegList::replaceItem(ExecState* exec, const ArgList& args) {
   return result;
 }
 
-JSValue* JSSVGPathSegList::removeItem(ExecState* exec, const ArgList& args) {
+JSValuePtr JSSVGPathSegList::removeItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
 
   bool indexOk;
@@ -138,20 +138,20 @@ JSValue* JSSVGPathSegList::removeItem(ExecState* exec, const ArgList& args) {
 
   RefPtr<SVGPathSeg> obj(imp->removeItem(index, ec));
 
-  JSC::JSValue* result = toJS(exec, obj.get(), m_context.get());
+  JSC::JSValuePtr result = toJS(exec, obj.get(), m_context.get());
   setDOMException(exec, ec);
 
   m_context->svgAttributeChanged(imp->associatedAttributeName());
   return result;
 }
 
-JSValue* JSSVGPathSegList::appendItem(ExecState* exec, const ArgList& args) {
+JSValuePtr JSSVGPathSegList::appendItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   SVGPathSeg* newItem = toSVGPathSeg(args.at(exec, 0));
 
   SVGPathSegList* imp = static_cast<SVGPathSegList*>(impl());
 
-  JSC::JSValue* result =
+  JSC::JSValuePtr result =
       toJS(exec, WTF::getPtr(imp->appendItem(newItem, ec)), m_context.get());
   setDOMException(exec, ec);
 
