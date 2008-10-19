@@ -46,7 +46,7 @@ JSValuePtr JSHTMLFormElement::nameGetter(ExecState* exec,
                                          const Identifier& propertyName,
                                          const PropertySlot& slot) {
   HTMLFormElement* form = static_cast<HTMLFormElement*>(
-      static_cast<JSHTMLElement*>(slot.slotBase())->impl());
+      static_cast<JSHTMLElement*>(asObject(slot.slotBase()))->impl());
 
   Vector<RefPtr<Node>> namedItems;
   form->getNamedElements(propertyName, namedItems);

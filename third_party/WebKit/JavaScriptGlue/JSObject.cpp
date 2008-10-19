@@ -74,7 +74,7 @@ static JSValuePtr nativeCallFunction(ExecState* exec,
                                      JSValuePtr thisValue,
                                      const ArgList& args) {
   return static_cast<UserObjectImp*>(functionObject)
-      ->callAsFunction(exec, static_cast<JSObject*>(thisValue), args);
+      ->callAsFunction(exec, asObject(thisValue), args);
 }
 
 CallType JSUserObject::getCallData(CallData& callData) {

@@ -127,7 +127,7 @@ JSValuePtr ScriptController::evaluate(const String& sourceURL,
     m_frame->domWindow()->console()->reportException(exec, comp.value());
 
   m_sourceURL = savedSourceURL;
-  return 0;
+  return noValue();
 }
 
 void ScriptController::clearWindowShell() {

@@ -46,13 +46,13 @@ class UserObjectImp : public JSObject {
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const ArgList& args);
+  virtual JSValuePtr callAsFunction(ExecState* exec,
+                                    JSObject* thisObj,
+                                    const ArgList& args);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   JSValue* value,
+                   JSValuePtr value,
                    int attr = None);
 
   JSValuePtr toPrimitive(ExecState*,

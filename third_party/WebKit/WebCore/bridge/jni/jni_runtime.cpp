@@ -99,7 +99,7 @@ jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
     if (mid != NULL) {
       RootObject* rootObject = instance->rootObject();
       if (rootObject && rootObject->nativeHandle()) {
-        JSValue* exceptionDescription = NULL;
+        JSValuePtr exceptionDescription = noValue();
         jvalue args[1];
 
         args[0].l = jinstance;
@@ -113,11 +113,11 @@ jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
   return result;
 }
 
-JSValue* JavaField::valueFromInstance(ExecState* exec,
-                                      const Instance* i) const {
+JSValuePtr JavaField::valueFromInstance(ExecState* exec,
+                                        const Instance* i) const {
   const JavaInstance* instance = static_cast<const JavaInstance*>(i);
 
-  JSValue* jsresult = jsUndefined();
+  JSValuePtr jsresult = jsUndefined();
 
   switch (_JNIType) {
     case array_type:
@@ -189,7 +189,7 @@ void JavaField::dispatchSetValueToInstance(ExecState* exec,
     if (mid != NULL) {
       RootObject* rootObject = instance->rootObject();
       if (rootObject && rootObject->nativeHandle()) {
-        JSValue* exceptionDescription = NULL;
+        JSValuePtr exceptionDescription = noValue();
         jvalue args[2];
         jvalue result;
 
@@ -206,7 +206,7 @@ void JavaField::dispatchSetValueToInstance(ExecState* exec,
 
 void JavaField::setValueToInstance(ExecState* exec,
                                    const Instance* i,
-                                   JSValue* aValue) const {
+                                   JSValuePtr aValue) const {
   const JavaInstance* instance = static_cast<const JavaInstance*>(i);
   jvalue javaValue = convertValueToJValue(exec, aValue, _JNIType, type());
 
@@ -402,8 +402,8 @@ RootObject* JavaArray::rootObject() const {
 }
 
 void JavaArray::setValueAt(ExecState* exec,
-                           unsigned int index,
-                           JSValue* aValue) const {
+                           unsigned index,
+                           JSValuePtr aValue) const {
   JNIEnv* env = getJNIEnv();
   char* javaClassName = 0;
 
@@ -471,7 +471,7 @@ void JavaArray::setValueAt(ExecState* exec,
     free((void*)javaClassName);
 }
 
-JSValue* JavaArray::valueAt(ExecState* exec, unsigned int index) const {
+JSValuePtr JavaArray::valueAt(ExecState* exec, unsigned index) const {
   JNIEnv* env = getJNIEnv();
   JNIType arrayType = JNITypeFromPrimitiveType(_type[1]);
   switch (arrayType) {

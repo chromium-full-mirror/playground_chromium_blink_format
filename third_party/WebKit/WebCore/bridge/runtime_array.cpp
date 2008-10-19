@@ -39,17 +39,17 @@ const ClassInfo RuntimeArray::s_info = {"RuntimeArray", &JSArray::info, 0, 0};
 RuntimeArray::RuntimeArray(ExecState* exec, Bindings::Array* a)
     : JSObject(getDOMStructure<RuntimeArray>(exec)), _array(a) {}
 
-JSValue* RuntimeArray::lengthGetter(ExecState* exec,
-                                    const Identifier&,
-                                    const PropertySlot& slot) {
-  RuntimeArray* thisObj = static_cast<RuntimeArray*>(slot.slotBase());
+JSValuePtr RuntimeArray::lengthGetter(ExecState* exec,
+                                      const Identifier&,
+                                      const PropertySlot& slot) {
+  RuntimeArray* thisObj = static_cast<RuntimeArray*>(asObject(slot.slotBase()));
   return jsNumber(exec, thisObj->getLength());
 }
 
-JSValue* RuntimeArray::indexGetter(ExecState* exec,
-                                   const Identifier&,
-                                   const PropertySlot& slot) {
-  RuntimeArray* thisObj = static_cast<RuntimeArray*>(slot.slotBase());
+JSValuePtr RuntimeArray::indexGetter(ExecState* exec,
+                                     const Identifier&,
+                                     const PropertySlot& slot) {
+  RuntimeArray* thisObj = static_cast<RuntimeArray*>(asObject(slot.slotBase()));
   return thisObj->getConcreteArray()->valueAt(exec, slot.index());
 }
 

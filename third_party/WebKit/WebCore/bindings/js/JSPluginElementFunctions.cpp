@@ -64,7 +64,8 @@ static RuntimeObjectImp* getRuntimeObject(ExecState* exec, Node* node) {
 JSValuePtr runtimeObjectGetter(ExecState* exec,
                                const Identifier& propertyName,
                                const PropertySlot& slot) {
-  JSHTMLElement* thisObj = static_cast<JSHTMLElement*>(slot.slotBase());
+  JSHTMLElement* thisObj =
+      static_cast<JSHTMLElement*>(asObject(slot.slotBase()));
   HTMLElement* element = static_cast<HTMLElement*>(thisObj->impl());
   RuntimeObjectImp* runtimeObject = getRuntimeObject(exec, element);
   return runtimeObject ? runtimeObject : jsUndefined();
@@ -73,7 +74,8 @@ JSValuePtr runtimeObjectGetter(ExecState* exec,
 JSValuePtr runtimeObjectPropertyGetter(ExecState* exec,
                                        const Identifier& propertyName,
                                        const PropertySlot& slot) {
-  JSHTMLElement* thisObj = static_cast<JSHTMLElement*>(slot.slotBase());
+  JSHTMLElement* thisObj =
+      static_cast<JSHTMLElement*>(asObject(slot.slotBase()));
   HTMLElement* element = static_cast<HTMLElement*>(thisObj->impl());
   RuntimeObjectImp* runtimeObject = getRuntimeObject(exec, element);
   if (!runtimeObject)

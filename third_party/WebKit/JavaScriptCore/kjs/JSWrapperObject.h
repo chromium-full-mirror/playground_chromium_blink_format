@@ -42,7 +42,7 @@ class JSWrapperObject : public JSObject {
 };
 
 inline JSWrapperObject::JSWrapperObject(PassRefPtr<StructureID> structure)
-    : JSObject(structure), m_internalValue(0) {}
+    : JSObject(structure), m_internalValue(noValue()) {}
 
 inline void JSWrapperObject::setInternalValue(JSValuePtr value) {
   ASSERT(value);

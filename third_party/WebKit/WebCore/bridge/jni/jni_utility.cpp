@@ -343,14 +343,13 @@ jvalue getJNIField(jobject obj,
 }
 
 static jobject convertArrayInstanceToJavaArray(ExecState* exec,
-                                               JSValue* value,
+                                               JSArray* jsArray,
                                                const char* javaClassName) {
   JNIEnv* env = getJNIEnv();
   // As JS Arrays can contain a mixture of objects, assume we can convert to
   // the requested Java Array type requested, unless the array type is some
   // object array
   // other than a string.
-  JSArray* jsArray = static_cast<JSArray*>(value);
   unsigned length = jsArray->length();
   jobjectArray jarray = 0;
 
@@ -471,7 +470,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
 }
 
 jvalue convertValueToJValue(ExecState* exec,
-                            JSValue* value,
+                            JSValuePtr value,
                             JNIType _JNIType,
                             const char* javaClassName) {
   JSLock lock(false);
@@ -485,9 +484,9 @@ jvalue convertValueToJValue(ExecState* exec,
 
       // First see if we have a Java instance.
       if (value->isObject()) {
-        JSObject* objectImp = static_cast<JSObject*>(value);
+        JSObject* objectImp = asObject(value);
         if (objectImp->classInfo() == &RuntimeObjectImp::s_info) {
-          RuntimeObjectImp* imp = static_cast<RuntimeObjectImp*>(value);
+          RuntimeObjectImp* imp = static_cast<RuntimeObjectImp*>(objectImp);
           JavaInstance* instance =
               static_cast<JavaInstance*>(imp->getInternalInstance());
           if (instance)
@@ -495,13 +494,13 @@ jvalue convertValueToJValue(ExecState* exec,
         } else if (objectImp->classInfo() == &RuntimeArray::s_info) {
           // Input is a JavaScript Array that was originally created from a Java
           // Array
-          RuntimeArray* imp = static_cast<RuntimeArray*>(value);
+          RuntimeArray* imp = static_cast<RuntimeArray*>(objectImp);
           JavaArray* array = static_cast<JavaArray*>(imp->getConcreteArray());
           result.l = array->javaArray();
         } else if (objectImp->classInfo() == &JSArray::info) {
           // Input is a Javascript Array. We need to create it to a Java Array.
-          result.l =
-              convertArrayInstanceToJavaArray(exec, value, javaClassName);
+          result.l = convertArrayInstanceToJavaArray(exec, asArray(value),
+                                                     javaClassName);
         }
       }
 

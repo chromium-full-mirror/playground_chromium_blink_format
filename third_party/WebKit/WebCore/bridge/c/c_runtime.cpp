@@ -76,7 +76,7 @@ JSValuePtr CField::valueFromInstance(ExecState* exec,
 
 void CField::setValueToInstance(ExecState* exec,
                                 const Instance* inst,
-                                JSValue* aValue) const {
+                                JSValuePtr aValue) const {
   const CInstance* instance = static_cast<const CInstance*>(inst);
   NPObject* obj = instance->getObject();
   if (obj->_class->setProperty) {

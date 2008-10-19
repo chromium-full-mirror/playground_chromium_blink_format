@@ -132,7 +132,7 @@ JSValuePtr JSCSSStyleDeclaration::nameGetter(ExecState* exec,
                                              const Identifier& propertyName,
                                              const PropertySlot& slot) {
   JSCSSStyleDeclaration* thisObj =
-      static_cast<JSCSSStyleDeclaration*>(slot.slotBase());
+      static_cast<JSCSSStyleDeclaration*>(asObject(slot.slotBase()));
 
   // Set up pixelOrPos boolean to handle the fact that
   // pixelTop returns "CSS Top" as number value in unit pixels

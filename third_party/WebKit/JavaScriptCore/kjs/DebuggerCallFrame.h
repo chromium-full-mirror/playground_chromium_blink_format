@@ -38,7 +38,7 @@ class DebuggerCallFrame {
   enum Type { ProgramType, FunctionType };
 
   DebuggerCallFrame(CallFrame* callFrame)
-      : m_callFrame(callFrame), m_exception(0) {}
+      : m_callFrame(callFrame), m_exception(noValue()) {}
 
   DebuggerCallFrame(CallFrame* callFrame, JSValuePtr exception)
       : m_callFrame(callFrame), m_exception(exception) {}

@@ -51,7 +51,7 @@ JSValuePtr JSInspectedObjectWrapper::wrap(ExecState* unwrappedExec,
   if (!unwrappedValue->isObject())
     return unwrappedValue;
 
-  JSObject* unwrappedObject = static_cast<JSObject*>(unwrappedValue);
+  JSObject* unwrappedObject = asObject(unwrappedValue);
 
   if (unwrappedObject->inherits(&JSInspectedObjectWrapper::s_info))
     return unwrappedObject;
@@ -68,10 +68,10 @@ JSValuePtr JSInspectedObjectWrapper::wrap(ExecState* unwrappedExec,
     return new (unwrappedExec) JSInspectedObjectWrapper(
         unwrappedExec, unwrappedObject,
         JSQuarantinedObjectWrapper::createStructureID(jsNull()));
-  return new (unwrappedExec) JSInspectedObjectWrapper(
-      unwrappedExec, unwrappedObject,
-      JSQuarantinedObjectWrapper::createStructureID(
-          static_cast<JSObject*>(wrap(unwrappedExec, prototype))));
+  return new (unwrappedExec)
+      JSInspectedObjectWrapper(unwrappedExec, unwrappedObject,
+                               JSQuarantinedObjectWrapper::createStructureID(
+                                   asObject(wrap(unwrappedExec, prototype))));
 }
 
 JSInspectedObjectWrapper::JSInspectedObjectWrapper(

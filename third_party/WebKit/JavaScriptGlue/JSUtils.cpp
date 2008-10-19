@@ -43,7 +43,7 @@ struct ObjectImpList {
   CFTypeRef data;
 };
 
-static CFTypeRef KJSValueToCFTypeInternal(JSValue* inValue,
+static CFTypeRef KJSValueToCFTypeInternal(JSValuePtr inValue,
                                           ExecState* exec,
                                           ObjectImpList* inImps);
 
@@ -93,11 +93,12 @@ CFStringRef IdentifierToCFString(const Identifier& inIdentifier) {
 //--------------------------------------------------------------------------
 // KJSValueToJSObject
 //--------------------------------------------------------------------------
-JSUserObject* KJSValueToJSObject(JSValue* inValue, ExecState* exec) {
+JSUserObject* KJSValueToJSObject(JSValuePtr inValue, ExecState* exec) {
   JSUserObject* result = 0;
 
   if (inValue->isObject(&UserObjectImp::info)) {
-    UserObjectImp* userObjectImp = static_cast<UserObjectImp*>(inValue);
+    UserObjectImp* userObjectImp =
+        static_cast<UserObjectImp*>(asObject(inValue));
     result = userObjectImp->GetJSUserObject();
     if (result)
       result->Retain();
@@ -118,10 +119,10 @@ JSUserObject* KJSValueToJSObject(JSValue* inValue, ExecState* exec) {
 //--------------------------------------------------------------------------
 // JSObjectKJSValue
 //--------------------------------------------------------------------------
-JSValue* JSObjectKJSValue(JSUserObject* ptr) {
+JSValuePtr JSObjectKJSValue(JSUserObject* ptr) {
   JSLock lock(true);
 
-  JSValue* result = jsUndefined();
+  JSValuePtr result = jsUndefined();
   if (ptr) {
     bool handled = false;
 
@@ -171,7 +172,7 @@ JSValue* JSObjectKJSValue(JSUserObject* ptr) {
 // KJSValueToCFTypeInternal
 //--------------------------------------------------------------------------
 // Caller is responsible for releasing the returned CFTypeRef
-CFTypeRef KJSValueToCFTypeInternal(JSValue* inValue,
+CFTypeRef KJSValueToCFTypeInternal(JSValuePtr inValue,
                                    ExecState* exec,
                                    ObjectImpList* inImps) {
   if (!inValue)
@@ -207,7 +208,8 @@ CFTypeRef KJSValueToCFTypeInternal(JSValue* inValue,
 
   if (inValue->isObject()) {
     if (inValue->isObject(&UserObjectImp::info)) {
-      UserObjectImp* userObjectImp = static_cast<UserObjectImp*>(inValue);
+      UserObjectImp* userObjectImp =
+          static_cast<UserObjectImp*>(asObject(inValue));
       JSUserObject* ptr = userObjectImp->GetJSUserObject();
       if (ptr) {
         result = ptr->CopyCFValue();
@@ -319,7 +321,7 @@ CFTypeRef KJSValueToCFTypeInternal(JSValue* inValue,
   return 0;
 }
 
-CFTypeRef KJSValueToCFType(JSValue* inValue, ExecState* exec) {
+CFTypeRef KJSValueToCFType(JSValuePtr inValue, ExecState* exec) {
   return KJSValueToCFTypeInternal(inValue, exec, 0);
 }
 

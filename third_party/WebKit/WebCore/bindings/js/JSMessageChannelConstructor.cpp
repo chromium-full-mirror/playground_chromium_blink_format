@@ -41,7 +41,7 @@ JSMessageChannelConstructor::JSMessageChannelConstructor(ExecState* exec,
                                                          Document* document)
     : DOMObject(JSMessageChannelConstructor::createStructureID(
           exec->lexicalGlobalObject()->objectPrototype())),
-      m_document(static_cast<JSDocument*>(toJS(exec, document))) {
+      m_document(static_cast<JSDocument*>(asObject(toJS(exec, document)))) {
   putDirect(exec->propertyNames().prototype,
             JSMessageChannelPrototype::self(exec), None);
 }
@@ -57,7 +57,7 @@ ConstructType JSMessageChannelConstructor::getConstructData(
 JSObject* JSMessageChannelConstructor::construct(ExecState* exec,
                                                  JSObject* constructor,
                                                  const ArgList&) {
-  return static_cast<JSObject*>(toJS(
+  return asObject(toJS(
       exec,
       MessageChannel::create(
           static_cast<JSMessageChannelConstructor*>(constructor)->document())));

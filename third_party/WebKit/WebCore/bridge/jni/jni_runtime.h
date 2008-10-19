@@ -98,11 +98,11 @@ class JavaField : public Field {
  public:
   JavaField(JNIEnv* env, jobject aField);
 
-  virtual JSValue* valueFromInstance(ExecState* exec,
-                                     const Instance* instance) const;
+  virtual JSValuePtr valueFromInstance(ExecState* exec,
+                                       const Instance* instance) const;
   virtual void setValueToInstance(ExecState* exec,
                                   const Instance* instance,
-                                  JSValue* aValue) const;
+                                  JSValuePtr aValue) const;
 
   virtual const char* name() const { return _name.UTF8String(); }
   virtual RuntimeType type() const { return _type.UTF8String(); }
@@ -164,8 +164,8 @@ class JavaArray : public Array {
 
   virtual void setValueAt(ExecState* exec,
                           unsigned int index,
-                          JSValue* aValue) const;
-  virtual JSValue* valueAt(ExecState* exec, unsigned int index) const;
+                          JSValuePtr aValue) const;
+  virtual JSValuePtr valueAt(ExecState* exec, unsigned int index) const;
   virtual unsigned int getLength() const;
 
   jobject javaArray() const { return _array->_instance; }

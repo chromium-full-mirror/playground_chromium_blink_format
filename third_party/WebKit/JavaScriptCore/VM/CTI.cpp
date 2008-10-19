@@ -3447,7 +3447,7 @@ void CTI::unlinkCall(StructureStubInfo* structureStubInfo) {
   // we could get a false positive
   // match).  Reset the check so it no longer matches.
   reinterpret_cast<void**>(structureStubInfo->hotPathBegin)[-1] =
-      JSImmediate::impossibleValue();
+      asPointer(JSImmediate::impossibleValue());
 }
 
 void CTI::linkCall(CodeBlock* callerCodeBlock,

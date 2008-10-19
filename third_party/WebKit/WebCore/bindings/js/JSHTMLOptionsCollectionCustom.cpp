@@ -90,7 +90,7 @@ JSValuePtr JSHTMLOptionsCollection::remove(ExecState* exec,
                                            const ArgList& args) {
   HTMLOptionsCollection* imp = static_cast<HTMLOptionsCollection*>(impl());
   JSHTMLSelectElement* base =
-      static_cast<JSHTMLSelectElement*>(toJS(exec, imp->base()));
+      static_cast<JSHTMLSelectElement*>(asObject(toJS(exec, imp->base())));
   return base->remove(exec, args);
 }
 }

@@ -45,7 +45,7 @@ bool JSStorage::canGetItemsForName(ExecState*,
 JSValuePtr JSStorage::nameGetter(ExecState* exec,
                                  const Identifier& propertyName,
                                  const PropertySlot& slot) {
-  JSStorage* thisObj = static_cast<JSStorage*>(slot.slotBase());
+  JSStorage* thisObj = static_cast<JSStorage*>(asObject(slot.slotBase()));
   return jsStringOrNull(exec, thisObj->impl()->getItem(propertyName));
 }
 
@@ -63,7 +63,7 @@ bool JSStorage::deleteProperty(ExecState* exec,
 
   JSValuePtr prototype = this->prototype();
   if (prototype->isObject() &&
-      static_cast<JSObject*>(prototype)->hasProperty(exec, propertyName))
+      asObject(prototype)->hasProperty(exec, propertyName))
     return false;
 
   m_impl->removeItem(propertyName);
@@ -96,7 +96,7 @@ bool JSStorage::customPut(ExecState* exec,
 
   JSValuePtr prototype = this->prototype();
   if (prototype->isObject() &&
-      static_cast<JSObject*>(prototype)->hasProperty(exec, propertyName))
+      asObject(prototype)->hasProperty(exec, propertyName))
     return false;
 
   String stringValue = valueToStringWithNullCheck(exec, value);
