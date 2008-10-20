@@ -1097,12 +1097,13 @@ void Frame::setExcludeFromTextSearch(bool exclude) {
 // returns FloatRect because going through IntRect would truncate any floats
 FloatRect Frame::selectionRect(bool clipToVisibleContent) const {
   RenderView* root = contentRenderer();
-  if (!root)
+  FrameView* view = d->m_view.get();
+  if (!root || !view)
     return IntRect();
 
   IntRect selectionRect = root->selectionRect(clipToVisibleContent);
   return clipToVisibleContent
-             ? intersection(selectionRect, d->m_view->visibleContentRect())
+             ? intersection(selectionRect, view->visibleContentRect())
              : selectionRect;
 }
 
