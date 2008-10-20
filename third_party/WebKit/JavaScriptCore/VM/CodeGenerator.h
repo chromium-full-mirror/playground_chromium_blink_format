@@ -260,6 +260,7 @@ class CodeGenerator {
   RegisterID* emitLoad(RegisterID* dst, double);
   RegisterID* emitLoad(RegisterID* dst, const Identifier&);
   RegisterID* emitLoad(RegisterID* dst, JSValuePtr);
+  RegisterID* emitLoad(RegisterID* dst, JSCell*);
   RegisterID* emitUnexpectedLoad(RegisterID* dst, bool);
   RegisterID* emitUnexpectedLoad(RegisterID* dst, double);
 
@@ -438,16 +439,16 @@ class CodeGenerator {
                                             ControlFlowContext* topScope,
                                             ControlFlowContext* bottomScope);
 
-  struct JSValueHashTraits : HashTraits<JSValuePtr> {
-    static void constructDeletedValue(JSValuePtr& slot) {
-      slot = JSImmediate::impossibleValue();
+  struct JSValueHashTraits : HashTraits<JSValue*> {
+    static void constructDeletedValue(JSValue*& slot) {
+      slot = JSImmediate::impossibleValue().payload();
     }
-    static bool isDeletedValue(JSValuePtr value) {
-      return value == JSImmediate::impossibleValue();
+    static bool isDeletedValue(JSValue* value) {
+      return value == JSImmediate::impossibleValue().payload();
     }
   };
 
-  typedef HashMap<JSValuePtr, unsigned, PtrHash<JSValuePtr>, JSValueHashTraits>
+  typedef HashMap<JSValue*, unsigned, PtrHash<JSValue*>, JSValueHashTraits>
       JSValueMap;
 
   struct IdentifierMapIndexHashTraits {
@@ -525,7 +526,7 @@ class CodeGenerator {
   unsigned addConstant(const Identifier&);
   RegisterID* addConstant(JSValuePtr);
   unsigned addUnexpectedConstant(JSValuePtr);
-  unsigned addRegExp(RegExp* r);
+  unsigned addRegExp(RegExp*);
   StructureID* addStructureID();
 
   Vector<Instruction>& instructions() { return m_codeBlock->instructions; }

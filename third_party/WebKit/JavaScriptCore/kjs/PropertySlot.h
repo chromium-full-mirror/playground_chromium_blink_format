@@ -42,8 +42,8 @@ class PropertySlot {
     clearValue();
   }
 
-  explicit PropertySlot(const JSValue* base)
-      : m_slotBase(const_cast<JSValuePtr>(base)), m_offset(WTF::notFound) {
+  explicit PropertySlot(JSValuePtr base)
+      : m_slotBase(base), m_offset(WTF::notFound) {
     clearValue();
   }
 

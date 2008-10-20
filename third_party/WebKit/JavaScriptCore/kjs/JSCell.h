@@ -119,7 +119,7 @@ JSCell* asCell(JSValuePtr);
 
 inline JSCell* asCell(JSValuePtr value) {
   ASSERT(!JSImmediate::isImmediate(value));
-  return static_cast<JSCell*>(value);
+  return static_cast<JSCell*>(value.payload());
 }
 
 inline JSCell::JSCell(StructureID* structureID) : m_structureID(structureID) {}
@@ -152,7 +152,7 @@ inline void JSCell::mark() {
 
 ALWAYS_INLINE JSCell* JSValue::asCell() const {
   ASSERT(!JSImmediate::isImmediate(asValue()));
-  return reinterpret_cast<JSCell*>(const_cast<JSValuePtr>(this));
+  return reinterpret_cast<JSCell*>(const_cast<JSValue*>(this));
 }
 
 inline void* JSCell::operator new(size_t size, JSGlobalData* globalData) {
@@ -162,6 +162,11 @@ inline void* JSCell::operator new(size_t size, JSGlobalData* globalData) {
   return globalData->heap.allocate(size);
 #endif
 }
+
+// --- JSValuePtr inlines ----------------------------
+
+inline JSValuePtr::JSValuePtr(const JSCell* cell)
+    : m_payload(reinterpret_cast<JSValue*>(const_cast<JSCell*>(cell))) {}
 
 // --- JSValue inlines ----------------------------
 
