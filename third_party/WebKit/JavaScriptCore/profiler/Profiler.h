@@ -51,18 +51,18 @@ class Profiler {
 
   static Profiler* profiler();
   static CallIdentifier createCallIdentifier(JSGlobalData*,
-                                             JSObject*,
+                                             JSValuePtr,
                                              const UString& sourceURL,
                                              int lineNumber);
 
   void startProfiling(ExecState*, const UString& title);
   PassRefPtr<Profile> stopProfiling(ExecState*, const UString& title);
 
-  void willExecute(ExecState*, JSObject* calledFunction);
+  void willExecute(ExecState*, JSValuePtr function);
   void willExecute(ExecState*,
                    const UString& sourceURL,
                    int startingLineNumber);
-  void didExecute(ExecState*, JSObject* calledFunction);
+  void didExecute(ExecState*, JSValuePtr function);
   void didExecute(ExecState*, const UString& sourceURL, int startingLineNumber);
 
   const Vector<RefPtr<ProfileGenerator>>& currentProfiles() {

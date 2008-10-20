@@ -210,6 +210,8 @@ class Machine {
   static void SFX_CALL cti_op_create_arguments_no_params(CTI_ARGS);
   static void SFX_CALL cti_op_tear_off_activation(CTI_ARGS);
   static void SFX_CALL cti_op_tear_off_arguments(CTI_ARGS);
+  static void SFX_CALL cti_op_profile_will_call(CTI_ARGS);
+  static void SFX_CALL cti_op_profile_did_call(CTI_ARGS);
   static void SFX_CALL cti_op_ret_scopeChain(CTI_ARGS);
   static JSObject* SFX_CALL cti_op_new_array(CTI_ARGS);
   static JSValue* SFX_CALL cti_op_resolve(CTI_ARGS);
@@ -276,9 +278,6 @@ class Machine {
   static void SFX_CALL cti_op_put_setter(CTI_ARGS);
   static JSObject* SFX_CALL cti_op_new_error(CTI_ARGS);
   static void SFX_CALL cti_op_debug(CTI_ARGS);
-
-  static void SFX_CALL cti_op_call_profiler(CTI_ARGS);
-  static void SFX_CALL cti_op_ret_profiler(CTI_ARGS);
 
   static JSValue* SFX_CALL cti_vm_throw(CTI_ARGS);
   static void* SFX_CALL cti_vm_compile(CTI_ARGS);
@@ -378,6 +377,11 @@ class Machine {
                        JSValuePtr baseValue,
                        const PutPropertySlot&);
   void uncachePutByID(CodeBlock*, Instruction* vPC);
+
+  bool isCallOpcode(Opcode opcode) {
+    return opcode == getOpcode(op_call) || opcode == getOpcode(op_construct) ||
+           opcode == getOpcode(op_call_eval);
+  }
 
 #if ENABLE(CTI)
   static void throwStackOverflowPreviousFrame(CallFrame*,

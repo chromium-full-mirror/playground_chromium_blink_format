@@ -544,6 +544,7 @@ class CodeGenerator {
   }
 
   bool m_shouldEmitDebugHooks;
+  bool m_shouldEmitProfileHooks;
 
   const ScopeChain* m_scopeChain;
   SymbolTable* m_symbolTable;

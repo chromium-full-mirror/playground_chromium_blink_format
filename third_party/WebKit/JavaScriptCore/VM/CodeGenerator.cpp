@@ -212,6 +212,7 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
                              VarStack& varStack,
                              FunctionStack& functionStack)
     : m_shouldEmitDebugHooks(!!debugger),
+      m_shouldEmitProfileHooks(scopeChain.globalObject()->supportsProfiling()),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(programNode),
@@ -306,6 +307,7 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
                              SymbolTable* symbolTable,
                              CodeBlock* codeBlock)
     : m_shouldEmitDebugHooks(!!debugger),
+      m_shouldEmitProfileHooks(scopeChain.globalObject()->supportsProfiling()),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(functionBody),
@@ -379,6 +381,7 @@ CodeGenerator::CodeGenerator(EvalNode* evalNode,
                              SymbolTable* symbolTable,
                              EvalCodeBlock* codeBlock)
     : m_shouldEmitDebugHooks(!!debugger),
+      m_shouldEmitProfileHooks(scopeChain.globalObject()->supportsProfiling()),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(evalNode),
@@ -1221,6 +1224,11 @@ RegisterID* CodeGenerator::emitCall(OpcodeID opcodeID,
   for (int i = 0; i < RegisterFile::CallFrameHeaderSize; ++i)
     callFrame.append(newTemporary());
 
+  if (m_shouldEmitProfileHooks) {
+    emitOpcode(op_profile_will_call);
+    instructions().append(func->index());
+  }
+
   emitExpressionInfo(divot, startOffset, endOffset);
   m_codeBlock->structureIDInstructions.append(instructions().size());
   emitOpcode(opcodeID);
@@ -1236,6 +1244,12 @@ RegisterID* CodeGenerator::emitCall(OpcodeID opcodeID,
   instructions().append(argv.size());       // argc
   instructions().append(argv[0]->index() + argv.size() +
                         RegisterFile::CallFrameHeaderSize);  // registerOffset
+
+  if (m_shouldEmitProfileHooks) {
+    emitOpcode(op_profile_did_call);
+    instructions().append(func->index());
+  }
+
   return dst;
 }
 
@@ -1263,10 +1277,7 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
                                          unsigned endOffset) {
   ASSERT(func->refCount());
 
-  // Load prototype.
-  emitExpressionInfo(divot, startOffset, endOffset);
   RefPtr<RegisterID> funcProto = newTemporary();
-  emitGetById(funcProto.get(), func, globalData()->propertyNames->prototype);
 
   // Generate code for arguments.
   Vector<RefPtr<RegisterID>, 16> argv;
@@ -1277,6 +1288,15 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
     argv.append(newTemporary());
     emitNode(argv.last().get(), n);
   }
+
+  if (m_shouldEmitProfileHooks) {
+    emitOpcode(op_profile_will_call);
+    instructions().append(func->index());
+  }
+
+  // Load prototype.
+  emitExpressionInfo(divot, startOffset, endOffset);
+  emitGetById(funcProto.get(), func, globalData()->propertyNames->prototype);
 
   // Reserve space for call frame.
   Vector<RefPtr<RegisterID>, RegisterFile::CallFrameHeaderSize> callFrame;
@@ -1297,6 +1317,11 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
   emitOpcode(op_construct_verify);
   instructions().append(dst->index());
   instructions().append(argv[0]->index());
+
+  if (m_shouldEmitProfileHooks) {
+    emitOpcode(op_profile_did_call);
+    instructions().append(func->index());
+  }
 
   return dst;
 }

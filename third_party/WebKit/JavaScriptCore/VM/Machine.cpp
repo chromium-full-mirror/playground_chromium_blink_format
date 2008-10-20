@@ -628,11 +628,6 @@ NEVER_INLINE JSValuePtr Machine::callEval(CallFrame* callFrame,
   if (!program->isString())
     return program;
 
-  Profiler** profiler = Profiler::enabledProfilerReference();
-  if (*profiler)
-    (*profiler)->willExecute(callFrame,
-                             scopeChain->globalObject()->evalFunction());
-
   UString programSource = asString(program)->value();
 
   CodeBlock* codeBlock = callFrame->codeBlock();
@@ -646,10 +641,6 @@ NEVER_INLINE JSValuePtr Machine::callEval(CallFrame* callFrame,
         callFrame->registers() - registerFile->start() + argv + 1 +
             RegisterFile::CallFrameHeaderSize,
         scopeChain, &exceptionValue);
-
-  if (*profiler)
-    (*profiler)->didExecute(callFrame,
-                            scopeChain->globalObject()->evalFunction());
 
   return result;
 }
@@ -948,6 +939,18 @@ NEVER_INLINE Instruction* Machine::throwException(CallFrame*& callFrame,
                         codeBlock->lineNumberForVPC(vPC));
   }
 
+  // If we throw in the middle of a call instruction, we need to notify
+  // the profiler manually that the call instruction has returned, since
+  // we'll never reach the relevant op_profile_did_call.
+  if (Profiler* profiler = *Profiler::enabledProfilerReference()) {
+    if (isCallOpcode(vPC[0].u.opcode))
+      profiler->didExecute(callFrame,
+                           callFrame[vPC[2].u.operand].jsValue(callFrame));
+    else if (vPC[8].u.opcode == getOpcode(op_construct))
+      profiler->didExecute(callFrame,
+                           callFrame[vPC[10].u.operand].jsValue(callFrame));
+  }
+
   // Calculate an exception handler vPC, unwinding call frames as necessary.
 
   int scopeDepth;
@@ -1121,6 +1124,9 @@ JSValuePtr Machine::execute(FunctionBodyNode* functionBodyNode,
       privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif
   m_reentryDepth--;
+
+  if (*profiler)
+    (*profiler)->didExecute(newCallFrame, function);
 
   MACHINE_SAMPLING_privateExecuteReturned();
 
@@ -2379,10 +2385,10 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
          Raises an exception if register constructor is not an
          object.
       */
-      int dst = (++vPC)->u.operand;
-      int value = (++vPC)->u.operand;
-      int base = (++vPC)->u.operand;
-      int baseProto = (++vPC)->u.operand;
+      int dst = vPC[1].u.operand;
+      int value = vPC[2].u.operand;
+      int base = vPC[3].u.operand;
+      int baseProto = vPC[4].u.operand;
 
       JSValuePtr baseVal = callFrame[base].jsValue(callFrame);
 
@@ -2398,7 +2404,7 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
                               callFrame[baseProto].jsValue(callFrame))
                         : false);
 
-      ++vPC;
+      vPC += 5;
       NEXT_OPCODE;
     }
     BEGIN_OPCODE(op_typeof) {
@@ -3513,12 +3519,11 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
          opcode). Otherwise, act exactly as the "call" opcode would.
        */
 
-      int dst = (++vPC)->u.operand;
-      int func = (++vPC)->u.operand;
-      int thisVal = (++vPC)->u.operand;
-      int firstArg = (++vPC)->u.operand;
-      int argCount = (++vPC)->u.operand;
-      ++vPC;  // registerOffset
+      int dst = vPC[1].u.operand;
+      int func = vPC[2].u.operand;
+      int thisVal = vPC[3].u.operand;
+      int firstArg = vPC[4].u.operand;
+      int argCount = vPC[5].u.operand;
 
       JSValuePtr funcVal = callFrame[func].jsValue(callFrame);
       JSValuePtr baseVal = callFrame[thisVal].jsValue(callFrame);
@@ -3536,14 +3541,13 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
 
         callFrame[dst] = result;
 
-        ++vPC;
+        vPC += 7;
         NEXT_OPCODE;
       }
 
       // We didn't find the blessed version of eval, so reset vPC and process
       // this instruction as a normal function call, supplying the proper 'this'
       // value.
-      vPC -= 6;
       callFrame[thisVal] = baseVal->toThisObject(callFrame);
 
 #if HAVE(COMPUTED_GOTO)
@@ -3592,12 +3596,12 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
          encountered.
        */
 
-      int dst = (++vPC)->u.operand;
-      int func = (++vPC)->u.operand;
-      int thisVal = (++vPC)->u.operand;
-      int firstArg = (++vPC)->u.operand;
-      int argCount = (++vPC)->u.operand;
-      int registerOffset = (++vPC)->u.operand;
+      int dst = vPC[1].u.operand;
+      int func = vPC[2].u.operand;
+      int thisVal = vPC[3].u.operand;
+      int firstArg = vPC[4].u.operand;
+      int argCount = vPC[5].u.operand;
+      int registerOffset = vPC[6].u.operand;
 
       JSValuePtr v = callFrame[func].jsValue(callFrame);
 
@@ -3624,12 +3628,8 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
           goto vm_throw;
         }
 
-        callFrame->init(newCodeBlock, vPC + 1, callDataScopeChain,
+        callFrame->init(newCodeBlock, vPC + 7, callDataScopeChain,
                         previousCallFrame, dst, argCount, asFunction(v));
-
-        if (*enabledProfilerReference)
-          (*enabledProfilerReference)->willExecute(callFrame, asObject(v));
-
         vPC = newCodeBlock->instructions.begin();
 
 #if DUMP_OPCODE_STATS
@@ -3648,10 +3648,7 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
         ScopeChainNode* scopeChain = callFrame->scopeChain();
         CallFrame* newCallFrame =
             CallFrame::create(callFrame->registers() + registerOffset);
-        newCallFrame->init(0, vPC + 1, scopeChain, callFrame, dst, argCount, 0);
-
-        if (*enabledProfilerReference)
-          (*enabledProfilerReference)->willExecute(newCallFrame, asObject(v));
+        newCallFrame->init(0, vPC + 7, scopeChain, callFrame, dst, argCount, 0);
 
         MACHINE_SAMPLING_callingHostFunction();
 
@@ -3661,10 +3658,7 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
 
         callFrame[dst] = returnValue;
 
-        if (*enabledProfilerReference)
-          (*enabledProfilerReference)->didExecute(callFrame, asObject(v));
-
-        ++vPC;
+        vPC += 7;
         NEXT_OPCODE;
       }
 
@@ -3704,9 +3698,6 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
       */
 
       int result = (++vPC)->u.operand;
-
-      if (*enabledProfilerReference)
-        (*enabledProfilerReference)->didExecute(callFrame, callFrame->callee());
 
       if (callFrame->codeBlock()->needsFullScopeChain)
         callFrame->scopeChain()->deref();
@@ -3824,12 +3815,12 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
          caching of this lookup.
       */
 
-      int dst = (++vPC)->u.operand;
-      int constr = (++vPC)->u.operand;
-      int constrProto = (++vPC)->u.operand;
-      int firstArg = (++vPC)->u.operand;
-      int argCount = (++vPC)->u.operand;
-      int registerOffset = (++vPC)->u.operand;
+      int dst = vPC[1].u.operand;
+      int constr = vPC[2].u.operand;
+      int constrProto = vPC[3].u.operand;
+      int firstArg = vPC[4].u.operand;
+      int argCount = vPC[5].u.operand;
+      int registerOffset = vPC[6].u.operand;
 
       JSValuePtr v = callFrame[constr].jsValue(callFrame);
 
@@ -3837,9 +3828,6 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
       ConstructType constructType = v->getConstructData(constructData);
 
       if (constructType == ConstructTypeJS) {
-        if (*enabledProfilerReference)
-          (*enabledProfilerReference)->willExecute(callFrame, asObject(v));
-
         ScopeChainNode* callDataScopeChain = constructData.js.scopeChain;
         FunctionBodyNode* functionBodyNode = constructData.js.functionBody;
         CodeBlock* newCodeBlock =
@@ -3866,12 +3854,8 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
           goto vm_throw;
         }
 
-        callFrame->init(newCodeBlock, vPC + 1, callDataScopeChain,
+        callFrame->init(newCodeBlock, vPC + 7, callDataScopeChain,
                         previousCallFrame, dst, argCount, asFunction(v));
-
-        if (*enabledProfilerReference)
-          (*enabledProfilerReference)->didExecute(callFrame, asObject(v));
-
         vPC = newCodeBlock->instructions.begin();
 
 #if DUMP_OPCODE_STATS
@@ -3885,26 +3869,19 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
         ArgList args(callFrame->registers() + firstArg + 1, argCount - 1);
 
         ScopeChainNode* scopeChain = callFrame->scopeChain();
-        CallFrame::create(callFrame->registers() + registerOffset)
-            ->init(0, vPC + 1, scopeChain, callFrame, dst, argCount, 0);
-        callFrame = CallFrame::create(callFrame->registers() + registerOffset);
-
-        if (*enabledProfilerReference)
-          (*enabledProfilerReference)->willExecute(callFrame, asObject(v));
+        CallFrame* newCallFrame =
+            CallFrame::create(callFrame->registers() + registerOffset);
+        newCallFrame->init(0, vPC + 7, scopeChain, callFrame, dst, argCount, 0);
 
         MACHINE_SAMPLING_callingHostFunction();
 
         JSValuePtr returnValue =
-            constructData.native.function(callFrame, asObject(v), args);
-        callFrame = CallFrame::create(callFrame->registers() - registerOffset);
+            constructData.native.function(newCallFrame, asObject(v), args);
 
         VM_CHECK_EXCEPTION();
         callFrame[dst] = returnValue;
 
-        if (*enabledProfilerReference)
-          (*enabledProfilerReference)->didExecute(callFrame, asObject(v));
-
-        ++vPC;
+        vPC += 7;
         NEXT_OPCODE;
       }
 
@@ -4225,6 +4202,36 @@ JSValuePtr Machine::privateExecute(ExecutionFlag flag,
             lastLine);
 
       ++vPC;
+      NEXT_OPCODE;
+    }
+    BEGIN_OPCODE(op_profile_will_call) {
+      /* op_profile_will_call function(r)
+
+       Notifies the profiler of the beginning of a function call. This opcode
+       is only generated if developer tools are enabled.
+      */
+      int function = vPC[1].u.operand;
+
+      if (*enabledProfilerReference)
+        (*enabledProfilerReference)
+            ->willExecute(callFrame, callFrame[function].jsValue(callFrame));
+
+      vPC += 2;
+      NEXT_OPCODE;
+    }
+    BEGIN_OPCODE(op_profile_did_call) {
+      /* op_profile_did_call function(r)
+
+       Notifies the profiler of the end of a function call. This opcode
+       is only generated if developer tools are enabled.
+      */
+      int function = vPC[1].u.operand;
+
+      if (*enabledProfilerReference)
+        (*enabledProfilerReference)
+            ->didExecute(callFrame, callFrame[function].jsValue(callFrame));
+
+      vPC += 2;
       NEXT_OPCODE;
     }
   vm_throw : {
@@ -5008,13 +5015,6 @@ JSObject* Machine::cti_op_new_func(CTI_ARGS) {
   return ARG_func1->makeFunction(ARG_callFrame, ARG_callFrame->scopeChain());
 }
 
-void Machine::cti_op_call_profiler(CTI_ARGS) {
-  CTI_STACK_HACK();
-
-  ASSERT(*ARG_profilerReference);
-  (*ARG_profilerReference)->willExecute(ARG_callFrame, asFunction(ARG_src1));
-}
-
 VoidPtrPair Machine::cti_op_call_JSFunction(CTI_ARGS) {
   CTI_STACK_HACK();
 
@@ -5127,9 +5127,6 @@ JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
                     previousCallFrame, 0, argCount, 0);
     ARG_setCallFrame(callFrame);
 
-    if (*ARG_profilerReference)
-      (*ARG_profilerReference)->willExecute(callFrame, asObject(funcVal));
-
     Register* argv = ARG_callFrame->registers() -
                      RegisterFile::CallFrameHeaderSize - argCount;
     ArgList argList(argv + 1, argCount - 1);
@@ -5140,10 +5137,6 @@ JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
         callFrame, asObject(funcVal), argv[0].jsValue(callFrame), argList);
     ARG_setCallFrame(previousCallFrame);
     VM_CHECK_EXCEPTION();
-
-    if (*ARG_profilerReference)
-      (*ARG_profilerReference)
-          ->didExecute(previousCallFrame, asObject(funcVal));
 
     return returnValue.payload();
   }
@@ -5164,6 +5157,8 @@ void Machine::cti_op_create_arguments(CTI_ARGS) {
 }
 
 void Machine::cti_op_create_arguments_no_params(CTI_ARGS) {
+  CTI_STACK_HACK();
+
   Arguments* arguments = new (ARG_globalData)
       Arguments(ARG_callFrame, Arguments::ArgumentsNoParameters);
   ARG_callFrame->setCalleeArguments(arguments);
@@ -5186,11 +5181,18 @@ void Machine::cti_op_tear_off_arguments(CTI_ARGS) {
   ARG_callFrame->optionalCalleeArguments()->copyRegisters();
 }
 
-void Machine::cti_op_ret_profiler(CTI_ARGS) {
+void Machine::cti_op_profile_will_call(CTI_ARGS) {
   CTI_STACK_HACK();
 
   ASSERT(*ARG_profilerReference);
-  (*ARG_profilerReference)->didExecute(ARG_callFrame, ARG_callFrame->callee());
+  (*ARG_profilerReference)->willExecute(ARG_callFrame, ARG_src1);
+}
+
+void Machine::cti_op_profile_did_call(CTI_ARGS) {
+  CTI_STACK_HACK();
+
+  ASSERT(*ARG_profilerReference);
+  (*ARG_profilerReference)->didExecute(ARG_callFrame, ARG_src1);
 }
 
 void Machine::cti_op_ret_scopeChain(CTI_ARGS) {
@@ -5332,21 +5334,13 @@ JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
   ConstructType constructType = constrVal->getConstructData(constructData);
 
   if (constructType == ConstructTypeHost) {
-    JSObject* constructor = asObject(constrVal);
-
-    if (*ARG_profilerReference)
-      (*ARG_profilerReference)->willExecute(callFrame, constructor);
-
     ArgList argList(callFrame->registers() + firstArg + 1, argCount - 1);
 
     CTI_MACHINE_SAMPLING_callingHostFunction();
 
     JSValuePtr returnValue =
-        constructData.native.function(callFrame, constructor, argList);
+        constructData.native.function(callFrame, asObject(constrVal), argList);
     VM_CHECK_EXCEPTION();
-
-    if (*ARG_profilerReference)
-      (*ARG_profilerReference)->didExecute(callFrame, constructor);
 
     return returnValue.payload();
   }

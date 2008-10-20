@@ -538,6 +538,10 @@ void JavaScriptDebugServer::didReachBreakpoint(
   pauseIfNeeded(toPage(debuggerCallFrame.dynamicGlobalObject()));
 }
 
+void JavaScriptDebugServer::recompileAllJSFunctionsSoon() {
+  m_recompileTimer.startOneShot(0);
+}
+
 void JavaScriptDebugServer::recompileAllJSFunctions(
     Timer<JavaScriptDebugServer>*) {
   JSLock lock(false);
@@ -598,7 +602,7 @@ void JavaScriptDebugServer::recompileAllJSFunctions(
 }
 
 void JavaScriptDebugServer::didAddListener(Page* page) {
-  m_recompileTimer.startOneShot(0);
+  recompileAllJSFunctionsSoon();
 
   if (page)
     page->setDebugger(this);
@@ -610,7 +614,7 @@ void JavaScriptDebugServer::didRemoveListener(Page* page) {
   if (hasGlobalListeners() || (page && hasListenersInterestedInPage(page)))
     return;
 
-  m_recompileTimer.startOneShot(0);
+  recompileAllJSFunctionsSoon();
 
   if (page)
     page->setDebugger(0);

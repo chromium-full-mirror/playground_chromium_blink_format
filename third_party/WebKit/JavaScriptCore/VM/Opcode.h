@@ -98,11 +98,13 @@ namespace JSC {
                                                                                       macro(op_jsr) macro(                \
                                                                                           op_sret)                        \
                                                                                                                           \
-                                                                                          macro(                          \
-                                                                                              op_debug)                   \
-                                                                                                                          \
+                                                                                          macro(op_debug) macro(          \
+                                                                                              op_profile_will_call)       \
                                                                                               macro(                      \
-                                                                                                  op_end)  // end must be the last opcode in the list
+                                                                                                  op_profile_did_call)    \
+                                                                                                                          \
+                                                                                                  macro(                  \
+                                                                                                      op_end)  // end must be the last opcode in the list
 
 #define OPCODE_ID_ENUM(opcode) opcode,
 typedef enum { FOR_EACH_OPCODE_ID(OPCODE_ID_ENUM) } OpcodeID;

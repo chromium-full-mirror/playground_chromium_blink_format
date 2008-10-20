@@ -73,7 +73,8 @@ class JavaScriptDebugServer : JSC::Debugger {
   void stepOverStatement();
   void stepOutOfFunction();
 
-  void recompileAllJSFunctions(Timer<JavaScriptDebugServer>*);
+  void recompileAllJSFunctionsSoon();
+  void recompileAllJSFunctions(Timer<JavaScriptDebugServer>* = 0);
 
   JavaScriptCallFrame* currentCallFrame();
 

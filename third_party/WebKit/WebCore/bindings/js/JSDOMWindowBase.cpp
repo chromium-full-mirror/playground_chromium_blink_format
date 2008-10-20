@@ -819,6 +819,18 @@ ExecState* JSDOMWindowBase::globalExec() {
   return Base::globalExec();
 }
 
+bool JSDOMWindowBase::supportsProfiling() const {
+  Frame* frame = impl()->frame();
+  if (!frame)
+    return false;
+
+  Settings* settings = frame->settings();
+  if (!settings)
+    return false;
+
+  return settings->developerExtrasEnabled();
+}
+
 bool JSDOMWindowBase::shouldInterruptScript() const {
   ASSERT(impl()->frame());
   Page* page = impl()->frame()->page();

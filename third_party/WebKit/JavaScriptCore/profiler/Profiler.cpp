@@ -107,12 +107,12 @@ static inline void dispatchFunctionToProfiles(
   }
 }
 
-void Profiler::willExecute(ExecState* exec, JSObject* calledFunction) {
+void Profiler::willExecute(ExecState* exec, JSValuePtr function) {
   ASSERT(!m_currentProfiles.isEmpty());
 
   dispatchFunctionToProfiles(
       m_currentProfiles, &ProfileGenerator::willExecute,
-      createCallIdentifier(&exec->globalData(), calledFunction, "", 0),
+      createCallIdentifier(&exec->globalData(), function, "", 0),
       exec->lexicalGlobalObject()->profileGroup());
 }
 
@@ -122,19 +122,19 @@ void Profiler::willExecute(ExecState* exec,
   ASSERT(!m_currentProfiles.isEmpty());
 
   CallIdentifier callIdentifier = createCallIdentifier(
-      &exec->globalData(), 0, sourceURL, startingLineNumber);
+      &exec->globalData(), noValue(), sourceURL, startingLineNumber);
 
   dispatchFunctionToProfiles(m_currentProfiles, &ProfileGenerator::willExecute,
                              callIdentifier,
                              exec->lexicalGlobalObject()->profileGroup());
 }
 
-void Profiler::didExecute(ExecState* exec, JSObject* calledFunction) {
+void Profiler::didExecute(ExecState* exec, JSValuePtr function) {
   ASSERT(!m_currentProfiles.isEmpty());
 
   dispatchFunctionToProfiles(
       m_currentProfiles, &ProfileGenerator::didExecute,
-      createCallIdentifier(&exec->globalData(), calledFunction, "", 0),
+      createCallIdentifier(&exec->globalData(), function, "", 0),
       exec->lexicalGlobalObject()->profileGroup());
 }
 
@@ -145,29 +145,29 @@ void Profiler::didExecute(ExecState* exec,
 
   dispatchFunctionToProfiles(
       m_currentProfiles, &ProfileGenerator::didExecute,
-      createCallIdentifier(&exec->globalData(), 0, sourceURL,
+      createCallIdentifier(&exec->globalData(), noValue(), sourceURL,
                            startingLineNumber),
       exec->lexicalGlobalObject()->profileGroup());
 }
 
 CallIdentifier Profiler::createCallIdentifier(JSGlobalData* globalData,
-                                              JSObject* calledFunction,
+                                              JSValuePtr function,
                                               const UString& defaultSourceURL,
                                               int defaultLineNumber) {
-  if (!calledFunction)
+  if (!function)
     return CallIdentifier(GlobalCodeExecution, defaultSourceURL,
                           defaultLineNumber);
-
-  if (calledFunction->inherits(&JSFunction::info))
-    return createCallIdentifierFromFunctionImp(
-        globalData, static_cast<JSFunction*>(calledFunction));
-  if (calledFunction->inherits(&InternalFunction::info))
+  if (!function->isObject())
+    return CallIdentifier("(unknown)", defaultSourceURL, defaultLineNumber);
+  if (asObject(function)->inherits(&JSFunction::info))
+    return createCallIdentifierFromFunctionImp(globalData,
+                                               asFunction(function));
+  if (asObject(function)->inherits(&InternalFunction::info))
     return CallIdentifier(
-        static_cast<InternalFunction*>(calledFunction)->name(globalData),
+        static_cast<InternalFunction*>(asObject(function))->name(globalData),
         defaultSourceURL, defaultLineNumber);
-
-  UString name = "(" + calledFunction->className() + " object)";
-  return CallIdentifier(name, defaultSourceURL, defaultLineNumber);
+  return CallIdentifier("(" + asObject(function)->className() + " object)",
+                        defaultSourceURL, defaultLineNumber);
 }
 
 CallIdentifier createCallIdentifierFromFunctionImp(JSGlobalData* globalData,

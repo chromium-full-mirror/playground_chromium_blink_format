@@ -267,6 +267,8 @@ class JSGlobalObject : public JSVariableObject {
   Debugger* debugger() const { return d()->debugger; }
   void setDebugger(Debugger* debugger) { d()->debugger = debugger; }
 
+  virtual bool supportsProfiling() const { return false; }
+
   int recursion() { return d()->recursion; }
   void incRecursion() { ++d()->recursion; }
   void decRecursion() { --d()->recursion; }

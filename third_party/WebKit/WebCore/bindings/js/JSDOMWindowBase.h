@@ -141,6 +141,8 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
 
   virtual JSC::ExecState* globalExec();
 
+  virtual bool supportsProfiling() const;
+
   virtual bool shouldInterruptScript() const;
 
   bool allowsAccessFrom(JSC::ExecState*) const;
