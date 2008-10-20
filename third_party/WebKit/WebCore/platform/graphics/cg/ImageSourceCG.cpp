@@ -136,6 +136,8 @@ IntSize ImageSource::size() const {
 
 int ImageSource::repetitionCount() {
   int result = cAnimationLoopOnce;  // No property means loop once.
+  if (!initialized())
+    return result;
 
   // A property with value 0 means loop forever.
   CFDictionaryRef properties =
@@ -190,6 +192,9 @@ bool ImageSource::frameIsCompleteAtIndex(size_t index) {
 }
 
 float ImageSource::frameDurationAtIndex(size_t index) {
+  if (!initialized())
+    return 0;
+
   float duration = 0;
   CFDictionaryRef properties = CGImageSourceCopyPropertiesAtIndex(
       m_decoder, index, imageSourceOptions());
