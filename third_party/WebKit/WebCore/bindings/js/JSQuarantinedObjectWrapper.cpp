@@ -119,9 +119,8 @@ bool JSQuarantinedObjectWrapper::getOwnPropertySlot(
   if (result) {
     JSValuePtr unwrappedValue =
         unwrappedSlot.getValue(unwrappedExecState(), identifier);
-    slot.setCustom(
-        asObject(wrapOutgoingValue(unwrappedExecState(), unwrappedValue)),
-        cachedValueGetter);
+    slot.setCustom(wrapOutgoingValue(unwrappedExecState(), unwrappedValue),
+                   cachedValueGetter);
   }
 
   transferExceptionToExecState(exec);
@@ -143,9 +142,8 @@ bool JSQuarantinedObjectWrapper::getOwnPropertySlot(ExecState* exec,
   if (result) {
     JSValuePtr unwrappedValue =
         unwrappedSlot.getValue(unwrappedExecState(), identifier);
-    slot.setCustom(
-        asObject(wrapOutgoingValue(unwrappedExecState(), unwrappedValue)),
-        cachedValueGetter);
+    slot.setCustom(wrapOutgoingValue(unwrappedExecState(), unwrappedValue),
+                   cachedValueGetter);
   }
 
   transferExceptionToExecState(exec);
