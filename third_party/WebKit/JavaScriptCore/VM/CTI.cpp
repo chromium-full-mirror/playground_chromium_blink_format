@@ -3329,9 +3329,9 @@ void CTI::privateCompilePutByIdReplace(StructureID* structureID,
 
 extern "C" {
 
-static JSValuePtr resizePropertyStorage(JSObject* baseObject,
-                                        size_t oldSize,
-                                        size_t newSize) {
+static JSObject* resizePropertyStorage(JSObject* baseObject,
+                                       size_t oldSize,
+                                       size_t newSize) {
   baseObject->allocatePropertyStorageInline(oldSize, newSize);
   return baseObject;
 }
