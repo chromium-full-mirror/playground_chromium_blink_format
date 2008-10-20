@@ -1245,13 +1245,13 @@ bool RenderObject::paintNinePieceImage(GraphicsContext* graphicsContext,
   int imageHeight = imageSize.height();
 
   int topSlice =
-      min(imageHeight, ninePieceImage.m_slices.top.calcValue(imageHeight));
+      min(imageHeight, ninePieceImage.m_slices.top().calcValue(imageHeight));
   int bottomSlice =
-      min(imageHeight, ninePieceImage.m_slices.bottom.calcValue(imageHeight));
+      min(imageHeight, ninePieceImage.m_slices.bottom().calcValue(imageHeight));
   int leftSlice =
-      min(imageWidth, ninePieceImage.m_slices.left.calcValue(imageWidth));
+      min(imageWidth, ninePieceImage.m_slices.left().calcValue(imageWidth));
   int rightSlice =
-      min(imageWidth, ninePieceImage.m_slices.right.calcValue(imageWidth));
+      min(imageWidth, ninePieceImage.m_slices.right().calcValue(imageWidth));
 
   ENinePieceImageRule hRule = ninePieceImage.horizontalRule();
   ENinePieceImageRule vRule = ninePieceImage.verticalRule();
@@ -3162,10 +3162,12 @@ void RenderObject::addDashboardRegions(Vector<DashboardRegionValue>& regions) {
 
     DashboardRegionValue region;
     region.label = styleRegion.label;
-    region.bounds = IntRect(
-        styleRegion.offset.left.value(), styleRegion.offset.top.value(),
-        w - styleRegion.offset.left.value() - styleRegion.offset.right.value(),
-        h - styleRegion.offset.top.value() - styleRegion.offset.bottom.value());
+    region.bounds = IntRect(styleRegion.offset.left().value(),
+                            styleRegion.offset.top().value(),
+                            w - styleRegion.offset.left().value() -
+                                styleRegion.offset.right().value(),
+                            h - styleRegion.offset.top().value() -
+                                styleRegion.offset.bottom().value());
     region.type = styleRegion.type;
 
     region.clip = region.bounds;
@@ -3177,8 +3179,8 @@ void RenderObject::addDashboardRegions(Vector<DashboardRegionValue>& regions) {
 
     int x, y;
     absolutePosition(x, y);
-    region.bounds.setX(x + styleRegion.offset.left.value());
-    region.bounds.setY(y + styleRegion.offset.top.value());
+    region.bounds.setX(x + styleRegion.offset.left().value());
+    region.bounds.setY(y + styleRegion.offset.top().value());
 
     if (document()->frame()) {
       float pageScaleFactor =
