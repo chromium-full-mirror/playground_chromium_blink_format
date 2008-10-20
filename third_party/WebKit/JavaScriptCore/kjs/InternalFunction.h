@@ -45,7 +45,6 @@ class InternalFunction : public JSObject {
 
  protected:
   InternalFunction(PassRefPtr<StructureID> structure) : JSObject(structure) {}
-  InternalFunction(JSGlobalData*);
   InternalFunction(JSGlobalData*, PassRefPtr<StructureID>, const Identifier&);
 
  private:

@@ -43,12 +43,13 @@ ErrorPrototype::ErrorPrototype(ExecState* exec,
     : ErrorInstance(structure) {
   // The constructor will be added later in ErrorConstructor's constructor
 
-  putDirect(exec->propertyNames().name, jsNontrivialString(exec, "Error"),
-            DontEnum);
-  putDirect(exec->propertyNames().message,
-            jsNontrivialString(exec, "Unknown error"), DontEnum);
+  putDirectWithoutTransition(exec->propertyNames().name,
+                             jsNontrivialString(exec, "Error"), DontEnum);
+  putDirectWithoutTransition(exec->propertyNames().message,
+                             jsNontrivialString(exec, "Unknown error"),
+                             DontEnum);
 
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().toString,
                                          errorProtoFuncToString),

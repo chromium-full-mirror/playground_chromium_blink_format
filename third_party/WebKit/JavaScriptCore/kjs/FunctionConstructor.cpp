@@ -43,12 +43,12 @@ FunctionConstructor::FunctionConstructor(ExecState* exec,
           &exec->globalData(),
           structure,
           Identifier(exec, functionPrototype->classInfo()->className)) {
-  putDirect(exec->propertyNames().prototype, functionPrototype,
-            DontEnum | DontDelete | ReadOnly);
+  putDirectWithoutTransition(exec->propertyNames().prototype, functionPrototype,
+                             DontEnum | DontDelete | ReadOnly);
 
   // Number of arguments for constructor
-  putDirect(exec->propertyNames().length, jsNumber(exec, 1),
-            ReadOnly | DontDelete | DontEnum);
+  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 1),
+                             ReadOnly | DontDelete | DontEnum);
 }
 
 static JSObject* constructWithFunctionConstructor(ExecState* exec,

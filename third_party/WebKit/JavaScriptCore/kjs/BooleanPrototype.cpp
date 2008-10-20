@@ -49,12 +49,12 @@ BooleanPrototype::BooleanPrototype(ExecState* exec,
     : BooleanObject(structure) {
   setInternalValue(jsBoolean(false));
 
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().toString,
                                          booleanProtoFuncToString),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().valueOf,
                                          booleanProtoFuncValueOf),

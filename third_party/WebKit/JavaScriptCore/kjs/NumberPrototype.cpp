@@ -71,32 +71,32 @@ NumberPrototype::NumberPrototype(ExecState* exec,
   // The constructor will be added later, after NumberConstructor has been
   // constructed
 
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().toString,
                                          numberProtoFuncToString),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().toLocaleString,
                                          numberProtoFuncToLocaleString),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().valueOf,
                                          numberProtoFuncValueOf),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().toFixed,
                                          numberProtoFuncToFixed),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().toExponential,
                                          numberProtoFuncToExponential),
       DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
                                          exec->propertyNames().toPrecision,
                                          numberProtoFuncToPrecision),

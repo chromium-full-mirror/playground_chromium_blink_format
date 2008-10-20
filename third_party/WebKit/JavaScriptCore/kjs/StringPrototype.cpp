@@ -210,8 +210,8 @@ StringPrototype::StringPrototype(ExecState* exec,
                                  PassRefPtr<StructureID> structure)
     : StringObject(exec, structure) {
   // The constructor will be added later, after StringConstructor has been built
-  putDirect(exec->propertyNames().length, jsNumber(exec, 0),
-            DontDelete | ReadOnly | DontEnum);
+  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 0),
+                             DontDelete | ReadOnly | DontEnum);
 }
 
 bool StringPrototype::getOwnPropertySlot(ExecState* exec,

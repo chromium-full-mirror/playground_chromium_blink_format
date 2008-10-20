@@ -61,20 +61,22 @@ RegExpPrototype::RegExpPrototype(ExecState* exec,
                                  PassRefPtr<StructureID> structure,
                                  StructureID* prototypeFunctionStructure)
     : JSObject(structure) {
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().compile,
                                          regExpProtoFuncCompile),
       DontEnum);
-  putDirectFunction(exec, new (exec) PrototypeFunction(
-                              exec, prototypeFunctionStructure, 0,
-                              exec->propertyNames().exec, regExpProtoFuncExec),
-                    DontEnum);
-  putDirectFunction(exec, new (exec) PrototypeFunction(
-                              exec, prototypeFunctionStructure, 0,
-                              exec->propertyNames().test, regExpProtoFuncTest),
-                    DontEnum);
-  putDirectFunction(
+  putDirectFunctionWithoutTransition(
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
+                                         exec->propertyNames().exec,
+                                         regExpProtoFuncExec),
+      DontEnum);
+  putDirectFunctionWithoutTransition(
+      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
+                                         exec->propertyNames().test,
+                                         regExpProtoFuncTest),
+      DontEnum);
+  putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().toString,
                                          regExpProtoFuncToString),
