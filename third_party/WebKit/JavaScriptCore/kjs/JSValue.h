@@ -39,33 +39,20 @@
 
 namespace JSC {
 
-class ExecState;
 class Identifier;
-class JSCell;
-class JSObject;
 class JSString;
 class PropertySlot;
 class PutPropertySlot;
-class StructureID;
 
 struct ClassInfo;
 struct Instruction;
 
 enum PreferredPrimitiveType { NoPreference, PreferNumber, PreferString };
 
-/**
- * JSValue is the base type for all primitives (Undefined, Null, Boolean,
- * String, Number) and objects in ECMAScript.
- *
- * Note: you should never inherit from JSValue as it is for primitive types
- * only (all of which are provided internally by KJS). Instead, inherit from
- * JSObject.
- */
 class JSValue : Noncopyable {
-  friend class JSCell;  // so it can derive from this class
  private:
   JSValue();
-  virtual ~JSValue();
+  ~JSValue();
 
  public:
   // Querying the type.
@@ -77,18 +64,16 @@ class JSValue : Noncopyable {
   bool isString() const;
   bool isGetterSetter() const;
   bool isObject() const;
-  bool isObject(const ClassInfo*) const;  // FIXME: Merge with inherits.
+  bool isObject(const ClassInfo*) const;
 
   // Extracting the value.
   bool getBoolean(bool&) const;
-  bool getBoolean() const;  // false if not a boolean
-  bool getNumber(double&) const;
+  bool getBoolean() const;   // false if not a boolean
   double getNumber() const;  // NaN if not a number
   double uncheckedGetNumber() const;
   bool getString(UString&) const;
-  UString getString() const;          // null string if not a string
-  JSObject* getObject();              // NULL if not an object
-  const JSObject* getObject() const;  // NULL if not an object
+  UString getString() const;    // null string if not a string
+  JSObject* getObject() const;  // 0 if not an object
 
   CallType getCallData(CallData&);
   ConstructType getConstructData(ConstructData&);
@@ -111,6 +96,7 @@ class JSValue : Noncopyable {
   JSValuePtr toJSNumber(ExecState*) const;  // Fast path for when you expect
                                             // that the value is an immediate
                                             // number.
+
   UString toString(ExecState*) const;
   JSObject* toObject(ExecState*) const;
 
@@ -173,10 +159,6 @@ int32_t toInt32(double);
 uint32_t toUInt32(double);
 int32_t toInt32SlowCase(double, bool& ok);
 uint32_t toUInt32SlowCase(double, bool& ok);
-
-inline JSValue::JSValue() {}
-
-inline JSValue::~JSValue() {}
 
 inline JSValuePtr JSValue::asValue() const {
   return const_cast<JSValue*>(this);

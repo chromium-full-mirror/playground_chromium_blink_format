@@ -29,16 +29,16 @@
 
 namespace JSC {
 
-class JSCell : public JSValue {
-  friend class Heap;
+class JSCell : Noncopyable {
+  friend class CTI;
   friend class GetterSetter;
+  friend class Heap;
+  friend class JSNumberCell;
   friend class JSObject;
   friend class JSPropertyNameIterator;
-  friend class JSValue;
-  friend class JSNumberCell;
   friend class JSString;
+  friend class JSValue;
   friend class Machine;
-  friend class CTI;
 
  private:
   explicit JSCell(StructureID*);
@@ -119,7 +119,7 @@ JSCell* asCell(JSValuePtr);
 
 inline JSCell* asCell(JSValuePtr value) {
   ASSERT(!JSImmediate::isImmediate(value));
-  return static_cast<JSCell*>(value.payload());
+  return reinterpret_cast<JSCell*>(value.payload());
 }
 
 inline JSCell::JSCell(StructureID* structureID) : m_structureID(structureID) {}
@@ -187,14 +187,6 @@ inline bool JSValue::isObject() const {
   return !JSImmediate::isImmediate(asValue()) && asCell()->isObject();
 }
 
-inline bool JSValue::getNumber(double& v) const {
-  if (JSImmediate::isImmediate(asValue())) {
-    v = JSImmediate::toDouble(asValue());
-    return true;
-  }
-  return asCell()->getNumber(v);
-}
-
 inline double JSValue::getNumber() const {
   return JSImmediate::isImmediate(asValue()) ? JSImmediate::toDouble(asValue())
                                              : asCell()->getNumber();
@@ -209,11 +201,7 @@ inline UString JSValue::getString() const {
                                              : asCell()->getString();
 }
 
-inline JSObject* JSValue::getObject() {
-  return JSImmediate::isImmediate(asValue()) ? 0 : asCell()->getObject();
-}
-
-inline const JSObject* JSValue::getObject() const {
+inline JSObject* JSValue::getObject() const {
   return JSImmediate::isImmediate(asValue()) ? 0 : asCell()->getObject();
 }
 
