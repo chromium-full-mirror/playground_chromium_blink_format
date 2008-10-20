@@ -46,7 +46,6 @@ class ArgList;
 class CollectorBlock;
 class JSCell;
 class JSGlobalData;
-class JSValue;
 
 enum OperationInProgress { NoOperation, Allocation, Collection };
 enum HeapType { PrimaryHeap, NumberHeap };

@@ -149,11 +149,11 @@ Class* QtInstance::getClass() const {
 void QtInstance::mark() {
   if (m_defaultMethod)
     m_defaultMethod->mark();
-  foreach (JSValue* val, m_methods.values()) {
+  foreach (JSObject* val, m_methods.values()) {
     if (val && !val->marked())
       val->mark();
   }
-  foreach (JSValue* val, m_children.values()) {
+  foreach (JSValuePtr val, m_children.values()) {
     if (val && !val->marked())
       val->mark();
   }
@@ -198,15 +198,15 @@ void QtInstance::getPropertyNames(ExecState* exec, PropertyNameArray& array) {
   }
 }
 
-JSValue* QtInstance::invokeMethod(ExecState*,
-                                  const MethodList&,
-                                  const ArgList&) {
+JSValuePtr QtInstance::invokeMethod(ExecState*,
+                                    const MethodList&,
+                                    const ArgList&) {
   // Implemented via fallbackMethod & QtRuntimeMetaMethod::callAsFunction
   return jsUndefined();
 }
 
-JSValue* QtInstance::defaultValue(ExecState* exec,
-                                  PreferredPrimitiveType hint) const {
+JSValuePtr QtInstance::defaultValue(ExecState* exec,
+                                    PreferredPrimitiveType hint) const {
   if (hint == PreferString)
     return stringValue(exec);
   if (hint == PreferNumber)
@@ -214,7 +214,7 @@ JSValue* QtInstance::defaultValue(ExecState* exec,
   return valueOf(exec);
 }
 
-JSValue* QtInstance::stringValue(ExecState* exec) const {
+JSValuePtr QtInstance::stringValue(ExecState* exec) const {
   // Hmm.. see if there is a toString defined
   QByteArray buf;
   bool useDefault = true;
@@ -261,25 +261,25 @@ JSValue* QtInstance::stringValue(ExecState* exec) const {
   return jsString(exec, buf.constData());
 }
 
-JSValue* QtInstance::numberValue(ExecState* exec) const {
+JSValuePtr QtInstance::numberValue(ExecState* exec) const {
   return jsNumber(exec, 0);
 }
 
-JSValue* QtInstance::booleanValue() const {
+JSValuePtr QtInstance::booleanValue() const {
   // ECMA 9.2
   return jsBoolean(true);
 }
 
-JSValue* QtInstance::valueOf(ExecState* exec) const {
+JSValuePtr QtInstance::valueOf(ExecState* exec) const {
   return stringValue(exec);
 }
 
 // In qt_runtime.cpp
-JSValue* convertQVariantToValue(ExecState* exec,
-                                PassRefPtr<RootObject> root,
-                                const QVariant& variant);
-QVariant convertValueToQVariant(ExecState* exec,
-                                JSValue* value,
+JSValuePtr convertQVariantToValue(ExecState*,
+                                  PassRefPtr<RootObject> root,
+                                  const QVariant& variant);
+QVariant convertValueToQVariant(ExecState*,
+                                JSValuePtr,
                                 QMetaType::Type hint,
                                 int* distance);
 
@@ -293,8 +293,8 @@ const char* QtField::name() const {
   return "";  // deleted child object
 }
 
-JSValue* QtField::valueFromInstance(ExecState* exec,
-                                    const Instance* inst) const {
+JSValuePtr QtField::valueFromInstance(ExecState* exec,
+                                      const Instance* inst) const {
   const QtInstance* instance = static_cast<const QtInstance*>(inst);
   QObject* obj = instance->getObject();
 
@@ -310,7 +310,7 @@ JSValue* QtField::valueFromInstance(ExecState* exec,
     else if (m_type == DynamicProperty)
       val = obj->property(m_dynamicProperty);
 
-    JSValue* ret = convertQVariantToValue(exec, inst->rootObject(), val);
+    JSValuePtr ret = convertQVariantToValue(exec, inst->rootObject(), val);
 
     // Need to save children so we can mark them
     if (m_type == ChildObject)
@@ -327,7 +327,7 @@ JSValue* QtField::valueFromInstance(ExecState* exec,
 
 void QtField::setValueToInstance(ExecState* exec,
                                  const Instance* inst,
-                                 JSValue* aValue) const {
+                                 JSValuePtr aValue) const {
   if (m_type == ChildObject)  // QtScript doesn't allow setting to a named child
     return;
 

@@ -37,7 +37,6 @@ class ArgList;
 class ExecState;
 class FunctionBodyNode;
 class JSObject;
-class JSValue;
 class ScopeChainNode;
 
 enum ConstructType { ConstructTypeNone, ConstructTypeHost, ConstructTypeJS };

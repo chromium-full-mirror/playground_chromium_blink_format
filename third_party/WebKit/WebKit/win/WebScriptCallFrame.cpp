@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -50,7 +50,7 @@
 using namespace JSC;
 
 UString WebScriptCallFrame::jsValueToString(JSC::ExecState* state,
-                                            JSValue* jsvalue) {
+                                            JSValuePtr jsvalue) {
   if (!jsvalue)
     return "undefined";
 
@@ -175,7 +175,7 @@ WebScriptCallFrame::stringByEvaluatingJavaScriptFromString(
 
   JSLock lock(false);
 
-  JSValue* scriptExecutionResult =
+  JSValuePtr scriptExecutionResult =
       valueByEvaluatingJavaScriptFromString(script);
   *result = WebCore::BString(jsValueToString(m_state, scriptExecutionResult))
                 .release();
@@ -214,8 +214,8 @@ HRESULT STDMETHODCALLTYPE WebScriptCallFrame::valueForVariable(
   Identifier identKey(m_state, reinterpret_cast<UChar*>(key),
                       SysStringLen(key));
 
-  JSValue* jsvalue = 0;
 #if 0
+    JSValuePtr jsvalue = noValue();
     ScopeChain scopeChain = m_state->scopeChain();
     for (ScopeChainIterator it = scopeChain.begin(); it != scopeChain.end() && !jsvalue; ++it)
         jsvalue = (*it)->get(m_state, identKey);
@@ -225,7 +225,7 @@ HRESULT STDMETHODCALLTYPE WebScriptCallFrame::valueForVariable(
   return S_OK;
 }
 
-JSValue* WebScriptCallFrame::valueByEvaluatingJavaScriptFromString(
+JSValuePtr WebScriptCallFrame::valueByEvaluatingJavaScriptFromString(
     BSTR script) {
 #if 0
     ExecState* state = m_state;
@@ -234,21 +234,21 @@ JSValue* WebScriptCallFrame::valueByEvaluatingJavaScriptFromString(
     // find "eval"
     JSObject* eval = 0;
     if (state->scopeNode()) {  // "eval" won't work without context (i.e. at global scope)
-        JSValue* v = globObj->get(state, "eval");
-        if (v->isObject() && static_cast<JSObject*>(v)->implementsCall())
-            eval = static_cast<JSObject*>(v);
+        JSValuePtr v = globObj->get(state, "eval");
+        if (v->isObject() && asObject(v)->implementsCall())
+            eval = asObject(v);
         else
             // no "eval" - fallback operates on global exec state
             state = globObj->globalExec();
     }
 
-    JSValue* savedException = state->exception();
+    JSValuePtr savedException = state->exception();
     state->clearException();
 
     UString code(reinterpret_cast<UChar*>(script), SysStringLen(script));
 
     // evaluate
-    JSValue* scriptExecutionResult;
+    JSValuePtr scriptExecutionResult;
     if (eval) {
         ArgList args;
         args.append(jsString(state, code));

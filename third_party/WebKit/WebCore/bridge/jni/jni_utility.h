@@ -28,6 +28,7 @@
 
 #if ENABLE(MAC_JAVA_BRIDGE)
 
+#include <kjs/JSValue.h>
 #include <JavaVM/jni.h>
 
 // The order of these items can not be modified as they are tightly
@@ -54,7 +55,6 @@ namespace JSC {
 
 class ExecState;
 class JSObject;
-class JSValue;
 
 namespace Bindings {
 
@@ -76,9 +76,9 @@ JNIType JNITypeFromClassName(const char* name);
 JNIType JNITypeFromPrimitiveType(char type);
 const char* signatureFromPrimitiveType(JNIType type);
 
-jvalue convertValueToJValue(ExecState* exec,
-                            JSValue* value,
-                            JNIType _JNIType,
+jvalue convertValueToJValue(ExecState*,
+                            JSValuePtr,
+                            JNIType,
                             const char* javaClassName);
 
 jvalue getJNIField(jobject obj,
@@ -289,7 +289,7 @@ bool dispatchJNICall(ExecState*,
                      jvalue* args,
                      jvalue& result,
                      const char* callingURL,
-                     JSValue*& exceptionDescription);
+                     JSValuePtr& exceptionDescription);
 
 }  // namespace Bindings
 

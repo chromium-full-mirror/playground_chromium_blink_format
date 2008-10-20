@@ -47,8 +47,10 @@ class QtField : public Field {
 
   QtField(QObject* child) : m_type(ChildObject), m_childObject(child) {}
 
-  virtual JSValue* valueFromInstance(ExecState*, const Instance*) const;
-  virtual void setValueToInstance(ExecState*, const Instance*, JSValue*) const;
+  virtual JSValuePtr valueFromInstance(ExecState*, const Instance*) const;
+  virtual void setValueToInstance(ExecState*,
+                                  const Instance*,
+                                  JSValuePtr) const;
   virtual const char* name() const;
   QtFieldType fieldType() const { return m_type; }
 
@@ -89,10 +91,8 @@ class QtArray : public Array {
 
   RootObject* rootObject() const;
 
-  virtual void setValueAt(ExecState* exec,
-                          unsigned int index,
-                          JSValue* aValue) const;
-  virtual JSValue* valueAt(ExecState* exec, unsigned int index) const;
+  virtual void setValueAt(ExecState*, unsigned index, JSValuePtr) const;
+  virtual JSValuePtr valueAt(ExecState*, unsigned index) const;
   virtual unsigned int getLength() const { return m_length; }
 
  private:
@@ -170,19 +170,19 @@ class QtRuntimeMetaMethod : public QtRuntimeMethod {
 
  private:
   virtual CallType getCallData(CallData&);
-  static JSValue* call(ExecState* exec,
-                       JSObject* functionObject,
-                       JSValue* thisValue,
-                       const ArgList& args);
-  static JSValue* lengthGetter(ExecState*,
-                               const Identifier&,
-                               const PropertySlot&);
-  static JSValue* connectGetter(ExecState*,
-                                const Identifier&,
-                                const PropertySlot&);
-  static JSValue* disconnectGetter(ExecState*,
-                                   const Identifier&,
-                                   const PropertySlot&);
+  static JSValuePtr call(ExecState* exec,
+                         JSObject* functionObject,
+                         JSValuePtr thisValue,
+                         const ArgList& args);
+  static JSValuePtr lengthGetter(ExecState*,
+                                 const Identifier&,
+                                 const PropertySlot&);
+  static JSValuePtr connectGetter(ExecState*,
+                                  const Identifier&,
+                                  const PropertySlot&);
+  static JSValuePtr disconnectGetter(ExecState*,
+                                     const Identifier&,
+                                     const PropertySlot&);
 };
 
 class QtConnectionObject;
@@ -204,13 +204,13 @@ class QtRuntimeConnectionMethod : public QtRuntimeMethod {
 
  private:
   virtual CallType getCallData(CallData&);
-  static JSValue* call(ExecState* exec,
-                       JSObject* functionObject,
-                       JSValue* thisValue,
-                       const ArgList& args);
-  static JSValue* lengthGetter(ExecState*,
-                               const Identifier&,
-                               const PropertySlot&);
+  static JSValuePtr call(ExecState* exec,
+                         JSObject* functionObject,
+                         JSValuePtr thisValue,
+                         const ArgList& args);
+  static JSValuePtr lengthGetter(ExecState*,
+                                 const Identifier&,
+                                 const PropertySlot&);
   static QMultiMap<QObject*, QtConnectionObject*> connections;
   friend class QtConnectionObject;
 };
@@ -245,7 +245,7 @@ class QtConnectionObject : public QObject {
 };
 
 QVariant convertValueToQVariant(ExecState* exec,
-                                JSValue* value,
+                                JSValuePtr value,
                                 QMetaType::Type hint,
                                 int* distance);
 

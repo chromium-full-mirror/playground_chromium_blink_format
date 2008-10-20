@@ -88,7 +88,6 @@ namespace JSC {
 
 class CodeBlock;
 class JSPropertyNameIterator;
-class JSValue;
 class Machine;
 class Register;
 class RegisterFile;

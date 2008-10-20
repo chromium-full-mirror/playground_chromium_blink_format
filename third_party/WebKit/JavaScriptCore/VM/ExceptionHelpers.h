@@ -40,7 +40,6 @@ class Instruction;
 class JSGlobalData;
 class JSNotAnObjectErrorStub;
 class JSObject;
-class JSValue;
 class Node;
 
 JSValuePtr createInterruptedExecutionException(JSGlobalData*);
