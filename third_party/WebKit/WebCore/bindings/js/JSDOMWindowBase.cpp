@@ -39,6 +39,7 @@
 #include "GCController.h"
 #include "HTMLDocument.h"
 #include "JSAudioConstructor.h"
+#include "JSDedicatedWorkerConstructor.h"
 #include "JSDOMWindowCustom.h"
 #include "JSEvent.h"
 #include "JSEventListener.h"
@@ -48,6 +49,7 @@
 #include "JSMessageChannelConstructor.h"
 #include "JSNode.h"
 #include "JSXMLHttpRequestConstructor.h"
+#include "JSXSLTProcessorConstructor.h"
 #include "Logging.h"
 #include "MediaPlayer.h"
 #include "Page.h"
@@ -65,10 +67,6 @@
 #include <kjs/JSLock.h>
 #include <wtf/AlwaysInline.h>
 #include <wtf/MathExtras.h>
-
-#if ENABLE(XSLT)
-#include "JSXSLTProcessorConstructor.h"
-#endif
 
 using namespace JSC;
 
@@ -106,6 +104,10 @@ static JSValuePtr jsDOMWindowBaseMessageChannel(ExecState*,
                                                 const Identifier&,
                                                 const PropertySlot&);
 static void setJSDOMWindowBaseMessageChannel(ExecState*, JSObject*, JSValuePtr);
+static JSValuePtr jsDOMWindowBaseWorker(ExecState*,
+                                        const Identifier&,
+                                        const PropertySlot&);
+static void setJSDOMWindowBaseWorker(ExecState*, JSObject*, JSValuePtr);
 static JSValuePtr jsDOMWindowBaseOption(ExecState*,
                                         const Identifier&,
                                         const PropertySlot&);
@@ -192,6 +194,7 @@ DontDelete|Function 0
   Image                         jsDOMWindowBaseImage DontDelete
   MessageChannel                jsDOMWindowBaseMessageChannel DontDelete
   Option                        jsDOMWindowBaseOption DontDelete
+  Worker                        jsDOMWindowBaseWorker DontDelete
   XMLHttpRequest                jsDOMWindowBaseXMLHttpRequest DontDelete
   XSLTProcessor                 jsDOMWindowBaseXSLTProcessor DontDelete
 @end
@@ -558,6 +561,19 @@ JSValuePtr jsDOMWindowBaseAudio(ExecState* exec,
 #endif
 }
 
+JSValuePtr jsDOMWindowBaseWorker(ExecState* exec,
+                                 const Identifier&,
+                                 const PropertySlot& slot) {
+#if ENABLE(WORKERS)
+  if (!static_cast<JSDOMWindowBase*>(asObject(slot.slotBase()))
+           ->allowsAccessFrom(exec))
+    return jsUndefined();
+  return getDOMConstructor<JSDedicatedWorkerConstructor>(exec);
+#else
+  return jsUndefined();
+#endif
+}
+
 JSValuePtr jsDOMWindowBaseXSLTProcessor(ExecState* exec,
                                         const Identifier&,
                                         const PropertySlot& slot) {
@@ -712,6 +728,7 @@ void JSDOMWindowBase::put(ExecState* exec,
           entry->propertyPutter() == setJSDOMWindowBaseImage ||
           entry->propertyPutter() == setJSDOMWindowBaseOption ||
           entry->propertyPutter() == setJSDOMWindowBaseMessageChannel ||
+          entry->propertyPutter() == setJSDOMWindowBaseWorker ||
           entry->propertyPutter() == setJSDOMWindowBaseXMLHttpRequest ||
           entry->propertyPutter() == setJSDOMWindowBaseXSLTProcessor)) {
       entry->propertyPutter()(exec, this, value);
@@ -742,6 +759,10 @@ void setJSDOMWindowBaseMessageChannel(ExecState*, JSObject*, JSValuePtr) {
 }
 
 void setJSDOMWindowBaseOption(ExecState*, JSObject*, JSValuePtr) {
+  ASSERT_NOT_REACHED();
+}
+
+void setJSDOMWindowBaseWorker(ExecState*, JSObject*, JSValuePtr) {
   ASSERT_NOT_REACHED();
 }
 
