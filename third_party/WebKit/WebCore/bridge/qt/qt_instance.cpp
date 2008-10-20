@@ -153,7 +153,7 @@ void QtInstance::mark() {
     if (val && !val->marked())
       val->mark();
   }
-  foreach (JSValuePtr val, m_children.values()) {
+  foreach (JSValue* val, m_children.values()) {
     if (val && !val->marked())
       val->mark();
   }
@@ -314,7 +314,7 @@ JSValuePtr QtField::valueFromInstance(ExecState* exec,
 
     // Need to save children so we can mark them
     if (m_type == ChildObject)
-      instance->m_children.insert(ret);
+      instance->m_children.insert(ret.payload());
 
     return ret;
   } else {
