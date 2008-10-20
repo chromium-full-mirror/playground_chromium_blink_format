@@ -589,8 +589,8 @@ IntSize RenderBox::calculateBackgroundSize(const FillLayer* bgLayer,
   if (bgLayer->isSizeSet()) {
     int w = scaledWidth;
     int h = scaledHeight;
-    Length bgWidth = bgLayer->size().width;
-    Length bgHeight = bgLayer->size().height;
+    Length bgWidth = bgLayer->size().width();
+    Length bgHeight = bgLayer->size().height();
 
     if (bgWidth.isFixed())
       w = bgWidth.value();

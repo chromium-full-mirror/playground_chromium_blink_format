@@ -401,8 +401,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return CSSPrimitiveValue::createIdentifier(CSSValueNone);
     case CSSPropertyWebkitBackgroundSize: {
       RefPtr<CSSValueList> list = CSSValueList::createSpaceSeparated();
-      list->append(CSSPrimitiveValue::create(style->backgroundSize().width));
-      list->append(CSSPrimitiveValue::create(style->backgroundSize().height));
+      list->append(CSSPrimitiveValue::create(style->backgroundSize().width()));
+      list->append(CSSPrimitiveValue::create(style->backgroundSize().height()));
       return list.release();
     }
     case CSSPropertyBackgroundRepeat:
@@ -704,8 +704,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return CSSPrimitiveValue::createIdentifier(CSSValueNone);
     case CSSPropertyWebkitMaskSize: {
       RefPtr<CSSValueList> list = CSSValueList::createSpaceSeparated();
-      list->append(CSSPrimitiveValue::create(style->maskSize().width));
-      list->append(CSSPrimitiveValue::create(style->maskSize().height));
+      list->append(CSSPrimitiveValue::create(style->maskSize().width()));
+      list->append(CSSPrimitiveValue::create(style->maskSize().height()));
       return list.release();
     }
     case CSSPropertyWebkitMaskRepeat:

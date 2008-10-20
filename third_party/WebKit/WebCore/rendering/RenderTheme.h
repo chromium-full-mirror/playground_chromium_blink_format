@@ -111,7 +111,7 @@ class RenderTheme {
   // checkbox).  When these controls repaint,
   // the theme needs to communicate this inflated rect to the engine so that it
   // can invalidate the whole control.
-  virtual void adjustRepaintRect(const RenderObject*, IntRect&) {}
+  virtual void adjustRepaintRect(const RenderObject*, IntRect&);
 
   // This method is called whenever a relevant state changes on a particular
   // themed object, e.g., the mouse becomes pressed
@@ -159,17 +159,6 @@ class RenderTheme {
   virtual int minimumMenuListSize(RenderStyle*) const { return 0; }
 
   virtual void adjustSliderThumbSize(RenderObject*) const;
-
-  // Methods for state querying
-  bool isActive(const RenderObject*) const;
-  bool isChecked(const RenderObject*) const;
-  bool isIndeterminate(const RenderObject*) const;
-  bool isEnabled(const RenderObject*) const;
-  bool isFocused(const RenderObject*) const;
-  bool isPressed(const RenderObject*) const;
-  bool isHovered(const RenderObject*) const;
-  bool isReadOnlyControl(const RenderObject*) const;
-  bool isDefault(const RenderObject*) const;
 
   virtual int popupInternalPaddingLeft(RenderStyle*) const { return 0; }
   virtual int popupInternalPaddingRight(RenderStyle*) const { return 0; }
@@ -349,6 +338,19 @@ class RenderTheme {
                                      const IntRect&) {
     return true;
   }
+
+ public:
+  // Methods for state querying
+  ControlStates controlStatesForRenderer(const RenderObject* o) const;
+  bool isActive(const RenderObject*) const;
+  bool isChecked(const RenderObject*) const;
+  bool isIndeterminate(const RenderObject*) const;
+  bool isEnabled(const RenderObject*) const;
+  bool isFocused(const RenderObject*) const;
+  bool isPressed(const RenderObject*) const;
+  bool isHovered(const RenderObject*) const;
+  bool isReadOnlyControl(const RenderObject*) const;
+  bool isDefault(const RenderObject*) const;
 
  private:
   mutable Color m_activeSelectionColor;

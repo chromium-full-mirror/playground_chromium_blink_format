@@ -28,14 +28,15 @@
 
 #include "Color.h"
 #include "Font.h"
-#include "IntSize.h"
 #include "IntRect.h"
+#include "Length.h"
 #include "PlatformString.h"
 #include "ThemeTypes.h"
 
 namespace WebCore {
 
 class GraphicsContext;
+class ScrollView;
 
 // Unlike other platform classes, Theme does extensively use virtual functions.
 // This design allows a platform to switch between multiple themes at runtime.
@@ -50,6 +51,7 @@ class Theme {
   // radio buttons are examples of
   // controls that need to do this.  The adjustment is an offset that adds to
   // the baseline, e.g., marginTop() + height() + |offset|.
+  // The offset is not zoomed.
   virtual int baselinePositionAdjustment(ControlPart) const { return 0; }
 
   // A method asking if the control changes its appearance when the window is
@@ -85,30 +87,37 @@ class Theme {
   virtual void themeChanged() {}
 
   // Methods used to adjust the RenderStyles of controls.
-  virtual IntSize controlSize(ControlPart, const Font&) { return IntSize(); }
-  virtual Font controlFont(ControlPart, const Font& font) { return font; }
-  virtual ControlBox controlPadding(ControlPart, ControlBox box, const Font&) {
-    return box;
-  }
-  virtual ControlBox controlInternalPadding(ControlPart) {
-    return ControlBox();
-  }
-  virtual ControlBox controlBorder(ControlPart, ControlBox box, const Font&) {
-    return box;
-  }
-  virtual int controlBorderRadius(ControlPart, const Font&) { return 0; }
 
-  // Method for painting a control.
+  // The size here is in zoomed coordinates already.  If a new size is returned,
+  // it also needs to be in zoomed coordinates.
+  virtual LengthSize controlSize(ControlPart,
+                                 const Font&,
+                                 const LengthSize& zoomedSize,
+                                 float zoomFactor) const {
+    return zoomedSize;
+  }
+  virtual bool controlSupportsBorder(ControlPart) const { return true; }
+  virtual bool controlSupportsPadding(ControlPart) const { return true; }
+
+  // Method for painting a control.  The rect is in zoomed coordinates.
   virtual void paint(ControlPart,
                      ControlStates,
                      GraphicsContext*,
-                     const IntRect&){};
+                     const IntRect& zoomedRect,
+                     float zoomFactor,
+                     ScrollView*) const {};
 
   // Some controls may spill out of their containers (e.g., the check on an OS X
   // checkbox).  When these controls repaint,
   // the theme needs to communicate this inflated rect to the engine so that it
   // can invalidate the whole control.
-  virtual void inflateControlPaintRect(ControlPart, ControlStates, IntRect&) {}
+  // The rect passed in is in zoomed coordinates, so the inflation should take
+  // that into account and make sure the inflation
+  // amount is also scaled by the zoomFactor.
+  virtual void inflateControlPaintRect(ControlPart,
+                                       ControlStates,
+                                       IntRect& zoomedRect,
+                                       float zoomFactor) const {}
 
   // This method is called once, from RenderTheme::adjustDefaultStyleSheet(), to
   // let each platform adjust
