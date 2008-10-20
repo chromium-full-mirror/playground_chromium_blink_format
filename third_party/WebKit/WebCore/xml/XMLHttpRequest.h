@@ -140,9 +140,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   virtual void removeEventListener(const AtomicString& eventType,
                                    EventListener*,
                                    bool useCapture);
-  virtual bool dispatchEvent(PassRefPtr<Event>,
-                             ExceptionCode&,
-                             bool tempEvent = false);
+  virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
   EventListenersMap& eventListeners() { return m_eventListeners; }
 
   using RefCounted<XMLHttpRequest>::ref;

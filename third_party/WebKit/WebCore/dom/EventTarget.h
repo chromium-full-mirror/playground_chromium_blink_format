@@ -76,9 +76,7 @@ class EventTarget {
   virtual void removeEventListener(const AtomicString& eventType,
                                    EventListener*,
                                    bool useCapture) = 0;
-  virtual bool dispatchEvent(PassRefPtr<Event>,
-                             ExceptionCode&,
-                             bool tempEvent = false) = 0;
+  virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&) = 0;
 
   void ref() { refEventTarget(); }
   void deref() { derefEventTarget(); }

@@ -884,7 +884,7 @@ static void dispatchChildInsertionEvents(Node* child, ExceptionCode& ec) {
     EventTargetNodeCast(c.get())->dispatchEvent(
         MutationEvent::create(DOMNodeInsertedEvent, true, false,
                               c->parentNode(), String(), String(), String(), 0),
-        ec, true);
+        ec);
     if (ec)
       return;
   }
@@ -900,7 +900,7 @@ static void dispatchChildInsertionEvents(Node* child, ExceptionCode& ec) {
       EventTargetNodeCast(c.get())->dispatchEvent(
           MutationEvent::create(DOMNodeInsertedIntoDocumentEvent, false, false,
                                 0, String(), String(), String(), 0),
-          ec, true);
+          ec);
       if (ec)
         return;
     }
@@ -922,7 +922,7 @@ static void dispatchChildRemovalEvents(Node* child, ExceptionCode& ec) {
     EventTargetNodeCast(c.get())->dispatchEvent(
         MutationEvent::create(DOMNodeRemovedEvent, true, false, c->parentNode(),
                               String(), String(), String(), 0),
-        ec, true);
+        ec);
     if (ec)
       return;
   }
@@ -937,7 +937,7 @@ static void dispatchChildRemovalEvents(Node* child, ExceptionCode& ec) {
       EventTargetNodeCast(c.get())->dispatchEvent(
           MutationEvent::create(DOMNodeRemovedFromDocumentEvent, false, false,
                                 0, String(), String(), String(), 0),
-          ec, true);
+          ec);
       if (ec)
         return;
     }

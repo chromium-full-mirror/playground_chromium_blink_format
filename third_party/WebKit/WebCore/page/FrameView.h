@@ -143,9 +143,7 @@ class FrameView : public ScrollView {
 
   void restoreScrollbar();
 
-  void scheduleEvent(PassRefPtr<Event>,
-                     PassRefPtr<EventTargetNode>,
-                     bool tempEvent);
+  void scheduleEvent(PassRefPtr<Event>, PassRefPtr<EventTargetNode>);
   void pauseScheduledEvents();
   void resumeScheduledEvents();
   void postLayoutTimerFired(Timer<FrameView>*);

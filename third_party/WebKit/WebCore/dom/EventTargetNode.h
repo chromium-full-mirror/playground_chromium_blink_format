@@ -49,9 +49,7 @@ class EventTargetNode : public Node, public EventTarget {
   virtual void removeEventListener(const AtomicString& eventType,
                                    EventListener*,
                                    bool useCapture);
-  virtual bool dispatchEvent(PassRefPtr<Event>,
-                             ExceptionCode&,
-                             bool tempEvent = false);
+  virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
   void removeAllEventListeners();
 
   void setEventListenerForType(const AtomicString& eventType,
@@ -112,7 +110,7 @@ class EventTargetNode : public Node, public EventTarget {
   bool dispatchWebKitTransitionEvent(const AtomicString& eventType,
                                      const String& propertyName,
                                      double elapsedTime);
-  bool dispatchGenericEvent(PassRefPtr<Event>, ExceptionCode&, bool tempEvent);
+  bool dispatchGenericEvent(PassRefPtr<Event>, ExceptionCode&);
 
   virtual void handleLocalEvents(Event*, bool useCapture);
 

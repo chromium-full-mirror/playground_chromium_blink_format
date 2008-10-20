@@ -205,8 +205,7 @@ void DOMApplicationCache::removeEventListener(const AtomicString& eventType,
 }
 
 bool DOMApplicationCache::dispatchEvent(PassRefPtr<Event> event,
-                                        ExceptionCode& ec,
-                                        bool tempEvent) {
+                                        ExceptionCode& ec) {
   if (event->type().isEmpty()) {
     ec = EventException::UNSPECIFIED_EVENT_TYPE_ERR;
     return true;
@@ -235,7 +234,7 @@ void DOMApplicationCache::callListener(const AtomicString& eventType,
   }
 
   ExceptionCode ec = 0;
-  dispatchEvent(event.release(), ec, false);
+  dispatchEvent(event.release(), ec);
   ASSERT(!ec);
 }
 

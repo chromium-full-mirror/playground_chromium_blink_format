@@ -1417,7 +1417,7 @@ bool EventHandler::dispatchDragEvent(const AtomicString& eventType,
       clipboard);
 
   ExceptionCode ec = 0;
-  EventTargetNodeCast(dragTarget)->dispatchEvent(me.get(), ec, true);
+  EventTargetNodeCast(dragTarget)->dispatchEvent(me.get(), ec);
   return me->defaultPrevented();
 }
 
@@ -1945,7 +1945,7 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
   keydown->setTarget(node);
 
   if (initialKeyEvent.type() == PlatformKeyboardEvent::RawKeyDown) {
-    node->dispatchEvent(keydown, ec, true);
+    node->dispatchEvent(keydown, ec);
     return keydown->defaultHandled() || keydown->defaultPrevented();
   }
 
@@ -1969,7 +1969,7 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
     keydown->setDefaultHandled();
   }
 
-  node->dispatchEvent(keydown, ec, true);
+  node->dispatchEvent(keydown, ec);
   bool keydownResult = keydown->defaultHandled() || keydown->defaultPrevented();
   if (handledByInputMethod || (keydownResult && !backwardCompatibilityMode))
     return keydownResult;
@@ -1996,7 +1996,7 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
 #if PLATFORM(MAC)
   keypress->keypressCommands() = keydown->keypressCommands();
 #endif
-  node->dispatchEvent(keypress, ec, true);
+  node->dispatchEvent(keypress, ec);
 
   return keydownResult || keypress->defaultPrevented() ||
          keypress->defaultHandled();
@@ -2302,7 +2302,7 @@ bool EventHandler::handleTextInputEvent(const String& text,
   event->setIsLineBreak(isLineBreak);
   event->setIsBackTab(isBackTab);
   ExceptionCode ec;
-  return target->dispatchEvent(event.release(), ec, true);
+  return target->dispatchEvent(event.release(), ec);
 }
 
 #if !PLATFORM(MAC) && !PLATFORM(QT)

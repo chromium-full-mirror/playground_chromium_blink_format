@@ -157,7 +157,7 @@ void TypingCommand::insertText(Document* document,
     // necessary.
     ExceptionCode ec = 0;
     RefPtr<BeforeTextInsertedEvent> evt = BeforeTextInsertedEvent::create(text);
-    startNode->rootEditableElement()->dispatchEvent(evt, ec, true);
+    startNode->rootEditableElement()->dispatchEvent(evt, ec);
     newText = evt->text();
   }
 

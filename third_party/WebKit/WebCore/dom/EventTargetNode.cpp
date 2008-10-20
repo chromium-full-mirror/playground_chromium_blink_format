@@ -249,9 +249,7 @@ static inline EventTarget* eventTargetRespectingSVGTargetRules(
   return referenceNode;
 }
 
-bool EventTargetNode::dispatchEvent(PassRefPtr<Event> e,
-                                    ExceptionCode& ec,
-                                    bool tempEvent) {
+bool EventTargetNode::dispatchEvent(PassRefPtr<Event> e, ExceptionCode& ec) {
   RefPtr<Event> evt(e);
   ASSERT(!eventDispatchForbidden());
   if (!evt || evt->type().isEmpty()) {
@@ -262,12 +260,11 @@ bool EventTargetNode::dispatchEvent(PassRefPtr<Event> e,
   evt->setTarget(eventTargetRespectingSVGTargetRules(this));
 
   RefPtr<FrameView> view = document()->view();
-  return dispatchGenericEvent(evt.release(), ec, tempEvent);
+  return dispatchGenericEvent(evt.release(), ec);
 }
 
 bool EventTargetNode::dispatchGenericEvent(PassRefPtr<Event> e,
-                                           ExceptionCode& ec,
-                                           bool tempEvent) {
+                                           ExceptionCode& ec) {
   RefPtr<Event> evt(e);
 
   ASSERT(!eventDispatchForbidden());
@@ -403,15 +400,6 @@ bool EventTargetNode::dispatchGenericEvent(PassRefPtr<Event> e,
 
   Document::updateDocumentsRendering();
 
-  // If tempEvent is true, this means that the DOM implementation
-  // will not be storing a reference to the event, i.e.  there is no
-  // way to retrieve it from javascript if a script does not already
-  // have a reference to it in a variable.  So there is no need for
-  // the interpreter to keep the event in it's cache
-  Frame* frame = document()->frame();
-  if (tempEvent && frame && frame->script()->isEnabled())
-    frame->script()->finishedWithEvent(evt.get());
-
   return !evt->defaultPrevented();  // ### what if defaultPrevented was called
                                     // before dispatchEvent?
 }
@@ -431,7 +419,7 @@ bool EventTargetNode::dispatchSubtreeModifiedEvent() {
   return dispatchEvent(
       MutationEvent::create(DOMSubtreeModifiedEvent, true, false, 0, String(),
                             String(), String(), 0),
-      ec, true);
+      ec);
 }
 
 void EventTargetNode::dispatchWindowEvent(PassRefPtr<Event> e) {
@@ -460,7 +448,7 @@ void EventTargetNode::dispatchWindowEvent(const AtomicString& eventType,
       RefPtr<Event> ownerEvent = Event::create(eventType, false, cancelableArg);
       ownerEvent->setTarget(ownerElement);
       ExceptionCode ec = 0;
-      ownerElement->dispatchGenericEvent(ownerEvent.release(), ec, true);
+      ownerElement->dispatchGenericEvent(ownerEvent.release(), ec);
     }
   }
 }
@@ -478,7 +466,7 @@ bool EventTargetNode::dispatchUIEvent(const AtomicString& eventType,
   RefPtr<UIEvent> evt = UIEvent::create(eventType, true, cancelable,
                                         document()->defaultView(), detail);
   evt->setUnderlyingEvent(underlyingEvent);
-  return dispatchEvent(evt.release(), ec, true);
+  return dispatchEvent(evt.release(), ec);
 }
 
 bool EventTargetNode::dispatchKeyEvent(const PlatformKeyboardEvent& key) {
@@ -486,7 +474,7 @@ bool EventTargetNode::dispatchKeyEvent(const PlatformKeyboardEvent& key) {
   ExceptionCode ec = 0;
   RefPtr<KeyboardEvent> keyboardEvent =
       KeyboardEvent::create(key, document()->defaultView());
-  bool r = dispatchEvent(keyboardEvent, ec, true);
+  bool r = dispatchEvent(keyboardEvent, ec);
 
   // we want to return false if default is prevented (already taken care of)
   // or if the element is default-handled by the DOM. Otherwise we let it just
@@ -619,7 +607,7 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
       relatedTarget, 0, isSimulated);
   mouseEvent->setUnderlyingEvent(underlyingEvent.get());
 
-  dispatchEvent(mouseEvent, ec, true);
+  dispatchEvent(mouseEvent, ec);
   bool defaultHandled = mouseEvent->defaultHandled();
   bool defaultPrevented = mouseEvent->defaultPrevented();
   if (defaultHandled || defaultPrevented)
@@ -639,7 +627,7 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
     doubleClickEvent->setUnderlyingEvent(underlyingEvent.get());
     if (defaultHandled)
       doubleClickEvent->setDefaultHandled();
-    dispatchEvent(doubleClickEvent, ec, true);
+    dispatchEvent(doubleClickEvent, ec);
     if (doubleClickEvent->defaultHandled() ||
         doubleClickEvent->defaultPrevented())
       swallowEvent = true;
@@ -675,7 +663,7 @@ void EventTargetNode::dispatchWheelEvent(PlatformWheelEvent& e) {
                          e.globalX(), e.globalY(), pos.x(), pos.y(),
                          e.ctrlKey(), e.altKey(), e.shiftKey(), e.metaKey());
   ExceptionCode ec = 0;
-  if (!dispatchEvent(we.release(), ec, true))
+  if (!dispatchEvent(we.release(), ec))
     e.accept();
 }
 
@@ -687,8 +675,7 @@ bool EventTargetNode::dispatchWebKitAnimationEvent(
 
   ExceptionCode ec = 0;
   return dispatchEvent(
-      WebKitAnimationEvent::create(eventType, animationName, elapsedTime), ec,
-      true);
+      WebKitAnimationEvent::create(eventType, animationName, elapsedTime), ec);
 }
 
 bool EventTargetNode::dispatchWebKitTransitionEvent(
@@ -699,8 +686,7 @@ bool EventTargetNode::dispatchWebKitTransitionEvent(
 
   ExceptionCode ec = 0;
   return dispatchEvent(
-      WebKitTransitionEvent::create(eventType, propertyName, elapsedTime), ec,
-      true);
+      WebKitTransitionEvent::create(eventType, propertyName, elapsedTime), ec);
 }
 
 void EventTargetNode::dispatchFocusEvent() {
@@ -717,7 +703,7 @@ bool EventTargetNode::dispatchEventForType(const AtomicString& eventType,
   ASSERT(!eventDispatchForbidden());
   ExceptionCode ec = 0;
   return dispatchEvent(Event::create(eventType, canBubbleArg, cancelableArg),
-                       ec, true);
+                       ec);
 }
 
 bool EventTargetNode::dispatchProgressEvent(const AtomicString& eventType,
@@ -728,7 +714,7 @@ bool EventTargetNode::dispatchProgressEvent(const AtomicString& eventType,
   ExceptionCode ec = 0;
   return dispatchEvent(ProgressEvent::create(eventType, lengthComputableArg,
                                              loadedArg, totalArg),
-                       ec, true);
+                       ec);
 }
 
 void EventTargetNode::dispatchStorageEvent(const AtomicString& eventType,
@@ -742,7 +728,7 @@ void EventTargetNode::dispatchStorageEvent(const AtomicString& eventType,
   dispatchEvent(StorageEvent::create(eventType, key, oldValue, newValue,
                                      source->document()->documentURI(),
                                      source->domWindow()),
-                ec, true);
+                ec);
 #endif
 }
 

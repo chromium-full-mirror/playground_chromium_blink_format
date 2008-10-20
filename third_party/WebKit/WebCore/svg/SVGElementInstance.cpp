@@ -150,9 +150,7 @@ void SVGElementInstance::removeEventListener(const AtomicString& eventType,
     element->removeEventListener(eventType, listener, useCapture);
 }
 
-bool SVGElementInstance::dispatchEvent(PassRefPtr<Event> e,
-                                       ExceptionCode& ec,
-                                       bool tempEvent) {
+bool SVGElementInstance::dispatchEvent(PassRefPtr<Event> e, ExceptionCode& ec) {
   RefPtr<Event> evt(e);
   ASSERT(!eventDispatchForbidden());
   if (!evt || evt->type().isEmpty()) {
@@ -169,7 +167,7 @@ bool SVGElementInstance::dispatchEvent(PassRefPtr<Event> e,
   evt->setTarget(this);
 
   RefPtr<FrameView> view = element->document()->view();
-  return element->dispatchGenericEvent(evt.release(), ec, tempEvent);
+  return element->dispatchGenericEvent(evt.release(), ec);
 }
 
 EventListener* SVGElementInstance::onabort() const {

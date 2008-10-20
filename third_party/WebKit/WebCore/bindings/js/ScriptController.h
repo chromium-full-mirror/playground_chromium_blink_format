@@ -88,7 +88,6 @@ class ScriptController {
                                                   const String& code,
                                                   Node*);
 #endif
-  void finishedWithEvent(Event*);
   void setEventHandlerLineno(int lineno) { m_handlerLineno = lineno; }
 
   void setProcessingTimerCallback(bool b) { m_processingTimerCallback = b; }
