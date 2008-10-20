@@ -1557,7 +1557,7 @@ NEVER_INLINE void Machine::tryCacheGetByID(CallFrame* callFrame,
       RefPtr<StructureID> transition =
           StructureID::fromDictionaryTransition(baseObject->structureID());
       baseObject->setStructureID(transition.release());
-      asObject(baseValue)->structureID()->setCachedPrototypeChain(0);
+      asCell(baseValue)->structureID()->setCachedPrototypeChain(0);
     }
 
     vPC[0] = getOpcode(op_get_by_id_proto);
