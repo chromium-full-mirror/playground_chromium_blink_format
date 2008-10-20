@@ -24,7 +24,7 @@
 #ifndef NinePieceImage_h
 #define NinePieceImage_h
 
-#include "Length.h"
+#include "LengthBox.h"
 #include "StyleImage.h"
 
 namespace WebCore {
@@ -37,6 +37,7 @@ class NinePieceImage {
       : m_image(0),
         m_horizontalRule(StretchImageRule),
         m_verticalRule(StretchImageRule) {}
+
   NinePieceImage(StyleImage* image,
                  LengthBox slices,
                  ENinePieceImageRule h,
@@ -64,5 +65,7 @@ class NinePieceImage {
   unsigned m_horizontalRule : 2;  // ENinePieceImageRule
   unsigned m_verticalRule : 2;    // ENinePieceImageRule
 };
-}
-#endif
+
+}  // namespace WebCore
+
+#endif  // NinePieceImage_h
