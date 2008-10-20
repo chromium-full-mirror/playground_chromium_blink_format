@@ -865,8 +865,7 @@ void RenderLayer::scrollToOffset(int x,
   if (view) {
     if (FrameView* frameView = view->frameView())
       frameView->scheduleEvent(Event::create(scrollEvent, false, false),
-                               EventTargetNodeCast(renderer()->element()),
-                               true);
+                               EventTargetNodeCast(renderer()->element()));
   }
 }
 
@@ -1448,7 +1447,7 @@ void RenderLayer::updateOverflowStatus(bool horizontalOverflow,
       frameView->scheduleEvent(
           OverflowEvent::create(horizontalOverflowChanged, horizontalOverflow,
                                 verticalOverflowChanged, verticalOverflow),
-          EventTargetNodeCast(m_object->element()), true);
+          EventTargetNodeCast(m_object->element()));
     }
   }
 }
