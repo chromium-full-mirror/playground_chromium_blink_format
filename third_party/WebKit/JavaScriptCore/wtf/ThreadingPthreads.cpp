@@ -29,6 +29,8 @@
 #include "config.h"
 #include "Threading.h"
 
+#if USE(PTHREADS)
+
 #include "HashMap.h"
 #include "MainThread.h"
 #include "MathExtras.h"
@@ -247,3 +249,5 @@ void ThreadCondition::broadcast() {
 }
 
 }  // namespace WTF
+
+#endif  // USE(PTHREADS)
