@@ -96,8 +96,8 @@ class Theme {
                                  float zoomFactor) const {
     return zoomedSize;
   }
-  virtual bool controlSupportsBorder(ControlPart) const { return true; }
-  virtual bool controlSupportsPadding(ControlPart) const { return true; }
+  virtual bool controlSupportsBorder(ControlPart) const;
+  virtual bool controlSupportsPadding(ControlPart) const;
 
   // Method for painting a control.  The rect is in zoomed coordinates.
   virtual void paint(ControlPart,

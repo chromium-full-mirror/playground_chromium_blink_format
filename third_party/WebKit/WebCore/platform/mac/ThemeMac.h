@@ -41,8 +41,6 @@ class ThemeMac : public Theme {
                                  const Font&,
                                  const LengthSize&,
                                  float zoomFactor) const;
-  virtual bool controlSupportsBorder(ControlPart) const;
-  virtual bool controlSupportsPadding(ControlPart) const;
 
   virtual void paint(ControlPart,
                      ControlStates,

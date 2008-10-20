@@ -107,7 +107,7 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
   // Call the appropriate style adjustment method based off the appearance
   // value.
   switch (style->appearance()) {
-#if USE(NEW_THEME)
+#if !USE(NEW_THEME)
     case CheckboxPart:
       return adjustCheckboxStyle(selector, style, e);
     case RadioPart:
@@ -537,6 +537,7 @@ bool RenderTheme::isDefault(const RenderObject* o) const {
   return o->style()->appearance() == DefaultButtonPart;
 }
 
+#if !USE(NEW_THEME)
 void RenderTheme::adjustCheckboxStyle(CSSStyleSelector* selector,
                                       RenderStyle* style,
                                       Element* e) const {
@@ -578,6 +579,7 @@ void RenderTheme::adjustRadioStyle(CSSStyleSelector* selector,
 
   style->setBoxShadow(0);
 }
+#endif
 
 void RenderTheme::adjustButtonStyle(CSSStyleSelector* selector,
                                     RenderStyle* style,

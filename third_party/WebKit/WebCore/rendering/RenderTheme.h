@@ -173,6 +173,7 @@ class RenderTheme {
   };
 
  protected:
+#if !USE(NEW_THEME)
   // Methods for each appearance value.
   virtual void adjustCheckboxStyle(CSSStyleSelector*,
                                    RenderStyle*,
@@ -193,6 +194,7 @@ class RenderTheme {
     return true;
   }
   virtual void setRadioSize(RenderStyle*) const {}
+#endif
 
   virtual void adjustButtonStyle(CSSStyleSelector*,
                                  RenderStyle*,
