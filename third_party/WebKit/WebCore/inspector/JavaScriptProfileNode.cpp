@@ -42,9 +42,9 @@ namespace WebCore {
 
 // Cache
 
-typedef HashMap<ProfileNode*, JSValuePtr> ProfileNodeMap;
+typedef HashMap<ProfileNode*, JSObject*> ProfileNodeMap;
 
-static ProfileNodeMap& ProfileNodeCache() {
+static ProfileNodeMap& profileNodeCache() {
   static ProfileNodeMap staticProfileNodes;
   return staticProfileNodes;
 }
@@ -233,7 +233,7 @@ static JSValueRef getVisible(JSContextRef ctx,
 static void finalize(JSObjectRef object) {
   ProfileNode* profileNode =
       static_cast<ProfileNode*>(JSObjectGetPrivate(object));
-  ProfileNodeCache().remove(profileNode);
+  profileNodeCache().remove(profileNode);
   profileNode->deref();
 }
 
@@ -269,24 +269,24 @@ JSClassRef ProfileNodeClass() {
                                               0,
                                               0};
 
-  static JSClassRef ProfileNodeClass = JSClassCreate(&classDefinition);
-  return ProfileNodeClass;
+  static JSClassRef profileNodeClass = JSClassCreate(&classDefinition);
+  return profileNodeClass;
 }
 
-JSValuePtr toJS(ExecState* exec, ProfileNode* ProfileNode) {
-  if (!ProfileNode)
+JSValuePtr toJS(ExecState* exec, ProfileNode* profileNode) {
+  if (!profileNode)
     return jsNull();
 
-  JSValuePtr ProfileNodeWrapper = ProfileNodeCache().get(ProfileNode);
-  if (ProfileNodeWrapper)
-    return ProfileNodeWrapper;
+  JSObject* profileNodeWrapper = profileNodeCache().get(profileNode);
+  if (profileNodeWrapper)
+    return profileNodeWrapper;
 
-  ProfileNode->ref();
+  profileNode->ref();
 
-  ProfileNodeWrapper = toJS(JSObjectMake(toRef(exec), ProfileNodeClass(),
-                                         static_cast<void*>(ProfileNode)));
-  ProfileNodeCache().set(ProfileNode, ProfileNodeWrapper);
-  return ProfileNodeWrapper;
+  profileNodeWrapper = toJS(JSObjectMake(toRef(exec), ProfileNodeClass(),
+                                         static_cast<void*>(profileNode)));
+  profileNodeCache().set(profileNode, profileNodeWrapper);
+  return profileNodeWrapper;
 }
 
 }  // namespace WebCore
