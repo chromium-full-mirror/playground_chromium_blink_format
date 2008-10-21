@@ -60,10 +60,8 @@ JSCallbackObject<Base>::JSCallbackObject(ExecState* exec,
 // FIXME: Move this into a separate JSGlobalCallbackObject class derived from
 // this one.
 template <class Base>
-JSCallbackObject<Base>::JSCallbackObject(JSGlobalData* globalData,
-                                         JSClassRef jsClass)
-    : Base(globalData),
-      m_callbackObjectData(new JSCallbackObjectData(0, jsClass)) {
+JSCallbackObject<Base>::JSCallbackObject(JSClassRef jsClass)
+    : Base(), m_callbackObjectData(new JSCallbackObjectData(0, jsClass)) {
   ASSERT(Base::isGlobalObject());
   init(static_cast<JSGlobalObject*>(this)->globalExec());
 }

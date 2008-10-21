@@ -34,8 +34,8 @@
 
 class JSGlueGlobalObject : public JSGlobalObject {
  public:
-  JSGlueGlobalObject(JSGlobalData* globalData, JSFlags flags = kJSFlagNone)
-      : JSGlobalObject(globalData), fJSFlags(flags) {}
+  JSGlueGlobalObject(JSFlags flags = kJSFlagNone)
+      : JSGlobalObject(), fJSFlags(flags) {}
 
   JSFlags Flags() const { return fJSFlags; }
 

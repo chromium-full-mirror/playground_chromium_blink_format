@@ -65,13 +65,12 @@ JSGlobalContextRef JSGlobalContextCreateInGroup(JSContextGroupRef group,
       group ? PassRefPtr<JSGlobalData>(toJS(group)) : JSGlobalData::create();
 
   if (!globalObjectClass) {
-    JSGlobalObject* globalObject =
-        new (globalData.get()) JSGlobalObject(globalData.get());
+    JSGlobalObject* globalObject = new (globalData.get()) JSGlobalObject;
     return JSGlobalContextRetain(toGlobalRef(globalObject->globalExec()));
   }
 
   JSGlobalObject* globalObject = new (globalData.get())
-      JSCallbackObject<JSGlobalObject>(globalData.get(), globalObjectClass);
+      JSCallbackObject<JSGlobalObject>(globalObjectClass);
   ExecState* exec = globalObject->globalExec();
   JSValuePtr prototype = globalObjectClass->prototype(exec);
   if (!prototype)

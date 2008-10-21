@@ -137,8 +137,8 @@ class JSGlobalObject : public JSVariableObject {
  public:
   void* operator new(size_t, JSGlobalData*);
 
-  explicit JSGlobalObject(JSGlobalData* globalData)
-      : JSVariableObject(globalData->nullProtoStructureID,
+  explicit JSGlobalObject()
+      : JSVariableObject(JSGlobalObject::createStructureID(jsNull()),
                          new JSGlobalObjectData) {
     init(this);
   }
