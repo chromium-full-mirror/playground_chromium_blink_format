@@ -96,6 +96,7 @@ class QWebHitTestResultPrivate {
   QWebHitTestResultPrivate(const WebCore::HitTestResult& hitTest);
 
   QPoint pos;
+  QRect boundingBox;
   QString title;
   QString linkText;
   QUrl linkUrl;
