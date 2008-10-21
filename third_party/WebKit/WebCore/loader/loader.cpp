@@ -392,6 +392,10 @@ void Loader::Host::didReceiveResponse(SubresourceLoader* loader,
 
       // Existing resource is ok, just use it updating the expiration time.
       cache()->revalidationSucceeded(resource, response);
+
+      if (request->docLoader()->frame())
+        request->docLoader()->frame()->loader()->checkCompleted();
+
       delete request;
 
       servePendingRequests();
