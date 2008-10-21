@@ -292,7 +292,12 @@ void MainResourceLoader::continueAfterContentPolicy(PolicyAction policy) {
 }
 
 void MainResourceLoader::didReceiveResponse(const ResourceResponse& r) {
+// There is a bug in CFNetwork where callbacks can be dispatched even when loads
+// are deferred.
+// See <rdar://problem/6304600> for more details.
+#if !PLATFORM(CF)
   ASSERT(shouldLoadAsEmptyDocument(r.url()) || !defersLoading());
+#endif
 
   if (m_loadingMultipartContent) {
     frameLoader()->setupForReplaceByMIMEType(r.mimeType());
@@ -324,7 +329,13 @@ void MainResourceLoader::didReceiveData(const char* data,
                                         bool allAtOnce) {
   ASSERT(data);
   ASSERT(length != 0);
+
+// There is a bug in CFNetwork where callbacks can be dispatched even when loads
+// are deferred.
+// See <rdar://problem/6304600> for more details.
+#if !PLATFORM(CF)
   ASSERT(!defersLoading());
+#endif
 
   // The additional processing can do anything including possibly removing the
   // last
@@ -335,9 +346,14 @@ void MainResourceLoader::didReceiveData(const char* data,
 }
 
 void MainResourceLoader::didFinishLoading() {
+// There is a bug in CFNetwork where callbacks can be dispatched even when loads
+// are deferred.
+// See <rdar://problem/6304600> for more details.
+#if !PLATFORM(CF)
   ASSERT(
       shouldLoadAsEmptyDocument(frameLoader()->activeDocumentLoader()->url()) ||
       !defersLoading());
+#endif
 
   // The additional processing can do anything including possibly removing the
   // last
@@ -362,7 +378,12 @@ void MainResourceLoader::didFinishLoading() {
 }
 
 void MainResourceLoader::didFail(const ResourceError& error) {
+// There is a bug in CFNetwork where callbacks can be dispatched even when loads
+// are deferred.
+// See <rdar://problem/6304600> for more details.
+#if !PLATFORM(CF)
   ASSERT(!defersLoading());
+#endif
 
   receivedError(error);
 }
