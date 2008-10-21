@@ -1224,7 +1224,7 @@ RegisterID* ConstStatementNode::emitCode(CodeGenerator& generator,
 
 static inline RegisterID* statementListEmitCode(StatementVector& statements,
                                                 CodeGenerator& generator,
-                                                RegisterID* dst = 0) {
+                                                RegisterID* dst) {
   StatementVector::iterator end = statements.end();
   for (StatementVector::iterator it = statements.begin(); it != end; ++it) {
     StatementNode* n = it->get();
@@ -1397,6 +1397,9 @@ RegisterID* WhileNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 // ------------------------------ ForNode --------------------------------------
 
 RegisterID* ForNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
+  if (dst == ignoredResult())
+    dst = 0;
+
   generator.emitDebugHook(WillExecuteStatement, firstLine(), lastLine());
 
   if (m_expr1)
@@ -1601,6 +1604,8 @@ RegisterID* ReturnNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   if (generator.codeType() != FunctionCode)
     return emitThrowError(generator, SyntaxError, "Invalid return statement.");
 
+  if (dst == ignoredResult())
+    dst = 0;
   RegisterID* r0 = m_value ? generator.emitNode(dst, m_value.get())
                            : generator.emitLoad(dst, jsUndefined());
   if (generator.scopeDepth()) {
@@ -1825,6 +1830,8 @@ RegisterID* LabelNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 // ------------------------------ ThrowNode ------------------------------------
 
 RegisterID* ThrowNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
+  if (dst == ignoredResult())
+    dst = 0;
   RefPtr<RegisterID> expr = generator.emitNode(dst, m_expr.get());
   generator.emitExpressionInfo(m_divot, m_startOffset, m_endOffset);
   generator.emitThrow(expr.get());
@@ -2079,7 +2086,7 @@ void FunctionBodyNode::generateCode(ScopeChainNode* scopeChainNode) {
 
 RegisterID* FunctionBodyNode::emitCode(CodeGenerator& generator, RegisterID*) {
   generator.emitDebugHook(DidEnterCallFrame, firstLine(), lastLine());
-  statementListEmitCode(m_children, generator);
+  statementListEmitCode(m_children, generator, ignoredResult());
   if (!m_children.size() || !m_children.last()->isReturnNode()) {
     RegisterID* r0 = generator.emitLoad(0, jsUndefined());
     generator.emitDebugHook(WillLeaveCallFrame, firstLine(), lastLine());
