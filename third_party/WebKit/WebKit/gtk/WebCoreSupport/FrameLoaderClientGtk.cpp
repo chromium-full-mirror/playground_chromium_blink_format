@@ -476,10 +476,6 @@ void FrameLoaderClient::setCopiesOnScroll() {
   notImplemented();
 }
 
-void FrameLoaderClient::detachedFromParent1() {
-  notImplemented();
-}
-
 void FrameLoaderClient::detachedFromParent2() {
   notImplemented();
 }
@@ -487,8 +483,6 @@ void FrameLoaderClient::detachedFromParent2() {
 void FrameLoaderClient::detachedFromParent3() {
   notImplemented();
 }
-
-void FrameLoaderClient::detachedFromParent4() {}
 
 void FrameLoaderClient::loadedFromCachedPage() {
   notImplemented();

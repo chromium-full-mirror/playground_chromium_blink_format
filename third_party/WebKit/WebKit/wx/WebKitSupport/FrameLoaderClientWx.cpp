@@ -171,19 +171,11 @@ void FrameLoaderClientWx::willCloseDocument() {
   notImplemented();
 }
 
-void FrameLoaderClientWx::detachedFromParent1() {
-  notImplemented();
-}
-
 void FrameLoaderClientWx::detachedFromParent2() {
   notImplemented();
 }
 
 void FrameLoaderClientWx::detachedFromParent3() {
-  notImplemented();
-}
-
-void FrameLoaderClientWx::detachedFromParent4() {
   notImplemented();
 }
 

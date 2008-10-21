@@ -86,7 +86,6 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
 
   virtual void detachedFromParent2();
   virtual void detachedFromParent3();
-  virtual void detachedFromParent4();
 
   virtual void assignIdentifierToInitialRequest(
       unsigned long identifier,
