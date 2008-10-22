@@ -455,7 +455,7 @@ static HFONT createGDIFont(const AtomicString& family,
   matchData.m_chosen.lfUnderline = false;
   matchData.m_chosen.lfStrikeOut = false;
   matchData.m_chosen.lfCharSet = DEFAULT_CHARSET;
-#if PLATFORM(CG)
+#if PLATFORM(CG) || PLATFORM(CAIRO)
   matchData.m_chosen.lfOutPrecision = OUT_TT_ONLY_PRECIS;
 #else
   matchData.m_chosen.lfOutPrecision = OUT_TT_PRECIS;
