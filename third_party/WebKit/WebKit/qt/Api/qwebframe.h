@@ -66,7 +66,7 @@ class QWEBKIT_EXPORT QWebHitTestResult {
   bool isNull() const;
 
   QPoint pos() const;
-  QRect boundingBox() const;
+  QRect boundingRect() const;
   QString title() const;
 
   QString linkText() const;

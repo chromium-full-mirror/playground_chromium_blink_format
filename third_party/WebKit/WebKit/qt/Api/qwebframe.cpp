@@ -970,7 +970,7 @@ QWebHitTestResultPrivate::QWebHitTestResultPrivate(
   if (!hitTest.innerNode())
     return;
   pos = hitTest.point();
-  boundingBox = hitTest.boundingBox();
+  boundingRect = hitTest.boundingBox();
   title = hitTest.title();
   linkText = hitTest.textContent();
   linkUrl = hitTest.absoluteLinkURL();
@@ -1054,10 +1054,10 @@ QPoint QWebHitTestResult::pos() const {
     \since 4.5
     Returns the bounding box of the element.
 */
-QRect QWebHitTestResult::boundingBox() const {
+QRect QWebHitTestResult::boundingRect() const {
   if (!d)
     return QRect();
-  return d->boundingBox;
+  return d->boundingRect;
 }
 
 /*!
