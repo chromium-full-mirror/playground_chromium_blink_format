@@ -249,12 +249,14 @@ static void webkit_web_view_get_property(GObject* object,
   WebKitWebView* webView = WEBKIT_WEB_VIEW(object);
 
   switch (prop_id) {
+#if GTK_CHECK_VERSION(2, 10, 0)
     case PROP_COPY_TARGET_LIST:
       g_value_set_boxed(value, webkit_web_view_get_copy_target_list(webView));
       break;
     case PROP_PASTE_TARGET_LIST:
       g_value_set_boxed(value, webkit_web_view_get_paste_target_list(webView));
       break;
+#endif
     case PROP_EDITABLE:
       g_value_set_boolean(value, webkit_web_view_get_editable(webView));
       break;
@@ -1214,22 +1216,39 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
   gtk_binding_entry_add_signal(binding_set, GDK_Insert, GDK_SHIFT_MASK,
                                "paste_clipboard", 0);
 
-  /*
-   * properties
-   */
+/*
+ * properties
+ */
+
+#if GTK_CHECK_VERSION(2, 10, 0)
+  /**
+  * WebKitWebView:copy-target-list:
+  *
+  * The list of targets this web view supports for clipboard copying.
+  *
+  * Since: 1.0.2
+  */
   g_object_class_install_property(
       objectClass, PROP_COPY_TARGET_LIST,
-      g_param_spec_boxed("copy-target-list", "Target list",
-                         "The list of targets this Web view supports for "
-                         "copying to the clipboard",
-                         GTK_TYPE_TARGET_LIST, WEBKIT_PARAM_READABLE));
+      g_param_spec_boxed(
+          "copy-target-list", "Copy target list",
+          "The list of targets this web view supports for clipboard copying",
+          GTK_TYPE_TARGET_LIST, WEBKIT_PARAM_READABLE));
 
+  /**
+  * WebKitWebView:paste-target-list:
+  *
+  * The list of targets this web view supports for clipboard pasting.
+  *
+  * Since: 1.0.2
+  */
   g_object_class_install_property(
       objectClass, PROP_PASTE_TARGET_LIST,
-      g_param_spec_boxed("paste-target-list", "Target list",
-                         "The list of targets this Web view supports for "
-                         "pasting to the clipboard",
-                         GTK_TYPE_TARGET_LIST, WEBKIT_PARAM_READABLE));
+      g_param_spec_boxed(
+          "paste-target-list", "Paste target list",
+          "The list of targets this web view supports for clipboard pasting",
+          GTK_TYPE_TARGET_LIST, WEBKIT_PARAM_READABLE));
+#endif
 
   g_object_class_install_property(
       objectClass, PROP_SETTINGS,
