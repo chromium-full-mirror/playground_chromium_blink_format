@@ -117,7 +117,7 @@ static void checkAndInitScrollbarTheme() {
 
 #if !USE(SAFARI_THEME)
 ScrollbarTheme* ScrollbarTheme::nativeTheme() {
-  static SafariThemeWin winTheme;
+  static ScrollbarThemeWin winTheme;
   return &winTheme;
 }
 #endif

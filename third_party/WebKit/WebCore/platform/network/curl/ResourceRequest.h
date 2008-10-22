@@ -29,6 +29,8 @@
 
 #include "ResourceRequestBase.h"
 
+typedef const void* CFURLRequestRef;
+
 namespace WebCore {
 
 struct ResourceRequest : ResourceRequestBase {
@@ -46,6 +48,9 @@ struct ResourceRequest : ResourceRequestBase {
   }
 
   ResourceRequest() : ResourceRequestBase(KURL(), UseProtocolCachePolicy) {}
+
+  // Needed for compatibility.
+  CFURLRequestRef cfURLRequest() const { return 0; }
 
  private:
   friend class ResourceRequestBase;
