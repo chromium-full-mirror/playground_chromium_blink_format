@@ -28,28 +28,34 @@
 
 namespace WebCore {
 
-bool Theme::controlSupportsBorder(ControlPart part) const {
+LengthBox Theme::controlBorder(ControlPart part,
+                               const Font&,
+                               const LengthBox& zoomedBox,
+                               float zoomFactor) const {
   switch (part) {
     case PushButtonPart:
     case MenulistPart:
     case SearchFieldPart:
     case CheckboxPart:
     case RadioPart:
-      return false;
+      return LengthBox(0);
     default:
-      return true;
+      return zoomedBox;
   }
 }
 
-bool Theme::controlSupportsPadding(ControlPart part) const {
+LengthBox Theme::controlPadding(ControlPart part,
+                                const Font&,
+                                const LengthBox& zoomedBox,
+                                float zoomFactor) const {
   switch (part) {
     case MenulistPart:
     case MenulistButtonPart:
     case CheckboxPart:
     case RadioPart:
-      return false;
+      return LengthBox(0);
     default:
-      return true;
+      return zoomedBox;
   }
 }
 }

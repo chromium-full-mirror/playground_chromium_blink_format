@@ -29,6 +29,7 @@
 #include "Color.h"
 #include "Font.h"
 #include "IntRect.h"
+#include "LengthBox.h"
 #include "LengthSize.h"
 #include "PlatformString.h"
 #include "ThemeTypes.h"
@@ -88,6 +89,13 @@ class Theme {
 
   // Methods used to adjust the RenderStyles of controls.
 
+  // The font description result should have a zoomed font size.
+  virtual FontDescription controlFont(ControlPart,
+                                      const Font& font,
+                                      float zoomFactor) const {
+    return font.fontDescription();
+  }
+
   // The size here is in zoomed coordinates already.  If a new size is returned,
   // it also needs to be in zoomed coordinates.
   virtual LengthSize controlSize(ControlPart,
@@ -96,8 +104,26 @@ class Theme {
                                  float zoomFactor) const {
     return zoomedSize;
   }
-  virtual bool controlSupportsBorder(ControlPart) const;
-  virtual bool controlSupportsPadding(ControlPart) const;
+
+  // Returns the minimum size for a control in zoomed coordinates.
+  virtual LengthSize minimumControlSize(ControlPart,
+                                        const Font&,
+                                        float zoomFactor) const {
+    return LengthSize(Length(0, Fixed), Length(0, Fixed));
+  }
+
+  // Allows the theme to modify the existing padding/border.
+  virtual LengthBox controlPadding(ControlPart,
+                                   const Font&,
+                                   const LengthBox& zoomedBox,
+                                   float zoomFactor) const;
+  virtual LengthBox controlBorder(ControlPart,
+                                  const Font&,
+                                  const LengthBox& zoomedBox,
+                                  float zoomFactor) const;
+
+  // Whether or not whitespace: pre should be forced on always.
+  virtual bool controlRequiresPreWhiteSpace(ControlPart) const { return false; }
 
   // Method for painting a control.  The rect is in zoomed coordinates.
   virtual void paint(ControlPart,

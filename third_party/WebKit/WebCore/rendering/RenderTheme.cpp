@@ -25,6 +25,7 @@
 #include "CSSValueKeywords.h"
 #include "Document.h"
 #include "FocusController.h"
+#include "FontSelector.h"
 #include "Frame.h"
 #include "GraphicsContext.h"
 #include "HTMLInputElement.h"
@@ -72,9 +73,10 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
 
   if (UAHasAppearance &&
       theme()->isControlStyled(style, border, background, backgroundColor)) {
-    if (part == MenulistPart)
+    if (part == MenulistPart) {
       style->setAppearance(MenulistButtonPart);
-    else
+      part = MenulistButtonPart;
+    } else
       style->setAppearance(NoControlPart);
   }
 
@@ -85,22 +87,89 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
   style->setBoxShadow(0);
 
 #if USE(NEW_THEME)
-  if (part == CheckboxPart || part == RadioPart) {
-    if (!m_theme->controlSupportsBorder(part))
-      style->resetBorder();
-    if (!m_theme->controlSupportsPadding(part))
-      style->resetPadding();
+  switch (part) {
+    case CheckboxPart:
+    case RadioPart:
+    case PushButtonPart:
+    case SquareButtonPart:
+    case DefaultButtonPart:
+    case ButtonPart: {
+      // Border
+      LengthBox borderBox(style->borderTopWidth(), style->borderRightWidth(),
+                          style->borderBottomWidth(), style->borderLeftWidth());
+      borderBox = m_theme->controlBorder(part, style->font(), borderBox,
+                                         style->effectiveZoom());
+      if (borderBox.top().value() != style->borderTopWidth()) {
+        if (borderBox.top().value())
+          style->setBorderTopWidth(borderBox.top().value());
+        else
+          style->resetBorderTop();
+      }
+      if (borderBox.right().value() != style->borderRightWidth()) {
+        if (borderBox.right().value())
+          style->setBorderRightWidth(borderBox.right().value());
+        else
+          style->resetBorderRight();
+      }
+      if (borderBox.bottom().value() != style->borderBottomWidth()) {
+        style->setBorderBottomWidth(borderBox.bottom().value());
+        if (borderBox.bottom().value())
+          style->setBorderBottomWidth(borderBox.bottom().value());
+        else
+          style->resetBorderBottom();
+      }
+      if (borderBox.left().value() != style->borderLeftWidth()) {
+        style->setBorderLeftWidth(borderBox.left().value());
+        if (borderBox.left().value())
+          style->setBorderLeftWidth(borderBox.left().value());
+        else
+          style->resetBorderLeft();
+      }
 
-    // The width and height here are affected by the zoom.
-    // FIXME: Check is flawed, since it doesn't take min-width/max-width into
-    // account.
-    LengthSize controlSize = m_theme->controlSize(
-        part, style->font(), LengthSize(style->width(), style->height()),
-        style->effectiveZoom());
-    if (controlSize.width() != style->width())
-      style->setWidth(controlSize.width());
-    if (controlSize.height() != style->height())
-      style->setHeight(controlSize.height());
+      // Padding
+      LengthBox paddingBox = m_theme->controlPadding(
+          part, style->font(), style->paddingBox(), style->effectiveZoom());
+      if (paddingBox != style->paddingBox())
+        style->setPaddingBox(paddingBox);
+
+      // Whitespace
+      if (m_theme->controlRequiresPreWhiteSpace(part))
+        style->setWhiteSpace(PRE);
+
+      // Width / Height
+      // The width and height here are affected by the zoom.
+      // FIXME: Check is flawed, since it doesn't take min-width/max-width into
+      // account.
+      LengthSize controlSize = m_theme->controlSize(
+          part, style->font(), LengthSize(style->width(), style->height()),
+          style->effectiveZoom());
+      if (controlSize.width() != style->width())
+        style->setWidth(controlSize.width());
+      if (controlSize.height() != style->height())
+        style->setHeight(controlSize.height());
+
+      // Min-Width / Min-Height
+      LengthSize minControlSize = m_theme->minimumControlSize(
+          part, style->font(), style->effectiveZoom());
+      if (minControlSize.width() != style->minWidth())
+        style->setMinWidth(minControlSize.width());
+      if (minControlSize.height() != style->minHeight())
+        style->setMinHeight(minControlSize.height());
+
+      // Font
+      FontDescription controlFont =
+          m_theme->controlFont(part, style->font(), style->effectiveZoom());
+      if (controlFont != style->font().fontDescription()) {
+        // Reset our line-height
+        style->setLineHeight(RenderStyle::initialLineHeight());
+
+        // Now update our font.
+        if (style->setFontDescription(controlFont))
+          style->font().update(0);
+      }
+    }
+    default:
+      break;
   }
 #endif
 
@@ -112,12 +181,12 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
       return adjustCheckboxStyle(selector, style, e);
     case RadioPart:
       return adjustRadioStyle(selector, style, e);
-#endif
     case PushButtonPart:
     case SquareButtonPart:
     case DefaultButtonPart:
     case ButtonPart:
       return adjustButtonStyle(selector, style, e);
+#endif
     case TextFieldPart:
       return adjustTextFieldStyle(selector, style, e);
     case TextAreaPart:
@@ -171,11 +240,19 @@ bool RenderTheme::paint(RenderObject* o,
   ControlPart part = o->style()->appearance();
 
 #if USE(NEW_THEME)
-  if (part == CheckboxPart || part == RadioPart) {
-    m_theme->paint(part, controlStatesForRenderer(o),
-                   const_cast<GraphicsContext*>(paintInfo.context), r,
-                   o->style()->effectiveZoom(), o->view()->frameView());
-    return false;
+  switch (part) {
+    case CheckboxPart:
+    case RadioPart:
+    case PushButtonPart:
+    case SquareButtonPart:
+    case DefaultButtonPart:
+    case ButtonPart:
+      m_theme->paint(part, controlStatesForRenderer(o),
+                     const_cast<GraphicsContext*>(paintInfo.context), r,
+                     o->style()->effectiveZoom(), o->view()->frameView());
+      return false;
+    default:
+      break;
   }
 #endif
 
@@ -186,12 +263,12 @@ bool RenderTheme::paint(RenderObject* o,
       return paintCheckbox(o, paintInfo, r);
     case RadioPart:
       return paintRadio(o, paintInfo, r);
-#endif
     case PushButtonPart:
     case SquareButtonPart:
     case DefaultButtonPart:
     case ButtonPart:
       return paintButton(o, paintInfo, r);
+#endif
     case MenulistPart:
       return paintMenuList(o, paintInfo, r);
     case SliderHorizontalPart:
@@ -531,9 +608,6 @@ bool RenderTheme::isDefault(const RenderObject* o) const {
   if (!settings || !settings->inApplicationChromeMode())
     return false;
 
-  if (!o->style())
-    return false;
-
   return o->style()->appearance() == DefaultButtonPart;
 }
 
@@ -579,7 +653,6 @@ void RenderTheme::adjustRadioStyle(CSSStyleSelector* selector,
 
   style->setBoxShadow(0);
 }
-#endif
 
 void RenderTheme::adjustButtonStyle(CSSStyleSelector* selector,
                                     RenderStyle* style,
@@ -590,6 +663,7 @@ void RenderTheme::adjustButtonStyle(CSSStyleSelector* selector,
   // desired vertical size.
   setButtonSize(style);
 }
+#endif
 
 void RenderTheme::adjustTextFieldStyle(CSSStyleSelector* selector,
                                        RenderStyle* style,

@@ -194,7 +194,6 @@ class RenderTheme {
     return true;
   }
   virtual void setRadioSize(RenderStyle*) const {}
-#endif
 
   virtual void adjustButtonStyle(CSSStyleSelector*,
                                  RenderStyle*,
@@ -205,6 +204,7 @@ class RenderTheme {
     return true;
   }
   virtual void setButtonSize(RenderStyle*) const {}
+#endif
 
   virtual void adjustTextFieldStyle(CSSStyleSelector*,
                                     RenderStyle*,

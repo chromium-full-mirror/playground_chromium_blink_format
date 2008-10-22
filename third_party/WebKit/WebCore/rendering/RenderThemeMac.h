@@ -81,15 +81,6 @@ class RenderThemeMac : public RenderTheme {
   virtual Color systemColor(int cssValueId) const;
 
  protected:
-  // Methods for each appearance value.
-  virtual void adjustButtonStyle(CSSStyleSelector*,
-                                 RenderStyle*,
-                                 WebCore::Element*) const;
-  virtual bool paintButton(RenderObject*,
-                           const RenderObject::PaintInfo&,
-                           const IntRect&);
-  virtual void setButtonSize(RenderStyle*) const;
-
   virtual bool paintTextField(RenderObject*,
                               const RenderObject::PaintInfo&,
                               const IntRect&);
@@ -217,11 +208,6 @@ class RenderThemeMac : public RenderTheme {
 
   // Helpers for adjusting appearance and for painting
 
-  void setButtonPaddingFromControlSize(RenderStyle*, NSControlSize) const;
-  const IntSize* buttonSizes() const;
-  const int* buttonMargins() const;
-  void setButtonCellState(const RenderObject*, const IntRect&);
-
   void setPopupButtonCellState(const RenderObject*, const IntRect&);
   const IntSize* popupButtonSizes() const;
   const int* popupButtonMargins() const;
@@ -237,7 +223,6 @@ class RenderThemeMac : public RenderTheme {
   void setSearchCellState(RenderObject*, const IntRect&);
   void setSearchFieldSize(RenderStyle*) const;
 
-  NSButtonCell* button() const;
   NSPopUpButtonCell* popupButton() const;
   NSSearchFieldCell* search() const;
   NSMenu* searchMenuTemplate() const;
@@ -245,7 +230,6 @@ class RenderThemeMac : public RenderTheme {
   NSSliderCell* sliderThumbVertical() const;
 
  private:
-  mutable RetainPtr<NSButtonCell> m_button;
   mutable RetainPtr<NSPopUpButtonCell> m_popupButton;
   mutable RetainPtr<NSSearchFieldCell> m_search;
   mutable RetainPtr<NSMenu> m_searchMenuTemplate;
