@@ -44,6 +44,7 @@ class Document;
 class Event;
 class Frame;
 class String;
+class WorkerContext;
 
 class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
  public:
@@ -69,6 +70,7 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
 
   void contextDestroyed();
   Document* document() { return m_document; }
+  WorkerContext* workerContext() { return 0; }  // Not implemented yet.
 
   virtual MessagePort* toMessagePort() { return this; }
 
@@ -92,7 +94,7 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
   using ThreadSafeShared<MessagePort>::ref;
   using ThreadSafeShared<MessagePort>::deref;
 
-  bool hasPendingActivity() { return m_pendingActivity; }
+  bool hasPendingActivity();
 
   void setOnmessage(PassRefPtr<EventListener> eventListener) {
     m_onMessageListener = eventListener;
@@ -117,9 +119,6 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
 
   void dispatchCloseEvent();
 
-  void setPendingActivity();
-  void unsetPendingActivity();
-
   MessagePort* m_entangledPort;
   MessageQueue<RefPtr<Event>> m_messageQueue;
   bool m_queueIsOpen;
@@ -132,7 +131,7 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
 
   EventListenersMap m_eventListeners;
 
-  unsigned m_pendingActivity;
+  bool m_pendingCloseEvent;
   bool m_jsWrapperIsInaccessible;
 };
 

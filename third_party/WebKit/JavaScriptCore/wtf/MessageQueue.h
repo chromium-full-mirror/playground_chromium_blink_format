@@ -44,9 +44,14 @@ class MessageQueue : Noncopyable {
   void append(const DataType&);
   void prepend(const DataType&);
   bool waitForMessage(DataType&);
-  bool tryGetMessage(DataType&);
   void kill();
+
+  bool tryGetMessage(DataType&);
   bool killed() const;
+
+  // The result of isEmpty() is only valid if no other thread is manipulating
+  // the queue at the same time.
+  bool isEmpty();
 
  private:
   mutable Mutex m_mutex;
@@ -96,6 +101,14 @@ inline bool MessageQueue<DataType>::tryGetMessage(DataType& result) {
   result = m_queue.first();
   m_queue.removeFirst();
   return true;
+}
+
+template <typename DataType>
+inline bool MessageQueue<DataType>::isEmpty() {
+  MutexLocker lock(m_mutex);
+  if (m_killed)
+    return true;
+  return m_queue.isEmpty();
 }
 
 template <typename DataType>

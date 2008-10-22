@@ -51,7 +51,6 @@ class CloseMessagePortTimer : public TimerBase {
       m_port->dispatchMessages();
 
     m_port->dispatchCloseEvent();
-    m_port->unsetPendingActivity();
     delete this;
   }
 
@@ -62,7 +61,7 @@ MessagePort::MessagePort(Document* document)
     : m_entangledPort(0),
       m_queueIsOpen(false),
       m_document(document),
-      m_pendingActivity(0),
+      m_pendingCloseEvent(false),
       m_jsWrapperIsInaccessible(false) {
   document->createdMessagePort(this);
 }
@@ -224,14 +223,17 @@ void MessagePort::dispatchMessages() {
 }
 
 void MessagePort::queueCloseEvent() {
-  // Need to keep listeners alive, and they are marked by the wrapper.
-  setPendingActivity();
+  ASSERT(!m_pendingCloseEvent);
+  m_pendingCloseEvent = true;
 
   CloseMessagePortTimer* timer = new CloseMessagePortTimer(this);
   timer->startOneShot(0);
 }
 
 void MessagePort::dispatchCloseEvent() {
+  ASSERT(m_pendingCloseEvent);
+  m_pendingCloseEvent = false;
+
   RefPtr<Event> evt = Event::create(EventNames::closeEvent, false, true);
   if (m_onCloseListener) {
     evt->setTarget(this);
@@ -299,15 +301,11 @@ bool MessagePort::dispatchEvent(PassRefPtr<Event> event, ExceptionCode& ec) {
   return !event->defaultPrevented();
 }
 
-void MessagePort::setPendingActivity() {
-  ref();
-  ++m_pendingActivity;
-}
-
-void MessagePort::unsetPendingActivity() {
-  ASSERT(m_pendingActivity > 0);
-  --m_pendingActivity;
-  deref();
+bool MessagePort::hasPendingActivity() {
+  // We only care about the result of this function when there is no entangled
+  // port, or it is inaccessible, so no more messages can be added to the queue.
+  // Thus, using MessageQueue::isEmpty() does not cause a race condition here.
+  return m_pendingCloseEvent || (m_queueIsOpen && !m_messageQueue.isEmpty());
 }
 
 }  // namespace WebCore
