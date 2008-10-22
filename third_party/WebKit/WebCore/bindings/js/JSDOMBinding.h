@@ -177,6 +177,10 @@ inline JSC::JSValuePtr getDOMNodeWrapper(JSC::ExecState* exec, DOMClass* node) {
   return createDOMNodeWrapper<WrapperClass>(exec, node);
 }
 
+const JSC::HashTable* getHashTableForGlobalData(
+    JSC::JSGlobalData&,
+    const JSC::HashTable* staticTable);
+
 // Convert a DOM implementation exception code into a JavaScript exception in
 // the execution state.
 void setDOMException(JSC::ExecState*, ExceptionCode);
