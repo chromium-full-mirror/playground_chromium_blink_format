@@ -224,6 +224,10 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       /* [in] */ RECT rect,
       /* [in] */ OLE_HANDLE deviceContext);
 
+  virtual HRESULT STDMETHODCALLTYPE elementDoesAutoComplete(
+      /* [in] */ IDOMElement* element,
+      /* [retval][out] */ BOOL* result);
+
   // IWebDocumentText
   virtual HRESULT STDMETHODCALLTYPE supportsTextEncoding(
       /* [retval][out] */ BOOL* result);
@@ -342,7 +346,6 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   HRESULT setInViewSourceMode(BOOL flag);
   HRESULT elementWithName(BSTR name, IDOMElement* form, IDOMElement** element);
   HRESULT formForElement(IDOMElement* element, IDOMElement** form);
-  HRESULT elementDoesAutoComplete(IDOMElement* element, bool* result);
   HRESULT controlsInForm(IDOMElement* form,
                          IDOMElement** controls,
                          int* cControls);

@@ -537,9 +537,30 @@ int LayoutTestController::windowCount() {
 
 bool LayoutTestController::elementDoesAutoCompleteForElementWithId(
     JSStringRef id) {
-  // FIXME: Implement this almost exactly like the Mac version
+  COMPtr<IDOMDocument> document;
+  if (FAILED(frame->DOMDocument(&document)))
+    return false;
 
-  return false;
+  wstring idWstring = jsStringRefToWString(id);
+  BSTR idBSTR =
+      SysAllocStringLen((OLECHAR*)idWstring.c_str(), idWstring.length());
+  COMPtr<IDOMElement> element;
+  HRESULT result = document->getElementById(idBSTR, &element);
+  SysFreeString(idBSTR);
+
+  if (FAILED(result))
+    return false;
+
+  COMPtr<IWebFramePrivate> framePrivate(Query, frame);
+  if (!framePrivate)
+    return false;
+
+  BOOL autoCompletes;
+  if (FAILED(
+          framePrivate->elementDoesAutoComplete(element.get(), &autoCompletes)))
+    return false;
+
+  return autoCompletes;
 }
 
 void LayoutTestController::execCommand(JSStringRef name, JSStringRef value) {
