@@ -70,10 +70,10 @@ namespace JSC {
                                               op_put_by_index) macro(op_put_getter) macro(op_put_setter)                  \
                                                                                                                           \
                                               macro(op_jmp) macro(op_jtrue) macro(                                        \
-                                                  op_jfalse) macro(op_jnless) macro(op_jmp_scopes)                        \
-                                                  macro(op_loop) macro(op_loop_if_true) macro(                            \
-                                                      op_loop_if_less) macro(op_loop_if_lesseq)                           \
-                                                      macro(op_switch_imm) macro(                                         \
+                                                  op_jfalse) macro(op_jeq_null) macro(op_jneq_null)                       \
+                                                  macro(op_jnless) macro(op_jmp_scopes) macro(                            \
+                                                      op_loop) macro(op_loop_if_true) macro(op_loop_if_less)              \
+                                                      macro(op_loop_if_lesseq) macro(op_switch_imm) macro(                \
                                                           op_switch_char) macro(op_switch_string)                         \
                                                                                                                           \
                                                           macro(op_new_func) macro(op_new_func_exp) macro(                \
