@@ -129,7 +129,7 @@ class InspectorController : JavaScriptDebugListener {
                                   unsigned lineNumber,
                                   const JSC::UString& sourceURL);
   void addScriptProfile(JSC::Profile* profile);
-  const Vector<RefPtr<JSC::Profile>>& profiles() const { return m_profiles; }
+  const ProfilesArray& profiles() const { return m_profiles; }
 
   void attachWindow();
   void detachWindow();
@@ -295,7 +295,7 @@ class InspectorController : JavaScriptDebugListener {
   HashSet<String> m_knownResources;
   FrameResourcesMap m_frameResources;
   Vector<ConsoleMessage*> m_consoleMessages;
-  Vector<RefPtr<JSC::Profile>> m_profiles;
+  ProfilesArray m_profiles;
   HashMap<String, double> m_times;
   HashMap<String, unsigned> m_counts;
 #if ENABLE(DATABASE)

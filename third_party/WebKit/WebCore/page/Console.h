@@ -30,16 +30,18 @@
 #define Console_h
 
 #include "PlatformString.h"
+#include <profiler/Profile.h>
 #include <wtf/RefCounted.h>
 #include <wtf/PassRefPtr.h>
 
 namespace JSC {
 class ExecState;
 class ArgList;
-class Profile;
 }
 
 namespace WebCore {
+
+typedef Vector<RefPtr<JSC::Profile>> ProfilesArray;
 
 class Frame;
 class Page;
@@ -99,6 +101,8 @@ class Console : public RefCounted<Console> {
 
   void reportException(JSC::ExecState*, JSC::JSValuePtr);
   void reportCurrentException(JSC::ExecState*);
+
+  const ProfilesArray& profiles() const { return m_profiles; }
 #endif
  private:
   inline Page* page() const;
@@ -106,6 +110,7 @@ class Console : public RefCounted<Console> {
   Console(Frame*);
 
   Frame* m_frame;
+  ProfilesArray m_profiles;
 };
 
 }  // namespace WebCore
