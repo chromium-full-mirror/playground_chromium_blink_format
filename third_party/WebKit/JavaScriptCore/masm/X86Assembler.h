@@ -30,6 +30,8 @@
 
 #include <wtf/Assertions.h>
 #include <wtf/AlwaysInline.h>
+#include <wtf/FastMalloc.h>
+
 #if HAVE(MMAN)
 #include <sys/mman.h>
 #endif
@@ -100,7 +102,7 @@ class JITCodeBuffer {
     if (!m_index)
       return 0;
 
-    void* result = fastMalloc(m_index);
+    void* result = WTF::fastMallocExecutable(m_index);
 
     if (!result)
       return 0;

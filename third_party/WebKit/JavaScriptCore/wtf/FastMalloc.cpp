@@ -165,6 +165,8 @@ void* tryFastZeroedMalloc(size_t n) {
 #include <stdlib.h>
 #if !PLATFORM(WIN_OS)
 #include <pthread.h>
+#else
+#include "windows.h"
 #endif
 
 namespace WTF {
@@ -214,6 +216,24 @@ void* fastRealloc(void* p, size_t n) {
 }
 
 void releaseFastMallocFreeMemory() {}
+
+#if HAVE(VIRTUALALLOC)
+void* fastMallocExecutable(size_t n) {
+  return VirtualAlloc(0, n, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+}
+
+void fastFreeExecutable(void* p) {
+  VirtualFree(p, 0, MEM_RELEASE);
+}
+#else
+void* fastMallocExecutable(size_t n) {
+  return fastMalloc(n);
+}
+
+void fastFreeExecutable(void* p) {
+  fastFree(p);
+}
+#endif
 
 }  // namespace WTF
 
@@ -3413,6 +3433,14 @@ ALWAYS_INLINE
   } else {
     return old_ptr;
   }
+}
+
+void* fastMallocExecutable(size_t n) {
+  return malloc<false>(n);
+}
+
+void fastFreeExecutable(void* p) {
+  free(p);
 }
 
 #ifdef WTF_CHANGES
