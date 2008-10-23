@@ -1,7 +1,7 @@
 /*
  * This file is part of the internal font implementation.
  *
- * Copyright (C) 2006, 2008 Apple Computer, Inc.
+ * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -29,10 +29,8 @@
 #include "GlyphWidthMap.h"
 #include <wtf/OwnPtr.h>
 
-#if PLATFORM(MAC)
 #if USE(ATSUI)
 typedef struct OpaqueATSUStyle* ATSUStyle;
-#endif
 #endif
 
 #if PLATFORM(WIN)
@@ -100,10 +98,13 @@ class SimpleFontData : public FontData {
 
 #if PLATFORM(MAC)
   NSFont* getNSFont() const { return m_font.font(); }
+#endif
+
 #if USE(CORE_TEXT)
   CTFontRef getCTFont() const;
   CFDictionaryRef getCFStringAttributes() const;
 #endif
+
 #if USE(ATSUI)
   void checkShapesArabic() const;
   bool shapesArabic() const {
@@ -111,7 +112,6 @@ class SimpleFontData : public FontData {
       checkShapesArabic();
     return m_shapesArabic;
   }
-#endif
 #endif
 
 #if PLATFORM(WIN)
@@ -182,6 +182,8 @@ class SimpleFontData : public FontData {
 #ifdef BUILDING_ON_TIGER
   void* m_styleGroup;
 #endif
+#endif
+
 #if USE(ATSUI)
   mutable ATSUStyle m_ATSUStyle;
   mutable bool m_ATSUStyleInitialized;
@@ -189,10 +191,10 @@ class SimpleFontData : public FontData {
   mutable bool m_checkedShapesArabic;
   mutable bool m_shapesArabic;
 #endif
+
 #if USE(CORE_TEXT)
   mutable RetainPtr<CTFontRef> m_CTFont;
   mutable RetainPtr<CFDictionaryRef> m_CFStringAttributes;
-#endif
 #endif
 
 #if PLATFORM(WIN)
