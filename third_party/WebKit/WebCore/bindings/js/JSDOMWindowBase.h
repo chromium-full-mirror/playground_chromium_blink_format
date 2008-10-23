@@ -24,6 +24,7 @@
 
 #include "PlatformString.h"
 #include "JSDOMBinding.h"
+#include "JSDOMGlobalObject.h"
 #include <kjs/protect.h>
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
@@ -46,13 +47,9 @@ class SecurityOrigin;
 
 class JSDOMWindowBasePrivate;
 
-typedef HashMap<const JSC::ClassInfo*, RefPtr<JSC::StructureID>>
-    JSDOMStructureMap;
-typedef HashMap<const JSC::ClassInfo*, JSC::JSObject*> JSDOMConstructorMap;
-
 // This is the only WebCore JS binding which does not inherit from DOMObject
-class JSDOMWindowBase : public JSC::JSGlobalObject {
-  typedef JSC::JSGlobalObject Base;
+class JSDOMWindowBase : public JSDOMGlobalObject {
+  typedef JSDOMGlobalObject Base;
 
   friend class ScheduledAction;
 
@@ -162,11 +159,8 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
 
   void clearAllTimeouts();
 
-  JSDOMStructureMap& structures() { return d()->structures; }
-  JSDOMConstructorMap& constructors() const { return d()->constructors; }
-
  private:
-  struct JSDOMWindowBaseData : public JSGlobalObjectData {
+  struct JSDOMWindowBaseData : public JSDOMGlobalObjectData {
     JSDOMWindowBaseData(PassRefPtr<DOMWindow>, JSDOMWindowShell*);
 
     RefPtr<DOMWindow> impl;
@@ -182,9 +176,6 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
 
     typedef HashMap<int, DOMWindowTimer*> TimeoutsMap;
     TimeoutsMap timeouts;
-
-    JSDOMStructureMap structures;
-    JSDOMConstructorMap constructors;
   };
 
   static JSC::JSValuePtr childFrameGetter(JSC::ExecState*,

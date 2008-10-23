@@ -37,6 +37,7 @@
 #include "HTMLImageElement.h"
 #include "HTMLNames.h"
 #include "JSDOMCoreException.h"
+#include "JSDOMGlobalObject.h"
 #include "JSDOMWindowCustom.h"
 #include "JSEventException.h"
 #include "JSNode.h"
@@ -500,7 +501,8 @@ ExecState* execStateFromNode(Node* node) {
 StructureID* getCachedDOMStructure(ExecState* exec,
                                    const ClassInfo* classInfo) {
   JSDOMStructureMap& structures =
-      static_cast<JSDOMWindow*>(exec->lexicalGlobalObject())->structures();
+      static_cast<JSDOMGlobalObject*>(exec->lexicalGlobalObject())
+          ->structures();
   return structures.get(classInfo).get();
 }
 
@@ -508,14 +510,16 @@ StructureID* cacheDOMStructure(ExecState* exec,
                                PassRefPtr<StructureID> structureID,
                                const ClassInfo* classInfo) {
   JSDOMStructureMap& structures =
-      static_cast<JSDOMWindow*>(exec->lexicalGlobalObject())->structures();
+      static_cast<JSDOMGlobalObject*>(exec->lexicalGlobalObject())
+          ->structures();
   ASSERT(!structures.contains(classInfo));
   return structures.set(classInfo, structureID).first->second.get();
 }
 
 JSObject* getCachedDOMConstructor(ExecState* exec, const ClassInfo* classInfo) {
   JSDOMConstructorMap& constructors =
-      static_cast<JSDOMWindow*>(exec->lexicalGlobalObject())->constructors();
+      static_cast<JSDOMGlobalObject*>(exec->lexicalGlobalObject())
+          ->constructors();
   return constructors.get(classInfo);
 }
 
@@ -523,7 +527,8 @@ void cacheDOMConstructor(ExecState* exec,
                          const ClassInfo* classInfo,
                          JSObject* constructor) {
   JSDOMConstructorMap& constructors =
-      static_cast<JSDOMWindow*>(exec->lexicalGlobalObject())->constructors();
+      static_cast<JSDOMGlobalObject*>(exec->lexicalGlobalObject())
+          ->constructors();
   ASSERT(!constructors.contains(classInfo));
   constructors.set(classInfo, constructor);
 }
