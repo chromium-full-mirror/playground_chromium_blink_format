@@ -284,9 +284,8 @@ void ChromeClientQt::scroll(const IntSize& delta,
   QWidget* view = m_webPage->view();
   if (view)
     view->scroll(delta.width(), delta.height(), scrollViewRect);
-  else
-    emit m_webPage->scrollRequested(delta.width(), delta.height(),
-                                    scrollViewRect);
+  emit m_webPage->scrollRequested(delta.width(), delta.height(),
+                                  scrollViewRect);
 }
 
 IntRect ChromeClientQt::windowToScreen(const IntRect& rect) const {
