@@ -303,13 +303,23 @@ void CodeBlock::dump(ExecState* exec) const {
     } while (i < regexps.size());
   }
 
-  if (structureIDInstructions.size()) {
+  if (globalResolveInstructions.size() || propertyAccessInstructions.size())
     printf("\nStructureIDs:\n");
+
+  if (globalResolveInstructions.size()) {
     size_t i = 0;
     do {
-      printStructureIDs(&instructions[structureIDInstructions[i].opcodeIndex]);
+      printStructureIDs(&instructions[globalResolveInstructions[i]]);
       ++i;
-    } while (i < structureIDInstructions.size());
+    } while (i < globalResolveInstructions.size());
+  }
+  if (propertyAccessInstructions.size()) {
+    size_t i = 0;
+    do {
+      printStructureIDs(
+          &instructions[propertyAccessInstructions[i].opcodeIndex]);
+      ++i;
+    } while (i < propertyAccessInstructions.size());
   }
 
   if (exceptionHandlers.size()) {
@@ -1056,15 +1066,20 @@ void CodeBlock::dump(ExecState* exec,
 #endif  // !defined(NDEBUG) || ENABLE(SAMPLING_TOOL)
 
 CodeBlock::~CodeBlock() {
-  size_t size = structureIDInstructions.size();
-  for (size_t i = 0; i < size; ++i) {
-    derefStructureIDs(&instructions[structureIDInstructions[i].opcodeIndex]);
-    if (structureIDInstructions[i].stubRoutine)
-      WTF::fastFreeExecutable(structureIDInstructions[i].stubRoutine);
-    if (CallLinkInfo* callLinkInfo = structureIDInstructions[i].linkInfoPtr) {
+  for (size_t size = globalResolveInstructions.size(), i = 0; i < size; ++i) {
+    derefStructureIDs(&instructions[globalResolveInstructions[i]]);
+  }
+
+  for (size_t size = propertyAccessInstructions.size(), i = 0; i < size; ++i) {
+    derefStructureIDs(&instructions[propertyAccessInstructions[i].opcodeIndex]);
+    if (propertyAccessInstructions[i].stubRoutine)
+      WTF::fastFreeExecutable(propertyAccessInstructions[i].stubRoutine);
+  }
+
+  for (size_t size = callLinkInfos.size(), i = 0; i < size; ++i) {
+    CallLinkInfo* callLinkInfo = &callLinkInfos[i];
+    if (callLinkInfo->isLinked())
       callLinkInfo->callee->removeCaller(callLinkInfo);
-      delete callLinkInfo;
-    }
   }
 
 #if ENABLE(CTI)
@@ -1080,9 +1095,8 @@ void CodeBlock::unlinkCallers() {
   size_t size = linkedCallerList.size();
   for (size_t i = 0; i < size; ++i) {
     CallLinkInfo* currentCaller = linkedCallerList[i];
-    CTI::unlinkCall(currentCaller->callerStructureStubInfo);
-    currentCaller->callerStructureStubInfo->linkInfoPtr = 0;
-    delete currentCaller;
+    CTI::unlinkCall(currentCaller);
+    currentCaller->setUnlinked();
   }
   linkedCallerList.clear();
 }
@@ -1127,10 +1141,7 @@ void CodeBlock::derefStructureIDs(Instruction* vPC) const {
          vPC[0].u.opcode == machine->getOpcode(op_get_by_id_generic) ||
          vPC[0].u.opcode == machine->getOpcode(op_put_by_id_generic) ||
          vPC[0].u.opcode == machine->getOpcode(op_get_array_length) ||
-         vPC[0].u.opcode == machine->getOpcode(op_get_string_length) ||
-         vPC[0].u.opcode == machine->getOpcode(op_call_eval) ||
-         vPC[0].u.opcode == machine->getOpcode(op_call) ||
-         vPC[0].u.opcode == machine->getOpcode(op_construct));
+         vPC[0].u.opcode == machine->getOpcode(op_get_string_length));
 }
 
 void CodeBlock::refStructureIDs(Instruction* vPC) const {
