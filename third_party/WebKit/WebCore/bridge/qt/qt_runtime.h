@@ -142,7 +142,7 @@ class QtRuntimeMethod : public InternalFunction {
   }
 
   static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
-    return StructureID::create(proto, TypeInfo(ObjectType));
+    return StructureID::create(prototype, TypeInfo(ObjectType));
   }
 
  protected:
