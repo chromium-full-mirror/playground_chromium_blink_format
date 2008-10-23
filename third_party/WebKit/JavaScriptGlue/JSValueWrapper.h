@@ -43,7 +43,7 @@ class JSValueWrapper {
   JSValuePtr GetValue();
 
  private:
-  ProtectedPtr<JSValuePtr> fValue;
+  ProtectedPtr<JSValue> fValue;
 
   static void JSObjectDispose(void* data);
   static CFArrayRef JSObjectCopyPropertyNames(void* data);

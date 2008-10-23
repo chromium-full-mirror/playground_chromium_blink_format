@@ -83,7 +83,6 @@ class ProtectedPtr {
   ProtectedPtr(const ProtectedPtr<U>&);
 
   T* get() const { return m_ptr; }
-  operator JSValuePtr() const { return m_ptr; }
   operator T*() const { return m_ptr; }
   T* operator->() const { return m_ptr; }
 
@@ -94,31 +93,6 @@ class ProtectedPtr {
 
  private:
   T* m_ptr;
-};
-
-template <>
-class ProtectedPtr<JSValuePtr> {
- public:
-  ProtectedPtr() : m_ptr(0) {}
-  ProtectedPtr(JSValuePtr);
-  ProtectedPtr(const ProtectedPtr&);
-  ~ProtectedPtr();
-
-  template <class U>
-  ProtectedPtr(const ProtectedPtr<U>&);
-
-  JSValue* get() const { return m_ptr; }
-  operator JSValuePtr() const { return m_ptr; }
-  operator JSValue*() const { return m_ptr; }
-  JSValue* operator->() const { return m_ptr; }
-
-  bool operator!() const { return !m_ptr; }
-
-  ProtectedPtr& operator=(JSValuePtr);
-  ProtectedPtr& operator=(const ProtectedPtr&);
-
- private:
-  JSValue* m_ptr;
 };
 
 template <class T>
@@ -156,37 +130,6 @@ inline ProtectedPtr<T>& ProtectedPtr<T>::operator=(T* optr) {
   gcProtectNullTolerant(optr);
   gcUnprotectNullTolerant(m_ptr);
   m_ptr = optr;
-  return *this;
-}
-
-inline ProtectedPtr<JSValuePtr>::ProtectedPtr(JSValuePtr ptr)
-    : m_ptr(ptr.payload()) {
-  gcProtectNullTolerant(m_ptr);
-}
-
-inline ProtectedPtr<JSValuePtr>::ProtectedPtr(const ProtectedPtr& o)
-    : m_ptr(o.m_ptr) {
-  gcProtectNullTolerant(m_ptr);
-}
-
-inline ProtectedPtr<JSValuePtr>::~ProtectedPtr() {
-  gcUnprotectNullTolerant(m_ptr);
-}
-
-inline ProtectedPtr<JSValuePtr>& ProtectedPtr<JSValuePtr>::operator=(
-    const ProtectedPtr& o) {
-  JSValuePtr optr = o.m_ptr;
-  gcProtectNullTolerant(optr);
-  gcUnprotectNullTolerant(m_ptr);
-  m_ptr = optr.payload();
-  return *this;
-}
-
-inline ProtectedPtr<JSValuePtr>& ProtectedPtr<JSValuePtr>::operator=(
-    JSValuePtr ptr) {
-  gcProtectNullTolerant(ptr);
-  gcUnprotectNullTolerant(m_ptr);
-  m_ptr = ptr.payload();
   return *this;
 }
 

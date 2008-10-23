@@ -37,7 +37,7 @@ JSValueWrapper::JSValueWrapper(JSValuePtr inValue) : fValue(inValue) {}
 JSValueWrapper::~JSValueWrapper() {}
 
 JSValuePtr JSValueWrapper::GetValue() {
-  return fValue;
+  return fValue.get();
 }
 
 void JSValueWrapper::GetJSObectCallBacks(JSObjectCallBacks& callBacks) {

@@ -441,10 +441,10 @@ class CodeGenerator {
 
   struct JSValueHashTraits : HashTraits<JSValue*> {
     static void constructDeletedValue(JSValue*& slot) {
-      slot = JSImmediate::impossibleValue().payload();
+      slot = JSImmediate::impossibleValue();
     }
     static bool isDeletedValue(JSValue* value) {
-      return value == JSImmediate::impossibleValue().payload();
+      return value == JSImmediate::impossibleValue();
     }
   };
 

@@ -50,7 +50,6 @@ class Register {
  public:
   Register();
   Register(JSValuePtr);
-  Register(JSCell*);
 
   JSValuePtr jsValue(CallFrame*) const;
   JSValuePtr getJSValue() const;
@@ -141,12 +140,7 @@ ALWAYS_INLINE Register::Register() {
 
 ALWAYS_INLINE Register::Register(JSValuePtr v) {
   SET_TYPE(ValueType);
-  u.value = v.payload();
-}
-
-ALWAYS_INLINE Register::Register(JSCell* v) {
-  SET_TYPE(ValueType);
-  u.value = JSValuePtr(v).payload();
+  u.value = v;
 }
 
 // This function is scaffolding for legacy clients. It will eventually go away.
