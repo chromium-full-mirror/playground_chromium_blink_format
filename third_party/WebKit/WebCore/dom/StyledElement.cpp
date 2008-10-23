@@ -253,6 +253,7 @@ void StyledElement::classAttributeChanged(const AtomicString& newClassString) {
       mappedAttributes()->clearClass();
   }
   setChanged();
+  dispatchSubtreeModifiedEvent();
 }
 
 void StyledElement::parseMappedAttribute(MappedAttribute* attr) {
