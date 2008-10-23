@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -46,6 +46,7 @@ struct ObjectImpList {
 static CFTypeRef KJSValueToCFTypeInternal(JSValuePtr inValue,
                                           ExecState* exec,
                                           ObjectImpList* inImps);
+static JSGlueGlobalObject* getThreadGlobalObject();
 
 //--------------------------------------------------------------------------
 // CFStringToUString
@@ -162,7 +163,8 @@ JSValuePtr JSObjectKJSValue(JSUserObject* ptr) {
     }
     if (!handled) {
       ExecState* exec = getThreadGlobalExecState();
-      result = new (exec) UserObjectImp(exec, ptr);
+      result = new (exec)
+          UserObjectImp(getThreadGlobalObject()->userObjectStructure(), ptr);
     }
   }
   return result;
@@ -352,30 +354,32 @@ CFTypeRef GetCFNull(void) {
 
 static pthread_key_t globalObjectKey;
 static pthread_once_t globalObjectKeyOnce = PTHREAD_ONCE_INIT;
-JSGlobalData* sharedGlobalData;
 
 static void unprotectGlobalObject(void* data) {
   JSLock lock(true);
-  gcUnprotect(static_cast<JSGlobalObject*>(data));
+  gcUnprotect(static_cast<JSGlueGlobalObject*>(data));
 }
 
 static void initializeGlobalObjectKey() {
-  sharedGlobalData = JSGlobalData::create().releaseRef();
   pthread_key_create(&globalObjectKey, unprotectGlobalObject);
 }
 
-ExecState* getThreadGlobalExecState() {
+static JSGlueGlobalObject* getThreadGlobalObject() {
   pthread_once(&globalObjectKeyOnce, initializeGlobalObjectKey);
-  JSGlobalObject* globalObject =
-      static_cast<JSGlobalObject*>(pthread_getspecific(globalObjectKey));
+  JSGlueGlobalObject* globalObject =
+      static_cast<JSGlueGlobalObject*>(pthread_getspecific(globalObjectKey));
   if (!globalObject) {
     RefPtr<JSGlobalData> globalData = JSGlobalData::create();
-    globalObject = new (globalData.get()) JSGlueGlobalObject;
+    globalObject = new (globalData.get())
+        JSGlueGlobalObject(JSGlueGlobalObject::createStructureID(jsNull()));
     gcProtect(globalObject);
     pthread_setspecific(globalObjectKey, globalObject);
   }
+  return globalObject;
+}
 
-  ExecState* exec = globalObject->globalExec();
+ExecState* getThreadGlobalExecState() {
+  ExecState* exec = getThreadGlobalObject()->globalExec();
 
   // Discard exceptions -- otherwise an exception would forestall JS
   // evaluation throughout the thread

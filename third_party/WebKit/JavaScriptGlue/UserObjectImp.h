@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,7 +36,7 @@
 
 class UserObjectImp : public JSObject {
  public:
-  UserObjectImp(ExecState* exec, JSUserObject* userObject);
+  UserObjectImp(PassRefPtr<StructureID>, JSUserObject*);
   virtual ~UserObjectImp();
 
   virtual const ClassInfo* classInfo() const;
@@ -64,6 +64,10 @@ class UserObjectImp : public JSObject {
   virtual void mark();
 
   JSUserObject* GetJSUserObject() const;
+
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+    return StructureID::create(prototype, TypeInfo(ObjectType));
+  }
 
  private:
   static JSValuePtr userObjectGetter(ExecState*,

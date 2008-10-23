@@ -42,8 +42,9 @@ class JSCallbackConstructor : public JSObject {
   static const ClassInfo info;
 
   static PassRefPtr<StructureID> createStructureID(JSValuePtr proto) {
-    return StructureID::create(proto,
-                               TypeInfo(ObjectType, ImplementsHasInstance));
+    return StructureID::create(
+        proto, TypeInfo(ObjectType,
+                        ImplementsHasInstance | HasStandardGetOwnPropertySlot));
   }
 
  private:

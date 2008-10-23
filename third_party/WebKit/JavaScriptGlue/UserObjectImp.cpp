@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc. All rights reserved.
+ * Copyright (C) 2005, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,9 +34,9 @@
 
 const ClassInfo UserObjectImp::info = {"UserObject", 0, 0, 0};
 
-UserObjectImp::UserObjectImp(ExecState* exec, JSUserObject* userObject)
-    : JSObject(exec->globalData().nullProtoStructureID),
-      fJSUserObject((JSUserObject*)userObject->Retain()) {}
+UserObjectImp::UserObjectImp(PassRefPtr<StructureID> structure,
+                             JSUserObject* userObject)
+    : JSObject(structure), fJSUserObject((JSUserObject*)userObject->Retain()) {}
 
 UserObjectImp::~UserObjectImp() {
   if (fJSUserObject)

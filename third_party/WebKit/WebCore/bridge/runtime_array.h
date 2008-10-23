@@ -58,6 +58,10 @@ class RuntimeArray : public JSObject {
     return exec->lexicalGlobalObject()->arrayPrototype();
   }
 
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+    return StructureID::create(prototype, TypeInfo(ObjectType));
+  }
+
  private:
   static JSValuePtr lengthGetter(ExecState*,
                                  const Identifier&,

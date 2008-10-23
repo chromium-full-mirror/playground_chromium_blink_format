@@ -141,6 +141,10 @@ class QtRuntimeMethod : public InternalFunction {
     return exec->lexicalGlobalObject()->functionPrototype();
   }
 
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+    return StructureID::create(proto, TypeInfo(ObjectType));
+  }
+
  protected:
   QtRuntimeMethodData* d_func() const { return d_ptr; }
   QtRuntimeMethod(QtRuntimeMethodData* dd,

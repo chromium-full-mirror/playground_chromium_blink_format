@@ -45,6 +45,11 @@ class JSRGBColor : public DOMObject {
     return exec->lexicalGlobalObject()->objectPrototype();
   }
 
+  static PassRefPtr<JSC::StructureID> createStructureID(
+      JSC::JSValuePtr prototype) {
+    return JSC::StructureID::create(prototype, JSC::TypeInfo(JSC::ObjectType));
+  }
+
  private:
   unsigned m_color;
 };

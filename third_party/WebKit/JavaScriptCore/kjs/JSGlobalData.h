@@ -78,10 +78,12 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   const HashTable* regExpConstructorTable;
   const HashTable* stringTable;
 
-  RefPtr<StructureID> nullProtoStructureID;
   RefPtr<StructureID> activationStructureID;
+  RefPtr<StructureID> interruptedExecutionErrorStructure;
   RefPtr<StructureID> staticScopeStructureID;
   RefPtr<StructureID> stringStructureID;
+  RefPtr<StructureID> notAnObjectErrorStubStructure;
+  RefPtr<StructureID> notAnObjectStructure;
   RefPtr<StructureID> numberStructureID;
 
   IdentifierTable* identifierTable;

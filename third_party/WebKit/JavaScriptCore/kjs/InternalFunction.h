@@ -39,8 +39,9 @@ class InternalFunction : public JSObject {
   const UString& name(JSGlobalData*);
 
   static PassRefPtr<StructureID> createStructureID(JSValuePtr proto) {
-    return StructureID::create(proto,
-                               TypeInfo(ObjectType, ImplementsHasInstance));
+    return StructureID::create(
+        proto, TypeInfo(ObjectType,
+                        ImplementsHasInstance | HasStandardGetOwnPropertySlot));
   }
 
  protected:

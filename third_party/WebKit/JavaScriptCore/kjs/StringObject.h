@@ -55,6 +55,10 @@ class StringObject : public JSWrapperObject {
     return asString(JSWrapperObject::internalValue());
   }
 
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+    return StructureID::create(prototype, TypeInfo(ObjectType));
+  }
+
  protected:
   StringObject(PassRefPtr<StructureID>, JSString*);
 

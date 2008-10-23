@@ -298,6 +298,10 @@ class JSGlobalObject : public JSVariableObject {
     return static_cast<JSGlobalObjectData*>(JSVariableObject::d);
   }
 
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+    return StructureID::create(prototype, TypeInfo(ObjectType));
+  }
+
  protected:
   struct GlobalPropertyInfo {
     GlobalPropertyInfo(const Identifier& i, JSValuePtr v, unsigned a)

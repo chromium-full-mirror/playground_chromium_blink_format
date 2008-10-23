@@ -113,6 +113,10 @@ class ObjcFallbackObjectImp : public JSObject {
     return exec->lexicalGlobalObject()->objectPrototype();
   }
 
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+    return StructureID::create(prototype, TypeInfo(ObjectType));
+  }
+
  private:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*,

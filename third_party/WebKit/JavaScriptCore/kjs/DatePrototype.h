@@ -36,6 +36,10 @@ class DatePrototype : public DateInstance {
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
+
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+    return StructureID::create(prototype, TypeInfo(ObjectType));
+  }
 };
 
 }  // namespace JSC

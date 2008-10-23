@@ -50,7 +50,7 @@ static void substitute(UString& string, const UString& substring) {
 class InterruptedExecutionError : public JSObject {
  public:
   InterruptedExecutionError(JSGlobalData* globalData)
-      : JSObject(globalData->nullProtoStructureID) {}
+      : JSObject(globalData->interruptedExecutionErrorStructure) {}
 
   virtual bool isWatchdogException() const { return true; }
 };

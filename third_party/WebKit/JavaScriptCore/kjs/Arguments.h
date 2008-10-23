@@ -52,10 +52,10 @@ struct ArgumentsData : Noncopyable {
 
 class Arguments : public JSObject {
  public:
-  enum ArgumentsParameters { ArgumentsNoParameters };
+  enum NoParametersType { NoParameters };
 
   Arguments(CallFrame*);
-  Arguments(CallFrame*, enum ArgumentsParameters);
+  Arguments(CallFrame*, NoParametersType);
   virtual ~Arguments();
 
   static const ClassInfo info;
@@ -69,6 +69,10 @@ class Arguments : public JSObject {
   void setActivation(JSActivation* activation) {
     d->activation = activation;
     d->registers = &activation->registerAt(0);
+  }
+
+  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+    return StructureID::create(prototype, TypeInfo(ObjectType));
   }
 
  private:
@@ -168,9 +172,11 @@ inline Arguments::Arguments(CallFrame* callFrame)
   d->overrodeCallee = false;
 }
 
-inline Arguments::Arguments(CallFrame* callFrame, enum ArgumentsParameters)
+inline Arguments::Arguments(CallFrame* callFrame, NoParametersType)
     : JSObject(callFrame->lexicalGlobalObject()->argumentsStructure()),
       d(new ArgumentsData) {
+  ASSERT(!callFrame->callee()->m_body->parameterCount());
+
   unsigned numArguments = callFrame->argumentCount() - 1;
 
   d->numParameters = 0;
