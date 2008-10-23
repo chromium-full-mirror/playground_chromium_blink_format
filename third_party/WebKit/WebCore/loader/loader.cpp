@@ -240,7 +240,7 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
       referrer.setPath("/");
     resourceRequest.setHTTPReferrer(referrer.string());
     FrameLoader::addHTTPOriginIfNeeded(
-        resourceRequest, docLoader->doc()->securityOrigin()->toHTTPOrigin());
+        resourceRequest, docLoader->doc()->securityOrigin()->toString());
 
     if (resourceIsCacheValidator) {
       CachedResource* resourceToRevalidate =
