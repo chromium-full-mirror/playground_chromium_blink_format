@@ -77,8 +77,4 @@ float userIdleTime() {
   return FLT_MAX;
 }  // return an arbitrarily high userIdleTime so that releasing pages from the
    // page cache isn't postponed
-
-void prefetchDNS(const String& hostname) {
-  notImplemented();
-}
 }
