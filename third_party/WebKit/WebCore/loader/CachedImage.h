@@ -95,6 +95,7 @@ class CachedImage : public CachedResource, public ImageObserver {
 
  private:
   void createImage();
+  size_t maximumDecodedImageSize();
   void notifyObservers();
   void decodedDataDeletionTimerFired(Timer<CachedImage>*);
 
