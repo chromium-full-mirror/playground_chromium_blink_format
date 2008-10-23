@@ -253,13 +253,20 @@ static RenderObject* bidiFirst(RenderBlock* block,
     }
     if (skipInlines && o->firstChild())
       o = bidiNext(block, o, resolver, skipInlines);
-    else
-      return o;  // Never skip empty inlines.
+    else {
+      // Never skip empty inlines.
+      if (resolver)
+        resolver->commitExplicitEmbedding();
+      return o;
+    }
   }
 
   if (o && !o->isText() && !o->isReplaced() && !o->isFloating() &&
       !o->isPositioned())
     o = bidiNext(block, o, resolver, skipInlines);
+
+  if (resolver)
+    resolver->commitExplicitEmbedding();
   return o;
 }
 
@@ -1660,6 +1667,7 @@ int RenderBlock::skipLeadingWhitespace(InlineBidiResolver& resolver) {
     }
     resolver.increment();
   }
+  resolver.commitExplicitEmbedding();
   return availableWidth;
 }
 
