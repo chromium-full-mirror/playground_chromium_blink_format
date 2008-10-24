@@ -711,6 +711,7 @@ void EventHandler::allowDHTMLDrag(bool& flagDHTML, bool& flagUA) const {
   if (!m_frame || !m_frame->document()) {
     flagDHTML = false;
     flagUA = false;
+    return;
   }
 
   unsigned mask = m_frame->page()->dragController()->delegateDragSourceAction(
