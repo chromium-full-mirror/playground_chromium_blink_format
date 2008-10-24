@@ -42,14 +42,14 @@ void FileChooser::openFileChooser(Document* doc) {
   if (!fl)
     return;
 
-  QString f = fl->chooseFile(m_filename);
+  QString f = fl->chooseFile(m_filenames[0]);
   if (!f.isEmpty())
     chooseFile(f);
 }
 
 String FileChooser::basenameForWidth(const Font& f, int width) const {
   QFontMetrics fm(f.font());
-  return fm.elidedText(m_filename, Qt::ElideLeft, width);
+  return fm.elidedText(m_filenames[0], Qt::ElideLeft, width);
 }
 }
 
