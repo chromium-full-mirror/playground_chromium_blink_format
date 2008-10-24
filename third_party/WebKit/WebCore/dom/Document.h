@@ -1150,6 +1150,10 @@ class Document : public ContainerNode {
   bool hasOpenDatabases() { return m_hasOpenDatabases; }
   void stopDatabases();
 #endif
+
+  void setUsingGeolocation(bool f) { m_usingGeolocation = f; }
+  bool usingGeolocation() const { return m_usingGeolocation; };
+
  protected:
   void clearXMLVersion() { m_xmlVersion = String(); }
 
@@ -1234,6 +1238,8 @@ class Document : public ContainerNode {
   typedef HashSet<Database*> DatabaseSet;
   OwnPtr<DatabaseSet> m_openDatabaseSet;
 #endif
+
+  bool m_usingGeolocation;
 
 #if USE(LOW_BANDWIDTH_DISPLAY)
   bool m_inLowBandwidthDisplay;

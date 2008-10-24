@@ -334,6 +334,8 @@ Document::Document(Frame* frame, bool isXHTML)
       ,
       m_hasOpenDatabases(false)
 #endif
+      ,
+      m_usingGeolocation(false)
 #if USE(LOW_BANDWIDTH_DISPLAY)
       ,
       m_inLowBandwidthDisplay(false)
