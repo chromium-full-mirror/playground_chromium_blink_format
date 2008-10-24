@@ -119,7 +119,7 @@ JSObjectRef JSContextGetGlobalObject(JSContextRef ctx) {
 
   // It is necessary to call toThisObject to get the wrapper object when used
   // with WebCore.
-  return toRef(exec->dynamicGlobalObject()->toThisObject(exec));
+  return toRef(exec->lexicalGlobalObject()->toThisObject(exec));
 }
 
 JSContextGroupRef JSContextGetGroup(JSContextRef ctx) {
