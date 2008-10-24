@@ -71,8 +71,4 @@ Color focusRingColor() {
   return focusRingColor;
 }
 
-void setFocusRingColorChangeFunction(void (*)()) {
-  notImplemented();
-}
-
 }  // namespace WebCore

@@ -136,7 +136,6 @@ Page::Page(ChromeClient* chromeClient,
       m_customHTMLTokenizerChunkSize(-1) {
   if (!allPages) {
     allPages = new HashSet<Page*>;
-    setFocusRingColorChangeFunction(setNeedsReapplyStyles);
 
     networkStateNotifier().setNetworkStateChangedFunction(networkStateChanged);
   }

@@ -656,7 +656,6 @@ void GraphicsContext::clip(const FloatRect& rect) {
  * RenderTheme handles drawing focus on widgets which
  * need it.
  */
-void setFocusRingColorChangeFunction(void (*)()) {}
 Color focusRingColor() {
   return Color(0, 0, 0);
 }
