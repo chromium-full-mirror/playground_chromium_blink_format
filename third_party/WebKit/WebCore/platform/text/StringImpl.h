@@ -93,6 +93,10 @@ class StringImpl : public RefCounted<StringImpl> {
       m_hash = computeHash(m_data, m_length);
     return m_hash;
   }
+  unsigned existingHash() const {
+    ASSERT(m_hash);
+    return m_hash;
+  }
   static unsigned computeHash(const UChar*, unsigned len);
   static unsigned computeHash(const char*);
 
