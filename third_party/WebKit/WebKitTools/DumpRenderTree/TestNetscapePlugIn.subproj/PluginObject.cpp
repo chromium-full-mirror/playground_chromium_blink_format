@@ -90,7 +90,8 @@ static const NPUTF8* pluginPropertyIdentifierNames[NUM_PROPERTY_IDENTIFIERS] = {
 #define ID_TEST_IDENTIFIER_TO_STRING 12
 #define ID_TEST_IDENTIFIER_TO_INT 13
 #define ID_TEST_POSTURL_FILE 14
-#define NUM_METHOD_IDENTIFIERS 15
+#define ID_TEST_CONSTRUCT 15
+#define NUM_METHOD_IDENTIFIERS 16
 
 static NPIdentifier pluginMethodIdentifiers[NUM_METHOD_IDENTIFIERS];
 static const NPUTF8* pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
@@ -101,7 +102,7 @@ static const NPUTF8* pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
     "testGetIntIdentifier",   "testGetProperty",
     "testEvaluate",           "testGetPropertyReturnValue",
     "testIdentifierToString", "testIdentifierToInt",
-    "testPostURLFile",
+    "testPostURLFile",        "testConstruct",
 };
 
 static NPUTF8* createCStringFromNPVariant(const NPVariant* variant) {
@@ -293,6 +294,8 @@ static bool testCallback(PluginObject* obj,
   browser->invoke(obj->npp, windowScriptObject, callbackIdentifier, 0, 0,
                   &browserResult);
   browser->releasevariantvalue(&browserResult);
+
+  browser->releaseobject(windowScriptObject);
 
   VOID_TO_NPVARIANT(*result);
   return true;
@@ -565,6 +568,17 @@ static bool testPostURLFile(PluginObject* obj,
   return true;
 }
 
+static bool testConstruct(PluginObject* obj,
+                          const NPVariant* args,
+                          uint32_t argCount,
+                          NPVariant* result) {
+  if (!argCount || !NPVARIANT_IS_OBJECT(args[0]))
+    return false;
+
+  return browser->construct(obj->npp, NPVARIANT_TO_OBJECT(args[0]), args + 1,
+                            argCount - 1, result);
+}
+
 static bool pluginInvoke(NPObject* header,
                          NPIdentifier name,
                          const NPVariant* args,
@@ -601,6 +615,8 @@ static bool pluginInvoke(NPObject* header,
     return testIdentifierToInt(plugin, args, argCount, result);
   else if (name == pluginMethodIdentifiers[ID_TEST_POSTURL_FILE])
     return testPostURLFile(plugin, args, argCount, result);
+  else if (name == pluginMethodIdentifiers[ID_TEST_CONSTRUCT])
+    return testConstruct(plugin, args, argCount, result);
 
   return false;
 }

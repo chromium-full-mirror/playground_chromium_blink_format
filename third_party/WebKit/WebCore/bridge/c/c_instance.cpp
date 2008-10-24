@@ -80,7 +80,7 @@ JSValue* CInstance::invokeMethod(ExecState* exec,
     return jsUndefined();
 
   unsigned count = args.size();
-  Vector<NPVariant, 128> cArgs(count);
+  Vector<NPVariant, 8> cArgs(count);
 
   unsigned i;
   for (i = 0; i < count; i++)
@@ -110,7 +110,7 @@ JSValue* CInstance::invokeDefaultMethod(ExecState* exec, const ArgList& args) {
     return jsUndefined();
 
   unsigned count = args.size();
-  Vector<NPVariant, 128> cArgs(count);
+  Vector<NPVariant, 8> cArgs(count);
 
   unsigned i;
   for (i = 0; i < count; i++)
@@ -123,6 +123,38 @@ JSValue* CInstance::invokeDefaultMethod(ExecState* exec, const ArgList& args) {
     JSLock::DropAllLocks dropAllLocks(false);
     _object->_class->invokeDefault(_object, cArgs.data(), count,
                                    &resultVariant);
+  }
+
+  for (i = 0; i < count; i++)
+    _NPN_ReleaseVariantValue(&cArgs[i]);
+
+  JSValue* resultValue =
+      convertNPVariantToValue(exec, &resultVariant, _rootObject.get());
+  _NPN_ReleaseVariantValue(&resultVariant);
+  return resultValue;
+}
+
+bool CInstance::supportsConstruct() const {
+  return _object->_class->construct;
+}
+
+JSValue* CInstance::invokeConstruct(ExecState* exec, const ArgList& args) {
+  if (!_object->_class->construct)
+    return jsUndefined();
+
+  unsigned count = args.size();
+  Vector<NPVariant, 8> cArgs(count);
+
+  unsigned i;
+  for (i = 0; i < count; i++)
+    convertValueToNPVariant(exec, args.at(exec, i), &cArgs[i]);
+
+  // Invoke the 'C' method.
+  NPVariant resultVariant;
+  VOID_TO_NPVARIANT(resultVariant);
+  {
+    JSLock::DropAllLocks dropAllLocks(false);
+    _object->_class->construct(_object, cArgs.data(), count, &resultVariant);
   }
 
   for (i = 0; i < count; i++)
