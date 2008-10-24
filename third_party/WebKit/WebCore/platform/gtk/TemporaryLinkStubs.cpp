@@ -61,7 +61,6 @@ void PluginView::invalidateRegion(NPRegion) {
 Color WebCore::focusRingColor() {
   return Color();
 }
-void WebCore::setFocusRingColorChangeFunction(void (*)()) {}
 
 namespace WebCore {
 void getSupportedKeySizes(Vector<String>&) {
