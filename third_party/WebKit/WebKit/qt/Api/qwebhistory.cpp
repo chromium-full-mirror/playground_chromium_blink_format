@@ -84,7 +84,9 @@ QWebHistoryItem::~QWebHistoryItem() {}
  \sa url()
 */
 QUrl QWebHistoryItem::originalUrl() const {
-  return QUrl(d->item->originalURL().string());
+  if (d->item)
+    return QUrl(d->item->originalURL().string());
+  return QUrl();
 }
 
 /*!
@@ -93,7 +95,9 @@ QUrl QWebHistoryItem::originalUrl() const {
  \sa originalUrl(), title(), lastVisited()
 */
 QUrl QWebHistoryItem::url() const {
-  return QUrl(d->item->url().string());
+  if (d->item)
+    return QUrl(d->item->url().string());
+  return QUrl();
 }
 
 /*!
@@ -102,7 +106,9 @@ QUrl QWebHistoryItem::url() const {
  \sa icon(), url(), lastVisited()
 */
 QString QWebHistoryItem::title() const {
-  return d->item->title();
+  if (d->item)
+    return d->item->title();
+  return QString();
 }
 
 /*!
@@ -114,7 +120,9 @@ QString QWebHistoryItem::title() const {
 QDateTime QWebHistoryItem::lastVisited() const {
   // FIXME : this will be wrong unless we correctly set lastVisitedTime
   // ourselves
-  return QDateTime::fromTime_t((uint)d->item->lastVisitedTime());
+  if (d->item)
+    return QDateTime::fromTime_t((uint)d->item->lastVisitedTime());
+  return QDateTime();
 }
 
 /*!
@@ -123,7 +131,9 @@ QDateTime QWebHistoryItem::lastVisited() const {
  \sa title(), url(), lastVisited()
 */
 QIcon QWebHistoryItem::icon() const {
-  return *d->item->icon()->nativeImageForCurrentFrame();
+  if (d->item)
+    return *d->item->icon()->nativeImageForCurrentFrame();
+  return QIcon();
 }
 
 /*!
@@ -131,6 +141,14 @@ QIcon QWebHistoryItem::icon() const {
 */
 QWebHistoryItem::QWebHistoryItem(QWebHistoryItemPrivate* priv) {
   d = priv;
+}
+
+/*!
+    \since 4.5
+    Returns whether this is a valid history item.
+*/
+bool QWebHistoryItem::isValid() const {
+  return d->item;
 }
 
 /*!

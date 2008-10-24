@@ -45,6 +45,8 @@ class QWEBKIT_EXPORT QWebHistoryItem {
 
   QIcon icon() const;
 
+  bool isValid() const;
+
  private:
   QWebHistoryItem(QWebHistoryItemPrivate* priv);
   friend class QWebHistory;
