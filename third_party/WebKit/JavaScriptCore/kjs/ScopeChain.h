@@ -67,8 +67,6 @@ class ScopeChainNode {
     return this;
   }
 
-  JSObject* bottom() const;
-
   ScopeChainNode* push(JSObject*);
   ScopeChainNode* pop();
 
@@ -98,13 +96,6 @@ inline ScopeChainNode* ScopeChainNode::pop() {
     delete this;
 
   return result;
-}
-
-inline JSObject* ScopeChainNode::bottom() const {
-  const ScopeChainNode* n = this;
-  while (n->next)
-    n = n->next;
-  return n->object;
 }
 
 inline void ScopeChainNode::release() {
@@ -179,7 +170,6 @@ class ScopeChain {
   ScopeChainNode* node() const { return m_node; }
 
   JSObject* top() const { return m_node->object; }
-  JSObject* bottom() const { return m_node->bottom(); }
 
   ScopeChainIterator begin() const { return m_node->begin(); }
   ScopeChainIterator end() const { return m_node->end(); }

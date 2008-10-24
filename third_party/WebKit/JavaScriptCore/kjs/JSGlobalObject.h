@@ -376,7 +376,10 @@ inline bool JSGlobalObject::getOwnPropertySlot(ExecState* exec,
 }
 
 inline JSGlobalObject* ScopeChainNode::globalObject() const {
-  return asGlobalObject(bottom());
+  const ScopeChainNode* n = this;
+  while (n->next)
+    n = n->next;
+  return asGlobalObject(n->object);
 }
 
 inline JSValue* StructureID::prototypeForLookup(ExecState* exec) {
