@@ -101,7 +101,10 @@ static bool testGetProperty(NPObject* npobj,
                             NPIdentifier name,
                             NPVariant* result) {
   if (name == testIdentifiers[ID_OBJECT_POINTER]) {
-    INT32_TO_NPVARIANT(reinterpret_cast<int32_t>(npobj), *result);
+    int32_t objectPointer =
+        static_cast<int32_t>(reinterpret_cast<long long>(npobj));
+
+    INT32_TO_NPVARIANT(objectPointer, *result);
     return true;
   }
 
