@@ -43,7 +43,7 @@ class StringObject : public JSWrapperObject {
 
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   JSValuePtr,
+                   JSValue*,
                    PutPropertySlot&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
@@ -55,7 +55,7 @@ class StringObject : public JSWrapperObject {
     return asString(JSWrapperObject::internalValue());
   }
 
-  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
     return StructureID::create(prototype, TypeInfo(ObjectType));
   }
 
@@ -68,9 +68,9 @@ class StringObject : public JSWrapperObject {
   virtual JSString* toThisJSString(ExecState*);
 };
 
-StringObject* asStringObject(JSValuePtr);
+StringObject* asStringObject(JSValue*);
 
-inline StringObject* asStringObject(JSValuePtr value) {
+inline StringObject* asStringObject(JSValue* value) {
   ASSERT(asObject(value)->inherits(&StringObject::info));
   return static_cast<StringObject*>(asObject(value));
 }

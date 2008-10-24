@@ -35,14 +35,14 @@ class RegExpConstructor : public InternalFunction {
  public:
   RegExpConstructor(ExecState*, PassRefPtr<StructureID>, RegExpPrototype*);
 
-  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
     return StructureID::create(prototype,
                                TypeInfo(ObjectType, ImplementsHasInstance));
   }
 
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValuePtr,
+                   JSValue*,
                    PutPropertySlot&);
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier& propertyName,
@@ -64,10 +64,10 @@ class RegExpConstructor : public InternalFunction {
   void setMultiline(bool);
   bool multiline() const;
 
-  JSValuePtr getBackref(ExecState*, unsigned) const;
-  JSValuePtr getLastParen(ExecState*) const;
-  JSValuePtr getLeftContext(ExecState*) const;
-  JSValuePtr getRightContext(ExecState*) const;
+  JSValue* getBackref(ExecState*, unsigned) const;
+  JSValue* getLastParen(ExecState*) const;
+  JSValue* getLeftContext(ExecState*) const;
+  JSValue* getRightContext(ExecState*) const;
 
  private:
   virtual ConstructType getConstructData(ConstructData&);
@@ -78,11 +78,11 @@ class RegExpConstructor : public InternalFunction {
   OwnPtr<RegExpConstructorPrivate> d;
 };
 
-RegExpConstructor* asRegExpConstructor(JSValuePtr);
+RegExpConstructor* asRegExpConstructor(JSValue*);
 
 JSObject* constructRegExp(ExecState*, const ArgList&);
 
-inline RegExpConstructor* asRegExpConstructor(JSValuePtr value) {
+inline RegExpConstructor* asRegExpConstructor(JSValue* value) {
   ASSERT(asObject(value)->inherits(&RegExpConstructor::info));
   return static_cast<RegExpConstructor*>(asObject(value));
 }

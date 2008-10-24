@@ -70,7 +70,7 @@
 using JSC::ExecState;
 using JSC::JSLock;
 using JSC::JSObject;
-using JSC::JSValuePtr;
+using JSC::JSValue*;
 using JSC::UString;
 
 using std::min;
@@ -199,7 +199,7 @@ static char* createUTF8String(const String& str) {
 }
 
 static bool getString(ScriptController* proxy,
-                      JSValuePtr result,
+                      JSValue* result,
                       String& string) {
   if (!proxy || !result || result->isUndefined())
     return false;
@@ -266,7 +266,7 @@ void PluginView::performRequest(PluginRequest* request) {
   // Executing a script can cause the plugin view to be destroyed, so we keep a
   // reference to the parent frame.
   RefPtr<Frame> parentFrame = m_parentFrame;
-  JSValuePtr result = m_parentFrame->loader()->executeScript(
+  JSValue* result = m_parentFrame->loader()->executeScript(
       jsString, request->shouldAllowPopups());
 
   if (targetFrameName.isNull()) {

@@ -152,7 +152,7 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
 
 void Arguments::put(ExecState* exec,
                     unsigned i,
-                    JSValuePtr value,
+                    JSValue* value,
                     PutPropertySlot& slot) {
   if (i < d->numArguments &&
       (!d->deletedArguments || !d->deletedArguments[i])) {
@@ -168,7 +168,7 @@ void Arguments::put(ExecState* exec,
 
 void Arguments::put(ExecState* exec,
                     const Identifier& propertyName,
-                    JSValuePtr value,
+                    JSValue* value,
                     PutPropertySlot& slot) {
   bool isArrayIndex;
   unsigned i = propertyName.toArrayIndex(&isArrayIndex);

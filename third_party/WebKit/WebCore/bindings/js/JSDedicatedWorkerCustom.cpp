@@ -56,8 +56,8 @@ void JSDedicatedWorker::mark() {
     listener->mark();
 }
 
-JSValuePtr JSDedicatedWorker::startConversation(ExecState* exec,
-                                                const ArgList& args) {
+JSValue* JSDedicatedWorker::startConversation(ExecState* exec,
+                                              const ArgList& args) {
   DOMWindow* window = asJSDOMWindow(exec->lexicalGlobalObject())->impl();
   const UString& message = args.at(exec, 0)->toString(exec);
 
@@ -65,7 +65,7 @@ JSValuePtr JSDedicatedWorker::startConversation(ExecState* exec,
               impl()->startConversation(window->document(), message).get());
 }
 
-void JSDedicatedWorker::setOnmessage(ExecState* exec, JSValuePtr value) {
+void JSDedicatedWorker::setOnmessage(ExecState* exec, JSValue* value) {
   Document* document = impl()->document();
   if (!document)
     return;
@@ -76,7 +76,7 @@ void JSDedicatedWorker::setOnmessage(ExecState* exec, JSValuePtr value) {
       window->findOrCreateJSUnprotectedEventListener(exec, value, true));
 }
 
-JSValuePtr JSDedicatedWorker::onmessage(ExecState*) const {
+JSValue* JSDedicatedWorker::onmessage(ExecState*) const {
   if (JSUnprotectedEventListener* listener =
           static_cast<JSUnprotectedEventListener*>(impl()->onMessageListener()))
     if (JSObject* listenerObj = listener->listenerObj())
@@ -84,7 +84,7 @@ JSValuePtr JSDedicatedWorker::onmessage(ExecState*) const {
   return jsNull();
 }
 
-void JSDedicatedWorker::setOnclose(ExecState* exec, JSValuePtr value) {
+void JSDedicatedWorker::setOnclose(ExecState* exec, JSValue* value) {
   Document* document = impl()->document();
   if (!document)
     return;
@@ -95,7 +95,7 @@ void JSDedicatedWorker::setOnclose(ExecState* exec, JSValuePtr value) {
       window->findOrCreateJSUnprotectedEventListener(exec, value, true));
 }
 
-JSValuePtr JSDedicatedWorker::onclose(ExecState*) const {
+JSValue* JSDedicatedWorker::onclose(ExecState*) const {
   if (JSUnprotectedEventListener* listener =
           static_cast<JSUnprotectedEventListener*>(impl()->onCloseListener()))
     if (JSObject* listenerObj = listener->listenerObj())
@@ -103,7 +103,7 @@ JSValuePtr JSDedicatedWorker::onclose(ExecState*) const {
   return jsNull();
 }
 
-void JSDedicatedWorker::setOnerror(ExecState* exec, JSValuePtr value) {
+void JSDedicatedWorker::setOnerror(ExecState* exec, JSValue* value) {
   Document* document = impl()->document();
   if (!document)
     return;
@@ -114,7 +114,7 @@ void JSDedicatedWorker::setOnerror(ExecState* exec, JSValuePtr value) {
       window->findOrCreateJSUnprotectedEventListener(exec, value, true));
 }
 
-JSValuePtr JSDedicatedWorker::onerror(ExecState*) const {
+JSValue* JSDedicatedWorker::onerror(ExecState*) const {
   if (JSUnprotectedEventListener* listener =
           static_cast<JSUnprotectedEventListener*>(impl()->onErrorListener()))
     if (JSObject* listenerObj = listener->listenerObj())

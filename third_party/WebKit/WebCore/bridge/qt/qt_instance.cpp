@@ -198,15 +198,15 @@ void QtInstance::getPropertyNames(ExecState* exec, PropertyNameArray& array) {
   }
 }
 
-JSValuePtr QtInstance::invokeMethod(ExecState*,
-                                    const MethodList&,
-                                    const ArgList&) {
+JSValue* QtInstance::invokeMethod(ExecState*,
+                                  const MethodList&,
+                                  const ArgList&) {
   // Implemented via fallbackMethod & QtRuntimeMetaMethod::callAsFunction
   return jsUndefined();
 }
 
-JSValuePtr QtInstance::defaultValue(ExecState* exec,
-                                    PreferredPrimitiveType hint) const {
+JSValue* QtInstance::defaultValue(ExecState* exec,
+                                  PreferredPrimitiveType hint) const {
   if (hint == PreferString)
     return stringValue(exec);
   if (hint == PreferNumber)
@@ -214,7 +214,7 @@ JSValuePtr QtInstance::defaultValue(ExecState* exec,
   return valueOf(exec);
 }
 
-JSValuePtr QtInstance::stringValue(ExecState* exec) const {
+JSValue* QtInstance::stringValue(ExecState* exec) const {
   // Hmm.. see if there is a toString defined
   QByteArray buf;
   bool useDefault = true;
@@ -261,25 +261,25 @@ JSValuePtr QtInstance::stringValue(ExecState* exec) const {
   return jsString(exec, buf.constData());
 }
 
-JSValuePtr QtInstance::numberValue(ExecState* exec) const {
+JSValue* QtInstance::numberValue(ExecState* exec) const {
   return jsNumber(exec, 0);
 }
 
-JSValuePtr QtInstance::booleanValue() const {
+JSValue* QtInstance::booleanValue() const {
   // ECMA 9.2
   return jsBoolean(true);
 }
 
-JSValuePtr QtInstance::valueOf(ExecState* exec) const {
+JSValue* QtInstance::valueOf(ExecState* exec) const {
   return stringValue(exec);
 }
 
 // In qt_runtime.cpp
-JSValuePtr convertQVariantToValue(ExecState*,
-                                  PassRefPtr<RootObject> root,
-                                  const QVariant& variant);
+JSValue* convertQVariantToValue(ExecState*,
+                                PassRefPtr<RootObject> root,
+                                const QVariant& variant);
 QVariant convertValueToQVariant(ExecState*,
-                                JSValuePtr,
+                                JSValue*,
                                 QMetaType::Type hint,
                                 int* distance);
 
@@ -293,8 +293,8 @@ const char* QtField::name() const {
   return "";  // deleted child object
 }
 
-JSValuePtr QtField::valueFromInstance(ExecState* exec,
-                                      const Instance* inst) const {
+JSValue* QtField::valueFromInstance(ExecState* exec,
+                                    const Instance* inst) const {
   const QtInstance* instance = static_cast<const QtInstance*>(inst);
   QObject* obj = instance->getObject();
 
@@ -310,7 +310,7 @@ JSValuePtr QtField::valueFromInstance(ExecState* exec,
     else if (m_type == DynamicProperty)
       val = obj->property(m_dynamicProperty);
 
-    JSValuePtr ret = convertQVariantToValue(exec, inst->rootObject(), val);
+    JSValue* ret = convertQVariantToValue(exec, inst->rootObject(), val);
 
     // Need to save children so we can mark them
     if (m_type == ChildObject)
@@ -327,7 +327,7 @@ JSValuePtr QtField::valueFromInstance(ExecState* exec,
 
 void QtField::setValueToInstance(ExecState* exec,
                                  const Instance* inst,
-                                 JSValuePtr aValue) const {
+                                 JSValue* aValue) const {
   if (m_type == ChildObject)  // QtScript doesn't allow setting to a named child
     return;
 

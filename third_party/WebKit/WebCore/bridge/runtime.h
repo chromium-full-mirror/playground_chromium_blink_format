@@ -50,10 +50,10 @@ typedef Vector<Method*> MethodList;
 class Field {
  public:
   virtual const char* name() const = 0;
-  virtual JSValuePtr valueFromInstance(ExecState*, const Instance*) const = 0;
+  virtual JSValue* valueFromInstance(ExecState*, const Instance*) const = 0;
   virtual void setValueToInstance(ExecState*,
                                   const Instance*,
-                                  JSValuePtr) const = 0;
+                                  JSValue*) const = 0;
 
   virtual ~Field() {}
 };
@@ -71,7 +71,7 @@ class Class : Noncopyable {
   virtual const char* name() const = 0;
   virtual MethodList methodsNamed(const Identifier&, Instance*) const = 0;
   virtual Field* fieldNamed(const Identifier&, Instance*) const = 0;
-  virtual JSValuePtr fallbackObject(ExecState*, Instance*, const Identifier&) {
+  virtual JSValue* fallbackObject(ExecState*, Instance*, const Identifier&) {
     return jsUndefined();
   }
 
@@ -113,31 +113,31 @@ class Instance : public RefCounted<Instance> {
 
   virtual Class* getClass() const = 0;
 
-  virtual JSValuePtr getValueOfField(ExecState*, const Field*) const;
-  virtual JSValuePtr getValueOfUndefinedField(ExecState*,
-                                              const Identifier&) const {
+  virtual JSValue* getValueOfField(ExecState*, const Field*) const;
+  virtual JSValue* getValueOfUndefinedField(ExecState*,
+                                            const Identifier&) const {
     return jsUndefined();
   }
-  virtual void setValueOfField(ExecState*, const Field*, JSValuePtr) const;
+  virtual void setValueOfField(ExecState*, const Field*, JSValue*) const;
   virtual bool supportsSetValueOfUndefinedField() { return false; }
   virtual void setValueOfUndefinedField(ExecState*,
                                         const Identifier&,
-                                        JSValuePtr) {}
+                                        JSValue*) {}
 
-  virtual JSValuePtr invokeMethod(ExecState*,
-                                  const MethodList&,
-                                  const ArgList& args) = 0;
+  virtual JSValue* invokeMethod(ExecState*,
+                                const MethodList&,
+                                const ArgList& args) = 0;
 
   virtual bool supportsInvokeDefaultMethod() const { return false; }
-  virtual JSValuePtr invokeDefaultMethod(ExecState*, const ArgList&) {
+  virtual JSValue* invokeDefaultMethod(ExecState*, const ArgList&) {
     return jsUndefined();
   }
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&) {}
 
-  virtual JSValuePtr defaultValue(ExecState*, PreferredPrimitiveType) const = 0;
+  virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const = 0;
 
-  virtual JSValuePtr valueOf(ExecState* exec) const {
+  virtual JSValue* valueOf(ExecState* exec) const {
     return jsString(exec, getClass()->name());
   }
 
@@ -159,8 +159,8 @@ class Array : Noncopyable {
   Array(PassRefPtr<RootObject>);
   virtual ~Array();
 
-  virtual void setValueAt(ExecState*, unsigned index, JSValuePtr) const = 0;
-  virtual JSValuePtr valueAt(ExecState*, unsigned index) const = 0;
+  virtual void setValueAt(ExecState*, unsigned index, JSValue*) const = 0;
+  virtual JSValue* valueAt(ExecState*, unsigned index) const = 0;
   virtual unsigned int getLength() const = 0;
 
  protected:

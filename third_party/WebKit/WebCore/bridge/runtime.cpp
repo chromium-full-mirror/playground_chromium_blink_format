@@ -68,14 +68,13 @@ void Instance::end() {
   virtualEnd();
 }
 
-JSValuePtr Instance::getValueOfField(ExecState* exec,
-                                     const Field* aField) const {
+JSValue* Instance::getValueOfField(ExecState* exec, const Field* aField) const {
   return aField->valueFromInstance(exec, this);
 }
 
 void Instance::setValueOfField(ExecState* exec,
                                const Field* aField,
-                               JSValuePtr aValue) const {
+                               JSValue* aValue) const {
   aField->setValueToInstance(exec, this, aValue);
 }
 

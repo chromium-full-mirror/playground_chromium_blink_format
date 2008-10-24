@@ -52,12 +52,12 @@ class JSFunction : public InternalFunction {
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValuePtr,
+                   JSValue*,
                    PutPropertySlot&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
 
   JSObject* construct(ExecState*, const ArgList&);
-  JSValuePtr call(ExecState*, JSValuePtr thisValue, const ArgList&);
+  JSValue* call(ExecState*, JSValue* thisValue, const ArgList&);
 
   // Note: Returns a null identifier for any parameters that will never get set
   // due to a later parameter with the same name.
@@ -73,7 +73,7 @@ class JSFunction : public InternalFunction {
   // FIXME: This should be private
   RefPtr<FunctionBodyNode> m_body;
 
-  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
     return StructureID::create(prototype,
                                TypeInfo(ObjectType, ImplementsHasInstance));
   }
@@ -84,22 +84,22 @@ class JSFunction : public InternalFunction {
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);
 
-  static JSValuePtr argumentsGetter(ExecState*,
-                                    const Identifier&,
-                                    const PropertySlot&);
-  static JSValuePtr callerGetter(ExecState*,
-                                 const Identifier&,
-                                 const PropertySlot&);
-  static JSValuePtr lengthGetter(ExecState*,
-                                 const Identifier&,
-                                 const PropertySlot&);
+  static JSValue* argumentsGetter(ExecState*,
+                                  const Identifier&,
+                                  const PropertySlot&);
+  static JSValue* callerGetter(ExecState*,
+                               const Identifier&,
+                               const PropertySlot&);
+  static JSValue* lengthGetter(ExecState*,
+                               const Identifier&,
+                               const PropertySlot&);
 
   ScopeChain m_scopeChain;
 };
 
-JSFunction* asFunction(JSValuePtr);
+JSFunction* asFunction(JSValue*);
 
-inline JSFunction* asFunction(JSValuePtr value) {
+inline JSFunction* asFunction(JSValue* value) {
   ASSERT(asObject(value)->inherits(&JSFunction::info));
   return static_cast<JSFunction*>(asObject(value));
 }

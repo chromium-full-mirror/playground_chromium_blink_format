@@ -42,9 +42,9 @@ bool JSStorage::canGetItemsForName(ExecState*,
   return impl->contains(propertyName);
 }
 
-JSValuePtr JSStorage::nameGetter(ExecState* exec,
-                                 const Identifier& propertyName,
-                                 const PropertySlot& slot) {
+JSValue* JSStorage::nameGetter(ExecState* exec,
+                               const Identifier& propertyName,
+                               const PropertySlot& slot) {
   JSStorage* thisObj = static_cast<JSStorage*>(asObject(slot.slotBase()));
   return jsStringOrNull(exec, thisObj->impl()->getItem(propertyName));
 }
@@ -61,7 +61,7 @@ bool JSStorage::deleteProperty(ExecState* exec,
                                           this, propertyName, slot))
     return false;
 
-  JSValuePtr prototype = this->prototype();
+  JSValue* prototype = this->prototype();
   if (prototype->isObject() &&
       asObject(prototype)->hasProperty(exec, propertyName))
     return false;
@@ -82,7 +82,7 @@ bool JSStorage::customGetPropertyNames(ExecState* exec,
 
 bool JSStorage::customPut(ExecState* exec,
                           const Identifier& propertyName,
-                          JSValuePtr value,
+                          JSValue* value,
                           PutPropertySlot&) {
   // Only perform the custom put if the object doesn't have a native property by
   // this name.
@@ -94,7 +94,7 @@ bool JSStorage::customPut(ExecState* exec,
                                           this, propertyName, slot))
     return false;
 
-  JSValuePtr prototype = this->prototype();
+  JSValue* prototype = this->prototype();
   if (prototype->isObject() &&
       asObject(prototype)->hasProperty(exec, propertyName))
     return false;

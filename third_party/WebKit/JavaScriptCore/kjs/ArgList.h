@@ -86,7 +86,7 @@ class ArgList : Noncopyable {
   size_t size() const { return m_size; }
   bool isEmpty() const { return !m_size; }
 
-  JSValuePtr at(ExecState* exec, size_t i) const {
+  JSValue* at(ExecState* exec, size_t i) const {
     if (i < m_size)
       return m_buffer[i].jsValue(exec);
     return jsUndefined();
@@ -98,7 +98,7 @@ class ArgList : Noncopyable {
     m_size = 0;
   }
 
-  void append(JSValuePtr v) {
+  void append(JSValue* v) {
     ASSERT(!m_isReadOnly);
 
     if (m_size < inlineCapacity) {
@@ -123,7 +123,7 @@ class ArgList : Noncopyable {
   static void markLists(ListSet&);
 
  private:
-  void slowAppend(JSValuePtr);
+  void slowAppend(JSValue*);
 
   Register* m_buffer;
   size_t m_size;

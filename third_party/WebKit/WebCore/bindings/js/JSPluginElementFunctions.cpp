@@ -61,9 +61,9 @@ static RuntimeObjectImp* getRuntimeObject(ExecState* exec, Node* node) {
   return JSC::Bindings::Instance::createRuntimeObject(exec, instance);
 }
 
-JSValuePtr runtimeObjectGetter(ExecState* exec,
-                               const Identifier& propertyName,
-                               const PropertySlot& slot) {
+JSValue* runtimeObjectGetter(ExecState* exec,
+                             const Identifier& propertyName,
+                             const PropertySlot& slot) {
   JSHTMLElement* thisObj =
       static_cast<JSHTMLElement*>(asObject(slot.slotBase()));
   HTMLElement* element = static_cast<HTMLElement*>(thisObj->impl());
@@ -71,9 +71,9 @@ JSValuePtr runtimeObjectGetter(ExecState* exec,
   return runtimeObject ? runtimeObject : jsUndefined();
 }
 
-JSValuePtr runtimeObjectPropertyGetter(ExecState* exec,
-                                       const Identifier& propertyName,
-                                       const PropertySlot& slot) {
+JSValue* runtimeObjectPropertyGetter(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     const PropertySlot& slot) {
   JSHTMLElement* thisObj =
       static_cast<JSHTMLElement*>(asObject(slot.slotBase()));
   HTMLElement* element = static_cast<HTMLElement*>(thisObj->impl());
@@ -98,7 +98,7 @@ bool runtimeObjectCustomGetOwnPropertySlot(ExecState* exec,
 
 bool runtimeObjectCustomPut(ExecState* exec,
                             const Identifier& propertyName,
-                            JSValuePtr value,
+                            JSValue* value,
                             HTMLElement* element,
                             PutPropertySlot& slot) {
   RuntimeObjectImp* runtimeObject = getRuntimeObject(exec, element);
@@ -110,14 +110,14 @@ bool runtimeObjectCustomPut(ExecState* exec,
   return true;
 }
 
-static JSValuePtr callPlugin(ExecState* exec,
-                             JSObject* function,
-                             JSValuePtr,
-                             const ArgList& args) {
+static JSValue* callPlugin(ExecState* exec,
+                           JSObject* function,
+                           JSValue*,
+                           const ArgList& args) {
   Instance* instance =
       pluginInstance(static_cast<JSHTMLElement*>(function)->impl());
   instance->begin();
-  JSValuePtr result = instance->invokeDefaultMethod(exec, args);
+  JSValue* result = instance->invokeDefaultMethod(exec, args);
   instance->end();
   return result;
 }

@@ -46,7 +46,7 @@ class JSRGBColor : public DOMObject {
   }
 
   static PassRefPtr<JSC::StructureID> createStructureID(
-      JSC::JSValuePtr prototype) {
+      JSC::JSValue* prototype) {
     return JSC::StructureID::create(prototype, JSC::TypeInfo(JSC::ObjectType));
   }
 
@@ -54,7 +54,7 @@ class JSRGBColor : public DOMObject {
   unsigned m_color;
 };
 
-JSC::JSValuePtr getJSRGBColor(JSC::ExecState*, unsigned color);
+JSC::JSValue* getJSRGBColor(JSC::ExecState*, unsigned color);
 
 }  // namespace WebCore
 

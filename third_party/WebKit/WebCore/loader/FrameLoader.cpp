@@ -194,7 +194,7 @@ static double storedTimeOfLastCompletedLoad;
 static FrameLoader::LocalLoadPolicy localLoadPolicy =
     FrameLoader::AllowLocalLoadsForLocalOnly;
 
-static bool getString(JSValuePtr result, String& string) {
+static bool getString(JSValue* result, String& string) {
   if (!result)
     return false;
   JSLock lock(false);
@@ -802,7 +802,7 @@ bool FrameLoader::executeIfJavaScriptURL(const KURL& url,
 
   String script =
       decodeURLEscapeSequences(url.string().substring(strlen("javascript:")));
-  JSValuePtr result = executeScript(script, userGesture);
+  JSValue* result = executeScript(script, userGesture);
 
   String scriptResult;
   if (!getString(result, scriptResult))
@@ -824,21 +824,21 @@ bool FrameLoader::executeIfJavaScriptURL(const KURL& url,
   return true;
 }
 
-JSValuePtr FrameLoader::executeScript(const String& script,
-                                      bool forceUserGesture) {
+JSValue* FrameLoader::executeScript(const String& script,
+                                    bool forceUserGesture) {
   return executeScript(forceUserGesture ? String() : m_URL.string(), 1, script);
 }
 
-JSValuePtr FrameLoader::executeScript(const String& url,
-                                      int baseLine,
-                                      const String& script) {
+JSValue* FrameLoader::executeScript(const String& url,
+                                    int baseLine,
+                                    const String& script) {
   if (!m_frame->script()->isEnabled() || m_frame->script()->isPaused())
     return noValue();
 
   bool wasRunningScript = m_isRunningScript;
   m_isRunningScript = true;
 
-  JSValuePtr result = m_frame->script()->evaluate(url, baseLine, script);
+  JSValue* result = m_frame->script()->evaluate(url, baseLine, script);
 
   if (!wasRunningScript) {
     m_isRunningScript = false;

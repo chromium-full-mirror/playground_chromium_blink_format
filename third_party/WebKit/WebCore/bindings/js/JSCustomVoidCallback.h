@@ -55,7 +55,7 @@ class JSCustomVoidCallback : public VoidCallback {
   RefPtr<Frame> m_frame;
 };
 
-PassRefPtr<VoidCallback> toVoidCallback(JSC::ExecState*, JSC::JSValuePtr);
+PassRefPtr<VoidCallback> toVoidCallback(JSC::ExecState*, JSC::JSValue*);
 
 }  // namespace WebCore
 

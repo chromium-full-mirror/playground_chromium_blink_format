@@ -40,7 +40,7 @@ class DebuggerCallFrame {
   DebuggerCallFrame(CallFrame* callFrame)
       : m_callFrame(callFrame), m_exception(noValue()) {}
 
-  DebuggerCallFrame(CallFrame* callFrame, JSValuePtr exception)
+  DebuggerCallFrame(CallFrame* callFrame, JSValue* exception)
       : m_callFrame(callFrame), m_exception(exception) {}
 
   JSGlobalObject* dynamicGlobalObject() const {
@@ -50,12 +50,12 @@ class DebuggerCallFrame {
   const UString* functionName() const;
   Type type() const;
   JSObject* thisObject() const;
-  JSValuePtr evaluate(const UString&, JSValuePtr& exception) const;
-  JSValuePtr exception() const { return m_exception; }
+  JSValue* evaluate(const UString&, JSValue*& exception) const;
+  JSValue* exception() const { return m_exception; }
 
  private:
   CallFrame* m_callFrame;
-  JSValuePtr m_exception;
+  JSValue* m_exception;
 };
 
 }  // namespace JSC

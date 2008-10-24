@@ -36,49 +36,49 @@ void JSTreeWalker::mark() {
   DOMObject::mark();
 }
 
-JSValuePtr JSTreeWalker::parentNode(ExecState* exec, const ArgList& args) {
+JSValue* JSTreeWalker::parentNode(ExecState* exec, const ArgList& args) {
   Node* node = impl()->parentNode(exec);
   if (exec->hadException())
     return jsUndefined();
   return toJS(exec, node);
 }
 
-JSValuePtr JSTreeWalker::firstChild(ExecState* exec, const ArgList& args) {
+JSValue* JSTreeWalker::firstChild(ExecState* exec, const ArgList& args) {
   Node* node = impl()->firstChild(exec);
   if (exec->hadException())
     return jsUndefined();
   return toJS(exec, node);
 }
 
-JSValuePtr JSTreeWalker::lastChild(ExecState* exec, const ArgList& args) {
+JSValue* JSTreeWalker::lastChild(ExecState* exec, const ArgList& args) {
   Node* node = impl()->lastChild(exec);
   if (exec->hadException())
     return jsUndefined();
   return toJS(exec, node);
 }
 
-JSValuePtr JSTreeWalker::nextSibling(ExecState* exec, const ArgList& args) {
+JSValue* JSTreeWalker::nextSibling(ExecState* exec, const ArgList& args) {
   Node* node = impl()->nextSibling(exec);
   if (exec->hadException())
     return jsUndefined();
   return toJS(exec, node);
 }
 
-JSValuePtr JSTreeWalker::previousSibling(ExecState* exec, const ArgList& args) {
+JSValue* JSTreeWalker::previousSibling(ExecState* exec, const ArgList& args) {
   Node* node = impl()->previousSibling(exec);
   if (exec->hadException())
     return jsUndefined();
   return toJS(exec, node);
 }
 
-JSValuePtr JSTreeWalker::previousNode(ExecState* exec, const ArgList& args) {
+JSValue* JSTreeWalker::previousNode(ExecState* exec, const ArgList& args) {
   Node* node = impl()->previousNode(exec);
   if (exec->hadException())
     return jsUndefined();
   return toJS(exec, node);
 }
 
-JSValuePtr JSTreeWalker::nextNode(ExecState* exec, const ArgList& args) {
+JSValue* JSTreeWalker::nextNode(ExecState* exec, const ArgList& args) {
   Node* node = impl()->nextNode(exec);
   if (exec->hadException())
     return jsUndefined();

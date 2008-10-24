@@ -76,9 +76,9 @@ class ScriptController {
     return m_windowShell->window();
   }
 
-  JSC::JSValuePtr evaluate(const String& sourceURL,
-                           int baseLine,
-                           const String& code);
+  JSC::JSValue* evaluate(const String& sourceURL,
+                         int baseLine,
+                         const String& code);
 
   PassRefPtr<EventListener> createHTMLEventHandler(const String& functionName,
                                                    const String& code,

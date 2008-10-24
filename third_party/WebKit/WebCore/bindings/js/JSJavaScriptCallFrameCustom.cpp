@@ -33,10 +33,9 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSValuePtr JSJavaScriptCallFrame::evaluate(ExecState* exec,
-                                           const ArgList& args) {
-  JSValuePtr exception = noValue();
-  JSValuePtr result =
+JSValue* JSJavaScriptCallFrame::evaluate(ExecState* exec, const ArgList& args) {
+  JSValue* exception = noValue();
+  JSValue* result =
       impl()->evaluate(args.at(exec, 0)->toString(exec), exception);
 
   if (exception)
@@ -45,11 +44,11 @@ JSValuePtr JSJavaScriptCallFrame::evaluate(ExecState* exec,
   return result;
 }
 
-JSValuePtr JSJavaScriptCallFrame::thisObject(ExecState* exec) const {
+JSValue* JSJavaScriptCallFrame::thisObject(ExecState* exec) const {
   return impl()->thisObject() ? impl()->thisObject() : jsNull();
 }
 
-JSValuePtr JSJavaScriptCallFrame::type(ExecState* exec) const {
+JSValue* JSJavaScriptCallFrame::type(ExecState* exec) const {
   switch (impl()->type()) {
     case DebuggerCallFrame::FunctionType:
       return jsString(exec, "function");
@@ -61,7 +60,7 @@ JSValuePtr JSJavaScriptCallFrame::type(ExecState* exec) const {
   return jsNull();
 }
 
-JSValuePtr JSJavaScriptCallFrame::scopeChain(ExecState* exec) const {
+JSValue* JSJavaScriptCallFrame::scopeChain(ExecState* exec) const {
   if (!impl()->scopeChain())
     return jsNull();
 

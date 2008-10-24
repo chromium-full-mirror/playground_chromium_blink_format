@@ -259,7 +259,7 @@ class CodeGenerator {
   RegisterID* emitLoad(RegisterID* dst, bool);
   RegisterID* emitLoad(RegisterID* dst, double);
   RegisterID* emitLoad(RegisterID* dst, const Identifier&);
-  RegisterID* emitLoad(RegisterID* dst, JSValuePtr);
+  RegisterID* emitLoad(RegisterID* dst, JSValue*);
   RegisterID* emitLoad(RegisterID* dst, JSCell*);
   RegisterID* emitUnexpectedLoad(RegisterID* dst, bool);
   RegisterID* emitUnexpectedLoad(RegisterID* dst, double);
@@ -309,11 +309,11 @@ class CodeGenerator {
   RegisterID* emitGetScopedVar(RegisterID* dst,
                                size_t skip,
                                int index,
-                               JSValuePtr globalObject);
+                               JSValue* globalObject);
   RegisterID* emitPutScopedVar(size_t skip,
                                int index,
                                RegisterID* value,
-                               JSValuePtr globalObject);
+                               JSValue* globalObject);
 
   RegisterID* emitResolveBase(RegisterID* dst, const Identifier& property);
   RegisterID* emitResolveWithBase(RegisterID* baseDst,
@@ -394,7 +394,7 @@ class CodeGenerator {
 
   RegisterID* emitCatch(RegisterID*, LabelID* start, LabelID* end);
   void emitThrow(RegisterID* exc) { emitUnaryNoDstOp(op_throw, exc); }
-  RegisterID* emitNewError(RegisterID* dst, ErrorType type, JSValuePtr message);
+  RegisterID* emitNewError(RegisterID* dst, ErrorType type, JSValue* message);
   void emitPushNewScope(RegisterID* dst,
                         Identifier& property,
                         RegisterID* value);
@@ -466,7 +466,7 @@ class CodeGenerator {
                   HashTraits<RefPtr<UString::Rep>>,
                   IdentifierMapIndexHashTraits>
       IdentifierMap;
-  typedef HashMap<double, JSValuePtr> NumberMap;
+  typedef HashMap<double, JSValue*> NumberMap;
   typedef HashMap<UString::Rep*, JSString*, IdentifierRepHash>
       IdentifierStringMap;
 
@@ -524,8 +524,8 @@ class CodeGenerator {
   unsigned addConstant(FuncDeclNode*);
   unsigned addConstant(FuncExprNode*);
   unsigned addConstant(const Identifier&);
-  RegisterID* addConstant(JSValuePtr);
-  unsigned addUnexpectedConstant(JSValuePtr);
+  RegisterID* addConstant(JSValue*);
+  unsigned addUnexpectedConstant(JSValue*);
   unsigned addRegExp(RegExp*);
   StructureID* addStructureID();
 

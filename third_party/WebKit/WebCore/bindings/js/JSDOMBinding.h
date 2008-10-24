@@ -119,8 +119,8 @@ inline DOMObject* createDOMObjectWrapper(JSC::ExecState* exec,
   return wrapper;
 }
 template <class WrapperClass, class DOMClass>
-inline JSC::JSValuePtr getDOMObjectWrapper(JSC::ExecState* exec,
-                                           DOMClass* object) {
+inline JSC::JSValue* getDOMObjectWrapper(JSC::ExecState* exec,
+                                         DOMClass* object) {
   if (!object)
     return JSC::jsNull();
   if (DOMObject* wrapper =
@@ -145,9 +145,9 @@ inline DOMObject* createDOMObjectWrapper(JSC::ExecState* exec,
   return wrapper;
 }
 template <class WrapperClass, class DOMClass>
-inline JSC::JSValuePtr getDOMObjectWrapper(JSC::ExecState* exec,
-                                           DOMClass* object,
-                                           SVGElement* context) {
+inline JSC::JSValue* getDOMObjectWrapper(JSC::ExecState* exec,
+                                         DOMClass* object,
+                                         SVGElement* context) {
   if (!object)
     return JSC::jsNull();
   if (DOMObject* wrapper =
@@ -169,7 +169,7 @@ inline JSNode* createDOMNodeWrapper(JSC::ExecState* exec, DOMClass* node) {
   return wrapper;
 }
 template <class WrapperClass, class DOMClass>
-inline JSC::JSValuePtr getDOMNodeWrapper(JSC::ExecState* exec, DOMClass* node) {
+inline JSC::JSValue* getDOMNodeWrapper(JSC::ExecState* exec, DOMClass* node) {
   if (!node)
     return JSC::jsNull();
   if (JSNode* wrapper = getCachedDOMNodeWrapper(node->document(), node))
@@ -185,40 +185,38 @@ const JSC::HashTable* getHashTableForGlobalData(
 // the execution state.
 void setDOMException(JSC::ExecState*, ExceptionCode);
 
-JSC::JSValuePtr jsStringOrNull(JSC::ExecState*,
-                               const String&);  // null if the string is null
-JSC::JSValuePtr jsStringOrNull(JSC::ExecState*,
-                               const KURL&);  // null if the URL is null
+JSC::JSValue* jsStringOrNull(JSC::ExecState*,
+                             const String&);  // null if the string is null
+JSC::JSValue* jsStringOrNull(JSC::ExecState*,
+                             const KURL&);  // null if the URL is null
 
-JSC::JSValuePtr jsStringOrUndefined(
+JSC::JSValue* jsStringOrUndefined(
     JSC::ExecState*,
     const String&);  // undefined if the string is null
-JSC::JSValuePtr jsStringOrUndefined(
-    JSC::ExecState*,
-    const KURL&);  // undefined if the URL is null
+JSC::JSValue* jsStringOrUndefined(JSC::ExecState*,
+                                  const KURL&);  // undefined if the URL is null
 
-JSC::JSValuePtr jsStringOrFalse(
+JSC::JSValue* jsStringOrFalse(
     JSC::ExecState*,
     const String&);  // boolean false if the string is null
-JSC::JSValuePtr jsStringOrFalse(
-    JSC::ExecState*,
-    const KURL&);  // boolean false if the URL is null
+JSC::JSValue* jsStringOrFalse(JSC::ExecState*,
+                              const KURL&);  // boolean false if the URL is null
 
 // See JavaScriptCore for explanation: Should be used for any UString that is
 // already owned by another
 // object, to let the engine know that collecting the JSString wrapper is
 // unlikely to save memory.
-JSC::JSValuePtr jsOwnedStringOrNull(JSC::ExecState*, const JSC::UString&);
+JSC::JSValue* jsOwnedStringOrNull(JSC::ExecState*, const JSC::UString&);
 
 JSC::UString valueToStringWithNullCheck(
     JSC::ExecState*,
-    JSC::JSValuePtr);  // null if the value is null
+    JSC::JSValue*);  // null if the value is null
 JSC::UString valueToStringWithUndefinedOrNullCheck(
     JSC::ExecState*,
-    JSC::JSValuePtr);  // null if the value is null or undefined
+    JSC::JSValue*);  // null if the value is null or undefined
 
 template <typename T>
-inline JSC::JSValuePtr toJS(JSC::ExecState* exec, PassRefPtr<T> ptr) {
+inline JSC::JSValue* toJS(JSC::ExecState* exec, PassRefPtr<T> ptr) {
   return toJS(exec, ptr.get());
 }
 
@@ -232,10 +230,9 @@ bool checkNodeSecurity(JSC::ExecState*, Node*);
 bool allowsAccessFromFrame(JSC::ExecState*, Frame*);
 bool allowsAccessFromFrame(JSC::ExecState*, Frame*, String& message);
 void printErrorMessageForFrame(Frame*, const String& message);
-JSC::JSValuePtr objectToStringFunctionGetter(
-    JSC::ExecState*,
-    const JSC::Identifier& propertyName,
-    const JSC::PropertySlot&);
+JSC::JSValue* objectToStringFunctionGetter(JSC::ExecState*,
+                                           const JSC::Identifier& propertyName,
+                                           const JSC::PropertySlot&);
 
 JSC::ExecState* execStateFromNode(Node*);
 

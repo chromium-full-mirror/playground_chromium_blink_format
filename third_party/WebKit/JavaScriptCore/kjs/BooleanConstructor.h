@@ -37,7 +37,7 @@ class BooleanConstructor : public InternalFunction {
   virtual CallType getCallData(CallData&);
 };
 
-JSObject* constructBooleanFromImmediateBoolean(ExecState*, JSValuePtr);
+JSObject* constructBooleanFromImmediateBoolean(ExecState*, JSValue*);
 JSObject* constructBoolean(ExecState*, const ArgList&);
 
 }  // namespace JSC

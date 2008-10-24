@@ -63,7 +63,7 @@ class Interpreter {
   static Completion evaluate(ExecState*,
                              ScopeChain&,
                              const SourceCode&,
-                             JSValuePtr thisValue = noValue());
+                             JSValue* thisValue = noValue());
 
   static bool shouldPrintExceptions();
   static void setShouldPrintExceptions(bool);

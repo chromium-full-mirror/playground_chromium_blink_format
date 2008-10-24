@@ -49,9 +49,9 @@ using namespace Unicode;
 
 namespace JSC {
 
-static JSValuePtr encode(ExecState* exec,
-                         const ArgList& args,
-                         const char* doNotEscape) {
+static JSValue* encode(ExecState* exec,
+                       const ArgList& args,
+                       const char* doNotEscape) {
   UString str = args.at(exec, 0)->toString(exec);
   CString cstr = str.UTF8String(true);
   if (!cstr.c_str())
@@ -73,10 +73,10 @@ static JSValuePtr encode(ExecState* exec,
   return jsString(exec, result);
 }
 
-static JSValuePtr decode(ExecState* exec,
-                         const ArgList& args,
-                         const char* doNotUnescape,
-                         bool strict) {
+static JSValue* decode(ExecState* exec,
+                       const ArgList& args,
+                       const char* doNotUnescape,
+                       bool strict) {
   UString result = "";
   UString str = args.at(exec, 0)->toString(exec);
   int k = 0;
@@ -279,10 +279,10 @@ static double parseFloat(const UString& s) {
   return s.toDouble(true /*tolerant*/, false /* NaN for empty string */);
 }
 
-JSValuePtr globalFuncEval(ExecState* exec,
-                          JSObject* function,
-                          JSValuePtr thisValue,
-                          const ArgList& args) {
+JSValue* globalFuncEval(ExecState* exec,
+                        JSObject* function,
+                        JSValue* thisValue,
+                        const ArgList& args) {
   JSObject* thisObject = thisValue->toThisObject(exec);
   JSGlobalObject* globalObject = thisObject->toGlobalObject(exec);
   if (!globalObject || globalObject->evalFunction() != function)
@@ -290,7 +290,7 @@ JSValuePtr globalFuncEval(ExecState* exec,
                       "The \"this\" value passed to eval must be the global "
                       "object from which eval originated");
 
-  JSValuePtr x = args.at(exec, 0);
+  JSValue* x = args.at(exec, 0);
   if (!x->isString())
     return x;
 
@@ -312,11 +312,11 @@ JSValuePtr globalFuncEval(ExecState* exec,
                                   exec->exceptionSlot());
 }
 
-JSValuePtr globalFuncParseInt(ExecState* exec,
-                              JSObject*,
-                              JSValuePtr,
-                              const ArgList& args) {
-  JSValuePtr value = args.at(exec, 0);
+JSValue* globalFuncParseInt(ExecState* exec,
+                            JSObject*,
+                            JSValue*,
+                            const ArgList& args) {
+  JSValue* value = args.at(exec, 0);
   int32_t radix = args.at(exec, 1)->toInt32(exec);
 
   if (value->isNumber() && (radix == 0 || radix == 10)) {
@@ -331,48 +331,48 @@ JSValuePtr globalFuncParseInt(ExecState* exec,
   return jsNumber(exec, parseInt(value->toString(exec), radix));
 }
 
-JSValuePtr globalFuncParseFloat(ExecState* exec,
-                                JSObject*,
-                                JSValuePtr,
-                                const ArgList& args) {
+JSValue* globalFuncParseFloat(ExecState* exec,
+                              JSObject*,
+                              JSValue*,
+                              const ArgList& args) {
   return jsNumber(exec, parseFloat(args.at(exec, 0)->toString(exec)));
 }
 
-JSValuePtr globalFuncIsNaN(ExecState* exec,
-                           JSObject*,
-                           JSValuePtr,
-                           const ArgList& args) {
+JSValue* globalFuncIsNaN(ExecState* exec,
+                         JSObject*,
+                         JSValue*,
+                         const ArgList& args) {
   return jsBoolean(isnan(args.at(exec, 0)->toNumber(exec)));
 }
 
-JSValuePtr globalFuncIsFinite(ExecState* exec,
-                              JSObject*,
-                              JSValuePtr,
-                              const ArgList& args) {
+JSValue* globalFuncIsFinite(ExecState* exec,
+                            JSObject*,
+                            JSValue*,
+                            const ArgList& args) {
   double n = args.at(exec, 0)->toNumber(exec);
   return jsBoolean(!isnan(n) && !isinf(n));
 }
 
-JSValuePtr globalFuncDecodeURI(ExecState* exec,
-                               JSObject*,
-                               JSValuePtr,
-                               const ArgList& args) {
+JSValue* globalFuncDecodeURI(ExecState* exec,
+                             JSObject*,
+                             JSValue*,
+                             const ArgList& args) {
   static const char do_not_unescape_when_decoding_URI[] = "#$&+,/:;=?@";
 
   return decode(exec, args, do_not_unescape_when_decoding_URI, true);
 }
 
-JSValuePtr globalFuncDecodeURIComponent(ExecState* exec,
-                                        JSObject*,
-                                        JSValuePtr,
-                                        const ArgList& args) {
+JSValue* globalFuncDecodeURIComponent(ExecState* exec,
+                                      JSObject*,
+                                      JSValue*,
+                                      const ArgList& args) {
   return decode(exec, args, "", true);
 }
 
-JSValuePtr globalFuncEncodeURI(ExecState* exec,
-                               JSObject*,
-                               JSValuePtr,
-                               const ArgList& args) {
+JSValue* globalFuncEncodeURI(ExecState* exec,
+                             JSObject*,
+                             JSValue*,
+                             const ArgList& args) {
   static const char do_not_escape_when_encoding_URI[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "abcdefghijklmnopqrstuvwxyz"
@@ -382,10 +382,10 @@ JSValuePtr globalFuncEncodeURI(ExecState* exec,
   return encode(exec, args, do_not_escape_when_encoding_URI);
 }
 
-JSValuePtr globalFuncEncodeURIComponent(ExecState* exec,
-                                        JSObject*,
-                                        JSValuePtr,
-                                        const ArgList& args) {
+JSValue* globalFuncEncodeURIComponent(ExecState* exec,
+                                      JSObject*,
+                                      JSValue*,
+                                      const ArgList& args) {
   static const char do_not_escape_when_encoding_URI_component[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "abcdefghijklmnopqrstuvwxyz"
@@ -395,10 +395,10 @@ JSValuePtr globalFuncEncodeURIComponent(ExecState* exec,
   return encode(exec, args, do_not_escape_when_encoding_URI_component);
 }
 
-JSValuePtr globalFuncEscape(ExecState* exec,
-                            JSObject*,
-                            JSValuePtr,
-                            const ArgList& args) {
+JSValue* globalFuncEscape(ExecState* exec,
+                          JSObject*,
+                          JSValue*,
+                          const ArgList& args) {
   static const char do_not_escape[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "abcdefghijklmnopqrstuvwxyz"
@@ -428,10 +428,10 @@ JSValuePtr globalFuncEscape(ExecState* exec,
   return jsString(exec, result);
 }
 
-JSValuePtr globalFuncUnescape(ExecState* exec,
-                              JSObject*,
-                              JSValuePtr,
-                              const ArgList& args) {
+JSValue* globalFuncUnescape(ExecState* exec,
+                            JSObject*,
+                            JSValue*,
+                            const ArgList& args) {
   UString result = "";
   UString str = args.at(exec, 0)->toString(exec);
   int k = 0;
@@ -460,10 +460,10 @@ JSValuePtr globalFuncUnescape(ExecState* exec,
 }
 
 #ifndef NDEBUG
-JSValuePtr globalFuncKJSPrint(ExecState* exec,
-                              JSObject*,
-                              JSValuePtr,
-                              const ArgList& args) {
+JSValue* globalFuncKJSPrint(ExecState* exec,
+                            JSObject*,
+                            JSValue*,
+                            const ArgList& args) {
   CStringBuffer string;
   args.at(exec, 0)->toString(exec).getCString(string);
   puts(string.data());

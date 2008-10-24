@@ -45,7 +45,7 @@ using namespace JSC;
 
 PassRefPtr<JSCustomXPathNSResolver> JSCustomXPathNSResolver::create(
     JSC::ExecState* exec,
-    JSC::JSValuePtr value) {
+    JSC::JSValue* value) {
   if (value->isUndefinedOrNull())
     return 0;
 
@@ -79,7 +79,7 @@ String JSCustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
   JSGlobalObject* globalObject = m_frame->script()->globalObject();
   ExecState* exec = globalObject->globalExec();
 
-  JSValuePtr function =
+  JSValue* function =
       m_customResolver->get(exec, Identifier(exec, "lookupNamespaceURI"));
   CallData callData;
   CallType callType = function->getCallData(callData);
@@ -102,7 +102,7 @@ String JSCustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
   args.append(jsString(exec, prefix));
 
   globalObject->startTimeoutCheck();
-  JSValuePtr retval =
+  JSValue* retval =
       call(exec, function, callType, callData, m_customResolver, args);
   globalObject->stopTimeoutCheck();
 

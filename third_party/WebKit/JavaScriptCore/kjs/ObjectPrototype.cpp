@@ -30,42 +30,42 @@ namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(ObjectPrototype);
 
-static JSValuePtr objectProtoFuncValueOf(ExecState*,
-                                         JSObject*,
-                                         JSValuePtr,
-                                         const ArgList&);
-static JSValuePtr objectProtoFuncHasOwnProperty(ExecState*,
-                                                JSObject*,
-                                                JSValuePtr,
-                                                const ArgList&);
-static JSValuePtr objectProtoFuncIsPrototypeOf(ExecState*,
-                                               JSObject*,
-                                               JSValuePtr,
-                                               const ArgList&);
-static JSValuePtr objectProtoFuncDefineGetter(ExecState*,
+static JSValue* objectProtoFuncValueOf(ExecState*,
+                                       JSObject*,
+                                       JSValue*,
+                                       const ArgList&);
+static JSValue* objectProtoFuncHasOwnProperty(ExecState*,
                                               JSObject*,
-                                              JSValuePtr,
+                                              JSValue*,
                                               const ArgList&);
-static JSValuePtr objectProtoFuncDefineSetter(ExecState*,
+static JSValue* objectProtoFuncIsPrototypeOf(ExecState*,
+                                             JSObject*,
+                                             JSValue*,
+                                             const ArgList&);
+static JSValue* objectProtoFuncDefineGetter(ExecState*,
+                                            JSObject*,
+                                            JSValue*,
+                                            const ArgList&);
+static JSValue* objectProtoFuncDefineSetter(ExecState*,
+                                            JSObject*,
+                                            JSValue*,
+                                            const ArgList&);
+static JSValue* objectProtoFuncLookupGetter(ExecState*,
+                                            JSObject*,
+                                            JSValue*,
+                                            const ArgList&);
+static JSValue* objectProtoFuncLookupSetter(ExecState*,
+                                            JSObject*,
+                                            JSValue*,
+                                            const ArgList&);
+static JSValue* objectProtoFuncPropertyIsEnumerable(ExecState*,
+                                                    JSObject*,
+                                                    JSValue*,
+                                                    const ArgList&);
+static JSValue* objectProtoFuncToLocaleString(ExecState*,
                                               JSObject*,
-                                              JSValuePtr,
+                                              JSValue*,
                                               const ArgList&);
-static JSValuePtr objectProtoFuncLookupGetter(ExecState*,
-                                              JSObject*,
-                                              JSValuePtr,
-                                              const ArgList&);
-static JSValuePtr objectProtoFuncLookupSetter(ExecState*,
-                                              JSObject*,
-                                              JSValuePtr,
-                                              const ArgList&);
-static JSValuePtr objectProtoFuncPropertyIsEnumerable(ExecState*,
-                                                      JSObject*,
-                                                      JSValuePtr,
-                                                      const ArgList&);
-static JSValuePtr objectProtoFuncToLocaleString(ExecState*,
-                                                JSObject*,
-                                                JSValuePtr,
-                                                const ArgList&);
 
 ObjectPrototype::ObjectPrototype(ExecState* exec,
                                  PassRefPtr<StructureID> stucture,
@@ -130,31 +130,31 @@ ObjectPrototype::ObjectPrototype(ExecState* exec,
 
 // ECMA 15.2.4.2, 15.2.4.4, 15.2.4.5, 15.2.4.7
 
-JSValuePtr objectProtoFuncValueOf(ExecState* exec,
-                                  JSObject*,
-                                  JSValuePtr thisValue,
-                                  const ArgList&) {
+JSValue* objectProtoFuncValueOf(ExecState* exec,
+                                JSObject*,
+                                JSValue* thisValue,
+                                const ArgList&) {
   return thisValue->toThisObject(exec);
 }
 
-JSValuePtr objectProtoFuncHasOwnProperty(ExecState* exec,
-                                         JSObject*,
-                                         JSValuePtr thisValue,
-                                         const ArgList& args) {
+JSValue* objectProtoFuncHasOwnProperty(ExecState* exec,
+                                       JSObject*,
+                                       JSValue* thisValue,
+                                       const ArgList& args) {
   return jsBoolean(thisValue->toThisObject(exec)->hasOwnProperty(
       exec, Identifier(exec, args.at(exec, 0)->toString(exec))));
 }
 
-JSValuePtr objectProtoFuncIsPrototypeOf(ExecState* exec,
-                                        JSObject*,
-                                        JSValuePtr thisValue,
-                                        const ArgList& args) {
+JSValue* objectProtoFuncIsPrototypeOf(ExecState* exec,
+                                      JSObject*,
+                                      JSValue* thisValue,
+                                      const ArgList& args) {
   JSObject* thisObj = thisValue->toThisObject(exec);
 
   if (!args.at(exec, 0)->isObject())
     return jsBoolean(false);
 
-  JSValuePtr v = asObject(args.at(exec, 0))->prototype();
+  JSValue* v = asObject(args.at(exec, 0))->prototype();
 
   while (true) {
     if (!v->isObject())
@@ -165,10 +165,10 @@ JSValuePtr objectProtoFuncIsPrototypeOf(ExecState* exec,
   }
 }
 
-JSValuePtr objectProtoFuncDefineGetter(ExecState* exec,
-                                       JSObject*,
-                                       JSValuePtr thisValue,
-                                       const ArgList& args) {
+JSValue* objectProtoFuncDefineGetter(ExecState* exec,
+                                     JSObject*,
+                                     JSValue* thisValue,
+                                     const ArgList& args) {
   CallData callData;
   if (args.at(exec, 1)->getCallData(callData) == CallTypeNone)
     return throwError(exec, SyntaxError, "invalid getter usage");
@@ -178,10 +178,10 @@ JSValuePtr objectProtoFuncDefineGetter(ExecState* exec,
   return jsUndefined();
 }
 
-JSValuePtr objectProtoFuncDefineSetter(ExecState* exec,
-                                       JSObject*,
-                                       JSValuePtr thisValue,
-                                       const ArgList& args) {
+JSValue* objectProtoFuncDefineSetter(ExecState* exec,
+                                     JSObject*,
+                                     JSValue* thisValue,
+                                     const ArgList& args) {
   CallData callData;
   if (args.at(exec, 1)->getCallData(callData) == CallTypeNone)
     return throwError(exec, SyntaxError, "invalid setter usage");
@@ -191,41 +191,41 @@ JSValuePtr objectProtoFuncDefineSetter(ExecState* exec,
   return jsUndefined();
 }
 
-JSValuePtr objectProtoFuncLookupGetter(ExecState* exec,
-                                       JSObject*,
-                                       JSValuePtr thisValue,
-                                       const ArgList& args) {
+JSValue* objectProtoFuncLookupGetter(ExecState* exec,
+                                     JSObject*,
+                                     JSValue* thisValue,
+                                     const ArgList& args) {
   return thisValue->toThisObject(exec)->lookupGetter(
       exec, Identifier(exec, args.at(exec, 0)->toString(exec)));
 }
 
-JSValuePtr objectProtoFuncLookupSetter(ExecState* exec,
-                                       JSObject*,
-                                       JSValuePtr thisValue,
-                                       const ArgList& args) {
+JSValue* objectProtoFuncLookupSetter(ExecState* exec,
+                                     JSObject*,
+                                     JSValue* thisValue,
+                                     const ArgList& args) {
   return thisValue->toThisObject(exec)->lookupSetter(
       exec, Identifier(exec, args.at(exec, 0)->toString(exec)));
 }
 
-JSValuePtr objectProtoFuncPropertyIsEnumerable(ExecState* exec,
-                                               JSObject*,
-                                               JSValuePtr thisValue,
-                                               const ArgList& args) {
+JSValue* objectProtoFuncPropertyIsEnumerable(ExecState* exec,
+                                             JSObject*,
+                                             JSValue* thisValue,
+                                             const ArgList& args) {
   return jsBoolean(thisValue->toThisObject(exec)->propertyIsEnumerable(
       exec, Identifier(exec, args.at(exec, 0)->toString(exec))));
 }
 
-JSValuePtr objectProtoFuncToLocaleString(ExecState* exec,
-                                         JSObject*,
-                                         JSValuePtr thisValue,
-                                         const ArgList&) {
+JSValue* objectProtoFuncToLocaleString(ExecState* exec,
+                                       JSObject*,
+                                       JSValue* thisValue,
+                                       const ArgList&) {
   return thisValue->toThisJSString(exec);
 }
 
-JSValuePtr objectProtoFuncToString(ExecState* exec,
-                                   JSObject*,
-                                   JSValuePtr thisValue,
-                                   const ArgList&) {
+JSValue* objectProtoFuncToString(ExecState* exec,
+                                 JSObject*,
+                                 JSValue* thisValue,
+                                 const ArgList&) {
   return jsNontrivialString(
       exec, "[object " + thisValue->toThisObject(exec)->className() + "]");
 }

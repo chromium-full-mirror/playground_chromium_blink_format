@@ -35,16 +35,16 @@ inline const JSDOMWindow* asJSDOMWindow(
   return static_cast<const JSDOMWindow*>(globalObject);
 }
 
-JSC::JSValuePtr nonCachingStaticCloseFunctionGetter(JSC::ExecState*,
-                                                    const JSC::Identifier&,
-                                                    const JSC::PropertySlot&);
-JSC::JSValuePtr nonCachingStaticBlurFunctionGetter(JSC::ExecState*,
-                                                   const JSC::Identifier&,
-                                                   const JSC::PropertySlot&);
-JSC::JSValuePtr nonCachingStaticFocusFunctionGetter(JSC::ExecState*,
-                                                    const JSC::Identifier&,
-                                                    const JSC::PropertySlot&);
-JSC::JSValuePtr nonCachingStaticPostMessageFunctionGetter(
+JSC::JSValue* nonCachingStaticCloseFunctionGetter(JSC::ExecState*,
+                                                  const JSC::Identifier&,
+                                                  const JSC::PropertySlot&);
+JSC::JSValue* nonCachingStaticBlurFunctionGetter(JSC::ExecState*,
+                                                 const JSC::Identifier&,
+                                                 const JSC::PropertySlot&);
+JSC::JSValue* nonCachingStaticFocusFunctionGetter(JSC::ExecState*,
+                                                  const JSC::Identifier&,
+                                                  const JSC::PropertySlot&);
+JSC::JSValue* nonCachingStaticPostMessageFunctionGetter(
     JSC::ExecState*,
     const JSC::Identifier&,
     const JSC::PropertySlot&);
@@ -151,7 +151,7 @@ ALWAYS_INLINE bool JSDOMWindow::customGetOwnPropertySlot(
 
 inline bool JSDOMWindow::customPut(JSC::ExecState* exec,
                                    const JSC::Identifier& propertyName,
-                                   JSC::JSValuePtr value,
+                                   JSC::JSValue* value,
                                    JSC::PutPropertySlot& slot) {
   if (!impl()->frame())
     return true;

@@ -150,7 +150,7 @@ static inline void retrieveLastCaller(ExecState* exec,
   int signedLineNumber;
   intptr_t sourceID;
   UString urlString;
-  JSValuePtr function;
+  JSValue* function;
 
   exec->machine()->retrieveLastCaller(exec, signedLineNumber, sourceID,
                                       urlString, function);
@@ -294,7 +294,7 @@ void Console::trace(ExecState* exec) {
   int signedLineNumber;
   intptr_t sourceID;
   UString urlString;
-  JSValuePtr func;
+  JSValue* func;
 
   exec->machine()->retrieveLastCaller(exec, signedLineNumber, sourceID,
                                       urlString, func);
@@ -460,7 +460,7 @@ void Console::warn(ExecState* exec, const ArgList& args) {
   printToStandardOut(WarningMessageLevel, exec, args, url);
 }
 
-void Console::reportException(ExecState* exec, JSValuePtr exception) {
+void Console::reportException(ExecState* exec, JSValue* exception) {
   UString errorMessage = exception->toString(exec);
   JSObject* exceptionObject = exception->toObject(exec);
   int lineNumber =
@@ -474,7 +474,7 @@ void Console::reportException(ExecState* exec, JSValuePtr exception) {
 }
 
 void Console::reportCurrentException(ExecState* exec) {
-  JSValuePtr exception = exec->exception();
+  JSValue* exception = exec->exception();
   exec->clearException();
   reportException(exec, exception);
 }

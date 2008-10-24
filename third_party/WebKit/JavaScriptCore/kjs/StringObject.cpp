@@ -66,7 +66,7 @@ bool StringObject::getOwnPropertySlot(ExecState* exec,
 
 void StringObject::put(ExecState* exec,
                        const Identifier& propertyName,
-                       JSValuePtr value,
+                       JSValue* value,
                        PutPropertySlot& slot) {
   if (propertyName == exec->propertyNames().length)
     return;

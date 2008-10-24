@@ -68,7 +68,7 @@ void JSAbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
 
   ExecState* exec = window->globalExec();
 
-  JSValuePtr handleEventFunction =
+  JSValue* handleEventFunction =
       listener->get(exec, Identifier(exec, "handleEvent"));
   CallData callData;
   CallType callType = handleEventFunction->getCallData(callData);
@@ -86,13 +86,13 @@ void JSAbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
     Event* savedEvent = window->currentEvent();
     window->setCurrentEvent(event);
 
-    JSValuePtr retval;
+    JSValue* retval;
     if (handleEventFunction) {
       window->startTimeoutCheck();
       retval =
           call(exec, handleEventFunction, callType, callData, listener, args);
     } else {
-      JSValuePtr thisValue;
+      JSValue* thisValue;
       if (isWindowEvent)
         thisValue = window->shell();
       else
@@ -254,7 +254,7 @@ JSObject* JSLazyEventListener::listenerObj() const {
 }
 
 // Helper function
-inline JSValuePtr eventParameterName(
+inline JSValue* eventParameterName(
     JSLazyEventListener::LazyEventListenerType type,
     ExecState* exec) {
   switch (type) {
@@ -310,7 +310,7 @@ void JSLazyEventListener::parseCode() const {
     // (and the document, and the form - see JSHTMLElement::eventHandlerScope)
     ScopeChain scope = listenerAsFunction->scope();
 
-    JSValuePtr thisObj = toJS(exec, m_originalNode);
+    JSValue* thisObj = toJS(exec, m_originalNode);
     if (thisObj->isObject()) {
       static_cast<JSEventTargetNode*>(asObject(thisObj))
           ->pushEventHandlerScope(exec, scope);

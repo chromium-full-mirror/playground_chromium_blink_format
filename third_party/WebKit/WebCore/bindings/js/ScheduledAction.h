@@ -37,7 +37,7 @@ class JSDOMWindowShell;
 class ScheduledAction {
  public:
   ScheduledAction(JSC::ExecState* exec,
-                  JSC::JSValuePtr function,
+                  JSC::JSValue* function,
                   const JSC::ArgList&);
   ScheduledAction(const String& code) : m_code(code) {}
 

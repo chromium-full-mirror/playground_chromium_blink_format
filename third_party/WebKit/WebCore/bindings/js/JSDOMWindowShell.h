@@ -61,7 +61,7 @@ class JSDOMWindowShell : public DOMObject {
   void* operator new(size_t);
 
   static PassRefPtr<JSC::StructureID> createStructureID(
-      JSC::JSValuePtr prototype) {
+      JSC::JSValue* prototype) {
     return JSC::StructureID::create(prototype, JSC::TypeInfo(JSC::ObjectType));
   }
 
@@ -73,11 +73,11 @@ class JSDOMWindowShell : public DOMObject {
                                   JSC::PropertySlot&);
   virtual void put(JSC::ExecState*,
                    const JSC::Identifier& propertyName,
-                   JSC::JSValuePtr,
+                   JSC::JSValue*,
                    JSC::PutPropertySlot&);
   virtual void putWithAttributes(JSC::ExecState*,
                                  const JSC::Identifier& propertyName,
-                                 JSC::JSValuePtr,
+                                 JSC::JSValue*,
                                  unsigned attributes);
   virtual bool deleteProperty(JSC::ExecState*,
                               const JSC::Identifier& propertyName);
@@ -91,17 +91,17 @@ class JSDOMWindowShell : public DOMObject {
   virtual void defineSetter(JSC::ExecState*,
                             const JSC::Identifier& propertyName,
                             JSC::JSObject* setterFunction);
-  virtual JSC::JSValuePtr lookupGetter(JSC::ExecState*,
-                                       const JSC::Identifier& propertyName);
-  virtual JSC::JSValuePtr lookupSetter(JSC::ExecState*,
-                                       const JSC::Identifier& propertyName);
+  virtual JSC::JSValue* lookupGetter(JSC::ExecState*,
+                                     const JSC::Identifier& propertyName);
+  virtual JSC::JSValue* lookupSetter(JSC::ExecState*,
+                                     const JSC::Identifier& propertyName);
   virtual JSC::JSGlobalObject* toGlobalObject(JSC::ExecState*) const;
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
 
   JSDOMWindow* m_window;
 };
 
-JSC::JSValuePtr toJS(JSC::ExecState*, Frame*);
+JSC::JSValue* toJS(JSC::ExecState*, Frame*);
 JSDOMWindowShell* toJSDOMWindowShell(Frame*);
 
 }  // namespace WebCore

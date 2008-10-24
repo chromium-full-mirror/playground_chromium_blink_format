@@ -85,7 +85,7 @@ bool JSActivation::getOwnPropertySlot(ExecState* exec,
   if (symbolTableGet(propertyName, slot))
     return true;
 
-  if (JSValuePtr* location = getDirectLocation(propertyName)) {
+  if (JSValue** location = getDirectLocation(propertyName)) {
     slot.setValueSlot(location);
     return true;
   }
@@ -105,7 +105,7 @@ bool JSActivation::getOwnPropertySlot(ExecState* exec,
 
 void JSActivation::put(ExecState*,
                        const Identifier& propertyName,
-                       JSValuePtr value,
+                       JSValue* value,
                        PutPropertySlot& slot) {
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
@@ -122,7 +122,7 @@ void JSActivation::put(ExecState*,
 // FIXME: Make this function honor ReadOnly (const) and DontEnum
 void JSActivation::putWithAttributes(ExecState*,
                                      const Identifier& propertyName,
-                                     JSValuePtr value,
+                                     JSValue* value,
                                      unsigned attributes) {
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
@@ -153,9 +153,9 @@ bool JSActivation::isDynamicScope() const {
   return d()->functionBody->usesEval();
 }
 
-JSValuePtr JSActivation::argumentsGetter(ExecState* exec,
-                                         const Identifier&,
-                                         const PropertySlot& slot) {
+JSValue* JSActivation::argumentsGetter(ExecState* exec,
+                                       const Identifier&,
+                                       const PropertySlot& slot) {
   JSActivation* activation = asActivation(slot.slotBase());
 
   if (activation->d()->functionBody->usesArguments()) {

@@ -107,7 +107,7 @@ static inline void dispatchFunctionToProfiles(
   }
 }
 
-void Profiler::willExecute(ExecState* exec, JSValuePtr function) {
+void Profiler::willExecute(ExecState* exec, JSValue* function) {
   ASSERT(!m_currentProfiles.isEmpty());
 
   dispatchFunctionToProfiles(
@@ -129,7 +129,7 @@ void Profiler::willExecute(ExecState* exec,
                              exec->lexicalGlobalObject()->profileGroup());
 }
 
-void Profiler::didExecute(ExecState* exec, JSValuePtr function) {
+void Profiler::didExecute(ExecState* exec, JSValue* function) {
   ASSERT(!m_currentProfiles.isEmpty());
 
   dispatchFunctionToProfiles(
@@ -151,7 +151,7 @@ void Profiler::didExecute(ExecState* exec,
 }
 
 CallIdentifier Profiler::createCallIdentifier(JSGlobalData* globalData,
-                                              JSValuePtr function,
+                                              JSValue* function,
                                               const UString& defaultSourceURL,
                                               int defaultLineNumber) {
   if (!function)

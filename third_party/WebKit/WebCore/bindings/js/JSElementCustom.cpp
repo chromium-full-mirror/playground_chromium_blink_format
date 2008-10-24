@@ -64,7 +64,7 @@ static inline bool allowSettingSrcToJavascriptURL(ExecState* exec,
   return true;
 }
 
-JSValuePtr JSElement::setAttribute(ExecState* exec, const ArgList& args) {
+JSValue* JSElement::setAttribute(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   AtomicString name = args.at(exec, 0)->toString(exec);
   AtomicString value = args.at(exec, 1)->toString(exec);
@@ -78,7 +78,7 @@ JSValuePtr JSElement::setAttribute(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValuePtr JSElement::setAttributeNode(ExecState* exec, const ArgList& args) {
+JSValue* JSElement::setAttributeNode(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   Attr* newAttr = toAttr(args.at(exec, 0));
   if (!newAttr) {
@@ -91,13 +91,12 @@ JSValuePtr JSElement::setAttributeNode(ExecState* exec, const ArgList& args) {
                                       newAttr->value()))
     return jsUndefined();
 
-  JSValuePtr result =
-      toJS(exec, WTF::getPtr(imp->setAttributeNode(newAttr, ec)));
+  JSValue* result = toJS(exec, WTF::getPtr(imp->setAttributeNode(newAttr, ec)));
   setDOMException(exec, ec);
   return result;
 }
 
-JSValuePtr JSElement::setAttributeNS(ExecState* exec, const ArgList& args) {
+JSValue* JSElement::setAttributeNS(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   AtomicString namespaceURI =
       valueToStringWithNullCheck(exec, args.at(exec, 0));
@@ -113,7 +112,7 @@ JSValuePtr JSElement::setAttributeNS(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValuePtr JSElement::setAttributeNodeNS(ExecState* exec, const ArgList& args) {
+JSValue* JSElement::setAttributeNodeNS(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   Attr* newAttr = toAttr(args.at(exec, 0));
   if (!newAttr) {
@@ -126,13 +125,13 @@ JSValuePtr JSElement::setAttributeNodeNS(ExecState* exec, const ArgList& args) {
                                       newAttr->value()))
     return jsUndefined();
 
-  JSValuePtr result =
+  JSValue* result =
       toJS(exec, WTF::getPtr(imp->setAttributeNodeNS(newAttr, ec)));
   setDOMException(exec, ec);
   return result;
 }
 
-JSValuePtr toJSNewlyCreated(ExecState* exec, Element* element) {
+JSValue* toJSNewlyCreated(ExecState* exec, Element* element) {
   if (!element)
     return jsNull();
 

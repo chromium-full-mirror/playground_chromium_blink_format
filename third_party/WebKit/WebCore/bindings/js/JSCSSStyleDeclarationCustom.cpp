@@ -128,9 +128,9 @@ bool JSCSSStyleDeclaration::canGetItemsForName(ExecState*,
 
 // FIXME: You can get these properties, and set them (see customPut below),
 // but you should also be able to enumerate them.
-JSValuePtr JSCSSStyleDeclaration::nameGetter(ExecState* exec,
-                                             const Identifier& propertyName,
-                                             const PropertySlot& slot) {
+JSValue* JSCSSStyleDeclaration::nameGetter(ExecState* exec,
+                                           const Identifier& propertyName,
+                                           const PropertySlot& slot) {
   JSCSSStyleDeclaration* thisObj =
       static_cast<JSCSSStyleDeclaration*>(asObject(slot.slotBase()));
 
@@ -164,7 +164,7 @@ JSValuePtr JSCSSStyleDeclaration::nameGetter(ExecState* exec,
 
 bool JSCSSStyleDeclaration::customPut(ExecState* exec,
                                       const Identifier& propertyName,
-                                      JSValuePtr value,
+                                      JSValue* value,
                                       PutPropertySlot&) {
   if (!isCSSPropertyName(propertyName))
     return false;

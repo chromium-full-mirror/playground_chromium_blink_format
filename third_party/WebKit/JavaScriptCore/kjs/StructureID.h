@@ -85,7 +85,7 @@ struct TransitionTableHashTraits {
 class StructureID : public RefCounted<StructureID> {
  public:
   friend class CTI;
-  static PassRefPtr<StructureID> create(JSValuePtr prototype,
+  static PassRefPtr<StructureID> create(JSValue* prototype,
                                         const TypeInfo& typeInfo) {
     return adoptRef(new StructureID(prototype, typeInfo));
   }
@@ -97,9 +97,8 @@ class StructureID : public RefCounted<StructureID> {
   static void dumpStatistics();
 #endif
 
-  static PassRefPtr<StructureID> changePrototypeTransition(
-      StructureID*,
-      JSValuePtr prototype);
+  static PassRefPtr<StructureID> changePrototypeTransition(StructureID*,
+                                                           JSValue* prototype);
   static PassRefPtr<StructureID> addPropertyTransition(
       StructureID*,
       const Identifier& propertyName,
@@ -119,7 +118,7 @@ class StructureID : public RefCounted<StructureID> {
   // These should be used with caution.
   size_t addPropertyWithoutTransition(const Identifier& propertyName,
                                       unsigned attributes);
-  void setPrototypeWithoutTransition(JSValuePtr prototype) {
+  void setPrototypeWithoutTransition(JSValue* prototype) {
     m_prototype = prototype;
   }
 
@@ -130,8 +129,8 @@ class StructureID : public RefCounted<StructureID> {
   // For use when first creating a new structure.
   TypeInfo& mutableTypeInfo() { return m_typeInfo; }
 
-  JSValuePtr storedPrototype() const { return m_prototype; }
-  JSValuePtr prototypeForLookup(ExecState*);
+  JSValue* storedPrototype() const { return m_prototype; }
+  JSValue* prototypeForLookup(ExecState*);
 
   StructureID* previousID() const { return m_previous.get(); }
 
@@ -171,7 +170,7 @@ class StructureID : public RefCounted<StructureID> {
                   TransitionTableHashTraits>
       TransitionTable;
 
-  StructureID(JSValuePtr prototype, const TypeInfo&);
+  StructureID(JSValue* prototype, const TypeInfo&);
 
   static const size_t s_maxTransitionLength = 64;
 
@@ -181,7 +180,7 @@ class StructureID : public RefCounted<StructureID> {
 
   bool m_hasGetterSetterProperties;
 
-  JSValuePtr m_prototype;
+  JSValue* m_prototype;
   RefPtr<StructureIDChain> m_cachedPrototypeChain;
 
   RefPtr<StructureID> m_previous;

@@ -47,7 +47,7 @@
 
 #define ARG_callFrame static_cast<CallFrame*>(ARGS[CTI_ARGS_callFrame])
 #define ARG_registerFile static_cast<RegisterFile*>(ARGS[CTI_ARGS_registerFile])
-#define ARG_exception static_cast<JSValuePtr*>(ARGS[CTI_ARGS_exception])
+#define ARG_exception static_cast<JSValue**>(ARGS[CTI_ARGS_exception])
 #define ARG_profilerReference \
   static_cast<Profiler**>(ARGS[CTI_ARGS_profilerReference])
 #define ARG_globalData static_cast<JSGlobalData*>(ARGS[CTI_ARGS_globalData])
@@ -201,7 +201,7 @@ extern "C" {
 JSValue* ctiTrampoline(void* code,
                        RegisterFile*,
                        CallFrame*,
-                       JSValuePtr* exception,
+                       JSValue** exception,
                        Profiler**,
                        JSGlobalData*);
 void ctiVMThrowTrampoline();
@@ -356,11 +356,11 @@ class CTI {
                        int callerArgCount);
   static void unlinkCall(CallLinkInfo*);
 
-  inline static JSValuePtr execute(void* code,
-                                   RegisterFile* registerFile,
-                                   CallFrame* callFrame,
-                                   JSGlobalData* globalData,
-                                   JSValuePtr* exception) {
+  inline static JSValue* execute(void* code,
+                                 RegisterFile* registerFile,
+                                 CallFrame* callFrame,
+                                 JSGlobalData* globalData,
+                                 JSValue** exception) {
     return ctiTrampoline(code, registerFile, callFrame, exception,
                          Profiler::enabledProfilerReference(), globalData);
   }
@@ -368,10 +368,10 @@ class CTI {
  private:
   CTI(Machine*, CallFrame*, CodeBlock*);
 
-  static uintptr_t asInteger(JSValuePtr);
+  static uintptr_t asInteger(JSValue*);
 
   bool isConstant(int src);
-  JSValuePtr getConstant(CallFrame*, int src);
+  JSValue* getConstant(CallFrame*, int src);
 
   void privateCompileMainPass();
   void privateCompileLinkPass();
@@ -456,8 +456,8 @@ class CTI {
   void emitGetFromCallFrameHeader(RegisterFile::CallFrameHeaderEntry entry,
                                   X86Assembler::RegisterID to);
 
-  JSValuePtr getConstantImmediateNumericArg(unsigned src);
-  unsigned getDeTaggedConstantImmediate(JSValuePtr imm);
+  JSValue* getConstantImmediateNumericArg(unsigned src);
+  unsigned getDeTaggedConstantImmediate(JSValue* imm);
 
   void emitJumpSlowCaseIfIsJSCell(X86Assembler::RegisterID reg,
                                   unsigned opcodeIndex);

@@ -84,18 +84,16 @@ class JSValue : Noncopyable {
   bool getTruncatedUInt32(uint32_t&) const;
 
   // Basic conversions.
-  JSValuePtr toPrimitive(ExecState*,
-                         PreferredPrimitiveType = NoPreference) const;
-  bool getPrimitiveNumber(ExecState*, double& number, JSValuePtr&);
+  JSValue* toPrimitive(ExecState*, PreferredPrimitiveType = NoPreference) const;
+  bool getPrimitiveNumber(ExecState*, double& number, JSValue*&);
 
   bool toBoolean(ExecState*) const;
 
   // toNumber conversion is expected to be side effect free if an exception has
   // been set in the ExecState already.
   double toNumber(ExecState*) const;
-  JSValuePtr toJSNumber(ExecState*) const;  // Fast path for when you expect
-                                            // that the value is an immediate
-                                            // number.
+  JSValue* toJSNumber(ExecState*) const;  // Fast path for when you expect that
+                                          // the value is an immediate number.
 
   UString toString(ExecState*) const;
   JSObject* toObject(ExecState*) const;
@@ -116,17 +114,15 @@ class JSValue : Noncopyable {
   bool marked() const;
 
   // Object operations, with the toObject operation included.
-  JSValuePtr get(ExecState*, const Identifier& propertyName) const;
-  JSValuePtr get(ExecState*,
-                 const Identifier& propertyName,
-                 PropertySlot&) const;
-  JSValuePtr get(ExecState*, unsigned propertyName) const;
-  JSValuePtr get(ExecState*, unsigned propertyName, PropertySlot&) const;
+  JSValue* get(ExecState*, const Identifier& propertyName) const;
+  JSValue* get(ExecState*, const Identifier& propertyName, PropertySlot&) const;
+  JSValue* get(ExecState*, unsigned propertyName) const;
+  JSValue* get(ExecState*, unsigned propertyName, PropertySlot&) const;
   void put(ExecState*,
            const Identifier& propertyName,
-           JSValuePtr,
+           JSValue*,
            PutPropertySlot&);
-  void put(ExecState*, unsigned propertyName, JSValuePtr);
+  void put(ExecState*, unsigned propertyName, JSValue*);
   bool deleteProperty(ExecState*, const Identifier& propertyName);
   bool deleteProperty(ExecState*, unsigned propertyName);
 
@@ -135,9 +131,9 @@ class JSValue : Noncopyable {
   UString toThisString(ExecState*) const;
   JSString* toThisJSString(ExecState*);
 
-  JSValuePtr getJSNumber();  // 0 if this is not a JSNumber or number object
+  JSValue* getJSNumber();  // 0 if this is not a JSNumber or number object
 
-  JSValuePtr asValue() const;
+  JSValue* asValue() const;
 
   JSCell* asCell() const;
 
@@ -157,7 +153,7 @@ uint32_t toUInt32(double);
 int32_t toInt32SlowCase(double, bool& ok);
 uint32_t toUInt32SlowCase(double, bool& ok);
 
-inline JSValuePtr JSValue::asValue() const {
+inline JSValue* JSValue::asValue() const {
   return const_cast<JSValue*>(this);
 }
 

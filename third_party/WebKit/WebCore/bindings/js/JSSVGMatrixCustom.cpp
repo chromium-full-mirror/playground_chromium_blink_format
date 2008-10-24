@@ -29,7 +29,7 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSValuePtr JSSVGMatrix::multiply(ExecState* exec, const ArgList& args) {
+JSValue* JSSVGMatrix::multiply(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   AffineTransform secondMatrix = toSVGMatrix(args.at(exec, 0));
@@ -39,9 +39,9 @@ JSValuePtr JSSVGMatrix::multiply(ExecState* exec, const ArgList& args) {
               m_context.get());
 }
 
-JSValuePtr JSSVGMatrix::inverse(ExecState* exec, const ArgList&) {
+JSValue* JSSVGMatrix::inverse(ExecState* exec, const ArgList&) {
   AffineTransform imp(*impl());
-  JSC::JSValuePtr result = toJS(
+  JSC::JSValue* result = toJS(
       exec,
       JSSVGStaticPODTypeWrapper<AffineTransform>::create(imp.inverse()).get(),
       m_context.get());
@@ -52,7 +52,7 @@ JSValuePtr JSSVGMatrix::inverse(ExecState* exec, const ArgList&) {
   return result;
 }
 
-JSValuePtr JSSVGMatrix::translate(ExecState* exec, const ArgList& args) {
+JSValue* JSSVGMatrix::translate(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float x = args.at(exec, 0)->toFloat(exec);
@@ -64,7 +64,7 @@ JSValuePtr JSSVGMatrix::translate(ExecState* exec, const ArgList& args) {
               m_context.get());
 }
 
-JSValuePtr JSSVGMatrix::scale(ExecState* exec, const ArgList& args) {
+JSValue* JSSVGMatrix::scale(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float scaleFactor = args.at(exec, 0)->toFloat(exec);
@@ -74,7 +74,7 @@ JSValuePtr JSSVGMatrix::scale(ExecState* exec, const ArgList& args) {
               m_context.get());
 }
 
-JSValuePtr JSSVGMatrix::scaleNonUniform(ExecState* exec, const ArgList& args) {
+JSValue* JSSVGMatrix::scaleNonUniform(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float scaleFactorX = args.at(exec, 0)->toFloat(exec);
@@ -86,7 +86,7 @@ JSValuePtr JSSVGMatrix::scaleNonUniform(ExecState* exec, const ArgList& args) {
               m_context.get());
 }
 
-JSValuePtr JSSVGMatrix::rotate(ExecState* exec, const ArgList& args) {
+JSValue* JSSVGMatrix::rotate(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float angle = args.at(exec, 0)->toFloat(exec);
@@ -96,13 +96,13 @@ JSValuePtr JSSVGMatrix::rotate(ExecState* exec, const ArgList& args) {
               m_context.get());
 }
 
-JSValuePtr JSSVGMatrix::rotateFromVector(ExecState* exec, const ArgList& args) {
+JSValue* JSSVGMatrix::rotateFromVector(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float x = args.at(exec, 0)->toFloat(exec);
   float y = args.at(exec, 1)->toFloat(exec);
 
-  JSC::JSValuePtr result =
+  JSC::JSValue* result =
       toJS(exec, JSSVGStaticPODTypeWrapper<AffineTransform>::create(
                      imp.rotateFromVector(x, y))
                      .get(),
@@ -114,7 +114,7 @@ JSValuePtr JSSVGMatrix::rotateFromVector(ExecState* exec, const ArgList& args) {
   return result;
 }
 
-JSValuePtr JSSVGMatrix::flipX(ExecState* exec, const ArgList&) {
+JSValue* JSSVGMatrix::flipX(ExecState* exec, const ArgList&) {
   AffineTransform imp(*impl());
   return toJS(
       exec,
@@ -122,7 +122,7 @@ JSValuePtr JSSVGMatrix::flipX(ExecState* exec, const ArgList&) {
       m_context.get());
 }
 
-JSValuePtr JSSVGMatrix::flipY(ExecState* exec, const ArgList&) {
+JSValue* JSSVGMatrix::flipY(ExecState* exec, const ArgList&) {
   AffineTransform imp(*impl());
   return toJS(
       exec,
@@ -130,7 +130,7 @@ JSValuePtr JSSVGMatrix::flipY(ExecState* exec, const ArgList&) {
       m_context.get());
 }
 
-JSValuePtr JSSVGMatrix::skewX(ExecState* exec, const ArgList& args) {
+JSValue* JSSVGMatrix::skewX(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float angle = args.at(exec, 0)->toFloat(exec);
@@ -140,7 +140,7 @@ JSValuePtr JSSVGMatrix::skewX(ExecState* exec, const ArgList& args) {
       m_context.get());
 }
 
-JSValuePtr JSSVGMatrix::skewY(ExecState* exec, const ArgList& args) {
+JSValue* JSSVGMatrix::skewY(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float angle = args.at(exec, 0)->toFloat(exec);

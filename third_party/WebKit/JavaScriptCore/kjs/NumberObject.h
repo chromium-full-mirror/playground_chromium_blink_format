@@ -37,11 +37,11 @@ class NumberObject : public JSWrapperObject {
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
 
-  virtual JSValuePtr getJSNumber();
+  virtual JSValue* getJSNumber();
 };
 
 NumberObject* constructNumber(ExecState*, JSNumberCell*);
-NumberObject* constructNumberFromImmediateNumber(ExecState*, JSValuePtr);
+NumberObject* constructNumberFromImmediateNumber(ExecState*, JSValue*);
 
 }  // namespace JSC
 

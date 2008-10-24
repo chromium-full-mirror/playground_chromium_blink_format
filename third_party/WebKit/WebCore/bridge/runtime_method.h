@@ -44,15 +44,15 @@ class RuntimeMethod : public InternalFunction {
     return exec->lexicalGlobalObject()->functionPrototype();
   }
 
-  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
     return StructureID::create(prototype,
                                TypeInfo(ObjectType, ImplementsHasInstance));
   }
 
  private:
-  static JSValuePtr lengthGetter(ExecState*,
-                                 const Identifier&,
-                                 const PropertySlot&);
+  static JSValue* lengthGetter(ExecState*,
+                               const Identifier&,
+                               const PropertySlot&);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual CallType getCallData(CallData&);
 

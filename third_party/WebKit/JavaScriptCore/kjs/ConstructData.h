@@ -29,7 +29,7 @@
 #ifndef ConstructData_h
 #define ConstructData_h
 
-#include "JSImmediate.h"  // temporary until JSValuePtr becomes a class we can forward-declare
+#include "JSImmediate.h"  // temporary until JSValue* becomes a class we can forward-declare
 
 namespace JSC {
 
@@ -54,7 +54,7 @@ union ConstructData {
 };
 
 JSObject* construct(ExecState*,
-                    JSValuePtr constructor,
+                    JSValue* constructor,
                     ConstructType,
                     const ConstructData&,
                     const ArgList&);

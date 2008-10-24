@@ -32,11 +32,11 @@
 #include <JavaScriptCore/PropertyNameArray.h>
 #include <pthread.h>
 
-JSValueWrapper::JSValueWrapper(JSValuePtr inValue) : fValue(inValue) {}
+JSValueWrapper::JSValueWrapper(JSValue* inValue) : fValue(inValue) {}
 
 JSValueWrapper::~JSValueWrapper() {}
 
-JSValuePtr JSValueWrapper::GetValue() {
+JSValue* JSValueWrapper::GetValue() {
   return fValue.get();
 }
 
@@ -97,7 +97,7 @@ JSObjectRef JSValueWrapper::JSObjectCopyProperty(void* data,
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     ExecState* exec = getThreadGlobalExecState();
-    JSValuePtr propValue = ptr->GetValue()->toObject(exec)->get(
+    JSValue* propValue = ptr->GetValue()->toObject(exec)->get(
         exec, CFStringToIdentifier(propertyName, exec));
     JSValueWrapper* wrapperValue = new JSValueWrapper(propValue);
 
@@ -122,7 +122,7 @@ void JSValueWrapper::JSObjectSetProperty(void* data,
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     ExecState* exec = getThreadGlobalExecState();
-    JSValuePtr value = JSObjectKJSValue((JSUserObject*)jsValue);
+    JSValue* value = JSObjectKJSValue((JSUserObject*)jsValue);
     JSObject* objValue = ptr->GetValue()->toObject(exec);
     PutPropertySlot slot;
     objValue->put(exec, CFStringToIdentifier(propertyName, exec), value, slot);
@@ -139,7 +139,7 @@ JSObjectRef JSValueWrapper::JSObjectCallFunction(void* data,
   if (ptr) {
     ExecState* exec = getThreadGlobalExecState();
 
-    JSValuePtr value = JSObjectKJSValue((JSUserObject*)thisObj);
+    JSValue* value = JSObjectKJSValue((JSUserObject*)thisObj);
     JSObject* ksjThisObj = value->toObject(exec);
     JSObject* objValue = ptr->GetValue()->toObject(exec);
 
@@ -147,7 +147,7 @@ JSObjectRef JSValueWrapper::JSObjectCallFunction(void* data,
     CFIndex argCount = args ? CFArrayGetCount(args) : 0;
     for (CFIndex i = 0; i < argCount; i++) {
       JSObjectRef jsArg = (JSObjectRef)CFArrayGetValueAtIndex(args, i);
-      JSValuePtr kgsArg = JSObjectKJSValue((JSUserObject*)jsArg);
+      JSValue* kgsArg = JSObjectKJSValue((JSUserObject*)jsArg);
       listArgs.append(kgsArg);
     }
 
@@ -155,7 +155,7 @@ JSObjectRef JSValueWrapper::JSObjectCallFunction(void* data,
     CallType callType = objValue->getCallData(callData);
     if (callType == CallTypeNone)
       return 0;
-    JSValuePtr resultValue =
+    JSValue* resultValue =
         call(exec, objValue, callType, callData, ksjThisObj, listArgs);
     JSValueWrapper* wrapperValue = new JSValueWrapper(resultValue);
     JSObjectCallBacks callBacks;

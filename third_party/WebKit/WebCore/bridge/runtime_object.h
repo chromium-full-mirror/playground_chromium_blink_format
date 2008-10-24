@@ -40,10 +40,10 @@ class RuntimeObjectImp : public JSObject {
                                   PropertySlot&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValuePtr,
+                   JSValue*,
                    PutPropertySlot&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
-  virtual JSValuePtr defaultValue(ExecState*, PreferredPrimitiveType) const;
+  virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const;
   virtual CallType getCallData(CallData&);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
@@ -58,7 +58,7 @@ class RuntimeObjectImp : public JSObject {
     return exec->lexicalGlobalObject()->objectPrototype();
   }
 
-  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
     return StructureID::create(prototype, TypeInfo(ObjectType));
   }
 
@@ -73,15 +73,15 @@ class RuntimeObjectImp : public JSObject {
 
   virtual const ClassInfo* classInfo() const { return &s_info; }
 
-  static JSValuePtr fallbackObjectGetter(ExecState*,
-                                         const Identifier&,
-                                         const PropertySlot&);
-  static JSValuePtr fieldGetter(ExecState*,
-                                const Identifier&,
-                                const PropertySlot&);
-  static JSValuePtr methodGetter(ExecState*,
-                                 const Identifier&,
-                                 const PropertySlot&);
+  static JSValue* fallbackObjectGetter(ExecState*,
+                                       const Identifier&,
+                                       const PropertySlot&);
+  static JSValue* fieldGetter(ExecState*,
+                              const Identifier&,
+                              const PropertySlot&);
+  static JSValue* methodGetter(ExecState*,
+                               const Identifier&,
+                               const PropertySlot&);
 
   RefPtr<Bindings::Instance> instance;
 };

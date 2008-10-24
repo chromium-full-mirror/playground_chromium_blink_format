@@ -32,19 +32,19 @@ class Node;
 // Runtime object support code for JSHTMLAppletElement, JSHTMLEmbedElement and
 // JSHTMLObjectElement.
 
-JSC::JSValuePtr runtimeObjectGetter(JSC::ExecState*,
-                                    const JSC::Identifier&,
-                                    const JSC::PropertySlot&);
-JSC::JSValuePtr runtimeObjectPropertyGetter(JSC::ExecState*,
-                                            const JSC::Identifier&,
-                                            const JSC::PropertySlot&);
+JSC::JSValue* runtimeObjectGetter(JSC::ExecState*,
+                                  const JSC::Identifier&,
+                                  const JSC::PropertySlot&);
+JSC::JSValue* runtimeObjectPropertyGetter(JSC::ExecState*,
+                                          const JSC::Identifier&,
+                                          const JSC::PropertySlot&);
 bool runtimeObjectCustomGetOwnPropertySlot(JSC::ExecState*,
                                            const JSC::Identifier&,
                                            JSC::PropertySlot&,
                                            JSHTMLElement*);
 bool runtimeObjectCustomPut(JSC::ExecState*,
                             const JSC::Identifier&,
-                            JSC::JSValuePtr,
+                            JSC::JSValue*,
                             HTMLElement*,
                             JSC::PutPropertySlot&);
 JSC::CallType runtimeObjectGetCallData(HTMLElement*, JSC::CallData&);

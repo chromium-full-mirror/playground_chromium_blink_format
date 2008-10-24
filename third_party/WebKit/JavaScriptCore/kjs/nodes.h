@@ -309,7 +309,7 @@ class NumberNode : public ExpressionNode {
 class ImmediateNumberNode : public NumberNode {
  public:
   ImmediateNumberNode(JSGlobalData* globalData,
-                      JSValuePtr v,
+                      JSValue* v,
                       double d) JSC_FAST_CALL : NumberNode(globalData, d),
                                                 m_value(v) {
     ASSERT(v == JSImmediate::from(d));
@@ -322,8 +322,8 @@ class ImmediateNumberNode : public NumberNode {
   }
 
  private:
-  JSValuePtr m_value;  // This is never a JSCell, only JSImmediate, thus no
-                       // ProtectedPtr
+  JSValue* m_value;  // This is never a JSCell, only JSImmediate, thus no
+                     // ProtectedPtr
 };
 
 class StringNode : public ExpressionNode {

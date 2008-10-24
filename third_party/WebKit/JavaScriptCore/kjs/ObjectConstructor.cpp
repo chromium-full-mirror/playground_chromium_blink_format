@@ -47,7 +47,7 @@ ObjectConstructor::ObjectConstructor(ExecState* exec,
 // ECMA 15.2.2
 static ALWAYS_INLINE JSObject* constructObject(ExecState* exec,
                                                const ArgList& args) {
-  JSValuePtr arg = args.at(exec, 0);
+  JSValue* arg = args.at(exec, 0);
   if (arg->isUndefinedOrNull())
     return new (exec)
         JSObject(exec->lexicalGlobalObject()->emptyObjectStructure());
@@ -66,10 +66,10 @@ ConstructType ObjectConstructor::getConstructData(
   return ConstructTypeHost;
 }
 
-static JSValuePtr callObjectConstructor(ExecState* exec,
-                                        JSObject*,
-                                        JSValuePtr,
-                                        const ArgList& args) {
+static JSValue* callObjectConstructor(ExecState* exec,
+                                      JSObject*,
+                                      JSValue*,
+                                      const ArgList& args) {
   return constructObject(exec, args);
 }
 

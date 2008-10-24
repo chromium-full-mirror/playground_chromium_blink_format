@@ -33,9 +33,9 @@ bool JSMimeTypeArray::canGetItemsForName(ExecState*,
   return mimeTypeArray->canGetItemsForName(propertyName);
 }
 
-JSValuePtr JSMimeTypeArray::nameGetter(ExecState* exec,
-                                       const Identifier& propertyName,
-                                       const PropertySlot& slot) {
+JSValue* JSMimeTypeArray::nameGetter(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     const PropertySlot& slot) {
   JSMimeTypeArray* thisObj =
       static_cast<JSMimeTypeArray*>(asObject(slot.slotBase()));
   return toJS(exec, thisObj->impl()->nameGetter(propertyName));

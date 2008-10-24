@@ -39,9 +39,9 @@ class RuntimeArray : public JSObject {
   virtual bool getOwnPropertySlot(ExecState*, unsigned, PropertySlot&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValuePtr,
+                   JSValue*,
                    PutPropertySlot&);
-  virtual void put(ExecState*, unsigned propertyName, JSValuePtr);
+  virtual void put(ExecState*, unsigned propertyName, JSValue*);
 
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState* exec, unsigned propertyName);
@@ -58,17 +58,17 @@ class RuntimeArray : public JSObject {
     return exec->lexicalGlobalObject()->arrayPrototype();
   }
 
-  static PassRefPtr<StructureID> createStructureID(JSValuePtr prototype) {
+  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
     return StructureID::create(prototype, TypeInfo(ObjectType));
   }
 
  private:
-  static JSValuePtr lengthGetter(ExecState*,
-                                 const Identifier&,
-                                 const PropertySlot&);
-  static JSValuePtr indexGetter(ExecState*,
-                                const Identifier&,
-                                const PropertySlot&);
+  static JSValue* lengthGetter(ExecState*,
+                               const Identifier&,
+                               const PropertySlot&);
+  static JSValue* indexGetter(ExecState*,
+                              const Identifier&,
+                              const PropertySlot&);
 
   OwnPtr<Bindings::Array> _array;
 };

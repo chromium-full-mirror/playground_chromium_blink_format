@@ -45,7 +45,7 @@ class QtClass : public Class {
   virtual MethodList methodsNamed(const Identifier&, Instance*) const;
   virtual Field* fieldNamed(const Identifier&, Instance*) const;
 
-  virtual JSValuePtr fallbackObject(ExecState*, Instance*, const Identifier&);
+  virtual JSValue* fallbackObject(ExecState*, Instance*, const Identifier&);
 
  private:
   QtClass(const QtClass&);             // prohibit copying

@@ -39,16 +39,16 @@ const ClassInfo RuntimeArray::s_info = {"RuntimeArray", &JSArray::info, 0, 0};
 RuntimeArray::RuntimeArray(ExecState* exec, Bindings::Array* a)
     : JSObject(getDOMStructure<RuntimeArray>(exec)), _array(a) {}
 
-JSValuePtr RuntimeArray::lengthGetter(ExecState* exec,
-                                      const Identifier&,
-                                      const PropertySlot& slot) {
+JSValue* RuntimeArray::lengthGetter(ExecState* exec,
+                                    const Identifier&,
+                                    const PropertySlot& slot) {
   RuntimeArray* thisObj = static_cast<RuntimeArray*>(asObject(slot.slotBase()));
   return jsNumber(exec, thisObj->getLength());
 }
 
-JSValuePtr RuntimeArray::indexGetter(ExecState* exec,
-                                     const Identifier&,
-                                     const PropertySlot& slot) {
+JSValue* RuntimeArray::indexGetter(ExecState* exec,
+                                   const Identifier&,
+                                   const PropertySlot& slot) {
   RuntimeArray* thisObj = static_cast<RuntimeArray*>(asObject(slot.slotBase()));
   return thisObj->getConcreteArray()->valueAt(exec, slot.index());
 }
@@ -86,7 +86,7 @@ bool RuntimeArray::getOwnPropertySlot(ExecState* exec,
 
 void RuntimeArray::put(ExecState* exec,
                        const Identifier& propertyName,
-                       JSValuePtr value,
+                       JSValue* value,
                        PutPropertySlot& slot) {
   if (propertyName == exec->propertyNames().length) {
     throwError(exec, RangeError);
@@ -103,7 +103,7 @@ void RuntimeArray::put(ExecState* exec,
   JSObject::put(exec, propertyName, value, slot);
 }
 
-void RuntimeArray::put(ExecState* exec, unsigned index, JSValuePtr value) {
+void RuntimeArray::put(ExecState* exec, unsigned index, JSValue* value) {
   if (index >= getLength()) {
     throwError(exec, RangeError);
     return;

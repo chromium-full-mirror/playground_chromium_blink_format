@@ -42,7 +42,7 @@ bool JSHTMLAppletElement::customGetOwnPropertySlot(
 
 bool JSHTMLAppletElement::customPut(ExecState* exec,
                                     const Identifier& propertyName,
-                                    JSValuePtr value,
+                                    JSValue* value,
                                     PutPropertySlot& slot) {
   return runtimeObjectCustomPut(exec, propertyName, value, impl(), slot);
 }
@@ -57,9 +57,9 @@ bool JSHTMLAppletElement::canGetItemsForName(ExecState*,
   return propertyName == "__apple_runtime_object";
 }
 
-JSValuePtr JSHTMLAppletElement::nameGetter(ExecState* exec,
-                                           const Identifier& propertyName,
-                                           const PropertySlot& slot) {
+JSValue* JSHTMLAppletElement::nameGetter(ExecState* exec,
+                                         const Identifier& propertyName,
+                                         const PropertySlot& slot) {
   return runtimeObjectGetter(exec, propertyName, slot);
 }
 

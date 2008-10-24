@@ -77,7 +77,7 @@ JNIType JNITypeFromPrimitiveType(char type);
 const char* signatureFromPrimitiveType(JNIType type);
 
 jvalue convertValueToJValue(ExecState*,
-                            JSValuePtr,
+                            JSValue*,
                             JNIType,
                             const char* javaClassName);
 
@@ -289,7 +289,7 @@ bool dispatchJNICall(ExecState*,
                      jvalue* args,
                      jvalue& result,
                      const char* callingURL,
-                     JSValuePtr& exceptionDescription);
+                     JSValue*& exceptionDescription);
 
 }  // namespace Bindings
 

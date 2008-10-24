@@ -44,7 +44,7 @@ class StringObjectThatMasqueradesAsUndefined : public StringObject {
                                          const UString& string)
       : StringObject(exec, structure, string) {}
 
-  static PassRefPtr<StructureID> createStructureID(JSValuePtr proto) {
+  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
     return StructureID::create(proto,
                                TypeInfo(ObjectType, MasqueradesAsUndefined));
   }

@@ -109,9 +109,9 @@ JSObjectRef JSObjectMakeConstructor(
   exec->globalData().heap.registerThread();
   JSLock lock(exec);
 
-  JSValuePtr jsPrototype = jsClass
-                               ? jsClass->prototype(exec)
-                               : exec->lexicalGlobalObject()->objectPrototype();
+  JSValue* jsPrototype = jsClass
+                             ? jsClass->prototype(exec)
+                             : exec->lexicalGlobalObject()->objectPrototype();
 
   JSCallbackConstructor* constructor = new (exec) JSCallbackConstructor(
       exec->lexicalGlobalObject()->callbackConstructorStructure(), jsClass,
@@ -256,7 +256,7 @@ JSValueRef JSObjectGetPrototype(JSContextRef, JSObjectRef object) {
 
 void JSObjectSetPrototype(JSContextRef, JSObjectRef object, JSValueRef value) {
   JSObject* jsObject = toJS(object);
-  JSValuePtr jsValue = toJS(value);
+  JSValue* jsValue = toJS(value);
 
   jsObject->setPrototype(jsValue->isObject() ? jsValue : jsNull());
 }
@@ -284,7 +284,7 @@ JSValueRef JSObjectGetProperty(JSContextRef ctx,
 
   JSObject* jsObject = toJS(object);
 
-  JSValuePtr jsValue =
+  JSValue* jsValue =
       jsObject->get(exec, propertyName->identifier(&exec->globalData()));
   if (exec->hadException()) {
     if (exception)
@@ -306,7 +306,7 @@ void JSObjectSetProperty(JSContextRef ctx,
 
   JSObject* jsObject = toJS(object);
   Identifier name(propertyName->identifier(&exec->globalData()));
-  JSValuePtr jsValue = toJS(value);
+  JSValue* jsValue = toJS(value);
 
   if (attributes && !jsObject->hasProperty(exec, name))
     jsObject->putWithAttributes(exec, name, jsValue, attributes);
@@ -332,7 +332,7 @@ JSValueRef JSObjectGetPropertyAtIndex(JSContextRef ctx,
 
   JSObject* jsObject = toJS(object);
 
-  JSValuePtr jsValue = jsObject->get(exec, propertyIndex);
+  JSValue* jsValue = jsObject->get(exec, propertyIndex);
   if (exec->hadException()) {
     if (exception)
       *exception = toRef(exec->exception());
@@ -351,7 +351,7 @@ void JSObjectSetPropertyAtIndex(JSContextRef ctx,
   JSLock lock(exec);
 
   JSObject* jsObject = toJS(object);
-  JSValuePtr jsValue = toJS(value);
+  JSValue* jsValue = toJS(value);
 
   jsObject->put(exec, propertyIndex, jsValue);
   if (exec->hadException()) {

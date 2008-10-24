@@ -48,7 +48,7 @@ id createJSWrapper(JSC::JSObject*,
 }
 
 @interface WebScriptObject (Private)
-+ (id)_convertValueToObjcValue:(JSC::JSValuePtr)value
++ (id)_convertValueToObjcValue:(JSC::JSValue*)value
               originRootObject:(JSC::Bindings::RootObject*)originRootObject
                     rootObject:(JSC::Bindings::RootObject*)rootObject;
 + (id)scriptObjectForJSObject:(JSObjectRef)jsObject

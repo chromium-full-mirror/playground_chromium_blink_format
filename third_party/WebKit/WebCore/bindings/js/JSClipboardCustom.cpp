@@ -48,7 +48,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-JSValuePtr JSClipboard::types(ExecState* exec) const {
+JSValue* JSClipboard::types(ExecState* exec) const {
   Clipboard* clipboard = impl();
 
   HashSet<String> types = clipboard->types();
@@ -62,7 +62,7 @@ JSValuePtr JSClipboard::types(ExecState* exec) const {
   return constructArray(exec, list);
 }
 
-JSValuePtr JSClipboard::clearData(ExecState* exec, const ArgList& args) {
+JSValue* JSClipboard::clearData(ExecState* exec, const ArgList& args) {
   Clipboard* clipboard = impl();
 
   if (args.size() == 0) {
@@ -81,7 +81,7 @@ JSValuePtr JSClipboard::clearData(ExecState* exec, const ArgList& args) {
                     "clearData: Invalid number of arguments");
 }
 
-JSValuePtr JSClipboard::getData(ExecState* exec, const ArgList& args) {
+JSValue* JSClipboard::getData(ExecState* exec, const ArgList& args) {
   // FIXME: It does not match the rest of the JS bindings to throw on invalid
   // number of arguments.
   if (args.size() != 1)
@@ -98,7 +98,7 @@ JSValuePtr JSClipboard::getData(ExecState* exec, const ArgList& args) {
   return jsString(exec, result);
 }
 
-JSValuePtr JSClipboard::setData(ExecState* exec, const ArgList& args) {
+JSValue* JSClipboard::setData(ExecState* exec, const ArgList& args) {
   Clipboard* clipboard = impl();
 
   // FIXME: It does not match the rest of the JS bindings to throw on invalid
@@ -111,7 +111,7 @@ JSValuePtr JSClipboard::setData(ExecState* exec, const ArgList& args) {
                                       args.at(exec, 1)->toString(exec)));
 }
 
-JSValuePtr JSClipboard::setDragImage(ExecState* exec, const ArgList& args) {
+JSValue* JSClipboard::setDragImage(ExecState* exec, const ArgList& args) {
   Clipboard* clipboard = impl();
 
   if (!clipboard->isForDragging())

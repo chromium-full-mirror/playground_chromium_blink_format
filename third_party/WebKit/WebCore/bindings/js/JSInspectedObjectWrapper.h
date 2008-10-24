@@ -32,8 +32,8 @@ namespace WebCore {
 
 class JSInspectedObjectWrapper : public JSQuarantinedObjectWrapper {
  public:
-  static JSC::JSValuePtr wrap(JSC::ExecState* unwrappedExec,
-                              JSC::JSValuePtr unwrappedValue);
+  static JSC::JSValue* wrap(JSC::ExecState* unwrappedExec,
+                            JSC::JSValue* unwrappedValue);
   virtual ~JSInspectedObjectWrapper();
 
   static const JSC::ClassInfo s_info;
@@ -51,12 +51,11 @@ class JSInspectedObjectWrapper : public JSQuarantinedObjectWrapper {
   virtual bool allowsCallAsFunction() const { return true; }
   virtual bool allowsGetPropertyNames() const { return true; }
 
-  virtual JSC::JSValuePtr prepareIncomingValue(
+  virtual JSC::JSValue* prepareIncomingValue(
       JSC::ExecState* unwrappedExec,
-      JSC::JSValuePtr unwrappedValue) const;
-  virtual JSC::JSValuePtr wrapOutgoingValue(
-      JSC::ExecState* unwrappedExec,
-      JSC::JSValuePtr unwrappedValue) const {
+      JSC::JSValue* unwrappedValue) const;
+  virtual JSC::JSValue* wrapOutgoingValue(JSC::ExecState* unwrappedExec,
+                                          JSC::JSValue* unwrappedValue) const {
     return wrap(unwrappedExec, unwrappedValue);
   }
 

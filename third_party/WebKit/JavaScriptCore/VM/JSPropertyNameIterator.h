@@ -40,12 +40,12 @@ class JSObject;
 
 class JSPropertyNameIterator : public JSCell {
  public:
-  static JSPropertyNameIterator* create(ExecState*, JSValuePtr);
+  static JSPropertyNameIterator* create(ExecState*, JSValue*);
 
   virtual ~JSPropertyNameIterator();
 
-  virtual JSValuePtr toPrimitive(ExecState*, PreferredPrimitiveType) const;
-  virtual bool getPrimitiveNumber(ExecState*, double&, JSValuePtr&);
+  virtual JSValue* toPrimitive(ExecState*, PreferredPrimitiveType) const;
+  virtual bool getPrimitiveNumber(ExecState*, double&, JSValue*&);
   virtual bool toBoolean(ExecState*) const;
   virtual double toNumber(ExecState*) const;
   virtual UString toString(ExecState*) const;
@@ -53,7 +53,7 @@ class JSPropertyNameIterator : public JSCell {
 
   virtual void mark();
 
-  JSValuePtr next(ExecState*);
+  JSValue* next(ExecState*);
   void invalidate();
 
  private:
@@ -81,7 +81,7 @@ inline JSPropertyNameIterator::JSPropertyNameIterator(
       m_end(m_data->end()) {}
 
 inline JSPropertyNameIterator* JSPropertyNameIterator::create(ExecState* exec,
-                                                              JSValuePtr v) {
+                                                              JSValue* v) {
   if (v->isUndefinedOrNull())
     return new (exec) JSPropertyNameIterator;
 
@@ -91,7 +91,7 @@ inline JSPropertyNameIterator* JSPropertyNameIterator::create(ExecState* exec,
   return new (exec) JSPropertyNameIterator(o, propertyNames.releaseData());
 }
 
-inline JSValuePtr JSPropertyNameIterator::next(ExecState* exec) {
+inline JSValue* JSPropertyNameIterator::next(ExecState* exec) {
   if (m_position == m_end)
     return noValue();
 

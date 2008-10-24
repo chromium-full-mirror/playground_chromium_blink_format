@@ -27,9 +27,9 @@
 
 namespace JSC {
 
-JSValuePtr PropertySlot::functionGetter(ExecState* exec,
-                                        const Identifier&,
-                                        const PropertySlot& slot) {
+JSValue* PropertySlot::functionGetter(ExecState* exec,
+                                      const Identifier&,
+                                      const PropertySlot& slot) {
   // Prevent getter functions from observing execution if an exception is
   // pending.
   if (exec->hadException())

@@ -44,7 +44,7 @@ JSObject* JSStaticScopeObject::toThisObject(ExecState* exec) const {
 
 void JSStaticScopeObject::put(ExecState*,
                               const Identifier& propertyName,
-                              JSValuePtr value,
+                              JSValue* value,
                               PutPropertySlot&) {
   if (symbolTablePut(propertyName, value))
     return;
@@ -54,7 +54,7 @@ void JSStaticScopeObject::put(ExecState*,
 
 void JSStaticScopeObject::putWithAttributes(ExecState*,
                                             const Identifier& propertyName,
-                                            JSValuePtr value,
+                                            JSValue* value,
                                             unsigned attributes) {
   if (symbolTablePutWithAttributes(propertyName, value, attributes))
     return;

@@ -36,7 +36,7 @@ void JSNodeIterator::mark() {
   DOMObject::mark();
 }
 
-JSValuePtr JSNodeIterator::nextNode(ExecState* exec, const ArgList& args) {
+JSValue* JSNodeIterator::nextNode(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   RefPtr<Node> node = impl()->nextNode(exec, ec);
   if (ec) {
@@ -50,7 +50,7 @@ JSValuePtr JSNodeIterator::nextNode(ExecState* exec, const ArgList& args) {
   return toJS(exec, node.get());
 }
 
-JSValuePtr JSNodeIterator::previousNode(ExecState* exec, const ArgList& args) {
+JSValue* JSNodeIterator::previousNode(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   RefPtr<Node> node = impl()->previousNode(exec, ec);
   if (ec) {
