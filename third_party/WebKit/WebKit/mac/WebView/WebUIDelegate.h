@@ -142,7 +142,8 @@ typedef enum {
    open panel.
     @param fileNames
 */
-- (void)chooseFilenames:(NSArray*)fileNames AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+- (void)chooseFilenames:(NSArray*)fileNames
+    WEBKIT_OBJC_METHOD_ANNOTATION(AVAILABLE_AFTER_WEBKIT_VERSION_3_1);
 
 /*!
     @method cancel
