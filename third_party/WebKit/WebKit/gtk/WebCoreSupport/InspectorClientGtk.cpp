@@ -70,4 +70,19 @@ void InspectorClient::hideHighlight() {
 void InspectorClient::inspectedURLChanged(const String&) {
   notImplemented();
 }
+
+void InspectorClient::populateSetting(const String& key,
+                                      InspectorController::Setting& setting) {
+  notImplemented();
+}
+
+void InspectorClient::storeSetting(
+    const String& key,
+    const InspectorController::Setting& setting) {
+  notImplemented();
+}
+
+void InspectorClient::removeSetting(const String& key) {
+  notImplemented();
+}
 }
