@@ -144,8 +144,9 @@ class SamplingTool {
                         bool inCTIFunction = false,
                         bool inHostFunction = false) {
     ASSERT(!(reinterpret_cast<intptr_t>(vPC) & 0x3));
-    return reinterpret_cast<intptr_t>(vPC) | (inCTIFunction << 1) |
-           inHostFunction;
+    return reinterpret_cast<intptr_t>(vPC) |
+           (static_cast<intptr_t>(inCTIFunction) << 1) |
+           static_cast<intptr_t>(inHostFunction);
   }
 
  private:
