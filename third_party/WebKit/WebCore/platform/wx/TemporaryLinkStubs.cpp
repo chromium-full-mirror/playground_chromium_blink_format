@@ -198,9 +198,6 @@ ScrollbarTheme* ScrollbarTheme::nativeTheme() {
   return &theme;
 }
 
-void FileChooser::openFileChooser(Document*) {
-  notImplemented();
-}
 String FileChooser::basenameForWidth(const Font&, int width) const {
   notImplemented();
   return String();

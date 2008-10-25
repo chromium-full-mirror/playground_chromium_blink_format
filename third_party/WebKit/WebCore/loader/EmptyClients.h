@@ -152,6 +152,8 @@ class EmptyChromeClient : public ChromeClient {
   virtual void print(Frame*) {}
 
   virtual void exceededDatabaseQuota(Frame*, const String&) {}
+
+  virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>) {}
 };
 
 class EmptyFrameLoaderClient : public FrameLoaderClient {

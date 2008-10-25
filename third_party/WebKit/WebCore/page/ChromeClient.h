@@ -111,7 +111,6 @@ class ChromeClient {
                                    const String& message,
                                    const String& defaultValue,
                                    String& result) = 0;
-
   virtual void setStatusbarText(const String&) = 0;
   virtual bool shouldInterruptJavaScript() = 0;
   virtual bool tabsToLinks() const = 0;
@@ -175,9 +174,9 @@ class ChromeClient {
                                     ScrollbarControlPartMask);
   virtual bool paintCustomScrollCorner(GraphicsContext*, const FloatRect&);
 
-#if PLATFORM(MAC)
-  virtual void runOpenPanel(PassRefPtr<FileChooser>);
+  virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>) = 0;
 
+#if PLATFORM(MAC)
   virtual KeyboardUIMode keyboardUIMode() { return KeyboardAccessDefault; }
 
   virtual NSResponder* firstResponder() { return 0; }

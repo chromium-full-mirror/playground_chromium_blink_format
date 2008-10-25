@@ -35,6 +35,7 @@ namespace WebCore {
 
 class ChromeClient;
 class ContextMenu;
+class FileChooser;
 class FloatRect;
 class Frame;
 class HitTestResult;
@@ -124,6 +125,8 @@ class Chrome : public HostWindow {
 
   void enableSuddenTermination();
   void disableSuddenTermination();
+
+  void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
 
 #if PLATFORM(MAC)
   void focusNSView(NSView*);

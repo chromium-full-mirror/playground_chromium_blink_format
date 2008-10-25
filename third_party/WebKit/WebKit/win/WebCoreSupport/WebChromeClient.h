@@ -134,6 +134,8 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual bool paintCustomScrollCorner(WebCore::GraphicsContext*,
                                        const WebCore::FloatRect&);
 
+  virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
+
   WebView* webView() const { return m_webView; }
 
  private:

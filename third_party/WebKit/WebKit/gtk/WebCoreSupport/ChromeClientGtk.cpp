@@ -22,6 +22,7 @@
 #include "config.h"
 #include "ChromeClientGtk.h"
 
+#include "FileSystem.h"
 #include "FloatRect.h"
 #include "IntRect.h"
 #include "PlatformString.h"
@@ -352,5 +353,26 @@ void ChromeClient::exceededDatabaseQuota(Frame* frame, const String&) {
   DatabaseTracker::tracker().setQuota(frame->document()->securityOrigin(),
                                       defaultQuota);
 #endif
+}
+
+void ChromeClient::runOpenPanel(Frame*,
+                                PassRefPtr<FileChooser> prpFileChooser) {
+  // FIXME: Support multiple files.
+
+  RefPtr<FileChooser> fileChooser = prpFileChooser;
+
+  GtkWidget* dialog = gtk_file_chooser_dialog_new(
+      _("Upload File"),
+      GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(platformWindow()))),
+      GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+
+  if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+    gchar* filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+    if (filename)
+      fileChooser->chooseFile(filenameToString(filename));
+    g_free(filename);
+  }
+  gtk_widget_destroy(dialog);
 }
 }
