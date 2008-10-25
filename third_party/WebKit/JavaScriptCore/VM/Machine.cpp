@@ -1674,7 +1674,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 #define CTI_SAMPLER ARG_globalData->machine->sampler()
 #else
 #define SAMPLE(codeBlock, vPC)
-#define CTI_SAMPLER
+#define CTI_SAMPLER 0
 #endif
 
 #if HAVE(COMPUTED_GOTO)
