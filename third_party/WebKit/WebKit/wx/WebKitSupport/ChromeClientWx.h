@@ -124,9 +124,10 @@ class ChromeClientWx : public ChromeClient {
 
   virtual void exceededDatabaseQuota(Frame*, const String&);
 
-  virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>)
+  virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
 
-      private : wxWebView* m_webView;
+ private:
+  wxWebView* m_webView;
 };
 }
 #endif  // ChromeClientWx_H
