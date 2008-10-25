@@ -295,7 +295,7 @@ struct CodeBlock {
     linkedCallerList.shrink(lastPos);
   }
 
-#if !defined(NDEBUG) || ENABLE_SAMPLING_TOOL
+#if !defined(NDEBUG) || ENABLE_OPCODE_SAMPLING
   void dump(ExecState*) const;
   void printStructureIDs(const Instruction*) const;
   void printStructureID(const char* name,
@@ -379,7 +379,7 @@ struct CodeBlock {
   EvalCodeCache evalCodeCache;
 
  private:
-#if !defined(NDEBUG) || ENABLE(SAMPLING_TOOL)
+#if !defined(NDEBUG) || ENABLE(OPCODE_SAMPLING)
   void dump(ExecState*,
             const Vector<Instruction>::const_iterator& begin,
             Vector<Instruction>::const_iterator&) const;

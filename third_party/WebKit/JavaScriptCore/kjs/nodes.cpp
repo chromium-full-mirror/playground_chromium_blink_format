@@ -34,10 +34,10 @@
 #include "Parser.h"
 #include "PropertyNameArray.h"
 #include "RegExpObject.h"
+#include "SamplingTool.h"
 #include "debugger.h"
 #include "lexer.h"
 #include "operations.h"
-#include "SamplingTool.h"
 #include <math.h>
 #include <wtf/Assertions.h>
 #include <wtf/HashCountedSet.h>
@@ -1918,8 +1918,9 @@ ScopeNode::ScopeNode(JSGlobalData* globalData,
     m_varStack = *varStack;
   if (funcStack)
     m_functionStack = *funcStack;
-
-  SCOPENODE_SAMPLING_notifyOfScope(globalData->machine->m_sampler);
+#if ENABLE(OPCODE_SAMPLING)
+  globalData->machine->sampler()->notifyOfScope(this);
+#endif
 }
 
 // ------------------------------ ProgramNode -----------------------------

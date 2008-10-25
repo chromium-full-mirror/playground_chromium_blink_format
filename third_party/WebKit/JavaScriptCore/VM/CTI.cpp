@@ -34,6 +34,7 @@
 #include "Machine.h"
 #include "wrec/WREC.h"
 #include "ResultType.h"
+#include "SamplingTool.h"
 
 #ifndef NDEBUG
 #include <stdio.h>
@@ -261,10 +262,6 @@ ALWAYS_INLINE void CTI::emitInitRegister(unsigned dst) {
   // FIXME: #ifndef NDEBUG, Write the correct m_type to the register.
 }
 
-#if ENABLE(SAMPLING_TOOL)
-unsigned inCalledCode = 0;
-#endif
-
 void ctiSetReturnAddress(void** where, void* what) {
   *where = what;
 }
@@ -323,113 +320,148 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitNakedCall(unsigned opcodeIndex,
   return call;
 }
 
-ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(unsigned opcodeIndex,
+ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
+                                                    unsigned opcodeIndex,
                                                     CTIHelper_j helper) {
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(1, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, true),
+                  m_machine->sampler()->sampleSlot());
+#else
+  UNUSED_PARAM(vPC);
 #endif
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(0, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, false),
+                  m_machine->sampler()->sampleSlot());
 #endif
 
   return call;
 }
 
-ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(unsigned opcodeIndex,
+ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
+                                                    unsigned opcodeIndex,
                                                     CTIHelper_o helper) {
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(1, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, true),
+                  m_machine->sampler()->sampleSlot());
+#else
+  UNUSED_PARAM(vPC);
 #endif
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(0, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, false),
+                  m_machine->sampler()->sampleSlot());
 #endif
 
   return call;
 }
 
-ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(unsigned opcodeIndex,
+ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
+                                                    unsigned opcodeIndex,
                                                     CTIHelper_p helper) {
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(1, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, true),
+                  m_machine->sampler()->sampleSlot());
+#else
+  UNUSED_PARAM(vPC);
 #endif
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(0, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, false),
+                  m_machine->sampler()->sampleSlot());
 #endif
 
   return call;
 }
 
-ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(unsigned opcodeIndex,
+ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
+                                                    unsigned opcodeIndex,
                                                     CTIHelper_b helper) {
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(1, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, true),
+                  m_machine->sampler()->sampleSlot());
+#else
+  UNUSED_PARAM(vPC);
 #endif
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(0, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, false),
+                  m_machine->sampler()->sampleSlot());
 #endif
 
   return call;
 }
 
-ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(unsigned opcodeIndex,
+ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
+                                                    unsigned opcodeIndex,
                                                     CTIHelper_v helper) {
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(1, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, true),
+                  m_machine->sampler()->sampleSlot());
+#else
+  UNUSED_PARAM(vPC);
 #endif
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(0, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, false),
+                  m_machine->sampler()->sampleSlot());
 #endif
 
   return call;
 }
 
-ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(unsigned opcodeIndex,
+ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
+                                                    unsigned opcodeIndex,
                                                     CTIHelper_s helper) {
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(1, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, true),
+                  m_machine->sampler()->sampleSlot());
+#else
+  UNUSED_PARAM(vPC);
 #endif
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(0, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, false),
+                  m_machine->sampler()->sampleSlot());
 #endif
 
   return call;
 }
 
-ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(unsigned opcodeIndex,
+ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
+                                                    unsigned opcodeIndex,
                                                     CTIHelper_2 helper) {
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(1, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, true),
+                  m_machine->sampler()->sampleSlot());
+#else
+  UNUSED_PARAM(vPC);
 #endif
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(SAMPLING_TOOL)
-  m_jit.movl_i32m(0, &inCalledCode);
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(m_machine->sampler()->encodeSample(vPC, false),
+                  m_machine->sampler()->sampleSlot());
 #endif
 
   return call;
@@ -522,7 +554,7 @@ CTI::CTI(Machine* machine, CallFrame* callFrame, CodeBlock* codeBlock)
   case name: {                                                \
     emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx); \
     emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx); \
-    emitCTICall(i, Machine::cti_##name);                      \
+    emitCTICall(instruction + i, i, Machine::cti_##name);     \
     emitPutResult(instruction[i + 1].u.operand);              \
     i += 4;                                                   \
     break;                                                    \
@@ -531,15 +563,11 @@ CTI::CTI(Machine* machine, CallFrame* callFrame, CodeBlock* codeBlock)
 #define CTI_COMPILE_UNARY_OP(name)                            \
   case name: {                                                \
     emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx); \
-    emitCTICall(i, Machine::cti_##name);                      \
+    emitCTICall(instruction + i, i, Machine::cti_##name);     \
     emitPutResult(instruction[i + 1].u.operand);              \
     i += 3;                                                   \
     break;                                                    \
   }
-
-#if ENABLE(SAMPLING_TOOL)
-OpcodeID currentOpcodeID = static_cast<OpcodeID>(-1);
-#endif
 
 static void unreachable() {
   ASSERT_NOT_REACHED();
@@ -590,10 +618,10 @@ void CTI::compileOpCallSetupArgs(Instruction* instruction,
     emitGetPutArg(instruction[3].u.operand, 16, X86::eax);
 }
 
-void CTI::compileOpCall(Instruction* instruction,
+void CTI::compileOpCall(OpcodeID opcodeID,
+                        Instruction* instruction,
                         unsigned i,
-                        unsigned callLinkInfoIndex,
-                        CompileOpCallType type) {
+                        unsigned callLinkInfoIndex) {
   int dst = instruction[1].u.operand;
   int callee = instruction[2].u.operand;
   int firstArg = instruction[4].u.operand;
@@ -601,7 +629,7 @@ void CTI::compileOpCall(Instruction* instruction,
   int registerOffset = instruction[6].u.operand;
 
   // Setup this value as the first argument (does not apply to constructors)
-  if (type != OpConstruct) {
+  if (opcodeID != op_construct) {
     int thisVal = instruction[3].u.operand;
     if (thisVal == missingThisObjectMarker()) {
       // FIXME: should this be loaded dynamically off m_callFrame?
@@ -615,11 +643,11 @@ void CTI::compileOpCall(Instruction* instruction,
 
   // Handle eval
   X86Assembler::JmpSrc wasEval;
-  if (type == OpCallEval) {
+  if (opcodeID == op_call_eval) {
     emitGetArg(callee, X86::ecx);
     compileOpCallSetupArgs(instruction, false, true);
 
-    emitCTICall(i, Machine::cti_op_call_eval);
+    emitCTICall(instruction, i, Machine::cti_op_call_eval);
     m_jit.cmpl_i32r(asInteger(JSImmediate::impossibleValue()), X86::eax);
     wasEval = m_jit.emitUnlinkedJne();
   }
@@ -642,10 +670,10 @@ void CTI::compileOpCall(Instruction* instruction,
 
   // In the case of OpConstruct, call oout to a cti_ function to create the new
   // object.
-  if (type == OpConstruct) {
+  if (opcodeID == op_construct) {
     emitPutArg(X86::ecx, 0);
     emitGetPutArg(instruction[3].u.operand, 4, X86::eax);
-    emitCTICall(i, Machine::cti_op_construct_JSConstructFast);
+    emitCTICall(instruction, i, Machine::cti_op_construct_JSConstructFast);
     emitPutResult(instruction[4].u.operand);
     emitGetArg(callee, X86::ecx);
   }
@@ -678,11 +706,16 @@ void CTI::compileOpCall(Instruction* instruction,
   m_callStructureStubCompilationInfo[callLinkInfoIndex].hotPathOther =
       emitNakedCall(i, unreachable);
 
-  if (type == OpCallEval)
+  if (opcodeID == op_call_eval)
     m_jit.link(wasEval, m_jit.label());
 
   // Put the return value in dst. In the interpreter, op_ret does this.
   emitPutResult(dst);
+
+#if ENABLE(CODEBLOCK_SAMPLING)
+  m_jit.movl_i32m(reinterpret_cast<unsigned>(m_codeBlock),
+                  m_machine->sampler()->codeBlockSlot());
+#endif
 }
 
 void CTI::compileOpStrictEq(Instruction* instruction,
@@ -743,10 +776,10 @@ void CTI::compileOpStrictEq(Instruction* instruction,
   emitPutResult(dst);
 }
 
-void CTI::emitSlowScriptCheck(unsigned opcodeIndex) {
+void CTI::emitSlowScriptCheck(Instruction* vPC, unsigned opcodeIndex) {
   m_jit.subl_i8r(1, X86::esi);
   X86Assembler::JmpSrc skipTimeout = m_jit.emitUnlinkedJne();
-  emitCTICall(opcodeIndex, Machine::cti_timeout_check);
+  emitCTICall(vPC, opcodeIndex, Machine::cti_timeout_check);
 
   emitGetCTIParam(CTI_ARGS_globalData, X86::ecx);
   m_jit.movl_mr(OBJECT_OFFSET(JSGlobalData, machine), X86::ecx, X86::ecx);
@@ -972,7 +1005,8 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
   }
 }
 
-void CTI::compileBinaryArithOpSlowCase(OpcodeID opcodeID,
+void CTI::compileBinaryArithOpSlowCase(Instruction* vPC,
+                                       OpcodeID opcodeID,
                                        Vector<SlowCaseEntry>::iterator& iter,
                                        unsigned dst,
                                        unsigned src1,
@@ -1011,12 +1045,12 @@ void CTI::compileBinaryArithOpSlowCase(OpcodeID opcodeID,
   emitGetPutArg(src1, 0, X86::ecx);
   emitGetPutArg(src2, 4, X86::ecx);
   if (opcodeID == op_add)
-    emitCTICall(i, Machine::cti_op_add);
+    emitCTICall(vPC, i, Machine::cti_op_add);
   else if (opcodeID == op_sub)
-    emitCTICall(i, Machine::cti_op_sub);
+    emitCTICall(vPC, i, Machine::cti_op_sub);
   else {
     ASSERT(opcodeID == op_mul);
-    emitCTICall(i, Machine::cti_op_mul);
+    emitCTICall(vPC, i, Machine::cti_op_mul);
   }
   emitPutResult(dst);
 }
@@ -1029,16 +1063,17 @@ void CTI::privateCompileMainPass() {
   unsigned callLinkInfoIndex = 0;
 
   for (unsigned i = 0; i < instructionCount;) {
-    m_labels[i] = m_jit.label();
-
-#if ENABLE(SAMPLING_TOOL)
-    m_jit.movl_i32m(m_machine->getOpcodeID(instruction[i].u.opcode),
-                    &currentOpcodeID);
-#endif
-
     ASSERT_WITH_MESSAGE(m_machine->isOpcode(instruction[i].u.opcode),
                         "privateCompileMainPass gone bad @ %d", i);
-    switch (m_machine->getOpcodeID(instruction[i].u.opcode)) {
+
+#if ENABLE(OPCODE_SAMPLING)
+    m_jit.movl_i32m(m_machine->sampler()->encodeSample(instruction + i),
+                    m_machine->sampler()->sampleSlot());
+#endif
+
+    m_labels[i] = m_jit.label();
+    OpcodeID opcodeID = m_machine->getOpcodeID(instruction[i].u.opcode);
+    switch (opcodeID) {
       case op_mov: {
         unsigned src = instruction[i + 2].u.operand;
         if (isConstant(src))
@@ -1077,7 +1112,7 @@ void CTI::privateCompileMainPass() {
           else {
             emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
             emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
-            emitCTICall(i, Machine::cti_op_add);
+            emitCTICall(instruction + i, i, Machine::cti_op_add);
             emitPutResult(instruction[i + 1].u.operand);
           }
         }
@@ -1087,11 +1122,8 @@ void CTI::privateCompileMainPass() {
       }
       case op_end: {
         if (m_codeBlock->needsFullScopeChain)
-          emitCTICall(i, Machine::cti_op_end);
+          emitCTICall(instruction + i, i, Machine::cti_op_end);
         emitGetArg(instruction[i + 1].u.operand, X86::eax);
-#if ENABLE(SAMPLING_TOOL)
-        m_jit.movl_i32m(-1, &currentOpcodeID);
-#endif
         m_jit.pushl_m(
             RegisterFile::ReturnPC * static_cast<int>(sizeof(Register)),
             X86::edi);
@@ -1118,7 +1150,7 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_loop: {
-        emitSlowScriptCheck(i);
+        emitSlowScriptCheck(instruction, i);
 
         unsigned target = instruction[i + 1].u.operand;
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJmp(), i + 1 + target));
@@ -1126,7 +1158,7 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_loop_if_less: {
-        emitSlowScriptCheck(i);
+        emitSlowScriptCheck(instruction, i);
 
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
@@ -1148,7 +1180,7 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_loop_if_lesseq: {
-        emitSlowScriptCheck(i);
+        emitSlowScriptCheck(instruction, i);
 
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
@@ -1170,7 +1202,7 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_new_object: {
-        emitCTICall(i, Machine::cti_op_new_object);
+        emitCTICall(instruction + i, i, Machine::cti_op_new_object);
         emitPutResult(instruction[i + 1].u.operand);
         i += 2;
         break;
@@ -1334,7 +1366,7 @@ void CTI::privateCompileMainPass() {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 3].u.operand]);
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
-        emitCTICall(i, Machine::cti_op_del_by_id);
+        emitCTICall(instruction + i, i, Machine::cti_op_del_by_id);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -1379,13 +1411,13 @@ void CTI::privateCompileMainPass() {
         FuncDeclNode* func =
             (m_codeBlock->functions[instruction[i + 2].u.operand]).get();
         emitPutArgConstant(reinterpret_cast<unsigned>(func), 0);
-        emitCTICall(i, Machine::cti_op_new_func);
+        emitCTICall(instruction + i, i, Machine::cti_op_new_func);
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_call: {
-        compileOpCall(instruction + i, i, callLinkInfoIndex++);
+        compileOpCall(opcodeID, instruction + i, i, callLinkInfoIndex++);
         i += 7;
         break;
       }
@@ -1445,12 +1477,12 @@ void CTI::privateCompileMainPass() {
       }
       case op_tear_off_activation: {
         emitGetPutArg(instruction[i + 1].u.operand, 0, X86::ecx);
-        emitCTICall(i, Machine::cti_op_tear_off_activation);
+        emitCTICall(instruction + i, i, Machine::cti_op_tear_off_activation);
         i += 2;
         break;
       }
       case op_tear_off_arguments: {
-        emitCTICall(i, Machine::cti_op_tear_off_arguments);
+        emitCTICall(instruction + i, i, Machine::cti_op_tear_off_arguments);
         i += 1;
         break;
       }
@@ -1458,7 +1490,7 @@ void CTI::privateCompileMainPass() {
         // We could JIT generate the deref, only calling out to C when the
         // refcount hits zero.
         if (m_codeBlock->needsFullScopeChain)
-          emitCTICall(i, Machine::cti_op_ret_scopeChain);
+          emitCTICall(instruction + i, i, Machine::cti_op_ret_scopeChain);
 
         // Return the result in %eax.
         emitGetArg(instruction[i + 1].u.operand, X86::eax);
@@ -1481,7 +1513,7 @@ void CTI::privateCompileMainPass() {
                       X86::edx);
         emitPutArg(X86::edx, 0);
         emitPutArgConstant(instruction[i + 3].u.operand, 4);
-        emitCTICall(i, Machine::cti_op_new_array);
+        emitCTICall(instruction + i, i, Machine::cti_op_new_array);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -1490,13 +1522,13 @@ void CTI::privateCompileMainPass() {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
-        emitCTICall(i, Machine::cti_op_resolve);
+        emitCTICall(instruction + i, i, Machine::cti_op_resolve);
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_construct: {
-        compileOpCall(instruction + i, i, callLinkInfoIndex++, OpConstruct);
+        compileOpCall(opcodeID, instruction + i, i, callLinkInfoIndex++);
         i += 7;
         break;
       }
@@ -1548,7 +1580,7 @@ void CTI::privateCompileMainPass() {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 3].u.operand]);
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
-        emitCTICall(i, Machine::cti_op_resolve_func);
+        emitCTICall(instruction + i, i, Machine::cti_op_resolve_func);
         emitPutResult(instruction[i + 1].u.operand);
         emitPutResult(instruction[i + 2].u.operand, X86::edx);
         i += 4;
@@ -1604,7 +1636,7 @@ void CTI::privateCompileMainPass() {
       }
         CTI_COMPILE_BINARY_OP(op_lesseq)
       case op_loop_if_true: {
-        emitSlowScriptCheck(i);
+        emitSlowScriptCheck(instruction, i);
 
         unsigned target = instruction[i + 2].u.operand;
         emitGetArg(instruction[i + 1].u.operand, X86::eax);
@@ -1627,14 +1659,14 @@ void CTI::privateCompileMainPass() {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
-        emitCTICall(i, Machine::cti_op_resolve_base);
+        emitCTICall(instruction + i, i, Machine::cti_op_resolve_base);
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_negate: {
         emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
-        emitCTICall(i, Machine::cti_op_negate);
+        emitCTICall(instruction + i, i, Machine::cti_op_negate);
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
         break;
@@ -1645,7 +1677,7 @@ void CTI::privateCompileMainPass() {
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
         emitPutArgConstant(
             instruction[i + 3].u.operand + m_codeBlock->needsFullScopeChain, 4);
-        emitCTICall(i, Machine::cti_op_resolve_skip);
+        emitCTICall(instruction + i, i, Machine::cti_op_resolve_skip);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -1678,7 +1710,7 @@ void CTI::privateCompileMainPass() {
         emitPutArgConstant(globalObject, 0);
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
         emitPutArgConstant(reinterpret_cast<unsigned>(instruction + i), 8);
-        emitCTICall(i, Machine::cti_op_resolve_global);
+        emitCTICall(instruction + i, i, Machine::cti_op_resolve_global);
         emitPutResult(instruction[i + 1].u.operand);
         m_jit.link(end, m_jit.label());
         i += 6;
@@ -1925,7 +1957,7 @@ void CTI::privateCompileMainPass() {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 3].u.operand]);
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
-        emitCTICall(i, Machine::cti_op_resolve_with_base);
+        emitCTICall(instruction + i, i, Machine::cti_op_resolve_with_base);
         emitPutResult(instruction[i + 1].u.operand);
         emitPutResult(instruction[i + 2].u.operand, X86::edx);
         i += 4;
@@ -1936,7 +1968,7 @@ void CTI::privateCompileMainPass() {
             (m_codeBlock->functionExpressions[instruction[i + 2].u.operand])
                 .get();
         emitPutArgConstant(reinterpret_cast<unsigned>(func), 0);
-        emitCTICall(i, Machine::cti_op_new_func_exp);
+        emitCTICall(instruction + i, i, Machine::cti_op_new_func_exp);
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
         break;
@@ -2020,7 +2052,7 @@ void CTI::privateCompileMainPass() {
         RegExp* regExp =
             m_codeBlock->regexps[instruction[i + 2].u.operand].get();
         emitPutArgConstant(reinterpret_cast<unsigned>(regExp), 0);
-        emitCTICall(i, Machine::cti_op_new_regexp);
+        emitCTICall(instruction + i, i, Machine::cti_op_new_regexp);
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
         break;
@@ -2035,13 +2067,13 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_call_eval: {
-        compileOpCall(instruction + i, i, callLinkInfoIndex++, OpCallEval);
+        compileOpCall(opcodeID, instruction + i, i, callLinkInfoIndex++);
         i += 7;
         break;
       }
       case op_throw: {
         emitGetPutArg(instruction[i + 1].u.operand, 0, X86::ecx);
-        emitCTICall(i, Machine::cti_op_throw);
+        emitCTICall(instruction + i, i, Machine::cti_op_throw);
         m_jit.addl_i8r(0x20, X86::esp);
         m_jit.popl_r(X86::ebx);
         m_jit.popl_r(X86::edi);
@@ -2052,7 +2084,7 @@ void CTI::privateCompileMainPass() {
       }
       case op_get_pnames: {
         emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
-        emitCTICall(i, Machine::cti_op_get_pnames);
+        emitCTICall(instruction + i, i, Machine::cti_op_get_pnames);
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
         break;
@@ -2060,7 +2092,7 @@ void CTI::privateCompileMainPass() {
       case op_next_pname: {
         emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
         unsigned target = instruction[i + 3].u.operand;
-        emitCTICall(i, Machine::cti_op_next_pname);
+        emitCTICall(instruction + i, i, Machine::cti_op_next_pname);
         m_jit.testl_rr(X86::eax, X86::eax);
         X86Assembler::JmpSrc endOfIter = m_jit.emitUnlinkedJe();
         emitPutResult(instruction[i + 1].u.operand);
@@ -2071,12 +2103,12 @@ void CTI::privateCompileMainPass() {
       }
       case op_push_scope: {
         emitGetPutArg(instruction[i + 1].u.operand, 0, X86::ecx);
-        emitCTICall(i, Machine::cti_op_push_scope);
+        emitCTICall(instruction + i, i, Machine::cti_op_push_scope);
         i += 2;
         break;
       }
       case op_pop_scope: {
-        emitCTICall(i, Machine::cti_op_pop_scope);
+        emitCTICall(instruction + i, i, Machine::cti_op_pop_scope);
         i += 1;
         break;
       }
@@ -2121,7 +2153,7 @@ void CTI::privateCompileMainPass() {
       case op_in: {
         emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
         emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
-        emitCTICall(i, Machine::cti_op_in);
+        emitCTICall(instruction + i, i, Machine::cti_op_in);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -2131,7 +2163,7 @@ void CTI::privateCompileMainPass() {
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
         emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
-        emitCTICall(i, Machine::cti_op_push_new_scope);
+        emitCTICall(instruction + i, i, Machine::cti_op_push_new_scope);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -2145,7 +2177,7 @@ void CTI::privateCompileMainPass() {
       case op_jmp_scopes: {
         unsigned count = instruction[i + 1].u.operand;
         emitPutArgConstant(count, 0);
-        emitCTICall(i, Machine::cti_op_jmp_scopes);
+        emitCTICall(instruction + i, i, Machine::cti_op_jmp_scopes);
         unsigned target = instruction[i + 2].u.operand;
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJmp(), i + 2 + target));
         i += 3;
@@ -2155,7 +2187,7 @@ void CTI::privateCompileMainPass() {
         emitGetPutArg(instruction[i + 1].u.operand, 0, X86::ecx);
         emitPutArgConstant(instruction[i + 2].u.operand, 4);
         emitGetPutArg(instruction[i + 3].u.operand, 8, X86::ecx);
-        emitCTICall(i, Machine::cti_op_put_by_index);
+        emitCTICall(instruction + i, i, Machine::cti_op_put_by_index);
         i += 4;
         break;
       }
@@ -2174,7 +2206,7 @@ void CTI::privateCompileMainPass() {
 
         emitGetPutArg(scrutinee, 0, X86::ecx);
         emitPutArgConstant(tableIndex, 4);
-        emitCTICall(i, Machine::cti_op_switch_imm);
+        emitCTICall(instruction + i, i, Machine::cti_op_switch_imm);
         m_jit.jmp_r(X86::eax);
         i += 4;
         break;
@@ -2194,7 +2226,7 @@ void CTI::privateCompileMainPass() {
 
         emitGetPutArg(scrutinee, 0, X86::ecx);
         emitPutArgConstant(tableIndex, 4);
-        emitCTICall(i, Machine::cti_op_switch_char);
+        emitCTICall(instruction + i, i, Machine::cti_op_switch_char);
         m_jit.jmp_r(X86::eax);
         i += 4;
         break;
@@ -2212,7 +2244,7 @@ void CTI::privateCompileMainPass() {
 
         emitGetPutArg(scrutinee, 0, X86::ecx);
         emitPutArgConstant(tableIndex, 4);
-        emitCTICall(i, Machine::cti_op_switch_string);
+        emitCTICall(instruction + i, i, Machine::cti_op_switch_string);
         m_jit.jmp_r(X86::eax);
         i += 4;
         break;
@@ -2220,7 +2252,7 @@ void CTI::privateCompileMainPass() {
       case op_del_by_val: {
         emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
         emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
-        emitCTICall(i, Machine::cti_op_del_by_val);
+        emitCTICall(instruction + i, i, Machine::cti_op_del_by_val);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -2231,7 +2263,7 @@ void CTI::privateCompileMainPass() {
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
         emitGetPutArg(instruction[i + 3].u.operand, 8, X86::ecx);
-        emitCTICall(i, Machine::cti_op_put_getter);
+        emitCTICall(instruction + i, i, Machine::cti_op_put_getter);
         i += 4;
         break;
       }
@@ -2241,7 +2273,7 @@ void CTI::privateCompileMainPass() {
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
         emitGetPutArg(instruction[i + 3].u.operand, 8, X86::ecx);
-        emitCTICall(i, Machine::cti_op_put_setter);
+        emitCTICall(instruction + i, i, Machine::cti_op_put_setter);
         i += 4;
         break;
       }
@@ -2251,7 +2283,7 @@ void CTI::privateCompileMainPass() {
         emitPutArgConstant(instruction[i + 2].u.operand, 0);
         emitPutArgConstant(asInteger(message), 4);
         emitPutArgConstant(m_codeBlock->lineNumberForVPC(&instruction[i]), 8);
-        emitCTICall(i, Machine::cti_op_new_error);
+        emitCTICall(instruction + i, i, Machine::cti_op_new_error);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -2260,7 +2292,7 @@ void CTI::privateCompileMainPass() {
         emitPutArgConstant(instruction[i + 1].u.operand, 0);
         emitPutArgConstant(instruction[i + 2].u.operand, 4);
         emitPutArgConstant(instruction[i + 3].u.operand, 8);
-        emitCTICall(i, Machine::cti_op_debug);
+        emitCTICall(instruction + i, i, Machine::cti_op_debug);
         i += 4;
         break;
       }
@@ -2349,16 +2381,17 @@ void CTI::privateCompileMainPass() {
         for (size_t j = 0; j < count; ++j)
           emitInitRegister(j);
 
-        emitCTICall(i, Machine::cti_op_push_activation);
+        emitCTICall(instruction + i, i, Machine::cti_op_push_activation);
         emitPutResult(instruction[i + 1].u.operand);
 
         i += 2;
         break;
       }
       case op_create_arguments: {
-        emitCTICall(i, (m_codeBlock->numParameters == 1)
-                           ? Machine::cti_op_create_arguments_no_params
-                           : Machine::cti_op_create_arguments);
+        emitCTICall(instruction + i, i,
+                    (m_codeBlock->numParameters == 1)
+                        ? Machine::cti_op_create_arguments_no_params
+                        : Machine::cti_op_create_arguments);
         i += 1;
         break;
       }
@@ -2380,7 +2413,7 @@ void CTI::privateCompileMainPass() {
         m_jit.cmpl_i32m(0, X86::eax);
         X86Assembler::JmpSrc noProfiler = m_jit.emitUnlinkedJe();
         emitGetPutArg(instruction[i + 1].u.operand, 0, X86::eax);
-        emitCTICall(i, Machine::cti_op_profile_will_call);
+        emitCTICall(instruction + i, i, Machine::cti_op_profile_will_call);
         m_jit.link(noProfiler, m_jit.label());
 
         i += 2;
@@ -2391,7 +2424,7 @@ void CTI::privateCompileMainPass() {
         m_jit.cmpl_i32m(0, X86::eax);
         X86Assembler::JmpSrc noProfiler = m_jit.emitUnlinkedJe();
         emitGetPutArg(instruction[i + 1].u.operand, 0, X86::eax);
-        emitCTICall(i, Machine::cti_op_profile_did_call);
+        emitCTICall(instruction + i, i, Machine::cti_op_profile_did_call);
         m_jit.link(noProfiler, m_jit.label());
 
         i += 2;
@@ -2427,7 +2460,7 @@ void CTI::privateCompileLinkPass() {
     m_jit.link(iter->from, m_jit.label());                    \
     emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx); \
     emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx); \
-    emitCTICall(i, Machine::cti_##name);                      \
+    emitCTICall(instruction + i, i, Machine::cti_##name);     \
     emitPutResult(instruction[i + 1].u.operand);              \
     i += 4;                                                   \
     break;                                                    \
@@ -2447,7 +2480,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_convert_this);
+        emitCTICall(instruction + i, i, Machine::cti_op_convert_this);
         emitPutResult(instruction[i + 1].u.operand);
         i += 2;
         break;
@@ -2463,7 +2496,7 @@ void CTI::privateCompileSlowCases() {
           m_jit.link(notImm, m_jit.label());
           emitGetPutArg(src1, 0, X86::ecx);
           emitPutArg(X86::edx, 4);
-          emitCTICall(i, Machine::cti_op_add);
+          emitCTICall(instruction + i, i, Machine::cti_op_add);
           emitPutResult(dst);
         } else if (JSValue* value = getConstantImmediateNumericArg(src2)) {
           X86Assembler::JmpSrc notImm = iter->from;
@@ -2472,14 +2505,14 @@ void CTI::privateCompileSlowCases() {
           m_jit.link(notImm, m_jit.label());
           emitPutArg(X86::eax, 0);
           emitGetPutArg(src2, 4, X86::ecx);
-          emitCTICall(i, Machine::cti_op_add);
+          emitCTICall(instruction + i, i, Machine::cti_op_add);
           emitPutResult(dst);
         } else {
           OperandTypes types =
               OperandTypes::fromInt(instruction[i + 4].u.operand);
           if (types.first().mightBeNumber() && types.second().mightBeNumber())
-            compileBinaryArithOpSlowCase(op_add, iter, dst, src1, src2, types,
-                                         i);
+            compileBinaryArithOpSlowCase(instruction, op_add, iter, dst, src1,
+                                         src2, types, i);
           else
             ASSERT_NOT_REACHED();
         }
@@ -2499,7 +2532,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(notImm, m_jit.label());
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::edx, 4);
-        emitCTICall(i, Machine::cti_op_get_by_val);
+        emitCTICall(instruction + i, i, Machine::cti_op_get_by_val);
         emitPutResult(instruction[i + 1].u.operand);
         m_jit.link(m_jit.emitUnlinkedJmp(), m_labels[i + 4]);
 
@@ -2526,7 +2559,7 @@ void CTI::privateCompileSlowCases() {
       }
       case op_sub: {
         compileBinaryArithOpSlowCase(
-            op_sub, iter, instruction[i + 1].u.operand,
+            instruction, op_sub, iter, instruction[i + 1].u.operand,
             instruction[i + 2].u.operand, instruction[i + 3].u.operand,
             OperandTypes::fromInt(instruction[i + 4].u.operand), i);
         i += 5;
@@ -2537,7 +2570,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link((++iter)->from, m_jit.label());
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::ecx, 4);
-        emitCTICall(i, Machine::cti_op_rshift);
+        emitCTICall(instruction + i, i, Machine::cti_op_rshift);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -2552,13 +2585,13 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(notImm2, m_jit.label());
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::ecx, 4);
-        emitCTICall(i, Machine::cti_op_lshift);
+        emitCTICall(instruction + i, i, Machine::cti_op_lshift);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_loop_if_less: {
-        emitSlowScriptCheck(i);
+        emitSlowScriptCheck(instruction, i);
 
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
@@ -2567,7 +2600,7 @@ void CTI::privateCompileSlowCases() {
           m_jit.link(iter->from, m_jit.label());
           emitPutArg(X86::edx, 0);
           emitGetPutArg(instruction[i + 2].u.operand, 4, X86::ecx);
-          emitCTICall(i, Machine::cti_op_loop_if_less);
+          emitCTICall(instruction + i, i, Machine::cti_op_loop_if_less);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJne(), m_labels[i + 3 + target]);
         } else {
@@ -2575,7 +2608,7 @@ void CTI::privateCompileSlowCases() {
           m_jit.link((++iter)->from, m_jit.label());
           emitPutArg(X86::eax, 0);
           emitPutArg(X86::edx, 4);
-          emitCTICall(i, Machine::cti_op_loop_if_less);
+          emitCTICall(instruction + i, i, Machine::cti_op_loop_if_less);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJne(), m_labels[i + 3 + target]);
         }
@@ -2591,7 +2624,8 @@ void CTI::privateCompileSlowCases() {
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::edx, 8);
-        X86Assembler::JmpSrc call = emitCTICall(i, Machine::cti_op_put_by_id);
+        X86Assembler::JmpSrc call =
+            emitCTICall(instruction + i, i, Machine::cti_op_put_by_id);
 
         // Track the location of the call; this will be used to recover repatch
         // information.
@@ -2626,7 +2660,8 @@ void CTI::privateCompileSlowCases() {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 3].u.operand]);
         emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
-        X86Assembler::JmpSrc call = emitCTICall(i, Machine::cti_op_get_by_id);
+        X86Assembler::JmpSrc call =
+            emitCTICall(instruction + i, i, Machine::cti_op_get_by_id);
         ASSERT(X86Assembler::getDifferenceBetweenLabels(coldPathBegin, call) ==
                repatchOffsetGetByIdSlowCaseCall);
         emitPutResult(instruction[i + 1].u.operand);
@@ -2644,7 +2679,7 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_loop_if_lesseq: {
-        emitSlowScriptCheck(i);
+        emitSlowScriptCheck(instruction, i);
 
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
@@ -2653,7 +2688,7 @@ void CTI::privateCompileSlowCases() {
           m_jit.link(iter->from, m_jit.label());
           emitPutArg(X86::edx, 0);
           emitGetPutArg(instruction[i + 2].u.operand, 4, X86::ecx);
-          emitCTICall(i, Machine::cti_op_loop_if_lesseq);
+          emitCTICall(instruction + i, i, Machine::cti_op_loop_if_lesseq);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJne(), m_labels[i + 3 + target]);
         } else {
@@ -2661,7 +2696,7 @@ void CTI::privateCompileSlowCases() {
           m_jit.link((++iter)->from, m_jit.label());
           emitPutArg(X86::eax, 0);
           emitPutArg(X86::edx, 4);
-          emitCTICall(i, Machine::cti_op_loop_if_lesseq);
+          emitCTICall(instruction + i, i, Machine::cti_op_loop_if_lesseq);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJne(), m_labels[i + 3 + target]);
         }
@@ -2677,7 +2712,7 @@ void CTI::privateCompileSlowCases() {
             X86::eax);
         m_jit.link(notImm, m_jit.label());
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_pre_inc);
+        emitCTICall(instruction + i, i, Machine::cti_op_pre_inc);
         emitPutResult(srcDst);
         i += 2;
         break;
@@ -2693,7 +2728,7 @@ void CTI::privateCompileSlowCases() {
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::edx, 4);
         emitPutArg(X86::ecx, 8);
-        emitCTICall(i, Machine::cti_op_put_by_val);
+        emitCTICall(instruction + i, i, Machine::cti_op_put_by_val);
         m_jit.link(m_jit.emitUnlinkedJmp(), m_labels[i + 4]);
 
         // slow cases for immediate int accesses to arrays
@@ -2703,17 +2738,17 @@ void CTI::privateCompileSlowCases() {
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::edx, 4);
         emitPutArg(X86::ecx, 8);
-        emitCTICall(i, Machine::cti_op_put_by_val_array);
+        emitCTICall(instruction + i, i, Machine::cti_op_put_by_val_array);
 
         i += 4;
         break;
       }
       case op_loop_if_true: {
-        emitSlowScriptCheck(i);
+        emitSlowScriptCheck(instruction, i);
 
         m_jit.link(iter->from, m_jit.label());
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_jtrue);
+        emitCTICall(instruction + i, i, Machine::cti_op_jtrue);
         m_jit.testl_rr(X86::eax, X86::eax);
         unsigned target = instruction[i + 2].u.operand;
         m_jit.link(m_jit.emitUnlinkedJne(), m_labels[i + 2 + target]);
@@ -2729,7 +2764,7 @@ void CTI::privateCompileSlowCases() {
             X86::eax);
         m_jit.link(notImm, m_jit.label());
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_pre_dec);
+        emitCTICall(instruction + i, i, Machine::cti_op_pre_dec);
         emitPutResult(srcDst);
         i += 2;
         break;
@@ -2742,7 +2777,7 @@ void CTI::privateCompileSlowCases() {
           m_jit.link(iter->from, m_jit.label());
           emitPutArg(X86::edx, 0);
           emitGetPutArg(instruction[i + 2].u.operand, 4, X86::ecx);
-          emitCTICall(i, Machine::cti_op_jless);
+          emitCTICall(instruction + i, i, Machine::cti_op_jless);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJe(), m_labels[i + 3 + target]);
         } else {
@@ -2750,7 +2785,7 @@ void CTI::privateCompileSlowCases() {
           m_jit.link((++iter)->from, m_jit.label());
           emitPutArg(X86::eax, 0);
           emitPutArg(X86::edx, 4);
-          emitCTICall(i, Machine::cti_op_jless);
+          emitCTICall(instruction + i, i, Machine::cti_op_jless);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJe(), m_labels[i + 3 + target]);
         }
@@ -2761,7 +2796,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
         m_jit.xorl_i8r(JSImmediate::FullTagTypeBool, X86::eax);
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_not);
+        emitCTICall(instruction + i, i, Machine::cti_op_not);
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
         break;
@@ -2769,7 +2804,7 @@ void CTI::privateCompileSlowCases() {
       case op_jfalse: {
         m_jit.link(iter->from, m_jit.label());
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_jtrue);
+        emitCTICall(instruction + i, i, Machine::cti_op_jtrue);
         m_jit.testl_rr(X86::eax, X86::eax);
         unsigned target = instruction[i + 2].u.operand;
         m_jit.link(m_jit.emitUnlinkedJe(),
@@ -2782,7 +2817,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_post_inc);
+        emitCTICall(instruction + i, i, Machine::cti_op_post_inc);
         emitPutResult(instruction[i + 1].u.operand);
         emitPutResult(srcDst, X86::edx);
         i += 3;
@@ -2791,7 +2826,7 @@ void CTI::privateCompileSlowCases() {
       case op_bitnot: {
         m_jit.link(iter->from, m_jit.label());
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_bitnot);
+        emitCTICall(instruction + i, i, Machine::cti_op_bitnot);
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
         break;
@@ -2804,19 +2839,19 @@ void CTI::privateCompileSlowCases() {
           m_jit.link(iter->from, m_jit.label());
           emitGetPutArg(src1, 0, X86::ecx);
           emitPutArg(X86::eax, 4);
-          emitCTICall(i, Machine::cti_op_bitand);
+          emitCTICall(instruction + i, i, Machine::cti_op_bitand);
           emitPutResult(dst);
         } else if (getConstantImmediateNumericArg(src2)) {
           m_jit.link(iter->from, m_jit.label());
           emitPutArg(X86::eax, 0);
           emitGetPutArg(src2, 4, X86::ecx);
-          emitCTICall(i, Machine::cti_op_bitand);
+          emitCTICall(instruction + i, i, Machine::cti_op_bitand);
           emitPutResult(dst);
         } else {
           m_jit.link(iter->from, m_jit.label());
           emitGetPutArg(src1, 0, X86::ecx);
           emitPutArg(X86::edx, 4);
-          emitCTICall(i, Machine::cti_op_bitand);
+          emitCTICall(instruction + i, i, Machine::cti_op_bitand);
           emitPutResult(dst);
         }
         i += 5;
@@ -2825,7 +2860,7 @@ void CTI::privateCompileSlowCases() {
       case op_jtrue: {
         m_jit.link(iter->from, m_jit.label());
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_jtrue);
+        emitCTICall(instruction + i, i, Machine::cti_op_jtrue);
         m_jit.testl_rr(X86::eax, X86::eax);
         unsigned target = instruction[i + 2].u.operand;
         m_jit.link(m_jit.emitUnlinkedJne(), m_labels[i + 2 + target]);
@@ -2837,7 +2872,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_post_dec);
+        emitCTICall(instruction + i, i, Machine::cti_op_post_dec);
         emitPutResult(instruction[i + 1].u.operand);
         emitPutResult(srcDst, X86::edx);
         i += 3;
@@ -2847,7 +2882,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::edx, 4);
-        emitCTICall(i, Machine::cti_op_bitxor);
+        emitCTICall(instruction + i, i, Machine::cti_op_bitxor);
         emitPutResult(instruction[i + 1].u.operand);
         i += 5;
         break;
@@ -2856,7 +2891,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::edx, 4);
-        emitCTICall(i, Machine::cti_op_bitor);
+        emitCTICall(instruction + i, i, Machine::cti_op_bitor);
         emitPutResult(instruction[i + 1].u.operand);
         i += 5;
         break;
@@ -2865,7 +2900,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::edx, 4);
-        emitCTICall(i, Machine::cti_op_eq);
+        emitCTICall(instruction + i, i, Machine::cti_op_eq);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -2874,7 +2909,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::edx, 4);
-        emitCTICall(i, Machine::cti_op_neq);
+        emitCTICall(instruction + i, i, Machine::cti_op_neq);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -2886,7 +2921,7 @@ void CTI::privateCompileSlowCases() {
         emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
         emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
         emitGetPutArg(instruction[i + 4].u.operand, 8, X86::ecx);
-        emitCTICall(i, Machine::cti_op_instanceof);
+        emitCTICall(instruction + i, i, Machine::cti_op_instanceof);
         emitPutResult(instruction[i + 1].u.operand);
         i += 5;
         break;
@@ -2901,7 +2936,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(notImm2, m_jit.label());
         emitPutArg(X86::eax, 0);
         emitPutArg(X86::ecx, 4);
-        emitCTICall(i, Machine::cti_op_mod);
+        emitCTICall(instruction + i, i, Machine::cti_op_mod);
         emitPutResult(instruction[i + 1].u.operand);
         i += 4;
         break;
@@ -2919,7 +2954,7 @@ void CTI::privateCompileSlowCases() {
           // for 0 since this should produce a result of -0.
           emitGetPutArg(src1, 0, X86::ecx);
           emitGetPutArg(src2, 4, X86::ecx);
-          emitCTICall(i, Machine::cti_op_mul);
+          emitCTICall(instruction + i, i, Machine::cti_op_mul);
           emitPutResult(dst);
         } else if (src2Value &&
                    ((value = JSImmediate::intValue(src2Value)) > 0)) {
@@ -2928,11 +2963,11 @@ void CTI::privateCompileSlowCases() {
           // for 0 since this should produce a result of -0.
           emitGetPutArg(src1, 0, X86::ecx);
           emitGetPutArg(src2, 4, X86::ecx);
-          emitCTICall(i, Machine::cti_op_mul);
+          emitCTICall(instruction + i, i, Machine::cti_op_mul);
           emitPutResult(dst);
         } else
           compileBinaryArithOpSlowCase(
-              op_mul, iter, dst, src1, src2,
+              instruction, op_mul, iter, dst, src1, src2,
               OperandTypes::fromInt(instruction[i + 4].u.operand), i);
         i += 5;
         break;
@@ -2961,9 +2996,10 @@ void CTI::privateCompileSlowCases() {
             m_jit.emitUnlinkedJne();
 
         // This handles JSFunctions
-        emitCTICall(i, (opcodeID == op_construct)
-                           ? Machine::cti_op_construct_JSConstruct
-                           : Machine::cti_op_call_JSFunction);
+        emitCTICall(instruction + i, i,
+                    (opcodeID == op_construct)
+                        ? Machine::cti_op_construct_JSConstruct
+                        : Machine::cti_op_call_JSFunction);
         // initialize the new call frame (pointed to by edx, after the last
         // call), then set edi to point to it.
         compileOpCallInitializeCallFrame(callee, argCount);
@@ -2973,7 +3009,8 @@ void CTI::privateCompileSlowCases() {
         CallLinkInfo* info = &(m_codeBlock->callLinkInfos[callLinkInfoIndex]);
         emitPutArgConstant(reinterpret_cast<unsigned>(info), 4);
         m_callStructureStubCompilationInfo[callLinkInfoIndex]
-            .callReturnLocation = emitCTICall(i, Machine::cti_vm_lazyLinkCall);
+            .callReturnLocation =
+            emitCTICall(instruction + i, i, Machine::cti_vm_lazyLinkCall);
         emitNakedCall(i, X86::eax);
         X86Assembler::JmpSrc storeResultForFirstRun = m_jit.emitUnlinkedJmp();
 
@@ -2999,16 +3036,18 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(isNotObject, notJSFunctionlabel);
         m_jit.link(callLinkFailNotObject, notJSFunctionlabel);
         m_jit.link(callLinkFailNotJSFunction, notJSFunctionlabel);
-        emitCTICall(i, ((opcodeID == op_construct)
-                            ? Machine::cti_op_construct_NotJSConstruct
-                            : Machine::cti_op_call_NotJSFunction));
+        emitCTICall(instruction + i, i,
+                    ((opcodeID == op_construct)
+                         ? Machine::cti_op_construct_NotJSConstruct
+                         : Machine::cti_op_call_NotJSFunction));
         X86Assembler::JmpSrc wasNotJSFunction = m_jit.emitUnlinkedJmp();
 
         // Next, handle JSFunctions...
         m_jit.link(isJSFunction, m_jit.label());
-        emitCTICall(i, (opcodeID == op_construct)
-                           ? Machine::cti_op_construct_JSConstruct
-                           : Machine::cti_op_call_JSFunction);
+        emitCTICall(instruction + i, i,
+                    (opcodeID == op_construct)
+                        ? Machine::cti_op_construct_JSConstruct
+                        : Machine::cti_op_call_JSFunction);
         // initialize the new call frame (pointed to by edx, after the last
         // call).
         compileOpCallInitializeCallFrame(callee, argCount);
@@ -3024,7 +3063,7 @@ void CTI::privateCompileSlowCases() {
         // make the call.
         m_jit.testl_rr(X86::eax, X86::eax);
         X86Assembler::JmpSrc hasCode = m_jit.emitUnlinkedJne();
-        emitCTICall(i, Machine::cti_vm_compile);
+        emitCTICall(instruction + i, i, Machine::cti_vm_compile);
         m_jit.link(hasCode, m_jit.label());
 
         emitNakedCall(i, X86::eax);
@@ -3035,7 +3074,12 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(storeResultForFirstRun, storeResult);
         emitPutResult(dst);
 
+#if ENABLE(CODEBLOCK_SAMPLING)
+        m_jit.movl_i32m(reinterpret_cast<unsigned>(m_codeBlock),
+                        m_machine->sampler()->codeBlockSlot());
+#endif
         ++callLinkInfoIndex;
+
         i += 7;
         break;
       }
@@ -3044,7 +3088,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
 
         emitPutArg(X86::eax, 0);
-        emitCTICall(i, Machine::cti_op_to_jsnumber);
+        emitCTICall(instruction + i, i, Machine::cti_op_to_jsnumber);
 
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
@@ -3065,6 +3109,16 @@ void CTI::privateCompileSlowCases() {
 }
 
 void CTI::privateCompile() {
+#if ENABLE(CODEBLOCK_SAMPLING)
+  m_jit.movl_i32m(reinterpret_cast<unsigned>(m_codeBlock),
+                  m_machine->sampler()->codeBlockSlot());
+#endif
+#if ENABLE(OPCODE_SAMPLING)
+  m_jit.movl_i32m(
+      m_machine->sampler()->encodeSample(m_codeBlock->instructions.begin()),
+      m_machine->sampler()->sampleSlot());
+#endif
+
   // Could use a popl_m, but would need to offset the following instruction if
   // so.
   m_jit.popl_r(X86::ecx);
@@ -3092,7 +3146,8 @@ void CTI::privateCompile() {
 
   if (m_codeBlock->codeType == FunctionCode) {
     m_jit.link(slowRegisterFileCheck, m_jit.label());
-    emitCTICall(0, Machine::cti_register_file_check);
+    emitCTICall(m_codeBlock->instructions.begin(), 0,
+                Machine::cti_register_file_check);
     X86Assembler::JmpSrc backToBody = m_jit.emitUnlinkedJmp();
     m_jit.link(backToBody, afterRegisterFileCheck);
   }

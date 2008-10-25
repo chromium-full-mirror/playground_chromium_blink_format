@@ -234,7 +234,7 @@ class CTI {
   static const int repatchOffsetGetByIdStructureID = 19;
   static const int repatchOffsetGetByIdBranchToSlowCase = 25;
   static const int repatchOffsetGetByIdPropertyMapOffset = 34;
-#if ENABLE(SAMPLING_TOOL)
+#if ENABLE(OPCODE_SAMPLING)
   static const int repatchOffsetGetByIdSlowCaseCall =
       27 + 4 + ctiArgumentInitSize;
 #else
@@ -402,11 +402,10 @@ class CTI {
   void* privateCompileStringLengthTrampoline();
   void privateCompilePatchGetArrayLength(void* returnAddress);
 
-  enum CompileOpCallType { OpCallNormal, OpCallEval, OpConstruct };
-  void compileOpCall(Instruction* instruction,
+  void compileOpCall(OpcodeID,
+                     Instruction* instruction,
                      unsigned i,
-                     unsigned structureIDInstructionIndex,
-                     CompileOpCallType type = OpCallNormal);
+                     unsigned callLinkInfoIndex);
   void compileOpCallInitializeCallFrame(unsigned callee, unsigned argCount);
   void compileOpCallSetupArgs(Instruction* instruction,
                               bool isConstruct,
@@ -429,7 +428,8 @@ class CTI {
                             unsigned src2,
                             OperandTypes opi,
                             unsigned i);
-  void compileBinaryArithOpSlowCase(OpcodeID,
+  void compileBinaryArithOpSlowCase(Instruction*,
+                                    OpcodeID,
                                     Vector<SlowCaseEntry>::iterator& iter,
                                     unsigned dst,
                                     unsigned src1,
@@ -484,13 +484,27 @@ class CTI {
 
   X86Assembler::JmpSrc emitNakedCall(unsigned opcodeIndex, X86::RegisterID);
   X86Assembler::JmpSrc emitNakedCall(unsigned opcodeIndex, void (*function)());
-  X86Assembler::JmpSrc emitCTICall(unsigned opcodeIndex, CTIHelper_j);
-  X86Assembler::JmpSrc emitCTICall(unsigned opcodeIndex, CTIHelper_o);
-  X86Assembler::JmpSrc emitCTICall(unsigned opcodeIndex, CTIHelper_p);
-  X86Assembler::JmpSrc emitCTICall(unsigned opcodeIndex, CTIHelper_v);
-  X86Assembler::JmpSrc emitCTICall(unsigned opcodeIndex, CTIHelper_s);
-  X86Assembler::JmpSrc emitCTICall(unsigned opcodeIndex, CTIHelper_b);
-  X86Assembler::JmpSrc emitCTICall(unsigned opcodeIndex, CTIHelper_2);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned opcodeIndex,
+                                   CTIHelper_j);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned opcodeIndex,
+                                   CTIHelper_o);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned opcodeIndex,
+                                   CTIHelper_p);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned opcodeIndex,
+                                   CTIHelper_v);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned opcodeIndex,
+                                   CTIHelper_s);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned opcodeIndex,
+                                   CTIHelper_b);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned opcodeIndex,
+                                   CTIHelper_2);
 
   void emitGetVariableObjectRegister(X86Assembler::RegisterID variableObject,
                                      int index,
@@ -499,7 +513,7 @@ class CTI {
                                      X86Assembler::RegisterID variableObject,
                                      int index);
 
-  void emitSlowScriptCheck(unsigned opcodeIndex);
+  void emitSlowScriptCheck(Instruction*, unsigned opcodeIndex);
 #ifndef NDEBUG
   void printOpcodeOperandTypes(unsigned src1, unsigned src2);
 #endif

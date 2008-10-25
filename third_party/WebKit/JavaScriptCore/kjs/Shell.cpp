@@ -369,10 +369,9 @@ static bool runWithScripts(GlobalObject* globalObject,
   if (dump)
     CodeGenerator::setDumpsGeneratedCode(true);
 
-#if ENABLE(SAMPLING_TOOL)
+#if ENABLE(OPCODE_SAMPLING)
   Machine* machine = globalObject->globalData()->machine;
-  machine->m_sampler = new SamplingTool();
-  machine->m_sampler->start();
+  machine->setSampler(new SamplingTool(machine));
 #endif
 
   bool success = true;
@@ -385,6 +384,9 @@ static bool runWithScripts(GlobalObject* globalObject,
     if (prettyPrint)
       prettyPrintScript(globalObject->globalExec(), fileName, script);
     else {
+#if ENABLE(OPCODE_SAMPLING)
+      machine->sampler()->start();
+#endif
       Completion completion = Interpreter::evaluate(
           globalObject->globalExec(), globalObject->globalScopeChain(),
           makeSource(script.data(), fileName));
@@ -401,13 +403,16 @@ static bool runWithScripts(GlobalObject* globalObject,
       }
 
       globalObject->globalExec()->clearException();
+
+#if ENABLE(OPCODE_SAMPLING)
+      machine->sampler()->stop();
+#endif
     }
   }
 
-#if ENABLE(SAMPLING_TOOL)
-  machine->m_sampler->stop();
-  machine->m_sampler->dump(globalObject->globalExec());
-  delete machine->m_sampler;
+#if ENABLE(OPCODE_SAMPLING)
+  machine->sampler()->dump(globalObject->globalExec());
+  delete machine->sampler();
 #endif
   return success;
 }

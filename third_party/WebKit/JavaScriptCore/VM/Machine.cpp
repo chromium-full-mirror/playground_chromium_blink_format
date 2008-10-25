@@ -1032,20 +1032,21 @@ JSValue* Machine::execute(ProgramNode* programNode,
     (*profiler)->willExecute(newCallFrame, programNode->sourceURL(),
                              programNode->lineNo());
 
-  m_reentryDepth++;
-#if ENABLE(CTI)
-  if (!codeBlock->ctiCode)
-    CTI::compile(this, newCallFrame, codeBlock);
-  JSValue* result =
-      CTI::execute(codeBlock->ctiCode, &m_registerFile, newCallFrame,
-                   scopeChain->globalData, exception);
-#else
-  JSValue* result =
-      privateExecute(Normal, &m_registerFile, newCallFrame, exception);
-#endif
-  m_reentryDepth--;
+  JSValue* result;
+  {
+    SamplingTool::CallRecord callRecord(m_sampler);
 
-  MACHINE_SAMPLING_privateExecuteReturned();
+    m_reentryDepth++;
+#if ENABLE(CTI)
+    if (!codeBlock->ctiCode)
+      CTI::compile(this, newCallFrame, codeBlock);
+    result = CTI::execute(codeBlock->ctiCode, &m_registerFile, newCallFrame,
+                          scopeChain->globalData, exception);
+#else
+    result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
+#endif
+    m_reentryDepth--;
+  }
 
   if (*profiler)
     (*profiler)->didExecute(callFrame, programNode->sourceURL(),
@@ -1110,23 +1111,24 @@ JSValue* Machine::execute(FunctionBodyNode* functionBodyNode,
   if (*profiler)
     (*profiler)->willExecute(newCallFrame, function);
 
-  m_reentryDepth++;
+  JSValue* result;
+  {
+    SamplingTool::CallRecord callRecord(m_sampler);
+
+    m_reentryDepth++;
 #if ENABLE(CTI)
-  if (!codeBlock->ctiCode)
-    CTI::compile(this, newCallFrame, codeBlock);
-  JSValue* result =
-      CTI::execute(codeBlock->ctiCode, &m_registerFile, newCallFrame,
-                   scopeChain->globalData, exception);
+    if (!codeBlock->ctiCode)
+      CTI::compile(this, newCallFrame, codeBlock);
+    result = CTI::execute(codeBlock->ctiCode, &m_registerFile, newCallFrame,
+                          scopeChain->globalData, exception);
 #else
-  JSValue* result =
-      privateExecute(Normal, &m_registerFile, newCallFrame, exception);
+    result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif
-  m_reentryDepth--;
+    m_reentryDepth--;
+  }
 
   if (*profiler)
     (*profiler)->didExecute(newCallFrame, function);
-
-  MACHINE_SAMPLING_privateExecuteReturned();
 
   m_registerFile.shrink(oldEnd);
   return result;
@@ -1223,20 +1225,21 @@ JSValue* Machine::execute(EvalNode* evalNode,
     (*profiler)->willExecute(newCallFrame, evalNode->sourceURL(),
                              evalNode->lineNo());
 
-  m_reentryDepth++;
-#if ENABLE(CTI)
-  if (!codeBlock->ctiCode)
-    CTI::compile(this, newCallFrame, codeBlock);
-  JSValue* result =
-      CTI::execute(codeBlock->ctiCode, &m_registerFile, newCallFrame,
-                   scopeChain->globalData, exception);
-#else
-  JSValue* result =
-      privateExecute(Normal, &m_registerFile, newCallFrame, exception);
-#endif
-  m_reentryDepth--;
+  JSValue* result;
+  {
+    SamplingTool::CallRecord callRecord(m_sampler);
 
-  MACHINE_SAMPLING_privateExecuteReturned();
+    m_reentryDepth++;
+#if ENABLE(CTI)
+    if (!codeBlock->ctiCode)
+      CTI::compile(this, newCallFrame, codeBlock);
+    result = CTI::execute(codeBlock->ctiCode, &m_registerFile, newCallFrame,
+                          scopeChain->globalData, exception);
+#else
+    result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
+#endif
+    m_reentryDepth--;
+  }
 
   if (*profiler)
     (*profiler)->didExecute(callFrame, evalNode->sourceURL(),
@@ -1655,7 +1658,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
     }                                                   \
   } while (0)
 
-#if DUMP_OPCODE_STATS
+#if ENABLE(OPCODE_STATS)
   OpcodeStats::resetLastInstruction();
 #endif
 
@@ -1666,11 +1669,19 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
     tickCount = m_ticksUntilNextTimeoutCheck;                              \
   }
 
+#if ENABLE(OPCODE_SAMPLING)
+#define SAMPLE(codeBlock, vPC) m_sampler->sample(codeBlock, vPC)
+#define CTI_SAMPLER ARG_globalData->machine->sampler()
+#else
+#define SAMPLE(codeBlock, vPC)
+#define CTI_SAMPLER
+#endif
+
 #if HAVE(COMPUTED_GOTO)
-#define NEXT_OPCODE                                     \
-  MACHINE_SAMPLING_sample(callFrame->codeBlock(), vPC); \
+#define NEXT_OPCODE                    \
+  SAMPLE(callFrame->codeBlock(), vPC); \
   goto * vPC->u.opcode
-#if DUMP_OPCODE_STATS
+#if ENABLE(OPCODE_STATS)
 #define BEGIN_OPCODE(opcode) \
   opcode:                    \
   OpcodeStats::recordInstruction(opcode);
@@ -1679,10 +1690,10 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 #endif
   NEXT_OPCODE;
 #else
-#define NEXT_OPCODE                                     \
-  MACHINE_SAMPLING_sample(callFrame->codeBlock(), vPC); \
+#define NEXT_OPCODE                    \
+  SAMPLE(callFrame->codeBlock(), vPC); \
   goto interpreterLoopStart
-#if DUMP_OPCODE_STATS
+#if ENABLE(OPCODE_STATS)
 #define BEGIN_OPCODE(opcode) \
   case opcode:               \
     OpcodeStats::recordInstruction(opcode);
@@ -3249,7 +3260,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
    Additionally this loop instruction may terminate JS execution is
    the JS timeout is reached.
  */
-#if DUMP_OPCODE_STATS
+#if ENABLE(OPCODE_STATS)
       OpcodeStats::resetLastInstruction();
 #endif
       int target = (++vPC)->u.operand;
@@ -3263,7 +3274,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
    Jumps unconditionally to offset target from the current
    instruction.
 */
-#if DUMP_OPCODE_STATS
+#if ENABLE(OPCODE_STATS)
       OpcodeStats::resetLastInstruction();
 #endif
       int target = (++vPC)->u.operand;
@@ -3675,7 +3686,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
                         previousCallFrame, dst, argCount, asFunction(v));
         vPC = newCodeBlock->instructions.begin();
 
-#if DUMP_OPCODE_STATS
+#if ENABLE(OPCODE_STATS)
         OpcodeStats::resetLastInstruction();
 #endif
 
@@ -3693,10 +3704,12 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
             CallFrame::create(callFrame->registers() + registerOffset);
         newCallFrame->init(0, vPC + 7, scopeChain, callFrame, dst, argCount, 0);
 
-        MACHINE_SAMPLING_callingHostFunction();
-
-        JSValue* returnValue = callData.native.function(
-            newCallFrame, asObject(v), thisValue, args);
+        JSValue* returnValue;
+        {
+          SamplingTool::HostCallRecord callRecord(m_sampler);
+          returnValue = callData.native.function(newCallFrame, asObject(v),
+                                                 thisValue, args);
+        }
         VM_CHECK_EXCEPTION();
 
         callFrame[dst] = returnValue;
@@ -3936,7 +3949,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
                         previousCallFrame, dst, argCount, asFunction(v));
         vPC = newCodeBlock->instructions.begin();
 
-#if DUMP_OPCODE_STATS
+#if ENABLE(OPCODE_STATS)
         OpcodeStats::resetLastInstruction();
 #endif
 
@@ -3951,11 +3964,12 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
             CallFrame::create(callFrame->registers() + registerOffset);
         newCallFrame->init(0, vPC + 7, scopeChain, callFrame, dst, argCount, 0);
 
-        MACHINE_SAMPLING_callingHostFunction();
-
-        JSValue* returnValue =
-            constructData.native.function(newCallFrame, asObject(v), args);
-
+        JSValue* returnValue;
+        {
+          SamplingTool::HostCallRecord callRecord(m_sampler);
+          returnValue =
+              constructData.native.function(newCallFrame, asObject(v), args);
+        }
         VM_CHECK_EXCEPTION();
         callFrame[dst] = returnValue;
 
@@ -5205,10 +5219,12 @@ JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
                      RegisterFile::CallFrameHeaderSize - argCount;
     ArgList argList(argv + 1, argCount - 1);
 
-    CTI_MACHINE_SAMPLING_callingHostFunction();
-
-    JSValue* returnValue = callData.native.function(
-        callFrame, asObject(funcVal), argv[0].jsValue(callFrame), argList);
+    JSValue* returnValue;
+    {
+      SamplingTool::HostCallRecord callRecord(CTI_SAMPLER);
+      returnValue = callData.native.function(
+          callFrame, asObject(funcVal), argv[0].jsValue(callFrame), argList);
+    }
     ARG_setCallFrame(previousCallFrame);
     VM_CHECK_EXCEPTION();
 
@@ -5410,10 +5426,12 @@ JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
   if (constructType == ConstructTypeHost) {
     ArgList argList(callFrame->registers() + firstArg + 1, argCount - 1);
 
-    CTI_MACHINE_SAMPLING_callingHostFunction();
-
-    JSValue* returnValue =
-        constructData.native.function(callFrame, asObject(constrVal), argList);
+    JSValue* returnValue;
+    {
+      SamplingTool::HostCallRecord callRecord(CTI_SAMPLER);
+      returnValue = constructData.native.function(callFrame,
+                                                  asObject(constrVal), argList);
+    }
     VM_CHECK_EXCEPTION();
 
     return returnValue;
