@@ -1706,7 +1706,7 @@ void webkit_web_view_load_string(WebKitWebView* webView,
 
   KURL url(baseUri ? String::fromUTF8(baseUri) : "");
   RefPtr<SharedBuffer> sharedBuffer =
-      SharedBuffer::create(strdup(content), strlen(content));
+      SharedBuffer::create(content, strlen(content));
   SubstituteData substituteData(
       sharedBuffer.release(),
       contentMimeType ? String(contentMimeType) : "text/html",
