@@ -41,6 +41,12 @@ class RenderSVGGradientStop : public RenderObject {
 
   virtual void layout();
 
+  // This override is needed to prevent crashing on <svg><stop /></svg>
+  // RenderObject's default impl asks the parent Object and RenderSVGRoot
+  // asks all child RenderObjects for overflow rects, thus infinite loop.
+  // https://bugs.webkit.org/show_bug.cgi?id=20400
+  virtual IntRect absoluteClippedOverflowRect() { return IntRect(); }
+
  protected:
   virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
