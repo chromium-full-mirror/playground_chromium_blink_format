@@ -44,10 +44,10 @@
 #include "JSEvent.h"
 #include "JSEventListener.h"
 #include "JSHTMLCollection.h"
-#include "JSHTMLOptionElementConstructor.h"
 #include "JSImageConstructor.h"
 #include "JSMessageChannelConstructor.h"
 #include "JSNode.h"
+#include "JSOptionConstructor.h"
 #include "JSXMLHttpRequestConstructor.h"
 #include "JSXSLTProcessorConstructor.h"
 #include "Logging.h"
@@ -533,7 +533,7 @@ JSValue* jsDOMWindowBaseOption(ExecState* exec,
   if (!static_cast<JSDOMWindowBase*>(asObject(slot.slotBase()))
            ->allowsAccessFrom(exec))
     return jsUndefined();
-  return getDOMConstructor<JSHTMLOptionElementConstructor>(
+  return getDOMConstructor<JSOptionConstructor>(
       exec, static_cast<JSDOMWindowBase*>(asObject(slot.slotBase())));
 }
 
