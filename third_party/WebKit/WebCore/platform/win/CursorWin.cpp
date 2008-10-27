@@ -359,4 +359,12 @@ const Cursor& zoomOutCursor() {
   static const Cursor c = loadCursorByName("zoomOutCursor", 7, 7);
   return c;
 }
+
+const Cursor& grabCursor() {
+  return pointerCursor();
+}
+
+const Cursor& grabbingCursor() {
+  return pointerCursor();
+}
 }

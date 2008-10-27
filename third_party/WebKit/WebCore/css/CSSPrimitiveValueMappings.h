@@ -646,6 +646,12 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(ECursor e) : m_type(CSS_IDENT) {
     case CURSOR_ALL_SCROLL:
       m_value.ident = CSSValueAllScroll;
       break;
+    case CURSOR_WEBKIT_GRAB:
+      m_value.ident = CSSValueWebkitGrab;
+      break;
+    case CURSOR_WEBKIT_GRABBING:
+      m_value.ident = CSSValueWebkitGrabbing;
+      break;
   }
 }
 

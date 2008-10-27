@@ -235,4 +235,14 @@ const Cursor& zoomOutCursor() {
   // TODO: Find a way to implement in/out magnifiers in wx.
   return zoomInCursor();
 }
+
+const Cursor& grabCursor() {
+  // TODO: Determine if we can find a better cursor for this.
+  return pointerCursor();
+}
+
+const Cursor& grabbingCursor() {
+  // TODO: Determine if we can find a better cursor for this.
+  return pointerCursor();
+}
 }

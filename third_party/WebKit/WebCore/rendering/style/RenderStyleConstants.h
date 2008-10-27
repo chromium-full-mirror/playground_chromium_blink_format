@@ -233,6 +233,7 @@ enum EListStylePosition { OUTSIDE, INSIDE };
 enum EVisibility { VISIBLE, HIDDEN, COLLAPSE };
 
 enum ECursor {
+  // The following must match the order in CSSValueKeywords.in.
   CURSOR_AUTO,
   CURSOR_CROSS,
   CURSOR_DEFAULT,
@@ -265,6 +266,10 @@ enum ECursor {
   CURSOR_WAIT,
   CURSOR_HELP,
   CURSOR_ALL_SCROLL,
+  CURSOR_WEBKIT_GRAB,
+  CURSOR_WEBKIT_GRABBING,
+
+  // The following are handled as exceptions so don't need to match.
   CURSOR_COPY,
   CURSOR_NONE
 };

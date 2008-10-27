@@ -1032,6 +1032,10 @@ Cursor EventHandler::selectCursor(const MouseEventWithHitTestResults& event,
       return zoomInCursor();
     case CURSOR_WEBKIT_ZOOM_OUT:
       return zoomOutCursor();
+    case CURSOR_WEBKIT_GRAB:
+      return grabCursor();
+    case CURSOR_WEBKIT_GRABBING:
+      return grabbingCursor();
   }
   return pointerCursor();
 }

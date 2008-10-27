@@ -843,7 +843,11 @@ bool CSSParser::parseValue(int propId, bool important) {
       // nw-resize | n-resize | se-resize | sw-resize | s-resize | w-resize |
       // ew-resize |
       // ns-resize | nesw-resize | nwse-resize | col-resize | row-resize | text
-      // | wait | help ] ] | inherit
+      // | wait | help |
+      // vertical-text | cell | context-menu | alias | copy | no-drop |
+      // not-allowed | -webkit-zoom-in
+      // -webkit-zoom-in | -webkit-zoom-out | all-scroll | -webkit-grab |
+      // -webkit-grabbing ] ] | inherit
       RefPtr<CSSValueList> list;
       while (value && value->unit == CSSPrimitiveValue::CSS_URI) {
         if (!list)
@@ -883,7 +887,7 @@ bool CSSParser::parseValue(int propId, bool important) {
           list->append(CSSPrimitiveValue::createIdentifier(CSSValuePointer));
         else if (value &&
                  ((value->id >= CSSValueAuto &&
-                   value->id <= CSSValueAllScroll) ||
+                   value->id <= CSSValueWebkitGrabbing) ||
                   value->id == CSSValueCopy || value->id == CSSValueNone))
           list->append(CSSPrimitiveValue::createIdentifier(value->id));
         m_valueList->next();
@@ -895,7 +899,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         id = CSSValuePointer;
         valid_primitive = true;
       } else if ((value->id >= CSSValueAuto &&
-                  value->id <= CSSValueAllScroll) ||
+                  value->id <= CSSValueWebkitGrabbing) ||
                  value->id == CSSValueCopy || value->id == CSSValueNone)
         valid_primitive = true;
       break;
