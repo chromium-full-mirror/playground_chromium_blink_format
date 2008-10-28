@@ -63,7 +63,7 @@ String FileChooser::basenameForWidth(const Font& font, int width) const {
     stringByAdoptingFileSystemRepresentation(systemBasename, string);
   } else if (m_filenames.size() > 1)
     return StringTruncator::rightTruncate(
-        String::number(m_filenames.size()) + " files", width, font, false);
+        multipleFileUploadText(m_filenames.size()), width, font, false);
 
   return StringTruncator::centerTruncate(string, width, font, false);
 }

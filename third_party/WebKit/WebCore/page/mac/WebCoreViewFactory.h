@@ -128,6 +128,7 @@
 - (NSString*)AXUncheckedCheckBoxActionVerb;
 - (NSString*)AXLinkActionVerb;
 
+- (NSString*)multipleFileUploadTextForNumberOfFiles:(unsigned)numberOfFiles;
 // FTP Directory Related
 - (NSString*)unknownFileSizeText;
 
