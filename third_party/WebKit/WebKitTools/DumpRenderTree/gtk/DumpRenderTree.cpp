@@ -171,7 +171,7 @@ void dump() {
     }
 
     if (printSeparators) {
-      puts("#EOF");
+      puts("#EOF");  // terminate the content block
       fputs("#EOF\n", stderr);
       fflush(stdout);
       fflush(stderr);
@@ -184,11 +184,14 @@ void dump() {
         !gLayoutTestController->dumpSourceAsWebArchive()) {
       // FIXME: Add support for dumping pixels
     }
-
-    fflush(stdout);
   }
 
   // FIXME: call displayWebView here when we support --paint
+
+  puts("#EOF");  // terminate the (possibly empty) pixels block
+
+  fflush(stdout);
+  fflush(stderr);
 
   done = true;
 }
