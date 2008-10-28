@@ -45,21 +45,25 @@ class NetscapePlugInStreamLoader;
 
 @class WebBaseNetscapePluginView;
 @class NSURLResponse;
+@class WebBaseNetscapePluginStream;
 
 class WebNetscapePluginStream
     : public RefCounted<WebNetscapePluginStream>,
       private WebCore::NetscapePlugInStreamLoaderClient {
  public:
-  static PassRefPtr<WebNetscapePluginStream> create(NSURLRequest* request,
-                                                    NPP plugin,
-                                                    bool sendNotification,
-                                                    void* notifyData) {
-    return adoptRef(new WebNetscapePluginStream(request, plugin,
+  static PassRefPtr<WebNetscapePluginStream> create(
+      WebBaseNetscapePluginStream* stream,
+      NSURLRequest* request,
+      NPP plugin,
+      bool sendNotification,
+      void* notifyData) {
+    return adoptRef(new WebNetscapePluginStream(stream, request, plugin,
                                                 sendNotification, notifyData));
   }
   static PassRefPtr<WebNetscapePluginStream> create(
+      WebBaseNetscapePluginStream* stream,
       WebCore::FrameLoader* frameLoader) {
-    return adoptRef(new WebNetscapePluginStream(frameLoader));
+    return adoptRef(new WebNetscapePluginStream(stream, frameLoader));
   }
   virtual ~WebNetscapePluginStream();
 
@@ -136,12 +140,30 @@ class WebNetscapePluginStream
   void deliverDataTimerFired(WebCore::Timer<WebNetscapePluginStream>* timer);
   WebCore::Timer<WebNetscapePluginStream> m_deliverDataTimer;
 
+  // FIXME: Remove this once it's not needed anymore.
+  WebBaseNetscapePluginStream* m_pluginStream;
+
  private:
-  WebNetscapePluginStream(WebCore::FrameLoader*);
-  WebNetscapePluginStream(NSURLRequest*,
+  WebNetscapePluginStream(WebBaseNetscapePluginStream*, WebCore::FrameLoader*);
+  WebNetscapePluginStream(WebBaseNetscapePluginStream*,
+                          NSURLRequest*,
                           NPP,
                           bool sendNotification,
                           void* notifyData);
 };
 
+@interface WebBaseNetscapePluginStream : NSObject {
+  RefPtr<WebNetscapePluginStream> _impl;
+}
+
+- (WebNetscapePluginStream*)impl;
+
+- (id)initWithFrameLoader:(WebCore::FrameLoader*)frameLoader;
+
+- (id)initWithRequest:(NSURLRequest*)theRequest
+               plugin:(NPP)thePlugin
+           notifyData:(void*)theNotifyData
+     sendNotification:(BOOL)sendNotification;
+
+@end
 #endif
