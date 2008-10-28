@@ -458,7 +458,7 @@ SIMPLE_INSPECTOR_CALLBACK(stepOutOfFunctionInDebugger,
 #endif
 SIMPLE_INSPECTOR_CALLBACK(closeWindow, closeWindow);
 SIMPLE_INSPECTOR_CALLBACK(clearMessages, clearConsoleMessages);
-SIMPLE_INSPECTOR_CALLBACK(startProfiling, startUserInitiatedProfiling);
+SIMPLE_INSPECTOR_CALLBACK(startProfiling, startUserInitiatedProfilingSoon);
 SIMPLE_INSPECTOR_CALLBACK(stopProfiling, stopUserInitiatedProfiling);
 SIMPLE_INSPECTOR_CALLBACK(enableProfiler, enableProfiler);
 SIMPLE_INSPECTOR_CALLBACK(disableProfiler, disableProfiler);
@@ -1230,7 +1230,9 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
       m_searchingForNode(false),
       m_currentUserInitiatedProfileNumber(-1),
       m_nextUserInitiatedProfileNumber(1),
-      m_previousMessage(0) {
+      m_previousMessage(0),
+      m_startProfiling(this,
+                       &InspectorController::startUserInitiatedProfiling) {
   ASSERT_ARG(page, page);
   ASSERT_ARG(client, client);
   ++s_inspectorControllerCount;
@@ -1284,7 +1286,6 @@ void InspectorController::inspectedPageDestroyed() {
 bool InspectorController::enabled() const {
   if (!m_inspectedPage)
     return false;
-
   return m_inspectedPage->settings()->developerExtrasEnabled();
 }
 
@@ -1869,18 +1870,30 @@ void InspectorController::closeWindow() {
   m_client->closeWindow();
 }
 
-void InspectorController::startUserInitiatedProfiling() {
+void InspectorController::startUserInitiatedProfilingSoon() {
+  m_startProfiling.startOneShot(0);
+}
+
+void InspectorController::startUserInitiatedProfiling(
+    Timer<InspectorController>*) {
   if (!enabled())
     return;
 
-  m_recordingUserInitiatedProfile = true;
+  if (!profilerEnabled()) {
+    enableProfiler(true);
+    JavaScriptDebugServer::shared().recompileAllJSFunctions();
+  }
 
-  ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
+  m_recordingUserInitiatedProfile = true;
   m_currentUserInitiatedProfileNumber = m_nextUserInitiatedProfileNumber++;
+
   UString title = UserInitiatedProfileName;
   title += ".";
   title += UString::from(m_currentUserInitiatedProfileNumber);
+
+  ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
   Profiler::profiler()->startProfiling(exec, title);
+
   toggleRecordButton(true);
 }
 
@@ -1890,22 +1903,41 @@ void InspectorController::stopUserInitiatedProfiling() {
 
   m_recordingUserInitiatedProfile = false;
 
-  ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
   UString title = UserInitiatedProfileName;
   title += ".";
   title += UString::from(m_currentUserInitiatedProfileNumber);
+
+  ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
   RefPtr<Profile> profile = Profiler::profiler()->stopProfiling(exec, title);
   if (profile)
     addProfile(profile, 0, UString());
+
   toggleRecordButton(false);
 }
 
-void InspectorController::enableProfiler() {
+void InspectorController::enableProfiler(bool skipRecompile) {
+  if (m_profilerEnabled)
+    return;
+
   m_profilerEnabled = true;
+
+  if (!skipRecompile)
+    JavaScriptDebugServer::shared().recompileAllJSFunctionsSoon();
+
+  if (m_scriptContext && m_scriptObject)
+    callSimpleFunction(m_scriptContext, m_scriptObject, "profilerWasEnabled");
 }
 
 void InspectorController::disableProfiler() {
+  if (!m_profilerEnabled)
+    return;
+
   m_profilerEnabled = false;
+
+  JavaScriptDebugServer::shared().recompileAllJSFunctionsSoon();
+
+  if (m_scriptContext && m_scriptObject)
+    callSimpleFunction(m_scriptContext, m_scriptObject, "profilerWasDisabled");
 }
 
 static void addHeaders(JSContextRef context,
@@ -2840,7 +2872,9 @@ void InspectorController::disableDebugger() {
   ASSERT(m_inspectedPage);
 
   JavaScriptDebugServer::shared().removeListener(this, m_inspectedPage);
+
   m_debuggerEnabled = false;
+  m_attachDebuggerWhenShown = false;
 
   if (m_scriptContext && m_scriptObject)
     callSimpleFunction(m_scriptContext, m_scriptObject, "debuggerWasDisabled");

@@ -38,6 +38,7 @@
 #include "FrameTree.h"
 #include "GCController.h"
 #include "HTMLDocument.h"
+#include "InspectorController.h"
 #include "JSAudioConstructor.h"
 #include "JSDedicatedWorkerConstructor.h"
 #include "JSDOMWindowCustom.h"
@@ -826,11 +827,11 @@ bool JSDOMWindowBase::supportsProfiling() const {
   if (!frame)
     return false;
 
-  Settings* settings = frame->settings();
-  if (!settings)
+  Page* page = frame->page();
+  if (!page)
     return false;
 
-  return settings->developerExtrasEnabled();
+  return page->inspectorController()->profilerEnabled();
 }
 
 bool JSDOMWindowBase::shouldInterruptScript() const {
