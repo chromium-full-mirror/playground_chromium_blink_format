@@ -43,8 +43,6 @@ class FrameLoader;
 class NetscapePlugInStreamLoader;
 }
 
-class WebNetscapePlugInStreamLoaderClient;
-
 @class WebBaseNetscapePluginView;
 @class NSURLResponse;
 @class WebBaseNetscapePluginStream;
@@ -137,7 +135,6 @@ class WebNetscapePluginStream
 
   WebCore::FrameLoader* m_frameLoader;
   WebCore::NetscapePlugInStreamLoader* m_loader;
-  WebNetscapePlugInStreamLoaderClient* m_client;
   NSURLRequest* m_request;
   NPPluginFuncs* m_pluginFuncs;
 
@@ -156,8 +153,7 @@ class WebNetscapePluginStream
                           void* notifyData);
 };
 
-@interface WebBaseNetscapePluginStream
-    : NSObject<WebPlugInStreamLoaderDelegate> {
+@interface WebBaseNetscapePluginStream : NSObject {
   RefPtr<WebNetscapePluginStream> _impl;
 }
 
