@@ -486,7 +486,7 @@ void GraphicsContext::fillRect(const FloatRect& rect, Generator& generator) {
 void GraphicsContext::setPlatformTextDrawingMode(int mode) {}
 #endif
 
-#if !PLATFORM(QT) && !PLATFORM(CAIRO)
+#if !PLATFORM(QT) && !PLATFORM(CAIRO) && !PLATFORM(SKIA)
 void GraphicsContext::setPlatformStrokeStyle(const StrokeStyle&) {}
 #endif
 

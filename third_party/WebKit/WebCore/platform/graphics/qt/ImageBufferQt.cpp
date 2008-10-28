@@ -41,21 +41,18 @@
 
 namespace WebCore {
 
-std::auto_ptr<ImageBuffer> ImageBuffer::create(const IntSize& size,
-                                               bool grayScale) {
-  QPixmap px(size);
+ImageBufferData::ImageBufferData(const IntSize& size) : m_pixmap(size) {
   px.fill(QColor(Qt::transparent));
-  return std::auto_ptr<ImageBuffer>(new ImageBuffer(px));
+  m_painter.set(new QPainter(&m_pixmap));
 }
 
-ImageBuffer::ImageBuffer(const QPixmap& px) : m_pixmap(px), m_painter(0) {
-  m_painter = new QPainter(&m_pixmap);
-  m_context.set(new GraphicsContext(m_painter));
+ImageBuffer::ImageBuffer(const IntSize& size, bool grayScale, bool& success)
+    : m_platform(size), m_size(size) {
+  m_context.set(new GraphicsContext(platform.m_painter));
+  success = true;
 }
 
-ImageBuffer::~ImageBuffer() {
-  delete m_painter;
-}
+ImageBuffer::~ImageBuffer() {}
 
 GraphicsContext* ImageBuffer::context() const {
   if (!m_painter->isActive())
