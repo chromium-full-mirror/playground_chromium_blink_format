@@ -723,9 +723,9 @@ void CTI::compileOpStrictEq(Instruction* instruction,
                             CompileOpStrictEqType type) {
   bool negated = (type == OpNStrictEq);
 
-  unsigned dst = instruction[i + 1].u.operand;
-  unsigned src1 = instruction[i + 2].u.operand;
-  unsigned src2 = instruction[i + 3].u.operand;
+  unsigned dst = instruction[1].u.operand;
+  unsigned src1 = instruction[2].u.operand;
+  unsigned src2 = instruction[3].u.operand;
 
   emitGetArg(src1, X86::eax);
   emitGetArg(src2, X86::edx);
@@ -1067,8 +1067,9 @@ void CTI::privateCompileMainPass() {
                         "privateCompileMainPass gone bad @ %d", i);
 
 #if ENABLE(OPCODE_SAMPLING)
-    m_jit.movl_i32m(m_machine->sampler()->encodeSample(instruction + i),
-                    m_machine->sampler()->sampleSlot());
+    if (i > 0)  // Avoid the overhead of sampling op_enter twice.
+      m_jit.movl_i32m(m_machine->sampler()->encodeSample(instruction + i),
+                      m_machine->sampler()->sampleSlot());
 #endif
 
     m_labels[i] = m_jit.label();
@@ -1150,7 +1151,7 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_loop: {
-        emitSlowScriptCheck(instruction, i);
+        emitSlowScriptCheck(instruction + i, i);
 
         unsigned target = instruction[i + 1].u.operand;
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJmp(), i + 1 + target));
@@ -1158,7 +1159,7 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_loop_if_less: {
-        emitSlowScriptCheck(instruction, i);
+        emitSlowScriptCheck(instruction + i, i);
 
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
@@ -1180,7 +1181,7 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_loop_if_lesseq: {
-        emitSlowScriptCheck(instruction, i);
+        emitSlowScriptCheck(instruction + i, i);
 
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
@@ -1636,7 +1637,7 @@ void CTI::privateCompileMainPass() {
       }
         CTI_COMPILE_BINARY_OP(op_lesseq)
       case op_loop_if_true: {
-        emitSlowScriptCheck(instruction, i);
+        emitSlowScriptCheck(instruction + i, i);
 
         unsigned target = instruction[i + 2].u.operand;
         emitGetArg(instruction[i + 1].u.operand, X86::eax);
@@ -2120,12 +2121,12 @@ void CTI::privateCompileMainPass() {
         CTI_COMPILE_UNARY_OP(op_is_object)
         CTI_COMPILE_UNARY_OP(op_is_function)
       case op_stricteq: {
-        compileOpStrictEq(instruction, i, OpStrictEq);
+        compileOpStrictEq(instruction + i, i, OpStrictEq);
         i += 4;
         break;
       }
       case op_nstricteq: {
-        compileOpStrictEq(instruction, i, OpNStrictEq);
+        compileOpStrictEq(instruction + i, i, OpNStrictEq);
         i += 4;
         break;
       }
@@ -2511,8 +2512,8 @@ void CTI::privateCompileSlowCases() {
           OperandTypes types =
               OperandTypes::fromInt(instruction[i + 4].u.operand);
           if (types.first().mightBeNumber() && types.second().mightBeNumber())
-            compileBinaryArithOpSlowCase(instruction, op_add, iter, dst, src1,
-                                         src2, types, i);
+            compileBinaryArithOpSlowCase(instruction + i, op_add, iter, dst,
+                                         src1, src2, types, i);
           else
             ASSERT_NOT_REACHED();
         }
@@ -2559,7 +2560,7 @@ void CTI::privateCompileSlowCases() {
       }
       case op_sub: {
         compileBinaryArithOpSlowCase(
-            instruction, op_sub, iter, instruction[i + 1].u.operand,
+            instruction + i, op_sub, iter, instruction[i + 1].u.operand,
             instruction[i + 2].u.operand, instruction[i + 3].u.operand,
             OperandTypes::fromInt(instruction[i + 4].u.operand), i);
         i += 5;
@@ -2591,7 +2592,7 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_loop_if_less: {
-        emitSlowScriptCheck(instruction, i);
+        emitSlowScriptCheck(instruction + i, i);
 
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
@@ -2679,7 +2680,7 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_loop_if_lesseq: {
-        emitSlowScriptCheck(instruction, i);
+        emitSlowScriptCheck(instruction + i, i);
 
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
@@ -2744,7 +2745,7 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_loop_if_true: {
-        emitSlowScriptCheck(instruction, i);
+        emitSlowScriptCheck(instruction + i, i);
 
         m_jit.link(iter->from, m_jit.label());
         emitPutArg(X86::eax, 0);
@@ -2967,7 +2968,7 @@ void CTI::privateCompileSlowCases() {
           emitPutResult(dst);
         } else
           compileBinaryArithOpSlowCase(
-              instruction, op_mul, iter, dst, src1, src2,
+              instruction + i, op_mul, iter, dst, src1, src2,
               OperandTypes::fromInt(instruction[i + 4].u.operand), i);
         i += 5;
         break;
