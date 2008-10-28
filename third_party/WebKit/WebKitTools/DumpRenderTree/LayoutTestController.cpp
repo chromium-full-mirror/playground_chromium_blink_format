@@ -34,9 +34,8 @@
 #include <wtf/Assertions.h>
 #include <wtf/MathExtras.h>
 
-LayoutTestController::LayoutTestController(
-    bool testRepaintDefault,
-    bool testRepaintSweepHorizontallyDefault)
+LayoutTestController::LayoutTestController(const std::string& testPathOrURL,
+                                           const std::string& expectedPixelHash)
     : m_dumpAsText(false),
       m_dumpAsPDF(false),
       m_dumpBackForwardList(false),
@@ -56,11 +55,14 @@ LayoutTestController::LayoutTestController(
       m_canOpenWindows(false),
       m_closeRemainingWindowsWhenComplete(true),
       m_stopProvisionalFrameLoads(false),
-      m_testRepaint(testRepaintDefault),
-      m_testRepaintSweepHorizontally(testRepaintSweepHorizontallyDefault),
+      m_testOnscreen(false),
+      m_testRepaint(false),
+      m_testRepaintSweepHorizontally(false),
       m_waitToDump(false),
       m_windowIsKey(true),
-      m_globalFlag(false) {}
+      m_globalFlag(false),
+      m_testPathOrURL(testPathOrURL),
+      m_expectedPixelHash(expectedPixelHash) {}
 
 // Static Functions
 
@@ -298,6 +300,18 @@ static JSValueRef setCloseRemainingWindowsWhenCompleteCallback(
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setCloseRemainingWindowsWhenComplete(
       JSValueToBoolean(context, arguments[0]));
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef testOnscreenCallback(JSContextRef context,
+                                       JSObjectRef function,
+                                       JSObjectRef thisObject,
+                                       size_t argumentCount,
+                                       const JSValueRef arguments[],
+                                       JSValueRef* exception) {
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setTestOnscreen(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -1119,6 +1133,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setUserStyleSheetLocation", setUserStyleSheetLocationCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setWindowIsKey", setWindowIsKeyCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"testOnscreen", testOnscreenCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"testRepaint", testRepaintCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
