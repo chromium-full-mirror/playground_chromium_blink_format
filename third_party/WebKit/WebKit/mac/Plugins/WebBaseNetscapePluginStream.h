@@ -59,6 +59,7 @@ class WebNetscapePluginStream
   }
   virtual ~WebNetscapePluginStream() {}
 
+  NPP plugin() const { return m_plugin; }
   void setPlugin(NPP);
 
   static NPP ownerForStream(NPStream*);
@@ -67,6 +68,13 @@ class WebNetscapePluginStream
   NSError* errorForReason(NPReason) const;
 
   void cancelLoadAndDestroyStreamWithError(NSError*);
+
+  void setRequestURL(NSURL* requestURL) { m_requestURL = requestURL; }
+
+  void start();
+  void stop();
+
+  void startStreamWithResponse(NSURLResponse* response);
 
   // FIXME: These should all be private once WebBaseNetscapePluginStream is
   // history...
@@ -157,7 +165,7 @@ class WebNetscapePluginStream
   RefPtr<WebNetscapePluginStream> _impl;
 }
 
-- (NSError*)errorForReason:(NPReason)theReason;
+- (WebNetscapePluginStream*)impl;
 
 - (id)initWithFrameLoader:(WebCore::FrameLoader*)frameLoader;
 
@@ -165,17 +173,6 @@ class WebNetscapePluginStream
                plugin:(NPP)thePlugin
            notifyData:(void*)theNotifyData
      sendNotification:(BOOL)sendNotification;
-
-- (void)setRequestURL:(NSURL*)theRequestURL;
-
-- (void)setPlugin:(NPP)thePlugin;
-
-- (NPP)plugin;
-
-- (void)cancelLoadWithError:(NSError*)error;
-
-- (void)start;
-- (void)stop;
 
 @end
 #endif
