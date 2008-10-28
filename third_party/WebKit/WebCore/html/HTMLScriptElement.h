@@ -75,9 +75,7 @@ class HTMLScriptElement : public HTMLElement, public ScriptElement {
   String type() const;
   void setType(const String&);
 
-  // A charset for loading the script (may be overridden by HTTP headers or a
-  // BOM).
-  String scriptCharset() const;
+  virtual String scriptCharset() const;
 
   virtual void getSubresourceAttributeStrings(Vector<String>&) const;
 

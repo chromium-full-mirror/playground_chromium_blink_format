@@ -57,6 +57,8 @@ class SVGScriptElement : public SVGElement,
   String type() const;
   void setType(const String&);
 
+  virtual String scriptCharset() const;
+
   virtual void getSubresourceAttributeStrings(Vector<String>&) const;
 
  protected:
