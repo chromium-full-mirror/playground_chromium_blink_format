@@ -45,25 +45,21 @@ class NetscapePlugInStreamLoader;
 
 @class WebBaseNetscapePluginView;
 @class NSURLResponse;
-@class WebBaseNetscapePluginStream;
 
 class WebNetscapePluginStream
     : public RefCounted<WebNetscapePluginStream>,
       private WebCore::NetscapePlugInStreamLoaderClient {
  public:
-  static PassRefPtr<WebNetscapePluginStream> create(
-      WebBaseNetscapePluginStream* stream,
-      NSURLRequest* request,
-      NPP plugin,
-      bool sendNotification,
-      void* notifyData) {
-    return adoptRef(new WebNetscapePluginStream(stream, request, plugin,
+  static PassRefPtr<WebNetscapePluginStream> create(NSURLRequest* request,
+                                                    NPP plugin,
+                                                    bool sendNotification,
+                                                    void* notifyData) {
+    return adoptRef(new WebNetscapePluginStream(request, plugin,
                                                 sendNotification, notifyData));
   }
   static PassRefPtr<WebNetscapePluginStream> create(
-      WebBaseNetscapePluginStream* stream,
       WebCore::FrameLoader* frameLoader) {
-    return adoptRef(new WebNetscapePluginStream(stream, frameLoader));
+    return adoptRef(new WebNetscapePluginStream(frameLoader));
   }
   virtual ~WebNetscapePluginStream();
 
@@ -84,12 +80,15 @@ class WebNetscapePluginStream
 
   void startStreamWithResponse(NSURLResponse* response);
 
-  // FIXME: These should all be private once WebBaseNetscapePluginStream is
-  // history...
- public:
+  void didReceiveData(WebCore::NetscapePlugInStreamLoader*,
+                      const char* bytes,
+                      int length);
+  void destroyStreamWithError(NSError*);
+  void didFinishLoading(WebCore::NetscapePlugInStreamLoader*);
+
+ private:
   void destroyStream();
   void cancelLoadWithError(NSError*);
-  void destroyStreamWithError(NSError*);
   void destroyStreamWithReason(NPReason);
   void deliverDataToFile(NSData* data);
   void deliverData();
@@ -105,12 +104,8 @@ class WebNetscapePluginStream
   // NetscapePlugInStreamLoaderClient methods.
   void didReceiveResponse(WebCore::NetscapePlugInStreamLoader*,
                           const WebCore::ResourceResponse&);
-  void didReceiveData(WebCore::NetscapePlugInStreamLoader*,
-                      const char* bytes,
-                      int length);
   void didFail(WebCore::NetscapePlugInStreamLoader*,
                const WebCore::ResourceError&);
-  void didFinishLoading(WebCore::NetscapePlugInStreamLoader*);
   bool wantsAllStreams() const;
 
   RetainPtr<NSMutableData> m_deliveryData;
@@ -140,30 +135,11 @@ class WebNetscapePluginStream
   void deliverDataTimerFired(WebCore::Timer<WebNetscapePluginStream>* timer);
   WebCore::Timer<WebNetscapePluginStream> m_deliverDataTimer;
 
-  // FIXME: Remove this once it's not needed anymore.
-  WebBaseNetscapePluginStream* m_pluginStream;
-
- private:
-  WebNetscapePluginStream(WebBaseNetscapePluginStream*, WebCore::FrameLoader*);
-  WebNetscapePluginStream(WebBaseNetscapePluginStream*,
-                          NSURLRequest*,
+  WebNetscapePluginStream(WebCore::FrameLoader*);
+  WebNetscapePluginStream(NSURLRequest*,
                           NPP,
                           bool sendNotification,
                           void* notifyData);
 };
 
-@interface WebBaseNetscapePluginStream : NSObject {
-  RefPtr<WebNetscapePluginStream> _impl;
-}
-
-- (WebNetscapePluginStream*)impl;
-
-- (id)initWithFrameLoader:(WebCore::FrameLoader*)frameLoader;
-
-- (id)initWithRequest:(NSURLRequest*)theRequest
-               plugin:(NPP)thePlugin
-           notifyData:(void*)theNotifyData
-     sendNotification:(BOOL)sendNotification;
-
-@end
 #endif
