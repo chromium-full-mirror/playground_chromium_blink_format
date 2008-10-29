@@ -1323,6 +1323,11 @@ RegisterID* IfElseNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   generator.emitJump(afterElse.get());
 
   generator.emitLabel(beforeElse.get());
+
+  if (!m_elseBlock->isBlock())
+    generator.emitDebugHook(WillExecuteStatement, m_elseBlock->firstLine(),
+                            m_elseBlock->lastLine());
+
   generator.emitNode(dst, m_elseBlock.get());
 
   generator.emitLabel(afterElse.get());
