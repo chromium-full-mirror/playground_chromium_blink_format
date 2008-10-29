@@ -32,13 +32,18 @@
 
 namespace WebCore {
 
-std::auto_ptr<ImageBuffer> ImageBuffer::create(const IntSize&, bool grayScale) {
-  return std::auto_ptr<ImageBuffer>(new ImageBuffer());
+ImageBufferData::ImageBufferData(const IntSize&) {}
+
+ImageBuffer::ImageBuffer(const IntSize&, bool grayScale, bool& success)
+    : m_data(IntSize()) {
+  notImplemented();
+  success = false;
 }
 
 ImageBuffer::~ImageBuffer() {}
 
 GraphicsContext* ImageBuffer::context() const {
+  notImplemented();
   return 0;
 }
 
