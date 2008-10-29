@@ -28,6 +28,7 @@
 #include "webkitwebview.h"
 #include "webkitmarshal.h"
 #include "webkitprivate.h"
+#include "webkitwebinspector.h"
 #include "webkitwebbackforwardlist.h"
 #include "webkitwebhistoryitem.h"
 
@@ -102,6 +103,7 @@ enum {
   PROP_PASTE_TARGET_LIST,
   PROP_EDITABLE,
   PROP_SETTINGS,
+  PROP_WEB_INSPECTOR,
   PROP_TRANSPARENT,
   PROP_ZOOM_LEVEL,
   PROP_FULL_CONTENT_ZOOM
@@ -262,6 +264,9 @@ static void webkit_web_view_get_property(GObject* object,
       break;
     case PROP_SETTINGS:
       g_value_set_object(value, webkit_web_view_get_settings(webView));
+      break;
+    case PROP_WEB_INSPECTOR:
+      g_value_set_object(value, webkit_web_view_get_inspector(webView));
       break;
     case PROP_TRANSPARENT:
       g_value_set_boolean(value, webkit_web_view_get_transparent(webView));
@@ -821,6 +826,7 @@ static void webkit_web_view_finalize(GObject* object) {
   g_signal_handlers_disconnect_by_func(
       priv->webSettings, (gpointer)webkit_web_view_settings_notify, webView);
   g_object_unref(priv->webSettings);
+  g_object_unref(priv->webInspector);
   g_object_unref(priv->mainFrame);
   g_object_unref(priv->imContext);
   gtk_target_list_unref(priv->copy_target_list);
@@ -1256,6 +1262,19 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
                           "An associated WebKitWebSettings instance",
                           WEBKIT_TYPE_WEB_SETTINGS, WEBKIT_PARAM_READWRITE));
 
+  /**
+  * WebKitWebView:web-inspector:
+  *
+  * The associated WebKitWebInspector instance.
+  *
+  * Since: 1.0.2
+  */
+  g_object_class_install_property(
+      objectClass, PROP_WEB_INSPECTOR,
+      g_param_spec_object("web-inspector", "Web Inspector",
+                          "The associated WebKitWebInspector instance",
+                          WEBKIT_TYPE_WEB_INSPECTOR, WEBKIT_PARAM_READABLE));
+
   g_object_class_install_property(
       objectClass, PROP_EDITABLE,
       g_param_spec_boolean("editable", "Editable",
@@ -1340,7 +1359,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       *fantasyFontFamily, *monospaceFontFamily, *sansSerifFontFamily,
       *serifFontFamily, *userStylesheetUri;
   gboolean autoLoadImages, autoShrinkImages, printBackgrounds, enableScripts,
-      enablePlugins, resizableTextAreas;
+      enablePlugins, enableDeveloperExtras, resizableTextAreas;
 
   g_object_get(G_OBJECT(webSettings), "default-encoding", &defaultEncoding,
                "cursive-font-family", &cursiveFontFamily, "default-font-family",
@@ -1352,7 +1371,8 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
                "print-backgrounds", &printBackgrounds, "enable-scripts",
                &enableScripts, "enable-plugins", &enablePlugins,
                "resizable-text-areas", &resizableTextAreas,
-               "user-stylesheet-uri", &userStylesheetUri, NULL);
+               "user-stylesheet-uri", &userStylesheetUri,
+               "enable-developer-extras", &enableDeveloperExtras, NULL);
 
   settings->setDefaultTextEncodingName(defaultEncoding);
   settings->setCursiveFontFamily(cursiveFontFamily);
@@ -1368,6 +1388,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setPluginsEnabled(enablePlugins);
   settings->setTextAreasAreResizable(resizableTextAreas);
   settings->setUserStyleSheetLocation(KURL(userStylesheetUri));
+  settings->setDeveloperExtrasEnabled(enableDeveloperExtras);
 
   g_free(defaultEncoding);
   g_free(cursiveFontFamily);
@@ -1437,10 +1458,20 @@ static void webkit_web_view_init(WebKitWebView* webView) {
   webView->priv = priv;
 
   priv->imContext = gtk_im_multicontext_new();
-  priv->corePage = new Page(
-      new WebKit::ChromeClient(webView), new WebKit::ContextMenuClient(webView),
-      new WebKit::EditorClient(webView), new WebKit::DragClient,
-      new WebKit::InspectorClient);
+
+  WebKit::InspectorClient* inspectorClient =
+      new WebKit::InspectorClient(webView);
+  priv->corePage = new Page(new WebKit::ChromeClient(webView),
+                            new WebKit::ContextMenuClient(webView),
+                            new WebKit::EditorClient(webView),
+                            new WebKit::DragClient, inspectorClient);
+
+  // We also add a simple wrapper class to provide the public
+  // interface for the Web Inspector.
+  priv->webInspector =
+      WEBKIT_WEB_INSPECTOR(g_object_new(WEBKIT_TYPE_WEB_INSPECTOR, NULL));
+  webkit_web_inspector_set_inspector_client(priv->webInspector,
+                                            inspectorClient);
 
   priv->horizontalAdjustment =
       GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
@@ -1523,6 +1554,29 @@ WebKitWebSettings* webkit_web_view_get_settings(WebKitWebView* webView) {
 
   WebKitWebViewPrivate* priv = webView->priv;
   return priv->webSettings;
+}
+
+/**
+ * webkit_web_view_get_inspector:
+ * @webView: a #WebKitWebView
+ *
+ * Obtains the #WebKitWebInspector associated with the
+ * #WebKitWebView. Every #WebKitWebView object has a
+ * #WebKitWebInspector object attached to it as soon as it is created,
+ * so this function will only return NULL if the argument is not a
+ * valid #WebKitWebView.
+ *
+ * Returns: the #WebKitWebInspector instance associated with the
+ * #WebKitWebView; %NULL is only returned if the argument is not a
+ * valid #WebKitWebView.
+ *
+ * Since: 1.0.2
+ */
+WebKitWebInspector* webkit_web_view_get_inspector(WebKitWebView* webView) {
+  g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), NULL);
+
+  WebKitWebViewPrivate* priv = webView->priv;
+  return priv->webInspector;
 }
 
 /**
