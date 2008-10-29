@@ -176,19 +176,13 @@ class StructureID : public RefCounted<StructureID> {
 
   TypeInfo m_typeInfo;
 
-  bool m_isDictionary;
-
-  bool m_hasGetterSetterProperties;
-
   JSValue* m_prototype;
   RefPtr<StructureIDChain> m_cachedPrototypeChain;
 
   RefPtr<StructureID> m_previous;
   UString::Rep* m_nameInPrevious;
-  unsigned m_attributesInPrevious;
 
   size_t m_transitionCount;
-  bool m_usingSingleTransitionSlot;
   union {
     StructureID* singleTransition;
     TransitionTable* table;
@@ -200,6 +194,11 @@ class StructureID : public RefCounted<StructureID> {
   size_t m_propertyStorageCapacity;
 
   size_t m_cachedTransistionOffset;
+
+  bool m_isDictionary : 1;
+  bool m_hasGetterSetterProperties : 1;
+  bool m_usingSingleTransitionSlot : 1;
+  unsigned m_attributesInPrevious : 5;
 };
 
 class StructureIDChain : public RefCounted<StructureIDChain> {
