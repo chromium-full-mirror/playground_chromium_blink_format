@@ -75,7 +75,6 @@
 #include "KeyboardEvent.h"
 #include "Logging.h"
 #include "MessageEvent.h"
-#include "MessagePort.h"
 #include "MouseEvent.h"
 #include "MouseEventWithHitTestResults.h"
 #include "MutationEvent.h"
@@ -275,19 +274,6 @@ static bool acceptsEditingFocus(Node* node) {
 
 static HashSet<Document*>* changedDocuments = 0;
 
-class MessagePortTimer : public TimerBase {
- public:
-  MessagePortTimer(PassRefPtr<Document> document) : m_document(document) {}
-
- private:
-  virtual void fired() {
-    m_document->dispatchMessagePortEvents();
-    delete this;
-  }
-
-  RefPtr<Document> m_document;
-};
-
 Document::Document(Frame* frame, bool isXHTML)
     : ContainerNode(0),
       m_domtree_version(0),
@@ -303,8 +289,7 @@ Document::Document(Frame* frame, bool isXHTML)
 #endif
       ,
       m_xmlVersion("1.0"),
-      m_xmlStandalone(false),
-      m_firedMessagePortTimer(false)
+      m_xmlStandalone(false)
 #if ENABLE(XBL)
       ,
       m_bindingManager(new XBLBindingManager(this))
@@ -444,22 +429,6 @@ Document::~Document() {
   ASSERT(m_ranges.isEmpty());
 
   removeAllEventListeners();
-
-  HashMap<ActiveDOMObject*, void*>::iterator activeObjectsEnd =
-      m_activeDOMObjects.end();
-  for (HashMap<ActiveDOMObject*, void*>::iterator iter =
-           m_activeDOMObjects.begin();
-       iter != activeObjectsEnd; ++iter) {
-    ASSERT(iter->first->document() == this);
-    iter->first->contextDestroyed();
-  }
-
-  HashSet<MessagePort*>::iterator messagePortsEnd = m_messagePorts.end();
-  for (HashSet<MessagePort*>::iterator iter = m_messagePorts.begin();
-       iter != messagePortsEnd; ++iter) {
-    ASSERT((*iter)->document() == this);
-    (*iter)->contextDestroyed();
-  }
 
   forgetAllDOMNodesForDocument(this);
 
@@ -4409,66 +4378,6 @@ HTMLCanvasElement* Document::getCSSCanvasElement(const String& name) {
     m_cssCanvasElements.set(name, result);
   }
   return result.get();
-}
-
-void Document::processMessagePortMessagesSoon() {
-  if (m_firedMessagePortTimer)
-    return;
-
-  MessagePortTimer* timer = new MessagePortTimer(this);
-  timer->startOneShot(0);
-
-  m_firedMessagePortTimer = true;
-}
-
-void Document::dispatchMessagePortEvents() {
-  RefPtr<Document> protect(this);
-
-  // Make a frozen copy.
-  Vector<MessagePort*> ports;
-  copyToVector(m_messagePorts, ports);
-
-  m_firedMessagePortTimer = false;
-
-  unsigned portCount = ports.size();
-  for (unsigned i = 0; i < portCount; ++i) {
-    MessagePort* port = ports[i];
-    if (m_messagePorts.contains(port) && port->queueIsOpen())
-      port->dispatchMessages();
-  }
-}
-
-void Document::createdMessagePort(MessagePort* port) {
-  ASSERT(port);
-  m_messagePorts.add(port);
-}
-
-void Document::destroyedMessagePort(MessagePort* port) {
-  ASSERT(port);
-  m_messagePorts.remove(port);
-}
-
-void Document::stopActiveDOMObjects() {
-  HashMap<ActiveDOMObject*, void*>::iterator activeObjectsEnd =
-      m_activeDOMObjects.end();
-  for (HashMap<ActiveDOMObject*, void*>::iterator iter =
-           m_activeDOMObjects.begin();
-       iter != activeObjectsEnd; ++iter) {
-    ASSERT(iter->first->document() == this);
-    iter->first->stop();
-  }
-}
-
-void Document::createdActiveDOMObject(ActiveDOMObject* object,
-                                      void* upcastPointer) {
-  ASSERT(object);
-  ASSERT(upcastPointer);
-  m_activeDOMObjects.add(object, upcastPointer);
-}
-
-void Document::destroyedActiveDOMObject(ActiveDOMObject* object) {
-  ASSERT(object);
-  m_activeDOMObjects.remove(object);
 }
 
 void Document::initDNSPrefetch() {

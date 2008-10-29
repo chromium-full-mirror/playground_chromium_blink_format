@@ -24,7 +24,6 @@
 
 #include "PlatformString.h"
 #include "JSDOMBinding.h"
-#include "JSDOMGlobalObject.h"
 #include <kjs/protect.h>
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
@@ -64,6 +63,7 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
   void updateDocument();
 
   DOMWindow* impl() const { return d()->impl.get(); }
+  virtual ScriptExecutionContext* scriptExecutionContext() const;
 
   void disconnectFrame();
 

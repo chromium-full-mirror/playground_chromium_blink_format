@@ -37,7 +37,6 @@
 #include "HTMLImageElement.h"
 #include "HTMLNames.h"
 #include "JSDOMCoreException.h"
-#include "JSDOMGlobalObject.h"
 #include "JSDOMWindowCustom.h"
 #include "JSEventException.h"
 #include "JSNode.h"
@@ -267,13 +266,15 @@ void markDOMNodesForDocument(Document* doc) {
   }
 }
 
-void markActiveObjectsForDocument(JSGlobalData& globalData, Document* doc) {
+void markActiveObjectsForContext(
+    JSGlobalData& globalData,
+    ScriptExecutionContext* scriptExecutionContext) {
   // If an element has pending activity that may result in listeners being
   // called
   // (e.g. an XMLHttpRequest), we need to keep all JS wrappers alive.
 
   const HashMap<ActiveDOMObject*, void*>& activeObjects =
-      doc->activeDOMObjects();
+      scriptExecutionContext->activeDOMObjects();
   HashMap<ActiveDOMObject*, void*>::const_iterator activeObjectsEnd =
       activeObjects.end();
   for (HashMap<ActiveDOMObject*, void*>::const_iterator iter =
@@ -288,7 +289,8 @@ void markActiveObjectsForDocument(JSGlobalData& globalData, Document* doc) {
     }
   }
 
-  const HashSet<MessagePort*>& messagePorts = doc->messagePorts();
+  const HashSet<MessagePort*>& messagePorts =
+      scriptExecutionContext->messagePorts();
   HashSet<MessagePort*>::const_iterator portsEnd = messagePorts.end();
   for (HashSet<MessagePort*>::const_iterator iter = messagePorts.begin();
        iter != portsEnd; ++iter) {
@@ -302,9 +304,11 @@ void markActiveObjectsForDocument(JSGlobalData& globalData, Document* doc) {
   }
 }
 
-void markCrossHeapDependentObjectsForDocument(JSGlobalData& globalData,
-                                              Document* document) {
-  const HashSet<MessagePort*>& messagePorts = document->messagePorts();
+void markCrossHeapDependentObjectsForContext(
+    JSGlobalData& globalData,
+    ScriptExecutionContext* scriptExecutionContext) {
+  const HashSet<MessagePort*>& messagePorts =
+      scriptExecutionContext->messagePorts();
   HashSet<MessagePort*>::const_iterator portsEnd = messagePorts.end();
   for (HashSet<MessagePort*>::const_iterator iter = messagePorts.begin();
        iter != portsEnd; ++iter) {
@@ -322,8 +326,10 @@ void markCrossHeapDependentObjectsForDocument(JSGlobalData& globalData,
       // one,
       // and it will never get a chance to be marked as inaccessible. So, the
       // port will keep getting marked in this function.
-      if ((port->document() && entangledPort->document()) ||
-          (port->workerContext() == entangledPort->workerContext()))
+      if ((port->scriptExecutionContext() ==
+           entangledPort->scriptExecutionContext()) ||
+          (port->scriptExecutionContext()->isDocument() &&
+           entangledPort->scriptExecutionContext()->isDocument()))
         continue;
 
       // If the wrapper hasn't been marked during the mark phase of GC, then the

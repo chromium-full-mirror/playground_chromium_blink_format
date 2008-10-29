@@ -40,25 +40,27 @@
 namespace WebCore {
 
 class AtomicStringImpl;
-class Document;
 class Event;
 class Frame;
+class ScriptExecutionContext;
 class String;
 class WorkerContext;
 
 class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
  public:
-  static PassRefPtr<MessagePort> create(Document* document) {
-    return adoptRef(new MessagePort(document));
+  static PassRefPtr<MessagePort> create(
+      ScriptExecutionContext* scriptExecutionContext) {
+    return adoptRef(new MessagePort(scriptExecutionContext));
   }
   ~MessagePort();
 
-  PassRefPtr<MessagePort> clone(Document*, ExceptionCode&);
+  PassRefPtr<MessagePort> clone(ScriptExecutionContext*, ExceptionCode&);
 
   bool active() const { return m_entangledPort; }
   void postMessage(const String& message, ExceptionCode&);
   void postMessage(const String& message, MessagePort*, ExceptionCode&);
-  PassRefPtr<MessagePort> startConversation(Document*, const String& message);
+  PassRefPtr<MessagePort> startConversation(ScriptExecutionContext*,
+                                            const String& message);
   void start();
   void close();
 
@@ -69,8 +71,9 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
   void unentangle();
 
   void contextDestroyed();
-  Document* document() { return m_document; }
-  WorkerContext* workerContext() { return 0; }  // Not implemented yet.
+  ScriptExecutionContext* scriptExecutionContext() {
+    return m_scriptExecutionContext;
+  }
 
   virtual MessagePort* toMessagePort() { return this; }
 
@@ -112,7 +115,7 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
  private:
   friend class CloseMessagePortTimer;
 
-  MessagePort(Document*);
+  MessagePort(ScriptExecutionContext*);
 
   virtual void refEventTarget() { ref(); }
   virtual void derefEventTarget() { deref(); }
@@ -123,8 +126,7 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
   MessageQueue<RefPtr<Event>> m_messageQueue;
   bool m_queueIsOpen;
 
-  Document* m_document;  // Will be 0 if the context does not contain a document
-                         // (e.g. if it's a worker thread).
+  ScriptExecutionContext* m_scriptExecutionContext;
 
   RefPtr<EventListener> m_onMessageListener;
   RefPtr<EventListener> m_onCloseListener;

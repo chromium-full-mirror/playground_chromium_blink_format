@@ -42,6 +42,7 @@ namespace WebCore {
 class CachedResource;
 class CachedScript;
 class Document;
+class ScriptExecutionContext;
 class MessagePort;
 class String;
 
@@ -58,7 +59,10 @@ class DedicatedWorker : public RefCounted<DedicatedWorker>,
   }
   ~DedicatedWorker();
 
-  PassRefPtr<MessagePort> startConversation(Document*, const String& message);
+  Document* document() const;
+
+  PassRefPtr<MessagePort> startConversation(ScriptExecutionContext*,
+                                            const String& message);
   void close();
   void postMessage(const String& message, MessagePort* port = 0);
 

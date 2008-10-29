@@ -27,22 +27,24 @@
 #include "config.h"
 #include "ActiveDOMObject.h"
 
-#include "Document.h"
+#include "ScriptExecutionContext.h"
 
 namespace WebCore {
 
-ActiveDOMObject::ActiveDOMObject(Document* document, void* upcastPointer)
-    : m_document(document), m_pendingActivityCount(0) {
-  m_document->createdActiveDOMObject(this, upcastPointer);
+ActiveDOMObject::ActiveDOMObject(ScriptExecutionContext* scriptExecutionContext,
+                                 void* upcastPointer)
+    : m_scriptExecutionContext(scriptExecutionContext),
+      m_pendingActivityCount(0) {
+  m_scriptExecutionContext->createdActiveDOMObject(this, upcastPointer);
 }
 
 ActiveDOMObject::~ActiveDOMObject() {
-  if (m_document)
-    m_document->destroyedActiveDOMObject(this);
+  if (m_scriptExecutionContext)
+    m_scriptExecutionContext->destroyedActiveDOMObject(this);
 }
 
 void ActiveDOMObject::contextDestroyed() {
-  m_document = 0;
+  m_scriptExecutionContext = 0;
 }
 
 void ActiveDOMObject::stop() {}

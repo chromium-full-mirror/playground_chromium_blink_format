@@ -33,13 +33,13 @@
 
 namespace WebCore {
 
-class Document;
 class MessagePort;
+class ScriptExecutionContext;
 
 class MessageChannel : public RefCounted<MessageChannel> {
  public:
-  static PassRefPtr<MessageChannel> create(Document* document) {
-    return adoptRef(new MessageChannel(document));
+  static PassRefPtr<MessageChannel> create(ScriptExecutionContext* context) {
+    return adoptRef(new MessageChannel(context));
   }
   ~MessageChannel();
 
@@ -47,7 +47,7 @@ class MessageChannel : public RefCounted<MessageChannel> {
   MessagePort* port2() const { return m_port2.get(); }
 
  private:
-  MessageChannel(Document*);
+  MessageChannel(ScriptExecutionContext*);
 
   RefPtr<MessagePort> m_port1;
   RefPtr<MessagePort> m_port2;

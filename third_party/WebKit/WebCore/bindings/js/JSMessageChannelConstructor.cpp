@@ -27,6 +27,7 @@
 #include "JSMessageChannelConstructor.h"
 
 #include "Document.h"
+#include "JSDocument.h"
 #include "JSMessageChannel.h"
 #include "MessageChannel.h"
 
@@ -37,11 +38,20 @@ namespace WebCore {
 const ClassInfo JSMessageChannelConstructor::s_info = {
     "MessageChannelConstructor", 0, 0, 0};
 
-JSMessageChannelConstructor::JSMessageChannelConstructor(ExecState* exec,
-                                                         Document* document)
+JSMessageChannelConstructor::JSMessageChannelConstructor(
+    ExecState* exec,
+    ScriptExecutionContext* scriptExecutionContext)
     : DOMObject(JSMessageChannelConstructor::createStructureID(
           exec->lexicalGlobalObject()->objectPrototype())),
-      m_document(static_cast<JSDocument*>(asObject(toJS(exec, document)))) {
+      m_scriptExecutionContext(scriptExecutionContext) {
+  if (m_scriptExecutionContext->isDocument())
+    m_contextWrapper =
+        toJS(exec, static_cast<Document*>(scriptExecutionContext));
+  else if (m_scriptExecutionContext->isWorkerContext())
+    ;  // Not yet implemented.
+  else
+    ASSERT_NOT_REACHED();
+
   putDirect(exec->propertyNames().prototype,
             JSMessageChannelPrototype::self(exec), None);
 }
@@ -57,16 +67,16 @@ ConstructType JSMessageChannelConstructor::getConstructData(
 JSObject* JSMessageChannelConstructor::construct(ExecState* exec,
                                                  JSObject* constructor,
                                                  const ArgList&) {
-  return asObject(toJS(
-      exec,
-      MessageChannel::create(
-          static_cast<JSMessageChannelConstructor*>(constructor)->document())));
+  return asObject(
+      toJS(exec, MessageChannel::create(
+                     static_cast<JSMessageChannelConstructor*>(constructor)
+                         ->scriptExecutionContext())));
 }
 
 void JSMessageChannelConstructor::mark() {
   DOMObject::mark();
-  if (!m_document->marked())
-    m_document->mark();
+  if (!m_contextWrapper->marked())
+    m_contextWrapper->mark();
 }
 
 }  // namespace WebCore

@@ -31,13 +31,15 @@
 
 namespace WebCore {
 
-class Document;
+class ScriptExecutionContext;
 
 class ActiveDOMObject {
  public:
-  ActiveDOMObject(Document*, void* upcastPointer);
+  ActiveDOMObject(ScriptExecutionContext*, void* upcastPointer);
 
-  Document* document() const { return m_document; }
+  ScriptExecutionContext* scriptExecutionContext() const {
+    return m_scriptExecutionContext;
+  }
   bool hasPendingActivity() { return m_pendingActivityCount; }
 
   virtual void contextDestroyed();
@@ -61,7 +63,7 @@ class ActiveDOMObject {
   }
 
  private:
-  Document* m_document;
+  ScriptExecutionContext* m_scriptExecutionContext;
   unsigned m_pendingActivityCount;
 };
 

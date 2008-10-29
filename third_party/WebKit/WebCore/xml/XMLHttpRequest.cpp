@@ -193,6 +193,11 @@ XMLHttpRequest::~XMLHttpRequest() {
     m_upload->disconnectXMLHttpRequest();
 }
 
+Document* XMLHttpRequest::document() const {
+  ASSERT(scriptExecutionContext()->isDocument());
+  return static_cast<Document*>(scriptExecutionContext());
+}
+
 Frame* XMLHttpRequest::associatedFrame() const {
   if (!document())
     return 0;

@@ -31,6 +31,7 @@
 #include "DedicatedWorker.h"
 
 #include "CachedScript.h"
+#include "DOMWindow.h"
 #include "DocLoader.h"
 #include "Document.h"
 #include "Event.h"
@@ -41,6 +42,7 @@
 #include "FrameLoader.h"
 #include "MessagePort.h"
 #include "SecurityOrigin.h"
+#include "ScriptExecutionContext.h"
 #include "Timer.h"
 #include <wtf/MainThread.h>
 
@@ -86,8 +88,13 @@ DedicatedWorker::~DedicatedWorker() {
   ASSERT(isMainThread());
 }
 
+Document* DedicatedWorker::document() const {
+  ASSERT(scriptExecutionContext()->isDocument());
+  return static_cast<Document*>(scriptExecutionContext());
+}
+
 PassRefPtr<MessagePort> DedicatedWorker::startConversation(
-    Document* /*scriptContextDocument*/,
+    ScriptExecutionContext* /*scriptExecutionContext*/,
     const String& /*message*/) {
   // Not implemented.
   return 0;
