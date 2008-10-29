@@ -35,7 +35,7 @@
 #include "JSEventTarget.h"
 #include "JSEventTargetNode.h"
 #include "ScriptController.h"
-#include <kjs/FunctionConstructor.h>
+#include <runtime/FunctionConstructor.h>
 #include <kjs/JSLock.h>
 #include <wtf/RefCountedLeakCounter.h>
 
