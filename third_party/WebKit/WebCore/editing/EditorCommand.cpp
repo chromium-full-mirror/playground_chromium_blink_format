@@ -520,6 +520,14 @@ static bool executeForwardDelete(Frame* frame,
   return false;
 }
 
+static bool executeIgnoreSpelling(Frame* frame,
+                                  Event*,
+                                  EditorCommandSource,
+                                  const String&) {
+  frame->editor()->ignoreSpelling();
+  return true;
+}
+
 static bool executeIndent(Frame* frame,
                           Event*,
                           EditorCommandSource,
@@ -1628,6 +1636,10 @@ static const CommandMap& createCommandMap() {
       {"HiliteColor",
        {executeBackColor, supported, enabledInRichlyEditableText, stateNone,
         valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
+      {"IgnoreSpelling",
+       {executeIgnoreSpelling, supportedFromMenuOrKeyBinding,
+        enabledInEditableText, stateNone, valueNull, notTextInsertion,
+        doNotAllowExecutionWhenDisabled}},
       {"Indent",
        {executeIndent, supported, enabledInRichlyEditableText, stateNone,
         valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
