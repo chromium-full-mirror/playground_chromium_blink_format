@@ -45,14 +45,4 @@ extern NSString* WebHistoryItemsDiscardedWhileLoadingNotification;
 // API?
 - (WebHistoryItem*)_itemForURLString:(NSString*)URLString;
 
-// FIXME: neither Safari nor WebKit use the following SPI -- do we still need
-// them?
-- (void)addItem:(WebHistoryItem*)entry;
-- (WebHistoryItem*)addItemForURL:(NSURL*)URL;
-- (NSCalendarDate*)ageLimitDate;
-- (BOOL)containsItemForURLString:(NSString*)URLString;
-- (void)removeItem:(WebHistoryItem*)entry;
-- (void)setLastVisitedTimeInterval:(NSTimeInterval)time
-                           forItem:(WebHistoryItem*)item;
-
 @end
