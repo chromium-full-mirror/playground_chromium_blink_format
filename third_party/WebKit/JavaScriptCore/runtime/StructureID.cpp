@@ -307,7 +307,8 @@ PassRefPtr<StructureID> StructureID::addPropertyTransition(
     StructureID* existingTransition =
         structureID->m_transitions.singleTransition;
     structureID->m_usingSingleTransitionSlot = false;
-    TransitionTable* transitionTable = new TransitionTable;
+    StructureIDTransitionTable* transitionTable =
+        new StructureIDTransitionTable;
     structureID->m_transitions.table = transitionTable;
     transitionTable->add(make_pair(existingTransition->m_nameInPrevious,
                                    existingTransition->m_attributesInPrevious),
