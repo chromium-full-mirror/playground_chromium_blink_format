@@ -301,9 +301,10 @@ class DOMWindow : public RefCounted<DOMWindow> {
  private:
   DOMWindow(Frame*);
 
-  void setEventListenerForType(const AtomicString& eventType,
-                               PassRefPtr<EventListener>);
-  EventListener* eventListenerForType(const AtomicString& eventType) const;
+  void setInlineEventListenerForType(const AtomicString& eventType,
+                                     PassRefPtr<EventListener>);
+  EventListener* inlineEventListenerForType(
+      const AtomicString& eventType) const;
 
   RefPtr<SecurityOrigin> m_securityOrigin;
   KURL m_url;

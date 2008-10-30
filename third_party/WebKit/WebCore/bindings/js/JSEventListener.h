@@ -34,26 +34,23 @@ class Node;
 class JSAbstractEventListener : public EventListener {
  public:
   virtual void handleEvent(Event*, bool isWindowEvent);
-  virtual bool isAttachedToEventTargetNode() const;
+  virtual bool isInline() const;
   virtual JSC::JSObject* listenerObj() const = 0;
   virtual JSDOMWindow* window() const = 0;
 
  protected:
-  JSAbstractEventListener(bool isAttachedToEventTargetNode)
-      : m_isAttachedToEventTargetNode(isAttachedToEventTargetNode) {}
+  JSAbstractEventListener(bool isInline) : m_isInline(isInline) {}
 
  private:
-  bool m_isAttachedToEventTargetNode;
+  bool m_isInline;
 };
 
 class JSUnprotectedEventListener : public JSAbstractEventListener {
  public:
-  static PassRefPtr<JSUnprotectedEventListener> create(
-      JSC::JSObject* listener,
-      JSDOMWindow* window,
-      bool isAttachedToEventTargetNode) {
-    return adoptRef(new JSUnprotectedEventListener(
-        listener, window, isAttachedToEventTargetNode));
+  static PassRefPtr<JSUnprotectedEventListener> create(JSC::JSObject* listener,
+                                                       JSDOMWindow* window,
+                                                       bool isInline) {
+    return adoptRef(new JSUnprotectedEventListener(listener, window, isInline));
   }
   virtual ~JSUnprotectedEventListener();
 
@@ -65,7 +62,7 @@ class JSUnprotectedEventListener : public JSAbstractEventListener {
  private:
   JSUnprotectedEventListener(JSC::JSObject* listener,
                              JSDOMWindow*,
-                             bool isAttachedToEventTargetNode);
+                             bool isInline);
 
   JSC::JSObject* m_listener;
   JSDOMWindow* m_window;
@@ -75,9 +72,8 @@ class JSEventListener : public JSAbstractEventListener {
  public:
   static PassRefPtr<JSEventListener> create(JSC::JSObject* listener,
                                             JSDOMWindow* window,
-                                            bool isAttachedToEventTargetNode) {
-    return adoptRef(
-        new JSEventListener(listener, window, isAttachedToEventTargetNode));
+                                            bool isInline) {
+    return adoptRef(new JSEventListener(listener, window, isInline));
   }
   virtual ~JSEventListener();
 
@@ -86,9 +82,7 @@ class JSEventListener : public JSAbstractEventListener {
   void clearWindow();
 
  protected:
-  JSEventListener(JSC::JSObject* listener,
-                  JSDOMWindow*,
-                  bool isAttachedToEventTargetNode);
+  JSEventListener(JSC::JSObject* listener, JSDOMWindow*, bool isInline);
 
   mutable JSC::ProtectedPtr<JSC::JSObject> m_listener;
 

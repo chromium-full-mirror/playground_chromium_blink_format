@@ -2732,31 +2732,30 @@ void Document::handleWindowEvent(Event* evt, bool useCapture) {
       (*it)->listener()->handleEvent(evt, true);
 }
 
-void Document::setWindowEventListenerForType(
+void Document::setWindowInlineEventListenerForType(
     const AtomicString& eventType,
     PassRefPtr<EventListener> listener) {
   // If we already have it we don't want removeWindowEventListener to delete it
-  removeWindowEventListenerForType(eventType);
+  removeWindowInlineEventListenerForType(eventType);
   if (listener)
     addWindowEventListener(eventType, listener, false);
 }
 
-EventListener* Document::windowEventListenerForType(
+EventListener* Document::windowInlineEventListenerForType(
     const AtomicString& eventType) {
   RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
   for (; it != m_windowEventListeners.end(); ++it) {
-    if ((*it)->eventType() == eventType &&
-        (*it)->listener()->isAttachedToEventTargetNode())
+    if ((*it)->eventType() == eventType && (*it)->listener()->isInline())
       return (*it)->listener();
   }
   return 0;
 }
 
-void Document::removeWindowEventListenerForType(const AtomicString& eventType) {
+void Document::removeWindowInlineEventListenerForType(
+    const AtomicString& eventType) {
   RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
   for (; it != m_windowEventListeners.end(); ++it) {
-    if ((*it)->eventType() == eventType &&
-        (*it)->listener()->isAttachedToEventTargetNode()) {
+    if ((*it)->eventType() == eventType && (*it)->listener()->isInline()) {
       if (eventType == unloadEvent)
         removePendingFrameUnloadEventCount();
       else if (eventType == beforeunloadEvent)
@@ -2842,13 +2841,13 @@ PassRefPtr<EventListener> Document::createEventListener(
 
   // We may want to treat compound document event handlers in a different way,
   // in future.
-  return frm->script()->createHTMLEventHandler(functionName, code, node);
+  return frm->script()->createInlineEventHandler(functionName, code, node);
 }
 
-void Document::setWindowEventListenerForTypeAndAttribute(
+void Document::setWindowInlineEventListenerForTypeAndAttribute(
     const AtomicString& eventType,
     Attribute* attr) {
-  setWindowEventListenerForType(
+  setWindowInlineEventListenerForType(
       eventType,
       createEventListener(attr->localName().string(), attr->value(), 0));
 }

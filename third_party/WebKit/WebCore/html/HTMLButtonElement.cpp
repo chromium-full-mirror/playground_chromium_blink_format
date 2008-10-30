@@ -83,9 +83,9 @@ void HTMLButtonElement::parseMappedAttribute(MappedAttribute* attr) {
     // not Opera.
     // See http://bugs.webkit.org/show_bug.cgi?id=12071
   } else if (attr->name() == onfocusAttr) {
-    setEventListenerForTypeAndAttribute(focusEvent, attr);
+    setInlineEventListenerForTypeAndAttribute(focusEvent, attr);
   } else if (attr->name() == onblurAttr) {
-    setEventListenerForTypeAndAttribute(blurEvent, attr);
+    setInlineEventListenerForTypeAndAttribute(blurEvent, attr);
   } else
     HTMLFormControlElement::parseMappedAttribute(attr);
 }

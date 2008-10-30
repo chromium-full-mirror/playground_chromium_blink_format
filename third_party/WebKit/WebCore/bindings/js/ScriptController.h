@@ -80,9 +80,9 @@ class ScriptController {
                          int baseLine,
                          const String& code);
 
-  PassRefPtr<EventListener> createHTMLEventHandler(const String& functionName,
-                                                   const String& code,
-                                                   Node*);
+  PassRefPtr<EventListener> createInlineEventHandler(const String& functionName,
+                                                     const String& code,
+                                                     Node*);
 #if ENABLE(SVG)
   PassRefPtr<EventListener> createSVGEventHandler(const String& functionName,
                                                   const String& code,

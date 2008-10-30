@@ -91,29 +91,28 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
   void timerFired(DOMWindowTimer*);
 
   // Finds a wrapper of a JS EventListener, returns 0 if no existing one.
-  JSEventListener* findJSEventListener(JSC::JSValue*,
-                                       bool attachedToEventTargetNode = false);
+  JSEventListener* findJSEventListener(JSC::JSValue*, bool isInline = false);
 
   // Finds or creates a wrapper of a JS EventListener. JS EventListener object
   // is GC-protected.
   PassRefPtr<JSEventListener> findOrCreateJSEventListener(
       JSC::ExecState*,
       JSC::JSValue*,
-      bool attachedToEventTargetNode = false);
+      bool isInline = false);
 
   // Finds a wrapper of a GC-unprotected JS EventListener, returns 0 if no
   // existing one.
   JSUnprotectedEventListener* findJSUnprotectedEventListener(
       JSC::ExecState*,
       JSC::JSValue*,
-      bool attachedToEventTargetNode = false);
+      bool isInline = false);
 
   // Finds or creates a wrapper of a JS EventListener. JS EventListener object
   // is *NOT* GC-protected.
   PassRefPtr<JSUnprotectedEventListener> findOrCreateJSUnprotectedEventListener(
       JSC::ExecState*,
       JSC::JSValue*,
-      bool attachedToEventTargetNode = false);
+      bool isInline = false);
 
   void clear();
 
@@ -128,10 +127,9 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
       UnprotectedListenersMap;
 
   ListenersMap& jsEventListeners();
-  ListenersMap& jsEventListenersAttachedToEventTargetNodes();
+  ListenersMap& jsInlineEventListeners();
   UnprotectedListenersMap& jsUnprotectedEventListeners();
-  UnprotectedListenersMap&
-  jsUnprotectedEventListenersAttachedToEventTargetNodes();
+  UnprotectedListenersMap& jsUnprotectedInlineEventListeners();
 
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
   static const JSC::ClassInfo s_info;
@@ -166,10 +164,9 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
     RefPtr<DOMWindow> impl;
 
     JSDOMWindowBase::ListenersMap jsEventListeners;
-    JSDOMWindowBase::ListenersMap jsEventListenersAttachedToEventTargetNodes;
+    JSDOMWindowBase::ListenersMap jsInlineEventListeners;
     JSDOMWindowBase::UnprotectedListenersMap jsUnprotectedEventListeners;
-    JSDOMWindowBase::UnprotectedListenersMap
-        jsUnprotectedEventListenersAttachedToEventTargetNodes;
+    JSDOMWindowBase::UnprotectedListenersMap jsUnprotectedInlineEventListeners;
     Event* evt;
     JSC::JSValue** returnValueSlot;
     JSDOMWindowShell* shell;
