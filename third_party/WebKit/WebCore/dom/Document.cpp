@@ -2841,7 +2841,7 @@ PassRefPtr<EventListener> Document::createEventListener(
 
   // We may want to treat compound document event handlers in a different way,
   // in future.
-  return frm->script()->createInlineEventHandler(functionName, code, node);
+  return frm->script()->createInlineEventListener(functionName, code, node);
 }
 
 void Document::setWindowInlineEventListenerForTypeAndAttribute(

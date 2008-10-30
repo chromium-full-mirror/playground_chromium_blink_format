@@ -147,7 +147,7 @@ void ScriptController::clearWindowShell() {
   gcController().garbageCollectSoon();
 }
 
-PassRefPtr<EventListener> ScriptController::createInlineEventHandler(
+PassRefPtr<EventListener> ScriptController::createInlineEventListener(
     const String& functionName,
     const String& code,
     Node* node) {
