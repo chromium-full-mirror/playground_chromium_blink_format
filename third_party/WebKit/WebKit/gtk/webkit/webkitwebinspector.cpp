@@ -32,7 +32,7 @@ enum {
   INSPECT_WEB_VIEW,
   SHOW_WINDOW,
   ATTACH_WINDOW,
-  DETTACH_WINDOW,
+  DETACH_WINDOW,
   CLOSE_WINDOW,
   FINISHED,
   LAST_SIGNAL
@@ -152,7 +152,7 @@ static void webkit_web_inspector_class_init(WebKitWebInspectorClass* klass) {
                    webkit_marshal_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
 
   /**
-   * WebKitWebInspector::dettach-window:
+   * WebKitWebInspector::detach-window:
    * @web_inspector: the object on which the signal is emitted
    * @return: %TRUE if the signal has been handled
    *
@@ -160,8 +160,8 @@ static void webkit_web_inspector_class_init(WebKitWebInspectorClass* klass) {
    *
    * Since: 1.0.3
    */
-  webkit_web_inspector_signals[DETTACH_WINDOW] =
-      g_signal_new("dettach-window", G_TYPE_FROM_CLASS(klass),
+  webkit_web_inspector_signals[DETACH_WINDOW] =
+      g_signal_new("detach-window", G_TYPE_FROM_CLASS(klass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
                    g_signal_accumulator_true_handled, NULL,
                    webkit_marshal_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
