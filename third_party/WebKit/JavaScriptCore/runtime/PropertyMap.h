@@ -88,14 +88,14 @@ class PropertyMap {
 
   PropertyMap& operator=(const PropertyMap&);
 
-  size_t get(const Identifier& propertyName);
-  size_t get(const Identifier& propertyName, unsigned& attributes);
+  size_t get(const Identifier& propertyName) const;
+  size_t get(const Identifier& propertyName, unsigned& attributes) const;
   size_t put(const Identifier& propertyName, unsigned attributes);
   size_t remove(const Identifier& propertyName);
 
   void getEnumerablePropertyNames(PropertyNameArray&) const;
 
-  bool isEmpty() { return !m_table; }
+  bool isEmpty() const { return !m_table; }
   unsigned storageSize() const {
     return m_table ? m_table->keyCount + m_deletedOffsets.size() : 0;
   }
@@ -126,7 +126,7 @@ class PropertyMap {
 
 inline PropertyMap::PropertyMap() : m_table(0) {}
 
-inline size_t PropertyMap::get(const Identifier& propertyName) {
+inline size_t PropertyMap::get(const Identifier& propertyName) const {
   ASSERT(!propertyName.isNull());
 
   if (!m_table)

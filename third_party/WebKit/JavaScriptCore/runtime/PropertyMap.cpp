@@ -266,7 +266,8 @@ size_t PropertyMap::remove(const Identifier& propertyName) {
   return offset;
 }
 
-size_t PropertyMap::get(const Identifier& propertyName, unsigned& attributes) {
+size_t PropertyMap::get(const Identifier& propertyName,
+                        unsigned& attributes) const {
   ASSERT(!propertyName.isNull());
 
   if (!m_table)

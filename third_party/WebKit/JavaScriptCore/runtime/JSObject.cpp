@@ -67,8 +67,8 @@ void JSObject::mark() {
   JSCell::mark();
   m_structureID->mark();
 
-  unsigned storageSize = m_structureID->propertyMap().storageSize();
-  for (unsigned i = 0; i < storageSize; ++i) {
+  size_t storageSize = m_structureID->propertyStorageSize();
+  for (size_t i = 0; i < storageSize; ++i) {
     JSValue* v = m_propertyStorage[i];
     if (!v->marked())
       v->mark();
@@ -134,8 +134,7 @@ void JSObject::put(ExecState* exec,
   }
 
   unsigned attributes;
-  if ((m_structureID->propertyMap().get(propertyName, attributes) !=
-       WTF::notFound) &&
+  if ((m_structureID->get(propertyName, attributes) != WTF::notFound) &&
       attributes & ReadOnly)
     return;
 
@@ -204,8 +203,7 @@ bool JSObject::hasProperty(ExecState* exec, unsigned propertyName) const {
 // ECMA 8.6.2.5
 bool JSObject::deleteProperty(ExecState* exec, const Identifier& propertyName) {
   unsigned attributes;
-  if (m_structureID->propertyMap().get(propertyName, attributes) !=
-      WTF::notFound) {
+  if (m_structureID->get(propertyName, attributes) != WTF::notFound) {
     if ((attributes & DontDelete))
       return false;
     removeDirect(propertyName);
@@ -430,8 +428,7 @@ bool JSObject::propertyIsEnumerable(ExecState* exec,
 bool JSObject::getPropertyAttributes(ExecState* exec,
                                      const Identifier& propertyName,
                                      unsigned& attributes) const {
-  if (m_structureID->propertyMap().get(propertyName, attributes) !=
-      WTF::notFound)
+  if (m_structureID->get(propertyName, attributes) != WTF::notFound)
     return true;
 
   // Look in the static hashtable of properties
@@ -482,7 +479,7 @@ JSGlobalObject* JSObject::toGlobalObject(ExecState*) const {
 void JSObject::removeDirect(const Identifier& propertyName) {
   size_t offset;
   if (m_structureID->isDictionary()) {
-    offset = m_structureID->propertyMap().remove(propertyName);
+    offset = m_structureID->remove(propertyName);
     if (offset != WTF::notFound) {
       m_propertyStorage[offset] = jsUndefined();
       m_structureID->clearEnumerationCache();
@@ -492,7 +489,7 @@ void JSObject::removeDirect(const Identifier& propertyName) {
 
   RefPtr<StructureID> structureID =
       StructureID::toDictionaryTransition(m_structureID);
-  offset = structureID->propertyMap().remove(propertyName);
+  offset = structureID->remove(propertyName);
   if (offset != WTF::notFound)
     m_propertyStorage[offset] = jsUndefined();
   setStructureID(structureID.release());

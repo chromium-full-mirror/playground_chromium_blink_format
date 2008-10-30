@@ -108,9 +108,6 @@ class StructureID : public RefCounted<StructureID> {
     return m_cachedPrototypeChain.get();
   }
 
-  const PropertyMap& propertyMap() const { return m_propertyMap; }
-  PropertyMap& propertyMap() { return m_propertyMap; }
-
   void setCachedTransistionOffset(size_t offset) {
     m_cachedTransistionOffset = offset;
   }
@@ -118,6 +115,20 @@ class StructureID : public RefCounted<StructureID> {
 
   void growPropertyStorageCapacity();
   size_t propertyStorageCapacity() const { return m_propertyStorageCapacity; }
+  size_t propertyStorageSize() const { return m_propertyMap.storageSize(); }
+
+  size_t get(const Identifier& propertyName) const {
+    return m_propertyMap.get(propertyName);
+  }
+  size_t get(const Identifier& propertyName, unsigned& attributes) const {
+    return m_propertyMap.get(propertyName, attributes);
+  }
+  size_t put(const Identifier& propertyName, unsigned attributes) {
+    return m_propertyMap.put(propertyName, attributes);
+  }
+  size_t remove(const Identifier& propertyName) {
+    return m_propertyMap.remove(propertyName);
+  }
 
   void getEnumerablePropertyNames(ExecState*, PropertyNameArray&, JSObject*);
   void clearEnumerationCache();
@@ -126,6 +137,8 @@ class StructureID : public RefCounted<StructureID> {
   void setHasGetterSetterProperties(bool hasGetterSetterProperties) {
     m_hasGetterSetterProperties = hasGetterSetterProperties;
   }
+
+  bool isEmpty() const { return m_propertyMap.isEmpty(); }
 
  private:
   StructureID(JSValue* prototype, const TypeInfo&);
