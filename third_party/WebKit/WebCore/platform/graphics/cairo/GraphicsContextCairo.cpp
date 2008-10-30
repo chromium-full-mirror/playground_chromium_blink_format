@@ -457,7 +457,7 @@ void GraphicsContext::fillPath() {
       if (fillColor().alpha()) {
         setColor(cr, fillColor());
         cairo_clip(cr);
-        cairo_paint_with_alpha(cr, m_data->globalAlpha);
+        cairo_paint_with_alpha(cr, m_common->state.globalAlpha);
       }
       break;
     case PatternColorSpace:
@@ -465,7 +465,7 @@ void GraphicsContext::fillPath() {
           cr,
           m_common->state.fillPattern.get()->createPlatformPattern(getCTM()));
       cairo_clip(cr);
-      cairo_paint_with_alpha(cr, m_data->globalAlpha);
+      cairo_paint_with_alpha(cr, m_common->state.globalAlpha);
       break;
     case GradientColorSpace:
       cairo_pattern_t* pattern =
@@ -473,7 +473,7 @@ void GraphicsContext::fillPath() {
       pattern = applySpreadMethod(pattern, spreadMethod());
       cairo_set_source(cr, pattern);
       cairo_clip(cr);
-      cairo_paint_with_alpha(cr, m_data->globalAlpha);
+      cairo_paint_with_alpha(cr, m_common->state.globalAlpha);
       break;
   }
   cairo_restore(cr);
@@ -489,9 +489,9 @@ void GraphicsContext::strokePath() {
     case SolidColorSpace:
       if (strokeColor().alpha()) {
         setColor(cr, strokeColor());
-        if (m_data->globalAlpha < 1.0f) {
+        if (m_common->state.globalAlpha < 1.0f) {
           cairo_push_group(cr);
-          cairo_paint_with_alpha(cr, m_data->globalAlpha);
+          cairo_paint_with_alpha(cr, m_common->state.globalAlpha);
           cairo_pop_group_to_source(cr);
         }
         cairo_stroke(cr);
@@ -501,9 +501,9 @@ void GraphicsContext::strokePath() {
       cairo_set_source(
           cr,
           m_common->state.strokePattern.get()->createPlatformPattern(getCTM()));
-      if (m_data->globalAlpha < 1.0f) {
+      if (m_common->state.globalAlpha < 1.0f) {
         cairo_push_group(cr);
-        cairo_paint_with_alpha(cr, m_data->globalAlpha);
+        cairo_paint_with_alpha(cr, m_common->state.globalAlpha);
         cairo_pop_group_to_source(cr);
       }
       cairo_stroke(cr);
@@ -513,9 +513,9 @@ void GraphicsContext::strokePath() {
           m_common->state.strokeGradient.get()->platformGradient();
       pattern = applySpreadMethod(pattern, spreadMethod());
       cairo_set_source(cr, pattern);
-      if (m_data->globalAlpha < 1.0f) {
+      if (m_common->state.globalAlpha < 1.0f) {
         cairo_push_group(cr);
-        cairo_paint_with_alpha(cr, m_data->globalAlpha);
+        cairo_paint_with_alpha(cr, m_common->state.globalAlpha);
         cairo_pop_group_to_source(cr);
       }
       cairo_stroke(cr);
@@ -881,11 +881,11 @@ void GraphicsContext::setMiterLimit(float miter) {
 }
 
 void GraphicsContext::setAlpha(float alpha) {
-  m_data->globalAlpha = alpha;
+  m_common->state.globalAlpha = alpha;
 }
 
 float GraphicsContext::getAlpha() {
-  return m_data->globalAlpha;
+  return m_common->state.globalAlpha;
 }
 
 static inline cairo_operator_t toCairoOperator(CompositeOperator op) {
