@@ -87,7 +87,7 @@ typedef union {
   struct {
     void* first;
     void* second;
-  };
+  } s;
   VoidPtrPair i;
 } VoidPtrPairValue;
 #endif
