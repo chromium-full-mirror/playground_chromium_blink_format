@@ -4738,11 +4738,11 @@ static NEVER_INLINE void setUpThrowTrampolineReturnAddress(
     VM_THROW_EXCEPTION_AT_END(); \
     return 0;                    \
   } while (0)
-#define VM_THROW_EXCEPTION_2()   \
-  do {                           \
-    VM_THROW_EXCEPTION_AT_END(); \
-    VoidPtrPair pair = {0, 0};   \
-    return pair;                 \
+#define VM_THROW_EXCEPTION_2()        \
+  do {                                \
+    VM_THROW_EXCEPTION_AT_END();      \
+    VoidPtrPairValue pair = {{0, 0}}; \
+    return pair.i;                    \
   } while (0)
 #define VM_THROW_EXCEPTION_AT_END() \
   setUpThrowTrampolineReturnAddress(ARG_globalData, CTI_RETURN_ADDRESS)
@@ -5125,9 +5125,10 @@ VoidPtrPair Machine::cti_op_call_JSFunction(CTI_ARGS) {
   int argCount = ARG_int3;
 
   if (LIKELY(argCount == newCodeBlock->numParameters)) {
-    VoidPtrPair pair = {newCodeBlock, CallFrame::create(callFrame->registers() +
-                                                        registerOffset)};
-    return pair;
+    VoidPtrPairValue pair = {
+        {newCodeBlock,
+         CallFrame::create(callFrame->registers() + registerOffset)}};
+    return pair.i;
   }
 
   if (argCount > newCodeBlock->numParameters) {
@@ -5139,8 +5140,8 @@ VoidPtrPair Machine::cti_op_call_JSFunction(CTI_ARGS) {
     for (size_t i = 0; i < numParameters; ++i)
       argv[i + argCount] = argv[i];
 
-    VoidPtrPair pair = {newCodeBlock, CallFrame::create(r)};
-    return pair;
+    VoidPtrPairValue pair = {{newCodeBlock, CallFrame::create(r)}};
+    return pair.i;
   }
 
   size_t omittedArgCount = newCodeBlock->numParameters - argCount;
@@ -5155,8 +5156,8 @@ VoidPtrPair Machine::cti_op_call_JSFunction(CTI_ARGS) {
   for (size_t i = 0; i < omittedArgCount; ++i)
     argv[i] = jsUndefined();
 
-  VoidPtrPair pair = {newCodeBlock, CallFrame::create(r)};
-  return pair;
+  VoidPtrPairValue pair = {{newCodeBlock, CallFrame::create(r)}};
+  return pair.i;
 }
 
 void* Machine::cti_vm_lazyLinkCall(CTI_ARGS) {
@@ -5378,9 +5379,10 @@ VoidPtrPair Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
   callFrame[firstArg] = newObject;  // "this" value
 
   if (LIKELY(argCount == newCodeBlock->numParameters)) {
-    VoidPtrPair pair = {newCodeBlock, CallFrame::create(callFrame->registers() +
-                                                        registerOffset)};
-    return pair;
+    VoidPtrPairValue pair = {
+        {newCodeBlock,
+         CallFrame::create(callFrame->registers() + registerOffset)}};
+    return pair.i;
   }
 
   if (argCount > newCodeBlock->numParameters) {
@@ -5392,8 +5394,8 @@ VoidPtrPair Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
     for (size_t i = 0; i < numParameters; ++i)
       argv[i + argCount] = argv[i];
 
-    VoidPtrPair pair = {newCodeBlock, CallFrame::create(r)};
-    return pair;
+    VoidPtrPairValue pair = {{newCodeBlock, CallFrame::create(r)}};
+    return pair.i;
   }
 
   size_t omittedArgCount = newCodeBlock->numParameters - argCount;
@@ -5408,8 +5410,8 @@ VoidPtrPair Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
   for (size_t i = 0; i < omittedArgCount; ++i)
     argv[i] = jsUndefined();
 
-  VoidPtrPair pair = {newCodeBlock, CallFrame::create(r)};
-  return pair;
+  VoidPtrPairValue pair = {{newCodeBlock, CallFrame::create(r)}};
+  return pair.i;
 }
 
 JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
@@ -5512,8 +5514,8 @@ VoidPtrPair Machine::cti_op_resolve_func(CTI_ARGS) {
       JSValue* result = slot.getValue(callFrame, ident);
       VM_CHECK_EXCEPTION_AT_END();
 
-      VoidPtrPair pair = {thisObj, asPointer(result)};
-      return pair;
+      VoidPtrPairValue pair = {{thisObj, asPointer(result)}};
+      return pair.i;
     }
     ++iter;
   } while (iter != end);
@@ -5786,10 +5788,10 @@ VoidPtrPair Machine::cti_op_post_inc(CTI_ARGS) {
   JSValue* number = v->toJSNumber(callFrame);
   VM_CHECK_EXCEPTION_AT_END();
 
-  VoidPtrPair pair = {
-      asPointer(number),
-      asPointer(jsNumber(ARG_globalData, number->uncheckedGetNumber() + 1))};
-  return pair;
+  VoidPtrPairValue pair = {
+      {asPointer(number),
+       asPointer(jsNumber(ARG_globalData, number->uncheckedGetNumber() + 1))}};
+  return pair.i;
 }
 
 JSValue* Machine::cti_op_eq(CTI_ARGS) {
@@ -5905,8 +5907,8 @@ VoidPtrPair Machine::cti_op_resolve_with_base(CTI_ARGS) {
       JSValue* result = slot.getValue(callFrame, ident);
       VM_CHECK_EXCEPTION_AT_END();
 
-      VoidPtrPair pair = {base, asPointer(result)};
-      return pair;
+      VoidPtrPairValue pair = {{base, asPointer(result)}};
+      return pair.i;
     }
     ++iter;
   } while (iter != end);
@@ -5972,10 +5974,10 @@ VoidPtrPair Machine::cti_op_post_dec(CTI_ARGS) {
   JSValue* number = v->toJSNumber(callFrame);
   VM_CHECK_EXCEPTION_AT_END();
 
-  VoidPtrPair pair = {
-      asPointer(number),
-      asPointer(jsNumber(ARG_globalData, number->uncheckedGetNumber() - 1))};
-  return pair;
+  VoidPtrPairValue pair = {
+      {asPointer(number),
+       asPointer(jsNumber(ARG_globalData, number->uncheckedGetNumber() - 1))}};
+  return pair.i;
 }
 
 JSValue* Machine::cti_op_urshift(CTI_ARGS) {

@@ -81,10 +81,15 @@ class SamplingTool;
 
 #endif
 
-struct VoidPtrPair {
-  void* first;
-  void* second;
-};
+typedef uint64_t VoidPtrPair;
+
+typedef union {
+  struct {
+    void* first;
+    void* second;
+  };
+  VoidPtrPair i;
+} VoidPtrPairValue;
 #endif
 
 enum DebugHookID {
