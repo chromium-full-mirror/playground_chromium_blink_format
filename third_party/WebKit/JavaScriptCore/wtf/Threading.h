@@ -98,10 +98,10 @@ QT_END_NAMESPACE
 
 // For portability, we do not use thread-safe statics natively supported by some
 // compilers (e.g. gcc).
-#define AtomicallyInitializedStatic(T, name)     \
-  WTF::atomicallyInitializedStaticMutex->lock(); \
-  static T name;                                 \
-  WTF::atomicallyInitializedStaticMutex->unlock();
+#define AtomicallyInitializedStatic(T, name)   \
+  WTF::lockAtomicallyInitializedStaticMutex(); \
+  static T name;                               \
+  WTF::unlockAtomicallyInitializedStaticMutex();
 
 namespace WTF {
 
@@ -267,7 +267,18 @@ class ThreadSafeShared : Noncopyable {
 // only requirement is that the calls are not reentrant.
 void initializeThreading();
 
+#if !PLATFORM(WIN_OS)
 extern Mutex* atomicallyInitializedStaticMutex;
+inline void lockAtomicallyInitializedStaticMutex() {
+  atomicallyInitializedStaticMutex->lock();
+}
+inline void unlockAtomicallyInitializedStaticMutex() {
+  atomicallyInitializedStaticMutex->unlock();
+}
+#else
+void lockAtomicallyInitializedStaticMutex();
+void unlockAtomicallyInitializedStaticMutex();
+#endif
 
 }  // namespace WTF
 
