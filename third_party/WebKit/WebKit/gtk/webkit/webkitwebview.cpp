@@ -1267,7 +1267,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
   *
   * The associated WebKitWebInspector instance.
   *
-  * Since: 1.0.2
+  * Since: 1.0.3
   */
   g_object_class_install_property(
       objectClass, PROP_WEB_INSPECTOR,
@@ -1570,7 +1570,7 @@ WebKitWebSettings* webkit_web_view_get_settings(WebKitWebView* webView) {
  * #WebKitWebView; %NULL is only returned if the argument is not a
  * valid #WebKitWebView.
  *
- * Since: 1.0.2
+ * Since: 1.0.3
  */
 WebKitWebInspector* webkit_web_view_get_inspector(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), NULL);
