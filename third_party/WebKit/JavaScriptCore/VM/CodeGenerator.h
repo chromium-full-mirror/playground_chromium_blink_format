@@ -264,7 +264,10 @@ class CodeGenerator {
   RegisterID* emitUnexpectedLoad(RegisterID* dst, bool);
   RegisterID* emitUnexpectedLoad(RegisterID* dst, double);
 
-  RegisterID* emitUnaryOp(OpcodeID, RegisterID* dst, RegisterID* src);
+  RegisterID* emitUnaryOp(OpcodeID,
+                          RegisterID* dst,
+                          RegisterID* src,
+                          ResultType);
   RegisterID* emitBinaryOp(OpcodeID,
                            RegisterID* dst,
                            RegisterID* src1,
@@ -287,7 +290,7 @@ class CodeGenerator {
   RegisterID* emitMove(RegisterID* dst, RegisterID* src);
 
   RegisterID* emitToJSNumber(RegisterID* dst, RegisterID* src) {
-    return emitUnaryOp(op_to_jsnumber, dst, src);
+    return emitUnaryOp(op_to_jsnumber, dst, src, ResultType::unknown());
   }
   RegisterID* emitPreInc(RegisterID* srcDst);
   RegisterID* emitPreDec(RegisterID* srcDst);
@@ -299,7 +302,7 @@ class CodeGenerator {
                              RegisterID* base,
                              RegisterID* basePrototype);
   RegisterID* emitTypeOf(RegisterID* dst, RegisterID* src) {
-    return emitUnaryOp(op_typeof, dst, src);
+    return emitUnaryOp(op_typeof, dst, src, ResultType::unknown());
   }
   RegisterID* emitIn(RegisterID* dst, RegisterID* property, RegisterID* base) {
     return emitBinaryOp(op_in, dst, property, base, OperandTypes());
@@ -386,7 +389,7 @@ class CodeGenerator {
   void emitSubroutineReturn(RegisterID* retAddrSrc);
 
   RegisterID* emitGetPropertyNames(RegisterID* dst, RegisterID* base) {
-    return emitUnaryOp(op_get_pnames, dst, base);
+    return emitUnaryOp(op_get_pnames, dst, base, ResultType::unknown());
   }
   RegisterID* emitNextPropertyName(RegisterID* dst,
                                    RegisterID* iter,

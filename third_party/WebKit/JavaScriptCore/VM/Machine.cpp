@@ -2043,6 +2043,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       */
       int dst = (++vPC)->u.operand;
       JSValue* src = callFrame[(++vPC)->u.operand].jsValue(callFrame);
+      ++vPC;
       double v;
       if (fastIsNumber(src, v))
         callFrame[dst] = jsNumber(callFrame, -v);

@@ -731,10 +731,13 @@ RegisterID* CodeGenerator::emitMove(RegisterID* dst, RegisterID* src) {
 
 RegisterID* CodeGenerator::emitUnaryOp(OpcodeID opcode,
                                        RegisterID* dst,
-                                       RegisterID* src) {
+                                       RegisterID* src,
+                                       ResultType type) {
   emitOpcode(opcode);
   instructions().append(dst->index());
   instructions().append(src->index());
+  if (opcode == op_negate)
+    instructions().append(type.toInt());
   return dst;
 }
 

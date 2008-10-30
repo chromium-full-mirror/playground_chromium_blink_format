@@ -86,6 +86,9 @@ class JSNumberCell : public JSCell {
                                TypeInfo(NumberType, NeedsThisConversion));
   }
 
+  JSNumberCell(JSGlobalData* globalData)
+      : JSCell(globalData->numberStructureID.get()) {}
+
  private:
   JSNumberCell(JSGlobalData* globalData, double value)
       : JSCell(globalData->numberStructureID.get()), m_value(value) {}
