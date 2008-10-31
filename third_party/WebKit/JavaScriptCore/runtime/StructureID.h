@@ -29,6 +29,7 @@
 #include "JSType.h"
 #include "JSValue.h"
 #include "PropertyMapHashTable.h"
+#include "StructureIDChain.h"
 #include "StructureIDTransitionTable.h"
 #include "TypeInfo.h"
 #include "identifier.h"
@@ -51,7 +52,6 @@ namespace JSC {
 
 class PropertyNameArray;
 class PropertyNameArrayData;
-class StructureIDChain;
 
 class StructureID : public RefCounted<StructureID> {
  public:
@@ -236,22 +236,6 @@ inline size_t StructureID::get(const Identifier& propertyName) const {
       return m_propertyTable->entries()[entryIndex - 1].offset;
   }
 }
-
-class StructureIDChain : public RefCounted<StructureIDChain> {
- public:
-  static PassRefPtr<StructureIDChain> create(StructureID* structureID) {
-    return adoptRef(new StructureIDChain(structureID));
-  }
-
-  RefPtr<StructureID>* head() { return m_vector.get(); }
-
- private:
-  StructureIDChain(StructureID* structureID);
-
-  OwnArrayPtr<RefPtr<StructureID>> m_vector;
-};
-
-bool structureIDChainsAreEqual(StructureIDChain*, StructureIDChain*);
 
 }  // namespace JSC
 
