@@ -86,7 +86,6 @@
 #include "runtime/ObjectPrototype.cpp"
 #include "operations.cpp"
 #include "Parser.cpp"
-#include "runtime/PropertyMap.cpp"
 #include "runtime/PropertySlot.cpp"
 #include "PropertyNameArray.cpp"
 #include "regexp.cpp"
