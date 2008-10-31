@@ -42,10 +42,10 @@ class Geoposition : public RefCounted<Geoposition> {
                                         double accuracy,
                                         double altitudeAccuracy,
                                         double heading,
-                                        double velocity,
+                                        double speed,
                                         DOMTimeStamp timestamp) {
     return adoptRef(new Geoposition(latitude, longitude, altitude, accuracy,
-                                    altitudeAccuracy, heading, velocity,
+                                    altitudeAccuracy, heading, speed,
                                     timestamp));
   }
 
@@ -55,7 +55,7 @@ class Geoposition : public RefCounted<Geoposition> {
   double accuracy() const { return m_accuracy; }
   double altitudeAccuracy() const { return m_altitudeAccuracy; }
   double heading() const { return m_heading; }
-  double velocity() const { return m_velocity; }
+  double speed() const { return m_speed; }
   DOMTimeStamp timestamp() const { return m_timestamp; }
 
   String toString() const;
@@ -67,7 +67,7 @@ class Geoposition : public RefCounted<Geoposition> {
               double accuracy,
               double altitudeAccuracy,
               double heading,
-              double velocity,
+              double speed,
               DOMTimeStamp timestamp)
       : m_latitude(latitude),
         m_longitude(longitude),
@@ -75,7 +75,7 @@ class Geoposition : public RefCounted<Geoposition> {
         m_accuracy(accuracy),
         m_altitudeAccuracy(altitudeAccuracy),
         m_heading(heading),
-        m_velocity(velocity),
+        m_speed(speed),
         m_timestamp(timestamp) {}
 
   double m_latitude;
@@ -84,7 +84,7 @@ class Geoposition : public RefCounted<Geoposition> {
   double m_accuracy;
   double m_altitudeAccuracy;
   double m_heading;
-  double m_velocity;
+  double m_speed;
   DOMTimeStamp m_timestamp;
 };
 
