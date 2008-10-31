@@ -1740,6 +1740,10 @@ void Document::clear() {
   m_windowEventListeners.clear();
 }
 
+const KURL& Document::virtualURL() const {
+  return m_url;
+}
+
 void Document::setURL(const KURL& url) {
   const KURL& newURL = url.isEmpty() ? blankURL() : url;
   if (newURL == m_url)

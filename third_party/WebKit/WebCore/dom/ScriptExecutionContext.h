@@ -46,6 +46,8 @@ class ScriptExecutionContext {
   virtual bool isDocument() const { return false; }
   virtual bool isWorkerContext() const { return false; }
 
+  const KURL& url() const { return virtualURL(); }
+
   // Active objects are not garbage collected even if inaccessible, e.g. because
   // their activity may result in callbacks being invoked.
   void stopActiveDOMObjects();
@@ -67,6 +69,8 @@ class ScriptExecutionContext {
   void deref() { derefScriptExecutionContext(); }
 
  private:
+  virtual const KURL& virtualURL() const = 0;
+
   bool m_firedMessagePortTimer;
   HashSet<MessagePort*> m_messagePorts;
 
