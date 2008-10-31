@@ -65,6 +65,9 @@ class Geolocation : public RefCounted<Geolocation>,
                     PositionOptions*);
   void clearWatch(int watchId);
 
+  void suspend();
+  void resume();
+
  private:
   Geolocation(Frame*);
 
@@ -90,7 +93,9 @@ class Geolocation : public RefCounted<Geolocation>,
                 PositionOptions*);
   };
 
-  void stopUpdatingIfEmpty();
+  bool hasListeners() const {
+    return !m_oneShots.isEmpty() || !m_watchers.isEmpty();
+  }
 
   void sendErrorToOneShots(PositionError*);
   void sendErrorToWatchers(PositionError*);

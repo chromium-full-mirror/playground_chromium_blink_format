@@ -110,12 +110,18 @@ int Geolocation::watchPosition(PassRefPtr<PositionCallback> successCallback,
 void Geolocation::clearWatch(int watchId) {
   m_watchers.remove(watchId);
 
-  stopUpdatingIfEmpty();
+  if (!hasListeners())
+    m_service->stopUpdating();
 }
 
-void Geolocation::stopUpdatingIfEmpty() {
-  if (m_watchers.isEmpty() && m_oneShots.isEmpty())
-    m_service->stopUpdating();
+void Geolocation::suspend() {
+  if (hasListeners())
+    m_service->suspend();
+}
+
+void Geolocation::resume() {
+  if (hasListeners())
+    m_service->resume();
 }
 
 void Geolocation::sendErrorToOneShots(PositionError* error) {
@@ -205,7 +211,9 @@ void Geolocation::geolocationServicePositionChanged(
   sendPositionToWatchers(service->lastPosition());
 
   m_oneShots.clear();
-  stopUpdatingIfEmpty();
+
+  if (!hasListeners())
+    m_service->stopUpdating();
 }
 
 void Geolocation::geolocationServiceErrorOccurred(GeolocationService* service) {
