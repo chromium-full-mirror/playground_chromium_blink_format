@@ -28,7 +28,7 @@
 #include "JSGlobalObject.h"
 #include "JSString.h"
 #include "Parser.h"
-#include "debugger.h"
+#include "Debugger.h"
 #include "lexer.h"
 #include "nodes.h"
 
