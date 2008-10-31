@@ -204,11 +204,11 @@ String FileChooser::basenameForWidth(const Font&, int width) const {
 }
 
 Icon::~Icon() {}
-PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
+PassRefPtr<Icon> Icon::createIconForFile(const String& filename) {
   notImplemented();
   return 0;
 }
-PassRefPtr<Icon> Icon::newIconForFiles(const Vector<String>& filenames) {
+PassRefPtr<Icon> Icon::createIconForFiles(const Vector<String>& filenames) {
   notImplemented();
   return 0;
 }
