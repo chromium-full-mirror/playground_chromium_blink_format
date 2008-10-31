@@ -173,6 +173,9 @@ class Page : Noncopyable {
   bool inLowQualityImageInterpolationMode() const;
   void setInLowQualityImageInterpolationMode(bool = true);
 
+  bool cookieEnabled() const { return m_cookieEnabled; }
+  void setCookieEnabled(bool enabled) { m_cookieEnabled = enabled; }
+
   void userStyleSheetLocationChanged();
   const String& userStyleSheet() const;
 
@@ -248,6 +251,7 @@ class Page : Noncopyable {
   bool m_defersLoading;
 
   bool m_inLowQualityInterpolationMode;
+  bool m_cookieEnabled;
 
   InspectorController* m_parentInspectorController;
 

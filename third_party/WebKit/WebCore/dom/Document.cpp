@@ -2911,10 +2911,16 @@ Element* Document::ownerElement() const {
 }
 
 String Document::cookie() const {
+  if (page() && !page()->cookieEnabled())
+    return String();
+
   return cookies(this, cookieURL());
 }
 
 void Document::setCookie(const String& value) {
+  if (page() && !page()->cookieEnabled())
+    return;
+
   setCookies(this, cookieURL(), policyBaseURL(), value);
 }
 

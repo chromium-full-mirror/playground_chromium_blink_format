@@ -431,6 +431,9 @@ backforward list.
 - (BOOL)_inFastImageScalingMode;
 - (void)_setUseFastImageScalingMode:(BOOL)flag;
 
+- (BOOL)_cookieEnabled;
+- (void)_setCookieEnabled:(BOOL)enable;
+
 // SPI for DumpRenderTree
 - (void)_executeCoreCommandByName:(NSString*)name value:(NSString*)value;
 - (void)_clearMainFrameName;
