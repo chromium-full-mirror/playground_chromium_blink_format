@@ -76,6 +76,12 @@ void BreakBlockquoteCommand::doApply() {
     return;
   }
 
+  // Don't move a line break just after the caret.  Doing so would create an
+  // extra, empty paragraph
+  // in the new blockquote.
+  if (lineBreakExistsAtPosition(visiblePos))
+    pos = pos.next();
+
   // Split at pos if in the middle of a text node.
   if (startNode->isTextNode()) {
     Text* textNode = static_cast<Text*>(startNode);
@@ -84,9 +90,6 @@ void BreakBlockquoteCommand::doApply() {
       ASSERT(startNode);
     } else if (pos.offset() > 0)
       splitTextNode(textNode, pos.offset());
-  } else if (startNode->hasTagName(brTag)) {
-    startNode = startNode->traverseNextNode();
-    ASSERT(startNode);
   } else if (pos.offset() > 0) {
     startNode = startNode->traverseNextNode();
     ASSERT(startNode);
