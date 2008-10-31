@@ -30,7 +30,6 @@
 #include "Error.h"
 #include "JSString.h"
 #include "JSType.h"
-#include "LabelStack.h"
 #include "Opcode.h"
 #include "RegisterID.h"
 #include "ResultType.h"
@@ -236,9 +235,6 @@ class StatementNode : public Node {
   int firstLine() const JSC_FAST_CALL { return lineNo(); }
   int lastLine() const JSC_FAST_CALL { return m_lastLine; }
 
-  virtual void pushLabel(const Identifier& ident) JSC_FAST_CALL {
-    m_labelStack.push(ident);
-  }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -247,9 +243,6 @@ class StatementNode : public Node {
 
   virtual bool isBlock() const JSC_FAST_CALL { return false; }
   virtual bool isLoop() const JSC_FAST_CALL { return false; }
-
- protected:
-  LabelStack m_labelStack;
 
  private:
   int m_lastLine;
@@ -2307,19 +2300,16 @@ class WithNode : public StatementNode {
 class LabelNode : public StatementNode, public ThrowableExpressionData {
  public:
   LabelNode(JSGlobalData* globalData,
-            const Identifier& label,
+            const Identifier& name,
             StatementNode* statement) JSC_FAST_CALL : StatementNode(globalData),
-                                                      m_label(label),
+                                                      m_name(name),
                                                       m_statement(statement) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
-  virtual void pushLabel(const Identifier& ident) JSC_FAST_CALL {
-    m_statement->pushLabel(ident);
-  }
 
  private:
-  Identifier m_label;
+  Identifier m_name;
   RefPtr<StatementNode> m_statement;
 };
 
