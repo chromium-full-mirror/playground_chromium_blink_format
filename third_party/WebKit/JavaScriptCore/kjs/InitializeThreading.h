@@ -26,8 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KJS_InitializeThreading_h
-#define KJS_InitializeThreading_h
+#ifndef InitializeThreading_h
+#define InitializeThreading_h
 
 namespace JSC {
 
@@ -38,4 +38,4 @@ namespace JSC {
 void initializeThreading();
 }
 
-#endif  // KJS_InitializeThreading_h
+#endif  // InitializeThreading_h
