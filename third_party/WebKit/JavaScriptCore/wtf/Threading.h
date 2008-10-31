@@ -267,7 +267,7 @@ class ThreadSafeShared : Noncopyable {
 // only requirement is that the calls are not reentrant.
 void initializeThreading();
 
-#if !PLATFORM(WIN_OS)
+#if !PLATFORM(WIN_OS) || PLATFORM(WX)
 extern Mutex* atomicallyInitializedStaticMutex;
 inline void lockAtomicallyInitializedStaticMutex() {
   atomicallyInitializedStaticMutex->lock();
