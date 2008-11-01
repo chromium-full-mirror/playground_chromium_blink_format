@@ -26,6 +26,7 @@
 #ifndef XMLHttpRequestUpload_h
 #define XMLHttpRequestUpload_h
 
+#include "AtomicStringHash.h"
 #include "EventListener.h"
 #include "EventTarget.h"
 #include <wtf/HashMap.h>
@@ -87,7 +88,7 @@ class XMLHttpRequestUpload : public RefCounted<XMLHttpRequestUpload>,
   EventListener* onprogress() const { return m_onProgressListener.get(); }
 
   typedef Vector<RefPtr<EventListener>> ListenerVector;
-  typedef HashMap<AtomicStringImpl*, ListenerVector> EventListenersMap;
+  typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
 
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,
