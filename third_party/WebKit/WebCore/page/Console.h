@@ -102,8 +102,12 @@ class Console : public RefCounted<Console> {
   void reportException(JSC::ExecState*, JSC::JSValue*);
   void reportCurrentException(JSC::ExecState*);
 
+  static bool shouldPrintExceptions();
+  static void setShouldPrintExceptions(bool);
+
   const ProfilesArray& profiles() const { return m_profiles; }
 #endif
+
  private:
   inline Page* page() const;
 

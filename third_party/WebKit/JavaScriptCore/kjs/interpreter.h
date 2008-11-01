@@ -64,9 +64,6 @@ class Interpreter {
                              ScopeChain&,
                              const SourceCode&,
                              JSValue* thisValue = noValue());
-
-  static bool shouldPrintExceptions();
-  static void setShouldPrintExceptions(bool);
 };
 
 }  // namespace JSC
