@@ -1465,8 +1465,7 @@ ForInNode::ForInNode(JSGlobalData* globalData,
   if (in) {
     AssignResolveNode* node =
         new AssignResolveNode(globalData, ident, in, true);
-    node->setExceptionSourceRange(divot, divot - startOffset,
-                                  endOffset - divot);
+    node->setExceptionSourceCode(divot, divot - startOffset, endOffset - divot);
     m_init = node;
   }
   // for( var foo = bar in baz )

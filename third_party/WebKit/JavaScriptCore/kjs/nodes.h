@@ -33,7 +33,7 @@
 #include "Opcode.h"
 #include "RegisterID.h"
 #include "ResultType.h"
-#include "SourceRange.h"
+#include "SourceCode.h"
 #include "SymbolTable.h"
 #include "regexp.h"
 #include <wtf/ListRefPtr.h>
@@ -349,9 +349,9 @@ class ThrowableExpressionData {
                           unsigned endOffset)
       : m_divot(divot), m_startOffset(startOffset), m_endOffset(endOffset) {}
 
-  void setExceptionSourceRange(unsigned divot,
-                               unsigned startOffset,
-                               unsigned endOffset) {
+  void setExceptionSourceCode(unsigned divot,
+                              unsigned startOffset,
+                              unsigned endOffset) {
     m_divot = divot;
     m_startOffset = startOffset;
     m_endOffset = endOffset;
