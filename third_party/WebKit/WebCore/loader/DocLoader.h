@@ -125,6 +125,7 @@ class DocLoader {
 
   void checkForReload(const KURL&);
   void checkCacheObjectStatus(CachedResource*);
+  bool canRequest(CachedResource::Type, const KURL&);
 
   Cache* m_cache;
   HashSet<String> m_reloadedURLs;
