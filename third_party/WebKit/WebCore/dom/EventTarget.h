@@ -41,9 +41,9 @@ class DOMApplicationCache;
 class Event;
 class EventListener;
 class EventTargetNode;
-class Frame;
 class MessagePort;
 class RegisteredEventListener;
+class ScriptExecutionContext;
 class SVGElementInstance;
 class XMLHttpRequest;
 class XMLHttpRequestUpload;
@@ -68,7 +68,7 @@ class EventTarget {
   virtual SVGElementInstance* toSVGElementInstance();
 #endif
 
-  virtual Frame* associatedFrame() const = 0;
+  virtual ScriptExecutionContext* scriptExecutionContext() const = 0;
 
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,

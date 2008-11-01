@@ -42,13 +42,13 @@ namespace WebCore {
 
 JSValue* JSEventTargetNode::addEventListener(ExecState* exec,
                                              const ArgList& args) {
-  Frame* frame = impl()->associatedFrame();
-  if (!frame)
+  JSDOMGlobalObject* globalObject =
+      toJSDOMGlobalObject(impl()->scriptExecutionContext());
+  if (!globalObject)
     return jsUndefined();
 
   if (RefPtr<JSEventListener> listener =
-          toJSDOMWindow(frame)->findOrCreateJSEventListener(exec,
-                                                            args.at(exec, 1)))
+          globalObject->findOrCreateJSEventListener(exec, args.at(exec, 1)))
     impl()->addEventListener(args.at(exec, 0)->toString(exec),
                              listener.release(),
                              args.at(exec, 2)->toBoolean(exec));
@@ -58,12 +58,13 @@ JSValue* JSEventTargetNode::addEventListener(ExecState* exec,
 
 JSValue* JSEventTargetNode::removeEventListener(ExecState* exec,
                                                 const ArgList& args) {
-  Frame* frame = impl()->associatedFrame();
-  if (!frame)
+  JSDOMGlobalObject* globalObject =
+      toJSDOMGlobalObject(impl()->scriptExecutionContext());
+  if (!globalObject)
     return jsUndefined();
 
   if (JSEventListener* listener =
-          toJSDOMWindow(frame)->findJSEventListener(args.at(exec, 1)))
+          globalObject->findJSEventListener(args.at(exec, 1)))
     impl()->removeEventListener(args.at(exec, 0)->toString(exec), listener,
                                 args.at(exec, 2)->toBoolean(exec));
 

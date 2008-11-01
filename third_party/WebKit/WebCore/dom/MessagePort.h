@@ -71,13 +71,11 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
   void unentangle();
 
   void contextDestroyed();
-  ScriptExecutionContext* scriptExecutionContext() {
+  virtual ScriptExecutionContext* scriptExecutionContext() const {
     return m_scriptExecutionContext;
   }
 
   virtual MessagePort* toMessagePort() { return this; }
-
-  virtual Frame* associatedFrame() const;
 
   void queueCloseEvent();
   void dispatchMessages();

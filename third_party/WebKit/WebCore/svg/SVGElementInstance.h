@@ -54,7 +54,7 @@ class SVGElementInstance : public TreeShared<SVGElementInstance>,
   bool needsUpdate() const { return m_needsUpdate; }
   void setNeedsUpdate(bool);
 
-  virtual Frame* associatedFrame() const;
+  virtual ScriptExecutionContext* scriptExecutionContext() const;
 
   virtual EventTargetNode* toNode() { return shadowTreeElement(); }
   virtual SVGElementInstance* toSVGElementInstance() { return this; }

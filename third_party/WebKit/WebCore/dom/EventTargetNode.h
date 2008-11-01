@@ -41,7 +41,7 @@ class EventTargetNode : public Node, public EventTarget {
   virtual bool isEventTargetNode() const { return true; }
   virtual EventTargetNode* toNode() { return this; }
 
-  Frame* associatedFrame() const;
+  virtual ScriptExecutionContext* scriptExecutionContext() const;
 
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,

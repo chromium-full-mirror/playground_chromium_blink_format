@@ -56,10 +56,10 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   virtual XMLHttpRequest* toXMLHttpRequest() { return this; }
 
-  Frame* associatedFrame() const;
-
   virtual void contextDestroyed();
   virtual void stop();
+
+  virtual ScriptExecutionContext* scriptExecutionContext() const;
 
   String statusText(ExceptionCode&) const;
   int status(ExceptionCode&) const;

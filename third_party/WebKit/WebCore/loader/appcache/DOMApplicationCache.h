@@ -120,7 +120,7 @@ class DOMApplicationCache : public RefCounted<DOMApplicationCache>,
   }
   EventListener* oncached() const { return m_onCachedListener.get(); }
 
-  Frame* associatedFrame() const { return m_frame; }
+  virtual ScriptExecutionContext* scriptExecutionContext() const;
   DOMApplicationCache* toDOMApplicationCache() { return this; }
 
   void callCheckingListener();

@@ -42,11 +42,11 @@ using namespace EventNames;
 XMLHttpRequestUpload::XMLHttpRequestUpload(XMLHttpRequest* xmlHttpRequest)
     : m_xmlHttpRequest(xmlHttpRequest) {}
 
-Frame* XMLHttpRequestUpload::associatedFrame() const {
+ScriptExecutionContext* XMLHttpRequestUpload::scriptExecutionContext() const {
   XMLHttpRequest* xmlHttpRequest = associatedXMLHttpRequest();
   if (!xmlHttpRequest)
     return 0;
-  return xmlHttpRequest->associatedFrame();
+  return xmlHttpRequest->scriptExecutionContext();
 }
 
 void XMLHttpRequestUpload::addEventListener(
