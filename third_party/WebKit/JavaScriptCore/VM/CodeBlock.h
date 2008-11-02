@@ -251,7 +251,7 @@ class EvalCodeCache {
 struct CodeBlock {
   CodeBlock(ScopeNode* ownerNode,
             CodeType codeType,
-            PassRefPtr<SourceProvider> source,
+            PassRefPtr<SourceProvider> sourceProvider,
             unsigned sourceOffset)
       : ownerNode(ownerNode),
         globalData(0)
@@ -267,7 +267,7 @@ struct CodeBlock {
         needsFullScopeChain(ownerNode->needsActivation()),
         usesEval(ownerNode->usesEval()),
         codeType(codeType),
-        source(source),
+        source(sourceProvider),
         sourceOffset(sourceOffset) {
     ASSERT(source);
   }
@@ -393,8 +393,9 @@ struct ProgramCodeBlock : public CodeBlock {
   ProgramCodeBlock(ScopeNode* ownerNode,
                    CodeType codeType,
                    JSGlobalObject* globalObject,
-                   PassRefPtr<SourceProvider> source)
-      : CodeBlock(ownerNode, codeType, source, 0), globalObject(globalObject) {
+                   PassRefPtr<SourceProvider> sourceProvider)
+      : CodeBlock(ownerNode, codeType, sourceProvider, 0),
+        globalObject(globalObject) {
     globalObject->codeBlocks().add(this);
   }
 
@@ -410,8 +411,8 @@ struct ProgramCodeBlock : public CodeBlock {
 struct EvalCodeBlock : public ProgramCodeBlock {
   EvalCodeBlock(ScopeNode* ownerNode,
                 JSGlobalObject* globalObject,
-                PassRefPtr<SourceProvider> source)
-      : ProgramCodeBlock(ownerNode, EvalCode, globalObject, source) {}
+                PassRefPtr<SourceProvider> sourceProvider)
+      : ProgramCodeBlock(ownerNode, EvalCode, globalObject, sourceProvider) {}
 };
 
 }  // namespace JSC
