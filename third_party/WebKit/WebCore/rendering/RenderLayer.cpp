@@ -542,7 +542,9 @@ static IntRect transparencyClipBox(const AffineTransform& enclosingTransform,
             transparencyClipBox(enclosingTransform, curr, rootLayer));
     }
   }
-  return clipRect;
+
+  // Now map the clipRect via the enclosing transform
+  return enclosingTransform.mapRect(clipRect);
 }
 
 void RenderLayer::beginTransparencyLayers(GraphicsContext* p,
