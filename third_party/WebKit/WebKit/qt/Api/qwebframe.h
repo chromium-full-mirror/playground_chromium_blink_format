@@ -46,6 +46,7 @@ class QWebNetworkRequest;
 class QWebFramePrivate;
 class QWebPage;
 class QWebHitTestResult;
+class QWebHistoryItem;
 
 namespace WebCore {
 class WidgetPrivate;
@@ -186,6 +187,8 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   void initialLayoutCompleted();
 
   void iconChanged();
+
+  void aboutToUpdateHistory(QWebHistoryItem* item);
 
  private:
   friend class QWebPage;

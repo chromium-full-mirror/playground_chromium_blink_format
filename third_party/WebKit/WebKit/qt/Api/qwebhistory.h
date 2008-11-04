@@ -30,6 +30,10 @@
 
 class QWebPage;
 
+namespace WebCore {
+class FrameLoaderClientQt;
+};
+
 class QWebHistoryItemPrivate;
 class QWEBKIT_EXPORT QWebHistoryItem {
  public:
@@ -45,12 +49,16 @@ class QWEBKIT_EXPORT QWebHistoryItem {
 
   QIcon icon() const;
 
+  QVariant userData() const;
+  void setUserData(const QVariant& userData);
+
   bool isValid() const;
 
  private:
   QWebHistoryItem(QWebHistoryItemPrivate* priv);
   friend class QWebHistory;
   friend class QWebPage;
+  friend class WebCore::FrameLoaderClientQt;
   QExplicitlySharedDataPointer<QWebHistoryItemPrivate> d;
 };
 
@@ -75,7 +83,12 @@ class QWEBKIT_EXPORT QWebHistory {
   QWebHistoryItem forwardItem() const;
   QWebHistoryItem itemAt(int i) const;
 
+  int currentItemIndex() const;
+
   int count() const;
+
+  int maximumItemCount() const;
+  void setMaximumItemCount(int count);
 
  private:
   QWebHistory();
