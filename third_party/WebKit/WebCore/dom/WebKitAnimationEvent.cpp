@@ -30,8 +30,6 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 WebKitAnimationEvent::WebKitAnimationEvent() : m_elapsedTime(0.0) {}
 
 WebKitAnimationEvent::WebKitAnimationEvent(const AtomicString& type,

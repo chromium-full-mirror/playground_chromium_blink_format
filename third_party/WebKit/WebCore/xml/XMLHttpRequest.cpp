@@ -52,8 +52,6 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 struct PreflightResultCacheItem {
   PreflightResultCacheItem(unsigned expiryDelta,
                            bool credentials,
@@ -1298,7 +1296,8 @@ void XMLHttpRequest::updateAndDispatchOnProgress(unsigned int len) {
 }
 
 void XMLHttpRequest::dispatchReadyStateChangeEvent() {
-  RefPtr<Event> evt = Event::create(readystatechangeEvent, false, false);
+  RefPtr<Event> evt =
+      Event::create(eventNames().readystatechangeEvent, false, false);
   if (m_onReadyStateChangeListener) {
     evt->setTarget(this);
     evt->setCurrentTarget(this);
@@ -1330,28 +1329,28 @@ void XMLHttpRequest::dispatchXMLHttpRequestProgressEvent(
 }
 
 void XMLHttpRequest::dispatchAbortEvent() {
-  dispatchXMLHttpRequestProgressEvent(m_onAbortListener.get(), abortEvent,
-                                      false, 0, 0);
+  dispatchXMLHttpRequestProgressEvent(m_onAbortListener.get(),
+                                      eventNames().abortEvent, false, 0, 0);
 }
 
 void XMLHttpRequest::dispatchErrorEvent() {
-  dispatchXMLHttpRequestProgressEvent(m_onErrorListener.get(), errorEvent,
-                                      false, 0, 0);
+  dispatchXMLHttpRequestProgressEvent(m_onErrorListener.get(),
+                                      eventNames().errorEvent, false, 0, 0);
 }
 
 void XMLHttpRequest::dispatchLoadEvent() {
-  dispatchXMLHttpRequestProgressEvent(m_onLoadListener.get(), loadEvent, false,
-                                      0, 0);
+  dispatchXMLHttpRequestProgressEvent(m_onLoadListener.get(),
+                                      eventNames().loadEvent, false, 0, 0);
 }
 
 void XMLHttpRequest::dispatchLoadStartEvent() {
   dispatchXMLHttpRequestProgressEvent(m_onLoadStartListener.get(),
-                                      loadstartEvent, false, 0, 0);
+                                      eventNames().loadstartEvent, false, 0, 0);
 }
 
 void XMLHttpRequest::dispatchProgressEvent(long long expectedLength) {
   dispatchXMLHttpRequestProgressEvent(
-      m_onProgressListener.get(), progressEvent,
+      m_onProgressListener.get(), eventNames().progressEvent,
       expectedLength && m_receivedLength <= expectedLength,
       static_cast<unsigned>(m_receivedLength),
       static_cast<unsigned>(expectedLength));

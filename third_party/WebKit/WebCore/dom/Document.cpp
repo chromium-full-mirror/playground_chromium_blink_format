@@ -147,7 +147,6 @@ using namespace Unicode;
 
 namespace WebCore {
 
-using namespace EventNames;
 using namespace HTMLNames;
 
 // #define INSTRUMENT_LAYOUT_SCHEDULING 1
@@ -1578,7 +1577,7 @@ void Document::implicitClose() {
     f->animation()->resumeAnimations(this);
 
   dispatchImageLoadEventsNow();
-  this->dispatchWindowEvent(loadEvent, false, false);
+  this->dispatchWindowEvent(eventNames().loadEvent, false, false);
   if (f)
     f->loader()->handledOnloadEvents();
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
@@ -2466,7 +2465,7 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
         static_cast<RenderObject*>(oldFocusedNode.get()->renderer());
     if (r && (r->isTextArea() || r->isTextField()) && r->isEdited()) {
       EventTargetNodeCast(oldFocusedNode.get())
-          ->dispatchEventForType(changeEvent, true, false);
+          ->dispatchEventForType(eventNames().changeEvent, true, false);
       if ((r = static_cast<RenderObject*>(oldFocusedNode.get()->renderer())))
         r->setEdited(false);
     }
@@ -2481,7 +2480,7 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
       newFocusedNode = 0;
     }
     EventTargetNodeCast(oldFocusedNode.get())
-        ->dispatchUIEvent(DOMFocusOutEvent);
+        ->dispatchUIEvent(eventNames().DOMFocusOutEvent);
     if (m_focusedNode) {
       // handler shifted focus
       focusChangeBlocked = true;
@@ -2513,7 +2512,8 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
       focusChangeBlocked = true;
       goto SetFocusedNodeDone;
     }
-    EventTargetNodeCast(m_focusedNode.get())->dispatchUIEvent(DOMFocusInEvent);
+    EventTargetNodeCast(m_focusedNode.get())
+        ->dispatchUIEvent(eventNames().DOMFocusInEvent);
     if (m_focusedNode != newFocusedNode) {
       // handler shifted focus
       focusChangeBlocked = true;
@@ -2691,29 +2691,29 @@ PassRefPtr<Event> Document::createEvent(const String& eventType,
 }
 
 void Document::addListenerTypeIfNeeded(const AtomicString& eventType) {
-  if (eventType == DOMSubtreeModifiedEvent)
+  if (eventType == eventNames().DOMSubtreeModifiedEvent)
     addListenerType(DOMSUBTREEMODIFIED_LISTENER);
-  else if (eventType == DOMNodeInsertedEvent)
+  else if (eventType == eventNames().DOMNodeInsertedEvent)
     addListenerType(DOMNODEINSERTED_LISTENER);
-  else if (eventType == DOMNodeRemovedEvent)
+  else if (eventType == eventNames().DOMNodeRemovedEvent)
     addListenerType(DOMNODEREMOVED_LISTENER);
-  else if (eventType == DOMNodeRemovedFromDocumentEvent)
+  else if (eventType == eventNames().DOMNodeRemovedFromDocumentEvent)
     addListenerType(DOMNODEREMOVEDFROMDOCUMENT_LISTENER);
-  else if (eventType == DOMNodeInsertedIntoDocumentEvent)
+  else if (eventType == eventNames().DOMNodeInsertedIntoDocumentEvent)
     addListenerType(DOMNODEINSERTEDINTODOCUMENT_LISTENER);
-  else if (eventType == DOMAttrModifiedEvent)
+  else if (eventType == eventNames().DOMAttrModifiedEvent)
     addListenerType(DOMATTRMODIFIED_LISTENER);
-  else if (eventType == DOMCharacterDataModifiedEvent)
+  else if (eventType == eventNames().DOMCharacterDataModifiedEvent)
     addListenerType(DOMCHARACTERDATAMODIFIED_LISTENER);
-  else if (eventType == overflowchangedEvent)
+  else if (eventType == eventNames().overflowchangedEvent)
     addListenerType(OVERFLOWCHANGED_LISTENER);
-  else if (eventType == webkitAnimationStartEvent)
+  else if (eventType == eventNames().webkitAnimationStartEvent)
     addListenerType(ANIMATIONSTART_LISTENER);
-  else if (eventType == webkitAnimationEndEvent)
+  else if (eventType == eventNames().webkitAnimationEndEvent)
     addListenerType(ANIMATIONEND_LISTENER);
-  else if (eventType == webkitAnimationIterationEvent)
+  else if (eventType == eventNames().webkitAnimationIterationEvent)
     addListenerType(ANIMATIONITERATION_LISTENER);
-  else if (eventType == webkitTransitionEndEvent)
+  else if (eventType == eventNames().webkitTransitionEndEvent)
     addListenerType(TRANSITIONEND_LISTENER);
 }
 
@@ -2760,9 +2760,9 @@ void Document::removeWindowInlineEventListenerForType(
   RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
   for (; it != m_windowEventListeners.end(); ++it) {
     if ((*it)->eventType() == eventType && (*it)->listener()->isInline()) {
-      if (eventType == unloadEvent)
+      if (eventType == eventNames().unloadEvent)
         removePendingFrameUnloadEventCount();
-      else if (eventType == beforeunloadEvent)
+      else if (eventType == eventNames().beforeunloadEvent)
         removePendingFrameBeforeUnloadEventCount();
       m_windowEventListeners.remove(it);
       return;
@@ -2773,9 +2773,9 @@ void Document::removeWindowInlineEventListenerForType(
 void Document::addWindowEventListener(const AtomicString& eventType,
                                       PassRefPtr<EventListener> listener,
                                       bool useCapture) {
-  if (eventType == unloadEvent)
+  if (eventType == eventNames().unloadEvent)
     addPendingFrameUnloadEventCount();
-  else if (eventType == beforeunloadEvent)
+  else if (eventType == eventNames().beforeunloadEvent)
     addPendingFrameBeforeUnloadEventCount();
   // Remove existing identical listener set with identical arguments.
   // The DOM 2 spec says that "duplicate instances are discarded" in this case.
@@ -2792,9 +2792,9 @@ void Document::removeWindowEventListener(const AtomicString& eventType,
     RegisteredEventListener& r = **it;
     if (r.eventType() == eventType && r.listener() == listener &&
         r.useCapture() == useCapture) {
-      if (eventType == unloadEvent)
+      if (eventType == eventNames().unloadEvent)
         removePendingFrameUnloadEventCount();
-      else if (eventType == beforeunloadEvent)
+      else if (eventType == eventNames().beforeunloadEvent)
         removePendingFrameBeforeUnloadEventCount();
       m_windowEventListeners.remove(it);
       return;
@@ -3867,7 +3867,8 @@ void Document::finishedParsing() {
   setParsing(false);
 
   ExceptionCode ec = 0;
-  dispatchEvent(Event::create(DOMContentLoadedEvent, true, false), ec);
+  dispatchEvent(Event::create(eventNames().DOMContentLoadedEvent, true, false),
+                ec);
 
   if (Frame* f = frame())
     f->loader()->finishedParsing();

@@ -58,7 +58,6 @@ using namespace Unicode;
 
 namespace WebCore {
 
-using namespace EventNames;
 using namespace HTMLNames;
 
 static const DOMTimeStamp typeAheadTimeout = 1000;
@@ -375,11 +374,11 @@ void HTMLSelectElement::parseMappedAttribute(MappedAttribute* attr) {
     // Don't map 'align' attribute.  This matches what Firefox, Opera and IE do.
     // See http://bugs.webkit.org/show_bug.cgi?id=12072
   } else if (attr->name() == onfocusAttr) {
-    setInlineEventListenerForTypeAndAttribute(focusEvent, attr);
+    setInlineEventListenerForTypeAndAttribute(eventNames().focusEvent, attr);
   } else if (attr->name() == onblurAttr) {
-    setInlineEventListenerForTypeAndAttribute(blurEvent, attr);
+    setInlineEventListenerForTypeAndAttribute(eventNames().blurEvent, attr);
   } else if (attr->name() == onchangeAttr) {
-    setInlineEventListenerForTypeAndAttribute(changeEvent, attr);
+    setInlineEventListenerForTypeAndAttribute(eventNames().changeEvent, attr);
   } else
     HTMLFormControlElementWithState::parseMappedAttribute(attr);
 }
@@ -609,7 +608,7 @@ void HTMLSelectElement::defaultEventHandler(Event* evt) {
   if (evt->defaultHandled())
     return;
 
-  if (evt->type() == keypressEvent && evt->isKeyboardEvent()) {
+  if (evt->type() == eventNames().keypressEvent && evt->isKeyboardEvent()) {
     KeyboardEvent* keyboardEvent = static_cast<KeyboardEvent*>(evt);
 
     if (!keyboardEvent->ctrlKey() && !keyboardEvent->altKey() &&
@@ -627,7 +626,7 @@ void HTMLSelectElement::defaultEventHandler(Event* evt) {
 void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
   RenderMenuList* menuList = static_cast<RenderMenuList*>(renderer());
 
-  if (evt->type() == keydownEvent) {
+  if (evt->type() == eventNames().keydownEvent) {
     if (!renderer() || !evt->isKeyboardEvent())
       return;
     String keyIdentifier = static_cast<KeyboardEvent*>(evt)->keyIdentifier();
@@ -675,7 +674,7 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
 
   // Use key press event here since sending simulated mouse events
   // on key down blocks the proper sending of the key press event.
-  if (evt->type() == keypressEvent) {
+  if (evt->type() == eventNames().keypressEvent) {
     if (!renderer() || !evt->isKeyboardEvent())
       return;
     int keyCode = static_cast<KeyboardEvent*>(evt)->keyCode();
@@ -710,7 +709,7 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
       evt->setDefaultHandled();
   }
 
-  if (evt->type() == mousedownEvent && evt->isMouseEvent() &&
+  if (evt->type() == eventNames().mousedownEvent && evt->isMouseEvent() &&
       static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     focus();
     if (menuList->popupIsVisible())
@@ -728,7 +727,7 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
 }
 
 void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
-  if (evt->type() == mousedownEvent && evt->isMouseEvent() &&
+  if (evt->type() == eventNames().mousedownEvent && evt->isMouseEvent() &&
       static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     focus();
 
@@ -799,14 +798,14 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
 
       evt->setDefaultHandled();
     }
-  } else if (evt->type() == mouseupEvent && evt->isMouseEvent() &&
+  } else if (evt->type() == eventNames().mouseupEvent && evt->isMouseEvent() &&
              static_cast<MouseEvent*>(evt)->button() == LeftButton &&
              document()->frame()->eventHandler()->autoscrollRenderer() !=
                  renderer())
     // This makes sure we fire onChange for a single click.  For drag selection,
     // onChange will fire when the autoscroll timer stops.
     listBoxOnChange();
-  else if (evt->type() == keydownEvent) {
+  else if (evt->type() == eventNames().keydownEvent) {
     if (!evt->isKeyboardEvent())
       return;
     String keyIdentifier = static_cast<KeyboardEvent*>(evt)->keyIdentifier();
@@ -852,7 +851,7 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
       listBoxOnChange();
       evt->setDefaultHandled();
     }
-  } else if (evt->type() == keypressEvent) {
+  } else if (evt->type() == eventNames().keypressEvent) {
     if (!evt->isKeyboardEvent())
       return;
     int keyCode = static_cast<KeyboardEvent*>(evt)->keyCode();

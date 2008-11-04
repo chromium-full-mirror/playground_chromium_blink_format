@@ -51,7 +51,6 @@
 namespace WebCore {
 
 using namespace HTMLNames;
-using namespace EventNames;
 using namespace SVGNames;
 
 SVGSVGElement::SVGSVGElement(const QualifiedName& tagName, Document* doc)
@@ -202,17 +201,17 @@ void SVGSVGElement::parseMappedAttribute(MappedAttribute* attr) {
 
     // Only handle events if we're the outermost <svg> element
     if (attr->name() == onunloadAttr)
-      document()->setWindowInlineEventListenerForTypeAndAttribute(unloadEvent,
-                                                                  attr);
+      document()->setWindowInlineEventListenerForTypeAndAttribute(
+          eventNames().unloadEvent, attr);
     else if (attr->name() == onresizeAttr)
-      document()->setWindowInlineEventListenerForTypeAndAttribute(resizeEvent,
-                                                                  attr);
+      document()->setWindowInlineEventListenerForTypeAndAttribute(
+          eventNames().resizeEvent, attr);
     else if (attr->name() == onscrollAttr)
-      document()->setWindowInlineEventListenerForTypeAndAttribute(scrollEvent,
-                                                                  attr);
+      document()->setWindowInlineEventListenerForTypeAndAttribute(
+          eventNames().scrollEvent, attr);
     else if (attr->name() == SVGNames::onzoomAttr)
-      document()->setWindowInlineEventListenerForTypeAndAttribute(zoomEvent,
-                                                                  attr);
+      document()->setWindowInlineEventListenerForTypeAndAttribute(
+          eventNames().zoomEvent, attr);
     else
       setListener = false;
 
@@ -221,11 +220,11 @@ void SVGSVGElement::parseMappedAttribute(MappedAttribute* attr) {
   }
 
   if (attr->name() == onabortAttr)
-    document()->setWindowInlineEventListenerForTypeAndAttribute(abortEvent,
-                                                                attr);
+    document()->setWindowInlineEventListenerForTypeAndAttribute(
+        eventNames().abortEvent, attr);
   else if (attr->name() == onerrorAttr)
-    document()->setWindowInlineEventListenerForTypeAndAttribute(errorEvent,
-                                                                attr);
+    document()->setWindowInlineEventListenerForTypeAndAttribute(
+        eventNames().errorEvent, attr);
   else if (attr->name() == SVGNames::xAttr)
     setXBaseValue(SVGLength(LengthModeWidth, attr->value()));
   else if (attr->name() == SVGNames::yAttr)

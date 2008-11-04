@@ -33,24 +33,22 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 static inline const AtomicString& eventTypeForKeyboardEventType(
     PlatformKeyboardEvent::Type type) {
   switch (type) {
     case PlatformKeyboardEvent::KeyUp:
-      return keyupEvent;
+      return eventNames().keyupEvent;
     case PlatformKeyboardEvent::RawKeyDown:
-      return keydownEvent;
+      return eventNames().keydownEvent;
     case PlatformKeyboardEvent::Char:
-      return keypressEvent;
+      return eventNames().keypressEvent;
     case PlatformKeyboardEvent::KeyDown:
       // The caller should disambiguate the combined event into RawKeyDown or
       // Char events.
       break;
   }
   ASSERT_NOT_REACHED();
-  return keydownEvent;
+  return eventNames().keydownEvent;
 }
 
 KeyboardEvent::KeyboardEvent()
@@ -150,7 +148,7 @@ int KeyboardEvent::keyCode() const {
   // We match IE.
   if (!m_keyEvent)
     return 0;
-  if (type() == keydownEvent || type() == keyupEvent)
+  if (type() == eventNames().keydownEvent || type() == eventNames().keyupEvent)
     return m_keyEvent->windowsVirtualKeyCode();
   return charCode();
 }
@@ -167,7 +165,8 @@ int KeyboardEvent::charCode() const {
                                     ->eventHandler()
                                     ->needsKeyboardEventDisambiguationQuirks();
 
-  if (!m_keyEvent || (type() != keypressEvent && !backwardCompatibilityMode))
+  if (!m_keyEvent ||
+      (type() != eventNames().keypressEvent && !backwardCompatibilityMode))
     return 0;
   String text = m_keyEvent->text();
   return static_cast<int>(text.characterStartingAt(0));

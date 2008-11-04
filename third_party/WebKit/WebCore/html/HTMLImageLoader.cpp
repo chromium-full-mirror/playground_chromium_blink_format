@@ -31,8 +31,6 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 HTMLImageLoader::HTMLImageLoader(Element* node) : ImageLoader(node) {}
 
 HTMLImageLoader::~HTMLImageLoader() {}
@@ -40,8 +38,10 @@ HTMLImageLoader::~HTMLImageLoader() {}
 void HTMLImageLoader::dispatchLoadEvent() {
   if (!haveFiredLoadEvent() && image()) {
     setHaveFiredLoadEvent(true);
-    element()->dispatchEventForType(
-        image()->errorOccurred() ? errorEvent : loadEvent, false, false);
+    element()->dispatchEventForType(image()->errorOccurred()
+                                        ? eventNames().errorEvent
+                                        : eventNames().loadEvent,
+                                    false, false);
   }
 }
 

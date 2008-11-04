@@ -27,8 +27,6 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 MouseEvent::MouseEvent() : m_button(0), m_buttonDown(false) {}
 
 MouseEvent::MouseEvent(const AtomicString& eventType,
@@ -111,9 +109,10 @@ bool MouseEvent::isMouseEvent() const {
 
 bool MouseEvent::isDragEvent() const {
   const AtomicString& t = type();
-  return t == dragenterEvent || t == dragoverEvent || t == dragleaveEvent ||
-         t == dropEvent || t == dragstartEvent || t == dragEvent ||
-         t == dragendEvent;
+  return t == eventNames().dragenterEvent || t == eventNames().dragoverEvent ||
+         t == eventNames().dragleaveEvent || t == eventNames().dropEvent ||
+         t == eventNames().dragstartEvent || t == eventNames().dragEvent ||
+         t == eventNames().dragendEvent;
 }
 
 int MouseEvent::which() const {
@@ -128,7 +127,7 @@ int MouseEvent::which() const {
 Node* MouseEvent::toElement() const {
   // MSIE extension - "the object toward which the user is moving the mouse
   // pointer"
-  if (type() == mouseoutEvent)
+  if (type() == eventNames().mouseoutEvent)
     return relatedTarget();
 
   return target() ? target()->toNode() : 0;
@@ -137,7 +136,7 @@ Node* MouseEvent::toElement() const {
 Node* MouseEvent::fromElement() const {
   // MSIE extension - "object from which activation or the mouse pointer is
   // exiting during the event" (huh?)
-  if (type() != mouseoutEvent)
+  if (type() != eventNames().mouseoutEvent)
     return relatedTarget();
 
   return target() ? target()->toNode() : 0;

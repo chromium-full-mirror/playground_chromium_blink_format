@@ -35,7 +35,6 @@
 
 namespace WebCore {
 
-using namespace EventNames;
 using namespace HTMLNames;
 
 HTMLButtonElement::HTMLButtonElement(Document* doc, HTMLFormElement* form)
@@ -83,15 +82,15 @@ void HTMLButtonElement::parseMappedAttribute(MappedAttribute* attr) {
     // not Opera.
     // See http://bugs.webkit.org/show_bug.cgi?id=12071
   } else if (attr->name() == onfocusAttr) {
-    setInlineEventListenerForTypeAndAttribute(focusEvent, attr);
+    setInlineEventListenerForTypeAndAttribute(eventNames().focusEvent, attr);
   } else if (attr->name() == onblurAttr) {
-    setInlineEventListenerForTypeAndAttribute(blurEvent, attr);
+    setInlineEventListenerForTypeAndAttribute(eventNames().blurEvent, attr);
   } else
     HTMLFormControlElement::parseMappedAttribute(attr);
 }
 
 void HTMLButtonElement::defaultEventHandler(Event* evt) {
-  if (evt->type() == DOMActivateEvent && !disabled()) {
+  if (evt->type() == eventNames().DOMActivateEvent && !disabled()) {
     if (form() && m_type == SUBMIT) {
       m_activeSubmit = true;
       form()->prepareSubmit(evt);
@@ -102,13 +101,13 @@ void HTMLButtonElement::defaultEventHandler(Event* evt) {
   }
 
   if (evt->isKeyboardEvent()) {
-    if (evt->type() == keydownEvent &&
+    if (evt->type() == eventNames().keydownEvent &&
         static_cast<KeyboardEvent*>(evt)->keyIdentifier() == "U+0020") {
       setActive(true, true);
       // No setDefaultHandled() - IE dispatches a keypress in this case.
       return;
     }
-    if (evt->type() == keypressEvent) {
+    if (evt->type() == eventNames().keypressEvent) {
       switch (static_cast<KeyboardEvent*>(evt)->charCode()) {
         case '\r':
           dispatchSimulatedClick(evt);
@@ -122,7 +121,7 @@ void HTMLButtonElement::defaultEventHandler(Event* evt) {
           break;
       }
     }
-    if (evt->type() == keyupEvent &&
+    if (evt->type() == eventNames().keyupEvent &&
         static_cast<KeyboardEvent*>(evt)->keyIdentifier() == "U+0020") {
       if (active())
         dispatchSimulatedClick(evt);

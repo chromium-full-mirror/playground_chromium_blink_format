@@ -32,7 +32,6 @@
 namespace WebCore {
 
 using namespace HTMLNames;
-using namespace EventNames;
 
 HTMLScriptElement::HTMLScriptElement(Document* doc)
     : HTMLElement(scriptTag, doc), m_data(this, this) {}
@@ -66,7 +65,7 @@ void HTMLScriptElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attrName == srcAttr)
     handleSourceAttribute(m_data, attr->value());
   else if (attrName == onloadAttr)
-    setInlineEventListenerForTypeAndAttribute(loadEvent, attr);
+    setInlineEventListenerForTypeAndAttribute(eventNames().loadEvent, attr);
   else
     HTMLElement::parseMappedAttribute(attr);
 }
@@ -188,10 +187,10 @@ void HTMLScriptElement::dispatchLoadEvent() {
   ASSERT(!m_data.haveFiredLoadEvent());
   m_data.setHaveFiredLoadEvent(true);
 
-  dispatchEventForType(loadEvent, false, false);
+  dispatchEventForType(eventNames().loadEvent, false, false);
 }
 
 void HTMLScriptElement::dispatchErrorEvent() {
-  dispatchEventForType(errorEvent, true, false);
+  dispatchEventForType(eventNames().errorEvent, true, false);
 }
 }

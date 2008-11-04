@@ -58,7 +58,6 @@ using namespace std;
 
 namespace WebCore {
 
-using namespace EventNames;
 using namespace HTMLNames;
 
 const int rowSpacing = 1;
@@ -541,8 +540,8 @@ void RenderListBox::valueChanged(Scrollbar*) {
     m_indexOffset = newOffset;
     repaint();
     // Fire the scroll DOM event.
-    EventTargetNodeCast(node())->dispatchEventForType(scrollEvent, false,
-                                                      false);
+    EventTargetNodeCast(node())->dispatchEventForType(eventNames().scrollEvent,
+                                                      false, false);
   }
 }
 

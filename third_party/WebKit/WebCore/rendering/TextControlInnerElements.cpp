@@ -38,8 +38,6 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 class RenderTextControlInnerBlock : public RenderBlock {
  public:
   RenderTextControlInnerBlock(Node* node) : RenderBlock(node) {}
@@ -120,7 +118,7 @@ void TextControlInnerTextElement::defaultEventHandler(Event* evt) {
       else
         static_cast<HTMLTextAreaElement*>(shadowAncestor)
             ->defaultEventHandler(evt);
-    if (evt->type() == webkitEditableContentChangedEvent)
+    if (evt->type() == eventNames().webkitEditableContentChangedEvent)
       static_cast<RenderTextControl*>(shadowAncestor->renderer())
           ->subtreeHasChanged();
   }
@@ -140,7 +138,7 @@ void SearchFieldResultsButtonElement::defaultEventHandler(Event* evt) {
   // On mousedown, bring up a menu, if needed
   HTMLInputElement* input =
       static_cast<HTMLInputElement*>(shadowAncestorNode());
-  if (evt->type() == mousedownEvent && evt->isMouseEvent() &&
+  if (evt->type() == eventNames().mousedownEvent && evt->isMouseEvent() &&
       static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     input->focus();
     input->select();
@@ -162,7 +160,7 @@ void SearchFieldCancelButtonElement::defaultEventHandler(Event* evt) {
   // If the element is visible, on mouseup, clear the value, and set selection
   HTMLInputElement* input =
       static_cast<HTMLInputElement*>(shadowAncestorNode());
-  if (evt->type() == mousedownEvent && evt->isMouseEvent() &&
+  if (evt->type() == eventNames().mousedownEvent && evt->isMouseEvent() &&
       static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     input->focus();
     input->select();
@@ -172,7 +170,7 @@ void SearchFieldCancelButtonElement::defaultEventHandler(Event* evt) {
         frame->eventHandler()->setCapturingMouseEventsNode(this);
         m_capturing = true;
       }
-  } else if (evt->type() == mouseupEvent && evt->isMouseEvent() &&
+  } else if (evt->type() == eventNames().mouseupEvent && evt->isMouseEvent() &&
              static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     if (m_capturing && renderer() &&
         renderer()->style()->visibility() == VISIBLE) {

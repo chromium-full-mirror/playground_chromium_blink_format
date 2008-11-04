@@ -30,10 +30,8 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 OverflowEvent::OverflowEvent()
-    : Event(overflowchangedEvent, false, false),
+    : Event(eventNames().overflowchangedEvent, false, false),
       m_orient(VERTICAL),
       m_horizontalOverflow(false),
       m_verticalOverflow(false) {}
@@ -42,7 +40,7 @@ OverflowEvent::OverflowEvent(bool horizontalOverflowChanged,
                              bool horizontalOverflow,
                              bool verticalOverflowChanged,
                              bool verticalOverflow)
-    : Event(overflowchangedEvent, false, false),
+    : Event(eventNames().overflowchangedEvent, false, false),
       m_horizontalOverflow(horizontalOverflow),
       m_verticalOverflow(verticalOverflow) {
   ASSERT(horizontalOverflowChanged || verticalOverflowChanged);

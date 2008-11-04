@@ -702,7 +702,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         m_waitedForResponse = false;
         m_animState = AnimationStateStartWaitTimer;
         m_animationTimerCallback.startTimer(
-            m_animation->delay(), EventNames::webkitAnimationStartEvent,
+            m_animation->delay(), eventNames().webkitAnimationStartEvent,
             m_animation->delay());
       }
       break;
@@ -885,11 +885,11 @@ void AnimationBase::animationTimerCallbackFired(const AtomicString& eventType,
   ASSERT(m_object->document() && !m_object->document()->inPageCache());
 
   // FIXME: use an enum
-  if (eventType == EventNames::webkitAnimationStartEvent)
+  if (eventType == eventNames().webkitAnimationStartEvent)
     updateStateMachine(AnimationStateInputStartTimerFired, elapsedTime);
-  else if (eventType == EventNames::webkitAnimationIterationEvent)
+  else if (eventType == eventNames().webkitAnimationIterationEvent)
     updateStateMachine(AnimationStateInputLoopTimerFired, elapsedTime);
-  else if (eventType == EventNames::webkitAnimationEndEvent) {
+  else if (eventType == eventNames().webkitAnimationEndEvent) {
     updateStateMachine(AnimationStateInputEndTimerFired, elapsedTime);
     // |this| may be deleted here
   }
@@ -977,13 +977,13 @@ void AnimationBase::primeEventTimers() {
     ASSERT(nextIterationTime > 0);
     m_animState = AnimationStateLooping;
     m_animationTimerCallback.startTimer(
-        durationLeft, EventNames::webkitAnimationIterationEvent,
+        durationLeft, eventNames().webkitAnimationIterationEvent,
         nextIterationTime);
   } else {
     // We are at the end, send an end event
     m_animState = AnimationStateEnding;
     m_animationTimerCallback.startTimer(
-        durationLeft, EventNames::webkitAnimationEndEvent, nextIterationTime);
+        durationLeft, eventNames().webkitAnimationEndEvent, nextIterationTime);
   }
 }
 

@@ -35,13 +35,11 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 DeleteButton::DeleteButton(Document* document) : HTMLImageElement(document) {}
 
 void DeleteButton::defaultEventHandler(Event* event) {
   if (event->isMouseEvent()) {
-    if (event->type() == clickEvent) {
+    if (event->type() == eventNames().clickEvent) {
       document()->frame()->editor()->deleteButtonController()->deleteTarget();
       event->setDefaultHandled();
     }

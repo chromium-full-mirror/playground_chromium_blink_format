@@ -30,8 +30,6 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 WebKitTransitionEvent::WebKitTransitionEvent()
     : m_propertyName(), m_elapsedTime(0.0) {}
 

@@ -58,8 +58,6 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 ContextMenuController::ContextMenuController(Page* page,
                                              ContextMenuClient* client)
     : m_page(page), m_client(client), m_contextMenu(0) {
@@ -76,7 +74,7 @@ void ContextMenuController::clearContextMenu() {
 }
 
 void ContextMenuController::handleContextMenuEvent(Event* event) {
-  ASSERT(event->type() == contextmenuEvent);
+  ASSERT(event->type() == eventNames().contextmenuEvent);
   if (!event->isMouseEvent())
     return;
   MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);

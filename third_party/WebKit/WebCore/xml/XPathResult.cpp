@@ -57,7 +57,7 @@ class InvalidatingEventListener : public EventListener {
 XPathResult::XPathResult(EventTargetNode* eventTarget, const Value& value)
     : m_value(value), m_eventTarget(eventTarget) {
   m_eventListener = InvalidatingEventListener::create(this);
-  m_eventTarget->addEventListener(EventNames::DOMSubtreeModifiedEvent,
+  m_eventTarget->addEventListener(eventNames().DOMSubtreeModifiedEvent,
                                   m_eventListener, false);
   switch (m_value.type()) {
     case Value::BooleanValue:
@@ -81,7 +81,7 @@ XPathResult::XPathResult(EventTargetNode* eventTarget, const Value& value)
 
 XPathResult::~XPathResult() {
   if (m_eventTarget)
-    m_eventTarget->removeEventListener(EventNames::DOMSubtreeModifiedEvent,
+    m_eventTarget->removeEventListener(eventNames().DOMSubtreeModifiedEvent,
                                        m_eventListener.get(), false);
 }
 
@@ -179,7 +179,7 @@ void XPathResult::invalidateIteratorState() {
   ASSERT(m_eventTarget);
   ASSERT(m_eventListener);
 
-  m_eventTarget->removeEventListener(EventNames::DOMSubtreeModifiedEvent,
+  m_eventTarget->removeEventListener(eventNames().DOMSubtreeModifiedEvent,
                                      m_eventListener.get(), false);
 
   m_eventTarget = 0;

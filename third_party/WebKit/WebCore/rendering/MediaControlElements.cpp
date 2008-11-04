@@ -42,7 +42,6 @@
 
 namespace WebCore {
 
-using namespace EventNames;
 using namespace HTMLNames;
 
 // FIXME: These constants may need to be tweaked to better match the seeking in
@@ -110,7 +109,7 @@ MediaControlMuteButtonElement::MediaControlMuteButtonElement(
                                element) {}
 
 void MediaControlMuteButtonElement::defaultEventHandler(Event* event) {
-  if (event->type() == clickEvent) {
+  if (event->type() == eventNames().clickEvent) {
     m_mediaElement->setMuted(!m_mediaElement->muted());
     event->setDefaultHandled();
   }
@@ -128,7 +127,7 @@ MediaControlPlayButtonElement::MediaControlPlayButtonElement(
                                element) {}
 
 void MediaControlPlayButtonElement::defaultEventHandler(Event* event) {
-  if (event->type() == clickEvent) {
+  if (event->type() == eventNames().clickEvent) {
     ExceptionCode ec;
     if (m_mediaElement->canPlay())
       m_mediaElement->play(ec);
@@ -157,7 +156,7 @@ MediaControlSeekButtonElement::MediaControlSeekButtonElement(
       m_seekTimer(this, &MediaControlSeekButtonElement::seekTimerFired) {}
 
 void MediaControlSeekButtonElement::defaultEventHandler(Event* event) {
-  if (event->type() == mousedownEvent) {
+  if (event->type() == eventNames().mousedownEvent) {
     if (Frame* frame = document()->frame()) {
       m_capturing = true;
       frame->eventHandler()->setCapturingMouseEventsNode(this);
@@ -166,7 +165,7 @@ void MediaControlSeekButtonElement::defaultEventHandler(Event* event) {
     m_mediaElement->pause(ec);
     m_seekTimer.startRepeating(cSeekRepeatDelay);
     event->setDefaultHandled();
-  } else if (event->type() == mouseupEvent) {
+  } else if (event->type() == eventNames().mouseupEvent) {
     if (m_capturing)
       if (Frame* frame = document()->frame()) {
         m_capturing = false;
@@ -216,7 +215,7 @@ void MediaControlTimelineElement::defaultEventHandler(Event* event) {
   HTMLInputElement::defaultEventHandler(event);
 
   float time = narrowPrecisionToFloat(value().toDouble());
-  if (oldTime != time || event->type() == inputEvent) {
+  if (oldTime != time || event->type() == eventNames().inputEvent) {
     ExceptionCode ec;
     m_mediaElement->setCurrentTime(time, ec);
   }
@@ -255,7 +254,7 @@ MediaControlFullscreenButtonElement::MediaControlFullscreenButtonElement(
                                element) {}
 
 void MediaControlFullscreenButtonElement::defaultEventHandler(Event* event) {
-  if (event->type() == clickEvent) {
+  if (event->type() == eventNames().clickEvent) {
     event->setDefaultHandled();
   }
   HTMLInputElement::defaultEventHandler(event);

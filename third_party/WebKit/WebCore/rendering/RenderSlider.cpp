@@ -39,7 +39,6 @@ using std::min;
 
 namespace WebCore {
 
-using namespace EventNames;
 using namespace HTMLNames;
 
 const int defaultTrackLength = 129;
@@ -71,7 +70,7 @@ HTMLSliderThumbElement::HTMLSliderThumbElement(Document* doc,
 
 void HTMLSliderThumbElement::defaultEventHandler(Event* event) {
   const AtomicString& eventType = event->type();
-  if (eventType == mousedownEvent && event->isMouseEvent() &&
+  if (eventType == eventNames().mousedownEvent && event->isMouseEvent() &&
       static_cast<MouseEvent*>(event)->button() == LeftButton) {
     MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
     if (document()->frame() && renderer() && renderer()->parent() &&
@@ -90,7 +89,7 @@ void HTMLSliderThumbElement::defaultEventHandler(Event* event) {
       event->setDefaultHandled();
       return;
     }
-  } else if (eventType == mouseupEvent && event->isMouseEvent() &&
+  } else if (eventType == eventNames().mouseupEvent && event->isMouseEvent() &&
              static_cast<MouseEvent*>(event)->button() == LeftButton) {
     if (m_inDragMode) {
       if (Frame* frame = document()->frame())
@@ -99,7 +98,8 @@ void HTMLSliderThumbElement::defaultEventHandler(Event* event) {
       event->setDefaultHandled();
       return;
     }
-  } else if (eventType == mousemoveEvent && event->isMouseEvent()) {
+  } else if (eventType == eventNames().mousemoveEvent &&
+             event->isMouseEvent()) {
     if (m_inDragMode && renderer() && renderer()->parent()) {
       // Move the slider
       MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);

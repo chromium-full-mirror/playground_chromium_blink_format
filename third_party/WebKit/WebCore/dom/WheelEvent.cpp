@@ -28,8 +28,6 @@
 
 namespace WebCore {
 
-using namespace EventNames;
-
 WheelEvent::WheelEvent() : m_wheelDeltaX(0), m_wheelDeltaY(0) {}
 
 WheelEvent::WheelEvent(float wheelDeltaX,
@@ -43,7 +41,7 @@ WheelEvent::WheelEvent(float wheelDeltaX,
                        bool altKey,
                        bool shiftKey,
                        bool metaKey)
-    : MouseRelatedEvent(mousewheelEvent,
+    : MouseRelatedEvent(eventNames().mousewheelEvent,
                         true,
                         true,
                         view,
@@ -82,7 +80,7 @@ void WheelEvent::initWheelEvent(int wheelDeltaX,
   if (dispatched())
     return;
 
-  initUIEvent(mousewheelEvent, true, true, view, 0);
+  initUIEvent(eventNames().mousewheelEvent, true, true, view, 0);
 
   m_screenX = screenX;
   m_screenY = screenY;

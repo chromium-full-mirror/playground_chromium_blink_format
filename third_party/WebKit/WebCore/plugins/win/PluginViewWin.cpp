@@ -91,7 +91,6 @@ using namespace WTF;
 
 namespace WebCore {
 
-using namespace EventNames;
 using namespace HTMLNames;
 
 const LPCWSTR kWebPluginViewdowClassName = L"WebPluginView";
@@ -408,10 +407,10 @@ void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
 
   npEvent.wParam = event->keyCode();
 
-  if (event->type() == keydownEvent) {
+  if (event->type() == eventNames().keydownEvent) {
     npEvent.event = WM_KEYDOWN;
     npEvent.lParam = 0;
-  } else if (event->type() == keyupEvent) {
+  } else if (event->type() == eventNames().keyupEvent) {
     npEvent.event = WM_KEYUP;
     npEvent.lParam = 0x8000;
   }
@@ -438,8 +437,9 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
   if (event->shiftKey())
     npEvent.wParam |= MK_SHIFT;
 
-  if (event->type() == mousemoveEvent || event->type() == mouseoutEvent ||
-      event->type() == mouseoverEvent) {
+  if (event->type() == eventNames().mousemoveEvent ||
+      event->type() == eventNames().mouseoutEvent ||
+      event->type() == eventNames().mouseoverEvent) {
     npEvent.event = WM_MOUSEMOVE;
     if (event->buttonDown())
       switch (event->button()) {
@@ -453,7 +453,7 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
           npEvent.wParam |= MK_RBUTTON;
           break;
       }
-  } else if (event->type() == mousedownEvent) {
+  } else if (event->type() == eventNames().mousedownEvent) {
     // Focus the plugin
     if (Page* page = m_parentFrame->page())
       page->focusController()->setFocusedFrame(m_parentFrame);
@@ -469,7 +469,7 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
         npEvent.event = WM_RBUTTONDOWN;
         break;
     }
-  } else if (event->type() == mouseupEvent) {
+  } else if (event->type() == eventNames().mouseupEvent) {
     switch (event->button()) {
       case 0:
         npEvent.event = WM_LBUTTONUP;
