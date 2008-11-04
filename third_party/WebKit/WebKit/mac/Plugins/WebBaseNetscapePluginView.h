@@ -98,7 +98,6 @@ typedef struct _NPPluginTextInputFuncs NPPluginTextInputFuncs;
   BOOL isStarted;
   BOOL inSetWindow;
   BOOL hasFocus;
-  BOOL isTransparent;
   BOOL isCompletelyObscured;
   BOOL shouldStopSoon;
 
