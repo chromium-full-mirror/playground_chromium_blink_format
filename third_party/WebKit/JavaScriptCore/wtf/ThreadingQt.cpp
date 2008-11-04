@@ -59,7 +59,7 @@ void ThreadPrivate::run() {
   m_returnValue = m_entryPoint(m_data);
 }
 
-Mutex* atomicallyInitializedStaticMutex;
+static Mutex* atomicallyInitializedStaticMutex;
 
 static ThreadIdentifier mainThreadIdentifier;
 
@@ -120,6 +120,15 @@ void initializeThreading() {
       mainThreadIdentifier = establishIdentifierForThread(mainThread);
     initializeMainThread();
   }
+}
+
+void lockAtomicallyInitializedStaticMutex() {
+  ASSERT(atomicallyInitializedStaticMutex);
+  atomicallyInitializedStaticMutex->lock();
+}
+
+void unlockAtomicallyInitializedStaticMutex() {
+  atomicallyInitializedStaticMutex->unlock();
 }
 
 ThreadIdentifier createThread(ThreadFunction entryPoint,

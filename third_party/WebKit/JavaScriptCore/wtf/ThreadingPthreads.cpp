@@ -40,7 +40,7 @@
 
 namespace WTF {
 
-Mutex* atomicallyInitializedStaticMutex;
+static Mutex* atomicallyInitializedStaticMutex;
 
 #if !PLATFORM(DARWIN)
 static ThreadIdentifier mainThreadIdentifier;  // The thread that was the first
@@ -49,7 +49,7 @@ static ThreadIdentifier mainThreadIdentifier;  // The thread that was the first
 #endif
 
 static Mutex& threadMapMutex() {
-  static Mutex mutex;
+  static Mutex& mutex = *new Mutex;
   return mutex;
 }
 
@@ -65,8 +65,18 @@ void initializeThreading() {
   }
 }
 
+void lockAtomicallyInitializedStaticMutex() {
+  ASSERT(atomicallyInitializedStaticMutex);
+  atomicallyInitializedStaticMutex->lock();
+}
+
+void unlockAtomicallyInitializedStaticMutex() {
+  atomicallyInitializedStaticMutex->unlock();
+}
+
 static HashMap<ThreadIdentifier, pthread_t>& threadMap() {
-  static HashMap<ThreadIdentifier, pthread_t> map;
+  static HashMap<ThreadIdentifier, pthread_t>& map =
+      *new HashMap<ThreadIdentifier, pthread_t>;
   return map;
 }
 

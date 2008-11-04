@@ -113,6 +113,7 @@ static void setThreadName(DWORD dwThreadID, LPCSTR szThreadName) {
 static Mutex* atomicallyInitializedStaticMutex;
 
 void lockAtomicallyInitializedStaticMutex() {
+  ASSERT(atomicallyInitializedStaticMutex);
   atomicallyInitializedStaticMutex->lock();
 }
 

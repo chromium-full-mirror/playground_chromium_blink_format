@@ -47,16 +47,16 @@ struct FunctionWithContext {
 
 typedef Vector<FunctionWithContext> FunctionQueue;
 
-static bool callbacksPaused;  // This global varialble is only accessed from
-                              // main thread.
+static bool
+    callbacksPaused;  // This global variable is only accessed from main thread.
 
 Mutex& mainThreadFunctionQueueMutex() {
-  static Mutex staticMutex;
+  static Mutex& staticMutex = *new Mutex;
   return staticMutex;
 }
 
 static FunctionQueue& functionQueue() {
-  static FunctionQueue staticFunctionQueue;
+  static FunctionQueue& staticFunctionQueue = *new FunctionQueue;
   return staticFunctionQueue;
 }
 
