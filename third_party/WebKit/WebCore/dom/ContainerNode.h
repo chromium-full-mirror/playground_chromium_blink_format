@@ -25,6 +25,7 @@
 #define ContainerNode_h
 
 #include "EventTargetNode.h"
+#include "FloatPoint.h"
 
 namespace WebCore {
 
@@ -106,8 +107,8 @@ class ContainerNode : public EventTargetNode {
  private:
   static void dispatchPostAttachCallbacks();
 
-  bool getUpperLeftCorner(int& x, int& y) const;
-  bool getLowerRightCorner(int& x, int& y) const;
+  bool getUpperLeftCorner(FloatPoint&) const;
+  bool getLowerRightCorner(FloatPoint&) const;
 
   Node* m_firstChild;
   Node* m_lastChild;

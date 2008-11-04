@@ -44,7 +44,9 @@ class RenderView : public RenderBlock {
   virtual void calcWidth();
   virtual void calcHeight();
   virtual void calcPrefWidths();
-  virtual bool absolutePosition(int& xPos, int& yPos, bool fixed = false) const;
+  virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
+                                     bool fixed = false,
+                                     bool useTransforms = false) const;
 
   int docHeight() const;
   int docWidth() const;

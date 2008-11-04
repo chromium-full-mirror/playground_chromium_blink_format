@@ -83,10 +83,10 @@ bool HTMLAreaElement::mapMouseEvent(int x,
 }
 
 IntRect HTMLAreaElement::getRect(RenderObject* obj) const {
-  int dx, dy;
-  obj->absolutePosition(dx, dy);
+  // FIXME: This doesn't work correctly with transforms.
+  FloatPoint absPos = obj->localToAbsolute();
   Path p = getRegion(m_lastSize);
-  p.translate(IntSize(dx, dy));
+  p.translate(absPos - FloatPoint());
   return enclosingIntRect(p.boundingRect());
 }
 

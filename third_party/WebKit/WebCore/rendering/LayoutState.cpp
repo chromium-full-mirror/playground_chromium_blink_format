@@ -42,20 +42,16 @@ LayoutState::LayoutState(LayoutState* prev,
   bool fixed = renderer->isPositioned() &&
                renderer->style()->position() == FixedPosition;
   if (fixed) {
-    int fixedX = 0;
-    int fixedY = 0;
-    renderer->view()->absolutePosition(fixedX, fixedY, true);
-    m_offset = IntSize(fixedX, fixedY) + offset;
+    // FIXME: This doesn't work correctly with transforms.
+    FloatPoint fixedOffset =
+        renderer->view()->localToAbsolute(FloatPoint(), true);
+    m_offset = IntSize(fixedOffset.x(), fixedOffset.y()) + offset;
   } else
     m_offset = prev->m_offset + offset;
 
   if (renderer->isRelPositioned()) {
-    if (renderer->hasLayer()) {
-      int relX = 0;
-      int relY = 0;
-      renderer->layer()->relativePositionOffset(relX, relY);
-      m_offset += IntSize(relX, relY);
-    }
+    if (renderer->hasLayer())
+      m_offset += renderer->layer()->relativePositionOffset();
   } else if (renderer->isPositioned() && !fixed) {
     if (RenderObject* container = renderer->container())
       m_offset += renderer->offsetForPositionedInContainer(container);
@@ -76,7 +72,7 @@ LayoutState::LayoutState(LayoutState* prev,
       m_clipRect = clipRect;
       m_clipped = true;
     }
-    layer->subtractScrollOffset(x, y);
+    layer->subtractScrolledContentOffset(x, y);
     m_offset = IntSize(x, y);
   }
   // FIXME: <http://bugs.webkit.org/show_bug.cgi?id=13443> Apply control clip if
@@ -85,10 +81,10 @@ LayoutState::LayoutState(LayoutState* prev,
 
 LayoutState::LayoutState(RenderObject* root) : m_clipped(false) {
   RenderObject* container = root->container();
-  int x = 0;
-  int y = 0;
-  container->absolutePositionForContent(x, y);
-  m_offset = IntSize(x, y);
+  // FIXME: this is broken with transforms?
+  FloatPoint absContentPoint =
+      container->localToAbsoluteForContent(FloatPoint());
+  m_offset = IntSize(absContentPoint.x(), absContentPoint.y());
   m_next = 0;
 }
 

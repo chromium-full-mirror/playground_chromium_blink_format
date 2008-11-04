@@ -55,7 +55,9 @@ class RenderBox : public RenderObject {
   virtual int overrideHeight() const;
   virtual void setOverrideSize(int);
 
-  virtual bool absolutePosition(int& x, int& y, bool fixed = false) const;
+  virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
+                                     bool fixed = false,
+                                     bool useTransforms = false) const;
 
   virtual int xPos() const { return m_x; }
   virtual int yPos() const { return m_y; }
@@ -158,6 +160,9 @@ class RenderBox : public RenderObject {
 
   int relativePositionOffsetX() const;
   int relativePositionOffsetY() const;
+  IntSize relativePositionOffset() const {
+    return IntSize(relativePositionOffsetX(), relativePositionOffsetY());
+  }
 
   virtual RenderLayer* layer() const { return m_layer; }
 

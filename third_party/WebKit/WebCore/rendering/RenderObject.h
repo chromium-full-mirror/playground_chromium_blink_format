@@ -726,8 +726,12 @@ class RenderObject : public CachedResourceClient {
   virtual int xPos() const { return 0; }
   virtual int yPos() const { return 0; }
 
-  // calculate client position of box
-  virtual bool absolutePosition(int& x, int& y, bool fixed = false) const;
+  // Convert the given local point to absolute coordinates
+  // FIXME: Temporary. If useTransforms is true, take transforms into account.
+  // Eventually localToAbsolute() will always be transform-aware.
+  virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
+                                     bool fixed = false,
+                                     bool useTransforms = false) const;
 
   // This function is used to deal with the extra top space that can occur in
   // table cells (called borderTopExtra).
@@ -735,12 +739,11 @@ class RenderObject : public CachedResourceClient {
   // in.  Any code that wants to
   // accurately deal with the contents of a cell must call this function instad
   // of absolutePosition.
-  bool absolutePositionForContent(int& xPos,
-                                  int& yPos,
-                                  bool fixed = false) const {
-    bool result = absolutePosition(xPos, yPos, fixed);
-    yPos += borderTopExtra();
-    return result;
+  FloatPoint localToAbsoluteForContent(FloatPoint localPoint = FloatPoint(),
+                                       bool fixed = false,
+                                       bool useTransforms = false) const {
+    localPoint.move(0.0f, static_cast<float>(borderTopExtra()));
+    return localToAbsolute(localPoint, fixed, useTransforms);
   }
 
   // width and height are without margins but include paddings and borders

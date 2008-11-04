@@ -214,10 +214,15 @@ class RenderLayer : public ScrollbarClient {
 
   // Scrolling methods for layers that can scroll their overflow.
   void scrollByRecursively(int xDelta, int yDelta);
-  void scrollOffset(int& x, int& y);
-  void subtractScrollOffset(int& x, int& y);
+  void addScrolledContentOffset(int& x, int& y) const;
+  void subtractScrolledContentOffset(int& x, int& y) const;
+  IntSize scrolledContentOffset() const {
+    return IntSize(scrollXOffset() + m_scrollLeftOverflow, scrollYOffset());
+  }
+
   int scrollXOffset() const { return m_scrollX + m_scrollOriginX; }
   int scrollYOffset() const { return m_scrollY; }
+
   void scrollToOffset(int x,
                       int y,
                       bool updateScrollbars = true,
@@ -282,10 +287,11 @@ class RenderLayer : public ScrollbarClient {
 
   void updateTransform();
 
-  void relativePositionOffset(int& relX, int& relY) {
+  void relativePositionOffset(int& relX, int& relY) const {
     relX += m_relX;
     relY += m_relY;
   }
+  IntSize relativePositionOffset() const { return IntSize(m_relX, m_relY); }
 
   void clearClipRects();
   void clearClipRect();
@@ -458,8 +464,8 @@ class RenderLayer : public ScrollbarClient {
   // Our scroll offsets if the view is scrolled.
   int m_scrollX;
   int m_scrollY;
-  int m_scrollOriginX;
-  int m_scrollLeftOverflow;
+  int m_scrollOriginX;       // only non-zero for rtl content
+  int m_scrollLeftOverflow;  // only non-zero for rtl content
 
   // The width/height of our scrolled area.
   int m_scrollWidth;

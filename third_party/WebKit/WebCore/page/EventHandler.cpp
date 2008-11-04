@@ -2227,10 +2227,10 @@ bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
     // drag
     // image and offset
     if (dragState().m_dragSrcIsDHTML) {
-      int srcX, srcY;
       if (RenderObject* renderer = dragState().m_dragSrc->renderer()) {
-        renderer->absolutePosition(srcX, srcY);
-        IntSize delta = m_mouseDownPos - IntPoint(srcX, srcY);
+        // FIXME: This doesn't work correctly with transforms.
+        FloatPoint absPos = renderer->localToAbsolute();
+        IntSize delta = m_mouseDownPos - roundedIntPoint(absPos);
         dragState().m_dragClipboard->setDragImageElement(
             dragState().m_dragSrc.get(), IntPoint() + delta);
       } else {

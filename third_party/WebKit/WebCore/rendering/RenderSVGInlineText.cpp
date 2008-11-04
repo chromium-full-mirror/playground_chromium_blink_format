@@ -106,8 +106,7 @@ IntRect RenderSVGInlineText::computeAbsoluteRectForRange(int startPos,
 
   // Mimic RenderBox::computeAbsoluteRepaintRect() functionality. But only the
   // subset needed for SVG and respecting SVG transformations.
-  int x, y;
-  cb->container()->absolutePosition(x, y);
+  FloatPoint absPos = cb->container()->localToAbsolute();
 
   // Remove HTML parent translation offsets here! These need to be retrieved
   // from the RenderSVGRoot object.
@@ -115,10 +114,11 @@ IntRect RenderSVGInlineText::computeAbsoluteRectForRange(int startPos,
   // text in scrollable <div>.
   AffineTransform htmlParentCtm = root->RenderContainer::absoluteTransform();
 
-  FloatRect fixedRect(
-      narrowPrecisionToFloat(rect.x() + x - xPos() - htmlParentCtm.e()),
-      narrowPrecisionToFloat(rect.y() + y - yPos() - htmlParentCtm.f()),
-      rect.width(), rect.height());
+  FloatRect fixedRect(narrowPrecisionToFloat(rect.x() + absPos.x() - xPos() -
+                                             htmlParentCtm.e()),
+                      narrowPrecisionToFloat(rect.y() + absPos.y() - yPos() -
+                                             htmlParentCtm.f()),
+                      rect.width(), rect.height());
   return enclosingIntRect(absoluteTransform().mapRect(fixedRect));
 }
 

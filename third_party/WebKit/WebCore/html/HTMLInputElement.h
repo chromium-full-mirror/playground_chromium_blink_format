@@ -242,9 +242,9 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
   String m_value;
   String m_originalValue;
   int xPos;
+  int yPos;
   int m_maxLen;
-  short m_size;
-  short yPos;
+  int m_size;
 
   short m_maxResults;
 
