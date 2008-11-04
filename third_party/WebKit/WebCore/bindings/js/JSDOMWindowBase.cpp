@@ -65,7 +65,7 @@
 #include "WindowFeatures.h"
 #include "htmlediting.h"
 #include <runtime/Error.h>
-#include <kjs/JSLock.h>
+#include <runtime/JSLock.h>
 #include <wtf/AlwaysInline.h>
 #include <wtf/MathExtras.h>
 
