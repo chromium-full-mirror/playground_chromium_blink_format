@@ -112,6 +112,9 @@ class WebMutableURLRequest : public IWebMutableURLRequest,
   virtual HRESULT STDMETHODCALLTYPE isEmpty(
       /* [retval][out] */ BOOL* result);
 
+  virtual HRESULT STDMETHODCALLTYPE mutableCopy(
+      /* [out, retval] */ IWebMutableURLRequest** result);
+
   // IWebMutableURLRequest
   virtual HRESULT STDMETHODCALLTYPE addValue(
       /* [in] */ BSTR value,
