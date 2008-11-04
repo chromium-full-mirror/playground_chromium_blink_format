@@ -217,6 +217,12 @@ void HistoryItem::setLastVisitedTime(double time) {
   }
 }
 
+void HistoryItem::visited(const String& title, double time) {
+  m_title = title;
+  m_lastVisitedTime = time;
+  m_visitCount++;
+}
+
 int HistoryItem::visitCount() const {
   return m_visitCount;
 }
