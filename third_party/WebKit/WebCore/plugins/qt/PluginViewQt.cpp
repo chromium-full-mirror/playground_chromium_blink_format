@@ -378,6 +378,12 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
       return NPERR_NO_ERROR;
     }
 
+    case NPNVToolkit:
+      if (m_plugin->quirks().contains(PluginQuirkRequiresGtkToolKit)) {
+        *((uint32*)value) = 2;
+        return NPERR_NO_ERROR;
+      }
+    // fall through
     default:
       return getValueStatic(variable, value);
   }
