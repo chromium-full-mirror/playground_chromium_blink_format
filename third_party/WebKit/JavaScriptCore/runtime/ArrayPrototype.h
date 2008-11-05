@@ -23,7 +23,7 @@
 #define ArrayPrototype_h
 
 #include "JSArray.h"
-#include "lookup.h"
+#include "Lookup.h"
 
 namespace JSC {
 

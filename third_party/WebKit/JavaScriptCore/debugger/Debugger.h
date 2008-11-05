@@ -23,7 +23,7 @@
 #ifndef Debugger_h
 #define Debugger_h
 
-#include "protect.h"
+#include "Protect.h"
 
 namespace JSC {
 

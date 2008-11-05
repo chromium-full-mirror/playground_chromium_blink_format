@@ -24,7 +24,7 @@
 
 #include "ErrorPrototype.h"
 #include "JSString.h"
-#include "ustring.h"
+#include "UString.h"
 
 namespace JSC {
 

@@ -22,7 +22,7 @@
 #define protect_h
 
 #include "JSCell.h"
-#include "collector.h"
+#include "Collector.h"
 
 namespace JSC {
 

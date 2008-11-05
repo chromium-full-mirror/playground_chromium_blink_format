@@ -42,7 +42,7 @@
 #include "Settings.h"
 #include "StringSourceProvider.h"
 
-#include <kjs/completion.h>
+#include <runtime/Completion.h>
 #include <debugger/Debugger.h>
 #include <runtime/JSLock.h>
 

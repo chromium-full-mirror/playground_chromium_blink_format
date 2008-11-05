@@ -21,7 +21,7 @@
  */
 
 #include "config.h"
-#include "collector.h"
+#include "Collector.h"
 
 #include "ArgList.h"
 #include "CollectorHeapIterator.h"

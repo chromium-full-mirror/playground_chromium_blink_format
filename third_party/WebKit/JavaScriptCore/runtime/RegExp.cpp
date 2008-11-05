@@ -20,7 +20,7 @@
  */
 
 #include "config.h"
-#include "regexp.h"
+#include "RegExp.h"
 
 #include "CTI.h"
 #include "lexer.h"

@@ -25,7 +25,7 @@
 #include "JSString.h"
 #include "ObjectPrototype.h"
 #include "PrototypeFunction.h"
-#include "ustring.h"
+#include "UString.h"
 
 namespace JSC {
 

@@ -30,7 +30,7 @@
 #include "ObjectPrototype.h"
 #include "PrototypeFunction.h"
 #include "RegExpObject.h"
-#include "regexp.h"
+#include "RegExp.h"
 
 namespace JSC {
 
