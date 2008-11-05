@@ -70,7 +70,7 @@ class XSLStyleSheet : public StyleSheet {
   DocLoader* docLoader();
 
   Document* ownerDocument() { return m_ownerDocument; }
-  void setOwnerDocument(Document* doc) { m_ownerDocument = doc; }
+  void setParentStyleSheet(XSLStyleSheet* parent);
 
   xmlDocPtr document();
 
@@ -91,6 +91,7 @@ class XSLStyleSheet : public StyleSheet {
   bool m_embedded;
   bool m_processed;
   bool m_stylesheetDocTaken;
+  XSLStyleSheet* m_parentStyleSheet;
 };
 
 }  // namespace WebCore
