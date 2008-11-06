@@ -59,6 +59,17 @@ class CloseMessagePortTimer : public TimerBase {
   RefPtr<MessagePort> m_port;
 };
 
+MessagePort::EventData::EventData() {}
+
+MessagePort::EventData::EventData(const String& message,
+                                  PassRefPtr<DOMWindow> window,
+                                  PassRefPtr<MessagePort> messagePort)
+    : message(message.copy()), window(window), messagePort(messagePort) {
+  ASSERT(!this->window || isMainThread());
+}
+
+MessagePort::EventData::~EventData() {}
+
 MessagePort::MessagePort(ScriptExecutionContext* scriptExecutionContext)
     : m_entangledPort(0),
       m_queueIsOpen(false),
@@ -92,9 +103,9 @@ PassRefPtr<MessagePort> MessagePort::clone(ScriptExecutionContext* newOwner,
   // If events are posted (e.g. from a worker thread) while this code is
   // executing, there is no guarantee whether they end up in the original or new
   // port's message queue.
-  RefPtr<Event> event;
-  while (m_messageQueue.tryGetMessage(event))
-    newPort->m_messageQueue.append(event);
+  EventData eventData;
+  while (m_messageQueue.tryGetMessage(eventData))
+    newPort->m_messageQueue.append(eventData);
 
   entangle(remotePort.get(),
            newPort.get());  // The port object will be unentangled.
@@ -130,7 +141,7 @@ void MessagePort::postMessage(const String& message,
           ? static_cast<Document*>(m_scriptExecutionContext)->domWindow()
           : 0;
   m_entangledPort->m_messageQueue.append(
-      MessageEvent::create(message, "", "", window, newMessagePort.get()));
+      EventData(message, window, newMessagePort));
   if (m_entangledPort->m_queueIsOpen)
     m_entangledPort->m_scriptExecutionContext->processMessagePortMessagesSoon();
 }
@@ -152,8 +163,7 @@ PassRefPtr<MessagePort> MessagePort::startConversation(
        m_entangledPort->m_scriptExecutionContext->isDocument())
           ? static_cast<Document*>(m_scriptExecutionContext)->domWindow()
           : 0;
-  m_entangledPort->m_messageQueue.append(
-      MessageEvent::create(message, "", "", window, port2.get()));
+  m_entangledPort->m_messageQueue.append(EventData(message, window, port2));
   if (m_entangledPort->m_queueIsOpen)
     m_entangledPort->m_scriptExecutionContext->processMessagePortMessagesSoon();
   return port1;
@@ -217,9 +227,13 @@ void MessagePort::dispatchMessages() {
   // JSAbstractEventListener::handleEvent() doesn't call handlers for these.
   ASSERT(queueIsOpen());
 
-  RefPtr<Event> evt;
-  while (m_messageQueue.tryGetMessage(evt)) {
-    ASSERT(evt->type() == eventNames().messageEvent);
+  EventData eventData;
+  while (m_messageQueue.tryGetMessage(eventData)) {
+    ASSERT(!eventData.window || isMainThread());
+    ASSERT(!eventData.window || scriptExecutionContext()->isDocument());
+
+    RefPtr<Event> evt = MessageEvent::create(
+        eventData.message, "", "", eventData.window, eventData.messagePort);
 
     if (m_onMessageListener) {
       evt->setTarget(this);
