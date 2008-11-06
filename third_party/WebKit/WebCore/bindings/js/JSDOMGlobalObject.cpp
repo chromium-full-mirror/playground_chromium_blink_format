@@ -30,6 +30,8 @@
 #include "Document.h"
 #include "JSDOMWindow.h"
 #include "JSEventListener.h"
+#include "JSWorkerContext.h"
+#include "WorkerContext.h"
 
 using namespace JSC;
 
@@ -168,7 +170,14 @@ JSDOMGlobalObject* toJSDOMGlobalObject(
     return toJSDOMWindow(
         static_cast<Document*>(scriptExecutionContext)->frame());
 
-  // Not implemented yet.
+#if ENABLE(WORKERS)
+  if (scriptExecutionContext->isWorkerContext())
+    return static_cast<WorkerContext*>(scriptExecutionContext)
+        ->script()
+        ->workerContextWrapper();
+#endif
+
+  ASSERT_NOT_REACHED();
   return 0;
 }
 
