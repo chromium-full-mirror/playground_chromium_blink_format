@@ -31,7 +31,7 @@
 namespace WebCore {
 
 NetworkStateNotifier& networkStateNotifier() {
-  static NetworkStateNotifier networkStateNotifier;
+  static NetworkStateNotifier& networkStateNotifier = *new NetworkStateNotifier;
 
   return networkStateNotifier;
 }

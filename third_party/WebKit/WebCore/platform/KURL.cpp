@@ -1629,7 +1629,7 @@ String mimeTypeFromDataURL(const String& url) {
 }
 
 const KURL& blankURL() {
-  static KURL staticBlankURL("about:blank");
+  static KURL& staticBlankURL = *new KURL("about:blank");
   return staticBlankURL;
 }
 

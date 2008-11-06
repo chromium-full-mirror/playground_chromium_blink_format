@@ -64,7 +64,8 @@ void SVGResourceMarker::draw(GraphicsContext* context,
   if (!m_marker)
     return;
 
-  static HashSet<SVGResourceMarker*> currentlyDrawingMarkers;
+  static HashSet<SVGResourceMarker*>& currentlyDrawingMarkers =
+      *new HashSet<SVGResourceMarker*>;
 
   // avoid drawing circular marker references
   if (currentlyDrawingMarkers.contains(this))

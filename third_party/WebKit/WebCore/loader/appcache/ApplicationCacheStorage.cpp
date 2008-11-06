@@ -716,7 +716,7 @@ bool ApplicationCacheStorage::storeCopyOfCache(const String& cacheDirectory,
 }
 
 ApplicationCacheStorage& cacheStorage() {
-  static ApplicationCacheStorage storage;
+  static ApplicationCacheStorage& storage = *new ApplicationCacheStorage;
 
   return storage;
 }

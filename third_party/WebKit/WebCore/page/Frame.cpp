@@ -311,7 +311,7 @@ static RegularExpression* createRegExpForLabels(const Vector<String>& labels) {
   // ptrs being
   // the same across calls.  We can't do that.
 
-  static RegularExpression wordRegExp = RegularExpression("\\w");
+  static RegularExpression& wordRegExp = *new RegularExpression("\\w");
   String pattern("(");
   unsigned int numLabels = labels.size();
   unsigned int i;
@@ -1004,7 +1004,7 @@ void Frame::removeEditingStyleFromElement(Element*) const {}
 
 #ifndef NDEBUG
 static HashSet<Frame*>& keepAliveSet() {
-  static HashSet<Frame*> staticKeepAliveSet;
+  static HashSet<Frame*>& staticKeepAliveSet = *new HashSet<Frame*>;
   return staticKeepAliveSet;
 }
 #endif

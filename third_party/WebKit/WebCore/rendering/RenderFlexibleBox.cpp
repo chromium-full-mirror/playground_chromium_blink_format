@@ -831,7 +831,8 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
           continue;
 
         const UChar ellipsisAndSpace[2] = {horizontalEllipsis, ' '};
-        static AtomicString ellipsisAndSpaceStr(ellipsisAndSpace, 2);
+        static AtomicString& ellipsisAndSpaceStr =
+            *new AtomicString(ellipsisAndSpace, 2);
 
         const Font& font = style(numVisibleLines == 1)->font();
         int ellipsisAndSpaceWidth = font.width(TextRun(ellipsisAndSpace, 2));

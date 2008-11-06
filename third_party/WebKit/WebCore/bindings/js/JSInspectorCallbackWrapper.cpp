@@ -37,7 +37,7 @@ ASSERT_CLASS_FITS_IN_CELL(JSInspectorCallbackWrapper)
 typedef HashMap<JSObject*, JSInspectorCallbackWrapper*> WrapperMap;
 
 static WrapperMap& wrappers() {
-  static WrapperMap map;
+  static WrapperMap& map = *new WrapperMap;
   return map;
 }
 

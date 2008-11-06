@@ -91,7 +91,8 @@ void ScriptElement::handleSourceAttribute(ScriptElementData& data,
 
 // Helper function
 static bool isSupportedJavaScriptLanguage(const String& language) {
-  static HashSet<String, CaseFoldingHash> languages;
+  static HashSet<String, CaseFoldingHash>& languages =
+      *new HashSet<String, CaseFoldingHash>;
   if (languages.isEmpty()) {
     languages.add("javascript");
     languages.add("javascript");
