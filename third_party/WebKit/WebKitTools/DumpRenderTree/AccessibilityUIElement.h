@@ -73,6 +73,8 @@ class AccessibilityUIElement {
   JSStringRef parameterizedAttributeNames();
 
   // Attributes - platform-independent implementations
+  JSStringRef attributeValue(JSStringRef attribute);
+  bool isAttributeSettable(JSStringRef attribute);
   JSStringRef role();
   JSStringRef title();
   JSStringRef description();

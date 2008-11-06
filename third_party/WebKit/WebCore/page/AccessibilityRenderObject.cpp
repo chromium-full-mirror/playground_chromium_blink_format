@@ -312,6 +312,10 @@ bool AccessibilityRenderObject::isReadOnly() const {
     if (!document)
       return true;
 
+    HTMLElement* body = document->body();
+    if (body && body->isContentEditable())
+      return false;
+
     Frame* frame = document->frame();
     if (!frame)
       return true;
