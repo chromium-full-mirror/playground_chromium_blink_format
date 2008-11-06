@@ -234,7 +234,7 @@ bool StyleChange::currentlyHasStyle(const Position& pos,
 }
 
 static String& styleSpanClassString() {
-  static String& styleSpanClassString = *new String(AppleStyleSpanClass);
+  static String styleSpanClassString = AppleStyleSpanClass;
   return styleSpanClassString;
 }
 

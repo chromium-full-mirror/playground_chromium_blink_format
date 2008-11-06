@@ -35,7 +35,7 @@ namespace WebCore {
 namespace {
 
 String convertedSpaceString() {
-  static String& convertedSpaceString = *new String;
+  static String convertedSpaceString;
   if (convertedSpaceString.isNull()) {
     convertedSpaceString = "<span class=\"";
     convertedSpaceString += AppleConvertedSpace;

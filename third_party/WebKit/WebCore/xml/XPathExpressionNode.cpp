@@ -36,7 +36,7 @@ namespace WebCore {
 namespace XPath {
 
 EvaluationContext& Expression::evaluationContext() {
-  static EvaluationContext& evaluationContext = *new EvaluationContext;
+  static EvaluationContext evaluationContext;
   return evaluationContext;
 }
 

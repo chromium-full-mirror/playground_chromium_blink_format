@@ -63,8 +63,7 @@ static void addString(HashSet<String, CaseFoldingHash>& set,
 
 static bool isSVG10Feature(const String& feature) {
   static bool initialized = false;
-  static HashSet<String, CaseFoldingHash>& svgFeatures =
-      *new HashSet<String, CaseFoldingHash>;
+  static HashSet<String, CaseFoldingHash> svgFeatures;
   if (!initialized) {
 #if ENABLE(SVG_USE) && ENABLE(SVG_FOREIGN_OBJECT) && ENABLE(SVG_FILTER) && \
     ENABLE(SVG_FONTS)
@@ -90,8 +89,7 @@ static bool isSVG10Feature(const String& feature) {
 
 static bool isSVG11Feature(const String& feature) {
   static bool initialized = false;
-  static HashSet<String, CaseFoldingHash>& svgFeatures =
-      *new HashSet<String, CaseFoldingHash>;
+  static HashSet<String, CaseFoldingHash> svgFeatures;
   if (!initialized) {
 // Sadly, we cannot claim to implement any of the SVG 1.1 generic feature sets
 // lack of Font and Filter support.
@@ -280,8 +278,8 @@ bool DOMImplementation::isXMLMIMEType(const String& mimeType) {
     return true;
   static const char* validChars =
       "[0-9a-zA-Z_\\-+~!$\\^{}|.%'`#&*]";  // per RFCs: 3023, 2045
-  static RegularExpression& xmlTypeRegExp = *new RegularExpression(
-      String("^") + validChars + "+/" + validChars + "+\\+xml$");
+  static RegularExpression xmlTypeRegExp(String("^") + validChars + "+/" +
+                                         validChars + "+\\+xml$");
   return xmlTypeRegExp.match(mimeType) > -1;
 }
 

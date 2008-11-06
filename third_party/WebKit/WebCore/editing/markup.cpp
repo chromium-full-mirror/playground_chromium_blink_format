@@ -89,11 +89,11 @@ static void appendAttributeValue(Vector<UChar>& result,
   unsigned len = attr.length();
   unsigned lastCopiedFrom = 0;
 
-  static const String& ampEntity = *new String("&amp;");
-  static const String& gtEntity = *new String("&gt;");
-  static const String& ltEntity = *new String("&lt;");
-  static const String& quotEntity = *new String("&quot;");
-  static const String& nbspEntity = *new String("&nbsp;");
+  static const String ampEntity("&amp;");
+  static const String gtEntity("&gt;");
+  static const String ltEntity("&lt;");
+  static const String quotEntity("&quot;");
+  static const String nbspEntity("&nbsp;");
 
   for (unsigned i = 0; i < len; ++i) {
     UChar c = uchars[i];
@@ -138,10 +138,10 @@ static void appendEscapedContent(Vector<UChar>& result,
   unsigned len = range.second;
   unsigned lastCopiedFrom = 0;
 
-  static const String& ampEntity = *new String("&amp;");
-  static const String& gtEntity = *new String("&gt;");
-  static const String& ltEntity = *new String("&lt;");
-  static const String& nbspEntity = *new String("&nbsp;");
+  static const String ampEntity("&amp;");
+  static const String gtEntity("&gt;");
+  static const String ltEntity("&lt;");
+  static const String nbspEntity("&nbsp;");
 
   for (unsigned i = 0; i < len; ++i) {
     UChar c = uchars[i];
@@ -322,10 +322,8 @@ static bool shouldAddNamespaceAttr(
     const Attribute* attr,
     HashMap<AtomicStringImpl*, AtomicStringImpl*>& namespaces) {
   // Don't add namespace attributes twice
-  static const AtomicString& xmlnsURI =
-      *new AtomicString("http://www.w3.org/2000/xmlns/");
-  static const QualifiedName& xmlnsAttr =
-      *new QualifiedName(nullAtom, "xmlns", xmlnsURI);
+  static const AtomicString xmlnsURI = "http://www.w3.org/2000/xmlns/";
+  static const QualifiedName xmlnsAttr(nullAtom, "xmlns", xmlnsURI);
   if (attr->name() == xmlnsAttr) {
     namespaces.set(emptyAtom.impl(), attr->value().impl());
     return false;
@@ -354,7 +352,7 @@ static void appendNamespace(
   AtomicStringImpl* foundNS = namespaces.get(pre);
   if (foundNS != ns.impl()) {
     namespaces.set(pre, ns.impl());
-    static const String& xmlns = *new String("xmlns");
+    static const String xmlns("xmlns");
     result.append(' ');
     append(result, xmlns);
     if (!prefix.isEmpty()) {
@@ -539,7 +537,7 @@ static void appendStartMarkup(
         if (convert)
           style->setProperty(CSSPropertyDisplay, CSSValueInline, true);
         if (style->length() > 0) {
-          static const String& stylePrefix = *new String(" style=\"");
+          static const String stylePrefix(" style=\"");
           append(result, stylePrefix);
           appendAttributeValue(result, style->cssText(), documentIsHTML);
           result.append('\"');
@@ -761,8 +759,8 @@ String createMarkup(const Range* range,
                     Vector<Node*>* nodes,
                     EAnnotateForInterchange annotate,
                     bool convertBlocksToInlines) {
-  static const String& interchangeNewlineString =
-      *new String("<br class=\"" AppleInterchangeNewline "\">");
+  static const String interchangeNewlineString =
+      String("<br class=\"") + AppleInterchangeNewline + "\">";
 
   if (!range)
     return "";
@@ -1012,14 +1010,14 @@ String createMarkup(const Range* range,
 
         if (style->length()) {
           Vector<UChar> openTag;
-          static const String& divStyle = *new String("<div style=\"");
+          static const String divStyle("<div style=\"");
           append(openTag, divStyle);
           appendAttributeValue(openTag, style->cssText(), documentIsHTML);
           openTag.append('\"');
           openTag.append('>');
           preMarkups.append(String::adopt(openTag));
 
-          static const String& divCloseTag = *new String("</div>");
+          static const String divCloseTag("</div>");
           markups.append(divCloseTag);
         }
       } else {
@@ -1037,9 +1035,9 @@ String createMarkup(const Range* range,
     }
   }
 
-  static const String& styleSpanOpen =
-      *new String("<span class=\"" AppleStyleSpanClass "\" style=\"");
-  static const String& styleSpanClose = *new String("</span>");
+  static const String styleSpanOpen =
+      String("<span class=\"" AppleStyleSpanClass "\" style=\"");
+  static const String styleSpanClose("</span>");
 
   // Add a wrapper span with the styles that all of the nodes in the markup
   // inherit.

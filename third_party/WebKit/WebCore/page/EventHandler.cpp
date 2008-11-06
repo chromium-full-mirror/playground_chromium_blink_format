@@ -158,7 +158,7 @@ EventHandler::EventHandler(Frame* frame)
 EventHandler::~EventHandler() {}
 
 EventHandler::EventHandlerDragState& EventHandler::dragState() {
-  static EventHandlerDragState& state = *new EventHandlerDragState;
+  static EventHandlerDragState state;
   return state;
 }
 

@@ -44,7 +44,7 @@ namespace WebCore {
 typedef HashMap<Profile*, JSObject*> ProfileMap;
 
 static ProfileMap& profileCache() {
-  static ProfileMap& staticProfiles = *new ProfileMap;
+  static ProfileMap staticProfiles;
   return staticProfiles;
 }
 

@@ -39,7 +39,7 @@ typedef HashMap<JSObject*, JSInspectedObjectWrapper*> WrapperMap;
 typedef HashMap<JSGlobalObject*, WrapperMap*> GlobalObjectWrapperMap;
 
 static GlobalObjectWrapperMap& wrappers() {
-  static GlobalObjectWrapperMap& map = *new GlobalObjectWrapperMap;
+  static GlobalObjectWrapperMap map;
   return map;
 }
 
