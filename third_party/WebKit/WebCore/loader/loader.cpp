@@ -409,11 +409,11 @@ void Loader::Host::didReceiveResponse(SubresourceLoader* loader,
 
   String encoding = response.textEncodingName();
   if (!encoding.isNull())
-    request->cachedResource()->setEncoding(encoding);
+    resource->setEncoding(encoding);
 
   if (request->isMultipart()) {
-    ASSERT(request->cachedResource()->isImage());
-    static_cast<CachedImage*>(request->cachedResource())->clear();
+    ASSERT(resource->isImage());
+    static_cast<CachedImage*>(resource)->clear();
     if (request->docLoader()->frame())
       request->docLoader()->frame()->loader()->checkCompleted();
   } else if (response.isMultipart()) {
@@ -424,7 +424,7 @@ void Loader::Host::didReceiveResponse(SubresourceLoader* loader,
 
     // If we get a multipart response, we must have a handle
     ASSERT(loader->handle());
-    if (!request->cachedResource()->isImage())
+    if (!resource->isImage())
       loader->handle()->cancel();
   }
 }

@@ -272,6 +272,12 @@ String String::simplifyWhiteSpace() const {
   return m_impl->simplifyWhiteSpace();
 }
 
+String String::removeCharacters(CharacterMatchFunctionPtr findMatch) const {
+  if (!m_impl)
+    return String();
+  return m_impl->removeCharacters(findMatch);
+}
+
 String String::foldCase() const {
   if (!m_impl)
     return String();

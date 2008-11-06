@@ -303,12 +303,16 @@ bool CachedResource::canUseCacheValidator() const {
 bool CachedResource::mustRevalidate(CachePolicy cachePolicy) const {
   if (m_loading)
     return false;
-  String cacheControl = m_response.httpHeaderField("Cache-Control");
-  // FIXME: It would be better to tokenize the field.
+
+  const CacheControlDirectiveMap& cacheControlDirectives =
+      m_response.parseCacheControlDirectives();
+
+  // FIXME: Also look at max-age, min-fresh, max-stale in Cache-Control
   if (cachePolicy == CachePolicyCache)
-    return !cacheControl.isEmpty() &&
-           (cacheControl.contains("no-cache", false) ||
-            (isExpired() && cacheControl.contains("must-revalidate", false)));
-  return isExpired() || cacheControl.contains("no-cache", false);
+    return !cacheControlDirectives.isEmpty() &&
+           (cacheControlDirectives.contains("no-cache") ||
+            (isExpired() &&
+             cacheControlDirectives.contains("must-revalidate")));
+  return isExpired() || cacheControlDirectives.contains("no-cache");
 }
 }
