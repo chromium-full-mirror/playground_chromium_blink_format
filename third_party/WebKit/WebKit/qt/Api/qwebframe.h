@@ -135,6 +135,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   void setUrl(const QUrl& url);
   QUrl url() const;
   QIcon icon() const;
+  QMultiMap<QString, QString> metaData() const;
 
   QString frameName() const;
 
