@@ -43,9 +43,7 @@ class CachedCSSStyleSheet : public CachedResource {
   CachedCSSStyleSheet(const String& URL, const String& charset);
   virtual ~CachedCSSStyleSheet();
 
-  const String sheetText(bool enforceMIMEType = true) const {
-    return canUseSheet(enforceMIMEType) ? m_sheet : "";
-  }
+  const String sheetText(bool enforceMIMEType = true) const;
 
   virtual void addClient(CachedResourceClient*);
 
@@ -62,7 +60,6 @@ class CachedCSSStyleSheet : public CachedResource {
   bool canUseSheet(bool enforceMIMEType) const;
 
  protected:
-  String m_sheet;
   RefPtr<TextResourceDecoder> m_decoder;
 };
 }
