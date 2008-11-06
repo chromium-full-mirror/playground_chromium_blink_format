@@ -110,15 +110,6 @@ class MediaPlayerPrivate : public QObject, Noncopyable {
   void setVisible(bool);
   void setRect(const IntRect&);
 
-  void loadStateChanged();
-  void rateChanged();
-  void sizeChanged();
-  void timeChanged();
-  void volumeChanged();
-  void didEnd();
-  void loadingFailed();
-
-  void repaint();
   void paint(GraphicsContext*, const IntRect&);
   static void getSupportedTypes(HashSet<String>&);
   static bool isAvailable() { return true; }
@@ -128,7 +119,6 @@ class MediaPlayerPrivate : public QObject, Noncopyable {
 
  private slots:
   void stateChanged(Phonon::State, Phonon::State);
-  void tick(qint64);
   void metaDataChanged();
   void seekableChanged(bool);
   void hasVideoChanged(bool);
@@ -136,7 +126,6 @@ class MediaPlayerPrivate : public QObject, Noncopyable {
   void finished();
   void currentSourceChanged(const Phonon::MediaSource&);
   void aboutToFinish();
-  void prefinishMarkReached(qint32);
   void totalTimeChanged(qint64);
 
  private:
