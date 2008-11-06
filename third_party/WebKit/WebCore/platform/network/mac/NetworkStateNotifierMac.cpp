@@ -104,6 +104,7 @@ void NetworkStateNotifier::networkStateChangeTimerFired(
 
 NetworkStateNotifier::NetworkStateNotifier()
     : m_isOnLine(false),
+      m_networkStateChangedFunction(0),
       m_networkStateChangeTimer(
           this,
           &NetworkStateNotifier::networkStateChangeTimerFired) {
