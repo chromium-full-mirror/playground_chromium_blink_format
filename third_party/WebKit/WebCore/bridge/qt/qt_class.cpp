@@ -19,7 +19,7 @@
  */
 
 #include "config.h"
-#include "identifier.h"
+#include "Identifier.h"
 
 #include "qt_class.h"
 #include "qt_instance.h"
