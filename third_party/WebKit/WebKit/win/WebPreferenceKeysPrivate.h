@@ -146,3 +146,5 @@
 #define WebKitPaintCustomScrollbarsPreferenceKey "WebKitPaintCustomScrollbars"
 
 #define WebKitPaintNativeControlsPreferenceKey "WebKitPaintNativeControls"
+
+#define WebKitZoomsTextOnlyPreferenceKey "WebKitZoomsTextOnly"

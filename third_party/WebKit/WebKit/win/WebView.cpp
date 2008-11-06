@@ -3314,7 +3314,7 @@ HRESULT STDMETHODCALLTYPE WebView::goForward(
 HRESULT STDMETHODCALLTYPE WebView::canMakeTextLarger(
     /* [in] */ IUnknown* /*sender*/,
     /* [retval][out] */ BOOL* result) {
-  bool canGrowMore = canZoomIn(true);
+  bool canGrowMore = canZoomIn(m_page->settings()->zoomsTextOnly());
   *result = canGrowMore ? TRUE : FALSE;
   return S_OK;
 }
@@ -3334,7 +3334,7 @@ bool WebView::canZoomIn(bool isTextOnly) {
 
 HRESULT STDMETHODCALLTYPE WebView::makeTextLarger(
     /* [in] */ IUnknown* /*sender*/) {
-  return zoomIn(true);
+  return zoomIn(m_page->settings()->zoomsTextOnly());
 }
 
 HRESULT STDMETHODCALLTYPE WebView::zoomPageIn(
@@ -3353,7 +3353,7 @@ HRESULT WebView::zoomIn(bool isTextOnly) {
 HRESULT STDMETHODCALLTYPE WebView::canMakeTextSmaller(
     /* [in] */ IUnknown* /*sender*/,
     /* [retval][out] */ BOOL* result) {
-  bool canShrinkMore = canZoomOut(true);
+  bool canShrinkMore = canZoomOut(m_page->settings()->zoomsTextOnly());
   *result = canShrinkMore ? TRUE : FALSE;
   return S_OK;
 }
@@ -3373,7 +3373,7 @@ bool WebView::canZoomOut(bool isTextOnly) {
 
 HRESULT STDMETHODCALLTYPE WebView::makeTextSmaller(
     /* [in] */ IUnknown* /*sender*/) {
-  return zoomOut(true);
+  return zoomOut(m_page->settings()->zoomsTextOnly());
 }
 
 HRESULT STDMETHODCALLTYPE WebView::zoomPageOut(
@@ -3392,6 +3392,8 @@ HRESULT WebView::zoomOut(bool isTextOnly) {
 HRESULT STDMETHODCALLTYPE WebView::canMakeTextStandardSize(
     /* [in] */ IUnknown* /*sender*/,
     /* [retval][out] */ BOOL* result) {
+  // Since we always reset text zoom and page zoom together, this should
+  // continue to return an answer about text zoom even if its not enabled.
   bool notAlreadyStandard = canResetZoom(true);
   *result = notAlreadyStandard ? TRUE : FALSE;
   return S_OK;
@@ -4137,6 +4139,11 @@ HRESULT WebView::notifyPreferencesChanged(IWebNotification* notification) {
   if (FAILED(hr))
     return hr;
   settings->setShouldPaintCustomScrollbars(!!enabled);
+
+  hr = preferences->zoomsTextOnly(&enabled);
+  if (FAILED(hr))
+    return hr;
+  settings->setZoomsTextOnly(!!enabled);
 
   settings->setShowsURLsInToolTips(false);
   settings->setForceFTPDirectoryListings(true);

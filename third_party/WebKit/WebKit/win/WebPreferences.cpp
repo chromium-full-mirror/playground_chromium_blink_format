@@ -1189,6 +1189,16 @@ WebPreferences::setLocalStorageDatabasePath(BSTR location) {
   return S_OK;
 }
 
+HRESULT WebPreferences::setZoomsTextOnly(BOOL zoomsTextOnly) {
+  setBoolValue(CFSTR(WebKitZoomsTextOnlyPreferenceKey), zoomsTextOnly);
+  return S_OK;
+}
+
+HRESULT WebPreferences::zoomsTextOnly(BOOL* zoomsTextOnly) {
+  *zoomsTextOnly = boolValueForKey(CFSTR(WebKitZoomsTextOnlyPreferenceKey));
+  return S_OK;
+}
+
 void WebPreferences::willAddToWebView() {
   ++m_numWebViews;
 }
