@@ -252,6 +252,7 @@ class JSImmediate {
   static double toDouble(JSValue*);
   static bool toBoolean(JSValue*);
   static JSObject* toObject(JSValue*, ExecState*);
+  static JSObject* toThisObject(JSValue*, ExecState*);
   static UString toString(JSValue*);
 
   static bool getUInt32(JSValue*, uint32_t&);

@@ -283,7 +283,7 @@ inline JSObject* JSValue::toObject(ExecState* exec) const {
 
 inline JSObject* JSValue::toThisObject(ExecState* exec) const {
   if (UNLIKELY(JSImmediate::isImmediate(asValue())))
-    return JSImmediate::toObject(asValue(), exec);
+    return JSImmediate::toThisObject(asValue(), exec);
   return asCell()->toThisObject(exec);
 }
 

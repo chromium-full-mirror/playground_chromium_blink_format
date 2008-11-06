@@ -5224,8 +5224,15 @@ JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
     JSValue* returnValue;
     {
       SamplingTool::HostCallRecord callRecord(CTI_SAMPLER);
-      returnValue = callData.native.function(
-          callFrame, asObject(funcVal), argv[0].jsValue(callFrame), argList);
+
+      // All host methods should be calling toThisObject, but this is not
+      // presently the case.
+      JSValue* thisValue = argv[0].jsValue(callFrame);
+      if (thisValue == jsNull())
+        thisValue = callFrame->globalThisValue();
+
+      returnValue = callData.native.function(callFrame, asObject(funcVal),
+                                             thisValue, argList);
     }
     ARG_setCallFrame(previousCallFrame);
     VM_CHECK_EXCEPTION();
@@ -6053,7 +6060,8 @@ JSValue* Machine::cti_op_call_eval(CTI_ARGS) {
   if (baseVal == scopeChain->globalObject() &&
       funcVal == scopeChain->globalObject()->evalFunction()) {
     JSObject* thisObject =
-        asObject(callFrame[codeBlock->thisRegister].jsValue(callFrame));
+        callFrame[codeBlock->thisRegister].jsValue(callFrame)->toThisObject(
+            callFrame);
     JSValue* exceptionValue = noValue();
     JSValue* result = machine->callEval(
         callFrame, thisObject, scopeChain, registerFile,

@@ -661,11 +661,10 @@ void CTI::compileOpCall(OpcodeID opcodeID,
   // Setup this value as the first argument (does not apply to constructors)
   if (opcodeID != op_construct) {
     int thisVal = instruction[3].u.operand;
-    if (thisVal == missingThisObjectMarker()) {
-      // FIXME: should this be loaded dynamically off m_callFrame?
-      m_jit.movl_i32m(asInteger(m_callFrame->globalThisValue()),
-                      firstArg * sizeof(Register), X86::edi);
-    } else {
+    if (thisVal == missingThisObjectMarker())
+      m_jit.movl_i32m(asInteger(jsNull()), firstArg * sizeof(Register),
+                      X86::edi);
+    else {
       emitGetArg(thisVal, X86::eax);
       emitPutResult(firstArg);
     }
