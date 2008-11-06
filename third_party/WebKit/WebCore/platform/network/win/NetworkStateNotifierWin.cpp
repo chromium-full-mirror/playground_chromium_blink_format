@@ -96,7 +96,8 @@ void NetworkStateNotifier::registerForAddressChange() {
   ::NotifyAddrChange(&handle, &m_overlapped);
 }
 
-NetworkStateNotifier::NetworkStateNotifier() : m_isOnLine(false) {
+NetworkStateNotifier::NetworkStateNotifier()
+    : m_isOnLine(false), m_networkStateChangedFunction(0) {
   updateState();
 
   memset(&m_overlapped, 0, sizeof(m_overlapped));
