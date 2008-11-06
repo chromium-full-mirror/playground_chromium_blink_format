@@ -2610,6 +2610,21 @@ FloatPoint RenderObject::localToAbsolute(FloatPoint localPoint,
   return FloatPoint();
 }
 
+FloatPoint RenderObject::absoluteToLocal(FloatPoint containerPoint,
+                                         bool fixed,
+                                         bool useTransforms) const {
+  RenderObject* o = parent();
+  if (o) {
+    FloatPoint localPoint =
+        o->absoluteToLocal(containerPoint, fixed, useTransforms);
+    localPoint.move(0.0f, -static_cast<float>(o->borderTopExtra()));
+    if (o->hasOverflowClip())
+      localPoint += o->layer()->scrolledContentOffset();
+    return localPoint;
+  }
+  return FloatPoint();
+}
+
 IntRect RenderObject::caretRect(InlineBox* inlineBox,
                                 int caretOffset,
                                 int* extraWidthToEndOfLine) {

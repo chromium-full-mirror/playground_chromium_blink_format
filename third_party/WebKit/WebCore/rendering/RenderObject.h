@@ -732,6 +732,9 @@ class RenderObject : public CachedResourceClient {
   virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
                                      bool fixed = false,
                                      bool useTransforms = false) const;
+  virtual FloatPoint absoluteToLocal(FloatPoint,
+                                     bool fixed = false,
+                                     bool useTransforms = false) const;
 
   // This function is used to deal with the extra top space that can occur in
   // table cells (called borderTopExtra).

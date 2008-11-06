@@ -58,6 +58,9 @@ class RenderBox : public RenderObject {
   virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
                                      bool fixed = false,
                                      bool useTransforms = false) const;
+  virtual FloatPoint absoluteToLocal(FloatPoint containerPoint,
+                                     bool fixed = false,
+                                     bool useTransforms = false) const;
 
   virtual int xPos() const { return m_x; }
   virtual int yPos() const { return m_y; }
@@ -258,6 +261,8 @@ class RenderBox : public RenderObject {
   virtual bool shouldCalculateSizeAsReplaced() const {
     return isReplaced() && !isInlineBlockOrInlineTable();
   }
+
+  IntSize offsetFromContainer(RenderObject*) const;
 
  private:
   void paintRootBoxDecorations(PaintInfo&, int tx, int ty);

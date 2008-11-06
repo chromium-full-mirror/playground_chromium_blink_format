@@ -47,6 +47,9 @@ class RenderView : public RenderBlock {
   virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
                                      bool fixed = false,
                                      bool useTransforms = false) const;
+  virtual FloatPoint absoluteToLocal(FloatPoint containerPoint,
+                                     bool fixed = false,
+                                     bool useTransforms = false) const;
 
   int docHeight() const;
   int docWidth() const;
