@@ -52,7 +52,8 @@ static PassRefPtr<Archive> archiveFactoryCreate(SharedBuffer* buffer) {
 
 static HashMap<String, RawDataCreationFunction*, CaseFoldingHash>&
 archiveMIMETypes() {
-  static HashMap<String, RawDataCreationFunction*, CaseFoldingHash> mimeTypes;
+  static HashMap<String, RawDataCreationFunction*, CaseFoldingHash>& mimeTypes =
+      *new HashMap<String, RawDataCreationFunction*, CaseFoldingHash>;
   static bool initialized = false;
 
   if (initialized)

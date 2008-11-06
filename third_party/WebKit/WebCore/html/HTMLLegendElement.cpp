@@ -52,7 +52,7 @@ RenderObject* HTMLLegendElement::createRenderer(RenderArena* arena,
 }
 
 const AtomicString& HTMLLegendElement::type() const {
-  static const AtomicString legend("legend");
+  static const AtomicString& legend = *new AtomicString("legend");
   return legend;
 }
 

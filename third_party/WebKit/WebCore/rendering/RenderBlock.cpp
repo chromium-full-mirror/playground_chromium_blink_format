@@ -2044,7 +2044,8 @@ void RenderBlock::paintEllipsisBoxes(PaintInfo& paintInfo, int tx, int ty) {
 }
 
 HashMap<RenderBlock*, RenderFlowSequencedSet*>* continuationOutlineTable() {
-  static HashMap<RenderBlock*, RenderFlowSequencedSet*> table;
+  static HashMap<RenderBlock*, RenderFlowSequencedSet*>& table =
+      *new HashMap<RenderBlock*, RenderFlowSequencedSet*>;
   return &table;
 }
 

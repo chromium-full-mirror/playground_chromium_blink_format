@@ -42,7 +42,7 @@ static CounterNode* counter(RenderObject*,
                             bool alwaysCreateCounter);
 
 static CounterMaps& counterMaps() {
-  static CounterMaps staticCounterMaps;
+  static CounterMaps& staticCounterMaps = *new CounterMaps;
   return staticCounterMaps;
 }
 
