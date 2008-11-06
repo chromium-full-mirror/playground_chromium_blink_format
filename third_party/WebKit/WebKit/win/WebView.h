@@ -874,7 +874,6 @@ class WebView : public IWebView,
   WebCore::String m_userAgentCustom;
   WebCore::String m_userAgentStandard;
   float m_zoomMultiplier;
-  bool m_zoomMultiplierIsTextOnly;
   WebCore::String m_overrideEncoding;
   WebCore::String m_applicationName;
   bool m_mouseActivated;
