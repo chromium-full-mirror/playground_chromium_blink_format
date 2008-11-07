@@ -558,9 +558,9 @@ class CodeGenerator {
   Vector<ControlFlowContext> m_scopeContextStack;
   Vector<SwitchInfo> m_switchContextStack;
 
-  int m_nextGlobal;
-  int m_nextParameter;
-  int m_nextConstant;
+  int m_nextGlobalIndex;
+  int m_nextParameterIndex;
+  int m_nextConstantIndex;
 
   int m_globalVarStorageOffset;
 
