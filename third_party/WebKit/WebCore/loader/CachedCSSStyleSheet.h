@@ -61,6 +61,7 @@ class CachedCSSStyleSheet : public CachedResource {
 
  protected:
   RefPtr<TextResourceDecoder> m_decoder;
+  String m_decodedSheetText;
 };
 }
 
