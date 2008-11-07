@@ -57,7 +57,7 @@
 #include "runtime/ErrorConstructor.cpp"
 #include "runtime/FunctionConstructor.cpp"
 #include "runtime/FunctionPrototype.cpp"
-#include "grammar.cpp"
+#include "Grammar.cpp"
 #include "runtime/Identifier.cpp"
 #include "runtime/JSString.cpp"
 #include "runtime/JSNumberCell.cpp"
