@@ -50,7 +50,7 @@ static void* collect(void*) {
 #endif
 
 GCController& gcController() {
-  static GCController& staticGCController = *new GCController;
+  static GCController staticGCController;
   return staticGCController;
 }
 

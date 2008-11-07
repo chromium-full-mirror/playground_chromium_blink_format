@@ -89,8 +89,7 @@ SVGSVGElement::~SVGSVGElement() {
 }
 
 const AtomicString& SVGSVGElement::contentScriptType() const {
-  static const AtomicString& defaultValue =
-      *new AtomicString("text/ecmascript");
+  static const AtomicString defaultValue("text/ecmascript");
   const AtomicString& n = getAttribute(contentScriptTypeAttr);
   return n.isNull() ? defaultValue : n;
 }
@@ -100,7 +99,7 @@ void SVGSVGElement::setContentScriptType(const AtomicString& type) {
 }
 
 const AtomicString& SVGSVGElement::contentStyleType() const {
-  static const AtomicString& defaultValue = *new AtomicString("text/css");
+  static const AtomicString defaultValue("text/css");
   const AtomicString& n = getAttribute(contentStyleTypeAttr);
   return n.isNull() ? defaultValue : n;
 }

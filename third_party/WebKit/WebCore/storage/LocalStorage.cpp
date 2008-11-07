@@ -41,7 +41,7 @@ namespace WebCore {
 typedef HashMap<String, LocalStorage*> LocalStorageMap;
 
 static LocalStorageMap& localStorageMap() {
-  static LocalStorageMap& localStorageMap = *new LocalStorageMap;
+  static LocalStorageMap localStorageMap;
   return localStorageMap;
 }
 

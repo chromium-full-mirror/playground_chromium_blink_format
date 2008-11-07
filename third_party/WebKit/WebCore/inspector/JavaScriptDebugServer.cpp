@@ -58,7 +58,7 @@ namespace WebCore {
 typedef JavaScriptDebugServer::ListenerSet ListenerSet;
 
 JavaScriptDebugServer& JavaScriptDebugServer::shared() {
-  static JavaScriptDebugServer& server = *new JavaScriptDebugServer;
+  static JavaScriptDebugServer server;
   return server;
 }
 

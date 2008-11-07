@@ -41,8 +41,7 @@ static bool isDefaultPortForProtocol(unsigned short port,
   if (protocol.isEmpty())
     return false;
 
-  static HashMap<String, unsigned>& defaultPorts =
-      *new HashMap<String, unsigned>;
+  static HashMap<String, unsigned> defaultPorts;
   if (defaultPorts.isEmpty()) {
     defaultPorts.set("http", 80);
     defaultPorts.set("https", 443);
@@ -251,7 +250,7 @@ PassRefPtr<SecurityOrigin> SecurityOrigin::createFromDatabaseIdentifier(
 }
 
 String SecurityOrigin::databaseIdentifier() const {
-  static String& separatorString = *new String(&SeparatorCharacter, 1);
+  static String separatorString = String(&SeparatorCharacter, 1);
   return m_protocol + separatorString + m_host + separatorString +
          String::number(m_port);
 }
