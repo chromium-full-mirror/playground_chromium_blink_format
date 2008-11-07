@@ -40,8 +40,6 @@
 
 namespace WebCore {
 
-unsigned EventHandler::s_accessKeyModifiers = PlatformKeyboardEvent::AltKey;
-
 const double EventHandler::TextDragDelay = 0.0;
 
 bool EventHandler::passMousePressEventToSubframe(
@@ -93,5 +91,9 @@ bool EventHandler::eventActivatedView(const PlatformMouseEvent&) const {
 
 PassRefPtr<Clipboard> EventHandler::createDraggingClipboard() const {
   return ClipboardWx::create(ClipboardWritable, true);
+}
+
+unsigned EventHandler::accessKeyModifiers() {
+  return PlatformKeyboardEvent::AltKey;
 }
 }

@@ -56,8 +56,6 @@ QT_END_NAMESPACE
 
 namespace WebCore {
 
-unsigned EventHandler::s_accessKeyModifiers = PlatformKeyboardEvent::CtrlKey;
-
 const double EventHandler::TextDragDelay = 0.0;
 
 static bool isKeyboardOptionTab(KeyboardEvent* event) {
@@ -131,5 +129,9 @@ bool EventHandler::passMouseReleaseEventToSubframe(
     Frame* subframe) {
   subframe->eventHandler()->handleMouseReleaseEvent(mev.event());
   return true;
+}
+
+unsigned EventHandler::accessKeyModifiers() {
+  return PlatformKeyboardEvent::CtrlKey;
 }
 }
