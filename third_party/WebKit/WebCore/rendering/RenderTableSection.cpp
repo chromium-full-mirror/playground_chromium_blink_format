@@ -265,7 +265,8 @@ void RenderTableSection::addCell(RenderTableCell* cell, RenderObject* row) {
 
 void RenderTableSection::setCellWidths() {
   Vector<int>& columnPos = table()->columnPositions();
-  bool pushedLayoutState = false;
+
+  LayoutStateMaintainer statePusher(view());
 
   for (int i = 0; i < m_gridRows; i++) {
     Row& row = *m_grid[i].row;
@@ -288,11 +289,10 @@ void RenderTableSection::setCellWidths() {
         cell->setNeedsLayout(true);
         if (!table()->selfNeedsLayout() &&
             cell->checkForRepaintDuringLayout()) {
-          if (!pushedLayoutState) {
+          if (!statePusher.didPush()) {
             // Technically, we should also push state for the row, but since
             // rows don't push a coordinate transform, that's not necessary.
-            view()->pushLayoutState(this, IntSize(m_x, m_y));
-            pushedLayoutState = true;
+            statePusher.push(this, IntSize(m_x, m_y));
           }
           cell->repaint();
         }
@@ -301,15 +301,15 @@ void RenderTableSection::setCellWidths() {
     }
   }
 
-  if (pushedLayoutState)
-    view()->popLayoutState();
+  statePusher.pop();  // only pops if we pushed
 }
 
 int RenderTableSection::calcRowHeight() {
   RenderTableCell* cell;
 
   int spacing = table()->vBorderSpacing();
-  bool pushedLayoutState = false;
+
+  LayoutStateMaintainer statePusher(view());
 
   m_rowPos.resize(m_gridRows + 1);
   m_rowPos[0] = spacing;
@@ -338,11 +338,10 @@ int RenderTableSection::calcRowHeight() {
       int indx = max(r - cell->rowSpan() + 1, 0);
 
       if (cell->overrideSize() != -1) {
-        if (!pushedLayoutState) {
+        if (!statePusher.didPush()) {
           // Technically, we should also push state for the row, but since
           // rows don't push a coordinate transform, that's not necessary.
-          view()->pushLayoutState(this, IntSize(m_x, m_y));
-          pushedLayoutState = true;
+          statePusher.push(this, IntSize(m_x, m_y));
         }
         cell->setOverrideSize(-1);
         cell->setChildNeedsLayout(true, false);
@@ -387,8 +386,7 @@ int RenderTableSection::calcRowHeight() {
     m_rowPos[r + 1] = max(m_rowPos[r + 1], m_rowPos[r]);
   }
 
-  if (pushedLayoutState)
-    view()->popLayoutState();
+  statePusher.pop();
 
   return m_rowPos[m_gridRows];
 }
@@ -472,7 +470,7 @@ int RenderTableSection::layoutRows(int toAdd) {
   int vspacing = table()->vBorderSpacing();
   int nEffCols = table()->numEffCols();
 
-  view()->pushLayoutState(this, IntSize(m_x, m_y));
+  LayoutStateMaintainer statePusher(view(), this, IntSize(m_x, m_y));
 
   for (int r = 0; r < totalRows; r++) {
     // Set the row's x/y position and width/height.
@@ -613,7 +611,7 @@ int RenderTableSection::layoutRows(int toAdd) {
     }
   }
 
-  view()->popLayoutState();
+  statePusher.pop();
 
   m_height = m_rowPos[totalRows];
   m_overflowHeight = max(m_overflowHeight, m_height);

@@ -128,7 +128,7 @@ void RenderTableRow::layout() {
   ASSERT(needsLayout());
 
   // Table rows do not add translation.
-  view()->pushLayoutState(this, IntSize());
+  LayoutStateMaintainer statePusher(view(), this, IntSize());
 
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {
@@ -159,7 +159,7 @@ void RenderTableRow::layout() {
     }
   }
 
-  view()->popLayoutState();
+  statePusher.pop();
   setNeedsLayout(false);
 }
 

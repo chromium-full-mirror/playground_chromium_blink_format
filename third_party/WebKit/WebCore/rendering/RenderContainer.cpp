@@ -571,7 +571,7 @@ void RenderContainer::insertChildNode(RenderObject* child,
 void RenderContainer::layout() {
   ASSERT(needsLayout());
 
-  view()->pushLayoutState(this, IntSize(m_x, m_y));
+  LayoutStateMaintainer statePusher(view(), this, IntSize(m_x, m_y));
 
   RenderObject* child = m_firstChild;
   while (child) {
@@ -580,7 +580,7 @@ void RenderContainer::layout() {
     child = child->nextSibling();
   }
 
-  view()->popLayoutState();
+  statePusher.pop();
   setNeedsLayout(false);
 }
 
