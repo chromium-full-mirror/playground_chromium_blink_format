@@ -103,6 +103,9 @@ const char* PluginView::userAgent() {
 void PluginView::invalidateRect(NPRect*) {
   notImplemented();
 }
+void PluginView::invalidateRect(const IntRect&) {
+  notImplemented();
+}
 void PluginView::invalidateRegion(NPRegion) {
   notImplemented();
 }
