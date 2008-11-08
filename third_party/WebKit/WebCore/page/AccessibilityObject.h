@@ -390,8 +390,12 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
 #endif
 #endif
 
-  // a platform-specific method for determining if an attachment is ignored
+// a platform-specific method for determining if an attachment is ignored
+#if HAVE(ACCESSIBILITY)
   bool accessibilityIgnoreAttachment() const;
+#else
+  bool accessibilityIgnoreAttachment() const { return true; }
+#endif
 
  protected:
   unsigned m_id;
