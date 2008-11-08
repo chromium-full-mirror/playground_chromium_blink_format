@@ -56,6 +56,8 @@
 #define WebKitJavaScriptCanOpenWindowsAutomaticallyPreferenceKey \
   "WebKitJavaScriptCanOpenWindowsAutomatically"
 #define WebKitPluginsEnabledPreferenceKey "WebKitPluginsEnabled"
+#define WebKitDatabasesEnabledPreferenceKey "WebKitDatabasesEnabled"
+#define WebKitLocalStorageEnabledPreferenceKey "WebKitLocalStorageEnabled"
 #define WebKitAllowAnimatedImagesPreferenceKey \
   "WebKitAllowAnimatedImagesPreferenceKey"
 #define WebKitAllowAnimatedImageLoopingPreferenceKey \

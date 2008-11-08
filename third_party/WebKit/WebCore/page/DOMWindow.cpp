@@ -55,6 +55,7 @@
 #include "PlatformString.h"
 #include "Screen.h"
 #include "SecurityOrigin.h"
+#include "Settings.h"
 #include <algorithm>
 #include <wtf/MathExtras.h>
 
@@ -319,6 +320,10 @@ Storage* DOMWindow::localStorage() const {
 
   Page* page = document->page();
   if (!page)
+    return 0;
+
+  Settings* settings = document->settings();
+  if (!settings || !settings->localStorageEnabled())
     return 0;
 
   LocalStorage* localStorage = page->group().localStorage();
@@ -774,6 +779,10 @@ PassRefPtr<Database> DOMWindow::openDatabase(const String& name,
   Document* doc = m_frame->document();
   ASSERT(doc);
   if (!doc)
+    return 0;
+
+  Settings* settings = m_frame->settings();
+  if (!settings || !settings->databasesEnabled())
     return 0;
 
   return Database::openDatabase(doc, name, version, displayName, estimatedSize,
