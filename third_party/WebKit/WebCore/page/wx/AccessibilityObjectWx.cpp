@@ -20,6 +20,8 @@
 #include "config.h"
 #include "AccessibilityObject.h"
 
+#if HAVE(ACCESSIBILITY)
+
 namespace WebCore {
 
 bool AccessibilityObject::accessibilityIgnoreAttachment() const {
@@ -27,3 +29,5 @@ bool AccessibilityObject::accessibilityIgnoreAttachment() const {
 }
 
 }  // namespace WebCore
+
+#endif  // HAVE(ACCESSIBILITY)
