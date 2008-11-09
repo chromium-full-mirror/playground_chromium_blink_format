@@ -1546,7 +1546,8 @@ static void encodeRelativeString(const String& rel,
 
   int pathEnd = -1;
   if (encoding != pathEncoding && encoding.isValid() &&
-      !protocolIs(rel, "mailto") && !protocolIs(rel, "data")) {
+      !protocolIs(rel, "mailto") && !protocolIs(rel, "data") &&
+      !protocolIs(rel, "javascript")) {
     // Find the first instance of either # or ?, keep pathEnd at -1 otherwise.
     pathEnd = findFirstOf(s.data(), s.size(), 0, "#?");
   }
