@@ -34,7 +34,7 @@
 class WebNetscapePluginEventHandlerCocoa
     : public WebNetscapePluginEventHandler {
  public:
-  WebNetscapePluginEventHandlerCocoa(WebBaseNetscapePluginView*);
+  WebNetscapePluginEventHandlerCocoa(WebNetscapePluginView*);
 
   virtual void drawRect(const NSRect&);
 
