@@ -83,10 +83,9 @@ static JSValue* functionReadline(ExecState*,
 static JSValue* functionQuit(ExecState*, JSObject*, JSValue*, const ArgList&);
 
 struct Options {
-  Options() : interactive(false), prettyPrint(false), dump(false) {}
+  Options() : interactive(false), dump(false) {}
 
   bool interactive;
-  bool prettyPrint;
   bool dump;
   Vector<UString> fileNames;
   Vector<UString> arguments;
@@ -339,28 +338,8 @@ int main(int argc, char** argv) {
   return res;
 }
 
-static bool prettyPrintScript(ExecState* exec,
-                              const UString& fileName,
-                              const Vector<char>& script) {
-  int errLine = 0;
-  UString errMsg;
-  RefPtr<ProgramNode> programNode =
-      exec->globalData().parser->parse<ProgramNode>(
-          exec, exec->dynamicGlobalObject()->debugger(),
-          makeSource(script.data(), fileName), &errLine, &errMsg);
-  if (!programNode) {
-    fprintf(stderr, "%s:%d: %s.\n", fileName.UTF8String().c_str(), errLine,
-            errMsg.UTF8String().c_str());
-    return false;
-  }
-
-  printf("%s\n", programNode->toString().UTF8String().c_str());
-  return true;
-}
-
 static bool runWithScripts(GlobalObject* globalObject,
                            const Vector<UString>& fileNames,
-                           bool prettyPrint,
                            bool dump) {
   Vector<char> script;
 
@@ -379,33 +358,29 @@ static bool runWithScripts(GlobalObject* globalObject,
     if (!fillBufferWithContentsOfFile(fileName, script))
       return false;  // fail early so we can catch missing files
 
-    if (prettyPrint)
-      prettyPrintScript(globalObject->globalExec(), fileName, script);
-    else {
 #if ENABLE(OPCODE_SAMPLING)
-      machine->sampler()->start();
+    machine->sampler()->start();
 #endif
-      Completion completion = Interpreter::evaluate(
-          globalObject->globalExec(), globalObject->globalScopeChain(),
-          makeSource(script.data(), fileName));
-      success = success && completion.complType() != Throw;
-      if (dump) {
-        if (completion.complType() == Throw)
-          printf(
-              "Exception: %s\n",
-              completion.value()->toString(globalObject->globalExec()).ascii());
-        else
-          printf(
-              "End: %s\n",
-              completion.value()->toString(globalObject->globalExec()).ascii());
-      }
-
-      globalObject->globalExec()->clearException();
-
-#if ENABLE(OPCODE_SAMPLING)
-      machine->sampler()->stop();
-#endif
+    Completion completion = Interpreter::evaluate(
+        globalObject->globalExec(), globalObject->globalScopeChain(),
+        makeSource(script.data(), fileName));
+    success = success && completion.complType() != Throw;
+    if (dump) {
+      if (completion.complType() == Throw)
+        printf(
+            "Exception: %s\n",
+            completion.value()->toString(globalObject->globalExec()).ascii());
+      else
+        printf(
+            "End: %s\n",
+            completion.value()->toString(globalObject->globalExec()).ascii());
     }
+
+    globalObject->globalExec()->clearException();
+
+#if ENABLE(OPCODE_SAMPLING)
+    machine->sampler()->stop();
+#endif
   }
 
 #if ENABLE(OPCODE_SAMPLING)
@@ -464,7 +439,6 @@ static void printUsageStatement() {
   fprintf(stderr,
           "  -i         Enables interactive mode (default if no files are "
           "specified)\n");
-  fprintf(stderr, "  -p         Prints formatted source code\n");
   fprintf(stderr,
           "  -s         Installs signal handlers that exit on a crash (Unix "
           "platforms only)\n");
@@ -486,10 +460,6 @@ static void parseArguments(int argc, char** argv, Options& options) {
     }
     if (strcmp(arg, "-i") == 0) {
       options.interactive = true;
-      continue;
-    }
-    if (strcmp(arg, "-p") == 0) {
-      options.prettyPrint = true;
       continue;
     }
     if (strcmp(arg, "-d") == 0) {
@@ -528,8 +498,7 @@ int jscmain(int argc, char** argv, JSGlobalData* globalData) {
   parseArguments(argc, argv, options);
 
   GlobalObject* globalObject = new (globalData) GlobalObject(options.arguments);
-  bool success = runWithScripts(globalObject, options.fileNames,
-                                options.prettyPrint, options.dump);
+  bool success = runWithScripts(globalObject, options.fileNames, options.dump);
   if (options.interactive && success)
     runInteractive(globalObject);
 

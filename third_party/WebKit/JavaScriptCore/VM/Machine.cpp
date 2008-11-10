@@ -1179,9 +1179,10 @@ JSValue* Machine::execute(EvalNode* evalNode,
 
     BatchedTransitionOptimizer optimizer(variableObject);
 
-    const Node::VarStack& varStack = codeBlock->ownerNode->varStack();
-    Node::VarStack::const_iterator varStackEnd = varStack.end();
-    for (Node::VarStack::const_iterator it = varStack.begin();
+    const DeclarationStacks::VarStack& varStack =
+        codeBlock->ownerNode->varStack();
+    DeclarationStacks::VarStack::const_iterator varStackEnd = varStack.end();
+    for (DeclarationStacks::VarStack::const_iterator it = varStack.begin();
          it != varStackEnd; ++it) {
       const Identifier& ident = (*it).first;
       if (!variableObject->hasProperty(callFrame, ident)) {
@@ -1190,10 +1191,12 @@ JSValue* Machine::execute(EvalNode* evalNode,
       }
     }
 
-    const Node::FunctionStack& functionStack =
+    const DeclarationStacks::FunctionStack& functionStack =
         codeBlock->ownerNode->functionStack();
-    Node::FunctionStack::const_iterator functionStackEnd = functionStack.end();
-    for (Node::FunctionStack::const_iterator it = functionStack.begin();
+    DeclarationStacks::FunctionStack::const_iterator functionStackEnd =
+        functionStack.end();
+    for (DeclarationStacks::FunctionStack::const_iterator it =
+             functionStack.begin();
          it != functionStackEnd; ++it) {
       PutPropertySlot slot;
       variableObject->put(callFrame, (*it)->m_ident,
