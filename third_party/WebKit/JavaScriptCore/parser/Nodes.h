@@ -36,7 +36,6 @@
 #include "SourceCode.h"
 #include "SymbolTable.h"
 #include "RegExp.h"
-#include <wtf/ListRefPtr.h>
 #include <wtf/MathExtras.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/UnusedParam.h>
@@ -56,6 +55,7 @@ class FuncDeclNode;
 class Node;
 class EvalCodeBlock;
 class JSFunction;
+class NodeReleaser;
 class ProgramCodeBlock;
 class PropertyListNode;
 class SourceStream;
@@ -140,6 +140,9 @@ class ParserRefCounted : Noncopyable {
   JSGlobalData* m_globalData;
 
  public:
+  // Nonrecursive destruction.
+  virtual void releaseNodes(NodeReleaser&);
+
   void ref() JSC_FAST_CALL;
   void deref() JSC_FAST_CALL;
   bool hasOneRef() JSC_FAST_CALL;
@@ -501,6 +504,9 @@ class ElementNode : public Node {
     l->m_next = this;
   }
 
+  virtual ~ElementNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -511,12 +517,9 @@ class ElementNode : public Node {
   ExpressionNode* value() { return m_node.get(); }
 
   ElementNode* next() { return m_next.get(); }
-  PassRefPtr<ElementNode> releaseNext() JSC_FAST_CALL {
-    return m_next.release();
-  }
 
  private:
-  ListRefPtr<ElementNode> m_next;
+  RefPtr<ElementNode> m_next;
   int m_elision;
   RefPtr<ExpressionNode> m_node;
 };
@@ -541,6 +544,9 @@ class ArrayNode : public ExpressionNode {
                                                   m_elision(elision),
                                                   m_optional(true) {}
 
+  virtual ~ArrayNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -563,6 +569,9 @@ class PropertyNode : public Node {
                                           m_name(name),
                                           m_assign(assign),
                                           m_type(type) {}
+
+  virtual ~PropertyNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const {
@@ -592,6 +601,9 @@ class PropertyListNode : public Node {
     list->m_next = this;
   }
 
+  virtual ~PropertyListNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const {
@@ -599,14 +611,10 @@ class PropertyListNode : public Node {
     return PrecExpression;
   }
 
-  PassRefPtr<PropertyListNode> releaseNext() JSC_FAST_CALL {
-    return m_next.release();
-  }
-
  private:
   friend class ObjectLiteralNode;
   RefPtr<PropertyNode> m_node;
-  ListRefPtr<PropertyListNode> m_next;
+  RefPtr<PropertyListNode> m_next;
 };
 
 class ObjectLiteralNode : public ExpressionNode {
@@ -618,6 +626,9 @@ class ObjectLiteralNode : public ExpressionNode {
                     PropertyListNode* list) JSC_FAST_CALL
       : ExpressionNode(globalData),
         m_list(list) {}
+
+  virtual ~ObjectLiteralNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -639,6 +650,9 @@ class BracketAccessorNode : public ExpressionNode,
         m_base(base),
         m_subscript(subscript),
         m_subscriptHasAssignments(subscriptHasAssignments) {}
+
+  virtual ~BracketAccessorNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
@@ -664,6 +678,9 @@ class DotAccessorNode : public ExpressionNode, public ThrowableExpressionData {
       : ExpressionNode(globalData),
         m_base(base),
         m_ident(ident) {}
+
+  virtual ~DotAccessorNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -692,6 +709,9 @@ class ArgumentListNode : public Node {
     listNode->m_next = this;
   }
 
+  virtual ~ArgumentListNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const {
@@ -699,11 +719,7 @@ class ArgumentListNode : public Node {
     return PrecExpression;
   }
 
-  PassRefPtr<ArgumentListNode> releaseNext() JSC_FAST_CALL {
-    return m_next.release();
-  }
-
-  ListRefPtr<ArgumentListNode> m_next;
+  RefPtr<ArgumentListNode> m_next;
   RefPtr<ExpressionNode> m_expr;
 };
 
@@ -715,6 +731,9 @@ class ArgumentsNode : public Node {
                 ArgumentListNode* listNode) JSC_FAST_CALL
       : Node(globalData),
         m_listNode(listNode) {}
+
+  virtual ~ArgumentsNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const {
@@ -736,6 +755,9 @@ class NewExprNode : public ExpressionNode, public ThrowableExpressionData {
               ArgumentsNode* args) JSC_FAST_CALL : ExpressionNode(globalData),
                                                    m_expr(expr),
                                                    m_args(args) {}
+
+  virtual ~NewExprNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
@@ -759,6 +781,9 @@ class EvalFunctionCallNode : public ExpressionNode,
         ThrowableExpressionData(divot, startOffset, endOffset),
         m_args(args) {}
 
+  virtual ~EvalFunctionCallNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const { return PrecCall; }
@@ -780,6 +805,9 @@ class FunctionCallValueNode : public ExpressionNode,
         ThrowableExpressionData(divot, startOffset, endOffset),
         m_expr(expr),
         m_args(args) {}
+
+  virtual ~FunctionCallValueNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -803,6 +831,9 @@ class FunctionCallResolveNode : public ExpressionNode,
         ThrowableExpressionData(divot, startOffset, endOffset),
         m_ident(ident),
         m_args(args) {}
+
+  virtual ~FunctionCallResolveNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
@@ -833,6 +864,9 @@ class FunctionCallBracketNode : public ExpressionNode,
         m_subscript(subscript),
         m_args(args) {}
 
+  virtual ~FunctionCallBracketNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const { return PrecCall; }
@@ -858,6 +892,9 @@ class FunctionCallDotNode : public ExpressionNode,
         m_base(base),
         m_ident(ident),
         m_args(args) {}
+
+  virtual ~FunctionCallDotNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -922,6 +959,9 @@ class PostfixBracketNode : public ExpressionNode,
         m_subscript(subscript),
         m_operator(oper) {}
 
+  virtual ~PostfixBracketNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
@@ -948,6 +988,9 @@ class PostfixDotNode : public ExpressionNode,
         m_ident(ident),
         m_operator(oper) {}
 
+  virtual ~PostfixDotNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
@@ -971,6 +1014,9 @@ class PostfixErrorNode : public ExpressionNode,
         ThrowableSubExpressionData(divot, startOffset, endOffset),
         m_expr(expr),
         m_operator(oper) {}
+
+  virtual ~PostfixErrorNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1016,6 +1062,9 @@ class DeleteBracketNode : public ExpressionNode,
         m_base(base),
         m_subscript(subscript) {}
 
+  virtual ~DeleteBracketNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1039,6 +1088,9 @@ class DeleteDotNode : public ExpressionNode, public ThrowableExpressionData {
         m_base(base),
         m_ident(ident) {}
 
+  virtual ~DeleteDotNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1055,6 +1107,9 @@ class DeleteValueNode : public ExpressionNode {
       : ExpressionNode(globalData),
         m_expr(expr) {}
 
+  virtual ~DeleteValueNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1069,6 +1124,9 @@ class VoidNode : public ExpressionNode {
   VoidNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
       : ExpressionNode(globalData),
         m_expr(expr) {}
+
+  virtual ~VoidNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
@@ -1103,6 +1161,9 @@ class TypeOfValueNode : public ExpressionNode {
   TypeOfValueNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
       : ExpressionNode(globalData, ResultType::string()),
         m_expr(expr) {}
+
+  virtual ~TypeOfValueNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
@@ -1149,6 +1210,9 @@ class PrefixBracketNode : public ExpressionNode,
         m_subscript(subscript),
         m_operator(oper) {}
 
+  virtual ~PrefixBracketNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
@@ -1175,6 +1239,9 @@ class PrefixDotNode : public ExpressionNode,
         m_ident(ident),
         m_operator(oper) {}
 
+  virtual ~PrefixDotNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
@@ -1198,6 +1265,9 @@ class PrefixErrorNode : public ExpressionNode, public ThrowableExpressionData {
         m_expr(expr),
         m_operator(oper) {}
 
+  virtual ~PrefixErrorNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
@@ -1214,6 +1284,9 @@ class UnaryOpNode : public ExpressionNode {
 
   UnaryOpNode(JSGlobalData* globalData, ResultType type, ExpressionNode* expr)
       : ExpressionNode(globalData, type), m_expr(expr) {}
+
+  virtual ~UnaryOpNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual OpcodeID opcode() const JSC_FAST_CALL = 0;
@@ -1285,6 +1358,9 @@ class BinaryOpNode : public ExpressionNode {
         m_expr2(expr2),
         m_rightHasAssignments(rightHasAssignments) {}
 
+  virtual ~BinaryOpNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual OpcodeID opcode() const JSC_FAST_CALL = 0;
 
@@ -1294,34 +1370,22 @@ class BinaryOpNode : public ExpressionNode {
   bool m_rightHasAssignments;
 };
 
-class ReverseBinaryOpNode : public ExpressionNode {
+class ReverseBinaryOpNode : public BinaryOpNode {
  public:
   ReverseBinaryOpNode(JSGlobalData* globalData,
                       ExpressionNode* expr1,
                       ExpressionNode* expr2,
                       bool rightHasAssignments)
-      : ExpressionNode(globalData),
-        m_expr1(expr1),
-        m_expr2(expr2),
-        m_rightHasAssignments(rightHasAssignments) {}
+      : BinaryOpNode(globalData, expr1, expr2, rightHasAssignments) {}
 
   ReverseBinaryOpNode(JSGlobalData* globalData,
                       ResultType type,
                       ExpressionNode* expr1,
                       ExpressionNode* expr2,
                       bool rightHasAssignments)
-      : ExpressionNode(globalData, type),
-        m_expr1(expr1),
-        m_expr2(expr2),
-        m_rightHasAssignments(rightHasAssignments) {}
+      : BinaryOpNode(globalData, type, expr1, expr2, rightHasAssignments) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
-  virtual OpcodeID opcode() const JSC_FAST_CALL = 0;
-
- protected:
-  RefPtr<ExpressionNode> m_expr1;
-  RefPtr<ExpressionNode> m_expr2;
-  bool m_rightHasAssignments;
 };
 
 class MultNode : public BinaryOpNode {
@@ -1713,6 +1777,9 @@ class LogicalOpNode : public ExpressionNode {
         m_expr2(expr2),
         m_operator(oper) {}
 
+  virtual ~LogicalOpNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const {
@@ -1738,6 +1805,9 @@ class ConditionalNode : public ExpressionNode {
         m_logical(logical),
         m_expr1(expr1),
         m_expr2(expr2) {}
+
+  virtual ~ConditionalNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1767,6 +1837,9 @@ class ReadModifyResolveNode : public ExpressionNode,
         m_operator(oper),
         m_rightHasAssignments(rightHasAssignments) {}
 
+  virtual ~ReadModifyResolveNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1791,6 +1864,9 @@ class AssignResolveNode : public ExpressionNode,
         m_ident(ident),
         m_right(right),
         m_rightHasAssignments(rightHasAssignments) {}
+
+  virtual ~AssignResolveNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
@@ -1826,6 +1902,9 @@ class ReadModifyBracketNode : public ExpressionNode,
         m_subscriptHasAssignments(subscriptHasAssignments),
         m_rightHasAssignments(rightHasAssignments) {}
 
+  virtual ~ReadModifyBracketNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1860,6 +1939,9 @@ class AssignBracketNode : public ExpressionNode,
         m_subscriptHasAssignments(subscriptHasAssignments),
         m_rightHasAssignments(rightHasAssignments) {}
 
+  virtual ~AssignBracketNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1889,6 +1971,9 @@ class AssignDotNode : public ExpressionNode, public ThrowableExpressionData {
         m_ident(ident),
         m_right(right),
         m_rightHasAssignments(rightHasAssignments) {}
+
+  virtual ~AssignDotNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1921,6 +2006,9 @@ class ReadModifyDotNode : public ExpressionNode,
         m_operator(oper),
         m_rightHasAssignments(rightHasAssignments) {}
 
+  virtual ~ReadModifyDotNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1949,6 +2037,9 @@ class AssignErrorNode : public ExpressionNode, public ThrowableExpressionData {
         m_operator(oper),
         m_right(right) {}
 
+  virtual ~AssignErrorNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const { return PrecAssignment; }
@@ -1966,6 +2057,9 @@ class CommaNode : public ExpressionNode {
             ExpressionNode* expr2) JSC_FAST_CALL : ExpressionNode(globalData),
                                                    m_expr1(expr1),
                                                    m_expr2(expr2) {}
+
+  virtual ~CommaNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -1991,17 +2085,17 @@ class ConstDeclNode : public ExpressionNode {
                 const Identifier& ident,
                 ExpressionNode* in) JSC_FAST_CALL;
 
+  virtual ~ConstDeclNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
   }
-  PassRefPtr<ConstDeclNode> releaseNext() JSC_FAST_CALL {
-    return m_next.release();
-  }
 
   Identifier m_ident;
-  ListRefPtr<ConstDeclNode> m_next;
+  RefPtr<ConstDeclNode> m_next;
   RefPtr<ExpressionNode> m_init;
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
@@ -2014,6 +2108,9 @@ class ConstStatementNode : public StatementNode {
                      ConstDeclNode* next) JSC_FAST_CALL
       : StatementNode(globalData),
         m_next(next) {}
+
+  virtual ~ConstStatementNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
 
@@ -2042,6 +2139,9 @@ class SourceElements : public ParserRefCounted {
 class BlockNode : public StatementNode {
  public:
   BlockNode(JSGlobalData*, SourceElements* children) JSC_FAST_CALL;
+
+  virtual ~BlockNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -2095,6 +2195,9 @@ class VarStatementNode : public StatementNode {
       : StatementNode(globalData),
         m_expr(expr) {}
 
+  virtual ~VarStatementNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -2110,6 +2213,9 @@ class IfNode : public StatementNode {
          StatementNode* ifBlock) JSC_FAST_CALL : StatementNode(globalData),
                                                  m_condition(condition),
                                                  m_ifBlock(ifBlock) {}
+
+  virtual ~IfNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -2128,6 +2234,9 @@ class IfElseNode : public IfNode {
       : IfNode(globalData, condition, ifBlock),
         m_elseBlock(elseBlock) {}
 
+  virtual ~IfElseNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
 
@@ -2142,6 +2251,9 @@ class DoWhileNode : public StatementNode {
               ExpressionNode* expr) JSC_FAST_CALL : StatementNode(globalData),
                                                     m_statement(statement),
                                                     m_expr(expr) {}
+
+  virtual ~DoWhileNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -2160,6 +2272,9 @@ class WhileNode : public StatementNode {
             StatementNode* statement) JSC_FAST_CALL : StatementNode(globalData),
                                                       m_expr(expr),
                                                       m_statement(statement) {}
+
+  virtual ~WhileNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -2188,6 +2303,9 @@ class ForNode : public StatementNode {
     ASSERT(statement);
   }
 
+  virtual ~ForNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
 
@@ -2213,6 +2331,9 @@ class ForInNode : public StatementNode, public ThrowableExpressionData {
             int divot,
             int startOffset,
             int endOffset) JSC_FAST_CALL;
+
+  virtual ~ForInNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -2266,6 +2387,9 @@ class ReturnNode : public StatementNode, public ThrowableExpressionData {
       : StatementNode(globalData),
         m_value(value) {}
 
+  virtual ~ReturnNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual bool isReturnNode() const JSC_FAST_CALL { return true; }
@@ -2287,6 +2411,9 @@ class WithNode : public StatementNode {
         m_divot(divot),
         m_expressionLength(expressionLength) {}
 
+  virtual ~WithNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
 
@@ -2305,6 +2432,9 @@ class LabelNode : public StatementNode, public ThrowableExpressionData {
                                                       m_name(name),
                                                       m_statement(statement) {}
 
+  virtual ~LabelNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
 
@@ -2318,6 +2448,9 @@ class ThrowNode : public StatementNode, public ThrowableExpressionData {
   ThrowNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
       : StatementNode(globalData),
         m_expr(expr) {}
+
+  virtual ~ThrowNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -2338,6 +2471,9 @@ class TryNode : public StatementNode {
         m_exceptionIdent(exceptionIdent),
         m_catchBlock(catchBlock),
         m_finallyBlock(finallyBlock) {}
+
+  virtual ~TryNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
 
@@ -2364,12 +2500,12 @@ class ParameterNode : public Node {
     l->m_next = this;
   }
 
+  virtual ~ParameterNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   Identifier ident() JSC_FAST_CALL { return m_ident; }
   ParameterNode* nextParam() JSC_FAST_CALL { return m_next.get(); }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
-  PassRefPtr<ParameterNode> releaseNext() JSC_FAST_CALL {
-    return m_next.release();
-  }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -2379,7 +2515,7 @@ class ParameterNode : public Node {
   friend class FuncDeclNode;
   friend class FuncExprNode;
   Identifier m_ident;
-  ListRefPtr<ParameterNode> m_next;
+  RefPtr<ParameterNode> m_next;
 };
 
 class ScopeNode : public BlockNode {
@@ -2597,6 +2733,9 @@ class FuncExprNode : public ExpressionNode {
     m_body->finishParsing(source, m_parameter.get());
   }
 
+  virtual ~FuncExprNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
   JSFunction* makeFunction(ExecState*, ScopeChainNode*) JSC_FAST_CALL;
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -2627,6 +2766,9 @@ class FuncDeclNode : public StatementNode {
     m_body->finishParsing(source, m_parameter.get());
   }
 
+  virtual ~FuncDeclNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
@@ -2655,6 +2797,9 @@ class CaseClauseNode : public Node {
       children->releaseContentsIntoVector(m_children);
   }
 
+  virtual ~CaseClauseNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
@@ -2682,12 +2827,12 @@ class ClauseListNode : public Node {
     clauseList->m_next = this;
   }
 
+  virtual ~ClauseListNode();
+  virtual void releaseNodes(NodeReleaser&);
+
   CaseClauseNode* getClause() const JSC_FAST_CALL { return m_clause.get(); }
   ClauseListNode* getNext() const JSC_FAST_CALL { return m_next.get(); }
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
-  PassRefPtr<ClauseListNode> releaseNext() JSC_FAST_CALL {
-    return m_next.release();
-  }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -2696,7 +2841,7 @@ class ClauseListNode : public Node {
  private:
   friend class CaseBlockNode;
   RefPtr<CaseClauseNode> m_clause;
-  ListRefPtr<ClauseListNode> m_next;
+  RefPtr<ClauseListNode> m_next;
 };
 
 class CaseBlockNode : public Node {
@@ -2709,6 +2854,9 @@ class CaseBlockNode : public Node {
         m_list1(list1),
         m_defaultClause(defaultClause),
         m_list2(list2) {}
+
+  virtual ~CaseBlockNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   RegisterID* emitCodeForBlock(CodeGenerator&,
                                RegisterID* input,
@@ -2737,6 +2885,9 @@ class SwitchNode : public StatementNode {
              CaseBlockNode* block) JSC_FAST_CALL : StatementNode(globalData),
                                                    m_expr(expr),
                                                    m_block(block) {}
+
+  virtual ~SwitchNode();
+  virtual void releaseNodes(NodeReleaser&);
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 

@@ -190,7 +190,12 @@ class CodeGenerator {
       LineInfo info = {instructions().size(), n->lineNo()};
       m_codeBlock->lineInfo.append(info);
     }
-    return n->emitCode(*this, dst);
+    if (m_emitNodeDepth >= s_maxEmitNodeDepth)
+      return emitThrowExpressionTooDeepException();
+    ++m_emitNodeDepth;
+    RegisterID* r = n->emitCode(*this, dst);
+    --m_emitNodeDepth;
+    return r;
   }
 
   RegisterID* emitNode(Node* n) { return emitNode(0, n); }
@@ -532,6 +537,8 @@ class CodeGenerator {
            !m_codeBlock->usesEval;
   }
 
+  RegisterID* emitThrowExpressionTooDeepException();
+
   bool m_shouldEmitDebugHooks;
   bool m_shouldEmitProfileHooks;
 
@@ -577,6 +584,10 @@ class CodeGenerator {
 #ifndef NDEBUG
   static bool s_dumpsGeneratedCode;
 #endif
+
+  unsigned m_emitNodeDepth;
+
+  static const unsigned s_maxEmitNodeDepth = 10000;
 };
 }
 
