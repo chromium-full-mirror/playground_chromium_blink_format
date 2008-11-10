@@ -86,9 +86,6 @@ class JSCallbackObject : public Base {
                        const ArgList&);
   static JSObject* construct(ExecState*, JSObject* constructor, const ArgList&);
 
-  static JSValue* cachedValueGetter(ExecState*,
-                                    const Identifier&,
-                                    const PropertySlot&);
   static JSValue* staticValueGetter(ExecState*,
                                     const Identifier&,
                                     const PropertySlot&);
