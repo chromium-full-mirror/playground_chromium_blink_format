@@ -29,12 +29,12 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KJS_AVL_TREE_H_
-#define KJS_AVL_TREE_H_
+#ifndef AVL_TREE_H_
+#define AVL_TREE_H_
 
 #include "Assertions.h"
 
-namespace JSC {
+namespace WTF {
 
 // Here is the reference class for BSet.
 //
@@ -212,10 +212,12 @@ class AVLTree {
             break;
           }
           cmp = -target_cmp;
-        } else if (target_cmp != 0)
-          if (!((cmp ^ target_cmp) & MASK_HIGH_BIT))
+        } else if (target_cmp != 0) {
+          if (!((cmp ^ target_cmp) & MASK_HIGH_BIT)) {
             // cmp and target_cmp are both negative or both positive.
             depth = d;
+          }
+        }
         h = cmp < 0 ? get_lt(h) : get_gt(h);
         if (h == null())
           break;
