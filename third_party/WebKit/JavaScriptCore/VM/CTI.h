@@ -516,7 +516,6 @@ class CTI {
   X86Assembler m_jit;
   Machine* m_machine;
   JSGlobalData* m_globalData;
-  CallFrame* m_callFrame;
   CodeBlock* m_codeBlock;
 
   Vector<CallRecord> m_calls;
