@@ -116,8 +116,7 @@ typedef struct _NPPluginTextInputFuncs NPPluginTextInputFuncs;
        loadManually:(BOOL)loadManually
          DOMElement:(DOMElement*)anElement;
 
-- (BOOL)start;
-- (BOOL)isStarted;
+- (void)start;
 - (void)stop;
 
 - (NPP)plugin;

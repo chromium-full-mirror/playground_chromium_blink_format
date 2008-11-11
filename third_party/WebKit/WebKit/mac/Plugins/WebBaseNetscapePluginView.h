@@ -72,6 +72,7 @@
 // Subclasses must override these.
 - (void)handleMouseMoved:(NSEvent*)event;
 - (void)setAttributeKeys:(NSArray*)keys andValues:(NSArray*)values;
+- (void)focusChanged;
 
 - (WebFrame*)webFrame;
 - (WebDataSource*)dataSource;
@@ -83,8 +84,9 @@
 
 - (void)stopTimers;
 - (void)startTimers;
-
 - (void)restartTimers;
+
+- (void)setHasFocus:(BOOL)hasFocus;
 
 @end
 
