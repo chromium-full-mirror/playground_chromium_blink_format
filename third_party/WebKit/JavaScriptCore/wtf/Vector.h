@@ -278,8 +278,10 @@ class VectorBufferBase : Noncopyable {
   }
 
   void deallocateBuffer(T* bufferToDeallocate) {
-    if (m_buffer == bufferToDeallocate)
+    if (m_buffer == bufferToDeallocate) {
       m_buffer = 0;
+      m_capacity = 0;
+    }
     fastFree(bufferToDeallocate);
   }
 
@@ -408,7 +410,10 @@ class Vector {
       TypeOperations::initialize(begin(), end());
   }
 
-  ~Vector() { clear(); }
+  ~Vector() {
+    if (m_size)
+      shrink(0);
+  }
 
   Vector(const Vector&);
   template <size_t otherCapacity>
@@ -457,10 +462,7 @@ class Vector {
   void reserveCapacity(size_t newCapacity);
   void shrinkCapacity(size_t newCapacity);
 
-  void clear() {
-    if (m_size)
-      shrink(0);
-  }
+  void clear() { shrinkCapacity(0); }
 
   template <typename U>
   void append(const U*, size_t);
@@ -688,7 +690,8 @@ void Vector<T, inlineCapacity>::shrinkCapacity(size_t newCapacity) {
   if (newCapacity >= capacity())
     return;
 
-  resize(min(m_size, newCapacity));
+  if (newCapacity < size())
+    shrink(newCapacity);
 
   T* oldBuffer = begin();
   if (newCapacity > 0) {
