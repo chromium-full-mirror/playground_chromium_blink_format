@@ -865,8 +865,10 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
                                unsigned i) {
   StructureID* numberStructureID =
       m_callFrame->globalData().numberStructureID.get();
-  X86Assembler::JmpSrc wasJSNumberCell1, wasJSNumberCell1b, wasJSNumberCell2,
-      wasJSNumberCell2b;
+  X86Assembler::JmpSrc wasJSNumberCell1;
+  X86Assembler::JmpSrc wasJSNumberCell1b;
+  X86Assembler::JmpSrc wasJSNumberCell2;
+  X86Assembler::JmpSrc wasJSNumberCell2b;
 
   emitGetArg(src1, X86::eax);
   emitGetArg(src2, X86::edx);
