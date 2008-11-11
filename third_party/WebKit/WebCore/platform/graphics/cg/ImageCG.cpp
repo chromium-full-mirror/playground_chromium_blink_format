@@ -291,10 +291,18 @@ void Image::drawPattern(GraphicsContext* ctxt,
   // tiling call in that case.
   // FIXME: Could create WebKitSystemInterface SPI for CGCreatePatternWithImage2
   // and probably make Tiger tile faster as well.
+  // FIXME: We cannot use CGContextDrawTiledImage with scaled tiles on Leopard,
+  // because it suffers from rounding errors.  Snow Leopard is ok.
   float scaledTileWidth =
       tileRect.width() * narrowPrecisionToFloat(patternTransform.a());
   float w = CGImageGetWidth(tileImage);
+#ifdef BUILDING_ON_LEOPARD
+  if (w == size().width() && h == size().height() &&
+      scaledTileWidth == tileRect.width() &&
+      scaledTileHeight == tileRect.height())
+#else
   if (w == size().width() && h == size().height())
+#endif
     CGContextDrawTiledImage(
         context,
         FloatRect(adjustedX, adjustedY, scaledTileWidth, scaledTileHeight),
