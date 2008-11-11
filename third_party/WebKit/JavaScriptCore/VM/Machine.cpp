@@ -684,6 +684,8 @@ Machine::Machine()
 void Machine::initialize(JSGlobalData* globalData) {
 #if ENABLE(CTI)
   CTI::compileCTIMachineTrampolines(globalData);
+#else
+  UNUSED_PARAM(globalData);
 #endif
 }
 
