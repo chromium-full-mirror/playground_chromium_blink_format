@@ -167,7 +167,7 @@ __declspec(naked) void ctiVMThrowTrampoline() {
 
 #endif
 
-inline uintptr_t asInteger(JSValue* value) {
+static ALWAYS_INLINE uintptr_t asInteger(JSValue* value) {
   return reinterpret_cast<uintptr_t>(value);
 }
 
