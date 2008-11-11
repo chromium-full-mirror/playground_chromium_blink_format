@@ -461,6 +461,7 @@ class Vector {
   void resize(size_t size);
   void reserveCapacity(size_t newCapacity);
   void shrinkCapacity(size_t newCapacity);
+  void shrinkToFit() { shrinkCapacity(size()); }
 
   void clear() { shrinkCapacity(0); }
 

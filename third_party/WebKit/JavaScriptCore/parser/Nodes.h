@@ -1868,6 +1868,7 @@ class SourceElements : public ParserRefCounted {
   void releaseContentsIntoVector(StatementVector& destination) {
     ASSERT(destination.isEmpty());
     m_statements.swap(destination);
+    destination.shrinkToFit();
   }
 
  private:
