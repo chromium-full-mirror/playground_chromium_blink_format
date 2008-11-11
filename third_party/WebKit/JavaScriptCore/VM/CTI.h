@@ -365,8 +365,6 @@ class CTI {
 
   static uintptr_t asInteger(JSValue*);
 
-  JSValue* getConstant(int src);
-
   void privateCompileMainPass();
   void privateCompileLinkPass();
   void privateCompileSlowCases();
