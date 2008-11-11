@@ -116,14 +116,9 @@ typedef struct _NPPluginTextInputFuncs NPPluginTextInputFuncs;
        loadManually:(BOOL)loadManually
          DOMElement:(DOMElement*)anElement;
 
-- (void)start;
-- (void)stop;
-
 - (NPP)plugin;
 
 - (WebNetscapePluginPackage*)pluginPackage;
-- (void)viewWillMoveToHostWindow:(NSWindow*)hostWindow;
-- (void)viewDidMoveToHostWindow;
 - (void)disconnectStream:(WebNetscapePluginStream*)stream;
 
 // Returns the NPObject that represents the plugin interface.

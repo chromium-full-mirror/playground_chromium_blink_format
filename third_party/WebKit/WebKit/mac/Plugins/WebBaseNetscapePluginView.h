@@ -86,8 +86,7 @@
 - (void)startTimers;
 - (void)restartTimers;
 
-- (void)setHasFocus:(BOOL)hasFocus;
-- (void)sendActivateEvent:(BOOL)activate;
+- (void)stop;
 
 @end
 
