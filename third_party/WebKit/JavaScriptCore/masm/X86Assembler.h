@@ -54,6 +54,8 @@ class JITCodeBuffer {
       growBuffer();
   }
 
+  bool isAligned(int alignment) { return !(m_index & (alignment - 1)); }
+
   void putByteUnchecked(int value) {
     m_buffer[m_index] = value;
     m_index++;
@@ -195,6 +197,7 @@ class X86Assembler {
     OP_CALL_rel32 = 0xE8,
     OP_JMP_rel32 = 0xE9,
     PRE_SSE_F2 = 0xF2,
+    OP_HLT = 0xF4,
     OP_GROUP3_Ev = 0xF7,
     OP_GROUP3_EvIz =
         0xF7,  // OP_GROUP3_Ev has an immediate, when instruction is a test.
@@ -787,6 +790,13 @@ class X86Assembler {
   }
 
   JmpDst label() { return JmpDst(m_buffer->getOffset()); }
+
+  JmpDst align(int alignment) {
+    while (!m_buffer->isAligned(alignment))
+      m_buffer->putByte(OP_HLT);
+
+    return label();
+  }
 
   JmpSrc emitUnlinkedJmp() {
     m_buffer->putByte(OP_JMP_rel32);

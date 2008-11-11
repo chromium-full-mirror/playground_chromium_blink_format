@@ -253,10 +253,8 @@ class CTI {
   static const int repatchOffsetOpCallCall = 6;
 
  public:
-  static void compile(Machine* machine,
-                      CallFrame* callFrame,
-                      CodeBlock* codeBlock) {
-    CTI cti(machine, callFrame, codeBlock);
+  static void compile(JSGlobalData* globalData, CodeBlock* codeBlock) {
+    CTI cti(globalData, codeBlock);
     cti.privateCompile();
   }
 
@@ -269,29 +267,28 @@ class CTI {
                              bool multiline = false);
 #endif
 
-  static void compileGetByIdSelf(Machine* machine,
-                                 CallFrame* callFrame,
+  static void compileGetByIdSelf(JSGlobalData* globalData,
                                  CodeBlock* codeBlock,
                                  StructureID* structureID,
                                  size_t cachedOffset,
                                  void* returnAddress) {
-    CTI cti(machine, callFrame, codeBlock);
+    CTI cti(globalData, codeBlock);
     cti.privateCompileGetByIdSelf(structureID, cachedOffset, returnAddress);
   }
 
-  static void compileGetByIdProto(Machine* machine,
+  static void compileGetByIdProto(JSGlobalData* globalData,
                                   CallFrame* callFrame,
                                   CodeBlock* codeBlock,
                                   StructureID* structureID,
                                   StructureID* prototypeStructureID,
                                   size_t cachedOffset,
                                   void* returnAddress) {
-    CTI cti(machine, callFrame, codeBlock);
+    CTI cti(globalData, codeBlock);
     cti.privateCompileGetByIdProto(structureID, prototypeStructureID,
-                                   cachedOffset, returnAddress);
+                                   cachedOffset, returnAddress, callFrame);
   }
 
-  static void compileGetByIdChain(Machine* machine,
+  static void compileGetByIdChain(JSGlobalData* globalData,
                                   CallFrame* callFrame,
                                   CodeBlock* codeBlock,
                                   StructureID* structureID,
@@ -299,47 +296,37 @@ class CTI {
                                   size_t count,
                                   size_t cachedOffset,
                                   void* returnAddress) {
-    CTI cti(machine, callFrame, codeBlock);
+    CTI cti(globalData, codeBlock);
     cti.privateCompileGetByIdChain(structureID, chain, count, cachedOffset,
-                                   returnAddress);
+                                   returnAddress, callFrame);
   }
 
-  static void compilePutByIdReplace(Machine* machine,
-                                    CallFrame* callFrame,
+  static void compilePutByIdReplace(JSGlobalData* globalData,
                                     CodeBlock* codeBlock,
                                     StructureID* structureID,
                                     size_t cachedOffset,
                                     void* returnAddress) {
-    CTI cti(machine, callFrame, codeBlock);
+    CTI cti(globalData, codeBlock);
     cti.privateCompilePutByIdReplace(structureID, cachedOffset, returnAddress);
   }
 
-  static void compilePutByIdTransition(Machine* machine,
-                                       CallFrame* callFrame,
+  static void compilePutByIdTransition(JSGlobalData* globalData,
                                        CodeBlock* codeBlock,
                                        StructureID* oldStructureID,
                                        StructureID* newStructureID,
                                        size_t cachedOffset,
                                        StructureIDChain* sIDC,
                                        void* returnAddress) {
-    CTI cti(machine, callFrame, codeBlock);
+    CTI cti(globalData, codeBlock);
     cti.privateCompilePutByIdTransition(oldStructureID, newStructureID,
                                         cachedOffset, sIDC, returnAddress);
   }
 
-  static void* compileArrayLengthTrampoline(Machine* machine,
-                                            CallFrame* callFrame,
-                                            CodeBlock* codeBlock) {
-    CTI cti(machine, callFrame, codeBlock);
-    return cti.privateCompileArrayLengthTrampoline();
+  static void compileCTIMachineTrampolines(JSGlobalData* globalData) {
+    CTI cti(globalData);
+    cti.privateCompileCTIMachineTrampolines();
   }
-
-  static void* compileStringLengthTrampoline(Machine* machine,
-                                             CallFrame* callFrame,
-                                             CodeBlock* codeBlock) {
-    CTI cti(machine, callFrame, codeBlock);
-    return cti.privateCompileStringLengthTrampoline();
-  }
+  static void freeCTIMachineTrampolines(Machine*);
 
   static void patchGetByIdSelf(CodeBlock* codeBlock,
                                StructureID* structureID,
@@ -350,11 +337,10 @@ class CTI {
                                   size_t cachedOffset,
                                   void* returnAddress);
 
-  static void compilePatchGetArrayLength(Machine* machine,
-                                         CallFrame* callFrame,
+  static void compilePatchGetArrayLength(JSGlobalData* globalData,
                                          CodeBlock* codeBlock,
                                          void* returnAddress) {
-    CTI cti(machine, callFrame, codeBlock);
+    CTI cti(globalData, codeBlock);
     return cti.privateCompilePatchGetArrayLength(returnAddress);
   }
 
@@ -375,11 +361,11 @@ class CTI {
   }
 
  private:
-  CTI(Machine*, CallFrame*, CodeBlock*);
+  CTI(JSGlobalData*, CodeBlock* = 0);
 
   static uintptr_t asInteger(JSValue*);
 
-  JSValue* getConstant(CallFrame*, int src);
+  JSValue* getConstant(int src);
 
   void privateCompileMainPass();
   void privateCompileLinkPass();
@@ -391,12 +377,14 @@ class CTI {
   void privateCompileGetByIdProto(StructureID*,
                                   StructureID* prototypeStructureID,
                                   size_t cachedOffset,
-                                  void* returnAddress);
+                                  void* returnAddress,
+                                  CallFrame* callFrame);
   void privateCompileGetByIdChain(StructureID*,
                                   StructureIDChain*,
                                   size_t count,
                                   size_t cachedOffset,
-                                  void* returnAddress);
+                                  void* returnAddress,
+                                  CallFrame* callFrame);
   void privateCompilePutByIdReplace(StructureID*,
                                     size_t cachedOffset,
                                     void* returnAddress);
@@ -406,8 +394,7 @@ class CTI {
                                        StructureIDChain*,
                                        void* returnAddress);
 
-  void* privateCompileArrayLengthTrampoline();
-  void* privateCompileStringLengthTrampoline();
+  void privateCompileCTIMachineTrampolines();
   void privateCompilePatchGetArrayLength(void* returnAddress);
 
   void compileOpCall(OpcodeID,
@@ -532,6 +519,7 @@ class CTI {
 
   X86Assembler m_jit;
   Machine* m_machine;
+  JSGlobalData* m_globalData;
   CallFrame* m_callFrame;
   CodeBlock* m_codeBlock;
 

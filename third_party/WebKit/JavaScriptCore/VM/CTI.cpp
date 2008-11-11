@@ -167,9 +167,9 @@ __declspec(naked) void ctiVMThrowTrampoline() {
 
 #endif
 
-ALWAYS_INLINE JSValue* CTI::getConstant(CallFrame* callFrame, int src) {
-  return m_codeBlock->constantRegisters[src - m_codeBlock->numVars].jsValue(
-      callFrame);
+ALWAYS_INLINE JSValue* CTI::getConstant(int src) {
+  return m_codeBlock->constantRegisters[src - m_codeBlock->numVars]
+      .getJSValue();
 }
 
 inline uintptr_t CTI::asInteger(JSValue* value) {
@@ -181,7 +181,7 @@ ALWAYS_INLINE void CTI::emitGetArg(int src, X86Assembler::RegisterID dst) {
   // TODO: we want to reuse values that are already in registers if we can - add
   // a register allocator!
   if (m_codeBlock->isConstant(src)) {
-    JSValue* js = getConstant(m_callFrame, src);
+    JSValue* js = getConstant(src);
     m_jit.movl_i32r(asInteger(js), dst);
   } else
     m_jit.movl_mr(src * sizeof(Register), X86::edi, dst);
@@ -193,7 +193,7 @@ ALWAYS_INLINE void CTI::emitGetPutArg(unsigned src,
                                       unsigned offset,
                                       X86Assembler::RegisterID scratch) {
   if (m_codeBlock->isConstant(src)) {
-    JSValue* js = getConstant(m_callFrame, src);
+    JSValue* js = getConstant(src);
     m_jit.movl_i32m(asInteger(js), offset + sizeof(void*), X86::esp);
   } else {
     m_jit.movl_mr(src * sizeof(Register), X86::edi, scratch);
@@ -213,7 +213,7 @@ ALWAYS_INLINE void CTI::emitPutArgConstant(unsigned value, unsigned offset) {
 
 ALWAYS_INLINE JSValue* CTI::getConstantImmediateNumericArg(unsigned src) {
   if (m_codeBlock->isConstant(src)) {
-    JSValue* js = getConstant(m_callFrame, src);
+    JSValue* js = getConstant(src);
     return JSImmediate::isNumber(js) ? js : noValue();
   }
   return noValue();
@@ -271,7 +271,7 @@ void ctiRepatchCallByReturnAddress(void* where, void* what) {
 void CTI::printOpcodeOperandTypes(unsigned src1, unsigned src2) {
   char which1 = '*';
   if (m_codeBlock->isConstant(src1)) {
-    JSValue* js = getConstant(m_callFrame, src1);
+    JSValue* js = getConstant(src1);
     which1 =
         JSImmediate::isImmediate(js)
             ? (JSImmediate::isNumber(js)
@@ -283,7 +283,7 @@ void CTI::printOpcodeOperandTypes(unsigned src1, unsigned src2) {
   }
   char which2 = '*';
   if (m_codeBlock->isConstant(src2)) {
-    JSValue* js = getConstant(m_callFrame, src2);
+    JSValue* js = getConstant(src2);
     which2 =
         JSImmediate::isImmediate(js)
             ? (JSImmediate::isNumber(js)
@@ -564,10 +564,10 @@ ALWAYS_INLINE void CTI::emitTagAsBoolImmediate(X86Assembler::RegisterID reg) {
   m_jit.orl_i32r(JSImmediate::FullTagTypeBool, reg);
 }
 
-CTI::CTI(Machine* machine, CallFrame* callFrame, CodeBlock* codeBlock)
-    : m_jit(machine->jitCodeBuffer()),
-      m_machine(machine),
-      m_callFrame(callFrame),
+CTI::CTI(JSGlobalData* globalData, CodeBlock* codeBlock)
+    : m_jit(globalData->machine->jitCodeBuffer()),
+      m_machine(globalData->machine),
+      m_globalData(globalData),
       m_codeBlock(codeBlock),
       m_labels(codeBlock ? codeBlock->instructions.size() : 0),
       m_propertyAccessCompilationInfo(
@@ -863,8 +863,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
                                unsigned src2,
                                OperandTypes types,
                                unsigned i) {
-  StructureID* numberStructureID =
-      m_callFrame->globalData().numberStructureID.get();
+  StructureID* numberStructureID = m_globalData->numberStructureID.get();
   X86Assembler::JmpSrc wasJSNumberCell1;
   X86Assembler::JmpSrc wasJSNumberCell1b;
   X86Assembler::JmpSrc wasJSNumberCell2;
@@ -1097,7 +1096,7 @@ void CTI::privateCompileMainPass() {
       case op_mov: {
         unsigned src = instruction[i + 2].u.operand;
         if (m_codeBlock->isConstant(src))
-          m_jit.movl_i32r(asInteger(getConstant(m_callFrame, src)), X86::eax);
+          m_jit.movl_i32r(asInteger(getConstant(src)), X86::eax);
         else
           emitGetArg(src, X86::eax);
         emitPutResult(instruction[i + 1].u.operand);
@@ -1714,7 +1713,7 @@ void CTI::privateCompileMainPass() {
           if (!resultType.definitelyIsNumber()) {
             emitJumpSlowCaseIfNotJSCell(X86::eax, i);
             StructureID* numberStructureID =
-                m_callFrame->globalData().numberStructureID.get();
+                m_globalData->numberStructureID.get();
             m_jit.cmpl_i32m(reinterpret_cast<unsigned>(numberStructureID),
                             OBJECT_OFFSET(JSCell, m_structureID), X86::eax);
             m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), i));
@@ -1728,7 +1727,7 @@ void CTI::privateCompileMainPass() {
                          X86::xmm0);
           X86Assembler::JmpSrc wasCell;
           if (!resultType.isReusableNumber())
-            emitAllocateNumber(&m_callFrame->globalData(), i);
+            emitAllocateNumber(m_globalData, i);
 
           putDoubleResultToJSNumberCellOrJSImmediate(
               X86::xmm0, X86::eax, instruction[i + 1].u.operand, &wasCell,
@@ -3406,7 +3405,8 @@ void CTI::privateCompileGetByIdSelf(StructureID* structureID,
 void CTI::privateCompileGetByIdProto(StructureID* structureID,
                                      StructureID* prototypeStructureID,
                                      size_t cachedOffset,
-                                     void* returnAddress) {
+                                     void* returnAddress,
+                                     CallFrame* callFrame) {
 #if USE(CTI_REPATCH_PIC)
   StructureStubInfo& info = m_codeBlock->getStubInfo(returnAddress);
 
@@ -3419,8 +3419,7 @@ void CTI::privateCompileGetByIdProto(StructureID* structureID,
   // is referencing a StructureID that is
   // referencing the prototype object - let's speculatively load it's table nice
   // and early!)
-  JSObject* protoObject =
-      asObject(structureID->prototypeForLookup(m_callFrame));
+  JSObject* protoObject = asObject(structureID->prototypeForLookup(callFrame));
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   m_jit.movl_mr(static_cast<void*>(protoPropertyStorage), X86::edx);
 
@@ -3473,8 +3472,7 @@ void CTI::privateCompileGetByIdProto(StructureID* structureID,
   // is referencing a StructureID that is
   // referencing the prototype object - let's speculatively load it's table nice
   // and early!)
-  JSObject* protoObject =
-      asObject(structureID->prototypeForLookup(m_callFrame));
+  JSObject* protoObject = asObject(structureID->prototypeForLookup(callFrame));
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   m_jit.movl_mr(static_cast<void*>(protoPropertyStorage), X86::edx);
 
@@ -3516,7 +3514,8 @@ void CTI::privateCompileGetByIdChain(StructureID* structureID,
                                      StructureIDChain* chain,
                                      size_t count,
                                      size_t cachedOffset,
-                                     void* returnAddress) {
+                                     void* returnAddress,
+                                     CallFrame* callFrame) {
   ASSERT(count);
 
   Vector<X86Assembler::JmpSrc> bucketsOfFail;
@@ -3532,7 +3531,7 @@ void CTI::privateCompileGetByIdChain(StructureID* structureID,
   RefPtr<StructureID>* chainEntries = chain->head();
   JSObject* protoObject = 0;
   for (unsigned i = 0; i < count; ++i) {
-    protoObject = asObject(currStructureID->prototypeForLookup(m_callFrame));
+    protoObject = asObject(currStructureID->prototypeForLookup(callFrame));
     currStructureID = chainEntries[i].get();
 
     // Check the prototype object's StructureID had not changed.
@@ -3736,44 +3735,36 @@ void CTI::linkCall(JSFunction* callee,
   ctiRepatchCallByReturnAddress(repatchCheck, callLinkInfo->coldPathOther);
 }
 
-void* CTI::privateCompileArrayLengthTrampoline() {
+void CTI::privateCompileCTIMachineTrampolines() {
+  // (1) The first function provides fast property access for array length
+
   // Check eax is an array
   m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
-  X86Assembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc array_failureCases1 = m_jit.emitUnlinkedJne();
   m_jit.cmpl_i32m(reinterpret_cast<unsigned>(m_machine->m_jsArrayVptr),
                   X86::eax);
-  X86Assembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc array_failureCases2 = m_jit.emitUnlinkedJne();
 
   // Checks out okay! - get the length from the storage
   m_jit.movl_mr(OBJECT_OFFSET(JSArray, m_storage), X86::eax, X86::eax);
   m_jit.movl_mr(OBJECT_OFFSET(ArrayStorage, m_length), X86::eax, X86::eax);
 
   m_jit.addl_rr(X86::eax, X86::eax);
-  X86Assembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJo();
+  X86Assembler::JmpSrc array_failureCases3 = m_jit.emitUnlinkedJo();
   m_jit.addl_i8r(1, X86::eax);
 
   m_jit.ret();
 
-  void* code = m_jit.copy();
-  ASSERT(code);
+  // (2) The second function provides fast property access for string length
 
-  X86Assembler::link(code, failureCases1,
-                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  X86Assembler::link(code, failureCases2,
-                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  X86Assembler::link(code, failureCases3,
-                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::JmpDst stringLengthBegin = m_jit.align(16);
 
-  return code;
-}
-
-void* CTI::privateCompileStringLengthTrampoline() {
   // Check eax is a string
   m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
-  X86Assembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc string_failureCases1 = m_jit.emitUnlinkedJne();
   m_jit.cmpl_i32m(reinterpret_cast<unsigned>(m_machine->m_jsStringVptr),
                   X86::eax);
-  X86Assembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc string_failureCases2 = m_jit.emitUnlinkedJne();
 
   // Checks out okay! - get the length from the Ustring.
   m_jit.movl_mr(
@@ -3782,22 +3773,37 @@ void* CTI::privateCompileStringLengthTrampoline() {
   m_jit.movl_mr(OBJECT_OFFSET(UString::Rep, len), X86::eax, X86::eax);
 
   m_jit.addl_rr(X86::eax, X86::eax);
-  X86Assembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJo();
+  X86Assembler::JmpSrc string_failureCases3 = m_jit.emitUnlinkedJo();
   m_jit.addl_i8r(1, X86::eax);
 
   m_jit.ret();
 
+  // All trampolines constructed! copy the code, link up calls, and set the
+  // pointers on the Machine object.
+
   void* code = m_jit.copy();
   ASSERT(code);
 
-  X86Assembler::link(code, failureCases1,
+  X86Assembler::link(code, array_failureCases1,
                      reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  X86Assembler::link(code, failureCases2,
+  X86Assembler::link(code, array_failureCases2,
                      reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  X86Assembler::link(code, failureCases3,
+  X86Assembler::link(code, array_failureCases3,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, string_failureCases1,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, string_failureCases2,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, string_failureCases3,
                      reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
 
-  return code;
+  m_machine->m_ctiArrayLengthTrampoline = code;
+  m_machine->m_ctiStringLengthTrampoline =
+      X86Assembler::getRelocatedAddress(code, stringLengthBegin);
+}
+
+void CTI::freeCTIMachineTrampolines(Machine* machine) {
+  WTF::fastFreeExecutable(machine->m_ctiArrayLengthTrampoline);
 }
 
 void CTI::patchGetByIdSelf(CodeBlock* codeBlock,

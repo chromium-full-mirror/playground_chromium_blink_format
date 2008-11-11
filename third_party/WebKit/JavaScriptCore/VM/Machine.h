@@ -110,6 +110,8 @@ class Machine {
   Machine();
   ~Machine();
 
+  void initialize(JSGlobalData*);
+
   RegisterFile& registerFile() { return m_registerFile; }
 
   Opcode getOpcode(OpcodeID id) {
@@ -404,9 +406,6 @@ class Machine {
                           void* returnAddress,
                           JSValue* baseValue,
                           const PutPropertySlot&);
-
-  void* getCTIArrayLengthTrampoline(CallFrame*, CodeBlock*);
-  void* getCTIStringLengthTrampoline(CallFrame*, CodeBlock*);
 
   JITCodeBuffer* jitCodeBuffer() const { return m_jitCodeBuffer.get(); }
 #endif
