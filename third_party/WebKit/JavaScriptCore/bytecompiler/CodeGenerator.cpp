@@ -814,7 +814,7 @@ RegisterID* CodeGenerator::emitEqualityOp(OpcodeID opcode,
     retrieveLastUnaryOp(dstIndex, srcIndex);
 
     if (src1->index() == dstIndex && src1->isTemporary() &&
-        m_codeBlock->isConstant(src2->index()) &&
+        m_codeBlock->isConstantRegisterIndex(src2->index()) &&
         m_codeBlock->constantRegisters[src2->index() - m_codeBlock->numVars]
             .jsValue(m_scopeChain->globalObject()->globalExec())
             ->isString()) {
