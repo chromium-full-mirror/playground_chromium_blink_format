@@ -414,6 +414,7 @@ class Node : public TreeShared<Node> {
 
   void checkSetPrefix(const AtomicString& prefix, ExceptionCode&);
   bool isDescendantOf(const Node*) const;
+  bool contains(const Node*) const;
 
   // These two methods are mutually exclusive.  The former is used to do strict
   // error-checking

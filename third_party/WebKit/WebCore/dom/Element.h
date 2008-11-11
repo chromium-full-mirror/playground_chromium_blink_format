@@ -189,8 +189,6 @@ class Element : public ContainerNode {
   virtual void formatForDebugger(char* buffer, unsigned length) const;
 #endif
 
-  bool contains(const Node*) const;
-
   String innerText() const;
   String outerText() const;
 
