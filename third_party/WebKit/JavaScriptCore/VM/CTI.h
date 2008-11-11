@@ -169,33 +169,29 @@ struct SlowCaseEntry {
 struct SwitchRecord {
   enum Type { Immediate, Character, String };
 
-  Type m_type;
+  Type type;
 
   union {
-    SimpleJumpTable* m_simpleJumpTable;
-    StringJumpTable* m_stringJumpTable;
-  } m_jumpTable;
+    SimpleJumpTable* simpleJumpTable;
+    StringJumpTable* stringJumpTable;
+  } jumpTable;
 
-  unsigned m_opcodeIndex;
-  unsigned m_defaultOffset;
+  unsigned opcodeIndex;
+  unsigned defaultOffset;
 
   SwitchRecord(SimpleJumpTable* jumpTable,
                unsigned opcodeIndex,
                unsigned defaultOffset,
                Type type)
-      : m_type(type),
-        m_opcodeIndex(opcodeIndex),
-        m_defaultOffset(defaultOffset) {
-    m_jumpTable.m_simpleJumpTable = jumpTable;
+      : type(type), opcodeIndex(opcodeIndex), defaultOffset(defaultOffset) {
+    this->jumpTable.simpleJumpTable = jumpTable;
   }
 
   SwitchRecord(StringJumpTable* jumpTable,
                unsigned opcodeIndex,
                unsigned defaultOffset)
-      : m_type(String),
-        m_opcodeIndex(opcodeIndex),
-        m_defaultOffset(defaultOffset) {
-    m_jumpTable.m_stringJumpTable = jumpTable;
+      : type(String), opcodeIndex(opcodeIndex), defaultOffset(defaultOffset) {
+    this->jumpTable.stringJumpTable = jumpTable;
   }
 };
 
