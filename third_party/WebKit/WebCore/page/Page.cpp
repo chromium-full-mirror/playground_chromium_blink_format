@@ -125,6 +125,7 @@ Page::Page(ChromeClient* chromeClient,
       m_defersLoading(false),
       m_inLowQualityInterpolationMode(false),
       m_cookieEnabled(true),
+      m_mediaVolume(1),
       m_parentInspectorController(0),
       m_didLoadUserStyleSheet(false),
       m_userStyleSheetModificationTime(0),
@@ -380,6 +381,21 @@ bool Page::inLowQualityImageInterpolationMode() const {
 
 void Page::setInLowQualityImageInterpolationMode(bool mode) {
   m_inLowQualityInterpolationMode = mode;
+}
+
+void Page::setMediaVolume(float volume) {
+  if (volume < 0 || volume > 1)
+    return;
+
+  if (m_mediaVolume == volume)
+    return;
+
+  m_mediaVolume = volume;
+  for (Frame* frame = mainFrame(); frame;
+       frame = frame->tree()->traverseNext()) {
+    if (frame->document())
+      frame->document()->mediaVolumeDidChange();
+  }
 }
 
 void Page::userStyleSheetLocationChanged() {

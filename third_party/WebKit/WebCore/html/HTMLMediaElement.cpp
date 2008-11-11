@@ -44,6 +44,7 @@
 #include "MediaQueryEvaluator.h"
 #include "MIMETypeRegistry.h"
 #include "MediaPlayer.h"
+#include "Page.h"
 #include "RenderVideo.h"
 #include "SystemTime.h"
 #include "TimeRanges.h"
@@ -82,10 +83,12 @@ HTMLMediaElement::HTMLMediaElement(const QualifiedName& tagName, Document* doc)
       m_inActiveDocument(true),
       m_player(0) {
   document()->registerForDocumentActivationCallbacks(this);
+  document()->registerForMediaVolumeCallbacks(this);
 }
 
 HTMLMediaElement::~HTMLMediaElement() {
   document()->unregisterForDocumentActivationCallbacks(this);
+  document()->unregisterForMediaVolumeCallbacks(this);
 }
 
 bool HTMLMediaElement::checkDTD(const Node* newChild) {
@@ -913,7 +916,10 @@ void HTMLMediaElement::updateVolume() {
   if (!m_player)
     return;
 
-  m_player->setVolume(m_muted ? 0 : m_volume);
+  Page* page = document()->page();
+  float volumeMultiplier = page ? page->mediaVolume() : 1;
+
+  m_player->setVolume(m_muted ? 0 : m_volume * volumeMultiplier);
 
   if (renderer())
     renderer()->updateFromElement();
@@ -986,6 +992,10 @@ void HTMLMediaElement::documentDidBecomeActive() {
 
   if (renderer())
     renderer()->updateFromElement();
+}
+
+void HTMLMediaElement::mediaVolumeDidChange() {
+  updateVolume();
 }
 
 void HTMLMediaElement::defaultEventHandler(Event* event) {

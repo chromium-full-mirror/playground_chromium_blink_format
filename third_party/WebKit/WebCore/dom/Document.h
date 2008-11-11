@@ -1091,6 +1091,10 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void documentWillBecomeInactive();
   void documentDidBecomeActive();
 
+  void registerForMediaVolumeCallbacks(Element*);
+  void unregisterForMediaVolumeCallbacks(Element*);
+  void mediaVolumeDidChange();
+
   void setShouldCreateRenderers(bool);
   bool shouldCreateRenderers();
 
@@ -1208,6 +1212,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   String m_iconURL;
 
   HashSet<Element*> m_documentActivationCallbackElements;
+  HashSet<Element*> m_mediaVolumeCallbackElements;
 
   bool m_useSecureKeyboardEntryWhenActive;
 

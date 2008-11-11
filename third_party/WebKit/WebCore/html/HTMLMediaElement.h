@@ -146,6 +146,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   virtual void documentWillBecomeInactive();
   virtual void documentDidBecomeActive();
+  virtual void mediaVolumeDidChange();
 
   void initAndDispatchProgressEvent(const AtomicString& eventName);
   void dispatchEventAsync(const AtomicString& eventName);
