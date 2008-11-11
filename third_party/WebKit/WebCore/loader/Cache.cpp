@@ -346,7 +346,7 @@ void Cache::pruneDeadResources() {
     while (current) {
       CachedResource* prev = current->m_prevInAllResourcesList;
       if (!current->hasClients() && !current->isPreloaded() &&
-          current->isLoaded() && current->decodedSize()) {
+          current->isLoaded()) {
         // Destroy our decoded data. This will remove us from
         // m_liveDecodedResources, and possibly move us to a differnt
         // LRU list in m_allResources.

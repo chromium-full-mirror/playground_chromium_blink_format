@@ -102,14 +102,13 @@ void BitmapImage::destroyDecodedData(bool incremental,
       if (imageObserver())
         imageObserver()->decodedSizeChanged(this, sizeChange);
     }
-
-    if (!incremental) {
-      // Reset the image source, since Image I/O has an underlying cache that it
-      // uses
-      // while animating that it seems to never clear.
-      m_source.clear();
-      m_source.setData(m_data.get(), m_allDataReceived);
-    }
+  }
+  if (!incremental) {
+    // Reset the image source, since Image I/O has an underlying cache that it
+    // uses
+    // while animating that it seems to never clear.
+    m_source.clear();
+    m_source.setData(m_data.get(), m_allDataReceived);
   }
 }
 
