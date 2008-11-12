@@ -310,15 +310,16 @@ class Machine {
   enum ExecutionFlag { Normal, InitializeAndReturn };
 
   NEVER_INLINE JSValue* callEval(CallFrame*,
+                                 JSObject* thisObject,
+                                 ScopeChainNode*,
                                  RegisterFile*,
-                                 Register* argv,
+                                 int argv,
                                  int argc,
-                                 int registerOffset,
                                  JSValue*& exceptionValue);
   JSValue* execute(EvalNode*,
                    CallFrame*,
                    JSObject* thisObject,
-                   int globalRegisterOffset,
+                   int registerOffset,
                    ScopeChainNode*,
                    JSValue** exception);
 
@@ -364,8 +365,8 @@ class Machine {
                           CallFrame*,
                           JSValue** exception);
 
-  void dumpCallFrame(CallFrame*);
-  void dumpRegisters(CallFrame*);
+  void dumpCallFrame(const RegisterFile*, CallFrame*);
+  void dumpRegisters(const RegisterFile*, CallFrame*);
 
   JSValue* checkTimeout(JSGlobalObject*);
   void resetTimeoutCheck();
@@ -390,7 +391,7 @@ class Machine {
   }
 
 #if ENABLE(CTI)
-  static void throwStackOverflowPreviousFrame(CallFrame**,
+  static void throwStackOverflowPreviousFrame(CallFrame*,
                                               JSGlobalData*,
                                               void*& returnAddress);
 

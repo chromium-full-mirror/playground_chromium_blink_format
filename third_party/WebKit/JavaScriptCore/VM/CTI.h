@@ -394,9 +394,9 @@ class CTI {
                      unsigned i,
                      unsigned callLinkInfoIndex);
   void compileOpCallInitializeCallFrame(unsigned callee, unsigned argCount);
-  void compileOpCallSetupArgs(Instruction*);
-  void compileOpCallEvalSetupArgs(Instruction*);
-  void compileOpConstructSetupArgs(Instruction*);
+  void compileOpCallSetupArgs(Instruction* instruction,
+                              bool isConstruct,
+                              bool isEval);
   enum CompileOpStrictEqType { OpStrictEq, OpNStrictEq };
   void compileOpStrictEq(Instruction* instruction,
                          unsigned i,
