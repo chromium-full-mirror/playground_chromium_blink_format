@@ -615,22 +615,41 @@ void CTI::compileOpCallInitializeCallFrame(unsigned, unsigned argCount) {
                 X86::edi);
 }
 
-void CTI::compileOpCallSetupArgs(Instruction* instruction,
-                                 bool isConstruct,
-                                 bool isEval) {
-  int firstArg = instruction[4].u.operand;
-  int argCount = instruction[5].u.operand;
-  int registerOffset = instruction[6].u.operand;
+void CTI::compileOpCallSetupArgs(Instruction* instruction) {
+  int argCount = instruction[3].u.operand;
+  int registerOffset = instruction[4].u.operand;
 
+  // ecx holds func
   emitPutArg(X86::ecx, 0);
   emitPutArgConstant(registerOffset, 4);
   emitPutArgConstant(argCount, 8);
   emitPutArgConstant(reinterpret_cast<unsigned>(instruction), 12);
-  if (isConstruct) {
-    emitGetPutArg(instruction[3].u.operand, 16, X86::eax);
-    emitPutArgConstant(firstArg, 20);
-  } else if (isEval)
-    emitGetPutArg(instruction[3].u.operand, 16, X86::eax);
+}
+
+void CTI::compileOpCallEvalSetupArgs(Instruction* instruction) {
+  int argCount = instruction[3].u.operand;
+  int registerOffset = instruction[4].u.operand;
+
+  // ecx holds func
+  emitPutArg(X86::ecx, 0);
+  emitPutArgConstant(registerOffset, 4);
+  emitPutArgConstant(argCount, 8);
+  emitPutArgConstant(reinterpret_cast<unsigned>(instruction), 12);
+}
+
+void CTI::compileOpConstructSetupArgs(Instruction* instruction) {
+  int argCount = instruction[3].u.operand;
+  int registerOffset = instruction[4].u.operand;
+  int proto = instruction[5].u.operand;
+  int thisRegister = instruction[6].u.operand;
+
+  // ecx holds func
+  emitPutArg(X86::ecx, 0);
+  emitPutArgConstant(registerOffset, 4);
+  emitPutArgConstant(argCount, 8);
+  emitGetPutArg(proto, 12, X86::eax);
+  emitPutArgConstant(thisRegister, 16);
+  emitPutArgConstant(reinterpret_cast<unsigned>(instruction), 20);
 }
 
 void CTI::compileOpCall(OpcodeID opcodeID,
@@ -639,27 +658,14 @@ void CTI::compileOpCall(OpcodeID opcodeID,
                         unsigned callLinkInfoIndex) {
   int dst = instruction[1].u.operand;
   int callee = instruction[2].u.operand;
-  int firstArg = instruction[4].u.operand;
-  int argCount = instruction[5].u.operand;
-  int registerOffset = instruction[6].u.operand;
-
-  // Setup this value as the first argument (does not apply to constructors)
-  if (opcodeID != op_construct) {
-    int thisVal = instruction[3].u.operand;
-    if (thisVal == missingThisObjectMarker())
-      m_jit.movl_i32m(asInteger(jsNull()), firstArg * sizeof(Register),
-                      X86::edi);
-    else {
-      emitGetArg(thisVal, X86::eax);
-      emitPutResult(firstArg);
-    }
-  }
+  int argCount = instruction[3].u.operand;
+  int registerOffset = instruction[4].u.operand;
 
   // Handle eval
   X86Assembler::JmpSrc wasEval;
   if (opcodeID == op_call_eval) {
     emitGetArg(callee, X86::ecx);
-    compileOpCallSetupArgs(instruction, false, true);
+    compileOpCallEvalSetupArgs(instruction);
 
     emitCTICall(instruction, i, Machine::cti_op_call_eval);
     m_jit.cmpl_i32r(asInteger(JSImmediate::impossibleValue()), X86::eax);
@@ -685,10 +691,13 @@ void CTI::compileOpCall(OpcodeID opcodeID,
   // In the case of OpConstruct, call out to a cti_ function to create the new
   // object.
   if (opcodeID == op_construct) {
+    int proto = instruction[5].u.operand;
+    int thisRegister = instruction[6].u.operand;
+
     emitPutArg(X86::ecx, 0);
-    emitGetPutArg(instruction[3].u.operand, 16, X86::eax);
+    emitGetPutArg(proto, 12, X86::eax);
     emitCTICall(instruction, i, Machine::cti_op_construct_JSConstruct);
-    emitPutResult(firstArg);
+    emitPutResult(thisRegister);
     emitGetArg(callee, X86::ecx);
   }
 
@@ -1432,9 +1441,11 @@ void CTI::privateCompileMainPass() {
         i += 3;
         break;
       }
-      case op_call: {
+      case op_call:
+      case op_call_eval:
+      case op_construct: {
         compileOpCall(opcodeID, instruction + i, i, callLinkInfoIndex++);
-        i += 7;
+        i += (opcodeID == op_construct ? 7 : 5);
         break;
       }
       case op_get_global_var: {
@@ -1541,11 +1552,6 @@ void CTI::privateCompileMainPass() {
         emitCTICall(instruction + i, i, Machine::cti_op_resolve);
         emitPutResult(instruction[i + 1].u.operand);
         i += 3;
-        break;
-      }
-      case op_construct: {
-        compileOpCall(opcodeID, instruction + i, i, callLinkInfoIndex++);
-        i += 7;
         break;
       }
       case op_construct_verify: {
@@ -2128,11 +2134,6 @@ void CTI::privateCompileMainPass() {
         m_jit.orl_rr(X86::edx, X86::eax);
         emitPutResult(instruction[i + 1].u.operand);
         i += 5;
-        break;
-      }
-      case op_call_eval: {
-        compileOpCall(opcodeID, instruction + i, i, callLinkInfoIndex++);
-        i += 7;
         break;
       }
       case op_throw: {
@@ -3050,16 +3051,16 @@ void CTI::privateCompileSlowCases() {
       case op_construct: {
         int dst = instruction[i + 1].u.operand;
         int callee = instruction[i + 2].u.operand;
-        int firstArg = instruction[i + 4].u.operand;
-        int argCount = instruction[i + 5].u.operand;
-        int registerOffset = instruction[i + 6].u.operand;
+        int argCount = instruction[i + 3].u.operand;
+        int registerOffset = instruction[i + 4].u.operand;
 
         m_jit.link(iter->from, m_jit.label());
 
         // The arguments have been set up on the hot path for op_call_eval
-        if (opcodeID != op_call_eval)
-          compileOpCallSetupArgs(instruction + i, (opcodeID == op_construct),
-                                 false);
+        if (opcodeID == op_call)
+          compileOpCallSetupArgs(instruction + i);
+        else if (opcodeID == op_construct)
+          compileOpConstructSetupArgs(instruction + i);
 
         // Fast check for JS function.
         m_jit.testl_i32r(JSImmediate::TagMask, X86::ecx);
@@ -3069,10 +3070,11 @@ void CTI::privateCompileSlowCases() {
         X86Assembler::JmpSrc callLinkFailNotJSFunction =
             m_jit.emitUnlinkedJne();
 
-        // First, in the cale of a construct, allocate the new object.
+        // First, in the case of a construct, allocate the new object.
         if (opcodeID == op_construct) {
           emitCTICall(instruction, i, Machine::cti_op_construct_JSConstruct);
-          emitPutResult(firstArg);
+          emitPutResult(registerOffset - RegisterFile::CallFrameHeaderSize -
+                        argCount);
           emitGetArg(callee, X86::ecx);
         }
 
@@ -3123,9 +3125,10 @@ void CTI::privateCompileSlowCases() {
             m_jit.label();
 
         // The arguments have been set up on the hot path for op_call_eval
-        if (opcodeID != op_call_eval)
-          compileOpCallSetupArgs(instruction + i, (opcodeID == op_construct),
-                                 false);
+        if (opcodeID == op_call)
+          compileOpCallSetupArgs(instruction + i);
+        else if (opcodeID == op_construct)
+          compileOpConstructSetupArgs(instruction + i);
 
         // Check for JSFunctions.
         m_jit.testl_i32r(JSImmediate::TagMask, X86::ecx);
@@ -3148,10 +3151,11 @@ void CTI::privateCompileSlowCases() {
         // Next, handle JSFunctions...
         m_jit.link(isJSFunction, m_jit.label());
 
-        // First, in the cale of a construct, allocate the new object.
+        // First, in the case of a construct, allocate the new object.
         if (opcodeID == op_construct) {
           emitCTICall(instruction, i, Machine::cti_op_construct_JSConstruct);
-          emitPutResult(firstArg);
+          emitPutResult(registerOffset - RegisterFile::CallFrameHeaderSize -
+                        argCount);
           emitGetArg(callee, X86::ecx);
         }
 
@@ -3204,7 +3208,7 @@ void CTI::privateCompileSlowCases() {
 #endif
         ++callLinkInfoIndex;
 
-        i += 7;
+        i += (opcodeID == op_construct ? 7 : 5);
         break;
       }
       case op_to_jsnumber: {

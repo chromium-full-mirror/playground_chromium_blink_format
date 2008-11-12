@@ -613,22 +613,22 @@ static NEVER_INLINE bool isNotObject(CallFrame* callFrame,
 }
 
 NEVER_INLINE JSValue* Machine::callEval(CallFrame* callFrame,
-                                        JSObject* thisObj,
-                                        ScopeChainNode* scopeChain,
                                         RegisterFile* registerFile,
-                                        int argv,
+                                        Register* argv,
                                         int argc,
+                                        int registerOffset,
                                         JSValue*& exceptionValue) {
   if (argc < 2)
     return jsUndefined();
 
-  JSValue* program = callFrame[argv + 1].jsValue(callFrame);
+  JSValue* program = argv[1].jsValue(callFrame);
 
   if (!program->isString())
     return program;
 
   UString programSource = asString(program)->value();
 
+  ScopeChainNode* scopeChain = callFrame->scopeChain();
   CodeBlock* codeBlock = callFrame->codeBlock();
   RefPtr<EvalNode> evalNode = codeBlock->evalCodeCache.get(
       callFrame, programSource, scopeChain, exceptionValue);
@@ -636,9 +636,9 @@ NEVER_INLINE JSValue* Machine::callEval(CallFrame* callFrame,
   JSValue* result = jsUndefined();
   if (evalNode)
     result = callFrame->globalData().machine->execute(
-        evalNode.get(), callFrame, thisObj,
-        callFrame->registers() - registerFile->start() + argv + 1 +
-            RegisterFile::CallFrameHeaderSize,
+        evalNode.get(), callFrame,
+        callFrame->thisValue()->toThisObject(callFrame),
+        callFrame->registers() - registerFile->start() + registerOffset,
         scopeChain, &exceptionValue);
 
   return result;
@@ -698,24 +698,22 @@ Machine::~Machine() {
 
 #ifndef NDEBUG
 
-void Machine::dumpCallFrame(const RegisterFile* registerFile,
-                            CallFrame* callFrame) {
-  JSGlobalObject* globalObject = callFrame->scopeChain()->globalObject();
-
-  CodeBlock* codeBlock = callFrame->codeBlock();
-  codeBlock->dump(globalObject->globalExec());
-
-  dumpRegisters(registerFile, callFrame);
+void Machine::dumpCallFrame(CallFrame* callFrame) {
+  callFrame->codeBlock()->dump(callFrame);
+  dumpRegisters(callFrame);
 }
 
-void Machine::dumpRegisters(const RegisterFile* registerFile,
-                            CallFrame* callFrame) {
+void Machine::dumpRegisters(CallFrame* callFrame) {
   printf("Register frame: \n\n");
   printf("----------------------------------------------------\n");
   printf("            use            |   address  |   value   \n");
   printf("----------------------------------------------------\n");
 
   CodeBlock* codeBlock = callFrame->codeBlock();
+  RegisterFile* registerFile = &callFrame->scopeChain()
+                                    ->globalObject()
+                                    ->globalData()
+                                    ->machine->registerFile();
   const Register* it;
   const Register* end;
 
@@ -1155,7 +1153,7 @@ JSValue* Machine::execute(EvalNode* evalNode,
 JSValue* Machine::execute(EvalNode* evalNode,
                           CallFrame* callFrame,
                           JSObject* thisObj,
-                          int registerOffset,
+                          int globalRegisterOffset,
                           ScopeChainNode* scopeChain,
                           JSValue** exception) {
   ASSERT(!scopeChain->globalData->exception);
@@ -1211,15 +1209,15 @@ JSValue* Machine::execute(EvalNode* evalNode,
   }
 
   Register* oldEnd = m_registerFile.end();
-  Register* newEnd =
-      m_registerFile.start() + registerOffset + codeBlock->numCalleeRegisters;
+  Register* newEnd = m_registerFile.start() + globalRegisterOffset +
+                     codeBlock->numCalleeRegisters;
   if (!m_registerFile.grow(newEnd)) {
     *exception = createStackOverflowError(callFrame);
     return jsNull();
   }
 
   CallFrame* newCallFrame =
-      CallFrame::create(m_registerFile.start() + registerOffset);
+      CallFrame::create(m_registerFile.start() + globalRegisterOffset);
 
   // a 0 codeBlock indicates a built-in caller
   newCallFrame[codeBlock->thisRegister] = thisObj;
@@ -3572,7 +3570,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       NEXT_OPCODE;
     }
     BEGIN_OPCODE(op_call_eval) {
-      /* call_eval dst(r) func(r) thisVal(r) firstArg(r) argCount(n)
+      /* call_eval dst(r) func(r) argCount(n) registerOffset(n)
 
          Call a function named "eval" with no explicit "this" value
          (which may therefore be the eval operator). If register
@@ -3585,34 +3583,31 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
       int dst = vPC[1].u.operand;
       int func = vPC[2].u.operand;
-      int thisVal = vPC[3].u.operand;
-      int firstArg = vPC[4].u.operand;
-      int argCount = vPC[5].u.operand;
+      int argCount = vPC[3].u.operand;
+      int registerOffset = vPC[4].u.operand;
 
       JSValue* funcVal = callFrame[func].jsValue(callFrame);
-      JSValue* baseVal = callFrame[thisVal].jsValue(callFrame);
 
-      ScopeChainNode* scopeChain = callFrame->scopeChain();
-      if (baseVal == scopeChain->globalObject() &&
-          funcVal == scopeChain->globalObject()->evalFunction()) {
-        JSObject* thisObject = asObject(
-            callFrame[callFrame->codeBlock()->thisRegister].jsValue(callFrame));
-        JSValue* result =
-            callEval(callFrame, thisObject, scopeChain, registerFile, firstArg,
-                     argCount, exceptionValue);
+      Register* newCallFrame = callFrame->registers() + registerOffset;
+      Register* argv =
+          newCallFrame - RegisterFile::CallFrameHeaderSize - argCount;
+      JSValue* thisValue = argv[0].jsValue(callFrame);
+      JSGlobalObject* globalObject = callFrame->scopeChain()->globalObject();
+
+      if (thisValue == globalObject &&
+          funcVal == globalObject->evalFunction()) {
+        JSValue* result = callEval(callFrame, registerFile, argv, argCount,
+                                   registerOffset, exceptionValue);
         if (exceptionValue)
           goto vm_throw;
-
         callFrame[dst] = result;
 
-        vPC += 7;
+        vPC += 5;
         NEXT_OPCODE;
       }
 
-      // We didn't find the blessed version of eval, so reset vPC and process
-      // this instruction as a normal function call, supplying the proper 'this'
-      // value.
-      callFrame[thisVal] = baseVal->toThisObject(callFrame);
+// We didn't find the blessed version of eval, so process this
+// instruction as a normal function call.
 
 #if HAVE(COMPUTED_GOTO)
       // Hack around gcc performance quirk by performing an indirect goto
@@ -3623,49 +3618,20 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       // fall through to op_call
     }
     BEGIN_OPCODE(op_call) {
-      /* call dst(r) func(r) thisVal(r) firstArg(r) argCount(n)
-         registerOffset(n)
+      /* call dst(r) func(r) argCount(n) registerOffset(n)
 
-         Perform a function call. Specifically, call register func
-         with a "this" value of register thisVal, and put the result
-         in register dst.
+         Perform a function call.
 
-         The arguments start at register firstArg and go up to
-         argCount, but the "this" value is considered an implicit
-         first argument, so the argCount should be one greater than
-         the number of explicit arguments passed, and the register
-         after firstArg should contain the actual first
-         argument. This opcode will copy from the thisVal register
-         to the firstArg register, unless the register index of
-         thisVal is the special missing this object marker, which is
-         2^31-1; in that case, the global object will be used as the
-         "this" value.
+         registerOffset is the distance the callFrame pointer should move
+         before the VM initializes the new call frame's header.
 
-         If func is a native code function, then this opcode calls
-         it and returns the value immediately.
-
-         But if it is a JS function, then the current scope chain
-         and code block is set to the function's, and we slide the
-         register window so that the arguments would form the first
-         few local registers of the called function's register
-         window. In addition, a call frame header is written
-         immediately before the arguments; see the call frame
-         documentation for an explanation of how many registers a
-         call frame takes and what they contain. That many registers
-         before the firstArg register will be overwritten by the
-         call. In addition, any registers higher than firstArg +
-         argCount may be overwritten. Once this setup is complete,
-         execution continues from the called function's first
-         argument, and does not return until a "ret" opcode is
-         encountered.
+         dst is where op_ret should store its result.
        */
 
       int dst = vPC[1].u.operand;
       int func = vPC[2].u.operand;
-      int thisVal = vPC[3].u.operand;
-      int firstArg = vPC[4].u.operand;
-      int argCount = vPC[5].u.operand;
-      int registerOffset = vPC[6].u.operand;
+      int argCount = vPC[3].u.operand;
+      int registerOffset = vPC[4].u.operand;
 
       JSValue* v = callFrame[func].jsValue(callFrame);
 
@@ -3678,10 +3644,6 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         CodeBlock* newCodeBlock =
             &functionBodyNode->byteCode(callDataScopeChain);
 
-        callFrame[firstArg] = thisVal == missingThisObjectMarker()
-                                  ? callFrame->globalThisValue()
-                                  : callFrame[thisVal].jsValue(callFrame);
-
         CallFrame* previousCallFrame = callFrame;
 
         callFrame = slideRegisterWindowForCall(
@@ -3692,7 +3654,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
           goto vm_throw;
         }
 
-        callFrame->init(newCodeBlock, vPC + 7, callDataScopeChain,
+        callFrame->init(newCodeBlock, vPC + 5, callDataScopeChain,
                         previousCallFrame, dst, argCount, asFunction(v));
         vPC = newCodeBlock->instructions.begin();
 
@@ -3704,15 +3666,20 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       }
 
       if (callType == CallTypeHost) {
-        JSValue* thisValue = thisVal == missingThisObjectMarker()
-                                 ? callFrame->globalThisValue()
-                                 : callFrame[thisVal].jsValue(callFrame);
-        ArgList args(callFrame->registers() + firstArg + 1, argCount - 1);
-
         ScopeChainNode* scopeChain = callFrame->scopeChain();
         CallFrame* newCallFrame =
             CallFrame::create(callFrame->registers() + registerOffset);
-        newCallFrame->init(0, vPC + 7, scopeChain, callFrame, dst, argCount, 0);
+        newCallFrame->init(0, vPC + 5, scopeChain, callFrame, dst, argCount, 0);
+
+        Register* thisRegister = newCallFrame->registers() -
+                                 RegisterFile::CallFrameHeaderSize - argCount;
+        ArgList args(thisRegister + 1, argCount - 1);
+
+        // FIXME: All host methods should be calling toThisObject, but this is
+        // not presently the case.
+        JSValue* thisValue = thisRegister->jsValue(callFrame);
+        if (thisValue == jsNull())
+          thisValue = callFrame->globalThisValue();
 
         JSValue* returnValue;
         {
@@ -3724,7 +3691,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
         callFrame[dst] = returnValue;
 
-        vPC += 7;
+        vPC += 5;
         NEXT_OPCODE;
       }
 
@@ -3901,29 +3868,29 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       NEXT_OPCODE;
     }
     BEGIN_OPCODE(op_construct) {
-      /* construct dst(r) constr(r) constrProto(r) firstArg(r) argCount(n)
-         registerOffset(n)
+      /* construct dst(r) func(r) argCount(n) registerOffset(n) proto(r)
+         thisRegister(r)
 
-         Invoke register "constr" as a constructor. For JS
+         Invoke register "func" as a constructor. For JS
          functions, the calling convention is exactly as for the
          "call" opcode, except that the "this" value is a newly
-         created Object. For native constructors, a null "this"
-         value is passed. In either case, the firstArg and argCount
+         created Object. For native constructors, no "this"
+         value is passed. In either case, the argCount and registerOffset
          registers are interpreted as for the "call" opcode.
 
-         Register constrProto must contain the prototype property of
-         register constsr. This is to enable polymorphic inline
+         Register proto must contain the prototype property of
+         register func. This is to enable polymorphic inline
          caching of this lookup.
       */
 
       int dst = vPC[1].u.operand;
-      int constr = vPC[2].u.operand;
-      int constrProto = vPC[3].u.operand;
-      int firstArg = vPC[4].u.operand;
-      int argCount = vPC[5].u.operand;
-      int registerOffset = vPC[6].u.operand;
+      int func = vPC[2].u.operand;
+      int argCount = vPC[3].u.operand;
+      int registerOffset = vPC[4].u.operand;
+      int proto = vPC[5].u.operand;
+      int thisRegister = vPC[6].u.operand;
 
-      JSValue* v = callFrame[constr].jsValue(callFrame);
+      JSValue* v = callFrame[func].jsValue(callFrame);
 
       ConstructData constructData;
       ConstructType constructType = v->getConstructData(constructData);
@@ -3935,7 +3902,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
             &functionBodyNode->byteCode(callDataScopeChain);
 
         StructureID* structure;
-        JSValue* prototype = callFrame[constrProto].jsValue(callFrame);
+        JSValue* prototype = callFrame[proto].jsValue(callFrame);
         if (prototype->isObject())
           structure = asObject(prototype)->inheritorID();
         else
@@ -3943,7 +3910,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
               callDataScopeChain->globalObject()->emptyObjectStructure();
         JSObject* newObject = new (globalData) JSObject(structure);
 
-        callFrame[firstArg] = newObject;  // "this" value
+        callFrame[thisRegister] = newObject;  // "this" value
 
         CallFrame* previousCallFrame = callFrame;
 
@@ -3967,7 +3934,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       }
 
       if (constructType == ConstructTypeHost) {
-        ArgList args(callFrame->registers() + firstArg + 1, argCount - 1);
+        ArgList args(callFrame->registers() + thisRegister + 1, argCount - 1);
 
         ScopeChainNode* scopeChain = callFrame->scopeChain();
         CallFrame* newCallFrame =
@@ -4759,6 +4726,19 @@ static NEVER_INLINE void setUpThrowTrampolineReturnAddress(
     }                                                       \
   } while (0)
 
+// This macro rewinds to the previous call frame because CTI functions that
+// throw stack overflow exceptions execute after the call frame has
+// optimistically moved forward.
+#define CTI_THROW_STACK_OVERFLOW()                                         \
+  do {                                                                     \
+    CallFrame* oldCallFrame = ARG_callFrame->callerFrame();                \
+    JSGlobalData* globalData = ARG_globalData;                             \
+    globalData->exception = createStackOverflowError(oldCallFrame);        \
+    globalData->throwReturnAddress = CTI_RETURN_ADDRESS;                   \
+    ARG_setCallFrame(oldCallFrame);                                        \
+    CTI_SET_RETURN_ADDRESS(reinterpret_cast<void*>(ctiVMThrowTrampoline)); \
+  } while (0);
+
 JSObject* Machine::cti_op_convert_this(CTI_ARGS) {
   CTI_STACK_HACK();
 
@@ -4847,16 +4827,6 @@ void Machine::cti_timeout_check(CTI_ARGS) {
   }
 }
 
-NEVER_INLINE void Machine::throwStackOverflowPreviousFrame(
-    CallFrame* callFrame,
-    JSGlobalData* globalData,
-    void*& returnAddress) {
-  globalData->exception = createStackOverflowError(callFrame->callerFrame());
-  globalData->throwReturnAddress = callFrame->returnPC();
-  ctiSetReturnAddress(&returnAddress,
-                      reinterpret_cast<void*>(ctiVMThrowTrampoline));
-}
-
 void Machine::cti_register_file_check(CTI_ARGS) {
   CTI_STACK_HACK();
 
@@ -4864,9 +4834,7 @@ void Machine::cti_register_file_check(CTI_ARGS) {
           ARG_callFrame + ARG_callFrame->codeBlock()->numCalleeRegisters)))
     return;
 
-  ARG_setCallFrame(ARG_callFrame->callerFrame());
-  throwStackOverflowPreviousFrame(ARG_callFrame, ARG_globalData,
-                                  CTI_RETURN_ADDRESS);
+  CTI_THROW_STACK_OVERFLOW();
 }
 
 int Machine::cti_op_loop_if_less(CTI_ARGS) {
@@ -5148,8 +5116,9 @@ VoidPtrPair Machine::cti_op_call_arityCheck(CTI_ARGS) {
     Register* r = callFrame->registers() + omittedArgCount;
     Register* newEnd = r + newCodeBlock->numCalleeRegisters;
     if (!ARG_registerFile->grow(newEnd)) {
-      ARG_globalData->exception = createStackOverflowError(oldCallFrame);
-      VM_THROW_EXCEPTION_2();
+      CTI_THROW_STACK_OVERFLOW();
+      VoidPtrPairValue pair = {{0, 0}};
+      return pair.i;
     }
 
     Register* argv = r - RegisterFile::CallFrameHeaderSize - omittedArgCount;
@@ -5217,7 +5186,7 @@ JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
     {
       SamplingTool::HostCallRecord callRecord(CTI_SAMPLER);
 
-      // All host methods should be calling toThisObject, but this is not
+      // FIXME: All host methods should be calling toThisObject, but this is not
       // presently the case.
       JSValue* thisValue = argv[0].jsValue(callFrame);
       if (thisValue == jsNull())
@@ -5339,8 +5308,8 @@ JSObject* Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
 #endif
 
   StructureID* structure;
-  if (ARG_src5->isObject())
-    structure = asObject(ARG_src5)->inheritorID();
+  if (ARG_src4->isObject())
+    structure = asObject(ARG_src4)->inheritorID();
   else
     structure = asFunction(ARG_src1)
                     ->m_scopeChain.node()
@@ -5356,13 +5325,13 @@ JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
 
   JSValue* constrVal = ARG_src1;
   int argCount = ARG_int3;
-  int firstArg = ARG_int6;
+  int thisRegister = ARG_int5;
 
   ConstructData constructData;
   ConstructType constructType = constrVal->getConstructData(constructData);
 
   if (constructType == ConstructTypeHost) {
-    ArgList argList(callFrame->registers() + firstArg + 1, argCount - 1);
+    ArgList argList(callFrame->registers() + thisRegister + 1, argCount - 1);
 
     JSValue* returnValue;
     {
@@ -5378,7 +5347,7 @@ JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
   ASSERT(constructType == ConstructTypeNone);
 
   ARG_globalData->exception = createNotAConstructorError(
-      callFrame, constrVal, ARG_instr4, callFrame->codeBlock());
+      callFrame, constrVal, ARG_instr6, callFrame->codeBlock());
   VM_THROW_EXCEPTION();
 }
 
@@ -5975,26 +5944,22 @@ JSValue* Machine::cti_op_call_eval(CTI_ARGS) {
 
   CallFrame* callFrame = ARG_callFrame;
   RegisterFile* registerFile = ARG_registerFile;
-  CodeBlock* codeBlock = callFrame->codeBlock();
-  ScopeChainNode* scopeChain = callFrame->scopeChain();
 
   Machine* machine = ARG_globalData->machine;
 
   JSValue* funcVal = ARG_src1;
   int registerOffset = ARG_int2;
   int argCount = ARG_int3;
-  JSValue* baseVal = ARG_src5;
 
-  if (baseVal == scopeChain->globalObject() &&
-      funcVal == scopeChain->globalObject()->evalFunction()) {
-    JSObject* thisObject =
-        callFrame[codeBlock->thisRegister].jsValue(callFrame)->toThisObject(
-            callFrame);
+  Register* newCallFrame = callFrame->registers() + registerOffset;
+  Register* argv = newCallFrame - RegisterFile::CallFrameHeaderSize - argCount;
+  JSValue* thisValue = argv[0].jsValue(callFrame);
+  JSGlobalObject* globalObject = callFrame->scopeChain()->globalObject();
+
+  if (thisValue == globalObject && funcVal == globalObject->evalFunction()) {
     JSValue* exceptionValue = noValue();
-    JSValue* result = machine->callEval(
-        callFrame, thisObject, scopeChain, registerFile,
-        registerOffset - RegisterFile::CallFrameHeaderSize - argCount, argCount,
-        exceptionValue);
+    JSValue* result = machine->callEval(callFrame, registerFile, argv, argCount,
+                                        registerOffset, exceptionValue);
     if (UNLIKELY(exceptionValue != noValue())) {
       ARG_globalData->exception = exceptionValue;
       VM_THROW_EXCEPTION_AT_END();
@@ -6348,17 +6313,18 @@ JSValue* Machine::cti_vm_throw(CTI_ARGS) {
 
   CallFrame* callFrame = ARG_callFrame;
   CodeBlock* codeBlock = callFrame->codeBlock();
+  JSGlobalData* globalData = ARG_globalData;
 
   ASSERT(codeBlock->ctiReturnAddressVPCMap.contains(
-      ARG_globalData->throwReturnAddress));
+      globalData->throwReturnAddress));
   unsigned vPCIndex =
-      codeBlock->ctiReturnAddressVPCMap.get(ARG_globalData->throwReturnAddress);
+      codeBlock->ctiReturnAddressVPCMap.get(globalData->throwReturnAddress);
 
-  JSValue* exceptionValue = ARG_globalData->exception;
+  JSValue* exceptionValue = globalData->exception;
   ASSERT(exceptionValue);
-  ARG_globalData->exception = noValue();
+  globalData->exception = noValue();
 
-  Instruction* handlerVPC = ARG_globalData->machine->throwException(
+  Instruction* handlerVPC = globalData->machine->throwException(
       callFrame, exceptionValue, codeBlock->instructions.begin() + vPCIndex,
       false);
 
