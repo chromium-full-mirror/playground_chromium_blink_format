@@ -1345,15 +1345,6 @@ void RenderBox::computeAbsoluteRepaintRect(IntRect& rect, bool fixed) {
   IntPoint topLeft = rect.location();
   topLeft.move(m_x, m_y);
 
-  // Apply the relative position offset when invalidating a rectangle.  The
-  // layer
-  // is translated, but the render box isn't, so we need to do this to get the
-  // right dirty rect.  Since this is called from RenderObject::setStyle, the
-  // relative position
-  // flag on the RenderObject has been cleared, so use the one on the style().
-  if (style()->position() == RelativePosition && m_layer)
-    topLeft += m_layer->relativePositionOffset();
-
   if (style()->position() == FixedPosition)
     fixed = true;
 
@@ -1370,9 +1361,6 @@ void RenderBox::computeAbsoluteRepaintRect(IntRect& rect, bool fixed) {
       }
     }
 
-    if (style()->position() == AbsolutePosition)
-      topLeft += offsetForPositionedInContainer(o);
-
     // We are now in our parent container's coordinate space.  Apply our
     // transform to obtain a bounding box
     // in the parent's coordinate space that encloses us.
@@ -1382,6 +1370,18 @@ void RenderBox::computeAbsoluteRepaintRect(IntRect& rect, bool fixed) {
       topLeft = rect.location();
       topLeft.move(m_x, m_y);
     }
+
+    if (style()->position() == AbsolutePosition)
+      topLeft += offsetForPositionedInContainer(o);
+
+    // Apply the relative position offset when invalidating a rectangle.  The
+    // layer
+    // is translated, but the render box isn't, so we need to do this to get the
+    // right dirty rect.  Since this is called from RenderObject::setStyle, the
+    // relative position
+    // flag on the RenderObject has been cleared, so use the one on the style().
+    if (style()->position() == RelativePosition && m_layer)
+      topLeft += m_layer->relativePositionOffset();
 
     // FIXME: We ignore the lightweight clipping rect that controls use, since
     // if |o| is in mid-layout,
