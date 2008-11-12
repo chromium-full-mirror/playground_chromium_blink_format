@@ -80,6 +80,7 @@ DeleteSelectionCommand::DeleteSelectionCommand(Document* document,
       m_mergeBlocksAfterDelete(mergeBlocksAfterDelete),
       m_replace(replace),
       m_expandForSpecialElements(expandForSpecialElements),
+      m_pruneStartBlockIfNecessary(false),
       m_startBlock(0),
       m_endBlock(0),
       m_typingStyle(0),
@@ -96,6 +97,7 @@ DeleteSelectionCommand::DeleteSelectionCommand(const Selection& selection,
       m_mergeBlocksAfterDelete(mergeBlocksAfterDelete),
       m_replace(replace),
       m_expandForSpecialElements(expandForSpecialElements),
+      m_pruneStartBlockIfNecessary(false),
       m_selectionToDelete(selection),
       m_startBlock(0),
       m_endBlock(0),
@@ -208,6 +210,20 @@ void DeleteSelectionCommand::initializePositionData() {
     m_endingPosition = m_downstreamEnd;
   else
     m_endingPosition = m_downstreamStart;
+
+  // We don't want to merge into a block if it will mean changing the quote
+  // level of content after deleting
+  // selections that contain a whole number paragraphs plus a line break, since
+  // it is unclear to most users
+  // that such a selection actually ends at the start of the next paragraph.
+  // This matches TextEdit behavior
+  // for indented paragraphs.
+  if (numEnclosingMailBlockquotes(start) != numEnclosingMailBlockquotes(end) &&
+      isStartOfParagraph(visibleEnd) &&
+      isStartOfParagraph(VisiblePosition(start))) {
+    m_mergeBlocksAfterDelete = false;
+    m_pruneStartBlockIfNecessary = true;
+  }
 
   // Handle leading and trailing whitespace, as well as smart delete adjustments
   // to the selection
@@ -599,8 +615,25 @@ void DeleteSelectionCommand::fixupWhitespace() {
 // bring content before the
 // start together with content after the end.
 void DeleteSelectionCommand::mergeParagraphs() {
-  if (!m_mergeBlocksAfterDelete)
+  if (!m_mergeBlocksAfterDelete) {
+    if (m_pruneStartBlockIfNecessary) {
+      // Make sure that the ending position isn't inside the block we're about
+      // to prune.
+      m_endingPosition = m_downstreamEnd;
+      // We aren't going to merge into the start block, so remove it if it's
+      // empty.
+      prune(m_upstreamStart.node());
+      // Removing the start block during a deletion is usually an indication
+      // that we need
+      // a placeholder, but not in this case.
+      m_needPlaceholder = false;
+    }
     return;
+  }
+
+  // It shouldn't have been asked to both try and merge content into the start
+  // block and prune it.
+  ASSERT(!m_pruneStartBlockIfNecessary);
 
   // FIXME: Deletion should adjust selection endpoints as it removes nodes so
   // that we never get into this state (4099839).

@@ -92,6 +92,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   bool m_needPlaceholder;
   bool m_replace;
   bool m_expandForSpecialElements;
+  bool m_pruneStartBlockIfNecessary;
 
   // This data is transient and should be cleared at the end of the doApply
   // function.
