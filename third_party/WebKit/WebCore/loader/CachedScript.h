@@ -41,7 +41,7 @@ class CachedScript : public CachedResource {
   CachedScript(const String& url, const String& charset);
   virtual ~CachedScript();
 
-  const String& script() const { return m_script; }
+  const String& script();
 
   virtual void addClient(CachedResourceClient*);
 
@@ -53,6 +53,8 @@ class CachedScript : public CachedResource {
   virtual bool schedule() const { return false; }
 
   void checkNotify();
+
+  virtual void destroyDecodedData();
 
  private:
   String m_script;
