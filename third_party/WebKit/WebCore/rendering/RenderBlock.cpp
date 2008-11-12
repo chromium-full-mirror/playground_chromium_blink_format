@@ -2845,7 +2845,6 @@ int RenderBlock::leftRelOffset(int y,
     left += style()->textIndent().calcMinValue(cw);
   }
 
-  // kdDebug( 6040 ) << "leftOffset(" << y << ") = " << left << endl;
   return left;
 }
 
@@ -2881,13 +2880,10 @@ int RenderBlock::rightRelOffset(int y,
     right -= style()->textIndent().calcMinValue(cw);
   }
 
-  // kdDebug( 6040 ) << "rightOffset(" << y << ") = " << right << endl;
   return right;
 }
 
 int RenderBlock::lineWidth(int y) const {
-  // kdDebug( 6040 ) << "lineWidth(" << y << ")=" << rightOffset(y) -
-  // leftOffset(y) << endl;
   int result = rightOffset(y) - leftOffset(y);
   return (result < 0) ? 0 : result;
 }

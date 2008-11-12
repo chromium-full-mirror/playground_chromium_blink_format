@@ -40,6 +40,7 @@ class CachedScript;
 class DocumentFragment;
 class Document;
 class HTMLDocument;
+class HTMLScriptElement;
 class HTMLViewSourceDocument;
 class FrameView;
 class HTMLParser;
@@ -52,10 +53,12 @@ class PreloadScanner;
  * of attributes. Can also represent text. In this case the id = 0 and
  * text contains the text.
  */
-class Token {
- public:
+struct Token {
   Token()
-      : beginTag(true), flat(false), brokenXMLStyle(false), m_sourceInfo(0) {}
+      : beginTag(true),
+        selfClosingTag(false),
+        brokenXMLStyle(false),
+        m_sourceInfo(0) {}
   ~Token() {}
 
   void addAttribute(Document*,
@@ -75,7 +78,7 @@ class Token {
     text = 0;
     tagName = nullAtom;
     beginTag = true;
-    flat = false;
+    selfClosingTag = false;
     brokenXMLStyle = false;
     if (m_sourceInfo)
       m_sourceInfo->clear();
@@ -91,7 +94,7 @@ class Token {
   RefPtr<StringImpl> text;
   AtomicString tagName;
   bool beginTag;
-  bool flat;
+  bool selfClosingTag;
   bool brokenXMLStyle;
   OwnPtr<Vector<UChar>> m_sourceInfo;
 };
@@ -154,13 +157,13 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   virtual int columnNumber() const { return 1; }
 
   bool processingContentWrittenByScript() const {
-    return src.excludeLineNumbers();
+    return m_src.excludeLineNumbers();
   }
 
   virtual void executeScriptsWaitingForStylesheets();
 
   virtual bool isHTMLTokenizer() const { return true; }
-  HTMLParser* htmlParser() const { return parser; }
+  HTMLParser* htmlParser() const { return m_parser.get(); }
 
  private:
   class State;
@@ -184,7 +187,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   State parseEntity(SegmentedString&,
                     UChar*& dest,
                     State,
-                    unsigned& _cBufferPos,
+                    unsigned& cBufferPos,
                     bool start,
                     bool parsingTag);
   State parseProcessingInstruction(SegmentedString&, State);
@@ -198,12 +201,12 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   // check if we have enough space in the buffer.
   // if not enlarge it
   inline void checkBuffer(int len = 10) {
-    if ((dest - buffer) > size - len)
+    if ((m_dest - m_buffer) > m_bufferSize - len)
       enlargeBuffer(len);
   }
 
   inline void checkScriptBuffer(int len = 10) {
-    if (scriptCodeSize + len >= scriptCodeMaxSize)
+    if (m_scriptCodeSize + len >= m_scriptCodeCapacity)
       enlargeScriptBuffer(len);
   }
 
@@ -215,17 +218,15 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   void allDataProcessed();
 
   // from CachedResourceClient
-  void notifyFinished(CachedResource* finishedObj);
+  void notifyFinished(CachedResource*);
 
   // Internal buffers
   ///////////////////
-  UChar* buffer;
-  UChar* dest;
+  UChar* m_buffer;
+  int m_bufferSize;
+  UChar* m_dest;
 
-  Token currToken;
-
-  // the size of buffer
-  int size;
+  Token m_currentToken;
 
   // Tokenizer flags
   //////////////////
@@ -370,19 +371,19 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   int m_doctypeSearchCount;
   int m_doctypeSecondarySearchCount;
 
-  bool brokenServer;
+  bool m_brokenServer;
 
   // Name of an attribute that we just scanned.
-  AtomicString attrName;
+  AtomicString m_attrName;
 
   // Used to store the code of a scripting sequence
-  UChar* scriptCode;
+  UChar* m_scriptCode;
   // Size of the script sequenze stored in @ref #scriptCode
-  int scriptCodeSize;
+  int m_scriptCodeSize;
   // Maximal size that can be stored in @ref #scriptCode
-  int scriptCodeMaxSize;
+  int m_scriptCodeCapacity;
   // resync point of script code size
-  int scriptCodeResync;
+  int m_scriptCodeResync;
 
   // Stores characters if we are scanning for a string like "</script>"
   UChar searchBuffer[10];
@@ -390,44 +391,42 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   // Counts where we are in the string we are scanning for
   int searchCount;
   // the stopper string
-  const char* searchStopper;
-  // the stopper len
-  int searchStopperLen;
+  const char* m_searchStopper;
+  int m_searchStopperLength;
 
   // if no more data is coming, just parse what we have (including ext scripts
   // that
   // may be still downloading) and finish
-  bool noMoreData;
+  bool m_noMoreData;
   // URL to get source code of script from
-  String scriptSrc;
-  String scriptSrcCharset;
+  String m_scriptTagSrcAttrValue;
+  String m_scriptTagCharsetAttrValue;
   // the HTML code we will parse after the external script we are waiting for
   // has loaded
-  SegmentedString pendingSrc;
+  SegmentedString m_pendingSrc;
 
   // the HTML code we will parse after this particular script has
   // loaded, but before all pending HTML
-  SegmentedString* currentPrependingSrc;
+  SegmentedString* m_currentPrependingSrc;
 
   // true if we are executing a script while parsing a document. This causes the
   // parsing of
   // the output of the script to be postponed until after the script has
   // finished executing
   int m_executingScript;
-  Deque<CachedResourceHandle<CachedScript>> pendingScripts;
-  RefPtr<Node> scriptNode;
+  Deque<CachedResourceHandle<CachedScript>> m_pendingScripts;
+  RefPtr<HTMLScriptElement> m_scriptNode;
 
   bool m_requestingScript;
   bool m_hasScriptsWaitingForStylesheets;
 
   // if we found one broken comment, there are most likely others as well
   // store a flag to get rid of the O(n^2) behaviour in such a case.
-  bool brokenComments;
+  bool m_brokenComments;
   // current line number
   int m_lineNumber;
-  // line number at which the current <script> started
-  int scriptStartLineno;
-  int tagStartLineno;
+  int m_currentScriptTagStartLineNumber;
+  int m_currentTagStartLineNumber;
 
   double m_tokenizerTimeDelay;
   int m_tokenizerChunkSize;
@@ -441,13 +440,13 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
 // of this buffer
 // we'll just make it large enough to handle all imaginable cases.
 #define CBUFLEN 1024
-  UChar cBuffer[CBUFLEN + 2];
+  UChar m_cBuffer[CBUFLEN + 2];
   unsigned int m_cBufferPos;
 
-  SegmentedString src;
+  SegmentedString m_src;
   Document* m_doc;
-  HTMLParser* parser;
-  bool inWrite;
+  OwnPtr<HTMLParser> m_parser;
+  bool m_inWrite;
   bool m_fragment;
 
   OwnPtr<PreloadScanner> m_preloadScanner;
