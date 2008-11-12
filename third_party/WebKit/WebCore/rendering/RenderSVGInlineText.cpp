@@ -57,6 +57,11 @@ void RenderSVGInlineText::absoluteRects(Vector<IntRect>& rects,
   rects.append(computeAbsoluteRectForRange(0, textLength()));
 }
 
+void RenderSVGInlineText::absoluteQuads(Vector<FloatQuad>& quads,
+                                        bool topLevel) {
+  quads.append(FloatRect(computeAbsoluteRectForRange(0, textLength())));
+}
+
 IntRect RenderSVGInlineText::selectionRect(bool) {
   ASSERT(!needsLayout());
 
@@ -119,6 +124,7 @@ IntRect RenderSVGInlineText::computeAbsoluteRectForRange(int startPos,
                       narrowPrecisionToFloat(rect.y() + absPos.y() - yPos() -
                                              htmlParentCtm.f()),
                       rect.width(), rect.height());
+  // FIXME: broken with CSS transforms
   return enclosingIntRect(absoluteTransform().mapRect(fixedRect));
 }
 

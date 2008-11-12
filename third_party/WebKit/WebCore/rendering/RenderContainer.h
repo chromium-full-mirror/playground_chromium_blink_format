@@ -72,6 +72,10 @@ class RenderContainer : public RenderBox {
                                unsigned startOffset = 0,
                                unsigned endOffset = UINT_MAX,
                                bool useSelectionHeight = false);
+  virtual void collectAbsoluteLineBoxQuads(Vector<FloatQuad>&,
+                                           unsigned startOffset = 0,
+                                           unsigned endOffset = UINT_MAX,
+                                           bool useSelectionHeight = false);
 
  private:
   RenderObject* m_firstChild;

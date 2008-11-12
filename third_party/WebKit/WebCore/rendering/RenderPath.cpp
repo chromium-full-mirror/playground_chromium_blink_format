@@ -235,6 +235,10 @@ void RenderPath::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
   rects.append(absoluteClippedOverflowRect());
 }
 
+void RenderPath::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
+  quads.append(absoluteClippedOverflowRect());
+}
+
 bool RenderPath::nodeAtPoint(const HitTestRequest& request,
                              HitTestResult& result,
                              int _x,

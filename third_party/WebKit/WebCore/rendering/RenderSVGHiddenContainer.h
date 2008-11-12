@@ -57,6 +57,7 @@ class RenderSVGHiddenContainer : public RenderSVGContainer {
                              int tx,
                              int ty,
                              bool topLevel = true);
+  virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
   virtual AffineTransform absoluteTransform() const;
   virtual AffineTransform localTransform() const;

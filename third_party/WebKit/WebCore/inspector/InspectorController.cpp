@@ -2933,54 +2933,86 @@ void InspectorController::removeBreakpoint(intptr_t sourceID,
 }
 #endif
 
-static void drawOutlinedRect(GraphicsContext& context,
-                             const IntRect& rect,
+static void drawOutlinedQuad(GraphicsContext& context,
+                             const FloatQuad& quad,
                              const Color& fillColor) {
-  static const int outlineThickness = 1;
+  static const int outlineThickness = 2;
   static const Color outlineColor(62, 86, 180, 228);
 
-  IntRect outline = rect;
-  outline.inflate(outlineThickness);
+  Path quadPath;
+  quadPath.moveTo(quad.p1());
+  quadPath.addLineTo(quad.p2());
+  quadPath.addLineTo(quad.p3());
+  quadPath.addLineTo(quad.p4());
+  quadPath.closeSubpath();
 
-  context.clearRect(outline);
+  // Clear the quad
+  {
+    context.save();
+    context.setCompositeOperation(CompositeClear);
+    context.addPath(quadPath);
+    context.fillPath();
+    context.restore();
+  }
 
-  context.save();
-  context.clipOut(rect);
-  context.fillRect(outline, outlineColor);
-  context.restore();
+  // Clip out the quad, then draw with a 2px stroke to get a pixel
+  // of outline (because inflating a quad is hard)
+  {
+    context.save();
+    context.addPath(quadPath);
+    context.clipOut(quadPath);
 
-  context.fillRect(rect, fillColor);
+    context.addPath(quadPath);
+    context.setStrokeThickness(outlineThickness);
+    context.setStrokeColor(outlineColor);
+    context.strokePath();
+
+    context.restore();
+  }
+
+  // Now do the fill
+  context.addPath(quadPath);
+  context.setFillColor(fillColor);
+  context.fillPath();
 }
 
 static void drawHighlightForBoxes(GraphicsContext& context,
-                                  const Vector<IntRect>& lineBoxRects,
-                                  const IntRect& contentBox,
-                                  const IntRect& paddingBox,
-                                  const IntRect& borderBox,
-                                  const IntRect& marginBox) {
+                                  const Vector<FloatQuad>& lineBoxQuads,
+                                  const FloatQuad& contentQuad,
+                                  const FloatQuad& paddingQuad,
+                                  const FloatQuad& borderQuad,
+                                  const FloatQuad& marginQuad) {
   static const Color contentBoxColor(125, 173, 217, 128);
   static const Color paddingBoxColor(125, 173, 217, 160);
   static const Color borderBoxColor(125, 173, 217, 192);
   static const Color marginBoxColor(125, 173, 217, 228);
 
-  if (!lineBoxRects.isEmpty()) {
-    for (size_t i = 0; i < lineBoxRects.size(); ++i)
-      drawOutlinedRect(context, lineBoxRects[i], contentBoxColor);
+  if (!lineBoxQuads.isEmpty()) {
+    for (size_t i = 0; i < lineBoxQuads.size(); ++i)
+      drawOutlinedQuad(context, lineBoxQuads[i], contentBoxColor);
     return;
   }
 
-  if (marginBox != borderBox)
-    drawOutlinedRect(context, marginBox, marginBoxColor);
-  if (borderBox != paddingBox)
-    drawOutlinedRect(context, borderBox, borderBoxColor);
-  if (paddingBox != contentBox)
-    drawOutlinedRect(context, paddingBox, paddingBoxColor);
-  drawOutlinedRect(context, contentBox, contentBoxColor);
+  if (marginQuad != borderQuad)
+    drawOutlinedQuad(context, marginQuad, marginBoxColor);
+  if (borderQuad != paddingQuad)
+    drawOutlinedQuad(context, borderQuad, borderBoxColor);
+  if (paddingQuad != contentQuad)
+    drawOutlinedQuad(context, paddingQuad, paddingBoxColor);
+
+  drawOutlinedQuad(context, contentQuad, contentBoxColor);
 }
 
 static inline void convertFromFrameToMainFrame(Frame* frame, IntRect& rect) {
   rect = frame->page()->mainFrame()->view()->windowToContents(
       frame->view()->contentsToWindow(rect));
+}
+
+static inline IntSize frameToMainFrameOffset(Frame* frame) {
+  IntPoint mainFramePoint =
+      frame->page()->mainFrame()->view()->windowToContents(
+          frame->view()->contentsToWindow(IntPoint()));
+  return mainFramePoint - IntPoint();
 }
 
 void InspectorController::drawNodeHighlight(GraphicsContext& context) const {
@@ -2992,8 +3024,7 @@ void InspectorController::drawNodeHighlight(GraphicsContext& context) const {
   if (!renderer || !containingFrame)
     return;
 
-  IntRect contentBox = renderer->absoluteContentBox();
-  IntRect boundingBox = renderer->absoluteBoundingBoxRect();
+  IntRect contentBox = renderer->contentBox();
 
   // FIXME: Should we add methods to RenderObject to obtain these rects?
   IntRect paddingBox(
@@ -3012,23 +3043,34 @@ void InspectorController::drawNodeHighlight(GraphicsContext& context) const {
       borderBox.width() + renderer->marginLeft() + renderer->marginRight(),
       borderBox.height() + renderer->marginTop() + renderer->marginBottom());
 
-  convertFromFrameToMainFrame(containingFrame, contentBox);
-  convertFromFrameToMainFrame(containingFrame, paddingBox);
-  convertFromFrameToMainFrame(containingFrame, borderBox);
-  convertFromFrameToMainFrame(containingFrame, marginBox);
-  convertFromFrameToMainFrame(containingFrame, boundingBox);
+  IntSize mainFrameOffset = frameToMainFrameOffset(containingFrame);
 
-  Vector<IntRect> lineBoxRects;
+  FloatQuad absContentQuad =
+      renderer->localToAbsoluteQuad(FloatRect(contentBox));
+  FloatQuad absPaddingQuad =
+      renderer->localToAbsoluteQuad(FloatRect(paddingBox));
+  FloatQuad absBorderQuad = renderer->localToAbsoluteQuad(FloatRect(borderBox));
+  FloatQuad absMarginQuad = renderer->localToAbsoluteQuad(FloatRect(marginBox));
+
+  absContentQuad.move(mainFrameOffset);
+  absPaddingQuad.move(mainFrameOffset);
+  absBorderQuad.move(mainFrameOffset);
+  absMarginQuad.move(mainFrameOffset);
+
+  IntRect boundingBox = renderer->absoluteBoundingBoxRect(true);
+  boundingBox.move(mainFrameOffset);
+
+  Vector<FloatQuad> lineBoxQuads;
   if (renderer->isInline() ||
       (renderer->isText() && !m_highlightedNode->isSVGElement())) {
     // FIXME: We should show margins/padding/border for inlines.
-    renderer->addLineBoxRects(lineBoxRects);
+    renderer->collectAbsoluteLineBoxQuads(lineBoxQuads);
   }
 
-  for (unsigned i = 0; i < lineBoxRects.size(); ++i)
-    convertFromFrameToMainFrame(containingFrame, lineBoxRects[i]);
+  for (unsigned i = 0; i < lineBoxQuads.size(); ++i)
+    lineBoxQuads[i] += mainFrameOffset;
 
-  if (lineBoxRects.isEmpty() && contentBox.isEmpty()) {
+  if (lineBoxQuads.isEmpty() && contentBox.isEmpty()) {
     // If we have no line boxes and our content box is empty, we'll just draw
     // our bounding box.
     // This can happen, e.g., with an <a> enclosing an <img
@@ -3037,7 +3079,7 @@ void InspectorController::drawNodeHighlight(GraphicsContext& context) const {
     // has no
     // width/height but the highlight makes it appear to be the size of the
     // <img>.
-    lineBoxRects.append(boundingBox);
+    lineBoxQuads.append(FloatRect(boundingBox));
   }
 
   ASSERT(m_inspectedPage);
@@ -3057,8 +3099,8 @@ void InspectorController::drawNodeHighlight(GraphicsContext& context) const {
 
   context.translate(-overlayRect.x(), -overlayRect.y());
 
-  drawHighlightForBoxes(context, lineBoxRects, contentBox, paddingBox,
-                        borderBox, marginBox);
+  drawHighlightForBoxes(context, lineBoxQuads, absContentQuad, absPaddingQuad,
+                        absBorderQuad, absMarginQuad);
 }
 
 void InspectorController::count(const UString& title,

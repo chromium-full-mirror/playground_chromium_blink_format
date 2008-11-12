@@ -36,6 +36,7 @@ class RenderSVGTSpan : public RenderSVGInline {
                              int tx,
                              int ty,
                              bool topLevel = true);
+  virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 };
 }
 

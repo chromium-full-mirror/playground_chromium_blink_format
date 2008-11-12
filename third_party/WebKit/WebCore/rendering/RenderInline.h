@@ -81,6 +81,7 @@ class RenderInline : public RenderFlow {
   virtual int offsetTop() const;
 
   void absoluteRects(Vector<IntRect>&, int tx, int ty, bool topLevel = true);
+  virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 

@@ -50,6 +50,8 @@ class RenderView : public RenderBlock {
   virtual FloatPoint absoluteToLocal(FloatPoint containerPoint,
                                      bool fixed = false,
                                      bool useTransforms = false) const;
+  virtual FloatQuad localToAbsoluteQuad(const FloatQuad&,
+                                        bool fixed = false) const;
 
   int docHeight() const;
   int docWidth() const;
@@ -102,6 +104,7 @@ class RenderView : public RenderBlock {
                              int tx,
                              int ty,
                              bool topLevel = true);
+  virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
   IntRect selectionRect(bool clipToVisibleContent = true) const;
 

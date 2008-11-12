@@ -28,6 +28,7 @@
 
 #include "CachedResourceClient.h"
 #include "Document.h"
+#include "FloatQuad.h"
 #include "RenderStyle.h"
 #include "ScrollTypes.h"
 #include "VisiblePosition.h"
@@ -699,7 +700,11 @@ class RenderObject : public CachedResourceClient {
 
   // content area (box minus padding/border)
   IntRect contentBox() const;
+  // absolute coords of content area. Ignores transforms.
   IntRect absoluteContentBox() const;
+  // content rect converted to absolute coords, taking transforms into account
+  FloatQuad absoluteContentQuad() const;
+
   int contentWidth() const {
     return clientWidth() - paddingLeft() - paddingRight();
   }
@@ -748,6 +753,10 @@ class RenderObject : public CachedResourceClient {
     localPoint.move(0.0f, static_cast<float>(borderTopExtra()));
     return localToAbsolute(localPoint, fixed, useTransforms);
   }
+
+  // Convert a local quad to an absolute quad, taking transforms into account.
+  virtual FloatQuad localToAbsoluteQuad(const FloatQuad&,
+                                        bool fixed = false) const;
 
   // width and height are without margins but include paddings and borders
   virtual int width() const { return 0; }
@@ -873,7 +882,15 @@ class RenderObject : public CachedResourceClient {
                              int tx,
                              int ty,
                              bool topLevel = true);
-  IntRect absoluteBoundingBoxRect();
+  // FIXME: useTransforms should go away eventually
+  IntRect absoluteBoundingBoxRect(bool useTransforms = false);
+
+  // Build an array of quads in absolute coords for line boxes
+  virtual void collectAbsoluteLineBoxQuads(Vector<FloatQuad>&,
+                                           unsigned startOffset = 0,
+                                           unsigned endOffset = UINT_MAX,
+                                           bool useSelectionHeight = false);
+  virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
   // the rect that will be painted if this object is passed as the paintingRoot
   IntRect paintingRootRect(IntRect& topLevelRect);

@@ -209,7 +209,6 @@ FloatPoint RenderTableCell::localToAbsolute(FloatPoint localPoint,
     localPoint.move(-parent()->xPos(), -parent()->yPos());
   }
   return RenderBlock::localToAbsolute(localPoint, fixed, useTransforms);
-  ;
 }
 
 FloatPoint RenderTableCell::absoluteToLocal(FloatPoint containerPoint,
@@ -222,6 +221,16 @@ FloatPoint RenderTableCell::absoluteToLocal(FloatPoint containerPoint,
     localPoint.move(parent()->xPos(), parent()->yPos());
   }
   return localPoint;
+}
+
+FloatQuad RenderTableCell::localToAbsoluteQuad(const FloatQuad& localQuad,
+                                               bool fixed) const {
+  FloatQuad quad = localQuad;
+  if (parent()) {
+    // Rows are in the same coordinate space, so don't add their offset in.
+    quad.move(-parent()->xPos(), -parent()->yPos());
+  }
+  return RenderBlock::localToAbsoluteQuad(quad, fixed);
 }
 
 int RenderTableCell::baselinePosition(bool /*firstLine*/,

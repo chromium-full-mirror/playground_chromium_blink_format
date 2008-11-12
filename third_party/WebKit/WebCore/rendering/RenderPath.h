@@ -73,6 +73,7 @@ class RenderPath : public RenderObject {
                              int tx,
                              int ty,
                              bool topLevel = true);
+  virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
 
   virtual bool nodeAtPoint(const HitTestRequest&,
