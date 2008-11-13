@@ -2262,9 +2262,9 @@ class ScopeNode : public BlockNode {
   FunctionStack& functionStack() { return m_functionStack; }
 
   int neededConstants() {
-    // We may need 1 more constant than the count given by the parser,
-    // because of the various uses of jsUndefined().
-    return m_numConstants + 1;
+    // We may need 2 more constants than the count given by the parser,
+    // because of the various uses of jsUndefined() and jsNull().
+    return m_numConstants + 2;
   }
 
  protected:

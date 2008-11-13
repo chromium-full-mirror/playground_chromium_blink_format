@@ -353,14 +353,14 @@ class CodeGenerator {
 
   RegisterID* emitCall(RegisterID* dst,
                        RegisterID* func,
-                       RegisterID* base,
+                       RegisterID* thisRegister,
                        ArgumentsNode*,
                        unsigned divot,
                        unsigned startOffset,
                        unsigned endOffset);
   RegisterID* emitCallEval(RegisterID* dst,
                            RegisterID* func,
-                           RegisterID* base,
+                           RegisterID* thisRegister,
                            ArgumentsNode*,
                            unsigned divot,
                            unsigned startOffset,
@@ -465,9 +465,9 @@ class CodeGenerator {
       IdentifierStringMap;
 
   RegisterID* emitCall(OpcodeID,
-                       RegisterID*,
-                       RegisterID*,
-                       RegisterID*,
+                       RegisterID* dst,
+                       RegisterID* func,
+                       RegisterID* thisRegister,
                        ArgumentsNode*,
                        unsigned divot,
                        unsigned startOffset,

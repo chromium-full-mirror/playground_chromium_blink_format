@@ -67,7 +67,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   JSValue* exception;
 #if ENABLE(CTI)
-  void* throwReturnAddress;
+  void* exceptionLocation;
 #endif
 
   const HashTable* arrayTable;

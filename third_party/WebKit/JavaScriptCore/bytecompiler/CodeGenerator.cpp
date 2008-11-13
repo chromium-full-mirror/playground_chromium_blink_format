@@ -1270,41 +1270,55 @@ RegisterID* CodeGenerator::emitNewFunctionExpression(RegisterID* r0,
 
 RegisterID* CodeGenerator::emitCall(RegisterID* dst,
                                     RegisterID* func,
-                                    RegisterID* base,
+                                    RegisterID* thisRegister,
                                     ArgumentsNode* argumentsNode,
                                     unsigned divot,
                                     unsigned startOffset,
                                     unsigned endOffset) {
-  return emitCall(op_call, dst, func, base, argumentsNode, divot, startOffset,
-                  endOffset);
+  return emitCall(op_call, dst, func, thisRegister, argumentsNode, divot,
+                  startOffset, endOffset);
 }
 
 RegisterID* CodeGenerator::emitCallEval(RegisterID* dst,
                                         RegisterID* func,
-                                        RegisterID* base,
+                                        RegisterID* thisRegister,
                                         ArgumentsNode* argumentsNode,
                                         unsigned divot,
                                         unsigned startOffset,
                                         unsigned endOffset) {
-  return emitCall(op_call_eval, dst, func, base, argumentsNode, divot,
+  return emitCall(op_call_eval, dst, func, thisRegister, argumentsNode, divot,
                   startOffset, endOffset);
 }
 
 RegisterID* CodeGenerator::emitCall(OpcodeID opcodeID,
                                     RegisterID* dst,
                                     RegisterID* func,
-                                    RegisterID* base,
+                                    RegisterID* thisRegister,
                                     ArgumentsNode* argumentsNode,
                                     unsigned divot,
                                     unsigned startOffset,
                                     unsigned endOffset) {
   ASSERT(opcodeID == op_call || opcodeID == op_call_eval);
   ASSERT(func->refCount());
-  ASSERT(!base || base->refCount());
+
+  if (m_shouldEmitProfileHooks) {
+    // If codegen decided to recycle func as this call's destination register,
+    // we need to undo that optimization here so that func will still be around
+    // for the sake of op_profile_did_call.
+    if (dst == func) {
+      RefPtr<RegisterID> protect = thisRegister;
+      RefPtr<RegisterID> movedThisRegister =
+          emitMove(newTemporary(), thisRegister);
+      RefPtr<RegisterID> movedFunc = emitMove(thisRegister, func);
+
+      thisRegister = movedThisRegister.release().releaseRef();
+      func = movedFunc.release().releaseRef();
+    }
+  }
 
   // Generate code for arguments.
   Vector<RefPtr<RegisterID>, 16> argv;
-  argv.append(newTemporary());  // reserve space for "this"
+  argv.append(thisRegister);
   for (ArgumentListNode* n = argumentsNode->m_listNode.get(); n;
        n = n->m_next.get()) {
     argv.append(newTemporary());
@@ -1323,23 +1337,23 @@ RegisterID* CodeGenerator::emitCall(OpcodeID opcodeID,
 
   emitExpressionInfo(divot, startOffset, endOffset);
   m_codeBlock->callLinkInfos.append(CallLinkInfo());
+
+  // Emit call.
   emitOpcode(opcodeID);
-  instructions().append(dst->index());
-  instructions().append(func->index());
-  instructions().append(
-      base ? base->index()
-           : missingThisObjectMarker());  // We encode the "this" value in the
-                                          // instruction stream, to avoid an
-                                          // explicit instruction for copying or
-                                          // loading it.
-  instructions().append(argv[0]->index());  // argv
-  instructions().append(argv.size());       // argc
+  instructions().append(dst->index());   // dst
+  instructions().append(func->index());  // func
+  instructions().append(argv.size());    // argCount
   instructions().append(argv[0]->index() + argv.size() +
                         RegisterFile::CallFrameHeaderSize);  // registerOffset
 
   if (m_shouldEmitProfileHooks) {
     emitOpcode(op_profile_did_call);
     instructions().append(func->index());
+
+    if (dst == func) {
+      thisRegister->deref();
+      func->deref();
+    }
   }
 
   return dst;
@@ -1369,6 +1383,16 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
                                          unsigned endOffset) {
   ASSERT(func->refCount());
 
+  if (m_shouldEmitProfileHooks) {
+    // If codegen decided to recycle func as this call's destination register,
+    // we need to undo that optimization here so that func will still be around
+    // for the sake of op_profile_did_call.
+    if (dst == func) {
+      RefPtr<RegisterID> movedFunc = emitMove(newTemporary(), func);
+      func = movedFunc.release().releaseRef();
+    }
+  }
+
   RefPtr<RegisterID> funcProto = newTemporary();
 
   // Generate code for arguments.
@@ -1397,14 +1421,15 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
 
   emitExpressionInfo(divot, startOffset, endOffset);
   m_codeBlock->callLinkInfos.append(CallLinkInfo());
+
   emitOpcode(op_construct);
-  instructions().append(dst->index());
-  instructions().append(func->index());
-  instructions().append(funcProto->index());
-  instructions().append(argv[0]->index());  // argv
-  instructions().append(argv.size());       // argc
+  instructions().append(dst->index());   // dst
+  instructions().append(func->index());  // func
+  instructions().append(argv.size());    // argCount
   instructions().append(argv[0]->index() + argv.size() +
                         RegisterFile::CallFrameHeaderSize);  // registerOffset
+  instructions().append(funcProto->index());                 // proto
+  instructions().append(argv[0]->index());                   // thisRegister
 
   emitOpcode(op_construct_verify);
   instructions().append(dst->index());
@@ -1413,6 +1438,9 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
   if (m_shouldEmitProfileHooks) {
     emitOpcode(op_profile_did_call);
     instructions().append(func->index());
+
+    if (dst == func)
+      func->deref();
   }
 
   return dst;
