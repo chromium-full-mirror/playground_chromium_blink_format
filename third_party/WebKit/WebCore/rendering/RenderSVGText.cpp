@@ -85,7 +85,7 @@ void RenderSVGText::layout() {
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint) {
     oldBounds = m_absoluteBounds;
-    oldOutlineBox = absoluteOutlineBox();
+    oldOutlineBox = absoluteOutlineBounds();
   }
 
   // Best guess for a relative starting point

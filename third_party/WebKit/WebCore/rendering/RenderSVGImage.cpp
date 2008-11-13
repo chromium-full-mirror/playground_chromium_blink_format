@@ -145,7 +145,7 @@ void RenderSVGImage::layout() {
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint) {
     oldBounds = absoluteClippedOverflowRect();
-    oldOutlineBox = absoluteOutlineBox();
+    oldOutlineBox = absoluteOutlineBounds();
   }
 
   calculateLocalTransform();
