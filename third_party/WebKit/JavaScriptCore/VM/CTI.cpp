@@ -530,6 +530,26 @@ ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotJSCell(
   m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), opcodeIndex));
 }
 
+ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotJSCell(
+    X86Assembler::RegisterID reg,
+    unsigned opcodeIndex,
+    int vReg) {
+  if (m_codeBlock->isKnownNotImmediate(vReg))
+    return;
+
+  emitJumpSlowCaseIfNotJSCell(reg, opcodeIndex);
+}
+
+ALWAYS_INLINE bool CTI::linkSlowCaseIfNotJSCell(
+    const Vector<SlowCaseEntry>::iterator& iter,
+    int vReg) {
+  if (m_codeBlock->isKnownNotImmediate(vReg))
+    return false;
+
+  m_jit.link(iter->from, m_jit.label());
+  return true;
+}
+
 ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotImmNum(
     X86Assembler::RegisterID reg,
     unsigned opcodeIndex) {
@@ -931,7 +951,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
     m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::edx);
     X86Assembler::JmpSrc op2imm = m_jit.emitUnlinkedJne();
     if (!types.second().definitelyIsNumber()) {
-      emitJumpSlowCaseIfNotJSCell(X86::edx, i);
+      emitJumpSlowCaseIfNotJSCell(X86::edx, i, src2);
       m_jit.cmpl_i32m(reinterpret_cast<unsigned>(numberStructureID),
                       OBJECT_OFFSET(JSCell, m_structureID), X86::edx);
       m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), i));
@@ -942,7 +962,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
     m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
     X86Assembler::JmpSrc op1imm = m_jit.emitUnlinkedJne();
     if (!types.first().definitelyIsNumber()) {
-      emitJumpSlowCaseIfNotJSCell(X86::eax, i);
+      emitJumpSlowCaseIfNotJSCell(X86::eax, i, src1);
       m_jit.cmpl_i32m(reinterpret_cast<unsigned>(numberStructureID),
                       OBJECT_OFFSET(JSCell, m_structureID), X86::eax);
       m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), i));
@@ -983,7 +1003,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
     m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
     X86Assembler::JmpSrc op1imm = m_jit.emitUnlinkedJne();
     if (!types.first().definitelyIsNumber()) {
-      emitJumpSlowCaseIfNotJSCell(X86::eax, i);
+      emitJumpSlowCaseIfNotJSCell(X86::eax, i, src1);
       m_jit.cmpl_i32m(reinterpret_cast<unsigned>(numberStructureID),
                       OBJECT_OFFSET(JSCell, m_structureID), X86::eax);
       m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), i));
@@ -994,7 +1014,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
     m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::edx);
     X86Assembler::JmpSrc op2imm = m_jit.emitUnlinkedJne();
     if (!types.second().definitelyIsNumber()) {
-      emitJumpSlowCaseIfNotJSCell(X86::edx, i);
+      emitJumpSlowCaseIfNotJSCell(X86::edx, i, src2);
       m_jit.cmpl_i32m(reinterpret_cast<unsigned>(numberStructureID),
                       OBJECT_OFFSET(JSCell, m_structureID), X86::edx);
       m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), i));
@@ -1091,22 +1111,26 @@ void CTI::compileBinaryArithOpSlowCase(Instruction* vPC,
   m_jit.link(iter->from, here);
   if (types.second().isReusable() && isSSE2Present()) {
     if (!types.first().definitelyIsNumber()) {
-      m_jit.link((++iter)->from, here);
-      m_jit.link((++iter)->from, here);
+      if (linkSlowCaseIfNotJSCell(++iter, src2))
+        ++iter;
+      m_jit.link(iter->from, here);
     }
     if (!types.second().definitelyIsNumber()) {
-      m_jit.link((++iter)->from, here);
-      m_jit.link((++iter)->from, here);
+      if (linkSlowCaseIfNotJSCell(++iter, src1))
+        ++iter;
+      m_jit.link(iter->from, here);
     }
     m_jit.link((++iter)->from, here);
   } else if (types.first().isReusable() && isSSE2Present()) {
     if (!types.first().definitelyIsNumber()) {
-      m_jit.link((++iter)->from, here);
-      m_jit.link((++iter)->from, here);
+      if (linkSlowCaseIfNotJSCell(++iter, src1))
+        ++iter;
+      m_jit.link(iter->from, here);
     }
     if (!types.second().definitelyIsNumber()) {
-      m_jit.link((++iter)->from, here);
-      m_jit.link((++iter)->from, here);
+      if (linkSlowCaseIfNotJSCell(++iter, src2))
+        ++iter;
+      m_jit.link(iter->from, here);
     }
     m_jit.link((++iter)->from, here);
   } else
@@ -1290,20 +1314,23 @@ void CTI::privateCompileMainPass() {
         // such that the StructureID & offset are always at the same distance
         // from this.
 
-        emitGetArg(instruction[i + 1].u.operand, X86::eax, i);
+        int baseVReg = instruction[i + 1].u.operand;
+        emitGetArg(baseVReg, X86::eax, i);
         emitGetArg(instruction[i + 3].u.operand, X86::edx, i);
 
         ASSERT(m_codeBlock
                    ->propertyAccessInstructions[propertyAccessInstructionIndex]
                    .opcodeIndex == i);
+
+        // Jump to a slow case if either the base object is an immediate, or if
+        // the StructureID does not match.
+        emitJumpSlowCaseIfNotJSCell(X86::eax, i, baseVReg);
+
         X86Assembler::JmpDst hotPathBegin = m_jit.label();
         m_propertyAccessCompilationInfo[propertyAccessInstructionIndex]
             .hotPathBegin = hotPathBegin;
         ++propertyAccessInstructionIndex;
 
-        // Jump to a slow case if either the base object is an immediate, or if
-        // the StructureID does not match.
-        emitJumpSlowCaseIfNotJSCell(X86::eax, i);
         // It is important that the following instruction plants a 32bit
         // immediate, in order that it can be patched over.
         m_jit.cmpl_i32m(repatchGetByIdDefaultStructureID,
@@ -1334,18 +1361,20 @@ void CTI::privateCompileMainPass() {
         // the the property-map access offset as a label
         // to jump back to if one of these trampolies finds a match.
 
-        emitGetArg(instruction[i + 2].u.operand, X86::eax, i);
+        int baseVReg = instruction[i + 2].u.operand;
+        emitGetArg(baseVReg, X86::eax, i);
 
         ASSERT(m_codeBlock
                    ->propertyAccessInstructions[propertyAccessInstructionIndex]
                    .opcodeIndex == i);
+
+        emitJumpSlowCaseIfNotJSCell(X86::eax, i, baseVReg);
 
         X86Assembler::JmpDst hotPathBegin = m_jit.label();
         m_propertyAccessCompilationInfo[propertyAccessInstructionIndex]
             .hotPathBegin = hotPathBegin;
         ++propertyAccessInstructionIndex;
 
-        emitJumpSlowCaseIfNotJSCell(X86::eax, i);
         m_jit.cmpl_i32m(repatchGetByIdDefaultStructureID,
                         OBJECT_OFFSET(JSCell, m_structureID), X86::eax);
         ASSERT(X86Assembler::getDifferenceBetweenLabels(hotPathBegin,
@@ -1738,7 +1767,9 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_negate: {
-        emitGetArg(instruction[i + 2].u.operand, X86::eax, i);
+        int srcVReg = instruction[i + 2].u.operand;
+        emitGetArg(srcVReg, X86::eax, i);
+
         m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
         X86Assembler::JmpSrc notImmediate = m_jit.emitUnlinkedJe();
 
@@ -1765,7 +1796,7 @@ void CTI::privateCompileMainPass() {
           m_jit.link(notImmediate, m_jit.label());
           ResultType resultType(instruction[i + 3].u.resultType);
           if (!resultType.definitelyIsNumber()) {
-            emitJumpSlowCaseIfNotJSCell(X86::eax, i);
+            emitJumpSlowCaseIfNotJSCell(X86::eax, i, srcVReg);
             StructureID* numberStructureID =
                 m_globalData->numberStructureID.get();
             m_jit.cmpl_i32m(reinterpret_cast<unsigned>(numberStructureID),
@@ -2246,12 +2277,13 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_to_jsnumber: {
-        emitGetArg(instruction[i + 2].u.operand, X86::eax, i);
+        int srcVReg = instruction[i + 2].u.operand;
+        emitGetArg(srcVReg, X86::eax, i);
 
         m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
         X86Assembler::JmpSrc wasImmediate = m_jit.emitUnlinkedJnz();
 
-        emitJumpSlowCaseIfNotJSCell(X86::eax, i);
+        emitJumpSlowCaseIfNotJSCell(X86::eax, i, srcVReg);
 
         m_jit.movl_mr(OBJECT_OFFSET(JSCell, m_structureID), X86::eax, X86::ecx);
         m_jit.cmpl_i32m(NumberType,
@@ -2582,6 +2614,18 @@ void CTI::privateCompileLinkPass() {
     break;                                                    \
   }
 
+#define CTI_COMPILE_BINARY_OP_SLOW_CASE_DOUBLE_ENTRY(name)    \
+  case name: {                                                \
+    m_jit.link(iter->from, m_jit.label());                    \
+    m_jit.link((++iter)->from, m_jit.label());                \
+    emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx); \
+    emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx); \
+    emitCTICall(instruction + i, i, Machine::cti_##name);     \
+    emitPutResult(instruction[i + 1].u.operand);              \
+    i += 4;                                                   \
+    break;                                                    \
+  }
+
 void CTI::privateCompileSlowCases() {
   unsigned propertyAccessInstructionIndex = 0;
   unsigned callLinkInfoIndex = 0;
@@ -2593,6 +2637,10 @@ void CTI::privateCompileSlowCases() {
     killLastResultRegister();
 
     unsigned i = iter->to;
+#ifndef NDEBUG
+    unsigned firstTo = i;
+#endif
+
     switch (OpcodeID opcodeID =
                 m_machine->getOpcodeID(instruction[i].u.opcode)) {
       case op_convert_this: {
@@ -2687,6 +2735,14 @@ void CTI::privateCompileSlowCases() {
       }
       case op_negate: {
         m_jit.link(iter->from, m_jit.label());
+        m_jit.link((++iter)->from, m_jit.label());
+        ResultType resultType(instruction[i + 3].u.resultType);
+        if (!resultType.definitelyIsNumber()) {
+          if (linkSlowCaseIfNotJSCell(++iter, instruction[i + 2].u.operand))
+            ++iter;
+          m_jit.link(iter->from, m_jit.label());
+        }
+
         emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_negate);
         emitPutResult(instruction[i + 1].u.operand);
@@ -2744,8 +2800,9 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_put_by_id: {
+        if (linkSlowCaseIfNotJSCell(iter, instruction[i + 1].u.operand))
+          ++iter;
         m_jit.link(iter->from, m_jit.label());
-        m_jit.link((++iter)->from, m_jit.label());
 
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
@@ -2778,8 +2835,9 @@ void CTI::privateCompileSlowCases() {
         // To do so we can subtract back
         // the distance from the call to the head of the slow case.
 
+        if (linkSlowCaseIfNotJSCell(iter, instruction[i + 2].u.operand))
+          ++iter;
         m_jit.link(iter->from, m_jit.label());
-        m_jit.link((++iter)->from, m_jit.label());
 
 #ifndef NDEBUG
         X86Assembler::JmpDst coldPathBegin = m_jit.label();
@@ -3042,10 +3100,12 @@ void CTI::privateCompileSlowCases() {
         i += 4;
         break;
       }
-        CTI_COMPILE_BINARY_OP_SLOW_CASE(op_stricteq);
-        CTI_COMPILE_BINARY_OP_SLOW_CASE(op_nstricteq);
+        CTI_COMPILE_BINARY_OP_SLOW_CASE_DOUBLE_ENTRY(op_stricteq);
+        CTI_COMPILE_BINARY_OP_SLOW_CASE_DOUBLE_ENTRY(op_nstricteq);
       case op_instanceof: {
         m_jit.link(iter->from, m_jit.label());
+        m_jit.link((++iter)->from, m_jit.label());
+        m_jit.link((++iter)->from, m_jit.label());
         emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
         emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
         emitGetPutArg(instruction[i + 4].u.operand, 8, X86::ecx);
@@ -3078,6 +3138,7 @@ void CTI::privateCompileSlowCases() {
         int32_t value;
         if (src1Value && ((value = JSImmediate::intValue(src1Value)) > 0)) {
           m_jit.link(iter->from, m_jit.label());
+          m_jit.link((++iter)->from, m_jit.label());
           // There is an extra slow case for (op1 * -N) or (-N * op2), to check
           // for 0 since this should produce a result of -0.
           emitGetPutArg(src1, 0, X86::ecx);
@@ -3087,6 +3148,7 @@ void CTI::privateCompileSlowCases() {
         } else if (src2Value &&
                    ((value = JSImmediate::intValue(src2Value)) > 0)) {
           m_jit.link(iter->from, m_jit.label());
+          m_jit.link((++iter)->from, m_jit.label());
           // There is an extra slow case for (op1 * -N) or (-N * op2), to check
           // for 0 since this should produce a result of -0.
           emitGetPutArg(src1, 0, X86::ecx);
@@ -3267,7 +3329,8 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_to_jsnumber: {
-        m_jit.link(iter->from, m_jit.label());
+        if (linkSlowCaseIfNotJSCell(iter, instruction[i + 2].u.operand))
+          ++iter;
         m_jit.link(iter->from, m_jit.label());
 
         emitPutArg(X86::eax, 0);
@@ -3282,6 +3345,12 @@ void CTI::privateCompileSlowCases() {
         ASSERT_NOT_REACHED();
         break;
     }
+
+    ASSERT_WITH_MESSAGE(
+        (iter + 1) == m_slowCases.end() || firstTo != (iter + 1)->to,
+        "Not enough jumps linked in slow case codegen.");
+    ASSERT_WITH_MESSAGE(firstTo == iter->to,
+                        "Too many jumps linked in slow case codegen.");
 
     m_jit.link(m_jit.emitUnlinkedJmp(), m_labels[i]);
   }

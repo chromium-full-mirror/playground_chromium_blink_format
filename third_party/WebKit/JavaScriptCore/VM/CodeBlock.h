@@ -253,6 +253,16 @@ struct CodeBlock {
     linkedCallerList.shrink(lastPos);
   }
 
+  inline bool isKnownNotImmediate(int index) {
+    if (index == thisRegister)
+      return true;
+
+    if (isConstantRegisterIndex(index))
+      return !JSImmediate::isImmediate(getConstant(index));
+
+    return false;
+  }
+
   ALWAYS_INLINE bool isConstantRegisterIndex(int index) {
     return index >= numVars && index < numVars + numConstants;
   }
