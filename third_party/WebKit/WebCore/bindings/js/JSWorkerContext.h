@@ -43,6 +43,10 @@ class JSWorkerContext : public JSDOMGlobalObject {
   virtual ~JSWorkerContext();
 
   static JSC::JSObject* createPrototype(JSC::ExecState*);
+  virtual void put(JSC::ExecState*,
+                   const JSC::Identifier& propertyName,
+                   JSC::JSValue*,
+                   JSC::PutPropertySlot&);
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   const JSC::Identifier& propertyName,
                                   JSC::PropertySlot&);

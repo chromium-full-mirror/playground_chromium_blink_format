@@ -38,35 +38,41 @@
 
 namespace WebCore {
 
-class CloseMessagePortTimer : public TimerBase {
+class MessagePortCloseEventTask : public ScriptExecutionContext::Task {
  public:
-  CloseMessagePortTimer(PassRefPtr<MessagePort> port) : m_port(port) {
-    ASSERT(m_port);
+  static PassRefPtr<MessagePortCloseEventTask> create(
+      PassRefPtr<MessagePort> port) {
+    return adoptRef(new MessagePortCloseEventTask(port));
   }
 
  private:
-  virtual void fired() {
+  MessagePortCloseEventTask(PassRefPtr<MessagePort> port) : m_port(port) {
+    ASSERT(m_port);
+  }
+
+  virtual void performTask(ScriptExecutionContext* context) {
     ASSERT(!m_port->active());
+    ASSERT(context == m_port->scriptExecutionContext());
 
     // Closing may destroy the port, dispatch any remaining messages now.
     if (m_port->queueIsOpen())
       m_port->dispatchMessages();
 
     m_port->dispatchCloseEvent();
-    delete this;
   }
 
   RefPtr<MessagePort> m_port;
 };
 
-MessagePort::EventData::EventData() {}
+PassRefPtr<MessagePort::EventData> MessagePort::EventData::create(
+    const String& message,
+    PassRefPtr<MessagePort> port) {
+  return adoptRef(new EventData(message, port));
+}
 
 MessagePort::EventData::EventData(const String& message,
-                                  PassRefPtr<DOMWindow> window,
                                   PassRefPtr<MessagePort> messagePort)
-    : message(message.copy()), window(window), messagePort(messagePort) {
-  ASSERT(!this->window || isMainThread());
-}
+    : message(message.copy()), messagePort(messagePort) {}
 
 MessagePort::EventData::~EventData() {}
 
@@ -74,9 +80,9 @@ MessagePort::MessagePort(ScriptExecutionContext* scriptExecutionContext)
     : m_entangledPort(0),
       m_queueIsOpen(false),
       m_scriptExecutionContext(scriptExecutionContext),
-      m_pendingCloseEvent(false),
-      m_jsWrapperIsInaccessible(false) {
-  scriptExecutionContext->createdMessagePort(this);
+      m_pendingCloseEvent(false) {
+  if (scriptExecutionContext)
+    scriptExecutionContext->createdMessagePort(this);
 }
 
 MessagePort::~MessagePort() {
@@ -87,15 +93,14 @@ MessagePort::~MessagePort() {
     m_scriptExecutionContext->destroyedMessagePort(this);
 }
 
-PassRefPtr<MessagePort> MessagePort::clone(ScriptExecutionContext* newOwner,
-                                           ExceptionCode& ec) {
+PassRefPtr<MessagePort> MessagePort::clone(ExceptionCode& ec) {
   if (!m_entangledPort) {
     ec = INVALID_STATE_ERR;
     return 0;
   }
 
   RefPtr<MessagePort> remotePort = m_entangledPort;
-  RefPtr<MessagePort> newPort = MessagePort::create(newOwner);
+  RefPtr<MessagePort> newPort = MessagePort::create(0);
 
   // Move all the events in the port message queue of original port to the port
   // message queue of new port, if any, leaving the new port's port message
@@ -103,7 +108,7 @@ PassRefPtr<MessagePort> MessagePort::clone(ScriptExecutionContext* newOwner,
   // If events are posted (e.g. from a worker thread) while this code is
   // executing, there is no guarantee whether they end up in the original or new
   // port's message queue.
-  EventData eventData;
+  RefPtr<EventData> eventData;
   while (m_messageQueue.tryGetMessage(eventData))
     newPort->m_messageQueue.append(eventData);
 
@@ -119,8 +124,7 @@ void MessagePort::postMessage(const String& message, ExceptionCode& ec) {
 void MessagePort::postMessage(const String& message,
                               MessagePort* dataPort,
                               ExceptionCode& ec) {
-  if (!m_entangledPort || !m_scriptExecutionContext ||
-      !m_entangledPort->m_scriptExecutionContext)
+  if (!m_entangledPort || !m_scriptExecutionContext)
     return;
 
   RefPtr<MessagePort> newMessagePort;
@@ -129,20 +133,15 @@ void MessagePort::postMessage(const String& message,
       ec = INVALID_ACCESS_ERR;
       return;
     }
-    newMessagePort =
-        dataPort->clone(m_entangledPort->m_scriptExecutionContext, ec);
+    newMessagePort = dataPort->clone(ec);
     if (ec)
       return;
   }
 
-  DOMWindow* window =
-      (m_scriptExecutionContext->isDocument() &&
-       m_entangledPort->m_scriptExecutionContext->isDocument())
-          ? static_cast<Document*>(m_scriptExecutionContext)->domWindow()
-          : 0;
   m_entangledPort->m_messageQueue.append(
-      EventData(message, window, newMessagePort));
-  if (m_entangledPort->m_queueIsOpen)
+      EventData::create(message, newMessagePort));
+  if (m_entangledPort->m_queueIsOpen &&
+      m_entangledPort->m_scriptExecutionContext)
     m_entangledPort->m_scriptExecutionContext->processMessagePortMessagesSoon();
 }
 
@@ -150,21 +149,15 @@ PassRefPtr<MessagePort> MessagePort::startConversation(
     ScriptExecutionContext* scriptExecutionContext,
     const String& message) {
   RefPtr<MessagePort> port1 = MessagePort::create(scriptExecutionContext);
-  if (!m_entangledPort || !m_scriptExecutionContext ||
-      !m_entangledPort->m_scriptExecutionContext)
+  if (!m_entangledPort || !m_scriptExecutionContext)
     return port1;
-  RefPtr<MessagePort> port2 =
-      MessagePort::create(m_entangledPort->m_scriptExecutionContext);
+  RefPtr<MessagePort> port2 = MessagePort::create(0);
 
   entangle(port1.get(), port2.get());
 
-  DOMWindow* window =
-      (m_scriptExecutionContext->isDocument() &&
-       m_entangledPort->m_scriptExecutionContext->isDocument())
-          ? static_cast<Document*>(m_scriptExecutionContext)->domWindow()
-          : 0;
-  m_entangledPort->m_messageQueue.append(EventData(message, window, port2));
-  if (m_entangledPort->m_queueIsOpen)
+  m_entangledPort->m_messageQueue.append(EventData::create(message, port2));
+  if (m_entangledPort->m_queueIsOpen &&
+      m_entangledPort->m_scriptExecutionContext)
     m_entangledPort->m_scriptExecutionContext->processMessagePortMessagesSoon();
   return port1;
 }
@@ -211,6 +204,8 @@ void MessagePort::unentangle() {
 }
 
 void MessagePort::contextDestroyed() {
+  ASSERT(m_scriptExecutionContext);
+
   if (m_entangledPort) {
     RefPtr<MessagePort> survivingPort = m_entangledPort;
     unentangle();
@@ -222,18 +217,37 @@ void MessagePort::contextDestroyed() {
   m_scriptExecutionContext = 0;
 }
 
+void MessagePort::attachToContext(
+    ScriptExecutionContext* scriptExecutionContext) {
+  ASSERT(!m_scriptExecutionContext);
+  ASSERT(!m_queueIsOpen);
+
+  m_scriptExecutionContext = scriptExecutionContext;
+  m_scriptExecutionContext->createdMessagePort(this);
+
+  // FIXME: Need to call processMessagePortMessagesSoon()?
+}
+
+ScriptExecutionContext* MessagePort::scriptExecutionContext() const {
+  return m_scriptExecutionContext;
+}
+
 void MessagePort::dispatchMessages() {
   // Messages for contexts that are not fully active get dispatched too, but
   // JSAbstractEventListener::handleEvent() doesn't call handlers for these.
+  // FIXME: Such messages should be dispatched if the document returns from page
+  // cache. They are only allowed to be lost if the document is discarded.
   ASSERT(queueIsOpen());
 
-  EventData eventData;
+  RefPtr<EventData> eventData;
   while (m_messageQueue.tryGetMessage(eventData)) {
-    ASSERT(!eventData.window || isMainThread());
-    ASSERT(!eventData.window || scriptExecutionContext()->isDocument());
+    ASSERT(!eventData->messagePort ||
+           !eventData->messagePort->m_scriptExecutionContext);
+    if (eventData->messagePort)
+      eventData->messagePort->attachToContext(m_scriptExecutionContext);
 
-    RefPtr<Event> evt = MessageEvent::create(
-        eventData.message, "", "", eventData.window, eventData.messagePort);
+    RefPtr<Event> evt = MessageEvent::create(eventData->message, "", "", 0,
+                                             eventData->messagePort);
 
     if (m_onMessageListener) {
       evt->setTarget(this);
@@ -251,8 +265,7 @@ void MessagePort::queueCloseEvent() {
   ASSERT(!m_pendingCloseEvent);
   m_pendingCloseEvent = true;
 
-  CloseMessagePortTimer* timer = new CloseMessagePortTimer(this);
-  timer->startOneShot(0);
+  m_scriptExecutionContext->postTask(MessagePortCloseEventTask::create(this));
 }
 
 void MessagePort::dispatchCloseEvent() {
@@ -327,9 +340,10 @@ bool MessagePort::dispatchEvent(PassRefPtr<Event> event, ExceptionCode& ec) {
 }
 
 bool MessagePort::hasPendingActivity() {
-  // We only care about the result of this function when there is no entangled
-  // port, or it is inaccessible, so no more messages can be added to the queue.
-  // Thus, using MessageQueue::isEmpty() does not cause a race condition here.
+  // In multi-threaded case, messages can be added to the queue asynchronously,
+  // but this can only happen if there is an accessible
+  // entangled port, in which case markCrossHeapDependentObjectsForContext will
+  // prevent collecting the port.
   return m_pendingCloseEvent || (m_queueIsOpen && !m_messageQueue.isEmpty());
 }
 
