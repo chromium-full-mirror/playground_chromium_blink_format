@@ -48,8 +48,6 @@
 
 namespace WebCore {
 
-static const double cAnimationTimerDelay = 0.025;
-
 // The epsilon value we pass to UnitBezier::solve given that the animation is
 // going to run over |dur| seconds. The longer the
 // animation, the more precision we need in the timing function result to avoid
@@ -528,7 +526,6 @@ AnimationBase::AnimationBase(const Animation* transition,
                              RenderObject* renderer,
                              CompositeAnimation* compAnim)
     : m_animState(AnimationStateNew),
-      m_iteration(0),
       m_isAnimating(false),
       m_waitedForResponse(false),
       m_startTime(0),
@@ -626,7 +623,7 @@ double AnimationBase::duration() const {
 }
 
 bool AnimationBase::playStatePlaying() const {
-  return m_animation && m_animation->playState() == AnimPlayStatePlaying;
+  return m_animation->playState() == AnimPlayStatePlaying;
 }
 
 bool AnimationBase::animationsMatch(const Animation* anim) const {
