@@ -273,6 +273,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
   void microFocusChanged();
   void contentsChanged();
+  void exceededDatabaseQuota(QWebFrame* frame, QString databaseName);
 
  protected:
   virtual QWebPage* createWindow(WebWindowType type);

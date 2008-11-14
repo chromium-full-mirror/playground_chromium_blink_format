@@ -58,7 +58,10 @@ class QWEBKIT_EXPORT QWebSettings {
     DeveloperExtrasEnabled,
     LinksIncludedInFocusChain,
     ZoomTextOnly,
-    PrintBackgroundElements
+    PrintBackgroundElements,
+    OfflineStorageDatabaseEnabled,
+    OfflineWebApplicationCacheEnabled,
+    LocalStorageDatabaseEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,
@@ -103,6 +106,17 @@ class QWEBKIT_EXPORT QWebSettings {
   static void setObjectCacheCapacities(int cacheMinDeadCapacity,
                                        int cacheMaxDead,
                                        int totalCapacity);
+
+  static void setOfflineStoragePath(const QString& path);
+  static QString offlineStoragePath();
+  static void setOfflineStorageDefaultQuota(qint64 maximumSize);
+  static qint64 offlineStorageDefaultQuota();
+
+  static void setOfflineWebApplicationCachePath(const QString& path);
+  static QString offlineWebApplicationCachePath();
+
+  void setLocalStorageDatabasePath(const QString& path);
+  QString localStorageDatabasePath() const;
 
  private:
   friend class QWebPagePrivate;
