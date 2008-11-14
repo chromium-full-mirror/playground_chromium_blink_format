@@ -28,6 +28,7 @@
 
 #include "AtomicString.h"
 #include "CSSPropertyNames.h"
+#include "CSSValueKeywords.h"
 #include "CreateLinkCommand.h"
 #include "DocumentFragment.h"
 #include "Editor.h"
@@ -240,6 +241,16 @@ static TriState stateStyle(Frame* frame,
 
 static String valueStyle(Frame* frame, int propertyID) {
   return frame->selectionStartStylePropertyValue(propertyID);
+}
+
+static TriState stateTextWritingDirection(Frame* frame,
+                                          WritingDirection direction) {
+  bool hasNestedOrMultipleEmbeddings;
+  WritingDirection selectionDirection =
+      frame->editor()->textDirectionForSelection(hasNestedOrMultipleEmbeddings);
+  return (selectionDirection == direction && !hasNestedOrMultipleEmbeddings)
+             ? TrueTriState
+             : FalseTriState;
 }
 
 static int verticalScrollDistance(Frame* frame) {
@@ -689,6 +700,43 @@ static bool executeJustifyRight(Frame* frame,
                                 const String&) {
   return executeApplyParagraphStyle(frame, source, EditActionAlignRight,
                                     CSSPropertyTextAlign, "right");
+}
+
+static bool executeMakeTextWritingDirectionLeftToRight(
+    Frame* frame,
+    Event*,
+    EditorCommandSource source,
+    const String&) {
+  RefPtr<CSSMutableStyleDeclaration> style =
+      CSSMutableStyleDeclaration::create();
+  style->setProperty(CSSPropertyUnicodeBidi, CSSValueEmbed);
+  style->setProperty(CSSPropertyDirection, CSSValueLtr);
+  frame->editor()->applyStyle(style.get(), EditActionSetWritingDirection);
+  return true;
+}
+
+static bool executeMakeTextWritingDirectionNatural(Frame* frame,
+                                                   Event*,
+                                                   EditorCommandSource source,
+                                                   const String&) {
+  RefPtr<CSSMutableStyleDeclaration> style =
+      CSSMutableStyleDeclaration::create();
+  style->setProperty(CSSPropertyUnicodeBidi, CSSValueNormal);
+  frame->editor()->applyStyle(style.get(), EditActionSetWritingDirection);
+  return true;
+}
+
+static bool executeMakeTextWritingDirectionRightToLeft(
+    Frame* frame,
+    Event*,
+    EditorCommandSource source,
+    const String&) {
+  RefPtr<CSSMutableStyleDeclaration> style =
+      CSSMutableStyleDeclaration::create();
+  style->setProperty(CSSPropertyUnicodeBidi, CSSValueEmbed);
+  style->setProperty(CSSPropertyDirection, CSSValueRtl);
+  frame->editor()->applyStyle(style.get(), EditActionSetWritingDirection);
+  return true;
 }
 
 static bool executeMoveBackward(Frame* frame,
@@ -1489,6 +1537,18 @@ static TriState stateSuperscript(Frame* frame, Event*) {
   return stateStyle(frame, CSSPropertyVerticalAlign, "super");
 }
 
+static TriState stateTextWritingDirectionLeftToRight(Frame* frame, Event*) {
+  return stateTextWritingDirection(frame, LeftToRightWritingDirection);
+}
+
+static TriState stateTextWritingDirectionNatural(Frame* frame, Event*) {
+  return stateTextWritingDirection(frame, NaturalWritingDirection);
+}
+
+static TriState stateTextWritingDirectionRightToLeft(Frame* frame, Event*) {
+  return stateTextWritingDirection(frame, RightToLeftWritingDirection);
+}
+
 static TriState stateUnderline(Frame* frame, Event*) {
   return stateStyle(frame, CSSPropertyTextDecoration, "underline");
 }
@@ -1705,6 +1765,20 @@ static const CommandMap& createCommandMap() {
       {"JustifyRight",
        {executeJustifyRight, supported, enabledInRichlyEditableText, stateNone,
         valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
+      {"MakeTextWritingDirectionLeftToRight",
+       {executeMakeTextWritingDirectionLeftToRight,
+        supportedFromMenuOrKeyBinding, enabledInRichlyEditableText,
+        stateTextWritingDirectionLeftToRight, valueNull, notTextInsertion,
+        doNotAllowExecutionWhenDisabled}},
+      {"MakeTextWritingDirectionNatural",
+       {executeMakeTextWritingDirectionNatural, supportedFromMenuOrKeyBinding,
+        enabledInRichlyEditableText, stateTextWritingDirectionNatural,
+        valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
+      {"MakeTextWritingDirectionRightToLeft",
+       {executeMakeTextWritingDirectionRightToLeft,
+        supportedFromMenuOrKeyBinding, enabledInRichlyEditableText,
+        stateTextWritingDirectionRightToLeft, valueNull, notTextInsertion,
+        doNotAllowExecutionWhenDisabled}},
       {"MoveBackward",
        {executeMoveBackward, supportedFromMenuOrKeyBinding,
         enabledInEditableText, stateNone, valueNull, notTextInsertion,

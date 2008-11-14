@@ -43,6 +43,12 @@ enum EditableLinkBehavior {
   EditableLinkNeverLive
 };
 
+enum TextDirectionSubmenuInclusionBehavior {
+  TextDirectionSubmenuNeverIncluded,
+  TextDirectionSubmenuAutomaticallyIncluded,
+  TextDirectionSubmenuAlwaysIncluded
+};
+
 class Settings {
  public:
   Settings(Page*);
@@ -126,6 +132,13 @@ class Settings {
   void setEditableLinkBehavior(EditableLinkBehavior);
   EditableLinkBehavior editableLinkBehavior() const {
     return m_editableLinkBehavior;
+  }
+
+  void setTextDirectionSubmenuInclusionBehavior(
+      TextDirectionSubmenuInclusionBehavior);
+  TextDirectionSubmenuInclusionBehavior textDirectionSubmenuInclusionBehavior()
+      const {
+    return m_textDirectionSubmenuInclusionBehavior;
   }
 
 #if ENABLE(DASHBOARD_SUPPORT)
@@ -243,6 +256,7 @@ class Settings {
   AtomicString m_cursiveFontFamily;
   AtomicString m_fantasyFontFamily;
   EditableLinkBehavior m_editableLinkBehavior;
+  TextDirectionSubmenuInclusionBehavior m_textDirectionSubmenuInclusionBehavior;
   int m_minimumFontSize;
   int m_minimumLogicalFontSize;
   int m_defaultFontSize;

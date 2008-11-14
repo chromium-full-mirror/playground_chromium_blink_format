@@ -318,6 +318,8 @@ class RenderBlock : public RenderFlow {
     return static_cast<RootInlineBox*>(lastLineBox());
   }
 
+  bool containsNonZeroBidiLevel() const;
+
   // Obtains the nearest enclosing block (including this block) that contributes
   // a first-line style to our inline
   // children.

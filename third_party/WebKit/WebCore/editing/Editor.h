@@ -126,6 +126,7 @@ class Editor {
 
   TriState selectionHasStyle(CSSStyleDeclaration*) const;
   const SimpleFontData* fontForSelection(bool&) const;
+  WritingDirection textDirectionForSelection(bool&) const;
 
   TriState selectionUnorderedListState() const;
   TriState selectionOrderedListState() const;
@@ -240,6 +241,8 @@ class Editor {
   void setBaseWritingDirection(WritingDirection);
 
   bool smartInsertDeleteEnabled();
+
+  bool hasBidiSelection() const;
 
   // international text input composition
   bool hasComposition() const { return m_compositionNode; }

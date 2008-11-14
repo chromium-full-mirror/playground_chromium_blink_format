@@ -4805,6 +4805,17 @@ int RenderBlock::getBaselineOfLastLineBox() const {
   return -1;
 }
 
+bool RenderBlock::containsNonZeroBidiLevel() const {
+  for (RootInlineBox* root = firstRootBox(); root; root = root->nextRootBox()) {
+    for (InlineBox* box = root->firstLeafChild(); box;
+         box = box->nextLeafChild()) {
+      if (box->bidiLevel())
+        return true;
+    }
+  }
+  return false;
+}
+
 RenderBlock* RenderBlock::firstLineBlock() const {
   const RenderObject* firstLineBlock = this;
   bool hasPseudo = false;

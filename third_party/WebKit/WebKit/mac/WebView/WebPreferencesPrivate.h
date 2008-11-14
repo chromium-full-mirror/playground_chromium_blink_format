@@ -37,6 +37,12 @@ typedef enum {
   WebKitEditableLinkNeverLive
 } WebKitEditableLinkBehavior;
 
+typedef enum {
+  WebTextDirectionSubmenuNeverIncluded,
+  WebTextDirectionSubmenuAutomaticallyIncluded,
+  WebTextDirectionSubmenuAlwaysIncluded
+} WebTextDirectionSubmenuInclusionBehavior;
+
 extern NSString* WebPreferencesChangedNotification;
 extern NSString* WebPreferencesRemovedNotification;
 
@@ -93,6 +99,11 @@ extern NSString* WebPreferencesRemovedNotification;
 
 - (WebKitEditableLinkBehavior)editableLinkBehavior;
 - (void)setEditableLinkBehavior:(WebKitEditableLinkBehavior)behavior;
+
+- (WebTextDirectionSubmenuInclusionBehavior)
+    textDirectionSubmenuInclusionBehavior;
+- (void)setTextDirectionSubmenuInclusionBehavior:
+    (WebTextDirectionSubmenuInclusionBehavior)behavior;
 
 // If site-specific spoofing is enabled, some pages that do inappropriate
 // user-agent string checks will be

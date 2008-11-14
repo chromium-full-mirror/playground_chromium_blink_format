@@ -237,6 +237,11 @@ void Settings::setEditableLinkBehavior(
   m_editableLinkBehavior = editableLinkBehavior;
 }
 
+void Settings::setTextDirectionSubmenuInclusionBehavior(
+    TextDirectionSubmenuInclusionBehavior behavior) {
+  m_textDirectionSubmenuInclusionBehavior = behavior;
+}
+
 #if ENABLE(DASHBOARD_SUPPORT)
 void Settings::setUsesDashboardBackwardCompatibilityMode(
     bool usesDashboardBackwardCompatibilityMode) {

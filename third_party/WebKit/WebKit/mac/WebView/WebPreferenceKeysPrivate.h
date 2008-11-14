@@ -107,6 +107,8 @@
   @"WebKitUseSiteSpecificSpoofing"
 #define WebKitEditableLinkBehaviorPreferenceKey @"WebKitEditableLinkBehavior"
 #define WebKitCacheModelPreferenceKey @"WebKitCacheModelPreferenceKey"
+#define WebKitTextDirectionSubmenuInclusionBehaviorPreferenceKey \
+  @"WebKitTextDirectionSubmenuInclusionBehaviorPreferenceKey"
 
 // CoreGraphics deferred updates are disabled if
 // WebKitEnableCoalescedUpdatesPreferenceKey is set
