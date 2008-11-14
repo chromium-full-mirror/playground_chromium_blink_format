@@ -2180,12 +2180,16 @@ void FrameLoader::setupForReplaceByMIMEType(const String& newMIMEType) {
   activeDocumentLoader()->setupForReplaceByMIMEType(newMIMEType);
 }
 
-void FrameLoader::loadFrameRequestWithFormState(
+void FrameLoader::loadFrameRequestWithFormAndValues(
     const FrameLoadRequest& request,
     bool lockHistory,
     Event* event,
-    PassRefPtr<FormState> prpFormState) {
-  RefPtr<FormState> formState = prpFormState;
+    HTMLFormElement* submitForm,
+    const HashMap<String, String>& formValues) {
+  RefPtr<FormState> formState;
+  if (submitForm)
+    formState = FormState::create(submitForm, formValues, m_frame);
+
   KURL url = request.resourceRequest().url();
 
   String referrer;
@@ -2227,20 +2231,6 @@ void FrameLoader::loadFrameRequestWithFormState(
   if (targetFrame && targetFrame != m_frame)
     if (Page* page = targetFrame->page())
       page->chrome()->focus();
-}
-
-void FrameLoader::loadFrameRequestWithFormAndValues(
-    const FrameLoadRequest& request,
-    bool lockHistory,
-    Event* event,
-    HTMLFormElement* submitForm,
-    const HashMap<String, String>& formValues) {
-  RefPtr<FormState> formState;
-  if (submitForm)
-    formState = FormState::create(submitForm, formValues, m_frame);
-
-  loadFrameRequestWithFormState(request, lockHistory, event,
-                                formState.release());
 }
 
 void FrameLoader::loadURL(const KURL& newURL,

@@ -184,10 +184,6 @@ class FrameLoader : Noncopyable
                PassRefPtr<FormState> prpFormState);
   void loadURLIntoChildFrame(const KURL&, const String& referer, Frame*);
 
-  void loadFrameRequestWithFormState(const FrameLoadRequest&,
-                                     bool lockHistory,
-                                     Event*,
-                                     PassRefPtr<FormState>);
   void loadFrameRequestWithFormAndValues(
       const FrameLoadRequest&,
       bool lockHistory,  // Called by submitForm, calls loadPostRequest()
