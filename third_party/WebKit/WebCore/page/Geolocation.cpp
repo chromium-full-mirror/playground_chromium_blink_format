@@ -49,7 +49,7 @@ void Geolocation::GeoNotifier::timerFired(Timer<GeoNotifier>*) {
   m_timer.stop();
 
   RefPtr<PositionError> error =
-      PositionError::create(PositionError::TIMEOUT_ERROR, "Timed out");
+      PositionError::create(PositionError::TIMEOUT, "Timed out");
   m_errorCallback->handleEvent(error.get());
 }
 
@@ -76,7 +76,7 @@ void Geolocation::getCurrentPosition(
   if (!m_service->startUpdating(options)) {
     if (notifier->m_errorCallback) {
       RefPtr<PositionError> error = PositionError::create(
-          PositionError::PERMISSION_ERROR, "Unable to Start");
+          PositionError::PERMISSION_DENIED, "Unable to Start");
       notifier->m_errorCallback->handleEvent(error.get());
     }
     return;
@@ -94,7 +94,7 @@ int Geolocation::watchPosition(PassRefPtr<PositionCallback> successCallback,
   if (!m_service->startUpdating(options)) {
     if (notifier->m_errorCallback) {
       RefPtr<PositionError> error = PositionError::create(
-          PositionError::PERMISSION_ERROR, "Unable to Start");
+          PositionError::PERMISSION_DENIED, "Unable to Start");
       notifier->m_errorCallback->handleEvent(error.get());
     }
     return 0;
