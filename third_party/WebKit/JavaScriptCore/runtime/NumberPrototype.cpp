@@ -110,7 +110,7 @@ NumberPrototype::NumberPrototype(ExecState* exec,
 static UString integerPartNoExp(double d) {
   int decimalPoint;
   int sign;
-  char* result = dtoa(d, 0, &decimalPoint, &sign, NULL);
+  char* result = WTF::dtoa(d, 0, &decimalPoint, &sign, NULL);
   bool resultIsInfOrNan = (decimalPoint == 9999);
   size_t length = strlen(result);
 
@@ -132,7 +132,7 @@ static UString integerPartNoExp(double d) {
     str.append(buf.data());
   }
 
-  freedtoa(result);
+  WTF::freedtoa(result);
 
   return str;
 }
@@ -400,7 +400,7 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
 
   int decimalPoint;
   int sign;
-  char* result = dtoa(x, 0, &decimalPoint, &sign, NULL);
+  char* result = WTF::dtoa(x, 0, &decimalPoint, &sign, NULL);
   size_t resultLength = strlen(result);
   decimalPoint += decimalAdjust;
 
@@ -425,7 +425,7 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
   }
   ASSERT(i <= 80);
 
-  freedtoa(result);
+  WTF::freedtoa(result);
 
   return jsString(exec, buf);
 }
