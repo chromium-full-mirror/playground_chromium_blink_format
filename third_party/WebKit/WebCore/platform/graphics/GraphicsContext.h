@@ -240,6 +240,7 @@ class GraphicsContext : Noncopyable {
                           const IntSize& topRight,
                           const IntSize& bottomLeft,
                           const IntSize& bottomRight);
+  void clipPath(WindRule);
   void clipToImageBuffer(const FloatRect&, const ImageBuffer*);
 
   int textDrawingMode();
