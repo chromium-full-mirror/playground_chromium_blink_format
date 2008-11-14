@@ -467,8 +467,25 @@ inline void JSObject::putDirect(const Identifier& propertyName,
     return;
   }
 
+  size_t offset;
+  size_t currentCapacity = m_structureID->propertyStorageCapacity();
+  if (RefPtr<StructureID> structureID =
+          StructureID::addPropertyTransitionToExistingStructure(
+              m_structureID, propertyName, attributes, offset)) {
+    if (currentCapacity != structureID->propertyStorageCapacity())
+      allocatePropertyStorage(currentCapacity,
+                              structureID->propertyStorageCapacity());
+
+    ASSERT(offset < structureID->propertyStorageCapacity());
+    m_propertyStorage[offset] = value;
+    slot.setNewProperty(this, offset);
+    slot.setWasTransition(true);
+    setStructureID(structureID.release());
+    return;
+  }
+
   unsigned currentAttributes;
-  size_t offset = m_structureID->get(propertyName, currentAttributes);
+  offset = m_structureID->get(propertyName, currentAttributes);
   if (offset != WTF::notFound) {
     if (checkReadOnly && currentAttributes & ReadOnly)
       return;
@@ -477,7 +494,6 @@ inline void JSObject::putDirect(const Identifier& propertyName,
     return;
   }
 
-  size_t currentCapacity = m_structureID->propertyStorageCapacity();
   RefPtr<StructureID> structureID = StructureID::addPropertyTransition(
       m_structureID, propertyName, attributes, offset);
   if (currentCapacity != structureID->propertyStorageCapacity())

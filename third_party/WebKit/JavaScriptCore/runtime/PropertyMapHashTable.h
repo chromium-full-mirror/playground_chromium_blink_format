@@ -31,8 +31,14 @@ struct PropertyMapEntry {
   unsigned attributes;
   unsigned index;
 
-  PropertyMapEntry(UString::Rep* k, int a)
-      : key(k), offset(0), attributes(a), index(0) {}
+  PropertyMapEntry(UString::Rep* key, unsigned attributes)
+      : key(key), offset(0), attributes(attributes), index(0) {}
+
+  PropertyMapEntry(UString::Rep* key,
+                   unsigned offset,
+                   unsigned attributes,
+                   unsigned index)
+      : key(key), offset(offset), attributes(attributes), index(index) {}
 };
 
 // lastIndexUsed is an ever-increasing index used to identify the order items
