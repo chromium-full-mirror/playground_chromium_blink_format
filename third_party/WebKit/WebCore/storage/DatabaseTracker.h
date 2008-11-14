@@ -90,6 +90,8 @@ class DatabaseTracker {
 
   static DatabaseTracker& tracker();
 
+  bool hasEntryForOrigin(SecurityOrigin*);
+
  private:
   DatabaseTracker();
 
@@ -98,7 +100,6 @@ class DatabaseTracker {
 
   String originPath(SecurityOrigin*) const;
 
-  bool hasEntryForOrigin(SecurityOrigin*);
   bool hasEntryForDatabase(SecurityOrigin*, const String& databaseIdentifier);
 
   bool addDatabase(SecurityOrigin*, const String& name, const String& path);
