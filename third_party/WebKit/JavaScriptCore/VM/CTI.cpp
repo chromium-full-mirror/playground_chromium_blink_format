@@ -926,7 +926,9 @@ void CTI::putDoubleResultToJSNumberCellOrJSImmediate(
 
   // Store the result to the JSNumberCell and jump.
   m_jit.movsd_rm(xmmSource, OBJECT_OFFSET(JSNumberCell, m_value), jsNumberCell);
-  emitPutResult(dst, jsNumberCell);
+  if (jsNumberCell != X86::eax)
+    m_jit.movl_rr(jsNumberCell, X86::eax);
+  emitPutResult(dst);
   *wroteJSNumberCell = m_jit.emitUnlinkedJmp();
 
   m_jit.link(resultIsImm, m_jit.label());
@@ -941,7 +943,9 @@ void CTI::putDoubleResultToJSNumberCellOrJSImmediate(
              resultLookedLikeImmButActuallyIsnt);  // Actually was -0
   // Yes it really really really is representable as a JSImmediate.
   emitFastArithIntToImmNoCheck(tempReg1);
-  emitPutResult(dst, tempReg1);
+  if (tempReg1 != X86::eax)
+    m_jit.movl_rr(tempReg1, X86::eax);
+  emitPutResult(dst);
 }
 
 void CTI::compileBinaryArithOp(OpcodeID opcodeID,
@@ -1107,10 +1111,6 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
     m_jit.link(wasJSNumberCell1, m_jit.label());
     m_jit.link(wasJSNumberCell1b, m_jit.label());
   }
-
-  // FIXME: make the different cases of this function all use eax as the
-  // destination register and enable the register caching optimization.
-  killLastResultRegister();
 }
 
 void CTI::compileBinaryArithOpSlowCase(Instruction* vPC,
