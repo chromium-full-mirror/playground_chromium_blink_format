@@ -425,6 +425,11 @@ class CTI {
                                     unsigned i);
 
   void emitGetArg(int src, X86Assembler::RegisterID dst, unsigned i);
+  void emitGetArgs(int src1,
+                   X86Assembler::RegisterID dst1,
+                   int src2,
+                   X86Assembler::RegisterID dst2,
+                   unsigned i);
   void emitGetPutArg(unsigned src,
                      unsigned offset,
                      X86Assembler::RegisterID scratch);
