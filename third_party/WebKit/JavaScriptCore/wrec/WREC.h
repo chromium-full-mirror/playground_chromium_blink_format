@@ -77,8 +77,8 @@ typedef Vector<X86Assembler::JmpSrc> JmpSrcVector;
 
 class WRECGenerator {
  public:
-  WRECGenerator(WRECParser& parser, X86Assembler& jit)
-      : m_parser(parser), m_jit(jit) {}
+  WRECGenerator(WRECParser& parser, X86Assembler& assembler)
+      : m_parser(parser), m_assembler(assembler) {}
 
   typedef X86Assembler::JmpSrc JmpSrc;
   typedef X86Assembler::JmpDst JmpDst;
@@ -149,7 +149,7 @@ class WRECGenerator {
 
  private:
   WRECParser& m_parser;
-  X86Assembler& m_jit;
+  X86Assembler& m_assembler;
 };
 
 class WRECParser {
@@ -171,12 +171,12 @@ class WRECParser {
   WRECParser(const UString& pattern,
              bool ignoreCase,
              bool multiline,
-             X86Assembler& jit)
+             X86Assembler& assembler)
       : m_ignoreCase(ignoreCase),
         m_multiline(multiline),
         m_numSubpatterns(0),
         m_err(NoError),
-        m_generator(*this, jit),
+        m_generator(*this, assembler),
         m_data(pattern.data()),
         m_size(pattern.size()),
         m_index(0) {}
