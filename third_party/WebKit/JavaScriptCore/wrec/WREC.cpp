@@ -35,23 +35,24 @@
 #define __ m_assembler.
 
 using namespace WTF;
+using namespace JSC;
 
-namespace JSC {
+namespace WREC {
 
 class GenerateAtomFunctor {
  public:
   virtual ~GenerateAtomFunctor() {}
 
-  virtual void generateAtom(WRECGenerator*, JmpSrcVector&) = 0;
-  virtual void backtrack(WRECGenerator*) = 0;
+  virtual void generateAtom(Generator*, JmpSrcVector&) = 0;
+  virtual void backtrack(Generator*) = 0;
 };
 
 class GeneratePatternCharacterFunctor : public GenerateAtomFunctor {
  public:
   GeneratePatternCharacterFunctor(const UChar ch) : m_ch(ch) {}
 
-  virtual void generateAtom(WRECGenerator*, JmpSrcVector&);
-  virtual void backtrack(WRECGenerator*);
+  virtual void generateAtom(Generator*, JmpSrcVector&);
+  virtual void backtrack(Generator*);
 
  private:
   const UChar m_ch;
@@ -62,8 +63,8 @@ class GenerateCharacterClassFunctor : public GenerateAtomFunctor {
   GenerateCharacterClassFunctor(CharacterClass* charClass, bool invert)
       : m_charClass(charClass), m_invert(invert) {}
 
-  virtual void generateAtom(WRECGenerator*, JmpSrcVector&);
-  virtual void backtrack(WRECGenerator*);
+  virtual void generateAtom(Generator*, JmpSrcVector&);
+  virtual void backtrack(Generator*);
 
  private:
   CharacterClass* m_charClass;
@@ -75,8 +76,8 @@ class GenerateBackreferenceFunctor : public GenerateAtomFunctor {
   GenerateBackreferenceFunctor(unsigned subpatternId)
       : m_subpatternId(subpatternId) {}
 
-  virtual void generateAtom(WRECGenerator*, JmpSrcVector&);
-  virtual void backtrack(WRECGenerator*);
+  virtual void generateAtom(Generator*, JmpSrcVector&);
+  virtual void backtrack(Generator*);
 
  private:
   unsigned m_subpatternId;
@@ -84,71 +85,70 @@ class GenerateBackreferenceFunctor : public GenerateAtomFunctor {
 
 class GenerateParenthesesNonGreedyFunctor : public GenerateAtomFunctor {
  public:
-  GenerateParenthesesNonGreedyFunctor(WRECGenerator::JmpDst start,
-                                      WRECGenerator::JmpSrc success,
-                                      WRECGenerator::JmpSrc fail)
+  GenerateParenthesesNonGreedyFunctor(Generator::JmpDst start,
+                                      Generator::JmpSrc success,
+                                      Generator::JmpSrc fail)
       : m_start(start), m_success(success), m_fail(fail) {}
 
-  virtual void generateAtom(WRECGenerator*, JmpSrcVector&);
-  virtual void backtrack(WRECGenerator*);
+  virtual void generateAtom(Generator*, JmpSrcVector&);
+  virtual void backtrack(Generator*);
 
  private:
-  WRECGenerator::JmpDst m_start;
-  WRECGenerator::JmpSrc m_success;
-  WRECGenerator::JmpSrc m_fail;
+  Generator::JmpDst m_start;
+  Generator::JmpSrc m_success;
+  Generator::JmpSrc m_fail;
 };
 
-void GeneratePatternCharacterFunctor::generateAtom(WRECGenerator* wrec,
+void GeneratePatternCharacterFunctor::generateAtom(Generator* wrec,
                                                    JmpSrcVector& failures) {
   wrec->generatePatternCharacter(failures, m_ch);
 }
-void GeneratePatternCharacterFunctor::backtrack(WRECGenerator* wrec) {
+void GeneratePatternCharacterFunctor::backtrack(Generator* wrec) {
   wrec->generateBacktrack1();
 }
 
-void GenerateCharacterClassFunctor::generateAtom(WRECGenerator* wrec,
+void GenerateCharacterClassFunctor::generateAtom(Generator* wrec,
                                                  JmpSrcVector& failures) {
   wrec->generateCharacterClass(failures, *m_charClass, m_invert);
 }
-void GenerateCharacterClassFunctor::backtrack(WRECGenerator* wrec) {
+void GenerateCharacterClassFunctor::backtrack(Generator* wrec) {
   wrec->generateBacktrack1();
 }
 
-void GenerateBackreferenceFunctor::generateAtom(WRECGenerator* wrec,
+void GenerateBackreferenceFunctor::generateAtom(Generator* wrec,
                                                 JmpSrcVector& failures) {
   wrec->generateBackreference(failures, m_subpatternId);
 }
-void GenerateBackreferenceFunctor::backtrack(WRECGenerator* wrec) {
+void GenerateBackreferenceFunctor::backtrack(Generator* wrec) {
   wrec->generateBacktrackBackreference(m_subpatternId);
 }
 
-void GenerateParenthesesNonGreedyFunctor::generateAtom(WRECGenerator* wrec,
+void GenerateParenthesesNonGreedyFunctor::generateAtom(Generator* wrec,
                                                        JmpSrcVector& failures) {
   wrec->generateParenthesesNonGreedy(failures, m_start, m_success, m_fail);
 }
 
-void GenerateParenthesesNonGreedyFunctor::backtrack(WRECGenerator*) {
+void GenerateParenthesesNonGreedyFunctor::backtrack(Generator*) {
   // FIXME: do something about this.
   CRASH();
 }
 
-void WRECGenerator::generateBacktrack1() {
+void Generator::generateBacktrack1() {
   __ subl_i8r(1, currentPositionRegister);
 }
 
-void WRECGenerator::generateBacktrackBackreference(unsigned subpatternId) {
+void Generator::generateBacktrackBackreference(unsigned subpatternId) {
   __ subl_mr((2 * subpatternId + 1) * sizeof(int), outputRegister,
              currentPositionRegister);
   __ addl_mr((2 * subpatternId) * sizeof(int), outputRegister,
              currentPositionRegister);
 }
 
-void WRECGenerator::generateBackreferenceQuantifier(
-    JmpSrcVector& failures,
-    Quantifier::Type quantifierType,
-    unsigned subpatternId,
-    unsigned min,
-    unsigned max) {
+void Generator::generateBackreferenceQuantifier(JmpSrcVector& failures,
+                                                Quantifier::Type quantifierType,
+                                                unsigned subpatternId,
+                                                unsigned min,
+                                                unsigned max) {
   GenerateBackreferenceFunctor functor(subpatternId);
 
   __ movl_mr((2 * subpatternId) * sizeof(int), outputRegister,
@@ -167,10 +167,10 @@ void WRECGenerator::generateBackreferenceQuantifier(
   __ link(skipIfEmpty, __ label());
 }
 
-void WRECGenerator::generateNonGreedyQuantifier(JmpSrcVector& failures,
-                                                GenerateAtomFunctor& functor,
-                                                unsigned min,
-                                                unsigned max) {
+void Generator::generateNonGreedyQuantifier(JmpSrcVector& failures,
+                                            GenerateAtomFunctor& functor,
+                                            unsigned min,
+                                            unsigned max) {
   // comment me better!
   JmpSrcVector newFailures;
 
@@ -238,10 +238,10 @@ void WRECGenerator::generateNonGreedyQuantifier(JmpSrcVector& failures,
   newFailures.clear();
 }
 
-void WRECGenerator::generateGreedyQuantifier(JmpSrcVector& failures,
-                                             GenerateAtomFunctor& functor,
-                                             unsigned min,
-                                             unsigned max) {
+void Generator::generateGreedyQuantifier(JmpSrcVector& failures,
+                                         GenerateAtomFunctor& functor,
+                                         unsigned min,
+                                         unsigned max) {
   if (!max)
     return;
 
@@ -326,7 +326,7 @@ void WRECGenerator::generateGreedyQuantifier(JmpSrcVector& failures,
   newFailures.clear();
 }
 
-void WRECGenerator::generatePatternCharacter(JmpSrcVector& failures, int ch) {
+void Generator::generatePatternCharacter(JmpSrcVector& failures, int ch) {
   // check there is more input, read a char.
   __ cmpl_rr(lengthRegister, currentPositionRegister);
   failures.append(__ emitUnlinkedJe());
@@ -367,7 +367,7 @@ void WRECGenerator::generatePatternCharacter(JmpSrcVector& failures, int ch) {
   __ addl_i8r(1, currentPositionRegister);
 }
 
-void WRECGenerator::generateCharacterClassInvertedRange(
+void Generator::generateCharacterClassInvertedRange(
     JmpSrcVector& failures,
     JmpSrcVector& matchDest,
     const CharacterClassRange* ranges,
@@ -429,8 +429,8 @@ void WRECGenerator::generateCharacterClassInvertedRange(
   } while (count);
 }
 
-void WRECGenerator::generateCharacterClassInverted(JmpSrcVector& matchDest,
-                                                   CharacterClass& charClass) {
+void Generator::generateCharacterClassInverted(JmpSrcVector& matchDest,
+                                               CharacterClass& charClass) {
   JmpSrc unicodeFail;
   if (charClass.numMatchesUnicode || charClass.numRangesUnicode) {
     __ cmpl_i8r(0x7f, currentValueRegister);
@@ -510,9 +510,9 @@ void WRECGenerator::generateCharacterClassInverted(JmpSrcVector& matchDest,
     __ link(unicodeFail, __ label());
 }
 
-void WRECGenerator::generateCharacterClass(JmpSrcVector& failures,
-                                           CharacterClass& charClass,
-                                           bool invert) {
+void Generator::generateCharacterClass(JmpSrcVector& failures,
+                                       CharacterClass& charClass,
+                                       bool invert) {
   __ cmpl_rr(lengthRegister, currentPositionRegister);
   failures.append(__ emitUnlinkedJe());
   __ movzwl_mr(inputRegister, currentPositionRegister, 2, currentValueRegister);
@@ -531,7 +531,7 @@ void WRECGenerator::generateCharacterClass(JmpSrcVector& failures,
   __ addl_i8r(1, currentPositionRegister);
 }
 
-WRECGenerator::JmpSrc WRECGenerator::generateParentheses(ParenthesesType type) {
+Generator::JmpSrc Generator::generateParentheses(ParenthesesType type) {
   unsigned subpatternId = (type == capturing) ? ++m_parser.m_numSubpatterns
                                               : m_parser.m_numSubpatterns;
 
@@ -581,17 +581,17 @@ WRECGenerator::JmpSrc WRECGenerator::generateParentheses(ParenthesesType type) {
   return jumpToFail;
 }
 
-void WRECGenerator::generateParenthesesNonGreedy(JmpSrcVector& failures,
-                                                 JmpDst start,
-                                                 JmpSrc success,
-                                                 JmpSrc fail) {
+void Generator::generateParenthesesNonGreedy(JmpSrcVector& failures,
+                                             JmpDst start,
+                                             JmpSrc success,
+                                             JmpSrc fail) {
   __ link(__ emitUnlinkedJmp(), start);
   __ link(success, __ label());
 
   failures.append(fail);
 }
 
-WRECGenerator::JmpSrc WRECGenerator::generateParenthesesResetTrampoline(
+Generator::JmpSrc Generator::generateParenthesesResetTrampoline(
     JmpSrcVector& newFailures,
     unsigned subpatternIdBefore,
     unsigned subpatternIdAfter) {
@@ -612,7 +612,7 @@ WRECGenerator::JmpSrc WRECGenerator::generateParenthesesResetTrampoline(
   return newFailJump;
 }
 
-void WRECGenerator::generateAssertionBOL(JmpSrcVector& failures) {
+void Generator::generateAssertionBOL(JmpSrcVector& failures) {
   if (m_parser.m_multiline) {
     JmpSrcVector previousIsNewline;
 
@@ -638,7 +638,7 @@ void WRECGenerator::generateAssertionBOL(JmpSrcVector& failures) {
   }
 }
 
-void WRECGenerator::generateAssertionEOL(JmpSrcVector& failures) {
+void Generator::generateAssertionEOL(JmpSrcVector& failures) {
   if (m_parser.m_multiline) {
     JmpSrcVector nextIsNewline;
 
@@ -663,8 +663,8 @@ void WRECGenerator::generateAssertionEOL(JmpSrcVector& failures) {
   }
 }
 
-void WRECGenerator::generateAssertionWordBoundary(JmpSrcVector& failures,
-                                                  bool invert) {
+void Generator::generateAssertionWordBoundary(JmpSrcVector& failures,
+                                              bool invert) {
   JmpSrcVector wordBoundary;
   JmpSrcVector notWordBoundary;
 
@@ -731,8 +731,8 @@ void WRECGenerator::generateAssertionWordBoundary(JmpSrcVector& failures,
   }
 }
 
-void WRECGenerator::generateBackreference(JmpSrcVector& failures,
-                                          unsigned subpatternId) {
+void Generator::generateBackreference(JmpSrcVector& failures,
+                                      unsigned subpatternId) {
   __ pushl_r(currentPositionRegister);
   __ pushl_r(quantifierCountRegister);
 
@@ -773,8 +773,8 @@ void WRECGenerator::generateBackreference(JmpSrcVector& failures,
   __ addl_i8r(4, X86::esp);
 }
 
-void WRECGenerator::generateDisjunction(JmpSrcVector& successes,
-                                        JmpSrcVector& failures) {
+void Generator::generateDisjunction(JmpSrcVector& successes,
+                                    JmpSrcVector& failures) {
   successes.append(__ emitUnlinkedJmp());
 
   JmpDst here = __ label();
@@ -786,14 +786,14 @@ void WRECGenerator::generateDisjunction(JmpSrcVector& successes,
   __ movl_mr(X86::esp, currentPositionRegister);
 }
 
-void WRECGenerator::terminateDisjunction(JmpSrcVector& successes) {
+void Generator::terminateDisjunction(JmpSrcVector& successes) {
   JmpDst here = __ label();
   for (unsigned i = 0; i < successes.size(); ++i)
     __ link(successes[i], here);
   successes.clear();
 }
 
-ALWAYS_INLINE Quantifier WRECParser::parseGreedyQuantifier() {
+ALWAYS_INLINE Quantifier Parser::parseGreedyQuantifier() {
   switch (peek()) {
     case '?':
       consume();
@@ -870,7 +870,7 @@ ALWAYS_INLINE Quantifier WRECParser::parseGreedyQuantifier() {
   }
 }
 
-Quantifier WRECParser::parseQuantifier() {
+Quantifier Parser::parseQuantifier() {
   Quantifier q = parseGreedyQuantifier();
 
   if ((q.type == Quantifier::Greedy) && (peek() == '?')) {
@@ -881,8 +881,7 @@ Quantifier WRECParser::parseQuantifier() {
   return q;
 }
 
-bool WRECParser::parsePatternCharacterQualifier(JmpSrcVector& failures,
-                                                int ch) {
+bool Parser::parsePatternCharacterQualifier(JmpSrcVector& failures, int ch) {
   Quantifier q = parseQuantifier();
 
   switch (q.type) {
@@ -910,9 +909,9 @@ bool WRECParser::parsePatternCharacterQualifier(JmpSrcVector& failures,
   return true;
 }
 
-bool WRECParser::parseCharacterClassQuantifier(JmpSrcVector& failures,
-                                               CharacterClass& charClass,
-                                               bool invert) {
+bool Parser::parseCharacterClassQuantifier(JmpSrcVector& failures,
+                                           CharacterClass& charClass,
+                                           bool invert) {
   Quantifier q = parseQuantifier();
 
   switch (q.type) {
@@ -940,8 +939,8 @@ bool WRECParser::parseCharacterClassQuantifier(JmpSrcVector& failures,
   return true;
 }
 
-bool WRECParser::parseBackreferenceQuantifier(JmpSrcVector& failures,
-                                              unsigned subpatternId) {
+bool Parser::parseBackreferenceQuantifier(JmpSrcVector& failures,
+                                          unsigned subpatternId) {
   Quantifier q = parseQuantifier();
 
   switch (q.type) {
@@ -963,7 +962,7 @@ bool WRECParser::parseBackreferenceQuantifier(JmpSrcVector& failures,
   return true;
 }
 
-bool WRECParser::parseParentheses(JmpSrcVector&) {
+bool Parser::parseParentheses(JmpSrcVector&) {
   // FIXME: We don't currently backtrack correctly within parentheses in cases
   // such as
   // "c".match(/(.*)c/) so we fall back to PCRE for any regexp containing
@@ -973,7 +972,7 @@ bool WRECParser::parseParentheses(JmpSrcVector&) {
   return false;
 }
 
-bool WRECParser::parseCharacterClass(JmpSrcVector& failures) {
+bool Parser::parseCharacterClass(JmpSrcVector& failures) {
   bool invert = false;
   if (peek() == '^') {
     consume();
@@ -1132,11 +1131,11 @@ bool WRECParser::parseCharacterClass(JmpSrcVector& failures) {
   return parseCharacterClassQuantifier(failures, charClass, invert);
 }
 
-bool WRECParser::parseOctalEscape(JmpSrcVector& failures) {
+bool Parser::parseOctalEscape(JmpSrcVector& failures) {
   return parsePatternCharacterQualifier(failures, consumeOctal());
 }
 
-bool WRECParser::parseEscape(JmpSrcVector& failures) {
+bool Parser::parseEscape(JmpSrcVector& failures) {
   switch (peek()) {
     case EndOfPattern:
       m_err = Error_malformedEscape;
@@ -1284,7 +1283,7 @@ bool WRECParser::parseEscape(JmpSrcVector& failures) {
   }
 }
 
-bool WRECParser::parseTerm(JmpSrcVector& failures) {
+bool Parser::parseTerm(JmpSrcVector& failures) {
   switch (peek()) {
     case EndOfPattern:
     case '*':
@@ -1336,7 +1335,7 @@ bool WRECParser::parseTerm(JmpSrcVector& failures) {
 /*
   interface req: CURR_POS is on stack (can be reloaded).
 */
-void WRECParser::parseDisjunction(JmpSrcVector& failures) {
+void Parser::parseDisjunction(JmpSrcVector& failures) {
   parseAlternative(failures);
 
   if (peek() == '|') {
@@ -1354,6 +1353,110 @@ void WRECParser::parseDisjunction(JmpSrcVector& failures) {
   }
 }
 
-}  // namespace JSC
+#undef __
+#define __ assembler.
+
+// This limit comes from the limit set in PCRE
+static const int MaxPatternSize = (1 << 16);
+
+void* compileRegExp(BytecodeInterpreter* interpreter,
+                    const UString& pattern,
+                    unsigned* numSubpatterns_ptr,
+                    const char** error_ptr,
+                    bool ignoreCase,
+                    bool multiline) {
+  // TODO: better error messages
+  if (pattern.size() > MaxPatternSize) {
+    *error_ptr = "regular expression too large";
+    return 0;
+  }
+
+  X86Assembler assembler(interpreter->assemblerBuffer());
+  Parser parser(pattern, ignoreCase, multiline, assembler);
+
+  __ emitConvertToFastCall();
+  // (0) Setup:
+  //     Preserve regs & initialize outputRegister.
+  __ pushl_r(Generator::outputRegister);
+  __ pushl_r(Generator::currentValueRegister);
+  // push pos onto the stack, both to preserve and as a parameter available to
+  // parseDisjunction
+  __ pushl_r(Generator::currentPositionRegister);
+  // load output pointer
+  __ movl_mr(16
+#if COMPILER(MSVC)
+                 + 3 * sizeof(void*)
+#endif
+                 ,
+             X86::esp, Generator::outputRegister);
+
+  // restart point on match fail.
+  Generator::JmpDst nextLabel = __ label();
+
+  // (1) Parse Disjunction:
+
+  //     Parsing the disjunction should fully consume the pattern.
+  JmpSrcVector failures;
+  parser.parseDisjunction(failures);
+  if (parser.isEndOfPattern()) {
+    parser.m_err = Parser::Error_malformedPattern;
+  }
+  if (parser.m_err) {
+    // TODO: better error messages
+    *error_ptr = "TODO: better error messages";
+    return 0;
+  }
+
+  // (2) Success:
+  //     Set return value & pop registers from the stack.
+
+  __ testl_rr(Generator::outputRegister, Generator::outputRegister);
+  Generator::JmpSrc noOutput = __ emitUnlinkedJe();
+
+  __ movl_rm(Generator::currentPositionRegister, 4, Generator::outputRegister);
+  __ popl_r(X86::eax);
+  __ movl_rm(X86::eax, Generator::outputRegister);
+  __ popl_r(Generator::currentValueRegister);
+  __ popl_r(Generator::outputRegister);
+  __ ret();
+
+  __ link(noOutput, __ label());
+
+  __ popl_r(X86::eax);
+  __ movl_rm(X86::eax, Generator::outputRegister);
+  __ popl_r(Generator::currentValueRegister);
+  __ popl_r(Generator::outputRegister);
+  __ ret();
+
+  // (3) Failure:
+  //     All fails link to here.  Progress the start point & if it is within
+  //     scope, loop.
+  //     Otherwise, return fail value.
+  Generator::JmpDst here = __ label();
+  for (unsigned i = 0; i < failures.size(); ++i)
+    __ link(failures[i], here);
+  failures.clear();
+
+  __ movl_mr(X86::esp, Generator::currentPositionRegister);
+  __ addl_i8r(1, Generator::currentPositionRegister);
+  __ movl_rm(Generator::currentPositionRegister, X86::esp);
+  __ cmpl_rr(Generator::lengthRegister, Generator::currentPositionRegister);
+  __ link(__ emitUnlinkedJle(), nextLabel);
+
+  __ addl_i8r(4, X86::esp);
+
+  __ movl_i32r(-1, X86::eax);
+  __ popl_r(Generator::currentValueRegister);
+  __ popl_r(Generator::outputRegister);
+  __ ret();
+
+  *numSubpatterns_ptr = parser.m_numSubpatterns;
+
+  void* code = __ copy();
+  ASSERT(code);
+  return code;
+}
+
+}  // namespace WREC
 
 #endif  // ENABLE(WREC)

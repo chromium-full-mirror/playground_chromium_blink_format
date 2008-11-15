@@ -32,6 +32,8 @@
 #include <wtf/Assertions.h>
 #include <wtf/OwnArrayPtr.h>
 
+using namespace WREC;
+
 namespace JSC {
 
 inline RegExp::RegExp(JSGlobalData* globalData, const UString& pattern)
@@ -41,8 +43,8 @@ inline RegExp::RegExp(JSGlobalData* globalData, const UString& pattern)
       m_constructionError(0),
       m_numSubpatterns(0) {
 #if ENABLE(WREC)
-  m_wrecFunction = CTI::compileRegExp(globalData->interpreter, pattern,
-                                      &m_numSubpatterns, &m_constructionError);
+  m_wrecFunction = WREC::compileRegExp(globalData->interpreter, pattern,
+                                       &m_numSubpatterns, &m_constructionError);
   if (m_wrecFunction)
     return;
 // Fall through to non-WREC case.
@@ -89,7 +91,7 @@ inline RegExp::RegExp(JSGlobalData* globalData,
   }
 
 #if ENABLE(WREC)
-  m_wrecFunction = CTI::compileRegExp(
+  m_wrecFunction = WREC::compileRegExp(
       globalData->interpreter, pattern, &m_numSubpatterns, &m_constructionError,
       (m_flagBits & IgnoreCase), (m_flagBits & Multiline));
   if (m_wrecFunction)

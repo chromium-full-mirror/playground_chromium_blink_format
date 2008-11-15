@@ -1116,6 +1116,8 @@ class X86Assembler {
   AssemblerBuffer* m_buffer;
 };
 
+typedef Vector<X86Assembler::JmpSrc> JmpSrcVector;
+
 }  // namespace JSC
 
 #endif  // ENABLE(MASM) && PLATFORM(X86)
