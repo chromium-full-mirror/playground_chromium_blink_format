@@ -40,87 +40,87 @@
 
 namespace JSC {
 
-class JITCodeBuffer {
+class AssemblerBuffer {
  public:
-  JITCodeBuffer(int size)
-      : m_buffer(static_cast<char*>(fastMalloc(size))),
-        m_size(size),
-        m_index(0) {}
+  AssemblerBuffer(int capacity)
+      : m_buffer(static_cast<char*>(fastMalloc(capacity))),
+        m_capacity(capacity),
+        m_size(0) {}
 
-  ~JITCodeBuffer() { fastFree(m_buffer); }
+  ~AssemblerBuffer() { fastFree(m_buffer); }
 
   void ensureSpace(int space) {
-    if (m_index > m_size - space)
-      growBuffer();
+    if (m_size > m_capacity - space)
+      grow();
   }
 
-  bool isAligned(int alignment) { return !(m_index & (alignment - 1)); }
+  bool isAligned(int alignment) { return !(m_size & (alignment - 1)); }
 
   void putByteUnchecked(int value) {
-    m_buffer[m_index] = value;
-    m_index++;
+    ASSERT(!(m_size > m_capacity - 4));
+    m_buffer[m_size] = value;
+    m_size++;
   }
 
   void putByte(int value) {
-    if (m_index > m_size - 4)
-      growBuffer();
+    if (m_size > m_capacity - 4)
+      grow();
     putByteUnchecked(value);
   }
 
   void putShortUnchecked(int value) {
-    *(short*)(&m_buffer[m_index]) = value;
-    m_index += 2;
+    ASSERT(!(m_size > m_capacity - 4));
+    *reinterpret_cast<short*>(&m_buffer[m_size]) = value;
+    m_size += 2;
   }
 
   void putShort(int value) {
-    if (m_index > m_size - 4)
-      growBuffer();
+    if (m_size > m_capacity - 4)
+      grow();
     putShortUnchecked(value);
   }
 
   void putIntUnchecked(int value) {
-    *reinterpret_cast<int*>(&m_buffer[m_index]) = value;
-    m_index += 4;
+    *reinterpret_cast<int*>(&m_buffer[m_size]) = value;
+    m_size += 4;
   }
 
   void putInt(int value) {
-    if (m_index > m_size - 4)
-      growBuffer();
+    if (m_size > m_capacity - 4)
+      grow();
     putIntUnchecked(value);
   }
 
-  void* getEIP() { return m_buffer + m_index; }
+  void* data() { return m_buffer; }
 
-  void* start() { return m_buffer; }
+  int size() { return m_size; }
 
-  int getOffset() { return m_index; }
-
-  JITCodeBuffer* reset() {
-    m_index = 0;
+  AssemblerBuffer* reset() {
+    m_size = 0;
     return this;
   }
 
   void* copy() {
-    if (!m_index)
+    if (!m_size)
       return 0;
 
-    void* result = WTF::fastMallocExecutable(m_index);
+    void* result = WTF::fastMallocExecutable(m_size);
 
     if (!result)
       return 0;
 
-    return memcpy(result, m_buffer, m_index);
+    return memcpy(result, m_buffer, m_size);
   }
 
  private:
-  void growBuffer() {
-    m_size += m_size / 2;
-    m_buffer = static_cast<char*>(fastRealloc(m_buffer, m_size));
+  void grow() {
+    m_capacity += m_capacity / 2;
+    m_buffer = static_cast<char*>(fastRealloc(m_buffer, m_capacity));
   }
 
   char* m_buffer;
+  int m_capacity;
   int m_size;
-  int m_index;
 };
 
 #define MODRM(type, reg, rm) ((type << 6) | (reg << 3) | (rm))
@@ -254,9 +254,9 @@ class X86Assembler {
     GROUP11_MOV = 0,
   } OpcodeID;
 
-  static const int MAX_INSTRUCTION_SIZE = 16;
+  static const int maxInstructionSize = 16;
 
-  X86Assembler(JITCodeBuffer* m_buffer) : m_buffer(m_buffer) {
+  X86Assembler(AssemblerBuffer* m_buffer) : m_buffer(m_buffer) {
     m_buffer->reset();
   }
 
@@ -447,7 +447,7 @@ class X86Assembler {
   }
 
   void testl_i32r(int imm, RegisterID dst) {
-    m_buffer->ensureSpace(MAX_INSTRUCTION_SIZE);
+    m_buffer->ensureSpace(maxInstructionSize);
     m_buffer->putByteUnchecked(OP_GROUP3_EvIz);
     emitModRm_opr_Unchecked(GROUP3_OP_TEST, dst);
     m_buffer->putIntUnchecked(imm);
@@ -543,7 +543,7 @@ class X86Assembler {
   }
 
   void movl_mr(int offset, RegisterID base, RegisterID dst) {
-    m_buffer->ensureSpace(MAX_INSTRUCTION_SIZE);
+    m_buffer->ensureSpace(maxInstructionSize);
     m_buffer->putByteUnchecked(OP_MOV_GvEv);
     emitModRm_rm_Unchecked(dst, base, offset);
   }
@@ -596,7 +596,7 @@ class X86Assembler {
   }
 
   void movl_rm(RegisterID src, int offset, RegisterID base) {
-    m_buffer->ensureSpace(MAX_INSTRUCTION_SIZE);
+    m_buffer->ensureSpace(maxInstructionSize);
     m_buffer->putByteUnchecked(OP_MOV_EvGv);
     emitModRm_rm_Unchecked(src, base, offset);
   }
@@ -617,7 +617,7 @@ class X86Assembler {
   }
 
   void movl_i32m(int imm, int offset, RegisterID base) {
-    m_buffer->ensureSpace(MAX_INSTRUCTION_SIZE);
+    m_buffer->ensureSpace(maxInstructionSize);
     m_buffer->putByteUnchecked(OP_GROUP11_EvIz);
     emitModRm_opm_Unchecked(GROUP11_MOV, base, offset);
     m_buffer->putIntUnchecked(imm);
@@ -780,16 +780,16 @@ class X86Assembler {
   JmpSrc emitCall() {
     m_buffer->putByte(OP_CALL_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitCall(RegisterID dst) {
     m_buffer->putByte(OP_GROUP5_Ev);
     emitModRm_opr(GROUP5_OP_CALLN, dst);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
-  JmpDst label() { return JmpDst(m_buffer->getOffset()); }
+  JmpDst label() { return JmpDst(m_buffer->size()); }
 
   JmpDst align(int alignment) {
     while (!m_buffer->isAligned(alignment))
@@ -801,101 +801,101 @@ class X86Assembler {
   JmpSrc emitUnlinkedJmp() {
     m_buffer->putByte(OP_JMP_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJne() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JNE_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJnz() { return emitUnlinkedJne(); }
 
   JmpSrc emitUnlinkedJe() {
-    m_buffer->ensureSpace(MAX_INSTRUCTION_SIZE);
+    m_buffer->ensureSpace(maxInstructionSize);
     m_buffer->putByteUnchecked(OP_2BYTE_ESCAPE);
     m_buffer->putByteUnchecked(OP2_JE_rel32);
     m_buffer->putIntUnchecked(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJl() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JL_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJb() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JB_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJle() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JLE_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJbe() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JBE_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJge() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JGE_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJg() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JG_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJa() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JA_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJae() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JAE_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJo() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JO_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJp() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JP_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   JmpSrc emitUnlinkedJs() {
     m_buffer->putByte(OP_2BYTE_ESCAPE);
     m_buffer->putByte(OP2_JS_rel32);
     m_buffer->putInt(0);
-    return JmpSrc(m_buffer->getOffset());
+    return JmpSrc(m_buffer->size());
   }
 
   void emitPredictionNotTaken() {
@@ -906,7 +906,7 @@ class X86Assembler {
     ASSERT(to.m_offset != -1);
     ASSERT(from.m_offset != -1);
 
-    reinterpret_cast<int*>(reinterpret_cast<ptrdiff_t>(m_buffer->start()) +
+    reinterpret_cast<int*>(reinterpret_cast<ptrdiff_t>(m_buffer->data()) +
                            from.m_offset)[-1] = to.m_offset - from.m_offset;
   }
 
@@ -999,7 +999,7 @@ class X86Assembler {
 
  private:
   void emitModRm_rr(RegisterID reg, RegisterID rm) {
-    m_buffer->ensureSpace(MAX_INSTRUCTION_SIZE);
+    m_buffer->ensureSpace(maxInstructionSize);
     emitModRm_rr_Unchecked(reg, rm);
   }
 
@@ -1043,7 +1043,7 @@ class X86Assembler {
   }
 
   void emitModRm_rm(RegisterID reg, RegisterID base, int offset) {
-    m_buffer->ensureSpace(MAX_INSTRUCTION_SIZE);
+    m_buffer->ensureSpace(maxInstructionSize);
     emitModRm_rm_Unchecked(reg, base, offset);
   }
 
@@ -1080,7 +1080,7 @@ class X86Assembler {
   }
 
   void emitModRm_opr(OpcodeID opcodeID, RegisterID rm) {
-    m_buffer->ensureSpace(MAX_INSTRUCTION_SIZE);
+    m_buffer->ensureSpace(maxInstructionSize);
     emitModRm_opr_Unchecked(opcodeID, rm);
   }
 
@@ -1113,7 +1113,7 @@ class X86Assembler {
                     offset);
   }
 
-  JITCodeBuffer* m_buffer;
+  AssemblerBuffer* m_buffer;
 };
 
 }  // namespace JSC

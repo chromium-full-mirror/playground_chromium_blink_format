@@ -43,7 +43,7 @@ class EvalNode;
 class FunctionBodyNode;
 class Instruction;
 class InternalFunction;
-class JITCodeBuffer;
+class AssemblerBuffer;
 class JSFunction;
 class JSGlobalObject;
 class ProgramNode;
@@ -407,7 +407,7 @@ class BytecodeInterpreter {
                           JSValue* baseValue,
                           const PutPropertySlot&);
 
-  JITCodeBuffer* jitCodeBuffer() const { return m_jitCodeBuffer.get(); }
+  AssemblerBuffer* assemblerBuffer() const { return m_assemblerBuffer.get(); }
 #endif
 
   SamplingTool* m_sampler;
@@ -419,7 +419,7 @@ class BytecodeInterpreter {
   void* m_ctiVirtualCallLink;
   void* m_ctiVirtualCall;
 
-  OwnPtr<JITCodeBuffer> m_jitCodeBuffer;
+  OwnPtr<AssemblerBuffer> m_assemblerBuffer;
 #endif
 
   int m_reentryDepth;
