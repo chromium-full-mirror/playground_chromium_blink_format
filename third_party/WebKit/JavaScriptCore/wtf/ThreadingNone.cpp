@@ -44,7 +44,7 @@ ThreadIdentifier currentThread() {
   return 0;
 }
 bool isMainThread() {
-  return false;
+  return true;
 }
 
 Mutex::Mutex() {}
