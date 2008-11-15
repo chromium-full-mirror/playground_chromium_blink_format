@@ -2374,8 +2374,6 @@ class FunctionBodyNode : public ScopeNode {
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) JSC_FAST_CALL;
 
-  SymbolTable& symbolTable() { return m_symbolTable; }  // FIXME: Remove this
-
   CodeBlock& byteCode(ScopeChainNode* scopeChain) JSC_FAST_CALL {
     ASSERT(scopeChain);
     if (!m_code)
@@ -2426,7 +2424,6 @@ class FunctionBodyNode : public ScopeNode {
 
   Identifier* m_parameters;
   size_t m_parameterCount;
-  SymbolTable m_symbolTable;
   OwnPtr<CodeBlock> m_code;
   unsigned m_refCount;
 };

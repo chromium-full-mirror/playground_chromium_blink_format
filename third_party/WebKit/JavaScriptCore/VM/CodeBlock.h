@@ -364,6 +364,8 @@ struct CodeBlock {
 
   EvalCodeCache evalCodeCache;
 
+  SymbolTable symbolTable;
+
  private:
 #if !defined(NDEBUG) || ENABLE(OPCODE_SAMPLING)
   void dump(ExecState*,
