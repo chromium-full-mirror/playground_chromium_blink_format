@@ -176,9 +176,10 @@ ALWAYS_INLINE void CTI::killLastResultRegister() {
 }
 
 // get arg puts an arg from the SF register array into a h/w register
-ALWAYS_INLINE void CTI::emitGetArg(int src,
-                                   X86Assembler::RegisterID dst,
-                                   unsigned currentInstructionIndex) {
+ALWAYS_INLINE void CTI::emitGetVirtualRegister(
+    int src,
+    X86Assembler::RegisterID dst,
+    unsigned currentInstructionIndex) {
   // TODO: we want to reuse values that are already in registers if we can - add
   // a register allocator!
   if (m_codeBlock->isConstantRegisterIndex(src)) {
@@ -213,25 +214,26 @@ ALWAYS_INLINE void CTI::emitGetArg(int src,
   killLastResultRegister();
 }
 
-ALWAYS_INLINE void CTI::emitGetArgs(int src1,
-                                    X86Assembler::RegisterID dst1,
-                                    int src2,
-                                    X86Assembler::RegisterID dst2,
-                                    unsigned i) {
+ALWAYS_INLINE void CTI::emitGetVirtualRegisters(int src1,
+                                                X86Assembler::RegisterID dst1,
+                                                int src2,
+                                                X86Assembler::RegisterID dst2,
+                                                unsigned i) {
   if (src2 == m_lastResultBytecodeRegister) {
-    emitGetArg(src2, dst2, i);
-    emitGetArg(src1, dst1, i);
+    emitGetVirtualRegister(src2, dst2, i);
+    emitGetVirtualRegister(src1, dst1, i);
   } else {
-    emitGetArg(src1, dst1, i);
-    emitGetArg(src2, dst2, i);
+    emitGetVirtualRegister(src1, dst1, i);
+    emitGetVirtualRegister(src2, dst2, i);
   }
 }
 
 // get arg puts an arg from the SF register array onto the stack, as an arg to a
 // context threaded function.
-ALWAYS_INLINE void CTI::emitGetPutArg(unsigned src,
-                                      unsigned offset,
-                                      X86Assembler::RegisterID scratch) {
+ALWAYS_INLINE void CTI::emitPutCTIArgFromVirtualRegister(
+    unsigned src,
+    unsigned offset,
+    X86Assembler::RegisterID scratch) {
   if (m_codeBlock->isConstantRegisterIndex(src)) {
     JSValue* value = m_codeBlock->getConstant(src);
     m_jit.movl_i32m(asInteger(value), offset + sizeof(void*), X86::esp);
@@ -244,17 +246,17 @@ ALWAYS_INLINE void CTI::emitGetPutArg(unsigned src,
 }
 
 // puts an arg onto the stack, as an arg to a context threaded function.
-ALWAYS_INLINE void CTI::emitPutArg(X86Assembler::RegisterID src,
-                                   unsigned offset) {
+ALWAYS_INLINE void CTI::emitPutCTIArg(X86Assembler::RegisterID src,
+                                      unsigned offset) {
   m_jit.movl_rm(src, offset + sizeof(void*), X86::esp);
 }
 
-ALWAYS_INLINE void CTI::emitRetrieveArg(unsigned offset,
-                                        X86Assembler::RegisterID dst) {
+ALWAYS_INLINE void CTI::emitGetCTIArg(unsigned offset,
+                                      X86Assembler::RegisterID dst) {
   m_jit.movl_mr(offset + sizeof(void*), X86::esp, dst);
 }
 
-ALWAYS_INLINE void CTI::emitPutArgConstant(unsigned value, unsigned offset) {
+ALWAYS_INLINE void CTI::emitPutCTIArgConstant(unsigned value, unsigned offset) {
   m_jit.movl_i32m(value, offset + sizeof(void*), X86::esp);
 }
 
@@ -295,8 +297,8 @@ ALWAYS_INLINE void CTI::emitGetFromCallFrameHeader(
   killLastResultRegister();
 }
 
-ALWAYS_INLINE void CTI::emitPutResult(unsigned dst,
-                                      X86Assembler::RegisterID from) {
+ALWAYS_INLINE void CTI::emitPutVirtualRegister(unsigned dst,
+                                               X86Assembler::RegisterID from) {
   m_jit.movl_rm(from, dst * sizeof(Register), X86::edi);
   m_lastResultBytecodeRegister =
       (from == X86::eax) ? dst : std::numeric_limits<int>::max();
@@ -657,23 +659,26 @@ CTI::CTI(JSGlobalData* globalData, CodeBlock* codeBlock)
       m_lastResultBytecodeRegister(std::numeric_limits<int>::max()),
       m_jumpTargetsPosition(0) {}
 
-#define CTI_COMPILE_BINARY_OP(name)                           \
-  case name: {                                                \
-    emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx); \
-    emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx); \
-    emitCTICall(instruction + i, i, Machine::cti_##name);     \
-    emitPutResult(instruction[i + 1].u.operand);              \
-    i += 4;                                                   \
-    break;                                                    \
+#define CTI_COMPILE_BINARY_OP(name)                                   \
+  case name: {                                                        \
+    emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0, \
+                                     X86::ecx);                       \
+    emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 4, \
+                                     X86::ecx);                       \
+    emitCTICall(instruction + i, i, Machine::cti_##name);             \
+    emitPutVirtualRegister(instruction[i + 1].u.operand);             \
+    i += 4;                                                           \
+    break;                                                            \
   }
 
-#define CTI_COMPILE_UNARY_OP(name)                            \
-  case name: {                                                \
-    emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx); \
-    emitCTICall(instruction + i, i, Machine::cti_##name);     \
-    emitPutResult(instruction[i + 1].u.operand);              \
-    i += 3;                                                   \
-    break;                                                    \
+#define CTI_COMPILE_UNARY_OP(name)                                    \
+  case name: {                                                        \
+    emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0, \
+                                     X86::ecx);                       \
+    emitCTICall(instruction + i, i, Machine::cti_##name);             \
+    emitPutVirtualRegister(instruction[i + 1].u.operand);             \
+    i += 3;                                                           \
+    break;                                                            \
   }
 
 static void unreachable() {
@@ -706,10 +711,10 @@ void CTI::compileOpCallSetupArgs(Instruction* instruction) {
   int registerOffset = instruction[4].u.operand;
 
   // ecx holds func
-  emitPutArg(X86::ecx, 0);
-  emitPutArgConstant(registerOffset, 4);
-  emitPutArgConstant(argCount, 8);
-  emitPutArgConstant(reinterpret_cast<unsigned>(instruction), 12);
+  emitPutCTIArg(X86::ecx, 0);
+  emitPutCTIArgConstant(registerOffset, 4);
+  emitPutCTIArgConstant(argCount, 8);
+  emitPutCTIArgConstant(reinterpret_cast<unsigned>(instruction), 12);
 }
 
 void CTI::compileOpCallEvalSetupArgs(Instruction* instruction) {
@@ -717,10 +722,10 @@ void CTI::compileOpCallEvalSetupArgs(Instruction* instruction) {
   int registerOffset = instruction[4].u.operand;
 
   // ecx holds func
-  emitPutArg(X86::ecx, 0);
-  emitPutArgConstant(registerOffset, 4);
-  emitPutArgConstant(argCount, 8);
-  emitPutArgConstant(reinterpret_cast<unsigned>(instruction), 12);
+  emitPutCTIArg(X86::ecx, 0);
+  emitPutCTIArgConstant(registerOffset, 4);
+  emitPutCTIArgConstant(argCount, 8);
+  emitPutCTIArgConstant(reinterpret_cast<unsigned>(instruction), 12);
 }
 
 void CTI::compileOpConstructSetupArgs(Instruction* instruction) {
@@ -730,12 +735,12 @@ void CTI::compileOpConstructSetupArgs(Instruction* instruction) {
   int thisRegister = instruction[6].u.operand;
 
   // ecx holds func
-  emitPutArg(X86::ecx, 0);
-  emitPutArgConstant(registerOffset, 4);
-  emitPutArgConstant(argCount, 8);
-  emitGetPutArg(proto, 12, X86::eax);
-  emitPutArgConstant(thisRegister, 16);
-  emitPutArgConstant(reinterpret_cast<unsigned>(instruction), 20);
+  emitPutCTIArg(X86::ecx, 0);
+  emitPutCTIArgConstant(registerOffset, 4);
+  emitPutCTIArgConstant(argCount, 8);
+  emitPutCTIArgFromVirtualRegister(proto, 12, X86::eax);
+  emitPutCTIArgConstant(thisRegister, 16);
+  emitPutCTIArgConstant(reinterpret_cast<unsigned>(instruction), 20);
 }
 
 void CTI::compileOpCall(OpcodeID opcodeID,
@@ -750,7 +755,7 @@ void CTI::compileOpCall(OpcodeID opcodeID,
   // Handle eval
   X86Assembler::JmpSrc wasEval;
   if (opcodeID == op_call_eval) {
-    emitGetArg(callee, X86::ecx, i);
+    emitGetVirtualRegister(callee, X86::ecx, i);
     compileOpCallEvalSetupArgs(instruction);
 
     emitCTICall(instruction, i, Machine::cti_op_call_eval);
@@ -762,7 +767,7 @@ void CTI::compileOpCall(OpcodeID opcodeID,
   // link to the callee.
   // This deliberately leaves the callee in ecx, used when setting up the stack
   // frame below
-  emitGetArg(callee, X86::ecx, i);
+  emitGetVirtualRegister(callee, X86::ecx, i);
   m_jit.cmpl_i32r(asInteger(JSImmediate::impossibleValue()), X86::ecx);
   X86Assembler::JmpDst addressOfLinkedFunctionCheck = m_jit.label();
   m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), i));
@@ -780,11 +785,11 @@ void CTI::compileOpCall(OpcodeID opcodeID,
     int proto = instruction[5].u.operand;
     int thisRegister = instruction[6].u.operand;
 
-    emitPutArg(X86::ecx, 0);
-    emitGetPutArg(proto, 12, X86::eax);
+    emitPutCTIArg(X86::ecx, 0);
+    emitPutCTIArgFromVirtualRegister(proto, 12, X86::eax);
     emitCTICall(instruction, i, Machine::cti_op_construct_JSConstruct);
-    emitPutResult(thisRegister);
-    emitGetArg(callee, X86::ecx, i);
+    emitPutVirtualRegister(thisRegister);
+    emitGetVirtualRegister(callee, X86::ecx, i);
   }
 
   // Fast version of stack frame initialization, directly relative to edi.
@@ -819,7 +824,7 @@ void CTI::compileOpCall(OpcodeID opcodeID,
     m_jit.link(wasEval, m_jit.label());
 
   // Put the return value in dst. In the interpreter, op_ret does this.
-  emitPutResult(dst);
+  emitPutVirtualRegister(dst);
 
 #if ENABLE(CODEBLOCK_SAMPLING)
   m_jit.movl_i32m(reinterpret_cast<unsigned>(m_codeBlock),
@@ -836,7 +841,7 @@ void CTI::compileOpStrictEq(Instruction* instruction,
   unsigned src1 = instruction[2].u.operand;
   unsigned src2 = instruction[3].u.operand;
 
-  emitGetArgs(src1, X86::eax, src2, X86::edx, i);
+  emitGetVirtualRegisters(src1, X86::eax, src2, X86::edx, i);
 
   m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
   X86Assembler::JmpSrc firstNotImmediate = m_jit.emitUnlinkedJe();
@@ -881,7 +886,7 @@ void CTI::compileOpStrictEq(Instruction* instruction,
   m_jit.link(bothWereImmediates, m_jit.label());
   m_jit.link(firstWasNotImmediate, m_jit.label());
 
-  emitPutResult(dst);
+  emitPutVirtualRegister(dst);
 }
 
 void CTI::emitSlowScriptCheck(Instruction* vPC, unsigned opcodeIndex) {
@@ -934,7 +939,7 @@ void CTI::putDoubleResultToJSNumberCellOrJSImmediate(
   m_jit.movsd_rm(xmmSource, OBJECT_OFFSET(JSNumberCell, m_value), jsNumberCell);
   if (jsNumberCell != X86::eax)
     m_jit.movl_rr(jsNumberCell, X86::eax);
-  emitPutResult(dst);
+  emitPutVirtualRegister(dst);
   *wroteJSNumberCell = m_jit.emitUnlinkedJmp();
 
   m_jit.link(resultIsImm, m_jit.label());
@@ -951,7 +956,7 @@ void CTI::putDoubleResultToJSNumberCellOrJSImmediate(
   emitFastArithIntToImmNoCheck(tempReg1);
   if (tempReg1 != X86::eax)
     m_jit.movl_rr(tempReg1, X86::eax);
-  emitPutResult(dst);
+  emitPutVirtualRegister(dst);
 }
 
 void CTI::compileBinaryArithOp(OpcodeID opcodeID,
@@ -966,7 +971,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
   X86Assembler::JmpSrc wasJSNumberCell2;
   X86Assembler::JmpSrc wasJSNumberCell2b;
 
-  emitGetArgs(src1, X86::eax, src2, X86::edx, i);
+  emitGetVirtualRegisters(src1, X86::eax, src2, X86::edx, i);
 
   if (types.second().isReusable() && isSSE2Present()) {
     ASSERT(types.second().mightBeNumber());
@@ -1063,7 +1068,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
       m_jit.mulsd_rr(X86::xmm1, X86::xmm0);
     }
     m_jit.movsd_rm(X86::xmm0, OBJECT_OFFSET(JSNumberCell, m_value), X86::eax);
-    emitPutResult(dst);
+    emitPutVirtualRegister(dst);
 
     putDoubleResultToJSNumberCellOrJSImmediate(X86::xmm0, X86::eax, dst,
                                                &wasJSNumberCell1, X86::xmm1,
@@ -1108,7 +1113,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
     m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
     emitFastArithReTagImmediate(X86::eax);
   }
-  emitPutResult(dst);
+  emitPutVirtualRegister(dst);
 
   if (types.second().isReusable() && isSSE2Present()) {
     m_jit.link(wasJSNumberCell2, m_jit.label());
@@ -1160,8 +1165,8 @@ void CTI::compileBinaryArithOpSlowCase(Instruction* vPC,
   if (opcodeID == op_mul)
     m_jit.link((++iter)->from, here);
 
-  emitGetPutArg(src1, 0, X86::ecx);
-  emitGetPutArg(src2, 4, X86::ecx);
+  emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
+  emitPutCTIArgFromVirtualRegister(src2, 4, X86::ecx);
   if (opcodeID == op_add)
     emitCTICall(vPC, i, Machine::cti_op_add);
   else if (opcodeID == op_sub)
@@ -1170,7 +1175,7 @@ void CTI::compileBinaryArithOpSlowCase(Instruction* vPC,
     ASSERT(opcodeID == op_mul);
     emitCTICall(vPC, i, Machine::cti_op_mul);
   }
-  emitPutResult(dst);
+  emitPutVirtualRegister(dst);
 }
 
 void CTI::privateCompileMainPass() {
@@ -1198,8 +1203,8 @@ void CTI::privateCompileMainPass() {
         if (m_codeBlock->isConstantRegisterIndex(src))
           m_jit.movl_i32r(asInteger(m_codeBlock->getConstant(src)), X86::eax);
         else
-          emitGetArg(src, X86::eax, i);
-        emitPutResult(instruction[i + 1].u.operand);
+          emitGetVirtualRegister(src, X86::eax, i);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
@@ -1209,17 +1214,17 @@ void CTI::privateCompileMainPass() {
         unsigned src2 = instruction[i + 3].u.operand;
 
         if (JSValue* value = getConstantImmediateNumericArg(src1)) {
-          emitGetArg(src2, X86::edx, i);
+          emitGetVirtualRegister(src2, X86::edx, i);
           emitJumpSlowCaseIfNotImmNum(X86::edx, i);
           m_jit.addl_i32r(getDeTaggedConstantImmediate(value), X86::edx);
           m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
-          emitPutResult(dst, X86::edx);
+          emitPutVirtualRegister(dst, X86::edx);
         } else if (JSValue* value = getConstantImmediateNumericArg(src2)) {
-          emitGetArg(src1, X86::eax, i);
+          emitGetVirtualRegister(src1, X86::eax, i);
           emitJumpSlowCaseIfNotImmNum(X86::eax, i);
           m_jit.addl_i32r(getDeTaggedConstantImmediate(value), X86::eax);
           m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else {
           OperandTypes types =
               OperandTypes::fromInt(instruction[i + 4].u.operand);
@@ -1229,10 +1234,12 @@ void CTI::privateCompileMainPass() {
                 instruction[i + 2].u.operand, instruction[i + 3].u.operand,
                 OperandTypes::fromInt(instruction[i + 4].u.operand), i);
           else {
-            emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
-            emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
+            emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0,
+                                             X86::ecx);
+            emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 4,
+                                             X86::ecx);
             emitCTICall(instruction + i, i, Machine::cti_op_add);
-            emitPutResult(instruction[i + 1].u.operand);
+            emitPutVirtualRegister(instruction[i + 1].u.operand);
           }
         }
 
@@ -1242,7 +1249,7 @@ void CTI::privateCompileMainPass() {
       case op_end: {
         if (m_codeBlock->needsFullScopeChain)
           emitCTICall(instruction + i, i, Machine::cti_op_end);
-        emitGetArg(instruction[i + 1].u.operand, X86::eax, i);
+        emitGetVirtualRegister(instruction[i + 1].u.operand, X86::eax, i);
         m_jit.pushl_m(
             RegisterFile::ReturnPC * static_cast<int>(sizeof(Register)),
             X86::edi);
@@ -1258,13 +1265,13 @@ void CTI::privateCompileMainPass() {
       }
       case op_pre_inc: {
         int srcDst = instruction[i + 1].u.operand;
-        emitGetArg(srcDst, X86::eax, i);
+        emitGetVirtualRegister(srcDst, X86::eax, i);
         emitJumpSlowCaseIfNotImmNum(X86::eax, i);
         m_jit.addl_i8r(
             getDeTaggedConstantImmediate(JSImmediate::oneImmediate()),
             X86::eax);
         m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
-        emitPutResult(srcDst);
+        emitPutVirtualRegister(srcDst);
         i += 2;
         break;
       }
@@ -1283,13 +1290,13 @@ void CTI::privateCompileMainPass() {
         JSValue* src2imm =
             getConstantImmediateNumericArg(instruction[i + 2].u.operand);
         if (src2imm) {
-          emitGetArg(instruction[i + 1].u.operand, X86::edx, i);
+          emitGetVirtualRegister(instruction[i + 1].u.operand, X86::edx, i);
           emitJumpSlowCaseIfNotImmNum(X86::edx, i);
           m_jit.cmpl_i32r(asInteger(src2imm), X86::edx);
           m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJl(), i + 3 + target));
         } else {
-          emitGetArgs(instruction[i + 1].u.operand, X86::eax,
-                      instruction[i + 2].u.operand, X86::edx, i);
+          emitGetVirtualRegisters(instruction[i + 1].u.operand, X86::eax,
+                                  instruction[i + 2].u.operand, X86::edx, i);
           emitJumpSlowCaseIfNotImmNum(X86::eax, i);
           emitJumpSlowCaseIfNotImmNum(X86::edx, i);
           m_jit.cmpl_rr(X86::edx, X86::eax);
@@ -1305,13 +1312,13 @@ void CTI::privateCompileMainPass() {
         JSValue* src2imm =
             getConstantImmediateNumericArg(instruction[i + 2].u.operand);
         if (src2imm) {
-          emitGetArg(instruction[i + 1].u.operand, X86::edx, i);
+          emitGetVirtualRegister(instruction[i + 1].u.operand, X86::edx, i);
           emitJumpSlowCaseIfNotImmNum(X86::edx, i);
           m_jit.cmpl_i32r(asInteger(src2imm), X86::edx);
           m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJle(), i + 3 + target));
         } else {
-          emitGetArgs(instruction[i + 1].u.operand, X86::eax,
-                      instruction[i + 2].u.operand, X86::edx, i);
+          emitGetVirtualRegisters(instruction[i + 1].u.operand, X86::eax,
+                                  instruction[i + 2].u.operand, X86::edx, i);
           emitJumpSlowCaseIfNotImmNum(X86::eax, i);
           emitJumpSlowCaseIfNotImmNum(X86::edx, i);
           m_jit.cmpl_rr(X86::edx, X86::eax);
@@ -1322,7 +1329,7 @@ void CTI::privateCompileMainPass() {
       }
       case op_new_object: {
         emitCTICall(instruction + i, i, Machine::cti_op_new_object);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 2;
         break;
       }
@@ -1335,8 +1342,8 @@ void CTI::privateCompileMainPass() {
         // from this.
 
         int baseVReg = instruction[i + 1].u.operand;
-        emitGetArgs(baseVReg, X86::eax, instruction[i + 3].u.operand, X86::edx,
-                    i);
+        emitGetVirtualRegisters(baseVReg, X86::eax,
+                                instruction[i + 3].u.operand, X86::edx, i);
 
         ASSERT(m_codeBlock
                    ->propertyAccessInstructions[propertyAccessInstructionIndex]
@@ -1382,7 +1389,7 @@ void CTI::privateCompileMainPass() {
         // to jump back to if one of these trampolies finds a match.
 
         int baseVReg = instruction[i + 2].u.operand;
-        emitGetArg(baseVReg, X86::eax, i);
+        emitGetVirtualRegister(baseVReg, X86::eax, i);
 
         ASSERT(m_codeBlock
                    ->propertyAccessInstructions[propertyAccessInstructionIndex]
@@ -1411,15 +1418,18 @@ void CTI::privateCompileMainPass() {
         ASSERT(X86Assembler::getDifferenceBetweenLabels(hotPathBegin,
                                                         m_jit.label()) ==
                repatchOffsetGetByIdPropertyMapOffset);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
 
         i += 8;
         break;
       }
       case op_instanceof: {
-        emitGetArg(instruction[i + 2].u.operand, X86::eax, i);  // value
-        emitGetArg(instruction[i + 3].u.operand, X86::ecx, i);  // baseVal
-        emitGetArg(instruction[i + 4].u.operand, X86::edx, i);  // proto
+        emitGetVirtualRegister(instruction[i + 2].u.operand, X86::eax,
+                               i);  // value
+        emitGetVirtualRegister(instruction[i + 3].u.operand, X86::ecx,
+                               i);  // baseVal
+        emitGetVirtualRegister(instruction[i + 4].u.operand, X86::edx,
+                               i);  // proto
 
         // check if any are immediates
         m_jit.orl_rr(X86::eax, X86::ecx);
@@ -1440,8 +1450,8 @@ void CTI::privateCompileMainPass() {
                       X86::ecx);
         m_jit.subl_mr(OBJECT_OFFSET(StructureID, m_typeInfo.m_type), X86::edx,
                       X86::ecx);
-        emitGetArg(instruction[i + 3].u.operand, X86::edx,
-                   i);  // reload baseVal
+        emitGetVirtualRegister(instruction[i + 3].u.operand, X86::edx,
+                               i);  // reload baseVal
         m_jit.movl_mr(OBJECT_OFFSET(JSCell, m_structureID), X86::edx, X86::edx);
         m_jit.cmpl_rm(X86::ecx, OBJECT_OFFSET(StructureID, m_typeInfo.m_type),
                       X86::edx);
@@ -1457,8 +1467,10 @@ void CTI::privateCompileMainPass() {
 
         m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), i));
 
-        emitGetArg(instruction[i + 2].u.operand, X86::ecx, i);  // reload value
-        emitGetArg(instruction[i + 4].u.operand, X86::edx, i);  // reload proto
+        emitGetVirtualRegister(instruction[i + 2].u.operand, X86::ecx,
+                               i);  // reload value
+        emitGetVirtualRegister(instruction[i + 4].u.operand, X86::edx,
+                               i);  // reload proto
 
         // optimistically load true result
         m_jit.movl_i32r(asInteger(jsBoolean(true)), X86::eax);
@@ -1481,18 +1493,19 @@ void CTI::privateCompileMainPass() {
 
         m_jit.link(exit, m_jit.label());
 
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
 
         i += 5;
         break;
       }
       case op_del_by_id: {
-        emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0,
+                                         X86::ecx);
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 3].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
         emitCTICall(instruction + i, i, Machine::cti_op_del_by_id);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
@@ -1507,22 +1520,22 @@ void CTI::privateCompileMainPass() {
         JSValue* src2Value = getConstantImmediateNumericArg(src2);
         int32_t value;
         if (src1Value && ((value = JSImmediate::intValue(src1Value)) > 0)) {
-          emitGetArg(src2, X86::eax, i);
+          emitGetVirtualRegister(src2, X86::eax, i);
           emitJumpSlowCaseIfNotImmNum(X86::eax, i);
           emitFastArithDeTagImmediate(X86::eax);
           m_jit.imull_i32r(X86::eax, value, X86::eax);
           m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
           emitFastArithReTagImmediate(X86::eax);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else if (src2Value &&
                    ((value = JSImmediate::intValue(src2Value)) > 0)) {
-          emitGetArg(src1, X86::eax, i);
+          emitGetVirtualRegister(src1, X86::eax, i);
           emitJumpSlowCaseIfNotImmNum(X86::eax, i);
           emitFastArithDeTagImmediate(X86::eax);
           m_jit.imull_i32r(X86::eax, value, X86::eax);
           m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
           emitFastArithReTagImmediate(X86::eax);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else
           compileBinaryArithOp(
               op_mul, instruction[i + 1].u.operand,
@@ -1535,9 +1548,9 @@ void CTI::privateCompileMainPass() {
       case op_new_func: {
         FuncDeclNode* func =
             (m_codeBlock->functions[instruction[i + 2].u.operand]).get();
-        emitPutArgConstant(reinterpret_cast<unsigned>(func), 0);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(func), 0);
         emitCTICall(instruction + i, i, Machine::cti_op_new_func);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
@@ -1554,12 +1567,12 @@ void CTI::privateCompileMainPass() {
         m_jit.movl_i32r(asInteger(globalObject), X86::eax);
         emitGetVariableObjectRegister(X86::eax, instruction[i + 3].u.operand,
                                       X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_put_global_var: {
-        emitGetArg(instruction[i + 3].u.operand, X86::edx, i);
+        emitGetVirtualRegister(instruction[i + 3].u.operand, X86::edx, i);
         JSVariableObject* globalObject =
             static_cast<JSVariableObject*>(instruction[i + 1].u.jsCell);
         m_jit.movl_i32r(asInteger(globalObject), X86::eax);
@@ -1572,7 +1585,7 @@ void CTI::privateCompileMainPass() {
         int skip =
             instruction[i + 3].u.operand + m_codeBlock->needsFullScopeChain;
 
-        emitGetArg(RegisterFile::ScopeChain, X86::eax, i);
+        emitGetVirtualRegister(RegisterFile::ScopeChain, X86::eax, i);
         while (skip--)
           m_jit.movl_mr(OBJECT_OFFSET(ScopeChainNode, next), X86::eax,
                         X86::eax);
@@ -1581,7 +1594,7 @@ void CTI::privateCompileMainPass() {
                       X86::eax);
         emitGetVariableObjectRegister(X86::eax, instruction[i + 2].u.operand,
                                       X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
@@ -1589,8 +1602,8 @@ void CTI::privateCompileMainPass() {
         int skip =
             instruction[i + 2].u.operand + m_codeBlock->needsFullScopeChain;
 
-        emitGetArg(RegisterFile::ScopeChain, X86::edx, i);
-        emitGetArg(instruction[i + 3].u.operand, X86::eax, i);
+        emitGetVirtualRegister(RegisterFile::ScopeChain, X86::edx, i);
+        emitGetVirtualRegister(instruction[i + 3].u.operand, X86::eax, i);
         while (skip--)
           m_jit.movl_mr(OBJECT_OFFSET(ScopeChainNode, next), X86::edx,
                         X86::edx);
@@ -1603,7 +1616,8 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_tear_off_activation: {
-        emitGetPutArg(instruction[i + 1].u.operand, 0, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 1].u.operand, 0,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_tear_off_activation);
         i += 2;
         break;
@@ -1620,13 +1634,13 @@ void CTI::privateCompileMainPass() {
           emitCTICall(instruction + i, i, Machine::cti_op_ret_scopeChain);
 
         // Return the result in %eax.
-        emitGetArg(instruction[i + 1].u.operand, X86::eax, i);
+        emitGetVirtualRegister(instruction[i + 1].u.operand, X86::eax, i);
 
         // Grab the return address.
-        emitGetArg(RegisterFile::ReturnPC, X86::edx, i);
+        emitGetVirtualRegister(RegisterFile::ReturnPC, X86::edx, i);
 
         // Restore our caller's "r".
-        emitGetArg(RegisterFile::CallerFrame, X86::edi, i);
+        emitGetVirtualRegister(RegisterFile::CallerFrame, X86::edi, i);
 
         // Return.
         m_jit.pushl_r(X86::edx);
@@ -1638,24 +1652,24 @@ void CTI::privateCompileMainPass() {
       case op_new_array: {
         m_jit.leal_mr(sizeof(Register) * instruction[i + 2].u.operand, X86::edi,
                       X86::edx);
-        emitPutArg(X86::edx, 0);
-        emitPutArgConstant(instruction[i + 3].u.operand, 4);
+        emitPutCTIArg(X86::edx, 0);
+        emitPutCTIArgConstant(instruction[i + 3].u.operand, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_new_array);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_resolve: {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 0);
         emitCTICall(instruction + i, i, Machine::cti_op_resolve);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_construct_verify: {
-        emitGetArg(instruction[i + 1].u.operand, X86::eax, i);
+        emitGetVirtualRegister(instruction[i + 1].u.operand, X86::eax, i);
 
         m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
         X86Assembler::JmpSrc isImmediate = m_jit.emitUnlinkedJne();
@@ -1666,16 +1680,16 @@ void CTI::privateCompileMainPass() {
         X86Assembler::JmpSrc isObject = m_jit.emitUnlinkedJe();
 
         m_jit.link(isImmediate, m_jit.label());
-        emitGetArg(instruction[i + 2].u.operand, X86::eax, i);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitGetVirtualRegister(instruction[i + 2].u.operand, X86::eax, i);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         m_jit.link(isObject, m_jit.label());
 
         i += 3;
         break;
       }
       case op_get_by_val: {
-        emitGetArgs(instruction[i + 2].u.operand, X86::eax,
-                    instruction[i + 3].u.operand, X86::edx, i);
+        emitGetVirtualRegisters(instruction[i + 2].u.operand, X86::eax,
+                                instruction[i + 3].u.operand, X86::edx, i);
         emitJumpSlowCaseIfNotImmNum(X86::edx, i);
         emitFastArithImmToInt(X86::edx);
         m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
@@ -1694,17 +1708,17 @@ void CTI::privateCompileMainPass() {
         // Get the value from the vector
         m_jit.movl_mr(OBJECT_OFFSET(ArrayStorage, m_vector[0]), X86::ecx,
                       X86::edx, sizeof(JSValue*), X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_resolve_func: {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 3].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 0);
         emitCTICall(instruction + i, i, Machine::cti_op_resolve_func);
-        emitPutResult(instruction[i + 1].u.operand);
-        emitPutResult(instruction[i + 2].u.operand, X86::edx);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 2].u.operand, X86::edx);
         i += 4;
         break;
       }
@@ -1717,8 +1731,8 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_put_by_val: {
-        emitGetArgs(instruction[i + 1].u.operand, X86::eax,
-                    instruction[i + 2].u.operand, X86::edx, i);
+        emitGetVirtualRegisters(instruction[i + 1].u.operand, X86::eax,
+                                instruction[i + 2].u.operand, X86::edx, i);
         emitJumpSlowCaseIfNotImmNum(X86::edx, i);
         emitFastArithImmToInt(X86::edx);
         m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
@@ -1750,7 +1764,7 @@ void CTI::privateCompileMainPass() {
 
         // All good - put the value into the array.
         m_jit.link(inFastVector, m_jit.label());
-        emitGetArg(instruction[i + 3].u.operand, X86::eax, i);
+        emitGetVirtualRegister(instruction[i + 3].u.operand, X86::eax, i);
         m_jit.movl_rm(X86::eax, OBJECT_OFFSET(ArrayStorage, m_vector[0]),
                       X86::ecx, X86::edx, sizeof(JSValue*));
         i += 4;
@@ -1761,7 +1775,7 @@ void CTI::privateCompileMainPass() {
         emitSlowScriptCheck(instruction + i, i);
 
         unsigned target = instruction[i + 2].u.operand;
-        emitGetArg(instruction[i + 1].u.operand, X86::eax, i);
+        emitGetVirtualRegister(instruction[i + 1].u.operand, X86::eax, i);
 
         m_jit.cmpl_i32r(asInteger(JSImmediate::zeroImmediate()), X86::eax);
         X86Assembler::JmpSrc isZero = m_jit.emitUnlinkedJe();
@@ -1780,15 +1794,15 @@ void CTI::privateCompileMainPass() {
       case op_resolve_base: {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 0);
         emitCTICall(instruction + i, i, Machine::cti_op_resolve_base);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_negate: {
         int srcVReg = instruction[i + 2].u.operand;
-        emitGetArg(srcVReg, X86::eax, i);
+        emitGetVirtualRegister(srcVReg, X86::eax, i);
 
         m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
         X86Assembler::JmpSrc notImmediate = m_jit.emitUnlinkedJe();
@@ -1799,16 +1813,17 @@ void CTI::privateCompileMainPass() {
         m_jit.negl_r(X86::eax);  // This can't overflow as we only have a 31bit
                                  // int at this point
         X86Assembler::JmpSrc overflow = emitArithIntToImmWithJump(X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         X86Assembler::JmpSrc immediateNegateSuccess = m_jit.emitUnlinkedJmp();
 
         if (!isSSE2Present()) {
           m_jit.link(zeroImmediate, m_jit.label());
           m_jit.link(overflow, m_jit.label());
           m_jit.link(notImmediate, m_jit.label());
-          emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
+          emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0,
+                                           X86::ecx);
           emitCTICall(instruction + i, i, Machine::cti_op_negate);
-          emitPutResult(instruction[i + 1].u.operand);
+          emitPutVirtualRegister(instruction[i + 1].u.operand);
         } else {
           // Slow case immediates
           m_slowCases.append(SlowCaseEntry(zeroImmediate, i));
@@ -1846,11 +1861,11 @@ void CTI::privateCompileMainPass() {
       case op_resolve_skip: {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
-        emitPutArgConstant(
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 0);
+        emitPutCTIArgConstant(
             instruction[i + 3].u.operand + m_codeBlock->needsFullScopeChain, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_resolve_skip);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
@@ -1874,16 +1889,16 @@ void CTI::privateCompileMainPass() {
                       X86::eax, X86::eax);
         m_jit.movl_mr(offsetAddr, X86::edx);
         m_jit.movl_mr(0, X86::eax, X86::edx, sizeof(JSValue*), X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         X86Assembler::JmpSrc end = m_jit.emitUnlinkedJmp();
 
         // Slow case
         m_jit.link(noMatch, m_jit.label());
-        emitPutArgConstant(globalObject, 0);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
-        emitPutArgConstant(reinterpret_cast<unsigned>(instruction + i), 8);
+        emitPutCTIArgConstant(globalObject, 0);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(instruction + i), 8);
         emitCTICall(instruction + i, i, Machine::cti_op_resolve_global);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         m_jit.link(end, m_jit.label());
         i += 6;
         break;
@@ -1891,13 +1906,13 @@ void CTI::privateCompileMainPass() {
         CTI_COMPILE_BINARY_OP(op_div)
       case op_pre_dec: {
         int srcDst = instruction[i + 1].u.operand;
-        emitGetArg(srcDst, X86::eax, i);
+        emitGetVirtualRegister(srcDst, X86::eax, i);
         emitJumpSlowCaseIfNotImmNum(X86::eax, i);
         m_jit.subl_i8r(
             getDeTaggedConstantImmediate(JSImmediate::oneImmediate()),
             X86::eax);
         m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
-        emitPutResult(srcDst);
+        emitPutVirtualRegister(srcDst);
         i += 2;
         break;
       }
@@ -1906,13 +1921,13 @@ void CTI::privateCompileMainPass() {
         JSValue* src2imm =
             getConstantImmediateNumericArg(instruction[i + 2].u.operand);
         if (src2imm) {
-          emitGetArg(instruction[i + 1].u.operand, X86::edx, i);
+          emitGetVirtualRegister(instruction[i + 1].u.operand, X86::edx, i);
           emitJumpSlowCaseIfNotImmNum(X86::edx, i);
           m_jit.cmpl_i32r(asInteger(src2imm), X86::edx);
           m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJge(), i + 3 + target));
         } else {
-          emitGetArgs(instruction[i + 1].u.operand, X86::eax,
-                      instruction[i + 2].u.operand, X86::edx, i);
+          emitGetVirtualRegisters(instruction[i + 1].u.operand, X86::eax,
+                                  instruction[i + 2].u.operand, X86::edx, i);
           emitJumpSlowCaseIfNotImmNum(X86::eax, i);
           emitJumpSlowCaseIfNotImmNum(X86::edx, i);
           m_jit.cmpl_rr(X86::edx, X86::eax);
@@ -1922,20 +1937,20 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_not: {
-        emitGetArg(instruction[i + 2].u.operand, X86::eax, i);
+        emitGetVirtualRegister(instruction[i + 2].u.operand, X86::eax, i);
         m_jit.xorl_i8r(JSImmediate::FullTagTypeBool, X86::eax);
         m_jit.testl_i32r(JSImmediate::FullTagTypeMask, X86::eax);  // i8?
         m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), i));
         m_jit.xorl_i8r((JSImmediate::FullTagTypeBool |
                         JSImmediate::ExtendedPayloadBitBoolValue),
                        X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_jfalse: {
         unsigned target = instruction[i + 2].u.operand;
-        emitGetArg(instruction[i + 1].u.operand, X86::eax, i);
+        emitGetVirtualRegister(instruction[i + 1].u.operand, X86::eax, i);
 
         m_jit.cmpl_i32r(asInteger(JSImmediate::zeroImmediate()), X86::eax);
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJe(), i + 2 + target));
@@ -1955,7 +1970,7 @@ void CTI::privateCompileMainPass() {
         unsigned src = instruction[i + 1].u.operand;
         unsigned target = instruction[i + 2].u.operand;
 
-        emitGetArg(src, X86::eax, i);
+        emitGetVirtualRegister(src, X86::eax, i);
         m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
         X86Assembler::JmpSrc isImmediate = m_jit.emitUnlinkedJnz();
 
@@ -1987,7 +2002,7 @@ void CTI::privateCompileMainPass() {
         unsigned src = instruction[i + 1].u.operand;
         unsigned target = instruction[i + 2].u.operand;
 
-        emitGetArg(src, X86::eax, i);
+        emitGetVirtualRegister(src, X86::eax, i);
         m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
         X86Assembler::JmpSrc isImmediate = m_jit.emitUnlinkedJnz();
 
@@ -2017,15 +2032,15 @@ void CTI::privateCompileMainPass() {
       }
       case op_post_inc: {
         int srcDst = instruction[i + 2].u.operand;
-        emitGetArg(srcDst, X86::eax, i);
+        emitGetVirtualRegister(srcDst, X86::eax, i);
         m_jit.movl_rr(X86::eax, X86::edx);
         emitJumpSlowCaseIfNotImmNum(X86::eax, i);
         m_jit.addl_i8r(
             getDeTaggedConstantImmediate(JSImmediate::oneImmediate()),
             X86::edx);
         m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
-        emitPutResult(srcDst, X86::edx);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(srcDst, X86::edx);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
@@ -2033,7 +2048,7 @@ void CTI::privateCompileMainPass() {
         JSValue* v =
             m_codeBlock->unexpectedConstants[instruction[i + 2].u.operand];
         m_jit.movl_i32r(asInteger(v), X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
@@ -2054,27 +2069,27 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_eq: {
-        emitGetArgs(instruction[i + 2].u.operand, X86::eax,
-                    instruction[i + 3].u.operand, X86::edx, i);
+        emitGetVirtualRegisters(instruction[i + 2].u.operand, X86::eax,
+                                instruction[i + 3].u.operand, X86::edx, i);
         emitJumpSlowCaseIfNotImmNums(X86::eax, X86::edx, i);
         m_jit.cmpl_rr(X86::edx, X86::eax);
         m_jit.sete_r(X86::eax);
         m_jit.movzbl_rr(X86::eax, X86::eax);
         emitTagAsBoolImmediate(X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_lshift: {
-        emitGetArgs(instruction[i + 2].u.operand, X86::eax,
-                    instruction[i + 3].u.operand, X86::ecx, i);
+        emitGetVirtualRegisters(instruction[i + 2].u.operand, X86::eax,
+                                instruction[i + 3].u.operand, X86::ecx, i);
         emitJumpSlowCaseIfNotImmNum(X86::eax, i);
         emitJumpSlowCaseIfNotImmNum(X86::ecx, i);
         emitFastArithImmToInt(X86::eax);
         emitFastArithImmToInt(X86::ecx);
         m_jit.shll_CLr(X86::eax);
         emitFastArithIntToImmOrSlowCase(X86::eax, i);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
@@ -2083,54 +2098,54 @@ void CTI::privateCompileMainPass() {
         unsigned src2 = instruction[i + 3].u.operand;
         unsigned dst = instruction[i + 1].u.operand;
         if (JSValue* value = getConstantImmediateNumericArg(src1)) {
-          emitGetArg(src2, X86::eax, i);
+          emitGetVirtualRegister(src2, X86::eax, i);
           emitJumpSlowCaseIfNotImmNum(X86::eax, i);
           m_jit.andl_i32r(asInteger(value), X86::eax);  // FIXME: make it more
                                                         // obvious this is
                                                         // relying on the format
                                                         // of JSImmediate
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else if (JSValue* value = getConstantImmediateNumericArg(src2)) {
-          emitGetArg(src1, X86::eax, i);
+          emitGetVirtualRegister(src1, X86::eax, i);
           emitJumpSlowCaseIfNotImmNum(X86::eax, i);
           m_jit.andl_i32r(asInteger(value), X86::eax);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else {
-          emitGetArgs(src1, X86::eax, src2, X86::edx, i);
+          emitGetVirtualRegisters(src1, X86::eax, src2, X86::edx, i);
           m_jit.andl_rr(X86::edx, X86::eax);
           emitJumpSlowCaseIfNotImmNum(X86::eax, i);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         }
         i += 5;
         break;
       }
       case op_rshift: {
-        emitGetArgs(instruction[i + 2].u.operand, X86::eax,
-                    instruction[i + 3].u.operand, X86::ecx, i);
+        emitGetVirtualRegisters(instruction[i + 2].u.operand, X86::eax,
+                                instruction[i + 3].u.operand, X86::ecx, i);
         emitJumpSlowCaseIfNotImmNum(X86::eax, i);
         emitJumpSlowCaseIfNotImmNum(X86::ecx, i);
         emitFastArithImmToInt(X86::ecx);
         m_jit.sarl_CLr(X86::eax);
         emitFastArithPotentiallyReTagImmediate(X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_bitnot: {
-        emitGetArg(instruction[i + 2].u.operand, X86::eax, i);
+        emitGetVirtualRegister(instruction[i + 2].u.operand, X86::eax, i);
         emitJumpSlowCaseIfNotImmNum(X86::eax, i);
         m_jit.xorl_i8r(~JSImmediate::TagBitTypeInteger, X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_resolve_with_base: {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 3].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 0);
         emitCTICall(instruction + i, i, Machine::cti_op_resolve_with_base);
-        emitPutResult(instruction[i + 1].u.operand);
-        emitPutResult(instruction[i + 2].u.operand, X86::edx);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 2].u.operand, X86::edx);
         i += 4;
         break;
       }
@@ -2138,15 +2153,15 @@ void CTI::privateCompileMainPass() {
         FuncExprNode* func =
             (m_codeBlock->functionExpressions[instruction[i + 2].u.operand])
                 .get();
-        emitPutArgConstant(reinterpret_cast<unsigned>(func), 0);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(func), 0);
         emitCTICall(instruction + i, i, Machine::cti_op_new_func_exp);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_mod: {
-        emitGetArgs(instruction[i + 2].u.operand, X86::eax,
-                    instruction[i + 3].u.operand, X86::ecx, i);
+        emitGetVirtualRegisters(instruction[i + 2].u.operand, X86::eax,
+                                instruction[i + 3].u.operand, X86::ecx, i);
         emitJumpSlowCaseIfNotImmNum(X86::eax, i);
         emitJumpSlowCaseIfNotImmNum(X86::ecx, i);
         emitFastArithDeTagImmediate(X86::eax);
@@ -2156,13 +2171,13 @@ void CTI::privateCompileMainPass() {
         m_jit.idivl_r(X86::ecx);
         emitFastArithReTagImmediate(X86::edx);
         m_jit.movl_rr(X86::edx, X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_jtrue: {
         unsigned target = instruction[i + 2].u.operand;
-        emitGetArg(instruction[i + 1].u.operand, X86::eax, i);
+        emitGetVirtualRegister(instruction[i + 1].u.operand, X86::eax, i);
 
         m_jit.cmpl_i32r(asInteger(JSImmediate::zeroImmediate()), X86::eax);
         X86Assembler::JmpSrc isZero = m_jit.emitUnlinkedJe();
@@ -2180,8 +2195,8 @@ void CTI::privateCompileMainPass() {
       }
         CTI_COMPILE_BINARY_OP(op_less)
       case op_neq: {
-        emitGetArgs(instruction[i + 2].u.operand, X86::eax,
-                    instruction[i + 3].u.operand, X86::edx, i);
+        emitGetVirtualRegisters(instruction[i + 2].u.operand, X86::eax,
+                                instruction[i + 3].u.operand, X86::edx, i);
         emitJumpSlowCaseIfNotImmNums(X86::eax, X86::edx, i);
         m_jit.cmpl_rr(X86::eax, X86::edx);
 
@@ -2189,56 +2204,57 @@ void CTI::privateCompileMainPass() {
         m_jit.movzbl_rr(X86::eax, X86::eax);
         emitTagAsBoolImmediate(X86::eax);
 
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
 
         i += 4;
         break;
       }
       case op_post_dec: {
         int srcDst = instruction[i + 2].u.operand;
-        emitGetArg(srcDst, X86::eax, i);
+        emitGetVirtualRegister(srcDst, X86::eax, i);
         m_jit.movl_rr(X86::eax, X86::edx);
         emitJumpSlowCaseIfNotImmNum(X86::eax, i);
         m_jit.subl_i8r(
             getDeTaggedConstantImmediate(JSImmediate::oneImmediate()),
             X86::edx);
         m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
-        emitPutResult(srcDst, X86::edx);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(srcDst, X86::edx);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
         CTI_COMPILE_BINARY_OP(op_urshift)
       case op_bitxor: {
-        emitGetArgs(instruction[i + 2].u.operand, X86::eax,
-                    instruction[i + 3].u.operand, X86::edx, i);
+        emitGetVirtualRegisters(instruction[i + 2].u.operand, X86::eax,
+                                instruction[i + 3].u.operand, X86::edx, i);
         emitJumpSlowCaseIfNotImmNums(X86::eax, X86::edx, i);
         m_jit.xorl_rr(X86::edx, X86::eax);
         emitFastArithReTagImmediate(X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 5;
         break;
       }
       case op_new_regexp: {
         RegExp* regExp =
             m_codeBlock->regexps[instruction[i + 2].u.operand].get();
-        emitPutArgConstant(reinterpret_cast<unsigned>(regExp), 0);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(regExp), 0);
         emitCTICall(instruction + i, i, Machine::cti_op_new_regexp);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_bitor: {
-        emitGetArgs(instruction[i + 2].u.operand, X86::eax,
-                    instruction[i + 3].u.operand, X86::edx, i);
+        emitGetVirtualRegisters(instruction[i + 2].u.operand, X86::eax,
+                                instruction[i + 3].u.operand, X86::edx, i);
         emitJumpSlowCaseIfNotImmNums(X86::eax, X86::edx, i);
         m_jit.orl_rr(X86::edx, X86::eax);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 5;
         break;
       }
       case op_throw: {
-        emitGetPutArg(instruction[i + 1].u.operand, 0, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 1].u.operand, 0,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_throw);
         m_jit.addl_i8r(0x20, X86::esp);
         m_jit.popl_r(X86::ebx);
@@ -2249,26 +2265,29 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_get_pnames: {
-        emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_get_pnames);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_next_pname: {
-        emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0,
+                                         X86::ecx);
         unsigned target = instruction[i + 3].u.operand;
         emitCTICall(instruction + i, i, Machine::cti_op_next_pname);
         m_jit.testl_rr(X86::eax, X86::eax);
         X86Assembler::JmpSrc endOfIter = m_jit.emitUnlinkedJe();
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJmp(), i + 3 + target));
         m_jit.link(endOfIter, m_jit.label());
         i += 4;
         break;
       }
       case op_push_scope: {
-        emitGetPutArg(instruction[i + 1].u.operand, 0, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 1].u.operand, 0,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_push_scope);
         i += 2;
         break;
@@ -2297,7 +2316,7 @@ void CTI::privateCompileMainPass() {
       }
       case op_to_jsnumber: {
         int srcVReg = instruction[i + 2].u.operand;
-        emitGetArg(srcVReg, X86::eax, i);
+        emitGetVirtualRegister(srcVReg, X86::eax, i);
 
         m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
         X86Assembler::JmpSrc wasImmediate = m_jit.emitUnlinkedJnz();
@@ -2313,37 +2332,40 @@ void CTI::privateCompileMainPass() {
 
         m_jit.link(wasImmediate, m_jit.label());
 
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_in: {
-        emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
-        emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0,
+                                         X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 4,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_in);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_push_new_scope: {
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 0);
-        emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 0);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 4,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_push_new_scope);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_catch: {
         emitGetCTIParam(CTI_ARGS_callFrame, X86::edi);  // edi := r
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 2;
         break;
       }
       case op_jmp_scopes: {
         unsigned count = instruction[i + 1].u.operand;
-        emitPutArgConstant(count, 0);
+        emitPutCTIArgConstant(count, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_jmp_scopes);
         unsigned target = instruction[i + 2].u.operand;
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJmp(), i + 2 + target));
@@ -2351,9 +2373,11 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_put_by_index: {
-        emitGetPutArg(instruction[i + 1].u.operand, 0, X86::ecx);
-        emitPutArgConstant(instruction[i + 2].u.operand, 4);
-        emitGetPutArg(instruction[i + 3].u.operand, 8, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 1].u.operand, 0,
+                                         X86::ecx);
+        emitPutCTIArgConstant(instruction[i + 2].u.operand, 4);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 8,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_put_by_index);
         i += 4;
         break;
@@ -2371,8 +2395,8 @@ void CTI::privateCompileMainPass() {
             SwitchRecord(jumpTable, i, defaultOffset, SwitchRecord::Immediate));
         jumpTable->ctiOffsets.grow(jumpTable->branchOffsets.size());
 
-        emitGetPutArg(scrutinee, 0, X86::ecx);
-        emitPutArgConstant(tableIndex, 4);
+        emitPutCTIArgFromVirtualRegister(scrutinee, 0, X86::ecx);
+        emitPutCTIArgConstant(tableIndex, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_switch_imm);
         m_jit.jmp_r(X86::eax);
         i += 4;
@@ -2391,8 +2415,8 @@ void CTI::privateCompileMainPass() {
             SwitchRecord(jumpTable, i, defaultOffset, SwitchRecord::Character));
         jumpTable->ctiOffsets.grow(jumpTable->branchOffsets.size());
 
-        emitGetPutArg(scrutinee, 0, X86::ecx);
-        emitPutArgConstant(tableIndex, 4);
+        emitPutCTIArgFromVirtualRegister(scrutinee, 0, X86::ecx);
+        emitPutCTIArgConstant(tableIndex, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_switch_char);
         m_jit.jmp_r(X86::eax);
         i += 4;
@@ -2409,37 +2433,43 @@ void CTI::privateCompileMainPass() {
             &m_codeBlock->stringSwitchJumpTables[tableIndex];
         m_switches.append(SwitchRecord(jumpTable, i, defaultOffset));
 
-        emitGetPutArg(scrutinee, 0, X86::ecx);
-        emitPutArgConstant(tableIndex, 4);
+        emitPutCTIArgFromVirtualRegister(scrutinee, 0, X86::ecx);
+        emitPutCTIArgConstant(tableIndex, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_switch_string);
         m_jit.jmp_r(X86::eax);
         i += 4;
         break;
       }
       case op_del_by_val: {
-        emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
-        emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0,
+                                         X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 4,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_del_by_val);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_put_getter: {
-        emitGetPutArg(instruction[i + 1].u.operand, 0, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 1].u.operand, 0,
+                                         X86::ecx);
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
-        emitGetPutArg(instruction[i + 3].u.operand, 8, X86::ecx);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 8,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_put_getter);
         i += 4;
         break;
       }
       case op_put_setter: {
-        emitGetPutArg(instruction[i + 1].u.operand, 0, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 1].u.operand, 0,
+                                         X86::ecx);
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
-        emitGetPutArg(instruction[i + 3].u.operand, 8, X86::ecx);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 8,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_put_setter);
         i += 4;
         break;
@@ -2447,18 +2477,19 @@ void CTI::privateCompileMainPass() {
       case op_new_error: {
         JSValue* message =
             m_codeBlock->unexpectedConstants[instruction[i + 3].u.operand];
-        emitPutArgConstant(instruction[i + 2].u.operand, 0);
-        emitPutArgConstant(asInteger(message), 4);
-        emitPutArgConstant(m_codeBlock->lineNumberForVPC(&instruction[i]), 8);
+        emitPutCTIArgConstant(instruction[i + 2].u.operand, 0);
+        emitPutCTIArgConstant(asInteger(message), 4);
+        emitPutCTIArgConstant(m_codeBlock->lineNumberForVPC(&instruction[i]),
+                              8);
         emitCTICall(instruction + i, i, Machine::cti_op_new_error);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_debug: {
-        emitPutArgConstant(instruction[i + 1].u.operand, 0);
-        emitPutArgConstant(instruction[i + 2].u.operand, 4);
-        emitPutArgConstant(instruction[i + 3].u.operand, 8);
+        emitPutCTIArgConstant(instruction[i + 1].u.operand, 0);
+        emitPutCTIArgConstant(instruction[i + 2].u.operand, 4);
+        emitPutCTIArgConstant(instruction[i + 3].u.operand, 8);
         emitCTICall(instruction + i, i, Machine::cti_op_debug);
         i += 4;
         break;
@@ -2467,7 +2498,7 @@ void CTI::privateCompileMainPass() {
         unsigned dst = instruction[i + 1].u.operand;
         unsigned src1 = instruction[i + 2].u.operand;
 
-        emitGetArg(src1, X86::eax, i);
+        emitGetVirtualRegister(src1, X86::eax, i);
         m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
         X86Assembler::JmpSrc isImmediate = m_jit.emitUnlinkedJnz();
 
@@ -2490,7 +2521,7 @@ void CTI::privateCompileMainPass() {
 
         m_jit.movzbl_rr(X86::eax, X86::eax);
         emitTagAsBoolImmediate(X86::eax);
-        emitPutResult(dst);
+        emitPutVirtualRegister(dst);
 
         i += 3;
         break;
@@ -2499,7 +2530,7 @@ void CTI::privateCompileMainPass() {
         unsigned dst = instruction[i + 1].u.operand;
         unsigned src1 = instruction[i + 2].u.operand;
 
-        emitGetArg(src1, X86::eax, i);
+        emitGetVirtualRegister(src1, X86::eax, i);
         m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
         X86Assembler::JmpSrc isImmediate = m_jit.emitUnlinkedJnz();
 
@@ -2522,7 +2553,7 @@ void CTI::privateCompileMainPass() {
 
         m_jit.movzbl_rr(X86::eax, X86::eax);
         emitTagAsBoolImmediate(X86::eax);
-        emitPutResult(dst);
+        emitPutVirtualRegister(dst);
 
         i += 3;
         break;
@@ -2549,7 +2580,7 @@ void CTI::privateCompileMainPass() {
           emitInitRegister(j);
 
         emitCTICall(instruction + i, i, Machine::cti_op_push_activation);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
 
         i += 2;
         break;
@@ -2563,7 +2594,7 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_convert_this: {
-        emitGetArg(instruction[i + 1].u.operand, X86::eax, i);
+        emitGetVirtualRegister(instruction[i + 1].u.operand, X86::eax, i);
 
         emitJumpSlowCaseIfNotJSCell(X86::eax, i);
         m_jit.movl_mr(OBJECT_OFFSET(JSCell, m_structureID), X86::eax, X86::edx);
@@ -2579,7 +2610,8 @@ void CTI::privateCompileMainPass() {
         emitGetCTIParam(CTI_ARGS_profilerReference, X86::eax);
         m_jit.cmpl_i32m(0, X86::eax);
         X86Assembler::JmpSrc noProfiler = m_jit.emitUnlinkedJe();
-        emitGetPutArg(instruction[i + 1].u.operand, 0, X86::eax);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 1].u.operand, 0,
+                                         X86::eax);
         emitCTICall(instruction + i, i, Machine::cti_op_profile_will_call);
         m_jit.link(noProfiler, m_jit.label());
 
@@ -2590,7 +2622,8 @@ void CTI::privateCompileMainPass() {
         emitGetCTIParam(CTI_ARGS_profilerReference, X86::eax);
         m_jit.cmpl_i32m(0, X86::eax);
         X86Assembler::JmpSrc noProfiler = m_jit.emitUnlinkedJe();
-        emitGetPutArg(instruction[i + 1].u.operand, 0, X86::eax);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 1].u.operand, 0,
+                                         X86::eax);
         emitCTICall(instruction + i, i, Machine::cti_op_profile_did_call);
         m_jit.link(noProfiler, m_jit.label());
 
@@ -2622,27 +2655,31 @@ void CTI::privateCompileLinkPass() {
   m_jmpTable.clear();
 }
 
-#define CTI_COMPILE_BINARY_OP_SLOW_CASE(name)                 \
-  case name: {                                                \
-    m_jit.link(iter->from, m_jit.label());                    \
-    emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx); \
-    emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx); \
-    emitCTICall(instruction + i, i, Machine::cti_##name);     \
-    emitPutResult(instruction[i + 1].u.operand);              \
-    i += 4;                                                   \
-    break;                                                    \
+#define CTI_COMPILE_BINARY_OP_SLOW_CASE(name)                         \
+  case name: {                                                        \
+    m_jit.link(iter->from, m_jit.label());                            \
+    emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0, \
+                                     X86::ecx);                       \
+    emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 4, \
+                                     X86::ecx);                       \
+    emitCTICall(instruction + i, i, Machine::cti_##name);             \
+    emitPutVirtualRegister(instruction[i + 1].u.operand);             \
+    i += 4;                                                           \
+    break;                                                            \
   }
 
-#define CTI_COMPILE_BINARY_OP_SLOW_CASE_DOUBLE_ENTRY(name)    \
-  case name: {                                                \
-    m_jit.link(iter->from, m_jit.label());                    \
-    m_jit.link((++iter)->from, m_jit.label());                \
-    emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx); \
-    emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx); \
-    emitCTICall(instruction + i, i, Machine::cti_##name);     \
-    emitPutResult(instruction[i + 1].u.operand);              \
-    i += 4;                                                   \
-    break;                                                    \
+#define CTI_COMPILE_BINARY_OP_SLOW_CASE_DOUBLE_ENTRY(name)            \
+  case name: {                                                        \
+    m_jit.link(iter->from, m_jit.label());                            \
+    m_jit.link((++iter)->from, m_jit.label());                        \
+    emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0, \
+                                     X86::ecx);                       \
+    emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 4, \
+                                     X86::ecx);                       \
+    emitCTICall(instruction + i, i, Machine::cti_##name);             \
+    emitPutVirtualRegister(instruction[i + 1].u.operand);             \
+    i += 4;                                                           \
+    break;                                                            \
   }
 
 void CTI::privateCompileSlowCases() {
@@ -2665,9 +2702,9 @@ void CTI::privateCompileSlowCases() {
       case op_convert_this: {
         m_jit.link(iter->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_convert_this);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 2;
         break;
       }
@@ -2680,19 +2717,19 @@ void CTI::privateCompileSlowCases() {
           m_jit.link((++iter)->from, m_jit.label());
           m_jit.subl_i32r(getDeTaggedConstantImmediate(value), X86::edx);
           m_jit.link(notImm, m_jit.label());
-          emitGetPutArg(src1, 0, X86::ecx);
-          emitPutArg(X86::edx, 4);
+          emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
+          emitPutCTIArg(X86::edx, 4);
           emitCTICall(instruction + i, i, Machine::cti_op_add);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else if (JSValue* value = getConstantImmediateNumericArg(src2)) {
           X86Assembler::JmpSrc notImm = iter->from;
           m_jit.link((++iter)->from, m_jit.label());
           m_jit.subl_i32r(getDeTaggedConstantImmediate(value), X86::eax);
           m_jit.link(notImm, m_jit.label());
-          emitPutArg(X86::eax, 0);
-          emitGetPutArg(src2, 4, X86::ecx);
+          emitPutCTIArg(X86::eax, 0);
+          emitPutCTIArgFromVirtualRegister(src2, 4, X86::ecx);
           emitCTICall(instruction + i, i, Machine::cti_op_add);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else {
           OperandTypes types =
               OperandTypes::fromInt(instruction[i + 4].u.operand);
@@ -2716,10 +2753,10 @@ void CTI::privateCompileSlowCases() {
         m_jit.link((++iter)->from, m_jit.label());
         emitFastArithIntToImmNoCheck(X86::edx);
         m_jit.link(notImm, m_jit.label());
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::edx, 4);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::edx, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_get_by_val);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         m_jit.link(m_jit.emitUnlinkedJmp(), m_labels[i + 4]);
 
         // This is slow case that handles accesses to arrays above the fast
@@ -2739,7 +2776,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.testl_rr(X86::ecx, X86::ecx);
         m_jit.link(m_jit.emitUnlinkedJe(), beginGetByValSlow);
         m_jit.movl_rr(X86::ecx, X86::eax);
-        emitPutResult(instruction[i + 1].u.operand, X86::eax);
+        emitPutVirtualRegister(instruction[i + 1].u.operand, X86::eax);
 
         i += 4;
         break;
@@ -2762,19 +2799,20 @@ void CTI::privateCompileSlowCases() {
           m_jit.link(iter->from, m_jit.label());
         }
 
-        emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_negate);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_rshift: {
         m_jit.link(iter->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::ecx, 4);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::ecx, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_rshift);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
@@ -2782,14 +2820,14 @@ void CTI::privateCompileSlowCases() {
         X86Assembler::JmpSrc notImm1 = iter->from;
         X86Assembler::JmpSrc notImm2 = (++iter)->from;
         m_jit.link((++iter)->from, m_jit.label());
-        emitGetArgs(instruction[i + 2].u.operand, X86::eax,
-                    instruction[i + 3].u.operand, X86::ecx, i);
+        emitGetVirtualRegisters(instruction[i + 2].u.operand, X86::eax,
+                                instruction[i + 3].u.operand, X86::ecx, i);
         m_jit.link(notImm1, m_jit.label());
         m_jit.link(notImm2, m_jit.label());
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::ecx, 4);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::ecx, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_lshift);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
@@ -2801,16 +2839,17 @@ void CTI::privateCompileSlowCases() {
             getConstantImmediateNumericArg(instruction[i + 2].u.operand);
         if (src2imm) {
           m_jit.link(iter->from, m_jit.label());
-          emitPutArg(X86::edx, 0);
-          emitGetPutArg(instruction[i + 2].u.operand, 4, X86::ecx);
+          emitPutCTIArg(X86::edx, 0);
+          emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 4,
+                                           X86::ecx);
           emitCTICall(instruction + i, i, Machine::cti_op_loop_if_less);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJne(), m_labels[i + 3 + target]);
         } else {
           m_jit.link(iter->from, m_jit.label());
           m_jit.link((++iter)->from, m_jit.label());
-          emitPutArg(X86::eax, 0);
-          emitPutArg(X86::edx, 4);
+          emitPutCTIArg(X86::eax, 0);
+          emitPutCTIArg(X86::edx, 4);
           emitCTICall(instruction + i, i, Machine::cti_op_loop_if_less);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJne(), m_labels[i + 3 + target]);
@@ -2825,9 +2864,9 @@ void CTI::privateCompileSlowCases() {
 
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 2].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::edx, 8);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::edx, 8);
         X86Assembler::JmpSrc call =
             emitCTICall(instruction + i, i, Machine::cti_op_put_by_id);
 
@@ -2861,15 +2900,15 @@ void CTI::privateCompileSlowCases() {
 #ifndef NDEBUG
         X86Assembler::JmpDst coldPathBegin = m_jit.label();
 #endif
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         Identifier* ident =
             &(m_codeBlock->identifiers[instruction[i + 3].u.operand]);
-        emitPutArgConstant(reinterpret_cast<unsigned>(ident), 4);
+        emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
         X86Assembler::JmpSrc call =
             emitCTICall(instruction + i, i, Machine::cti_op_get_by_id);
         ASSERT(X86Assembler::getDifferenceBetweenLabels(coldPathBegin, call) ==
                repatchOffsetGetByIdSlowCaseCall);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
 
         // Track the location of the call; this will be used to recover repatch
         // information.
@@ -2891,16 +2930,17 @@ void CTI::privateCompileSlowCases() {
             getConstantImmediateNumericArg(instruction[i + 2].u.operand);
         if (src2imm) {
           m_jit.link(iter->from, m_jit.label());
-          emitPutArg(X86::edx, 0);
-          emitGetPutArg(instruction[i + 2].u.operand, 4, X86::ecx);
+          emitPutCTIArg(X86::edx, 0);
+          emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 4,
+                                           X86::ecx);
           emitCTICall(instruction + i, i, Machine::cti_op_loop_if_lesseq);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJne(), m_labels[i + 3 + target]);
         } else {
           m_jit.link(iter->from, m_jit.label());
           m_jit.link((++iter)->from, m_jit.label());
-          emitPutArg(X86::eax, 0);
-          emitPutArg(X86::edx, 4);
+          emitPutCTIArg(X86::eax, 0);
+          emitPutCTIArg(X86::edx, 4);
           emitCTICall(instruction + i, i, Machine::cti_op_loop_if_lesseq);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJne(), m_labels[i + 3 + target]);
@@ -2916,9 +2956,9 @@ void CTI::privateCompileSlowCases() {
             getDeTaggedConstantImmediate(JSImmediate::oneImmediate()),
             X86::eax);
         m_jit.link(notImm, m_jit.label());
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_pre_inc);
-        emitPutResult(srcDst);
+        emitPutVirtualRegister(srcDst);
         i += 2;
         break;
       }
@@ -2929,20 +2969,20 @@ void CTI::privateCompileSlowCases() {
         m_jit.link((++iter)->from, m_jit.label());
         emitFastArithIntToImmNoCheck(X86::edx);
         m_jit.link(notImm, m_jit.label());
-        emitGetArg(instruction[i + 3].u.operand, X86::ecx, i);
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::edx, 4);
-        emitPutArg(X86::ecx, 8);
+        emitGetVirtualRegister(instruction[i + 3].u.operand, X86::ecx, i);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::edx, 4);
+        emitPutCTIArg(X86::ecx, 8);
         emitCTICall(instruction + i, i, Machine::cti_op_put_by_val);
         m_jit.link(m_jit.emitUnlinkedJmp(), m_labels[i + 4]);
 
         // slow cases for immediate int accesses to arrays
         m_jit.link((++iter)->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
-        emitGetArg(instruction[i + 3].u.operand, X86::ecx, i);
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::edx, 4);
-        emitPutArg(X86::ecx, 8);
+        emitGetVirtualRegister(instruction[i + 3].u.operand, X86::ecx, i);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::edx, 4);
+        emitPutCTIArg(X86::ecx, 8);
         emitCTICall(instruction + i, i, Machine::cti_op_put_by_val_array);
 
         i += 4;
@@ -2952,7 +2992,7 @@ void CTI::privateCompileSlowCases() {
         emitSlowScriptCheck(instruction + i, i);
 
         m_jit.link(iter->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_jtrue);
         m_jit.testl_rr(X86::eax, X86::eax);
         unsigned target = instruction[i + 2].u.operand;
@@ -2968,9 +3008,9 @@ void CTI::privateCompileSlowCases() {
             getDeTaggedConstantImmediate(JSImmediate::oneImmediate()),
             X86::eax);
         m_jit.link(notImm, m_jit.label());
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_pre_dec);
-        emitPutResult(srcDst);
+        emitPutVirtualRegister(srcDst);
         i += 2;
         break;
       }
@@ -2980,16 +3020,17 @@ void CTI::privateCompileSlowCases() {
             getConstantImmediateNumericArg(instruction[i + 2].u.operand);
         if (src2imm) {
           m_jit.link(iter->from, m_jit.label());
-          emitPutArg(X86::edx, 0);
-          emitGetPutArg(instruction[i + 2].u.operand, 4, X86::ecx);
+          emitPutCTIArg(X86::edx, 0);
+          emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 4,
+                                           X86::ecx);
           emitCTICall(instruction + i, i, Machine::cti_op_jless);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJe(), m_labels[i + 3 + target]);
         } else {
           m_jit.link(iter->from, m_jit.label());
           m_jit.link((++iter)->from, m_jit.label());
-          emitPutArg(X86::eax, 0);
-          emitPutArg(X86::edx, 4);
+          emitPutCTIArg(X86::eax, 0);
+          emitPutCTIArg(X86::edx, 4);
           emitCTICall(instruction + i, i, Machine::cti_op_jless);
           m_jit.testl_rr(X86::eax, X86::eax);
           m_jit.link(m_jit.emitUnlinkedJe(), m_labels[i + 3 + target]);
@@ -3000,15 +3041,15 @@ void CTI::privateCompileSlowCases() {
       case op_not: {
         m_jit.link(iter->from, m_jit.label());
         m_jit.xorl_i8r(JSImmediate::FullTagTypeBool, X86::eax);
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_not);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_jfalse: {
         m_jit.link(iter->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_jtrue);
         m_jit.testl_rr(X86::eax, X86::eax);
         unsigned target = instruction[i + 2].u.operand;
@@ -3021,18 +3062,18 @@ void CTI::privateCompileSlowCases() {
         unsigned srcDst = instruction[i + 2].u.operand;
         m_jit.link(iter->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_post_inc);
-        emitPutResult(srcDst, X86::edx);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(srcDst, X86::edx);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_bitnot: {
         m_jit.link(iter->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_bitnot);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
@@ -3042,29 +3083,29 @@ void CTI::privateCompileSlowCases() {
         unsigned dst = instruction[i + 1].u.operand;
         if (getConstantImmediateNumericArg(src1)) {
           m_jit.link(iter->from, m_jit.label());
-          emitGetPutArg(src1, 0, X86::ecx);
-          emitPutArg(X86::eax, 4);
+          emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
+          emitPutCTIArg(X86::eax, 4);
           emitCTICall(instruction + i, i, Machine::cti_op_bitand);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else if (getConstantImmediateNumericArg(src2)) {
           m_jit.link(iter->from, m_jit.label());
-          emitPutArg(X86::eax, 0);
-          emitGetPutArg(src2, 4, X86::ecx);
+          emitPutCTIArg(X86::eax, 0);
+          emitPutCTIArgFromVirtualRegister(src2, 4, X86::ecx);
           emitCTICall(instruction + i, i, Machine::cti_op_bitand);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else {
           m_jit.link(iter->from, m_jit.label());
-          emitGetPutArg(src1, 0, X86::ecx);
-          emitPutArg(X86::edx, 4);
+          emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
+          emitPutCTIArg(X86::edx, 4);
           emitCTICall(instruction + i, i, Machine::cti_op_bitand);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         }
         i += 5;
         break;
       }
       case op_jtrue: {
         m_jit.link(iter->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_jtrue);
         m_jit.testl_rr(X86::eax, X86::eax);
         unsigned target = instruction[i + 2].u.operand;
@@ -3076,46 +3117,46 @@ void CTI::privateCompileSlowCases() {
         unsigned srcDst = instruction[i + 2].u.operand;
         m_jit.link(iter->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_post_dec);
-        emitPutResult(srcDst, X86::edx);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(srcDst, X86::edx);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
       case op_bitxor: {
         m_jit.link(iter->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::edx, 4);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::edx, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_bitxor);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 5;
         break;
       }
       case op_bitor: {
         m_jit.link(iter->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::edx, 4);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::edx, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_bitor);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 5;
         break;
       }
       case op_eq: {
         m_jit.link(iter->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::edx, 4);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::edx, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_eq);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
       case op_neq: {
         m_jit.link(iter->from, m_jit.label());
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::edx, 4);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::edx, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_neq);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
@@ -3125,11 +3166,14 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
-        emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
-        emitGetPutArg(instruction[i + 3].u.operand, 4, X86::ecx);
-        emitGetPutArg(instruction[i + 4].u.operand, 8, X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 2].u.operand, 0,
+                                         X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 3].u.operand, 4,
+                                         X86::ecx);
+        emitPutCTIArgFromVirtualRegister(instruction[i + 4].u.operand, 8,
+                                         X86::ecx);
         emitCTICall(instruction + i, i, Machine::cti_op_instanceof);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 5;
         break;
       }
@@ -3141,10 +3185,10 @@ void CTI::privateCompileSlowCases() {
         emitFastArithReTagImmediate(X86::ecx);
         m_jit.link(notImm1, m_jit.label());
         m_jit.link(notImm2, m_jit.label());
-        emitPutArg(X86::eax, 0);
-        emitPutArg(X86::ecx, 4);
+        emitPutCTIArg(X86::eax, 0);
+        emitPutCTIArg(X86::ecx, 4);
         emitCTICall(instruction + i, i, Machine::cti_op_mod);
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 4;
         break;
       }
@@ -3160,20 +3204,20 @@ void CTI::privateCompileSlowCases() {
           m_jit.link((++iter)->from, m_jit.label());
           // There is an extra slow case for (op1 * -N) or (-N * op2), to check
           // for 0 since this should produce a result of -0.
-          emitGetPutArg(src1, 0, X86::ecx);
-          emitGetPutArg(src2, 4, X86::ecx);
+          emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
+          emitPutCTIArgFromVirtualRegister(src2, 4, X86::ecx);
           emitCTICall(instruction + i, i, Machine::cti_op_mul);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else if (src2Value &&
                    ((value = JSImmediate::intValue(src2Value)) > 0)) {
           m_jit.link(iter->from, m_jit.label());
           m_jit.link((++iter)->from, m_jit.label());
           // There is an extra slow case for (op1 * -N) or (-N * op2), to check
           // for 0 since this should produce a result of -0.
-          emitGetPutArg(src1, 0, X86::ecx);
-          emitGetPutArg(src2, 4, X86::ecx);
+          emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
+          emitPutCTIArgFromVirtualRegister(src2, 4, X86::ecx);
           emitCTICall(instruction + i, i, Machine::cti_op_mul);
-          emitPutResult(dst);
+          emitPutVirtualRegister(dst);
         } else
           compileBinaryArithOpSlowCase(
               instruction + i, op_mul, iter, dst, src1, src2,
@@ -3209,9 +3253,9 @@ void CTI::privateCompileSlowCases() {
         // First, in the case of a construct, allocate the new object.
         if (opcodeID == op_construct) {
           emitCTICall(instruction, i, Machine::cti_op_construct_JSConstruct);
-          emitPutResult(registerOffset - RegisterFile::CallFrameHeaderSize -
-                        argCount);
-          emitGetArg(callee, X86::ecx, i);
+          emitPutVirtualRegister(registerOffset -
+                                 RegisterFile::CallFrameHeaderSize - argCount);
+          emitGetVirtualRegister(callee, X86::ecx, i);
         }
 
         m_jit.movl_i32r(argCount, X86::edx);
@@ -3265,9 +3309,9 @@ void CTI::privateCompileSlowCases() {
         // First, in the case of a construct, allocate the new object.
         if (opcodeID == op_construct) {
           emitCTICall(instruction, i, Machine::cti_op_construct_JSConstruct);
-          emitPutResult(registerOffset - RegisterFile::CallFrameHeaderSize -
-                        argCount);
-          emitGetArg(callee, X86::ecx, i);
+          emitPutVirtualRegister(registerOffset -
+                                 RegisterFile::CallFrameHeaderSize - argCount);
+          emitGetVirtualRegister(callee, X86::ecx, i);
         }
 
         // Speculatively roll the callframe, assuming argCount will match the
@@ -3285,7 +3329,7 @@ void CTI::privateCompileSlowCases() {
         X86Assembler::JmpDst storeResult = m_jit.label();
         m_jit.link(wasNotJSFunction, storeResult);
         m_jit.link(storeResultForFirstRun, storeResult);
-        emitPutResult(dst);
+        emitPutVirtualRegister(dst);
 
 #if ENABLE(CODEBLOCK_SAMPLING)
         m_jit.movl_i32m(reinterpret_cast<unsigned>(m_codeBlock),
@@ -3301,10 +3345,10 @@ void CTI::privateCompileSlowCases() {
           ++iter;
         m_jit.link(iter->from, m_jit.label());
 
-        emitPutArg(X86::eax, 0);
+        emitPutCTIArg(X86::eax, 0);
         emitCTICall(instruction + i, i, Machine::cti_op_to_jsnumber);
 
-        emitPutResult(instruction[i + 1].u.operand);
+        emitPutVirtualRegister(instruction[i + 1].u.operand);
         i += 3;
         break;
       }
@@ -3881,8 +3925,8 @@ void CTI::privateCompileCTIMachineTrampolines() {
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callJSFunction1 = m_jit.emitCall();
-  emitRetrieveArg(0, X86::ecx);
-  emitRetrieveArg(8, X86::edx);
+  emitGetCTIArg(0, X86::ecx);
+  emitGetCTIArg(8, X86::edx);
   m_jit.pushl_r(X86::ebx);
   m_jit.link(hasCodeBlock1, m_jit.label());
 
@@ -3890,21 +3934,21 @@ void CTI::privateCompileCTIMachineTrampolines() {
   m_jit.cmpl_rm(X86::edx, OBJECT_OFFSET(CodeBlock, numParameters), X86::eax);
   X86Assembler::JmpSrc arityCheckOkay1 = m_jit.emitUnlinkedJe();
   m_jit.popl_r(X86::ebx);
-  emitPutArg(X86::ebx, 4);
-  emitPutArg(X86::eax, 12);
+  emitPutCTIArg(X86::ebx, 4);
+  emitPutCTIArg(X86::eax, 12);
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callArityCheck1 = m_jit.emitCall();
   m_jit.movl_rr(X86::edx, X86::edi);
-  emitRetrieveArg(0, X86::ecx);
-  emitRetrieveArg(8, X86::edx);
+  emitGetCTIArg(0, X86::ecx);
+  emitGetCTIArg(8, X86::edx);
   m_jit.pushl_r(X86::ebx);
   m_jit.link(arityCheckOkay1, m_jit.label());
 
   compileOpCallInitializeCallFrame();
 
   m_jit.popl_r(X86::ebx);
-  emitPutArg(X86::ebx, 4);
+  emitPutCTIArg(X86::ebx, 4);
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callDontLazyLinkCall = m_jit.emitCall();
@@ -3923,8 +3967,8 @@ void CTI::privateCompileCTIMachineTrampolines() {
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callJSFunction2 = m_jit.emitCall();
-  emitRetrieveArg(0, X86::ecx);
-  emitRetrieveArg(8, X86::edx);
+  emitGetCTIArg(0, X86::ecx);
+  emitGetCTIArg(8, X86::edx);
   m_jit.pushl_r(X86::ebx);
   m_jit.link(hasCodeBlock2, m_jit.label());
 
@@ -3932,21 +3976,21 @@ void CTI::privateCompileCTIMachineTrampolines() {
   m_jit.cmpl_rm(X86::edx, OBJECT_OFFSET(CodeBlock, numParameters), X86::eax);
   X86Assembler::JmpSrc arityCheckOkay2 = m_jit.emitUnlinkedJe();
   m_jit.popl_r(X86::ebx);
-  emitPutArg(X86::ebx, 4);
-  emitPutArg(X86::eax, 12);
+  emitPutCTIArg(X86::ebx, 4);
+  emitPutCTIArg(X86::eax, 12);
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callArityCheck2 = m_jit.emitCall();
   m_jit.movl_rr(X86::edx, X86::edi);
-  emitRetrieveArg(0, X86::ecx);
-  emitRetrieveArg(8, X86::edx);
+  emitGetCTIArg(0, X86::ecx);
+  emitGetCTIArg(8, X86::edx);
   m_jit.pushl_r(X86::ebx);
   m_jit.link(arityCheckOkay2, m_jit.label());
 
   compileOpCallInitializeCallFrame();
 
   m_jit.popl_r(X86::ebx);
-  emitPutArg(X86::ebx, 4);
+  emitPutCTIArg(X86::ebx, 4);
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callLazyLinkCall = m_jit.emitCall();
@@ -3965,8 +4009,8 @@ void CTI::privateCompileCTIMachineTrampolines() {
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callJSFunction3 = m_jit.emitCall();
-  emitRetrieveArg(0, X86::ecx);
-  emitRetrieveArg(8, X86::edx);
+  emitGetCTIArg(0, X86::ecx);
+  emitGetCTIArg(8, X86::edx);
   m_jit.pushl_r(X86::ebx);
   m_jit.link(hasCodeBlock3, m_jit.label());
 
@@ -3974,14 +4018,14 @@ void CTI::privateCompileCTIMachineTrampolines() {
   m_jit.cmpl_rm(X86::edx, OBJECT_OFFSET(CodeBlock, numParameters), X86::eax);
   X86Assembler::JmpSrc arityCheckOkay3 = m_jit.emitUnlinkedJe();
   m_jit.popl_r(X86::ebx);
-  emitPutArg(X86::ebx, 4);
-  emitPutArg(X86::eax, 12);
+  emitPutCTIArg(X86::ebx, 4);
+  emitPutCTIArg(X86::eax, 12);
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callArityCheck3 = m_jit.emitCall();
   m_jit.movl_rr(X86::edx, X86::edi);
-  emitRetrieveArg(0, X86::ecx);
-  emitRetrieveArg(8, X86::edx);
+  emitGetCTIArg(0, X86::ecx);
+  emitGetCTIArg(8, X86::edx);
   m_jit.pushl_r(X86::ebx);
   m_jit.link(arityCheckOkay3, m_jit.label());
 
