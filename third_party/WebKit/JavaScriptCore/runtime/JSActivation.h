@@ -77,7 +77,7 @@ class JSActivation : public JSVariableObject {
   struct JSActivationData : public JSVariableObjectData {
     JSActivationData(PassRefPtr<FunctionBodyNode> functionBody,
                      Register* registers)
-        : JSVariableObjectData(&functionBody->generatedByteCode().symbolTable,
+        : JSVariableObjectData(&functionBody->generatedBytecode().symbolTable,
                                registers),
           functionBody(functionBody) {}
 

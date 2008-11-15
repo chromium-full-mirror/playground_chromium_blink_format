@@ -358,7 +358,7 @@ static bool runWithScripts(GlobalObject* globalObject,
   Vector<char> script;
 
   if (dump)
-    CodeGenerator::setDumpsGeneratedCode(true);
+    BytecodeGenerator::setDumpsGeneratedCode(true);
 
 #if ENABLE(BYTECODE_SAMPLING)
   BytecodeInterpreter* interpreter = globalObject->globalData()->interpreter;

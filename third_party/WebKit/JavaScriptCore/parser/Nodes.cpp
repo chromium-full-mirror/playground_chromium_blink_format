@@ -240,9 +240,10 @@ static void substitute(UString& string, const UString& substring) {
   string = newString;
 }
 
-RegisterID* ThrowableExpressionData::emitThrowError(CodeGenerator& generator,
-                                                    ErrorType e,
-                                                    const char* msg) {
+RegisterID* ThrowableExpressionData::emitThrowError(
+    BytecodeGenerator& generator,
+    ErrorType e,
+    const char* msg) {
   generator.emitExpressionInfo(divot(), startOffset(), endOffset());
   RegisterID* exception = generator.emitNewError(
       generator.newTemporary(), e, jsString(generator.globalData(), msg));
@@ -250,10 +251,11 @@ RegisterID* ThrowableExpressionData::emitThrowError(CodeGenerator& generator,
   return exception;
 }
 
-RegisterID* ThrowableExpressionData::emitThrowError(CodeGenerator& generator,
-                                                    ErrorType e,
-                                                    const char* msg,
-                                                    const Identifier& label) {
+RegisterID* ThrowableExpressionData::emitThrowError(
+    BytecodeGenerator& generator,
+    ErrorType e,
+    const char* msg,
+    const Identifier& label) {
   UString message = msg;
   substitute(message, label.ustring());
   generator.emitExpressionInfo(divot(), startOffset(), endOffset());
@@ -285,7 +287,8 @@ void SourceElements::append(PassRefPtr<StatementNode> statement) {
 
 // ------------------------------ NullNode -------------------------------------
 
-RegisterID* NullNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* NullNode::emitBytecode(BytecodeGenerator& generator,
+                                   RegisterID* dst) {
   if (dst == ignoredResult())
     return 0;
   return generator.emitLoad(dst, jsNull());
@@ -293,7 +296,7 @@ RegisterID* NullNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
 
 // ------------------------------ BooleanNode ----------------------------------
 
-RegisterID* BooleanNode::emitBytecode(CodeGenerator& generator,
+RegisterID* BooleanNode::emitBytecode(BytecodeGenerator& generator,
                                       RegisterID* dst) {
   if (dst == ignoredResult())
     return 0;
@@ -302,7 +305,7 @@ RegisterID* BooleanNode::emitBytecode(CodeGenerator& generator,
 
 // ------------------------------ NumberNode -----------------------------------
 
-RegisterID* NumberNode::emitBytecode(CodeGenerator& generator,
+RegisterID* NumberNode::emitBytecode(BytecodeGenerator& generator,
                                      RegisterID* dst) {
   if (dst == ignoredResult())
     return 0;
@@ -311,7 +314,7 @@ RegisterID* NumberNode::emitBytecode(CodeGenerator& generator,
 
 // ------------------------------ StringNode -----------------------------------
 
-RegisterID* StringNode::emitBytecode(CodeGenerator& generator,
+RegisterID* StringNode::emitBytecode(BytecodeGenerator& generator,
                                      RegisterID* dst) {
   if (dst == ignoredResult())
     return 0;
@@ -320,7 +323,7 @@ RegisterID* StringNode::emitBytecode(CodeGenerator& generator,
 
 // ------------------------------ RegExpNode -----------------------------------
 
-RegisterID* RegExpNode::emitBytecode(CodeGenerator& generator,
+RegisterID* RegExpNode::emitBytecode(BytecodeGenerator& generator,
                                      RegisterID* dst) {
   RefPtr<RegExp> regExp =
       RegExp::create(generator.globalData(), m_pattern, m_flags);
@@ -337,7 +340,8 @@ RegisterID* RegExpNode::emitBytecode(CodeGenerator& generator,
 
 // ------------------------------ ThisNode -------------------------------------
 
-RegisterID* ThisNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* ThisNode::emitBytecode(BytecodeGenerator& generator,
+                                   RegisterID* dst) {
   if (dst == ignoredResult())
     return 0;
   return generator.moveToDestinationIfNeeded(dst, generator.thisRegister());
@@ -345,11 +349,11 @@ RegisterID* ThisNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
 
 // ------------------------------ ResolveNode ----------------------------------
 
-bool ResolveNode::isPure(CodeGenerator& generator) const {
+bool ResolveNode::isPure(BytecodeGenerator& generator) const {
   return generator.isLocal(m_ident);
 }
 
-RegisterID* ResolveNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ResolveNode::emitBytecode(BytecodeGenerator& generator,
                                       RegisterID* dst) {
   if (RegisterID* local = generator.registerFor(m_ident)) {
     if (dst == ignoredResult())
@@ -384,7 +388,8 @@ void ArrayNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_element);
 }
 
-RegisterID* ArrayNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* ArrayNode::emitBytecode(BytecodeGenerator& generator,
+                                    RegisterID* dst) {
   // FIXME: Should we put all of this code into emitNewArray?
 
   unsigned length = 0;
@@ -438,7 +443,7 @@ void ObjectLiteralNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_list);
 }
 
-RegisterID* ObjectLiteralNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ObjectLiteralNode::emitBytecode(BytecodeGenerator& generator,
                                             RegisterID* dst) {
   if (!m_list) {
     if (dst == ignoredResult())
@@ -459,7 +464,7 @@ void PropertyListNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_next);
 }
 
-RegisterID* PropertyListNode::emitBytecode(CodeGenerator& generator,
+RegisterID* PropertyListNode::emitBytecode(BytecodeGenerator& generator,
                                            RegisterID* dst) {
   RefPtr<RegisterID> newObj = generator.tempDestination(dst);
 
@@ -501,7 +506,7 @@ void BracketAccessorNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_subscript);
 }
 
-RegisterID* BracketAccessorNode::emitBytecode(CodeGenerator& generator,
+RegisterID* BracketAccessorNode::emitBytecode(BytecodeGenerator& generator,
                                               RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
       m_base.get(), m_subscriptHasAssignments, m_subscript->isPure(generator));
@@ -522,7 +527,7 @@ void DotAccessorNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_base);
 }
 
-RegisterID* DotAccessorNode::emitBytecode(CodeGenerator& generator,
+RegisterID* DotAccessorNode::emitBytecode(BytecodeGenerator& generator,
                                           RegisterID* dst) {
   RegisterID* base = generator.emitNode(m_base.get());
   generator.emitExpressionInfo(divot(), startOffset(), endOffset());
@@ -540,7 +545,7 @@ void ArgumentListNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr);
 }
 
-RegisterID* ArgumentListNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ArgumentListNode::emitBytecode(BytecodeGenerator& generator,
                                            RegisterID* dst) {
   ASSERT(m_expr);
   return generator.emitNode(dst, m_expr.get());
@@ -567,7 +572,7 @@ void NewExprNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_args);
 }
 
-RegisterID* NewExprNode::emitBytecode(CodeGenerator& generator,
+RegisterID* NewExprNode::emitBytecode(BytecodeGenerator& generator,
                                       RegisterID* dst) {
   RefPtr<RegisterID> func = generator.emitNode(m_expr.get());
   return generator.emitConstruct(generator.finalDestination(dst), func.get(),
@@ -586,7 +591,7 @@ void EvalFunctionCallNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_args);
 }
 
-RegisterID* EvalFunctionCallNode::emitBytecode(CodeGenerator& generator,
+RegisterID* EvalFunctionCallNode::emitBytecode(BytecodeGenerator& generator,
                                                RegisterID* dst) {
   RefPtr<RegisterID> func = generator.tempDestination(dst);
   RefPtr<RegisterID> thisRegister = generator.newTemporary();
@@ -609,7 +614,7 @@ void FunctionCallValueNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_args);
 }
 
-RegisterID* FunctionCallValueNode::emitBytecode(CodeGenerator& generator,
+RegisterID* FunctionCallValueNode::emitBytecode(BytecodeGenerator& generator,
                                                 RegisterID* dst) {
   RefPtr<RegisterID> func = generator.emitNode(m_expr.get());
   RefPtr<RegisterID> thisRegister =
@@ -630,7 +635,7 @@ void FunctionCallResolveNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_args);
 }
 
-RegisterID* FunctionCallResolveNode::emitBytecode(CodeGenerator& generator,
+RegisterID* FunctionCallResolveNode::emitBytecode(BytecodeGenerator& generator,
                                                   RegisterID* dst) {
   if (RefPtr<RegisterID> local = generator.registerFor(m_ident)) {
     RefPtr<RegisterID> thisRegister =
@@ -679,7 +684,7 @@ void FunctionCallBracketNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_args);
 }
 
-RegisterID* FunctionCallBracketNode::emitBytecode(CodeGenerator& generator,
+RegisterID* FunctionCallBracketNode::emitBytecode(BytecodeGenerator& generator,
                                                   RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNode(m_base.get());
   RegisterID* property = generator.emitNode(m_subscript.get());
@@ -707,7 +712,7 @@ void FunctionCallDotNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_args);
 }
 
-RegisterID* FunctionCallDotNode::emitBytecode(CodeGenerator& generator,
+RegisterID* FunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
                                               RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNode(m_base.get());
   generator.emitExpressionInfo(divot() - m_subexpressionDivotOffset,
@@ -725,14 +730,14 @@ RegisterID* FunctionCallDotNode::emitBytecode(CodeGenerator& generator,
 // ------------------------------ PostfixResolveNode
 // ----------------------------------
 
-static RegisterID* emitPreIncOrDec(CodeGenerator& generator,
+static RegisterID* emitPreIncOrDec(BytecodeGenerator& generator,
                                    RegisterID* srcDst,
                                    Operator oper) {
   return (oper == OpPlusPlus) ? generator.emitPreInc(srcDst)
                               : generator.emitPreDec(srcDst);
 }
 
-static RegisterID* emitPostIncOrDec(CodeGenerator& generator,
+static RegisterID* emitPostIncOrDec(BytecodeGenerator& generator,
                                     RegisterID* dst,
                                     RegisterID* srcDst,
                                     Operator oper) {
@@ -740,7 +745,7 @@ static RegisterID* emitPostIncOrDec(CodeGenerator& generator,
                               : generator.emitPostDec(dst, srcDst);
 }
 
-RegisterID* PostfixResolveNode::emitBytecode(CodeGenerator& generator,
+RegisterID* PostfixResolveNode::emitBytecode(BytecodeGenerator& generator,
                                              RegisterID* dst) {
   if (RegisterID* local = generator.registerFor(m_ident)) {
     if (generator.isLocalConstant(m_ident)) {
@@ -802,7 +807,7 @@ void PostfixBracketNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_subscript);
 }
 
-RegisterID* PostfixBracketNode::emitBytecode(CodeGenerator& generator,
+RegisterID* PostfixBracketNode::emitBytecode(BytecodeGenerator& generator,
                                              RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNode(m_base.get());
   RefPtr<RegisterID> property = generator.emitNode(m_subscript.get());
@@ -842,7 +847,7 @@ void PostfixDotNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_base);
 }
 
-RegisterID* PostfixDotNode::emitBytecode(CodeGenerator& generator,
+RegisterID* PostfixDotNode::emitBytecode(BytecodeGenerator& generator,
                                          RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNode(m_base.get());
 
@@ -881,7 +886,7 @@ void PostfixErrorNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr);
 }
 
-RegisterID* PostfixErrorNode::emitBytecode(CodeGenerator& generator,
+RegisterID* PostfixErrorNode::emitBytecode(BytecodeGenerator& generator,
                                            RegisterID*) {
   return emitThrowError(
       generator, ReferenceError,
@@ -893,7 +898,7 @@ RegisterID* PostfixErrorNode::emitBytecode(CodeGenerator& generator,
 // ------------------------------ DeleteResolveNode
 // -----------------------------------
 
-RegisterID* DeleteResolveNode::emitBytecode(CodeGenerator& generator,
+RegisterID* DeleteResolveNode::emitBytecode(BytecodeGenerator& generator,
                                             RegisterID* dst) {
   if (generator.registerFor(m_ident))
     return generator.emitUnexpectedLoad(generator.finalDestination(dst), false);
@@ -917,7 +922,7 @@ void DeleteBracketNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_subscript);
 }
 
-RegisterID* DeleteBracketNode::emitBytecode(CodeGenerator& generator,
+RegisterID* DeleteBracketNode::emitBytecode(BytecodeGenerator& generator,
                                             RegisterID* dst) {
   RefPtr<RegisterID> r0 = generator.emitNode(m_base.get());
   RegisterID* r1 = generator.emitNode(m_subscript.get());
@@ -938,7 +943,7 @@ void DeleteDotNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_base);
 }
 
-RegisterID* DeleteDotNode::emitBytecode(CodeGenerator& generator,
+RegisterID* DeleteDotNode::emitBytecode(BytecodeGenerator& generator,
                                         RegisterID* dst) {
   RegisterID* r0 = generator.emitNode(m_base.get());
 
@@ -957,7 +962,7 @@ void DeleteValueNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr);
 }
 
-RegisterID* DeleteValueNode::emitBytecode(CodeGenerator& generator,
+RegisterID* DeleteValueNode::emitBytecode(BytecodeGenerator& generator,
                                           RegisterID* dst) {
   generator.emitNode(ignoredResult(), m_expr.get());
 
@@ -975,7 +980,8 @@ void VoidNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr);
 }
 
-RegisterID* VoidNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* VoidNode::emitBytecode(BytecodeGenerator& generator,
+                                   RegisterID* dst) {
   if (dst == ignoredResult()) {
     generator.emitNode(ignoredResult(), m_expr.get());
     return 0;
@@ -987,7 +993,7 @@ RegisterID* VoidNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
 // ------------------------------ TypeOfValueNode
 // -----------------------------------
 
-RegisterID* TypeOfResolveNode::emitBytecode(CodeGenerator& generator,
+RegisterID* TypeOfResolveNode::emitBytecode(BytecodeGenerator& generator,
                                             RegisterID* dst) {
   if (RegisterID* local = generator.registerFor(m_ident)) {
     if (dst == ignoredResult())
@@ -1015,7 +1021,7 @@ void TypeOfValueNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr);
 }
 
-RegisterID* TypeOfValueNode::emitBytecode(CodeGenerator& generator,
+RegisterID* TypeOfValueNode::emitBytecode(BytecodeGenerator& generator,
                                           RegisterID* dst) {
   if (dst == ignoredResult()) {
     generator.emitNode(ignoredResult(), m_expr.get());
@@ -1028,7 +1034,7 @@ RegisterID* TypeOfValueNode::emitBytecode(CodeGenerator& generator,
 // ------------------------------ PrefixResolveNode
 // ----------------------------------
 
-RegisterID* PrefixResolveNode::emitBytecode(CodeGenerator& generator,
+RegisterID* PrefixResolveNode::emitBytecode(BytecodeGenerator& generator,
                                             RegisterID* dst) {
   if (RegisterID* local = generator.registerFor(m_ident)) {
     if (generator.isLocalConstant(m_ident)) {
@@ -1079,7 +1085,7 @@ void PrefixBracketNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_subscript);
 }
 
-RegisterID* PrefixBracketNode::emitBytecode(CodeGenerator& generator,
+RegisterID* PrefixBracketNode::emitBytecode(BytecodeGenerator& generator,
                                             RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNode(m_base.get());
   RefPtr<RegisterID> property = generator.emitNode(m_subscript.get());
@@ -1110,7 +1116,7 @@ void PrefixDotNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_base);
 }
 
-RegisterID* PrefixDotNode::emitBytecode(CodeGenerator& generator,
+RegisterID* PrefixDotNode::emitBytecode(BytecodeGenerator& generator,
                                         RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNode(m_base.get());
   RefPtr<RegisterID> propDst = generator.tempDestination(dst);
@@ -1139,7 +1145,7 @@ void PrefixErrorNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr);
 }
 
-RegisterID* PrefixErrorNode::emitBytecode(CodeGenerator& generator,
+RegisterID* PrefixErrorNode::emitBytecode(BytecodeGenerator& generator,
                                           RegisterID*) {
   return emitThrowError(
       generator, ReferenceError,
@@ -1159,7 +1165,7 @@ void UnaryOpNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr);
 }
 
-RegisterID* UnaryOpNode::emitBytecode(CodeGenerator& generator,
+RegisterID* UnaryOpNode::emitBytecode(BytecodeGenerator& generator,
                                       RegisterID* dst) {
   RegisterID* src = generator.emitNode(m_expr.get());
   return generator.emitUnaryOp(bytecode(), generator.finalDestination(dst), src,
@@ -1178,7 +1184,7 @@ void BinaryOpNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr2);
 }
 
-RegisterID* BinaryOpNode::emitBytecode(CodeGenerator& generator,
+RegisterID* BinaryOpNode::emitBytecode(BytecodeGenerator& generator,
                                        RegisterID* dst) {
   BytecodeID bytecode = this->bytecode();
   if (bytecode == op_neq) {
@@ -1199,7 +1205,8 @@ RegisterID* BinaryOpNode::emitBytecode(CodeGenerator& generator,
       OperandTypes(m_expr1->resultDescriptor(), m_expr2->resultDescriptor()));
 }
 
-RegisterID* EqualNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* EqualNode::emitBytecode(BytecodeGenerator& generator,
+                                    RegisterID* dst) {
   if (m_expr1->isNull() || m_expr2->isNull()) {
     RefPtr<RegisterID> src = generator.emitNode(
         dst, m_expr1->isNull() ? m_expr2.get() : m_expr1.get());
@@ -1215,7 +1222,7 @@ RegisterID* EqualNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
       op_eq, generator.finalDestination(dst, src1.get()), src1.get(), src2);
 }
 
-RegisterID* StrictEqualNode::emitBytecode(CodeGenerator& generator,
+RegisterID* StrictEqualNode::emitBytecode(BytecodeGenerator& generator,
                                           RegisterID* dst) {
   RefPtr<RegisterID> src1 = generator.emitNodeForLeftHandSide(
       m_expr1.get(), m_rightHasAssignments, m_expr2->isPure(generator));
@@ -1225,7 +1232,7 @@ RegisterID* StrictEqualNode::emitBytecode(CodeGenerator& generator,
                                   src1.get(), src2);
 }
 
-RegisterID* ReverseBinaryOpNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ReverseBinaryOpNode::emitBytecode(BytecodeGenerator& generator,
                                               RegisterID* dst) {
   RefPtr<RegisterID> src1 = generator.emitNodeForLeftHandSide(
       m_expr1.get(), m_rightHasAssignments, m_expr2->isPure(generator));
@@ -1235,7 +1242,7 @@ RegisterID* ReverseBinaryOpNode::emitBytecode(CodeGenerator& generator,
       OperandTypes(m_expr2->resultDescriptor(), m_expr1->resultDescriptor()));
 }
 
-RegisterID* ThrowableBinaryOpNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ThrowableBinaryOpNode::emitBytecode(BytecodeGenerator& generator,
                                                 RegisterID* dst) {
   RefPtr<RegisterID> src1 = generator.emitNodeForLeftHandSide(
       m_expr1.get(), m_rightHasAssignments, m_expr2->isPure(generator));
@@ -1246,7 +1253,7 @@ RegisterID* ThrowableBinaryOpNode::emitBytecode(CodeGenerator& generator,
       OperandTypes(m_expr1->resultDescriptor(), m_expr2->resultDescriptor()));
 }
 
-RegisterID* InstanceOfNode::emitBytecode(CodeGenerator& generator,
+RegisterID* InstanceOfNode::emitBytecode(BytecodeGenerator& generator,
                                          RegisterID* dst) {
   RefPtr<RegisterID> src1 = generator.emitNodeForLeftHandSide(
       m_expr1.get(), m_rightHasAssignments, m_expr2->isPure(generator));
@@ -1273,7 +1280,7 @@ void LogicalOpNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr2);
 }
 
-RegisterID* LogicalOpNode::emitBytecode(CodeGenerator& generator,
+RegisterID* LogicalOpNode::emitBytecode(BytecodeGenerator& generator,
                                         RegisterID* dst) {
   RefPtr<RegisterID> temp = generator.tempDestination(dst);
   RefPtr<LabelID> target = generator.newLabel();
@@ -1301,7 +1308,7 @@ void ConditionalNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr2);
 }
 
-RegisterID* ConditionalNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ConditionalNode::emitBytecode(BytecodeGenerator& generator,
                                           RegisterID* dst) {
   RefPtr<RegisterID> newDst = generator.finalDestination(dst);
   RefPtr<LabelID> beforeElse = generator.newLabel();
@@ -1332,9 +1339,9 @@ void ReadModifyResolveNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_right);
 }
 
-// FIXME: should this be moved to be a method on CodeGenerator?
+// FIXME: should this be moved to be a method on BytecodeGenerator?
 static ALWAYS_INLINE RegisterID* emitReadModifyAssignment(
-    CodeGenerator& generator,
+    BytecodeGenerator& generator,
     RegisterID* dst,
     RegisterID* src1,
     RegisterID* src2,
@@ -1383,7 +1390,7 @@ static ALWAYS_INLINE RegisterID* emitReadModifyAssignment(
   return generator.emitBinaryOp(bytecode, dst, src1, src2, types);
 }
 
-RegisterID* ReadModifyResolveNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ReadModifyResolveNode::emitBytecode(BytecodeGenerator& generator,
                                                 RegisterID* dst) {
   if (RegisterID* local = generator.registerFor(m_ident)) {
     if (generator.isLocalConstant(m_ident)) {
@@ -1453,7 +1460,7 @@ void AssignResolveNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_right);
 }
 
-RegisterID* AssignResolveNode::emitBytecode(CodeGenerator& generator,
+RegisterID* AssignResolveNode::emitBytecode(BytecodeGenerator& generator,
                                             RegisterID* dst) {
   if (RegisterID* local = generator.registerFor(m_ident)) {
     if (generator.isLocalConstant(m_ident))
@@ -1496,7 +1503,7 @@ void AssignDotNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_right);
 }
 
-RegisterID* AssignDotNode::emitBytecode(CodeGenerator& generator,
+RegisterID* AssignDotNode::emitBytecode(BytecodeGenerator& generator,
                                         RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
       m_base.get(), m_rightHasAssignments, m_right->isPure(generator));
@@ -1519,7 +1526,7 @@ void ReadModifyDotNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_right);
 }
 
-RegisterID* ReadModifyDotNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ReadModifyDotNode::emitBytecode(BytecodeGenerator& generator,
                                             RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
       m_base.get(), m_rightHasAssignments, m_right->isPure(generator));
@@ -1551,7 +1558,7 @@ void AssignErrorNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_right);
 }
 
-RegisterID* AssignErrorNode::emitBytecode(CodeGenerator& generator,
+RegisterID* AssignErrorNode::emitBytecode(BytecodeGenerator& generator,
                                           RegisterID*) {
   return emitThrowError(generator, ReferenceError,
                         "Left side of assignment is not a reference.");
@@ -1570,7 +1577,7 @@ void AssignBracketNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_right);
 }
 
-RegisterID* AssignBracketNode::emitBytecode(CodeGenerator& generator,
+RegisterID* AssignBracketNode::emitBytecode(BytecodeGenerator& generator,
                                             RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
       m_base.get(), m_subscriptHasAssignments || m_rightHasAssignments,
@@ -1598,7 +1605,7 @@ void ReadModifyBracketNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_right);
 }
 
-RegisterID* ReadModifyBracketNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ReadModifyBracketNode::emitBytecode(BytecodeGenerator& generator,
                                                 RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
       m_base.get(), m_subscriptHasAssignments || m_rightHasAssignments,
@@ -1634,7 +1641,8 @@ void CommaNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr2);
 }
 
-RegisterID* CommaNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* CommaNode::emitBytecode(BytecodeGenerator& generator,
+                                    RegisterID* dst) {
   generator.emitNode(ignoredResult(), m_expr1.get());
   return generator.emitNode(dst, m_expr2.get());
 }
@@ -1656,7 +1664,7 @@ ConstDeclNode::ConstDeclNode(JSGlobalData* globalData,
                              ExpressionNode* init)
     : ExpressionNode(globalData), m_ident(ident), m_init(init) {}
 
-RegisterID* ConstDeclNode::emitCodeSingle(CodeGenerator& generator) {
+RegisterID* ConstDeclNode::emitCodeSingle(BytecodeGenerator& generator) {
   if (RegisterID* local = generator.constRegisterFor(m_ident)) {
     if (!m_init)
       return local;
@@ -1673,7 +1681,8 @@ RegisterID* ConstDeclNode::emitCodeSingle(CodeGenerator& generator) {
   return generator.emitPutById(base.get(), m_ident, value);
 }
 
-RegisterID* ConstDeclNode::emitBytecode(CodeGenerator& generator, RegisterID*) {
+RegisterID* ConstDeclNode::emitBytecode(BytecodeGenerator& generator,
+                                        RegisterID*) {
   RegisterID* result = 0;
   for (ConstDeclNode* n = this; n; n = n->m_next.get())
     result = n->emitCodeSingle(generator);
@@ -1692,7 +1701,7 @@ void ConstStatementNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_next);
 }
 
-RegisterID* ConstStatementNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ConstStatementNode::emitBytecode(BytecodeGenerator& generator,
                                              RegisterID*) {
   return generator.emitNode(m_next.get());
 }
@@ -1702,7 +1711,7 @@ RegisterID* ConstStatementNode::emitBytecode(CodeGenerator& generator,
 
 static inline RegisterID* statementListEmitCode(
     const StatementVector& statements,
-    CodeGenerator& generator,
+    BytecodeGenerator& generator,
     RegisterID* dst) {
   StatementVector::const_iterator end = statements.end();
   for (StatementVector::const_iterator it = statements.begin(); it != end;
@@ -1734,20 +1743,22 @@ BlockNode::BlockNode(JSGlobalData* globalData, SourceElements* children)
     children->releaseContentsIntoVector(m_children);
 }
 
-RegisterID* BlockNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* BlockNode::emitBytecode(BytecodeGenerator& generator,
+                                    RegisterID* dst) {
   return statementListEmitCode(m_children, generator, dst);
 }
 
 // ------------------------------ EmptyStatementNode ---------------------------
 
-RegisterID* EmptyStatementNode::emitBytecode(CodeGenerator&, RegisterID* dst) {
+RegisterID* EmptyStatementNode::emitBytecode(BytecodeGenerator&,
+                                             RegisterID* dst) {
   return dst;
 }
 
 // ------------------------------ DebuggerStatementNode
 // ---------------------------
 
-RegisterID* DebuggerStatementNode::emitBytecode(CodeGenerator& generator,
+RegisterID* DebuggerStatementNode::emitBytecode(BytecodeGenerator& generator,
                                                 RegisterID* dst) {
   generator.emitDebugHook(DidReachBreakpoint, firstLine(), lastLine());
   return dst;
@@ -1755,7 +1766,7 @@ RegisterID* DebuggerStatementNode::emitBytecode(CodeGenerator& generator,
 
 // ------------------------------ ExprStatementNode ----------------------------
 
-RegisterID* ExprStatementNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ExprStatementNode::emitBytecode(BytecodeGenerator& generator,
                                             RegisterID* dst) {
   ASSERT(m_expr);
   return generator.emitNode(dst, m_expr.get());
@@ -1771,7 +1782,7 @@ void VarStatementNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr);
 }
 
-RegisterID* VarStatementNode::emitBytecode(CodeGenerator& generator,
+RegisterID* VarStatementNode::emitBytecode(BytecodeGenerator& generator,
                                            RegisterID*) {
   ASSERT(m_expr);
   return generator.emitNode(m_expr.get());
@@ -1788,7 +1799,8 @@ void IfNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_ifBlock);
 }
 
-RegisterID* IfNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* IfNode::emitBytecode(BytecodeGenerator& generator,
+                                 RegisterID* dst) {
   RefPtr<LabelID> afterThen = generator.newLabel();
 
   RegisterID* cond = generator.emitNode(m_condition.get());
@@ -1818,7 +1830,7 @@ void IfElseNode::releaseNodes(NodeReleaser& releaser) {
   IfNode::releaseNodes(releaser);
 }
 
-RegisterID* IfElseNode::emitBytecode(CodeGenerator& generator,
+RegisterID* IfElseNode::emitBytecode(BytecodeGenerator& generator,
                                      RegisterID* dst) {
   RefPtr<LabelID> beforeElse = generator.newLabel();
   RefPtr<LabelID> afterElse = generator.newLabel();
@@ -1859,7 +1871,7 @@ void DoWhileNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr);
 }
 
-RegisterID* DoWhileNode::emitBytecode(CodeGenerator& generator,
+RegisterID* DoWhileNode::emitBytecode(BytecodeGenerator& generator,
                                       RegisterID* dst) {
   RefPtr<LabelScope> scope = generator.newLabelScope(LabelScope::Loop);
 
@@ -1895,7 +1907,8 @@ void WhileNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_statement);
 }
 
-RegisterID* WhileNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* WhileNode::emitBytecode(BytecodeGenerator& generator,
+                                    RegisterID* dst) {
   RefPtr<LabelScope> scope = generator.newLabelScope(LabelScope::Loop);
 
   generator.emitJump(scope->continueTarget());
@@ -1935,7 +1948,8 @@ void ForNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_statement);
 }
 
-RegisterID* ForNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* ForNode::emitBytecode(BytecodeGenerator& generator,
+                                  RegisterID* dst) {
   if (dst == ignoredResult())
     dst = 0;
 
@@ -2019,7 +2033,8 @@ ForInNode::ForInNode(JSGlobalData* globalData,
   // for( var foo = bar in baz )
 }
 
-RegisterID* ForInNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator,
+                                    RegisterID* dst) {
   RefPtr<LabelScope> scope = generator.newLabelScope(LabelScope::Loop);
 
   if (!m_lexpr->isLocation())
@@ -2092,7 +2107,7 @@ RegisterID* ForInNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
 // ------------------------------ ContinueNode ---------------------------------
 
 // ECMA 12.7
-RegisterID* ContinueNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ContinueNode::emitBytecode(BytecodeGenerator& generator,
                                        RegisterID* dst) {
   LabelScope* scope = generator.continueTarget(m_ident);
 
@@ -2110,7 +2125,8 @@ RegisterID* ContinueNode::emitBytecode(CodeGenerator& generator,
 // ------------------------------ BreakNode ------------------------------------
 
 // ECMA 12.8
-RegisterID* BreakNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* BreakNode::emitBytecode(BytecodeGenerator& generator,
+                                    RegisterID* dst) {
   LabelScope* scope = generator.breakTarget(m_ident);
 
   if (!scope)
@@ -2134,7 +2150,7 @@ void ReturnNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_value);
 }
 
-RegisterID* ReturnNode::emitBytecode(CodeGenerator& generator,
+RegisterID* ReturnNode::emitBytecode(BytecodeGenerator& generator,
                                      RegisterID* dst) {
   if (generator.codeType() != FunctionCode)
     return emitThrowError(generator, SyntaxError, "Invalid return statement.");
@@ -2163,7 +2179,8 @@ void WithNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_statement);
 }
 
-RegisterID* WithNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* WithNode::emitBytecode(BytecodeGenerator& generator,
+                                   RegisterID* dst) {
   RefPtr<RegisterID> scope =
       generator.emitNode(m_expr.get());  // scope must be protected until popped
   generator.emitExpressionInfo(m_divot, m_expressionLength, 0);
@@ -2296,9 +2313,9 @@ SwitchInfo::SwitchType CaseBlockNode::tryOptimizedSwitch(
   return SwitchInfo::SwitchString;
 }
 
-RegisterID* CaseBlockNode::emitCodeForBlock(CodeGenerator& generator,
-                                            RegisterID* switchExpression,
-                                            RegisterID* dst) {
+RegisterID* CaseBlockNode::emitBytecodeForBlock(BytecodeGenerator& generator,
+                                                RegisterID* switchExpression,
+                                                RegisterID* dst) {
   RefPtr<LabelID> defaultLabel;
   Vector<RefPtr<LabelID>, 8> labelVector;
   Vector<ExpressionNode*, 8> literalVector;
@@ -2381,12 +2398,12 @@ void SwitchNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_block);
 }
 
-RegisterID* SwitchNode::emitBytecode(CodeGenerator& generator,
+RegisterID* SwitchNode::emitBytecode(BytecodeGenerator& generator,
                                      RegisterID* dst) {
   RefPtr<LabelScope> scope = generator.newLabelScope(LabelScope::Switch);
 
   RefPtr<RegisterID> r0 = generator.emitNode(m_expr.get());
-  RegisterID* r1 = m_block->emitCodeForBlock(generator, r0.get(), dst);
+  RegisterID* r1 = m_block->emitBytecodeForBlock(generator, r0.get(), dst);
 
   generator.emitLabel(scope->breakTarget());
   return r1;
@@ -2402,7 +2419,8 @@ void LabelNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_statement);
 }
 
-RegisterID* LabelNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* LabelNode::emitBytecode(BytecodeGenerator& generator,
+                                    RegisterID* dst) {
   if (generator.breakTarget(m_name))
     return emitThrowError(generator, SyntaxError, "Duplicate label: %s.",
                           m_name);
@@ -2425,7 +2443,8 @@ void ThrowNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_expr);
 }
 
-RegisterID* ThrowNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* ThrowNode::emitBytecode(BytecodeGenerator& generator,
+                                    RegisterID* dst) {
   if (dst == ignoredResult())
     dst = 0;
   RefPtr<RegisterID> expr = generator.emitNode(dst, m_expr.get());
@@ -2446,7 +2465,8 @@ void TryNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_finallyBlock);
 }
 
-RegisterID* TryNode::emitBytecode(CodeGenerator& generator, RegisterID* dst) {
+RegisterID* TryNode::emitBytecode(BytecodeGenerator& generator,
+                                  RegisterID* dst) {
   RefPtr<LabelID> tryStartLabel = generator.newLabel();
   RefPtr<LabelID> tryEndLabel = generator.newLabel();
   RefPtr<LabelID> finallyStart;
@@ -2584,7 +2604,7 @@ EvalNode::EvalNode(JSGlobalData* globalData,
                 features,
                 numConstants) {}
 
-RegisterID* EvalNode::emitBytecode(CodeGenerator& generator, RegisterID*) {
+RegisterID* EvalNode::emitBytecode(BytecodeGenerator& generator, RegisterID*) {
   generator.emitDebugHook(WillExecuteProgram, firstLine(), lastLine());
 
   RefPtr<RegisterID> dstRegister = generator.newTemporary();
@@ -2596,14 +2616,14 @@ RegisterID* EvalNode::emitBytecode(CodeGenerator& generator, RegisterID*) {
   return 0;
 }
 
-void EvalNode::generateCode(ScopeChainNode* scopeChainNode) {
+void EvalNode::generateBytecode(ScopeChainNode* scopeChainNode) {
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   m_code.set(new EvalCodeBlock(this, globalObject, source().provider()));
 
-  CodeGenerator generator(this, globalObject->debugger(), scopeChain,
-                          &m_code->symbolTable, m_code.get());
+  BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
+                              &m_code->symbolTable, m_code.get());
   generator.generate();
 }
 
@@ -2688,19 +2708,19 @@ FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
                               sourceCode, features, numConstants);
 }
 
-void FunctionBodyNode::generateCode(ScopeChainNode* scopeChainNode) {
+void FunctionBodyNode::generateBytecode(ScopeChainNode* scopeChainNode) {
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   m_code.set(new CodeBlock(this, FunctionCode, source().provider(),
                            source().startOffset()));
 
-  CodeGenerator generator(this, globalObject->debugger(), scopeChain,
-                          &m_code->symbolTable, m_code.get());
+  BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
+                              &m_code->symbolTable, m_code.get());
   generator.generate();
 }
 
-RegisterID* FunctionBodyNode::emitBytecode(CodeGenerator& generator,
+RegisterID* FunctionBodyNode::emitBytecode(BytecodeGenerator& generator,
                                            RegisterID*) {
   generator.emitDebugHook(DidEnterCallFrame, firstLine(), lastLine());
   statementListEmitCode(children(), generator, ignoredResult());
@@ -2712,7 +2732,8 @@ RegisterID* FunctionBodyNode::emitBytecode(CodeGenerator& generator,
   return 0;
 }
 
-RegisterID* ProgramNode::emitBytecode(CodeGenerator& generator, RegisterID*) {
+RegisterID* ProgramNode::emitBytecode(BytecodeGenerator& generator,
+                                      RegisterID*) {
   generator.emitDebugHook(WillExecuteProgram, firstLine(), lastLine());
 
   RefPtr<RegisterID> dstRegister = generator.newTemporary();
@@ -2724,16 +2745,16 @@ RegisterID* ProgramNode::emitBytecode(CodeGenerator& generator, RegisterID*) {
   return 0;
 }
 
-void ProgramNode::generateCode(ScopeChainNode* scopeChainNode) {
+void ProgramNode::generateBytecode(ScopeChainNode* scopeChainNode) {
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   m_code.set(new ProgramCodeBlock(this, GlobalCode, globalObject,
                                   source().provider()));
 
-  CodeGenerator generator(this, globalObject->debugger(), scopeChain,
-                          &globalObject->symbolTable(), m_code.get(),
-                          m_varStack, m_functionStack);
+  BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
+                              &globalObject->symbolTable(), m_code.get(),
+                              m_varStack, m_functionStack);
   generator.generate();
 }
 
@@ -2772,7 +2793,7 @@ JSFunction* FuncDeclNode::makeFunction(ExecState* exec,
   return new (exec) JSFunction(exec, m_ident, m_body.get(), scopeChain);
 }
 
-RegisterID* FuncDeclNode::emitBytecode(CodeGenerator&, RegisterID* dst) {
+RegisterID* FuncDeclNode::emitBytecode(BytecodeGenerator&, RegisterID* dst) {
   return dst;
 }
 
@@ -2787,7 +2808,7 @@ void FuncExprNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_body);
 }
 
-RegisterID* FuncExprNode::emitBytecode(CodeGenerator& generator,
+RegisterID* FuncExprNode::emitBytecode(BytecodeGenerator& generator,
                                        RegisterID* dst) {
   return generator.emitNewFunctionExpression(generator.finalDestination(dst),
                                              this);

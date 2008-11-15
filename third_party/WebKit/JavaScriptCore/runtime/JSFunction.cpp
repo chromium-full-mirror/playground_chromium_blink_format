@@ -65,7 +65,7 @@ JSFunction::~JSFunction() {
   // this memory is freed and may be reused (potentially for another, different
   // JSFunction).
   if (m_body.get() && m_body->isGenerated())
-    m_body->generatedByteCode().unlinkCallers();
+    m_body->generatedBytecode().unlinkCallers();
 #endif
 }
 
