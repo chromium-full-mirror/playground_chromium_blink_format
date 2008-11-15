@@ -29,6 +29,7 @@
 #include "config.h"
 #include "MainThread.h"
 
+#include "StdLibExtras.h"
 #include "Threading.h"
 #include "Vector.h"
 
@@ -51,12 +52,12 @@ static bool
     callbacksPaused;  // This global variable is only accessed from main thread.
 
 Mutex& mainThreadFunctionQueueMutex() {
-  static Mutex& staticMutex = *new Mutex;
+  DEFINE_STATIC_LOCAL(Mutex, staticMutex, ());
   return staticMutex;
 }
 
 static FunctionQueue& functionQueue() {
-  static FunctionQueue& staticFunctionQueue = *new FunctionQueue;
+  DEFINE_STATIC_LOCAL(FunctionQueue, staticFunctionQueue, ());
   return staticFunctionQueue;
 }
 
