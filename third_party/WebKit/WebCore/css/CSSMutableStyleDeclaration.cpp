@@ -30,6 +30,7 @@
 #include "Document.h"
 #include "ExceptionCode.h"
 #include "StyledElement.h"
+#include <wtf/StdLibExtras.h>
 
 using namespace std;
 
@@ -352,7 +353,9 @@ struct PropertyLonghand {
   unsigned m_length;
 };
 
-static void initShorthandMap(HashMap<int, PropertyLonghand>& shorthandMap) {
+typedef HashMap<int, PropertyLonghand> ShorthandMap;
+
+static void initShorthandMap(ShorthandMap& shorthandMap) {
 #define SET_SHORTHAND_MAP_ENTRY(map, propID, array) \
   map.set(propID, PropertyLonghand(array, sizeof(array) / sizeof(array[0])))
 
@@ -507,7 +510,7 @@ String CSSMutableStyleDeclaration::removeProperty(int propertyID,
                                                   ExceptionCode& ec) {
   ec = 0;
 
-  static HashMap<int, PropertyLonghand> shorthandMap;
+  DEFINE_STATIC_LOCAL(ShorthandMap, shorthandMap, ());
   if (shorthandMap.isEmpty())
     initShorthandMap(shorthandMap);
 

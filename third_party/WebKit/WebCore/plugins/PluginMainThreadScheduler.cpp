@@ -25,11 +25,12 @@
 
 #include "config.h"
 #include "PluginMainThreadScheduler.h"
+#include <wtf/StdLibExtras.h>
 
 namespace WebCore {
 
 PluginMainThreadScheduler& PluginMainThreadScheduler::scheduler() {
-  static PluginMainThreadScheduler& scheduler = *new PluginMainThreadScheduler;
+  DEFINE_STATIC_LOCAL(PluginMainThreadScheduler, scheduler, ());
 
   return scheduler;
 }

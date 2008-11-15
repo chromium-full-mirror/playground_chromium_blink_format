@@ -88,6 +88,7 @@
 #include "ScriptController.h"
 #include <runtime/JSLock.h>
 #include <runtime/JSObject.h>
+#include <wtf/StdLibExtras.h>
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
 #include "ApplicationCache.h"
@@ -116,6 +117,8 @@ using namespace HTMLNames;
 #if USE(LOW_BANDWIDTH_DISPLAY)
 const unsigned int cMaxPendingSourceLengthInLowBandwidthDisplay = 128 * 1024;
 #endif
+
+typedef HashSet<String, CaseFoldingHash> LocalSchemesMap;
 
 struct FormSubmission {
   const char* action;
@@ -1246,8 +1249,8 @@ bool FrameLoader::allowSubstituteDataAccessToLocal() {
   return localLoadPolicy != FrameLoader::AllowLocalLoadsForLocalOnly;
 }
 
-static HashSet<String, CaseFoldingHash>& localSchemes() {
-  static HashSet<String, CaseFoldingHash> localSchemes;
+static LocalSchemesMap& localSchemes() {
+  DEFINE_STATIC_LOCAL(LocalSchemesMap, localSchemes, ());
 
   if (localSchemes.isEmpty()) {
     localSchemes.add("file");

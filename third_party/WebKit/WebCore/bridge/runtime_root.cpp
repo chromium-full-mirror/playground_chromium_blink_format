@@ -30,6 +30,7 @@
 #include <runtime/JSGlobalObject.h>
 #include <wtf/HashCountedSet.h>
 #include <wtf/HashSet.h>
+#include <wtf/StdLibExtras.h>
 
 namespace JSC {
 namespace Bindings {
@@ -45,7 +46,7 @@ namespace Bindings {
 typedef HashSet<RootObject*> RootObjectSet;
 
 static RootObjectSet* rootObjectSet() {
-  static RootObjectSet staticRootObjectSet;
+  DEFINE_STATIC_LOCAL(RootObjectSet, staticRootObjectSet, ());
   return &staticRootObjectSet;
 }
 

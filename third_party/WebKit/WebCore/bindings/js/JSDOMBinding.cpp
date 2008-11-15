@@ -48,6 +48,7 @@
 #include "ScriptController.h"
 #include "XMLHttpRequestException.h"
 #include <runtime/PrototypeFunction.h>
+#include <wtf/StdLibExtras.h>
 
 #if ENABLE(SVG)
 #include "JSSVGException.h"
@@ -92,10 +93,11 @@ static inline void removeWrappers(const JSWrapperCache&) {}
 
 static HashSet<DOMObject*>& wrapperSet() {
 #if ENABLE(WORKERS)
-  static ThreadSpecific<HashSet<DOMObject*>> staticWrapperSet;
+  DEFINE_STATIC_LOCAL(ThreadSpecific<HashSet<DOMObject*>>, staticWrapperSet,
+                      ());
   return *staticWrapperSet;
 #else
-  static HashSet<DOMObject*> staticWrapperSet;
+  DEFINE_STATIC_LOCAL(HashSet<DOMObject*>, staticWrapperSet, ());
   return staticWrapperSet;
 #endif
 }

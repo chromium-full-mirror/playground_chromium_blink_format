@@ -35,6 +35,7 @@
 #include <JavaScriptCore/JSStringRef.h>
 #include <runtime/JSLock.h>
 #include <runtime/JSValue.h>
+#include <wtf/StdLibExtras.h>
 
 using namespace JSC;
 
@@ -45,7 +46,7 @@ namespace WebCore {
 typedef HashMap<ProfileNode*, JSObject*> ProfileNodeMap;
 
 static ProfileNodeMap& profileNodeCache() {
-  static ProfileNodeMap staticProfileNodes;
+  DEFINE_STATIC_LOCAL(ProfileNodeMap, staticProfileNodes, ());
   return staticProfileNodes;
 }
 

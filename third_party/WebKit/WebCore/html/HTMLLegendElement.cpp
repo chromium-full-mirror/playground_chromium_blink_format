@@ -29,6 +29,7 @@
 
 #include "HTMLNames.h"
 #include "RenderLegend.h"
+#include <wtf/StdLibExtras.h>
 
 namespace WebCore {
 
@@ -52,7 +53,7 @@ RenderObject* HTMLLegendElement::createRenderer(RenderArena* arena,
 }
 
 const AtomicString& HTMLLegendElement::type() const {
-  static const AtomicString legend("legend");
+  DEFINE_STATIC_LOCAL(const AtomicString, legend, ("legend"));
   return legend;
 }
 

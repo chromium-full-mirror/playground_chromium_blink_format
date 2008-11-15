@@ -30,6 +30,7 @@
 #include "ExceptionCode.h"
 #include "HTMLNames.h"
 #include "XMLNames.h"
+#include <wtf/StdLibExtras.h>
 
 namespace WebCore {
 
@@ -47,7 +48,7 @@ void SVGStyleElement::setXmlspace(const AtomicString&, ExceptionCode& ec) {
 }
 
 const AtomicString& SVGStyleElement::type() const {
-  static const AtomicString defaultValue("text/css");
+  DEFINE_STATIC_LOCAL(const AtomicString, defaultValue, ("text/css"));
   const AtomicString& n = getAttribute(typeAttr);
   return n.isNull() ? defaultValue : n;
 }
@@ -57,7 +58,7 @@ void SVGStyleElement::setType(const AtomicString&, ExceptionCode& ec) {
 }
 
 const AtomicString& SVGStyleElement::media() const {
-  static const AtomicString defaultValue("all");
+  DEFINE_STATIC_LOCAL(const AtomicString, defaultValue, ("all"));
   const AtomicString& n = getAttribute(mediaAttr);
   return n.isNull() ? defaultValue : n;
 }

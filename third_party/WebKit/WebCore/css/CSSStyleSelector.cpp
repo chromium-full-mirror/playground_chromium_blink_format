@@ -88,6 +88,7 @@
 #include "WebKitCSSTransformValue.h"
 #include "XMLNames.h"
 #include "loader.h"
+#include <wtf/StdLibExtras.h>
 #include <wtf/Vector.h>
 
 #if ENABLE(DASHBOARD_SUPPORT)
@@ -396,12 +397,12 @@ static bool elementCanUseSimpleDefaultStyle(Element* e) {
 }
 
 static const MediaQueryEvaluator& screenEval() {
-  static const MediaQueryEvaluator staticScreenEval("screen");
+  DEFINE_STATIC_LOCAL(const MediaQueryEvaluator, staticScreenEval, ("screen"));
   return staticScreenEval;
 }
 
 static const MediaQueryEvaluator& printEval() {
-  static const MediaQueryEvaluator staticPrintEval("print");
+  DEFINE_STATIC_LOCAL(const MediaQueryEvaluator, staticPrintEval, ("print"));
   return staticPrintEval;
 }
 

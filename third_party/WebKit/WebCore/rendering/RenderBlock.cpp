@@ -40,6 +40,7 @@
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "SelectionController.h"
+#include <wtf/StdLibExtras.h>
 
 using namespace std;
 using namespace WTF;
@@ -72,6 +73,9 @@ static PercentHeightDescendantsMap* gPercentHeightDescendantsMap = 0;
 typedef WTF::HashMap<const RenderBox*, HashSet<RenderBlock*>*>
     PercentHeightContainerMap;
 static PercentHeightContainerMap* gPercentHeightContainerMap = 0;
+
+typedef WTF::HashMap<RenderBlock*, RenderFlowSequencedSet*>
+    ContinuationOutlineTableMap;
 
 // Our MarginInfo state used when laying out block children.
 RenderBlock::MarginInfo::MarginInfo(RenderBlock* block, int top, int bottom) {
@@ -2032,8 +2036,8 @@ void RenderBlock::paintEllipsisBoxes(PaintInfo& paintInfo, int tx, int ty) {
   }
 }
 
-HashMap<RenderBlock*, RenderFlowSequencedSet*>* continuationOutlineTable() {
-  static HashMap<RenderBlock*, RenderFlowSequencedSet*> table;
+ContinuationOutlineTableMap* continuationOutlineTable() {
+  DEFINE_STATIC_LOCAL(ContinuationOutlineTableMap, table, ());
   return &table;
 }
 
@@ -2043,8 +2047,7 @@ void RenderBlock::addContinuationWithOutline(RenderFlow* flow) {
   // way of painting.
   ASSERT(!flow->layer());
 
-  HashMap<RenderBlock*, RenderFlowSequencedSet*>* table =
-      continuationOutlineTable();
+  ContinuationOutlineTableMap* table = continuationOutlineTable();
   RenderFlowSequencedSet* continuations = table->get(this);
   if (!continuations) {
     continuations = new RenderFlowSequencedSet;
@@ -2055,8 +2058,7 @@ void RenderBlock::addContinuationWithOutline(RenderFlow* flow) {
 }
 
 void RenderBlock::paintContinuationOutlines(PaintInfo& info, int tx, int ty) {
-  HashMap<RenderBlock*, RenderFlowSequencedSet*>* table =
-      continuationOutlineTable();
+  ContinuationOutlineTableMap* table = continuationOutlineTable();
   if (table->isEmpty())
     return;
 

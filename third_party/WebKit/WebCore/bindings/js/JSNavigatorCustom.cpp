@@ -55,8 +55,8 @@ static bool needsYouTubeQuirk(ExecState* exec, Frame* frame) {
   JSFunction* function = exec->function();
   if (!function)
     return false;
-  static const Identifier& isWindowsFunctionName =
-      *new Identifier(exec, "isWindows");
+  DEFINE_STATIC_LOCAL(const Identifier, isWindowsFunctionName,
+                      (exec, "isWindows"));
   if (function->functionName() != isWindowsFunctionName)
     return false;
 
@@ -72,8 +72,7 @@ static bool needsYouTubeQuirk(ExecState* exec, Frame* frame) {
   JSObject* thisObject = callingExec->thisValue();
   if (!thisObject)
     return false;
-  static const Identifier& isSafariFunctionName =
-      *new Identifier(exec, "isSafari");
+  DEFINE_STATIC_LOCAL(const Identifier, isSafariFunction, (exec, "isSafari"));
   JSValue* isSafariFunction = thisObject->getDirect(isSafariFunctionName);
   if (isSafariFunction != callingFunction)
     return false;

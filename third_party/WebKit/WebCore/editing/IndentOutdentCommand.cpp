@@ -37,13 +37,14 @@
 #include "SplitElementCommand.h"
 #include "TextIterator.h"
 #include "visible_units.h"
+#include <wtf/StdLibExtras.h>
 
 namespace WebCore {
 
 using namespace HTMLNames;
 
 static String indentBlockquoteString() {
-  static String string = "webkit-indent-blockquote";
+  DEFINE_STATIC_LOCAL(String, string, ("webkit-indent-blockquote"));
   return string;
 }
 

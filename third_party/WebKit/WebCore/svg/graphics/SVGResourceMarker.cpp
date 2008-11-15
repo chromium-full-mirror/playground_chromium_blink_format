@@ -32,6 +32,7 @@
 #include "GraphicsContext.h"
 #include "RenderSVGViewportContainer.h"
 #include "TextStream.h"
+#include <wtf/StdLibExtras.h>
 
 namespace WebCore {
 
@@ -64,7 +65,7 @@ void SVGResourceMarker::draw(GraphicsContext* context,
   if (!m_marker)
     return;
 
-  static HashSet<SVGResourceMarker*> currentlyDrawingMarkers;
+  DEFINE_STATIC_LOCAL(HashSet<SVGResourceMarker*>, currentlyDrawingMarkers, ());
 
   // avoid drawing circular marker references
   if (currentlyDrawingMarkers.contains(this))

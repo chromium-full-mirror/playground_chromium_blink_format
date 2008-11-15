@@ -37,10 +37,13 @@
 
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
+#include <wtf/StdLibExtras.h>
 
 namespace WebCore {
 
 typedef PassRefPtr<Archive> RawDataCreationFunction(SharedBuffer*);
+typedef HashMap<String, RawDataCreationFunction*, CaseFoldingHash>
+    ArchiveMIMETypesMap;
 
 // The create functions in the archive classes return PassRefPtr to concrete
 // subclasses
@@ -50,9 +53,8 @@ static PassRefPtr<Archive> archiveFactoryCreate(SharedBuffer* buffer) {
   return ArchiveClass::create(buffer);
 }
 
-static HashMap<String, RawDataCreationFunction*, CaseFoldingHash>&
-archiveMIMETypes() {
-  static HashMap<String, RawDataCreationFunction*, CaseFoldingHash> mimeTypes;
+static ArchiveMIMETypesMap& archiveMIMETypes() {
+  DEFINE_STATIC_LOCAL(ArchiveMIMETypesMap, mimeTypes, ());
   static bool initialized = false;
 
   if (initialized)
@@ -80,10 +82,8 @@ PassRefPtr<Archive> ArchiveFactory::create(SharedBuffer* data,
 void ArchiveFactory::registerKnownArchiveMIMETypes() {
   HashSet<String>& mimeTypes =
       MIMETypeRegistry::getSupportedNonImageMIMETypes();
-  HashMap<String, RawDataCreationFunction*, CaseFoldingHash>::iterator i =
-      archiveMIMETypes().begin();
-  HashMap<String, RawDataCreationFunction*, CaseFoldingHash>::iterator end =
-      archiveMIMETypes().end();
+  ArchiveMIMETypesMap::iterator i = archiveMIMETypes().begin();
+  ArchiveMIMETypesMap::iterator end = archiveMIMETypes().end();
 
   for (; i != end; ++i)
     mimeTypes.add(i->first);

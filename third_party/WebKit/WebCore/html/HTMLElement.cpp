@@ -43,6 +43,7 @@
 #include "TextIterator.h"
 #include "XMLTokenizer.h"
 #include "markup.h"
+#include <wtf/StdLibExtras.h>
 
 namespace WebCore {
 
@@ -818,7 +819,7 @@ bool HTMLElement::childAllowed(Node* newChild) {
 // This unfortunate function is only needed when checking against the DTD.
 // Other languages (like SVG) won't need this.
 bool HTMLElement::isRecognizedTagName(const QualifiedName& tagName) {
-  static HashSet<AtomicStringImpl*> tagList;
+  DEFINE_STATIC_LOCAL(HashSet<AtomicStringImpl*>, tagList, ());
   if (tagList.isEmpty()) {
     size_t tagCount = 0;
     WebCore::QualifiedName** tags = HTMLNames::getHTMLTags(&tagCount);
@@ -832,7 +833,7 @@ bool HTMLElement::isRecognizedTagName(const QualifiedName& tagName) {
 // assuming all inlines or all blocks
 // need to be in these two lists.
 HashSet<AtomicStringImpl*>* inlineTagList() {
-  static HashSet<AtomicStringImpl*> tagList;
+  DEFINE_STATIC_LOCAL(HashSet<AtomicStringImpl*>, tagList, ());
   if (tagList.isEmpty()) {
     tagList.add(ttTag.localName().impl());
     tagList.add(iTag.localName().impl());
@@ -890,7 +891,7 @@ HashSet<AtomicStringImpl*>* inlineTagList() {
 }
 
 HashSet<AtomicStringImpl*>* blockTagList() {
-  static HashSet<AtomicStringImpl*> tagList;
+  DEFINE_STATIC_LOCAL(HashSet<AtomicStringImpl*>, tagList, ());
   if (tagList.isEmpty()) {
     tagList.add(addressTag.localName().impl());
     tagList.add(blockquoteTag.localName().impl());

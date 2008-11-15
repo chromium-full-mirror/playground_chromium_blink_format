@@ -42,6 +42,7 @@
 #include "TextIterator.h"
 #include "htmlediting.h"
 #include "visible_units.h"
+#include <wtf/StdLibExtras.h>
 
 namespace WebCore {
 
@@ -248,7 +249,7 @@ bool StyleChange::currentlyHasStyle(const Position& pos,
 }
 
 static String& styleSpanClassString() {
-  static String styleSpanClassString = AppleStyleSpanClass;
+  DEFINE_STATIC_LOCAL(String, styleSpanClassString, ((AppleStyleSpanClass)));
   return styleSpanClassString;
 }
 
