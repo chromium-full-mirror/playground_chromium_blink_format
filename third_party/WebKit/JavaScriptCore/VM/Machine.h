@@ -114,24 +114,24 @@ class BytecodeInterpreter {
 
   RegisterFile& registerFile() { return m_registerFile; }
 
-  Opcode getOpcode(OpcodeID id) {
+  Bytecode getBytecode(BytecodeID id) {
 #if HAVE(COMPUTED_GOTO)
-    return m_opcodeTable[id];
+    return m_bytecodeTable[id];
 #else
     return id;
 #endif
   }
 
-  OpcodeID getOpcodeID(Opcode opcode) {
+  BytecodeID getBytecodeID(Bytecode bytecode) {
 #if HAVE(COMPUTED_GOTO)
-    ASSERT(isOpcode(opcode));
-    return m_opcodeIDTable.get(opcode);
+    ASSERT(isBytecode(bytecode));
+    return m_bytecodeIDTable.get(bytecode);
 #else
-    return opcode;
+    return bytecode;
 #endif
   }
 
-  bool isOpcode(Opcode opcode);
+  bool isBytecode(Bytecode bytecode);
 
   JSValue* execute(ProgramNode*,
                    CallFrame*,
@@ -385,9 +385,10 @@ class BytecodeInterpreter {
                        const PutPropertySlot&);
   void uncachePutByID(CodeBlock*, Instruction* vPC);
 
-  bool isCallOpcode(Opcode opcode) {
-    return opcode == getOpcode(op_call) || opcode == getOpcode(op_construct) ||
-           opcode == getOpcode(op_call_eval);
+  bool isCallBytecode(Bytecode bytecode) {
+    return bytecode == getBytecode(op_call) ||
+           bytecode == getBytecode(op_construct) ||
+           bytecode == getBytecode(op_call_eval);
   }
 
 #if ENABLE(CTI)
@@ -436,9 +437,10 @@ class BytecodeInterpreter {
   void* m_jsFunctionVptr;
 
 #if HAVE(COMPUTED_GOTO)
-  Opcode m_opcodeTable[numOpcodeIDs];  // Maps OpcodeID => Opcode for compiling
-  HashMap<Opcode, OpcodeID>
-      m_opcodeIDTable;  // Maps Opcode => OpcodeID for decompiling
+  Bytecode m_bytecodeTable[numBytecodeIDs];  // Maps BytecodeID => Bytecode for
+                                             // compiling
+  HashMap<Bytecode, BytecodeID>
+      m_bytecodeIDTable;  // Maps Bytecode => BytecodeID for decompiling
 #endif
 };
 

@@ -40,7 +40,7 @@ class StructureID;
 class StructureIDChain;
 
 struct Instruction {
-  Instruction(Opcode opcode) { u.opcode = opcode; }
+  Instruction(Bytecode bytecode) { u.bytecode = bytecode; }
   Instruction(int operand) {
     // We have to initialize one of the pointer members to ensure that
     // the entire struct is initialised in 64-bit.
@@ -55,7 +55,7 @@ struct Instruction {
   Instruction(JSCell* jsCell) { u.jsCell = jsCell; }
 
   union {
-    Opcode opcode;
+    Bytecode bytecode;
     int operand;
     StructureID* structureID;
     StructureIDChain* structureIDChain;

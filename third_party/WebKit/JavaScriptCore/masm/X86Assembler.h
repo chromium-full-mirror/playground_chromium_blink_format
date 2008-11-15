@@ -252,7 +252,7 @@ class X86Assembler {
     GROUP5_OP_PUSH = 6,
 
     GROUP11_MOV = 0,
-  } OpcodeID;
+  } BytecodeID;
 
   static const int MAX_INSTRUCTION_SIZE = 16;
 
@@ -1079,37 +1079,39 @@ class X86Assembler {
     }
   }
 
-  void emitModRm_opr(OpcodeID opcode, RegisterID rm) {
+  void emitModRm_opr(BytecodeID bytecode, RegisterID rm) {
     m_buffer->ensureSpace(MAX_INSTRUCTION_SIZE);
-    emitModRm_opr_Unchecked(opcode, rm);
+    emitModRm_opr_Unchecked(bytecode, rm);
   }
 
-  void emitModRm_opr_Unchecked(OpcodeID opcode, RegisterID rm) {
-    emitModRm_rr_Unchecked(static_cast<RegisterID>(opcode), rm);
+  void emitModRm_opr_Unchecked(BytecodeID bytecode, RegisterID rm) {
+    emitModRm_rr_Unchecked(static_cast<RegisterID>(bytecode), rm);
   }
 
-  void emitModRm_opm(OpcodeID opcode, RegisterID base) {
-    emitModRm_rm(static_cast<RegisterID>(opcode), base);
+  void emitModRm_opm(BytecodeID bytecode, RegisterID base) {
+    emitModRm_rm(static_cast<RegisterID>(bytecode), base);
   }
 
-  void emitModRm_opm_Unchecked(OpcodeID opcode, RegisterID base, int offset) {
-    emitModRm_rm_Unchecked(static_cast<RegisterID>(opcode), base, offset);
+  void emitModRm_opm_Unchecked(BytecodeID bytecode,
+                               RegisterID base,
+                               int offset) {
+    emitModRm_rm_Unchecked(static_cast<RegisterID>(bytecode), base, offset);
   }
 
-  void emitModRm_opm(OpcodeID opcode, RegisterID base, int offset) {
-    emitModRm_rm(static_cast<RegisterID>(opcode), base, offset);
+  void emitModRm_opm(BytecodeID bytecode, RegisterID base, int offset) {
+    emitModRm_rm(static_cast<RegisterID>(bytecode), base, offset);
   }
 
-  void emitModRm_opm(OpcodeID opcode, void* addr) {
-    emitModRm_rm(static_cast<RegisterID>(opcode), addr);
+  void emitModRm_opm(BytecodeID bytecode, void* addr) {
+    emitModRm_rm(static_cast<RegisterID>(bytecode), addr);
   }
 
-  void emitModRm_opmsib(OpcodeID opcode,
+  void emitModRm_opmsib(BytecodeID bytecode,
                         RegisterID base,
                         RegisterID index,
                         int scale,
                         int offset) {
-    emitModRm_rmsib(static_cast<RegisterID>(opcode), base, index, scale,
+    emitModRm_rmsib(static_cast<RegisterID>(bytecode), base, index, scale,
                     offset);
   }
 

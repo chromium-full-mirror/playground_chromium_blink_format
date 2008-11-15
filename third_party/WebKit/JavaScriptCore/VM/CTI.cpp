@@ -321,7 +321,7 @@ void ctiRepatchCallByReturnAddress(void* where, void* what) {
 
 #ifndef NDEBUG
 
-void CTI::printOpcodeOperandTypes(unsigned src1, unsigned src2) {
+void CTI::printBytecodeOperandTypes(unsigned src1, unsigned src2) {
   char which1 = '*';
   if (m_codeBlock->isConstantRegisterIndex(src1)) {
     JSValue* value = m_codeBlock->getConstant(src1);
@@ -363,39 +363,40 @@ static JSValue* FASTCALL allocateNumber(JSGlobalData* globalData) {
 }
 
 ALWAYS_INLINE void CTI::emitAllocateNumber(JSGlobalData* globalData,
-                                           unsigned opcodeIndex) {
+                                           unsigned bytecodeIndex) {
   m_jit.movl_i32r(reinterpret_cast<intptr_t>(globalData), X86::ecx);
-  emitNakedFastCall(opcodeIndex, (void*)allocateNumber);
+  emitNakedFastCall(bytecodeIndex, (void*)allocateNumber);
 }
 
-ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitNakedCall(unsigned opcodeIndex,
+ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitNakedCall(unsigned bytecodeIndex,
                                                       X86::RegisterID r) {
   X86Assembler::JmpSrc call = m_jit.emitCall(r);
-  m_calls.append(CallRecord(call, opcodeIndex));
+  m_calls.append(CallRecord(call, bytecodeIndex));
 
   return call;
 }
 
-ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitNakedCall(unsigned opcodeIndex,
+ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitNakedCall(unsigned bytecodeIndex,
                                                       void* function) {
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(
-      CallRecord(call, reinterpret_cast<CTIHelper_v>(function), opcodeIndex));
+      CallRecord(call, reinterpret_cast<CTIHelper_v>(function), bytecodeIndex));
   return call;
 }
 
-ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitNakedFastCall(unsigned opcodeIndex,
-                                                          void* function) {
+ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitNakedFastCall(
+    unsigned bytecodeIndex,
+    void* function) {
   X86Assembler::JmpSrc call = m_jit.emitCall();
   m_calls.append(
-      CallRecord(call, reinterpret_cast<CTIHelper_v>(function), opcodeIndex));
+      CallRecord(call, reinterpret_cast<CTIHelper_v>(function), bytecodeIndex));
   return call;
 }
 
 ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
-                                                    unsigned opcodeIndex,
+                                                    unsigned bytecodeIndex,
                                                     CTIHelper_j helper) {
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, true),
                   m_interpreter->sampler()->sampleSlot());
 #else
@@ -404,8 +405,8 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
-  m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(OPCODE_SAMPLING)
+  m_calls.append(CallRecord(call, helper, bytecodeIndex));
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, false),
                   m_interpreter->sampler()->sampleSlot());
 #endif
@@ -415,9 +416,9 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
 }
 
 ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
-                                                    unsigned opcodeIndex,
+                                                    unsigned bytecodeIndex,
                                                     CTIHelper_o helper) {
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, true),
                   m_interpreter->sampler()->sampleSlot());
 #else
@@ -426,8 +427,8 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
-  m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(OPCODE_SAMPLING)
+  m_calls.append(CallRecord(call, helper, bytecodeIndex));
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, false),
                   m_interpreter->sampler()->sampleSlot());
 #endif
@@ -437,9 +438,9 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
 }
 
 ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
-                                                    unsigned opcodeIndex,
+                                                    unsigned bytecodeIndex,
                                                     CTIHelper_p helper) {
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, true),
                   m_interpreter->sampler()->sampleSlot());
 #else
@@ -448,8 +449,8 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
-  m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(OPCODE_SAMPLING)
+  m_calls.append(CallRecord(call, helper, bytecodeIndex));
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, false),
                   m_interpreter->sampler()->sampleSlot());
 #endif
@@ -459,9 +460,9 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
 }
 
 ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
-                                                    unsigned opcodeIndex,
+                                                    unsigned bytecodeIndex,
                                                     CTIHelper_b helper) {
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, true),
                   m_interpreter->sampler()->sampleSlot());
 #else
@@ -470,8 +471,8 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
-  m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(OPCODE_SAMPLING)
+  m_calls.append(CallRecord(call, helper, bytecodeIndex));
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, false),
                   m_interpreter->sampler()->sampleSlot());
 #endif
@@ -481,9 +482,9 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
 }
 
 ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
-                                                    unsigned opcodeIndex,
+                                                    unsigned bytecodeIndex,
                                                     CTIHelper_v helper) {
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, true),
                   m_interpreter->sampler()->sampleSlot());
 #else
@@ -492,8 +493,8 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
-  m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(OPCODE_SAMPLING)
+  m_calls.append(CallRecord(call, helper, bytecodeIndex));
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, false),
                   m_interpreter->sampler()->sampleSlot());
 #endif
@@ -503,9 +504,9 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
 }
 
 ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
-                                                    unsigned opcodeIndex,
+                                                    unsigned bytecodeIndex,
                                                     CTIHelper_s helper) {
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, true),
                   m_interpreter->sampler()->sampleSlot());
 #else
@@ -514,8 +515,8 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
-  m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(OPCODE_SAMPLING)
+  m_calls.append(CallRecord(call, helper, bytecodeIndex));
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, false),
                   m_interpreter->sampler()->sampleSlot());
 #endif
@@ -525,9 +526,9 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
 }
 
 ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
-                                                    unsigned opcodeIndex,
+                                                    unsigned bytecodeIndex,
                                                     CTIHelper_2 helper) {
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, true),
                   m_interpreter->sampler()->sampleSlot());
 #else
@@ -536,8 +537,8 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
   m_jit.emitRestoreArgumentReference();
   emitPutCTIParam(X86::edi, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc call = m_jit.emitCall();
-  m_calls.append(CallRecord(call, helper, opcodeIndex));
-#if ENABLE(OPCODE_SAMPLING)
+  m_calls.append(CallRecord(call, helper, bytecodeIndex));
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(vPC, false),
                   m_interpreter->sampler()->sampleSlot());
 #endif
@@ -548,19 +549,19 @@ ALWAYS_INLINE X86Assembler::JmpSrc CTI::emitCTICall(Instruction* vPC,
 
 ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotJSCell(
     X86Assembler::RegisterID reg,
-    unsigned opcodeIndex) {
+    unsigned bytecodeIndex) {
   m_jit.testl_i32r(JSImmediate::TagMask, reg);
-  m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), opcodeIndex));
+  m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJne(), bytecodeIndex));
 }
 
 ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotJSCell(
     X86Assembler::RegisterID reg,
-    unsigned opcodeIndex,
+    unsigned bytecodeIndex,
     int vReg) {
   if (m_codeBlock->isKnownNotImmediate(vReg))
     return;
 
-  emitJumpSlowCaseIfNotJSCell(reg, opcodeIndex);
+  emitJumpSlowCaseIfNotJSCell(reg, bytecodeIndex);
 }
 
 ALWAYS_INLINE bool CTI::linkSlowCaseIfNotJSCell(
@@ -575,18 +576,18 @@ ALWAYS_INLINE bool CTI::linkSlowCaseIfNotJSCell(
 
 ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotImmNum(
     X86Assembler::RegisterID reg,
-    unsigned opcodeIndex) {
+    unsigned bytecodeIndex) {
   m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, reg);
-  m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJe(), opcodeIndex));
+  m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJe(), bytecodeIndex));
 }
 
 ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotImmNums(
     X86Assembler::RegisterID reg1,
     X86Assembler::RegisterID reg2,
-    unsigned opcodeIndex) {
+    unsigned bytecodeIndex) {
   m_jit.movl_rr(reg1, X86::ecx);
   m_jit.andl_rr(reg2, X86::ecx);
-  emitJumpSlowCaseIfNotImmNum(X86::ecx, opcodeIndex);
+  emitJumpSlowCaseIfNotImmNum(X86::ecx, bytecodeIndex);
 }
 
 ALWAYS_INLINE unsigned CTI::getDeTaggedConstantImmediate(JSValue* imm) {
@@ -621,9 +622,9 @@ ALWAYS_INLINE void CTI::emitFastArithImmToInt(X86Assembler::RegisterID reg) {
 
 ALWAYS_INLINE void CTI::emitFastArithIntToImmOrSlowCase(
     X86Assembler::RegisterID reg,
-    unsigned opcodeIndex) {
+    unsigned bytecodeIndex) {
   m_jit.addl_rr(reg, reg);
-  m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), opcodeIndex));
+  m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), bytecodeIndex));
   emitFastArithReTagImmediate(reg);
 }
 
@@ -743,7 +744,7 @@ void CTI::compileOpConstructSetupArgs(Instruction* instruction) {
   emitPutCTIArgConstant(reinterpret_cast<unsigned>(instruction), 20);
 }
 
-void CTI::compileOpCall(OpcodeID opcodeID,
+void CTI::compileOpCall(BytecodeID bytecodeID,
                         Instruction* instruction,
                         unsigned i,
                         unsigned callLinkInfoIndex) {
@@ -754,7 +755,7 @@ void CTI::compileOpCall(OpcodeID opcodeID,
 
   // Handle eval
   X86Assembler::JmpSrc wasEval;
-  if (opcodeID == op_call_eval) {
+  if (bytecodeID == op_call_eval) {
     emitGetVirtualRegister(callee, X86::ecx, i);
     compileOpCallEvalSetupArgs(instruction);
 
@@ -781,7 +782,7 @@ void CTI::compileOpCall(OpcodeID opcodeID,
 
   // In the case of OpConstruct, call out to a cti_ function to create the new
   // object.
-  if (opcodeID == op_construct) {
+  if (bytecodeID == op_construct) {
     int proto = instruction[5].u.operand;
     int thisRegister = instruction[6].u.operand;
 
@@ -821,7 +822,7 @@ void CTI::compileOpCall(OpcodeID opcodeID,
   m_callStructureStubCompilationInfo[callLinkInfoIndex].hotPathOther =
       emitNakedCall(i, reinterpret_cast<void*>(unreachable));
 
-  if (opcodeID == op_call_eval)
+  if (bytecodeID == op_call_eval)
     m_jit.link(wasEval, m_jit.label());
 
   // Put the return value in dst. In the interpreter, op_ret does this.
@@ -890,10 +891,10 @@ void CTI::compileOpStrictEq(Instruction* instruction,
   emitPutVirtualRegister(dst);
 }
 
-void CTI::emitSlowScriptCheck(Instruction* vPC, unsigned opcodeIndex) {
+void CTI::emitSlowScriptCheck(Instruction* vPC, unsigned bytecodeIndex) {
   m_jit.subl_i8r(1, X86::esi);
   X86Assembler::JmpSrc skipTimeout = m_jit.emitUnlinkedJne();
-  emitCTICall(vPC, opcodeIndex, BytecodeInterpreter::cti_timeout_check);
+  emitCTICall(vPC, bytecodeIndex, BytecodeInterpreter::cti_timeout_check);
 
   emitGetCTIParam(CTI_ARGS_globalData, X86::ecx);
   m_jit.movl_mr(OBJECT_OFFSET(JSGlobalData, interpreter), X86::ecx, X86::ecx);
@@ -961,7 +962,7 @@ void CTI::putDoubleResultToJSNumberCellOrJSImmediate(
   emitPutVirtualRegister(dst);
 }
 
-void CTI::compileBinaryArithOp(OpcodeID opcodeID,
+void CTI::compileBinaryArithOp(BytecodeID bytecodeID,
                                unsigned dst,
                                unsigned src1,
                                unsigned src2,
@@ -1008,12 +1009,12 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
     m_jit.cvtsi2sd_rr(X86::eax, X86::xmm0);
     // (1c)
     m_jit.link(loadedDouble, m_jit.label());
-    if (opcodeID == op_add)
+    if (bytecodeID == op_add)
       m_jit.addsd_mr(OBJECT_OFFSET(JSNumberCell, m_value), X86::edx, X86::xmm0);
-    else if (opcodeID == op_sub)
+    else if (bytecodeID == op_sub)
       m_jit.subsd_mr(OBJECT_OFFSET(JSNumberCell, m_value), X86::edx, X86::xmm0);
     else {
-      ASSERT(opcodeID == op_mul);
+      ASSERT(bytecodeID == op_mul);
       m_jit.mulsd_mr(OBJECT_OFFSET(JSNumberCell, m_value), X86::edx, X86::xmm0);
     }
 
@@ -1061,12 +1062,12 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
     // (1c)
     m_jit.link(loadedDouble, m_jit.label());
     m_jit.movsd_mr(OBJECT_OFFSET(JSNumberCell, m_value), X86::eax, X86::xmm0);
-    if (opcodeID == op_add)
+    if (bytecodeID == op_add)
       m_jit.addsd_rr(X86::xmm1, X86::xmm0);
-    else if (opcodeID == op_sub)
+    else if (bytecodeID == op_sub)
       m_jit.subsd_rr(X86::xmm1, X86::xmm0);
     else {
-      ASSERT(opcodeID == op_mul);
+      ASSERT(bytecodeID == op_mul);
       m_jit.mulsd_rr(X86::xmm1, X86::xmm0);
     }
     m_jit.movsd_rm(X86::xmm0, OBJECT_OFFSET(JSNumberCell, m_value), X86::eax);
@@ -1085,16 +1086,16 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
   } else
     emitJumpSlowCaseIfNotImmNums(X86::eax, X86::edx, i);
 
-  if (opcodeID == op_add) {
+  if (bytecodeID == op_add) {
     emitFastArithDeTagImmediate(X86::eax);
     m_jit.addl_rr(X86::edx, X86::eax);
     m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
-  } else if (opcodeID == op_sub) {
+  } else if (bytecodeID == op_sub) {
     m_jit.subl_rr(X86::edx, X86::eax);
     m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), i));
     emitFastArithReTagImmediate(X86::eax);
   } else {
-    ASSERT(opcodeID == op_mul);
+    ASSERT(bytecodeID == op_mul);
     // convert eax & edx from JSImmediates to ints, and check if either are zero
     emitFastArithImmToInt(X86::edx);
     X86Assembler::JmpSrc op1Zero =
@@ -1127,7 +1128,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
 }
 
 void CTI::compileBinaryArithOpSlowCase(Instruction* vPC,
-                                       OpcodeID opcodeID,
+                                       BytecodeID bytecodeID,
                                        Vector<SlowCaseEntry>::iterator& iter,
                                        unsigned dst,
                                        unsigned src1,
@@ -1164,17 +1165,17 @@ void CTI::compileBinaryArithOpSlowCase(Instruction* vPC,
     m_jit.link((++iter)->from, here);
 
   // additional entry point to handle -0 cases.
-  if (opcodeID == op_mul)
+  if (bytecodeID == op_mul)
     m_jit.link((++iter)->from, here);
 
   emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
   emitPutCTIArgFromVirtualRegister(src2, 4, X86::ecx);
-  if (opcodeID == op_add)
+  if (bytecodeID == op_add)
     emitCTICall(vPC, i, BytecodeInterpreter::cti_op_add);
-  else if (opcodeID == op_sub)
+  else if (bytecodeID == op_sub)
     emitCTICall(vPC, i, BytecodeInterpreter::cti_op_sub);
   else {
-    ASSERT(opcodeID == op_mul);
+    ASSERT(bytecodeID == op_mul);
     emitCTICall(vPC, i, BytecodeInterpreter::cti_op_mul);
   }
   emitPutVirtualRegister(dst);
@@ -1188,18 +1189,19 @@ void CTI::privateCompileMainPass() {
   unsigned callLinkInfoIndex = 0;
 
   for (unsigned i = 0; i < instructionCount;) {
-    ASSERT_WITH_MESSAGE(m_interpreter->isOpcode(instruction[i].u.opcode),
+    ASSERT_WITH_MESSAGE(m_interpreter->isBytecode(instruction[i].u.bytecode),
                         "privateCompileMainPass gone bad @ %d", i);
 
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(BYTECODE_SAMPLING)
     if (i > 0)  // Avoid the overhead of sampling op_enter twice.
       m_jit.movl_i32m(m_interpreter->sampler()->encodeSample(instruction + i),
                       m_interpreter->sampler()->sampleSlot());
 #endif
 
     m_labels[i] = m_jit.label();
-    OpcodeID opcodeID = m_interpreter->getOpcodeID(instruction[i].u.opcode);
-    switch (opcodeID) {
+    BytecodeID bytecodeID =
+        m_interpreter->getBytecodeID(instruction[i].u.bytecode);
+    switch (bytecodeID) {
       case op_mov: {
         unsigned src = instruction[i + 2].u.operand;
         if (m_codeBlock->isConstantRegisterIndex(src))
@@ -1349,7 +1351,7 @@ void CTI::privateCompileMainPass() {
 
         ASSERT(m_codeBlock
                    ->propertyAccessInstructions[propertyAccessInstructionIndex]
-                   .opcodeIndex == i);
+                   .bytecodeIndex == i);
 
         // Jump to a slow case if either the base object is an immediate, or if
         // the StructureID does not match.
@@ -1395,7 +1397,7 @@ void CTI::privateCompileMainPass() {
 
         ASSERT(m_codeBlock
                    ->propertyAccessInstructions[propertyAccessInstructionIndex]
-                   .opcodeIndex == i);
+                   .bytecodeIndex == i);
 
         emitJumpSlowCaseIfNotJSCell(X86::eax, i, baseVReg);
 
@@ -1559,8 +1561,8 @@ void CTI::privateCompileMainPass() {
       case op_call:
       case op_call_eval:
       case op_construct: {
-        compileOpCall(opcodeID, instruction + i, i, callLinkInfoIndex++);
-        i += (opcodeID == op_construct ? 7 : 5);
+        compileOpCall(bytecodeID, instruction + i, i, callLinkInfoIndex++);
+        i += (bytecodeID == op_construct ? 7 : 5);
         break;
       }
       case op_get_global_var: {
@@ -2715,8 +2717,8 @@ void CTI::privateCompileSlowCases() {
     unsigned firstTo = i;
 #endif
 
-    switch (OpcodeID opcodeID =
-                m_interpreter->getOpcodeID(instruction[i].u.opcode)) {
+    switch (BytecodeID bytecodeID =
+                m_interpreter->getBytecodeID(instruction[i].u.bytecode)) {
       case op_convert_this: {
         m_jit.link(iter->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
@@ -2895,7 +2897,7 @@ void CTI::privateCompileSlowCases() {
         // information.
         ASSERT(m_codeBlock
                    ->propertyAccessInstructions[propertyAccessInstructionIndex]
-                   .opcodeIndex == i);
+                   .bytecodeIndex == i);
         m_propertyAccessCompilationInfo[propertyAccessInstructionIndex]
             .callReturnLocation = call;
         ++propertyAccessInstructionIndex;
@@ -2935,7 +2937,7 @@ void CTI::privateCompileSlowCases() {
         // information.
         ASSERT(m_codeBlock
                    ->propertyAccessInstructions[propertyAccessInstructionIndex]
-                   .opcodeIndex == i);
+                   .bytecodeIndex == i);
         m_propertyAccessCompilationInfo[propertyAccessInstructionIndex]
             .callReturnLocation = call;
         ++propertyAccessInstructionIndex;
@@ -3261,9 +3263,9 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(iter->from, m_jit.label());
 
         // The arguments have been set up on the hot path for op_call_eval
-        if (opcodeID == op_call)
+        if (bytecodeID == op_call)
           compileOpCallSetupArgs(instruction + i);
-        else if (opcodeID == op_construct)
+        else if (bytecodeID == op_construct)
           compileOpConstructSetupArgs(instruction + i);
 
         // Fast check for JS function.
@@ -3276,7 +3278,7 @@ void CTI::privateCompileSlowCases() {
             m_jit.emitUnlinkedJne();
 
         // First, in the case of a construct, allocate the new object.
-        if (opcodeID == op_construct) {
+        if (bytecodeID == op_construct) {
           emitCTICall(instruction, i,
                       BytecodeInterpreter::cti_op_construct_JSConstruct);
           emitPutVirtualRegister(registerOffset -
@@ -3306,9 +3308,9 @@ void CTI::privateCompileSlowCases() {
             m_jit.label();
 
         // The arguments have been set up on the hot path for op_call_eval
-        if (opcodeID == op_call)
+        if (bytecodeID == op_call)
           compileOpCallSetupArgs(instruction + i);
-        else if (opcodeID == op_construct)
+        else if (bytecodeID == op_construct)
           compileOpConstructSetupArgs(instruction + i);
 
         // Check for JSFunctions.
@@ -3325,7 +3327,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(callLinkFailNotObject, notJSFunctionlabel);
         m_jit.link(callLinkFailNotJSFunction, notJSFunctionlabel);
         emitCTICall(instruction + i, i,
-                    ((opcodeID == op_construct)
+                    ((bytecodeID == op_construct)
                          ? BytecodeInterpreter::cti_op_construct_NotJSConstruct
                          : BytecodeInterpreter::cti_op_call_NotJSFunction));
         X86Assembler::JmpSrc wasNotJSFunction = m_jit.emitUnlinkedJmp();
@@ -3334,7 +3336,7 @@ void CTI::privateCompileSlowCases() {
         m_jit.link(isJSFunction, m_jit.label());
 
         // First, in the case of a construct, allocate the new object.
-        if (opcodeID == op_construct) {
+        if (bytecodeID == op_construct) {
           emitCTICall(instruction, i,
                       BytecodeInterpreter::cti_op_construct_JSConstruct);
           emitPutVirtualRegister(registerOffset -
@@ -3365,7 +3367,7 @@ void CTI::privateCompileSlowCases() {
 #endif
         ++callLinkInfoIndex;
 
-        i += (opcodeID == op_construct ? 7 : 5);
+        i += (bytecodeID == op_construct ? 7 : 5);
         break;
       }
       case op_to_jsnumber: {
@@ -3406,7 +3408,7 @@ void CTI::privateCompile() {
   m_jit.movl_i32m(reinterpret_cast<unsigned>(m_codeBlock),
                   m_interpreter->sampler()->codeBlockSlot());
 #endif
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(BYTECODE_SAMPLING)
   m_jit.movl_i32m(
       m_interpreter->sampler()->encodeSample(m_codeBlock->instructions.begin()),
       m_interpreter->sampler()->sampleSlot());
@@ -3454,7 +3456,7 @@ void CTI::privateCompile() {
   // tables.
   for (unsigned i = 0; i < m_switches.size(); ++i) {
     SwitchRecord record = m_switches[i];
-    unsigned opcodeIndex = record.opcodeIndex;
+    unsigned bytecodeIndex = record.bytecodeIndex;
 
     if (record.type != SwitchRecord::String) {
       ASSERT(record.type == SwitchRecord::Immediate ||
@@ -3463,22 +3465,22 @@ void CTI::privateCompile() {
              record.jumpTable.simpleJumpTable->ctiOffsets.size());
 
       record.jumpTable.simpleJumpTable->ctiDefault = m_jit.getRelocatedAddress(
-          code, m_labels[opcodeIndex + 3 + record.defaultOffset]);
+          code, m_labels[bytecodeIndex + 3 + record.defaultOffset]);
 
       for (unsigned j = 0;
            j < record.jumpTable.simpleJumpTable->branchOffsets.size(); ++j) {
         unsigned offset = record.jumpTable.simpleJumpTable->branchOffsets[j];
         record.jumpTable.simpleJumpTable->ctiOffsets[j] =
             offset
-                ? m_jit.getRelocatedAddress(code,
-                                            m_labels[opcodeIndex + 3 + offset])
+                ? m_jit.getRelocatedAddress(
+                      code, m_labels[bytecodeIndex + 3 + offset])
                 : record.jumpTable.simpleJumpTable->ctiDefault;
       }
     } else {
       ASSERT(record.type == SwitchRecord::String);
 
       record.jumpTable.stringJumpTable->ctiDefault = m_jit.getRelocatedAddress(
-          code, m_labels[opcodeIndex + 3 + record.defaultOffset]);
+          code, m_labels[bytecodeIndex + 3 + record.defaultOffset]);
 
       StringJumpTable::StringOffsetTable::iterator end =
           record.jumpTable.stringJumpTable->offsetTable.end();
@@ -3488,8 +3490,8 @@ void CTI::privateCompile() {
         unsigned offset = it->second.branchOffset;
         it->second.ctiOffset =
             offset
-                ? m_jit.getRelocatedAddress(code,
-                                            m_labels[opcodeIndex + 3 + offset])
+                ? m_jit.getRelocatedAddress(
+                      code, m_labels[bytecodeIndex + 3 + offset])
                 : record.jumpTable.stringJumpTable->ctiDefault;
       }
     }
@@ -3505,7 +3507,7 @@ void CTI::privateCompile() {
     if (iter->to)
       X86Assembler::link(code, iter->from, iter->to);
     m_codeBlock->ctiReturnAddressVPCMap.add(
-        m_jit.getRelocatedAddress(code, iter->from), iter->opcodeIndex);
+        m_jit.getRelocatedAddress(code, iter->from), iter->bytecodeIndex);
   }
 
   // Link absolute addresses for jsr
