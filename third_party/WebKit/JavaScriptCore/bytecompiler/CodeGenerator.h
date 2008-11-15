@@ -521,7 +521,6 @@ class BytecodeGenerator {
   RegisterID* addConstant(JSValue*);
   unsigned addUnexpectedConstant(JSValue*);
   unsigned addRegExp(RegExp*);
-  StructureID* addStructureID();
 
   Vector<Instruction>& instructions() { return m_codeBlock->instructions; }
   SymbolTable& symbolTable() { return *m_symbolTable; }
