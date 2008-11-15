@@ -174,6 +174,10 @@ String WebCore::contextMenuItemTagWritingDirectionMenu() {
   return String(LPCTSTR_UI_STRING("Writing Direction",
                                   "Writing direction context sub-menu item"));
 }
+String WebCore::contextMenuItemTagTextDirectionMenu() {
+  return String(LPCTSTR_UI_STRING("Text Direction",
+                                  "Text direction context sub-menu item"));
+}
 String WebCore::contextMenuItemTagDefaultDirection() {
   return String(LPCTSTR_UI_STRING(
       "Default", "Default writing direction context menu item"));
