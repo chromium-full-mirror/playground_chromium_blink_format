@@ -522,7 +522,7 @@ PassRefPtr<LabelScope> BytecodeGenerator::newLabelScope(
   return &m_labelScopes.last();
 }
 
-PassRefPtr<LabelID> BytecodeGenerator::newLabel() {
+PassRefPtr<Label> BytecodeGenerator::newLabel() {
   // Reclaim free label IDs.
   while (m_labels.size() && !m_labels.last().refCount())
     m_labels.removeLast();
@@ -532,7 +532,7 @@ PassRefPtr<LabelID> BytecodeGenerator::newLabel() {
   return &m_labels.last();
 }
 
-PassRefPtr<LabelID> BytecodeGenerator::emitLabel(LabelID* l0) {
+PassRefPtr<Label> BytecodeGenerator::emitLabel(Label* l0) {
   unsigned newLabelIndex = instructions().size();
   l0->setLocation(newLabelIndex);
 
@@ -585,15 +585,15 @@ void ALWAYS_INLINE BytecodeGenerator::rewindUnaryOp() {
   instructions().shrink(instructions().size() - 3);
 }
 
-PassRefPtr<LabelID> BytecodeGenerator::emitJump(LabelID* target) {
-  emitOpcode(target->isForwardLabel() ? op_jmp : op_loop);
+PassRefPtr<Label> BytecodeGenerator::emitJump(Label* target) {
+  emitOpcode(target->isForward() ? op_jmp : op_loop);
   instructions().append(target->offsetFrom(instructions().size()));
   return target;
 }
 
-PassRefPtr<LabelID> BytecodeGenerator::emitJumpIfTrue(RegisterID* cond,
-                                                      LabelID* target) {
-  if (m_lastOpcodeID == op_less && !target->isForwardLabel()) {
+PassRefPtr<Label> BytecodeGenerator::emitJumpIfTrue(RegisterID* cond,
+                                                    Label* target) {
+  if (m_lastOpcodeID == op_less && !target->isForward()) {
     int dstIndex;
     int src1Index;
     int src2Index;
@@ -608,7 +608,7 @@ PassRefPtr<LabelID> BytecodeGenerator::emitJumpIfTrue(RegisterID* cond,
       instructions().append(target->offsetFrom(instructions().size()));
       return target;
     }
-  } else if (m_lastOpcodeID == op_lesseq && !target->isForwardLabel()) {
+  } else if (m_lastOpcodeID == op_lesseq && !target->isForward()) {
     int dstIndex;
     int src1Index;
     int src2Index;
@@ -623,7 +623,7 @@ PassRefPtr<LabelID> BytecodeGenerator::emitJumpIfTrue(RegisterID* cond,
       instructions().append(target->offsetFrom(instructions().size()));
       return target;
     }
-  } else if (m_lastOpcodeID == op_eq_null && target->isForwardLabel()) {
+  } else if (m_lastOpcodeID == op_eq_null && target->isForward()) {
     int dstIndex;
     int srcIndex;
 
@@ -636,7 +636,7 @@ PassRefPtr<LabelID> BytecodeGenerator::emitJumpIfTrue(RegisterID* cond,
       instructions().append(target->offsetFrom(instructions().size()));
       return target;
     }
-  } else if (m_lastOpcodeID == op_neq_null && target->isForwardLabel()) {
+  } else if (m_lastOpcodeID == op_neq_null && target->isForward()) {
     int dstIndex;
     int srcIndex;
 
@@ -651,15 +651,15 @@ PassRefPtr<LabelID> BytecodeGenerator::emitJumpIfTrue(RegisterID* cond,
     }
   }
 
-  emitOpcode(target->isForwardLabel() ? op_jtrue : op_loop_if_true);
+  emitOpcode(target->isForward() ? op_jtrue : op_loop_if_true);
   instructions().append(cond->index());
   instructions().append(target->offsetFrom(instructions().size()));
   return target;
 }
 
-PassRefPtr<LabelID> BytecodeGenerator::emitJumpIfFalse(RegisterID* cond,
-                                                       LabelID* target) {
-  ASSERT(target->isForwardLabel());
+PassRefPtr<Label> BytecodeGenerator::emitJumpIfFalse(RegisterID* cond,
+                                                     Label* target) {
+  ASSERT(target->isForward());
 
   if (m_lastOpcodeID == op_less) {
     int dstIndex;
@@ -1495,7 +1495,7 @@ void BytecodeGenerator::emitDebugHook(DebugHookID debugHookID,
   instructions().append(lastLine);
 }
 
-void BytecodeGenerator::pushFinallyContext(LabelID* target,
+void BytecodeGenerator::pushFinallyContext(Label* target,
                                            RegisterID* retAddrDst) {
   ControlFlowContext scope;
   scope.isFinallyBlock = true;
@@ -1579,8 +1579,8 @@ LabelScope* BytecodeGenerator::continueTarget(const Identifier& name) {
   return 0;
 }
 
-PassRefPtr<LabelID> BytecodeGenerator::emitComplexJumpScopes(
-    LabelID* target,
+PassRefPtr<Label> BytecodeGenerator::emitComplexJumpScopes(
+    Label* target,
     ControlFlowContext* topScope,
     ControlFlowContext* bottomScope) {
   while (topScope > bottomScope) {
@@ -1609,7 +1609,7 @@ PassRefPtr<LabelID> BytecodeGenerator::emitComplexJumpScopes(
 
       // Otherwise we just use jmp_scopes to pop a group of scopes and go
       // to the next instruction
-      RefPtr<LabelID> nextInsn = newLabel();
+      RefPtr<Label> nextInsn = newLabel();
       instructions().append(nextInsn->offsetFrom(instructions().size()));
       emitLabel(nextInsn.get());
     }
@@ -1627,10 +1627,10 @@ PassRefPtr<LabelID> BytecodeGenerator::emitComplexJumpScopes(
   return emitJump(target);
 }
 
-PassRefPtr<LabelID> BytecodeGenerator::emitJumpScopes(LabelID* target,
-                                                      int targetScopeDepth) {
+PassRefPtr<Label> BytecodeGenerator::emitJumpScopes(Label* target,
+                                                    int targetScopeDepth) {
   ASSERT(scopeDepth() - targetScopeDepth >= 0);
-  ASSERT(target->isForwardLabel());
+  ASSERT(target->isForward());
 
   size_t scopeDelta = scopeDepth() - targetScopeDepth;
   ASSERT(scopeDelta <= m_scopeContextStack.size());
@@ -1649,7 +1649,7 @@ PassRefPtr<LabelID> BytecodeGenerator::emitJumpScopes(LabelID* target,
 
 RegisterID* BytecodeGenerator::emitNextPropertyName(RegisterID* dst,
                                                     RegisterID* iter,
-                                                    LabelID* target) {
+                                                    Label* target) {
   emitOpcode(op_next_pname);
   instructions().append(dst->index());
   instructions().append(iter->index());
@@ -1658,8 +1658,8 @@ RegisterID* BytecodeGenerator::emitNextPropertyName(RegisterID* dst,
 }
 
 RegisterID* BytecodeGenerator::emitCatch(RegisterID* targetRegister,
-                                         LabelID* start,
-                                         LabelID* end) {
+                                         Label* start,
+                                         Label* end) {
   HandlerInfo info = {start->offsetFrom(0), end->offsetFrom(0),
                       instructions().size(), m_dynamicScopeDepth, 0};
   exceptionHandlers().append(info);
@@ -1678,9 +1678,8 @@ RegisterID* BytecodeGenerator::emitNewError(RegisterID* dst,
   return dst;
 }
 
-PassRefPtr<LabelID> BytecodeGenerator::emitJumpSubroutine(
-    RegisterID* retAddrDst,
-    LabelID* finally) {
+PassRefPtr<Label> BytecodeGenerator::emitJumpSubroutine(RegisterID* retAddrDst,
+                                                        Label* finally) {
   emitOpcode(op_jsr);
   instructions().append(retAddrDst->index());
   instructions().append(finally->offsetFrom(instructions().size()));
@@ -1746,7 +1745,7 @@ static int32_t keyForImmediateSwitch(ExpressionNode* node,
 static void prepareJumpTableForImmediateSwitch(SimpleJumpTable& jumpTable,
                                                int32_t switchAddress,
                                                uint32_t clauseCount,
-                                               RefPtr<LabelID>* labels,
+                                               RefPtr<Label>* labels,
                                                ExpressionNode** nodes,
                                                int32_t min,
                                                int32_t max) {
@@ -1756,7 +1755,7 @@ static void prepareJumpTableForImmediateSwitch(SimpleJumpTable& jumpTable,
   for (uint32_t i = 0; i < clauseCount; ++i) {
     // We're emitting this after the clause labels should have been fixed, so
     // the labels should not be "forward" references
-    ASSERT(!labels[i]->isForwardLabel());
+    ASSERT(!labels[i]->isForward());
     jumpTable.add(keyForImmediateSwitch(nodes[i], min, max),
                   labels[i]->offsetFrom(switchAddress));
   }
@@ -1780,7 +1779,7 @@ static int32_t keyForCharacterSwitch(ExpressionNode* node,
 static void prepareJumpTableForCharacterSwitch(SimpleJumpTable& jumpTable,
                                                int32_t switchAddress,
                                                uint32_t clauseCount,
-                                               RefPtr<LabelID>* labels,
+                                               RefPtr<Label>* labels,
                                                ExpressionNode** nodes,
                                                int32_t min,
                                                int32_t max) {
@@ -1790,7 +1789,7 @@ static void prepareJumpTableForCharacterSwitch(SimpleJumpTable& jumpTable,
   for (uint32_t i = 0; i < clauseCount; ++i) {
     // We're emitting this after the clause labels should have been fixed, so
     // the labels should not be "forward" references
-    ASSERT(!labels[i]->isForwardLabel());
+    ASSERT(!labels[i]->isForward());
     jumpTable.add(keyForCharacterSwitch(nodes[i], min, max),
                   labels[i]->offsetFrom(switchAddress));
   }
@@ -1799,12 +1798,12 @@ static void prepareJumpTableForCharacterSwitch(SimpleJumpTable& jumpTable,
 static void prepareJumpTableForStringSwitch(StringJumpTable& jumpTable,
                                             int32_t switchAddress,
                                             uint32_t clauseCount,
-                                            RefPtr<LabelID>* labels,
+                                            RefPtr<Label>* labels,
                                             ExpressionNode** nodes) {
   for (uint32_t i = 0; i < clauseCount; ++i) {
     // We're emitting this after the clause labels should have been fixed, so
     // the labels should not be "forward" references
-    ASSERT(!labels[i]->isForwardLabel());
+    ASSERT(!labels[i]->isForward());
 
     ASSERT(nodes[i]->isString());
     UString::Rep* clause =
@@ -1819,9 +1818,9 @@ static void prepareJumpTableForStringSwitch(StringJumpTable& jumpTable,
 }
 
 void BytecodeGenerator::endSwitch(uint32_t clauseCount,
-                                  RefPtr<LabelID>* labels,
+                                  RefPtr<Label>* labels,
                                   ExpressionNode** nodes,
-                                  LabelID* defaultLabel,
+                                  Label* defaultLabel,
                                   int32_t min,
                                   int32_t max) {
   SwitchInfo switchInfo = m_switchContextStack.last();
