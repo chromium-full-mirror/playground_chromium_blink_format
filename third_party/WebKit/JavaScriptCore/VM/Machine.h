@@ -290,6 +290,7 @@ class Machine {
   static JSValue* SFX_CALL cti_allocate_number(CTI_ARGS);
 
   static JSValue* SFX_CALL cti_vm_throw(CTI_ARGS);
+  static void* SFX_CALL cti_vm_dontLazyLinkCall(CTI_ARGS);
   static void* SFX_CALL cti_vm_lazyLinkCall(CTI_ARGS);
   static JSObject* SFX_CALL cti_op_push_activation(CTI_ARGS);
 
@@ -414,6 +415,9 @@ class Machine {
 #if ENABLE(CTI)
   void* m_ctiArrayLengthTrampoline;
   void* m_ctiStringLengthTrampoline;
+  void* m_ctiVirtualCallPreLink;
+  void* m_ctiVirtualCallLink;
+  void* m_ctiVirtualCall;
 
   OwnPtr<JITCodeBuffer> m_jitCodeBuffer;
 #endif

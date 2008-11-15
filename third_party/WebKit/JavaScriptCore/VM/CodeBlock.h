@@ -115,6 +115,10 @@ inline void* getStructureStubInfoReturnLocation(
   return structureStubInfo->callReturnLocation;
 }
 
+inline void* getCallLinkInfoReturnLocation(CallLinkInfo* callLinkInfo) {
+  return callLinkInfo->callReturnLocation;
+}
+
 // Binary chop algorithm, calls valueAtPosition on pre-sorted elements in array,
 // compares result with key (KeyTypes should be comparable with '--', '<', '>').
 // Optimized for cases where the array contains the key, checked by assertions.
@@ -301,6 +305,11 @@ struct CodeBlock {
                         getStructureStubInfoReturnLocation>(
         propertyAccessInstructions.begin(), propertyAccessInstructions.size(),
         returnAddress));
+  }
+
+  CallLinkInfo& getCallLinkInfo(void* returnAddress) {
+    return *(binaryChop<CallLinkInfo, void*, getCallLinkInfoReturnLocation>(
+        callLinkInfos.begin(), callLinkInfos.size(), returnAddress));
   }
 
   ScopeNode* ownerNode;
