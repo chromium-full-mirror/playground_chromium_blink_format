@@ -38,7 +38,7 @@ class JSCell : public JSValue {
   friend class JSPropertyNameIterator;
   friend class JSString;
   friend class JSValue;
-  friend class Machine;
+  friend class BytecodeInterpreter;
 
  private:
   explicit JSCell(StructureID*);

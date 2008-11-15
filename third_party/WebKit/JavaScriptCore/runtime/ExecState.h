@@ -86,7 +86,7 @@ class ExecState : private Register {
     return *globalData().propertyNames;
   }
   const ArgList& emptyList() const { return *globalData().emptyList; }
-  Machine* machine() { return globalData().machine; }
+  BytecodeInterpreter* interpreter() { return globalData().interpreter; }
   Heap* heap() { return &globalData().heap; }
 
   static const HashTable* arrayTable(CallFrame* callFrame) {
@@ -115,7 +115,7 @@ class ExecState : private Register {
   friend class Arguments;
   friend class JSActivation;
   friend class JSGlobalObject;
-  friend class Machine;
+  friend class BytecodeInterpreter;
 
   static CallFrame* create(Register* callFrameBase) {
     return static_cast<CallFrame*>(callFrameBase);

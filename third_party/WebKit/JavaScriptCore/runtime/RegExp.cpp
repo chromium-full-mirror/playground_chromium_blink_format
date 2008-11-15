@@ -41,7 +41,7 @@ inline RegExp::RegExp(JSGlobalData* globalData, const UString& pattern)
       m_constructionError(0),
       m_numSubpatterns(0) {
 #if ENABLE(WREC)
-  m_wrecFunction = CTI::compileRegExp(globalData->machine, pattern,
+  m_wrecFunction = CTI::compileRegExp(globalData->interpreter, pattern,
                                       &m_numSubpatterns, &m_constructionError);
   if (m_wrecFunction)
     return;
@@ -90,7 +90,7 @@ inline RegExp::RegExp(JSGlobalData* globalData,
 
 #if ENABLE(WREC)
   m_wrecFunction = CTI::compileRegExp(
-      globalData->machine, pattern, &m_numSubpatterns, &m_constructionError,
+      globalData->interpreter, pattern, &m_numSubpatterns, &m_constructionError,
       (m_flagBits & IgnoreCase), (m_flagBits & Multiline));
   if (m_wrecFunction)
     return;

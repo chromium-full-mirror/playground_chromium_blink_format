@@ -98,7 +98,7 @@ namespace JSC {
 
 class CodeBlock;
 class JSPropertyNameIterator;
-class Machine;
+class BytecodeInterpreter;
 class Register;
 class RegisterFile;
 class ScopeChainNode;
@@ -255,7 +255,7 @@ class CTI {
   }
 
 #if ENABLE(WREC)
-  static void* compileRegExp(Machine*,
+  static void* compileRegExp(BytecodeInterpreter*,
                              const UString& pattern,
                              unsigned* numSubpatterns_ptr,
                              const char** error_ptr,
@@ -322,7 +322,7 @@ class CTI {
     CTI cti(globalData);
     cti.privateCompileCTIMachineTrampolines();
   }
-  static void freeCTIMachineTrampolines(Machine*);
+  static void freeCTIMachineTrampolines(BytecodeInterpreter*);
 
   static void patchGetByIdSelf(CodeBlock* codeBlock,
                                StructureID* structureID,
@@ -525,7 +525,7 @@ class CTI {
   void killLastResultRegister();
 
   X86Assembler m_jit;
-  Machine* m_machine;
+  BytecodeInterpreter* m_interpreter;
   JSGlobalData* m_globalData;
   CodeBlock* m_codeBlock;
 

@@ -47,7 +47,7 @@ class IdentifierTable;
 class JSGlobalObject;
 class JSObject;
 class Lexer;
-class Machine;
+class BytecodeInterpreter;
 class Parser;
 class ParserRefCounted;
 class StructureID;
@@ -63,7 +63,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   static PassRefPtr<JSGlobalData> createLeaked();
   ~JSGlobalData();
 
-  Machine* machine;
+  BytecodeInterpreter* interpreter;
 
   JSValue* exception;
 #if ENABLE(CTI)

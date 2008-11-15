@@ -176,8 +176,8 @@ static inline bool jsLess(CallFrame* callFrame, JSValue* v1, JSValue* v2) {
   if (fastIsNumber(v1, n1) && fastIsNumber(v2, n2))
     return n1 < n2;
 
-  Machine* machine = callFrame->machine();
-  if (machine->isJSString(v1) && machine->isJSString(v2))
+  BytecodeInterpreter* interpreter = callFrame->interpreter();
+  if (interpreter->isJSString(v1) && interpreter->isJSString(v2))
     return asString(v1)->value() < asString(v2)->value();
 
   JSValue* p1;
@@ -201,8 +201,8 @@ static inline bool jsLessEq(CallFrame* callFrame, JSValue* v1, JSValue* v2) {
   if (fastIsNumber(v1, n1) && fastIsNumber(v2, n2))
     return n1 <= n2;
 
-  Machine* machine = callFrame->machine();
-  if (machine->isJSString(v1) && machine->isJSString(v2))
+  BytecodeInterpreter* interpreter = callFrame->interpreter();
+  if (interpreter->isJSString(v1) && interpreter->isJSString(v2))
     return !(asString(v2)->value() < asString(v1)->value());
 
   JSValue* p1;
@@ -325,9 +325,9 @@ static bool jsIsFunctionType(JSValue* v) {
   return false;
 }
 
-NEVER_INLINE bool Machine::resolve(CallFrame* callFrame,
-                                   Instruction* vPC,
-                                   JSValue*& exceptionValue) {
+NEVER_INLINE bool BytecodeInterpreter::resolve(CallFrame* callFrame,
+                                               Instruction* vPC,
+                                               JSValue*& exceptionValue) {
   int dst = (vPC + 1)->u.operand;
   int property = (vPC + 2)->u.operand;
 
@@ -355,9 +355,9 @@ NEVER_INLINE bool Machine::resolve(CallFrame* callFrame,
   return false;
 }
 
-NEVER_INLINE bool Machine::resolveSkip(CallFrame* callFrame,
-                                       Instruction* vPC,
-                                       JSValue*& exceptionValue) {
+NEVER_INLINE bool BytecodeInterpreter::resolveSkip(CallFrame* callFrame,
+                                                   Instruction* vPC,
+                                                   JSValue*& exceptionValue) {
   CodeBlock* codeBlock = callFrame->codeBlock();
 
   int dst = (vPC + 1)->u.operand;
@@ -390,9 +390,9 @@ NEVER_INLINE bool Machine::resolveSkip(CallFrame* callFrame,
   return false;
 }
 
-NEVER_INLINE bool Machine::resolveGlobal(CallFrame* callFrame,
-                                         Instruction* vPC,
-                                         JSValue*& exceptionValue) {
+NEVER_INLINE bool BytecodeInterpreter::resolveGlobal(CallFrame* callFrame,
+                                                     Instruction* vPC,
+                                                     JSValue*& exceptionValue) {
   int dst = (vPC + 1)->u.operand;
   JSGlobalObject* globalObject =
       static_cast<JSGlobalObject*>((vPC + 2)->u.jsCell);
@@ -457,7 +457,8 @@ static ALWAYS_INLINE JSValue* inlineResolveBase(CallFrame* callFrame,
   return noValue();
 }
 
-NEVER_INLINE void Machine::resolveBase(CallFrame* callFrame, Instruction* vPC) {
+NEVER_INLINE void BytecodeInterpreter::resolveBase(CallFrame* callFrame,
+                                                   Instruction* vPC) {
   int dst = (vPC + 1)->u.operand;
   int property = (vPC + 2)->u.operand;
   callFrame[dst] = inlineResolveBase(
@@ -465,9 +466,10 @@ NEVER_INLINE void Machine::resolveBase(CallFrame* callFrame, Instruction* vPC) {
       callFrame->scopeChain());
 }
 
-NEVER_INLINE bool Machine::resolveBaseAndProperty(CallFrame* callFrame,
-                                                  Instruction* vPC,
-                                                  JSValue*& exceptionValue) {
+NEVER_INLINE bool BytecodeInterpreter::resolveBaseAndProperty(
+    CallFrame* callFrame,
+    Instruction* vPC,
+    JSValue*& exceptionValue) {
   int baseDst = (vPC + 1)->u.operand;
   int propDst = (vPC + 2)->u.operand;
   int property = (vPC + 3)->u.operand;
@@ -503,9 +505,10 @@ NEVER_INLINE bool Machine::resolveBaseAndProperty(CallFrame* callFrame,
   return false;
 }
 
-NEVER_INLINE bool Machine::resolveBaseAndFunc(CallFrame* callFrame,
-                                              Instruction* vPC,
-                                              JSValue*& exceptionValue) {
+NEVER_INLINE bool BytecodeInterpreter::resolveBaseAndFunc(
+    CallFrame* callFrame,
+    Instruction* vPC,
+    JSValue*& exceptionValue) {
   int baseDst = (vPC + 1)->u.operand;
   int funcDst = (vPC + 2)->u.operand;
   int property = (vPC + 3)->u.operand;
@@ -553,7 +556,7 @@ NEVER_INLINE bool Machine::resolveBaseAndFunc(CallFrame* callFrame,
   return false;
 }
 
-ALWAYS_INLINE CallFrame* Machine::slideRegisterWindowForCall(
+ALWAYS_INLINE CallFrame* BytecodeInterpreter::slideRegisterWindowForCall(
     CodeBlock* newCodeBlock,
     RegisterFile* registerFile,
     CallFrame* callFrame,
@@ -612,12 +615,12 @@ static NEVER_INLINE bool isNotObject(CallFrame* callFrame,
   return true;
 }
 
-NEVER_INLINE JSValue* Machine::callEval(CallFrame* callFrame,
-                                        RegisterFile* registerFile,
-                                        Register* argv,
-                                        int argc,
-                                        int registerOffset,
-                                        JSValue*& exceptionValue) {
+NEVER_INLINE JSValue* BytecodeInterpreter::callEval(CallFrame* callFrame,
+                                                    RegisterFile* registerFile,
+                                                    Register* argv,
+                                                    int argc,
+                                                    int registerOffset,
+                                                    JSValue*& exceptionValue) {
   if (argc < 2)
     return jsUndefined();
 
@@ -635,7 +638,7 @@ NEVER_INLINE JSValue* Machine::callEval(CallFrame* callFrame,
 
   JSValue* result = jsUndefined();
   if (evalNode)
-    result = callFrame->globalData().machine->execute(
+    result = callFrame->globalData().interpreter->execute(
         evalNode.get(), callFrame,
         callFrame->thisValue()->toThisObject(callFrame),
         callFrame->registers() - registerFile->start() + registerOffset,
@@ -644,7 +647,7 @@ NEVER_INLINE JSValue* Machine::callEval(CallFrame* callFrame,
   return result;
 }
 
-Machine::Machine()
+BytecodeInterpreter::BytecodeInterpreter()
     : m_sampler(0)
 #if ENABLE(CTI)
       ,
@@ -685,7 +688,7 @@ Machine::Machine()
   fastFree(storage);
 }
 
-void Machine::initialize(JSGlobalData* globalData) {
+void BytecodeInterpreter::initialize(JSGlobalData* globalData) {
 #if ENABLE(CTI)
   CTI::compileCTIMachineTrampolines(globalData);
 #else
@@ -693,7 +696,7 @@ void Machine::initialize(JSGlobalData* globalData) {
 #endif
 }
 
-Machine::~Machine() {
+BytecodeInterpreter::~BytecodeInterpreter() {
 #if ENABLE(CTI)
   CTI::freeCTIMachineTrampolines(this);
 #endif
@@ -701,12 +704,12 @@ Machine::~Machine() {
 
 #ifndef NDEBUG
 
-void Machine::dumpCallFrame(CallFrame* callFrame) {
+void BytecodeInterpreter::dumpCallFrame(CallFrame* callFrame) {
   callFrame->codeBlock()->dump(callFrame);
   dumpRegisters(callFrame);
 }
 
-void Machine::dumpRegisters(CallFrame* callFrame) {
+void BytecodeInterpreter::dumpRegisters(CallFrame* callFrame) {
   printf("Register frame: \n\n");
   printf("----------------------------------------------------\n");
   printf("            use            |   address  |   value   \n");
@@ -716,7 +719,7 @@ void Machine::dumpRegisters(CallFrame* callFrame) {
   RegisterFile* registerFile = &callFrame->scopeChain()
                                     ->globalObject()
                                     ->globalData()
-                                    ->machine->registerFile();
+                                    ->interpreter->registerFile();
   const Register* it;
   const Register* end;
 
@@ -800,7 +803,7 @@ void Machine::dumpRegisters(CallFrame* callFrame) {
 
 #endif
 
-bool Machine::isOpcode(Opcode opcode) {
+bool BytecodeInterpreter::isOpcode(Opcode opcode) {
 #if HAVE(COMPUTED_GOTO)
   return opcode != HashTraits<Opcode>::emptyValue() &&
          !HashTraits<Opcode>::isDeletedValue(opcode) &&
@@ -810,10 +813,10 @@ bool Machine::isOpcode(Opcode opcode) {
 #endif
 }
 
-NEVER_INLINE bool Machine::unwindCallFrame(CallFrame*& callFrame,
-                                           JSValue* exceptionValue,
-                                           const Instruction*& vPC,
-                                           CodeBlock*& codeBlock) {
+NEVER_INLINE bool BytecodeInterpreter::unwindCallFrame(CallFrame*& callFrame,
+                                                       JSValue* exceptionValue,
+                                                       const Instruction*& vPC,
+                                                       CodeBlock*& codeBlock) {
   CodeBlock* oldCodeBlock = codeBlock;
   ScopeChainNode* scopeChain = callFrame->scopeChain();
 
@@ -862,10 +865,11 @@ NEVER_INLINE bool Machine::unwindCallFrame(CallFrame*& callFrame,
   return true;
 }
 
-NEVER_INLINE Instruction* Machine::throwException(CallFrame*& callFrame,
-                                                  JSValue*& exceptionValue,
-                                                  const Instruction* vPC,
-                                                  bool explicitThrow) {
+NEVER_INLINE Instruction* BytecodeInterpreter::throwException(
+    CallFrame*& callFrame,
+    JSValue*& exceptionValue,
+    const Instruction* vPC,
+    bool explicitThrow) {
   // Set up the exception object
 
   CodeBlock* codeBlock = callFrame->codeBlock();
@@ -996,11 +1000,11 @@ class DynamicGlobalObjectScope : Noncopyable {
   JSGlobalObject* m_savedDynamicGlobalObject;
 };
 
-JSValue* Machine::execute(ProgramNode* programNode,
-                          CallFrame* callFrame,
-                          ScopeChainNode* scopeChain,
-                          JSObject* thisObj,
-                          JSValue** exception) {
+JSValue* BytecodeInterpreter::execute(ProgramNode* programNode,
+                                      CallFrame* callFrame,
+                                      ScopeChainNode* scopeChain,
+                                      JSObject* thisObj,
+                                      JSValue** exception) {
   ASSERT(!scopeChain->globalData->exception);
 
   if (m_reentryDepth >= MaxReentryDepth) {
@@ -1067,13 +1071,13 @@ JSValue* Machine::execute(ProgramNode* programNode,
   return result;
 }
 
-JSValue* Machine::execute(FunctionBodyNode* functionBodyNode,
-                          CallFrame* callFrame,
-                          JSFunction* function,
-                          JSObject* thisObj,
-                          const ArgList& args,
-                          ScopeChainNode* scopeChain,
-                          JSValue** exception) {
+JSValue* BytecodeInterpreter::execute(FunctionBodyNode* functionBodyNode,
+                                      CallFrame* callFrame,
+                                      JSFunction* function,
+                                      JSObject* thisObj,
+                                      const ArgList& args,
+                                      ScopeChainNode* scopeChain,
+                                      JSValue** exception) {
   ASSERT(!scopeChain->globalData->exception);
 
   if (m_reentryDepth >= MaxReentryDepth) {
@@ -1141,11 +1145,11 @@ JSValue* Machine::execute(FunctionBodyNode* functionBodyNode,
   return result;
 }
 
-JSValue* Machine::execute(EvalNode* evalNode,
-                          CallFrame* callFrame,
-                          JSObject* thisObj,
-                          ScopeChainNode* scopeChain,
-                          JSValue** exception) {
+JSValue* BytecodeInterpreter::execute(EvalNode* evalNode,
+                                      CallFrame* callFrame,
+                                      JSObject* thisObj,
+                                      ScopeChainNode* scopeChain,
+                                      JSValue** exception) {
   return execute(evalNode, callFrame, thisObj,
                  m_registerFile.size() +
                      evalNode->byteCode(scopeChain).numParameters +
@@ -1153,12 +1157,12 @@ JSValue* Machine::execute(EvalNode* evalNode,
                  scopeChain, exception);
 }
 
-JSValue* Machine::execute(EvalNode* evalNode,
-                          CallFrame* callFrame,
-                          JSObject* thisObj,
-                          int globalRegisterOffset,
-                          ScopeChainNode* scopeChain,
-                          JSValue** exception) {
+JSValue* BytecodeInterpreter::execute(EvalNode* evalNode,
+                                      CallFrame* callFrame,
+                                      JSObject* thisObj,
+                                      int globalRegisterOffset,
+                                      ScopeChainNode* scopeChain,
+                                      JSValue** exception) {
   ASSERT(!scopeChain->globalData->exception);
 
   if (m_reentryDepth >= MaxReentryDepth) {
@@ -1259,10 +1263,10 @@ JSValue* Machine::execute(EvalNode* evalNode,
   return result;
 }
 
-NEVER_INLINE void Machine::debug(CallFrame* callFrame,
-                                 DebugHookID debugHookID,
-                                 int firstLine,
-                                 int lastLine) {
+NEVER_INLINE void BytecodeInterpreter::debug(CallFrame* callFrame,
+                                             DebugHookID debugHookID,
+                                             int firstLine,
+                                             int lastLine) {
   Debugger* debugger = callFrame->dynamicGlobalObject()->debugger();
   if (!debugger)
     return;
@@ -1295,7 +1299,7 @@ NEVER_INLINE void Machine::debug(CallFrame* callFrame,
   }
 }
 
-void Machine::resetTimeoutCheck() {
+void BytecodeInterpreter::resetTimeoutCheck() {
   m_ticksUntilNextTimeoutCheck = initialTickCountThreshold;
   m_timeAtLastCheckTimeout = 0;
   m_timeExecuting = 0;
@@ -1346,7 +1350,8 @@ static inline unsigned getCPUTime() {
 
 // We have to return a JSValue here, gcc seems to produce worse code if
 // we attempt to return a bool
-ALWAYS_INLINE JSValue* Machine::checkTimeout(JSGlobalObject* globalObject) {
+ALWAYS_INLINE JSValue* BytecodeInterpreter::checkTimeout(
+    JSGlobalObject* globalObject) {
   unsigned currentTime = getCPUTime();
 
   if (!m_timeAtLastCheckTimeout) {
@@ -1385,7 +1390,7 @@ ALWAYS_INLINE JSValue* Machine::checkTimeout(JSGlobalObject* globalObject) {
   return noValue();
 }
 
-NEVER_INLINE ScopeChainNode* Machine::createExceptionScope(
+NEVER_INLINE ScopeChainNode* BytecodeInterpreter::createExceptionScope(
     CallFrame* callFrame,
     const Instruction* vPC) {
   int dst = (++vPC)->u.operand;
@@ -1410,11 +1415,12 @@ static StructureIDChain* cachePrototypeChain(CallFrame* callFrame,
   return structureID->cachedPrototypeChain();
 }
 
-NEVER_INLINE void Machine::tryCachePutByID(CallFrame* callFrame,
-                                           CodeBlock* codeBlock,
-                                           Instruction* vPC,
-                                           JSValue* baseValue,
-                                           const PutPropertySlot& slot) {
+NEVER_INLINE void BytecodeInterpreter::tryCachePutByID(
+    CallFrame* callFrame,
+    CodeBlock* codeBlock,
+    Instruction* vPC,
+    JSValue* baseValue,
+    const PutPropertySlot& slot) {
   // Recursive invocation may already have specialized this instruction.
   if (vPC[0].u.opcode != getOpcode(op_put_by_id))
     return;
@@ -1485,19 +1491,20 @@ NEVER_INLINE void Machine::tryCachePutByID(CallFrame* callFrame,
   codeBlock->refStructureIDs(vPC);
 }
 
-NEVER_INLINE void Machine::uncachePutByID(CodeBlock* codeBlock,
-                                          Instruction* vPC) {
+NEVER_INLINE void BytecodeInterpreter::uncachePutByID(CodeBlock* codeBlock,
+                                                      Instruction* vPC) {
   codeBlock->derefStructureIDs(vPC);
   vPC[0] = getOpcode(op_put_by_id);
   vPC[4] = 0;
 }
 
-NEVER_INLINE void Machine::tryCacheGetByID(CallFrame* callFrame,
-                                           CodeBlock* codeBlock,
-                                           Instruction* vPC,
-                                           JSValue* baseValue,
-                                           const Identifier& propertyName,
-                                           const PropertySlot& slot) {
+NEVER_INLINE void BytecodeInterpreter::tryCacheGetByID(
+    CallFrame* callFrame,
+    CodeBlock* codeBlock,
+    Instruction* vPC,
+    JSValue* baseValue,
+    const Identifier& propertyName,
+    const PropertySlot& slot) {
   // Recursive invocation may already have specialized this instruction.
   if (vPC[0].u.opcode != getOpcode(op_get_by_id))
     return;
@@ -1618,17 +1625,17 @@ NEVER_INLINE void Machine::tryCacheGetByID(CallFrame* callFrame,
   codeBlock->refStructureIDs(vPC);
 }
 
-NEVER_INLINE void Machine::uncacheGetByID(CodeBlock* codeBlock,
-                                          Instruction* vPC) {
+NEVER_INLINE void BytecodeInterpreter::uncacheGetByID(CodeBlock* codeBlock,
+                                                      Instruction* vPC) {
   codeBlock->derefStructureIDs(vPC);
   vPC[0] = getOpcode(op_get_by_id);
   vPC[4] = 0;
 }
 
-JSValue* Machine::privateExecute(ExecutionFlag flag,
-                                 RegisterFile* registerFile,
-                                 CallFrame* callFrame,
-                                 JSValue** exception) {
+JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
+                                             RegisterFile* registerFile,
+                                             CallFrame* callFrame,
+                                             JSValue** exception) {
   // One-time initialization of our address tables. We have to put this code
   // here because our labels are only in scope inside this function.
   if (flag == InitializeAndReturn) {
@@ -1681,7 +1688,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
 #if ENABLE(OPCODE_SAMPLING)
 #define SAMPLE(codeBlock, vPC) m_sampler->sample(codeBlock, vPC)
-#define CTI_SAMPLER ARG_globalData->machine->sampler()
+#define CTI_SAMPLER ARG_globalData->interpreter->sampler()
 #else
 #define SAMPLE(codeBlock, vPC)
 #define CTI_SAMPLER 0
@@ -4332,8 +4339,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 #undef CHECK_FOR_TIMEOUT
 }
 
-JSValue* Machine::retrieveArguments(CallFrame* callFrame,
-                                    JSFunction* function) const {
+JSValue* BytecodeInterpreter::retrieveArguments(CallFrame* callFrame,
+                                                JSFunction* function) const {
   CallFrame* functionCallFrame = findFunctionCallFrame(callFrame, function);
   if (!functionCallFrame)
     return jsNull();
@@ -4359,8 +4366,8 @@ JSValue* Machine::retrieveArguments(CallFrame* callFrame,
   return arguments;
 }
 
-JSValue* Machine::retrieveCaller(CallFrame* callFrame,
-                                 InternalFunction* function) const {
+JSValue* BytecodeInterpreter::retrieveCaller(CallFrame* callFrame,
+                                             InternalFunction* function) const {
   CallFrame* functionCallFrame = findFunctionCallFrame(callFrame, function);
   if (!functionCallFrame)
     return jsNull();
@@ -4376,11 +4383,11 @@ JSValue* Machine::retrieveCaller(CallFrame* callFrame,
   return caller;
 }
 
-void Machine::retrieveLastCaller(CallFrame* callFrame,
-                                 int& lineNumber,
-                                 intptr_t& sourceID,
-                                 UString& sourceURL,
-                                 JSValue*& function) const {
+void BytecodeInterpreter::retrieveLastCaller(CallFrame* callFrame,
+                                             int& lineNumber,
+                                             intptr_t& sourceID,
+                                             UString& sourceURL,
+                                             JSValue*& function) const {
   function = noValue();
   lineNumber = -1;
   sourceURL = UString();
@@ -4400,8 +4407,9 @@ void Machine::retrieveLastCaller(CallFrame* callFrame,
   function = callerFrame->callee();
 }
 
-CallFrame* Machine::findFunctionCallFrame(CallFrame* callFrame,
-                                          InternalFunction* function) {
+CallFrame* BytecodeInterpreter::findFunctionCallFrame(
+    CallFrame* callFrame,
+    InternalFunction* function) {
   for (CallFrame* candidate = callFrame; candidate;
        candidate = candidate->callerFrame()->removeHostCallFrameFlag()) {
     if (candidate->callee() == function)
@@ -4412,11 +4420,12 @@ CallFrame* Machine::findFunctionCallFrame(CallFrame* callFrame,
 
 #if ENABLE(CTI)
 
-NEVER_INLINE void Machine::tryCTICachePutByID(CallFrame* callFrame,
-                                              CodeBlock* codeBlock,
-                                              void* returnAddress,
-                                              JSValue* baseValue,
-                                              const PutPropertySlot& slot) {
+NEVER_INLINE void BytecodeInterpreter::tryCTICachePutByID(
+    CallFrame* callFrame,
+    CodeBlock* codeBlock,
+    void* returnAddress,
+    JSValue* baseValue,
+    const PutPropertySlot& slot) {
   // The interpreter checks for recursion here; I do not believe this can occur
   // in CTI.
 
@@ -4495,12 +4504,13 @@ NEVER_INLINE void Machine::tryCTICachePutByID(CallFrame* callFrame,
 #endif
 }
 
-NEVER_INLINE void Machine::tryCTICacheGetByID(CallFrame* callFrame,
-                                              CodeBlock* codeBlock,
-                                              void* returnAddress,
-                                              JSValue* baseValue,
-                                              const Identifier& propertyName,
-                                              const PropertySlot& slot) {
+NEVER_INLINE void BytecodeInterpreter::tryCTICacheGetByID(
+    CallFrame* callFrame,
+    CodeBlock* codeBlock,
+    void* returnAddress,
+    JSValue* baseValue,
+    const Identifier& propertyName,
+    const PropertySlot& slot) {
   // FIXME: Write a test that proves we need to check for recursion here just
   // like the interpreter does, then add a check for recursion.
 
@@ -4737,7 +4747,7 @@ static NEVER_INLINE void throwStackOverflowError(CallFrame* callFrame,
     }                                                       \
   } while (0)
 
-JSObject* Machine::cti_op_convert_this(CTI_ARGS) {
+JSObject* BytecodeInterpreter::cti_op_convert_this(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* v1 = ARG_src1;
@@ -4748,7 +4758,7 @@ JSObject* Machine::cti_op_convert_this(CTI_ARGS) {
   return result;
 }
 
-void Machine::cti_op_end(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_end(CTI_ARGS) {
   CTI_STACK_HACK();
 
   ScopeChainNode* scopeChain = ARG_callFrame->scopeChain();
@@ -4756,7 +4766,7 @@ void Machine::cti_op_end(CTI_ARGS) {
   scopeChain->deref();
 }
 
-JSValue* Machine::cti_op_add(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_add(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* v1 = ARG_src1;
@@ -4803,7 +4813,7 @@ JSValue* Machine::cti_op_add(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_pre_inc(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_pre_inc(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* v = ARG_src1;
@@ -4814,10 +4824,10 @@ JSValue* Machine::cti_op_pre_inc(CTI_ARGS) {
   return result;
 }
 
-void Machine::cti_timeout_check(CTI_ARGS) {
+void BytecodeInterpreter::cti_timeout_check(CTI_ARGS) {
   CTI_STACK_HACK();
 
-  if (ARG_globalData->machine->checkTimeout(
+  if (ARG_globalData->interpreter->checkTimeout(
           ARG_callFrame->dynamicGlobalObject())) {
     ARG_globalData->exception =
         createInterruptedExecutionException(ARG_globalData);
@@ -4825,7 +4835,7 @@ void Machine::cti_timeout_check(CTI_ARGS) {
   }
 }
 
-void Machine::cti_register_file_check(CTI_ARGS) {
+void BytecodeInterpreter::cti_register_file_check(CTI_ARGS) {
   CTI_STACK_HACK();
 
   if (LIKELY(ARG_registerFile->grow(
@@ -4840,7 +4850,7 @@ void Machine::cti_register_file_check(CTI_ARGS) {
                           oldCallFrame->returnPC(), CTI_RETURN_ADDRESS);
 }
 
-int Machine::cti_op_loop_if_less(CTI_ARGS) {
+int BytecodeInterpreter::cti_op_loop_if_less(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -4852,7 +4862,7 @@ int Machine::cti_op_loop_if_less(CTI_ARGS) {
   return result;
 }
 
-int Machine::cti_op_loop_if_lesseq(CTI_ARGS) {
+int BytecodeInterpreter::cti_op_loop_if_lesseq(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -4864,13 +4874,13 @@ int Machine::cti_op_loop_if_lesseq(CTI_ARGS) {
   return result;
 }
 
-JSObject* Machine::cti_op_new_object(CTI_ARGS) {
+JSObject* BytecodeInterpreter::cti_op_new_object(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return constructEmptyObject(ARG_callFrame);
 }
 
-void Machine::cti_op_put_by_id(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_put_by_id(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -4885,18 +4895,18 @@ void Machine::cti_op_put_by_id(CTI_ARGS) {
   VM_CHECK_EXCEPTION_AT_END();
 }
 
-void Machine::cti_op_put_by_id_second(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_put_by_id_second(CTI_ARGS) {
   CTI_STACK_HACK();
 
   PutPropertySlot slot;
   ARG_src1->put(ARG_callFrame, *ARG_id2, ARG_src3, slot);
-  ARG_globalData->machine->tryCTICachePutByID(
+  ARG_globalData->interpreter->tryCTICachePutByID(
       ARG_callFrame, ARG_callFrame->codeBlock(), CTI_RETURN_ADDRESS, ARG_src1,
       slot);
   VM_CHECK_EXCEPTION_AT_END();
 }
 
-void Machine::cti_op_put_by_id_generic(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_put_by_id_generic(CTI_ARGS) {
   CTI_STACK_HACK();
 
   PutPropertySlot slot;
@@ -4904,7 +4914,7 @@ void Machine::cti_op_put_by_id_generic(CTI_ARGS) {
   VM_CHECK_EXCEPTION_AT_END();
 }
 
-void Machine::cti_op_put_by_id_fail(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_put_by_id_fail(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -4921,7 +4931,7 @@ void Machine::cti_op_put_by_id_fail(CTI_ARGS) {
   VM_CHECK_EXCEPTION_AT_END();
 }
 
-JSValue* Machine::cti_op_get_by_id(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_get_by_id(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -4938,7 +4948,7 @@ JSValue* Machine::cti_op_get_by_id(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_get_by_id_second(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_get_by_id_second(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -4948,15 +4958,15 @@ JSValue* Machine::cti_op_get_by_id_second(CTI_ARGS) {
   PropertySlot slot(baseValue);
   JSValue* result = baseValue->get(callFrame, ident, slot);
 
-  ARG_globalData->machine->tryCTICacheGetByID(callFrame, callFrame->codeBlock(),
-                                              CTI_RETURN_ADDRESS, baseValue,
-                                              ident, slot);
+  ARG_globalData->interpreter->tryCTICacheGetByID(
+      callFrame, callFrame->codeBlock(), CTI_RETURN_ADDRESS, baseValue, ident,
+      slot);
 
   VM_CHECK_EXCEPTION_AT_END();
   return result;
 }
 
-JSValue* Machine::cti_op_get_by_id_generic(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_get_by_id_generic(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -4970,7 +4980,7 @@ JSValue* Machine::cti_op_get_by_id_generic(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_get_by_id_fail(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_get_by_id_fail(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -4989,7 +4999,7 @@ JSValue* Machine::cti_op_get_by_id_fail(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_instanceof(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_instanceof(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5036,7 +5046,7 @@ JSValue* Machine::cti_op_instanceof(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_del_by_id(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_del_by_id(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5049,7 +5059,7 @@ JSValue* Machine::cti_op_del_by_id(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_mul(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_mul(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5067,13 +5077,13 @@ JSValue* Machine::cti_op_mul(CTI_ARGS) {
   return result;
 }
 
-JSObject* Machine::cti_op_new_func(CTI_ARGS) {
+JSObject* BytecodeInterpreter::cti_op_new_func(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return ARG_func1->makeFunction(ARG_callFrame, ARG_callFrame->scopeChain());
 }
 
-void* Machine::cti_op_call_JSFunction(CTI_ARGS) {
+void* BytecodeInterpreter::cti_op_call_JSFunction(CTI_ARGS) {
   CTI_STACK_HACK();
 
 #ifndef NDEBUG
@@ -5092,7 +5102,7 @@ void* Machine::cti_op_call_JSFunction(CTI_ARGS) {
   return newCodeBlock;
 }
 
-VoidPtrPair Machine::cti_op_call_arityCheck(CTI_ARGS) {
+VoidPtrPair BytecodeInterpreter::cti_op_call_arityCheck(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5141,7 +5151,7 @@ VoidPtrPair Machine::cti_op_call_arityCheck(CTI_ARGS) {
   return pair.i;
 }
 
-void* Machine::cti_vm_dontLazyLinkCall(CTI_ARGS) {
+void* BytecodeInterpreter::cti_vm_dontLazyLinkCall(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSFunction* callee = asFunction(ARG_src1);
@@ -5149,13 +5159,13 @@ void* Machine::cti_vm_dontLazyLinkCall(CTI_ARGS) {
   if (!codeBlock->ctiCode)
     CTI::compile(ARG_globalData, codeBlock);
 
-  ctiRepatchCallByReturnAddress(ARG_returnAddress2,
-                                ARG_globalData->machine->m_ctiVirtualCallLink);
+  ctiRepatchCallByReturnAddress(
+      ARG_returnAddress2, ARG_globalData->interpreter->m_ctiVirtualCallLink);
 
   return codeBlock->ctiCode;
 }
 
-void* Machine::cti_vm_lazyLinkCall(CTI_ARGS) {
+void* BytecodeInterpreter::cti_vm_lazyLinkCall(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSFunction* callee = asFunction(ARG_src1);
@@ -5171,7 +5181,7 @@ void* Machine::cti_vm_lazyLinkCall(CTI_ARGS) {
   return codeBlock->ctiCode;
 }
 
-JSObject* Machine::cti_op_push_activation(CTI_ARGS) {
+JSObject* BytecodeInterpreter::cti_op_push_activation(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSActivation* activation = new (ARG_globalData) JSActivation(
@@ -5182,7 +5192,7 @@ JSObject* Machine::cti_op_push_activation(CTI_ARGS) {
   return activation;
 }
 
-JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_call_NotJSFunction(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* funcVal = ARG_src1;
@@ -5233,7 +5243,7 @@ JSValue* Machine::cti_op_call_NotJSFunction(CTI_ARGS) {
   VM_THROW_EXCEPTION();
 }
 
-void Machine::cti_op_create_arguments(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_create_arguments(CTI_ARGS) {
   CTI_STACK_HACK();
 
   Arguments* arguments = new (ARG_globalData) Arguments(ARG_callFrame);
@@ -5241,7 +5251,7 @@ void Machine::cti_op_create_arguments(CTI_ARGS) {
   ARG_callFrame[RegisterFile::ArgumentsRegister] = arguments;
 }
 
-void Machine::cti_op_create_arguments_no_params(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_create_arguments_no_params(CTI_ARGS) {
   CTI_STACK_HACK();
 
   Arguments* arguments =
@@ -5250,7 +5260,7 @@ void Machine::cti_op_create_arguments_no_params(CTI_ARGS) {
   ARG_callFrame[RegisterFile::ArgumentsRegister] = arguments;
 }
 
-void Machine::cti_op_tear_off_activation(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_tear_off_activation(CTI_ARGS) {
   CTI_STACK_HACK();
 
   ASSERT(ARG_callFrame->codeBlock()->needsFullScopeChain);
@@ -5258,7 +5268,7 @@ void Machine::cti_op_tear_off_activation(CTI_ARGS) {
       ARG_callFrame->optionalCalleeArguments());
 }
 
-void Machine::cti_op_tear_off_arguments(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_tear_off_arguments(CTI_ARGS) {
   CTI_STACK_HACK();
 
   ASSERT(ARG_callFrame->codeBlock()->usesArguments &&
@@ -5266,35 +5276,35 @@ void Machine::cti_op_tear_off_arguments(CTI_ARGS) {
   ARG_callFrame->optionalCalleeArguments()->copyRegisters();
 }
 
-void Machine::cti_op_profile_will_call(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_profile_will_call(CTI_ARGS) {
   CTI_STACK_HACK();
 
   ASSERT(*ARG_profilerReference);
   (*ARG_profilerReference)->willExecute(ARG_callFrame, ARG_src1);
 }
 
-void Machine::cti_op_profile_did_call(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_profile_did_call(CTI_ARGS) {
   CTI_STACK_HACK();
 
   ASSERT(*ARG_profilerReference);
   (*ARG_profilerReference)->didExecute(ARG_callFrame, ARG_src1);
 }
 
-void Machine::cti_op_ret_scopeChain(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_ret_scopeChain(CTI_ARGS) {
   CTI_STACK_HACK();
 
   ASSERT(ARG_callFrame->codeBlock()->needsFullScopeChain);
   ARG_callFrame->scopeChain()->deref();
 }
 
-JSObject* Machine::cti_op_new_array(CTI_ARGS) {
+JSObject* BytecodeInterpreter::cti_op_new_array(CTI_ARGS) {
   CTI_STACK_HACK();
 
   ArgList argList(ARG_registers1, ARG_int2);
   return constructArray(ARG_callFrame, argList);
 }
 
-JSValue* Machine::cti_op_resolve(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_resolve(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5323,7 +5333,7 @@ JSValue* Machine::cti_op_resolve(CTI_ARGS) {
   VM_THROW_EXCEPTION();
 }
 
-JSObject* Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
+JSObject* BytecodeInterpreter::cti_op_construct_JSConstruct(CTI_ARGS) {
   CTI_STACK_HACK();
 
 #ifndef NDEBUG
@@ -5343,7 +5353,7 @@ JSObject* Machine::cti_op_construct_JSConstruct(CTI_ARGS) {
   return new (ARG_globalData) JSObject(structure);
 }
 
-JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_construct_NotJSConstruct(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5376,11 +5386,11 @@ JSValue* Machine::cti_op_construct_NotJSConstruct(CTI_ARGS) {
   VM_THROW_EXCEPTION();
 }
 
-JSValue* Machine::cti_op_get_by_val(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_get_by_val(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
-  Machine* machine = ARG_globalData->machine;
+  BytecodeInterpreter* interpreter = ARG_globalData->interpreter;
 
   JSValue* baseValue = ARG_src1;
   JSValue* subscript = ARG_src2;
@@ -5390,13 +5400,13 @@ JSValue* Machine::cti_op_get_by_val(CTI_ARGS) {
 
   bool isUInt32 = JSImmediate::getUInt32(subscript, i);
   if (LIKELY(isUInt32)) {
-    if (machine->isJSArray(baseValue)) {
+    if (interpreter->isJSArray(baseValue)) {
       JSArray* jsArray = asArray(baseValue);
       if (jsArray->canGetIndex(i))
         result = jsArray->getIndex(i);
       else
         result = jsArray->JSArray::get(callFrame, i);
-    } else if (machine->isJSString(baseValue) &&
+    } else if (interpreter->isJSString(baseValue) &&
                asString(baseValue)->canGetIndex(i))
       result = asString(baseValue)->getIndex(ARG_globalData, i);
     else
@@ -5410,7 +5420,7 @@ JSValue* Machine::cti_op_get_by_val(CTI_ARGS) {
   return result;
 }
 
-VoidPtrPair Machine::cti_op_resolve_func(CTI_ARGS) {
+VoidPtrPair BytecodeInterpreter::cti_op_resolve_func(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5457,7 +5467,7 @@ VoidPtrPair Machine::cti_op_resolve_func(CTI_ARGS) {
   VM_THROW_EXCEPTION_2();
 }
 
-JSValue* Machine::cti_op_sub(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_sub(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5475,11 +5485,11 @@ JSValue* Machine::cti_op_sub(CTI_ARGS) {
   return result;
 }
 
-void Machine::cti_op_put_by_val(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_put_by_val(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
-  Machine* machine = ARG_globalData->machine;
+  BytecodeInterpreter* interpreter = ARG_globalData->interpreter;
 
   JSValue* baseValue = ARG_src1;
   JSValue* subscript = ARG_src2;
@@ -5489,7 +5499,7 @@ void Machine::cti_op_put_by_val(CTI_ARGS) {
 
   bool isUInt32 = JSImmediate::getUInt32(subscript, i);
   if (LIKELY(isUInt32)) {
-    if (machine->isJSArray(baseValue)) {
+    if (interpreter->isJSArray(baseValue)) {
       JSArray* jsArray = asArray(baseValue);
       if (jsArray->canSetIndex(i))
         jsArray->setIndex(i, value);
@@ -5509,7 +5519,7 @@ void Machine::cti_op_put_by_val(CTI_ARGS) {
   VM_CHECK_EXCEPTION_AT_END();
 }
 
-void Machine::cti_op_put_by_val_array(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_put_by_val_array(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5518,7 +5528,7 @@ void Machine::cti_op_put_by_val_array(CTI_ARGS) {
   int i = ARG_int2;
   JSValue* value = ARG_src3;
 
-  ASSERT(ARG_globalData->machine->isJSArray(baseValue));
+  ASSERT(ARG_globalData->interpreter->isJSArray(baseValue));
 
   if (LIKELY(i >= 0))
     asArray(baseValue)->JSArray::put(callFrame, i, value);
@@ -5535,7 +5545,7 @@ void Machine::cti_op_put_by_val_array(CTI_ARGS) {
   VM_CHECK_EXCEPTION_AT_END();
 }
 
-JSValue* Machine::cti_op_lesseq(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_lesseq(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5544,7 +5554,7 @@ JSValue* Machine::cti_op_lesseq(CTI_ARGS) {
   return result;
 }
 
-int Machine::cti_op_loop_if_true(CTI_ARGS) {
+int BytecodeInterpreter::cti_op_loop_if_true(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5556,7 +5566,7 @@ int Machine::cti_op_loop_if_true(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_negate(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_negate(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src = ARG_src1;
@@ -5571,14 +5581,14 @@ JSValue* Machine::cti_op_negate(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_resolve_base(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_resolve_base(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return inlineResolveBase(ARG_callFrame, *ARG_id1,
                            ARG_callFrame->scopeChain());
 }
 
-JSValue* Machine::cti_op_resolve_skip(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_resolve_skip(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5612,7 +5622,7 @@ JSValue* Machine::cti_op_resolve_skip(CTI_ARGS) {
   VM_THROW_EXCEPTION();
 }
 
-JSValue* Machine::cti_op_resolve_global(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_resolve_global(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5642,7 +5652,7 @@ JSValue* Machine::cti_op_resolve_global(CTI_ARGS) {
   VM_THROW_EXCEPTION();
 }
 
-JSValue* Machine::cti_op_div(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_div(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5660,7 +5670,7 @@ JSValue* Machine::cti_op_div(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_pre_dec(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_pre_dec(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* v = ARG_src1;
@@ -5671,7 +5681,7 @@ JSValue* Machine::cti_op_pre_dec(CTI_ARGS) {
   return result;
 }
 
-int Machine::cti_op_jless(CTI_ARGS) {
+int BytecodeInterpreter::cti_op_jless(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5683,7 +5693,7 @@ int Machine::cti_op_jless(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_not(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_not(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src = ARG_src1;
@@ -5695,7 +5705,7 @@ JSValue* Machine::cti_op_not(CTI_ARGS) {
   return result;
 }
 
-int SFX_CALL Machine::cti_op_jtrue(CTI_ARGS) {
+int SFX_CALL BytecodeInterpreter::cti_op_jtrue(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5707,7 +5717,7 @@ int SFX_CALL Machine::cti_op_jtrue(CTI_ARGS) {
   return result;
 }
 
-VoidPtrPair Machine::cti_op_post_inc(CTI_ARGS) {
+VoidPtrPair BytecodeInterpreter::cti_op_post_inc(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* v = ARG_src1;
@@ -5723,7 +5733,7 @@ VoidPtrPair Machine::cti_op_post_inc(CTI_ARGS) {
   return pair.i;
 }
 
-JSValue* Machine::cti_op_eq(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_eq(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5737,7 +5747,7 @@ JSValue* Machine::cti_op_eq(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_lshift(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_lshift(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* val = ARG_src1;
@@ -5760,7 +5770,7 @@ JSValue* Machine::cti_op_lshift(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_bitand(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_bitand(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5778,7 +5788,7 @@ JSValue* Machine::cti_op_bitand(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_rshift(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_rshift(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* val = ARG_src1;
@@ -5799,7 +5809,7 @@ JSValue* Machine::cti_op_rshift(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_bitnot(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_bitnot(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src = ARG_src1;
@@ -5814,7 +5824,7 @@ JSValue* Machine::cti_op_bitnot(CTI_ARGS) {
   return result;
 }
 
-VoidPtrPair Machine::cti_op_resolve_with_base(CTI_ARGS) {
+VoidPtrPair BytecodeInterpreter::cti_op_resolve_with_base(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5850,13 +5860,13 @@ VoidPtrPair Machine::cti_op_resolve_with_base(CTI_ARGS) {
   VM_THROW_EXCEPTION_2();
 }
 
-JSObject* Machine::cti_op_new_func_exp(CTI_ARGS) {
+JSObject* BytecodeInterpreter::cti_op_new_func_exp(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return ARG_funcexp1->makeFunction(ARG_callFrame, ARG_callFrame->scopeChain());
 }
 
-JSValue* Machine::cti_op_mod(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_mod(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* dividendValue = ARG_src1;
@@ -5870,7 +5880,7 @@ JSValue* Machine::cti_op_mod(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_less(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_less(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -5879,7 +5889,7 @@ JSValue* Machine::cti_op_less(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_neq(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_neq(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5893,7 +5903,7 @@ JSValue* Machine::cti_op_neq(CTI_ARGS) {
   return result;
 }
 
-VoidPtrPair Machine::cti_op_post_dec(CTI_ARGS) {
+VoidPtrPair BytecodeInterpreter::cti_op_post_dec(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* v = ARG_src1;
@@ -5909,7 +5919,7 @@ VoidPtrPair Machine::cti_op_post_dec(CTI_ARGS) {
   return pair.i;
 }
 
-JSValue* Machine::cti_op_urshift(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_urshift(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* val = ARG_src1;
@@ -5929,7 +5939,7 @@ JSValue* Machine::cti_op_urshift(CTI_ARGS) {
   }
 }
 
-JSValue* Machine::cti_op_bitxor(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_bitxor(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5943,14 +5953,14 @@ JSValue* Machine::cti_op_bitxor(CTI_ARGS) {
   return result;
 }
 
-JSObject* Machine::cti_op_new_regexp(CTI_ARGS) {
+JSObject* BytecodeInterpreter::cti_op_new_regexp(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return new (ARG_globalData) RegExpObject(
       ARG_callFrame->lexicalGlobalObject()->regExpStructure(), ARG_regexp1);
 }
 
-JSValue* Machine::cti_op_bitor(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_bitor(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -5964,13 +5974,13 @@ JSValue* Machine::cti_op_bitor(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_call_eval(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_call_eval(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
   RegisterFile* registerFile = ARG_registerFile;
 
-  Machine* machine = ARG_globalData->machine;
+  BytecodeInterpreter* interpreter = ARG_globalData->interpreter;
 
   JSValue* funcVal = ARG_src1;
   int registerOffset = ARG_int2;
@@ -5983,8 +5993,9 @@ JSValue* Machine::cti_op_call_eval(CTI_ARGS) {
 
   if (thisValue == globalObject && funcVal == globalObject->evalFunction()) {
     JSValue* exceptionValue = noValue();
-    JSValue* result = machine->callEval(callFrame, registerFile, argv, argCount,
-                                        registerOffset, exceptionValue);
+    JSValue* result =
+        interpreter->callEval(callFrame, registerFile, argv, argCount,
+                              registerOffset, exceptionValue);
     if (UNLIKELY(exceptionValue != noValue())) {
       ARG_globalData->exception = exceptionValue;
       VM_THROW_EXCEPTION_AT_END();
@@ -5995,7 +6006,7 @@ JSValue* Machine::cti_op_call_eval(CTI_ARGS) {
   return JSImmediate::impossibleValue();
 }
 
-JSValue* Machine::cti_op_throw(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_throw(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -6007,7 +6018,7 @@ JSValue* Machine::cti_op_throw(CTI_ARGS) {
   JSValue* exceptionValue = ARG_src1;
   ASSERT(exceptionValue);
 
-  Instruction* handlerVPC = ARG_globalData->machine->throwException(
+  Instruction* handlerVPC = ARG_globalData->interpreter->throwException(
       callFrame, exceptionValue, codeBlock->instructions.begin() + vPCIndex,
       true);
 
@@ -6024,13 +6035,13 @@ JSValue* Machine::cti_op_throw(CTI_ARGS) {
   return exceptionValue;
 }
 
-JSPropertyNameIterator* Machine::cti_op_get_pnames(CTI_ARGS) {
+JSPropertyNameIterator* BytecodeInterpreter::cti_op_get_pnames(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return JSPropertyNameIterator::create(ARG_callFrame, ARG_src1);
 }
 
-JSValue* Machine::cti_op_next_pname(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_next_pname(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSPropertyNameIterator* it = ARG_pni1;
@@ -6040,7 +6051,7 @@ JSValue* Machine::cti_op_next_pname(CTI_ARGS) {
   return temp;
 }
 
-void Machine::cti_op_push_scope(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_push_scope(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSObject* o = ARG_src1->toObject(ARG_callFrame);
@@ -6048,19 +6059,19 @@ void Machine::cti_op_push_scope(CTI_ARGS) {
   ARG_callFrame->setScopeChain(ARG_callFrame->scopeChain()->push(o));
 }
 
-void Machine::cti_op_pop_scope(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_pop_scope(CTI_ARGS) {
   CTI_STACK_HACK();
 
   ARG_callFrame->setScopeChain(ARG_callFrame->scopeChain()->pop());
 }
 
-JSValue* Machine::cti_op_typeof(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_typeof(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return jsTypeStringForValue(ARG_callFrame, ARG_src1);
 }
 
-JSValue* Machine::cti_op_is_undefined(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_is_undefined(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* v = ARG_src1;
@@ -6070,37 +6081,37 @@ JSValue* Machine::cti_op_is_undefined(CTI_ARGS) {
           : v->asCell()->structureID()->typeInfo().masqueradesAsUndefined());
 }
 
-JSValue* Machine::cti_op_is_boolean(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_is_boolean(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return jsBoolean(ARG_src1->isBoolean());
 }
 
-JSValue* Machine::cti_op_is_number(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_is_number(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return jsBoolean(ARG_src1->isNumber());
 }
 
-JSValue* Machine::cti_op_is_string(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_is_string(CTI_ARGS) {
   CTI_STACK_HACK();
 
-  return jsBoolean(ARG_globalData->machine->isJSString(ARG_src1));
+  return jsBoolean(ARG_globalData->interpreter->isJSString(ARG_src1));
 }
 
-JSValue* Machine::cti_op_is_object(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_is_object(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return jsBoolean(jsIsObjectType(ARG_src1));
 }
 
-JSValue* Machine::cti_op_is_function(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_is_function(CTI_ARGS) {
   CTI_STACK_HACK();
 
   return jsBoolean(jsIsFunctionType(ARG_src1));
 }
 
-JSValue* Machine::cti_op_stricteq(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_stricteq(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -6115,7 +6126,7 @@ JSValue* Machine::cti_op_stricteq(CTI_ARGS) {
   return jsBoolean(strictEqualSlowCaseInline(src1, src2));
 }
 
-JSValue* Machine::cti_op_nstricteq(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_nstricteq(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src1 = ARG_src1;
@@ -6130,7 +6141,7 @@ JSValue* Machine::cti_op_nstricteq(CTI_ARGS) {
   return jsBoolean(!strictEqualSlowCaseInline(src1, src2));
 }
 
-JSValue* Machine::cti_op_to_jsnumber(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_to_jsnumber(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* src = ARG_src1;
@@ -6141,7 +6152,7 @@ JSValue* Machine::cti_op_to_jsnumber(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_in(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_in(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -6171,7 +6182,7 @@ JSValue* Machine::cti_op_in(CTI_ARGS) {
   return jsBoolean(baseObj->hasProperty(callFrame, property));
 }
 
-JSObject* Machine::cti_op_push_new_scope(CTI_ARGS) {
+JSObject* BytecodeInterpreter::cti_op_push_new_scope(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSObject* scope = new (ARG_globalData)
@@ -6182,7 +6193,7 @@ JSObject* Machine::cti_op_push_new_scope(CTI_ARGS) {
   return scope;
 }
 
-void Machine::cti_op_jmp_scopes(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_jmp_scopes(CTI_ARGS) {
   CTI_STACK_HACK();
 
   unsigned count = ARG_int1;
@@ -6194,7 +6205,7 @@ void Machine::cti_op_jmp_scopes(CTI_ARGS) {
   callFrame->setScopeChain(tmp);
 }
 
-void Machine::cti_op_put_by_index(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_put_by_index(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -6203,7 +6214,7 @@ void Machine::cti_op_put_by_index(CTI_ARGS) {
   ARG_src1->put(callFrame, property, ARG_src3);
 }
 
-void* Machine::cti_op_switch_imm(CTI_ARGS) {
+void* BytecodeInterpreter::cti_op_switch_imm(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* scrutinee = ARG_src1;
@@ -6219,7 +6230,7 @@ void* Machine::cti_op_switch_imm(CTI_ARGS) {
   return codeBlock->immediateSwitchJumpTables[tableIndex].ctiDefault;
 }
 
-void* Machine::cti_op_switch_char(CTI_ARGS) {
+void* BytecodeInterpreter::cti_op_switch_char(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* scrutinee = ARG_src1;
@@ -6239,7 +6250,7 @@ void* Machine::cti_op_switch_char(CTI_ARGS) {
   return result;
 }
 
-void* Machine::cti_op_switch_string(CTI_ARGS) {
+void* BytecodeInterpreter::cti_op_switch_string(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* scrutinee = ARG_src1;
@@ -6257,7 +6268,7 @@ void* Machine::cti_op_switch_string(CTI_ARGS) {
   return result;
 }
 
-JSValue* Machine::cti_op_del_by_val(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_op_del_by_val(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -6281,7 +6292,7 @@ JSValue* Machine::cti_op_del_by_val(CTI_ARGS) {
   return result;
 }
 
-void Machine::cti_op_put_getter(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_put_getter(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -6293,7 +6304,7 @@ void Machine::cti_op_put_getter(CTI_ARGS) {
   baseObj->defineGetter(callFrame, ident, asObject(ARG_src3));
 }
 
-void Machine::cti_op_put_setter(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_put_setter(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -6305,7 +6316,7 @@ void Machine::cti_op_put_setter(CTI_ARGS) {
   baseObj->defineSetter(callFrame, ident, asObject(ARG_src3));
 }
 
-JSObject* Machine::cti_op_new_error(CTI_ARGS) {
+JSObject* BytecodeInterpreter::cti_op_new_error(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -6320,7 +6331,7 @@ JSObject* Machine::cti_op_new_error(CTI_ARGS) {
                        codeBlock->ownerNode->sourceURL());
 }
 
-void Machine::cti_op_debug(CTI_ARGS) {
+void BytecodeInterpreter::cti_op_debug(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -6329,11 +6340,11 @@ void Machine::cti_op_debug(CTI_ARGS) {
   int firstLine = ARG_int2;
   int lastLine = ARG_int3;
 
-  ARG_globalData->machine->debug(
+  ARG_globalData->interpreter->debug(
       callFrame, static_cast<DebugHookID>(debugHookID), firstLine, lastLine);
 }
 
-JSValue* Machine::cti_vm_throw(CTI_ARGS) {
+JSValue* BytecodeInterpreter::cti_vm_throw(CTI_ARGS) {
   CTI_STACK_HACK();
 
   CallFrame* callFrame = ARG_callFrame;
@@ -6349,7 +6360,7 @@ JSValue* Machine::cti_vm_throw(CTI_ARGS) {
   ASSERT(exceptionValue);
   globalData->exception = noValue();
 
-  Instruction* handlerVPC = globalData->machine->throwException(
+  Instruction* handlerVPC = globalData->interpreter->throwException(
       callFrame, exceptionValue, codeBlock->instructions.begin() + vPCIndex,
       false);
 

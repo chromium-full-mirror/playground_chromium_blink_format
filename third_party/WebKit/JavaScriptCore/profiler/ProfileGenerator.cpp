@@ -68,8 +68,8 @@ void ProfileGenerator::addParentForConsoleStart(ExecState* exec) {
   UString sourceURL;
   JSValue* function;
 
-  exec->machine()->retrieveLastCaller(exec, lineNumber, sourceID, sourceURL,
-                                      function);
+  exec->interpreter()->retrieveLastCaller(exec, lineNumber, sourceID, sourceURL,
+                                          function);
   m_currentNode = ProfileNode::create(
       Profiler::createCallIdentifier(
           &exec->globalData(), function ? function->toThisObject(exec) : 0,

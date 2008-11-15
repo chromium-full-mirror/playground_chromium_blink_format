@@ -152,8 +152,8 @@ static inline void retrieveLastCaller(ExecState* exec,
   UString urlString;
   JSValue* function;
 
-  exec->machine()->retrieveLastCaller(exec, signedLineNumber, sourceID,
-                                      urlString, function);
+  exec->interpreter()->retrieveLastCaller(exec, signedLineNumber, sourceID,
+                                          urlString, function);
 
   url = KURL(urlString);
   lineNumber = (signedLineNumber >= 0 ? signedLineNumber : 0);
@@ -284,13 +284,13 @@ void Console::trace(ExecState* exec) {
   UString urlString;
   JSValue* func;
 
-  exec->machine()->retrieveLastCaller(exec, signedLineNumber, sourceID,
-                                      urlString, func);
+  exec->interpreter()->retrieveLastCaller(exec, signedLineNumber, sourceID,
+                                          urlString, func);
 
   ArgList args;
   while (!func->isNull()) {
     args.append(func);
-    func = exec->machine()->retrieveCaller(exec, asInternalFunction(func));
+    func = exec->interpreter()->retrieveCaller(exec, asInternalFunction(func));
   }
 
   page->inspectorController()->addMessageToConsole(

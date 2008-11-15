@@ -2514,7 +2514,7 @@ ScopeNode::ScopeNode(JSGlobalData* globalData,
   if (funcStack)
     m_functionStack = *funcStack;
 #if ENABLE(OPCODE_SAMPLING)
-  globalData->machine->sampler()->notifyOfScope(this);
+  globalData->interpreter->sampler()->notifyOfScope(this);
 #endif
 }
 

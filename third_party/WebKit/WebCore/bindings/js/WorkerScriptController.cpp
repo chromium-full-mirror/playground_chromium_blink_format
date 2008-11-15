@@ -69,7 +69,7 @@ JSValue* WorkerScriptController::evaluate(const String& sourceURL,
 
   ExecState* exec = m_workerContextWrapper->globalExec();
   m_workerContextWrapper->startTimeoutCheck();
-  Completion comp = Interpreter::evaluate(
+  Completion comp = JSC::evaluate(
       exec, exec->dynamicGlobalObject()->globalScopeChain(),
       makeSource(code, sourceURL, baseLine), m_workerContextWrapper);
   m_workerContextWrapper->stopTimeoutCheck();

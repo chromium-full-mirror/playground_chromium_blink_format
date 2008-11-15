@@ -135,7 +135,7 @@ JSValue* functionProtoFuncApply(ExecState* exec,
       return throwError(exec, TypeError);
     if (asObject(argArray)->classInfo() == &Arguments::info)
       asArguments(argArray)->fillArgList(exec, applyArgs);
-    else if (exec->machine()->isJSArray(argArray))
+    else if (exec->interpreter()->isJSArray(argArray))
       asArray(argArray)->fillArgList(exec, applyArgs);
     else if (asObject(argArray)->inherits(&JSArray::info)) {
       unsigned length = asArray(argArray)

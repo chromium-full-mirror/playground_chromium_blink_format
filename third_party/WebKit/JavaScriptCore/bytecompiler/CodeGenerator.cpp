@@ -149,7 +149,8 @@ void CodeGenerator::generate() {
   m_scopeNode->children().shrinkCapacity(0);
   if (m_codeType != EvalCode) {  // eval code needs to hang on to its
                                  // declaration stacks to keep declaration info
-                                 // alive until Machine::execute time.
+                                 // alive until BytecodeInterpreter::execute
+                                 // time.
     m_scopeNode->varStack().shrinkCapacity(0);
     m_scopeNode->functionStack().shrinkCapacity(0);
   }
@@ -251,13 +252,14 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
   emitOpcode(op_enter);
   codeBlock->globalData = m_globalData;
 
-  // FIXME: Move code that modifies the global object to Machine::execute.
+  // FIXME: Move code that modifies the global object to
+  // BytecodeInterpreter::execute.
 
   m_codeBlock->numParameters = 1;  // Allocate space for "this"
 
   JSGlobalObject* globalObject = scopeChain.globalObject();
   ExecState* exec = globalObject->globalExec();
-  RegisterFile* registerFile = &exec->globalData().machine->registerFile();
+  RegisterFile* registerFile = &exec->globalData().interpreter->registerFile();
 
   // Shift register indexes in generated code to elide registers allocated by
   // intermediate stack frames.
@@ -551,7 +553,7 @@ PassRefPtr<LabelID> CodeGenerator::emitLabel(LabelID* l0) {
 }
 
 void CodeGenerator::emitOpcode(OpcodeID opcodeID) {
-  instructions().append(globalData()->machine->getOpcode(opcodeID));
+  instructions().append(globalData()->interpreter->getOpcode(opcodeID));
   m_lastOpcodeID = opcodeID;
 }
 

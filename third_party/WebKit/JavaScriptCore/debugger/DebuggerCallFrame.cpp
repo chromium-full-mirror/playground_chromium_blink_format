@@ -77,7 +77,7 @@ JSValue* DebuggerCallFrame::evaluate(const UString& script,
     return Error::create(m_callFrame, SyntaxError, errMsg, errLine,
                          source.provider()->asID(), source.provider()->url());
 
-  return m_callFrame->scopeChain()->globalData->machine->execute(
+  return m_callFrame->scopeChain()->globalData->interpreter->execute(
       evalNode.get(), m_callFrame, thisObject(), m_callFrame->scopeChain(),
       &exception);
 }

@@ -249,9 +249,8 @@ JSValue* functionRun(ExecState* exec,
   JSGlobalObject* globalObject = exec->lexicalGlobalObject();
 
   stopWatch.start();
-  Interpreter::evaluate(globalObject->globalExec(),
-                        globalObject->globalScopeChain(),
-                        makeSource(script.data(), fileName));
+  evaluate(globalObject->globalExec(), globalObject->globalScopeChain(),
+           makeSource(script.data(), fileName));
   stopWatch.stop();
 
   return jsNumber(globalObject->globalExec(), stopWatch.getElapsedMS());
@@ -267,9 +266,8 @@ JSValue* functionLoad(ExecState* exec,
     return throwError(exec, GeneralError, "Could not open file.");
 
   JSGlobalObject* globalObject = exec->lexicalGlobalObject();
-  Interpreter::evaluate(globalObject->globalExec(),
-                        globalObject->globalScopeChain(),
-                        makeSource(script.data(), fileName));
+  evaluate(globalObject->globalExec(), globalObject->globalScopeChain(),
+           makeSource(script.data(), fileName));
 
   return jsUndefined();
 }
@@ -363,8 +361,8 @@ static bool runWithScripts(GlobalObject* globalObject,
     CodeGenerator::setDumpsGeneratedCode(true);
 
 #if ENABLE(OPCODE_SAMPLING)
-  Machine* machine = globalObject->globalData()->machine;
-  machine->setSampler(new SamplingTool(machine));
+  BytecodeInterpreter* interpreter = globalObject->globalData()->interpreter;
+  interpreter->setSampler(new SamplingTool(machine));
 #endif
 
   bool success = true;
@@ -375,11 +373,11 @@ static bool runWithScripts(GlobalObject* globalObject,
       return false;  // fail early so we can catch missing files
 
 #if ENABLE(OPCODE_SAMPLING)
-    machine->sampler()->start();
+    interpreter->sampler()->start();
 #endif
-    Completion completion = Interpreter::evaluate(
-        globalObject->globalExec(), globalObject->globalScopeChain(),
-        makeSource(script.data(), fileName));
+    Completion completion =
+        evaluate(globalObject->globalExec(), globalObject->globalScopeChain(),
+                 makeSource(script.data(), fileName));
     success = success && completion.complType() != Throw;
     if (dump) {
       if (completion.complType() == Throw)
@@ -395,13 +393,13 @@ static bool runWithScripts(GlobalObject* globalObject,
     globalObject->globalExec()->clearException();
 
 #if ENABLE(OPCODE_SAMPLING)
-    machine->sampler()->stop();
+    interpreter->sampler()->stop();
 #endif
   }
 
 #if ENABLE(OPCODE_SAMPLING)
-  machine->sampler()->dump(globalObject->globalExec());
-  delete machine->sampler();
+  interpreter->sampler()->dump(globalObject->globalExec());
+  delete interpreter->sampler();
 #endif
   return success;
 }
@@ -414,9 +412,9 @@ static void runInteractive(GlobalObject* globalObject) {
       break;
     if (line[0])
       add_history(line);
-    Completion completion = Interpreter::evaluate(
-        globalObject->globalExec(), globalObject->globalScopeChain(),
-        makeSource(line, interpreterName));
+    Completion completion =
+        evaluate(globalObject->globalExec(), globalObject->globalScopeChain(),
+                 makeSource(line, interpreterName));
     free(line);
 #else
     puts(interactivePrompt);
@@ -429,9 +427,9 @@ static void runInteractive(GlobalObject* globalObject) {
       line.append(c);
     }
     line.append('\0');
-    Completion completion = Interpreter::evaluate(
-        globalObject->globalExec(), globalObject->globalScopeChain(),
-        makeSource(line.data(), interpreterName));
+    Completion completion =
+        evaluate(globalObject->globalExec(), globalObject->globalScopeChain(),
+                 makeSource(line.data(), interpreterName));
 #endif
     if (completion.complType() == Throw)
       printf("Exception: %s\n",
