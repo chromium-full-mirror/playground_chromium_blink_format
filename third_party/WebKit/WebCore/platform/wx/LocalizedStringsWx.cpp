@@ -187,6 +187,10 @@ String contextMenuItemTagWritingDirectionMenu() {
   return String();
 }
 
+String contextMenuItemTagTextDirectionMenu() {
+  return String();
+}
+
 String contextMenuItemTagDefaultDirection() {
   return String();
 }
