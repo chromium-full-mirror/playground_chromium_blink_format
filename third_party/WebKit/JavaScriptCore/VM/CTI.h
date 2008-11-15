@@ -241,7 +241,7 @@ class CTI {
   static const int repatchOffsetGetByIdStructureID = 7;
   static const int repatchOffsetGetByIdBranchToSlowCase = 13;
   static const int repatchOffsetGetByIdPropertyMapOffset = 22;
-#if ENABLE(BYTECODE_SAMPLING)
+#if ENABLE(OPCODE_SAMPLING)
   static const int repatchOffsetGetByIdSlowCaseCall =
       27 + 4 + ctiArgumentInitSize;
 #else
@@ -391,7 +391,7 @@ class CTI {
   void privateCompileCTIMachineTrampolines();
   void privateCompilePatchGetArrayLength(void* returnAddress);
 
-  void compileOpCall(BytecodeID,
+  void compileOpCall(OpcodeID,
                      Instruction* instruction,
                      unsigned i,
                      unsigned callLinkInfoIndex);
@@ -411,14 +411,14 @@ class CTI {
       X86::XMMRegisterID tempXmm,
       X86::RegisterID tempReg1,
       X86::RegisterID tempReg2);
-  void compileBinaryArithOp(BytecodeID,
+  void compileBinaryArithOp(OpcodeID,
                             unsigned dst,
                             unsigned src1,
                             unsigned src2,
                             OperandTypes opi,
                             unsigned i);
   void compileBinaryArithOpSlowCase(Instruction*,
-                                    BytecodeID,
+                                    OpcodeID,
                                     Vector<SlowCaseEntry>::iterator& iter,
                                     unsigned dst,
                                     unsigned src1,

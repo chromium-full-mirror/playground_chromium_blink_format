@@ -261,20 +261,20 @@ class BytecodeGenerator {
   RegisterID* emitUnexpectedLoad(RegisterID* dst, bool);
   RegisterID* emitUnexpectedLoad(RegisterID* dst, double);
 
-  RegisterID* emitUnaryOp(BytecodeID,
+  RegisterID* emitUnaryOp(OpcodeID,
                           RegisterID* dst,
                           RegisterID* src,
                           ResultType);
-  RegisterID* emitBinaryOp(BytecodeID,
+  RegisterID* emitBinaryOp(OpcodeID,
                            RegisterID* dst,
                            RegisterID* src1,
                            RegisterID* src2,
                            OperandTypes);
-  RegisterID* emitEqualityOp(BytecodeID,
+  RegisterID* emitEqualityOp(OpcodeID,
                              RegisterID* dst,
                              RegisterID* src1,
                              RegisterID* src2);
-  RegisterID* emitUnaryNoDstOp(BytecodeID, RegisterID* src);
+  RegisterID* emitUnaryNoDstOp(OpcodeID, RegisterID* src);
 
   RegisterID* emitNewObject(RegisterID* dst);
   RegisterID* emitNewArray(RegisterID* dst,
@@ -423,7 +423,7 @@ class BytecodeGenerator {
   CodeType codeType() const { return m_codeType; }
 
  private:
-  void emitBytecode(BytecodeID);
+  void emitOpcode(OpcodeID);
   void retrieveLastBinaryOp(int& dstIndex, int& src1Index, int& src2Index);
   void retrieveLastUnaryOp(int& dstIndex, int& srcIndex);
   void rewindBinaryOp();
@@ -464,7 +464,7 @@ class BytecodeGenerator {
   typedef HashMap<UString::Rep*, JSString*, IdentifierRepHash>
       IdentifierStringMap;
 
-  RegisterID* emitCall(BytecodeID,
+  RegisterID* emitCall(OpcodeID,
                        RegisterID* dst,
                        RegisterID* func,
                        RegisterID* thisRegister,
@@ -579,7 +579,7 @@ class BytecodeGenerator {
 
   JSGlobalData* m_globalData;
 
-  BytecodeID m_lastBytecodeID;
+  OpcodeID m_lastOpcodeID;
 
 #ifndef NDEBUG
   static bool s_dumpsGeneratedCode;

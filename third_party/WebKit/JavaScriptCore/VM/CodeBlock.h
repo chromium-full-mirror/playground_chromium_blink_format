@@ -279,7 +279,7 @@ struct CodeBlock {
     return index >= numVars + numConstants;
   }
 
-#if !defined(NDEBUG) || ENABLE_BYTECODE_SAMPLING
+#if !defined(NDEBUG) || ENABLE_OPCODE_SAMPLING
   void dump(ExecState*) const;
   void printStructureIDs(const Instruction*) const;
   void printStructureID(const char* name,
@@ -367,7 +367,7 @@ struct CodeBlock {
   SymbolTable symbolTable;
 
  private:
-#if !defined(NDEBUG) || ENABLE(BYTECODE_SAMPLING)
+#if !defined(NDEBUG) || ENABLE(OPCODE_SAMPLING)
   void dump(ExecState*,
             const Vector<Instruction>::const_iterator& begin,
             Vector<Instruction>::const_iterator&) const;

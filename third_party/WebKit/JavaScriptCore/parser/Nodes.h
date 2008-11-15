@@ -1148,7 +1148,7 @@ class UnaryOpNode : public ExpressionNode {
 
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
-  virtual BytecodeID bytecode() const JSC_FAST_CALL = 0;
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL = 0;
 
  protected:
   RefPtr<ExpressionNode> m_expr;
@@ -1161,7 +1161,7 @@ class UnaryPlusNode : public UnaryOpNode {
 
   virtual ExpressionNode* stripUnaryPlus() { return m_expr.get(); }
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_to_jsnumber; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_to_jsnumber; }
 };
 
 class NegateNode : public UnaryOpNode {
@@ -1169,7 +1169,7 @@ class NegateNode : public UnaryOpNode {
   NegateNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
       : UnaryOpNode(globalData, ResultType::reusableNumber(), expr) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_negate; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_negate; }
 };
 
 class BitwiseNotNode : public UnaryOpNode {
@@ -1177,7 +1177,7 @@ class BitwiseNotNode : public UnaryOpNode {
   BitwiseNotNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
       : UnaryOpNode(globalData, ResultType::reusableNumber(), expr) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_bitnot; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_bitnot; }
 };
 
 class LogicalNotNode : public UnaryOpNode {
@@ -1185,7 +1185,7 @@ class LogicalNotNode : public UnaryOpNode {
   LogicalNotNode(JSGlobalData* globalData, ExpressionNode* expr) JSC_FAST_CALL
       : UnaryOpNode(globalData, ResultType::boolean(), expr) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_not; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_not; }
 };
 
 class BinaryOpNode : public ExpressionNode {
@@ -1214,7 +1214,7 @@ class BinaryOpNode : public ExpressionNode {
 
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
-  virtual BytecodeID bytecode() const JSC_FAST_CALL = 0;
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL = 0;
 
  protected:
   RefPtr<ExpressionNode> m_expr1;
@@ -1253,7 +1253,7 @@ class MultNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_mul; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_mul; }
 };
 
 class DivNode : public BinaryOpNode {
@@ -1268,7 +1268,7 @@ class DivNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_div; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_div; }
 };
 
 class ModNode : public BinaryOpNode {
@@ -1283,7 +1283,7 @@ class ModNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_mod; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_mod; }
 };
 
 class AddNode : public BinaryOpNode {
@@ -1299,7 +1299,7 @@ class AddNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_add; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_add; }
 };
 
 class SubNode : public BinaryOpNode {
@@ -1314,7 +1314,7 @@ class SubNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_sub; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_sub; }
 };
 
 class LeftShiftNode : public BinaryOpNode {
@@ -1329,7 +1329,7 @@ class LeftShiftNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_lshift; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_lshift; }
 };
 
 class RightShiftNode : public BinaryOpNode {
@@ -1344,7 +1344,7 @@ class RightShiftNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_rshift; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_rshift; }
 };
 
 class UnsignedRightShiftNode : public BinaryOpNode {
@@ -1359,7 +1359,7 @@ class UnsignedRightShiftNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_urshift; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_urshift; }
 };
 
 class LessNode : public BinaryOpNode {
@@ -1374,7 +1374,7 @@ class LessNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_less; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_less; }
 };
 
 class GreaterNode : public ReverseBinaryOpNode {
@@ -1389,7 +1389,7 @@ class GreaterNode : public ReverseBinaryOpNode {
                             expr2,
                             rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_less; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_less; }
 };
 
 class LessEqNode : public BinaryOpNode {
@@ -1404,7 +1404,7 @@ class LessEqNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_lesseq; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_lesseq; }
 };
 
 class GreaterEqNode : public ReverseBinaryOpNode {
@@ -1419,7 +1419,7 @@ class GreaterEqNode : public ReverseBinaryOpNode {
                             expr2,
                             rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_lesseq; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_lesseq; }
 };
 
 class ThrowableBinaryOpNode : public BinaryOpNode,
@@ -1452,7 +1452,7 @@ class InstanceOfNode : public ThrowableBinaryOpNode {
                               expr2,
                               rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_instanceof; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_instanceof; }
 
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
@@ -1466,7 +1466,7 @@ class InNode : public ThrowableBinaryOpNode {
          bool rightHasAssignments) JSC_FAST_CALL
       : ThrowableBinaryOpNode(globalData, expr1, expr2, rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_in; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_in; }
 };
 
 class EqualNode : public BinaryOpNode {
@@ -1483,7 +1483,7 @@ class EqualNode : public BinaryOpNode {
 
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_eq; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_eq; }
 };
 
 class NotEqualNode : public BinaryOpNode {
@@ -1498,7 +1498,7 @@ class NotEqualNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_neq; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_neq; }
 };
 
 class StrictEqualNode : public BinaryOpNode {
@@ -1515,7 +1515,7 @@ class StrictEqualNode : public BinaryOpNode {
 
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_stricteq; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_stricteq; }
 };
 
 class NotStrictEqualNode : public BinaryOpNode {
@@ -1530,7 +1530,7 @@ class NotStrictEqualNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_nstricteq; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_nstricteq; }
 };
 
 class BitAndNode : public BinaryOpNode {
@@ -1545,7 +1545,7 @@ class BitAndNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_bitand; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_bitand; }
 };
 
 class BitOrNode : public BinaryOpNode {
@@ -1560,7 +1560,7 @@ class BitOrNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_bitor; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_bitor; }
 };
 
 class BitXOrNode : public BinaryOpNode {
@@ -1575,7 +1575,7 @@ class BitXOrNode : public BinaryOpNode {
                      expr2,
                      rightHasAssignments) {}
 
-  virtual BytecodeID bytecode() const JSC_FAST_CALL { return op_bitxor; }
+  virtual OpcodeID opcodeID() const JSC_FAST_CALL { return op_bitxor; }
 };
 
 /**

@@ -49,7 +49,7 @@ struct ScopeSampleRecord {
       : m_scope(scope),
         m_codeBlock(0),
         m_sampleCount(0),
-        m_bytecodeSampleCount(0),
+        m_opcodeSampleCount(0),
         m_samples(0),
         m_size(0) {}
 
@@ -63,7 +63,7 @@ struct ScopeSampleRecord {
   RefPtr<ScopeNode> m_scope;
   CodeBlock* m_codeBlock;
   int m_sampleCount;
-  int m_bytecodeSampleCount;
+  int m_opcodeSampleCount;
   int* m_samples;
   unsigned m_size;
 };
@@ -75,7 +75,7 @@ class SamplingTool {
   friend class CallRecord;
   friend class HostCallRecord;
 
-#if ENABLE(BYTECODE_SAMPLING)
+#if ENABLE(OPCODE_SAMPLING)
   class CallRecord : Noncopyable {
    public:
     CallRecord(SamplingTool* samplingTool)
@@ -118,11 +118,11 @@ class SamplingTool {
         m_codeBlock(0),
         m_sample(0),
         m_sampleCount(0),
-        m_bytecodeSampleCount(0),
+        m_opcodeSampleCount(0),
         m_scopeSampleMap(new ScopeSampleRecordMap()) {
-    memset(m_bytecodeSamples, 0, sizeof(m_bytecodeSamples));
-    memset(m_bytecodeSamplesInCTIFunctions, 0,
-           sizeof(m_bytecodeSamplesInCTIFunctions));
+    memset(m_opcodeSamples, 0, sizeof(m_opcodeSamples));
+    memset(m_opcodeSamplesInCTIFunctions, 0,
+           sizeof(m_opcodeSamplesInCTIFunctions));
   }
 
   ~SamplingTool() { deleteAllValues(*m_scopeSampleMap); }
@@ -186,9 +186,9 @@ class SamplingTool {
 
   // Gathered sample data.
   long long m_sampleCount;
-  long long m_bytecodeSampleCount;
-  unsigned m_bytecodeSamples[numBytecodeIDs];
-  unsigned m_bytecodeSamplesInCTIFunctions[numBytecodeIDs];
+  long long m_opcodeSampleCount;
+  unsigned m_opcodeSamples[numOpcodeIDs];
+  unsigned m_opcodeSamplesInCTIFunctions[numOpcodeIDs];
 
   Mutex m_scopeSampleMapMutex;
   OwnPtr<ScopeSampleRecordMap> m_scopeSampleMap;
