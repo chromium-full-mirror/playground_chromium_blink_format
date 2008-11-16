@@ -606,14 +606,6 @@ JSValue* JSDOMWindowBase::namedItemGetter(ExecState* exec,
   return toJS(exec, collection.get());
 }
 
-void JSDOMWindowBase::markCrossHeapDependentObjects() {
-  Document* document = impl()->document();
-  if (!document)
-    return;
-
-  markCrossHeapDependentObjectsForContext(*globalData(), document);
-}
-
 bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
                                          const Identifier& propertyName,
                                          PropertySlot& slot) {

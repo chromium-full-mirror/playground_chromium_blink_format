@@ -155,7 +155,6 @@ class JSGlobalObject : public JSVariableObject {
   virtual ~JSGlobalObject();
 
   virtual void mark();
-  virtual void markCrossHeapDependentObjects();
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual bool getOwnPropertySlot(ExecState*,

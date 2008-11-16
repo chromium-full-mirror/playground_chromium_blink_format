@@ -35,7 +35,6 @@
 #include <wtf/MessageQueue.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
-#include <wtf/Threading.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -47,7 +46,7 @@ class ScriptExecutionContext;
 class String;
 class WorkerContext;
 
-class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
+class MessagePort : public RefCounted<MessagePort>, public EventTarget {
  public:
   static PassRefPtr<MessagePort> create(
       ScriptExecutionContext* scriptExecutionContext) {
@@ -93,11 +92,13 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
   typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
   EventListenersMap& eventListeners() { return m_eventListeners; }
 
-  using ThreadSafeShared<MessagePort>::ref;
-  using ThreadSafeShared<MessagePort>::deref;
+  using RefCounted<MessagePort>::ref;
+  using RefCounted<MessagePort>::deref;
 
   bool hasPendingActivity();
 
+  // FIXME: Per current spec, setting onmessage should automagically start the
+  // port (unlike addEventListener("message", ...)).
   void setOnmessage(PassRefPtr<EventListener> eventListener) {
     m_onMessageListener = eventListener;
   }
@@ -120,7 +121,9 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
 
   MessagePort* m_entangledPort;
 
-  struct EventData : public ThreadSafeShared<EventData> {
+  // FIXME: EventData is necessary to pass messages to other threads. In single
+  // threaded case, we can just queue a created event.
+  struct EventData : public RefCounted<EventData> {
     static PassRefPtr<EventData> create(const String& message,
                                         PassRefPtr<MessagePort>);
     ~EventData();
@@ -131,7 +134,9 @@ class MessagePort : public ThreadSafeShared<MessagePort>, public EventTarget {
    private:
     EventData(const String& message, PassRefPtr<MessagePort>);
   };
-  MessageQueue<RefPtr<EventData>> m_messageQueue;
+  MessageQueue<RefPtr<EventData>> m_messageQueue;  // FIXME: No need to use
+                                                   // MessageQueue in single
+                                                   // threaded case.
   bool m_queueIsOpen;
 
   ScriptExecutionContext* m_scriptExecutionContext;
