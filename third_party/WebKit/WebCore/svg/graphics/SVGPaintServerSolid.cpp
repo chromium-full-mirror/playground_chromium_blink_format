@@ -58,19 +58,19 @@ bool SVGPaintServerSolid::setup(GraphicsContext*& context,
                                 SVGPaintTargetType type,
                                 bool isPaintingText) const {
   RenderStyle* style = object ? object->style() : 0;
-  const SVGRenderStyle* svgStyle = object ? object->style()->svgStyle() : 0;
+  const SVGRenderStyle* svgStyle = style ? style->svgStyle() : 0;
 
   if ((type & ApplyToFillTargetType) && (!style || svgStyle->hasFill())) {
-    context->setAlpha(svgStyle->fillOpacity());
+    context->setAlpha(style ? svgStyle->fillOpacity() : 1);
     context->setFillColor(color().rgb());
-    context->setFillRule(svgStyle->fillRule());
+    context->setFillRule(style ? svgStyle->fillRule() : RULE_NONZERO);
 
     if (isPaintingText)
       context->setTextDrawingMode(cTextFill);
   }
 
   if ((type & ApplyToStrokeTargetType) && (!style || svgStyle->hasStroke())) {
-    context->setAlpha(svgStyle->strokeOpacity());
+    context->setAlpha(style ? svgStyle->strokeOpacity() : 1);
     context->setStrokeColor(color().rgb());
 
     if (style)
@@ -86,12 +86,12 @@ bool SVGPaintServerSolid::setup(GraphicsContext*& context,
 void SVGPaintServerSolid::renderPath(GraphicsContext*& context,
                                      const RenderObject* path,
                                      SVGPaintTargetType type) const {
-  const SVGRenderStyle* svgStyle = path->style()->svgStyle();
+  const SVGRenderStyle* svgStyle = path ? path->style()->svgStyle() : 0;
 
-  if ((type & ApplyToFillTargetType) && svgStyle->hasFill())
+  if ((type & ApplyToFillTargetType) && (!svgStyle || svgStyle->hasFill()))
     context->fillPath();
 
-  if ((type & ApplyToStrokeTargetType) && svgStyle->hasStroke())
+  if ((type & ApplyToStrokeTargetType) && (!svgStyle || svgStyle->hasStroke()))
     context->strokePath();
 }
 
