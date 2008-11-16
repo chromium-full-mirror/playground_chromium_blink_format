@@ -2753,8 +2753,7 @@ void ProgramNode::generateBytecode(ScopeChainNode* scopeChainNode) {
                                   source().provider()));
 
   BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
-                              &globalObject->symbolTable(), m_code.get(),
-                              m_varStack, m_functionStack);
+                              &globalObject->symbolTable(), m_code.get());
   generator.generate();
 }
 

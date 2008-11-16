@@ -229,9 +229,7 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
                                      const Debugger* debugger,
                                      const ScopeChain& scopeChain,
                                      SymbolTable* symbolTable,
-                                     CodeBlock* codeBlock,
-                                     VarStack& varStack,
-                                     FunctionStack& functionStack)
+                                     ProgramCodeBlock* codeBlock)
     : m_shouldEmitDebugHooks(!!debugger),
       m_shouldEmitProfileHooks(scopeChain.globalObject()->supportsProfiling()),
       m_scopeChain(&scopeChain),
@@ -275,6 +273,8 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
 
   BatchedTransitionOptimizer optimizer(globalObject);
 
+  const VarStack& varStack = programNode->varStack();
+  const FunctionStack& functionStack = programNode->functionStack();
   bool canOptimizeNewGlobals =
       symbolTable->size() + functionStack.size() + varStack.size() <
       registerFile->maxGlobals();

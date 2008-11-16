@@ -71,9 +71,7 @@ class BytecodeGenerator {
                     const Debugger*,
                     const ScopeChain&,
                     SymbolTable*,
-                    CodeBlock*,
-                    VarStack&,
-                    FunctionStack&);
+                    ProgramCodeBlock*);
   BytecodeGenerator(FunctionBodyNode*,
                     const Debugger*,
                     const ScopeChain&,
