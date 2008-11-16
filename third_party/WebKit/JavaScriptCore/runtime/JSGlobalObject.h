@@ -110,21 +110,21 @@ class JSGlobalObject : public JSVariableObject {
     DatePrototype* datePrototype;
     RegExpPrototype* regExpPrototype;
 
-    RefPtr<StructureID> argumentsStructure;
-    RefPtr<StructureID> arrayStructure;
-    RefPtr<StructureID> booleanObjectStructure;
-    RefPtr<StructureID> callbackConstructorStructure;
-    RefPtr<StructureID> callbackFunctionStructure;
-    RefPtr<StructureID> callbackObjectStructure;
-    RefPtr<StructureID> dateStructure;
-    RefPtr<StructureID> emptyObjectStructure;
-    RefPtr<StructureID> errorStructure;
-    RefPtr<StructureID> functionStructure;
-    RefPtr<StructureID> numberObjectStructure;
-    RefPtr<StructureID> prototypeFunctionStructure;
-    RefPtr<StructureID> regExpMatchesArrayStructure;
-    RefPtr<StructureID> regExpStructure;
-    RefPtr<StructureID> stringObjectStructure;
+    RefPtr<Structure> argumentsStructure;
+    RefPtr<Structure> arrayStructure;
+    RefPtr<Structure> booleanObjectStructure;
+    RefPtr<Structure> callbackConstructorStructure;
+    RefPtr<Structure> callbackFunctionStructure;
+    RefPtr<Structure> callbackObjectStructure;
+    RefPtr<Structure> dateStructure;
+    RefPtr<Structure> emptyObjectStructure;
+    RefPtr<Structure> errorStructure;
+    RefPtr<Structure> functionStructure;
+    RefPtr<Structure> numberObjectStructure;
+    RefPtr<Structure> prototypeFunctionStructure;
+    RefPtr<Structure> regExpMatchesArrayStructure;
+    RefPtr<Structure> regExpStructure;
+    RefPtr<Structure> stringObjectStructure;
 
     SymbolTable symbolTable;
     unsigned profileGroup;
@@ -138,13 +138,13 @@ class JSGlobalObject : public JSVariableObject {
   void* operator new(size_t, JSGlobalData*);
 
   explicit JSGlobalObject()
-      : JSVariableObject(JSGlobalObject::createStructureID(jsNull()),
+      : JSVariableObject(JSGlobalObject::createStructure(jsNull()),
                          new JSGlobalObjectData) {
     init(this);
   }
 
  protected:
-  JSGlobalObject(PassRefPtr<StructureID> structure,
+  JSGlobalObject(PassRefPtr<Structure> structure,
                  JSGlobalObjectData* data,
                  JSObject* thisValue)
       : JSVariableObject(structure, data) {
@@ -219,41 +219,39 @@ class JSGlobalObject : public JSVariableObject {
   DatePrototype* datePrototype() const { return d()->datePrototype; }
   RegExpPrototype* regExpPrototype() const { return d()->regExpPrototype; }
 
-  StructureID* argumentsStructure() const {
+  Structure* argumentsStructure() const {
     return d()->argumentsStructure.get();
   }
-  StructureID* arrayStructure() const { return d()->arrayStructure.get(); }
-  StructureID* booleanObjectStructure() const {
+  Structure* arrayStructure() const { return d()->arrayStructure.get(); }
+  Structure* booleanObjectStructure() const {
     return d()->booleanObjectStructure.get();
   }
-  StructureID* callbackConstructorStructure() const {
+  Structure* callbackConstructorStructure() const {
     return d()->callbackConstructorStructure.get();
   }
-  StructureID* callbackFunctionStructure() const {
+  Structure* callbackFunctionStructure() const {
     return d()->callbackFunctionStructure.get();
   }
-  StructureID* callbackObjectStructure() const {
+  Structure* callbackObjectStructure() const {
     return d()->callbackObjectStructure.get();
   }
-  StructureID* dateStructure() const { return d()->dateStructure.get(); }
-  StructureID* emptyObjectStructure() const {
+  Structure* dateStructure() const { return d()->dateStructure.get(); }
+  Structure* emptyObjectStructure() const {
     return d()->emptyObjectStructure.get();
   }
-  StructureID* errorStructure() const { return d()->errorStructure.get(); }
-  StructureID* functionStructure() const {
-    return d()->functionStructure.get();
-  }
-  StructureID* numberObjectStructure() const {
+  Structure* errorStructure() const { return d()->errorStructure.get(); }
+  Structure* functionStructure() const { return d()->functionStructure.get(); }
+  Structure* numberObjectStructure() const {
     return d()->numberObjectStructure.get();
   }
-  StructureID* prototypeFunctionStructure() const {
+  Structure* prototypeFunctionStructure() const {
     return d()->prototypeFunctionStructure.get();
   }
-  StructureID* regExpMatchesArrayStructure() const {
+  Structure* regExpMatchesArrayStructure() const {
     return d()->regExpMatchesArrayStructure.get();
   }
-  StructureID* regExpStructure() const { return d()->regExpStructure.get(); }
-  StructureID* stringObjectStructure() const {
+  Structure* regExpStructure() const { return d()->regExpStructure.get(); }
+  Structure* stringObjectStructure() const {
     return d()->stringObjectStructure.get();
   }
 
@@ -298,8 +296,8 @@ class JSGlobalObject : public JSVariableObject {
     return static_cast<JSGlobalObjectData*>(JSVariableObject::d);
   }
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
-    return StructureID::create(prototype, TypeInfo(ObjectType));
+  static PassRefPtr<Structure> createStructure(JSValue* prototype) {
+    return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
  protected:
@@ -382,7 +380,7 @@ inline JSGlobalObject* ScopeChainNode::globalObject() const {
   return asGlobalObject(n->object);
 }
 
-inline JSValue* StructureID::prototypeForLookup(ExecState* exec) {
+inline JSValue* Structure::prototypeForLookup(ExecState* exec) {
   if (typeInfo().type() == ObjectType)
     return m_prototype;
 

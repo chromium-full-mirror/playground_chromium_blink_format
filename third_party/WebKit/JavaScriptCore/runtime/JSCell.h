@@ -23,7 +23,7 @@
 #ifndef JSCell_h
 #define JSCell_h
 
-#include "StructureID.h"
+#include "Structure.h"
 #include "JSValue.h"
 #include "Collector.h"
 
@@ -41,7 +41,7 @@ class JSCell : public JSValue {
   friend class BytecodeInterpreter;
 
  private:
-  explicit JSCell(StructureID*);
+  explicit JSCell(Structure*);
   virtual ~JSCell();
 
  public:
@@ -52,7 +52,7 @@ class JSCell : public JSValue {
   virtual bool isGetterSetter() const;
   virtual bool isObject(const ClassInfo*) const;
 
-  StructureID* structureID() const;
+  Structure* structure() const;
 
   // Extracting the value.
   bool getNumber(double&) const;
@@ -115,7 +115,7 @@ class JSCell : public JSValue {
                                   unsigned propertyName,
                                   PropertySlot&);
 
-  StructureID* m_structureID;
+  Structure* m_structure;
 };
 
 JSCell* asCell(JSValue*);
@@ -125,7 +125,7 @@ inline JSCell* asCell(JSValue* value) {
   return static_cast<JSCell*>(value);
 }
 
-inline JSCell::JSCell(StructureID* structureID) : m_structureID(structureID) {}
+inline JSCell::JSCell(Structure* structure) : m_structure(structure) {}
 
 inline JSCell::~JSCell() {}
 
@@ -134,15 +134,15 @@ inline bool JSCell::isNumber() const {
 }
 
 inline bool JSCell::isObject() const {
-  return m_structureID->typeInfo().type() == ObjectType;
+  return m_structure->typeInfo().type() == ObjectType;
 }
 
 inline bool JSCell::isString() const {
-  return m_structureID->typeInfo().type() == StringType;
+  return m_structure->typeInfo().type() == StringType;
 }
 
-inline StructureID* JSCell::structureID() const {
-  return m_structureID;
+inline Structure* JSCell::structure() const {
+  return m_structure;
 }
 
 inline bool JSCell::marked() const {
@@ -290,7 +290,7 @@ inline JSObject* JSValue::toThisObject(ExecState* exec) const {
 inline bool JSValue::needsThisConversion() const {
   if (UNLIKELY(JSImmediate::isImmediate(asValue())))
     return true;
-  return asCell()->structureID()->typeInfo().needsThisConversion();
+  return asCell()->structure()->typeInfo().needsThisConversion();
 }
 
 inline UString JSValue::toThisString(ExecState* exec) const {

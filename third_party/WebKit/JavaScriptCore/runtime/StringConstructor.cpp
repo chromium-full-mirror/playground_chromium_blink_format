@@ -50,8 +50,8 @@ static JSValue* stringFromCharCode(ExecState* exec,
 ASSERT_CLASS_FITS_IN_CELL(StringConstructor);
 
 StringConstructor::StringConstructor(ExecState* exec,
-                                     PassRefPtr<StructureID> structure,
-                                     StructureID* prototypeFunctionStructure,
+                                     PassRefPtr<Structure> structure,
+                                     Structure* prototypeFunctionStructure,
                                      StringPrototype* stringPrototype)
     : InternalFunction(
           &exec->globalData(),

@@ -53,7 +53,7 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
   friend class ScheduledAction;
 
  protected:
-  JSDOMWindowBase(PassRefPtr<JSC::StructureID>,
+  JSDOMWindowBase(PassRefPtr<JSC::Structure>,
                   PassRefPtr<DOMWindow>,
                   JSDOMWindowShell*);
 

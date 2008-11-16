@@ -73,14 +73,14 @@ JSGlobalData::JSGlobalData(bool isShared)
       regExpTable(new HashTable(JSC::regExpTable)),
       regExpConstructorTable(new HashTable(JSC::regExpConstructorTable)),
       stringTable(new HashTable(JSC::stringTable)),
-      activationStructureID(JSActivation::createStructureID(jsNull())),
-      interruptedExecutionErrorStructure(JSObject::createStructureID(jsNull())),
-      staticScopeStructureID(JSStaticScopeObject::createStructureID(jsNull())),
-      stringStructureID(JSString::createStructureID(jsNull())),
+      activationStructure(JSActivation::createStructure(jsNull())),
+      interruptedExecutionErrorStructure(JSObject::createStructure(jsNull())),
+      staticScopeStructure(JSStaticScopeObject::createStructure(jsNull())),
+      stringStructure(JSString::createStructure(jsNull())),
       notAnObjectErrorStubStructure(
-          JSNotAnObjectErrorStub::createStructureID(jsNull())),
-      notAnObjectStructure(JSNotAnObject::createStructureID(jsNull())),
-      numberStructureID(JSNumberCell::createStructureID(jsNull())),
+          JSNotAnObjectErrorStub::createStructure(jsNull())),
+      notAnObjectStructure(JSNotAnObject::createStructure(jsNull())),
+      numberStructure(JSNumberCell::createStructure(jsNull())),
       identifierTable(createIdentifierTable()),
       propertyNames(new CommonIdentifiers(this)),
       emptyList(new ArgList),
@@ -147,9 +147,9 @@ PassRefPtr<JSGlobalData> JSGlobalData::create() {
 
 PassRefPtr<JSGlobalData> JSGlobalData::createLeaked() {
 #ifndef NDEBUG
-  StructureID::startIgnoringLeaks();
+  Structure::startIgnoringLeaks();
   RefPtr<JSGlobalData> data = create();
-  StructureID::stopIgnoringLeaks();
+  Structure::stopIgnoringLeaks();
   return data.release();
 #else
   return create();

@@ -29,7 +29,7 @@ namespace JSC {
 
 class RegExpObject : public JSObject {
  public:
-  RegExpObject(PassRefPtr<StructureID>, PassRefPtr<RegExp>);
+  RegExpObject(PassRefPtr<Structure>, PassRefPtr<RegExp>);
   virtual ~RegExpObject();
 
   void setRegExp(PassRefPtr<RegExp> r) { d->regExp = r; }
@@ -52,8 +52,8 @@ class RegExpObject : public JSObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
-    return StructureID::create(prototype, TypeInfo(ObjectType));
+  static PassRefPtr<Structure> createStructure(JSValue* prototype) {
+    return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
  private:

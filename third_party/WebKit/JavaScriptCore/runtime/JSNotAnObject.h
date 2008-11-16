@@ -56,8 +56,8 @@ class JSNotAnObject : public JSObject {
       : JSObject(exec->globalData().notAnObjectStructure),
         m_exception(exception) {}
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
-    return StructureID::create(prototype, TypeInfo(ObjectType));
+  static PassRefPtr<Structure> createStructure(JSValue* prototype) {
+    return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
  private:

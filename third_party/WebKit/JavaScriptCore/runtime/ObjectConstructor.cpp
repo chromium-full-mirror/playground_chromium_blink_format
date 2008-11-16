@@ -30,7 +30,7 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(ObjectConstructor);
 
 ObjectConstructor::ObjectConstructor(ExecState* exec,
-                                     PassRefPtr<StructureID> structure,
+                                     PassRefPtr<Structure> structure,
                                      ObjectPrototype* objectPrototype)
     : InternalFunction(&exec->globalData(),
                        structure,

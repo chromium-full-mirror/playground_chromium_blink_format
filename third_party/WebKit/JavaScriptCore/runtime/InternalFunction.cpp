@@ -37,7 +37,7 @@ const ClassInfo* InternalFunction::classInfo() const {
 }
 
 InternalFunction::InternalFunction(JSGlobalData* globalData,
-                                   PassRefPtr<StructureID> structure,
+                                   PassRefPtr<Structure> structure,
                                    const Identifier& name)
     : JSObject(structure) {
   putDirect(globalData->propertyNames->name,

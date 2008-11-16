@@ -42,7 +42,7 @@ const ClassInfo JSMessageChannelConstructor::s_info = {
 JSMessageChannelConstructor::JSMessageChannelConstructor(
     ExecState* exec,
     ScriptExecutionContext* scriptExecutionContext)
-    : DOMObject(JSMessageChannelConstructor::createStructureID(
+    : DOMObject(JSMessageChannelConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())),
       m_scriptExecutionContext(scriptExecutionContext) {
   if (m_scriptExecutionContext->isDocument())

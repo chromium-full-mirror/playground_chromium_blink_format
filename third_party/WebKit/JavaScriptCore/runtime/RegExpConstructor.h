@@ -33,11 +33,11 @@ struct RegExpConstructorPrivate;
 
 class RegExpConstructor : public InternalFunction {
  public:
-  RegExpConstructor(ExecState*, PassRefPtr<StructureID>, RegExpPrototype*);
+  RegExpConstructor(ExecState*, PassRefPtr<Structure>, RegExpPrototype*);
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
-    return StructureID::create(prototype,
-                               TypeInfo(ObjectType, ImplementsHasInstance));
+  static PassRefPtr<Structure> createStructure(JSValue* prototype) {
+    return Structure::create(prototype,
+                             TypeInfo(ObjectType, ImplementsHasInstance));
   }
 
   virtual void put(ExecState*,

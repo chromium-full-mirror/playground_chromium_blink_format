@@ -149,7 +149,7 @@ inline void JSArray::checkConsistency(ConsistencyCheckType) {}
 
 #endif
 
-JSArray::JSArray(PassRefPtr<StructureID> structureID) : JSObject(structureID) {
+JSArray::JSArray(PassRefPtr<Structure> structure) : JSObject(structure) {
   unsigned initialCapacity = 0;
 
   m_storage = static_cast<ArrayStorage*>(
@@ -161,7 +161,7 @@ JSArray::JSArray(PassRefPtr<StructureID> structureID) : JSObject(structureID) {
   checkConsistency();
 }
 
-JSArray::JSArray(PassRefPtr<StructureID> structure, unsigned initialLength)
+JSArray::JSArray(PassRefPtr<Structure> structure, unsigned initialLength)
     : JSObject(structure) {
   unsigned initialCapacity = min(initialLength, MIN_SPARSE_ARRAY_INDEX);
 
@@ -177,7 +177,7 @@ JSArray::JSArray(PassRefPtr<StructureID> structure, unsigned initialLength)
 }
 
 JSArray::JSArray(ExecState* exec,
-                 PassRefPtr<StructureID> structure,
+                 PassRefPtr<Structure> structure,
                  const ArgList& list)
     : JSObject(structure) {
   unsigned length = list.size();

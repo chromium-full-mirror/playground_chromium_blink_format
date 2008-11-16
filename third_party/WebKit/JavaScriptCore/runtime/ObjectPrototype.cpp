@@ -68,8 +68,8 @@ static JSValue* objectProtoFuncToLocaleString(ExecState*,
                                               const ArgList&);
 
 ObjectPrototype::ObjectPrototype(ExecState* exec,
-                                 PassRefPtr<StructureID> stucture,
-                                 StructureID* prototypeFunctionStructure)
+                                 PassRefPtr<Structure> stucture,
+                                 Structure* prototypeFunctionStructure)
     : JSObject(stucture) {
   putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,

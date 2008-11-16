@@ -52,9 +52,8 @@ class JSWorkerContext : public JSDOMGlobalObject {
                                   JSC::PropertySlot&);
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
   static const JSC::ClassInfo s_info;
-  static PassRefPtr<JSC::StructureID> createStructureID(
-      JSC::JSValue* prototype) {
-    return JSC::StructureID::create(prototype, JSC::TypeInfo(JSC::ObjectType));
+  static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue* prototype) {
+    return JSC::Structure::create(prototype, JSC::TypeInfo(JSC::ObjectType));
   }
 
   WorkerContext* impl() const { return m_impl.get(); }
@@ -69,7 +68,7 @@ class JSWorkerContext : public JSDOMGlobalObject {
 class JSWorkerContextPrototype : public JSC::JSObject {
  public:
   static JSC::JSObject* self(JSC::ExecState*);
-  JSWorkerContextPrototype(PassRefPtr<JSC::StructureID> structure)
+  JSWorkerContextPrototype(PassRefPtr<JSC::Structure> structure)
       : JSC::JSObject(structure) {}
 
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
@@ -77,9 +76,8 @@ class JSWorkerContextPrototype : public JSC::JSObject {
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   const JSC::Identifier&,
                                   JSC::PropertySlot&);
-  static PassRefPtr<JSC::StructureID> createStructureID(
-      JSC::JSValue* prototype) {
-    return JSC::StructureID::create(prototype, JSC::TypeInfo(JSC::ObjectType));
+  static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue* prototype) {
+    return JSC::Structure::create(prototype, JSC::TypeInfo(JSC::ObjectType));
   }
 };
 

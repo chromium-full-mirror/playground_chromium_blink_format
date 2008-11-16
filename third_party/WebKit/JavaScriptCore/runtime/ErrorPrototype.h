@@ -31,8 +31,8 @@ class ObjectPrototype;
 class ErrorPrototype : public ErrorInstance {
  public:
   ErrorPrototype(ExecState*,
-                 PassRefPtr<StructureID>,
-                 StructureID* prototypeFunctionStructure);
+                 PassRefPtr<Structure>,
+                 Structure* prototypeFunctionStructure);
 };
 
 }  // namespace JSC

@@ -44,9 +44,9 @@ class RuntimeMethod : public InternalFunction {
     return exec->lexicalGlobalObject()->functionPrototype();
   }
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
-    return StructureID::create(prototype,
-                               TypeInfo(ObjectType, ImplementsHasInstance));
+  static PassRefPtr<Structure> createStructure(JSValue* prototype) {
+    return Structure::create(prototype,
+                             TypeInfo(ObjectType, ImplementsHasInstance));
   }
 
  private:

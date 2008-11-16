@@ -31,7 +31,7 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(ErrorConstructor);
 
 ErrorConstructor::ErrorConstructor(ExecState* exec,
-                                   PassRefPtr<StructureID> structure,
+                                   PassRefPtr<Structure> structure,
                                    ErrorPrototype* errorPrototype)
     : InternalFunction(
           &exec->globalData(),

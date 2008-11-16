@@ -31,7 +31,7 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(NativeErrorPrototype);
 
 NativeErrorPrototype::NativeErrorPrototype(ExecState* exec,
-                                           PassRefPtr<StructureID> structure,
+                                           PassRefPtr<Structure> structure,
                                            const UString& name,
                                            const UString& message)
     : JSObject(structure) {

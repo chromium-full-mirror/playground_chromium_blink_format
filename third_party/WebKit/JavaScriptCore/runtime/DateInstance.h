@@ -30,7 +30,7 @@ struct GregorianDateTime;
 
 class DateInstance : public JSWrapperObject {
  public:
-  explicit DateInstance(PassRefPtr<StructureID>);
+  explicit DateInstance(PassRefPtr<Structure>);
   virtual ~DateInstance();
 
   double internalNumber() const {

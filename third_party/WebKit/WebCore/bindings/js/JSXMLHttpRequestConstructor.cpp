@@ -37,7 +37,7 @@ const ClassInfo JSXMLHttpRequestConstructor::s_info = {
 JSXMLHttpRequestConstructor::JSXMLHttpRequestConstructor(
     ExecState* exec,
     ScriptExecutionContext* context)
-    : DOMObject(JSXMLHttpRequestConstructor::createStructureID(
+    : DOMObject(JSXMLHttpRequestConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())) {
   ASSERT(context->isDocument());
   m_document = static_cast<JSDocument*>(

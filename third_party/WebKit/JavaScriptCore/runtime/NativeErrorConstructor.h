@@ -33,7 +33,7 @@ class NativeErrorPrototype;
 class NativeErrorConstructor : public InternalFunction {
  public:
   NativeErrorConstructor(ExecState*,
-                         PassRefPtr<StructureID>,
+                         PassRefPtr<Structure>,
                          NativeErrorPrototype*);
 
   static const ClassInfo info;
@@ -46,7 +46,7 @@ class NativeErrorConstructor : public InternalFunction {
 
   virtual const ClassInfo* classInfo() const { return &info; }
 
-  RefPtr<StructureID> m_errorStructure;
+  RefPtr<Structure> m_errorStructure;
 };
 
 }  // namespace JSC

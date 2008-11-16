@@ -34,19 +34,19 @@ class StringObjectThatMasqueradesAsUndefined : public StringObject {
   static StringObjectThatMasqueradesAsUndefined* create(ExecState* exec,
                                                         const UString& string) {
     return new (exec) StringObjectThatMasqueradesAsUndefined(
-        exec, createStructureID(exec->lexicalGlobalObject()->stringPrototype()),
+        exec, createStructure(exec->lexicalGlobalObject()->stringPrototype()),
         string);
   }
 
  private:
   StringObjectThatMasqueradesAsUndefined(ExecState* exec,
-                                         PassRefPtr<StructureID> structure,
+                                         PassRefPtr<Structure> structure,
                                          const UString& string)
       : StringObject(exec, structure, string) {}
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
-    return StructureID::create(proto,
-                               TypeInfo(ObjectType, MasqueradesAsUndefined));
+  static PassRefPtr<Structure> createStructure(JSValue* proto) {
+    return Structure::create(proto,
+                             TypeInfo(ObjectType, MasqueradesAsUndefined));
   }
 
   virtual bool toBoolean(ExecState*) const { return false; }

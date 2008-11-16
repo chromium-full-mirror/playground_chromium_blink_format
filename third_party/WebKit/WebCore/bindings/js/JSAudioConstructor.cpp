@@ -42,7 +42,7 @@ const ClassInfo JSAudioConstructor::s_info = {"AudioConstructor", 0, 0, 0};
 
 JSAudioConstructor::JSAudioConstructor(ExecState* exec,
                                        ScriptExecutionContext* context)
-    : DOMObject(JSAudioConstructor::createStructureID(
+    : DOMObject(JSAudioConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())) {
   ASSERT(context->isDocument());
   m_document = static_cast<JSDocument*>(

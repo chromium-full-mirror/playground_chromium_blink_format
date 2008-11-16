@@ -30,7 +30,7 @@ class FunctionPrototype;
 
 class FunctionConstructor : public InternalFunction {
  public:
-  FunctionConstructor(ExecState*, PassRefPtr<StructureID>, FunctionPrototype*);
+  FunctionConstructor(ExecState*, PassRefPtr<Structure>, FunctionPrototype*);
 
  private:
   virtual ConstructType getConstructData(ConstructData&);

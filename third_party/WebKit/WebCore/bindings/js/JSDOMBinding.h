@@ -50,8 +50,8 @@ class SVGElement;
 // Base class for all objects in this binding except Window.
 class DOMObject : public JSC::JSObject {
  protected:
-  explicit DOMObject(PassRefPtr<JSC::StructureID> structureID)
-      : JSObject(structureID) {}
+  explicit DOMObject(PassRefPtr<JSC::Structure> structure)
+      : JSObject(structure) {}
 
 #ifndef NDEBUG
   virtual ~DOMObject();
@@ -75,10 +75,10 @@ void markDOMObjectWrapper(JSC::JSGlobalData& globalData, void* object);
 void markCrossHeapDependentObjectsForContext(JSC::JSGlobalData&,
                                              ScriptExecutionContext*);
 
-JSC::StructureID* getCachedDOMStructure(JSC::ExecState*, const JSC::ClassInfo*);
-JSC::StructureID* cacheDOMStructure(JSC::ExecState*,
-                                    PassRefPtr<JSC::StructureID>,
-                                    const JSC::ClassInfo*);
+JSC::Structure* getCachedDOMStructure(JSC::ExecState*, const JSC::ClassInfo*);
+JSC::Structure* cacheDOMStructure(JSC::ExecState*,
+                                  PassRefPtr<JSC::Structure>,
+                                  const JSC::ClassInfo*);
 
 JSC::JSObject* getCachedDOMConstructor(JSC::ExecState*, const JSC::ClassInfo*);
 void cacheDOMConstructor(JSC::ExecState*,
@@ -86,13 +86,13 @@ void cacheDOMConstructor(JSC::ExecState*,
                          JSC::JSObject* constructor);
 
 template <class WrapperClass>
-inline JSC::StructureID* getDOMStructure(JSC::ExecState* exec) {
-  if (JSC::StructureID* structure =
+inline JSC::Structure* getDOMStructure(JSC::ExecState* exec) {
+  if (JSC::Structure* structure =
           getCachedDOMStructure(exec, &WrapperClass::s_info))
     return structure;
-  return cacheDOMStructure(exec, WrapperClass::createStructureID(
-                                     WrapperClass::createPrototype(exec)),
-                           &WrapperClass::s_info);
+  return cacheDOMStructure(
+      exec, WrapperClass::createStructure(WrapperClass::createPrototype(exec)),
+      &WrapperClass::s_info);
 }
 template <class WrapperClass>
 inline JSC::JSObject* getDOMPrototype(JSC::ExecState* exec) {

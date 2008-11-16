@@ -203,7 +203,7 @@ JSDOMWindowBase::JSDOMWindowBaseData::JSDOMWindowBaseData(
     JSDOMWindowShell* shell)
     : impl(window), returnValueSlot(0), shell(shell) {}
 
-JSDOMWindowBase::JSDOMWindowBase(PassRefPtr<StructureID> structure,
+JSDOMWindowBase::JSDOMWindowBase(PassRefPtr<Structure> structure,
                                  PassRefPtr<DOMWindow> window,
                                  JSDOMWindowShell* shell)
     : JSDOMGlobalObject(structure,

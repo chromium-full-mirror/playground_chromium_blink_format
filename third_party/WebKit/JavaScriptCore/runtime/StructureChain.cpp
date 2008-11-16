@@ -23,34 +23,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef StructureIDChain_h
-#define StructureIDChain_h
+#include "config.h"
+#include "StructureChain.h"
 
-#include <wtf/OwnArrayPtr.h>
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
+#include "JSObject.h"
+#include "Structure.h"
 #include <wtf/RefPtr.h>
 
 namespace JSC {
 
-class StructureID;
+StructureChain::StructureChain(Structure* structure) {
+  size_t size = 1;
 
-class StructureIDChain : public RefCounted<StructureIDChain> {
- public:
-  static PassRefPtr<StructureIDChain> create(StructureID* structureID) {
-    return adoptRef(new StructureIDChain(structureID));
+  Structure* tmp = structure;
+  while (!tmp->storedPrototype()->isNull()) {
+    ++size;
+    tmp = asCell(tmp->storedPrototype())->structure();
   }
 
-  RefPtr<StructureID>* head() { return m_vector.get(); }
+  m_vector.set(new RefPtr<Structure>[size + 1]);
 
- private:
-  StructureIDChain(StructureID* structureID);
+  size_t i;
+  for (i = 0; i < size - 1; ++i) {
+    m_vector[i] = structure;
+    structure = asObject(structure->storedPrototype())->structure();
+  }
+  m_vector[i] = structure;
+  m_vector[i + 1] = 0;
+}
 
-  OwnArrayPtr<RefPtr<StructureID>> m_vector;
-};
+bool structureChainsAreEqual(StructureChain* chainA, StructureChain* chainB) {
+  if (!chainA || !chainB)
+    return false;
 
-bool structureIDChainsAreEqual(StructureIDChain*, StructureIDChain*);
+  RefPtr<Structure>* a = chainA->head();
+  RefPtr<Structure>* b = chainB->head();
+  while (1) {
+    if (*a != *b)
+      return false;
+    if (!*a)
+      return true;
+    a++;
+    b++;
+  }
+}
 
 }  // namespace JSC
-
-#endif  // StructureIDChain_h

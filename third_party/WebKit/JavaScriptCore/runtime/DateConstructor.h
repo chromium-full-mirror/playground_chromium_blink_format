@@ -31,8 +31,8 @@ class DatePrototype;
 class DateConstructor : public InternalFunction {
  public:
   DateConstructor(ExecState*,
-                  PassRefPtr<StructureID>,
-                  StructureID* prototypeFunctionStructure,
+                  PassRefPtr<Structure>,
+                  Structure* prototypeFunctionStructure,
                   DatePrototype*);
 
  private:

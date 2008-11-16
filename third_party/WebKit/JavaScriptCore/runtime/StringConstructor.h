@@ -31,8 +31,8 @@ class StringPrototype;
 class StringConstructor : public InternalFunction {
  public:
   StringConstructor(ExecState*,
-                    PassRefPtr<StructureID>,
-                    StructureID* prototypeFunctionStructure,
+                    PassRefPtr<Structure>,
+                    Structure* prototypeFunctionStructure,
                     StringPrototype*);
 
   virtual ConstructType getConstructData(ConstructData&);

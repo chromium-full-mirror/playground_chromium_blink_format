@@ -132,7 +132,7 @@ struct RegExpConstructorPrivate {
 };
 
 RegExpConstructor::RegExpConstructor(ExecState* exec,
-                                     PassRefPtr<StructureID> structure,
+                                     PassRefPtr<Structure> structure,
                                      RegExpPrototype* regExpPrototype)
     : InternalFunction(&exec->globalData(),
                        structure,

@@ -371,7 +371,7 @@ static JSGlueGlobalObject* getThreadGlobalObject() {
   if (!globalObject) {
     RefPtr<JSGlobalData> globalData = JSGlobalData::create();
     globalObject = new (globalData.get())
-        JSGlueGlobalObject(JSGlueGlobalObject::createStructureID(jsNull()));
+        JSGlueGlobalObject(JSGlueGlobalObject::createStructure(jsNull()));
     gcProtect(globalObject);
     pthread_setspecific(globalObjectKey, globalObject);
   }

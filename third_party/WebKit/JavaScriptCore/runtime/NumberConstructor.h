@@ -30,16 +30,16 @@ class NumberPrototype;
 
 class NumberConstructor : public InternalFunction {
  public:
-  NumberConstructor(ExecState*, PassRefPtr<StructureID>, NumberPrototype*);
+  NumberConstructor(ExecState*, PassRefPtr<Structure>, NumberPrototype*);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
 
   static const ClassInfo info;
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
-    return StructureID::create(proto,
-                               TypeInfo(ObjectType, ImplementsHasInstance));
+  static PassRefPtr<Structure> createStructure(JSValue* proto) {
+    return Structure::create(proto,
+                             TypeInfo(ObjectType, ImplementsHasInstance));
   }
 
   enum { NaNValue, NegInfinity, PosInfinity, MaxValue, MinValue };

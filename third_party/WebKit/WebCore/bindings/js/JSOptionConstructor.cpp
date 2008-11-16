@@ -35,7 +35,7 @@ const ClassInfo JSOptionConstructor::s_info = {"OptionConstructor", 0, 0, 0};
 
 JSOptionConstructor::JSOptionConstructor(ExecState* exec,
                                          ScriptExecutionContext* context)
-    : DOMObject(JSOptionConstructor::createStructureID(
+    : DOMObject(JSOptionConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())) {
   ASSERT(context->isDocument());
   m_document = static_cast<JSDocument*>(

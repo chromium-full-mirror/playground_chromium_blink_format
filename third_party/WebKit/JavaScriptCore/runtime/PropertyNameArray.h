@@ -23,7 +23,7 @@
 
 #include "ExecState.h"
 #include "Identifier.h"
-#include "StructureID.h"
+#include "Structure.h"
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 
@@ -43,25 +43,25 @@ class PropertyNameArrayData : public RefCounted<PropertyNameArrayData> {
 
   PropertyNameVector& propertyNameVector() { return m_propertyNameVector; }
 
-  void setCachedStructureID(StructureID* structureID) {
-    m_cachedStructureID = structureID;
+  void setCachedStructure(Structure* structure) {
+    m_cachedStructure = structure;
   }
-  StructureID* cachedStructureID() const { return m_cachedStructureID; }
+  Structure* cachedStructure() const { return m_cachedStructure; }
 
   void setCachedPrototypeChain(
-      PassRefPtr<StructureIDChain> cachedPrototypeChain) {
+      PassRefPtr<StructureChain> cachedPrototypeChain) {
     m_cachedPrototypeChain = cachedPrototypeChain;
   }
-  StructureIDChain* cachedPrototypeChain() {
+  StructureChain* cachedPrototypeChain() {
     return m_cachedPrototypeChain.get();
   }
 
  private:
-  PropertyNameArrayData() : m_cachedStructureID(0) {}
+  PropertyNameArrayData() : m_cachedStructure(0) {}
 
   PropertyNameVector m_propertyNameVector;
-  StructureID* m_cachedStructureID;
-  RefPtr<StructureIDChain> m_cachedPrototypeChain;
+  Structure* m_cachedStructure;
+  RefPtr<StructureChain> m_cachedPrototypeChain;
 };
 
 class PropertyNameArray {

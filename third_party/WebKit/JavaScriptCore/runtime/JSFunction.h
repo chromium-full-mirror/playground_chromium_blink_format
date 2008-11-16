@@ -42,7 +42,7 @@ class JSFunction : public InternalFunction {
   friend class BytecodeInterpreter;
 
   typedef InternalFunction Base;
-  JSFunction(PassRefPtr<JSC::StructureID> st)
+  JSFunction(PassRefPtr<JSC::Structure> st)
       : InternalFunction(st), m_scopeChain(NoScopeChain()) {}
 
  public:
@@ -73,9 +73,9 @@ class JSFunction : public InternalFunction {
   // FIXME: This should be private
   RefPtr<FunctionBodyNode> m_body;
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
-    return StructureID::create(prototype,
-                               TypeInfo(ObjectType, ImplementsHasInstance));
+  static PassRefPtr<Structure> createStructure(JSValue* prototype) {
+    return Structure::create(prototype,
+                             TypeInfo(ObjectType, ImplementsHasInstance));
   }
 
  private:

@@ -35,14 +35,14 @@ namespace JSC {
 class BatchedTransitionOptimizer : Noncopyable {
  public:
   BatchedTransitionOptimizer(JSObject* object) : m_object(object) {
-    if (!m_object->structureID()->isDictionary())
-      m_object->setStructureID(
-          StructureID::toDictionaryTransition(m_object->structureID()));
+    if (!m_object->structure()->isDictionary())
+      m_object->setStructure(
+          Structure::toDictionaryTransition(m_object->structure()));
   }
 
   ~BatchedTransitionOptimizer() {
-    m_object->setStructureID(
-        StructureID::fromDictionaryTransition(m_object->structureID()));
+    m_object->setStructure(
+        Structure::fromDictionaryTransition(m_object->structure()));
   }
 
  private:

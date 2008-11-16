@@ -36,7 +36,7 @@ class JSEventListener;
 class JSUnprotectedEventListener;
 class ScriptExecutionContext;
 
-typedef HashMap<const JSC::ClassInfo*, RefPtr<JSC::StructureID>>
+typedef HashMap<const JSC::ClassInfo*, RefPtr<JSC::Structure>>
     JSDOMStructureMap;
 typedef HashMap<const JSC::ClassInfo*, JSC::JSObject*> JSDOMConstructorMap;
 
@@ -46,7 +46,7 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
  protected:
   struct JSDOMGlobalObjectData;
 
-  JSDOMGlobalObject(PassRefPtr<JSC::StructureID>,
+  JSDOMGlobalObject(PassRefPtr<JSC::Structure>,
                     JSDOMGlobalObjectData*,
                     JSC::JSObject* thisValue);
   virtual ~JSDOMGlobalObject();

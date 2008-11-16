@@ -41,7 +41,7 @@ const ClassInfo JSActivation::info = {"JSActivation", 0, 0, 0};
 
 JSActivation::JSActivation(CallFrame* callFrame,
                            PassRefPtr<FunctionBodyNode> functionBody)
-    : Base(callFrame->globalData().activationStructureID,
+    : Base(callFrame->globalData().activationStructure,
            new JSActivationData(functionBody, callFrame)) {}
 
 JSActivation::~JSActivation() {

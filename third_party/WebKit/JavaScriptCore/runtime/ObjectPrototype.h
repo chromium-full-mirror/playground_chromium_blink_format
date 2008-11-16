@@ -29,8 +29,8 @@ namespace JSC {
 class ObjectPrototype : public JSObject {
  public:
   ObjectPrototype(ExecState*,
-                  PassRefPtr<StructureID>,
-                  StructureID* prototypeFunctionStructure);
+                  PassRefPtr<Structure>,
+                  Structure* prototypeFunctionStructure);
 };
 
 JSValue* objectProtoFuncToString(ExecState*,

@@ -290,7 +290,7 @@ static JSValue* jsTypeStringForValue(CallFrame* callFrame, JSValue* v) {
   if (v->isObject()) {
     // Return "undefined" for objects that should be treated
     // as null when doing comparisons.
-    if (asObject(v)->structureID()->typeInfo().masqueradesAsUndefined())
+    if (asObject(v)->structure()->typeInfo().masqueradesAsUndefined())
       return jsNontrivialString(callFrame, "undefined");
     CallData callData;
     if (asObject(v)->getCallData(callData) != CallTypeNone)
@@ -303,11 +303,11 @@ static bool jsIsObjectType(JSValue* v) {
   if (JSImmediate::isImmediate(v))
     return v->isNull();
 
-  JSType type = asCell(v)->structureID()->typeInfo().type();
+  JSType type = asCell(v)->structure()->typeInfo().type();
   if (type == NumberType || type == StringType)
     return false;
   if (type == ObjectType) {
-    if (asObject(v)->structureID()->typeInfo().masqueradesAsUndefined())
+    if (asObject(v)->structure()->typeInfo().masqueradesAsUndefined())
       return false;
     CallData callData;
     if (asObject(v)->getCallData(callData) != CallTypeNone)
@@ -398,10 +398,10 @@ NEVER_INLINE bool BytecodeInterpreter::resolveGlobal(CallFrame* callFrame,
       static_cast<JSGlobalObject*>((vPC + 2)->u.jsCell);
   ASSERT(globalObject->isGlobalObject());
   int property = (vPC + 3)->u.operand;
-  StructureID* structureID = (vPC + 4)->u.structureID;
+  Structure* structure = (vPC + 4)->u.structure;
   int offset = (vPC + 5)->u.operand;
 
-  if (structureID == globalObject->structureID()) {
+  if (structure == globalObject->structure()) {
     callFrame[dst] = globalObject->getDirectOffset(offset);
     return true;
   }
@@ -412,10 +412,10 @@ NEVER_INLINE bool BytecodeInterpreter::resolveGlobal(CallFrame* callFrame,
   if (globalObject->getPropertySlot(callFrame, ident, slot)) {
     JSValue* result = slot.getValue(callFrame, ident);
     if (slot.isCacheable()) {
-      if (vPC[4].u.structureID)
-        vPC[4].u.structureID->deref();
-      globalObject->structureID()->ref();
-      vPC[4] = globalObject->structureID();
+      if (vPC[4].u.structure)
+        vPC[4].u.structure->deref();
+      globalObject->structure()->ref();
+      vPC[4] = globalObject->structure();
       vPC[5] = slot.cachedOffset();
       callFrame[dst] = result;
       return true;
@@ -672,7 +672,7 @@ BytecodeInterpreter::BytecodeInterpreter()
   // stack.
   void* storage = fastMalloc(sizeof(CollectorBlock));
 
-  JSCell* jsArray = new (storage) JSArray(JSArray::createStructureID(jsNull()));
+  JSCell* jsArray = new (storage) JSArray(JSArray::createStructure(jsNull()));
   m_jsArrayVptr = jsArray->vptr();
   jsArray->~JSCell();
 
@@ -681,7 +681,7 @@ BytecodeInterpreter::BytecodeInterpreter()
   jsString->~JSCell();
 
   JSCell* jsFunction =
-      new (storage) JSFunction(JSFunction::createStructureID(jsNull()));
+      new (storage) JSFunction(JSFunction::createStructure(jsNull()));
   m_jsFunctionVptr = jsFunction->vptr();
   jsFunction->~JSCell();
 
@@ -1404,15 +1404,15 @@ NEVER_INLINE ScopeChainNode* BytecodeInterpreter::createExceptionScope(
   return callFrame->scopeChain()->push(scope);
 }
 
-static StructureIDChain* cachePrototypeChain(CallFrame* callFrame,
-                                             StructureID* structureID) {
-  JSValue* prototype = structureID->prototypeForLookup(callFrame);
+static StructureChain* cachePrototypeChain(CallFrame* callFrame,
+                                           Structure* structure) {
+  JSValue* prototype = structure->prototypeForLookup(callFrame);
   if (JSImmediate::isImmediate(prototype))
     return 0;
-  RefPtr<StructureIDChain> chain =
-      StructureIDChain::create(asObject(prototype)->structureID());
-  structureID->setCachedPrototypeChain(chain.release());
-  return structureID->cachedPrototypeChain();
+  RefPtr<StructureChain> chain =
+      StructureChain::create(asObject(prototype)->structure());
+  structure->setCachedPrototypeChain(chain.release());
+  return structure->cachedPrototypeChain();
 }
 
 NEVER_INLINE void BytecodeInterpreter::tryCachePutByID(
@@ -1435,19 +1435,19 @@ NEVER_INLINE void BytecodeInterpreter::tryCachePutByID(
   }
 
   JSCell* baseCell = asCell(baseValue);
-  StructureID* structureID = baseCell->structureID();
+  Structure* structure = baseCell->structure();
 
-  if (structureID->isDictionary()) {
+  if (structure->isDictionary()) {
     vPC[0] = getOpcode(op_put_by_id_generic);
     return;
   }
 
-  // Cache miss: record StructureID to compare against next time.
-  StructureID* lastStructureID = vPC[4].u.structureID;
-  if (structureID != lastStructureID) {
-    // First miss: record StructureID to compare against next time.
-    if (!lastStructureID) {
-      vPC[4] = structureID;
+  // Cache miss: record Structure to compare against next time.
+  Structure* lastStructure = vPC[4].u.structure;
+  if (structure != lastStructure) {
+    // First miss: record Structure to compare against next time.
+    if (!lastStructure) {
+      vPC[4] = structure;
       return;
     }
 
@@ -1456,7 +1456,7 @@ NEVER_INLINE void BytecodeInterpreter::tryCachePutByID(
     return;
   }
 
-  // Cache hit: Specialize instruction and ref StructureIDs.
+  // Cache hit: Specialize instruction and ref Structures.
 
   // If baseCell != slot.base(), then baseCell must be a proxy for another
   // object.
@@ -1465,14 +1465,14 @@ NEVER_INLINE void BytecodeInterpreter::tryCachePutByID(
     return;
   }
 
-  // StructureID transition, cache transition info
+  // Structure transition, cache transition info
   if (slot.type() == PutPropertySlot::NewProperty) {
     vPC[0] = getOpcode(op_put_by_id_transition);
-    vPC[4] = structureID->previousID();
-    vPC[5] = structureID;
-    StructureIDChain* chain = structureID->cachedPrototypeChain();
+    vPC[4] = structure->previousID();
+    vPC[5] = structure;
+    StructureChain* chain = structure->cachedPrototypeChain();
     if (!chain) {
-      chain = cachePrototypeChain(callFrame, structureID);
+      chain = cachePrototypeChain(callFrame, structure);
       if (!chain) {
         // This happens if someone has manually inserted null into the prototype
         // chain
@@ -1482,18 +1482,18 @@ NEVER_INLINE void BytecodeInterpreter::tryCachePutByID(
     }
     vPC[6] = chain;
     vPC[7] = slot.cachedOffset();
-    codeBlock->refStructureIDs(vPC);
+    codeBlock->refStructures(vPC);
     return;
   }
 
   vPC[0] = getOpcode(op_put_by_id_replace);
   vPC[5] = slot.cachedOffset();
-  codeBlock->refStructureIDs(vPC);
+  codeBlock->refStructures(vPC);
 }
 
 NEVER_INLINE void BytecodeInterpreter::uncachePutByID(CodeBlock* codeBlock,
                                                       Instruction* vPC) {
-  codeBlock->derefStructureIDs(vPC);
+  codeBlock->derefStructures(vPC);
   vPC[0] = getOpcode(op_put_by_id);
   vPC[4] = 0;
 }
@@ -1533,19 +1533,19 @@ NEVER_INLINE void BytecodeInterpreter::tryCacheGetByID(
     return;
   }
 
-  StructureID* structureID = asCell(baseValue)->structureID();
+  Structure* structure = asCell(baseValue)->structure();
 
-  if (structureID->isDictionary()) {
+  if (structure->isDictionary()) {
     vPC[0] = getOpcode(op_get_by_id_generic);
     return;
   }
 
   // Cache miss
-  StructureID* lastStructureID = vPC[4].u.structureID;
-  if (structureID != lastStructureID) {
-    // First miss: record StructureID to compare against next time.
-    if (!lastStructureID) {
-      vPC[4] = structureID;
+  Structure* lastStructure = vPC[4].u.structure;
+  if (structure != lastStructure) {
+    // First miss: record Structure to compare against next time.
+    if (!lastStructure) {
+      vPC[4] = structure;
       return;
     }
 
@@ -1554,42 +1554,42 @@ NEVER_INLINE void BytecodeInterpreter::tryCacheGetByID(
     return;
   }
 
-  // Cache hit: Specialize instruction and ref StructureIDs.
+  // Cache hit: Specialize instruction and ref Structures.
 
   if (slot.slotBase() == baseValue) {
     vPC[0] = getOpcode(op_get_by_id_self);
     vPC[5] = slot.cachedOffset();
 
-    codeBlock->refStructureIDs(vPC);
+    codeBlock->refStructures(vPC);
     return;
   }
 
-  if (slot.slotBase() == structureID->prototypeForLookup(callFrame)) {
+  if (slot.slotBase() == structure->prototypeForLookup(callFrame)) {
     ASSERT(slot.slotBase()->isObject());
 
     JSObject* baseObject = asObject(slot.slotBase());
 
     // Heavy access to a prototype is a good indication that it's not being
     // used as a dictionary.
-    if (baseObject->structureID()->isDictionary()) {
-      RefPtr<StructureID> transition =
-          StructureID::fromDictionaryTransition(baseObject->structureID());
-      baseObject->setStructureID(transition.release());
-      asCell(baseValue)->structureID()->setCachedPrototypeChain(0);
+    if (baseObject->structure()->isDictionary()) {
+      RefPtr<Structure> transition =
+          Structure::fromDictionaryTransition(baseObject->structure());
+      baseObject->setStructure(transition.release());
+      asCell(baseValue)->structure()->setCachedPrototypeChain(0);
     }
 
     vPC[0] = getOpcode(op_get_by_id_proto);
-    vPC[5] = baseObject->structureID();
+    vPC[5] = baseObject->structure();
     vPC[6] = slot.cachedOffset();
 
-    codeBlock->refStructureIDs(vPC);
+    codeBlock->refStructures(vPC);
     return;
   }
 
   size_t count = 0;
   JSObject* o = asObject(baseValue);
   while (slot.slotBase() != o) {
-    JSValue* v = o->structureID()->prototypeForLookup(callFrame);
+    JSValue* v = o->structure()->prototypeForLookup(callFrame);
 
     // If we didn't find base in baseValue's prototype chain, then baseValue
     // must be a proxy for another object.
@@ -1602,32 +1602,32 @@ NEVER_INLINE void BytecodeInterpreter::tryCacheGetByID(
 
     // Heavy access to a prototype is a good indication that it's not being
     // used as a dictionary.
-    if (o->structureID()->isDictionary()) {
-      RefPtr<StructureID> transition =
-          StructureID::fromDictionaryTransition(o->structureID());
-      o->setStructureID(transition.release());
-      asObject(baseValue)->structureID()->setCachedPrototypeChain(0);
+    if (o->structure()->isDictionary()) {
+      RefPtr<Structure> transition =
+          Structure::fromDictionaryTransition(o->structure());
+      o->setStructure(transition.release());
+      asObject(baseValue)->structure()->setCachedPrototypeChain(0);
     }
 
     ++count;
   }
 
-  StructureIDChain* chain = structureID->cachedPrototypeChain();
+  StructureChain* chain = structure->cachedPrototypeChain();
   if (!chain)
-    chain = cachePrototypeChain(callFrame, structureID);
+    chain = cachePrototypeChain(callFrame, structure);
   ASSERT(chain);
 
   vPC[0] = getOpcode(op_get_by_id_chain);
-  vPC[4] = structureID;
+  vPC[4] = structure;
   vPC[5] = chain;
   vPC[6] = count;
   vPC[7] = slot.cachedOffset();
-  codeBlock->refStructureIDs(vPC);
+  codeBlock->refStructures(vPC);
 }
 
 NEVER_INLINE void BytecodeInterpreter::uncacheGetByID(CodeBlock* codeBlock,
                                                       Instruction* vPC) {
-  codeBlock->derefStructureIDs(vPC);
+  codeBlock->derefStructures(vPC);
   vPC[0] = getOpcode(op_get_by_id);
   vPC[4] = 0;
 }
@@ -1817,7 +1817,7 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
 
       callFrame[dst] = jsBoolean(
           !JSImmediate::isImmediate(src) &&
-          src->asCell()->structureID()->typeInfo().masqueradesAsUndefined());
+          src->asCell()->structure()->typeInfo().masqueradesAsUndefined());
       ++vPC;
       NEXT_INSTRUCTION;
     }
@@ -1859,7 +1859,7 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
 
       callFrame[dst] = jsBoolean(
           JSImmediate::isImmediate(src) ||
-          !asCell(src)->structureID()->typeInfo().masqueradesAsUndefined());
+          !asCell(src)->structure()->typeInfo().masqueradesAsUndefined());
       ++vPC;
       NEXT_INSTRUCTION;
     }
@@ -2424,7 +2424,7 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
 
       JSObject* baseObj = asObject(baseVal);
       callFrame[dst] =
-          jsBoolean(baseObj->structureID()->typeInfo().implementsHasInstance()
+          jsBoolean(baseObj->structure()->typeInfo().implementsHasInstance()
                         ? baseObj->hasInstance(
                               callFrame, callFrame[value].jsValue(callFrame),
                               callFrame[baseProto].jsValue(callFrame))
@@ -2457,12 +2457,10 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
       int dst = (++vPC)->u.operand;
       int src = (++vPC)->u.operand;
       JSValue* v = callFrame[src].jsValue(callFrame);
-      callFrame[dst] = jsBoolean(JSImmediate::isImmediate(v)
-                                     ? v->isUndefined()
-                                     : v->asCell()
-                                           ->structureID()
-                                           ->typeInfo()
-                                           .masqueradesAsUndefined());
+      callFrame[dst] = jsBoolean(
+          JSImmediate::isImmediate(v)
+              ? v->isUndefined()
+              : v->asCell()->structure()->typeInfo().masqueradesAsUndefined());
 
       ++vPC;
       NEXT_INSTRUCTION;
@@ -2602,16 +2600,16 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION;
     }
     DEFINE_OPCODE(op_resolve_global) {
-      /* resolve_skip dst(r) globalObject(c) property(id) structureID(sID)
+      /* resolve_skip dst(r) globalObject(c) property(id) structure(sID)
          offset(n)
 
          Performs a dynamic property lookup for the given property, on the
          provided
-         global object.  If structureID matches the StructureID of the global
-         then perform
+         global object.  If structure matches the Structure of the global then
+         perform
          a fast lookup using the case offset, otherwise fall back to a full
          resolve and
-         cache the new structureID and offset
+         cache the new structure and offset
        */
       if (UNLIKELY(!resolveGlobal(callFrame, vPC, exceptionValue)))
         goto vm_throw;
@@ -2751,7 +2749,7 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION;
     }
     DEFINE_OPCODE(op_get_by_id) {
-      /* get_by_id dst(r) base(r) property(id) structureID(sID) nop(n) nop(n)
+      /* get_by_id dst(r) base(r) property(id) structure(sID) nop(n) nop(n)
          nop(n)
 
          Generic property access: Gets the property named by identifier
@@ -2775,8 +2773,8 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION;
     }
     DEFINE_OPCODE(op_get_by_id_self) {
-      /* op_get_by_id_self dst(r) base(r) property(id) structureID(sID)
-         offset(n) nop(n) nop(n)
+      /* op_get_by_id_self dst(r) base(r) property(id) structure(sID) offset(n)
+         nop(n) nop(n)
 
          Cached property access: Attempts to get a cached property from the
          value base. If the cache misses, op_get_by_id_self reverts to
@@ -2787,9 +2785,9 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
 
       if (LIKELY(!JSImmediate::isImmediate(baseValue))) {
         JSCell* baseCell = asCell(baseValue);
-        StructureID* structureID = vPC[4].u.structureID;
+        Structure* structure = vPC[4].u.structure;
 
-        if (LIKELY(baseCell->structureID() == structureID)) {
+        if (LIKELY(baseCell->structure() == structure)) {
           ASSERT(baseCell->isObject());
           JSObject* baseObject = asObject(baseCell);
           int dst = vPC[1].u.operand;
@@ -2810,8 +2808,8 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION;
     }
     DEFINE_OPCODE(op_get_by_id_proto) {
-      /* op_get_by_id_proto dst(r) base(r) property(id) structureID(sID)
-         protoStructureID(sID) offset(n) nop(n)
+      /* op_get_by_id_proto dst(r) base(r) property(id) structure(sID)
+         prototypeStructure(sID) offset(n) nop(n)
 
          Cached property access: Attempts to get a cached property from the
          value base's prototype. If the cache misses, op_get_by_id_proto
@@ -2822,15 +2820,15 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
 
       if (LIKELY(!JSImmediate::isImmediate(baseValue))) {
         JSCell* baseCell = asCell(baseValue);
-        StructureID* structureID = vPC[4].u.structureID;
+        Structure* structure = vPC[4].u.structure;
 
-        if (LIKELY(baseCell->structureID() == structureID)) {
-          ASSERT(structureID->prototypeForLookup(callFrame)->isObject());
+        if (LIKELY(baseCell->structure() == structure)) {
+          ASSERT(structure->prototypeForLookup(callFrame)->isObject());
           JSObject* protoObject =
-              asObject(structureID->prototypeForLookup(callFrame));
-          StructureID* protoStructureID = vPC[5].u.structureID;
+              asObject(structure->prototypeForLookup(callFrame));
+          Structure* prototypeStructure = vPC[5].u.structure;
 
-          if (LIKELY(protoObject->structureID() == protoStructureID)) {
+          if (LIKELY(protoObject->structure() == prototypeStructure)) {
             int dst = vPC[1].u.operand;
             int offset = vPC[6].u.operand;
 
@@ -2850,8 +2848,8 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION;
     }
     DEFINE_OPCODE(op_get_by_id_chain) {
-      /* op_get_by_id_chain dst(r) base(r) property(id) structureID(sID)
-         structureIDChain(sIDc) count(n) offset(n)
+      /* op_get_by_id_chain dst(r) base(r) property(id) structure(sID)
+         structureChain(chain) count(n) offset(n)
 
          Cached property access: Attempts to get a cached property from the
          value base's prototype chain. If the cache misses, op_get_by_id_chain
@@ -2862,18 +2860,18 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
 
       if (LIKELY(!JSImmediate::isImmediate(baseValue))) {
         JSCell* baseCell = asCell(baseValue);
-        StructureID* structureID = vPC[4].u.structureID;
+        Structure* structure = vPC[4].u.structure;
 
-        if (LIKELY(baseCell->structureID() == structureID)) {
-          RefPtr<StructureID>* it = vPC[5].u.structureIDChain->head();
+        if (LIKELY(baseCell->structure() == structure)) {
+          RefPtr<Structure>* it = vPC[5].u.structureChain->head();
           size_t count = vPC[6].u.operand;
-          RefPtr<StructureID>* end = it + count;
+          RefPtr<Structure>* end = it + count;
 
           JSObject* baseObject = asObject(baseCell);
           while (1) {
             baseObject = asObject(
-                baseObject->structureID()->prototypeForLookup(callFrame));
-            if (UNLIKELY(baseObject->structureID() != (*it).get()))
+                baseObject->structure()->prototypeForLookup(callFrame));
+            if (UNLIKELY(baseObject->structure() != (*it).get()))
               break;
 
             if (++it == end) {
@@ -2989,9 +2987,8 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION;
     }
     DEFINE_OPCODE(op_put_by_id_transition) {
-      /* op_put_by_id_transition base(r) property(id) value(r)
-         oldStructureID(sID) newStructureID(sID) structureIDChain(sIDc)
-         offset(n)
+      /* op_put_by_id_transition base(r) property(id) value(r) oldStructure(sID)
+         newStructure(sID) structureChain(chain) offset(n)
 
          Cached property access: Attempts to set a new property with a cached
          transition
@@ -3007,28 +3004,27 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
 
       if (LIKELY(!JSImmediate::isImmediate(baseValue))) {
         JSCell* baseCell = asCell(baseValue);
-        StructureID* oldStructureID = vPC[4].u.structureID;
-        StructureID* newStructureID = vPC[5].u.structureID;
+        Structure* oldStructure = vPC[4].u.structure;
+        Structure* newStructure = vPC[5].u.structure;
 
-        if (LIKELY(baseCell->structureID() == oldStructureID)) {
+        if (LIKELY(baseCell->structure() == oldStructure)) {
           ASSERT(baseCell->isObject());
           JSObject* baseObject = asObject(baseCell);
 
-          RefPtr<StructureID>* it = vPC[6].u.structureIDChain->head();
+          RefPtr<Structure>* it = vPC[6].u.structureChain->head();
 
           JSValue* proto =
-              baseObject->structureID()->prototypeForLookup(callFrame);
+              baseObject->structure()->prototypeForLookup(callFrame);
           while (!proto->isNull()) {
-            if (UNLIKELY(asObject(proto)->structureID() != (*it).get())) {
+            if (UNLIKELY(asObject(proto)->structure() != (*it).get())) {
               uncachePutByID(callFrame->codeBlock(), vPC);
               NEXT_INSTRUCTION;
             }
             ++it;
-            proto =
-                asObject(proto)->structureID()->prototypeForLookup(callFrame);
+            proto = asObject(proto)->structure()->prototypeForLookup(callFrame);
           }
 
-          baseObject->transitionTo(newStructureID);
+          baseObject->transitionTo(newStructure);
 
           int value = vPC[3].u.operand;
           unsigned offset = vPC[7].u.operand;
@@ -3047,7 +3043,7 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION;
     }
     DEFINE_OPCODE(op_put_by_id_replace) {
-      /* op_put_by_id_replace base(r) property(id) value(r) structureID(sID)
+      /* op_put_by_id_replace base(r) property(id) value(r) structure(sID)
          offset(n) nop(n) nop(n)
 
          Cached property access: Attempts to set a pre-existing, cached
@@ -3063,9 +3059,9 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
 
       if (LIKELY(!JSImmediate::isImmediate(baseValue))) {
         JSCell* baseCell = asCell(baseValue);
-        StructureID* structureID = vPC[4].u.structureID;
+        Structure* structure = vPC[4].u.structure;
 
-        if (LIKELY(baseCell->structureID() == structureID)) {
+        if (LIKELY(baseCell->structure() == structure)) {
           ASSERT(baseCell->isObject());
           JSObject* baseObject = asObject(baseCell);
           int value = vPC[3].u.operand;
@@ -3365,7 +3361,7 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
       if (srcValue->isUndefinedOrNull() ||
           (!JSImmediate::isImmediate(srcValue) &&
            srcValue->asCell()
-               ->structureID()
+               ->structure()
                ->typeInfo()
                .masqueradesAsUndefined())) {
         vPC += target;
@@ -3388,7 +3384,7 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
       if (!srcValue->isUndefinedOrNull() ||
           (!JSImmediate::isImmediate(srcValue) &&
            !srcValue->asCell()
-                ->structureID()
+                ->structure()
                 ->typeInfo()
                 .masqueradesAsUndefined())) {
         vPC += target;
@@ -3911,7 +3907,7 @@ JSValue* BytecodeInterpreter::privateExecute(ExecutionFlag flag,
         CodeBlock* newCodeBlock =
             &functionBodyNode->bytecode(callDataScopeChain);
 
-        StructureID* structure;
+        Structure* structure;
         JSValue* prototype = callFrame[proto].jsValue(callFrame);
         if (prototype->isObject())
           structure = asObject(prototype)->inheritorID();
@@ -4440,9 +4436,9 @@ NEVER_INLINE void BytecodeInterpreter::tryCTICachePutByID(
   }
 
   JSCell* baseCell = asCell(baseValue);
-  StructureID* structureID = baseCell->structureID();
+  Structure* structure = baseCell->structure();
 
-  if (structureID->isDictionary()) {
+  if (structure->isDictionary()) {
     ctiRepatchCallByReturnAddress(
         returnAddress, reinterpret_cast<void*>(cti_op_put_by_id_generic));
     return;
@@ -4454,7 +4450,7 @@ NEVER_INLINE void BytecodeInterpreter::tryCTICachePutByID(
   unsigned vPCIndex = codeBlock->ctiReturnAddressVPCMap.get(returnAddress);
   Instruction* vPC = codeBlock->instructions.begin() + vPCIndex;
 
-  // Cache hit: Specialize instruction and ref StructureIDs.
+  // Cache hit: Specialize instruction and ref Structures.
 
   // If baseCell != base, then baseCell must be a proxy for another object.
   if (baseCell != slot.base()) {
@@ -4463,14 +4459,14 @@ NEVER_INLINE void BytecodeInterpreter::tryCTICachePutByID(
     return;
   }
 
-  // StructureID transition, cache transition info
+  // Structure transition, cache transition info
   if (slot.type() == PutPropertySlot::NewProperty) {
     vPC[0] = getOpcode(op_put_by_id_transition);
-    vPC[4] = structureID->previousID();
-    vPC[5] = structureID;
-    StructureIDChain* chain = structureID->cachedPrototypeChain();
+    vPC[4] = structure->previousID();
+    vPC[5] = structure;
+    StructureChain* chain = structure->cachedPrototypeChain();
     if (!chain) {
-      chain = cachePrototypeChain(callFrame, structureID);
+      chain = cachePrototypeChain(callFrame, structure);
       if (!chain) {
         // This happens if someone has manually inserted null into the prototype
         // chain
@@ -4480,26 +4476,25 @@ NEVER_INLINE void BytecodeInterpreter::tryCTICachePutByID(
     }
     vPC[6] = chain;
     vPC[7] = slot.cachedOffset();
-    codeBlock->refStructureIDs(vPC);
+    codeBlock->refStructures(vPC);
     CTI::compilePutByIdTransition(callFrame->scopeChain()->globalData,
-                                  codeBlock, structureID->previousID(),
-                                  structureID, slot.cachedOffset(), chain,
-                                  returnAddress);
+                                  codeBlock, structure->previousID(), structure,
+                                  slot.cachedOffset(), chain, returnAddress);
     return;
   }
 
   vPC[0] = getOpcode(op_put_by_id_replace);
-  vPC[4] = structureID;
+  vPC[4] = structure;
   vPC[5] = slot.cachedOffset();
-  codeBlock->refStructureIDs(vPC);
+  codeBlock->refStructures(vPC);
 
 #if USE(CTI_REPATCH_PIC)
   UNUSED_PARAM(callFrame);
-  CTI::patchPutByIdReplace(codeBlock, structureID, slot.cachedOffset(),
+  CTI::patchPutByIdReplace(codeBlock, structure, slot.cachedOffset(),
                            returnAddress);
 #else
   CTI::compilePutByIdReplace(callFrame->scopeChain()->globalData, callFrame,
-                             codeBlock, structureID, slot.cachedOffset(),
+                             codeBlock, structure, slot.cachedOffset(),
                              returnAddress);
 #endif
 }
@@ -4548,9 +4543,9 @@ NEVER_INLINE void BytecodeInterpreter::tryCTICacheGetByID(
   }
 
   JSCell* baseCell = asCell(baseValue);
-  StructureID* structureID = baseCell->structureID();
+  Structure* structure = baseCell->structure();
 
-  if (structureID->isDictionary()) {
+  if (structure->isDictionary()) {
     ctiRepatchCallByReturnAddress(
         returnAddress, reinterpret_cast<void*>(cti_op_get_by_id_generic));
     return;
@@ -4562,56 +4557,56 @@ NEVER_INLINE void BytecodeInterpreter::tryCTICacheGetByID(
   unsigned vPCIndex = codeBlock->ctiReturnAddressVPCMap.get(returnAddress);
   Instruction* vPC = codeBlock->instructions.begin() + vPCIndex;
 
-  // Cache hit: Specialize instruction and ref StructureIDs.
+  // Cache hit: Specialize instruction and ref Structures.
 
   if (slot.slotBase() == baseValue) {
-    // set this up, so derefStructureIDs can do it's job.
+    // set this up, so derefStructures can do it's job.
     vPC[0] = getOpcode(op_get_by_id_self);
-    vPC[4] = structureID;
+    vPC[4] = structure;
     vPC[5] = slot.cachedOffset();
-    codeBlock->refStructureIDs(vPC);
+    codeBlock->refStructures(vPC);
 
 #if USE(CTI_REPATCH_PIC)
-    CTI::patchGetByIdSelf(codeBlock, structureID, slot.cachedOffset(),
+    CTI::patchGetByIdSelf(codeBlock, structure, slot.cachedOffset(),
                           returnAddress);
 #else
     CTI::compileGetByIdSelf(callFrame->scopeChain()->globalData, callFrame,
-                            codeBlock, structureID, slot.cachedOffset(),
+                            codeBlock, structure, slot.cachedOffset(),
                             returnAddress);
 #endif
     return;
   }
 
-  if (slot.slotBase() == structureID->prototypeForLookup(callFrame)) {
+  if (slot.slotBase() == structure->prototypeForLookup(callFrame)) {
     ASSERT(slot.slotBase()->isObject());
 
     JSObject* slotBaseObject = asObject(slot.slotBase());
 
     // Heavy access to a prototype is a good indication that it's not being
     // used as a dictionary.
-    if (slotBaseObject->structureID()->isDictionary()) {
-      RefPtr<StructureID> transition =
-          StructureID::fromDictionaryTransition(slotBaseObject->structureID());
-      slotBaseObject->setStructureID(transition.release());
-      asObject(baseValue)->structureID()->setCachedPrototypeChain(0);
+    if (slotBaseObject->structure()->isDictionary()) {
+      RefPtr<Structure> transition =
+          Structure::fromDictionaryTransition(slotBaseObject->structure());
+      slotBaseObject->setStructure(transition.release());
+      asObject(baseValue)->structure()->setCachedPrototypeChain(0);
     }
 
     vPC[0] = getOpcode(op_get_by_id_proto);
-    vPC[4] = structureID;
-    vPC[5] = slotBaseObject->structureID();
+    vPC[4] = structure;
+    vPC[5] = slotBaseObject->structure();
     vPC[6] = slot.cachedOffset();
-    codeBlock->refStructureIDs(vPC);
+    codeBlock->refStructures(vPC);
 
-    CTI::compileGetByIdProto(
-        callFrame->scopeChain()->globalData, callFrame, codeBlock, structureID,
-        slotBaseObject->structureID(), slot.cachedOffset(), returnAddress);
+    CTI::compileGetByIdProto(callFrame->scopeChain()->globalData, callFrame,
+                             codeBlock, structure, slotBaseObject->structure(),
+                             slot.cachedOffset(), returnAddress);
     return;
   }
 
   size_t count = 0;
   JSObject* o = asObject(baseValue);
   while (slot.slotBase() != o) {
-    JSValue* v = o->structureID()->prototypeForLookup(callFrame);
+    JSValue* v = o->structure()->prototypeForLookup(callFrame);
 
     // If we didn't find slotBase in baseValue's prototype chain, then baseValue
     // must be a proxy for another object.
@@ -4625,30 +4620,30 @@ NEVER_INLINE void BytecodeInterpreter::tryCTICacheGetByID(
 
     // Heavy access to a prototype is a good indication that it's not being
     // used as a dictionary.
-    if (o->structureID()->isDictionary()) {
-      RefPtr<StructureID> transition =
-          StructureID::fromDictionaryTransition(o->structureID());
-      o->setStructureID(transition.release());
-      asObject(baseValue)->structureID()->setCachedPrototypeChain(0);
+    if (o->structure()->isDictionary()) {
+      RefPtr<Structure> transition =
+          Structure::fromDictionaryTransition(o->structure());
+      o->setStructure(transition.release());
+      asObject(baseValue)->structure()->setCachedPrototypeChain(0);
     }
 
     ++count;
   }
 
-  StructureIDChain* chain = structureID->cachedPrototypeChain();
+  StructureChain* chain = structure->cachedPrototypeChain();
   if (!chain)
-    chain = cachePrototypeChain(callFrame, structureID);
+    chain = cachePrototypeChain(callFrame, structure);
 
   ASSERT(chain);
   vPC[0] = getOpcode(op_get_by_id_chain);
-  vPC[4] = structureID;
+  vPC[4] = structure;
   vPC[5] = chain;
   vPC[6] = count;
   vPC[7] = slot.cachedOffset();
-  codeBlock->refStructureIDs(vPC);
+  codeBlock->refStructures(vPC);
 
   CTI::compileGetByIdChain(callFrame->scopeChain()->globalData, callFrame,
-                           codeBlock, structureID, chain, count,
+                           codeBlock, structure, chain, count,
                            slot.cachedOffset(), returnAddress);
 }
 
@@ -5010,7 +5005,7 @@ JSValue* BytecodeInterpreter::cti_op_instanceof(CTI_ARGS) {
   // at least one of these checks must have failed to get to the slow case
   ASSERT(JSImmediate::isAnyImmediate(value, baseVal, proto) ||
          !value->isObject() || !baseVal->isObject() || !proto->isObject() ||
-         (asObject(baseVal)->structureID()->typeInfo().flags() &
+         (asObject(baseVal)->structure()->typeInfo().flags() &
           (ImplementsHasInstance | OverridesHasInstance)) !=
              ImplementsHasInstance);
 
@@ -5026,7 +5021,7 @@ JSValue* BytecodeInterpreter::cti_op_instanceof(CTI_ARGS) {
     VM_THROW_EXCEPTION();
   }
 
-  if (!asObject(baseVal)->structureID()->typeInfo().implementsHasInstance())
+  if (!asObject(baseVal)->structure()->typeInfo().implementsHasInstance())
     return jsBoolean(false);
 
   if (!proto->isObject()) {
@@ -5342,7 +5337,7 @@ JSObject* BytecodeInterpreter::cti_op_construct_JSConstruct(CTI_ARGS) {
          ConstructTypeJS);
 #endif
 
-  StructureID* structure;
+  Structure* structure;
   if (ARG_src4->isObject())
     structure = asObject(ARG_src4)->inheritorID();
   else
@@ -5635,10 +5630,10 @@ JSValue* BytecodeInterpreter::cti_op_resolve_global(CTI_ARGS) {
   if (globalObject->getPropertySlot(callFrame, ident, slot)) {
     JSValue* result = slot.getValue(callFrame, ident);
     if (slot.isCacheable()) {
-      if (vPC[4].u.structureID)
-        vPC[4].u.structureID->deref();
-      globalObject->structureID()->ref();
-      vPC[4] = globalObject->structureID();
+      if (vPC[4].u.structure)
+        vPC[4].u.structure->deref();
+      globalObject->structure()->ref();
+      vPC[4] = globalObject->structure();
       vPC[5] = slot.cachedOffset();
       return result;
     }
@@ -6078,7 +6073,7 @@ JSValue* BytecodeInterpreter::cti_op_is_undefined(CTI_ARGS) {
   return jsBoolean(
       JSImmediate::isImmediate(v)
           ? v->isUndefined()
-          : v->asCell()->structureID()->typeInfo().masqueradesAsUndefined());
+          : v->asCell()->structure()->typeInfo().masqueradesAsUndefined());
 }
 
 JSValue* BytecodeInterpreter::cti_op_is_boolean(CTI_ARGS) {

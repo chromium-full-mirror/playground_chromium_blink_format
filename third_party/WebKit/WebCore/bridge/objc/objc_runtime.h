@@ -111,8 +111,8 @@ class ObjcFallbackObjectImp : public JSObject {
     return exec->lexicalGlobalObject()->objectPrototype();
   }
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* prototype) {
-    return StructureID::create(prototype, TypeInfo(ObjectType));
+  static PassRefPtr<Structure> createStructure(JSValue* prototype) {
+    return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
  private:

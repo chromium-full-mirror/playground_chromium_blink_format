@@ -79,17 +79,17 @@ class JSString : public JSCell {
 
  public:
   JSString(JSGlobalData* globalData, const UString& value)
-      : JSCell(globalData->stringStructureID.get()), m_value(value) {
+      : JSCell(globalData->stringStructure.get()), m_value(value) {
     Heap::heap(this)->reportExtraMemoryCost(value.cost());
   }
 
   enum HasOtherOwnerType { HasOtherOwner };
   JSString(JSGlobalData* globalData, const UString& value, HasOtherOwnerType)
-      : JSCell(globalData->stringStructureID.get()), m_value(value) {}
+      : JSCell(globalData->stringStructure.get()), m_value(value) {}
   JSString(JSGlobalData* globalData,
            PassRefPtr<UString::Rep> value,
            HasOtherOwnerType)
-      : JSCell(globalData->stringStructureID.get()), m_value(value) {}
+      : JSCell(globalData->stringStructure.get()), m_value(value) {}
 
   const UString& value() const { return m_value; }
 
@@ -103,9 +103,8 @@ class JSString : public JSCell {
   }
   JSString* getIndex(JSGlobalData*, unsigned);
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
-    return StructureID::create(proto,
-                               TypeInfo(StringType, NeedsThisConversion));
+  static PassRefPtr<Structure> createStructure(JSValue* proto) {
+    return Structure::create(proto, TypeInfo(StringType, NeedsThisConversion));
   }
 
  private:

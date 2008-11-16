@@ -38,15 +38,15 @@ class InternalFunction : public JSObject {
 
   const UString& name(JSGlobalData*);
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
-    return StructureID::create(
+  static PassRefPtr<Structure> createStructure(JSValue* proto) {
+    return Structure::create(
         proto, TypeInfo(ObjectType,
                         ImplementsHasInstance | HasStandardGetOwnPropertySlot));
   }
 
  protected:
-  InternalFunction(PassRefPtr<StructureID> structure) : JSObject(structure) {}
-  InternalFunction(JSGlobalData*, PassRefPtr<StructureID>, const Identifier&);
+  InternalFunction(PassRefPtr<Structure> structure) : JSObject(structure) {}
+  InternalFunction(JSGlobalData*, PassRefPtr<Structure>, const Identifier&);
 
  private:
   virtual CallType getCallData(CallData&) = 0;

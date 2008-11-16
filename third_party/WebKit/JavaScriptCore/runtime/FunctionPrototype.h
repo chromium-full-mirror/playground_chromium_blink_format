@@ -28,12 +28,11 @@ namespace JSC {
 
 class FunctionPrototype : public InternalFunction {
  public:
-  FunctionPrototype(ExecState*, PassRefPtr<StructureID>);
-  void addFunctionProperties(ExecState*,
-                             StructureID* prototypeFunctionStructure);
+  FunctionPrototype(ExecState*, PassRefPtr<Structure>);
+  void addFunctionProperties(ExecState*, Structure* prototypeFunctionStructure);
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
-    return StructureID::create(
+  static PassRefPtr<Structure> createStructure(JSValue* proto) {
+    return Structure::create(
         proto, TypeInfo(ObjectType, HasStandardGetOwnPropertySlot));
   }
 

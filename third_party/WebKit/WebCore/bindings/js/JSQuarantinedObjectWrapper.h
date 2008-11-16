@@ -46,8 +46,8 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
 
   static const JSC::ClassInfo s_info;
 
-  static PassRefPtr<JSC::StructureID> createStructureID(JSC::JSValue* proto) {
-    return JSC::StructureID::create(
+  static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue* proto) {
+    return JSC::Structure::create(
         proto, JSC::TypeInfo(JSC::ObjectType, JSC::ImplementsHasInstance |
                                                   JSC::OverridesHasInstance));
   }
@@ -55,7 +55,7 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
  protected:
   JSQuarantinedObjectWrapper(JSC::ExecState* unwrappedExec,
                              JSC::JSObject* unwrappedObject,
-                             PassRefPtr<JSC::StructureID>);
+                             PassRefPtr<JSC::Structure>);
 
   virtual void mark();
 

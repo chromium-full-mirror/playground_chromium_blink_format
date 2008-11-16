@@ -81,20 +81,19 @@ class JSNumberCell : public JSCell {
 #endif
   }
 
-  static PassRefPtr<StructureID> createStructureID(JSValue* proto) {
-    return StructureID::create(proto,
-                               TypeInfo(NumberType, NeedsThisConversion));
+  static PassRefPtr<Structure> createStructure(JSValue* proto) {
+    return Structure::create(proto, TypeInfo(NumberType, NeedsThisConversion));
   }
 
   JSNumberCell(JSGlobalData* globalData)
-      : JSCell(globalData->numberStructureID.get()) {}
+      : JSCell(globalData->numberStructure.get()) {}
 
  private:
   JSNumberCell(JSGlobalData* globalData, double value)
-      : JSCell(globalData->numberStructureID.get()), m_value(value) {}
+      : JSCell(globalData->numberStructure.get()), m_value(value) {}
 
   JSNumberCell(ExecState* exec, double value)
-      : JSCell(exec->globalData().numberStructureID.get()), m_value(value) {}
+      : JSCell(exec->globalData().numberStructure.get()), m_value(value) {}
 
   virtual bool getUInt32(uint32_t&) const;
   virtual bool getTruncatedInt32(int32_t&) const;

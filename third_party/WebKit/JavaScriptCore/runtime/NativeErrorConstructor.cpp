@@ -36,7 +36,7 @@ const ClassInfo NativeErrorConstructor::info = {"Function",
 
 NativeErrorConstructor::NativeErrorConstructor(
     ExecState* exec,
-    PassRefPtr<StructureID> structure,
+    PassRefPtr<Structure> structure,
     NativeErrorPrototype* nativeErrorPrototype)
     : InternalFunction(
           &exec->globalData(),
@@ -44,7 +44,7 @@ NativeErrorConstructor::NativeErrorConstructor(
           Identifier(exec,
                      nativeErrorPrototype->getDirect(exec->propertyNames().name)
                          ->getString())),
-      m_errorStructure(ErrorInstance::createStructureID(nativeErrorPrototype)) {
+      m_errorStructure(ErrorInstance::createStructure(nativeErrorPrototype)) {
   putDirect(exec->propertyNames().length, jsNumber(exec, 1),
             DontDelete | ReadOnly | DontEnum);  // ECMA 15.11.7.5
   putDirect(exec->propertyNames().prototype, nativeErrorPrototype,

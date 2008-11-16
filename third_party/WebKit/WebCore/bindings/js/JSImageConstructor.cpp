@@ -35,7 +35,7 @@ const ClassInfo JSImageConstructor::s_info = {"ImageConstructor", 0, 0, 0};
 
 JSImageConstructor::JSImageConstructor(ExecState* exec,
                                        ScriptExecutionContext* context)
-    : DOMObject(JSImageConstructor::createStructureID(
+    : DOMObject(JSImageConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())) {
   ASSERT(context->isDocument());
   m_document = static_cast<JSDocument*>(

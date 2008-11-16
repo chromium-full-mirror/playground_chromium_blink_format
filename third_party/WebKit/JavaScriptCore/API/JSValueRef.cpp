@@ -143,7 +143,7 @@ bool JSValueIsInstanceOfConstructor(JSContextRef ctx,
 
   JSValue* jsValue = toJS(value);
   JSObject* jsConstructor = toJS(constructor);
-  if (!jsConstructor->structureID()->typeInfo().implementsHasInstance())
+  if (!jsConstructor->structure()->typeInfo().implementsHasInstance())
     return false;
   bool result = jsConstructor->hasInstance(
       exec, jsValue,

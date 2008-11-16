@@ -30,7 +30,7 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(BooleanConstructor);
 
 BooleanConstructor::BooleanConstructor(ExecState* exec,
-                                       PassRefPtr<StructureID> structure,
+                                       PassRefPtr<Structure> structure,
                                        BooleanPrototype* booleanPrototype)
     : InternalFunction(
           &exec->globalData(),

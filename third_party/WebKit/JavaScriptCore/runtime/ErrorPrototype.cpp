@@ -38,8 +38,8 @@ static JSValue* errorProtoFuncToString(ExecState*,
 
 // ECMA 15.9.4
 ErrorPrototype::ErrorPrototype(ExecState* exec,
-                               PassRefPtr<StructureID> structure,
-                               StructureID* prototypeFunctionStructure)
+                               PassRefPtr<Structure> structure,
+                               Structure* prototypeFunctionStructure)
     : ErrorInstance(structure) {
   // The constructor will be added later in ErrorConstructor's constructor
 

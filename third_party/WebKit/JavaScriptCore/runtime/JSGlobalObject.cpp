@@ -83,7 +83,7 @@ static inline void markIfNeeded(JSValue* v) {
     v->mark();
 }
 
-static inline void markIfNeeded(const RefPtr<StructureID>& s) {
+static inline void markIfNeeded(const RefPtr<Structure>& s) {
   if (s)
     s->mark();
 }
@@ -203,72 +203,71 @@ void JSGlobalObject::reset(JSValue* prototype) {
   // Prototypes
 
   d()->functionPrototype = new (exec) FunctionPrototype(
-      exec, FunctionPrototype::createStructureID(jsNull()));  // The real
-                                                              // prototype will
-                                                              // be set once
-                                                              // ObjectPrototype
-                                                              // is created.
+      exec, FunctionPrototype::createStructure(jsNull()));  // The real
+                                                            // prototype will be
+                                                            // set once
+                                                            // ObjectPrototype
+                                                            // is created.
   d()->prototypeFunctionStructure =
-      PrototypeFunction::createStructureID(d()->functionPrototype);
+      PrototypeFunction::createStructure(d()->functionPrototype);
   d()->functionPrototype->addFunctionProperties(
       exec, d()->prototypeFunctionStructure.get());
   d()->objectPrototype = new (exec)
-      ObjectPrototype(exec, ObjectPrototype::createStructureID(jsNull()),
+      ObjectPrototype(exec, ObjectPrototype::createStructure(jsNull()),
                       d()->prototypeFunctionStructure.get());
-  d()->functionPrototype->structureID()->setPrototypeWithoutTransition(
+  d()->functionPrototype->structure()->setPrototypeWithoutTransition(
       d()->objectPrototype);
 
   d()->emptyObjectStructure = d()->objectPrototype->inheritorID();
 
-  d()->functionStructure =
-      JSFunction::createStructureID(d()->functionPrototype);
+  d()->functionStructure = JSFunction::createStructure(d()->functionPrototype);
   d()->callbackFunctionStructure =
-      JSCallbackFunction::createStructureID(d()->functionPrototype);
-  d()->argumentsStructure = Arguments::createStructureID(d()->objectPrototype);
+      JSCallbackFunction::createStructure(d()->functionPrototype);
+  d()->argumentsStructure = Arguments::createStructure(d()->objectPrototype);
   d()->callbackConstructorStructure =
-      JSCallbackConstructor::createStructureID(d()->objectPrototype);
+      JSCallbackConstructor::createStructure(d()->objectPrototype);
   d()->callbackObjectStructure =
-      JSCallbackObject<JSObject>::createStructureID(d()->objectPrototype);
+      JSCallbackObject<JSObject>::createStructure(d()->objectPrototype);
 
   d()->arrayPrototype = new (exec)
-      ArrayPrototype(ArrayPrototype::createStructureID(d()->objectPrototype));
-  d()->arrayStructure = JSArray::createStructureID(d()->arrayPrototype);
+      ArrayPrototype(ArrayPrototype::createStructure(d()->objectPrototype));
+  d()->arrayStructure = JSArray::createStructure(d()->arrayPrototype);
   d()->regExpMatchesArrayStructure =
-      RegExpMatchesArray::createStructureID(d()->arrayPrototype);
+      RegExpMatchesArray::createStructure(d()->arrayPrototype);
 
   d()->stringPrototype = new (exec) StringPrototype(
-      exec, StringPrototype::createStructureID(d()->objectPrototype));
+      exec, StringPrototype::createStructure(d()->objectPrototype));
   d()->stringObjectStructure =
-      StringObject::createStructureID(d()->stringPrototype);
+      StringObject::createStructure(d()->stringPrototype);
 
   d()->booleanPrototype = new (exec) BooleanPrototype(
-      exec, BooleanPrototype::createStructureID(d()->objectPrototype),
+      exec, BooleanPrototype::createStructure(d()->objectPrototype),
       d()->prototypeFunctionStructure.get());
   d()->booleanObjectStructure =
-      BooleanObject::createStructureID(d()->booleanPrototype);
+      BooleanObject::createStructure(d()->booleanPrototype);
 
   d()->numberPrototype = new (exec) NumberPrototype(
-      exec, NumberPrototype::createStructureID(d()->objectPrototype),
+      exec, NumberPrototype::createStructure(d()->objectPrototype),
       d()->prototypeFunctionStructure.get());
   d()->numberObjectStructure =
-      NumberObject::createStructureID(d()->numberPrototype);
+      NumberObject::createStructure(d()->numberPrototype);
 
-  d()->datePrototype = new (exec) DatePrototype(
-      exec, DatePrototype::createStructureID(d()->objectPrototype));
-  d()->dateStructure = DateInstance::createStructureID(d()->datePrototype);
+  d()->datePrototype = new (exec)
+      DatePrototype(exec, DatePrototype::createStructure(d()->objectPrototype));
+  d()->dateStructure = DateInstance::createStructure(d()->datePrototype);
 
   d()->regExpPrototype = new (exec) RegExpPrototype(
-      exec, RegExpPrototype::createStructureID(d()->objectPrototype),
+      exec, RegExpPrototype::createStructure(d()->objectPrototype),
       d()->prototypeFunctionStructure.get());
-  d()->regExpStructure = RegExpObject::createStructureID(d()->regExpPrototype);
+  d()->regExpStructure = RegExpObject::createStructure(d()->regExpPrototype);
 
   ErrorPrototype* errorPrototype = new (exec) ErrorPrototype(
-      exec, ErrorPrototype::createStructureID(d()->objectPrototype),
+      exec, ErrorPrototype::createStructure(d()->objectPrototype),
       d()->prototypeFunctionStructure.get());
-  d()->errorStructure = ErrorInstance::createStructureID(errorPrototype);
+  d()->errorStructure = ErrorInstance::createStructure(errorPrototype);
 
-  RefPtr<StructureID> nativeErrorPrototypeStructure =
-      NativeErrorPrototype::createStructureID(errorPrototype);
+  RefPtr<Structure> nativeErrorPrototypeStructure =
+      NativeErrorPrototype::createStructure(errorPrototype);
 
   NativeErrorPrototype* evalErrorPrototype = new (exec) NativeErrorPrototype(
       exec, nativeErrorPrototypeStructure, "EvalError", "EvalError");
@@ -287,37 +286,37 @@ void JSGlobalObject::reset(JSValue* prototype) {
   // Constructors
 
   JSValue* objectConstructor = new (exec) ObjectConstructor(
-      exec, ObjectConstructor::createStructureID(d()->functionPrototype),
+      exec, ObjectConstructor::createStructure(d()->functionPrototype),
       d()->objectPrototype);
   JSValue* functionConstructor = new (exec) FunctionConstructor(
-      exec, FunctionConstructor::createStructureID(d()->functionPrototype),
+      exec, FunctionConstructor::createStructure(d()->functionPrototype),
       d()->functionPrototype);
   JSValue* arrayConstructor = new (exec) ArrayConstructor(
-      exec, ArrayConstructor::createStructureID(d()->functionPrototype),
+      exec, ArrayConstructor::createStructure(d()->functionPrototype),
       d()->arrayPrototype);
   JSValue* stringConstructor = new (exec) StringConstructor(
-      exec, StringConstructor::createStructureID(d()->functionPrototype),
+      exec, StringConstructor::createStructure(d()->functionPrototype),
       d()->prototypeFunctionStructure.get(), d()->stringPrototype);
   JSValue* booleanConstructor = new (exec) BooleanConstructor(
-      exec, BooleanConstructor::createStructureID(d()->functionPrototype),
+      exec, BooleanConstructor::createStructure(d()->functionPrototype),
       d()->booleanPrototype);
   JSValue* numberConstructor = new (exec) NumberConstructor(
-      exec, NumberConstructor::createStructureID(d()->functionPrototype),
+      exec, NumberConstructor::createStructure(d()->functionPrototype),
       d()->numberPrototype);
   JSValue* dateConstructor = new (exec) DateConstructor(
-      exec, DateConstructor::createStructureID(d()->functionPrototype),
+      exec, DateConstructor::createStructure(d()->functionPrototype),
       d()->prototypeFunctionStructure.get(), d()->datePrototype);
 
   d()->regExpConstructor = new (exec) RegExpConstructor(
-      exec, RegExpConstructor::createStructureID(d()->functionPrototype),
+      exec, RegExpConstructor::createStructure(d()->functionPrototype),
       d()->regExpPrototype);
 
   d()->errorConstructor = new (exec) ErrorConstructor(
-      exec, ErrorConstructor::createStructureID(d()->functionPrototype),
+      exec, ErrorConstructor::createStructure(d()->functionPrototype),
       errorPrototype);
 
-  RefPtr<StructureID> nativeErrorStructure =
-      NativeErrorConstructor::createStructureID(d()->functionPrototype);
+  RefPtr<Structure> nativeErrorStructure =
+      NativeErrorConstructor::createStructure(d()->functionPrototype);
 
   d()->evalErrorConstructor = new (exec)
       NativeErrorConstructor(exec, nativeErrorStructure, evalErrorPrototype);
@@ -404,7 +403,7 @@ void JSGlobalObject::reset(JSValue* prototype) {
       GlobalPropertyInfo(
           Identifier(exec, "Math"),
           new (exec) MathObject(
-              exec, MathObject::createStructureID(d()->objectPrototype)),
+              exec, MathObject::createStructure(d()->objectPrototype)),
           DontEnum | DontDelete),
       GlobalPropertyInfo(Identifier(exec, "NaN"), jsNaN(exec),
                          DontEnum | DontDelete),
@@ -419,7 +418,7 @@ void JSGlobalObject::reset(JSValue* prototype) {
   // Set global functions.
 
   d()->evalFunction = new (exec) GlobalEvalFunction(
-      exec, GlobalEvalFunction::createStructureID(d()->functionPrototype), 1,
+      exec, GlobalEvalFunction::createStructure(d()->functionPrototype), 1,
       exec->propertyNames().eval, globalFuncEval, this);
   putDirectFunctionWithoutTransition(exec, d()->evalFunction, DontEnum);
   putDirectFunctionWithoutTransition(

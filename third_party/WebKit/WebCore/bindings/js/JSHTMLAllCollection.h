@@ -35,12 +35,12 @@ class HTMLCollection;
 
 class JSHTMLAllCollection : public JSHTMLCollection {
  public:
-  JSHTMLAllCollection(PassRefPtr<JSC::StructureID> structure,
+  JSHTMLAllCollection(PassRefPtr<JSC::Structure> structure,
                       PassRefPtr<HTMLCollection> collection)
       : JSHTMLCollection(structure, collection) {}
 
-  static PassRefPtr<JSC::StructureID> createStructureID(JSC::JSValue* proto) {
-    return JSC::StructureID::create(
+  static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue* proto) {
+    return JSC::Structure::create(
         proto, JSC::TypeInfo(JSC::ObjectType, JSC::MasqueradesAsUndefined));
   }
 

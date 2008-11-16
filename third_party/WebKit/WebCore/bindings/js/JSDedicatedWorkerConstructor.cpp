@@ -43,7 +43,7 @@ const ClassInfo JSDedicatedWorkerConstructor::s_info = {
     "DedicatedWorkerConstructor", 0, 0, 0};
 
 JSDedicatedWorkerConstructor::JSDedicatedWorkerConstructor(ExecState* exec)
-    : DOMObject(JSDedicatedWorkerConstructor::createStructureID(
+    : DOMObject(JSDedicatedWorkerConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())) {
   putDirect(exec->propertyNames().length, jsNumber(exec, 1),
             ReadOnly | DontDelete | DontEnum);

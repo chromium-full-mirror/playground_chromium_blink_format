@@ -48,7 +48,7 @@ static JSValue* functionProtoFuncCall(ExecState*,
                                       const ArgList&);
 
 FunctionPrototype::FunctionPrototype(ExecState* exec,
-                                     PassRefPtr<StructureID> structure)
+                                     PassRefPtr<Structure> structure)
     : InternalFunction(&exec->globalData(),
                        structure,
                        exec->propertyNames().nullIdentifier) {
@@ -58,7 +58,7 @@ FunctionPrototype::FunctionPrototype(ExecState* exec,
 
 void FunctionPrototype::addFunctionProperties(
     ExecState* exec,
-    StructureID* prototypeFunctionStructure) {
+    Structure* prototypeFunctionStructure) {
   putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().toString,

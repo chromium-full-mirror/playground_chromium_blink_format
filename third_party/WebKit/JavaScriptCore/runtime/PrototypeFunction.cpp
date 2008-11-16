@@ -49,7 +49,7 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
 
 PrototypeFunction::PrototypeFunction(
     ExecState* exec,
-    PassRefPtr<StructureID> prototypeFunctionStructure,
+    PassRefPtr<Structure> prototypeFunctionStructure,
     int length,
     const Identifier& name,
     NativeFunction function)

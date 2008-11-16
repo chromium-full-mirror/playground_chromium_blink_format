@@ -48,7 +48,7 @@ inline JSCallbackObject<Base>* JSCallbackObject<Base>::asCallbackObject(
 
 template <class Base>
 JSCallbackObject<Base>::JSCallbackObject(ExecState* exec,
-                                         PassRefPtr<StructureID> structure,
+                                         PassRefPtr<Structure> structure,
                                          JSClassRef jsClass,
                                          void* data)
     : Base(structure),

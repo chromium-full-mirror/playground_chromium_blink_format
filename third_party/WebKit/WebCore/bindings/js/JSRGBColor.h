@@ -45,9 +45,8 @@ class JSRGBColor : public DOMObject {
     return exec->lexicalGlobalObject()->objectPrototype();
   }
 
-  static PassRefPtr<JSC::StructureID> createStructureID(
-      JSC::JSValue* prototype) {
-    return JSC::StructureID::create(prototype, JSC::TypeInfo(JSC::ObjectType));
+  static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue* prototype) {
+    return JSC::Structure::create(prototype, JSC::TypeInfo(JSC::ObjectType));
   }
 
  private:

@@ -33,7 +33,7 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(ArrayConstructor);
 
 ArrayConstructor::ArrayConstructor(ExecState* exec,
-                                   PassRefPtr<StructureID> structure,
+                                   PassRefPtr<Structure> structure,
                                    ArrayPrototype* arrayPrototype)
     : InternalFunction(
           &exec->globalData(),

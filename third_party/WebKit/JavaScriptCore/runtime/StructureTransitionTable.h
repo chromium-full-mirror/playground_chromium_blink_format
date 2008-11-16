@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef StructureIDTransitionTable_h
-#define StructureIDTransitionTable_h
+#ifndef StructureTransitionTable_h
+#define StructureTransitionTable_h
 
 #include "UString.h"
 #include <wtf/HashFunctions.h>
@@ -34,9 +34,9 @@
 
 namespace JSC {
 
-class StructureID;
+class Structure;
 
-struct StructureIDTransitionTableHash {
+struct StructureTransitionTableHash {
   typedef std::pair<RefPtr<UString::Rep>, unsigned> Key;
   static unsigned hash(const Key& p) { return p.first->computedHash(); }
 
@@ -45,7 +45,7 @@ struct StructureIDTransitionTableHash {
   static const bool safeToCompareToEmptyOrDeleted = true;
 };
 
-struct StructureIDTransitionTableHashTraits {
+struct StructureTransitionTableHashTraits {
   typedef WTF::HashTraits<RefPtr<UString::Rep>> FirstTraits;
   typedef WTF::GenericHashTraits<unsigned> SecondTraits;
   typedef std::pair<FirstTraits::TraitType, SecondTraits::TraitType> TraitType;
@@ -68,12 +68,12 @@ struct StructureIDTransitionTableHashTraits {
   }
 };
 
-typedef HashMap<StructureIDTransitionTableHash::Key,
-                StructureID*,
-                StructureIDTransitionTableHash,
-                StructureIDTransitionTableHashTraits>
-    StructureIDTransitionTable;
+typedef HashMap<StructureTransitionTableHash::Key,
+                Structure*,
+                StructureTransitionTableHash,
+                StructureTransitionTableHashTraits>
+    StructureTransitionTable;
 
 }  // namespace JSC
 
-#endif  // StructureIDTransitionTable_h
+#endif  // StructureTransitionTable_h

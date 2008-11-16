@@ -34,16 +34,16 @@
 
 class JSGlueGlobalObject : public JSGlobalObject {
  public:
-  JSGlueGlobalObject(PassRefPtr<StructureID>, JSFlags = kJSFlagNone);
+  JSGlueGlobalObject(PassRefPtr<Structure>, JSFlags = kJSFlagNone);
 
   JSFlags Flags() const { return d()->flags; }
-  StructureID* userObjectStructure() const {
+  Structure* userObjectStructure() const {
     return d()->userObjectStructure.get();
   }
 
  private:
   struct Data : JSGlobalObjectData {
-    RefPtr<StructureID> userObjectStructure;
+    RefPtr<Structure> userObjectStructure;
     JSFlags flags;
   };
 

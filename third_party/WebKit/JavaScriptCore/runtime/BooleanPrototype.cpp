@@ -44,8 +44,8 @@ static JSValue* booleanProtoFuncValueOf(ExecState*,
 // ECMA 15.6.4
 
 BooleanPrototype::BooleanPrototype(ExecState* exec,
-                                   PassRefPtr<StructureID> structure,
-                                   StructureID* prototypeFunctionStructure)
+                                   PassRefPtr<Structure> structure,
+                                   Structure* prototypeFunctionStructure)
     : BooleanObject(structure) {
   setInternalValue(jsBoolean(false));
 
