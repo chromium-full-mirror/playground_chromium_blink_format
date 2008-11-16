@@ -22,8 +22,8 @@
 
 #include "config.h"
 
-#include "Completion.h"
 #include "CodeGenerator.h"
+#include "Completion.h"
 #include "InitializeThreading.h"
 #include "Interpreter.h"
 #include "JSArray.h"
@@ -32,6 +32,7 @@
 #include "SamplingTool.h"
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #if !PLATFORM(WIN_OS)
@@ -64,6 +65,7 @@
 using namespace JSC;
 using namespace WTF;
 
+static void cleanupGlobalData(JSGlobalData*);
 static bool fillBufferWithContentsOfFile(const UString& fileName,
                                          Vector<char>& buffer);
 
@@ -289,14 +291,8 @@ JSValue* functionReadline(ExecState* exec,
 }
 
 JSValue* functionQuit(ExecState* exec, JSObject*, JSValue*, const ArgList&) {
-  {
-    JSLock lock(false);
-    JSGlobalData& globalData = exec->globalData();
-    globalData.heap.destroy();
-    globalData.deref();
-  }
-
-  exit(0);
+  cleanupGlobalData(&exec->globalData());
+  exit(EXIT_SUCCESS);
 #if !COMPILER(MSVC)
   // MSVC knows that exit(0) never returns, so it flags this return statement as
   // unreachable.
@@ -344,12 +340,14 @@ int main(int argc, char** argv) {
   TRY res = jscmain(argc, argv, globalData);
   EXCEPT(res = 3)
 
-  JSLock::lock(false);
-  globalData->heap.destroy();
-  JSLock::unlock(false);
-
-  globalData->deref();
+  cleanupGlobalData(globalData);
   return res;
+}
+
+static void cleanupGlobalData(JSGlobalData* globalData) {
+  JSLock lock(false);
+  globalData->heap.destroy();
+  globalData->deref();
 }
 
 static bool runWithScripts(GlobalObject* globalObject,
@@ -456,7 +454,7 @@ static void printUsageStatement() {
   fprintf(stderr,
           "  -s         Installs signal handlers that exit on a crash (Unix "
           "platforms only)\n");
-  exit(-1);
+  exit(EXIT_FAILURE);
 }
 
 static void parseArguments(int argc, char** argv, Options& options) {
