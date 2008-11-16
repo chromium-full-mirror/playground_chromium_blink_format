@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008 Apple Inc. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,32 +20,27 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ *
  */
 
-#ifndef JSDedicatedWorkerConstructor_h
-#define JSDedicatedWorkerConstructor_h
+module threads {
 
-#if ENABLE(WORKERS)
+    interface [CustomMarkFunction, Conditional=WORKERS] Worker {
 
-#include "JSDOMBinding.h"
+        attribute EventListener onerror;
+        attribute EventListener onmessage;
+        void postMessage(in DOMString message);
 
-namespace WebCore {
+        // EventTarget interface
+        [Custom] void addEventListener(in DOMString type, 
+                                       in EventListener listener, 
+                                       in boolean useCapture);
+        [Custom] void removeEventListener(in DOMString type, 
+                                          in EventListener listener, 
+                                          in boolean useCapture);
+        boolean dispatchEvent(in Event evt)
+            raises(EventException);
+    };
 
-class JSDedicatedWorkerConstructor : public DOMObject {
- public:
-  JSDedicatedWorkerConstructor(JSC::ExecState*);
-
-  static const JSC::ClassInfo s_info;
-
- private:
-  virtual JSC::ConstructType getConstructData(JSC::ConstructData&);
-
-  virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
-};
-
-}  // namespace WebCore
-
-#endif  // ENABLE(WORKERS)
-
-#endif  // JSDedicatedWorkerConstructor_h
+}

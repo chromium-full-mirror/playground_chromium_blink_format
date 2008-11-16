@@ -45,6 +45,7 @@ class MessagePort;
 class RegisteredEventListener;
 class ScriptExecutionContext;
 class SVGElementInstance;
+class Worker;
 class WorkerContext;
 class XMLHttpRequest;
 class XMLHttpRequestUpload;
@@ -69,6 +70,7 @@ class EventTarget {
   virtual SVGElementInstance* toSVGElementInstance();
 #endif
 #if ENABLE(WORKERS)
+  virtual Worker* toWorker();
   virtual WorkerContext* toWorkerContext();
 #endif
 

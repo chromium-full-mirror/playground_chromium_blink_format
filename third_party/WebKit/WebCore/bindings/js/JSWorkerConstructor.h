@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,24 +20,32 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
- *
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-module threads {
+#ifndef JSWorkerConstructor_h
+#define JSWorkerConstructor_h
 
-    interface [CustomMarkFunction, Conditional=WORKERS] DedicatedWorker {
+#if ENABLE(WORKERS)
 
-        // These also used for shared workers.
-        attribute EventListener onclose;
-        attribute EventListener onerror;
+#include "JSDOMBinding.h"
 
-        // These are only for dedicated workers.
-        attribute EventListener onmessage;
-        [Custom] MessagePort connect(in DOMString message);
-        void close();
-        void postMessage(in DOMString message, in [Optional] MessagePort port);
+namespace WebCore {
 
-    };
+class JSWorkerConstructor : public DOMObject {
+ public:
+  JSWorkerConstructor(JSC::ExecState*);
 
-}
+  static const JSC::ClassInfo s_info;
+
+ private:
+  virtual JSC::ConstructType getConstructData(JSC::ConstructData&);
+
+  virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
+};
+
+}  // namespace WebCore
+
+#endif  // ENABLE(WORKERS)
+
+#endif  // JSWorkerConstructor_h

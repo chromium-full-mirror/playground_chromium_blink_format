@@ -73,6 +73,8 @@ class WorkerContext : public RefCounted<WorkerContext>,
 
   virtual WorkerContext* toWorkerContext() { return this; }
 
+  void postMessage(const String& message);
+
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,
                                 bool useCapture);
@@ -81,10 +83,10 @@ class WorkerContext : public RefCounted<WorkerContext>,
                                    bool useCapture);
   virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
 
-  void setOnconnect(PassRefPtr<EventListener> eventListener) {
-    m_onconnectListener = eventListener;
+  void setOnmessage(PassRefPtr<EventListener> eventListener) {
+    m_onmessageListener = eventListener;
   }
-  EventListener* onconnect() const { return m_onconnectListener.get(); }
+  EventListener* onmessage() const { return m_onmessageListener.get(); }
 
   typedef Vector<RefPtr<EventListener>> ListenerVector;
   typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
@@ -110,7 +112,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
   WorkerScriptController m_script;
   WorkerThread* m_thread;
 
-  RefPtr<EventListener> m_onconnectListener;
+  RefPtr<EventListener> m_onmessageListener;
   EventListenersMap m_eventListeners;
 };
 
