@@ -4360,6 +4360,10 @@ PassRefPtr<HistoryItem> FrameLoader::createHistoryItem(bool useOriginal) {
       HistoryItem::create(url, m_frame->tree()->name(), parent, title);
   item->setOriginalURLString(originalURL.string());
 
+  if (!unreachableURL.isEmpty() || !docLoader ||
+      docLoader->response().httpStatusCode() >= 400)
+    item->setLastVisitWasFailure(true);
+
   // Save form state if this is a POST
   if (docLoader) {
     if (useOriginal)
