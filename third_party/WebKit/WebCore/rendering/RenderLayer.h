@@ -255,9 +255,9 @@ class RenderLayer : public ScrollbarClient {
   int horizontalScrollbarHeight() const;
 
   void positionOverflowControls(int tx, int ty);
-  bool isPointInResizeControl(const IntPoint&);
+  bool isPointInResizeControl(const IntPoint& absolutePoint) const;
   bool hitTestOverflowControls(HitTestResult&);
-  IntSize offsetFromResizeCorner(const IntPoint&) const;
+  IntSize offsetFromResizeCorner(const IntPoint& absolutePoint) const;
 
   void paintOverflowControls(GraphicsContext*,
                              int tx,
@@ -433,6 +433,10 @@ class RenderLayer : public ScrollbarClient {
   bool paintingInsideReflection() const { return m_paintingInsideReflection; }
 
   RenderLayer* enclosingTransformedAncestor() const;
+
+  // Convert a point in absolute coords into layer coords, taking transforms
+  // into account
+  IntPoint absoluteToContents(const IntPoint&) const;
 
   void updateScrollCornerStyle();
   void updateResizerStyle();
