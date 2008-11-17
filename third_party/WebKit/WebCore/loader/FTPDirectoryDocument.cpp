@@ -341,15 +341,15 @@ void FTPDirectoryTokenizer::parseAndAppendOneLine(const String& inputLine) {
               result.type == FTPDirectoryEntry);
 }
 
-static inline SharedBuffer* createTemplateDocumentData(Settings* settings) {
-  SharedBuffer* buffer = 0;
+static inline PassRefPtr<SharedBuffer> createTemplateDocumentData(
+    Settings* settings) {
+  RefPtr<SharedBuffer> buffer = 0;
   if (settings)
     buffer = SharedBuffer::createWithContentsOfFile(
-                 settings->ftpDirectoryTemplatePath())
-                 .releaseRef();
+        settings->ftpDirectoryTemplatePath());
   if (buffer)
     LOG(FTP, "Loaded FTPDirectoryTemplate of length %i\n", buffer->size());
-  return buffer;
+  return buffer.release();
 }
 
 bool FTPDirectoryTokenizer::loadDocumentTemplate() {
