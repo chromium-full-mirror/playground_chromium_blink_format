@@ -20,10 +20,8 @@
  *
  */
 
-#ifndef ExecState_h
-#define ExecState_h
-
-// FIXME: Rename this file to CallFrame.h.
+#ifndef CallFrame_h
+#define CallFrame_h
 
 #include "JSGlobalData.h"
 #include "RegisterFile.h"
@@ -201,4 +199,4 @@ class ExecState : private Register {
 
 }  // namespace JSC
 
-#endif  // ExecState_h
+#endif  // CallFrame_h
