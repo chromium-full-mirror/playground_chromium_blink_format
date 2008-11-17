@@ -40,7 +40,7 @@ static const unsigned NeedsThisConversion = 1 << 3;
 static const unsigned HasStandardGetOwnPropertySlot = 1 << 4;
 
 class TypeInfo {
-  friend class CTI;
+  friend class JIT;
 
  public:
   TypeInfo(JSType type, unsigned flags = 0) : m_type(type), m_flags(flags) {}

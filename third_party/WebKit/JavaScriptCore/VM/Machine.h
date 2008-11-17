@@ -104,7 +104,7 @@ enum DebugHookID {
 enum { MaxReentryDepth = 128 };
 
 class Interpreter {
-  friend class CTI;
+  friend class JIT;
 
  public:
   Interpreter();

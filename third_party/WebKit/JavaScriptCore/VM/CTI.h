@@ -225,7 +225,7 @@ void ctiVMThrowTrampoline();
 void ctiSetReturnAddress(void** where, void* what);
 void ctiRepatchCallByReturnAddress(void* where, void* what);
 
-class CTI {
+class JIT {
   typedef X86Assembler::RegisterID RegisterID;
   typedef X86Assembler::XMMRegisterID XMMRegisterID;
   typedef X86Assembler::JmpSrc JmpSrc;
@@ -265,8 +265,8 @@ class CTI {
 
  public:
   static void compile(JSGlobalData* globalData, CodeBlock* codeBlock) {
-    CTI cti(globalData, codeBlock);
-    cti.privateCompile();
+    JIT jit(globalData, codeBlock);
+    jit.privateCompile();
   }
 
   static void compileGetByIdSelf(JSGlobalData* globalData,
@@ -274,8 +274,8 @@ class CTI {
                                  Structure* structure,
                                  size_t cachedOffset,
                                  void* returnAddress) {
-    CTI cti(globalData, codeBlock);
-    cti.privateCompileGetByIdSelf(structure, cachedOffset, returnAddress);
+    JIT jit(globalData, codeBlock);
+    jit.privateCompileGetByIdSelf(structure, cachedOffset, returnAddress);
   }
 
   static void compileGetByIdProto(JSGlobalData* globalData,
@@ -285,8 +285,8 @@ class CTI {
                                   Structure* prototypeStructure,
                                   size_t cachedOffset,
                                   void* returnAddress) {
-    CTI cti(globalData, codeBlock);
-    cti.privateCompileGetByIdProto(structure, prototypeStructure, cachedOffset,
+    JIT jit(globalData, codeBlock);
+    jit.privateCompileGetByIdProto(structure, prototypeStructure, cachedOffset,
                                    returnAddress, callFrame);
   }
 
@@ -298,8 +298,8 @@ class CTI {
                                   size_t count,
                                   size_t cachedOffset,
                                   void* returnAddress) {
-    CTI cti(globalData, codeBlock);
-    cti.privateCompileGetByIdChain(structure, chain, count, cachedOffset,
+    JIT jit(globalData, codeBlock);
+    jit.privateCompileGetByIdChain(structure, chain, count, cachedOffset,
                                    returnAddress, callFrame);
   }
 
@@ -308,8 +308,8 @@ class CTI {
                                     Structure* structure,
                                     size_t cachedOffset,
                                     void* returnAddress) {
-    CTI cti(globalData, codeBlock);
-    cti.privateCompilePutByIdReplace(structure, cachedOffset, returnAddress);
+    JIT jit(globalData, codeBlock);
+    jit.privateCompilePutByIdReplace(structure, cachedOffset, returnAddress);
   }
 
   static void compilePutByIdTransition(JSGlobalData* globalData,
@@ -319,14 +319,14 @@ class CTI {
                                        size_t cachedOffset,
                                        StructureChain* chain,
                                        void* returnAddress) {
-    CTI cti(globalData, codeBlock);
-    cti.privateCompilePutByIdTransition(oldStructure, newStructure,
+    JIT jit(globalData, codeBlock);
+    jit.privateCompilePutByIdTransition(oldStructure, newStructure,
                                         cachedOffset, chain, returnAddress);
   }
 
   static void compileCTIMachineTrampolines(JSGlobalData* globalData) {
-    CTI cti(globalData);
-    cti.privateCompileCTIMachineTrampolines();
+    JIT jit(globalData);
+    jit.privateCompileCTIMachineTrampolines();
   }
   static void freeCTIMachineTrampolines(Interpreter*);
 
@@ -342,8 +342,8 @@ class CTI {
   static void compilePatchGetArrayLength(JSGlobalData* globalData,
                                          CodeBlock* codeBlock,
                                          void* returnAddress) {
-    CTI cti(globalData, codeBlock);
-    return cti.privateCompilePatchGetArrayLength(returnAddress);
+    JIT jit(globalData, codeBlock);
+    return jit.privateCompilePatchGetArrayLength(returnAddress);
   }
 
   static void linkCall(JSFunction* callee,
@@ -363,7 +363,7 @@ class CTI {
   }
 
  private:
-  CTI(JSGlobalData*, CodeBlock* = 0);
+  JIT(JSGlobalData*, CodeBlock* = 0);
 
   void privateCompileMainPass();
   void privateCompileLinkPass();

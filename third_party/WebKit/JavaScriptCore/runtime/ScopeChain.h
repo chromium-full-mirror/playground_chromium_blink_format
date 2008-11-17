@@ -146,7 +146,7 @@ inline ScopeChainIterator ScopeChainNode::end() const {
 class NoScopeChain {};
 
 class ScopeChain {
-  friend class CTI;
+  friend class JIT;
 
  public:
   ScopeChain(NoScopeChain) : m_node(0) {}

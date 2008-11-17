@@ -184,12 +184,12 @@ static ALWAYS_INLINE uintptr_t asInteger(JSValue* value) {
   return reinterpret_cast<uintptr_t>(value);
 }
 
-ALWAYS_INLINE void CTI::killLastResultRegister() {
+ALWAYS_INLINE void JIT::killLastResultRegister() {
   m_lastResultBytecodeRegister = std::numeric_limits<int>::max();
 }
 
 // get arg puts an arg from the SF register array into a h/w register
-ALWAYS_INLINE void CTI::emitGetVirtualRegister(
+ALWAYS_INLINE void JIT::emitGetVirtualRegister(
     int src,
     RegisterID dst,
     unsigned currentInstructionIndex) {
@@ -227,7 +227,7 @@ ALWAYS_INLINE void CTI::emitGetVirtualRegister(
   killLastResultRegister();
 }
 
-ALWAYS_INLINE void CTI::emitGetVirtualRegisters(int src1,
+ALWAYS_INLINE void JIT::emitGetVirtualRegisters(int src1,
                                                 RegisterID dst1,
                                                 int src2,
                                                 RegisterID dst2,
@@ -243,7 +243,7 @@ ALWAYS_INLINE void CTI::emitGetVirtualRegisters(int src1,
 
 // get arg puts an arg from the SF register array onto the stack, as an arg to a
 // context threaded function.
-ALWAYS_INLINE void CTI::emitPutCTIArgFromVirtualRegister(unsigned src,
+ALWAYS_INLINE void JIT::emitPutCTIArgFromVirtualRegister(unsigned src,
                                                          unsigned offset,
                                                          RegisterID scratch) {
   if (m_codeBlock->isConstantRegisterIndex(src)) {
@@ -258,19 +258,19 @@ ALWAYS_INLINE void CTI::emitPutCTIArgFromVirtualRegister(unsigned src,
 }
 
 // puts an arg onto the stack, as an arg to a context threaded function.
-ALWAYS_INLINE void CTI::emitPutCTIArg(RegisterID src, unsigned offset) {
+ALWAYS_INLINE void JIT::emitPutCTIArg(RegisterID src, unsigned offset) {
   __ movl_rm(src, offset + sizeof(void*), X86::esp);
 }
 
-ALWAYS_INLINE void CTI::emitGetCTIArg(unsigned offset, RegisterID dst) {
+ALWAYS_INLINE void JIT::emitGetCTIArg(unsigned offset, RegisterID dst) {
   __ movl_mr(offset + sizeof(void*), X86::esp, dst);
 }
 
-ALWAYS_INLINE void CTI::emitPutCTIArgConstant(unsigned value, unsigned offset) {
+ALWAYS_INLINE void JIT::emitPutCTIArgConstant(unsigned value, unsigned offset) {
   __ movl_i32m(value, offset + sizeof(void*), X86::esp);
 }
 
-ALWAYS_INLINE JSValue* CTI::getConstantImmediateNumericArg(unsigned src) {
+ALWAYS_INLINE JSValue* JIT::getConstantImmediateNumericArg(unsigned src) {
   if (m_codeBlock->isConstantRegisterIndex(src)) {
     JSValue* value = m_codeBlock->getConstant(src);
     return JSImmediate::isNumber(value) ? value : noValue();
@@ -278,41 +278,41 @@ ALWAYS_INLINE JSValue* CTI::getConstantImmediateNumericArg(unsigned src) {
   return noValue();
 }
 
-ALWAYS_INLINE void CTI::emitPutCTIParam(void* value, unsigned name) {
+ALWAYS_INLINE void JIT::emitPutCTIParam(void* value, unsigned name) {
   __ movl_i32m(reinterpret_cast<intptr_t>(value), name * sizeof(void*),
                X86::esp);
 }
 
-ALWAYS_INLINE void CTI::emitPutCTIParam(RegisterID from, unsigned name) {
+ALWAYS_INLINE void JIT::emitPutCTIParam(RegisterID from, unsigned name) {
   __ movl_rm(from, name * sizeof(void*), X86::esp);
 }
 
-ALWAYS_INLINE void CTI::emitGetCTIParam(unsigned name, RegisterID to) {
+ALWAYS_INLINE void JIT::emitGetCTIParam(unsigned name, RegisterID to) {
   __ movl_mr(name * sizeof(void*), X86::esp, to);
   killLastResultRegister();
 }
 
-ALWAYS_INLINE void CTI::emitPutToCallFrameHeader(
+ALWAYS_INLINE void JIT::emitPutToCallFrameHeader(
     RegisterID from,
     RegisterFile::CallFrameHeaderEntry entry) {
   __ movl_rm(from, entry * sizeof(Register), X86::edi);
 }
 
-ALWAYS_INLINE void CTI::emitGetFromCallFrameHeader(
+ALWAYS_INLINE void JIT::emitGetFromCallFrameHeader(
     RegisterFile::CallFrameHeaderEntry entry,
     RegisterID to) {
   __ movl_mr(entry * sizeof(Register), X86::edi, to);
   killLastResultRegister();
 }
 
-ALWAYS_INLINE void CTI::emitPutVirtualRegister(unsigned dst, RegisterID from) {
+ALWAYS_INLINE void JIT::emitPutVirtualRegister(unsigned dst, RegisterID from) {
   __ movl_rm(from, dst * sizeof(Register), X86::edi);
   m_lastResultBytecodeRegister =
       (from == X86::eax) ? dst : std::numeric_limits<int>::max();
   // FIXME: #ifndef NDEBUG, Write the correct m_type to the register.
 }
 
-ALWAYS_INLINE void CTI::emitInitRegister(unsigned dst) {
+ALWAYS_INLINE void JIT::emitInitRegister(unsigned dst) {
   __ movl_i32m(asInteger(jsUndefined()), dst * sizeof(Register), X86::edi);
   // FIXME: #ifndef NDEBUG, Write the correct m_type to the register.
 }
@@ -328,7 +328,7 @@ void ctiRepatchCallByReturnAddress(void* where, void* what) {
 
 #ifndef NDEBUG
 
-void CTI::printBytecodeOperandTypes(unsigned src1, unsigned src2) {
+void JIT::printBytecodeOperandTypes(unsigned src1, unsigned src2) {
   char which1 = '*';
   if (m_codeBlock->isConstantRegisterIndex(src1)) {
     JSValue* value = m_codeBlock->getConstant(src1);
@@ -369,13 +369,13 @@ static JSValue* FASTCALL allocateNumber(JSGlobalData* globalData) {
 }
 }
 
-ALWAYS_INLINE void CTI::emitAllocateNumber(JSGlobalData* globalData,
+ALWAYS_INLINE void JIT::emitAllocateNumber(JSGlobalData* globalData,
                                            unsigned bytecodeIndex) {
   __ movl_i32r(reinterpret_cast<intptr_t>(globalData), X86::ecx);
   emitNakedFastCall(bytecodeIndex, (void*)allocateNumber);
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitNakedCall(unsigned bytecodeIndex,
+ALWAYS_INLINE JmpSrc JIT::emitNakedCall(unsigned bytecodeIndex,
                                         X86::RegisterID r) {
   JmpSrc call = __ emitCall(r);
   m_calls.append(CallRecord(call, bytecodeIndex));
@@ -383,7 +383,7 @@ ALWAYS_INLINE JmpSrc CTI::emitNakedCall(unsigned bytecodeIndex,
   return call;
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitNakedCall(unsigned bytecodeIndex,
+ALWAYS_INLINE JmpSrc JIT::emitNakedCall(unsigned bytecodeIndex,
                                         void* function) {
   JmpSrc call = __ emitCall();
   m_calls.append(
@@ -391,7 +391,7 @@ ALWAYS_INLINE JmpSrc CTI::emitNakedCall(unsigned bytecodeIndex,
   return call;
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitNakedFastCall(unsigned bytecodeIndex,
+ALWAYS_INLINE JmpSrc JIT::emitNakedFastCall(unsigned bytecodeIndex,
                                             void* function) {
   JmpSrc call = __ emitCall();
   m_calls.append(
@@ -399,7 +399,7 @@ ALWAYS_INLINE JmpSrc CTI::emitNakedFastCall(unsigned bytecodeIndex,
   return call;
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
+ALWAYS_INLINE JmpSrc JIT::emitCTICall(Instruction* vPC,
                                       unsigned bytecodeIndex,
                                       CTIHelper_j helper) {
 #if ENABLE(OPCODE_SAMPLING)
@@ -421,7 +421,7 @@ ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
   return call;
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
+ALWAYS_INLINE JmpSrc JIT::emitCTICall(Instruction* vPC,
                                       unsigned bytecodeIndex,
                                       CTIHelper_o helper) {
 #if ENABLE(OPCODE_SAMPLING)
@@ -443,7 +443,7 @@ ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
   return call;
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
+ALWAYS_INLINE JmpSrc JIT::emitCTICall(Instruction* vPC,
                                       unsigned bytecodeIndex,
                                       CTIHelper_p helper) {
 #if ENABLE(OPCODE_SAMPLING)
@@ -465,7 +465,7 @@ ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
   return call;
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
+ALWAYS_INLINE JmpSrc JIT::emitCTICall(Instruction* vPC,
                                       unsigned bytecodeIndex,
                                       CTIHelper_b helper) {
 #if ENABLE(OPCODE_SAMPLING)
@@ -487,7 +487,7 @@ ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
   return call;
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
+ALWAYS_INLINE JmpSrc JIT::emitCTICall(Instruction* vPC,
                                       unsigned bytecodeIndex,
                                       CTIHelper_v helper) {
 #if ENABLE(OPCODE_SAMPLING)
@@ -509,7 +509,7 @@ ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
   return call;
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
+ALWAYS_INLINE JmpSrc JIT::emitCTICall(Instruction* vPC,
                                       unsigned bytecodeIndex,
                                       CTIHelper_s helper) {
 #if ENABLE(OPCODE_SAMPLING)
@@ -531,7 +531,7 @@ ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
   return call;
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
+ALWAYS_INLINE JmpSrc JIT::emitCTICall(Instruction* vPC,
                                       unsigned bytecodeIndex,
                                       CTIHelper_2 helper) {
 #if ENABLE(OPCODE_SAMPLING)
@@ -553,13 +553,13 @@ ALWAYS_INLINE JmpSrc CTI::emitCTICall(Instruction* vPC,
   return call;
 }
 
-ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotJSCell(RegisterID reg,
+ALWAYS_INLINE void JIT::emitJumpSlowCaseIfNotJSCell(RegisterID reg,
                                                     unsigned bytecodeIndex) {
   __ testl_i32r(JSImmediate::TagMask, reg);
   m_slowCases.append(SlowCaseEntry(__ emitUnlinkedJne(), bytecodeIndex));
 }
 
-ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotJSCell(RegisterID reg,
+ALWAYS_INLINE void JIT::emitJumpSlowCaseIfNotJSCell(RegisterID reg,
                                                     unsigned bytecodeIndex,
                                                     int vReg) {
   if (m_codeBlock->isKnownNotImmediate(vReg))
@@ -568,7 +568,7 @@ ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotJSCell(RegisterID reg,
   emitJumpSlowCaseIfNotJSCell(reg, bytecodeIndex);
 }
 
-ALWAYS_INLINE bool CTI::linkSlowCaseIfNotJSCell(
+ALWAYS_INLINE bool JIT::linkSlowCaseIfNotJSCell(
     const Vector<SlowCaseEntry>::iterator& iter,
     int vReg) {
   if (m_codeBlock->isKnownNotImmediate(vReg))
@@ -578,13 +578,13 @@ ALWAYS_INLINE bool CTI::linkSlowCaseIfNotJSCell(
   return true;
 }
 
-ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotImmNum(RegisterID reg,
+ALWAYS_INLINE void JIT::emitJumpSlowCaseIfNotImmNum(RegisterID reg,
                                                     unsigned bytecodeIndex) {
   __ testl_i32r(JSImmediate::TagBitTypeInteger, reg);
   m_slowCases.append(SlowCaseEntry(__ emitUnlinkedJe(), bytecodeIndex));
 }
 
-ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotImmNums(RegisterID reg1,
+ALWAYS_INLINE void JIT::emitJumpSlowCaseIfNotImmNums(RegisterID reg1,
                                                      RegisterID reg2,
                                                      unsigned bytecodeIndex) {
   __ movl_rr(reg1, X86::ecx);
@@ -592,34 +592,34 @@ ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotImmNums(RegisterID reg1,
   emitJumpSlowCaseIfNotImmNum(X86::ecx, bytecodeIndex);
 }
 
-ALWAYS_INLINE unsigned CTI::getDeTaggedConstantImmediate(JSValue* imm) {
+ALWAYS_INLINE unsigned JIT::getDeTaggedConstantImmediate(JSValue* imm) {
   ASSERT(JSImmediate::isNumber(imm));
   return asInteger(imm) & ~JSImmediate::TagBitTypeInteger;
 }
 
-ALWAYS_INLINE void CTI::emitFastArithDeTagImmediate(RegisterID reg) {
+ALWAYS_INLINE void JIT::emitFastArithDeTagImmediate(RegisterID reg) {
   __ subl_i8r(JSImmediate::TagBitTypeInteger, reg);
 }
 
 ALWAYS_INLINE JmpSrc
-CTI::emitFastArithDeTagImmediateJumpIfZero(RegisterID reg) {
+JIT::emitFastArithDeTagImmediateJumpIfZero(RegisterID reg) {
   __ subl_i8r(JSImmediate::TagBitTypeInteger, reg);
   return __ emitUnlinkedJe();
 }
 
-ALWAYS_INLINE void CTI::emitFastArithReTagImmediate(RegisterID reg) {
+ALWAYS_INLINE void JIT::emitFastArithReTagImmediate(RegisterID reg) {
   __ addl_i8r(JSImmediate::TagBitTypeInteger, reg);
 }
 
-ALWAYS_INLINE void CTI::emitFastArithPotentiallyReTagImmediate(RegisterID reg) {
+ALWAYS_INLINE void JIT::emitFastArithPotentiallyReTagImmediate(RegisterID reg) {
   __ orl_i32r(JSImmediate::TagBitTypeInteger, reg);
 }
 
-ALWAYS_INLINE void CTI::emitFastArithImmToInt(RegisterID reg) {
+ALWAYS_INLINE void JIT::emitFastArithImmToInt(RegisterID reg) {
   __ sarl_i8r(1, reg);
 }
 
-ALWAYS_INLINE void CTI::emitFastArithIntToImmOrSlowCase(
+ALWAYS_INLINE void JIT::emitFastArithIntToImmOrSlowCase(
     RegisterID reg,
     unsigned bytecodeIndex) {
   __ addl_rr(reg, reg);
@@ -627,24 +627,24 @@ ALWAYS_INLINE void CTI::emitFastArithIntToImmOrSlowCase(
   emitFastArithReTagImmediate(reg);
 }
 
-ALWAYS_INLINE void CTI::emitFastArithIntToImmNoCheck(RegisterID reg) {
+ALWAYS_INLINE void JIT::emitFastArithIntToImmNoCheck(RegisterID reg) {
   __ addl_rr(reg, reg);
   emitFastArithReTagImmediate(reg);
 }
 
-ALWAYS_INLINE JmpSrc CTI::emitArithIntToImmWithJump(RegisterID reg) {
+ALWAYS_INLINE JmpSrc JIT::emitArithIntToImmWithJump(RegisterID reg) {
   __ addl_rr(reg, reg);
   JmpSrc jmp = __ emitUnlinkedJo();
   emitFastArithReTagImmediate(reg);
   return jmp;
 }
 
-ALWAYS_INLINE void CTI::emitTagAsBoolImmediate(RegisterID reg) {
+ALWAYS_INLINE void JIT::emitTagAsBoolImmediate(RegisterID reg) {
   __ shl_i8r(JSImmediate::ExtendedPayloadShift, reg);
   __ orl_i32r(JSImmediate::FullTagTypeBool, reg);
 }
 
-CTI::CTI(JSGlobalData* globalData, CodeBlock* codeBlock)
+JIT::JIT(JSGlobalData* globalData, CodeBlock* codeBlock)
     : m_assembler(globalData->interpreter->assemblerBuffer()),
       m_interpreter(globalData->interpreter),
       m_globalData(globalData),
@@ -684,7 +684,7 @@ static void unreachable() {
   exit(1);
 }
 
-void CTI::compileOpCallInitializeCallFrame() {
+void JIT::compileOpCallInitializeCallFrame() {
   __ movl_rm(X86::edx,
              RegisterFile::ArgumentCount * static_cast<int>(sizeof(Register)),
              X86::edi);
@@ -704,7 +704,7 @@ void CTI::compileOpCallInitializeCallFrame() {
              X86::edi);
 }
 
-void CTI::compileOpCallSetupArgs(Instruction* instruction) {
+void JIT::compileOpCallSetupArgs(Instruction* instruction) {
   int argCount = instruction[3].u.operand;
   int registerOffset = instruction[4].u.operand;
 
@@ -715,7 +715,7 @@ void CTI::compileOpCallSetupArgs(Instruction* instruction) {
   emitPutCTIArgConstant(reinterpret_cast<unsigned>(instruction), 12);
 }
 
-void CTI::compileOpCallEvalSetupArgs(Instruction* instruction) {
+void JIT::compileOpCallEvalSetupArgs(Instruction* instruction) {
   int argCount = instruction[3].u.operand;
   int registerOffset = instruction[4].u.operand;
 
@@ -726,7 +726,7 @@ void CTI::compileOpCallEvalSetupArgs(Instruction* instruction) {
   emitPutCTIArgConstant(reinterpret_cast<unsigned>(instruction), 12);
 }
 
-void CTI::compileOpConstructSetupArgs(Instruction* instruction) {
+void JIT::compileOpConstructSetupArgs(Instruction* instruction) {
   int argCount = instruction[3].u.operand;
   int registerOffset = instruction[4].u.operand;
   int proto = instruction[5].u.operand;
@@ -741,7 +741,7 @@ void CTI::compileOpConstructSetupArgs(Instruction* instruction) {
   emitPutCTIArgConstant(reinterpret_cast<unsigned>(instruction), 20);
 }
 
-void CTI::compileOpCall(OpcodeID opcodeID,
+void JIT::compileOpCall(OpcodeID opcodeID,
                         Instruction* instruction,
                         unsigned i,
                         unsigned callLinkInfoIndex) {
@@ -830,7 +830,7 @@ void CTI::compileOpCall(OpcodeID opcodeID,
 #endif
 }
 
-void CTI::compileOpStrictEq(Instruction* instruction,
+void JIT::compileOpStrictEq(Instruction* instruction,
                             unsigned i,
                             CompileOpStrictEqType type) {
   bool negated = (type == OpNStrictEq);
@@ -886,7 +886,7 @@ void CTI::compileOpStrictEq(Instruction* instruction,
   emitPutVirtualRegister(dst);
 }
 
-void CTI::emitSlowScriptCheck(Instruction* vPC, unsigned bytecodeIndex) {
+void JIT::emitSlowScriptCheck(Instruction* vPC, unsigned bytecodeIndex) {
   __ subl_i8r(1, X86::esi);
   JmpSrc skipTimeout = __ emitUnlinkedJne();
   emitCTICall(vPC, bytecodeIndex, Interpreter::cti_timeout_check);
@@ -913,7 +913,7 @@ void CTI::emitSlowScriptCheck(Instruction* vPC, unsigned bytecodeIndex) {
   the JSImmediate value will be written to the output, and flow
   control will fall through from the code planted.
 */
-void CTI::putDoubleResultToJSNumberCellOrJSImmediate(
+void JIT::putDoubleResultToJSNumberCellOrJSImmediate(
     X86::XMMRegisterID xmmSource,
     X86::RegisterID jsNumberCell,
     unsigned dst,
@@ -956,7 +956,7 @@ void CTI::putDoubleResultToJSNumberCellOrJSImmediate(
   emitPutVirtualRegister(dst);
 }
 
-void CTI::compileBinaryArithOp(OpcodeID opcodeID,
+void JIT::compileBinaryArithOp(OpcodeID opcodeID,
                                unsigned dst,
                                unsigned src1,
                                unsigned src2,
@@ -1120,7 +1120,7 @@ void CTI::compileBinaryArithOp(OpcodeID opcodeID,
   }
 }
 
-void CTI::compileBinaryArithOpSlowCase(Instruction* vPC,
+void JIT::compileBinaryArithOpSlowCase(Instruction* vPC,
                                        OpcodeID opcodeID,
                                        Vector<SlowCaseEntry>::iterator& iter,
                                        unsigned dst,
@@ -1174,7 +1174,7 @@ void CTI::compileBinaryArithOpSlowCase(Instruction* vPC,
   emitPutVirtualRegister(dst);
 }
 
-void CTI::privateCompileMainPass() {
+void JIT::privateCompileMainPass() {
   Instruction* instruction = m_codeBlock->instructions.begin();
   unsigned instructionCount = m_codeBlock->instructions.size();
 
@@ -2624,7 +2624,7 @@ void CTI::privateCompileMainPass() {
   ASSERT(callLinkInfoIndex == m_codeBlock->callLinkInfos.size());
 }
 
-void CTI::privateCompileLinkPass() {
+void JIT::privateCompileLinkPass() {
   unsigned jmpTableCount = m_jmpTable.size();
   for (unsigned i = 0; i < jmpTableCount; ++i)
     __ link(m_jmpTable[i].from, m_labels[m_jmpTable[i].to]);
@@ -2658,7 +2658,7 @@ void CTI::privateCompileLinkPass() {
     break;                                                            \
   }
 
-void CTI::privateCompileSlowCases() {
+void JIT::privateCompileSlowCases() {
   unsigned propertyAccessInstructionIndex = 0;
   unsigned callLinkInfoIndex = 0;
 
@@ -3348,7 +3348,7 @@ void CTI::privateCompileSlowCases() {
   ASSERT(callLinkInfoIndex == m_codeBlock->callLinkInfos.size());
 }
 
-void CTI::privateCompile() {
+void JIT::privateCompile() {
 #if ENABLE(CODEBLOCK_SAMPLING)
   __ movl_i32m(reinterpret_cast<unsigned>(m_codeBlock),
                m_interpreter->sampler()->codeBlockSlot());
@@ -3481,7 +3481,7 @@ void CTI::privateCompile() {
   m_codeBlock->ctiCode = code;
 }
 
-void CTI::privateCompileGetByIdSelf(Structure* structure,
+void JIT::privateCompileGetByIdSelf(Structure* structure,
                                     size_t cachedOffset,
                                     void* returnAddress) {
   // Check eax is an object of the right Structure.
@@ -3511,7 +3511,7 @@ void CTI::privateCompileGetByIdSelf(Structure* structure,
   ctiRepatchCallByReturnAddress(returnAddress, code);
 }
 
-void CTI::privateCompileGetByIdProto(Structure* structure,
+void JIT::privateCompileGetByIdProto(Structure* structure,
                                      Structure* prototypeStructure,
                                      size_t cachedOffset,
                                      void* returnAddress,
@@ -3623,7 +3623,7 @@ void CTI::privateCompileGetByIdProto(Structure* structure,
 #endif
 }
 
-void CTI::privateCompileGetByIdChain(Structure* structure,
+void JIT::privateCompileGetByIdChain(Structure* structure,
                                      StructureChain* chain,
                                      size_t count,
                                      size_t cachedOffset,
@@ -3675,7 +3675,7 @@ void CTI::privateCompileGetByIdChain(Structure* structure,
   ctiRepatchCallByReturnAddress(returnAddress, code);
 }
 
-void CTI::privateCompilePutByIdReplace(Structure* structure,
+void JIT::privateCompilePutByIdReplace(Structure* structure,
                                        size_t cachedOffset,
                                        void* returnAddress) {
   // check eax is an object of the right Structure.
@@ -3721,7 +3721,7 @@ static inline bool transitionWillNeedStorageRealloc(Structure* oldStructure,
          newStructure->propertyStorageCapacity();
 }
 
-void CTI::privateCompilePutByIdTransition(Structure* oldStructure,
+void JIT::privateCompilePutByIdTransition(Structure* oldStructure,
                                           Structure* newStructure,
                                           size_t cachedOffset,
                                           StructureChain* chain,
@@ -3818,7 +3818,7 @@ void CTI::privateCompilePutByIdTransition(Structure* oldStructure,
   ctiRepatchCallByReturnAddress(returnAddress, code);
 }
 
-void CTI::unlinkCall(CallLinkInfo* callLinkInfo) {
+void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
   // When the JSFunction is deleted the pointer embedded in the instruction
   // stream will no longer be valid
   // (and, if a new JSFunction happened to be constructed at the same location,
@@ -3828,7 +3828,7 @@ void CTI::unlinkCall(CallLinkInfo* callLinkInfo) {
       asPointer(JSImmediate::impossibleValue());
 }
 
-void CTI::linkCall(JSFunction* callee,
+void JIT::linkCall(JSFunction* callee,
                    CodeBlock* calleeCodeBlock,
                    void* ctiCode,
                    CallLinkInfo* callLinkInfo,
@@ -3851,7 +3851,7 @@ void CTI::linkCall(JSFunction* callee,
   ctiRepatchCallByReturnAddress(repatchCheck, callLinkInfo->coldPathOther);
 }
 
-void CTI::privateCompileCTIMachineTrampolines() {
+void JIT::privateCompileCTIMachineTrampolines() {
   // (1) The first function provides fast property access for array length
 
   // Check eax is an array
@@ -4077,11 +4077,11 @@ void CTI::privateCompileCTIMachineTrampolines() {
       X86Assembler::getRelocatedAddress(code, virtualCallBegin);
 }
 
-void CTI::freeCTIMachineTrampolines(Interpreter* interpreter) {
+void JIT::freeCTIMachineTrampolines(Interpreter* interpreter) {
   WTF::fastFreeExecutable(interpreter->m_ctiArrayLengthTrampoline);
 }
 
-void CTI::patchGetByIdSelf(CodeBlock* codeBlock,
+void JIT::patchGetByIdSelf(CodeBlock* codeBlock,
                            Structure* structure,
                            size_t cachedOffset,
                            void* returnAddress) {
@@ -4106,7 +4106,7 @@ void CTI::patchGetByIdSelf(CodeBlock* codeBlock,
                                  reinterpret_cast<uint32_t>(structure));
 }
 
-void CTI::patchPutByIdReplace(CodeBlock* codeBlock,
+void JIT::patchPutByIdReplace(CodeBlock* codeBlock,
                               Structure* structure,
                               size_t cachedOffset,
                               void* returnAddress) {
@@ -4131,7 +4131,7 @@ void CTI::patchPutByIdReplace(CodeBlock* codeBlock,
                                  reinterpret_cast<uint32_t>(structure));
 }
 
-void CTI::privateCompilePatchGetArrayLength(void* returnAddress) {
+void JIT::privateCompilePatchGetArrayLength(void* returnAddress) {
   StructureStubInfo& info = m_codeBlock->getStubInfo(returnAddress);
 
   // We don't want to repatch more than once - in future go to
@@ -4187,7 +4187,7 @@ void CTI::privateCompilePatchGetArrayLength(void* returnAddress) {
   X86Assembler::repatchBranchOffset(jmpLocation, code);
 }
 
-void CTI::emitGetVariableObjectRegister(RegisterID variableObject,
+void JIT::emitGetVariableObjectRegister(RegisterID variableObject,
                                         int index,
                                         RegisterID dst) {
   __ movl_mr(FIELD_OFFSET(JSVariableObject, d), variableObject, dst);
@@ -4196,7 +4196,7 @@ void CTI::emitGetVariableObjectRegister(RegisterID variableObject,
   __ movl_mr(index * sizeof(Register), dst, dst);
 }
 
-void CTI::emitPutVariableObjectRegister(RegisterID src,
+void JIT::emitPutVariableObjectRegister(RegisterID src,
                                         RegisterID variableObject,
                                         int index) {
   __ movl_mr(FIELD_OFFSET(JSVariableObject, d), variableObject, variableObject);

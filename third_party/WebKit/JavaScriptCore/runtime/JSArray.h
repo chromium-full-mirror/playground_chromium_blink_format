@@ -39,7 +39,7 @@ struct ArrayStorage {
 };
 
 class JSArray : public JSObject {
-  friend class CTI;
+  friend class JIT;
 
  public:
   explicit JSArray(PassRefPtr<Structure>);

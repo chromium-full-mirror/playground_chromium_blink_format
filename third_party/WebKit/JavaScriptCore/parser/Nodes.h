@@ -2421,7 +2421,7 @@ class EvalNode : public ScopeNode {
 };
 
 class FunctionBodyNode : public ScopeNode {
-  friend class CTI;
+  friend class JIT;
 
  public:
   static FunctionBodyNode* create(JSGlobalData*,
