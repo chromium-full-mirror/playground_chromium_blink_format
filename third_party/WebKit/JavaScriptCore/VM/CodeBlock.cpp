@@ -1079,7 +1079,7 @@ CodeBlock::~CodeBlock() {
       callLinkInfo->callee->removeCaller(callLinkInfo);
   }
 
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   unlinkCallers();
 
   if (ctiCode)
@@ -1087,7 +1087,7 @@ CodeBlock::~CodeBlock() {
 #endif
 }
 
-#if ENABLE(CTI)
+#if ENABLE(JIT)
 void CodeBlock::unlinkCallers() {
   size_t size = linkedCallerList.size();
   for (size_t i = 0; i < size; ++i) {

@@ -51,7 +51,7 @@ class Register;
 class ScopeChainNode;
 class SamplingTool;
 
-#if ENABLE(CTI)
+#if ENABLE(JIT)
 
 #if USE(CTI_ARGUMENT)
 #define CTI_ARGS void** args
@@ -188,7 +188,7 @@ class Interpreter {
   void setSampler(SamplingTool* sampler) { m_sampler = sampler; }
   SamplingTool* sampler() { return m_sampler; }
 
-#if ENABLE(CTI)
+#if ENABLE(JIT)
 
   static void SFX_CALL cti_timeout_check(CTI_ARGS);
   static void SFX_CALL cti_register_file_check(CTI_ARGS);
@@ -296,7 +296,7 @@ class Interpreter {
 
   AssemblerBuffer* assemblerBuffer() const { return m_assemblerBuffer.get(); }
 
-#endif  // ENABLE(CTI)
+#endif  // ENABLE(JIT)
 
   // Default number of ticks before a timeout check should be done.
   static const int initialTickCountThreshold = 1024;
@@ -392,7 +392,7 @@ class Interpreter {
            opcode == getOpcode(op_call_eval);
   }
 
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   static void throwStackOverflowPreviousFrame(CallFrame**,
                                               JSGlobalData*,
                                               void*& returnAddress);
@@ -412,7 +412,7 @@ class Interpreter {
 
   SamplingTool* m_sampler;
 
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   void* m_ctiArrayLengthTrampoline;
   void* m_ctiStringLengthTrampoline;
   void* m_ctiVirtualCallPreLink;

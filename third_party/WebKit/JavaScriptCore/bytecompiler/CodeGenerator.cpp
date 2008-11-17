@@ -1808,7 +1808,7 @@ static void prepareJumpTableForStringSwitch(StringJumpTable& jumpTable,
         static_cast<StringNode*>(nodes[i])->value().ustring().rep();
     OffsetLocation location;
     location.branchOffset = labels[i]->offsetFrom(switchAddress);
-#if ENABLE(CTI)
+#if ENABLE(JIT)
     location.ctiOffset = 0;
 #endif
     jumpTable.offsetTable.add(clause, location);

@@ -72,7 +72,7 @@ struct LineInfo {
 
 struct OffsetLocation {
   int32_t branchOffset;
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   void* ctiOffset;
 #endif
 };
@@ -163,7 +163,7 @@ inline ArrayType* binaryChop(ArrayType* array, size_t size, KeyType key) {
 struct StringJumpTable {
   typedef HashMap<RefPtr<UString::Rep>, OffsetLocation> StringOffsetTable;
   StringOffsetTable offsetTable;
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   void* ctiDefault;  // FIXME: it should not be necessary to store this.
 #endif
 
@@ -175,7 +175,7 @@ struct StringJumpTable {
     return loc->second.branchOffset;
   }
 
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   inline void* ctiForValue(UString::Rep* value) {
     StringOffsetTable::const_iterator end = offsetTable.end();
     StringOffsetTable::const_iterator loc = offsetTable.find(value);
@@ -190,7 +190,7 @@ struct SimpleJumpTable {
   // FIXME: The two Vectors can be combind into one Vector<OffsetLocation>
   Vector<int32_t> branchOffsets;
   int32_t min;
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   Vector<void*> ctiOffsets;
   void* ctiDefault;
 #endif
@@ -201,7 +201,7 @@ struct SimpleJumpTable {
       branchOffsets[key] = offset;
   }
 
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   inline void* ctiForValue(int32_t value) {
     if (value >= min && static_cast<uint32_t>(value - min) < ctiOffsets.size())
       return ctiOffsets[value - min];
@@ -217,7 +217,7 @@ struct CodeBlock {
             unsigned sourceOffset)
       : ownerNode(ownerNode),
         globalData(0)
-#if ENABLE(CTI)
+#if ENABLE(JIT)
         ,
         ctiCode(0)
 #endif
@@ -236,7 +236,7 @@ struct CodeBlock {
 
   ~CodeBlock();
 
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   void unlinkCallers();
 #endif
 
@@ -312,7 +312,7 @@ struct CodeBlock {
 
   ScopeNode* ownerNode;
   JSGlobalData* globalData;
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   void* ctiCode;
 #endif
 
@@ -354,7 +354,7 @@ struct CodeBlock {
   Vector<SimpleJumpTable> characterSwitchJumpTables;
   Vector<StringJumpTable> stringSwitchJumpTables;
 
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   HashMap<void*, unsigned> ctiReturnAddressVPCMap;
 #endif
 

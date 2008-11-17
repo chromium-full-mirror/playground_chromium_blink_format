@@ -66,7 +66,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   Interpreter* interpreter;
 
   JSValue* exception;
-#if ENABLE(CTI)
+#if ENABLE(JIT)
   void* exceptionLocation;
 #endif
 
