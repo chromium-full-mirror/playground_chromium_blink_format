@@ -40,7 +40,7 @@
 #endif
 
 namespace JSC {
-class BytecodeInterpreter;
+class Interpreter;
 }
 
 namespace WREC {
@@ -54,7 +54,7 @@ typedef int (*WRECFunction)(const UChar* input,
                             unsigned length,
                             int* output) WREC_CALL;
 
-void* compileRegExp(JSC::BytecodeInterpreter*,
+void* compileRegExp(JSC::Interpreter*,
                     const JSC::UString& pattern,
                     unsigned* numSubpatterns_ptr,
                     const char** error_ptr,

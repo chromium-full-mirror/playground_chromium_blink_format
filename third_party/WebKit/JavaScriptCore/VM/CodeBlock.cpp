@@ -190,7 +190,7 @@ void CodeBlock::printStructure(const char* name,
 }
 
 void CodeBlock::printStructures(const Instruction* vPC) const {
-  BytecodeInterpreter* interpreter = globalData->interpreter;
+  Interpreter* interpreter = globalData->interpreter;
   unsigned instructionOffset = vPC - instructions.begin();
 
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id)) {
@@ -1100,7 +1100,7 @@ void CodeBlock::unlinkCallers() {
 #endif
 
 void CodeBlock::derefStructures(Instruction* vPC) const {
-  BytecodeInterpreter* interpreter = globalData->interpreter;
+  Interpreter* interpreter = globalData->interpreter;
 
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_self)) {
     vPC[4].u.structure->deref();
@@ -1142,7 +1142,7 @@ void CodeBlock::derefStructures(Instruction* vPC) const {
 }
 
 void CodeBlock::refStructures(Instruction* vPC) const {
-  BytecodeInterpreter* interpreter = globalData->interpreter;
+  Interpreter* interpreter = globalData->interpreter;
 
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_self)) {
     vPC[4].u.structure->ref();
