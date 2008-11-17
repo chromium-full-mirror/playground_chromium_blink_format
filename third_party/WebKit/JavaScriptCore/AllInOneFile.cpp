@@ -103,4 +103,4 @@
 #include "wtf/FastMalloc.cpp"
 #include "wtf/TCSystemAlloc.cpp"
 #include "bytecompiler/BytecodeGenerator.cpp"
-#include "VM/RegisterFile.cpp"
+#include "interpreter/RegisterFile.cpp"
