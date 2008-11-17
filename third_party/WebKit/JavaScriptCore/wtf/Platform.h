@@ -406,7 +406,7 @@
 #endif
 
 #if ENABLE(JIT) || ENABLE(WREC)
-#define ENABLE_MASM 1
+#define ENABLE_ASSEMBLER 1
 #endif
 
 #if !defined(ENABLE_PAN_SCROLLING) && (PLATFORM(WIN) || PLATFORM(CHROMIUM) || \
