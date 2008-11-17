@@ -519,9 +519,11 @@ void HTMLTableElement::addSharedCellBordersDecl(
     Vector<CSSMutableStyleDeclaration*>& results) {
   CellBorders borders = cellBorders();
 
-  static const AtomicString cellBorderNames[] = {"none", "solid", "inset",
-                                                 "solid-cols", "solid-rows"};
-  const AtomicString& cellborderValue = cellBorderNames[borders];
+  static const AtomicString* cellBorderNames[] = {
+      new AtomicString("none"), new AtomicString("solid"),
+      new AtomicString("inset"), new AtomicString("solid-cols"),
+      new AtomicString("solid-rows")};
+  const AtomicString& cellborderValue = *cellBorderNames[borders];
   CSSMappedAttributeDeclaration* decl =
       getMappedAttributeDecl(ePersistent, cellborderAttr, cellborderValue);
   if (!decl) {
@@ -572,7 +574,7 @@ void HTMLTableElement::addSharedCellBordersDecl(
     }
 
     setMappedAttributeDecl(ePersistent, cellborderAttr,
-                           cellBorderNames[borders], decl);
+                           *cellBorderNames[borders], decl);
     decl->setParent(0);
     decl->setNode(0);
     decl->setMappedState(ePersistent, cellborderAttr, cellborderValue);

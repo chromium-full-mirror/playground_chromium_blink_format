@@ -458,8 +458,9 @@ static inline void loadDefaultIconRecord(IconRecord* defaultIconRecord) {
       0x00, 0x08, 0x00, 0x08, 0x00, 0x0A, 0xFC, 0x80, 0x00, 0x00, 0x27, 0x10,
       0x00, 0x0A, 0xFC, 0x80, 0x00, 0x00, 0x27, 0x10};
 
-  static RefPtr<SharedBuffer> defaultIconBuffer(
-      SharedBuffer::create(defaultIconData, sizeof(defaultIconData)));
+  DEFINE_STATIC_LOCAL(
+      RefPtr<SharedBuffer>, defaultIconBuffer,
+      (SharedBuffer::create(defaultIconData, sizeof(defaultIconData))));
   defaultIconRecord->setImageData(defaultIconBuffer);
 }
 #endif
