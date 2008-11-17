@@ -149,7 +149,8 @@ void BytecodeGenerator::generate() {
   m_scopeNode->children().shrinkCapacity(0);
   if (m_codeType != EvalCode) {  // eval code needs to hang on to its
                                  // declaration stacks to keep declaration info
-                                 // alive until Interpreter::execute time.
+                                 // alive until BytecodeInterpreter::execute
+                                 // time.
     m_scopeNode->varStack().shrinkCapacity(0);
     m_scopeNode->functionStack().shrinkCapacity(0);
   }
@@ -249,7 +250,8 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
   emitOpcode(op_enter);
   codeBlock->globalData = m_globalData;
 
-  // FIXME: Move code that modifies the global object to Interpreter::execute.
+  // FIXME: Move code that modifies the global object to
+  // BytecodeInterpreter::execute.
 
   m_codeBlock->numParameters = 1;  // Allocate space for "this"
 

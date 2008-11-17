@@ -59,9 +59,9 @@ class Register {
 
  private:
   friend class ExecState;
-  friend class Interpreter;
+  friend class BytecodeInterpreter;
 
-  // Only CallFrame and Interpreter should use these functions.
+  // Only CallFrame and BytecodeInterpreter should use these functions.
 
   Register(intptr_t);
 
@@ -164,7 +164,7 @@ ALWAYS_INLINE void Register::mark() {
   getJSValue()->mark();
 }
 
-// Interpreter functions
+// BytecodeInterpreter functions
 
 ALWAYS_INLINE Register::Register(Arguments* arguments) {
   SET_TYPE(ArgumentsType);

@@ -100,7 +100,7 @@ class AssemblerBuffer {
     return this;
   }
 
-  void* executableCopy() {
+  void* copy() {
     if (!m_size)
       return 0;
 
@@ -965,7 +965,7 @@ class X86Assembler {
         (reinterpret_cast<intptr_t>(destination) - where);
   }
 
-  void* executableCopy() { return m_buffer->executableCopy(); }
+  void* copy() { return m_buffer->copy(); }
 
 #if COMPILER(MSVC)
   void emitConvertToFastCall() {

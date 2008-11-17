@@ -75,7 +75,7 @@ JSString* jsOwnedString(ExecState*, const UString&);
 
 class JSString : public JSCell {
   friend class CTI;
-  friend class Interpreter;
+  friend class BytecodeInterpreter;
 
  public:
   JSString(JSGlobalData* globalData, const UString& value)

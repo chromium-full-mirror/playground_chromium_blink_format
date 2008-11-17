@@ -98,7 +98,7 @@ namespace JSC {
 
 class CodeBlock;
 class JSPropertyNameIterator;
-class Interpreter;
+class BytecodeInterpreter;
 class Register;
 class RegisterFile;
 class ScopeChainNode;
@@ -119,55 +119,50 @@ typedef int(SFX_CALL* CTIHelper_b)(CTI_ARGS);
 typedef VoidPtrPair(SFX_CALL* CTIHelper_2)(CTI_ARGS);
 
 struct CallRecord {
-  typedef X86Assembler::JmpSrc JmpSrc;
-
-  JmpSrc from;
+  X86Assembler::JmpSrc from;
   void* to;
   unsigned bytecodeIndex;
 
   CallRecord() {}
 
-  CallRecord(JmpSrc f, CTIHelper_j t, unsigned i)
+  CallRecord(X86Assembler::JmpSrc f, CTIHelper_j t, unsigned i)
       : from(f), to(reinterpret_cast<void*>(t)), bytecodeIndex(i) {}
 
-  CallRecord(JmpSrc f, CTIHelper_o t, unsigned i)
+  CallRecord(X86Assembler::JmpSrc f, CTIHelper_o t, unsigned i)
       : from(f), to(reinterpret_cast<void*>(t)), bytecodeIndex(i) {}
 
-  CallRecord(JmpSrc f, CTIHelper_p t, unsigned i)
+  CallRecord(X86Assembler::JmpSrc f, CTIHelper_p t, unsigned i)
       : from(f), to(reinterpret_cast<void*>(t)), bytecodeIndex(i) {}
 
-  CallRecord(JmpSrc f, CTIHelper_v t, unsigned i)
+  CallRecord(X86Assembler::JmpSrc f, CTIHelper_v t, unsigned i)
       : from(f), to(reinterpret_cast<void*>(t)), bytecodeIndex(i) {}
 
-  CallRecord(JmpSrc f, CTIHelper_s t, unsigned i)
+  CallRecord(X86Assembler::JmpSrc f, CTIHelper_s t, unsigned i)
       : from(f), to(reinterpret_cast<void*>(t)), bytecodeIndex(i) {}
 
-  CallRecord(JmpSrc f, CTIHelper_b t, unsigned i)
+  CallRecord(X86Assembler::JmpSrc f, CTIHelper_b t, unsigned i)
       : from(f), to(reinterpret_cast<void*>(t)), bytecodeIndex(i) {}
 
-  CallRecord(JmpSrc f, CTIHelper_2 t, unsigned i)
+  CallRecord(X86Assembler::JmpSrc f, CTIHelper_2 t, unsigned i)
       : from(f), to(reinterpret_cast<void*>(t)), bytecodeIndex(i) {}
 
-  CallRecord(JmpSrc f, unsigned i) : from(f), to(0), bytecodeIndex(i) {}
+  CallRecord(X86Assembler::JmpSrc f, unsigned i)
+      : from(f), to(0), bytecodeIndex(i) {}
 };
 
 struct JmpTable {
-  typedef X86Assembler::JmpSrc JmpSrc;
-
-  JmpSrc from;
+  X86Assembler::JmpSrc from;
   unsigned to;
 
-  JmpTable(JmpSrc f, unsigned t) : from(f), to(t) {}
+  JmpTable(X86Assembler::JmpSrc f, unsigned t) : from(f), to(t) {}
 };
 
 struct SlowCaseEntry {
-  typedef X86Assembler::JmpSrc JmpSrc;
-
-  JmpSrc from;
+  X86Assembler::JmpSrc from;
   unsigned to;
   unsigned hint;
 
-  SlowCaseEntry(JmpSrc f, unsigned t, unsigned h = 0)
+  SlowCaseEntry(X86Assembler::JmpSrc f, unsigned t, unsigned h = 0)
       : from(f), to(t), hint(h) {}
 };
 
@@ -203,13 +198,10 @@ struct SwitchRecord {
 };
 
 struct StructureStubCompilationInfo {
-  typedef X86Assembler::JmpSrc JmpSrc;
-  typedef X86Assembler::JmpDst JmpDst;
-
-  JmpSrc callReturnLocation;
-  JmpDst hotPathBegin;
-  JmpSrc hotPathOther;
-  JmpDst coldPathOther;
+  X86Assembler::JmpSrc callReturnLocation;
+  X86Assembler::JmpDst hotPathBegin;
+  X86Assembler::JmpSrc hotPathOther;
+  X86Assembler::JmpDst coldPathOther;
 };
 
 extern "C" {
@@ -226,11 +218,6 @@ void ctiSetReturnAddress(void** where, void* what);
 void ctiRepatchCallByReturnAddress(void* where, void* what);
 
 class CTI {
-  typedef X86Assembler::JmpSrc JmpSrc;
-  typedef X86Assembler::JmpDst JmpDst;
-  typedef X86Assembler::RegisterID RegisterID;
-  typedef X86Assembler::XMMRegisterID XMMRegisterID;
-
   static const int repatchGetByIdDefaultStructure = -1;
   // Magic number - initial offset cannot be representable as a signed 8bit
   // value, or the X86Assembler
@@ -328,7 +315,7 @@ class CTI {
     CTI cti(globalData);
     cti.privateCompileCTIMachineTrampolines();
   }
-  static void freeCTIMachineTrampolines(Interpreter*);
+  static void freeCTIMachineTrampolines(BytecodeInterpreter*);
 
   static void patchGetByIdSelf(CodeBlock* codeBlock,
                                Structure* structure,
@@ -407,13 +394,14 @@ class CTI {
   void compileOpStrictEq(Instruction* instruction,
                          unsigned i,
                          CompileOpStrictEqType type);
-  void putDoubleResultToJSNumberCellOrJSImmediate(XMMRegisterID xmmSource,
-                                                  RegisterID jsNumberCell,
-                                                  unsigned dst,
-                                                  JmpSrc* wroteJSNumberCell,
-                                                  XMMRegisterID tempXmm,
-                                                  RegisterID tempReg1,
-                                                  RegisterID tempReg2);
+  void putDoubleResultToJSNumberCellOrJSImmediate(
+      X86::XMMRegisterID xmmSource,
+      X86::RegisterID jsNumberCell,
+      unsigned dst,
+      X86Assembler::JmpSrc* wroteJSNumberCell,
+      X86::XMMRegisterID tempXmm,
+      X86::RegisterID tempReg1,
+      X86::RegisterID tempReg2);
   void compileBinaryArithOp(OpcodeID,
                             unsigned dst,
                             unsigned src1,
@@ -429,76 +417,97 @@ class CTI {
                                     OperandTypes opi,
                                     unsigned i);
 
-  void emitGetVirtualRegister(int src, RegisterID dst, unsigned i);
+  void emitGetVirtualRegister(int src,
+                              X86Assembler::RegisterID dst,
+                              unsigned i);
   void emitGetVirtualRegisters(int src1,
-                               RegisterID dst1,
+                               X86Assembler::RegisterID dst1,
                                int src2,
-                               RegisterID dst2,
+                               X86Assembler::RegisterID dst2,
                                unsigned i);
-  void emitPutVirtualRegister(unsigned dst, RegisterID from = X86::eax);
+  void emitPutVirtualRegister(unsigned dst,
+                              X86Assembler::RegisterID from = X86::eax);
 
-  void emitPutCTIArg(RegisterID src, unsigned offset);
+  void emitPutCTIArg(X86Assembler::RegisterID src, unsigned offset);
   void emitPutCTIArgFromVirtualRegister(unsigned src,
                                         unsigned offset,
-                                        RegisterID scratch);
+                                        X86Assembler::RegisterID scratch);
   void emitPutCTIArgConstant(unsigned value, unsigned offset);
-  void emitGetCTIArg(unsigned offset, RegisterID dst);
+  void emitGetCTIArg(unsigned offset, X86Assembler::RegisterID dst);
 
   void emitInitRegister(unsigned dst);
 
   void emitPutCTIParam(void* value, unsigned name);
-  void emitPutCTIParam(RegisterID from, unsigned name);
-  void emitGetCTIParam(unsigned name, RegisterID to);
+  void emitPutCTIParam(X86Assembler::RegisterID from, unsigned name);
+  void emitGetCTIParam(unsigned name, X86Assembler::RegisterID to);
 
-  void emitPutToCallFrameHeader(RegisterID from,
+  void emitPutToCallFrameHeader(X86Assembler::RegisterID from,
                                 RegisterFile::CallFrameHeaderEntry entry);
   void emitGetFromCallFrameHeader(RegisterFile::CallFrameHeaderEntry entry,
-                                  RegisterID to);
+                                  X86Assembler::RegisterID to);
 
   JSValue* getConstantImmediateNumericArg(unsigned src);
   unsigned getDeTaggedConstantImmediate(JSValue* imm);
 
   bool linkSlowCaseIfNotJSCell(const Vector<SlowCaseEntry>::iterator&,
                                int vReg);
-  void emitJumpSlowCaseIfNotJSCell(RegisterID, unsigned bytecodeIndex);
-  void emitJumpSlowCaseIfNotJSCell(RegisterID,
+  void emitJumpSlowCaseIfNotJSCell(X86Assembler::RegisterID,
+                                   unsigned bytecodeIndex);
+  void emitJumpSlowCaseIfNotJSCell(X86Assembler::RegisterID,
                                    unsigned bytecodeIndex,
                                    int VReg);
 
-  void emitJumpSlowCaseIfNotImmNum(RegisterID, unsigned bytecodeIndex);
-  void emitJumpSlowCaseIfNotImmNums(RegisterID,
-                                    RegisterID,
+  void emitJumpSlowCaseIfNotImmNum(X86Assembler::RegisterID,
+                                   unsigned bytecodeIndex);
+  void emitJumpSlowCaseIfNotImmNums(X86Assembler::RegisterID,
+                                    X86Assembler::RegisterID,
                                     unsigned bytecodeIndex);
 
-  void emitFastArithDeTagImmediate(RegisterID);
-  JmpSrc emitFastArithDeTagImmediateJumpIfZero(RegisterID);
-  void emitFastArithReTagImmediate(RegisterID);
-  void emitFastArithPotentiallyReTagImmediate(RegisterID);
-  void emitFastArithImmToInt(RegisterID);
-  void emitFastArithIntToImmOrSlowCase(RegisterID, unsigned bytecodeIndex);
-  void emitFastArithIntToImmNoCheck(RegisterID);
-  JmpSrc emitArithIntToImmWithJump(RegisterID reg);
+  void emitFastArithDeTagImmediate(X86Assembler::RegisterID);
+  X86Assembler::JmpSrc emitFastArithDeTagImmediateJumpIfZero(
+      X86Assembler::RegisterID);
+  void emitFastArithReTagImmediate(X86Assembler::RegisterID);
+  void emitFastArithPotentiallyReTagImmediate(X86Assembler::RegisterID);
+  void emitFastArithImmToInt(X86Assembler::RegisterID);
+  void emitFastArithIntToImmOrSlowCase(X86Assembler::RegisterID,
+                                       unsigned bytecodeIndex);
+  void emitFastArithIntToImmNoCheck(X86Assembler::RegisterID);
+  X86Assembler::JmpSrc emitArithIntToImmWithJump(X86Assembler::RegisterID reg);
 
-  void emitTagAsBoolImmediate(RegisterID reg);
+  void emitTagAsBoolImmediate(X86Assembler::RegisterID reg);
 
   void emitAllocateNumber(JSGlobalData*, unsigned);
 
-  JmpSrc emitNakedCall(unsigned bytecodeIndex, X86::RegisterID);
-  JmpSrc emitNakedCall(unsigned bytecodeIndex, void* function);
-  JmpSrc emitNakedFastCall(unsigned bytecodeIndex, void*);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_j);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_o);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_p);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_v);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_s);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_b);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_2);
+  X86Assembler::JmpSrc emitNakedCall(unsigned bytecodeIndex, X86::RegisterID);
+  X86Assembler::JmpSrc emitNakedCall(unsigned bytecodeIndex, void* function);
+  X86Assembler::JmpSrc emitNakedFastCall(unsigned bytecodeIndex, void*);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned bytecodeIndex,
+                                   CTIHelper_j);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned bytecodeIndex,
+                                   CTIHelper_o);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned bytecodeIndex,
+                                   CTIHelper_p);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned bytecodeIndex,
+                                   CTIHelper_v);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned bytecodeIndex,
+                                   CTIHelper_s);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned bytecodeIndex,
+                                   CTIHelper_b);
+  X86Assembler::JmpSrc emitCTICall(Instruction*,
+                                   unsigned bytecodeIndex,
+                                   CTIHelper_2);
 
-  void emitGetVariableObjectRegister(RegisterID variableObject,
+  void emitGetVariableObjectRegister(X86Assembler::RegisterID variableObject,
                                      int index,
-                                     RegisterID dst);
-  void emitPutVariableObjectRegister(RegisterID src,
-                                     RegisterID variableObject,
+                                     X86Assembler::RegisterID dst);
+  void emitPutVariableObjectRegister(X86Assembler::RegisterID src,
+                                     X86Assembler::RegisterID variableObject,
                                      int index);
 
   void emitSlowScriptCheck(Instruction*, unsigned bytecodeIndex);
@@ -509,21 +518,22 @@ class CTI {
   void killLastResultRegister();
 
   X86Assembler m_assembler;
-  Interpreter* m_interpreter;
+  BytecodeInterpreter* m_interpreter;
   JSGlobalData* m_globalData;
   CodeBlock* m_codeBlock;
 
   Vector<CallRecord> m_calls;
-  Vector<JmpDst> m_labels;
+  Vector<X86Assembler::JmpDst> m_labels;
   Vector<StructureStubCompilationInfo> m_propertyAccessCompilationInfo;
   Vector<StructureStubCompilationInfo> m_callStructureStubCompilationInfo;
   Vector<JmpTable> m_jmpTable;
 
   struct JSRInfo {
-    JmpDst addrPosition;
-    JmpDst target;
+    X86Assembler::JmpDst addrPosition;
+    X86Assembler::JmpDst target;
 
-    JSRInfo(const JmpDst& storeLocation, const JmpDst& targetLocation)
+    JSRInfo(const X86Assembler::JmpDst& storeLocation,
+            const X86Assembler::JmpDst& targetLocation)
         : addrPosition(storeLocation), target(targetLocation) {}
   };
 

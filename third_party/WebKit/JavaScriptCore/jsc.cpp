@@ -359,7 +359,7 @@ static bool runWithScripts(GlobalObject* globalObject,
     BytecodeGenerator::setDumpsGeneratedCode(true);
 
 #if ENABLE(OPCODE_SAMPLING)
-  Interpreter* interpreter = globalObject->globalData()->interpreter;
+  BytecodeInterpreter* interpreter = globalObject->globalData()->interpreter;
   interpreter->setSampler(new SamplingTool(machine));
 #endif
 
