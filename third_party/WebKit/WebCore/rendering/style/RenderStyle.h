@@ -72,6 +72,7 @@
 #include "TransformOperations.h"
 #include <wtf/OwnPtr.h>
 #include <wtf/RefCounted.h>
+#include <wtf/StdLibExtras.h>
 #include <wtf/Vector.h>
 
 #if ENABLE(DASHBOARD_SUPPORT)
@@ -1644,7 +1645,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   static float initialTextStrokeWidth() { return 0; }
   static unsigned short initialColumnCount() { return 1; }
   static const TransformOperations& initialTransform() {
-    static TransformOperations ops;
+    DEFINE_STATIC_LOCAL(TransformOperations, ops, ());
     return ops;
   }
   static Length initialTransformOriginX() { return Length(50.0, Percent); }
