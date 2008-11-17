@@ -225,6 +225,8 @@ class AnimationBase : public RefCounted<AnimationBase> {
     return m_transformFunctionListValid;
   }
 
+  void pauseAtTime(double t);
+
  protected:
   virtual void overrideAnimations() {}
   virtual void resumeOverriddenAnimations() {}

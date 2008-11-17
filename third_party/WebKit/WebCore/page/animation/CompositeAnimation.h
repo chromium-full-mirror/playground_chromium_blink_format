@@ -71,6 +71,9 @@ class CompositeAnimation : public Noncopyable {
   void overrideImplicitAnimations(int property);
   void resumeOverriddenImplicitAnimations(int property);
 
+  bool pauseAnimationAtTime(const AtomicString& name, double t);
+  bool pauseTransitionAtTime(int property, double t);
+
  private:
   CompositeAnimationPrivate* m_data;
 };
