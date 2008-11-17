@@ -23,6 +23,7 @@
 #define KJS_REGEXP_H
 
 #include "UString.h"
+#include "WREC.h"
 #include <wtf/Forward.h>
 #include <wtf/RefCounted.h>
 
@@ -69,8 +70,7 @@ class RegExp : public RefCounted<RegExp> {
   unsigned m_numSubpatterns;
 
 #if ENABLE(WREC)
-  // Called as a WRECFunction
-  void* m_wrecFunction;
+  WREC::RegExpFunction m_wrecFunction;
 #endif
 };
 
