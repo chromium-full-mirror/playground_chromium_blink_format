@@ -345,11 +345,9 @@ static inline SharedBuffer* createTemplateDocumentData(Settings* settings) {
   SharedBuffer* buffer = 0;
   if (settings)
     buffer = SharedBuffer::createWithContentsOfFile(
-                 settings->ftpDirectoryTemplatePath())
-                 .releaseRef();
+        settings->ftpDirectoryTemplatePath());
   if (buffer)
-    LOG(FTP, "Loaded FTPDirectoryTemplate of length %i\n",
-        templateDocumentData->size());
+    LOG(FTP, "Loaded FTPDirectoryTemplate of length %i\n", buffer->size());
   return buffer;
 }
 
