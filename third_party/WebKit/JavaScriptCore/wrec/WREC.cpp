@@ -1452,7 +1452,7 @@ CompiledRegExp compileRegExp(Interpreter* interpreter,
 
   *numSubpatterns_ptr = parser.m_numSubpatterns;
 
-  void* code = __ copy();
+  void* code = __ executableCopy();
   ASSERT(code);
   return reinterpret_cast<CompiledRegExp>(code);
 }

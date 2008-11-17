@@ -3402,7 +3402,7 @@ void CTI::privateCompile() {
 
   ASSERT(m_jmpTable.isEmpty());
 
-  void* code = __ copy();
+  void* code = __ executableCopy();
   ASSERT(code);
 
   // Translate vPC offsets into addresses in JIT generated code, for switch
@@ -3504,7 +3504,7 @@ void CTI::privateCompileGetByIdSelf(Structure* structure,
   __ movl_mr(cachedOffset * sizeof(JSValue*), X86::eax, X86::eax);
   __ ret();
 
-  void* code = __ copy();
+  void* code = __ executableCopy();
   ASSERT(code);
 
   X86Assembler::link(
@@ -3559,7 +3559,7 @@ void CTI::privateCompileGetByIdProto(Structure* structure,
 
   X86Assembler::JmpSrc success = __ emitUnlinkedJmp();
 
-  void* code = __ copy();
+  void* code = __ executableCopy();
   ASSERT(code);
 
   // Use the repatch information to link the failure cases back to the original
@@ -3612,7 +3612,7 @@ void CTI::privateCompileGetByIdProto(Structure* structure,
 
   __ ret();
 
-  void* code = __ copy();
+  void* code = __ executableCopy();
   ASSERT(code);
 
   X86Assembler::link(
@@ -3670,7 +3670,7 @@ void CTI::privateCompileGetByIdChain(Structure* structure,
 
   bucketsOfFail.append(__ emitUnlinkedJmp());
 
-  void* code = __ copy();
+  void* code = __ executableCopy();
   ASSERT(code);
 
   for (unsigned i = 0; i < bucketsOfFail.size(); ++i)
@@ -3698,7 +3698,7 @@ void CTI::privateCompilePutByIdReplace(Structure* structure,
   __ movl_rm(X86::edx, cachedOffset * sizeof(JSValue*), X86::eax);
   __ ret();
 
-  void* code = __ copy();
+  void* code = __ executableCopy();
   ASSERT(code);
 
   X86Assembler::link(
@@ -3809,7 +3809,7 @@ void CTI::privateCompilePutByIdTransition(Structure* oldStructure,
     failureJump = __ emitUnlinkedJmp();
   }
 
-  void* code = __ copy();
+  void* code = __ executableCopy();
   ASSERT(code);
 
   if (failureCases.size())
@@ -4029,7 +4029,7 @@ void CTI::privateCompileCTIMachineTrampolines() {
   // All trampolines constructed! copy the code, link up calls, and set the
   // pointers on the Machine object.
 
-  void* code = __ copy();
+  void* code = __ executableCopy();
   ASSERT(code);
 
   X86Assembler::link(
@@ -4167,7 +4167,7 @@ void CTI::privateCompilePatchGetArrayLength(void* returnAddress) {
   __ movl_rr(X86::ecx, X86::eax);
   X86Assembler::JmpSrc success = __ emitUnlinkedJmp();
 
-  void* code = __ copy();
+  void* code = __ executableCopy();
   ASSERT(code);
 
   // Use the repatch information to link the failure cases back to the original
