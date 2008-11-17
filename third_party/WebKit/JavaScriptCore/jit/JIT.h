@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CTI_h
-#define CTI_h
+#ifndef JIT_h
+#define JIT_h
 
 #include <wtf/Platform.h>
 
@@ -540,4 +540,4 @@ class JIT {
 
 #endif  // ENABLE(JIT)
 
-#endif  // CTI_h
+#endif  // JIT_h
