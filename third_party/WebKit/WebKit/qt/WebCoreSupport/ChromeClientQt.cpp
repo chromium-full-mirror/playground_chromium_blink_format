@@ -360,7 +360,9 @@ void ChromeClientQt::runOpenPanel(Frame* frame,
   // FIXME: Support multiple files.
 
   RefPtr<FileChooser> fileChooser = prpFileChooser;
-  QString suggestedFile = fileChooser->filenames()[0];
+  QString suggestedFile;
+  if (!fileChooser->filenames().isEmpty())
+    suggestedFile = fileChooser->filenames()[0];
   QString file =
       m_webPage->chooseFile(QWebFramePrivate::kit(frame), suggestedFile);
   if (!file.isEmpty())
