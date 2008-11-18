@@ -33,8 +33,8 @@
 namespace JSC {
 namespace WREC {
 
-class CharacterClass;
 class Generator;
+struct CharacterClass;
 
 class GenerateAtomFunctor {
  public:

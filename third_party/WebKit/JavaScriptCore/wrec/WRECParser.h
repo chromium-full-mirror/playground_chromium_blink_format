@@ -42,7 +42,7 @@ class X86Assembler;
 namespace JSC {
 namespace WREC {
 
-class CharacterClass;
+struct CharacterClass;
 
 class Parser {
  public:
