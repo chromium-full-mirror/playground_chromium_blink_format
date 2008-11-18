@@ -45,6 +45,7 @@ namespace WebCore {
 
 class AuthenticationChallenge;
 class CachedPage;
+class Color;
 class DocumentLoader;
 class Element;
 class FormState;
@@ -70,7 +71,7 @@ typedef void (FrameLoader::*FramePolicyFunction)(PolicyAction);
 
 class FrameLoaderClient {
  public:
-  virtual ~FrameLoaderClient() {}
+  virtual ~FrameLoaderClient();
   virtual void frameLoaderDestroyed() = 0;
 
   virtual bool hasWebView() const = 0;  // mainly for assertions
@@ -273,6 +274,12 @@ class FrameLoaderClient {
       unsigned long identifier,
       NSCachedURLResponse*) const = 0;
 #endif
+
+ protected:
+  static void transitionToCommittedForNewPage(Frame*,
+                                              const IntSize&,
+                                              const Color&,
+                                              bool);
 };
 
 }  // namespace WebCore
