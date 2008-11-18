@@ -551,8 +551,6 @@ bool RenderThemeQt::paintMenuList(RenderObject* o,
   opt.rect.moveTo(QPoint(0, 0));
   opt.rect.setSize(r.size());
 
-  opt.frame = false;
-
   p.drawComplexControl(QStyle::CC_ComboBox, opt);
   p.painter->translate(-topLeft);
   return false;
