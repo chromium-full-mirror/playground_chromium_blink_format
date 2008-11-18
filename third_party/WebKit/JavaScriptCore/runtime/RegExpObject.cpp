@@ -125,14 +125,14 @@ void setRegExpObjectLastIndex(ExecState* exec,
 }
 
 bool RegExpObject::match(ExecState* exec, const ArgList& args) {
-  RegExpConstructor* regExpObj =
+  RegExpConstructor* regExpConstructor =
       exec->lexicalGlobalObject()->regExpConstructor();
 
   UString input;
   if (!args.isEmpty())
     input = args.at(exec, 0)->toString(exec);
   else {
-    input = regExpObj->input();
+    input = regExpConstructor->input();
     if (input.isNull()) {
       throwError(exec, GeneralError, "No input.");
       return false;
@@ -151,8 +151,8 @@ bool RegExpObject::match(ExecState* exec, const ArgList& args) {
 
   int foundIndex;
   int foundLength;
-  regExpObj->performMatch(d->regExp.get(), input, lastIndex, foundIndex,
-                          foundLength);
+  regExpConstructor->performMatch(d->regExp.get(), input, lastIndex, foundIndex,
+                                  foundLength);
 
   if (global) {
     lastIndex = foundIndex < 0 ? 0 : foundIndex + foundLength;
