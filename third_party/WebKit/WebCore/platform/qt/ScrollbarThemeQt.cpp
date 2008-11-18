@@ -97,6 +97,8 @@ static QStyleOptionSlider* styleOptionSlider(Scrollbar* scrollbar,
   else
     opt.state |= QStyle::State_Active;
 
+  opt.state &= ~QStyle::State_HasFocus;
+
   opt.rect = scrollbar->frameRect();
   if (scrollbar->enabled())
     opt.state |= QStyle::State_Enabled;
