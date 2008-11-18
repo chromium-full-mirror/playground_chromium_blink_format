@@ -48,13 +48,13 @@ class Parser {
  public:
   enum Error {
     NoError,
-    Error_malformedCharacterClass,
-    Error_malformedParentheses,
-    Error_malformedPattern,
-    Error_malformedQuantifier,
-    Error_malformedEscape,
-    TempError_unsupportedQuantifier,
-    TempError_unsupportedParentheses,
+    MalformedCharacterClass,
+    MalformedParentheses,
+    MalformedPattern,
+    MalformedQuantifier,
+    MalformedEscape,
+    UnsupportedQuantifier,
+    UnsupportedParentheses,
   };
 
   static const int EndOfPattern = -1;
@@ -144,9 +144,8 @@ class Parser {
     return n;
   }
 
-  bool isEndOfPattern() { return peek() != EndOfPattern; }
+  bool atEndOfPattern() { return peek() == EndOfPattern; }
 
-  void setError(Error error) { m_error = error; }
   Error error() { return m_error; }
 
   void recordSubpattern() { ++m_numSubpatterns; }

@@ -54,7 +54,7 @@ ALWAYS_INLINE Quantifier Parser::parseGreedyQuantifier() {
       consume();
       // a numeric quantifier should always have a lower bound
       if (!peekIsDigit()) {
-        m_error = Error_malformedQuantifier;
+        m_error = MalformedQuantifier;
         return Quantifier(Quantifier::Error);
       }
       int min = consumeNumber();
@@ -89,7 +89,7 @@ ALWAYS_INLINE Quantifier Parser::parseGreedyQuantifier() {
               int max = consumeNumber();
 
               if (peek() != '}') {
-                m_error = Error_malformedQuantifier;
+                m_error = MalformedQuantifier;
                 return Quantifier(Quantifier::Error);
               }
               consume();
@@ -98,12 +98,12 @@ ALWAYS_INLINE Quantifier Parser::parseGreedyQuantifier() {
             }
 
             default:
-              m_error = Error_malformedQuantifier;
+              m_error = MalformedQuantifier;
               return Quantifier(Quantifier::Error);
           }
 
         default:
-          m_error = Error_malformedQuantifier;
+          m_error = MalformedQuantifier;
           return Quantifier(Quantifier::Error);
       }
     }
@@ -211,7 +211,7 @@ bool Parser::parseParentheses(JmpSrcVector&) {
   // "c".match(/(.*)c/) so we fall back to PCRE for any regexp containing
   // parentheses.
 
-  m_error = TempError_unsupportedParentheses;
+  m_error = UnsupportedParentheses;
   return false;
 }
 
@@ -228,14 +228,14 @@ bool Parser::parseCharacterClass(JmpSrcVector& failures) {
   while ((ch = peek()) != ']') {
     switch (ch) {
       case EndOfPattern:
-        m_error = Error_malformedCharacterClass;
+        m_error = MalformedCharacterClass;
         return false;
 
       case '\\':
         consume();
         switch (ch = peek()) {
           case EndOfPattern:
-            m_error = Error_malformedEscape;
+            m_error = MalformedEscape;
             return false;
           case '0':
           case '1':
@@ -279,7 +279,7 @@ bool Parser::parseCharacterClass(JmpSrcVector& failures) {
             consume();
             int control = consume();
             if (!isASCIIAlpha(control)) {
-              m_error = Error_malformedEscape;
+              m_error = MalformedEscape;
               return false;
             }
             charClassConstructor.put(control & 31);
@@ -291,7 +291,7 @@ bool Parser::parseCharacterClass(JmpSrcVector& failures) {
             consume();
             int x = consumeHex(2);
             if (x == -1) {
-              m_error = Error_malformedEscape;
+              m_error = MalformedEscape;
               return false;
             }
             charClassConstructor.put(x);
@@ -303,7 +303,7 @@ bool Parser::parseCharacterClass(JmpSrcVector& failures) {
             consume();
             int x = consumeHex(4);
             if (x == -1) {
-              m_error = Error_malformedEscape;
+              m_error = MalformedEscape;
               return false;
             }
             charClassConstructor.put(x);
@@ -347,7 +347,7 @@ bool Parser::parseCharacterClass(JmpSrcVector& failures) {
             // TODO: check this test for IdentifierPart.
             int ch = consume();
             if (isASCIIAlphanumeric(ch) || (ch == '_')) {
-              m_error = Error_malformedEscape;
+              m_error = MalformedEscape;
               return false;
             }
             charClassConstructor.put(ch);
@@ -365,7 +365,7 @@ bool Parser::parseCharacterClass(JmpSrcVector& failures) {
 
   // lazily catch reversed ranges ([z-a])in character classes
   if (charClassConstructor.isUpsideDown()) {
-    m_error = Error_malformedCharacterClass;
+    m_error = MalformedCharacterClass;
     return false;
   }
 
@@ -381,7 +381,7 @@ bool Parser::parseOctalEscape(JmpSrcVector& failures) {
 bool Parser::parseEscape(JmpSrcVector& failures) {
   switch (peek()) {
     case EndOfPattern:
-      m_error = Error_malformedEscape;
+      m_error = MalformedEscape;
       return false;
 
     // Assertions
@@ -420,7 +420,7 @@ bool Parser::parseEscape(JmpSrcVector& failures) {
       unsigned value = peekDigit();
       if (value > m_numSubpatterns) {
         consume();
-        m_error = Error_malformedEscape;
+        m_error = MalformedEscape;
         return false;
       }
       consume();
@@ -459,7 +459,7 @@ bool Parser::parseEscape(JmpSrcVector& failures) {
       consume();
       int control = consume();
       if (!isASCIIAlpha(control)) {
-        m_error = Error_malformedEscape;
+        m_error = MalformedEscape;
         return false;
       }
       return parsePatternCharacterQualifier(failures, control & 31);
@@ -470,7 +470,7 @@ bool Parser::parseEscape(JmpSrcVector& failures) {
       consume();
       int x = consumeHex(2);
       if (x == -1) {
-        m_error = Error_malformedEscape;
+        m_error = MalformedEscape;
         return false;
       }
       return parsePatternCharacterQualifier(failures, x);
@@ -481,7 +481,7 @@ bool Parser::parseEscape(JmpSrcVector& failures) {
       consume();
       int x = consumeHex(4);
       if (x == -1) {
-        m_error = Error_malformedEscape;
+        m_error = MalformedEscape;
         return false;
       }
       return parsePatternCharacterQualifier(failures, x);
@@ -518,7 +518,7 @@ bool Parser::parseEscape(JmpSrcVector& failures) {
       // TODO: check this test for IdentifierPart.
       int ch = consume();
       if (isASCIIAlphanumeric(ch) || (ch == '_')) {
-        m_error = Error_malformedEscape;
+        m_error = MalformedEscape;
         return false;
       }
       return parsePatternCharacterQualifier(failures, ch);
