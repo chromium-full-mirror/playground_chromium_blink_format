@@ -72,6 +72,8 @@ class Worker : public RefCounted<Worker>,
 
   void postMessage(const String& message);
 
+  virtual bool hasPendingActivity() const;
+
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,
                                 bool useCapture);

@@ -32,6 +32,8 @@
 
 #include "JSWorkerContext.h"
 #include "WorkerContext.h"
+#include "WorkerMessagingProxy.h"
+#include "WorkerThread.h"
 #include <parser/SourceCode.h>
 #include <runtime/Completion.h>
 #include <runtime/Completion.h>
@@ -73,6 +75,9 @@ JSValue* WorkerScriptController::evaluate(const String& sourceURL,
       exec, exec->dynamicGlobalObject()->globalScopeChain(),
       makeSource(code, sourceURL, baseLine), m_workerContextWrapper);
   m_workerContextWrapper->stopTimeoutCheck();
+
+  m_workerContext->thread()->messagingProxy()->reportWorkerThreadActivity(
+      m_workerContext->hasPendingActivity());
 
   if (comp.complType() == Normal || comp.complType() == ReturnValue)
     return comp.value();
