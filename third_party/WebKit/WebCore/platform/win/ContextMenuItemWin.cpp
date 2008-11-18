@@ -98,8 +98,7 @@ LPMENUITEMINFO ContextMenuItem::releasePlatformDescription() {
 
 ContextMenuItemType ContextMenuItem::type() const {
   ContextMenuItemType type = ActionType;
-
-  if ((m_platformDescription->fType & MFT_STRING) &&
+  if (((m_platformDescription->fType & ~MFT_OWNERDRAW) == MFT_STRING) &&
       m_platformDescription->hSubMenu)
     type = SubmenuType;
   else if (m_platformDescription->fType & MFT_SEPARATOR)
@@ -176,6 +175,6 @@ void ContextMenuItem::setEnabled(bool enabled) {
 }
 
 bool ContextMenuItem::enabled() const {
-  return m_platformDescription->fState & MFS_ENABLED;
+  return !(m_platformDescription->fState & MFS_DISABLED);
 }
 }
