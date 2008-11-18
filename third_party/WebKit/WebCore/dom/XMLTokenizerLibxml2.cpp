@@ -951,7 +951,7 @@ void XMLTokenizer::internalSubset(const xmlChar* name,
   if (m_doc) {
 #if ENABLE(WML)
     String extId = toString(externalID);
-    if (m_doc->isWMLDocument() && extId != "-//WAPFORUM//DTD WML 1.3//EN" &&
+    if (isWMLDocument() && extId != "-//WAPFORUM//DTD WML 1.3//EN" &&
         extId != "-//WAPFORUM//DTD WML 1.2//EN" &&
         extId != "-//WAPFORUM//DTD WML 1.1//EN" &&
         extId != "-//WAPFORUM//DTD WML 1.0//EN")
@@ -1099,7 +1099,11 @@ static xmlEntityPtr getEntityHandler(void* closure, const xmlChar* name) {
   }
 
   ent = xmlGetDocEntity(ctxt->myDoc, name);
-  if (!ent && getTokenizer(closure)->isXHTMLDocument()) {
+  if (!ent && (getTokenizer(closure)->isXHTMLDocument()
+#if ENABLE(WML)
+               || getTokenizer(closure)->isWMLDocument()
+#endif
+                   )) {
     ent = getXHTMLEntity(name);
     if (ent)
       ent->etype = XML_INTERNAL_GENERAL_ENTITY;

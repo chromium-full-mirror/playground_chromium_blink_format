@@ -36,6 +36,11 @@ class WMLPElement : public WMLElement {
 
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(MappedAttribute*);
+
+  virtual void insertedIntoDocument();
+
+ private:
+  String m_mode;
 };
 }
 
