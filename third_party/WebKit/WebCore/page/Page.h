@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008 Torch Mobile Inc.  All rights reserved.
+ *               http://www.torchmobile.com/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -64,6 +66,9 @@ class SelectionController;
 class SessionStorage;
 #endif
 class Settings;
+#if ENABLE(WML)
+class WMLPageState;
+#endif
 
 enum TextCaseSensitivity { TextCaseSensitive, TextCaseInsensitive };
 enum FindDirection { FindDirectionForward, FindDirectionBackward };
@@ -210,6 +215,10 @@ class Page : Noncopyable {
   void setSessionStorage(PassRefPtr<SessionStorage>);
 #endif
 
+#if ENABLE(WML)
+  void setWMLPageState(RefPtr<WMLPageState>);
+  WMLPageState* wmlPageState() const;
+#endif
   void setCustomHTMLTokenizerTimeDelay(double);
   bool hasCustomHTMLTokenizerTimeDelay() const {
     return m_customHTMLTokenizerTimeDelay != -1;
@@ -281,6 +290,10 @@ class Page : Noncopyable {
 #if PLATFORM(WIN) || (PLATFORM(WX) && defined(__WXMSW__)) || \
     (PLATFORM(QT) && defined(Q_WS_WIN))
   static HINSTANCE s_instanceHandle;
+#endif
+
+#if ENABLE(WML)
+  RefPtr<WMLPageState> m_wmlPageState;
 #endif
 };
 

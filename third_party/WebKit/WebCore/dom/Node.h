@@ -185,6 +185,12 @@ class Node : public TreeShared<Node> {
   static bool isSVGElement() { return false; }
 #endif
 
+#if ENABLE(WML)
+  virtual bool isWMLElement() const { return false; }
+#else
+  static bool isWMLElement() { return false; }
+#endif
+
   virtual bool isStyledElement() const { return false; }
   virtual bool isFrameOwnerElement() const { return false; }
   virtual bool isAttributeNode() const { return false; }
