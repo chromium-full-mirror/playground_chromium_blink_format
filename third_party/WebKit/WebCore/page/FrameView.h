@@ -105,6 +105,7 @@ class FrameView : public ScrollView {
 
   Color baseBackgroundColor() const;
   void setBaseBackgroundColor(Color);
+  void updateBackgroundRecursively(const Color&, bool);
 
   bool shouldUpdateWhileOffscreen() const;
   void setShouldUpdateWhileOffscreen(bool);
