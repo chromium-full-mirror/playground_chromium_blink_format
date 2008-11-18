@@ -333,11 +333,7 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
     return Document::createXHTML(frame);
 
 #if ENABLE(WML)
-  if (type == "text/vnd.wap.wml"
-#if ENABLE(WBXML)
-      || type == "application/vnd.wap.wmlc"
-#endif
-      )
+  if (type == "text/vnd.wap.wml" || type == "application/vnd.wap.wmlc")
     return WMLDocument::create(frame);
 #endif
 
