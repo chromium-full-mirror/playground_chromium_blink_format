@@ -1069,6 +1069,8 @@ Widget* FrameLoaderClientQt::createPlugin(const IntSize& pluginSize,
       widget->setParent(view);
       QtPluginWidget* w = new QtPluginWidget();
       w->setPlatformWidget(widget);
+      // Make sure it's invisible until properly placed into the layout
+      w->setFrameRect(IntRect(0, 0, 0, 0));
       return w;
     }
     // FIXME: make things work for widgetless plugins as well
