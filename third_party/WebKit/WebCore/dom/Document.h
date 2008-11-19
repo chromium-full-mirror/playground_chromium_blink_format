@@ -909,6 +909,10 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void initDNSPrefetch();
   void parseDNSPrefetchControlHeader(const String&);
 
+  virtual void reportException(const String& errorMessage,
+                               int lineNumber,
+                               const String& sourceURL);
+
  protected:
   Document(Frame*, bool isXHTML);
 

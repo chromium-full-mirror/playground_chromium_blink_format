@@ -49,6 +49,10 @@ class WorkerMessagingProxy : Noncopyable {
   void postMessageToWorkerObject(const String& message);
   void postMessageToWorkerContext(const String& message);
 
+  void postWorkerException(const String& errorMessage,
+                           int lineNumber,
+                           const String& sourceURL);
+
   void workerThreadCreated(PassRefPtr<WorkerThread>);
   void workerObjectDestroyed();
   void workerContextDestroyed();

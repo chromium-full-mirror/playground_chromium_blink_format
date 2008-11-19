@@ -50,6 +50,10 @@ class ScriptExecutionContext {
 
   const KURL& url() const { return virtualURL(); }
 
+  virtual void reportException(const String& errorMessage,
+                               int lineNumber,
+                               const String& sourceURL) = 0;
+
   // Active objects are not garbage collected even if inaccessible, e.g. because
   // their activity may result in callbacks being invoked.
   void stopActiveDOMObjects();

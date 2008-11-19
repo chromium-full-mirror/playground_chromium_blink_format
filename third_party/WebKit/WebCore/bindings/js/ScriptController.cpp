@@ -123,7 +123,7 @@ JSValue* ScriptController::evaluate(const String& sourceURL,
   }
 
   if (comp.complType() == Throw)
-    m_frame->domWindow()->console()->reportException(exec, comp.value());
+    reportException(exec, comp.value());
 
   m_sourceURL = savedSourceURL;
   return noValue();

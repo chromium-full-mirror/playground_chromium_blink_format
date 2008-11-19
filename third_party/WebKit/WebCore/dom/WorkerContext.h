@@ -73,6 +73,10 @@ class WorkerContext : public RefCounted<WorkerContext>,
 
   bool hasPendingActivity() const;
 
+  virtual void reportException(const String& errorMessage,
+                               int lineNumber,
+                               const String& sourceURL);
+
   virtual WorkerContext* toWorkerContext() { return this; }
 
   void postMessage(const String& message);
