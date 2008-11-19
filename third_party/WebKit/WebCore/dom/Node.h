@@ -322,6 +322,7 @@ class Node : public TreeShared<Node> {
   virtual bool isKeyboardFocusable(KeyboardEvent*) const;
   virtual bool isMouseFocusable() const;
 
+  virtual bool isAutofilled() const { return false; }
   virtual bool isControl() const {
     return false;
   }  // Eventually the notion of what is a control will be extensible.

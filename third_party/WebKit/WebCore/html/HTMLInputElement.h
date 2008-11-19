@@ -195,8 +195,8 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
   String useMap() const;
   void setUseMap(const String&);
 
-  bool autofilled() const { return m_autofilled; }
-  void setAutofilled(bool b = true) { m_autofilled = b; }
+  virtual bool isAutofilled() const { return m_autofilled; }
+  void setAutofilled(bool b = true);
 
   FileList* files();
 

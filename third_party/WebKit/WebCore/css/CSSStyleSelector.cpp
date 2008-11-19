@@ -989,7 +989,8 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
         return false;
       if (isControl && (s->isEnabled() != m_element->isEnabled()) ||
           (s->isIndeterminate() != m_element->isIndeterminate()) ||
-          (s->isChecked() != m_element->isChecked()))
+          (s->isChecked() != m_element->isChecked()) ||
+          (s->isAutofilled() != m_element->isAutofilled()))
         return false;
 
       if (style->transitions() || style->animations())
@@ -2389,8 +2390,8 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
           return true;
         break;
       case CSSSelector::PseudoAutofill:
-        if (e && e->hasTagName(inputTag))
-          return static_cast<HTMLInputElement*>(e)->autofilled();
+        if (e)
+          return e->isAutofilled();
         break;
       case CSSSelector::PseudoLink:
         if (pseudoState == PseudoUnknown || pseudoState == PseudoAnyLink)
