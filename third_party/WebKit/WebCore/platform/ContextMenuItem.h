@@ -119,13 +119,13 @@ enum ContextMenuAction {
   ContextMenuItemTagDefaultDirection,
   ContextMenuItemTagLeftToRight,
   ContextMenuItemTagRightToLeft,
+  ContextMenuItemTagPDFSinglePageScrolling,
+  ContextMenuItemTagPDFFacingPagesScrolling,
+  ContextMenuItemTagInspectElement,
   ContextMenuItemTagTextDirectionMenu,  // Text Direction sub-menu
   ContextMenuItemTagTextDirectionDefault,
   ContextMenuItemTagTextDirectionLeftToRight,
   ContextMenuItemTagTextDirectionRightToLeft,
-  ContextMenuItemTagPDFSinglePageScrolling,
-  ContextMenuItemTagPDFFacingPagesScrolling,
-  ContextMenuItemTagInspectElement,
   ContextMenuItemBaseApplicationTag = 10000
 };
 
