@@ -979,8 +979,7 @@ void WebView::paintIntoBackingStore(FrameView* frameView,
   ::ReleaseDC(m_viewWindow, dc);
 #endif
 
-  if (!m_transparent)
-    FillRect(bitmapDC, &rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
+  FillRect(bitmapDC, &rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
   if (frameView && frameView->frame() &&
       frameView->frame()->contentRenderer()) {
     GraphicsContext gc(bitmapDC, m_transparent);
