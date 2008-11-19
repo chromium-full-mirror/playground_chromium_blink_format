@@ -69,7 +69,7 @@ void FrameLoaderClient::transitionToCommittedForNewPage(
   // assigned it to frame.
   frameView->deref();
 
-  if (!backgroundColor.isValid())
+  if (backgroundColor.isValid())
     frameView->updateBackgroundRecursively(backgroundColor, transparent);
 
   if (isMainFrame)
