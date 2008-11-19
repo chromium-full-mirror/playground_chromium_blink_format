@@ -1135,12 +1135,12 @@ void JIT::compileBinaryArithOpSlowCase(Instruction* vPC,
   __ link(iter->from, here);
   if (types.second().isReusable() && isSSE2Present()) {
     if (!types.first().definitelyIsNumber()) {
-      if (linkSlowCaseIfNotJSCell(++iter, src2))
+      if (linkSlowCaseIfNotJSCell(++iter, src1))
         ++iter;
       __ link(iter->from, here);
     }
     if (!types.second().definitelyIsNumber()) {
-      if (linkSlowCaseIfNotJSCell(++iter, src1))
+      if (linkSlowCaseIfNotJSCell(++iter, src2))
         ++iter;
       __ link(iter->from, here);
     }
