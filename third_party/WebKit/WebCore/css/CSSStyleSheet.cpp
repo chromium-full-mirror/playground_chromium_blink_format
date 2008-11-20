@@ -38,7 +38,8 @@ CSSStyleSheet::CSSStyleSheet(CSSStyleSheet* parentSheet,
       m_doc(parentSheet ? parentSheet->doc() : 0),
       m_namespaces(0),
       m_charset(charset),
-      m_loadCompleted(false) {}
+      m_loadCompleted(false),
+      m_strictParsing(!parentSheet || parentSheet->useStrictParsing()) {}
 
 CSSStyleSheet::CSSStyleSheet(Node* parentNode,
                              const String& href,
@@ -47,7 +48,8 @@ CSSStyleSheet::CSSStyleSheet(Node* parentNode,
       m_doc(parentNode->document()),
       m_namespaces(0),
       m_charset(charset),
-      m_loadCompleted(false) {}
+      m_loadCompleted(false),
+      m_strictParsing(false) {}
 
 CSSStyleSheet::CSSStyleSheet(CSSRule* ownerRule,
                              const String& href,
@@ -55,7 +57,8 @@ CSSStyleSheet::CSSStyleSheet(CSSRule* ownerRule,
     : StyleSheet(ownerRule, href),
       m_namespaces(0),
       m_charset(charset),
-      m_loadCompleted(false) {
+      m_loadCompleted(false),
+      m_strictParsing(!ownerRule || ownerRule->useStrictParsing()) {
   CSSStyleSheet* parentSheet = ownerRule ? ownerRule->parentStyleSheet() : 0;
   m_doc = parentSheet ? parentSheet->doc() : 0;
 }

@@ -67,21 +67,19 @@ class StyleBase : public RefCounted<StyleBase> {
 
   virtual void checkLoaded();
 
-  void setStrictParsing(bool b) { m_strictParsing = b; }
-  bool useStrictParsing() const { return m_strictParsing; }
+  bool useStrictParsing() const {
+    return !m_parent || m_parent->useStrictParsing();
+  }
 
   virtual void insertedIntoParent() {}
 
   StyleSheet* stylesheet();
 
  protected:
-  StyleBase(StyleBase* parent)
-      : m_parent(parent),
-        m_strictParsing(!parent || parent->useStrictParsing()) {}
+  StyleBase(StyleBase* parent) : m_parent(parent) {}
 
  private:
   StyleBase* m_parent;
-  bool m_strictParsing;
 };
 }
 

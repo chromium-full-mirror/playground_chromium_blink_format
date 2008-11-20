@@ -145,6 +145,9 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
     return m_variableDependentValueCount > 0;
   }
 
+  void setStrictParsing(bool b) { m_strictParsing = b; }
+  bool useStrictParsing() const { return m_strictParsing; }
+
  protected:
   CSSMutableStyleDeclaration(CSSRule* parentRule);
 
@@ -168,7 +171,8 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
 
   DeprecatedValueList<CSSProperty> m_values;
   Node* m_node;
-  unsigned m_variableDependentValueCount;
+  unsigned m_variableDependentValueCount : 31;
+  bool m_strictParsing : 1;
 };
 
 }  // namespace WebCore

@@ -25,6 +25,7 @@
 #include "CSSParser.h"
 #include "CSSProperty.h"
 #include "CSSPropertyNames.h"
+#include "CSSRule.h"
 #include "CSSStyleSheet.h"
 #include "CSSValueList.h"
 #include "Document.h"
@@ -37,12 +38,13 @@ using namespace std;
 namespace WebCore {
 
 CSSMutableStyleDeclaration::CSSMutableStyleDeclaration()
-    : m_node(0), m_variableDependentValueCount(0) {}
+    : m_node(0), m_variableDependentValueCount(0), m_strictParsing(false) {}
 
 CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(CSSRule* parent)
     : CSSStyleDeclaration(parent),
       m_node(0),
-      m_variableDependentValueCount(0) {}
+      m_variableDependentValueCount(0),
+      m_strictParsing(!parent || parent->useStrictParsing()) {}
 
 CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
     CSSRule* parent,
@@ -51,7 +53,8 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
     : CSSStyleDeclaration(parent),
       m_values(values),
       m_node(0),
-      m_variableDependentValueCount(variableDependentValueCount) {
+      m_variableDependentValueCount(variableDependentValueCount),
+      m_strictParsing(!parent || parent->useStrictParsing()) {
   // FIXME: This allows duplicate properties.
 }
 
@@ -59,7 +62,10 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
     CSSRule* parent,
     const CSSProperty* const* properties,
     int numProperties)
-    : CSSStyleDeclaration(parent), m_node(0), m_variableDependentValueCount(0) {
+    : CSSStyleDeclaration(parent),
+      m_node(0),
+      m_variableDependentValueCount(0),
+      m_strictParsing(!parent || parent->useStrictParsing()) {
   for (int i = 0; i < numProperties; ++i) {
     ASSERT(properties[i]);
     m_values.append(*properties[i]);
@@ -73,6 +79,7 @@ CSSMutableStyleDeclaration& CSSMutableStyleDeclaration::operator=(
     const CSSMutableStyleDeclaration& other) {
   // don't attach it to the same node, just leave the current m_node value
   m_values = other.m_values;
+  m_strictParsing = other.m_strictParsing;
   return *this;
 }
 
