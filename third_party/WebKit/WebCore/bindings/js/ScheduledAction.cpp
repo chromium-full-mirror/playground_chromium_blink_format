@@ -32,6 +32,7 @@
 #include "JSDOMBinding.h"
 #include "JSDOMWindow.h"
 #include "ScriptController.h"
+#include "ScriptValue.h"
 #include <runtime/JSLock.h>
 
 using namespace JSC;

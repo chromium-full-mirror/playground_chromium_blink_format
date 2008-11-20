@@ -39,6 +39,7 @@
 #include "PageGroup.h"
 #include "PausedTimeouts.h"
 #include "runtime_root.h"
+#include "ScriptValue.h"
 #include "Settings.h"
 #include "StringSourceProvider.h"
 
@@ -90,9 +91,9 @@ ScriptController::~ScriptController() {
   disconnectPlatformScriptObjects();
 }
 
-JSValue* ScriptController::evaluate(const String& sourceURL,
-                                    int baseLine,
-                                    const String& str) {
+ScriptValue ScriptController::evaluate(const String& sourceURL,
+                                       int baseLine,
+                                       const String& str) {
   // evaluate code. Returns the JS return value or 0
   // if there was none, an error occured or the type couldn't be converted.
 

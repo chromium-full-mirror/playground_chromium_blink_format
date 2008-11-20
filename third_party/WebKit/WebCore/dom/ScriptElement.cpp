@@ -32,6 +32,7 @@
 #include "FrameLoader.h"
 #include "MIMETypeRegistry.h"
 #include "ScriptController.h"
+#include "ScriptValue.h"
 #include "StringHash.h"
 #include "Text.h"
 #include <wtf/StdLibExtras.h>

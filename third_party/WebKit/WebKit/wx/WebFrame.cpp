@@ -42,6 +42,7 @@
 #include "FrameLoaderClientWx.h"
 
 #include "ScriptController.h"
+#include "ScriptValue.h"
 #include "JSDOMBinding.h"
 #include <runtime/JSValue.h>
 #include <runtime/UString.h>
@@ -168,7 +169,7 @@ wxString wxWebFrame::RunScript(const wxString& javascript) {
   wxString returnValue = wxEmptyString;
   if (m_impl->frame) {
     JSC::JSValue* result =
-        m_impl->frame->loader()->executeScript(javascript, true);
+        m_impl->frame->loader()->executeScript(javascript, true).jsValue();
     if (result)
       returnValue = wxString(
           result
