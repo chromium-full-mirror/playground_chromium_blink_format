@@ -58,6 +58,7 @@
 #include "PasteboardHelper.h"
 #include "PlatformKeyboardEvent.h"
 #include "PlatformWheelEvent.h"
+#include "ScriptValue.h"
 #include "Scrollbar.h"
 #include "SubstituteData.h"
 #include <wtf/GOwnPtr.h>
