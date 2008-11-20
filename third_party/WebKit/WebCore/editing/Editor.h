@@ -300,6 +300,8 @@ class Editor {
                                      bool caseFlag,
                                      bool wrapFlag);
 
+  void addToKillRing(Range*, bool prepend);
+
  private:
   Frame* m_frame;
   OwnPtr<DeleteButtonController> m_deleteButtonController;
@@ -331,8 +333,6 @@ class Editor {
   void selectComposition();
   void confirmComposition(const String&, bool preserveSelection);
   void setIgnoreCompositionSelectionChange(bool ignore);
-
-  void addToKillRing(Range*, bool prepend);
 
   PassRefPtr<Range> firstVisibleRange(const String&, bool caseFlag);
   PassRefPtr<Range> lastVisibleRange(const String&, bool caseFlag);
