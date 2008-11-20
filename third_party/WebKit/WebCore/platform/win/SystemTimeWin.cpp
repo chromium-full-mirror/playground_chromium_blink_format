@@ -47,6 +47,7 @@ double currentTime() {
 }
 
 float userIdleTime() {
+#if !PLATFORM(WIN_CE)
   LASTINPUTINFO lastInputInfo = {0};
   lastInputInfo.cbSize = sizeof(LASTINPUTINFO);
   if (::GetLastInputInfo(&lastInputInfo))
@@ -54,6 +55,7 @@ float userIdleTime() {
                                                              // returns ms of
                                                              // uptime valid for
                                                              // up to 49.7 days.
+#endif
   return FLT_MAX;  // return an arbitrarily high userIdleTime so that releasing
                    // pages from the page cache isn't postponed.
 }
