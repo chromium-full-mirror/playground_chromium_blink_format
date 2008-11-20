@@ -55,6 +55,8 @@ static JSObject* constructWorker(ExecState* exec,
     return throwError(exec, SyntaxError, "Not enough arguments");
 
   UString scriptURL = args.at(exec, 0)->toString(exec);
+  if (exec->hadException())
+    return 0;
 
   DOMWindow* window = asJSDOMWindow(exec->lexicalGlobalObject())->impl();
 
