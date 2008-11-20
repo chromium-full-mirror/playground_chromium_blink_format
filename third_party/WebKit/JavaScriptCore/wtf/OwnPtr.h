@@ -22,6 +22,7 @@
 #define WTF_OwnPtr_h
 
 #include <algorithm>
+#include <memory>
 #include <wtf/Assertions.h>
 #include <wtf/Noncopyable.h>
 
@@ -74,6 +75,7 @@ class OwnPtr : Noncopyable {
   typedef ValueType* PtrType;
 
   explicit OwnPtr(PtrType ptr = 0) : m_ptr(ptr) {}
+  OwnPtr(std::auto_ptr<ValueType> autoPtr) : m_ptr(autoPtr.release()) {}
   ~OwnPtr() { deleteOwnedPtr(m_ptr); }
 
   PtrType get() const { return m_ptr; }
@@ -83,11 +85,19 @@ class OwnPtr : Noncopyable {
     return ptr;
   }
 
+  // FIXME: This should be renamed to adopt.
   void set(PtrType ptr) {
     ASSERT(!ptr || m_ptr != ptr);
     deleteOwnedPtr(m_ptr);
     m_ptr = ptr;
   }
+
+  void adopt(std::auto_ptr<ValueType> autoPtr) {
+    ASSERT(!autoPtr.get() || m_ptr != autoPtr.get());
+    deleteOwnedPtr(m_ptr);
+    m_ptr = autoPtr.release();
+  }
+
   void clear() {
     deleteOwnedPtr(m_ptr);
     m_ptr = 0;
