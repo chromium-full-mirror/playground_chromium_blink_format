@@ -146,14 +146,6 @@ void BytecodeGenerator::generate() {
   }
 #endif
 
-  m_scopeNode->children().shrinkCapacity(0);
-  if (m_codeType != EvalCode) {  // eval code needs to hang on to its
-                                 // declaration stacks to keep declaration info
-                                 // alive until Interpreter::execute time.
-    m_scopeNode->varStack().shrinkCapacity(0);
-    m_scopeNode->functionStack().shrinkCapacity(0);
-  }
-
   m_codeBlock->instructions.shrinkToFit();
   m_codeBlock->globalResolveInstructions.shrinkToFit();
   m_codeBlock->propertyAccessInstructions.shrinkToFit();

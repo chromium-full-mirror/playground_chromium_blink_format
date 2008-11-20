@@ -54,6 +54,8 @@ class Parser : Noncopyable {
                                int* errLine = 0,
                                UString* errMsg = 0);
 
+  void reparse(JSGlobalData*, FunctionBodyNode*);
+
   void didFinishParsing(SourceElements*,
                         ParserRefCountedData<DeclarationStacks::VarStack>*,
                         ParserRefCountedData<DeclarationStacks::FunctionStack>*,

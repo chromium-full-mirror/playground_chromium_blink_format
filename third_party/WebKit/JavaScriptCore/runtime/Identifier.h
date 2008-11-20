@@ -83,6 +83,7 @@ class Identifier {
   friend bool operator!=(const Identifier&, const Identifier&);
 
   friend bool operator==(const Identifier&, const char*);
+  friend bool operator!=(const Identifier&, const char*);
 
   static void remove(UString::Rep*);
 
@@ -151,6 +152,10 @@ inline bool operator!=(const Identifier& a, const Identifier& b) {
 
 inline bool operator==(const Identifier& a, const char* b) {
   return Identifier::equal(a, b);
+}
+
+inline bool operator!=(const Identifier& a, const char* b) {
+  return !Identifier::equal(a, b);
 }
 
 IdentifierTable* createIdentifierTable();

@@ -89,9 +89,8 @@ class Lexer : Noncopyable {
 
   void clear();
   SourceCode sourceCode(int openBrace, int closeBrace, int firstLine) {
-    return SourceCode(m_source->provider(),
-                      m_source->startOffset() + openBrace + 1,
-                      m_source->startOffset() + closeBrace, firstLine);
+    return SourceCode(m_source->provider(), openBrace + 1, closeBrace,
+                      firstLine);
   }
 
  private:
