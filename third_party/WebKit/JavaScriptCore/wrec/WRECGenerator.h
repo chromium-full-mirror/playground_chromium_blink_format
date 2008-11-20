@@ -52,13 +52,14 @@ class Generator {
   typedef X86Assembler::JmpDst JmpDst;
   typedef X86Assembler::RegisterID RegisterID;
 
-  // these regs setup by the params
-  static const RegisterID inputRegister = X86::eax;
-  static const RegisterID currentPositionRegister = X86::edx;
-  static const RegisterID lengthRegister = X86::ecx;
-  static const RegisterID currentValueRegister = X86::esi;
-  static const RegisterID outputRegister = X86::edi;
-  static const RegisterID quantifierCountRegister = X86::ebx;
+  static const RegisterID input = X86::eax;
+  static const RegisterID length = X86::ecx;
+  static const RegisterID index = X86::edx;
+  static const RegisterID character = X86::esi;
+  static const RegisterID output = X86::edi;
+  static const RegisterID repeatCount = X86::ebx;  // How many times the current
+                                                   // atom repeats in the
+                                                   // current match.
 
   void generateGreedyQuantifier(JmpSrcVector& failures,
                                 GenerateAtomFunctor& functor,
@@ -107,7 +108,7 @@ class Generator {
                                     JmpSrc success,
                                     JmpSrc fail);
 
-  void generateDisjunction(JmpSrcVector& successes, JmpSrcVector& failures);
+  void terminateAlternative(JmpSrcVector& successes, JmpSrcVector& failures);
   void terminateDisjunction(JmpSrcVector& successes);
 
  private:

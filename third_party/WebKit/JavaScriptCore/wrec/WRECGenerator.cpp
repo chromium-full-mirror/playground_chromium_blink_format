@@ -42,14 +42,12 @@ namespace JSC {
 namespace WREC {
 
 void Generator::generateBacktrack1() {
-  __ subl_i8r(1, currentPositionRegister);
+  __ subl_i8r(1, index);
 }
 
 void Generator::generateBacktrackBackreference(unsigned subpatternId) {
-  __ subl_mr((2 * subpatternId + 1) * sizeof(int), outputRegister,
-             currentPositionRegister);
-  __ addl_mr((2 * subpatternId) * sizeof(int), outputRegister,
-             currentPositionRegister);
+  __ subl_mr((2 * subpatternId + 1) * sizeof(int), output, index);
+  __ addl_mr((2 * subpatternId) * sizeof(int), output, index);
 }
 
 void Generator::generateBackreferenceQuantifier(JmpSrcVector& failures,
@@ -59,10 +57,8 @@ void Generator::generateBackreferenceQuantifier(JmpSrcVector& failures,
                                                 unsigned max) {
   GenerateBackreferenceFunctor functor(subpatternId);
 
-  __ movl_mr((2 * subpatternId) * sizeof(int), outputRegister,
-             currentValueRegister);
-  __ cmpl_rm(currentValueRegister, ((2 * subpatternId) + 1) * sizeof(int),
-             outputRegister);
+  __ movl_mr((2 * subpatternId) * sizeof(int), output, character);
+  __ cmpl_rm(character, ((2 * subpatternId) + 1) * sizeof(int), output);
   JmpSrc skipIfEmpty = __ je();
 
   ASSERT(quantifierType == Quantifier::Greedy ||
@@ -83,26 +79,26 @@ void Generator::generateNonGreedyQuantifier(JmpSrcVector& failures,
   JmpSrcVector newFailures;
 
   // (0) Setup:
-  //     init quantifierCountRegister
-  __ pushl_r(quantifierCountRegister);
-  __ xorl_rr(quantifierCountRegister, quantifierCountRegister);
+  //     init repeatCount
+  __ pushl_r(repeatCount);
+  __ xorl_rr(repeatCount, repeatCount);
   JmpSrc gotoStart = __ jmp();
 
   // (4) Failure case
 
   JmpDst quantifierFailed = __ label();
-  // (4.1) Restore original value of quantifierCountRegister from the stack
-  __ popl_r(quantifierCountRegister);
+  // (4.1) Restore original value of repeatCount from the stack
+  __ popl_r(repeatCount);
   failures.append(__ jmp());
 
   // (3) We just tried an alternative, and it failed - check we can try more.
 
   JmpDst alternativeFailed = __ label();
   // (3.1) remove the value pushed prior to testing the alternative
-  __ popl_r(currentPositionRegister);
+  __ popl_r(index);
   // (3.2) if there is a limit, and we have reached it, game over.
   if (max != Quantifier::noMaxSpecified) {
-    __ cmpl_i32r(max, quantifierCountRegister);
+    __ cmpl_i32r(max, repeatCount);
     __ link(__ je(), quantifierFailed);
   }
 
@@ -116,7 +112,7 @@ void Generator::generateNonGreedyQuantifier(JmpSrcVector& failures,
   // (1.1) Do a check for the atom check.
   functor.generateAtom(this, newFailures);
   // (1.2) If we get here, successful match!
-  __ addl_i8r(1, quantifierCountRegister);
+  __ addl_i8r(1, repeatCount);
   // (1.3) We needed to read the atom, and we failed - that's terminally  bad
   // news.
   for (unsigned i = 0; i < newFailures.size(); ++i)
@@ -126,7 +122,7 @@ void Generator::generateNonGreedyQuantifier(JmpSrcVector& failures,
   if (min) {
     // ... except if min was 1 no need to keep checking!
     if (min != 1) {
-      __ cmpl_i32r(min, quantifierCountRegister);
+      __ cmpl_i32r(min, repeatCount);
       __ link(__ jl(), testQuantifiedAtom);
     }
   } else
@@ -136,10 +132,10 @@ void Generator::generateNonGreedyQuantifier(JmpSrcVector& failures,
   // (2) Plant an alternative check for the remainder of the expression
 
   // (2.1) recursively call to parseAlternative, if it falls through, success!
-  __ pushl_r(currentPositionRegister);
+  __ pushl_r(index);
   m_parser.parseAlternative(newFailures);
   __ addl_i8r(4, X86::esp);
-  __ popl_r(quantifierCountRegister);
+  __ popl_r(repeatCount);
   // (2.2) link failure cases to jump back up to alternativeFailed.
   for (unsigned i = 0; i < newFailures.size(); ++i)
     __ link(newFailures[i], alternativeFailed);
@@ -157,9 +153,9 @@ void Generator::generateGreedyQuantifier(JmpSrcVector& failures,
   JmpSrcVector newFailures;
 
   // (0) Setup:
-  //     init quantifierCountRegister
-  __ pushl_r(quantifierCountRegister);
-  __ xorl_rr(quantifierCountRegister, quantifierCountRegister);
+  //     init repeatCount
+  __ pushl_r(repeatCount);
+  __ xorl_rr(repeatCount, repeatCount);
 
   // (1) Greedily read as many of the atom as possible
 
@@ -168,13 +164,13 @@ void Generator::generateGreedyQuantifier(JmpSrcVector& failures,
   // (1.1) Do a character class check.
   functor.generateAtom(this, newFailures);
   // (1.2) If we get here, successful match!
-  __ addl_i8r(1, quantifierCountRegister);
+  __ addl_i8r(1, repeatCount);
   // (1.3) loop, unless we've read max limit.
   if (max != Quantifier::noMaxSpecified) {
     if (max != 1) {
       // if there is a limit, only loop while less than limit, otherwise fall
       // throught to...
-      __ cmpl_i32r(max, quantifierCountRegister);
+      __ cmpl_i32r(max, repeatCount);
       __ link(__ jne(), readMore);
     }
     // ...if there is no min we need jump to the alternative test, if there is
@@ -192,29 +188,29 @@ void Generator::generateGreedyQuantifier(JmpSrcVector& failures,
       __ link(newFailures[i], minimumTest);
     newFailures.clear();
     //
-    __ cmpl_i32r(min, quantifierCountRegister);
+    __ cmpl_i32r(min, repeatCount);
     newFailures.append(__ jae());
   }
 
   // (4) Failure case
 
   JmpDst quantifierFailed = __ label();
-  // (4.1) Restore original value of quantifierCountRegister from the stack
-  __ popl_r(quantifierCountRegister);
+  // (4.1) Restore original value of repeatCount from the stack
+  __ popl_r(repeatCount);
   failures.append(__ jmp());
 
   // (3) Backtrack
 
   JmpDst backtrack = __ label();
   // (3.1) this was preserved prior to executing the alternative
-  __ popl_r(currentPositionRegister);
+  __ popl_r(index);
   // (3.2) check we can retry with fewer matches - backtracking fails if already
   // at the minimum
-  __ cmpl_i32r(min, quantifierCountRegister);
+  __ cmpl_i32r(min, repeatCount);
   __ link(__ je(), quantifierFailed);
   // (3.3) roll off one match, and retry.
   functor.backtrack(this);
-  __ subl_i8r(1, quantifierCountRegister);
+  __ subl_i8r(1, repeatCount);
 
   // (2) Try an alternative.
 
@@ -224,10 +220,10 @@ void Generator::generateGreedyQuantifier(JmpSrcVector& failures,
     __ link(newFailures[i], tryAlternative);
   newFailures.clear();
   // (2.2) recursively call to parseAlternative, if it falls through, success!
-  __ pushl_r(currentPositionRegister);
+  __ pushl_r(index);
   m_parser.parseAlternative(newFailures);
   __ addl_i8r(4, X86::esp);
-  __ popl_r(quantifierCountRegister);
+  __ popl_r(repeatCount);
   // (2.3) link failure cases to here.
   for (unsigned i = 0; i < newFailures.size(); ++i)
     __ link(newFailures[i], backtrack);
@@ -236,9 +232,9 @@ void Generator::generateGreedyQuantifier(JmpSrcVector& failures,
 
 void Generator::generatePatternCharacter(JmpSrcVector& failures, int ch) {
   // check there is more input, read a char.
-  __ cmpl_rr(lengthRegister, currentPositionRegister);
+  __ cmpl_rr(length, index);
   failures.append(__ je());
-  __ movzwl_mr(inputRegister, currentPositionRegister, 2, currentValueRegister);
+  __ movzwl_mr(input, index, 2, character);
 
   // used for unicode case insensitive
   bool hasUpper = false;
@@ -250,12 +246,12 @@ void Generator::generatePatternCharacter(JmpSrcVector& failures, int ch) {
 
     // check for ascii case sensitive characters
     if (isASCIIAlpha(ch)) {
-      __ orl_i32r(32, currentValueRegister);
+      __ orl_i32r(32, character);
       ch |= 32;
     } else if ((ch > 0x7f) && ((lower = Unicode::toLower(ch)) !=
                                (upper = Unicode::toUpper(ch)))) {
       // handle unicode case sentitive characters - branch to success on upper
-      __ cmpl_i32r(upper, currentValueRegister);
+      __ cmpl_i32r(upper, character);
       isUpper = __ je();
       hasUpper = true;
       ch = lower;
@@ -263,7 +259,7 @@ void Generator::generatePatternCharacter(JmpSrcVector& failures, int ch) {
   }
 
   // checks for ch, or lower case version of ch, if insensitive
-  __ cmpl_i32r((unsigned short)ch, currentValueRegister);
+  __ cmpl_i32r((unsigned short)ch, character);
   failures.append(__ jne());
 
   if (m_parser.ignoreCase() && hasUpper) {
@@ -272,7 +268,7 @@ void Generator::generatePatternCharacter(JmpSrcVector& failures, int ch) {
   }
 
   // on success consume the char
-  __ addl_i8r(1, currentPositionRegister);
+  __ addl_i8r(1, index);
 }
 
 void Generator::generateCharacterClassInvertedRange(
@@ -289,7 +285,7 @@ void Generator::generateCharacterClassInvertedRange(
     char lo = ranges[which].begin;
     char hi = ranges[which].end;
 
-    __ cmpl_i32r((unsigned short)lo, currentValueRegister);
+    __ cmpl_i32r((unsigned short)lo, character);
 
     // check if there are any ranges or matches below lo.  If not, just jl to
     // failure -
@@ -304,8 +300,7 @@ void Generator::generateCharacterClassInvertedRange(
                                             matchIndex, matches, matchCount);
 
       do {
-        __ cmpl_i32r((unsigned short)matches[*matchIndex],
-                     currentValueRegister);
+        __ cmpl_i32r((unsigned short)matches[*matchIndex], character);
         matchDest.append(__ je());
         ++*matchIndex;
       } while ((*matchIndex < matchCount) && (matches[*matchIndex] < lo));
@@ -326,7 +321,7 @@ void Generator::generateCharacterClassInvertedRange(
     while ((*matchIndex < matchCount) && (matches[*matchIndex] <= hi))
       ++*matchIndex;
 
-    __ cmpl_i32r((unsigned short)hi, currentValueRegister);
+    __ cmpl_i32r((unsigned short)hi, character);
     matchDest.append(__ jle());
     // fall through to here, the value is above hi.
 
@@ -342,13 +337,13 @@ void Generator::generateCharacterClassInverted(
     const CharacterClass& charClass) {
   JmpSrc unicodeFail;
   if (charClass.numMatchesUnicode || charClass.numRangesUnicode) {
-    __ cmpl_i8r(0x7f, currentValueRegister);
+    __ cmpl_i8r(0x7f, character);
     JmpSrc isAscii = __ jle();
 
     if (charClass.numMatchesUnicode) {
       for (unsigned i = 0; i < charClass.numMatchesUnicode; ++i) {
         UChar ch = charClass.matchesUnicode[i];
-        __ cmpl_i32r((unsigned short)ch, currentValueRegister);
+        __ cmpl_i32r((unsigned short)ch, character);
         matchDest.append(__ je());
       }
     }
@@ -358,9 +353,9 @@ void Generator::generateCharacterClassInverted(
         UChar lo = charClass.rangesUnicode[i].begin;
         UChar hi = charClass.rangesUnicode[i].end;
 
-        __ cmpl_i32r((unsigned short)lo, currentValueRegister);
+        __ cmpl_i32r((unsigned short)lo, character);
         JmpSrc below = __ jl();
-        __ cmpl_i32r((unsigned short)hi, currentValueRegister);
+        __ cmpl_i32r((unsigned short)hi, character);
         matchDest.append(__ jle());
         __ link(below, __ label());
       }
@@ -377,8 +372,7 @@ void Generator::generateCharacterClassInverted(
         failures, matchDest, charClass.ranges, charClass.numRanges, &matchIndex,
         charClass.matches, charClass.numMatches);
     while (matchIndex < charClass.numMatches) {
-      __ cmpl_i32r((unsigned short)charClass.matches[matchIndex],
-                   currentValueRegister);
+      __ cmpl_i32r((unsigned short)charClass.matches[matchIndex], character);
       matchDest.append(__ je());
       ++matchIndex;
     }
@@ -400,16 +394,16 @@ void Generator::generateCharacterClassInverted(
         if (isASCIIUpper(ch))
           continue;
       }
-      __ cmpl_i32r((unsigned short)ch, currentValueRegister);
+      __ cmpl_i32r((unsigned short)ch, character);
       matchDest.append(__ je());
     }
 
     if (unsigned countAZaz = matchesAZaz.size()) {
-      __ orl_i32r(32, currentValueRegister);
+      __ orl_i32r(32, character);
 
       for (unsigned i = 0; i < countAZaz; ++i) {
         char ch = matchesAZaz[i];
-        __ cmpl_i32r((unsigned short)ch, currentValueRegister);
+        __ cmpl_i32r((unsigned short)ch, character);
         matchDest.append(__ je());
       }
     }
@@ -422,9 +416,9 @@ void Generator::generateCharacterClassInverted(
 void Generator::generateCharacterClass(JmpSrcVector& failures,
                                        const CharacterClass& charClass,
                                        bool invert) {
-  __ cmpl_rr(lengthRegister, currentPositionRegister);
+  __ cmpl_rr(length, index);
   failures.append(__ je());
-  __ movzwl_mr(inputRegister, currentPositionRegister, 2, currentValueRegister);
+  __ movzwl_mr(input, index, 2, character);
 
   if (invert)
     generateCharacterClassInverted(failures, charClass);
@@ -437,7 +431,7 @@ void Generator::generateCharacterClass(JmpSrcVector& failures,
       __ link(successes[i], here);
   }
 
-  __ addl_i8r(1, currentPositionRegister);
+  __ addl_i8r(1, index);
 }
 
 Generator::JmpSrc Generator::generateParentheses(ParenthesesType type) {
@@ -447,22 +441,20 @@ Generator::JmpSrc Generator::generateParentheses(ParenthesesType type) {
   unsigned subpatternId = m_parser.numSubpatterns();
 
   // push pos, both to preserve for fail + reloaded in parseDisjunction
-  __ pushl_r(currentPositionRegister);
+  __ pushl_r(index);
 
   // Plant a disjunction, wrapped to invert behaviour -
   JmpSrcVector newFailures;
   m_parser.parseDisjunction(newFailures);
 
   if (type == capturing) {
-    __ popl_r(currentValueRegister);
-    __ movl_rm(currentValueRegister, (2 * subpatternId) * sizeof(int),
-               outputRegister);
-    __ movl_rm(currentPositionRegister, (2 * subpatternId + 1) * sizeof(int),
-               outputRegister);
+    __ popl_r(character);
+    __ movl_rm(character, (2 * subpatternId) * sizeof(int), output);
+    __ movl_rm(index, (2 * subpatternId + 1) * sizeof(int), output);
   } else if (type == non_capturing)
     __ addl_i8r(4, X86::esp);
   else
-    __ popl_r(currentPositionRegister);
+    __ popl_r(index);
 
   // This is a little lame - jump to jump if there is a nested disjunction.
   // (suggestion to fix: make parseDisjunction populate a JmpSrcVector of
@@ -474,8 +466,8 @@ Generator::JmpSrc Generator::generateParentheses(ParenthesesType type) {
   for (unsigned i = 0; i < newFailures.size(); ++i)
     __ link(newFailures[i], originalFailure);
   newFailures.clear();
-  // fail: restore currentPositionRegister
-  __ popl_r(currentPositionRegister);
+  // fail: restore index
+  __ popl_r(index);
 
   JmpSrc jumpToFail;
   // If this was an inverted assert, fail = success! - just let the failure case
@@ -513,8 +505,8 @@ Generator::JmpSrc Generator::generateParenthesesResetTrampoline(
     __ link(newFailures[i], subPatternResetTrampoline);
   newFailures.clear();
   for (unsigned i = subpatternIdBefore + 1; i <= subpatternIdAfter; ++i) {
-    __ movl_i32m(-1, (2 * i) * sizeof(int), outputRegister);
-    __ movl_i32m(-1, (2 * i + 1) * sizeof(int), outputRegister);
+    __ movl_i32m(-1, (2 * i) * sizeof(int), output);
+    __ movl_i32m(-1, (2 * i + 1) * sizeof(int), output);
   }
 
   JmpSrc newFailJump = __ jmp();
@@ -528,12 +520,11 @@ void Generator::generateAssertionBOL(JmpSrcVector& failures) {
     JmpSrcVector previousIsNewline;
 
     // begin of input == success
-    __ cmpl_i8r(0, currentPositionRegister);
+    __ cmpl_i8r(0, index);
     previousIsNewline.append(__ je());
 
     // now check prev char against newline characters.
-    __ movzwl_mr(-2, inputRegister, currentPositionRegister, 2,
-                 currentValueRegister);
+    __ movzwl_mr(-2, input, index, 2, character);
     generateCharacterClassInverted(previousIsNewline,
                                    CharacterClass::newline());
 
@@ -544,7 +535,7 @@ void Generator::generateAssertionBOL(JmpSrcVector& failures) {
       __ link(previousIsNewline[i], success);
     previousIsNewline.clear();
   } else {
-    __ cmpl_i8r(0, currentPositionRegister);
+    __ cmpl_i8r(0, index);
     failures.append(__ jne());
   }
 }
@@ -554,12 +545,11 @@ void Generator::generateAssertionEOL(JmpSrcVector& failures) {
     JmpSrcVector nextIsNewline;
 
     // end of input == success
-    __ cmpl_rr(lengthRegister, currentPositionRegister);
+    __ cmpl_rr(length, index);
     nextIsNewline.append(__ je());
 
     // now check next char against newline characters.
-    __ movzwl_mr(inputRegister, currentPositionRegister, 2,
-                 currentValueRegister);
+    __ movzwl_mr(input, index, 2, character);
     generateCharacterClassInverted(nextIsNewline, CharacterClass::newline());
 
     failures.append(__ jmp());
@@ -569,7 +559,7 @@ void Generator::generateAssertionEOL(JmpSrcVector& failures) {
       __ link(nextIsNewline[i], success);
     nextIsNewline.clear();
   } else {
-    __ cmpl_rr(lengthRegister, currentPositionRegister);
+    __ cmpl_rr(length, index);
     failures.append(__ jne());
   }
 }
@@ -582,11 +572,10 @@ void Generator::generateAssertionWordBoundary(JmpSrcVector& failures,
   // (1) Check if the previous value was a word char
 
   // (1.1) check for begin of input
-  __ cmpl_i8r(0, currentPositionRegister);
+  __ cmpl_i8r(0, index);
   JmpSrc atBegin = __ je();
   // (1.2) load the last char, and chck if is word character
-  __ movzwl_mr(-2, inputRegister, currentPositionRegister, 2,
-               currentValueRegister);
+  __ movzwl_mr(-2, input, index, 2, character);
   JmpSrcVector previousIsWord;
   generateCharacterClassInverted(previousIsWord, CharacterClass::wordchar());
   // (1.3) if we get here, previous is not a word char
@@ -595,10 +584,10 @@ void Generator::generateAssertionWordBoundary(JmpSrcVector& failures,
   // (2) Handle situation where previous was NOT a \w
 
   // (2.1) check for end of input
-  __ cmpl_rr(lengthRegister, currentPositionRegister);
+  __ cmpl_rr(length, index);
   notWordBoundary.append(__ je());
   // (2.2) load the next char, and chck if is word character
-  __ movzwl_mr(inputRegister, currentPositionRegister, 2, currentValueRegister);
+  __ movzwl_mr(input, index, 2, character);
   generateCharacterClassInverted(wordBoundary, CharacterClass::wordchar());
   // (2.3) If we get here, neither chars are word chars
   notWordBoundary.append(__ jmp());
@@ -611,10 +600,10 @@ void Generator::generateAssertionWordBoundary(JmpSrcVector& failures,
     __ link(previousIsWord[i], section3);
   previousIsWord.clear();
   // (3.1) check for end of input
-  __ cmpl_rr(lengthRegister, currentPositionRegister);
+  __ cmpl_rr(length, index);
   wordBoundary.append(__ je());
   // (3.2) load the next char, and chck if is word character
-  __ movzwl_mr(inputRegister, currentPositionRegister, 2, currentValueRegister);
+  __ movzwl_mr(input, index, 2, character);
   generateCharacterClassInverted(notWordBoundary, CharacterClass::wordchar());
   // (3.3) If we get here, this is an end of a word, within the input.
 
@@ -644,63 +633,59 @@ void Generator::generateAssertionWordBoundary(JmpSrcVector& failures,
 
 void Generator::generateBackreference(JmpSrcVector& failures,
                                       unsigned subpatternId) {
-  __ pushl_r(currentPositionRegister);
-  __ pushl_r(quantifierCountRegister);
+  __ pushl_r(index);
+  __ pushl_r(repeatCount);
 
-  // get the start pos of the backref into quantifierCountRegister
-  // (multipurpose!)
-  __ movl_mr((2 * subpatternId) * sizeof(int), outputRegister,
-             quantifierCountRegister);
+  // get the start pos of the backref into repeatCount (multipurpose!)
+  __ movl_mr((2 * subpatternId) * sizeof(int), output, repeatCount);
 
   JmpSrc skipIncrement = __ jmp();
   JmpDst topOfLoop = __ label();
-  __ addl_i8r(1, currentPositionRegister);
-  __ addl_i8r(1, quantifierCountRegister);
+  __ addl_i8r(1, index);
+  __ addl_i8r(1, repeatCount);
   __ link(skipIncrement, __ label());
 
   // check if we're at the end of backref (if we are, success!)
-  __ cmpl_rm(quantifierCountRegister, ((2 * subpatternId) + 1) * sizeof(int),
-             outputRegister);
+  __ cmpl_rm(repeatCount, ((2 * subpatternId) + 1) * sizeof(int), output);
   JmpSrc endOfBackRef = __ je();
 
-  __ movzwl_mr(inputRegister, quantifierCountRegister, 2, currentValueRegister);
+  __ movzwl_mr(input, repeatCount, 2, character);
 
   // check if we've run out of input (this would be a can o'fail)
-  __ cmpl_rr(lengthRegister, currentPositionRegister);
+  __ cmpl_rr(length, index);
   JmpSrc endOfInput = __ je();
 
-  __ cmpw_rm(currentValueRegister, inputRegister, currentPositionRegister, 2);
+  __ cmpw_rm(character, input, index, 2);
   __ link(__ je(), topOfLoop);
 
   __ link(endOfInput, __ label());
   // Failure
-  __ popl_r(quantifierCountRegister);
-  __ popl_r(currentPositionRegister);
+  __ popl_r(repeatCount);
+  __ popl_r(index);
   failures.append(__ jmp());
 
   // Success
   __ link(endOfBackRef, __ label());
-  __ popl_r(quantifierCountRegister);
+  __ popl_r(repeatCount);
   __ addl_i8r(4, X86::esp);
 }
 
-void Generator::generateDisjunction(JmpSrcVector& successes,
-                                    JmpSrcVector& failures) {
+void Generator::terminateAlternative(JmpSrcVector& successes,
+                                     JmpSrcVector& failures) {
   successes.append(__ jmp());
 
-  JmpDst here = __ label();
-
+  JmpDst failure = __ label();
   for (unsigned i = 0; i < failures.size(); ++i)
-    __ link(failures[i], here);
+    __ link(failures[i], failure);
   failures.clear();
 
-  __ movl_mr(X86::esp, currentPositionRegister);
+  __ movl_mr(X86::esp, index);
 }
 
 void Generator::terminateDisjunction(JmpSrcVector& successes) {
-  JmpDst here = __ label();
+  JmpDst success = __ label();
   for (unsigned i = 0; i < successes.size(); ++i)
-    __ link(successes[i], here);
+    __ link(successes[i], success);
   successes.clear();
 }
 }
