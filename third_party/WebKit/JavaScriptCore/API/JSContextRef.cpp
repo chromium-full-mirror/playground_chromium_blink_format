@@ -64,6 +64,10 @@ JSGlobalContextRef JSGlobalContextCreateInGroup(JSContextGroupRef group,
   RefPtr<JSGlobalData> globalData =
       group ? PassRefPtr<JSGlobalData>(toJS(group)) : JSGlobalData::create();
 
+#if ENABLE(JSC_MULTIPLE_THREADS)
+  globalData->makeUsableFromMultipleThreads();
+#endif
+
   if (!globalObjectClass) {
     JSGlobalObject* globalObject = new (globalData.get()) JSGlobalObject;
     return JSGlobalContextRetain(toGlobalRef(globalObject->globalExec()));

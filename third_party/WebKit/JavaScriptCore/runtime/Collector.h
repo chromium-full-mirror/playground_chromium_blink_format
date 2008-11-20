@@ -158,6 +158,8 @@ class Heap : Noncopyable {
   HashSet<ArgList*>* m_markListSet;
 
 #if ENABLE(JSC_MULTIPLE_THREADS)
+  void makeUsableFromMultipleThreads();
+
   static void unregisterThread(void*);
   void unregisterThread();
 
