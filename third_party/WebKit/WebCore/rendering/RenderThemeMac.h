@@ -186,6 +186,11 @@ class RenderThemeMac : public RenderTheme {
                       const int* margins,
                       float zoomLevel = 1.0f) const;
 
+  FloatRect convertToPaintingRect(const RenderObject* inputRenderer,
+                                  const RenderObject* partRenderer,
+                                  const FloatRect& inputRect,
+                                  const IntRect& r) const;
+
   // Get the control size based off the font.  Used by some of the controls
   // (like buttons).
   NSControlSize controlSizeForFont(RenderStyle*) const;
