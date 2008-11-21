@@ -33,11 +33,41 @@
 #include "ResultType.h"
 #include <wtf/VectorTraits.h>
 
+#define PROTOTYPE_LIST_CACHE_SIZE 4
+
 namespace JSC {
 
 class JSCell;
 class Structure;
 class StructureChain;
+
+// Structure used by op_get_by_id_proto_list instruction to hold data off the
+// main opcode stream.
+struct PrototypeStructureList {
+  struct ProtoStubInfo {
+    Structure* base;
+    Structure* proto;
+    int cachedOffset;
+    void* stubRoutine;
+
+    void set(Structure* _base,
+             Structure* _proto,
+             int _cachedOffset,
+             void* _stubRoutine) {
+      base = _base;
+      proto = _proto;
+      cachedOffset = _cachedOffset;
+      stubRoutine = _stubRoutine;
+    }
+  } list[PROTOTYPE_LIST_CACHE_SIZE];
+
+  PrototypeStructureList(Structure* firstBase,
+                         Structure* firstProto,
+                         int cachedOffset,
+                         void* stubRoutine) {
+    list[0].set(firstBase, firstProto, cachedOffset, stubRoutine);
+  }
+};
 
 struct Instruction {
   Instruction(Opcode opcode) { u.opcode = opcode; }
@@ -53,6 +83,9 @@ struct Instruction {
     u.structureChain = structureChain;
   }
   Instruction(JSCell* jsCell) { u.jsCell = jsCell; }
+  Instruction(PrototypeStructureList* prototypeStructure) {
+    u.prototypeStructure = prototypeStructure;
+  }
 
   union {
     Opcode opcode;
@@ -61,6 +94,7 @@ struct Instruction {
     StructureChain* structureChain;
     JSCell* jsCell;
     ResultType::Type resultType;
+    PrototypeStructureList* prototypeStructure;
   } u;
 };
 
