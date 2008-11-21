@@ -54,6 +54,10 @@ void CachedScript::addClient(CachedResourceClient* c) {
     c->notifyFinished(this);
 }
 
+void CachedScript::allClientsRemoved() {
+  destroyDecodedData();
+}
+
 void CachedScript::setEncoding(const String& chs) {
   TextEncoding encoding(chs);
   if (encoding.isValid())
