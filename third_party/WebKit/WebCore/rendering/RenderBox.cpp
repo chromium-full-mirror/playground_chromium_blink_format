@@ -104,6 +104,14 @@ void RenderBox::styleWillChange(RenderStyle::Diff diff,
 
 void RenderBox::styleDidChange(RenderStyle::Diff diff,
                                const RenderStyle* oldStyle) {
+  // We need to ensure that view->maximalOutlineSize() is valid for any repaints
+  // that happen
+  // during the style change (it's used by absoluteClippedOverflowRect()).
+  if (style()->outlineWidth() > 0 &&
+      style()->outlineSize() > maximalOutlineSize(PaintPhaseOutline))
+    static_cast<RenderView*>(document()->renderer())
+        ->setMaximalOutlineSize(style()->outlineSize());
+
   RenderObject::styleDidChange(diff, oldStyle);
 
   if (needsLayout() && oldStyle &&
@@ -212,11 +220,6 @@ void RenderBox::styleDidChange(RenderStyle::Diff diff,
   // Set the text color if we're the body.
   if (isBody())
     document()->setTextColor(style()->color());
-
-  if (style()->outlineWidth() > 0 &&
-      style()->outlineSize() > maximalOutlineSize(PaintPhaseOutline))
-    static_cast<RenderView*>(document()->renderer())
-        ->setMaximalOutlineSize(style()->outlineSize());
 }
 
 int RenderBox::minPrefWidth() const {
@@ -1324,7 +1327,8 @@ IntRect RenderBox::absoluteClippedOverflowRect() {
 
   IntRect r = overflowRect(false);
 
-  if (RenderView* v = view())
+  RenderView* v = view();
+  if (v)
     r.move(v->layoutDelta());
 
   if (style()) {
@@ -1332,12 +1336,12 @@ IntRect RenderBox::absoluteClippedOverflowRect() {
       // The theme may wish to inflate the rect used when repainting.
       theme()->adjustRepaintRect(this, r);
 
-    // FIXME: Technically the outline inflation could fit within the theme
-    // inflation.
-    if (!isInline() && continuation())
-      r.inflate(continuation()->style()->outlineSize());
-    else
-      r.inflate(style()->outlineSize());
+    // We have to use maximalOutlineSize() because a child might have an outline
+    // that projects outside of our overflowRect.
+    if (v) {
+      ASSERT(style()->outlineSize() <= v->maximalOutlineSize());
+      r.inflate(v->maximalOutlineSize());
+    }
   }
   computeAbsoluteRepaintRect(r);
   return r;
