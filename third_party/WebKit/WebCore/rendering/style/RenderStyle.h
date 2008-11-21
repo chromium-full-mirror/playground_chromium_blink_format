@@ -1656,7 +1656,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   static bool initialAnimationDirection() { return false; }
   static double initialAnimationDuration() { return 0; }
   static int initialAnimationIterationCount() { return 1; }
-  static String initialAnimationName() { return String(); }
+  static String initialAnimationName() { return String("none"); }
   static unsigned initialAnimationPlayState() { return AnimPlayStatePlaying; }
   static int initialAnimationProperty() { return cAnimateAll; }
   static TimingFunction initialAnimationTimingFunction() {
