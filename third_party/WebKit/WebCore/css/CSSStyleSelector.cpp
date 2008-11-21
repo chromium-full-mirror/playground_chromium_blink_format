@@ -62,6 +62,7 @@
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
 #include "HTMLTextAreaElement.h"
+#include "LinkHash.h"
 #include "MatrixTransformOperation.h"
 #include "MediaList.h"
 #include "MediaQueryEvaluator.h"
@@ -911,7 +912,7 @@ PseudoState CSSStyleSelector::SelectorChecker::checkPseudoState(
   if (!checkVisited)
     return PseudoAnyLink;
 
-  unsigned hash = m_document->visitedLinkHash(*attr);
+  LinkHash hash = visitedLinkHash(m_document->baseURL(), *attr);
   if (!hash)
     return PseudoLink;
 
@@ -6149,12 +6150,12 @@ void CSSStyleSelector::SelectorChecker::allVisitedStateChanged() {
 }
 
 void CSSStyleSelector::SelectorChecker::visitedStateChanged(
-    unsigned visitedHash) {
+    LinkHash visitedHash) {
   if (!m_linksCheckedForVisitedState.contains(visitedHash))
     return;
   for (Node* node = m_document; node; node = node->traverseNextNode()) {
     const AtomicString* attr = linkAttribute(node);
-    if (attr && m_document->visitedLinkHash(*attr) == visitedHash)
+    if (attr && visitedLinkHash(m_document->baseURL(), *attr) == visitedHash)
       node->setChanged();
   }
 }

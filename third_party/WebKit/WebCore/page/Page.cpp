@@ -496,7 +496,7 @@ void Page::allVisitedStateChanged(PageGroup* group) {
   }
 }
 
-void Page::visitedStateChanged(PageGroup* group, unsigned visitedLinkHash) {
+void Page::visitedStateChanged(PageGroup* group, LinkHash visitedLinkHash) {
   ASSERT(group);
   ASSERT(allPages);
   HashSet<Page*>::iterator pagesEnd = allPages->end();
