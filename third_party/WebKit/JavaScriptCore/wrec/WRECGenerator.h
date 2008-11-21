@@ -61,6 +61,13 @@ class Generator {
                                                    // atom repeats in the
                                                    // current match.
 
+  void generateEnter();
+  void generateSaveIndex();
+  void generateIncrementIndex();
+  void generateLoopIfNotEndOfInput(JmpDst);
+  void generateReturnSuccess();
+  void generateReturnFailure();
+
   void generateGreedyQuantifier(JmpSrcVector& failures,
                                 GenerateAtomFunctor& functor,
                                 unsigned min,

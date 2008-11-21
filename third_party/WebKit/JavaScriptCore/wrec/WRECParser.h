@@ -153,8 +153,9 @@ class Parser {
   unsigned numSubpatterns() { return m_numSubpatterns; }
 
   bool ignoreCase() { return m_ignoreCase; }
-
   bool multiline() { return m_multiline; }
+
+  Generator& generator() { return m_generator; }
 
  private:
   Generator m_generator;

@@ -887,7 +887,11 @@ class X86Assembler {
         (reinterpret_cast<intptr_t>(destination) - where);
   }
 
-  void* executableCopy() { return m_buffer->executableCopy(); }
+  void* executableCopy() {
+    void* copy = m_buffer->executableCopy();
+    ASSERT(copy);
+    return copy;
+  }
 
 #if COMPILER(MSVC)
   void convertToFastCall() {

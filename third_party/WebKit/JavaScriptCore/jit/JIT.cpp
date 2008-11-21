@@ -3403,7 +3403,6 @@ void JIT::privateCompile() {
   ASSERT(m_jmpTable.isEmpty());
 
   void* code = __ executableCopy();
-  ASSERT(code);
 
   // Translate vPC offsets into addresses in JIT generated code, for switch
   // tables.
@@ -3503,7 +3502,6 @@ void JIT::privateCompileGetByIdSelf(Structure* structure,
   __ ret();
 
   void* code = __ executableCopy();
-  ASSERT(code);
 
   X86Assembler::link(
       code, failureCases1,
@@ -3561,7 +3559,6 @@ void JIT::privateCompileGetByIdProto(Structure* structure,
   JmpSrc success = __ jmp();
 
   void* code = __ executableCopy();
-  ASSERT(code);
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
@@ -3611,7 +3608,6 @@ void JIT::privateCompileGetByIdProto(Structure* structure,
   __ ret();
 
   void* code = __ executableCopy();
-  ASSERT(code);
 
 #if USE(CTI_REPATCH_PIC)
   X86Assembler::link(
@@ -3675,7 +3671,6 @@ void JIT::privateCompileGetByIdProtoList(
   JmpSrc success = __ jmp();
 
   void* code = __ executableCopy();
-  ASSERT(code);
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
@@ -3741,7 +3736,6 @@ void JIT::privateCompileGetByIdChain(Structure* structure,
   bucketsOfFail.append(__ jmp());
 
   void* code = __ executableCopy();
-  ASSERT(code);
 
   for (unsigned i = 0; i < bucketsOfFail.size(); ++i)
     X86Assembler::link(
@@ -3767,7 +3761,6 @@ void JIT::privateCompilePutByIdReplace(Structure* structure,
   __ ret();
 
   void* code = __ executableCopy();
-  ASSERT(code);
 
   X86Assembler::link(
       code, failureCases1,
@@ -3878,7 +3871,6 @@ void JIT::privateCompilePutByIdTransition(Structure* oldStructure,
   }
 
   void* code = __ executableCopy();
-  ASSERT(code);
 
   if (failureCases.size())
     X86Assembler::link(
@@ -4102,7 +4094,6 @@ void JIT::privateCompileCTIMachineTrampolines() {
   // pointers on the Machine object.
 
   void* code = __ executableCopy();
-  ASSERT(code);
 
   X86Assembler::link(
       code, array_failureCases1,
@@ -4240,7 +4231,6 @@ void JIT::privateCompilePatchGetArrayLength(void* returnAddress) {
   JmpSrc success = __ jmp();
 
   void* code = __ executableCopy();
-  ASSERT(code);
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
