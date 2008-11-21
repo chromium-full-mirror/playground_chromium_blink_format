@@ -35,6 +35,7 @@
 namespace JSC {
 class JSGlobalData;
 class JSValue;
+class SourceCode;
 }
 
 namespace WebCore {
@@ -53,9 +54,7 @@ class WorkerScriptController : Noncopyable {
     return m_workerContextWrapper;
   }
 
-  JSC::JSValue* evaluate(const String& sourceURL,
-                         int baseLine,
-                         const String& code);
+  JSC::JSValue* evaluate(const JSC::SourceCode&);
 
  private:
   void initScriptIfNeeded() {

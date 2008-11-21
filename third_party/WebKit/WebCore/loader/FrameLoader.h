@@ -49,6 +49,10 @@
 #include "CachedResourceClient.h"
 #endif
 
+namespace JSC {
+class SourceCode;
+}
+
 namespace WebCore {
 
 class Archive;
@@ -435,9 +439,7 @@ class FrameLoader : Noncopyable
                               bool userGesture = false,
                               bool replaceDocument = true);
 
-  ScriptValue executeScript(const String& url,
-                            int baseLine,
-                            const String& script);
+  ScriptValue executeScript(const JSC::SourceCode&);
   ScriptValue executeScript(const String& script,
                             bool forceUserGesture = false);
 

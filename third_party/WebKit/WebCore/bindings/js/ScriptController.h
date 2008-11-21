@@ -41,6 +41,7 @@ struct NPObject;
 
 namespace JSC {
 class JSGlobalObject;
+class SourceCode;
 
 namespace Bindings {
 class Instance;
@@ -77,9 +78,7 @@ class ScriptController {
     return m_windowShell->window();
   }
 
-  ScriptValue evaluate(const String& sourceURL,
-                       int baseLine,
-                       const String& code);
+  ScriptValue evaluate(const JSC::SourceCode&);
 
   PassRefPtr<EventListener> createInlineEventListener(
       const String& functionName,
