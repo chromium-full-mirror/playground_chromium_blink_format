@@ -31,6 +31,7 @@
 
 #include "CachedResource.h"
 #include "TextEncoding.h"
+#include "Timer.h"
 
 namespace WebCore {
 
@@ -58,8 +59,11 @@ class CachedScript : public CachedResource {
   virtual void destroyDecodedData();
 
  private:
+  void decodedDataDeletionTimerFired(Timer<CachedScript>*);
+
   String m_script;
   TextEncoding m_encoding;
+  Timer<CachedScript> m_decodedDataDeletionTimer;
 };
 }
 
