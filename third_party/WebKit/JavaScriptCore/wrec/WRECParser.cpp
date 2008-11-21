@@ -576,7 +576,7 @@ bool Parser::parseTerm(JmpSrcVector& failures) {
 }
 
 /*
-  TOS holds index at the start of a disjunction.
+  TOS holds index.
 */
 void Parser::parseDisjunction(JmpSrcVector& failures) {
   parseAlternative(failures);

@@ -106,11 +106,8 @@ CompiledRegExp compileRegExp(Interpreter* interpreter,
   __ ret();
 
   // (3) Failure:
-  //     All top-level failures link to here.
-  Generator::JmpDst failure = __ label();
-  for (unsigned i = 0; i < failures.size(); ++i)
-    __ link(failures[i], failure);
-  failures.clear();
+  //     All failures in the top-level disjunction link to here.
+  __ link(failures, __ label());
 
   // Move to the next input character and try again.
   __ movl_mr(X86::esp, Generator::index);

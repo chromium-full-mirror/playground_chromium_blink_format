@@ -195,6 +195,8 @@ class X86Assembler {
     int m_offset;
   };
 
+  typedef Vector<X86Assembler::JmpSrc> JmpSrcVector;
+
   static const int maxInstructionSize = 16;
 
   X86Assembler(AssemblerBuffer* m_buffer) : m_buffer(m_buffer) {
@@ -815,6 +817,13 @@ class X86Assembler {
 
   void predictNotTaken() { m_buffer->putByte(PRE_PREDICT_BRANCH_NOT_TAKEN); }
 
+  void link(JmpSrcVector& vector, JmpDst to) {
+    size_t size = vector.size();
+    for (size_t i = 0; i < size; ++i)
+      link(vector[i], to);
+    vector.clear();
+  }
+
   void link(JmpSrc from, JmpDst to) {
     ASSERT(to.m_offset != -1);
     ASSERT(from.m_offset != -1);
@@ -1028,7 +1037,7 @@ class X86Assembler {
   AssemblerBuffer* m_buffer;
 };
 
-typedef Vector<X86Assembler::JmpSrc> JmpSrcVector;
+typedef X86Assembler::JmpSrcVector JmpSrcVector;
 
 }  // namespace JSC
 
