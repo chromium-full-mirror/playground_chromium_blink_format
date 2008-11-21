@@ -128,6 +128,7 @@ class CompositeEditCommand : public EditCommand {
                       bool preserveStyle = true);
 
   bool breakOutOfEmptyListItem();
+  bool breakOutOfEmptyMailBlockquotedParagraph();
 
   Position positionAvoidingSpecialElementBoundary(
       const Position&,
