@@ -46,7 +46,6 @@
 #else
 #include <sys/types.h>
 #endif
-#include <stdlib.h> /* for abort() */
 
 #if PLATFORM(WIN_OS)
 #ifndef WIN32_LEAN_AND_MEAN
@@ -196,19 +195,19 @@ struct TCMalloc_SpinLock {
 
   inline void Init() {
     if (pthread_mutex_init(&private_lock_, NULL) != 0)
-      abort();
+      CRASH();
   }
   inline void Finalize() {
     if (pthread_mutex_destroy(&private_lock_) != 0)
-      abort();
+      CRASH();
   }
   inline void Lock() {
     if (pthread_mutex_lock(&private_lock_) != 0)
-      abort();
+      CRASH();
   }
   inline void Unlock() {
     if (pthread_mutex_unlock(&private_lock_) != 0)
-      abort();
+      CRASH();
   }
 };
 
