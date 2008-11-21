@@ -70,7 +70,7 @@ void Parser::reparse(JSGlobalData* globalData,
   m_source = &functionBodyNode->source();
   parse(globalData, 0, 0);
   ASSERT(m_sourceElements);
-  functionBodyNode->adoptData(auto_ptr<ScopeNodeData>(new ScopeNodeData(
+  functionBodyNode->adoptData(std::auto_ptr<ScopeNodeData>(new ScopeNodeData(
       m_sourceElements.get(), m_varDeclarations ? &m_varDeclarations->data : 0,
       m_funcDeclarations ? &m_funcDeclarations->data : 0, m_numConstants)));
   bool usesArguments = functionBodyNode->usesArguments();
