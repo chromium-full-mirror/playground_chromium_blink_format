@@ -224,4 +224,8 @@ JSValue* JSXMLHttpRequest::removeEventListener(ExecState* exec,
   return jsUndefined();
 }
 
+JSValue* JSXMLHttpRequest::responseText(ExecState* exec) const {
+  return jsOwnedStringOrNull(exec, impl()->responseText());
+}
+
 }  // namespace WebCore
