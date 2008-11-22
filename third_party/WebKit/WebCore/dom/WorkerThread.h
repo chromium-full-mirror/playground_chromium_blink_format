@@ -36,6 +36,7 @@
 namespace WebCore {
 
 class KURL;
+class WorkerContext;
 class WorkerMessagingProxy;
 class WorkerTask;
 
@@ -47,6 +48,7 @@ class WorkerThread : public RefCounted<WorkerThread> {
   ~WorkerThread();
 
   bool start();
+  void stop();
 
   ThreadIdentifier threadID() const { return m_threadID; }
   MessageQueue<RefPtr<WorkerTask>>& messageQueue() { return m_messageQueue; }
@@ -64,6 +66,8 @@ class WorkerThread : public RefCounted<WorkerThread> {
   String m_scriptURL;
   String m_sourceCode;
   WorkerMessagingProxy* m_messagingProxy;
+
+  RefPtr<WorkerContext> m_workerContext;
 
   MessageQueue<RefPtr<WorkerTask>> m_messageQueue;
 };
