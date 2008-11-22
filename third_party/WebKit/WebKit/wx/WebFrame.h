@@ -33,13 +33,14 @@
 #include "wx/wx.h"
 #endif
 
-class WebViewPrivate;
+class WebFramePrivate;
 class WebViewFrameData;
 class wxWebView;
 
 namespace WebCore {
 class ChromeClientWx;
 class FrameLoaderClientWx;
+class EditorClientWx;
 class Frame;
 }
 
@@ -62,6 +63,7 @@ class WXDLLIMPEXP_WEBKIT wxWebFrame {
   // for the createWindow function.
   friend class WebCore::ChromeClientWx;
   friend class WebCore::FrameLoaderClientWx;
+  friend class WebCore::EditorClientWx;
   friend class wxWebView;
 
   wxWebFrame(wxWebView* container,
@@ -86,6 +88,12 @@ class WXDLLIMPEXP_WEBKIT wxWebFrame {
   void Cut();
   void Copy();
   void Paste();
+
+  bool CanUndo();
+  bool CanRedo();
+
+  void Undo();
+  void Redo();
 
   wxString GetPageSource();
   void SetPageSource(const wxString& source,
@@ -114,7 +122,7 @@ class WXDLLIMPEXP_WEBKIT wxWebFrame {
   bool m_isEditable;
   bool m_isInitialized;
   bool m_beingDestroyed;
-  WebViewPrivate* m_impl;
+  WebFramePrivate* m_impl;
   wxString m_title;
 };
 

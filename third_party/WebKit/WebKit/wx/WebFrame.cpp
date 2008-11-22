@@ -54,6 +54,7 @@
 
 #include "WebFrame.h"
 #include "WebView.h"
+#include "WebFramePrivate.h"
 #include "WebViewPrivate.h"
 
 #include <wx/defs.h>
@@ -72,7 +73,7 @@ wxWebFrame::wxWebFrame(wxWebView* container,
       m_isInitialized(false),
       m_beingDestroyed(false),
       m_title(wxEmptyString) {
-  m_impl = new WebViewPrivate();
+  m_impl = new WebFramePrivate();
 
   WebCore::HTMLFrameOwnerElement* parentFrame = 0;
 
@@ -231,6 +232,31 @@ bool wxWebFrame::CanGoForward() {
 
   return false;
 }
+
+void wxWebFrame::Undo() {
+  if (m_impl->frame && m_impl->frame->editor() && CanUndo())
+    return m_impl->frame->editor()->undo();
+}
+
+void wxWebFrame::Redo() {
+  if (m_impl->frame && m_impl->frame->editor() && CanRedo())
+    return m_impl->frame->editor()->redo();
+}
+
+bool wxWebFrame::CanUndo() {
+  if (m_impl->frame && m_impl->frame->editor())
+    return m_impl->frame->editor()->canUndo();
+
+  return false;
+}
+
+bool wxWebFrame::CanRedo() {
+  if (m_impl->frame && m_impl->frame->editor())
+    return m_impl->frame->editor()->canRedo();
+
+  return false;
+}
+
 bool wxWebFrame::CanIncreaseTextSize() const {
   if (m_impl->frame) {
     if (m_textMagnifier * TextSizeMultiplierRatio <= MaximumTextSizeMultiplier)

@@ -472,12 +472,12 @@ void wxWebView::OnMouseEvents(wxMouseEvent& event) {
   WebCore::PlatformMouseEvent wkEvent(event, globalPoint);
 
   if (type == wxEVT_LEFT_DOWN || type == wxEVT_MIDDLE_DOWN ||
-      type == wxEVT_RIGHT_DOWN)
+      type == wxEVT_RIGHT_DOWN || type == wxEVT_LEFT_DCLICK ||
+      type == wxEVT_MIDDLE_DCLICK || type == wxEVT_RIGHT_DCLICK)
     frame->eventHandler()->handleMousePressEvent(wkEvent);
 
   else if (type == wxEVT_LEFT_UP || type == wxEVT_MIDDLE_UP ||
-           type == wxEVT_RIGHT_UP || type == wxEVT_LEFT_DCLICK ||
-           type == wxEVT_MIDDLE_DCLICK || type == wxEVT_RIGHT_DCLICK)
+           type == wxEVT_RIGHT_UP)
     frame->eventHandler()->handleMouseReleaseEvent(wkEvent);
 
   else if (type == wxEVT_MOTION)
@@ -529,13 +529,23 @@ void wxWebView::OnKeyEvents(wxKeyEvent& event) {
     // WebCore doesn't handle these events itself, so we need to do
     // it and not send the event down or else CTRL+C will erase the text
     // and replace it with c.
-    if (event.CmdDown() && event.GetKeyCode() == static_cast<int>('C'))
-      Copy();
-    else if (event.CmdDown() && event.GetKeyCode() == static_cast<int>('X'))
-      Cut();
-    else if (event.CmdDown() && event.GetKeyCode() == static_cast<int>('V'))
-      Paste();
-    else {
+    if (event.CmdDown() && event.GetEventType() == wxEVT_KEY_UP) {
+      if (event.GetKeyCode() == static_cast<int>('C'))
+        Copy();
+      else if (event.GetKeyCode() == static_cast<int>('X'))
+        Cut();
+      else if (event.GetKeyCode() == static_cast<int>('V'))
+        Paste();
+      else if (event.GetKeyCode() == static_cast<int>('Z')) {
+        if (event.ShiftDown()) {
+          if (m_mainFrame->CanRedo())
+            m_mainFrame->Redo();
+        } else {
+          if (m_mainFrame->CanUndo())
+            m_mainFrame->Undo();
+        }
+      }
+    } else {
       WebCore::PlatformKeyboardEvent wkEvent(event);
       if (wkEvent.type() == WebCore::PlatformKeyboardEvent::Char &&
           wkEvent.altKey())
