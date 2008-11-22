@@ -298,6 +298,22 @@ void DeleteSelectionCommand::initializePositionData() {
                                    &isBlock, false);
 }
 
+static void removeEnclosingAnchorStyle(CSSMutableStyleDeclaration* style,
+                                       const Position& position) {
+  Node* enclosingAnchor = enclosingAnchorElement(position);
+  if (!enclosingAnchor || !enclosingAnchor->parentNode())
+    return;
+
+  RefPtr<CSSMutableStyleDeclaration> parentStyle =
+      Position(enclosingAnchor->parentNode(), 0)
+          .computedStyle()
+          ->copyInheritableProperties();
+  RefPtr<CSSMutableStyleDeclaration> anchorStyle =
+      Position(enclosingAnchor, 0).computedStyle()->copyInheritableProperties();
+  parentStyle->diff(anchorStyle.get());
+  anchorStyle->diff(style);
+}
+
 void DeleteSelectionCommand::saveTypingStyleState() {
   // A common case is deleting characters that are all from the same text node.
   // In
@@ -316,6 +332,8 @@ void DeleteSelectionCommand::saveTypingStyleState() {
   RefPtr<CSSComputedStyleDeclaration> computedStyle =
       positionBeforeTabSpan(m_selectionToDelete.start()).computedStyle();
   m_typingStyle = computedStyle->copyInheritableProperties();
+
+  removeEnclosingAnchorStyle(m_typingStyle.get(), m_selectionToDelete.start());
 
   // If we're deleting into a Mail blockquote, save the style at end() instead
   // of start()
@@ -830,34 +848,6 @@ void DeleteSelectionCommand::clearTransientState() {
   m_trailingWhitespace.clear();
 }
 
-void DeleteSelectionCommand::saveFullySelectedAnchor() {
-  // If deleting an anchor element, save it away so that it can be restored
-  // when the user begins entering text.
-
-  Position start = m_selectionToDelete.start();
-  Node* startAnchor = enclosingNodeWithTag(start.downstream(), aTag);
-  if (!startAnchor)
-    return;
-
-  Position end = m_selectionToDelete.end();
-  Node* endAnchor = enclosingNodeWithTag(end.upstream(), aTag);
-  if (startAnchor != endAnchor)
-    return;
-
-  VisiblePosition visibleStart(m_selectionToDelete.visibleStart());
-  VisiblePosition visibleEnd(m_selectionToDelete.visibleEnd());
-
-  Node* beforeStartAnchor = enclosingNodeWithTag(
-      visibleStart.previous().deepEquivalent().downstream(), aTag);
-  Node* afterEndAnchor =
-      enclosingNodeWithTag(visibleEnd.next().deepEquivalent().upstream(), aTag);
-
-  if (startAnchor && startAnchor == endAnchor &&
-      startAnchor != beforeStartAnchor && endAnchor != afterEndAnchor)
-    document()->frame()->editor()->setRemovedAnchor(
-        startAnchor->cloneNode(false));
-}
-
 void DeleteSelectionCommand::doApply() {
   // If selection has not been set to a custom selection when the command was
   // created,
@@ -909,8 +899,6 @@ void DeleteSelectionCommand::doApply() {
   deleteInsignificantTextDownstream(m_trailingWhitespace);
 
   saveTypingStyleState();
-
-  saveFullySelectedAnchor();
 
   // deleting just a BR is handled specially, at least because we do not
   // want to replace it with a placeholder BR!

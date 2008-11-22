@@ -1066,8 +1066,7 @@ bool CompositeEditCommand::breakOutOfEmptyMailBlockquotedParagraph() {
 // varies depending on how
 // the caret was made.
 Position CompositeEditCommand::positionAvoidingSpecialElementBoundary(
-    const Position& original,
-    bool alwaysAvoidAnchors) {
+    const Position& original) {
   if (original.isNull())
     return original;
 
@@ -1083,8 +1082,7 @@ Position CompositeEditCommand::positionAvoidingSpecialElementBoundary(
     // If visually just after the anchor, insert *inside* the anchor unless it's
     // the last
     // VisiblePosition in the document, to match NSTextView.
-    if (visiblePos == lastInAnchor &&
-        (isEndOfDocument(visiblePos) || alwaysAvoidAnchors)) {
+    if (visiblePos == lastInAnchor) {
       // Make sure anchors are pushed down before avoiding them so that we don't
       // also avoid structural elements like lists and blocks (5142012).
       if (original.node() != enclosingAnchor &&
@@ -1108,8 +1106,7 @@ Position CompositeEditCommand::positionAvoidingSpecialElementBoundary(
     // If visually just before an anchor, insert *outside* the anchor unless
     // it's the first
     // VisiblePosition in a paragraph, to match NSTextView.
-    if (visiblePos == firstInAnchor &&
-        (!isStartOfParagraph(visiblePos) || alwaysAvoidAnchors)) {
+    if (visiblePos == firstInAnchor) {
       // Make sure anchors are pushed down before avoiding them so that we don't
       // also avoid structural elements like lists and blocks (5142012).
       if (original.node() != enclosingAnchor &&
