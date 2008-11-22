@@ -35,8 +35,6 @@
 #include "FrameLoader.h"
 #include "HTTPParsers.h"
 #include "InspectorController.h"
-#include "JSDOMBinding.h"
-#include "JSDOMWindow.h"
 #include "KURL.h"
 #include "KURLHash.h"
 #include "Page.h"
@@ -48,8 +46,11 @@
 #include "XMLHttpRequestProgressEvent.h"
 #include "XMLHttpRequestUpload.h"
 #include "markup.h"
-#include <runtime/JSLock.h>
 #include <wtf/StdLibExtras.h>
+
+#if USE(JSC)
+#include "JSDOMWindow.h"
+#endif
 
 namespace WebCore {
 
@@ -207,7 +208,7 @@ XMLHttpRequest::State XMLHttpRequest::readyState() const {
   return m_state;
 }
 
-const JSC::UString& XMLHttpRequest::responseText() const {
+const ScriptString& XMLHttpRequest::responseText() const {
   return m_responseText;
 }
 
@@ -803,10 +804,7 @@ void XMLHttpRequest::internalAbort() {
 
 void XMLHttpRequest::clearResponse() {
   m_response = ResourceResponse();
-  {
-    JSC::JSLock lock(false);
-    m_responseText = "";
-  }
+  m_responseText = "";
   m_createdDocument = false;
   m_responseXML = 0;
 }
@@ -847,6 +845,7 @@ void XMLHttpRequest::abortError() {
 }
 
 void XMLHttpRequest::dropProtection() {
+#if USE(JSC)
   // The XHR object itself holds on to the responseText, and
   // thus has extra cost even independent of any
   // responseText or responseXML objects it has handed
@@ -860,6 +859,7 @@ void XMLHttpRequest::dropProtection() {
       JSC::Heap::heap(wrapper)->reportExtraMemoryCost(m_responseText.size() *
                                                       2);
   }
+#endif
 
   unsetPendingActivity(this);
 }
@@ -1089,11 +1089,8 @@ void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
   if (m_state < HEADERS_RECEIVED)
     changeState(HEADERS_RECEIVED);
 
-  {
-    JSC::JSLock lock(false);
-    if (m_decoder)
-      m_responseText += m_decoder->flush();
-  }
+  if (m_decoder)
+    m_responseText += m_decoder->flush();
 
   if (Frame* frame = document()->frame()) {
     if (Page* page = frame->page()) {
@@ -1310,12 +1307,7 @@ void XMLHttpRequest::didReceiveData(SubresourceLoader*,
   if (len == -1)
     len = strlen(data);
 
-  String decoded = m_decoder->decode(data, len);
-
-  {
-    JSC::JSLock lock(false);
-    m_responseText += decoded;
-  }
+  m_responseText += m_decoder->decode(data, len);
 
   if (!m_error) {
     updateAndDispatchOnProgress(len);

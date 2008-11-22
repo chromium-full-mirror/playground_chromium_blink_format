@@ -265,7 +265,7 @@ class InspectorController
                       unsigned long identifier,
                       const ResourceError&);
   void resourceRetrievedByXMLHttpRequest(unsigned long identifier,
-                                         JSC::UString& sourceString);
+                                         const JSC::UString& sourceString);
 
 #if ENABLE(DATABASE)
   void didOpenDatabase(Database*,
