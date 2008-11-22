@@ -111,7 +111,7 @@ class StructureChain;
 struct CallLinkInfo;
 struct Instruction;
 struct OperandTypes;
-struct PrototypeStructureList;
+struct PolymorphicAccessStructureList;
 struct StructureStubInfo;
 
 typedef JSValue*(SFX_CALL* CTIHelper_j)(CTI_ARGS);
@@ -295,12 +295,24 @@ class JIT {
   }
 
 #if USE(CTI_REPATCH_PIC)
+  static void compileGetByIdSelfList(
+      JSGlobalData* globalData,
+      CodeBlock* codeBlock,
+      StructureStubInfo* stubInfo,
+      PolymorphicAccessStructureList* polymorphicStructures,
+      int currentIndex,
+      Structure* structure,
+      size_t cachedOffset) {
+    JIT jit(globalData, codeBlock);
+    jit.privateCompileGetByIdSelfList(stubInfo, polymorphicStructures,
+                                      currentIndex, structure, cachedOffset);
+  }
   static void compileGetByIdProtoList(
       JSGlobalData* globalData,
       CallFrame* callFrame,
       CodeBlock* codeBlock,
       StructureStubInfo* stubInfo,
-      PrototypeStructureList* prototypeStructureList,
+      PolymorphicAccessStructureList* prototypeStructureList,
       int currentIndex,
       Structure* structure,
       Structure* prototypeStructure,
@@ -400,8 +412,13 @@ class JIT {
                                   void* returnAddress,
                                   CallFrame* callFrame);
 #if USE(CTI_REPATCH_PIC)
+  void privateCompileGetByIdSelfList(StructureStubInfo*,
+                                     PolymorphicAccessStructureList*,
+                                     int,
+                                     Structure*,
+                                     size_t cachedOffset);
   void privateCompileGetByIdProtoList(StructureStubInfo*,
-                                      PrototypeStructureList*,
+                                      PolymorphicAccessStructureList*,
                                       int,
                                       Structure*,
                                       Structure* prototypeStructure,

@@ -2619,6 +2619,7 @@ void JIT::privateCompileMainPass() {
       case op_get_by_id_proto:
       case op_get_by_id_proto_list:
       case op_get_by_id_self:
+      case op_get_by_id_self_list:
       case op_get_string_length:
       case op_put_by_id_generic:
       case op_put_by_id_replace:
@@ -3638,9 +3639,50 @@ void JIT::privateCompileGetByIdProto(Structure* structure,
 }
 
 #if USE(CTI_REPATCH_PIC)
+void JIT::privateCompileGetByIdSelfList(
+    StructureStubInfo* stubInfo,
+    PolymorphicAccessStructureList* polymorphicStructures,
+    int currentIndex,
+    Structure* structure,
+    size_t cachedOffset) {
+  JmpSrc failureCase = checkStructure(X86::eax, structure);
+  __ movl_mr(FIELD_OFFSET(JSObject, m_propertyStorage), X86::eax, X86::eax);
+  __ movl_mr(cachedOffset * sizeof(JSValue*), X86::eax, X86::eax);
+  JmpSrc success = __ jmp();
+
+  void* code = __ executableCopy();
+  ASSERT(code);
+
+  // Use the repatch information to link the failure cases back to the original
+  // slow case routine.
+  void* lastProtoBegin =
+      polymorphicStructures->list[currentIndex - 1].stubRoutine;
+  if (!lastProtoBegin)
+    lastProtoBegin = reinterpret_cast<char*>(stubInfo->callReturnLocation) -
+                     repatchOffsetGetByIdSlowCaseCall;
+
+  X86Assembler::link(code, failureCase, lastProtoBegin);
+
+  // On success return back to the hot patch code, at a point it will perform
+  // the store to dest for us.
+  intptr_t successDest = reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
+                         repatchOffsetGetByIdPropertyMapOffset;
+  X86Assembler::link(code, success, reinterpret_cast<void*>(successDest));
+
+  structure->ref();
+  polymorphicStructures->list[currentIndex].set(structure, 0, cachedOffset,
+                                                0 /*code*/);
+
+  // Finally repatch the jump to slow case back in the hot path to jump here
+  // instead.
+  intptr_t jmpLocation = reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
+                         repatchOffsetGetByIdBranchToSlowCase;
+  X86Assembler::repatchBranchOffset(jmpLocation, code);
+}
+
 void JIT::privateCompileGetByIdProtoList(
     StructureStubInfo* stubInfo,
-    PrototypeStructureList* prototypeStructures,
+    PolymorphicAccessStructureList* prototypeStructures,
     int currentIndex,
     Structure* structure,
     Structure* prototypeStructure,
@@ -4164,7 +4206,7 @@ void JIT::patchGetByIdSelf(CodeBlock* codeBlock,
   // do anything interesting right now.
   ctiRepatchCallByReturnAddress(
       returnAddress,
-      reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_generic));
+      reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_self_fail));
 
   // Repatch the offset into the propoerty map to load from, then repatch the
   // Structure to look for.

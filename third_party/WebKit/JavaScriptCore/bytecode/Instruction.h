@@ -33,7 +33,7 @@
 #include "ResultType.h"
 #include <wtf/VectorTraits.h>
 
-#define PROTOTYPE_LIST_CACHE_SIZE 4
+#define POLYMORPHIC_LIST_CACHE_SIZE 4
 
 namespace JSC {
 
@@ -43,8 +43,8 @@ class StructureChain;
 
 // Structure used by op_get_by_id_proto_list instruction to hold data off the
 // main opcode stream.
-struct PrototypeStructureList {
-  struct ProtoStubInfo {
+struct PolymorphicAccessStructureList {
+  struct PolymorphicStubInfo {
     Structure* base;
     Structure* proto;
     int cachedOffset;
@@ -59,13 +59,28 @@ struct PrototypeStructureList {
       cachedOffset = _cachedOffset;
       stubRoutine = _stubRoutine;
     }
-  } list[PROTOTYPE_LIST_CACHE_SIZE];
+  } list[POLYMORPHIC_LIST_CACHE_SIZE];
 
-  PrototypeStructureList(Structure* firstBase,
-                         Structure* firstProto,
-                         int cachedOffset,
-                         void* stubRoutine) {
+  PolymorphicAccessStructureList(Structure* firstBase,
+                                 Structure* firstProto,
+                                 int cachedOffset,
+                                 void* stubRoutine) {
     list[0].set(firstBase, firstProto, cachedOffset, stubRoutine);
+  }
+
+  void derefStructures(int count) {
+    for (int i = 0; i < count; ++i) {
+      PolymorphicStubInfo& info = list[i];
+
+      ASSERT(info.base);
+      info.base->deref();
+
+      if (info.proto)
+        info.proto->deref();
+
+      if (info.stubRoutine)
+        WTF::fastFreeExecutable(info.stubRoutine);
+    }
   }
 };
 
@@ -83,8 +98,8 @@ struct Instruction {
     u.structureChain = structureChain;
   }
   Instruction(JSCell* jsCell) { u.jsCell = jsCell; }
-  Instruction(PrototypeStructureList* prototypeStructure) {
-    u.prototypeStructure = prototypeStructure;
+  Instruction(PolymorphicAccessStructureList* polymorphicStructures) {
+    u.polymorphicStructures = polymorphicStructures;
   }
 
   union {
@@ -94,7 +109,7 @@ struct Instruction {
     StructureChain* structureChain;
     JSCell* jsCell;
     ResultType::Type resultType;
-    PrototypeStructureList* prototypeStructure;
+    PolymorphicAccessStructureList* polymorphicStructures;
   } u;
 };
 
