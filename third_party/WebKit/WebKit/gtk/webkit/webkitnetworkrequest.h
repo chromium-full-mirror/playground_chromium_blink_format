@@ -46,6 +46,7 @@ typedef struct _WebKitNetworkRequestPrivate WebKitNetworkRequestPrivate;
 struct _WebKitNetworkRequest {
   GObject parent_instance;
 
+  /*< private >*/
   WebKitNetworkRequestPrivate* priv;
 };
 
