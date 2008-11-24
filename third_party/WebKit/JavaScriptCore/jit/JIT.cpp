@@ -3753,6 +3753,7 @@ void JIT::privateCompileGetByIdChain(Structure* structure,
 
   // Check eax is an object of the right Structure.
   __ testl_i32r(JSImmediate::TagMask, X86::eax);
+  bucketsOfFail.append(__ jne());
   bucketsOfFail.append(checkStructure(X86::eax, structure));
 
   Structure* currStructure = structure;
