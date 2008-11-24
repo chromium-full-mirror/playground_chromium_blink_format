@@ -154,6 +154,8 @@ bool ScrollbarThemeComposite::paint(Scrollbar* scrollbar,
     if (scrollMask & ForwardTrackPart)
       paintTrackPiece(graphicsContext, scrollbar, endTrackRect,
                       ForwardTrackPart);
+
+    paintTickmarks(graphicsContext, scrollbar, trackPaintRect);
   }
 
   // Paint the thumb.
