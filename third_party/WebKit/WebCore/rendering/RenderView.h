@@ -106,7 +106,6 @@ class RenderView : public RenderBlock {
                              bool topLevel = true);
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
-  virtual IntRect selectionRect(bool);
   IntRect selectionBounds(bool clipToVisibleContent = true) const;
 
   void setMaximalOutlineSize(int o) { m_maximalOutlineSize = o; }
@@ -161,6 +160,10 @@ class RenderView : public RenderBlock {
     ASSERT(m_layoutStateDisableCount > 0);
     m_layoutStateDisableCount--;
   }
+
+ private:
+  // selectionRect should never be called on a RenderView
+  virtual IntRect selectionRect(bool);
 
  protected:
   FrameView* m_frameView;
