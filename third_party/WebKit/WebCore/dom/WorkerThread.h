@@ -29,13 +29,12 @@
 
 #if ENABLE(WORKERS)
 
-#include "PlatformString.h"
+#include "KURL.h"
 #include <wtf/MessageQueue.h>
 #include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
-class KURL;
 class WorkerContext;
 class WorkerMessagingProxy;
 class WorkerTask;
@@ -63,7 +62,7 @@ class WorkerThread : public RefCounted<WorkerThread> {
 
   ThreadIdentifier m_threadID;
 
-  String m_scriptURL;
+  KURL m_scriptURL;
   String m_sourceCode;
   WorkerMessagingProxy* m_messagingProxy;
 

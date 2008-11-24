@@ -26,20 +26,17 @@
 #include "ScriptElement.h"
 
 #include "CachedScript.h"
-#include "CachedScriptSourceProvider.h"
 #include "DocLoader.h"
 #include "Document.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "MIMETypeRegistry.h"
 #include "ScriptController.h"
+#include "ScriptSourceCode.h"
 #include "ScriptValue.h"
 #include "StringHash.h"
-#include "StringSourceProvider.h"
 #include "Text.h"
 #include <wtf/StdLibExtras.h>
-
-using namespace JSC;
 
 namespace WebCore {
 
@@ -56,11 +53,10 @@ void ScriptElement::insertedIntoDocument(ScriptElementData& data,
   // If there's an empty script node, we shouldn't evaluate the script
   // because if a script is inserted afterwards (by setting text or innerText)
   // it should be evaluated, and evaluateScript only evaluates a script once.
-  data.evaluateScript(makeSource(
+  data.evaluateScript(ScriptSourceCode(
       data.scriptContent(),
-      data.element()->document()->url().string()));  // FIXME: Provide a real
-                                                     // starting line number
-                                                     // here.
+      data.element()->document()->url()));  // FIXME: Provide a real starting
+                                            // line number here.
 }
 
 void ScriptElement::removedFromDocument(ScriptElementData& data) {
@@ -78,10 +74,10 @@ void ScriptElement::childrenChanged(ScriptElementData& data) {
   // and the script element has been inserted in the document
   // we evaluate the script.
   if (element->inDocument() && element->firstChild())
-    data.evaluateScript(makeSource(
+    data.evaluateScript(ScriptSourceCode(
         data.scriptContent(),
-        element->document()->url().string()));  // FIXME: Provide a real
-                                                // starting line number here
+        element->document()
+            ->url()));  // FIXME: Provide a real starting line number here
 }
 
 void ScriptElement::finishParsingChildren(ScriptElementData& data,
@@ -168,8 +164,8 @@ void ScriptElementData::requestScript(const String& sourceUrl) {
   m_scriptElement->dispatchErrorEvent();
 }
 
-void ScriptElementData::evaluateScript(const SourceCode& sourceCode) {
-  if (m_evaluated || !sourceCode.length() || !shouldExecuteAsJavaScript())
+void ScriptElementData::evaluateScript(const ScriptSourceCode& sourceCode) {
+  if (m_evaluated || sourceCode.isEmpty() || !shouldExecuteAsJavaScript())
     return;
 
   if (Frame* frame = m_element->document()->frame()) {
@@ -201,7 +197,7 @@ void ScriptElementData::notifyFinished(CachedResource* o) {
   if (cs->errorOccurred())
     m_scriptElement->dispatchErrorEvent();
   else {
-    evaluateScript(makeSource(cs));
+    evaluateScript(ScriptSourceCode(cs));
     m_scriptElement->dispatchLoadEvent();
   }
 

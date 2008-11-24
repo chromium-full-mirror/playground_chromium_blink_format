@@ -39,9 +39,9 @@
 #include "PageGroup.h"
 #include "PausedTimeouts.h"
 #include "runtime_root.h"
+#include "ScriptSourceCode.h"
 #include "ScriptValue.h"
 #include "Settings.h"
-#include "StringSourceProvider.h"
 
 #include <runtime/Completion.h>
 #include <debugger/Debugger.h>
@@ -91,9 +91,11 @@ ScriptController::~ScriptController() {
   disconnectPlatformScriptObjects();
 }
 
-ScriptValue ScriptController::evaluate(const JSC::SourceCode& sourceCode) {
+ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode) {
   // evaluate code. Returns the JS return value or 0
   // if there was none, an error occured or the type couldn't be converted.
+
+  const SourceCode& jsSourceCode = sourceCode.jsSourceCode();
 
   initScriptIfNeeded();
   // inlineCode is true for <a href="javascript:doSomething()">
@@ -102,7 +104,7 @@ ScriptValue ScriptController::evaluate(const JSC::SourceCode& sourceCode) {
   // See smart window.open policy for where this is used.
   ExecState* exec = m_windowShell->window()->globalExec();
   const String* savedSourceURL = m_sourceURL;
-  String sourceURL = sourceCode.provider()->url();
+  String sourceURL = jsSourceCode.provider()->url();
   m_sourceURL = &sourceURL;
 
   JSLock lock(false);
@@ -114,7 +116,7 @@ ScriptValue ScriptController::evaluate(const JSC::SourceCode& sourceCode) {
   m_windowShell->window()->startTimeoutCheck();
   Completion comp =
       JSC::evaluate(exec, exec->dynamicGlobalObject()->globalScopeChain(),
-                    sourceCode, m_windowShell);
+                    jsSourceCode, m_windowShell);
   m_windowShell->window()->stopTimeoutCheck();
 
   if (comp.complType() == Normal || comp.complType() == ReturnValue) {

@@ -30,7 +30,6 @@
 #include "CSSHelper.h"
 #include "Cache.h"
 #include "CachedScript.h"
-#include "CachedScriptSourceProvider.h"
 #include "DocLoader.h"
 #include "DocumentFragment.h"
 #include "EventNames.h"
@@ -45,8 +44,8 @@
 #include "Page.h"
 #include "PreloadScanner.h"
 #include "ScriptController.h"
+#include "ScriptSourceCode.h"
 #include "ScriptValue.h"
-#include "StringSourceProvider.h"
 #include "SystemTime.h"
 #include <wtf/ASCIICType.h>
 
@@ -55,7 +54,6 @@
 #define PRELOAD_SCANNER_ENABLED 1
 // #define INSTRUMENT_LAYOUT_SCHEDULING 1
 
-using namespace JSC;
 using namespace WTF;
 using namespace std;
 
@@ -534,10 +532,10 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
         prependingSrc = m_src;
       setSrc(SegmentedString());
       state = scriptExecution(
-          makeSource(scriptString,
-                     m_doc->frame() ? m_doc->frame()->document()->url().string()
-                                    : String(),
-                     startLine),
+          ScriptSourceCode(
+              scriptString,
+              m_doc->frame() ? m_doc->frame()->document()->url() : KURL(),
+              startLine),
           state);
     }
   }
@@ -581,7 +579,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
 }
 
 HTMLTokenizer::State HTMLTokenizer::scriptExecution(
-    const SourceCode& sourceCode,
+    const ScriptSourceCode& sourceCode,
     State state) {
   if (m_fragment || !m_doc->frame())
     return state;
@@ -2067,7 +2065,7 @@ void HTMLTokenizer::notifyFinished(CachedResource*) {
 
     // make sure we forget about the script before we execute the new one
     // infinite recursion might happen otherwise
-    JSC::SourceCode sourceCode = makeSource(cs);
+    ScriptSourceCode sourceCode(cs);
     bool errorOccurred = cs->errorOccurred();
     cs->removeClient(this);
 

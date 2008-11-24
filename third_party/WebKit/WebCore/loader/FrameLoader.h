@@ -49,10 +49,6 @@
 #include "CachedResourceClient.h"
 #endif
 
-namespace JSC {
-class SourceCode;
-}
-
 namespace WebCore {
 
 class Archive;
@@ -79,6 +75,7 @@ class ResourceError;
 class ResourceLoader;
 class ResourceRequest;
 class ResourceResponse;
+class ScriptSourceCode;
 class ScriptValue;
 class SecurityOrigin;
 class SharedBuffer;
@@ -439,7 +436,7 @@ class FrameLoader : Noncopyable
                               bool userGesture = false,
                               bool replaceDocument = true);
 
-  ScriptValue executeScript(const JSC::SourceCode&);
+  ScriptValue executeScript(const ScriptSourceCode&);
   ScriptValue executeScript(const String& script,
                             bool forceUserGesture = false);
 
