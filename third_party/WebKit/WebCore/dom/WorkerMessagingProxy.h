@@ -57,6 +57,8 @@ class WorkerMessagingProxy : Noncopyable {
   void workerObjectDestroyed();
   void workerContextDestroyed();
 
+  void terminate();
+
   void confirmWorkerThreadMessage(bool hasPendingActivity);
   void reportWorkerThreadActivity(bool hasPendingActivity);
   bool workerThreadHasPendingActivity() const;
@@ -72,6 +74,7 @@ class WorkerMessagingProxy : Noncopyable {
   void reportWorkerThreadActivityInternal(bool confirmingMessage,
                                           bool hasPendingActivity);
   Worker* workerObject() const { return m_workerObject; }
+  bool askedToTerminate() { return m_askedToTerminate; }
 
   RefPtr<ScriptExecutionContext> m_scriptExecutionContext;
   Worker* m_workerObject;
@@ -82,6 +85,8 @@ class WorkerMessagingProxy : Noncopyable {
   bool m_workerThreadHadPendingActivity;  // The latest confirmation from worker
                                           // thread reported that it was still
                                           // active.
+
+  bool m_askedToTerminate;
 
   Vector<RefPtr<WorkerTask>> m_queuedEarlyTasks;  // Tasks are queued here until
                                                   // there's a thread object
