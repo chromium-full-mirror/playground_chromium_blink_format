@@ -102,6 +102,7 @@ class WebHistoryItem : public IWebHistoryItem, IWebHistoryItemPrivate {
   virtual HRESULT STDMETHODCALLTYPE children(unsigned* childCount,
                                              SAFEARRAY** children);
   virtual HRESULT STDMETHODCALLTYPE lastVisitWasFailure(BOOL* wasFailure);
+  virtual HRESULT STDMETHODCALLTYPE setLastVisitWasFailure(BOOL wasFailure);
 
   // WebHistoryItem
   WebCore::HistoryItem* historyItem() const;

@@ -111,7 +111,9 @@ class WebHistory : public IWebHistory {
 
   // WebHistory
   static WebHistory* sharedHistory();
-  void addItem(const WebCore::KURL&, const WebCore::String&);
+  void addItem(const WebCore::KURL&,
+               const WebCore::String& title,
+               bool wasFailure);
   void addVisitedLinksToPageGroup(WebCore::PageGroup&);
 
  private:

@@ -661,7 +661,9 @@ HRESULT WebHistory::addItem(IWebHistoryItem* entry) {
   return hr;
 }
 
-void WebHistory::addItem(const KURL& url, const String& title) {
+void WebHistory::addItem(const KURL& url,
+                         const String& title,
+                         bool wasFailure) {
   COMPtr<WebHistoryItem> item(AdoptCOM, WebHistoryItem::createInstance());
   if (!item)
     return;
@@ -681,6 +683,9 @@ void WebHistory::addItem(const KURL& url, const String& title) {
       lastVisited);  // also increments visitedCount
   if (FAILED(hr))
     return;
+
+  if (wasFailure)
+    item->setLastVisitWasFailure(true);
 
   addItem(item.get());
 }

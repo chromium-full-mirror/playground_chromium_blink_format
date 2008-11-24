@@ -177,7 +177,9 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
 
   void stopRecordingResponses();
   const String& title() const { return m_pageTitle; }
+
   KURL urlForHistory() const;
+  bool urlForHistoryReflectsFailure() const;
 
   void loadFromCachedPage(PassRefPtr<CachedPage>);
   void setLoadingFromCachedPage(bool loading) {

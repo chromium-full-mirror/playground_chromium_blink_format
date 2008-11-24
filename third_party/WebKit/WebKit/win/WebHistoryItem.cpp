@@ -328,6 +328,12 @@ WebHistoryItem::lastVisitWasFailure(BOOL* wasFailure) {
   return S_OK;
 }
 
+HRESULT STDMETHODCALLTYPE
+WebHistoryItem::setLastVisitWasFailure(BOOL wasFailure) {
+  m_historyItem->setLastVisitWasFailure(wasFailure);
+  return S_OK;
+}
+
 // IUnknown -------------------------------------------------------------------
 
 HRESULT STDMETHODCALLTYPE WebHistoryItem::QueryInterface(REFIID riid,
