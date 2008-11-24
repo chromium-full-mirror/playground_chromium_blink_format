@@ -46,6 +46,7 @@ class FontPlatformData {
   FontPlatformData()
 #if PLATFORM(CAIRO)
       : m_fontFace(0),
+        m_scaledFont(0),
 #else
       :
 #endif
