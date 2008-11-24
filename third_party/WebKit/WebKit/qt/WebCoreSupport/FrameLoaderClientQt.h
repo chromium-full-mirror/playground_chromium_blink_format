@@ -181,7 +181,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void committedLoad(WebCore::DocumentLoader*, const char*, int);
   virtual void finishedLoading(DocumentLoader*);
 
-  virtual void updateGlobalHistory(const KURL&);
+  virtual void updateGlobalHistory();
   virtual bool shouldGoToHistoryItem(HistoryItem*) const;
 
   virtual ResourceError cancelledError(const ResourceRequest&);

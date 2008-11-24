@@ -446,12 +446,12 @@ void WebFrameLoaderClient::finishedLoading(DocumentLoader* loader) {
   m_hasSentResponseToPlugin = false;
 }
 
-void WebFrameLoaderClient::updateGlobalHistory(const KURL& url) {
+void WebFrameLoaderClient::updateGlobalHistory() {
   WebHistory* history = WebHistory::sharedHistory();
   if (!history)
     return;
   DocumentLoader* loader = core(m_webFrame)->loader()->documentLoader();
-  history->addItem(url, loader->title(),
+  history->addItem(loader->urlForHistory(), loader->title(),
                    loader->urlForHistoryReflectsFailure());
 }
 

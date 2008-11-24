@@ -187,7 +187,7 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void committedLoad(WebCore::DocumentLoader*, const char*, int);
   virtual void finishedLoading(WebCore::DocumentLoader*);
 
-  virtual void updateGlobalHistory(const WebCore::KURL&);
+  virtual void updateGlobalHistory();
   virtual bool shouldGoToHistoryItem(WebCore::HistoryItem*) const;
 
   virtual WebCore::ResourceError cancelledError(

@@ -338,7 +338,7 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void transitionToCommittedFromCachedPage(CachedPage*) {}
   virtual void transitionToCommittedForNewPage() {}
 
-  virtual void updateGlobalHistory(const KURL&) {}
+  virtual void updateGlobalHistory() {}
   virtual bool shouldGoToHistoryItem(HistoryItem*) const { return false; }
   virtual void saveViewStateToItem(HistoryItem*) {}
   virtual bool canCachePage() const { return false; }
