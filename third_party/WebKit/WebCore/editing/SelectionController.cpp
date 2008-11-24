@@ -1162,7 +1162,7 @@ void SelectionController::focusedOrActiveStateChanged() {
   // we have to update places those colors were painted.
   if (RenderView* view =
           static_cast<RenderView*>(m_frame->document()->renderer()))
-    view->repaintViewRectangle(enclosingIntRect(m_frame->selectionRect()));
+    view->repaintViewRectangle(enclosingIntRect(m_frame->selectionBounds()));
 
   // Caret appears in the active frame.
   if (activeAndFocused)

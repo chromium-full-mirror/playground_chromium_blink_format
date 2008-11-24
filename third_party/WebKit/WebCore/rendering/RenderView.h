@@ -106,7 +106,8 @@ class RenderView : public RenderBlock {
                              bool topLevel = true);
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
-  IntRect selectionRect(bool clipToVisibleContent = true) const;
+  virtual IntRect selectionRect(bool);
+  IntRect selectionBounds(bool clipToVisibleContent = true) const;
 
   void setMaximalOutlineSize(int o) { m_maximalOutlineSize = o; }
   int maximalOutlineSize() const { return m_maximalOutlineSize; }

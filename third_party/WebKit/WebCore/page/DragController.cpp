@@ -614,7 +614,7 @@ static IntPoint dragLocForDHTMLDrag(const IntPoint& mouseDraggedPoint,
 }
 
 static IntPoint dragLocForSelectionDrag(Frame* src) {
-  IntRect draggingRect = enclosingIntRect(src->selectionRect());
+  IntRect draggingRect = enclosingIntRect(src->selectionBounds());
   int xpos = draggingRect.right();
   xpos = draggingRect.x() < xpos ? draggingRect.x() : xpos;
   int ypos = draggingRect.bottom();
