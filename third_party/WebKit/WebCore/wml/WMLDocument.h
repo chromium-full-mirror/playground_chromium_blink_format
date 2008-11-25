@@ -27,6 +27,8 @@
 
 namespace WebCore {
 
+class WMLPageState;
+
 class WMLDocument : public Document {
  public:
   static PassRefPtr<WMLDocument> create(Frame* frame) {
@@ -41,6 +43,8 @@ class WMLDocument : public Document {
  private:
   WMLDocument(Frame*);
 };
+
+WMLPageState* wmlPageStateForDocument(Document*);
 }
 
 #endif
