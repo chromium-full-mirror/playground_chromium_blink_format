@@ -76,6 +76,11 @@ bool EditorClientWx::smartInsertDeleteEnabled() {
   return false;
 }
 
+bool EditorClientWx::isSelectTrailingWhitespaceEnabled() {
+  notImplemented();
+  return false;
+}
+
 bool EditorClientWx::isContinuousSpellCheckingEnabled() {
   notImplemented();
   return false;
