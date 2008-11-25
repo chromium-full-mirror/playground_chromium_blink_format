@@ -211,6 +211,10 @@ void LayoutTestController::setJavaScriptProfilingEnabled(bool flag) {
   // FIXME: implement
 }
 
+void LayoutTestController::setSelectTrailingWhitespaceEnabled(bool flag) {
+  // FIXME: implement
+}
+
 void LayoutTestController::setPopupBlockingEnabled(bool popupBlockingEnabled) {
   // FIXME: implement
 }
