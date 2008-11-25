@@ -294,18 +294,18 @@ ALWAYS_INLINE void* Heap::heapAllocate(size_t s) {
 
   ASSERT(heap.operationInProgress == NoOperation);
   ASSERT(heapType == PrimaryHeap || heap.extraCost == 0);
-  // FIXME: If another global variable access here doesn't hurt performance
-  // too much, we could CRASH() in NDEBUG builds, which could help ensure we
-  // don't spend any time debugging cases where we allocate inside an object's
-  // deallocation code.
-
-  size_t numLiveObjects = heap.numLiveObjects;
-  size_t usedBlocks = heap.usedBlocks;
-  size_t i = heap.firstBlockWithPossibleSpace;
+// FIXME: If another global variable access here doesn't hurt performance
+// too much, we could CRASH() in NDEBUG builds, which could help ensure we
+// don't spend any time debugging cases where we allocate inside an object's
+// deallocation code.
 
 #if COLLECT_ON_EVERY_ALLOCATION
   collect();
 #endif
+
+  size_t numLiveObjects = heap.numLiveObjects;
+  size_t usedBlocks = heap.usedBlocks;
+  size_t i = heap.firstBlockWithPossibleSpace;
 
   // if we have a huge amount of extra cost, we'll try to collect even if we
   // still have
