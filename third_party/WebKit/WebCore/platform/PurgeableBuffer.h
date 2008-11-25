@@ -70,7 +70,7 @@ class PurgeableBuffer : Noncopyable {
   mutable State m_state;
 };
 
-#if !PLATFORM(DARWIN) || defined(BUILDING_ON_TIGER)
+#if !PLATFORM(DARWIN) || defined(BUILDING_ON_TIGER) || PLATFORM(WX)
 inline PurgeableBuffer* PurgeableBuffer::create(const char*, size_t) {
   return 0;
 }
