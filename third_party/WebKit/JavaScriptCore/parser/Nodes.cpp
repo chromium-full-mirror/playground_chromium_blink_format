@@ -2840,6 +2840,8 @@ JSFunction* FuncDeclNode::makeFunction(ExecState* exec,
 }
 
 RegisterID* FuncDeclNode::emitBytecode(BytecodeGenerator&, RegisterID* dst) {
+  if (dst == ignoredResult())
+    dst = 0;
   return dst;
 }
 
