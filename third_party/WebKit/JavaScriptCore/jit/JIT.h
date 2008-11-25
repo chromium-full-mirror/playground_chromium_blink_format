@@ -322,6 +322,22 @@ class JIT {
         stubInfo, prototypeStructureList, currentIndex, structure,
         prototypeStructure, cachedOffset, callFrame);
   }
+  static void compileGetByIdChainList(
+      JSGlobalData* globalData,
+      CallFrame* callFrame,
+      CodeBlock* codeBlock,
+      StructureStubInfo* stubInfo,
+      PolymorphicAccessStructureList* prototypeStructureList,
+      int currentIndex,
+      Structure* structure,
+      StructureChain* chain,
+      size_t count,
+      size_t cachedOffset) {
+    JIT jit(globalData, codeBlock);
+    jit.privateCompileGetByIdChainList(stubInfo, prototypeStructureList,
+                                       currentIndex, structure, chain, count,
+                                       cachedOffset, callFrame);
+  }
 #endif
 
   static void compileGetByIdChain(JSGlobalData* globalData,
@@ -422,6 +438,14 @@ class JIT {
                                       int,
                                       Structure*,
                                       Structure* prototypeStructure,
+                                      size_t cachedOffset,
+                                      CallFrame* callFrame);
+  void privateCompileGetByIdChainList(StructureStubInfo*,
+                                      PolymorphicAccessStructureList*,
+                                      int,
+                                      Structure*,
+                                      StructureChain* chain,
+                                      size_t count,
                                       size_t cachedOffset,
                                       CallFrame* callFrame);
 #endif

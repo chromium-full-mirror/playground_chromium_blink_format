@@ -84,11 +84,6 @@ namespace JSC {
 // Preferred number of milliseconds between each timeout check
 static const int preferredScriptCheckTimeInterval = 1000;
 
-#if HAVE(COMPUTED_GOTO)
-static void* op_throw_end_indirect;
-static void* op_call_indirect;
-#endif
-
 #if ENABLE(JIT)
 
 static ALWAYS_INLINE Instruction* vPCForPC(CodeBlock* codeBlock, void* pc) {
@@ -1494,6 +1489,40 @@ NEVER_INLINE void Interpreter::uncachePutByID(CodeBlock* codeBlock,
   vPC[4] = 0;
 }
 
+static size_t countPrototypeChainEntriesAndCheckForProxies(
+    CallFrame* callFrame,
+    JSValue* baseValue,
+    const PropertySlot& slot) {
+  JSObject* o = asObject(baseValue);
+  size_t count = 0;
+
+  while (slot.slotBase() != o) {
+    JSValue* v = o->structure()->prototypeForLookup(callFrame);
+
+    // If we didn't find slotBase in baseValue's prototype chain, then baseValue
+    // must be a proxy for another object.
+
+    if (v->isNull())
+      return 0;
+
+    o = asObject(v);
+
+    // Heavy access to a prototype is a good indication that it's not being
+    // used as a dictionary.
+    if (o->structure()->isDictionary()) {
+      RefPtr<Structure> transition =
+          Structure::fromDictionaryTransition(o->structure());
+      o->setStructure(transition.release());
+      asObject(baseValue)->structure()->setCachedPrototypeChain(0);
+    }
+
+    ++count;
+  }
+
+  ASSERT(count);
+  return count;
+}
+
 NEVER_INLINE void Interpreter::tryCacheGetByID(CallFrame* callFrame,
                                                CodeBlock* codeBlock,
                                                Instruction* vPC,
@@ -1581,30 +1610,11 @@ NEVER_INLINE void Interpreter::tryCacheGetByID(CallFrame* callFrame,
     return;
   }
 
-  size_t count = 0;
-  JSObject* o = asObject(baseValue);
-  while (slot.slotBase() != o) {
-    JSValue* v = o->structure()->prototypeForLookup(callFrame);
-
-    // If we didn't find base in baseValue's prototype chain, then baseValue
-    // must be a proxy for another object.
-    if (v->isNull()) {
-      vPC[0] = getOpcode(op_get_by_id_generic);
-      return;
-    }
-
-    o = asObject(v);
-
-    // Heavy access to a prototype is a good indication that it's not being
-    // used as a dictionary.
-    if (o->structure()->isDictionary()) {
-      RefPtr<Structure> transition =
-          Structure::fromDictionaryTransition(o->structure());
-      o->setStructure(transition.release());
-      asObject(baseValue)->structure()->setCachedPrototypeChain(0);
-    }
-
-    ++count;
+  size_t count =
+      countPrototypeChainEntriesAndCheckForProxies(callFrame, baseValue, slot);
+  if (!count) {
+    vPC[0] = getOpcode(op_get_by_id_generic);
+    return;
   }
 
   StructureChain* chain = structure->cachedPrototypeChain();
@@ -1643,8 +1653,6 @@ JSValue* Interpreter::privateExecute(ExecutionFlag flag,
     FOR_EACH_OPCODE_ID(ADD_OPCODE_ID);
 #undef ADD_OPCODE_ID
     ASSERT(m_opcodeIDTable.size() == numOpcodeIDs);
-    op_throw_end_indirect = &&op_throw_end;
-    op_call_indirect = &&op_call;
 #endif  // HAVE(COMPUTED_GOTO)
     return noValue();
   }
@@ -3624,15 +3632,8 @@ JSValue* Interpreter::privateExecute(ExecutionFlag flag,
         NEXT_INSTRUCTION();
       }
 
-// We didn't find the blessed version of eval, so process this
-// instruction as a normal function call.
-
-#if HAVE(COMPUTED_GOTO)
-      // Hack around gcc performance quirk by performing an indirect goto
-      // in order to set the vPC -- attempting to do so directly results in a
-      // significant regression.
-      goto* op_call_indirect;  // indirect goto -> op_call
-#endif
+      // We didn't find the blessed version of eval, so process this
+      // instruction as a normal function call.
       // fall through to op_call
     }
     DEFINE_OPCODE(op_call) {
@@ -4140,18 +4141,9 @@ JSValue* Interpreter::privateExecute(ExecutionFlag flag,
         return jsNull();
       }
 
-#if HAVE(COMPUTED_GOTO)
-      // Hack around gcc performance quirk by performing an indirect goto
-      // in order to set the vPC -- attempting to do so directly results in a
-      // significant regression.
-      goto* op_throw_end_indirect;  // indirect goto -> op_throw_end
+      vPC = handlerVPC;
+      NEXT_INSTRUCTION();
     }
-  op_throw_end : {
-#endif
-
-    vPC = handlerVPC;
-    NEXT_INSTRUCTION();
-  }
     DEFINE_OPCODE(op_unexpected_load) {
       /* unexpected_load load dst(r) src(k)
 
@@ -4613,38 +4605,18 @@ NEVER_INLINE void Interpreter::tryCTICacheGetByID(
     return;
   }
 
-  size_t count = 0;
-  JSObject* o = asObject(baseValue);
-  while (slot.slotBase() != o) {
-    JSValue* v = o->structure()->prototypeForLookup(callFrame);
-
-    // If we didn't find slotBase in baseValue's prototype chain, then baseValue
-    // must be a proxy for another object.
-
-    if (v->isNull()) {
-      vPC[0] = getOpcode(op_get_by_id_generic);
-      return;
-    }
-
-    o = asObject(v);
-
-    // Heavy access to a prototype is a good indication that it's not being
-    // used as a dictionary.
-    if (o->structure()->isDictionary()) {
-      RefPtr<Structure> transition =
-          Structure::fromDictionaryTransition(o->structure());
-      o->setStructure(transition.release());
-      asObject(baseValue)->structure()->setCachedPrototypeChain(0);
-    }
-
-    ++count;
+  size_t count =
+      countPrototypeChainEntriesAndCheckForProxies(callFrame, baseValue, slot);
+  if (!count) {
+    vPC[0] = getOpcode(op_get_by_id_generic);
+    return;
   }
 
   StructureChain* chain = structure->cachedPrototypeChain();
   if (!chain)
     chain = cachePrototypeChain(callFrame, structure);
-
   ASSERT(chain);
+
   vPC[0] = getOpcode(op_get_by_id_chain);
   vPC[4] = structure;
   vPC[5] = chain;
@@ -5011,7 +4983,7 @@ JSValue* Interpreter::cti_op_get_by_id_self_fail(CTI_ARGS) {
         ARG_globalData->interpreter->getOpcode(op_get_by_id_self)) {
       ASSERT(!stubInfo->stubRoutine);
       polymorphicStructureList = new PolymorphicAccessStructureList(
-          vPC[4].u.structure, 0, vPC[5].u.operand, 0);
+          vPC[5].u.operand, 0, vPC[4].u.structure);
 
       vPC[0] = ARG_globalData->interpreter->getOpcode(op_get_by_id_self_list);
       vPC[4] = polymorphicStructureList;
@@ -5039,6 +5011,44 @@ JSValue* Interpreter::cti_op_get_by_id_self_fail(CTI_ARGS) {
   return result;
 }
 
+static PolymorphicAccessStructureList* getPolymorphicAccessStructureListSlot(
+    Interpreter* interpreter,
+    StructureStubInfo* stubInfo,
+    Instruction* vPC,
+    int& listIndex) {
+  PolymorphicAccessStructureList* prototypeStructureList;
+  listIndex = 1;
+
+  if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_proto)) {
+    prototypeStructureList = new PolymorphicAccessStructureList(
+        vPC[6].u.operand, stubInfo->stubRoutine, vPC[4].u.structure,
+        vPC[5].u.structure);
+    stubInfo->stubRoutine = 0;
+
+    vPC[0] = interpreter->getOpcode(op_get_by_id_proto_list);
+    vPC[4] = prototypeStructureList;
+    vPC[5] = 2;
+  } else if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_chain)) {
+    prototypeStructureList = new PolymorphicAccessStructureList(
+        vPC[6].u.operand, stubInfo->stubRoutine, vPC[4].u.structure,
+        vPC[5].u.structureChain);
+    stubInfo->stubRoutine = 0;
+
+    vPC[0] = interpreter->getOpcode(op_get_by_id_proto_list);
+    vPC[4] = prototypeStructureList;
+    vPC[5] = 2;
+  } else {
+    ASSERT(vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_proto_list));
+    prototypeStructureList = vPC[4].u.polymorphicStructures;
+    listIndex = vPC[5].u.operand;
+    vPC[5] = listIndex + 1;
+
+    ASSERT(listIndex < POLYMORPHIC_LIST_CACHE_SIZE);
+  }
+
+  return prototypeStructureList;
+}
+
 JSValue* Interpreter::cti_op_get_by_id_proto_list(CTI_ARGS) {
   CTI_STACK_HACK();
 
@@ -5050,21 +5060,28 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list(CTI_ARGS) {
 
   CHECK_FOR_EXCEPTION();
 
-  if (baseValue->isObject() && slot.isCacheable() &&
-      !asCell(baseValue)->structure()->isDictionary() &&
-      slot.slotBase() ==
-          asCell(baseValue)->structure()->prototypeForLookup(callFrame)) {
-    JSCell* baseCell = asCell(baseValue);
-    Structure* structure = baseCell->structure();
-    CodeBlock* codeBlock = callFrame->codeBlock();
-    unsigned vPCIndex =
-        codeBlock->ctiReturnAddressVPCMap.get(CTI_RETURN_ADDRESS);
-    Instruction* vPC = codeBlock->instructions.begin() + vPCIndex;
+  if (!baseValue->isObject() || !slot.isCacheable() ||
+      asCell(baseValue)->structure()->isDictionary()) {
+    ctiRepatchCallByReturnAddress(
+        CTI_RETURN_ADDRESS,
+        reinterpret_cast<void*>(cti_op_get_by_id_proto_fail));
+    return result;
+  }
 
-    ASSERT(slot.slotBase()->isObject());
+  Structure* structure = asCell(baseValue)->structure();
+  CodeBlock* codeBlock = callFrame->codeBlock();
+  Instruction* vPC = codeBlock->instructions.begin() +
+                     codeBlock->ctiReturnAddressVPCMap.get(CTI_RETURN_ADDRESS);
 
-    JSObject* slotBaseObject = asObject(slot.slotBase());
+  ASSERT(slot.slotBase()->isObject());
+  JSObject* slotBaseObject = asObject(slot.slotBase());
 
+  if (slot.slotBase() == baseValue)
+    ctiRepatchCallByReturnAddress(
+        CTI_RETURN_ADDRESS,
+        reinterpret_cast<void*>(cti_op_get_by_id_proto_fail));
+  else if (slot.slotBase() ==
+           asCell(baseValue)->structure()->prototypeForLookup(callFrame)) {
     // Heavy access to a prototype is a good indication that it's not being
     // used as a dictionary.
     if (slotBaseObject->structure()->isDictionary()) {
@@ -5075,26 +5092,10 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list(CTI_ARGS) {
     }
 
     StructureStubInfo* stubInfo = &codeBlock->getStubInfo(CTI_RETURN_ADDRESS);
-
-    PolymorphicAccessStructureList* prototypeStructureList;
-    int listIndex = 1;
-
-    if (vPC[0].u.opcode ==
-        ARG_globalData->interpreter->getOpcode(op_get_by_id_proto)) {
-      prototypeStructureList = new PolymorphicAccessStructureList(
-          vPC[4].u.structure, vPC[5].u.structure, vPC[6].u.operand,
-          stubInfo->stubRoutine);
-      stubInfo->stubRoutine = 0;
-
-      vPC[0] = ARG_globalData->interpreter->getOpcode(op_get_by_id_proto_list);
-      vPC[4] = prototypeStructureList;
-      vPC[5] = 2;
-    } else {
-      prototypeStructureList = vPC[4].u.polymorphicStructures;
-      listIndex = vPC[5].u.operand;
-
-      vPC[5] = listIndex + 1;
-    }
+    int listIndex;
+    PolymorphicAccessStructureList* prototypeStructureList =
+        getPolymorphicAccessStructureListSlot(ARG_globalData->interpreter,
+                                              stubInfo, vPC, listIndex);
 
     JIT::compileGetByIdProtoList(
         callFrame->scopeChain()->globalData, callFrame, codeBlock, stubInfo,
@@ -5105,11 +5106,33 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list(CTI_ARGS) {
       ctiRepatchCallByReturnAddress(
           CTI_RETURN_ADDRESS,
           reinterpret_cast<void*>(cti_op_get_by_id_proto_list_full));
-  } else {
+  } else if (size_t count = countPrototypeChainEntriesAndCheckForProxies(
+                 callFrame, baseValue, slot)) {
+    StructureChain* chain = structure->cachedPrototypeChain();
+    if (!chain)
+      chain = cachePrototypeChain(callFrame, structure);
+    ASSERT(chain);
+
+    StructureStubInfo* stubInfo = &codeBlock->getStubInfo(CTI_RETURN_ADDRESS);
+    int listIndex;
+    PolymorphicAccessStructureList* prototypeStructureList =
+        getPolymorphicAccessStructureListSlot(ARG_globalData->interpreter,
+                                              stubInfo, vPC, listIndex);
+
+    JIT::compileGetByIdChainList(callFrame->scopeChain()->globalData, callFrame,
+                                 codeBlock, stubInfo, prototypeStructureList,
+                                 listIndex, structure, chain, count,
+                                 slot.cachedOffset());
+
+    if (listIndex == (POLYMORPHIC_LIST_CACHE_SIZE - 1))
+      ctiRepatchCallByReturnAddress(
+          CTI_RETURN_ADDRESS,
+          reinterpret_cast<void*>(cti_op_get_by_id_proto_list_full));
+  } else
     ctiRepatchCallByReturnAddress(
         CTI_RETURN_ADDRESS,
         reinterpret_cast<void*>(cti_op_get_by_id_proto_fail));
-  }
+
   return result;
 }
 
@@ -5125,17 +5148,6 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list_full(CTI_ARGS) {
 }
 
 JSValue* Interpreter::cti_op_get_by_id_proto_fail(CTI_ARGS) {
-  CTI_STACK_HACK();
-
-  JSValue* baseValue = ARG_src1;
-  PropertySlot slot(baseValue);
-  JSValue* result = baseValue->get(ARG_callFrame, *ARG_id2, slot);
-
-  CHECK_FOR_EXCEPTION_AT_END();
-  return result;
-}
-
-JSValue* Interpreter::cti_op_get_by_id_chain_fail(CTI_ARGS) {
   CTI_STACK_HACK();
 
   JSValue* baseValue = ARG_src1;

@@ -45,27 +45,64 @@ class StructureChain;
 // main opcode stream.
 struct PolymorphicAccessStructureList {
   struct PolymorphicStubInfo {
-    Structure* base;
-    Structure* proto;
-    int cachedOffset;
+    unsigned cachedOffset : 31;
+    unsigned isChain : 1;
     void* stubRoutine;
+    Structure* base;
+    union {
+      Structure* proto;
+      StructureChain* chain;
+    } u;
 
-    void set(Structure* _base,
-             Structure* _proto,
-             int _cachedOffset,
-             void* _stubRoutine) {
-      base = _base;
-      proto = _proto;
+    void set(int _cachedOffset, void* _stubRoutine, Structure* _base) {
       cachedOffset = _cachedOffset;
       stubRoutine = _stubRoutine;
+      base = _base;
+      u.proto = 0;
+      isChain = false;
+    }
+
+    void set(int _cachedOffset,
+             void* _stubRoutine,
+             Structure* _base,
+             Structure* _proto) {
+      cachedOffset = _cachedOffset;
+      stubRoutine = _stubRoutine;
+      base = _base;
+      u.proto = _proto;
+      isChain = false;
+    }
+
+    void set(int _cachedOffset,
+             void* _stubRoutine,
+             Structure* _base,
+             StructureChain* _chain) {
+      cachedOffset = _cachedOffset;
+      stubRoutine = _stubRoutine;
+      base = _base;
+      u.chain = _chain;
+      isChain = true;
     }
   } list[POLYMORPHIC_LIST_CACHE_SIZE];
 
-  PolymorphicAccessStructureList(Structure* firstBase,
-                                 Structure* firstProto,
-                                 int cachedOffset,
-                                 void* stubRoutine) {
-    list[0].set(firstBase, firstProto, cachedOffset, stubRoutine);
+  PolymorphicAccessStructureList(int cachedOffset,
+                                 void* stubRoutine,
+                                 Structure* firstBase) {
+    list[0].set(cachedOffset, stubRoutine, firstBase);
+  }
+
+  PolymorphicAccessStructureList(int cachedOffset,
+                                 void* stubRoutine,
+                                 Structure* firstBase,
+                                 Structure* firstProto) {
+    list[0].set(cachedOffset, stubRoutine, firstBase, firstProto);
+  }
+
+  PolymorphicAccessStructureList(int cachedOffset,
+                                 void* stubRoutine,
+                                 Structure* firstBase,
+                                 StructureChain* firstChain) {
+    list[0].set(cachedOffset, stubRoutine, firstBase, firstChain);
   }
 
   void derefStructures(int count) {
@@ -75,8 +112,12 @@ struct PolymorphicAccessStructureList {
       ASSERT(info.base);
       info.base->deref();
 
-      if (info.proto)
-        info.proto->deref();
+      if (info.u.proto) {
+        if (info.isChain)
+          info.u.chain->deref();
+        else
+          info.u.proto->deref();
+      }
 
       if (info.stubRoutine)
         WTF::fastFreeExecutable(info.stubRoutine);
