@@ -29,17 +29,18 @@ class Document;
 class String;
 
 enum WMLVariableEscapingMode {
-  WMLVariableEscaping_None = 0,
-  WMLVariableEscaping_Escape = 1,
-  WMLVariableEscaping_Unescape = 2
+  WMLVariableEscapingNone = 0,
+  WMLVariableEscapingEscape,
+  WMLVariableEscapingUnescape
 };
 
-bool isValidVariableName(const String& name, bool isReference);
+bool isValidVariableName(const String&, bool isReference);
+bool containsVariableReference(const String&);
 
 String substituteVariableReferences(
     const String& variableReference,
     Document*,
-    WMLVariableEscapingMode mode = WMLVariableEscaping_None);
+    WMLVariableEscapingMode mode = WMLVariableEscapingNone);
 }
 
 #endif
