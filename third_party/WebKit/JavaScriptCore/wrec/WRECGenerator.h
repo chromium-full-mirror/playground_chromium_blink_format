@@ -65,7 +65,8 @@ class Generator {
   void generateSaveIndex();
   void generateIncrementIndex();
   void generateLoadCharacter(JmpSrcVector& failures);
-  void generateLoopIfNotEndOfInput(JmpDst);
+  void generateJumpIfEndOfInput(JmpSrcVector& failures);
+  void generateJumpIfNotEndOfInput(JmpDst);
   void generateReturnSuccess();
   void generateReturnFailure();
 
