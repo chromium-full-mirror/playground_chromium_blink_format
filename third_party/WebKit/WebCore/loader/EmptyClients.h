@@ -399,6 +399,7 @@ class EmptyEditorClient : public EditorClient {
   virtual bool shouldDeleteRange(Range*) { return false; }
   virtual bool shouldShowDeleteInterface(HTMLElement*) { return false; }
   virtual bool smartInsertDeleteEnabled() { return false; }
+  virtual bool isSelectTrailingWhitespaceEnabled() { return false; }
   virtual bool isContinuousSpellCheckingEnabled() { return false; }
   virtual void toggleContinuousSpellChecking() {}
   virtual bool isGrammarCheckingEnabled() { return false; }

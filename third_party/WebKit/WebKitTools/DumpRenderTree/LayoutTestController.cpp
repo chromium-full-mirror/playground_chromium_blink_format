@@ -934,6 +934,23 @@ static JSValueRef setSmartInsertDeleteEnabledCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setSelectTrailingWhitespaceEnabledCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setSelectTrailingWhitespaceEnabled(
+      JSValueToBoolean(context, arguments[0]));
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setStopProvisionalFrameLoadsCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -1191,6 +1208,9 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setPopupBlockingEnabled", setPopupBlockingEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setSmartInsertDeleteEnabled", setSmartInsertDeleteEnabledCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setSelectTrailingWhitespaceEnabled",
+       setSelectTrailingWhitespaceEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setStopProvisionalFrameLoads", setStopProvisionalFrameLoadsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

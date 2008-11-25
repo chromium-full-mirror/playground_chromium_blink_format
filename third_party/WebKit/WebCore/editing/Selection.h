@@ -81,6 +81,8 @@ class Selection {
 
   bool isBaseFirst() const { return m_baseIsFirst; }
 
+  void appendTrailingWhitespace();
+
   bool expandUsingGranularity(TextGranularity granularity);
   TextGranularity granularity() const { return m_granularity; }
 

@@ -211,6 +211,10 @@ bool Editor::canSmartCopyOrDelete() {
          m_frame->selectionGranularity() == WordGranularity;
 }
 
+bool Editor::isSelectTrailingWhitespaceEnabled() {
+  return client() && client()->isSelectTrailingWhitespaceEnabled();
+}
+
 bool Editor::deleteWithDirection(SelectionController::EDirection direction,
                                  TextGranularity granularity,
                                  bool killRing,

@@ -452,6 +452,9 @@ backforward list.
     usesDocumentViews:(BOOL)usesDocumentViews;
 - (BOOL)_usesDocumentViews;
 
+- (void)setSelectTrailingWhitespaceEnabled:(BOOL)flag;
+- (BOOL)isSelectTrailingWhitespaceEnabled;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)

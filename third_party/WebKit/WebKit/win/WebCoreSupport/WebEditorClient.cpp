@@ -300,6 +300,12 @@ bool WebEditorClient::smartInsertDeleteEnabled(void) {
   return !!enabled;
 }
 
+bool WebEditorClient::isSelectTrailingWhitespaceEnabled(void) {
+  BOOL enabled = FALSE;
+  m_webView->isSelectTrailingWhitespaceEnabled(&enabled);
+  return !!enabled;
+}
+
 bool WebEditorClient::shouldChangeSelectedRange(WebCore::Range*,
                                                 WebCore::Range*,
                                                 WebCore::EAffinity,

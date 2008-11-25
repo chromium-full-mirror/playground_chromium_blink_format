@@ -200,6 +200,9 @@ void EventHandler::selectClosestWordFromMouseEvent(
     if (newSelection.isRange()) {
       m_frame->setSelectionGranularity(WordGranularity);
       m_beganSelectingText = true;
+      if (result.event().clickCount() == 2 &&
+          m_frame->editor()->isSelectTrailingWhitespaceEnabled())
+        newSelection.appendTrailingWhitespace();
     }
 
     if (m_frame->shouldChangeSelection(newSelection))

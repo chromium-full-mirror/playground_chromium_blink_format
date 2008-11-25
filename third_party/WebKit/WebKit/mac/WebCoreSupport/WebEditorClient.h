@@ -48,6 +48,7 @@ class WebEditorClient : public WebCore::EditorClient {
   virtual int spellCheckerDocumentTag();
 
   virtual bool smartInsertDeleteEnabled();
+  virtual bool isSelectTrailingWhitespaceEnabled();
   virtual bool isEditable();
 
   virtual bool shouldDeleteRange(WebCore::Range*);
