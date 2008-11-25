@@ -61,8 +61,10 @@ class WMLPageState : public RefCounted<WMLPageState> {
   void setActiveCard(WMLCardElement* card) { m_activeCard = card; }
 
   // deck access control
-  void setDeckAccessDomain(const String& domain) { m_accessDomain = domain; }
-  void setDeckAccessPath(const String& path) { m_accessPath = path; }
+  void restrictDeckAccessToDomain(const String& domain) {
+    m_accessDomain = domain;
+  }
+  void restrictDeckAccessToPath(const String& path) { m_accessPath = path; }
   bool hasDeckAccess() const { return m_hasDeckAccess; }
 
   void setNeedCheckDeckAccess(bool);
