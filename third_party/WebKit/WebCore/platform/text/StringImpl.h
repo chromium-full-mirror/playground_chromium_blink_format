@@ -108,6 +108,14 @@ class StringImpl : public RefCounted<StringImpl> {
   // copy.
   PassRefPtr<StringImpl> copy();
 
+  // Makes a deep copy like copy() but only for a substring.
+  // (This ensures that you always get something suitable for a thread while
+  // subtring
+  // may not.  For example, in the empty string case, substring returns empty()
+  // which
+  // is not safe for another thread.)
+  PassRefPtr<StringImpl> substringCopy(unsigned pos, unsigned len = UINT_MAX);
+
   PassRefPtr<StringImpl> substring(unsigned pos, unsigned len = UINT_MAX);
 
   UChar operator[](unsigned i) {
