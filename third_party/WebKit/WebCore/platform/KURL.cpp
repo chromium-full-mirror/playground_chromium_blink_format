@@ -572,6 +572,12 @@ void KURL::init(const KURL& base,
   }
 }
 
+KURL KURL::copy() const {
+  KURL result = *this;
+  result.m_string = result.m_string.copy();
+  return result;
+}
+
 bool KURL::hasPath() const {
   return m_pathEnd != m_portEnd;
 }
