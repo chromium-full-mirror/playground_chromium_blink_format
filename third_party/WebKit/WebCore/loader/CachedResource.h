@@ -29,6 +29,7 @@
 #include "SharedBuffer.h"
 #include <wtf/HashCountedSet.h>
 #include <wtf/HashSet.h>
+#include <wtf/OwnPtr.h>
 #include <wtf/Vector.h>
 #include <time.h>
 
@@ -39,6 +40,7 @@ class CachedResourceClient;
 class CachedResourceHandleBase;
 class DocLoader;
 class Request;
+class PurgeableBuffer;
 
 // A resource that is held in the cache. Classes who want to use this object
 // should derive
@@ -143,7 +145,10 @@ class CachedResource {
 
   void setRequest(Request*);
 
-  SharedBuffer* data() const { return m_data.get(); }
+  SharedBuffer* data() const {
+    ASSERT(!m_purgeableData);
+    return m_data.get();
+  }
 
   void setResponse(const ResourceResponse&);
   const ResourceResponse& response() const { return m_response; }
@@ -196,10 +201,15 @@ class CachedResource {
     return m_resourceToRevalidate;
   }
 
+  bool isPurgeable() const;
+  bool wasPurged() const;
+
  protected:
   void setEncodedSize(unsigned);
   void setDecodedSize(unsigned);
   void didAccessDecodedData(double timeStamp);
+
+  bool makePurgeable(bool purgeable);
 
   HashCountedSet<CachedResourceClient*> m_clients;
 
@@ -209,6 +219,7 @@ class CachedResource {
 
   ResourceResponse m_response;
   RefPtr<SharedBuffer> m_data;
+  OwnPtr<PurgeableBuffer> m_purgeableData;
 
   Type m_type;
   Status m_status;

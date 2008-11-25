@@ -26,6 +26,8 @@
 #include "config.h"
 #include "SharedBuffer.h"
 
+#include "PurgeableBuffer.h"
+
 namespace WebCore {
 
 SharedBuffer::SharedBuffer() {}
@@ -38,15 +40,28 @@ SharedBuffer::SharedBuffer(const unsigned char* data, int size) {
   m_buffer.append(data, size);
 }
 
+SharedBuffer::~SharedBuffer() {}
+
 PassRefPtr<SharedBuffer> SharedBuffer::adoptVector(Vector<char>& vector) {
   RefPtr<SharedBuffer> buffer = create();
   buffer->m_buffer.swap(vector);
   return buffer.release();
 }
 
+PassRefPtr<SharedBuffer> SharedBuffer::adoptPurgeableBuffer(
+    PurgeableBuffer* purgeableBuffer) {
+  ASSERT(!purgeableBuffer->isPurgeable());
+  RefPtr<SharedBuffer> buffer = create();
+  buffer->m_purgeableBuffer.set(purgeableBuffer);
+  return buffer.release();
+}
+
 unsigned SharedBuffer::size() const {
   if (hasPlatformData())
     return platformDataSize();
+
+  if (m_purgeableBuffer)
+    return m_purgeableBuffer->size();
 
   return m_buffer.size();
 }
@@ -55,10 +70,15 @@ const char* SharedBuffer::data() const {
   if (hasPlatformData())
     return platformData();
 
+  if (m_purgeableBuffer)
+    return m_purgeableBuffer->data();
+
   return m_buffer.data();
 }
 
 void SharedBuffer::append(const char* data, int len) {
+  ASSERT(!m_purgeableBuffer);
+
   maybeTransferPlatformData();
 
   m_buffer.append(data, len);
@@ -68,10 +88,16 @@ void SharedBuffer::clear() {
   clearPlatformData();
 
   m_buffer.clear();
+  m_purgeableBuffer.clear();
 }
 
 PassRefPtr<SharedBuffer> SharedBuffer::copy() const {
   return SharedBuffer::create(data(), size());
+}
+
+PurgeableBuffer* SharedBuffer::releasePurgeableBuffer() {
+  ASSERT(hasOneRef());
+  return m_purgeableBuffer.release();
 }
 
 #if !PLATFORM(CF)

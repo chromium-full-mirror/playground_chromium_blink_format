@@ -47,6 +47,8 @@ class CachedCSSStyleSheet : public CachedResource {
 
   virtual void addClient(CachedResourceClient*);
 
+  virtual void allClientsRemoved();
+
   virtual void setEncoding(const String&);
   virtual String encoding() const;
   virtual void data(PassRefPtr<SharedBuffer> data, bool allDataReceived);

@@ -58,8 +58,7 @@ void CachedScript::addClient(CachedResourceClient* c) {
 }
 
 void CachedScript::allClientsRemoved() {
-  destroyDecodedData();
-  m_decodedDataDeletionTimer.stop();
+  m_decodedDataDeletionTimer.startOneShot(0);
 }
 
 void CachedScript::setEncoding(const String& chs) {
@@ -73,6 +72,8 @@ String CachedScript::encoding() const {
 }
 
 const String& CachedScript::script() {
+  ASSERT(!isPurgeable());
+
   if (!m_script && m_data) {
     m_script = m_encoding.decode(m_data->data(), encodedSize());
     setDecodedSize(m_script.length() * sizeof(UChar));
@@ -110,6 +111,8 @@ void CachedScript::error() {
 void CachedScript::destroyDecodedData() {
   m_script = String();
   setDecodedSize(0);
+  if (!hasClients())
+    makePurgeable(true);
 }
 
 void CachedScript::decodedDataDeletionTimerFired(Timer<CachedScript>*) {

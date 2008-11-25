@@ -54,6 +54,10 @@ void CachedCSSStyleSheet::addClient(CachedResourceClient* c) {
     c->setCSSStyleSheet(m_url, m_decoder->encoding().name(), this);
 }
 
+void CachedCSSStyleSheet::allClientsRemoved() {
+  makePurgeable(true);
+}
+
 void CachedCSSStyleSheet::setEncoding(const String& chs) {
   m_decoder->setEncoding(chs, TextResourceDecoder::EncodingFromHTTPHeader);
 }
@@ -63,6 +67,8 @@ String CachedCSSStyleSheet::encoding() const {
 }
 
 const String CachedCSSStyleSheet::sheetText(bool enforceMIMEType) const {
+  ASSERT(!isPurgeable());
+
   if (!m_data || m_data->isEmpty() || !canUseSheet(enforceMIMEType))
     return String();
 
