@@ -23,11 +23,11 @@
 #define WMLCardElement_h
 
 #if ENABLE(WML)
-#include "WMLElement.h"
+#include "WMLEventHandlingElement.h"
 
 namespace WebCore {
 
-class WMLCardElement : public WMLElement {
+class WMLCardElement : public WMLEventHandlingElement {
  public:
   WMLCardElement(const QualifiedName&, Document*);
   virtual ~WMLCardElement();
@@ -42,7 +42,8 @@ class WMLCardElement : public WMLElement {
                                                  const KURL& targetUrl);
 
  private:
-  void setVisibility(bool isVisible);
+  bool isVisible() const { return m_isVisible; }
+  void setVisible(bool isVisible) { m_isVisible = isVisible; }
 
   bool m_isVisible;
 };
