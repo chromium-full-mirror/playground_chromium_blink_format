@@ -55,7 +55,6 @@ class CompositeAnimation : public Noncopyable {
   bool isAnimating() const;
 
   void setWaitingForStyleAvailable(bool);
-  void resetTransitions(RenderObject*);
 
   void suspendAnimations();
   void resumeAnimations();

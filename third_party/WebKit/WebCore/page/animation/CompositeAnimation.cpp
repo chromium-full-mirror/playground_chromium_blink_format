@@ -58,9 +58,6 @@ class CompositeAnimationPrivate {
 
   const KeyframeAnimation* getAnimationForProperty(int property) const;
 
-  void resetTransitions(RenderObject*);
-  void resetAnimations(RenderObject*);
-
   void cleanupFinishedAnimations(RenderObject*);
 
   void setAnimationStartTime(double t);
@@ -104,6 +101,25 @@ class CompositeAnimationPrivate {
 };
 
 CompositeAnimationPrivate::~CompositeAnimationPrivate() {
+  // Clear the renderers from all running animations, in case we are in the
+  // middle of
+  // an animation callback (see https://bugs.webkit.org/show_bug.cgi?id=22052)
+  CSSPropertyTransitionsMap::const_iterator transitionsEnd =
+      m_transitions.end();
+  for (CSSPropertyTransitionsMap::const_iterator it = m_transitions.begin();
+       it != transitionsEnd; ++it) {
+    ImplicitAnimation* transition = it->second.get();
+    transition->clearRenderer();
+  }
+
+  AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
+  for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
+       it != animationsEnd; ++it) {
+    KeyframeAnimation* anim = it->second.get();
+    anim->clearRenderer();
+  }
+
+  // Toss the refs to all animations
   m_transitions.clear();
   m_keyframeAnimations.clear();
 }
@@ -366,14 +382,6 @@ const KeyframeAnimation* CompositeAnimationPrivate::getAnimationForProperty(
   return retval;
 }
 
-void CompositeAnimationPrivate::resetTransitions(RenderObject* renderer) {
-  m_transitions.clear();
-}
-
-void CompositeAnimationPrivate::resetAnimations(RenderObject*) {
-  m_keyframeAnimations.clear();
-}
-
 void CompositeAnimationPrivate::cleanupFinishedAnimations(
     RenderObject* renderer) {
   if (isSuspended())
@@ -622,10 +630,6 @@ bool CompositeAnimation::isAnimating() const {
 
 void CompositeAnimation::setWaitingForStyleAvailable(bool b) {
   m_data->setWaitingForStyleAvailable(b);
-}
-
-void CompositeAnimation::resetTransitions(RenderObject* renderer) {
-  m_data->resetTransitions(renderer);
 }
 
 void CompositeAnimation::suspendAnimations() {
