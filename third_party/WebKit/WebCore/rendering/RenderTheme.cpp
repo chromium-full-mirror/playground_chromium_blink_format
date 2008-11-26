@@ -217,10 +217,6 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
   }
 }
 
-#if !PLATFORM(QT)
-void RenderTheme::adjustDefaultStyleSheet(CSSStyleSheet*) {}
-#endif
-
 bool RenderTheme::paint(RenderObject* o,
                         const RenderObject::PaintInfo& paintInfo,
                         const IntRect& r) {

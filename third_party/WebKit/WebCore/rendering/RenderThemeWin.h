@@ -48,6 +48,9 @@ class RenderThemeWin : public RenderTheme {
   RenderThemeWin();
   ~RenderThemeWin();
 
+  virtual String extraDefaultStyleSheet();
+  virtual String extraQuirksStyleSheet();
+
   // A method asking if the theme's controls actually care about redrawing when
   // hovered.
   virtual bool supportsHover(const RenderStyle*) const;
