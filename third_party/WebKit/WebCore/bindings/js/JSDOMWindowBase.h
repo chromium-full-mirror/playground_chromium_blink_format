@@ -31,8 +31,8 @@
 namespace WebCore {
 
 class AtomicString;
+class DOMTimer;
 class DOMWindow;
-class DOMWindowTimer;
 class Event;
 class Frame;
 class JSDOMWindow;
@@ -86,7 +86,7 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
   void pauseTimeouts(OwnPtr<PausedTimeouts>&);
   void resumeTimeouts(OwnPtr<PausedTimeouts>&);
 
-  void timerFired(DOMWindowTimer*);
+  void timerFired(DOMTimer*);
 
   void clear();
 
@@ -128,7 +128,7 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
     JSC::JSValue** returnValueSlot;
     JSDOMWindowShell* shell;
 
-    typedef HashMap<int, DOMWindowTimer*> TimeoutsMap;
+    typedef HashMap<int, DOMTimer*> TimeoutsMap;
     TimeoutsMap timeouts;
   };
 
