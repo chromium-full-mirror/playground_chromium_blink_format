@@ -202,23 +202,35 @@ void CSSStyleSheet::styleSheetChanged() {
 
 void CSSStyleSheet::addSubresourceURLStrings(HashSet<String>& urls,
                                              const String& base) const {
-  RefPtr<CSSRuleList> ruleList = const_cast<CSSStyleSheet*>(this)->cssRules();
+  typedef HashMap<RefPtr<CSSStyleSheet>, KURL> CSSStyleSheetMap;
+  CSSStyleSheetMap styleSheetMap;
+  styleSheetMap.add(const_cast<CSSStyleSheet*>(this), KURL(base));
 
-  // Add the URLs for each child import rule, and recurse for the stylesheet
-  // belonging to each of those rules.
-  for (unsigned i = 0; i < ruleList->length(); ++i) {
-    CSSRule* rule = ruleList->item(i);
-    if (rule->type() != CSSRule::IMPORT_RULE)
-      continue;
+  while (styleSheetMap.size() > 0) {
+    CSSStyleSheetMap::iterator it = styleSheetMap.begin();
+    RefPtr<CSSStyleSheet> styleSheet = it->first;
+    const KURL baseURL = it->second;
+    styleSheetMap.remove(it);
 
-    CSSImportRule* importRule = static_cast<CSSImportRule*>(rule);
-    CSSStyleSheet* ruleSheet = importRule->styleSheet();
-    if (!ruleSheet)
-      continue;
+    RefPtr<CSSRuleList> ruleList = styleSheet->cssRules();
 
-    KURL fullURL(KURL(base), importRule->href());
-    urls.add(fullURL.string());
-    ruleSheet->addSubresourceURLStrings(urls, fullURL.string());
+    // Add the URLs for each child import rule to styleSheetMap for processing
+    for (unsigned i = 0; i < ruleList->length(); ++i) {
+      CSSRule* rule = ruleList->item(i);
+      if (rule->type() != CSSRule::IMPORT_RULE)
+        continue;
+
+      CSSImportRule* importRule = static_cast<CSSImportRule*>(rule);
+      RefPtr<CSSStyleSheet> ruleSheet = importRule->styleSheet();
+      if (!ruleSheet)
+        continue;
+
+      const KURL fullURL(baseURL, importRule->href());
+      if (!urls.contains(fullURL.string())) {
+        urls.add(fullURL.string());
+        styleSheetMap.add(ruleSheet, fullURL);
+      }
+    }
   }
 }
 }
