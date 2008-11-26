@@ -148,7 +148,8 @@ void DeleteButtonController::respondToChangedSelection(
 }
 
 void DeleteButtonController::createDeletionUI() {
-  RefPtr<HTMLDivElement> container = new HTMLDivElement(m_target->document());
+  RefPtr<HTMLDivElement> container =
+      new HTMLDivElement(divTag, m_target->document());
   container->setId(containerElementIdentifier);
 
   CSSMutableStyleDeclaration* style = container->getInlineStyleDecl();
@@ -156,7 +157,8 @@ void DeleteButtonController::createDeletionUI() {
   style->setProperty(CSSPropertyWebkitUserSelect, CSSValueNone);
   style->setProperty(CSSPropertyWebkitUserModify, CSSValueNone);
 
-  RefPtr<HTMLDivElement> outline = new HTMLDivElement(m_target->document());
+  RefPtr<HTMLDivElement> outline =
+      new HTMLDivElement(divTag, m_target->document());
   outline->setId(outlineElementIdentifier);
 
   const int borderWidth = 4;

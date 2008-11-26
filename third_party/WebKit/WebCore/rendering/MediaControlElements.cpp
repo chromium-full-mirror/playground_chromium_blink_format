@@ -53,7 +53,7 @@ static const float cSeekTime = 0.2f;
 MediaControlShadowRootElement::MediaControlShadowRootElement(
     Document* doc,
     HTMLMediaElement* mediaElement)
-    : HTMLDivElement(doc), m_mediaElement(mediaElement) {
+    : HTMLDivElement(divTag, doc), m_mediaElement(mediaElement) {
   RefPtr<RenderStyle> rootStyle = RenderStyle::create();
   rootStyle->inheritFrom(mediaElement->renderer()->style());
   rootStyle->setDisplay(BLOCK);
@@ -75,7 +75,7 @@ MediaControlInputElement::MediaControlInputElement(
     RenderStyle::PseudoId pseudo,
     const String& type,
     HTMLMediaElement* mediaElement)
-    : HTMLInputElement(doc), m_mediaElement(mediaElement) {
+    : HTMLInputElement(inputTag, doc), m_mediaElement(mediaElement) {
   setInputType(type);
   RenderStyle* style = m_mediaElement->renderer()->getCachedPseudoStyle(pseudo);
   RenderObject* renderer =

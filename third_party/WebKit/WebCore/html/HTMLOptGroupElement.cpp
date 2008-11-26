@@ -37,8 +37,10 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLOptGroupElement::HTMLOptGroupElement(Document* doc, HTMLFormElement* f)
-    : HTMLFormControlElement(optgroupTag, doc, f), m_style(0) {}
+HTMLOptGroupElement::HTMLOptGroupElement(const QualifiedName& tagName,
+                                         Document* doc,
+                                         HTMLFormElement* f)
+    : HTMLFormControlElement(tagName, doc, f), m_style(0) {}
 
 bool HTMLOptGroupElement::isFocusable() const {
   return HTMLElement::isFocusable();

@@ -47,9 +47,10 @@ using namespace HTMLNames;
 static const int defaultRows = 2;
 static const int defaultCols = 20;
 
-HTMLTextAreaElement::HTMLTextAreaElement(Document* document,
+HTMLTextAreaElement::HTMLTextAreaElement(const QualifiedName& tagName,
+                                         Document* document,
                                          HTMLFormElement* form)
-    : HTMLFormControlElementWithState(textareaTag, document, form),
+    : HTMLFormControlElementWithState(tagName, document, form),
       m_rows(defaultRows),
       m_cols(defaultCols),
       m_wrap(SoftWrap),

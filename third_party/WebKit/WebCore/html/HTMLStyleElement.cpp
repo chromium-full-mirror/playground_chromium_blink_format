@@ -32,8 +32,8 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLStyleElement::HTMLStyleElement(Document* doc)
-    : HTMLElement(styleTag, doc), m_loading(false), m_createdByParser(false) {}
+HTMLStyleElement::HTMLStyleElement(const QualifiedName& tagName, Document* doc)
+    : HTMLElement(tagName, doc), m_loading(false), m_createdByParser(false) {}
 
 // other stuff...
 void HTMLStyleElement::parseMappedAttribute(MappedAttribute* attr) {

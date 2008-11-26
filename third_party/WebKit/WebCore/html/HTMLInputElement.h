@@ -54,10 +54,7 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
 
   enum AutoCompleteSetting { Uninitialized, On, Off };
 
-  HTMLInputElement(Document*, HTMLFormElement* = 0);
-  HTMLInputElement(const QualifiedName& tagName,
-                   Document*,
-                   HTMLFormElement* = 0);
+  HTMLInputElement(const QualifiedName&, Document*, HTMLFormElement* = 0);
   virtual ~HTMLInputElement();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }

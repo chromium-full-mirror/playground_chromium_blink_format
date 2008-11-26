@@ -35,8 +35,10 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLLegendElement::HTMLLegendElement(Document* doc, HTMLFormElement* f)
-    : HTMLFormControlElement(legendTag, doc, f) {}
+HTMLLegendElement::HTMLLegendElement(const QualifiedName& tagName,
+                                     Document* doc,
+                                     HTMLFormElement* f)
+    : HTMLFormControlElement(tagName, doc, f) {}
 
 HTMLLegendElement::~HTMLLegendElement() {}
 

@@ -308,6 +308,6 @@ String RenderFileUploadControl::fileTextValue() {
 HTMLFileUploadInnerButtonElement::HTMLFileUploadInnerButtonElement(
     Document* doc,
     Node* shadowParent)
-    : HTMLInputElement(doc), m_shadowParent(shadowParent) {}
+    : HTMLInputElement(inputTag, doc), m_shadowParent(shadowParent) {}
 
 }  // namespace WebCore
