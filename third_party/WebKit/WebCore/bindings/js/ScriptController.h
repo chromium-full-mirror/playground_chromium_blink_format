@@ -24,6 +24,7 @@
 #define ScriptController_h
 
 #include "JSDOMWindowShell.h"
+#include "ScriptInstance.h"
 #include <runtime/Protect.h>
 #include <wtf/RefPtr.h>
 
@@ -43,7 +44,6 @@ namespace JSC {
 class JSGlobalObject;
 
 namespace Bindings {
-class Instance;
 class RootObject;
 }
 }
@@ -117,7 +117,7 @@ class ScriptController {
   void clearScriptObjects();
   void cleanupScriptObjectsForPlugin(void*);
 
-  PassRefPtr<JSC::Bindings::Instance> createScriptInstanceForWidget(Widget*);
+  PassScriptInstance createScriptInstanceForWidget(Widget*);
   JSC::Bindings::RootObject* bindingRootObject();
 
   PassRefPtr<JSC::Bindings::RootObject> createRootObject(void* nativeHandle);
