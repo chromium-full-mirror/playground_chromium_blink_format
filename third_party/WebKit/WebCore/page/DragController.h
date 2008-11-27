@@ -135,6 +135,7 @@ class DragController {
                     Clipboard*,
                     Frame*,
                     bool forLink);
+  void cleanupAfterSystemDrag();
   Page* m_page;
   DragClient* m_client;
 

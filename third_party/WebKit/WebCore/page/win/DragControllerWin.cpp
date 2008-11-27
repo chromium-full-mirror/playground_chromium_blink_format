@@ -61,4 +61,6 @@ const IntSize& DragController::maxDragImageSize() {
 
   return maxDragImageSize;
 }
+
+void DragController::cleanupAfterSystemDrag() {}
 }
