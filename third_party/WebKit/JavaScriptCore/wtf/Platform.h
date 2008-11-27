@@ -428,7 +428,8 @@
 #endif
 
 #if !defined(ENABLE_PAN_SCROLLING) && (PLATFORM(WIN) || PLATFORM(CHROMIUM) || \
-                                       (PLATFORM(WX) && PLATFORM(WIN_OS)))
+                                       (PLATFORM(WX) && PLATFORM(WIN_OS)) ||  \
+                                       (PLATFORM(CAIRO) && PLATFORM(WIN_OS)))
 #define ENABLE_PAN_SCROLLING 1
 #endif
 
