@@ -67,7 +67,7 @@ class WMLPageState : public RefCounted<WMLPageState> {
   void restrictDeckAccessToPath(const String& path) { m_accessPath = path; }
   bool hasDeckAccess() const { return m_hasDeckAccess; }
 
-  void setNeedCheckDeckAccess(bool);
+  bool setNeedCheckDeckAccess(bool);
   bool isDeckAccessible();
 
  private:

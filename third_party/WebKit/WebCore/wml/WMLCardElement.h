@@ -32,6 +32,7 @@ class WMLCardElement : public WMLEventHandlingElement {
   WMLCardElement(const QualifiedName&, Document*);
   virtual ~WMLCardElement();
 
+  virtual void insertedIntoDocument();
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
   // Switch active card in document to the one specified in the URL reference

@@ -28,16 +28,14 @@ namespace WebCore {
 
 WMLIntrinsicEventHandler::WMLIntrinsicEventHandler() {}
 
-void WMLIntrinsicEventHandler::registerIntrinsicEvent(
+bool WMLIntrinsicEventHandler::registerIntrinsicEvent(
     WMLIntrinsicEventType type,
     PassRefPtr<WMLIntrinsicEvent> event) {
-  if (m_events.contains(type)) {
-    // FIXME: error reporting
-    // WMLHelper::tokenizer()->reportError(ConflictingEventBindingError);
-    return;
-  }
+  if (m_events.contains(type))
+    return false;
 
   m_events.set(type, event);
+  return true;
 }
 
 void WMLIntrinsicEventHandler::triggerIntrinsicEvent(
