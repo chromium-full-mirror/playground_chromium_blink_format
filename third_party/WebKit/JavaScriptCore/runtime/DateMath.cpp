@@ -718,6 +718,17 @@ static int findMonth(const char* monthStr) {
   return -1;
 }
 
+static bool parseLong(const char* string,
+                      char** stopPosition,
+                      int base,
+                      long* result) {
+  *result = strtol(string, stopPosition, base);
+  // Avoid the use of errno as it is not available on Windows CE
+  if (string == *stopPosition || *result == LONG_MIN || *result == LONG_MAX)
+    return false;
+  return true;
+}
+
 double parseDate(const UString& date) {
   // This parses a date in the form:
   //     Tuesday, 09-Nov-99 23:12:40 GMT
@@ -763,9 +774,8 @@ double parseDate(const UString& date) {
 
   // ' 09-Nov-99 23:12:40 GMT'
   char* newPosStr;
-  errno = 0;
-  long day = strtol(dateString, &newPosStr, 10);
-  if (errno)
+  long day;
+  if (!parseLong(dateString, &newPosStr, 10, &day))
     return NaN;
   dateString = newPosStr;
 
@@ -784,22 +794,20 @@ double parseDate(const UString& date) {
     if (!*++dateString)
       return NaN;
     year = day;
-    month = strtol(dateString, &newPosStr, 10) - 1;
-    if (errno)
+    if (!parseLong(dateString, &newPosStr, 10, &month))
       return NaN;
+    month -= 1;
     dateString = newPosStr;
     if (*dateString++ != '/' || !*dateString)
       return NaN;
-    day = strtol(dateString, &newPosStr, 10);
-    if (errno)
+    if (!parseLong(dateString, &newPosStr, 10, &day))
       return NaN;
     dateString = newPosStr;
   } else if (*dateString == '/' && month == -1) {
     dateString++;
     // This looks like a MM/DD/YYYY date, not an RFC date.
     month = day - 1;  // 0-based
-    day = strtol(dateString, &newPosStr, 10);
-    if (errno)
+    if (!parseLong(dateString, &newPosStr, 10, &day))
       return NaN;
     if (day < 1 || day > 31)
       return NaN;
@@ -842,8 +850,7 @@ double parseDate(const UString& date) {
 
   // '99 23:12:40 GMT'
   if (year <= 0 && *dateString) {
-    year = strtol(dateString, &newPosStr, 10);
-    if (errno)
+    if (!parseLong(dateString, &newPosStr, 10, &year))
       return NaN;
   }
 
@@ -866,7 +873,7 @@ double parseDate(const UString& date) {
       skipSpacesAndComments(dateString);
     }
 
-    hour = strtol(dateString, &newPosStr, 10);
+    parseLong(dateString, &newPosStr, 10, &hour);
     // Do not check for errno here since we want to continue
     // even if errno was set becasue we are still looking
     // for the timezone!
@@ -885,8 +892,7 @@ double parseDate(const UString& date) {
       if (*dateString++ != ':')
         return NaN;
 
-      minute = strtol(dateString, &newPosStr, 10);
-      if (errno)
+      if (!parseLong(dateString, &newPosStr, 10, &minute))
         return NaN;
       dateString = newPosStr;
 
@@ -901,8 +907,7 @@ double parseDate(const UString& date) {
       if (*dateString == ':') {
         dateString++;
 
-        second = strtol(dateString, &newPosStr, 10);
-        if (errno)
+        if (!parseLong(dateString, &newPosStr, 10, &second))
           return NaN;
         dateString = newPosStr;
 
@@ -943,8 +948,8 @@ double parseDate(const UString& date) {
     }
 
     if (*dateString == '+' || *dateString == '-') {
-      long o = strtol(dateString, &newPosStr, 10);
-      if (errno)
+      long o;
+      if (!parseLong(dateString, &newPosStr, 10, &o))
         return NaN;
       dateString = newPosStr;
 
@@ -956,8 +961,8 @@ double parseDate(const UString& date) {
       if (*dateString != ':') {
         offset = ((o / 100) * 60 + (o % 100)) * sgn;
       } else {  // GMT+05:00
-        long o2 = strtol(dateString, &newPosStr, 10);
-        if (errno)
+        long o2;
+        if (!parseLong(dateString, &newPosStr, 10, &o2))
           return NaN;
         dateString = newPosStr;
         offset = (o * 60 + o2) * sgn;
@@ -979,8 +984,7 @@ double parseDate(const UString& date) {
   skipSpacesAndComments(dateString);
 
   if (*dateString && year == -1) {
-    year = strtol(dateString, &newPosStr, 10);
-    if (errno)
+    if (!parseLong(dateString, &newPosStr, 10, &year))
       return NaN;
     dateString = newPosStr;
   }
