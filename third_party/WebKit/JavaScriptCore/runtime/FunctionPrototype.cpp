@@ -98,8 +98,8 @@ JSValue* functionProtoFuncToString(ExecState* exec,
   if (thisValue->isObject(&JSFunction::info)) {
     JSFunction* function = asFunction(thisValue);
     return jsString(exec, "function " + function->name(&exec->globalData()) +
-                              "(" + function->m_body->paramString() + ") " +
-                              function->m_body->toSourceString());
+                              "(" + function->body()->paramString() + ") " +
+                              function->body()->toSourceString());
   }
 
   if (thisValue->isObject(&InternalFunction::info)) {

@@ -42,8 +42,9 @@ class JSFunction : public InternalFunction {
   friend class Interpreter;
 
   typedef InternalFunction Base;
-  JSFunction(PassRefPtr<JSC::Structure> st)
-      : InternalFunction(st), m_scopeChain(NoScopeChain()) {}
+
+  JSFunction(PassRefPtr<Structure> structure)
+      : InternalFunction(structure), m_scopeChain(NoScopeChain()) {}
 
  public:
   JSFunction(ExecState*, const Identifier&, FunctionBodyNode*, ScopeChainNode*);
@@ -62,12 +63,11 @@ class JSFunction : public InternalFunction {
   void setScope(const ScopeChain& scopeChain) { m_scopeChain = scopeChain; }
   ScopeChain& scope() { return m_scopeChain; }
 
+  FunctionBodyNode* body() const { return m_body.get(); }
+
   virtual void mark();
 
   static const ClassInfo info;
-
-  // FIXME: This should be private
-  RefPtr<FunctionBodyNode> m_body;
 
   static PassRefPtr<Structure> createStructure(JSValue* prototype) {
     return Structure::create(prototype,
@@ -90,6 +90,7 @@ class JSFunction : public InternalFunction {
                                const Identifier&,
                                const PropertySlot&);
 
+  RefPtr<FunctionBodyNode> m_body;
   ScopeChain m_scopeChain;
 };
 

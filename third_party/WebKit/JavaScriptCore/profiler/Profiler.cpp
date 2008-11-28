@@ -174,8 +174,8 @@ CallIdentifier createCallIdentifierFromFunctionImp(JSGlobalData* globalData,
                                                    JSFunction* function) {
   const UString& name = function->name(globalData);
   return CallIdentifier(name.isEmpty() ? AnonymousFunction : name,
-                        function->m_body->sourceURL(),
-                        function->m_body->lineNo());
+                        function->body()->sourceURL(),
+                        function->body()->lineNo());
 }
 
 }  // namespace JSC

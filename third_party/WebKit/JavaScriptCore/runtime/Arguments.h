@@ -119,7 +119,7 @@ ALWAYS_INLINE void Arguments::getArgumentsData(CallFrame* callFrame,
                                                int& argc) {
   function = callFrame->callee();
 
-  CodeBlock* codeBlock = &function->m_body->generatedBytecode();
+  CodeBlock* codeBlock = &function->body()->generatedBytecode();
   int numParameters = codeBlock->numParameters;
   argc = callFrame->argumentCount();
 
@@ -144,7 +144,7 @@ inline Arguments::Arguments(CallFrame* callFrame)
   int numArguments;
   getArgumentsData(callFrame, callee, firstParameterIndex, argv, numArguments);
 
-  d->numParameters = callee->m_body->parameterCount();
+  d->numParameters = callee->body()->parameterCount();
   d->firstParameterIndex = firstParameterIndex;
   d->numArguments = numArguments;
 
@@ -175,7 +175,7 @@ inline Arguments::Arguments(CallFrame* callFrame)
 inline Arguments::Arguments(CallFrame* callFrame, NoParametersType)
     : JSObject(callFrame->lexicalGlobalObject()->argumentsStructure()),
       d(new ArgumentsData) {
-  ASSERT(!callFrame->callee()->m_body->parameterCount());
+  ASSERT(!callFrame->callee()->body()->parameterCount());
 
   unsigned numArguments = callFrame->argumentCount() - 1;
 
