@@ -573,11 +573,11 @@ void JavaScriptDebugServer::recompileAllJSFunctions(
   for (size_t i = 0; i < size; ++i) {
     JSFunction* function = functions[i];
 
-    FunctionBodyNode* oldBody = function->m_body.get();
+    FunctionBodyNode* oldBody = function->body();
     pair<FunctionBodyMap::iterator, bool> result =
         functionBodies.add(oldBody, 0);
     if (!result.second) {
-      function->m_body = result.first->second;
+      function->setBody(result.first->second.get());
       continue;
     }
 
@@ -592,7 +592,7 @@ void JavaScriptDebugServer::recompileAllJSFunctions(
                            oldBody->parameterCount());
 
     result.first->second = newBody;
-    function->m_body = newBody.release();
+    function->setBody(newBody.release());
 
     if (hasListeners()) {
       SourceProvider* provider = sourceCode.provider();
