@@ -25,6 +25,7 @@
 #include "WMLDocument.h"
 
 #include "Page.h"
+#include "Tokenizer.h"
 #include "WMLCardElement.h"
 #include "WMLErrorHandling.h"
 #include "WMLPageState.h"
@@ -53,6 +54,15 @@ void WMLDocument::finishedParsing() {
     return;
   }
 
+  Tokenizer* tokenizer = this->tokenizer();
+  if (tokenizer && !tokenizer->wellFormed()) {
+    Document::finishedParsing();
+    return;
+  }
+
+  // Remember that we'e successfully entered the deck
+  wmlPageState->setNeedCheckDeckAccess(false);
+
   // FIXME: Notify the existance of templates to all cards of the current deck
   // WMLTemplateElement::registerTemplatesInDocument(document()));
 
@@ -66,9 +76,10 @@ void WMLDocument::finishedParsing() {
   }
 
   // FIXME: shadow the deck-level do if needed
-  // FIXME: handle the intrinsic event
 
-  wmlPageState->setNeedCheckDeckAccess(false);
+  // Handle card-level intrinsic event
+  card->handleIntrinsicEventIfNeeded();
+
   Document::finishedParsing();
 }
 
