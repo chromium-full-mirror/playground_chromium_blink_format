@@ -103,12 +103,15 @@ class MacroAssembler {
     int32_t offset;
   };
 
+  class Jump;
+
   // Label:
   //
   // A Label records a point in the generated instruction stream, typically such
   // that
   // it may be used as a destination for a jump.
   class Label {
+    friend class Jump;
     friend class MacroAssembler;
 
    public:
