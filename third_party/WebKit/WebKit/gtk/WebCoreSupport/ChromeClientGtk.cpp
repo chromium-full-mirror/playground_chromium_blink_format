@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Holger Hans Peter Freyther
+ * Copyright (C) 2007, 2008 Holger Hans Peter Freyther
  * Copyright (C) 2007, 2008 Christian Dywan <christian@imendio.com>
  * Copyright (C) 2008 Nuanti Ltd.
  * Copyright (C) 2008 Alp Toker <alp@atoker.com>
@@ -50,15 +50,15 @@ using namespace WebCore;
 
 namespace WebKit {
 
-ChromeClient::ChromeClient(WebKitWebView* webView) : m_webView(webView) {}
+ChromeClient::ChromeClient(WebKitWebView* webView) : m_webView(webView) {
+  ASSERT(m_webView);
+}
 
 void ChromeClient::chromeDestroyed() {
   delete this;
 }
 
 FloatRect ChromeClient::windowRect() {
-  if (!m_webView)
-    return FloatRect();
   GtkWidget* window = gtk_widget_get_toplevel(GTK_WIDGET(m_webView));
   if (GTK_WIDGET_TOPLEVEL(window)) {
     gint left, top, width, height;
@@ -70,9 +70,6 @@ FloatRect ChromeClient::windowRect() {
 }
 
 void ChromeClient::setWindowRect(const FloatRect& rect) {
-  if (!m_webView)
-    return;
-
   IntRect intrect = IntRect(rect);
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
@@ -82,8 +79,6 @@ void ChromeClient::setWindowRect(const FloatRect& rect) {
 }
 
 FloatRect ChromeClient::pageRect() {
-  if (!m_webView)
-    return FloatRect();
   GtkAllocation allocation = GTK_WIDGET(m_webView)->allocation;
   return IntRect(allocation.x, allocation.y, allocation.width,
                  allocation.height);
@@ -95,14 +90,10 @@ float ChromeClient::scaleFactor() {
 }
 
 void ChromeClient::focus() {
-  if (!m_webView)
-    return;
   gtk_widget_grab_focus(GTK_WIDGET(m_webView));
 }
 
 void ChromeClient::unfocus() {
-  if (!m_webView)
-    return;
   GtkWidget* window = gtk_widget_get_toplevel(GTK_WIDGET(m_webView));
   if (GTK_WIDGET_TOPLEVEL(window))
     gtk_window_set_focus(GTK_WINDOW(window), NULL);
@@ -132,9 +123,6 @@ Page* ChromeClient::createWindow(Frame* frame,
 }
 
 void ChromeClient::show() {
-  if (!m_webView)
-    return;
-
   webkit_web_view_notify_ready(m_webView);
 }
 
@@ -148,9 +136,6 @@ void ChromeClient::runModal() {
 }
 
 void ChromeClient::setToolbarsVisible(bool visible) {
-  if (!m_webView)
-    return;
-
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
 
@@ -158,9 +143,6 @@ void ChromeClient::setToolbarsVisible(bool visible) {
 }
 
 bool ChromeClient::toolbarsVisible() {
-  if (!m_webView)
-    return false;
-
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
   gboolean visible;
@@ -170,9 +152,6 @@ bool ChromeClient::toolbarsVisible() {
 }
 
 void ChromeClient::setStatusbarVisible(bool visible) {
-  if (!m_webView)
-    return;
-
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
 
@@ -180,9 +159,6 @@ void ChromeClient::setStatusbarVisible(bool visible) {
 }
 
 bool ChromeClient::statusbarVisible() {
-  if (!m_webView)
-    return false;
-
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
   gboolean visible;
@@ -193,9 +169,6 @@ bool ChromeClient::statusbarVisible() {
 }
 
 void ChromeClient::setScrollbarsVisible(bool visible) {
-  if (!m_webView)
-    return;
-
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
 
@@ -203,9 +176,6 @@ void ChromeClient::setScrollbarsVisible(bool visible) {
 }
 
 bool ChromeClient::scrollbarsVisible() {
-  if (!m_webView)
-    return false;
-
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
   gboolean visible;
@@ -216,9 +186,6 @@ bool ChromeClient::scrollbarsVisible() {
 }
 
 void ChromeClient::setMenubarVisible(bool visible) {
-  if (!m_webView)
-    return;
-
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
 
@@ -226,9 +193,6 @@ void ChromeClient::setMenubarVisible(bool visible) {
 }
 
 bool ChromeClient::menubarVisible() {
-  if (!m_webView)
-    return false;
-
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
   gboolean visible;
@@ -246,8 +210,6 @@ void ChromeClient::closeWindowSoon() {
 }
 
 bool ChromeClient::canTakeFocus(FocusDirection) {
-  if (!m_webView)
-    return false;
   return GTK_WIDGET_CAN_FOCUS(m_webView);
 }
 
@@ -327,9 +289,6 @@ void ChromeClient::repaint(const IntRect& windowRect,
                            bool contentChanged,
                            bool immediate,
                            bool repaintContentOnly) {
-  if (!m_webView)
-    return;
-
   GdkRectangle rect = windowRect;
   GdkWindow* window = GTK_WIDGET(m_webView)->window;
 
@@ -346,9 +305,6 @@ void ChromeClient::repaint(const IntRect& windowRect,
 void ChromeClient::scroll(const IntSize& delta,
                           const IntRect& rectToScroll,
                           const IntRect& clipRect) {
-  if (!m_webView)
-    return;
-
   GdkWindow* window = GTK_WIDGET(m_webView)->window;
   if (!window)
     return;
@@ -385,7 +341,7 @@ IntPoint ChromeClient::screenToWindow(const IntPoint& point) const {
 }
 
 PlatformWidget ChromeClient::platformWindow() const {
-  return m_webView ? GTK_WIDGET(m_webView) : 0;
+  return GTK_WIDGET(m_webView);
 }
 
 void ChromeClient::mouseDidMoveOverElement(const HitTestResult& hit,
