@@ -30,6 +30,7 @@
 #include <webkit/webkitwebview.h>
 #include <webkit/webkitwebframe.h>
 #include <webkit/webkitwebsettings.h>
+#include <webkit/webkitwebwindowfeatures.h>
 #include <webkit/webkitwebbackforwardlist.h>
 
 #include "BackForwardList.h"
@@ -39,6 +40,7 @@
 #include "Frame.h"
 #include "InspectorClientGtk.h"
 #include "FrameLoaderClient.h"
+#include "WindowFeatures.h"
 
 #include <glib.h>
 
@@ -75,6 +77,7 @@ struct _WebKitWebViewPrivate {
   WebCore::Page* corePage;
   WebKitWebSettings* webSettings;
   WebKitWebInspector* webInspector;
+  WebKitWebWindowFeatures* webWindowFeatures;
 
   WebKitWebFrame* mainFrame;
   WebCore::String applicationNameForUserAgent;
@@ -129,6 +132,11 @@ void webkit_web_inspector_set_web_view(WebKitWebInspector* web_inspector,
 
 void webkit_web_inspector_set_inspected_uri(WebKitWebInspector* web_inspector,
                                             const gchar* inspected_uri);
+
+WebKitWebWindowFeatures* webkit_web_window_features_new_from_core_features(
+    const WebCore::WindowFeatures& features);
+
+void webkit_web_view_notify_ready(WebKitWebView* web_view);
 
 // FIXME: Move these to webkitwebframe.h once their API has been discussed.
 
