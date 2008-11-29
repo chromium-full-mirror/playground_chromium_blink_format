@@ -318,7 +318,7 @@ void MessagePort::removeEventListener(const AtomicString& eventType,
 }
 
 bool MessagePort::dispatchEvent(PassRefPtr<Event> event, ExceptionCode& ec) {
-  if (event->type().isEmpty()) {
+  if (!event || event->type().isEmpty()) {
     ec = EventException::UNSPECIFIED_EVENT_TYPE_ERR;
     return true;
   }

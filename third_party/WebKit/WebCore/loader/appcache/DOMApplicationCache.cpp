@@ -208,7 +208,7 @@ void DOMApplicationCache::removeEventListener(const AtomicString& eventType,
 
 bool DOMApplicationCache::dispatchEvent(PassRefPtr<Event> event,
                                         ExceptionCode& ec) {
-  if (event->type().isEmpty()) {
+  if (!event || event->type().isEmpty()) {
     ec = EventException::UNSPECIFIED_EVENT_TYPE_ERR;
     return true;
   }

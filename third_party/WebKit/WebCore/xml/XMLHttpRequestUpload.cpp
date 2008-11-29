@@ -89,7 +89,7 @@ void XMLHttpRequestUpload::removeEventListener(const AtomicString& eventType,
 bool XMLHttpRequestUpload::dispatchEvent(PassRefPtr<Event> evt,
                                          ExceptionCode& ec) {
   // FIXME: check for other error conditions enumerated in the spec.
-  if (evt->type().isEmpty()) {
+  if (!evt || evt->type().isEmpty()) {
     ec = EventException::UNSPECIFIED_EVENT_TYPE_ERR;
     return true;
   }
