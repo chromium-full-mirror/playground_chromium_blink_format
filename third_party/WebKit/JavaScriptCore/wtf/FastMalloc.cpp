@@ -1001,7 +1001,6 @@ static ALWAYS_INLINE bool DLL_IsEmpty(const Span* list) {
   return list->next == list;
 }
 
-#ifndef WTF_CHANGES
 static int DLL_Length(const Span* list) {
   int result = 0;
   for (Span* s = list->next; s != list; s = s->next) {
@@ -1009,7 +1008,6 @@ static int DLL_Length(const Span* list) {
   }
   return result;
 }
-#endif
 
 #if 0 /* Not needed at the moment -- causes compiler warnings if not used */
 static void DLL_Print(const char* label, const Span* list) {
@@ -1116,6 +1114,8 @@ class TCMalloc_PageHeap {
     pagemap_.Ensure(p, 1);
     return GetDescriptor(p);
   }
+
+  size_t ReturnedBytes() const;
 #endif
 
 // Dump state to stderr
@@ -1502,6 +1502,21 @@ void TCMalloc_PageHeap::RegisterSizeClass(Span* span, size_t sc) {
     pagemap_.set(span->start + i, span);
   }
 }
+
+#ifdef WTF_CHANGES
+size_t TCMalloc_PageHeap::ReturnedBytes() const {
+  size_t result = 0;
+  for (unsigned s = 0; s < kMaxPages; s++) {
+    const int r_length = DLL_Length(&free_[s].returned);
+    unsigned r_pages = s * r_length;
+    result += r_pages << kPageShift;
+  }
+
+  for (Span* s = large_.returned.next; s != &large_.returned; s = s->next)
+    result += s->length << kPageShift;
+  return result;
+}
+#endif
 
 #ifndef WTF_CHANGES
 static double PagesToMB(uint64_t pages) {
@@ -3915,12 +3930,22 @@ void FastMallocZone::init() {
 
 #endif
 
+#if WTF_CHANGES
 void releaseFastMallocFreeMemory() {
   SpinLockHolder h(&pageheap_lock);
   pageheap->ReleaseFreePages();
 }
 
-#if WTF_CHANGES
+FastMallocStatistics fastMallocStatistics() {
+  SpinLockHolder h(&pageheap_lock);
+
+  FastMallocStatistics statistics;
+  statistics.heapSize = static_cast<size_t>(pageheap->SystemBytes());
+  statistics.freeSize = static_cast<size_t>(pageheap->FreeBytes());
+  statistics.returnedSize = pageheap->ReturnedBytes();
+  return statistics;
+}
+
 }  // namespace WTF
 #endif
 

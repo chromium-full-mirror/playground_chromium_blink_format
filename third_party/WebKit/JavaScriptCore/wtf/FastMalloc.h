@@ -51,6 +51,13 @@ void fastMallocAllow();
 
 void releaseFastMallocFreeMemory();
 
+struct FastMallocStatistics {
+  size_t heapSize;
+  size_t freeSize;
+  size_t returnedSize;
+};
+FastMallocStatistics fastMallocStatistics();
+
 }  // namespace WTF
 
 using WTF::fastMalloc;
