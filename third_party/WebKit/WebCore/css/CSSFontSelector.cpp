@@ -380,7 +380,7 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
   }
 }
 
-void CSSFontSelector::fontLoaded(CSSSegmentedFontFace*) {
+void CSSFontSelector::fontLoaded() {
   if (!m_document || m_document->inPageCache() || !m_document->renderer())
     return;
   m_document->recalcStyle(Document::Force);
