@@ -61,6 +61,10 @@
 #include "JIT.h"
 #endif
 
+#if ENABLE(ASSEMBLER)
+#include "AssemblerBuffer.h"
+#endif
+
 #if PLATFORM(DARWIN)
 #include <mach/mach.h>
 #endif
@@ -649,7 +653,10 @@ Interpreter::Interpreter()
       m_ctiStringLengthTrampoline(0),
       m_ctiVirtualCallPreLink(0),
       m_ctiVirtualCallLink(0),
-      m_ctiVirtualCall(0),
+      m_ctiVirtualCall(0)
+#endif
+#if ENABLE(ASSEMBLER)
+      ,
       m_assemblerBuffer(new AssemblerBuffer(1024 * 1024))
 #endif
       ,
