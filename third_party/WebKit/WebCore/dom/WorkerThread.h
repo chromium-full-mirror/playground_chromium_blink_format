@@ -67,7 +67,7 @@ class WorkerThread : public RefCounted<WorkerThread> {
   WorkerMessagingProxy* m_messagingProxy;
 
   RefPtr<WorkerContext> m_workerContext;
-  Mutex m_workerContextMutex;
+  Mutex m_threadCreationMutex;
 
   MessageQueue<RefPtr<WorkerTask>> m_messageQueue;
 };

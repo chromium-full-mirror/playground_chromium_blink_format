@@ -34,6 +34,7 @@
 #include <wtf/MessageQueue.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
+#include <wtf/Threading.h>
 
 namespace WebCore {
 
@@ -70,6 +71,7 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
   static void* databaseThreadStart(void*);
   void* databaseThread();
 
+  Mutex m_threadCreationMutex;
   ThreadIdentifier m_threadID;
   RefPtr<DatabaseThread> m_selfRef;
 

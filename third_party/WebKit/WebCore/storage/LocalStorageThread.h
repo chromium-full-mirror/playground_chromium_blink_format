@@ -59,6 +59,7 @@ class LocalStorageThread : public ThreadSafeShared<LocalStorageThread> {
   static void* localStorageThreadStart(void*);
   void* localStorageThread();
 
+  Mutex m_threadCreationMutex;
   ThreadIdentifier m_threadID;
   RefPtr<LocalStorageThread> m_selfRef;
 

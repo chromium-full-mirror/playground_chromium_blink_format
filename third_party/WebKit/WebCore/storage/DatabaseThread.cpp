@@ -45,6 +45,8 @@ DatabaseThread::~DatabaseThread() {
 }
 
 bool DatabaseThread::start() {
+  MutexLocker lock(m_threadCreationMutex);
+
   if (m_threadID)
     return true;
 
@@ -69,7 +71,11 @@ void* DatabaseThread::databaseThreadStart(void* vDatabaseThread) {
 }
 
 void* DatabaseThread::databaseThread() {
-  LOG(StorageAPI, "Starting DatabaseThread %p", this);
+  {
+    // Wait for DatabaseThread::start() to complete.
+    MutexLocker lock(m_threadCreationMutex);
+    LOG(StorageAPI, "Started DatabaseThread %p", this);
+  }
 
   AutodrainedPool pool;
   while (true) {
