@@ -92,7 +92,12 @@ class Heap : Noncopyable {
 
   void reportExtraMemoryCost(size_t cost);
 
-  size_t size();
+  size_t objectCount();
+  struct Statistics {
+    size_t size;
+    size_t free;
+  };
+  Statistics statistics() const;
 
   void setGCProtectNeedsLocking();
   void protect(JSValue*);
