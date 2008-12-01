@@ -1948,6 +1948,9 @@ AccessibilityObject* AccessibilityRenderObject::activeDescendant() const {
 
   Element* target =
       renderer()->document()->getElementById(activeDescendantAttrStr);
+  if (!target)
+    return 0;
+
   AccessibilityObject* obj =
       renderer()->document()->axObjectCache()->get(target->renderer());
   if (obj->isAccessibilityRenderObject())
