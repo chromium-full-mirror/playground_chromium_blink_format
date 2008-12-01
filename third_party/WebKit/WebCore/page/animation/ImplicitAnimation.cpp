@@ -114,10 +114,6 @@ bool ImplicitAnimation::sendTransitionEvent(const AtomicString& eventType,
       if (!element)
         return false;
 
-      // Keep a reference to this ImplicitAnimation so it doesn't go away in the
-      // handler
-      RefPtr<ImplicitAnimation> retainer(this);
-
       // Call the event handler
       element->dispatchWebKitTransitionEvent(eventType, propertyName,
                                              elapsedTime);

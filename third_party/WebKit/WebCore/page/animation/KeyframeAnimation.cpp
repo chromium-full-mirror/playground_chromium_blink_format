@@ -220,10 +220,6 @@ bool KeyframeAnimation::sendAnimationEvent(const AtomicString& eventType,
     if (!element)
       return false;
 
-    // Keep a reference to this ImplicitAnimation so it doesn't go away in the
-    // handler
-    RefPtr<KeyframeAnimation> retainer(this);
-
     // Call the event handler
     element->dispatchWebKitAnimationEvent(
         eventType, m_keyframes.animationName(), elapsedTime);
