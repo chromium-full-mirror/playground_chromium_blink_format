@@ -332,6 +332,8 @@ class VectorBuffer<T, 0> : private VectorBufferBase<T> {
     std::swap(m_capacity, other.m_capacity);
   }
 
+  void restoreInlineBufferIfNeeded() {}
+
   using Base::allocateBuffer;
   using Base::deallocateBuffer;
 
@@ -369,6 +371,13 @@ class VectorBuffer : private VectorBufferBase<T> {
     if (bufferToDeallocate == inlineBuffer())
       return;
     Base::deallocateBuffer(bufferToDeallocate);
+  }
+
+  void restoreInlineBufferIfNeeded() {
+    if (m_buffer)
+      return;
+    m_buffer = inlineBuffer();
+    m_capacity = inlineCapacity;
   }
 
   using Base::buffer;
@@ -703,6 +712,7 @@ void Vector<T, inlineCapacity>::shrinkCapacity(size_t newCapacity) {
   }
 
   m_buffer.deallocateBuffer(oldBuffer);
+  m_buffer.restoreInlineBufferIfNeeded();
 }
 
 // Templatizing these is better than just letting the conversion happen
