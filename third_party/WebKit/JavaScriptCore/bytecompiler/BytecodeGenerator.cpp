@@ -255,7 +255,7 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
                              m_codeBlock->numParameters - registerFile->size();
 
   // Add previously defined symbols to bookkeeping.
-  m_globals.resize(symbolTable->size());
+  m_globals.reserveCapacity(symbolTable->size());
   SymbolTable::iterator end = symbolTable->end();
   for (SymbolTable::iterator it = symbolTable->begin(); it != end; ++it)
     registerFor(it->second.getIndex())
@@ -371,7 +371,7 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
   size_t parameterCount = functionBody->parameterCount();
   m_nextParameterIndex =
       -RegisterFile::CallFrameHeaderSize - parameterCount - 1;
-  m_parameters.resize(1 + parameterCount);  // reserve space for "this"
+  m_parameters.reserveCapacity(1 + parameterCount);  // reserve space for "this"
 
   // Add "this" as a parameter
   m_thisRegister.setIndex(m_nextParameterIndex);
