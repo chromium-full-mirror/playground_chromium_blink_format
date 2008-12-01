@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008 David Levin <levin@chromium.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -24,6 +25,7 @@
 #include "FastMalloc.h"
 #include "HashTraits.h"
 #include <wtf/Assertions.h>
+#include <wtf/Threading.h>
 
 namespace WTF {
 
@@ -42,13 +44,21 @@ namespace WTF {
 
 struct HashTableStats {
   ~HashTableStats();
+  // All of the variables are accessed in ~HashTableStats when the static struct
+  // is destroyed.
+
+  // The following variables are all atomically incremented when modified.
   static int numAccesses;
-  static int numCollisions;
-  static int collisionGraph[4096];
-  static int maxCollisions;
   static int numRehashes;
   static int numRemoves;
   static int numReinserts;
+
+  // The following variables are only modified in the recordCollisionAtCount
+  // method within a mutex.
+  static int maxCollisions;
+  static int numCollisions;
+  static int collisionGraph[4096];
+
   static void recordCollisionAtCount(int count);
 };
 
@@ -275,6 +285,9 @@ class HashTableConstIterator {
 
 #if CHECK_HASHTABLE_ITERATORS
  public:
+  // Any modifications of the m_next or m_previous of an iterator that is in a
+  // linked list of a HashTable::m_iterator,
+  // should be guarded with m_table->m_mutex.
   mutable const HashTableType* m_table;
   mutable const_iterator* m_next;
   mutable const_iterator* m_previous;
@@ -588,7 +601,9 @@ class HashTable {
 
 #if CHECK_HASHTABLE_ITERATORS
  public:
+  // All access to m_iterators should be guarded with m_mutex.
   mutable const_iterator* m_iterators;
+  mutable Mutex m_mutex;
 #endif
 };
 
@@ -679,7 +694,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::lookup(
     return 0;
 
 #if DUMP_HASHTABLE_STATS
-  ++HashTableStats::numAccesses;
+  atomicIncrement(&HashTableStats::numAccesses);
   int probeCount = 0;
 #endif
 
@@ -736,7 +751,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
   int i = h & sizeMask;
 
 #if DUMP_HASHTABLE_STATS
-  ++HashTableStats::numAccesses;
+  atomicIncrement(&HashTableStats::numAccesses);
   int probeCount = 0;
 #endif
 
@@ -799,7 +814,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
   int i = h & sizeMask;
 
 #if DUMP_HASHTABLE_STATS
-  ++HashTableStats::numAccesses;
+  atomicIncrement(&HashTableStats::numAccesses);
   int probeCount = 0;
 #endif
 
@@ -872,7 +887,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::add(
   int i = h & sizeMask;
 
 #if DUMP_HASHTABLE_STATS
-  ++HashTableStats::numAccesses;
+  atomicIncrement(&HashTableStats::numAccesses);
   int probeCount = 0;
 #endif
 
@@ -1006,7 +1021,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::reinsert(
   ASSERT(
       !isDeletedBucket(*(lookupForWriting(Extractor::extract(entry)).first)));
 #if DUMP_HASHTABLE_STATS
-  ++HashTableStats::numReinserts;
+  atomicIncrement(&HashTableStats::numReinserts);
 #endif
 
   Mover<ValueType, Traits::needsDestruction>::move(
@@ -1105,7 +1120,7 @@ template <typename Key,
 void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
     ValueType* pos) {
 #if DUMP_HASHTABLE_STATS
-  ++HashTableStats::numRemoves;
+  atomicIncrement(&HashTableStats::numRemoves);
 #endif
 
   deleteBucket(*pos);
@@ -1231,7 +1246,7 @@ void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::rehash(
 
 #if DUMP_HASHTABLE_STATS
   if (oldTableSize != 0)
-    ++HashTableStats::numRehashes;
+    atomicIncrement(&HashTableStats::numRehashes);
 #endif
 
   m_tableSize = newTableSize;
@@ -1399,6 +1414,7 @@ template <typename Key,
           typename KeyTraits>
 void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     invalidateIterators() {
+  MutexLocker lock(m_mutex);
   const_iterator* next;
   for (const_iterator* p = m_iterators; p; p = next) {
     next = p->m_next;
@@ -1431,6 +1447,7 @@ void addIterator(
   if (!table) {
     it->m_next = 0;
   } else {
+    MutexLocker lock(table->m_mutex);
     ASSERT(table->m_iterators != it);
     it->m_next = table->m_iterators;
     table->m_iterators = it;
@@ -1464,6 +1481,7 @@ void removeIterator(HashTableConstIterator<Key,
     ASSERT(!it->m_next);
     ASSERT(!it->m_previous);
   } else {
+    MutexLocker lock(it->m_table->m_mutex);
     if (it->m_next) {
       ASSERT(it->m_next->m_previous == it);
       it->m_next->m_previous = it->m_previous;
