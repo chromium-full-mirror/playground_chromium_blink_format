@@ -74,8 +74,8 @@ void ChromeClient::setWindowRect(const FloatRect& rect) {
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
 
-  g_object_set(G_OBJECT(webWindowFeatures), "x", intrect.x(), "y", intrect.y(),
-               "width", intrect.width(), "height", intrect.height(), NULL);
+  g_object_set(webWindowFeatures, "x", intrect.x(), "y", intrect.y(), "width",
+               intrect.width(), "height", intrect.height(), NULL);
 }
 
 FloatRect ChromeClient::pageRect() {
@@ -112,7 +112,7 @@ Page* ChromeClient::createWindow(Frame* frame,
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_window_features_new_from_core_features(coreFeatures);
   webkit_web_view_set_window_features(webView, webWindowFeatures);
-  g_object_unref(G_OBJECT(webWindowFeatures));
+  g_object_unref(webWindowFeatures);
 
   if (!frameLoadRequest.isEmpty())
     webkit_web_view_open(
@@ -139,7 +139,7 @@ void ChromeClient::setToolbarsVisible(bool visible) {
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
 
-  g_object_set(G_OBJECT(webWindowFeatures), "toolbar-visible", visible, NULL);
+  g_object_set(webWindowFeatures, "toolbar-visible", visible, NULL);
 }
 
 bool ChromeClient::toolbarsVisible() {
@@ -147,7 +147,7 @@ bool ChromeClient::toolbarsVisible() {
       webkit_web_view_get_window_features(m_webView);
   gboolean visible;
 
-  g_object_get(G_OBJECT(webWindowFeatures), "toolbar-visible", &visible, NULL);
+  g_object_get(webWindowFeatures, "toolbar-visible", &visible, NULL);
   return visible;
 }
 
@@ -155,7 +155,7 @@ void ChromeClient::setStatusbarVisible(bool visible) {
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
 
-  g_object_set(G_OBJECT(webWindowFeatures), "statusbar-visible", visible, NULL);
+  g_object_set(webWindowFeatures, "statusbar-visible", visible, NULL);
 }
 
 bool ChromeClient::statusbarVisible() {
@@ -163,8 +163,7 @@ bool ChromeClient::statusbarVisible() {
       webkit_web_view_get_window_features(m_webView);
   gboolean visible;
 
-  g_object_get(G_OBJECT(webWindowFeatures), "statusbar-visible", &visible,
-               NULL);
+  g_object_get(webWindowFeatures, "statusbar-visible", &visible, NULL);
   return visible;
 }
 
@@ -172,7 +171,7 @@ void ChromeClient::setScrollbarsVisible(bool visible) {
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
 
-  g_object_set(G_OBJECT(webWindowFeatures), "scrollbar-visible", visible, NULL);
+  g_object_set(webWindowFeatures, "scrollbar-visible", visible, NULL);
 }
 
 bool ChromeClient::scrollbarsVisible() {
@@ -180,8 +179,7 @@ bool ChromeClient::scrollbarsVisible() {
       webkit_web_view_get_window_features(m_webView);
   gboolean visible;
 
-  g_object_get(G_OBJECT(webWindowFeatures), "scrollbar-visible", &visible,
-               NULL);
+  g_object_get(webWindowFeatures, "scrollbar-visible", &visible, NULL);
   return visible;
 }
 
@@ -189,7 +187,7 @@ void ChromeClient::setMenubarVisible(bool visible) {
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_view_get_window_features(m_webView);
 
-  g_object_set(G_OBJECT(webWindowFeatures), "menubar-visible", visible, NULL);
+  g_object_set(webWindowFeatures, "menubar-visible", visible, NULL);
 }
 
 bool ChromeClient::menubarVisible() {
@@ -197,7 +195,7 @@ bool ChromeClient::menubarVisible() {
       webkit_web_view_get_window_features(m_webView);
   gboolean visible;
 
-  g_object_get(G_OBJECT(webWindowFeatures), "menubar-visible", &visible, NULL);
+  g_object_get(webWindowFeatures, "menubar-visible", &visible, NULL);
   return visible;
 }
 
@@ -366,7 +364,7 @@ void ChromeClient::mouseDidMoveOverElement(const HitTestResult& hit,
 void ChromeClient::setToolTip(const String& toolTip) {
 #if GTK_CHECK_VERSION(2, 12, 0)
   if (toolTip.isEmpty())
-    g_object_set(G_OBJECT(m_webView), "has-tooltip", FALSE, NULL);
+    g_object_set(m_webView, "has-tooltip", FALSE, NULL);
   else
     gtk_widget_set_tooltip_text(GTK_WIDGET(m_webView), toolTip.utf8().data());
 #else

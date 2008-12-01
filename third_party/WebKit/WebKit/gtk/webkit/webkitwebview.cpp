@@ -1451,7 +1451,7 @@ static void webkit_web_view_screen_changed(WebKitWebView* webView,
   guint defaultFontSize, defaultMonospaceFontSize, minimumFontSize,
       minimumLogicalFontSize;
 
-  g_object_get(G_OBJECT(webSettings), "default-font-size", &defaultFontSize,
+  g_object_get(webSettings, "default-font-size", &defaultFontSize,
                "default-monospace-font-size", &defaultMonospaceFontSize,
                "minimum-font-size", &minimumFontSize,
                "minimum-logical-font-size", &minimumLogicalFontSize, NULL);
@@ -1473,18 +1473,17 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   gboolean autoLoadImages, autoShrinkImages, printBackgrounds, enableScripts,
       enablePlugins, enableDeveloperExtras, resizableTextAreas;
 
-  g_object_get(G_OBJECT(webSettings), "default-encoding", &defaultEncoding,
-               "cursive-font-family", &cursiveFontFamily, "default-font-family",
-               &defaultFontFamily, "fantasy-font-family", &fantasyFontFamily,
-               "monospace-font-family", &monospaceFontFamily,
-               "sans-serif-font-family", &sansSerifFontFamily,
-               "serif-font-family", &serifFontFamily, "auto-load-images",
-               &autoLoadImages, "auto-shrink-images", &autoShrinkImages,
-               "print-backgrounds", &printBackgrounds, "enable-scripts",
-               &enableScripts, "enable-plugins", &enablePlugins,
-               "resizable-text-areas", &resizableTextAreas,
-               "user-stylesheet-uri", &userStylesheetUri,
-               "enable-developer-extras", &enableDeveloperExtras, NULL);
+  g_object_get(
+      webSettings, "default-encoding", &defaultEncoding, "cursive-font-family",
+      &cursiveFontFamily, "default-font-family", &defaultFontFamily,
+      "fantasy-font-family", &fantasyFontFamily, "monospace-font-family",
+      &monospaceFontFamily, "sans-serif-font-family", &sansSerifFontFamily,
+      "serif-font-family", &serifFontFamily, "auto-load-images",
+      &autoLoadImages, "auto-shrink-images", &autoShrinkImages,
+      "print-backgrounds", &printBackgrounds, "enable-scripts", &enableScripts,
+      "enable-plugins", &enablePlugins, "resizable-text-areas",
+      &resizableTextAreas, "user-stylesheet-uri", &userStylesheetUri,
+      "enable-developer-extras", &enableDeveloperExtras, NULL);
 
   settings->setDefaultTextEncodingName(defaultEncoding);
   settings->setCursiveFontFamily(cursiveFontFamily);
