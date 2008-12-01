@@ -96,7 +96,7 @@ ULONG STDMETHODCALLTYPE AccessibleBase::Release(void) {
 HRESULT STDMETHODCALLTYPE AccessibleBase::get_accParent(IDispatch** parent) {
   *parent = 0;
 
-  if (!m_object)
+  if (!m_object || !m_object->topDocumentFrameView())
     return E_FAIL;
 
   return WebView::AccessibleObjectFromWindow(
@@ -388,6 +388,9 @@ HRESULT STDMETHODCALLTYPE AccessibleBase::accLocation(long* left,
   if (FAILED(hr))
     return hr;
 
+  if (!childObj->documentFrameView())
+    return E_FAIL;
+
   IntRect screenRect(childObj->documentFrameView()->contentsToScreen(
       childObj->boundingBoxRect()));
   *left = screenRect.x();
@@ -464,7 +467,7 @@ HRESULT STDMETHODCALLTYPE AccessibleBase::accHitTest(long x,
 
   ::VariantInit(pvChildAtPoint);
 
-  if (!m_object)
+  if (!m_object || !m_object->documentFrameView())
     return E_FAIL;
 
   IntPoint point =
