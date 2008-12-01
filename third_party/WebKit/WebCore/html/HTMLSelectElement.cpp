@@ -76,7 +76,9 @@ HTMLSelectElement::HTMLSelectElement(const QualifiedName& tagName,
       m_activeSelectionEndIndex(-1),
       m_activeSelectionState(false),
       m_repeatingChar(0),
-      m_lastCharTime(0) {}
+      m_lastCharTime(0) {
+  ASSERT(hasTagName(selectTag) || hasTagName(keygenTag));
+}
 
 bool HTMLSelectElement::checkDTD(const Node* newChild) {
   // Make sure to keep <optgroup> in sync with this.

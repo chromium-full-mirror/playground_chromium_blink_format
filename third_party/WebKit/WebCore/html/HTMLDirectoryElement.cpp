@@ -29,7 +29,9 @@ using namespace HTMLNames;
 
 HTMLDirectoryElement::HTMLDirectoryElement(const QualifiedName& tagName,
                                            Document* doc)
-    : HTMLElement(tagName, doc) {}
+    : HTMLElement(tagName, doc) {
+  ASSERT(hasTagName(dirTag));
+}
 
 bool HTMLDirectoryElement::compact() const {
   return !getAttribute(compactAttr).isNull();

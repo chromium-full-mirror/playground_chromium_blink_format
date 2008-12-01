@@ -33,7 +33,9 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLLIElement::HTMLLIElement(const QualifiedName& tagName, Document* doc)
-    : HTMLElement(tagName, doc), m_requestedValue(0) {}
+    : HTMLElement(tagName, doc), m_requestedValue(0) {
+  ASSERT(hasTagName(liTag));
+}
 
 bool HTMLLIElement::mapToEntry(const QualifiedName& attrName,
                                MappedAttributeEntry& result) const {

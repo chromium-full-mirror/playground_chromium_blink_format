@@ -31,7 +31,9 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLOListElement::HTMLOListElement(const QualifiedName& tagName, Document* doc)
-    : HTMLElement(tagName, doc), m_start(1) {}
+    : HTMLElement(tagName, doc), m_start(1) {
+  ASSERT(hasTagName(olTag));
+}
 
 bool HTMLOListElement::mapToEntry(const QualifiedName& attrName,
                                   MappedAttributeEntry& result) const {

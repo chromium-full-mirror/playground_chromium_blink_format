@@ -1,6 +1,4 @@
 /**
- * This file is part of the DOM implementation for KDE.
- *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Simon Hausmann (hausmann@kde.org)
@@ -38,7 +36,9 @@ using namespace HTMLNames;
 HTMLFrameElement::HTMLFrameElement(const QualifiedName& tagName, Document* doc)
     : HTMLFrameElementBase(tagName, doc),
       m_frameBorder(true),
-      m_frameBorderSet(false) {}
+      m_frameBorderSet(false) {
+  ASSERT(hasTagName(frameTag));
+}
 
 bool HTMLFrameElement::rendererIsNeeded(RenderStyle* style) {
   // For compatibility, frames render even when display: none is set.

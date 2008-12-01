@@ -75,7 +75,9 @@ HTMLFormElement::HTMLFormElement(const QualifiedName& tagName, Document* doc)
       m_insubmit(false),
       m_doingsubmit(false),
       m_inreset(false),
-      m_malformed(false) {}
+      m_malformed(false) {
+  ASSERT(hasTagName(formTag));
+}
 
 HTMLFormElement::~HTMLFormElement() {
   if (!m_autocomplete)

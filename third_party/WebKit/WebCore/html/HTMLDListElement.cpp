@@ -28,7 +28,9 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLDListElement::HTMLDListElement(const QualifiedName& tagName, Document* doc)
-    : HTMLElement(tagName, doc) {}
+    : HTMLElement(tagName, doc) {
+  ASSERT(hasTagName(dlTag));
+}
 
 bool HTMLDListElement::compact() const {
   return !getAttribute(compactAttr).isNull();

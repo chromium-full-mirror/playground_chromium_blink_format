@@ -40,7 +40,9 @@ using namespace HTMLNames;
 HTMLOptGroupElement::HTMLOptGroupElement(const QualifiedName& tagName,
                                          Document* doc,
                                          HTMLFormElement* f)
-    : HTMLFormControlElement(tagName, doc, f), m_style(0) {}
+    : HTMLFormControlElement(tagName, doc, f), m_style(0) {
+  ASSERT(hasTagName(optgroupTag));
+}
 
 bool HTMLOptGroupElement::isFocusable() const {
   return HTMLElement::isFocusable();

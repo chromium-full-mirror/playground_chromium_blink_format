@@ -43,7 +43,9 @@ using namespace HTMLNames;
 HTMLOptionElement::HTMLOptionElement(const QualifiedName& tagName,
                                      Document* doc,
                                      HTMLFormElement* f)
-    : HTMLFormControlElement(tagName, doc, f), m_selected(false), m_style(0) {}
+    : HTMLFormControlElement(tagName, doc, f), m_selected(false), m_style(0) {
+  ASSERT(hasTagName(optionTag));
+}
 
 bool HTMLOptionElement::checkDTD(const Node* newChild) {
   return newChild->isTextNode() || newChild->hasTagName(scriptTag);

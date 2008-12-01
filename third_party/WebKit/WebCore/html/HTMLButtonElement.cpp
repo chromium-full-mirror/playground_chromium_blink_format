@@ -43,7 +43,9 @@ HTMLButtonElement::HTMLButtonElement(const QualifiedName& tagName,
                                      HTMLFormElement* form)
     : HTMLFormControlElement(tagName, doc, form),
       m_type(SUBMIT),
-      m_activeSubmit(false) {}
+      m_activeSubmit(false) {
+  ASSERT(hasTagName(buttonTag));
+}
 
 HTMLButtonElement::~HTMLButtonElement() {}
 

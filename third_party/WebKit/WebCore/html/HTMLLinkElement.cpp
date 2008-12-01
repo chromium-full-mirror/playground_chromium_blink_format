@@ -51,7 +51,9 @@ HTMLLinkElement::HTMLLinkElement(const QualifiedName& qName, Document* doc)
       m_isStyleSheet(false),
       m_isIcon(false),
       m_isDNSPrefetch(false),
-      m_createdByParser(false) {}
+      m_createdByParser(false) {
+  ASSERT(hasTagName(linkTag));
+}
 
 HTMLLinkElement::~HTMLLinkElement() {
   if (m_cachedSheet) {

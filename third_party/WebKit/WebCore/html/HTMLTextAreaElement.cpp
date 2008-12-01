@@ -56,6 +56,7 @@ HTMLTextAreaElement::HTMLTextAreaElement(const QualifiedName& tagName,
       m_wrap(SoftWrap),
       m_cachedSelectionStart(-1),
       m_cachedSelectionEnd(-1) {
+  ASSERT(hasTagName(textareaTag));
   setValueMatchesRenderer();
 }
 

@@ -43,6 +43,7 @@ HTMLKeygenElement::HTMLKeygenElement(const QualifiedName& tagName,
                                      Document* doc,
                                      HTMLFormElement* f)
     : HTMLSelectElement(tagName, doc, f) {
+  ASSERT(hasTagName(keygenTag));
   Vector<String> keys;
   getSupportedKeySizes(keys);
 

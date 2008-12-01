@@ -28,7 +28,9 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLMenuElement::HTMLMenuElement(const QualifiedName& tagName, Document* doc)
-    : HTMLElement(tagName, doc) {}
+    : HTMLElement(tagName, doc) {
+  ASSERT(hasTagName(menuTag));
+}
 
 bool HTMLMenuElement::compact() const {
   return !getAttribute(compactAttr).isNull();
