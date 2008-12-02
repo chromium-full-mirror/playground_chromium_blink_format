@@ -160,7 +160,7 @@ class StringImpl : public RefCounted<StringImpl> {
   int reverseFind(StringImpl*, int index, bool caseSensitive = true);
 
   bool startsWith(StringImpl* m_data, bool caseSensitive = true) {
-    return find(m_data, 0, caseSensitive) == 0;
+    return reverseFind(m_data, 0, caseSensitive) == 0;
   }
   bool endsWith(StringImpl*, bool caseSensitive = true);
 
