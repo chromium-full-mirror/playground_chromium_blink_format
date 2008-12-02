@@ -296,6 +296,13 @@ void Generator::generateGreedyQuantifier(JumpList& failures,
   newFailures.linkTo(backtrack);
 }
 
+void Generator::generatePatternCharacterSequence(JumpList& failures,
+                                                 int* sequence,
+                                                 size_t count) {
+  for (size_t i = 0; i < count; ++i)
+    generatePatternCharacter(failures, sequence[i]);
+}
+
 void Generator::generatePatternCharacter(JumpList& failures, int ch) {
   generateLoadCharacter(failures);
 

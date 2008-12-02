@@ -30,6 +30,7 @@
 
 #if ENABLE(WREC)
 
+#include "Escapes.h"
 #include "Quantifier.h"
 #include "UString.h"
 #include "WRECGenerator.h"
@@ -94,17 +95,14 @@ class Parser {
 
   void parseDisjunction(JumpList& failures);
   bool parseTerm(JumpList& failures);
-  bool parseEscape(JumpList& failures);
-  bool parseOctalEscape(JumpList& failures);
+  bool parseEscape(JumpList& failures, const Escape&);
   bool parseParentheses(JumpList& failures);
   bool parseCharacterClass(JumpList& failures);
   bool parseCharacterClassQuantifier(JumpList& failures,
                                      const CharacterClass& charClass,
                                      bool invert);
-  bool parsePatternCharacterQualifier(JumpList& failures, int ch);
+  bool parsePatternCharacterSequence(JumpList& failures, int ch);
   bool parseBackreferenceQuantifier(JumpList& failures, unsigned subpatternId);
-  ALWAYS_INLINE Quantifier parseGreedyQuantifier();
-  Quantifier parseQuantifier();
 
  private:
   void reset() {
@@ -159,9 +157,13 @@ class Parser {
   unsigned consumeOctal() {
     unsigned n = 0;
     while (n < 32 && WTF::isASCIIOctalDigit(peek()))
-      n = n * 8 + (consume() - '0');
+      n = n * 8 + consumeDigit();
     return n;
   }
+
+  ALWAYS_INLINE Quantifier consumeGreedyQuantifier();
+  Quantifier consumeQuantifier();
+  Escape consumeEscape(bool inCharacterClass);
 
   static const int EndOfPattern = -1;
 

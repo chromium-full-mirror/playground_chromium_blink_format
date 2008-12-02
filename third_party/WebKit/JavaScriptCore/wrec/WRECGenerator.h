@@ -101,6 +101,9 @@ class Generator : private MacroAssembler {
                                            const UChar* matches,
                                            unsigned matchCount);
   void generatePatternCharacter(JumpList& failures, int ch);
+  void generatePatternCharacterSequence(JumpList& failures,
+                                        int* sequence,
+                                        size_t count);
   void generateAssertionWordBoundary(JumpList& failures, bool invert);
   void generateAssertionBOL(JumpList& failures);
   void generateAssertionEOL(JumpList& failures);

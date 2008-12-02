@@ -43,9 +43,7 @@ struct Quantifier {
     Error,
   };
 
-  Quantifier() : type(None) {}
-
-  Quantifier(Type type, unsigned min = 0, unsigned max = noMaxSpecified)
+  Quantifier(Type type = None, unsigned min = 0, unsigned max = noMaxSpecified)
       : type(type), min(min), max(max) {}
 
   Type type;
