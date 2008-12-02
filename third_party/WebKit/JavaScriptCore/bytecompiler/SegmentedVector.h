@@ -36,7 +36,9 @@ namespace JSC {
 template <typename T, size_t SegmentSize>
 class SegmentedVector {
  public:
-  SegmentedVector() : m_size(0) { m_segments.append(&m_inlineSegment); }
+  SegmentedVector() : m_size(0), m_currentSegmentIndex(0) {
+    m_segments.append(&m_inlineSegment);
+  }
 
   ~SegmentedVector() {
     for (size_t i = 1; i < m_segments.size(); i++)
@@ -45,25 +47,26 @@ class SegmentedVector {
 
   T& last() {
     ASSERT(m_size);
-    return m_segments.last()->last();
+    return m_segments[m_currentSegmentIndex]->last();
   }
 
   template <typename U>
   void append(const U& value) {
-    if (!(m_size % SegmentSize) && m_size)
-      m_segments.append(new Segment);
-    m_segments.last()->uncheckedAppend(value);
+    if (!(m_size % SegmentSize) && m_size) {
+      if (m_currentSegmentIndex == m_segments.size() - 1)
+        m_segments.append(new Segment);
+      m_currentSegmentIndex++;
+    }
+    m_segments[m_currentSegmentIndex]->uncheckedAppend(value);
     m_size++;
   }
 
   void removeLast() {
     ASSERT(m_size);
     m_size--;
-    m_segments.last()->removeLast();
-    if (!(m_size % SegmentSize) && m_size >= SegmentSize) {
-      delete m_segments.last();
-      m_segments.removeLast();
-    }
+    m_segments[m_currentSegmentIndex]->removeLast();
+    if (!(m_size % SegmentSize) && m_size >= SegmentSize)
+      m_currentSegmentIndex--;
   }
 
   size_t size() const { return m_size; }
@@ -75,34 +78,34 @@ class SegmentedVector {
     return m_segments[index / SegmentSize]->at(index % SegmentSize);
   }
 
-  void reserveCapacity(size_t newCapacity) {
-    if (newCapacity <= m_size)
+  void grow(size_t newSize) {
+    if (newSize <= m_size)
       return;
 
-    if (newCapacity <= SegmentSize) {
-      m_inlineSegment.resize(newCapacity);
-      m_size = newCapacity;
+    if (newSize <= SegmentSize) {
+      m_inlineSegment.resize(newSize);
+      m_size = newSize;
       return;
     }
 
-    size_t numSegments = newCapacity / SegmentSize;
-    size_t extra = newCapacity % SegmentSize;
+    size_t newNumSegments = newSize / SegmentSize;
+    size_t extra = newSize % SegmentSize;
     if (extra)
-      numSegments++;
-    size_t oldSize = m_segments.size();
+      newNumSegments++;
+    size_t oldNumSegments = m_segments.size();
 
-    if (numSegments == oldSize) {
+    if (newNumSegments == oldNumSegments) {
       m_segments.last()->resize(extra);
-      m_size = newCapacity;
+      m_size = newSize;
       return;
     }
 
     m_segments.last()->resize(SegmentSize);
 
-    m_segments.resize(numSegments);
+    m_segments.resize(newNumSegments);
 
-    ASSERT(oldSize < m_segments.size());
-    for (size_t i = oldSize; i < (numSegments - 1); i++) {
+    ASSERT(oldNumSegments < m_segments.size());
+    for (size_t i = oldNumSegments; i < (newNumSegments - 1); i++) {
       Segment* segment = new Segment;
       segment->resize(SegmentSize);
       m_segments[i] = segment;
@@ -110,8 +113,9 @@ class SegmentedVector {
 
     Segment* segment = new Segment;
     segment->resize(extra ? extra : SegmentSize);
-    m_segments[numSegments - 1] = segment;
-    m_size = newCapacity;
+    m_currentSegmentIndex = newNumSegments - 1;
+    m_segments[m_currentSegmentIndex] = segment;
+    m_size = newSize;
   }
 
   void clear() {
@@ -119,12 +123,16 @@ class SegmentedVector {
       delete m_segments[i];
     m_segments.resize(1);
     m_inlineSegment.resize(0);
+    m_currentSegmentIndex = 0;
     m_size = 0;
   }
 
  private:
   typedef Vector<T, SegmentSize> Segment;
+
   size_t m_size;
+  size_t m_currentSegmentIndex;
+
   Segment m_inlineSegment;
   Vector<Segment*, 32> m_segments;
 };
