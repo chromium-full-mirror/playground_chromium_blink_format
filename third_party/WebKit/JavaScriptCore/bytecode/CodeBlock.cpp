@@ -514,7 +514,6 @@ void CodeBlock::dump(ExecState* exec,
     }
     case op_negate: {
       printUnaryOp(location, it, "negate");
-      ++it;
       break;
     }
     case op_add: {

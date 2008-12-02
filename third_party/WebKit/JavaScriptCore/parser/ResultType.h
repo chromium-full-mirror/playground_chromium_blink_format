@@ -47,8 +47,6 @@ struct ResultType {
 
   bool isReusable() { return (m_type & TypeReusable); }
 
-  bool isReusableNumber() { return isReusable() && definitelyIsNumber(); }
-
   bool definitelyIsNumber() {
     return ((m_type & ~TypeReusable) == TypeMaybeNumber);
   }
@@ -56,8 +54,6 @@ struct ResultType {
   bool isNotNumber() { return ((m_type & TypeMaybeNumber) == 0); }
 
   bool mightBeNumber() { return !isNotNumber(); }
-
-  int toInt() { return static_cast<int>(m_type); }
 
   static ResultType nullType() { return ResultType(TypeMaybeNull); }
 

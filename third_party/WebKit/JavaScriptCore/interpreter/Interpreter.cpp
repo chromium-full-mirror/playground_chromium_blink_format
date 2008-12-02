@@ -2080,7 +2080,6 @@ JSValue* Interpreter::privateExecute(ExecutionFlag flag,
         callFrame[dst] = result;
       }
 
-      ++vPC;
       NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_add) {
