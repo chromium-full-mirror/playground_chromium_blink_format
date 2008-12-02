@@ -27,7 +27,6 @@
 #include "HTMLNames.h"
 #include "WMLCardElement.h"
 #include "WMLDocument.h"
-#include "WMLErrorHandling.h"
 #include "WMLNames.h"
 #include "WMLPageState.h"
 #include "WMLVariables.h"
@@ -40,16 +39,10 @@ WMLTimerElement::WMLTimerElement(const QualifiedName& tagName, Document* doc)
     : WMLElement(tagName, doc), m_timer(this, &WMLTimerElement::timerFired) {}
 
 void WMLTimerElement::parseMappedAttribute(MappedAttribute* attr) {
-  if (attr->name() == HTMLNames::nameAttr) {
-    const AtomicString& value = attr->value();
-    if (!isValidVariableName(value, true)) {
-      reportWMLError(document(), WMLErrorInvalidVariableName);
-      return;
-    }
-
-    m_name = value;
-  } else if (attr->name() == HTMLNames::valueAttr)
-    m_value = substituteVariableReferences(attr->value(), document());
+  if (attr->name() == HTMLNames::nameAttr)
+    m_name = parseValueForbiddingVariableReferences(attr->value());
+  else if (attr->name() == HTMLNames::valueAttr)
+    m_value = parseValueSubstitutingVariableReferences(attr->value());
   else
     WMLElement::parseMappedAttribute(attr);
 }
