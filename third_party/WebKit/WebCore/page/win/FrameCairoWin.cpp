@@ -38,4 +38,9 @@ HBITMAP imageFromSelection(Frame* frame, bool forceBlackText) {
   return 0;
 }
 
+HBITMAP Frame::nodeImage(Node*) const {
+  notImplemented();
+  return 0;
+}
+
 }  // namespace WebCore
