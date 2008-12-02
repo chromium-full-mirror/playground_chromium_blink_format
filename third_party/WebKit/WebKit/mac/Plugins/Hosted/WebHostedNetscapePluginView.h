@@ -40,6 +40,7 @@ class NetscapePluginInstanceProxy;
   RetainPtr<CALayer> _pluginLayer;
 
   RefPtr<WebKit::NetscapePluginInstanceProxy> _proxy;
+  BOOL _pluginHostDied;
 }
 
 - (id)initWithFrame:(NSRect)r
@@ -51,6 +52,8 @@ class NetscapePluginInstanceProxy;
     attributeValues:(NSArray*)values
        loadManually:(BOOL)loadManually
          DOMElement:(DOMElement*)anElement;
+
+- (void)pluginHostDied;
 @end
 
 #endif  // USE(PLUGIN_HOST_PROCESS)

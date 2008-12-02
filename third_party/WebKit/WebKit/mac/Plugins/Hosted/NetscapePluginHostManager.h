@@ -31,6 +31,7 @@
 #import <wtf/HashMap.h>
 #import <wtf/PassRefPtr.h>
 
+@class WebHostedNetscapePluginView;
 @class WebNetscapePluginPackage;
 
 namespace WebKit {
@@ -44,6 +45,7 @@ class NetscapePluginHostManager {
 
   PassRefPtr<NetscapePluginInstanceProxy> instantiatePlugin(
       WebNetscapePluginPackage*,
+      WebHostedNetscapePluginView*,
       NSString* mimeType,
       NSArray* attributeKeys,
       NSArray* attributeValues,

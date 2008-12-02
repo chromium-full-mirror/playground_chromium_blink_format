@@ -32,6 +32,8 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
+@class WebHostedNetscapePluginView;
+
 namespace WebKit {
 
 class NetscapePluginHostProxy;
@@ -40,16 +42,21 @@ class NetscapePluginInstanceProxy
     : public RefCounted<NetscapePluginInstanceProxy> {
  public:
   static PassRefPtr<NetscapePluginInstanceProxy> create(
-      mach_port_t pluginHostPort,
+      NetscapePluginHostProxy* pluginHostProxy,
+      WebHostedNetscapePluginView* pluginView,
       uint32_t pluginID,
       uint32_t renderContextID,
       boolean_t useSoftwareRenderer) {
-    return adoptRef(new NetscapePluginInstanceProxy(
-        pluginHostPort, pluginID, renderContextID, useSoftwareRenderer));
+    return adoptRef(new NetscapePluginInstanceProxy(pluginHostProxy, pluginView,
+                                                    pluginID, renderContextID,
+                                                    useSoftwareRenderer));
   }
+  ~NetscapePluginInstanceProxy();
 
   uint32_t renderContextID() const { return m_renderContextID; }
   bool useSoftwareRenderer() const { return m_useSoftwareRenderer; }
+
+  void pluginHostDied();
 
   void resize(NSRect size, NSRect clipRect);
   void destroy();
@@ -62,12 +69,15 @@ class NetscapePluginInstanceProxy
   void stopTimers();
 
  private:
-  NetscapePluginInstanceProxy(mach_port_t pluginHostPort,
+  NetscapePluginInstanceProxy(NetscapePluginHostProxy*,
+                              WebHostedNetscapePluginView*,
                               uint32_t pluginID,
                               uint32_t renderContextID,
                               boolean_t useSoftwareRenderer);
 
-  mach_port_t m_pluginHostPort;
+  NetscapePluginHostProxy* m_pluginHostProxy;
+  WebHostedNetscapePluginView* m_pluginView;
+
   uint32_t m_pluginID;
   uint32_t m_renderContextID;
   boolean_t m_useSoftwareRenderer;
