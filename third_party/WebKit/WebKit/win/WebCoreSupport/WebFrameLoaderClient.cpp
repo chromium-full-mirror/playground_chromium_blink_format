@@ -585,7 +585,7 @@ void WebFrameLoaderClient::loadURLIntoChild(const KURL& originalURL,
   // of this child frame with whatever was there at that point.
   // Reload will maintain the frame contents, LoadSame will not.
   if (parentItem && parentItem->children().size() &&
-      (isBackForwardLoadType(loadType) || loadType == FrameLoadTypeReload ||
+      (isBackForwardLoadType(loadType) ||
        loadType == FrameLoadTypeReloadAllowingStaleData)) {
     if (HistoryItem* childItem =
             parentItem->childItemWithName(core(childFrame)->tree()->name())) {
