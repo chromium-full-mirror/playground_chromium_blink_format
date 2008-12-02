@@ -50,6 +50,8 @@ class ScriptExecutionContext {
 
   const KURL& url() const { return virtualURL(); }
 
+  SecurityOrigin* securityOrigin() const { return m_securityOrigin.get(); }
+
   virtual void reportException(const String& errorMessage,
                                int lineNumber,
                                const String& sourceURL) = 0;
@@ -82,8 +84,16 @@ class ScriptExecutionContext {
   void postTask(PassRefPtr<Task>);  // Executes the task on context's thread
                                     // asynchronously.
 
+ protected:
+  // Explicitly override the security origin for this script context.
+  // Note: It is dangerous to change the security origin of a script context
+  //       that already contains content.
+  void setSecurityOrigin(PassRefPtr<SecurityOrigin>);
+
  private:
   virtual const KURL& virtualURL() const = 0;
+
+  RefPtr<SecurityOrigin> m_securityOrigin;
 
   HashSet<MessagePort*> m_messagePorts;
 

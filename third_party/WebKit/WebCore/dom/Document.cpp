@@ -6,6 +6,7 @@
  * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Torch Mobile Inc.  All rights reserved.
  *               http://www.torchmobile.com/
+ * Copyright (C) 2008 David Levin (levin@chromium.org)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -1442,7 +1443,7 @@ void Document::open(Document* ownerDocument) {
   if (ownerDocument) {
     setURL(ownerDocument->url());
     m_cookieURL = ownerDocument->cookieURL();
-    m_securityOrigin = ownerDocument->securityOrigin();
+    ScriptExecutionContext::setSecurityOrigin(ownerDocument->securityOrigin());
   }
 
   if (m_frame) {
@@ -2945,7 +2946,7 @@ String Document::referrer() const {
 }
 
 String Document::domain() const {
-  return m_securityOrigin->domain();
+  return securityOrigin()->domain();
 }
 
 void Document::setDomain(const String& newDomain) {
@@ -2955,13 +2956,13 @@ void Document::setDomain(const String& newDomain) {
   // FIXME: We should add logging indicating why a domain was not allowed.
 
   // If the new domain is the same as the old domain, still call
-  // m_securityOrigin.setDomainForDOM. This will change the
+  // securityOrigin()->setDomainForDOM. This will change the
   // security check behavior. For example, if a page loaded on port 8000
   // assigns its current domain using document.domain, the page will
   // allow other pages loaded on different ports in the same domain that
   // have also assigned to access this page.
   if (equalIgnoringCase(domain(), newDomain)) {
-    m_securityOrigin->setDomainFromDOM(newDomain);
+    securityOrigin()->setDomainFromDOM(newDomain);
     return;
   }
 
@@ -2982,7 +2983,7 @@ void Document::setDomain(const String& newDomain) {
   if (test != newDomain)
     return;
 
-  m_securityOrigin->setDomainFromDOM(newDomain);
+  securityOrigin()->setDomainFromDOM(newDomain);
 }
 
 String Document::lastModified() const {
@@ -4084,14 +4085,14 @@ bool Document::useSecureKeyboardEntryWhenActive() const {
 }
 
 void Document::initSecurityContext() {
-  if (m_securityOrigin && !m_securityOrigin->isEmpty())
+  if (securityOrigin() && !securityOrigin()->isEmpty())
     return;  // m_securityOrigin has already been initialized.
 
   if (!m_frame) {
     // No source for a security context.
     // This can occur via document.implementation.createDocument().
     m_cookieURL = KURL("");
-    m_securityOrigin = SecurityOrigin::createEmpty();
+    ScriptExecutionContext::setSecurityOrigin(SecurityOrigin::createEmpty());
     return;
   }
 
@@ -4099,7 +4100,7 @@ void Document::initSecurityContext() {
   // loading URL.
   const KURL& url = m_frame->loader()->url();
   m_cookieURL = url;
-  m_securityOrigin = SecurityOrigin::create(url);
+  ScriptExecutionContext::setSecurityOrigin(SecurityOrigin::create(url));
 
   if (FrameLoader::allowSubstituteDataAccessToLocal()) {
     // If this document was loaded with substituteData, then the document can
@@ -4108,10 +4109,10 @@ void Document::initSecurityContext() {
     // discussion.
     DocumentLoader* documentLoader = m_frame->loader()->documentLoader();
     if (documentLoader && documentLoader->substituteData().isValid())
-      m_securityOrigin->grantLoadLocalResources();
+      securityOrigin()->grantLoadLocalResources();
   }
 
-  if (!m_securityOrigin->isEmpty())
+  if (!securityOrigin()->isEmpty())
     return;
 
   // If we do not obtain a meaningful origin from the URL, then we try to
@@ -4125,12 +4126,16 @@ void Document::initSecurityContext() {
     m_cookieURL = ownerFrame->document()->cookieURL();
     // We alias the SecurityOrigins to match Firefox, see Bug 15313
     // https://bugs.webkit.org/show_bug.cgi?id=15313
-    m_securityOrigin = ownerFrame->document()->securityOrigin();
+    ScriptExecutionContext::setSecurityOrigin(
+        ownerFrame->document()->securityOrigin());
   }
 }
 
 void Document::setSecurityOrigin(SecurityOrigin* securityOrigin) {
-  m_securityOrigin = securityOrigin;
+  ScriptExecutionContext::setSecurityOrigin(securityOrigin);
+  // FIXME: Find a better place to enable DNS prefetch, which is a loader
+  // concept,
+  // not applicable to arbitrary documents.
   initDNSPrefetch();
 }
 

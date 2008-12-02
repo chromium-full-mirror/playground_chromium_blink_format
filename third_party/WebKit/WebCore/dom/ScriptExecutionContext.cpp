@@ -30,6 +30,7 @@
 #include "ActiveDOMObject.h"
 #include "Document.h"
 #include "MessagePort.h"
+#include "SecurityOrigin.h"
 #include "Timer.h"
 #include "WorkerContext.h"
 #include "WorkerTask.h"
@@ -137,6 +138,11 @@ void ScriptExecutionContext::createdActiveDOMObject(ActiveDOMObject* object,
 void ScriptExecutionContext::destroyedActiveDOMObject(ActiveDOMObject* object) {
   ASSERT(object);
   m_activeDOMObjects.remove(object);
+}
+
+void ScriptExecutionContext::setSecurityOrigin(
+    PassRefPtr<SecurityOrigin> securityOrigin) {
+  m_securityOrigin = securityOrigin;
 }
 
 ScriptExecutionContext::Task::~Task() {}
