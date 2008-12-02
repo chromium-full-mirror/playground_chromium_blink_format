@@ -492,8 +492,7 @@ class JIT {
                             unsigned src2,
                             OperandTypes opi,
                             unsigned i);
-  void compileBinaryArithOpSlowCase(Instruction*,
-                                    OpcodeID,
+  void compileBinaryArithOpSlowCase(OpcodeID,
                                     Vector<SlowCaseEntry>::iterator& iter,
                                     unsigned dst,
                                     unsigned src1,
@@ -560,13 +559,13 @@ class JIT {
   JmpSrc emitNakedCall(unsigned bytecodeIndex, RegisterID);
   JmpSrc emitNakedCall(unsigned bytecodeIndex, void* function);
   JmpSrc emitNakedFastCall(unsigned bytecodeIndex, void*);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_j);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_o);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_p);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_v);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_s);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_b);
-  JmpSrc emitCTICall(Instruction*, unsigned bytecodeIndex, CTIHelper_2);
+  JmpSrc emitCTICall(unsigned bytecodeIndex, CTIHelper_j);
+  JmpSrc emitCTICall(unsigned bytecodeIndex, CTIHelper_o);
+  JmpSrc emitCTICall(unsigned bytecodeIndex, CTIHelper_p);
+  JmpSrc emitCTICall(unsigned bytecodeIndex, CTIHelper_v);
+  JmpSrc emitCTICall(unsigned bytecodeIndex, CTIHelper_s);
+  JmpSrc emitCTICall(unsigned bytecodeIndex, CTIHelper_b);
+  JmpSrc emitCTICall(unsigned bytecodeIndex, CTIHelper_2);
 
   void emitGetVariableObjectRegister(RegisterID variableObject,
                                      int index,
@@ -575,7 +574,7 @@ class JIT {
                                      RegisterID variableObject,
                                      int index);
 
-  void emitSlowScriptCheck(Instruction*, unsigned bytecodeIndex);
+  void emitSlowScriptCheck(unsigned bytecodeIndex);
 #ifndef NDEBUG
   void printBytecodeOperandTypes(unsigned src1, unsigned src2);
 #endif
