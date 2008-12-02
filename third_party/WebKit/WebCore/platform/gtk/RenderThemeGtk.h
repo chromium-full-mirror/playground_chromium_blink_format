@@ -70,7 +70,7 @@ class RenderThemeGtk : public RenderTheme {
   virtual Color inactiveListBoxSelectionBackgroundColor() const;
   virtual Color inactiveListBoxSelectionForegroundColor() const;
 
-  virtual double caretBlinkFrequency() const;
+  virtual double caretBlinkInterval() const;
 
   // System fonts.
   virtual void systemFont(int propId, FontDescription&) const;

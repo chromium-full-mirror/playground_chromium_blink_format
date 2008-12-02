@@ -150,7 +150,7 @@ class RenderTheme {
 
   virtual void platformColorsDidChange();
 
-  virtual double caretBlinkFrequency() const { return 0.5; }
+  virtual double caretBlinkInterval() const { return 0.5; }
 
   // System fonts and colors for CSS.
   virtual void systemFont(int cssValueId, FontDescription&) const = 0;
