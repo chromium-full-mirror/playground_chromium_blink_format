@@ -62,6 +62,14 @@
 
 namespace WebCore {
 
+static const unsigned aquaFocusRingColor = 0xFF7DADD9;
+
+Color focusRingColor() {
+  static Color focusRingColor = aquaFocusRingColor;
+
+  return focusRingColor;
+}
+
 static inline void setColor(cairo_t* cr, const Color& col) {
   float red, green, blue, alpha;
   col.getRGBA(red, green, blue, alpha);
