@@ -30,7 +30,6 @@
 
 #import <wtf/HashMap.h>
 #import <wtf/PassRefPtr.h>
-#import <wtf/RefPtr.h>
 
 @class WebNetscapePluginPackage;
 
@@ -51,6 +50,8 @@ class NetscapePluginHostManager {
       NSString* userAgent,
       NSURL* sourceURL);
 
+  void pluginHostDied(NetscapePluginHostProxy*);
+
  private:
   NetscapePluginHostProxy* hostForPackage(WebNetscapePluginPackage*);
 
@@ -65,7 +66,7 @@ class NetscapePluginHostManager {
 
   // FIXME: This should really be a HashMap of RetainPtrs, but that doesn't work
   // right now.
-  typedef HashMap<WebNetscapePluginPackage*, RefPtr<NetscapePluginHostProxy>>
+  typedef HashMap<WebNetscapePluginPackage*, NetscapePluginHostProxy*>
       PluginHostMap;
   PluginHostMap m_pluginHosts;
 };
