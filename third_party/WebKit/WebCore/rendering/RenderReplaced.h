@@ -54,6 +54,8 @@ class RenderReplaced : public RenderBox {
   virtual int overflowTop(bool includeInterior = true) const;
   virtual IntRect overflowRect(bool includeInterior = true) const;
 
+  virtual IntRect absoluteClippedOverflowRect();
+
   virtual unsigned caretMaxRenderedOffset() const;
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
@@ -74,6 +76,7 @@ class RenderReplaced : public RenderBox {
 
   bool shouldPaint(PaintInfo&, int& tx, int& ty);
   void adjustOverflowForBoxShadow();
+  IntRect localSelectionRect(bool checkWhetherSelected = true) const;
 
  private:
   IntSize m_intrinsicSize;
