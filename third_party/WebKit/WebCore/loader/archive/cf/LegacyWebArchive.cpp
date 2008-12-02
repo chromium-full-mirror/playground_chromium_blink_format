@@ -655,9 +655,10 @@ PassRefPtr<LegacyWebArchive> LegacyWebArchive::create(
           resource = ArchiveResource::create(cachedResource->data(),
                                              subresourceURLs[i],
                                              cachedResource->response());
-          if (resource)
+          if (resource) {
             subresources.append(resource.release());
-          continue;
+            continue;
+          }
         }
 
         // FIXME: should do something better than spew to console here
