@@ -492,21 +492,21 @@ static PassRefPtr<HTMLElement> brConstructor(const QualifiedName&,
                                              Document* doc,
                                              HTMLFormElement*,
                                              bool) {
-  return new HTMLBRElement(doc);
+  return new HTMLBRElement(brTag, doc);
 }
 
 static PassRefPtr<HTMLElement> quoteConstructor(const QualifiedName&,
                                                 Document* doc,
                                                 HTMLFormElement*,
                                                 bool) {
-  return new HTMLQuoteElement(doc);
+  return new HTMLQuoteElement(qTag, doc);
 }
 
 static PassRefPtr<HTMLElement> marqueeConstructor(const QualifiedName&,
                                                   Document* doc,
                                                   HTMLFormElement*,
                                                   bool) {
-  return new HTMLMarqueeElement(doc);
+  return new HTMLMarqueeElement(marqueeTag, doc);
 }
 
 #if ENABLE(VIDEO)
@@ -516,7 +516,7 @@ static PassRefPtr<HTMLElement> audioConstructor(const QualifiedName& tagName,
                                                 bool) {
   if (!MediaPlayer::isAvailable())
     return new HTMLElement(tagName, doc);
-  return new HTMLAudioElement(doc);
+  return new HTMLAudioElement(audioTag, doc);
 }
 
 static PassRefPtr<HTMLElement> videoConstructor(const QualifiedName& tagName,
@@ -525,7 +525,7 @@ static PassRefPtr<HTMLElement> videoConstructor(const QualifiedName& tagName,
                                                 bool) {
   if (!MediaPlayer::isAvailable())
     return new HTMLElement(tagName, doc);
-  return new HTMLVideoElement(doc);
+  return new HTMLVideoElement(videoTag, doc);
 }
 
 static PassRefPtr<HTMLElement> sourceConstructor(const QualifiedName& tagName,
@@ -534,7 +534,7 @@ static PassRefPtr<HTMLElement> sourceConstructor(const QualifiedName& tagName,
                                                  bool) {
   if (!MediaPlayer::isAvailable())
     return new HTMLElement(tagName, doc);
-  return new HTMLSourceElement(doc);
+  return new HTMLSourceElement(sourceTag, doc);
 }
 #endif
 

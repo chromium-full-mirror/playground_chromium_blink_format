@@ -30,6 +30,7 @@
 #include "JSAudioConstructor.h"
 
 #include "HTMLAudioElement.h"
+#include "HTMLNames.h"
 #include "JSHTMLAudioElement.h"
 #include "ScriptExecutionContext.h"
 #include "Text.h"
@@ -59,6 +60,7 @@ static JSObject* constructAudio(ExecState* exec,
   // JSImageConstructor?
 
   RefPtr<HTMLAudioElement> audio = new HTMLAudioElement(
+      HTMLNames::audioTag,
       static_cast<JSAudioConstructor*>(constructor)->document());
   if (args.size() > 0) {
     audio->setSrc(args.at(exec, 0)->toString(exec));
