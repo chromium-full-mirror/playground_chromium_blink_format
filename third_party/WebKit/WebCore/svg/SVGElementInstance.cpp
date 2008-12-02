@@ -31,11 +31,14 @@
 #include "EventListener.h"
 #include "EventNames.h"
 #include "FrameView.h"
-#include "GCController.h"
 #include "SVGElementInstanceList.h"
 #include "SVGUseElement.h"
 
 #include <wtf/RefCountedLeakCounter.h>
+
+#if USE(JSC)
+#include "GCController.h"
+#endif
 
 namespace WebCore {
 
@@ -84,6 +87,7 @@ void SVGElementInstance::setShadowTreeElement(SVGElement* element) {
 }
 
 void SVGElementInstance::forgetWrapper() {
+#if USE(JSC)
   // FIXME: This is fragile, as discussed with Sam. Need to find a better
   // solution.
   // Think about the case where JS explicitely holds "var root =
@@ -97,6 +101,7 @@ void SVGElementInstance::forgetWrapper() {
   // to
   // be deleted (and the shadow tree is not destructed as well). Force JS GC.
   gcController().garbageCollectNow();
+#endif
 }
 
 void SVGElementInstance::appendChild(PassRefPtr<SVGElementInstance> child) {
