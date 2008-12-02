@@ -2456,8 +2456,6 @@ bool CSSParser::parseFillProperty(int propId,
 
 PassRefPtr<CSSValue> CSSParser::parseAnimationDelay() {
   CSSParserValue* value = m_valueList->current();
-  if (value->id == CSSValueNow)
-    return CSSPrimitiveValue::createIdentifier(value->id);
   if (validUnit(value, FTime, m_strict))
     return CSSPrimitiveValue::create(value->fValue,
                                      (CSSPrimitiveValue::UnitTypes)value->unit);
