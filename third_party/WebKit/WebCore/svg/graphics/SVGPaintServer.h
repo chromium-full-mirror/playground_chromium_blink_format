@@ -93,9 +93,7 @@ class SVGPaintServer : public SVGResource {
  protected:
 #if PLATFORM(CG)
   void strokePath(CGContextRef, const RenderObject*) const;
-  void clipToStrokePath(CGContextRef, const RenderObject*) const;
   void fillPath(CGContextRef, const RenderObject*) const;
-  void clipToFillPath(CGContextRef, const RenderObject*) const;
 #endif
 
  protected:
