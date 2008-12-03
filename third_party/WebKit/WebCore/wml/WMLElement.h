@@ -24,6 +24,7 @@
 
 #if ENABLE(WML)
 #include "StyledElement.h"
+#include "WMLErrorHandling.h"
 
 namespace WebCore {
 
@@ -44,7 +45,9 @@ class WMLElement : public StyledElement {
 
  protected:
   // Helper function for derived classes
-  String parseValueSubstitutingVariableReferences(const AtomicString&);
+  String parseValueSubstitutingVariableReferences(
+      const AtomicString&,
+      WMLErrorCode defaultErrorCode = WMLErrorInvalidVariableReference);
   String parseValueForbiddingVariableReferences(const AtomicString&);
 };
 }

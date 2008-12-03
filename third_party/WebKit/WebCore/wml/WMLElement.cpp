@@ -86,13 +86,14 @@ RenderObject* WMLElement::createRenderer(RenderArena*, RenderStyle* style) {
 }
 
 String WMLElement::parseValueSubstitutingVariableReferences(
-    const AtomicString& value) {
+    const AtomicString& value,
+    WMLErrorCode defaultErrorCode) {
   bool isValid = false;
   if (!containsVariableReference(value, isValid))
     return value;
 
   if (!isValid) {
-    reportWMLError(document(), WMLErrorInvalidVariableReference);
+    reportWMLError(document(), defaultErrorCode);
     return String();
   }
 
@@ -101,7 +102,8 @@ String WMLElement::parseValueSubstitutingVariableReferences(
 
 String WMLElement::parseValueForbiddingVariableReferences(
     const AtomicString& value) {
-  if (containsVariableReference(value)) {
+  bool isValid = false;
+  if (containsVariableReference(value, isValid)) {
     reportWMLError(document(), WMLErrorInvalidVariableReferenceLocation);
     return String();
   }
