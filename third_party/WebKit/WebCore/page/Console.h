@@ -47,6 +47,7 @@ class Frame;
 class Page;
 class String;
 
+// Keep in sync with inspector/front-end/Console.js
 enum MessageSource {
   HTMLMessageSource,
   WMLMessageSource,
