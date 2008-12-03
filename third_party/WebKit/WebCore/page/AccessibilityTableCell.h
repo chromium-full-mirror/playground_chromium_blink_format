@@ -51,6 +51,10 @@ class AccessibilityTableCell : public AccessibilityRenderObject {
   // fills in the start location and column span of cell
   void columnIndexRange(pair<int, int>& columnRange);
 
+  // if a table cell is not exposed as a table cell, a TH element can
+  // serve as its title ui element
+  AccessibilityObject* titleUIElement() const;
+
  private:
   int m_rowIndex;
 };

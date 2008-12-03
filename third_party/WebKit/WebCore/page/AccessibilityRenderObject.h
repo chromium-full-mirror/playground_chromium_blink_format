@@ -86,6 +86,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool isMenuItem() const;
   virtual bool isControl() const;
   virtual bool isFieldset() const;
+  virtual bool isGroup() const;
 
   virtual bool isEnabled() const;
   virtual bool isSelected() const;

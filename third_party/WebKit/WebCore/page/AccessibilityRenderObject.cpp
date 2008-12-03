@@ -397,6 +397,10 @@ bool AccessibilityRenderObject::isFieldset() const {
   return m_renderer->isFieldset();
 }
 
+bool AccessibilityRenderObject::isGroup() const {
+  return roleValue() == GroupRole;
+}
+
 const AtomicString& AccessibilityRenderObject::getAttribute(
     const QualifiedName& attribute) const {
   Node* node = m_renderer->element();
