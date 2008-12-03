@@ -34,7 +34,6 @@
 #include "CSSFontFaceSource.h"
 #include "CSSImportRule.h"
 #include "CSSMediaRule.h"
-#include "CSSNthSelector.h"
 #include "CSSParser.h"
 #include "CSSPrimitiveValueMappings.h"
 #include "CSSProperty.h"
@@ -1788,7 +1787,7 @@ CSSStyleSelector::SelectorChecker::checkSelector(
   CSSSelector::Relation relation = sel->relation();
 
   // Prepare next sel
-  sel = sel->m_tagHistory;
+  sel = sel->tagHistory();
   if (!sel)
     return SelectorMatches;
 
@@ -1972,26 +1971,28 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
     if (sel->m_match == CSSSelector::Id)
       return e->hasID() && e->getIDAttribute() == sel->m_value;
 
+    const QualifiedName& attr = sel->attribute();
+
     // FIXME: Handle the case were elementStyle is 0.
     if (elementStyle &&
         (!e->isStyledElement() ||
-         (!static_cast<StyledElement*>(e)->isMappedAttribute(sel->m_attr) &&
-          sel->m_attr != typeAttr && sel->m_attr != readonlyAttr))) {
+         (!static_cast<StyledElement*>(e)->isMappedAttribute(attr) &&
+          attr != typeAttr && attr != readonlyAttr))) {
       elementStyle->setAffectedByAttributeSelectors();  // Special-case the
                                                         // "type" and "readonly"
                                                         // attributes so input
                                                         // form controls can
                                                         // share style.
       if (selectorAttrs)
-        selectorAttrs->add(sel->m_attr.localName().impl());
+        selectorAttrs->add(attr.localName().impl());
     }
 
-    const AtomicString& value = e->getAttribute(sel->m_attr);
+    const AtomicString& value = e->getAttribute(attr);
     if (value.isNull())
       return false;  // attribute is not set
 
     bool caseSensitive =
-        !m_documentIsHTML || !htmlAttributeHasCaseInsensitiveValue(sel->m_attr);
+        !m_documentIsHTML || !htmlAttributeHasCaseInsensitiveValue(attr);
 
     switch (sel->m_match) {
       case CSSSelector::Exact:
@@ -2056,11 +2057,11 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
     // Handle :not up front.
     if (sel->pseudoType() == CSSSelector::PseudoNot) {
       // check the simple selector
-      for (CSSSelector* subSel = sel->m_simpleSelector; subSel;
-           subSel = subSel->m_tagHistory) {
+      for (CSSSelector* subSel = sel->simpleSelector(); subSel;
+           subSel = subSel->tagHistory()) {
         // :not cannot nest. I don't really know why this is a
         // restriction in CSS3, but it is, so let's honor it.
-        if (subSel->m_simpleSelector)
+        if (subSel->simpleSelector())
           break;
         if (!checkOneSelector(subSel, e, selectorAttrs, dynamicPseudo,
                               isAncestor, true, elementStyle,
@@ -2285,7 +2286,7 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
         break;
       }
       case CSSSelector::PseudoNthChild: {
-        if (!static_cast<CSSNthSelector*>(sel)->parseNth())
+        if (!sel->parseNth())
           break;
         if (e->parentNode() && e->parentNode()->isElementNode()) {
           int count = 1;
@@ -2315,13 +2316,13 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
               parentStyle->setChildrenAffectedByForwardPositionalRules();
           }
 
-          if (static_cast<CSSNthSelector*>(sel)->matchNth(count))
+          if (sel->matchNth(count))
             return true;
         }
         break;
       }
       case CSSSelector::PseudoNthOfType: {
-        if (!static_cast<CSSNthSelector*>(sel)->parseNth())
+        if (!sel->parseNth())
           break;
         if (e->parentNode() && e->parentNode()->isElementNode()) {
           int count = 1;
@@ -2342,13 +2343,13 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
               parentStyle->setChildrenAffectedByForwardPositionalRules();
           }
 
-          if (static_cast<CSSNthSelector*>(sel)->matchNth(count))
+          if (sel->matchNth(count))
             return true;
         }
         break;
       }
       case CSSSelector::PseudoNthLastChild: {
-        if (!static_cast<CSSNthSelector*>(sel)->parseNth())
+        if (!sel->parseNth())
           break;
         if (e->parentNode() && e->parentNode()->isElementNode()) {
           Element* parentNode = static_cast<Element*>(e->parentNode());
@@ -2367,13 +2368,13 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
               count++;
             n = n->nextSibling();
           }
-          if (static_cast<CSSNthSelector*>(sel)->matchNth(count))
+          if (sel->matchNth(count))
             return true;
         }
         break;
       }
       case CSSSelector::PseudoNthLastOfType: {
-        if (!static_cast<CSSNthSelector*>(sel)->parseNth())
+        if (!sel->parseNth())
           break;
         if (e->parentNode() && e->parentNode()->isElementNode()) {
           Element* parentNode = static_cast<Element*>(e->parentNode());
@@ -2394,7 +2395,7 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
               count++;
             n = n->nextSibling();
           }
-          if (static_cast<CSSNthSelector*>(sel)->matchNth(count))
+          if (sel->matchNth(count))
             return true;
         }
         break;
@@ -2530,10 +2531,11 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
 
           n = n->parent();
         }
-        if (value.isEmpty() || !value.startsWith(sel->m_argument, false))
+        const AtomicString& argument = sel->argument();
+        if (value.isEmpty() || !value.startsWith(argument, false))
           break;
-        if (value.length() != sel->m_argument.length() &&
-            value[sel->m_argument.length()] != '-')
+        if (value.length() != argument.length() &&
+            value[argument.length()] != '-')
           break;
         return true;
       }

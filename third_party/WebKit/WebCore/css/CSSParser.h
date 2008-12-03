@@ -37,7 +37,6 @@ class CSSProperty;
 class CSSRule;
 class CSSRuleList;
 class CSSSelector;
-class CSSNthSelector;
 class CSSStyleSheet;
 class CSSValue;
 class CSSValueList;
@@ -178,7 +177,6 @@ class CSSParser {
   int yyparse();
 
   CSSSelector* createFloatingSelector();
-  CSSNthSelector* createFloatingNthSelector();
   CSSSelector* sinkFloatingSelector(CSSSelector*);
 
   CSSParserValueList* createFloatingValueList();
