@@ -90,7 +90,9 @@ class ResourceResponseBase {
         m_httpStatusCode(0),
         m_expirationDate(0),
         m_lastModifiedDate(0),
-        m_isNull(true) {}
+        m_isNull(true),
+        m_haveParsedCacheControlHeader(false),
+        m_haveParsedPragmaHeader(false) {}
 
   ResourceResponseBase(const KURL& url,
                        const String& mimeType,
@@ -105,7 +107,9 @@ class ResourceResponseBase {
         m_httpStatusCode(0),
         m_expirationDate(0),
         m_lastModifiedDate(0),
-        m_isNull(false) {}
+        m_isNull(false),
+        m_haveParsedCacheControlHeader(false),
+        m_haveParsedPragmaHeader(false) {}
 
   void lazyInit() const;
 
