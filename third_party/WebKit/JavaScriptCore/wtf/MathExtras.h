@@ -244,6 +244,12 @@ inline double deg2grad(double d) {
 inline double grad2deg(double g) {
   return g * 360.0 / 400.0;
 }
+inline double turn2deg(double t) {
+  return t * 360.0;
+}
+inline double deg2turn(double d) {
+  return d / 360.0;
+}
 inline double rad2grad(double r) {
   return r * 200.0 / piDouble;
 }
@@ -262,6 +268,12 @@ inline float deg2grad(float d) {
 }
 inline float grad2deg(float g) {
   return g * 360.0f / 400.0f;
+}
+inline float turn2deg(float t) {
+  return t * 360.0f;
+}
+inline float deg2turn(float d) {
+  return d / 360.0f;
 }
 inline float rad2grad(float r) {
   return r * 200.0f / piFloat;
