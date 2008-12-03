@@ -107,29 +107,35 @@ class MessageWorkerTask : public ScriptExecutionContext::Task {
 
 class WorkerExceptionTask : public ScriptExecutionContext::Task {
  public:
-  static PassRefPtr<WorkerExceptionTask> create(const String& errorMessage,
-                                                int lineNumber,
-                                                const String& sourceURL) {
-    return adoptRef(
-        new WorkerExceptionTask(errorMessage, lineNumber, sourceURL));
+  static PassRefPtr<WorkerExceptionTask> create(
+      const String& errorMessage,
+      int lineNumber,
+      const String& sourceURL,
+      WorkerMessagingProxy* messagingProxy) {
+    return adoptRef(new WorkerExceptionTask(errorMessage, lineNumber, sourceURL,
+                                            messagingProxy));
   }
 
  private:
   WorkerExceptionTask(const String& errorMessage,
                       int lineNumber,
-                      const String& sourceURL)
+                      const String& sourceURL,
+                      WorkerMessagingProxy* messagingProxy)
       : m_errorMessage(errorMessage.copy()),
         m_lineNumber(lineNumber),
-        m_sourceURL(sourceURL.copy()) {}
+        m_sourceURL(sourceURL.copy()),
+        m_messagingProxy(messagingProxy) {}
 
   virtual void performTask(ScriptExecutionContext* context) {
-    context->reportException(m_errorMessage, m_lineNumber, m_sourceURL);
+    if (!m_messagingProxy->askedToTerminate())
+      context->reportException(m_errorMessage, m_lineNumber, m_sourceURL);
   }
 
  private:
   String m_errorMessage;
   int m_lineNumber;
   String m_sourceURL;
+  WorkerMessagingProxy* m_messagingProxy;
 };
 
 class WorkerContextDestroyedTask : public ScriptExecutionContext::Task {
@@ -227,7 +233,7 @@ void WorkerMessagingProxy::postWorkerException(const String& errorMessage,
                                                int lineNumber,
                                                const String& sourceURL) {
   m_scriptExecutionContext->postTask(
-      WorkerExceptionTask::create(errorMessage, lineNumber, sourceURL));
+      WorkerExceptionTask::create(errorMessage, lineNumber, sourceURL, this));
 }
 
 void WorkerMessagingProxy::workerThreadCreated(
