@@ -25,6 +25,7 @@
 #include "AtomicString.h"
 #include "Color.h"
 #include "CSSParserValues.h"
+#include "CSSSelectorList.h"
 #include "MediaQuery.h"
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
@@ -132,7 +133,7 @@ class CSSParser {
                           bool parseAlpha);
   PassRefPtr<CSSPrimitiveValue> parseColor(CSSParserValue* = 0);
   bool parseColorFromValue(CSSParserValue*, RGBA32&, bool = false);
-  std::auto_ptr<CSSSelector> parseSelector(const String&, Document* doc = 0);
+  void parseSelector(const String&, Document* doc, CSSSelectorList&);
 
   static bool parseColor(const String&, RGBA32& rgb, bool strict);
 
@@ -194,7 +195,7 @@ class CSSParser {
   WebKitCSSKeyframesRule* createKeyframesRule();
   CSSRule* createMediaRule(MediaList*, CSSRuleList*);
   CSSRuleList* createRuleList();
-  CSSRule* createStyleRule(CSSSelector*);
+  CSSRule* createStyleRule(Vector<CSSSelector*>* selectors);
   CSSRule* createFontFaceRule();
   CSSRule* createVariablesRule(MediaList*, bool variablesKeyword);
 
@@ -215,6 +216,10 @@ class CSSParser {
   bool checkForVariables(CSSParserValueList*);
   void addUnresolvedProperty(int propId, bool important);
 
+  Vector<CSSSelector*>* reusableSelectorVector() {
+    return &m_reusableSelectorVector;
+  }
+
  public:
   bool m_strict;
   bool m_important;
@@ -225,7 +230,7 @@ class CSSParser {
   MediaQuery* m_mediaQuery;
   CSSParserValueList* m_valueList;
   CSSProperty** m_parsedProperties;
-  CSSSelector* m_floatingSelector;
+  CSSSelectorList* m_selectorListForParseSelector;
   int m_numParsedProperties;
   int m_maxParsedProperties;
 
@@ -279,6 +284,8 @@ class CSSParser {
   MediaQuery* m_floatingMediaQuery;
   MediaQueryExp* m_floatingMediaQueryExp;
   Vector<MediaQueryExp*>* m_floatingMediaQueryExpList;
+
+  Vector<CSSSelector*> m_reusableSelectorVector;
 
   // defines units allowed for a certain property, used in parseUnit
   enum Units {
