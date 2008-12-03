@@ -72,6 +72,14 @@ void ActiveDOMObject::contextDestroyed() {
   m_scriptExecutionContext = 0;
 }
 
+bool ActiveDOMObject::canSuspend() const {
+  return false;
+}
+
+void ActiveDOMObject::suspend() {}
+
+void ActiveDOMObject::resume() {}
+
 void ActiveDOMObject::stop() {}
 
 }  // namespace WebCore

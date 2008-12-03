@@ -59,6 +59,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   virtual XMLHttpRequest* toXMLHttpRequest() { return this; }
 
   virtual void contextDestroyed();
+  virtual bool canSuspend() const;
   virtual void stop();
 
   virtual ScriptExecutionContext* scriptExecutionContext() const;

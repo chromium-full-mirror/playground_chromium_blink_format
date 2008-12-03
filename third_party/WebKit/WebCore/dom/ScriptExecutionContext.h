@@ -58,6 +58,9 @@ class ScriptExecutionContext {
 
   // Active objects are not garbage collected even if inaccessible, e.g. because
   // their activity may result in callbacks being invoked.
+  bool canSuspendActiveDOMObjects();
+  void suspendActiveDOMObjects();
+  void resumeActiveDOMObjects();
   void stopActiveDOMObjects();
   void createdActiveDOMObject(ActiveDOMObject*, void* upcastPointer);
   void destroyedActiveDOMObject(ActiveDOMObject*);

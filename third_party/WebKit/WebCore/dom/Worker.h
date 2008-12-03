@@ -74,6 +74,8 @@ class Worker : public RefCounted<Worker>,
 
   void terminate();
 
+  virtual bool canSuspend() const;
+  virtual void stop();
   virtual bool hasPendingActivity() const;
 
   virtual void addEventListener(const AtomicString& eventType,
