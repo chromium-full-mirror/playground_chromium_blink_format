@@ -49,6 +49,7 @@ class String;
 
 enum MessageSource {
   HTMLMessageSource,
+  WMLMessageSource,
   XMLMessageSource,
   JSMessageSource,
   CSSMessageSource,
