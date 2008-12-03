@@ -138,6 +138,8 @@ class BytecodeGenerator {
 
   // Functions for handling of dst register
 
+  RegisterID* ignoredResult() { return &m_ignoredResultRegister; }
+
   // Returns a place to write intermediate values of an operation
   // which reuses dst if it is safe to do so.
   RegisterID* tempDestination(RegisterID* dst) {
@@ -543,6 +545,7 @@ class BytecodeGenerator {
   CodeBlock* m_codeBlock;
 
   HashSet<RefPtr<UString::Rep>, IdentifierRepHash> m_functions;
+  RegisterID m_ignoredResultRegister;
   RegisterID m_thisRegister;
   RegisterID m_argumentsRegister;
   int m_activationRegisterIndex;
