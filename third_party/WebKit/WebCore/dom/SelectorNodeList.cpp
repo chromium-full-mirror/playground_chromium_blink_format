@@ -51,7 +51,7 @@ PassRefPtr<StaticNodeList> createSelectorNodeList(Node* rootNode,
   if (strictParsing && querySelector->m_match == CSSSelector::Id &&
       rootNode->inDocument() && !querySelector->next() &&
       !document->containsMultipleElementsWithId(selectorValue)) {
-    ASSERT(querySelector->m_attr == idAttr);
+    ASSERT(querySelector->attribute() == idAttr);
     Element* element = document->getElementById(selectorValue);
     if (element &&
         (rootNode->isDocumentNode() || element->isDescendantOf(rootNode)) &&
