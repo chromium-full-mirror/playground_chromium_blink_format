@@ -217,9 +217,9 @@ class Page : Noncopyable {
 #endif
 
 #if ENABLE(WML)
-  void setWMLPageState(RefPtr<WMLPageState>);
-  WMLPageState* wmlPageState() const;
+  WMLPageState* wmlPageState();
 #endif
+
   void setCustomHTMLTokenizerTimeDelay(double);
   bool hasCustomHTMLTokenizerTimeDelay() const {
     return m_customHTMLTokenizerTimeDelay != -1;
@@ -294,7 +294,7 @@ class Page : Noncopyable {
 #endif
 
 #if ENABLE(WML)
-  RefPtr<WMLPageState> m_wmlPageState;
+  OwnPtr<WMLPageState> m_wmlPageState;
 #endif
 };
 

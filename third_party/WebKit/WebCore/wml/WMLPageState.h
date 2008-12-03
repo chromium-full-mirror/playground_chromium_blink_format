@@ -35,7 +35,7 @@ class WMLCardElement;
 
 typedef HashMap<String, String> WMLVariableMap;
 
-class WMLPageState : public RefCounted<WMLPageState> {
+class WMLPageState {
  public:
   WMLPageState(Page*);
   virtual ~WMLPageState();
@@ -50,7 +50,6 @@ class WMLPageState : public RefCounted<WMLPageState> {
   }
   void storeVariables(WMLVariableMap& variables) { m_variables = variables; }
   String getVariable(const String& name) const { return m_variables.get(name); }
-  bool hasVariables() const { return m_variables.size(); }
 
   int historyLength() const { return m_historyLength; }
   void setHistoryLength(int length) { m_historyLength = length; }
