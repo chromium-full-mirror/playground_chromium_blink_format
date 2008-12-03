@@ -49,7 +49,7 @@ namespace WebCore {
 WorkerScriptController::WorkerScriptController(WorkerContext* workerContext)
     : m_globalData(JSGlobalData::create()),
       m_workerContext(workerContext),
-      m_executionForbidded(false) {}
+      m_executionForbidden(false) {}
 
 WorkerScriptController::~WorkerScriptController() {
   m_workerContextWrapper = 0;  // Unprotect the global object.
@@ -72,7 +72,7 @@ ScriptValue WorkerScriptController::evaluate(
     const ScriptSourceCode& sourceCode) {
   {
     MutexLocker lock(m_sharedDataMutex);
-    if (m_executionForbidded)
+    if (m_executionForbidden)
       return noValue();
   }
 
@@ -99,14 +99,14 @@ ScriptValue WorkerScriptController::evaluate(
 
 void WorkerScriptController::forbidExecution() {
   // This function is called from another thread.
-  // Mutex protection for m_executionForbidded is needed to guarantee that the
+  // Mutex protection for m_executionForbidden is needed to guarantee that the
   // value is synchronized between processors, because
   // if it were not, the worker could re-enter JSC::evaluate(), but with timeout
   // already reset.
   // It is not critical for Interpreter::m_timeoutTime to be synchronized, we
   // just rely on it reaching the worker thread's processor sooner or later.
   MutexLocker lock(m_sharedDataMutex);
-  m_executionForbidded = true;
+  m_executionForbidden = true;
   m_globalData->interpreter->setTimeoutTime(
       1);  // 1 ms is the smallest timeout that can be set.
 }
