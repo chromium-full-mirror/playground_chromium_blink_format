@@ -866,6 +866,7 @@ void FrameLoader::clear(bool clearWindowProperties, bool clearScriptObjects) {
 
   if (m_frame->document() && !m_frame->document()->inPageCache()) {
     m_frame->document()->cancelParsing();
+    m_frame->document()->stopActiveDOMObjects();
     if (m_frame->document()->attached()) {
       m_frame->document()->willRemove();
       m_frame->document()->detach();
@@ -2837,13 +2838,11 @@ void FrameLoader::commitProvisionalLoad(PassRefPtr<CachedPage> prpCachedPage) {
       // To avoid this, we clear all timeouts if the page is not to be cached in
       // the back forward list.
       // Cached pages have their timers paused so they are fine.
+      // FIXME: Integrate clearing timeouts into stopActiveDOMObjects().
       ScriptController* proxy = m_frame->script();
       if (proxy->haveWindowShell())
         proxy->windowShell()->window()->clearAllTimeouts();
     }
-    // FIXME: Integrate clearing timeouts into stopActiveDOMObjects().
-    if (Document* document = m_frame->document())
-      document->stopActiveDOMObjects();
   }
 
   if (m_loadType != FrameLoadTypeReplace)
