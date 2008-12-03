@@ -171,7 +171,7 @@ void Console::addMessage(MessageSource source,
   if (!page)
     return;
 
-  if (source == JSMessageSource)
+  if (source == JSMessageSource || source == WMLMessageSource)
     page->chrome()->client()->addMessageToConsole(message, lineNumber,
                                                   sourceURL);
 

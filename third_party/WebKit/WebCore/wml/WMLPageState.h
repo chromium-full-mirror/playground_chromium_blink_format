@@ -50,6 +50,7 @@ class WMLPageState {
   }
   void storeVariables(WMLVariableMap& variables) { m_variables = variables; }
   String getVariable(const String& name) const { return m_variables.get(name); }
+  bool hasVariables() const { return !m_variables.isEmpty(); }
 
   int historyLength() const { return m_historyLength; }
   void setHistoryLength(int length) { m_historyLength = length; }

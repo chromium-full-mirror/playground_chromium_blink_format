@@ -31,7 +31,12 @@
 
 #if ENABLE(SVG)
 #include "RenderSVGInlineText.h"
-#endif  // ENABLE(SVG)
+#endif
+
+#if ENABLE(WML)
+#include "WMLDocument.h"
+#include "WMLVariables.h"
+#endif
 
 namespace WebCore {
 
@@ -289,6 +294,28 @@ PassRefPtr<Text> Text::createWithLengthLimit(Document* doc,
 
   return new Text(doc, nodeText);
 }
+
+#if ENABLE(WML)
+void Text::insertedIntoDocument() {
+  CharacterData::insertedIntoDocument();
+
+  if (!parentNode()->isWMLElement() || !length())
+    return;
+
+  WMLPageState* pageState = wmlPageStateForDocument(document());
+  if (!pageState->hasVariables())
+    return;
+
+  String text = data();
+  if (!text.impl() || text.impl()->containsOnlyWhitespace())
+    return;
+
+  text = substituteVariableReferences(text, document());
+
+  ExceptionCode ec;
+  setData(text, ec);
+}
+#endif
 
 #ifndef NDEBUG
 void Text::formatForDebugger(char* buffer, unsigned length) const {

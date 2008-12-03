@@ -65,6 +65,10 @@ class Text : public CharacterData {
       unsigned& charsLeft,
       unsigned maxChars = cTextNodeLengthLimit);
 
+#if ENABLE(WML)
+  virtual void insertedIntoDocument();
+#endif
+
 #ifndef NDEBUG
   virtual void formatForDebugger(char* buffer, unsigned length) const;
 #endif
