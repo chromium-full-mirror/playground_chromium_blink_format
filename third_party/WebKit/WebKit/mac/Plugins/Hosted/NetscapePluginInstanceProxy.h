@@ -53,6 +53,7 @@ class NetscapePluginInstanceProxy
   }
   ~NetscapePluginInstanceProxy();
 
+  uint32_t pluginID() const { return m_pluginID; }
   uint32_t renderContextID() const { return m_renderContextID; }
   bool useSoftwareRenderer() const { return m_useSoftwareRenderer; }
 
@@ -67,6 +68,8 @@ class NetscapePluginInstanceProxy
   void mouseEvent(NSView* pluginView, NSEvent*, NPCocoaEventType);
   void startTimers(bool throttleTimers);
   void stopTimers();
+
+  void status(const char* message);
 
  private:
   NetscapePluginInstanceProxy(NetscapePluginHostProxy*,
