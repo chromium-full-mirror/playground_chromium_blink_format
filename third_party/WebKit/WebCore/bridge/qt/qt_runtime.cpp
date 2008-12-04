@@ -795,8 +795,7 @@ JSValue* convertQVariantToValue(ExecState* exec,
 
       UString pattern((UChar*)re.pattern().utf16(), re.pattern().length());
 
-      RefPtr<JSC::RegExp> regExp =
-          JSC::RegExp::create(&exec->globalData(), pattern, uflags);
+      RefPtr<JSC::RegExp> regExp = JSC::RegExp::create(pattern, uflags);
       if (regExp->isValid())
         return new (exec) RegExpObject(
             exec->lexicalGlobalObject()->regExpStructure(), regExp.release());
