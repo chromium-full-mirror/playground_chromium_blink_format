@@ -387,7 +387,8 @@ Document* XMLHttpRequest::responseXML() const {
     return 0;
 
   if (!m_createdDocument) {
-    if (m_response.isHTTP() && !responseIsXML()) {
+    if ((m_response.isHTTP() && !responseIsXML()) ||
+        scriptExecutionContext()->isWorkerContext()) {
       // The W3C spec requires this.
       m_responseXML = 0;
     } else {
@@ -477,7 +478,7 @@ void XMLHttpRequest::changeState(State newState) {
 }
 
 void XMLHttpRequest::callReadyStateChangeListener() {
-  if (!document() || !document()->frame())
+  if (!scriptExecutionContext())
     return;
 
   dispatchReadyStateChangeEvent();
@@ -568,7 +569,7 @@ void XMLHttpRequest::open(const String& method,
 }
 
 bool XMLHttpRequest::initSend(ExceptionCode& ec) {
-  if (!document())
+  if (!scriptExecutionContext())
     return false;
 
   if (m_state != OPENED || m_loader) {
