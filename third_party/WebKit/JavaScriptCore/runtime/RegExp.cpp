@@ -38,21 +38,18 @@ namespace JSC {
 using namespace WREC;
 #endif
 
-inline RegExp::RegExp(JSGlobalData* globalData, const UString& pattern)
+inline RegExp::RegExp(const UString& pattern)
     : m_pattern(pattern),
       m_flagBits(0),
       m_regExp(0),
       m_constructionError(0),
       m_numSubpatterns(0) {
 #if ENABLE(WREC)
-  m_wrecFunction =
-      Generator::compileRegExp(globalData->interpreter, pattern,
-                               &m_numSubpatterns, &m_constructionError);
+  m_wrecFunction = Generator::compileRegExp(pattern, &m_numSubpatterns,
+                                            &m_constructionError);
   if (m_wrecFunction)
     return;
 // Fall through to non-WREC case.
-#else
-  UNUSED_PARAM(globalData);
 #endif
   m_regExp = jsRegExpCompile(reinterpret_cast<const UChar*>(pattern.data()),
                              pattern.size(), JSRegExpDoNotIgnoreCase,
@@ -60,14 +57,11 @@ inline RegExp::RegExp(JSGlobalData* globalData, const UString& pattern)
                              &m_constructionError);
 }
 
-PassRefPtr<RegExp> RegExp::create(JSGlobalData* globalData,
-                                  const UString& pattern) {
-  return adoptRef(new RegExp(globalData, pattern));
+PassRefPtr<RegExp> RegExp::create(const UString& pattern) {
+  return adoptRef(new RegExp(pattern));
 }
 
-inline RegExp::RegExp(JSGlobalData* globalData,
-                      const UString& pattern,
-                      const UString& flags)
+inline RegExp::RegExp(const UString& pattern, const UString& flags)
     : m_pattern(pattern),
       m_flags(flags),
       m_flagBits(0),
@@ -95,23 +89,20 @@ inline RegExp::RegExp(JSGlobalData* globalData,
 
 #if ENABLE(WREC)
   m_wrecFunction = Generator::compileRegExp(
-      globalData->interpreter, pattern, &m_numSubpatterns, &m_constructionError,
+      pattern, &m_numSubpatterns, &m_constructionError,
       (m_flagBits & IgnoreCase), (m_flagBits & Multiline));
   if (m_wrecFunction)
     return;
 // Fall through to non-WREC case.
-#else
-  UNUSED_PARAM(globalData);
 #endif
   m_regExp = jsRegExpCompile(reinterpret_cast<const UChar*>(pattern.data()),
                              pattern.size(), ignoreCaseOption, multilineOption,
                              &m_numSubpatterns, &m_constructionError);
 }
 
-PassRefPtr<RegExp> RegExp::create(JSGlobalData* globalData,
-                                  const UString& pattern,
+PassRefPtr<RegExp> RegExp::create(const UString& pattern,
                                   const UString& flags) {
-  return adoptRef(new RegExp(globalData, pattern, flags));
+  return adoptRef(new RegExp(pattern, flags));
 }
 
 RegExp::~RegExp() {

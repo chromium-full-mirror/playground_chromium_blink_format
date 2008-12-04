@@ -299,10 +299,6 @@ class Interpreter {
 
 #endif  // ENABLE(JIT)
 
-#if ENABLE(ASSEMBLER)
-  AssemblerBuffer* assemblerBuffer() const { return m_assemblerBuffer.get(); }
-#endif
-
   // Default number of ticks before a timeout check should be done.
   static const int initialTickCountThreshold = 1024;
 
@@ -423,10 +419,6 @@ class Interpreter {
   void* m_ctiVirtualCallPreLink;
   void* m_ctiVirtualCallLink;
   void* m_ctiVirtualCall;
-#endif
-
-#if ENABLE(ASSEMBLER)
-  OwnPtr<AssemblerBuffer> m_assemblerBuffer;
 #endif
 
   int m_reentryDepth;

@@ -56,11 +56,8 @@ class Parser {
     UnsupportedParentheses,
   };
 
-  Parser(const UString& pattern,
-         bool ignoreCase,
-         bool multiline,
-         AssemblerBuffer* assemblerBuffer)
-      : m_generator(*this, assemblerBuffer),
+  Parser(const UString& pattern, bool ignoreCase, bool multiline)
+      : m_generator(*this),
         m_data(pattern.data()),
         m_size(pattern.size()),
         m_ignoreCase(ignoreCase),

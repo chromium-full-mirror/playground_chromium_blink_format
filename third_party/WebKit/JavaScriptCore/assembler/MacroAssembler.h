@@ -44,8 +44,7 @@ class MacroAssembler {
   // Note: do not rely on values in this enum, these will change (to 0..3).
   enum Scale { TimesOne = 1, TimesTwo = 2, TimesFour = 4, TimesEight = 8 };
 
-  MacroAssembler(AssemblerBuffer* assemblerBuffer)
-      : m_assembler(assemblerBuffer) {}
+  MacroAssembler() {}
 
   void* copyCode() { return m_assembler.executableCopy(); }
 
