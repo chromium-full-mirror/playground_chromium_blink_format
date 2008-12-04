@@ -584,6 +584,9 @@ void CompositeAnimationPrivate::setWaitingForStyleAvailable(bool waiting) {
 
 bool CompositeAnimationPrivate::pauseAnimationAtTime(const AtomicString& name,
                                                      double t) {
+  if (!name)
+    return false;
+
   RefPtr<KeyframeAnimation> keyframeAnim =
       m_keyframeAnimations.get(name.impl());
   if (!keyframeAnim || !keyframeAnim->running())
@@ -599,6 +602,10 @@ bool CompositeAnimationPrivate::pauseAnimationAtTime(const AtomicString& name,
 }
 
 bool CompositeAnimationPrivate::pauseTransitionAtTime(int property, double t) {
+  if ((property < firstCSSProperty) ||
+      (property >= firstCSSProperty + numCSSProperties))
+    return false;
+
   ImplicitAnimation* implAnim = m_transitions.get(property).get();
   if (!implAnim || !implAnim->running())
     return false;
