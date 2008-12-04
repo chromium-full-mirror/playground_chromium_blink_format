@@ -466,6 +466,11 @@ class JIT {
   void compileOpCallInitializeCallFrame();
   void compileOpCallSetupArgs(Instruction*);
   void compileOpCallEvalSetupArgs(Instruction*);
+  void compileOpCallSlowCase(Instruction* instruction,
+                             unsigned i,
+                             Vector<SlowCaseEntry>::iterator& iter,
+                             unsigned callLinkInfoIndex,
+                             OpcodeID opcodeID);
   void compileOpConstructSetupArgs(Instruction*);
   enum CompileOpStrictEqType { OpStrictEq, OpNStrictEq };
   void compileOpStrictEq(Instruction* instruction,
