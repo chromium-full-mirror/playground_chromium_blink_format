@@ -40,7 +40,6 @@ class JSDOMWindowShell;
 class JSEventListener;
 class JSLocation;
 class JSUnprotectedEventListener;
-class PausedTimeouts;
 class ScheduledAction;
 class SecurityOrigin;
 
@@ -81,10 +80,7 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
                      const JSC::ArgList& args,
                      int t,
                      bool singleShot);
-  void removeTimeout(int timerId, bool delAction = true);
-
-  void pauseTimeouts(OwnPtr<PausedTimeouts>&);
-  void resumeTimeouts(OwnPtr<PausedTimeouts>&);
+  void removeTimeout(int timeoutId);
 
   void timerFired(DOMTimer*);
 
@@ -117,8 +113,6 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
 
   static JSC::JSGlobalData* commonJSGlobalData();
 
-  void clearAllTimeouts();
-
  private:
   struct JSDOMWindowBaseData : public JSDOMGlobalObjectData {
     JSDOMWindowBaseData(PassRefPtr<DOMWindow>, JSDOMWindowShell*);
@@ -127,9 +121,6 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
 
     JSC::JSValue** returnValueSlot;
     JSDOMWindowShell* shell;
-
-    typedef HashMap<int, DOMTimer*> TimeoutsMap;
-    TimeoutsMap timeouts;
   };
 
   static JSC::JSValue* childFrameGetter(JSC::ExecState*,

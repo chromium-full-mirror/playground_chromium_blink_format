@@ -54,7 +54,6 @@
 #include "Logging.h"
 #include "MediaPlayer.h"
 #include "Page.h"
-#include "PausedTimeouts.h"
 #include "PlatformScreen.h"
 #include "PluginInfoStore.h"
 #include "RenderView.h"
@@ -194,8 +193,6 @@ void JSDOMWindowBase::updateDocument() {
 JSDOMWindowBase::~JSDOMWindowBase() {
   if (d()->impl->frame())
     d()->impl->frame()->script()->clearFormerWindow(asJSDOMWindow(this));
-
-  clearAllTimeouts();
 }
 
 ScriptExecutionContext* JSDOMWindowBase::scriptExecutionContext() const {
@@ -825,7 +822,6 @@ void JSDOMWindowBase::clear() {
   if (d()->returnValueSlot && !*d()->returnValueSlot)
     *d()->returnValueSlot = getDirect(Identifier(globalExec(), "returnValue"));
 
-  clearAllTimeouts();
   clearHelperObjectProperties();
 }
 
@@ -975,18 +971,15 @@ void JSDOMWindowBase::setReturnValueSlot(JSValue** slot) {
 
 ////////////////////// timeouts ////////////////////////
 
-void JSDOMWindowBase::clearAllTimeouts() {
-  deleteAllValues(d()->timeouts);
-  d()->timeouts.clear();
-}
-
 int JSDOMWindowBase::installTimeout(ScheduledAction* a,
                                     int t,
                                     bool singleShot) {
-  DOMTimer* timer = new DOMTimer(this, a);
+  DOMTimer* timer = new DOMTimer(scriptExecutionContext(), a);
   int timeoutId = timer->timeoutId();
-  ASSERT(!d()->timeouts.get(timeoutId));
-  d()->timeouts.set(timeoutId, timer);
+
+  ASSERT(d()->impl->document());
+  d()->impl->document()->addTimeout(timeoutId, timer);
+
   // Use a minimum interval of 10 ms to match other browsers, but only once
   // we've
   // nested enough to notice that we're repeating.
@@ -1016,56 +1009,15 @@ int JSDOMWindowBase::installTimeout(ExecState* exec,
   return installTimeout(new ScheduledAction(exec, func, args), t, singleShot);
 }
 
-void JSDOMWindowBase::pauseTimeouts(OwnPtr<PausedTimeouts>& result) {
-  size_t timeoutsCount = d()->timeouts.size();
-  if (!timeoutsCount) {
-    result.clear();
-    return;
-  }
-
-  PausedTimeout* t = new PausedTimeout[timeoutsCount];
-  result.set(new PausedTimeouts(t, timeoutsCount));
-
-  JSDOMWindowBaseData::TimeoutsMap::iterator it = d()->timeouts.begin();
-  for (size_t i = 0; i != timeoutsCount; ++i, ++it) {
-    int timeoutId = it->first;
-    DOMTimer* timer = it->second;
-    t[i].timeoutId = timeoutId;
-    t[i].nestingLevel = timer->nestingLevel();
-    t[i].nextFireInterval = timer->nextFireInterval();
-    t[i].repeatInterval = timer->repeatInterval();
-    t[i].action = timer->takeAction();
-  }
-  ASSERT(it == d()->timeouts.end());
-
-  deleteAllValues(d()->timeouts);
-  d()->timeouts.clear();
-}
-
-void JSDOMWindowBase::resumeTimeouts(OwnPtr<PausedTimeouts>& timeouts) {
-  if (!timeouts)
-    return;
-  size_t count = timeouts->numTimeouts();
-  PausedTimeout* array = timeouts->takeTimeouts();
-  for (size_t i = 0; i != count; ++i) {
-    int timeoutId = array[i].timeoutId;
-    DOMTimer* timer =
-        new DOMTimer(timeoutId, array[i].nestingLevel, this, array[i].action);
-    d()->timeouts.set(timeoutId, timer);
-    timer->start(array[i].nextFireInterval, array[i].repeatInterval);
-  }
-  delete[] array;
-  timeouts.clear();
-}
-
-void JSDOMWindowBase::removeTimeout(int timeoutId, bool delAction) {
+void JSDOMWindowBase::removeTimeout(int timeoutId) {
   // timeout IDs have to be positive, and 0 and -1 are unsafe to
   // even look up since they are the empty and deleted value
   // respectively
   if (timeoutId <= 0)
     return;
 
-  delete d()->timeouts.take(timeoutId);
+  ASSERT(d()->impl->document());
+  d()->impl->document()->removeTimeout(timeoutId);
 }
 
 void JSDOMWindowBase::timerFired(DOMTimer* timer) {
@@ -1076,7 +1028,8 @@ void JSDOMWindowBase::timerFired(DOMTimer* timer) {
     timer->action()->execute(shell());
     // The DOMTimer object may have been deleted or replaced during execution,
     // so we re-fetch it.
-    timer = d()->timeouts.get(timeoutId);
+    ASSERT(d()->impl->document());
+    timer = d()->impl->document()->findTimeout(timeoutId);
     if (!timer)
       return;
 
@@ -1092,17 +1045,14 @@ void JSDOMWindowBase::timerFired(DOMTimer* timer) {
 
   // Delete timer before executing the action for one-shot timers.
   ScheduledAction* action = timer->takeAction();
-  d()->timeouts.remove(timer->timeoutId());
-  delete timer;
+  removeTimeout(timer->timeoutId());
   action->execute(shell());
 
   JSLock lock(false);
   delete action;
 }
 
-void JSDOMWindowBase::disconnectFrame() {
-  clearAllTimeouts();
-}
+void JSDOMWindowBase::disconnectFrame() {}
 
 JSValue* toJS(ExecState*, DOMWindow* domWindow) {
   if (!domWindow)

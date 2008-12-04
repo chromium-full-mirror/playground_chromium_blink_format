@@ -65,6 +65,7 @@ class Comment;
 class Database;
 class DOMImplementation;
 class DOMSelection;
+class DOMTimer;
 class DOMWindow;
 class DatabaseThread;
 class DocLoader;
@@ -911,6 +912,10 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                                int lineNumber,
                                const String& sourceURL);
 
+  void addTimeout(int timeoutId, DOMTimer*);
+  void removeTimeout(int timeoutId);
+  DOMTimer* findTimeout(int timeoutId);
+
  protected:
   Document(Frame*, bool isXHTML);
 
@@ -1248,6 +1253,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 #if USE(LOW_BANDWIDTH_DISPLAY)
   bool m_inLowBandwidthDisplay;
 #endif
+
+  typedef HashMap<int, DOMTimer*> TimeoutsMap;
+  TimeoutsMap m_timeouts;
 };
 
 inline bool Document::hasElementWithId(AtomicStringImpl* id) const {

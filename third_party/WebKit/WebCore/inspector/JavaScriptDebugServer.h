@@ -45,7 +45,6 @@ class Frame;
 class FrameView;
 class Page;
 class PageGroup;
-class PausedTimeouts;
 class JavaScriptCallFrame;
 class JavaScriptDebugListener;
 
@@ -141,7 +140,6 @@ class JavaScriptDebugServer : JSC::Debugger {
   bool m_doneProcessingDebuggerEvents;
   JavaScriptCallFrame* m_pauseOnCallFrame;
   RefPtr<JavaScriptCallFrame> m_currentCallFrame;
-  HashMap<RefPtr<Frame>, PausedTimeouts*> m_pausedTimeouts;
   HashMap<intptr_t, HashSet<unsigned>*> m_breakpoints;
   Timer<JavaScriptDebugServer> m_recompileTimer;
 };

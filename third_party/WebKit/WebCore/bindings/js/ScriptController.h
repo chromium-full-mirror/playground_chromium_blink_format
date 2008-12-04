@@ -111,9 +111,6 @@ class ScriptController {
   }
   void updateDocument();
 
-  void pauseTimeouts(OwnPtr<PausedTimeouts>&);
-  void resumeTimeouts(OwnPtr<PausedTimeouts>&);
-
   void clearScriptObjects();
   void cleanupScriptObjectsForPlugin(void*);
 

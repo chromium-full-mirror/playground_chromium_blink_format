@@ -42,7 +42,6 @@
 #include "Logging.h"
 #include "Page.h"
 #include "PageGroup.h"
-#include "PausedTimeouts.h"
 #include "SystemTime.h"
 #include "ScriptController.h"
 #include <runtime/JSLock.h>
@@ -84,7 +83,6 @@ CachedPage::CachedPage(Page* page)
   ScriptController* proxy = mainFrame->script();
   if (proxy->haveWindowShell()) {
     m_window = proxy->windowShell()->window();
-    m_window->pauseTimeouts(m_pausedTimeouts);
   }
 
   m_document->setInPageCache(true);
@@ -110,7 +108,6 @@ void CachedPage::restore(Page* page) {
     JSDOMWindowShell* windowShell = proxy->windowShell();
     if (m_window) {
       windowShell->setWindow(m_window.get());
-      windowShell->window()->resumeTimeouts(m_pausedTimeouts);
     } else {
       windowShell->setWindow(mainFrame->domWindow());
       proxy->attachDebugger(page->debugger());
@@ -167,7 +164,6 @@ void CachedPage::clear() {
   m_URL = KURL();
 
   JSLock lock(false);
-  m_pausedTimeouts.clear();
   m_window = 0;
 
   m_cachedPagePlatformData.clear();

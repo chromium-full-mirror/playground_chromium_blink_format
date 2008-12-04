@@ -27,6 +27,7 @@
 #ifndef DOMTimer_h
 #define DOMTimer_h
 
+#include "ActiveDOMObject.h"
 #include "Timer.h"
 
 namespace WebCore {
@@ -34,13 +35,10 @@ namespace WebCore {
 class JSDOMWindowBase;
 class ScheduledAction;
 
-class DOMTimer : public TimerBase {
+class DOMTimer : public TimerBase, public ActiveDOMObject {
  public:
   // Creates a new timer with the next id and nesting level.
-  DOMTimer(JSDOMWindowBase*, ScheduledAction*);
-  // Creates a timer from PausedTimeout, takes timeoutId and nestingLevel as
-  // they were persisted.
-  DOMTimer(int timeoutId, int nestingLevel, JSDOMWindowBase*, ScheduledAction*);
+  DOMTimer(ScriptExecutionContext*, ScheduledAction*);
   virtual ~DOMTimer();
 
   int timeoutId() const { return m_timeoutId; }
@@ -55,14 +53,23 @@ class DOMTimer : public TimerBase {
     return a;
   }
 
+  // ActiveDOMObject
+  virtual bool hasPendingActivity() const;
+  virtual void contextDestroyed();
+  virtual void stop();
+  virtual bool canSuspend() const;
+  virtual void suspend();
+  virtual void resume();
+
  private:
   virtual void fired();
 
   int m_timeoutId;
   int m_nestingLevel;
-  JSDOMWindowBase* m_object;
   ScheduledAction* m_action;
   static int m_timerNestingLevel;
+  double m_nextFireInterval;
+  double m_repeatInterval;
 };
 
 }  // namespace WebCore
