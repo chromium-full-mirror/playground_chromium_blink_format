@@ -911,6 +911,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   virtual void reportException(const String& errorMessage,
                                int lineNumber,
                                const String& sourceURL);
+  virtual void postTask(PassRefPtr<Task>);  // Executes the task on context's
+                                            // thread asynchronously.
 
   void addTimeout(int timeoutId, DOMTimer*);
   void removeTimeout(int timeoutId);
