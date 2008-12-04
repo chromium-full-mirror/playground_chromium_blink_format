@@ -177,11 +177,24 @@ COMPropertyBag<ValueType, HashType>::Write(LPCOLESTR pszPropName,
 template <typename ValueType, typename HashType>
 HRESULT STDMETHODCALLTYPE
 COMPropertyBag<ValueType, HashType>::Read(ULONG cProperties,
-                                          PROPBAG2*,
-                                          IErrorLog*,
+                                          PROPBAG2* pPropBag,
+                                          IErrorLog* pErrorLog,
                                           VARIANT* pvarValue,
                                           HRESULT* phrError) {
-  return E_NOTIMPL;
+  if (!pPropBag || !pvarValue || !phrError)
+    return E_POINTER;
+
+  HRESULT hr = S_OK;
+
+  for (ULONG i = 0; i < cProperties; ++i) {
+    VariantInit(&pvarValue[i]);
+    pvarValue[i].vt = pPropBag[i].vt;
+    phrError[i] = Read(pPropBag[i].pstrName, &pvarValue[i], pErrorLog);
+    if (FAILED(phrError[i]))
+      hr = E_FAIL;
+  }
+
+  return hr;
 }
 
 template <typename ValueType, typename HashType>
@@ -222,13 +235,12 @@ COMPropertyBag<ValueType, HashType>::GetPropertyInfo(ULONG iProperty,
     ;
   for (ULONG j = 0; j < cProperties && current != end; ++j, ++current) {
     // FIXME: the following fields aren't filled in
-    // pPropBag[j].dwType;   // (DWORD) Type of property. This will be one of
-    // the PROPBAG2_TYPE values.
     // pPropBag[j].cfType;   // (CLIPFORMAT) Clipboard format or MIME type of
     // the property.
     // pPropBag[j].clsid;    // (CLSID) CLSID of the object. This member is
     // valid only if dwType is PROPBAG2_TYPE_OBJECT.
 
+    pPropBag[j].dwType = PROPBAG2_TYPE_DATA;
     pPropBag[j].vt = COMVariantSetter<ValueType>::VariantType;
     pPropBag[j].dwHint = iProperty + j;
     pPropBag[j].pstrName = (LPOLESTR)CoTaskMemAlloc(
