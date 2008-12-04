@@ -34,7 +34,10 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLMapElement::HTMLMapElement(Document* doc) : HTMLElement(mapTag, doc) {}
+HTMLMapElement::HTMLMapElement(const QualifiedName& tagName, Document* doc)
+    : HTMLElement(tagName, doc) {
+  ASSERT(hasTagName(mapTag));
+}
 
 HTMLMapElement::~HTMLMapElement() {
   document()->removeImageMap(this);

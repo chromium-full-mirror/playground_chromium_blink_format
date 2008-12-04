@@ -32,10 +32,12 @@
 #include "Event.h"
 #include "EventNames.h"
 #include "Frame.h"
+#include "HTMLNames.h"
 
 namespace WebCore {
 
-DeleteButton::DeleteButton(Document* document) : HTMLImageElement(document) {}
+DeleteButton::DeleteButton(Document* document)
+    : HTMLImageElement(HTMLNames::imgTag, document) {}
 
 void DeleteButton::defaultEventHandler(Event* event) {
   if (event->isMouseEvent()) {

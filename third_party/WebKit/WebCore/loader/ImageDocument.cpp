@@ -79,7 +79,8 @@ class ImageTokenizer : public Tokenizer {
 class ImageDocumentElement : public HTMLImageElement {
  public:
   ImageDocumentElement(ImageDocument* doc)
-      : HTMLImageElement(doc), m_imageDocument(doc) {}
+      : HTMLImageElement(imgTag, doc), m_imageDocument(doc) {}
+
   virtual ~ImageDocumentElement();
   virtual void willMoveToNewOwnerDocument();
 

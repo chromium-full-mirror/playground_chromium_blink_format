@@ -41,13 +41,15 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLTableElement::HTMLTableElement(Document* doc)
-    : HTMLElement(tableTag, doc),
+HTMLTableElement::HTMLTableElement(const QualifiedName& tagName, Document* doc)
+    : HTMLElement(tagName, doc),
       m_borderAttr(false),
       m_borderColorAttr(false),
       m_frameAttr(false),
       m_rulesAttr(UnsetRules),
-      m_padding(1) {}
+      m_padding(1) {
+  ASSERT(hasTagName(tableTag));
+}
 
 bool HTMLTableElement::checkDTD(const Node* newChild) {
   if (newChild->isTextNode())
@@ -149,7 +151,7 @@ PassRefPtr<HTMLElement> HTMLTableElement::createCaption() {
   if (HTMLTableCaptionElement* existingCaption = caption())
     return existingCaption;
   RefPtr<HTMLTableCaptionElement> caption =
-      new HTMLTableCaptionElement(document());
+      new HTMLTableCaptionElement(captionTag, document());
   ExceptionCode ec;
   setCaption(caption, ec);
   return caption.release();
@@ -201,14 +203,16 @@ PassRefPtr<HTMLElement> HTMLTableElement::insertRow(int index,
     if (!parent) {
       RefPtr<HTMLTableSectionElement> newBody =
           new HTMLTableSectionElement(tbodyTag, document());
-      RefPtr<HTMLTableRowElement> newRow = new HTMLTableRowElement(document());
+      RefPtr<HTMLTableRowElement> newRow =
+          new HTMLTableRowElement(trTag, document());
       newBody->appendChild(newRow, ec);
       appendChild(newBody.release(), ec);
       return newRow.release();
     }
   }
 
-  RefPtr<HTMLTableRowElement> newRow = new HTMLTableRowElement(document());
+  RefPtr<HTMLTableRowElement> newRow =
+      new HTMLTableRowElement(trTag, document());
   parent->insertBefore(newRow, row, ec);
   return newRow.release();
 }

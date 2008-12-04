@@ -55,7 +55,7 @@ class CanvasObserver {
 
 class HTMLCanvasElement : public HTMLElement {
  public:
-  HTMLCanvasElement(Document*);
+  HTMLCanvasElement(const QualifiedName&, Document*);
   virtual ~HTMLCanvasElement();
 
 #if ENABLE(DASHBOARD_SUPPORT)

@@ -32,7 +32,7 @@ class HTMLImageLoader;
 
 class HTMLAppletElement : public HTMLPlugInElement {
  public:
-  HTMLAppletElement(Document*);
+  HTMLAppletElement(const QualifiedName&, Document*);
   ~HTMLAppletElement();
 
   virtual int tagPriority() const { return 1; }

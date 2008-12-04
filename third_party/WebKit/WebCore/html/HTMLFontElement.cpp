@@ -33,8 +33,11 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLFontElement::HTMLFontElement(Document* document)
-    : HTMLElement(fontTag, document) {}
+HTMLFontElement::HTMLFontElement(const QualifiedName& tagName,
+                                 Document* document)
+    : HTMLElement(tagName, document) {
+  ASSERT(hasTagName(fontTag));
+}
 
 // Allows leading spaces.
 // Allows trailing nonnumeric characters.

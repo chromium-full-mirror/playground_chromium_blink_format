@@ -22,6 +22,7 @@
 #include "JSImageConstructor.h"
 
 #include "HTMLImageElement.h"
+#include "HTMLNames.h"
 #include "JSNode.h"
 #include "ScriptExecutionContext.h"
 
@@ -67,7 +68,8 @@ static JSObject* constructImage(ExecState* exec,
   // necessary).
   toJS(exec, document);
 
-  RefPtr<HTMLImageElement> image = new HTMLImageElement(document);
+  RefPtr<HTMLImageElement> image =
+      new HTMLImageElement(HTMLNames::imgTag, document);
   if (widthSet)
     image->setWidth(width);
   if (heightSet)
