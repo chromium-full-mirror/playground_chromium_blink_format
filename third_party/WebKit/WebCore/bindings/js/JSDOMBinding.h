@@ -26,6 +26,7 @@
 #include <runtime/Completion.h>
 #include <runtime/Lookup.h>
 #include <runtime/JSFunction.h>
+#include "ScriptState.h"
 #include <wtf/Noncopyable.h>
 
 namespace JSC {
@@ -228,7 +229,7 @@ JSC::JSValue* objectToStringFunctionGetter(JSC::ExecState*,
                                            const JSC::Identifier& propertyName,
                                            const JSC::PropertySlot&);
 
-JSC::ExecState* execStateFromNode(Node*);
+ScriptState* scriptStateFromNode(Node*);
 
 }  // namespace WebCore
 

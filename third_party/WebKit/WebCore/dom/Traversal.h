@@ -25,12 +25,9 @@
 #ifndef Traversal_h
 #define Traversal_h
 
+#include "ScriptState.h"
 #include <wtf/Forward.h>
 #include <wtf/RefPtr.h>
-
-namespace JSC {
-class ExecState;
-}
 
 namespace WebCore {
 
@@ -49,7 +46,7 @@ class Traversal {
             unsigned whatToShow,
             PassRefPtr<NodeFilter>,
             bool expandEntityReferences);
-  short acceptNode(JSC::ExecState*, Node*) const;
+  short acceptNode(ScriptState*, Node*) const;
 
  private:
   RefPtr<Node> m_root;

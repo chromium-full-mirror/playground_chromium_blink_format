@@ -25,12 +25,10 @@
 #include "config.h"
 #include "NodeIterator.h"
 
-#include <interpreter/CallFrame.h>
 #include "Document.h"
 #include "ExceptionCode.h"
 #include "NodeFilter.h"
-
-using namespace JSC;
+#include "ScriptState.h"
 
 namespace WebCore {
 
@@ -79,7 +77,7 @@ NodeIterator::~NodeIterator() {
   root()->document()->detachNodeIterator(this);
 }
 
-PassRefPtr<Node> NodeIterator::nextNode(ExecState* exec, ExceptionCode& ec) {
+PassRefPtr<Node> NodeIterator::nextNode(ScriptState* state, ExceptionCode& ec) {
   if (m_detached) {
     ec = INVALID_STATE_ERR;
     return 0;
@@ -94,8 +92,8 @@ PassRefPtr<Node> NodeIterator::nextNode(ExecState* exec, ExceptionCode& ec) {
     // of the rejected node. Hence, FILTER_REJECT is the same as FILTER_SKIP.
     RefPtr<Node> provisionalResult = m_candidateNode.node;
     bool nodeWasAccepted =
-        acceptNode(exec, provisionalResult.get()) == NodeFilter::FILTER_ACCEPT;
-    if (exec && exec->hadException())
+        acceptNode(state, provisionalResult.get()) == NodeFilter::FILTER_ACCEPT;
+    if (state && state->hadException())
       break;
     if (nodeWasAccepted) {
       m_referenceNode = m_candidateNode;
@@ -108,7 +106,7 @@ PassRefPtr<Node> NodeIterator::nextNode(ExecState* exec, ExceptionCode& ec) {
   return result.release();
 }
 
-PassRefPtr<Node> NodeIterator::previousNode(ExecState* exec,
+PassRefPtr<Node> NodeIterator::previousNode(ScriptState* state,
                                             ExceptionCode& ec) {
   if (m_detached) {
     ec = INVALID_STATE_ERR;
@@ -124,8 +122,8 @@ PassRefPtr<Node> NodeIterator::previousNode(ExecState* exec,
     // of the rejected node. Hence, FILTER_REJECT is the same as FILTER_SKIP.
     RefPtr<Node> provisionalResult = m_candidateNode.node;
     bool nodeWasAccepted =
-        acceptNode(exec, provisionalResult.get()) == NodeFilter::FILTER_ACCEPT;
-    if (exec && exec->hadException())
+        acceptNode(state, provisionalResult.get()) == NodeFilter::FILTER_ACCEPT;
+    if (state && state->hadException())
       break;
     if (nodeWasAccepted) {
       m_referenceNode = m_candidateNode;

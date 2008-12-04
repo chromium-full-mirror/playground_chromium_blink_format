@@ -485,7 +485,7 @@ JSValue* objectToStringFunctionGetter(ExecState* exec,
       PrototypeFunction(exec, 0, propertyName, objectProtoFuncToString);
 }
 
-ExecState* execStateFromNode(Node* node) {
+ScriptState* scriptStateFromNode(Node* node) {
   if (!node)
     return 0;
   Document* document = node->document();

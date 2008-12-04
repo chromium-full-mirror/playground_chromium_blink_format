@@ -46,8 +46,8 @@ class NodeIterator : public RefCounted<NodeIterator>, public Traversal {
   }
   ~NodeIterator();
 
-  PassRefPtr<Node> nextNode(JSC::ExecState*, ExceptionCode&);
-  PassRefPtr<Node> previousNode(JSC::ExecState*, ExceptionCode&);
+  PassRefPtr<Node> nextNode(ScriptState*, ExceptionCode&);
+  PassRefPtr<Node> previousNode(ScriptState*, ExceptionCode&);
   void detach();
 
   Node* referenceNode() const { return m_referenceNode.node.get(); }
@@ -60,10 +60,10 @@ class NodeIterator : public RefCounted<NodeIterator>, public Traversal {
 
   // For non-JS bindings. Silently ignores the JavaScript exception if any.
   PassRefPtr<Node> nextNode(ExceptionCode& ec) {
-    return nextNode(execStateFromNode(referenceNode()), ec);
+    return nextNode(scriptStateFromNode(referenceNode()), ec);
   }
   PassRefPtr<Node> previousNode(ExceptionCode& ec) {
-    return previousNode(execStateFromNode(referenceNode()), ec);
+    return previousNode(scriptStateFromNode(referenceNode()), ec);
   }
 
  private:
