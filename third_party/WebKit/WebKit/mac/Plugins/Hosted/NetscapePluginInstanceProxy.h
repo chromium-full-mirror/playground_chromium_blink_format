@@ -36,7 +36,6 @@
 #include <wtf/RetainPtr.h>
 
 @class WebHostedNetscapePluginView;
-@class WebPluginRequest;
 
 namespace WebKit {
 
@@ -60,6 +59,8 @@ class NetscapePluginInstanceProxy
   uint32_t pluginID() const { return m_pluginID; }
   uint32_t renderContextID() const { return m_renderContextID; }
   bool useSoftwareRenderer() const { return m_useSoftwareRenderer; }
+  WebHostedNetscapePluginView* pluginView() const { return m_pluginView; }
+  NetscapePluginHostProxy* hostProxy() const { return m_pluginHostProxy; }
 
   void pluginHostDied();
 
@@ -81,14 +82,17 @@ class NetscapePluginInstanceProxy
                   uint32_t postDataLength,
                   bool postDataIsFile,
                   bool currentEventIsUserGesture,
-                  uint32_t& streamID);
+                  uint32_t& requestID);
 
  private:
   NPError loadRequest(NSURLRequest*,
                       const char* cTarget,
                       bool currentEventIsUserGesture,
                       uint32_t& streamID);
-  void performRequest(WebPluginRequest*);
+
+  class PluginRequest;
+  void performRequest(PluginRequest*);
+  void evaluateJavaScript(PluginRequest*);
 
   NetscapePluginInstanceProxy(NetscapePluginHostProxy*,
                               WebHostedNetscapePluginView*,
@@ -101,7 +105,9 @@ class NetscapePluginInstanceProxy
 
   void requestTimerFired(WebCore::Timer<NetscapePluginInstanceProxy>*);
   WebCore::Timer<NetscapePluginInstanceProxy> m_requestTimer;
-  Deque<RetainPtr<WebPluginRequest>> m_pluginRequests;
+  Deque<PluginRequest*> m_pluginRequests;
+
+  uint32_t m_currentRequestID;
 
   uint32_t m_pluginID;
   uint32_t m_renderContextID;
