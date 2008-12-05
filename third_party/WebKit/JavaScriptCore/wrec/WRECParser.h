@@ -90,6 +90,12 @@ class Parser {
     }
   }
 
+  void parseAlternative(MacroAssembler::Label& label) {
+    JumpList failures;
+    parseAlternative(failures);
+    failures.linkTo(label);
+  }
+
   void parseDisjunction(JumpList& failures);
   bool parseTerm(JumpList& failures);
   bool parseEscape(JumpList& failures, const Escape&);
