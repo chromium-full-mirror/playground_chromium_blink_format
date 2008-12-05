@@ -190,7 +190,7 @@ class Interpreter {
 
 #if ENABLE(JIT)
 
-  static void SFX_CALL cti_timeout_check(CTI_ARGS);
+  static int SFX_CALL cti_timeout_check(CTI_ARGS);
   static void SFX_CALL cti_register_file_check(CTI_ARGS);
 
   static JSObject* SFX_CALL cti_op_convert_this(CTI_ARGS);
