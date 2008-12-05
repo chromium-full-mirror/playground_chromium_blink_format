@@ -100,6 +100,11 @@ class ResourceRequestBase {
     setHTTPHeaderField("Accept", httpAccept);
   }
 
+  void setResponseContentDispositionEncodingFallbackArray(
+      const String& encoding1,
+      const String& encoding2 = String(),
+      const String& encoding3 = String());
+
   FormData* httpBody() const;
   void setHTTPBody(PassRefPtr<FormData> httpBody);
 
@@ -133,6 +138,7 @@ class ResourceRequestBase {
   KURL m_mainDocumentURL;
   String m_httpMethod;
   HTTPHeaderMap m_httpHeaderFields;
+  Vector<String> m_responseContentDispositionEncodingFallbackArray;
   RefPtr<FormData> m_httpBody;
   bool m_allowHTTPCookies;
   mutable bool m_resourceRequestUpdated;
