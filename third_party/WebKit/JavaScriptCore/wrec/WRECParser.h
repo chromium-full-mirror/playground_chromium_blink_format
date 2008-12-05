@@ -41,9 +41,10 @@ namespace WREC {
 
 struct CharacterClass;
 
-typedef Generator::JumpList JumpList;
-
 class Parser {
+  typedef Generator::JumpList JumpList;
+  typedef Generator::ParenthesesType ParenthesesType;
+
  public:
   enum Error {
     NoError,
@@ -52,7 +53,6 @@ class Parser {
     MalformedPattern,
     MalformedQuantifier,
     MalformedEscape,
-    UnsupportedQuantifier,
     UnsupportedParentheses,
   };
 
@@ -167,6 +167,7 @@ class Parser {
   ALWAYS_INLINE Quantifier consumeGreedyQuantifier();
   Quantifier consumeQuantifier();
   Escape consumeEscape(bool inCharacterClass);
+  ParenthesesType consumeParenthesesType();
 
   static const int EndOfPattern = -1;
 
