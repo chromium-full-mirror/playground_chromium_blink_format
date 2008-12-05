@@ -213,17 +213,17 @@ ALWAYS_INLINE JmpSrc JIT::emitNakedCall(unsigned bytecodeIndex,
 ALWAYS_INLINE void JIT::restoreArgumentReference() {
 #if USE(CTI_ARGUMENT)
 #if USE(FAST_CALL_CTI_ARGUMENT)
-  movl_rr(X86::esp, X86::ecx);
+  __ movl_rr(X86::esp, X86::ecx);
 #else
-  movl_rm(X86::esp, 0, X86::esp);
+  __ movl_rm(X86::esp, 0, X86::esp);
 #endif
 #endif
 }
 
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {
 #if USE(CTI_ARGUMENT) && USE(FAST_CALL_CTI_ARGUMENT)
-  movl_rr(X86::esp, X86::ecx);
-  addl_i32r(4, X86::ecx);
+  __ movl_rr(X86::esp, X86::ecx);
+  __ addl_i32r(4, X86::ecx);
 #endif
 }
 
