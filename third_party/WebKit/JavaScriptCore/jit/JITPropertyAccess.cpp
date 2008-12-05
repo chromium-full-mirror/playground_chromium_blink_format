@@ -362,7 +362,7 @@ void JIT::privateCompilePutByIdTransition(Structure* oldStructure,
   if (failureCases.size()) {
     for (unsigned i = 0; i < failureCases.size(); ++i)
       __ link(failureCases[i], __ label());
-    __ restoreArgumentReferenceForTrampoline();
+    restoreArgumentReferenceForTrampoline();
     failureJump = __ jmp();
   }
 
