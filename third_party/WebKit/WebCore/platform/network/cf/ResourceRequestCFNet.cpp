@@ -132,12 +132,13 @@ void ResourceRequest::doUpdatePlatformRequest() {
         AdoptCF,
         m_responseContentDispositionEncodingFallbackArray[i].createCFString());
     CFStringEncoding encoding =
-        CFStringConvertIANACharSetNameToEncoding(encodingName);
+        CFStringConvertIANACharSetNameToEncoding(encodingName.get());
     if (encoding != kCFStringEncodingInvalidId)
-      CFArrayAppendValue(encodingFallbacks,
+      CFArrayAppendValue(encodingFallbacks.get(),
                          reinterpret_cast<const void*>(encoding));
   }
-  setContentDispositionEncodingFallbackArray(cfRequest, encodingFallbacks);
+  setContentDispositionEncodingFallbackArray(cfRequest,
+                                             encodingFallbacks.get());
 
   if (m_cfRequest) {
     RetainPtr<CFHTTPCookieStorageRef> cookieStorage(
@@ -183,10 +184,10 @@ void ResourceRequest::doUpdateResourceRequest() {
   RetainPtr<CFArrayRef> encodingFallbacks(
       AdoptCF, copyContentDispositionEncodingFallbackArray(m_cfRequest.get()));
   if (encodingFallbacks) {
-    CFIndex count = CFArrayGetCount(encodingFallbacks);
+    CFIndex count = CFArrayGetCount(encodingFallbacks.get());
     for (CFIndex i = 0; i < count; ++i) {
       CFStringEncoding encoding = reinterpret_cast<CFIndex>(
-          CFArrayGetValueAtIndex(encodingFallbacks, i));
+          CFArrayGetValueAtIndex(encodingFallbacks.get(), i));
       if (encoding != kCFStringEncodingInvalidId)
         m_responseContentDispositionEncodingFallbackArray.append(
             CFStringGetNameOfEncoding(encoding));
