@@ -31,6 +31,7 @@
 #include "Frame.h"
 #include "KURL.h"
 #include "markup.h"
+#include "NotImplemented.h"
 #include "PlatformString.h"
 
 #include <wx/defs.h>
@@ -59,10 +60,12 @@ void Pasteboard::writeSelection(Range* selectedRange,
 }
 
 bool Pasteboard::canSmartReplace() {
+  notImplemented();
   return false;
 }
 
 String Pasteboard::plainText(Frame* frame) {
+  notImplemented();
   return String();
 }
 
@@ -71,6 +74,19 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     PassRefPtr<Range> context,
     bool allowPlainText,
     bool& chosePlainText) {
+  RefPtr<DocumentFragment> fragment = 0;
+  if (wxTheClipboard->Open()) {
+    if (allowPlainText && wxTheClipboard->IsSupported(wxDF_TEXT)) {
+      wxTextDataObject data;
+      wxTheClipboard->GetData(data);
+      chosePlainText = true;
+      fragment = createFragmentFromText(context.get(), data.GetText());
+    }
+    wxTheClipboard->Close();
+  }
+  if (fragment)
+    return fragment.release();
+
   return 0;
 }
 
@@ -85,5 +101,7 @@ void Pasteboard::clear() {
   wxTheClipboard->Clear();
 }
 
-void Pasteboard::writeImage(Node*, const KURL&, const String& title) {}
+void Pasteboard::writeImage(Node*, const KURL&, const String& title) {
+  notImplemented();
+}
 }
