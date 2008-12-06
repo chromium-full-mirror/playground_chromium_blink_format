@@ -56,7 +56,7 @@ void JSActivation::mark() {
     return;
 
   size_t numParametersMinusThis =
-      d()->functionBody->generatedBytecode().numParameters - 1;
+      d()->functionBody->generatedBytecode().m_numParameters - 1;
 
   size_t i = 0;
   size_t count = numParametersMinusThis;
@@ -66,7 +66,7 @@ void JSActivation::mark() {
       r.mark();
   }
 
-  size_t numVars = d()->functionBody->generatedBytecode().numVars;
+  size_t numVars = d()->functionBody->generatedBytecode().m_numVars;
 
   // Skip the call frame, which sits between the parameters and vars.
   i += RegisterFile::CallFrameHeaderSize;

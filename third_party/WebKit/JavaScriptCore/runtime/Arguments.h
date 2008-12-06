@@ -120,7 +120,7 @@ ALWAYS_INLINE void Arguments::getArgumentsData(CallFrame* callFrame,
   function = callFrame->callee();
 
   CodeBlock* codeBlock = &function->body()->generatedBytecode();
-  int numParameters = codeBlock->numParameters;
+  int numParameters = codeBlock->m_numParameters;
   argc = callFrame->argumentCount();
 
   if (argc <= numParameters)
@@ -223,8 +223,8 @@ inline void JSActivation::copyRegisters(Arguments* arguments) {
   ASSERT(!d()->registerArray);
 
   size_t numParametersMinusThis =
-      d()->functionBody->generatedBytecode().numParameters - 1;
-  size_t numVars = d()->functionBody->generatedBytecode().numVars;
+      d()->functionBody->generatedBytecode().m_numParameters - 1;
+  size_t numVars = d()->functionBody->generatedBytecode().m_numVars;
   size_t numLocals = numVars + numParametersMinusThis;
 
   if (!numLocals)
