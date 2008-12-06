@@ -46,7 +46,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void notifyFinished(CachedResource*);
 
-  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
   bool build(FilterBuilder*);
 
  protected:

@@ -107,7 +107,7 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
 
   bool containsJavaApplet() const;
 
-  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
  private:
   void updateDocNamedItem();

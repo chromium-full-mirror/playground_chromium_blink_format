@@ -105,7 +105,7 @@ class HTMLTableElement : public HTMLElement {
   void addSharedCellDecls(Vector<CSSMutableStyleDeclaration*>&);
   void addSharedGroupDecls(bool rows, Vector<CSSMutableStyleDeclaration*>&);
 
-  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
  private:
   void addSharedCellBordersDecl(Vector<CSSMutableStyleDeclaration*>&);

@@ -101,9 +101,9 @@ bool SVGFEImageElement::build(FilterBuilder* builder) {
   return true;
 }
 
-void SVGFEImageElement::getSubresourceAttributeStrings(
-    Vector<String>& urls) const {
-  urls.append(href());
+void SVGFEImageElement::addSubresourceAttributeURLs(
+    ListHashSet<KURL>& urls) const {
+  addSubresourceURL(urls, document->completeURL(href()));
 }
 }
 

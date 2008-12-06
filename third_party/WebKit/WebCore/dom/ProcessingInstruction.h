@@ -79,7 +79,7 @@ class ProcessingInstruction : public ContainerNode,
   bool isXSL() const { return m_isXSL; }
 #endif
 
-  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
  private:
   void parseStyleSheet(const String& sheet);

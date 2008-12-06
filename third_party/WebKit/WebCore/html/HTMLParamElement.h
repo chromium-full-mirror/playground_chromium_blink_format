@@ -53,7 +53,7 @@ class HTMLParamElement : public HTMLElement {
   String valueType() const;
   void setValueType(const String&);
 
-  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
  protected:
   AtomicString m_name;

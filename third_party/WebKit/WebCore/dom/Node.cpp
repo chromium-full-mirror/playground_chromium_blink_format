@@ -1895,17 +1895,8 @@ bool NodeListsNodeData::isEmpty() const {
   return true;
 }
 
-void Node::getSubresourceURLs(Vector<KURL>& urls) const {
-  Vector<String> subresourceStrings;
-  getSubresourceAttributeStrings(subresourceStrings);
-
-  for (unsigned i = 0; i < subresourceStrings.size(); ++i) {
-    String& subresourceString(subresourceStrings[i]);
-
-    // FIXME: Is parseURL appropriate here?
-    if (subresourceString.length())
-      urls.append(document()->completeURL(parseURL(subresourceString)));
-  }
+void Node::getSubresourceURLs(ListHashSet<KURL>& urls) const {
+  addSubresourceAttributeURLs(urls);
 }
 
 // --------

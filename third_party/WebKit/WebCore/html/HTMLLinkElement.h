@@ -101,7 +101,7 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
                                    bool& icon,
                                    bool& dnsPrefetch);
 
-  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
   void setCreatedByParser(bool createdByParser) {
     m_createdByParser = createdByParser;

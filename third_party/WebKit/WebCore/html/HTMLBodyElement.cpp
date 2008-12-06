@@ -284,8 +284,8 @@ int HTMLBodyElement::scrollWidth() const {
   return view ? view->contentsWidth() : 0;
 }
 
-void HTMLBodyElement::getSubresourceAttributeStrings(
-    Vector<String>& urls) const {
-  urls.append(background());
+void HTMLBodyElement::addSubresourceAttributeURLs(
+    ListHashSet<KURL>& urls) const {
+  addSubresourceURL(urls, document()->completeURL(background()));
 }
 }

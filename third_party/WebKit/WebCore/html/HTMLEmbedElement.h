@@ -63,7 +63,7 @@ class HTMLEmbedElement : public HTMLPlugInImageElement {
   String type() const;
   void setType(const String&);
 
-  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
  private:
   bool m_needWidgetUpdate;

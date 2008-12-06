@@ -59,7 +59,7 @@ class SVGScriptElement : public SVGElement,
 
   virtual String scriptCharset() const;
 
-  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

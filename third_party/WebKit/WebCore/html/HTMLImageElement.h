@@ -117,7 +117,7 @@ class HTMLImageElement : public HTMLElement {
 
   bool haveFiredLoadEvent() const { return m_imageLoader.haveFiredLoadEvent(); }
 
-  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
  private:
   HTMLImageLoader m_imageLoader;
