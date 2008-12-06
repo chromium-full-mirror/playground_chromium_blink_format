@@ -44,17 +44,26 @@ class RenderStyle;
 // A CompositeAnimation represents a collection of animations that are running
 // on a single RenderObject, such as a number of properties transitioning at
 // once.
-class CompositeAnimation : public Noncopyable {
+class CompositeAnimation : public RefCounted<CompositeAnimation> {
  public:
-  CompositeAnimation(AnimationController* animationController);
+  static PassRefPtr<CompositeAnimation> create(
+      AnimationController* animationController) {
+    return adoptRef(new CompositeAnimation(animationController));
+  };
+
   ~CompositeAnimation();
+
+  void clearRenderer();
 
   PassRefPtr<RenderStyle> animate(RenderObject*,
                                   RenderStyle* currentStyle,
                                   RenderStyle* targetStyle);
   bool isAnimating() const;
 
+  AnimationController* animationController();
+
   void setWaitingForStyleAvailable(bool);
+  bool isWaitingForStyleAvailable() const;
 
   void suspendAnimations();
   void resumeAnimations();
@@ -74,6 +83,8 @@ class CompositeAnimation : public Noncopyable {
   bool pauseTransitionAtTime(int property, double t);
 
  private:
+  CompositeAnimation(AnimationController* animationController);
+
   CompositeAnimationPrivate* m_data;
 };
 
