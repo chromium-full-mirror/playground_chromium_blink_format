@@ -1765,8 +1765,6 @@ void JIT::privateCompileSlowCases() {
         break;
       }
       case op_loop_if_less: {
-        emitSlowScriptCheck(i);
-
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
             getConstantImmediateNumericArg(instruction[i + 2].u.operand);
@@ -1808,8 +1806,6 @@ void JIT::privateCompileSlowCases() {
         break;
       }
       case op_loop_if_lesseq: {
-        emitSlowScriptCheck(i);
-
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
             getConstantImmediateNumericArg(instruction[i + 2].u.operand);
@@ -1873,8 +1869,6 @@ void JIT::privateCompileSlowCases() {
         break;
       }
       case op_loop_if_true: {
-        emitSlowScriptCheck(i);
-
         __ link(iter->from, __ label());
         emitPutCTIArg(X86::eax, 0);
         emitCTICall(i, Interpreter::cti_op_jtrue);
