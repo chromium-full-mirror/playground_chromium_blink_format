@@ -63,12 +63,13 @@ const int NoXPosForVerticalArrowNavigation = INT_MIN;
 
 SelectionController::SelectionController(Frame* frame,
                                          bool isDragCaretController)
-    : m_needsLayout(true),
+    : m_frame(frame),
+      m_xPosForVerticalArrowNavigation(NoXPosForVerticalArrowNavigation),
+      m_needsLayout(true),
+      m_absCaretBoundsDirty(true),
       m_lastChangeWasHorizontalExtension(false),
-      m_frame(frame),
       m_isDragCaretController(isDragCaretController),
       m_isCaretBlinkingSuspended(false),
-      m_xPosForVerticalArrowNavigation(NoXPosForVerticalArrowNavigation),
       m_focused(false) {}
 
 void SelectionController::moveTo(const VisiblePosition& pos,
@@ -595,8 +596,8 @@ bool SelectionController::modify(EAlteration alter,
 }
 
 // FIXME: Maybe baseline would be better?
-static bool caretY(const VisiblePosition& c, int& y) {
-  IntRect rect = c.caretRect();
+static bool absoluteCaretY(const VisiblePosition& c, int& y) {
+  IntRect rect = c.absoluteCaretBounds();
   if (rect.isEmpty())
     return false;
   y = rect.y() + rect.height() / 2;
@@ -642,7 +643,7 @@ bool SelectionController::modify(EAlteration alter,
   }
 
   int startY;
-  if (!caretY(pos, startY))
+  if (!absoluteCaretY(pos, startY))
     return false;
   if (up)
     startY = -startY;
@@ -655,7 +656,7 @@ bool SelectionController::modify(EAlteration alter,
     if (next.isNull() || next == p)
       break;
     int nextY;
-    if (!caretY(next, nextY))
+    if (!absoluteCaretY(next, nextY))
       break;
     if (up)
       nextY = -nextY;
@@ -725,7 +726,9 @@ int SelectionController::xPosForVerticalArrowNavigation(EPositionType type) {
     // VisiblePosition creation can fail here if a node containing the selection
     // becomes visibility:hidden
     // after the selection is created and before this function is called.
-    x = visiblePosition.isNotNull() ? visiblePosition.caretRect().x() : 0;
+    x = visiblePosition.isNotNull()
+            ? visiblePosition.xOffsetForVerticalNavigation()
+            : 0;
     m_xPosForVerticalArrowNavigation = x;
   } else
     x = m_xPosForVerticalArrowNavigation;
@@ -771,46 +774,77 @@ void SelectionController::layout() {
   if (isNone() || !m_sel.start().node()->inDocument() ||
       !m_sel.end().node()->inDocument()) {
     m_caretRect = IntRect();
-    m_caretPositionOnLayout = IntPoint();
     return;
   }
 
   m_sel.start().node()->document()->updateRendering();
 
   m_caretRect = IntRect();
-  m_caretPositionOnLayout = IntPoint();
 
   if (isCaret()) {
     VisiblePosition pos(m_sel.start(), m_sel.affinity());
     if (pos.isNotNull()) {
       ASSERT(pos.deepEquivalent().node()->renderer());
-      m_caretRect = pos.caretRect();
 
-      // FIXME: broken with transforms
-      FloatPoint absPos =
-          pos.deepEquivalent().node()->renderer()->localToAbsoluteForContent(
-              FloatPoint());
-      m_caretPositionOnLayout = roundedIntPoint(absPos);
+      // First compute a rect local to the renderer at the selection start
+      RenderObject* renderer;
+      IntRect localRect = pos.localCaretRect(renderer);
+
+      // Get the renderer that will be responsible for painting the caret (which
+      // is either the renderer we just found, or one of its containers)
+      RenderObject* caretPainter = caretRenderer();
+
+      // Compute an offset between the renderer and the caretPainter
+      IntSize offsetFromPainter;
+      bool unrooted = false;
+      while (renderer != caretPainter) {
+        RenderObject* containerObject = renderer->container();
+        if (!containerObject) {
+          unrooted = true;
+          break;
+        }
+        offsetFromPainter += renderer->offsetFromContainer(containerObject);
+        renderer = containerObject;
+      }
+
+      if (!unrooted) {
+        // Move the caret rect to the coords of the painter
+        localRect.move(offsetFromPainter);
+        m_caretRect = localRect;
+      }
+
+      m_absCaretBoundsDirty = true;
     }
   }
 
   m_needsLayout = false;
 }
 
-IntRect SelectionController::caretRect() const {
+RenderObject* SelectionController::caretRenderer() const {
+  Node* node = m_sel.start().node();
+  if (!node)
+    return 0;
+
+  RenderObject* renderer = node->renderer();
+  if (!renderer)
+    return 0;
+
+  // if caretNode is a block and caret is inside it then caret should be painted
+  // by that block
+  bool paintedByBlock = renderer->isBlockFlow() && caretRendersInsideNode(node);
+  return paintedByBlock ? renderer : renderer->containingBlock();
+}
+
+IntRect SelectionController::localCaretRect() const {
   if (m_needsLayout)
     const_cast<SelectionController*>(this)->layout();
 
-  IntRect caret = m_caretRect;
+  return m_caretRect;
+}
 
-  if (m_sel.start().node() && m_sel.start().node()->renderer()) {
-    FloatPoint absPos =
-        m_sel.start().node()->renderer()->localToAbsoluteForContent(
-            FloatPoint());
-    caret.move(roundedIntPoint(absPos) - m_caretPositionOnLayout);
-  }
-
-  return caret;
+IntRect SelectionController::absoluteCaretBounds() {
+  recomputeCaretRect();
+  return m_absCaretBounds;
 }
 
 static IntRect repaintRectForCaret(IntRect caret) {
@@ -825,7 +859,14 @@ static IntRect repaintRectForCaret(IntRect caret) {
 }
 
 IntRect SelectionController::caretRepaintRect() const {
-  return repaintRectForCaret(caretRect());
+  IntRect localRect = repaintRectForCaret(localCaretRect());
+
+  RenderObject* caretPainter = caretRenderer();
+  if (caretPainter)
+    return caretPainter->localToAbsoluteQuad(FloatRect(localRect))
+        .enclosingBoundingBox();
+
+  return IntRect();
 }
 
 bool SelectionController::recomputeCaretRect() {
@@ -841,15 +882,23 @@ bool SelectionController::recomputeCaretRect() {
 
   IntRect oldRect = m_caretRect;
   m_needsLayout = true;
-  IntRect newRect = caretRect();
-  if (oldRect == newRect)
+  IntRect newRect = localCaretRect();
+  if (oldRect == newRect && !m_absCaretBoundsDirty)
+    return false;
+
+  IntRect oldAbsRepaintRect = m_absCaretBounds;
+  m_absCaretBounds = caretRepaintRect();
+  m_absCaretBoundsDirty = false;
+
+  if (oldAbsRepaintRect == m_absCaretBounds)
     return false;
 
   if (RenderView* view =
           static_cast<RenderView*>(m_frame->document()->renderer())) {
-    view->repaintViewRectangle(repaintRectForCaret(oldRect), false);
-    view->repaintViewRectangle(repaintRectForCaret(newRect), false);
+    view->repaintViewRectangle(oldAbsRepaintRect, false);
+    view->repaintViewRectangle(m_absCaretBounds, false);
   }
+
   return true;
 }
 
@@ -859,6 +908,8 @@ void SelectionController::invalidateCaretRect() {
 
   Document* d = m_sel.start().node()->document();
 
+  // recomputeCaretRect will always return false for the drag caret,
+  // because its m_frame is always 0.
   bool caretRectChanged = recomputeCaretRect();
 
   // EDIT FIXME: This is an unfortunate hack.
@@ -880,14 +931,19 @@ void SelectionController::invalidateCaretRect() {
   }
 }
 
-void SelectionController::paintCaret(GraphicsContext* p, const IntRect& rect) {
+void SelectionController::paintCaret(GraphicsContext* p,
+                                     int tx,
+                                     int ty,
+                                     const IntRect& clipRect) {
   if (!m_sel.isCaret())
     return;
 
   if (m_needsLayout)
     layout();
 
-  IntRect caret = intersection(caretRect(), rect);
+  IntRect drawingRect = localCaretRect();
+  drawingRect.move(tx, ty);
+  IntRect caret = intersection(drawingRect, clipRect);
   if (!caret.isEmpty()) {
     Color caretColor = Color::black;
     Element* element = rootEditableElement();
@@ -1147,11 +1203,10 @@ bool SelectionController::isInPasswordField() const {
          HTMLInputElement::PASSWORD;
 }
 
-bool SelectionController::isInsideNode() const {
-  Node* startNode = start().node();
-  if (!startNode)
+bool SelectionController::caretRendersInsideNode(Node* node) const {
+  if (!node)
     return false;
-  return !isTableElement(startNode) && !editingIgnoresContent(startNode);
+  return !isTableElement(node) && !editingIgnoresContent(node);
 }
 
 void SelectionController::focusedOrActiveStateChanged() {

@@ -145,9 +145,9 @@ class RenderText : public RenderObject {
   }
   virtual void setSelectionState(SelectionState s);
   virtual IntRect selectionRect(bool clipToVisibleContent = true);
-  virtual IntRect caretRect(InlineBox*,
-                            int caretOffset,
-                            int* extraWidthToEndOfLine = 0);
+  virtual IntRect localCaretRect(InlineBox*,
+                                 int caretOffset,
+                                 int* extraWidthToEndOfLine = 0);
 
   virtual int marginLeft() const {
     return style()->marginLeft().calcMinValue(0);

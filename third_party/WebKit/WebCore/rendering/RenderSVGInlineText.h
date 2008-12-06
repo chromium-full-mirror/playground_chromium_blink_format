@@ -46,9 +46,9 @@ class RenderSVGInlineText : public RenderText {
   virtual bool isSVGText() const { return true; }
   virtual InlineTextBox* createInlineTextBox();
 
-  virtual IntRect caretRect(InlineBox*,
-                            int caretOffset,
-                            int* extraWidthToEndOfLine = 0);
+  virtual IntRect localCaretRect(InlineBox*,
+                                 int caretOffset,
+                                 int* extraWidthToEndOfLine = 0);
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
   virtual void destroy();

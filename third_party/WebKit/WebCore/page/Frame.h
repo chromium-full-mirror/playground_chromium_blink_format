@@ -275,8 +275,14 @@ class Frame : public RefCounted<Frame> {
   void invalidateSelection();
 
   void setCaretVisible(bool = true);
-  void paintCaret(GraphicsContext*, const IntRect&) const;
-  void paintDragCaret(GraphicsContext*, const IntRect&) const;
+  void paintCaret(GraphicsContext*,
+                  int tx,
+                  int ty,
+                  const IntRect& clipRect) const;
+  void paintDragCaret(GraphicsContext*,
+                      int tx,
+                      int ty,
+                      const IntRect& clipRect) const;
 
   bool isContentEditable() const;  // if true, everything in frame is editable
 

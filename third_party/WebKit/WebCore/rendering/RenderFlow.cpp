@@ -670,13 +670,13 @@ int RenderFlow::leftmostPosition(bool includeOverflowInterior,
   return left;
 }
 
-IntRect RenderFlow::caretRect(InlineBox* inlineBox,
-                              int caretOffset,
-                              int* extraWidthToEndOfLine) {
+IntRect RenderFlow::localCaretRect(InlineBox* inlineBox,
+                                   int caretOffset,
+                                   int* extraWidthToEndOfLine) {
   // Do the normal calculation in most cases.
   if (firstChild() || style()->display() == INLINE)
-    return RenderContainer::caretRect(inlineBox, caretOffset,
-                                      extraWidthToEndOfLine);
+    return RenderContainer::localCaretRect(inlineBox, caretOffset,
+                                           extraWidthToEndOfLine);
 
   // This is a special case:
   // The element is not an inline element, and it's empty. So we have to
@@ -748,9 +748,7 @@ IntRect RenderFlow::caretRect(InlineBox* inlineBox,
     }
   }
 
-  FloatPoint absPos = localToAbsoluteForContent(FloatPoint());
-  x += absPos.x();
-  int y = absPos.y() + paddingTop() + borderTop();
+  int y = paddingTop() + borderTop();
 
   return IntRect(x, y, caretWidth, height);
 }

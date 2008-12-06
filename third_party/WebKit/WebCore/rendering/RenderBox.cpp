@@ -3009,9 +3009,9 @@ void RenderBox::calcAbsoluteVerticalReplaced() {
   m_y = topValue + m_marginTop + containerBlock->borderTop();
 }
 
-IntRect RenderBox::caretRect(InlineBox* box,
-                             int caretOffset,
-                             int* extraWidthToEndOfLine) {
+IntRect RenderBox::localCaretRect(InlineBox* box,
+                                  int caretOffset,
+                                  int* extraWidthToEndOfLine) {
   // VisiblePositions at offsets inside containers either a) refer to the
   // positions before/after
   // those containers (tables and select elements) or b) refer to the position
@@ -3048,17 +3048,11 @@ IntRect RenderBox::caretRect(InlineBox* box,
   if (fontHeight > rect.height() || !isReplaced() && !isTable())
     rect.setHeight(fontHeight);
 
-  RenderObject* cb = containingBlock();
-  if (!cb)
-    // No point returning a relative position.
-    return IntRect();
-
-  FloatPoint absPos = cb->localToAbsolute();
-
   if (extraWidthToEndOfLine)
     *extraWidthToEndOfLine = xPos() + m_width - rect.right();
 
-  rect.move(absPos.x(), absPos.y());
+  // Move to local coords
+  rect.move(-xPos(), -yPos());
   return rect;
 }
 

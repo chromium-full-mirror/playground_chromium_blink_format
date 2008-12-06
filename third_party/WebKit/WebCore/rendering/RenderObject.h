@@ -1075,18 +1075,16 @@ class RenderObject : public CachedResourceClient {
                       bool& dhtmlWillDrag) const;
 
   /**
-   * Returns the content coordinates of the caret within this render object.
-   * @param offset zero-based offset determining position within the render
+   * Returns the local coordinates of the caret within this render object.
+   * @param caretOffset zero-based offset determining position within the render
    * object.
-   * @param override @p true if input overrides existing characters,
-   * @p false if it inserts them. The width of the caret depends on this one.
    * @param extraWidthToEndOfLine optional out arg to give extra width to end of
    * line -
    * useful for character range rect computations
    */
-  virtual IntRect caretRect(InlineBox*,
-                            int caretOffset,
-                            int* extraWidthToEndOfLine = 0);
+  virtual IntRect localCaretRect(InlineBox*,
+                                 int caretOffset,
+                                 int* extraWidthToEndOfLine = 0);
 
   virtual int lowestPosition(bool /*includeOverflowInterior*/ = true,
                              bool /*includeSelf*/ = true) const {

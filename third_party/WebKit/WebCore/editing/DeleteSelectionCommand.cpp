@@ -707,8 +707,8 @@ void DeleteSelectionCommand::mergeParagraphs() {
   // FIXME: handleSpecialCaseBRDelete prevents us from getting here in a case
   // like <ul><li>foo<br><br></li></ul>^foo
   if (isStartOfParagraph(mergeDestination) &&
-      startOfParagraphToMove.caretRect().x() >
-          mergeDestination.caretRect().x()) {
+      startOfParagraphToMove.absoluteCaretBounds().x() >
+          mergeDestination.absoluteCaretBounds().x()) {
     ASSERT(mergeDestination.deepEquivalent().downstream().node()->hasTagName(
         brTag));
     removeNodeAndPruneAncestors(
