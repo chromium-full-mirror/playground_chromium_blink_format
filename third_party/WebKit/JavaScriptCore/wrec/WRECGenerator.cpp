@@ -71,7 +71,7 @@ void Generator::generateEnter() {
 
 #ifndef NDEBUG
   // ASSERT that the output register is not null.
-  Jump outputNotNull = jne32(Imm32(0), output);
+  Jump outputNotNull = jne32(output, Imm32(0));
   breakpoint();
   outputNotNull.link(this);
 #endif
@@ -181,7 +181,7 @@ void Generator::generateNonGreedyQuantifier(JumpList& failures,
   pop(index);
   // (3.2) if there is a limit, and we have reached it, game over.
   if (max != Quantifier::noMaxSpecified) {
-    je32(Imm32(max), repeatCount, quantifierFailed);
+    je32(repeatCount, Imm32(max), quantifierFailed);
   }
 
   // (1) Do a check for the atom
@@ -239,7 +239,7 @@ void Generator::generateGreedyQuantifier(JumpList& failures,
   else if (max == 1)
     doneReadingAtoms.append(jump());
   else {
-    jne32(Imm32(max), repeatCount, readAnAtom);
+    jne32(repeatCount, Imm32(max), readAnAtom);
     doneReadingAtoms.append(jump());
   }
 
@@ -328,7 +328,7 @@ bool Generator::generatePatternCharacterPair(JumpList& failures,
   }
   int pair = ch1 | (ch2 << 16);
 
-  failures.append(jne32(Imm32(pair), character));
+  failures.append(jne32(character, Imm32(pair)));
   return true;
 }
 
@@ -350,14 +350,14 @@ void Generator::generatePatternCharacter(JumpList& failures, int ch) {
     } else if (!isASCII(ch) && ((lower = Unicode::toLower(ch)) !=
                                 (upper = Unicode::toUpper(ch)))) {
       // handle unicode case sentitive characters - branch to success on upper
-      isUpper = je32(Imm32(upper), character);
+      isUpper = je32(character, Imm32(upper));
       hasUpper = true;
       ch = lower;
     }
   }
 
   // checks for ch, or lower case version of ch, if insensitive
-  failures.append(jne32(Imm32((unsigned short)ch), character));
+  failures.append(jne32(character, Imm32((unsigned short)ch)));
 
   if (m_parser.ignoreCase() && hasUpper) {
     // for unicode case insensitive matches, branch here if upper matches.
@@ -396,7 +396,7 @@ void Generator::generateCharacterClassInvertedRange(
 
       do {
         matchDest.append(
-            je32(Imm32((unsigned short)matches[*matchIndex]), character));
+            je32(character, Imm32((unsigned short)matches[*matchIndex])));
         ++*matchIndex;
       } while ((*matchIndex < matchCount) && (matches[*matchIndex] < lo));
       failures.append(jump());
@@ -436,7 +436,7 @@ void Generator::generateCharacterClassInverted(
     if (charClass.numMatchesUnicode) {
       for (unsigned i = 0; i < charClass.numMatchesUnicode; ++i) {
         UChar ch = charClass.matchesUnicode[i];
-        matchDest.append(je32(Imm32(ch), character));
+        matchDest.append(je32(character, Imm32(ch)));
       }
     }
 
@@ -463,7 +463,7 @@ void Generator::generateCharacterClassInverted(
         charClass.matches, charClass.numMatches);
     while (matchIndex < charClass.numMatches)
       matchDest.append(je32(
-          Imm32((unsigned short)charClass.matches[matchIndex++]), character));
+          character, Imm32((unsigned short)charClass.matches[matchIndex++])));
 
     failures.link(this);
   } else if (charClass.numMatches) {
@@ -480,13 +480,13 @@ void Generator::generateCharacterClassInverted(
         if (isASCIIUpper(ch))
           continue;
       }
-      matchDest.append(je32(Imm32((unsigned short)ch), character));
+      matchDest.append(je32(character, Imm32((unsigned short)ch)));
     }
 
     if (unsigned countAZaz = matchesAZaz.size()) {
       or32(Imm32(32), character);
       for (unsigned i = 0; i < countAZaz; ++i)
-        matchDest.append(je32(Imm32(matchesAZaz[i]), character));
+        matchDest.append(je32(character, Imm32(matchesAZaz[i])));
     }
   }
 
@@ -572,7 +572,7 @@ void Generator::generateAssertionBOL(JumpList& failures) {
     JumpList previousIsNewline;
 
     // begin of input == success
-    previousIsNewline.append(je32(Imm32(0), index));
+    previousIsNewline.append(je32(index, Imm32(0)));
 
     // now check prev char against newline characters.
     load16(BaseIndex(input, index, TimesTwo, -2), character);
@@ -583,7 +583,7 @@ void Generator::generateAssertionBOL(JumpList& failures) {
 
     previousIsNewline.link(this);
   } else
-    failures.append(jne32(Imm32(0), index));
+    failures.append(jne32(index, Imm32(0)));
 }
 
 void Generator::generateAssertionEOL(JumpList& failures) {
@@ -606,7 +606,7 @@ void Generator::generateAssertionWordBoundary(JumpList& failures, bool invert) {
   // (1) Check if the previous value was a word char
 
   // (1.1) check for begin of input
-  Jump atBegin = je32(Imm32(0), index);
+  Jump atBegin = je32(index, Imm32(0));
   // (1.2) load the last char, and chck if is word character
   load16(BaseIndex(input, index, TimesTwo, -2), character);
   JumpList previousIsWord;
