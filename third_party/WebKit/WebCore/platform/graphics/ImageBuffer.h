@@ -27,6 +27,7 @@
 #ifndef ImageBuffer_h
 #define ImageBuffer_h
 
+#include "AffineTransform.h"
 #include "Image.h"
 #include "IntSize.h"
 #include "ImageBufferData.h"
@@ -69,7 +70,13 @@ class ImageBuffer : Noncopyable {
                     const IntPoint& destPoint);
 
   String toDataURL(const String& mimeType) const;
-
+#if !PLATFORM(CG)
+  AffineTransform baseTransform() const { return AffineTransform(); }
+#else
+  AffineTransform baseTransform() const {
+    return AffineTransform(1, 0, 0, -1, 0, m_size.height());
+  }
+#endif
  private:
   ImageBufferData m_data;
 

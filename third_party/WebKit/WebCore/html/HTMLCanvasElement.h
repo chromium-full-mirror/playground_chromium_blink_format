@@ -27,6 +27,7 @@
 #ifndef HTMLCanvasElement_h
 #define HTMLCanvasElement_h
 
+#include "AffineTransform.h"
 #include "HTMLElement.h"
 #include "IntSize.h"
 
@@ -104,6 +105,8 @@ class HTMLCanvasElement : public HTMLElement {
   static const float MaxCanvasArea;
 
   void setObserver(CanvasObserver* o) { m_observer = o; }
+
+  AffineTransform baseTransform() const;
 
  private:
   void createImageBuffer() const;
