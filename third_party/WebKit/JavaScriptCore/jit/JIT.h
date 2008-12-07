@@ -376,7 +376,6 @@ class JIT : private MacroAssembler {
     JIT jit(globalData);
     jit.privateCompileCTIMachineTrampolines();
   }
-  static void freeCTIMachineTrampolines(Interpreter*);
 
   static void patchGetByIdSelf(CodeBlock* codeBlock,
                                Structure* structure,

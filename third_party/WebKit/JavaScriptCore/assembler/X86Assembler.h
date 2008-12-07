@@ -199,6 +199,8 @@ class X86Assembler {
 
   X86Assembler() {}
 
+  size_t size() const { return m_buffer.size(); }
+
   void int3() { m_buffer.putByte(OP_INT3); }
 
 #if PLATFORM(X86_64)
@@ -981,8 +983,8 @@ class X86Assembler {
         (reinterpret_cast<intptr_t>(destination) - where);
   }
 
-  void* executableCopy() {
-    void* copy = m_buffer.executableCopy();
+  void* executableCopy(ExecutablePool* allocator) {
+    void* copy = m_buffer.executableCopy(allocator);
     ASSERT(copy);
     return copy;
   }

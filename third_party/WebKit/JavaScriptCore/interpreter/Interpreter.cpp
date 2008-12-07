@@ -692,11 +692,7 @@ void Interpreter::initialize(JSGlobalData* globalData) {
 #endif
 }
 
-Interpreter::~Interpreter() {
-#if ENABLE(JIT)
-  JIT::freeCTIMachineTrampolines(this);
-#endif
-}
+Interpreter::~Interpreter() {}
 
 #ifndef NDEBUG
 

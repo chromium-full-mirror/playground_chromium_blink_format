@@ -31,6 +31,7 @@
 #if ENABLE(ASSEMBLER)
 
 #include <string.h>
+#include <jit/ExecutableAllocator.h>
 #include <wtf/Assertions.h>
 #include <wtf/FastMalloc.h>
 
@@ -92,13 +93,13 @@ class AssemblerBuffer {
 
   void* data() { return m_buffer; }
 
-  int size() { return m_size; }
+  int size() const { return m_size; }
 
-  void* executableCopy() {
+  void* executableCopy(ExecutablePool* allocator) {
     if (!m_size)
       return 0;
 
-    void* result = WTF::fastMallocExecutable(m_size);
+    void* result = allocator->alloc(m_size);
 
     if (!result)
       return 0;

@@ -117,9 +117,6 @@ struct PolymorphicAccessStructureList {
         else
           info.u.proto->deref();
       }
-
-      if (info.stubRoutine)
-        WTF::fastFreeExecutable(info.stubRoutine);
     }
   }
 };

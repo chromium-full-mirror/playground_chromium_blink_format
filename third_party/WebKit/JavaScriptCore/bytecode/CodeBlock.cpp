@@ -1103,8 +1103,6 @@ CodeBlock::~CodeBlock() {
        ++i) {
     derefStructures(
         &m_instructions[m_propertyAccessInstructions[i].bytecodeIndex]);
-    if (m_propertyAccessInstructions[i].stubRoutine)
-      WTF::fastFreeExecutable(m_propertyAccessInstructions[i].stubRoutine);
   }
 
   for (size_t size = m_callLinkInfos.size(), i = 0; i < size; ++i) {
@@ -1115,9 +1113,6 @@ CodeBlock::~CodeBlock() {
 
 #if ENABLE(JIT)
   unlinkCallers();
-
-  if (m_jitCode)
-    WTF::fastFreeExecutable(m_jitCode);
 #endif
 }
 

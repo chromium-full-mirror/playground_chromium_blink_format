@@ -41,9 +41,6 @@ void* tryFastRealloc(void* p, size_t n);
 
 void fastFree(void* p);
 
-void* fastMallocExecutable(size_t n);
-void fastFreeExecutable(void* p);
-
 #ifndef NDEBUG
 void fastMallocForbid();
 void fastMallocAllow();

@@ -366,7 +366,7 @@ void JIT::privateCompilePutByIdTransition(Structure* oldStructure,
     failureJump = __ jmp();
   }
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
 
   if (failureCases.size())
     X86Assembler::link(
@@ -458,7 +458,7 @@ void JIT::privateCompilePatchGetArrayLength(void* returnAddress) {
   __ movl_rr(X86::ecx, X86::eax);
   JmpSrc success = __ jmp();
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
@@ -496,7 +496,7 @@ void JIT::privateCompileGetByIdSelf(Structure* structure,
   __ movl_mr(cachedOffset * sizeof(JSValue*), X86::eax, X86::eax);
   __ ret();
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
 
   X86Assembler::link(
       code, failureCases1,
@@ -546,7 +546,7 @@ void JIT::privateCompileGetByIdProto(Structure* structure,
 
   JmpSrc success = __ jmp();
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
@@ -594,7 +594,7 @@ void JIT::privateCompileGetByIdProto(Structure* structure,
 
   __ ret();
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
 
   X86Assembler::link(
       code, failureCases1,
@@ -624,7 +624,7 @@ void JIT::privateCompileGetByIdSelfList(
   __ movl_mr(cachedOffset * sizeof(JSValue*), X86::eax, X86::eax);
   JmpSrc success = __ jmp();
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
   ASSERT(code);
 
   // Use the repatch information to link the failure cases back to the original
@@ -683,7 +683,7 @@ void JIT::privateCompileGetByIdProtoList(
 
   JmpSrc success = __ jmp();
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
@@ -746,7 +746,7 @@ void JIT::privateCompileGetByIdChainList(
   __ movl_mr(cachedOffset * sizeof(JSValue*), X86::edx, X86::eax);
   JmpSrc success = __ jmp();
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
@@ -818,7 +818,7 @@ void JIT::privateCompileGetByIdChain(Structure* structure,
   __ movl_mr(cachedOffset * sizeof(JSValue*), X86::edx, X86::eax);
   JmpSrc success = __ jmp();
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
@@ -872,7 +872,7 @@ void JIT::privateCompileGetByIdChain(Structure* structure,
   __ movl_mr(cachedOffset * sizeof(JSValue*), X86::edx, X86::eax);
   __ ret();
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
 
   for (unsigned i = 0; i < bucketsOfFail.size(); ++i)
     X86Assembler::link(
@@ -898,7 +898,7 @@ void JIT::privateCompilePutByIdReplace(Structure* structure,
   __ movl_rm(X86::edx, cachedOffset * sizeof(JSValue*), X86::eax);
   __ ret();
 
-  void* code = __ executableCopy();
+  void* code = __ executableCopy(m_codeBlock->executablePool());
 
   X86Assembler::link(
       code, failureCases1,

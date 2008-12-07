@@ -33,6 +33,7 @@
 #include <wtf/HashMap.h>
 #include <wtf/RefCounted.h>
 #include "Collector.h"
+#include "ExecutableAllocator.h"
 #include "SmallStrings.h"
 
 struct OpaqueJSClass;
@@ -123,8 +124,13 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   Heap heap;
 
+  PassRefPtr<ExecutablePool> poolForSize(size_t n) {
+    return m_executableAllocator.poolForSize(n);
+  }
+
  private:
   JSGlobalData(bool isShared = false);
+  ExecutableAllocator m_executableAllocator;
 
   static JSGlobalData*& sharedInstanceInternal();
 };

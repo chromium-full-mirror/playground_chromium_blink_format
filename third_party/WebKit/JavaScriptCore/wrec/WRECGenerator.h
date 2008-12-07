@@ -37,6 +37,9 @@
 #include "WREC.h"
 
 namespace JSC {
+
+class JSGlobalData;
+
 namespace WREC {
 
 class CharacterRange;
@@ -58,9 +61,11 @@ class Generator : private MacroAssembler {
     Error
   };
 
-  static CompiledRegExp compileRegExp(const UString& pattern,
+  static CompiledRegExp compileRegExp(JSGlobalData*,
+                                      const UString& pattern,
                                       unsigned* numSubpatterns_ptr,
                                       const char** error_ptr,
+                                      RefPtr<ExecutablePool>& pool,
                                       bool ignoreCase = false,
                                       bool multiline = false);
 
