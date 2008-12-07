@@ -64,7 +64,7 @@ void JIT::compileGetByIdHotPath(int resultVReg,
 #ifdef NDEBUG
   UNUSED_PARAM(propertyAccessInstructionIndex);
 #endif
-  ASSERT(m_codeBlock->propertyAccessInstructions[propertyAccessInstructionIndex]
+  ASSERT(m_codeBlock->propertyAccessInstruction(propertyAccessInstructionIndex)
              .bytecodeIndex == i);
 
 #ifndef NDEBUG
@@ -79,7 +79,7 @@ void JIT::compileGetByIdHotPath(int resultVReg,
 
   // Track the location of the call; this will be used to recover repatch
   // information.
-  ASSERT(m_codeBlock->propertyAccessInstructions[propertyAccessInstructionIndex]
+  ASSERT(m_codeBlock->propertyAccessInstruction(propertyAccessInstructionIndex)
              .bytecodeIndex == i);
   m_propertyAccessCompilationInfo[propertyAccessInstructionIndex]
       .callReturnLocation = call;
@@ -114,7 +114,7 @@ void JIT::compilePutByIdHotPath(int baseVReg,
 
   // Track the location of the call; this will be used to recover repatch
   // information.
-  ASSERT(m_codeBlock->propertyAccessInstructions[propertyAccessInstructionIndex]
+  ASSERT(m_codeBlock->propertyAccessInstruction(propertyAccessInstructionIndex)
              .bytecodeIndex == i);
   m_propertyAccessCompilationInfo[propertyAccessInstructionIndex]
       .callReturnLocation = call;
