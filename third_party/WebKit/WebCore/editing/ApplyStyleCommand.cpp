@@ -112,9 +112,8 @@ void StyleChange::init(PassRefPtr<CSSStyleDeclaration> style,
   String styleText("");
 
   bool addedDirection = false;
-  DeprecatedValueListConstIterator<CSSProperty> end;
-  for (DeprecatedValueListConstIterator<CSSProperty> it =
-           mutableStyle->valuesIterator();
+  CSSMutableStyleDeclaration::const_iterator end = mutableStyle->end();
+  for (CSSMutableStyleDeclaration::const_iterator it = mutableStyle->begin();
        it != end; ++it) {
     const CSSProperty* property = &*it;
 
@@ -144,9 +143,8 @@ void StyleChange::init(PassRefPtr<CSSStyleDeclaration> style,
 
     if (property->id() == CSSPropertyWebkitTextDecorationsInEffect) {
       // we have to special-case text decorations
-      CSSProperty alteredProperty =
-          CSSProperty(CSSPropertyTextDecoration, property->value(),
-                      property->isImportant());
+      CSSProperty alteredProperty(CSSPropertyTextDecoration, property->value(),
+                                  property->isImportant());
       styleText += alteredProperty.cssText();
     } else
       styleText += property->cssText();
@@ -1012,9 +1010,8 @@ void ApplyStyleCommand::applyInlineStyleToRange(
 
 bool ApplyStyleCommand::isHTMLStyleNode(CSSMutableStyleDeclaration* style,
                                         HTMLElement* elem) {
-  DeprecatedValueListConstIterator<CSSProperty> end;
-  for (DeprecatedValueListConstIterator<CSSProperty> it =
-           style->valuesIterator();
+  CSSMutableStyleDeclaration::const_iterator end = style->end();
+  for (CSSMutableStyleDeclaration::const_iterator it = style->begin();
        it != end; ++it) {
     switch ((*it).id()) {
       case CSSPropertyFontWeight:
@@ -1047,9 +1044,8 @@ void ApplyStyleCommand::removeHTMLFontStyle(CSSMutableStyleDeclaration* style,
   if (!elem->hasLocalName(fontTag))
     return;
 
-  DeprecatedValueListConstIterator<CSSProperty> end;
-  for (DeprecatedValueListConstIterator<CSSProperty> it =
-           style->valuesIterator();
+  CSSMutableStyleDeclaration::const_iterator end = style->end();
+  for (CSSMutableStyleDeclaration::const_iterator it = style->begin();
        it != end; ++it) {
     switch ((*it).id()) {
       case CSSPropertyColor:
@@ -1096,9 +1092,8 @@ void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
   if (!decl)
     return;
 
-  DeprecatedValueListConstIterator<CSSProperty> end;
-  for (DeprecatedValueListConstIterator<CSSProperty> it =
-           style->valuesIterator();
+  CSSMutableStyleDeclaration::const_iterator end = style->end();
+  for (CSSMutableStyleDeclaration::const_iterator it = style->begin();
        it != end; ++it) {
     int propertyID = (*it).id();
     RefPtr<CSSValue> value = decl->getPropertyCSSValue(propertyID);

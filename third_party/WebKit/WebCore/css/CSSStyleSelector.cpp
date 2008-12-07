@@ -611,10 +611,9 @@ void CSSStyleSelector::resolveVariablesForDeclaration(
   // mutating the new declaration (possibly expanding shorthands).  The new
   // declaration has no m_node
   // though, so it can't mistakenly call setChanged on anything.
-  DeprecatedValueListConstIterator<CSSProperty> end;
-  for (DeprecatedValueListConstIterator<CSSProperty> it =
-           decl->valuesIterator();
-       it != end; ++it) {
+  CSSMutableStyleDeclaration::const_iterator end = decl->end();
+  for (CSSMutableStyleDeclaration::const_iterator it = decl->begin(); it != end;
+       ++it) {
     const CSSProperty& current = *it;
     if (!current.value()->isVariableDependentValue()) {
       // We can just add the parsed property directly.
@@ -1354,9 +1353,8 @@ void CSSStyleSelector::keyframeStylesForAnimation(
       updateFont();
 
     // Add all the animating properties to the list
-    DeprecatedValueListConstIterator<CSSProperty> end;
-    for (DeprecatedValueListConstIterator<CSSProperty> it =
-             kf->style()->valuesIterator();
+    CSSMutableStyleDeclaration::const_iterator end = kf->style()->end();
+    for (CSSMutableStyleDeclaration::const_iterator it = kf->style()->begin();
          it != end; ++it)
       list.addProperty((*it).id());
 
@@ -2911,9 +2909,8 @@ void CSSStyleSelector::applyDeclarations(bool applyFirst,
 
   for (int i = startIndex; i <= endIndex; i++) {
     CSSMutableStyleDeclaration* decl = m_matchedDecls[i];
-    DeprecatedValueListConstIterator<CSSProperty> end;
-    for (DeprecatedValueListConstIterator<CSSProperty> it =
-             decl->valuesIterator();
+    CSSMutableStyleDeclaration::const_iterator end = decl->end();
+    for (CSSMutableStyleDeclaration::const_iterator it = decl->begin();
          it != end; ++it) {
       const CSSProperty& current = *it;
       // give special priority to font-xxx, color properties
