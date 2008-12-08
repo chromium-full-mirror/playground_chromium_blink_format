@@ -155,6 +155,7 @@ class GraphicsContext : Noncopyable {
   void setFillColor(const Color&);
   void setFillPattern(PassRefPtr<Pattern>);
   void setFillGradient(PassRefPtr<Gradient>);
+  void setShadowsIgnoreTransforms(bool);
 
   void save();
   void restore();

@@ -59,7 +59,8 @@ struct GraphicsContextState {
         fillColorSpace(SolidColorSpace),
         fillColor(Color::black),
         paintingDisabled(false),
-        shadowBlur(0) {
+        shadowBlur(0),
+        shadowsIgnoreTransforms(false) {
   }
 
   Font font;
@@ -89,6 +90,8 @@ struct GraphicsContextState {
   IntSize shadowSize;
   unsigned shadowBlur;
   Color shadowColor;
+
+  bool shadowsIgnoreTransforms;
 };
 
 class GraphicsContextPrivate {

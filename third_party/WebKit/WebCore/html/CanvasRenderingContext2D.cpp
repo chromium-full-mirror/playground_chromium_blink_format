@@ -803,16 +803,9 @@ void CanvasRenderingContext2D::setShadow(float width,
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
-// FIXME: Do this through platform-independent GraphicsContext API.
-#if PLATFORM(CG)
-  const CGFloat components[2] = {grayLevel, 1};
-  CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
-  CGColorRef color = CGColorCreate(colorSpace, components);
-  CGColorSpaceRelease(colorSpace);
-  CGContextSetShadowWithColor(c->platformContext(),
-                              adjustedShadowSize(width, -height), blur, color);
-  CGColorRelease(color);
-#endif
+
+  RGBA32 rgba = makeRGBA32FromFloats(grayLevel, grayLevel, grayLevel, 1.0f);
+  c->setShadow(IntSize(width, -height), state().m_shadowBlur, Color(rgba));
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -827,21 +820,12 @@ void CanvasRenderingContext2D::setShadow(float width,
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
-// FIXME: Do this through platform-independent GraphicsContext API.
-#if PLATFORM(CG)
+
   RGBA32 rgba = 0;  // default is transparent black
-  CSSParser::parseColor(rgba, color);
-  const CGFloat components[4] = {((rgba >> 16) & 0xFF) / 255.0f,
-                                 ((rgba >> 8) & 0xFF) / 255.0f,
-                                 (rgba & 0xFF) / 255.0f, alpha};
-  CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-  CGColorRef shadowColor = CGColorCreate(colorSpace, components);
-  CGColorSpaceRelease(colorSpace);
-  CGContextSetShadowWithColor(c->platformContext(),
-                              adjustedShadowSize(width, -height), blur,
-                              shadowColor);
-  CGColorRelease(shadowColor);
-#endif
+  if (!state().m_shadowColor.isEmpty())
+    CSSParser::parseColor(rgba, state().m_shadowColor);
+  c->setShadow(IntSize(width, -height), state().m_shadowBlur,
+               Color(colorWithOverrideAlpha(rgba, alpha)));
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -856,16 +840,9 @@ void CanvasRenderingContext2D::setShadow(float width,
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
-// FIXME: Do this through platform-independent GraphicsContext API.
-#if PLATFORM(CG)
-  const CGFloat components[2] = {grayLevel, alpha};
-  CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
-  CGColorRef color = CGColorCreate(colorSpace, components);
-  CGColorSpaceRelease(colorSpace);
-  CGContextSetShadowWithColor(c->platformContext(),
-                              adjustedShadowSize(width, -height), blur, color);
-  CGColorRelease(color);
-#endif
+
+  RGBA32 rgba = makeRGBA32FromFloats(grayLevel, grayLevel, grayLevel, alpha);
+  c->setShadow(IntSize(width, -height), state().m_shadowBlur, Color(rgba));
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -882,17 +859,12 @@ void CanvasRenderingContext2D::setShadow(float width,
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
-// FIXME: Do this through platform-independent GraphicsContext API.
-#if PLATFORM(CG)
-  const CGFloat components[4] = {r, g, b, a};
-  CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-  CGColorRef shadowColor = CGColorCreate(colorSpace, components);
-  CGColorSpaceRelease(colorSpace);
-  CGContextSetShadowWithColor(c->platformContext(),
-                              adjustedShadowSize(width, -height), blur,
-                              shadowColor);
-  CGColorRelease(shadowColor);
-#endif
+
+  RGBA32 rgba =
+      makeRGBA32FromFloats(r, g, b, a);  // default is transparent black
+  if (!state().m_shadowColor.isEmpty())
+    CSSParser::parseColor(rgba, state().m_shadowColor);
+  c->setShadow(IntSize(width, -height), state().m_shadowBlur, Color(rgba));
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -934,25 +906,13 @@ void CanvasRenderingContext2D::applyShadow() {
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
-// FIXME: Do this through platform-independent GraphicsContext API.
-#if PLATFORM(CG)
+
   RGBA32 rgba = 0;  // default is transparent black
   if (!state().m_shadowColor.isEmpty())
     CSSParser::parseColor(rgba, state().m_shadowColor);
-  const CGFloat components[4] = {
-      ((rgba >> 16) & 0xFF) / 255.0f, ((rgba >> 8) & 0xFF) / 255.0f,
-      (rgba & 0xFF) / 255.0f, ((rgba >> 24) & 0xFF) / 255.0f};
-  CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-  CGColorRef color = CGColorCreate(colorSpace, components);
-  CGColorSpaceRelease(colorSpace);
-
-  CGContextSetShadowWithColor(
-      c->platformContext(),
-      adjustedShadowSize(state().m_shadowOffset.width(),
-                         -state().m_shadowOffset.height()),
-      state().m_shadowBlur, color);
-  CGColorRelease(color);
-#endif
+  float width = state().m_shadowOffset.width();
+  float height = state().m_shadowOffset.height();
+  c->setShadow(IntSize(width, -height), state().m_shadowBlur, Color(rgba));
 }
 
 static IntSize size(HTMLImageElement* image) {
