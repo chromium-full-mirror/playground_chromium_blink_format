@@ -37,7 +37,6 @@
 #include "NP_jsobject.h"
 #include "Page.h"
 #include "PageGroup.h"
-#include "PausedTimeouts.h"
 #include "runtime_root.h"
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"

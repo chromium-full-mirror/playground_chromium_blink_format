@@ -35,7 +35,6 @@
 #include "InspectorController.h"
 #include "Page.h"
 #include "PageGroup.h"
-#include "PausedTimeouts.h"
 #include "ResourceHandle.h"
 #include "ScriptController.h"
 #include "SecurityOrigin.h"
@@ -61,9 +60,6 @@ class PageGroupLoadDeferrer : Noncopyable {
 
  private:
   Vector<RefPtr<Frame>, 16> m_deferredFrames;
-#if !PLATFORM(MAC)
-  Vector<pair<RefPtr<Frame>, PausedTimeouts*>, 16> m_pausedTimeouts;
-#endif
 };
 
 Chrome::Chrome(Page* page, ChromeClient* client)
