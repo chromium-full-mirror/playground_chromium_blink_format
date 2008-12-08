@@ -5760,8 +5760,13 @@ void CSSStyleSelector::mapAnimationProperty(Animation* animation,
     return;
 
   CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
-  animation->setProperty(
-      static_cast<CSSPropertyID>(primitiveValue->getIdent()));
+  if (primitiveValue->getIdent() == CSSValueAll)
+    animation->setProperty(cAnimateAll);
+  else if (primitiveValue->getIdent() == CSSValueNone)
+    animation->setProperty(cAnimateNone);
+  else
+    animation->setProperty(
+        static_cast<CSSPropertyID>(primitiveValue->getIdent()));
 }
 
 void CSSStyleSelector::mapAnimationTimingFunction(Animation* animation,

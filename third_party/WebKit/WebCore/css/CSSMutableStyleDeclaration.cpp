@@ -234,6 +234,18 @@ String CSSMutableStyleDeclaration::getPropertyValue(int propertyID) const {
           CSSPropertyWebkitMaskClip,       CSSPropertyWebkitMaskOrigin};
       return getLayeredShorthandValue(properties, 6);
     }
+    case CSSPropertyWebkitTransformOrigin: {
+      const int properties[2] = {CSSPropertyWebkitTransformOriginX,
+                                 CSSPropertyWebkitTransformOriginY};
+      return getShorthandValue(properties, 2);
+    }
+    case CSSPropertyWebkitTransition: {
+      const int properties[4] = {CSSPropertyWebkitTransitionProperty,
+                                 CSSPropertyWebkitTransitionDuration,
+                                 CSSPropertyWebkitTransitionTimingFunction,
+                                 CSSPropertyWebkitTransitionDelay};
+      return getLayeredShorthandValue(properties, 4);
+    }
 #if ENABLE(SVG)
     case CSSPropertyMarker: {
       RefPtr<CSSValue> value = getPropertyCSSValue(CSSPropertyMarkerStart);
