@@ -39,6 +39,7 @@ typedef int ExceptionCode;
 
 class CSSMutableStyleDeclaration;
 class CSSRule;
+class CSSValue;
 class CSSValueList;
 
 class CSSVariablesDeclaration : public StyleBase {
@@ -46,7 +47,7 @@ class CSSVariablesDeclaration : public StyleBase {
   static PassRefPtr<CSSVariablesDeclaration> create(
       StyleBase* owningRule,
       const Vector<String>& names,
-      const Vector<RefPtr<StyleBase>>& values) {
+      const Vector<RefPtr<CSSValue>>& values) {
     return adoptRef(new CSSVariablesDeclaration(owningRule, names, values));
   }
   virtual ~CSSVariablesDeclaration();
@@ -66,7 +67,7 @@ class CSSVariablesDeclaration : public StyleBase {
                                    // settable.
 
   void addParsedVariable(const String& variableName,
-                         PassRefPtr<StyleBase> variableValue,
+                         PassRefPtr<CSSValue> variableValue,
                          bool updateNamesList = true);
 
   CSSValueList* getParsedVariable(const String& variableName);
@@ -76,13 +77,13 @@ class CSSVariablesDeclaration : public StyleBase {
  private:
   CSSVariablesDeclaration(StyleBase* owningRule,
                           const Vector<String>& names,
-                          const Vector<RefPtr<StyleBase>>& values);
+                          const Vector<RefPtr<CSSValue>>& values);
 
   void setChanged();
 
  protected:
   Vector<String> m_variableNames;
-  HashMap<String, RefPtr<StyleBase>> m_variablesMap;
+  HashMap<String, RefPtr<CSSValue>> m_variablesMap;
 };
 
 }  // namespace WebCore

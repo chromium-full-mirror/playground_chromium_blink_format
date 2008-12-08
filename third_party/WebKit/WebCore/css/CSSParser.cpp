@@ -4858,7 +4858,9 @@ bool CSSParser::addVariable(const CSSParserString& name,
 }
 
 bool CSSParser::addVariableDeclarationBlock(const CSSParserString& name) {
-#if ENABLE(CSS_VARIABLES)
+// FIXME: Disabling declarations as variable values for now since they no longer
+// have a common base class with CSSValues.
+#if ENABLE(CSS_VARIABLES) && 0
   m_variableNames.append(String(name));
   m_variableValues.append(CSSMutableStyleDeclaration::create(
       0, m_parsedProperties, m_numParsedProperties));
