@@ -414,6 +414,8 @@ backforward list.
 - (BOOL)usesPageCache;
 - (void)setUsesPageCache:(BOOL)usesPageCache;
 
+- (WebHistoryItem*)_globalHistoryItem;
+
 /*!
  @method textIteratorForRect:
  @param rectangle from which we want the WebTextIterator to load text from

@@ -703,6 +703,9 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE defersCallbacks(
       /* [out, retval] */ BOOL* defersCallbacks);
 
+  virtual HRESULT STDMETHODCALLTYPE globalHistoryItem(
+      /* [out, retval] */ IWebHistoryItem** item);
+
   virtual HRESULT STDMETHODCALLTYPE setAlwaysUsesComplexTextCodePath(
       /* [in] */ BOOL complex);
 

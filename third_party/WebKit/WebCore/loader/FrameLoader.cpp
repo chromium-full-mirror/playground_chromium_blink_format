@@ -3305,8 +3305,13 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
         }
       }
       if (shouldReset && item)
-        if (Page* page = m_frame->page())
+        if (Page* page = m_frame->page()) {
           page->backForwardList()->goToItem(item.get());
+          Settings* settings = m_frame->settings();
+          page->setGlobalHistoryItem(
+              (!settings || settings->privateBrowsingEnabled()) ? 0
+                                                                : item.get());
+        }
       return;
     }
 
@@ -4115,8 +4120,13 @@ void FrameLoader::continueLoadAfterNavigationPolicy(
       if (Page* page = m_frame->page()) {
         Frame* mainFrame = page->mainFrame();
         if (HistoryItem* resetItem =
-                mainFrame->loader()->m_currentHistoryItem.get())
+                mainFrame->loader()->m_currentHistoryItem.get()) {
           page->backForwardList()->goToItem(resetItem);
+          Settings* settings = m_frame->settings();
+          page->setGlobalHistoryItem(
+              (!settings || settings->privateBrowsingEnabled()) ? 0
+                                                                : resetItem);
+        }
       }
     return;
   }
@@ -4760,6 +4770,9 @@ void FrameLoader::goToItem(HistoryItem* targetItem, FrameLoadType type) {
   BackForwardList* bfList = page->backForwardList();
   HistoryItem* currentItem = bfList->currentItem();
   bfList->goToItem(targetItem);
+  Settings* settings = m_frame->settings();
+  page->setGlobalHistoryItem(
+      (!settings || settings->privateBrowsingEnabled()) ? 0 : targetItem);
   recursiveGoToItem(targetItem, currentItem, type);
 }
 
@@ -4880,6 +4893,9 @@ void FrameLoader::updateHistoryForStandardLoad() {
       addBackForwardItemClippedAtTarget(true);
       if (!needPrivacy)
         m_client->updateGlobalHistory();
+      if (Page* page = m_frame->page())
+        page->setGlobalHistoryItem(
+            needPrivacy ? 0 : page->backForwardList()->currentItem());
     }
   } else if (documentLoader()->unreachableURL().isEmpty() &&
              m_currentHistoryItem) {
@@ -4967,8 +4983,13 @@ void FrameLoader::updateHistoryForRedirectWithLockedHistory() {
   if (documentLoader()->isClientRedirect()) {
     if (!m_currentHistoryItem && !m_frame->tree()->parent()) {
       addBackForwardItemClippedAtTarget(true);
-      if (!needPrivacy && !historyURL.isEmpty())
-        m_client->updateGlobalHistory();
+      if (!historyURL.isEmpty()) {
+        if (!needPrivacy)
+          m_client->updateGlobalHistory();
+        if (Page* page = m_frame->page())
+          page->setGlobalHistoryItem(
+              needPrivacy ? 0 : page->backForwardList()->currentItem());
+      }
     }
     if (m_currentHistoryItem) {
       m_currentHistoryItem->setURL(documentLoader()->url());
