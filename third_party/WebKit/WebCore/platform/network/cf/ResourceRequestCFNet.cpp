@@ -40,12 +40,18 @@ typedef CFArrayRef (
     *CFURLRequestCopyContentDispositionEncodingFallbackArrayFunction)(
     CFURLRequestRef);
 
+static HMODULE findCFNetworkModule() {
+  if (HMODULE module = GetModuleHandleA("CFNetwork"))
+    return module;
+  return GetModuleHandleA("CFNetwork_debug");
+}
+
 static CFURLRequestSetContentDispositionEncodingFallbackArrayFunction
 findCFURLRequestSetContentDispositionEncodingFallbackArrayFunction() {
   return reinterpret_cast<
       CFURLRequestSetContentDispositionEncodingFallbackArrayFunction>(
       GetProcAddress(
-          GetModuleHandleA("CFNetwork"),
+          findCFNetworkModule(),
           "_CFURLRequestSetContentDispositionEncodingFallbackArray"));
 }
 
@@ -54,7 +60,7 @@ findCFURLRequestCopyContentDispositionEncodingFallbackArrayFunction() {
   return reinterpret_cast<
       CFURLRequestCopyContentDispositionEncodingFallbackArrayFunction>(
       GetProcAddress(
-          GetModuleHandleA("CFNetwork"),
+          findCFNetworkModule(),
           "_CFURLRequestCopyContentDispositionEncodingFallbackArray"));
 }
 
