@@ -79,6 +79,8 @@ class FrameView : public ScrollView {
 
   virtual void setCanHaveScrollbars(bool);
 
+  virtual PassRefPtr<Scrollbar> createScrollbar(ScrollbarOrientation);
+
   void layout(bool allowSubtree = true);
   bool didFirstLayout() const;
   void layoutTimerFired(Timer<FrameView>*);
