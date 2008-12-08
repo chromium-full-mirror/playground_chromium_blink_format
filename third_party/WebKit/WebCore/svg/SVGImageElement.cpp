@@ -106,7 +106,7 @@ void SVGImageElement::svgAttributeChanged(const QualifiedName& attrName) {
     renderer()->setNeedsLayout(true);
 
     if (isURIAttribute)
-      m_imageLoader.updateFromElement();
+      m_imageLoader.updateFromElementIgnoringPreviousError();
   }
 }
 
