@@ -123,14 +123,16 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   HashSet<JSObject*> arrayVisitedElements;
 
   Heap heap;
-
+#if ENABLE(ASSEMBLER)
   PassRefPtr<ExecutablePool> poolForSize(size_t n) {
     return m_executableAllocator.poolForSize(n);
   }
-
+#endif
  private:
   JSGlobalData(bool isShared = false);
+#if ENABLE(ASSEMBLER)
   ExecutableAllocator m_executableAllocator;
+#endif
 
   static JSGlobalData*& sharedInstanceInternal();
 };
