@@ -878,7 +878,8 @@ void AnimationBase::animationTimerCallbackFired(const AtomicString& eventType,
   // and it ref counts this object, we will keep a ref to that instead. That way
   // the AnimationBase
   // can still access the resources of its CompositeAnimation as needed.
-  RefPtr<CompositeAnimation> protector(m_compAnim);
+  RefPtr<AnimationBase> protector(this);
+  RefPtr<CompositeAnimation> compProtector(m_compAnim);
 
   ASSERT(m_object->document() && !m_object->document()->inPageCache());
 
