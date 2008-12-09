@@ -714,13 +714,13 @@ QString QWebSettings::offlineWebApplicationCachePath() {
 }
 
 /*!
-    Sets the path for HTML5 offline web application cache storage to \a path.
+    Sets the path for HTML5 local storage databases to \a path.
 
     \a path must point to an existing directory where the cache is stored.
 
     Setting an empty path disables the feature.
 
-    \sa offlineWebApplicationCachePath()
+    \sa localStorageDatabasePath()
 */
 void QWebSettings::setLocalStorageDatabasePath(const QString& path) {
   QWebSettingsPrivate* global = QWebSettings::globalSettings()->d;
@@ -729,12 +729,10 @@ void QWebSettings::setLocalStorageDatabasePath(const QString& path) {
 }
 
 /*!
-    Sets the path for HTML5 local storage database to \a path.
+    Returns the path for HTML5 local storage databases
+    or an empty string if the feature is disabled.
 
-    \a path must point to an existing directory where the cache is stored.
-
-    Setting an empty path disables the feature.
-
+    \sa setLocalStorageDatabasePath()
 */
 QString QWebSettings::localStorageDatabasePath() const {
   QWebSettingsPrivate* global = QWebSettings::globalSettings()->d;
