@@ -42,6 +42,7 @@ class WorkerTask;
 class WorkerThread : public RefCounted<WorkerThread> {
  public:
   static PassRefPtr<WorkerThread> create(const KURL& scriptURL,
+                                         const String& userAgent,
                                          const String& sourceCode,
                                          WorkerMessagingProxy*);
   ~WorkerThread();
@@ -55,7 +56,10 @@ class WorkerThread : public RefCounted<WorkerThread> {
   WorkerMessagingProxy* messagingProxy() const { return m_messagingProxy; }
 
  private:
-  WorkerThread(const KURL&, const String& sourceCode, WorkerMessagingProxy*);
+  WorkerThread(const KURL&,
+               const String& userAgent,
+               const String& sourceCode,
+               WorkerMessagingProxy*);
 
   static void* workerThreadStart(void*);
   void* workerThread();
@@ -63,6 +67,7 @@ class WorkerThread : public RefCounted<WorkerThread> {
   ThreadIdentifier m_threadID;
 
   KURL m_scriptURL;
+  String m_userAgent;
   String m_sourceCode;
   WorkerMessagingProxy* m_messagingProxy;
 

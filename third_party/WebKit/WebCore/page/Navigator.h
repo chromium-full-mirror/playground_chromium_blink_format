@@ -20,6 +20,7 @@
 #ifndef Navigator_h
 #define Navigator_h
 
+#include "NavigatorBase.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -33,7 +34,7 @@ class PluginData;
 class PluginArray;
 class String;
 
-class Navigator : public RefCounted<Navigator> {
+class Navigator : public NavigatorBase, public RefCounted<Navigator> {
  public:
   static PassRefPtr<Navigator> create(Frame* frame) {
     return adoptRef(new Navigator(frame));
@@ -43,22 +44,15 @@ class Navigator : public RefCounted<Navigator> {
   void disconnectFrame();
   Frame* frame() const { return m_frame; }
 
-  String appCodeName() const;
-  String appName() const;
   String appVersion() const;
   String language() const;
-  String userAgent() const;
-  String platform() const;
   PluginArray* plugins() const;
   MimeTypeArray* mimeTypes() const;
-  String product() const;
-  String productSub() const;
-  String vendor() const;
-  String vendorSub() const;
   bool cookieEnabled() const;
   bool javaEnabled() const;
 
-  bool onLine() const;
+  virtual String userAgent() const;
+
   Geolocation* geolocation() const;
   // This is used for GC marking.
   Geolocation* optionalGeolocation() const { return m_geolocation.get(); }

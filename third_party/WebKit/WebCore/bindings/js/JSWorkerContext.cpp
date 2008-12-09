@@ -37,6 +37,7 @@
 #include "JSMessageEvent.h"
 #include "JSMessagePort.h"
 #include "JSWorkerLocation.h"
+#include "JSWorkerNavigator.h"
 #include "WorkerContext.h"
 #include "WorkerLocation.h"
 
@@ -65,6 +66,9 @@ static JSValue* jsWorkerContextPrototypeFunctionDispatchEvent(ExecState*,
 JSValue* jsWorkerContextLocation(ExecState*,
                                  const Identifier&,
                                  const PropertySlot&);
+JSValue* jsWorkerContextNavigator(ExecState*,
+                                  const Identifier&,
+                                  const PropertySlot&);
 JSValue* jsWorkerContextOnmessage(ExecState*,
                                   const Identifier&,
                                   const PropertySlot&);
@@ -95,6 +99,7 @@ DontDelete|Function 2
 /*
 @begin JSWorkerContextTable
   location                      jsWorkerContextLocation DontDelete|ReadOnly
+  navigator                     jsWorkerContextNavigator DontDelete|ReadOnly
   onmessage                     jsWorkerContextOnmessage DontDelete
   MessageEvent                  jsWorkerContextMessageEvent DontDelete
   WorkerLocation                jsWorkerContextWorkerLocation DontDelete
@@ -264,6 +269,14 @@ JSValue* jsWorkerContextLocation(JSC::ExecState* exec,
   WorkerContext* imp = static_cast<WorkerContext*>(
       static_cast<JSWorkerContext*>(asObject(slot.slotBase()))->impl());
   return toJS(exec, imp->location());
+}
+
+JSValue* jsWorkerContextNavigator(JSC::ExecState* exec,
+                                  const Identifier&,
+                                  const PropertySlot& slot) {
+  WorkerContext* imp = static_cast<WorkerContext*>(
+      static_cast<JSWorkerContext*>(asObject(slot.slotBase()))->impl());
+  return toJS(exec, imp->navigator());
 }
 
 JSValue* jsWorkerContextOnmessage(JSC::ExecState* exec,

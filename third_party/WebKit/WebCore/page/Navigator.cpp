@@ -31,41 +31,12 @@
 #include "Geolocation.h"
 #include "Language.h"
 #include "MimeTypeArray.h"
-#include "NetworkStateNotifier.h"
 #include "Page.h"
 #include "PlatformString.h"
 #include "PluginArray.h"
 #include "PluginData.h"
 #include "ScriptController.h"
 #include "Settings.h"
-
-#ifndef WEBCORE_NAVIGATOR_PLATFORM
-#if PLATFORM(MAC) && PLATFORM(PPC)
-#define WEBCORE_NAVIGATOR_PLATFORM "MacPPC"
-#elif PLATFORM(MAC) && PLATFORM(X86)
-#define WEBCORE_NAVIGATOR_PLATFORM "MacIntel"
-#elif PLATFORM(WIN_OS)
-#define WEBCORE_NAVIGATOR_PLATFORM "Win32"
-#else
-#define WEBCORE_NAVIGATOR_PLATFORM ""
-#endif
-#endif  // ifndef WEBCORE_NAVIGATOR_PLATFORM
-
-#ifndef WEBCORE_NAVIGATOR_PRODUCT
-#define WEBCORE_NAVIGATOR_PRODUCT "Gecko"
-#endif  // ifndef WEBCORE_NAVIGATOR_PRODUCT
-
-#ifndef WEBCORE_NAVIGATOR_PRODUCT_SUB
-#define WEBCORE_NAVIGATOR_PRODUCT_SUB "20030107"
-#endif  // ifndef WEBCORE_NAVIGATOR_PRODUCT_SUB
-
-#ifndef WEBCORE_NAVIGATOR_VENDOR
-#define WEBCORE_NAVIGATOR_VENDOR "Apple Computer, Inc."
-#endif  // ifndef WEBCORE_NAVIGATOR_VENDOR
-
-#ifndef WEBCORE_NAVIGATOR_VENDOR_SUB
-#define WEBCORE_NAVIGATOR_VENDOR_SUB ""
-#endif  // ifndef WEBCORE_NAVIGATOR_VENDOR_SUB
 
 namespace WebCore {
 
@@ -89,14 +60,6 @@ void Navigator::disconnectFrame() {
     m_geolocation = 0;
   }
   m_frame = 0;
-}
-
-String Navigator::appCodeName() const {
-  return "Mozilla";
-}
-
-String Navigator::appName() const {
-  return "Netscape";
 }
 
 // If this function returns true, we need to hide the substring "4." that would
@@ -123,10 +86,7 @@ static bool shouldHideFourDot(Frame* frame) {
 String Navigator::appVersion() const {
   if (!m_frame)
     return String();
-  // Version is everything in the user agent string past the "Mozilla/" prefix.
-  const String& userAgent = m_frame->loader()->userAgent(
-      m_frame->document() ? m_frame->document()->url() : KURL());
-  String appVersion = userAgent.substring(userAgent.find('/') + 1);
+  String appVersion = NavigatorBase::appVersion();
   if (shouldHideFourDot(m_frame))
     appVersion.replace("4.", "4_");
   return appVersion;
@@ -143,10 +103,6 @@ String Navigator::userAgent() const {
       m_frame->document() ? m_frame->document()->url() : KURL());
 }
 
-String Navigator::platform() const {
-  return WEBCORE_NAVIGATOR_PLATFORM;
-}
-
 PluginArray* Navigator::plugins() const {
   if (!m_plugins)
     m_plugins = PluginArray::create(m_frame);
@@ -157,22 +113,6 @@ MimeTypeArray* Navigator::mimeTypes() const {
   if (!m_mimeTypes)
     m_mimeTypes = MimeTypeArray::create(m_frame);
   return m_mimeTypes.get();
-}
-
-String Navigator::product() const {
-  return WEBCORE_NAVIGATOR_PRODUCT;
-}
-
-String Navigator::productSub() const {
-  return WEBCORE_NAVIGATOR_PRODUCT_SUB;
-}
-
-String Navigator::vendor() const {
-  return WEBCORE_NAVIGATOR_VENDOR;
-}
-
-String Navigator::vendorSub() const {
-  return WEBCORE_NAVIGATOR_VENDOR_SUB;
 }
 
 bool Navigator::cookieEnabled() const {
@@ -186,10 +126,6 @@ bool Navigator::javaEnabled() const {
   if (!m_frame)
     return false;
   return m_frame->settings()->isJavaEnabled();
-}
-
-bool Navigator::onLine() const {
-  return networkStateNotifier().onLine();
 }
 
 Geolocation* Navigator::geolocation() const {

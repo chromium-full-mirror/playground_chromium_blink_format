@@ -41,16 +41,20 @@ namespace WebCore {
 
 PassRefPtr<WorkerThread> WorkerThread::create(
     const KURL& scriptURL,
+    const String& userAgent,
     const String& sourceCode,
     WorkerMessagingProxy* messagingProxy) {
-  return adoptRef(new WorkerThread(scriptURL, sourceCode, messagingProxy));
+  return adoptRef(
+      new WorkerThread(scriptURL, userAgent, sourceCode, messagingProxy));
 }
 
 WorkerThread::WorkerThread(const KURL& scriptURL,
+                           const String& userAgent,
                            const String& sourceCode,
                            WorkerMessagingProxy* messagingProxy)
     : m_threadID(0),
       m_scriptURL(scriptURL.copy()),
+      m_userAgent(userAgent.copy()),
       m_sourceCode(sourceCode.copy()),
       m_messagingProxy(messagingProxy) {}
 
@@ -77,7 +81,7 @@ void* WorkerThread::workerThreadStart(void* thread) {
 void* WorkerThread::workerThread() {
   {
     MutexLocker lock(m_threadCreationMutex);
-    m_workerContext = WorkerContext::create(m_scriptURL, this);
+    m_workerContext = WorkerContext::create(m_scriptURL, m_userAgent, this);
   }
 
   WorkerScriptController* script = m_workerContext->script();
