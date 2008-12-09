@@ -42,7 +42,18 @@ class MacroAssembler {
   typedef X86::RegisterID RegisterID;
 
   // Note: do not rely on values in this enum, these will change (to 0..3).
-  enum Scale { TimesOne = 1, TimesTwo = 2, TimesFour = 4, TimesEight = 8 };
+  enum Scale {
+    TimesOne = 1,
+    TimesTwo = 2,
+    TimesFour = 4,
+    TimesEight = 8,
+#if PLATFORM(X86)
+    ScalePtr = TimesFour
+#endif
+#if PLATFORM(X86_64)
+        ScalePtr = TimesEight
+#endif
+  };
 
   MacroAssembler() {}
 
@@ -201,6 +212,17 @@ class MacroAssembler {
     int32_t m_value;
   };
 
+  // ImmPtr:
+  //
+  // A pointer sized immediate operand to an instruction - this is wrapped
+  // in a class requiring explicit construction in order to differentiate
+  // from pointers used as absolute addresses to memory operations
+  struct ImmPtr {
+    explicit ImmPtr(void* value) : m_value(value) {}
+
+    void* m_value;
+  };
+
   // Integer arithmetic operations:
   //
   // Operations are typically two operand - operation(source, srcDst)
@@ -234,11 +256,21 @@ class MacroAssembler {
   }
 
   void add32(Address src, RegisterID dest) {
-    m_assembler.addl_mr(src.offset, src.base, dest);
+    if (src.offset)
+      m_assembler.addl_mr(src.offset, src.base, dest);
+    else
+      m_assembler.addl_mr(src.base, dest);
   }
 
   void and32(RegisterID src, RegisterID dest) {
     m_assembler.andl_rr(src, dest);
+  }
+
+  void and32(Imm32 imm, RegisterID dest) {
+    if (CAN_SIGN_EXTEND_8_32(imm.m_value))
+      m_assembler.andl_i8r(imm.m_value, dest);
+    else
+      m_assembler.andl_i32r(imm.m_value, dest);
   }
 
   void lshift32(Imm32 imm, RegisterID dest) {
@@ -248,6 +280,8 @@ class MacroAssembler {
   void mul32(Imm32 imm, RegisterID src, RegisterID dest) {
     m_assembler.imull_i32r(src, imm.m_value, dest);
   }
+
+  void or32(RegisterID src, RegisterID dest) { m_assembler.orl_rr(src, dest); }
 
   void or32(Imm32 imm, RegisterID dest) {
     if (CAN_SIGN_EXTEND_8_32(imm.m_value))
@@ -268,7 +302,21 @@ class MacroAssembler {
   }
 
   void sub32(Address src, RegisterID dest) {
-    m_assembler.subl_mr(src.offset, src.base, dest);
+    if (src.offset)
+      m_assembler.subl_mr(src.offset, src.base, dest);
+    else
+      m_assembler.subl_mr(src.base, dest);
+  }
+
+  void xor32(RegisterID src, RegisterID dest) {
+    m_assembler.xorl_rr(src, dest);
+  }
+
+  void xor32(Imm32 imm, RegisterID dest) {
+    if (CAN_SIGN_EXTEND_8_32(imm.m_value))
+      m_assembler.xorl_i8r(imm.m_value, dest);
+    else
+      m_assembler.xorl_i32r(imm.m_value, dest);
   }
 
   // Memory access operations:
@@ -285,12 +333,15 @@ class MacroAssembler {
     else
       m_assembler.movq_mr(address.base, dest);
 #else
-    if (address.offset)
-      m_assembler.movl_mr(address.offset, address.base, dest);
-    else
-      m_assembler.movl_mr(address.base, dest);
+    load32(address, dest);
 #endif
   }
+
+#if !PLATFORM(X86_64)
+  void loadPtr(BaseIndex address, RegisterID dest) { load32(address, dest); }
+
+  void loadPtr(void* address, RegisterID dest) { load32(address, dest); }
+#endif
 
   void load32(ImplicitAddress address, RegisterID dest) {
     if (address.offset)
@@ -306,6 +357,12 @@ class MacroAssembler {
     else
       m_assembler.movl_mr(address.base, address.index, address.scale, dest);
   }
+
+#if !PLATFORM(X86_64)
+  void load32(void* address, RegisterID dest) {
+    m_assembler.movl_mr(address, dest);
+  }
+#endif
 
   void load16(BaseIndex address, RegisterID dest) {
     if (address.offset)
@@ -330,13 +387,16 @@ class MacroAssembler {
   }
 
 #if !PLATFORM(X86_64)
-  void storePtr(void* value, ImplicitAddress address) {
+  void storePtr(ImmPtr imm, ImplicitAddress address) {
     if (address.offset)
-      m_assembler.movl_i32m(reinterpret_cast<unsigned>(value), address.offset,
-                            address.base);
+      m_assembler.movl_i32m(reinterpret_cast<unsigned>(imm.m_value),
+                            address.offset, address.base);
     else
-      m_assembler.movl_i32m(reinterpret_cast<unsigned>(value), address.base);
+      m_assembler.movl_i32m(reinterpret_cast<unsigned>(imm.m_value),
+                            address.base);
   }
+
+  void storePtr(RegisterID src, BaseIndex address) { store32(src, address); }
 #endif
 
   void store32(RegisterID src, ImplicitAddress address) {
@@ -344,6 +404,14 @@ class MacroAssembler {
       m_assembler.movl_rm(src, address.offset, address.base);
     else
       m_assembler.movl_rm(src, address.base);
+  }
+
+  void store32(RegisterID src, BaseIndex address) {
+    if (address.offset)
+      m_assembler.movl_rm(src, address.offset, address.base, address.index,
+                          address.scale);
+    else
+      m_assembler.movl_rm(src, address.base, address.index, address.scale);
   }
 
   void store32(Imm32 imm, ImplicitAddress address) {
@@ -398,8 +466,8 @@ class MacroAssembler {
   }
 
 #if !PLATFORM(X86_64)
-  void poke(void* value, int index = 0) {
-    storePtr(value, Address(X86::esp, (index * sizeof(void*))));
+  void poke(ImmPtr imm, int index = 0) {
+    storePtr(imm, Address(X86::esp, (index * sizeof(void*))));
   }
 #endif
 
@@ -427,8 +495,8 @@ class MacroAssembler {
   }
 
 #if !PLATFORM(X86_64)
-  void move(void* value, RegisterID dest) {
-    m_assembler.movl_i32r(reinterpret_cast<int32_t>(value), dest);
+  void move(ImmPtr imm, RegisterID dest) {
+    m_assembler.movl_i32r(reinterpret_cast<int32_t>(imm.m_value), dest);
   }
 #endif
 
@@ -446,6 +514,9 @@ class MacroAssembler {
   // Operands to the comparision are provided in the expected order, e.g.
   // jle32(reg1, Imm32(5)) will branch if the value held in reg1, when
   // treated as a signed 32bit value, is less than or equal to 5.
+  //
+  // jz and jnz test whether the first operand is equal to zero, and take
+  // an optional second operand of a mask under which to perform the test.
 
  private:
   void compareImm32ForBranch(RegisterID left, int32_t right) {
@@ -478,11 +549,73 @@ class MacroAssembler {
     }
   }
 
+  void testImm32(RegisterID reg, Imm32 mask) {
+    // if we are only interested in the low seven bits, this can be tested with
+    // a testb
+    if (mask.m_value == -1)
+      m_assembler.testl_rr(reg, reg);
+    else if ((mask.m_value & ~0x7f) == 0)
+      m_assembler.testb_i8r(mask.m_value, reg);
+    else
+      m_assembler.testl_i32r(mask.m_value, reg);
+  }
+
+  void testImm32(Address address, Imm32 mask) {
+    if (address.offset) {
+      if (mask.m_value == -1)
+        m_assembler.cmpl_i8m(0, address.offset, address.base);
+      else
+        m_assembler.testl_i32m(mask.m_value, address.offset, address.base);
+    } else {
+      if (mask.m_value == -1)
+        m_assembler.cmpl_i8m(0, address.base);
+      else
+        m_assembler.testl_i32m(mask.m_value, address.base);
+    }
+  }
+
+  void testImm32(BaseIndex address, Imm32 mask) {
+    if (address.offset) {
+      if (mask.m_value == -1)
+        m_assembler.cmpl_i8m(0, address.offset, address.base, address.index,
+                             address.scale);
+      else
+        m_assembler.testl_i32m(mask.m_value, address.offset, address.base,
+                               address.index, address.scale);
+    } else {
+      if (mask.m_value == -1)
+        m_assembler.cmpl_i8m(0, address.base, address.index, address.scale);
+      else
+        m_assembler.testl_i32m(mask.m_value, address.base, address.index,
+                               address.scale);
+    }
+  }
+
  public:
   Jump jae32(RegisterID left, Imm32 right) {
     compareImm32ForBranch(left, right.m_value);
     return Jump(m_assembler.jae());
   }
+
+  Jump jae32(RegisterID left, Address right) {
+    if (right.offset)
+      m_assembler.cmpl_mr(right.offset, right.base, left);
+    else
+      m_assembler.cmpl_mr(right.base, left);
+    return Jump(m_assembler.jae());
+  }
+
+  Jump jb32(RegisterID left, Address right) {
+    if (right.offset)
+      m_assembler.cmpl_mr(right.offset, right.base, left);
+    else
+      m_assembler.cmpl_mr(right.base, left);
+    return Jump(m_assembler.jb());
+  }
+
+#if !PLATFORM(X86_64)
+  Jump jePtr(RegisterID op1, RegisterID op2) { return je32(op1, op2); }
+#endif
 
   Jump je32(RegisterID op1, RegisterID op2) {
     m_assembler.cmpl_rr(op1, op2);
@@ -496,6 +629,11 @@ class MacroAssembler {
 
   Jump je32(RegisterID reg, Imm32 imm) {
     compareImm32ForBranchEquality(reg, imm.m_value);
+    return Jump(m_assembler.je());
+  }
+
+  Jump je32(Address address, Imm32 imm) {
+    compareImm32ForBranchEquality(address, imm.m_value);
     return Jump(m_assembler.je());
   }
 
@@ -544,9 +682,16 @@ class MacroAssembler {
   }
 
 #if !PLATFORM(X86_64)
-  Jump jnePtr(void* ptr, Address address) {
-    compareImm32ForBranchEquality(address, reinterpret_cast<uint32_t>(ptr));
+  Jump jnePtr(RegisterID reg, Address address) {
+    if (address.offset)
+      m_assembler.cmpl_rm(reg, address.offset, address.base);
+    else
+      m_assembler.cmpl_rm(reg, address.base);
     return Jump(m_assembler.jne());
+  }
+
+  Jump jnePtr(Address address, ImmPtr imm) {
+    return jne32(address, Imm32(reinterpret_cast<int32_t>(imm.m_value)));
   }
 #endif
 
@@ -560,24 +705,56 @@ class MacroAssembler {
     return Jump(m_assembler.jne());
   }
 
-  Jump jnset32(Imm32 imm, RegisterID reg) {
-    // if we are only interested in the low seven bits, this can be tested with
-    // a testb
-    if ((imm.m_value & ~0x7f) == 0)
-      m_assembler.testb_i8r(imm.m_value, reg);
+  Jump jne32(Address address, Imm32 imm) {
+    compareImm32ForBranchEquality(address, imm.m_value);
+    return Jump(m_assembler.jne());
+  }
+
+  Jump jne32(Address address, RegisterID reg) {
+    if (address.offset)
+      m_assembler.cmpl_rm(reg, address.offset, address.base);
     else
-      m_assembler.testl_i32r(imm.m_value, reg);
+      m_assembler.cmpl_rm(reg, address.base);
+    return Jump(m_assembler.jne());
+  }
+
+#if !PLATFORM(X86_64)
+  Jump jnzPtr(RegisterID reg, Imm32 mask = Imm32(-1)) {
+    return jnz32(reg, mask);
+  }
+#endif
+
+  Jump jnz32(RegisterID reg, Imm32 mask = Imm32(-1)) {
+    testImm32(reg, mask);
+    return Jump(m_assembler.jne());
+  }
+
+  Jump jnz32(Address address, Imm32 mask = Imm32(-1)) {
+    testImm32(address, mask);
+    return Jump(m_assembler.jne());
+  }
+
+#if !PLATFORM(X86_64)
+  Jump jzPtr(RegisterID reg, Imm32 mask = Imm32(-1)) { return jz32(reg, mask); }
+
+  Jump jzPtr(BaseIndex address, Imm32 mask = Imm32(-1)) {
+    return jz32(address, mask);
+  }
+#endif
+
+  Jump jz32(RegisterID reg, Imm32 mask = Imm32(-1)) {
+    testImm32(reg, mask);
     return Jump(m_assembler.je());
   }
 
-  Jump jset32(Imm32 imm, RegisterID reg) {
-    // if we are only interested in the low seven bits, this can be tested with
-    // a testb
-    if ((imm.m_value & ~0x7f) == 0)
-      m_assembler.testb_i8r(imm.m_value, reg);
-    else
-      m_assembler.testl_i32r(imm.m_value, reg);
-    return Jump(m_assembler.jne());
+  Jump jz32(Address address, Imm32 mask = Imm32(-1)) {
+    testImm32(address, mask);
+    return Jump(m_assembler.je());
+  }
+
+  Jump jz32(BaseIndex address, Imm32 mask = Imm32(-1)) {
+    testImm32(address, mask);
+    return Jump(m_assembler.je());
   }
 
   Jump jump() { return Jump(m_assembler.jmp()); }
@@ -660,6 +837,11 @@ class MacroAssembler {
     return Jump(m_assembler.jo());
   }
 
+  Jump joSub32(Imm32 imm, RegisterID dest) {
+    sub32(imm, dest);
+    return Jump(m_assembler.jo());
+  }
+
   Jump jzSub32(Imm32 imm, RegisterID dest) {
     sub32(imm, dest);
     return Jump(m_assembler.je());
@@ -671,9 +853,61 @@ class MacroAssembler {
 
   Jump call() { return Jump(m_assembler.call()); }
 
+  // FIXME: why does this return a Jump object? - it can't be linked.
+  // This may be to get a reference to the return address of the call.
+  //
+  // This should probably be handled by a separate label type to a regular
+  // jump.  Todo: add a CallLabel type, for the regular call - can be linked
+  // like a jump (possibly a subclass of jump?, or possibly casts to a Jump).
+  // Also add a CallReturnLabel type for this to return (just a more JmpDsty
+  // form of label, can get the void* after the code has been linked, but can't
+  // try to link it like a Jump object), and let the CallLabel be cast into a
+  // CallReturnLabel.
   Jump call(RegisterID target) { return Jump(m_assembler.call(target)); }
 
+  void jump(RegisterID target) { m_assembler.jmp_r(target); }
+
   void ret() { m_assembler.ret(); }
+
+  void sete32(RegisterID src, RegisterID srcDest) {
+    m_assembler.cmpl_rr(srcDest, src);
+    m_assembler.sete_r(srcDest);
+    m_assembler.movzbl_rr(srcDest, srcDest);
+  }
+
+  void sete32(Imm32 imm, RegisterID srcDest) {
+    compareImm32ForBranchEquality(srcDest, imm.m_value);
+    m_assembler.sete_r(srcDest);
+    m_assembler.movzbl_rr(srcDest, srcDest);
+  }
+
+  void setne32(RegisterID src, RegisterID srcDest) {
+    m_assembler.cmpl_rr(srcDest, src);
+    m_assembler.setne_r(srcDest);
+    m_assembler.movzbl_rr(srcDest, srcDest);
+  }
+
+  void setne32(Imm32 imm, RegisterID srcDest) {
+    compareImm32ForBranchEquality(srcDest, imm.m_value);
+    m_assembler.setne_r(srcDest);
+    m_assembler.movzbl_rr(srcDest, srcDest);
+  }
+
+  // FIXME:
+  // The mask should be optional... paerhaps the argument order should be
+  // dest-src, operations always have a dest? ... possibly not true, considering
+  // asm ops like test, or pseudo ops like pop().
+  void setnz32(Address address, Imm32 mask, RegisterID dest) {
+    testImm32(address, mask);
+    m_assembler.setnz_r(dest);
+    m_assembler.movzbl_rr(dest, dest);
+  }
+
+  void setz32(Address address, Imm32 mask, RegisterID dest) {
+    testImm32(address, mask);
+    m_assembler.setz_r(dest);
+    m_assembler.movzbl_rr(dest, dest);
+  }
 };
 
 }  // namespace JSC

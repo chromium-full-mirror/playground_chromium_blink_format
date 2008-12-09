@@ -282,6 +282,11 @@ class X86Assembler {
   }
 #endif
 
+  void addl_mr(RegisterID base, RegisterID dst) {
+    m_buffer.putByte(OP_ADD_GvEv);
+    modRm_rm(dst, base);
+  }
+
   void addl_mr(int offset, RegisterID base, RegisterID dst) {
     m_buffer.putByte(OP_ADD_GvEv);
     modRm_rm(dst, base, offset);
@@ -290,6 +295,12 @@ class X86Assembler {
   void andl_rr(RegisterID src, RegisterID dst) {
     m_buffer.putByte(OP_AND_EvGv);
     modRm_rr(src, dst);
+  }
+
+  void andl_i8r(int imm, RegisterID dst) {
+    m_buffer.putByte(OP_GROUP1_EvIb);
+    modRm_opr(GROUP1_OP_AND, dst);
+    m_buffer.putByte(imm);
   }
 
   void andl_i32r(int imm, RegisterID dst) {
@@ -309,9 +320,19 @@ class X86Assembler {
     modRm_rr(src, dst);
   }
 
+  void cmpl_rm(RegisterID src, RegisterID base) {
+    m_buffer.putByte(OP_CMP_EvGv);
+    modRm_rm(src, base);
+  }
+
   void cmpl_rm(RegisterID src, int offset, RegisterID base) {
     m_buffer.putByte(OP_CMP_EvGv);
     modRm_rm(src, base, offset);
+  }
+
+  void cmpl_mr(RegisterID base, RegisterID dst) {
+    m_buffer.putByte(OP_CMP_GvEv);
+    modRm_rm(dst, base);
   }
 
   void cmpl_mr(int offset, RegisterID base, RegisterID dst) {
@@ -354,6 +375,12 @@ class X86Assembler {
   void cmpl_i8m(int imm, int offset, RegisterID dst) {
     m_buffer.putByte(OP_GROUP1_EvIb);
     modRm_opm(GROUP1_OP_CMP, dst, offset);
+    m_buffer.putByte(imm);
+  }
+
+  void cmpl_i8m(int imm, RegisterID base, RegisterID index, int scale) {
+    m_buffer.putByte(OP_GROUP1_EvIb);
+    modRm_opmsib(GROUP1_OP_CMP, base, index, scale);
     m_buffer.putByte(imm);
   }
 
@@ -446,6 +473,11 @@ class X86Assembler {
     m_buffer.putInt(imm);
   }
 
+  void subl_mr(RegisterID base, RegisterID dst) {
+    m_buffer.putByte(OP_SUB_GvEv);
+    modRm_rm(dst, base);
+  }
+
   void subl_mr(int offset, RegisterID base, RegisterID dst) {
     m_buffer.putByte(OP_SUB_GvEv);
     modRm_rm(dst, base, offset);
@@ -477,6 +509,22 @@ class X86Assembler {
     m_buffer.putInt(imm);
   }
 
+  void testl_i32m(int imm, RegisterID base, RegisterID index, int scale) {
+    m_buffer.putByte(OP_GROUP3_EvIz);
+    modRm_opmsib(GROUP3_OP_TEST, base, index, scale);
+    m_buffer.putInt(imm);
+  }
+
+  void testl_i32m(int imm,
+                  int offset,
+                  RegisterID base,
+                  RegisterID index,
+                  int scale) {
+    m_buffer.putByte(OP_GROUP3_EvIz);
+    modRm_opmsib(GROUP3_OP_TEST, base, index, scale, offset);
+    m_buffer.putInt(imm);
+  }
+
   void testl_rr(RegisterID src, RegisterID dst) {
     m_buffer.putByte(OP_TEST_EvGv);
     modRm_rr(src, dst);
@@ -486,6 +534,12 @@ class X86Assembler {
     m_buffer.putByte(OP_GROUP1_EvIb);
     modRm_opr(GROUP1_OP_XOR, dst);
     m_buffer.putByte(imm);
+  }
+
+  void xorl_i32r(int imm, RegisterID dst) {
+    m_buffer.putByte(OP_GROUP1_EvIz);
+    modRm_opr(GROUP1_OP_XOR, dst);
+    m_buffer.putInt(imm);
   }
 
   void xorl_rr(RegisterID src, RegisterID dst) {
@@ -644,6 +698,11 @@ class X86Assembler {
     modRm_rm_Unchecked(src, base, offset);
   }
 #endif
+
+  void movl_rm(RegisterID src, RegisterID base, RegisterID index, int scale) {
+    m_buffer.putByte(OP_MOV_EvGv);
+    modRm_rmsib(src, base, index, scale);
+  }
 
   void movl_rm(RegisterID src,
                int offset,
@@ -1119,6 +1178,13 @@ class X86Assembler {
                     int scale,
                     int offset) {
     modRm_rmsib(static_cast<RegisterID>(opcodeID), base, index, scale, offset);
+  }
+
+  void modRm_opmsib(OpcodeID opcodeID,
+                    RegisterID base,
+                    RegisterID index,
+                    int scale) {
+    modRm_rmsib(static_cast<RegisterID>(opcodeID), base, index, scale);
   }
 
   AssemblerBuffer m_buffer;

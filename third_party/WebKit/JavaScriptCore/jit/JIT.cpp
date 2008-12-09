@@ -573,7 +573,7 @@ void JIT::privateCompileMainPass() {
       case op_get_global_var: {
         JSVariableObject* globalObject =
             static_cast<JSVariableObject*>(instruction[i + 2].u.jsCell);
-        move(globalObject, X86::eax);
+        move(ImmPtr(globalObject), X86::eax);
         emitGetVariableObjectRegister(X86::eax, instruction[i + 3].u.operand,
                                       X86::eax);
         emitPutVirtualRegister(instruction[i + 1].u.operand);
@@ -584,7 +584,7 @@ void JIT::privateCompileMainPass() {
         emitGetVirtualRegister(instruction[i + 3].u.operand, X86::edx, i);
         JSVariableObject* globalObject =
             static_cast<JSVariableObject*>(instruction[i + 1].u.jsCell);
-        move(globalObject, X86::eax);
+        move(ImmPtr(globalObject), X86::eax);
         emitPutVariableObjectRegister(X86::edx, X86::eax,
                                       instruction[i + 2].u.operand);
         i += 4;
