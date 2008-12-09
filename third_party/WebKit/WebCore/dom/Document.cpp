@@ -4224,8 +4224,8 @@ void Document::stopDatabases() {
 
 #if ENABLE(WML)
 void Document::resetWMLPageState() {
-  if (WMLPageState* wmlPageState = wmlPageStateForDocument(this))
-    wmlPageState->reset();
+  if (WMLPageState* pageState = wmlPageStateForDocument(this))
+    pageState->reset();
 }
 #endif
 

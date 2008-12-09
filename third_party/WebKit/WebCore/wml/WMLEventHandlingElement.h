@@ -27,8 +27,11 @@
 #include "WMLIntrinsicEventHandler.h"
 
 #include <wtf/OwnPtr.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
+
+class WMLDoElement;
 
 class WMLEventHandlingElement : public WMLElement {
  public:
@@ -41,8 +44,11 @@ class WMLEventHandlingElement : public WMLElement {
   }
   void createEventHandlerIfNeeded();
 
+  void registerDoElement(WMLDoElement*);
+
  private:
   OwnPtr<WMLIntrinsicEventHandler> m_eventHandler;
+  Vector<WMLDoElement*> m_doElements;
 };
 }
 
