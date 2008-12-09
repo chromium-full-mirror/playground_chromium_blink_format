@@ -294,13 +294,15 @@ class CodeBlock {
   unsigned lastJumpTarget() const { return m_jumpTargets.last(); }
 
   size_t numberOfExceptionHandlers() const {
-    return m_exceptionHandlers.size();
+    return m_rareData ? m_rareData->m_exceptionHandlers.size() : 0;
   }
   void addExceptionHandler(const HandlerInfo& hanler) {
-    return m_exceptionHandlers.append(hanler);
+    createRareDataIfNecessary();
+    return m_rareData->m_exceptionHandlers.append(hanler);
   }
   HandlerInfo& exceptionHandler(int index) {
-    return m_exceptionHandlers[index];
+    ASSERT(m_rareData);
+    return m_rareData->m_exceptionHandlers[index];
   }
 
   void addExpressionInfo(const ExpressionRangeInfo& expressionInfo) {
@@ -333,13 +335,6 @@ class CodeBlock {
   }
   Register& constantRegister(int index) { return m_constantRegisters[index]; }
 
-  unsigned addFunction(FuncDeclNode* n) {
-    unsigned size = m_functions.size();
-    m_functions.append(n);
-    return size;
-  }
-  FuncDeclNode* function(int index) const { return m_functions[index].get(); }
-
   unsigned addFunctionExpression(FuncExprNode* n) {
     unsigned size = m_functionExpressions.size();
     m_functionExpressions.append(n);
@@ -349,59 +344,86 @@ class CodeBlock {
     return m_functionExpressions[index].get();
   }
 
+  unsigned addFunction(FuncDeclNode* n) {
+    createRareDataIfNecessary();
+    unsigned size = m_rareData->m_functions.size();
+    m_rareData->m_functions.append(n);
+    return size;
+  }
+  FuncDeclNode* function(int index) const {
+    ASSERT(m_rareData);
+    return m_rareData->m_functions[index].get();
+  }
+
   unsigned addUnexpectedConstant(JSValue* v) {
-    unsigned size = m_unexpectedConstants.size();
-    m_unexpectedConstants.append(v);
+    createRareDataIfNecessary();
+    unsigned size = m_rareData->m_unexpectedConstants.size();
+    m_rareData->m_unexpectedConstants.append(v);
     return size;
   }
   JSValue* unexpectedConstant(int index) const {
-    return m_unexpectedConstants[index];
+    ASSERT(m_rareData);
+    return m_rareData->m_unexpectedConstants[index];
   }
 
   unsigned addRegExp(RegExp* r) {
-    unsigned size = m_regexps.size();
-    m_regexps.append(r);
+    createRareDataIfNecessary();
+    unsigned size = m_rareData->m_regexps.size();
+    m_rareData->m_regexps.append(r);
     return size;
   }
-  RegExp* regexp(int index) const { return m_regexps[index].get(); }
+  RegExp* regexp(int index) const {
+    ASSERT(m_rareData);
+    return m_rareData->m_regexps[index].get();
+  }
 
   // Jump Tables
 
   size_t numberOfImmediateSwitchJumpTables() const {
-    return m_immediateSwitchJumpTables.size();
+    return m_rareData ? m_rareData->m_immediateSwitchJumpTables.size() : 0;
   }
   SimpleJumpTable& addImmediateSwitchJumpTable() {
-    m_immediateSwitchJumpTables.append(SimpleJumpTable());
-    return m_immediateSwitchJumpTables.last();
+    createRareDataIfNecessary();
+    m_rareData->m_immediateSwitchJumpTables.append(SimpleJumpTable());
+    return m_rareData->m_immediateSwitchJumpTables.last();
   }
   SimpleJumpTable& immediateSwitchJumpTable(int tableIndex) {
-    return m_immediateSwitchJumpTables[tableIndex];
+    ASSERT(m_rareData);
+    return m_rareData->m_immediateSwitchJumpTables[tableIndex];
   }
 
   size_t numberOfCharacterSwitchJumpTables() const {
-    return m_characterSwitchJumpTables.size();
+    return m_rareData ? m_rareData->m_characterSwitchJumpTables.size() : 0;
   }
   SimpleJumpTable& addCharacterSwitchJumpTable() {
-    m_characterSwitchJumpTables.append(SimpleJumpTable());
-    return m_characterSwitchJumpTables.last();
+    createRareDataIfNecessary();
+    m_rareData->m_characterSwitchJumpTables.append(SimpleJumpTable());
+    return m_rareData->m_characterSwitchJumpTables.last();
   }
   SimpleJumpTable& characterSwitchJumpTable(int tableIndex) {
-    return m_characterSwitchJumpTables[tableIndex];
+    ASSERT(m_rareData);
+    return m_rareData->m_characterSwitchJumpTables[tableIndex];
   }
 
   size_t numberOfStringSwitchJumpTables() const {
-    return m_stringSwitchJumpTables.size();
+    return m_rareData ? m_rareData->m_stringSwitchJumpTables.size() : 0;
   }
   StringJumpTable& addStringSwitchJumpTable() {
-    m_stringSwitchJumpTables.append(StringJumpTable());
-    return m_stringSwitchJumpTables.last();
+    createRareDataIfNecessary();
+    m_rareData->m_stringSwitchJumpTables.append(StringJumpTable());
+    return m_rareData->m_stringSwitchJumpTables.last();
   }
   StringJumpTable& stringSwitchJumpTable(int tableIndex) {
-    return m_stringSwitchJumpTables[tableIndex];
+    ASSERT(m_rareData);
+    return m_rareData->m_stringSwitchJumpTables[tableIndex];
   }
 
   SymbolTable& symbolTable() { return m_symbolTable; }
-  EvalCodeCache& evalCodeCache() { return m_evalCodeCache; }
+
+  EvalCodeCache& evalCodeCache() {
+    createRareDataIfNecessary();
+    return m_rareData->m_evalCodeCache;
+  }
 
   void shrinkToFit();
 
@@ -422,6 +444,11 @@ class CodeBlock {
             const Vector<Instruction>::const_iterator& begin,
             Vector<Instruction>::const_iterator&) const;
 #endif
+
+  void createRareDataIfNecessary() {
+    if (!m_rareData)
+      m_rareData.set(new RareData);
+  }
 
   ScopeNode* m_ownerNode;
   JSGlobalData* m_globalData;
@@ -450,7 +477,6 @@ class CodeBlock {
 
   Vector<unsigned> m_jumpTargets;
 
-  Vector<HandlerInfo> m_exceptionHandlers;
   Vector<ExpressionRangeInfo> m_expressionInfo;
   Vector<LineInfo> m_lineInfo;
 
@@ -461,19 +487,27 @@ class CodeBlock {
   // Constant Pool
   Vector<Identifier> m_identifiers;
   Vector<Register> m_constantRegisters;
-  Vector<RefPtr<FuncDeclNode>> m_functions;
   Vector<RefPtr<FuncExprNode>> m_functionExpressions;
-  Vector<JSValue*> m_unexpectedConstants;
-  Vector<RefPtr<RegExp>> m_regexps;
-
-  // Jump Tables
-  Vector<SimpleJumpTable> m_immediateSwitchJumpTables;
-  Vector<SimpleJumpTable> m_characterSwitchJumpTables;
-  Vector<StringJumpTable> m_stringSwitchJumpTables;
 
   SymbolTable m_symbolTable;
 
-  EvalCodeCache m_evalCodeCache;
+  struct RareData {
+    Vector<HandlerInfo> m_exceptionHandlers;
+
+    // Rare Constants
+    Vector<RefPtr<FuncDeclNode>> m_functions;
+    Vector<JSValue*> m_unexpectedConstants;
+    Vector<RefPtr<RegExp>> m_regexps;
+
+    // Jump Tables
+    Vector<SimpleJumpTable> m_immediateSwitchJumpTables;
+    Vector<SimpleJumpTable> m_characterSwitchJumpTables;
+    Vector<StringJumpTable> m_stringSwitchJumpTables;
+
+    EvalCodeCache m_evalCodeCache;
+  };
+
+  OwnPtr<RareData> m_rareData;
 };
 
 // Program code is not marked by any function, so we make the global object
