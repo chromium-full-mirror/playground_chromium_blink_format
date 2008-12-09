@@ -30,6 +30,7 @@
 
 #if ENABLE(WREC)
 
+#include <wtf/Assertions.h>
 #include <limits.h>
 
 namespace JSC {
@@ -44,7 +45,9 @@ struct Quantifier {
   };
 
   Quantifier(Type type = None, unsigned min = 0, unsigned max = noMaxSpecified)
-      : type(type), min(min), max(max) {}
+      : type(type), min(min), max(max) {
+    ASSERT(min <= max);
+  }
 
   Type type;
 
