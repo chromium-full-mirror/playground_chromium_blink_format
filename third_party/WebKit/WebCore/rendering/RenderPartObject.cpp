@@ -36,6 +36,7 @@
 #include "HTMLParamElement.h"
 #include "MIMETypeRegistry.h"
 #include "Page.h"
+#include "PluginData.h"
 #include "Text.h"
 
 namespace WebCore {
@@ -73,27 +74,55 @@ static bool isURLAllowed(Document* doc, const String& url) {
 }
 
 static inline void mapClassIdToServiceType(const String& classId,
-                                           String& serviceType) {
-  // It is ActiveX, but the nsplugin system handling
-  // should also work, that's why we don't override the
-  // serviceType with application/x-activex-handler
-  // but let the KTrader in khtmlpart::createPart() detect
-  // the user's preference: launch with activex viewer or
-  // with nspluginviewer (Niko)
-  if (classId.contains("D27CDB6E-AE6D-11cf-96B8-444553540000"))
-    serviceType = "application/x-shockwave-flash";
-  else if (classId.contains("CFCDAA03-8BE4-11cf-B84B-0020AFBBCCFA"))
-    serviceType = "audio/x-pn-realaudio-plugin";
-  else if (classId.contains("02BF25D5-8C17-4B23-BC80-D3488ABDDC6B"))
-    serviceType = "video/quicktime";
-  else if (classId.contains("166B1BCA-3F9C-11CF-8075-444553540000"))
-    serviceType = "application/x-director";
-  else if (classId.contains("6BF52A52-394A-11d3-B153-00C04F79FAA6"))
-    serviceType = "application/x-mplayer2";
-  else if (!classId.isEmpty()) {
-    // We have a clsid, means this is Active X (Niko)
-    serviceType = "application/x-activex-handler";
+                                           String& serviceType,
+                                           const PluginData* pluginData) {
+  // Return early if classId is empty (since we won't do anything below).
+  // Furthermore, if classId is null, calling get() below will crash.
+  if (classId.isEmpty())
+    return;
+
+  typedef HashMap<String, String, CaseFoldingHash> ServiceTypeHashMap;
+  static ServiceTypeHashMap* serviceTypeFallbackForClassId = 0;
+  if (!serviceTypeFallbackForClassId) {
+    serviceTypeFallbackForClassId = new ServiceTypeHashMap;
+    serviceTypeFallbackForClassId->add(
+        "clsid:D27CDB6E-AE6D-11CF-96B8-444553540000",
+        "application/x-shockwave-flash");
+    serviceTypeFallbackForClassId->add(
+        "clsid:CFCDAA03-8BE4-11CF-B84B-0020AFBBCCFA",
+        "audio/x-pn-realaudio-plugin");
+    serviceTypeFallbackForClassId->add(
+        "clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B", "video/quicktime");
+    serviceTypeFallbackForClassId->add(
+        "clsid:166B1BCA-3F9C-11CF-8075-444553540000", "application/x-director");
+#if ENABLE(ACTIVEX_TYPE_CONVERSION_WMPLAYER)
+    serviceTypeFallbackForClassId->add(
+        "clsid:6BF52A52-394A-11D3-B153-00C04F79FAA6", "application/x-mplayer2");
+    serviceTypeFallbackForClassId->add(
+        "clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95", "application/x-mplayer2");
+#endif
   }
+
+  const String fallbackServiceType =
+      serviceTypeFallbackForClassId->get(classId);
+  if (pluginData->supportsMimeType(fallbackServiceType))
+    serviceType = fallbackServiceType;
+  else if (pluginData->supportsMimeType("application/x-oleobject"))
+    serviceType = "application/x-oleobject";
+}
+
+static bool shouldUseChildEmbedOfObject(HTMLObjectElement* o,
+                                        const PluginData* pluginData) {
+  // An OBJECT tag with a classId is some kind of ActiveX control.  The most
+  // common controls have parallel plugin versions and thus possibly nested
+  // EMBED tags.  If this is the case, the OBJECT's classId should map to some
+  // known plugin MIME type.  If it doesn't, either the control is unlikely to
+  // have a parallel plugin implementation (so there's no point looking
+  // inside), or we've purposefully disabled conversion for this classId, in
+  // which case we want to use the ActiveX OBJECT instead of the EMBED anyway.
+  String serviceType;
+  mapClassIdToServiceType(o->classId(), serviceType, pluginData);
+  return serviceType != "application/x-oleobject";
 }
 
 void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
@@ -109,17 +138,22 @@ void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
     o->setNeedWidgetUpdate(false);
     if (!o->isFinishedParsingChildren())
       return;
+
     // Check for a child EMBED tag.
     HTMLEmbedElement* embed = 0;
-    for (Node* child = o->firstChild(); child;) {
-      if (child->hasTagName(embedTag)) {
-        embed = static_cast<HTMLEmbedElement*>(child);
-        break;
-      } else if (child->hasTagName(objectTag))
-        child = child->nextSibling();  // Don't descend into nested OBJECT tags
-      else
-        child = child->traverseNextNode(
-            o);  // Otherwise descend (EMBEDs may be inside COMMENT tags)
+    const PluginData* pluginData = frame->page()->pluginData();
+    if (shouldUseChildEmbedOfObject(o, pluginData)) {
+      for (Node* child = o->firstChild(); child;) {
+        if (child->hasTagName(embedTag)) {
+          embed = static_cast<HTMLEmbedElement*>(child);
+          break;
+        } else if (child->hasTagName(objectTag))
+          child =
+              child->nextSibling();  // Don't descend into nested OBJECT tags
+        else
+          child = child->traverseNextNode(
+              o);  // Otherwise descend (EMBEDs may be inside COMMENT tags)
+      }
     }
 
     // Use the attributes from the EMBED tag instead of the OBJECT tag including
@@ -200,8 +234,8 @@ void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
 
     // If we still don't have a type, try to map from a specific CLASSID to a
     // type.
-    if (serviceType.isEmpty() && !o->classId().isEmpty())
-      mapClassIdToServiceType(o->classId(), serviceType);
+    if (serviceType.isEmpty())
+      mapClassIdToServiceType(o->classId(), serviceType, pluginData);
 
     if (!isURLAllowed(document(), url))
       return;
