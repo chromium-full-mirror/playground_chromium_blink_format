@@ -273,23 +273,26 @@ class JIT : private MacroAssembler {
 
   static void compileGetByIdSelf(JSGlobalData* globalData,
                                  CodeBlock* codeBlock,
+                                 StructureStubInfo* stubInfo,
                                  Structure* structure,
                                  size_t cachedOffset,
                                  void* returnAddress) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompileGetByIdSelf(structure, cachedOffset, returnAddress);
+    jit.privateCompileGetByIdSelf(stubInfo, structure, cachedOffset,
+                                  returnAddress);
   }
 
   static void compileGetByIdProto(JSGlobalData* globalData,
                                   CallFrame* callFrame,
                                   CodeBlock* codeBlock,
+                                  StructureStubInfo* stubInfo,
                                   Structure* structure,
                                   Structure* prototypeStructure,
                                   size_t cachedOffset,
                                   void* returnAddress) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompileGetByIdProto(structure, prototypeStructure, cachedOffset,
-                                   returnAddress, callFrame);
+    jit.privateCompileGetByIdProto(stubInfo, structure, prototypeStructure,
+                                   cachedOffset, returnAddress, callFrame);
   }
 
 #if USE(CTI_REPATCH_PIC)
@@ -341,34 +344,38 @@ class JIT : private MacroAssembler {
   static void compileGetByIdChain(JSGlobalData* globalData,
                                   CallFrame* callFrame,
                                   CodeBlock* codeBlock,
+                                  StructureStubInfo* stubInfo,
                                   Structure* structure,
                                   StructureChain* chain,
                                   size_t count,
                                   size_t cachedOffset,
                                   void* returnAddress) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompileGetByIdChain(structure, chain, count, cachedOffset,
-                                   returnAddress, callFrame);
+    jit.privateCompileGetByIdChain(stubInfo, structure, chain, count,
+                                   cachedOffset, returnAddress, callFrame);
   }
 
   static void compilePutByIdReplace(JSGlobalData* globalData,
                                     CodeBlock* codeBlock,
+                                    StructureStubInfo* stubInfo,
                                     Structure* structure,
                                     size_t cachedOffset,
                                     void* returnAddress) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompilePutByIdReplace(structure, cachedOffset, returnAddress);
+    jit.privateCompilePutByIdReplace(stubInfo, structure, cachedOffset,
+                                     returnAddress);
   }
 
   static void compilePutByIdTransition(JSGlobalData* globalData,
                                        CodeBlock* codeBlock,
+                                       StructureStubInfo* stubInfo,
                                        Structure* oldStructure,
                                        Structure* newStructure,
                                        size_t cachedOffset,
                                        StructureChain* chain,
                                        void* returnAddress) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompilePutByIdTransition(oldStructure, newStructure,
+    jit.privateCompilePutByIdTransition(stubInfo, oldStructure, newStructure,
                                         cachedOffset, chain, returnAddress);
   }
 
@@ -377,12 +384,12 @@ class JIT : private MacroAssembler {
     jit.privateCompileCTIMachineTrampolines();
   }
 
-  static void patchGetByIdSelf(CodeBlock* codeBlock,
-                               Structure* structure,
+  static void patchGetByIdSelf(StructureStubInfo*,
+                               Structure*,
                                size_t cachedOffset,
                                void* returnAddress);
-  static void patchPutByIdReplace(CodeBlock* codeBlock,
-                                  Structure* structure,
+  static void patchPutByIdReplace(StructureStubInfo*,
+                                  Structure*,
                                   size_t cachedOffset,
                                   void* returnAddress);
 
@@ -416,10 +423,12 @@ class JIT : private MacroAssembler {
   void privateCompileLinkPass();
   void privateCompileSlowCases();
   void privateCompile();
-  void privateCompileGetByIdSelf(Structure*,
+  void privateCompileGetByIdSelf(StructureStubInfo*,
+                                 Structure*,
                                  size_t cachedOffset,
                                  void* returnAddress);
-  void privateCompileGetByIdProto(Structure*,
+  void privateCompileGetByIdProto(StructureStubInfo*,
+                                  Structure*,
                                   Structure* prototypeStructure,
                                   size_t cachedOffset,
                                   void* returnAddress,
@@ -446,16 +455,19 @@ class JIT : private MacroAssembler {
                                       size_t cachedOffset,
                                       CallFrame* callFrame);
 #endif
-  void privateCompileGetByIdChain(Structure*,
+  void privateCompileGetByIdChain(StructureStubInfo*,
+                                  Structure*,
                                   StructureChain*,
                                   size_t count,
                                   size_t cachedOffset,
                                   void* returnAddress,
                                   CallFrame* callFrame);
-  void privateCompilePutByIdReplace(Structure*,
+  void privateCompilePutByIdReplace(StructureStubInfo*,
+                                    Structure*,
                                     size_t cachedOffset,
                                     void* returnAddress);
-  void privateCompilePutByIdTransition(Structure*,
+  void privateCompilePutByIdTransition(StructureStubInfo*,
+                                       Structure*,
                                        Structure*,
                                        size_t cachedOffset,
                                        StructureChain*,

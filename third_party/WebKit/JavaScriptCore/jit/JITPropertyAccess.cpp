@@ -286,7 +286,8 @@ static inline bool transitionWillNeedStorageRealloc(Structure* oldStructure,
          newStructure->propertyStorageCapacity();
 }
 
-void JIT::privateCompilePutByIdTransition(Structure* oldStructure,
+void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
+                                          Structure* oldStructure,
                                           Structure* newStructure,
                                           size_t cachedOffset,
                                           StructureChain* chain,
@@ -377,17 +378,15 @@ void JIT::privateCompilePutByIdTransition(Structure* oldStructure,
     X86Assembler::link(code, callTarget,
                        reinterpret_cast<void*>(resizePropertyStorage));
 
-  m_codeBlock->getStubInfo(returnAddress).stubRoutine = code;
+  stubInfo->stubRoutine = code;
 
   ctiRepatchCallByReturnAddress(returnAddress, code);
 }
 
-void JIT::patchGetByIdSelf(CodeBlock* codeBlock,
+void JIT::patchGetByIdSelf(StructureStubInfo* stubInfo,
                            Structure* structure,
                            size_t cachedOffset,
                            void* returnAddress) {
-  StructureStubInfo& info = codeBlock->getStubInfo(returnAddress);
-
   // We don't want to repatch more than once - in future go to
   // cti_op_get_by_id_generic.
   // Should probably go to Interpreter::cti_op_get_by_id_fail, but that doesn't
@@ -399,20 +398,19 @@ void JIT::patchGetByIdSelf(CodeBlock* codeBlock,
   // Repatch the offset into the propoerty map to load from, then repatch the
   // Structure to look for.
   X86Assembler::repatchDisplacement(
-      reinterpret_cast<intptr_t>(info.hotPathBegin) +
+      reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
           repatchOffsetGetByIdPropertyMapOffset,
       cachedOffset * sizeof(JSValue*));
-  X86Assembler::repatchImmediate(reinterpret_cast<intptr_t>(info.hotPathBegin) +
-                                     repatchOffsetGetByIdStructure,
-                                 reinterpret_cast<uint32_t>(structure));
+  X86Assembler::repatchImmediate(
+      reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
+          repatchOffsetGetByIdStructure,
+      reinterpret_cast<uint32_t>(structure));
 }
 
-void JIT::patchPutByIdReplace(CodeBlock* codeBlock,
+void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
                               Structure* structure,
                               size_t cachedOffset,
                               void* returnAddress) {
-  StructureStubInfo& info = codeBlock->getStubInfo(returnAddress);
-
   // We don't want to repatch more than once - in future go to
   // cti_op_put_by_id_generic.
   // Should probably go to Interpreter::cti_op_put_by_id_fail, but that doesn't
@@ -424,16 +422,17 @@ void JIT::patchPutByIdReplace(CodeBlock* codeBlock,
   // Repatch the offset into the propoerty map to load from, then repatch the
   // Structure to look for.
   X86Assembler::repatchDisplacement(
-      reinterpret_cast<intptr_t>(info.hotPathBegin) +
+      reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
           repatchOffsetPutByIdPropertyMapOffset,
       cachedOffset * sizeof(JSValue*));
-  X86Assembler::repatchImmediate(reinterpret_cast<intptr_t>(info.hotPathBegin) +
-                                     repatchOffsetPutByIdStructure,
-                                 reinterpret_cast<uint32_t>(structure));
+  X86Assembler::repatchImmediate(
+      reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
+          repatchOffsetPutByIdStructure,
+      reinterpret_cast<uint32_t>(structure));
 }
 
 void JIT::privateCompilePatchGetArrayLength(void* returnAddress) {
-  StructureStubInfo& info = m_codeBlock->getStubInfo(returnAddress);
+  StructureStubInfo* stubInfo = &m_codeBlock->getStubInfo(returnAddress);
 
   // We don't want to repatch more than once - in future go to
   // cti_op_put_by_id_generic.
@@ -462,28 +461,29 @@ void JIT::privateCompilePatchGetArrayLength(void* returnAddress) {
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
-  void* slowCaseBegin = reinterpret_cast<char*>(info.callReturnLocation) -
+  void* slowCaseBegin = reinterpret_cast<char*>(stubInfo->callReturnLocation) -
                         repatchOffsetGetByIdSlowCaseCall;
   X86Assembler::link(code, failureCases1, slowCaseBegin);
   X86Assembler::link(code, failureCases2, slowCaseBegin);
 
   // On success return back to the hot patch code, at a point it will perform
   // the store to dest for us.
-  intptr_t successDest = reinterpret_cast<intptr_t>(info.hotPathBegin) +
+  intptr_t successDest = reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
                          repatchOffsetGetByIdPropertyMapOffset;
   X86Assembler::link(code, success, reinterpret_cast<void*>(successDest));
 
   // Track the stub we have created so that it will be deleted later.
-  m_codeBlock->getStubInfo(returnAddress).stubRoutine = code;
+  stubInfo->stubRoutine = code;
 
   // Finally repatch the jump to sow case back in the hot path to jump here
   // instead.
-  intptr_t jmpLocation = reinterpret_cast<intptr_t>(info.hotPathBegin) +
+  intptr_t jmpLocation = reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
                          repatchOffsetGetByIdBranchToSlowCase;
   X86Assembler::repatchBranchOffset(jmpLocation, code);
 }
 
-void JIT::privateCompileGetByIdSelf(Structure* structure,
+void JIT::privateCompileGetByIdSelf(StructureStubInfo* stubInfo,
+                                    Structure* structure,
                                     size_t cachedOffset,
                                     void* returnAddress) {
   // Check eax is an object of the right Structure.
@@ -505,19 +505,18 @@ void JIT::privateCompileGetByIdSelf(Structure* structure,
       code, failureCases2,
       reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_self_fail));
 
-  m_codeBlock->getStubInfo(returnAddress).stubRoutine = code;
+  stubInfo->stubRoutine = code;
 
   ctiRepatchCallByReturnAddress(returnAddress, code);
 }
 
-void JIT::privateCompileGetByIdProto(Structure* structure,
+void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
+                                     Structure* structure,
                                      Structure* prototypeStructure,
                                      size_t cachedOffset,
                                      void* returnAddress,
                                      CallFrame* callFrame) {
 #if USE(CTI_REPATCH_PIC)
-  StructureStubInfo& info = m_codeBlock->getStubInfo(returnAddress);
-
   // We don't want to repatch more than once - in future go to
   // cti_op_put_by_id_generic.
   ctiRepatchCallByReturnAddress(
@@ -550,23 +549,23 @@ void JIT::privateCompileGetByIdProto(Structure* structure,
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
-  void* slowCaseBegin = reinterpret_cast<char*>(info.callReturnLocation) -
+  void* slowCaseBegin = reinterpret_cast<char*>(stubInfo->callReturnLocation) -
                         repatchOffsetGetByIdSlowCaseCall;
   X86Assembler::link(code, failureCases1, slowCaseBegin);
   X86Assembler::link(code, failureCases2, slowCaseBegin);
 
   // On success return back to the hot patch code, at a point it will perform
   // the store to dest for us.
-  intptr_t successDest = reinterpret_cast<intptr_t>(info.hotPathBegin) +
+  intptr_t successDest = reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
                          repatchOffsetGetByIdPropertyMapOffset;
   X86Assembler::link(code, success, reinterpret_cast<void*>(successDest));
 
   // Track the stub we have created so that it will be deleted later.
-  info.stubRoutine = code;
+  stubInfo->stubRoutine = code;
 
   // Finally repatch the jump to slow case back in the hot path to jump here
   // instead.
-  intptr_t jmpLocation = reinterpret_cast<intptr_t>(info.hotPathBegin) +
+  intptr_t jmpLocation = reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
                          repatchOffsetGetByIdBranchToSlowCase;
   X86Assembler::repatchBranchOffset(jmpLocation, code);
 #else
@@ -606,7 +605,7 @@ void JIT::privateCompileGetByIdProto(Structure* structure,
       code, failureCases3,
       reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_proto_fail));
 
-  m_codeBlock->getStubInfo(returnAddress).stubRoutine = code;
+  stubInfo->stubRoutine = code;
 
   ctiRepatchCallByReturnAddress(returnAddress, code);
 #endif
@@ -776,15 +775,14 @@ void JIT::privateCompileGetByIdChainList(
 }
 #endif
 
-void JIT::privateCompileGetByIdChain(Structure* structure,
+void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
+                                     Structure* structure,
                                      StructureChain* chain,
                                      size_t count,
                                      size_t cachedOffset,
                                      void* returnAddress,
                                      CallFrame* callFrame) {
 #if USE(CTI_REPATCH_PIC)
-  StructureStubInfo& info = m_codeBlock->getStubInfo(returnAddress);
-
   // We don't want to repatch more than once - in future go to
   // cti_op_put_by_id_generic.
   ctiRepatchCallByReturnAddress(
@@ -822,7 +820,7 @@ void JIT::privateCompileGetByIdChain(Structure* structure,
 
   // Use the repatch information to link the failure cases back to the original
   // slow case routine.
-  void* slowCaseBegin = reinterpret_cast<char*>(info.callReturnLocation) -
+  void* slowCaseBegin = reinterpret_cast<char*>(stubInfo->callReturnLocation) -
                         repatchOffsetGetByIdSlowCaseCall;
 
   for (unsigned i = 0; i < bucketsOfFail.size(); ++i)
@@ -830,16 +828,16 @@ void JIT::privateCompileGetByIdChain(Structure* structure,
 
   // On success return back to the hot patch code, at a point it will perform
   // the store to dest for us.
-  intptr_t successDest = reinterpret_cast<intptr_t>(info.hotPathBegin) +
+  intptr_t successDest = reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
                          repatchOffsetGetByIdPropertyMapOffset;
   X86Assembler::link(code, success, reinterpret_cast<void*>(successDest));
 
   // Track the stub we have created so that it will be deleted later.
-  info.stubRoutine = code;
+  stubInfo->stubRoutine = code;
 
   // Finally repatch the jump to slow case back in the hot path to jump here
   // instead.
-  intptr_t jmpLocation = reinterpret_cast<intptr_t>(info.hotPathBegin) +
+  intptr_t jmpLocation = reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
                          repatchOffsetGetByIdBranchToSlowCase;
   X86Assembler::repatchBranchOffset(jmpLocation, code);
 #else
@@ -879,13 +877,14 @@ void JIT::privateCompileGetByIdChain(Structure* structure,
         code, bucketsOfFail[i],
         reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_proto_fail));
 
-  m_codeBlock->getStubInfo(returnAddress).stubRoutine = code;
+  stubInfo->stubRoutine = code;
 
   ctiRepatchCallByReturnAddress(returnAddress, code);
 #endif
 }
 
-void JIT::privateCompilePutByIdReplace(Structure* structure,
+void JIT::privateCompilePutByIdReplace(StructureStubInfo* stubInfo,
+                                       Structure* structure,
                                        size_t cachedOffset,
                                        void* returnAddress) {
   // Check eax is an object of the right Structure.
@@ -907,7 +906,7 @@ void JIT::privateCompilePutByIdReplace(Structure* structure,
       code, failureCases2,
       reinterpret_cast<void*>(Interpreter::cti_op_put_by_id_fail));
 
-  m_codeBlock->getStubInfo(returnAddress).stubRoutine = code;
+  stubInfo->stubRoutine = code;
 
   ctiRepatchCallByReturnAddress(returnAddress, code);
 }

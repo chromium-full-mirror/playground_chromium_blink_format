@@ -4445,20 +4445,18 @@ NEVER_INLINE void Interpreter::tryCTICachePutByID(CallFrame* callFrame,
     return;
   }
 
-  // In the interpreter the last structure is trapped here; in CTI we use the
-  // *_second method to achieve a similar (but not quite the same) effect.
-
-  unsigned vPCIndex = codeBlock->jitReturnAddressVPCMap().get(returnAddress);
-  Instruction* vPC = codeBlock->instructions().begin() + vPCIndex;
-
-  // Cache hit: Specialize instruction and ref Structures.
-
   // If baseCell != base, then baseCell must be a proxy for another object.
   if (baseCell != slot.base()) {
     ctiRepatchCallByReturnAddress(
         returnAddress, reinterpret_cast<void*>(cti_op_put_by_id_generic));
     return;
   }
+
+  StructureStubInfo* stubInfo = &codeBlock->getStubInfo(returnAddress);
+  Instruction* vPC =
+      codeBlock->instructions().begin() + stubInfo->bytecodeIndex;
+
+  // Cache hit: Specialize instruction and ref Structures.
 
   // Structure transition, cache transition info
   if (slot.type() == PutPropertySlot::NewProperty) {
@@ -4479,8 +4477,9 @@ NEVER_INLINE void Interpreter::tryCTICachePutByID(CallFrame* callFrame,
     vPC[7] = slot.cachedOffset();
     codeBlock->refStructures(vPC);
     JIT::compilePutByIdTransition(callFrame->scopeChain()->globalData,
-                                  codeBlock, structure->previousID(), structure,
-                                  slot.cachedOffset(), chain, returnAddress);
+                                  codeBlock, stubInfo, structure->previousID(),
+                                  structure, slot.cachedOffset(), chain,
+                                  returnAddress);
     return;
   }
 
@@ -4491,12 +4490,12 @@ NEVER_INLINE void Interpreter::tryCTICachePutByID(CallFrame* callFrame,
 
 #if USE(CTI_REPATCH_PIC)
   UNUSED_PARAM(callFrame);
-  JIT::patchPutByIdReplace(codeBlock, structure, slot.cachedOffset(),
+  JIT::patchPutByIdReplace(stubInfo, structure, slot.cachedOffset(),
                            returnAddress);
 #else
   JIT::compilePutByIdReplace(callFrame->scopeChain()->globalData, callFrame,
-                             codeBlock, structure, slot.cachedOffset(),
-                             returnAddress);
+                             codeBlock, stubInfo, structure,
+                             slot.cachedOffset(), returnAddress);
 #endif
 }
 
@@ -4555,8 +4554,9 @@ NEVER_INLINE void Interpreter::tryCTICacheGetByID(
   // In the interpreter the last structure is trapped here; in CTI we use the
   // *_second method to achieve a similar (but not quite the same) effect.
 
-  unsigned vPCIndex = codeBlock->jitReturnAddressVPCMap().get(returnAddress);
-  Instruction* vPC = codeBlock->instructions().begin() + vPCIndex;
+  StructureStubInfo* stubInfo = &codeBlock->getStubInfo(returnAddress);
+  Instruction* vPC =
+      codeBlock->instructions().begin() + stubInfo->bytecodeIndex;
 
   // Cache hit: Specialize instruction and ref Structures.
 
@@ -4568,11 +4568,11 @@ NEVER_INLINE void Interpreter::tryCTICacheGetByID(
     codeBlock->refStructures(vPC);
 
 #if USE(CTI_REPATCH_PIC)
-    JIT::patchGetByIdSelf(codeBlock, structure, slot.cachedOffset(),
+    JIT::patchGetByIdSelf(stubInfo, structure, slot.cachedOffset(),
                           returnAddress);
 #else
     JIT::compileGetByIdSelf(callFrame->scopeChain()->globalData, callFrame,
-                            codeBlock, structure, slot.cachedOffset(),
+                            codeBlock, stubInfo, structure, slot.cachedOffset(),
                             returnAddress);
 #endif
     return;
@@ -4599,8 +4599,9 @@ NEVER_INLINE void Interpreter::tryCTICacheGetByID(
     codeBlock->refStructures(vPC);
 
     JIT::compileGetByIdProto(callFrame->scopeChain()->globalData, callFrame,
-                             codeBlock, structure, slotBaseObject->structure(),
-                             slot.cachedOffset(), returnAddress);
+                             codeBlock, stubInfo, structure,
+                             slotBaseObject->structure(), slot.cachedOffset(),
+                             returnAddress);
     return;
   }
 
@@ -4624,7 +4625,7 @@ NEVER_INLINE void Interpreter::tryCTICacheGetByID(
   codeBlock->refStructures(vPC);
 
   JIT::compileGetByIdChain(callFrame->scopeChain()->globalData, callFrame,
-                           codeBlock, structure, chain, count,
+                           codeBlock, stubInfo, structure, chain, count,
                            slot.cachedOffset(), returnAddress);
 }
 
@@ -4969,13 +4970,11 @@ JSValue* Interpreter::cti_op_get_by_id_self_fail(CTI_ARGS) {
       !asCell(baseValue)->structure()->isDictionary() &&
       slot.slotBase() == baseValue) {
     CodeBlock* codeBlock = callFrame->codeBlock();
-    unsigned vPCIndex =
-        codeBlock->jitReturnAddressVPCMap().get(CTI_RETURN_ADDRESS);
-    Instruction* vPC = codeBlock->instructions().begin() + vPCIndex;
+    StructureStubInfo* stubInfo = &codeBlock->getStubInfo(CTI_RETURN_ADDRESS);
+    Instruction* vPC =
+        codeBlock->instructions().begin() + stubInfo->bytecodeIndex;
 
     ASSERT(slot.slotBase()->isObject());
-
-    StructureStubInfo* stubInfo = &codeBlock->getStubInfo(CTI_RETURN_ADDRESS);
 
     PolymorphicAccessStructureList* polymorphicStructureList;
     int listIndex = 1;
@@ -5071,9 +5070,9 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list(CTI_ARGS) {
 
   Structure* structure = asCell(baseValue)->structure();
   CodeBlock* codeBlock = callFrame->codeBlock();
+  StructureStubInfo* stubInfo = &codeBlock->getStubInfo(CTI_RETURN_ADDRESS);
   Instruction* vPC =
-      codeBlock->instructions().begin() +
-      codeBlock->jitReturnAddressVPCMap().get(CTI_RETURN_ADDRESS);
+      codeBlock->instructions().begin() + stubInfo->bytecodeIndex;
 
   ASSERT(slot.slotBase()->isObject());
   JSObject* slotBaseObject = asObject(slot.slotBase());
@@ -5093,7 +5092,6 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list(CTI_ARGS) {
       asObject(baseValue)->structure()->setCachedPrototypeChain(0);
     }
 
-    StructureStubInfo* stubInfo = &codeBlock->getStubInfo(CTI_RETURN_ADDRESS);
     int listIndex;
     PolymorphicAccessStructureList* prototypeStructureList =
         getPolymorphicAccessStructureListSlot(ARG_globalData->interpreter,
@@ -5115,7 +5113,6 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list(CTI_ARGS) {
       chain = cachePrototypeChain(callFrame, structure);
     ASSERT(chain);
 
-    StructureStubInfo* stubInfo = &codeBlock->getStubInfo(CTI_RETURN_ADDRESS);
     int listIndex;
     PolymorphicAccessStructureList* prototypeStructureList =
         getPolymorphicAccessStructureListSlot(ARG_globalData->interpreter,
