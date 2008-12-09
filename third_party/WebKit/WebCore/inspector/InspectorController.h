@@ -61,6 +61,7 @@ class Node;
 class Page;
 class ResourceResponse;
 class ResourceError;
+class ScriptCallStack;
 class SharedBuffer;
 
 struct ConsoleMessage;
@@ -194,12 +195,7 @@ class InspectorController
   bool windowVisible();
   void setWindowVisible(bool visible = true, bool attached = false);
 
-  void addMessageToConsole(MessageSource,
-                           MessageLevel,
-                           JSC::ExecState*,
-                           const JSC::ArgList& arguments,
-                           unsigned lineNumber,
-                           const String& sourceID);
+  void addMessageToConsole(MessageSource, MessageLevel, ScriptCallStack*);
   void addMessageToConsole(MessageSource,
                            MessageLevel,
                            const String& message,
@@ -302,18 +298,12 @@ class InspectorController
 
   void drawNodeHighlight(GraphicsContext&) const;
 
-  void count(const JSC::UString& title,
-             unsigned lineNumber,
-             const String& sourceID);
+  void count(const String& title, unsigned lineNumber, const String& sourceID);
 
-  void startTiming(const JSC::UString& title);
-  bool stopTiming(const JSC::UString& title, double& elapsed);
+  void startTiming(const String& title);
+  bool stopTiming(const String& title, double& elapsed);
 
-  void startGroup(MessageSource source,
-                  JSC::ExecState* exec,
-                  const JSC::ArgList& arguments,
-                  unsigned lineNumber,
-                  const String& sourceURL);
+  void startGroup(MessageSource source, ScriptCallStack* callFrame);
   void endGroup(MessageSource source,
                 unsigned lineNumber,
                 const String& sourceURL);
