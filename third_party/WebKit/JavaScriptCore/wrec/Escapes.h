@@ -40,7 +40,6 @@ class CharacterClass;
 class Escape {
  public:
   enum Type {
-    None,
     PatternCharacter,
     CharacterClass,
     Backreference,
@@ -48,7 +47,7 @@ class Escape {
     Error,
   };
 
-  Escape(Type type = None) : m_type(type) {}
+  Escape(Type type) : m_type(type) {}
 
   Type type() const { return m_type; }
 

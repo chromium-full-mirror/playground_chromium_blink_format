@@ -45,6 +45,8 @@ class Parser {
   typedef Generator::JumpList JumpList;
   typedef Generator::ParenthesesType ParenthesesType;
 
+  friend class SavedState;
+
  public:
   enum Error {
     NoError,
@@ -97,6 +99,17 @@ class Parser {
   bool parseBackreferenceQuantifier(JumpList& failures, unsigned subpatternId);
 
  private:
+  class SavedState {
+   public:
+    SavedState(Parser& parser) : m_parser(parser), m_index(parser.m_index) {}
+
+    void restore() { m_parser.m_index = m_index; }
+
+   private:
+    Parser& m_parser;
+    unsigned m_index;
+  };
+
   void reset() {
     m_index = 0;
     m_numSubpatterns = 0;
