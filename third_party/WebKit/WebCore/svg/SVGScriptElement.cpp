@@ -31,17 +31,17 @@
 
 namespace WebCore {
 
-SVGScriptElement::SVGScriptElement(const QualifiedName& tagName, Document* doc)
+SVGScriptElement::SVGScriptElement(const QualifiedName& tagName,
+                                   Document* doc,
+                                   bool createdByParser)
     : SVGElement(tagName, doc),
       SVGURIReference(),
       SVGExternalResourcesRequired(),
-      m_data(this, this) {}
-
-SVGScriptElement::~SVGScriptElement() {}
-
-void SVGScriptElement::setCreatedByParser(bool createdByParser) {
+      m_data(this, this) {
   m_data.setCreatedByParser(createdByParser);
 }
+
+SVGScriptElement::~SVGScriptElement() {}
 
 String SVGScriptElement::scriptContent() const {
   return m_data.scriptContent();
