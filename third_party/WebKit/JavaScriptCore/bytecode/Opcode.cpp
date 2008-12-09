@@ -38,7 +38,7 @@ namespace JSC {
     ENABLE(OPCODE_STATS)
 
 const char* const opcodeNames[] = {
-#define OPCODE_NAME_ENTRY(opcode) #opcode,
+#define OPCODE_NAME_ENTRY(opcode, size) #opcode,
     FOR_EACH_OPCODE_ID(OPCODE_NAME_ENTRY)
 #undef OPCODE_NAME_ENTRY
 };
