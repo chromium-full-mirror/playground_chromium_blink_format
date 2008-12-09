@@ -236,9 +236,21 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
   QMenu* createStandardContextMenu();
 
-  enum Extension {};
+  enum Extension { ChooseMultipleFilesExtension };
   class ExtensionOption {};
   class ExtensionReturn {};
+
+  class ChooseMultipleFilesExtensionOption : public ExtensionOption {
+   public:
+    QWebFrame* parentFrame;
+    QStringList suggestedFiles;
+  };
+
+  class ChooseMultipleFilesExtensionReturn : public ExtensionReturn {
+   public:
+    QStringList files;
+  };
+
   virtual bool extension(Extension extension,
                          const ExtensionOption* option = 0,
                          ExtensionReturn* output = 0);
