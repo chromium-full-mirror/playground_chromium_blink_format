@@ -158,6 +158,7 @@ class RenderTheme {
 
   virtual int minimumMenuListSize(RenderStyle*) const { return 0; }
 
+  virtual void adjustButtonInnerStyle(RenderStyle*) const;
   virtual void adjustSliderThumbSize(RenderObject*) const;
 
   virtual int popupInternalPaddingLeft(RenderStyle*) const { return 0; }

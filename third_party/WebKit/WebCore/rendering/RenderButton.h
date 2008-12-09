@@ -47,6 +47,7 @@ class RenderButton : public RenderFlexibleBox {
   virtual void removeLeftoverAnonymousBlock(RenderBlock*) {}
   virtual bool createsAnonymousWrapper() const { return true; }
 
+  void setupInnerStyle(RenderStyle*);
   virtual void updateFromElement();
 
   virtual void updateBeforeAfterContent(RenderStyle::PseudoId);

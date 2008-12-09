@@ -677,6 +677,8 @@ void RenderTheme::adjustMenuListButtonStyle(CSSStyleSelector* selector,
                                             RenderStyle* style,
                                             Element* e) const {}
 
+void RenderTheme::adjustButtonInnerStyle(RenderStyle* style) const {}
+
 void RenderTheme::adjustSliderTrackStyle(CSSStyleSelector* selector,
                                          RenderStyle* style,
                                          Element* e) const {}
