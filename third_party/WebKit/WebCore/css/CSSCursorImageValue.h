@@ -44,6 +44,10 @@ class CSSCursorImageValue : public CSSImageValue {
   bool updateIfSVGCursorIsUsed(Element*);
   virtual StyleCachedImage* cachedImage(DocLoader*);
 
+#if ENABLE(SVG)
+  void removeReferencedElement(SVGElement*);
+#endif
+
  private:
   CSSCursorImageValue(const String& url, const IntPoint& hotspot);
 

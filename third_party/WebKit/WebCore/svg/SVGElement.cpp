@@ -26,6 +26,7 @@
 #if ENABLE(SVG)
 #include "SVGElement.h"
 
+#include "CSSCursorImageValue.h"
 #include "DOMImplementation.h"
 #include "Document.h"
 #include "Event.h"
@@ -34,7 +35,9 @@
 #include "FrameView.h"
 #include "HTMLNames.h"
 #include "PlatformString.h"
+#include "RegisteredEventListener.h"
 #include "RenderObject.h"
+#include "SVGCursorElement.h"
 #include "SVGDocumentExtensions.h"
 #include "SVGElementInstance.h"
 #include "SVGNames.h"
@@ -43,16 +46,23 @@
 #include "SVGURIReference.h"
 #include "SVGUseElement.h"
 #include "XMLNames.h"
-#include "RegisteredEventListener.h"
 
 namespace WebCore {
 
 using namespace HTMLNames;
 
 SVGElement::SVGElement(const QualifiedName& tagName, Document* doc)
-    : StyledElement(tagName, doc), m_shadowParent(0) {}
+    : StyledElement(tagName, doc),
+      m_shadowParent(0),
+      m_cursorElement(0),
+      m_cursorImageValue(0) {}
 
-SVGElement::~SVGElement() {}
+SVGElement::~SVGElement() {
+  if (m_cursorElement)
+    m_cursorElement->removeClient(this);
+  if (m_cursorImageValue)
+    m_cursorImageValue->removeReferencedElement(this);
+}
 
 bool SVGElement::isSupported(StringImpl* feature, StringImpl* version) const {
   return DOMImplementation::hasFeature(feature, version);
