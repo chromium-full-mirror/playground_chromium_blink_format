@@ -124,7 +124,8 @@ void LayoutTestController::setAcceptsEditing(bool acceptsEditing) {
   webkit_web_view_set_editable(webView, acceptsEditing);
 }
 
-void LayoutTestController::setCustomPolicyDelegate(bool setDelegate) {
+void LayoutTestController::setCustomPolicyDelegate(bool setDelegate,
+                                                   bool permissive) {
   // FIXME: implement
 }
 
