@@ -26,6 +26,7 @@
 #include "config.h"
 #include "HTMLTextAreaElement.h"
 
+#include "ChromeClient.h"
 #include "Document.h"
 #include "Event.h"
 #include "EventNames.h"
@@ -47,6 +48,13 @@ using namespace HTMLNames;
 static const int defaultRows = 2;
 static const int defaultCols = 20;
 
+static inline void notifyFormStateChanged(const HTMLTextAreaElement* element) {
+  Frame* frame = element->document()->frame();
+  if (!frame)
+    return;
+  frame->page()->chrome()->client()->formStateDidChange(element);
+}
+
 HTMLTextAreaElement::HTMLTextAreaElement(const QualifiedName& tagName,
                                          Document* document,
                                          HTMLFormElement* form)
@@ -58,6 +66,7 @@ HTMLTextAreaElement::HTMLTextAreaElement(const QualifiedName& tagName,
       m_cachedSelectionEnd(-1) {
   ASSERT(hasTagName(textareaTag));
   setValueMatchesRenderer();
+  notifyFormStateChanged(this);
 }
 
 const AtomicString& HTMLTextAreaElement::type() const {
@@ -250,6 +259,7 @@ void HTMLTextAreaElement::updateValue() const {
   ASSERT(renderer());
   m_value = static_cast<RenderTextControl*>(renderer())->text();
   setValueMatchesRenderer();
+  notifyFormStateChanged(this);
 }
 
 String HTMLTextAreaElement::value() const {
@@ -278,6 +288,7 @@ void HTMLTextAreaElement::setValue(const String& value) {
   }
 
   setChanged();
+  notifyFormStateChanged(this);
 }
 
 String HTMLTextAreaElement::defaultValue() const {

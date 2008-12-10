@@ -126,6 +126,8 @@ class ChromeClientWx : public ChromeClient {
 
   virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
 
+  virtual void formStateDidChange(const Node*) {}
+
  private:
   wxWebView* m_webView;
 };

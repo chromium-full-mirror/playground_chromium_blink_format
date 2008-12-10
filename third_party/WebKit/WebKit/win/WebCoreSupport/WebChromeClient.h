@@ -138,6 +138,8 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   WebView* webView() const { return m_webView; }
 
+  virtual void formStateDidChange(const WebCore::Node*) {}
+
  private:
   COMPtr<IWebUIDelegate> uiDelegate();
   COMPtr<IWebUIDelegate2> uiDelegate2();
