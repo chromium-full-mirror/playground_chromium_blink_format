@@ -95,8 +95,7 @@ static ALWAYS_INLINE Instruction* vPCForPC(CodeBlock* codeBlock, void* pc) {
       pc < codeBlock->instructions().end())
     return static_cast<Instruction*>(pc);
 
-  ASSERT(codeBlock->jitReturnAddressVPCMap().contains(pc));
-  unsigned vPCIndex = codeBlock->jitReturnAddressVPCMap().get(pc);
+  unsigned vPCIndex = codeBlock->getBytecodeIndex(pc);
   return codeBlock->instructions().begin() + vPCIndex;
 }
 
@@ -5201,9 +5200,7 @@ JSValue* Interpreter::cti_op_instanceof(CTI_ARGS) {
   if (!baseVal->isObject()) {
     CallFrame* callFrame = ARG_callFrame;
     CodeBlock* codeBlock = callFrame->codeBlock();
-    ASSERT(codeBlock->jitReturnAddressVPCMap().contains(CTI_RETURN_ADDRESS));
-    unsigned vPCIndex =
-        codeBlock->jitReturnAddressVPCMap().get(CTI_RETURN_ADDRESS);
+    unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
     ARG_globalData->exception = createInvalidParamError(
         callFrame, "instanceof", baseVal,
         codeBlock->instructions().begin() + vPCIndex, codeBlock);
@@ -5510,9 +5507,7 @@ JSValue* Interpreter::cti_op_resolve(CTI_ARGS) {
   } while (++iter != end);
 
   CodeBlock* codeBlock = callFrame->codeBlock();
-  ASSERT(codeBlock->jitReturnAddressVPCMap().contains(CTI_RETURN_ADDRESS));
-  unsigned vPCIndex =
-      codeBlock->jitReturnAddressVPCMap().get(CTI_RETURN_ADDRESS);
+  unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
   ARG_globalData->exception = createUndefinedVariableError(
       callFrame, ident, codeBlock->instructions().begin() + vPCIndex,
       codeBlock);
@@ -5646,9 +5641,7 @@ VoidPtrPair Interpreter::cti_op_resolve_func(CTI_ARGS) {
   } while (iter != end);
 
   CodeBlock* codeBlock = callFrame->codeBlock();
-  ASSERT(codeBlock->jitReturnAddressVPCMap().contains(CTI_RETURN_ADDRESS));
-  unsigned vPCIndex =
-      codeBlock->jitReturnAddressVPCMap().get(CTI_RETURN_ADDRESS);
+  unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
   ARG_globalData->exception = createUndefinedVariableError(
       callFrame, ident, codeBlock->instructions().begin() + vPCIndex,
       codeBlock);
@@ -5803,9 +5796,7 @@ JSValue* Interpreter::cti_op_resolve_skip(CTI_ARGS) {
   } while (++iter != end);
 
   CodeBlock* codeBlock = callFrame->codeBlock();
-  ASSERT(codeBlock->jitReturnAddressVPCMap().contains(CTI_RETURN_ADDRESS));
-  unsigned vPCIndex =
-      codeBlock->jitReturnAddressVPCMap().get(CTI_RETURN_ADDRESS);
+  unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
   ARG_globalData->exception = createUndefinedVariableError(
       callFrame, ident, codeBlock->instructions().begin() + vPCIndex,
       codeBlock);
@@ -6043,9 +6034,7 @@ VoidPtrPair Interpreter::cti_op_resolve_with_base(CTI_ARGS) {
   } while (iter != end);
 
   CodeBlock* codeBlock = callFrame->codeBlock();
-  ASSERT(codeBlock->jitReturnAddressVPCMap().contains(CTI_RETURN_ADDRESS));
-  unsigned vPCIndex =
-      codeBlock->jitReturnAddressVPCMap().get(CTI_RETURN_ADDRESS);
+  unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
   ARG_globalData->exception = createUndefinedVariableError(
       callFrame, ident, codeBlock->instructions().begin() + vPCIndex,
       codeBlock);
@@ -6204,9 +6193,7 @@ JSValue* Interpreter::cti_op_throw(CTI_ARGS) {
   CallFrame* callFrame = ARG_callFrame;
   CodeBlock* codeBlock = callFrame->codeBlock();
 
-  ASSERT(codeBlock->jitReturnAddressVPCMap().contains(CTI_RETURN_ADDRESS));
-  unsigned vPCIndex =
-      codeBlock->jitReturnAddressVPCMap().get(CTI_RETURN_ADDRESS);
+  unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
 
   JSValue* exceptionValue = ARG_src1;
   ASSERT(exceptionValue);
@@ -6353,9 +6340,7 @@ JSValue* Interpreter::cti_op_in(CTI_ARGS) {
   if (!baseVal->isObject()) {
     CallFrame* callFrame = ARG_callFrame;
     CodeBlock* codeBlock = callFrame->codeBlock();
-    ASSERT(codeBlock->jitReturnAddressVPCMap().contains(CTI_RETURN_ADDRESS));
-    unsigned vPCIndex =
-        codeBlock->jitReturnAddressVPCMap().get(CTI_RETURN_ADDRESS);
+    unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
     ARG_globalData->exception = createInvalidParamError(
         callFrame, "in", baseVal, codeBlock->instructions().begin() + vPCIndex,
         codeBlock);
@@ -6541,10 +6526,8 @@ JSValue* Interpreter::cti_vm_throw(CTI_ARGS) {
   CodeBlock* codeBlock = callFrame->codeBlock();
   JSGlobalData* globalData = ARG_globalData;
 
-  ASSERT(codeBlock->jitReturnAddressVPCMap().contains(
-      globalData->exceptionLocation));
   unsigned vPCIndex =
-      codeBlock->jitReturnAddressVPCMap().get(globalData->exceptionLocation);
+      codeBlock->getBytecodeIndex(globalData->exceptionLocation);
 
   JSValue* exceptionValue = globalData->exception;
   ASSERT(exceptionValue);
