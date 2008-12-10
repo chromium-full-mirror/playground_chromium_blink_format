@@ -128,7 +128,7 @@ class ChromeClientQt : public ChromeClient {
 
   virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
 
-  virtual void formStateDidChange(Node*) {}
+  virtual void formStateDidChange(const Node*) {}
 
   QWebPage* m_webPage;
   WebCore::KURL lastHoverURL;
