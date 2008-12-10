@@ -268,8 +268,11 @@ static int checkEscape(const UChar** ptrPtr,
         /* Handle an octal number following \. If the first digit is 8 or 9,
          this is not octal. */
 
-        if ((c = *ptr) >= '8')
+        if ((c = *ptr) >= '8') {
+          c = '\\';
+          ptr -= 1;
           break;
+        }
 
       /* \0 always starts an octal number, but we may drop through to here with
        a
@@ -331,7 +334,13 @@ static int checkEscape(const UChar** ptrPtr,
           *errorCodePtr = ERR2;
           return 0;
         }
+
         c = *ptr;
+        if (!isASCIIAlpha(c)) {
+          c = '\\';
+          ptr -= 2;
+          break;
+        }
 
         /* A letter is upper-cased; then the 0x40 bit is flipped. This coding
          is ASCII-specific, but then the whole concept of \cx is ASCII-specific.

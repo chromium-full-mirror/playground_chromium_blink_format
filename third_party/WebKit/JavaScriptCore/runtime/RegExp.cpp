@@ -49,7 +49,7 @@ inline RegExp::RegExp(JSGlobalData* globalData, const UString& pattern)
   m_wrecFunction =
       Generator::compileRegExp(globalData, pattern, &m_numSubpatterns,
                                &m_constructionError, m_executablePool);
-  if (m_wrecFunction)
+  if (m_wrecFunction || m_constructionError)
     return;
 // Fall through to non-WREC case.
 #endif
@@ -98,7 +98,7 @@ inline RegExp::RegExp(JSGlobalData* globalData,
   m_wrecFunction = Generator::compileRegExp(
       globalData, pattern, &m_numSubpatterns, &m_constructionError,
       m_executablePool, (m_flagBits & IgnoreCase), (m_flagBits & Multiline));
-  if (m_wrecFunction)
+  if (m_wrecFunction || m_constructionError)
     return;
 // Fall through to non-WREC case.
 #endif
