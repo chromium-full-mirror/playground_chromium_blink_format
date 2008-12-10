@@ -147,6 +147,10 @@ void BytecodeGenerator::generate() {
 #endif
 
   m_codeBlock->shrinkToFit();
+  if ((m_codeType == FunctionCode && !m_codeBlock->needsFullScopeChain() &&
+       !m_codeBlock->usesArguments()) ||
+      m_codeType == EvalCode)
+    symbolTable().clear();
 }
 
 bool BytecodeGenerator::addVar(const Identifier& ident,

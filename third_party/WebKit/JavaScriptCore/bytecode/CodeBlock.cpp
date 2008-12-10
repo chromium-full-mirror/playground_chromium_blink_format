@@ -1106,8 +1106,11 @@ void CodeBlock::dumpStatistics() {
   // Non-vector data members
   size_t jitReturnAddressVPCMapIsNotEmpty = 0;
   size_t evalCodeCacheIsNotEmpty = 0;
+  size_t symbolTableIsNotEmpty = 0;
 
   size_t hasRareData = 0;
+
+  size_t symbolTableTotalSize = 0;
 
   HashSet<CodeBlock*>::const_iterator end = liveCodeBlockSet.end();
   for (HashSet<CodeBlock*>::const_iterator it = liveCodeBlockSet.begin();
@@ -1123,6 +1126,13 @@ void CodeBlock::dumpStatistics() {
 
     if (!codeBlock->m_jitReturnAddressVPCMap.isEmpty())
       jitReturnAddressVPCMapIsNotEmpty++;
+
+    if (!codeBlock->m_symbolTable.isEmpty()) {
+      symbolTableIsNotEmpty++;
+      symbolTableTotalSize +=
+          (codeBlock->m_symbolTable.capacity() *
+           (sizeof(SymbolTable::KeyType) + sizeof(SymbolTable::MappedType)));
+    }
 
     if (codeBlock->m_rareData) {
       hasRareData++;
@@ -1154,6 +1164,10 @@ void CodeBlock::dumpStatistics() {
          jitReturnAddressVPCMapIsNotEmpty);
   printf("Number of CodeBlocks with evalCodeCache: %zu\n",
          evalCodeCacheIsNotEmpty);
+  printf("Number of CodeBlocks with symbolTable: %zu\n", symbolTableIsNotEmpty);
+
+  printf("Size of all symbolTables: %zu\n", symbolTableTotalSize);
+
 #else
   printf("Dumping CodeBlock statistics is not enabled.\n");
 #endif
