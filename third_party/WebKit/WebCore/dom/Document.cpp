@@ -97,6 +97,7 @@
 #include "RenderArena.h"
 #include "RenderView.h"
 #include "RenderWidget.h"
+#include "ScriptController.h"
 #include "SecurityOrigin.h"
 #include "SegmentedString.h"
 #include "SelectionController.h"
@@ -2969,6 +2970,8 @@ void Document::setDomain(const String& newDomain) {
   // have also assigned to access this page.
   if (equalIgnoringCase(domain(), newDomain)) {
     securityOrigin()->setDomainFromDOM(newDomain);
+    if (m_frame)
+      m_frame->script()->updateSecurityOrigin();
     return;
   }
 
@@ -2990,6 +2993,8 @@ void Document::setDomain(const String& newDomain) {
     return;
 
   securityOrigin()->setDomainFromDOM(newDomain);
+  if (m_frame)
+    m_frame->script()->updateSecurityOrigin();
 }
 
 String Document::lastModified() const {

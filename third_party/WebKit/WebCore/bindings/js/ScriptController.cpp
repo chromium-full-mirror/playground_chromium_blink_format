@@ -247,6 +247,10 @@ void ScriptController::updateDocument() {
     (*it)->updateDocument();
 }
 
+void ScriptController::updateSecurityOrigin() {
+  // Our bindings do not do anything in this case.
+}
+
 Bindings::RootObject* ScriptController::bindingRootObject() {
   if (!isEnabled())
     return 0;
