@@ -104,6 +104,7 @@ struct CallLinkInfo {
   bool isLinked() { return callee; }
 };
 
+#if ENABLE(JIT)
 struct PC {
   PC(void* nativePC, unsigned bytecodeIndex)
       : nativePC(nativePC), bytecodeIndex(bytecodeIndex) {}
@@ -111,6 +112,7 @@ struct PC {
   void* nativePC;
   unsigned bytecodeIndex;
 };
+#endif
 
 // valueAtPosition helpers for the binaryChop algorithm below.
 
@@ -123,9 +125,11 @@ inline void* getCallLinkInfoReturnLocation(CallLinkInfo* callLinkInfo) {
   return callLinkInfo->callReturnLocation;
 }
 
+#if ENABLE(JIT)
 inline void* getNativePC(PC* pc) {
   return pc->nativePC;
 }
+#endif
 
 // Binary chop algorithm, calls valueAtPosition on pre-sorted elements in array,
 // compares result with key (KeyTypes should be comparable with '--', '<', '>').
@@ -251,11 +255,13 @@ class CodeBlock {
         m_callLinkInfos.begin(), m_callLinkInfos.size(), returnAddress));
   }
 
+#if ENABLE(JIT)
   unsigned getBytecodeIndex(void* nativePC) {
     return binaryChop<PC, void*, getNativePC>(m_pcVector.begin(),
                                               m_pcVector.size(), nativePC)
         ->bytecodeIndex;
   }
+#endif
 
   Vector<Instruction>& instructions() { return m_instructions; }
 #if ENABLE(JIT)
