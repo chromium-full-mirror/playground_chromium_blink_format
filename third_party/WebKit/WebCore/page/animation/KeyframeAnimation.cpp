@@ -98,7 +98,7 @@ void KeyframeAnimation::animate(CompositeAnimation* animation,
 
   // Find the first key
   double elapsedTime =
-      (m_startTime > 0)
+      (m_startTime > 0 || m_pauseTime > 0)
           ? ((!paused() ? currentTime() : m_pauseTime) - m_startTime)
           : 0;
   if (elapsedTime < 0)
