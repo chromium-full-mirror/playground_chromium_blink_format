@@ -359,15 +359,19 @@ static HGLOBAL createGlobalImageFileDescriptor(const String& url,
   fgd->fgd[0].dwFlags = FD_FILESIZE;
   fgd->fgd[0].nFileSizeLow = image->image()->data()->size();
 
-  String extension(".");
-  extension += WebCore::MIMETypeRegistry::getPreferredExtensionForMIMEType(
-      image->response().mimeType());
   const String& preferredTitle =
       title.isEmpty() ? image->response().suggestedFilename() : title;
+  String extension = image->image()->filenameExtension();
+  if (extension.isEmpty()) {
+    // Do not continue processing in the rare and unusual case where a decoded
+    // image is not able
+    // to provide a filename extension. Something tricky (like a bait-n-switch)
+    // is going on
+    return 0;
+  }
+  extension.insert(".", 0);
   fsPath = filesystemPathFromUrlOrTitle(
-      url, preferredTitle,
-      extension.length() ? (TCHAR*)extension.charactersWithNullTermination()
-                         : 0,
+      url, preferredTitle, (TCHAR*)extension.charactersWithNullTermination(),
       false);
 
   if (fsPath.length() <= 0) {

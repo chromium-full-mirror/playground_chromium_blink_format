@@ -112,6 +112,7 @@ class BitmapImage : public Image {
   IntSize currentFrameSize() const;
 
   virtual bool dataChanged(bool allDataReceived);
+  virtual String filenameExtension() const;
 
   // It may look unusual that there is no start animation call as public API.
   // This is because
