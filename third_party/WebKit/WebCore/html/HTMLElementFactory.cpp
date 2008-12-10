@@ -128,9 +128,7 @@ static PassRefPtr<HTMLElement> linkConstructor(const QualifiedName&,
                                                Document* doc,
                                                HTMLFormElement*,
                                                bool createdByParser) {
-  RefPtr<HTMLLinkElement> link = new HTMLLinkElement(linkTag, doc);
-  link->setCreatedByParser(createdByParser);
-  return link.release();
+  return new HTMLLinkElement(linkTag, doc, createdByParser);
 }
 
 static PassRefPtr<HTMLElement> metaConstructor(const QualifiedName&,
@@ -144,9 +142,7 @@ static PassRefPtr<HTMLElement> styleConstructor(const QualifiedName&,
                                                 Document* doc,
                                                 HTMLFormElement*,
                                                 bool createdByParser) {
-  RefPtr<HTMLStyleElement> style = new HTMLStyleElement(styleTag, doc);
-  style->setCreatedByParser(createdByParser);
-  return style.release();
+  return new HTMLStyleElement(styleTag, doc, createdByParser);
 }
 
 static PassRefPtr<HTMLElement> titleConstructor(const QualifiedName&,

@@ -133,7 +133,6 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
                                        DocumentFragment* fragment,
                                        Element* parent);
 
-  static void eventuallyMarkAsParserCreated(Element* element);
   void initializeParserContext(const char* chunk = 0);
   void setCurrentNode(Node*);
 

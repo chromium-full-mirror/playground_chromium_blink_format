@@ -36,8 +36,10 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-SVGStyleElement::SVGStyleElement(const QualifiedName& tagName, Document* doc)
-    : SVGElement(tagName, doc), m_createdByParser(false) {}
+SVGStyleElement::SVGStyleElement(const QualifiedName& tagName,
+                                 Document* doc,
+                                 bool createdByParser)
+    : SVGElement(tagName, doc), m_createdByParser(createdByParser) {}
 
 const AtomicString& SVGStyleElement::xmlspace() const {
   return getAttribute(XMLNames::spaceAttr);

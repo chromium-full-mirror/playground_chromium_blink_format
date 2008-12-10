@@ -31,7 +31,7 @@ namespace WebCore {
 
 class SVGStyleElement : public SVGElement, public StyleElement {
  public:
-  SVGStyleElement(const QualifiedName&, Document*);
+  SVGStyleElement(const QualifiedName&, Document*, bool createdByParser);
 
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute*);
@@ -42,9 +42,6 @@ class SVGStyleElement : public SVGElement, public StyleElement {
                                Node* afterChange = 0,
                                int childCountDelta = 0);
 
-  void setCreatedByParser(bool createdByParser) {
-    m_createdByParser = createdByParser;
-  }
   virtual void finishParsingChildren();
 
   // 'SVGStyleElement' functions

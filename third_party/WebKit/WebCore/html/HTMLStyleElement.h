@@ -1,6 +1,4 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  * Copyright (C) 2003 Apple Computer, Inc.
@@ -32,7 +30,7 @@ namespace WebCore {
 
 class HTMLStyleElement : public HTMLElement, public StyleElement {
  public:
-  HTMLStyleElement(const QualifiedName&, Document*);
+  HTMLStyleElement(const QualifiedName&, Document*, bool createdByParser);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 1; }
@@ -47,9 +45,6 @@ class HTMLStyleElement : public HTMLElement, public StyleElement {
                                Node* afterChange = 0,
                                int childCountDelta = 0);
 
-  void setCreatedByParser(bool createdByParser) {
-    m_createdByParser = createdByParser;
-  }
   virtual void finishParsingChildren();
 
   virtual bool isLoading() const;
