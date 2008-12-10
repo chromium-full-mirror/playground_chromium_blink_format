@@ -271,9 +271,6 @@ void Console::profileEnd(const JSC::UString& title,
   if (!page)
     return;
 
-  if (title.isNull())
-    return;
-
   if (!page->inspectorController()->profilerEnabled())
     return;
 
