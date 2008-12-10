@@ -50,6 +50,7 @@ class ProgramNode;
 class Register;
 class ScopeChainNode;
 class SamplingTool;
+struct HandlerInfo;
 
 #if ENABLE(JIT)
 
@@ -346,7 +347,7 @@ class Interpreter {
                                     JSValue*,
                                     const Instruction*&,
                                     CodeBlock*&);
-  NEVER_INLINE Instruction* throwException(CallFrame*&,
+  NEVER_INLINE HandlerInfo* throwException(CallFrame*&,
                                            JSValue*&,
                                            const Instruction*,
                                            bool);
