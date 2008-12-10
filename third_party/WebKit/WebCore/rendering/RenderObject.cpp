@@ -2467,7 +2467,7 @@ void RenderObject::styleWillChange(RenderStyle::Diff diff,
       if (diff == RenderStyle::RepaintLayer) {
         layer()->repaintIncludingDescendants();
         if (!(m_style->clip() == newStyle->clip()))
-          layer()->clearClipRects();
+          layer()->clearClipRectsIncludingDescendants();
       } else if (diff == RenderStyle::Repaint ||
                  newStyle->outlineSize() < m_style->outlineSize())
         repaint();

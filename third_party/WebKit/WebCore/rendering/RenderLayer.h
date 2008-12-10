@@ -293,8 +293,8 @@ class RenderLayer : public ScrollbarClient {
   }
   IntSize relativePositionOffset() const { return IntSize(m_relX, m_relY); }
 
+  void clearClipRectsIncludingDescendants();
   void clearClipRects();
-  void clearClipRect();
 
   // Get the enclosing stacking context for this layer.  A stacking context is a
   // layer
