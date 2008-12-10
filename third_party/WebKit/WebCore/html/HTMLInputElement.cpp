@@ -419,8 +419,6 @@ const AtomicString& HTMLInputElement::type() const {
       DEFINE_STATIC_LOCAL(const AtomicString, text, ("text"));
       return text;
     }
-
-      notifyFormStateChanged(this);
   }
   return emptyAtom;
 }
@@ -767,7 +765,6 @@ void HTMLInputElement::attach() {
         imageObj->setImageSizeForAltText();
     }
   }
-  notifyFormStateChanged(this);
 }
 
 void HTMLInputElement::detach() {
