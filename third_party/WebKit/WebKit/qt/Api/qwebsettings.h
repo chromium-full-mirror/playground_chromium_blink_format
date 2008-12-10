@@ -58,7 +58,7 @@ class QWEBKIT_EXPORT QWebSettings {
     DeveloperExtrasEnabled,
     LinksIncludedInFocusChain,
     ZoomTextOnly,
-    PrintBackgroundElements,
+    PrintElementBackgrounds,
     OfflineStorageDatabaseEnabled,
     OfflineWebApplicationCacheEnabled,
     LocalStorageDatabaseEnabled

@@ -351,7 +351,7 @@ void ChromeClientQt::exceededDatabaseQuota(Frame* frame,
     DatabaseTracker::tracker().setQuota(frame->document()->securityOrigin(),
                                         quota);
 #endif
-  emit m_webPage->exceededDatabaseQuota(QWebFramePrivate::kit(frame),
+  emit m_webPage->databaseQuotaExceeded(QWebFramePrivate::kit(frame),
                                         databaseName);
 }
 
@@ -367,16 +367,16 @@ void ChromeClientQt::runOpenPanel(Frame* frame,
 
     if (!fileChooser->filenames().isEmpty())
       for (int i = 0; i < fileChooser->filenames().size(); ++i)
-        option.suggestedFiles += fileChooser->filenames()[i];
+        option.suggestedFileNames += fileChooser->filenames()[i];
 
     QWebPage::ChooseMultipleFilesExtensionReturn output;
     m_webPage->extension(QWebPage::ChooseMultipleFilesExtension, &option,
                          &output);
 
-    if (!output.files.isEmpty()) {
+    if (!output.fileNames.isEmpty()) {
       Vector<String> names;
-      for (int i = 0; i < output.files.count(); ++i)
-        names.append(output.files[i]);
+      for (int i = 0; i < output.fileNames.count(); ++i)
+        names.append(output.fileNames.at(i));
       fileChooser->chooseFiles(names);
     }
   } else {

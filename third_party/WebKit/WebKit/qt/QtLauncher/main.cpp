@@ -170,7 +170,7 @@ class MainWindow : public QMainWindow {
   }
 
   void setEditable(bool on) {
-    view->page()->setEditable(on);
+    view->page()->setContentEditable(on);
     formatMenuAction->setVisible(on);
   }
 

@@ -233,7 +233,7 @@ bool EditorClientQt::selectWordBeforeMenuEvent() {
 }
 
 bool EditorClientQt::isEditable() {
-  return m_page->isEditable();
+  return m_page->isContentEditable();
 }
 
 void EditorClientQt::registerCommandForUndo(
