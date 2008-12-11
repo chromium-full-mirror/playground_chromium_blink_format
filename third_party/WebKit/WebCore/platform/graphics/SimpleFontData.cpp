@@ -54,7 +54,7 @@ SimpleFontData::SimpleFontData(const FontPlatformData& f,
       m_isCustomFont(customFont),
       m_isLoading(loading),
       m_smallCapsFontData(0) {
-#if ENABLE(SVG_FONTS) && !PLATFORM(QT)
+#if ENABLE(SVG_FONTS)
   if (SVGFontFaceElement* svgFontFaceElement =
           svgFontData ? svgFontData->svgFontFaceElement() : 0) {
     m_unitsPerEm = svgFontFaceElement->unitsPerEm();
@@ -80,7 +80,11 @@ SimpleFontData::SimpleFontData(const FontPlatformData& f,
 #endif
 
   platformInit();
+  platformGlyphInit();
+}
 
+#if !PLATFORM(QT)
+void SimpleFontData::platformGlyphInit() {
   GlyphPage* glyphPageZero = GlyphPageTreeNode::getRootChild(this, 0)->page();
   if (!glyphPageZero) {
     LOG_ERROR("Failed to get glyph page zero.");
@@ -122,6 +126,7 @@ SimpleFontData::SimpleFontData(const FontPlatformData& f,
   m_missingGlyphData.fontData = this;
   m_missingGlyphData.glyph = 0;
 }
+#endif
 
 SimpleFontData::~SimpleFontData() {
   if (!isCustomFont()) {
@@ -130,12 +135,13 @@ SimpleFontData::~SimpleFontData() {
     GlyphPageTreeNode::pruneTreeFontData(this);
   }
 
-#if ENABLE(SVG_FONTS) && !PLATFORM(QT)
+#if ENABLE(SVG_FONTS)
   if (!m_svgFontData || !m_svgFontData->svgFontFaceElement())
 #endif
     platformDestroy();
 }
 
+#if !PLATFORM(QT)
 float SimpleFontData::widthForGlyph(Glyph glyph) const {
   float width = m_glyphToWidthMap.widthForGlyph(glyph);
   if (width != cGlyphWidthUnknown)
@@ -146,6 +152,7 @@ float SimpleFontData::widthForGlyph(Glyph glyph) const {
 
   return width;
 }
+#endif
 
 const SimpleFontData* SimpleFontData::fontDataForCharacter(UChar32) const {
   return this;
