@@ -74,6 +74,8 @@ class RenderThemeQt : public RenderTheme {
 
   virtual void adjustSliderThumbSize(RenderObject*) const;
 
+  virtual double caretBlinkInterval() const;
+
  protected:
   virtual bool paintCheckbox(RenderObject* o,
                              const RenderObject::PaintInfo& i,
