@@ -268,7 +268,7 @@ void RenderSlider::updateFromElement() {
     addChild(m_thumb->renderer());
   }
   setPositionFromValue();
-  setNeedsLayout(true);
+  setNeedsLayout(true, false);
 }
 
 bool RenderSlider::mouseEventIsInThumb(MouseEvent* evt) {
