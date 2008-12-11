@@ -5481,7 +5481,7 @@ void Interpreter::cti_op_ret_scopeChain(CTI_ARGS) {
 JSObject* Interpreter::cti_op_new_array(CTI_ARGS) {
   CTI_STACK_HACK();
 
-  ArgList argList(ARG_registers1, ARG_int2);
+  ArgList argList(&ARG_callFrame->registers()[ARG_int1], ARG_int2);
   return constructArray(ARG_callFrame, argList);
 }
 
