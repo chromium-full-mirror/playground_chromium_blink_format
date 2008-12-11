@@ -49,7 +49,7 @@ ScrollView::ScrollView()
       m_drawPanScrollIcon(false) {
   platformInit();
   if (platformWidget())
-    platformSetCanBlitOnScroll();
+    platformSetCanBlitOnScroll(true);
 }
 
 ScrollView::~ScrollView() {
@@ -140,11 +140,19 @@ void ScrollView::setCanHaveScrollbars(bool canScroll) {
 }
 
 void ScrollView::setCanBlitOnScroll(bool b) {
-  if (m_canBlitOnScroll == b)
+  if (platformWidget()) {
+    platformSetCanBlitOnScroll(b);
     return;
+  }
+
   m_canBlitOnScroll = b;
+}
+
+bool ScrollView::canBlitOnScroll() const {
   if (platformWidget())
-    platformSetCanBlitOnScroll();
+    return platformCanBlitOnScroll();
+
+  return m_canBlitOnScroll;
 }
 
 IntRect ScrollView::visibleContentRect(bool includeScrollbars) const {
@@ -797,8 +805,6 @@ void ScrollView::platformRemoveChild(Widget*) {}
 #endif
 
 #if !PLATFORM(MAC)
-void ScrollView::platformSetCanBlitOnScroll() {}
-
 void ScrollView::platformSetScrollbarsSuppressed(bool repaintOnUnsuppress) {}
 #endif
 
@@ -807,6 +813,12 @@ void ScrollView::platformSetScrollbarModes() {}
 
 void ScrollView::platformScrollbarModes(ScrollbarMode& horizontal,
                                         ScrollbarMode& vertical) const {}
+
+void ScrollView::platformSetCanBlitOnScroll(bool) {}
+
+bool ScrollView::platformCanBlitOnScroll() const {
+  return false;
+}
 
 IntRect ScrollView::platformVisibleContentRect(bool) const {
   return IntRect();

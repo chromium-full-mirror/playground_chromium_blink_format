@@ -305,6 +305,14 @@ void ScrollView::platformScrollbarModes(ScrollbarMode& horizontal,
   vertical = m_data->vScrollbarMode;
 }
 
+void ScrollView::platformSetCanBlitOnScroll(bool canBlitOnScroll) {
+  m_canBlitOnScroll = canBlitOnScroll;
+}
+
+bool ScrollView::platformCanBlitOnScroll() const {
+  return m_canBlitOnScroll;
+}
+
 // used for subframes support
 void ScrollView::platformAddChild(Widget* widget) {
   // NB: In all cases I'm aware of,
