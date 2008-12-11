@@ -29,6 +29,7 @@
 #include "WMLCardElement.h"
 #include "WMLErrorHandling.h"
 #include "WMLPageState.h"
+#include "WMLTemplateElement.h"
 
 namespace WebCore {
 
@@ -56,8 +57,8 @@ void WMLDocument::finishedParsing() {
   // Remember that we'e successfully entered the deck
   wmlPageState->setNeedCheckDeckAccess(false);
 
-  // FIXME: Notify the existance of templates to all cards of the current deck
-  // WMLTemplateElement::registerTemplatesInDocument(this));
+  // Notify the existance of templates to all cards of the current deck
+  WMLTemplateElement::registerTemplatesInDocument(this);
 
   // Set destination card
   WMLCardElement* card = WMLCardElement::setActiveCardInDocument(this, KURL());
@@ -67,7 +68,8 @@ void WMLDocument::finishedParsing() {
     return;
   }
 
-  // FIXME: shadow the deck-level do if needed
+  // Handle deck-level task overrides
+  card->handleDeckLevelTaskOverridesIfNeeded();
 
   // Handle card-level intrinsic event
   card->handleIntrinsicEventIfNeeded();

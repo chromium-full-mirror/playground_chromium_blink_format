@@ -39,6 +39,7 @@ enum WMLErrorCode {
   WMLErrorInvalidVariableReference,
   WMLErrorInvalidVariableReferenceLocation,
   WMLErrorMultipleAccessElements,
+  WMLErrorMultipleTemplateElements,
   WMLErrorMultipleTimerElements,
   WMLErrorNoCardInDocument
 };

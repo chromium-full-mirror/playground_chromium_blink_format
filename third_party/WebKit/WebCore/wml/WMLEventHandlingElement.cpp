@@ -37,6 +37,8 @@ WMLEventHandlingElement::WMLEventHandlingElement(const QualifiedName& tagName,
                                                  Document* doc)
     : WMLElement(tagName, doc) {}
 
+WMLEventHandlingElement::~WMLEventHandlingElement() {}
+
 void WMLEventHandlingElement::createEventHandlerIfNeeded() {
   if (!m_eventHandler)
     m_eventHandler.set(new WMLIntrinsicEventHandler);

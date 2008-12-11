@@ -43,6 +43,10 @@
 #include "visible_units.h"
 #include <wtf/StdLibExtras.h>
 
+#if ENABLE(WML)
+#include "WMLNames.h"
+#endif
+
 using namespace std;
 
 namespace WebCore {
@@ -69,7 +73,11 @@ bool canHaveChildrenForEditing(const Node* node) {
          !node->hasTagName(inputTag) && !node->hasTagName(textareaTag) &&
          !node->hasTagName(objectTag) && !node->hasTagName(iframeTag) &&
          !node->hasTagName(embedTag) && !node->hasTagName(appletTag) &&
-         !node->hasTagName(selectTag) && !node->isTextNode();
+         !node->hasTagName(selectTag) &&
+#if ENABLE(WML)
+         !node->hasTagName(WMLNames::doTag) &&
+#endif
+         !node->isTextNode();
 }
 
 // Compare two positions, taking into account the possibility that one or both

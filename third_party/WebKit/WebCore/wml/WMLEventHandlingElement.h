@@ -36,6 +36,7 @@ class WMLDoElement;
 class WMLEventHandlingElement : public WMLElement {
  public:
   WMLEventHandlingElement(const QualifiedName& tagName, Document*);
+  virtual ~WMLEventHandlingElement();
 
   virtual bool isWMLEventHandlingElement() const { return true; }
 
@@ -44,6 +45,7 @@ class WMLEventHandlingElement : public WMLElement {
   }
   void createEventHandlerIfNeeded();
 
+  Vector<WMLDoElement*>& doElements() { return m_doElements; }
   void registerDoElement(WMLDoElement*);
 
  private:
