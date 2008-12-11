@@ -192,8 +192,6 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
 
   void iconChanged();
 
-  void aboutToUpdateHistory(QWebHistoryItem* item);
-
  private:
   friend class QWebPage;
   friend class QWebPagePrivate;
