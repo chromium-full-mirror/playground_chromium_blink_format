@@ -41,6 +41,7 @@
 #include <JavaScriptCore/Assertions.h>
 #include <JavaScriptCore/JavaScriptCore.h>
 #include <JavaScriptCore/JSRetainPtr.h>
+#include <JavaScriptCore/JSStringRefBSTR.h>
 #include <WebKit/WebKit.h>
 #include <string>
 #include <CoreFoundation/CoreFoundation.h>
@@ -647,4 +648,25 @@ bool LayoutTestController::pauseTransitionAtTimeOnElementWithId(
     double time,
     JSStringRef elementId) {
   return false;  // FIXME: Implement this on Windows
+}
+
+void LayoutTestController::overridePreference(JSStringRef key,
+                                              JSStringRef flag) {
+  COMPtr<IWebView> webView;
+  if (FAILED(frame->webView(&webView)))
+    return;
+
+  COMPtr<IWebPreferences> preferences;
+  if (FAILED(webView->preferences(&preferences)))
+    return;
+
+  COMPtr<IWebPreferencesPrivate> prefsPrivate(Query, preferences);
+  if (!prefsPrivate)
+    return;
+
+  BSTR keyBSTR = JSStringCopyBSTR(key);
+  BSTR flagBSTR = JSStringCopyBSTR(flag);
+  prefsPrivate->overridePreference(keyBSTR, flagBSTR);
+  SysFreeString(keyBSTR);
+  SysFreeString(flagBSTR);
 }
