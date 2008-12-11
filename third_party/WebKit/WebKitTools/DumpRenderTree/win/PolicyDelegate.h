@@ -74,8 +74,12 @@ class PolicyDelegate : public IWebPolicyDelegate {
     return E_NOTIMPL;
   }
 
+  // PolicyDelegate
+  void setPermissive(bool permissive) { m_permissiveDelegate = permissive; }
+
  private:
   ULONG m_refCount;
+  bool m_permissiveDelegate;
 };
 
 #endif  // PolicyDelegate_h
