@@ -90,6 +90,12 @@ class NetscapePluginInstanceProxy
                   uint32_t& requestID);
 
  private:
+  NetscapePluginInstanceProxy(NetscapePluginHostProxy*,
+                              WebHostedNetscapePluginView*,
+                              uint32_t pluginID,
+                              uint32_t renderContextID,
+                              boolean_t useSoftwareRenderer);
+
   NPError loadRequest(NSURLRequest*,
                       const char* cTarget,
                       bool currentEventIsUserGesture,
@@ -99,11 +105,7 @@ class NetscapePluginInstanceProxy
   void performRequest(PluginRequest*);
   void evaluateJavaScript(PluginRequest*);
 
-  NetscapePluginInstanceProxy(NetscapePluginHostProxy*,
-                              WebHostedNetscapePluginView*,
-                              uint32_t pluginID,
-                              uint32_t renderContextID,
-                              boolean_t useSoftwareRenderer);
+  void stopAllStreams();
 
   NetscapePluginHostProxy* m_pluginHostProxy;
   WebHostedNetscapePluginView* m_pluginView;
