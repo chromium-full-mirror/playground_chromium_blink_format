@@ -34,7 +34,9 @@
 namespace WebCore {
 
 class AnimationControllerPrivate;
+class AtomicString;
 class Document;
+class Element;
 class Frame;
 class Node;
 class RenderObject;
@@ -66,9 +68,12 @@ class AnimationController {
 
   void suspendAnimations(Document*);
   void resumeAnimations(Document*);
-  void updateAnimationTimer();
 
   void startUpdateRenderingDispatcher();
+  void addEventToDispatch(PassRefPtr<Element>,
+                          const AtomicString& eventType,
+                          const String& name,
+                          double elapsedTime);
 
   void styleAvailable();
 

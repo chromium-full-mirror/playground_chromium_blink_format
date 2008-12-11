@@ -58,9 +58,9 @@ class CompositeAnimationPrivate {
   AnimationController* animationController() { return m_animationController; }
 
   void setAnimating(bool);
-  bool isAnimating() const;
+  double willNeedService() const;
 
-  const KeyframeAnimation* getAnimationForProperty(int property) const;
+  PassRefPtr<KeyframeAnimation> getAnimationForProperty(int property);
 
   void cleanupFinishedAnimations(RenderObject*);
 
@@ -173,7 +173,7 @@ void CompositeAnimationPrivate::updateTransitions(RenderObject* renderer,
       // test
       // against the unanimated style here, but we "override" the transition
       // later.
-      const KeyframeAnimation* keyframeAnim = getAnimationForProperty(prop);
+      RefPtr<KeyframeAnimation> keyframeAnim = getAnimationForProperty(prop);
       RenderStyle* fromStyle =
           keyframeAnim ? keyframeAnim->unanimatedStyle() : currentStyle;
 
@@ -351,31 +351,42 @@ void CompositeAnimationPrivate::setAnimating(bool animating) {
   }
 }
 
-bool CompositeAnimationPrivate::isAnimating() const {
+double CompositeAnimationPrivate::willNeedService() const {
+  // Returns the time at which next service is required. -1 means no service is
+  // required. 0 means
+  // service is required now, and > 0 means service is required that many
+  // seconds in the future.
+  double minT = -1;
+
   CSSPropertyTransitionsMap::const_iterator transitionsEnd =
       m_transitions.end();
   for (CSSPropertyTransitionsMap::const_iterator it = m_transitions.begin();
        it != transitionsEnd; ++it) {
     ImplicitAnimation* transition = it->second.get();
-    if (transition && !transition->paused() && transition->isAnimating() &&
-        transition->active())
-      return true;
+    double t = transition ? transition->willNeedService() : -1;
+    if (t < minT || minT == -1)
+      minT = t;
+    if (minT == 0)
+      return 0;
   }
 
   AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
   for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
        it != animationsEnd; ++it) {
-    KeyframeAnimation* anim = it->second.get();
-    if (anim && !anim->paused() && anim->isAnimating() && anim->active())
-      return true;
+    KeyframeAnimation* animation = it->second.get();
+    double t = animation ? animation->willNeedService() : -1;
+    if (t < minT || minT == -1)
+      minT = t;
+    if (minT == 0)
+      return 0;
   }
 
-  return false;
+  return minT;
 }
 
-const KeyframeAnimation* CompositeAnimationPrivate::getAnimationForProperty(
-    int property) const {
-  const KeyframeAnimation* retval = 0;
+PassRefPtr<KeyframeAnimation>
+CompositeAnimationPrivate::getAnimationForProperty(int property) {
+  RefPtr<KeyframeAnimation> retval;
 
   // We want to send back the last animation with the property if there are
   // multiples.
@@ -383,7 +394,7 @@ const KeyframeAnimation* CompositeAnimationPrivate::getAnimationForProperty(
   AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
   for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
        it != animationsEnd; ++it) {
-    const KeyframeAnimation* anim = it->second.get();
+    RefPtr<KeyframeAnimation> anim = it->second;
     if (anim->hasAnimationForProperty(property))
       retval = anim;
   }
@@ -634,6 +645,10 @@ CompositeAnimation::~CompositeAnimation() {
   delete m_data;
 }
 
+AnimationController* CompositeAnimation::animationController() {
+  return m_data->animationController();
+}
+
 void CompositeAnimation::clearRenderer() {
   m_data->clearRenderer();
 }
@@ -644,12 +659,8 @@ PassRefPtr<RenderStyle> CompositeAnimation::animate(RenderObject* renderer,
   return m_data->animate(renderer, currentStyle, targetStyle);
 }
 
-AnimationController* CompositeAnimation::animationController() {
-  return m_data->animationController();
-}
-
-bool CompositeAnimation::isAnimating() const {
-  return m_data->isAnimating();
+double CompositeAnimation::willNeedService() const {
+  return m_data->willNeedService();
 }
 
 void CompositeAnimation::setWaitingForStyleAvailable(bool b) {
@@ -683,6 +694,11 @@ void CompositeAnimation::setAnimating(bool b) {
 bool CompositeAnimation::isAnimatingProperty(int property,
                                              bool isRunningNow) const {
   return m_data->isAnimatingProperty(property, isRunningNow);
+}
+
+PassRefPtr<KeyframeAnimation> CompositeAnimation::getAnimationForProperty(
+    int property) {
+  return m_data->getAnimationForProperty(property);
 }
 
 void CompositeAnimation::setAnimationStartTime(double t) {
