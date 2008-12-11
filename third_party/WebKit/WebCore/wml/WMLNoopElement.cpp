@@ -35,6 +35,8 @@ using namespace WMLNames;
 WMLNoopElement::WMLNoopElement(const QualifiedName& tagName, Document* doc)
     : WMLElement(tagName, doc) {}
 
+WMLNoopElement::~WMLNoopElement() {}
+
 void WMLNoopElement::insertedIntoDocument() {
   WMLElement::insertedIntoDocument();
 

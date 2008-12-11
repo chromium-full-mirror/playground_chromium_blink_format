@@ -112,6 +112,8 @@ class HTMLElement : public StyledElement {
   HTMLFormElement* form() const { return virtualForm(); }
   HTMLFormElement* findFormAncestor() const;
 
+  static void addHTMLAlignmentToStyledElement(StyledElement*, MappedAttribute*);
+
  protected:
   void addHTMLAlignment(MappedAttribute*);
 
