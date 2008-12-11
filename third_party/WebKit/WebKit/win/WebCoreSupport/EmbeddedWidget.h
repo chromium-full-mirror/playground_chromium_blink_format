@@ -57,7 +57,7 @@ class EmbeddedWidget : public WebCore::Widget {
 
   virtual void invalidateRect(const WebCore::IntRect&);
   virtual void setFrameRect(const WebCore::IntRect&);
-  virtual void frameRectsChanged() const;
+  virtual void frameRectsChanged();
   virtual void setFocus();
   virtual void show();
   virtual void hide();

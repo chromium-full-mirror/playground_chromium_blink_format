@@ -52,14 +52,13 @@ class ScrollbarGtk : public Scrollbar {
 
   virtual void setEnabled(bool);
 
-  virtual void frameRectsChanged() const;
+  virtual void frameRectsChanged();
 
  protected:
   ScrollbarGtk(ScrollbarClient*, ScrollbarOrientation, ScrollbarControlSize);
 
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();
-  virtual void frameRectsChanged();
 
  private:
   static void gtkValueChanged(GtkAdjustment*, ScrollbarGtk*);

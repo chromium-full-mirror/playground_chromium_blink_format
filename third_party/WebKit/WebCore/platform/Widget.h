@@ -182,7 +182,7 @@ class Widget {
       const;  // See comment above about when not to use this method.
   IntRect convertFromContainingWindow(const IntRect&) const;
 
-  virtual void frameRectsChanged() const {}
+  virtual void frameRectsChanged() {}
 
 #if PLATFORM(MAC)
   NSView* getOuterView() const;

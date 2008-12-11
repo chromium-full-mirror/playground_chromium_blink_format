@@ -219,7 +219,7 @@ class ScrollView : public Widget, public ScrollbarClient {
 
   // Called when our frame rect changes (or the rect/scroll position of an
   // ancestor changes).
-  virtual void frameRectsChanged() const;
+  virtual void frameRectsChanged();
 
   // Widget override to update our scrollbars and notify our contents of the
   // resize.

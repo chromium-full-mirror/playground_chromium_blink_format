@@ -978,7 +978,7 @@ class QtPluginWidget : public Widget {
     if (platformWidget())
       platformWidget()->update(r);
   }
-  virtual void frameRectsChanged() const {
+  virtual void frameRectsChanged() {
     if (!platformWidget())
       return;
 
