@@ -439,7 +439,9 @@ void DocumentLoader::setPrimaryLoadComplete(bool flag) {
 #endif
       m_mainResourceLoader = 0;
     }
-    updateLoading();
+
+    if (this == frameLoader()->activeDocumentLoader())
+      updateLoading();
   }
 }
 
