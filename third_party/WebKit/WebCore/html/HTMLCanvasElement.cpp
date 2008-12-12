@@ -252,8 +252,11 @@ void HTMLCanvasElement::createImageBuffer() const {
   IntSize size = convertLogicalToDevice(unscaledSize);
   if (!size.width() || !size.height())
     return;
-  m_imageBuffer.set(ImageBuffer::create(size, false).release());
 
+  m_imageBuffer.set(ImageBuffer::create(size, false).release());
+  m_imageBuffer->context()->scale(
+      FloatSize(size.width() / unscaledSize.width(),
+                size.height() / unscaledSize.height()));
   m_imageBuffer->context()->setShadowsIgnoreTransforms(true);
 }
 
@@ -269,6 +272,13 @@ ImageBuffer* HTMLCanvasElement::buffer() const {
 
 AffineTransform HTMLCanvasElement::baseTransform() const {
   ASSERT(m_createdImageBuffer);
-  return m_imageBuffer->baseTransform();
+  FloatSize unscaledSize(width(), height());
+  IntSize size = convertLogicalToDevice(unscaledSize);
+  AffineTransform transform;
+  if (size.width() && size.height())
+    transform.scale(size.width() / unscaledSize.width(),
+                    size.height() / unscaledSize.height());
+  transform.multiply(m_imageBuffer->baseTransform());
+  return transform;
 }
 }
