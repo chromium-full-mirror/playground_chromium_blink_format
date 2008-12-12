@@ -345,145 +345,138 @@ void EditorClientQt::handleKeyboardEvent(KeyboardEvent* event) {
 
   // FIXME: refactor all of this to use Actions or something like them
   if (start->isContentEditable()) {
-    switch (kevent->windowsVirtualKeyCode()) {
+#ifndef QT_NO_SHORTCUT
+    QWebPage::WebAction action =
+        QWebPagePrivate::editorActionForKeyEvent(kevent->qtEvent());
+    if (action != QWebPage::NoWebAction) {
+      m_page->triggerAction(action);
+    } else
+#endif  // QT_NO_SHORTCUT
+      switch (kevent->windowsVirtualKeyCode()) {
 #if QT_VERSION < 0x040500
-      case VK_RETURN:
+        case VK_RETURN:
 #ifdef QT_WS_MAC
-        if (kevent->shiftKey() || kevent->metaKey())
+          if (kevent->shiftKey() || kevent->metaKey())
 #else
-        if (kevent->shiftKey())
+          if (kevent->shiftKey())
 #endif
-          frame->editor()->command("InsertLineBreak").execute();
-        else
-          frame->editor()->command("InsertNewline").execute();
-        break;
+            frame->editor()->command("InsertLineBreak").execute();
+          else
+            frame->editor()->command("InsertNewline").execute();
+          break;
 #endif
-      case VK_BACK:
-        frame->editor()->deleteWithDirection(SelectionController::BACKWARD,
-                                             CharacterGranularity, false, true);
-        break;
-      case VK_DELETE:
-        frame->editor()->deleteWithDirection(SelectionController::FORWARD,
-                                             CharacterGranularity, false, true);
-        break;
-      case VK_LEFT:
-        if (kevent->shiftKey())
-          frame->editor()->command("MoveLeftAndModifySelection").execute();
-        else
-          frame->editor()->command("MoveLeft").execute();
-        break;
-      case VK_RIGHT:
-        if (kevent->shiftKey())
-          frame->editor()->command("MoveRightAndModifySelection").execute();
-        else
-          frame->editor()->command("MoveRight").execute();
-        break;
-      case VK_UP:
-        if (kevent->shiftKey())
-          frame->editor()->command("MoveUpAndModifySelection").execute();
-        else
-          frame->editor()->command("MoveUp").execute();
-        break;
-      case VK_DOWN:
-        if (kevent->shiftKey())
-          frame->editor()->command("MoveDownAndModifySelection").execute();
-        else
-          frame->editor()->command("MoveDown").execute();
-        break;
-      case VK_PRIOR:  // PageUp
-        frame->editor()->command("MovePageUp").execute();
-        break;
-      case VK_NEXT:  // PageDown
-        frame->editor()->command("MovePageDown").execute();
-        break;
-      case VK_TAB:
-        return;
-      default:
-        if (kevent->type() != PlatformKeyboardEvent::KeyDown &&
-            !kevent->ctrlKey()
+        case VK_BACK:
+          frame->editor()->deleteWithDirection(
+              SelectionController::BACKWARD, CharacterGranularity, false, true);
+          break;
+        case VK_DELETE:
+          frame->editor()->deleteWithDirection(
+              SelectionController::FORWARD, CharacterGranularity, false, true);
+          break;
+        case VK_LEFT:
+          if (kevent->shiftKey())
+            frame->editor()->command("MoveLeftAndModifySelection").execute();
+          else
+            frame->editor()->command("MoveLeft").execute();
+          break;
+        case VK_RIGHT:
+          if (kevent->shiftKey())
+            frame->editor()->command("MoveRightAndModifySelection").execute();
+          else
+            frame->editor()->command("MoveRight").execute();
+          break;
+        case VK_UP:
+          if (kevent->shiftKey())
+            frame->editor()->command("MoveUpAndModifySelection").execute();
+          else
+            frame->editor()->command("MoveUp").execute();
+          break;
+        case VK_DOWN:
+          if (kevent->shiftKey())
+            frame->editor()->command("MoveDownAndModifySelection").execute();
+          else
+            frame->editor()->command("MoveDown").execute();
+          break;
+        case VK_PRIOR:  // PageUp
+          frame->editor()->command("MovePageUp").execute();
+          break;
+        case VK_NEXT:  // PageDown
+          frame->editor()->command("MovePageDown").execute();
+          break;
+        case VK_TAB:
+          return;
+        default:
+          if (kevent->type() != PlatformKeyboardEvent::KeyDown &&
+              !kevent->ctrlKey()
 #ifndef Q_WS_MAC
-            // We need to exclude checking for Alt because it is just a
-            // different Shift
-            && !kevent->altKey()
+              // We need to exclude checking for Alt because it is just a
+              // different Shift
+              && !kevent->altKey()
 #endif
-            && !kevent->text().isEmpty()) {
-          frame->editor()->insertText(kevent->text(), event);
-        } else if (kevent->ctrlKey()) {
-          switch (kevent->windowsVirtualKeyCode()) {
-            case VK_A:
-              frame->editor()->command("SelectAll").execute();
-              break;
-            case VK_B:
-              frame->editor()->command("ToggleBold").execute();
-              break;
-            case VK_C:
-              frame->editor()->command("Copy").execute();
-              break;
-            case VK_I:
-              frame->editor()->command("ToggleItalic").execute();
-              break;
-            case VK_V:
-              frame->editor()->command("Paste").execute();
-              break;
-            case VK_X:
-              frame->editor()->command("Cut").execute();
-              break;
-            case VK_Y:
-              frame->editor()->command("Redo").execute();
-              break;
-            case VK_Z:
-              frame->editor()->command("Undo").execute();
-              break;
-            default:
-              // catch combination AltGr+key or Ctrl+Alt+key
-              if (kevent->type() != PlatformKeyboardEvent::KeyDown &&
-                  kevent->altKey() && !kevent->text().isEmpty()) {
-                frame->editor()->insertText(kevent->text(), event);
+              && !kevent->text().isEmpty()) {
+            frame->editor()->insertText(kevent->text(), event);
+          } else if (kevent->ctrlKey()) {
+            switch (kevent->windowsVirtualKeyCode()) {
+              case VK_A:
+                frame->editor()->command("SelectAll").execute();
                 break;
-              }
-              return;
-          }
-        } else
-          return;
-    }
+              case VK_B:
+                frame->editor()->command("ToggleBold").execute();
+                break;
+              case VK_I:
+                frame->editor()->command("ToggleItalic").execute();
+                break;
+              default:
+                // catch combination AltGr+key or Ctrl+Alt+key
+                if (kevent->type() != PlatformKeyboardEvent::KeyDown &&
+                    kevent->altKey() && !kevent->text().isEmpty()) {
+                  frame->editor()->insertText(kevent->text(), event);
+                  break;
+                }
+                return;
+            }
+          } else
+            return;
+      }
   } else {
-    switch (kevent->windowsVirtualKeyCode()) {
-      case VK_UP:
-        frame->editor()->command("MoveUp").execute();
-        break;
-      case VK_DOWN:
-        frame->editor()->command("MoveDown").execute();
-        break;
-      case VK_PRIOR:  // PageUp
-        frame->editor()->command("MovePageUp").execute();
-        break;
-      case VK_NEXT:  // PageDown
-        frame->editor()->command("MovePageDown").execute();
-        break;
-      case VK_HOME:
-        if (kevent->ctrlKey())
-          frame->editor()->command("MoveToBeginningOfDocument").execute();
-        break;
-      case VK_END:
-        if (kevent->ctrlKey())
-          frame->editor()->command("MoveToEndOfDocument").execute();
-        break;
-      default:
-        if (kevent->ctrlKey()) {
-          switch (kevent->windowsVirtualKeyCode()) {
-            case VK_A:
-              frame->editor()->command("SelectAll").execute();
-              break;
-            case VK_C:
-            case VK_X:
-              frame->editor()->command("Copy").execute();
-              break;
-            default:
-              return;
-          }
-        } else
-          return;
-    }
+#ifndef QT_NO_SHORTCUT
+    if (kevent->qtEvent() == QKeySequence::Copy) {
+      m_page->triggerAction(QWebPage::Copy);
+    } else
+#endif  // QT_NO_SHORTCUT
+      switch (kevent->windowsVirtualKeyCode()) {
+        case VK_UP:
+          frame->editor()->command("MoveUp").execute();
+          break;
+        case VK_DOWN:
+          frame->editor()->command("MoveDown").execute();
+          break;
+        case VK_PRIOR:  // PageUp
+          frame->editor()->command("MovePageUp").execute();
+          break;
+        case VK_NEXT:  // PageDown
+          frame->editor()->command("MovePageDown").execute();
+          break;
+        case VK_HOME:
+          if (kevent->ctrlKey())
+            frame->editor()->command("MoveToBeginningOfDocument").execute();
+          break;
+        case VK_END:
+          if (kevent->ctrlKey())
+            frame->editor()->command("MoveToEndOfDocument").execute();
+          break;
+        default:
+          if (kevent->ctrlKey()) {
+            switch (kevent->windowsVirtualKeyCode()) {
+              case VK_A:
+                frame->editor()->command("SelectAll").execute();
+                break;
+              default:
+                return;
+            }
+          } else
+            return;
+      }
   }
   event->setDefaultHandled();
 }
