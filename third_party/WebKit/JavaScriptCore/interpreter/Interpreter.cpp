@@ -890,8 +890,9 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
           int startOffset = 0;
           int endOffset = 0;
           int divotPoint = 0;
-          int line = codeBlock->expressionRangeForVPC(vPC, divotPoint,
-                                                      startOffset, endOffset);
+          int line = codeBlock->expressionRangeForBytecodeOffset(
+              vPC - codeBlock->instructions().begin(), divotPoint, startOffset,
+              endOffset);
           exception->putWithAttributes(callFrame, Identifier(callFrame, "line"),
                                        jsNumber(callFrame, line),
                                        ReadOnly | DontDelete);
@@ -911,7 +912,8 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
         } else
           exception->putWithAttributes(
               callFrame, Identifier(callFrame, "line"),
-              jsNumber(callFrame, codeBlock->lineNumberForVPC(vPC)),
+              jsNumber(callFrame, codeBlock->lineNumberForBytecodeOffset(
+                                      vPC - codeBlock->instructions().begin())),
               ReadOnly | DontDelete);
         exception->putWithAttributes(
             callFrame, Identifier(callFrame, "sourceId"),
@@ -936,7 +938,8 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
   if (Debugger* debugger = callFrame->dynamicGlobalObject()->debugger()) {
     DebuggerCallFrame debuggerCallFrame(callFrame, exceptionValue);
     debugger->exception(debuggerCallFrame, codeBlock->ownerNode()->sourceID(),
-                        codeBlock->lineNumberForVPC(vPC));
+                        codeBlock->lineNumberForBytecodeOffset(
+                            vPC - codeBlock->instructions().begin()));
   }
 
   // If we throw in the middle of a call instruction, we need to notify
@@ -954,7 +957,8 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
   // Calculate an exception handler vPC, unwinding call frames as necessary.
 
   HandlerInfo* handler = 0;
-  while (!(handler = codeBlock->handlerForVPC(vPC))) {
+  while (!(handler = codeBlock->handlerForBytecodeOffset(
+               vPC - codeBlock->instructions().begin()))) {
     if (!unwindCallFrame(callFrame, exceptionValue, vPC, codeBlock))
       return 0;
   }
@@ -4168,7 +4172,9 @@ JSValue* Interpreter::privateExecute(ExecutionFlag flag,
       callFrame[dst] = Error::create(
           callFrame, (ErrorType)type,
           codeBlock->unexpectedConstant(message)->toString(callFrame),
-          codeBlock->lineNumberForVPC(vPC), codeBlock->ownerNode()->sourceID(),
+          codeBlock->lineNumberForBytecodeOffset(
+              vPC - codeBlock->instructions().begin()),
+          codeBlock->ownerNode()->sourceID(),
           codeBlock->ownerNode()->sourceURL());
 
       ++vPC;
@@ -4398,7 +4404,8 @@ void Interpreter::retrieveLastCaller(CallFrame* callFrame,
     return;
 
   Instruction* vPC = vPCForPC(callerCodeBlock, callFrame->returnPC());
-  lineNumber = callerCodeBlock->lineNumberForVPC(vPC - 1);
+  lineNumber = callerCodeBlock->lineNumberForBytecodeOffset(
+      (vPC - 1) - callerCodeBlock->instructions().begin());
   sourceID = callerCodeBlock->ownerNode()->sourceID();
   sourceURL = callerCodeBlock->ownerNode()->sourceURL();
   function = callerFrame->callee();
