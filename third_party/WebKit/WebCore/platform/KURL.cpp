@@ -24,6 +24,9 @@
  */
 
 #include "config.h"
+
+#if !USE(GOOGLEURL)
+
 #include "KURL.h"
 
 #include "CString.h"
@@ -1651,3 +1654,5 @@ void KURL::print() const {
 }
 #endif
 }
+
+#endif  // !USE(GOOGLEURL)
