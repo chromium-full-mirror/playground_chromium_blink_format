@@ -111,7 +111,7 @@ Page* ChromeClient::createWindow(Frame* frame,
 
   WebKitWebWindowFeatures* webWindowFeatures =
       webkit_web_window_features_new_from_core_features(coreFeatures);
-  webkit_web_view_set_window_features(webView, webWindowFeatures);
+  g_object_set(webView, "window-features", webWindowFeatures, NULL);
   g_object_unref(webWindowFeatures);
 
   if (!frameLoadRequest.isEmpty())
