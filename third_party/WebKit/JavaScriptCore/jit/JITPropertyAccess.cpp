@@ -64,8 +64,6 @@ void JIT::compileGetByIdHotPath(int resultVReg,
 #ifdef NDEBUG
   UNUSED_PARAM(propertyAccessInstructionIndex);
 #endif
-  ASSERT(m_codeBlock->propertyAccessInstruction(propertyAccessInstructionIndex)
-             .bytecodeIndex == i);
 
 #ifndef NDEBUG
   JmpDst coldPathBegin = __ label();
@@ -79,8 +77,6 @@ void JIT::compileGetByIdHotPath(int resultVReg,
 
   // Track the location of the call; this will be used to recover repatch
   // information.
-  ASSERT(m_codeBlock->propertyAccessInstruction(propertyAccessInstructionIndex)
-             .bytecodeIndex == i);
   m_propertyAccessCompilationInfo[propertyAccessInstructionIndex]
       .callReturnLocation = call;
 }
@@ -114,8 +110,6 @@ void JIT::compilePutByIdHotPath(int baseVReg,
 
   // Track the location of the call; this will be used to recover repatch
   // information.
-  ASSERT(m_codeBlock->propertyAccessInstruction(propertyAccessInstructionIndex)
-             .bytecodeIndex == i);
   m_propertyAccessCompilationInfo[propertyAccessInstructionIndex]
       .callReturnLocation = call;
 }
@@ -145,9 +139,6 @@ void JIT::compileGetByIdHotPath(int resultVReg,
   // to jump back to if one of these trampolies finds a match.
 
   emitGetVirtualRegister(baseVReg, X86::eax, i);
-
-  ASSERT(m_codeBlock->propertyAccessInstruction(propertyAccessInstructionIndex)
-             .bytecodeIndex == i);
 
   emitJumpSlowCaseIfNotJSCell(X86::eax, i, baseVReg);
 
@@ -202,8 +193,6 @@ void JIT::compileGetByIdSlowCase(int resultVReg,
 
   // Track the location of the call; this will be used to recover repatch
   // information.
-  ASSERT(m_codeBlock->propertyAccessInstruction(propertyAccessInstructionIndex)
-             .bytecodeIndex == i);
   m_propertyAccessCompilationInfo[propertyAccessInstructionIndex]
       .callReturnLocation = call;
 }
@@ -220,9 +209,6 @@ void JIT::compilePutByIdHotPath(int baseVReg,
   // such that the Structure & offset are always at the same distance from this.
 
   emitGetVirtualRegisters(baseVReg, X86::eax, valueVReg, X86::edx, i);
-
-  ASSERT(m_codeBlock->propertyAccessInstruction(propertyAccessInstructionIndex)
-             .bytecodeIndex == i);
 
   // Jump to a slow case if either the base object is an immediate, or if the
   // Structure does not match.
@@ -265,8 +251,6 @@ void JIT::compilePutByIdSlowCase(int baseVReg,
 
   // Track the location of the call; this will be used to recover repatch
   // information.
-  ASSERT(m_codeBlock->propertyAccessInstruction(propertyAccessInstructionIndex)
-             .bytecodeIndex == i);
   m_propertyAccessCompilationInfo[propertyAccessInstructionIndex]
       .callReturnLocation = call;
 }
@@ -642,7 +626,7 @@ void JIT::privateCompileGetByIdSelfList(
   X86Assembler::link(code, success, reinterpret_cast<void*>(successDest));
 
   structure->ref();
-  polymorphicStructures->list[currentIndex].set(cachedOffset, code, structure);
+  polymorphicStructures->list[currentIndex].set(code, structure);
 
   // Finally repatch the jump to slow case back in the hot path to jump here
   // instead.
@@ -698,7 +682,7 @@ void JIT::privateCompileGetByIdProtoList(
 
   structure->ref();
   prototypeStructure->ref();
-  prototypeStructures->list[currentIndex].set(cachedOffset, code, structure,
+  prototypeStructures->list[currentIndex].set(code, structure,
                                               prototypeStructure);
 
   // Finally repatch the jump to slow case back in the hot path to jump here
@@ -763,8 +747,7 @@ void JIT::privateCompileGetByIdChainList(
   // Track the stub we have created so that it will be deleted later.
   structure->ref();
   chain->ref();
-  prototypeStructures->list[currentIndex].set(cachedOffset, code, structure,
-                                              chain);
+  prototypeStructures->list[currentIndex].set(code, structure, chain);
 
   // Finally repatch the jump to slow case back in the hot path to jump here
   // instead.
