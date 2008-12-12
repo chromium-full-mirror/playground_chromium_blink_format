@@ -267,7 +267,7 @@ class PluginView : public Widget, private PluginStreamClient {
 #ifndef NP_NO_CARBON
   bool dispatchNPEvent(NPEvent&);
 #endif
-  void updatePluginWidget() const;
+  void updatePluginWidget();
   void paintMissingPluginIcon(GraphicsContext*, const IntRect&);
 
   void handleKeyboardEvent(KeyboardEvent*);
@@ -335,8 +335,8 @@ class PluginView : public Widget, private PluginStreamClient {
   Point globalMousePosForPlugin() const;
 #endif
 
-  mutable IntRect m_clipRect;    // The clip rect to apply to a windowed plug-in
-  mutable IntRect m_windowRect;  // Our window rect.
+  IntRect m_clipRect;    // The clip rect to apply to a windowed plug-in
+  IntRect m_windowRect;  // Our window rect.
 
   bool m_loadManually;
   RefPtr<PluginStream> m_manualStream;
