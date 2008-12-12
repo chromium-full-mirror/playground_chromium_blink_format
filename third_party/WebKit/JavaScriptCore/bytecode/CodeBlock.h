@@ -77,6 +77,14 @@ struct LineInfo {
   int32_t lineNumber;
 };
 
+// Both op_construct and op_instanceof require a use of op_get_by_id to get
+// the prototype property from an object. The exception messages for exceptions
+// thrown by these instances op_get_by_id need to reflect this.
+struct GetByIdExceptionInfo {
+  unsigned bytecodeOffset : 31;
+  bool isOpConstruct : 1;
+};
+
 #if ENABLE(JIT)
 struct CallLinkInfo {
   CallLinkInfo()
@@ -223,6 +231,8 @@ class CodeBlock {
                                        int& divot,
                                        int& startOffset,
                                        int& endOffset);
+  bool getByIdExceptionInfoForBytecodeOffset(unsigned bytecodeOffset,
+                                             OpcodeID&);
 
 #if ENABLE(JIT)
   void addCaller(CallLinkInfo* caller) {
@@ -310,6 +320,9 @@ class CodeBlock {
 
   void addExpressionInfo(const ExpressionRangeInfo& expressionInfo) {
     return m_expressionInfo.append(expressionInfo);
+  }
+  void addGetByIdExceptionInfo(const GetByIdExceptionInfo& info) {
+    m_getByIdExceptionInfo.append(info);
   }
 
   size_t numberOfLineInfos() const { return m_lineInfo.size(); }
@@ -513,6 +526,7 @@ class CodeBlock {
 
   Vector<ExpressionRangeInfo> m_expressionInfo;
   Vector<LineInfo> m_lineInfo;
+  Vector<GetByIdExceptionInfo> m_getByIdExceptionInfo;
 
 #if ENABLE(JIT)
   Vector<PC> m_pcVector;
