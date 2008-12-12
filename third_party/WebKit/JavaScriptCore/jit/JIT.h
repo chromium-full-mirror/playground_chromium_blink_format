@@ -239,13 +239,6 @@ class JIT : private MacroAssembler {
   // offset.
   static const int repatchGetByIdDefaultOffset = 256;
 
-#if USE(FAST_CALL_CTI_ARGUMENT)
-  static const int ctiArgumentInitSize = 2;
-#elif USE(CTI_ARGUMENT)
-  static const int ctiArgumentInitSize = 4;
-#else
-  static const int ctiArgumentInitSize = 0;
-#endif
   // These architecture specific value are used to enable repatching - see
   // comment on op_put_by_id.
   static const int repatchOffsetPutByIdStructure = 7;
@@ -256,11 +249,9 @@ class JIT : private MacroAssembler {
   static const int repatchOffsetGetByIdBranchToSlowCase = 13;
   static const int repatchOffsetGetByIdPropertyMapOffset = 22;
 #if ENABLE(OPCODE_SAMPLING)
-  static const int repatchOffsetGetByIdSlowCaseCall =
-      27 + 4 + ctiArgumentInitSize;
+  static const int repatchOffsetGetByIdSlowCaseCall = 27 + 4;
 #else
-  static const int repatchOffsetGetByIdSlowCaseCall =
-      17 + 4 + ctiArgumentInitSize;
+  static const int repatchOffsetGetByIdSlowCaseCall = 17 + 4;
 #endif
   static const int repatchOffsetOpCallCall = 6;
 
@@ -595,9 +586,6 @@ class JIT : private MacroAssembler {
   void emitFastArithIntToImmNoCheck(RegisterID);
 
   void emitTagAsBoolImmediate(RegisterID reg);
-
-  void restoreArgumentReference();
-  void restoreArgumentReferenceForTrampoline();
 
   JmpSrc emitNakedCall(unsigned bytecodeIndex, RegisterID);
   JmpSrc emitNakedCall(unsigned bytecodeIndex, void* function);
