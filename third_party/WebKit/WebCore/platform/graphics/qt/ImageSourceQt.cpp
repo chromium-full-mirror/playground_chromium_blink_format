@@ -37,25 +37,6 @@
 #include <QImageReader>
 
 namespace WebCore {
-static bool canHandleImage(const SharedBuffer& _data) {
-  // We need at least 4 bytes to figure out what kind of image we're dealing
-  // with.
-  if (_data.size() < 4)
-    return false;
-
-  QByteArray data = QByteArray::fromRawData(_data.data(), _data.size());
-  QBuffer buffer(&data);
-  if (!buffer.open(QBuffer::ReadOnly))
-    return false;
-
-  return !QImageReader::imageFormat(&buffer).isEmpty();
-}
-
-ImageDecoderQt* createDecoder(const SharedBuffer& data) {
-  if (!canHandleImage(data))
-    return 0;
-  return new ImageDecoderQt();
-}
 
 ImageSource::ImageSource() : m_decoder(0) {}
 
@@ -75,7 +56,7 @@ void ImageSource::setData(SharedBuffer* data, bool allDataReceived) {
   // plugin will be
   // made.
   if (!m_decoder)
-    m_decoder = createDecoder(*data);
+    m_decoder = ImageDecoderQt::create(*data);
 
   if (!m_decoder)
     return;
@@ -84,8 +65,10 @@ void ImageSource::setData(SharedBuffer* data, bool allDataReceived) {
 }
 
 String ImageSource::filenameExtension() const {
-  notImplemented();
-  return String();
+  if (!m_decoder)
+    return String();
+
+  return m_decoder->imageFormat();
 }
 
 bool ImageSource::isSizeAvailable() {

@@ -180,8 +180,26 @@ ImageDecoderQt::ReadContext::readImageLines(ImageData& imageData) {
   return IncrementalReadComplete;
 }
 
-// ImageDecoderQt
-ImageDecoderQt::ImageDecoderQt() {}
+ImageDecoderQt* ImageDecoderQt::create(const SharedBuffer& data) {
+  // We need at least 4 bytes to figure out what kind of image we're dealing
+  // with.
+  if (data.size() < 4)
+    return 0;
+
+  QByteArray bytes = QByteArray::fromRawData(data.data(), data.size());
+  QBuffer buffer(&bytes);
+  if (!buffer.open(QBuffer::ReadOnly))
+    return 0;
+
+  QString imageFormat = QImageReader::imageFormat(&buffer).toLower();
+  if (imageFormat.isEmpty())
+    return 0;  // Image format not supported
+
+  return new ImageDecoderQt(imageFormat);
+}
+
+ImageDecoderQt::ImageDecoderQt(const QString& imageFormat)
+    : m_imageFormat(imageFormat) {}
 
 ImageDecoderQt::~ImageDecoderQt() {}
 
@@ -262,6 +280,12 @@ int ImageDecoderQt::duration(size_t index) const {
     return 0;
   return m_imageList[index].m_duration;
 }
+
+QString ImageDecoderQt::imageFormat() const {
+  if (debugImageDecoderQt)
+    qDebug() << " ImageDecoderQt::imageFormat() returns" << m_imageFormat;
+  return m_imageFormat;
+};
 
 RGBA32Buffer* ImageDecoderQt::frameBufferAtIndex(size_t index) {
   Q_ASSERT("use imageAtIndex instead");
