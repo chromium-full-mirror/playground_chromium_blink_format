@@ -321,11 +321,11 @@ class Interpreter {
 
   NEVER_INLINE bool unwindCallFrame(CallFrame*&,
                                     JSValue*,
-                                    const Instruction*&,
+                                    unsigned& bytecodeOffset,
                                     CodeBlock*&);
   NEVER_INLINE HandlerInfo* throwException(CallFrame*&,
                                            JSValue*&,
-                                           const Instruction*,
+                                           unsigned bytecodeOffset,
                                            bool);
   NEVER_INLINE bool resolveBaseAndFunc(CallFrame*,
                                        Instruction*,

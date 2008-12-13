@@ -88,24 +88,17 @@ namespace JSC {
 // Preferred number of milliseconds between each timeout check
 static const int preferredScriptCheckTimeInterval = 1000;
 
+static ALWAYS_INLINE unsigned bytecodeOffsetForPC(CodeBlock* codeBlock,
+                                                  void* pc) {
 #if ENABLE(JIT)
-
-static ALWAYS_INLINE Instruction* vPCForPC(CodeBlock* codeBlock, void* pc) {
   if (pc >= codeBlock->instructions().begin() &&
       pc < codeBlock->instructions().end())
-    return static_cast<Instruction*>(pc);
-
-  unsigned vPCIndex = codeBlock->getBytecodeIndex(pc);
-  return codeBlock->instructions().begin() + vPCIndex;
+    return static_cast<Instruction*>(pc) - codeBlock->instructions().begin();
+  return codeBlock->getBytecodeIndex(pc);
+#else
+  return static_cast<Instruction*>(pc) - codeBlock->instructions().begin();
+#endif
 }
-
-#else  // ENABLE(JIT)
-
-static ALWAYS_INLINE Instruction* vPCForPC(CodeBlock*, void* pc) {
-  return static_cast<Instruction*>(pc);
-}
-
-#endif  // ENABLE(JIT)
 
 // Returns the depth of the scope chain within a given call frame.
 static int depth(CodeBlock* codeBlock, ScopeChain& sc) {
@@ -348,8 +341,8 @@ NEVER_INLINE bool Interpreter::resolve(CallFrame* callFrame,
       return true;
     }
   } while (++iter != end);
-  exceptionValue =
-      createUndefinedVariableError(callFrame, ident, vPC, codeBlock);
+  exceptionValue = createUndefinedVariableError(
+      callFrame, ident, vPC - codeBlock->instructions().begin(), codeBlock);
   return false;
 }
 
@@ -383,8 +376,8 @@ NEVER_INLINE bool Interpreter::resolveSkip(CallFrame* callFrame,
       return true;
     }
   } while (++iter != end);
-  exceptionValue =
-      createUndefinedVariableError(callFrame, ident, vPC, codeBlock);
+  exceptionValue = createUndefinedVariableError(
+      callFrame, ident, vPC - codeBlock->instructions().begin(), codeBlock);
   return false;
 }
 
@@ -426,8 +419,8 @@ NEVER_INLINE bool Interpreter::resolveGlobal(CallFrame* callFrame,
     return true;
   }
 
-  exceptionValue =
-      createUndefinedVariableError(callFrame, ident, vPC, codeBlock);
+  exceptionValue = createUndefinedVariableError(
+      callFrame, ident, vPC - codeBlock->instructions().begin(), codeBlock);
   return false;
 }
 
@@ -498,8 +491,8 @@ NEVER_INLINE bool Interpreter::resolveBaseAndProperty(
     ++iter;
   } while (iter != end);
 
-  exceptionValue =
-      createUndefinedVariableError(callFrame, ident, vPC, codeBlock);
+  exceptionValue = createUndefinedVariableError(
+      callFrame, ident, vPC - codeBlock->instructions().begin(), codeBlock);
   return false;
 }
 
@@ -548,8 +541,8 @@ NEVER_INLINE bool Interpreter::resolveBaseAndFunc(CallFrame* callFrame,
     ++iter;
   } while (iter != end);
 
-  exceptionValue =
-      createUndefinedVariableError(callFrame, ident, vPC, codeBlock);
+  exceptionValue = createUndefinedVariableError(
+      callFrame, ident, vPC - codeBlock->instructions().begin(), codeBlock);
   return false;
 }
 
@@ -607,7 +600,8 @@ static NEVER_INLINE bool isNotObject(CallFrame* callFrame,
   if (value->isObject())
     return false;
   exceptionData = createInvalidParamError(
-      callFrame, forInstanceOf ? "instanceof" : "in", value, vPC, codeBlock);
+      callFrame, forInstanceOf ? "instanceof" : "in", value,
+      vPC - codeBlock->instructions().begin(), codeBlock);
   return true;
 }
 
@@ -806,7 +800,7 @@ bool Interpreter::isOpcode(Opcode opcode) {
 
 NEVER_INLINE bool Interpreter::unwindCallFrame(CallFrame*& callFrame,
                                                JSValue* exceptionValue,
-                                               const Instruction*& vPC,
+                                               unsigned& bytecodeOffset,
                                                CodeBlock*& codeBlock) {
   CodeBlock* oldCodeBlock = codeBlock;
   ScopeChainNode* scopeChain = callFrame->scopeChain();
@@ -853,13 +847,13 @@ NEVER_INLINE bool Interpreter::unwindCallFrame(CallFrame*& callFrame,
     return false;
 
   codeBlock = callFrame->codeBlock();
-  vPC = vPCForPC(codeBlock, returnPC);
+  bytecodeOffset = bytecodeOffsetForPC(codeBlock, returnPC);
   return true;
 }
 
 NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
                                                       JSValue*& exceptionValue,
-                                                      const Instruction* vPC,
+                                                      unsigned bytecodeOffset,
                                                       bool explicitThrow) {
   // Set up the exception object
 
@@ -868,8 +862,8 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
     JSObject* exception = asObject(exceptionValue);
     if (exception->isNotAnObjectErrorStub()) {
       exception = createNotAnObjectError(
-          callFrame, static_cast<JSNotAnObjectErrorStub*>(exception), vPC,
-          codeBlock);
+          callFrame, static_cast<JSNotAnObjectErrorStub*>(exception),
+          bytecodeOffset, codeBlock);
       exceptionValue = exception;
     } else {
       if (!exception->hasProperty(callFrame, Identifier(callFrame, "line")) &&
@@ -891,8 +885,7 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
           int endOffset = 0;
           int divotPoint = 0;
           int line = codeBlock->expressionRangeForBytecodeOffset(
-              vPC - codeBlock->instructions().begin(), divotPoint, startOffset,
-              endOffset);
+              bytecodeOffset, divotPoint, startOffset, endOffset);
           exception->putWithAttributes(callFrame, Identifier(callFrame, "line"),
                                        jsNumber(callFrame, line),
                                        ReadOnly | DontDelete);
@@ -912,8 +905,8 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
         } else
           exception->putWithAttributes(
               callFrame, Identifier(callFrame, "line"),
-              jsNumber(callFrame, codeBlock->lineNumberForBytecodeOffset(
-                                      vPC - codeBlock->instructions().begin())),
+              jsNumber(callFrame,
+                       codeBlock->lineNumberForBytecodeOffset(bytecodeOffset)),
               ReadOnly | DontDelete);
         exception->putWithAttributes(
             callFrame, Identifier(callFrame, "sourceId"),
@@ -926,7 +919,8 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
       }
 
       if (exception->isWatchdogException()) {
-        while (unwindCallFrame(callFrame, exceptionValue, vPC, codeBlock)) {
+        while (unwindCallFrame(callFrame, exceptionValue, bytecodeOffset,
+                               codeBlock)) {
           // Don't need handler checks or anything, we just want to unroll all
           // the JS callframes possible.
         }
@@ -938,28 +932,31 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
   if (Debugger* debugger = callFrame->dynamicGlobalObject()->debugger()) {
     DebuggerCallFrame debuggerCallFrame(callFrame, exceptionValue);
     debugger->exception(debuggerCallFrame, codeBlock->ownerNode()->sourceID(),
-                        codeBlock->lineNumberForBytecodeOffset(
-                            vPC - codeBlock->instructions().begin()));
+                        codeBlock->lineNumberForBytecodeOffset(bytecodeOffset));
   }
 
   // If we throw in the middle of a call instruction, we need to notify
   // the profiler manually that the call instruction has returned, since
   // we'll never reach the relevant op_profile_did_call.
   if (Profiler* profiler = *Profiler::enabledProfilerReference()) {
-    if (isCallBytecode(vPC[0].u.opcode))
-      profiler->didExecute(callFrame,
-                           callFrame[vPC[2].u.operand].jsValue(callFrame));
-    else if (vPC[8].u.opcode == getOpcode(op_construct))
-      profiler->didExecute(callFrame,
-                           callFrame[vPC[10].u.operand].jsValue(callFrame));
+    if (isCallBytecode(codeBlock->instructions()[bytecodeOffset].u.opcode))
+      profiler->didExecute(
+          callFrame,
+          callFrame[codeBlock->instructions()[bytecodeOffset + 2].u.operand]
+              .jsValue(callFrame));
+    else if (codeBlock->instructions()[bytecodeOffset + 8].u.opcode ==
+             getOpcode(op_construct))
+      profiler->didExecute(
+          callFrame,
+          callFrame[codeBlock->instructions()[bytecodeOffset + 10].u.operand]
+              .jsValue(callFrame));
   }
 
   // Calculate an exception handler vPC, unwinding call frames as necessary.
 
   HandlerInfo* handler = 0;
-  while (!(handler = codeBlock->handlerForBytecodeOffset(
-               vPC - codeBlock->instructions().begin()))) {
-    if (!unwindCallFrame(callFrame, exceptionValue, vPC, codeBlock))
+  while (!(handler = codeBlock->handlerForBytecodeOffset(bytecodeOffset))) {
+    if (!unwindCallFrame(callFrame, exceptionValue, bytecodeOffset, codeBlock))
       return 0;
   }
 
@@ -3716,8 +3713,9 @@ JSValue* Interpreter::privateExecute(ExecutionFlag flag,
 
       ASSERT(callType == CallTypeNone);
 
-      exceptionValue =
-          createNotAFunctionError(callFrame, v, vPC, callFrame->codeBlock());
+      exceptionValue = createNotAFunctionError(
+          callFrame, v, vPC - callFrame->codeBlock()->instructions().begin(),
+          callFrame->codeBlock());
       goto vm_throw;
     }
     DEFINE_OPCODE(op_tear_off_activation) {
@@ -3975,8 +3973,9 @@ JSValue* Interpreter::privateExecute(ExecutionFlag flag,
 
       ASSERT(constructType == ConstructTypeNone);
 
-      exceptionValue =
-          createNotAConstructorError(callFrame, v, vPC, callFrame->codeBlock());
+      exceptionValue = createNotAConstructorError(
+          callFrame, v, vPC - callFrame->codeBlock()->instructions().begin(),
+          callFrame->codeBlock());
       goto vm_throw;
     }
     DEFINE_OPCODE(op_construct_verify) {
@@ -4135,7 +4134,9 @@ JSValue* Interpreter::privateExecute(ExecutionFlag flag,
       int ex = (++vPC)->u.operand;
       exceptionValue = callFrame[ex].jsValue(callFrame);
 
-      handler = throwException(callFrame, exceptionValue, vPC, true);
+      handler = throwException(
+          callFrame, exceptionValue,
+          vPC - callFrame->codeBlock()->instructions().begin(), true);
       if (!handler) {
         *exception = exceptionValue;
         return jsNull();
@@ -4323,7 +4324,9 @@ JSValue* Interpreter::privateExecute(ExecutionFlag flag,
       // branching)
       exceptionValue = createInterruptedExecutionException(globalData);
     }
-    handler = throwException(callFrame, exceptionValue, vPC, false);
+    handler = throwException(
+        callFrame, exceptionValue,
+        vPC - callFrame->codeBlock()->instructions().begin(), false);
     if (!handler) {
       *exception = exceptionValue;
       return jsNull();
@@ -4403,9 +4406,9 @@ void Interpreter::retrieveLastCaller(CallFrame* callFrame,
   if (!callerCodeBlock)
     return;
 
-  Instruction* vPC = vPCForPC(callerCodeBlock, callFrame->returnPC());
-  lineNumber = callerCodeBlock->lineNumberForBytecodeOffset(
-      (vPC - 1) - callerCodeBlock->instructions().begin());
+  unsigned bytecodeOffset =
+      bytecodeOffsetForPC(callerCodeBlock, callFrame->returnPC());
+  lineNumber = callerCodeBlock->lineNumberForBytecodeOffset(bytecodeOffset - 1);
   sourceID = callerCodeBlock->ownerNode()->sourceID();
   sourceURL = callerCodeBlock->ownerNode()->sourceURL();
   function = callerFrame->callee();
@@ -5170,8 +5173,7 @@ JSValue* Interpreter::cti_op_instanceof(CTI_ARGS) {
     CodeBlock* codeBlock = callFrame->codeBlock();
     unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
     ARG_globalData->exception = createInvalidParamError(
-        callFrame, "instanceof", baseVal,
-        codeBlock->instructions().begin() + vPCIndex, codeBlock);
+        callFrame, "instanceof", baseVal, vPCIndex, codeBlock);
     VM_THROW_EXCEPTION();
   }
 
@@ -5387,8 +5389,10 @@ JSValue* Interpreter::cti_op_call_NotJSFunction(CTI_ARGS) {
 
   ASSERT(callType == CallTypeNone);
 
-  ARG_globalData->exception = createNotAFunctionError(
-      ARG_callFrame, funcVal, ARG_instr4, ARG_callFrame->codeBlock());
+  CodeBlock* codeBlock = ARG_callFrame->codeBlock();
+  unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
+  ARG_globalData->exception =
+      createNotAFunctionError(ARG_callFrame, funcVal, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION();
 }
 
@@ -5476,9 +5480,8 @@ JSValue* Interpreter::cti_op_resolve(CTI_ARGS) {
 
   CodeBlock* codeBlock = callFrame->codeBlock();
   unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
-  ARG_globalData->exception = createUndefinedVariableError(
-      callFrame, ident, codeBlock->instructions().begin() + vPCIndex,
-      codeBlock);
+  ARG_globalData->exception =
+      createUndefinedVariableError(callFrame, ident, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION();
 }
 
@@ -5530,8 +5533,10 @@ JSValue* Interpreter::cti_op_construct_NotJSConstruct(CTI_ARGS) {
 
   ASSERT(constructType == ConstructTypeNone);
 
-  ARG_globalData->exception = createNotAConstructorError(
-      callFrame, constrVal, ARG_instr6, callFrame->codeBlock());
+  CodeBlock* codeBlock = callFrame->codeBlock();
+  unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
+  ARG_globalData->exception =
+      createNotAConstructorError(callFrame, constrVal, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION();
 }
 
@@ -5610,9 +5615,8 @@ VoidPtrPair Interpreter::cti_op_resolve_func(CTI_ARGS) {
 
   CodeBlock* codeBlock = callFrame->codeBlock();
   unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
-  ARG_globalData->exception = createUndefinedVariableError(
-      callFrame, ident, codeBlock->instructions().begin() + vPCIndex,
-      codeBlock);
+  ARG_globalData->exception =
+      createUndefinedVariableError(callFrame, ident, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION_2();
 }
 
@@ -5765,9 +5769,8 @@ JSValue* Interpreter::cti_op_resolve_skip(CTI_ARGS) {
 
   CodeBlock* codeBlock = callFrame->codeBlock();
   unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
-  ARG_globalData->exception = createUndefinedVariableError(
-      callFrame, ident, codeBlock->instructions().begin() + vPCIndex,
-      codeBlock);
+  ARG_globalData->exception =
+      createUndefinedVariableError(callFrame, ident, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION();
 }
 
@@ -5778,7 +5781,6 @@ JSValue* Interpreter::cti_op_resolve_global(CTI_ARGS) {
   JSGlobalObject* globalObject = asGlobalObject(ARG_src1);
   Identifier& ident = *ARG_id2;
   unsigned globalResolveInfoIndex = ARG_int3;
-  Instruction* vPC = ARG_instr4;
   ASSERT(globalObject->isGlobalObject());
 
   PropertySlot slot(globalObject);
@@ -5799,8 +5801,10 @@ JSValue* Interpreter::cti_op_resolve_global(CTI_ARGS) {
     return result;
   }
 
+  unsigned vPCIndex =
+      ARG_callFrame->codeBlock()->getBytecodeIndex(CTI_RETURN_ADDRESS);
   ARG_globalData->exception = createUndefinedVariableError(
-      callFrame, ident, vPC, callFrame->codeBlock());
+      callFrame, ident, vPCIndex, callFrame->codeBlock());
   VM_THROW_EXCEPTION();
 }
 
@@ -6006,9 +6010,8 @@ VoidPtrPair Interpreter::cti_op_resolve_with_base(CTI_ARGS) {
 
   CodeBlock* codeBlock = callFrame->codeBlock();
   unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
-  ARG_globalData->exception = createUndefinedVariableError(
-      callFrame, ident, codeBlock->instructions().begin() + vPCIndex,
-      codeBlock);
+  ARG_globalData->exception =
+      createUndefinedVariableError(callFrame, ident, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION_2();
 }
 
@@ -6170,8 +6173,7 @@ JSValue* Interpreter::cti_op_throw(CTI_ARGS) {
   ASSERT(exceptionValue);
 
   HandlerInfo* handler = ARG_globalData->interpreter->throwException(
-      callFrame, exceptionValue, codeBlock->instructions().begin() + vPCIndex,
-      true);
+      callFrame, exceptionValue, vPCIndex, true);
 
   if (!handler) {
     *ARG_exception = exceptionValue;
@@ -6312,9 +6314,8 @@ JSValue* Interpreter::cti_op_in(CTI_ARGS) {
     CallFrame* callFrame = ARG_callFrame;
     CodeBlock* codeBlock = callFrame->codeBlock();
     unsigned vPCIndex = codeBlock->getBytecodeIndex(CTI_RETURN_ADDRESS);
-    ARG_globalData->exception = createInvalidParamError(
-        callFrame, "in", baseVal, codeBlock->instructions().begin() + vPCIndex,
-        codeBlock);
+    ARG_globalData->exception =
+        createInvalidParamError(callFrame, "in", baseVal, vPCIndex, codeBlock);
     VM_THROW_EXCEPTION();
   }
 
@@ -6505,8 +6506,7 @@ JSValue* Interpreter::cti_vm_throw(CTI_ARGS) {
   globalData->exception = noValue();
 
   HandlerInfo* handler = globalData->interpreter->throwException(
-      callFrame, exceptionValue, codeBlock->instructions().begin() + vPCIndex,
-      false);
+      callFrame, exceptionValue, vPCIndex, false);
 
   if (!handler) {
     *ARG_exception = exceptionValue;

@@ -46,25 +46,25 @@ JSValue* createInterruptedExecutionException(JSGlobalData*);
 JSValue* createStackOverflowError(ExecState*);
 JSValue* createUndefinedVariableError(ExecState*,
                                       const Identifier&,
-                                      const Instruction*,
+                                      unsigned bytecodeOffset,
                                       CodeBlock*);
 JSNotAnObjectErrorStub* createNotAnObjectErrorStub(ExecState*, bool isNull);
 JSObject* createInvalidParamError(ExecState*,
                                   const char* op,
                                   JSValue*,
-                                  const Instruction*,
+                                  unsigned bytecodeOffset,
                                   CodeBlock*);
 JSObject* createNotAConstructorError(ExecState*,
                                      JSValue*,
-                                     const Instruction*,
+                                     unsigned bytecodeOffset,
                                      CodeBlock*);
 JSValue* createNotAFunctionError(ExecState*,
                                  JSValue*,
-                                 const Instruction*,
+                                 unsigned bytecodeOffset,
                                  CodeBlock*);
 JSObject* createNotAnObjectError(ExecState*,
                                  JSNotAnObjectErrorStub*,
-                                 const Instruction*,
+                                 unsigned bytecodeOffset,
                                  CodeBlock*);
 
 }  // namespace JSC
