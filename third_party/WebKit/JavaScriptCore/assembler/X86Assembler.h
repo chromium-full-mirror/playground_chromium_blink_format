@@ -97,6 +97,7 @@ class X86Assembler {
     OP_GROUP1_EvIz = 0x81,
     OP_GROUP1_EvIb = 0x83,
     OP_TEST_EvGv = 0x85,
+    OP_XCHG_EvGv = 0x87,
     OP_MOV_EvGv = 0x89,
     OP_MOV_GvEv = 0x8B,
     OP_LEA = 0x8D,
@@ -579,6 +580,11 @@ class X86Assembler {
     modRm_opr(GROUP2_OP_SHL, dst);
   }
 
+  void xchgl_rr(RegisterID src, RegisterID dst) {
+    m_buffer.putByte(OP_XCHG_EvGv);
+    modRm_rr(src, dst);
+  }
+
   void imull_rr(RegisterID src, RegisterID dst) {
     m_buffer.putByte(OP_2BYTE_ESCAPE);
     m_buffer.putByte(OP2_IMUL_GvEv);
@@ -756,6 +762,11 @@ class X86Assembler {
   void jmp_r(RegisterID dst) {
     m_buffer.putByte(OP_GROUP5_Ev);
     modRm_opr(GROUP5_OP_JMPN, dst);
+  }
+
+  void jmp_m(RegisterID base) {
+    m_buffer.putByte(OP_GROUP5_Ev);
+    modRm_opm(GROUP5_OP_JMPN, base);
   }
 
   void jmp_m(int offset, RegisterID base) {
@@ -987,15 +998,11 @@ class X86Assembler {
                            from.m_offset)[-1] = to.m_offset - from.m_offset;
   }
 
-  static void linkAbsoluteAddress(void* code,
-                                  JmpDst useOffset,
-                                  JmpDst address) {
-    ASSERT(useOffset.m_offset != -1);
-    ASSERT(address.m_offset != -1);
+  static void repatchAddress(void* code, JmpDst position, void* value) {
+    ASSERT(position.m_offset != -1);
 
-    reinterpret_cast<int*>(reinterpret_cast<ptrdiff_t>(code) +
-                           useOffset.m_offset)[-1] =
-        reinterpret_cast<ptrdiff_t>(code) + address.m_offset;
+    reinterpret_cast<void**>(reinterpret_cast<ptrdiff_t>(code) +
+                             position.m_offset)[-1] = value;
   }
 
   static void link(void* code, JmpSrc from, void* to) {
@@ -1012,9 +1019,11 @@ class X86Assembler {
                                    jump.m_offset);
   }
 
-  static void* getRelocatedAddress(void* code, JmpDst jump) {
+  static void* getRelocatedAddress(void* code, JmpDst destination) {
+    ASSERT(destination.m_offset != -1);
+
     return reinterpret_cast<void*>(reinterpret_cast<ptrdiff_t>(code) +
-                                   jump.m_offset);
+                                   destination.m_offset);
   }
 
   static int getDifferenceBetweenLabels(JmpDst src, JmpDst dst) {

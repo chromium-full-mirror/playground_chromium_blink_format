@@ -1347,12 +1347,7 @@ CodeBlock::CodeBlock(ScopeNode* ownerNode,
       m_numVars(0),
       m_numParameters(0),
       m_ownerNode(ownerNode),
-      m_globalData(0)
-#if ENABLE(JIT)
-      ,
-      m_jitCode(0)
-#endif
-      ,
+      m_globalData(0),
       m_needsFullScopeChain(ownerNode->needsActivation()),
       m_usesEval(ownerNode->usesEval()),
       m_codeType(codeType),

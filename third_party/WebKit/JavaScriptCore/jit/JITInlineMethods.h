@@ -30,8 +30,6 @@
 
 #if ENABLE(JIT)
 
-#define __ m_assembler.
-
 #if PLATFORM(WIN)
 #undef FIELD_OFFSET  // Fix conflict with winnt.h.
 #endif
@@ -46,8 +44,6 @@
    0x4000)
 
 namespace JSC {
-
-typedef X86Assembler::JmpSrc JmpSrc;
 
 static ALWAYS_INLINE uintptr_t asInteger(JSValue* value) {
   return reinterpret_cast<uintptr_t>(value);
@@ -199,27 +195,27 @@ ALWAYS_INLINE void JIT::emitInitRegister(unsigned dst) {
   // FIXME: #ifndef NDEBUG, Write the correct m_type to the register.
 }
 
-ALWAYS_INLINE JmpSrc JIT::emitNakedCall(X86::RegisterID r) {
+ALWAYS_INLINE JIT::Jump JIT::emitNakedCall(X86::RegisterID r) {
   ASSERT(m_bytecodeIndex != (unsigned)-1);  // This method should only be called
                                             // during hot/cold path generation,
                                             // so that m_bytecodeIndex is set.
 
-  JmpSrc nakedCall = call(r);
+  Jump nakedCall = call(r);
   m_calls.append(CallRecord(nakedCall, m_bytecodeIndex));
   return nakedCall;
 }
 
-ALWAYS_INLINE JmpSrc JIT::emitNakedCall(void* function) {
+ALWAYS_INLINE JIT::Jump JIT::emitNakedCall(void* function) {
   ASSERT(m_bytecodeIndex != (unsigned)-1);  // This method should only be called
                                             // during hot/cold path generation,
                                             // so that m_bytecodeIndex is set.
 
-  JmpSrc nakedCall = call();
+  Jump nakedCall = call();
   m_calls.append(CallRecord(nakedCall, m_bytecodeIndex, function));
   return nakedCall;
 }
 
-ALWAYS_INLINE JmpSrc JIT::emitCTICall_internal(void* helper) {
+ALWAYS_INLINE JIT::Jump JIT::emitCTICall_internal(void* helper) {
   ASSERT(m_bytecodeIndex != (unsigned)-1);  // This method should only be called
                                             // during hot/cold path generation,
                                             // so that m_bytecodeIndex is set.
@@ -230,7 +226,7 @@ ALWAYS_INLINE JmpSrc JIT::emitCTICall_internal(void* helper) {
           m_interpreter->sampler()->sampleSlot());
 #endif
   emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
-  JmpSrc ctiCall = call();
+  Jump ctiCall = call();
   m_calls.append(CallRecord(ctiCall, m_bytecodeIndex, helper));
 #if ENABLE(OPCODE_SAMPLING)
   store32(Imm32(m_interpreter->sampler()->encodeSample(
@@ -242,7 +238,8 @@ ALWAYS_INLINE JmpSrc JIT::emitCTICall_internal(void* helper) {
   return ctiCall;
 }
 
-ALWAYS_INLINE JmpSrc JIT::checkStructure(RegisterID reg, Structure* structure) {
+ALWAYS_INLINE JIT::Jump JIT::checkStructure(RegisterID reg,
+                                            Structure* structure) {
   return jnePtr(Address(reg, FIELD_OFFSET(JSCell, m_structure)),
                 ImmPtr(structure));
 }
@@ -296,8 +293,8 @@ ALWAYS_INLINE void JIT::emitFastArithDeTagImmediate(RegisterID reg) {
   sub32(Imm32(JSImmediate::TagBitTypeInteger), reg);
 }
 
-ALWAYS_INLINE JmpSrc
-JIT::emitFastArithDeTagImmediateJumpIfZero(RegisterID reg) {
+ALWAYS_INLINE JIT::Jump JIT::emitFastArithDeTagImmediateJumpIfZero(
+    RegisterID reg) {
   return jzSub32(Imm32(JSImmediate::TagBitTypeInteger), reg);
 }
 
@@ -328,7 +325,7 @@ ALWAYS_INLINE void JIT::emitTagAsBoolImmediate(RegisterID reg) {
   or32(Imm32(JSImmediate::FullTagTypeBool), reg);
 }
 
-ALWAYS_INLINE void JIT::addSlowCase(JmpSrc jump) {
+ALWAYS_INLINE void JIT::addSlowCase(Jump jump) {
   ASSERT(m_bytecodeIndex != (unsigned)-1);  // This method should only be called
                                             // during hot/cold path generation,
                                             // so that m_bytecodeIndex is set.
@@ -336,20 +333,20 @@ ALWAYS_INLINE void JIT::addSlowCase(JmpSrc jump) {
   m_slowCases.append(SlowCaseEntry(jump, m_bytecodeIndex));
 }
 
-ALWAYS_INLINE void JIT::addJump(JmpSrc jump, int relativeOffset) {
+ALWAYS_INLINE void JIT::addJump(Jump jump, int relativeOffset) {
   ASSERT(m_bytecodeIndex != (unsigned)-1);  // This method should only be called
                                             // during hot/cold path generation,
                                             // so that m_bytecodeIndex is set.
 
-  m_jmpTable.append(JmpTable(jump, m_bytecodeIndex + relativeOffset));
+  m_jmpTable.append(JumpTable(jump, m_bytecodeIndex + relativeOffset));
 }
 
-ALWAYS_INLINE void JIT::emitJumpSlowToHot(JmpSrc jump, int relativeOffset) {
+ALWAYS_INLINE void JIT::emitJumpSlowToHot(Jump jump, int relativeOffset) {
   ASSERT(m_bytecodeIndex != (unsigned)-1);  // This method should only be called
                                             // during hot/cold path generation,
                                             // so that m_bytecodeIndex is set.
 
-  __ link(jump, m_labels[m_bytecodeIndex + relativeOffset]);
+  jump.linkTo(m_labels[m_bytecodeIndex + relativeOffset], this);
 }
 }
 

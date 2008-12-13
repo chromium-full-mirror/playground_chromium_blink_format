@@ -109,21 +109,21 @@ typedef int(SFX_CALL* CTIHelper_b)(CTI_ARGS);
 typedef VoidPtrPair(SFX_CALL* CTIHelper_2)(CTI_ARGS);
 
 struct CallRecord {
-  X86Assembler::JmpSrc from;
+  MacroAssembler::Jump from;
   unsigned bytecodeIndex;
   void* to;
 
   CallRecord() {}
 
-  CallRecord(X86Assembler::JmpSrc from, unsigned bytecodeIndex, void* to = 0)
+  CallRecord(MacroAssembler::Jump from, unsigned bytecodeIndex, void* to = 0)
       : from(from), bytecodeIndex(bytecodeIndex), to(to) {}
 };
 
-struct JmpTable {
-  X86Assembler::JmpSrc from;
-  unsigned to;
+struct JumpTable {
+  MacroAssembler::Jump from;
+  unsigned toBytecodeIndex;
 
-  JmpTable(X86Assembler::JmpSrc f, unsigned t) : from(f), to(t) {}
+  JumpTable(MacroAssembler::Jump f, unsigned t) : from(f), toBytecodeIndex(t) {}
 };
 
 struct SlowCaseEntry {
@@ -167,13 +167,10 @@ struct SwitchRecord {
 };
 
 struct StructureStubCompilationInfo {
-  typedef X86Assembler::JmpSrc JmpSrc;
-  typedef X86Assembler::JmpDst JmpDst;
-
-  JmpSrc callReturnLocation;
-  JmpDst hotPathBegin;
-  JmpSrc hotPathOther;
-  JmpDst coldPathOther;
+  X86Assembler::JmpSrc callReturnLocation;
+  X86Assembler::JmpDst hotPathBegin;
+  X86Assembler::JmpSrc hotPathOther;
+  X86Assembler::JmpDst coldPathOther;
 };
 
 extern "C" {
@@ -193,11 +190,6 @@ class JIT : private MacroAssembler {
   using MacroAssembler::Jump;
   using MacroAssembler::JumpList;
   using MacroAssembler::Label;
-
-  typedef X86Assembler::RegisterID RegisterID;
-  typedef X86Assembler::XMMRegisterID XMMRegisterID;
-  typedef X86Assembler::JmpSrc JmpSrc;
-  typedef X86Assembler::JmpDst JmpDst;
 
   static const RegisterID callFrameRegister = X86::edi;
 
@@ -435,9 +427,9 @@ class JIT : private MacroAssembler {
   void privateCompileCTIMachineTrampolines();
   void privateCompilePatchGetArrayLength(void* returnAddress);
 
-  void addSlowCase(JmpSrc);
-  void addJump(JmpSrc, int);
-  void emitJumpSlowToHot(JmpSrc, int);
+  void addSlowCase(Jump);
+  void addJump(Jump, int);
+  void emitJumpSlowToHot(Jump, int);
 
   void compileGetByIdHotPath(int resultVReg,
                              int baseVReg,
@@ -470,13 +462,14 @@ class JIT : private MacroAssembler {
   void compileOpConstructSetupArgs(Instruction*);
   enum CompileOpStrictEqType { OpStrictEq, OpNStrictEq };
   void compileOpStrictEq(Instruction* instruction, CompileOpStrictEqType type);
-  void putDoubleResultToJSNumberCellOrJSImmediate(XMMRegisterID xmmSource,
-                                                  RegisterID jsNumberCell,
-                                                  unsigned dst,
-                                                  JmpSrc* wroteJSNumberCell,
-                                                  XMMRegisterID tempXmm,
-                                                  RegisterID tempReg1,
-                                                  RegisterID tempReg2);
+  void putDoubleResultToJSNumberCellOrJSImmediate(
+      X86Assembler::XMMRegisterID xmmSource,
+      RegisterID jsNumberCell,
+      unsigned dst,
+      X86Assembler::JmpSrc* wroteJSNumberCell,
+      X86Assembler::XMMRegisterID tempXmm,
+      RegisterID tempReg1,
+      RegisterID tempReg2);
   void compileBinaryArithOp(OpcodeID,
                             unsigned dst,
                             unsigned src1,
@@ -539,10 +532,10 @@ class JIT : private MacroAssembler {
   void emitJumpSlowCaseIfNotImmNum(RegisterID);
   void emitJumpSlowCaseIfNotImmNums(RegisterID, RegisterID, RegisterID);
 
-  JmpSrc checkStructure(RegisterID reg, Structure* structure);
+  Jump checkStructure(RegisterID reg, Structure* structure);
 
   void emitFastArithDeTagImmediate(RegisterID);
-  JmpSrc emitFastArithDeTagImmediateJumpIfZero(RegisterID);
+  Jump emitFastArithDeTagImmediateJumpIfZero(RegisterID);
   void emitFastArithReTagImmediate(RegisterID);
   void emitFastArithPotentiallyReTagImmediate(RegisterID);
   void emitFastArithImmToInt(RegisterID);
@@ -551,28 +544,28 @@ class JIT : private MacroAssembler {
 
   void emitTagAsBoolImmediate(RegisterID reg);
 
-  JmpSrc emitNakedCall(RegisterID);
-  JmpSrc emitNakedCall(void* function);
-  JmpSrc emitCTICall_internal(void*);
-  JmpSrc emitCTICall(CTIHelper_j helper) {
+  Jump emitNakedCall(RegisterID);
+  Jump emitNakedCall(void* function);
+  Jump emitCTICall_internal(void*);
+  Jump emitCTICall(CTIHelper_j helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  JmpSrc emitCTICall(CTIHelper_o helper) {
+  Jump emitCTICall(CTIHelper_o helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  JmpSrc emitCTICall(CTIHelper_p helper) {
+  Jump emitCTICall(CTIHelper_p helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  JmpSrc emitCTICall(CTIHelper_v helper) {
+  Jump emitCTICall(CTIHelper_v helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  JmpSrc emitCTICall(CTIHelper_s helper) {
+  Jump emitCTICall(CTIHelper_s helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  JmpSrc emitCTICall(CTIHelper_b helper) {
+  Jump emitCTICall(CTIHelper_b helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  JmpSrc emitCTICall(CTIHelper_2 helper) {
+  Jump emitCTICall(CTIHelper_2 helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
 
@@ -595,17 +588,17 @@ class JIT : private MacroAssembler {
   CodeBlock* m_codeBlock;
 
   Vector<CallRecord> m_calls;
-  Vector<JmpDst> m_labels;
+  Vector<Label> m_labels;
   Vector<StructureStubCompilationInfo> m_propertyAccessCompilationInfo;
   Vector<StructureStubCompilationInfo> m_callStructureStubCompilationInfo;
-  Vector<JmpTable> m_jmpTable;
+  Vector<JumpTable> m_jmpTable;
 
   struct JSRInfo {
-    JmpDst addrPosition;
-    JmpDst target;
+    DataLabelPtr storeLocation;
+    Label target;
 
-    JSRInfo(const JmpDst& storeLocation, const JmpDst& targetLocation)
-        : addrPosition(storeLocation), target(targetLocation) {}
+    JSRInfo(DataLabelPtr storeLocation, Label targetLocation)
+        : storeLocation(storeLocation), target(targetLocation) {}
   };
 
   unsigned m_bytecodeIndex;

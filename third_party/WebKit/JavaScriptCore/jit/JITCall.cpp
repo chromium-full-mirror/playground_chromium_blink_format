@@ -40,6 +40,8 @@
 #include <stdio.h>
 #endif
 
+#define __ m_assembler.
+
 using namespace std;
 
 namespace JSC {
@@ -208,6 +210,9 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
 }
 
 #else
+
+typedef X86Assembler::JmpSrc JmpSrc;
+typedef X86Assembler::JmpDst JmpDst;
 
 static void unreachable() {
   ASSERT_NOT_REACHED();

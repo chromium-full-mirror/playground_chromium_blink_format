@@ -40,6 +40,8 @@
 #include <stdio.h>
 #endif
 
+#define __ m_assembler.
+
 using namespace std;
 
 namespace JSC {
@@ -74,6 +76,10 @@ void JIT::compileBinaryArithOpSlowCase(OpcodeID,
 }
 
 #else
+
+typedef X86Assembler::JmpSrc JmpSrc;
+typedef X86Assembler::JmpDst JmpDst;
+typedef X86Assembler::XMMRegisterID XMMRegisterID;
 
 #if PLATFORM(MAC)
 
