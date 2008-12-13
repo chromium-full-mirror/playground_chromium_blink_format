@@ -219,7 +219,6 @@ WebKitWebFrame* webkit_web_frame_init_with_web_view(
   priv->client = new WebKit::FrameLoaderClient(frame);
   priv->coreFrame =
       Frame::create(viewPriv->corePage, element, priv->client).releaseRef();
-  priv->coreFrame->init();
 
   return frame;
 }
