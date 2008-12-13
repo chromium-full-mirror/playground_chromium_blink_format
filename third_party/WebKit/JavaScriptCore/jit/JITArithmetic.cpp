@@ -51,8 +51,8 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
                                unsigned src1,
                                unsigned src2,
                                OperandTypes) {
-  emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
-  emitPutCTIArgFromVirtualRegister(src2, 4, X86::ecx);
+  emitPutJITStubArgFromVirtualRegister(src1, 1, X86::ecx);
+  emitPutJITStubArgFromVirtualRegister(src2, 2, X86::ecx);
   if (opcodeID == op_add)
     emitCTICall(Interpreter::cti_op_add);
   else if (opcodeID == op_sub)
@@ -357,8 +357,8 @@ void JIT::compileBinaryArithOpSlowCase(OpcodeID opcodeID,
   if (opcodeID == op_mul)
     linkSlowCase(iter);
 
-  emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
-  emitPutCTIArgFromVirtualRegister(src2, 4, X86::ecx);
+  emitPutJITStubArgFromVirtualRegister(src1, 1, X86::ecx);
+  emitPutJITStubArgFromVirtualRegister(src2, 2, X86::ecx);
   if (opcodeID == op_add)
     emitCTICall(Interpreter::cti_op_add);
   else if (opcodeID == op_sub)

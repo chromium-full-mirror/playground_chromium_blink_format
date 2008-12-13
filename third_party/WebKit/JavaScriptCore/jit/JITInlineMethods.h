@@ -109,20 +109,24 @@ ALWAYS_INLINE void JIT::emitGetVirtualRegisters(int src1,
 }
 
 // puts an arg onto the stack, as an arg to a context threaded function.
-ALWAYS_INLINE void JIT::emitPutCTIArg(RegisterID src, unsigned offset) {
-  poke(src, (offset / sizeof(void*)) + 1);
+ALWAYS_INLINE void JIT::emitPutJITStubArg(RegisterID src,
+                                          unsigned argumentNumber) {
+  poke(src, argumentNumber);
 }
 
-ALWAYS_INLINE void JIT::emitPutCTIArgConstant(unsigned value, unsigned offset) {
-  poke(Imm32(value), (offset / sizeof(void*)) + 1);
+ALWAYS_INLINE void JIT::emitPutJITStubArgConstant(unsigned value,
+                                                  unsigned argumentNumber) {
+  poke(Imm32(value), argumentNumber);
 }
 
-ALWAYS_INLINE void JIT::emitPutCTIArgConstant(void* value, unsigned offset) {
-  poke(ImmPtr(value), (offset / sizeof(void*)) + 1);
+ALWAYS_INLINE void JIT::emitPutJITStubArgConstant(void* value,
+                                                  unsigned argumentNumber) {
+  poke(ImmPtr(value), argumentNumber);
 }
 
-ALWAYS_INLINE void JIT::emitGetCTIArg(unsigned offset, RegisterID dst) {
-  peek(dst, (offset / sizeof(void*)) + 1);
+ALWAYS_INLINE void JIT::emitGetJITStubArg(unsigned argumentNumber,
+                                          RegisterID dst) {
+  peek(dst, argumentNumber);
 }
 
 ALWAYS_INLINE JSValue* JIT::getConstantImmediateNumericArg(unsigned src) {
@@ -135,15 +139,16 @@ ALWAYS_INLINE JSValue* JIT::getConstantImmediateNumericArg(unsigned src) {
 
 // get arg puts an arg from the SF register array onto the stack, as an arg to a
 // context threaded function.
-ALWAYS_INLINE void JIT::emitPutCTIArgFromVirtualRegister(unsigned src,
-                                                         unsigned offset,
-                                                         RegisterID scratch) {
+ALWAYS_INLINE void JIT::emitPutJITStubArgFromVirtualRegister(
+    unsigned src,
+    unsigned argumentNumber,
+    RegisterID scratch) {
   if (m_codeBlock->isConstantRegisterIndex(src)) {
     JSValue* value = m_codeBlock->getConstant(src);
-    emitPutCTIArgConstant(value, offset);
+    emitPutJITStubArgConstant(value, argumentNumber);
   } else {
     loadPtr(Address(callFrameRegister, src * sizeof(Register)), scratch);
-    emitPutCTIArg(scratch, offset);
+    emitPutJITStubArg(scratch, argumentNumber);
   }
 
   killLastResultRegister();

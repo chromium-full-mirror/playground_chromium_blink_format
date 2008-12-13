@@ -60,8 +60,8 @@ void JIT::compileGetByIdHotPath(int resultVReg,
 
   emitGetVirtualRegister(baseVReg, X86::eax);
 
-  emitPutCTIArg(X86::eax, 0);
-  emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
+  emitPutJITStubArg(X86::eax, 1);
+  emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 2);
   emitCTICall(Interpreter::cti_op_get_by_id_generic);
   emitPutVirtualRegister(resultVReg);
 }
@@ -86,9 +86,9 @@ void JIT::compilePutByIdHotPath(int baseVReg,
 
   emitGetVirtualRegisters(baseVReg, X86::eax, valueVReg, X86::edx);
 
-  emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
-  emitPutCTIArg(X86::eax, 0);
-  emitPutCTIArg(X86::edx, 8);
+  emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 2);
+  emitPutJITStubArg(X86::eax, 1);
+  emitPutJITStubArg(X86::edx, 3);
   emitCTICall(Interpreter::cti_op_put_by_id_generic);
 }
 
@@ -158,8 +158,8 @@ void JIT::compileGetByIdSlowCase(int resultVReg,
 #ifndef NDEBUG
   JmpDst coldPathBegin = __ label();
 #endif
-  emitPutCTIArg(X86::eax, 0);
-  emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
+  emitPutJITStubArg(X86::eax, 1);
+  emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 2);
   JmpSrc call = emitCTICall(Interpreter::cti_op_get_by_id);
   ASSERT(X86Assembler::getDifferenceBetweenLabels(coldPathBegin, call) ==
          repatchOffsetGetByIdSlowCaseCall);
@@ -215,9 +215,9 @@ void JIT::compilePutByIdSlowCase(int baseVReg,
   linkSlowCaseIfNotJSCell(iter, baseVReg);
   linkSlowCase(iter);
 
-  emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
-  emitPutCTIArg(X86::eax, 0);
-  emitPutCTIArg(X86::edx, 8);
+  emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 2);
+  emitPutJITStubArg(X86::eax, 1);
+  emitPutJITStubArg(X86::edx, 3);
   JmpSrc call = emitCTICall(Interpreter::cti_op_put_by_id);
 
   // Track the location of the call; this will be used to recover repatch
