@@ -566,7 +566,9 @@ String RenderTextControl::text() {
 
   for (Node* n = m_innerText.get(); n;
        n = n->traverseNextNode(m_innerText.get())) {
-    if (n->isTextNode()) {
+    if (n->hasTagName(brTag))
+      result.append(&newlineCharacter, 1);
+    else if (n->isTextNode()) {
       Text* text = static_cast<Text*>(n);
       String data = text->data();
       unsigned length = data.length();
