@@ -128,6 +128,8 @@ class MacroAssembler {
     friend class MacroAssembler;
 
    public:
+    Label() {}
+
     Label(MacroAssembler* masm) : m_label(masm->m_assembler.label()) {}
 
    private:
@@ -605,6 +607,14 @@ class MacroAssembler {
     return Jump(m_assembler.jae());
   }
 
+  Jump jae32(Address left, RegisterID right) {
+    if (left.offset)
+      m_assembler.cmpl_rm(right, left.offset, left.base);
+    else
+      m_assembler.cmpl_rm(right, left.base);
+    return Jump(m_assembler.jae());
+  }
+
   Jump jb32(RegisterID left, Address right) {
     if (right.offset)
       m_assembler.cmpl_mr(right.offset, right.base, left);
@@ -648,6 +658,14 @@ class MacroAssembler {
 
   Jump jg32(RegisterID left, RegisterID right) {
     m_assembler.cmpl_rr(right, left);
+    return Jump(m_assembler.jg());
+  }
+
+  Jump jg32(RegisterID reg, Address address) {
+    if (address.offset)
+      m_assembler.cmpl_mr(address.offset, address.base, reg);
+    else
+      m_assembler.cmpl_mr(address.base, reg);
     return Jump(m_assembler.jg());
   }
 
@@ -779,6 +797,10 @@ class MacroAssembler {
   //     // ...
   //     jne32(reg1, reg2).linkTo(topOfLoop);
 
+  void jae32(RegisterID left, Address right, Label target) {
+    jae32(left, right).linkTo(target, this);
+  }
+
   void je32(RegisterID op1, Imm32 imm, Label target) {
     je32(op1, imm).linkTo(target, this);
   }
@@ -802,6 +824,10 @@ class MacroAssembler {
   void jne32(RegisterID op1, Imm32 imm, Label target) {
     jne32(op1, imm).linkTo(target, this);
   }
+
+#if !PLATFORM(X86_64)
+  void jzPtr(RegisterID reg, Label target) { jzPtr(reg).linkTo(target, this); }
+#endif
 
   void jump(Label target) {
     m_assembler.link(m_assembler.jmp(), target.m_label);
