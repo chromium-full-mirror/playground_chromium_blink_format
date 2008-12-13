@@ -50,17 +50,16 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
                                unsigned dst,
                                unsigned src1,
                                unsigned src2,
-                               OperandTypes,
-                               unsigned i) {
+                               OperandTypes) {
   emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
   emitPutCTIArgFromVirtualRegister(src2, 4, X86::ecx);
   if (opcodeID == op_add)
-    emitCTICall(i, Interpreter::cti_op_add);
+    emitCTICall(Interpreter::cti_op_add);
   else if (opcodeID == op_sub)
-    emitCTICall(i, Interpreter::cti_op_sub);
+    emitCTICall(Interpreter::cti_op_sub);
   else {
     ASSERT(opcodeID == op_mul);
-    emitCTICall(i, Interpreter::cti_op_mul);
+    emitCTICall(Interpreter::cti_op_mul);
   }
   emitPutVirtualRegister(dst);
 }
@@ -70,8 +69,7 @@ void JIT::compileBinaryArithOpSlowCase(OpcodeID,
                                        unsigned,
                                        unsigned,
                                        unsigned,
-                                       OperandTypes,
-                                       unsigned) {
+                                       OperandTypes) {
   ASSERT_NOT_REACHED();
 }
 
@@ -168,15 +166,14 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
                                unsigned dst,
                                unsigned src1,
                                unsigned src2,
-                               OperandTypes types,
-                               unsigned i) {
+                               OperandTypes types) {
   Structure* numberStructure = m_globalData->numberStructure.get();
   JmpSrc wasJSNumberCell1;
   JmpSrc wasJSNumberCell1b;
   JmpSrc wasJSNumberCell2;
   JmpSrc wasJSNumberCell2b;
 
-  emitGetVirtualRegisters(src1, X86::eax, src2, X86::edx, i);
+  emitGetVirtualRegisters(src1, X86::eax, src2, X86::edx);
 
   if (types.second().isReusable() && isSSE2Present()) {
     ASSERT(types.second().mightBeNumber());
@@ -185,10 +182,10 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
     __ testl_i32r(JSImmediate::TagBitTypeInteger, X86::edx);
     JmpSrc op2imm = __ jne();
     if (!types.second().definitelyIsNumber()) {
-      emitJumpSlowCaseIfNotJSCell(X86::edx, i, src2);
+      emitJumpSlowCaseIfNotJSCell(X86::edx, src2);
       __ cmpl_i32m(reinterpret_cast<unsigned>(numberStructure),
                    FIELD_OFFSET(JSCell, m_structure), X86::edx);
-      m_slowCases.append(SlowCaseEntry(__ jne(), i));
+      addSlowCase(__ jne());
     }
 
     // (1) In this case src2 is a reusable number cell.
@@ -196,10 +193,10 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
     __ testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
     JmpSrc op1imm = __ jne();
     if (!types.first().definitelyIsNumber()) {
-      emitJumpSlowCaseIfNotJSCell(X86::eax, i, src1);
+      emitJumpSlowCaseIfNotJSCell(X86::eax, src1);
       __ cmpl_i32m(reinterpret_cast<unsigned>(numberStructure),
                    FIELD_OFFSET(JSCell, m_structure), X86::eax);
-      m_slowCases.append(SlowCaseEntry(__ jne(), i));
+      addSlowCase(__ jne());
     }
 
     // (1a) if we get here, src1 is also a number cell
@@ -229,7 +226,7 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
     //     Two slow cases - either src1 isn't an immediate, or the subtract
     //     overflows.
     __ link(op2imm, __ label());
-    emitJumpSlowCaseIfNotImmNum(X86::eax, i);
+    emitJumpSlowCaseIfNotImmNum(X86::eax);
   } else if (types.first().isReusable() && isSSE2Present()) {
     ASSERT(types.first().mightBeNumber());
 
@@ -237,10 +234,10 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
     __ testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
     JmpSrc op1imm = __ jne();
     if (!types.first().definitelyIsNumber()) {
-      emitJumpSlowCaseIfNotJSCell(X86::eax, i, src1);
+      emitJumpSlowCaseIfNotJSCell(X86::eax, src1);
       __ cmpl_i32m(reinterpret_cast<unsigned>(numberStructure),
                    FIELD_OFFSET(JSCell, m_structure), X86::eax);
-      m_slowCases.append(SlowCaseEntry(__ jne(), i));
+      addSlowCase(__ jne());
     }
 
     // (1) In this case src1 is a reusable number cell.
@@ -248,10 +245,10 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
     __ testl_i32r(JSImmediate::TagBitTypeInteger, X86::edx);
     JmpSrc op2imm = __ jne();
     if (!types.second().definitelyIsNumber()) {
-      emitJumpSlowCaseIfNotJSCell(X86::edx, i, src2);
+      emitJumpSlowCaseIfNotJSCell(X86::edx, src2);
       __ cmpl_i32m(reinterpret_cast<unsigned>(numberStructure),
                    FIELD_OFFSET(JSCell, m_structure), X86::edx);
-      m_slowCases.append(SlowCaseEntry(__ jne(), i));
+      addSlowCase(__ jne());
     }
 
     // (1a) if we get here, src2 is also a number cell
@@ -284,17 +281,17 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
     //     Two slow cases - either src2 isn't an immediate, or the subtract
     //     overflows.
     __ link(op1imm, __ label());
-    emitJumpSlowCaseIfNotImmNum(X86::edx, i);
+    emitJumpSlowCaseIfNotImmNum(X86::edx);
   } else
-    emitJumpSlowCaseIfNotImmNums(X86::eax, X86::edx, X86::ecx, i);
+    emitJumpSlowCaseIfNotImmNums(X86::eax, X86::edx, X86::ecx);
 
   if (opcodeID == op_add) {
     emitFastArithDeTagImmediate(X86::eax);
     __ addl_rr(X86::edx, X86::eax);
-    m_slowCases.append(SlowCaseEntry(__ jo(), i));
+    addSlowCase(__ jo());
   } else if (opcodeID == op_sub) {
     __ subl_rr(X86::edx, X86::eax);
-    m_slowCases.append(SlowCaseEntry(__ jo(), i));
+    addSlowCase(__ jo());
     emitFastArithReTagImmediate(X86::eax);
   } else {
     ASSERT(opcodeID == op_mul);
@@ -310,11 +307,11 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
     // a JSImmediate.
     __ movl_rr(X86::eax, X86::ecx);
     __ addl_rr(X86::edx, X86::ecx);
-    m_slowCases.append(SlowCaseEntry(__ js(), i));
+    addSlowCase(__ js());
     // Skip the above check if neither input is zero
     __ link(op2NonZero, __ label());
     __ imull_rr(X86::edx, X86::eax);
-    m_slowCases.append(SlowCaseEntry(__ jo(), i));
+    addSlowCase(__ jo());
     emitFastArithReTagImmediate(X86::eax);
   }
   emitPutVirtualRegister(dst);
@@ -333,8 +330,7 @@ void JIT::compileBinaryArithOpSlowCase(OpcodeID opcodeID,
                                        unsigned dst,
                                        unsigned src1,
                                        unsigned src2,
-                                       OperandTypes types,
-                                       unsigned i) {
+                                       OperandTypes types) {
   linkSlowCase(iter);
   if (types.second().isReusable() && isSSE2Present()) {
     if (!types.first().definitelyIsNumber()) {
@@ -364,12 +360,12 @@ void JIT::compileBinaryArithOpSlowCase(OpcodeID opcodeID,
   emitPutCTIArgFromVirtualRegister(src1, 0, X86::ecx);
   emitPutCTIArgFromVirtualRegister(src2, 4, X86::ecx);
   if (opcodeID == op_add)
-    emitCTICall(i, Interpreter::cti_op_add);
+    emitCTICall(Interpreter::cti_op_add);
   else if (opcodeID == op_sub)
-    emitCTICall(i, Interpreter::cti_op_sub);
+    emitCTICall(Interpreter::cti_op_sub);
   else {
     ASSERT(opcodeID == op_mul);
-    emitCTICall(i, Interpreter::cti_op_mul);
+    emitCTICall(Interpreter::cti_op_mul);
   }
   emitPutVirtualRegister(dst);
 }

@@ -49,7 +49,6 @@ namespace JSC {
 void JIT::compileGetByIdHotPath(int resultVReg,
                                 int baseVReg,
                                 Identifier* ident,
-                                unsigned i,
                                 unsigned) {
   // As for put_by_id, get_by_id requires the offset of the Structure and the
   // offset of the access to be repatched.
@@ -59,18 +58,17 @@ void JIT::compileGetByIdHotPath(int resultVReg,
   // property-map access offset as a label
   // to jump back to if one of these trampolies finds a match.
 
-  emitGetVirtualRegister(baseVReg, X86::eax, i);
+  emitGetVirtualRegister(baseVReg, X86::eax);
 
   emitPutCTIArg(X86::eax, 0);
   emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
-  emitCTICall(i, Interpreter::cti_op_get_by_id_generic);
+  emitCTICall(Interpreter::cti_op_get_by_id_generic);
   emitPutVirtualRegister(resultVReg);
 }
 
 void JIT::compileGetByIdSlowCase(int,
                                  int,
                                  Identifier*,
-                                 unsigned,
                                  Vector<SlowCaseEntry>::iterator&,
                                  unsigned) {
   ASSERT_NOT_REACHED();
@@ -79,7 +77,6 @@ void JIT::compileGetByIdSlowCase(int,
 void JIT::compilePutByIdHotPath(int baseVReg,
                                 Identifier* ident,
                                 int valueVReg,
-                                unsigned i,
                                 unsigned) {
   // In order to be able to repatch both the Structure, and the object offset,
   // we store one pointer,
@@ -87,18 +84,17 @@ void JIT::compilePutByIdHotPath(int baseVReg,
   // and we generate code
   // such that the Structure & offset are always at the same distance from this.
 
-  emitGetVirtualRegisters(baseVReg, X86::eax, valueVReg, X86::edx, i);
+  emitGetVirtualRegisters(baseVReg, X86::eax, valueVReg, X86::edx);
 
   emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
   emitPutCTIArg(X86::eax, 0);
   emitPutCTIArg(X86::edx, 8);
-  emitCTICall(i, Interpreter::cti_op_put_by_id_generic);
+  emitCTICall(Interpreter::cti_op_put_by_id_generic);
 }
 
 void JIT::compilePutByIdSlowCase(int,
                                  Identifier*,
                                  int,
-                                 unsigned,
                                  Vector<SlowCaseEntry>::iterator&,
                                  unsigned) {
   ASSERT_NOT_REACHED();
@@ -109,7 +105,6 @@ void JIT::compilePutByIdSlowCase(int,
 void JIT::compileGetByIdHotPath(int resultVReg,
                                 int baseVReg,
                                 Identifier*,
-                                unsigned i,
                                 unsigned propertyAccessInstructionIndex) {
   // As for put_by_id, get_by_id requires the offset of the Structure and the
   // offset of the access to be repatched.
@@ -119,9 +114,9 @@ void JIT::compileGetByIdHotPath(int resultVReg,
   // property-map access offset as a label
   // to jump back to if one of these trampolies finds a match.
 
-  emitGetVirtualRegister(baseVReg, X86::eax, i);
+  emitGetVirtualRegister(baseVReg, X86::eax);
 
-  emitJumpSlowCaseIfNotJSCell(X86::eax, i, baseVReg);
+  emitJumpSlowCaseIfNotJSCell(X86::eax, baseVReg);
 
   JmpDst hotPathBegin = __ label();
   m_propertyAccessCompilationInfo[propertyAccessInstructionIndex].hotPathBegin =
@@ -131,7 +126,7 @@ void JIT::compileGetByIdHotPath(int resultVReg,
                FIELD_OFFSET(JSCell, m_structure), X86::eax);
   ASSERT(X86Assembler::getDifferenceBetweenLabels(hotPathBegin, __ label()) ==
          repatchOffsetGetByIdStructure);
-  m_slowCases.append(SlowCaseEntry(__ jne(), i));
+  addSlowCase(__ jne());
   ASSERT(X86Assembler::getDifferenceBetweenLabels(hotPathBegin, __ label()) ==
          repatchOffsetGetByIdBranchToSlowCase);
 
@@ -145,7 +140,6 @@ void JIT::compileGetByIdHotPath(int resultVReg,
 void JIT::compileGetByIdSlowCase(int resultVReg,
                                  int baseVReg,
                                  Identifier* ident,
-                                 unsigned i,
                                  Vector<SlowCaseEntry>::iterator& iter,
                                  unsigned propertyAccessInstructionIndex) {
   // As for the hot path of get_by_id, above, we ensure that we can use an
@@ -166,7 +160,7 @@ void JIT::compileGetByIdSlowCase(int resultVReg,
 #endif
   emitPutCTIArg(X86::eax, 0);
   emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
-  JmpSrc call = emitCTICall(i, Interpreter::cti_op_get_by_id);
+  JmpSrc call = emitCTICall(Interpreter::cti_op_get_by_id);
   ASSERT(X86Assembler::getDifferenceBetweenLabels(coldPathBegin, call) ==
          repatchOffsetGetByIdSlowCaseCall);
   emitPutVirtualRegister(resultVReg);
@@ -180,7 +174,6 @@ void JIT::compileGetByIdSlowCase(int resultVReg,
 void JIT::compilePutByIdHotPath(int baseVReg,
                                 Identifier*,
                                 int valueVReg,
-                                unsigned i,
                                 unsigned propertyAccessInstructionIndex) {
   // In order to be able to repatch both the Structure, and the object offset,
   // we store one pointer,
@@ -188,11 +181,11 @@ void JIT::compilePutByIdHotPath(int baseVReg,
   // and we generate code
   // such that the Structure & offset are always at the same distance from this.
 
-  emitGetVirtualRegisters(baseVReg, X86::eax, valueVReg, X86::edx, i);
+  emitGetVirtualRegisters(baseVReg, X86::eax, valueVReg, X86::edx);
 
   // Jump to a slow case if either the base object is an immediate, or if the
   // Structure does not match.
-  emitJumpSlowCaseIfNotJSCell(X86::eax, i, baseVReg);
+  emitJumpSlowCaseIfNotJSCell(X86::eax, baseVReg);
 
   JmpDst hotPathBegin = __ label();
   m_propertyAccessCompilationInfo[propertyAccessInstructionIndex].hotPathBegin =
@@ -204,7 +197,7 @@ void JIT::compilePutByIdHotPath(int baseVReg,
                FIELD_OFFSET(JSCell, m_structure), X86::eax);
   ASSERT(X86Assembler::getDifferenceBetweenLabels(hotPathBegin, __ label()) ==
          repatchOffsetPutByIdStructure);
-  m_slowCases.append(SlowCaseEntry(__ jne(), i));
+  addSlowCase(__ jne());
 
   // Plant a load from a bogus ofset in the object's property map; we will patch
   // this later, if it is to be used.
@@ -217,7 +210,6 @@ void JIT::compilePutByIdHotPath(int baseVReg,
 void JIT::compilePutByIdSlowCase(int baseVReg,
                                  Identifier* ident,
                                  int,
-                                 unsigned i,
                                  Vector<SlowCaseEntry>::iterator& iter,
                                  unsigned propertyAccessInstructionIndex) {
   linkSlowCaseIfNotJSCell(iter, baseVReg);
@@ -226,7 +218,7 @@ void JIT::compilePutByIdSlowCase(int baseVReg,
   emitPutCTIArgConstant(reinterpret_cast<unsigned>(ident), 4);
   emitPutCTIArg(X86::eax, 0);
   emitPutCTIArg(X86::edx, 8);
-  JmpSrc call = emitCTICall(i, Interpreter::cti_op_put_by_id);
+  JmpSrc call = emitCTICall(Interpreter::cti_op_put_by_id);
 
   // Track the location of the call; this will be used to recover repatch
   // information.
