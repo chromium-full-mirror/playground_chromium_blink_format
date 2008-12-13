@@ -148,6 +148,16 @@ WEBKIT_API void webkit_web_frame_print(WebKitWebFrame* frame);
 
 WEBKIT_API gchar* webkit_web_frame_dump_render_tree(WebKitWebFrame* frame);
 
+WEBKIT_API bool webkit_web_frame_pause_animation(WebKitWebFrame* frame,
+                                                 const gchar* name,
+                                                 double time,
+                                                 const gchar* element);
+
+WEBKIT_API bool webkit_web_frame_pause_transition(WebKitWebFrame* frame,
+                                                  const gchar* name,
+                                                  double time,
+                                                  const gchar* element);
+
 WEBKIT_API gchar* webkit_web_view_get_selected_text(WebKitWebView* web_view);
 
 WEBKIT_API void webkit_web_settings_add_extra_plugin_directory(

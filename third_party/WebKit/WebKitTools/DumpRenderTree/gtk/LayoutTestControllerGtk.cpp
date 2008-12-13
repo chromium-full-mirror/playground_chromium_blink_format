@@ -41,6 +41,17 @@
 #include <glib.h>
 #include <webkit/webkit.h>
 
+extern "C" {
+bool webkit_web_frame_pause_animation(WebKitWebFrame* frame,
+                                      const gchar* name,
+                                      double time,
+                                      const gchar* element);
+bool webkit_web_frame_pause_transition(WebKitWebFrame* frame,
+                                       const gchar* name,
+                                       double time,
+                                       const gchar* element);
+}
+
 LayoutTestController::~LayoutTestController() {
   // FIXME: implement
 }
@@ -256,12 +267,16 @@ bool LayoutTestController::pauseAnimationAtTimeOnElementWithId(
     JSStringRef animationName,
     double time,
     JSStringRef elementId) {
-  // FIXME: implement
+  gchar* name = JSStringCopyUTF8CString(animationName);
+  gchar* element = JSStringCopyUTF8CString(elementId);
+  return webkit_web_frame_pause_animation(mainFrame, name, time, element);
 }
 
 bool LayoutTestController::pauseTransitionAtTimeOnElementWithId(
     JSStringRef propertyName,
     double time,
     JSStringRef elementId) {
-  // FIXME: implement
+  gchar* name = JSStringCopyUTF8CString(propertyName);
+  gchar* element = JSStringCopyUTF8CString(elementId);
+  return webkit_web_frame_pause_transition(mainFrame, name, time, element);
 }
