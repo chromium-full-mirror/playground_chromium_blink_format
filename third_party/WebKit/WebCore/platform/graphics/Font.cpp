@@ -281,7 +281,7 @@ float Font::floatWidth(const TextRun& run,
   charsConsumed = run.length();
   glyphName = "";
 
-#if ENABLE(FONT_FAST_PATH)
+#if USE(FONT_FAST_PATH)
   if (canUseGlyphCache(run))
     return floatWidthForSimpleText(run, 0);
 #endif
