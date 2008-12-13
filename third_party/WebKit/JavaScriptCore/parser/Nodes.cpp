@@ -1189,8 +1189,9 @@ RegisterID* BinaryOpNode::emitBytecode(BytecodeGenerator& generator,
   OpcodeID opcodeID = this->opcodeID();
   if (opcodeID == op_neq) {
     if (m_expr1->isNull() || m_expr2->isNull()) {
-      RefPtr<RegisterID> src = generator.emitNode(
-          dst, m_expr1->isNull() ? m_expr2.get() : m_expr1.get());
+      RefPtr<RegisterID> src = generator.tempDestination(dst);
+      generator.emitNode(src.get(),
+                         m_expr1->isNull() ? m_expr2.get() : m_expr1.get());
       return generator.emitUnaryOp(
           op_neq_null, generator.finalDestination(dst, src.get()), src.get());
     }
@@ -1207,8 +1208,9 @@ RegisterID* BinaryOpNode::emitBytecode(BytecodeGenerator& generator,
 RegisterID* EqualNode::emitBytecode(BytecodeGenerator& generator,
                                     RegisterID* dst) {
   if (m_expr1->isNull() || m_expr2->isNull()) {
-    RefPtr<RegisterID> src = generator.emitNode(
-        dst, m_expr1->isNull() ? m_expr2.get() : m_expr1.get());
+    RefPtr<RegisterID> src = generator.tempDestination(dst);
+    generator.emitNode(src.get(),
+                       m_expr1->isNull() ? m_expr2.get() : m_expr1.get());
     return generator.emitUnaryOp(
         op_eq_null, generator.finalDestination(dst, src.get()), src.get());
   }
