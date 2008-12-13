@@ -30,7 +30,6 @@
 #include "WebView.h"
 
 #include <shlobj.h>
-#include <CoreGraphics/CoreGraphics.h>
 
 #pragma warning(push, 0)
 #include <WebCore/ClipboardWin.h>
@@ -46,7 +45,8 @@
 #pragma warning(pop)
 
 namespace WebCore {
-HBITMAP allocImage(HDC dc, IntSize size, CGContextRef* targetRef);
+HBITMAP allocImage(HDC dc, IntSize size, PlatformGraphicsContext** targetRef);
+void deallocContext(PlatformGraphicsContext* target);
 }
 
 #define DRAG_LABEL_BORDER_X 4
@@ -236,7 +236,7 @@ DragImageRef WebDragClient::createDragImageForLink(KURL& url,
     return 0;
   }
 
-  CGContextRef contextRef;
+  PlatformGraphicsContext* contextRef;
   image = allocImage(workingDC, imageSize, &contextRef);
   if (!image) {
     DeleteDC(workingDC);
@@ -279,7 +279,7 @@ DragImageRef WebDragClient::createDragImageForLink(KURL& url,
   WebCoreDrawDoubledTextAtPoint(context, label, textPos, labelFont, topColor,
                                 bottomColor);
 
-  CGContextRelease(contextRef);
+  deallocContext(contextRef);
   DeleteDC(workingDC);
   ReleaseDC(0, dc);
   return image;
