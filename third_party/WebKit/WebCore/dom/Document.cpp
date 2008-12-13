@@ -1357,6 +1357,9 @@ void Document::clearFramePointer() {
 }
 
 void Document::removeAllEventListenersFromAllNodes() {
+  size_t size = m_windowEventListeners.size();
+  for (size_t i = 0; i < size; ++i)
+    m_windowEventListeners[i]->setRemoved(true);
   m_windowEventListeners.clear();
   removeAllDisconnectedNodeEventListeners();
   for (Node* n = this; n; n = n->traverseNextNode()) {
@@ -1758,6 +1761,9 @@ void Document::clear() {
 
   removeChildren();
 
+  size_t size = m_windowEventListeners.size();
+  for (size_t i = 0; i < size; ++i)
+    m_windowEventListeners[i]->setRemoved(true);
   m_windowEventListeners.clear();
 }
 
@@ -2743,19 +2749,20 @@ CSSStyleDeclaration* Document::getOverrideStyle(Element*, const String&) {
   return 0;
 }
 
-void Document::handleWindowEvent(Event* evt, bool useCapture) {
+void Document::handleWindowEvent(Event* event, bool useCapture) {
   if (m_windowEventListeners.isEmpty())
     return;
 
-  // if any html event listeners are registered on the window, then dispatch
-  // them here
-  RegisteredEventListenerList listenersCopy = m_windowEventListeners;
-  RegisteredEventListenerList::iterator it = listenersCopy.begin();
-
-  for (; it != listenersCopy.end(); ++it)
-    if ((*it)->eventType() == evt->type() &&
-        (*it)->useCapture() == useCapture && !(*it)->removed())
-      (*it)->listener()->handleEvent(evt, true);
+  // If any HTML event listeners are registered on the window, dispatch them
+  // here.
+  RegisteredEventListenerVector listenersCopy = m_windowEventListeners;
+  size_t size = listenersCopy.size();
+  for (size_t i = 0; i < size; ++i) {
+    RegisteredEventListener& r = *listenersCopy[i];
+    if (r.eventType() == event->type() && r.useCapture() == useCapture &&
+        !r.removed())
+      r.listener()->handleEvent(event, true);
+  }
 }
 
 void Document::setWindowInlineEventListenerForType(
@@ -2769,24 +2776,27 @@ void Document::setWindowInlineEventListenerForType(
 
 EventListener* Document::windowInlineEventListenerForType(
     const AtomicString& eventType) {
-  RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
-  for (; it != m_windowEventListeners.end(); ++it) {
-    if ((*it)->eventType() == eventType && (*it)->listener()->isInline())
-      return (*it)->listener();
+  size_t size = m_windowEventListeners.size();
+  for (size_t i = 0; i < size; ++i) {
+    RegisteredEventListener& r = *m_windowEventListeners[i];
+    if (r.eventType() == eventType && r.listener()->isInline())
+      return r.listener();
   }
   return 0;
 }
 
 void Document::removeWindowInlineEventListenerForType(
     const AtomicString& eventType) {
-  RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
-  for (; it != m_windowEventListeners.end(); ++it) {
-    if ((*it)->eventType() == eventType && (*it)->listener()->isInline()) {
+  size_t size = m_windowEventListeners.size();
+  for (size_t i = 0; i < size; ++i) {
+    RegisteredEventListener& r = *m_windowEventListeners[i];
+    if (r.eventType() == eventType && r.listener()->isInline()) {
       if (eventType == eventNames().unloadEvent)
         removePendingFrameUnloadEventCount();
       else if (eventType == eventNames().beforeunloadEvent)
         removePendingFrameBeforeUnloadEventCount();
-      m_windowEventListeners.remove(it);
+      r.setRemoved(true);
+      m_windowEventListeners.remove(i);
       return;
     }
   }
@@ -2810,26 +2820,28 @@ void Document::addWindowEventListener(const AtomicString& eventType,
 void Document::removeWindowEventListener(const AtomicString& eventType,
                                          EventListener* listener,
                                          bool useCapture) {
-  RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
-  for (; it != m_windowEventListeners.end(); ++it) {
-    RegisteredEventListener& r = **it;
+  size_t size = m_windowEventListeners.size();
+  for (size_t i = 0; i < size; ++i) {
+    RegisteredEventListener& r = *m_windowEventListeners[i];
     if (r.eventType() == eventType && r.listener() == listener &&
         r.useCapture() == useCapture) {
       if (eventType == eventNames().unloadEvent)
         removePendingFrameUnloadEventCount();
       else if (eventType == eventNames().beforeunloadEvent)
         removePendingFrameBeforeUnloadEventCount();
-      m_windowEventListeners.remove(it);
+      r.setRemoved(true);
+      m_windowEventListeners.remove(i);
       return;
     }
   }
 }
 
 bool Document::hasWindowEventListener(const AtomicString& eventType) {
-  RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
-  for (; it != m_windowEventListeners.end(); ++it)
-    if ((*it)->eventType() == eventType)
+  size_t size = m_windowEventListeners.size();
+  for (size_t i = 0; i < size; ++i) {
+    if (m_windowEventListeners[i]->eventType() == eventType)
       return true;
+  }
   return false;
 }
 

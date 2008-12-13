@@ -628,10 +628,10 @@ void Element::attach() {
   ContainerNode::attach();
   if (hasRareData()) {
     ElementRareData* data = rareData();
-    if (data->m_needsFocusAppearanceUpdateSoonAfterAttach) {
+    if (data->needsFocusAppearanceUpdateSoonAfterAttach()) {
       if (isFocusable() && document()->focusedNode() == this)
         document()->updateFocusAppearanceSoon();
-      data->m_needsFocusAppearanceUpdateSoonAfterAttach = false;
+      data->setNeedsFocusAppearanceUpdateSoonAfterAttach(false);
     }
   }
 }
@@ -1109,7 +1109,7 @@ void Element::focus(bool restorePreviousSelection) {
     page->focusController()->setFocusedNode(this, doc->frame());
 
   if (!isFocusable()) {
-    ensureRareData()->m_needsFocusAppearanceUpdateSoonAfterAttach = true;
+    ensureRareData()->setNeedsFocusAppearanceUpdateSoonAfterAttach(true);
     return;
   }
 
@@ -1202,7 +1202,7 @@ RenderStyle* Element::computedStyle() {
 
 void Element::cancelFocusAppearanceUpdate() {
   if (hasRareData())
-    rareData()->m_needsFocusAppearanceUpdateSoonAfterAttach = false;
+    rareData()->setNeedsFocusAppearanceUpdateSoonAfterAttach(false);
   if (document()->focusedNode() == this)
     document()->cancelFocusAppearanceUpdate();
 }

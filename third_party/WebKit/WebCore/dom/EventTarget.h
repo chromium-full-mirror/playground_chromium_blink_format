@@ -32,7 +32,6 @@
 #ifndef EventTarget_h
 #define EventTarget_h
 
-#include "DeprecatedValueList.h"
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -43,7 +42,6 @@ class Event;
 class EventListener;
 class EventTargetNode;
 class MessagePort;
-class RegisteredEventListener;
 class ScriptExecutionContext;
 class SVGElementInstance;
 class Worker;
@@ -52,11 +50,6 @@ class XMLHttpRequest;
 class XMLHttpRequestUpload;
 
 typedef int ExceptionCode;
-
-template <typename T>
-class DeprecatedValueList;
-typedef DeprecatedValueList<RefPtr<RegisteredEventListener>>
-    RegisteredEventListenerList;
 
 class EventTarget {
  public:
@@ -103,13 +96,15 @@ class EventTarget {
   virtual void derefEventTarget() = 0;
 };
 
-#ifndef NDEBUG
 void forbidEventDispatch();
 void allowEventDispatch();
+
+#ifndef NDEBUG
 bool eventDispatchForbidden();
 #else
 inline void forbidEventDispatch() {}
 inline void allowEventDispatch() {}
-#endif  // NDEBUG
+#endif
 }
+
 #endif

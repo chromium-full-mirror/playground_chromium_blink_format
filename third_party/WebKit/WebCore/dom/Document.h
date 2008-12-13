@@ -1012,7 +1012,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                                                   // (<link>, <style>,
                                                   // <?xml-stylesheet>)
 
-  RegisteredEventListenerList m_windowEventListeners;
+  RegisteredEventListenerVector m_windowEventListeners;
 
   typedef HashMap<FormElementKey,
                   Vector<String>,
