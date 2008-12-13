@@ -583,6 +583,7 @@ void Font::drawTextUsingSVGFont(GraphicsContext* context,
     }
 
     data.extraCharsAvailable = 0;
+    data.charsConsumed = 0;
 
     SVGTextRunWalker<SVGTextRunWalkerDrawTextData> runWalker(
         fontData, fontElement, data, drawTextUsingSVGFontCallback,
