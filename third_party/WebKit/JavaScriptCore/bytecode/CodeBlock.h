@@ -64,6 +64,7 @@ struct HandlerInfo {
 #endif
 };
 
+#if ENABLE(JIT)
 // The code, and the associated pool from which it was allocated.
 struct JITCodeRef {
   void* code;
@@ -74,6 +75,7 @@ struct JITCodeRef {
   JITCodeRef(void* code, PassRefPtr<ExecutablePool> executablePool)
       : code(code), executablePool(executablePool) {}
 };
+#endif
 
 struct ExpressionRangeInfo {
   enum { MaxOffset = (1 << 7) - 1, MaxDivot = (1 << 25) - 1 };
