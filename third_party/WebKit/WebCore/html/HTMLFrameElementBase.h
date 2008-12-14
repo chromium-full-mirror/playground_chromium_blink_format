@@ -82,7 +82,7 @@ class HTMLFrameElementBase : public HTMLFrameOwnerElement {
   bool viewSourceMode() const { return m_viewSource; }
 
  protected:
-  HTMLFrameElementBase(const QualifiedName&, Document*);
+  HTMLFrameElementBase(const QualifiedName&, Document*, bool createdByParser);
 
   bool isURLAllowed(const AtomicString&) const;
   void setNameAndOpenURL();

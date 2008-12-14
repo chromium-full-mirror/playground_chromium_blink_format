@@ -156,9 +156,7 @@ static PassRefPtr<HTMLElement> frameConstructor(const QualifiedName&,
                                                 Document* doc,
                                                 HTMLFormElement*,
                                                 bool createdByParser) {
-  RefPtr<HTMLFrameElement> frame = new HTMLFrameElement(frameTag, doc);
-  frame->setCreatedByParser(createdByParser);
-  return frame.release();
+  return new HTMLFrameElement(frameTag, doc, createdByParser);
 }
 
 static PassRefPtr<HTMLElement> framesetConstructor(const QualifiedName&,
@@ -172,9 +170,7 @@ static PassRefPtr<HTMLElement> iframeConstructor(const QualifiedName&,
                                                  Document* doc,
                                                  HTMLFormElement*,
                                                  bool createdByParser) {
-  RefPtr<HTMLIFrameElement> iFrame = new HTMLIFrameElement(iframeTag, doc);
-  iFrame->setCreatedByParser(createdByParser);
-  return iFrame.release();
+  return new HTMLIFrameElement(iframeTag, doc, createdByParser);
 }
 
 static PassRefPtr<HTMLElement> formConstructor(const QualifiedName&,
@@ -419,9 +415,7 @@ static PassRefPtr<HTMLElement> objectConstructor(const QualifiedName&,
                                                  Document* doc,
                                                  HTMLFormElement*,
                                                  bool createdByParser) {
-  RefPtr<HTMLObjectElement> object =
-      new HTMLObjectElement(objectTag, doc, createdByParser);
-  return object.release();
+  return new HTMLObjectElement(objectTag, doc, createdByParser);
 }
 
 static PassRefPtr<HTMLElement> paramConstructor(const QualifiedName&,
