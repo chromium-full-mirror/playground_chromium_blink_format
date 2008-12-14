@@ -26,6 +26,8 @@
 #ifndef WorkerNavigator_h
 #define WorkerNavigator_h
 
+#if ENABLE(WORKERS)
+
 #include "NavigatorBase.h"
 #include "PlatformString.h"
 #include <wtf/PassRefPtr.h>
@@ -51,5 +53,7 @@ class WorkerNavigator : public NavigatorBase,
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(WORKERS)
 
 #endif  // WorkerNavigator_h

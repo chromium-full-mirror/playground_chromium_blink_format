@@ -25,6 +25,9 @@
  */
 
 #include "config.h"
+
+#if ENABLE(WORKERS)
+
 #include "WorkerNavigator.h"
 
 namespace WebCore {
@@ -39,3 +42,5 @@ String WorkerNavigator::userAgent() const {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(WORKERS)
