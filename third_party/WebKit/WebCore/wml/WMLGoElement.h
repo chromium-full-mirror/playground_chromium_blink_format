@@ -45,7 +45,7 @@ class WMLGoElement : public WMLTaskElement {
   void preparePOSTRequest(ResourceRequest&,
                           bool inSameDeck,
                           const String& cacheControl);
-  void prepareGETRequest(ResourceRequest&, bool inSameDeck, const KURL&);
+  void prepareGETRequest(ResourceRequest&, const KURL&);
 
   HashSet<WMLPostfieldElement*> m_postfieldElements;
 

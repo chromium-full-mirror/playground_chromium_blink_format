@@ -56,8 +56,9 @@ class WMLCardElement : public WMLEventHandlingElement {
   // (foo.wml#mycard)
   // If the 'targetUrl' doesn't contain a reference, use the first <card>
   // element in the document.
-  static WMLCardElement* setActiveCardInDocument(Document*,
-                                                 const KURL& targetUrl);
+  static WMLCardElement* determineActiveCard(Document*);
+  static WMLCardElement* findNamedCardInDocument(Document*,
+                                                 const String& cardName);
 
  private:
   bool isVisible() const { return m_isVisible; }
