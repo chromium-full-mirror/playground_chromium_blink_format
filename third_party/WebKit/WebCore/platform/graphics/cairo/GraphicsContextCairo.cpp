@@ -459,11 +459,9 @@ void GraphicsContext::fillPath() {
                                                      : CAIRO_FILL_RULE_WINDING);
   switch (m_common->state.fillColorSpace) {
     case SolidColorSpace:
-      if (fillColor().alpha()) {
-        setColor(cr, fillColor());
-        cairo_clip(cr);
-        cairo_paint_with_alpha(cr, m_common->state.globalAlpha);
-      }
+      setColor(cr, fillColor());
+      cairo_clip(cr);
+      cairo_paint_with_alpha(cr, m_common->state.globalAlpha);
       break;
     case PatternColorSpace: {
       AffineTransform affine;
@@ -493,15 +491,12 @@ void GraphicsContext::strokePath() {
   cairo_save(cr);
   switch (m_common->state.strokeColorSpace) {
     case SolidColorSpace:
-      if (strokeColor().alpha()) {
-        setColor(cr, strokeColor());
-        if (m_common->state.globalAlpha < 1.0f) {
-          cairo_push_group(cr);
-          cairo_paint_with_alpha(cr, m_common->state.globalAlpha);
-          cairo_pop_group_to_source(cr);
-        }
-        cairo_stroke(cr);
-      }
+      float red, green, blue, alpha;
+      strokeColor().getRGBA(red, green, blue, alpha);
+      if (m_common->state.globalAlpha < 1.0f)
+        alpha *= m_common->state.globalAlpha;
+      cairo_set_source_rgba(cr, red, green, blue, alpha);
+      cairo_stroke(cr);
       break;
     case PatternColorSpace: {
       AffineTransform affine;
