@@ -851,6 +851,7 @@ void FrameLoader::cancelAndClear() {
     closeURL();
 
   clear(false);
+  m_frame->script()->updatePlatformScriptObjects();
 }
 
 void FrameLoader::clear(bool clearWindowProperties, bool clearScriptObjects) {
@@ -965,6 +966,8 @@ void FrameLoader::begin(const KURL& url,
       !(m_isDisplayingInitialEmptyDocument && m_frame->document() &&
         m_frame->document()->securityOrigin()->isSecureTransitionTo(url));
   clear(resetScripting, resetScripting);
+  if (resetScripting)
+    m_frame->script()->updatePlatformScriptObjects();
   if (dispatch)
     dispatchWindowObjectAvailable();
 
@@ -3118,6 +3121,7 @@ void FrameLoader::open(CachedPage& cachedPage) {
   m_frame->setView(view);
 
   m_frame->setDocument(document);
+  m_frame->setDOMWindow(cachedPage.domWindow());
   m_frame->domWindow()->setURL(document->url());
   m_frame->domWindow()->setSecurityOrigin(document->securityOrigin());
 
@@ -3127,6 +3131,10 @@ void FrameLoader::open(CachedPage& cachedPage) {
 
   cachedPage.restore(m_frame->page());
   document->resumeActiveDOMObjects();
+
+  // It is necessary to update any platform script objects after restoring the
+  // cached page.
+  m_frame->script()->updatePlatformScriptObjects();
 
   checkCompleted();
 }

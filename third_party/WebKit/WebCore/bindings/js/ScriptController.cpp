@@ -318,7 +318,7 @@ NPObject* ScriptController::createScriptObjectForPluginElement(
 #endif
 
 #if !PLATFORM(MAC)
-void ScriptController::clearPlatformScriptObjects() {}
+void ScriptController::updatePlatformScriptObjects() {}
 
 void ScriptController::disconnectPlatformScriptObjects() {}
 #endif
@@ -359,8 +359,6 @@ void ScriptController::clearScriptObjects() {
     m_windowScriptNPObject = 0;
   }
 #endif
-
-  clearPlatformScriptObjects();
 }
 
 }  // namespace WebCore

@@ -120,6 +120,8 @@ class ScriptController {
   void clearScriptObjects();
   void cleanupScriptObjectsForPlugin(void*);
 
+  void updatePlatformScriptObjects();
+
   PassScriptInstance createScriptInstanceForWidget(Widget*);
   JSC::Bindings::RootObject* bindingRootObject();
 
@@ -144,7 +146,6 @@ class ScriptController {
   }
   void initScript();
 
-  void clearPlatformScriptObjects();
   void disconnectPlatformScriptObjects();
 
   JSC::ProtectedPtr<JSDOMWindowShell> m_windowShell;
