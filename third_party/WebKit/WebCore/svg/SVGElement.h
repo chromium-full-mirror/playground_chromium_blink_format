@@ -66,10 +66,8 @@ class SVGElement : public StyledElement {
 
   virtual bool isShadowNode() const { return m_shadowParent; }
   virtual Node* shadowParentNode() { return m_shadowParent; }
-  void setShadowParentNode(Node* node) { m_shadowParent = node; }
-  virtual Node* eventParentNode() {
-    return isShadowNode() ? shadowParentNode() : parentNode();
-  }
+  void setShadowParentNode(ContainerNode* node) { m_shadowParent = node; }
+  virtual ContainerNode* eventParentNode();
 
   // For SVGTests
   virtual bool isValid() const { return true; }
@@ -136,7 +134,7 @@ class SVGElement : public StyledElement {
 
   virtual bool haveLoadedRequiredResources();
 
-  Node* m_shadowParent;
+  ContainerNode* m_shadowParent;
   mutable HashMap<String, const SVGAnimatedPropertyBase*> m_svgPropertyMap;
 
   SVGCursorElement* m_cursorElement;

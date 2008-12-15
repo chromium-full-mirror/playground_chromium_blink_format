@@ -29,7 +29,6 @@
 
 #include "Attr.h"
 #include "Color.h"
-#include "DeprecatedPtrList.h"
 #include "DocumentMarker.h"
 #include "HTMLCollection.h"
 #include "HTMLFormElement.h"
@@ -1057,8 +1056,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   mutable AXObjectCache* m_axObjectCache;
 
-  DeprecatedPtrList<ImageLoader> m_imageLoadEventDispatchSoonList;
-  DeprecatedPtrList<ImageLoader> m_imageLoadEventDispatchingList;
+  Vector<ImageLoader*> m_imageLoadEventDispatchSoonList;
+  Vector<ImageLoader*> m_imageLoadEventDispatchingList;
   Timer<Document> m_imageLoadEventTimer;
 
   Timer<Document> m_updateFocusAppearanceTimer;

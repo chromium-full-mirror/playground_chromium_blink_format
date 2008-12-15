@@ -1899,6 +1899,12 @@ void Node::getSubresourceURLs(ListHashSet<KURL>& urls) const {
   addSubresourceAttributeURLs(urls);
 }
 
+ContainerNode* Node::eventParentNode() {
+  Node* parent = parentNode();
+  ASSERT(!parent || parent->isContainerNode());
+  return static_cast<ContainerNode*>(parent);
+}
+
 // --------
 
 }  // namespace WebCore

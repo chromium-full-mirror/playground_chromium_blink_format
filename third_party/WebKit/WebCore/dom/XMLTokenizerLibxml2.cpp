@@ -65,9 +65,9 @@ using namespace std;
 
 namespace WebCore {
 
-class PendingCallbacks {
+class PendingCallbacks : Noncopyable {
  public:
-  PendingCallbacks() { m_callbacks.setAutoDelete(true); }
+  ~PendingCallbacks() { deleteAllValues(m_callbacks); }
 
   void appendStartElementNSCallback(const xmlChar* xmlLocalName,
                                     const xmlChar* xmlPrefix,
@@ -177,10 +177,9 @@ class PendingCallbacks {
   }
 
   void callAndRemoveFirstCallback(XMLTokenizer* tokenizer) {
-    PendingCallback* cb = m_callbacks.getFirst();
-
-    cb->call(tokenizer);
+    OwnPtr<PendingCallback> callback(m_callbacks.first());
     m_callbacks.removeFirst();
+    callback->call(tokenizer);
   }
 
   bool isEmpty() const { return m_callbacks.isEmpty(); }
@@ -188,7 +187,6 @@ class PendingCallbacks {
  private:
   struct PendingCallback {
     virtual ~PendingCallback() {}
-
     virtual void call(XMLTokenizer* tokenizer) = 0;
   };
 
@@ -299,8 +297,7 @@ class PendingCallbacks {
     int columnNumber;
   };
 
- public:
-  DeprecatedPtrList<PendingCallback> m_callbacks;
+  Deque<PendingCallback*> m_callbacks;
 };
 // --------------------------------
 
