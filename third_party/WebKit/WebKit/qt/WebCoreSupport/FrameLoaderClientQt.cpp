@@ -908,9 +908,6 @@ PassRefPtr<Frame> FrameLoaderClientQt::createFrame(
 
   RefPtr<Frame> childFrame = adoptRef(webFrame->d->frame);
 
-  // FIXME: All of the below should probably be moved over into WebCore
-  childFrame->tree()->setName(name);
-  m_frame->tree()->appendChild(childFrame);
   // ### set override encoding if we have one
 
   FrameLoadType loadType = m_frame->loader()->loadType();
