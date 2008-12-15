@@ -89,12 +89,18 @@ ImageDecoder* createDecoder(const Vector<char>& data) {
 ImageSource::ImageSource() : m_decoder(0) {}
 
 ImageSource::~ImageSource() {
-  clear();
+  clear(true);
 }
 
-void ImageSource::clear() {
-  delete m_decoder;
-  m_decoder = 0;
+void ImageSource::clear(bool destroyAll, size_t clearBeforeFrame) {
+  if (destroyAll) {
+    delete m_decoder;
+    m_decoder = 0;
+    return;
+  }
+
+  if (m_decoder)
+    m_decoder->clearFrameBufferCache(clearBeforeFrame);
 }
 
 bool ImageSource::initialized() const {
