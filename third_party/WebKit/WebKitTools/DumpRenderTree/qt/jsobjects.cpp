@@ -36,6 +36,7 @@
 #include "DumpRenderTree.h"
 extern void qt_dump_editing_callbacks(bool b);
 extern void qt_dump_resource_load_callbacks(bool b);
+extern void qt_drt_setJavaScriptProfilingEnabled(QWebFrame*, bool enabled);
 
 LayoutTestController::LayoutTestController(WebCore::DumpRenderTree* drt)
     : QObject(), m_drt(drt) {
@@ -127,6 +128,12 @@ QString LayoutTestController::decodeHostName(const QString& host) {
   QString decoded = QUrl::fromAce(host.toLatin1() + QByteArray(".no"));
   decoded.truncate(decoded.length() - 3);
   return decoded;
+}
+
+void LayoutTestController::setJavaScriptProfilingEnabled(bool enable) {
+  m_topLoadingFrame->page()->settings()->setAttribute(
+      QWebSettings::DeveloperExtrasEnabled, true);
+  qt_drt_setJavaScriptProfilingEnabled(m_topLoadingFrame, enable);
 }
 
 EventSender::EventSender(QWebPage* parent) : QObject(parent) {

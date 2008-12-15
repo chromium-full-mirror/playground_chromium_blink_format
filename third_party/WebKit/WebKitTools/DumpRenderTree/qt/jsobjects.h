@@ -78,6 +78,7 @@ class LayoutTestController : public QObject {
   QString encodeHostName(const QString& host);
   QString decodeHostName(const QString& host);
   void dumpSelectionRect() const {}
+  void setJavaScriptProfilingEnabled(bool enable);
 
  private:
   bool m_isLoading;
