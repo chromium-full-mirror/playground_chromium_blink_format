@@ -83,8 +83,7 @@ class DocLoader {
   bool autoLoadImages() const { return m_autoLoadImages; }
   void setAutoLoadImages(bool);
 
-  CachePolicy cachePolicy() const { return m_cachePolicy; }
-  void setCachePolicy(CachePolicy);
+  CachePolicy cachePolicy() const;
 
   Frame* frame() const;  // Can be NULL
   Document* doc() const { return m_doc; }
@@ -130,7 +129,6 @@ class DocLoader {
   Cache* m_cache;
   HashSet<String> m_reloadedURLs;
   mutable HashMap<String, CachedResource*> m_docResources;
-  CachePolicy m_cachePolicy;
   Document* m_doc;
 
   int m_requestCount;

@@ -239,7 +239,6 @@ class FrameLoader : Noncopyable
   bool frameHasLoaded() const;
 
   int numPendingOrLoadingRequests(bool recurse) const;
-  bool isReloading() const;
   String referrer() const;
   String outgoingReferrer() const;
   String outgoingOrigin() const;
@@ -300,7 +299,7 @@ class FrameLoader : Noncopyable
                           void* argument);
   void cancelContentPolicyCheck();
 
-  void reload();
+  void reload(bool endToEndReload = false);
   void reloadAllowingStaleData(const String& overrideEncoding);
 
   void didReceiveServerRedirectForProvisionalLoadForFrame();
@@ -316,6 +315,7 @@ class FrameLoader : Noncopyable
   void didChangeTitle(DocumentLoader*);
 
   FrameLoadType loadType() const;
+  CachePolicy cachePolicy() const;
 
   void didFirstLayout();
   bool firstLayoutDone() const;
@@ -347,9 +347,9 @@ class FrameLoader : Noncopyable
   void detachFromParent();
   void detachChildren();
 
-  void addExtraFieldsToRequest(ResourceRequest&,
-                               bool isMainResource,
-                               bool alwaysFromRequest);
+  void addExtraFieldsToSubresourceRequest(ResourceRequest&);
+  void addExtraFieldsToMainResourceRequest(ResourceRequest&);
+
   static void addHTTPOriginIfNeeded(ResourceRequest&, String origin);
 
   FrameLoaderClient* client() const;
@@ -359,11 +359,13 @@ class FrameLoader : Noncopyable
   void changeLocation(const String& url,
                       const String& referrer,
                       bool lockHistory = true,
-                      bool userGesture = false);
+                      bool userGesture = false,
+                      bool refresh = false);
   void changeLocation(const KURL&,
                       const String& referrer,
                       bool lockHistory = true,
-                      bool userGesture = false);
+                      bool userGesture = false,
+                      bool refresh = false);
   void urlSelected(const ResourceRequest&,
                    const String& target,
                    Event*,
@@ -633,6 +635,11 @@ class FrameLoader : Noncopyable
   void updatePolicyBaseURL();
   void setPolicyBaseURL(const KURL&);
 
+  void addExtraFieldsToRequest(ResourceRequest&,
+                               FrameLoadType loadType,
+                               bool isMainResource,
+                               bool cookiePolicyURLFromRequest);
+
   // Also not cool.
   void stopLoadingSubframes();
 
@@ -775,8 +782,6 @@ class FrameLoader : Noncopyable
   bool m_navigationDuringLoad;
 
   String m_outgoingReferrer;
-
-  CachePolicy m_cachePolicy;
 
   HashSet<String> m_urlsClientKnowsAbout;
 

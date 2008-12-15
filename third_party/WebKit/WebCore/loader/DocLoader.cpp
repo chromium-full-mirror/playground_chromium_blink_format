@@ -49,7 +49,6 @@ namespace WebCore {
 
 DocLoader::DocLoader(Document* doc)
     : m_cache(cache()),
-      m_cachePolicy(CachePolicyVerify),
       m_doc(doc),
       m_requestCount(0),
       m_autoLoadImages(true),
@@ -78,27 +77,35 @@ void DocLoader::checkForReload(const KURL& fullURL) {
   if (fullURL.isEmpty())
     return;
 
-  if (m_cachePolicy == CachePolicyVerify || m_cachePolicy == CachePolicyCache) {
-    if (!m_reloadedURLs.contains(fullURL.string())) {
-      CachedResource* existing = cache()->resourceForURL(fullURL.string());
-      if (existing && !existing->isPreloaded() &&
-          existing->mustRevalidate(m_cachePolicy)) {
-        cache()->revalidateResource(existing, this);
-        m_reloadedURLs.add(fullURL.string());
-      }
-    }
-  } else if ((m_cachePolicy == CachePolicyReload) ||
-             (m_cachePolicy == CachePolicyRefresh)) {
-    if (!m_reloadedURLs.contains(fullURL.string())) {
-      CachedResource* existing = cache()->resourceForURL(fullURL.string());
-      if (existing && !existing->isPreloaded()) {
-        // FIXME: Use revalidateResource() to implement HTTP 1.1 "Specific
-        // end-to-end revalidation" for regular reloading
-        cache()->remove(existing);
-        m_reloadedURLs.add(fullURL.string());
-      }
-    }
+  if (m_reloadedURLs.contains(fullURL.string()))
+    return;
+
+  CachedResource* existing = cache()->resourceForURL(fullURL.string());
+  if (!existing || existing->isPreloaded())
+    return;
+
+  switch (cachePolicy()) {
+    case CachePolicyVerify:
+      if (!existing->mustRevalidate(CachePolicyVerify))
+        return;
+      cache()->revalidateResource(existing, this);
+      break;
+    case CachePolicyCache:
+      if (!existing->mustRevalidate(CachePolicyCache))
+        return;
+      cache()->revalidateResource(existing, this);
+      break;
+    case CachePolicyReload:
+      cache()->remove(existing);
+      break;
+    case CachePolicyRevalidate:
+      cache()->revalidateResource(existing, this);
+      break;
+    default:
+      ASSERT_NOT_REACHED();
   }
+
+  m_reloadedURLs.add(fullURL.string());
 }
 
 CachedImage* DocLoader::requestImage(const String& url) {
@@ -199,9 +206,6 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
     }
   }
 
-  if (frame() && frame()->loader()->isReloading())
-    setCachePolicy(CachePolicyReload);
-
   checkForReload(fullURL);
 
   CachedResource* resource =
@@ -267,8 +271,8 @@ void DocLoader::setAutoLoadImages(bool enable) {
   }
 }
 
-void DocLoader::setCachePolicy(CachePolicy cachePolicy) {
-  m_cachePolicy = cachePolicy;
+CachePolicy DocLoader::cachePolicy() const {
+  return frame() ? frame()->loader()->cachePolicy() : CachePolicyVerify;
 }
 
 void DocLoader::removeCachedResource(CachedResource* resource) const {

@@ -252,8 +252,8 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
       const String& eTag =
           resourceToRevalidate->response().httpHeaderField("ETag");
       if (!lastModified.isEmpty() || !eTag.isEmpty()) {
-        if (docLoader->cachePolicy() == CachePolicyReload ||
-            docLoader->cachePolicy() == CachePolicyRefresh)
+        ASSERT(docLoader->cachePolicy() != CachePolicyReload);
+        if (docLoader->cachePolicy() == CachePolicyRevalidate)
           resourceRequest.setHTTPHeaderField("Cache-Control", "max-age=0");
         if (!lastModified.isEmpty())
           resourceRequest.setHTTPHeaderField("If-Modified-Since", lastModified);

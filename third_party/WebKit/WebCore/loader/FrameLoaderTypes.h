@@ -54,7 +54,8 @@ enum FrameLoadType {
   FrameLoadTypeReloadAllowingStaleData,
   FrameLoadTypeSame,  // user loads same URL again (but not reload button)
   FrameLoadTypeRedirectWithLockedHistory,
-  FrameLoadTypeReplace
+  FrameLoadTypeReplace,
+  FrameLoadTypeReloadFromOrigin
 };
 
 enum NavigationType {
