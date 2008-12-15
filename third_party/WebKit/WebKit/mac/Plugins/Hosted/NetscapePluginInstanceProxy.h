@@ -48,19 +48,23 @@ class NetscapePluginInstanceProxy
  public:
   static PassRefPtr<NetscapePluginInstanceProxy> create(
       NetscapePluginHostProxy* pluginHostProxy,
-      WebHostedNetscapePluginView* pluginView,
-      uint32_t pluginID,
-      uint32_t renderContextID,
-      boolean_t useSoftwareRenderer) {
-    return adoptRef(new NetscapePluginInstanceProxy(pluginHostProxy, pluginView,
-                                                    pluginID, renderContextID,
-                                                    useSoftwareRenderer));
+      WebHostedNetscapePluginView* pluginView) {
+    return adoptRef(
+        new NetscapePluginInstanceProxy(pluginHostProxy, pluginView));
   }
   ~NetscapePluginInstanceProxy();
 
   uint32_t pluginID() const { return m_pluginID; }
   uint32_t renderContextID() const { return m_renderContextID; }
+  void setRenderContextID(uint32_t renderContextID) {
+    m_renderContextID = renderContextID;
+  }
+
   bool useSoftwareRenderer() const { return m_useSoftwareRenderer; }
+  void setUseSoftwareRenderer(bool useSoftwareRenderer) {
+    m_useSoftwareRenderer = useSoftwareRenderer;
+  }
+
   WebHostedNetscapePluginView* pluginView() const { return m_pluginView; }
   NetscapePluginHostProxy* hostProxy() const { return m_pluginHostProxy; }
 
@@ -91,10 +95,7 @@ class NetscapePluginInstanceProxy
 
  private:
   NetscapePluginInstanceProxy(NetscapePluginHostProxy*,
-                              WebHostedNetscapePluginView*,
-                              uint32_t pluginID,
-                              uint32_t renderContextID,
-                              boolean_t useSoftwareRenderer);
+                              WebHostedNetscapePluginView*);
 
   NPError loadRequest(NSURLRequest*,
                       const char* cTarget,
