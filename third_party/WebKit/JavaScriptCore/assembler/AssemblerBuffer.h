@@ -54,7 +54,7 @@ class AssemblerBuffer {
       grow();
   }
 
-  bool isAligned(int alignment) { return !(m_size & (alignment - 1)); }
+  bool isAligned(int alignment) const { return !(m_size & (alignment - 1)); }
 
   void putByteUnchecked(int value) {
     ASSERT(!(m_size > m_capacity - 4));
@@ -91,7 +91,7 @@ class AssemblerBuffer {
     putIntUnchecked(value);
   }
 
-  void* data() { return m_buffer; }
+  void* data() const { return m_buffer; }
 
   int size() const { return m_size; }
 
