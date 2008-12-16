@@ -27,6 +27,7 @@
 #include <time.h>
 #include <wtf/Assertions.h>
 #include <wtf/MathExtras.h>
+#include <wtf/RandomNumber.h>
 
 namespace JSC {
 
@@ -307,15 +308,7 @@ JSValue* mathProtoFuncRandom(ExecState* exec,
                              JSObject*,
                              JSValue*,
                              const ArgList&) {
-#if !ENABLE(JSC_MULTIPLE_THREADS)
-  static bool didInitRandom;
-  if (!didInitRandom) {
-    wtf_random_init();
-    didInitRandom = true;
-  }
-#endif
-
-  return jsNumber(exec, wtf_random());
+  return jsNumber(exec, randomNumber());
 }
 
 JSValue* mathProtoFuncRound(ExecState* exec,
