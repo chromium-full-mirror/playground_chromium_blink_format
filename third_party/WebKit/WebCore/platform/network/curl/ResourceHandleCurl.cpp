@@ -101,7 +101,6 @@ ResourceHandle::~ResourceHandle() {
 
 bool ResourceHandle::start(Frame* frame) {
   ASSERT(frame);
-  ref();
   ResourceHandleManager::sharedInstance()->add(this);
   return true;
 }
