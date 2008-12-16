@@ -77,7 +77,16 @@ SYMBOL_STRING(ctiTrampoline) ":" "\n"
 asm(
 ".globl " SYMBOL_STRING(ctiVMThrowTrampoline) "\n"
 SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
+#if USE(CTI_ARGUMENT)
+#if USE(FAST_CALL_CTI_ARGUMENT)
+    "movl %esp, %ecx" "\n"
+#else
+    "movl %esp, 0(%esp)" "\n"
+#endif
+    "call " SYMBOL_STRING(_ZN3JSC11Interpreter12cti_vm_throwEPPv) "\n"
+#else
     "call " SYMBOL_STRING(_ZN3JSC11Interpreter12cti_vm_throwEPvz) "\n"
+#endif
     "addl $0x20, %esp" "\n"
     "popl %ebx" "\n"
     "popl %edi" "\n"
@@ -2141,6 +2150,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   __ testl_rr(X86::eax, X86::eax);
   X86Assembler::JmpSrc hasCodeBlock1 = __ jne();
   __ pop_r(X86::ebx);
+  restoreArgumentReference();
   emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callJSFunction1 = __ call();
   emitGetJITStubArg(1, X86::ecx);
@@ -2154,6 +2164,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   __ pop_r(X86::ebx);
   emitPutJITStubArg(X86::ebx, 2);
   emitPutJITStubArg(X86::eax, 4);
+  restoreArgumentReference();
   emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callArityCheck1 = __ call();
   __ movl_rr(X86::edx, callFrameRegister);
@@ -2166,6 +2177,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
 
   __ pop_r(X86::ebx);
   emitPutJITStubArg(X86::ebx, 2);
+  restoreArgumentReference();
   emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callDontLazyLinkCall = __ call();
   __ push_r(X86::ebx);
@@ -2180,6 +2192,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   __ testl_rr(X86::eax, X86::eax);
   X86Assembler::JmpSrc hasCodeBlock2 = __ jne();
   __ pop_r(X86::ebx);
+  restoreArgumentReference();
   emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callJSFunction2 = __ call();
   emitGetJITStubArg(1, X86::ecx);
@@ -2193,6 +2206,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   __ pop_r(X86::ebx);
   emitPutJITStubArg(X86::ebx, 2);
   emitPutJITStubArg(X86::eax, 4);
+  restoreArgumentReference();
   emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callArityCheck2 = __ call();
   __ movl_rr(X86::edx, callFrameRegister);
@@ -2205,6 +2219,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
 
   __ pop_r(X86::ebx);
   emitPutJITStubArg(X86::ebx, 2);
+  restoreArgumentReference();
   emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callLazyLinkCall = __ call();
   __ push_r(X86::ebx);
@@ -2219,6 +2234,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   __ testl_rr(X86::eax, X86::eax);
   X86Assembler::JmpSrc hasCodeBlock3 = __ jne();
   __ pop_r(X86::ebx);
+  restoreArgumentReference();
   emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callJSFunction3 = __ call();
   emitGetJITStubArg(1, X86::ecx);
@@ -2232,6 +2248,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   __ pop_r(X86::ebx);
   emitPutJITStubArg(X86::ebx, 2);
   emitPutJITStubArg(X86::eax, 4);
+  restoreArgumentReference();
   emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
   X86Assembler::JmpSrc callArityCheck3 = __ call();
   __ movl_rr(X86::edx, callFrameRegister);
