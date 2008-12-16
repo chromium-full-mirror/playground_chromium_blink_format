@@ -273,7 +273,6 @@ class JSGlobalObject : public JSVariableObject {
   ScopeChain& globalScopeChain() { return d()->globalScopeChain; }
 
   virtual bool isGlobalObject() const { return true; }
-  virtual JSGlobalObject* toGlobalObject(ExecState*) const;
 
   virtual ExecState* globalExec();
 

@@ -103,19 +103,19 @@ void JSObject::put(ExecState* exec,
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
   if (propertyName == exec->propertyNames().underscoreProto) {
-    JSObject* proto = value->getObject();
-
     // Setting __proto__ to a non-object, non-null value is silently ignored to
     // match Mozilla.
-    if (!proto && !value->isNull())
+    if (!value->isObject() && !value->isNull())
       return;
 
-    while (proto) {
-      if (proto == this) {
+    JSValue* nextPrototypeValue = value;
+    while (nextPrototypeValue && nextPrototypeValue->isObject()) {
+      JSObject* nextPrototype = asObject(nextPrototypeValue)->unwrappedObject();
+      if (nextPrototype == this) {
         throwError(exec, GeneralError, "cyclic __proto__ value");
         return;
       }
-      proto = proto->prototype() ? proto->prototype()->getObject() : 0;
+      nextPrototypeValue = nextPrototype->prototype();
     }
 
     setPrototype(value);
@@ -472,8 +472,8 @@ JSObject* JSObject::toThisObject(ExecState*) const {
   return const_cast<JSObject*>(this);
 }
 
-JSGlobalObject* JSObject::toGlobalObject(ExecState*) const {
-  return 0;
+JSObject* JSObject::unwrappedObject() {
+  return this;
 }
 
 void JSObject::removeDirect(const Identifier& propertyName) {

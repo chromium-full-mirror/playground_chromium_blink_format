@@ -94,7 +94,7 @@ class JSDOMWindowShell : public DOMObject {
                                      const JSC::Identifier& propertyName);
   virtual JSC::JSValue* lookupSetter(JSC::ExecState*,
                                      const JSC::Identifier& propertyName);
-  virtual JSC::JSGlobalObject* toGlobalObject(JSC::ExecState*) const;
+  virtual JSC::JSObject* unwrappedObject();
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
 
   JSDOMWindow* m_window;
