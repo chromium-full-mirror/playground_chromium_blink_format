@@ -176,7 +176,7 @@ class Structure : public RefCounted<Structure> {
   RefPtr<StructureChain> m_cachedPrototypeChain;
 
   RefPtr<Structure> m_previous;
-  UString::Rep* m_nameInPrevious;
+  RefPtr<UString::Rep> m_nameInPrevious;
 
   size_t m_transitionCount;
   union {

@@ -167,9 +167,9 @@ Structure::~Structure() {
       m_previous->m_transitions.singleTransition = 0;
     } else {
       ASSERT(m_previous->m_transitions.table->contains(
-          make_pair(m_nameInPrevious, m_attributesInPrevious)));
+          make_pair(m_nameInPrevious.get(), m_attributesInPrevious)));
       m_previous->m_transitions.table->remove(
-          make_pair(m_nameInPrevious, m_attributesInPrevious));
+          make_pair(m_nameInPrevious.get(), m_attributesInPrevious));
     }
   }
 
@@ -284,9 +284,9 @@ void Structure::materializePropertyMap() {
   for (ptrdiff_t i = structures.size() - 2; i >= 0; --i) {
     structure = structures[i];
     structure->m_nameInPrevious->ref();
-    PropertyMapEntry entry(structure->m_nameInPrevious, structure->m_offset,
-                           structure->m_attributesInPrevious,
-                           ++m_propertyTable->lastIndexUsed);
+    PropertyMapEntry entry(
+        structure->m_nameInPrevious.get(), structure->m_offset,
+        structure->m_attributesInPrevious, ++m_propertyTable->lastIndexUsed);
     insertIntoPropertyMapHashTable(entry);
   }
 }
@@ -372,7 +372,8 @@ PassRefPtr<Structure> Structure::addPropertyTransitionToExistingStructure(
   if (structure->m_usingSingleTransitionSlot) {
     Structure* existingTransition = structure->m_transitions.singleTransition;
     if (existingTransition &&
-        existingTransition->m_nameInPrevious == propertyName.ustring().rep() &&
+        existingTransition->m_nameInPrevious.get() ==
+            propertyName.ustring().rep() &&
         existingTransition->m_attributesInPrevious == attributes) {
       offset = structure->m_transitions.singleTransition->m_offset;
       ASSERT(offset != WTF::notFound);
@@ -451,7 +452,7 @@ PassRefPtr<Structure> Structure::addPropertyTransition(
     structure->m_usingSingleTransitionSlot = false;
     StructureTransitionTable* transitionTable = new StructureTransitionTable;
     structure->m_transitions.table = transitionTable;
-    transitionTable->add(make_pair(existingTransition->m_nameInPrevious,
+    transitionTable->add(make_pair(existingTransition->m_nameInPrevious.get(),
                                    existingTransition->m_attributesInPrevious),
                          existingTransition);
   }
