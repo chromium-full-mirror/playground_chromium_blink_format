@@ -121,13 +121,13 @@ const HTTPHeaderMap& ResourceRequestBase::httpHeaderFields() const {
   return m_httpHeaderFields;
 }
 
-String ResourceRequestBase::httpHeaderField(const String& name) const {
+String ResourceRequestBase::httpHeaderField(const AtomicString& name) const {
   updateResourceRequest();
 
   return m_httpHeaderFields.get(name);
 }
 
-void ResourceRequestBase::setHTTPHeaderField(const String& name,
+void ResourceRequestBase::setHTTPHeaderField(const AtomicString& name,
                                              const String& value) {
   updateResourceRequest();
 
@@ -181,7 +181,7 @@ void ResourceRequestBase::setAllowHTTPCookies(bool allowHTTPCookies) {
   m_platformRequestUpdated = false;
 }
 
-void ResourceRequestBase::addHTTPHeaderField(const String& name,
+void ResourceRequestBase::addHTTPHeaderField(const AtomicString& name,
                                              const String& value) {
   updateResourceRequest();
   pair<HTTPHeaderMap::iterator, bool> result =

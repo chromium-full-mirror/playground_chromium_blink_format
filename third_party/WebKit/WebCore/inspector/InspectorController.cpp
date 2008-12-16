@@ -1969,7 +1969,8 @@ static void addHeaders(JSContextRef context,
   for (HTTPHeaderMap::const_iterator it = headers.begin(); it != end; ++it) {
     JSValueRef value =
         JSValueMakeString(context, jsStringRef(it->second).get());
-    JSObjectSetProperty(context, object, jsStringRef(it->first).get(), value,
+    JSObjectSetProperty(context, object,
+                        jsStringRef((it->first).string()).get(), value,
                         kJSPropertyAttributeNone, exception);
     if (exception && *exception)
       return;
