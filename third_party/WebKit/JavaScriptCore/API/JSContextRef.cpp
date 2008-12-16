@@ -57,7 +57,8 @@ void JSContextGroupRelease(JSContextGroupRef group) {
 }
 
 JSGlobalContextRef JSGlobalContextCreate(JSClassRef globalObjectClass) {
-#if PLATFORM(DARWIN)
+#if PLATFORM(DARWIN) && !defined(BUILDING_ON_TIGER) && \
+    !defined(BUILDING_ON_LEOPARD)
   if (NSVersionOfLinkTimeLibrary("JavaScriptCore") <=
       webkitFirstVersionWithConcurrentGlobalContexts) {
     JSLock lock(true);
