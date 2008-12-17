@@ -119,6 +119,15 @@ struct CallLinkInfo {
   bool isLinked() { return callee; }
 };
 
+struct FunctionRegisterInfo {
+  FunctionRegisterInfo(unsigned bytecodeOffset, int functionRegisterIndex)
+      : bytecodeOffset(bytecodeOffset),
+        functionRegisterIndex(functionRegisterIndex) {}
+
+  unsigned bytecodeOffset;
+  int functionRegisterIndex;
+};
+
 struct GlobalResolveInfo {
   GlobalResolveInfo() : structure(0), offset(0) {}
 
@@ -282,6 +291,9 @@ class CodeBlock {
                                               m_pcVector.size(), nativePC)
         ->bytecodeIndex;
   }
+
+  bool functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
+                                         int& functionRegisterIndex);
 #endif
 
   Vector<Instruction>& instructions() { return m_instructions; }
@@ -371,6 +383,12 @@ class CodeBlock {
   size_t numberOfCallLinkInfos() const { return m_callLinkInfos.size(); }
   void addCallLinkInfo() { m_callLinkInfos.append(CallLinkInfo()); }
   CallLinkInfo& callLinkInfo(int index) { return m_callLinkInfos[index]; }
+
+  void addFunctionRegisterInfo(unsigned bytecodeOffset, int functionIndex) {
+    createRareDataIfNecessary();
+    m_rareData->m_functionRegisterInfos.append(
+        FunctionRegisterInfo(bytecodeOffset, functionIndex));
+  }
 
   Vector<PC>& pcVector() { return m_pcVector; }
 #endif
@@ -564,6 +582,10 @@ class CodeBlock {
     Vector<StringJumpTable> m_stringSwitchJumpTables;
 
     EvalCodeCache m_evalCodeCache;
+
+#if ENABLE(JIT)
+    Vector<FunctionRegisterInfo> m_functionRegisterInfos;
+#endif
   };
 
   OwnPtr<RareData> m_rareData;
