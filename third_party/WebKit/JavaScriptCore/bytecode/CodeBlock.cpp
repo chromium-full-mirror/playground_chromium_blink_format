@@ -34,6 +34,7 @@
 #include "JSValue.h"
 #include "Interpreter.h"
 #include "Debugger.h"
+#include "BytecodeGenerator.h"
 #include <stdio.h>
 #include <wtf/StringExtras.h>
 
@@ -383,6 +384,11 @@ void CodeBlock::printStructures(const Instruction* vPC) const {
 }
 
 void CodeBlock::dump(ExecState* exec) const {
+  if (m_instructions.isEmpty()) {
+    printf("No instructions available.\n");
+    return;
+  }
+
   size_t instructionCount = 0;
 
   for (size_t i = 0; i < m_instructions.size();
@@ -1347,7 +1353,12 @@ CodeBlock::CodeBlock(ScopeNode* ownerNode,
       m_numVars(0),
       m_numParameters(0),
       m_ownerNode(ownerNode),
-      m_globalData(0),
+      m_globalData(0)
+#ifndef NDEBUG
+      ,
+      m_instructionCount(0)
+#endif
+      ,
       m_needsFullScopeChain(ownerNode->needsActivation()),
       m_usesEval(ownerNode->usesEval()),
       m_codeType(codeType),
@@ -1507,10 +1518,10 @@ void CodeBlock::mark() {
 }
 
 HandlerInfo* CodeBlock::handlerForBytecodeOffset(unsigned bytecodeOffset) {
+  ASSERT(bytecodeOffset < m_instructionCount);
+
   if (!m_rareData)
     return 0;
-
-  ASSERT(bytecodeOffset < m_instructions.size());
 
   Vector<HandlerInfo>& exceptionHandlers = m_rareData->m_exceptionHandlers;
   for (size_t i = 0; i < exceptionHandlers.size(); ++i) {
@@ -1525,7 +1536,7 @@ HandlerInfo* CodeBlock::handlerForBytecodeOffset(unsigned bytecodeOffset) {
 }
 
 int CodeBlock::lineNumberForBytecodeOffset(unsigned bytecodeOffset) {
-  ASSERT(bytecodeOffset < m_instructions.size());
+  ASSERT(bytecodeOffset < m_instructionCount);
 
   if (!m_lineInfo.size())
     return m_ownerNode->source().firstLine();  // Empty function
@@ -1549,7 +1560,7 @@ int CodeBlock::expressionRangeForBytecodeOffset(unsigned bytecodeOffset,
                                                 int& divot,
                                                 int& startOffset,
                                                 int& endOffset) {
-  ASSERT(bytecodeOffset < m_instructions.size());
+  ASSERT(bytecodeOffset < m_instructionCount);
 
   if (!m_expressionInfo.size()) {
     // We didn't think anything could throw.  Apparently we were wrong.
@@ -1585,7 +1596,7 @@ int CodeBlock::expressionRangeForBytecodeOffset(unsigned bytecodeOffset,
 
 bool CodeBlock::getByIdExceptionInfoForBytecodeOffset(unsigned bytecodeOffset,
                                                       OpcodeID& opcodeID) {
-  ASSERT(bytecodeOffset < m_instructions.size());
+  ASSERT(bytecodeOffset < m_instructionCount);
 
   if (!m_getByIdExceptionInfo.size())
     return false;
@@ -1611,7 +1622,7 @@ bool CodeBlock::getByIdExceptionInfoForBytecodeOffset(unsigned bytecodeOffset,
 #if ENABLE(JIT)
 bool CodeBlock::functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
                                                   int& functionRegisterIndex) {
-  ASSERT(bytecodeOffset < m_instructions.size());
+  ASSERT(bytecodeOffset < m_instructionCount);
 
   if (!m_rareData || !m_rareData->m_functionRegisterInfos.size())
     return false;
@@ -1635,6 +1646,14 @@ bool CodeBlock::functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
   functionRegisterIndex =
       m_rareData->m_functionRegisterInfos[low - 1].functionRegisterIndex;
   return true;
+}
+
+void CodeBlock::setJITCode(JITCodeRef& jitCode) {
+  m_jitCode = jitCode;
+#if !ENABLE(OPCODE_SAMPLING)
+  if (!BytecodeGenerator::dumpsGeneratedCode())
+    m_instructions.clear();
+#endif
 }
 #endif
 

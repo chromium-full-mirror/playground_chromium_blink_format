@@ -66,6 +66,7 @@ class BytecodeGenerator {
   typedef DeclarationStacks::FunctionStack FunctionStack;
 
   static void setDumpsGeneratedCode(bool dumpsGeneratedCode);
+  static bool dumpsGeneratedCode();
 
   BytecodeGenerator(ProgramNode*,
                     const Debugger*,
