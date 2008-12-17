@@ -374,8 +374,9 @@ HRESULT STDMETHODCALLTYPE WebURLResponse::allHeaderFields(
     /* [retval][out] */ IPropertyBag** headerFields) {
   ASSERT(m_response.isHTTP());
 
-  *headerFields = COMPropertyBag<AtomicString, CaseFoldingHash>::createInstance(
-      m_response.httpHeaderFields());
+  *headerFields =
+      COMPropertyBag<String, AtomicString, CaseFoldingHash>::createInstance(
+          m_response.httpHeaderFields());
   return S_OK;
 }
 
