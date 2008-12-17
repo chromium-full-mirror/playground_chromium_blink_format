@@ -98,6 +98,26 @@ SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
     "ret" "\n"
 );
 
+#elif COMPILER(GCC) && PLATFORM(X86_64)
+
+#if PLATFORM(DARWIN)
+#define SYMBOL_STRING(name) "_" #name
+#else
+#define SYMBOL_STRING(name) #name
+#endif
+
+asm(
+".globl " SYMBOL_STRING(ctiTrampoline) "\n"
+SYMBOL_STRING(ctiTrampoline) ":" "\n"
+    "int3" "\n"
+);
+
+asm(
+".globl " SYMBOL_STRING(ctiVMThrowTrampoline) "\n"
+SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
+    "int3" "\n"
+);
+
 #elif COMPILER(MSVC)
 
 extern "C" {
@@ -465,7 +485,7 @@ void JIT::privateCompileMainPass() {
                                              X86::ecx);
         Identifier* ident =
             &(m_codeBlock->identifier(currentInstruction[3].u.operand));
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 2);
+        emitPutJITStubArgConstant(ident, 2);
         emitCTICall(Interpreter::cti_op_del_by_id);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_del_by_id);
@@ -506,7 +526,7 @@ void JIT::privateCompileMainPass() {
       case op_new_func: {
         FuncDeclNode* func =
             m_codeBlock->function(currentInstruction[2].u.operand);
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(func), 1);
+        emitPutJITStubArgConstant(func, 1);
         emitCTICall(Interpreter::cti_op_new_func);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_new_func);
@@ -615,7 +635,7 @@ void JIT::privateCompileMainPass() {
       case op_resolve: {
         Identifier* ident =
             &(m_codeBlock->identifier(currentInstruction[2].u.operand));
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 1);
+        emitPutJITStubArgConstant(ident, 1);
         emitCTICall(Interpreter::cti_op_resolve);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_resolve);
@@ -658,7 +678,7 @@ void JIT::privateCompileMainPass() {
       case op_resolve_func: {
         Identifier* ident =
             &(m_codeBlock->identifier(currentInstruction[3].u.operand));
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 1);
+        emitPutJITStubArgConstant(ident, 1);
         emitCTICall(Interpreter::cti_op_resolve_func);
         emitPutVirtualRegister(currentInstruction[2].u.operand, X86::edx);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
@@ -730,7 +750,7 @@ void JIT::privateCompileMainPass() {
       case op_resolve_base: {
         Identifier* ident =
             &(m_codeBlock->identifier(currentInstruction[2].u.operand));
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 1);
+        emitPutJITStubArgConstant(ident, 1);
         emitCTICall(Interpreter::cti_op_resolve_base);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_resolve_base);
@@ -745,7 +765,7 @@ void JIT::privateCompileMainPass() {
       case op_resolve_skip: {
         Identifier* ident =
             &(m_codeBlock->identifier(currentInstruction[2].u.operand));
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 1);
+        emitPutJITStubArgConstant(ident, 1);
         emitPutJITStubArgConstant(currentInstruction[3].u.operand +
                                       m_codeBlock->needsFullScopeChain(),
                                   2);
@@ -786,7 +806,7 @@ void JIT::privateCompileMainPass() {
         // Slow case
         noMatch.link(this);
         emitPutJITStubArgConstant(globalObject, 1);
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 2);
+        emitPutJITStubArgConstant(ident, 2);
         emitPutJITStubArgConstant(currentIndex, 3);
         emitCTICall(Interpreter::cti_op_resolve_global);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
@@ -1004,7 +1024,7 @@ void JIT::privateCompileMainPass() {
       case op_resolve_with_base: {
         Identifier* ident =
             &(m_codeBlock->identifier(currentInstruction[3].u.operand));
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 1);
+        emitPutJITStubArgConstant(ident, 1);
         emitCTICall(Interpreter::cti_op_resolve_with_base);
         emitPutVirtualRegister(currentInstruction[2].u.operand, X86::edx);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
@@ -1013,7 +1033,7 @@ void JIT::privateCompileMainPass() {
       case op_new_func_exp: {
         FuncExprNode* func =
             m_codeBlock->functionExpression(currentInstruction[2].u.operand);
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(func), 1);
+        emitPutJITStubArgConstant(func, 1);
         emitCTICall(Interpreter::cti_op_new_func_exp);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_new_func_exp);
@@ -1084,7 +1104,7 @@ void JIT::privateCompileMainPass() {
       }
       case op_new_regexp: {
         RegExp* regExp = m_codeBlock->regexp(currentInstruction[2].u.operand);
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(regExp), 1);
+        emitPutJITStubArgConstant(regExp, 1);
         emitCTICall(Interpreter::cti_op_new_regexp);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_new_regexp);
@@ -1174,7 +1194,7 @@ void JIT::privateCompileMainPass() {
       case op_push_new_scope: {
         Identifier* ident =
             &(m_codeBlock->identifier(currentInstruction[2].u.operand));
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 1);
+        emitPutJITStubArgConstant(ident, 1);
         emitPutJITStubArgFromVirtualRegister(currentInstruction[3].u.operand, 2,
                                              X86::ecx);
         emitCTICall(Interpreter::cti_op_push_new_scope);
@@ -1273,7 +1293,7 @@ void JIT::privateCompileMainPass() {
                                              X86::ecx);
         Identifier* ident =
             &(m_codeBlock->identifier(currentInstruction[2].u.operand));
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 2);
+        emitPutJITStubArgConstant(ident, 2);
         emitPutJITStubArgFromVirtualRegister(currentInstruction[3].u.operand, 3,
                                              X86::ecx);
         emitCTICall(Interpreter::cti_op_put_getter);
@@ -1284,7 +1304,7 @@ void JIT::privateCompileMainPass() {
                                              X86::ecx);
         Identifier* ident =
             &(m_codeBlock->identifier(currentInstruction[2].u.operand));
-        emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 2);
+        emitPutJITStubArgConstant(ident, 2);
         emitPutJITStubArgFromVirtualRegister(currentInstruction[3].u.operand, 3,
                                              X86::ecx);
         emitCTICall(Interpreter::cti_op_put_setter);
@@ -1294,7 +1314,7 @@ void JIT::privateCompileMainPass() {
         JSValue* message =
             m_codeBlock->unexpectedConstant(currentInstruction[3].u.operand);
         emitPutJITStubArgConstant(currentInstruction[2].u.operand, 1);
-        emitPutJITStubArgConstant(asInteger(message), 2);
+        emitPutJITStubArgConstant(message, 2);
         emitPutJITStubArgConstant(
             m_codeBlock->lineNumberForBytecodeOffset(m_bytecodeIndex), 3);
         emitCTICall(Interpreter::cti_op_new_error);
@@ -2082,6 +2102,7 @@ void JIT::privateCompile() {
     repatchBuffer.setPtr(iter->storeLocation,
                          repatchBuffer.addressOf(iter->target));
 
+#if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
   for (unsigned i = 0; i < m_codeBlock->numberOfStructureStubInfos(); ++i) {
     StructureStubInfo& info = m_codeBlock->structureStubInfo(i);
     info.callReturnLocation = X86Assembler::getRelocatedAddress(
@@ -2089,6 +2110,7 @@ void JIT::privateCompile() {
     info.hotPathBegin = X86Assembler::getRelocatedAddress(
         code, m_propertyAccessCompilationInfo[i].hotPathBegin);
   }
+#endif
   for (unsigned i = 0; i < m_codeBlock->numberOfCallLinkInfos(); ++i) {
     CallLinkInfo& info = m_codeBlock->callLinkInfo(i);
     info.callReturnLocation = X86Assembler::getRelocatedAddress(
@@ -2105,7 +2127,9 @@ void JIT::privateCompile() {
 }
 
 void JIT::privateCompileCTIMachineTrampolines() {
+#if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
   // (1) The first function provides fast property access for array length
+  X86Assembler::JmpDst arrayLengthBegin = __ align(16);
 
   // Check eax is an array
   X86Assembler::JmpSrc array_failureCases1 = emitJumpIfNotJSCell(X86::eax);
@@ -2126,7 +2150,6 @@ void JIT::privateCompileCTIMachineTrampolines() {
   __ ret();
 
   // (2) The second function provides fast property access for string length
-
   X86Assembler::JmpDst stringLengthBegin = __ align(16);
 
   // Check eax is a string
@@ -2147,6 +2170,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   __ addl_ir(1, X86::eax);
 
   __ ret();
+#endif
 
   // (3) Trampolines for the slow cases of op_call / op_call_eval /
   // op_construct.
@@ -2278,6 +2302,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   m_interpreter->m_executablePool = m_globalData->poolForSize(__ size());
   void* code = __ executableCopy(m_interpreter->m_executablePool.get());
 
+#if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
   X86Assembler::link(
       code, array_failureCases1,
       reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_array_fail));
@@ -2296,6 +2321,13 @@ void JIT::privateCompileCTIMachineTrampolines() {
   X86Assembler::link(
       code, string_failureCases3,
       reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_string_fail));
+
+  m_interpreter->m_ctiArrayLengthTrampoline =
+      X86Assembler::getRelocatedAddress(code, arrayLengthBegin);
+  m_interpreter->m_ctiStringLengthTrampoline =
+      X86Assembler::getRelocatedAddress(code, stringLengthBegin);
+#endif
+
   X86Assembler::link(
       code, callArityCheck1,
       reinterpret_cast<void*>(Interpreter::cti_op_call_arityCheck));
@@ -2320,9 +2352,6 @@ void JIT::privateCompileCTIMachineTrampolines() {
   X86Assembler::link(code, callLazyLinkCall,
                      reinterpret_cast<void*>(Interpreter::cti_vm_lazyLinkCall));
 
-  m_interpreter->m_ctiArrayLengthTrampoline = code;
-  m_interpreter->m_ctiStringLengthTrampoline =
-      X86Assembler::getRelocatedAddress(code, stringLengthBegin);
   m_interpreter->m_ctiVirtualCallPreLink =
       X86Assembler::getRelocatedAddress(code, virtualCallPreLinkBegin);
   m_interpreter->m_ctiVirtualCallLink =

@@ -38,6 +38,10 @@ class MacroAssembler {
  protected:
   X86Assembler m_assembler;
 
+#if PLATFORM(X86_64)
+  static const X86::RegisterID scratchRegister = X86::r11;
+#endif
+
  public:
   typedef X86::RegisterID RegisterID;
 
@@ -460,11 +464,28 @@ class MacroAssembler {
 #endif
   }
 
-#if !PLATFORM(X86_64)
-  void loadPtr(BaseIndex address, RegisterID dest) { load32(address, dest); }
-
-  void loadPtr(void* address, RegisterID dest) { load32(address, dest); }
+  void loadPtr(BaseIndex address, RegisterID dest) {
+#if PLATFORM(X86_64)
+    m_assembler.movq_mr(address.offset, address.base, address.index,
+                        address.scale, dest);
+#else
+    load32(address, dest);
 #endif
+  }
+
+  void loadPtr(void* address, RegisterID dest) {
+#if PLATFORM(X86_64)
+    if (dest == X86::eax)
+      m_assembler.movq_mEAX(address);
+    else {
+      move(X86::eax, dest);
+      m_assembler.movq_mEAX(address);
+      swap(X86::eax, dest);
+    }
+#else
+    load32(address, dest);
+#endif
+  }
 
   void load32(ImplicitAddress address, RegisterID dest) {
     m_assembler.movl_mr(address.offset, address.base, dest);
@@ -475,11 +496,19 @@ class MacroAssembler {
                         address.scale, dest);
   }
 
-#if !PLATFORM(X86_64)
   void load32(void* address, RegisterID dest) {
+#if PLATFORM(X86_64)
+    if (dest == X86::eax)
+      m_assembler.movl_mEAX(address);
+    else {
+      move(X86::eax, dest);
+      m_assembler.movl_mEAX(address);
+      swap(X86::eax, dest);
+    }
+#else
     m_assembler.movl_mr(address, dest);
-  }
 #endif
+  }
 
   void load16(BaseIndex address, RegisterID dest) {
     m_assembler.movzwl_mr(address.offset, address.base, address.index,
@@ -490,23 +519,40 @@ class MacroAssembler {
 #if PLATFORM(X86_64)
     m_assembler.movq_rm(src, address.offset, address.base);
 #else
-    m_assembler.movl_rm(src, address.offset, address.base);
+    store32(src, address);
 #endif
   }
 
-#if !PLATFORM(X86_64)
+  void storePtr(RegisterID src, BaseIndex address) {
+#if PLATFORM(X86_64)
+    m_assembler.movq_rm(src, address.offset, address.base, address.index,
+                        address.scale);
+#else
+    store32(src, address);
+#endif
+  }
+
   void storePtr(ImmPtr imm, ImplicitAddress address) {
+#if PLATFORM(X86_64)
+    move(imm, scratchRegister);
+    storePtr(scratchRegister, address);
+#else
     m_assembler.movl_i32m(reinterpret_cast<unsigned>(imm.m_value),
                           address.offset, address.base);
+#endif
   }
-
-  void storePtr(RegisterID src, BaseIndex address) { store32(src, address); }
 
   DataLabelPtr storePtrWithRepatch(Address address) {
+#if PLATFORM(X86_64)
+    m_assembler.movq_i64r(0, scratchRegister);
+    DataLabelPtr label(this);
+    storePtr(scratchRegister, address);
+    return label;
+#else
     m_assembler.movl_i32m(0, address.offset, address.base);
     return DataLabelPtr(this);
-  }
 #endif
+  }
 
   void store32(RegisterID src, ImplicitAddress address) {
     m_assembler.movl_rm(src, address.offset, address.base);
@@ -521,11 +567,16 @@ class MacroAssembler {
     m_assembler.movl_i32m(imm.m_value, address.offset, address.base);
   }
 
-#if !PLATFORM(X86_64)
   void store32(Imm32 imm, void* address) {
+#if PLATFORM(X86_64)
+    move(X86::eax, scratchRegister);
+    move(imm, X86::eax);
+    m_assembler.movl_EAXm(address);
+    move(scratchRegister, X86::eax);
+#else
     m_assembler.movl_i32m(imm.m_value, address);
-  }
 #endif
+  }
 
   // Stack manipulation operations:
   //
@@ -553,11 +604,9 @@ class MacroAssembler {
     store32(value, Address(X86::esp, (index * sizeof(void*))));
   }
 
-#if !PLATFORM(X86_64)
   void poke(ImmPtr imm, int index = 0) {
     storePtr(imm, Address(X86::esp, (index * sizeof(void*))));
   }
-#endif
 
   // Register move operations:
   //
@@ -582,11 +631,13 @@ class MacroAssembler {
 #endif
   }
 
-#if !PLATFORM(X86_64)
   void move(ImmPtr imm, RegisterID dest) {
+#if PLATFORM(X86_64)
+    m_assembler.movq_i64r(reinterpret_cast<int64_t>(imm.m_value), dest);
+#else
     m_assembler.movl_i32r(reinterpret_cast<int32_t>(imm.m_value), dest);
-  }
 #endif
+  }
 
   void swap(RegisterID reg1, RegisterID reg2) {
 #if PLATFORM(X86_64)
@@ -668,6 +719,22 @@ class MacroAssembler {
     else
       m_assembler.testq_i32r(mask.m_value, reg);
   }
+
+  void testImm64(Address address, Imm32 mask) {
+    if (mask.m_value == -1)
+      m_assembler.cmpq_im(0, address.offset, address.base);
+    else
+      m_assembler.testq_i32m(mask.m_value, address.offset, address.base);
+  }
+
+  void testImm64(BaseIndex address, Imm32 mask) {
+    if (mask.m_value == -1)
+      m_assembler.cmpq_im(0, address.offset, address.base, address.index,
+                          address.scale);
+    else
+      m_assembler.testq_i32m(mask.m_value, address.offset, address.base,
+                             address.index, address.scale);
+  }
 #endif
 
  public:
@@ -691,9 +758,14 @@ class MacroAssembler {
     return Jump(m_assembler.jb());
   }
 
-#if !PLATFORM(X86_64)
-  Jump jePtr(RegisterID op1, RegisterID op2) { return je32(op1, op2); }
+  Jump jePtr(RegisterID op1, RegisterID op2) {
+#if PLATFORM(X86_64)
+    m_assembler.cmpq_rr(op1, op2);
+    return Jump(m_assembler.je());
+#else
+    return je32(op1, op2);
 #endif
+  }
 
   Jump je32(RegisterID op1, RegisterID op2) {
     m_assembler.cmpl_rr(op1, op2);
@@ -760,16 +832,41 @@ class MacroAssembler {
     return Jump(m_assembler.jle());
   }
 
-#if !PLATFORM(X86_64)
+  Jump jnePtr(RegisterID op1, RegisterID op2) {
+#if PLATFORM(X86_64)
+    m_assembler.cmpq_rr(op1, op2);
+    return Jump(m_assembler.jne());
+#else
+    return jne32(op1, op2);
+#endif
+  }
+
   Jump jnePtr(RegisterID reg, Address address) {
+#if PLATFORM(X86_64)
+    m_assembler.cmpq_rm(reg, address.offset, address.base);
+#else
     m_assembler.cmpl_rm(reg, address.offset, address.base);
+#endif
     return Jump(m_assembler.jne());
   }
 
-  Jump jnePtr(Address address, ImmPtr imm) {
-    return jne32(address, Imm32(reinterpret_cast<int32_t>(imm.m_value)));
-  }
+  Jump jnePtr(RegisterID reg, ImmPtr imm) {
+#if PLATFORM(X86_64)
+    move(imm, scratchRegister);
+    return jnePtr(scratchRegister, reg);
+#else
+    return jne32(reg, Imm32(reinterpret_cast<int32_t>(imm.m_value)));
 #endif
+  }
+
+  Jump jnePtr(Address address, ImmPtr imm) {
+#if PLATFORM(X86_64)
+    move(imm, scratchRegister);
+    return jnePtr(scratchRegister, address);
+#else
+    return jne32(address, Imm32(reinterpret_cast<int32_t>(imm.m_value)));
+#endif
+  }
 
   Jump jne32(RegisterID op1, RegisterID op2) {
     m_assembler.cmpl_rr(op1, op2);
@@ -800,11 +897,14 @@ class MacroAssembler {
 #endif
   }
 
-#if !PLATFORM(X86_64)
   Jump jnzPtr(Address address, Imm32 mask = Imm32(-1)) {
+#if PLATFORM(X86_64)
+    testImm64(address, mask);
+    return Jump(m_assembler.jne());
+#else
     return jnz32(address, mask);
-  }
 #endif
+  }
 
   Jump jnz32(RegisterID reg, Imm32 mask = Imm32(-1)) {
     testImm32(reg, mask);
@@ -816,17 +916,32 @@ class MacroAssembler {
     return Jump(m_assembler.jne());
   }
 
-#if !PLATFORM(X86_64)
-  Jump jzPtr(RegisterID reg, Imm32 mask = Imm32(-1)) { return jz32(reg, mask); }
+  Jump jzPtr(RegisterID reg, Imm32 mask = Imm32(-1)) {
+#if PLATFORM(X86_64)
+    testImm64(reg, mask);
+    return Jump(m_assembler.je());
+#else
+    return jz32(reg, mask);
+#endif
+  }
 
   Jump jzPtr(Address address, Imm32 mask = Imm32(-1)) {
+#if PLATFORM(X86_64)
+    testImm64(address, mask);
+    return Jump(m_assembler.je());
+#else
     return jz32(address, mask);
+#endif
   }
 
   Jump jzPtr(BaseIndex address, Imm32 mask = Imm32(-1)) {
+#if PLATFORM(X86_64)
+    testImm64(address, mask);
+    return Jump(m_assembler.je());
+#else
     return jz32(address, mask);
-  }
 #endif
+  }
 
   Jump jz32(RegisterID reg, Imm32 mask = Imm32(-1)) {
     testImm32(reg, mask);
@@ -893,9 +1008,7 @@ class MacroAssembler {
     jne32(op1, imm).linkTo(target, this);
   }
 
-#if !PLATFORM(X86_64)
   void jzPtr(RegisterID reg, Label target) { jzPtr(reg).linkTo(target, this); }
-#endif
 
   void jump(Label target) {
     m_assembler.link(m_assembler.jmp(), target.m_label);
