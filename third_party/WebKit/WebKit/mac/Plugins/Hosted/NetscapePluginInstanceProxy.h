@@ -35,6 +35,7 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RetainPtr.h>
+#include "WebKitPluginHostTypes.h"
 
 @class WebHostedNetscapePluginView;
 
@@ -86,11 +87,9 @@ class NetscapePluginInstanceProxy
   void status(const char* message);
   NPError loadURL(const char* url,
                   const char* target,
-                  bool post,
                   const char* postData,
                   uint32_t postDataLength,
-                  bool postDataIsFile,
-                  bool currentEventIsUserGesture,
+                  LoadURLFlags,
                   uint32_t& requestID);
 
   // Reply structs
