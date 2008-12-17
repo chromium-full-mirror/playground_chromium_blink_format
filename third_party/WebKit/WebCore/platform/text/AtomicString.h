@@ -102,7 +102,7 @@ class AtomicString {
   static void remove(StringImpl*);
 
 #if PLATFORM(CF) || (PLATFORM(QT) && PLATFORM(DARWIN))
-  AtomicString(CFStringRef) : m_string(add(String(s).impl())) {}
+  AtomicString(CFStringRef s) : m_string(add(String(s).impl())) {}
   CFStringRef createCFString() const { return m_string.createCFString(); }
 #endif
 #ifdef __OBJC__
