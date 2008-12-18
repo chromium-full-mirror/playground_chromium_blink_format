@@ -230,6 +230,7 @@ ALWAYS_INLINE void JIT::restoreArgumentReference() {
 #endif
 #endif
 #endif
+  emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
 }
 
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {
@@ -250,7 +251,6 @@ ALWAYS_INLINE JIT::Jump JIT::emitCTICall_internal(void* helper) {
           m_interpreter->sampler()->sampleSlot());
 #endif
   restoreArgumentReference();
-  emitPutCTIParam(callFrameRegister, CTI_ARGS_callFrame);
   Jump ctiCall = call();
   m_calls.append(CallRecord(ctiCall, m_bytecodeIndex, helper));
 #if ENABLE(OPCODE_SAMPLING)

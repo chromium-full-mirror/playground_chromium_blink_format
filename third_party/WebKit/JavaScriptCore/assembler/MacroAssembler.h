@@ -772,8 +772,8 @@ class MacroAssembler {
     return Jump(m_assembler.je());
   }
 
-  Jump je32(RegisterID op1, Address op2) {
-    m_assembler.cmpl_rm(op1, op2.offset, op2.base);
+  Jump je32(Address op1, RegisterID op2) {
+    m_assembler.cmpl_mr(op1.offset, op1.base, op2);
     return Jump(m_assembler.je());
   }
 
