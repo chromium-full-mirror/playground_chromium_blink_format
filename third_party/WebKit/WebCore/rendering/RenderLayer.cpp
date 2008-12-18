@@ -1791,7 +1791,8 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
                              bool haveTransparency,
                              PaintRestriction paintRestriction,
                              RenderObject* paintingRoot,
-                             bool appliedTransform) {
+                             bool appliedTransform,
+                             bool temporaryClipRects) {
   // Avoid painting layers when stylesheets haven't loaded.  This eliminates
   // FOUC.
   // It's ok not to draw, because later on, when all the stylesheets do load,
@@ -1824,8 +1825,14 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     // Make sure the parent's clip rects have been calculated.
     IntRect clipRect = paintDirtyRect;
     if (parent()) {
-      parent()->calculateClipRects(rootLayer);
-      clipRect = parent()->clipRects()->overflowClipRect();
+      if (temporaryClipRects) {
+        ClipRects parentClipRects;
+        parent()->calculateClipRects(rootLayer, parentClipRects);
+        clipRect = parentClipRects.overflowClipRect();
+      } else {
+        parent()->updateClipRects(rootLayer);
+        clipRect = parent()->clipRects()->overflowClipRect();
+      }
       clipRect.intersect(paintDirtyRect);
     }
 
@@ -1849,7 +1856,8 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
 
     // Now do a paint with the root layer shifted to be us.
     paintLayer(this, p, transform.inverse().mapRect(paintDirtyRect),
-               haveTransparency, paintRestriction, paintingRoot, true);
+               haveTransparency, paintRestriction, paintingRoot, true,
+               temporaryClipRects);
 
     p->restore();
 
@@ -1873,7 +1881,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   // Calculate the clip rects we should use.
   IntRect layerBounds, damageRect, clipRectToApply, outlineRect;
   calculateRects(rootLayer, paintDirtyRect, layerBounds, damageRect,
-                 clipRectToApply, outlineRect);
+                 clipRectToApply, outlineRect, temporaryClipRects);
   int x = layerBounds.x();
   int y = layerBounds.y();
   int tx = x - renderer()->xPos();
@@ -1934,7 +1942,8 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     for (Vector<RenderLayer*>::iterator it = m_negZOrderList->begin();
          it != m_negZOrderList->end(); ++it)
       it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
-                        paintRestriction, paintingRoot);
+                        paintRestriction, paintingRoot, false,
+                        temporaryClipRects);
 
   // Now establish the appropriate clip and paint our child RenderObjects.
   if (shouldPaint && !clipRectToApply.isEmpty()) {
@@ -1977,14 +1986,16 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     for (Vector<RenderLayer*>::iterator it = m_overflowList->begin();
          it != m_overflowList->end(); ++it)
       it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
-                        paintRestriction, paintingRoot);
+                        paintRestriction, paintingRoot, false,
+                        temporaryClipRects);
 
   // Now walk the sorted list of children with positive z-indices.
   if (m_posZOrderList)
     for (Vector<RenderLayer*>::iterator it = m_posZOrderList->begin();
          it != m_posZOrderList->end(); ++it)
       it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
-                        paintRestriction, paintingRoot);
+                        paintRestriction, paintingRoot, false,
+                        temporaryClipRects);
 
   if (renderer()->hasMask() && shouldPaint && !selectionOnly &&
       !damageRect.isEmpty()) {
@@ -2070,7 +2081,7 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
 
     // Make sure the parent's clip rects have been calculated.
     if (parent()) {
-      parent()->calculateClipRects(rootLayer);
+      parent()->updateClipRects(rootLayer);
 
       // Go ahead and test the enclosing clip now.
       IntRect clipRect = parent()->clipRects()->overflowClipRect();
@@ -2199,15 +2210,30 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   return 0;
 }
 
-void RenderLayer::calculateClipRects(const RenderLayer* rootLayer) {
+void RenderLayer::updateClipRects(const RenderLayer* rootLayer) {
   if (m_clipRects)
     return;  // We have the correct cached value.
 
+  if (parent())
+    parent()->updateClipRects(rootLayer);
+
+  ClipRects clipRects;
+  calculateClipRects(rootLayer, clipRects, true);
+
+  if (parent() && parent()->clipRects() && clipRects == *parent()->clipRects())
+    m_clipRects = parent()->clipRects();
+  else
+    m_clipRects = new (m_object->renderArena()) ClipRects(clipRects);
+  m_clipRects->ref();
+}
+
+void RenderLayer::calculateClipRects(const RenderLayer* rootLayer,
+                                     ClipRects& clipRects,
+                                     bool useCached) const {
   IntRect infiniteRect(INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
   if (!parent()) {
     // The root layer's clip rect is always infinite.
-    m_clipRects = new (m_object->renderArena()) ClipRects(infiniteRect);
-    m_clipRects->ref();
+    clipRects.reset(infiniteRect);
     return;
   }
 
@@ -2218,30 +2244,25 @@ void RenderLayer::calculateClipRects(const RenderLayer* rootLayer) {
 
   // Ensure that our parent's clip has been calculated so that we can examine
   // the values.
-  if (parentLayer)
-    parentLayer->calculateClipRects(rootLayer);
-
-  // Set up our three rects to initially match the parent rects.
-  IntRect posClipRect(parentLayer ? parentLayer->clipRects()->posClipRect()
-                                  : infiniteRect);
-  IntRect overflowClipRect(parentLayer
-                               ? parentLayer->clipRects()->overflowClipRect()
-                               : infiniteRect);
-  IntRect fixedClipRect(parentLayer ? parentLayer->clipRects()->fixedClipRect()
-                                    : infiniteRect);
-  bool fixed = parentLayer ? parentLayer->clipRects()->fixed() : false;
+  if (parentLayer) {
+    if (useCached && parentLayer->clipRects())
+      clipRects = *parentLayer->clipRects();
+    else
+      parentLayer->calculateClipRects(rootLayer, clipRects);
+  } else
+    clipRects.reset(infiniteRect);
 
   // A fixed object is essentially the root of its containing block hierarchy,
   // so when
   // we encounter such an object, we reset our clip rects to the fixedClipRect.
   if (m_object->style()->position() == FixedPosition) {
-    posClipRect = fixedClipRect;
-    overflowClipRect = fixedClipRect;
-    fixed = true;
+    clipRects.setPosClipRect(clipRects.fixedClipRect());
+    clipRects.setOverflowClipRect(clipRects.fixedClipRect());
+    clipRects.setFixed(true);
   } else if (m_object->style()->position() == RelativePosition)
-    posClipRect = overflowClipRect;
+    clipRects.setPosClipRect(clipRects.overflowClipRect());
   else if (m_object->style()->position() == AbsolutePosition)
-    overflowClipRect = posClipRect;
+    clipRects.setOverflowClipRect(clipRects.posClipRect());
 
   // Update the clip rects that will be passed to child layers.
   if (m_object->hasOverflowClip() || m_object->hasClip()) {
@@ -2251,37 +2272,29 @@ void RenderLayer::calculateClipRects(const RenderLayer* rootLayer) {
     convertToLayerCoords(rootLayer, x, y);
     RenderView* view = renderer()->view();
     ASSERT(view);
-    if (view && fixed && rootLayer->renderer() == view) {
+    if (view && clipRects.fixed() && rootLayer->renderer() == view) {
       x -= view->frameView()->scrollX();
       y -= view->frameView()->scrollY();
     }
 
     if (m_object->hasOverflowClip()) {
       IntRect newOverflowClip = m_object->getOverflowClipRect(x, y);
-      overflowClipRect.intersect(newOverflowClip);
+      clipRects.setOverflowClipRect(
+          intersection(newOverflowClip, clipRects.overflowClipRect()));
       if (m_object->isPositioned() || m_object->isRelPositioned())
-        posClipRect.intersect(newOverflowClip);
+        clipRects.setPosClipRect(
+            intersection(newOverflowClip, clipRects.posClipRect()));
     }
     if (m_object->hasClip()) {
       IntRect newPosClip = m_object->getClipRect(x, y);
-      posClipRect.intersect(newPosClip);
-      overflowClipRect.intersect(newPosClip);
-      fixedClipRect.intersect(newPosClip);
+      clipRects.setPosClipRect(
+          intersection(newPosClip, clipRects.posClipRect()));
+      clipRects.setOverflowClipRect(
+          intersection(newPosClip, clipRects.overflowClipRect()));
+      clipRects.setFixedClipRect(
+          intersection(newPosClip, clipRects.fixedClipRect()));
     }
   }
-
-  // If our clip rects match our parent's clip, then we can just share its data
-  // structure and
-  // ref count.
-  if (parent()->clipRects() && fixed == parent()->clipRects()->fixed() &&
-      posClipRect == parent()->clipRects()->posClipRect() &&
-      overflowClipRect == parent()->clipRects()->overflowClipRect() &&
-      fixedClipRect == parent()->clipRects()->fixedClipRect())
-    m_clipRects = parent()->clipRects();
-  else
-    m_clipRects = new (m_object->renderArena())
-        ClipRects(overflowClipRect, fixedClipRect, posClipRect, fixed);
-  m_clipRects->ref();
 }
 
 void RenderLayer::calculateRects(const RenderLayer* rootLayer,
@@ -2289,24 +2302,32 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
                                  IntRect& layerBounds,
                                  IntRect& backgroundRect,
                                  IntRect& foregroundRect,
-                                 IntRect& outlineRect) const {
+                                 IntRect& outlineRect,
+                                 bool temporaryClipRects) const {
   if (rootLayer != this && parent()) {
-    parent()->calculateClipRects(rootLayer);
+    ClipRects parentClipRects;
+    if (temporaryClipRects)
+      parent()->calculateClipRects(rootLayer, parentClipRects);
+    else {
+      parent()->updateClipRects(rootLayer);
+      parentClipRects = *parent()->clipRects();
+    }
 
-    backgroundRect = m_object->style()->position() == FixedPosition
-                         ? parent()->clipRects()->fixedClipRect()
-                         : (m_object->isPositioned()
-                                ? parent()->clipRects()->posClipRect()
-                                : parent()->clipRects()->overflowClipRect());
+    backgroundRect =
+        m_object->style()->position() == FixedPosition
+            ? parentClipRects.fixedClipRect()
+            : (m_object->isPositioned() ? parentClipRects.posClipRect()
+                                        : parentClipRects.overflowClipRect());
     RenderView* view = renderer()->view();
     ASSERT(view);
-    if (view && parent()->clipRects()->fixed() && rootLayer->renderer() == view)
+    if (view && parentClipRects.fixed() && rootLayer->renderer() == view)
       backgroundRect.move(view->frameView()->scrollX(),
                           view->frameView()->scrollY());
 
     backgroundRect.intersect(paintDirtyRect);
   } else
     backgroundRect = paintDirtyRect;
+
   foregroundRect = backgroundRect;
   outlineRect = backgroundRect;
 
