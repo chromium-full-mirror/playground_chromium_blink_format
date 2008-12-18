@@ -42,6 +42,8 @@
 + (void)replaySavedEvents;
 + (void)clearSavedEvents;
 
+- (void)scheduleAsynchronousClick;
+
 - (void)enableDOMUIEventLogging:(WebScriptObject*)node;
 
 - (void)handleEvent:(DOMEvent*)event;
