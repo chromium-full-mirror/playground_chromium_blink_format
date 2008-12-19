@@ -379,6 +379,7 @@ void JIT::privateCompileMainPass() {
         addSlowCase(joAdd32(
             Imm32(getDeTaggedConstantImmediate(JSImmediate::oneImmediate())),
             X86::eax));
+        signExtend32ToPtr(X86::eax, X86::eax);
         emitPutVirtualRegister(srcDst);
         NEXT_OPCODE(op_pre_inc);
       }
@@ -852,6 +853,7 @@ void JIT::privateCompileMainPass() {
         addSlowCase(joSub32(
             Imm32(getDeTaggedConstantImmediate(JSImmediate::oneImmediate())),
             X86::eax));
+        signExtend32ToPtr(X86::eax, X86::eax);
         emitPutVirtualRegister(srcDst);
         NEXT_OPCODE(op_pre_dec);
       }
@@ -954,6 +956,7 @@ void JIT::privateCompileMainPass() {
         addSlowCase(joAdd32(
             Imm32(getDeTaggedConstantImmediate(JSImmediate::oneImmediate())),
             X86::edx));
+        signExtend32ToPtr(X86::edx, X86::edx);
         emitPutVirtualRegister(srcDst, X86::edx);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_post_inc);
@@ -1119,6 +1122,7 @@ void JIT::privateCompileMainPass() {
         addSlowCase(joSub32(
             Imm32(getDeTaggedConstantImmediate(JSImmediate::oneImmediate())),
             X86::edx));
+        signExtend32ToPtr(X86::edx, X86::edx);
         emitPutVirtualRegister(srcDst, X86::edx);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_post_dec);
