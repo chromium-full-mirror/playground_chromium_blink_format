@@ -329,12 +329,14 @@ void JIT::privateCompileMainPass() {
           emitJumpSlowCaseIfNotImmNum(X86::eax);
           addSlowCase(
               joAdd32(Imm32(getDeTaggedConstantImmediate(value)), X86::eax));
+          signExtend32ToPtr(X86::eax, X86::eax);
           emitPutVirtualRegister(dst);
         } else if (JSValue* value = getConstantImmediateNumericArg(src2)) {
           emitGetVirtualRegister(src1, X86::eax);
           emitJumpSlowCaseIfNotImmNum(X86::eax);
           addSlowCase(
               joAdd32(Imm32(getDeTaggedConstantImmediate(value)), X86::eax));
+          signExtend32ToPtr(X86::eax, X86::eax);
           emitPutVirtualRegister(dst);
         } else {
           OperandTypes types =
@@ -872,11 +874,11 @@ void JIT::privateCompileMainPass() {
       }
       case op_not: {
         emitGetVirtualRegister(currentInstruction[2].u.operand, X86::eax);
-        xor32(Imm32(JSImmediate::FullTagTypeBool), X86::eax);
+        xorPtr(Imm32(JSImmediate::FullTagTypeBool), X86::eax);
         addSlowCase(jnz32(X86::eax, Imm32(JSImmediate::FullTagTypeMask)));
-        xor32(Imm32(JSImmediate::FullTagTypeBool |
-                    JSImmediate::ExtendedPayloadBitBoolValue),
-              X86::eax);
+        xorPtr(Imm32(JSImmediate::FullTagTypeBool |
+                     JSImmediate::ExtendedPayloadBitBoolValue),
+               X86::eax);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_not);
       }
@@ -1005,19 +1007,19 @@ void JIT::privateCompileMainPass() {
         if (JSValue* value = getConstantImmediateNumericArg(src1)) {
           emitGetVirtualRegister(src2, X86::eax);
           emitJumpSlowCaseIfNotImmNum(X86::eax);
-          and32(Imm32(asInteger(value)), X86::eax);  // FIXME: make it more
-                                                     // obvious this is relying
-                                                     // on the format of
-                                                     // JSImmediate
+          andPtr(Imm32(asInteger(value)), X86::eax);  // FIXME: make it more
+                                                      // obvious this is relying
+                                                      // on the format of
+                                                      // JSImmediate
           emitPutVirtualRegister(dst);
         } else if (JSValue* value = getConstantImmediateNumericArg(src2)) {
           emitGetVirtualRegister(src1, X86::eax);
           emitJumpSlowCaseIfNotImmNum(X86::eax);
-          and32(Imm32(asInteger(value)), X86::eax);
+          andPtr(Imm32(asInteger(value)), X86::eax);
           emitPutVirtualRegister(dst);
         } else {
           emitGetVirtualRegisters(src1, X86::eax, src2, X86::edx);
-          and32(X86::edx, X86::eax);
+          andPtr(X86::edx, X86::eax);
           emitJumpSlowCaseIfNotImmNum(X86::eax);
           emitPutVirtualRegister(dst);
         }
@@ -1046,7 +1048,7 @@ void JIT::privateCompileMainPass() {
       case op_bitnot: {
         emitGetVirtualRegister(currentInstruction[2].u.operand, X86::eax);
         emitJumpSlowCaseIfNotImmNum(X86::eax);
-        xor32(Imm32(~JSImmediate::TagBitTypeInteger), X86::eax);
+        xorPtr(Imm32(~JSImmediate::TagBitTypeInteger), X86::eax);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_bitnot);
       }
@@ -1142,7 +1144,7 @@ void JIT::privateCompileMainPass() {
         emitGetVirtualRegisters(currentInstruction[2].u.operand, X86::eax,
                                 currentInstruction[3].u.operand, X86::edx);
         emitJumpSlowCaseIfNotImmNums(X86::eax, X86::edx, X86::ecx);
-        or32(X86::edx, X86::eax);
+        orPtr(X86::edx, X86::eax);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_bitor);
       }
@@ -1787,7 +1789,7 @@ void JIT::privateCompileSlowCases() {
       }
       case op_not: {
         linkSlowCase(iter);
-        xor32(Imm32(JSImmediate::FullTagTypeBool), X86::eax);
+        xorPtr(Imm32(JSImmediate::FullTagTypeBool), X86::eax);
         emitPutJITStubArg(X86::eax, 1);
         emitCTICall(Interpreter::cti_op_not);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
