@@ -38,6 +38,8 @@ class PNGImageDecoder : public ImageDecoder {
   PNGImageDecoder();
   ~PNGImageDecoder();
 
+  virtual String filenameExtension() const { return "png"; }
+
   // Take the data and store it.
   virtual void setData(SharedBuffer* data, bool allDataReceived);
 

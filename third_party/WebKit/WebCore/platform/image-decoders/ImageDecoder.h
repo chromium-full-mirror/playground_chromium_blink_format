@@ -28,6 +28,7 @@
 
 #include "IntRect.h"
 #include "ImageSource.h"
+#include "PlatformString.h"
 #include "SharedBuffer.h"
 #include <wtf/Vector.h>
 
@@ -134,6 +135,10 @@ class ImageDecoder {
  public:
   ImageDecoder() : m_sizeAvailable(false), m_failed(false) {}
   virtual ~ImageDecoder() {}
+
+  // The the filename extension usually associated with an undecoded image of
+  // this type.
+  virtual String filenameExtension() const = 0;
 
   // All specific decoder plugins must do something with the data they are
   // given.

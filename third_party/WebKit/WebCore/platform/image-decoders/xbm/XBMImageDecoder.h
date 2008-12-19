@@ -35,6 +35,8 @@ class XBMImageReader;
 // This class decodes the XBM image format.
 class XBMImageDecoder : public ImageDecoder {
  public:
+  virtual String filenameExtension() const { return "xbm"; }
+
   // Whether or not the size information has been decoded yet.
   virtual bool isSizeAvailable() const;
 
