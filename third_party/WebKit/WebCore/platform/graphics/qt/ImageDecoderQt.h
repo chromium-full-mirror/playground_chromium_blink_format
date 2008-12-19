@@ -51,7 +51,7 @@ class ImageDecoderQt : public ImageDecoder {
   QPixmap* imageAtIndex(size_t index) const;
   virtual bool supportsAlpha() const;
   int duration(size_t index) const;
-  QString imageFormat() const;
+  virtual String filenameExtension() const;
 
   void clearFrame(size_t index);
 
