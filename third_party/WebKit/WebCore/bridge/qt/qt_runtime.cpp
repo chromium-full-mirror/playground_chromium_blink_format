@@ -47,6 +47,7 @@
 #include <runtime.h>
 #include <runtime_array.h>
 #include <runtime_object.h>
+#include "BooleanObject.h"
 
 // QtScript has these
 Q_DECLARE_METATYPE(QObjectList);
@@ -183,7 +184,12 @@ QVariant convertValueToQVariant(ExecState* exec,
         hint = QMetaType::QRegExp;
         break;
       case Object:
-        hint = QMetaType::QVariantMap;
+        if (object->inherits(&NumberObject::info))
+          hint = QMetaType::Double;
+        else if (object->inherits(&BooleanObject::info))
+          hint = QMetaType::Bool;
+        else
+          hint = QMetaType::QVariantMap;
         break;
       case QObj:
         hint = QMetaType::QObjectStar;
@@ -210,7 +216,11 @@ QVariant convertValueToQVariant(ExecState* exec,
   int dist = -1;
   switch (hint) {
     case QMetaType::Bool:
-      ret = QVariant(value->toBoolean(exec));
+      if (type == Object && object->inherits(&BooleanObject::info))
+        ret =
+            QVariant(asBooleanObject(value)->internalValue()->toBoolean(exec));
+      else
+        ret = QVariant(value->toBoolean(exec));
       if (type == Boolean)
         dist = 0;
       else
@@ -730,7 +740,12 @@ QVariant convertValueToQVariant(ExecState* exec,
             *distance = 1;
           return QVariant();
         } else {
-          // Well.. we can do anything... just recurse with the autodetect flag
+          if (type == Object) {
+            // Since we haven't really visited this object yet, we remove it
+            visitedObjects->remove(object);
+          }
+
+          // And then recurse with the autodetect flag
           ret = convertValueToQVariant(exec, value, QMetaType::Void, distance,
                                        visitedObjects);
           dist = 10;
