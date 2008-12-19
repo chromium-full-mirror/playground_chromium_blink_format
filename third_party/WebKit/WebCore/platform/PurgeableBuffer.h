@@ -40,7 +40,7 @@ class PurgeableBuffer : Noncopyable {
 
   ~PurgeableBuffer();
 
-  // Call makePurgeable(true) and check the return value before accessing the
+  // Call makePurgeable(false) and check the return value before accessing the
   // data.
   const char* data() const;
   size_t size() const { return m_size; }
