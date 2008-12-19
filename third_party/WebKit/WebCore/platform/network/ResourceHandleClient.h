@@ -82,6 +82,7 @@ class ResourceHandleClient {
 
   virtual void willCacheResponse(ResourceHandle*, CacheStoragePolicy&) {}
 
+  virtual bool shouldUseCredentialStorage(ResourceHandle*) { return false; }
   virtual void didReceiveAuthenticationChallenge(
       ResourceHandle*,
       const AuthenticationChallenge&) {}

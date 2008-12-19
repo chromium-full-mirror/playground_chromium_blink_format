@@ -45,6 +45,9 @@
                           response:(NSURLResponse*)response
                             length:(WebNSInteger)length
                     fromDataSource:(WebDataSource*)dataSource;
+- (BOOL)webView:(WebView*)webView
+                                   resource:(id)identifier
+    shouldUseCredentialStorageForDataSource:(WebDataSource*)dataSource;
 
 @end
 

@@ -88,6 +88,7 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
 
+  virtual bool shouldUseCredentialStorage();
   virtual void didReceiveAuthenticationChallenge(
       const AuthenticationChallenge&);
   void didCancelAuthenticationChallenge(const AuthenticationChallenge&);
@@ -113,6 +114,9 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
                                      const char* data,
                                      int length) {
     willStopBufferingData(data, length);
+  }
+  virtual bool shouldUseCredentialStorage(ResourceHandle*) {
+    return shouldUseCredentialStorage();
   }
   virtual void didReceiveAuthenticationChallenge(
       ResourceHandle*,

@@ -193,6 +193,12 @@ void FrameLoaderClient::committedLoad(DocumentLoader* loader,
   }
 }
 
+bool FrameLoaderClient::shouldUseCredentialStorage(DocumentLoader*,
+                                                   unsigned long identifier) {
+  notImplemented();
+  return false;
+}
+
 void FrameLoaderClient::dispatchDidReceiveAuthenticationChallenge(
     DocumentLoader*,
     unsigned long identifier,

@@ -5193,6 +5193,11 @@ void FrameLoader::didFinishLoad(ResourceLoader* loader) {
   dispatchDidFinishLoading(loader->documentLoader(), loader->identifier());
 }
 
+bool FrameLoader::shouldUseCredentialStorage(ResourceLoader* loader) {
+  return m_client->shouldUseCredentialStorage(loader->documentLoader(),
+                                              loader->identifier());
+}
+
 void FrameLoader::didReceiveAuthenticationChallenge(
     ResourceLoader* loader,
     const AuthenticationChallenge& currentWebChallenge) {

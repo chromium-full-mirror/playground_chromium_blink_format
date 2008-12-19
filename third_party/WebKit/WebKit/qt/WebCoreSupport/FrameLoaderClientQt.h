@@ -96,6 +96,8 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
                                        unsigned long,
                                        WebCore::ResourceRequest&,
                                        const WebCore::ResourceResponse&);
+  virtual bool shouldUseCredentialStorage(DocumentLoader*,
+                                          unsigned long identifier);
   virtual void dispatchDidReceiveAuthenticationChallenge(
       DocumentLoader*,
       unsigned long identifier,

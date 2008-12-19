@@ -251,6 +251,16 @@ void SubresourceLoader::didCancel(const ResourceError& error) {
   ResourceLoader::didCancel(error);
 }
 
+bool SubresourceLoader::shouldUseCredentialStorage() {
+  RefPtr<SubresourceLoader> protect(this);
+
+  bool shouldUse;
+  if (m_client && m_client->getShouldUseCredentialStorage(this, shouldUse))
+    return shouldUse;
+
+  return ResourceLoader::shouldUseCredentialStorage();
+}
+
 void SubresourceLoader::didReceiveAuthenticationChallenge(
     const AuthenticationChallenge& challenge) {
   RefPtr<SubresourceLoader> protect(this);

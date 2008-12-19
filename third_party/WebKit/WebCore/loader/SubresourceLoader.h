@@ -29,7 +29,6 @@
 #ifndef SubresourceLoader_h
 #define SubresourceLoader_h
 
-#include "ResourceHandleClient.h"
 #include "ResourceLoader.h"
 #include <wtf/PassRefPtr.h>
 
@@ -66,6 +65,7 @@ class SubresourceLoader : public ResourceLoader {
                               bool allAtOnce);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
+  virtual bool shouldUseCredentialStorage();
   virtual void didReceiveAuthenticationChallenge(
       const AuthenticationChallenge&);
   virtual void receivedCancellation(const AuthenticationChallenge&);

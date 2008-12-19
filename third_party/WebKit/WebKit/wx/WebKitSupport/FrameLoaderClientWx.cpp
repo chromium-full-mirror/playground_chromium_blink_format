@@ -521,6 +521,12 @@ void FrameLoaderClientWx::dispatchWillSendRequest(
   notImplemented();
 }
 
+bool FrameLoaderClientWx::shouldUseCredentialStorage(DocumentLoader*,
+                                                     unsigned long) {
+  notImplemented();
+  return false;
+}
+
 void FrameLoaderClientWx::dispatchDidReceiveAuthenticationChallenge(
     DocumentLoader*,
     unsigned long,

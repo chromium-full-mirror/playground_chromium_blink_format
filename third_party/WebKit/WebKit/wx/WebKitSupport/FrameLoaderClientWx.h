@@ -184,6 +184,8 @@ class FrameLoaderClientWx : public FrameLoaderClient,
                                        unsigned long,
                                        ResourceRequest&,
                                        const ResourceResponse&);
+  virtual bool shouldUseCredentialStorage(DocumentLoader*,
+                                          unsigned long identifier);
   virtual void dispatchDidReceiveAuthenticationChallenge(
       DocumentLoader*,
       unsigned long identifier,

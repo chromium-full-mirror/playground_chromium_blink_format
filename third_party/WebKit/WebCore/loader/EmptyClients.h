@@ -191,6 +191,10 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void assignIdentifierToInitialRequest(unsigned long identifier,
                                                 DocumentLoader*,
                                                 const ResourceRequest&) {}
+  virtual bool shouldUseCredentialStorage(DocumentLoader*,
+                                          unsigned long identifier) {
+    return false;
+  }
   virtual void dispatchWillSendRequest(
       DocumentLoader*,
       unsigned long identifier,

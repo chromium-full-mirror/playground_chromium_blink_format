@@ -87,6 +87,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       unsigned long identifier,
       WebCore::ResourceRequest&,
       const WebCore::ResourceResponse& redirectResponse);
+  virtual bool shouldUseCredentialStorage(WebCore::DocumentLoader*,
+                                          unsigned long identifier);
   virtual void dispatchDidReceiveAuthenticationChallenge(
       WebCore::DocumentLoader*,
       unsigned long identifier,

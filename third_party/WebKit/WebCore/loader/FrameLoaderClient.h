@@ -96,6 +96,8 @@ class FrameLoaderClient {
       unsigned long identifier,
       ResourceRequest&,
       const ResourceResponse& redirectResponse) = 0;
+  virtual bool shouldUseCredentialStorage(DocumentLoader*,
+                                          unsigned long identifier) = 0;
   virtual void dispatchDidReceiveAuthenticationChallenge(
       DocumentLoader*,
       unsigned long identifier,
