@@ -169,6 +169,8 @@ class FrameView : public ScrollView {
 
   void layoutIfNeededRecursive();
 
+  void setIsVisuallyNonEmpty();
+
  private:
   void init();
 

@@ -106,6 +106,8 @@ class FrameViewPrivate {
     m_repaintRects.clear();
     m_paintRestriction = PaintRestrictionNone;
     m_isPainting = false;
+    m_isVisuallyNonEmpty = false;
+    m_firstVisuallyNonEmptyLayoutCallbackPending = true;
   }
 
   bool m_doFullRepaint;
@@ -158,6 +160,9 @@ class FrameViewPrivate {
   RefPtr<Node> m_nodeToDraw;
   PaintRestriction m_paintRestriction;
   bool m_isPainting;
+
+  bool m_isVisuallyNonEmpty;
+  bool m_firstVisuallyNonEmptyLayoutCallbackPending;
 };
 
 FrameView::FrameView(Frame* frame)
@@ -945,6 +950,12 @@ void FrameView::performPostLayoutTasks() {
     m_frame->loader()->didFirstLayout();
   }
 
+  if (d->m_isVisuallyNonEmpty &&
+      d->m_firstVisuallyNonEmptyLayoutCallbackPending) {
+    d->m_firstVisuallyNonEmptyLayoutCallbackPending = false;
+    m_frame->loader()->didFirstVisuallyNonEmptyLayout();
+  }
+
   RenderView* root = m_frame->contentRenderer();
 
   root->updateWidgetPositions();
@@ -1255,4 +1266,9 @@ void FrameView::layoutIfNeededRecursive() {
     if ((*current)->isFrameView())
       static_cast<FrameView*>(*current)->layoutIfNeededRecursive();
 }
+
+void FrameView::setIsVisuallyNonEmpty() {
+  d->m_isVisuallyNonEmpty = true;
 }
+
+}  // namespace WebCore

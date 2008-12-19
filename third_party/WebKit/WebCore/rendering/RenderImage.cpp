@@ -28,6 +28,7 @@
 
 #include "BitmapImage.h"
 #include "Document.h"
+#include "FrameView.h"
 #include "GraphicsContext.h"
 #include "HTMLImageElement.h"
 #include "HTMLInputElement.h"
@@ -188,6 +189,8 @@ using namespace HTMLNames;
 RenderImage::RenderImage(Node* node)
     : RenderReplaced(node, IntSize(0, 0)), m_cachedImage(0) {
   updateAltText();
+
+  view()->frameView()->setIsVisuallyNonEmpty();
 }
 
 RenderImage::~RenderImage() {

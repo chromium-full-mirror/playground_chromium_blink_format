@@ -111,6 +111,7 @@ class FrameLoaderClientWx : public FrameLoaderClient,
   virtual void dispatchDidFinishDocumentLoad();
   virtual void dispatchDidFinishLoad();
   virtual void dispatchDidFirstLayout();
+  virtual void dispatchDidFirstVisuallyNonEmptyLayout();
 
   virtual void dispatchShow();
   virtual void cancelPolicyCheck();

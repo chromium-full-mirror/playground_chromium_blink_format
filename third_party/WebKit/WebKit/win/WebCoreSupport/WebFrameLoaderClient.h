@@ -92,6 +92,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchDidFinishDocumentLoad();
   virtual void dispatchDidFinishLoad();
   virtual void dispatchDidFirstLayout();
+  virtual void dispatchDidFirstVisuallyNonEmptyLayout();
 
   virtual WebCore::Frame* dispatchCreatePage();
   virtual void dispatchShow();

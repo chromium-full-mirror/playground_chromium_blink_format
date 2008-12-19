@@ -320,6 +320,8 @@ class FrameLoader : Noncopyable
   void didFirstLayout();
   bool firstLayoutDone() const;
 
+  void didFirstVisuallyNonEmptyLayout();
+
   void clientRedirectCancelledOrFinished(bool cancelWithLoadInProgress);
   void clientRedirected(const KURL&,
                         double delay,
