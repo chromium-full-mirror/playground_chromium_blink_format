@@ -1469,8 +1469,11 @@ void QWebPage::triggerAction(WebAction action, bool checked) {
       editor->setBaseWritingDirection(RightToLeftWritingDirection);
       break;
     case InspectElement:
-      d->page->inspectorController()->inspect(
-          d->hitTestResult.d->innerNonSharedNode.get());
+      if (!d->hitTestResult.isNull())
+        d->page->inspectorController()->inspect(
+            d->hitTestResult.d->innerNonSharedNode.get());
+      else
+        d->page->inspectorController()->show();
       break;
     default:
       command = editorCommandForWebActions(action);
