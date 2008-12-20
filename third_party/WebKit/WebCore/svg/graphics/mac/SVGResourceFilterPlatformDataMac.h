@@ -53,7 +53,7 @@ class SVGResourceFilterPlatformDataMac : public SVGResourceFilterPlatformData {
 
   NSArray* getCIFilterStack(CIImage* inputImage, const FloatRect& bbox);
 
-  CIContext* m_filterCIContext;
+  RetainPtr<CIContext> m_filterCIContext;
   CGLayerRef m_filterCGLayer;
   RetainPtr<NSMutableDictionary> m_imagesByName;
   SVGResourceFilter* m_filter;
