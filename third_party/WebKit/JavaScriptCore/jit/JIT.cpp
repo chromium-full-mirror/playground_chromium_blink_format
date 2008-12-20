@@ -40,8 +40,6 @@
 #include <stdio.h>
 #endif
 
-#define __ m_assembler.
-
 using namespace std;
 
 namespace JSC {
@@ -198,8 +196,7 @@ void ctiSetReturnAddress(void** where, void* what) {
 }
 
 void ctiRepatchCallByReturnAddress(void* where, void* what) {
-  (static_cast<void**>(where))[-1] = reinterpret_cast<void*>(
-      reinterpret_cast<uintptr_t>(what) - reinterpret_cast<uintptr_t>(where));
+  MacroAssembler::Jump::repatch(where, what);
 }
 
 JIT::JIT(JSGlobalData* globalData, CodeBlock* codeBlock)
@@ -362,9 +359,10 @@ void JIT::privateCompileMainPass() {
         if (m_codeBlock->needsFullScopeChain())
           emitCTICall(Interpreter::cti_op_end);
         emitGetVirtualRegister(currentInstruction[1].u.operand, X86::eax);
-        __ push_m(RegisterFile::ReturnPC * static_cast<int>(sizeof(Register)),
-                  callFrameRegister);
-        __ ret();
+        push(Address(
+            callFrameRegister,
+            RegisterFile::ReturnPC * static_cast<int>(sizeof(Register))));
+        ret();
         NEXT_OPCODE(op_end);
       }
       case op_jmp: {
@@ -652,8 +650,8 @@ void JIT::privateCompileMainPass() {
                                    callFrameRegister);
 
         // Return.
-        __ push_r(X86::edx);
-        __ ret();
+        push(X86::edx);
+        ret();
 
         NEXT_OPCODE(op_ret);
       }
@@ -2040,7 +2038,7 @@ void JIT::privateCompile() {
 
   // Could use a pop_m, but would need to offset the following instruction if
   // so.
-  __ pop_r(X86::ecx);
+  pop(X86::ecx);
   emitPutToCallFrameHeader(X86::ecx, RegisterFile::ReturnPC);
 
   Jump slowRegisterFileCheck;
@@ -2183,54 +2181,54 @@ void JIT::privateCompile() {
 void JIT::privateCompileCTIMachineTrampolines() {
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
   // (1) The first function provides fast property access for array length
-  X86Assembler::JmpDst arrayLengthBegin = __ align(16);
+  Label arrayLengthBegin = align();
 
   // Check eax is an array
-  X86Assembler::JmpSrc array_failureCases1 = emitJumpIfNotJSCell(X86::eax);
-  __ cmpl_im(reinterpret_cast<unsigned>(m_interpreter->m_jsArrayVptr), 0,
-             X86::eax);
-  X86Assembler::JmpSrc array_failureCases2 = __ jne();
+  Jump array_failureCases1 = emitJumpIfNotJSCell(X86::eax);
+  Jump array_failureCases2 =
+      jnePtr(Address(X86::eax), ImmPtr(m_interpreter->m_jsArrayVptr));
 
   // Checks out okay! - get the length from the storage
-  __ movl_mr(FIELD_OFFSET(JSArray, m_storage), X86::eax, X86::eax);
-  __ movl_mr(FIELD_OFFSET(ArrayStorage, m_length), X86::eax, X86::eax);
+  loadPtr(Address(X86::eax, FIELD_OFFSET(JSArray, m_storage)), X86::eax);
+  load32(Address(X86::eax, FIELD_OFFSET(ArrayStorage, m_length)), X86::eax);
 
-  __ cmpl_ir(JSImmediate::maxImmediateInt, X86::eax);
-  X86Assembler::JmpSrc array_failureCases3 = __ ja();
+  Jump array_failureCases3 =
+      ja32(X86::eax, Imm32(JSImmediate::maxImmediateInt));
 
-  __ addl_rr(X86::eax, X86::eax);
-  __ addl_ir(1, X86::eax);
+  add32(X86::eax, X86::eax);
+  add32(Imm32(1), X86::eax);
 
-  __ ret();
+  ret();
 
   // (2) The second function provides fast property access for string length
-  X86Assembler::JmpDst stringLengthBegin = __ align(16);
+  Label stringLengthBegin = align();
 
   // Check eax is a string
-  X86Assembler::JmpSrc string_failureCases1 = emitJumpIfNotJSCell(X86::eax);
-  __ cmpl_im(reinterpret_cast<unsigned>(m_interpreter->m_jsStringVptr), 0,
-             X86::eax);
-  X86Assembler::JmpSrc string_failureCases2 = __ jne();
+  Jump string_failureCases1 = emitJumpIfNotJSCell(X86::eax);
+  Jump string_failureCases2 =
+      jnePtr(Address(X86::eax), ImmPtr(m_interpreter->m_jsStringVptr));
 
   // Checks out okay! - get the length from the Ustring.
-  __ movl_mr(FIELD_OFFSET(JSString, m_value) + FIELD_OFFSET(UString, m_rep),
-             X86::eax, X86::eax);
-  __ movl_mr(FIELD_OFFSET(UString::Rep, len), X86::eax, X86::eax);
+  loadPtr(Address(X86::eax, FIELD_OFFSET(JSString, m_value) +
+                                FIELD_OFFSET(UString, m_rep)),
+          X86::eax);
+  load32(Address(X86::eax, FIELD_OFFSET(UString::Rep, len)), X86::eax);
 
-  __ cmpl_ir(JSImmediate::maxImmediateInt, X86::eax);
-  X86Assembler::JmpSrc string_failureCases3 = __ ja();
+  Jump string_failureCases3 =
+      ja32(X86::eax, Imm32(JSImmediate::maxImmediateInt));
 
-  __ addl_rr(X86::eax, X86::eax);
-  __ addl_ir(1, X86::eax);
+  add32(X86::eax, X86::eax);
+  add32(Imm32(1), X86::eax);
 
-  __ ret();
+  ret();
 #endif
 
   // (3) Trampolines for the slow cases of op_call / op_call_eval /
   // op_construct.
 
-  X86Assembler::JmpDst virtualCallPreLinkBegin = __ align(16);
+  Label virtualCallPreLinkBegin = align();
 
+#define __ m_assembler.
   // Load the callee CodeBlock* into eax
   __ movl_mr(FIELD_OFFSET(JSFunction, m_body), X86::ecx, X86::eax);
   __ movl_mr(FIELD_OFFSET(FunctionBodyNode, m_code), X86::eax, X86::eax);
@@ -2268,7 +2266,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
 
   __ jmp_r(X86::eax);
 
-  X86Assembler::JmpDst virtualCallLinkBegin = __ align(16);
+  Label virtualCallLinkBegin = align();
 
   // Load the callee CodeBlock* into eax
   __ movl_mr(FIELD_OFFSET(JSFunction, m_body), X86::ecx, X86::eax);
@@ -2307,7 +2305,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
 
   __ jmp_r(X86::eax);
 
-  X86Assembler::JmpDst virtualCallBegin = __ align(16);
+  Label virtualCallBegin = align();
 
   // Load the callee CodeBlock* into eax
   loadPtr(Address(X86::ecx, FIELD_OFFSET(JSFunction, m_body)), X86::eax);
@@ -2344,35 +2342,37 @@ void JIT::privateCompileCTIMachineTrampolines() {
 
   // All trampolines constructed! copy the code, link up calls, and set the
   // pointers on the Machine object.
-  m_interpreter->m_executablePool = m_globalData->poolForSize(__ size());
-  void* code = __ executableCopy(m_interpreter->m_executablePool.get());
+  m_interpreter->m_executablePool =
+      m_globalData->poolForSize(m_assembler.size());
+  void* code =
+      m_assembler.executableCopy(m_interpreter->m_executablePool.get());
+  RepatchBuffer repatchBuffer(code);
 
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
-  X86Assembler::link(
-      code, array_failureCases1,
+  repatchBuffer.link(
+      array_failureCases1,
       reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_array_fail));
-  X86Assembler::link(
-      code, array_failureCases2,
+  repatchBuffer.link(
+      array_failureCases2,
       reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_array_fail));
-  X86Assembler::link(
-      code, array_failureCases3,
+  repatchBuffer.link(
+      array_failureCases3,
       reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_array_fail));
-  X86Assembler::link(
-      code, string_failureCases1,
+  repatchBuffer.link(
+      string_failureCases1,
       reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_string_fail));
-  X86Assembler::link(
-      code, string_failureCases2,
+  repatchBuffer.link(
+      string_failureCases2,
       reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_string_fail));
-  X86Assembler::link(
-      code, string_failureCases3,
+  repatchBuffer.link(
+      string_failureCases3,
       reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_string_fail));
 
   m_interpreter->m_ctiArrayLengthTrampoline =
-      X86Assembler::getRelocatedAddress(code, arrayLengthBegin);
+      repatchBuffer.addressOf(arrayLengthBegin);
   m_interpreter->m_ctiStringLengthTrampoline =
-      X86Assembler::getRelocatedAddress(code, stringLengthBegin);
+      repatchBuffer.addressOf(stringLengthBegin);
 #endif
-
   X86Assembler::link(
       code, callArityCheck1,
       reinterpret_cast<void*>(Interpreter::cti_op_call_arityCheck));
@@ -2398,11 +2398,10 @@ void JIT::privateCompileCTIMachineTrampolines() {
                      reinterpret_cast<void*>(Interpreter::cti_vm_lazyLinkCall));
 
   m_interpreter->m_ctiVirtualCallPreLink =
-      X86Assembler::getRelocatedAddress(code, virtualCallPreLinkBegin);
+      repatchBuffer.addressOf(virtualCallPreLinkBegin);
   m_interpreter->m_ctiVirtualCallLink =
-      X86Assembler::getRelocatedAddress(code, virtualCallLinkBegin);
-  m_interpreter->m_ctiVirtualCall =
-      X86Assembler::getRelocatedAddress(code, virtualCallBegin);
+      repatchBuffer.addressOf(virtualCallLinkBegin);
+  m_interpreter->m_ctiVirtualCall = repatchBuffer.addressOf(virtualCallBegin);
 }
 
 void JIT::emitGetVariableObjectRegister(RegisterID variableObject,

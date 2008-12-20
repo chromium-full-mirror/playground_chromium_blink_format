@@ -70,7 +70,7 @@ class RefCountedBase : Noncopyable {
     return false;
   }
 
- private:
+ protected:
   int m_refCount;
 #ifndef NDEBUG
   bool m_deletionHasBegun;

@@ -105,9 +105,6 @@ class MacroAssembler {
   //
   // Describes a complex addressing mode.
   struct BaseIndex {
-    BaseIndex(RegisterID base, RegisterID index, int32_t offset = 0)
-        : base(base), index(index), scale(TimesOne), offset(offset) {}
-
     BaseIndex(RegisterID base,
               RegisterID index,
               Scale scale,
@@ -118,6 +115,16 @@ class MacroAssembler {
     RegisterID index;
     Scale scale;
     int32_t offset;
+  };
+
+  // AbsoluteAddress:
+  //
+  // Describes an memory operand given by a pointer.  For regular load & store
+  // operations an unwrapped void* will be used, rather than using this.
+  struct AbsoluteAddress {
+    explicit AbsoluteAddress(void* ptr) : m_ptr(ptr) {}
+
+    void* m_ptr;
   };
 
   class Jump;
@@ -137,6 +144,38 @@ class MacroAssembler {
 
     DataLabelPtr(MacroAssembler* masm) : m_label(masm->m_assembler.label()) {}
 
+#if !PLATFORM(X86_64)
+    static void repatch(void* address, void* value) {
+      X86Assembler::repatchImmediate(reinterpret_cast<intptr_t>(address),
+                                     reinterpret_cast<uint32_t>(value));
+    }
+#endif
+
+   private:
+    X86Assembler::JmpDst m_label;
+  };
+
+  // DataLabel32:
+  //
+  // A DataLabelPtr is used to refer to a location in the code containing a
+  // pointer to be
+  // repatched after the code has been generated.
+  class DataLabel32 {
+    friend class MacroAssembler;
+    friend class RepatchBuffer;
+
+   public:
+    DataLabel32() {}
+
+    DataLabel32(MacroAssembler* masm) : m_label(masm->m_assembler.label()) {}
+
+#if !PLATFORM(X86_64)
+    static void repatch(void* address, int32_t value) {
+      X86Assembler::repatchImmediate(reinterpret_cast<intptr_t>(address),
+                                     value);
+    }
+#endif
+
    private:
     X86Assembler::JmpDst m_label;
   };
@@ -155,6 +194,9 @@ class MacroAssembler {
     Label() {}
 
     Label(MacroAssembler* masm) : m_label(masm->m_assembler.label()) {}
+
+    // FIXME: transitionary method, while we replace JmpSrces with Jumps.
+    operator X86Assembler::JmpDst() { return m_label; }
 
    private:
     X86Assembler::JmpDst m_label;
@@ -196,6 +238,11 @@ class MacroAssembler {
     // FIXME: transitionary method, while we replace JmpSrces with Jumps.
     operator X86Assembler::JmpSrc() { return m_jmp; }
 
+    static void repatch(void* address, void* destination) {
+      X86Assembler::repatchBranchOffset(reinterpret_cast<intptr_t>(address),
+                                        destination);
+    }
+
    private:
     X86Assembler::JmpSrc m_jmp;
   };
@@ -205,6 +252,8 @@ class MacroAssembler {
   // A JumpList is a set of Jump objects.
   // All jumps in the set will be linked to the same destination.
   class JumpList {
+    friend class RepatchBuffer;
+
    public:
     void link(MacroAssembler* masm) {
       size_t size = m_jumps.size();
@@ -226,8 +275,10 @@ class MacroAssembler {
       m_jumps.append(other.m_jumps.begin(), other.m_jumps.size());
     }
 
+    bool empty() { return !m_jumps.size(); }
+
    private:
-    Vector<Jump> m_jumps;
+    Vector<Jump, 16> m_jumps;
   };
 
   // RepatchBuffer:
@@ -260,6 +311,11 @@ class MacroAssembler {
 
     void link(Jump jump, void* target) {
       X86Assembler::link(m_code, jump.m_jmp, target);
+    }
+
+    void link(JumpList list, void* target) {
+      for (unsigned i = 0; i < list.m_jumps.size(); ++i)
+        X86Assembler::link(m_code, list.m_jumps[i], target);
     }
 
     void* addressOf(Jump jump) {
@@ -328,16 +384,14 @@ class MacroAssembler {
     m_assembler.addl_ir(imm.m_value, dest);
   }
 
+#if !PLATFORM(X86_64)
+  void add32(Imm32 imm, AbsoluteAddress address) {
+    m_assembler.addl_im(imm.m_value, address.m_ptr);
+  }
+#endif
+
   void add32(Address src, RegisterID dest) {
     m_assembler.addl_mr(src.offset, src.base, dest);
-  }
-
-  void and32(RegisterID src, RegisterID dest) {
-    m_assembler.andl_rr(src, dest);
-  }
-
-  void and32(Imm32 imm, RegisterID dest) {
-    m_assembler.andl_ir(imm.m_value, dest);
   }
 
   void andPtr(RegisterID src, RegisterID dest) {
@@ -354,6 +408,14 @@ class MacroAssembler {
 #else
     and32(imm, srcDest);
 #endif
+  }
+
+  void and32(RegisterID src, RegisterID dest) {
+    m_assembler.andl_rr(src, dest);
+  }
+
+  void and32(Imm32 imm, RegisterID dest) {
+    m_assembler.andl_ir(imm.m_value, dest);
   }
 
   void lshift32(Imm32 imm, RegisterID dest) {
@@ -461,6 +523,12 @@ class MacroAssembler {
     m_assembler.subl_ir(imm.m_value, dest);
   }
 
+#if !PLATFORM(X86_64)
+  void sub32(Imm32 imm, AbsoluteAddress address) {
+    m_assembler.subl_im(imm.m_value, address.m_ptr);
+  }
+#endif
+
   void sub32(Address src, RegisterID dest) {
     m_assembler.subl_mr(src.offset, src.base, dest);
   }
@@ -495,6 +563,13 @@ class MacroAssembler {
     load32(address, dest);
 #endif
   }
+
+#if !PLATFORM(X86_64)
+  DataLabel32 loadPtrWithAddressRepatch(Address address, RegisterID dest) {
+    m_assembler.movl_mr_disp32(address.offset, address.base, dest);
+    return DataLabel32(this);
+  }
+#endif
 
   void loadPtr(BaseIndex address, RegisterID dest) {
 #if PLATFORM(X86_64)
@@ -554,6 +629,13 @@ class MacroAssembler {
     store32(src, address);
 #endif
   }
+
+#if !PLATFORM(X86_64)
+  DataLabel32 storePtrWithAddressRepatch(RegisterID src, Address address) {
+    m_assembler.movl_rm_disp32(src, address.offset, address.base);
+    return DataLabel32(this);
+  }
+#endif
 
   void storePtr(RegisterID src, BaseIndex address) {
 #if PLATFORM(X86_64)
@@ -621,6 +703,12 @@ class MacroAssembler {
   void pop(RegisterID dest) { m_assembler.pop_r(dest); }
 
   void push(RegisterID src) { m_assembler.push_r(src); }
+
+  void push(Address address) {
+    m_assembler.push_m(address.offset, address.base);
+  }
+
+  void push(Imm32 imm) { m_assembler.push_i32(imm.m_value); }
 
   void pop() { addPtr(Imm32(sizeof(void*)), X86::esp); }
 
@@ -779,6 +867,11 @@ class MacroAssembler {
 #endif
 
  public:
+  Jump ja32(RegisterID left, Imm32 right) {
+    compareImm32ForBranch(left, right.m_value);
+    return Jump(m_assembler.ja());
+  }
+
   Jump jae32(RegisterID left, Imm32 right) {
     compareImm32ForBranch(left, right.m_value);
     return Jump(m_assembler.jae());
@@ -805,6 +898,15 @@ class MacroAssembler {
     return Jump(m_assembler.je());
 #else
     return je32(op1, op2);
+#endif
+  }
+
+  Jump jePtr(RegisterID reg, ImmPtr imm) {
+#if PLATFORM(X86_64)
+    move(imm, scratchRegister);
+    return jePtr(scratchRegister, reg);
+#else
+    return je32(reg, Imm32(reinterpret_cast<int32_t>(imm.m_value)));
 #endif
   }
 
@@ -908,6 +1010,24 @@ class MacroAssembler {
     return jne32(address, Imm32(reinterpret_cast<int32_t>(imm.m_value)));
 #endif
   }
+
+#if !PLATFORM(X86_64)
+  Jump jnePtr(AbsoluteAddress address, ImmPtr imm) {
+    m_assembler.cmpl_im(reinterpret_cast<uint32_t>(imm.m_value), address.m_ptr);
+    return Jump(m_assembler.jne());
+  }
+#endif
+
+#if !PLATFORM(X86_64)
+  Jump jnePtrWithRepatch(Address address,
+                         DataLabelPtr& dataLabel,
+                         ImmPtr initialValue = ImmPtr(0)) {
+    m_assembler.cmpl_im_force32(reinterpret_cast<int32_t>(initialValue.m_value),
+                                address.offset, address.base);
+    dataLabel = DataLabelPtr(this);
+    return Jump(m_assembler.jne());
+  }
+#endif
 
   Jump jne32(RegisterID op1, RegisterID op2) {
     m_assembler.cmpl_rr(op1, op2);
@@ -1121,6 +1241,27 @@ class MacroAssembler {
   Jump call(RegisterID target) { return Jump(m_assembler.call(target)); }
 
   Label label() { return Label(this); }
+
+  Label align() {
+    m_assembler.align(16);
+    return Label(this);
+  }
+
+  ptrdiff_t differenceBetween(Label from, Jump to) {
+    return X86Assembler::getDifferenceBetweenLabels(from.m_label, to.m_jmp);
+  }
+
+  ptrdiff_t differenceBetween(Label from, Label to) {
+    return X86Assembler::getDifferenceBetweenLabels(from.m_label, to.m_label);
+  }
+
+  ptrdiff_t differenceBetween(Label from, DataLabelPtr to) {
+    return X86Assembler::getDifferenceBetweenLabels(from.m_label, to.m_label);
+  }
+
+  ptrdiff_t differenceBetween(Label from, DataLabel32 to) {
+    return X86Assembler::getDifferenceBetweenLabels(from.m_label, to.m_label);
+  }
 
   void ret() { m_assembler.ret(); }
 

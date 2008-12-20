@@ -240,6 +240,7 @@ class JIT : private MacroAssembler {
   static const int repatchOffsetGetByIdStructure = 7;
   static const int repatchOffsetGetByIdBranchToSlowCase = 13;
   static const int repatchOffsetGetByIdPropertyMapOffset = 22;
+  static const int repatchOffsetGetByIdPutResult = 22;
 #if ENABLE(OPCODE_SAMPLING)
   static const int repatchOffsetGetByIdSlowCaseCall =
       27 + 4 + ctiArgumentInitSize;
