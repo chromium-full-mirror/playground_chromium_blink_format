@@ -45,4 +45,11 @@ extern NSString* WebHistoryItemsDiscardedWhileLoadingNotification;
 // API?
 - (WebHistoryItem*)_itemForURLString:(NSString*)URLString;
 
+/*!
+    @method allItems
+    @result Returns an array of all WebHistoryItems in WebHistory, in an
+   undefined order.
+*/
+- (NSArray*)allItems;
+
 @end

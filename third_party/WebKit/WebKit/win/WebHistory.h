@@ -109,6 +109,10 @@ class WebHistory : public IWebHistory {
   virtual HRESULT STDMETHODCALLTYPE historyAgeInDaysLimit(
       /* [retval][out] */ int* limit);
 
+  virtual HRESULT STDMETHODCALLTYPE allItems(
+      /* [out][in] */ int* count,
+      /* [in] */ IWebHistoryItem** items);
+
   // WebHistory
   static WebHistory* sharedHistory();
   void addItem(const WebCore::KURL&,
