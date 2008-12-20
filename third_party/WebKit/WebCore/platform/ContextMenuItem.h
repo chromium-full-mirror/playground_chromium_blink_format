@@ -172,7 +172,20 @@ struct PlatformMenuItemDescription {
   bool enabled;
 };
 #elif PLATFORM(WX)
-typedef wxMenuItem* PlatformMenuItemDescription;
+struct PlatformMenuItemDescription {
+  PlatformMenuItemDescription()
+      : type(ActionType),
+        action(ContextMenuItemTagNoAction),
+        checked(false),
+        enabled(true) {}
+
+  ContextMenuItemType type;
+  ContextMenuAction action;
+  String title;
+  wxMenu* subMenu;
+  bool checked;
+  bool enabled;
+};
 #else
 typedef void* PlatformMenuItemDescription;
 #endif

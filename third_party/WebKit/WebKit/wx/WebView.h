@@ -154,6 +154,8 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   void OnPaint(wxPaintEvent& event);
   void OnSize(wxSizeEvent& event);
   void OnMouseEvents(wxMouseEvent& event);
+  void OnContextMenuEvents(wxContextMenuEvent& event);
+  void OnMenuSelectEvents(wxCommandEvent& event);
   void OnKeyEvents(wxKeyEvent& event);
   void OnSetFocus(wxFocusEvent& event);
   void OnKillFocus(wxFocusEvent& event);

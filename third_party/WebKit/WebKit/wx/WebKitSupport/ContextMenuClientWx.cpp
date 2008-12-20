@@ -28,6 +28,7 @@
 #include "config.h"
 #include "ContextMenuClientWx.h"
 #include "NotImplemented.h"
+#include "ContextMenu.h"
 #include <stdio.h>
 
 namespace WebCore {
@@ -35,13 +36,12 @@ namespace WebCore {
 ContextMenuClientWx::~ContextMenuClientWx() {}
 
 void ContextMenuClientWx::contextMenuDestroyed() {
-  notImplemented();
+  delete this;
 }
 
 PlatformMenuDescription ContextMenuClientWx::getCustomMenuFromDefaultItems(
-    ContextMenu*) {
-  notImplemented();
-  return 0;
+    ContextMenu* menu) {
+  return menu->releasePlatformDescription();
 }
 
 void ContextMenuClientWx::contextMenuItemSelected(ContextMenuItem*,
