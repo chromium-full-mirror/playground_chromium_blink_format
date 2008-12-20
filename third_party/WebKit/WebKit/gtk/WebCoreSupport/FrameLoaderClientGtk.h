@@ -33,6 +33,7 @@
 #include "FrameLoaderClient.h"
 #include "ResourceResponse.h"
 #include "PluginView.h"
+#include "webkitwebpolicydecision.h"
 
 typedef struct _WebKitWebFrame WebKitWebFrame;
 
@@ -41,7 +42,7 @@ namespace WebKit {
 class FrameLoaderClient : public WebCore::FrameLoaderClient {
  public:
   FrameLoaderClient(WebKitWebFrame*);
-  virtual ~FrameLoaderClient() {}
+  virtual ~FrameLoaderClient();
   virtual void frameLoaderDestroyed();
 
   WebKitWebFrame* webFrame() const { return m_frame; }
@@ -244,6 +245,7 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
   WebKitWebFrame* m_frame;
   WebCore::ResourceResponse m_response;
   WebCore::String m_userAgent;
+  WebKitWebPolicyDecision* m_policyDecision;
 
   // Plugin view to redirect data to
   WebCore::PluginView* m_pluginView;
