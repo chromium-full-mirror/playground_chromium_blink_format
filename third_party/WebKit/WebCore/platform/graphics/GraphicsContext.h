@@ -367,6 +367,7 @@ class GraphicsContext : Noncopyable {
 #if PLATFORM(QT)
   bool inTransparencyLayer() const;
   PlatformPath* currentPath();
+  QPen pen();
 #endif
 
 #if PLATFORM(GTK)

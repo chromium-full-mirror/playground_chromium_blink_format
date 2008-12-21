@@ -32,8 +32,10 @@
 #include "AffineTransform.h"
 #include <ApplicationServices/ApplicationServices.h>
 #include "FloatRect.h"
+#include "GraphicsContext.h"
 #include "IntRect.h"
 #include "PlatformString.h"
+#include "StrokeStyleApplier.h"
 
 #include <wtf/MathExtras.h>
 
@@ -52,6 +54,24 @@ Path& Path::operator=(const Path& other) {
   CGPathRelease(m_path);
   m_path = path;
   return *this;
+}
+
+static CGContextRef createScratchContext() {
+  CFMutableDataRef empty = CFDataCreateMutable(NULL, 0);
+  CGDataConsumerRef consumer = CGDataConsumerCreateWithCFData(empty);
+  CGContextRef contextRef = CGPDFContextCreate(consumer, NULL, NULL);
+  CGDataConsumerRelease(consumer);
+  CFRelease(empty);
+
+  CGFloat black[4] = {0, 0, 0, 1};
+  CGContextSetFillColor(contextRef, black);
+  CGContextSetStrokeColor(contextRef, black);
+  return contextRef;
+}
+
+static inline CGContextRef scratchContext() {
+  static CGContextRef context = createScratchContext();
+  return context;
 }
 
 static void copyClosingSubpathsApplierFunction(void* info,
@@ -116,6 +136,28 @@ void Path::translate(const FloatSize& size) {
 
 FloatRect Path::boundingRect() const {
   return CGPathGetBoundingBox(m_path);
+}
+
+FloatRect Path::strokeBoundingRect(StrokeStyleApplier* applier) {
+  CGContextRef context = scratchContext();
+
+  CGContextSaveGState(context);
+  CGContextBeginPath(context);
+  CGContextAddPath(context, platformPath());
+
+  GraphicsContext gc(context);
+  if (applier)
+    applier->strokeStyle(&gc);
+
+  CGContextReplacePathWithStrokedPath(context);
+  if (CGContextIsPathEmpty(context)) {
+    CGContextRestoreGState(context);
+    return FloatRect();
+  }
+  CGRect box = CGContextGetPathBoundingBox(context);
+  CGContextRestoreGState(context);
+
+  return box;
 }
 
 void Path::moveTo(const FloatPoint& point) {
