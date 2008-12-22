@@ -4430,7 +4430,7 @@ NEVER_INLINE void Interpreter::tryCTICachePutByID(CallFrame* callFrame,
 
   // Uncacheable: give up.
   if (!slot.isCacheable()) {
-    ctiRepatchCallByReturnAddress(
+    ctiPatchCallByReturnAddress(
         returnAddress, reinterpret_cast<void*>(cti_op_put_by_id_generic));
     return;
   }
@@ -4439,14 +4439,14 @@ NEVER_INLINE void Interpreter::tryCTICachePutByID(CallFrame* callFrame,
   Structure* structure = baseCell->structure();
 
   if (structure->isDictionary()) {
-    ctiRepatchCallByReturnAddress(
+    ctiPatchCallByReturnAddress(
         returnAddress, reinterpret_cast<void*>(cti_op_put_by_id_generic));
     return;
   }
 
   // If baseCell != base, then baseCell must be a proxy for another object.
   if (baseCell != slot.base()) {
-    ctiRepatchCallByReturnAddress(
+    ctiPatchCallByReturnAddress(
         returnAddress, reinterpret_cast<void*>(cti_op_put_by_id_generic));
     return;
   }
@@ -4500,7 +4500,7 @@ NEVER_INLINE void Interpreter::tryCTICacheGetByID(
 
   // FIXME: Cache property access for immediates.
   if (JSImmediate::isImmediate(baseValue)) {
-    ctiRepatchCallByReturnAddress(
+    ctiPatchCallByReturnAddress(
         returnAddress, reinterpret_cast<void*>(cti_op_get_by_id_generic));
     return;
   }
@@ -4511,22 +4511,22 @@ NEVER_INLINE void Interpreter::tryCTICacheGetByID(
     JIT::compilePatchGetArrayLength(callFrame->scopeChain()->globalData,
                                     codeBlock, returnAddress);
 #else
-    ctiRepatchCallByReturnAddress(returnAddress, m_ctiArrayLengthTrampoline);
+    ctiPatchCallByReturnAddress(returnAddress, m_ctiArrayLengthTrampoline);
 #endif
     return;
   }
   if (isJSString(baseValue) &&
       propertyName == callFrame->propertyNames().length) {
-    // The tradeoff of compiling an repatched inline string length access
-    // routine does not seem
+    // The tradeoff of compiling an patched inline string length access routine
+    // does not seem
     // to pay off, so we currently only do this for arrays.
-    ctiRepatchCallByReturnAddress(returnAddress, m_ctiStringLengthTrampoline);
+    ctiPatchCallByReturnAddress(returnAddress, m_ctiStringLengthTrampoline);
     return;
   }
 
   // Uncacheable: give up.
   if (!slot.isCacheable()) {
-    ctiRepatchCallByReturnAddress(
+    ctiPatchCallByReturnAddress(
         returnAddress, reinterpret_cast<void*>(cti_op_get_by_id_generic));
     return;
   }
@@ -4535,7 +4535,7 @@ NEVER_INLINE void Interpreter::tryCTICacheGetByID(
   Structure* structure = baseCell->structure();
 
   if (structure->isDictionary()) {
-    ctiRepatchCallByReturnAddress(
+    ctiPatchCallByReturnAddress(
         returnAddress, reinterpret_cast<void*>(cti_op_get_by_id_generic));
     return;
   }
@@ -4878,8 +4878,8 @@ void Interpreter::cti_op_put_by_id(STUB_ARGS) {
   PutPropertySlot slot;
   ARG_src1->put(callFrame, ident, ARG_src3, slot);
 
-  ctiRepatchCallByReturnAddress(
-      STUB_RETURN_ADDRESS, reinterpret_cast<void*>(cti_op_put_by_id_second));
+  ctiPatchCallByReturnAddress(STUB_RETURN_ADDRESS,
+                              reinterpret_cast<void*>(cti_op_put_by_id_second));
 
   CHECK_FOR_EXCEPTION_AT_END();
 }
@@ -4917,8 +4917,8 @@ JSValue* Interpreter::cti_op_get_by_id(STUB_ARGS) {
   PropertySlot slot(baseValue);
   JSValue* result = baseValue->get(callFrame, ident, slot);
 
-  ctiRepatchCallByReturnAddress(
-      STUB_RETURN_ADDRESS, reinterpret_cast<void*>(cti_op_get_by_id_second));
+  ctiPatchCallByReturnAddress(STUB_RETURN_ADDRESS,
+                              reinterpret_cast<void*>(cti_op_get_by_id_second));
 
   CHECK_FOR_EXCEPTION_AT_END();
   return result;
@@ -4982,11 +4982,11 @@ JSValue* Interpreter::cti_op_get_by_id_self_fail(STUB_ARGS) {
                                 slot.cachedOffset());
 
     if (listIndex == (POLYMORPHIC_LIST_CACHE_SIZE - 1))
-      ctiRepatchCallByReturnAddress(
+      ctiPatchCallByReturnAddress(
           STUB_RETURN_ADDRESS,
           reinterpret_cast<void*>(cti_op_get_by_id_generic));
   } else {
-    ctiRepatchCallByReturnAddress(
+    ctiPatchCallByReturnAddress(
         STUB_RETURN_ADDRESS, reinterpret_cast<void*>(cti_op_get_by_id_generic));
   }
   return result;
@@ -5039,7 +5039,7 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list(STUB_ARGS) {
 
   if (JSImmediate::isImmediate(baseValue) || !slot.isCacheable() ||
       asCell(baseValue)->structure()->isDictionary()) {
-    ctiRepatchCallByReturnAddress(
+    ctiPatchCallByReturnAddress(
         STUB_RETURN_ADDRESS,
         reinterpret_cast<void*>(cti_op_get_by_id_proto_fail));
     return result;
@@ -5053,7 +5053,7 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list(STUB_ARGS) {
   JSObject* slotBaseObject = asObject(slot.slotBase());
 
   if (slot.slotBase() == baseValue)
-    ctiRepatchCallByReturnAddress(
+    ctiPatchCallByReturnAddress(
         STUB_RETURN_ADDRESS,
         reinterpret_cast<void*>(cti_op_get_by_id_proto_fail));
   else if (slot.slotBase() ==
@@ -5077,7 +5077,7 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list(STUB_ARGS) {
         slotBaseObject->structure(), slot.cachedOffset());
 
     if (listIndex == (POLYMORPHIC_LIST_CACHE_SIZE - 1))
-      ctiRepatchCallByReturnAddress(
+      ctiPatchCallByReturnAddress(
           STUB_RETURN_ADDRESS,
           reinterpret_cast<void*>(cti_op_get_by_id_proto_list_full));
   } else if (size_t count = countPrototypeChainEntriesAndCheckForProxies(
@@ -5097,11 +5097,11 @@ JSValue* Interpreter::cti_op_get_by_id_proto_list(STUB_ARGS) {
                                  slot.cachedOffset());
 
     if (listIndex == (POLYMORPHIC_LIST_CACHE_SIZE - 1))
-      ctiRepatchCallByReturnAddress(
+      ctiPatchCallByReturnAddress(
           STUB_RETURN_ADDRESS,
           reinterpret_cast<void*>(cti_op_get_by_id_proto_list_full));
   } else
-    ctiRepatchCallByReturnAddress(
+    ctiPatchCallByReturnAddress(
         STUB_RETURN_ADDRESS,
         reinterpret_cast<void*>(cti_op_get_by_id_proto_fail));
 
@@ -5308,7 +5308,7 @@ void* Interpreter::cti_vm_dontLazyLinkCall(STUB_ARGS) {
   if (!codeBlock->jitCode())
     JIT::compile(ARG_globalData, codeBlock);
 
-  ctiRepatchCallByReturnAddress(
+  ctiPatchCallByReturnAddress(
       ARG_returnAddress2, ARG_globalData->interpreter->m_ctiVirtualCallLink);
 
   return codeBlock->jitCode();
