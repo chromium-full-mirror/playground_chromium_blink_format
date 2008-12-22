@@ -125,7 +125,9 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
   // The caches in this cache group.
   HashSet<ApplicationCache*> m_caches;
 
-  // The cache being updated (if any).
+  // The cache being updated (if any). Note that cache updating does not
+  // immediately create a new
+  // ApplicationCache object, so this may be null even when status is not Idle.
   RefPtr<ApplicationCache> m_cacheBeingUpdated;
 
   // When a cache group does not yet have a complete cache, this contains the
