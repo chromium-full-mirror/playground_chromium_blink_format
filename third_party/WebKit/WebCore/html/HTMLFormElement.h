@@ -24,6 +24,7 @@
 #ifndef HTMLFormElement_h
 #define HTMLFormElement_h
 
+#include "FormDataBuilder.h"
 #include "HTMLCollection.h"
 #include "HTMLElement.h"
 
@@ -59,11 +60,11 @@ class HTMLFormElement : public HTMLElement {
   unsigned length() const;
   Node* item(unsigned index);
 
-  String enctype() const { return m_enctype; }
+  String enctype() const { return m_formDataBuilder.encodingType(); }
   void setEnctype(const String&);
 
-  String encoding() const { return m_enctype; }
-  void setEncoding(const String& enctype) { setEnctype(enctype); }
+  String encoding() const { return m_formDataBuilder.encodingType(); }
+  void setEncoding(const String& value) { setEnctype(value); }
 
   bool autoComplete() const { return m_autocomplete; }
 
@@ -92,7 +93,7 @@ class HTMLFormElement : public HTMLElement {
   String name() const;
   void setName(const String&);
 
-  String acceptCharset() const;
+  String acceptCharset() const { return m_formDataBuilder.acceptCharset(); }
   void setAcceptCharset(const String&);
 
   String action() const;
@@ -130,10 +131,9 @@ class HTMLFormElement : public HTMLElement {
   virtual void didMoveToNewOwnerDocument();
 
  private:
-  void parseEnctype(const String&);
   bool isMailtoForm() const;
   TextEncoding dataEncoding() const;
-  PassRefPtr<FormData> formData(const char* boundary) const;
+  PassRefPtr<FormData> createFormData(const CString& boundary);
   unsigned formElementIndex(HTMLFormControlElement*);
 
   friend class HTMLFormCollection;
@@ -141,6 +141,7 @@ class HTMLFormElement : public HTMLElement {
   typedef HashMap<RefPtr<AtomicStringImpl>, RefPtr<HTMLFormControlElement>>
       AliasMap;
 
+  FormDataBuilder m_formDataBuilder;
   AliasMap* m_elementAliases;
   HTMLCollection::CollectionInfo* collectionInfo;
 
@@ -149,10 +150,6 @@ class HTMLFormElement : public HTMLElement {
   Vector<HTMLImageElement*> imgElements;
   String m_url;
   String m_target;
-  String m_enctype;
-  String m_acceptcharset;
-  bool m_post : 1;
-  bool m_multipart : 1;
   bool m_autocomplete : 1;
   bool m_insubmit : 1;
   bool m_doingsubmit : 1;
