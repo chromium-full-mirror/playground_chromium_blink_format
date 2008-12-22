@@ -357,7 +357,7 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
   // This is the address for the cold path *after* the first run (which tries to
   // link the call).
   m_callStructureStubCompilationInfo[callLinkInfoIndex].coldPathOther =
-      Label(this);
+      MacroAssembler::Label(this);
 
   // The arguments have been set up on the hot path for op_call_eval
   if (opcodeID == op_call)
