@@ -1585,7 +1585,11 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
   // This will be important when we use block flows for all form controls.
   if (e && (e->hasTagName(legendTag) || e->hasTagName(buttonTag) ||
             e->hasTagName(inputTag) || e->hasTagName(selectTag) ||
-            e->hasTagName(textareaTag))) {
+            e->hasTagName(textareaTag))
+#if ENABLE(WML)
+      || e->hasTagName(WMLNames::insertedLegendTag)
+#endif
+          ) {
     if (style->width().isAuto())
       style->setWidth(Length(Intrinsic));
   }

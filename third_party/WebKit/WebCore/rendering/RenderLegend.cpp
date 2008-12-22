@@ -26,11 +26,8 @@
 #include "config.h"
 #include "RenderLegend.h"
 
-#include "HTMLFormControlElement.h"
-
 namespace WebCore {
 
-RenderLegend::RenderLegend(HTMLFormControlElement* element)
-    : RenderBlock(element) {}
+RenderLegend::RenderLegend(Node* element) : RenderBlock(element) {}
 
 }  // namespace WebCore
