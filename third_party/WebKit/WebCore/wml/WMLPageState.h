@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
- *               http://www.torchmobile.com/
+ * (http://www.torchmobile.com/)
  *
  * Copyright (C) 2004-2007 Apple Inc. All rights reserved.
  *
