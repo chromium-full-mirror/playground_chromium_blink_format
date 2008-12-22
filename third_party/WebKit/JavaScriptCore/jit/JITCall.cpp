@@ -40,8 +40,6 @@
 #include <stdio.h>
 #endif
 
-#define __ m_assembler.
-
 using namespace std;
 
 namespace JSC {
@@ -52,8 +50,8 @@ void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
   // (and, if a new JSFunction happened to be constructed at the same location,
   // we could get a false positive
   // match).  Reset the check so it no longer matches.
-  reinterpret_cast<void**>(callLinkInfo->hotPathBegin)[-1] =
-      asPointer(JSImmediate::impossibleValue());
+  DataLabelPtr::repatch(callLinkInfo->hotPathBegin,
+                        JSImmediate::impossibleValue());
 }
 
 void JIT::linkCall(JSFunction* callee,
@@ -67,16 +65,16 @@ void JIT::linkCall(JSFunction* callee,
 
     calleeCodeBlock->addCaller(callLinkInfo);
 
-    reinterpret_cast<void**>(callLinkInfo->hotPathBegin)[-1] = callee;
-    ctiRepatchCallByReturnAddress(callLinkInfo->hotPathOther, ctiCode);
+    DataLabelPtr::repatch(callLinkInfo->hotPathBegin, callee);
+    Jump::repatch(callLinkInfo->hotPathOther, ctiCode);
   }
 
   // repatch the instruction that jumps out to the cold path, so that we only
   // try to link once.
   void* repatchCheck = reinterpret_cast<void*>(
       reinterpret_cast<ptrdiff_t>(callLinkInfo->hotPathBegin) +
-      repatchOffsetOpCallCall);
-  ctiRepatchCallByReturnAddress(repatchCheck, callLinkInfo->coldPathOther);
+      repatchOffsetOpCallCompareToJump);
+  Jump::repatch(repatchCheck, callLinkInfo->coldPathOther);
 }
 
 void JIT::compileOpCallInitializeCallFrame() {
@@ -216,9 +214,6 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
 
 #else
 
-typedef X86Assembler::JmpSrc JmpSrc;
-typedef X86Assembler::JmpDst JmpDst;
-
 static void unreachable() {
   ASSERT_NOT_REACHED();
   exit(1);
@@ -233,14 +228,13 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   int registerOffset = instruction[4].u.operand;
 
   // Handle eval
-  JmpSrc wasEval;
+  Jump wasEval;
   if (opcodeID == op_call_eval) {
     emitGetVirtualRegister(callee, X86::ecx);
     compileOpCallEvalSetupArgs(instruction);
 
     emitCTICall(Interpreter::cti_op_call_eval);
-    __ cmpl_ir(asInteger(JSImmediate::impossibleValue()), X86::eax);
-    wasEval = __ jne();
+    wasEval = jnePtr(X86::eax, ImmPtr(JSImmediate::impossibleValue()));
   }
 
   // This plants a check for a cached JSFunction value, so we can plant a fast
@@ -248,12 +242,12 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   // This deliberately leaves the callee in ecx, used when setting up the stack
   // frame below
   emitGetVirtualRegister(callee, X86::ecx);
-  __ cmpl_ir_force32(asInteger(JSImmediate::impossibleValue()), X86::ecx);
-  JmpDst addressOfLinkedFunctionCheck = __ label();
-  addSlowCase(__ jne());
-  ASSERT(X86Assembler::getDifferenceBetweenLabels(addressOfLinkedFunctionCheck,
-                                                  __ label()) ==
-         repatchOffsetOpCallCall);
+  DataLabelPtr addressOfLinkedFunctionCheck;
+  Jump jumpToSlow = jnePtrWithRepatch(X86::ecx, addressOfLinkedFunctionCheck,
+                                      ImmPtr(JSImmediate::impossibleValue()));
+  addSlowCase(jumpToSlow);
+  ASSERT(differenceBetween(addressOfLinkedFunctionCheck, jumpToSlow) ==
+         repatchOffsetOpCallCompareToJump);
   m_callStructureStubCompilationInfo[callLinkInfoIndex].hotPathBegin =
       addressOfLinkedFunctionCheck;
 
@@ -275,40 +269,41 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   // Fast version of stack frame initialization, directly relative to edi.
   // Note that this omits to set up RegisterFile::CodeBlock, which is set in the
   // callee
-  __ movl_i32m(asInteger(noValue()),
-               (registerOffset + RegisterFile::OptionalCalleeArguments) *
-                   static_cast<int>(sizeof(Register)),
-               X86::edi);
-  __ movl_rm(X86::ecx, (registerOffset + RegisterFile::Callee) *
-                           static_cast<int>(sizeof(Register)),
-             X86::edi);
-  __ movl_mr(
-      FIELD_OFFSET(JSFunction, m_scopeChain) + FIELD_OFFSET(ScopeChain, m_node),
-      X86::ecx, X86::edx);  // newScopeChain
-  __ movl_i32m(argCount, (registerOffset + RegisterFile::ArgumentCount) *
-                             static_cast<int>(sizeof(Register)),
-               X86::edi);
-  __ movl_rm(X86::edi, (registerOffset + RegisterFile::CallerFrame) *
-                           static_cast<int>(sizeof(Register)),
-             X86::edi);
-  __ movl_rm(X86::edx, (registerOffset + RegisterFile::ScopeChain) *
-                           static_cast<int>(sizeof(Register)),
-             X86::edi);
-  __ addl_ir(registerOffset * sizeof(Register), X86::edi);
+  storePtr(ImmPtr(noValue()),
+           Address(callFrameRegister,
+                   (registerOffset + RegisterFile::OptionalCalleeArguments) *
+                       static_cast<int>(sizeof(Register))));
+  storePtr(X86::ecx,
+           Address(callFrameRegister, (registerOffset + RegisterFile::Callee) *
+                                          static_cast<int>(sizeof(Register))));
+  loadPtr(Address(X86::ecx, FIELD_OFFSET(JSFunction, m_scopeChain) +
+                                FIELD_OFFSET(ScopeChain, m_node)),
+          X86::edx);  // newScopeChain
+  store32(Imm32(argCount),
+          Address(callFrameRegister,
+                  (registerOffset + RegisterFile::ArgumentCount) *
+                      static_cast<int>(sizeof(Register))));
+  storePtr(
+      callFrameRegister,
+      Address(callFrameRegister, (registerOffset + RegisterFile::CallerFrame) *
+                                     static_cast<int>(sizeof(Register))));
+  storePtr(X86::edx, Address(callFrameRegister,
+                             (registerOffset + RegisterFile::ScopeChain) *
+                                 static_cast<int>(sizeof(Register))));
+  addPtr(Imm32(registerOffset * sizeof(Register)), callFrameRegister);
 
   // Call to the callee
   m_callStructureStubCompilationInfo[callLinkInfoIndex].hotPathOther =
       emitNakedCall(reinterpret_cast<void*>(unreachable));
 
   if (opcodeID == op_call_eval)
-    __ link(wasEval, __ label());
+    wasEval.link(this);
 
   // Put the return value in dst. In the interpreter, op_ret does this.
   emitPutVirtualRegister(dst);
 
 #if ENABLE(CODEBLOCK_SAMPLING)
-  __ movl_i32m(reinterpret_cast<unsigned>(m_codeBlock),
-               m_interpreter->sampler()->codeBlockSlot());
+  storePtr(ImmPtr(m_codeBlock), m_interpreter->sampler()->codeBlockSlot());
 #endif
 }
 
@@ -330,11 +325,9 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
     compileOpConstructSetupArgs(instruction);
 
   // Fast check for JS function.
-  __ testl_i32r(JSImmediate::TagMask, X86::ecx);
-  JmpSrc callLinkFailNotObject = __ jne();
-  __ cmpl_im(reinterpret_cast<unsigned>(m_interpreter->m_jsFunctionVptr), 0,
-             X86::ecx);
-  JmpSrc callLinkFailNotJSFunction = __ jne();
+  Jump callLinkFailNotObject = jnz32(X86::ecx, Imm32(JSImmediate::TagMask));
+  Jump callLinkFailNotJSFunction =
+      jnePtr(Address(X86::ecx), ImmPtr(m_interpreter->m_jsFunctionVptr));
 
   // First, in the case of a construct, allocate the new object.
   if (opcodeID == op_construct) {
@@ -344,23 +337,27 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
     emitGetVirtualRegister(callee, X86::ecx);
   }
 
-  __ movl_i32r(argCount, X86::edx);
+  move(Imm32(argCount), X86::edx);
 
   // Speculatively roll the callframe, assuming argCount will match the arity.
-  __ movl_rm(X86::edi, (RegisterFile::CallerFrame + registerOffset) *
-                           static_cast<int>(sizeof(Register)),
-             X86::edi);
-  __ addl_ir(registerOffset * static_cast<int>(sizeof(Register)), X86::edi);
+  storePtr(
+      callFrameRegister,
+      Address(callFrameRegister, (RegisterFile::CallerFrame + registerOffset) *
+                                     static_cast<int>(sizeof(Register))));
+  addPtr(Imm32(registerOffset * static_cast<int>(sizeof(Register))),
+         callFrameRegister);
 
   m_callStructureStubCompilationInfo[callLinkInfoIndex].callReturnLocation =
       emitNakedCall(m_interpreter->m_ctiVirtualCallPreLink);
 
-  JmpSrc storeResultForFirstRun = __ jmp();
+  Jump storeResultForFirstRun = jump();
 
+  // FIXME: this label can be removed, since it is a fixed offset from
+  // 'callReturnLocation'.
   // This is the address for the cold path *after* the first run (which tries to
   // link the call).
   m_callStructureStubCompilationInfo[callLinkInfoIndex].coldPathOther =
-      __ label();
+      Label(this);
 
   // The arguments have been set up on the hot path for op_call_eval
   if (opcodeID == op_call)
@@ -369,24 +366,21 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
     compileOpConstructSetupArgs(instruction);
 
   // Check for JSFunctions.
-  __ testl_i32r(JSImmediate::TagMask, X86::ecx);
-  JmpSrc isNotObject = __ jne();
-  __ cmpl_im(reinterpret_cast<unsigned>(m_interpreter->m_jsFunctionVptr), 0,
-             X86::ecx);
-  JmpSrc isJSFunction = __ je();
+  Jump isNotObject = jnzPtr(X86::ecx, Imm32(JSImmediate::TagMask));
+  Jump isJSFunction =
+      jePtr(Address(X86::ecx), ImmPtr(m_interpreter->m_jsFunctionVptr));
 
   // This handles host functions
-  JmpDst notJSFunctionlabel = __ label();
-  __ link(isNotObject, notJSFunctionlabel);
-  __ link(callLinkFailNotObject, notJSFunctionlabel);
-  __ link(callLinkFailNotJSFunction, notJSFunctionlabel);
+  isNotObject.link(this);
+  callLinkFailNotObject.link(this);
+  callLinkFailNotJSFunction.link(this);
   emitCTICall(((opcodeID == op_construct)
                    ? Interpreter::cti_op_construct_NotJSConstruct
                    : Interpreter::cti_op_call_NotJSFunction));
-  JmpSrc wasNotJSFunction = __ jmp();
+  Jump wasNotJSFunction = jump();
 
   // Next, handle JSFunctions...
-  __ link(isJSFunction, __ label());
+  isJSFunction.link(this);
 
   // First, in the case of a construct, allocate the new object.
   if (opcodeID == op_construct) {
@@ -397,23 +391,23 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
   }
 
   // Speculatively roll the callframe, assuming argCount will match the arity.
-  __ movl_rm(X86::edi, (RegisterFile::CallerFrame + registerOffset) *
-                           static_cast<int>(sizeof(Register)),
-             X86::edi);
-  __ addl_ir(registerOffset * static_cast<int>(sizeof(Register)), X86::edi);
-  __ movl_i32r(argCount, X86::edx);
+  storePtr(
+      callFrameRegister,
+      Address(callFrameRegister, (RegisterFile::CallerFrame + registerOffset) *
+                                     static_cast<int>(sizeof(Register))));
+  addPtr(Imm32(registerOffset * static_cast<int>(sizeof(Register))),
+         callFrameRegister);
+  move(Imm32(argCount), X86::edx);
 
   emitNakedCall(m_interpreter->m_ctiVirtualCall);
 
   // Put the return value in dst. In the interpreter, op_ret does this.
-  JmpDst storeResult = __ label();
-  __ link(wasNotJSFunction, storeResult);
-  __ link(storeResultForFirstRun, storeResult);
+  wasNotJSFunction.link(this);
+  storeResultForFirstRun.link(this);
   emitPutVirtualRegister(dst);
 
 #if ENABLE(CODEBLOCK_SAMPLING)
-  __ movl_i32m(reinterpret_cast<unsigned>(m_codeBlock),
-               m_interpreter->sampler()->codeBlockSlot());
+  storePtr(ImmPtr(m_codeBlock), m_interpreter->sampler()->codeBlockSlot());
 #endif
 }
 

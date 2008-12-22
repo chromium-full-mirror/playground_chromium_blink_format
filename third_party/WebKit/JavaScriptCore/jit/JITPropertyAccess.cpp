@@ -134,7 +134,7 @@ void JIT::compileGetByIdHotPath(int resultVReg,
 
   loadPtr(Address(X86::eax, FIELD_OFFSET(JSObject, m_propertyStorage)),
           X86::eax);
-  DataLabel32 displacementLabel = loadPtrWithAddressRepatch(
+  DataLabel32 displacementLabel = loadPtrWithAddressOffsetRepatch(
       Address(X86::eax, repatchGetByIdDefaultOffset), X86::eax);
   ASSERT(differenceBetween(hotPathBegin, displacementLabel) ==
          repatchOffsetGetByIdPropertyMapOffset);
@@ -167,7 +167,7 @@ void JIT::compileGetByIdSlowCase(int resultVReg,
   Label coldPathBegin(this);
 #endif
   emitPutJITStubArg(X86::eax, 1);
-  emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 2);
+  emitPutJITStubArgConstant(ident, 2);
   Jump call = emitCTICall(Interpreter::cti_op_get_by_id);
   emitPutVirtualRegister(resultVReg);
 
@@ -213,7 +213,7 @@ void JIT::compilePutByIdHotPath(int baseVReg,
   // this later, if it is to be used.
   loadPtr(Address(X86::eax, FIELD_OFFSET(JSObject, m_propertyStorage)),
           X86::eax);
-  DataLabel32 displacementLabel = storePtrWithAddressRepatch(
+  DataLabel32 displacementLabel = storePtrWithAddressOffsetRepatch(
       X86::edx, Address(X86::eax, repatchGetByIdDefaultOffset));
   ASSERT(differenceBetween(hotPathBegin, displacementLabel) ==
          repatchOffsetPutByIdPropertyMapOffset);
@@ -227,7 +227,7 @@ void JIT::compilePutByIdSlowCase(int baseVReg,
   linkSlowCaseIfNotJSCell(iter, baseVReg);
   linkSlowCase(iter);
 
-  emitPutJITStubArgConstant(reinterpret_cast<unsigned>(ident), 2);
+  emitPutJITStubArgConstant(ident, 2);
   emitPutJITStubArg(X86::eax, 1);
   emitPutJITStubArg(X86::edx, 3);
   Jump call = emitCTICall(Interpreter::cti_op_put_by_id);
@@ -238,17 +238,11 @@ void JIT::compilePutByIdSlowCase(int baseVReg,
       .callReturnLocation = call;
 }
 
-struct JsObjectJSValue {
-  JSObject* obj;
-  JSValue* val;
-};
-static JsObjectJSValue resizePropertyStorage(JSObject* baseObject,
-                                             JSValue* valueBeingPut,
-                                             size_t oldSize,
-                                             size_t newSize) {
-  baseObject->allocatePropertyStorageInline(oldSize, newSize);
-  JsObjectJSValue objVal = {baseObject, valueBeingPut};
-  return objVal;
+static JSValue* resizePropertyStorage(JSObject* baseObject,
+                                      int32_t oldSize,
+                                      int32_t newSize) {
+  baseObject->allocatePropertyStorage(oldSize, newSize);
+  return baseObject;
 }
 
 static inline bool transitionWillNeedStorageRealloc(Structure* oldStructure,
@@ -305,12 +299,21 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
 
   // emit a call only if storage realloc is needed
   if (transitionWillNeedStorageRealloc(oldStructure, newStructure)) {
+    pop(X86::ebx);
+#if PLATFORM(X86_64)
+    move(Imm32(newStructure->propertyStorageCapacity()), X86::edx);
+    move(Imm32(oldStructure->propertyStorageCapacity()), X86::esi);
+    move(X86::eax, X86::edi);
+    callTarget = call();
+#else
     push(Imm32(newStructure->propertyStorageCapacity()));
     push(Imm32(oldStructure->propertyStorageCapacity()));
-    push(X86::edx);
     push(X86::eax);
     callTarget = call();
-    addPtr(Imm32(4 * sizeof(void*)), X86::esp);
+    addPtr(Imm32(3 * sizeof(void*)), X86::esp);
+#endif
+    emitGetJITStubArg(3, X86::edx);
+    push(X86::ebx);
   }
 
   // Assumes m_refCount can be decremented easily, refcount decrement is safe as
@@ -499,8 +502,14 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
 
   // Check the prototype object's Structure had not changed.
   Structure** prototypeStructureAddress = &(protoObject->m_structure);
+#if PLATFORM(X86_64)
+  move(ImmPtr(prototypeStructure), X86::ebx);
+  Jump failureCases2 =
+      jnePtr(X86::ebx, AbsoluteAddress(prototypeStructureAddress));
+#else
   Jump failureCases2 = jnePtr(AbsoluteAddress(prototypeStructureAddress),
                               ImmPtr(prototypeStructure));
+#endif
 
   // Checks out okay! - getDirectOffset
   loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValue*)), X86::eax);
@@ -637,8 +646,14 @@ void JIT::privateCompileGetByIdProtoList(
 
   // Check the prototype object's Structure had not changed.
   Structure** prototypeStructureAddress = &(protoObject->m_structure);
+#if PLATFORM(X86_64)
+  move(ImmPtr(prototypeStructure), X86::ebx);
+  Jump failureCases2 =
+      jnePtr(X86::ebx, AbsoluteAddress(prototypeStructureAddress));
+#else
   Jump failureCases2 = jnePtr(AbsoluteAddress(prototypeStructureAddress),
                               ImmPtr(prototypeStructure));
+#endif
 
   // Checks out okay! - getDirectOffset
   loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValue*)), X86::eax);
@@ -699,8 +714,14 @@ void JIT::privateCompileGetByIdChainList(
 
     // Check the prototype object's Structure had not changed.
     Structure** prototypeStructureAddress = &(protoObject->m_structure);
+#if PLATFORM(X86_64)
+    move(ImmPtr(currStructure), X86::ebx);
+    bucketsOfFail.append(
+        jnePtr(X86::ebx, AbsoluteAddress(prototypeStructureAddress)));
+#else
     bucketsOfFail.append(jnePtr(AbsoluteAddress(prototypeStructureAddress),
                                 ImmPtr(currStructure)));
+#endif
   }
   ASSERT(protoObject);
 
@@ -767,8 +788,14 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
 
     // Check the prototype object's Structure had not changed.
     Structure** prototypeStructureAddress = &(protoObject->m_structure);
+#if PLATFORM(X86_64)
+    move(ImmPtr(currStructure), X86::ebx);
+    bucketsOfFail.append(
+        jnePtr(X86::ebx, AbsoluteAddress(prototypeStructureAddress)));
+#else
     bucketsOfFail.append(jnePtr(AbsoluteAddress(prototypeStructureAddress),
                                 ImmPtr(currStructure)));
+#endif
   }
   ASSERT(protoObject);
 
@@ -819,8 +846,14 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
 
     // Check the prototype object's Structure had not changed.
     Structure** prototypeStructureAddress = &(protoObject->m_structure);
+#if PLATFORM(X86_64)
+    move(ImmPtr(currStructure), X86::ebx);
+    bucketsOfFail.append(
+        jnePtr(X86::ebx, AbsoluteAddress(prototypeStructureAddress)));
+#else
     bucketsOfFail.append(jnePtr(AbsoluteAddress(prototypeStructureAddress),
                                 ImmPtr(currStructure)));
+#endif
   }
   ASSERT(protoObject);
 
