@@ -68,6 +68,10 @@ const KURL& WorkerContext::virtualURL() const {
   return m_url;
 }
 
+KURL WorkerContext::virtualCompleteURL(const String& url) const {
+  return completeURL(url);
+}
+
 KURL WorkerContext::completeURL(const String& url) const {
   // Always return a null URL when passed a null string.
   // FIXME: Should we change the KURL constructor to have this behavior?

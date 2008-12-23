@@ -32,7 +32,6 @@
 #include "DocumentMarker.h"
 #include "HTMLCollection.h"
 #include "HTMLFormElement.h"
-#include "KURL.h"
 #include "ScriptExecutionContext.h"
 #include "StringHash.h"
 #include "Timer.h"
@@ -928,6 +927,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                                            // ScriptExecutionContext to
                                            // implement it without a performance
                                            // loss for direct calls.
+  virtual KURL virtualCompleteURL(const String&)
+      const;  // Same as completeURL() for the same reason as above.
 
   CSSStyleSelector* m_styleSelector;
   bool m_didCalculateStyleSelector;
