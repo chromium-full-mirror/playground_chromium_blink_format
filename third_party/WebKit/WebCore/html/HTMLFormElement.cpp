@@ -206,10 +206,13 @@ PassRefPtr<FormData> HTMLFormElement::createFormData(const CString& boundary) {
               }
             }
 
-            if (!fileName.isEmpty()) {
-              m_formDataBuilder.addFilenameToMultiPartHeader(header, encoding,
-                                                             fileName);
+            // We have to include the filename=".." part in the header, even if
+            // the filename is empty
+            // Covered by LayoutTests/http/tests/misc/empty-file-formdata.html
+            m_formDataBuilder.addFilenameToMultiPartHeader(header, encoding,
+                                                           fileName);
 
+            if (!fileName.isEmpty()) {
               // FIXME: The MIMETypeRegistry function's name makes it sound like
               // it takes a path,
               // not just a basename. But filename is not the path. But note
