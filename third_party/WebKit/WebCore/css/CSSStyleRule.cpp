@@ -70,4 +70,9 @@ void CSSStyleRule::setDeclaration(
   m_style = style;
 }
 
+void CSSStyleRule::addSubresourceStyleURLs(ListHashSet<KURL>& urls) {
+  if (m_style)
+    m_style->addSubresourceStyleURLs(urls);
+}
+
 }  // namespace WebCore

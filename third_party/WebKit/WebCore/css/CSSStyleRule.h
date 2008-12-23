@@ -57,6 +57,8 @@ class CSSStyleRule : public CSSRule {
   const CSSSelectorList& selectorList() const { return m_selectorList; }
   CSSMutableStyleDeclaration* declaration() { return m_style.get(); }
 
+  virtual void addSubresourceStyleURLs(ListHashSet<KURL>& urls);
+
  private:
   CSSStyleRule(CSSStyleSheet* parent);
 

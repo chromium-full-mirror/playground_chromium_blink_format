@@ -52,6 +52,8 @@ class CSSImportRule : public CSSRule, private CachedResourceClient {
   // Not part of the CSSOM
   bool isLoading() const;
 
+  virtual void addSubresourceStyleURLs(ListHashSet<KURL>& urls);
+
  private:
   CSSImportRule(CSSStyleSheet* parent,
                 const String& href,

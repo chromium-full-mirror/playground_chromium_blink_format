@@ -24,7 +24,9 @@
 #include "CSSStyleDeclaration.h"
 #include "CSSPrimitiveValue.h"
 #include "CSSProperty.h"
+#include "KURLHash.h"
 #include "PlatformString.h"
+#include <wtf/ListHashSet.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -168,6 +170,8 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
   void setStrictParsing(bool b) { m_strictParsing = b; }
   bool useStrictParsing() const { return m_strictParsing; }
 
+  void addSubresourceStyleURLs(ListHashSet<KURL>&);
+
  protected:
   CSSMutableStyleDeclaration(CSSRule* parentRule);
 
@@ -196,6 +200,7 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
   Vector<CSSProperty>::iterator findPropertyWithId(int propertyId);
 
   Vector<CSSProperty> m_properties;
+
   Node* m_node;
   unsigned m_variableDependentValueCount : 24;
   bool m_strictParsing : 1;

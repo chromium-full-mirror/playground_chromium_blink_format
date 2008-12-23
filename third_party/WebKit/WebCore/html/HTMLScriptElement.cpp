@@ -165,6 +165,8 @@ String HTMLScriptElement::scriptContent() const {
 
 void HTMLScriptElement::addSubresourceAttributeURLs(
     ListHashSet<KURL>& urls) const {
+  HTMLElement::addSubresourceAttributeURLs(urls);
+
   addSubresourceURL(urls, src());
 }
 

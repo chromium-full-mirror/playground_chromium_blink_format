@@ -391,6 +391,8 @@ bool HTMLImageElement::complete() const {
 
 void HTMLImageElement::addSubresourceAttributeURLs(
     ListHashSet<KURL>& urls) const {
+  HTMLElement::addSubresourceAttributeURLs(urls);
+
   addSubresourceURL(urls, src());
   addSubresourceURL(urls, document()->completeURL(useMap()));
 }

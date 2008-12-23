@@ -43,6 +43,9 @@ class CSSBorderImageValue : public CSSValue {
 
   CSSValue* imageValue() const { return m_image.get(); }
 
+  virtual void addSubresourceStyleURLs(ListHashSet<KURL>&,
+                                       const CSSStyleSheet*);
+
   // The border image.
   RefPtr<CSSValue> m_image;
 

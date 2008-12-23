@@ -92,8 +92,8 @@ class CSSStyleSheet : public StyleSheet {
 
   bool loadCompleted() const { return m_loadCompleted; }
 
-  virtual void addSubresourceStyleURLs(ListHashSet<KURL>&,
-                                       const KURL& baseURL) const;
+  virtual KURL completeURL(const String& url) const;
+  virtual void addSubresourceStyleURLs(ListHashSet<KURL>&);
 
   void setStrictParsing(bool b) { m_strictParsing = b; }
   bool useStrictParsing() const { return m_strictParsing; }

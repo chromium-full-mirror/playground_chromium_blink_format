@@ -873,7 +873,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         if (m_strict || coords.size() == 0) {
           if (!uri.isNull())
             list->append(CSSCursorImageValue::create(
-                KURL(m_styleSheet->baseURL(), uri).string(), hotspot));
+                m_styleSheet->completeURL(uri), hotspot));
         }
         if ((m_strict && !value) ||
             (value &&
@@ -948,8 +948,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         // ### allow string in non strict mode?
         String uri = parseURL(value->string);
         if (!uri.isNull()) {
-          parsedValue = CSSImageValue::create(
-              KURL(m_styleSheet->baseURL(), uri).string());
+          parsedValue = CSSImageValue::create(m_styleSheet->completeURL(uri));
           m_valueList->next();
         }
       } else if (value->unit == CSSParserValue::Function &&
@@ -1185,8 +1184,7 @@ bool CSSParser::parseValue(int propId, bool important) {
           if (val->unit == CSSPrimitiveValue::CSS_URI) {
             String value = parseURL(val->string);
             parsedValue = CSSPrimitiveValue::create(
-                KURL(m_styleSheet->baseURL(), value).string(),
-                CSSPrimitiveValue::CSS_URI);
+                m_styleSheet->completeURL(value), CSSPrimitiveValue::CSS_URI);
           }
           if (!parsedValue)
             break;
@@ -2100,8 +2098,7 @@ bool CSSParser::parseContent(int propId, bool important) {
     if (val->unit == CSSPrimitiveValue::CSS_URI) {
       // url
       String value = parseURL(val->string);
-      parsedValue =
-          CSSImageValue::create(KURL(m_styleSheet->baseURL(), value).string());
+      parsedValue = CSSImageValue::create(m_styleSheet->completeURL(value));
     } else if (val->unit == CSSParserValue::Function) {
       // attr(X) | counter(X [,Y]) | counters(X, Y, [,Z]) |
       // -webkit-gradient(...)
@@ -2177,8 +2174,7 @@ bool CSSParser::parseFillImage(RefPtr<CSSValue>& value) {
   if (m_valueList->current()->unit == CSSPrimitiveValue::CSS_URI) {
     String uri = parseURL(m_valueList->current()->string);
     if (!uri.isNull())
-      value =
-          CSSImageValue::create(KURL(m_styleSheet->baseURL(), uri).string());
+      value = CSSImageValue::create(m_styleSheet->completeURL(uri));
     return true;
   }
 
@@ -3273,8 +3269,8 @@ bool CSSParser::parseFontFaceSrc() {
     RefPtr<CSSFontFaceSrcValue> parsedValue;
     if (val->unit == CSSPrimitiveValue::CSS_URI && !expectComma) {
       String value = parseURL(val->string);
-      parsedValue = CSSFontFaceSrcValue::create(
-          KURL(m_styleSheet->baseURL(), value).string());
+      parsedValue =
+          CSSFontFaceSrcValue::create(m_styleSheet->completeURL(value));
       uriValue = parsedValue;
       allowFormat = true;
       expectComma = true;
@@ -3918,8 +3914,7 @@ bool CSSParser::parseBorderImage(int propId,
     String uri = parseURL(val->string);
     if (uri.isNull())
       return false;
-    context.commitImage(
-        CSSImageValue::create(KURL(m_styleSheet->baseURL(), uri).string()));
+    context.commitImage(CSSImageValue::create(m_styleSheet->completeURL(uri)));
   } else if (val->unit == CSSParserValue::Function) {
     RefPtr<CSSValue> value;
     if ((equalIgnoringCase(val->function->name, "-webkit-gradient(") &&

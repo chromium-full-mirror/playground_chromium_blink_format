@@ -150,6 +150,8 @@ const QualifiedName& SVGImageElement::imageSourceAttributeName() const {
 
 void SVGImageElement::addSubresourceAttributeURLs(
     ListHashSet<KURL>& urls) const {
+  SVGStyledTransformableElement::addSubresourceAttributeURLs(urls);
+
   addSubresourceURL(urls, document()->completeURL(href()));
 }
 }

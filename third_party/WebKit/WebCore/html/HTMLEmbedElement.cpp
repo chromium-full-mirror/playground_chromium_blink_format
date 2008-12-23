@@ -236,6 +236,8 @@ void HTMLEmbedElement::setType(const String& value) {
 
 void HTMLEmbedElement::addSubresourceAttributeURLs(
     ListHashSet<KURL>& urls) const {
+  HTMLPlugInImageElement::addSubresourceAttributeURLs(urls);
+
   addSubresourceURL(urls, document()->completeURL(src()));
 }
 }

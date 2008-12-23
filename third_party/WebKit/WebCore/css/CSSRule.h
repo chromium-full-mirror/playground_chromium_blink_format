@@ -23,6 +23,8 @@
 #define CSSRule_h
 
 #include "CSSStyleSheet.h"
+#include "KURLHash.h"
+#include <wtf/ListHashSet.h>
 
 namespace WebCore {
 
@@ -52,6 +54,8 @@ class CSSRule : public StyleBase {
 
   virtual String cssText() const = 0;
   void setCssText(const String&, ExceptionCode&);
+
+  virtual void addSubresourceStyleURLs(ListHashSet<KURL>& urls) {}
 
  protected:
   CSSRule(CSSStyleSheet* parent) : StyleBase(parent) {}

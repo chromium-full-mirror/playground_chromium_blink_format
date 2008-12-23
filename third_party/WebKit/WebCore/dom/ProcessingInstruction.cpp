@@ -241,7 +241,7 @@ void ProcessingInstruction::addSubresourceAttributeURLs(
   if (!sheet())
     return;
 
-  addSubresourceURL(urls, document()->completeURL(sheet()->href()));
+  addSubresourceURL(urls, sheet()->baseURL());
 }
 
 void ProcessingInstruction::insertedIntoDocument() {

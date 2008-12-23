@@ -50,6 +50,9 @@ class CSSReflectValue : public CSSValue {
 
   virtual String cssText() const;
 
+  virtual void addSubresourceStyleURLs(ListHashSet<KURL>&,
+                                       const CSSStyleSheet*);
+
  private:
   CSSReflectValue(CSSReflectionDirection direction,
                   PassRefPtr<CSSPrimitiveValue> offset,

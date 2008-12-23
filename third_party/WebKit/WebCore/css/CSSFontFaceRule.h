@@ -47,6 +47,8 @@ class CSSFontFaceRule : public CSSRule {
 
   void setDeclaration(PassRefPtr<CSSMutableStyleDeclaration>);
 
+  virtual void addSubresourceStyleURLs(ListHashSet<KURL>& urls);
+
  private:
   CSSFontFaceRule(CSSStyleSheet* parent);
 

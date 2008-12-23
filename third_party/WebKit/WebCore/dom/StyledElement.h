@@ -116,6 +116,8 @@ class StyledElement : public Element {
 
   virtual void copyNonAttributeProperties(const Element*);
 
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
+
  protected:
   // classAttributeChanged() exists to share code between
   // parseMappedAttribute (called via setAttribute()) and
