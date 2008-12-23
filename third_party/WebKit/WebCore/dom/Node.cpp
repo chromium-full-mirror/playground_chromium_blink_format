@@ -155,7 +155,16 @@ Node::Node(Document* doc, bool isElement, bool isContainer)
       m_inSubtreeMark(false),
       m_hasRareData(false),
       m_isElement(isElement),
-      m_isContainer(isContainer) {
+      m_isContainer(isContainer),
+      m_isStyleAttributeValid(true),
+      m_synchronizingStyleAttribute(false)
+#if ENABLE(SVG)
+      ,
+      m_areSVGAttributesValid(true),
+      m_synchronizingSVGAttributes(false)
+#endif
+      ,
+      m_parsingChildrenFinished(true) {
 #ifndef NDEBUG
   if (shouldIgnoreLeaks)
     ignoreSet.add(this);
