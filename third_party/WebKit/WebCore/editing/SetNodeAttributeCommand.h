@@ -43,7 +43,7 @@ class SetNodeAttributeCommand : public SimpleEditCommand {
  private:
   SetNodeAttributeCommand(PassRefPtr<Element>,
                           const QualifiedName& attribute,
-                          const String& value);
+                          const AtomicString& value);
 
   virtual void doApply();
   virtual void doUnapply();

@@ -82,8 +82,8 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   void calculateEndingPosition();
   void calculateTypingStyleAfterDelete();
   void clearTransientState();
-  virtual void removeNode(Node*);
-  virtual void deleteTextFromNode(Text*, int, int);
+  virtual void removeNode(PassRefPtr<Node>);
+  virtual void deleteTextFromNode(PassRefPtr<Text>, unsigned, unsigned);
 
   bool m_hasSelectionToDelete;
   bool m_smartDelete;

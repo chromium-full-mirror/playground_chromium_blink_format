@@ -114,7 +114,7 @@ class Node : public TreeShared<Node> {
   virtual void setNodeValue(const String&, ExceptionCode&);
   virtual NodeType nodeType() const = 0;
   Node* parentNode() const { return parent(); }
-  Node* parentElement() const { return parent(); }  // IE extension
+  Element* parentElement() const;
   Node* previousSibling() const { return m_previous; }
   Node* nextSibling() const { return m_next; }
   virtual PassRefPtr<NodeList> childNodes();

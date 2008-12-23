@@ -29,9 +29,14 @@
 #include "CharacterNames.h"
 #include "Document.h"
 #include "EditingText.h"
-#include "HTMLElement.h"
+#include "HTMLBRElement.h"
+#include "HTMLDivElement.h"
+#include "HTMLElementFactory.h"
 #include "HTMLInterchange.h"
+#include "HTMLLIElement.h"
 #include "HTMLNames.h"
+#include "HTMLOListElement.h"
+#include "HTMLUListElement.h"
 #include "PositionIterator.h"
 #include "RenderObject.h"
 #include "RegularExpression.h"
@@ -295,7 +300,7 @@ bool isBlock(const Node* node) {
 // the only one responsible for
 // knowing about these kinds of special cases.
 Node* enclosingBlock(Node* node) {
-  return enclosingNodeOfType(Position(node, 0), &isBlock);
+  return static_cast<Element*>(enclosingNodeOfType(Position(node, 0), isBlock));
 }
 
 Position rangeCompliantEquivalent(const Position& pos) {
@@ -610,7 +615,7 @@ Node* highestEnclosingNodeOfType(const Position& p,
 }
 
 Node* enclosingTableCell(const Position& p) {
-  return enclosingNodeOfType(p, &isTableCell);
+  return static_cast<Element*>(enclosingNodeOfType(p, isTableCell));
 }
 
 Node* enclosingAnchorElement(const Position& p) {
@@ -623,7 +628,7 @@ Node* enclosingAnchorElement(const Position& p) {
   return node;
 }
 
-Node* enclosingList(Node* node) {
+HTMLElement* enclosingList(Node* node) {
   if (!node)
     return 0;
 
@@ -631,7 +636,7 @@ Node* enclosingList(Node* node) {
 
   for (Node* n = node->parentNode(); n; n = n->parentNode()) {
     if (n->hasTagName(ulTag) || n->hasTagName(olTag))
-      return n;
+      return static_cast<HTMLElement*>(n);
     if (n == root)
       return 0;
   }
@@ -659,11 +664,11 @@ Node* enclosingListChild(Node* node) {
   return 0;
 }
 
-static Node* embeddedSublist(Node* listItem) {
+static HTMLElement* embeddedSublist(Node* listItem) {
   // Check the DOM so that we'll find collapsed sublists without renderers.
   for (Node* n = listItem->firstChild(); n; n = n->nextSibling()) {
     if (isListElement(n))
-      return n;
+      return static_cast<HTMLElement*>(n);
   }
 
   return 0;
@@ -673,7 +678,7 @@ static Node* appendedSublist(Node* listItem) {
   // Check the DOM so that we'll find collapsed sublists without renderers.
   for (Node* n = listItem->nextSibling(); n; n = n->nextSibling()) {
     if (isListElement(n))
-      return n;
+      return static_cast<HTMLElement*>(n);
     if (n->renderer() && n->renderer()->isListItem())
       return 0;
   }
@@ -709,12 +714,13 @@ Node* outermostEnclosingListChild(Node* node) {
   return listNode;
 }
 
-Node* outermostEnclosingList(Node* node) {
-  Node* listNode = 0;
-  Node* nextNode = node;
-  while ((nextNode = enclosingList(nextNode)))
-    listNode = nextNode;
-  return listNode;
+HTMLElement* outermostEnclosingList(Node* node) {
+  HTMLElement* list = enclosingList(node);
+  if (!list)
+    return 0;
+  while (HTMLElement* nextList = enclosingList(list))
+    list = nextList;
+  return list;
 }
 
 Node* highestAncestor(Node* node) {
@@ -744,52 +750,30 @@ bool isTableCell(const Node* node) {
   return r->isTableCell();
 }
 
-PassRefPtr<Element> createDefaultParagraphElement(Document* document) {
-  ExceptionCode ec = 0;
-  RefPtr<Element> element =
-      document->createElementNS(xhtmlNamespaceURI, "div", ec);
-  ASSERT(ec == 0);
-  return element.release();
+PassRefPtr<HTMLElement> createDefaultParagraphElement(Document* document) {
+  return new HTMLDivElement(divTag, document);
 }
 
-PassRefPtr<Element> createBreakElement(Document* document) {
-  ExceptionCode ec = 0;
-  RefPtr<Element> breakNode =
-      document->createElementNS(xhtmlNamespaceURI, "br", ec);
-  ASSERT(ec == 0);
-  return breakNode.release();
+PassRefPtr<HTMLElement> createBreakElement(Document* document) {
+  return new HTMLBRElement(brTag, document);
 }
 
-PassRefPtr<Element> createOrderedListElement(Document* document) {
-  ExceptionCode ec = 0;
-  RefPtr<Element> element =
-      document->createElementNS(xhtmlNamespaceURI, "ol", ec);
-  ASSERT(ec == 0);
-  return element.release();
+PassRefPtr<HTMLElement> createOrderedListElement(Document* document) {
+  return new HTMLOListElement(olTag, document);
 }
 
-PassRefPtr<Element> createUnorderedListElement(Document* document) {
-  ExceptionCode ec = 0;
-  RefPtr<Element> element =
-      document->createElementNS(xhtmlNamespaceURI, "ul", ec);
-  ASSERT(ec == 0);
-  return element.release();
+PassRefPtr<HTMLElement> createUnorderedListElement(Document* document) {
+  return new HTMLUListElement(ulTag, document);
 }
 
-PassRefPtr<Element> createListItemElement(Document* document) {
-  ExceptionCode ec = 0;
-  RefPtr<Element> breakNode =
-      document->createElementNS(xhtmlNamespaceURI, "li", ec);
-  ASSERT(ec == 0);
-  return breakNode.release();
+PassRefPtr<HTMLElement> createListItemElement(Document* document) {
+  return new HTMLLIElement(liTag, document);
 }
 
-PassRefPtr<Element> createElement(Document* document, const String& tagName) {
-  ExceptionCode ec = 0;
-  RefPtr<Element> breakNode =
-      document->createElementNS(xhtmlNamespaceURI, tagName, ec);
-  ASSERT(ec == 0);
-  return breakNode.release();
+PassRefPtr<HTMLElement> createHTMLElement(Document* document,
+                                          const AtomicString& tagName) {
+  return HTMLElementFactory::createHTMLElement(
+      QualifiedName(nullAtom, tagName, xhtmlNamespaceURI), document, 0, false);
 }
 
 bool isTabSpanNode(const Node* node) {

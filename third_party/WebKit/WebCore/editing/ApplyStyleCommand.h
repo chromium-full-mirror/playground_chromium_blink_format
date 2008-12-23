@@ -56,7 +56,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
         new ApplyStyleCommand(document, style, start, end, action, level));
   }
   static PassRefPtr<ApplyStyleCommand> create(
-      Element* element,
+      PassRefPtr<Element> element,
       bool removeOnly = false,
       EditAction action = EditActionChangeAttributes) {
     return adoptRef(new ApplyStyleCommand(element, removeOnly, action));
@@ -73,7 +73,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
                     const Position& end,
                     EditAction,
                     EPropertyLevel);
-  ApplyStyleCommand(Element*, bool removeOnly, EditAction);
+  ApplyStyleCommand(PassRefPtr<Element>, bool removeOnly, EditAction);
 
   virtual void doApply();
   virtual EditAction editingAction() const;

@@ -35,21 +35,21 @@ class Text;
 class InsertIntoTextNodeCommand : public SimpleEditCommand {
  public:
   static PassRefPtr<InsertIntoTextNodeCommand> create(PassRefPtr<Text> node,
-                                                      int offset,
+                                                      unsigned offset,
                                                       const String& text) {
     return adoptRef(new InsertIntoTextNodeCommand(node, offset, text));
   }
 
  private:
   InsertIntoTextNodeCommand(PassRefPtr<Text> node,
-                            int offset,
+                            unsigned offset,
                             const String& text);
 
   virtual void doApply();
   virtual void doUnapply();
 
   RefPtr<Text> m_node;
-  int m_offset;
+  unsigned m_offset;
   String m_text;
 };
 

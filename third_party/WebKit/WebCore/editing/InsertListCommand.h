@@ -30,6 +30,8 @@
 
 namespace WebCore {
 
+class HTMLElement;
+
 class InsertListCommand : public CompositeEditCommand {
  public:
   enum Type { OrderedList, UnorderedList };
@@ -40,7 +42,7 @@ class InsertListCommand : public CompositeEditCommand {
     return adoptRef(new InsertListCommand(document, listType, listID));
   }
 
-  static PassRefPtr<Node> insertList(Document*, Type);
+  static PassRefPtr<HTMLElement> insertList(Document*, Type);
 
   virtual bool preservesTypingStyle() const { return true; }
 
@@ -50,9 +52,9 @@ class InsertListCommand : public CompositeEditCommand {
   virtual void doApply();
   virtual EditAction editingAction() const { return EditActionInsertList; }
 
-  Node* fixOrphanedListChild(Node*);
+  HTMLElement* fixOrphanedListChild(Node*);
   bool modifyRange();
-  RefPtr<Node> m_listElement;
+  RefPtr<HTMLElement> m_listElement;
   Type m_type;
   String m_id;
   bool m_forceCreateList;

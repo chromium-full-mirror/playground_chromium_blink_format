@@ -379,7 +379,7 @@ static void updatePositionForNodeRemoval(Node* node, Position& position) {
     position = positionBeforeNode(node);
 }
 
-void DeleteSelectionCommand::removeNode(Node* node) {
+void DeleteSelectionCommand::removeNode(PassRefPtr<Node> node) {
   if (!node)
     return;
 
@@ -409,7 +409,7 @@ void DeleteSelectionCommand::removeNode(Node* node) {
     }
   }
 
-  if (isTableStructureNode(node) || node == node->rootEditableElement()) {
+  if (isTableStructureNode(node.get()) || node == node->rootEditableElement()) {
     // Do not remove an element of table structure; remove its contents.
     // Likewise for the root editable element.
     Node* child = node->firstChild();
@@ -439,9 +439,9 @@ void DeleteSelectionCommand::removeNode(Node* node) {
     m_needPlaceholder = true;
 
   // FIXME: Update the endpoints of the range being deleted.
-  updatePositionForNodeRemoval(node, m_endingPosition);
-  updatePositionForNodeRemoval(node, m_leadingWhitespace);
-  updatePositionForNodeRemoval(node, m_trailingWhitespace);
+  updatePositionForNodeRemoval(node.get(), m_endingPosition);
+  updatePositionForNodeRemoval(node.get(), m_leadingWhitespace);
+  updatePositionForNodeRemoval(node.get(), m_trailingWhitespace);
 
   CompositeEditCommand::removeNode(node);
 }
@@ -458,13 +458,13 @@ void updatePositionForTextRemoval(Node* node,
   }
 }
 
-void DeleteSelectionCommand::deleteTextFromNode(Text* node,
-                                                int offset,
-                                                int count) {
+void DeleteSelectionCommand::deleteTextFromNode(PassRefPtr<Text> node,
+                                                unsigned offset,
+                                                unsigned count) {
   // FIXME: Update the endpoints of the range being deleted.
-  updatePositionForTextRemoval(node, offset, count, m_endingPosition);
-  updatePositionForTextRemoval(node, offset, count, m_leadingWhitespace);
-  updatePositionForTextRemoval(node, offset, count, m_trailingWhitespace);
+  updatePositionForTextRemoval(node.get(), offset, count, m_endingPosition);
+  updatePositionForTextRemoval(node.get(), offset, count, m_leadingWhitespace);
+  updatePositionForTextRemoval(node.get(), offset, count, m_trailingWhitespace);
 
   CompositeEditCommand::deleteTextFromNode(node, offset, count);
 }

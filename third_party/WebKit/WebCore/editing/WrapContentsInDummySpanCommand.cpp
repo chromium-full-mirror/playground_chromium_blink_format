@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,39 +38,42 @@ WrapContentsInDummySpanCommand::WrapContentsInDummySpanCommand(
 }
 
 void WrapContentsInDummySpanCommand::doApply() {
-  ASSERT(m_element);
+  Vector<RefPtr<Node>> children;
+  for (Node* child = m_element->firstChild(); child;
+       child = child->nextSibling())
+    children.append(child);
 
-  ExceptionCode ec = 0;
+  RefPtr<HTMLElement> span = createStyleSpanElement(document());
 
-  if (!m_dummySpan)
-    m_dummySpan =
-        static_pointer_cast<HTMLElement>(createStyleSpanElement(document()));
+  ExceptionCode ec;
 
-  while (m_element->firstChild()) {
-    m_dummySpan->appendChild(m_element->firstChild(), ec);
-    ASSERT(ec == 0);
-  }
+  size_t size = children.size();
+  for (size_t i = 0; i < size; ++i)
+    span->appendChild(children[i].release(), ec);
 
-  m_element->appendChild(m_dummySpan.get(), ec);
-  ASSERT(ec == 0);
+  m_element->appendChild(span.get(), ec);
+
+  m_dummySpan = span.release();
 }
 
 void WrapContentsInDummySpanCommand::doUnapply() {
   ASSERT(m_element);
-  ASSERT(m_dummySpan);
 
-  ASSERT(m_element->firstChild() == m_dummySpan);
-  ASSERT(!m_element->firstChild()->nextSibling());
+  RefPtr<HTMLElement> span = m_dummySpan.release();
+  if (!span)
+    return;
 
-  ExceptionCode ec = 0;
+  Vector<RefPtr<Node>> children;
+  for (Node* child = span->firstChild(); child; child = child->nextSibling())
+    children.append(child);
 
-  while (m_dummySpan->firstChild()) {
-    m_element->appendChild(m_dummySpan->firstChild(), ec);
-    ASSERT(ec == 0);
-  }
+  ExceptionCode ec;
 
-  m_element->removeChild(m_dummySpan.get(), ec);
-  ASSERT(ec == 0);
+  size_t size = children.size();
+  for (size_t i = 0; i < size; ++i)
+    m_element->appendChild(children[i].release(), ec);
+
+  span->remove(ec);
 }
 
 }  // namespace WebCore

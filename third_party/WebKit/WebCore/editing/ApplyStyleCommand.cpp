@@ -290,12 +290,9 @@ static PassRefPtr<Element> createFontElement(Document* document) {
 }
 
 PassRefPtr<HTMLElement> createStyleSpanElement(Document* document) {
-  ExceptionCode ec = 0;
-  RefPtr<Element> styleElement =
-      document->createElementNS(xhtmlNamespaceURI, "span", ec);
-  ASSERT(ec == 0);
+  RefPtr<HTMLElement> styleElement = new HTMLElement(spanTag, document);
   styleElement->setAttribute(classAttr, styleSpanClassString());
-  return static_pointer_cast<HTMLElement>(styleElement.release());
+  return styleElement.release();
 }
 
 ApplyStyleCommand::ApplyStyleCommand(Document* document,
@@ -328,7 +325,7 @@ ApplyStyleCommand::ApplyStyleCommand(Document* document,
       m_styledInlineElement(0),
       m_removeOnly(false) {}
 
-ApplyStyleCommand::ApplyStyleCommand(Element* element,
+ApplyStyleCommand::ApplyStyleCommand(PassRefPtr<Element> element,
                                      bool removeOnly,
                                      EditAction editingAction)
     : CompositeEditCommand(element->document()),
@@ -1096,7 +1093,7 @@ void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
   CSSMutableStyleDeclaration::const_iterator end = style->end();
   for (CSSMutableStyleDeclaration::const_iterator it = style->begin();
        it != end; ++it) {
-    int propertyID = (*it).id();
+    CSSPropertyID propertyID = static_cast<CSSPropertyID>((*it).id());
     RefPtr<CSSValue> value = decl->getPropertyCSSValue(propertyID);
     if (value &&
         (propertyID != CSSPropertyWhiteSpace || !isTabSpanNode(elem))) {
@@ -1710,8 +1707,7 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
   }
 
   if (m_styledInlineElement) {
-    RefPtr<Element> clonedElement =
-        static_pointer_cast<Element>(m_styledInlineElement->cloneNode(false));
+    RefPtr<Element> clonedElement = m_styledInlineElement->cloneElement();
     insertNodeBefore(clonedElement.get(), startNode);
     surroundNodeRangeWithElement(startNode, endNode, clonedElement.get());
   }

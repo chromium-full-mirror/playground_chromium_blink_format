@@ -33,18 +33,18 @@ namespace WebCore {
 class FormatBlockCommand : public CompositeEditCommand {
  public:
   static PassRefPtr<FormatBlockCommand> create(Document* document,
-                                               const String& tagName) {
+                                               const AtomicString& tagName) {
     return adoptRef(new FormatBlockCommand(document, tagName));
   }
 
  private:
-  FormatBlockCommand(Document*, const String& tagName);
+  FormatBlockCommand(Document*, const AtomicString& tagName);
 
   virtual void doApply();
   virtual EditAction editingAction() const { return EditActionFormatBlock; }
 
   bool modifyRange();
-  String m_tagName;
+  AtomicString m_tagName;
 };
 
 }  // namespace WebCore
