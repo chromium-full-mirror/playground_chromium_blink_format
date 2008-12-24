@@ -69,6 +69,17 @@ class TextCodecMac : public TextCodec {
   mutable TECObjectRef m_converterTEC;
 };
 
+struct TECConverterWrapper {
+  TECConverterWrapper() : converter(0), encoding(invalidEncoding) {}
+  ~TECConverterWrapper() {
+    if (converter)
+      TECDisposeConverter(converter);
+  }
+
+  TECObjectRef converter;
+  TECTextEncodingID encoding;
+};
+
 }  // namespace WebCore
 
 #endif  // TextCodecMac_h

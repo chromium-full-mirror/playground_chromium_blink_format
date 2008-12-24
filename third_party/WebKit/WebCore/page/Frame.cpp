@@ -119,7 +119,6 @@ Frame::Frame(Page* page,
                          ownerElement,
                          frameLoaderClient)) {
   AtomicString::init();
-  EventNames::init();
   HTMLNames::init();
   QualifiedName::init();
   MediaFeatureNames::init();
