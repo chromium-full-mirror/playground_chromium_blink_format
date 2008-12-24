@@ -148,6 +148,8 @@ void SVGImage::draw(GraphicsContext* context,
   context->scale(FloatSize(dstRect.width() / srcRect.width(),
                            dstRect.height() / srcRect.height()));
 
+  m_frame->view()->resize(size());
+
   if (m_frame->view()->needsLayout())
     m_frame->view()->layout();
   m_frame->view()->paint(context, enclosingIntRect(srcRect));
