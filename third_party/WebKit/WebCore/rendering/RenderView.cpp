@@ -172,9 +172,8 @@ void RenderView::paint(PaintInfo& paintInfo, int tx, int ty) {
 }
 
 static inline bool rendererObscuresBackground(RenderObject* object) {
-  // FIXME: this should test opacity too.
   return object && object->style()->visibility() == VISIBLE &&
-         !object->style()->hasTransform();
+         object->style()->opacity() == 1 && !object->style()->hasTransform();
 }
 
 void RenderView::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
