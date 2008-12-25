@@ -112,23 +112,6 @@ void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
   ApplicationCache* mainResourceCache =
       documentLoader->mainResourceApplicationCache();
 
-  // Check if the main resource is being loaded as part of navigation of the
-  // main frame
-  bool isMainFrame = frame->page()->mainFrame() == frame;
-
-  if (!isMainFrame) {
-    if (mainResourceCache &&
-        manifestURL != mainResourceCache->group()->manifestURL()) {
-      ApplicationCacheResource* resource =
-          mainResourceCache->resourceForURL(documentLoader->originalURL());
-      ASSERT(resource);
-
-      resource->addType(ApplicationCacheResource::Foreign);
-    }
-
-    return;
-  }
-
   if (mainResourceCache) {
     if (manifestURL == mainResourceCache->group()->m_manifestURL) {
       mainResourceCache->group()->associateDocumentLoaderWithCache(
@@ -211,9 +194,8 @@ void ApplicationCacheGroup::selectCacheWithoutManifestURL(Frame* frame) {
 
   ApplicationCache* mainResourceCache =
       documentLoader->mainResourceApplicationCache();
-  bool isMainFrame = frame->page()->mainFrame() == frame;
 
-  if (isMainFrame && mainResourceCache) {
+  if (mainResourceCache) {
     mainResourceCache->group()->associateDocumentLoaderWithCache(
         documentLoader, mainResourceCache);
     mainResourceCache->group()->update(frame);

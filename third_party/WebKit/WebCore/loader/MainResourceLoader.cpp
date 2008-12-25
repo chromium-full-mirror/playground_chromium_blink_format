@@ -471,14 +471,8 @@ bool MainResourceLoader::load(const ResourceRequest& r,
       frameLoader()->frame()->settings()->offlineWebApplicationCacheEnabled()) {
     ASSERT(!m_applicationCache);
 
-    if (Page* page = frameLoader()->frame()->page()) {
-      if (frameLoader()->frame() == page->mainFrame())
-        m_applicationCache = ApplicationCacheGroup::cacheForMainRequest(
-            r, m_documentLoader.get());
-      else
-        m_applicationCache =
-            frameLoader()->documentLoader()->topLevelApplicationCache();
-    }
+    m_applicationCache =
+        ApplicationCacheGroup::cacheForMainRequest(r, m_documentLoader.get());
 
     if (m_applicationCache) {
       // Get the resource from the application cache.
