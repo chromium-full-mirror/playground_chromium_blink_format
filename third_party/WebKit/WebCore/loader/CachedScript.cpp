@@ -111,7 +111,7 @@ void CachedScript::error() {
 void CachedScript::destroyDecodedData() {
   m_script = String();
   setDecodedSize(0);
-  if (!hasClients())
+  if (isSafeToMakePurgeable())
     makePurgeable(true);
 }
 

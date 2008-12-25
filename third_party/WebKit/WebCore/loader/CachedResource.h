@@ -213,6 +213,7 @@ class CachedResource {
   void didAccessDecodedData(double timeStamp);
 
   bool makePurgeable(bool purgeable);
+  bool isSafeToMakePurgeable() const;
 
   HashCountedSet<CachedResourceClient*> m_clients;
 
