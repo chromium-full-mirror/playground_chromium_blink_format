@@ -576,9 +576,6 @@ void ApplicationCacheGroup::checkIfLoadIsComplete() {
 
   m_cacheBeingUpdated->setManifestResource(m_manifestResource.release());
 
-  m_status = Idle;
-  m_frame = 0;
-
   Vector<RefPtr<DocumentLoader>> documentLoaders;
 
   if (isUpgradeAttempt) {
@@ -609,6 +606,9 @@ void ApplicationCacheGroup::checkIfLoadIsComplete() {
   callListeners(isUpgradeAttempt ? &DOMApplicationCache::callUpdateReadyListener
                                  : &DOMApplicationCache::callCachedListener,
                 documentLoaders);
+
+  m_status = Idle;
+  m_frame = 0;
 }
 
 void ApplicationCacheGroup::startLoadingEntry() {
