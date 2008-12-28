@@ -114,6 +114,9 @@ typedef void* (*ThreadFunction)(void* argument);
 
 // Returns 0 if thread creation failed
 ThreadIdentifier createThread(ThreadFunction, void*, const char* threadName);
+ThreadIdentifier createThreadInternal(ThreadFunction,
+                                      void*,
+                                      const char* threadName);
 
 ThreadIdentifier currentThread();
 bool isMainThread();

@@ -33,7 +33,7 @@
 namespace WTF {
 
 void initializeThreading() {}
-ThreadIdentifier createThread(ThreadFunction, void*, const char*) {
+ThreadIdentifier createThreadInternal(ThreadFunction, void*, const char*) {
   return 0;
 }
 int waitForThreadCompletion(ThreadIdentifier, void**) {

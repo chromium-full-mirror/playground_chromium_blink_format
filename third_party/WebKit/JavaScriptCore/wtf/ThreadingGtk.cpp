@@ -77,16 +77,6 @@ static HashMap<ThreadIdentifier, GThread*>& threadMap() {
   return map;
 }
 
-static ThreadIdentifier establishIdentifierForThread(GThread*& thread) {
-  MutexLocker locker(threadMapMutex());
-
-  static ThreadIdentifier identifierCount = 1;
-
-  threadMap().add(identifierCount, thread);
-
-  return identifierCount++;
-}
-
 static ThreadIdentifier identifierByGthreadHandle(GThread*& thread) {
   MutexLocker locker(threadMapMutex());
 
@@ -97,6 +87,18 @@ static ThreadIdentifier identifierByGthreadHandle(GThread*& thread) {
   }
 
   return 0;
+}
+
+static ThreadIdentifier establishIdentifierForThread(GThread*& thread) {
+  ASSERT(!identifierByGthreadHandle(thread));
+
+  MutexLocker locker(threadMapMutex());
+
+  static ThreadIdentifier identifierCount = 1;
+
+  threadMap().add(identifierCount, thread);
+
+  return identifierCount++;
 }
 
 static GThread* threadForIdentifier(ThreadIdentifier id) {
@@ -113,9 +115,9 @@ static void clearThreadForIdentifier(ThreadIdentifier id) {
   threadMap().remove(id);
 }
 
-ThreadIdentifier createThread(ThreadFunction entryPoint,
-                              void* data,
-                              const char*) {
+ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
+                                      void* data,
+                                      const char*) {
   GThread* thread;
   if (!(thread = g_thread_create(entryPoint, data, TRUE, 0))) {
     LOG_ERROR("Failed to create thread at entry point %p with data %p",
