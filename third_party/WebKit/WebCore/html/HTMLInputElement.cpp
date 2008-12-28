@@ -51,7 +51,7 @@
 #include "RenderImage.h"
 #include "RenderSlider.h"
 #include "RenderText.h"
-#include "RenderTextControl.h"
+#include "RenderTextControlSingleLine.h"
 #include "RenderTheme.h"
 #include "SelectionController.h"
 #include "TextBreakIterator.h"
@@ -736,7 +736,7 @@ RenderObject* HTMLInputElement::createRenderer(RenderArena* arena,
     case PASSWORD:
     case SEARCH:
     case TEXT:
-      return new (arena) RenderTextControl(this, false);
+      return new (arena) RenderTextControlSingleLine(this);
   }
   ASSERT(false);
   return 0;
@@ -1445,7 +1445,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
       (evt->isMouseEvent() || evt->isDragEvent() || evt->isWheelEvent() ||
        evt->type() == eventNames().blurEvent ||
        evt->type() == eventNames().focusEvent))
-    static_cast<RenderTextControl*>(renderer())->forwardEvent(evt);
+    static_cast<RenderTextControlSingleLine*>(renderer())->forwardEvent(evt);
 
   if (inputType() == RANGE && renderer()) {
     RenderSlider* slider = static_cast<RenderSlider*>(renderer());
@@ -1594,7 +1594,8 @@ void HTMLInputElement::updatePlaceholderVisibility(
   if ((oldPlaceholderShouldBeVisible != m_placeholderShouldBeVisible ||
        placeholderValueChanged) &&
       renderer())
-    static_cast<RenderTextControl*>(renderer())->updatePlaceholderVisibility();
+    static_cast<RenderTextControlSingleLine*>(renderer())
+        ->updatePlaceholderVisibility();
 }
 
 String HTMLInputElement::constrainValue(const String& proposedValue,
@@ -1622,13 +1623,14 @@ String HTMLInputElement::constrainValue(const String& proposedValue,
 void HTMLInputElement::addSearchResult() {
   ASSERT(isSearchField());
   if (renderer())
-    static_cast<RenderTextControl*>(renderer())->addSearchResult();
+    static_cast<RenderTextControlSingleLine*>(renderer())->addSearchResult();
 }
 
 void HTMLInputElement::onSearch() {
   ASSERT(isSearchField());
   if (renderer())
-    static_cast<RenderTextControl*>(renderer())->stopSearchEventTimer();
+    static_cast<RenderTextControlSingleLine*>(renderer())
+        ->stopSearchEventTimer();
   dispatchEventForType(eventNames().searchEvent, true, false);
 }
 
