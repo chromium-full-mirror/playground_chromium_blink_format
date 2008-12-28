@@ -29,6 +29,7 @@
 namespace WebCore {
 
 class JSDOMWindowShell;
+class ScriptExecutionContext;
 
 /* An action (either function or string) to be executed after a specified
  * time interval, either once or repeatedly. Used for window.setTimeout()
@@ -41,9 +42,11 @@ class ScheduledAction {
                   const JSC::ArgList&);
   ScheduledAction(const String& code) : m_code(code) {}
 
-  void execute(JSDOMWindowShell*);
+  void execute(ScriptExecutionContext*);
 
  private:
+  void execute(JSDOMWindowShell*);
+
   JSC::ProtectedPtr<JSC::JSValue> m_function;
   Vector<JSC::ProtectedPtr<JSC::JSValue>> m_args;
   String m_code;

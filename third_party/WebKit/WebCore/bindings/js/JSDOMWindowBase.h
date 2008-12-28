@@ -31,7 +31,6 @@
 namespace WebCore {
 
 class AtomicString;
-class DOMTimer;
 class DOMWindow;
 class Event;
 class Frame;
@@ -81,8 +80,6 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
                      int t,
                      bool singleShot);
   void removeTimeout(int timeoutId);
-
-  void timerFired(DOMTimer*);
 
   void clear();
 
