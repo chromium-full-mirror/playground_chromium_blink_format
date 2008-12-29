@@ -41,7 +41,7 @@
 #include "Settings.h"
 #include "TextControlInnerElements.h"
 
-using std::max;
+using namespace std;
 
 namespace WebCore {
 
@@ -54,7 +54,9 @@ RenderTextControlSingleLine::RenderTextControlSingleLine(Node* node)
       m_shouldDrawCapsLockIndicator(false),
       m_searchEventTimer(this,
                          &RenderTextControlSingleLine::searchEventTimerFired),
-      m_searchPopup(0) {}
+      m_searchPopup(0) {
+  ASSERT(node->hasTagName(inputTag));
+}
 
 RenderTextControlSingleLine::~RenderTextControlSingleLine() {
   if (m_searchPopup) {
@@ -507,7 +509,7 @@ void RenderTextControlSingleLine::updateFromElement() {
     innerTextElement()->setInnerText(element->getAttribute(placeholderAttr),
                                      ec);
     ASSERT(ec == 0);
-  } else if (!element->valueMatchesRenderer() ||
+  } else if (!formControlElement()->valueMatchesRenderer() ||
              placeholderVisibilityShouldChange)
     setInnerTextValue(element->value());
 
