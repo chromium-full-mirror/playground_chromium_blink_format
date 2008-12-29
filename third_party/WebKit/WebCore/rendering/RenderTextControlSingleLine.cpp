@@ -54,9 +54,7 @@ RenderTextControlSingleLine::RenderTextControlSingleLine(Node* node)
       m_shouldDrawCapsLockIndicator(false),
       m_searchEventTimer(this,
                          &RenderTextControlSingleLine::searchEventTimerFired),
-      m_searchPopup(0) {
-  ASSERT(node->hasTagName(inputTag));
-}
+      m_searchPopup(0) {}
 
 RenderTextControlSingleLine::~RenderTextControlSingleLine() {
   if (m_searchPopup) {
