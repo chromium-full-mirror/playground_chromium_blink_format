@@ -39,6 +39,7 @@ class Cache;
 class CachedResourceClient;
 class CachedResourceHandleBase;
 class DocLoader;
+class InspectorResource;
 class Request;
 class PurgeableBuffer;
 
@@ -50,6 +51,7 @@ class PurgeableBuffer;
 // resource from the network.
 class CachedResource {
   friend class Cache;
+  friend class InspectorResource;
 
  public:
   enum Type {
