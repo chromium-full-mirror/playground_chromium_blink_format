@@ -682,11 +682,12 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
       attach();
     }
     setChanged();
-  } else if (attr->name() == placeholderAttr)
-    updatePlaceholderVisibility(true);
-  else if (attr->name() == autosaveAttr || attr->name() == incrementalAttr ||
-           attr->name() == minAttr || attr->name() == maxAttr ||
-           attr->name() == multipleAttr || attr->name() == precisionAttr)
+  } else if (attr->name() == placeholderAttr) {
+    if (isTextField())
+      updatePlaceholderVisibility(true);
+  } else if (attr->name() == autosaveAttr || attr->name() == incrementalAttr ||
+             attr->name() == minAttr || attr->name() == maxAttr ||
+             attr->name() == multipleAttr || attr->name() == precisionAttr)
     setChanged();
   else
     HTMLFormControlElementWithState::parseMappedAttribute(attr);
