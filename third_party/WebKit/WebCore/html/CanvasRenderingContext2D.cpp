@@ -141,8 +141,6 @@ void CanvasRenderingContext2D::setStrokeStyle(PassRefPtr<CanvasStyle> style) {
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
-  if (!state().m_invertibleCTM)
-    return;
   state().m_strokeStyle->applyStrokeColor(c);
 }
 
@@ -164,8 +162,6 @@ void CanvasRenderingContext2D::setFillStyle(PassRefPtr<CanvasStyle> style) {
   state().m_fillStyle = style;
   GraphicsContext* c = drawingContext();
   if (!c)
-    return;
-  if (!state().m_invertibleCTM)
     return;
   state().m_fillStyle->applyFillColor(c);
 }
@@ -394,8 +390,6 @@ void CanvasRenderingContext2D::setTransform(float m11,
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
-  if (!state().m_invertibleCTM)
-    return;
 
   // HTML5 3.14.11.1 -- ignore any calls that pass non-finite numbers
   if (!isfinite(m11) | !isfinite(m21) | !isfinite(dx) | !isfinite(m12) |
@@ -410,6 +404,7 @@ void CanvasRenderingContext2D::setTransform(float m11,
   state().m_transform.multiply(ctm.inverse());
   m_path.transform(ctm);
 
+  state().m_invertibleCTM = true;
   transform(m11, m12, m21, m22, dx, dy);
 }
 
@@ -477,14 +472,10 @@ void CanvasRenderingContext2D::setFillColor(float c,
 }
 
 void CanvasRenderingContext2D::beginPath() {
-  if (!state().m_invertibleCTM)
-    return;
   m_path.clear();
 }
 
 void CanvasRenderingContext2D::closePath() {
-  if (!state().m_invertibleCTM)
-    return;
   m_path.closeSubpath();
 }
 
