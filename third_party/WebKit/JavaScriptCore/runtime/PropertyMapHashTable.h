@@ -22,6 +22,7 @@
 #define PropertyMapHashTable_h
 
 #include "UString.h"
+#include <wtf/Vector.h>
 
 namespace JSC {
 
@@ -53,6 +54,7 @@ struct PropertyMapHashTable {
   unsigned keyCount;
   unsigned deletedSentinelCount;
   unsigned lastIndexUsed;
+  Vector<unsigned>* deletedOffsets;
   unsigned entryIndices[1];
 
   PropertyMapEntry* entries() {

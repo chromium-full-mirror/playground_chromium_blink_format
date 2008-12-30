@@ -34,9 +34,6 @@
 #include "StructureTransitionTable.h"
 #include "TypeInfo.h"
 #include "UString.h"
-#include <wtf/HashFunctions.h>
-#include <wtf/HashTraits.h>
-#include <wtf/OwnArrayPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
@@ -120,8 +117,12 @@ class Structure : public RefCounted<Structure> {
   void growPropertyStorageCapacity();
   size_t propertyStorageCapacity() const { return m_propertyStorageCapacity; }
   size_t propertyStorageSize() const {
-    return m_propertyTable ? m_propertyTable->keyCount + m_deletedOffsets.size()
-                           : m_offset + 1;
+    return m_propertyTable
+               ? m_propertyTable->keyCount +
+                     (m_propertyTable->deletedOffsets
+                          ? m_propertyTable->deletedOffsets->size()
+                          : 0)
+               : m_offset + 1;
   }
 
   size_t get(const Identifier& propertyName);
@@ -186,7 +187,6 @@ class Structure : public RefCounted<Structure> {
   RefPtr<PropertyNameArrayData> m_cachedPropertyNameArrayData;
 
   PropertyMapHashTable* m_propertyTable;
-  Vector<unsigned> m_deletedOffsets;
 
   size_t m_propertyStorageCapacity;
   size_t m_offset;
