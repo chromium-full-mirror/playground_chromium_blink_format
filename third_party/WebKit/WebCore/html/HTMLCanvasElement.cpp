@@ -158,10 +158,14 @@ void HTMLCanvasElement::willDraw(const FloatRect& rect) {
         static_cast<float>(ro->height()) / static_cast<float>(m_size.height());
     FloatRect r(rect.x() * widthScale, rect.y() * heightScale,
                 rect.width() * widthScale, rect.height() * heightScale);
-    ro->repaintRectangle(enclosingIntRect(r));
 #else
-    ro->repaint();
+    FloatRect r(0, 0, ro->width(), ro->height());
 #endif
+    if (m_dirtyRect.contains(r))
+      return;
+
+    m_dirtyRect.unite(r);
+    ro->repaintRectangle(enclosingIntRect(m_dirtyRect));
   }
 
   if (m_observer)
@@ -202,6 +206,9 @@ void HTMLCanvasElement::reset() {
 }
 
 void HTMLCanvasElement::paint(GraphicsContext* context, const IntRect& r) {
+  // Clear the dirty rect
+  m_dirtyRect = FloatRect();
+
   if (context->paintingDisabled())
     return;
 
