@@ -66,6 +66,7 @@ Lexer::Lexer(JSGlobalData* globalData)
       m_position(0),
       m_code(0),
       m_length(0),
+      m_isReparsing(false),
       m_atLineStart(true),
       m_current(0),
       m_next1(0),
@@ -185,7 +186,7 @@ int Lexer::lex(void* p1, void* p2) {
           shift(1);
           m_state = InMultiLineComment;
         } else if (m_current == -1) {
-          if (!m_terminator && !m_delimited) {
+          if (!m_terminator && !m_delimited && !m_isReparsing) {
             // automatic semicolon insertion if program incomplete
             token = ';';
             m_stackToken = 0;
@@ -884,6 +885,8 @@ void Lexer::clear() {
   Vector<UChar> newBuffer16;
   newBuffer16.reserveCapacity(initialReadBufferCapacity);
   m_buffer16.swap(newBuffer16);
+
+  m_isReparsing = false;
 
   m_pattern = 0;
   m_flags = 0;
