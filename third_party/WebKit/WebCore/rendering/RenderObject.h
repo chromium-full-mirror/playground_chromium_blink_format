@@ -1003,6 +1003,9 @@ class RenderObject : public CachedResourceClient {
   bool hasReflection() const { return m_hasReflection; }
   IntRect reflectionBox() const;
   int reflectionOffset() const;
+  // Given a rect in the object's coordinate space, returns the corresponding
+  // rect in the reflection.
+  IntRect reflectedRect(const IntRect&) const;
 
   // Applied as a "slop" to dirty rect checks during the outline painting
   // phase's dirty-rect checks.
