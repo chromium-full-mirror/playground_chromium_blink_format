@@ -47,6 +47,7 @@ typedef struct _WebKitWebHistoryItemPrivate WebKitWebHistoryItemPrivate;
 struct _WebKitWebHistoryItem {
   GObject parent_instance;
 
+  /*< private >*/
   WebKitWebHistoryItemPrivate* priv;
 };
 
