@@ -2260,13 +2260,15 @@ class TryNode : public StatementNode {
   TryNode(JSGlobalData* globalData,
           StatementNode* tryBlock,
           const Identifier& exceptionIdent,
+          bool catchHasEval,
           StatementNode* catchBlock,
           StatementNode* finallyBlock) JSC_FAST_CALL
       : StatementNode(globalData),
         m_tryBlock(tryBlock),
         m_exceptionIdent(exceptionIdent),
         m_catchBlock(catchBlock),
-        m_finallyBlock(finallyBlock) {}
+        m_finallyBlock(finallyBlock),
+        m_catchHasEval(catchHasEval) {}
 
   virtual ~TryNode();
   virtual void releaseNodes(NodeReleaser&);
@@ -2279,6 +2281,7 @@ class TryNode : public StatementNode {
   Identifier m_exceptionIdent;
   RefPtr<StatementNode> m_catchBlock;
   RefPtr<StatementNode> m_finallyBlock;
+  bool m_catchHasEval;
 };
 
 class ParameterNode : public ParserRefCounted {
