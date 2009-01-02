@@ -530,13 +530,54 @@ class JIT : private MacroAssembler {
       X86Assembler::XMMRegisterID tempXmm,
       RegisterID tempReg1,
       RegisterID tempReg2);
+
+  void compileFastArith_op_add(Instruction*);
+  void compileFastArith_op_mul(Instruction*);
+  void compileFastArith_op_mod(unsigned result, unsigned op1, unsigned op2);
+  void compileFastArith_op_bitand(unsigned result, unsigned op1, unsigned op2);
+  void compileFastArith_op_lshift(unsigned result, unsigned op1, unsigned op2);
+  void compileFastArith_op_rshift(unsigned result, unsigned op1, unsigned op2);
+  void compileFastArith_op_pre_inc(unsigned srcDst);
+  void compileFastArith_op_pre_dec(unsigned srcDst);
+  void compileFastArith_op_post_inc(unsigned result, unsigned srcDst);
+  void compileFastArith_op_post_dec(unsigned result, unsigned srcDst);
+  void compileFastArithSlow_op_add(Instruction*,
+                                   Vector<SlowCaseEntry>::iterator&);
+  void compileFastArithSlow_op_mul(Instruction*,
+                                   Vector<SlowCaseEntry>::iterator&);
+  void compileFastArithSlow_op_mod(unsigned result,
+                                   unsigned op1,
+                                   unsigned op2,
+                                   Vector<SlowCaseEntry>::iterator&);
+  void compileFastArithSlow_op_bitand(unsigned result,
+                                      unsigned op1,
+                                      unsigned op2,
+                                      Vector<SlowCaseEntry>::iterator&);
+  void compileFastArithSlow_op_lshift(unsigned result,
+                                      unsigned op1,
+                                      unsigned op2,
+                                      Vector<SlowCaseEntry>::iterator&);
+  void compileFastArithSlow_op_rshift(unsigned result,
+                                      unsigned op1,
+                                      unsigned op2,
+                                      Vector<SlowCaseEntry>::iterator&);
+  void compileFastArithSlow_op_pre_inc(unsigned srcDst,
+                                       Vector<SlowCaseEntry>::iterator&);
+  void compileFastArithSlow_op_pre_dec(unsigned srcDst,
+                                       Vector<SlowCaseEntry>::iterator&);
+  void compileFastArithSlow_op_post_inc(unsigned result,
+                                        unsigned srcDst,
+                                        Vector<SlowCaseEntry>::iterator&);
+  void compileFastArithSlow_op_post_dec(unsigned result,
+                                        unsigned srcDst,
+                                        Vector<SlowCaseEntry>::iterator&);
   void compileBinaryArithOp(OpcodeID,
                             unsigned dst,
                             unsigned src1,
                             unsigned src2,
                             OperandTypes opi);
   void compileBinaryArithOpSlowCase(OpcodeID,
-                                    Vector<SlowCaseEntry>::iterator& iter,
+                                    Vector<SlowCaseEntry>::iterator&,
                                     unsigned dst,
                                     unsigned src1,
                                     unsigned src2,
@@ -572,7 +613,10 @@ class JIT : private MacroAssembler {
                                   RegisterID to);
 
   JSValue* getConstantImmediateNumericArg(unsigned src);
-  unsigned getDeTaggedConstantImmediate(JSValue* imm);
+  JSValue* getConstantOperand(unsigned src);
+  int32_t getConstantOperandImmediateInt(unsigned src);
+  bool isOperandConstantImmediateInt(unsigned src);
+  bool isOperandConstant31BitImmediateInt(unsigned src);
 
   Jump emitJumpIfJSCell(RegisterID);
   void emitJumpSlowCaseIfJSCell(RegisterID);
@@ -597,9 +641,7 @@ class JIT : private MacroAssembler {
   void emitFastArithDeTagImmediate(RegisterID);
   Jump emitFastArithDeTagImmediateJumpIfZero(RegisterID);
   void emitFastArithReTagImmediate(RegisterID);
-  void emitFastArithPotentiallyReTagImmediate(RegisterID);
   void emitFastArithImmToInt(RegisterID);
-  void emitFastArithIntToImmOrSlowCase(RegisterID);
   void emitFastArithIntToImmNoCheck(RegisterID);
 
   void emitTagAsBoolImmediate(RegisterID reg);
