@@ -30,6 +30,7 @@
 #include "FloatPoint.h"
 #include "FloatRect.h"
 #include "NotImplemented.h"
+#include "StrokeStyleApplier.h"
 
 #include <stdio.h>
 
@@ -88,6 +89,11 @@ FloatRect Path::boundingRect() const {
   }
 #endif
 
+  return FloatRect();
+}
+
+FloatRect Path::strokeBoundingRect(StrokeStyleApplier* applier) {
+  notImplemented();
   return FloatRect();
 }
 
