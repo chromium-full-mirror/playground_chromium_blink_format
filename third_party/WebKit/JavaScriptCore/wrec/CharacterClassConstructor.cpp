@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -169,7 +169,7 @@ void CharacterClassConstructor::put(UChar ch) {
           // we're going to scan along, updating the start of the range
           while (unicodeCurr <= hi) {
             // Spin forwards over any characters that don't have two cases.
-            for (; kjs_pcre_ucp_othercase(unicodeCurr) == -1; ++unicodeCurr) {
+            for (; jsc_pcre_ucp_othercase(unicodeCurr) == -1; ++unicodeCurr) {
               // if this was the last character in the range, we're done.
               if (unicodeCurr == hi)
                 return;
@@ -177,7 +177,7 @@ void CharacterClassConstructor::put(UChar ch) {
             // if we fall through to here, unicodeCurr <= hi & has another case.
             // Get the other case.
             UChar rangeStart = unicodeCurr;
-            UChar otherCurr = kjs_pcre_ucp_othercase(unicodeCurr);
+            UChar otherCurr = jsc_pcre_ucp_othercase(unicodeCurr);
 
             // If unicodeCurr is not yet hi, check the next char in the range.
             // If it also has another case,
@@ -187,7 +187,7 @@ void CharacterClassConstructor::put(UChar ch) {
             // range.
             while (
                 (unicodeCurr < hi) &&
-                (kjs_pcre_ucp_othercase(unicodeCurr + 1) == (otherCurr + 1))) {
+                (jsc_pcre_ucp_othercase(unicodeCurr + 1) == (otherCurr + 1))) {
               // increment unicodeCurr; it points to the end of the range.
               // increment otherCurr, due to the check above other for next must
               // be 1 greater than the currrent other value.
@@ -240,7 +240,7 @@ void CharacterClassConstructor::flush() {
     } else {
       addSorted(m_matchesUnicode, m_charBuffer);
       if (m_isCaseInsensitive) {
-        int other = kjs_pcre_ucp_othercase(m_charBuffer);
+        int other = jsc_pcre_ucp_othercase(m_charBuffer);
         if (other != -1)
           addSorted(m_matchesUnicode, other);
       }

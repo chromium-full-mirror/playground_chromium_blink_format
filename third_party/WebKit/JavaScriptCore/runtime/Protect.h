@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2004, 2008 Apple Inc. All rights reserved.
+ *  Copyright (C) 2004, 2008, 2009 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef protect_h
-#define protect_h
+#ifndef Protect_h
+#define Protect_h
 
 #include "JSCell.h"
 #include "Collector.h"
@@ -161,4 +161,4 @@ inline bool operator!=(const T* a, const ProtectedPtr<T>& b) {
 
 }  // namespace JSC
 
-#endif  // protect_h
+#endif  // Protect_h

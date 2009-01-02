@@ -6,7 +6,8 @@ needed by JavaScriptCore and the rest of WebKit.
 
                  Originally written by Philip Hazel
            Copyright (c) 1997-2006 University of Cambridge
-    Copyright (C) 2002, 2004, 2006, 2007 Apple Inc. All rights reserved.
+    Copyright (C) 2002, 2004, 2006, 2007, 2008, 2009 Apple Inc. All rights
+reserved.
     Copyright (C) 2007 Eric Seidel <eric@webkit.org>
 
 -----------------------------------------------------------------------------
@@ -255,7 +256,7 @@ static bool matchRef(int offset,
   if (md.ignoreCase) {
     while (length-- > 0) {
       UChar c = *p++;
-      int othercase = kjs_pcre_ucp_othercase(c);
+      int othercase = jsc_pcre_ucp_othercase(c);
       UChar d = *subjectPtr++;
       if (c != d && othercase != d)
         return false;
@@ -412,9 +413,9 @@ static inline void getUTF8CharAndIncrementLength(
     int& len) {
   c = *subjectPtr;
   if ((c & 0xc0) == 0xc0) {
-    int gcaa = kjs_pcre_utf8_table4[c & 0x3f]; /* Number of additional bytes */
+    int gcaa = jsc_pcre_utf8_table4[c & 0x3f]; /* Number of additional bytes */
     int gcss = 6 * gcaa;
-    c = (c & kjs_pcre_utf8_table3[gcaa]) << gcss;
+    c = (c & jsc_pcre_utf8_table3[gcaa]) << gcss;
     for (int gcii = 1; gcii <= gcaa; gcii++) {
       gcss -= 6;
       c |= (subjectPtr[gcii] & 0x3f) << gcss;
@@ -1174,7 +1175,7 @@ RECURSE:
         if (stack.currentFrame->args.subjectPtr >= md.endSubject)
           RRETURN_NO_MATCH;
         int c = *stack.currentFrame->args.subjectPtr++;
-        if (!kjs_pcre_xclass(c, stack.currentFrame->locals.data))
+        if (!jsc_pcre_xclass(c, stack.currentFrame->locals.data))
           RRETURN_NO_MATCH;
       }
 
@@ -1198,7 +1199,7 @@ RECURSE:
               stack.currentFrame->args.subjectPtr >= md.endSubject)
             RRETURN;
           int c = *stack.currentFrame->args.subjectPtr++;
-          if (!kjs_pcre_xclass(c, stack.currentFrame->locals.data))
+          if (!jsc_pcre_xclass(c, stack.currentFrame->locals.data))
             RRETURN;
         }
         /* Control never reaches here */
@@ -1213,7 +1214,7 @@ RECURSE:
           if (stack.currentFrame->args.subjectPtr >= md.endSubject)
             break;
           int c = *stack.currentFrame->args.subjectPtr;
-          if (!kjs_pcre_xclass(c, stack.currentFrame->locals.data))
+          if (!jsc_pcre_xclass(c, stack.currentFrame->locals.data))
             break;
           ++stack.currentFrame->args.subjectPtr;
         }
@@ -1261,7 +1262,7 @@ RECURSE:
           RRETURN_NO_MATCH;
         int dc = *stack.currentFrame->args.subjectPtr++;
         if (stack.currentFrame->locals.fc != dc &&
-            kjs_pcre_ucp_othercase(stack.currentFrame->locals.fc) != dc)
+            jsc_pcre_ucp_othercase(stack.currentFrame->locals.fc) != dc)
           RRETURN_NO_MATCH;
         NEXT_OPCODE;
       }
@@ -1335,7 +1336,7 @@ RECURSE:
       if (stack.currentFrame->locals.fc <= 0xFFFF) {
         int othercase =
             md.ignoreCase
-                ? kjs_pcre_ucp_othercase(stack.currentFrame->locals.fc)
+                ? jsc_pcre_ucp_othercase(stack.currentFrame->locals.fc)
                 : -1;
 
         for (int i = 1; i <= min; i++) {
