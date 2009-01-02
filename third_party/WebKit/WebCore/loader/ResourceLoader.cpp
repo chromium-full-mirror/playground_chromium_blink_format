@@ -193,6 +193,19 @@ void ResourceLoader::clearResourceData() {
     m_resourceData->clear();
 }
 
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+bool ResourceLoader::scheduleLoadFallbackResourceFromApplicationCache(
+    ApplicationCache* cache) {
+  if (documentLoader()->scheduleLoadFallbackResourceFromApplicationCache(
+          this, m_request, cache)) {
+    handle()->cancel();
+    m_wasLoadedFromApplicationCache = true;
+    return true;
+  }
+  return false;
+}
+#endif
+
 void ResourceLoader::willSendRequest(ResourceRequest& request,
                                      const ResourceResponse& redirectResponse) {
   // Protect this in this delegate method since the additional processing can do
@@ -370,6 +383,13 @@ ResourceError ResourceLoader::cannotShowURLError() {
 void ResourceLoader::willSendRequest(ResourceHandle*,
                                      ResourceRequest& request,
                                      const ResourceResponse& redirectResponse) {
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  if (!redirectResponse.isNull() &&
+      !protocolHostAndPortAreEqual(request.url(), redirectResponse.url())) {
+    if (scheduleLoadFallbackResourceFromApplicationCache())
+      return;
+  }
+#endif
   willSendRequest(request, redirectResponse);
 }
 
@@ -381,6 +401,13 @@ void ResourceLoader::didSendData(ResourceHandle*,
 
 void ResourceLoader::didReceiveResponse(ResourceHandle*,
                                         const ResourceResponse& response) {
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  if (response.httpStatusCode() / 100 == 4 ||
+      response.httpStatusCode() / 100 == 5) {
+    if (scheduleLoadFallbackResourceFromApplicationCache())
+      return;
+  }
+#endif
   didReceiveResponse(response);
 }
 
@@ -396,6 +423,13 @@ void ResourceLoader::didFinishLoading(ResourceHandle*) {
 }
 
 void ResourceLoader::didFail(ResourceHandle*, const ResourceError& error) {
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  if (!error.isCancellation()) {
+    if (documentLoader()->scheduleLoadFallbackResourceFromApplicationCache(
+            this, m_request))
+      return;
+  }
+#endif
   didFail(error);
 }
 

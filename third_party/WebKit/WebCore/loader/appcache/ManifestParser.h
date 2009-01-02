@@ -28,10 +28,7 @@
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
 
-#include <wtf/HashMap.h>
-#include <wtf/HashSet.h>
-#include "StringHash.h"
-#include "PlatformString.h"
+#include "ApplicationCache.h"
 
 namespace WebCore {
 
@@ -40,7 +37,7 @@ class KURL;
 struct Manifest {
   HashSet<String> onlineWhitelistedURLs;
   HashSet<String> explicitURLs;
-  HashMap<String, String> fallbackURLs;
+  FallbackURLVector fallbackURLs;
 };
 
 bool parseManifest(const KURL& manifestURL,

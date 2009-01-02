@@ -294,6 +294,21 @@ void MainResourceLoader::continueAfterContentPolicy(PolicyAction policy) {
 }
 
 void MainResourceLoader::didReceiveResponse(const ResourceResponse& r) {
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  if (r.httpStatusCode() / 100 == 4 || r.httpStatusCode() / 100 == 5) {
+    ASSERT(!m_applicationCache);
+    if (m_frame->settings() &&
+        m_frame->settings()->offlineWebApplicationCacheEnabled()) {
+      m_applicationCache = ApplicationCacheGroup::fallbackCacheForMainRequest(
+          request(), documentLoader());
+
+      if (scheduleLoadFallbackResourceFromApplicationCache(
+              m_applicationCache.get()))
+        return;
+    }
+  }
+#endif
+
 // There is a bug in CFNetwork where callbacks can be dispatched even when loads
 // are deferred.
 // See <rdar://problem/6304600> for more details.
@@ -380,6 +395,21 @@ void MainResourceLoader::didFinishLoading() {
 }
 
 void MainResourceLoader::didFail(const ResourceError& error) {
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  if (!error.isCancellation()) {
+    ASSERT(!m_applicationCache);
+    if (m_frame->settings() &&
+        m_frame->settings()->offlineWebApplicationCacheEnabled()) {
+      m_applicationCache = ApplicationCacheGroup::fallbackCacheForMainRequest(
+          request(), documentLoader());
+
+      if (scheduleLoadFallbackResourceFromApplicationCache(
+              m_applicationCache.get()))
+        return;
+    }
+  }
+#endif
+
 // There is a bug in CFNetwork where callbacks can be dispatched even when loads
 // are deferred.
 // See <rdar://problem/6304600> for more details.
@@ -475,14 +505,13 @@ bool MainResourceLoader::load(const ResourceRequest& r,
         ApplicationCacheGroup::cacheForMainRequest(r, m_documentLoader.get());
 
     if (m_applicationCache) {
-      // Get the resource from the application cache.
-      // FIXME: If the resource does not exist, the load should fail.
-      if (ApplicationCacheResource* resource =
-              m_applicationCache->resourceForRequest(r)) {
-        m_substituteData =
-            SubstituteData(resource->data(), resource->response().mimeType(),
-                           resource->response().textEncodingName(), KURL());
-      }
+      // Get the resource from the application cache. By definition,
+      // cacheForMainRequest() returns a cache that contains the resource.
+      ApplicationCacheResource* resource =
+          m_applicationCache->resourceForRequest(r);
+      m_substituteData =
+          SubstituteData(resource->data(), resource->response().mimeType(),
+                         resource->response().textEncodingName(), KURL());
     }
   }
 #endif

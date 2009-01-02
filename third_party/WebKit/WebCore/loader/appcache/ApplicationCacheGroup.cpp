@@ -90,6 +90,22 @@ ApplicationCache* ApplicationCacheGroup::cacheForMainRequest(
   return 0;
 }
 
+ApplicationCache* ApplicationCacheGroup::fallbackCacheForMainRequest(
+    const ResourceRequest& request,
+    DocumentLoader* loader) {
+  if (!ApplicationCache::requestIsHTTPOrHTTPSGet(request))
+    return 0;
+
+  if (ApplicationCacheGroup* group =
+          cacheStorage().fallbackCacheGroupForURL(request.url())) {
+    ASSERT(group->newestCache());
+
+    return group->newestCache();
+  }
+
+  return 0;
+}
+
 void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
   ASSERT(frame && frame->page());
 
@@ -525,7 +541,13 @@ void ApplicationCacheGroup::didFinishLoadingManifest() {
        it != end; ++it)
     addEntry(*it, ApplicationCacheResource::Explicit);
 
+  size_t fallbackCount = manifest.fallbackURLs.size();
+  for (size_t i = 0; i < fallbackCount; ++i)
+    addEntry(manifest.fallbackURLs[i].second,
+             ApplicationCacheResource::Fallback);
+
   m_cacheBeingUpdated->setOnlineWhitelist(manifest.onlineWhitelistedURLs);
+  m_cacheBeingUpdated->setFallbackURLs(manifest.fallbackURLs);
 
   startLoadingEntry();
 }
