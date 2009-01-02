@@ -1040,9 +1040,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_usesFirstLineRules;
   bool m_usesFirstLetterRules;
   bool m_gotoAnchorNeededAfterStylesheetsLoad;
-
   bool m_isDNSPrefetchEnabled;
   bool m_haveExplicitlyDisabledDNSPrefetch;
+  bool m_frameElementsShouldIgnoreScrolling;
 
   String m_title;
   bool m_titleSetExplicitly;
@@ -1116,6 +1116,14 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   TextResourceDecoder* decoder() const { return m_decoder.get(); }
 
   UChar backslashAsCurrencySymbol() const;
+
+  // Quirk for the benefit of Apple's Dictionary application.
+  void setFrameElementsShouldIgnoreScrolling(bool ignore) {
+    m_frameElementsShouldIgnoreScrolling = ignore;
+  }
+  bool frameElementsShouldIgnoreScrolling() const {
+    return m_frameElementsShouldIgnoreScrolling;
+  }
 
 #if ENABLE(DASHBOARD_SUPPORT)
   void setDashboardRegionsDirty(bool f) { m_dashboardRegionsDirty = f; }
