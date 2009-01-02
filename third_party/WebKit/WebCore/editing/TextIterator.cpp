@@ -41,16 +41,12 @@
 #include "RenderTextControl.h"
 #include "visible_units.h"
 
-#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER)
-#define HAVE_ICU_SEARCH 1
-#endif
-
-#if HAVE(ICU_SEARCH)
+#if USE(ICU_UNICODE)
 #include <unicode/usearch.h>
 #endif
 
-using namespace std;
 using namespace WTF::Unicode;
+using namespace std;
 
 namespace WebCore {
 
@@ -77,7 +73,7 @@ class SearchBuffer : Noncopyable {
   size_t search(size_t& startOffset);
   bool atBreak() const;
 
-#if HAVE(ICU_SEARCH)
+#if USE(ICU_UNICODE)
 
  private:
   String m_target;
@@ -98,8 +94,6 @@ class SearchBuffer : Noncopyable {
   Vector<bool> m_isCharacterStartBuffer;
   bool m_isBufferFull;
   size_t m_cursor;
-
-  bool m_atBreak;
 
 #endif
 };
@@ -133,11 +127,11 @@ TextIterator::TextIterator(const Range* r,
 
   // get and validate the range endpoints
   Node* startContainer = r->startContainer();
+  if (!startContainer)
+    return;
   int startOffset = r->startOffset();
   Node* endContainer = r->endContainer();
   int endOffset = r->endOffset();
-  if (!startContainer)
-    return;
 
   // Callers should be handing us well-formed ranges. If we discover that this
   // isn't
@@ -372,7 +366,7 @@ void TextIterator::handleTextBox() {
         unsigned spaceRunStart = runStart - 1;
         while (spaceRunStart > 0 && str[spaceRunStart - 1] == ' ')
           --spaceRunStart;
-        emitText(m_node, spaceRunStart, runStart);
+        emitText(m_node, spaceRunStart, spaceRunStart + 1);
       } else
         emitCharacter(' ', m_node, 0, runStart, runStart);
       return;
@@ -818,11 +812,11 @@ SimplifiedBackwardsTextIterator::SimplifiedBackwardsTextIterator(
     return;
 
   Node* startNode = r->startContainer();
+  if (!startNode)
+    return;
   Node* endNode = r->endContainer();
   int startOffset = r->startOffset();
   int endOffset = r->endOffset();
-  if (!startNode)
-    return;
 
   if (!startNode->offsetInCharacters()) {
     if (startOffset >= 0 &&
@@ -1217,7 +1211,7 @@ const UChar* WordAwareIterator::characters() const {
 
 // --------
 
-#if HAVE(ICU_SEARCH)
+#if USE(ICU_UNICODE)
 
 static const size_t minimumSearchBufferSize = 8192;
 
@@ -1355,7 +1349,7 @@ inline size_t SearchBuffer::search(size_t& start) {
   return usearch_getMatchedLength(searcher);
 }
 
-#else
+#else  // !ICU_UNICODE
 
 inline SearchBuffer::SearchBuffer(const String& target, bool isCaseSensitive)
     : m_target(isCaseSensitive ? target : target.foldCase()),
@@ -1443,7 +1437,7 @@ size_t SearchBuffer::length() const {
   return length;
 }
 
-#endif
+#endif  // !ICU_UNICODE
 
 // --------
 
