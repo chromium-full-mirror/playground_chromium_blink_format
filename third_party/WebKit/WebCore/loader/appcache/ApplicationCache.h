@@ -70,9 +70,13 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   bool addDynamicEntry(const String& url);
   void removeDynamicEntry(const String& url);
 
-  void setOnlineWhitelist(const HashSet<String>& onlineWhitelist);
-  const HashSet<String>& onlineWhitelist() const { return m_onlineWhitelist; }
-  bool isURLInOnlineWhitelist(const KURL&);
+  void setOnlineWhitelist(const Vector<KURL>& onlineWhitelist);
+  const Vector<KURL>& onlineWhitelist() const { return m_onlineWhitelist; }
+  bool isURLInOnlineWhitelist(const KURL&);  // There is an entry in online
+                                             // whitelist that has the same
+                                             // origin as the resource's URL and
+                                             // that is a prefix match for the
+                                             // resource's URL.
 
   void setFallbackURLs(const FallbackURLVector&);
   const FallbackURLVector& fallbackURLs() const { return m_fallbackURLs; }
@@ -99,7 +103,7 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   ResourceMap m_resources;
   ApplicationCacheResource* m_manifest;
 
-  HashSet<String> m_onlineWhitelist;
+  Vector<KURL> m_onlineWhitelist;
   FallbackURLVector m_fallbackURLs;
 
   unsigned m_storageID;
