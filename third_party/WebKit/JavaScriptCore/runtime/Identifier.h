@@ -100,8 +100,6 @@ class Identifier {
       JSGlobalData*,
       const char*);  // Only to be used with string literals.
 
-  static void initializeIdentifierThreading();
-
  private:
   UString _ustring;
 
