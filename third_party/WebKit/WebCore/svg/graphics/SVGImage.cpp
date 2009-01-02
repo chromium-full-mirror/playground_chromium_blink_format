@@ -50,13 +50,47 @@
 
 namespace WebCore {
 
+class SVGImageChromeClient : public EmptyChromeClient {
+ public:
+  SVGImageChromeClient(SVGImage* image) : m_image(image) {}
+
+  SVGImage* image() const { return m_image; }
+
+  virtual void chromeDestroyed() { m_image = 0; }
+
+  virtual void repaint(const IntRect& r,
+                       bool contentChanged,
+                       bool immediate,
+                       bool repaintContentOnly) {
+    if (m_image && m_image->imageObserver())
+      m_image->imageObserver()->changedInRect(m_image, r);
+  }
+
+ private:
+  SVGImage* m_image;
+};
+
 SVGImage::SVGImage(ImageObserver* observer)
-    : Image(observer), m_document(0), m_page(0), m_frame(0), m_frameView(0) {}
+    : Image(observer),
+      m_document(0),
+      m_chromeClient(0),
+      m_page(0),
+      m_frame(0),
+      m_frameView(0) {}
 
 SVGImage::~SVGImage() {
   if (m_frame)
     m_frame->loader()->frameDetached();  // Break both the loader and view
                                          // references to the frame
+
+  // Clear these manually so we can safely delete the ChromeClient afterwards
+  m_frameView.clear();
+  m_frame.clear();
+  m_page.clear();
+
+  // Verify that page teardown destroyed the Chrome
+  ASSERT(!m_chromeClient->image());
+  delete m_chromeClient;
 }
 
 void SVGImage::setContainerSize(const IntSize& containerSize) {
@@ -184,7 +218,6 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     return true;
 
   if (allDataReceived) {
-    static ChromeClient* dummyChromeClient = new EmptyChromeClient;
     static FrameLoaderClient* dummyFrameLoaderClient =
         new EmptyFrameLoaderClient;
     static EditorClient* dummyEditorClient = new EmptyEditorClient;
@@ -193,11 +226,13 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     static DragClient* dummyDragClient = new EmptyDragClient;
     static InspectorClient* dummyInspectorClient = new EmptyInspectorClient;
 
+    m_chromeClient = new SVGImageChromeClient(this);
+
     // FIXME: If this SVG ends up loading itself, we'll leak this Frame (and
     // associated DOM & render trees).
     // The Cache code does not know about CachedImages holding Frames and won't
     // know to break the cycle.
-    m_page.set(new Page(dummyChromeClient, dummyContextMenuClient,
+    m_page.set(new Page(m_chromeClient, dummyContextMenuClient,
                         dummyEditorClient, dummyDragClient,
                         dummyInspectorClient));
     m_page->settings()->setJavaScriptEnabled(false);

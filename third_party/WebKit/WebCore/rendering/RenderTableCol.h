@@ -46,7 +46,7 @@ class RenderTableCol : public RenderContainer {
   virtual bool requiresLayer() { return false; }
 
   virtual IntRect absoluteClippedOverflowRect();
-  virtual void imageChanged(WrappedImagePtr);
+  virtual void imageChanged(WrappedImagePtr, const IntRect* = 0);
 
   int span() const { return m_span; }
   void setSpan(int s) { m_span = s; }

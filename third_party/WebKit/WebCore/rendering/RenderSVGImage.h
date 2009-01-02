@@ -51,7 +51,7 @@ class RenderSVGImage : public RenderImage {
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
 
-  virtual void imageChanged(WrappedImagePtr);
+  virtual void imageChanged(WrappedImagePtr, const IntRect* = 0);
   void adjustRectsForAspectRatio(FloatRect& destRect,
                                  FloatRect& srcRect,
                                  SVGPreserveAspectRatio*);

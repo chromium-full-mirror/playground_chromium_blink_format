@@ -240,8 +240,8 @@ FloatRect RenderSVGImage::relativeBBox(bool) const {
   return m_localBounds;
 }
 
-void RenderSVGImage::imageChanged(WrappedImagePtr image) {
-  RenderImage::imageChanged(image);
+void RenderSVGImage::imageChanged(WrappedImagePtr image, const IntRect* rect) {
+  RenderImage::imageChanged(image, rect);
 
   // We override to invalidate a larger rect, since SVG images can draw outside
   // their "bounds"

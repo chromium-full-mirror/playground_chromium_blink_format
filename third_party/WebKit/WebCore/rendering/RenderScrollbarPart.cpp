@@ -137,11 +137,12 @@ void RenderScrollbarPart::styleDidChange(RenderStyle::Diff diff,
     m_scrollbar->theme()->invalidatePart(m_scrollbar, m_part);
 }
 
-void RenderScrollbarPart::imageChanged(WrappedImagePtr image) {
+void RenderScrollbarPart::imageChanged(WrappedImagePtr image,
+                                       const IntRect* rect) {
   if (m_scrollbar && m_part != NoPart)
     m_scrollbar->theme()->invalidatePart(m_scrollbar, m_part);
   else
-    RenderBlock::imageChanged(image);
+    RenderBlock::imageChanged(image, rect);
 }
 
 void RenderScrollbarPart::paintIntoRect(GraphicsContext* graphicsContext,

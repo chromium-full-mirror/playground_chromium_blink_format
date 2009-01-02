@@ -3447,8 +3447,8 @@ AnimationController* RenderObject::animation() const {
   return document()->frame()->animation();
 }
 
-void RenderObject::imageChanged(CachedImage* image) {
-  imageChanged(static_cast<WrappedImagePtr>(image));
+void RenderObject::imageChanged(CachedImage* image, const IntRect* rect) {
+  imageChanged(static_cast<WrappedImagePtr>(image), rect);
 }
 
 IntRect RenderObject::reflectionBox() const {

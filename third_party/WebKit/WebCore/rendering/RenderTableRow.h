@@ -69,7 +69,7 @@ class RenderTableRow : public RenderContainer {
   virtual bool requiresLayer() { return isTransparent() || hasOverflowClip(); }
 
   virtual void paint(PaintInfo&, int tx, int ty);
-  virtual void imageChanged(WrappedImagePtr);
+  virtual void imageChanged(WrappedImagePtr, const IntRect* = 0);
 
  protected:
   virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
