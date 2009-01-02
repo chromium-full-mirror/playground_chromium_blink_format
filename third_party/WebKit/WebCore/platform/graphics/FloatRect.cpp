@@ -114,4 +114,17 @@ IntRect enclosingIntRect(const FloatRect& rect) {
   int b = static_cast<int>(ceilf(rect.bottom()));
   return IntRect(l, t, r - l, b - t);
 }
+
+FloatRect mapRect(const FloatRect& r,
+                  const FloatRect& srcRect,
+                  const FloatRect& destRect) {
+  if (srcRect.width() == 0 || srcRect.height() == 0)
+    return FloatRect();
+
+  float widthScale = destRect.width() / srcRect.width();
+  float heightScale = destRect.height() / srcRect.height();
+  return FloatRect(destRect.x() + (r.x() - srcRect.x()) * widthScale,
+                   destRect.y() + (r.y() - srcRect.y()) * heightScale,
+                   r.width() * widthScale, r.height() * heightScale);
+}
 }
