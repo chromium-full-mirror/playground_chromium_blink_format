@@ -226,6 +226,7 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
       m_thisRegister(RegisterFile::ProgramCodeThisRegister),
       m_finallyDepth(0),
       m_dynamicScopeDepth(0),
+      m_baseScopeDepth(0),
       m_codeType(GlobalCode),
       m_nextGlobalIndex(-1),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
@@ -323,6 +324,7 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
       m_codeBlock(codeBlock),
       m_finallyDepth(0),
       m_dynamicScopeDepth(0),
+      m_baseScopeDepth(0),
       m_codeType(FunctionCode),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end),
@@ -400,11 +402,12 @@ BytecodeGenerator::BytecodeGenerator(EvalNode* evalNode,
       m_thisRegister(RegisterFile::ProgramCodeThisRegister),
       m_finallyDepth(0),
       m_dynamicScopeDepth(0),
+      m_baseScopeDepth(scopeChain.localDepth()),
       m_codeType(EvalCode),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end),
       m_emitNodeDepth(0) {
-  if (m_shouldEmitDebugHooks)
+  if (m_shouldEmitDebugHooks || m_baseScopeDepth)
     m_codeBlock->setNeedsFullScopeChain(true);
 
   emitOpcode(op_enter);
@@ -1676,10 +1679,12 @@ RegisterID* BytecodeGenerator::emitCatch(RegisterID* targetRegister,
                                          Label* end) {
 #if ENABLE(JIT)
   HandlerInfo info = {start->offsetFrom(0), end->offsetFrom(0),
-                      instructions().size(), m_dynamicScopeDepth, 0};
+                      instructions().size(),
+                      m_dynamicScopeDepth + m_baseScopeDepth, 0};
 #else
   HandlerInfo info = {start->offsetFrom(0), end->offsetFrom(0),
-                      instructions().size(), m_dynamicScopeDepth};
+                      instructions().size(),
+                      m_dynamicScopeDepth + m_baseScopeDepth};
 #endif
 
   m_codeBlock->addExceptionHandler(info);

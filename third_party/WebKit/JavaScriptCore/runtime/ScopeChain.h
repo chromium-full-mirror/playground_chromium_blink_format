@@ -51,10 +51,15 @@ class ScopeChainNode {
   int refCount;
 
   void deref() {
-    if (--refCount == 0)
+    ASSERT(refCount);
+    if (--refCount == 0) {
       release();
+    }
   }
-  void ref() { ++refCount; }
+  void ref() {
+    ASSERT(refCount);
+    ++refCount;
+  }
   void release();
 
   // Before calling "push" on a bare ScopeChainNode, a client should
@@ -185,6 +190,13 @@ class ScopeChain {
   JSGlobalObject* globalObject() const { return m_node->globalObject(); }
 
   void mark() const;
+
+  // Caution: this should only be used if the codeblock this is being used
+  // with needs a full scope chain, otherwise this returns the depth of
+  // the preceeding call frame
+  //
+  // Returns the depth of the current call frame's scope chain
+  int localDepth() const;
 
 #ifndef NDEBUG
   void print() const { m_node->print(); }

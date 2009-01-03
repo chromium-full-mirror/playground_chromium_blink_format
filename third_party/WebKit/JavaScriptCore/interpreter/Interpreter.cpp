@@ -101,16 +101,7 @@ static ALWAYS_INLINE unsigned bytecodeOffsetForPC(CodeBlock* codeBlock,
 static int depth(CodeBlock* codeBlock, ScopeChain& sc) {
   if (!codeBlock->needsFullScopeChain())
     return 0;
-  int scopeDepth = 0;
-  ScopeChainIterator iter = sc.begin();
-  ScopeChainIterator end = sc.end();
-  while (!(*iter)->isObject(&JSActivation::info)) {
-    ++iter;
-    if (iter == end)
-      break;
-    ++scopeDepth;
-  }
-  return scopeDepth;
+  return sc.localDepth();
 }
 
 // FIXME: This operation should be called "getNumber", not "isNumber" (as it is
