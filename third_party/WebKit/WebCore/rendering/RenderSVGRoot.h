@@ -70,6 +70,8 @@ class RenderSVGRoot : public RenderContainer {
                            int ty,
                            HitTestAction);
 
+  virtual void position(InlineBox*);
+
  private:
   void calcViewport();
   void applyContentTransforms(PaintInfo&, int parentX, int parentY);
