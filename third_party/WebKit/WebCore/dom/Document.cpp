@@ -118,6 +118,7 @@
 #include "XMLTokenizer.h"
 #include "JSDOMBinding.h"
 #include "ScriptController.h"
+#include <wtf/HashFunctions.h>
 #include <wtf/MainThread.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/PassRefPtr.h>
@@ -176,9 +177,6 @@ static const int cLayoutScheduleThreshold = 250;
 // Use 1 to represent the document's default form.
 static HTMLFormElement* const defaultForm =
     reinterpret_cast<HTMLFormElement*>(1);
-
-// Golden ratio - arbitrary start value to avoid mapping all 0's to all 0's
-static const unsigned PHI = 0x9e3779b9U;
 
 // DOM Level 2 says (letters added):
 //
@@ -4072,7 +4070,7 @@ unsigned FormElementKeyHash::hash(const FormElementKey& k) {
 
   unsigned l = sizeof(k) / (sizeof(uint16_t) * 2);
   const uint16_t* s = reinterpret_cast<const uint16_t*>(&k);
-  uint32_t hash = PHI;
+  uint32_t hash = WTF::stringHashingStartValue;
 
   // Main loop
   for (; l > 0; l--) {

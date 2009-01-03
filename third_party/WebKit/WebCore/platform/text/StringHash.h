@@ -23,6 +23,7 @@
 
 #include "AtomicString.h"
 #include "PlatformString.h"
+#include <wtf/HashFunctions.h>
 #include <wtf/HashTraits.h>
 #include <wtf/unicode/Unicode.h>
 
@@ -77,17 +78,13 @@ struct StringHash {
 };
 
 class CaseFoldingHash {
- private:
-  // Golden ratio - arbitrary start value to avoid mapping all 0's to all 0's
-  static const unsigned PHI = 0x9e3779b9U;
-
  public:
   // Paul Hsieh's SuperFastHash
   // http://www.azillionmonkeys.com/qed/hash.html
   static unsigned hash(const UChar* data, unsigned length) {
     unsigned l = length;
     const UChar* s = data;
-    uint32_t hash = PHI;
+    uint32_t hash = WTF::stringHashingStartValue;
     uint32_t tmp;
 
     int rem = l & 1;
@@ -137,7 +134,7 @@ class CaseFoldingHash {
 
     unsigned l = length;
     const char* s = str;
-    uint32_t hash = PHI;
+    uint32_t hash = WTF::stringHashingStartValue;
     uint32_t tmp;
 
     int rem = l & 1;
