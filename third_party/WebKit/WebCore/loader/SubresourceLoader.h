@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,13 +30,9 @@
 #define SubresourceLoader_h
 
 #include "ResourceLoader.h"
-#include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
-class FormData;
-class String;
-class ResourceHandle;
 class ResourceRequest;
 class SubresourceLoaderClient;
 
@@ -50,9 +46,14 @@ class SubresourceLoader : public ResourceLoader {
       bool sendResourceLoadCallbacks = true,
       bool shouldContentSniff = true);
 
-  virtual ~SubresourceLoader();
+  void clearClient() { m_client = 0; }
 
-  virtual bool load(const ResourceRequest&);
+ private:
+  SubresourceLoader(Frame*,
+                    SubresourceLoaderClient*,
+                    bool sendResourceLoadCallbacks,
+                    bool shouldContentSniff);
+  virtual ~SubresourceLoader();
 
   virtual void willSendRequest(ResourceRequest&,
                                const ResourceResponse& redirectResponse);
@@ -69,16 +70,8 @@ class SubresourceLoader : public ResourceLoader {
   virtual void didReceiveAuthenticationChallenge(
       const AuthenticationChallenge&);
   virtual void receivedCancellation(const AuthenticationChallenge&);
-
-  void clearClient() { m_client = 0; }
-
- private:
-  SubresourceLoader(Frame*,
-                    SubresourceLoaderClient*,
-                    bool sendResourceLoadCallbacks,
-                    bool shouldContentSniff);
-
   virtual void didCancel(const ResourceError&);
+
   SubresourceLoaderClient* m_client;
   bool m_loadingMultipartContent;
 };
