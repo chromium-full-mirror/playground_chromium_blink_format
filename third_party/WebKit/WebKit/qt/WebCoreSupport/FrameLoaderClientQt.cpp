@@ -203,7 +203,8 @@ void FrameLoaderClientQt::transitionToCommittedForNewPage() {
       brush.style() == Qt::SolidPattern ? brush.color() : QColor();
   WebCore::FrameLoaderClient::transitionToCommittedForNewPage(
       m_frame, m_webFrame->page()->viewportSize(), backgroundColor,
-      !backgroundColor.alpha());
+      !backgroundColor.alpha(), m_webFrame->page()->fixedLayoutSize(),
+      m_webFrame->page()->useFixedLayout());
 }
 
 void FrameLoaderClientQt::makeRepresentation(DocumentLoader*) {

@@ -32,6 +32,7 @@
 #include <qdebug.h>
 #include <qpoint.h>
 #include <qstringlist.h>
+#include <qsize.h>
 
 class QWebFrame;
 namespace WebCore {
@@ -79,6 +80,8 @@ class LayoutTestController : public QObject {
   QString decodeHostName(const QString& host);
   void dumpSelectionRect() const {}
   void setJavaScriptProfilingEnabled(bool enable);
+  void setFixedLayoutSize(int width, int height);
+  void setUseFixedLayout(bool enable);
 
  private:
   bool m_isLoading;

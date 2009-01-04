@@ -158,6 +158,7 @@ class QWebPagePrivate {
   QWebPage::LinkDelegationPolicy linkPolicy;
 
   QSize viewportSize;
+  QSize fixedLayoutSize;
   QWebHistory history;
   QWebHitTestResult hitTestResult;
 #ifndef QT_NO_CONTEXTMENU
@@ -166,6 +167,7 @@ class QWebPagePrivate {
   QWebSettings* settings;
   QPalette palette;
   bool editable;
+  bool useFixedLayout;
 
   QAction* actions[QWebPage::WebActionCount];
 
