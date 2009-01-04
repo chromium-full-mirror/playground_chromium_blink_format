@@ -553,7 +553,8 @@ void WebFrameLoaderClient::transitionToCommittedForNewPage() {
   bool transparent = view->transparent();
   Color backgroundColor = transparent ? Color::transparent : Color::white;
   WebCore::FrameLoaderClient::transitionToCommittedForNewPage(
-      core(m_webFrame), IntRect(rect).size(), backgroundColor, transparent);
+      core(m_webFrame), IntRect(rect).size(), backgroundColor, transparent,
+      IntSize(), false);
 }
 
 bool WebFrameLoaderClient::canCachePage() const {
