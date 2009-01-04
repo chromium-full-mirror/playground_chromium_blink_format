@@ -46,7 +46,8 @@ ScrollView::ScrollView()
       m_scrollbarsAvoidingResizer(0),
       m_scrollbarsSuppressed(false),
       m_inUpdateScrollbars(false),
-      m_drawPanScrollIcon(false) {
+      m_drawPanScrollIcon(false),
+      m_useFixedLayout(false) {
   platformInit();
   if (platformWidget())
     platformSetCanBlitOnScroll(true);
@@ -166,6 +167,40 @@ IntRect ScrollView::visibleContentRect(bool includeScrollbars) const {
               max(0, height() - (horizontalScrollbar() && !includeScrollbars
                                      ? horizontalScrollbar()->height()
                                      : 0))));
+}
+
+int ScrollView::layoutWidth() const {
+  return m_fixedLayoutSize.isEmpty() || !m_useFixedLayout
+             ? visibleWidth()
+             : m_fixedLayoutSize.width();
+}
+
+int ScrollView::layoutHeight() const {
+  return m_fixedLayoutSize.isEmpty() || !m_useFixedLayout
+             ? visibleHeight()
+             : m_fixedLayoutSize.height();
+}
+
+IntSize ScrollView::fixedLayoutSize() const {
+  return m_fixedLayoutSize;
+}
+
+void ScrollView::setFixedLayoutSize(const IntSize& newSize) {
+  if (fixedLayoutSize() == newSize)
+    return;
+  m_fixedLayoutSize = newSize;
+  updateScrollbars(scrollOffset());
+}
+
+bool ScrollView::useFixedLayout() const {
+  return m_useFixedLayout;
+}
+
+void ScrollView::setUseFixedLayout(bool enable) {
+  if (useFixedLayout() == enable)
+    return;
+  m_useFixedLayout = enable;
+  updateScrollbars(scrollOffset());
 }
 
 IntSize ScrollView::contentsSize() const {

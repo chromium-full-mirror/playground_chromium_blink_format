@@ -145,6 +145,17 @@ class ScrollView : public Widget, public ScrollbarClient {
   int visibleWidth() const { return visibleContentRect().width(); }
   int visibleHeight() const { return visibleContentRect().height(); }
 
+  // Methods for getting/setting the size webkit should use to layout the
+  // contents.  By default this is the same as the visible
+  // content size.  Explicitly setting a layout size value will cause webkit to
+  // layout the contents using this size instead.
+  int layoutWidth() const;
+  int layoutHeight() const;
+  IntSize fixedLayoutSize() const;
+  void setFixedLayoutSize(const IntSize&);
+  bool useFixedLayout() const;
+  void setUseFixedLayout(bool enable);
+
   // Methods for getting/setting the size of the document contained inside the
   // ScrollView (as an IntSize or as individual width and height
   // values).
@@ -297,6 +308,7 @@ class ScrollView : public Widget, public ScrollbarClient {
   IntSize m_scrollOffset;  // FIXME: Would rather store this as a position, but
                            // we will wait to make this change until more code
                            // is shared.
+  IntSize m_fixedLayoutSize;
   IntSize m_contentsSize;
 
   int m_scrollbarsAvoidingResizer;
@@ -306,6 +318,7 @@ class ScrollView : public Widget, public ScrollbarClient {
 
   IntPoint m_panScrollIconPoint;
   bool m_drawPanScrollIcon;
+  bool m_useFixedLayout;
 
   void init();
   void destroy();

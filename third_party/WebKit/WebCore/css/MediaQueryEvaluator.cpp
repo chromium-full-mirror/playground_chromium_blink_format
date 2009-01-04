@@ -324,11 +324,11 @@ static bool heightMediaFeatureEval(CSSValue* value,
   if (value)
     return value->isPrimitiveValue() &&
            compareValue(
-               view->visibleHeight(),
+               view->layoutHeight(),
                static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(style),
                op);
 
-  return view->visibleHeight() != 0;
+  return view->layoutHeight() != 0;
 }
 
 static bool widthMediaFeatureEval(CSSValue* value,
@@ -340,11 +340,11 @@ static bool widthMediaFeatureEval(CSSValue* value,
   if (value)
     return value->isPrimitiveValue() &&
            compareValue(
-               view->visibleWidth(),
+               view->layoutWidth(),
                static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(style),
                op);
 
-  return view->visibleWidth() != 0;
+  return view->layoutWidth() != 0;
 }
 
 // rest of the functions are trampolines which set the prefix according to the

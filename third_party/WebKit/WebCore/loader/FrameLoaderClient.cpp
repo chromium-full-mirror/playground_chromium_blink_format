@@ -43,9 +43,11 @@ FrameLoaderClient::~FrameLoaderClient() {}
 
 void FrameLoaderClient::transitionToCommittedForNewPage(
     Frame* frame,
-    const IntSize& size,
+    const IntSize& viewportSize,
     const Color& backgroundColor,
-    bool transparent) {
+    bool transparent,
+    const IntSize& fixedLayoutSize,
+    bool useFixedLayout) {
   ASSERT(frame);
 
   Page* page = frame->page();
@@ -60,9 +62,12 @@ void FrameLoaderClient::transitionToCommittedForNewPage(
 
   FrameView* frameView;
   if (isMainFrame)
-    frameView = new FrameView(frame, size);
+    frameView = new FrameView(frame, viewportSize);
   else
     frameView = new FrameView(frame);
+
+  frameView->setFixedLayoutSize(fixedLayoutSize);
+  frameView->setUseFixedLayout(useFixedLayout);
 
   frame->setView(frameView);
   // FrameViews are created with a ref count of 1. Release this ref since we've

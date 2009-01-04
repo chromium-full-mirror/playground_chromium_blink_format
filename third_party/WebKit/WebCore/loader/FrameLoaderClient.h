@@ -282,6 +282,8 @@ class FrameLoaderClient {
   static void transitionToCommittedForNewPage(Frame*,
                                               const IntSize&,
                                               const Color&,
+                                              bool,
+                                              const IntSize&,
                                               bool);
 };
 
