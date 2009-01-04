@@ -867,7 +867,7 @@ void FrameLoaderClient::transitionToCommittedForNewPage() {
   ASSERT(frame);
 
   WebCore::FrameLoaderClient::transitionToCommittedForNewPage(
-      frame, size, backgroundColor, transparent);
+      frame, size, backgroundColor, transparent, IntSize(), false);
 
   // We need to do further manipulation on the FrameView if it was the mainFrame
   if (frame != frame->page()->mainFrame())
