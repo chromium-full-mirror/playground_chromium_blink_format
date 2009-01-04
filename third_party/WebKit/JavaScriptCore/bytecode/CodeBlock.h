@@ -136,10 +136,10 @@ struct GlobalResolveInfo {
 };
 
 struct PC {
-  PC(void* nativePC, unsigned bytecodeIndex)
-      : nativePC(nativePC), bytecodeIndex(bytecodeIndex) {}
+  PC(ptrdiff_t nativePCOffset, unsigned bytecodeIndex)
+      : nativePCOffset(nativePCOffset), bytecodeIndex(bytecodeIndex) {}
 
-  void* nativePC;
+  ptrdiff_t nativePCOffset;
   unsigned bytecodeIndex;
 };
 
@@ -154,8 +154,8 @@ inline void* getCallLinkInfoReturnLocation(CallLinkInfo* callLinkInfo) {
   return callLinkInfo->callReturnLocation;
 }
 
-inline void* getNativePC(PC* pc) {
-  return pc->nativePC;
+inline ptrdiff_t getNativePCOffset(PC* pc) {
+  return pc->nativePCOffset;
 }
 
 // Binary chop algorithm, calls valueAtPosition on pre-sorted elements in array,
@@ -287,8 +287,10 @@ class CodeBlock {
   }
 
   unsigned getBytecodeIndex(void* nativePC) {
-    return binaryChop<PC, void*, getNativePC>(m_pcVector.begin(),
-                                              m_pcVector.size(), nativePC)
+    ptrdiff_t nativePCOffset = reinterpret_cast<void**>(nativePC) -
+                               reinterpret_cast<void**>(m_jitCode.code);
+    return binaryChop<PC, ptrdiff_t, getNativePCOffset>(
+               m_pcVector.begin(), m_pcVector.size(), nativePCOffset)
         ->bytecodeIndex;
   }
 

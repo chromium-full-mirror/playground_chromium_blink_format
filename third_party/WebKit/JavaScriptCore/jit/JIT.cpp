@@ -1861,7 +1861,9 @@ void JIT::privateCompile() {
     if (iter->to)
       patchBuffer.link(iter->from, iter->to);
     m_codeBlock->pcVector().append(
-        PC(patchBuffer.addressOf(iter->from), iter->bytecodeIndex));
+        PC(reinterpret_cast<void**>(patchBuffer.addressOf(iter->from)) -
+               reinterpret_cast<void**>(code),
+           iter->bytecodeIndex));
   }
 
   // Link absolute addresses for jsr
