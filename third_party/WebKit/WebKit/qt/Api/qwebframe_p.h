@@ -95,6 +95,7 @@ class QWebHitTestResultPrivate {
 
   QPoint pos;
   QRect boundingRect;
+  QRect enclosingBlock;
   QString title;
   QString linkText;
   QUrl linkUrl;
@@ -106,6 +107,7 @@ class QWebHitTestResultPrivate {
   bool isContentEditable;
   bool isContentSelected;
   QPointer<QWebFrame> frame;
+  RefPtr<WebCore::Node> innerNode;
   RefPtr<WebCore::Node> innerNonSharedNode;
 };
 
