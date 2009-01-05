@@ -471,6 +471,10 @@ PlatformWidget WebChromeClient::platformWindow() const {
   return viewWindow;
 }
 
+void WebChromeClient::contentsSizeChanged(Frame*, const IntSize&) const {
+  notImplemented();
+}
+
 void WebChromeClient::mouseDidMoveOverElement(const HitTestResult& result,
                                               unsigned modifierFlags) {
   COMPtr<IWebUIDelegate> uiDelegate;

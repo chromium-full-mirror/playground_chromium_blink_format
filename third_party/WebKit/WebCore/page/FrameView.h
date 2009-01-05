@@ -81,6 +81,8 @@ class FrameView : public ScrollView {
 
   virtual PassRefPtr<Scrollbar> createScrollbar(ScrollbarOrientation);
 
+  virtual void setContentsSize(const IntSize&);
+
   void layout(bool allowSubtree = true);
   bool didFirstLayout() const;
   void layoutTimerFired(Timer<FrameView>*);

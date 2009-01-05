@@ -162,7 +162,7 @@ class ScrollView : public Widget, public ScrollbarClient {
   IntSize contentsSize() const;
   int contentsWidth() const { return contentsSize().width(); }
   int contentsHeight() const { return contentsSize().height(); }
-  void setContentsSize(const IntSize&);
+  virtual void setContentsSize(const IntSize&);
 
   // Methods for querying the current scrolled position (both as a point, a
   // size, or as individual X and Y values).

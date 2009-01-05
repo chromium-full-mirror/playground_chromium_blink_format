@@ -96,6 +96,10 @@ PlatformWidget Chrome::platformWindow() const {
   return m_client->platformWindow();
 }
 
+void Chrome::contentsSizeChanged(Frame* frame, const IntSize& size) const {
+  m_client->contentsSizeChanged(frame, size);
+}
+
 void Chrome::setWindowRect(const FloatRect& rect) const {
   m_client->setWindowRect(rect);
 }
