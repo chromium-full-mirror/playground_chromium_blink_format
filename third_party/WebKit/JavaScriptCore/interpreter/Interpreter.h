@@ -322,6 +322,10 @@ class Interpreter {
     return !JSImmediate::isImmediate(v) &&
            v->asCell()->vptr() == m_jsStringVptr;
   }
+  bool isJSByteArray(JSValue* v) {
+    return !JSImmediate::isImmediate(v) &&
+           v->asCell()->vptr() == m_jsByteArrayVptr;
+  }
 
  private:
   enum ExecutionFlag { Normal, InitializeAndReturn };
@@ -445,6 +449,7 @@ class Interpreter {
   RegisterFile m_registerFile;
 
   void* m_jsArrayVptr;
+  void* m_jsByteArrayVptr;
   void* m_jsStringVptr;
   void* m_jsFunctionVptr;
 

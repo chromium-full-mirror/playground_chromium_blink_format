@@ -101,7 +101,7 @@ Image* ImageBuffer::image() const {
 
 PassRefPtr<ImageData> ImageBuffer::getImageData(const IntRect& rect) const {
   PassRefPtr<ImageData> result = ImageData::create(rect.width(), rect.height());
-  unsigned char* data = result->data()->data().data();
+  unsigned char* data = result->data()->data();
 
   if (rect.x() < 0 || rect.y() < 0 ||
       (rect.x() + rect.width()) > m_size.width() ||
@@ -189,7 +189,7 @@ void ImageBuffer::putImageData(ImageData* source,
   unsigned destBytesPerRow = 4 * m_size.width();
 
   unsigned char* srcRows =
-      source->data()->data().data() + originy * srcBytesPerRow + originx * 4;
+      source->data()->data() + originy * srcBytesPerRow + originx * 4;
   unsigned char* destRows = reinterpret_cast<unsigned char*>(m_data.m_data) +
                             desty * destBytesPerRow + destx * 4;
   for (int y = 0; y < numRows; ++y) {
