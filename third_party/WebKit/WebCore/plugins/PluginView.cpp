@@ -626,6 +626,9 @@ PluginView::PluginView(Frame* parentFrame,
 }
 
 void PluginView::didReceiveResponse(const ResourceResponse& response) {
+  if (m_status != PluginStatusLoadedSuccessfully)
+    return;
+
   ASSERT(m_loadManually);
   ASSERT(!m_manualStream);
 
@@ -639,6 +642,9 @@ void PluginView::didReceiveResponse(const ResourceResponse& response) {
 }
 
 void PluginView::didReceiveData(const char* data, int length) {
+  if (m_status != PluginStatusLoadedSuccessfully)
+    return;
+
   ASSERT(m_loadManually);
   ASSERT(m_manualStream);
 
@@ -646,6 +652,9 @@ void PluginView::didReceiveData(const char* data, int length) {
 }
 
 void PluginView::didFinishLoading() {
+  if (m_status != PluginStatusLoadedSuccessfully)
+    return;
+
   ASSERT(m_loadManually);
   ASSERT(m_manualStream);
 
@@ -653,6 +662,9 @@ void PluginView::didFinishLoading() {
 }
 
 void PluginView::didFail(const ResourceError& error) {
+  if (m_status != PluginStatusLoadedSuccessfully)
+    return;
+
   ASSERT(m_loadManually);
   ASSERT(m_manualStream);
 

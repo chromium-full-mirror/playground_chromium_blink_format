@@ -104,7 +104,17 @@ class PluginRequest {
   bool m_shouldAllowPopups;
 };
 
-class PluginView : public Widget, private PluginStreamClient {
+class PluginManualLoader {
+ public:
+  virtual void didReceiveResponse(const ResourceResponse&) = 0;
+  virtual void didReceiveData(const char*, int) = 0;
+  virtual void didFinishLoading() = 0;
+  virtual void didFail(const ResourceError&) = 0;
+};
+
+class PluginView : public Widget,
+                   private PluginStreamClient,
+                   public PluginManualLoader {
  public:
   static PluginView* create(Frame* parentFrame,
                             const IntSize&,
