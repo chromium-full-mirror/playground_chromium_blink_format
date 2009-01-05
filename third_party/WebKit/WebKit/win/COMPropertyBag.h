@@ -163,7 +163,7 @@ COMPropertyBag<ValueType, KeyType, HashType>::Read(LPCOLESTR pszPropName,
   V_VT(pVar) = VT_EMPTY;
   COMVariantSetter<ValueType>::setVariant(pVar, it->second);
 
-  if (requestedType != COMVariantSetter<ValueType>::VariantType &&
+  if (requestedType != COMVariantSetter<ValueType>::variantType(it->second) &&
       requestedType != VT_EMPTY)
     return ::VariantChangeType(
         pVar, pVar, VARIANT_NOUSEROVERRIDE | VARIANT_ALPHABOOL, requestedType);
@@ -247,7 +247,7 @@ COMPropertyBag<ValueType, KeyType, HashType>::GetPropertyInfo(
     // valid only if dwType is PROPBAG2_TYPE_OBJECT.
 
     pPropBag[j].dwType = PROPBAG2_TYPE_DATA;
-    pPropBag[j].vt = COMVariantSetter<ValueType>::VariantType;
+    pPropBag[j].vt = COMVariantSetter<ValueType>::variantType(current->second);
     pPropBag[j].dwHint = iProperty + j;
     pPropBag[j].pstrName = (LPOLESTR)CoTaskMemAlloc(
         sizeof(wchar_t) * (current->first.length() + 1));
