@@ -66,7 +66,7 @@ ThreadGlobalData& threadGlobalData() {
 ThreadGlobalData::ThreadGlobalData()
     : m_emptyString(new StringImpl),
       m_atomicStringTable(new HashSet<StringImpl*>),
-      m_eventNames(0)
+      m_eventNames(new EventNames)
 #if USE(ICU_UNICODE)
       ,
       m_cachedConverterICU(new ICUConverterWrapper)
@@ -95,14 +95,6 @@ ThreadGlobalData::~ThreadGlobalData() {
                                        // will be many strings remaining on the
                                        // main thread.
   delete m_emptyString;
-}
-
-EventNames& ThreadGlobalData::eventNames() {
-  // m_eventNames cannot be initialized in constructor, as that would cause
-  // recursion.
-  if (!m_eventNames)
-    m_eventNames = new EventNames;
-  return *m_eventNames;
 }
 
 }  // namespace WebCore
