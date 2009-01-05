@@ -73,7 +73,7 @@ class SearchBuffer : Noncopyable {
   size_t search(size_t& startOffset);
   bool atBreak() const;
 
-#if USE(ICU_UNICODE)
+#if USE(ICU_UNICODE) && !UCONFIG_NO_COLLATION
 
  private:
   String m_target;
@@ -1211,7 +1211,7 @@ const UChar* WordAwareIterator::characters() const {
 
 // --------
 
-#if USE(ICU_UNICODE)
+#if USE(ICU_UNICODE) && !UCONFIG_NO_COLLATION
 
 static const size_t minimumSearchBufferSize = 8192;
 
