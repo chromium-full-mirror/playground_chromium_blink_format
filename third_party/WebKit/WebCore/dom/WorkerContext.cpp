@@ -133,7 +133,7 @@ void WorkerContext::addEventListener(const AtomicString& eventType,
 
 void WorkerContext::removeEventListener(const AtomicString& eventType,
                                         EventListener* eventListener,
-                                        bool useCapture) {
+                                        bool) {
   EventListenersMap::iterator iter = m_eventListeners.find(eventType);
   if (iter == m_eventListeners.end())
     return;

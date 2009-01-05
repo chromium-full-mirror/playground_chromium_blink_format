@@ -37,7 +37,7 @@ EditingText::EditingText(Document* impl) : Text(impl) {}
 
 EditingText::~EditingText() {}
 
-bool EditingText::rendererIsNeeded(RenderStyle* style) {
+bool EditingText::rendererIsNeeded(RenderStyle*) {
   return true;
 }
 

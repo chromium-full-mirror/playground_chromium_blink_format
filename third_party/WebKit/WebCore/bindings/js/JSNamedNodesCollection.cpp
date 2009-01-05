@@ -50,7 +50,7 @@ JSNamedNodesCollection::JSNamedNodesCollection(
       m_nodes(new Vector<RefPtr<Node>>(nodes)) {}
 
 JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,
-                                              const Identifier& propertyName,
+                                              const Identifier&,
                                               const PropertySlot& slot) {
   JSNamedNodesCollection* thisObj =
       static_cast<JSNamedNodesCollection*>(asObject(slot.slotBase()));
@@ -58,7 +58,7 @@ JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,
 }
 
 JSValue* JSNamedNodesCollection::indexGetter(ExecState* exec,
-                                             const Identifier& propertyName,
+                                             const Identifier&,
                                              const PropertySlot& slot) {
   JSNamedNodesCollection* thisObj =
       static_cast<JSNamedNodesCollection*>(asObject(slot.slotBase()));

@@ -81,10 +81,8 @@ float SVGInlineTextBox::calculateGlyphWidth(RenderStyle* style,
 }
 
 float SVGInlineTextBox::calculateGlyphHeight(RenderStyle* style,
-                                             int offset,
-                                             int extraCharsAvailable) const {
-  ASSERT(style);
-
+                                             int,
+                                             int) const {
   // This is just a guess, and the only purpose of this function is to
   // centralize this hack.
   // In real-life top-top-bottom scripts this won't be enough, I fear.
@@ -284,20 +282,19 @@ bool SVGInlineTextBox::svgCharacterHitsPosition(int x,
   return true;
 }
 
-int SVGInlineTextBox::offsetForPosition(int x,
-                                        bool includePartialGlyphs) const {
+int SVGInlineTextBox::offsetForPosition(int, bool) const {
   // SVG doesn't use the offset <-> position selection system.
   ASSERT_NOT_REACHED();
   return 0;
 }
 
-int SVGInlineTextBox::positionForOffset(int offset) const {
+int SVGInlineTextBox::positionForOffset(int) const {
   // SVG doesn't use the offset <-> position selection system.
   ASSERT_NOT_REACHED();
   return 0;
 }
 
-bool SVGInlineTextBox::nodeAtPoint(const HitTestRequest& request,
+bool SVGInlineTextBox::nodeAtPoint(const HitTestRequest&,
                                    HitTestResult& result,
                                    int x,
                                    int y,
@@ -471,7 +468,7 @@ void SVGInlineTextBox::paintCharacters(RenderObject::PaintInfo& paintInfo,
 
 void SVGInlineTextBox::paintSelection(int boxStartOffset,
                                       const SVGChar& svgChar,
-                                      const UChar* chars,
+                                      const UChar*,
                                       int length,
                                       GraphicsContext* p,
                                       RenderStyle* style,

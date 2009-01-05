@@ -225,7 +225,7 @@ void AccessibilityObject::setSelectedText(const String&) {
   notImplemented();
 }
 
-void AccessibilityObject::setSelectedTextRange(const PlainTextRange& range) {}
+void AccessibilityObject::setSelectedTextRange(const PlainTextRange&) {}
 
 void AccessibilityObject::makeRangeVisible(const PlainTextRange&) {
   // TODO: make range visible (scrollRectToVisible).  <rdar://problem/4712101>
@@ -236,9 +236,9 @@ KURL AccessibilityObject::url() const {
   return KURL();
 }
 
-void AccessibilityObject::setFocused(bool on) {}
+void AccessibilityObject::setFocused(bool) {}
 
-void AccessibilityObject::setValue(const String& string) {}
+void AccessibilityObject::setValue(const String&) {}
 
 void AccessibilityObject::setSelected(bool) {}
 
@@ -280,16 +280,15 @@ VisiblePositionRange AccessibilityObject::visiblePositionRange() const {
 }
 
 VisiblePositionRange AccessibilityObject::visiblePositionRangeForLine(
-    unsigned lineCount) const {
+    unsigned) const {
   return VisiblePositionRange();
 }
 
-VisiblePosition AccessibilityObject::visiblePositionForIndex(int index) const {
+VisiblePosition AccessibilityObject::visiblePositionForIndex(int) const {
   return VisiblePosition();
 }
 
-int AccessibilityObject::indexForVisiblePosition(
-    const VisiblePosition& pos) const {
+int AccessibilityObject::indexForVisiblePosition(const VisiblePosition&) const {
   return 0;
 }
 
@@ -572,7 +571,7 @@ String AccessibilityObject::stringForVisiblePositionRange(
 }
 
 IntRect AccessibilityObject::boundsForVisiblePositionRange(
-    const VisiblePositionRange& visiblePositionRange) const {
+    const VisiblePositionRange&) const {
   return IntRect();
 }
 
@@ -609,7 +608,7 @@ void AccessibilityObject::setSelectedVisiblePositionRange(
     const VisiblePositionRange&) const {}
 
 VisiblePosition AccessibilityObject::visiblePositionForPoint(
-    const IntPoint& point) const {
+    const IntPoint&) const {
   return VisiblePosition();
 }
 
@@ -778,9 +777,8 @@ VisiblePosition AccessibilityObject::previousParagraphStartPosition(
 }
 
 // NOTE: Consider providing this utility method as AX API
-VisiblePosition AccessibilityObject::visiblePositionForIndex(
-    unsigned indexValue,
-    bool lastIndexOK) const {
+VisiblePosition AccessibilityObject::visiblePositionForIndex(unsigned,
+                                                             bool) const {
   return VisiblePosition();
 }
 
@@ -832,15 +830,14 @@ PlainTextRange AccessibilityObject::plainTextRangeForVisiblePositionRange(
 }
 
 // NOTE: Consider providing this utility method as AX API
-int AccessibilityObject::index(const VisiblePosition& position) const {
+int AccessibilityObject::index(const VisiblePosition&) const {
   return -1;
 }
 
 // Given a line number, the range of characters of the text associated with this
 // accessibility
 // object that contains the line number.
-PlainTextRange AccessibilityObject::doAXRangeForLine(
-    unsigned lineNumber) const {
+PlainTextRange AccessibilityObject::doAXRangeForLine(unsigned) const {
   return PlainTextRange();
 }
 
@@ -870,7 +867,7 @@ PlainTextRange AccessibilityObject::doAXRangeForPosition(
 // the complete
 // range of characters (including surrogate pairs of multi-byte glyphs) at the
 // given index.
-PlainTextRange AccessibilityObject::doAXRangeForIndex(unsigned index) const {
+PlainTextRange AccessibilityObject::doAXRangeForIndex(unsigned) const {
   return PlainTextRange();
 }
 
@@ -886,8 +883,7 @@ PlainTextRange AccessibilityObject::doAXStyleRangeForIndex(
 
 // A substring of the text associated with this accessibility object that is
 // specified by the given character range.
-String AccessibilityObject::doAXStringForRange(
-    const PlainTextRange& range) const {
+String AccessibilityObject::doAXStringForRange(const PlainTextRange&) const {
   return String();
 }
 
@@ -896,8 +892,7 @@ String AccessibilityObject::doAXStringForRange(
 // specified by the given range. This is the bounding rectangle a sighted user
 // would see
 // on the display screen, in pixels.
-IntRect AccessibilityObject::doAXBoundsForRange(
-    const PlainTextRange& range) const {
+IntRect AccessibilityObject::doAXBoundsForRange(const PlainTextRange&) const {
   return IntRect();
 }
 
@@ -920,7 +915,7 @@ FrameView* AccessibilityObject::documentFrameView() const {
 }
 
 AccessibilityObject* AccessibilityObject::doAccessibilityHitTest(
-    const IntPoint& point) const {
+    const IntPoint&) const {
   return 0;
 }
 

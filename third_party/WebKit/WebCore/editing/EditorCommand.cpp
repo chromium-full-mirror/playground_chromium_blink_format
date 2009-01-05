@@ -368,7 +368,7 @@ static bool executeDeleteBackwardByDecomposingPreviousCharacter(
 
 static bool executeDeleteForward(Frame* frame,
                                  Event*,
-                                 EditorCommandSource source,
+                                 EditorCommandSource,
                                  const String&) {
   frame->editor()->deleteWithDirection(SelectionController::FORWARD,
                                        CharacterGranularity, false, true);
@@ -702,11 +702,10 @@ static bool executeJustifyRight(Frame* frame,
                                     CSSPropertyTextAlign, "right");
 }
 
-static bool executeMakeTextWritingDirectionLeftToRight(
-    Frame* frame,
-    Event*,
-    EditorCommandSource source,
-    const String&) {
+static bool executeMakeTextWritingDirectionLeftToRight(Frame* frame,
+                                                       Event*,
+                                                       EditorCommandSource,
+                                                       const String&) {
   RefPtr<CSSMutableStyleDeclaration> style =
       CSSMutableStyleDeclaration::create();
   style->setProperty(CSSPropertyUnicodeBidi, CSSValueEmbed);
@@ -717,7 +716,7 @@ static bool executeMakeTextWritingDirectionLeftToRight(
 
 static bool executeMakeTextWritingDirectionNatural(Frame* frame,
                                                    Event*,
-                                                   EditorCommandSource source,
+                                                   EditorCommandSource,
                                                    const String&) {
   RefPtr<CSSMutableStyleDeclaration> style =
       CSSMutableStyleDeclaration::create();
@@ -726,11 +725,10 @@ static bool executeMakeTextWritingDirectionNatural(Frame* frame,
   return true;
 }
 
-static bool executeMakeTextWritingDirectionRightToLeft(
-    Frame* frame,
-    Event*,
-    EditorCommandSource source,
-    const String&) {
+static bool executeMakeTextWritingDirectionRightToLeft(Frame* frame,
+                                                       Event*,
+                                                       EditorCommandSource,
+                                                       const String&) {
   RefPtr<CSSMutableStyleDeclaration> style =
       CSSMutableStyleDeclaration::create();
   style->setProperty(CSSPropertyUnicodeBidi, CSSValueEmbed);

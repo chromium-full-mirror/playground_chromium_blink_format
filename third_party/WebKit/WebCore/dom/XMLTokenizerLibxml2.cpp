@@ -306,7 +306,7 @@ static int globalDescriptor = 0;
 static DocLoader* globalDocLoader = 0;
 static ThreadIdentifier libxmlLoaderThread = 0;
 
-static int matchFunc(const char* uri) {
+static int matchFunc(const char*) {
   // Only match loads initiated due to uses of libxml2 from within XMLTokenizer
   // to avoid
   // interfering with client applications that also use libxml2.
@@ -409,7 +409,7 @@ static int readFunc(void* context, char* buffer, int len) {
   return data->readOutBytes(buffer, len);
 }
 
-static int writeFunc(void* context, const char* buffer, int len) {
+static int writeFunc(void*, const char*, int) {
   // Always just do 0-byte writes
   return 0;
 }
@@ -994,9 +994,9 @@ static void startElementNsHandler(void* closure,
 }
 
 static void endElementNsHandler(void* closure,
-                                const xmlChar* localname,
-                                const xmlChar* prefix,
-                                const xmlChar* uri) {
+                                const xmlChar*,
+                                const xmlChar*,
+                                const xmlChar*) {
   if (hackAroundLibXMLEntityBug(closure))
     return;
 
@@ -1129,9 +1129,9 @@ static void internalSubsetHandler(void* closure,
 }
 
 static void externalSubsetHandler(void* closure,
-                                  const xmlChar* name,
+                                  const xmlChar*,
                                   const xmlChar* externalId,
-                                  const xmlChar* systemId) {
+                                  const xmlChar*) {
   String extId = toString(externalId);
   if ((extId == "-//W3C//DTD XHTML 1.0 Transitional//EN") ||
       (extId == "-//W3C//DTD XHTML 1.1//EN") ||
@@ -1145,7 +1145,7 @@ static void externalSubsetHandler(void* closure,
         true);  // controls if we replace entities or not.
 }
 
-static void ignorableWhitespaceHandler(void* ctx, const xmlChar* ch, int len) {
+static void ignorableWhitespaceHandler(void*, const xmlChar*, int) {
   // nothing to do, but we need this to work around a crasher
   // http://bugzilla.gnome.org/show_bug.cgi?id=172255
   // http://bugs.webkit.org/show_bug.cgi?id=5792
@@ -1314,12 +1314,12 @@ struct AttributeParseState {
 
 static void attributesStartElementNsHandler(void* closure,
                                             const xmlChar* xmlLocalName,
-                                            const xmlChar* xmlPrefix,
-                                            const xmlChar* xmlURI,
-                                            int nb_namespaces,
-                                            const xmlChar** namespaces,
+                                            const xmlChar* /*xmlPrefix*/,
+                                            const xmlChar* /*xmlURI*/,
+                                            int /*nb_namespaces*/,
+                                            const xmlChar** /*namespaces*/,
                                             int nb_attributes,
-                                            int nb_defaulted,
+                                            int /*nb_defaulted*/,
                                             const xmlChar** libxmlAttributes) {
   if (strcmp(reinterpret_cast<const char*>(xmlLocalName), "attrs") != 0)
     return;

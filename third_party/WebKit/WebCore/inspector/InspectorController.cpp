@@ -991,7 +991,7 @@ static JSValueRef localizedStrings(JSContextRef ctx,
 
 static JSValueRef platform(JSContextRef ctx,
                            JSObjectRef /*function*/,
-                           JSObjectRef thisObject,
+                           JSObjectRef /*thisObject*/,
                            size_t /*argumentCount*/,
                            const JSValueRef[] /*arguments[]*/,
                            JSValueRef* /*exception*/) {
@@ -1076,7 +1076,7 @@ static JSValueRef wrapCallback(JSContextRef ctx,
                                JSObjectRef thisObject,
                                size_t argumentCount,
                                const JSValueRef arguments[],
-                               JSValueRef* exception) {
+                               JSValueRef* /*exception*/) {
   InspectorController* controller =
       reinterpret_cast<InspectorController*>(JSObjectGetPrivate(thisObject));
   if (!controller)
@@ -1629,7 +1629,7 @@ void InspectorController::toggleSearchForNodeInPage() {
 }
 
 void InspectorController::mouseDidMoveOverElement(const HitTestResult& result,
-                                                  unsigned modifierFlags) {
+                                                  unsigned) {
   if (!enabled() || !m_searchingForNode)
     return;
 
@@ -2723,7 +2723,7 @@ void InspectorController::identifierForInitialRequest(
 }
 
 void InspectorController::willSendRequest(
-    DocumentLoader* loader,
+    DocumentLoader*,
     unsigned long identifier,
     ResourceRequest& request,
     const ResourceResponse& redirectResponse) {
@@ -2792,7 +2792,7 @@ void InspectorController::didReceiveContentLength(DocumentLoader*,
     updateScriptResource(resource, resource->length);
 }
 
-void InspectorController::didFinishLoading(DocumentLoader* loader,
+void InspectorController::didFinishLoading(DocumentLoader*,
                                            unsigned long identifier) {
   if (!enabled())
     return;
@@ -2815,7 +2815,7 @@ void InspectorController::didFinishLoading(DocumentLoader* loader,
   }
 }
 
-void InspectorController::didFailLoading(DocumentLoader* loader,
+void InspectorController::didFailLoading(DocumentLoader*,
                                          unsigned long identifier,
                                          const ResourceError& /*error*/) {
   if (!enabled())
@@ -3210,10 +3210,10 @@ bool InspectorController::handleException(JSContextRef context,
 }
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
+
 // JavaScriptDebugListener functions
 
-void InspectorController::didParseSource(ExecState* exec,
-                                         const SourceCode& source) {
+void InspectorController::didParseSource(ExecState*, const SourceCode& source) {
   JSValueRef sourceIDValue =
       JSValueMakeNumber(m_scriptContext, source.provider()->asID());
   JSValueRef sourceURLValue = JSValueMakeString(
@@ -3230,7 +3230,7 @@ void InspectorController::didParseSource(ExecState* exec,
                arguments, exception);
 }
 
-void InspectorController::failedToParseSource(ExecState* exec,
+void InspectorController::failedToParseSource(ExecState*,
                                               const SourceCode& source,
                                               int errorLine,
                                               const UString& errorMessage) {
@@ -3256,6 +3256,7 @@ void InspectorController::didPause() {
   callFunction(m_scriptContext, m_scriptObject, "pausedScript", 0, 0,
                exception);
 }
+
 #endif
 
 }  // namespace WebCore

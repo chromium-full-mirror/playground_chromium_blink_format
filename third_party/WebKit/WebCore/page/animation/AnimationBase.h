@@ -146,9 +146,9 @@ class AnimationBase : public RefCounted<AnimationBase> {
 
   virtual void animate(CompositeAnimation*,
                        RenderObject*,
-                       const RenderStyle* currentStyle,
-                       const RenderStyle* targetStyle,
-                       RefPtr<RenderStyle>& animatedStyle) {}
+                       const RenderStyle* /*currentStyle*/,
+                       const RenderStyle* /*targetStyle*/,
+                       RefPtr<RenderStyle>& /*animatedStyle*/) {}
 
   virtual bool shouldFireEvents() const { return false; }
 
@@ -167,7 +167,7 @@ class AnimationBase : public RefCounted<AnimationBase> {
   virtual bool overridden() const { return false; }
 
   // Does this animation/transition involve the given property?
-  virtual bool affectsProperty(int property) const { return false; }
+  virtual bool affectsProperty(int /*property*/) const { return false; }
   bool isAnimatingProperty(int property, bool isRunningNow) const {
     if (isRunningNow)
       return (!waitingToStart() && !postActive()) && affectsProperty(property);
@@ -189,11 +189,11 @@ class AnimationBase : public RefCounted<AnimationBase> {
 
   // These are called when the corresponding timer fires so subclasses can do
   // any extra work
-  virtual void onAnimationStart(double elapsedTime) {}
-  virtual void onAnimationIteration(double elapsedTime) {}
-  virtual void onAnimationEnd(double elapsedTime) {}
-  virtual bool startAnimation(double beginTime) { return false; }
-  virtual void endAnimation(bool reset) {}
+  virtual void onAnimationStart(double /*elapsedTime*/) {}
+  virtual void onAnimationIteration(double /*elapsedTime*/) {}
+  virtual void onAnimationEnd(double /*elapsedTime*/) {}
+  virtual bool startAnimation(double /*beginTime*/) { return false; }
+  virtual void endAnimation(bool /*reset*/) {}
 
   void goIntoEndingOrLoopingState();
 
@@ -213,7 +213,6 @@ class AnimationBase : public RefCounted<AnimationBase> {
 
   static void setChanged(Node*);
 
- protected:
   AnimState m_animState;
 
   bool m_isAnimating;  // transition/animation requires continual timer firing

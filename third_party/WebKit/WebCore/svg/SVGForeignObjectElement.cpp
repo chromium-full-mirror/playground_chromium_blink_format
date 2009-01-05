@@ -158,7 +158,7 @@ void SVGForeignObjectElement::svgAttributeChanged(
 }
 
 RenderObject* SVGForeignObjectElement::createRenderer(RenderArena* arena,
-                                                      RenderStyle* style) {
+                                                      RenderStyle*) {
   return new (arena) RenderForeignObject(this);
 }
 

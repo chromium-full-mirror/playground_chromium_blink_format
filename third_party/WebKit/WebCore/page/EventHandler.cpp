@@ -1671,7 +1671,7 @@ void EventHandler::updateMouseEventTargetNode(
 
 bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
                                       Node* targetNode,
-                                      bool cancelable,
+                                      bool /*cancelable*/,
                                       int clickCount,
                                       const PlatformMouseEvent& mouseEvent,
                                       bool setUnder) {

@@ -95,7 +95,7 @@ class HTMLFormControlElement : public HTMLElement, public FormControlElement {
 
   virtual bool isSuccessfulSubmitButton() const { return false; }
   virtual bool isActivatedSubmit() const { return false; }
-  virtual void setActivatedSubmit(bool flag) {}
+  virtual void setActivatedSubmit(bool) {}
 
   virtual short tabIndex() const;
 

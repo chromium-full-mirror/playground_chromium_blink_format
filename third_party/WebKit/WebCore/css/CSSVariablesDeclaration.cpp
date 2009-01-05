@@ -125,8 +125,7 @@ CSSValueList* CSSVariablesDeclaration::getParsedVariable(
 }
 
 CSSMutableStyleDeclaration*
-CSSVariablesDeclaration::getParsedVariableDeclarationBlock(
-    const String& variableName) {
+CSSVariablesDeclaration::getParsedVariableDeclarationBlock(const String&) {
 // FIXME: Disabling declarations as variable values for now since they no longer
 // have a common base class with CSSValues.
 #if 0

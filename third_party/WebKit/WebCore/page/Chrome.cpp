@@ -413,9 +413,9 @@ bool ChromeClient::paintCustomScrollbar(GraphicsContext*,
                                         ScrollbarControlSize,
                                         ScrollbarControlState,
                                         ScrollbarPart,
-                                        bool vertical,
-                                        float value,
-                                        float proportion,
+                                        bool,
+                                        float,
+                                        float,
                                         ScrollbarControlPartMask) {
   return false;
 }

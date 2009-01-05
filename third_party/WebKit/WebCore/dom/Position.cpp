@@ -796,7 +796,7 @@ Position Position::leadingWhitespacePosition(
 
 // This assumes that it starts in editable content.
 Position Position::trailingWhitespacePosition(
-    EAffinity affinity,
+    EAffinity,
     bool considerNonCollapsibleWhitespace) const {
   ASSERT(isEditablePosition(*this));
   if (isNull())

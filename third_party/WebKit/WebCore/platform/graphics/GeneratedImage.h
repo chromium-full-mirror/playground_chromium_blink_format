@@ -53,7 +53,7 @@ class GeneratedImage : public Image {
   virtual IntSize size() const { return m_size; }
 
   // Assume that generated content has no decoded data we need to worry about
-  virtual void destroyDecodedData(bool destroyAll = true) {}
+  virtual void destroyDecodedData(bool /*destroyAll*/ = true) {}
   virtual unsigned decodedSize() const { return 0; }
 
  protected:
@@ -68,7 +68,6 @@ class GeneratedImage : public Image {
                            CompositeOperator,
                            const FloatRect& destRect);
 
- protected:
   GeneratedImage(PassRefPtr<Generator> generator, const IntSize& size)
       : m_generator(generator), m_size(size) {}
 

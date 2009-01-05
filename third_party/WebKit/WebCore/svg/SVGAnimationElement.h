@@ -117,8 +117,8 @@ class SVGAnimationElement : public SVGSMILElement,
   virtual void calculateAnimatedValue(float percentage,
                                       unsigned repeat,
                                       SVGSMILElement* resultElement) = 0;
-  virtual float calculateDistance(const String& fromString,
-                                  const String& toString) {
+  virtual float calculateDistance(const String& /*fromString*/,
+                                  const String& /*toString*/) {
     return -1.f;
   }
   virtual Path animationPath() const { return Path(); }

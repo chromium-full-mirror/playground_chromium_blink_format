@@ -123,9 +123,8 @@ void MainResourceLoader::callContinueAfterNavigationPolicy(
       request, shouldContinue);
 }
 
-void MainResourceLoader::continueAfterNavigationPolicy(
-    const ResourceRequest& request,
-    bool shouldContinue) {
+void MainResourceLoader::continueAfterNavigationPolicy(const ResourceRequest&,
+                                                       bool shouldContinue) {
   if (!shouldContinue)
     stopLoadingForPolicyChange();
   deref();  // balances ref in willSendRequest

@@ -92,7 +92,7 @@ class Theme {
   // The font description result should have a zoomed font size.
   virtual FontDescription controlFont(ControlPart,
                                       const Font& font,
-                                      float zoomFactor) const {
+                                      float /*zoomFactor*/) const {
     return font.fontDescription();
   }
 
@@ -101,14 +101,14 @@ class Theme {
   virtual LengthSize controlSize(ControlPart,
                                  const Font&,
                                  const LengthSize& zoomedSize,
-                                 float zoomFactor) const {
+                                 float /*zoomFactor*/) const {
     return zoomedSize;
   }
 
   // Returns the minimum size for a control in zoomed coordinates.
   virtual LengthSize minimumControlSize(ControlPart,
                                         const Font&,
-                                        float zoomFactor) const {
+                                        float /*zoomFactor*/) const {
     return LengthSize(Length(0, Fixed), Length(0, Fixed));
   }
 
@@ -125,13 +125,13 @@ class Theme {
   // Whether or not whitespace: pre should be forced on always.
   virtual bool controlRequiresPreWhiteSpace(ControlPart) const { return false; }
 
-  // Method for painting a control.  The rect is in zoomed coordinates.
+  // Method for painting a control. The rect is in zoomed coordinates.
   virtual void paint(ControlPart,
                      ControlStates,
                      GraphicsContext*,
-                     const IntRect& zoomedRect,
-                     float zoomFactor,
-                     ScrollView*) const {};
+                     const IntRect& /*zoomedRect*/,
+                     float /*zoomFactor*/,
+                     ScrollView*) const {}
 
   // Some controls may spill out of their containers (e.g., the check on an OS X
   // checkbox).  When these controls repaint,
@@ -142,8 +142,8 @@ class Theme {
   // amount is also scaled by the zoomFactor.
   virtual void inflateControlPaintRect(ControlPart,
                                        ControlStates,
-                                       IntRect& zoomedRect,
-                                       float zoomFactor) const {}
+                                       IntRect& /*zoomedRect*/,
+                                       float /*zoomFactor*/) const {}
 
   // This method is called once, from RenderTheme::adjustDefaultStyleSheet(), to
   // let each platform adjust

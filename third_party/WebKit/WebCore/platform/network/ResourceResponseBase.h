@@ -121,8 +121,8 @@ class ResourceResponseBase {
 
   // The ResourceResponse subclass may "shadow" this method to compare platform
   // specific fields
-  static bool platformCompare(const ResourceResponse& a,
-                              const ResourceResponse& b) {
+  static bool platformCompare(const ResourceResponse&,
+                              const ResourceResponse&) {
     return true;
   }
 

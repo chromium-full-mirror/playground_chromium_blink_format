@@ -68,7 +68,7 @@ void SVGTextPathElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 RenderObject* SVGTextPathElement::createRenderer(RenderArena* arena,
-                                                 RenderStyle* style) {
+                                                 RenderStyle*) {
   return new (arena) RenderSVGTextPath(this);
 }
 

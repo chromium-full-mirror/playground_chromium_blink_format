@@ -37,6 +37,7 @@ class SkewTransformOperation : public TransformOperation {
     return adoptRef(new SkewTransformOperation(angleX, angleY, type));
   }
 
+ private:
   virtual bool isIdentity() const { return m_angleX == 0 && m_angleY == 0; }
   virtual OperationType getOperationType() const { return m_type; }
   virtual bool isSameType(const TransformOperation& o) const {
@@ -51,8 +52,7 @@ class SkewTransformOperation : public TransformOperation {
     return m_angleX == s->m_angleX && m_angleY == s->m_angleY;
   }
 
-  virtual bool apply(AffineTransform& transform,
-                     const IntSize& borderBoxSize) const {
+  virtual bool apply(AffineTransform& transform, const IntSize&) const {
     transform.skew(m_angleX, m_angleY);
     return false;
   }
@@ -61,7 +61,6 @@ class SkewTransformOperation : public TransformOperation {
                                                double progress,
                                                bool blendToIdentity = false);
 
- private:
   SkewTransformOperation(double angleX, double angleY, OperationType type)
       : m_angleX(angleX), m_angleY(angleY), m_type(type) {}
 

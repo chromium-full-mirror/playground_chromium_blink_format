@@ -154,7 +154,7 @@ bool SVGAnimationElement::beginElement(ExceptionCode& ec) {
   return beginElementAt(0, ec);
 }
 
-bool SVGAnimationElement::beginElementAt(float offset, ExceptionCode& ec) {
+bool SVGAnimationElement::beginElementAt(float offset, ExceptionCode&) {
   addBeginTime(elapsed() + offset);
   return true;
 }
@@ -163,7 +163,7 @@ bool SVGAnimationElement::endElement(ExceptionCode& ec) {
   return endElementAt(0, ec);
 }
 
-bool SVGAnimationElement::endElementAt(float offset, ExceptionCode& ec) {
+bool SVGAnimationElement::endElementAt(float offset, ExceptionCode&) {
   if (offset < 0)
     return false;
 

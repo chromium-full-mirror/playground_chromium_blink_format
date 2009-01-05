@@ -120,7 +120,7 @@ unsigned ApplicationCache::numDynamicEntries() const {
   return 0;
 }
 
-String ApplicationCache::dynamicEntry(unsigned index) const {
+String ApplicationCache::dynamicEntry(unsigned) const {
   // FIXME: Implement
   return String();
 }
@@ -134,7 +134,7 @@ bool ApplicationCache::addDynamicEntry(const String& url) {
   return true;
 }
 
-void ApplicationCache::removeDynamicEntry(const String& url) {
+void ApplicationCache::removeDynamicEntry(const String&) {
   // FIXME: Implement
 }
 

@@ -223,8 +223,8 @@ class SVGPathParser {
                          bool closed,
                          bool abs = true) = 0;
   virtual void svgLineTo(double x1, double y1, bool abs = true) = 0;
-  virtual void svgLineToHorizontal(double x, bool abs = true) {}
-  virtual void svgLineToVertical(double y, bool abs = true) {}
+  virtual void svgLineToHorizontal(double, bool /*abs*/ = true) {}
+  virtual void svgLineToVertical(double /*y*/, bool /*abs*/ = true) {}
   virtual void svgCurveToCubic(double x1,
                                double y1,
                                double x2,
@@ -232,25 +232,27 @@ class SVGPathParser {
                                double x,
                                double y,
                                bool abs = true) = 0;
-  virtual void svgCurveToCubicSmooth(double x,
-                                     double y,
-                                     double x2,
-                                     double y2,
-                                     bool abs = true) {}
-  virtual void svgCurveToQuadratic(double x,
-                                   double y,
-                                   double x1,
-                                   double y1,
-                                   bool abs = true) {}
-  virtual void svgCurveToQuadraticSmooth(double x, double y, bool abs = true) {}
-  virtual void svgArcTo(double x,
-                        double y,
-                        double r1,
-                        double r2,
-                        double angle,
-                        bool largeArcFlag,
-                        bool sweepFlag,
-                        bool abs = true) {}
+  virtual void svgCurveToCubicSmooth(double /*x*/,
+                                     double /*y*/,
+                                     double /*x2*/,
+                                     double /*y2*/,
+                                     bool /*abs*/ = true) {}
+  virtual void svgCurveToQuadratic(double /*x*/,
+                                   double /*y*/,
+                                   double /*x1*/,
+                                   double /*y1*/,
+                                   bool /*abs*/ = true) {}
+  virtual void svgCurveToQuadraticSmooth(double /*x*/,
+                                         double /*y*/,
+                                         bool /*abs*/ = true) {}
+  virtual void svgArcTo(double /*x*/,
+                        double /*y*/,
+                        double /*r1*/,
+                        double /*r2*/,
+                        double /*angle*/,
+                        bool /*largeArcFlag*/,
+                        bool /*sweepFlag*/,
+                        bool /*abs*/ = true) {}
   virtual void svgClosePath() = 0;
 
  private:

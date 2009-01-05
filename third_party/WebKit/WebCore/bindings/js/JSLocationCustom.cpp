@@ -40,21 +40,21 @@ namespace WebCore {
 
 JSValue* nonCachingStaticReplaceFunctionGetter(ExecState* exec,
                                                const Identifier& propertyName,
-                                               const PropertySlot& slot) {
+                                               const PropertySlot&) {
   return new (exec) PrototypeFunction(exec, 1, propertyName,
                                       jsLocationPrototypeFunctionReplace);
 }
 
 JSValue* nonCachingStaticReloadFunctionGetter(ExecState* exec,
                                               const Identifier& propertyName,
-                                              const PropertySlot& slot) {
+                                              const PropertySlot&) {
   return new (exec) PrototypeFunction(exec, 0, propertyName,
                                       jsLocationPrototypeFunctionReload);
 }
 
 JSValue* nonCachingStaticAssignFunctionGetter(ExecState* exec,
                                               const Identifier& propertyName,
-                                              const PropertySlot& slot) {
+                                              const PropertySlot&) {
   return new (exec) PrototypeFunction(exec, 1, propertyName,
                                       jsLocationPrototypeFunctionAssign);
 }
@@ -280,7 +280,7 @@ JSValue* JSLocation::replace(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValue* JSLocation::reload(ExecState* exec, const ArgList& args) {
+JSValue* JSLocation::reload(ExecState* exec, const ArgList&) {
   Frame* frame = impl()->frame();
   if (!frame)
     return jsUndefined();

@@ -99,13 +99,10 @@ class EmptyChromeClient : public ChromeClient {
 
   virtual void setResizable(bool) {}
 
-  virtual void addMessageToConsole(const String& message,
-                                   unsigned int lineNumber,
-                                   const String& sourceID) {}
+  virtual void addMessageToConsole(const String&, unsigned, const String&) {}
 
   virtual bool canRunBeforeUnloadConfirmPanel() { return false; }
-  virtual bool runBeforeUnloadConfirmPanel(const String& message,
-                                           Frame* frame) {
+  virtual bool runBeforeUnloadConfirmPanel(const String&, Frame*) {
     return true;
   }
 
@@ -114,9 +111,9 @@ class EmptyChromeClient : public ChromeClient {
   virtual void runJavaScriptAlert(Frame*, const String&) {}
   virtual bool runJavaScriptConfirm(Frame*, const String&) { return false; }
   virtual bool runJavaScriptPrompt(Frame*,
-                                   const String& message,
-                                   const String& defaultValue,
-                                   String& result) {
+                                   const String&,
+                                   const String&,
+                                   String&) {
     return false;
   }
   virtual bool shouldInterruptJavaScript() { return false; }
@@ -127,25 +124,16 @@ class EmptyChromeClient : public ChromeClient {
 
   virtual IntRect windowResizerRect() const { return IntRect(); }
   virtual void addToDirtyRegion(const IntRect&) {}
-  virtual void scrollBackingStore(int dx,
-                                  int dy,
-                                  const IntRect& scrollViewRect,
-                                  const IntRect& clipRect) {}
+  virtual void scrollBackingStore(int, int, const IntRect&, const IntRect&) {}
   virtual void updateBackingStore() {}
 
-  virtual void repaint(const IntRect&,
-                       bool contentChanged,
-                       bool immediate = false,
-                       bool repaintContentOnly = false) {}
-  virtual void scroll(const IntSize& scrollDelta,
-                      const IntRect& rectToScroll,
-                      const IntRect& clipRect) {}
+  virtual void repaint(const IntRect&, bool, bool, bool) {}
+  virtual void scroll(const IntSize&, const IntRect&, const IntRect&) {}
   virtual IntPoint screenToWindow(const IntPoint& p) const { return p; }
   virtual IntRect windowToScreen(const IntRect& r) const { return r; }
   virtual PlatformWidget platformWindow() const { return 0; }
 
-  virtual void mouseDidMoveOverElement(const HitTestResult&,
-                                       unsigned modifierFlags) {}
+  virtual void mouseDidMoveOverElement(const HitTestResult&, unsigned) {}
 
   virtual void setToolTip(const String&) {}
 
@@ -179,55 +167,50 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
                         const ResourceRequest&,
                         const ResourceResponse&) {}
 
-  virtual void assignIdentifierToInitialRequest(unsigned long identifier,
+  virtual void assignIdentifierToInitialRequest(unsigned long,
                                                 DocumentLoader*,
                                                 const ResourceRequest&) {}
-  virtual bool shouldUseCredentialStorage(DocumentLoader*,
-                                          unsigned long identifier) {
+  virtual bool shouldUseCredentialStorage(DocumentLoader*, unsigned long) {
     return false;
   }
-  virtual void dispatchWillSendRequest(
-      DocumentLoader*,
-      unsigned long identifier,
-      ResourceRequest&,
-      const ResourceResponse& redirectResponse) {}
+  virtual void dispatchWillSendRequest(DocumentLoader*,
+                                       unsigned long,
+                                       ResourceRequest&,
+                                       const ResourceResponse&) {}
   virtual void dispatchDidReceiveAuthenticationChallenge(
       DocumentLoader*,
-      unsigned long identifier,
+      unsigned long,
       const AuthenticationChallenge&) {}
   virtual void dispatchDidCancelAuthenticationChallenge(
       DocumentLoader*,
-      unsigned long identifier,
+      unsigned long,
       const AuthenticationChallenge&) {}
   virtual void dispatchDidReceiveResponse(DocumentLoader*,
-                                          unsigned long identifier,
+                                          unsigned long,
                                           const ResourceResponse&) {}
   virtual void dispatchDidReceiveContentLength(DocumentLoader*,
-                                               unsigned long identifier,
-                                               int lengthReceived) {}
-  virtual void dispatchDidFinishLoading(DocumentLoader*,
-                                        unsigned long identifier) {}
+                                               unsigned long,
+                                               int) {}
+  virtual void dispatchDidFinishLoading(DocumentLoader*, unsigned long) {}
   virtual void dispatchDidFailLoading(DocumentLoader*,
-                                      unsigned long identifier,
+                                      unsigned long,
                                       const ResourceError&) {}
   virtual bool dispatchDidLoadResourceFromMemoryCache(DocumentLoader*,
                                                       const ResourceRequest&,
                                                       const ResourceResponse&,
-                                                      int length) {
+                                                      int) {
     return false;
   }
 
   virtual void dispatchDidHandleOnloadEvents() {}
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad() {}
   virtual void dispatchDidCancelClientRedirect() {}
-  virtual void dispatchWillPerformClientRedirect(const KURL&,
-                                                 double interval,
-                                                 double fireDate) {}
+  virtual void dispatchWillPerformClientRedirect(const KURL&, double, double) {}
   virtual void dispatchDidChangeLocationWithinPage() {}
   virtual void dispatchWillClose() {}
   virtual void dispatchDidReceiveIcon() {}
   virtual void dispatchDidStartProvisionalLoad() {}
-  virtual void dispatchDidReceiveTitle(const String& title) {}
+  virtual void dispatchDidReceiveTitle(const String&) {}
   virtual void dispatchDidCommitLoad() {}
   virtual void dispatchDidFailProvisionalLoad(const ResourceError&) {}
   virtual void dispatchDidFailLoad(const ResourceError&) {}
@@ -240,14 +223,13 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void dispatchShow() {}
 
   virtual void dispatchDecidePolicyForMIMEType(FramePolicyFunction,
-                                               const String& MIMEType,
+                                               const String&,
                                                const ResourceRequest&) {}
   virtual void dispatchDecidePolicyForNewWindowAction(FramePolicyFunction,
                                                       const NavigationAction&,
                                                       const ResourceRequest&,
                                                       PassRefPtr<FormState>,
-                                                      const String& frameName) {
-  }
+                                                      const String&) {}
   virtual void dispatchDecidePolicyForNavigationAction(FramePolicyFunction,
                                                        const NavigationAction&,
                                                        const ResourceRequest&,
@@ -305,11 +287,11 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual bool shouldFallBack(const ResourceError&) { return false; }
 
   virtual bool canHandleRequest(const ResourceRequest&) const { return false; }
-  virtual bool canShowMIMEType(const String& MIMEType) const { return false; }
-  virtual bool representationExistsForURLScheme(const String& URLScheme) const {
+  virtual bool canShowMIMEType(const String&) const { return false; }
+  virtual bool representationExistsForURLScheme(const String&) const {
     return false;
   }
-  virtual String generatedMIMETypeForURLScheme(const String& URLScheme) const {
+  virtual String generatedMIMETypeForURLScheme(const String&) const {
     return "";
   }
 
@@ -327,7 +309,7 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
       const SubstituteData& substituteData) {
     return DocumentLoader::create(request, substituteData);
   }
-  virtual void setTitle(const String& title, const KURL&) {}
+  virtual void setTitle(const String&, const KURL&) {}
 
   virtual String userAgent(const KURL&) { return ""; }
 
@@ -340,13 +322,13 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void saveViewStateToItem(HistoryItem*) {}
   virtual bool canCachePage() const { return false; }
 
-  virtual PassRefPtr<Frame> createFrame(const KURL& url,
-                                        const String& name,
-                                        HTMLFrameOwnerElement* ownerElement,
-                                        const String& referrer,
-                                        bool allowsScrolling,
-                                        int marginWidth,
-                                        int marginHeight) {
+  virtual PassRefPtr<Frame> createFrame(const KURL&,
+                                        const String&,
+                                        HTMLFrameOwnerElement*,
+                                        const String&,
+                                        bool,
+                                        int,
+                                        int) {
     return 0;
   }
   virtual Widget* createPlugin(const IntSize&,
@@ -366,8 +348,7 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
     return 0;
   }
 
-  virtual ObjectContentType objectContentType(const KURL& url,
-                                              const String& mimeType) {
+  virtual ObjectContentType objectContentType(const KURL&, const String&) {
     return ObjectContentType();
   }
   virtual String overrideMediaType() const { return String(); }
@@ -376,12 +357,12 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void windowObjectCleared() {}
   virtual void didPerformFirstNavigation() const {}
 
-  virtual void registerForIconNotification(bool listen) {}
+  virtual void registerForIconNotification(bool) {}
 
 #if PLATFORM(MAC)
   virtual NSCachedURLResponse* willCacheResponse(
       DocumentLoader*,
-      unsigned long identifier,
+      unsigned long,
       NSCachedURLResponse* response) const {
     return response;
   }
@@ -416,10 +397,7 @@ class EmptyEditorClient : public EditorClient {
   virtual bool shouldInsertText(const String&, Range*, EditorInsertAction) {
     return false;
   }
-  virtual bool shouldChangeSelectedRange(Range* fromRange,
-                                         Range* toRange,
-                                         EAffinity,
-                                         bool stillSelecting) {
+  virtual bool shouldChangeSelectedRange(Range*, Range*, EAffinity, bool) {
     return false;
   }
 
@@ -473,22 +451,19 @@ class EmptyEditorClient : public EditorClient {
 #endif
   virtual void ignoreWordInSpellDocument(const String&) {}
   virtual void learnWord(const String&) {}
-  virtual void checkSpellingOfString(const UChar*,
-                                     int length,
-                                     int* misspellingLocation,
-                                     int* misspellingLength) {}
+  virtual void checkSpellingOfString(const UChar*, int, int*, int*) {}
   virtual void checkGrammarOfString(const UChar*,
-                                    int length,
+                                    int,
                                     Vector<GrammarDetail>&,
-                                    int* badGrammarLocation,
-                                    int* badGrammarLength) {}
+                                    int*,
+                                    int*) {}
   virtual void updateSpellingUIWithGrammarString(const String&,
                                                  const GrammarDetail&) {}
   virtual void updateSpellingUIWithMisspelledWord(const String&) {}
-  virtual void showSpellingUI(bool show) {}
+  virtual void showSpellingUI(bool) {}
   virtual bool spellingUIIsShowing() { return false; }
-  virtual void getGuessesForWord(const String&, Vector<String>& guesses) {}
-  virtual void setInputMethodState(bool enabled) {}
+  virtual void getGuessesForWord(const String&, Vector<String>&) {}
+  virtual void setInputMethodState(bool) {}
 };
 
 class EmptyContextMenuClient : public ContextMenuClient {
@@ -501,7 +476,7 @@ class EmptyContextMenuClient : public ContextMenuClient {
   }
   virtual void contextMenuItemSelected(ContextMenuItem*, const ContextMenu*) {}
 
-  virtual void downloadURL(const KURL& url) {}
+  virtual void downloadURL(const KURL&) {}
   virtual void copyImageToClipboard(const HitTestResult&) {}
   virtual void searchWithGoogle(const Frame*) {}
   virtual void lookUpInDictionary(Frame*) {}
@@ -533,9 +508,7 @@ class EmptyDragClient : public DragClient {
                          Clipboard*,
                          Frame*,
                          bool) {}
-  virtual DragImageRef createDragImageForLink(KURL&,
-                                              const String& label,
-                                              Frame*) {
+  virtual DragImageRef createDragImageForLink(KURL&, const String&, Frame*) {
     return 0;
   }
   virtual void dragControllerDestroyed() {}
@@ -561,13 +534,12 @@ class EmptyInspectorClient : public InspectorClient {
 
   virtual void highlight(Node*) {}
   virtual void hideHighlight() {}
-  virtual void inspectedURLChanged(const String& newURL) {}
+  virtual void inspectedURLChanged(const String&) {}
 
-  virtual void populateSetting(const String& key,
-                               InspectorController::Setting&) {}
-  virtual void storeSetting(const String& key,
+  virtual void populateSetting(const String&, InspectorController::Setting&) {}
+  virtual void storeSetting(const String&,
                             const InspectorController::Setting&) {}
-  virtual void removeSetting(const String& key) {}
+  virtual void removeSetting(const String&) {}
 };
 }
 

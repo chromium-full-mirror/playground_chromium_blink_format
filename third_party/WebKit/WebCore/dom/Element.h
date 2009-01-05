@@ -160,7 +160,7 @@ class Element : public ContainerNode {
   // not part of the DOM
   void setAttributeMap(PassRefPtr<NamedAttrMap>);
 
-  virtual void copyNonAttributeProperties(const Element* source) {}
+  virtual void copyNonAttributeProperties(const Element* /*source*/) {}
 
   virtual void attach();
   virtual void detach();
@@ -177,7 +177,7 @@ class Element : public ContainerNode {
   void dispatchAttrRemovalEvent(Attribute*);
   void dispatchAttrAdditionEvent(Attribute*);
 
-  virtual void accessKeyAction(bool sendToAnyEvent) {}
+  virtual void accessKeyAction(bool /*sendToAnyEvent*/) {}
 
   virtual bool isURLAttribute(Attribute*) const;
   virtual const QualifiedName& imageSourceAttributeName() const;

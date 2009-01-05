@@ -51,7 +51,7 @@ class RotateTransformOperation : public TransformOperation {
   }
 
   virtual bool apply(AffineTransform& transform,
-                     const IntSize& borderBoxSize) const {
+                     const IntSize& /*borderBoxSize*/) const {
     transform.rotate(m_angle);
     return false;
   }

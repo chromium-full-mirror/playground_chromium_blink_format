@@ -3048,7 +3048,7 @@ IntRect RenderBox::localCaretRect(InlineBox* box,
   return rect;
 }
 
-int RenderBox::lowestPosition(bool includeOverflowInterior,
+int RenderBox::lowestPosition(bool /*includeOverflowInterior*/,
                               bool includeSelf) const {
   if (!includeSelf || !m_width)
     return 0;
@@ -3058,7 +3058,7 @@ int RenderBox::lowestPosition(bool includeOverflowInterior,
   return bottom;
 }
 
-int RenderBox::rightmostPosition(bool includeOverflowInterior,
+int RenderBox::rightmostPosition(bool /*includeOverflowInterior*/,
                                  bool includeSelf) const {
   if (!includeSelf || !m_height)
     return 0;
@@ -3068,7 +3068,7 @@ int RenderBox::rightmostPosition(bool includeOverflowInterior,
   return right;
 }
 
-int RenderBox::leftmostPosition(bool includeOverflowInterior,
+int RenderBox::leftmostPosition(bool /*includeOverflowInterior*/,
                                 bool includeSelf) const {
   if (!includeSelf || !m_height)
     return m_width;

@@ -78,7 +78,7 @@ class RenderImage : public RenderReplaced {
   void highQualityRepaintTimerFired(Timer<RenderImage>*);
 
  protected:
-  virtual Image* image(int w = 0, int h = 0) {
+  virtual Image* image(int /*w*/ = 0, int /*h*/ = 0) {
     return m_cachedImage ? m_cachedImage->image() : nullImage();
   }
   virtual bool errorOccurred() const {

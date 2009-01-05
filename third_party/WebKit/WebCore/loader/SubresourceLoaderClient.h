@@ -44,10 +44,10 @@ class SubresourceLoaderClient {
   // request may be modified
   virtual void willSendRequest(SubresourceLoader*,
                                ResourceRequest&,
-                               const ResourceResponse& redirectResponse) {}
+                               const ResourceResponse& /*redirectResponse*/) {}
   virtual void didSendData(SubresourceLoader*,
-                           unsigned long long bytesSent,
-                           unsigned long long totalBytesToBeSent) {}
+                           unsigned long long /*bytesSent*/,
+                           unsigned long long /*totalBytesToBeSent*/) {}
 
   virtual void didReceiveResponse(SubresourceLoader*, const ResourceResponse&) {
   }
@@ -55,8 +55,9 @@ class SubresourceLoaderClient {
   virtual void didFinishLoading(SubresourceLoader*) {}
   virtual void didFail(SubresourceLoader*, const ResourceError&) {}
 
-  virtual bool getShouldUseCredentialStorage(SubresourceLoader*,
-                                             bool& shouldUseCredentialStorage) {
+  virtual bool getShouldUseCredentialStorage(
+      SubresourceLoader*,
+      bool& /*shouldUseCredentialStorage*/) {
     return false;
   }
   virtual void didReceiveAuthenticationChallenge(

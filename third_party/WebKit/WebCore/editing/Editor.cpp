@@ -1530,7 +1530,7 @@ static PassRefPtr<Range> paragraphAlignedRangeForRange(
 static int findFirstGrammarDetailInRange(
     const Vector<GrammarDetail>& grammarDetails,
     int badGrammarPhraseLocation,
-    int badGrammarPhraseLength,
+    int /*badGrammarPhraseLength*/,
     Range* searchRange,
     int startOffset,
     int endOffset,

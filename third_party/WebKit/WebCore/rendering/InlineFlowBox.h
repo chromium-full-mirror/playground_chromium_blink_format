@@ -196,8 +196,8 @@ class InlineFlowBox : public InlineRunBox {
                             int& selectionBottom);
   void shrinkBoxesWithNoTextChildren(int topPosition, int bottomPosition);
 
-  virtual void setVerticalOverflowPositions(int top, int bottom) {}
-  virtual void setVerticalSelectionPositions(int top, int bottom) {}
+  virtual void setVerticalOverflowPositions(int /*top*/, int /*bottom*/) {}
+  virtual void setVerticalSelectionPositions(int /*top*/, int /*bottom*/) {}
   int maxHorizontalVisualOverflow() const {
     return m_maxHorizontalVisualOverflow;
   }

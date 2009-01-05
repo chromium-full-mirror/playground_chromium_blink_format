@@ -521,8 +521,8 @@ class Node : public TreeShared<Node> {
   // document tree, or it could be another disconnected tree.  Override these
   // functions to do any work that depends
   // on connectedness to some ancestor (e.g., an ancestor <form> for example).
-  virtual void insertedIntoTree(bool deep) {}
-  virtual void removedFromTree(bool deep) {}
+  virtual void insertedIntoTree(bool /*deep*/) {}
+  virtual void removedFromTree(bool /*deep*/) {}
 
   /**
    * Notifies the node that it's list of children have changed (either by adding
@@ -530,10 +530,10 @@ class Node : public TreeShared<Node> {
    * node that is of the type CDATA_SECTION_NODE, TEXT_NODE or COMMENT_NODE has
    * changed its value.
    */
-  virtual void childrenChanged(bool changedByParser = false,
-                               Node* beforeChange = 0,
-                               Node* afterChange = 0,
-                               int childCountDelta = 0){};
+  virtual void childrenChanged(bool /*changedByParser*/ = false,
+                               Node* /*beforeChange*/ = 0,
+                               Node* /*afterChange*/ = 0,
+                               int /*childCountDelta*/ = 0) {}
 
 #ifndef NDEBUG
   virtual void formatForDebugger(char* buffer, unsigned length) const;

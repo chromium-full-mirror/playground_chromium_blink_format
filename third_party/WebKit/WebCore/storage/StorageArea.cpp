@@ -62,7 +62,7 @@ String StorageArea::internalGetItem(const String& key) const {
 
 void StorageArea::internalSetItem(const String& key,
                                   const String& value,
-                                  ExceptionCode& ec,
+                                  ExceptionCode&,
                                   Frame* frame) {
   ASSERT(!value.isNull());
 

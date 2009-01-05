@@ -91,11 +91,11 @@ void HTMLAppletElement::removedFromDocument() {
   HTMLPlugInElement::removedFromDocument();
 }
 
-bool HTMLAppletElement::rendererIsNeeded(RenderStyle* style) {
+bool HTMLAppletElement::rendererIsNeeded(RenderStyle*) {
   return !getAttribute(codeAttr).isNull();
 }
 
-RenderObject* HTMLAppletElement::createRenderer(RenderArena* arena,
+RenderObject* HTMLAppletElement::createRenderer(RenderArena*,
                                                 RenderStyle* style) {
   Settings* settings = document()->settings();
 

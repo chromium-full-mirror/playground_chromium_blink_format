@@ -282,7 +282,7 @@ unsigned long SVGSVGElement::suspendRedraw(
 }
 
 void SVGSVGElement::unsuspendRedraw(unsigned long /* suspend_handle_id */,
-                                    ExceptionCode& ec) {
+                                    ExceptionCode&) {
   // if suspend_handle_id is not found, throw exception
   // FIXME: Implement me (see bug 11275)
 }
@@ -295,26 +295,24 @@ void SVGSVGElement::forceRedraw() {
   // FIXME: Implement me (see bug 11275)
 }
 
-NodeList* SVGSVGElement::getIntersectionList(const FloatRect& rect,
-                                             SVGElement*) {
+NodeList* SVGSVGElement::getIntersectionList(const FloatRect&, SVGElement*) {
   // FIXME: Implement me (see bug 11274)
   return 0;
 }
 
-NodeList* SVGSVGElement::getEnclosureList(const FloatRect& rect, SVGElement*) {
+NodeList* SVGSVGElement::getEnclosureList(const FloatRect&, SVGElement*) {
   // FIXME: Implement me (see bug 11274)
   return 0;
 }
 
-bool SVGSVGElement::checkIntersection(SVGElement* element,
-                                      const FloatRect& rect) {
+bool SVGSVGElement::checkIntersection(SVGElement*, const FloatRect& rect) {
   // TODO : take into account pointer-events?
   // FIXME: Why is element ignored??
   // FIXME: Implement me (see bug 11274)
   return rect.intersects(getBBox());
 }
 
-bool SVGSVGElement::checkEnclosure(SVGElement* element, const FloatRect& rect) {
+bool SVGSVGElement::checkEnclosure(SVGElement*, const FloatRect& rect) {
   // TODO : take into account pointer-events?
   // FIXME: Why is element ignored??
   // FIXME: Implement me (see bug 11274)

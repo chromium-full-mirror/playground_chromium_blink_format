@@ -91,9 +91,9 @@ static int CeilingLog2(unsigned int i) {
 }
 
 void InitArenaPool(ArenaPool* pool,
-                   const char* name,
-                   unsigned int size,
-                   unsigned int align) {
+                   const char*,
+                   unsigned size,
+                   unsigned align) {
   if (align == 0)
     align = ARENA_DEFAULT_ALIGN;
   pool->mask = BITMASK(CeilingLog2(align));

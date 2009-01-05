@@ -45,7 +45,7 @@ class StyleImage : public RefCounted<StyleImage> {
 
   virtual PassRefPtr<CSSValue> cssValue() = 0;
 
-  virtual bool canRender(float multiplier) const { return true; }
+  virtual bool canRender(float /*multiplier*/) const { return true; }
   virtual bool isLoaded() const { return true; }
   virtual bool errorOccurred() const { return false; }
   virtual IntSize imageSize(const RenderObject*, float multiplier) const = 0;

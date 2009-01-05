@@ -50,11 +50,6 @@ class RenderTableSection : public RenderContainer {
 
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
 
-  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const {
-    return 0;
-  }
-  virtual void position(InlineBox*) {}
-
   virtual int getBaselineOfFirstLineBox() const;
 
   void addCell(RenderTableCell*, RenderObject* row);
@@ -149,6 +144,9 @@ class RenderTableSection : public RenderContainer {
                            HitTestAction);
 
  private:
+  virtual int lineHeight(bool, bool) const { return 0; }
+  virtual void position(InlineBox*) {}
+
   bool ensureRows(int);
   void clearGrid();
 

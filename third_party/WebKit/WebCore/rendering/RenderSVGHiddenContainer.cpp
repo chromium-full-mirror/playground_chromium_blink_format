@@ -39,12 +39,11 @@ bool RenderSVGHiddenContainer::requiresLayer() {
   return false;
 }
 
-int RenderSVGHiddenContainer::lineHeight(bool b, bool isRootLineBox) const {
+int RenderSVGHiddenContainer::lineHeight(bool, bool) const {
   return 0;
 }
 
-int RenderSVGHiddenContainer::baselinePosition(bool b,
-                                               bool isRootLineBox) const {
+int RenderSVGHiddenContainer::baselinePosition(bool, bool) const {
   return 0;
 }
 
@@ -73,15 +72,11 @@ IntRect RenderSVGHiddenContainer::absoluteClippedOverflowRect() {
   return IntRect();
 }
 
-void RenderSVGHiddenContainer::absoluteRects(Vector<IntRect>& rects,
-                                             int,
-                                             int,
-                                             bool) {
+void RenderSVGHiddenContainer::absoluteRects(Vector<IntRect>&, int, int, bool) {
   // This subtree does not take up space or paint
 }
 
-void RenderSVGHiddenContainer::absoluteQuads(Vector<FloatQuad>& quads,
-                                             bool topLevel) {
+void RenderSVGHiddenContainer::absoluteQuads(Vector<FloatQuad>&, bool) {
   // This subtree does not take up space or paint
 }
 
@@ -93,17 +88,17 @@ AffineTransform RenderSVGHiddenContainer::localTransform() const {
   return AffineTransform();
 }
 
-bool RenderSVGHiddenContainer::nodeAtPoint(const HitTestRequest& request,
-                                           HitTestResult& result,
-                                           int _x,
-                                           int _y,
-                                           int _tx,
-                                           int _ty,
-                                           HitTestAction hitTestAction) {
+bool RenderSVGHiddenContainer::nodeAtPoint(const HitTestRequest&,
+                                           HitTestResult&,
+                                           int,
+                                           int,
+                                           int,
+                                           int,
+                                           HitTestAction) {
   return false;
 }
 
-FloatRect RenderSVGHiddenContainer::relativeBBox(bool includeStroke) const {
+FloatRect RenderSVGHiddenContainer::relativeBBox(bool) const {
   return FloatRect();
 }
 }

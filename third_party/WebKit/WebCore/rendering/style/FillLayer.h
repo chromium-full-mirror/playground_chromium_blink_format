@@ -153,10 +153,10 @@ struct FillLayer {
     return CompositeSourceOver;
   }
   static LengthSize initialFillSize(EFillLayerType) { return LengthSize(); }
-  static Length initialFillXPosition(EFillLayerType type) {
+  static Length initialFillXPosition(EFillLayerType) {
     return Length(0.0, Percent);
   }
-  static Length initialFillYPosition(EFillLayerType type) {
+  static Length initialFillYPosition(EFillLayerType) {
     return Length(0.0, Percent);
   }
   static StyleImage* initialFillImage(EFillLayerType) { return 0; }

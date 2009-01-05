@@ -521,9 +521,9 @@ bool DOMWindow::find(const String& string,
                      bool caseSensitive,
                      bool backwards,
                      bool wrap,
-                     bool wholeWord,
-                     bool searchInFrames,
-                     bool showDialog) const {
+                     bool /*wholeWord*/,
+                     bool /*searchInFrames*/,
+                     bool /*showDialog*/) const {
   if (!m_frame)
     return false;
 

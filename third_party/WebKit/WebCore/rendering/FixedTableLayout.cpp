@@ -76,7 +76,7 @@ namespace WebCore {
 
 FixedTableLayout::FixedTableLayout(RenderTable* table) : TableLayout(table) {}
 
-int FixedTableLayout::calcWidthArray(int tableWidth) {
+int FixedTableLayout::calcWidthArray(int) {
   int usedWidth = 0;
 
   // iterate over all <col> elements

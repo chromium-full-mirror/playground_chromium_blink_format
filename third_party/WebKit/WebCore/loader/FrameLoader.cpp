@@ -4133,7 +4133,7 @@ void FrameLoader::callContinueLoadAfterNavigationPolicy(
 }
 
 void FrameLoader::continueLoadAfterNavigationPolicy(
-    const ResourceRequest& request,
+    const ResourceRequest&,
     PassRefPtr<FormState> formState,
     bool shouldContinue) {
   // If we loaded an alternate page to replace an unreachableURL, we'll get in
@@ -5158,7 +5158,7 @@ void FrameLoader::setMainDocumentError(DocumentLoader* loader,
 }
 
 void FrameLoader::mainReceivedCompleteError(DocumentLoader* loader,
-                                            const ResourceError& error) {
+                                            const ResourceError&) {
   loader->setPrimaryLoadComplete(true);
   m_client->dispatchDidLoadMainResource(activeDocumentLoader());
   checkCompleted();

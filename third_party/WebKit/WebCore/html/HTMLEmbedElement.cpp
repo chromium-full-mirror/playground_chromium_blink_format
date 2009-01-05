@@ -135,7 +135,7 @@ bool HTMLEmbedElement::rendererIsNeeded(RenderStyle* style) {
 }
 
 RenderObject* HTMLEmbedElement::createRenderer(RenderArena* arena,
-                                               RenderStyle* style) {
+                                               RenderStyle*) {
   if (isImageType())
     return new (arena) RenderImage(this);
   return new (arena) RenderPartObject(this);

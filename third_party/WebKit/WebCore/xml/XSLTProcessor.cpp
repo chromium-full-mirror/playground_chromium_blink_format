@@ -107,7 +107,7 @@ SOFT_LINK(libxslt,
 
 namespace WebCore {
 
-void XSLTProcessor::genericErrorFunc(void* userData, const char* msg, ...) {
+void XSLTProcessor::genericErrorFunc(void*, const char*, ...) {
   // It would be nice to do something with this error message.
 }
 
@@ -140,7 +140,7 @@ void XSLTProcessor::parseErrorFunc(void* userData, xmlError* error) {
 static XSLTProcessor* globalProcessor = 0;
 static DocLoader* globalDocLoader = 0;
 static xmlDocPtr docLoaderFunc(const xmlChar* uri,
-                               xmlDictPtr dict,
+                               xmlDictPtr,
                                int options,
                                void* ctxt,
                                xsltLoadType type) {
@@ -512,7 +512,7 @@ PassRefPtr<DocumentFragment> XSLTProcessor::transformToFragment(
                                   outputDoc);
 }
 
-void XSLTProcessor::setParameter(const String& namespaceURI,
+void XSLTProcessor::setParameter(const String& /*namespaceURI*/,
                                  const String& localName,
                                  const String& value) {
   // FIXME: namespace support?
@@ -520,14 +520,14 @@ void XSLTProcessor::setParameter(const String& namespaceURI,
   m_parameters.set(localName, value);
 }
 
-String XSLTProcessor::getParameter(const String& namespaceURI,
+String XSLTProcessor::getParameter(const String& /*namespaceURI*/,
                                    const String& localName) const {
   // FIXME: namespace support?
   // should make a QualifiedName here but we'd have to expose the impl
   return m_parameters.get(localName);
 }
 
-void XSLTProcessor::removeParameter(const String& namespaceURI,
+void XSLTProcessor::removeParameter(const String& /*namespaceURI*/,
                                     const String& localName) {
   // FIXME: namespace support?
   m_parameters.remove(localName);

@@ -132,7 +132,7 @@ void RenderView::layout() {
 
 FloatPoint RenderView::localToAbsolute(FloatPoint localPoint,
                                        bool fixed,
-                                       bool useTransforms) const {
+                                       bool) const {
   if (fixed && m_frameView)
     localPoint += m_frameView->scrollOffset();
 
@@ -141,7 +141,7 @@ FloatPoint RenderView::localToAbsolute(FloatPoint localPoint,
 
 FloatPoint RenderView::absoluteToLocal(FloatPoint containerPoint,
                                        bool fixed,
-                                       bool useTransforms) const {
+                                       bool) const {
   if (fixed && m_frameView)
     containerPoint -= m_frameView->scrollOffset();
 
@@ -176,7 +176,7 @@ static inline bool rendererObscuresBackground(RenderObject* object) {
          object->style()->opacity() == 1 && !object->style()->hasTransform();
 }
 
-void RenderView::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
+void RenderView::paintBoxDecorations(PaintInfo& paintInfo, int, int) {
   // Check to see if we are enclosed by a layer that requires complex painting
   // rules.  If so, we cannot blit
   // when scrolling, and we need to use slow repaints.  Examples of layers that
@@ -268,7 +268,7 @@ void RenderView::absoluteRects(Vector<IntRect>& rects, int tx, int ty, bool) {
   rects.append(IntRect(tx, ty, m_layer->width(), m_layer->height()));
 }
 
-void RenderView::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
+void RenderView::absoluteQuads(Vector<FloatQuad>& quads, bool) {
   quads.append(FloatRect(0, 0, m_layer->width(), m_layer->height()));
 }
 

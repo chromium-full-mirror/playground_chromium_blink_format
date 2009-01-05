@@ -53,6 +53,7 @@ class MediaTokenizer : public Tokenizer {
  public:
   MediaTokenizer(Document* doc) : m_doc(doc), m_mediaElement(0) {}
 
+ private:
   virtual bool write(const SegmentedString&, bool appendData);
   virtual void stopParsing();
   virtual void finish();
@@ -63,12 +64,11 @@ class MediaTokenizer : public Tokenizer {
 
   void createDocumentStructure();
 
- private:
   Document* m_doc;
   HTMLMediaElement* m_mediaElement;
 };
 
-bool MediaTokenizer::write(const SegmentedString& s, bool appendData) {
+bool MediaTokenizer::write(const SegmentedString&, bool) {
   ASSERT_NOT_REACHED();
   return false;
 }
@@ -109,7 +109,7 @@ void MediaTokenizer::createDocumentStructure() {
       ->setShouldBufferData(false);
 }
 
-bool MediaTokenizer::writeRawData(const char* data, int len) {
+bool MediaTokenizer::writeRawData(const char*, int) {
   ASSERT(!m_mediaElement);
   if (m_mediaElement)
     return false;

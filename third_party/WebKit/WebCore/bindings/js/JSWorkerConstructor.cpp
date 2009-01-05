@@ -49,7 +49,7 @@ JSWorkerConstructor::JSWorkerConstructor(ExecState* exec)
 }
 
 static JSObject* constructWorker(ExecState* exec,
-                                 JSObject* constructor,
+                                 JSObject*,
                                  const ArgList& args) {
   if (args.size() == 0)
     return throwError(exec, SyntaxError, "Not enough arguments");

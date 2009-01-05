@@ -83,7 +83,7 @@ class ResourceErrorBase {
 
   // The ResourceError subclass may "shadow" this method to compare platform
   // specific fields
-  static bool platformCompare(const ResourceError& a, const ResourceError& b) {
+  static bool platformCompare(const ResourceError&, const ResourceError&) {
     return true;
   }
 

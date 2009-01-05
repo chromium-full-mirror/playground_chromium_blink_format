@@ -4819,9 +4819,24 @@ CSSRule* CSSParser::createFontFaceRule() {
   return result;
 }
 
+#if !ENABLE(CSS_VARIABLES)
+
+CSSRule* CSSParser::createVariablesRule(MediaList*, bool) {
+  return 0;
+}
+
+bool CSSParser::addVariable(const CSSParserString&, CSSParserValueList*) {
+  return false;
+}
+
+bool CSSParser::addVariableDeclarationBlock(const CSSParserString&) {
+  return false;
+}
+
+#else
+
 CSSRule* CSSParser::createVariablesRule(MediaList* mediaList,
                                         bool variablesKeyword) {
-#if ENABLE(CSS_VARIABLES)
   RefPtr<CSSVariablesRule> rule =
       CSSVariablesRule::create(m_styleSheet, mediaList, variablesKeyword);
   rule->setDeclaration(CSSVariablesDeclaration::create(
@@ -4830,14 +4845,10 @@ CSSRule* CSSParser::createVariablesRule(MediaList* mediaList,
   CSSRule* result = rule.get();
   m_parsedStyleObjects.append(rule.release());
   return result;
-#else
-  return 0;
-#endif
 }
 
 bool CSSParser::addVariable(const CSSParserString& name,
                             CSSParserValueList* valueList) {
-#if ENABLE(CSS_VARIABLES)
   if (checkForVariables(valueList)) {
     delete valueList;
     return false;
@@ -4845,24 +4856,20 @@ bool CSSParser::addVariable(const CSSParserString& name,
   m_variableNames.append(String(name));
   m_variableValues.append(CSSValueList::createFromParserValueList(valueList));
   return true;
-#else
-  return false;
-#endif
 }
 
-bool CSSParser::addVariableDeclarationBlock(const CSSParserString& name) {
+bool CSSParser::addVariableDeclarationBlock(const CSSParserString&) {
 // FIXME: Disabling declarations as variable values for now since they no longer
 // have a common base class with CSSValues.
-#if ENABLE(CSS_VARIABLES) && 0
-  m_variableNames.append(String(name));
-  m_variableValues.append(CSSMutableStyleDeclaration::create(
-      0, m_parsedProperties, m_numParsedProperties));
-  clearProperties();
-  return true;
-#else
-  return false;
+#if 0
+    m_variableNames.append(String(name));
+    m_variableValues.append(CSSMutableStyleDeclaration::create(0, m_parsedProperties, m_numParsedProperties));
+    clearProperties();
 #endif
+  return true;
 }
+
+#endif
 
 void CSSParser::clearVariables() {
   m_variableNames.clear();

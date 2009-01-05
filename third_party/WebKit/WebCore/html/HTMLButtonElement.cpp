@@ -50,7 +50,7 @@ HTMLButtonElement::HTMLButtonElement(const QualifiedName& tagName,
 HTMLButtonElement::~HTMLButtonElement() {}
 
 RenderObject* HTMLButtonElement::createRenderer(RenderArena* arena,
-                                                RenderStyle* style) {
+                                                RenderStyle*) {
   return new (arena) RenderButton(this);
 }
 

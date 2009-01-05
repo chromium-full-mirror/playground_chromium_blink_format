@@ -55,8 +55,8 @@ static JSClassRef ProfileClass();
 
 static JSValueRef getTitleCallback(JSContextRef ctx,
                                    JSObjectRef thisObject,
-                                   JSStringRef propertyName,
-                                   JSValueRef* exception) {
+                                   JSStringRef,
+                                   JSValueRef*) {
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
     return JSValueMakeUndefined(ctx);
 
@@ -66,8 +66,8 @@ static JSValueRef getTitleCallback(JSContextRef ctx,
 
 static JSValueRef getHeadCallback(JSContextRef ctx,
                                   JSObjectRef thisObject,
-                                  JSStringRef propertyName,
-                                  JSValueRef* exception) {
+                                  JSStringRef,
+                                  JSValueRef*) {
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
     return JSValueMakeUndefined(ctx);
 
@@ -77,8 +77,8 @@ static JSValueRef getHeadCallback(JSContextRef ctx,
 
 static JSValueRef getHeavyProfileCallback(JSContextRef ctx,
                                           JSObjectRef thisObject,
-                                          JSStringRef propertyName,
-                                          JSValueRef* exception) {
+                                          JSStringRef,
+                                          JSValueRef*) {
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
     return JSValueMakeUndefined(ctx);
 
@@ -88,8 +88,8 @@ static JSValueRef getHeavyProfileCallback(JSContextRef ctx,
 
 static JSValueRef getTreeProfileCallback(JSContextRef ctx,
                                          JSObjectRef thisObject,
-                                         JSStringRef propertyName,
-                                         JSValueRef* exception) {
+                                         JSStringRef,
+                                         JSValueRef*) {
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
     return JSValueMakeUndefined(ctx);
 
@@ -99,8 +99,8 @@ static JSValueRef getTreeProfileCallback(JSContextRef ctx,
 
 static JSValueRef getUniqueIdCallback(JSContextRef ctx,
                                       JSObjectRef thisObject,
-                                      JSStringRef propertyName,
-                                      JSValueRef* exception) {
+                                      JSStringRef,
+                                      JSValueRef*) {
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
     return JSValueMakeUndefined(ctx);
 
@@ -157,8 +157,8 @@ static JSValueRef exclude(JSContextRef ctx,
 static JSValueRef restoreAll(JSContextRef ctx,
                              JSObjectRef /*function*/,
                              JSObjectRef thisObject,
-                             size_t argumentCount,
-                             const JSValueRef arguments[],
+                             size_t /*argumentCount*/,
+                             const JSValueRef[] /*arguments*/,
                              JSValueRef* /*exception*/) {
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
     return JSValueMakeUndefined(ctx);

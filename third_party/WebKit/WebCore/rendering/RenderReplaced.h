@@ -44,7 +44,7 @@ class RenderReplaced : public RenderBox {
   virtual int minimumReplacedHeight() const { return 0; }
 
   virtual void paint(PaintInfo&, int tx, int ty);
-  virtual void paintReplaced(PaintInfo&, int tx, int ty) {}
+  virtual void paintReplaced(PaintInfo&, int /*tx*/, int /*ty*/) {}
 
   virtual IntSize intrinsicSize() const;
 

@@ -40,7 +40,9 @@ class ScrollbarTheme {
  public:
   virtual ~ScrollbarTheme(){};
 
-  virtual bool paint(Scrollbar*, GraphicsContext*, const IntRect& damageRect) {
+  virtual bool paint(Scrollbar*,
+                     GraphicsContext*,
+                     const IntRect& /*damageRect*/) {
     return false;
   }
   virtual ScrollbarPart hitTest(Scrollbar*, const PlatformMouseEvent&) {

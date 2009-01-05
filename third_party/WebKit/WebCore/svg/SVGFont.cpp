@@ -686,10 +686,9 @@ FloatRect Font::selectionRectForTextUsingSVGFont(const TextRun& run,
                    height);
 }
 
-int Font::offsetForPositionForTextUsingSVGFont(
-    const TextRun&,
-    int position,
-    bool includePartialGlyphs) const {
+int Font::offsetForPositionForTextUsingSVGFont(const TextRun&,
+                                               int,
+                                               bool) const {
   // TODO: Fix text selection when HTML text is drawn using a SVG Font
   // We need to integrate the SVG text selection code in the offsetForPosition()
   // framework.

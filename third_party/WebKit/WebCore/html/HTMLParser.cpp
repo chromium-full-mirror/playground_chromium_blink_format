@@ -684,7 +684,7 @@ bool HTMLParser::commentCreateErrorCheck(Token* t, RefPtr<Node>& result) {
   return false;
 }
 
-bool HTMLParser::headCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::headCreateErrorCheck(Token*, RefPtr<Node>& result) {
   if (!head || current->localName() == htmlTag) {
     head = new HTMLHeadElement(headTag, document);
     result = head;
@@ -693,7 +693,7 @@ bool HTMLParser::headCreateErrorCheck(Token* t, RefPtr<Node>& result) {
   return false;
 }
 
-bool HTMLParser::bodyCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::bodyCreateErrorCheck(Token*, RefPtr<Node>&) {
   // body no longer allowed if we have a frameset
   if (haveFrameSet)
     return false;
@@ -702,7 +702,7 @@ bool HTMLParser::bodyCreateErrorCheck(Token* t, RefPtr<Node>& result) {
   return true;
 }
 
-bool HTMLParser::framesetCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::framesetCreateErrorCheck(Token*, RefPtr<Node>&) {
   popBlock(headTag);
   if (inBody && !haveFrameSet && !haveContent) {
     popBlock(bodyTag);
@@ -743,7 +743,7 @@ bool HTMLParser::isindexCreateErrorCheck(Token* t, RefPtr<Node>& result) {
   return false;
 }
 
-bool HTMLParser::selectCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::selectCreateErrorCheck(Token*, RefPtr<Node>&) {
   return true;
 }
 
@@ -761,7 +761,7 @@ bool HTMLParser::dtCreateErrorCheck(Token* t, RefPtr<Node>& result) {
   return true;
 }
 
-bool HTMLParser::nestedCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::nestedCreateErrorCheck(Token* t, RefPtr<Node>&) {
   popBlock(t->tagName);
   return true;
 }
@@ -772,34 +772,34 @@ bool HTMLParser::nestedPCloserCreateErrorCheck(Token* t, RefPtr<Node>& result) {
   return true;
 }
 
-bool HTMLParser::nestedStyleCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::nestedStyleCreateErrorCheck(Token* t, RefPtr<Node>&) {
   return allowNestedRedundantTag(t->tagName);
 }
 
-bool HTMLParser::tableCellCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::tableCellCreateErrorCheck(Token*, RefPtr<Node>&) {
   popBlock(tdTag);
   popBlock(thTag);
   return true;
 }
 
-bool HTMLParser::tableSectionCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::tableSectionCreateErrorCheck(Token*, RefPtr<Node>&) {
   popBlock(theadTag);
   popBlock(tbodyTag);
   popBlock(tfootTag);
   return true;
 }
 
-bool HTMLParser::noembedCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::noembedCreateErrorCheck(Token*, RefPtr<Node>&) {
   setSkipMode(noembedTag);
   return true;
 }
 
-bool HTMLParser::noframesCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::noframesCreateErrorCheck(Token*, RefPtr<Node>&) {
   setSkipMode(noframesTag);
   return true;
 }
 
-bool HTMLParser::noscriptCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::noscriptCreateErrorCheck(Token*, RefPtr<Node>&) {
   if (!m_isParsingFragment) {
     Settings* settings = document->settings();
     if (settings && settings->isJavaScriptEnabled())
@@ -808,13 +808,13 @@ bool HTMLParser::noscriptCreateErrorCheck(Token* t, RefPtr<Node>& result) {
   return true;
 }
 
-bool HTMLParser::pCloserCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::pCloserCreateErrorCheck(Token*, RefPtr<Node>&) {
   if (hasPElementInScope())
     popBlock(pTag);
   return true;
 }
 
-bool HTMLParser::pCloserStrictCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::pCloserStrictCreateErrorCheck(Token*, RefPtr<Node>&) {
   if (document->inCompatMode())
     return true;
   if (hasPElementInScope())
@@ -822,7 +822,7 @@ bool HTMLParser::pCloserStrictCreateErrorCheck(Token* t, RefPtr<Node>& result) {
   return true;
 }
 
-bool HTMLParser::mapCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+bool HTMLParser::mapCreateErrorCheck(Token*, RefPtr<Node>& result) {
   m_currentMapElement = new HTMLMapElement(mapTag, document);
   result = m_currentMapElement;
   return false;

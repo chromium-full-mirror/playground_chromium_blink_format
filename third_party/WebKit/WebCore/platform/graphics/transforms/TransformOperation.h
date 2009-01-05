@@ -67,7 +67,7 @@ class TransformOperation : public RefCounted<TransformOperation> {
       bool blendToIdentity = false) = 0;
 
   virtual OperationType getOperationType() const = 0;
-  virtual bool isSameType(const TransformOperation& o) const { return false; }
+  virtual bool isSameType(const TransformOperation&) const { return false; }
 };
 
 }  // namespace WebCore

@@ -477,7 +477,7 @@ PassRefPtr<Attribute> Element::createAttribute(const QualifiedName& name,
   return Attribute::create(name, value);
 }
 
-void Element::attributeChanged(Attribute* attr, bool preserveDecls) {
+void Element::attributeChanged(Attribute* attr, bool) {
   const QualifiedName& attrName = attr->name();
   if (attrName == aria_activedescendantAttr) {
     // any change to aria-activedescendant attribute triggers accessibility
@@ -570,7 +570,7 @@ void Element::createAttributeMap() const {
   namedAttrMap = NamedAttrMap::create(const_cast<Element*>(this));
 }
 
-bool Element::isURLAttribute(Attribute* attr) const {
+bool Element::isURLAttribute(Attribute*) const {
   return false;
 }
 
@@ -902,7 +902,7 @@ void Element::dispatchAttrRemovalEvent(Attribute*) {
 #endif
 }
 
-void Element::dispatchAttrAdditionEvent(Attribute* attr) {
+void Element::dispatchAttrAdditionEvent(Attribute*) {
   ASSERT(!eventDispatchForbidden());
 #if 0
     if (!document()->hasListenerType(Document::DOMATTRMODIFIED_LISTENER))
@@ -1110,7 +1110,7 @@ void Element::focus(bool restorePreviousSelection) {
   updateFocusAppearance(restorePreviousSelection);
 }
 
-void Element::updateFocusAppearance(bool restorePreviousSelection) {
+void Element::updateFocusAppearance(bool /*restorePreviousSelection*/) {
   if (this == rootEditableElement()) {
     Frame* frame = document()->frame();
     if (!frame)

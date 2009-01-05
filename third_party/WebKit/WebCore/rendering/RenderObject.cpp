@@ -630,7 +630,7 @@ bool RenderObject::scroll(ScrollDirection direction,
   return false;
 }
 
-bool RenderObject::canBeProgramaticallyScrolled(bool scrollToAnchor) const {
+bool RenderObject::canBeProgramaticallyScrolled(bool) const {
   if (!layer())
     return false;
 
@@ -1849,10 +1849,8 @@ void RenderObject::paintBoxShadow(GraphicsContext* context,
   }
 }
 
-void RenderObject::addLineBoxRects(Vector<IntRect>&,
-                                   unsigned startOffset,
-                                   unsigned endOffset,
-                                   bool useSelectionHeight) {}
+void RenderObject::addLineBoxRects(Vector<IntRect>&, unsigned, unsigned, bool) {
+}
 
 void RenderObject::absoluteRects(Vector<IntRect>& rects,
                                  int tx,
@@ -1904,10 +1902,10 @@ IntRect RenderObject::absoluteBoundingBoxRect(bool useTransforms) {
   return result;
 }
 
-void RenderObject::collectAbsoluteLineBoxQuads(Vector<FloatQuad>& quads,
-                                               unsigned startOffset,
-                                               unsigned endOffset,
-                                               bool useSelectionHeight) {}
+void RenderObject::collectAbsoluteLineBoxQuads(Vector<FloatQuad>&,
+                                               unsigned,
+                                               unsigned,
+                                               bool) {}
 
 void RenderObject::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
   // For blocks inside inlines, we go ahead and include margins so that we run
@@ -2188,9 +2186,9 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   return false;
 }
 
-void RenderObject::repaintDuringLayoutIfMoved(const IntRect& rect) {}
+void RenderObject::repaintDuringLayoutIfMoved(const IntRect&) {}
 
-void RenderObject::repaintOverhangingFloats(bool paintAllDescendants) {}
+void RenderObject::repaintOverhangingFloats(bool) {}
 
 bool RenderObject::checkForRepaintDuringLayout() const {
   // FIXME: <https://bugs.webkit.org/show_bug.cgi?id=20885> It is probably safe
@@ -2253,7 +2251,7 @@ void RenderObject::computeAbsoluteRepaintRect(IntRect& rect, bool fixed) {
   }
 }
 
-void RenderObject::dirtyLinesFromChangedChild(RenderObject* child) {}
+void RenderObject::dirtyLinesFromChangedChild(RenderObject*) {}
 
 #ifndef NDEBUG
 
@@ -2599,8 +2597,7 @@ void RenderObject::styleWillChange(RenderStyle::Diff diff,
   }
 }
 
-void RenderObject::styleDidChange(RenderStyle::Diff diff,
-                                  const RenderStyle* oldStyle) {
+void RenderObject::styleDidChange(RenderStyle::Diff diff, const RenderStyle*) {
   setHasBoxDecorations(m_style->hasBorder() || m_style->hasBackground() ||
                        m_style->hasAppearance() || m_style->boxShadow());
 
@@ -2710,8 +2707,8 @@ IntSize RenderObject::offsetFromContainer(RenderObject* o) const {
   return offset;
 }
 
-IntRect RenderObject::localCaretRect(InlineBox* inlineBox,
-                                     int caretOffset,
+IntRect RenderObject::localCaretRect(InlineBox*,
+                                     int,
                                      int* extraWidthToEndOfLine) {
   if (extraWidthToEndOfLine)
     *extraWidthToEndOfLine = 0;
@@ -2905,7 +2902,7 @@ void RenderObject::arenaDelete(RenderArena* arena, void* base) {
   arena->free(*(size_t*)base, base);
 }
 
-VisiblePosition RenderObject::positionForCoordinates(int x, int y) {
+VisiblePosition RenderObject::positionForCoordinates(int, int) {
   return VisiblePosition(element(), caretMinOffset(), DOWNSTREAM);
 }
 

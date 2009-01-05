@@ -66,9 +66,9 @@ KeyframeAnimation::~KeyframeAnimation() {
     updateStateMachine(AnimationStateInputEndAnimation, -1);
 }
 
-void KeyframeAnimation::animate(CompositeAnimation* animation,
-                                RenderObject* renderer,
-                                const RenderStyle* currentStyle,
+void KeyframeAnimation::animate(CompositeAnimation*,
+                                RenderObject*,
+                                const RenderStyle*,
                                 const RenderStyle* targetStyle,
                                 RefPtr<RenderStyle>& animatedStyle) {
   // Fire the start timeout if needed

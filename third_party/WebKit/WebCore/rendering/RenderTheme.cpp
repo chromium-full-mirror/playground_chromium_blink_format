@@ -608,9 +608,10 @@ bool RenderTheme::isDefault(const RenderObject* o) const {
 }
 
 #if !USE(NEW_THEME)
-void RenderTheme::adjustCheckboxStyle(CSSStyleSelector* selector,
+
+void RenderTheme::adjustCheckboxStyle(CSSStyleSelector*,
                                       RenderStyle* style,
-                                      Element* e) const {
+                                      Element*) const {
   // A summary of the rules for checkbox designed to match WinIE:
   // width/height - honored (WinIE actually scales its control for small widths,
   // but lets it overflow for small heights.)
@@ -629,9 +630,9 @@ void RenderTheme::adjustCheckboxStyle(CSSStyleSelector* selector,
   style->setBoxShadow(0);
 }
 
-void RenderTheme::adjustRadioStyle(CSSStyleSelector* selector,
+void RenderTheme::adjustRadioStyle(CSSStyleSelector*,
                                    RenderStyle* style,
-                                   Element* e) const {
+                                   Element*) const {
   // A summary of the rules for checkbox designed to match WinIE:
   // width/height - honored (WinIE actually scales its control for small widths,
   // but lets it overflow for small heights.)
@@ -650,66 +651,65 @@ void RenderTheme::adjustRadioStyle(CSSStyleSelector* selector,
   style->setBoxShadow(0);
 }
 
-void RenderTheme::adjustButtonStyle(CSSStyleSelector* selector,
+void RenderTheme::adjustButtonStyle(CSSStyleSelector*,
                                     RenderStyle* style,
-                                    Element* e) const {
+                                    Element*) const {
   // Most platforms will completely honor all CSS, and so we have no need to
   // adjust the style
   // at all by default.  We will still allow the theme a crack at setting up a
   // desired vertical size.
   setButtonSize(style);
 }
+
 #endif
 
-void RenderTheme::adjustTextFieldStyle(CSSStyleSelector* selector,
-                                       RenderStyle* style,
-                                       Element* e) const {}
+void RenderTheme::adjustTextFieldStyle(CSSStyleSelector*,
+                                       RenderStyle*,
+                                       Element*) const {}
 
-void RenderTheme::adjustTextAreaStyle(CSSStyleSelector* selector,
-                                      RenderStyle* style,
-                                      Element* e) const {}
+void RenderTheme::adjustTextAreaStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const {}
 
-void RenderTheme::adjustMenuListStyle(CSSStyleSelector* selector,
-                                      RenderStyle* style,
-                                      Element* e) const {}
+void RenderTheme::adjustMenuListStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const {}
 
-void RenderTheme::adjustMenuListButtonStyle(CSSStyleSelector* selector,
-                                            RenderStyle* style,
-                                            Element* e) const {}
+void RenderTheme::adjustMenuListButtonStyle(CSSStyleSelector*,
+                                            RenderStyle*,
+                                            Element*) const {}
 
-void RenderTheme::adjustButtonInnerStyle(RenderStyle* style) const {}
+void RenderTheme::adjustButtonInnerStyle(RenderStyle*) const {}
 
-void RenderTheme::adjustSliderTrackStyle(CSSStyleSelector* selector,
-                                         RenderStyle* style,
-                                         Element* e) const {}
+void RenderTheme::adjustSliderTrackStyle(CSSStyleSelector*,
+                                         RenderStyle*,
+                                         Element*) const {}
 
-void RenderTheme::adjustSliderThumbStyle(CSSStyleSelector* selector,
-                                         RenderStyle* style,
-                                         Element* e) const {}
+void RenderTheme::adjustSliderThumbStyle(CSSStyleSelector*,
+                                         RenderStyle*,
+                                         Element*) const {}
 
 void RenderTheme::adjustSliderThumbSize(RenderObject*) const {}
 
-void RenderTheme::adjustSearchFieldStyle(CSSStyleSelector* selector,
-                                         RenderStyle* style,
-                                         Element* e) const {}
+void RenderTheme::adjustSearchFieldStyle(CSSStyleSelector*,
+                                         RenderStyle*,
+                                         Element*) const {}
 
-void RenderTheme::adjustSearchFieldCancelButtonStyle(CSSStyleSelector* selector,
-                                                     RenderStyle* style,
-                                                     Element* e) const {}
+void RenderTheme::adjustSearchFieldCancelButtonStyle(CSSStyleSelector*,
+                                                     RenderStyle*,
+                                                     Element*) const {}
 
-void RenderTheme::adjustSearchFieldDecorationStyle(CSSStyleSelector* selector,
-                                                   RenderStyle* style,
-                                                   Element* e) const {}
+void RenderTheme::adjustSearchFieldDecorationStyle(CSSStyleSelector*,
+                                                   RenderStyle*,
+                                                   Element*) const {}
 
-void RenderTheme::adjustSearchFieldResultsDecorationStyle(
-    CSSStyleSelector* selector,
-    RenderStyle* style,
-    Element* e) const {}
+void RenderTheme::adjustSearchFieldResultsDecorationStyle(CSSStyleSelector*,
+                                                          RenderStyle*,
+                                                          Element*) const {}
 
-void RenderTheme::adjustSearchFieldResultsButtonStyle(
-    CSSStyleSelector* selector,
-    RenderStyle* style,
-    Element* e) const {}
+void RenderTheme::adjustSearchFieldResultsButtonStyle(CSSStyleSelector*,
+                                                      RenderStyle*,
+                                                      Element*) const {}
 
 void RenderTheme::platformColorsDidChange() {
   m_activeSelectionColor = Color();

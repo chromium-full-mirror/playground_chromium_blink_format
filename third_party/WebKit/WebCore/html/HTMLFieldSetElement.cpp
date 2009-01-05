@@ -56,7 +56,7 @@ const AtomicString& HTMLFieldSetElement::type() const {
 }
 
 RenderObject* HTMLFieldSetElement::createRenderer(RenderArena* arena,
-                                                  RenderStyle* style) {
+                                                  RenderStyle*) {
   return new (arena) RenderFieldset(this);
 }
 

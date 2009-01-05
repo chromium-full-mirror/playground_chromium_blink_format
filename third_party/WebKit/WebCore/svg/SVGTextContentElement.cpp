@@ -131,7 +131,7 @@ struct SVGInlineTextBoxQueryWalker {
 
   void chunkPortionCallback(SVGInlineTextBox* textBox,
                             int startOffset,
-                            const AffineTransform& chunkCtm,
+                            const AffineTransform&,
                             const Vector<SVGChar>::iterator& start,
                             const Vector<SVGChar>::iterator& end) {
     RenderStyle* style = textBox->textObject()->style();

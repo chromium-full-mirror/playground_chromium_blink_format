@@ -76,7 +76,7 @@ ApplicationCacheGroup::~ApplicationCacheGroup() {
 
 ApplicationCache* ApplicationCacheGroup::cacheForMainRequest(
     const ResourceRequest& request,
-    DocumentLoader* loader) {
+    DocumentLoader*) {
   if (!ApplicationCache::requestIsHTTPOrHTTPSGet(request))
     return 0;
 
@@ -92,7 +92,7 @@ ApplicationCache* ApplicationCacheGroup::cacheForMainRequest(
 
 ApplicationCache* ApplicationCacheGroup::fallbackCacheForMainRequest(
     const ResourceRequest& request,
-    DocumentLoader* loader) {
+    DocumentLoader*) {
   if (!ApplicationCache::requestIsHTTPOrHTTPSGet(request))
     return 0;
 
@@ -396,7 +396,7 @@ void ApplicationCacheGroup::didReceiveResponse(
 void ApplicationCacheGroup::didReceiveData(ResourceHandle* handle,
                                            const char* data,
                                            int length,
-                                           int lengthReceived) {
+                                           int) {
   if (handle == m_manifestHandle) {
     didReceiveManifestData(data, length);
     return;

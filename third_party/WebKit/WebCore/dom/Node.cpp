@@ -814,7 +814,7 @@ Node* Node::traversePreviousSiblingPostOrder(const Node* stayWithin) const {
   return 0;
 }
 
-void Node::checkSetPrefix(const AtomicString& _prefix, ExceptionCode& ec) {
+void Node::checkSetPrefix(const AtomicString&, ExceptionCode& ec) {
   // Perform error checking as required by spec for setting Node.prefix. Used by
   // Element::setPrefix() and Attr::setPrefix()
 
@@ -850,7 +850,7 @@ void Node::checkSetPrefix(const AtomicString& _prefix, ExceptionCode& ec) {
   }*/
 }
 
-bool Node::canReplaceChild(Node* newChild, Node* oldChild) {
+bool Node::canReplaceChild(Node* newChild, Node*) {
   if (newChild->nodeType() != DOCUMENT_FRAGMENT_NODE) {
     if (!childTypeAllowed(newChild->nodeType()))
       return false;
@@ -860,7 +860,6 @@ bool Node::canReplaceChild(Node* newChild, Node* oldChild) {
         return false;
     }
   }
-
   return true;
 }
 
@@ -1207,7 +1206,7 @@ bool Node::rendererIsNeeded(RenderStyle* style) {
   return (document()->documentElement() == this) || (style->display() != NONE);
 }
 
-RenderObject* Node::createRenderer(RenderArena* arena, RenderStyle* style) {
+RenderObject* Node::createRenderer(RenderArena*, RenderStyle*) {
   ASSERT(false);
   return 0;
 }

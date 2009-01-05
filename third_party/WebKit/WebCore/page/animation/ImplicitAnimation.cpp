@@ -63,9 +63,9 @@ bool ImplicitAnimation::shouldSendEventForListener(
   return m_object->document()->hasListenerType(inListenerType);
 }
 
-void ImplicitAnimation::animate(CompositeAnimation* animation,
-                                RenderObject* renderer,
-                                RenderStyle* currentStyle,
+void ImplicitAnimation::animate(CompositeAnimation*,
+                                RenderObject*,
+                                RenderStyle*,
                                 RenderStyle* targetStyle,
                                 RefPtr<RenderStyle>& animatedStyle) {
   // If we get this far and the animation is done, it means we are cleaning up a

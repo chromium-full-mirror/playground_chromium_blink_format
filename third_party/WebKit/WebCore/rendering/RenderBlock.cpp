@@ -2459,7 +2459,7 @@ IntRect RenderBlock::fillLeftSelectionGap(RenderObject* selObj,
                                           int height,
                                           RenderBlock* rootBlock,
                                           int blockX,
-                                          int blockY,
+                                          int /*blockY*/,
                                           int tx,
                                           int ty,
                                           const PaintInfo* paintInfo) {
@@ -2485,7 +2485,7 @@ IntRect RenderBlock::fillRightSelectionGap(RenderObject* selObj,
                                            int height,
                                            RenderBlock* rootBlock,
                                            int blockX,
-                                           int blockY,
+                                           int /*blockY*/,
                                            int tx,
                                            int ty,
                                            const PaintInfo* paintInfo) {
@@ -3497,10 +3497,10 @@ void RenderBlock::addVisualOverflow(const IntRect& r) {
 }
 
 bool RenderBlock::isPointInOverflowControl(HitTestResult& result,
-                                           int _x,
-                                           int _y,
-                                           int _tx,
-                                           int _ty) {
+                                           int,
+                                           int,
+                                           int,
+                                           int) {
   if (!scrollsOverflow())
     return false;
 

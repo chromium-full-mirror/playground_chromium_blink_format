@@ -1428,8 +1428,8 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
                                                 float x,
                                                 float y,
                                                 bool fill,
-                                                float maxWidth,
-                                                bool useMaxWidth) {
+                                                float /*maxWidth*/,
+                                                bool /*useMaxWidth*/) {
   GraphicsContext* c = drawingContext();
   if (!c)
     return;

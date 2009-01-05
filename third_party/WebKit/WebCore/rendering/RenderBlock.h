@@ -150,7 +150,7 @@ class RenderBlock : public RenderFlow {
       const;  // Shrink the box in which the border paints if border-fit is set.
 
   // Called to lay out the legend for a fieldset.
-  virtual RenderObject* layoutLegend(bool relayoutChildren) { return 0; };
+  virtual RenderObject* layoutLegend(bool /*relayoutChildren*/) { return 0; }
 
   // the implementation of the following functions is in bidi.cpp
   struct FloatWithRect {

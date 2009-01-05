@@ -745,7 +745,7 @@ void RenderContainer::addLineBoxRects(Vector<IntRect>& rects,
 void RenderContainer::collectAbsoluteLineBoxQuads(Vector<FloatQuad>& quads,
                                                   unsigned start,
                                                   unsigned end,
-                                                  bool useSelectionHeight) {
+                                                  bool /*useSelectionHeight*/) {
   if (!m_firstChild && (isInline() || isAnonymousBlock())) {
     absoluteQuads(quads);
     return;

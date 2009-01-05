@@ -350,7 +350,7 @@ void RenderReplaced::adjustOverflowForBoxShadow() {
   }
 }
 
-int RenderReplaced::overflowHeight(bool includeInterior) const {
+int RenderReplaced::overflowHeight(bool) const {
   if (m_hasOverflow) {
     IntRect* r = &gOverflowRectMap->find(this)->second;
     return r->height() + r->y();
@@ -359,7 +359,7 @@ int RenderReplaced::overflowHeight(bool includeInterior) const {
   return height();
 }
 
-int RenderReplaced::overflowWidth(bool includeInterior) const {
+int RenderReplaced::overflowWidth(bool) const {
   if (m_hasOverflow) {
     IntRect* r = &gOverflowRectMap->find(this)->second;
     return r->width() + r->x();
@@ -368,21 +368,21 @@ int RenderReplaced::overflowWidth(bool includeInterior) const {
   return width();
 }
 
-int RenderReplaced::overflowLeft(bool includeInterior) const {
+int RenderReplaced::overflowLeft(bool) const {
   if (m_hasOverflow)
     return gOverflowRectMap->get(this).x();
 
   return 0;
 }
 
-int RenderReplaced::overflowTop(bool includeInterior) const {
+int RenderReplaced::overflowTop(bool) const {
   if (m_hasOverflow)
     return gOverflowRectMap->get(this).y();
 
   return 0;
 }
 
-IntRect RenderReplaced::overflowRect(bool includeInterior) const {
+IntRect RenderReplaced::overflowRect(bool) const {
   if (m_hasOverflow)
     return gOverflowRectMap->find(this)->second;
 

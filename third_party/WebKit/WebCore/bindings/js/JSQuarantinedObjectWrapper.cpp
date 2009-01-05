@@ -304,7 +304,7 @@ CallType JSQuarantinedObjectWrapper::getCallData(CallData& callData) {
   return CallTypeHost;
 }
 
-void JSQuarantinedObjectWrapper::getPropertyNames(ExecState* exec,
+void JSQuarantinedObjectWrapper::getPropertyNames(ExecState*,
                                                   PropertyNameArray& array) {
   if (!allowsGetPropertyNames())
     return;

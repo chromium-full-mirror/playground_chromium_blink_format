@@ -86,7 +86,8 @@ class EventTarget {
   // has been dispatched.  The data pointer is handed back by the preDispatch
   // and passed to postDispatch.
   virtual void* preDispatchEventHandler(Event*) { return 0; }
-  virtual void postDispatchEventHandler(Event*, void* dataFromPreDispatch) {}
+  virtual void postDispatchEventHandler(Event*, void* /*dataFromPreDispatch*/) {
+  }
 
  protected:
   virtual ~EventTarget();

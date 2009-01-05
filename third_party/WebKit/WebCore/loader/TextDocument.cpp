@@ -86,7 +86,7 @@ TextTokenizer::TextTokenizer(HTMLViewSourceDocument* doc)
   m_dest = m_buffer;
 }
 
-bool TextTokenizer::write(const SegmentedString& s, bool appendData) {
+bool TextTokenizer::write(const SegmentedString& s, bool) {
   ExceptionCode ec;
 
   m_dest = m_buffer;

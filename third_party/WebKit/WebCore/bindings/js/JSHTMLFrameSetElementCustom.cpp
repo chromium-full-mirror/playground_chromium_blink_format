@@ -47,7 +47,7 @@ bool JSHTMLFrameSetElement::canGetItemsForName(ExecState*,
   return frame && frame->hasTagName(frameTag);
 }
 
-JSValue* JSHTMLFrameSetElement::nameGetter(ExecState* exec,
+JSValue* JSHTMLFrameSetElement::nameGetter(ExecState*,
                                            const Identifier& propertyName,
                                            const PropertySlot& slot) {
   JSHTMLElement* thisObj =

@@ -188,7 +188,7 @@ SVGResource* SVGMarkerElement::canvasResource() {
 }
 
 RenderObject* SVGMarkerElement::createRenderer(RenderArena* arena,
-                                               RenderStyle* style) {
+                                               RenderStyle*) {
   RenderSVGViewportContainer* markerContainer =
       new (arena) RenderSVGViewportContainer(this);
   markerContainer->setDrawsContents(

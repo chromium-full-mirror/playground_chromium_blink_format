@@ -2711,7 +2711,7 @@ bool RenderLayer::shouldBeOverflowOnly() const {
          !renderer()->hasTransform() && !isTransparent();
 }
 
-void RenderLayer::styleChanged(RenderStyle::Diff, const RenderStyle* oldStyle) {
+void RenderLayer::styleChanged(RenderStyle::Diff, const RenderStyle*) {
   bool isOverflowOnly = shouldBeOverflowOnly();
   if (isOverflowOnly != m_isOverflowOnly) {
     m_isOverflowOnly = isOverflowOnly;

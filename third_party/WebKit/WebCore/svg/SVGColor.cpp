@@ -73,14 +73,14 @@ Color SVGColor::colorFromRGBColorString(const String& colorString) {
 
 void SVGColor::setRGBColorICCColor(const String& /* rgbColor */,
                                    const String& /* iccColor */,
-                                   ExceptionCode& ec) {
+                                   ExceptionCode&) {
   // TODO: implement me!
 }
 
 void SVGColor::setColor(unsigned short colorType,
                         const String& /* rgbColor */,
                         const String& /* iccColor */,
-                        ExceptionCode& ec) {
+                        ExceptionCode&) {
   // TODO: implement me!
   m_colorType = colorType;
 }

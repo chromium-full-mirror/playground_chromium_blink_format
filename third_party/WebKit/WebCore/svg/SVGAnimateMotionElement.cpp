@@ -162,7 +162,7 @@ bool SVGAnimateMotionElement::calculateFromAndByValues(const String& fromString,
 }
 
 void SVGAnimateMotionElement::calculateAnimatedValue(float percentage,
-                                                     unsigned repeat,
+                                                     unsigned,
                                                      SVGSMILElement*) {
   SVGElement* target = targetElement();
   if (!target)

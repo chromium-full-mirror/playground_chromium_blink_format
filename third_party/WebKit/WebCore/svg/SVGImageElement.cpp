@@ -116,7 +116,7 @@ bool SVGImageElement::hasRelativeValues() const {
 }
 
 RenderObject* SVGImageElement::createRenderer(RenderArena* arena,
-                                              RenderStyle* style) {
+                                              RenderStyle*) {
   return new (arena) RenderSVGImage(this);
 }
 

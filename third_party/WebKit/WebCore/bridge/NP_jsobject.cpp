@@ -441,7 +441,7 @@ bool _NPN_Enumerate(NPP,
   return false;
 }
 
-bool _NPN_Construct(NPP npp,
+bool _NPN_Construct(NPP,
                     NPObject* o,
                     const NPVariant* args,
                     uint32_t argCount,

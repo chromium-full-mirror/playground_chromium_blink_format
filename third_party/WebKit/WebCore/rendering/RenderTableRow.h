@@ -35,6 +35,14 @@ class RenderTableRow : public RenderContainer {
  public:
   RenderTableRow(Node*);
 
+  RenderTableSection* section() const {
+    return static_cast<RenderTableSection*>(parent());
+  }
+  RenderTable* table() const {
+    return static_cast<RenderTable*>(parent()->parent());
+  }
+
+ private:
   virtual const char* renderName() const {
     return isAnonymous() ? "RenderTableRow (anonymous)" : "RenderTableRow";
   }
@@ -43,17 +51,8 @@ class RenderTableRow : public RenderContainer {
 
   virtual void destroy();
 
-  RenderTableSection* section() const {
-    return static_cast<RenderTableSection*>(parent());
-  }
-  RenderTable* table() const {
-    return static_cast<RenderTable*>(parent()->parent());
-  }
-
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
-  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const {
-    return 0;
-  }
+  virtual int lineHeight(bool, bool) const { return 0; }
   virtual void position(InlineBox*) {}
   virtual void layout();
   virtual IntRect absoluteClippedOverflowRect();
@@ -71,7 +70,6 @@ class RenderTableRow : public RenderContainer {
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void imageChanged(WrappedImagePtr, const IntRect* = 0);
 
- protected:
   virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
 };
 

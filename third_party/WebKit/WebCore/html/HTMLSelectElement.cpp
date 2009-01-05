@@ -415,7 +415,7 @@ void HTMLSelectElement::selectAll() {
 }
 
 RenderObject* HTMLSelectElement::createRenderer(RenderArena* arena,
-                                                RenderStyle* style) {
+                                                RenderStyle*) {
   if (usesMenuList())
     return new (arena) RenderMenuList(this);
   return new (arena) RenderListBox(this);
