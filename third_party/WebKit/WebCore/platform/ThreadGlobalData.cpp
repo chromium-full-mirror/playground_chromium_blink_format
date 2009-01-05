@@ -58,7 +58,14 @@ ThreadGlobalData& threadGlobalData() {
       threadGlobalData = new ThreadSpecific<ThreadGlobalData>);
   return **threadGlobalData;
 #else
-  static ThreadGlobalData* staticData = new ThreadGlobalData;
+  static ThreadGlobalData* staticData;
+  if (!staticData) {
+    staticData =
+        static_cast<ThreadGlobalData*>(fastMalloc(sizeof(ThreadGlobalData)));
+    // ThreadGlobalData constructor indirectly uses staticData, so we need to
+    // set up the memory before invoking it.
+    new (staticData) ThreadGlobalData;
+  }
   return *staticData;
 #endif
 }
