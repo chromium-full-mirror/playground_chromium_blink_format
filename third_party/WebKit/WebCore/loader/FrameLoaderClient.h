@@ -30,6 +30,7 @@
 #define FrameLoaderClient_h
 
 #include "FrameLoaderTypes.h"
+#include "ScrollTypes.h"
 #include <wtf/Forward.h>
 #include <wtf/Platform.h>
 #include <wtf/Vector.h>
@@ -284,7 +285,9 @@ class FrameLoaderClient {
                                               const Color&,
                                               bool,
                                               const IntSize&,
-                                              bool);
+                                              bool,
+                                              ScrollbarMode = ScrollbarAuto,
+                                              ScrollbarMode = ScrollbarAuto);
 };
 
 }  // namespace WebCore
