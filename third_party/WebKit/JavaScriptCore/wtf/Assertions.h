@@ -181,6 +181,7 @@ void WTFLogVerbose(const char* file,
 #define ASSERT(assertion) ((void)0)
 #define ASSERT_WITH_MESSAGE(assertion, ...) ((void)0)
 #define ASSERT_NOT_REACHED() ((void)0)
+#define ASSERT_UNUSED(variable, assertion) ((void)variable)
 
 #else
 
@@ -209,6 +210,8 @@ void WTFLogVerbose(const char* file,
     WTFReportAssertionFailure(__FILE__, __LINE__, WTF_PRETTY_FUNCTION, 0); \
     CRASH();                                                               \
   } while (0)
+
+#define ASSERT_UNUSED(variable, assertion) ASSERT(assertion)
 
 #endif
 
