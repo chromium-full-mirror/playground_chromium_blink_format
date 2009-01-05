@@ -181,7 +181,7 @@ bool RuntimeObjectImp::getOwnPropertySlot(ExecState* exec,
 void RuntimeObjectImp::put(ExecState* exec,
                            const Identifier& propertyName,
                            JSValue* value,
-                           PutPropertySlot&) {
+                           PutPropertySlot& slot) {
   if (!instance) {
     throwInvalidAccessError(exec);
     return;
