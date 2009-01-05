@@ -88,8 +88,8 @@ class HTMLCollection : public RefCounted<HTMLCollection> {
   virtual Node* item(unsigned index) const;
   virtual Node* nextItem() const;
 
-  virtual Node* namedItem(const String& name, bool caseSensitive = true) const;
-  virtual Node* nextNamedItem(const String& name)
+  virtual Node* namedItem(const AtomicString& name) const;
+  virtual Node* nextNamedItem(const AtomicString& name)
       const;  // In case of multiple items named the same way
 
   Node* firstItem() const;
@@ -153,8 +153,7 @@ class HTMLCollection : public RefCounted<HTMLCollection> {
 
   bool checkForNameMatch(Element*,
                          bool checkName,
-                         const String& name,
-                         bool caseSensitive) const;
+                         const AtomicString& name) const;
 
   RefPtr<Node> m_base;
   Type m_type;

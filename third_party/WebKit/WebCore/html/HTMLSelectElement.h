@@ -133,7 +133,7 @@ class HTMLSelectElement : public HTMLFormControlElementWithState {
   void setOption(unsigned index, HTMLOptionElement*, ExceptionCode&);
   void setLength(unsigned, ExceptionCode&);
 
-  Node* namedItem(const String& name, bool caseSensitive = true);
+  Node* namedItem(const AtomicString& name);
   Node* item(unsigned index);
 
   HTMLCollection::CollectionInfo* collectionInfo() { return &m_collectionInfo; }

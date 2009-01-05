@@ -44,8 +44,8 @@ class HTMLFormCollection : public HTMLCollection {
   virtual Node* item(unsigned index) const;
   virtual Node* nextItem() const;
 
-  virtual Node* namedItem(const String& name, bool caseSensitive = true) const;
-  virtual Node* nextNamedItem(const String& name) const;
+  virtual Node* namedItem(const AtomicString& name) const;
+  virtual Node* nextNamedItem(const AtomicString& name) const;
 
  private:
   HTMLFormCollection(PassRefPtr<HTMLFormElement>);
@@ -56,14 +56,12 @@ class HTMLFormCollection : public HTMLCollection {
   static CollectionInfo* formCollectionInfo(HTMLFormElement*);
 
   Element* getNamedItem(const QualifiedName& attrName,
-                        const String& name,
-                        bool caseSensitive) const;
+                        const AtomicString& name) const;
   Element* nextNamedItemInternal(const String& name) const;
 
   Element* getNamedFormItem(const QualifiedName& attrName,
                             const String& name,
-                            int duplicateNumber,
-                            bool caseSensitive) const;
+                            int duplicateNumber) const;
 
   mutable int currentPos;
 };
