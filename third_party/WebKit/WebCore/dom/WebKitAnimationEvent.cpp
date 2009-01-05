@@ -42,16 +42,17 @@ WebKitAnimationEvent::WebKitAnimationEvent(const AtomicString& type,
 WebKitAnimationEvent::~WebKitAnimationEvent() {}
 
 void WebKitAnimationEvent::initWebKitAnimationEvent(const AtomicString& type,
-                                                    bool /*canBubbleArg*/,
-                                                    bool /*cancelableArg*/,
+                                                    bool canBubbleArg,
+                                                    bool cancelableArg,
                                                     const String& animationName,
                                                     double elapsedTime) {
   if (dispatched())
     return;
 
-  initEvent(type, false, true);
+  initEvent(type, canBubbleArg, cancelableArg);
 
   m_animationName = animationName;
+  m_elapsedTime = elapsedTime;
 }
 
 const String& WebKitAnimationEvent::animationName() const {
