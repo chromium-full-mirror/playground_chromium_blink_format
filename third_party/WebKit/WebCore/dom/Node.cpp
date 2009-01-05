@@ -1341,11 +1341,12 @@ bool Node::inSameContainingBlockFlowElement(Node* n) {
 // out of Node.
 
 PassRefPtr<NodeList> Node::getElementsByTagName(const String& name) {
-  return getElementsByTagNameNS("*", name);
+  return getElementsByTagNameNS(starAtom, name);
 }
 
-PassRefPtr<NodeList> Node::getElementsByTagNameNS(const String& namespaceURI,
-                                                  const String& localName) {
+PassRefPtr<NodeList> Node::getElementsByTagNameNS(
+    const AtomicString& namespaceURI,
+    const String& localName) {
   if (localName.isNull())
     return 0;
 
@@ -1365,9 +1366,9 @@ PassRefPtr<NodeList> Node::getElementsByTagNameNS(const String& namespaceURI,
   if (result.second)
     result.first->second = new DynamicNodeList::Caches;
 
-  return TagNodeList::create(
-      this, namespaceURI.isEmpty() ? nullAtom : AtomicString(namespaceURI),
-      name, result.first->second);
+  return TagNodeList::create(this,
+                             namespaceURI.isEmpty() ? nullAtom : namespaceURI,
+                             name, result.first->second);
 }
 
 PassRefPtr<NodeList> Node::getElementsByName(const String& elementName) {
@@ -1587,7 +1588,7 @@ bool Node::isEqualNode(Node* other) const {
   return true;
 }
 
-bool Node::isDefaultNamespace(const String& namespaceURI) const {
+bool Node::isDefaultNamespace(const AtomicString& namespaceURI) const {
   // Implemented according to
   // http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/namespaces-algorithms.html#isDefaultNamespaceAlgo
 
@@ -1636,7 +1637,7 @@ bool Node::isDefaultNamespace(const String& namespaceURI) const {
   }
 }
 
-String Node::lookupPrefix(const String& namespaceURI) const {
+String Node::lookupPrefix(const AtomicString& namespaceURI) const {
   // Implemented according to
   // http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/namespaces-algorithms.html#lookupNamespacePrefixAlgo
 
@@ -1730,7 +1731,7 @@ String Node::lookupNamespaceURI(const String& prefix) const {
   }
 }
 
-String Node::lookupNamespacePrefix(const String& _namespaceURI,
+String Node::lookupNamespacePrefix(const AtomicString& _namespaceURI,
                                    const Element* originalElement) const {
   if (_namespaceURI.isNull())
     return String();

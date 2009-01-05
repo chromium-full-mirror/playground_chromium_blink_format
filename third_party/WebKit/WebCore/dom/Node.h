@@ -162,10 +162,10 @@ class Node : public TreeShared<Node> {
 
   bool isSameNode(Node* other) const { return this == other; }
   bool isEqualNode(Node*) const;
-  bool isDefaultNamespace(const String& namespaceURI) const;
-  String lookupPrefix(const String& namespaceURI) const;
+  bool isDefaultNamespace(const AtomicString& namespaceURI) const;
+  String lookupPrefix(const AtomicString& namespaceURI) const;
   String lookupNamespaceURI(const String& prefix) const;
-  String lookupNamespacePrefix(const String& namespaceURI,
+  String lookupNamespacePrefix(const AtomicString& namespaceURI,
                                const Element* originalElement) const;
 
   String textContent(bool convertBRsToNewlines = false) const;
@@ -554,7 +554,7 @@ class Node : public TreeShared<Node> {
   void notifyLocalNodeListsAttributeChanged();
 
   PassRefPtr<NodeList> getElementsByTagName(const String&);
-  PassRefPtr<NodeList> getElementsByTagNameNS(const String& namespaceURI,
+  PassRefPtr<NodeList> getElementsByTagNameNS(const AtomicString& namespaceURI,
                                               const String& localName);
   PassRefPtr<NodeList> getElementsByName(const String& elementName);
   PassRefPtr<NodeList> getElementsByClassName(const String& classNames);
