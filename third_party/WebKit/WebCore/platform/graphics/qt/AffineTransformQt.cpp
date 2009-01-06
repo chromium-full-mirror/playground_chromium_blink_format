@@ -42,7 +42,7 @@ TransformationMatrix::TransformationMatrix(double a,
     : m_transform(a, b, c, d, tx, ty) {}
 
 TransformationMatrix::TransformationMatrix(
-    const PlatformAffineTransform& matrix)
+    const PlatformTransformationMatrix& matrix)
     : m_transform(matrix) {}
 
 void TransformationMatrix::setMatrix(double a,
