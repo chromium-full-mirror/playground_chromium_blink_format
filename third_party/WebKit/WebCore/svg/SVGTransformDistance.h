@@ -27,7 +27,7 @@
 
 namespace WebCore {
 
-class AffineTransform;
+class TransformationMatrix;
 
 class SVGTransformDistance {
  public:
@@ -51,13 +51,13 @@ class SVGTransformDistance {
                        float angle,
                        float cx,
                        float cy,
-                       const AffineTransform&);
+                       const TransformationMatrix&);
 
   SVGTransform::SVGTransformType m_type;
   float m_angle;
   float m_cx;
   float m_cy;
-  AffineTransform
+  TransformationMatrix
       m_transform;  // for storing scale, translation or matrix transforms
 };
 }

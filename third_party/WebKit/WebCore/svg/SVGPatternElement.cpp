@@ -26,7 +26,7 @@
 #if ENABLE(SVG)
 #include "SVGPatternElement.h"
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "Document.h"
 #include "FloatConversion.h"
 #include "GraphicsContext.h"
@@ -212,7 +212,7 @@ void SVGPatternElement::buildPattern(const FloatRect& targetRect) const {
     }
   }
 
-  AffineTransform viewBoxCTM = viewBoxToViewTransform(
+  TransformationMatrix viewBoxCTM = viewBoxToViewTransform(
       patternBoundaries.width(), patternBoundaries.height());
   FloatRect patternBoundariesIncludingOverflow = patternBoundaries;
 

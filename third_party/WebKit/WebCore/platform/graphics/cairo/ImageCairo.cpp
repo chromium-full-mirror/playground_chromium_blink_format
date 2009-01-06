@@ -29,7 +29,7 @@
 
 #if PLATFORM(CAIRO)
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "FloatRect.h"
 #include "GraphicsContext.h"
 #include "ImageObserver.h"
@@ -143,7 +143,7 @@ void BitmapImage::draw(GraphicsContext* context,
 
 void Image::drawPattern(GraphicsContext* context,
                         const FloatRect& tileRect,
-                        const AffineTransform& patternTransform,
+                        const TransformationMatrix& patternTransform,
                         const FloatPoint& phase,
                         CompositeOperator op,
                         const FloatRect& destRect) {

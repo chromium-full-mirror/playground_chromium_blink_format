@@ -117,7 +117,7 @@ FloatRect SVGInlineTextBox::calculateGlyphBoundaries(
   FloatRect glyphRect(x1, y1, x2 - x1, y2 - y1);
 
   // Take per-character transformations into account
-  AffineTransform ctm = svgChar.characterTransform();
+  TransformationMatrix ctm = svgChar.characterTransform();
   if (!ctm.isIdentity())
     glyphRect = ctm.mapRect(glyphRect);
 
@@ -131,7 +131,7 @@ struct SVGInlineTextBoxClosestCharacterToPositionWalker {
 
   void chunkPortionCallback(SVGInlineTextBox* textBox,
                             int startOffset,
-                            const AffineTransform& chunkCtm,
+                            const TransformationMatrix& chunkCtm,
                             const Vector<SVGChar>::iterator& start,
                             const Vector<SVGChar>::iterator& end) {
     RenderStyle* style = textBox->textObject()->style();
@@ -198,7 +198,7 @@ struct SVGInlineTextBoxSelectionRectWalker {
 
   void chunkPortionCallback(SVGInlineTextBox* textBox,
                             int startOffset,
-                            const AffineTransform& chunkCtm,
+                            const TransformationMatrix& chunkCtm,
                             const Vector<SVGChar>::iterator& start,
                             const Vector<SVGChar>::iterator& end) {
     RenderStyle* style = textBox->textObject()->style();
@@ -371,7 +371,7 @@ void SVGInlineTextBox::paintCharacters(RenderObject::PaintInfo& paintInfo,
   if (*font != paintInfo.context->font())
     paintInfo.context->setFont(*font);
 
-  AffineTransform ctm = svgChar.characterTransform();
+  TransformationMatrix ctm = svgChar.characterTransform();
   if (!ctm.isIdentity())
     paintInfo.context->concatCTM(ctm);
 
@@ -576,7 +576,7 @@ void SVGInlineTextBox::paintDecoration(ETextDecoration decoration,
   context->save();
   context->beginPath();
 
-  AffineTransform ctm = svgChar.characterTransform();
+  TransformationMatrix ctm = svgChar.characterTransform();
   if (!ctm.isIdentity())
     context->concatCTM(ctm);
 

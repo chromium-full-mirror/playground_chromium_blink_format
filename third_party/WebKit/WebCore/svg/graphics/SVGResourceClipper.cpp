@@ -28,7 +28,7 @@
 #if ENABLE(SVG)
 #include "SVGResourceClipper.h"
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "GraphicsContext.h"
 #include "SVGRenderTreeAsText.h"
 
@@ -64,7 +64,7 @@ void SVGResourceClipper::applyClip(GraphicsContext* context,
     Path clipPath = clipData.path;
 
     if (clipData.bboxUnits) {
-      AffineTransform transform;
+      TransformationMatrix transform;
       transform.translate(boundingBox.x(), boundingBox.y());
       transform.scale(boundingBox.width(), boundingBox.height());
       clipPath.transform(transform);

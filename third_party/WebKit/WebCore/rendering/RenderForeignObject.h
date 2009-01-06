@@ -24,7 +24,7 @@
 #define RenderForeignObject_h
 #if ENABLE(SVG) && ENABLE(SVG_FOREIGN_OBJECT)
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "RenderSVGBlock.h"
 
 namespace WebCore {
@@ -39,7 +39,9 @@ class RenderForeignObject : public RenderSVGBlock {
 
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
-  virtual AffineTransform localTransform() const { return m_localTransform; }
+  virtual TransformationMatrix localTransform() const {
+    return m_localTransform;
+  }
   virtual bool calculateLocalTransform();
 
   virtual void computeAbsoluteRepaintRect(IntRect&, bool fixed);
@@ -55,9 +57,9 @@ class RenderForeignObject : public RenderSVGBlock {
                            HitTestAction);
 
  private:
-  AffineTransform translationForAttributes();
+  TransformationMatrix translationForAttributes();
 
-  AffineTransform m_localTransform;
+  TransformationMatrix m_localTransform;
   IntRect m_absoluteBounds;
 };
 

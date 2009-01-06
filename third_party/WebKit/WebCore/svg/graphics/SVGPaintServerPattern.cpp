@@ -70,12 +70,12 @@ void SVGPaintServerPattern::setTile(auto_ptr<ImageBuffer> tile) {
   m_tile.set(tile.release());
 }
 
-AffineTransform SVGPaintServerPattern::patternTransform() const {
+TransformationMatrix SVGPaintServerPattern::patternTransform() const {
   return m_patternTransform;
 }
 
 void SVGPaintServerPattern::setPatternTransform(
-    const AffineTransform& transform) {
+    const TransformationMatrix& transform) {
   m_patternTransform = transform;
 }
 

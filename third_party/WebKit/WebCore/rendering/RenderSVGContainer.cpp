@@ -199,7 +199,7 @@ void RenderSVGContainer::setDrawsContents(bool drawsContents) {
   m_drawsContents = drawsContents;
 }
 
-AffineTransform RenderSVGContainer::localTransform() const {
+TransformationMatrix RenderSVGContainer::localTransform() const {
   return m_localTransform;
 }
 
@@ -352,8 +352,8 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
                  m_absoluteBounds.width(), m_absoluteBounds.height(), style());
 }
 
-AffineTransform RenderSVGContainer::viewportTransform() const {
-  return AffineTransform();
+TransformationMatrix RenderSVGContainer::viewportTransform() const {
+  return TransformationMatrix();
 }
 
 IntRect RenderSVGContainer::absoluteClippedOverflowRect() {

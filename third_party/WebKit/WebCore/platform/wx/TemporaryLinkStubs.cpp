@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <float.h>
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "AXObjectCache.h"
 #include "BitmapImage.h"
 #include "CachedResource.h"
@@ -185,7 +185,7 @@ Color WebCore::focusRingColor() {
 
 void Image::drawPattern(GraphicsContext*,
                         const FloatRect& srcRect,
-                        const AffineTransform& patternTransform,
+                        const TransformationMatrix& patternTransform,
                         const FloatPoint& phase,
                         CompositeOperator,
                         const FloatRect& destRect) {

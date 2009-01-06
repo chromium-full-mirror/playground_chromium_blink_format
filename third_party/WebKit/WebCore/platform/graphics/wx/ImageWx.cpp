@@ -26,7 +26,7 @@
 #include "config.h"
 #include "Image.h"
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "BitmapImage.h"
 #include "FloatRect.h"
 #include "GraphicsContext.h"
@@ -177,7 +177,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 
 void BitmapImage::drawPattern(GraphicsContext* ctxt,
                               const FloatRect& srcRect,
-                              const AffineTransform& patternTransform,
+                              const TransformationMatrix& patternTransform,
                               const FloatPoint& phase,
                               CompositeOperator,
                               const FloatRect& dstRect) {

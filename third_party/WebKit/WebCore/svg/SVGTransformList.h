@@ -40,7 +40,7 @@ class SVGTransformList : public SVGPODList<SVGTransform> {
   }
   virtual ~SVGTransformList();
 
-  SVGTransform createSVGTransformFromMatrix(const AffineTransform&) const;
+  SVGTransform createSVGTransformFromMatrix(const TransformationMatrix&) const;
   SVGTransform consolidate();
 
   // Internal use only

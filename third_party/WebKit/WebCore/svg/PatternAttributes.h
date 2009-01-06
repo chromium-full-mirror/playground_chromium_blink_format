@@ -49,7 +49,7 @@ struct PatternAttributes {
   SVGLength height() const { return m_height; }
   bool boundingBoxMode() const { return m_boundingBoxMode; }
   bool boundingBoxModeContent() const { return m_boundingBoxModeContent; }
-  AffineTransform patternTransform() const { return m_patternTransform; }
+  TransformationMatrix patternTransform() const { return m_patternTransform; }
   const SVGPatternElement* patternContentElement() const {
     return m_patternContentElement;
   }
@@ -78,7 +78,7 @@ struct PatternAttributes {
     m_boundingBoxModeContent = value;
     m_boundingBoxModeContentSet = true;
   }
-  void setPatternTransform(const AffineTransform& value) {
+  void setPatternTransform(const TransformationMatrix& value) {
     m_patternTransform = value;
     m_patternTransformSet = true;
   }
@@ -104,7 +104,7 @@ struct PatternAttributes {
   SVGLength m_height;
   bool m_boundingBoxMode;
   bool m_boundingBoxModeContent;
-  AffineTransform m_patternTransform;
+  TransformationMatrix m_patternTransform;
   const SVGPatternElement* m_patternContentElement;
 
   // Property states

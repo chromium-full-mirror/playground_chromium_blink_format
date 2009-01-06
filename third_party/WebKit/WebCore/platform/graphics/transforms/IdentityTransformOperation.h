@@ -46,7 +46,9 @@ class IdentityTransformOperation : public TransformOperation {
     return isSameType(o);
   }
 
-  virtual bool apply(AffineTransform&, const IntSize&) const { return false; }
+  virtual bool apply(TransformationMatrix&, const IntSize&) const {
+    return false;
+  }
 
   virtual PassRefPtr<TransformOperation> blend(const TransformOperation*,
                                                double,

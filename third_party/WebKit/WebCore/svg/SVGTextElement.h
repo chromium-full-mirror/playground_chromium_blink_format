@@ -41,10 +41,10 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual SVGElement* farthestViewportElement() const;
 
   virtual FloatRect getBBox() const;
-  virtual AffineTransform getCTM() const;
-  virtual AffineTransform getScreenCTM() const;
-  virtual AffineTransform animatedLocalTransform() const;
-  virtual AffineTransform* supplementalTransform();
+  virtual TransformationMatrix getCTM() const;
+  virtual TransformationMatrix getScreenCTM() const;
+  virtual TransformationMatrix animatedLocalTransform() const;
+  virtual TransformationMatrix* supplementalTransform();
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual bool childShouldCreateRenderer(Node*) const;
@@ -60,7 +60,7 @@ class SVGTextElement : public SVGTextPositioningElement,
                                  transform)
 
   // Used by <animateMotion>
-  OwnPtr<AffineTransform> m_supplementalTransform;
+  OwnPtr<TransformationMatrix> m_supplementalTransform;
 };
 
 }  // namespace WebCore

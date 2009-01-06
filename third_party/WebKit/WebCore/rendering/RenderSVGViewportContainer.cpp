@@ -94,7 +94,7 @@ void RenderSVGViewportContainer::applyContentTransforms(PaintInfo& paintInfo) {
                                                               // clipping
 
     paintInfo.context->concatCTM(
-        AffineTransform().translate(viewport().x(), viewport().y()));
+        TransformationMatrix().translate(viewport().x(), viewport().y()));
   }
 
   RenderSVGContainer::applyContentTransforms(paintInfo);
@@ -134,7 +134,7 @@ void RenderSVGViewportContainer::calcViewport() {
   }
 }
 
-AffineTransform RenderSVGViewportContainer::viewportTransform() const {
+TransformationMatrix RenderSVGViewportContainer::viewportTransform() const {
   if (element()->hasTagName(SVGNames::svgTag)) {
     SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
     return svg->viewBoxToViewTransform(viewport().width(), viewport().height());
@@ -144,11 +144,11 @@ AffineTransform RenderSVGViewportContainer::viewportTransform() const {
                                           viewport().height());
   }
 
-  return AffineTransform();
+  return TransformationMatrix();
 }
 
-AffineTransform RenderSVGViewportContainer::absoluteTransform() const {
-  AffineTransform ctm = RenderObject::absoluteTransform();
+TransformationMatrix RenderSVGViewportContainer::absoluteTransform() const {
+  TransformationMatrix ctm = RenderObject::absoluteTransform();
   ctm.translate(viewport().x(), viewport().y());
   return viewportTransform() * ctm;
 }
@@ -165,7 +165,7 @@ bool RenderSVGViewportContainer::nodeAtPoint(const HitTestRequest& request,
     // Check if we need to do anything at all.
     IntRect overflowBox = overflowRect(false);
     overflowBox.move(_tx, _ty);
-    AffineTransform ctm = RenderObject::absoluteTransform();
+    TransformationMatrix ctm = RenderObject::absoluteTransform();
     ctm.translate(viewport().x(), viewport().y());
     double localX, localY;
     ctm.inverse().map(_x - _tx, _y - _ty, &localX, &localY);

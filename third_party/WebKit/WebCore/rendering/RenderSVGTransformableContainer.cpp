@@ -35,7 +35,7 @@ RenderSVGTransformableContainer::RenderSVGTransformableContainer(
     : RenderSVGContainer(node) {}
 
 bool RenderSVGTransformableContainer::calculateLocalTransform() {
-  AffineTransform oldTransform = m_localTransform;
+  TransformationMatrix oldTransform = m_localTransform;
   m_localTransform = static_cast<SVGStyledTransformableElement*>(element())
                          ->animatedLocalTransform();
   return (m_localTransform != oldTransform);

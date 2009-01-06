@@ -25,7 +25,7 @@
 #ifndef RenderStyle_h
 #define RenderStyle_h
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "AnimationList.h"
 #include "BorderData.h"
 #include "BorderValue.h"
@@ -893,7 +893,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return !rareNonInheritedData->m_transform->m_operations.operations()
                 .isEmpty();
   }
-  void applyTransform(AffineTransform&,
+  void applyTransform(TransformationMatrix&,
                       const IntSize& borderBoxSize,
                       bool includeTransformOrigin = true) const;
   bool hasMask() const {

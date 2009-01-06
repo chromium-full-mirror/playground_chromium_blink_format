@@ -31,7 +31,7 @@
 
 #if PLATFORM(CAIRO)
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "CairoPath.h"
 #include "FloatRect.h"
 #include "Font.h"
@@ -115,7 +115,7 @@ GraphicsContext::~GraphicsContext() {
   delete m_data;
 }
 
-AffineTransform GraphicsContext::getCTM() const {
+TransformationMatrix GraphicsContext::getCTM() const {
   cairo_t* cr = platformContext();
   cairo_matrix_t m;
   cairo_get_matrix(cr, &m);
@@ -464,7 +464,7 @@ void GraphicsContext::fillPath() {
       cairo_paint_with_alpha(cr, m_common->state.globalAlpha);
       break;
     case PatternColorSpace: {
-      AffineTransform affine;
+      TransformationMatrix affine;
       cairo_set_source(
           cr, m_common->state.fillPattern->createPlatformPattern(affine));
       cairo_clip(cr);
@@ -499,7 +499,7 @@ void GraphicsContext::strokePath() {
       cairo_stroke(cr);
       break;
     case PatternColorSpace: {
-      AffineTransform affine;
+      TransformationMatrix affine;
       cairo_set_source(
           cr, m_common->state.strokePattern->createPlatformPattern(affine));
       if (m_common->state.globalAlpha < 1.0f) {
@@ -746,7 +746,7 @@ void GraphicsContext::setURLForRect(const KURL& link, const IntRect& destRect) {
   notImplemented();
 }
 
-void GraphicsContext::concatCTM(const AffineTransform& transform) {
+void GraphicsContext::concatCTM(const TransformationMatrix& transform) {
   if (paintingDisabled())
     return;
 

@@ -133,16 +133,17 @@ void RenderSVGRoot::applyContentTransforms(PaintInfo& paintInfo,
 
   if (origin.x() || origin.y()) {
     paintInfo.context->concatCTM(
-        AffineTransform().translate(origin.x(), origin.y()));
+        TransformationMatrix().translate(origin.x(), origin.y()));
     paintInfo.rect.move(-origin.x(), -origin.y());
   }
 
   // Respect scroll offset caused by html parents
-  AffineTransform ctm = RenderContainer::absoluteTransform();
+  TransformationMatrix ctm = RenderContainer::absoluteTransform();
   paintInfo.rect.move(static_cast<int>(ctm.e()), static_cast<int>(ctm.f()));
 
   SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
-  paintInfo.context->concatCTM(AffineTransform().scale(svg->currentScale()));
+  paintInfo.context->concatCTM(
+      TransformationMatrix().scale(svg->currentScale()));
 
   if (!viewport().isEmpty()) {
     if (style()->overflowX() != OVISIBLE)
@@ -153,10 +154,10 @@ void RenderSVGRoot::applyContentTransforms(PaintInfo& paintInfo,
                                                               // clipping
 
     paintInfo.context->concatCTM(
-        AffineTransform().translate(viewport().x(), viewport().y()));
+        TransformationMatrix().translate(viewport().x(), viewport().y()));
   }
 
-  paintInfo.context->concatCTM(AffineTransform().translate(
+  paintInfo.context->concatCTM(TransformationMatrix().translate(
       svg->currentTranslate().x(), svg->currentTranslate().y()));
 }
 
@@ -281,8 +282,8 @@ void RenderSVGRoot::absoluteQuads(Vector<FloatQuad>& quads, bool) {
     current->absoluteQuads(quads);
 }
 
-AffineTransform RenderSVGRoot::absoluteTransform() const {
-  AffineTransform ctm = RenderContainer::absoluteTransform();
+TransformationMatrix RenderSVGRoot::absoluteTransform() const {
+  TransformationMatrix ctm = RenderContainer::absoluteTransform();
   ctm.translate(m_x, m_y);
   SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
   ctm.scale(svg->currentScale());
@@ -309,8 +310,8 @@ FloatRect RenderSVGRoot::relativeBBox(bool includeStroke) const {
   return rect;
 }
 
-AffineTransform RenderSVGRoot::localTransform() const {
-  return AffineTransform();
+TransformationMatrix RenderSVGRoot::localTransform() const {
+  return TransformationMatrix();
 }
 
 bool RenderSVGRoot::nodeAtPoint(const HitTestRequest& request,
@@ -320,7 +321,7 @@ bool RenderSVGRoot::nodeAtPoint(const HitTestRequest& request,
                                 int _tx,
                                 int _ty,
                                 HitTestAction hitTestAction) {
-  AffineTransform ctm = RenderContainer::absoluteTransform();
+  TransformationMatrix ctm = RenderContainer::absoluteTransform();
 
   int sx = (_tx - static_cast<int>(ctm.e()));  // scroll offset
   int sy = (_ty - static_cast<int>(ctm.f()));  // scroll offset

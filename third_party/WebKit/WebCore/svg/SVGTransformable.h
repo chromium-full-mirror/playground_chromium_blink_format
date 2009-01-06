@@ -30,7 +30,7 @@
 
 namespace WebCore {
 
-class AffineTransform;
+class TransformationMatrix;
 class AtomicString;
 class SVGTransform;
 class QualifiedName;
@@ -50,10 +50,10 @@ class SVGTransformable : virtual public SVGLocatable {
                                   const UChar* end,
                                   SVGTransform&);
 
-  AffineTransform getCTM(const SVGElement*) const;
-  AffineTransform getScreenCTM(const SVGElement*) const;
+  TransformationMatrix getCTM(const SVGElement*) const;
+  TransformationMatrix getScreenCTM(const SVGElement*) const;
 
-  virtual AffineTransform animatedLocalTransform() const = 0;
+  virtual TransformationMatrix animatedLocalTransform() const = 0;
 
   bool isKnownAttribute(const QualifiedName&);
 };

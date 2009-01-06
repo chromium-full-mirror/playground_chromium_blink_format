@@ -51,7 +51,7 @@
 
 namespace WebCore {
 
-class AffineTransform;
+class TransformationMatrix;
 class CachedResource;
 class HitTestResult;
 class RenderFrameSet;
@@ -411,7 +411,7 @@ class RenderLayer : public ScrollbarClient {
   void setStaticY(int staticY) { m_staticY = staticY; }
 
   bool hasTransform() const { return m_object->hasTransform(); }
-  AffineTransform* transform() const { return m_transform.get(); }
+  TransformationMatrix* transform() const { return m_transform.get(); }
 
   void destroy(RenderArena*);
 
@@ -568,7 +568,7 @@ class RenderLayer : public ScrollbarClient {
   int m_staticX;
   int m_staticY;
 
-  OwnPtr<AffineTransform> m_transform;
+  OwnPtr<TransformationMatrix> m_transform;
 
   // May ultimately be extended to many replicas (with their own paint order).
   RenderReplica* m_reflection;

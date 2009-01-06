@@ -27,7 +27,7 @@
 #include "config.h"
 #include "Image.h"
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "BitmapImage.h"
 #include "GraphicsContext.h"
 #include "IntRect.h"
@@ -135,8 +135,8 @@ void Image::drawTiled(GraphicsContext* ctxt,
 
   FloatSize scale(scaledTileSize.width() / intrinsicTileSize.width(),
                   scaledTileSize.height() / intrinsicTileSize.height());
-  AffineTransform patternTransform =
-      AffineTransform().scale(scale.width(), scale.height());
+  TransformationMatrix patternTransform =
+      TransformationMatrix().scale(scale.width(), scale.height());
 
   FloatRect oneTileRect;
   oneTileRect.setX(destRect.x() +
@@ -188,8 +188,8 @@ void Image::drawTiled(GraphicsContext* ctxt,
     vRule = RepeatTile;
 
   FloatSize scale = calculatePatternScale(dstRect, srcRect, hRule, vRule);
-  AffineTransform patternTransform =
-      AffineTransform().scale(scale.width(), scale.height());
+  TransformationMatrix patternTransform =
+      TransformationMatrix().scale(scale.width(), scale.height());
 
   // We want to construct the phase such that the pattern is centered (when
   // stretch is not

@@ -169,7 +169,7 @@ class BitmapImage : public Image {
 #if PLATFORM(QT) || PLATFORM(WX)
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
-                           const AffineTransform& patternTransform,
+                           const TransformationMatrix& patternTransform,
                            const FloatPoint& phase,
                            CompositeOperator,
                            const FloatRect& destRect);

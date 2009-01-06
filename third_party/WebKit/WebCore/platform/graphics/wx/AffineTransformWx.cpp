@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 
 #include "FloatRect.h"
 #include "IntRect.h"
@@ -37,17 +37,18 @@
 namespace WebCore {
 
 #if USE(WXGC)
-AffineTransform::AffineTransform(const PlatformAffineTransform& matrix) {
+TransformationMatrix::TransformationMatrix(
+    const PlatformAffineTransform& matrix) {
   m_transform = matrix;
 }
 #endif
 
-AffineTransform::AffineTransform(double a,
-                                 double b,
-                                 double c,
-                                 double d,
-                                 double e,
-                                 double f) {
+TransformationMatrix::TransformationMatrix(double a,
+                                           double b,
+                                           double c,
+                                           double d,
+                                           double e,
+                                           double f) {
 #if USE(WXGC)
   wxGraphicsRenderer* renderer = wxGraphicsRenderer::GetDefaultRenderer();
   m_transform = renderer->CreateMatrix();
@@ -55,7 +56,7 @@ AffineTransform::AffineTransform(double a,
   setMatrix(a, b, c, d, e, f);
 }
 
-AffineTransform::AffineTransform() {
+TransformationMatrix::TransformationMatrix() {
 // NB: If we ever support using Cairo backend on Win/Mac, this will need to be
 // changed somehow (though I'm not sure how as we don't have a reference to the
 // graphics context here.
@@ -65,27 +66,30 @@ AffineTransform::AffineTransform() {
 #endif
 }
 
-AffineTransform AffineTransform::inverse() const {
+TransformationMatrix TransformationMatrix::inverse() const {
   notImplemented();
   return *this;
 }
 
-void AffineTransform::setMatrix(double a,
-                                double b,
-                                double c,
-                                double d,
-                                double e,
-                                double f) {
+void TransformationMatrix::setMatrix(double a,
+                                     double b,
+                                     double c,
+                                     double d,
+                                     double e,
+                                     double f) {
 #if USE(WXGC)
   m_transform.Set(a, b, c, d, e, f);
 #endif
 }
 
-void AffineTransform::map(double x, double y, double* x2, double* y2) const {
+void TransformationMatrix::map(double x,
+                               double y,
+                               double* x2,
+                               double* y2) const {
   notImplemented();
 }
 
-IntRect AffineTransform::mapRect(const IntRect& rect) const {
+IntRect TransformationMatrix::mapRect(const IntRect& rect) const {
 #if USE(WXGC)
   double x, y, width, height;
   x = rect.x();
@@ -100,7 +104,7 @@ IntRect AffineTransform::mapRect(const IntRect& rect) const {
   return IntRect();
 }
 
-FloatRect AffineTransform::mapRect(const FloatRect& rect) const {
+FloatRect TransformationMatrix::mapRect(const FloatRect& rect) const {
 #if USE(WXGC)
   double x, y, width, height;
   x = rect.x();
@@ -115,42 +119,43 @@ FloatRect AffineTransform::mapRect(const FloatRect& rect) const {
   return FloatRect();
 }
 
-AffineTransform& AffineTransform::scale(double sx, double sy) {
+TransformationMatrix& TransformationMatrix::scale(double sx, double sy) {
 #if USE(WXGC)
   m_transform.Scale((wxDouble)sx, (wxDouble)sy);
 #endif
   return *this;
 }
 
-void AffineTransform::reset() {
+void TransformationMatrix::reset() {
   notImplemented();
 }
 
-AffineTransform& AffineTransform::rotate(double d) {
+TransformationMatrix& TransformationMatrix::rotate(double d) {
 #if USE(WXGC)
   m_transform.Rotate((wxDouble)d);
 #endif
   return *this;
 }
 
-AffineTransform& AffineTransform::translate(double tx, double ty) {
+TransformationMatrix& TransformationMatrix::translate(double tx, double ty) {
 #if USE(WXGC)
   m_transform.Translate((wxDouble)tx, (wxDouble)ty);
 #endif
   return *this;
 }
 
-AffineTransform& AffineTransform::shear(double sx, double sy) {
+TransformationMatrix& TransformationMatrix::shear(double sx, double sy) {
   notImplemented();
   return *this;
 }
 
-AffineTransform& AffineTransform::operator*=(const AffineTransform& other) {
+TransformationMatrix& TransformationMatrix::operator*=(
+    const TransformationMatrix& other) {
   notImplemented();
   return *this;
 }
 
-bool AffineTransform::operator==(const AffineTransform& other) const {
+bool TransformationMatrix::operator==(const TransformationMatrix& other) const {
 #if USE(WXGC)
   return m_transform.IsEqual((wxGraphicsMatrix)other);
 #else
@@ -159,23 +164,24 @@ bool AffineTransform::operator==(const AffineTransform& other) const {
 #endif
 }
 
-AffineTransform AffineTransform::operator*(const AffineTransform& other) {
+TransformationMatrix TransformationMatrix::operator*(
+    const TransformationMatrix& other) {
   notImplemented();
   return *this;  // m_transform * other.m_transform;
 }
 
-double AffineTransform::det() const {
+double TransformationMatrix::det() const {
   notImplemented();
   return 0;
 }
 
 #if USE(WXGC)
-AffineTransform::operator wxGraphicsMatrix() const {
+TransformationMatrix::operator wxGraphicsMatrix() const {
   return m_transform;
 }
 #endif
 
-double AffineTransform::a() const {
+double TransformationMatrix::a() const {
   double a = 0;
 #if USE(WXGC)
   m_transform.Get(&a);
@@ -183,11 +189,11 @@ double AffineTransform::a() const {
   return a;
 }
 
-void AffineTransform::setA(double a) {
+void TransformationMatrix::setA(double a) {
   setMatrix(a, b(), c(), d(), e(), f());
 }
 
-double AffineTransform::b() const {
+double TransformationMatrix::b() const {
   double b = 0;
 #if USE(WXGC)
   m_transform.Get(&b);
@@ -195,11 +201,11 @@ double AffineTransform::b() const {
   return b;
 }
 
-void AffineTransform::setB(double b) {
+void TransformationMatrix::setB(double b) {
   setMatrix(a(), b, c(), d(), e(), f());
 }
 
-double AffineTransform::c() const {
+double TransformationMatrix::c() const {
   double c = 0;
 #if USE(WXGC)
   m_transform.Get(&c);
@@ -207,11 +213,11 @@ double AffineTransform::c() const {
   return c;
 }
 
-void AffineTransform::setC(double c) {
+void TransformationMatrix::setC(double c) {
   setMatrix(a(), b(), c, d(), e(), f());
 }
 
-double AffineTransform::d() const {
+double TransformationMatrix::d() const {
   double d = 0;
 #if USE(WXGC)
   m_transform.Get(&d);
@@ -219,11 +225,11 @@ double AffineTransform::d() const {
   return d;
 }
 
-void AffineTransform::setD(double d) {
+void TransformationMatrix::setD(double d) {
   setMatrix(a(), b(), c(), d, e(), f());
 }
 
-double AffineTransform::e() const {
+double TransformationMatrix::e() const {
   double e = 0;
 #if USE(WXGC)
   m_transform.Get(&e);
@@ -231,11 +237,11 @@ double AffineTransform::e() const {
   return e;
 }
 
-void AffineTransform::setE(double e) {
+void TransformationMatrix::setE(double e) {
   setMatrix(a(), b(), c(), d(), e, f());
 }
 
-double AffineTransform::f() const {
+double TransformationMatrix::f() const {
   double f = 0;
 #if USE(WXGC)
   m_transform.Get(&f);
@@ -243,7 +249,7 @@ double AffineTransform::f() const {
   return f;
 }
 
-void AffineTransform::setF(double f) {
+void TransformationMatrix::setF(double f) {
   setMatrix(a(), b(), c(), d(), e(), f);
 }
 }

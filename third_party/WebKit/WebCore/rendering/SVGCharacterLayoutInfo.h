@@ -29,7 +29,7 @@
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include <wtf/RefCounted.h>
 #include "SVGRenderStyle.h"
 #include "SVGTextContentElement.h"
@@ -231,7 +231,7 @@ struct SVGChar {
 
   // Helper methods
   bool isHidden() const;
-  AffineTransform characterTransform() const;
+  TransformationMatrix characterTransform() const;
 };
 
 struct SVGInlineBoxCharacterRange {
@@ -271,7 +271,7 @@ struct SVGTextChunk {
   // textLength & lengthAdjust support
   float textLength;
   ELengthAdjust lengthAdjust;
-  AffineTransform ctm;
+  TransformationMatrix ctm;
 
   // status flags
   bool isVerticalText : 1;
@@ -289,7 +289,7 @@ struct SVGTextChunkWalkerBase {
 
   virtual void operator()(SVGInlineTextBox* textBox,
                           int startOffset,
-                          const AffineTransform& chunkCtm,
+                          const TransformationMatrix& chunkCtm,
                           const Vector<SVGChar>::iterator& start,
                           const Vector<SVGChar>::iterator& end) = 0;
 
@@ -307,7 +307,7 @@ struct SVGTextChunkWalker : public SVGTextChunkWalkerBase {
   typedef void (CallbackClass::*SVGTextChunkWalkerCallback)(
       SVGInlineTextBox* textBox,
       int startOffset,
-      const AffineTransform& chunkCtm,
+      const TransformationMatrix& chunkCtm,
       const Vector<SVGChar>::iterator& start,
       const Vector<SVGChar>::iterator& end);
 
@@ -337,7 +337,7 @@ struct SVGTextChunkWalker : public SVGTextChunkWalkerBase {
 
   virtual void operator()(SVGInlineTextBox* textBox,
                           int startOffset,
-                          const AffineTransform& chunkCtm,
+                          const TransformationMatrix& chunkCtm,
                           const Vector<SVGChar>::iterator& start,
                           const Vector<SVGChar>::iterator& end) {
     (*m_object.*m_walkerCallback)(textBox, startOffset, chunkCtm, start, end);

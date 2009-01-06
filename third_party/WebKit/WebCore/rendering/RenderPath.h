@@ -27,7 +27,7 @@
 
 #if ENABLE(SVG)
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "FloatRect.h"
 
 #include "RenderObject.h"
@@ -59,7 +59,7 @@ class RenderPath : public RenderObject {
   virtual const char* renderName() const { return "RenderPath"; }
 
   bool calculateLocalTransform();
-  virtual AffineTransform localTransform() const;
+  virtual TransformationMatrix localTransform() const;
 
   virtual void layout();
   virtual IntRect absoluteClippedOverflowRect();
@@ -94,7 +94,7 @@ class RenderPath : public RenderObject {
   mutable FloatRect m_fillBBox;
   mutable FloatRect m_strokeBbox;
   FloatRect m_markerBounds;
-  AffineTransform m_localTransform;
+  TransformationMatrix m_localTransform;
   IntRect m_absoluteBounds;
 };
 }

@@ -112,16 +112,16 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   static SVGLength createSVGLength();
   static PassRefPtr<SVGAngle> createSVGAngle();
   static FloatPoint createSVGPoint();
-  static AffineTransform createSVGMatrix();
+  static TransformationMatrix createSVGMatrix();
   static FloatRect createSVGRect();
   static SVGTransform createSVGTransform();
-  static SVGTransform createSVGTransformFromMatrix(const AffineTransform&);
+  static SVGTransform createSVGTransformFromMatrix(const TransformationMatrix&);
 
   virtual void parseMappedAttribute(MappedAttribute*);
 
   // 'virtual SVGLocatable' functions
-  virtual AffineTransform getCTM() const;
-  virtual AffineTransform getScreenCTM() const;
+  virtual TransformationMatrix getCTM() const;
+  virtual TransformationMatrix getScreenCTM() const;
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
@@ -133,8 +133,8 @@ class SVGSVGElement : public SVGStyledLocatableElement,
 
   virtual void svgAttributeChanged(const QualifiedName&);
 
-  virtual AffineTransform viewBoxToViewTransform(float viewWidth,
-                                                 float viewHeight) const;
+  virtual TransformationMatrix viewBoxToViewTransform(float viewWidth,
+                                                      float viewHeight) const;
 
   void inheritViewAttributes(SVGViewElement*);
 

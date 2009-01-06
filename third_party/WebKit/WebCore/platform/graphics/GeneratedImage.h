@@ -63,7 +63,7 @@ class GeneratedImage : public Image {
                     CompositeOperator);
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
-                           const AffineTransform& patternTransform,
+                           const TransformationMatrix& patternTransform,
                            const FloatPoint& phase,
                            CompositeOperator,
                            const FloatRect& destRect);

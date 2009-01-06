@@ -27,7 +27,7 @@
 #ifndef GraphicsContextPrivate_h
 #define GraphicsContextPrivate_h
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "Font.h"
 #include "Gradient.h"
 #include "GraphicsContext.h"
@@ -71,7 +71,7 @@ struct GraphicsContextState {
 #if PLATFORM(CAIRO)
   float globalAlpha;
 #elif PLATFORM(QT)
-  AffineTransform pathTransform;
+  TransformationMatrix pathTransform;
 #endif
   ColorSpace strokeColorSpace;
   Color strokeColor;

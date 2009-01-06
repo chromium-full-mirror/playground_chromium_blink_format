@@ -59,8 +59,8 @@ class MatrixTransformOperation : public TransformOperation {
            m_e == m->m_e && m_f == m->m_f;
   }
 
-  virtual bool apply(AffineTransform& transform, const IntSize&) const {
-    AffineTransform matrix(m_a, m_b, m_c, m_d, m_e, m_f);
+  virtual bool apply(TransformationMatrix& transform, const IntSize&) const {
+    TransformationMatrix matrix(m_a, m_b, m_c, m_d, m_e, m_f);
     transform = matrix * transform;
     return false;
   }

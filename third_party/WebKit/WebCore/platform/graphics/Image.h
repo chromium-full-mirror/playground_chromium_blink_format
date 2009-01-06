@@ -62,7 +62,7 @@ class NativeImageSkia;
 
 namespace WebCore {
 
-class AffineTransform;
+class TransformationMatrix;
 class FloatPoint;
 class FloatRect;
 class FloatSize;
@@ -188,7 +188,7 @@ class Image : public RefCounted<Image> {
 
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
-                           const AffineTransform& patternTransform,
+                           const TransformationMatrix& patternTransform,
                            const FloatPoint& phase,
                            CompositeOperator,
                            const FloatRect& destRect);

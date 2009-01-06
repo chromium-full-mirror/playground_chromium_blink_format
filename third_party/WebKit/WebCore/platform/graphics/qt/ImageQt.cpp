@@ -34,7 +34,7 @@
 #include "FloatRect.h"
 #include "PlatformString.h"
 #include "GraphicsContext.h"
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "NotImplemented.h"
 #include "StillImageQt.h"
 #include "qwebsettings.h"
@@ -88,7 +88,7 @@ PassRefPtr<Image> Image::loadPlatformResource(const char* name) {
 
 void Image::drawPattern(GraphicsContext* ctxt,
                         const FloatRect& tileRect,
-                        const AffineTransform& patternTransform,
+                        const TransformationMatrix& patternTransform,
                         const FloatPoint& phase,
                         CompositeOperator op,
                         const FloatRect& destRect) {
@@ -133,7 +133,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 
 void BitmapImage::drawPattern(GraphicsContext* ctxt,
                               const FloatRect& tileRect,
-                              const AffineTransform& patternTransform,
+                              const TransformationMatrix& patternTransform,
                               const FloatPoint& phase,
                               CompositeOperator op,
                               const FloatRect& destRect) {

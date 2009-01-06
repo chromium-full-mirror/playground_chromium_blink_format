@@ -509,7 +509,7 @@ struct SVGRootInlineBoxPaintWalker {
 
   void chunkPortionCallback(SVGInlineTextBox* textBox,
                             int startOffset,
-                            const AffineTransform& chunkCtm,
+                            const TransformationMatrix& chunkCtm,
                             const Vector<SVGChar>::iterator& start,
                             const Vector<SVGChar>::iterator& end) {
     RenderText* text = textBox->textObject();
@@ -903,7 +903,7 @@ static void applyTextLengthCorrectionToTextChunk(SVGTextChunk& chunk) {
     SVGChar& firstChar = *(chunk.start);
 
     // Assure we apply the chunk scaling in the right origin
-    AffineTransform newChunkCtm;
+    TransformationMatrix newChunkCtm;
     newChunkCtm.translate(firstChar.x, firstChar.y);
     newChunkCtm = chunk.ctm * newChunkCtm;
     newChunkCtm.translate(-firstChar.x, -firstChar.y);
@@ -1023,7 +1023,7 @@ void SVGRootInlineBox::buildLayoutInformation(InlineFlowBox* start,
         Vector<SVGTextChunk>::iterator it = tempChunks.begin();
         Vector<SVGTextChunk>::iterator end = tempChunks.end();
 
-        AffineTransform ctm;
+        TransformationMatrix ctm;
         float computedLength = 0.0f;
 
         for (; it != end; ++it) {

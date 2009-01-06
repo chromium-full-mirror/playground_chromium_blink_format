@@ -80,12 +80,12 @@ void RenderSVGHiddenContainer::absoluteQuads(Vector<FloatQuad>&, bool) {
   // This subtree does not take up space or paint
 }
 
-AffineTransform RenderSVGHiddenContainer::absoluteTransform() const {
-  return AffineTransform();
+TransformationMatrix RenderSVGHiddenContainer::absoluteTransform() const {
+  return TransformationMatrix();
 }
 
-AffineTransform RenderSVGHiddenContainer::localTransform() const {
-  return AffineTransform();
+TransformationMatrix RenderSVGHiddenContainer::localTransform() const {
+  return TransformationMatrix();
 }
 
 bool RenderSVGHiddenContainer::nodeAtPoint(const HitTestRequest&,

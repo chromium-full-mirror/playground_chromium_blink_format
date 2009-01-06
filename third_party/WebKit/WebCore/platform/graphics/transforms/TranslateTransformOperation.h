@@ -54,7 +54,7 @@ class TranslateTransformOperation : public TransformOperation {
     return m_x == t->m_x && m_y == t->m_y;
   }
 
-  virtual bool apply(AffineTransform& transform,
+  virtual bool apply(TransformationMatrix& transform,
                      const IntSize& borderBoxSize) const {
     transform.translate(m_x.calcFloatValue(borderBoxSize.width()),
                         m_y.calcFloatValue(borderBoxSize.height()));

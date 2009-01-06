@@ -25,7 +25,7 @@
 
 #include "SVGLocatable.h"
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "RenderPath.h"
 #include "SVGException.h"
 #include "SVGSVGElement.h"
@@ -91,17 +91,17 @@ FloatRect SVGLocatable::getBBox(const SVGElement* e) {
   return bboxRect;
 }
 
-AffineTransform SVGLocatable::getCTM(const SVGElement* element) {
+TransformationMatrix SVGLocatable::getCTM(const SVGElement* element) {
   if (!element)
-    return AffineTransform();
+    return TransformationMatrix();
 
-  AffineTransform ctm;
+  TransformationMatrix ctm;
 
   Node* parent = element->parentNode();
   if (parent && parent->isSVGElement()) {
     SVGElement* parentElement = static_cast<SVGElement*>(parent);
     if (parentElement && parentElement->isStyledLocatable()) {
-      AffineTransform parentCTM =
+      TransformationMatrix parentCTM =
           static_cast<SVGStyledLocatableElement*>(parentElement)->getCTM();
       ctm = parentCTM * ctm;
     }
@@ -110,17 +110,17 @@ AffineTransform SVGLocatable::getCTM(const SVGElement* element) {
   return ctm;
 }
 
-AffineTransform SVGLocatable::getScreenCTM(const SVGElement* element) {
+TransformationMatrix SVGLocatable::getScreenCTM(const SVGElement* element) {
   if (!element)
-    return AffineTransform();
+    return TransformationMatrix();
 
-  AffineTransform ctm;
+  TransformationMatrix ctm;
 
   Node* parent = element->parentNode();
   if (parent && parent->isSVGElement()) {
     SVGElement* parentElement = static_cast<SVGElement*>(parent);
     if (parentElement && parentElement->isStyledLocatable()) {
-      AffineTransform parentCTM =
+      TransformationMatrix parentCTM =
           static_cast<SVGStyledLocatableElement*>(parentElement)
               ->getScreenCTM();
       ctm = parentCTM * ctm;
@@ -130,12 +130,13 @@ AffineTransform SVGLocatable::getScreenCTM(const SVGElement* element) {
   return ctm;
 }
 
-AffineTransform SVGLocatable::getTransformToElement(SVGElement* target,
-                                                    ExceptionCode& ec) const {
-  AffineTransform ctm = getCTM();
+TransformationMatrix SVGLocatable::getTransformToElement(
+    SVGElement* target,
+    ExceptionCode& ec) const {
+  TransformationMatrix ctm = getCTM();
 
   if (target && target->isStyledLocatable()) {
-    AffineTransform targetCTM =
+    TransformationMatrix targetCTM =
         static_cast<SVGStyledLocatableElement*>(target)->getCTM();
     if (!targetCTM.isInvertible()) {
       ec = SVGException::SVG_MATRIX_NOT_INVERTABLE;

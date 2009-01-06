@@ -25,7 +25,7 @@
 #if ENABLE(SVG)
 #include "SVGFitToViewBox.h"
 
-#include "AffineTransform.h"
+#include "TransformationMatrix.h"
 #include "Document.h"
 #include "FloatRect.h"
 #include "SVGNames.h"
@@ -87,12 +87,12 @@ bool SVGFitToViewBox::parseViewBox(const UChar*& c,
   return true;
 }
 
-AffineTransform SVGFitToViewBox::viewBoxToViewTransform(
+TransformationMatrix SVGFitToViewBox::viewBoxToViewTransform(
     float viewWidth,
     float viewHeight) const {
   FloatRect viewBoxRect = viewBox();
   if (!viewBoxRect.width() || !viewBoxRect.height())
-    return AffineTransform();
+    return TransformationMatrix();
 
   return preserveAspectRatio()->getCTM(
       viewBoxRect.x(), viewBoxRect.y(), viewBoxRect.width(),

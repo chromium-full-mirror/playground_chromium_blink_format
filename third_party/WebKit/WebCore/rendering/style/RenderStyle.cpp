@@ -664,7 +664,7 @@ void RenderStyle::setContent(CounterContent* c, bool add) {
   newContentData->m_type = CONTENT_COUNTER;
 }
 
-void RenderStyle::applyTransform(AffineTransform& transform,
+void RenderStyle::applyTransform(TransformationMatrix& transform,
                                  const IntSize& borderBoxSize,
                                  bool includeTransformOrigin) const {
   // transform-origin brackets the transform with translate operations.
