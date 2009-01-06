@@ -279,6 +279,10 @@ class FrameLoaderClient {
       NSCachedURLResponse*) const = 0;
 #endif
 
+  virtual bool shouldUsePluginDocument(const String& mimeType) const {
+    return false;
+  }
+
  protected:
   static void transitionToCommittedForNewPage(Frame*,
                                               const IntSize&,
