@@ -72,14 +72,14 @@ static const int computedProperties[] = {
     CSSPropertyOutlineStyle, CSSPropertyOutlineWidth, CSSPropertyOverflowX,
     CSSPropertyOverflowY, CSSPropertyPaddingBottom, CSSPropertyPaddingLeft,
     CSSPropertyPaddingRight, CSSPropertyPaddingTop, CSSPropertyPageBreakAfter,
-    CSSPropertyPageBreakBefore, CSSPropertyPageBreakInside, CSSPropertyPosition,
-    CSSPropertyResize, CSSPropertyRight, CSSPropertyTableLayout,
-    CSSPropertyTextAlign, CSSPropertyTextDecoration, CSSPropertyTextIndent,
-    CSSPropertyTextShadow, CSSPropertyTextTransform, CSSPropertyTop,
-    CSSPropertyUnicodeBidi, CSSPropertyVerticalAlign, CSSPropertyVisibility,
-    CSSPropertyWhiteSpace, CSSPropertyWidows, CSSPropertyWidth,
-    CSSPropertyWordSpacing, CSSPropertyWordWrap, CSSPropertyZIndex,
-    CSSPropertyZoom,
+    CSSPropertyPageBreakBefore, CSSPropertyPageBreakInside,
+    CSSPropertyPointerEvents, CSSPropertyPosition, CSSPropertyResize,
+    CSSPropertyRight, CSSPropertyTableLayout, CSSPropertyTextAlign,
+    CSSPropertyTextDecoration, CSSPropertyTextIndent, CSSPropertyTextShadow,
+    CSSPropertyTextTransform, CSSPropertyTop, CSSPropertyUnicodeBidi,
+    CSSPropertyVerticalAlign, CSSPropertyVisibility, CSSPropertyWhiteSpace,
+    CSSPropertyWidows, CSSPropertyWidth, CSSPropertyWordSpacing,
+    CSSPropertyWordWrap, CSSPropertyZIndex, CSSPropertyZoom,
 
     CSSPropertyWebkitAnimationDelay, CSSPropertyWebkitAnimationDirection,
     CSSPropertyWebkitAnimationDuration,
@@ -130,12 +130,11 @@ static const int computedProperties[] = {
     CSSPropertyClipPath, CSSPropertyClipRule, CSSPropertyMask,
     CSSPropertyFilter, CSSPropertyFloodColor, CSSPropertyFloodOpacity,
     CSSPropertyLightingColor, CSSPropertyStopColor, CSSPropertyStopOpacity,
-    CSSPropertyPointerEvents, CSSPropertyColorInterpolation,
-    CSSPropertyColorInterpolationFilters, CSSPropertyColorRendering,
-    CSSPropertyFill, CSSPropertyFillOpacity, CSSPropertyFillRule,
-    CSSPropertyImageRendering, CSSPropertyMarkerEnd, CSSPropertyMarkerMid,
-    CSSPropertyMarkerStart, CSSPropertyShapeRendering, CSSPropertyStroke,
-    CSSPropertyStrokeDasharray, CSSPropertyStrokeDashoffset,
+    CSSPropertyColorInterpolation, CSSPropertyColorInterpolationFilters,
+    CSSPropertyColorRendering, CSSPropertyFill, CSSPropertyFillOpacity,
+    CSSPropertyFillRule, CSSPropertyImageRendering, CSSPropertyMarkerEnd,
+    CSSPropertyMarkerMid, CSSPropertyMarkerStart, CSSPropertyShapeRendering,
+    CSSPropertyStroke, CSSPropertyStrokeDasharray, CSSPropertyStrokeDashoffset,
     CSSPropertyStrokeLinecap, CSSPropertyStrokeLinejoin,
     CSSPropertyStrokeMiterlimit, CSSPropertyStrokeOpacity,
     CSSPropertyStrokeWidth, CSSPropertyTextRendering,
@@ -1195,6 +1194,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     }
     case CSSPropertyWebkitTransitionTimingFunction:
       return getTimingFunctionValue(style->transitions());
+    case CSSPropertyPointerEvents:
+      return CSSPrimitiveValue::create(style->pointerEvents());
     case CSSPropertyBackground:
     case CSSPropertyBorder:
     case CSSPropertyBorderBottom:

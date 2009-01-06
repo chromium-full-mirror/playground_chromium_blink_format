@@ -1161,6 +1161,11 @@ class RenderObject : public CachedResourceClient {
 
   AnimationController* animation() const;
 
+  bool visibleToHitTesting() const {
+    return style()->visibility() == VISIBLE &&
+           style()->pointerEvents() != PE_NONE;
+  }
+
  protected:
   // Overrides should call the superclass at the end
   virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);

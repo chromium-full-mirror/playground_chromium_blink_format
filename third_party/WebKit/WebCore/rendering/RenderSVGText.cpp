@@ -130,7 +130,7 @@ bool RenderSVGText::nodeAtPoint(const HitTestRequest& request,
                                 int _ty,
                                 HitTestAction hitTestAction) {
   PointerEventsHitRules hitRules(PointerEventsHitRules::SVG_TEXT_HITTESTING,
-                                 style()->svgStyle()->pointerEvents());
+                                 style()->pointerEvents());
   bool isVisible = (style()->visibility() == VISIBLE);
   if (isVisible || !hitRules.requireVisible) {
     if ((hitRules.canHitStroke &&

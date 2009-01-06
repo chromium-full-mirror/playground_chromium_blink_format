@@ -1486,6 +1486,15 @@ bool CSSParser::parseValue(int propId, bool important) {
             // property.
         valid_primitive = validUnit(value, FLength, true);
       break;
+    case CSSPropertyPointerEvents:
+      // none | visiblePainted | visibleFill | visibleStroke | visible |
+      // painted | fill | stroke | auto | all | inherit
+      if (id == CSSValueVisible || id == CSSValueNone || id == CSSValueAll ||
+          id == CSSValueAuto ||
+          (id >= CSSValueVisiblepainted && id <= CSSValueStroke))
+        valid_primitive = true;
+      break;
+
     // End of CSS3 properties
 
     // Apple specific properties.  These will never be standardized and are

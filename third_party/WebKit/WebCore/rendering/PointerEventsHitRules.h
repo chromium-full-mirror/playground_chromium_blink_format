@@ -21,21 +21,20 @@
 
 #ifndef PointerEventsHitRules_h
 #define PointerEventsHitRules_h
-#if ENABLE(SVG)
 
-#include "SVGRenderStyle.h"
+#include "RenderStyle.h"
 
 namespace WebCore {
 
 class PointerEventsHitRules {
  public:
-  enum ESVGHitTesting {
+  enum EHitTesting {
     SVG_IMAGE_HITTESTING,
     SVG_PATH_HITTESTING,
     SVG_TEXT_HITTESTING
   };
 
-  PointerEventsHitRules(ESVGHitTesting, EPointerEvents);
+  PointerEventsHitRules(EHitTesting, EPointerEvents);
 
   bool requireVisible;
   bool requireFill;
@@ -45,7 +44,6 @@ class PointerEventsHitRules {
 };
 }
 
-#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

@@ -213,7 +213,7 @@ bool RenderSVGImage::nodeAtPoint(const HitTestRequest&,
     return false;
 
   PointerEventsHitRules hitRules(PointerEventsHitRules::SVG_IMAGE_HITTESTING,
-                                 style()->svgStyle()->pointerEvents());
+                                 style()->pointerEvents());
 
   bool isVisible = (style()->visibility() == VISIBLE);
   if (isVisible || !hitRules.requireVisible) {

@@ -131,18 +131,6 @@ enum EDominantBaseline {
   DB_TEXT_BEFORE_EDGE
 };
 
-enum EPointerEvents {
-  PE_NONE,
-  PE_STROKE,
-  PE_FILL,
-  PE_PAINTED,
-  PE_VISIBLE,
-  PE_VISIBLE_STROKE,
-  PE_VISIBLE_FILL,
-  PE_VISIBLE_PAINTED,
-  PE_ALL
-};
-
 class CSSValue;
 class CSSValueList;
 class SVGPaint;

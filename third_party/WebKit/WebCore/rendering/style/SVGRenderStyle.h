@@ -88,10 +88,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
                                     imageRendering,
                                     IR_AUTO)
   SVG_RS_DEFINE_ATTRIBUTE_INHERITED(LineJoin, JoinStyle, joinStyle, MiterJoin)
-  SVG_RS_DEFINE_ATTRIBUTE_INHERITED(EPointerEvents,
-                                    PointerEvents,
-                                    pointerEvents,
-                                    PE_VISIBLE_PAINTED)
   SVG_RS_DEFINE_ATTRIBUTE_INHERITED(EShapeRendering,
                                     ShapeRendering,
                                     shapeRendering,
@@ -279,7 +275,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
              (_textAnchor == other._textAnchor) &&
              (_colorInterpolation == other._colorInterpolation) &&
              (_colorInterpolationFilters == other._colorInterpolationFilters) &&
-             (_pointerEvents == other._pointerEvents) &&
              (_writingMode == other._writingMode) &&
              (_glyphOrientationHorizontal ==
               other._glyphOrientationHorizontal) &&
@@ -301,7 +296,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
     unsigned _textAnchor : 2;                  // ETextAnchor
     unsigned _colorInterpolation : 2;          // EColorInterpolation
     unsigned _colorInterpolationFilters : 2;   // EColorInterpolation
-    unsigned _pointerEvents : 4;               // EPointerEvents
     unsigned _writingMode : 3;                 // EWritingMode
     unsigned _glyphOrientationHorizontal : 3;  // EGlyphOrientation
     unsigned _glyphOrientationVertical : 3;    // EGlyphOrientation
@@ -361,7 +355,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
     svg_inherited_flags._colorInterpolation = initialColorInterpolation();
     svg_inherited_flags._colorInterpolationFilters =
         initialColorInterpolationFilters();
-    svg_inherited_flags._pointerEvents = initialPointerEvents();
     svg_inherited_flags._writingMode = initialWritingMode();
     svg_inherited_flags._glyphOrientationHorizontal =
         initialGlyphOrientationHorizontal();
