@@ -119,7 +119,7 @@ class Node : public TreeShared<Node> {
   Element* parentElement() const;
   Node* previousSibling() const { return m_previous; }
   Node* nextSibling() const { return m_next; }
-  virtual PassRefPtr<NodeList> childNodes();
+  PassRefPtr<NodeList> childNodes();
   Node* firstChild() const {
     return isContainerNode() ? containerFirstChild() : 0;
   }
