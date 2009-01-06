@@ -31,6 +31,7 @@
 
 #include "CFDictionaryPropertyBag.h"
 #include "COMPropertyBag.h"
+#include "DOMHTMLClasses.h"
 #include "EmbeddedWidget.h"
 #include "MarshallingHelpers.h"
 #include "WebCachedPagePlatformData.h"
@@ -671,14 +672,18 @@ Widget* WebFrameLoaderClient::createPlugin(const IntSize& pluginSize,
         viewArguments.set(paramNames[i], paramValues[i]);
       COMPtr<IPropertyBag> viewArgumentsBag(
           AdoptCOM, COMPropertyBag<String>::adopt(viewArguments));
+      COMPtr<IDOMElement> containingElement(
+          AdoptCOM, DOMElement::createInstance(element));
 
-      // Now create a new property bag where the view arguments is the only
-      // property.
-      HashMap<String, COMPtr<IUnknown>> arguments;
-      arguments.set(WebEmbeddedViewAttributesKey,
-                    COMPtr<IUnknown>(AdoptCOM, viewArgumentsBag.releaseRef()));
+      HashMap<String, COMVariant> arguments;
+
+      arguments.set(WebEmbeddedViewAttributesKey, viewArgumentsBag);
+      arguments.set(WebEmbeddedViewBaseURLKey, url.string());
+      arguments.set(WebEmbeddedViewContainingElementKey, containingElement);
+      arguments.set(WebEmbeddedViewMIMETypeKey, mimeType);
+
       COMPtr<IPropertyBag> argumentsBag(
-          AdoptCOM, COMPropertyBag<COMPtr<IUnknown>>::adopt(arguments));
+          AdoptCOM, COMPropertyBag<COMVariant>::adopt(arguments));
 
       COMPtr<IWebEmbeddedView> view;
       HRESULT result = uiPrivate->embeddedViewWithArguments(
