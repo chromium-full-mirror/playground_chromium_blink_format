@@ -1523,6 +1523,7 @@ QSize QWebPage::fixedLayoutSize() const {
 
 /*!
     \property QWebPage::fixedLayoutSize
+    \since 4.6
     \brief the size of the fixed layout
 
     The size affects the layout of the page in the viewport.  If set to a fixed
@@ -1548,6 +1549,7 @@ bool QWebPage::useFixedLayout() const {
 
 /*!
     \property QWebPage::usedFixedLayout
+    \since 4.6
     \brief whether to use a fixed layout size
 */
 void QWebPage::setUseFixedLayout(bool useFixedLayout) {
