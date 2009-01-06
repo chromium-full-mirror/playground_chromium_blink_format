@@ -173,7 +173,7 @@ void ImageBuffer::putImageData(ImageData* source,
   int stride = cairo_image_surface_get_stride(m_data.m_surface);
 
   unsigned char* srcRows =
-      source->data()->data().data() + originy * srcBytesPerRow + originx * 4;
+      source->data()->data() + originy * srcBytesPerRow + originx * 4;
   for (int y = 0; y < numRows; ++y) {
     unsigned char* row = dataDst + stride * (y + desty);
     for (int x = 0; x < numColumns; x++) {
