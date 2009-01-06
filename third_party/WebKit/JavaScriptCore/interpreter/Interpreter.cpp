@@ -654,7 +654,7 @@ Interpreter::Interpreter()
   m_jsArrayVptr = jsArray->vptr();
   jsArray->~JSCell();
 
-  JSByteArray* jsByteArray =
+  JSCell* jsByteArray =
       new (storage) JSByteArray(JSByteArray::VPtrStealingHack);
   m_jsByteArrayVptr = jsByteArray->vptr();
   jsByteArray->~JSCell();
