@@ -190,9 +190,9 @@ struct HashTraits<WebCore::QualifiedName>
                                   WebCore::nullAtom);
   }
   static void constructDeletedValue(WebCore::QualifiedName& slot) {
-    new (&slot) WebCore::QualifiedName(WebCore::nullAtom,
-                                       WebCore::String(HashTableDeletedValue),
-                                       WebCore::nullAtom);
+    new (&slot) WebCore::QualifiedName(
+        WebCore::nullAtom, WebCore::AtomicString(HashTableDeletedValue),
+        WebCore::nullAtom);
   }
   static bool isDeletedValue(const WebCore::QualifiedName& slot) {
     return slot.localName().isHashTableDeletedValue();
