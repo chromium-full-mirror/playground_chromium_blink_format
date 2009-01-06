@@ -53,9 +53,10 @@ ThreadGlobalData& threadGlobalData() {
 // We need to check for e.g. database objects manipulating strings on secondary
 // threads.
 #if ENABLE(WORKERS)
-  AtomicallyInitializedStatic(
-      ThreadSpecific<ThreadGlobalData>*,
-      threadGlobalData = new ThreadSpecific<ThreadGlobalData>);
+  // ThreadGlobalData is used on main thread before it could possibly be used on
+  // secondary ones, so there is no need for synchronization here.
+  static ThreadSpecific<ThreadGlobalData>* threadGlobalData =
+      new ThreadSpecific<ThreadGlobalData>;
   return **threadGlobalData;
 #else
   static ThreadGlobalData* staticData;
