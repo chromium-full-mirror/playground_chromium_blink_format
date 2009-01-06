@@ -57,6 +57,8 @@ class WebIconDatabase : public IWebIconDatabase,
   WebIconDatabase();
   ~WebIconDatabase();
   void init();
+
+ protected:
   void startUpIconDatabase();
   void shutDownIconDatabase();
 
