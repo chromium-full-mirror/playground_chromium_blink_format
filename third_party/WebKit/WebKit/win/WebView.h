@@ -34,6 +34,7 @@
 #include <WebCore/IntRect.h>
 #include <WebCore/Timer.h>
 #include <WebCore/WindowMessageListener.h>
+#include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 
 class WebFrame;
@@ -724,7 +725,12 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE mediaVolume(
       /* [out, retval] */ float* volume);
 
+  virtual HRESULT STDMETHODCALLTYPE registerEmbeddedViewMIMEType(
+      /* [in] */ BSTR mimeType);
+
   // WebView
+  bool shouldUseEmbeddedView(const WebCore::String& mimeType) const;
+
   WebCore::Page* page();
   bool handleMouseEvent(UINT, WPARAM, LPARAM);
   void setMouseActivated(bool flag) { m_mouseActivated = flag; }
@@ -917,6 +923,8 @@ class WebView : public IWebView,
   OwnPtr<TRACKMOUSEEVENT> m_mouseOutTracker;
 
   HWND m_topLevelParent;
+
+  OwnPtr<HashSet<WebCore::String>> m_embeddedViewMIMETypes;
 };
 
 #endif

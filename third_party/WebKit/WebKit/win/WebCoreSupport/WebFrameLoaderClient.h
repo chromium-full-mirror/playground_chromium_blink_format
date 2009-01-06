@@ -140,6 +140,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                                         bool loadManually);
   virtual void redirectDataToPlugin(WebCore::Widget* pluginWidget);
 
+  virtual bool shouldUsePluginDocument(const WebCore::String& mimeType) const;
+
  protected:
   WebFrameLoaderClient(WebFrame*);
   ~WebFrameLoaderClient();
