@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -456,6 +456,9 @@ backforward list.
 
 - (void)setSelectTrailingWhitespaceEnabled:(BOOL)flag;
 - (BOOL)isSelectTrailingWhitespaceEnabled;
+
+- (void)setMemoryCacheDelegateCallsEnabled:(BOOL)suspend;
+- (BOOL)areMemoryCacheDelegateCallsEnabled;
 
 @end
 

@@ -333,6 +333,7 @@ class FrameLoader : Noncopyable
                            unsigned long& identifier,
                            ResourceError&);
   void loadedResourceFromMemoryCache(const CachedResource*);
+  void tellClientAboutPastMemoryCacheLoads();
 
   void recursiveCheckLoadComplete();
   void checkLoadComplete();

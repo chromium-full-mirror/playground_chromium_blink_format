@@ -130,6 +130,7 @@ Page::Page(ChromeClient* chromeClient,
       m_defersLoading(false),
       m_inLowQualityInterpolationMode(false),
       m_cookieEnabled(true),
+      m_areMemoryCacheClientCallsEnabled(true),
       m_mediaVolume(1),
       m_parentInspectorController(0),
       m_didLoadUserStyleSheet(false),
@@ -603,6 +604,19 @@ void Page::setCustomHTMLTokenizerChunkSize(int customHTMLTokenizerChunkSize) {
     return;
   }
   m_customHTMLTokenizerChunkSize = customHTMLTokenizerChunkSize;
+}
+
+void Page::setMemoryCacheClientCallsEnabled(bool enabled) {
+  if (m_areMemoryCacheClientCallsEnabled == enabled)
+    return;
+
+  m_areMemoryCacheClientCallsEnabled = enabled;
+  if (!enabled)
+    return;
+
+  for (RefPtr<Frame> frame = mainFrame(); frame;
+       frame = frame->tree()->traverseNext())
+    frame->loader()->tellClientAboutPastMemoryCacheLoads();
 }
 
 }  // namespace WebCore

@@ -210,6 +210,8 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   bool haveToldClientAboutLoad(const String& url) {
     return m_resourcesClientKnowsAbout.contains(url);
   }
+  void recordMemoryCacheLoadForFutureClientNotification(const String& url);
+  void takeMemoryCacheLoadsForClientNotification(Vector<String>& loads);
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   bool scheduleApplicationCacheLoad(ResourceLoader*,
@@ -318,6 +320,7 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   RefPtr<SharedBuffer> m_parsedArchiveData;
 
   HashSet<String> m_resourcesClientKnowsAbout;
+  Vector<String> m_resourcesLoadedFromMemoryCacheForClientNotification;
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   // The application cache that the document loader is associated with (if any).
@@ -333,6 +336,17 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   RefPtr<ApplicationCache> m_mainResourceApplicationCache;
 #endif
 };
+
+inline void DocumentLoader::recordMemoryCacheLoadForFutureClientNotification(
+    const String& url) {
+  m_resourcesLoadedFromMemoryCacheForClientNotification.append(url);
+}
+
+inline void DocumentLoader::takeMemoryCacheLoadsForClientNotification(
+    Vector<String>& loadsSet) {
+  loadsSet.swap(m_resourcesLoadedFromMemoryCacheForClientNotification);
+  m_resourcesLoadedFromMemoryCacheForClientNotification.clear();
+}
 }
 
 #endif  // DocumentLoader_h
