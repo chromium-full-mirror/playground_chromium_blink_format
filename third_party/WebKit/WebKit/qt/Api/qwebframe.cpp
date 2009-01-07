@@ -957,7 +957,8 @@ QVariant QWebFrame::evaluateJavaScript(const QString& scriptSource) {
   ScriptController* proxy = d->frame->script();
   QVariant rc;
   if (proxy) {
-    JSC::JSValue* v = proxy->evaluate(ScriptSourceCode(scriptSource)).jsValue();
+    JSC::JSValuePtr v =
+        proxy->evaluate(ScriptSourceCode(scriptSource)).jsValue();
     if (v) {
       int distance = 0;
       rc = JSC::Bindings::convertValueToQVariant(
