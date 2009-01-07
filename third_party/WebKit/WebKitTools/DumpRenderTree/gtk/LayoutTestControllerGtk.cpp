@@ -50,6 +50,8 @@ bool webkit_web_frame_pause_transition(WebKitWebFrame* frame,
                                        const gchar* name,
                                        double time,
                                        const gchar* element);
+unsigned int webkit_web_frame_number_of_active_animations(
+    WebKitWebFrame* frame);
 }
 
 LayoutTestController::~LayoutTestController() {
@@ -279,4 +281,8 @@ bool LayoutTestController::pauseTransitionAtTimeOnElementWithId(
   gchar* name = JSStringCopyUTF8CString(propertyName);
   gchar* element = JSStringCopyUTF8CString(elementId);
   return webkit_web_frame_pause_transition(mainFrame, name, time, element);
+}
+
+unsigned LayoutTestController::numberOfActiveAnimations() const {
+  return webkit_web_frame_number_of_active_animations(mainFrame);
 }
