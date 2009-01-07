@@ -178,7 +178,8 @@ class NetscapePluginInstanceProxy
   uint32_t idForObject(JSC::JSObject*);
 
   uint32_t m_objectIDCounter;
-  HashMap<uint32_t, JSC::ProtectedPtr<JSC::JSObject>> m_objects;
+  typedef HashMap<uint32_t, JSC::ProtectedPtr<JSC::JSObject>> ObjectMap;
+  ObjectMap m_objects;
 };
 
 }  // namespace WebKit
