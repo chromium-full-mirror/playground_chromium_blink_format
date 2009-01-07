@@ -678,7 +678,8 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
       // canceled before
       // we get a response, so move to the next state.
       endAnimation(false);
-      updateStateMachine(AnimationStateInputStartTimeSet, currentTime());
+      updateStateMachine(AnimationStateInputStartTimeSet,
+                         beginAnimationUpdateTime());
     }
     return;
   }
@@ -701,7 +702,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
       if (input == AnimationStateInputStartAnimation ||
           input == AnimationStateInputPlayStateRunnning) {
         m_waitedForResponse = false;
-        m_requestedStartTime = currentTime();
+        m_requestedStartTime = beginAnimationUpdateTime();
         m_animState = AnimationStateStartWaitTimer;
       }
       break;
@@ -723,7 +724,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         ASSERT(!paused());
         // We're waiting for the start timer to fire and we got a pause. Cancel
         // the timer, pause and wait
-        m_pauseTime = currentTime();
+        m_pauseTime = beginAnimationUpdateTime();
         m_animState = AnimationStatePausedWaitTimer;
       }
       break;
@@ -747,7 +748,8 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         // We're not going to get a startTime callback, so fire the start time
         // here
         m_animState = AnimationStateStartWaitResponse;
-        updateStateMachine(AnimationStateInputStartTimeSet, currentTime());
+        updateStateMachine(AnimationStateInputStartTimeSet,
+                           beginAnimationUpdateTime());
       } else
         m_waitedForResponse = true;
       break;
@@ -791,7 +793,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         goIntoEndingOrLoopingState();
       } else {
         // We are pausing while running. Cancel the animation and wait
-        m_pauseTime = currentTime();
+        m_pauseTime = beginAnimationUpdateTime();
         endAnimation(false);
         m_animState = AnimationStatePausedRun;
       }
@@ -816,7 +818,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         }
       } else {
         // We are pausing while running. Cancel the animation and wait
-        m_pauseTime = currentTime();
+        m_pauseTime = beginAnimationUpdateTime();
         endAnimation(false);
         m_animState = AnimationStatePausedRun;
       }
@@ -826,7 +828,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
       ASSERT(input == AnimationStateInputPlayStateRunnning);
       ASSERT(paused());
       // Update the times
-      m_startTime += currentTime() - m_pauseTime;
+      m_startTime += beginAnimationUpdateTime() - m_pauseTime;
       m_pauseTime = -1;
 
       // we were waiting for the start timer to fire, go back and wait again
@@ -846,7 +848,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
       ASSERT(paused());
       // Update the times
       if (m_animState == AnimationStatePausedRun)
-        m_startTime += currentTime() - m_pauseTime;
+        m_startTime += beginAnimationUpdateTime() - m_pauseTime;
       else
         m_startTime = 0;
       m_pauseTime = -1;
@@ -859,7 +861,8 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
       if (overridden() || !startAnimation(m_startTime)) {
         // We're not going to get a startTime callback, so fire the start time
         // here
-        updateStateMachine(AnimationStateInputStartTimeSet, currentTime());
+        updateStateMachine(AnimationStateInputStartTimeSet,
+                           beginAnimationUpdateTime());
       } else
         m_waitedForResponse = true;
       break;
@@ -889,12 +892,13 @@ void AnimationBase::fireAnimationEventsIfNeeded() {
 
   // Check for start timeout
   if (m_animState == AnimationStateStartWaitTimer) {
-    if (currentTime() - m_requestedStartTime >= m_animation->delay())
+    if (beginAnimationUpdateTime() - m_requestedStartTime >=
+        m_animation->delay())
       updateStateMachine(AnimationStateInputStartTimerFired, 0);
     return;
   }
 
-  double elapsedDuration = currentTime() - m_startTime;
+  double elapsedDuration = beginAnimationUpdateTime() - m_startTime;
   ASSERT(elapsedDuration >= 0);
 
   // Check for end timeout
@@ -939,8 +943,8 @@ double AnimationBase::willNeedService() const {
     return -1;
 
   if (m_animState == AnimationStateStartWaitTimer) {
-    double timeFromNow =
-        m_animation->delay() - (currentTime() - m_requestedStartTime);
+    double timeFromNow = m_animation->delay() -
+                         (beginAnimationUpdateTime() - m_requestedStartTime);
     return (float)((timeFromNow > 0) ? timeFromNow : 0);
   }
 
@@ -954,8 +958,9 @@ double AnimationBase::progress(double scale,
   if (preActive())
     return 0;
 
-  double elapsedTime = running() && !paused() ? (currentTime() - m_startTime)
-                                              : (m_pauseTime - m_startTime);
+  double elapsedTime = running() && !paused()
+                           ? (beginAnimationUpdateTime() - m_startTime)
+                           : (m_pauseTime - m_startTime);
   if (running() && elapsedTime < 0)
     return 0;
 
@@ -999,7 +1004,7 @@ void AnimationBase::goIntoEndingOrLoopingState() {
   if (m_animation->iterationCount() > 0)
     totalDuration = m_animation->duration() * m_animation->iterationCount();
 
-  const double elapsedDuration = currentTime() - m_startTime;
+  const double elapsedDuration = beginAnimationUpdateTime() - m_startTime;
   ASSERT(elapsedDuration >= 0);
   double durationLeft = 0;
   double nextIterationTime = totalDuration;
@@ -1023,6 +1028,10 @@ void AnimationBase::goIntoEndingOrLoopingState() {
 void AnimationBase::pauseAtTime(double t) {
   updatePlayState(false);
   m_pauseTime = m_startTime + t - m_animation->delay();
+}
+
+double AnimationBase::beginAnimationUpdateTime() const {
+  return m_compAnim->animationController()->beginAnimationUpdateTime();
 }
 
 }  // namespace WebCore

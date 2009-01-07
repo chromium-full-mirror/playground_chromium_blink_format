@@ -181,6 +181,8 @@ class AnimationBase : public RefCounted<AnimationBase> {
 
   void pauseAtTime(double t);
 
+  double beginAnimationUpdateTime() const;
+
  protected:
   virtual void overrideAnimations() {}
   virtual void resumeOverriddenAnimations() {}

@@ -32,11 +32,13 @@
 #include "CSSParser.h"
 #include "EventNames.h"
 #include "Frame.h"
+#include "SystemTime.h"
 #include "Timer.h"
 
 namespace WebCore {
 
 static const double cAnimationTimerDelay = 0.025;
+static const double cBeginAnimationUpdateTimeNotSet = -1;
 
 class AnimationControllerPrivate {
  public:
@@ -70,6 +72,14 @@ class AnimationControllerPrivate {
   bool pauseAnimationAtTime(RenderObject*, const String& name, double t);
   bool pauseTransitionAtTime(RenderObject*, const String& property, double t);
 
+  double beginAnimationUpdateTime() {
+    if (m_beginAnimationUpdateTime == cBeginAnimationUpdateTimeNotSet)
+      m_beginAnimationUpdateTime = currentTime();
+    return m_beginAnimationUpdateTime;
+  }
+
+  void setBeginAnimationUpdateTime(double t) { m_beginAnimationUpdateTime = t; }
+
  private:
   typedef HashMap<RenderObject*, RefPtr<CompositeAnimation>>
       RenderObjectAnimationMap;
@@ -88,6 +98,8 @@ class AnimationControllerPrivate {
   };
 
   Vector<EventToDispatch> m_eventsToDispatch;
+
+  double m_beginAnimationUpdateTime;
 };
 
 AnimationControllerPrivate::AnimationControllerPrivate(Frame* frame)
@@ -95,7 +107,8 @@ AnimationControllerPrivate::AnimationControllerPrivate(Frame* frame)
       m_updateRenderingDispatcher(
           this,
           &AnimationControllerPrivate::updateRenderingDispatcherFired),
-      m_frame(frame) {}
+      m_frame(frame),
+      m_beginAnimationUpdateTime(cBeginAnimationUpdateTimeNotSet) {}
 
 AnimationControllerPrivate::~AnimationControllerPrivate() {}
 
@@ -443,5 +456,15 @@ void AnimationController::styleAvailable() {
 
   m_data->styleAvailable();
 }
+
+double AnimationController::beginAnimationUpdateTime() {
+  return m_data->beginAnimationUpdateTime();
+}
+
+void AnimationController::beginAnimationUpdate() {
+  m_data->setBeginAnimationUpdateTime(cBeginAnimationUpdateTimeNotSet);
+}
+
+void AnimationController::endAnimationUpdate() {}
 
 }  // namespace WebCore

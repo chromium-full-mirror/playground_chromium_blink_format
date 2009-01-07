@@ -1136,6 +1136,8 @@ void Document::recalcStyle(StyleChange change) {
   if (m_inStyleRecalc)
     return;  // Guard against re-entrancy. -dwh
 
+  m_frame->animation()->beginAnimationUpdate();
+
   m_inStyleRecalc = true;
   suspendPostAttachCallbacks();
 
@@ -1204,6 +1206,8 @@ bail_out:
     m_closeAfterStyleRecalc = false;
     implicitClose();
   }
+
+  m_frame->animation()->endAnimationUpdate();
 }
 
 void Document::updateRendering() {
