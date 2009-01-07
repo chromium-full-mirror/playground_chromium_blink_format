@@ -74,6 +74,9 @@ class WebInspectorClient : public WebCore::InspectorClient,
  private:
   ~WebInspectorClient();
 
+  void closeWindowWithoutNotifications();
+  void showWindowWithoutNotifications();
+
   void updateWindowTitle();
 
   LRESULT onGetMinMaxInfo(WPARAM, LPARAM);
@@ -91,6 +94,7 @@ class WebInspectorClient : public WebCore::InspectorClient,
   COMPtr<WebView> m_webView;
   HWND m_webViewHwnd;
 
+  bool m_shouldAttachWhenShown;
   bool m_attached;
 
   OwnPtr<WebNodeHighlight> m_highlight;
