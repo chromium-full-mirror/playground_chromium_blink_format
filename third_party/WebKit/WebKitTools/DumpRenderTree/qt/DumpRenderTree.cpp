@@ -102,7 +102,7 @@ QWebPage* WebPage::createWindow(QWebPage::WebWindowType) {
   return m_drt->createWindow();
 }
 
-void WebPage::javaScriptAlert(QWebFrame* frame, const QString& message) {
+void WebPage::javaScriptAlert(QWebFrame*, const QString& message) {
   fprintf(stdout, "ALERT: %s\n", message.toUtf8().constData());
 }
 
@@ -113,12 +113,12 @@ void WebPage::javaScriptConsoleMessage(const QString& message,
           message.toUtf8().constData());
 }
 
-bool WebPage::javaScriptConfirm(QWebFrame* frame, const QString& msg) {
+bool WebPage::javaScriptConfirm(QWebFrame*, const QString& msg) {
   fprintf(stdout, "CONFIRM: %s\n", msg.toUtf8().constData());
   return true;
 }
 
-bool WebPage::javaScriptPrompt(QWebFrame* frame,
+bool WebPage::javaScriptPrompt(QWebFrame*,
                                const QString& msg,
                                const QString& defaultValue,
                                QString* result) {
