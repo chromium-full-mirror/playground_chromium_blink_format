@@ -238,11 +238,11 @@ void JIT::compilePutByIdSlowCase(int baseVReg,
       .callReturnLocation = call;
 }
 
-static JSValue* resizePropertyStorage(JSObject* baseObject,
-                                      int32_t oldSize,
-                                      int32_t newSize) {
+static JSValueEncodedAsPointer* resizePropertyStorage(JSObject* baseObject,
+                                                      int32_t oldSize,
+                                                      int32_t newSize) {
   baseObject->allocatePropertyStorage(oldSize, newSize);
-  return baseObject;
+  return JSValuePtr::encode(baseObject);
 }
 
 static inline bool transitionWillNeedStorageRealloc(Structure* oldStructure,
@@ -278,7 +278,7 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
   // ecx = baseObject->m_structure
   for (RefPtr<Structure>* it = chain->head(); *it; ++it) {
     // null check the prototype
-    successCases.append(jePtr(X86::ecx, ImmPtr(jsNull())));
+    successCases.append(jePtr(X86::ecx, ImmPtr(JSValuePtr::encode(jsNull()))));
 
     // Check the structure id
     failureCases.append(
@@ -326,7 +326,7 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
   // write the value
   loadPtr(Address(X86::eax, FIELD_OFFSET(JSObject, m_propertyStorage)),
           X86::eax);
-  storePtr(X86::edx, Address(X86::eax, cachedOffset * sizeof(JSValue*)));
+  storePtr(X86::edx, Address(X86::eax, cachedOffset * sizeof(JSValuePtr)));
 
   ret();
 
@@ -375,7 +375,7 @@ void JIT::patchGetByIdSelf(StructureStubInfo* stubInfo,
       reinterpret_cast<intptr_t>(stubInfo->hotPathBegin) +
       patchOffsetGetByIdPropertyMapOffset);
   DataLabelPtr::patch(structureAddress, structure);
-  DataLabel32::patch(displacementAddress, cachedOffset * sizeof(JSValue*));
+  DataLabel32::patch(displacementAddress, cachedOffset * sizeof(JSValuePtr));
 }
 
 void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
@@ -396,7 +396,7 @@ void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
   void* displacementAddress = reinterpret_cast<char*>(stubInfo->hotPathBegin) +
                               patchOffsetPutByIdPropertyMapOffset;
   DataLabelPtr::patch(structureAddress, structure);
-  DataLabel32::patch(displacementAddress, cachedOffset * sizeof(JSValue*));
+  DataLabel32::patch(displacementAddress, cachedOffset * sizeof(JSValuePtr));
 }
 
 void JIT::privateCompilePatchGetArrayLength(void* returnAddress) {
@@ -459,7 +459,7 @@ void JIT::privateCompileGetByIdSelf(StructureStubInfo* stubInfo,
   // Checks out okay! - getDirectOffset
   loadPtr(Address(X86::eax, FIELD_OFFSET(JSObject, m_propertyStorage)),
           X86::eax);
-  loadPtr(Address(X86::eax, cachedOffset * sizeof(JSValue*)), X86::eax);
+  loadPtr(Address(X86::eax, cachedOffset * sizeof(JSValuePtr)), X86::eax);
   ret();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
@@ -510,7 +510,7 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
 #endif
 
   // Checks out okay! - getDirectOffset
-  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValue*)), X86::eax);
+  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValuePtr)), X86::eax);
 
   Jump success = jump();
 
@@ -557,7 +557,7 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
                               ImmPtr(prototypeStructure));
 
   // Checks out okay! - getDirectOffset
-  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValue*)), X86::eax);
+  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValuePtr)), X86::eax);
 
   ret();
 
@@ -590,7 +590,7 @@ void JIT::privateCompileGetByIdSelfList(
   Jump failureCase = checkStructure(X86::eax, structure);
   loadPtr(Address(X86::eax, FIELD_OFFSET(JSObject, m_propertyStorage)),
           X86::eax);
-  loadPtr(Address(X86::eax, cachedOffset * sizeof(JSValue*)), X86::eax);
+  loadPtr(Address(X86::eax, cachedOffset * sizeof(JSValuePtr)), X86::eax);
   Jump success = jump();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
@@ -654,7 +654,7 @@ void JIT::privateCompileGetByIdProtoList(
 #endif
 
   // Checks out okay! - getDirectOffset
-  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValue*)), X86::eax);
+  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValuePtr)), X86::eax);
 
   Jump success = jump();
 
@@ -725,7 +725,7 @@ void JIT::privateCompileGetByIdChainList(
 
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   loadPtr(protoPropertyStorage, X86::edx);
-  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValue*)), X86::eax);
+  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValuePtr)), X86::eax);
   Jump success = jump();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
@@ -799,7 +799,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
 
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   loadPtr(protoPropertyStorage, X86::edx);
-  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValue*)), X86::eax);
+  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValuePtr)), X86::eax);
   Jump success = jump();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
@@ -857,7 +857,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
 
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   loadPtr(protoPropertyStorage, X86::edx);
-  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValue*)), X86::eax);
+  loadPtr(Address(X86::edx, cachedOffset * sizeof(JSValuePtr)), X86::eax);
   ret();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
@@ -883,7 +883,7 @@ void JIT::privateCompilePutByIdReplace(StructureStubInfo* stubInfo,
   // checks out okay! - putDirectOffset
   loadPtr(Address(X86::eax, FIELD_OFFSET(JSObject, m_propertyStorage)),
           X86::eax);
-  storePtr(X86::edx, Address(X86::eax, cachedOffset * sizeof(JSValue*)));
+  storePtr(X86::edx, Address(X86::eax, cachedOffset * sizeof(JSValuePtr)));
   ret();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());

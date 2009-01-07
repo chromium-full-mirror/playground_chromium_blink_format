@@ -31,7 +31,7 @@
 namespace JSC {
 
 JSObject* construct(ExecState* exec,
-                    JSValue* object,
+                    JSValuePtr object,
                     ConstructType constructType,
                     const ConstructData& constructData,
                     const ArgList& args) {

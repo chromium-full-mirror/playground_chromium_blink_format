@@ -84,7 +84,7 @@ void JSDOMGlobalObject::mark() {
   }
 }
 
-JSEventListener* JSDOMGlobalObject::findJSEventListener(JSValue* val,
+JSEventListener* JSDOMGlobalObject::findJSEventListener(JSValuePtr val,
                                                         bool isInline) {
   if (!val->isObject())
     return 0;
@@ -96,7 +96,7 @@ JSEventListener* JSDOMGlobalObject::findJSEventListener(JSValue* val,
 
 PassRefPtr<JSEventListener> JSDOMGlobalObject::findOrCreateJSEventListener(
     ExecState*,
-    JSValue* val,
+    JSValuePtr val,
     bool isInline) {
   if (JSEventListener* listener = findJSEventListener(val, isInline))
     return listener;
@@ -110,7 +110,7 @@ PassRefPtr<JSEventListener> JSDOMGlobalObject::findOrCreateJSEventListener(
 
 JSUnprotectedEventListener* JSDOMGlobalObject::findJSUnprotectedEventListener(
     ExecState*,
-    JSValue* val,
+    JSValuePtr val,
     bool isInline) {
   if (!val->isObject())
     return 0;
@@ -123,7 +123,7 @@ JSUnprotectedEventListener* JSDOMGlobalObject::findJSUnprotectedEventListener(
 
 PassRefPtr<JSUnprotectedEventListener>
 JSDOMGlobalObject::findOrCreateJSUnprotectedEventListener(ExecState* exec,
-                                                          JSValue* val,
+                                                          JSValuePtr val,
                                                           bool isInline) {
   if (JSUnprotectedEventListener* listener =
           findJSUnprotectedEventListener(exec, val, isInline))

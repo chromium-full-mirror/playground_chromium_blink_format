@@ -25,6 +25,7 @@
 
 #include "Structure.h"
 #include "JSValue.h"
+#include "JSImmediate.h"
 #include "Collector.h"
 
 namespace JSC {
@@ -71,8 +72,8 @@ class JSCell : public JSValue {
   virtual bool getTruncatedUInt32(uint32_t&) const;
 
   // Basic conversions.
-  virtual JSValue* toPrimitive(ExecState*, PreferredPrimitiveType) const = 0;
-  virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*&) = 0;
+  virtual JSValuePtr toPrimitive(ExecState*, PreferredPrimitiveType) const = 0;
+  virtual bool getPrimitiveNumber(ExecState*, double& number, JSValuePtr&) = 0;
   virtual bool toBoolean(ExecState*) const = 0;
   virtual double toNumber(ExecState*) const = 0;
   virtual UString toString(ExecState*) const = 0;
@@ -91,16 +92,16 @@ class JSCell : public JSValue {
   virtual const ClassInfo* classInfo() const;
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue*,
+                   JSValuePtr,
                    PutPropertySlot&);
-  virtual void put(ExecState*, unsigned propertyName, JSValue*);
+  virtual void put(ExecState*, unsigned propertyName, JSValuePtr);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
 
   virtual JSObject* toThisObject(ExecState*) const;
   virtual UString toThisString(ExecState*) const;
   virtual JSString* toThisJSString(ExecState*);
-  virtual JSValue* getJSNumber();
+  virtual JSValuePtr getJSNumber();
   void* vptr() { return *reinterpret_cast<void**>(this); }
 
  private:
@@ -118,11 +119,11 @@ class JSCell : public JSValue {
   Structure* m_structure;
 };
 
-JSCell* asCell(JSValue*);
+JSCell* asCell(JSValuePtr);
 
-inline JSCell* asCell(JSValue* value) {
+inline JSCell* asCell(JSValuePtr value) {
   ASSERT(!JSImmediate::isImmediate(value));
-  return static_cast<JSCell*>(value);
+  return value->asCell();
 }
 
 inline JSCell::JSCell(Structure* structure) : m_structure(structure) {}
@@ -155,7 +156,7 @@ inline void JSCell::mark() {
 
 ALWAYS_INLINE JSCell* JSValue::asCell() const {
   ASSERT(!JSImmediate::isImmediate(asValue()));
-  return reinterpret_cast<JSCell*>(const_cast<JSValue*>(this));
+  return const_cast<JSCell*>(reinterpret_cast<const JSCell*>(this));
 }
 
 inline void* JSCell::operator new(size_t size, JSGlobalData* globalData) {
@@ -241,7 +242,7 @@ inline bool JSValue::marked() const {
   return JSImmediate::isImmediate(asValue()) || asCell()->marked();
 }
 
-inline JSValue* JSValue::toPrimitive(
+inline JSValuePtr JSValue::toPrimitive(
     ExecState* exec,
     PreferredPrimitiveType preferredType) const {
   return JSImmediate::isImmediate(asValue())
@@ -251,7 +252,7 @@ inline JSValue* JSValue::toPrimitive(
 
 inline bool JSValue::getPrimitiveNumber(ExecState* exec,
                                         double& number,
-                                        JSValue*& value) {
+                                        JSValuePtr& value) {
   if (JSImmediate::isImmediate(asValue())) {
     number = JSImmediate::toDouble(asValue());
     value = asValue();
@@ -298,7 +299,7 @@ inline UString JSValue::toThisString(ExecState* exec) const {
                                              : asCell()->toThisString(exec);
 }
 
-inline JSValue* JSValue::getJSNumber() {
+inline JSValuePtr JSValue::getJSNumber() {
   return JSImmediate::isNumber(asValue())
              ? asValue()
              : JSImmediate::isImmediate(asValue()) ? noValue()

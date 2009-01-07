@@ -51,7 +51,7 @@ void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
   // we could get a false positive
   // match).  Reset the check so it no longer matches.
   DataLabelPtr::patch(callLinkInfo->hotPathBegin,
-                      JSImmediate::impossibleValue());
+                      JSValuePtr::encode(JSImmediate::impossibleValue()));
 }
 
 void JIT::linkCall(JSFunction* callee,
@@ -86,7 +86,7 @@ void JIT::compileOpCallInitializeCallFrame() {
                                 FIELD_OFFSET(ScopeChain, m_node)),
           X86::edx);  // newScopeChain
 
-  storePtr(ImmPtr(noValue()),
+  storePtr(ImmPtr(JSValuePtr::encode(noValue())),
            Address(callFrameRegister, RegisterFile::OptionalCalleeArguments *
                                           static_cast<int>(sizeof(Register))));
   storePtr(X86::ecx,
@@ -234,7 +234,8 @@ void JIT::compileOpCall(OpcodeID opcodeID,
     compileOpCallEvalSetupArgs(instruction);
 
     emitCTICall(Interpreter::cti_op_call_eval);
-    wasEval = jnePtr(X86::eax, ImmPtr(JSImmediate::impossibleValue()));
+    wasEval = jnePtr(
+        X86::eax, ImmPtr(JSValuePtr::encode(JSImmediate::impossibleValue())));
   }
 
   // This plants a check for a cached JSFunction value, so we can plant a fast
@@ -243,8 +244,9 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   // frame below
   emitGetVirtualRegister(callee, X86::ecx);
   DataLabelPtr addressOfLinkedFunctionCheck;
-  Jump jumpToSlow = jnePtrWithPatch(X86::ecx, addressOfLinkedFunctionCheck,
-                                    ImmPtr(JSImmediate::impossibleValue()));
+  Jump jumpToSlow = jnePtrWithPatch(
+      X86::ecx, addressOfLinkedFunctionCheck,
+      ImmPtr(JSValuePtr::encode(JSImmediate::impossibleValue())));
   addSlowCase(jumpToSlow);
   ASSERT(differenceBetween(addressOfLinkedFunctionCheck, jumpToSlow) ==
          patchOffsetOpCallCompareToJump);
@@ -269,7 +271,7 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   // Fast version of stack frame initialization, directly relative to edi.
   // Note that this omits to set up RegisterFile::CodeBlock, which is set in the
   // callee
-  storePtr(ImmPtr(noValue()),
+  storePtr(ImmPtr(JSValuePtr::encode(noValue())),
            Address(callFrameRegister,
                    (registerOffset + RegisterFile::OptionalCalleeArguments) *
                        static_cast<int>(sizeof(Register))));

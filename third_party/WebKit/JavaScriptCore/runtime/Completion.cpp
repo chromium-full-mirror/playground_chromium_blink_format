@@ -55,7 +55,7 @@ Completion checkSyntax(ExecState* exec, const SourceCode& source) {
 Completion evaluate(ExecState* exec,
                     ScopeChain& scopeChain,
                     const SourceCode& source,
-                    JSValue* thisValue) {
+                    JSValuePtr thisValue) {
   JSLock lock(exec);
 
   int errLine;
@@ -74,8 +74,8 @@ Completion evaluate(ExecState* exec,
                           ? exec->dynamicGlobalObject()
                           : thisValue->toObject(exec);
 
-  JSValue* exception = noValue();
-  JSValue* result = exec->interpreter()->execute(
+  JSValuePtr exception = noValue();
+  JSValuePtr result = exec->interpreter()->execute(
       programNode.get(), exec, scopeChain.node(), thisObj, &exception);
 
   if (exception) {

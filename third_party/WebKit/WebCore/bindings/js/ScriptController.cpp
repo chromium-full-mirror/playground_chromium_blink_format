@@ -307,7 +307,7 @@ NPObject* ScriptController::createScriptObjectForPluginElement(
   // Create a JSObject bound to this element
   JSLock lock(false);
   ExecState* exec = globalObject()->globalExec();
-  JSValue* jsElementValue = toJS(exec, plugin);
+  JSValuePtr jsElementValue = toJS(exec, plugin);
   if (!jsElementValue || !jsElementValue->isObject())
     return _NPN_CreateNoScriptObject();
 

@@ -274,7 +274,7 @@ JSClassRef ProfileNodeClass() {
   return profileNodeClass;
 }
 
-JSValue* toJS(ExecState* exec, ProfileNode* profileNode) {
+JSValuePtr toJS(ExecState* exec, ProfileNode* profileNode) {
   if (!profileNode)
     return jsNull();
 

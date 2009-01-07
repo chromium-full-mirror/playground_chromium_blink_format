@@ -56,14 +56,14 @@ class JSNotAnObject : public JSObject {
       : JSObject(exec->globalData().notAnObjectStructure),
         m_exception(exception) {}
 
-  static PassRefPtr<Structure> createStructure(JSValue* prototype) {
+  static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
  private:
   // JSValue methods
-  virtual JSValue* toPrimitive(ExecState*, PreferredPrimitiveType) const;
-  virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*&);
+  virtual JSValuePtr toPrimitive(ExecState*, PreferredPrimitiveType) const;
+  virtual bool getPrimitiveNumber(ExecState*, double& number, JSValuePtr&);
   virtual bool toBoolean(ExecState*) const;
   virtual double toNumber(ExecState*) const;
   virtual UString toString(ExecState*) const;
@@ -82,9 +82,9 @@ class JSNotAnObject : public JSObject {
 
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue*,
+                   JSValuePtr,
                    PutPropertySlot&);
-  virtual void put(ExecState*, unsigned propertyName, JSValue*);
+  virtual void put(ExecState*, unsigned propertyName, JSValuePtr);
 
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);

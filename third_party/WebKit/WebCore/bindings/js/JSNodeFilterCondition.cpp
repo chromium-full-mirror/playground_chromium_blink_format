@@ -32,7 +32,7 @@ using namespace JSC;
 
 ASSERT_CLASS_FITS_IN_CELL(JSNodeFilterCondition)
 
-JSNodeFilterCondition::JSNodeFilterCondition(JSValue* filter)
+JSNodeFilterCondition::JSNodeFilterCondition(JSValuePtr filter)
     : m_filter(filter) {}
 
 void JSNodeFilterCondition::mark() {
@@ -64,7 +64,7 @@ short JSNodeFilterCondition::acceptNode(JSC::ExecState* exec,
   if (exec->hadException())
     return NodeFilter::FILTER_REJECT;
 
-  JSValue* result = call(exec, m_filter, callType, callData, m_filter, args);
+  JSValuePtr result = call(exec, m_filter, callType, callData, m_filter, args);
   if (exec->hadException())
     return NodeFilter::FILTER_REJECT;
 

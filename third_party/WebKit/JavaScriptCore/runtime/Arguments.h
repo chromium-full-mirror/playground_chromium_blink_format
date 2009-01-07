@@ -71,7 +71,7 @@ class Arguments : public JSObject {
     d->registers = &activation->registerAt(0);
   }
 
-  static PassRefPtr<Structure> createStructure(JSValue* prototype) {
+  static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
@@ -89,11 +89,11 @@ class Arguments : public JSObject {
                                   PropertySlot&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue*,
+                   JSValuePtr,
                    PutPropertySlot&);
   virtual void put(ExecState*,
                    unsigned propertyName,
-                   JSValue*,
+                   JSValuePtr,
                    PutPropertySlot&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
@@ -105,9 +105,9 @@ class Arguments : public JSObject {
   OwnPtr<ArgumentsData> d;
 };
 
-Arguments* asArguments(JSValue*);
+Arguments* asArguments(JSValuePtr);
 
-inline Arguments* asArguments(JSValue* value) {
+inline Arguments* asArguments(JSValuePtr value) {
   ASSERT(asObject(value)->inherits(&Arguments::info));
   return static_cast<Arguments*>(asObject(value));
 }

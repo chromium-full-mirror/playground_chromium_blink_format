@@ -152,14 +152,14 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
 
 void Arguments::put(ExecState* exec,
                     unsigned i,
-                    JSValue* value,
+                    JSValuePtr value,
                     PutPropertySlot& slot) {
   if (i < d->numArguments &&
       (!d->deletedArguments || !d->deletedArguments[i])) {
     if (i < d->numParameters)
-      d->registers[d->firstParameterIndex + i] = value;
+      d->registers[d->firstParameterIndex + i] = JSValuePtr(value);
     else
-      d->extraArguments[i - d->numParameters] = value;
+      d->extraArguments[i - d->numParameters] = JSValuePtr(value);
     return;
   }
 
@@ -168,16 +168,16 @@ void Arguments::put(ExecState* exec,
 
 void Arguments::put(ExecState* exec,
                     const Identifier& propertyName,
-                    JSValue* value,
+                    JSValuePtr value,
                     PutPropertySlot& slot) {
   bool isArrayIndex;
   unsigned i = propertyName.toArrayIndex(&isArrayIndex);
   if (isArrayIndex && i < d->numArguments &&
       (!d->deletedArguments || !d->deletedArguments[i])) {
     if (i < d->numParameters)
-      d->registers[d->firstParameterIndex + i] = value;
+      d->registers[d->firstParameterIndex + i] = JSValuePtr(value);
     else
-      d->extraArguments[i - d->numParameters] = value;
+      d->extraArguments[i - d->numParameters] = JSValuePtr(value);
     return;
   }
 

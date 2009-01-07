@@ -103,7 +103,7 @@ class JSString : public JSCell {
   }
   JSString* getIndex(JSGlobalData*, unsigned);
 
-  static PassRefPtr<Structure> createStructure(JSValue* proto) {
+  static PassRefPtr<Structure> createStructure(JSValuePtr proto) {
     return Structure::create(proto, TypeInfo(StringType, NeedsThisConversion));
   }
 
@@ -111,8 +111,10 @@ class JSString : public JSCell {
   enum VPtrStealingHackType { VPtrStealingHack };
   JSString(VPtrStealingHackType) : JSCell(0) {}
 
-  virtual JSValue* toPrimitive(ExecState*, PreferredPrimitiveType) const;
-  virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*& value);
+  virtual JSValuePtr toPrimitive(ExecState*, PreferredPrimitiveType) const;
+  virtual bool getPrimitiveNumber(ExecState*,
+                                  double& number,
+                                  JSValuePtr& value);
   virtual bool toBoolean(ExecState*) const;
   virtual double toNumber(ExecState*) const;
   virtual JSObject* toObject(ExecState*) const;
@@ -133,9 +135,9 @@ class JSString : public JSCell {
   UString m_value;
 };
 
-JSString* asString(JSValue*);
+JSString* asString(JSValuePtr);
 
-inline JSString* asString(JSValue* value) {
+inline JSString* asString(JSValuePtr value) {
   ASSERT(asCell(value)->isString());
   return static_cast<JSString*>(asCell(value));
 }

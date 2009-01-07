@@ -40,10 +40,10 @@ class RuntimeObjectImp : public JSObject {
                                   PropertySlot&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue*,
+                   JSValuePtr,
                    PutPropertySlot&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
-  virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const;
+  virtual JSValuePtr defaultValue(ExecState*, PreferredPrimitiveType) const;
   virtual CallType getCallData(CallData&);
   virtual ConstructType getConstructData(ConstructData&);
 
@@ -60,7 +60,7 @@ class RuntimeObjectImp : public JSObject {
     return exec->lexicalGlobalObject()->objectPrototype();
   }
 
-  static PassRefPtr<Structure> createStructure(JSValue* prototype) {
+  static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
@@ -75,15 +75,15 @@ class RuntimeObjectImp : public JSObject {
 
   virtual const ClassInfo* classInfo() const { return &s_info; }
 
-  static JSValue* fallbackObjectGetter(ExecState*,
-                                       const Identifier&,
-                                       const PropertySlot&);
-  static JSValue* fieldGetter(ExecState*,
-                              const Identifier&,
-                              const PropertySlot&);
-  static JSValue* methodGetter(ExecState*,
-                               const Identifier&,
-                               const PropertySlot&);
+  static JSValuePtr fallbackObjectGetter(ExecState*,
+                                         const Identifier&,
+                                         const PropertySlot&);
+  static JSValuePtr fieldGetter(ExecState*,
+                                const Identifier&,
+                                const PropertySlot&);
+  static JSValuePtr methodGetter(ExecState*,
+                                 const Identifier&,
+                                 const PropertySlot&);
 
   RefPtr<Bindings::Instance> instance;
 };

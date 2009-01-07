@@ -49,14 +49,14 @@ class RegExpMatchesArray : public JSArray {
 
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   JSValue* v,
+                   JSValuePtr v,
                    PutPropertySlot& slot) {
     if (lazyCreationData())
       fillArrayInstance(exec);
     JSArray::put(exec, propertyName, v, slot);
   }
 
-  virtual void put(ExecState* exec, unsigned propertyName, JSValue* v) {
+  virtual void put(ExecState* exec, unsigned propertyName, JSValuePtr v) {
     if (lazyCreationData())
       fillArrayInstance(exec);
     JSArray::put(exec, propertyName, v);

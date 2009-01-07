@@ -46,9 +46,9 @@ struct HashTableValue {
 };
 
 // FIXME: There is no reason this get function can't be simpler.
-// ie. typedef JSValue* (*GetFunction)(ExecState*, JSObject* baseObject)
+// ie. typedef JSValuePtr (*GetFunction)(ExecState*, JSObject* baseObject)
 typedef PropertySlot::GetValueFunc GetFunction;
-typedef void (*PutFunction)(ExecState*, JSObject* baseObject, JSValue* value);
+typedef void (*PutFunction)(ExecState*, JSObject* baseObject, JSValuePtr value);
 
 class HashEntry {
  public:
@@ -279,7 +279,7 @@ inline bool getStaticValueSlot(ExecState* exec,
 template <class ThisImp>
 inline bool lookupPut(ExecState* exec,
                       const Identifier& propertyName,
-                      JSValue* value,
+                      JSValuePtr value,
                       const HashTable* table,
                       ThisImp* thisObj) {
   const HashEntry* entry = table->entry(exec, propertyName);
@@ -304,7 +304,7 @@ inline bool lookupPut(ExecState* exec,
 template <class ThisImp, class ParentImp>
 inline void lookupPut(ExecState* exec,
                       const Identifier& propertyName,
-                      JSValue* value,
+                      JSValuePtr value,
                       const HashTable* table,
                       ThisImp* thisObj,
                       PutPropertySlot& slot) {

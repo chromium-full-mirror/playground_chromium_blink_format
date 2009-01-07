@@ -40,28 +40,29 @@ class Instruction;
 class JSGlobalData;
 class JSNotAnObjectErrorStub;
 class JSObject;
+class JSValuePtr;
 class Node;
 
-JSValue* createInterruptedExecutionException(JSGlobalData*);
-JSValue* createStackOverflowError(ExecState*);
-JSValue* createUndefinedVariableError(ExecState*,
-                                      const Identifier&,
-                                      unsigned bytecodeOffset,
-                                      CodeBlock*);
+JSValuePtr createInterruptedExecutionException(JSGlobalData*);
+JSValuePtr createStackOverflowError(ExecState*);
+JSValuePtr createUndefinedVariableError(ExecState*,
+                                        const Identifier&,
+                                        unsigned bytecodeOffset,
+                                        CodeBlock*);
 JSNotAnObjectErrorStub* createNotAnObjectErrorStub(ExecState*, bool isNull);
 JSObject* createInvalidParamError(ExecState*,
                                   const char* op,
-                                  JSValue*,
+                                  JSValuePtr,
                                   unsigned bytecodeOffset,
                                   CodeBlock*);
 JSObject* createNotAConstructorError(ExecState*,
-                                     JSValue*,
+                                     JSValuePtr,
                                      unsigned bytecodeOffset,
                                      CodeBlock*);
-JSValue* createNotAFunctionError(ExecState*,
-                                 JSValue*,
-                                 unsigned bytecodeOffset,
-                                 CodeBlock*);
+JSValuePtr createNotAFunctionError(ExecState*,
+                                   JSValuePtr,
+                                   unsigned bytecodeOffset,
+                                   CodeBlock*);
 JSObject* createNotAnObjectError(ExecState*,
                                  JSNotAnObjectErrorStub*,
                                  unsigned bytecodeOffset,

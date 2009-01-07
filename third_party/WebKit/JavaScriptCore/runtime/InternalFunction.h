@@ -38,7 +38,7 @@ class InternalFunction : public JSObject {
 
   const UString& name(JSGlobalData*);
 
-  static PassRefPtr<Structure> createStructure(JSValue* proto) {
+  static PassRefPtr<Structure> createStructure(JSValuePtr proto) {
     return Structure::create(
         proto, TypeInfo(ObjectType,
                         ImplementsHasInstance | HasStandardGetOwnPropertySlot));
@@ -52,9 +52,9 @@ class InternalFunction : public JSObject {
   virtual CallType getCallData(CallData&) = 0;
 };
 
-InternalFunction* asInternalFunction(JSValue*);
+InternalFunction* asInternalFunction(JSValuePtr);
 
-inline InternalFunction* asInternalFunction(JSValue* value) {
+inline InternalFunction* asInternalFunction(JSValuePtr value) {
   ASSERT(asObject(value)->inherits(&InternalFunction::info));
   return static_cast<InternalFunction*>(asObject(value));
 }

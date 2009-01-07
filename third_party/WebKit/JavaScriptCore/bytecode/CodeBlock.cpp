@@ -54,7 +54,7 @@ static UString escapeQuotes(const UString& str) {
   return result;
 }
 
-static UString valueToSourceString(ExecState* exec, JSValue* val) {
+static UString valueToSourceString(ExecState* exec, JSValuePtr val) {
   if (val->isString()) {
     UString result("\"");
     result += escapeQuotes(val->toString(exec)) + "\"";
@@ -71,7 +71,7 @@ static CString registerName(int r) {
   return (UString("r") + UString::from(r)).UTF8String();
 }
 
-static CString constantName(ExecState* exec, int k, JSValue* value) {
+static CString constantName(ExecState* exec, int k, JSValuePtr value) {
   return (valueToSourceString(exec, value) + "(@k" + UString::from(k) + ")")
       .UTF8String();
 }
@@ -809,7 +809,7 @@ void CodeBlock::dump(ExecState* exec,
     }
     case op_resolve_global: {
       int r0 = (++it)->u.operand;
-      JSValue* scope = static_cast<JSValue*>((++it)->u.jsCell);
+      JSValuePtr scope = JSValuePtr((++it)->u.jsCell);
       int id0 = (++it)->u.operand;
       printf("[%4d] resolve_global\t %s, %s, %s\n", location,
              registerName(r0).c_str(), valueToSourceString(exec, scope).ascii(),
@@ -835,7 +835,7 @@ void CodeBlock::dump(ExecState* exec,
     }
     case op_get_global_var: {
       int r0 = (++it)->u.operand;
-      JSValue* scope = static_cast<JSValue*>((++it)->u.jsCell);
+      JSValuePtr scope = JSValuePtr((++it)->u.jsCell);
       int index = (++it)->u.operand;
       printf("[%4d] get_global_var\t %s, %s, %d\n", location,
              registerName(r0).c_str(), valueToSourceString(exec, scope).ascii(),
@@ -843,7 +843,7 @@ void CodeBlock::dump(ExecState* exec,
       break;
     }
     case op_put_global_var: {
-      JSValue* scope = static_cast<JSValue*>((++it)->u.jsCell);
+      JSValuePtr scope = JSValuePtr((++it)->u.jsCell);
       int index = (++it)->u.operand;
       int r0 = (++it)->u.operand;
       printf("[%4d] put_global_var\t %s, %d, %s\n", location,

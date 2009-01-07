@@ -24,7 +24,6 @@
 #ifndef Collector_h
 #define Collector_h
 
-#include "JSImmediate.h"
 #include <stddef.h>
 #include <string.h>
 #include <wtf/HashCountedSet.h>
@@ -47,6 +46,7 @@ class ArgList;
 class CollectorBlock;
 class JSCell;
 class JSGlobalData;
+class JSValuePtr;
 
 enum OperationInProgress { NoOperation, Allocation, Collection };
 enum HeapType { PrimaryHeap, NumberHeap };
@@ -100,10 +100,10 @@ class Heap : Noncopyable {
   Statistics statistics() const;
 
   void setGCProtectNeedsLocking();
-  void protect(JSValue*);
-  void unprotect(JSValue*);
+  void protect(JSValuePtr);
+  void unprotect(JSValuePtr);
 
-  static Heap* heap(JSValue*);  // 0 for immediate values
+  static Heap* heap(JSValuePtr);  // 0 for immediate values
 
   size_t globalObjectCount();
   size_t protectedObjectCount();

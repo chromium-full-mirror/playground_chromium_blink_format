@@ -48,7 +48,7 @@ class JSVariableObject : public JSObject {
 
   virtual void putWithAttributes(ExecState*,
                                  const Identifier&,
-                                 JSValue*,
+                                 JSValuePtr,
                                  unsigned attributes) = 0;
 
   virtual bool deleteProperty(ExecState*, const Identifier&);
@@ -94,9 +94,9 @@ class JSVariableObject : public JSObject {
 
   bool symbolTableGet(const Identifier&, PropertySlot&);
   bool symbolTableGet(const Identifier&, PropertySlot&, bool& slotIsWriteable);
-  bool symbolTablePut(const Identifier&, JSValue*);
+  bool symbolTablePut(const Identifier&, JSValuePtr);
   bool symbolTablePutWithAttributes(const Identifier&,
-                                    JSValue*,
+                                    JSValuePtr,
                                     unsigned attributes);
 
   JSVariableObjectData* d;
@@ -127,7 +127,7 @@ inline bool JSVariableObject::symbolTableGet(const Identifier& propertyName,
 }
 
 inline bool JSVariableObject::symbolTablePut(const Identifier& propertyName,
-                                             JSValue* value) {
+                                             JSValuePtr value) {
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
   SymbolTableEntry entry =
@@ -142,7 +142,7 @@ inline bool JSVariableObject::symbolTablePut(const Identifier& propertyName,
 
 inline bool JSVariableObject::symbolTablePutWithAttributes(
     const Identifier& propertyName,
-    JSValue* value,
+    JSValuePtr value,
     unsigned attributes) {
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 

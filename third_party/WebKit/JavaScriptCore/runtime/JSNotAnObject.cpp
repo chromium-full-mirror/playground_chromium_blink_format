@@ -36,13 +36,13 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(JSNotAnObject);
 
 // JSValue methods
-JSValue* JSNotAnObject::toPrimitive(ExecState* exec,
-                                    PreferredPrimitiveType) const {
+JSValuePtr JSNotAnObject::toPrimitive(ExecState* exec,
+                                      PreferredPrimitiveType) const {
   ASSERT_UNUSED(exec, exec->hadException() && exec->exception() == m_exception);
   return m_exception;
 }
 
-bool JSNotAnObject::getPrimitiveNumber(ExecState* exec, double&, JSValue*&) {
+bool JSNotAnObject::getPrimitiveNumber(ExecState* exec, double&, JSValuePtr&) {
   ASSERT_UNUSED(exec, exec->hadException() && exec->exception() == m_exception);
   return false;
 }
@@ -92,12 +92,12 @@ bool JSNotAnObject::getOwnPropertySlot(ExecState* exec,
 
 void JSNotAnObject::put(ExecState* exec,
                         const Identifier&,
-                        JSValue*,
+                        JSValuePtr,
                         PutPropertySlot&) {
   ASSERT_UNUSED(exec, exec->hadException() && exec->exception() == m_exception);
 }
 
-void JSNotAnObject::put(ExecState* exec, unsigned, JSValue*) {
+void JSNotAnObject::put(ExecState* exec, unsigned, JSValuePtr) {
   ASSERT_UNUSED(exec, exec->hadException() && exec->exception() == m_exception);
 }
 

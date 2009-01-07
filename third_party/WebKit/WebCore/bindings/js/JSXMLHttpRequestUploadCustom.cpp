@@ -85,8 +85,8 @@ void JSXMLHttpRequestUpload::mark() {
   }
 }
 
-JSValue* JSXMLHttpRequestUpload::addEventListener(ExecState* exec,
-                                                  const ArgList& args) {
+JSValuePtr JSXMLHttpRequestUpload::addEventListener(ExecState* exec,
+                                                    const ArgList& args) {
   JSDOMGlobalObject* globalObject =
       toJSDOMGlobalObject(impl()->scriptExecutionContext());
   if (!globalObject)
@@ -101,8 +101,8 @@ JSValue* JSXMLHttpRequestUpload::addEventListener(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* JSXMLHttpRequestUpload::removeEventListener(ExecState* exec,
-                                                     const ArgList& args) {
+JSValuePtr JSXMLHttpRequestUpload::removeEventListener(ExecState* exec,
+                                                       const ArgList& args) {
   JSDOMGlobalObject* globalObject =
       toJSDOMGlobalObject(impl()->scriptExecutionContext());
   if (!globalObject)

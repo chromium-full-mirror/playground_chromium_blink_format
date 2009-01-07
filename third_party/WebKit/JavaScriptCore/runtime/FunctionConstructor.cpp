@@ -63,10 +63,10 @@ ConstructType FunctionConstructor::getConstructData(
   return ConstructTypeHost;
 }
 
-static JSValue* callFunctionConstructor(ExecState* exec,
-                                        JSObject*,
-                                        JSValue*,
-                                        const ArgList& args) {
+static JSValuePtr callFunctionConstructor(ExecState* exec,
+                                          JSObject*,
+                                          JSValuePtr,
+                                          const ArgList& args) {
   return constructFunction(exec, args);
 }
 

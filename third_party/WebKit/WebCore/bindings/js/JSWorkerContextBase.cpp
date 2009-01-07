@@ -75,7 +75,7 @@ const ClassInfo JSWorkerContextBase::s_info = {"WorkerContext", 0, 0,
 
 void JSWorkerContextBase::put(ExecState* exec,
                               const Identifier& propertyName,
-                              JSValue* value,
+                              JSValuePtr value,
                               PutPropertySlot& slot) {
   lookupPut<JSWorkerContextBase, Base>(
       exec, propertyName, value, getJSWorkerContextBaseTable(exec), this, slot);

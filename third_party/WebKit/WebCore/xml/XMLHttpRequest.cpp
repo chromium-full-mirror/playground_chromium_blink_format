@@ -996,8 +996,9 @@ void XMLHttpRequest::dropProtection() {
   // report the extra cost at that point.
 
   if (JSDOMWindow* window = toJSDOMWindow(document()->frame())) {
-    if (JSC::JSValue* wrapper =
-            getCachedDOMObjectWrapper(*window->globalData(), this))
+    JSC::JSValuePtr wrapper =
+        getCachedDOMObjectWrapper(*window->globalData(), this);
+    if (wrapper)
       JSC::Heap::heap(wrapper)->reportExtraMemoryCost(m_responseText.size() *
                                                       2);
   }

@@ -45,7 +45,7 @@ class Frame;
 class JSCustomXPathNSResolver : public XPathNSResolver {
  public:
   static PassRefPtr<JSCustomXPathNSResolver> create(JSC::ExecState*,
-                                                    JSC::JSValue*);
+                                                    JSC::JSValuePtr);
 
   virtual ~JSCustomXPathNSResolver();
 

@@ -89,8 +89,8 @@ class JavaJSObject {
 
   static jvalue invoke(JSObjectCallContext*);
 
-  jobject convertValueToJObject(JSValue*) const;
-  JSValue* convertJObjectToValue(ExecState*, jobject) const;
+  jobject convertValueToJObject(JSValuePtr) const;
+  JSValuePtr convertJObjectToValue(ExecState*, jobject) const;
   void getListFromJArray(ExecState*, jobjectArray, ArgList&) const;
 
   RootObject* rootObject() const;

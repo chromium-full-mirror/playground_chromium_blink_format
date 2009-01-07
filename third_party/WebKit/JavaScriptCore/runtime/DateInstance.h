@@ -57,9 +57,9 @@ class DateInstance : public JSWrapperObject {
   mutable Cache* m_cache;
 };
 
-DateInstance* asDateInstance(JSValue*);
+DateInstance* asDateInstance(JSValuePtr);
 
-inline DateInstance* asDateInstance(JSValue* value) {
+inline DateInstance* asDateInstance(JSValuePtr value) {
   ASSERT(asObject(value)->inherits(&DateInstance::info));
   return static_cast<DateInstance*>(asObject(value));
 }

@@ -44,9 +44,9 @@ class ObjcClass : public Class {
   virtual MethodList methodsNamed(const Identifier&, Instance* instance) const;
   virtual Field* fieldNamed(const Identifier&, Instance* instance) const;
 
-  virtual JSValue* fallbackObject(ExecState* exec,
-                                  Instance* instance,
-                                  const Identifier& propertyName);
+  virtual JSValuePtr fallbackObject(ExecState* exec,
+                                    Instance* instance,
+                                    const Identifier& propertyName);
 
   ClassStructPtr isa() { return _isa; }
 
