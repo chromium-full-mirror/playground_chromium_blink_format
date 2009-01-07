@@ -103,4 +103,8 @@ typedef enum {
                             onNode:(DOMNode*)node
                             atTime:(NSTimeInterval)time;
 
+// Returns the total number of currently running animations (includes both CSS
+// transitions and CSS animations).
+- (unsigned)_numberOfActiveAnimations;
+
 @end

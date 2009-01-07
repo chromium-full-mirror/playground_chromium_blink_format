@@ -207,6 +207,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool pauseTransitionAtTimeOnElementWithId(JSStringRef propertyName,
                                             double time,
                                             JSStringRef elementId);
+  unsigned numberOfActiveAnimations() const;
 
  private:
   bool m_dumpAsText;

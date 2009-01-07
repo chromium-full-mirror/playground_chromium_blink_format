@@ -84,6 +84,7 @@ class CompositeAnimation : public RefCounted<CompositeAnimation> {
 
   bool pauseAnimationAtTime(const AtomicString& name, double t);
   bool pauseTransitionAtTime(int property, double t);
+  unsigned numberOfActiveAnimations() const;
 
  private:
   CompositeAnimation(AnimationController* animationController);

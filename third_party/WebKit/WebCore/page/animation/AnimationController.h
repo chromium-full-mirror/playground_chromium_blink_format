@@ -60,7 +60,8 @@ class AnimationController {
                             double t);  // To be used only for testing
   bool pauseTransitionAtTime(RenderObject*,
                              const String& property,
-                             double t);  // To be used only for testing
+                             double t);       // To be used only for testing
+  unsigned numberOfActiveAnimations() const;  // To be used only for testing
 
   bool isAnimatingPropertyOnRenderer(RenderObject*,
                                      int property,

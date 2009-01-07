@@ -648,3 +648,7 @@ bool LayoutTestController::pauseTransitionAtTimeOnElementWithId(
     JSStringRef elementId) {
   return false;  // FIXME: Implement this on Windows
 }
+
+unsigned LayoutTestController::numberOfActiveAnimations() const {
+  return 0;  // FIXME: Implement this on Windows
+}
