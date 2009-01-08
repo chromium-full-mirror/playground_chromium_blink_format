@@ -1709,10 +1709,7 @@ PassRefPtr<Range> findPlainText(const Range* range,
   // collapsible
   // whitespace, so we won't even try. This also takes care of the empty string
   // case.
-  // FIXME: This code does not allow \n at the moment because of issues with
-  // <br>.
-  // Once we fix those, we can remove the specific check for \n.
-  if (isAllCollapsibleWhitespace(target) || target.contains('\n'))
+  if (isAllCollapsibleWhitespace(target))
     return collapsedToBoundary(range, forward);
 
   // First, find the text.
