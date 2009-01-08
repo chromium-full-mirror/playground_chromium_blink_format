@@ -32,6 +32,9 @@
 
 namespace WebCore {
 
+const int cAnimateNone = 0;
+const int cAnimateAll = -2;
+
 class Animation : public RefCounted<Animation> {
  public:
   ~Animation();
@@ -150,6 +153,18 @@ class Animation : public RefCounted<Animation> {
   bool m_timingFunctionSet : 1;
 
   bool m_isNone : 1;
+
+ public:
+  static float initialAnimationDelay() { return 0; }
+  static bool initialAnimationDirection() { return false; }
+  static double initialAnimationDuration() { return 0; }
+  static int initialAnimationIterationCount() { return 1; }
+  static String initialAnimationName() { return String("none"); }
+  static unsigned initialAnimationPlayState() { return AnimPlayStatePlaying; }
+  static int initialAnimationProperty() { return cAnimateAll; }
+  static TimingFunction initialAnimationTimingFunction() {
+    return TimingFunction();
+  }
 };
 
 }  // namespace WebCore
