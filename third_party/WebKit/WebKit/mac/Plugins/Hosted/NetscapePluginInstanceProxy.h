@@ -38,6 +38,10 @@
 #include <wtf/RetainPtr.h>
 #include "WebKitPluginHostTypes.h"
 
+namespace WebCore {
+class String;
+}
+
 @class WebHostedNetscapePluginView;
 
 namespace WebKit {
@@ -87,6 +91,8 @@ class NetscapePluginInstanceProxy
   void stopTimers();
 
   bool getWindowNPObject(uint32_t& objectID);
+  void releaseObject(uint32_t objectID);
+  JSC::JSValuePtr evaluate(uint32_t objectID, const WebCore::String& script);
 
   void status(const char* message);
   NPError loadURL(const char* url,
