@@ -34,7 +34,6 @@ namespace WebCore {
 
 class IntPoint;
 class IntRect;
-class Frame;
 
 class HostWindow : Noncopyable {
  public:
@@ -64,9 +63,6 @@ class HostWindow : Noncopyable {
 
   // Method for retrieving the native window.
   virtual PlatformWidget platformWindow() const = 0;
-
-  // Method for notifying the window when a frame's contents size changes
-  virtual void contentsSizeChanged(Frame* frame, const IntSize& size) const = 0;
 };
 
 }  // namespace WebCore
