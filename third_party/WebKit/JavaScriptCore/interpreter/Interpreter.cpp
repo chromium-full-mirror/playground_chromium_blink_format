@@ -89,11 +89,13 @@ namespace JSC {
 // Preferred number of milliseconds between each timeout check
 static const int preferredScriptCheckTimeInterval = 1000;
 
-static ALWAYS_INLINE unsigned bytecodeOffsetForPC(CodeBlock* codeBlock,
+static ALWAYS_INLINE unsigned bytecodeOffsetForPC(CallFrame* callFrame,
+                                                  CodeBlock* codeBlock,
                                                   void* pc) {
 #if ENABLE(JIT)
-  return codeBlock->getBytecodeIndex(pc);
+  return codeBlock->getBytecodeIndex(callFrame, pc);
 #else
+  UNUSED_PARAM(callFrame);
   return static_cast<Instruction*>(pc) - codeBlock->instructions().begin();
 #endif
 }
@@ -843,7 +845,7 @@ NEVER_INLINE bool Interpreter::unwindCallFrame(CallFrame*& callFrame,
     return false;
 
   codeBlock = callFrame->codeBlock();
-  bytecodeOffset = bytecodeOffsetForPC(codeBlock, returnPC);
+  bytecodeOffset = bytecodeOffsetForPC(callFrame, codeBlock, returnPC);
   return true;
 }
 
@@ -2625,7 +2627,7 @@ JSValuePtr Interpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_get_global_var) {
-      /* get_global_var dst(r) globalObject(c) index(n) nop(n) nop(n)
+      /* get_global_var dst(r) globalObject(c) index(n)
 
          Gets the global var at global slot index and places it in register dst.
        */
@@ -4432,7 +4434,7 @@ void Interpreter::retrieveLastCaller(CallFrame* callFrame,
     return;
 
   unsigned bytecodeOffset =
-      bytecodeOffsetForPC(callerCodeBlock, callFrame->returnPC());
+      bytecodeOffsetForPC(callerFrame, callerCodeBlock, callFrame->returnPC());
   lineNumber = callerCodeBlock->lineNumberForBytecodeOffset(callerFrame,
                                                             bytecodeOffset - 1);
   sourceID = callerCodeBlock->ownerNode()->sourceID();
@@ -5210,7 +5212,8 @@ JSValueEncodedAsPointer* Interpreter::cti_op_instanceof(STUB_ARGS) {
   if (!baseVal->isObject()) {
     CallFrame* callFrame = ARG_callFrame;
     CodeBlock* codeBlock = callFrame->codeBlock();
-    unsigned vPCIndex = codeBlock->getBytecodeIndex(STUB_RETURN_ADDRESS);
+    unsigned vPCIndex =
+        codeBlock->getBytecodeIndex(callFrame, STUB_RETURN_ADDRESS);
     ARG_globalData->exception = createInvalidParamError(
         callFrame, "instanceof", baseVal, vPCIndex, codeBlock);
     VM_THROW_EXCEPTION();
@@ -5427,8 +5430,10 @@ JSValueEncodedAsPointer* Interpreter::cti_op_call_NotJSFunction(STUB_ARGS) {
 
   ASSERT(callType == CallTypeNone);
 
-  CodeBlock* codeBlock = ARG_callFrame->codeBlock();
-  unsigned vPCIndex = codeBlock->getBytecodeIndex(STUB_RETURN_ADDRESS);
+  CallFrame* callFrame = ARG_callFrame;
+  CodeBlock* codeBlock = callFrame->codeBlock();
+  unsigned vPCIndex =
+      codeBlock->getBytecodeIndex(callFrame, STUB_RETURN_ADDRESS);
   ARG_globalData->exception =
       createNotAFunctionError(ARG_callFrame, funcVal, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION();
@@ -5517,7 +5522,8 @@ JSValueEncodedAsPointer* Interpreter::cti_op_resolve(STUB_ARGS) {
   } while (++iter != end);
 
   CodeBlock* codeBlock = callFrame->codeBlock();
-  unsigned vPCIndex = codeBlock->getBytecodeIndex(STUB_RETURN_ADDRESS);
+  unsigned vPCIndex =
+      codeBlock->getBytecodeIndex(callFrame, STUB_RETURN_ADDRESS);
   ARG_globalData->exception =
       createUndefinedVariableError(callFrame, ident, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION();
@@ -5573,7 +5579,8 @@ JSValueEncodedAsPointer* Interpreter::cti_op_construct_NotJSConstruct(
   ASSERT(constructType == ConstructTypeNone);
 
   CodeBlock* codeBlock = callFrame->codeBlock();
-  unsigned vPCIndex = codeBlock->getBytecodeIndex(STUB_RETURN_ADDRESS);
+  unsigned vPCIndex =
+      codeBlock->getBytecodeIndex(callFrame, STUB_RETURN_ADDRESS);
   ARG_globalData->exception =
       createNotAConstructorError(callFrame, constrVal, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION();
@@ -5656,7 +5663,8 @@ VoidPtrPair Interpreter::cti_op_resolve_func(STUB_ARGS) {
   } while (iter != end);
 
   CodeBlock* codeBlock = callFrame->codeBlock();
-  unsigned vPCIndex = codeBlock->getBytecodeIndex(STUB_RETURN_ADDRESS);
+  unsigned vPCIndex =
+      codeBlock->getBytecodeIndex(callFrame, STUB_RETURN_ADDRESS);
   ARG_globalData->exception =
       createUndefinedVariableError(callFrame, ident, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION_2();
@@ -5822,7 +5830,8 @@ JSValueEncodedAsPointer* Interpreter::cti_op_resolve_skip(STUB_ARGS) {
   } while (++iter != end);
 
   CodeBlock* codeBlock = callFrame->codeBlock();
-  unsigned vPCIndex = codeBlock->getBytecodeIndex(STUB_RETURN_ADDRESS);
+  unsigned vPCIndex =
+      codeBlock->getBytecodeIndex(callFrame, STUB_RETURN_ADDRESS);
   ARG_globalData->exception =
       createUndefinedVariableError(callFrame, ident, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION();
@@ -5856,7 +5865,7 @@ JSValueEncodedAsPointer* Interpreter::cti_op_resolve_global(STUB_ARGS) {
   }
 
   unsigned vPCIndex =
-      ARG_callFrame->codeBlock()->getBytecodeIndex(STUB_RETURN_ADDRESS);
+      callFrame->codeBlock()->getBytecodeIndex(callFrame, STUB_RETURN_ADDRESS);
   ARG_globalData->exception = createUndefinedVariableError(
       callFrame, ident, vPCIndex, callFrame->codeBlock());
   VM_THROW_EXCEPTION();
@@ -6063,7 +6072,8 @@ VoidPtrPair Interpreter::cti_op_resolve_with_base(STUB_ARGS) {
   } while (iter != end);
 
   CodeBlock* codeBlock = callFrame->codeBlock();
-  unsigned vPCIndex = codeBlock->getBytecodeIndex(STUB_RETURN_ADDRESS);
+  unsigned vPCIndex =
+      codeBlock->getBytecodeIndex(callFrame, STUB_RETURN_ADDRESS);
   ARG_globalData->exception =
       createUndefinedVariableError(callFrame, ident, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION_2();
@@ -6221,7 +6231,8 @@ JSValueEncodedAsPointer* Interpreter::cti_op_throw(STUB_ARGS) {
   CallFrame* callFrame = ARG_callFrame;
   CodeBlock* codeBlock = callFrame->codeBlock();
 
-  unsigned vPCIndex = codeBlock->getBytecodeIndex(STUB_RETURN_ADDRESS);
+  unsigned vPCIndex =
+      codeBlock->getBytecodeIndex(callFrame, STUB_RETURN_ADDRESS);
 
   JSValuePtr exceptionValue = ARG_src1;
   ASSERT(exceptionValue);
@@ -6369,7 +6380,8 @@ JSValueEncodedAsPointer* Interpreter::cti_op_in(STUB_ARGS) {
   if (!baseVal->isObject()) {
     CallFrame* callFrame = ARG_callFrame;
     CodeBlock* codeBlock = callFrame->codeBlock();
-    unsigned vPCIndex = codeBlock->getBytecodeIndex(STUB_RETURN_ADDRESS);
+    unsigned vPCIndex =
+        codeBlock->getBytecodeIndex(callFrame, STUB_RETURN_ADDRESS);
     ARG_globalData->exception =
         createInvalidParamError(callFrame, "in", baseVal, vPCIndex, codeBlock);
     VM_THROW_EXCEPTION();
@@ -6558,7 +6570,7 @@ JSValueEncodedAsPointer* Interpreter::cti_vm_throw(STUB_ARGS) {
   JSGlobalData* globalData = ARG_globalData;
 
   unsigned vPCIndex =
-      codeBlock->getBytecodeIndex(globalData->exceptionLocation);
+      codeBlock->getBytecodeIndex(callFrame, globalData->exceptionLocation);
 
   JSValuePtr exceptionValue = globalData->exception;
   ASSERT(exceptionValue);
