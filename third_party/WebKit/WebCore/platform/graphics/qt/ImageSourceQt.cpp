@@ -41,7 +41,7 @@ namespace WebCore {
 ImageSource::ImageSource() : m_decoder(0) {}
 
 ImageSource::~ImageSource() {
-  delete m_decoder;
+  clear(true);
 }
 
 bool ImageSource::initialized() const {
@@ -138,15 +138,20 @@ bool ImageSource::frameIsCompleteAtIndex(size_t index) {
   return (m_decoder && m_decoder->imageAtIndex(index) != 0);
 }
 
-void ImageSource::clear(bool destroyAll, size_t clearBeforeFrame) {
-  if (destroyAll) {
-    delete m_decoder;
-    m_decoder = 0;
+void ImageSource::clear(bool destroyAll,
+                        size_t clearBeforeFrame,
+                        SharedBuffer* data,
+                        bool allDataReceived) {
+  if (!destroyAll) {
+    if (m_decoder)
+      m_decoder->clearFrameBufferCache(clearBeforeFrame);
     return;
   }
 
-  if (m_decoder)
-    m_decoder->clearFrameBufferCache(clearBeforeFrame);
+  delete m_decoder;
+  m_decoder = 0;
+  if (data)
+    setData(data, allDataReceived);
 }
 }
 
