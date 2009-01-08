@@ -645,7 +645,7 @@ unsigned CompositeAnimationPrivate::numberOfActiveAnimations() const {
   for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
        it != animationsEnd; ++it) {
     KeyframeAnimation* anim = it->second.get();
-    if (anim->active())
+    if (anim->running())
       ++count;
   }
 
@@ -654,7 +654,7 @@ unsigned CompositeAnimationPrivate::numberOfActiveAnimations() const {
   for (CSSPropertyTransitionsMap::const_iterator it = m_transitions.begin();
        it != transitionsEnd; ++it) {
     ImplicitAnimation* anim = it->second.get();
-    if (anim->active())
+    if (anim->running())
       ++count;
   }
 
