@@ -95,21 +95,17 @@ bool SimpleFontData::containsCharacters(const UChar* characters,
                                         int length) const {
   bool result = true;
 
-  PangoCoverage* requested =
-      pango_coverage_from_bytes((guchar*)characters, length);
-  PangoCoverage* available =
+  PangoCoverage* coverage =
       pango_font_get_coverage(m_font.m_font, pango_language_get_default());
-  pango_coverage_max(requested, available);
 
   for (int i = 0; i < length; i++) {
-    if (PANGO_COVERAGE_NONE == pango_coverage_get(requested, i)) {
+    if (PANGO_COVERAGE_NONE == pango_coverage_get(coverage, characters[i])) {
       result = false;
       break;
     }
   }
 
-  pango_coverage_unref(requested);
-  pango_coverage_unref(available);
+  pango_coverage_unref(coverage);
 
   return result;
 }
