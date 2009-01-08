@@ -65,8 +65,8 @@ void Parser::parse(JSGlobalData* globalData, int* errLine, UString* errMsg) {
   }
 }
 
-void Parser::reparse(JSGlobalData* globalData,
-                     FunctionBodyNode* functionBodyNode) {
+void Parser::reparseInPlace(JSGlobalData* globalData,
+                            FunctionBodyNode* functionBodyNode) {
   ASSERT(!functionBodyNode->data());
 
   m_source = &functionBodyNode->source();

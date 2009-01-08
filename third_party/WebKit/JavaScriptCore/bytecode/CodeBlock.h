@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Cameron Zwarich <cwzwarich@uwaterloo.ca>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -248,12 +248,14 @@ class CodeBlock {
   }
 
   HandlerInfo* handlerForBytecodeOffset(unsigned bytecodeOffset);
-  int lineNumberForBytecodeOffset(unsigned bytecodeOffset);
-  int expressionRangeForBytecodeOffset(unsigned bytecodeOffset,
+  int lineNumberForBytecodeOffset(CallFrame*, unsigned bytecodeOffset);
+  int expressionRangeForBytecodeOffset(CallFrame*,
+                                       unsigned bytecodeOffset,
                                        int& divot,
                                        int& startOffset,
                                        int& endOffset);
-  bool getByIdExceptionInfoForBytecodeOffset(unsigned bytecodeOffset,
+  bool getByIdExceptionInfoForBytecodeOffset(CallFrame*,
+                                             unsigned bytecodeOffset,
                                              OpcodeID&);
 
 #if ENABLE(JIT)
@@ -337,31 +339,6 @@ class CodeBlock {
   unsigned jumpTarget(int index) const { return m_jumpTargets[index]; }
   unsigned lastJumpTarget() const { return m_jumpTargets.last(); }
 
-  size_t numberOfExceptionHandlers() const {
-    return m_rareData ? m_rareData->m_exceptionHandlers.size() : 0;
-  }
-  void addExceptionHandler(const HandlerInfo& hanler) {
-    createRareDataIfNecessary();
-    return m_rareData->m_exceptionHandlers.append(hanler);
-  }
-  HandlerInfo& exceptionHandler(int index) {
-    ASSERT(m_rareData);
-    return m_rareData->m_exceptionHandlers[index];
-  }
-
-  void addExpressionInfo(const ExpressionRangeInfo& expressionInfo) {
-    return m_expressionInfo.append(expressionInfo);
-  }
-  void addGetByIdExceptionInfo(const GetByIdExceptionInfo& info) {
-    m_getByIdExceptionInfo.append(info);
-  }
-
-  size_t numberOfLineInfos() const { return m_lineInfo.size(); }
-  void addLineInfo(const LineInfo& lineInfo) {
-    return m_lineInfo.append(lineInfo);
-  }
-  LineInfo& lastLineInfo() { return m_lineInfo.last(); }
-
 #if !ENABLE(JIT)
   void addPropertyAccessInstruction(unsigned propertyAccessInstruction) {
     m_propertyAccessInstructions.append(propertyAccessInstruction);
@@ -399,6 +376,44 @@ class CodeBlock {
 
   Vector<PC>& pcVector() { return m_pcVector; }
 #endif
+
+  // Exception handling support
+
+  size_t numberOfExceptionHandlers() const {
+    return m_rareData ? m_rareData->m_exceptionHandlers.size() : 0;
+  }
+  void addExceptionHandler(const HandlerInfo& hanler) {
+    createRareDataIfNecessary();
+    return m_rareData->m_exceptionHandlers.append(hanler);
+  }
+  HandlerInfo& exceptionHandler(int index) {
+    ASSERT(m_rareData);
+    return m_rareData->m_exceptionHandlers[index];
+  }
+
+  void clearExceptionInfo() { m_exceptionInfo.clear(); }
+
+  void addExpressionInfo(const ExpressionRangeInfo& expressionInfo) {
+    ASSERT(m_exceptionInfo);
+    m_exceptionInfo->m_expressionInfo.append(expressionInfo);
+  }
+  void addGetByIdExceptionInfo(const GetByIdExceptionInfo& info) {
+    ASSERT(m_exceptionInfo);
+    m_exceptionInfo->m_getByIdExceptionInfo.append(info);
+  }
+
+  size_t numberOfLineInfos() const {
+    ASSERT(m_exceptionInfo);
+    return m_exceptionInfo->m_lineInfo.size();
+  }
+  void addLineInfo(const LineInfo& lineInfo) {
+    ASSERT(m_exceptionInfo);
+    m_exceptionInfo->m_lineInfo.append(lineInfo);
+  }
+  LineInfo& lastLineInfo() {
+    ASSERT(m_exceptionInfo);
+    return m_exceptionInfo->m_lineInfo.last();
+  }
 
   // Constant Pool
 
@@ -524,6 +539,8 @@ class CodeBlock {
             Vector<Instruction>::const_iterator&) const;
 #endif
 
+  void reparseForExceptionInfoIfNecessary(CallFrame*);
+
   void createRareDataIfNecessary() {
     if (!m_rareData)
       m_rareData.set(new RareData);
@@ -559,17 +576,11 @@ class CodeBlock {
   Vector<GlobalResolveInfo> m_globalResolveInfos;
   Vector<CallLinkInfo> m_callLinkInfos;
   Vector<CallLinkInfo*> m_linkedCallerList;
+
+  Vector<PC> m_pcVector;
 #endif
 
   Vector<unsigned> m_jumpTargets;
-
-  Vector<ExpressionRangeInfo> m_expressionInfo;
-  Vector<LineInfo> m_lineInfo;
-  Vector<GetByIdExceptionInfo> m_getByIdExceptionInfo;
-
-#if ENABLE(JIT)
-  Vector<PC> m_pcVector;
-#endif
 
   // Constant Pool
   Vector<Identifier> m_identifiers;
@@ -577,6 +588,13 @@ class CodeBlock {
   Vector<RefPtr<FuncExprNode>> m_functionExpressions;
 
   SymbolTable m_symbolTable;
+
+  struct ExceptionInfo {
+    Vector<ExpressionRangeInfo> m_expressionInfo;
+    Vector<LineInfo> m_lineInfo;
+    Vector<GetByIdExceptionInfo> m_getByIdExceptionInfo;
+  };
+  OwnPtr<ExceptionInfo> m_exceptionInfo;
 
   struct RareData {
     Vector<HandlerInfo> m_exceptionHandlers;
@@ -597,7 +615,6 @@ class CodeBlock {
     Vector<FunctionRegisterInfo> m_functionRegisterInfos;
 #endif
   };
-
   OwnPtr<RareData> m_rareData;
 };
 

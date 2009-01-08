@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -93,7 +93,7 @@ JSValuePtr createUndefinedVariableError(ExecState* exec,
   int endOffset = 0;
   int divotPoint = 0;
   int line = codeBlock->expressionRangeForBytecodeOffset(
-      bytecodeOffset, divotPoint, startOffset, endOffset);
+      exec, bytecodeOffset, divotPoint, startOffset, endOffset);
   UString message = "Can't find variable: ";
   message.append(ident.ustring());
   JSObject* exception = Error::create(exec, ReferenceError, message, line,
@@ -179,7 +179,7 @@ JSObject* createInvalidParamError(ExecState* exec,
   int endOffset = 0;
   int divotPoint = 0;
   int line = codeBlock->expressionRangeForBytecodeOffset(
-      bytecodeOffset, divotPoint, startOffset, endOffset);
+      exec, bytecodeOffset, divotPoint, startOffset, endOffset);
   UString errorMessage =
       createErrorMessage(exec, codeBlock, line, divotPoint,
                          divotPoint + endOffset, value, message);
@@ -206,7 +206,7 @@ JSObject* createNotAConstructorError(ExecState* exec,
   int endOffset = 0;
   int divotPoint = 0;
   int line = codeBlock->expressionRangeForBytecodeOffset(
-      bytecodeOffset, divotPoint, startOffset, endOffset);
+      exec, bytecodeOffset, divotPoint, startOffset, endOffset);
 
   // We're in a "new" expression, so we need to skip over the "new.." part
   int startPoint =
@@ -241,7 +241,7 @@ JSValuePtr createNotAFunctionError(ExecState* exec,
   int endOffset = 0;
   int divotPoint = 0;
   int line = codeBlock->expressionRangeForBytecodeOffset(
-      bytecodeOffset, divotPoint, startOffset, endOffset);
+      exec, bytecodeOffset, divotPoint, startOffset, endOffset);
   UString errorMessage =
       createErrorMessage(exec, codeBlock, line, divotPoint - startOffset,
                          divotPoint, value, "not a function");
@@ -274,7 +274,7 @@ JSObject* createNotAnObjectError(ExecState* exec,
   // exceptions
   // thrown by these instances op_get_by_id need to reflect this.
   OpcodeID followingOpcodeID;
-  if (codeBlock->getByIdExceptionInfoForBytecodeOffset(bytecodeOffset,
+  if (codeBlock->getByIdExceptionInfoForBytecodeOffset(exec, bytecodeOffset,
                                                        followingOpcodeID)) {
     ASSERT(followingOpcodeID == op_construct ||
            followingOpcodeID == op_instanceof);
@@ -291,7 +291,7 @@ JSObject* createNotAnObjectError(ExecState* exec,
   int endOffset = 0;
   int divotPoint = 0;
   int line = codeBlock->expressionRangeForBytecodeOffset(
-      bytecodeOffset, divotPoint, startOffset, endOffset);
+      exec, bytecodeOffset, divotPoint, startOffset, endOffset);
   UString errorMessage = createErrorMessage(
       exec, codeBlock, line, divotPoint - startOffset, divotPoint,
       error->isNull() ? jsNull() : jsUndefined(), "not an object");

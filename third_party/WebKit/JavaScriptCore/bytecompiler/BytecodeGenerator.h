@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Cameron Zwarich <cwzwarich@uwaterloo.ca>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -429,6 +429,10 @@ class BytecodeGenerator {
 
   CodeType codeType() const { return m_codeType; }
 
+  void setRegeneratingForExceptionInfo() {
+    m_regeneratingForExceptionInfo = true;
+  }
+
  private:
   void emitOpcode(OpcodeID);
   void retrieveLastBinaryOp(int& dstIndex, int& src1Index, int& src2Index);
@@ -547,6 +551,8 @@ class BytecodeGenerator {
 
   bool m_shouldEmitDebugHooks;
   bool m_shouldEmitProfileHooks;
+
+  bool m_regeneratingForExceptionInfo;
 
   const ScopeChain* m_scopeChain;
   SymbolTable* m_symbolTable;

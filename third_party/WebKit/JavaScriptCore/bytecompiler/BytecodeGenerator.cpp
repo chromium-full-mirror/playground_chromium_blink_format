@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Cameron Zwarich <cwzwarich@uwaterloo.ca>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -156,11 +156,18 @@ void BytecodeGenerator::generate() {
   }
 #endif
 
-  m_codeBlock->shrinkToFit();
   if ((m_codeType == FunctionCode && !m_codeBlock->needsFullScopeChain() &&
        !m_codeBlock->usesArguments()) ||
       m_codeType == EvalCode)
     symbolTable().clear();
+
+#if !ENABLE(OPCODE_SAMPLING)
+  if (!m_regeneratingForExceptionInfo &&
+      (m_codeType == FunctionCode || m_codeType == EvalCode))
+    m_codeBlock->clearExceptionInfo();
+#endif
+
+  m_codeBlock->shrinkToFit();
 }
 
 bool BytecodeGenerator::addVar(const Identifier& ident,
@@ -219,6 +226,7 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
                                      ProgramCodeBlock* codeBlock)
     : m_shouldEmitDebugHooks(!!debugger),
       m_shouldEmitProfileHooks(scopeChain.globalObject()->supportsProfiling()),
+      m_regeneratingForExceptionInfo(false),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(programNode),
@@ -318,6 +326,7 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
                                      CodeBlock* codeBlock)
     : m_shouldEmitDebugHooks(!!debugger),
       m_shouldEmitProfileHooks(scopeChain.globalObject()->supportsProfiling()),
+      m_regeneratingForExceptionInfo(false),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(functionBody),
@@ -395,6 +404,7 @@ BytecodeGenerator::BytecodeGenerator(EvalNode* evalNode,
                                      EvalCodeBlock* codeBlock)
     : m_shouldEmitDebugHooks(!!debugger),
       m_shouldEmitProfileHooks(scopeChain.globalObject()->supportsProfiling()),
+      m_regeneratingForExceptionInfo(false),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(evalNode),
@@ -1058,10 +1068,13 @@ RegisterID* BytecodeGenerator::emitGetScopedVar(RegisterID* dst,
                                                 int index,
                                                 JSValuePtr globalObject) {
   if (globalObject) {
+    // op_get_global_var must be the same length as op_resolve_global.
     emitOpcode(op_get_global_var);
     instructions().append(dst->index());
     instructions().append(asCell(globalObject));
     instructions().append(index);
+    instructions().append(0);
+    instructions().append(0);
     return dst;
   }
 
