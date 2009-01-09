@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008 Google Inc.  All rights reserved.
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2008 Google, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,15 +28,14 @@
 #define ResourceResponse_h
 
 #include "CString.h"
-#include "ResourceResponseBase.h"
-
 #include "NotImplemented.h"
+#include "ResourceResponseBase.h"
 
 namespace WebCore {
 
 class ResourceResponse : public ResourceResponseBase {
  public:
-  ResourceResponse() : ResourceResponseBase(), m_isContentFiltered(false) {}
+  ResourceResponse() : m_isContentFiltered(false) {}
 
   ResourceResponse(const KURL& url,
                    const String& mimeType,
@@ -77,4 +76,4 @@ class ResourceResponse : public ResourceResponseBase {
 
 }  // namespace WebCore
 
-#endif  // ResourceResponse_h
+#endif
