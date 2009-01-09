@@ -226,7 +226,6 @@ void ImageSourceSkia::setData(SharedBuffer* data,
 }
 
 String ImageSource::filenameExtension() const {
-  // FIXME: Implement me!
-  return String();
+  return m_decoder ? m_decoder->filenameExtension() : String();
 }
 }
