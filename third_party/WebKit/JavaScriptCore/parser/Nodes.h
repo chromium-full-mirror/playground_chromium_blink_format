@@ -2437,7 +2437,8 @@ class EvalNode : public ScopeNode {
     return *m_code;
   }
 
-  EvalCodeBlock& bytecodeForExceptionInfoReparse(ScopeChainNode*) JSC_FAST_CALL;
+  EvalCodeBlock& bytecodeForExceptionInfoReparse(ScopeChainNode*,
+                                                 CodeBlock*) JSC_FAST_CALL;
 
  private:
   EvalNode(JSGlobalData*,
@@ -2514,8 +2515,8 @@ class FunctionBodyNode : public ScopeNode {
       ScopeNode::deref();
   }
 
-  CodeBlock& bytecodeForExceptionInfoReparse(ScopeChainNode* scopeChain)
-      JSC_FAST_CALL;
+  CodeBlock& bytecodeForExceptionInfoReparse(ScopeChainNode*,
+                                             CodeBlock*) JSC_FAST_CALL;
 
  private:
   FunctionBodyNode(JSGlobalData*) JSC_FAST_CALL;

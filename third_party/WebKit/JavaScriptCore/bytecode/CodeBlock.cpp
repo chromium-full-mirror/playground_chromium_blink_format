@@ -834,13 +834,12 @@ void CodeBlock::dump(ExecState* exec,
       break;
     }
     case op_get_global_var: {
-      int r0 = it[1].u.operand;
-      JSValuePtr scope = JSValuePtr(it[2].u.jsCell);
-      int index = it[3].u.operand;
+      int r0 = (++it)->u.operand;
+      JSValuePtr scope = JSValuePtr((++it)->u.jsCell);
+      int index = (++it)->u.operand;
       printf("[%4d] get_global_var\t %s, %s, %d\n", location,
              registerName(r0).c_str(), valueToSourceString(exec, scope).ascii(),
              index);
-      it += OPCODE_LENGTH(op_get_global_var);
       break;
     }
     case op_put_global_var: {
@@ -1256,7 +1255,7 @@ static HashSet<CodeBlock*> liveCodeBlockSet;
 #define FOR_EACH_MEMBER_VECTOR(macro)                                     \
   macro(instructions) macro(globalResolveInfos) macro(structureStubInfos) \
       macro(callLinkInfos) macro(linkedCallerList) macro(identifiers)     \
-          macro(functionExpressions) macro(constantRegisters) macro(pcVector)
+          macro(functionExpressions) macro(constantRegisters)
 
 #define FOR_EACH_MEMBER_VECTOR_RARE_DATA(macro)                          \
   macro(regexps) macro(functions) macro(unexpectedConstants)             \
@@ -1264,8 +1263,9 @@ static HashSet<CodeBlock*> liveCodeBlockSet;
           macro(characterSwitchJumpTables) macro(stringSwitchJumpTables) \
               macro(functionRegisterInfos)
 
-#define FOR_EACH_MEMBER_VECTOR_EXCEPTION_INFO(macro) \
-  macro(expressionInfo) macro(lineInfo) macro(getByIdExceptionInfo)
+#define FOR_EACH_MEMBER_VECTOR_EXCEPTION_INFO(macro)                \
+  macro(expressionInfo) macro(lineInfo) macro(getByIdExceptionInfo) \
+      macro(pcVector)
 
 template <typename T>
 static size_t sizeInBytes(const Vector<T>& vector) {
@@ -1582,6 +1582,18 @@ void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
     return;
 
   ScopeChainNode* scopeChain = callFrame->scopeChain();
+  if (m_needsFullScopeChain) {
+    ScopeChain sc(scopeChain);
+    int scopeDelta = sc.localDepth();
+    if (m_codeType == EvalCode)
+      scopeDelta -= static_cast<EvalCodeBlock*>(this)->baseScopeDepth();
+    else if (m_codeType == FunctionCode)
+      scopeDelta++;  // Compilation of function code assumes activation is not
+                     // on the scope chain yet.
+    ASSERT(scopeDelta >= 0);
+    while (scopeDelta--)
+      scopeChain = scopeChain->next;
+  }
 
   switch (m_codeType) {
     case FunctionCode: {
@@ -1593,9 +1605,15 @@ void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
       newFunctionBody->finishParsing(ownerFunctionBodyNode->copyParameters(),
                                      ownerFunctionBodyNode->parameterCount());
       CodeBlock& newCodeBlock =
-          newFunctionBody->bytecodeForExceptionInfoReparse(scopeChain);
+          newFunctionBody->bytecodeForExceptionInfoReparse(scopeChain, this);
       ASSERT(newCodeBlock.m_exceptionInfo);
       ASSERT(newCodeBlock.m_instructionCount == m_instructionCount);
+
+#if ENABLE(JIT)
+      JIT::compile(m_globalData, &newCodeBlock);
+      ASSERT(newCodeBlock.m_jitCode.codeSize == m_jitCode.codeSize);
+#endif
+
       m_exceptionInfo.set(newCodeBlock.m_exceptionInfo.release());
       break;
     }
@@ -1604,9 +1622,15 @@ void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
       RefPtr<EvalNode> newEvalBody =
           m_globalData->parser->reparse<EvalNode>(m_globalData, ownerEvalNode);
       EvalCodeBlock& newCodeBlock =
-          newEvalBody->bytecodeForExceptionInfoReparse(scopeChain);
+          newEvalBody->bytecodeForExceptionInfoReparse(scopeChain, this);
       ASSERT(newCodeBlock.m_exceptionInfo);
       ASSERT(newCodeBlock.m_instructionCount == m_instructionCount);
+
+#if ENABLE(JIT)
+      JIT::compile(m_globalData, &newCodeBlock);
+      ASSERT(newCodeBlock.m_jitCode.codeSize == m_jitCode.codeSize);
+#endif
+
       m_exceptionInfo.set(newCodeBlock.m_exceptionInfo.release());
       break;
     }
@@ -1766,7 +1790,50 @@ bool CodeBlock::functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
       m_rareData->m_functionRegisterInfos[low - 1].functionRegisterIndex;
   return true;
 }
+#endif
 
+#if !ENABLE(JIT)
+bool CodeBlock::hasGlobalResolveInstructionAtBytecodeOffset(
+    unsigned bytecodeOffset) {
+  if (m_globalResolveInstructions.isEmpty())
+    return false;
+
+  int low = 0;
+  int high = m_globalResolveInstructions.size();
+  while (low < high) {
+    int mid = low + (high - low) / 2;
+    if (m_globalResolveInstructions[mid] <= bytecodeOffset)
+      low = mid + 1;
+    else
+      high = mid;
+  }
+
+  if (!low || m_globalResolveInstructions[low - 1] != bytecodeOffset)
+    return false;
+  return true;
+}
+#else
+bool CodeBlock::hasGlobalResolveInfoAtBytecodeOffset(unsigned bytecodeOffset) {
+  if (m_globalResolveInfos.isEmpty())
+    return false;
+
+  int low = 0;
+  int high = m_globalResolveInfos.size();
+  while (low < high) {
+    int mid = low + (high - low) / 2;
+    if (m_globalResolveInfos[mid].bytecodeOffset <= bytecodeOffset)
+      low = mid + 1;
+    else
+      high = mid;
+  }
+
+  if (!low || m_globalResolveInfos[low - 1].bytecodeOffset != bytecodeOffset)
+    return false;
+  return true;
+}
+#endif
+
+#if ENABLE(JIT)
 void CodeBlock::setJITCode(JITCodeRef& jitCode) {
   m_jitCode = jitCode;
 #if !ENABLE(OPCODE_SAMPLING)
