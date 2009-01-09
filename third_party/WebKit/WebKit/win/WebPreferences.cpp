@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2008 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008, 2009 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -278,6 +278,8 @@ void WebPreferences::initializeDefaultSettings() {
                        kCFBooleanTrue);
   CFDictionaryAddValue(defaults, CFSTR(WebKitFontSmoothingTypePreferenceKey),
                        CFSTR("2"));
+  CFDictionaryAddValue(
+      defaults, CFSTR(WebKitFontSmoothingContrastPreferenceKey), CFSTR("2"));
   CFDictionaryAddValue(defaults,
                        CFSTR(WebKitCookieStorageAcceptPolicyPreferenceKey),
                        CFSTR("2"));
@@ -399,6 +401,15 @@ void WebPreferences::setStringValue(CFStringRef key, LPCTSTR value) {
 
 void WebPreferences::setIntegerValue(CFStringRef key, int value) {
   if (integerValueForKey(key) == value)
+    return;
+
+  setValueForKey(key, cfNumber(value).get());
+
+  postPreferencesChangesNotification();
+}
+
+void WebPreferences::setFloatValue(CFStringRef key, float value) {
+  if (floatValueForKey(key) == value)
     return;
 
   setValueForKey(key, cfNumber(value).get());
@@ -984,8 +995,21 @@ HRESULT STDMETHODCALLTYPE WebPreferences::setFontSmoothing(
     /* [in] */ FontSmoothingType smoothingType) {
   setIntegerValue(CFSTR(WebKitFontSmoothingTypePreferenceKey), smoothingType);
   if (smoothingType == FontSmoothingTypeWindows)
-    smoothingType = FontSmoothingTypeStandard;
+    smoothingType = FontSmoothingTypeMedium;
   wkSetFontSmoothingLevel((int)smoothingType);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebPreferences::fontSmoothingContrast(
+    /* [retval][out] */ float* contrast) {
+  *contrast = floatValueForKey(CFSTR(WebKitFontSmoothingContrastPreferenceKey));
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebPreferences::setFontSmoothingContrast(
+    /* [in] */ float contrast) {
+  setFloatValue(CFSTR(WebKitFontSmoothingContrastPreferenceKey), contrast);
+  wkSetFontSmoothingContrast(contrast);
   return S_OK;
 }
 
