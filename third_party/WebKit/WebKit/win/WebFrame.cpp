@@ -1283,9 +1283,11 @@ ResourceError WebFrame::blockedError(const ResourceRequest& request) {
                        request.url().string(), String());
 }
 
-ResourceError WebFrame::cannotShowURLError(const ResourceRequest&) {
-  notImplemented();
-  return ResourceError();
+ResourceError WebFrame::cannotShowURLError(const ResourceRequest& request) {
+  // FIXME: Need to implement the String descriptions for errors in the
+  // WebKitErrorDomain and have them localized
+  return ResourceError(String(WebKitErrorDomain), WebKitErrorCannotShowURL,
+                       request.url().string(), String());
 }
 
 ResourceError WebFrame::interruptForPolicyChangeError(
