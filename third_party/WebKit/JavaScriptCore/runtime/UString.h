@@ -2,6 +2,7 @@
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
+ *  Copyright (c) 2009, Google Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -29,6 +30,7 @@
 #include <wtf/Assertions.h>
 #include <wtf/FastMalloc.h>
 #include <wtf/PassRefPtr.h>
+#include <wtf/PtrAndFlags.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 #include <wtf/unicode/Unicode.h>
@@ -109,18 +111,22 @@ class UString {
     }
 
     IdentifierTable* identifierTable() const {
-      return reinterpret_cast<IdentifierTable*>(m_identifierTable &
-                                                ~static_cast<uintptr_t>(1));
+      return m_identifierTableAndFlags.get();
     }
     void setIdentifierTable(IdentifierTable* table) {
       ASSERT(!isStatic());
-      m_identifierTable = reinterpret_cast<intptr_t>(table);
+      m_identifierTableAndFlags.set(table);
     }
 
-    bool isStatic() const { return m_identifierTable & 1; }
+    bool isStatic() const {
+      return m_identifierTableAndFlags.isFlagSet(StaticFlag);
+    }
     void setStatic(bool v) {
       ASSERT(!identifierTable());
-      m_identifierTable = v;
+      if (v)
+        m_identifierTableAndFlags.setFlag(StaticFlag);
+      else
+        m_identifierTableAndFlags.clearFlag(StaticFlag);
     }
 
     Rep* ref() {
@@ -133,6 +139,7 @@ class UString {
     }
 
     void checkConsistency() const;
+    enum UStringFlags { StaticFlag };
 
     // unshared data
     int offset;
@@ -141,9 +148,7 @@ class UString {
              // correct count, because ref/deref are not thread-safe. A special
              // case in destroy() guarantees that these do not get deleted.
     mutable unsigned _hash;
-    intptr_t m_identifierTable;  // A pointer to identifier table. The lowest
-                                 // bit is used to indicate whether the string
-                                 // is static (null or empty).
+    PtrAndFlags<IdentifierTable, UStringFlags> m_identifierTableAndFlags;
     UString::Rep* baseString;
     size_t reportedCost;
 
@@ -154,8 +159,13 @@ class UString {
     int usedPreCapacity;
     int preCapacity;
 
-    static Rep null;
-    static Rep empty;
+    static Rep& null() { return *nullBaseString; }
+    static Rep& empty() { return *emptyBaseString; }
+
+   private:
+    friend void initializeUString();
+    static Rep* nullBaseString;
+    static Rep* emptyBaseString;
   };
 
  public:
@@ -224,7 +234,7 @@ class UString {
 
   const UChar* data() const { return m_rep->data(); }
 
-  bool isNull() const { return (m_rep == &Rep::null); }
+  bool isNull() const { return (m_rep == &Rep::null()); }
   bool isEmpty() const { return (!m_rep->len); }
 
   bool is8Bit() const;
@@ -250,7 +260,7 @@ class UString {
 
   UString substr(int pos = 0, int len = -1) const;
 
-  static const UString& null();
+  static const UString& null() { return *nullUString; }
 
   Rep* rep() const { return m_rep.get(); }
   static Rep* nullRep();
@@ -267,7 +277,9 @@ class UString {
   void makeNull();
 
   RefPtr<Rep> m_rep;
+  static UString* nullUString;
 
+  friend void initializeUString();
   friend bool operator==(const UString&, const UString&);
   friend PassRefPtr<Rep> concatenate(Rep*, Rep*);  // returns 0 if out of memory
 };
@@ -313,7 +325,7 @@ bool equal(const UString::Rep*, const UString::Rep*);
 inline void UString::Rep::checkConsistency() const {}
 #endif
 
-inline UString::UString() : m_rep(&Rep::null) {}
+inline UString::UString() : m_rep(&Rep::null()) {}
 
 // Rule from ECMA 15.2 about what an array index is.
 // Must exactly match string form of an unsigned integer, and be less than 2^32
@@ -356,6 +368,7 @@ struct IdentifierRepHash : PtrHash<RefPtr<JSC::UString::Rep>> {
   static unsigned hash(JSC::UString::Rep* key) { return key->computedHash(); }
 };
 
+void initializeUString();
 }  // namespace JSC
 
 namespace WTF {

@@ -48,9 +48,9 @@ static pthread_once_t initializeThreadingKeyOnce = PTHREAD_ONCE_INIT;
 
 static void initializeThreadingOnce() {
   WTF::initializeThreading();
+  initializeUString();
 #if ENABLE(JSC_MULTIPLE_THREADS)
   s_dtoaP5Mutex = new Mutex;
-  UString::null();
   initDateMath();
 #endif
 }
