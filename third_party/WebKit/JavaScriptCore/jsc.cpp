@@ -350,6 +350,9 @@ int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
 #endif
 
+  // Initialize JSC before getting JSGlobalData.
+  JSC::initializeThreading();
+
   // We can't use destructors in the following code because it uses Windows
   // Structured Exception Handling
   int res = 0;
@@ -519,8 +522,6 @@ static void parseArguments(int argc, char** argv, Options& options) {
 }
 
 int jscmain(int argc, char** argv, JSGlobalData* globalData) {
-  JSC::initializeThreading();
-
   JSLock lock(false);
 
   Options options;
