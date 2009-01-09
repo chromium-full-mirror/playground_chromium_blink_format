@@ -84,7 +84,7 @@ class Event : public RefCounted<Event> {
 
   bool bubbles() const { return m_canBubble; }
   bool cancelable() const { return m_cancelable; }
-  DOMTimeStamp timeStamp() { return m_createTime; }
+  DOMTimeStamp timeStamp() const { return m_createTime; }
   void stopPropagation() { m_propagationStopped = true; }
 
   // IE Extensions
