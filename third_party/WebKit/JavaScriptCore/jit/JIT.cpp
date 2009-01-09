@@ -1818,9 +1818,6 @@ void JIT::privateCompile() {
       m_globalData->poolForSize(m_assembler.size());
   void* code = m_assembler.executableCopy(allocator.get());
   JITCodeRef codeRef(code, allocator);
-#ifndef NDEBUG
-  codeRef.codeSize = m_assembler.size();
-#endif
 
   PatchBuffer patchBuffer(code);
 
@@ -1870,20 +1867,15 @@ void JIT::privateCompile() {
     handler.nativeCode = patchBuffer.addressOf(m_labels[handler.target]);
   }
 
+  m_codeBlock->pcVector().reserveCapacity(m_calls.size());
   for (Vector<CallRecord>::iterator iter = m_calls.begin();
        iter != m_calls.end(); ++iter) {
     if (iter->to)
       patchBuffer.link(iter->from, iter->to);
-  }
-
-  if (m_codeBlock->hasExceptionInfo()) {
-    m_codeBlock->pcVector().reserveCapacity(m_calls.size());
-    for (Vector<CallRecord>::iterator iter = m_calls.begin();
-         iter != m_calls.end(); ++iter)
-      m_codeBlock->pcVector().append(
-          PC(reinterpret_cast<void**>(patchBuffer.addressOf(iter->from)) -
-                 reinterpret_cast<void**>(code),
-             iter->bytecodeIndex));
+    m_codeBlock->pcVector().append(
+        PC(reinterpret_cast<void**>(patchBuffer.addressOf(iter->from)) -
+               reinterpret_cast<void**>(code),
+           iter->bytecodeIndex));
   }
 
   // Link absolute addresses for jsr

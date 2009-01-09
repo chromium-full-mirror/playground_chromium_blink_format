@@ -68,29 +68,12 @@ struct HandlerInfo {
 // The code, and the associated pool from which it was allocated.
 struct JITCodeRef {
   void* code;
-#ifndef NDEBUG
-  unsigned codeSize;
-#endif
   RefPtr<ExecutablePool> executablePool;
 
-  JITCodeRef()
-      : code(0)
-#ifndef NDEBUG
-        ,
-        codeSize(0)
-#endif
-  {
-  }
+  JITCodeRef() : code(0) {}
 
   JITCodeRef(void* code, PassRefPtr<ExecutablePool> executablePool)
-      : code(code)
-#ifndef NDEBUG
-        ,
-        codeSize(0)
-#endif
-        ,
-        executablePool(executablePool) {
-  }
+      : code(code), executablePool(executablePool) {}
 };
 #endif
 
@@ -146,12 +129,10 @@ struct FunctionRegisterInfo {
 };
 
 struct GlobalResolveInfo {
-  GlobalResolveInfo(unsigned bytecodeOffset)
-      : structure(0), offset(0), bytecodeOffset(bytecodeOffset) {}
+  GlobalResolveInfo() : structure(0), offset(0) {}
 
   Structure* structure;
   unsigned offset;
-  unsigned bytecodeOffset;
 };
 
 struct PC {
@@ -307,13 +288,11 @@ class CodeBlock {
         m_callLinkInfos.begin(), m_callLinkInfos.size(), returnAddress));
   }
 
-  unsigned getBytecodeIndex(CallFrame* callFrame, void* nativePC) {
-    reparseForExceptionInfoIfNecessary(callFrame);
+  unsigned getBytecodeIndex(void* nativePC) {
     ptrdiff_t nativePCOffset = reinterpret_cast<void**>(nativePC) -
                                reinterpret_cast<void**>(m_jitCode.code);
     return binaryChop<PC, ptrdiff_t, getNativePCOffset>(
-               m_exceptionInfo->m_pcVector.begin(),
-               m_exceptionInfo->m_pcVector.size(), nativePCOffset)
+               m_pcVector.begin(), m_pcVector.size(), nativePCOffset)
         ->bytecodeIndex;
   }
 
@@ -364,10 +343,9 @@ class CodeBlock {
   void addPropertyAccessInstruction(unsigned propertyAccessInstruction) {
     m_propertyAccessInstructions.append(propertyAccessInstruction);
   }
-  void addGlobalResolveInstruction(unsigned globalResolveInstruction) {
-    m_globalResolveInstructions.append(globalResolveInstruction);
+  void addGlobalResolveInstruction(unsigned globalResolveInstructions) {
+    m_globalResolveInstructions.append(globalResolveInstructions);
   }
-  bool hasGlobalResolveInstructionAtBytecodeOffset(unsigned bytecodeOffset);
 #else
   size_t numberOfStructureStubInfos() const {
     return m_structureStubInfos.size();
@@ -379,13 +357,12 @@ class CodeBlock {
     return m_structureStubInfos[index];
   }
 
-  void addGlobalResolveInfo(unsigned globalResolveInstruction) {
-    m_globalResolveInfos.append(GlobalResolveInfo(globalResolveInstruction));
+  void addGlobalResolveInfo() {
+    m_globalResolveInfos.append(GlobalResolveInfo());
   }
   GlobalResolveInfo& globalResolveInfo(int index) {
     return m_globalResolveInfos[index];
   }
-  bool hasGlobalResolveInfoAtBytecodeOffset(unsigned bytecodeOffset);
 
   size_t numberOfCallLinkInfos() const { return m_callLinkInfos.size(); }
   void addCallLinkInfo() { m_callLinkInfos.append(CallLinkInfo()); }
@@ -396,6 +373,8 @@ class CodeBlock {
     m_rareData->m_functionRegisterInfos.append(
         FunctionRegisterInfo(bytecodeOffset, functionIndex));
   }
+
+  Vector<PC>& pcVector() { return m_pcVector; }
 #endif
 
   // Exception handling support
@@ -412,7 +391,6 @@ class CodeBlock {
     return m_rareData->m_exceptionHandlers[index];
   }
 
-  bool hasExceptionInfo() const { return m_exceptionInfo; }
   void clearExceptionInfo() { m_exceptionInfo.clear(); }
 
   void addExpressionInfo(const ExpressionRangeInfo& expressionInfo) {
@@ -436,13 +414,6 @@ class CodeBlock {
     ASSERT(m_exceptionInfo);
     return m_exceptionInfo->m_lineInfo.last();
   }
-
-#if ENABLE(JIT)
-  Vector<PC>& pcVector() {
-    ASSERT(m_exceptionInfo);
-    return m_exceptionInfo->m_pcVector;
-  }
-#endif
 
   // Constant Pool
 
@@ -605,6 +576,8 @@ class CodeBlock {
   Vector<GlobalResolveInfo> m_globalResolveInfos;
   Vector<CallLinkInfo> m_callLinkInfos;
   Vector<CallLinkInfo*> m_linkedCallerList;
+
+  Vector<PC> m_pcVector;
 #endif
 
   Vector<unsigned> m_jumpTargets;
@@ -620,10 +593,6 @@ class CodeBlock {
     Vector<ExpressionRangeInfo> m_expressionInfo;
     Vector<LineInfo> m_lineInfo;
     Vector<GetByIdExceptionInfo> m_getByIdExceptionInfo;
-
-#if ENABLE(JIT)
-    Vector<PC> m_pcVector;
-#endif
   };
   OwnPtr<ExceptionInfo> m_exceptionInfo;
 
@@ -679,15 +648,8 @@ class EvalCodeBlock : public ProgramCodeBlock {
  public:
   EvalCodeBlock(ScopeNode* ownerNode,
                 JSGlobalObject* globalObject,
-                PassRefPtr<SourceProvider> sourceProvider,
-                int baseScopeDepth)
-      : ProgramCodeBlock(ownerNode, EvalCode, globalObject, sourceProvider),
-        m_baseScopeDepth(baseScopeDepth) {}
-
-  int baseScopeDepth() const { return m_baseScopeDepth; }
-
- private:
-  int m_baseScopeDepth;
+                PassRefPtr<SourceProvider> sourceProvider)
+      : ProgramCodeBlock(ownerNode, EvalCode, globalObject, sourceProvider) {}
 };
 
 }  // namespace JSC

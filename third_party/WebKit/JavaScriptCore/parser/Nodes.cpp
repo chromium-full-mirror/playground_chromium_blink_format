@@ -2699,8 +2699,7 @@ void EvalNode::generateBytecode(ScopeChainNode* scopeChainNode) {
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
-  m_code.set(new EvalCodeBlock(this, globalObject, source().provider(),
-                               scopeChain.localDepth()));
+  m_code.set(new EvalCodeBlock(this, globalObject, source().provider()));
 
   BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
                               &m_code->symbolTable(), m_code.get());
@@ -2713,19 +2712,17 @@ void EvalNode::generateBytecode(ScopeChainNode* scopeChainNode) {
 }
 
 EvalCodeBlock& EvalNode::bytecodeForExceptionInfoReparse(
-    ScopeChainNode* scopeChainNode,
-    CodeBlock* codeBlockBeingRegeneratedFrom) {
+    ScopeChainNode* scopeChainNode) {
   ASSERT(!m_code);
 
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
-  m_code.set(new EvalCodeBlock(this, globalObject, source().provider(),
-                               scopeChain.localDepth()));
+  m_code.set(new EvalCodeBlock(this, globalObject, source().provider()));
 
   BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
                               &m_code->symbolTable(), m_code.get());
-  generator.setRegeneratingForExceptionInfo(codeBlockBeingRegeneratedFrom);
+  generator.setRegeneratingForExceptionInfo();
   generator.generate();
 
   return *m_code;
@@ -2824,8 +2821,7 @@ void FunctionBodyNode::generateBytecode(ScopeChainNode* scopeChainNode) {
 }
 
 CodeBlock& FunctionBodyNode::bytecodeForExceptionInfoReparse(
-    ScopeChainNode* scopeChainNode,
-    CodeBlock* codeBlockBeingRegeneratedFrom) {
+    ScopeChainNode* scopeChainNode) {
   ASSERT(!m_code);
 
   ScopeChain scopeChain(scopeChainNode);
@@ -2836,7 +2832,7 @@ CodeBlock& FunctionBodyNode::bytecodeForExceptionInfoReparse(
 
   BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
                               &m_code->symbolTable(), m_code.get());
-  generator.setRegeneratingForExceptionInfo(codeBlockBeingRegeneratedFrom);
+  generator.setRegeneratingForExceptionInfo();
   generator.generate();
 
   return *m_code;
