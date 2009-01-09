@@ -2115,15 +2115,6 @@ void QWebPage::updatePositionDependentActions(const QPoint& pos) {
 */
 
 /*!
-    \class QWebPage::ExtensionOption
-    \since 4.4
-    \brief The ExtensionOption class provides an extended input argument to
-   QWebPage's extension support.
-
-    \sa QWebPage::extension()
-*/
-
-/*!
     \class QWebPage::ChooseMultipleFilesExtensionOption
     \since 4.5
     \brief The ChooseMultipleFilesExtensionOption class describes the option
@@ -2159,6 +2150,9 @@ void QWebPage::updatePositionDependentActions(const QPoint& pos) {
 
     You can call supportsExtension() to check if an extension is supported by
    the page.
+
+    Returns true if the extension was called successfully; otherwise returns
+   false.
 
     \sa supportsExtension(), Extension
 */
@@ -2611,7 +2605,7 @@ quint64 QWebPage::bytesReceived() const {
     This signal is emitted whenever the text in form elements changes
     as well as other editable content.
 
-    \sa contentEditable(), QWebFrame::toHtml(), QWebFrame::toPlainText()
+    \sa contentEditable, QWebFrame::toHtml(), QWebFrame::toPlainText()
 */
 
 /*!
@@ -2754,7 +2748,11 @@ quint64 QWebPage::bytesReceived() const {
   item);
 
   This signal is emitted shortly before the history of navigated pages
-  is changed, for example when navigating back in the history.
+  in \a frame is changed, for example when navigating back in the history.
+
+  The provided QWebHistoryItem, \a item, holds the history entry of the frame
+  before
+  the change.
 
   A potential use-case for this signal is to store custom data in
   the QWebHistoryItem associated to the frame, using
@@ -2765,8 +2763,8 @@ quint64 QWebPage::bytesReceived() const {
   \since 4.5
   \fn void QWebPage::restoreFrameStateRequested(QWebFrame* frame);
 
-  This signal is emitted when the load is finished and the application may now
-  update its state accordingly.
+  This signal is emitted when the load of \a frame is finished and the
+  application may now update its state accordingly.
 */
 
 #include "moc_qwebpage.cpp"
