@@ -188,6 +188,7 @@ class X86Assembler {
     GROUP2_OP_SAR = 7,
 
     GROUP3_OP_TEST = 0,
+    GROUP3_OP_NOT = 2,
     GROUP3_OP_IDIV = 7,
 
     GROUP5_OP_CALLN = 2,
@@ -337,6 +338,10 @@ class X86Assembler {
     }
   }
 #endif
+
+  void notl_r(RegisterID dst) {
+    m_formatter.oneByteOp(OP_GROUP3_Ev, GROUP3_OP_NOT, dst);
+  }
 
   void orl_rr(RegisterID src, RegisterID dst) {
     m_formatter.oneByteOp(OP_OR_EvGv, src, dst);
@@ -665,7 +670,7 @@ class X86Assembler {
   }
 
   void testq_i32r(int imm, RegisterID dst) {
-    m_formatter.oneByteOp64(OP_GROUP1_EvIz, GROUP3_OP_TEST, dst);
+    m_formatter.oneByteOp64(OP_GROUP3_EvIz, GROUP3_OP_TEST, dst);
     m_formatter.immediate32(imm);
   }
 
