@@ -34,6 +34,7 @@
 #include "DOMHTMLClasses.h"
 #include "EmbeddedWidget.h"
 #include "MarshallingHelpers.h"
+#include "NotImplemented.h"
 #include "WebCachedPagePlatformData.h"
 #include "WebChromeClient.h"
 #include "WebDocumentLoader.h"
@@ -128,6 +129,7 @@ void WebFrameLoaderClient::dispatchDidReceiveAuthenticationChallenge(
     DocumentLoader* loader,
     unsigned long identifier,
     const AuthenticationChallenge& challenge) {
+#if USE(CFNETWORK)
   ASSERT(challenge.sourceHandle());
 
   WebView* webView = m_webFrame->webView();
@@ -146,6 +148,9 @@ void WebFrameLoaderClient::dispatchDidReceiveAuthenticationChallenge(
   // behavior
   challenge.sourceHandle()->receivedRequestToContinueWithoutCredential(
       challenge);
+#else
+  notImplemented();
+#endif
 }
 
 void WebFrameLoaderClient::dispatchDidCancelAuthenticationChallenge(
@@ -534,6 +539,7 @@ void WebFrameLoaderClient::setTitle(const String& title, const KURL& url) {
 
 void WebFrameLoaderClient::savePlatformDataToCachedPage(
     CachedPage* cachedPage) {
+#if ENABLE(CFNETWORK)
   Frame* coreFrame = core(m_webFrame);
   if (!coreFrame)
     return;
@@ -544,6 +550,9 @@ void WebFrameLoaderClient::savePlatformDataToCachedPage(
       new WebCachedPagePlatformData(static_cast<IWebDataSource*>(
           getWebDataSource(coreFrame->loader()->documentLoader())));
   cachedPage->setCachedPagePlatformData(webPlatformData);
+#else
+  notImplemented();
+#endif
 }
 
 void WebFrameLoaderClient::transitionToCommittedForNewPage() {

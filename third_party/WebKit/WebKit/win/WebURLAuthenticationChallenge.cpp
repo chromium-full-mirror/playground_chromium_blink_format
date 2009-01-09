@@ -150,15 +150,16 @@ WebURLAuthenticationChallenge::initWithProtectionSpace(
   if (!webSender)
     return E_NOINTERFACE;
 
-  // FIXME: After we change AuthenticationChallenge to use "ResourceHandle" as
-  // the abstract "Sender" or "Source of this Auth Challenge", then we'll
-  // construct the AuthenticationChallenge with that as obtained from the
-  // webSender
-
+// FIXME: After we change AuthenticationChallenge to use "ResourceHandle" as the
+// abstract "Sender" or "Source of this Auth Challenge", then we'll
+// construct the AuthenticationChallenge with that as obtained from the
+// webSender
+#if USE(CFNETWORK)
   m_authenticationChallenge = AuthenticationChallenge(
       webSpace->protectionSpace(), webCredential->credential(),
       previousFailureCount, webResponse->resourceResponse(),
       webError->resourceError());
+#endif
   return S_OK;
 }
 
