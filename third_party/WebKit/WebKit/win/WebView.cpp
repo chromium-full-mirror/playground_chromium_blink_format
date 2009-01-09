@@ -1774,7 +1774,10 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
                                        LPARAM lParam) {
   LRESULT lResult = 0;
   LONG_PTR longPtr = GetWindowLongPtr(hWnd, 0);
-  WebView* webView = reinterpret_cast<WebView*>(longPtr);
+  COMPtr<WebView> webView =
+      reinterpret_cast<WebView*>(longPtr);  // hold a ref, since the WebView
+                                            // could go away in an event
+                                            // handler.
   WebFrame* mainFrameImpl = webView ? webView->topLevelFrame() : 0;
   if (!mainFrameImpl || webView->isBeingDestroyed())
     return DefWindowProc(hWnd, message, wParam, lParam);
@@ -1876,7 +1879,7 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
           SUCCEEDED(uiDelegate->QueryInterface(IID_IWebUIDelegatePrivate,
                                                (void**)&uiDelegatePrivate)) &&
           uiDelegatePrivate)
-        uiDelegatePrivate->webViewReceivedFocus(webView);
+        uiDelegatePrivate->webViewReceivedFocus(webView.get());
 
       FocusController* focusController = webView->page()->focusController();
       if (Frame* frame = focusController->focusedFrame()) {
@@ -1896,7 +1899,7 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
           SUCCEEDED(uiDelegate->QueryInterface(IID_IWebUIDelegatePrivate,
                                                (void**)&uiDelegatePrivate)) &&
           uiDelegatePrivate)
-        uiDelegatePrivate->webViewLostFocus(webView,
+        uiDelegatePrivate->webViewLostFocus(webView.get(),
                                             (OLE_HANDLE)(ULONG64)newFocusWnd);
 
       FocusController* focusController = webView->page()->focusController();
@@ -1975,7 +1978,7 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
           SUCCEEDED(uiDelegate->QueryInterface(IID_IWebUIDelegatePrivate,
                                                (void**)&uiDelegatePrivate)) &&
           uiDelegatePrivate && SUCCEEDED(uiDelegatePrivate->webViewGetDlgCode(
-                                   webView, keyCode, &dlgCode)))
+                                   webView.get(), keyCode, &dlgCode)))
         return dlgCode;
       handled = false;
       break;
