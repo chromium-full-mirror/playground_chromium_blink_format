@@ -299,6 +299,7 @@ class EventHandler : Noncopyable {
   bool passMouseDownEventToWidget(Widget*);
   bool passWheelEventToWidget(PlatformWheelEvent&, Widget*);
 
+  void defaultSpaceEventHandler(KeyboardEvent*);
   void defaultTabEventHandler(KeyboardEvent*);
 
   void allowDHTMLDrag(bool& flagDHTML, bool& flagUA) const;
