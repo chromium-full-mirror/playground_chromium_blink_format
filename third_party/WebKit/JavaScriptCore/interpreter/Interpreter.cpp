@@ -5610,10 +5610,45 @@ JSValueEncodedAsPointer* Interpreter::cti_op_get_by_val(STUB_ARGS) {
       return JSValuePtr::encode(
           asString(baseValue)->getIndex(ARG_globalData, i));
     else if (interpreter->isJSByteArray(baseValue) &&
-             asByteArray(baseValue)->canAccessIndex(i))
+             asByteArray(baseValue)->canAccessIndex(i)) {
+      ctiPatchCallByReturnAddress(
+          STUB_RETURN_ADDRESS,
+          reinterpret_cast<void*>(cti_op_get_by_val_byte_array));
       return JSValuePtr::encode(asByteArray(baseValue)->getIndex(i));
-    else
+    } else
       result = baseValue->get(callFrame, i);
+  } else {
+    Identifier property(callFrame, subscript->toString(callFrame));
+    result = baseValue->get(callFrame, property);
+  }
+
+  CHECK_FOR_EXCEPTION_AT_END();
+  return JSValuePtr::encode(result);
+}
+
+JSValueEncodedAsPointer* Interpreter::cti_op_get_by_val_byte_array(STUB_ARGS) {
+  BEGIN_STUB_FUNCTION();
+
+  CallFrame* callFrame = ARG_callFrame;
+  Interpreter* interpreter = ARG_globalData->interpreter;
+
+  JSValuePtr baseValue = ARG_src1;
+  JSValuePtr subscript = ARG_src2;
+
+  JSValuePtr result;
+  unsigned i;
+
+  bool isUInt32 = JSImmediate::getUInt32(subscript, i);
+  if (LIKELY(isUInt32)) {
+    if (interpreter->isJSByteArray(baseValue) &&
+        asByteArray(baseValue)->canAccessIndex(i))
+      return JSValuePtr::encode(asByteArray(baseValue)->getIndex(i));
+    else {
+      result = baseValue->get(callFrame, i);
+      if (!interpreter->isJSByteArray(baseValue))
+        ctiPatchCallByReturnAddress(STUB_RETURN_ADDRESS,
+                                    reinterpret_cast<void*>(cti_op_get_by_val));
+    }
   } else {
     Identifier property(callFrame, subscript->toString(callFrame));
     result = baseValue->get(callFrame, property);
@@ -5711,6 +5746,9 @@ void Interpreter::cti_op_put_by_val(STUB_ARGS) {
                asByteArray(baseValue)->canAccessIndex(i)) {
       JSByteArray* jsByteArray = asByteArray(baseValue);
       double dValue = 0;
+      ctiPatchCallByReturnAddress(
+          STUB_RETURN_ADDRESS,
+          reinterpret_cast<void*>(cti_op_put_by_val_byte_array));
       if (JSImmediate::isNumber(value)) {
         jsByteArray->setIndex(i, JSImmediate::getTruncatedInt32(value));
         return;
@@ -5749,6 +5787,50 @@ void Interpreter::cti_op_put_by_val_array(STUB_ARGS) {
   else {
     Identifier property(callFrame, JSImmediate::from(i)->toString(callFrame));
     // FIXME: can toString throw an exception here?
+    if (!ARG_globalData->exception) {  // Don't put to an object if toString
+                                       // threw an exception.
+      PutPropertySlot slot;
+      baseValue->put(callFrame, property, value, slot);
+    }
+  }
+
+  CHECK_FOR_EXCEPTION_AT_END();
+}
+
+void Interpreter::cti_op_put_by_val_byte_array(STUB_ARGS) {
+  BEGIN_STUB_FUNCTION();
+
+  CallFrame* callFrame = ARG_callFrame;
+  Interpreter* interpreter = ARG_globalData->interpreter;
+
+  JSValuePtr baseValue = ARG_src1;
+  JSValuePtr subscript = ARG_src2;
+  JSValuePtr value = ARG_src3;
+
+  unsigned i;
+
+  bool isUInt32 = JSImmediate::getUInt32(subscript, i);
+  if (LIKELY(isUInt32)) {
+    if (interpreter->isJSByteArray(baseValue) &&
+        asByteArray(baseValue)->canAccessIndex(i)) {
+      JSByteArray* jsByteArray = asByteArray(baseValue);
+      double dValue = 0;
+      if (JSImmediate::isNumber(value)) {
+        jsByteArray->setIndex(i, JSImmediate::getTruncatedInt32(value));
+        return;
+      } else if (fastIsNumber(value, dValue)) {
+        jsByteArray->setIndex(i, dValue);
+        return;
+      } else
+        baseValue->put(callFrame, i, value);
+    } else {
+      if (!interpreter->isJSByteArray(baseValue))
+        ctiPatchCallByReturnAddress(STUB_RETURN_ADDRESS,
+                                    reinterpret_cast<void*>(cti_op_put_by_val));
+      baseValue->put(callFrame, i, value);
+    }
+  } else {
+    Identifier property(callFrame, subscript->toString(callFrame));
     if (!ARG_globalData->exception) {  // Don't put to an object if toString
                                        // threw an exception.
       PutPropertySlot slot;
