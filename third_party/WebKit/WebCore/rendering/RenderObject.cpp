@@ -3097,8 +3097,8 @@ void RenderObject::scheduleRelayout() {
 
 void RenderObject::removeLeftoverAnonymousBlock(RenderBlock*) {}
 
-InlineBox* RenderObject::createInlineBox(bool, bool isRootLineBox, bool) {
-  ASSERT(!isRootLineBox);
+InlineBox* RenderObject::createInlineBox(bool, bool unusedIsRootLineBox, bool) {
+  ASSERT_UNUSED(unusedIsRootLineBox, !unusedIsRootLineBox);
   return new (renderArena()) InlineBox(this);
 }
 

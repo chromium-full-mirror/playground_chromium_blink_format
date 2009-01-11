@@ -324,8 +324,8 @@ void XMLTokenizer::insertErrorMessageBlock() {
   doc->updateRendering();
 }
 
-void XMLTokenizer::notifyFinished(CachedResource* finishedObj) {
-  ASSERT(m_pendingScript == finishedObj);
+void XMLTokenizer::notifyFinished(CachedResource* unusedResource) {
+  ASSERT_UNUSED(unusedResource, unusedResource == m_pendingScript);
   ASSERT(m_pendingScript->accessCount() > 0);
 
   ScriptSourceCode sourceCode(m_pendingScript.get());

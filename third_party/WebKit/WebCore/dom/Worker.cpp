@@ -114,8 +114,9 @@ bool Worker::hasPendingActivity() const {
          ActiveDOMObject::hasPendingActivity();
 }
 
-void Worker::notifyFinished(CachedResource* resource) {
-  ASSERT(resource == m_cachedScript.get());
+void Worker::notifyFinished(CachedResource* unusedResource) {
+  ASSERT_UNUSED(unusedResource, unusedResource == m_cachedScript);
+
   if (m_cachedScript->errorOccurred())
     dispatchErrorEvent();
   else {
