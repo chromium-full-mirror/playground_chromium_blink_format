@@ -221,7 +221,7 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren) {
   }
 
   LayoutStateMaintainer statePusher(view(), this, IntSize(m_x, m_y),
-                                    !hasReflection());
+                                    !hasTransform() && !hasReflection());
 
   int previousWidth = m_width;
   int previousHeight = m_height;
