@@ -5607,8 +5607,7 @@ JSValueEncodedAsPointer* Interpreter::cti_op_get_by_val(STUB_ARGS) {
         result = jsArray->JSArray::get(callFrame, i);
     } else if (interpreter->isJSString(baseValue) &&
                asString(baseValue)->canGetIndex(i))
-      result =
-          JSValuePtr::encode(asString(baseValue)->getIndex(ARG_globalData, i));
+      result = asString(baseValue)->getIndex(ARG_globalData, i);
     else if (interpreter->isJSByteArray(baseValue) &&
              asByteArray(baseValue)->canAccessIndex(i)) {
       // All fast byte array accesses are safe from exceptions so return
