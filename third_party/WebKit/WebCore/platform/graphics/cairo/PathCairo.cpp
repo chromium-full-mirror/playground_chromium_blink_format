@@ -281,6 +281,16 @@ bool Path::contains(const FloatPoint& point, WindRule rule) const {
   return contains;
 }
 
+bool Path::strokeContains(StrokeStyleApplier* applier,
+                          const FloatPoint& point) const {
+  ASSERT(applier);
+  cairo_t* cr = platformPath()->m_cr;
+  GraphicsContext gc(cr);
+  applier->strokeStyle(&gc);
+
+  return cairo_in_stroke(cr, point.x(), point.y());
+}
+
 void Path::apply(void* info, PathApplierFunction function) const {
   cairo_t* cr = platformPath()->m_cr;
   cairo_path_t* path = cairo_copy_path(cr);
