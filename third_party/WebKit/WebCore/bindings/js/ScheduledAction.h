@@ -26,10 +26,15 @@
 #include <runtime/Protect.h>
 #include <wtf/Vector.h>
 
+namespace JSC {
+class JSGlobalObject;
+}
+
 namespace WebCore {
 
-class JSDOMWindowShell;
+class Document;
 class ScriptExecutionContext;
+class WorkerContext;
 
 /* An action (either function or string) to be executed after a specified
  * time interval, either once or repeatedly. Used for window.setTimeout()
@@ -45,7 +50,12 @@ class ScheduledAction {
   void execute(ScriptExecutionContext*);
 
  private:
-  void execute(JSDOMWindowShell*);
+  void executeFunctionInContext(JSC::JSGlobalObject*,
+                                JSC::JSValuePtr thisValue);
+  void execute(Document*);
+#if ENABLE(WORKERS)
+  void execute(WorkerContext*);
+#endif
 
   JSC::ProtectedJSValuePtr m_function;
   Vector<JSC::ProtectedJSValuePtr> m_args;
