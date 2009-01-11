@@ -105,7 +105,6 @@
 #include "Settings.h"
 #include "StorageEvent.h"
 #include "StyleSheetList.h"
-#include "SystemTime.h"
 #include "TextEvent.h"
 #include "TextIterator.h"
 #include "TextResourceDecoder.h"
@@ -120,6 +119,7 @@
 #include "XMLTokenizer.h"
 #include "JSDOMBinding.h"
 #include "ScriptController.h"
+#include <wtf/CurrentTime.h>
 #include <wtf/HashFunctions.h>
 #include <wtf/MainThread.h>
 #include <wtf/StdLibExtras.h>

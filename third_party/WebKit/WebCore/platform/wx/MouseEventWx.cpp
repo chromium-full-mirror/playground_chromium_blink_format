@@ -26,7 +26,7 @@
 #include "config.h"
 #include "Assertions.h"
 #include "PlatformMouseEvent.h"
-#include "SystemTime.h"
+#include <wtf/CurrentTime.h>
 
 #include <wx/defs.h>
 #include <wx/event.h>
@@ -71,6 +71,6 @@ PlatformMouseEvent::PlatformMouseEvent(const wxMouseEvent& event,
   else
     m_clickCount = event.ButtonDClick() ? 2 : 1;
 
-  m_timestamp = WebCore::currentTime();
+  m_timestamp = WTF::currentTime();
 }
 }

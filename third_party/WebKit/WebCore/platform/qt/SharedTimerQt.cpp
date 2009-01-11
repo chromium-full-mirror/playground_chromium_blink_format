@@ -29,7 +29,7 @@
 
 #include "config.h"
 
-#include "SystemTime.h"
+#include <wtf/CurrentTime.h>
 
 #include <QBasicTimer>
 #include <QCoreApplication>
