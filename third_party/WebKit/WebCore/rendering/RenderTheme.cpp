@@ -390,6 +390,7 @@ bool RenderTheme::paintDecorations(RenderObject* o,
   return false;
 }
 
+#if ENABLE(VIDEO)
 String RenderTheme::styleSheetForMediaControls() {
   return String(mediaControlsUserAgentStyleSheet,
                 sizeof(mediaControlsUserAgentStyleSheet));
@@ -402,6 +403,7 @@ bool RenderTheme::hitTestMediaControlPart(RenderObject* o,
 
   return o->borderBox().contains(roundedIntPoint(localPoint));
 }
+#endif
 
 Color RenderTheme::activeSelectionBackgroundColor() const {
   if (!m_activeSelectionColor.isValid())
