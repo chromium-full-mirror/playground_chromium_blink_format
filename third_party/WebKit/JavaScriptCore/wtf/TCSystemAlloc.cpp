@@ -397,8 +397,6 @@ void* TCMalloc_SystemAlloc(size_t size, size_t* actual_size, size_t alignment) {
 }
 
 void TCMalloc_SystemRelease(void* start, size_t length) {
-  UNUSED_PARAM(start);
-  UNUSED_PARAM(length);
 #if HAVE(MADV_DONTNEED)
   if (FLAGS_malloc_devmem_start) {
     // It's not safe to use MADV_DONTNEED if we've been mapping
@@ -445,11 +443,13 @@ void TCMalloc_SystemRelease(void* start, size_t length) {
       newAddress == start || newAddress == reinterpret_cast<void*>(MAP_FAILED));
   return;
 #endif
+
+#if !HAVE(MADV_DONTNEED) && !HAVE(MMAP)
+  UNUSED_PARAM(start);
+  UNUSED_PARAM(length);
+#endif
 }
 
 #if HAVE(VIRTUALALLOC)
-void TCMalloc_SystemCommit(void* start, size_t length) {
-  UNUSED_PARAM(start);
-  UNUSED_PARAM(length);
-}
+void TCMalloc_SystemCommit(void*, size_t) {}
 #endif

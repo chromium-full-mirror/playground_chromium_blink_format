@@ -230,17 +230,19 @@ static JSValuePtr dateProtoFuncToUTCString(ExecState*,
                                            JSObject*,
                                            JSValuePtr,
                                            const ArgList&);
-static JSValuePtr dateProtoFuncValueOf(ExecState*,
-                                       JSObject*,
-                                       JSValuePtr,
-                                       const ArgList&);
 }
 
 #include "DatePrototype.lut.h"
 
 namespace JSC {
 
+enum LocaleDateTimeFormat { LocaleDateAndTime, LocaleDate, LocaleTime };
+
 #if PLATFORM(MAC)
+
+// FIXME: Since this is superior to the strftime-based version, why limit this
+// to PLATFORM(MAC)?
+// Instead we should consider using this whenever PLATFORM(CF) is true.
 
 static CFDateFormatterStyle styleFromArgString(
     const UString& string,
@@ -256,15 +258,17 @@ static CFDateFormatterStyle styleFromArgString(
   return defaultStyle;
 }
 
-static UString formatLocaleDate(ExecState* exec,
-                                double time,
-                                bool includeDate,
-                                bool includeTime,
+static JSCell* formatLocaleDate(ExecState* exec,
+                                DateInstance*,
+                                double timeInMilliseconds,
+                                LocaleDateTimeFormat format,
                                 const ArgList& args) {
   CFDateFormatterStyle dateStyle =
-      (includeDate ? kCFDateFormatterLongStyle : kCFDateFormatterNoStyle);
+      (format != LocaleTime ? kCFDateFormatterLongStyle
+                            : kCFDateFormatterNoStyle);
   CFDateFormatterStyle timeStyle =
-      (includeTime ? kCFDateFormatterLongStyle : kCFDateFormatterNoStyle);
+      (format != LocaleDate ? kCFDateFormatterLongStyle
+                            : kCFDateFormatterNoStyle);
 
   bool useCustomFormat = false;
   UString customFormatString;
@@ -273,12 +277,12 @@ static UString formatLocaleDate(ExecState* exec,
   if (arg0String == "custom" && !args.at(exec, 1)->isUndefined()) {
     useCustomFormat = true;
     customFormatString = args.at(exec, 1)->toString(exec);
-  } else if (includeDate && includeTime && !args.at(exec, 1)->isUndefined()) {
+  } else if (format == LocaleDateAndTime && !args.at(exec, 1)->isUndefined()) {
     dateStyle = styleFromArgString(arg0String, dateStyle);
     timeStyle = styleFromArgString(args.at(exec, 1)->toString(exec), timeStyle);
-  } else if (includeDate && !args.at(exec, 0)->isUndefined())
+  } else if (format != LocaleTime && !args.at(exec, 0)->isUndefined())
     dateStyle = styleFromArgString(arg0String, dateStyle);
-  else if (includeTime && !args.at(exec, 0)->isUndefined())
+  else if (format != LocaleDate && !args.at(exec, 0)->isUndefined())
     timeStyle = styleFromArgString(arg0String, timeStyle);
 
   CFLocaleRef locale = CFLocaleCopyCurrent();
@@ -288,13 +292,14 @@ static UString formatLocaleDate(ExecState* exec,
 
   if (useCustomFormat) {
     CFStringRef customFormatCFString = CFStringCreateWithCharacters(
-        0, (UniChar*)customFormatString.data(), customFormatString.size());
+        0, customFormatString.data(), customFormatString.size());
     CFDateFormatterSetFormat(formatter, customFormatCFString);
     CFRelease(customFormatCFString);
   }
 
   CFStringRef string = CFDateFormatterCreateStringWithAbsoluteTime(
-      0, formatter, time - kCFAbsoluteTimeIntervalSince1970);
+      0, formatter, floor(timeInMilliseconds / msPerSecond) -
+                        kCFAbsoluteTimeIntervalSince1970);
 
   CFRelease(formatter);
 
@@ -308,22 +313,19 @@ static UString formatLocaleDate(ExecState* exec,
   ASSERT(length <= bufferLength);
   if (length > bufferLength)
     length = bufferLength;
-  CFStringGetCharacters(string, CFRangeMake(0, length),
-                        reinterpret_cast<UniChar*>(buffer));
+  CFStringGetCharacters(string, CFRangeMake(0, length), buffer);
 
   CFRelease(string);
 
-  return UString(buffer, length);
+  return jsNontrivialString(exec, UString(buffer, length));
 }
 
-#else
-
-enum LocaleDateTimeFormat { LocaleDateAndTime, LocaleDate, LocaleTime };
+#else  // !PLATFORM(MAC)
 
 static JSCell* formatLocaleDate(ExecState* exec,
                                 const GregorianDateTime& gdt,
-                                const LocaleDateTimeFormat format) {
-  static const char* formatStrings[] = {"%#c", "%#x", "%X"};
+                                LocaleDateTimeFormat format) {
+  static const char* const formatStrings[] = {"%#c", "%#x", "%X"};
 
   // Offset year if needed
   struct tm localTM = gdt;
@@ -355,7 +357,19 @@ static JSCell* formatLocaleDate(ExecState* exec,
   return jsNontrivialString(exec, timebuffer);
 }
 
-#endif  // PLATFORM(WIN_OS)
+static JSCell* formatLocaleDate(ExecState* exec,
+                                DateInstance* dateObject,
+                                double timeInMilliseconds,
+                                LocaleDateTimeFormat format,
+                                const ArgList&) {
+  GregorianDateTime gregorianDateTime;
+  const bool notUTC = false;
+  dateObject->msToGregorianDateTime(timeInMilliseconds, notUTC,
+                                    gregorianDateTime);
+  return formatLocaleDate(exec, gregorianDateTime, format);
+}
+
+#endif  // !PLATFORM(MAC)
 
 // Converts a list of arguments sent to a Date member function into
 // milliseconds, updating
@@ -450,7 +464,6 @@ const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, 0,
                                        ExecState::dateTable};
 
 /* Source for DatePrototype.lut.h
-   FIXME: We could use templates to simplify the UTC variants.
 @begin dateTable
   toString              dateProtoFuncToString                DontEnum|Function 0
   toUTCString           dateProtoFuncToUTCString             DontEnum|Function 0
@@ -459,7 +472,7 @@ const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, 0,
   toLocaleString        dateProtoFuncToLocaleString          DontEnum|Function 0
   toLocaleDateString    dateProtoFuncToLocaleDateString      DontEnum|Function 0
   toLocaleTimeString    dateProtoFuncToLocaleTimeString      DontEnum|Function 0
-  valueOf               dateProtoFuncValueOf                 DontEnum|Function 0
+  valueOf               dateProtoFuncGetTime                 DontEnum|Function 0
   getTime               dateProtoFuncGetTime                 DontEnum|Function 0
   getFullYear           dateProtoFuncGetFullYear             DontEnum|Function 0
   getUTCFullYear        dateProtoFuncGetUTCFullYear          DontEnum|Function 0
@@ -498,6 +511,7 @@ const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, 0,
   getYear               dateProtoFuncGetYear                 DontEnum|Function 0
 @end
 */
+
 // ECMA 15.9.4
 
 DatePrototype::DatePrototype(ExecState* exec, PassRefPtr<Structure> structure)
@@ -604,19 +618,7 @@ JSValuePtr dateProtoFuncToLocaleString(ExecState* exec,
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
 
-#if PLATFORM(MAC)
-  double secs = floor(milli / msPerSecond);
-  return jsNontrivialString(exec,
-                            formatLocaleDate(exec, secs, true, true, args));
-#else
-  UNUSED_PARAM(args);
-
-  const bool utc = false;
-
-  GregorianDateTime t;
-  thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return formatLocaleDate(exec, t, LocaleDateAndTime);
-#endif
+  return formatLocaleDate(exec, thisDateObj, milli, LocaleDateAndTime, args);
 }
 
 JSValuePtr dateProtoFuncToLocaleDateString(ExecState* exec,
@@ -631,19 +633,7 @@ JSValuePtr dateProtoFuncToLocaleDateString(ExecState* exec,
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
 
-#if PLATFORM(MAC)
-  double secs = floor(milli / msPerSecond);
-  return jsNontrivialString(exec,
-                            formatLocaleDate(exec, secs, true, false, args));
-#else
-  UNUSED_PARAM(args);
-
-  const bool utc = false;
-
-  GregorianDateTime t;
-  thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return formatLocaleDate(exec, t, LocaleDate);
-#endif
+  return formatLocaleDate(exec, thisDateObj, milli, LocaleDate, args);
 }
 
 JSValuePtr dateProtoFuncToLocaleTimeString(ExecState* exec,
@@ -658,34 +648,7 @@ JSValuePtr dateProtoFuncToLocaleTimeString(ExecState* exec,
   if (isnan(milli))
     return jsNontrivialString(exec, "Invalid Date");
 
-#if PLATFORM(MAC)
-  double secs = floor(milli / msPerSecond);
-  return jsNontrivialString(exec,
-                            formatLocaleDate(exec, secs, false, true, args));
-#else
-  UNUSED_PARAM(args);
-
-  const bool utc = false;
-
-  GregorianDateTime t;
-  thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return formatLocaleDate(exec, t, LocaleTime);
-#endif
-}
-
-JSValuePtr dateProtoFuncValueOf(ExecState* exec,
-                                JSObject*,
-                                JSValuePtr thisValue,
-                                const ArgList&) {
-  if (!thisValue->isObject(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  DateInstance* thisDateObj = asDateInstance(thisValue);
-  double milli = thisDateObj->internalNumber();
-  if (isnan(milli))
-    return jsNaN(exec);
-
-  return jsNumber(exec, milli);
+  return formatLocaleDate(exec, thisDateObj, milli, LocaleTime, args);
 }
 
 JSValuePtr dateProtoFuncGetTime(ExecState* exec,

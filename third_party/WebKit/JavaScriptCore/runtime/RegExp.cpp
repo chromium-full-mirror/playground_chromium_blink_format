@@ -44,7 +44,6 @@ inline RegExp::RegExp(JSGlobalData* globalData, const UString& pattern)
       m_regExp(0),
       m_constructionError(0),
       m_numSubpatterns(0) {
-  UNUSED_PARAM(globalData);
 #if ENABLE(WREC)
   m_wrecFunction =
       Generator::compileRegExp(globalData, pattern, &m_numSubpatterns,
@@ -52,6 +51,8 @@ inline RegExp::RegExp(JSGlobalData* globalData, const UString& pattern)
   if (m_wrecFunction || m_constructionError)
     return;
 // Fall through to non-WREC case.
+#else
+  UNUSED_PARAM(globalData);
 #endif
   m_regExp = jsRegExpCompile(reinterpret_cast<const UChar*>(pattern.data()),
                              pattern.size(), JSRegExpDoNotIgnoreCase,
@@ -73,8 +74,6 @@ inline RegExp::RegExp(JSGlobalData* globalData,
       m_regExp(0),
       m_constructionError(0),
       m_numSubpatterns(0) {
-  UNUSED_PARAM(globalData);
-
   // NOTE: The global flag is handled on a case-by-case basis by functions like
   // String::match and RegExpObject::match.
   if (flags.find('g') != -1)
@@ -101,6 +100,8 @@ inline RegExp::RegExp(JSGlobalData* globalData,
   if (m_wrecFunction || m_constructionError)
     return;
 // Fall through to non-WREC case.
+#else
+  UNUSED_PARAM(globalData);
 #endif
   m_regExp = jsRegExpCompile(reinterpret_cast<const UChar*>(pattern.data()),
                              pattern.size(), ignoreCaseOption, multilineOption,
