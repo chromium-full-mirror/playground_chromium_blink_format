@@ -106,6 +106,9 @@ class ScriptController {
   }  // 0 if we are not evaluating any script
 
   void clearWindowShell();
+  void clearFormerWindow(JSDOMWindow* window) {
+    m_liveFormerWindows.remove(window);
+  }
   void updateDocument();
 
   // Notifies the ScriptController that the securityOrigin of the current
@@ -146,6 +149,7 @@ class ScriptController {
   void disconnectPlatformScriptObjects();
 
   JSC::ProtectedPtr<JSDOMWindowShell> m_windowShell;
+  HashSet<JSDOMWindow*> m_liveFormerWindows;
   Frame* m_frame;
   int m_handlerLineno;
   const String* m_sourceURL;
