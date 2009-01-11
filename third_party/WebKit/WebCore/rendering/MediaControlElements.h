@@ -80,6 +80,7 @@ class MediaControlInputElement : public HTMLInputElement {
                            HTMLMediaElement*);
   void attachToParent(Element*);
   void update();
+  bool hitTest(const IntPoint& absPoint);
 
  protected:
   HTMLMediaElement* m_mediaElement;

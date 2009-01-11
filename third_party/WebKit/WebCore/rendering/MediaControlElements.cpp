@@ -39,6 +39,7 @@
 #include "Frame.h"
 #include "HTMLNames.h"
 #include "RenderSlider.h"
+#include "RenderTheme.h"
 
 namespace WebCore {
 
@@ -96,6 +97,13 @@ void MediaControlInputElement::attachToParent(Element* parent) {
 void MediaControlInputElement::update() {
   if (renderer())
     renderer()->updateFromElement();
+}
+
+bool MediaControlInputElement::hitTest(const IntPoint& absPoint) {
+  if (renderer() && renderer()->style()->hasAppearance())
+    return theme()->hitTestMediaControlPart(renderer(), absPoint);
+
+  return false;
 }
 
 // ----------------------------

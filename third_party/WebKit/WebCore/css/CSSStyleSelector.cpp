@@ -1176,11 +1176,12 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForElement(
   if (!loadedMediaStyleSheet &&
       (e->hasTagName(videoTag) || e->hasTagName(audioTag))) {
     loadedMediaStyleSheet = true;
-    CSSStyleSheet* mediaControlsSheet =
-        parseUASheet(mediaControlsUserAgentStyleSheet,
-                     sizeof(mediaControlsUserAgentStyleSheet));
-    defaultStyle->addRulesFromSheet(mediaControlsSheet, screenEval());
-    defaultPrintStyle->addRulesFromSheet(mediaControlsSheet, printEval());
+    const String& sheetText = theme()->styleSheetForMediaControls();
+    if (!sheetText.isNull()) {
+      CSSStyleSheet* mediaControlsSheet = parseUASheet(sheetText);
+      defaultStyle->addRulesFromSheet(mediaControlsSheet, screenEval());
+      defaultPrintStyle->addRulesFromSheet(mediaControlsSheet, printEval());
+    }
   }
 #endif
 
