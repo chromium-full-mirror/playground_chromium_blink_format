@@ -345,7 +345,7 @@ class MyQObject : public QObject {
   void myOverloadedSlot() { m_qtFunctionInvoked = 24; }
   void myOverloadedSlot(QObject* arg) {
     m_qtFunctionInvoked = 41;
-    m_actuals << arg;
+    m_actuals << qVariantFromValue(arg);
   }
   void myOverloadedSlot(bool arg) {
     m_qtFunctionInvoked = 25;
