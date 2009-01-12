@@ -154,7 +154,6 @@ class QWebViewPrivate {
 QWebView::QWebView(QWidget* parent) : QWidget(parent) {
   d = new QWebViewPrivate(this);
 
-  setAttribute(Qt::WA_OpaquePaintEvent);
 #if !defined(Q_WS_QWS)
   setAttribute(Qt::WA_InputMethodEnabled);
 #endif
@@ -234,6 +233,7 @@ void QWebView::setPage(QWebPage* page) {
     connect(d->page, SIGNAL(microFocusChanged()), this,
             SLOT(updateMicroFocus()));
   }
+  setAttribute(Qt::WA_OpaquePaintEvent, d->page);
   update();
 }
 
