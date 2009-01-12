@@ -65,6 +65,7 @@ class SmallStrings : Noncopyable {
   JSString* m_singleCharacterStrings[0x100];
   OwnPtr<SmallStringsStorage> m_storage;
 };
-}
 
-#endif
+}  // namespace JSC
+
+#endif  // SmallStrings_h
