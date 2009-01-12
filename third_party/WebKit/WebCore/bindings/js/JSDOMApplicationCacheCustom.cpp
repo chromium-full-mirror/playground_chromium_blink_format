@@ -87,6 +87,8 @@ void JSDOMApplicationCache::mark() {
   }
 }
 
+#if ENABLE(APPLICATION_CAHE_DYNAMIC_ENTRIES)
+
 JSValuePtr JSDOMApplicationCache::hasItem(ExecState* exec,
                                           const ArgList& args) {
   Frame* frame = asJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
@@ -126,6 +128,8 @@ JSValuePtr JSDOMApplicationCache::remove(ExecState* exec, const ArgList& args) {
   setDOMException(exec, ec);
   return jsUndefined();
 }
+
+#endif
 
 JSValuePtr JSDOMApplicationCache::addEventListener(ExecState* exec,
                                                    const ArgList& args) {
