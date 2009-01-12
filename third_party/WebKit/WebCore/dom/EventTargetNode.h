@@ -114,7 +114,7 @@ class EventTargetNode : public Node, public EventTarget {
   bool dispatchWebKitTransitionEvent(const AtomicString& eventType,
                                      const String& propertyName,
                                      double elapsedTime);
-  bool dispatchGenericEvent(PassRefPtr<Event>, ExceptionCode&);
+  bool dispatchGenericEvent(PassRefPtr<Event>);
 
   virtual void handleLocalEvents(Event*, bool useCapture);
 

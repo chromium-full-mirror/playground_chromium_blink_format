@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2005, 2006, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -86,9 +86,6 @@ class ApplyStyleCommand : public CompositeEditCommand {
   void removeHTMLFontStyle(CSSMutableStyleDeclaration*, HTMLElement*);
   void removeHTMLBidiEmbeddingStyle(CSSMutableStyleDeclaration*, HTMLElement*);
   void removeCSSStyle(CSSMutableStyleDeclaration*, HTMLElement*);
-  void removeBlockStyle(CSSMutableStyleDeclaration*,
-                        const Position& start,
-                        const Position& end);
   void removeInlineStyle(PassRefPtr<CSSMutableStyleDeclaration>,
                          const Position& start,
                          const Position& end);
@@ -102,10 +99,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   PassRefPtr<CSSMutableStyleDeclaration> extractAndNegateTextDecorationStyle(
       Node*);
   void applyTextDecorationStyle(Node*, CSSMutableStyleDeclaration* style);
-  void pushDownTextDecorationStyleAroundNode(Node*,
-                                             const Position& start,
-                                             const Position& end,
-                                             bool force);
+  void pushDownTextDecorationStyleAroundNode(Node*, bool force);
   void pushDownTextDecorationStyleAtBoundaries(const Position& start,
                                                const Position& end);
 

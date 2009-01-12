@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2007, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,7 +29,6 @@
 #include "DragActions.h"
 #include "DragImage.h"
 #include "IntPoint.h"
-#include "IntRect.h"
 #include "KURL.h"
 
 namespace WebCore {
@@ -41,6 +40,7 @@ class DragData;
 class Element;
 class Frame;
 class Image;
+class IntRect;
 class Node;
 class Page;
 class PlatformMouseEvent;
@@ -59,7 +59,7 @@ class DragController {
   bool performDrag(DragData*);
 
   // FIXME: It should be possible to remove a number of these accessors once all
-  // drag logic is in WebCore
+  // drag logic is in WebCore.
   void setDidInitiateDrag(bool initiated) { m_didInitiateDrag = initiated; }
   bool didInitiateDrag() const { return m_didInitiateDrag; }
   void setIsHandlingDrag(bool handling) { m_isHandlingDrag = handling; }
@@ -104,14 +104,14 @@ class DragController {
 
  private:
   bool canProcessDrag(DragData*);
-  bool concludeDrag(DragData*, DragDestinationAction);
+  bool concludeEditDrag(DragData*);
   DragOperation dragEnteredOrUpdated(DragData*);
   DragOperation operationForLoad(DragData*);
   DragOperation tryDocumentDrag(DragData*, DragDestinationAction);
   DragOperation tryDHTMLDrag(DragData*);
   DragOperation dragOperation(DragData*);
   void cancelDrag();
-  bool dragIsMove(SelectionController*, DragData*);
+  bool dragIsMove(SelectionController*);
   bool isCopyKeyDown();
 
   IntRect selectionDraggingRect(Frame*);
@@ -136,14 +136,12 @@ class DragController {
                     Frame*,
                     bool forLink);
   void cleanupAfterSystemDrag();
+
   Page* m_page;
   DragClient* m_client;
 
-  // The Document the mouse was last dragged over
-  Document* m_document;
-
-  // The Document (if any) that initiated the drag
-  Document* m_dragInitiator;
+  Document* m_document;       // The document the mouse was last dragged over.
+  Document* m_dragInitiator;  // The Document (if any) that initiated the drag.
 
   DragDestinationAction m_dragDestinationAction;
   DragSourceAction m_dragSourceAction;

@@ -342,7 +342,6 @@ PassRefPtr<Document> XSLTProcessor::createDocumentFromSource(
 static inline RefPtr<DocumentFragment> createFragmentFromSource(
     const String& sourceString,
     const String& sourceMIMEType,
-    Node* sourceNode,
     Document* outputDoc) {
   RefPtr<DocumentFragment> fragment = new DocumentFragment(outputDoc);
 
@@ -508,8 +507,7 @@ PassRefPtr<DocumentFragment> XSLTProcessor::transformToFragment(
   if (!transformToString(sourceNode, resultMIMEType, resultString,
                          resultEncoding))
     return 0;
-  return createFragmentFromSource(resultString, resultMIMEType, sourceNode,
-                                  outputDoc);
+  return createFragmentFromSource(resultString, resultMIMEType, outputDoc);
 }
 
 void XSLTProcessor::setParameter(const String& /*namespaceURI*/,

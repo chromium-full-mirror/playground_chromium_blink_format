@@ -3,7 +3,8 @@
               (C) 1997 Torben Weis (weis@kde.org)
               (C) 1998 Waldo Bastian (bastian@kde.org)
               (C) 2001 Dirk Mueller (mueller@kde.org)
-    Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
+   reserved.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -62,8 +63,7 @@ struct Token {
         m_sourceInfo(0) {}
   ~Token() {}
 
-  void addAttribute(Document*,
-                    AtomicString& attrName,
+  void addAttribute(AtomicString& attrName,
                     const AtomicString& v,
                     bool viewSourceMode);
 

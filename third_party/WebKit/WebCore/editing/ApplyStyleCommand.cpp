@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -1108,16 +1108,6 @@ void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
     removeNodePreservingChildren(elem);
 }
 
-void ApplyStyleCommand::removeBlockStyle(CSSMutableStyleDeclaration* style,
-                                         const Position& start,
-                                         const Position& end) {
-  ASSERT(start.isNotNull());
-  ASSERT(end.isNotNull());
-  ASSERT(start.node()->inDocument());
-  ASSERT(end.node()->inDocument());
-  ASSERT(Range::compareBoundaryPoints(start, end) <= 0);
-}
-
 static bool hasTextDecorationProperty(Node* node) {
   if (!node->isElementNode())
     return false;
@@ -1223,11 +1213,8 @@ void ApplyStyleCommand::applyTextDecorationStyle(
   }
 }
 
-void ApplyStyleCommand::pushDownTextDecorationStyleAroundNode(
-    Node* node,
-    const Position& start,
-    const Position& end,
-    bool force) {
+void ApplyStyleCommand::pushDownTextDecorationStyleAroundNode(Node* node,
+                                                              bool force) {
   Node* highestAncestor = highestAncestorWithTextDecoration(node);
 
   if (highestAncestor) {
@@ -1267,13 +1254,13 @@ void ApplyStyleCommand::pushDownTextDecorationStyleAtBoundaries(
   // styles (caused by stylesheets) and explicitly negate text
   // decoration while pushing down.
 
-  pushDownTextDecorationStyleAroundNode(start.node(), start, end, false);
+  pushDownTextDecorationStyleAroundNode(start.node(), false);
   updateLayout();
-  pushDownTextDecorationStyleAroundNode(start.node(), start, end, true);
+  pushDownTextDecorationStyleAroundNode(start.node(), true);
 
-  pushDownTextDecorationStyleAroundNode(end.node(), start, end, false);
+  pushDownTextDecorationStyleAroundNode(end.node(), false);
   updateLayout();
-  pushDownTextDecorationStyleAroundNode(end.node(), start, end, true);
+  pushDownTextDecorationStyleAroundNode(end.node(), true);
 }
 
 static int maxRangeOffset(Node* n) {

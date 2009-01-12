@@ -72,7 +72,6 @@ class Settings;
 class WMLPageState;
 #endif
 
-enum TextCaseSensitivity { TextCaseSensitive, TextCaseInsensitive };
 enum FindDirection { FindDirectionForward, FindDirectionBackward };
 
 class Page : Noncopyable {

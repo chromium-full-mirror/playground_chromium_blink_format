@@ -4,7 +4,8 @@
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
  *           (C) 2007 David Smith (catfish.man@gmail.com)
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
+ * reserved.
  *           (C) 2007 Eric Seidel (eric@webkit.org)
  *
  * This library is free software; you can redistribute it and/or
@@ -71,7 +72,7 @@ inline ElementRareData* Element::ensureRareData() {
 }
 
 NodeRareData* Element::createRareData() {
-  return new ElementRareData(this);
+  return new ElementRareData;
 }
 
 PassRefPtr<Node> Element::cloneNode(bool deep) {
@@ -632,7 +633,7 @@ void Element::attach() {
 void Element::detach() {
   cancelFocusAppearanceUpdate();
   if (hasRareData())
-    rareData()->resetComputedStyle(this);
+    rareData()->resetComputedStyle();
   ContainerNode::detach();
 }
 
@@ -651,7 +652,7 @@ void Element::recalcStyle(StyleChange change) {
 
   if ((change > NoChange || changed())) {
     if (hasRareData())
-      rareData()->resetComputedStyle(this);
+      rareData()->resetComputedStyle();
   }
   if (hasParentStyle && (change >= Inherit || changed())) {
     RefPtr<RenderStyle> newStyle =
