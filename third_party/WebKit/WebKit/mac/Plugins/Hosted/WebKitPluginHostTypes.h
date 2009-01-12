@@ -42,8 +42,6 @@ enum LoadURLFlags {
   CurrentEventIsUserGesture = 1 << 3,
 };
 
-enum ValueType {
-  VoidValueType = 0,
-};
+enum ValueType { VoidValueType = 0, ObjectValueType = 1 };
 
 #endif  // WebKitPluginHostTypes_h
