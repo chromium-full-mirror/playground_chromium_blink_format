@@ -1147,7 +1147,8 @@ FloatPoint RenderBox::localToAbsolute(FloatPoint localPoint,
                                       bool fixed,
                                       bool useTransforms) const {
   if (RenderView* v = view()) {
-    if (LayoutState* layoutState = v->layoutState()) {
+    if (v->layoutStateEnabled()) {
+      LayoutState* layoutState = v->layoutState();
       IntSize offset = layoutState->m_offset;
       offset.expand(m_x, m_y);
       localPoint += offset;
@@ -1180,7 +1181,7 @@ FloatPoint RenderBox::absoluteToLocal(FloatPoint containerPoint,
                                       bool fixed,
                                       bool useTransforms) const {
   // We don't expect absoluteToLocal() to be called during layout (yet)
-  ASSERT(!view() || !view()->layoutState());
+  ASSERT(!view() || !view()->layoutStateEnabled());
 
   if (style()->position() == FixedPosition)
     fixed = true;
@@ -1349,7 +1350,8 @@ IntRect RenderBox::absoluteClippedOverflowRect() {
 
 void RenderBox::computeAbsoluteRepaintRect(IntRect& rect, bool fixed) {
   if (RenderView* v = view()) {
-    if (LayoutState* layoutState = v->layoutState()) {
+    if (v->layoutStateEnabled()) {
+      LayoutState* layoutState = v->layoutState();
       if (style()->position() == RelativePosition && m_layer)
         rect.move(m_layer->relativePositionOffset());
 

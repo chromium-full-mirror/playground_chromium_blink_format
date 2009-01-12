@@ -648,7 +648,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
 
   LayoutStateMaintainer statePusher(
       view(), this, IntSize(xPos(), yPos()),
-      !m_hasColumns && !hasTransform() && !hasReflection());
+      m_hasColumns || hasTransform() || hasReflection());
 
   int oldWidth = m_width;
   int oldColumnWidth = desiredColumnWidth();
@@ -1467,7 +1467,9 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
     // child moves.
     IntRect oldRect(child->xPos(), child->yPos(), child->width(),
                     child->height());
-
+#ifndef NDEBUG
+    IntSize oldLayoutDelta = view()->layoutDelta();
+#endif
     // Go ahead and position the child as though it didn't collapse with the
     // top.
     view()->addLayoutDelta(IntSize(0, child->yPos() - yPosEstimate));
@@ -1563,6 +1565,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
     if (!childHadLayout && child->checkForRepaintDuringLayout())
       child->repaint();
 
+    ASSERT(oldLayoutDelta == view()->layoutDelta());
     child = child->nextSibling();
   }
 
@@ -1578,7 +1581,7 @@ bool RenderBlock::layoutOnlyPositionedObjects() {
 
   LayoutStateMaintainer statePusher(
       view(), this, IntSize(xPos(), yPos()),
-      !m_hasColumns && !hasTransform() && !hasReflection());
+      m_hasColumns || hasTransform() || hasReflection());
 
   if (needsPositionedMovementLayout()) {
     tryLayoutDoingPositionedMovementOnly();

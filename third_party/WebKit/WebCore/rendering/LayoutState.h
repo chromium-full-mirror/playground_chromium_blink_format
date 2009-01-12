@@ -38,7 +38,15 @@ class RenderObject;
 
 class LayoutState : Noncopyable {
  public:
-  LayoutState() : m_clipped(false), m_next(0) {}
+  LayoutState()
+      : m_clipped(false),
+        m_next(0)
+#ifndef NDEBUG
+        ,
+        m_renderer(0)
+#endif
+  {
+  }
 
   LayoutState(LayoutState*, RenderBox*, const IntSize& offset);
   LayoutState(RenderObject*);
@@ -58,8 +66,15 @@ class LayoutState : Noncopyable {
  public:
   bool m_clipped;
   IntRect m_clipRect;
-  IntSize m_offset;
+  IntSize m_offset;  // x/y offset from container.
+  IntSize
+      m_layoutDelta;  // Transient offset from the final position of the object
+  // used to ensure that repaints happen in the correct place.
+  // This is a total delta accumulated from the root.
   LayoutState* m_next;
+#ifndef NDEBUG
+  RenderObject* m_renderer;
+#endif
 };
 
 }  // namespace WebCore

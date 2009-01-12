@@ -236,7 +236,7 @@ void RenderLayer::updateLayerPositions(bool doFullRepaint,
     // FIXME: Optimize using LayoutState and remove the disableLayoutState()
     // call
     // from updateScrollInfoAfterLayout().
-    ASSERT(!view->layoutState());
+    ASSERT(!view->layoutStateEnabled());
 
     IntRect newRect = m_object->absoluteClippedOverflowRect();
     IntRect newOutlineBox = m_object->absoluteOutlineBounds();

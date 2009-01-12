@@ -911,7 +911,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       setNeedsLayout(true, false);  // Mark ourselves as needing a full layout.
                                     // This way we'll repaint like
                                     // we're supposed to.
-      if (!document()->view()->needsFullRepaint() && m_layer) {
+      RenderView* v = view();
+      if (v && !v->doingFullRepaint() && m_layer) {
         // Because we waited until we were already inside layout to discover
         // that the block really needed a full layout, we missed our chance to
         // repaint the layer
@@ -919,9 +920,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         // for its original
         // position and size, and so we can use that to make a repaint happen
         // now.
-        RenderView* c = view();
-        if (c && !c->printing())
-          c->repaintViewRectangle(m_layer->repaintRect());
+        v->repaintViewRectangle(m_layer->repaintRect());
       }
     }
 

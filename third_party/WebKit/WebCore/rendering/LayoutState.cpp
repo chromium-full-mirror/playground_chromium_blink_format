@@ -34,10 +34,14 @@ namespace WebCore {
 
 LayoutState::LayoutState(LayoutState* prev,
                          RenderBox* renderer,
-                         const IntSize& offset) {
-  ASSERT(prev);
-
-  m_next = prev;
+                         const IntSize& offset)
+    : m_next(prev)
+#ifndef NDEBUG
+      ,
+      m_renderer(renderer)
+#endif
+{
+  ASSERT(m_next);
 
   bool fixed = renderer->isPositioned() &&
                renderer->style()->position() == FixedPosition;
@@ -75,16 +79,25 @@ LayoutState::LayoutState(LayoutState* prev,
     layer->subtractScrolledContentOffset(x, y);
     m_offset = IntSize(x, y);
   }
+
+  m_layoutDelta = m_next->m_layoutDelta;
+
   // FIXME: <http://bugs.webkit.org/show_bug.cgi?id=13443> Apply control clip if
   // present.
 }
 
-LayoutState::LayoutState(RenderObject* root) : m_clipped(false) {
+LayoutState::LayoutState(RenderObject* root)
+    : m_clipped(false),
+      m_next(0)
+#ifndef NDEBUG
+      ,
+      m_renderer(root)
+#endif
+{
   RenderObject* container = root->container();
   FloatPoint absContentPoint =
       container->localToAbsoluteForContent(FloatPoint(), false, true);
   m_offset = IntSize(absContentPoint.x(), absContentPoint.y());
-  m_next = 0;
 }
 
 #ifndef NDEBUG
