@@ -43,6 +43,13 @@ using namespace WTF;
 
 namespace WebCore {
 
+FontCache* fontCache() {
+  DEFINE_STATIC_LOCAL(FontCache, globalFontCache, ());
+  return &globalFontCache;
+}
+
+FontCache::FontCache() {}
+
 struct FontPlatformDataCacheKey {
   FontPlatformDataCacheKey(
       const AtomicString& family = AtomicString(),

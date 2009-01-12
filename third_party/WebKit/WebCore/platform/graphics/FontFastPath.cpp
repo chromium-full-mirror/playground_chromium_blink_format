@@ -150,7 +150,7 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c,
     codeUnitsLength = 2;
   }
   const SimpleFontData* characterFontData =
-      FontCache::getFontDataForCharacters(*this, codeUnits, codeUnitsLength);
+      fontCache()->getFontDataForCharacters(*this, codeUnits, codeUnitsLength);
   if (useSmallCapsFont && characterFontData)
     characterFontData = characterFontData->smallCapsFontData(m_fontDescription);
   if (characterFontData) {

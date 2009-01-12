@@ -125,7 +125,7 @@ bool SimpleFontData::containsCharacters(const UChar* characters,
   // merely by testing code page intersection.  This seems suspect though.
   // Can't a font only partially
   // cover a given code page?
-  IMLangFontLink2* langFontLink = FontCache::getFontLinkInterface();
+  IMLangFontLink2* langFontLink = fontCache()->getFontLinkInterface();
   if (!langFontLink)
     return false;
 

@@ -65,11 +65,11 @@ CSSFontSelector::CSSFontSelector(Document* document) : m_document(document) {
   // seem to be any such guarantee.
 
   ASSERT(m_document);
-  FontCache::addClient(this);
+  fontCache()->addClient(this);
 }
 
 CSSFontSelector::~CSSFontSelector() {
-  FontCache::removeClient(this);
+  fontCache()->removeClient(this);
   deleteAllValues(m_fontFaces);
   deleteAllValues(m_locallyInstalledFontFaces);
   deleteAllValues(m_fonts);
@@ -356,8 +356,8 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
       Vector<RefPtr<CSSFontFace>>* familyLocallyInstalledFaces;
 
       Vector<unsigned> locallyInstalledFontsTraitsMasks;
-      FontCache::getTraitsInFamily(familyName,
-                                   locallyInstalledFontsTraitsMasks);
+      fontCache()->getTraitsInFamily(familyName,
+                                     locallyInstalledFontsTraitsMasks);
       unsigned numLocallyInstalledFaces =
           locallyInstalledFontsTraitsMasks.size();
       if (numLocallyInstalledFaces) {
@@ -420,8 +420,8 @@ static FontData* fontDataForGenericFamily(
     genericFamily = settings->standardFontFamily();
 
   if (!genericFamily.isEmpty())
-    return FontCache::getCachedFontData(
-        FontCache::getCachedFontPlatformData(fontDescription, genericFamily));
+    return fontCache()->getCachedFontData(
+        fontCache()->getCachedFontPlatformData(fontDescription, genericFamily));
 
   return 0;
 }
