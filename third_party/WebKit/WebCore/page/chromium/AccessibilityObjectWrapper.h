@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008 Google Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,7 +30,6 @@
 namespace WebCore {
 
 class AccessibilityObject;
-
 class AccessibilityObjectWrapper
     : public RefCounted<AccessibilityObjectWrapper> {
  public:
@@ -48,4 +48,4 @@ class AccessibilityObjectWrapper
 
 }  // namespace WebCore
 
-#endif  // AccessibilityObjectWrapper_h
+#endif
