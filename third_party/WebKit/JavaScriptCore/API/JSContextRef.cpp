@@ -44,6 +44,7 @@ static const int32_t webkitFirstVersionWithConcurrentGlobalContexts =
 using namespace JSC;
 
 JSContextGroupRef JSContextGroupCreate() {
+  initializeThreading();
   return toRef(JSGlobalData::create().releaseRef());
 }
 
@@ -57,6 +58,7 @@ void JSContextGroupRelease(JSContextGroupRef group) {
 }
 
 JSGlobalContextRef JSGlobalContextCreate(JSClassRef globalObjectClass) {
+  initializeThreading();
 #if PLATFORM(DARWIN)
 // When running on Tiger or Leopard, or if the application was linked before
 // JSGlobalContextCreate was changed

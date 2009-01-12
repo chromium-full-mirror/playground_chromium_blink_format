@@ -27,6 +27,7 @@
 #include "JSStringRefCF.h"
 
 #include "APICast.h"
+#include "InitializeThreading.h"
 #include "JSStringRef.h"
 #include "OpaqueJSString.h"
 #include <runtime/UString.h>
@@ -34,6 +35,7 @@
 #include <wtf/OwnArrayPtr.h>
 
 JSStringRef JSStringCreateWithCFString(CFStringRef string) {
+  JSC::initializeThreading();
   CFIndex length = CFStringGetLength(string);
   if (length) {
     OwnArrayPtr<UniChar> buffer(new UniChar[length]);
