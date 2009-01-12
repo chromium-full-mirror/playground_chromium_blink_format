@@ -38,7 +38,7 @@ namespace WebCore {
 
 #if USE(WXGC)
 TransformationMatrix::TransformationMatrix(
-    const PlatformAffineTransform& matrix) {
+    const PlatformTransformationMatrix& matrix) {
   m_transform = matrix;
 }
 #endif
