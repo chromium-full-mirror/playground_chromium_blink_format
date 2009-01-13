@@ -104,6 +104,8 @@ NPError NPP_New(NPMIMEType pluginType,
         obj->returnErrorFromNewStream = TRUE;
       else if (strcasecmp(argn[i], "logfirstsetwindow") == 0)
         obj->logSetWindow = TRUE;
+      else if (strcasecmp(argn[i], "testnpruntime") == 0)
+        testNPRuntime(instance);
     }
 
     instance->pdata = obj;
@@ -316,14 +318,16 @@ void NPP_URLNotify(NPP instance,
 }
 
 NPError NPP_GetValue(NPP instance, NPPVariable variable, void* value) {
+  PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
+
   if (variable == NPPVpluginScriptableNPObject) {
     void** v = (void**)value;
-    PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
     // Return value is expected to be retained
     browser->retainobject((NPObject*)obj);
     *v = obj;
     return NPERR_NO_ERROR;
   }
+
   return NPERR_GENERIC_ERROR;
 }
 

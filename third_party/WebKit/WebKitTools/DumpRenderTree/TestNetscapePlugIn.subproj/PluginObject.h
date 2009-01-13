@@ -53,3 +53,4 @@ extern void handleCallback(PluginObject* object,
 extern void notifyStream(PluginObject* object,
                          const char* url,
                          const char* headers);
+extern void testNPRuntime(NPP npp);
