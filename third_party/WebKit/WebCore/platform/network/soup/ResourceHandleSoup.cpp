@@ -2,6 +2,7 @@
  * Copyright (C) 2008 Alp Toker <alp@atoker.com>
  * Copyright (C) 2008 Xan Lopez <xan@gnome.org>
  * Copyright (C) 2008 Collabora Ltd.
+ * Copyright (C) 2009 Holger Hans Peter Freyther
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -476,8 +477,9 @@ static void readCallback(GObject* source, GAsyncResult* res, gpointer data) {
 
   nread = g_input_stream_read_finish(d->m_input_stream, res, &error);
   if (error) {
-    client->didFail(handle, networkErrorForFile(d->m_gfile, error));
+    ResourceError resourceError = networkErrorForFile(d->m_gfile, error);
     cleanupGioOperation(handle);
+    client->didFail(handle, resourceError);
     return;
   } else if (!nread) {
     g_input_stream_close_async(d->m_input_stream, G_PRIORITY_DEFAULT, NULL,
@@ -507,8 +509,9 @@ static void openCallback(GObject* source, GAsyncResult* res, gpointer data) {
   GError* error = NULL;
   in = g_file_read_finish(G_FILE(source), res, &error);
   if (error) {
-    client->didFail(handle, networkErrorForFile(d->m_gfile, error));
+    ResourceError resourceError = networkErrorForFile(d->m_gfile, error);
     cleanupGioOperation(handle);
+    client->didFail(handle, resourceError);
     return;
   }
 
@@ -550,8 +553,9 @@ static void queryInfoCallback(GObject* source,
     // and set a timeout to unmount it later after it's been idle
     // for a while).
 
-    client->didFail(handle, networkErrorForFile(d->m_gfile, error));
+    ResourceError resourceError = networkErrorForFile(d->m_gfile, error);
     cleanupGioOperation(handle);
+    client->didFail(handle, resourceError);
     return;
   }
 
@@ -559,8 +563,9 @@ static void queryInfoCallback(GObject* source,
     // FIXME: what if the URI points to a directory? Should we
     // generate a listing? How? What do other backends do here?
 
-    client->didFail(handle, networkErrorForFile(d->m_gfile, error));
+    ResourceError resourceError = networkErrorForFile(d->m_gfile, error);
     cleanupGioOperation(handle);
+    client->didFail(handle, resourceError);
     return;
   }
 
