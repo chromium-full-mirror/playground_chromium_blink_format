@@ -2069,11 +2069,8 @@ void EventHandler::defaultKeyboardEventHandler(KeyboardEvent* event) {
     m_frame->editor()->handleKeyboardEvent(event);
     if (event->defaultHandled())
       return;
-    const String& keyIdentifier = event->keyIdentifier();
-    if (keyIdentifier == "U+0009")
+    if (event->keyIdentifier() == "U+0009")
       defaultTabEventHandler(event);
-    else if (keyIdentifier == "U+0020")
-      defaultSpaceEventHandler(event);
 
     // provides KB navigation and selection for enhanced accessibility users
     if (AXObjectCache::accessibilityEnhancedUserInterfaceEnabled())
@@ -2083,6 +2080,8 @@ void EventHandler::defaultKeyboardEventHandler(KeyboardEvent* event) {
     m_frame->editor()->handleKeyboardEvent(event);
     if (event->defaultHandled())
       return;
+    if (event->charCode() == ' ')
+      defaultSpaceEventHandler(event);
   }
 }
 
@@ -2312,16 +2311,16 @@ bool EventHandler::handleTextInputEvent(const String& text,
                                         Event* underlyingEvent,
                                         bool isLineBreak,
                                         bool isBackTab) {
-  if (!m_frame)
-    return false;
-#ifndef NDEBUG
   // Platforms should differentiate real commands like selectAll from text input
   // in disguise (like insertNewline),
   // and avoid dispatching text input events from keydown default handlers.
-  if (underlyingEvent && underlyingEvent->isKeyboardEvent())
-    ASSERT(static_cast<KeyboardEvent*>(underlyingEvent)->type() ==
-           eventNames().keypressEvent);
-#endif
+  ASSERT(!underlyingEvent || !underlyingEvent->isKeyboardEvent() ||
+         static_cast<KeyboardEvent*>(underlyingEvent)->type() ==
+             eventNames().keypressEvent);
+
+  if (!m_frame)
+    return false;
+
   EventTarget* target;
   if (underlyingEvent)
     target = underlyingEvent->target();
@@ -2329,12 +2328,14 @@ bool EventHandler::handleTextInputEvent(const String& text,
     target = eventTargetNodeForDocument(m_frame->document());
   if (!target)
     return false;
+
   RefPtr<TextEvent> event = TextEvent::create(m_frame->domWindow(), text);
   event->setUnderlyingEvent(underlyingEvent);
   event->setIsLineBreak(isLineBreak);
   event->setIsBackTab(isBackTab);
   ExceptionCode ec;
-  return target->dispatchEvent(event.release(), ec);
+  target->dispatchEvent(event, ec);
+  return event->defaultHandled();
 }
 
 #if !PLATFORM(MAC) && !PLATFORM(QT)
