@@ -53,11 +53,15 @@ static SoupSession* session = 0;
 
 enum { ERROR_TRANSPORT, ERROR_UNKNOWN_PROTOCOL, ERROR_BAD_NON_HTTP_METHOD };
 
+static void cleanupGioOperation(ResourceHandleInternal* handle);
+
 ResourceHandleInternal::~ResourceHandleInternal() {
   if (m_msg) {
     g_object_unref(m_msg);
     m_msg = 0;
   }
+
+  cleanupGioOperation(this);
 
   if (m_idleHandler) {
     g_source_remove(m_idleHandler);
@@ -431,9 +435,7 @@ static inline ResourceError networkErrorForFile(GFile* file, GError* error) {
   return resourceError;
 }
 
-static void cleanupGioOperation(ResourceHandle* handle) {
-  ResourceHandleInternal* d = handle->getInternal();
-
+static void cleanupGioOperation(ResourceHandleInternal* d) {
   if (d->m_gfile) {
     g_object_set_data(G_OBJECT(d->m_gfile), "webkit-resource", 0);
     g_object_unref(d->m_gfile);
@@ -464,7 +466,7 @@ static void closeCallback(GObject* source, GAsyncResult* res, gpointer) {
   ResourceHandleClient* client = handle->client();
 
   g_input_stream_close_finish(d->m_input_stream, res, NULL);
-  cleanupGioOperation(handle);
+  cleanupGioOperation(d);
   client->didFinishLoading(handle);
 }
 
@@ -478,7 +480,7 @@ static void readCallback(GObject* source, GAsyncResult* res, gpointer) {
   ResourceHandleClient* client = handle->client();
 
   if (d->m_cancelled || !client) {
-    cleanupGioOperation(handle);
+    cleanupGioOperation(d);
     return;
   }
 
@@ -488,7 +490,7 @@ static void readCallback(GObject* source, GAsyncResult* res, gpointer) {
   nread = g_input_stream_read_finish(d->m_input_stream, res, &error);
   if (error) {
     ResourceError resourceError = networkErrorForFile(d->m_gfile, error);
-    cleanupGioOperation(handle);
+    cleanupGioOperation(d);
     client->didFail(handle, resourceError);
     return;
   } else if (!nread) {
@@ -515,7 +517,7 @@ static void openCallback(GObject* source, GAsyncResult* res, gpointer) {
   ResourceHandleClient* client = handle->client();
 
   if (d->m_cancelled || !client) {
-    cleanupGioOperation(handle);
+    cleanupGioOperation(d);
     return;
   }
 
@@ -524,7 +526,7 @@ static void openCallback(GObject* source, GAsyncResult* res, gpointer) {
   in = g_file_read_finish(G_FILE(source), res, &error);
   if (error) {
     ResourceError resourceError = networkErrorForFile(d->m_gfile, error);
-    cleanupGioOperation(handle);
+    cleanupGioOperation(d);
     client->didFail(handle, resourceError);
     return;
   }
@@ -549,7 +551,7 @@ static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
   ResourceHandleClient* client = handle->client();
 
   if (d->m_cancelled) {
-    cleanupGioOperation(handle);
+    cleanupGioOperation(d);
     return;
   }
 
@@ -571,7 +573,7 @@ static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
     // for a while).
 
     ResourceError resourceError = networkErrorForFile(d->m_gfile, error);
-    cleanupGioOperation(handle);
+    cleanupGioOperation(d);
     client->didFail(handle, resourceError);
     return;
   }
@@ -581,7 +583,7 @@ static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
     // generate a listing? How? What do other backends do here?
 
     ResourceError resourceError = networkErrorForFile(d->m_gfile, error);
-    cleanupGioOperation(handle);
+    cleanupGioOperation(d);
     client->didFail(handle, resourceError);
     return;
   }
