@@ -102,7 +102,6 @@
 #include "SegmentedString.h"
 #include "SelectionController.h"
 #include "Settings.h"
-#include "StorageEvent.h"
 #include "StyleSheetList.h"
 #include "TextEvent.h"
 #include "TextIterator.h"
@@ -127,6 +126,10 @@
 #if ENABLE(DATABASE)
 #include "Database.h"
 #include "DatabaseThread.h"
+#endif
+
+#if ENABLE(DOM_STORAGE)
+#include "StorageEvent.h"
 #endif
 
 #if ENABLE(XPATH)
@@ -2708,8 +2711,10 @@ PassRefPtr<Event> Document::createEvent(const String& eventType,
     return OverflowEvent::create();
   if (eventType == "ProgressEvent")
     return ProgressEvent::create();
+#if ENABLE(DOM_STORAGE)
   if (eventType == "StorageEvent")
     return StorageEvent::create();
+#endif
   if (eventType == "TextEvent")
     return TextEvent::create();
   if (eventType == "UIEvent" || eventType == "UIEvents")
