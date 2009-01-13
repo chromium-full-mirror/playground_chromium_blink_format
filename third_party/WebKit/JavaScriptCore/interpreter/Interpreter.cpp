@@ -1814,7 +1814,7 @@ JSValuePtr Interpreter::privateExecute(ExecutionFlag flag,
       }
 
       callFrame[dst] = jsBoolean(
-          src->isCell() ||
+          !src->isCell() ||
           !asCell(src)->structure()->typeInfo().masqueradesAsUndefined());
       ++vPC;
       NEXT_INSTRUCTION();
