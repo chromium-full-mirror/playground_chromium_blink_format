@@ -57,8 +57,6 @@ class JSCell : Noncopyable {
   Structure* structure() const;
 
   // Extracting the value.
-  bool getNumber(double&) const;
-  double getNumber() const;  // NaN if not a number
   bool getString(UString&) const;
   UString getString() const;          // null string if not a string
   JSObject* getObject();              // NULL if not an object
@@ -68,6 +66,8 @@ class JSCell : Noncopyable {
   virtual ConstructType getConstructData(ConstructData&);
 
   // Extracting integer values.
+  // FIXME: remove these methods, can check isNumberCell in JSValuePtr && then
+  // call asNumberCell::*.
   virtual bool getUInt32(uint32_t&) const;
   virtual bool getTruncatedInt32(int32_t&) const;
   virtual bool getTruncatedUInt32(uint32_t&) const;
@@ -134,6 +134,10 @@ inline bool JSCell::isNumber() const {
   return Heap::isNumber(const_cast<JSCell*>(this));
 }
 
+inline bool JSValuePtr::isNumberCell() const {
+  return isCell() && asCell()->isNumber();
+}
+
 inline bool JSCell::isObject() const {
   return m_structure->typeInfo().type() == ObjectType;
 }
@@ -155,7 +159,7 @@ inline void JSCell::mark() {
 }
 
 ALWAYS_INLINE JSCell* JSValuePtr::asCell() const {
-  ASSERT(!JSImmediate::isImmediate(asValue()));
+  ASSERT(isCell());
   return m_ptr;
 }
 
@@ -170,8 +174,7 @@ inline void* JSCell::operator new(size_t size, JSGlobalData* globalData) {
 // --- JSValue inlines ----------------------------
 
 inline bool JSValuePtr::isNumber() const {
-  return JSImmediate::isNumber(asValue()) ||
-         (!JSImmediate::isImmediate(asValue()) && asCell()->isNumber());
+  return JSImmediate::isNumber(asValue()) || (isCell() && asCell()->isNumber());
 }
 
 inline bool JSValuePtr::isString() const {
@@ -184,11 +187,6 @@ inline bool JSValuePtr::isGetterSetter() const {
 
 inline bool JSValuePtr::isObject() const {
   return !JSImmediate::isImmediate(asValue()) && asCell()->isObject();
-}
-
-inline double JSValuePtr::getNumber() const {
-  return JSImmediate::isImmediate(asValue()) ? JSImmediate::toDouble(asValue())
-                                             : asCell()->getNumber();
 }
 
 inline bool JSValuePtr::getString(UString& s) const {

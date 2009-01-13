@@ -30,12 +30,16 @@
 namespace JSC {
 
 // ECMA 11.9.3
-bool equal(ExecState*, JSValuePtr, JSValuePtr);
-bool equalSlowCase(ExecState*, JSValuePtr, JSValuePtr);
+inline bool JSValuePtr::equal(ExecState* exec, JSValuePtr v1, JSValuePtr v2) {
+  if (JSImmediate::areBothImmediateNumbers(v1, v2))
+    return v1 == v2;
 
-ALWAYS_INLINE bool equalSlowCaseInline(ExecState* exec,
-                                       JSValuePtr v1,
-                                       JSValuePtr v2) {
+  return equalSlowCase(exec, v1, v2);
+}
+
+ALWAYS_INLINE bool JSValuePtr::equalSlowCaseInline(ExecState* exec,
+                                                   JSValuePtr v1,
+                                                   JSValuePtr v2) {
   ASSERT(!JSImmediate::areBothImmediateNumbers(v1, v2));
 
   do {
@@ -103,31 +107,39 @@ ALWAYS_INLINE bool equalSlowCaseInline(ExecState* exec,
   } while (true);
 }
 
-bool strictEqual(JSValuePtr, JSValuePtr);
-bool strictEqualSlowCase(JSValuePtr, JSValuePtr);
+// ECMA 11.9.3
+inline bool JSValuePtr::strictEqual(JSValuePtr v1, JSValuePtr v2) {
+  if (JSImmediate::areBothImmediate(v1, v2))
+    return v1 == v2;
 
-inline bool strictEqualSlowCaseInline(JSValuePtr v1, JSValuePtr v2) {
+  if (JSImmediate::isEitherImmediate(v1, v2) & (v1 != js0()) & (v2 != js0()))
+    return false;
+
+  return strictEqualSlowCase(v1, v2);
+}
+
+ALWAYS_INLINE bool JSValuePtr::strictEqualSlowCaseInline(JSValuePtr v1,
+                                                         JSValuePtr v2) {
   ASSERT(!JSImmediate::areBothImmediate(v1, v2));
 
   if (JSImmediate::isEitherImmediate(v1, v2)) {
-    ASSERT(v1 == JSImmediate::zeroImmediate() ||
-           v2 == JSImmediate::zeroImmediate());
+    ASSERT(v1 == js0() || v2 == js0());
     ASSERT(v1 != v2);
 
     // The reason we can't just return false here is that 0 === -0,
     // and while the former is an immediate number, the latter is not.
-    if (v1 == JSImmediate::zeroImmediate())
-      return asCell(v2)->isNumber() && asNumberCell(v2)->value() == 0;
-    return asCell(v1)->isNumber() && asNumberCell(v1)->value() == 0;
+    if (v1 == js0())
+      return v2->asCell()->isNumber() && v2->asNumberCell()->value() == 0;
+    return v1->asCell()->isNumber() && v1->asNumberCell()->value() == 0;
   }
 
-  if (asCell(v1)->isNumber()) {
-    return asCell(v2)->isNumber() &&
-           asNumberCell(v1)->value() == asNumberCell(v2)->value();
+  if (v1->asCell()->isNumber()) {
+    return v2->asCell()->isNumber() &&
+           v1->asNumberCell()->value() == v2->asNumberCell()->value();
   }
 
-  if (asCell(v1)->isString()) {
-    return asCell(v2)->isString() &&
+  if (v1->asCell()->isString()) {
+    return v2->asCell()->isString() &&
            asString(v1)->value() == asString(v2)->value();
   }
 
@@ -136,5 +148,4 @@ inline bool strictEqualSlowCaseInline(JSValuePtr v1, JSValuePtr v2) {
 
 JSValuePtr throwOutOfMemoryError(ExecState*);
 }
-
 #endif

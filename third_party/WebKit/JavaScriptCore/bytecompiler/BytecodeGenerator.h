@@ -447,10 +447,10 @@ class BytecodeGenerator {
 
   struct JSValueHashTraits : HashTraits<JSValueEncodedAsPointer*> {
     static void constructDeletedValue(JSValueEncodedAsPointer*& slot) {
-      slot = JSValuePtr::encode(JSImmediate::impossibleValue());
+      slot = JSValuePtr::encode(jsImpossibleValue());
     }
     static bool isDeletedValue(JSValueEncodedAsPointer* value) {
-      return value == JSValuePtr::encode(JSImmediate::impossibleValue());
+      return value == JSValuePtr::encode(jsImpossibleValue());
     }
   };
 

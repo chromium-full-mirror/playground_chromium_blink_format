@@ -1785,8 +1785,9 @@ static int32_t keyForImmediateSwitch(ExpressionNode* node,
   UNUSED_PARAM(max);
   ASSERT(node->isNumber());
   double value = static_cast<NumberNode*>(node)->value();
-  ASSERT(JSImmediate::from(value));
   int32_t key = static_cast<int32_t>(value);
+  ASSERT(JSValuePtr::makeInt32Fast(key) &&
+         (JSValuePtr::makeInt32Fast(key)->getInt32Fast() == value));
   ASSERT(key == value);
   ASSERT(key >= min);
   ASSERT(key <= max);

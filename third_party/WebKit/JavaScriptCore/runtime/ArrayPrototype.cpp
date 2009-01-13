@@ -907,7 +907,7 @@ JSValuePtr arrayProtoFuncIndexOf(ExecState* exec,
     JSValuePtr e = getProperty(exec, thisObj, index);
     if (!e)
       continue;
-    if (strictEqual(searchElement, e))
+    if (JSValuePtr::strictEqual(searchElement, e))
       return jsNumber(exec, index);
   }
 
@@ -942,7 +942,7 @@ JSValuePtr arrayProtoFuncLastIndexOf(ExecState* exec,
     JSValuePtr e = getProperty(exec, thisObj, index);
     if (!e)
       continue;
-    if (strictEqual(searchElement, e))
+    if (JSValuePtr::strictEqual(searchElement, e))
       return jsNumber(exec, index);
   }
 

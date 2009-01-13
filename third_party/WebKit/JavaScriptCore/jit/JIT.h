@@ -433,6 +433,12 @@ class JIT : private MacroAssembler {
         Profiler::enabledProfilerReference(), globalData));
   }
 
+  static bool isStrictEqCaseHandledInJITCode(JSValuePtr src1, JSValuePtr src2) {
+    return JSImmediate::areBothImmediate(src1, src2) ||
+           (JSImmediate::isEitherImmediate(src1, src2) & (src1 != js0()) &
+            (src2 != js0()));
+  }
+
  private:
   JIT(JSGlobalData*, CodeBlock* = 0);
 

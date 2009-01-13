@@ -249,7 +249,7 @@ class CodeBlock {
       return true;
 
     if (isConstantRegisterIndex(index))
-      return !JSImmediate::isImmediate(getConstant(index));
+      return getConstant(index)->isCell();
 
     return false;
   }

@@ -326,15 +326,13 @@ class Interpreter {
   static const int initialTickCountThreshold = 1024;
 
   bool isJSArray(JSValuePtr v) {
-    return !JSImmediate::isImmediate(v) && v->asCell()->vptr() == m_jsArrayVptr;
+    return v->isCell() && v->asCell()->vptr() == m_jsArrayVptr;
   }
   bool isJSString(JSValuePtr v) {
-    return !JSImmediate::isImmediate(v) &&
-           v->asCell()->vptr() == m_jsStringVptr;
+    return v->isCell() && v->asCell()->vptr() == m_jsStringVptr;
   }
   bool isJSByteArray(JSValuePtr v) {
-    return !JSImmediate::isImmediate(v) &&
-           v->asCell()->vptr() == m_jsByteArrayVptr;
+    return v->isCell() && v->asCell()->vptr() == m_jsByteArrayVptr;
   }
 
  private:

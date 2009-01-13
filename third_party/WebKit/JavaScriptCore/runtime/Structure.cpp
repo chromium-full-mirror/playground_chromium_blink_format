@@ -577,7 +577,7 @@ StructureChain* Structure::createCachedPrototypeChain() {
   ASSERT(!m_cachedPrototypeChain);
 
   JSValuePtr prototype = storedPrototype();
-  if (JSImmediate::isImmediate(prototype))
+  if (!prototype->isCell())
     return 0;
 
   RefPtr<StructureChain> chain =

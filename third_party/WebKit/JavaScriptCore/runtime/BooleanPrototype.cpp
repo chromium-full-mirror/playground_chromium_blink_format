@@ -89,7 +89,7 @@ JSValuePtr booleanProtoFuncValueOf(ExecState* exec,
                                    JSObject*,
                                    JSValuePtr thisValue,
                                    const ArgList&) {
-  if (JSImmediate::isBoolean(thisValue))
+  if (thisValue->isBoolean())
     return thisValue;
 
   if (!thisValue->isObject(&BooleanObject::info))
