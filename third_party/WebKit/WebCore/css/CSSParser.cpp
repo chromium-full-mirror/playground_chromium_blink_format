@@ -418,7 +418,7 @@ bool CSSParser::validUnit(CSSParserValue* value, Units unitflags, bool strict) {
         value->unit = (unitflags & FLength)
                           ? CSSPrimitiveValue::CSS_PX
                           : ((unitflags & FAngle) ? CSSPrimitiveValue::CSS_DEG
-                                                  : CSSPrimitiveValue::CSS_S);
+                                                  : CSSPrimitiveValue::CSS_MS);
         b = true;
       }
       if (!b && (unitflags & FInteger) && value->isInt)
