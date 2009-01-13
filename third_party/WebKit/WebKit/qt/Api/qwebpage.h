@@ -267,6 +267,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
                          ExtensionReturn* output = 0);
   virtual bool supportsExtension(Extension extension) const;
 
+  inline QWebPagePrivate* handle() const { return d; }
+
  Q_SIGNALS:
   void loadStarted();
   void loadProgress(int progress);

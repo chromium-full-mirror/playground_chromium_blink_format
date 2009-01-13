@@ -115,8 +115,7 @@ class QWEBKIT_EXPORT QWebSettings {
   static void setOfflineWebApplicationCachePath(const QString& path);
   static QString offlineWebApplicationCachePath();
 
-  void setLocalStorageDatabasePath(const QString& path);
-  QString localStorageDatabasePath() const;
+  inline QWebSettingsPrivate* handle() const { return d; }
 
  private:
   friend class QWebPagePrivate;

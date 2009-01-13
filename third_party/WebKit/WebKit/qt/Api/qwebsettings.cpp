@@ -739,7 +739,7 @@ QString QWebSettings::offlineWebApplicationCachePath() {
 #endif
 }
 
-/*!
+/*
     \since 4.5
 
     Sets the path for HTML5 local storage databases to \a path.
@@ -750,13 +750,16 @@ QString QWebSettings::offlineWebApplicationCachePath() {
 
     \sa localStorageDatabasePath()
 */
-void QWebSettings::setLocalStorageDatabasePath(const QString& path) {
-  QWebSettingsPrivate* global = QWebSettings::globalSettings()->d;
-  global->localStorageDatabasePath = path;
+
+void QWEBKIT_EXPORT
+qt_websettings_setLocalStorageDatabasePath(QWebSettings* settings,
+                                           const QString& path) {
+  QWebSettingsPrivate* d = settings->handle();
+  d->localStorageDatabasePath = path;
   d->apply();
 }
 
-/*!
+/*
     \since 4.5
 
     Returns the path for HTML5 local storage databases
@@ -764,7 +767,12 @@ void QWebSettings::setLocalStorageDatabasePath(const QString& path) {
 
     \sa setLocalStorageDatabasePath()
 */
-QString QWebSettings::localStorageDatabasePath() const {
-  QWebSettingsPrivate* global = QWebSettings::globalSettings()->d;
-  return global->localStorageDatabasePath;
+QString QWEBKIT_EXPORT
+qt_websettings_localStorageDatabasePath(QWebSettings* settings) {
+  return settings->handle()->localStorageDatabasePath;
 }
+
+/*!
+    \fn QWebSettingsPrivate* QWebSettings::handle() const
+    \internal
+*/
