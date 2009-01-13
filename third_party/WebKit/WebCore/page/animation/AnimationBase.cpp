@@ -957,11 +957,7 @@ double AnimationBase::progress(double scale,
   if (preActive())
     return 0;
 
-  double elapsedTime = running() && !paused()
-                           ? (beginAnimationUpdateTime() - m_startTime)
-                           : (m_pauseTime - m_startTime);
-  if (running() && elapsedTime < 0)
-    return 0;
+  double elapsedTime = getElapsedTime();
 
   double dur = m_animation->duration();
   if (m_animation->iterationCount() > 0)
@@ -1031,6 +1027,16 @@ void AnimationBase::pauseAtTime(double t) {
 
 double AnimationBase::beginAnimationUpdateTime() const {
   return m_compAnim->animationController()->beginAnimationUpdateTime();
+}
+
+double AnimationBase::getElapsedTime() const {
+  if (paused())
+    return m_pauseTime - m_startTime;
+  if (m_startTime <= 0)
+    return 0;
+  if (postActive())
+    return 1;
+  return beginAnimationUpdateTime() - m_startTime;
 }
 
 }  // namespace WebCore

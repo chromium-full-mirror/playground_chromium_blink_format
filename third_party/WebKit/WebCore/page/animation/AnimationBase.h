@@ -56,7 +56,6 @@ class AnimationBase : public RefCounted<AnimationBase> {
   RenderObject* renderer() const { return m_object; }
   void clearRenderer() { m_object = 0; }
 
-  double startTime() const { return m_startTime; }
   double duration() const;
 
   // Animations and Transitions go through the states below. When entering the
@@ -182,6 +181,8 @@ class AnimationBase : public RefCounted<AnimationBase> {
   void pauseAtTime(double t);
 
   double beginAnimationUpdateTime() const;
+
+  double getElapsedTime() const;
 
  protected:
   virtual void overrideAnimations() {}
