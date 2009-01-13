@@ -103,9 +103,15 @@ class NetscapePluginInstanceProxy
                 data_t& resultData,
                 mach_msg_type_number_t& resultLength);
   bool invoke(uint32_t objectID,
-              JSC::Identifier methodName,
+              const JSC::Identifier& methodName,
               data_t& resultData,
               mach_msg_type_number_t& resultLength);
+
+  bool removeProperty(uint32_t objectID, const JSC::Identifier& propertyName);
+  bool removeProperty(uint32_t objectID, unsigned propertyName);
+  bool hasProperty(uint32_t objectID, const JSC::Identifier& propertyName);
+  bool hasProperty(uint32_t objectID, unsigned propertyName);
+  bool hasMethod(uint32_t objectID, const JSC::Identifier& methodName);
 
   void status(const char* message);
   NPError loadURL(const char* url,
