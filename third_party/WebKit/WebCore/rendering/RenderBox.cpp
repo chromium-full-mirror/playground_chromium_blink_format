@@ -645,7 +645,7 @@ void RenderBox::imageChanged(WrappedImagePtr image, const IntRect*) {
 bool RenderBox::repaintLayerRectsForImage(WrappedImagePtr image,
                                           const FillLayer* layers,
                                           bool drawingBackground) {
-  IntRect absoluteRect;
+  IntRect rendererRect;
   RenderBox* layerRenderer = 0;
 
   for (const FillLayer* curLayer = layers; curLayer;
@@ -677,7 +677,7 @@ bool RenderBox::repaintLayerRectsForImage(WrappedImagePtr image,
             rw = layerRenderer->width();
             rh = layerRenderer->height();
           }
-          absoluteRect =
+          rendererRect =
               IntRect(-layerRenderer->marginLeft(), -layerRenderer->marginTop(),
                       max(layerRenderer->width() + layerRenderer->marginLeft() +
                               layerRenderer->marginRight() +
@@ -691,20 +691,18 @@ bool RenderBox::repaintLayerRectsForImage(WrappedImagePtr image,
                           rh));
         } else {
           layerRenderer = this;
-          absoluteRect = borderBox();
+          rendererRect = borderBox();
         }
-
-        layerRenderer->computeAbsoluteRepaintRect(absoluteRect);
       }
 
       IntRect repaintRect;
       IntPoint phase;
       IntSize tileSize;
       layerRenderer->calculateBackgroundImageGeometry(
-          curLayer, absoluteRect.x(), absoluteRect.y(), absoluteRect.width(),
-          absoluteRect.height(), repaintRect, phase, tileSize);
-      view()->repaintViewRectangle(repaintRect);
-      if (repaintRect == absoluteRect)
+          curLayer, rendererRect.x(), rendererRect.y(), rendererRect.width(),
+          rendererRect.height(), repaintRect, phase, tileSize);
+      layerRenderer->repaintRectangle(repaintRect);
+      if (repaintRect == rendererRect)
         return true;
     }
   }
