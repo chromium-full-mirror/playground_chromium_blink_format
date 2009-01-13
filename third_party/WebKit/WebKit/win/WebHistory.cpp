@@ -699,6 +699,7 @@ HRESULT WebHistory::addItem(IWebHistoryItem* entry) {
 
 void WebHistory::addItem(const KURL& url,
                          const String& title,
+                         const String& httpMethod,
                          bool wasFailure) {
   COMPtr<WebHistoryItem> item(AdoptCOM, WebHistoryItem::createInstance());
   if (!item)
@@ -722,6 +723,9 @@ void WebHistory::addItem(const KURL& url,
 
   if (wasFailure)
     item->setLastVisitWasFailure(true);
+
+  if (!httpMethod.isEmpty() && !equalIgnoringCase(httpMethod, "GET"))
+    item->setLastVisitWasHTTPNonGet(true);
 
   addItem(item.get());
 }

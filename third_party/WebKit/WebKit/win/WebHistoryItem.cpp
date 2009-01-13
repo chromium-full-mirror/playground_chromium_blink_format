@@ -34,6 +34,7 @@
 #pragma warning(push, 0)
 #include <WebCore/BString.h>
 #include <WebCore/HistoryItem.h>
+#include <WebCore/KURL.h>
 #pragma warning(pop)
 
 #include <wtf/RetainPtr.h>
@@ -91,6 +92,7 @@ static CFStringRef lastVisitedDateKey = CFSTR("lastVisitedDate");
 static CFStringRef titleKey = CFSTR("title");
 static CFStringRef visitCountKey = CFSTR("visitCount");
 static CFStringRef lastVisitWasFailureKey = CFSTR("lastVisitWasFailure");
+static CFStringRef lastVisitWasHTTPNonGetKey = CFSTR("lastVisitWasHTTPNonGet");
 
 HRESULT STDMETHODCALLTYPE
 WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
@@ -128,6 +130,14 @@ WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
   bool lastVisitWasFailure =
       lastVisitWasFailureRef && CFBooleanGetValue(lastVisitWasFailureRef);
 
+  CFBooleanRef lastVisitWasHTTPNonGetRef = static_cast<CFBooleanRef>(
+      CFDictionaryGetValue(dictionaryRef, lastVisitWasHTTPNonGetKey));
+  if (lastVisitWasHTTPNonGetRef &&
+      CFGetTypeID(lastVisitWasHTTPNonGetRef) != CFBooleanGetTypeID())
+    return E_FAIL;
+  bool lastVisitWasHTTPNonGet =
+      lastVisitWasHTTPNonGetRef && CFBooleanGetValue(lastVisitWasHTTPNonGetRef);
+
   historyItemWrappers().remove(m_historyItem.get());
   m_historyItem = HistoryItem::create(urlStringRef, titleRef, lastVisitedTime);
   historyItemWrappers().set(m_historyItem.get(), this);
@@ -135,6 +145,11 @@ WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
   m_historyItem->setVisitCount(visitedCount);
   if (lastVisitWasFailure)
     m_historyItem->setLastVisitWasFailure(true);
+
+  if (lastVisitWasHTTPNonGet &&
+      (protocolIs(m_historyItem->urlString(), "http") ||
+       protocolIs(m_historyItem->urlString(), "https")))
+    m_historyItem->setLastVisitWasHTTPNonGet(true);
 
   return S_OK;
 }
@@ -149,8 +164,8 @@ WebHistoryItem::dictionaryRepresentation(void** dictionary) {
     return E_FAIL;
 
   int keyCount = 0;
-  CFTypeRef keys[5];
-  CFTypeRef values[5];
+  CFTypeRef keys[6];
+  CFTypeRef values[6];
 
   if (!m_historyItem->urlString().isEmpty()) {
     keys[keyCount] = urlKey;
@@ -171,6 +186,13 @@ WebHistoryItem::dictionaryRepresentation(void** dictionary) {
 
   if (m_historyItem->lastVisitWasFailure()) {
     keys[keyCount] = lastVisitWasFailureKey;
+    values[keyCount++] = CFRetain(kCFBooleanTrue);
+  }
+
+  if (m_historyItem->lastVisitWasHTTPNonGet()) {
+    ASSERT(m_historyItem->urlString().startsWith("http:", false) ||
+           m_historyItem->urlString().startsWith("https:", false));
+    keys[keyCount] = lastVisitWasHTTPNonGetKey;
     values[keyCount++] = CFRetain(kCFBooleanTrue);
   }
 
@@ -331,6 +353,24 @@ WebHistoryItem::lastVisitWasFailure(BOOL* wasFailure) {
 HRESULT STDMETHODCALLTYPE
 WebHistoryItem::setLastVisitWasFailure(BOOL wasFailure) {
   m_historyItem->setLastVisitWasFailure(wasFailure);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebHistoryItem::lastVisitWasHTTPNonGet(BOOL* HTTPNonGet) {
+  if (!HTTPNonGet) {
+    ASSERT_NOT_REACHED();
+    return E_POINTER;
+  }
+
+  *HTTPNonGet = m_historyItem->lastVisitWasHTTPNonGet();
+
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebHistoryItem::setLastVisitWasHTTPNonGet(BOOL HTTPNonGet) {
+  m_historyItem->setLastVisitWasHTTPNonGet(HTTPNonGet);
   return S_OK;
 }
 
