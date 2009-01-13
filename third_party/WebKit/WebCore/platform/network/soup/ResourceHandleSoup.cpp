@@ -435,6 +435,7 @@ static void cleanupGioOperation(ResourceHandle* handle) {
   ResourceHandleInternal* d = handle->getInternal();
 
   if (d->m_gfile) {
+    g_object_set_data(G_OBJECT(d->m_gfile), "webkit-resource", 0);
     g_object_unref(d->m_gfile);
     d->m_gfile = NULL;
   }
@@ -443,6 +444,7 @@ static void cleanupGioOperation(ResourceHandle* handle) {
     d->m_cancellable = NULL;
   }
   if (d->m_input_stream) {
+    g_object_set_data(G_OBJECT(d->m_input_stream), "webkit-resource", 0);
     g_object_unref(d->m_input_stream);
     d->m_input_stream = NULL;
   }
@@ -452,8 +454,12 @@ static void cleanupGioOperation(ResourceHandle* handle) {
   }
 }
 
-static void closeCallback(GObject* source, GAsyncResult* res, gpointer data) {
-  ResourceHandle* handle = static_cast<ResourceHandle*>(data);
+static void closeCallback(GObject* source, GAsyncResult* res, gpointer) {
+  ResourceHandle* handle = static_cast<ResourceHandle*>(
+      g_object_get_data(source, "webkit-resource"));
+  if (!handle)
+    return;
+
   ResourceHandleInternal* d = handle->getInternal();
   ResourceHandleClient* client = handle->client();
 
@@ -462,8 +468,12 @@ static void closeCallback(GObject* source, GAsyncResult* res, gpointer data) {
   client->didFinishLoading(handle);
 }
 
-static void readCallback(GObject* source, GAsyncResult* res, gpointer data) {
-  ResourceHandle* handle = static_cast<ResourceHandle*>(data);
+static void readCallback(GObject* source, GAsyncResult* res, gpointer) {
+  ResourceHandle* handle = static_cast<ResourceHandle*>(
+      g_object_get_data(source, "webkit-resource"));
+  if (!handle)
+    return;
+
   ResourceHandleInternal* d = handle->getInternal();
   ResourceHandleClient* client = handle->client();
 
@@ -483,7 +493,7 @@ static void readCallback(GObject* source, GAsyncResult* res, gpointer data) {
     return;
   } else if (!nread) {
     g_input_stream_close_async(d->m_input_stream, G_PRIORITY_DEFAULT, NULL,
-                               closeCallback, handle);
+                               closeCallback, NULL);
     return;
   }
 
@@ -492,11 +502,15 @@ static void readCallback(GObject* source, GAsyncResult* res, gpointer data) {
 
   g_input_stream_read_async(d->m_input_stream, d->m_buffer, d->m_bufsize,
                             G_PRIORITY_DEFAULT, d->m_cancellable, readCallback,
-                            handle);
+                            NULL);
 }
 
-static void openCallback(GObject* source, GAsyncResult* res, gpointer data) {
-  ResourceHandle* handle = static_cast<ResourceHandle*>(data);
+static void openCallback(GObject* source, GAsyncResult* res, gpointer) {
+  ResourceHandle* handle = static_cast<ResourceHandle*>(
+      g_object_get_data(source, "webkit-resource"));
+  if (!handle)
+    return;
+
   ResourceHandleInternal* d = handle->getInternal();
   ResourceHandleClient* client = handle->client();
 
@@ -519,15 +533,18 @@ static void openCallback(GObject* source, GAsyncResult* res, gpointer data) {
   d->m_bufsize = 8192;
   d->m_buffer = static_cast<char*>(g_malloc(d->m_bufsize));
   d->m_total = 0;
+  g_object_set_data(G_OBJECT(d->m_input_stream), "webkit-resource", handle);
   g_input_stream_read_async(d->m_input_stream, d->m_buffer, d->m_bufsize,
                             G_PRIORITY_DEFAULT, d->m_cancellable, readCallback,
-                            handle);
+                            NULL);
 }
 
-static void queryInfoCallback(GObject* source,
-                              GAsyncResult* res,
-                              gpointer data) {
-  ResourceHandle* handle = static_cast<ResourceHandle*>(data);
+static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
+  ResourceHandle* handle = static_cast<ResourceHandle*>(
+      g_object_get_data(source, "webkit-resource"));
+  if (!handle)
+    return;
+
   ResourceHandleInternal* d = handle->getInternal();
   ResourceHandleClient* client = handle->client();
 
@@ -580,7 +597,7 @@ static void queryInfoCallback(GObject* source,
   client->didReceiveResponse(handle, response);
 
   g_file_read_async(d->m_gfile, G_PRIORITY_DEFAULT, d->m_cancellable,
-                    openCallback, handle);
+                    openCallback, NULL);
 }
 
 bool ResourceHandle::startGio(String urlString) {
@@ -598,12 +615,13 @@ bool ResourceHandle::startGio(String urlString) {
     urlString = urlString.left(fragPos);
 
   d->m_gfile = g_file_new_for_uri(urlString.utf8().data());
+  g_object_set_data(G_OBJECT(d->m_gfile), "webkit-resource", this);
   d->m_cancellable = g_cancellable_new();
   g_file_query_info_async(d->m_gfile, G_FILE_ATTRIBUTE_STANDARD_TYPE
                           "," G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE
                           "," G_FILE_ATTRIBUTE_STANDARD_SIZE,
                           G_FILE_QUERY_INFO_NONE, G_PRIORITY_DEFAULT,
-                          d->m_cancellable, queryInfoCallback, this);
+                          d->m_cancellable, queryInfoCallback, NULL);
   return true;
 }
 }
