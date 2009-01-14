@@ -238,7 +238,7 @@ static void paintSkBitmap(PlatformContextSkia* platformContext,
   skia::PlatformCanvas* canvas = platformContext->canvas();
 
   ResamplingMode resampling =
-      platformContext->IsPrinting()
+      platformContext->isPrinting()
           ? RESAMPLE_NONE
           : computeResamplingMode(bitmap, srcRect.width(), srcRect.height(),
                                   SkScalarToFloat(destRect.width()),
@@ -293,14 +293,18 @@ static FloatRect normalizeRect(const FloatRect& rect) {
   return norm;
 }
 
-void FrameData::clear() {
-  // ImageSource::createFrameAtIndex() allocated |m_frame| and passed
-  // ownership to BitmapImage; we must delete it here.
-  delete m_frame;
-  m_frame = 0;
-  // NOTE: We purposefully don't reset metadata here, so that even if we
-  // throw away previously-decoded data, animation loops can still access
-  // properties like frame durations without re-decoding.
+bool FrameData::clear(bool clearMetadata) {
+  if (clearMetadata)
+    m_haveMetadata = false;
+
+  if (m_frame) {
+    // ImageSource::createFrameAtIndex() allocated |m_frame| and passed
+    // ownership to BitmapImage; we must delete it here.
+    delete m_frame;
+    m_frame = 0;
+    return true;
+  }
+  return false;
 }
 
 PassRefPtr<Image> Image::loadPlatformResource(const char* name) {
@@ -339,7 +343,7 @@ void Image::drawPattern(GraphicsContext* context,
 
   // Compute the resampling mode.
   ResamplingMode resampling;
-  if (context->platformContext()->IsPrinting())
+  if (context->platformContext()->isPrinting())
     resampling = RESAMPLE_LINEAR;
   else {
     resampling =
