@@ -26,16 +26,12 @@
 #include "config.h"
 #include "IconFetcher.h"
 
-#include "Document.h"
 #include "Frame.h"
 #include "HTMLHeadElement.h"
 #include "HTMLLinkElement.h"
 #include "HTMLNames.h"
-#include "MIMETypeRegistry.h"
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
-#include "SharedBuffer.h"
-#include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
@@ -178,7 +174,7 @@ void IconFetcher::loadFailed() {
 
 void IconFetcher::didReceiveResponse(ResourceHandle* handle,
                                      const ResourceResponse& response) {
-  ASSERT(m_handle == handle);
+  ASSERT_UNUSED(handle, m_handle == handle);
 
   int statusCode = response.httpStatusCode() / 100;
   if (statusCode == 4 || statusCode == 5) {
@@ -190,14 +186,14 @@ void IconFetcher::didReceiveResponse(ResourceHandle* handle,
 void IconFetcher::didReceiveData(ResourceHandle* handle,
                                  const char* data,
                                  int length,
-                                 int lengthReceived) {
-  ASSERT(m_handle == handle);
+                                 int) {
+  ASSERT_UNUSED(handle, m_handle == handle);
 
   m_entries[m_currentEntry].buffer()->append(data, length);
 }
 
 void IconFetcher::didFinishLoading(ResourceHandle* handle) {
-  ASSERT(m_handle == handle);
+  ASSERT_UNUSED(handle, m_handle == handle);
 
   if (m_currentEntry == m_entries.size() - 1) {
     // We finished loading, create the icon
@@ -214,7 +210,7 @@ void IconFetcher::didFinishLoading(ResourceHandle* handle) {
 }
 
 void IconFetcher::didFail(ResourceHandle* handle, const ResourceError&) {
-  ASSERT(m_handle == handle);
+  ASSERT_UNUSED(handle, m_handle == handle);
 
   loadFailed();
 }

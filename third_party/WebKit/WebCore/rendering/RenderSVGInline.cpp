@@ -35,7 +35,7 @@ RenderSVGInline::RenderSVGInline(Node* n) : RenderInline(n) {}
 
 InlineBox* RenderSVGInline::createInlineBox(bool unusedMakePlaceHolderBox,
                                             bool unusedIsRootLineBox,
-                                            bool isOnlyRun) {
+                                            bool) {
 #if ASSERT_DISABLED
   UNUSED_PARAM(unusedIsRootLineBox);
   UNUSED_PARAM(unusedMakePlaceHolderBox);

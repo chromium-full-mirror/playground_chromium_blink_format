@@ -35,6 +35,7 @@
 #include "SVGResourceMasker.h"
 #include "SVGStyledElement.h"
 #include "SVGURIReference.h"
+#include <wtf/UnusedParam.h>
 
 namespace WebCore {
 
@@ -43,6 +44,11 @@ void prepareToRenderSVGContent(RenderObject* object,
                                const FloatRect& boundingBox,
                                SVGResourceFilter*& filter,
                                SVGResourceFilter* rootFilter) {
+#if !ENABLE(SVG_FILTERS)
+  UNUSED_PARAM(filter);
+  UNUSED_PARAM(rootFilter);
+#endif
+
   SVGElement* svgElement = static_cast<SVGElement*>(object->element());
   ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
   ASSERT(object);
@@ -114,6 +120,12 @@ void finishRenderSVGContent(RenderObject* object,
                             const FloatRect& boundingBox,
                             SVGResourceFilter*& filter,
                             GraphicsContext* savedContext) {
+#if !ENABLE(SVG_FILTERS)
+  UNUSED_PARAM(boundingBox);
+  UNUSED_PARAM(filter);
+  UNUSED_PARAM(savedContext);
+#endif
+
   ASSERT(object);
 
   const RenderStyle* style = object->style();

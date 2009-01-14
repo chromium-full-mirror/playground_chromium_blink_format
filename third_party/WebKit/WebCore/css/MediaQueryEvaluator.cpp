@@ -463,8 +463,8 @@ static bool max_device_widthMediaFeatureEval(CSSValue* value,
 }
 
 static bool animationMediaFeatureEval(CSSValue* value,
-                                      RenderStyle* style,
-                                      Frame* frame,
+                                      RenderStyle*,
+                                      Frame*,
                                       MediaFeaturePrefix op) {
   if (value) {
     float number;
@@ -475,8 +475,8 @@ static bool animationMediaFeatureEval(CSSValue* value,
 }
 
 static bool transitionMediaFeatureEval(CSSValue* value,
-                                       RenderStyle* style,
-                                       Frame* frame,
+                                       RenderStyle*,
+                                       Frame*,
                                        MediaFeaturePrefix op) {
   if (value) {
     float number;
@@ -487,8 +487,8 @@ static bool transitionMediaFeatureEval(CSSValue* value,
 }
 
 static bool transform_2dMediaFeatureEval(CSSValue* value,
-                                         RenderStyle* style,
-                                         Frame* frame,
+                                         RenderStyle*,
+                                         Frame*,
                                          MediaFeaturePrefix op) {
   if (value) {
     float number;
@@ -499,8 +499,8 @@ static bool transform_2dMediaFeatureEval(CSSValue* value,
 }
 
 static bool transform_3dMediaFeatureEval(CSSValue* value,
-                                         RenderStyle* style,
-                                         Frame* frame,
+                                         RenderStyle*,
+                                         Frame*,
                                          MediaFeaturePrefix op) {
   if (value) {
     float number;

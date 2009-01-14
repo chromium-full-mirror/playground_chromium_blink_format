@@ -45,7 +45,7 @@ ImageSource::~ImageSource() {
   clear(true);
 }
 
-void ImageSource::clear(bool destroyAll,
+void ImageSource::clear(bool,
                         size_t,
                         SharedBuffer* data,
                         bool allDataReceived) {
