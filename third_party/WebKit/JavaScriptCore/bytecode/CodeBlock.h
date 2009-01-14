@@ -478,6 +478,11 @@ class CodeBlock {
     return m_rareData->m_functions[index].get();
   }
 
+  bool hasFunctions() const {
+    return m_functionExpressions.size() ||
+           (m_rareData && m_rareData->m_functions.size());
+  }
+
   unsigned addUnexpectedConstant(JSValuePtr v) {
     createRareDataIfNecessary();
     unsigned size = m_rareData->m_unexpectedConstants.size();

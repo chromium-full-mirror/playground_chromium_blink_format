@@ -2319,6 +2319,8 @@ struct ScopeNodeData {
   FunctionStack m_functionStack;
   int m_numConstants;
   StatementVector m_children;
+
+  void mark();
 };
 
 class ScopeNode : public StatementNode {
@@ -2439,6 +2441,8 @@ class EvalNode : public ScopeNode {
 
   EvalCodeBlock& bytecodeForExceptionInfoReparse(ScopeChainNode*,
                                                  CodeBlock*) JSC_FAST_CALL;
+
+  void mark();
 
  private:
   EvalNode(JSGlobalData*,
