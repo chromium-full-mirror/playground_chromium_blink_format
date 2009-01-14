@@ -31,6 +31,7 @@
 #include "MainResourceLoader.h"
 #include "ResourceHandle.h"
 #include "ResourceLoader.h"
+#include <wtf/UnusedParam.h>
 
 namespace WebCore {
 
@@ -60,6 +61,8 @@ void DocumentLoader::schedule(SchedulePair* pair) {
   scheduleAll(m_subresourceLoaders, pair);
   scheduleAll(m_plugInStreamLoaders, pair);
   scheduleAll(m_multipartSubresourceLoaders, pair);
+#else
+  UNUSED_PARAM(pair);
 #endif
 }
 
@@ -70,6 +73,8 @@ void DocumentLoader::unschedule(SchedulePair* pair) {
   unscheduleAll(m_subresourceLoaders, pair);
   unscheduleAll(m_plugInStreamLoaders, pair);
   unscheduleAll(m_multipartSubresourceLoaders, pair);
+#else
+  UNUSED_PARAM(pair);
 #endif
 }
 

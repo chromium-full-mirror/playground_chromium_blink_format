@@ -65,6 +65,7 @@
 #include "htmlediting.h"
 #include "markup.h"
 #include "visible_units.h"
+#include <wtf/UnusedParam.h>
 
 namespace WebCore {
 
@@ -2075,6 +2076,8 @@ void Editor::markMisspellings(const Selection& selection) {
 void Editor::markBadGrammar(const Selection& selection) {
 #ifndef BUILDING_ON_TIGER
   markMisspellingsOrBadGrammar(this, selection, false);
+#else
+  UNUSED_PARAM(selection);
 #endif
 }
 
