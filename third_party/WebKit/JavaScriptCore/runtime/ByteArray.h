@@ -30,7 +30,7 @@
 #include "wtf/RefCounted.h"
 
 namespace JSC {
-class ByteArray : public RefCounted<ByteArray> {
+class ByteArray : public WTF::RefCountedBase {
  public:
   unsigned length() const { return m_size; }
 
@@ -53,10 +53,19 @@ class ByteArray : public RefCounted<ByteArray> {
 
   unsigned char* data() { return m_data; }
 
+  void deref() {
+    if (derefBase()) {
+      // We allocated with new unsigned char[] in create(),
+      // and then used placement new to construct the object.
+      this->~ByteArray();
+      delete[] reinterpret_cast<unsigned char*>(this);
+    }
+  }
+
   static PassRefPtr<ByteArray> create(size_t size);
 
  private:
-  ByteArray(size_t size) : m_size(size) {}
+  ByteArray(size_t size) : RefCountedBase(1), m_size(size) {}
   size_t m_size;
   unsigned char m_data[sizeof(size_t)];
 };
