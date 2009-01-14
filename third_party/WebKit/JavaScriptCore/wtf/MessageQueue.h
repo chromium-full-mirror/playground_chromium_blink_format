@@ -36,6 +36,13 @@
 
 namespace WTF {
 
+enum MessageQueueWaitResult {
+  MessageQueueTerminated,  // Queue was destroyed while waiting for message.
+  MessageQueueTimeout,     // Timeout was specified and it expired.
+  MessageQueueMessageReceived,  // A message was successfully received and
+                                // returned.
+};
+
 template <typename DataType>
 class MessageQueue : Noncopyable {
  public:
@@ -44,6 +51,7 @@ class MessageQueue : Noncopyable {
   void append(const DataType&);
   void prepend(const DataType&);
   bool waitForMessage(DataType&);
+  MessageQueueWaitResult waitForMessageTimed(DataType&, double absoluteTime);
   void kill();
 
   bool tryGetMessage(DataType&);
@@ -91,6 +99,28 @@ inline bool MessageQueue<DataType>::waitForMessage(DataType& result) {
 }
 
 template <typename DataType>
+inline MessageQueueWaitResult MessageQueue<DataType>::waitForMessageTimed(
+    DataType& result,
+    double absoluteTime) {
+  MutexLocker lock(m_mutex);
+  bool timedOut = false;
+
+  while (!m_killed && !timedOut && m_queue.isEmpty())
+    timedOut = !m_condition.timedWait(m_mutex, absoluteTime);
+
+  if (m_killed)
+    return MessageQueueTerminated;
+
+  if (timedOut)
+    return MessageQueueTimeout;
+
+  ASSERT(!m_queue.isEmpty());
+  result = m_queue.first();
+  m_queue.removeFirst();
+  return MessageQueueMessageReceived;
+}
+
+template <typename DataType>
 inline bool MessageQueue<DataType>::tryGetMessage(DataType& result) {
   MutexLocker lock(m_mutex);
   if (m_killed)
@@ -126,5 +156,10 @@ inline bool MessageQueue<DataType>::killed() const {
 }
 
 using WTF::MessageQueue;
+// MessageQueueWaitResult enum and all its values.
+using WTF::MessageQueueWaitResult;
+using WTF::MessageQueueTerminated;
+using WTF::MessageQueueTimeout;
+using WTF::MessageQueueMessageReceived;
 
 #endif  // MessageQueue_h
