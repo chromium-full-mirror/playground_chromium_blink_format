@@ -39,7 +39,7 @@ ApplicationCacheResource::ApplicationCacheResource(
     : SubstituteResource(url, response, data), m_type(type), m_storageID(0) {}
 
 void ApplicationCacheResource::addType(unsigned type) {
-  ASSERT(!m_storageID);
+  // Caller should take care of storing the new type in database.
   m_type |= type;
 }
 

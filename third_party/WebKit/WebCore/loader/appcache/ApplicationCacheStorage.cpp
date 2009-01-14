@@ -182,6 +182,9 @@ ApplicationCacheGroup* ApplicationCacheStorage::cacheGroupForURL(
   while ((result = statement.step()) == SQLResultRow) {
     KURL manifestURL = KURL(statement.getColumnText(1));
 
+    if (m_cachesInMemory.contains(manifestURL))
+      continue;
+
     if (!protocolHostAndPortAreEqual(url, manifestURL))
       continue;
 
@@ -191,7 +194,10 @@ ApplicationCacheGroup* ApplicationCacheStorage::cacheGroupForURL(
     unsigned newestCacheID = static_cast<unsigned>(statement.getColumnInt64(2));
     RefPtr<ApplicationCache> cache = loadCache(newestCacheID);
 
-    if (!cache->resourceForURL(url))
+    ApplicationCacheResource* resource = cache->resourceForURL(url);
+    if (!resource)
+      continue;
+    if (resource->type() & ApplicationCacheResource::Foreign)
       continue;
 
     ApplicationCacheGroup* group = new ApplicationCacheGroup(manifestURL);
@@ -199,7 +205,6 @@ ApplicationCacheGroup* ApplicationCacheStorage::cacheGroupForURL(
     group->setStorageID(static_cast<unsigned>(statement.getColumnInt64(0)));
     group->setNewestCache(cache.release());
 
-    ASSERT(!m_cachesInMemory.contains(manifestURL));
     m_cachesInMemory.set(group->manifestURL(), group);
 
     return group;
@@ -245,6 +250,9 @@ ApplicationCacheGroup* ApplicationCacheStorage::fallbackCacheGroupForURL(
   while ((result = statement.step()) == SQLResultRow) {
     KURL manifestURL = KURL(statement.getColumnText(1));
 
+    if (m_cachesInMemory.contains(manifestURL))
+      continue;
+
     // Fallback namespaces always have the same origin as manifest URL, so we
     // can avoid loading caches that cannot match.
     if (!protocolHostAndPortAreEqual(url, manifestURL))
@@ -268,7 +276,6 @@ ApplicationCacheGroup* ApplicationCacheStorage::fallbackCacheGroupForURL(
     group->setStorageID(static_cast<unsigned>(statement.getColumnInt64(0)));
     group->setNewestCache(cache.release());
 
-    ASSERT(!m_cachesInMemory.contains(manifestURL));
     m_cachesInMemory.set(group->manifestURL(), group);
 
     return group;
@@ -587,6 +594,28 @@ bool ApplicationCacheStorage::store(ApplicationCacheResource* resource,
 
   resource->setStorageID(resourceId);
   return true;
+}
+
+bool ApplicationCacheStorage::storeUpdatedType(
+    ApplicationCacheResource* resource,
+    ApplicationCache* cache) {
+  ASSERT(cache->storageID());
+  ASSERT(resource->storageID());
+
+  // FIXME: If the resource gained a Dynamic bit, it should be re-inserted at
+  // the end for correct order.
+  ASSERT(!(resource->type() & ApplicationCacheResource::Dynamic));
+
+  // First, insert the data
+  SQLiteStatement entryStatement(
+      m_database, "UPDATE CacheEntries SET type=? WHERE resource=?");
+  if (entryStatement.prepare() != SQLResultOk)
+    return false;
+
+  entryStatement.bindInt64(1, resource->type());
+  entryStatement.bindInt64(2, resource->storageID());
+
+  return executeStatement(entryStatement);
 }
 
 void ApplicationCacheStorage::store(ApplicationCacheResource* resource,

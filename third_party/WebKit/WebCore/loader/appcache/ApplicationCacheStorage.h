@@ -57,6 +57,7 @@ class ApplicationCacheStorage {
 
   bool storeNewestCache(ApplicationCacheGroup*);
   void store(ApplicationCacheResource*, ApplicationCache*);
+  bool storeUpdatedType(ApplicationCacheResource*, ApplicationCache*);
 
   void remove(ApplicationCache*);
 
