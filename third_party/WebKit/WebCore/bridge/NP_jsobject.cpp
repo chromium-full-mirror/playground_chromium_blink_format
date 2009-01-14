@@ -32,6 +32,7 @@
 #include "PlatformString.h"
 #include "StringSourceProvider.h"
 #include "c_utility.h"
+#include "c_instance.h"
 #include "npruntime_impl.h"
 #include "npruntime_priv.h"
 #include "runtime_root.h"
@@ -397,10 +398,10 @@ bool _NPN_HasMethod(NPP, NPObject* o, NPIdentifier methodName) {
   return false;
 }
 
-void _NPN_SetException(NPObject*, const NPUTF8*) {
-  // FIXME:
-  // Bug 19888: Implement _NPN_SetException() correctly
-  // <https://bugs.webkit.org/show_bug.cgi?id=19888>
+void _NPN_SetException(NPObject*, const NPUTF8* message) {
+  // Ignorning the NPObject param is consistent with the Mozilla implementation.
+  UString exception(message);
+  CInstance::setGlobalException(exception);
 }
 
 bool _NPN_Enumerate(NPP,

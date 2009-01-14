@@ -36,6 +36,8 @@ typedef struct NPObject NPObject;
 
 namespace JSC {
 
+class UString;
+
 namespace Bindings {
 
 class CClass;
@@ -46,6 +48,9 @@ class CInstance : public Instance {
                                       PassRefPtr<RootObject> rootObject) {
     return adoptRef(new CInstance(object, rootObject));
   }
+
+  static void setGlobalException(JSC::UString exception);
+
   ~CInstance();
 
   virtual Class* getClass() const;
@@ -73,6 +78,7 @@ class CInstance : public Instance {
   virtual BindingLanguage getBindingLanguage() const { return CLanguage; }
 
  private:
+  static void moveGlobalExceptionToExecState(ExecState* exec);
   CInstance(NPObject*, PassRefPtr<RootObject>);
 
   mutable CClass* _class;

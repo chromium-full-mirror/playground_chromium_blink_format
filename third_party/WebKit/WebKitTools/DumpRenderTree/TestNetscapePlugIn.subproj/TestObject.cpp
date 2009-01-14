@@ -32,7 +32,13 @@
 static bool testEnumerate(NPObject* npobj,
                           NPIdentifier** value,
                           uint32_t* count);
-static bool testHasProperty(NPObject* obj, NPIdentifier name);
+static bool testHasMethod(NPObject*, NPIdentifier name);
+static bool testInvoke(NPObject*,
+                       NPIdentifier name,
+                       const NPVariant* args,
+                       uint32_t argCount,
+                       NPVariant* result);
+static bool testHasProperty(NPObject*, NPIdentifier name);
 static bool testGetProperty(NPObject*, NPIdentifier name, NPVariant*);
 static NPObject* testAllocate(NPP npp, NPClass* theClass);
 static void testDeallocate(NPObject* obj);
@@ -45,8 +51,8 @@ static NPClass testClass = {NP_CLASS_STRUCT_VERSION,
                             testAllocate,
                             testDeallocate,
                             0,
-                            0,
-                            0,
+                            testHasMethod,
+                            testInvoke,
                             0,
                             testHasProperty,
                             testGetProperty,
@@ -71,9 +77,19 @@ static const NPUTF8* testIdentifierNames[NUM_TEST_IDENTIFIERS] = {
     "foo", "bar", "objectPointer",
 };
 
+#define ID_THROW_EXCEPTION_METHOD 0
+#define NUM_METHOD_IDENTIFIERS 1
+
+static NPIdentifier testMethodIdentifiers[NUM_METHOD_IDENTIFIERS];
+static const NPUTF8* testMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
+    "throwException",
+};
+
 static void initializeIdentifiers(void) {
   browser->getstringidentifiers(testIdentifierNames, NUM_TEST_IDENTIFIERS,
                                 testIdentifiers);
+  browser->getstringidentifiers(testMethodIdentifierNames,
+                                NUM_METHOD_IDENTIFIERS, testMethodIdentifiers);
 }
 
 static NPObject* testAllocate(NPP npp, NPClass* theClass) {
@@ -91,7 +107,27 @@ static void testDeallocate(NPObject* obj) {
   free(obj);
 }
 
-static bool testHasProperty(NPObject* obj, NPIdentifier name) {
+static bool testHasMethod(NPObject*, NPIdentifier name) {
+  for (unsigned i = 0; i < NUM_METHOD_IDENTIFIERS; i++) {
+    if (testMethodIdentifiers[i] == name)
+      return true;
+  }
+  return false;
+}
+
+static bool testInvoke(NPObject* header,
+                       NPIdentifier name,
+                       const NPVariant* args,
+                       uint32_t argCount,
+                       NPVariant* result) {
+  if (name == testMethodIdentifiers[ID_THROW_EXCEPTION_METHOD]) {
+    browser->setexception(header, "test object throwException SUCCESS");
+    return true;
+  }
+  return false;
+}
+
+static bool testHasProperty(NPObject*, NPIdentifier name) {
   for (unsigned i = 0; i < NUM_TEST_IDENTIFIERS; i++) {
     if (testIdentifiers[i] == name)
       return true;
