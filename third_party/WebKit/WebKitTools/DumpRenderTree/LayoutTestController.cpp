@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -728,6 +728,23 @@ static JSValueRef setDatabaseQuotaCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setIconDatabaseEnabledCallback(JSContextRef context,
+                                                 JSObjectRef function,
+                                                 JSObjectRef thisObject,
+                                                 size_t argumentCount,
+                                                 const JSValueRef arguments[],
+                                                 JSValueRef* exception) {
+  // Has mac & windows implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setIconDatabaseEnabled(JSValueToBoolean(context, arguments[0]));
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setJavaScriptProfilingEnabledCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -742,6 +759,7 @@ static JSValueRef setJavaScriptProfilingEnabledCallback(
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setJavaScriptProfilingEnabled(
       JSValueToBoolean(context, arguments[0]));
+
   return JSValueMakeUndefined(context);
 }
 
@@ -1237,6 +1255,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setCustomPolicyDelegate", setCustomPolicyDelegateCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setDatabaseQuota", setDatabaseQuotaCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setIconDatabaseEnabled", setIconDatabaseEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setJavaScriptProfilingEnabled", setJavaScriptProfilingEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

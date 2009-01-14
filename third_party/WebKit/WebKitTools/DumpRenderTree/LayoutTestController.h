@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -64,13 +64,14 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void setAuthorAndUserStylesEnabled(bool);
   void setCustomPolicyDelegate(bool setDelegate, bool permissive);
   void setDatabaseQuota(unsigned long long quota);
+  void setIconDatabaseEnabled(bool iconDatabaseEnabled);
+  void setJavaScriptProfilingEnabled(bool profilingEnabled);
   void setMainFrameIsFirstResponder(bool flag);
   void setPrivateBrowsingEnabled(bool flag);
   void setPopupBlockingEnabled(bool flag);
   void setTabKeyCyclesThroughElements(bool cycles);
   void setSmartInsertDeleteEnabled(bool flag);
   void setSelectTrailingWhitespaceEnabled(bool flag);
-  void setJavaScriptProfilingEnabled(bool profilingEnabled);
   void setUseDashboardCompatibilityMode(bool flag);
   void setUserStyleSheetEnabled(bool flag);
   void setUserStyleSheetLocation(JSStringRef path);
