@@ -41,6 +41,7 @@ class PasteboardPrivate {
     WebSmartPasteFormat,
   };
 };
-}
+
+}  // namespace WebCore
 
 #endif
