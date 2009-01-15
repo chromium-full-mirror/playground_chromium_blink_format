@@ -40,6 +40,7 @@ class QtInstance : public Instance {
   ~QtInstance();
 
   virtual Class* getClass() const;
+  virtual RuntimeObjectImp* createRuntimeObject(ExecState*) const;
 
   virtual void begin();
   virtual void end();
@@ -64,8 +65,6 @@ class QtInstance : public Instance {
   QObject* getObject() const { return m_object; }
 
   static PassRefPtr<QtInstance> getQtInstance(QObject*, PassRefPtr<RootObject>);
-  static RuntimeObjectImp* getRuntimeObject(ExecState* exec,
-                                            PassRefPtr<QtInstance>);
 
  private:
   static PassRefPtr<QtInstance> create(QObject* instance,

@@ -138,8 +138,7 @@ JSValuePtr convertNPVariantToValue(ExecState* exec,
       return ((JavaScriptObject*)obj)->imp;
 
     // Wrap NPObject in a CInstance.
-    return Instance::createRuntimeObject(exec,
-                                         CInstance::create(obj, rootObject));
+    return CInstance::create(obj, rootObject)->createRuntimeObject(exec);
   }
 
   return jsUndefined();

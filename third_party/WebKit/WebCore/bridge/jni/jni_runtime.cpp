@@ -132,8 +132,8 @@ JSValuePtr JavaField::valueFromInstance(ExecState* exec,
         jsresult = JavaArray::convertJObjectToArray(exec, anObject, arrayType,
                                                     instance->rootObject());
       } else if (anObject != 0) {
-        jsresult = Instance::createRuntimeObject(
-            exec, JavaInstance::create(anObject, instance->rootObject()));
+        jsresult = JavaInstance::create(anObject, instance->rootObject())
+                       ->createRuntimeObject(exec);
       }
     } break;
 
@@ -491,8 +491,8 @@ JSValuePtr JavaArray::valueAt(ExecState* exec, unsigned index) const {
                                                 rootObject());
       }
       // or array of other object type?
-      return Instance::createRuntimeObject(
-          exec, JavaInstance::create(anObject, rootObject()));
+      return JavaInstance::create(anObject, rootObject())
+          ->createRuntimeObject(exec);
     }
 
     case boolean_type: {
