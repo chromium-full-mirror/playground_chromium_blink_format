@@ -46,12 +46,13 @@ class ArgList;
 class CommonIdentifiers;
 class Heap;
 class IdentifierTable;
+class Interpreter;
 class JSGlobalObject;
 class JSObject;
 class Lexer;
-class Interpreter;
 class Parser;
 class ParserRefCounted;
+class ScopeNode;
 class Structure;
 class UString;
 struct HashTable;
@@ -122,6 +123,8 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   ClientData* clientData;
 
   HashSet<JSObject*> arrayVisitedElements;
+
+  ScopeNode* scopeNodeBeingReparsed;
 
   Heap heap;
 #if ENABLE(ASSEMBLER)

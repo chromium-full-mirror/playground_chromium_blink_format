@@ -1605,6 +1605,9 @@ void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
               m_globalData, ownerFunctionBodyNode);
       newFunctionBody->finishParsing(ownerFunctionBodyNode->copyParameters(),
                                      ownerFunctionBodyNode->parameterCount());
+
+      m_globalData->scopeNodeBeingReparsed = newFunctionBody.get();
+
       CodeBlock& newCodeBlock =
           newFunctionBody->bytecodeForExceptionInfoReparse(scopeChain, this);
       ASSERT(newCodeBlock.m_exceptionInfo);
@@ -1616,12 +1619,18 @@ void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
 #endif
 
       m_exceptionInfo.set(newCodeBlock.m_exceptionInfo.release());
+
+      m_globalData->scopeNodeBeingReparsed = 0;
+
       break;
     }
     case EvalCode: {
       EvalNode* ownerEvalNode = static_cast<EvalNode*>(m_ownerNode);
       RefPtr<EvalNode> newEvalBody =
           m_globalData->parser->reparse<EvalNode>(m_globalData, ownerEvalNode);
+
+      m_globalData->scopeNodeBeingReparsed = newEvalBody.get();
+
       EvalCodeBlock& newCodeBlock =
           newEvalBody->bytecodeForExceptionInfoReparse(scopeChain, this);
       ASSERT(newCodeBlock.m_exceptionInfo);
@@ -1633,6 +1642,9 @@ void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
 #endif
 
       m_exceptionInfo.set(newCodeBlock.m_exceptionInfo.release());
+
+      m_globalData->scopeNodeBeingReparsed = 0;
+
       break;
     }
     default:

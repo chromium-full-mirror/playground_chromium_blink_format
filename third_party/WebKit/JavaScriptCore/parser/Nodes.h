@@ -2382,6 +2382,8 @@ class ScopeNode : public StatementNode {
     return m_data->m_numConstants + 2;
   }
 
+  virtual void mark() {}
+
  protected:
   void setSource(const SourceCode& source) { m_source = source; }
 
@@ -2442,7 +2444,7 @@ class EvalNode : public ScopeNode {
   EvalCodeBlock& bytecodeForExceptionInfoReparse(ScopeChainNode*,
                                                  CodeBlock*) JSC_FAST_CALL;
 
-  void mark();
+  virtual void mark();
 
  private:
   EvalNode(JSGlobalData*,
@@ -2496,7 +2498,7 @@ class FunctionBodyNode : public ScopeNode {
 
   bool isGenerated() JSC_FAST_CALL { return m_code; }
 
-  void mark();
+  virtual void mark();
 
   void finishParsing(const SourceCode&, ParameterNode*);
   void finishParsing(Identifier* parameters, size_t parameterCount);
