@@ -66,6 +66,9 @@ class QtInstance : public Instance {
 
   static PassRefPtr<QtInstance> getQtInstance(QObject*, PassRefPtr<RootObject>);
 
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual void put(ExecState*, const Identifier&, JSValuePtr, PutPropertySlot&);
+
  private:
   static PassRefPtr<QtInstance> create(QObject* instance,
                                        PassRefPtr<RootObject> rootObject) {
