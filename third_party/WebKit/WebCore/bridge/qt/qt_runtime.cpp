@@ -570,8 +570,7 @@ QVariant convertValueToQVariant(ExecState* exec,
 
     case QMetaType::QObjectStar:
       if (type == QObj) {
-        QtInstance* qtinst = static_cast<QtInstance*>(
-            Instance::getInstance(object, Instance::QtLanguage));
+        QtInstance* qtinst = QtInstance::getInstance(object);
         if (qtinst) {
           if (qtinst->getObject()) {
             qConvDebug() << "found instance, with object:"
@@ -596,8 +595,7 @@ QVariant convertValueToQVariant(ExecState* exec,
 
     case QMetaType::VoidStar:
       if (type == QObj) {
-        QtInstance* qtinst = static_cast<QtInstance*>(
-            Instance::getInstance(object, Instance::QtLanguage));
+        QtInstance* qtinst = QtInstance::getInstance(object);
         if (qtinst) {
           if (qtinst->getObject()) {
             qConvDebug() << "found instance, with object:"

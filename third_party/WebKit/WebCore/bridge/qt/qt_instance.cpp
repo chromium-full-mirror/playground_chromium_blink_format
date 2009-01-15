@@ -55,6 +55,8 @@ class QtRuntimeObjectImp : public RuntimeObjectImp {
   ~QtRuntimeObjectImp();
   virtual void invalidate();
 
+  static const ClassInfo s_info;
+
   virtual void mark() {
     QtInstance* instance = static_cast<QtInstance*>(getInternalInstance());
     if (instance)
@@ -64,7 +66,13 @@ class QtRuntimeObjectImp : public RuntimeObjectImp {
 
  protected:
   void removeFromCache();
+
+ private:
+  virtual const ClassInfo* classInfo() const { return &s_info; }
 };
+
+const ClassInfo QtRuntimeObjectImp::s_info = {"QtRuntimeObject",
+                                              &RuntimeObjectImp::s_info, 0, 0};
 
 QtRuntimeObjectImp::QtRuntimeObjectImp(ExecState* exec,
                                        PassRefPtr<Instance> instance)
@@ -136,6 +144,15 @@ void QtInstance::put(ExecState* exec,
                      JSValuePtr value,
                      PutPropertySlot& slot) {
   JSObject::put(exec, propertyName, value, slot);
+}
+
+static QtInstance* QtInstance::getInstance(JSObject* object) {
+  if (!object)
+    return 0;
+  if (!object->inherits(&QtRuntimeObjectImp::s_info))
+    return 0;
+  return static_cast<QtInstance*>(
+      static_cast<RuntimeObjectImp*>(object)->getInternalInstance());
 }
 
 Class* QtInstance::getClass() const {
