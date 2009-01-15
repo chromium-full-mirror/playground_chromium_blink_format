@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2009 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -135,7 +135,7 @@ HRESULT STDMETHODCALLTYPE DOMNode::parentNode(
   if (!m_node || !m_node->parentNode())
     return E_FAIL;
   *result = DOMNode::createInstance(m_node->parentNode());
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::childNodes(
@@ -182,7 +182,7 @@ HRESULT STDMETHODCALLTYPE DOMNode::ownerDocument(
   if (!m_node)
     return E_FAIL;
   *result = DOMDocument::createInstance(m_node->ownerDocument());
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::insertBefore(
@@ -437,9 +437,7 @@ HRESULT STDMETHODCALLTYPE DOMNodeList::item(
     return E_FAIL;
 
   *result = DOMNode::createInstance(itemNode);
-  if (!(*result))
-    return E_FAIL;
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 HRESULT STDMETHODCALLTYPE DOMNodeList::length(
@@ -513,7 +511,7 @@ HRESULT STDMETHODCALLTYPE DOMDocument::implementation(
 HRESULT STDMETHODCALLTYPE DOMDocument::documentElement(
     /* [retval][out] */ IDOMElement** result) {
   *result = DOMElement::createInstance(m_document->documentElement());
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 HRESULT STDMETHODCALLTYPE DOMDocument::createElement(
@@ -526,9 +524,7 @@ HRESULT STDMETHODCALLTYPE DOMDocument::createElement(
   ExceptionCode ec;
   *result = DOMElement::createInstance(
       m_document->createElement(tagNameString, ec).get());
-  if (!(*result))
-    return E_FAIL;
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 HRESULT STDMETHODCALLTYPE DOMDocument::createDocumentFragment(
@@ -589,9 +585,7 @@ HRESULT STDMETHODCALLTYPE DOMDocument::getElementsByTagName(
   String tagNameString(tagName);
   *result = DOMNodeList::createInstance(
       m_document->getElementsByTagName(tagNameString).get());
-  if (!(*result))
-    return E_FAIL;
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 HRESULT STDMETHODCALLTYPE DOMDocument::importNode(
@@ -630,9 +624,7 @@ HRESULT STDMETHODCALLTYPE DOMDocument::getElementsByTagNameNS(
   *result = DOMNodeList::createInstance(
       m_document->getElementsByTagNameNS(namespaceURIString, localNameString)
           .get());
-  if (!(*result))
-    return E_FAIL;
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 HRESULT STDMETHODCALLTYPE DOMDocument::getElementById(
@@ -643,9 +635,7 @@ HRESULT STDMETHODCALLTYPE DOMDocument::getElementById(
 
   String idString(elementId);
   *result = DOMElement::createInstance(m_document->getElementById(idString));
-  if (!(*result))
-    return E_FAIL;
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 // DOMDocument - IDOMViewCSS --------------------------------------------------
@@ -671,7 +661,7 @@ HRESULT STDMETHODCALLTYPE DOMDocument::getComputedStyle(
 
   *result = DOMCSSStyleDeclaration::createInstance(
       dv->getComputedStyle(element, pseudoEltString.impl()).get());
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 // DOMDocument - IDOMDocumentEvent --------------------------------------------
@@ -683,7 +673,7 @@ HRESULT STDMETHODCALLTYPE DOMDocument::createEvent(
   WebCore::ExceptionCode ec = 0;
   *result =
       DOMEvent::createInstance(m_document->createEvent(eventTypeString, ec));
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 // DOMDocument - DOMDocument --------------------------------------------------
@@ -1029,7 +1019,7 @@ HRESULT STDMETHODCALLTYPE DOMElement::style(
     return E_FAIL;
 
   *result = DOMCSSStyleDeclaration::createInstance(style);
-  return S_OK;
+  return *result ? S_OK : E_FAIL;
 }
 
 // IDOMElementExtensions ------------------------------------------------------
