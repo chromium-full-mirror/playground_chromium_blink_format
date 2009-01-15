@@ -71,8 +71,14 @@ Path::Path(const Path& path) {
 bool Path::contains(const FloatPoint& point, const WindRule rule) const {
 #if USE(WXGC)
   if (m_path) {
+#if wxCHECK_VERSION(2, 9, 0)
+    return m_path->Contains(
+        point.x(), point.y(),
+        static_cast<wxPolygonFillMode>(getWxWindRuleForWindRule(rule)));
+#else
     return m_path->Contains(point.x(), point.y(),
                             getWxWindRuleForWindRule(rule));
+#endif
   }
 #endif
   return false;

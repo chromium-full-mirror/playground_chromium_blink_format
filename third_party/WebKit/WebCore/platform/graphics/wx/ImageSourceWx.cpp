@@ -207,8 +207,9 @@ NativeImagePtr ImageSource::createFrameAtIndex(size_t index) {
       p.MoveTo(data, 0, rowCounter);
     }
   }
-
+#if !wxCHECK_VERSION(2, 9, 0)
   bmp->UseAlpha();
+#endif
   ASSERT(bmp->IsOk());
   return bmp;
 }

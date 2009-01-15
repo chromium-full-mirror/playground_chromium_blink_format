@@ -34,6 +34,7 @@
 
 #include "WebKit/wx/WebView.h"
 
+#include <wx/dcgraph.h>
 #include <wx/defs.h>
 #include <wx/renderer.h>
 #include <wx/dcclient.h>
@@ -282,7 +283,11 @@ bool RenderThemeWx::paintButton(RenderObject* o,
   else if (part == RadioPart) {
     if (isChecked(o))
       flags |= wxCONTROL_CHECKED;
+#if wxCHECK_VERSION(2, 9, 0)
+    wxRendererNative::Get().DrawRadioButton(window, *dc, r, flags);
+#else
     wxRenderer_DrawRadioButton(window, *dc, r, flags);
+#endif
   } else if (part == CheckboxPart) {
     if (isChecked(o))
       flags |= wxCONTROL_CHECKED;
@@ -300,7 +305,12 @@ bool RenderThemeWx::paintTextField(RenderObject* o,
                                    const IntRect& r) {
   wxWindow* window = o->view()->frameView()->platformWidget();
   wxDC* dc = static_cast<wxDC*>(i.context->platformContext());
+#if wxCHECK_VERSION(2, 9, 0)
+  wxRendererNative::Get().DrawTextCtrl(window, *dc, r, 0);
+#else
   wxRenderer_DrawTextCtrl(window, *dc, r, 0);
+#endif
+
   return false;
 }
 
@@ -328,7 +338,11 @@ bool RenderThemeWx::paintMenuList(RenderObject* o,
   if (isPressed(o))
     flags |= wxCONTROL_PRESSED;
 
+#if wxCHECK_VERSION(2, 9, 0)
+  wxRendererNative::Get().DrawChoice(window, *dc, r, flags);
+#else
   wxRenderer_DrawChoice(window, *dc, r, flags);
+#endif
 
   return false;
 }
