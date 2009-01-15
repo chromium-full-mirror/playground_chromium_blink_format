@@ -38,10 +38,10 @@ const ClassInfo JSWebKitCSSMatrixConstructor::s_info = {
 
 JSWebKitCSSMatrixConstructor::JSWebKitCSSMatrixConstructor(
     ExecState* exec,
-    ScriptExecutionContext*)
+    ScriptExecutionContext* context)
     : DOMObject(JSWebKitCSSMatrixConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())) {
-  ASSERT(context->isDocument());
+  ASSERT_UNUSED(context, context->isDocument());
   putDirect(exec->propertyNames().length, jsNumber(exec, 1),
             ReadOnly | DontDelete | DontEnum);
 }
