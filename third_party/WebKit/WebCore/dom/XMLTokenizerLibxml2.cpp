@@ -56,6 +56,7 @@
 #include <wtf/Platform.h>
 #include <wtf/StringExtras.h>
 #include <wtf/Threading.h>
+#include <wtf/UnusedParam.h>
 #include <wtf/Vector.h>
 
 #if ENABLE(XSLT)
