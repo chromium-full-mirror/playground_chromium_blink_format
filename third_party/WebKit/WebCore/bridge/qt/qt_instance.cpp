@@ -140,7 +140,7 @@ RuntimeObjectImp* QtInstance::createRuntimeObject(ExecState* exec) {
   RuntimeObjectImp* ret =
       static_cast<RuntimeObjectImp*>(cachedObjects.value(this));
   if (!ret) {
-    ret = new (exec) QtRuntimeObjectImp(exec, instance);
+    ret = new (exec) QtRuntimeObjectImp(exec, this);
     cachedObjects.insert(this, ret);
     ret = static_cast<RuntimeObjectImp*>(cachedObjects.value(this));
   }
