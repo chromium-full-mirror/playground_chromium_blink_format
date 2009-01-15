@@ -63,7 +63,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
   if (!tile())
     return false;
 
-  AffineTransform transform = patternTransform();
+  TransformationMatrix transform = patternTransform();
   transform.translate(patternBoundaries().x(), patternBoundaries().y());
 
   RefPtr<Pattern> pattern(Pattern::create(tile()->image(), true, true));
