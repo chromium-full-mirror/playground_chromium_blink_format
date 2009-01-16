@@ -75,6 +75,7 @@ class AnimationController {
                           const AtomicString& eventType,
                           const String& name,
                           double elapsedTime);
+  void addNodeChangeToDispatch(PassRefPtr<Node>);
 
   void styleAvailable();
 

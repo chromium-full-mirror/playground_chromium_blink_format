@@ -57,6 +57,7 @@ class AnimationControllerPrivate {
                           const AtomicString& eventType,
                           const String& name,
                           double elapsedTime);
+  void addNodeChangeToDispatch(PassRefPtr<Node>);
 
   bool hasAnimations() const { return !m_compositeAnimations.isEmpty(); }
 
@@ -99,6 +100,7 @@ class AnimationControllerPrivate {
   };
 
   Vector<EventToDispatch> m_eventsToDispatch;
+  Vector<RefPtr<Node>> m_nodeChangesToDispatch;
 
   double m_beginAnimationUpdateTime;
 };
@@ -214,9 +216,10 @@ void AnimationControllerPrivate::updateAnimationTimer(
 void AnimationControllerPrivate::updateRenderingDispatcherFired(
     Timer<AnimationControllerPrivate>*) {
   // fire all the events
-  Vector<EventToDispatch>::const_iterator end = m_eventsToDispatch.end();
+  Vector<EventToDispatch>::const_iterator eventsToDispatchEnd =
+      m_eventsToDispatch.end();
   for (Vector<EventToDispatch>::const_iterator it = m_eventsToDispatch.begin();
-       it != end; ++it) {
+       it != eventsToDispatchEnd; ++it) {
     if (it->eventType == eventNames().webkitTransitionEndEvent)
       it->element->dispatchWebKitTransitionEvent(it->eventType, it->name,
                                                  it->elapsedTime);
@@ -226,6 +229,16 @@ void AnimationControllerPrivate::updateRenderingDispatcherFired(
   }
 
   m_eventsToDispatch.clear();
+
+  // call setChanged on all the elements
+  Vector<RefPtr<Node>>::const_iterator nodeChangesToDispatchEnd =
+      m_nodeChangesToDispatch.end();
+  for (Vector<RefPtr<Node>>::const_iterator it =
+           m_nodeChangesToDispatch.begin();
+       it != nodeChangesToDispatchEnd; ++it)
+    (*it)->setChanged(AnimationStyleChange);
+
+  m_nodeChangesToDispatch.clear();
 
   if (m_frame && m_frame->document())
     m_frame->document()->updateRendering();
@@ -248,6 +261,12 @@ void AnimationControllerPrivate::addEventToDispatch(
   event.name = name;
   event.elapsedTime = elapsedTime;
 
+  startUpdateRenderingDispatcher();
+}
+
+void AnimationControllerPrivate::addNodeChangeToDispatch(
+    PassRefPtr<Node> node) {
+  m_nodeChangesToDispatch.append(node);
   startUpdateRenderingDispatcher();
 }
 
@@ -472,6 +491,12 @@ void AnimationController::addEventToDispatch(PassRefPtr<Element> element,
                                              const String& name,
                                              double elapsedTime) {
   m_data->addEventToDispatch(element, eventType, name, elapsedTime);
+}
+
+void AnimationController::addNodeChangeToDispatch(PassRefPtr<Node> node) {
+  ASSERT(!node || (node->document() && !node->document()->inPageCache()));
+  if (node)
+    m_data->addNodeChangeToDispatch(node);
 }
 
 void AnimationController::styleAvailable() {
