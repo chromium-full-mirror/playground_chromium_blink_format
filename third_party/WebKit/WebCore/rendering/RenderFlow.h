@@ -56,7 +56,8 @@ class RenderFlow : public RenderContainer {
   virtual ~RenderFlow();
 #endif
 
-  virtual RenderFlow* continuation() const { return m_continuation; }
+  virtual RenderFlow* virtualContinuation() const { return continuation(); }
+  RenderFlow* continuation() const { return m_continuation; }
   void setContinuation(RenderFlow* c) { m_continuation = c; }
   RenderFlow* continuationBefore(RenderObject* beforeChild);
 

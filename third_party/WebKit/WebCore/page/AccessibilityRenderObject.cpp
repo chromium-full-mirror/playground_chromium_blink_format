@@ -425,8 +425,9 @@ Element* AccessibilityRenderObject::anchorElement() const {
   // earlier continuation, though.
   for (currRenderer = m_renderer; currRenderer && !currRenderer->element();
        currRenderer = currRenderer->parent()) {
-    if (currRenderer->continuation())
-      return cache->get(currRenderer->continuation())->anchorElement();
+    RenderFlow* continuation = currRenderer->virtualContinuation();
+    if (continuation)
+      return cache->get(continuation)->anchorElement();
   }
 
   // bail if none found

@@ -407,7 +407,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
   RenderObject* next = oldChild->nextSibling();
   bool canDeleteAnonymousBlocks =
       !documentBeingDestroyed() && !isInline() && !oldChild->isInline() &&
-      !oldChild->continuation() &&
+      !oldChild->virtualContinuation() &&
       (!prev || (prev->isAnonymousBlock() && prev->childrenInline())) &&
       (!next || (next->isAnonymousBlock() && next->childrenInline()));
   if (canDeleteAnonymousBlocks && prev && next) {

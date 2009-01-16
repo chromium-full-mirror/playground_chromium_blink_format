@@ -30,6 +30,7 @@
 #include "Document.h"
 #include "RenderCounter.h"
 #include "RenderImageGeneratedContent.h"
+#include "RenderInline.h"
 #include "RenderLayer.h"
 #include "RenderListItem.h"
 #include "RenderTable.h"
@@ -296,7 +297,7 @@ void RenderContainer::updateBeforeAfterContentForContainer(
   // continuation for our object,
   // then we don't generate the :after content.
   if (newContentWanted && type == RenderStyle::AFTER && isRenderInline() &&
-      continuation())
+      static_cast<RenderInline*>(this)->continuation())
     newContentWanted = false;
 
   // If we don't want generated content any longer, or if we have generated

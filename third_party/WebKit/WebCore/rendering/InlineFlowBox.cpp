@@ -241,12 +241,12 @@ void InlineFlowBox::determineSpacingForFlowBoxes(bool lastLine,
     // the end object's chain), then we just closed as well.
     if (!flow->lastLineBox()->isConstructed()) {
       if (ltr) {
-        if (!nextLineBox() && ((lastLine && !object()->continuation()) ||
+        if (!nextLineBox() && ((lastLine && !flow->continuation()) ||
                                nextOnLineExists() || onEndChain(endObject)))
           includeRightEdge = true;
       } else {
         if ((!prevLineBox() || prevLineBox()->isConstructed()) &&
-            ((lastLine && !object()->continuation()) || prevOnLineExists() ||
+            ((lastLine && !flow->continuation()) || prevOnLineExists() ||
              onEndChain(endObject)))
           includeLeftEdge = true;
       }
@@ -682,7 +682,8 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
       // outlines.
       if (object()->style()->visibility() == VISIBLE &&
           object()->hasOutline() && !isRootInlineBox()) {
-        if ((object()->continuation() || object()->isInlineContinuation()) &&
+        if ((flowObject()->continuation() ||
+             object()->isInlineContinuation()) &&
             !object()->hasLayer()) {
           // Add ourselves to the containing block of the entire continuation so
           // that it can
