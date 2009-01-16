@@ -269,9 +269,7 @@ void ResourceHandleManager::downloadTimerCallback(
   timeout.tv_sec = 0;
   timeout.tv_usec = selectTimeoutMS * 1000;  // select waits microseconds
 
-  // Temporarily disable timers since signals may interrupt select(), raising
-  // EINTR errors on some platforms
-  setDeferringTimers(true);
+  // Retry 'select' if it was interrupted by a process signal.
   int rc = 0;
   do {
     FD_ZERO(&fdread);
@@ -284,7 +282,6 @@ void ResourceHandleManager::downloadTimerCallback(
     if (maxfd >= 0)
       rc = ::select(maxfd + 1, &fdread, &fdwrite, &fdexcep, &timeout);
   } while (rc == -1 && errno == EINTR);
-  setDeferringTimers(false);
 
   if (-1 == rc) {
 #ifndef NDEBUG
