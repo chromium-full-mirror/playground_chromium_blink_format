@@ -100,7 +100,7 @@ JSValuePtr CInstance::invokeMethod(ExecState* exec,
 
   CMethod* method = static_cast<CMethod*>(methodList[0]);
 
-  NPIdentifier ident = _NPN_GetStringIdentifier(method->name());
+  NPIdentifier ident = method->identifier();
   if (!_object->_class->hasMethod(_object, ident))
     return jsUndefined();
 

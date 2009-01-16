@@ -104,7 +104,7 @@ class JavaField : public Field {
                                   const Instance* instance,
                                   JSValuePtr aValue) const;
 
-  virtual const char* name() const { return _name.UTF8String(); }
+  UString::Rep* name() const { return ((UString)_name).rep(); }
   virtual RuntimeType type() const { return _type.UTF8String(); }
 
   JNIType getJNIType() const { return _JNIType; }
@@ -132,7 +132,7 @@ class JavaMethod : public Method {
   JavaMethod(JNIEnv* env, jobject aMethod);
   ~JavaMethod();
 
-  virtual const char* name() const { return _name.UTF8String(); };
+  UString::Rep* name() const { return ((UString)_name).rep(); }
   RuntimeType returnType() const { return _returnType.UTF8String(); };
   JavaParameter* parameterAt(int i) const { return &_parameters[i]; };
   int numParameters() const { return _numParameters; };

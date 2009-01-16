@@ -55,21 +55,17 @@ JavaClass::JavaClass(jobject anInstance) {
   int i;
   JNIEnv* env = getJNIEnv();
 
-  JSGlobalData* globalData = WebCore::JSDOMWindow::commonJSGlobalData();
-
   // Get the fields
   jarray fields = (jarray)callJNIMethod<jobject>(
       aClass, "getFields", "()[Ljava/lang/reflect/Field;");
   int numFields = env->GetArrayLength(fields);
   for (i = 0; i < numFields; i++) {
     jobject aJField = env->GetObjectArrayElement((jobjectArray)fields, i);
-    Field* aField =
+    JavaField* aField =
         new JavaField(env, aJField);  // deleted in the JavaClass destructor
     {
       JSLock lock(false);
-      _fields.set(
-          Identifier(globalData, UString(aField->name())).ustring().rep(),
-          aField);
+      _fields.set(aField->name(), aField);
     }
     env->DeleteLocalRef(aJField);
   }
@@ -80,19 +76,16 @@ JavaClass::JavaClass(jobject anInstance) {
   int numMethods = env->GetArrayLength(methods);
   for (i = 0; i < numMethods; i++) {
     jobject aJMethod = env->GetObjectArrayElement((jobjectArray)methods, i);
-    Method* aMethod =
+    JavaMethod* aMethod =
         new JavaMethod(env, aJMethod);  // deleted in the JavaClass destructor
     MethodList* methodList;
     {
       JSLock lock(false);
 
-      methodList = _methods.get(
-          Identifier(globalData, UString(aMethod->name())).ustring().rep());
+      methodList = _methods.get(aMethod->name());
       if (!methodList) {
         methodList = new MethodList();
-        _methods.set(
-            Identifier(globalData, UString(aMethod->name())).ustring().rep(),
-            methodList);
+        _methods.set(aMethod->name(), methodList);
       }
     }
     methodList->append(aMethod);

@@ -49,7 +49,6 @@ typedef Vector<Method*> MethodList;
 
 class Field {
  public:
-  virtual const char* name() const = 0;
   virtual JSValuePtr valueFromInstance(ExecState*, const Instance*) const = 0;
   virtual void setValueToInstance(ExecState*,
                                   const Instance*,
@@ -60,7 +59,6 @@ class Field {
 
 class Method : Noncopyable {
  public:
-  virtual const char* name() const = 0;
   virtual int numParameters() const = 0;
 
   virtual ~Method() {}
