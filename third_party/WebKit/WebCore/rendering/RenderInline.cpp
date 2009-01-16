@@ -63,7 +63,7 @@ void RenderInline::styleDidChange(RenderStyle::Diff diff,
   m_lineHeight = -1;
 
   // Update pseudos for :before and :after now.
-  if (!isAnonymous()) {
+  if (!isAnonymous() && document()->usesBeforeAfterRules()) {
     updateBeforeAfterContent(RenderStyle::BEFORE);
     updateBeforeAfterContent(RenderStyle::AFTER);
   }
@@ -115,7 +115,8 @@ void RenderInline::addChildToFlow(RenderObject* newChild,
     // to ensure that our :after
     // content gets properly destroyed.
     bool isLastChild = (beforeChild == lastChild());
-    updateBeforeAfterContent(RenderStyle::AFTER);
+    if (document()->usesBeforeAfterRules())
+      updateBeforeAfterContent(RenderStyle::AFTER);
     if (isLastChild && beforeChild != lastChild())
       beforeChild = 0;  // We destroyed the last child, so now we need to update
                         // our insertion
@@ -193,7 +194,8 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
       // has to move into the inline continuation.  Call
       // updateBeforeAfterContent to ensure that the inline's :after
       // content gets properly destroyed.
-      curr->updateBeforeAfterContent(RenderStyle::AFTER);
+      if (document()->usesBeforeAfterRules())
+        curr->updateBeforeAfterContent(RenderStyle::AFTER);
 
       // Now we need to take all of the children starting from the first child
       // *after* currChild and append them all to the clone.
