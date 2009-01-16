@@ -1838,8 +1838,9 @@ bool FrameLoader::shouldUsePlugin(const KURL& url,
   // override QT.
   if (m_frame->page() && (mimeType == "image/tiff" || mimeType == "image/tif" ||
                           mimeType == "image/x-tiff")) {
+    const PluginData* pluginData = m_frame->page()->pluginData();
     String pluginName =
-        m_frame->page()->pluginData()->pluginNameForMimeType(mimeType);
+        pluginData ? pluginData->pluginNameForMimeType(mimeType) : String();
     if (!pluginName.isEmpty() && !pluginName.contains("QuickTime", false))
       return true;
   }

@@ -986,7 +986,7 @@ ObjectContentType FrameLoaderClientQt::objectContentType(
   if (PluginDatabase::installedPlugins()->isMIMETypeRegistered(mimeType))
     return ObjectContentNetscapePlugin;
 
-  if (m_frame->page() &&
+  if (m_frame->page() && m_frame->page()->pluginData() &&
       m_frame->page()->pluginData()->supportsMimeType(mimeType))
     return ObjectContentOtherPlugin;
 
