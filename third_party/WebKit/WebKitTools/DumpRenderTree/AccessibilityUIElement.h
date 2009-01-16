@@ -64,6 +64,7 @@ class AccessibilityUIElement {
   void getChildren(Vector<AccessibilityUIElement>&);
   AccessibilityUIElement getChildAtIndex(unsigned);
   AccessibilityUIElement titleUIElement();
+  AccessibilityUIElement parentElement();
 
   // Methods - platform-independent implementations
   JSStringRef allAttributes();

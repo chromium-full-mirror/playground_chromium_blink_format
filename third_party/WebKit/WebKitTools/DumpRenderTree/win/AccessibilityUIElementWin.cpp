@@ -79,7 +79,12 @@ JSStringRef AccessibilityUIElement::attributesOfLinkedUIElements() {
 JSStringRef AccessibilityUIElement::attributesOfDocumentLinks() {
   return JSStringCreateWithCharacters(0, 0);
 }
+
 AccessibilityUIElement AccessibilityUIElement::titleUIElement() {
+  return 0;
+}
+
+AccessibilityUIElement AccessibilityUIElement::parentElement() {
   return 0;
 }
 
