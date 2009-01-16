@@ -961,7 +961,7 @@ void GraphicsContext::setPlatformTextDrawingMode(int mode) {
 void GraphicsContext::setURLForRect(const KURL& link, const IntRect& destRect) {
 }
 
-void GraphicsContext::setUseAntialiasing(bool enable) {
+void GraphicsContext::setPlatformShouldAntialias(bool enable) {
   if (paintingDisabled())
     return;
 

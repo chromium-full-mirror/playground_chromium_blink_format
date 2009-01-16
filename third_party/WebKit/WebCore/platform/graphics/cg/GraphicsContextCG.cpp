@@ -188,11 +188,13 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
   }
 
   CGContextRef context = platformContext();
-  CGContextSaveGState(context);
 
-  CGContextSetShouldAntialias(context, false);
+  if (shouldAntialias())
+    CGContextSetShouldAntialias(context, false);
 
   if (patWidth) {
+    CGContextSaveGState(context);
+
     // Do a rect fill of our endpoints.  This ensures we always have the
     // appearance of being a border.  We then draw the actual dotted/dashed
     // line.
@@ -252,7 +254,11 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
 
   CGContextStrokePath(context);
 
-  CGContextRestoreGState(context);
+  if (patWidth)
+    CGContextRestoreGState(context);
+
+  if (shouldAntialias())
+    CGContextSetShouldAntialias(context, true);
 }
 
 // This method is only used to draw the little circles used in lists.
@@ -371,7 +377,7 @@ void GraphicsContext::strokeArc(const IntRect& rect,
 
 void GraphicsContext::drawConvexPolygon(size_t npoints,
                                         const FloatPoint* points,
-                                        bool shouldAntialias) {
+                                        bool antialiased) {
   if (paintingDisabled() ||
       !fillColor().alpha() &&
           (strokeThickness() <= 0 || strokeStyle() == NoStroke))
@@ -382,9 +388,8 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
 
   CGContextRef context = platformContext();
 
-  CGContextSaveGState(context);
-
-  CGContextSetShouldAntialias(context, shouldAntialias);
+  if (antialiased != shouldAntialias())
+    CGContextSetShouldAntialias(context, antialiased);
 
   CGContextBeginPath(context);
   CGContextMoveToPoint(context, points[0].x(), points[0].y());
@@ -394,7 +399,8 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
 
   drawPath();
 
-  CGContextRestoreGState(context);
+  if (antialiased != shouldAntialias())
+    CGContextSetShouldAntialias(context, shouldAntialias());
 }
 
 static void applyStrokePattern(GraphicsContext* context, Pattern* pattern) {
@@ -971,8 +977,6 @@ void GraphicsContext::drawLineForText(const IntPoint& point,
   if (width <= 0)
     return;
 
-  CGContextSaveGState(platformContext());
-
   float x = point.x();
   float y = point.y();
   float lineLength = width;
@@ -981,6 +985,8 @@ void GraphicsContext::drawLineForText(const IntPoint& point,
   // See http://bugs.webkit.org/show_bug.cgi?id=4255 for details of why 0.5 is
   // the right minimum thickness to use.
   float thickness = max(strokeThickness(), 0.5f);
+
+  bool restoreAntialiasMode = false;
 
   if (!printing) {
     // On screen, use a minimum thickness of 1.0 in user space (later rounded to
@@ -1000,15 +1006,21 @@ void GraphicsContext::drawLineForText(const IntPoint& point,
       y = lineRect.origin.y;
       lineLength = lineRect.size.width;
       thickness = lineRect.size.height;
-      CGContextSetShouldAntialias(platformContext(), false);
+      if (shouldAntialias()) {
+        CGContextSetShouldAntialias(platformContext(), false);
+        restoreAntialiasMode = true;
+      }
     }
   }
 
   if (fillColor() != strokeColor())
     setCGFillColor(platformContext(), strokeColor());
   CGContextFillRect(platformContext(), CGRectMake(x, y, lineLength, thickness));
+  if (fillColor() != strokeColor())
+    setCGFillColor(platformContext(), fillColor());
 
-  CGContextRestoreGState(platformContext());
+  if (restoreAntialiasMode)
+    CGContextSetShouldAntialias(platformContext(), true);
 }
 
 void GraphicsContext::setURLForRect(const KURL& link, const IntRect& destRect) {
@@ -1142,7 +1154,7 @@ void GraphicsContext::setPlatformFillColor(const Color& color) {
   setCGFillColor(platformContext(), color);
 }
 
-void GraphicsContext::setUseAntialiasing(bool enable) {
+void GraphicsContext::setPlatformShouldAntialias(bool enable) {
   if (paintingDisabled())
     return;
   CGContextSetShouldAntialias(platformContext(), enable);

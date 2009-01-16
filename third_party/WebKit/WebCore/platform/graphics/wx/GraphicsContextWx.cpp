@@ -449,7 +449,7 @@ void GraphicsContext::concatCTM(const TransformationMatrix& transform) {
   return;
 }
 
-void GraphicsContext::setUseAntialiasing(bool enable) {
+void GraphicsContext::setPlatformShouldAntialias(bool enable) {
   if (paintingDisabled())
     return;
   notImplemented();

@@ -1084,7 +1084,7 @@ void GraphicsContext::setPlatformFillColor(const Color& color) {
   m_data->p()->setBrush(QBrush(color));
 }
 
-void GraphicsContext::setUseAntialiasing(bool enable) {
+void GraphicsContext::setPlatformShouldAntialias(bool enable) {
   if (paintingDisabled())
     return;
   m_data->p()->setRenderHint(QPainter::Antialiasing, enable);

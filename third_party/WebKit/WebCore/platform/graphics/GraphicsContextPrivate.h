@@ -58,6 +58,7 @@ struct GraphicsContextState {
         fillRule(RULE_NONZERO),
         fillColorSpace(SolidColorSpace),
         fillColor(Color::black),
+        shouldAntialias(true),
         paintingDisabled(false),
         shadowBlur(0),
         shadowsIgnoreTransforms(false) {
@@ -84,6 +85,8 @@ struct GraphicsContextState {
   Color fillColor;
   RefPtr<Gradient> fillGradient;
   RefPtr<Pattern> fillPattern;
+
+  bool shouldAntialias;
 
   bool paintingDisabled;
 
