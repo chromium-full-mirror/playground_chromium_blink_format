@@ -82,26 +82,10 @@ typedef void (*KJSDidExecuteFunctionPtr)(ExecState*, JSObject* rootObject);
 
 class Instance : public RefCounted<Instance> {
  public:
-  typedef enum {
-#if ENABLE(MAC_JAVA_BRIDGE)
-    JavaLanguage,
-#endif
-#if PLATFORM(MAC)
-    ObjectiveCLanguage,
-#endif
-    CLanguage
-#if PLATFORM(QT)
-    ,
-    QtLanguage
-#endif
-  } BindingLanguage;
-
   Instance(PassRefPtr<RootObject>);
 
   static void setDidExecuteFunction(KJSDidExecuteFunctionPtr func);
   static KJSDidExecuteFunctionPtr didExecuteFunction();
-
-  static Instance* getInstance(JSObject*, BindingLanguage);
 
   // These functions are called before and after the main entry points into
   // the native implementations.  They can be used to establish and cleanup
@@ -148,8 +132,6 @@ class Instance : public RefCounted<Instance> {
   RootObject* rootObject() const;
 
   virtual ~Instance();
-
-  virtual BindingLanguage getBindingLanguage() const = 0;
 
   virtual bool getOwnPropertySlot(JSObject*,
                                   ExecState*,

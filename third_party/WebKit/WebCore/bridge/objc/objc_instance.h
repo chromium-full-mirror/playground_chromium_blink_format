@@ -75,10 +75,6 @@ class ObjcInstance : public Instance {
   JSValuePtr numberValue(ExecState*) const;
   JSValuePtr booleanValue() const;
 
-  virtual BindingLanguage getBindingLanguage() const {
-    return ObjectiveCLanguage;
-  }
-
  protected:
   virtual void virtualBegin();
   virtual void virtualEnd();

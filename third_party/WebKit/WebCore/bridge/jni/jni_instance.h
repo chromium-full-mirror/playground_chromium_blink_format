@@ -87,8 +87,6 @@ class JavaInstance : public Instance {
   JSValuePtr numberValue(ExecState*) const;
   JSValuePtr booleanValue() const;
 
-  virtual BindingLanguage getBindingLanguage() const { return JavaLanguage; }
-
  protected:
   virtual void virtualBegin();
   virtual void virtualEnd();
