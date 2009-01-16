@@ -99,11 +99,7 @@ void RenderText::styleDidChange(RenderStyle::Diff diff,
   ETextSecurity oldSecurity = oldStyle ? oldStyle->textSecurity() : TSNONE;
 
   if (oldTransform != style()->textTransform() ||
-      oldSecurity != style()->textSecurity()
-#if ENABLE(SVG)
-      || isSVGText() /* All SVG text has to be transformed */
-#endif
-      ) {
+      oldSecurity != style()->textSecurity()) {
     if (RefPtr<StringImpl> textToTransform = originalText())
       setText(textToTransform.release(), true);
   }
