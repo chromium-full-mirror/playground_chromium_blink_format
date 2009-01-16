@@ -1132,11 +1132,6 @@ static bool compileBranch(int options,
 
         reqvary = (repeatMin == repeat_max) ? 0 : REQ_VARY;
 
-        // A quantifier after an assertion is meaningless, since assertions
-        // don't move index forward. So, we discard it.
-        if (*previous == OP_ASSERT || *previous == OP_ASSERT_NOT)
-          goto END_REPEAT;
-
         opType = 0; /* Default single-char op codes */
 
         /* Save start of previous item, in case we have to move it up to make
@@ -1517,6 +1512,15 @@ static bool compileBranch(int options,
 
           else
             code[-ketoffset] = OP_KETRMAX + repeatType;
+        }
+
+        // A quantifier after an assertion is mostly meaningless, but it
+        // can nullify the assertion if it has a 0 minimum.
+        else if (*previous == OP_ASSERT || *previous == OP_ASSERT_NOT) {
+          if (repeatMin == 0) {
+            code = previous;
+            goto END_REPEAT;
+          }
         }
 
         /* Else there's some kind of shambles */
