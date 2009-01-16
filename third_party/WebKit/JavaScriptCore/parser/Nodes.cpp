@@ -1399,7 +1399,7 @@ RegisterID* ReadModifyResolveNode::emitBytecode(BytecodeGenerator& generator,
       RegisterID* src2 = generator.emitNode(m_right.get());
       return emitReadModifyAssignment(
           generator, generator.finalDestination(dst), local, src2, m_operator,
-          OperandTypes(ResultType::unknown(), m_right->resultDescriptor()));
+          OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
     }
 
     if (generator.leftHandSideNeedsCopy(m_rightHasAssignments,
@@ -1409,7 +1409,7 @@ RegisterID* ReadModifyResolveNode::emitBytecode(BytecodeGenerator& generator,
       RegisterID* src2 = generator.emitNode(m_right.get());
       emitReadModifyAssignment(
           generator, result.get(), result.get(), src2, m_operator,
-          OperandTypes(ResultType::unknown(), m_right->resultDescriptor()));
+          OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
       generator.emitMove(local, result.get());
       return generator.moveToDestinationIfNeeded(dst, result.get());
     }
@@ -1417,7 +1417,7 @@ RegisterID* ReadModifyResolveNode::emitBytecode(BytecodeGenerator& generator,
     RegisterID* src2 = generator.emitNode(m_right.get());
     RegisterID* result = emitReadModifyAssignment(
         generator, local, local, src2, m_operator,
-        OperandTypes(ResultType::unknown(), m_right->resultDescriptor()));
+        OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
     return generator.moveToDestinationIfNeeded(dst, result);
   }
 
@@ -1432,7 +1432,7 @@ RegisterID* ReadModifyResolveNode::emitBytecode(BytecodeGenerator& generator,
     RegisterID* result = emitReadModifyAssignment(
         generator, generator.finalDestination(dst, src1.get()), src1.get(),
         src2, m_operator,
-        OperandTypes(ResultType::unknown(), m_right->resultDescriptor()));
+        OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
     generator.emitPutScopedVar(depth, index, result, globalObject);
     return result;
   }
@@ -1447,7 +1447,7 @@ RegisterID* ReadModifyResolveNode::emitBytecode(BytecodeGenerator& generator,
   RegisterID* result = emitReadModifyAssignment(
       generator, generator.finalDestination(dst, src1.get()), src1.get(), src2,
       m_operator,
-      OperandTypes(ResultType::unknown(), m_right->resultDescriptor()));
+      OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
   return generator.emitPutById(base.get(), m_ident, result);
 }
 
@@ -1542,7 +1542,7 @@ RegisterID* ReadModifyDotNode::emitBytecode(BytecodeGenerator& generator,
   RegisterID* updatedValue = emitReadModifyAssignment(
       generator, generator.finalDestination(dst, value.get()), value.get(),
       change, m_operator,
-      OperandTypes(ResultType::unknown(), m_right->resultDescriptor()));
+      OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
 
   generator.emitExpressionInfo(divot(), startOffset(), endOffset());
   return generator.emitPutById(base.get(), m_ident, updatedValue);
@@ -1624,7 +1624,7 @@ RegisterID* ReadModifyBracketNode::emitBytecode(BytecodeGenerator& generator,
   RegisterID* updatedValue = emitReadModifyAssignment(
       generator, generator.finalDestination(dst, value.get()), value.get(),
       change, m_operator,
-      OperandTypes(ResultType::unknown(), m_right->resultDescriptor()));
+      OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
 
   generator.emitExpressionInfo(divot(), startOffset(), endOffset());
   generator.emitPutByVal(base.get(), property.get(), updatedValue);
