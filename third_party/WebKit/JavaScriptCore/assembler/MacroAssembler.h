@@ -495,6 +495,10 @@ class MacroAssembler {
     m_assembler.idivl_r(divisor);
   }
 
+  void mul32(RegisterID src, RegisterID dest) {
+    m_assembler.imull_rr(src, dest);
+  }
+
   void mul32(Imm32 imm, RegisterID src, RegisterID dest) {
     m_assembler.imull_i32r(src, imm.m_value, dest);
   }
@@ -615,6 +619,10 @@ class MacroAssembler {
 #else
     sub32(Imm32(imm), dest);
 #endif
+  }
+
+  void sub32(RegisterID src, RegisterID dest) {
+    m_assembler.subl_rr(src, dest);
   }
 
   void sub32(Imm32 imm, RegisterID dest) {
@@ -1575,8 +1583,18 @@ class MacroAssembler {
     return Jump(m_assembler.jo());
   }
 
+  Jump joMul32(RegisterID src, RegisterID dest) {
+    mul32(src, dest);
+    return Jump(m_assembler.jo());
+  }
+
   Jump joMul32(Imm32 imm, RegisterID src, RegisterID dest) {
     mul32(imm, src, dest);
+    return Jump(m_assembler.jo());
+  }
+
+  Jump joSub32(RegisterID src, RegisterID dest) {
+    sub32(src, dest);
     return Jump(m_assembler.jo());
   }
 

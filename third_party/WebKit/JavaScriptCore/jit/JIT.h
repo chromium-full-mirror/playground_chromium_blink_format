@@ -538,6 +538,7 @@ class JIT : private MacroAssembler {
       RegisterID tempReg2);
 
   void compileFastArith_op_add(Instruction*);
+  void compileFastArith_op_sub(Instruction*);
   void compileFastArith_op_mul(Instruction*);
   void compileFastArith_op_mod(unsigned result, unsigned op1, unsigned op2);
   void compileFastArith_op_bitand(unsigned result, unsigned op1, unsigned op2);
@@ -548,6 +549,8 @@ class JIT : private MacroAssembler {
   void compileFastArith_op_post_inc(unsigned result, unsigned srcDst);
   void compileFastArith_op_post_dec(unsigned result, unsigned srcDst);
   void compileFastArithSlow_op_add(Instruction*,
+                                   Vector<SlowCaseEntry>::iterator&);
+  void compileFastArithSlow_op_sub(Instruction*,
                                    Vector<SlowCaseEntry>::iterator&);
   void compileFastArithSlow_op_mul(Instruction*,
                                    Vector<SlowCaseEntry>::iterator&);
@@ -577,6 +580,7 @@ class JIT : private MacroAssembler {
   void compileFastArithSlow_op_post_dec(unsigned result,
                                         unsigned srcDst,
                                         Vector<SlowCaseEntry>::iterator&);
+#if ENABLE(JIT_OPTIMIZE_ARITHMETIC) && !USE(ALTERNATE_JSIMMEDIATE)
   void compileBinaryArithOp(OpcodeID,
                             unsigned dst,
                             unsigned src1,
@@ -588,6 +592,7 @@ class JIT : private MacroAssembler {
                                     unsigned src1,
                                     unsigned src2,
                                     OperandTypes opi);
+#endif
 
   void emitGetVirtualRegister(int src, RegisterID dst);
   void emitGetVirtualRegisters(int src1,
