@@ -33,7 +33,6 @@ namespace JSC {
 
 class Identifier;
 class JSCell;
-class JSNumberCell;
 class JSObject;
 class JSString;
 class PropertySlot;
@@ -196,8 +195,8 @@ class JSValuePtr {
  private:
   inline const JSValuePtr asValue() const { return *this; }
 
-  bool isNumberCell() const;
-  JSNumberCell* asNumberCell() const;
+  bool isDoubleNumber() const;
+  double getDoubleNumber() const;
 
   JSCell* m_ptr;
 };

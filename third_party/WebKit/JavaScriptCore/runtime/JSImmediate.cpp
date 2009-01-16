@@ -35,7 +35,7 @@ namespace JSC {
 JSObject* JSImmediate::toThisObject(JSValuePtr v, ExecState* exec) {
   ASSERT(isImmediate(v));
   if (isNumber(v))
-    return constructNumberFromImmediateNumber(exec, v);
+    return constructNumber(exec, v);
   if (isBoolean(v))
     return constructBooleanFromImmediateBoolean(exec, v);
   if (v->isNull())
@@ -50,7 +50,7 @@ JSObject* JSImmediate::toThisObject(JSValuePtr v, ExecState* exec) {
 JSObject* JSImmediate::toObject(JSValuePtr v, ExecState* exec) {
   ASSERT(isImmediate(v));
   if (isNumber(v))
-    return constructNumberFromImmediateNumber(exec, v);
+    return constructNumber(exec, v);
   if (isBoolean(v))
     return constructBooleanFromImmediateBoolean(exec, v);
 
@@ -75,8 +75,19 @@ JSObject* JSImmediate::prototype(JSValuePtr v, ExecState* exec) {
 
 UString JSImmediate::toString(JSValuePtr v) {
   ASSERT(isImmediate(v));
-  if (isNumber(v))
+  if (isIntegerNumber(v))
     return UString::from(getTruncatedInt32(v));
+#if USE(ALTERNATE_JSIMMEDIATE)
+  if (isNumber(v)) {
+    ASSERT(isDoubleNumber(v));
+    double value = doubleValue(v);
+    if (value == 0.0)  // +0.0 or -0.0
+      return "0";
+    return UString::from(value);
+  }
+#else
+  ASSERT(!isNumber(v));
+#endif
   if (jsBoolean(false) == v)
     return "false";
   if (jsBoolean(true) == v)

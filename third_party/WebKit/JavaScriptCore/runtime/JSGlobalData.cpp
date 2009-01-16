@@ -79,8 +79,12 @@ JSGlobalData::JSGlobalData(bool isShared)
       stringStructure(JSString::createStructure(jsNull())),
       notAnObjectErrorStubStructure(
           JSNotAnObjectErrorStub::createStructure(jsNull())),
-      notAnObjectStructure(JSNotAnObject::createStructure(jsNull())),
-      numberStructure(JSNumberCell::createStructure(jsNull())),
+      notAnObjectStructure(JSNotAnObject::createStructure(jsNull()))
+#if !USE(ALTERNATE_JSIMMEDIATE)
+      ,
+      numberStructure(JSNumberCell::createStructure(jsNull()))
+#endif
+      ,
       identifierTable(createIdentifierTable()),
       propertyNames(new CommonIdentifiers(this)),
       emptyList(new ArgList),

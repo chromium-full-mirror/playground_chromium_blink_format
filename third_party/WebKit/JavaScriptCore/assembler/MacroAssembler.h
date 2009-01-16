@@ -608,6 +608,15 @@ class MacroAssembler {
 #endif
   }
 
+  void subPtr(ImmPtr imm, RegisterID dest) {
+#if PLATFORM(X86_64)
+    move(imm, scratchRegister);
+    m_assembler.subq_rr(scratchRegister, dest);
+#else
+    sub32(Imm32(imm), dest);
+#endif
+  }
+
   void sub32(Imm32 imm, RegisterID dest) {
     m_assembler.subl_ir(imm.m_value, dest);
   }

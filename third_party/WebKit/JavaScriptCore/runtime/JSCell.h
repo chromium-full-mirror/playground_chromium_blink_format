@@ -134,10 +134,6 @@ inline bool JSCell::isNumber() const {
   return Heap::isNumber(const_cast<JSCell*>(this));
 }
 
-inline bool JSValuePtr::isNumberCell() const {
-  return isCell() && asCell()->isNumber();
-}
-
 inline bool JSCell::isObject() const {
   return m_structure->typeInfo().type() == ObjectType;
 }
@@ -172,10 +168,6 @@ inline void* JSCell::operator new(size_t size, JSGlobalData* globalData) {
 }
 
 // --- JSValue inlines ----------------------------
-
-inline bool JSValuePtr::isNumber() const {
-  return JSImmediate::isNumber(asValue()) || (isCell() && asCell()->isNumber());
-}
 
 inline bool JSValuePtr::isString() const {
   return !JSImmediate::isImmediate(asValue()) && asCell()->isString();

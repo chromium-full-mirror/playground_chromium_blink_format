@@ -28,6 +28,8 @@
 
 namespace JSC {
 
+#if !USE(ALTERNATE_JSIMMEDIATE)
+
 JSValuePtr JSNumberCell::toPrimitive(ExecState*, PreferredPrimitiveType) const {
   return const_cast<JSNumberCell*>(this);
 }
@@ -91,20 +93,21 @@ JSValuePtr JSNumberCell::getJSNumber() {
   return this;
 }
 
-NEVER_INLINE JSValuePtr jsNumberCell(ExecState* exec, double d) {
+JSValuePtr jsNumberCell(ExecState* exec, double d) {
   return new (exec) JSNumberCell(exec, d);
 }
 
-NEVER_INLINE JSValuePtr jsNaN(ExecState* exec) {
-  return new (exec) JSNumberCell(exec, NaN);
-}
-
-NEVER_INLINE JSValuePtr jsNumberCell(JSGlobalData* globalData, double d) {
+JSValuePtr jsNumberCell(JSGlobalData* globalData, double d) {
   return new (globalData) JSNumberCell(globalData, d);
 }
 
-NEVER_INLINE JSValuePtr jsNaN(JSGlobalData* globalData) {
-  return new (globalData) JSNumberCell(globalData, NaN);
+#else
+
+JSValuePtr jsNumberCell(ExecState*, double) {
+  ASSERT_NOT_REACHED();
+  return noValue();
 }
+
+#endif
 
 }  // namespace JSC
