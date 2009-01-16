@@ -186,9 +186,7 @@ void JIT::compileOpCall(OpcodeID opcodeID, Instruction* instruction, unsigned) {
   // Put the return value in dst. In the interpreter, op_ret does this.
   emitPutVirtualRegister(dst);
 
-#if ENABLE(CODEBLOCK_SAMPLING)
-  storePtr(ImmPtr(m_codeBlock), m_interpreter->sampler()->codeBlockSlot());
-#endif
+  sampleCodeBlock(m_codeBlock);
 }
 
 void JIT::compileOpCallSlowCase(Instruction* instruction,
@@ -207,9 +205,7 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
   // Put the return value in dst. In the interpreter, op_ret does this.
   emitPutVirtualRegister(dst);
 
-#if ENABLE(CODEBLOCK_SAMPLING)
-  storePtr(ImmPtr(m_codeBlock), m_interpreter->sampler()->codeBlockSlot());
-#endif
+  sampleCodeBlock(m_codeBlock);
 }
 
 #else
@@ -303,9 +299,7 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   // Put the return value in dst. In the interpreter, op_ret does this.
   emitPutVirtualRegister(dst);
 
-#if ENABLE(CODEBLOCK_SAMPLING)
-  storePtr(ImmPtr(m_codeBlock), m_interpreter->sampler()->codeBlockSlot());
-#endif
+  sampleCodeBlock(m_codeBlock);
 }
 
 void JIT::compileOpCallSlowCase(Instruction* instruction,
@@ -407,9 +401,7 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
   storeResultForFirstRun.link(this);
   emitPutVirtualRegister(dst);
 
-#if ENABLE(CODEBLOCK_SAMPLING)
-  storePtr(ImmPtr(m_codeBlock), m_interpreter->sampler()->codeBlockSlot());
-#endif
+  sampleCodeBlock(m_codeBlock);
 }
 
 #endif
