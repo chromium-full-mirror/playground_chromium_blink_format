@@ -151,12 +151,14 @@ class Instance : public RefCounted<Instance> {
 
   virtual BindingLanguage getBindingLanguage() const = 0;
 
-  virtual bool getOwnPropertySlot(ExecState*,
+  virtual bool getOwnPropertySlot(JSObject*,
+                                  ExecState*,
                                   const Identifier&,
                                   PropertySlot&) {
     return false;
   }
-  virtual void put(ExecState*,
+  virtual void put(JSObject*,
+                   ExecState*,
                    const Identifier&,
                    JSValuePtr,
                    PutPropertySlot&) {}

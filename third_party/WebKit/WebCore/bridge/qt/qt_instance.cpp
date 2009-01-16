@@ -133,17 +133,19 @@ PassRefPtr<QtInstance> QtInstance::getQtInstance(
   return ret.release();
 }
 
-bool QtInstance::getOwnPropertySlot(ExecState* exec,
+bool QtInstance::getOwnPropertySlot(JSObject* object,
+                                    ExecState* exec,
                                     const Identifier& propertyName,
                                     PropertySlot& slot) {
-  return JSObject::getOwnPropertySlot(exec, propertyName, slot);
+  return object->JSObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
-void QtInstance::put(ExecState* exec,
+void QtInstance::put(JSObject* object,
+                     ExecState* exec,
                      const Identifier& propertyName,
                      JSValuePtr value,
                      PutPropertySlot& slot) {
-  JSObject::put(exec, propertyName, value, slot);
+  object->JSObject::put(exec, propertyName, value, slot);
 }
 
 static QtInstance* QtInstance::getInstance(JSObject* object) {

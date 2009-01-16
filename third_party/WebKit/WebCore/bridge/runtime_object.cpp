@@ -170,7 +170,7 @@ bool RuntimeObjectImp::getOwnPropertySlot(ExecState* exec,
 
   instance->end();
 
-  return instance->getOwnPropertySlot(exec, propertyName, slot);
+  return instance->getOwnPropertySlot(this, exec, propertyName, slot);
 }
 
 void RuntimeObjectImp::put(ExecState* exec,
@@ -193,7 +193,7 @@ void RuntimeObjectImp::put(ExecState* exec,
   else if (instance->supportsSetValueOfUndefinedField())
     instance->setValueOfUndefinedField(exec, propertyName, value);
   else
-    instance->put(exec, propertyName, value, slot);
+    instance->put(this, exec, propertyName, value, slot);
 
   instance->end();
 }
