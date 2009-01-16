@@ -57,6 +57,8 @@ class SmallStrings : Noncopyable {
 
   void mark();
 
+  unsigned count() const;
+
  private:
   void createEmptyString(JSGlobalData*);
   void createSingleCharacterString(JSGlobalData*, unsigned char);
