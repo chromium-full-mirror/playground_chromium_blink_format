@@ -578,6 +578,12 @@ class FrameLoader : Noncopyable
   PassRefPtr<HistoryItem> createHistoryItemTree(Frame* targetFrame,
                                                 bool clipAtTarget);
 
+  bool canCachePageContainingThisFrame();
+#ifndef NDEBUG
+  void logCanCachePageDecision();
+  bool logCanCacheFrameDecision();
+#endif
+
   void addBackForwardItemClippedAtTarget(bool doClip);
   void restoreScrollPositionAndViewState();
   void saveDocumentState();
