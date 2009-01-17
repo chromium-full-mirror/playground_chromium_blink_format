@@ -225,7 +225,13 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                                Node* beforeChange = 0,
                                Node* afterChange = 0,
                                int childCountDelta = 0);
-  Element* documentElement() const;
+
+  Element* documentElement() const {
+    if (!m_documentElement)
+      cacheDocumentElement();
+    return m_documentElement.get();
+  }
+
   virtual PassRefPtr<Element> createElement(const AtomicString& tagName,
                                             ExceptionCode&);
   PassRefPtr<DocumentFragment> createDocumentFragment();
@@ -1196,6 +1202,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void imageLoadEventTimerFired(Timer<Document>*);
   void updateFocusAppearanceTimerFired(Timer<Document>*);
   void updateBaseURL();
+
+  void cacheDocumentElement() const;
 
   RenderObject* m_savedRenderer;
   int m_secureForms;
