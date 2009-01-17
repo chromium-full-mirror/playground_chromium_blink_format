@@ -232,6 +232,17 @@ bool AccessibilityRenderObject::isFileUploadButton() const {
   return false;
 }
 
+bool AccessibilityRenderObject::isInputImage() const {
+  if (m_renderer && m_renderer->element() &&
+      m_renderer->element()->hasTagName(inputTag)) {
+    HTMLInputElement* input =
+        static_cast<HTMLInputElement*>(m_renderer->element());
+    return input->inputType() == HTMLInputElement::IMAGE;
+  }
+
+  return false;
+}
+
 bool AccessibilityRenderObject::isProgressIndicator() const {
   return roleValue() == ProgressIndicatorRole;
 }
@@ -1322,6 +1333,9 @@ KURL AccessibilityRenderObject::url() const {
   if (isImage() && m_renderer->element() &&
       m_renderer->element()->hasTagName(imgTag))
     return static_cast<HTMLImageElement*>(m_renderer->element())->src();
+
+  if (isInputImage())
+    return static_cast<HTMLInputElement*>(m_renderer->element())->src();
 
   return KURL();
 }
