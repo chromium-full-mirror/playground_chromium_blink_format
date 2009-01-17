@@ -93,7 +93,7 @@ class Image : public RefCounted<Image> {
   virtual bool hasSingleSecurityOrigin() const { return false; }
 
   static Image* nullImage();
-  bool isNull() const { return !size().isEmpty(); }
+  bool isNull() const { return size().isEmpty(); }
 
   // These are only used for SVGImage right now
   virtual void setContainerSize(const IntSize&) {}
