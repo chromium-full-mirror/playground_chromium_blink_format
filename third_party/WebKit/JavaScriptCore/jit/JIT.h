@@ -41,7 +41,12 @@
 #include <wtf/AlwaysInline.h>
 #include <wtf/Vector.h>
 
+#if PLATFORM(X86_64)
+#define STUB_ARGS_offset 0x10
+#else
 #define STUB_ARGS_offset 0x0C
+#endif
+
 #define STUB_ARGS_code (STUB_ARGS_offset)
 #define STUB_ARGS_registerFile (STUB_ARGS_offset + 1)
 #define STUB_ARGS_callFrame (STUB_ARGS_offset + 2)
@@ -219,6 +224,8 @@ class JIT : private MacroAssembler {
 #if PLATFORM(X86_64)
   static const RegisterID timeoutCheckRegister = X86::r12;
   static const RegisterID callFrameRegister = X86::r13;
+  static const RegisterID tagTypeNumberRegister = X86::r14;
+  static const RegisterID tagMaskRegister = X86::r15;
 #else
   static const RegisterID timeoutCheckRegister = X86::esi;
   static const RegisterID callFrameRegister = X86::edi;
@@ -233,7 +240,7 @@ class JIT : private MacroAssembler {
 
 #if USE(JIT_STUB_ARGUMENT_REGISTER)
 #if PLATFORM(X86_64)
-  static const int ctiArgumentInitSize = 3;
+  static const int ctiArgumentInitSize = 6;
 #else
   static const int ctiArgumentInitSize = 2;
 #endif
