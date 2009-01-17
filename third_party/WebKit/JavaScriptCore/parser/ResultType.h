@@ -41,19 +41,20 @@ struct ResultType {
   static const Type TypeMaybeBool = 0x20;
   static const Type TypeMaybeOther = 0x40;
 
+  static const Type TypeBits = TypeMaybeNumber | TypeMaybeString |
+                               TypeMaybeNull | TypeMaybeBool | TypeMaybeOther;
+
   explicit ResultType(Type type) : m_type(type) {}
 
-  bool isReusable() { return (m_type & TypeReusable); }
+  bool isReusable() { return m_type & TypeReusable; }
 
-  bool isInt32() { return (m_type & TypeInt32); }
+  bool isInt32() { return m_type & TypeInt32; }
 
-  bool definitelyIsNumber() {
-    return ((m_type & ~TypeReusable) == TypeMaybeNumber);
-  }
+  bool definitelyIsNumber() { return (m_type & TypeBits) == TypeMaybeNumber; }
 
-  bool isNotNumber() { return !(m_type & TypeMaybeNumber); }
+  bool mightBeNumber() { return m_type & TypeMaybeNumber; }
 
-  bool mightBeNumber() { return !isNotNumber(); }
+  bool isNotNumber() { return !mightBeNumber(); }
 
   static ResultType nullType() { return ResultType(TypeMaybeNull); }
 
@@ -75,10 +76,7 @@ struct ResultType {
 
   static ResultType stringType() { return ResultType(TypeMaybeString); }
 
-  static ResultType unknownType() {
-    return ResultType(TypeMaybeNumber | TypeMaybeString | TypeMaybeNull |
-                      TypeMaybeBool | TypeMaybeOther);
-  }
+  static ResultType unknownType() { return ResultType(TypeBits); }
 
   static ResultType forAdd(ResultType op1, ResultType op2) {
     if (op1.definitelyIsNumber() && op2.definitelyIsNumber())

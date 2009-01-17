@@ -1000,6 +1000,11 @@ class X86Assembler {
   }
 
 #if PLATFORM(X86_64)
+  void movq_rr(XMMRegisterID src, RegisterID dst) {
+    m_formatter.prefix(PRE_SSE_66);
+    m_formatter.twoByteOp64(OP2_MOVD_EdVd, (RegisterID)src, dst);
+  }
+
   void movq_rr(RegisterID src, XMMRegisterID dst) {
     m_formatter.prefix(PRE_SSE_66);
     m_formatter.twoByteOp64(OP2_MOVD_VdEd, (RegisterID)dst, src);

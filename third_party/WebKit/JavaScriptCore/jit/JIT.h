@@ -581,7 +581,7 @@ class JIT : private MacroAssembler {
   void compileFastArithSlow_op_post_dec(unsigned result,
                                         unsigned srcDst,
                                         Vector<SlowCaseEntry>::iterator&);
-#if ENABLE(JIT_OPTIMIZE_ARITHMETIC) && !USE(ALTERNATE_JSIMMEDIATE)
+#if ENABLE(JIT_OPTIMIZE_ARITHMETIC)
   void compileBinaryArithOp(OpcodeID,
                             unsigned dst,
                             unsigned src1,
