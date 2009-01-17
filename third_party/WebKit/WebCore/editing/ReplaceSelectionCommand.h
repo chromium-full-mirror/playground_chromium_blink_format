@@ -63,9 +63,10 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
 
   void completeHTMLReplacement(const Position& lastPositionToSelect);
 
-  void insertNodeAfterAndUpdateNodesInserted(Node* insertChild, Node* refChild);
-  void insertNodeAtAndUpdateNodesInserted(Node*, const Position&);
-  void insertNodeBeforeAndUpdateNodesInserted(Node* insertChild,
+  void insertNodeAfterAndUpdateNodesInserted(PassRefPtr<Node> insertChild,
+                                             Node* refChild);
+  void insertNodeAtAndUpdateNodesInserted(PassRefPtr<Node>, const Position&);
+  void insertNodeBeforeAndUpdateNodesInserted(PassRefPtr<Node> insertChild,
                                               Node* refChild);
 
   void updateNodesInserted(Node*);
