@@ -28,7 +28,6 @@
 #define GraphicsContextPrivate_h
 
 #include "TransformationMatrix.h"
-#include "Font.h"
 #include "Gradient.h"
 #include "GraphicsContext.h"
 #include "Pattern.h"
@@ -64,7 +63,6 @@ struct GraphicsContextState {
         shadowsIgnoreTransforms(false) {
   }
 
-  Font font;
   int textDrawingMode;
 
   StrokeStyle strokeStyle;

@@ -67,7 +67,7 @@ class SVGInlineTextBox : public InlineTextBox {
                       int length,
                       GraphicsContext*,
                       RenderStyle*,
-                      const Font*);
+                      const Font&);
 
   // SVGs custom paint decoration method
   void paintDecoration(ETextDecoration,

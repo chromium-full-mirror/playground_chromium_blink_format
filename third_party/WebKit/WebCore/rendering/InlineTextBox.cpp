@@ -248,6 +248,7 @@ bool InlineTextBox::nodeAtPoint(const HitTestRequest&,
 }
 
 static void paintTextWithShadows(GraphicsContext* context,
+                                 const Font& font,
                                  const TextRun& textRun,
                                  int startOffset,
                                  int endOffset,
@@ -281,13 +282,14 @@ static void paintTextWithShadows(GraphicsContext* context,
     }
 
     if (startOffset <= endOffset)
-      context->drawText(textRun, textOrigin + extraOffset, startOffset,
+      context->drawText(font, textRun, textOrigin + extraOffset, startOffset,
                         endOffset);
     else {
       if (endOffset > 0)
-        context->drawText(textRun, textOrigin + extraOffset, 0, endOffset);
+        context->drawText(font, textRun, textOrigin + extraOffset, 0,
+                          endOffset);
       if (startOffset < textRun.length())
-        context->drawText(textRun, textOrigin + extraOffset, startOffset);
+        context->drawText(font, textRun, textOrigin + extraOffset, startOffset);
     }
 
     if (!shadow)
@@ -341,9 +343,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   // Set our font.
   RenderStyle* styleToUse = object()->style(m_firstLine);
   int d = styleToUse->textDecorationsInEffect();
-  const Font* font = &styleToUse->font();
-  if (*font != context->font())
-    context->setFont(*font);
+  const Font& font = styleToUse->font();
 
   // 1. Paint backgrounds behind text if needed. Examples of such backgrounds
   // include selection
@@ -469,13 +469,13 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
                           textStrokeWidth);
     if (!paintSelectedTextSeparately || ePos <= sPos) {
       // FIXME: Truncate right-to-left text correctly.
-      paintTextWithShadows(context, textRun, 0,
+      paintTextWithShadows(context, font, textRun, 0,
                            m_truncation == cNoTruncation ? m_len : m_truncation,
                            textOrigin, m_x + tx, m_y + ty, width(), height(),
                            textShadow, textStrokeWidth > 0);
     } else
-      paintTextWithShadows(context, textRun, ePos, sPos, textOrigin, m_x + tx,
-                           m_y + ty, width(), height(), textShadow,
+      paintTextWithShadows(context, font, textRun, ePos, sPos, textOrigin,
+                           m_x + tx, m_y + ty, width(), height(), textShadow,
                            textStrokeWidth > 0);
 
     if (textStrokeWidth > 0)
@@ -489,8 +489,8 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 
     updateGraphicsContext(context, selectionFillColor, selectionStrokeColor,
                           selectionStrokeWidth);
-    paintTextWithShadows(context, textRun, sPos, ePos, textOrigin, m_x + tx,
-                         m_y + ty, width(), height(), selectionShadow,
+    paintTextWithShadows(context, font, textRun, sPos, ePos, textOrigin,
+                         m_x + tx, m_y + ty, width(), height(), selectionShadow,
                          selectionStrokeWidth > 0);
 
     if (selectionStrokeWidth > 0)
@@ -564,7 +564,7 @@ void InlineTextBox::paintSelection(GraphicsContext* context,
                                    int tx,
                                    int ty,
                                    RenderStyle* style,
-                                   const Font*) {
+                                   const Font& font) {
   // See if we have a selection to paint at all.
   int sPos, ePos;
   selectionStartEnd(sPos, ePos);
@@ -589,6 +589,7 @@ void InlineTextBox::paintSelection(GraphicsContext* context,
   int h = selectionHeight();
   context->clip(IntRect(m_x + tx, y + ty, m_width, h));
   context->drawHighlightForText(
+      font,
       TextRun(textObject()->text()->characters() + m_start, m_len,
               textObject()->allowTabs(), textPos(), m_toAdd, direction() == RTL,
               m_dirOverride || style->visuallyOrdered()),
@@ -600,7 +601,7 @@ void InlineTextBox::paintCompositionBackground(GraphicsContext* context,
                                                int tx,
                                                int ty,
                                                RenderStyle* style,
-                                               const Font*,
+                                               const Font& font,
                                                int startPos,
                                                int endPos) {
   int offset = m_start;
@@ -619,6 +620,7 @@ void InlineTextBox::paintCompositionBackground(GraphicsContext* context,
   int y = selectionTop();
   int h = selectionHeight();
   context->drawHighlightForText(
+      font,
       TextRun(textObject()->text()->characters() + m_start, m_len,
               textObject()->allowTabs(), textPos(), m_toAdd, direction() == RTL,
               m_dirOverride || style->visuallyOrdered()),
@@ -741,7 +743,7 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
                                                  int ty,
                                                  DocumentMarker marker,
                                                  RenderStyle* style,
-                                                 const Font* f,
+                                                 const Font& font,
                                                  bool grammar) {
   // Never print spelling/grammar markers (5327887)
   if (textObject()->document()->printing())
@@ -777,7 +779,7 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
                 direction() == RTL, m_dirOverride || style->visuallyOrdered());
     int h = selectionHeight();
 
-    IntRect markerRect = enclosingIntRect(f->selectionRectForText(
+    IntRect markerRect = enclosingIntRect(font.selectionRectForText(
         run, startPoint, h, startPosition, endPosition));
     start = markerRect.x() - startPoint.x();
     width = markerRect.width();
@@ -821,7 +823,7 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
                                          int ty,
                                          DocumentMarker marker,
                                          RenderStyle* style,
-                                         const Font* f) {
+                                         const Font& font) {
   // Use same y positioning and height as for selection, so that when the
   // selection and this highlight are on
   // the same word there are no pieces sticking out.
@@ -836,8 +838,8 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
   IntPoint startPoint = IntPoint(m_x + tx, y + ty);
 
   // Always compute and store the rect associated with this marker
-  IntRect markerRect =
-      enclosingIntRect(f->selectionRectForText(run, startPoint, h, sPos, ePos));
+  IntRect markerRect = enclosingIntRect(
+      font.selectionRectForText(run, startPoint, h, sPos, ePos));
   object()->document()->setRenderedRectForMarker(object()->node(), marker,
                                                  markerRect);
 
@@ -847,7 +849,7 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
     pt->save();
     updateGraphicsContext(pt, color, color, 0);  // Don't draw text at all!
     pt->clip(IntRect(tx + m_x, ty + y, m_width, h));
-    pt->drawHighlightForText(run, startPoint, h, color, sPos, ePos);
+    pt->drawHighlightForText(font, run, startPoint, h, color, sPos, ePos);
     pt->restore();
   }
 }
@@ -856,7 +858,7 @@ void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
                                          int tx,
                                          int ty,
                                          RenderStyle* style,
-                                         const Font* f,
+                                         const Font& font,
                                          bool background) {
   Vector<DocumentMarker> markers =
       object()->document()->markersForNode(object()->node());
@@ -901,13 +903,13 @@ void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
     // marker intersects this run.  Paint it.
     switch (marker.type) {
       case DocumentMarker::Spelling:
-        paintSpellingOrGrammarMarker(pt, tx, ty, marker, style, f, false);
+        paintSpellingOrGrammarMarker(pt, tx, ty, marker, style, font, false);
         break;
       case DocumentMarker::Grammar:
-        paintSpellingOrGrammarMarker(pt, tx, ty, marker, style, f, true);
+        paintSpellingOrGrammarMarker(pt, tx, ty, marker, style, font, true);
         break;
       case DocumentMarker::TextMatch:
-        paintTextMatchMarker(pt, tx, ty, marker, style, f);
+        paintTextMatchMarker(pt, tx, ty, marker, style, font);
         break;
       default:
         ASSERT_NOT_REACHED();

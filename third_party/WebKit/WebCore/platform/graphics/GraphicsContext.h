@@ -135,9 +135,6 @@ class GraphicsContext : Noncopyable {
 
   PlatformGraphicsContext* platformContext() const;
 
-  const Font& font() const;
-  void setFont(const Font&);
-
   float strokeThickness() const;
   void setStrokeThickness(float);
   StrokeStyle strokeStyle() const;
@@ -250,9 +247,14 @@ class GraphicsContext : Noncopyable {
   int textDrawingMode();
   void setTextDrawingMode(int);
 
-  void drawText(const TextRun&, const IntPoint&, int from = 0, int to = -1);
-  void drawBidiText(const TextRun&, const FloatPoint&);
-  void drawHighlightForText(const TextRun&,
+  void drawText(const Font&,
+                const TextRun&,
+                const IntPoint&,
+                int from = 0,
+                int to = -1);
+  void drawBidiText(const Font&, const TextRun&, const FloatPoint&);
+  void drawHighlightForText(const Font&,
+                            const TextRun&,
                             const IntPoint&,
                             int h,
                             const Color& backgroundColor,

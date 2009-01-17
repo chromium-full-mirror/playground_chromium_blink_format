@@ -1361,12 +1361,6 @@ void CanvasRenderingContext2D::setFont(const String& newFont) {
   state().m_font = newStyle->font();
   state().m_font.update(styleSelector->fontSelector());
   state().m_realizedFont = true;
-
-  // Set the font in the graphics context.
-  GraphicsContext* c = drawingContext();
-  if (!c)
-    return;
-  c->setFont(state().m_font);
 }
 
 String CanvasRenderingContext2D::textAlign() const {
@@ -1527,8 +1521,7 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
     maskImageContext->setTextDrawingMode(fill ? cTextFill : cTextStroke);
     maskImageContext->translate(-maskRect.x(), -maskRect.y());
 
-    maskImageContext->setFont(font);
-    maskImageContext->drawBidiText(textRun, location);
+    maskImageContext->drawBidiText(font, textRun, location);
 
     c->save();
     c->clipToImageBuffer(maskRect, maskImage.get());
@@ -1540,7 +1533,7 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
   }
 
   c->setTextDrawingMode(fill ? cTextFill : cTextStroke);
-  c->drawBidiText(textRun, location);
+  c->drawBidiText(font, textRun, location);
 }
 
 const Font& CanvasRenderingContext2D::accessFont() {

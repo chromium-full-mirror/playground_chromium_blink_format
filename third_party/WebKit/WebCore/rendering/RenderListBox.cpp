@@ -330,7 +330,6 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
     itemFont = Font(d, itemFont.letterSpacing(), itemFont.wordSpacing());
     itemFont.update(document()->styleSelector()->fontSelector());
   }
-  paintInfo.context->setFont(itemFont);
 
   unsigned length = itemText.length();
   const UChar* string = itemText.characters();
@@ -339,7 +338,7 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
 
   // Draw the item text
   if (itemStyle->visibility() != HIDDEN)
-    paintInfo.context->drawBidiText(textRun, r.location());
+    paintInfo.context->drawBidiText(itemFont, textRun, r.location());
 }
 
 void RenderListBox::paintItemBackground(PaintInfo& paintInfo,

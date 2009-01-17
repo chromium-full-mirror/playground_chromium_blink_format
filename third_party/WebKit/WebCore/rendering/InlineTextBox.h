@@ -135,14 +135,14 @@ class InlineTextBox : public InlineRunBox {
                                   int tx,
                                   int ty,
                                   RenderStyle*,
-                                  const Font*,
+                                  const Font&,
                                   int startPos,
                                   int endPos);
   void paintDocumentMarkers(GraphicsContext*,
                             int tx,
                             int ty,
                             RenderStyle*,
-                            const Font*,
+                            const Font&,
                             bool background);
   void paintCompositionUnderline(GraphicsContext*,
                                  int tx,
@@ -162,20 +162,20 @@ class InlineTextBox : public InlineRunBox {
                       int tx,
                       int ty,
                       RenderStyle*,
-                      const Font*);
+                      const Font&);
   void paintSpellingOrGrammarMarker(GraphicsContext*,
                                     int tx,
                                     int ty,
                                     DocumentMarker,
                                     RenderStyle*,
-                                    const Font*,
+                                    const Font&,
                                     bool grammar);
   void paintTextMatchMarker(GraphicsContext*,
                             int tx,
                             int ty,
                             DocumentMarker,
                             RenderStyle*,
-                            const Font*);
+                            const Font&);
   friend class RenderText;
 };
 
