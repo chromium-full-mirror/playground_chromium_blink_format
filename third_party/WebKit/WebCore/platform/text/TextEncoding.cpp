@@ -55,11 +55,12 @@ static const TextEncoding& UTF7Encoding() {
 }
 
 TextEncoding::TextEncoding(const char* name)
-    : m_name(atomicCanonicalTextEncodingName(name)) {}
+    : m_name(atomicCanonicalTextEncodingName(name)),
+      m_backslashAsCurrencySymbol(backslashAsCurrencySymbol()) {}
 
 TextEncoding::TextEncoding(const String& name)
-    : m_name(
-          atomicCanonicalTextEncodingName(name.characters(), name.length())) {}
+    : m_name(atomicCanonicalTextEncodingName(name.characters(), name.length())),
+      m_backslashAsCurrencySymbol(backslashAsCurrencySymbol()) {}
 
 String TextEncoding::decode(const char* data,
                             size_t length,

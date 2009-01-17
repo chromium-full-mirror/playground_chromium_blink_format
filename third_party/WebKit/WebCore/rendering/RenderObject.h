@@ -1118,9 +1118,6 @@ class RenderObject : public CachedResourceClient {
   virtual bool isFlexingChildren() const { return false; }
   virtual bool isStretchingChildren() const { return false; }
 
-  // Convenience, to avoid repeating the code to dig down to get this.
-  UChar backslashAsCurrencySymbol() const;
-
   virtual int caretMinOffset() const;
   virtual int caretMaxOffset() const;
   virtual unsigned caretMaxRenderedOffset() const;

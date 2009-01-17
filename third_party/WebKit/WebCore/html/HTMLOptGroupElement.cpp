@@ -157,9 +157,9 @@ RenderStyle* HTMLOptGroupElement::nonRendererRenderStyle() const {
 }
 
 String HTMLOptGroupElement::groupLabelText() const {
-  String itemText = getAttribute(labelAttr);
+  String itemText =
+      document()->displayStringModifiedByEncoding(getAttribute(labelAttr));
 
-  itemText.replace('\\', document()->backslashAsCurrencySymbol());
   // In WinIE, leading and trailing whitespace is ignored in options and
   // optgroups. We match this behavior.
   itemText = itemText.stripWhiteSpace();

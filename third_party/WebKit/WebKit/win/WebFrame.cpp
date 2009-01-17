@@ -869,8 +869,8 @@ HRESULT STDMETHODCALLTYPE WebFrame::selectedString(
   if (!coreFrame)
     return E_FAIL;
 
-  String text = coreFrame->selectedText();
-  text.replace('\\', coreFrame->backslashAsCurrencySymbol());
+  String text =
+      coreFrame->displayStringModifiedByEncoding(coreFrame->selectedText());
 
   *result = BString(text).release();
   return S_OK;
