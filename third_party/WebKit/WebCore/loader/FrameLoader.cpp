@@ -2094,7 +2094,7 @@ void FrameLoader::logCanCachePageDecision() {
       LOG(PageCache, " -The back/forward list is disabled");
       cannotCache = true;
     }
-    if (!m_frame->page()->backForwardList()->capacity() > 0) {
+    if (!(m_frame->page()->backForwardList()->capacity() > 0)) {
       LOG(PageCache, " -The back/forward list has a 0 capacity");
       cannotCache = true;
     }
