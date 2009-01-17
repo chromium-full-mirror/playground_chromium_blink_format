@@ -72,6 +72,25 @@ class MediaControlShadowRootElement : public HTMLDivElement {
 
 // ----------------------------
 
+class MediaTextDisplayElement : public HTMLDivElement {
+ public:
+  MediaTextDisplayElement(Document*, RenderStyle::PseudoId, HTMLMediaElement*);
+  void attachToParent(Element*);
+  void update();
+
+ protected:
+  HTMLMediaElement* m_mediaElement;
+};
+
+// ----------------------------
+
+class MediaTimeDisplayElement : public MediaTextDisplayElement {
+ public:
+  MediaTimeDisplayElement(Document*, HTMLMediaElement*, bool currentTime);
+};
+
+// ----------------------------
+
 class MediaControlInputElement : public HTMLInputElement {
  public:
   MediaControlInputElement(Document*,

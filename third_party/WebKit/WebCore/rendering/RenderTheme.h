@@ -178,6 +178,7 @@ class RenderTheme {
   };
 
 #if ENABLE(VIDEO)
+  // Media controls
   virtual bool hitTestMediaControlPart(RenderObject*, const IntPoint& absPoint);
 #endif
 
@@ -347,6 +348,21 @@ class RenderTheme {
   virtual bool paintMediaSliderThumb(RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&) {
+    return true;
+  }
+  virtual bool paintMediaTimelineContainer(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&) {
+    return true;
+  }
+  virtual bool paintMediaCurrentTime(RenderObject*,
+                                     const RenderObject::PaintInfo&,
+                                     const IntRect&) {
+    return true;
+  }
+  virtual bool paintMediaTimeRemaining(RenderObject*,
+                                       const RenderObject::PaintInfo&,
+                                       const IntRect&) {
     return true;
   }
 

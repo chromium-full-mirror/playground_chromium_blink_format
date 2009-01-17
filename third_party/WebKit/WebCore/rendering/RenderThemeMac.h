@@ -158,6 +158,7 @@ class RenderThemeMac : public RenderTheme {
                                              const RenderObject::PaintInfo&,
                                              const IntRect&);
 
+#if ENABLE(VIDEO)
   virtual bool paintMediaFullscreenButton(RenderObject*,
                                           const RenderObject::PaintInfo&,
                                           const IntRect&);
@@ -179,6 +180,20 @@ class RenderThemeMac : public RenderTheme {
   virtual bool paintMediaSliderThumb(RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&);
+  virtual bool paintMediaTimelineContainer(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&);
+  virtual bool paintMediaCurrentTime(RenderObject*,
+                                     const RenderObject::PaintInfo&,
+                                     const IntRect&);
+  virtual bool paintMediaTimeRemaining(RenderObject*,
+                                       const RenderObject::PaintInfo&,
+                                       const IntRect&);
+
+  // Media controls
+  virtual bool hitTestMediaControlPart(RenderObject*, const IntPoint& absPoint);
+  virtual String extraMediaControlsStyleSheet();
+#endif
 
  private:
   IntRect inflateRect(const IntRect&,

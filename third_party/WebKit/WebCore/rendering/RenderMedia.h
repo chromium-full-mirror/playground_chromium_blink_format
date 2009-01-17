@@ -40,6 +40,7 @@ class MediaControlPlayButtonElement;
 class MediaControlSeekButtonElement;
 class MediaControlTimelineElement;
 class MediaControlFullscreenButtonElement;
+class MediaTimeDisplayElement;
 class MediaPlayer;
 
 class RenderMedia : public RenderReplaced {
@@ -66,6 +67,7 @@ class RenderMedia : public RenderReplaced {
   void updateFromElement();
   void updatePlayer();
   void updateControls();
+  void updateTimeDisplay();
 
   void forwardEvent(Event*);
 
@@ -78,17 +80,19 @@ class RenderMedia : public RenderReplaced {
 
  private:
   void createControlsShadowRoot();
+  void destroyControlsShadowRoot();
   void createPanel();
   void createMuteButton();
   void createPlayButton();
   void createSeekBackButton();
   void createSeekForwardButton();
+  void createTimelineContainer();
   void createTimeline();
-  void createTimeDisplay();
+  void createCurrentTimeDisplay();
+  void createTimeRemainingDisplay();
   void createFullscreenButton();
 
   void timeUpdateTimerFired(Timer<RenderMedia>*);
-  void updateTimeDisplay();
 
   void updateControlVisibility();
   void changeOpacity(HTMLElement*, float opacity);
@@ -102,7 +106,9 @@ class RenderMedia : public RenderReplaced {
   RefPtr<MediaControlSeekButtonElement> m_seekForwardButton;
   RefPtr<MediaControlTimelineElement> m_timeline;
   RefPtr<MediaControlFullscreenButtonElement> m_fullscreenButton;
-  RefPtr<HTMLElement> m_timeDisplay;
+  RefPtr<HTMLElement> m_timelineContainer;
+  RefPtr<MediaTimeDisplayElement> m_currentTimeDisplay;
+  RefPtr<MediaTimeDisplayElement> m_timeRemainingDisplay;
   EventTargetNode* m_lastUnderNode;
   EventTargetNode* m_nodeUnderMouse;
 

@@ -110,8 +110,6 @@ void CSSSelector::extractPseudoType() const {
                       ("-webkit-media-controls-mute-button"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsPlayButton,
                       ("-webkit-media-controls-play-button"));
-  DEFINE_STATIC_LOCAL(AtomicString, mediaControlsTimeDisplay,
-                      ("-webkit-media-controls-time-display"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsTimeline,
                       ("-webkit-media-controls-timeline"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsSeekBackButton,
@@ -120,6 +118,12 @@ void CSSSelector::extractPseudoType() const {
                       ("-webkit-media-controls-seek-forward-button"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsFullscreenButton,
                       ("-webkit-media-controls-fullscreen-button"));
+  DEFINE_STATIC_LOCAL(AtomicString, mediaControlsTimelineContainer,
+                      ("-webkit-media-controls-timeline-container"));
+  DEFINE_STATIC_LOCAL(AtomicString, mediaControlsCurrentTimeDisplay,
+                      ("-webkit-media-controls-current-time-display"));
+  DEFINE_STATIC_LOCAL(AtomicString, mediaControlsTimeRemainingDisplay,
+                      ("-webkit-media-controls-time-remaining-display"));
   DEFINE_STATIC_LOCAL(AtomicString, notStr, ("not("));
   DEFINE_STATIC_LOCAL(AtomicString, onlyChild, ("only-child"));
   DEFINE_STATIC_LOCAL(AtomicString, onlyOfType, ("only-of-type"));
@@ -239,8 +243,11 @@ void CSSSelector::extractPseudoType() const {
   } else if (m_value == mediaControlsPlayButton) {
     m_pseudoType = PseudoMediaControlsPlayButton;
     element = true;
-  } else if (m_value == mediaControlsTimeDisplay) {
-    m_pseudoType = PseudoMediaControlsTimeDisplay;
+  } else if (m_value == mediaControlsCurrentTimeDisplay) {
+    m_pseudoType = PseudoMediaControlsCurrentTimeDisplay;
+    element = true;
+  } else if (m_value == mediaControlsTimeRemainingDisplay) {
+    m_pseudoType = PseudoMediaControlsTimeRemainingDisplay;
     element = true;
   } else if (m_value == mediaControlsTimeline) {
     m_pseudoType = PseudoMediaControlsTimeline;
@@ -253,6 +260,9 @@ void CSSSelector::extractPseudoType() const {
     element = true;
   } else if (m_value == mediaControlsFullscreenButton) {
     m_pseudoType = PseudoMediaControlsFullscreenButton;
+    element = true;
+  } else if (m_value == mediaControlsTimelineContainer) {
+    m_pseudoType = PseudoMediaControlsTimelineContainer;
     element = true;
   } else if (m_value == notStr)
     m_pseudoType = PseudoNot;

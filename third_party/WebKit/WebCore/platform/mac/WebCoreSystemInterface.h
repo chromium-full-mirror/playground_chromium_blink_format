@@ -105,12 +105,14 @@ extern BOOL (*wkGetGlyphTransformedAdvances)(CGFontRef,
                                              CGAffineTransform*,
                                              ATSGlyphRef*,
                                              CGSize* advance);
-extern void (*wkDrawMediaSliderTrack)(CGContextRef context,
+extern void (*wkDrawMediaSliderTrack)(int themeStyle,
+                                      CGContextRef context,
                                       CGRect rect,
                                       float timeLoaded,
                                       float currentTime,
                                       float duration);
 extern void (*wkDrawMediaUIPart)(int part,
+                                 int themeStyle,
                                  CGContextRef context,
                                  CGRect rect,
                                  BOOL active);
@@ -126,8 +128,12 @@ extern void (*wkGetWheelEventDeltas)(NSEvent*,
                                      float* deltaX,
                                      float* deltaY,
                                      BOOL* continuous);
-extern BOOL (*wkHitTestMediaUIPart)(int part, CGRect bounds, CGPoint point);
+extern BOOL (*wkHitTestMediaUIPart)(int part,
+                                    int themeStyle,
+                                    CGRect bounds,
+                                    CGPoint point);
 extern void (*wkMeasureMediaUIPart)(int part,
+                                    int themeStyle,
                                     CGRect* bounds,
                                     CGSize* naturalSize);
 extern void (*wkPopupMenu)(NSMenu*,
