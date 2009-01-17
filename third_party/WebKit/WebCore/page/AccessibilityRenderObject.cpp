@@ -816,7 +816,7 @@ String AccessibilityRenderObject::title() const {
 
   if (isInputTag || AccessibilityObject::isARIAInput(ariaRole) || isControl()) {
     HTMLLabelElement* label = labelForElement(static_cast<Element*>(node));
-    if (label)
+    if (label && !titleUIElement())
       return label->innerText();
   }
 
