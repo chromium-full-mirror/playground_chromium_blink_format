@@ -45,11 +45,9 @@ using namespace HTMLNames;
 
 HTMLViewSourceDocument::HTMLViewSourceDocument(Frame* frame,
                                                const String& mimeType)
-    : HTMLDocument(frame),
-      m_type(mimeType),
-      m_current(0),
-      m_tbody(0),
-      m_td(0) {}
+    : HTMLDocument(frame), m_type(mimeType), m_current(0), m_tbody(0), m_td(0) {
+  setUsesBeforeAfterRules(true);
+}
 
 Tokenizer* HTMLViewSourceDocument::createTokenizer() {
   if (implementation()->isTextMIMEType(m_type))
