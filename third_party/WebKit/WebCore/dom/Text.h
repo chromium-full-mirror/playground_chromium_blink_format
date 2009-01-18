@@ -52,7 +52,6 @@ class Text : public CharacterData {
 
   // Other methods (not part of DOM)
 
-  virtual bool isTextNode() const { return true; }
   virtual void attach();
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);

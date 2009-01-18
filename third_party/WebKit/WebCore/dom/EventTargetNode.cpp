@@ -63,8 +63,9 @@ static HashSet<EventTargetNode*>* gNodesDispatchingSimulatedClicks = 0;
 
 EventTargetNode::EventTargetNode(Document* doc,
                                  bool isElement,
-                                 bool isContainer)
-    : Node(doc, isElement, isContainer) {}
+                                 bool isContainer,
+                                 bool isText)
+    : Node(doc, isElement, isContainer, isText) {}
 
 EventTargetNode::~EventTargetNode() {
   if (!eventListeners().isEmpty() && !inDocument())

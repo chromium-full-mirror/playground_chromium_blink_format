@@ -291,7 +291,7 @@ Node::StyleChange Node::diff(RenderStyle* s1, RenderStyle* s2) {
   return ch;
 }
 
-Node::Node(Document* doc, bool isElement, bool isContainer)
+Node::Node(Document* doc, bool isElement, bool isContainer, bool isText)
     : m_document(doc),
       m_previous(0),
       m_next(0),
@@ -311,6 +311,7 @@ Node::Node(Document* doc, bool isElement, bool isContainer)
       m_hasRareData(false),
       m_isElement(isElement),
       m_isContainer(isContainer),
+      m_isText(isText),
       m_parsingChildrenFinished(true)
 #if ENABLE(SVG)
       ,

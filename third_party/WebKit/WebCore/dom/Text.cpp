@@ -43,9 +43,9 @@ namespace WebCore {
 // DOM Section 1.1.1
 
 Text::Text(Document* document, const String& text)
-    : CharacterData(document, text) {}
+    : CharacterData(document, text, true) {}
 
-Text::Text(Document* document) : CharacterData(document) {}
+Text::Text(Document* document) : CharacterData(document, true) {}
 
 Text::~Text() {}
 
