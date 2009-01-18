@@ -529,7 +529,6 @@ void PopupMenu::paint(const IntRect& damageRect, HDC hdc) {
       itemFont = Font(d, itemFont.letterSpacing(), itemFont.wordSpacing());
       itemFont.update(m_popupClient->fontSelector());
     }
-    context.setFont(itemFont);
 
     // Draw the item text
     if (itemStyle.isVisible()) {
@@ -537,7 +536,7 @@ void PopupMenu::paint(const IntRect& damageRect, HDC hdc) {
           max(0, client()->clientPaddingLeft() - client()->clientInsetLeft());
       int textY = itemRect.y() + itemFont.ascent() +
                   (itemRect.height() - itemFont.height()) / 2;
-      context.drawBidiText(textRun, IntPoint(textX, textY));
+      context.drawBidiText(itemFont, textRun, IntPoint(textX, textY));
     }
   }
 
