@@ -30,6 +30,8 @@
 #include "AnimationBase.h"
 
 #include "AnimationController.h"
+#include "CSSMutableStyleDeclaration.h"
+#include "CSSPropertyLonghand.h"
 #include "CSSPropertyNames.h"
 #include "CString.h"
 #include "CompositeAnimation.h"
@@ -188,11 +190,18 @@ static inline EVisibility blendFunc(const AnimationBase* anim,
   return result > 0. ? VISIBLE : (to != VISIBLE ? to : from);
 }
 
+class PropertyWrapperBase;
+
+static void addShorthandProperties();
+static PropertyWrapperBase* wrapperForProperty(int propertyID);
+
 class PropertyWrapperBase {
  public:
   PropertyWrapperBase(int prop) : m_prop(prop) {}
 
   virtual ~PropertyWrapperBase() {}
+
+  virtual bool isShorthandWrapper() const { return false; }
   virtual bool equals(const RenderStyle* a, const RenderStyle* b) const = 0;
   virtual void blend(const AnimationBase* anim,
                      RenderStyle* dst,
@@ -324,8 +333,51 @@ class PropertyWrapperMaybeInvalidColor : public PropertyWrapperBase {
   void (RenderStyle::*m_setter)(const Color&);
 };
 
+class ShorthandPropertyWrapper : public PropertyWrapperBase {
+ public:
+  ShorthandPropertyWrapper(int property, const CSSPropertyLonghand& longhand)
+      : PropertyWrapperBase(property) {
+    for (unsigned i = 0; i < longhand.length(); ++i) {
+      PropertyWrapperBase* wrapper =
+          wrapperForProperty(longhand.properties()[i]);
+      if (wrapper)
+        m_propertyWrappers.append(wrapper);
+    }
+  }
+
+  virtual bool isShorthandWrapper() const { return true; }
+
+  virtual bool equals(const RenderStyle* a, const RenderStyle* b) const {
+    Vector<PropertyWrapperBase*>::const_iterator end = m_propertyWrappers.end();
+    for (Vector<PropertyWrapperBase*>::const_iterator it =
+             m_propertyWrappers.begin();
+         it != end; ++it) {
+      if (!(*it)->equals(a, b))
+        return false;
+    }
+    return true;
+  }
+
+  virtual void blend(const AnimationBase* anim,
+                     RenderStyle* dst,
+                     const RenderStyle* a,
+                     const RenderStyle* b,
+                     double progress) const {
+    Vector<PropertyWrapperBase*>::const_iterator end = m_propertyWrappers.end();
+    for (Vector<PropertyWrapperBase*>::const_iterator it =
+             m_propertyWrappers.begin();
+         it != end; ++it)
+      (*it)->blend(anim, dst, a, b, progress);
+  }
+
+ private:
+  Vector<PropertyWrapperBase*> m_propertyWrappers;
+};
+
 static Vector<PropertyWrapperBase*>* gPropertyWrappers = 0;
 static int gPropertyWrapperMap[numCSSProperties];
+
+static const int cInvalidPropertyWrapperIndex = -1;
 
 static void ensurePropertyMap() {
   // FIXME: This data is never destroyed. Maybe we should ref count it and toss
@@ -503,10 +555,33 @@ static void ensurePropertyMap() {
         &RenderStyle::setStrokeOpacity));
 #endif
 
-    // Make sure unused slots have a value
-    for (unsigned int i = 0; i < (unsigned int)numCSSProperties; ++i)
-      gPropertyWrapperMap[i] = CSSPropertyInvalid;
+    // TODO:
+    //
+    //  CSSPropertyBackground, CSSPropertyBackgroundPosition
+    //  CSSPropertyMinWidth, CSSPropertyMaxWidth, CSSPropertyMinHeight,
+    //  CSSPropertyMaxHeight
+    //  CSSPropertyTextIndent
+    //  CSSPropertyVerticalAlign
+    //  CSSPropertyWebkitBackgroundOrigin
+    //  CSSPropertyWebkitBackgroundSize
+    //  CSSPropertyWebkitMaskPosition
+    //  CSSPropertyWebkitMaskOrigin
+    //  CSSPropertyWebkitMaskSize
+    //
+    // Compound properties that have components that should be animatable:
+    //
+    //  CSSPropertyWebkitColumns
+    //  CSSPropertyWebkitMask
+    //  CSSPropertyWebkitBoxReflect
 
+    // Make sure unused slots have a value
+    for (unsigned int i = 0; i < static_cast<unsigned int>(numCSSProperties);
+         ++i)
+      gPropertyWrapperMap[i] = cInvalidPropertyWrapperIndex;
+
+    // First we put the non-shorthand property wrappers into the map, so the
+    // shorthand-building
+    // code can find them.
     size_t n = gPropertyWrappers->size();
     for (unsigned int i = 0; i < n; ++i) {
       ASSERT((*gPropertyWrappers)[i]->property() - firstCSSProperty <
@@ -514,7 +589,70 @@ static void ensurePropertyMap() {
       gPropertyWrapperMap[(*gPropertyWrappers)[i]->property() -
                           firstCSSProperty] = i;
     }
+
+    // Now add the shorthand wrappers.
+    addShorthandProperties();
   }
+}
+
+static void addPropertyWrapper(int propertyID, PropertyWrapperBase* wrapper) {
+  int propIndex = propertyID - firstCSSProperty;
+
+  ASSERT(gPropertyWrapperMap[propIndex] == cInvalidPropertyWrapperIndex);
+
+  unsigned wrapperIndex = gPropertyWrappers->size();
+  gPropertyWrappers->append(wrapper);
+  gPropertyWrapperMap[propIndex] = wrapperIndex;
+}
+
+static void addShorthandProperties() {
+  static const int animatableShorthandProperties[] = {
+      CSSPropertyBackground,  // for background-color
+      CSSPropertyBorderTop,
+      CSSPropertyBorderRight,
+      CSSPropertyBorderBottom,
+      CSSPropertyBorderLeft,
+      CSSPropertyBorderColor,
+      CSSPropertyBorderWidth,
+      CSSPropertyBorder,
+      CSSPropertyBorderSpacing,
+      CSSPropertyMargin,
+      CSSPropertyOutline,
+      CSSPropertyPadding,
+      CSSPropertyWebkitTextStroke,
+      CSSPropertyWebkitColumnRule,
+      CSSPropertyWebkitBorderRadius,
+      CSSPropertyWebkitTransformOrigin};
+
+  for (unsigned i = 0; i < sizeof(animatableShorthandProperties) /
+                               sizeof(animatableShorthandProperties[0]);
+       ++i) {
+    int propertyID = animatableShorthandProperties[i];
+    CSSPropertyLonghand longhand = longhandForProperty(propertyID);
+    if (longhand.length() > 0)
+      addPropertyWrapper(propertyID,
+                         new ShorthandPropertyWrapper(propertyID, longhand));
+  }
+
+  // 'font' is not in the shorthand map.
+  static const int animatableFontProperties[] = {CSSPropertyFontSize,
+                                                 CSSPropertyFontWeight};
+
+  CSSPropertyLonghand fontLonghand(
+      animatableFontProperties,
+      sizeof(animatableFontProperties) / sizeof(animatableFontProperties[0]));
+  addPropertyWrapper(CSSPropertyFont, new ShorthandPropertyWrapper(
+                                          CSSPropertyFont, fontLonghand));
+}
+
+static PropertyWrapperBase* wrapperForProperty(int propertyID) {
+  int propIndex = propertyID - firstCSSProperty;
+  if (propIndex >= 0 && propIndex < numCSSProperties) {
+    int wrapperIndex = gPropertyWrapperMap[propIndex];
+    if (wrapperIndex >= 0)
+      return (*gPropertyWrappers)[wrapperIndex];
+  }
+  return 0;
 }
 
 AnimationBase::AnimationBase(const Animation* transition,
@@ -549,26 +687,27 @@ bool AnimationBase::propertiesEqual(int prop,
   if (prop == cAnimateAll) {
     size_t n = gPropertyWrappers->size();
     for (unsigned int i = 0; i < n; ++i) {
-      if (!(*gPropertyWrappers)[i]->equals(a, b))
+      PropertyWrapperBase* wrapper = (*gPropertyWrappers)[i];
+      // No point comparing shorthand wrappers for 'all'.
+      if (!wrapper->isShorthandWrapper() && !wrapper->equals(a, b))
         return false;
     }
   } else {
-    int propIndex = prop - firstCSSProperty;
-
-    if (propIndex >= 0 && propIndex < numCSSProperties) {
-      int i = gPropertyWrapperMap[propIndex];
-      return i >= 0 ? (*gPropertyWrappers)[i]->equals(a, b) : true;
-    }
+    PropertyWrapperBase* wrapper = wrapperForProperty(prop);
+    if (wrapper)
+      return wrapper->equals(a, b);
   }
   return true;
 }
 
-int AnimationBase::getPropertyAtIndex(int i) {
+int AnimationBase::getPropertyAtIndex(int i, bool& isShorthand) {
   ensurePropertyMap();
   if (i < 0 || i >= static_cast<int>(gPropertyWrappers->size()))
     return CSSPropertyInvalid;
 
-  return (*gPropertyWrappers)[i]->property();
+  PropertyWrapperBase* wrapper = (*gPropertyWrappers)[i];
+  isShorthand = wrapper->isShorthandWrapper();
+  return wrapper->property();
 }
 
 int AnimationBase::getNumProperties() {
@@ -584,31 +723,12 @@ bool AnimationBase::blendProperties(const AnimationBase* anim,
                                     const RenderStyle* b,
                                     double progress) {
   ASSERT(prop != cAnimateAll);
-  // FIXME: Why can this happen?
 
   ensurePropertyMap();
-  if (prop == cAnimateAll) {
-    bool needsTimer = false;
-
-    size_t n = gPropertyWrappers->size();
-    for (unsigned int i = 0; i < n; ++i) {
-      PropertyWrapperBase* wrapper = (*gPropertyWrappers)[i];
-      if (!wrapper->equals(a, b)) {
-        wrapper->blend(anim, dst, a, b, progress);
-        needsTimer = true;
-      }
-    }
-    return needsTimer;
-  }
-
-  int propIndex = prop - firstCSSProperty;
-  if (propIndex >= 0 && propIndex < numCSSProperties) {
-    int i = gPropertyWrapperMap[propIndex];
-    if (i >= 0) {
-      PropertyWrapperBase* wrapper = (*gPropertyWrappers)[i];
-      wrapper->blend(anim, dst, a, b, progress);
-      return true;
-    }
+  PropertyWrapperBase* wrapper = wrapperForProperty(prop);
+  if (wrapper) {
+    wrapper->blend(anim, dst, a, b, progress);
+    return true;
   }
 
   return false;

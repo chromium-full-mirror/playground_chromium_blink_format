@@ -159,13 +159,16 @@ void CompositeAnimationPrivate::updateTransitions(RenderObject* renderer,
     for (int propertyIndex = 0;
          propertyIndex < AnimationBase::getNumProperties(); ++propertyIndex) {
       if (all) {
-        // Get the next property
-        prop = AnimationBase::getPropertyAtIndex(propertyIndex);
+        // Get the next property which is not a shorthand.
+        bool isShorthand;
+        prop = AnimationBase::getPropertyAtIndex(propertyIndex, isShorthand);
+        if (isShorthand)
+          continue;
       }
 
       // ImplicitAnimations are always hashed by actual properties, never
       // cAnimateAll
-      ASSERT(prop > firstCSSProperty &&
+      ASSERT(prop >= firstCSSProperty &&
              prop < (firstCSSProperty + numCSSProperties));
 
       // If there is a running animation for this property, the transition is
