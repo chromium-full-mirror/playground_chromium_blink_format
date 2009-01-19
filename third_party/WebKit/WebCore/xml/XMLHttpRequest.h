@@ -42,8 +42,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
                        private SubresourceLoaderClient,
                        public ActiveDOMObject {
  public:
-  static PassRefPtr<XMLHttpRequest> create(Document* document) {
-    return adoptRef(new XMLHttpRequest(document));
+  static PassRefPtr<XMLHttpRequest> create(ScriptExecutionContext* context) {
+    return adoptRef(new XMLHttpRequest(context));
   }
   ~XMLHttpRequest();
 
@@ -150,7 +150,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   using RefCounted<XMLHttpRequest>::deref;
 
  private:
-  XMLHttpRequest(Document*);
+  XMLHttpRequest(ScriptExecutionContext*);
 
   virtual void refEventTarget() { ref(); }
   virtual void derefEventTarget() { deref(); }

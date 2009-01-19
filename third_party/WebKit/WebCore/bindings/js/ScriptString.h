@@ -32,7 +32,6 @@
 #define ScriptString_h
 
 #include "PlatformString.h"
-#include <runtime/JSLock.h>
 #include <runtime/UString.h>
 
 namespace WebCore {
@@ -51,24 +50,18 @@ class ScriptString {
   size_t size() const { return m_str.size(); }
 
   ScriptString& operator=(const char* s) {
-    JSC::JSLock lock(false);
     m_str = s;
     return *this;
   }
 
   ScriptString& operator+=(const String& s) {
-    JSC::JSLock lock(false);
     m_str += s;
     return *this;
   }
 
-  bool operator==(const ScriptString& s) const {
-    JSC::JSLock lock(false);
-    return m_str == s.m_str;
-  }
+  bool operator==(const ScriptString& s) const { return m_str == s.m_str; }
 
   bool operator!=(const ScriptString& s) const {
-    JSC::JSLock lock(false);
     // Avoid exporting an extra symbol by re-using "==" operator.
     return !(m_str == s.m_str);
   }
