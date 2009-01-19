@@ -65,8 +65,19 @@ DEFINE_GUID(IID_DOMElement,
             0xe2,
             0x3e);
 
-using namespace WebCore;
-using namespace HTMLNames;
+// Our normal style is just to say "using namespace WebCore" rather than having
+// individual using directives for each type from that namespace. But
+// "DOMObject" exists both in the WebCore namespace and unnamespaced in this
+// file, which leads to ambiguities if we say "using namespace WebCore".
+using namespace WebCore::HTMLNames;
+using WebCore::AtomicString;
+using WebCore::BString;
+using WebCore::Element;
+using WebCore::ExceptionCode;
+using WebCore::FontDescription;
+using WebCore::Frame;
+using WebCore::IntRect;
+using WebCore::String;
 
 // DOMObject - IUnknown -------------------------------------------------------
 
@@ -979,7 +990,7 @@ DOMElement::font(WebFontDescription* webFontDescription) {
   webFontDescription->family = family.characters();
   webFontDescription->familyLength = family.length();
   webFontDescription->size = fontDescription.computedSize();
-  webFontDescription->bold = fontDescription.weight() >= FontWeight600;
+  webFontDescription->bold = fontDescription.weight() >= WebCore::FontWeight600;
   webFontDescription->italic = fontDescription.italic();
 
   return S_OK;
