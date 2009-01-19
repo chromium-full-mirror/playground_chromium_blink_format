@@ -240,7 +240,6 @@ static inline UString substituteBackreferences(const UString& replacement,
       ++i;
       substitutedReplacement.append(replacement.data() + offset, i - offset);
       offset = i + 1;
-      substitutedReplacement.append('$');
       continue;
     }
 
