@@ -28,7 +28,6 @@
 
 #include <windows.h>
 
-#include "FramePrivate.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
 #include "Settings.h"
@@ -103,9 +102,9 @@ HBITMAP Frame::nodeImage(Node* node) const {
 
   document()->updateLayout();
 
-  d->m_view->setNodeToDraw(node);  // invoke special sub-tree drawing mode
+  m_view->setNodeToDraw(node);  // invoke special sub-tree drawing mode
   HBITMAP result = imageFromRect(this, paintingRect);
-  d->m_view->setNodeToDraw(0);
+  m_view->setNodeToDraw(0);
 
   return result;
 }
