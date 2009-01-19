@@ -73,6 +73,10 @@ void JSDOMApplicationCache::mark() {
           static_cast<JSUnprotectedEventListener*>(m_impl->oncached()))
     listener->mark();
 
+  if (JSUnprotectedEventListener* listener =
+          static_cast<JSUnprotectedEventListener*>(m_impl->onobsolete()))
+    listener->mark();
+
   typedef DOMApplicationCache::EventListenersMap EventListenersMap;
   typedef DOMApplicationCache::ListenerVector ListenerVector;
   EventListenersMap& eventListeners = m_impl->eventListeners();

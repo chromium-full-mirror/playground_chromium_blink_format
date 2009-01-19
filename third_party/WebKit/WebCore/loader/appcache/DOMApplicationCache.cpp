@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -60,21 +60,21 @@ unsigned short DOMApplicationCache::status() const {
   if (!cache)
     return UNCACHED;
 
-  switch (cache->group()->status()) {
+  switch (cache->group()->updateStatus()) {
     case ApplicationCacheGroup::Checking:
       return CHECKING;
     case ApplicationCacheGroup::Downloading:
       return DOWNLOADING;
     case ApplicationCacheGroup::Idle: {
+      if (cache->group()->isObsolete())
+        return OBSOLETE;
       if (cache != cache->group()->newestCache())
         return UPDATEREADY;
-
       return IDLE;
     }
-    default:
-      ASSERT_NOT_REACHED();
   }
 
+  ASSERT_NOT_REACHED();
   return 0;
 }
 
@@ -97,7 +97,15 @@ bool DOMApplicationCache::swapCache() {
   if (!cache)
     return false;
 
-  // Check if we already have the newest cache
+  // If the group of application caches to which cache belongs has the lifecycle
+  // status obsolete, unassociate document from cache.
+  if (cache->group()->isObsolete()) {
+    cache->group()->disassociateDocumentLoader(
+        m_frame->loader()->documentLoader());
+    return true;
+  }
+
+  // If there is no newer cache, raise an INVALID_STATE_ERR exception.
   ApplicationCache* newestCache = cache->group()->newestCache();
   if (cache == newestCache)
     return false;
@@ -272,6 +280,10 @@ void DOMApplicationCache::callUpdateReadyListener() {
 
 void DOMApplicationCache::callCachedListener() {
   callListener(eventNames().cachedEvent, m_onCachedListener.get());
+}
+
+void DOMApplicationCache::callObsoleteListener() {
+  callListener(eventNames().obsoleteEvent, m_onObsoleteListener.get());
 }
 
 }  // namespace WebCore

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -59,6 +59,7 @@ class DOMApplicationCache : public RefCounted<DOMApplicationCache>,
     CHECKING = 2,
     DOWNLOADING = 3,
     UPDATEREADY = 4,
+    OBSOLETE = 5
   };
 
   unsigned short status() const;
@@ -121,6 +122,11 @@ class DOMApplicationCache : public RefCounted<DOMApplicationCache>,
   }
   EventListener* oncached() const { return m_onCachedListener.get(); }
 
+  void setOnobsolete(PassRefPtr<EventListener> eventListener) {
+    m_onObsoleteListener = eventListener;
+  }
+  EventListener* onobsolete() const { return m_onObsoleteListener.get(); }
+
   virtual ScriptExecutionContext* scriptExecutionContext() const;
   DOMApplicationCache* toDOMApplicationCache() { return this; }
 
@@ -131,6 +137,7 @@ class DOMApplicationCache : public RefCounted<DOMApplicationCache>,
   void callProgressListener();
   void callUpdateReadyListener();
   void callCachedListener();
+  void callObsoleteListener();
 
  private:
   DOMApplicationCache(Frame*);
@@ -149,6 +156,7 @@ class DOMApplicationCache : public RefCounted<DOMApplicationCache>,
   RefPtr<EventListener> m_onProgressListener;
   RefPtr<EventListener> m_onUpdateReadyListener;
   RefPtr<EventListener> m_onCachedListener;
+  RefPtr<EventListener> m_onObsoleteListener;
 
   EventListenersMap m_eventListeners;
 

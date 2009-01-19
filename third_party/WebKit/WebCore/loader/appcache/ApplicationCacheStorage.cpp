@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -155,6 +155,8 @@ ApplicationCacheGroup* ApplicationCacheStorage::cacheGroupForURL(
        ++it) {
     ApplicationCacheGroup* group = it->second;
 
+    ASSERT(!group->isObsolete());
+
     if (!protocolHostAndPortAreEqual(url, group->manifestURL()))
       continue;
 
@@ -225,6 +227,8 @@ ApplicationCacheGroup* ApplicationCacheStorage::fallbackCacheGroupForURL(
        ++it) {
     ApplicationCacheGroup* group = it->second;
 
+    ASSERT(!group->isObsolete());
+
     if (ApplicationCache* cache = group->newestCache()) {
       KURL fallbackURL;
       if (!cache->urlMatchesFallbackNamespace(url, &fallbackURL))
@@ -290,13 +294,32 @@ ApplicationCacheGroup* ApplicationCacheStorage::fallbackCacheGroupForURL(
 
 void ApplicationCacheStorage::cacheGroupDestroyed(
     ApplicationCacheGroup* group) {
+  if (group->isObsolete()) {
+    ASSERT(!group->storageID());
+    ASSERT(m_cachesInMemory.get(group->manifestURL()) != group);
+    return;
+  }
+
   ASSERT(m_cachesInMemory.get(group->manifestURL()) == group);
 
   m_cachesInMemory.remove(group->manifestURL());
 
-  // If the cache is half-created, we don't want it in the saved set.
+  // If the cache group is half-created, we don't want it in the saved set (as
+  // it is not stored in database).
   if (!group->storageID())
     m_cacheHostSet.remove(urlHostHash(group->manifestURL()));
+}
+
+void ApplicationCacheStorage::cacheGroupMadeObsolete(
+    ApplicationCacheGroup* group) {
+  ASSERT(m_cachesInMemory.get(group->manifestURL()) == group);
+  ASSERT(m_cacheHostSet.contains(urlHostHash(group->manifestURL())));
+
+  if (ApplicationCache* newestCache = group->newestCache())
+    remove(newestCache);
+
+  m_cachesInMemory.remove(group->manifestURL());
+  m_cacheHostSet.remove(urlHostHash(group->manifestURL()));
 }
 
 void ApplicationCacheStorage::setCacheDirectory(const String& cacheDirectory) {
@@ -655,6 +678,7 @@ bool ApplicationCacheStorage::storeNewestCache(ApplicationCacheGroup* group) {
   }
 
   ASSERT(group->newestCache());
+  ASSERT(!group->isObsolete());
   ASSERT(!group->newestCache()->storageID());
 
   // Store the newest cache
@@ -807,6 +831,9 @@ void ApplicationCacheStorage::remove(ApplicationCache* cache) {
   if (!m_database.isOpen())
     return;
 
+  ASSERT(cache->group());
+  ASSERT(cache->group()->storageID());
+
   // All associated data will be deleted by database triggers.
   SQLiteStatement statement(m_database, "DELETE FROM Caches WHERE id=?");
   if (statement.prepare() != SQLResultOk)
@@ -814,6 +841,22 @@ void ApplicationCacheStorage::remove(ApplicationCache* cache) {
 
   statement.bindInt64(1, cache->storageID());
   executeStatement(statement);
+
+  cache->clearStorageID();
+
+  if (cache->group()->newestCache() == cache) {
+    // Currently, there are no triggers on the cache group, which is why the
+    // cache had to be removed separately above.
+    SQLiteStatement groupStatement(m_database,
+                                   "DELETE FROM CacheGroups WHERE id=?");
+    if (groupStatement.prepare() != SQLResultOk)
+      return;
+
+    groupStatement.bindInt64(1, cache->group()->storageID());
+    executeStatement(groupStatement);
+
+    cache->group()->clearStorageID();
+  }
 }
 
 void ApplicationCacheStorage::empty() {

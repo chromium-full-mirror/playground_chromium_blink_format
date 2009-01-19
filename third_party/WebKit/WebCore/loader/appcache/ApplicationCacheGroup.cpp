@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,10 +47,10 @@ namespace WebCore {
 ApplicationCacheGroup::ApplicationCacheGroup(const KURL& manifestURL,
                                              bool isCopy)
     : m_manifestURL(manifestURL),
-      m_status(Idle),
-      m_savedNewestCachePointer(0),
+      m_updateStatus(Idle),
       m_frame(0),
       m_storageID(0),
+      m_isObsolete(false),
       m_isCopy(isCopy) {}
 
 ApplicationCacheGroup::~ApplicationCacheGroup() {
@@ -83,6 +83,7 @@ ApplicationCache* ApplicationCacheGroup::cacheForMainRequest(
   if (ApplicationCacheGroup* group =
           cacheStorage().cacheGroupForURL(request.url())) {
     ASSERT(group->newestCache());
+    ASSERT(!group->isObsolete());
 
     return group->newestCache();
   }
@@ -99,6 +100,7 @@ ApplicationCache* ApplicationCacheGroup::fallbackCacheForMainRequest(
   if (ApplicationCacheGroup* group =
           cacheStorage().fallbackCacheGroupForURL(request.url())) {
     ASSERT(group->newestCache());
+    ASSERT(!group->isObsolete());
 
     return group->newestCache();
   }
@@ -286,23 +288,30 @@ void ApplicationCacheGroup::stopLoading() {
   m_cacheBeingUpdated = 0;
 }
 
-void ApplicationCacheGroup::documentLoaderDestroyed(DocumentLoader* loader) {
+void ApplicationCacheGroup::disassociateDocumentLoader(DocumentLoader* loader) {
   HashSet<DocumentLoader*>::iterator it =
       m_associatedDocumentLoaders.find(loader);
 
   if (it != m_associatedDocumentLoaders.end()) {
     ASSERT(!m_cacheCandidates.contains(loader));
-
     m_associatedDocumentLoaders.remove(it);
+
+    // Either the loader is being destroyed, or DOMApplicationCache::swapCache()
+    // was called for an obsolete cache group.
+    ASSERT(!loader->candidateApplicationCacheGroup());
+    loader->setApplicationCache(0);
   } else {
     ASSERT(m_cacheCandidates.contains(loader));
     m_cacheCandidates.remove(loader);
+
+    // The document loader is being destroyed, so there is no need to reset its
+    // cache references.
   }
 
   if (!m_associatedDocumentLoaders.isEmpty() || !m_cacheCandidates.isEmpty())
     return;
 
-  if (m_caches.size() == 0) {
+  if (m_caches.isEmpty()) {
     // There is an initial cache attempt in progress.
     ASSERT(m_cacheBeingUpdated);
     ASSERT(!m_newestCache);
@@ -316,7 +325,6 @@ void ApplicationCacheGroup::documentLoaderDestroyed(DocumentLoader* loader) {
   // Release our reference to the newest cache. This could cause us to be
   // deleted.
   // Any ongoing updates will be stopped from destructor.
-  m_savedNewestCachePointer = m_newestCache.get();
   m_newestCache.release();
 }
 
@@ -325,13 +333,11 @@ void ApplicationCacheGroup::cacheDestroyed(ApplicationCache* cache) {
 
   m_caches.remove(cache);
 
-  // If no one holds a reference to the newest cache, then the cache group won't
-  // be revived.
-  if (cache == m_savedNewestCachePointer)
-    m_savedNewestCachePointer = 0;
-
-  if (m_caches.isEmpty())
+  if (m_caches.isEmpty()) {
+    ASSERT(m_associatedDocumentLoaders.isEmpty());
+    ASSERT(m_cacheCandidates.isEmpty());
     delete this;
+  }
 }
 
 void ApplicationCacheGroup::setNewestCache(
@@ -339,24 +345,29 @@ void ApplicationCacheGroup::setNewestCache(
   ASSERT(!m_caches.contains(newestCache.get()));
   ASSERT(!newestCache->group());
 
-  if (m_newestCache) {
-    cacheStorage().remove(m_newestCache.get());
-    m_newestCache->clearStorageID();
-  }
-
   m_newestCache = newestCache;
+
   m_caches.add(m_newestCache.get());
   m_newestCache->setGroup(this);
 }
 
+void ApplicationCacheGroup::makeObsolete() {
+  if (isObsolete())
+    return;
+
+  m_isObsolete = true;
+  cacheStorage().cacheGroupMadeObsolete(this);
+  ASSERT(!m_storageID);
+}
+
 void ApplicationCacheGroup::update(Frame* frame) {
-  if (m_status == Checking || m_status == Downloading)
+  if (m_updateStatus == Checking || m_updateStatus == Downloading)
     return;
 
   ASSERT(!m_frame);
   m_frame = frame;
 
-  m_status = Checking;
+  m_updateStatus = Checking;
 
   callListenersOnAssociatedDocuments(
       &DOMApplicationCache::callCheckingListener);
@@ -385,6 +396,8 @@ void ApplicationCacheGroup::didReceiveResponse(
 
   int statusCode = response.httpStatusCode() / 100;
   if (statusCode == 4 || statusCode == 5) {
+    // FIXME: Failing to load resources that are not marked as explicit or
+    // fallback should not be fatal.
     // Note that cacheUpdateFailed() can cause the cache group to be deleted.
     cacheUpdateFailed();
     return;
@@ -448,21 +461,27 @@ void ApplicationCacheGroup::didFinishLoading(ResourceHandle* handle) {
 void ApplicationCacheGroup::didFail(ResourceHandle* handle,
                                     const ResourceError&) {
   if (handle == m_manifestHandle) {
-    didFailToLoadManifest();
+    cacheUpdateFailed();
     return;
   }
 
   // Note that cacheUpdateFailed() can cause the cache group to be deleted.
+  // FIXME: Failing to load resources that are not marked as explicit or
+  // fallback should not be fatal.
   cacheUpdateFailed();
 }
 
 void ApplicationCacheGroup::didReceiveManifestResponse(
     const ResourceResponse& response) {
-  int statusCode = response.httpStatusCode() / 100;
+  if (response.httpStatusCode() == 404 || response.httpStatusCode() == 410) {
+    manifestNotFound();
+    return;
+  }
 
+  int statusCode = response.httpStatusCode() / 100;
   if (statusCode == 4 || statusCode == 5 ||
       !equalIgnoringCase(response.mimeType(), "text/cache-manifest")) {
-    didFailToLoadManifest();
+    cacheUpdateFailed();
     return;
   }
 
@@ -481,7 +500,7 @@ void ApplicationCacheGroup::didReceiveManifestData(const char* data,
 
 void ApplicationCacheGroup::didFinishLoadingManifest() {
   if (!m_manifestResource) {
-    didFailToLoadManifest();
+    cacheUpdateFailed();
     return;
   }
 
@@ -502,7 +521,7 @@ void ApplicationCacheGroup::didFinishLoadingManifest() {
       callListenersOnAssociatedDocuments(
           &DOMApplicationCache::callNoUpdateListener);
 
-      m_status = Idle;
+      m_updateStatus = Idle;
       m_frame = 0;
       m_manifestResource = 0;
       return;
@@ -512,12 +531,12 @@ void ApplicationCacheGroup::didFinishLoadingManifest() {
   Manifest manifest;
   if (!parseManifest(m_manifestURL, m_manifestResource->data()->data(),
                      m_manifestResource->data()->size(), manifest)) {
-    didFailToLoadManifest();
+    cacheUpdateFailed();
     return;
   }
 
   // We have the manifest, now download the resources.
-  m_status = Downloading;
+  m_updateStatus = Downloading;
 
   callListenersOnAssociatedDocuments(
       &DOMApplicationCache::callDownloadingListener);
@@ -580,17 +599,41 @@ void ApplicationCacheGroup::cacheUpdateFailed() {
     m_cacheCandidates.remove(it);
   }
 
-  m_status = Idle;
+  m_updateStatus = Idle;
   m_frame = 0;
 
-  // If there are no associated caches, delete ourselves
-  if (m_associatedDocumentLoaders.isEmpty())
+  if (m_caches.isEmpty()) {
+    ASSERT(m_associatedDocumentLoaders.isEmpty());
     delete this;
+  }
 }
 
-void ApplicationCacheGroup::didFailToLoadManifest() {
-  // Note that cacheUpdateFailed() can cause the cache group to be deleted.
-  cacheUpdateFailed();
+void ApplicationCacheGroup::manifestNotFound() {
+  stopLoading();
+
+  callListenersOnAssociatedDocuments(
+      &DOMApplicationCache::callObsoleteListener);
+
+  m_pendingEntries.clear();
+  m_manifestResource = 0;
+
+  while (!m_cacheCandidates.isEmpty()) {
+    HashSet<DocumentLoader*>::iterator it = m_cacheCandidates.begin();
+
+    ASSERT((*it)->candidateApplicationCacheGroup() == this);
+    (*it)->setCandidateApplicationCacheGroup(0);
+    m_cacheCandidates.remove(it);
+  }
+
+  makeObsolete();
+
+  m_updateStatus = Idle;
+  m_frame = 0;
+
+  if (m_caches.isEmpty()) {
+    ASSERT(m_associatedDocumentLoaders.isEmpty());
+    delete this;
+  }
 }
 
 void ApplicationCacheGroup::checkIfLoadIsComplete() {
@@ -629,16 +672,20 @@ void ApplicationCacheGroup::checkIfLoadIsComplete() {
     }
   }
 
-  setNewestCache(m_cacheBeingUpdated.release());
+  RefPtr<ApplicationCache> oldNewestCache =
+      (m_newestCache == m_cacheBeingUpdated) ? 0 : m_newestCache;
 
-  // Store the cache
+  setNewestCache(m_cacheBeingUpdated.release());
   cacheStorage().storeNewestCache(this);
+
+  if (oldNewestCache)
+    cacheStorage().remove(oldNewestCache.get());
 
   callListeners(isUpgradeAttempt ? &DOMApplicationCache::callUpdateReadyListener
                                  : &DOMApplicationCache::callCachedListener,
                 documentLoaders);
 
-  m_status = Idle;
+  m_updateStatus = Idle;
   m_frame = 0;
 }
 
@@ -710,11 +757,10 @@ void ApplicationCacheGroup::associateDocumentLoaderWithCache(
     DocumentLoader* loader,
     ApplicationCache* cache) {
   // If teardown started already, revive the group.
-  if (m_savedNewestCachePointer) {
-    ASSERT(cache == m_savedNewestCachePointer);
-    m_newestCache = m_savedNewestCachePointer;
-    m_savedNewestCachePointer = 0;
-  }
+  if (!m_newestCache)
+    m_newestCache = cache;
+
+  ASSERT(!m_isObsolete);
 
   loader->setApplicationCache(cache);
 
