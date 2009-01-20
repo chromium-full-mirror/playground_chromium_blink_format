@@ -382,10 +382,12 @@ void ResourceHandle::cancel() {
     soup_session_cancel_message(session, d->m_msg, SOUP_STATUS_CANCELLED);
     // For re-entrancy troubles we call didFinishLoading when the message hasn't
     // been handled yet.
-    d->client()->didFinishLoading(this);
+    if (client())
+      client()->didFinishLoading(this);
   } else if (d->m_cancellable) {
     g_cancellable_cancel(d->m_cancellable);
-    d->client()->didFinishLoading(this);
+    if (client())
+      client()->didFinishLoading(this);
   }
 }
 
