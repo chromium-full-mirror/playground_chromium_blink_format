@@ -157,6 +157,11 @@ class GraphicsContext : Noncopyable {
   void setShouldAntialias(bool);
   bool shouldAntialias() const;
 
+#if PLATFORM(CG)
+  void applyStrokePattern();
+  void applyFillPattern();
+#endif
+
   void save();
   void restore();
 
