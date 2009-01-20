@@ -42,6 +42,12 @@ namespace WebCore {
 class String;
 }
 
+namespace JSC {
+namespace Bindings {
+class Instance;
+class RootObject;
+}
+}
 @class WebHostedNetscapePluginView;
 
 namespace WebKit {
@@ -145,9 +151,12 @@ class NetscapePluginInstanceProxy
                   LoadURLFlags,
                   uint32_t& requestID);
 
+  PassRefPtr<JSC::Bindings::Instance> createBindingsInstance(
+      PassRefPtr<JSC::Bindings::RootObject>);
+
   // Reply structs
   struct Reply {
-    enum Type { InstantiatePlugin };
+    enum Type { InstantiatePlugin, GetScriptableNPObject };
 
     Reply(Type type) : m_type(type) {}
     virtual ~Reply() {}
@@ -169,6 +178,15 @@ class NetscapePluginInstanceProxy
     kern_return_t m_resultCode;
     uint32_t m_renderContextID;
     boolean_t m_useSoftwareRenderer;
+  };
+
+  struct GetScriptableNPObjectReply : public Reply {
+    static const int ReplyType = GetScriptableNPObject;
+
+    GetScriptableNPObjectReply(uint32_t objectID)
+        : Reply(GetScriptableNPObject), m_objectID(objectID) {}
+
+    uint32_t m_objectID;
   };
 
   void setCurrentReply(Reply* reply) {
