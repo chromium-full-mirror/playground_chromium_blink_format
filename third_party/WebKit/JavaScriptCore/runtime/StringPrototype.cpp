@@ -229,7 +229,7 @@ static inline UString substituteBackreferences(const UString& replacement,
                                                RegExp* reg) {
   UString substitutedReplacement;
   int offset = 0;
-  int i;
+  int i = -1;
   while ((i = replacement.find('$', i + 1)) != -1) {
     if (i + 1 == replacement.size())
       break;
