@@ -35,7 +35,7 @@ HTMLIsIndexElement::HTMLIsIndexElement(const QualifiedName& tagName,
                                        HTMLFormElement* f)
     : HTMLInputElement(tagName, doc, f) {
   ASSERT(hasTagName(isindexTag));
-  m_name = "isindex";
+  setDefaultName(isindexTag.localName());
 }
 
 void HTMLIsIndexElement::parseMappedAttribute(MappedAttribute* attr) {

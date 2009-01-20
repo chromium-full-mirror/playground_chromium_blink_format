@@ -24,6 +24,8 @@
 
 namespace WebCore {
 
+class Element;
+
 class FormControlElement {
  public:
   virtual ~FormControlElement() {}
@@ -34,6 +36,8 @@ class FormControlElement {
  protected:
   FormControlElement() {}
 };
+
+FormControlElement* formControlElementForElement(Element*);
 }
 
 #endif
