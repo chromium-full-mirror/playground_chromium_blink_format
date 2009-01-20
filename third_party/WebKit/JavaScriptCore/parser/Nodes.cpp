@@ -2249,7 +2249,7 @@ static void processClauseList(ClauseListNode* list,
       JSValuePtr jsValue =
           JSValuePtr::makeInt32Fast(static_cast<int32_t>(value));
       if ((typeForTable & ~SwitchNumber) || !jsValue ||
-          (jsValue->getInt32Fast() != value)) {
+          (jsValue.getInt32Fast() != value)) {
         typeForTable = SwitchNeither;
         break;
       }

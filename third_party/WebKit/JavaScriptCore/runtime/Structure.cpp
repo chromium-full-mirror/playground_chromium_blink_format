@@ -145,7 +145,7 @@ Structure::Structure(JSValuePtr prototype, const TypeInfo& typeInfo)
       m_usingSingleTransitionSlot(true),
       m_attributesInPrevious(0) {
   ASSERT(m_prototype);
-  ASSERT(m_prototype->isObject() || m_prototype->isNull());
+  ASSERT(m_prototype.isObject() || m_prototype.isNull());
 
   m_transitions.singleTransition = 0;
 
@@ -334,7 +334,7 @@ void Structure::getEnumerablePropertyNames(ExecState* exec,
     }
   }
 
-  if (m_prototype->isObject())
+  if (m_prototype.isObject())
     asObject(m_prototype)->getPropertyNames(exec, propertyNames);
 
   if (shouldCache) {
@@ -577,7 +577,7 @@ StructureChain* Structure::createCachedPrototypeChain() {
   ASSERT(!m_cachedPrototypeChain);
 
   JSValuePtr prototype = storedPrototype();
-  if (!prototype->isCell())
+  if (!prototype.isCell())
     return 0;
 
   RefPtr<StructureChain> chain =

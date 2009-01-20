@@ -63,8 +63,6 @@ class JSValuePtr {
 
   JSValuePtr(const JSCell* ptr) : m_ptr(const_cast<JSCell*>(ptr)) {}
 
-  JSValuePtr* operator->() const { return const_cast<JSValuePtr*>(this); }
-
   operator bool() const { return m_ptr; }
 
   bool operator==(const JSValuePtr other) const { return m_ptr == other.m_ptr; }

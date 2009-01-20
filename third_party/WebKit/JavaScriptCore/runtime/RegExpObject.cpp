@@ -121,7 +121,7 @@ void RegExpObject::put(ExecState* exec,
 void setRegExpObjectLastIndex(ExecState* exec,
                               JSObject* baseObject,
                               JSValuePtr value) {
-  asRegExpObject(baseObject)->setLastIndex(value->toInteger(exec));
+  asRegExpObject(baseObject)->setLastIndex(value.toInteger(exec));
 }
 
 JSValuePtr RegExpObject::test(ExecState* exec, const ArgList& args) {
@@ -153,7 +153,7 @@ bool RegExpObject::match(ExecState* exec, const ArgList& args) {
       exec->lexicalGlobalObject()->regExpConstructor();
 
   UString input = args.isEmpty() ? regExpConstructor->input()
-                                 : args.at(exec, 0)->toString(exec);
+                                 : args.at(exec, 0).toString(exec);
   if (input.isNull()) {
     throwError(exec, GeneralError, "No input to " + toString(exec) + ".");
     return false;

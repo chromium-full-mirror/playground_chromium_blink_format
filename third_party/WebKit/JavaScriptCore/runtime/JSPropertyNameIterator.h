@@ -82,10 +82,10 @@ inline JSPropertyNameIterator::JSPropertyNameIterator(
 
 inline JSPropertyNameIterator* JSPropertyNameIterator::create(ExecState* exec,
                                                               JSValuePtr v) {
-  if (v->isUndefinedOrNull())
+  if (v.isUndefinedOrNull())
     return new (exec) JSPropertyNameIterator;
 
-  JSObject* o = v->toObject(exec);
+  JSObject* o = v.toObject(exec);
   PropertyNameArray propertyNames(exec);
   o->getPropertyNames(exec, propertyNames);
   return new (exec) JSPropertyNameIterator(o, propertyNames.releaseData());

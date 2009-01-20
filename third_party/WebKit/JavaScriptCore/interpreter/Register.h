@@ -157,11 +157,11 @@ ALWAYS_INLINE JSValuePtr Register::getJSValue() const {
 }
 
 ALWAYS_INLINE bool Register::marked() const {
-  return getJSValue()->marked();
+  return getJSValue().marked();
 }
 
 ALWAYS_INLINE void Register::mark() {
-  getJSValue()->mark();
+  getJSValue().mark();
 }
 
 // Interpreter functions

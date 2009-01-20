@@ -43,32 +43,32 @@ ALWAYS_INLINE bool JSValuePtr::equalSlowCaseInline(ExecState* exec,
   ASSERT(!JSImmediate::areBothImmediateIntegerNumbers(v1, v2));
 
   do {
-    if (v1->isNumber() && v2->isNumber())
-      return v1->uncheckedGetNumber() == v2->uncheckedGetNumber();
+    if (v1.isNumber() && v2.isNumber())
+      return v1.uncheckedGetNumber() == v2.uncheckedGetNumber();
 
-    bool s1 = v1->isString();
-    bool s2 = v2->isString();
+    bool s1 = v1.isString();
+    bool s2 = v2.isString();
     if (s1 && s2)
       return asString(v1)->value() == asString(v2)->value();
 
-    if (v1->isUndefinedOrNull()) {
-      if (v2->isUndefinedOrNull())
+    if (v1.isUndefinedOrNull()) {
+      if (v2.isUndefinedOrNull())
         return true;
       if (JSImmediate::isImmediate(v2))
         return false;
-      return v2->asCell()->structure()->typeInfo().masqueradesAsUndefined();
+      return v2.asCell()->structure()->typeInfo().masqueradesAsUndefined();
     }
 
-    if (v2->isUndefinedOrNull()) {
+    if (v2.isUndefinedOrNull()) {
       if (JSImmediate::isImmediate(v1))
         return false;
-      return v1->asCell()->structure()->typeInfo().masqueradesAsUndefined();
+      return v1.asCell()->structure()->typeInfo().masqueradesAsUndefined();
     }
 
-    if (v1->isObject()) {
-      if (v2->isObject())
+    if (v1.isObject()) {
+      if (v2.isObject())
         return v1 == v2;
-      JSValuePtr p1 = v1->toPrimitive(exec);
+      JSValuePtr p1 = v1.toPrimitive(exec);
       if (exec->hadException())
         return false;
       v1 = p1;
@@ -77,8 +77,8 @@ ALWAYS_INLINE bool JSValuePtr::equalSlowCaseInline(ExecState* exec,
       continue;
     }
 
-    if (v2->isObject()) {
-      JSValuePtr p2 = v2->toPrimitive(exec);
+    if (v2.isObject()) {
+      JSValuePtr p2 = v2.toPrimitive(exec);
       if (exec->hadException())
         return false;
       v2 = p2;
@@ -88,19 +88,17 @@ ALWAYS_INLINE bool JSValuePtr::equalSlowCaseInline(ExecState* exec,
     }
 
     if (s1 || s2) {
-      double d1 = v1->toNumber(exec);
-      double d2 = v2->toNumber(exec);
+      double d1 = v1.toNumber(exec);
+      double d2 = v2.toNumber(exec);
       return d1 == d2;
     }
 
-    if (v1->isBoolean()) {
-      if (v2->isNumber())
-        return static_cast<double>(v1->getBoolean()) ==
-               v2->uncheckedGetNumber();
-    } else if (v2->isBoolean()) {
-      if (v1->isNumber())
-        return v1->uncheckedGetNumber() ==
-               static_cast<double>(v2->getBoolean());
+    if (v1.isBoolean()) {
+      if (v2.isNumber())
+        return static_cast<double>(v1.getBoolean()) == v2.uncheckedGetNumber();
+    } else if (v2.isBoolean()) {
+      if (v1.isNumber())
+        return v1.uncheckedGetNumber() == static_cast<double>(v2.getBoolean());
     }
 
     return v1 == v2;
@@ -112,8 +110,8 @@ inline bool JSValuePtr::strictEqual(JSValuePtr v1, JSValuePtr v2) {
   if (JSImmediate::areBothImmediateIntegerNumbers(v1, v2))
     return v1 == v2;
 
-  if (v1->isNumber() && v2->isNumber())
-    return v1->uncheckedGetNumber() == v2->uncheckedGetNumber();
+  if (v1.isNumber() && v2.isNumber())
+    return v1.uncheckedGetNumber() == v2.uncheckedGetNumber();
 
   if (JSImmediate::isEitherImmediate(v1, v2))
     return v1 == v2;
@@ -125,7 +123,7 @@ ALWAYS_INLINE bool JSValuePtr::strictEqualSlowCaseInline(JSValuePtr v1,
                                                          JSValuePtr v2) {
   ASSERT(!JSImmediate::isEitherImmediate(v1, v2));
 
-  if (v1->asCell()->isString() && v2->asCell()->isString())
+  if (v1.asCell()->isString() && v2.asCell()->isString())
     return asString(v1)->value() == asString(v2)->value();
 
   return v1 == v2;

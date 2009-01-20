@@ -67,7 +67,7 @@ CFArrayRef JSValueWrapper::JSObjectCopyPropertyNames(void* data) {
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     ExecState* exec = getThreadGlobalExecState();
-    JSObject* object = ptr->GetValue()->toObject(exec);
+    JSObject* object = ptr->GetValue().toObject(exec);
     PropertyNameArray propNames(exec);
     object->getPropertyNames(exec, propNames);
     PropertyNameArray::const_iterator iterator = propNames.begin();
@@ -97,7 +97,7 @@ JSObjectRef JSValueWrapper::JSObjectCopyProperty(void* data,
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     ExecState* exec = getThreadGlobalExecState();
-    JSValuePtr propValue = ptr->GetValue()->toObject(exec)->get(
+    JSValuePtr propValue = ptr->GetValue().toObject(exec)->get(
         exec, CFStringToIdentifier(propertyName, exec));
     JSValueWrapper* wrapperValue = new JSValueWrapper(propValue);
 
@@ -123,7 +123,7 @@ void JSValueWrapper::JSObjectSetProperty(void* data,
   if (ptr) {
     ExecState* exec = getThreadGlobalExecState();
     JSValuePtr value = JSObjectKJSValue((JSUserObject*)jsValue);
-    JSObject* objValue = ptr->GetValue()->toObject(exec);
+    JSObject* objValue = ptr->GetValue().toObject(exec);
     PutPropertySlot slot;
     objValue->put(exec, CFStringToIdentifier(propertyName, exec), value, slot);
   }
@@ -140,8 +140,8 @@ JSObjectRef JSValueWrapper::JSObjectCallFunction(void* data,
     ExecState* exec = getThreadGlobalExecState();
 
     JSValuePtr value = JSObjectKJSValue((JSUserObject*)thisObj);
-    JSObject* ksjThisObj = value->toObject(exec);
-    JSObject* objValue = ptr->GetValue()->toObject(exec);
+    JSObject* ksjThisObj = value.toObject(exec);
+    JSObject* objValue = ptr->GetValue().toObject(exec);
 
     ArgList listArgs;
     CFIndex argCount = args ? CFArrayGetCount(args) : 0;
@@ -182,6 +182,6 @@ CFTypeRef JSValueWrapper::JSObjectCopyCFValue(void* data) {
 void JSValueWrapper::JSObjectMark(void* data) {
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
-    ptr->fValue->mark();
+    ptr->fValue.get().mark();
   }
 }

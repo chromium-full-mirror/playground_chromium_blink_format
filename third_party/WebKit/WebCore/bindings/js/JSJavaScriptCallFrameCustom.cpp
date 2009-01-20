@@ -37,7 +37,7 @@ JSValuePtr JSJavaScriptCallFrame::evaluate(ExecState* exec,
                                            const ArgList& args) {
   JSValuePtr exception = noValue();
   JSValuePtr result =
-      impl()->evaluate(args.at(exec, 0)->toString(exec), exception);
+      impl()->evaluate(args.at(exec, 0).toString(exec), exception);
 
   if (exception)
     exec->setException(exception);

@@ -362,7 +362,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
             length, env->FindClass("java/lang/String"), env->NewStringUTF(""));
         for (unsigned i = 0; i < length; i++) {
           JSValuePtr item = jsArray->get(exec, i);
-          UString stringValue = item->toString(exec);
+          UString stringValue = item.toString(exec);
           env->SetObjectArrayElement(
               jarray, i,
               env->functions->NewString(env, (const jchar*)stringValue.data(),
@@ -376,7 +376,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
       jarray = (jobjectArray)env->NewBooleanArray(length);
       for (unsigned i = 0; i < length; i++) {
         JSValuePtr item = jsArray->get(exec, i);
-        jboolean value = (jboolean)item->toNumber(exec);
+        jboolean value = (jboolean)item.toNumber(exec);
         env->SetBooleanArrayRegion((jbooleanArray)jarray, (jsize)i, (jsize)1,
                                    &value);
       }
@@ -387,7 +387,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
       jarray = (jobjectArray)env->NewByteArray(length);
       for (unsigned i = 0; i < length; i++) {
         JSValuePtr item = jsArray->get(exec, i);
-        jbyte value = (jbyte)item->toNumber(exec);
+        jbyte value = (jbyte)item.toNumber(exec);
         env->SetByteArrayRegion((jbyteArray)jarray, (jsize)i, (jsize)1, &value);
       }
       break;
@@ -397,7 +397,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
       jarray = (jobjectArray)env->NewCharArray(length);
       for (unsigned i = 0; i < length; i++) {
         JSValuePtr item = jsArray->get(exec, i);
-        UString stringValue = item->toString(exec);
+        UString stringValue = item.toString(exec);
         jchar value = 0;
         if (stringValue.size() > 0)
           value = ((const jchar*)stringValue.data())[0];
@@ -410,7 +410,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
       jarray = (jobjectArray)env->NewShortArray(length);
       for (unsigned i = 0; i < length; i++) {
         JSValuePtr item = jsArray->get(exec, i);
-        jshort value = (jshort)item->toNumber(exec);
+        jshort value = (jshort)item.toNumber(exec);
         env->SetShortArrayRegion((jshortArray)jarray, (jsize)i, (jsize)1,
                                  &value);
       }
@@ -421,7 +421,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
       jarray = (jobjectArray)env->NewIntArray(length);
       for (unsigned i = 0; i < length; i++) {
         JSValuePtr item = jsArray->get(exec, i);
-        jint value = (jint)item->toNumber(exec);
+        jint value = (jint)item.toNumber(exec);
         env->SetIntArrayRegion((jintArray)jarray, (jsize)i, (jsize)1, &value);
       }
       break;
@@ -431,7 +431,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
       jarray = (jobjectArray)env->NewLongArray(length);
       for (unsigned i = 0; i < length; i++) {
         JSValuePtr item = jsArray->get(exec, i);
-        jlong value = (jlong)item->toNumber(exec);
+        jlong value = (jlong)item.toNumber(exec);
         env->SetLongArrayRegion((jlongArray)jarray, (jsize)i, (jsize)1, &value);
       }
       break;
@@ -441,7 +441,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
       jarray = (jobjectArray)env->NewFloatArray(length);
       for (unsigned i = 0; i < length; i++) {
         JSValuePtr item = jsArray->get(exec, i);
-        jfloat value = (jfloat)item->toNumber(exec);
+        jfloat value = (jfloat)item.toNumber(exec);
         env->SetFloatArrayRegion((jfloatArray)jarray, (jsize)i, (jsize)1,
                                  &value);
       }
@@ -452,7 +452,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
       jarray = (jobjectArray)env->NewDoubleArray(length);
       for (unsigned i = 0; i < length; i++) {
         JSValuePtr item = jsArray->get(exec, i);
-        jdouble value = (jdouble)item->toNumber(exec);
+        jdouble value = (jdouble)item.toNumber(exec);
         env->SetDoubleArrayRegion((jdoubleArray)jarray, (jsize)i, (jsize)1,
                                   &value);
       }
@@ -483,7 +483,7 @@ jvalue convertValueToJValue(ExecState* exec,
       result.l = (jobject)0;
 
       // First see if we have a Java instance.
-      if (value->isObject()) {
+      if (value.isObject()) {
         JSObject* objectImp = asObject(value);
         if (objectImp->classInfo() == &RuntimeObjectImp::s_info) {
           RuntimeObjectImp* imp = static_cast<RuntimeObjectImp*>(objectImp);
@@ -516,10 +516,10 @@ jvalue convertValueToJValue(ExecState* exec,
           result.l = javaString;
         } else
 #else
-        if (!value->isNull())
+        if (!value.isNull())
 #endif
         {
-          UString stringValue = value->toString(exec);
+          UString stringValue = value.toString(exec);
           JNIEnv* env = getJNIEnv();
           jobject javaString = env->functions->NewString(
               env, (const jchar*)stringValue.data(), stringValue.size());
@@ -530,35 +530,35 @@ jvalue convertValueToJValue(ExecState* exec,
     } break;
 
     case boolean_type: {
-      result.z = (jboolean)value->toNumber(exec);
+      result.z = (jboolean)value.toNumber(exec);
     } break;
 
     case byte_type: {
-      result.b = (jbyte)value->toNumber(exec);
+      result.b = (jbyte)value.toNumber(exec);
     } break;
 
     case char_type: {
-      result.c = (jchar)value->toNumber(exec);
+      result.c = (jchar)value.toNumber(exec);
     } break;
 
     case short_type: {
-      result.s = (jshort)value->toNumber(exec);
+      result.s = (jshort)value.toNumber(exec);
     } break;
 
     case int_type: {
-      result.i = (jint)value->toNumber(exec);
+      result.i = (jint)value.toNumber(exec);
     } break;
 
     case long_type: {
-      result.j = (jlong)value->toNumber(exec);
+      result.j = (jlong)value.toNumber(exec);
     } break;
 
     case float_type: {
-      result.f = (jfloat)value->toNumber(exec);
+      result.f = (jfloat)value.toNumber(exec);
     } break;
 
     case double_type: {
-      result.d = (jdouble)value->toNumber(exec);
+      result.d = (jdouble)value.toNumber(exec);
     } break;
 
       break;

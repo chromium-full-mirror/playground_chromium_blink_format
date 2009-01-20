@@ -123,7 +123,7 @@ class JSCell : Noncopyable {
 JSCell* asCell(JSValuePtr);
 
 inline JSCell* asCell(JSValuePtr value) {
-  return value->asCell();
+  return value.asCell();
 }
 
 inline JSCell::JSCell(Structure* structure) : m_structure(structure) {}

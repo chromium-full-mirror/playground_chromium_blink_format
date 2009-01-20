@@ -89,7 +89,7 @@ void ScriptCallStack::initialize() {
     return;
 
   JSValuePtr func = m_exec->interpreter()->retrieveCaller(m_exec, m_caller);
-  while (!func->isNull()) {
+  while (!func.isNull()) {
     InternalFunction* internalFunction = asInternalFunction(func);
     ArgList emptyArgList;
     m_frames.append(

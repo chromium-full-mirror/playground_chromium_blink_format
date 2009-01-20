@@ -99,7 +99,7 @@ JSValuePtr JSDOMApplicationCache::hasItem(ExecState* exec,
   if (!frame)
     return jsUndefined();
   const KURL& url =
-      frame->loader()->completeURL(args.at(exec, 0)->toString(exec));
+      frame->loader()->completeURL(args.at(exec, 0).toString(exec));
 
   ExceptionCode ec = 0;
   bool result = impl()->hasItem(url, ec);
@@ -112,7 +112,7 @@ JSValuePtr JSDOMApplicationCache::add(ExecState* exec, const ArgList& args) {
   if (!frame)
     return jsUndefined();
   const KURL& url =
-      frame->loader()->completeURL(args.at(exec, 0)->toString(exec));
+      frame->loader()->completeURL(args.at(exec, 0).toString(exec));
 
   ExceptionCode ec = 0;
   impl()->add(url, ec);
@@ -125,7 +125,7 @@ JSValuePtr JSDOMApplicationCache::remove(ExecState* exec, const ArgList& args) {
   if (!frame)
     return jsUndefined();
   const KURL& url =
-      frame->loader()->completeURL(args.at(exec, 0)->toString(exec));
+      frame->loader()->completeURL(args.at(exec, 0).toString(exec));
 
   ExceptionCode ec = 0;
   impl()->remove(url, ec);
@@ -146,8 +146,8 @@ JSValuePtr JSDOMApplicationCache::addEventListener(ExecState* exec,
                                                            args.at(exec, 1));
   if (!listener)
     return jsUndefined();
-  impl()->addEventListener(args.at(exec, 0)->toString(exec), listener.release(),
-                           args.at(exec, 2)->toBoolean(exec));
+  impl()->addEventListener(args.at(exec, 0).toString(exec), listener.release(),
+                           args.at(exec, 2).toBoolean(exec));
   return jsUndefined();
 }
 
@@ -161,8 +161,8 @@ JSValuePtr JSDOMApplicationCache::removeEventListener(ExecState* exec,
       globalObject->findJSUnprotectedEventListener(exec, args.at(exec, 1));
   if (!listener)
     return jsUndefined();
-  impl()->removeEventListener(args.at(exec, 0)->toString(exec), listener,
-                              args.at(exec, 2)->toBoolean(exec));
+  impl()->removeEventListener(args.at(exec, 0).toString(exec), listener,
+                              args.at(exec, 2).toBoolean(exec));
   return jsUndefined();
 }
 

@@ -85,7 +85,7 @@ bool JSString::getOwnPropertySlot(ExecState* exec,
   slot.setBase(this);
   JSObject* object;
   for (JSValuePtr prototype = exec->lexicalGlobalObject()->stringPrototype();
-       !prototype->isNull(); prototype = object->prototype()) {
+       !prototype.isNull(); prototype = object->prototype()) {
     object = asObject(prototype);
     if (object->getOwnPropertySlot(exec, propertyName, slot))
       return true;

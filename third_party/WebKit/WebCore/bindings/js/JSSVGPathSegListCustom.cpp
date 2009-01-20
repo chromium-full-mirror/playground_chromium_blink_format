@@ -66,7 +66,7 @@ JSValuePtr JSSVGPathSegList::getItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
 
   bool indexOk;
-  unsigned index = args.at(exec, 0)->toInt32(exec, indexOk);
+  unsigned index = args.at(exec, 0).toInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -86,7 +86,7 @@ JSValuePtr JSSVGPathSegList::insertItemBefore(ExecState* exec,
   SVGPathSeg* newItem = toSVGPathSeg(args.at(exec, 0));
 
   bool indexOk;
-  unsigned index = args.at(exec, 1)->toInt32(exec, indexOk);
+  unsigned index = args.at(exec, 1).toInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -108,7 +108,7 @@ JSValuePtr JSSVGPathSegList::replaceItem(ExecState* exec, const ArgList& args) {
   SVGPathSeg* newItem = toSVGPathSeg(args.at(exec, 0));
 
   bool indexOk;
-  unsigned index = args.at(exec, 1)->toInt32(exec, indexOk);
+  unsigned index = args.at(exec, 1).toInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -128,7 +128,7 @@ JSValuePtr JSSVGPathSegList::removeItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
 
   bool indexOk;
-  unsigned index = args.at(exec, 0)->toInt32(exec, indexOk);
+  unsigned index = args.at(exec, 0).toInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();

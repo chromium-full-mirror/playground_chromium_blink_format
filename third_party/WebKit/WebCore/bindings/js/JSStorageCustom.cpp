@@ -62,7 +62,7 @@ bool JSStorage::deleteProperty(ExecState* exec,
     return false;
 
   JSValuePtr prototype = this->prototype();
-  if (prototype->isObject() &&
+  if (prototype.isObject() &&
       asObject(prototype)->hasProperty(exec, propertyName))
     return false;
 
@@ -95,7 +95,7 @@ bool JSStorage::customPut(ExecState* exec,
     return false;
 
   JSValuePtr prototype = this->prototype();
-  if (prototype->isObject() &&
+  if (prototype.isObject() &&
       asObject(prototype)->hasProperty(exec, propertyName))
     return false;
 

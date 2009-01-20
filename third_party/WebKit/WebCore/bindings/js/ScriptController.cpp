@@ -308,11 +308,11 @@ NPObject* ScriptController::createScriptObjectForPluginElement(
   JSLock lock(false);
   ExecState* exec = globalObject()->globalExec();
   JSValuePtr jsElementValue = toJS(exec, plugin);
-  if (!jsElementValue || !jsElementValue->isObject())
+  if (!jsElementValue || !jsElementValue.isObject())
     return _NPN_CreateNoScriptObject();
 
   // Wrap the JSObject in an NPObject
-  return _NPN_CreateScriptObject(0, jsElementValue->getObject(),
+  return _NPN_CreateScriptObject(0, jsElementValue.getObject(),
                                  bindingRootObject());
 }
 #endif

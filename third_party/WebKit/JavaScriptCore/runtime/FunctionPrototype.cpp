@@ -95,14 +95,14 @@ JSValuePtr functionProtoFuncToString(ExecState* exec,
                                      JSObject*,
                                      JSValuePtr thisValue,
                                      const ArgList&) {
-  if (thisValue->isObject(&JSFunction::info)) {
+  if (thisValue.isObject(&JSFunction::info)) {
     JSFunction* function = asFunction(thisValue);
     return jsString(exec, "function " + function->name(&exec->globalData()) +
                               "(" + function->body()->paramString() + ") " +
                               function->body()->toSourceString());
   }
 
-  if (thisValue->isObject(&InternalFunction::info)) {
+  if (thisValue.isObject(&InternalFunction::info)) {
     InternalFunction* function = asInternalFunction(thisValue);
     return jsString(exec, "function " + function->name(&exec->globalData()) +
                               "() {\n    [native code]\n}");
@@ -116,7 +116,7 @@ JSValuePtr functionProtoFuncApply(ExecState* exec,
                                   JSValuePtr thisValue,
                                   const ArgList& args) {
   CallData callData;
-  CallType callType = thisValue->getCallData(callData);
+  CallType callType = thisValue.getCallData(callData);
   if (callType == CallTypeNone)
     return throwError(exec, TypeError);
 
@@ -124,14 +124,14 @@ JSValuePtr functionProtoFuncApply(ExecState* exec,
   JSValuePtr argArray = args.at(exec, 1);
 
   JSValuePtr applyThis;
-  if (thisArg->isUndefinedOrNull())
+  if (thisArg.isUndefinedOrNull())
     applyThis = exec->globalThisValue();
   else
-    applyThis = thisArg->toObject(exec);
+    applyThis = thisArg.toObject(exec);
 
   ArgList applyArgs;
-  if (!argArray->isUndefinedOrNull()) {
-    if (!argArray->isObject())
+  if (!argArray.isUndefinedOrNull()) {
+    if (!argArray.isObject())
       return throwError(exec, TypeError);
     if (asObject(argArray)->classInfo() == &Arguments::info)
       asArguments(argArray)->fillArgList(exec, applyArgs);
@@ -140,7 +140,7 @@ JSValuePtr functionProtoFuncApply(ExecState* exec,
     else if (asObject(argArray)->inherits(&JSArray::info)) {
       unsigned length = asArray(argArray)
                             ->get(exec, exec->propertyNames().length)
-                            ->toUInt32(exec);
+                            .toUInt32(exec);
       for (unsigned i = 0; i < length; ++i)
         applyArgs.append(asArray(argArray)->get(exec, i));
     } else
@@ -155,17 +155,17 @@ JSValuePtr functionProtoFuncCall(ExecState* exec,
                                  JSValuePtr thisValue,
                                  const ArgList& args) {
   CallData callData;
-  CallType callType = thisValue->getCallData(callData);
+  CallType callType = thisValue.getCallData(callData);
   if (callType == CallTypeNone)
     return throwError(exec, TypeError);
 
   JSValuePtr thisArg = args.at(exec, 0);
 
   JSObject* callThis;
-  if (thisArg->isUndefinedOrNull())
+  if (thisArg.isUndefinedOrNull())
     callThis = exec->globalThisValue();
   else
-    callThis = thisArg->toObject(exec);
+    callThis = thisArg.toObject(exec);
 
   ArgList argsTail;
   args.getSlice(1, argsTail);

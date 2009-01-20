@@ -74,7 +74,7 @@ JSValuePtr JSMessagePort::startConversation(ExecState* exec,
                                             const ArgList& args) {
   JSDOMGlobalObject* globalObject =
       static_cast<JSDOMGlobalObject*>(exec->lexicalGlobalObject());
-  const UString& message = args.at(exec, 0)->toString(exec);
+  const UString& message = args.at(exec, 0).toString(exec);
 
   return toJS(exec, impl()
                         ->startConversation(
@@ -93,8 +93,8 @@ JSValuePtr JSMessagePort::addEventListener(ExecState* exec,
                                                            args.at(exec, 1));
   if (!listener)
     return jsUndefined();
-  impl()->addEventListener(args.at(exec, 0)->toString(exec), listener.release(),
-                           args.at(exec, 2)->toBoolean(exec));
+  impl()->addEventListener(args.at(exec, 0).toString(exec), listener.release(),
+                           args.at(exec, 2).toBoolean(exec));
   return jsUndefined();
 }
 
@@ -108,8 +108,8 @@ JSValuePtr JSMessagePort::removeEventListener(ExecState* exec,
       globalObject->findJSUnprotectedEventListener(exec, args.at(exec, 1));
   if (!listener)
     return jsUndefined();
-  impl()->removeEventListener(args.at(exec, 0)->toString(exec), listener,
-                              args.at(exec, 2)->toBoolean(exec));
+  impl()->removeEventListener(args.at(exec, 0).toString(exec), listener,
+                              args.at(exec, 2).toBoolean(exec));
   return jsUndefined();
 }
 

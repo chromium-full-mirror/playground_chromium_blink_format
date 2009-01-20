@@ -2770,9 +2770,9 @@ HRESULT STDMETHODCALLTYPE WebView::stringByEvaluatingJavaScriptFromString(
           .jsValue();
   if (!scriptExecutionResult)
     return E_FAIL;
-  else if (scriptExecutionResult->isString()) {
+  else if (scriptExecutionResult.isString()) {
     JSLock lock(false);
-    *result = BString(String(scriptExecutionResult->getString()));
+    *result = BString(String(scriptExecutionResult.getString()));
   }
 
   return S_OK;

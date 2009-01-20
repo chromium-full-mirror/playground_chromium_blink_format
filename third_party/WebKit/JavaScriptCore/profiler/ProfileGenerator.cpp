@@ -71,9 +71,9 @@ void ProfileGenerator::addParentForConsoleStart(ExecState* exec) {
   exec->interpreter()->retrieveLastCaller(exec, lineNumber, sourceID, sourceURL,
                                           function);
   m_currentNode = ProfileNode::create(
-      Profiler::createCallIdentifier(
-          &exec->globalData(), function ? function->toThisObject(exec) : 0,
-          sourceURL, lineNumber),
+      Profiler::createCallIdentifier(&exec->globalData(),
+                                     function ? function.toThisObject(exec) : 0,
+                                     sourceURL, lineNumber),
       m_head.get(), m_head.get());
   m_head->insertNode(m_currentNode.get());
 }

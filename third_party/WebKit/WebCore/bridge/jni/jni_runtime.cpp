@@ -106,7 +106,7 @@ jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
         dispatchJNICall(exec, rootObject->nativeHandle(), fieldJInstance, false,
                         returnType, mid, args, result, 0, exceptionDescription);
         if (exceptionDescription)
-          throwError(exec, GeneralError, exceptionDescription->toString(exec));
+          throwError(exec, GeneralError, exceptionDescription.toString(exec));
       }
     }
   }
@@ -170,7 +170,7 @@ JSValuePtr JavaField::valueFromInstance(ExecState* exec,
   }
 
   JS_LOG("getting %s = %s\n", UString(name()).UTF8String().c_str(),
-         jsresult->toString(exec).ascii());
+         jsresult.toString(exec).ascii());
 
   return jsresult;
 }
@@ -199,7 +199,7 @@ void JavaField::dispatchSetValueToInstance(ExecState* exec,
         dispatchJNICall(exec, rootObject->nativeHandle(), fieldJInstance, false,
                         void_type, mid, args, result, 0, exceptionDescription);
         if (exceptionDescription)
-          throwError(exec, GeneralError, exceptionDescription->toString(exec));
+          throwError(exec, GeneralError, exceptionDescription.toString(exec));
       }
     }
   }
@@ -212,7 +212,7 @@ void JavaField::setValueToInstance(ExecState* exec,
   jvalue javaValue = convertValueToJValue(exec, aValue, _JNIType, type());
 
   JS_LOG("setting value %s to %s\n", UString(name()).UTF8String().c_str(),
-         aValue->toString(exec).ascii());
+         aValue.toString(exec).ascii());
 
   switch (_JNIType) {
     case array_type:

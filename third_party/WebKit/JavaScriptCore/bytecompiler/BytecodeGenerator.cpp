@@ -846,7 +846,7 @@ RegisterID* BytecodeGenerator::emitEqualityOp(OpcodeID opcodeID,
         m_codeBlock->isConstantRegisterIndex(src2->index()) &&
         m_codeBlock->constantRegister(src2->index() - m_codeBlock->m_numVars)
             .jsValue(m_scopeChain->globalObject()->globalExec())
-            ->isString()) {
+            .isString()) {
       const UString& value =
           asString(
               m_codeBlock
@@ -1787,7 +1787,7 @@ static int32_t keyForImmediateSwitch(ExpressionNode* node,
   double value = static_cast<NumberNode*>(node)->value();
   int32_t key = static_cast<int32_t>(value);
   ASSERT(JSValuePtr::makeInt32Fast(key) &&
-         (JSValuePtr::makeInt32Fast(key)->getInt32Fast() == value));
+         (JSValuePtr::makeInt32Fast(key).getInt32Fast() == value));
   ASSERT(key == value);
   ASSERT(key >= min);
   ASSERT(key <= max);

@@ -100,7 +100,7 @@ JSValuePtr JSSVGTransformList::initialize(ExecState* exec,
 
 JSValuePtr JSSVGTransformList::getItem(ExecState* exec, const ArgList& args) {
   bool indexOk;
-  unsigned index = args.at(exec, 0)->toUInt32(exec, indexOk);
+  unsigned index = args.at(exec, 0).toUInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -114,7 +114,7 @@ JSValuePtr JSSVGTransformList::getItem(ExecState* exec, const ArgList& args) {
 JSValuePtr JSSVGTransformList::insertItemBefore(ExecState* exec,
                                                 const ArgList& args) {
   bool indexOk;
-  unsigned index = args.at(exec, 1)->toUInt32(exec, indexOk);
+  unsigned index = args.at(exec, 1).toUInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -131,7 +131,7 @@ JSValuePtr JSSVGTransformList::insertItemBefore(ExecState* exec,
 JSValuePtr JSSVGTransformList::replaceItem(ExecState* exec,
                                            const ArgList& args) {
   bool indexOk;
-  unsigned index = args.at(exec, 1)->toUInt32(exec, indexOk);
+  unsigned index = args.at(exec, 1).toUInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -148,7 +148,7 @@ JSValuePtr JSSVGTransformList::replaceItem(ExecState* exec,
 JSValuePtr JSSVGTransformList::removeItem(ExecState* exec,
                                           const ArgList& args) {
   bool indexOk;
-  unsigned index = args.at(exec, 0)->toUInt32(exec, indexOk);
+  unsigned index = args.at(exec, 0).toUInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();

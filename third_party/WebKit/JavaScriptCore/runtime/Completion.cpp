@@ -70,16 +70,16 @@ Completion evaluate(ExecState* exec,
                                            source.provider()->asID(),
                                            source.provider()->url()));
 
-  JSObject* thisObj = (!thisValue || thisValue->isUndefinedOrNull())
+  JSObject* thisObj = (!thisValue || thisValue.isUndefinedOrNull())
                           ? exec->dynamicGlobalObject()
-                          : thisValue->toObject(exec);
+                          : thisValue.toObject(exec);
 
   JSValuePtr exception = noValue();
   JSValuePtr result = exec->interpreter()->execute(
       programNode.get(), exec, scopeChain.node(), thisObj, &exception);
 
   if (exception) {
-    if (exception->isObject() && asObject(exception)->isWatchdogException())
+    if (exception.isObject() && asObject(exception)->isWatchdogException())
       return Completion(Interrupted, result);
     return Completion(Throw, exception);
   }

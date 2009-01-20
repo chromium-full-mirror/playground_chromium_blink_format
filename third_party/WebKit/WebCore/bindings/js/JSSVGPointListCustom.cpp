@@ -97,7 +97,7 @@ JSValuePtr JSSVGPointList::initialize(ExecState* exec, const ArgList& args) {
 
 JSValuePtr JSSVGPointList::getItem(ExecState* exec, const ArgList& args) {
   bool indexOk;
-  unsigned index = args.at(exec, 0)->toUInt32(exec, indexOk);
+  unsigned index = args.at(exec, 0).toUInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -111,7 +111,7 @@ JSValuePtr JSSVGPointList::getItem(ExecState* exec, const ArgList& args) {
 JSValuePtr JSSVGPointList::insertItemBefore(ExecState* exec,
                                             const ArgList& args) {
   bool indexOk;
-  unsigned index = args.at(exec, 1)->toUInt32(exec, indexOk);
+  unsigned index = args.at(exec, 1).toUInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -127,7 +127,7 @@ JSValuePtr JSSVGPointList::insertItemBefore(ExecState* exec,
 
 JSValuePtr JSSVGPointList::replaceItem(ExecState* exec, const ArgList& args) {
   bool indexOk;
-  unsigned index = args.at(exec, 1)->toInt32(exec, indexOk);
+  unsigned index = args.at(exec, 1).toInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -143,7 +143,7 @@ JSValuePtr JSSVGPointList::replaceItem(ExecState* exec, const ArgList& args) {
 
 JSValuePtr JSSVGPointList::removeItem(ExecState* exec, const ArgList& args) {
   bool indexOk;
-  unsigned index = args.at(exec, 0)->toInt32(exec, indexOk);
+  unsigned index = args.at(exec, 0).toInt32(exec, indexOk);
   if (!indexOk) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();

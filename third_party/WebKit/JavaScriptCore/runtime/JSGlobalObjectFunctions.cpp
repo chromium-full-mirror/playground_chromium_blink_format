@@ -51,7 +51,7 @@ namespace JSC {
 static JSValuePtr encode(ExecState* exec,
                          const ArgList& args,
                          const char* doNotEscape) {
-  UString str = args.at(exec, 0)->toString(exec);
+  UString str = args.at(exec, 0).toString(exec);
   CString cstr = str.UTF8String(true);
   if (!cstr.c_str())
     return throwError(exec, URIError,
@@ -77,7 +77,7 @@ static JSValuePtr decode(ExecState* exec,
                          const char* doNotUnescape,
                          bool strict) {
   UString result = "";
-  UString str = args.at(exec, 0)->toString(exec);
+  UString str = args.at(exec, 0).toString(exec);
   int k = 0;
   int len = str.size();
   const UChar* d = str.data();
@@ -282,7 +282,7 @@ JSValuePtr globalFuncEval(ExecState* exec,
                           JSObject* function,
                           JSValuePtr thisValue,
                           const ArgList& args) {
-  JSObject* thisObject = thisValue->toThisObject(exec);
+  JSObject* thisObject = thisValue.toThisObject(exec);
   JSObject* unwrappedObject = thisObject->unwrappedObject();
   if (!unwrappedObject->isGlobalObject() ||
       static_cast<JSGlobalObject*>(unwrappedObject)->evalFunction() != function)
@@ -291,10 +291,10 @@ JSValuePtr globalFuncEval(ExecState* exec,
                       "object from which eval originated");
 
   JSValuePtr x = args.at(exec, 0);
-  if (!x->isString())
+  if (!x.isString())
     return x;
 
-  UString s = x->toString(exec);
+  UString s = x.toString(exec);
 
   int errLine;
   UString errMsg;
@@ -318,12 +318,12 @@ JSValuePtr globalFuncParseInt(ExecState* exec,
                               JSValuePtr,
                               const ArgList& args) {
   JSValuePtr value = args.at(exec, 0);
-  int32_t radix = args.at(exec, 1)->toInt32(exec);
+  int32_t radix = args.at(exec, 1).toInt32(exec);
 
-  if (value->isNumber() && (radix == 0 || radix == 10)) {
-    if (value->isInt32Fast())
+  if (value.isNumber() && (radix == 0 || radix == 10)) {
+    if (value.isInt32Fast())
       return value;
-    double d = value->uncheckedGetNumber();
+    double d = value.uncheckedGetNumber();
     if (isfinite(d))
       return jsNumber(exec, floor(d));
     if (isnan(d))
@@ -331,28 +331,28 @@ JSValuePtr globalFuncParseInt(ExecState* exec,
     return js0();
   }
 
-  return jsNumber(exec, parseInt(value->toString(exec), radix));
+  return jsNumber(exec, parseInt(value.toString(exec), radix));
 }
 
 JSValuePtr globalFuncParseFloat(ExecState* exec,
                                 JSObject*,
                                 JSValuePtr,
                                 const ArgList& args) {
-  return jsNumber(exec, parseFloat(args.at(exec, 0)->toString(exec)));
+  return jsNumber(exec, parseFloat(args.at(exec, 0).toString(exec)));
 }
 
 JSValuePtr globalFuncIsNaN(ExecState* exec,
                            JSObject*,
                            JSValuePtr,
                            const ArgList& args) {
-  return jsBoolean(isnan(args.at(exec, 0)->toNumber(exec)));
+  return jsBoolean(isnan(args.at(exec, 0).toNumber(exec)));
 }
 
 JSValuePtr globalFuncIsFinite(ExecState* exec,
                               JSObject*,
                               JSValuePtr,
                               const ArgList& args) {
-  double n = args.at(exec, 0)->toNumber(exec);
+  double n = args.at(exec, 0).toNumber(exec);
   return jsBoolean(!isnan(n) && !isinf(n));
 }
 
@@ -410,7 +410,7 @@ JSValuePtr globalFuncEscape(ExecState* exec,
 
   UString result = "";
   UString s;
-  UString str = args.at(exec, 0)->toString(exec);
+  UString str = args.at(exec, 0).toString(exec);
   const UChar* c = str.data();
   for (int k = 0; k < str.size(); k++, c++) {
     int u = c[0];
@@ -436,7 +436,7 @@ JSValuePtr globalFuncUnescape(ExecState* exec,
                               JSValuePtr,
                               const ArgList& args) {
   UString result = "";
-  UString str = args.at(exec, 0)->toString(exec);
+  UString str = args.at(exec, 0).toString(exec);
   int k = 0;
   int len = str.size();
   while (k < len) {
@@ -468,7 +468,7 @@ JSValuePtr globalFuncJSCPrint(ExecState* exec,
                               JSValuePtr,
                               const ArgList& args) {
   CStringBuffer string;
-  args.at(exec, 0)->toString(exec).getCString(string);
+  args.at(exec, 0).toString(exec).getCString(string);
   puts(string.data());
   return jsUndefined();
 }

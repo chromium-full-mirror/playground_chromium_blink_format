@@ -150,7 +150,7 @@ void JSDOMWindow::setLocation(ExecState* exec, JSValuePtr value) {
   if (!activeFrame->loader()->shouldAllowNavigation(impl()->frame()))
     return;
   String dstUrl =
-      activeFrame->loader()->completeURL(value->toString(exec)).string();
+      activeFrame->loader()->completeURL(value.toString(exec)).string();
   if (!protocolIs(dstUrl, "javascript") || allowsAccessFrom(exec)) {
     bool userGesture = activeFrame->script()->processingUserGesture();
     // We want a new history item if this JS was called via a user gesture
@@ -163,7 +163,7 @@ JSValuePtr JSDOMWindow::postMessage(ExecState* exec, const ArgList& args) {
   DOMWindow* window = impl();
 
   DOMWindow* source = asJSDOMWindow(exec->dynamicGlobalObject())->impl();
-  String message = args.at(exec, 0)->toString(exec);
+  String message = args.at(exec, 0).toString(exec);
 
   if (exec->hadException())
     return jsUndefined();
@@ -188,12 +188,12 @@ static JSValuePtr setTimeoutOrInterval(ExecState* exec,
                                        const ArgList& args,
                                        bool timeout) {
   JSValuePtr v = args.at(exec, 0);
-  int delay = args.at(exec, 1)->toInt32(exec);
-  if (v->isString())
+  int delay = args.at(exec, 1).toInt32(exec);
+  if (v.isString())
     return jsNumber(
         exec, window->installTimeout(asString(v)->value(), delay, timeout));
   CallData callData;
-  if (v->getCallData(callData) == CallTypeNone)
+  if (v.getCallData(callData) == CallTypeNone)
     return jsUndefined();
   ArgList argsTail;
   args.getSlice(2, argsTail);
@@ -206,7 +206,7 @@ JSValuePtr JSDOMWindow::setTimeout(ExecState* exec, const ArgList& args) {
 }
 
 JSValuePtr JSDOMWindow::clearTimeout(ExecState* exec, const ArgList& args) {
-  removeTimeout(args.at(exec, 0)->toInt32(exec));
+  removeTimeout(args.at(exec, 0).toInt32(exec));
   return jsUndefined();
 }
 
@@ -215,7 +215,7 @@ JSValuePtr JSDOMWindow::setInterval(ExecState* exec, const ArgList& args) {
 }
 
 JSValuePtr JSDOMWindow::clearInterval(ExecState* exec, const ArgList& args) {
-  removeTimeout(args.at(exec, 0)->toInt32(exec));
+  removeTimeout(args.at(exec, 0).toInt32(exec));
   return jsUndefined();
 }
 
@@ -224,10 +224,10 @@ JSValuePtr JSDOMWindow::atob(ExecState* exec, const ArgList& args) {
     return throwError(exec, SyntaxError, "Not enough arguments");
 
   JSValuePtr v = args.at(exec, 0);
-  if (v->isNull())
+  if (v.isNull())
     return jsEmptyString(exec);
 
-  UString s = v->toString(exec);
+  UString s = v.toString(exec);
   if (!s.is8Bit()) {
     setDOMException(exec, INVALID_CHARACTER_ERR);
     return jsUndefined();
@@ -249,10 +249,10 @@ JSValuePtr JSDOMWindow::btoa(ExecState* exec, const ArgList& args) {
     return throwError(exec, SyntaxError, "Not enough arguments");
 
   JSValuePtr v = args.at(exec, 0);
-  if (v->isNull())
+  if (v.isNull())
     return jsEmptyString(exec);
 
-  UString s = v->toString(exec);
+  UString s = v.toString(exec);
   if (!s.is8Bit()) {
     setDOMException(exec, INVALID_CHARACTER_ERR);
     return jsUndefined();
@@ -276,9 +276,9 @@ JSValuePtr JSDOMWindow::addEventListener(ExecState* exec, const ArgList& args) {
   if (RefPtr<JSEventListener> listener =
           findOrCreateJSEventListener(exec, args.at(exec, 1))) {
     if (Document* doc = frame->document())
-      doc->addWindowEventListener(
-          AtomicString(args.at(exec, 0)->toString(exec)), listener.release(),
-          args.at(exec, 2)->toBoolean(exec));
+      doc->addWindowEventListener(AtomicString(args.at(exec, 0).toString(exec)),
+                                  listener.release(),
+                                  args.at(exec, 2).toBoolean(exec));
   }
 
   return jsUndefined();
@@ -293,15 +293,15 @@ JSValuePtr JSDOMWindow::removeEventListener(ExecState* exec,
   if (JSEventListener* listener = findJSEventListener(args.at(exec, 1))) {
     if (Document* doc = frame->document())
       doc->removeWindowEventListener(
-          AtomicString(args.at(exec, 0)->toString(exec)), listener,
-          args.at(exec, 2)->toBoolean(exec));
+          AtomicString(args.at(exec, 0).toString(exec)), listener,
+          args.at(exec, 2).toBoolean(exec));
   }
 
   return jsUndefined();
 }
 
 DOMWindow* toDOMWindow(JSValuePtr value) {
-  if (!value->isObject())
+  if (!value.isObject())
     return 0;
   JSObject* object = asObject(value);
   if (object->inherits(&JSDOMWindow::s_info))

@@ -180,7 +180,7 @@ JSValuePtr arrayProtoFuncToString(ExecState* exec,
                                   JSObject*,
                                   JSValuePtr thisValue,
                                   const ArgList&) {
-  if (!thisValue->isObject(&JSArray::info))
+  if (!thisValue.isObject(&JSArray::info))
     return throwError(exec, TypeError);
   JSObject* thisObj = asArray(thisValue);
 
@@ -196,7 +196,7 @@ JSValuePtr arrayProtoFuncToString(ExecState* exec,
 
   Vector<UChar, 256> strBuffer;
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   for (unsigned k = 0; k < length; k++) {
     if (k >= 1)
       strBuffer.append(',');
@@ -207,10 +207,10 @@ JSValuePtr arrayProtoFuncToString(ExecState* exec,
     }
 
     JSValuePtr element = thisObj->get(exec, k);
-    if (element->isUndefinedOrNull())
+    if (element.isUndefinedOrNull())
       continue;
 
-    UString str = element->toString(exec);
+    UString str = element.toString(exec);
     strBuffer.append(str.data(), str.size());
 
     if (!strBuffer.data()) {
@@ -230,7 +230,7 @@ JSValuePtr arrayProtoFuncToLocaleString(ExecState* exec,
                                         JSObject*,
                                         JSValuePtr thisValue,
                                         const ArgList&) {
-  if (!thisValue->isObject(&JSArray::info))
+  if (!thisValue.isObject(&JSArray::info))
     return throwError(exec, TypeError);
   JSObject* thisObj = asArray(thisValue);
 
@@ -246,7 +246,7 @@ JSValuePtr arrayProtoFuncToLocaleString(ExecState* exec,
 
   Vector<UChar, 256> strBuffer;
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   for (unsigned k = 0; k < length; k++) {
     if (k >= 1)
       strBuffer.append(',');
@@ -257,21 +257,21 @@ JSValuePtr arrayProtoFuncToLocaleString(ExecState* exec,
     }
 
     JSValuePtr element = thisObj->get(exec, k);
-    if (element->isUndefinedOrNull())
+    if (element.isUndefinedOrNull())
       continue;
 
-    JSObject* o = element->toObject(exec);
+    JSObject* o = element.toObject(exec);
     JSValuePtr conversionFunction =
         o->get(exec, exec->propertyNames().toLocaleString);
     UString str;
     CallData callData;
-    CallType callType = conversionFunction->getCallData(callData);
+    CallType callType = conversionFunction.getCallData(callData);
     if (callType != CallTypeNone)
       str = call(exec, conversionFunction, callType, callData, element,
                  exec->emptyList())
-                ->toString(exec);
+                .toString(exec);
     else
-      str = element->toString(exec);
+      str = element.toString(exec);
     strBuffer.append(str.data(), str.size());
 
     if (!strBuffer.data()) {
@@ -291,7 +291,7 @@ JSValuePtr arrayProtoFuncJoin(ExecState* exec,
                               JSObject*,
                               JSValuePtr thisValue,
                               const ArgList& args) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   HashSet<JSObject*>& arrayVisitedElements =
       exec->globalData().arrayVisitedElements;
@@ -306,12 +306,12 @@ JSValuePtr arrayProtoFuncJoin(ExecState* exec,
   Vector<UChar, 256> strBuffer;
 
   UChar comma = ',';
-  UString separator = args.at(exec, 0)->isUndefined()
+  UString separator = args.at(exec, 0).isUndefined()
                           ? UString(&comma, 1)
-                          : args.at(exec, 0)->toString(exec);
+                          : args.at(exec, 0).toString(exec);
 
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   for (unsigned k = 0; k < length; k++) {
     if (k >= 1)
       strBuffer.append(separator.data(), separator.size());
@@ -322,10 +322,10 @@ JSValuePtr arrayProtoFuncJoin(ExecState* exec,
     }
 
     JSValuePtr element = thisObj->get(exec, k);
-    if (element->isUndefinedOrNull())
+    if (element.isUndefinedOrNull())
       continue;
 
-    UString str = element->toString(exec);
+    UString str = element.toString(exec);
     strBuffer.append(str.data(), str.size());
 
     if (!strBuffer.data()) {
@@ -347,11 +347,11 @@ JSValuePtr arrayProtoFuncConcat(ExecState* exec,
                                 const ArgList& args) {
   JSArray* arr = constructEmptyArray(exec);
   int n = 0;
-  JSValuePtr curArg = thisValue->toThisObject(exec);
+  JSValuePtr curArg = thisValue.toThisObject(exec);
   ArgList::const_iterator it = args.begin();
   ArgList::const_iterator end = args.end();
   while (1) {
-    if (curArg->isObject(&JSArray::info)) {
+    if (curArg.isObject(&JSArray::info)) {
       JSArray* curArray = asArray(curArg);
       unsigned length = curArray->length();
       for (unsigned k = 0; k < length; ++k) {
@@ -379,10 +379,10 @@ JSValuePtr arrayProtoFuncPop(ExecState* exec,
   if (exec->interpreter()->isJSArray(thisValue))
     return asArray(thisValue)->pop();
 
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
   JSValuePtr result;
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   if (length == 0) {
     putProperty(exec, thisObj, exec->propertyNames().length,
                 jsNumber(exec, length));
@@ -406,9 +406,9 @@ JSValuePtr arrayProtoFuncPush(ExecState* exec,
     return jsNumber(exec, array->length());
   }
 
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   for (unsigned n = 0; n < args.size(); n++)
     thisObj->put(exec, length + n, args.at(exec, n));
   length += args.size();
@@ -421,9 +421,9 @@ JSValuePtr arrayProtoFuncReverse(ExecState* exec,
                                  JSObject*,
                                  JSValuePtr thisValue,
                                  const ArgList&) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   unsigned middle = length / 2;
 
   for (unsigned k = 0; k < middle; k++) {
@@ -448,11 +448,11 @@ JSValuePtr arrayProtoFuncShift(ExecState* exec,
                                JSObject*,
                                JSValuePtr thisValue,
                                const ArgList&) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
   JSValuePtr result;
 
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   if (length == 0) {
     putProperty(exec, thisObj, exec->propertyNames().length,
                 jsNumber(exec, length));
@@ -479,14 +479,14 @@ JSValuePtr arrayProtoFuncSlice(ExecState* exec,
   // http://developer.netscape.com/docs/manuals/js/client/jsref/array.htm#1193713
   // or 15.4.4.10
 
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   // We return a new array
   JSArray* resObj = constructEmptyArray(exec);
   JSValuePtr result = resObj;
-  double begin = args.at(exec, 0)->toInteger(exec);
+  double begin = args.at(exec, 0).toInteger(exec);
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   if (begin >= 0) {
     if (begin > length)
       begin = length;
@@ -496,10 +496,10 @@ JSValuePtr arrayProtoFuncSlice(ExecState* exec,
       begin = 0;
   }
   double end;
-  if (args.at(exec, 1)->isUndefined())
+  if (args.at(exec, 1).isUndefined())
     end = length;
   else {
-    end = args.at(exec, 1)->toInteger(exec);
+    end = args.at(exec, 1).toInteger(exec);
     if (end < 0) {
       end += length;
       if (end < 0)
@@ -525,11 +525,11 @@ JSValuePtr arrayProtoFuncSort(ExecState* exec,
                               JSObject*,
                               JSValuePtr thisValue,
                               const ArgList& args) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   JSValuePtr function = args.at(exec, 0);
   CallData callData;
-  CallType callType = function->getCallData(callData);
+  CallType callType = function.getCallData(callData);
 
   if (thisObj->classInfo() == &JSArray::info) {
     if (callType != CallTypeNone)
@@ -540,7 +540,7 @@ JSValuePtr arrayProtoFuncSort(ExecState* exec,
   }
 
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
 
   if (!length)
     return thisObj;
@@ -554,10 +554,10 @@ JSValuePtr arrayProtoFuncSort(ExecState* exec,
     for (unsigned j = i + 1; j < length; ++j) {
       JSValuePtr jObj = thisObj->get(exec, j);
       double compareResult;
-      if (jObj->isUndefined())
+      if (jObj.isUndefined())
         compareResult = 1;  // don't check minObj because there's no need to
                             // differentiate == (0) from > (1)
-      else if (minObj->isUndefined())
+      else if (minObj.isUndefined())
         compareResult = -1;
       else if (callType != CallTypeNone) {
         ArgList l;
@@ -565,10 +565,9 @@ JSValuePtr arrayProtoFuncSort(ExecState* exec,
         l.append(minObj);
         compareResult =
             call(exec, function, callType, callData, exec->globalThisValue(), l)
-                ->toNumber(exec);
+                .toNumber(exec);
       } else
-        compareResult =
-            (jObj->toString(exec) < minObj->toString(exec)) ? -1 : 1;
+        compareResult = (jObj.toString(exec) < minObj.toString(exec)) ? -1 : 1;
 
       if (compareResult < 0) {
         themin = j;
@@ -588,16 +587,16 @@ JSValuePtr arrayProtoFuncSplice(ExecState* exec,
                                 JSObject*,
                                 JSValuePtr thisValue,
                                 const ArgList& args) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   // 15.4.4.12
   JSArray* resObj = constructEmptyArray(exec);
   JSValuePtr result = resObj;
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   if (!args.size())
     return jsUndefined();
-  int begin = args.at(exec, 0)->toUInt32(exec);
+  int begin = args.at(exec, 0).toUInt32(exec);
   if (begin < 0)
     begin = std::max<int>(begin + length, 0);
   else
@@ -606,7 +605,7 @@ JSValuePtr arrayProtoFuncSplice(ExecState* exec,
   unsigned deleteCount;
   if (args.size() > 1)
     deleteCount = std::min<int>(
-        std::max<int>(args.at(exec, 1)->toUInt32(exec), 0), length - begin);
+        std::max<int>(args.at(exec, 1).toUInt32(exec), 0), length - begin);
   else
     deleteCount = length - begin;
 
@@ -648,11 +647,11 @@ JSValuePtr arrayProtoFuncUnShift(ExecState* exec,
                                  JSObject*,
                                  JSValuePtr thisValue,
                                  const ArgList& args) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   // 15.4.4.13
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   unsigned nrArgs = args.size();
   if (nrArgs) {
     for (unsigned k = length; k > 0; --k) {
@@ -673,22 +672,22 @@ JSValuePtr arrayProtoFuncFilter(ExecState* exec,
                                 JSObject*,
                                 JSValuePtr thisValue,
                                 const ArgList& args) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   JSValuePtr function = args.at(exec, 0);
   CallData callData;
-  CallType callType = function->getCallData(callData);
+  CallType callType = function.getCallData(callData);
   if (callType == CallTypeNone)
     return throwError(exec, TypeError);
 
-  JSObject* applyThis = args.at(exec, 1)->isUndefinedOrNull()
+  JSObject* applyThis = args.at(exec, 1).isUndefinedOrNull()
                             ? exec->globalThisValue()
-                            : args.at(exec, 1)->toObject(exec);
+                            : args.at(exec, 1).toObject(exec);
   JSArray* resultArray = constructEmptyArray(exec);
 
   unsigned filterIndex = 0;
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
     PropertySlot slot(thisObj);
 
@@ -706,7 +705,7 @@ JSValuePtr arrayProtoFuncFilter(ExecState* exec,
     JSValuePtr result =
         call(exec, function, callType, callData, applyThis, eachArguments);
 
-    if (result->toBoolean(exec))
+    if (result.toBoolean(exec))
       resultArray->put(exec, filterIndex++, v);
   }
   return resultArray;
@@ -716,20 +715,20 @@ JSValuePtr arrayProtoFuncMap(ExecState* exec,
                              JSObject*,
                              JSValuePtr thisValue,
                              const ArgList& args) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   JSValuePtr function = args.at(exec, 0);
   CallData callData;
-  CallType callType = function->getCallData(callData);
+  CallType callType = function.getCallData(callData);
   if (callType == CallTypeNone)
     return throwError(exec, TypeError);
 
-  JSObject* applyThis = args.at(exec, 1)->isUndefinedOrNull()
+  JSObject* applyThis = args.at(exec, 1).isUndefinedOrNull()
                             ? exec->globalThisValue()
-                            : args.at(exec, 1)->toObject(exec);
+                            : args.at(exec, 1).toObject(exec);
 
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
 
   JSArray* resultArray = constructEmptyArray(exec, length);
 
@@ -763,22 +762,22 @@ JSValuePtr arrayProtoFuncEvery(ExecState* exec,
                                JSObject*,
                                JSValuePtr thisValue,
                                const ArgList& args) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   JSValuePtr function = args.at(exec, 0);
   CallData callData;
-  CallType callType = function->getCallData(callData);
+  CallType callType = function.getCallData(callData);
   if (callType == CallTypeNone)
     return throwError(exec, TypeError);
 
-  JSObject* applyThis = args.at(exec, 1)->isUndefinedOrNull()
+  JSObject* applyThis = args.at(exec, 1).isUndefinedOrNull()
                             ? exec->globalThisValue()
-                            : args.at(exec, 1)->toObject(exec);
+                            : args.at(exec, 1).toObject(exec);
 
   JSValuePtr result = jsBoolean(true);
 
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
     PropertySlot slot(thisObj);
 
@@ -793,7 +792,7 @@ JSValuePtr arrayProtoFuncEvery(ExecState* exec,
 
     bool predicateResult =
         call(exec, function, callType, callData, applyThis, eachArguments)
-            ->toBoolean(exec);
+            .toBoolean(exec);
 
     if (!predicateResult) {
       result = jsBoolean(false);
@@ -808,20 +807,20 @@ JSValuePtr arrayProtoFuncForEach(ExecState* exec,
                                  JSObject*,
                                  JSValuePtr thisValue,
                                  const ArgList& args) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   JSValuePtr function = args.at(exec, 0);
   CallData callData;
-  CallType callType = function->getCallData(callData);
+  CallType callType = function.getCallData(callData);
   if (callType == CallTypeNone)
     return throwError(exec, TypeError);
 
-  JSObject* applyThis = args.at(exec, 1)->isUndefinedOrNull()
+  JSObject* applyThis = args.at(exec, 1).isUndefinedOrNull()
                             ? exec->globalThisValue()
-                            : args.at(exec, 1)->toObject(exec);
+                            : args.at(exec, 1).toObject(exec);
 
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
     PropertySlot slot(thisObj);
     if (!thisObj->getPropertySlot(exec, k, slot))
@@ -841,22 +840,22 @@ JSValuePtr arrayProtoFuncSome(ExecState* exec,
                               JSObject*,
                               JSValuePtr thisValue,
                               const ArgList& args) {
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   JSValuePtr function = args.at(exec, 0);
   CallData callData;
-  CallType callType = function->getCallData(callData);
+  CallType callType = function.getCallData(callData);
   if (callType == CallTypeNone)
     return throwError(exec, TypeError);
 
-  JSObject* applyThis = args.at(exec, 1)->isUndefinedOrNull()
+  JSObject* applyThis = args.at(exec, 1).isUndefinedOrNull()
                             ? exec->globalThisValue()
-                            : args.at(exec, 1)->toObject(exec);
+                            : args.at(exec, 1).toObject(exec);
 
   JSValuePtr result = jsBoolean(false);
 
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
     PropertySlot slot(thisObj);
     if (!thisObj->getPropertySlot(exec, k, slot))
@@ -869,7 +868,7 @@ JSValuePtr arrayProtoFuncSome(ExecState* exec,
 
     bool predicateResult =
         call(exec, function, callType, callData, applyThis, eachArguments)
-            ->toBoolean(exec);
+            .toBoolean(exec);
 
     if (predicateResult) {
       result = jsBoolean(true);
@@ -887,12 +886,12 @@ JSValuePtr arrayProtoFuncIndexOf(ExecState* exec,
   // Documentation:
   // http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:indexOf
 
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   unsigned index = 0;
-  double d = args.at(exec, 1)->toInteger(exec);
+  double d = args.at(exec, 1).toInteger(exec);
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   if (d < 0)
     d += length;
   if (d > 0) {
@@ -922,12 +921,12 @@ JSValuePtr arrayProtoFuncLastIndexOf(ExecState* exec,
   // Documentation:
   // http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:lastIndexOf
 
-  JSObject* thisObj = thisValue->toThisObject(exec);
+  JSObject* thisObj = thisValue.toThisObject(exec);
 
   unsigned length =
-      thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
   int index = length - 1;
-  double d = args.at(exec, 1)->toIntegerPreserveNaN(exec);
+  double d = args.at(exec, 1).toIntegerPreserveNaN(exec);
 
   if (d < 0) {
     d += length;

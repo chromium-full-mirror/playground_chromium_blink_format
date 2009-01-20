@@ -121,7 +121,7 @@ bool _NPN_InvokeDefault(NPP,
     // Call the function object.
     JSValuePtr function = obj->imp;
     CallData callData;
-    CallType callType = function->getCallData(callData);
+    CallType callType = function.getCallData(callData);
     if (callType == CallTypeNone)
       return false;
 
@@ -177,7 +177,7 @@ bool _NPN_Invoke(NPP npp,
     JSValuePtr function =
         obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
     CallData callData;
-    CallType callType = function->getCallData(callData);
+    CallType callType = function.getCallData(callData);
     if (callType == CallTypeNone)
       return false;
 
@@ -389,7 +389,7 @@ bool _NPN_HasMethod(NPP, NPObject* o, NPIdentifier methodName) {
     JSValuePtr func =
         obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
     exec->clearException();
-    return !func->isUndefined();
+    return !func.isUndefined();
   }
 
   if (o->_class->hasMethod)
@@ -463,7 +463,7 @@ bool _NPN_Construct(NPP,
     // Call the constructor object.
     JSValuePtr constructor = obj->imp;
     ConstructData constructData;
-    ConstructType constructType = constructor->getConstructData(constructData);
+    ConstructType constructType = constructor.getConstructData(constructData);
     if (constructType == ConstructTypeNone)
       return false;
 

@@ -85,7 +85,7 @@ JSValuePtr JSFunction::call(ExecState* exec,
                             JSValuePtr thisValue,
                             const ArgList& args) {
   return exec->interpreter()->execute(
-      m_body.get(), exec, this, thisValue->toThisObject(exec), args,
+      m_body.get(), exec, this, thisValue.toThisObject(exec), args,
       m_scopeChain.node(), exec->exceptionSlot());
 }
 
@@ -173,7 +173,7 @@ ConstructType JSFunction::getConstructData(ConstructData& constructData) {
 JSObject* JSFunction::construct(ExecState* exec, const ArgList& args) {
   Structure* structure;
   JSValuePtr prototype = get(exec, exec->propertyNames().prototype);
-  if (prototype->isObject())
+  if (prototype.isObject())
     structure = asObject(prototype)->inheritorID();
   else
     structure = exec->lexicalGlobalObject()->emptyObjectStructure();
@@ -182,7 +182,7 @@ JSObject* JSFunction::construct(ExecState* exec, const ArgList& args) {
   JSValuePtr result =
       exec->interpreter()->execute(m_body.get(), exec, this, thisObj, args,
                                    m_scopeChain.node(), exec->exceptionSlot());
-  if (exec->hadException() || !result->isObject())
+  if (exec->hadException() || !result.isObject())
     return thisObj;
   return asObject(result);
 }

@@ -86,7 +86,7 @@ void JSDOMGlobalObject::mark() {
 
 JSEventListener* JSDOMGlobalObject::findJSEventListener(JSValuePtr val,
                                                         bool isInline) {
-  if (!val->isObject())
+  if (!val.isObject())
     return 0;
   JSObject* object = asObject(val);
   ListenersMap& listeners =
@@ -101,7 +101,7 @@ PassRefPtr<JSEventListener> JSDOMGlobalObject::findOrCreateJSEventListener(
   if (JSEventListener* listener = findJSEventListener(val, isInline))
     return listener;
 
-  if (!val->isObject())
+  if (!val.isObject())
     return 0;
 
   // The JSEventListener constructor adds it to our jsEventListeners map.
@@ -112,7 +112,7 @@ JSUnprotectedEventListener* JSDOMGlobalObject::findJSUnprotectedEventListener(
     ExecState*,
     JSValuePtr val,
     bool isInline) {
-  if (!val->isObject())
+  if (!val.isObject())
     return 0;
 
   UnprotectedListenersMap& listeners =
@@ -129,7 +129,7 @@ JSDOMGlobalObject::findOrCreateJSUnprotectedEventListener(ExecState* exec,
           findJSUnprotectedEventListener(exec, val, isInline))
     return listener;
 
-  if (!val->isObject())
+  if (!val.isObject())
     return 0;
 
   // The JSUnprotectedEventListener constructor adds it to our

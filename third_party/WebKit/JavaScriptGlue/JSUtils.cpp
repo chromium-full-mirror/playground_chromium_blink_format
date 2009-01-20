@@ -97,7 +97,7 @@ CFStringRef IdentifierToCFString(const Identifier& inIdentifier) {
 JSUserObject* KJSValueToJSObject(JSValuePtr inValue, ExecState* exec) {
   JSUserObject* result = 0;
 
-  if (inValue->isObject(&UserObjectImp::info)) {
+  if (inValue.isObject(&UserObjectImp::info)) {
     UserObjectImp* userObjectImp =
         static_cast<UserObjectImp*>(asObject(inValue));
     result = userObjectImp->GetJSUserObject();
@@ -184,21 +184,21 @@ CFTypeRef KJSValueToCFTypeInternal(JSValuePtr inValue,
 
   JSLock lock(true);
 
-  if (inValue->isBoolean()) {
-    result = inValue->toBoolean(exec) ? kCFBooleanTrue : kCFBooleanFalse;
+  if (inValue.isBoolean()) {
+    result = inValue.toBoolean(exec) ? kCFBooleanTrue : kCFBooleanFalse;
     RetainCFType(result);
     return result;
   }
 
-  if (inValue->isString()) {
-    UString uString = inValue->toString(exec);
+  if (inValue.isString()) {
+    UString uString = inValue.toString(exec);
     result = UStringToCFString(uString);
     return result;
   }
 
-  if (inValue->isNumber()) {
-    double number1 = inValue->toNumber(exec);
-    double number2 = (double)inValue->toInteger(exec);
+  if (inValue.isNumber()) {
+    double number1 = inValue.toNumber(exec);
+    double number2 = (double)inValue.toInteger(exec);
     if (number1 == number2) {
       int intValue = (int)number2;
       result = CFNumberCreate(0, kCFNumberIntType, &intValue);
@@ -208,8 +208,8 @@ CFTypeRef KJSValueToCFTypeInternal(JSValuePtr inValue,
     return result;
   }
 
-  if (inValue->isObject()) {
-    if (inValue->isObject(&UserObjectImp::info)) {
+  if (inValue.isObject()) {
+    if (inValue.isObject(&UserObjectImp::info)) {
       UserObjectImp* userObjectImp =
           static_cast<UserObjectImp*>(asObject(inValue));
       JSUserObject* ptr = userObjectImp->GetJSUserObject();
@@ -217,7 +217,7 @@ CFTypeRef KJSValueToCFTypeInternal(JSValuePtr inValue,
         result = ptr->CopyCFValue();
       }
     } else {
-      JSObject* object = inValue->toObject(exec);
+      JSObject* object = inValue.toObject(exec);
       UInt8 isArray = false;
 
       // if two objects reference each
@@ -270,7 +270,7 @@ CFTypeRef KJSValueToCFTypeInternal(JSValuePtr inValue,
       if (isArray) {
         // This is an KJS array
         unsigned int length =
-            object->get(exec, Identifier(exec, "length"))->toUInt32(exec);
+            object->get(exec, Identifier(exec, "length")).toUInt32(exec);
         result = CFArrayCreateMutable(0, 0, &kCFTypeArrayCallBacks);
         if (result) {
           for (unsigned i = 0; i < length; i++) {
@@ -314,7 +314,7 @@ CFTypeRef KJSValueToCFTypeInternal(JSValuePtr inValue,
     return result;
   }
 
-  if (inValue->isUndefinedOrNull()) {
+  if (inValue.isUndefinedOrNull()) {
     result = RetainCFType(GetCFNull());
     return result;
   }

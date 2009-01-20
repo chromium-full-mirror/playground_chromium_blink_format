@@ -714,7 +714,7 @@ bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
   // can have
   // precedence over the index and name getters.
   JSValuePtr proto = prototype();
-  if (proto->isObject()) {
+  if (proto.isObject()) {
     if (asObject(proto)->getPropertySlot(exec, propertyName, slot)) {
       if (!allowsAccessFrom(exec))
         slot.setUndefined();
@@ -897,9 +897,9 @@ JSValuePtr windowProtoFuncOpen(ExecState* exec,
 
   String urlString =
       valueToStringWithUndefinedOrNullCheck(exec, args.at(exec, 0));
-  AtomicString frameName = args.at(exec, 1)->isUndefinedOrNull()
+  AtomicString frameName = args.at(exec, 1).isUndefinedOrNull()
                                ? "_blank"
-                               : AtomicString(args.at(exec, 1)->toString(exec));
+                               : AtomicString(args.at(exec, 1).toString(exec));
 
   // Because FrameTree::find() returns true for empty strings, we must check for
   // empty framenames.
@@ -1046,7 +1046,7 @@ JSDOMWindow* toJSDOMWindow(Frame* frame) {
 }
 
 JSDOMWindow* toJSDOMWindow(JSValuePtr value) {
-  if (!value->isObject())
+  if (!value.isObject())
     return 0;
   const ClassInfo* classInfo = asObject(value)->classInfo();
   if (classInfo == &JSDOMWindow::s_info)

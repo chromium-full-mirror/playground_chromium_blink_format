@@ -222,7 +222,7 @@ JSValuePtr functionPrint(ExecState* exec,
     if (i != 0)
       putchar(' ');
 
-    printf("%s", args.at(exec, i)->toString(exec).UTF8String().c_str());
+    printf("%s", args.at(exec, i).toString(exec).UTF8String().c_str());
   }
 
   putchar('\n');
@@ -235,7 +235,7 @@ JSValuePtr functionDebug(ExecState* exec,
                          JSValuePtr,
                          const ArgList& args) {
   fprintf(stderr, "--> %s\n",
-          args.at(exec, 0)->toString(exec).UTF8String().c_str());
+          args.at(exec, 0).toString(exec).UTF8String().c_str());
   return jsUndefined();
 }
 
@@ -257,7 +257,7 @@ JSValuePtr functionRun(ExecState* exec,
                        JSValuePtr,
                        const ArgList& args) {
   StopWatch stopWatch;
-  UString fileName = args.at(exec, 0)->toString(exec);
+  UString fileName = args.at(exec, 0).toString(exec);
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
     return throwError(exec, GeneralError, "Could not open file.");
@@ -276,7 +276,7 @@ JSValuePtr functionLoad(ExecState* exec,
                         JSObject*,
                         JSValuePtr,
                         const ArgList& args) {
-  UString fileName = args.at(exec, 0)->toString(exec);
+  UString fileName = args.at(exec, 0).toString(exec);
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
     return throwError(exec, GeneralError, "Could not open file.");
@@ -399,13 +399,11 @@ static bool runWithScripts(GlobalObject* globalObject,
     success = success && completion.complType() != Throw;
     if (dump) {
       if (completion.complType() == Throw)
-        printf(
-            "Exception: %s\n",
-            completion.value()->toString(globalObject->globalExec()).ascii());
+        printf("Exception: %s\n",
+               completion.value().toString(globalObject->globalExec()).ascii());
       else
-        printf(
-            "End: %s\n",
-            completion.value()->toString(globalObject->globalExec()).ascii());
+        printf("End: %s\n",
+               completion.value().toString(globalObject->globalExec()).ascii());
     }
 
     globalObject->globalExec()->clearException();
@@ -451,10 +449,10 @@ static void runInteractive(GlobalObject* globalObject) {
 #endif
     if (completion.complType() == Throw)
       printf("Exception: %s\n",
-             completion.value()->toString(globalObject->globalExec()).ascii());
+             completion.value().toString(globalObject->globalExec()).ascii());
     else
       printf("%s\n", completion.value()
-                         ->toString(globalObject->globalExec())
+                         .toString(globalObject->globalExec())
                          .UTF8String()
                          .c_str());
 
