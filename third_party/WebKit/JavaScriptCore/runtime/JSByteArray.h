@@ -26,8 +26,9 @@
 #ifndef JSByteArray_h
 #define JSByteArray_h
 
-#include "ByteArray.h"
 #include "JSObject.h"
+
+#include <wtf/ByteArray.h>
 
 namespace JSC {
 
@@ -71,7 +72,7 @@ class JSByteArray : public JSObject {
 
   JSByteArray(ExecState* exec,
               PassRefPtr<Structure>,
-              ByteArray* storage,
+              WTF::ByteArray* storage,
               const JSC::ClassInfo* = &s_defaultInfo);
   static PassRefPtr<Structure> createStructure(JSValuePtr prototype);
 
@@ -99,7 +100,7 @@ class JSByteArray : public JSObject {
   JSByteArray(VPtrStealingHackType)
       : JSObject(createStructure(jsNull())), m_classInfo(0) {}
 
-  RefPtr<ByteArray> m_storage;
+  RefPtr<WTF::ByteArray> m_storage;
   const ClassInfo* m_classInfo;
 };
 
