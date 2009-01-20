@@ -2287,8 +2287,8 @@ Color RenderObject::selectionForegroundColor() const {
       color = pseudoStyle->color();
   } else
     color = document()->frame()->selection()->isFocusedAndActive()
-                ? theme()->platformActiveSelectionForegroundColor()
-                : theme()->platformInactiveSelectionForegroundColor();
+                ? theme()->activeSelectionForegroundColor()
+                : theme()->inactiveSelectionForegroundColor();
 
   return color;
 }

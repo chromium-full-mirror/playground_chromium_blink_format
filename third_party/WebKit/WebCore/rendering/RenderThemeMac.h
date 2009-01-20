@@ -58,7 +58,10 @@ class RenderThemeMac : public RenderTheme {
 
   virtual Color platformActiveSelectionBackgroundColor() const;
   virtual Color platformInactiveSelectionBackgroundColor() const;
-  virtual Color activeListBoxSelectionBackgroundColor() const;
+  virtual Color platformActiveListBoxSelectionBackgroundColor() const;
+  virtual Color platformActiveListBoxSelectionForegroundColor() const;
+  virtual Color platformInactiveListBoxSelectionBackgroundColor() const;
+  virtual Color platformInactiveListBoxSelectionForegroundColor() const;
 
   virtual void platformColorsDidChange();
 
@@ -81,6 +84,8 @@ class RenderThemeMac : public RenderTheme {
   virtual Color systemColor(int cssValueId) const;
 
  protected:
+  virtual bool supportsSelectionForegroundColors() const { return false; }
+
   virtual bool paintTextField(RenderObject*,
                               const RenderObject::PaintInfo&,
                               const IntRect&);
