@@ -42,8 +42,6 @@
 #include "WMLNames.h"
 #endif
 
-using namespace std;
-
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -262,7 +260,8 @@ void InputElement::parseMaxLengthAttribute(InputElementData& data,
                                            MappedAttribute* attribute) {
   int maxLength = attribute->isNull() ? InputElement::s_maximumLength
                                       : attribute->value().toInt();
-  maxLength = max(0, min(maxLength, InputElement::s_maximumLength));
+  if (maxLength <= 0 || maxLength > InputElement::s_maximumLength)
+    maxLength = InputElement::s_maximumLength;
 
   int oldMaxLength = data.maxLength();
   data.setMaxLength(maxLength);
