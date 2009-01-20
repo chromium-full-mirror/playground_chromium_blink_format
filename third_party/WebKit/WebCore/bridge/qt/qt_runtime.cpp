@@ -113,16 +113,16 @@ QDebug operator<<(QDebug dbg, const JSRealType& c) {
 #endif
 
 static JSRealType valueRealType(ExecState* exec, JSValuePtr val) {
-  if (val->isNumber())
+  if (val.isNumber())
     return Number;
-  else if (val->isString())
+  else if (val.isString())
     return String;
-  else if (val->isBoolean())
+  else if (val.isBoolean())
     return Boolean;
-  else if (val->isNull())
+  else if (val.isNull())
     return Null;
-  else if (val->isObject()) {
-    JSObject* object = val->toObject(exec);
+  else if (val.isObject()) {
+    JSObject* object = val.toObject(exec);
     if (object->inherits(&RuntimeArray::s_info))  // RuntimeArray 'inherits'
                                                   // from Array, but not in C++
       return RTArray;
@@ -146,8 +146,8 @@ QVariant convertValueToQVariant(ExecState* exec,
                                 int* distance,
                                 HashSet<JSObject*>* visitedObjects) {
   JSObject* object = 0;
-  if (value->isObject()) {
-    object = value->toObject(exec);
+  if (value.isObject()) {
+    object = value.toObject(exec);
     if (visitedObjects->contains(object))
       return QVariant();
 
@@ -217,10 +217,9 @@ QVariant convertValueToQVariant(ExecState* exec,
   switch (hint) {
     case QMetaType::Bool:
       if (type == Object && object->inherits(&BooleanObject::info))
-        ret =
-            QVariant(asBooleanObject(value)->internalValue()->toBoolean(exec));
+        ret = QVariant(asBooleanObject(value)->internalValue().toBoolean(exec));
       else
-        ret = QVariant(value->toBoolean(exec));
+        ret = QVariant(value.toBoolean(exec));
       if (type == Boolean)
         dist = 0;
       else
@@ -237,7 +236,7 @@ QVariant convertValueToQVariant(ExecState* exec,
     case QMetaType::UShort:
     case QMetaType::Float:
     case QMetaType::Double:
-      ret = QVariant(value->toNumber(exec));
+      ret = QVariant(value.toNumber(exec));
       ret.convert((QVariant::Type)hint);
       if (type == Number) {
         switch (hint) {
@@ -275,13 +274,13 @@ QVariant convertValueToQVariant(ExecState* exec,
 
     case QMetaType::QChar:
       if (type == Number || type == Boolean) {
-        ret = QVariant(QChar((ushort)value->toNumber(exec)));
+        ret = QVariant(QChar((ushort)value.toNumber(exec)));
         if (type == Boolean)
           dist = 3;
         else
           dist = 6;
       } else {
-        UString str = value->toString(exec);
+        UString str = value.toString(exec);
         ret =
             QVariant(QChar(str.size() ? *(const ushort*)str.rep()->data() : 0));
         if (type == String)
@@ -292,12 +291,12 @@ QVariant convertValueToQVariant(ExecState* exec,
       break;
 
     case QMetaType::QString: {
-      if (value->isUndefinedOrNull()) {
+      if (value.isUndefinedOrNull()) {
         if (distance)
           *distance = 1;
         return QString();
       } else {
-        UString ustring = value->toString(exec);
+        UString ustring = value.toString(exec);
         ret = QVariant(QString::fromUtf16((const ushort*)ustring.rep()->data(),
                                           ustring.size()));
         if (type == String)
@@ -402,7 +401,7 @@ QVariant convertValueToQVariant(ExecState* exec,
         int len = rtarray->getLength();
         for (int i = 0; i < len; ++i) {
           JSValuePtr val = rtarray->getConcreteArray()->valueAt(exec, i);
-          UString ustring = val->toString(exec);
+          UString ustring = val.toString(exec);
           QString qstring = QString::fromUtf16(
               (const ushort*)ustring.rep()->data(), ustring.size());
 
@@ -417,7 +416,7 @@ QVariant convertValueToQVariant(ExecState* exec,
         int len = array->length();
         for (int i = 0; i < len; ++i) {
           JSValuePtr val = array->get(exec, i);
-          UString ustring = val->toString(exec);
+          UString ustring = val.toString(exec);
           QString qstring = QString::fromUtf16(
               (const ushort*)ustring.rep()->data(), ustring.size());
 
@@ -427,7 +426,7 @@ QVariant convertValueToQVariant(ExecState* exec,
         ret = QVariant(result);
       } else {
         // Make a single length array
-        UString ustring = value->toString(exec);
+        UString ustring = value.toString(exec);
         QString qstring = QString::fromUtf16(
             (const ushort*)ustring.rep()->data(), ustring.size());
         QStringList result;
@@ -439,7 +438,7 @@ QVariant convertValueToQVariant(ExecState* exec,
     }
 
     case QMetaType::QByteArray: {
-      UString ustring = value->toString(exec);
+      UString ustring = value.toString(exec);
       ret = QVariant(QString::fromUtf16((const ushort*)ustring.rep()->data(),
                                         ustring.size())
                          .toLatin1());
@@ -469,7 +468,7 @@ QVariant convertValueToQVariant(ExecState* exec,
           dist = 2;
         }
       } else if (type == Number) {
-        double b = value->toNumber(exec);
+        double b = value.toNumber(exec);
         GregorianDateTime gdt;
         msToGregorianDateTime(b, true, gdt);
         if (hint == QMetaType::QDateTime) {
@@ -484,7 +483,7 @@ QVariant convertValueToQVariant(ExecState* exec,
           dist = 10;
         }
       } else if (type == String) {
-        UString ustring = value->toString(exec);
+        UString ustring = value.toString(exec);
         QString qstring = QString::fromUtf16(
             (const ushort*)ustring.rep()->data(), ustring.size());
 
@@ -534,7 +533,7 @@ QVariant convertValueToQVariant(ExecState* exec,
                         RegExpObject *re = static_cast<RegExpObject*>(object);
         */
         // Attempt to convert.. a bit risky
-        UString ustring = value->toString(exec);
+        UString ustring = value.toString(exec);
         QString qstring = QString::fromUtf16(
             (const ushort*)ustring.rep()->data(), ustring.size());
 
@@ -556,7 +555,7 @@ QVariant convertValueToQVariant(ExecState* exec,
           qConvDebug() << "couldn't parse a JS regexp";
         }
       } else if (type == String) {
-        UString ustring = value->toString(exec);
+        UString ustring = value.toString(exec);
         QString qstring = QString::fromUtf16(
             (const ushort*)ustring.rep()->data(), ustring.size());
 
@@ -616,7 +615,7 @@ QVariant convertValueToQVariant(ExecState* exec,
         // I don't think that converting a double to a pointer is a wise
         // move.  Except maybe 0.
         qConvDebug() << "got number for void * - not converting, seems unsafe:"
-                     << value->toNumber(exec);
+                     << value.toNumber(exec);
       } else {
         qConvDebug() << "void* - unhandled type" << type;
       }
@@ -646,7 +645,7 @@ QVariant convertValueToQVariant(ExecState* exec,
             ret = QVariant::fromValue(result);
           }
         } else if (type == Array) {
-          JSObject* object = value->toObject(exec);
+          JSObject* object = value.toObject(exec);
           JSArray* array = static_cast<JSArray*>(object);
           QObjectList result;
           int len = array->length();
@@ -733,7 +732,7 @@ QVariant convertValueToQVariant(ExecState* exec,
         }
         break;
       } else if (hint == (QMetaType::Type)qMetaTypeId<QVariant>()) {
-        if (value->isUndefinedOrNull()) {
+        if (value.isUndefinedOrNull()) {
           if (distance)
             *distance = 1;
           return QVariant();
@@ -1500,7 +1499,7 @@ JSValuePtr QtRuntimeConnectionMethod::call(ExecState* exec,
 
     if (signalIndex != -1) {
       if (args.size() == 1) {
-        funcObject = args.at(exec, 0)->toObject(exec);
+        funcObject = args.at(exec, 0).toObject(exec);
         CallData callData;
         if (funcObject->getCallData(callData) == CallTypeNone) {
           if (d->m_isConnect)
@@ -1512,24 +1511,24 @@ JSValuePtr QtRuntimeConnectionMethod::call(ExecState* exec,
                 "QtMetaMethod.disconnect: target is not a function");
         }
       } else if (args.size() >= 2) {
-        if (args.at(exec, 0)->isObject()) {
-          thisObject = args.at(exec, 0)->toObject(exec);
+        if (args.at(exec, 0).isObject()) {
+          thisObject = args.at(exec, 0).toObject(exec);
 
           // Get the actual function to call
-          JSObject* asObj = args.at(exec, 1)->toObject(exec);
+          JSObject* asObj = args.at(exec, 1).toObject(exec);
           CallData callData;
           if (asObj->getCallData(callData) != CallTypeNone) {
             // Function version
             funcObject = asObj;
           } else {
             // Convert it to a string
-            UString funcName = args.at(exec, 1)->toString(exec);
+            UString funcName = args.at(exec, 1).toString(exec);
             Identifier funcIdent(exec, funcName);
 
             // ### DropAllLocks
             // This is resolved at this point in QtScript
             JSValuePtr val = thisObject->get(exec, funcIdent);
-            JSObject* asFuncObj = val->toObject(exec);
+            JSObject* asFuncObj = val.toObject(exec);
 
             if (asFuncObj->getCallData(callData) != CallTypeNone) {
               funcObject = asFuncObj;
@@ -1748,7 +1747,7 @@ void QtConnectionObject::execute(void** argv) {
           ArgList l;
           // ### DropAllLocks?
           int funcArgC = m_funcObject->get(exec, exec->propertyNames().length)
-                             ->toInt32(exec);
+                             .toInt32(exec);
           int argTotal = qMax(funcArgC, argc);
           for (int i = 0; i < argTotal; i++) {
             if (i < argc) {
