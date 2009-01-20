@@ -61,13 +61,10 @@ class ObjcInstance : public Instance {
   virtual bool supportsInvokeDefaultMethod() const;
   virtual JSValuePtr invokeDefaultMethod(ExecState*, const ArgList&);
 
-  virtual bool supportsSetValueOfUndefinedField();
-  virtual void setValueOfUndefinedField(ExecState*,
+  JSValuePtr getValueOfUndefinedField(ExecState*, const Identifier&) const;
+  virtual bool setValueOfUndefinedField(ExecState*,
                                         const Identifier&,
                                         JSValuePtr);
-
-  virtual JSValuePtr getValueOfUndefinedField(ExecState*,
-                                              const Identifier& property) const;
 
   ObjectStructPtr getObject() const { return _instance.get(); }
 

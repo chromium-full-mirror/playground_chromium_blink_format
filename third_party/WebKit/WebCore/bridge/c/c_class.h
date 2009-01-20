@@ -43,7 +43,6 @@ class CClass : public Class {
   static CClass* classForIsA(NPClass*);
   virtual ~CClass();
 
-  virtual const char* name() const;
   virtual MethodList methodsNamed(const Identifier&, Instance*) const;
   virtual Field* fieldNamed(const Identifier&, Instance*) const;
 

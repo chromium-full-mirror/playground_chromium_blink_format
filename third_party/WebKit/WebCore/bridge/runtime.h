@@ -66,7 +66,6 @@ class Method : Noncopyable {
 
 class Class : Noncopyable {
  public:
-  virtual const char* name() const = 0;
   virtual MethodList methodsNamed(const Identifier&, Instance*) const = 0;
   virtual Field* fieldNamed(const Identifier&, Instance*) const = 0;
   virtual JSValuePtr fallbackObject(ExecState*, Instance*, const Identifier&) {
@@ -94,16 +93,12 @@ class Instance : public RefCounted<Instance> {
   virtual Class* getClass() const = 0;
   virtual RuntimeObjectImp* createRuntimeObject(ExecState*);
 
-  virtual JSValuePtr getValueOfField(ExecState*, const Field*) const;
-  virtual JSValuePtr getValueOfUndefinedField(ExecState*,
-                                              const Identifier&) const {
-    return jsUndefined();
-  }
-  virtual void setValueOfField(ExecState*, const Field*, JSValuePtr) const;
-  virtual bool supportsSetValueOfUndefinedField() { return false; }
-  virtual void setValueOfUndefinedField(ExecState*,
+  // Returns false if the value was not set successfully.
+  virtual bool setValueOfUndefinedField(ExecState*,
                                         const Identifier&,
-                                        JSValuePtr) {}
+                                        JSValuePtr) {
+    return false;
+  }
 
   virtual JSValuePtr invokeMethod(ExecState*,
                                   const MethodList&,
@@ -123,9 +118,7 @@ class Instance : public RefCounted<Instance> {
 
   virtual JSValuePtr defaultValue(ExecState*, PreferredPrimitiveType) const = 0;
 
-  virtual JSValuePtr valueOf(ExecState* exec) const {
-    return jsString(exec, getClass()->name());
-  }
+  virtual JSValuePtr valueOf(ExecState* exec) const = 0;
 
   RootObject* rootObject() const;
 
