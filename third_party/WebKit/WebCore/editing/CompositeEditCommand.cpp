@@ -378,7 +378,6 @@ void CompositeEditCommand::removeCSSProperty(
 void CompositeEditCommand::removeNodeAttribute(PassRefPtr<Element> element,
                                                const QualifiedName& attribute) {
   setNodeAttribute(element, attribute, AtomicString());
-  ;
 }
 
 void CompositeEditCommand::setNodeAttribute(PassRefPtr<Element> element,

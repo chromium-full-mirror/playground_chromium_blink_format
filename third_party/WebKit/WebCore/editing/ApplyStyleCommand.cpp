@@ -1130,6 +1130,11 @@ void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
     }
   }
 
+  // No need to serialize <foo style=""> if we just removed the last css
+  // property
+  if (decl->length() == 0)
+    removeNodeAttribute(elem, styleAttr);
+
   if (isUnstyledStyleSpan(elem))
     removeNodePreservingChildren(elem);
 }
