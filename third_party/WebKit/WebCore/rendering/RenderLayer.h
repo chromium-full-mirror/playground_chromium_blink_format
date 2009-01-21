@@ -45,7 +45,7 @@
 #define RenderLayer_h
 
 #include "ScrollbarClient.h"
-#include "RenderObject.h"
+#include "RenderBox.h"
 #include "Timer.h"
 #include <wtf/OwnPtr.h>
 
@@ -56,7 +56,6 @@ class CachedResource;
 class HitTestResult;
 class RenderFrameSet;
 class RenderMarquee;
-class RenderObject;
 class RenderReplica;
 class RenderScrollbarPart;
 class RenderStyle;
@@ -180,10 +179,10 @@ class RenderLayer : public ScrollbarClient {
     return s.m_rectHidden;
   }
 
-  RenderLayer(RenderObject*);
+  RenderLayer(RenderBox*);
   ~RenderLayer();
 
-  RenderObject* renderer() const { return m_object; }
+  RenderBox* renderer() const { return m_renderer; }
   RenderLayer* parent() const { return m_parent; }
   RenderLayer* previousSibling() const { return m_previous; }
   RenderLayer* nextSibling() const { return m_next; }
@@ -211,7 +210,7 @@ class RenderLayer : public ScrollbarClient {
   RenderLayer* transparentAncestor();
   void beginTransparencyLayers(GraphicsContext*, const RenderLayer* rootLayer);
 
-  bool hasReflection() const { return m_object->hasReflection(); }
+  bool hasReflection() const { return renderer()->hasReflection(); }
   RenderReplica* reflection() const { return m_reflection; }
   RenderLayer* reflectionLayer() const;
 
@@ -410,7 +409,7 @@ class RenderLayer : public ScrollbarClient {
   void setStaticX(int staticX) { m_staticX = staticX; }
   void setStaticY(int staticY) { m_staticY = staticY; }
 
-  bool hasTransform() const { return m_object->hasTransform(); }
+  bool hasTransform() const { return renderer()->hasTransform(); }
   TransformationMatrix* transform() const { return m_transform.get(); }
 
   void destroy(RenderArena*);
@@ -480,7 +479,7 @@ class RenderLayer : public ScrollbarClient {
   void updateResizerStyle();
 
  protected:
-  RenderObject* m_object;
+  RenderBox* m_renderer;
 
   RenderLayer* m_parent;
   RenderLayer* m_previous;
