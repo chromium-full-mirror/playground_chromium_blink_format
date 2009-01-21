@@ -49,9 +49,9 @@ JSValuePtr toJS(ExecState* exec, ImageData* imageData) {
   DEFINE_STATIC_LOCAL(RefPtr<Structure>, cpaStructure,
                       (JSByteArray::createStructure(jsNull())));
   static const ClassInfo cpaClassInfo = {"CanvasPixelArray", 0, 0, 0};
-  wrapper->putDirect(dataName,
-                     new (exec) JSByteArray(exec, cpaStructure,
-                                            imageData->data(), &cpaClassInfo),
+  wrapper->putDirect(dataName, new (exec) JSByteArray(exec, cpaStructure,
+                                                      imageData->data()->data(),
+                                                      &cpaClassInfo),
                      DontDelete | ReadOnly);
   exec->heap()->reportExtraMemoryCost(imageData->data()->length());
 
