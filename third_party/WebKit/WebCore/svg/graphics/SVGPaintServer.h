@@ -91,12 +91,6 @@ class SVGPaintServer : public SVGResource {
   static SVGPaintServerSolid* sharedSolidPaintServer();
 
  protected:
-#if PLATFORM(CG)
-  void strokePath(CGContextRef, const RenderObject*) const;
-  void fillPath(CGContextRef, const RenderObject*) const;
-#endif
-
- protected:
   SVGPaintServer();
 };
 
