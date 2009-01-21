@@ -2,6 +2,8 @@
  * This file is part of the select element renderer in WebCore.
  *
  * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
+ *               2009 Torch Mobile Inc. All rights reserved.
+ * (http://www.torchmobile.com/)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,10 +43,10 @@
 #include "FrameView.h"
 #include "GraphicsContext.h"
 #include "HTMLNames.h"
-#include "HTMLOptGroupElement.h"
-#include "HTMLOptionElement.h"
 #include "HTMLSelectElement.h"
 #include "HitTestResult.h"
+#include "OptionGroupElement.h"
+#include "OptionElement.h"
 #include "Page.h"
 #include "RenderScrollbar.h"
 #include "RenderTheme.h"
@@ -100,10 +102,11 @@ void RenderListBox::updateFromElement() {
       HTMLElement* element = listItems[i];
       String text;
       Font itemFont = style()->font();
-      if (element->hasTagName(optionTag))
-        text = static_cast<HTMLOptionElement*>(element)->optionText();
-      else if (element->hasTagName(optgroupTag)) {
-        text = static_cast<HTMLOptGroupElement*>(element)->groupLabelText();
+      if (OptionElement* optionElement = optionElementForElement(element))
+        text = optionElement->optionText();
+      else if (OptionGroupElement* optionGroupElement =
+                   optionGroupElementForElement(element)) {
+        text = optionGroupElement->groupLabelText();
         FontDescription d = itemFont.fontDescription();
         d.setWeight(d.bolderWeight());
         itemFont = Font(d, itemFont.letterSpacing(), itemFont.wordSpacing());
@@ -294,12 +297,14 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
   HTMLSelectElement* select = static_cast<HTMLSelectElement*>(node());
   const Vector<HTMLElement*>& listItems = select->listItems();
   HTMLElement* element = listItems[listIndex];
+  OptionElement* optionElement = optionElementForElement(element);
 
   String itemText;
-  if (element->hasTagName(optionTag))
-    itemText = static_cast<HTMLOptionElement*>(element)->optionText();
-  else if (element->hasTagName(optgroupTag))
-    itemText = static_cast<HTMLOptGroupElement*>(element)->groupLabelText();
+  if (optionElement)
+    itemText = optionElement->optionText();
+  else if (OptionGroupElement* optionGroupElement =
+               optionGroupElementForElement(element))
+    itemText = optionGroupElement->groupLabelText();
 
   // Determine where the item text should be placed
   IntRect r = itemBoundingBoxRect(tx, ty, listIndex);
@@ -311,8 +316,7 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
 
   Color textColor = element->renderStyle() ? element->renderStyle()->color()
                                            : style()->color();
-  if (element->hasTagName(optionTag) &&
-      static_cast<HTMLOptionElement*>(element)->selected()) {
+  if (optionElement && optionElement->selected()) {
     if (document()->frame()->selection()->isFocusedAndActive() &&
         document()->focusedNode() == node())
       textColor = theme()->activeListBoxSelectionForegroundColor();
@@ -348,10 +352,10 @@ void RenderListBox::paintItemBackground(PaintInfo& paintInfo,
   HTMLSelectElement* select = static_cast<HTMLSelectElement*>(node());
   const Vector<HTMLElement*>& listItems = select->listItems();
   HTMLElement* element = listItems[listIndex];
+  OptionElement* optionElement = optionElementForElement(element);
 
   Color backColor;
-  if (element->hasTagName(optionTag) &&
-      static_cast<HTMLOptionElement*>(element)->selected()) {
+  if (optionElement && optionElement->selected()) {
     if (document()->frame()->selection()->isFocusedAndActive() &&
         document()->focusedNode() == node())
       backColor = theme()->activeListBoxSelectionBackgroundColor();

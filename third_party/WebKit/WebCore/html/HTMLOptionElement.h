@@ -24,6 +24,7 @@
 #define HTMLOptionElement_h
 
 #include "HTMLFormControlElement.h"
+#include "OptionElement.h"
 
 namespace WebCore {
 
@@ -31,7 +32,7 @@ class HTMLSelectElement;
 class HTMLFormElement;
 class MappedAttribute;
 
-class HTMLOptionElement : public HTMLFormControlElement {
+class HTMLOptionElement : public HTMLFormControlElement, public OptionElement {
   friend class HTMLSelectElement;
   friend class RenderMenuList;
 
@@ -58,7 +59,7 @@ class HTMLOptionElement : public HTMLFormControlElement {
   String value() const;
   void setValue(const String&);
 
-  bool selected() const { return m_selected; }
+  virtual bool selected() const { return m_selected; }
   void setSelected(bool);
   void setSelectedState(bool);
 
@@ -75,7 +76,7 @@ class HTMLOptionElement : public HTMLFormControlElement {
   String label() const;
   void setLabel(const String&);
 
-  String optionText();
+  virtual String optionText() const;
 
   virtual bool disabled() const;
 
