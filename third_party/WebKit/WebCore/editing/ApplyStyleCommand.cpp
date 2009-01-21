@@ -64,6 +64,8 @@ class StyleChange {
   String cssStyle() const { return m_cssStyle; }
   bool applyBold() const { return m_applyBold; }
   bool applyItalic() const { return m_applyItalic; }
+  bool applySubscript() const { return m_applySubscript; }
+  bool applySuperscript() const { return m_applySuperscript; }
   bool applyFontColor() const { return m_applyFontColor.length() > 0; }
   bool applyFontFace() const { return m_applyFontFace.length() > 0; }
   bool applyFontSize() const { return m_applyFontSize.length() > 0; }
@@ -82,6 +84,8 @@ class StyleChange {
   String m_cssStyle;
   bool m_applyBold;
   bool m_applyItalic;
+  bool m_applySubscript;
+  bool m_applySuperscript;
   String m_applyFontColor;
   String m_applyFontFace;
   String m_applyFontSize;
@@ -92,6 +96,8 @@ StyleChange::StyleChange(CSSStyleDeclaration* style,
                          ELegacyHTMLStyles usesLegacyStyles)
     : m_applyBold(false),
       m_applyItalic(false),
+      m_applySubscript(false),
+      m_applySuperscript(false),
       m_usesLegacyStyles(usesLegacyStyles) {
   init(style, Position());
 }
@@ -101,6 +107,8 @@ StyleChange::StyleChange(CSSStyleDeclaration* style,
                          ELegacyHTMLStyles usesLegacyStyles)
     : m_applyBold(false),
       m_applyItalic(false),
+      m_applySubscript(false),
+      m_applySuperscript(false),
       m_usesLegacyStyles(usesLegacyStyles) {
   init(style, position);
 }
@@ -143,6 +151,7 @@ void StyleChange::init(PassRefPtr<CSSStyleDeclaration> style,
 
     if (property->id() == CSSPropertyWebkitTextDecorationsInEffect) {
       // we have to special-case text decorations
+      // FIXME: Why?
       CSSProperty alteredProperty(CSSPropertyTextDecoration, property->value(),
                                   property->isImportant());
       styleText += alteredProperty.cssText();
@@ -165,16 +174,27 @@ StyleChange::ELegacyHTMLStyles StyleChange::styleModeForParseMode(
   return isQuirksMode ? UseLegacyHTMLStyles : DoNotUseLegacyHTMLStyles;
 }
 
+// This function is the mapping from CSS styles to styling tags (like
+// font-weight: bold to <b>)
 bool StyleChange::checkForLegacyHTMLStyleChange(const CSSProperty* property) {
-  if (!property || !property->value()) {
+  if (!property || !property->value())
     return false;
-  }
 
   String valueText(property->value()->cssText());
   switch (property->id()) {
     case CSSPropertyFontWeight:
       if (equalIgnoringCase(valueText, "bold")) {
         m_applyBold = true;
+        return true;
+      }
+      break;
+    case CSSPropertyVerticalAlign:
+      if (equalIgnoringCase(valueText, "sub")) {
+        m_applySubscript = true;
+        return true;
+      }
+      if (equalIgnoringCase(valueText, "super")) {
+        m_applySuperscript = true;
         return true;
       }
       break;
@@ -1009,6 +1029,8 @@ void ApplyStyleCommand::applyInlineStyleToRange(
   }
 }
 
+// This function maps from styling tags to CSS styles.  Used for knowing which
+// styling tags should be removed when toggling styles.
 bool ApplyStyleCommand::isHTMLStyleNode(CSSMutableStyleDeclaration* style,
                                         HTMLElement* elem) {
   CSSMutableStyleDeclaration::const_iterator end = style->end();
@@ -1017,6 +1039,10 @@ bool ApplyStyleCommand::isHTMLStyleNode(CSSMutableStyleDeclaration* style,
     switch ((*it).id()) {
       case CSSPropertyFontWeight:
         if (elem->hasLocalName(bTag))
+          return true;
+        break;
+      case CSSPropertyVerticalAlign:
+        if (elem->hasLocalName(subTag) || elem->hasLocalName(supTag))
           return true;
         break;
       case CSSPropertyFontStyle:
@@ -1682,14 +1708,19 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
   }
 
   if (styleChange.applyBold())
-    surroundNodeRangeWithElement(
-        startNode, endNode,
-        document()->createElementNS(xhtmlNamespaceURI, "b", ec));
+    surroundNodeRangeWithElement(startNode, endNode,
+                                 createHTMLElement(document(), bTag));
 
   if (styleChange.applyItalic())
-    surroundNodeRangeWithElement(
-        startNode, endNode,
-        document()->createElementNS(xhtmlNamespaceURI, "i", ec));
+    surroundNodeRangeWithElement(startNode, endNode,
+                                 createHTMLElement(document(), iTag));
+
+  if (styleChange.applySubscript())
+    surroundNodeRangeWithElement(startNode, endNode,
+                                 createHTMLElement(document(), subTag));
+  else if (styleChange.applySuperscript())
+    surroundNodeRangeWithElement(startNode, endNode,
+                                 createHTMLElement(document(), supTag));
 
   if (m_styledInlineElement)
     surroundNodeRangeWithElement(startNode, endNode,

@@ -1278,16 +1278,16 @@ static bool executeSubscript(Frame* frame,
                              Event*,
                              EditorCommandSource source,
                              const String&) {
-  return executeApplyStyle(frame, source, EditActionSubscript,
-                           CSSPropertyVerticalAlign, "sub");
+  return executeToggleStyle(frame, source, EditActionSubscript,
+                            CSSPropertyVerticalAlign, "baseline", "sub");
 }
 
 static bool executeSuperscript(Frame* frame,
                                Event*,
                                EditorCommandSource source,
                                const String&) {
-  return executeApplyStyle(frame, source, EditActionSuperscript,
-                           CSSPropertyVerticalAlign, "super");
+  return executeToggleStyle(frame, source, EditActionSuperscript,
+                            CSSPropertyVerticalAlign, "baseline", "super");
 }
 
 static bool executeSwapWithMark(Frame* frame,
