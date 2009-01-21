@@ -95,6 +95,8 @@ class ScriptElementData : private CachedResourceClient {
   bool m_evaluated;
   bool m_firedLoad;
 };
+
+ScriptElement* toScriptElement(Element*);
 }
 
 #endif

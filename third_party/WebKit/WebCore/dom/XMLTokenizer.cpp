@@ -40,7 +40,6 @@
 #include "FrameView.h"
 #include "HTMLLinkElement.h"
 #include "HTMLNames.h"
-#include "HTMLScriptElement.h"
 #include "HTMLStyleElement.h"
 #include "ProcessingInstruction.h"
 #include "ResourceError.h"
@@ -48,6 +47,7 @@
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
 #include "ScriptController.h"
+#include "ScriptElement.h"
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"
 #include "TextResourceDecoder.h"
@@ -58,7 +58,6 @@
 
 #if ENABLE(SVG)
 #include "SVGNames.h"
-#include "SVGScriptElement.h"
 #include "SVGStyleElement.h"
 #endif
 
@@ -67,29 +66,6 @@ using namespace std;
 namespace WebCore {
 
 const int maxErrors = 25;
-
-bool isScriptElement(Element* element) {
-  return element->hasTagName(HTMLNames::scriptTag)
-#if ENABLE(SVG)
-         || element->hasTagName(SVGNames::scriptTag)
-#endif
-      ;
-}
-
-ScriptElement* castToScriptElement(Element* element) {
-  ASSERT(isScriptElement(element));
-
-  if (element->hasTagName(HTMLNames::scriptTag))
-    return static_cast<HTMLScriptElement*>(element);
-
-#if ENABLE(SVG)
-  if (element->hasTagName(SVGNames::scriptTag))
-    return static_cast<SVGScriptElement*>(element);
-#endif
-
-  ASSERT_NOT_REACHED();
-  return 0;
-}
 
 #if ENABLE(WML)
 bool XMLTokenizer::isWMLDocument() const {
@@ -337,7 +313,7 @@ void XMLTokenizer::notifyFinished(CachedResource* unusedResource) {
   RefPtr<Element> e = m_scriptElement;
   m_scriptElement = 0;
 
-  ScriptElement* scriptElement = castToScriptElement(e.get());
+  ScriptElement* scriptElement = toScriptElement(e.get());
   ASSERT(scriptElement);
 
   if (errorOccurred)
