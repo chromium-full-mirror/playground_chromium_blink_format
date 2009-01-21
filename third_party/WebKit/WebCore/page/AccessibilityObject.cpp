@@ -1001,4 +1001,6 @@ const String& AccessibilityObject::actionVerb() const {
   }
 }
 
+void AccessibilityObject::updateBackingStore() {}
+
 }  // namespace WebCore
