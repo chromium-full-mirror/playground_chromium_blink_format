@@ -89,7 +89,6 @@ class TimerBase : Noncopyable {
       m_heapInsertionOrder;  // Used to keep order among equal-fire-time timers
 
   friend void updateSharedTimer();
-  friend void setDeferringTimers(bool);
   friend class TimerHeapElement;
   friend bool operator<(const TimerHeapElement&, const TimerHeapElement&);
 };
@@ -108,11 +107,6 @@ class Timer : public TimerBase {
   TimerFiredClass* m_object;
   TimerFiredFunction m_function;
 };
-
-// Set to true to prevent any timers from firing.
-// When set back to false, timers that were deferred will fire.
-bool isDeferringTimers();
-void setDeferringTimers(bool);
 }
 
 #endif
