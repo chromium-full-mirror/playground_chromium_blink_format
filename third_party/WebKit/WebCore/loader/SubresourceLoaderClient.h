@@ -51,7 +51,9 @@ class SubresourceLoaderClient {
 
   virtual void didReceiveResponse(SubresourceLoader*, const ResourceResponse&) {
   }
-  virtual void didReceiveData(SubresourceLoader*, const char*, int) {}
+  virtual void didReceiveData(SubresourceLoader*,
+                              const char*,
+                              int /*lengthReceived*/) {}
   virtual void didFinishLoading(SubresourceLoader*) {}
   virtual void didFail(SubresourceLoader*, const ResourceError&) {}
 

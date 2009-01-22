@@ -27,19 +27,21 @@
 #include "EventTarget.h"
 #include "FormData.h"
 #include "ResourceResponse.h"
-#include "SubresourceLoaderClient.h"
 #include "ScriptString.h"
+#include "ThreadableLoaderClient.h"
 #include <wtf/OwnPtr.h>
 
 namespace WebCore {
 
 class Document;
 class File;
+class ResourceRequest;
 class TextResourceDecoder;
+class ThreadableLoader;
 
 class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
                        public EventTarget,
-                       private SubresourceLoaderClient,
+                       private ThreadableLoaderClient,
                        public ActiveDOMObject {
  public:
   static PassRefPtr<XMLHttpRequest> create(ScriptExecutionContext* context) {
@@ -157,24 +159,25 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   Document* document() const;
 
-  virtual void willSendRequest(SubresourceLoader*,
-                               ResourceRequest& request,
-                               const ResourceResponse& redirectResponse);
-  virtual void didSendData(SubresourceLoader*,
-                           unsigned long long bytesSent,
+#if ENABLE(DASHBOARD_SUPPORT)
+  bool usesDashboardBackwardCompatibilityMode() const;
+#endif
+
+  virtual void didSendData(unsigned long long bytesSent,
                            unsigned long long totalBytesToBeSent);
-  virtual void didReceiveResponse(SubresourceLoader*, const ResourceResponse&);
-  virtual void didReceiveData(SubresourceLoader*, const char* data, int size);
-  virtual void didFail(SubresourceLoader*, const ResourceError&);
-  virtual void didFinishLoading(SubresourceLoader*);
-  virtual void receivedCancellation(SubresourceLoader*,
-                                    const AuthenticationChallenge&);
+  virtual void didReceiveResponse(const ResourceResponse&);
+  virtual void didReceiveData(const char* data, int lengthReceived);
+  virtual void didFinishLoading(unsigned long identifier);
+  virtual void didFail();
+  virtual void didGetCancelled();
+  virtual void didReceiveAuthenticationCancellation(const ResourceResponse&);
 
   // Special versions for the preflight
-  void didReceiveResponsePreflight(SubresourceLoader*, const ResourceResponse&);
-  void didFinishLoadingPreflight(SubresourceLoader*);
+  void didReceiveResponsePreflight(const ResourceResponse&);
+  void didFinishLoadingPreflight();
 
-  void processSyncLoadResults(const Vector<char>& data,
+  void processSyncLoadResults(unsigned long identifier,
+                              const Vector<char>& data,
                               const ResourceResponse&,
                               ExceptionCode&);
   void updateAndDispatchOnProgress(unsigned int len);
@@ -247,16 +250,15 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   bool m_async;
   bool m_includeCredentials;
 
-  RefPtr<SubresourceLoader> m_loader;
+  RefPtr<ThreadableLoader> m_loader;
   State m_state;
 
   ResourceResponse m_response;
   String m_responseEncoding;
 
   RefPtr<TextResourceDecoder> m_decoder;
-  unsigned long m_identifier;
 
-  // Unlike most strings in the DOM, we keep this as a JSC::UString, not a
+  // Unlike most strings in the DOM, we keep this as a ScriptString, not a
   // WebCore::String.
   // That's because these strings can easily get huge (they are filled from the
   // network with
