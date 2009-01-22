@@ -157,8 +157,7 @@ void InputElement::setValueFromRenderer(InputElementData& data,
     data.setValue(value);
 
   Element* element = data.element();
-  FormControlElement* formControlElement =
-      formControlElementForElement(element);
+  FormControlElement* formControlElement = toFormControlElement(element);
   ASSERT(formControlElement);
   formControlElement->setValueMatchesRenderer();
 
@@ -308,7 +307,7 @@ const AtomicString& InputElementData::name() const {
   return m_name.isNull() ? emptyAtom : m_name;
 }
 
-InputElement* inputElementForElement(Element* element) {
+InputElement* toInputElement(Element* element) {
   if (element->isHTMLElement() &&
       (element->hasTagName(inputTag) || element->hasTagName(isindexTag)))
     return static_cast<HTMLInputElement*>(element);

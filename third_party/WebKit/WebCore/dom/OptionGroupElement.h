@@ -37,7 +37,7 @@ class OptionGroupElement {
   OptionGroupElement() {}
 };
 
-OptionGroupElement* optionGroupElementForElement(Element*);
+OptionGroupElement* toOptionGroupElement(Element*);
 }
 
 #endif

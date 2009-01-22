@@ -75,7 +75,7 @@ class OptionElementData {
   bool m_selected;
 };
 
-OptionElement* optionElementForElement(Element*);
+OptionElement* toOptionElement(Element*);
 }
 
 #endif

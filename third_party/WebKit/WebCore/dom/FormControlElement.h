@@ -37,7 +37,7 @@ class FormControlElement {
   FormControlElement() {}
 };
 
-FormControlElement* formControlElementForElement(Element*);
+FormControlElement* toFormControlElement(Element*);
 }
 
 #endif

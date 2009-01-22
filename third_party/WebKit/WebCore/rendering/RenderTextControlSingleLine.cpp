@@ -797,6 +797,6 @@ PassRefPtr<Scrollbar> RenderTextControlSingleLine::createScrollbar(
 }
 
 InputElement* RenderTextControlSingleLine::inputElement() const {
-  return inputElementForElement(static_cast<Element*>(node()));
+  return toInputElement(static_cast<Element*>(node()));
 }
 }

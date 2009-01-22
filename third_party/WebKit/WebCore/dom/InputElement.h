@@ -131,7 +131,7 @@ class InputElementData {
   int m_cachedSelectionEnd;
 };
 
-InputElement* inputElementForElement(Element*);
+InputElement* toInputElement(Element*);
 }
 
 #endif
