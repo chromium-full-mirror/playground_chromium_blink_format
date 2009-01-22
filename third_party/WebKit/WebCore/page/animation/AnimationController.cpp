@@ -171,7 +171,7 @@ void AnimationControllerPrivate::updateAnimationTimer(
            m_compositeAnimations.begin();
        it != animationsEnd; ++it) {
     RefPtr<CompositeAnimation> compAnim = it->second;
-    if (!compAnim->isSuspended()) {
+    if (!compAnim->isSuspended() && compAnim->hasAnimations()) {
       double t = compAnim->willNeedService();
       if (t != -1 && (t < needsService || needsService == -1))
         needsService = t;

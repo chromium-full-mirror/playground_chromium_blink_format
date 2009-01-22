@@ -70,6 +70,8 @@ class CompositeAnimation : public RefCounted<CompositeAnimation> {
   void resumeAnimations();
   bool isSuspended() const;
 
+  bool hasAnimations() const;
+
   void styleAvailable();
   void setAnimating(bool);
   bool isAnimatingProperty(int property, bool isRunningNow) const;
