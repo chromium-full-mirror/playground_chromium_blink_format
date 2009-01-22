@@ -56,12 +56,12 @@ class HTMLOptionElement : public HTMLFormControlElement, public OptionElement {
   int index() const;
   virtual void parseMappedAttribute(MappedAttribute*);
 
-  String value() const;
+  virtual String value() const;
   void setValue(const String&);
 
-  virtual bool selected() const { return m_selected; }
+  virtual bool selected() const;
   void setSelected(bool);
-  void setSelectedState(bool);
+  virtual void setSelectedState(bool);
 
   HTMLSelectElement* ownerSelectElement() const;
 
@@ -76,7 +76,7 @@ class HTMLOptionElement : public HTMLFormControlElement, public OptionElement {
   String label() const;
   void setLabel(const String&);
 
-  virtual String optionText() const;
+  virtual String textIndentedToRespectGroupLabel() const;
 
   virtual bool disabled() const;
 
@@ -86,8 +86,7 @@ class HTMLOptionElement : public HTMLFormControlElement, public OptionElement {
  private:
   virtual RenderStyle* nonRendererRenderStyle() const;
 
-  String m_value;
-  bool m_selected;
+  OptionElementData m_data;
   RefPtr<RenderStyle> m_style;
 };
 

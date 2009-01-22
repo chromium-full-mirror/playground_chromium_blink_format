@@ -103,7 +103,7 @@ void RenderListBox::updateFromElement() {
       String text;
       Font itemFont = style()->font();
       if (OptionElement* optionElement = optionElementForElement(element))
-        text = optionElement->optionText();
+        text = optionElement->textIndentedToRespectGroupLabel();
       else if (OptionGroupElement* optionGroupElement =
                    optionGroupElementForElement(element)) {
         text = optionGroupElement->groupLabelText();
@@ -301,7 +301,7 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
 
   String itemText;
   if (optionElement)
-    itemText = optionElement->optionText();
+    itemText = optionElement->textIndentedToRespectGroupLabel();
   else if (OptionGroupElement* optionGroupElement =
                optionGroupElementForElement(element))
     itemText = optionGroupElement->groupLabelText();

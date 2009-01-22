@@ -152,7 +152,7 @@ void RenderMenuList::updateOptionsWidth() {
     if (!optionElement)
       continue;
 
-    String text = optionElement->optionText();
+    String text = optionElement->textIndentedToRespectGroupLabel();
     if (!text.isEmpty())
       maxOptionWidth = max(maxOptionWidth, style()->font().floatWidth(text));
   }
@@ -186,7 +186,7 @@ void RenderMenuList::setTextFromOption(int optionIndex) {
   String text = "";
   if (i >= 0 && i < size) {
     if (OptionElement* optionElement = optionElementForElement(listItems[i]))
-      text = optionElement->optionText();
+      text = optionElement->textIndentedToRespectGroupLabel();
   }
 
   setText(text.stripWhiteSpace());
@@ -315,7 +315,7 @@ String RenderMenuList::itemText(unsigned listIndex) const {
           optionGroupElementForElement(element))
     return optionGroupElement->groupLabelText();
   else if (OptionElement* optionElement = optionElementForElement(element))
-    return optionElement->optionText();
+    return optionElement->textIndentedToRespectGroupLabel();
   return String();
 }
 
