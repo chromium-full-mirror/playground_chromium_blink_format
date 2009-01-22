@@ -347,8 +347,7 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
        paintInfo.phase == PaintPhaseSelfOutline) &&
       style()->outlineWidth() && style()->visibility() == VISIBLE)
     paintOutline(paintInfo.context, m_absoluteBounds.x(), m_absoluteBounds.y(),
-                 m_absoluteBounds.width(), m_absoluteBounds.height(), style(),
-                 true);
+                 m_absoluteBounds.width(), m_absoluteBounds.height(), style());
 }
 
 TransformationMatrix RenderSVGContainer::viewportTransform() const {

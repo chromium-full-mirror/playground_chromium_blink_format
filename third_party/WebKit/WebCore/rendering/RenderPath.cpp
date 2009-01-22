@@ -253,7 +253,7 @@ void RenderPath::paint(PaintInfo& paintInfo, int, int) {
     paintOutline(paintInfo.context, static_cast<int>(boundingBox.x()),
                  static_cast<int>(boundingBox.y()),
                  static_cast<int>(boundingBox.width()),
-                 static_cast<int>(boundingBox.height()), style(), true);
+                 static_cast<int>(boundingBox.height()), style());
 
   paintInfo.context->restore();
 }

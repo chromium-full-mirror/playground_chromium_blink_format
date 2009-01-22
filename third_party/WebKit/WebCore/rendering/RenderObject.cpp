@@ -1747,13 +1747,11 @@ void RenderObject::paintOutline(GraphicsContext* graphicsContext,
                                 int ty,
                                 int w,
                                 int h,
-                                const RenderStyle* style,
-                                bool onlyUsePassedInBounds) {
+                                const RenderStyle* style) {
   if (!hasOutline())
     return;
 
   int ow = style->outlineWidth();
-
   EBorderStyle os = style->outlineStyle();
 
   Color oc = style->outlineColor();
@@ -1767,7 +1765,7 @@ void RenderObject::paintOutline(GraphicsContext* graphicsContext,
       // Only paint the focus ring by hand if the theme isn't able to draw the
       // focus ring.
       graphicsContext->initFocusRing(ow, offset);
-      if (style->outlineStyleIsAuto() && !onlyUsePassedInBounds)
+      if (style->outlineStyleIsAuto())
         addFocusRingRects(graphicsContext, tx, ty);
       else
         addPDFURLRect(graphicsContext,

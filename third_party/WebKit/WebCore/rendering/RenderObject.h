@@ -1071,8 +1071,7 @@ class RenderObject : public CachedResourceClient {
                     int ty,
                     int w,
                     int h,
-                    const RenderStyle*,
-                    bool onlyUsePassedInBounds = false);
+                    const RenderStyle*);
   void addPDFURLRect(GraphicsContext*, const IntRect&);
 
   virtual IntRect viewRect() const;
