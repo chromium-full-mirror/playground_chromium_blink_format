@@ -249,14 +249,14 @@ HRESULT STDMETHODCALLTYPE WebHistoryItem::setTitle(BSTR title) {
 }
 
 HRESULT STDMETHODCALLTYPE WebHistoryItem::RSSFeedReferrer(BSTR* url) {
-  BString str(m_historyItem->rssFeedReferrer());
+  BString str(m_historyItem->referrer());
   *url = str.release();
 
   return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE WebHistoryItem::setRSSFeedReferrer(BSTR url) {
-  m_historyItem->setRSSFeedReferrer(String(url, SysStringLen(url)));
+  m_historyItem->setReferrer(String(url, SysStringLen(url)));
 
   return S_OK;
 }

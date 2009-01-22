@@ -97,13 +97,12 @@ class HistoryItem : public RefCounted<HistoryItem> {
   const String& parent() const;
   KURL url() const;
   KURL originalURL() const;
+  const String& referrer() const;
   const String& target() const;
   bool isTargetItem() const;
 
   FormData* formData();
   String formContentType() const;
-  String formReferrer() const;
-  String rssFeedReferrer() const;
 
   int visitCount() const;
   bool lastVisitWasFailure() const { return m_lastVisitWasFailure; }
@@ -121,6 +120,7 @@ class HistoryItem : public RefCounted<HistoryItem> {
   void setURL(const KURL&);
   void setURLString(const String&);
   void setOriginalURLString(const String&);
+  void setReferrer(const String&);
   void setTarget(const String&);
   void setParent(const String&);
   void setTitle(const String&);
@@ -128,7 +128,6 @@ class HistoryItem : public RefCounted<HistoryItem> {
 
   void setFormInfoFromRequest(const ResourceRequest&);
 
-  void setRSSFeedReferrer(const String&);
   void setVisitCount(int);
   void setLastVisitWasFailure(bool wasFailure) {
     m_lastVisitWasFailure = wasFailure;
@@ -191,6 +190,7 @@ class HistoryItem : public RefCounted<HistoryItem> {
 
   String m_urlString;
   String m_originalURLString;
+  String m_referrer;
   String m_target;
   String m_parent;
   String m_title;
@@ -212,10 +212,6 @@ class HistoryItem : public RefCounted<HistoryItem> {
   // info used to repost form data
   RefPtr<FormData> m_formData;
   String m_formContentType;
-  String m_formReferrer;
-
-  // info used to support RSS feeds
-  String m_rssFeedReferrer;
 
   // PageCache controls these fields.
   HistoryItem* m_next;
