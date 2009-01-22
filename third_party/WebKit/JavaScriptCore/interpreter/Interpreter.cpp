@@ -2834,10 +2834,10 @@ JSValuePtr Interpreter::privateExecute(ExecutionFlag flag,
           size_t count = vPC[6].u.operand;
           RefPtr<Structure>* end = it + count;
 
-          JSObject* baseObject = asObject(baseCell);
-          while (1) {
-            baseObject = asObject(
-                baseObject->structure()->prototypeForLookup(callFrame));
+          while (true) {
+            JSObject* baseObject =
+                asObject(baseCell->structure()->prototypeForLookup(callFrame));
+
             if (UNLIKELY(baseObject->structure() != (*it).get()))
               break;
 
@@ -2854,6 +2854,10 @@ JSValuePtr Interpreter::privateExecute(ExecutionFlag flag,
               vPC += 8;
               NEXT_INSTRUCTION();
             }
+
+            // Update baseCell, so that next time around the loop we'll pick up
+            // the prototype's prototype.
+            baseCell = baseObject;
           }
         }
       }
