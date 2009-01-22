@@ -779,9 +779,12 @@ bool RenderThemeWin::paintSearchFieldCancelButton(
     const IntRect& r) {
   IntRect bounds = r;
   ASSERT(o->parent());
-  if (!o->parent())
+  if (!o->parent() || !o->parent()->isBox())
     return false;
-  IntRect parentBox = o->parent()->absoluteContentBox();
+
+  RenderBox* parentRenderBox = RenderBox::toRenderBox(o->parent());
+
+  IntRect parentBox = parentRenderBox->absoluteContentBox();
 
   // Make sure the scaled button stays square and will fit in its parent's box
   bounds.setHeight(
@@ -845,9 +848,11 @@ bool RenderThemeWin::paintSearchFieldResultsDecoration(
     const IntRect& r) {
   IntRect bounds = r;
   ASSERT(o->parent());
-  if (!o->parent())
+  if (!o->parent() || !o->parent()->isBox())
     return false;
-  IntRect parentBox = o->parent()->absoluteContentBox();
+
+  RenderBox* parentRenderBox = RenderBox::toRenderBox(o->parent());
+  IntRect parentBox = parentRenderBox->absoluteContentBox();
 
   // Make sure the scaled decoration stays square and will fit in its parent's
   // box
@@ -892,7 +897,11 @@ bool RenderThemeWin::paintSearchFieldResultsButton(
   ASSERT(o->parent());
   if (!o->parent())
     return false;
-  IntRect parentBox = o->parent()->absoluteContentBox();
+  if (!o->parent() || !o->parent()->isBox())
+    return false;
+
+  RenderBox* parentRenderBox = RenderBox::toRenderBox(o->parent());
+  IntRect parentBox = parentRenderBox->absoluteContentBox();
 
   // Make sure the scaled decoration will fit in its parent's box
   bounds.setHeight(min(parentBox.height(), bounds.height()));
