@@ -2503,9 +2503,7 @@ class FunctionBodyNode : public ScopeNode {
   void finishParsing(const SourceCode&, ParameterNode*);
   void finishParsing(Identifier* parameters, size_t parameterCount);
 
-  UString toSourceString() const JSC_FAST_CALL {
-    return UString("{") + source().toString() + UString("}");
-  }
+  UString toSourceString() const JSC_FAST_CALL { return source().toString(); }
 
   // These objects are ref/deref'd a lot in the scope chain, so this is a faster
   // ref/deref.

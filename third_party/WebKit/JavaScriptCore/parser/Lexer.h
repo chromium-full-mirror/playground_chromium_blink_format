@@ -90,7 +90,7 @@ class Lexer : Noncopyable {
 
   void clear();
   SourceCode sourceCode(int openBrace, int closeBrace, int firstLine) {
-    return SourceCode(m_source->provider(), openBrace + 1, closeBrace,
+    return SourceCode(m_source->provider(), openBrace, closeBrace + 1,
                       firstLine);
   }
 
