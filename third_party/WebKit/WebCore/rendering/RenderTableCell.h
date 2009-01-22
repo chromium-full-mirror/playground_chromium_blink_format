@@ -69,7 +69,7 @@ class RenderTableCell : public RenderBlock {
 
   virtual void calcPrefWidths();
   virtual void calcWidth();
-  virtual void setWidth(int);
+  void updateWidth(int);
 
   virtual bool expandsToEncloseOverhangingFloats() const { return true; }
 
@@ -104,9 +104,6 @@ class RenderTableCell : public RenderBlock {
                                   int tx,
                                   int ty,
                                   RenderObject* backgroundObject);
-
-  // Lie about position to outside observers.
-  virtual int yPos() const { return m_y + m_topExtra; }
 
   virtual IntRect absoluteClippedOverflowRect();
   virtual void computeAbsoluteRepaintRect(IntRect&, bool fixed = false);

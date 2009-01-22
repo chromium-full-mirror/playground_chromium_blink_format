@@ -286,7 +286,8 @@ static bool endsOfNodeAreVisuallyDistinctPositions(Node* node) {
 
   // There is a VisiblePosition inside an empty inline-block container.
   return node->renderer()->isReplaced() && canHaveChildrenForEditing(node) &&
-         node->renderer()->height() != 0 && !node->firstChild();
+         RenderBox::toRenderBox(node->renderer())->height() != 0 &&
+         !node->firstChild();
 }
 
 static Node* enclosingVisualBoundary(Node* node) {
@@ -574,9 +575,11 @@ bool Position::hasRenderedNonAnonymousDescendantsWithHeight(
   RenderObject* stop = renderer->nextInPreOrderAfterChildren();
   for (RenderObject* o = renderer->firstChild(); o && o != stop;
        o = o->nextInPreOrder())
-    if (o->element() && o->height())
-      return true;
-
+    if (o->element()) {
+      if ((o->isText() && static_cast<RenderText*>(o)->boundingBoxHeight()) ||
+          (o->isBox() && RenderBox::toRenderBox(o)->height()))
+        return true;
+    }
   return false;
 }
 
@@ -608,7 +611,8 @@ bool Position::isCandidate() const {
 
   if (!node()->hasTagName(htmlTag) && renderer->isBlockFlow() &&
       !hasRenderedNonAnonymousDescendantsWithHeight(renderer) &&
-      (renderer->height() || node()->hasTagName(bodyTag)))
+      (RenderBox::toRenderBox(renderer)->height() ||
+       node()->hasTagName(bodyTag)))
     return offset() == 0 && !nodeIsUserSelectNone(node());
 
   return false;

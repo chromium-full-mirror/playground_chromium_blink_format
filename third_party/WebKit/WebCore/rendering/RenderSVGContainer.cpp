@@ -42,9 +42,7 @@ RenderSVGContainer::RenderSVGContainer(SVGStyledElement* node)
       m_lastChild(0),
       m_width(0),
       m_height(0),
-      m_drawsContents(true) {
-  setReplaced(true);
-}
+      m_drawsContents(true) {}
 
 RenderSVGContainer::~RenderSVGContainer() {}
 
@@ -349,7 +347,8 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
        paintInfo.phase == PaintPhaseSelfOutline) &&
       style()->outlineWidth() && style()->visibility() == VISIBLE)
     paintOutline(paintInfo.context, m_absoluteBounds.x(), m_absoluteBounds.y(),
-                 m_absoluteBounds.width(), m_absoluteBounds.height(), style());
+                 m_absoluteBounds.width(), m_absoluteBounds.height(), style(),
+                 true);
 }
 
 TransformationMatrix RenderSVGContainer::viewportTransform() const {
@@ -431,6 +430,12 @@ bool RenderSVGContainer::nodeAtPoint(const HitTestRequest& request,
   // under the pointer (i.e., there is no target element), the event is not
   // dispatched."
   return false;
+}
+
+IntRect RenderSVGContainer::absoluteOutlineBounds() const {
+  IntRect result = m_absoluteBounds;
+  adjustRectForOutlineAndShadow(result);
+  return result;
 }
 }
 

@@ -161,14 +161,14 @@ class RootInlineBox : public InlineFlowBox {
 
   InlineBox* closestLeafChildForXPos(int x, bool onlyEditableLeaves = false);
 
-  Vector<RenderObject*>& floats() {
+  Vector<RenderBox*>& floats() {
     ASSERT(!isDirty());
     if (!m_overflow)
       m_overflow = new (m_object->renderArena()) Overflow(this);
     return m_overflow->floats;
   }
 
-  Vector<RenderObject*>* floatsPtr() {
+  Vector<RenderBox*>* floatsPtr() {
     ASSERT(!isDirty());
     return m_overflow ? &m_overflow->floats : 0;
   }
@@ -203,7 +203,7 @@ class RootInlineBox : public InlineFlowBox {
     // Floats hanging off the line are pushed into this vector during layout. It
     // is only
     // good for as long as the line has not been marked dirty.
-    Vector<RenderObject*> floats;
+    Vector<RenderBox*> floats;
 
    private:
     void* operator new(size_t) throw();

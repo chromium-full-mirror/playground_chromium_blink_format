@@ -33,13 +33,13 @@ namespace WebCore {
 PassRefPtr<Scrollbar> RenderScrollbar::createCustomScrollbar(
     ScrollbarClient* client,
     ScrollbarOrientation orientation,
-    RenderObject* renderer) {
+    RenderBox* renderer) {
   return adoptRef(new RenderScrollbar(client, orientation, renderer));
 }
 
 RenderScrollbar::RenderScrollbar(ScrollbarClient* client,
                                  ScrollbarOrientation orientation,
-                                 RenderObject* renderer)
+                                 RenderBox* renderer)
     : Scrollbar(client,
                 orientation,
                 RegularScrollbar,
@@ -53,7 +53,7 @@ RenderScrollbar::~RenderScrollbar() {
 void RenderScrollbar::setParent(ScrollView* parent) {
   Scrollbar::setParent(parent);
   if (!parent) {
-    // Destroy all of the scrollbar's RenderObjects.
+    // Destroy all of the scrollbar's RenderBoxes.
     updateScrollbarParts(true);
   }
 }

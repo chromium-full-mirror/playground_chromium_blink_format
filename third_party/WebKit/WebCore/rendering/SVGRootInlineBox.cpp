@@ -30,6 +30,7 @@
 #include "Editor.h"
 #include "Frame.h"
 #include "GraphicsContext.h"
+#include "RenderBlock.h"
 #include "RenderSVGRoot.h"
 #include "SVGInlineFlowBox.h"
 #include "SVGInlineTextBox.h"
@@ -656,9 +657,9 @@ int SVGRootInlineBox::placeBoxesHorizontally(int,
   return 0;
 }
 
-void SVGRootInlineBox::verticallyAlignBoxes(int& heightOfBlock) {
+int SVGRootInlineBox::verticallyAlignBoxes(int) {
   // height is set by layoutInlineBoxes.
-  heightOfBlock = height();
+  return height();
 }
 
 float cummulatedWidthOfInlineBoxCharacterRange(
@@ -947,7 +948,7 @@ void SVGRootInlineBox::computePerCharacterLayoutInformation() {
   // Finally the top left position of our box is known.
   // Propogate this knownledge to our RenderSVGText parent.
   FloatPoint topLeft = topLeftPositionOfCharacterRange(m_svgChars);
-  object()->setPos((int)floorf(topLeft.x()), (int)floorf(topLeft.y()));
+  block()->setLocation((int)floorf(topLeft.x()), (int)floorf(topLeft.y()));
 
   // Layout all InlineText/Flow boxes
   // BEWARE: This requires the root top/left position to be set correctly
@@ -1113,10 +1114,10 @@ void SVGRootInlineBox::layoutInlineBoxes(InlineFlowBox* start,
       int minY = enclosedStringRect.y();
       int maxY = minY + enclosedStringRect.height();
 
-      curr->setXPos(minX - object()->xPos());
+      curr->setXPos(minX - block()->x());
       curr->setWidth(enclosedStringRect.width());
 
-      curr->setYPos(minY - object()->yPos());
+      curr->setYPos(minY - block()->y());
       curr->setBaseline(font.ascent());
       curr->setHeight(enclosedStringRect.height());
 
@@ -1146,10 +1147,10 @@ void SVGRootInlineBox::layoutInlineBoxes(InlineFlowBox* start,
 
       layoutInlineBoxes(flowBox, it, minX, maxX, minY, maxY);
 
-      curr->setXPos(minX - object()->xPos());
+      curr->setXPos(minX - block()->x());
       curr->setWidth(maxX - minX);
 
-      curr->setYPos(minY - object()->yPos());
+      curr->setYPos(minY - block()->y());
       curr->setBaseline(font.ascent());
       curr->setHeight(maxY - minY);
 
@@ -1168,10 +1169,10 @@ void SVGRootInlineBox::layoutInlineBoxes(InlineFlowBox* start,
   }
 
   if (start->isRootInlineBox()) {
-    int top = lowY - object()->yPos();
-    int bottom = highY - object()->yPos();
+    int top = lowY - block()->y();
+    int bottom = highY - block()->y();
 
-    start->setXPos(lowX - object()->xPos());
+    start->setXPos(lowX - block()->x());
     start->setYPos(top);
 
     start->setWidth(highX - lowX);

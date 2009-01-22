@@ -167,8 +167,8 @@ void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
   if (!shouldPaint(paintInfo, tx, ty))
     return;
 
-  tx += m_x;
-  ty += m_y;
+  tx += x();
+  ty += m_frameRect.y();
 
   if (hasBoxDecorations() && (paintInfo.phase == PaintPhaseForeground ||
                               paintInfo.phase == PaintPhaseSelection))
@@ -186,7 +186,8 @@ void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
 #if PLATFORM(MAC)
   if (style()->highlight() != nullAtom &&
       !paintInfo.context->paintingDisabled())
-    paintCustomHighlight(tx - m_x, ty - m_y, style()->highlight(), true);
+    paintCustomHighlight(tx - x(), ty - m_frameRect.y(), style()->highlight(),
+                         true);
 #endif
 
   if (m_widget) {
@@ -223,12 +224,12 @@ void RenderWidget::updateWidgetPosition() {
   FloatPoint absPos = localToAbsolute();
   absPos.move(borderLeft() + paddingLeft(), borderTop() + paddingTop());
 
-  int width =
-      m_width - borderLeft() - borderRight() - paddingLeft() - paddingRight();
-  int height =
-      m_height - borderTop() - borderBottom() - paddingTop() - paddingBottom();
+  int w =
+      width() - borderLeft() - borderRight() - paddingLeft() - paddingRight();
+  int h =
+      height() - borderTop() - borderBottom() - paddingTop() - paddingBottom();
 
-  IntRect newBounds(absPos.x(), absPos.y(), width, height);
+  IntRect newBounds(absPos.x(), absPos.y(), w, h);
   IntRect oldBounds(m_widget->frameRect());
   if (newBounds != oldBounds) {
     // The widget changed positions.  Update the frame geometry.
@@ -278,7 +279,7 @@ bool RenderWidget::nodeAtPoint(const HitTestRequest& request,
   // Check to see if we are really over the widget itself (and not just in the
   // border/padding area).
   if (inside && !hadResult && result.innerNode() == element())
-    result.setIsOverWidget(contentBox().contains(result.localPoint()));
+    result.setIsOverWidget(contentBoxRect().contains(result.localPoint()));
   return inside;
 }
 

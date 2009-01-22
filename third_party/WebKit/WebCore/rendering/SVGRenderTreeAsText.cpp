@@ -312,9 +312,8 @@ static TextStream& operator<<(TextStream& ts, const RenderSVGText& text) {
 
   Vector<SVGTextChunk>& chunks =
       const_cast<Vector<SVGTextChunk>&>(box->svgTextChunks());
-  ts << " at (" << text.xPos() << "," << text.yPos() << ") size "
-     << box->width() << "x" << box->height() << " contains " << chunks.size()
-     << " chunk(s)";
+  ts << " at (" << text.x() << "," << text.y() << ") size " << box->width()
+     << "x" << box->height() << " contains " << chunks.size() << " chunk(s)";
 
   if (text.parent() &&
       (text.parent()->style()->color() != text.style()->color()))
@@ -509,8 +508,8 @@ void write(TextStream& ts, const RenderSVGInlineText& text, int indent) {
       ts << " {" << tagName << "}";
   }
 
-  ts << " at (" << text.xPos() << "," << text.yPos() << ") size "
-     << text.width() << "x" << text.height() << "\n";
+  ts << " at (" << text.firstRunX() << "," << text.firstRunY() << ") size "
+     << text.boundingBoxWidth() << "x" << text.boundingBoxHeight() << "\n";
   writeSVGInlineText(ts, text, indent);
 }
 

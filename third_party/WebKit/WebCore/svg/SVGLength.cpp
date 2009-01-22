@@ -291,8 +291,11 @@ float SVGLength::PercentageOfViewport(float value,
     }
   } else if (context->parent() && !context->parent()->isSVGElement()) {
     if (RenderObject* renderer = context->renderer()) {
-      width = renderer->width();
-      height = renderer->height();
+      if (renderer->isBox()) {
+        RenderBox* box = RenderBox::toRenderBox(renderer);
+        width = box->width();
+        height = box->height();
+      }
     }
   }
 

@@ -141,7 +141,7 @@ void RenderFileUploadControl::updateFromElement() {
 
 int RenderFileUploadControl::maxFilenameWidth() const {
   return max(
-      0, contentWidth() - m_button->renderer()->width() - afterButtonSpacing -
+      0, contentWidth() - m_button->renderBox()->width() - afterButtonSpacing -
              (m_fileChooser->icon() ? iconWidth + iconFilenameSpacing : 0));
 }
 
@@ -193,7 +193,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
     // Determine where the filename should be placed
     int contentLeft = tx + borderLeft() + paddingLeft();
     int buttonAndIconWidth =
-        m_button->renderer()->width() + afterButtonSpacing +
+        m_button->renderBox()->width() + afterButtonSpacing +
         (m_fileChooser->icon() ? iconWidth + iconFilenameSpacing : 0);
     int textX;
     if (style()->direction() == LTR)
@@ -222,9 +222,9 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
       int iconX;
       if (style()->direction() == LTR)
         iconX =
-            contentLeft + m_button->renderer()->width() + afterButtonSpacing;
+            contentLeft + m_button->renderBox()->width() + afterButtonSpacing;
       else
-        iconX = contentLeft + contentWidth() - m_button->renderer()->width() -
+        iconX = contentLeft + contentWidth() - m_button->renderBox()->width() -
                 afterButtonSpacing - iconWidth;
 
       // Draw the file icon

@@ -211,7 +211,7 @@ Image* HitTestResult::image() const {
 IntRect HitTestResult::imageRect() const {
   if (!image())
     return IntRect();
-  return m_innerNonSharedNode->renderer()->absoluteContentBox();
+  return m_innerNonSharedNode->renderBox()->absoluteContentBox();
 }
 
 KURL HitTestResult::absoluteImageURL() const {

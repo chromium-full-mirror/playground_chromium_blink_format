@@ -534,7 +534,7 @@ IntRect RenderFlow::absoluteClippedOverflowRect() {
     // Now invalidate a rectangle.
     int ow = style() ? style()->outlineSize() : 0;
     if (isCompact())
-      left -= m_x;
+      left -= x();
 
     // We need to add in the relative position offsets of any inlines (including
     // us) up to our
@@ -594,9 +594,9 @@ int RenderFlow::lowestPosition(bool includeOverflowInterior,
                                bool includeSelf) const {
   ASSERT(!isInlineFlow());
   if (!includeOverflowInterior && (hasOverflowClip() || hasControlClip()))
-    return includeSelf && m_width > 0 ? overflowHeight(false) : 0;
+    return includeSelf && width() > 0 ? overflowHeight(false) : 0;
 
-  int bottom = includeSelf && m_width > 0 ? m_height : 0;
+  int bottom = includeSelf && width() > 0 ? height() : 0;
   if (!hasColumns()) {
     // FIXME: Come up with a way to use the layer tree to avoid visiting all the
     // kids.
@@ -607,7 +607,7 @@ int RenderFlow::lowestPosition(bool includeOverflowInterior,
     // the abs div.
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
       if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow())
-        bottom = max(bottom, c->yPos() + c->lowestPosition(false));
+        bottom = max(bottom, toRenderBox(c)->y() + c->lowestPosition(false));
     }
   }
 
@@ -621,9 +621,10 @@ int RenderFlow::rightmostPosition(bool includeOverflowInterior,
                                   bool includeSelf) const {
   ASSERT(!isInlineFlow());
   if (!includeOverflowInterior && (hasOverflowClip() || hasControlClip()))
-    return includeSelf && m_height > 0 ? overflowWidth(false) : 0;
+    return includeSelf && height() > 0 ? overflowWidth(false) : 0;
 
-  int right = includeSelf && m_height > 0 ? m_width : 0;
+  int right = includeSelf && height() > 0 ? width() : 0;
+
   if (!hasColumns()) {
     // FIXME: Come up with a way to use the layer tree to avoid visiting all the
     // kids.
@@ -633,8 +634,8 @@ int RenderFlow::rightmostPosition(bool includeOverflowInterior,
     // have to get to
     // the abs div.
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
-      if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow())
-        right = max(right, c->xPos() + c->rightmostPosition(false));
+      if (!c->isFloatingOrPositioned() && c->isBox() && !c->isInlineFlow())
+        right = max(right, toRenderBox(c)->x() + c->rightmostPosition(false));
     }
   }
 
@@ -648,9 +649,9 @@ int RenderFlow::leftmostPosition(bool includeOverflowInterior,
                                  bool includeSelf) const {
   ASSERT(!isInlineFlow());
   if (!includeOverflowInterior && (hasOverflowClip() || hasControlClip()))
-    return includeSelf && m_height > 0 ? overflowLeft(false) : m_width;
+    return includeSelf && height() > 0 ? overflowLeft(false) : width();
 
-  int left = includeSelf && m_height > 0 ? 0 : m_width;
+  int left = includeSelf && height() > 0 ? 0 : width();
   if (!hasColumns()) {
     // FIXME: Come up with a way to use the layer tree to avoid visiting all the
     // kids.
@@ -660,8 +661,8 @@ int RenderFlow::leftmostPosition(bool includeOverflowInterior,
     // have to get to
     // the abs div.
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
-      if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow())
-        left = min(left, c->xPos() + c->leftmostPosition(false));
+      if (!c->isFloatingOrPositioned() && c->isBox() && !c->isInlineFlow())
+        left = min(left, toRenderBox(c)->x() + c->leftmostPosition(false));
     }
   }
 
@@ -741,7 +742,7 @@ IntRect RenderFlow::localCaretRect(InlineBox* inlineBox,
       FloatPoint absRightPoint =
           localToAbsoluteForContent(FloatPoint(myRight, 0));
 
-      int containerRight = containingBlock()->xPos() + containingBlockWidth();
+      int containerRight = containingBlock()->x() + containingBlockWidth();
       FloatPoint absContainerPoint =
           localToAbsoluteForContent(FloatPoint(containerRight, 0));
 
@@ -778,28 +779,27 @@ void RenderFlow::addFocusRingRects(GraphicsContext* graphicsContext,
           tx + curr->xPos(), ty + curr->yPos(), curr->width(), curr->height()));
 
     for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling())
-      if (!curr->isText() && !curr->isListMarker()) {
+      if (!curr->isText() && !curr->isListMarker() && curr->isBox()) {
+        RenderBox* box = toRenderBox(curr);
         FloatPoint pos;
         // FIXME: This doesn't work correctly with transforms.
         if (curr->layer())
           pos = curr->localToAbsolute();
         else
-          pos = FloatPoint(tx + curr->xPos(), ty + curr->yPos());
-        curr->addFocusRingRects(graphicsContext, pos.x(), pos.y());
+          pos = FloatPoint(tx + box->x(), ty + box->y());
+        box->addFocusRingRects(graphicsContext, pos.x(), pos.y());
       }
   }
 
   if (continuation()) {
     if (isInline())
       continuation()->addFocusRingRects(
-          graphicsContext,
-          tx - containingBlock()->xPos() + continuation()->xPos(),
-          ty - containingBlock()->yPos() + continuation()->yPos());
+          graphicsContext, tx - containingBlock()->x() + continuation()->x(),
+          ty - containingBlock()->y() + continuation()->y());
     else
       continuation()->addFocusRingRects(
-          graphicsContext,
-          tx - xPos() + continuation()->containingBlock()->xPos(),
-          ty - yPos() + continuation()->containingBlock()->yPos());
+          graphicsContext, tx - x() + continuation()->containingBlock()->x(),
+          ty - y() + continuation()->containingBlock()->y());
   }
 }
 

@@ -85,6 +85,8 @@ class RenderPath : public RenderObject {
                                 const FloatRect&,
                                 const Path&) const;
 
+  virtual IntRect absoluteOutlineBounds() const;
+
  private:
   FloatPoint mapAbsolutePointToLocal(const FloatPoint&) const;
 

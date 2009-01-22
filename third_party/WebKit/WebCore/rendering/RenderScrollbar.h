@@ -32,19 +32,19 @@
 
 namespace WebCore {
 
-class RenderObject;
+class RenderBox;
 class RenderScrollbarPart;
 class RenderStyle;
 
 class RenderScrollbar : public Scrollbar {
  protected:
-  RenderScrollbar(ScrollbarClient*, ScrollbarOrientation, RenderObject*);
+  RenderScrollbar(ScrollbarClient*, ScrollbarOrientation, RenderBox*);
 
  public:
   friend class Scrollbar;
   static PassRefPtr<Scrollbar> createCustomScrollbar(ScrollbarClient*,
                                                      ScrollbarOrientation,
-                                                     RenderObject*);
+                                                     RenderBox*);
   virtual ~RenderScrollbar();
 
   virtual void setParent(ScrollView*);
@@ -62,7 +62,7 @@ class RenderScrollbar : public Scrollbar {
 
   virtual void styleChanged();
 
-  RenderObject* owningRenderer() const { return m_owner; }
+  RenderBox* owningRenderer() const { return m_owner; }
 
   void paintPart(GraphicsContext*, ScrollbarPart, const IntRect&);
 
@@ -77,7 +77,7 @@ class RenderScrollbar : public Scrollbar {
                                                   RenderStyle::PseudoId);
   void updateScrollbarPart(ScrollbarPart, bool destroy = false);
 
-  RenderObject* m_owner;
+  RenderBox* m_owner;
   HashMap<unsigned, RenderScrollbarPart*> m_parts;
 };
 

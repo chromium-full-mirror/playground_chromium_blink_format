@@ -46,7 +46,7 @@ class RenderFieldset : public RenderBlock {
   }
   virtual bool stretchesToMinIntrinsicWidth() const { return true; }
 
-  RenderObject* findLegend() const;
+  RenderBox* findLegend() const;
 
  protected:
   virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);

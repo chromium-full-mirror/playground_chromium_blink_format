@@ -65,7 +65,7 @@ void RenderVideo::videoSizeChanged() {
 }
 
 IntRect RenderVideo::videoBox() const {
-  IntRect contentRect = contentBox();
+  IntRect contentRect = contentBoxRect();
 
   if (intrinsicSize().isEmpty() || contentRect.isEmpty())
     return IntRect();

@@ -89,8 +89,6 @@ class RenderText : public RenderObject {
                          unsigned len,
                          int xPos,
                          bool firstLine = false) const;
-  virtual int width() const;
-  virtual int height() const;
 
   virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
 
@@ -110,12 +108,18 @@ class RenderText : public RenderObject {
                          int& maxW,
                          bool& stripFrontSpaces);
 
-  // returns the minimum x position of all runs relative to the parent.
-  // defaults to 0.
-  int minXPos() const;
+  // Returns the leftmost (and topmost) position of the bounding box that
+  // encloses all text runs
+  int boundingBoxX() const;
+  int boundingBoxY() const;
 
-  virtual int xPos() const;
-  virtual int yPos() const;
+  // Returns the width and height of the bounding box that encloses all text
+  // runs.
+  int boundingBoxWidth() const;
+  int boundingBoxHeight() const;
+
+  int firstRunX() const;
+  int firstRunY() const;
 
   virtual int verticalPositionHint(bool firstLine) const;
 

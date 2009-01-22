@@ -151,7 +151,7 @@ void RenderSVGImage::layout() {
   calculateLocalTransform();
 
   // minimum height
-  m_height = errorOccurred() ? intrinsicSize().height() : 0;
+  setHeight(errorOccurred() ? intrinsicSize().height() : 0);
 
   calcWidth();
   calcHeight();

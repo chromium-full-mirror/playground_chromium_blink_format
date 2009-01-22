@@ -64,14 +64,14 @@ void RenderApplet::createWidgetIfNecessary() {
   // use fixed widths/heights from the style system when we can, since the
   // widget might
   // not have an accurate m_width/m_height.
-  int width = style()->width().isFixed()
-                  ? style()->width().value()
-                  : m_width - borderLeft() - borderRight() - paddingLeft() -
-                        paddingRight();
-  int height = style()->height().isFixed()
-                   ? style()->height().value()
-                   : m_height - borderTop() - borderBottom() - paddingTop() -
-                         paddingBottom();
+  int contentWidth = style()->width().isFixed()
+                         ? style()->width().value()
+                         : width() - borderLeft() - borderRight() -
+                               paddingLeft() - paddingRight();
+  int contentHeight = style()->height().isFixed()
+                          ? style()->height().value()
+                          : height() - borderTop() - borderBottom() -
+                                paddingTop() - paddingBottom();
   for (Node* child = element->firstChild(); child;
        child = child->nextSibling()) {
     if (child->hasTagName(paramTag)) {
@@ -83,8 +83,8 @@ void RenderApplet::createWidgetIfNecessary() {
 
   Frame* frame = document()->frame();
   ASSERT(frame);
-  setWidget(frame->loader()->createJavaAppletWidget(IntSize(width, height),
-                                                    element, m_args));
+  setWidget(frame->loader()->createJavaAppletWidget(
+      IntSize(contentWidth, contentHeight), element, m_args));
 }
 
 void RenderApplet::layout() {

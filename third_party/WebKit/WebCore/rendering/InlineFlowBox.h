@@ -176,7 +176,7 @@ class InlineFlowBox : public InlineRunBox {
                                      int& leftPosition,
                                      int& rightPosition,
                                      bool& needsWordSpacing);
-  virtual void verticallyAlignBoxes(int& heightOfBlock);
+  virtual int verticallyAlignBoxes(int heightOfBlock);
   void computeLogicalBoxHeights(int& maxPositionTop,
                                 int& maxPositionBottom,
                                 int& maxAscent,

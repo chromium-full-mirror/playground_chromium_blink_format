@@ -335,7 +335,7 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
           // not the left border box.  We have to subtract |x| from the width of
           // the block
           // (which can be obtained from the root line box).
-          curr->setXPos(root()->object()->width() - x);
+          curr->setXPos(root()->block()->width() - x);
         continue;  // The positioned object has no effect on the width.
       }
       if (curr->object()->isInlineFlow()) {
@@ -356,9 +356,9 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
         x += curr->object()->marginLeft();
         curr->setXPos(x);
         leftPosition =
-            min(x + curr->object()->overflowLeft(false), leftPosition);
+            min(x + curr->renderBox()->overflowLeft(false), leftPosition);
         rightPosition =
-            max(x + curr->object()->overflowWidth(false), rightPosition);
+            max(x + curr->renderBox()->overflowWidth(false), rightPosition);
         x += curr->width() + curr->object()->marginRight();
       }
     }
@@ -371,7 +371,7 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
   return x;
 }
 
-void InlineFlowBox::verticallyAlignBoxes(int& heightOfBlock) {
+int InlineFlowBox::verticallyAlignBoxes(int heightOfBlock) {
   int maxPositionTop = 0;
   int maxPositionBottom = 0;
   int maxAscent = 0;
@@ -409,6 +409,8 @@ void InlineFlowBox::verticallyAlignBoxes(int& heightOfBlock) {
     shrinkBoxesWithNoTextChildren(topPosition, bottomPosition);
 
   heightOfBlock += maxHeight;
+
+  return heightOfBlock;
 }
 
 void InlineFlowBox::adjustMaxAscentAndDescent(int& maxAscent,
@@ -558,9 +560,9 @@ void InlineFlowBox::placeBoxesVertically(int y,
       }
 
       if (curr->object()->hasReflection()) {
-        overflowTop = min(overflowTop, curr->object()->reflectionBox().y());
+        overflowTop = min(overflowTop, curr->renderBox()->reflectionBox().y());
         overflowBottom =
-            max(overflowBottom, curr->object()->reflectionBox().bottom());
+            max(overflowBottom, curr->renderBox()->reflectionBox().bottom());
       }
 
       if (curr->isInlineFlowBox()) {
@@ -575,8 +577,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
       newY += curr->object()->marginTop();
       newHeight = curr->height() - (curr->object()->marginTop() +
                                     curr->object()->marginBottom());
-      overflowTop = curr->object()->overflowTop(false);
-      overflowBottom = curr->object()->overflowHeight(false) - newHeight;
+      overflowTop = curr->renderBox()->overflowTop(false);
+      overflowBottom = curr->renderBox()->overflowHeight(false) - newHeight;
     }
 
     curr->setYPos(newY);

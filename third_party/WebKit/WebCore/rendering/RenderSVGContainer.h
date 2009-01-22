@@ -40,8 +40,8 @@ class RenderSVGContainer : public RenderObject {
   virtual RenderObject* firstChild() const { return m_firstChild; }
   virtual RenderObject* lastChild() const { return m_lastChild; }
 
-  virtual int width() const { return m_width; }
-  virtual int height() const { return m_height; }
+  int width() const { return m_width; }
+  int height() const { return m_height; }
 
   virtual bool canHaveChildren() const;
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
@@ -102,6 +102,8 @@ class RenderSVGContainer : public RenderObject {
                            int tx,
                            int ty,
                            HitTestAction);
+
+  virtual IntRect absoluteOutlineBounds() const;
 
  protected:
   virtual void applyContentTransforms(PaintInfo&);

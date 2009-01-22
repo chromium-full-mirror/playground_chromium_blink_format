@@ -33,6 +33,7 @@
 namespace WebCore {
 
 class RenderTableCell;
+class RenderTableRow;
 
 class RenderTableSection : public RenderContainer {
  public:
@@ -52,7 +53,7 @@ class RenderTableSection : public RenderContainer {
 
   virtual int getBaselineOfFirstLineBox() const;
 
-  void addCell(RenderTableCell*, RenderObject* row);
+  void addCell(RenderTableCell*, RenderTableRow* row);
 
   void setCellWidths();
   int calcRowHeight();
@@ -69,7 +70,7 @@ class RenderTableSection : public RenderContainer {
 
   struct RowStruct {
     Row* row;
-    RenderObject* rowRenderer;
+    RenderTableRow* rowRenderer;
     int baseline;
     Length height;
   };
@@ -83,13 +84,13 @@ class RenderTableSection : public RenderContainer {
   void splitColumn(int pos, int newSize);
 
   virtual int overflowWidth(bool includeInterior = true) const {
-    return (!includeInterior && hasOverflowClip()) ? m_width : m_overflowWidth;
+    return (!includeInterior && hasOverflowClip()) ? width() : m_overflowWidth;
   }
   virtual int overflowLeft(bool includeInterior = true) const {
     return (!includeInterior && hasOverflowClip()) ? 0 : m_overflowLeft;
   }
   virtual int overflowHeight(bool includeInterior = true) const {
-    return (!includeInterior && hasOverflowClip()) ? m_height
+    return (!includeInterior && hasOverflowClip()) ? height()
                                                    : m_overflowHeight;
   }
   virtual int overflowTop(bool includeInterior = true) const {

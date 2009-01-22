@@ -258,7 +258,7 @@ static int verticalScrollDistance(Frame* frame) {
   if (!focusedNode)
     return 0;
   RenderObject* renderer = focusedNode->renderer();
-  if (!renderer)
+  if (!renderer || !renderer->isBox())
     return 0;
   RenderStyle* style = renderer->style();
   if (!style)
@@ -266,7 +266,7 @@ static int verticalScrollDistance(Frame* frame) {
   if (!(style->overflowY() == OSCROLL || style->overflowY() == OAUTO ||
         renderer->isTextArea()))
     return 0;
-  int height = renderer->clientHeight();
+  int height = RenderBox::toRenderBox(renderer)->clientHeight();
   return max((height + 1) / 2, height - cAmountToKeepWhenPaging);
 }
 

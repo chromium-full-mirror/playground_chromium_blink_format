@@ -64,7 +64,7 @@ RenderText::RenderText(Node* node, PassRefPtr<StringImpl> str)
       m_containsReversedText(false),
       m_isAllASCII(charactersAreAllASCII(m_text.get())) {
   ASSERT(m_text);
-  setRenderText();
+  setIsText();
   m_text = document()->displayStringModifiedByEncoding(
       PassRefPtr<StringImpl>(m_text));
 
@@ -788,7 +788,7 @@ bool RenderText::containsOnlyWhitespace(unsigned from, unsigned len) const {
   return currPos >= (from + len);
 }
 
-int RenderText::minXPos() const {
+int RenderText::boundingBoxX() const {
   if (!m_firstTextBox)
     return 0;
 
@@ -800,11 +800,23 @@ int RenderText::minXPos() const {
   return minXPos;
 }
 
-int RenderText::xPos() const {
+int RenderText::boundingBoxY() const {
+  if (!m_firstTextBox)
+    return 0;
+
+  // FIXME: we should not use an arbitrary value like this.  Perhaps we should
+  // use INT_MAX.
+  int minYPos = 6666666;
+  for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
+    minYPos = min(minYPos, static_cast<int>(box->m_y));
+  return minYPos;
+}
+
+int RenderText::firstRunX() const {
   return m_firstTextBox ? m_firstTextBox->m_x : 0;
 }
 
-int RenderText::yPos() const {
+int RenderText::firstRunY() const {
   return m_firstTextBox ? m_firstTextBox->m_y : 0;
 }
 
@@ -1035,7 +1047,7 @@ void RenderText::setText(PassRefPtr<StringImpl> text, bool force) {
   setNeedsLayoutAndPrefWidthsRecalc();
 }
 
-int RenderText::height() const {
+int RenderText::boundingBoxHeight() const {
   int retval = 0;
   if (firstTextBox())
     retval = lastTextBox()->m_y + lastTextBox()->height() - firstTextBox()->m_y;
@@ -1126,7 +1138,7 @@ unsigned int RenderText::width(unsigned int from,
   return w;
 }
 
-int RenderText::width() const {
+int RenderText::boundingBoxWidth() const {
   // FIXME: we should not use an arbitrary value like this.  Perhaps we should
   // use INT_MAX.
   int minx = 100000000;

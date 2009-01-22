@@ -149,8 +149,8 @@ CanvasRenderingContext* HTMLCanvasElement::getContext(const String& type) {
 void HTMLCanvasElement::willDraw(const FloatRect& rect) {
   m_imageBuffer->clearImage();
 
-  if (RenderObject* ro = renderer()) {
-    FloatRect destRect = ro->contentBox();
+  if (RenderBox* ro = renderBox()) {
+    FloatRect destRect = ro->contentBoxRect();
     FloatRect r = mapRect(
         rect, FloatRect(0, 0, m_size.width(), m_size.height()), destRect);
     r.intersect(destRect);

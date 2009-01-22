@@ -41,8 +41,9 @@ int SVGInlineFlowBox::placeBoxesHorizontally(int, int&, int&, bool&) {
   return 0;
 }
 
-void SVGInlineFlowBox::verticallyAlignBoxes(int&) {
+int SVGInlineFlowBox::verticallyAlignBoxes(int) {
   // no-op
+  return 0;
 }
 
 }  // namespace WebCore

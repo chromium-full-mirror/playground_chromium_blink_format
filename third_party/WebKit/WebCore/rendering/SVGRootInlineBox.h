@@ -55,7 +55,7 @@ class SVGRootInlineBox : public RootInlineBox {
                                      int& leftPosition,
                                      int& rightPosition,
                                      bool& needsWordSpacing);
-  virtual void verticallyAlignBoxes(int& heightOfBlock);
+  virtual int verticallyAlignBoxes(int heightOfBlock);
 
   virtual void computePerCharacterLayoutInformation();
 
