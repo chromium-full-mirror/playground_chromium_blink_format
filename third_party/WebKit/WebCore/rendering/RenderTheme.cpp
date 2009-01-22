@@ -440,14 +440,14 @@ Color RenderTheme::inactiveSelectionForegroundColor() const {
 Color RenderTheme::activeListBoxSelectionBackgroundColor() const {
   if (!m_activeListBoxSelectionBackgroundColor.isValid())
     m_activeListBoxSelectionBackgroundColor =
-        platformActiveSelectionBackgroundColor();
+        platformActiveListBoxSelectionBackgroundColor();
   return m_activeListBoxSelectionBackgroundColor;
 }
 
 Color RenderTheme::inactiveListBoxSelectionBackgroundColor() const {
   if (!m_inactiveListBoxSelectionBackgroundColor.isValid())
     m_inactiveListBoxSelectionBackgroundColor =
-        platformInactiveSelectionBackgroundColor();
+        platformInactiveListBoxSelectionBackgroundColor();
   return m_inactiveListBoxSelectionBackgroundColor;
 }
 
@@ -455,7 +455,7 @@ Color RenderTheme::activeListBoxSelectionForegroundColor() const {
   if (!m_activeListBoxSelectionForegroundColor.isValid() &&
       supportsListBoxSelectionForegroundColors())
     m_activeListBoxSelectionForegroundColor =
-        platformActiveSelectionForegroundColor();
+        platformActiveListBoxSelectionForegroundColor();
   return m_activeListBoxSelectionForegroundColor;
 }
 
@@ -463,7 +463,7 @@ Color RenderTheme::inactiveListBoxSelectionForegroundColor() const {
   if (!m_inactiveListBoxSelectionForegroundColor.isValid() &&
       supportsListBoxSelectionForegroundColors())
     m_inactiveListBoxSelectionForegroundColor =
-        platformInactiveSelectionForegroundColor();
+        platformInactiveListBoxSelectionForegroundColor();
   return m_inactiveListBoxSelectionForegroundColor;
 }
 
