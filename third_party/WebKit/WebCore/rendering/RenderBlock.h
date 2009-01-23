@@ -621,7 +621,7 @@ class RenderBlock : public RenderFlow {
     int margin() const { return m_posMargin - m_negMargin; }
   };
 
-  void adjustPositionedBlock(RenderObject* child, const MarginInfo&);
+  void adjustPositionedBlock(RenderBox* child, const MarginInfo&);
   void adjustFloatingBlock(const MarginInfo&);
   RenderBox* handleSpecialChild(RenderBox* child,
                                 const MarginInfo&,
@@ -641,7 +641,7 @@ class RenderBlock : public RenderFlow {
                            int oldTopPosMargin,
                            int oldTopNegMargin);
   void insertCompactIfNeeded(RenderBox* child, CompactInfo&);
-  int estimateVerticalPosition(RenderObject* child, const MarginInfo&);
+  int estimateVerticalPosition(RenderBox* child, const MarginInfo&);
   void determineHorizontalPosition(RenderBox* child);
   void handleBottomOfBlock(int top, int bottom, MarginInfo&);
   void setCollapsedBottomMargin(const MarginInfo&);

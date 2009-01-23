@@ -21,13 +21,12 @@
 #ifndef InlineBox_h
 #define InlineBox_h
 
-#include "RenderObject.h"  // needed for RenderObject::PaintInfo
+#include "RenderBox.h"
 #include "TextDirection.h"
 
 namespace WebCore {
 
 class HitTestResult;
-class RenderBox;
 class RootInlineBox;
 
 struct HitTestRequest;
@@ -269,7 +268,7 @@ class InlineBox {
   }
 
   // Use with caution! The type is not checked!
-  RenderBox* renderBox() const;
+  RenderBox* renderBox() const { return RenderBox::toRenderBox(m_object); }
 
  public:
   RenderObject* m_object;
