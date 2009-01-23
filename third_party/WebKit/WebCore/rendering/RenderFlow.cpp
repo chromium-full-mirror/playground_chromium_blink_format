@@ -545,7 +545,9 @@ IntRect RenderFlow::absoluteClippedOverflowRect() {
          inlineFlow = inlineFlow->parent()) {
       if (inlineFlow->style()->position() == RelativePosition &&
           inlineFlow->hasLayer())
-        inlineFlow->layer()->relativePositionOffset(left, top);
+        RenderBox::toRenderBox(inlineFlow)
+            ->layer()
+            ->relativePositionOffset(left, top);
     }
 
     IntRect r(-ow + left, -ow + top, width() + ow * 2, height() + ow * 2);
@@ -782,7 +784,7 @@ void RenderFlow::addFocusRingRects(GraphicsContext* graphicsContext,
         RenderBox* box = toRenderBox(curr);
         FloatPoint pos;
         // FIXME: This doesn't work correctly with transforms.
-        if (curr->layer())
+        if (box->layer())
           pos = curr->localToAbsolute();
         else
           pos = FloatPoint(tx + box->x(), ty + box->y());
