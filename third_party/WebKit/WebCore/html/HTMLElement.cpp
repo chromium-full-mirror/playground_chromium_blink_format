@@ -1018,6 +1018,8 @@ HTMLFormElement* HTMLElement::virtualForm() const {
 }  // namespace WebCore
 
 #ifndef NDEBUG
+
+// For use in the debugger
 void dumpInnerHTML(WebCore::HTMLElement*);
 
 void dumpInnerHTML(WebCore::HTMLElement* element) {
