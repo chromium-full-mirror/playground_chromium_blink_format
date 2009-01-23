@@ -567,12 +567,14 @@ void InlineFlowBox::placeBoxesVertically(int y,
       }
 
       if (curr->isInlineFlowBox()) {
-        newHeight +=
-            curr->object()->borderTop() + curr->object()->paddingTop() +
-            curr->object()->borderBottom() + curr->object()->paddingBottom();
-        newY -= curr->object()->borderTop() + curr->object()->paddingTop();
+        newHeight += curr->renderBox()->borderTop() +
+                     curr->renderBox()->paddingTop() +
+                     curr->renderBox()->borderBottom() +
+                     curr->renderBox()->paddingBottom();
+        newY -=
+            curr->renderBox()->borderTop() + curr->renderBox()->paddingTop();
         newBaseline +=
-            curr->object()->borderTop() + curr->object()->paddingTop();
+            curr->renderBox()->borderTop() + curr->renderBox()->paddingTop();
       }
     } else if (!curr->object()->isBR()) {
       newY += curr->renderBox()->marginTop();

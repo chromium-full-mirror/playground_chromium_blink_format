@@ -174,6 +174,17 @@ class RenderBox : public RenderObject {
   int marginLeft() const { return m_marginLeft; }
   int marginRight() const { return m_marginRight; }
 
+  // Virtual since table cells override
+  virtual int paddingTop(bool includeIntrinsicPadding = true) const;
+  virtual int paddingBottom(bool includeIntrinsicPadding = true) const;
+  virtual int paddingLeft(bool includeIntrinsicPadding = true) const;
+  virtual int paddingRight(bool includeIntrinsicPadding = true) const;
+
+  virtual int borderTop() const { return style()->borderTopWidth(); }
+  virtual int borderBottom() const { return style()->borderBottomWidth(); }
+  virtual int borderLeft() const { return style()->borderLeftWidth(); }
+  virtual int borderRight() const { return style()->borderRightWidth(); }
+
   // The following seven functions are used to implement collapsing margins.
   // All objects know their maximal positive and negative margins.  The
   // formula for computing a collapsed margin is |maxPosMargin| -
@@ -451,7 +462,7 @@ class RenderBox : public RenderObject {
 
   void calcAbsoluteVertical();
   void calcAbsoluteHorizontalValues(Length width,
-                                    const RenderObject* cb,
+                                    const RenderBox* cb,
                                     TextDirection containerDirection,
                                     int containerWidth,
                                     int bordersPlusPadding,
@@ -464,7 +475,7 @@ class RenderBox : public RenderObject {
                                     int& marginRightValue,
                                     int& xPos);
   void calcAbsoluteVerticalValues(Length height,
-                                  const RenderObject* cb,
+                                  const RenderBox* cb,
                                   int containerHeight,
                                   int bordersPlusPadding,
                                   Length top,

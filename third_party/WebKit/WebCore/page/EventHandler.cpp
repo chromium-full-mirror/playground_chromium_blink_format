@@ -737,7 +737,8 @@ HitTestResult EventHandler::hitTestResultAtPoint(const IntPoint& point,
     if (!result.isOverWidget() || !n || !n->renderer() ||
         !n->renderer()->isWidget())
       break;
-    Widget* widget = static_cast<RenderWidget*>(n->renderer())->widget();
+    RenderWidget* renderWidget = static_cast<RenderWidget*>(n->renderer());
+    Widget* widget = renderWidget->widget();
     if (!widget || !widget->isFrameView())
       break;
     Frame* frame = static_cast<HTMLFrameElementBase*>(n)->contentFrame();
@@ -745,10 +746,10 @@ HitTestResult EventHandler::hitTestResultAtPoint(const IntPoint& point,
       break;
     FrameView* view = static_cast<FrameView*>(widget);
     IntPoint widgetPoint(
-        result.localPoint().x() + view->scrollX() -
-            n->renderer()->borderLeft() - n->renderer()->paddingLeft(),
-        result.localPoint().y() + view->scrollY() - n->renderer()->borderTop() -
-            n->renderer()->paddingTop());
+        result.localPoint().x() + view->scrollX() - renderWidget->borderLeft() -
+            renderWidget->paddingLeft(),
+        result.localPoint().y() + view->scrollY() - renderWidget->borderTop() -
+            renderWidget->paddingTop());
     HitTestResult widgetHitTestResult(widgetPoint);
     frame->contentRenderer()->layer()->hitTest(HitTestRequest(true, true),
                                                widgetHitTestResult);
