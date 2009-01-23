@@ -1091,8 +1091,8 @@ HDC GraphicsContext::getWindowsContext(const IntRect& dstRect,
                                        bool supportAlphaBlend,
                                        bool mayCreateBitmap) {
   // painting through native HDC is only supported for plugin, where
-  // mayCreateBitmap is always TRUE
-  Q_ASSERT(mayCreateBitmap == TRUE);
+  // mayCreateBitmap is always true
+  Q_ASSERT(mayCreateBitmap);
 
   if (dstRect.isEmpty())
     return 0;
@@ -1155,8 +1155,8 @@ void GraphicsContext::releaseWindowsContext(HDC hdc,
                                             bool supportAlphaBlend,
                                             bool mayCreateBitmap) {
   // painting through native HDC is only supported for plugin, where
-  // mayCreateBitmap is always TRUE
-  Q_ASSERT(mayCreateBitmap == TRUE);
+  // mayCreateBitmap is always true
+  Q_ASSERT(mayCreateBitmap);
 
   if (hdc) {
     if (!dstRect.isEmpty()) {
