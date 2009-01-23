@@ -3371,6 +3371,8 @@ ALWAYS_INLINE
   return result;
 }
 
+// Since cfree isn't used anywhere, we don't compile it in.
+#ifndef WTF_CHANGES
 #ifndef WTF_CHANGES
 extern "C"
 #endif
@@ -3381,6 +3383,7 @@ extern "C"
 #endif
   do_free(ptr);
 }
+#endif
 
 #ifndef WTF_CHANGES
 extern "C"

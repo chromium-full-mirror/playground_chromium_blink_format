@@ -120,7 +120,7 @@ PassRefPtr<OpaqueJSClass> OpaqueJSClass::createNoAutomaticPrototype(
   return adoptRef(new OpaqueJSClass(definition, 0));
 }
 
-void clearReferenceToPrototype(JSObjectRef prototype) {
+static void clearReferenceToPrototype(JSObjectRef prototype) {
   OpaqueJSClassContextData* jsClassData =
       static_cast<OpaqueJSClassContextData*>(JSObjectGetPrivate(prototype));
   ASSERT(jsClassData);

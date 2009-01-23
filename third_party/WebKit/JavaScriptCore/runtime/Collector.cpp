@@ -671,8 +671,8 @@ typedef CONTEXT PlatformThreadRegisters;
 #error Need a thread register struct for this platform
 #endif
 
-size_t getPlatformThreadRegisters(const PlatformThread& platformThread,
-                                  PlatformThreadRegisters& regs) {
+static size_t getPlatformThreadRegisters(const PlatformThread& platformThread,
+                                         PlatformThreadRegisters& regs) {
 #if PLATFORM(DARWIN)
 
 #if PLATFORM(X86)

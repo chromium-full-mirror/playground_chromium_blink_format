@@ -80,6 +80,7 @@ JSValuePtr globalFuncJSCPrint(ExecState*,
 
 static const double mantissaOverflowLowerBound = 9007199254740992.0;
 double parseIntOverflow(const char*, int length, int radix);
+bool isStrWhiteSpace(UChar);
 
 }  // namespace JSC
 

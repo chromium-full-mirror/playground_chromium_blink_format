@@ -46,6 +46,8 @@ class PropertySlot;
 struct ClassInfo;
 struct Instruction;
 
+JSValuePtr jsNumberCell(ExecState*, double);
+
 class JSNumberCell : public JSCell {
   friend class JIT;
   friend JSValuePtr jsNumberCell(JSGlobalData*, double);
@@ -102,7 +104,6 @@ class JSNumberCell : public JSCell {
 };
 
 JSValuePtr jsNumberCell(JSGlobalData*, double);
-JSValuePtr jsNumberCell(ExecState*, double);
 
 inline bool isNumberCell(JSValuePtr v) {
   return v.isCell() && v.asCell()->isNumber();
