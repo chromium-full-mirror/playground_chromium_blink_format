@@ -220,7 +220,7 @@ void WorkerMessagingProxy::postMessageToWorkerContext(const String& message) {
 
   if (m_workerThread) {
     ++m_unconfirmedMessageCount;
-    m_workerThread->messageQueue().append(
+    m_workerThread->runLoop().postTask(
         MessageWorkerContextTask::create(message));
   } else
     m_queuedEarlyTasks.append(MessageWorkerContextTask::create(message));
@@ -252,7 +252,7 @@ void WorkerMessagingProxy::workerThreadCreated(
         taskCount + 1;  // Worker initialization counts as a pending message.
 
     for (unsigned i = 0; i < taskCount; ++i)
-      m_workerThread->messageQueue().append(m_queuedEarlyTasks[i]);
+      m_workerThread->runLoop().postTask(m_queuedEarlyTasks[i]);
     m_queuedEarlyTasks.clear();
   }
 }

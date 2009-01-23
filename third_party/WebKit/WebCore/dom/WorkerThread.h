@@ -29,7 +29,7 @@
 
 #if ENABLE(WORKERS)
 
-#include <wtf/MessageQueue.h>
+#include <WorkerRunLoop.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -55,8 +55,7 @@ class WorkerThread : public RefCounted<WorkerThread> {
   void stop();
 
   ThreadIdentifier threadID() const { return m_threadID; }
-  MessageQueue<RefPtr<WorkerTask>>& messageQueue() { return m_messageQueue; }
-
+  WorkerRunLoop& runLoop() { return m_runLoop; }
   WorkerMessagingProxy* messagingProxy() const { return m_messagingProxy; }
 
  private:
@@ -69,12 +68,12 @@ class WorkerThread : public RefCounted<WorkerThread> {
   void* workerThread();
 
   ThreadIdentifier m_threadID;
+  WorkerRunLoop m_runLoop;
   WorkerMessagingProxy* m_messagingProxy;
 
   RefPtr<WorkerContext> m_workerContext;
   Mutex m_threadCreationMutex;
 
-  MessageQueue<RefPtr<WorkerTask>> m_messageQueue;
   OwnPtr<WorkerThreadStartupData> m_startupData;
 };
 

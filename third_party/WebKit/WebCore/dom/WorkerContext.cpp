@@ -223,7 +223,7 @@ class ScriptExecutionContextTaskWorkerTask : public WorkerTask {
 };
 
 void WorkerContext::postTask(PassRefPtr<Task> task) {
-  thread()->messageQueue().append(
+  thread()->runLoop().postTask(
       ScriptExecutionContextTaskWorkerTask::create(task));
 }
 
