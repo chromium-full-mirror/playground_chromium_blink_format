@@ -72,13 +72,10 @@ class RenderInline : public RenderFlow {
     return isRelPositioned() || isTransparent() || hasMask();
   }
 
-  int boundingBoxWidth() const;
-  int boundingBoxHeight() const;
-
   virtual int offsetLeft() const;
   virtual int offsetTop() const;
-  virtual int offsetWidth() const { return boundingBoxWidth(); }
-  virtual int offsetHeight() const { return boundingBoxHeight(); }
+  virtual int offsetWidth() const { return linesBoundingBox().width(); }
+  virtual int offsetHeight() const { return linesBoundingBox().height(); }
 
   void absoluteRects(Vector<IntRect>&, int tx, int ty, bool topLevel = true);
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);

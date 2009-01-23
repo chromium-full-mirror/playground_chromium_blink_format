@@ -576,7 +576,8 @@ bool Position::hasRenderedNonAnonymousDescendantsWithHeight(
   for (RenderObject* o = renderer->firstChild(); o && o != stop;
        o = o->nextInPreOrder())
     if (o->element()) {
-      if ((o->isText() && static_cast<RenderText*>(o)->boundingBoxHeight()) ||
+      if ((o->isText() &&
+           static_cast<RenderText*>(o)->linesBoundingBox().height()) ||
           (o->isBox() && RenderBox::toRenderBox(o)->height()))
         return true;
     }
