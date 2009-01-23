@@ -61,7 +61,7 @@ class RenderSVGImage : public RenderImage {
   virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
-  bool requiresLayer();
+  bool requiresLayer() const { return false; }
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,

@@ -522,7 +522,9 @@ int RenderTableSection::layoutRows(int toAdd) {
 
       for (RenderObject* o = cell->firstChild(); o; o = o->nextSibling()) {
         if (!o->isText() && o->style()->height().isPercent() &&
-            (o->isReplaced() || o->scrollsOverflow() || flexAllChildren)) {
+            (o->isReplaced() ||
+             (o->isBox() && RenderBox::toRenderBox(o)->scrollsOverflow()) ||
+             flexAllChildren)) {
           // Tables with no sections do not flex.
           if (!o->isTable() || static_cast<RenderTable*>(o)->hasSections()) {
             o->setNeedsLayout(true, false);

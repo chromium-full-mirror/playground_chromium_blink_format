@@ -35,7 +35,7 @@ class RenderSVGInline : public RenderInline {
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
                                      bool isRootLineBox,
                                      bool isOnlyRun = false);
-  virtual bool requiresLayer() { return false; }
+  virtual bool requiresLayer() const { return false; }
 };
 }
 

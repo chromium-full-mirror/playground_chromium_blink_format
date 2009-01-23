@@ -55,7 +55,7 @@ class RenderSVGText : public RenderSVGBlock {
                            int ty,
                            HitTestAction);
 
-  virtual bool requiresLayer();
+  virtual bool requiresLayer() const { return false; }
   virtual void layout();
 
   virtual void absoluteRects(Vector<IntRect>&,

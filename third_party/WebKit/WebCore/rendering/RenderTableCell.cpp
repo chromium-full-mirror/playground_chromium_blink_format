@@ -275,11 +275,6 @@ void RenderTableCell::styleDidChange(RenderStyle::Diff diff,
   setHasBoxDecorations(true);
 }
 
-bool RenderTableCell::requiresLayer() {
-  return isPositioned() || isTransparent() || hasOverflowClip() ||
-         hasTransform() || hasMask() || hasReflection();
-}
-
 // The following rules apply for resolving conflicts and figuring out which
 // border
 // to use.

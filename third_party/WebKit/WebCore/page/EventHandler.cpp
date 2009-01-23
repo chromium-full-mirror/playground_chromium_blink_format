@@ -105,10 +105,10 @@ static inline void scrollAndAcceptEvent(float delta,
                                         ScrollDirection negativeDirection,
                                         PlatformWheelEvent& e,
                                         Node* node) {
-  if (!delta)
+  if (!delta || !node->renderBox())
     return;
   if (e.granularity() == ScrollByPageWheelEvent) {
-    if (node->renderer()->scroll(
+    if (node->renderBox()->scroll(
             delta < 0 ? negativeDirection : positiveDirection, ScrollByPage, 1))
       e.accept();
     return;
@@ -116,7 +116,7 @@ static inline void scrollAndAcceptEvent(float delta,
   float pixelsToScroll = delta > 0 ? delta : -delta;
   if (e.granularity() == ScrollByLineWheelEvent)
     pixelsToScroll *= cMouseWheelPixelsPerLineStep;
-  if (node->renderer()->scroll(
+  if (node->renderBox()->scroll(
           delta < 0 ? negativeDirection : positiveDirection, ScrollByPixel,
           pixelsToScroll))
     e.accept();
@@ -396,8 +396,8 @@ bool EventHandler::handleMousePressEvent(
 
   m_mouseDownMayStartAutoscroll =
       m_mouseDownMayStartSelect ||
-      (m_mousePressNode && m_mousePressNode->renderer() &&
-       m_mousePressNode->renderer()->canBeProgramaticallyScrolled(true));
+      (m_mousePressNode && m_mousePressNode->renderBox() &&
+       m_mousePressNode->renderBox()->canBeProgramaticallyScrolled(true));
 
   return swallowEvent;
 }
@@ -426,7 +426,10 @@ bool EventHandler::handleMouseDraggedEvent(
     // should handle the autoscroll
     // Otherwise, let the bridge handle it so the view can scroll itself.
     RenderObject* renderer = targetNode->renderer();
-    while (renderer && !renderer->canBeProgramaticallyScrolled(false)) {
+    while (renderer &&
+           (!renderer->isBox() ||
+            !RenderBox::toRenderBox(renderer)->canBeProgramaticallyScrolled(
+                false))) {
       if (!renderer->parent() && renderer->node() == renderer->document() &&
           renderer->document()->ownerElement())
         renderer = renderer->document()->ownerElement()->renderer();
@@ -477,7 +480,7 @@ void EventHandler::updateSelectionForMouseDrag() {
   FrameView* view = m_frame->view();
   if (!view)
     return;
-  RenderObject* renderer = m_frame->contentRenderer();
+  RenderView* renderer = m_frame->contentRenderer();
   if (!renderer)
     return;
   RenderLayer* layer = renderer->layer();
@@ -627,7 +630,7 @@ void EventHandler::handleAutoscroll(RenderObject* renderer) {
 
 void EventHandler::autoscrollTimerFired(Timer<EventHandler>*) {
   RenderObject* r = autoscrollRenderer();
-  if (!r) {
+  if (!r || !r->isBox()) {
     stopAutoscrollTimer();
     return;
   }
@@ -637,7 +640,7 @@ void EventHandler::autoscrollTimerFired(Timer<EventHandler>*) {
       stopAutoscrollTimer();
       return;
     }
-    r->autoscroll();
+    RenderBox::toRenderBox(r)->autoscroll();
   } else {
     // we verify that the main frame hasn't received the order to stop the
     // panScroll
@@ -701,8 +704,9 @@ void EventHandler::updateAutoscrollRenderer() {
   if (Node* nodeAtPoint = hitTest.innerNode())
     m_autoscrollRenderer = nodeAtPoint->renderer();
 
-  while (m_autoscrollRenderer &&
-         !m_autoscrollRenderer->canBeProgramaticallyScrolled(false))
+  while (m_autoscrollRenderer && (!m_autoscrollRenderer->isBox() ||
+                                  !RenderBox::toRenderBox(m_autoscrollRenderer)
+                                       ->canBeProgramaticallyScrolled(false)))
     m_autoscrollRenderer = m_autoscrollRenderer->parent();
 }
 
@@ -795,7 +799,7 @@ void EventHandler::stopAutoscrollTimer(bool rendererIsBeingDestroyed) {
   if (autoscrollRenderer()) {
     if (!rendererIsBeingDestroyed &&
         (m_autoscrollInProgress || m_panScrollInProgress))
-      autoscrollRenderer()->stopAutoscroll();
+      RenderBox::toRenderBox(autoscrollRenderer())->stopAutoscroll();
 #if ENABLE(PAN_SCROLLING)
     if (m_panScrollInProgress) {
       m_frame->view()->removePanScrollIcon();
@@ -835,8 +839,8 @@ bool EventHandler::scrollOverflow(ScrollDirection direction,
 
   if (node) {
     RenderObject* r = node->renderer();
-    if (r && !r->isListBox())
-      return r->scroll(direction, granularity);
+    if (r && r->isBox() && !r->isListBox())
+      return RenderBox::toRenderBox(r)->scroll(direction, granularity);
   }
 
   return false;
@@ -1748,7 +1752,7 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
 
   HitTestRequest request(true, false);
   HitTestResult result(vPoint);
-  doc->renderer()->layer()->hitTest(request, result);
+  doc->renderView()->layer()->hitTest(request, result);
   Node* node = result.innerNode();
 
   if (node) {
@@ -1871,7 +1875,7 @@ void EventHandler::hoverTimerFired(Timer<EventHandler>*) {
   ASSERT(m_frame);
   ASSERT(m_frame->document());
 
-  if (RenderObject* renderer = m_frame->contentRenderer()) {
+  if (RenderView* renderer = m_frame->contentRenderer()) {
     HitTestResult result(
         m_frame->view()->windowToContents(m_currentMousePosition));
     renderer->layer()->hitTest(HitTestRequest(false, false, true), result);

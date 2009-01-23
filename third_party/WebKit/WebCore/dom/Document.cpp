@@ -931,7 +931,7 @@ Element* Document::elementFromPoint(int x, int y) const {
 
   HitTestRequest request(true, true);
   HitTestResult result(IntPoint(x, y));
-  renderer()->layer()->hitTest(request, result);
+  renderView()->layer()->hitTest(request, result);
 
   Node* n = result.innerNode();
   while (n && !n->isElementNode())
@@ -1392,6 +1392,10 @@ void Document::removeAllDisconnectedNodeEventListeners() {
        i != end; ++i)
     EventTargetNodeCast(*i)->removeAllEventListeners();
   m_disconnectedNodesWithEventListeners.clear();
+}
+
+RenderView* Document::renderView() const {
+  return static_cast<RenderView*>(renderer());
 }
 
 void Document::clearAXObjectCache() {
@@ -2043,7 +2047,7 @@ MouseEventWithHitTestResults Document::prepareMouseEvent(
     return MouseEventWithHitTestResults(event, HitTestResult(IntPoint()));
 
   HitTestResult result(documentPoint);
-  renderer()->layer()->hitTest(request, result);
+  renderView()->layer()->hitTest(request, result);
 
   if (!request.readonly)
     updateRendering();

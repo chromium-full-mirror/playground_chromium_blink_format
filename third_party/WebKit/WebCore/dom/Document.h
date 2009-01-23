@@ -97,6 +97,7 @@ class ProcessingInstruction;
 class Range;
 class RegisteredEventListener;
 class RenderArena;
+class RenderView;
 class SecurityOrigin;
 class Settings;
 class StyleSheet;
@@ -466,6 +467,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void clearFramePointer();
 
   RenderArena* renderArena() { return m_renderArena; }
+
+  RenderView* renderView() const;
 
   void clearAXObjectCache();
   AXObjectCache* axObjectCache() const;

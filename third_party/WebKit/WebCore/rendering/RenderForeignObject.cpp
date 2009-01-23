@@ -80,10 +80,6 @@ void RenderForeignObject::computeAbsoluteRepaintRect(IntRect& r, bool f) {
   RenderBlock::computeAbsoluteRepaintRect(r, f);
 }
 
-bool RenderForeignObject::requiresLayer() {
-  return false;
-}
-
 bool RenderForeignObject::calculateLocalTransform() {
   TransformationMatrix oldTransform = m_localTransform;
   m_localTransform = static_cast<SVGForeignObjectElement*>(element())

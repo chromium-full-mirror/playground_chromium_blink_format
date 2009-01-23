@@ -40,7 +40,7 @@ class RenderScrollbarPart : public RenderBlock {
 
   virtual const char* renderName() const { return "RenderScrollbarPart"; }
 
-  virtual bool requiresLayer() { return false; }
+  virtual bool requiresLayer() const { return false; }
 
   virtual void layout();
   virtual void calcPrefWidths();

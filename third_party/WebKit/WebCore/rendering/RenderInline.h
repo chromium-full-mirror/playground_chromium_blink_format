@@ -68,8 +68,9 @@ class RenderInline : public RenderFlow {
                            int ty,
                            HitTestAction);
 
-  // overrides RenderObject
-  virtual bool requiresLayer();
+  virtual bool requiresLayer() const {
+    return isRelPositioned() || isTransparent() || hasMask();
+  }
 
   int boundingBoxWidth() const;
   int boundingBoxHeight() const;

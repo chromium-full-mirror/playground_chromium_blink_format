@@ -187,10 +187,6 @@ IntRect RenderPath::absoluteClippedOverflowRect() {
   return enclosingIntRect(repaintRect);
 }
 
-bool RenderPath::requiresLayer() {
-  return false;
-}
-
 int RenderPath::lineHeight(bool, bool) const {
   return relativeBBox(true).height();
 }

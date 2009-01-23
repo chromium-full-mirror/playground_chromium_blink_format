@@ -65,7 +65,10 @@ class RenderTableCell : public RenderBlock {
 
   Length styleOrColWidth() const;
 
-  virtual bool requiresLayer();
+  virtual bool requiresLayer() const {
+    return isPositioned() || isTransparent() || hasOverflowClip() ||
+           hasTransform() || hasMask() || hasReflection();
+  }
 
   virtual void calcPrefWidths();
   virtual void calcWidth();
