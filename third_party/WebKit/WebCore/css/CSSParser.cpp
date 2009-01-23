@@ -4039,9 +4039,9 @@ static PassRefPtr<CSSPrimitiveValue> parseGradientPoint(CSSParserValue* a,
   return result;
 }
 
-bool parseGradientColorStop(CSSParser* p,
-                            CSSParserValue* a,
-                            CSSGradientColorStop& stop) {
+static bool parseGradientColorStop(CSSParser* p,
+                                   CSSParserValue* a,
+                                   CSSGradientColorStop& stop) {
   if (a->unit != CSSParserValue::Function)
     return false;
 

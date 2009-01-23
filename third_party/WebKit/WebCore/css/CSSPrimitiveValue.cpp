@@ -485,7 +485,7 @@ void CSSPrimitiveValue::setFloatValue(unsigned short unitType,
   m_type = unitType;
 }
 
-double scaleFactorForConversion(unsigned short unitType) {
+static double scaleFactorForConversion(unsigned short unitType) {
   double factor = 1.0;
   switch (unitType) {
     case CSSPrimitiveValue::CSS_PX:

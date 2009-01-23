@@ -2036,7 +2036,7 @@ void RenderBlock::paintEllipsisBoxes(PaintInfo& paintInfo, int tx, int ty) {
   }
 }
 
-ContinuationOutlineTableMap* continuationOutlineTable() {
+static ContinuationOutlineTableMap* continuationOutlineTable() {
   DEFINE_STATIC_LOCAL(ContinuationOutlineTableMap, table, ());
   return &table;
 }
@@ -5030,10 +5030,10 @@ static RootInlineBox* getLineAtIndex(RenderBlock* block, int i, int& count) {
   return 0;
 }
 
-int getHeightForLineCount(RenderBlock* block,
-                          int l,
-                          bool includeBottom,
-                          int& count) {
+static int getHeightForLineCount(RenderBlock* block,
+                                 int l,
+                                 bool includeBottom,
+                                 int& count) {
   if (block->style()->visibility() == VISIBLE) {
     if (block->childrenInline()) {
       for (RootInlineBox* box = block->firstRootBox(); box;

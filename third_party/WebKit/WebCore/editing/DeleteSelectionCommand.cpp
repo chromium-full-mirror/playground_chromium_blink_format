@@ -448,10 +448,10 @@ void DeleteSelectionCommand::removeNode(PassRefPtr<Node> node) {
   CompositeEditCommand::removeNode(node);
 }
 
-void updatePositionForTextRemoval(Node* node,
-                                  int offset,
-                                  int count,
-                                  Position& position) {
+static void updatePositionForTextRemoval(Node* node,
+                                         int offset,
+                                         int count,
+                                         Position& position) {
   if (position.node() == node) {
     if (position.offset() > offset + count)
       position = Position(position.node(), position.offset() - count);

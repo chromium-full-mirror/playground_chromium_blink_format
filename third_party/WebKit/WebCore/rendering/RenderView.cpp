@@ -269,7 +269,8 @@ void RenderView::absoluteQuads(Vector<FloatQuad>& quads, bool) {
   quads.append(FloatRect(0, 0, m_layer->width(), m_layer->height()));
 }
 
-RenderObject* rendererAfterPosition(RenderObject* object, unsigned offset) {
+static RenderObject* rendererAfterPosition(RenderObject* object,
+                                           unsigned offset) {
   if (!object)
     return 0;
 

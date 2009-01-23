@@ -217,7 +217,7 @@ bool RenderStyle::inheritedNotEqual(RenderStyle* other) const {
          rareInheritedData != other->rareInheritedData;
 }
 
-bool positionedObjectMoved(const LengthBox& a, const LengthBox& b) {
+static bool positionedObjectMoved(const LengthBox& a, const LengthBox& b) {
   // If any unit types are different, then we can't guarantee
   // that this was just a movement.
   if (a.left().type() != b.left().type() ||

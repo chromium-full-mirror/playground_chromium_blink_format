@@ -50,11 +50,11 @@ TransformationMatrix SVGTransformable::getScreenCTM(
   return animatedLocalTransform() * ctm;
 }
 
-int parseTransformParamList(const UChar*& ptr,
-                            const UChar* end,
-                            float* values,
-                            int required,
-                            int optional) {
+static int parseTransformParamList(const UChar*& ptr,
+                                   const UChar* end,
+                                   float* values,
+                                   int required,
+                                   int optional) {
   int optionalParams = 0, requiredParams = 0;
 
   if (!skipOptionalSpaces(ptr, end) || *ptr != '(')

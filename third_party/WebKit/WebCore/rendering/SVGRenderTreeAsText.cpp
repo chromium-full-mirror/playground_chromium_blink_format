@@ -84,7 +84,7 @@ TextStream& operator<<(TextStream& ts, const IntRect& r) {
             << r.height();
 }
 
-bool hasFractions(double val) {
+static bool hasFractions(double val) {
   double epsilon = 0.0001;
   int ival = static_cast<int>(val);
   double dval = static_cast<double>(ival);

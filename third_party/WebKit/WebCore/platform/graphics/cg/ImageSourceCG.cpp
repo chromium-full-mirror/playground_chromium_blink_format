@@ -60,7 +60,7 @@ void ImageSource::clear(bool,
     setData(data, allDataReceived);
 }
 
-CFDictionaryRef imageSourceOptions() {
+static CFDictionaryRef imageSourceOptions() {
   static CFDictionaryRef options;
 
   if (!options) {

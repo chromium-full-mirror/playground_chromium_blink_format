@@ -472,7 +472,7 @@ VisiblePosition VisiblePosition::honorEditableBoundaryAtOrAfter(
                                                   highestRoot);
 }
 
-Position canonicalizeCandidate(const Position& candidate) {
+static Position canonicalizeCandidate(const Position& candidate) {
   if (candidate.isNull())
     return Position();
   ASSERT(candidate.isCandidate());

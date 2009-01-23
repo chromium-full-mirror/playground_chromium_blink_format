@@ -49,7 +49,7 @@ using namespace std;
 
 namespace WebCore {
 
-TextStream& operator<<(TextStream& ts, GradientSpreadMethod m) {
+static TextStream& operator<<(TextStream& ts, GradientSpreadMethod m) {
   switch (m) {
     case SpreadMethodPad:
       ts << "PAD";
@@ -65,7 +65,8 @@ TextStream& operator<<(TextStream& ts, GradientSpreadMethod m) {
   return ts;
 }
 
-TextStream& operator<<(TextStream& ts, const Vector<SVGGradientStop>& l) {
+static TextStream& operator<<(TextStream& ts,
+                              const Vector<SVGGradientStop>& l) {
   ts << "[";
   for (Vector<SVGGradientStop>::const_iterator it = l.begin(); it != l.end();
        ++it) {

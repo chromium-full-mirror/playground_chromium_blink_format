@@ -392,8 +392,9 @@ struct SVGTextRunWalkerMeasuredLengthData {
   const Font* font;
 };
 
-bool floatWidthUsingSVGFontCallback(const SVGGlyphIdentifier& identifier,
-                                    SVGTextRunWalkerMeasuredLengthData& data) {
+static bool floatWidthUsingSVGFontCallback(
+    const SVGGlyphIdentifier& identifier,
+    SVGTextRunWalkerMeasuredLengthData& data) {
   if (data.at >= data.from && data.at < data.to)
     data.length += identifier.horizontalAdvanceX * data.scale;
 
@@ -401,8 +402,9 @@ bool floatWidthUsingSVGFontCallback(const SVGGlyphIdentifier& identifier,
   return data.at < data.to;
 }
 
-void floatWidthMissingGlyphCallback(const TextRun& run,
-                                    SVGTextRunWalkerMeasuredLengthData& data) {
+static void floatWidthMissingGlyphCallback(
+    const TextRun& run,
+    SVGTextRunWalkerMeasuredLengthData& data) {
   // Handle system font fallback
   FontDescription fontDescription(data.font->fontDescription());
   fontDescription.setFamily(FontFamily());
@@ -508,14 +510,14 @@ struct SVGTextRunWalkerDrawTextData {
   Vector<UChar> fallbackCharacters;
 };
 
-bool drawTextUsingSVGFontCallback(const SVGGlyphIdentifier& identifier,
-                                  SVGTextRunWalkerDrawTextData& data) {
+static bool drawTextUsingSVGFontCallback(const SVGGlyphIdentifier& identifier,
+                                         SVGTextRunWalkerDrawTextData& data) {
   data.glyphIdentifiers.append(identifier);
   return true;
 }
 
-void drawTextMissingGlyphCallback(const TextRun& run,
-                                  SVGTextRunWalkerDrawTextData& data) {
+static void drawTextMissingGlyphCallback(const TextRun& run,
+                                         SVGTextRunWalkerDrawTextData& data) {
   ASSERT(run.length() == 1);
   data.glyphIdentifiers.append(SVGGlyphIdentifier());
   data.fallbackCharacters.append(run[0]);

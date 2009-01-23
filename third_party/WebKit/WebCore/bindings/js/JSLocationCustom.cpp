@@ -38,23 +38,26 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSValuePtr nonCachingStaticReplaceFunctionGetter(ExecState* exec,
-                                                 const Identifier& propertyName,
-                                                 const PropertySlot&) {
+static JSValuePtr nonCachingStaticReplaceFunctionGetter(
+    ExecState* exec,
+    const Identifier& propertyName,
+    const PropertySlot&) {
   return new (exec) PrototypeFunction(exec, 1, propertyName,
                                       jsLocationPrototypeFunctionReplace);
 }
 
-JSValuePtr nonCachingStaticReloadFunctionGetter(ExecState* exec,
-                                                const Identifier& propertyName,
-                                                const PropertySlot&) {
+static JSValuePtr nonCachingStaticReloadFunctionGetter(
+    ExecState* exec,
+    const Identifier& propertyName,
+    const PropertySlot&) {
   return new (exec) PrototypeFunction(exec, 0, propertyName,
                                       jsLocationPrototypeFunctionReload);
 }
 
-JSValuePtr nonCachingStaticAssignFunctionGetter(ExecState* exec,
-                                                const Identifier& propertyName,
-                                                const PropertySlot&) {
+static JSValuePtr nonCachingStaticAssignFunctionGetter(
+    ExecState* exec,
+    const Identifier& propertyName,
+    const PropertySlot&) {
   return new (exec) PrototypeFunction(exec, 1, propertyName,
                                       jsLocationPrototypeFunctionAssign);
 }
@@ -88,7 +91,7 @@ bool JSLocation::customGetOwnPropertySlot(ExecState* exec,
       slot.setCustom(this, nonCachingStaticReplaceFunctionGetter);
       return true;
     } else if (entry->function() == jsLocationPrototypeFunctionReload) {
-      slot.setCustom(this, nonCachingStaticReplaceFunctionGetter);
+      slot.setCustom(this, nonCachingStaticReloadFunctionGetter);
       return true;
     } else if (entry->function() == jsLocationPrototypeFunctionAssign) {
       slot.setCustom(this, nonCachingStaticAssignFunctionGetter);
