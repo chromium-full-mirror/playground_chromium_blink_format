@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2008, 2009 Google, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,8 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PNG_DECODER_H_
-#define PNG_DECODER_H_
+#ifndef PNGImageDecoder_h
+#define PNGImageDecoder_h
 
 #include "ImageDecoder.h"
 
@@ -53,7 +54,7 @@ class PNGImageDecoder : public ImageDecoder {
   PNGImageReader* reader() { return m_reader; }
 
   // Callbacks from libpng
-  void decodingFailed() { m_failed = true; }
+  void decodingFailed();
   void headerAvailable();
   void rowAvailable(unsigned char* rowBuffer,
                     unsigned rowIndex,
@@ -63,6 +64,7 @@ class PNGImageDecoder : public ImageDecoder {
  private:
   mutable PNGImageReader* m_reader;
 };
-}
+
+}  // namespace WebCore
 
 #endif

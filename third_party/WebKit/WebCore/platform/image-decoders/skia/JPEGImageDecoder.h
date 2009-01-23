@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2008, 2009 Google, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,8 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef JPEG_DECODER_H_
-#define JPEG_DECODER_H_
+#ifndef JPEGImageDecoder_h
+#define JPEGImageDecoder_h
 
 #include "ImageDecoder.h"
 
@@ -54,19 +55,14 @@ class JPEGImageDecoder : public ImageDecoder {
 
   JPEGImageReader* reader() { return m_reader; }
 
-  void setSize(int width, int height) {
-    if (!m_sizeAvailable) {
-      m_sizeAvailable = true;
-      m_size = IntSize(width, height);
-    }
-  }
-
   bool outputScanlines();
   void jpegComplete();
 
  private:
+  friend class JPEGImageReader;
   mutable JPEGImageReader* m_reader;
 };
-}
+
+}  // namespace WebCore
 
 #endif
