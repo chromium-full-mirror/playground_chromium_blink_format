@@ -28,7 +28,7 @@
 
 #include "KURL.h"
 #include <wtf/OwnPtr.h>
-#include "ScriptCachedPageData.h"
+#include "ScriptCachedFrameData.h"
 
 namespace WebCore {
 
@@ -74,7 +74,7 @@ class CachedPage : public RefCounted<CachedPage> {
   RefPtr<FrameView> m_view;
   RefPtr<Node> m_mousePressNode;
   KURL m_URL;
-  ScriptCachedPageData m_cachedPageScriptData;
+  ScriptCachedFrameData m_cachedPageScriptData;
   OwnPtr<CachedPagePlatformData> m_cachedPagePlatformData;
 };
 
