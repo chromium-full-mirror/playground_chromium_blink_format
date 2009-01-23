@@ -57,6 +57,7 @@
 #include "PluginDebug.h"
 #include "PluginMainThreadScheduler.h"
 #include "PluginPackage.h"
+#include "RenderBox.h"
 #include "RenderObject.h"
 #include "c_instance.h"
 #include "npruntime_impl.h"
@@ -947,9 +948,9 @@ void PluginView::invalidateWindowlessPluginRect(const IntRect& rect) {
   if (!isVisible())
     return;
 
-  RenderObject* renderer = m_element->renderer();
-  if (!renderer)
+  if (!m_element->renderer())
     return;
+  RenderBox* renderer = RenderBox::toRenderBox(m_element->renderer());
 
   IntRect dirtyRect = rect;
   dirtyRect.move(renderer->borderLeft() + renderer->paddingLeft(),
