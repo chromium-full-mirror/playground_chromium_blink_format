@@ -290,6 +290,18 @@ static bool isUnstyledStyleSpan(const Node* node) {
          elem->getAttribute(classAttr) == styleSpanClassString();
 }
 
+static bool isSpanWithoutAttributesOrUnstyleStyleSpan(const Node* node) {
+  if (!node || !node->isHTMLElement() || !node->hasTagName(spanTag))
+    return false;
+
+  const HTMLElement* elem = static_cast<const HTMLElement*>(node);
+  NamedAttrMap* attributes = elem->attributes(true);  // readonly
+  if (attributes->length() == 0)
+    return true;
+
+  return isUnstyledStyleSpan(node);
+}
+
 static bool isEmptyFontTag(const Node* node) {
   if (!node || !node->hasTagName(fontTag))
     return false;
@@ -612,6 +624,8 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
     }
     if (inlineStyleDecl->length() == 0) {
       removeNodeAttribute(element.get(), styleAttr);
+      // FIXME: should this be isSpanWithoutAttributesOrUnstyleStyleSpan?  Need
+      // a test.
       if (isUnstyledStyleSpan(element.get()))
         unstyledSpans.append(element.release());
     }
@@ -755,6 +769,8 @@ void ApplyStyleCommand::removeEmbeddingUpToEnclosingBlock(
           inlineStyle->setProperty(CSSPropertyUnicodeBidi, CSSValueNormal);
           inlineStyle->removeProperty(CSSPropertyDirection);
           setNodeAttribute(element, styleAttr, inlineStyle->cssText());
+          // FIXME: should this be isSpanWithoutAttributesOrUnstyleStyleSpan?
+          // Need a test.
           if (isUnstyledStyleSpan(element))
             removeNodePreservingChildren(element);
         }
@@ -1103,6 +1119,8 @@ void ApplyStyleCommand::removeHTMLBidiEmbeddingStyle(
 
   removeNodeAttribute(elem, dirAttr);
 
+  // FIXME: should this be isSpanWithoutAttributesOrUnstyleStyleSpan?  Need a
+  // test.
   if (isUnstyledStyleSpan(elem))
     removeNodePreservingChildren(elem);
 }
@@ -1135,7 +1153,7 @@ void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
   if (decl->length() == 0)
     removeNodeAttribute(elem, styleAttr);
 
-  if (isUnstyledStyleSpan(elem))
+  if (isSpanWithoutAttributesOrUnstyleStyleSpan(elem))
     removeNodePreservingChildren(elem);
 }
 
