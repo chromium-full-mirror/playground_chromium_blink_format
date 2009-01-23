@@ -127,7 +127,7 @@ void RenderSVGRoot::applyContentTransforms(PaintInfo& paintInfo,
   // renderers)
   IntPoint origin;
   origin.move(parentX, parentY);
-  origin.move(x(), m_frameRect.y());
+  origin.move(x(), y());
   origin.move(borderLeft(), borderTop());
   origin.move(paddingLeft(), paddingTop());
 
@@ -175,7 +175,7 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   // This should only exist for <svg> renderers
   if (hasBoxDecorations() && (paintInfo.phase == PaintPhaseForeground ||
                               paintInfo.phase == PaintPhaseSelection))
-    paintBoxDecorations(paintInfo, x() + parentX, m_frameRect.y() + parentY);
+    paintBoxDecorations(paintInfo, x() + parentX, y() + parentY);
 
   if (!firstChild()) {
 #if ENABLE(SVG_FILTERS)
@@ -284,7 +284,7 @@ void RenderSVGRoot::absoluteQuads(Vector<FloatQuad>& quads, bool) {
 
 TransformationMatrix RenderSVGRoot::absoluteTransform() const {
   TransformationMatrix ctm = RenderContainer::absoluteTransform();
-  ctm.translate(x(), m_frameRect.y());
+  ctm.translate(x(), y());
   SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
   ctm.scale(svg->currentScale());
   ctm.translate(svg->currentTranslate().x(), svg->currentTranslate().y());
@@ -329,7 +329,7 @@ bool RenderSVGRoot::nodeAtPoint(const HitTestRequest& request,
   if (!viewport().isEmpty() && style()->overflowX() == OHIDDEN &&
       style()->overflowY() == OHIDDEN) {
     int tx = x() - _tx + sx;
-    int ty = m_frameRect.y() - _ty + sy;
+    int ty = y() - _ty + sy;
 
     // Check if we need to do anything at all.
     IntRect overflowBox = overflowRect(false);

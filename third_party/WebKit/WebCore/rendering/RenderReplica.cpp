@@ -38,7 +38,7 @@ RenderReplica::RenderReplica(Node* n) : RenderBox(n) {}
 RenderReplica::~RenderReplica() {}
 
 void RenderReplica::layout() {
-  m_frameRect = parentBox()->borderBoxRect();
+  setFrameRect(parentBox()->borderBoxRect());
   setNeedsLayout(false);
 }
 
@@ -54,7 +54,7 @@ void RenderReplica::paint(PaintInfo& paintInfo, int tx, int ty) {
     return;
 
   tx += x();
-  ty += m_frameRect.y();
+  ty += y();
 
   if (paintInfo.phase == PaintPhaseForeground)
     // Turn around and paint the parent layer. Use temporary clipRects, so that

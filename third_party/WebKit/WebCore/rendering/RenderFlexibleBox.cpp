@@ -213,7 +213,7 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren) {
     oldOutlineBox = absoluteOutlineBounds();
   }
 
-  LayoutStateMaintainer statePusher(view(), this, IntSize(x(), m_frameRect.y()),
+  LayoutStateMaintainer statePusher(view(), this, IntSize(x(), y()),
                                     hasTransform() || hasReflection());
 
   int previousWidth = width();

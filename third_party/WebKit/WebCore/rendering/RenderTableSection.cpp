@@ -292,7 +292,7 @@ void RenderTableSection::setCellWidths() {
           if (!statePusher.didPush()) {
             // Technically, we should also push state for the row, but since
             // rows don't push a coordinate transform, that's not necessary.
-            statePusher.push(this, IntSize(x(), m_frameRect.y()));
+            statePusher.push(this, IntSize(x(), y()));
           }
           cell->repaint();
         }
@@ -341,7 +341,7 @@ int RenderTableSection::calcRowHeight() {
         if (!statePusher.didPush()) {
           // Technically, we should also push state for the row, but since
           // rows don't push a coordinate transform, that's not necessary.
-          statePusher.push(this, IntSize(x(), m_frameRect.y()));
+          statePusher.push(this, IntSize(x(), y()));
         }
         cell->setOverrideSize(-1);
         cell->setChildNeedsLayout(true, false);
@@ -477,8 +477,7 @@ int RenderTableSection::layoutRows(int toAdd) {
   int vspacing = table()->vBorderSpacing();
   int nEffCols = table()->numEffCols();
 
-  LayoutStateMaintainer statePusher(view(), this,
-                                    IntSize(x(), m_frameRect.y()));
+  LayoutStateMaintainer statePusher(view(), this, IntSize(x(), y()));
 
   for (int r = 0; r < totalRows; r++) {
     // Set the row's x/y position and width/height.
@@ -930,7 +929,7 @@ void RenderTableSection::paint(PaintInfo& paintInfo, int tx, int ty) {
     return;
 
   tx += x();
-  ty += m_frameRect.y();
+  ty += y();
 
   // Check which rows and cols are visible and only paint these.
   // FIXME: Could use a binary search here.
@@ -1138,7 +1137,7 @@ bool RenderTableSection::nodeAtPoint(const HitTestRequest& request,
   // Table sections cannot ever be hit tested.  Effectively they do not exist.
   // Just forward to our children always.
   tx += x();
-  ty += m_frameRect.y();
+  ty += y();
 
   for (RenderObject* child = lastChild(); child;
        child = child->previousSibling()) {
