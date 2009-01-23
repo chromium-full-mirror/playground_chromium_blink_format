@@ -31,6 +31,7 @@
 #include <WebCore/runtime.h>
 #include <WebCore/runtime_root.h>
 #include <wtf/OwnPtr.h>
+#include "WebKitPluginHostTypes.h"
 
 namespace WebKit {
 
@@ -60,6 +61,10 @@ class ProxyInstance : public JSC::Bindings::Instance {
   virtual JSC::JSValuePtr invokeMethod(JSC::ExecState*,
                                        const JSC::Bindings::MethodList&,
                                        const JSC::ArgList& args);
+  virtual bool supportsInvokeDefaultMethod() const;
+  virtual JSC::JSValuePtr invokeDefaultMethod(JSC::ExecState*,
+                                              const JSC::ArgList&);
+
   virtual JSC::JSValuePtr defaultValue(JSC::ExecState*,
                                        JSC::PreferredPrimitiveType) const;
   virtual JSC::JSValuePtr valueOf(JSC::ExecState*) const;
@@ -67,6 +72,11 @@ class ProxyInstance : public JSC::Bindings::Instance {
   JSC::JSValuePtr stringValue(JSC::ExecState*) const;
   JSC::JSValuePtr numberValue(JSC::ExecState*) const;
   JSC::JSValuePtr booleanValue() const;
+
+  virtual JSC::JSValuePtr invoke(JSC::ExecState*,
+                                 InvokeType,
+                                 uint64_t identifier,
+                                 const JSC::ArgList& args);
 
   NetscapePluginInstanceProxy* m_instanceProxy;
   uint32_t m_objectID;

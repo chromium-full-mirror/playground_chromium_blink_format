@@ -42,6 +42,8 @@ enum LoadURLFlags {
   CurrentEventIsUserGesture = 1 << 3,
 };
 
+enum InvokeType { Invoke, InvokeDefault, Construct };
+
 enum ValueType {
   VoidValueType,
   NullValueType,
