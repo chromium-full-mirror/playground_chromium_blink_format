@@ -548,10 +548,9 @@ IntRect RenderBlock::overflowRect(bool includeInterior) const {
   if (!includeInterior && hasOverflowClip())
     return borderBoxRect();
   int l = overflowLeft(includeInterior);
-  int t = min(overflowTop(includeInterior), -borderTopExtra());
-  return IntRect(
-      l, t, overflowWidth(includeInterior) - l,
-      max(overflowHeight(includeInterior), height() + borderBottomExtra()) - t);
+  int t = overflowTop(includeInterior);
+  return IntRect(l, t, overflowWidth(includeInterior) - l,
+                 max(overflowHeight(includeInterior), height()) - t);
 }
 
 bool RenderBlock::isSelfCollapsingBlock() const {
@@ -722,10 +721,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
 
   // Expand our intrinsic height to encompass floats.
   int toAdd = borderBottom() + paddingBottom() + horizontalScrollbarHeight();
-  if (floatBottom() > (height() - toAdd) &&
-      (isInlineBlockOrInlineTable() || isFloatingOrPositioned() ||
-       hasOverflowClip() ||
-       (parent() && parent()->isFlexibleBox() || m_hasColumns)))
+  if (floatBottom() > (height() - toAdd) && expandsToEncloseOverhangingFloats())
     setHeight(floatBottom() + toAdd);
 
   // Now lay out our columns within this intrinsic height, since they can
@@ -762,12 +758,6 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   }
   if (previousHeight != height())
     relayoutChildren = true;
-
-  // Some classes of objects (floats and fieldsets with no specified heights and
-  // table cells) expand to encompass
-  // overhanging floats.
-  if (hasOverhangingFloats() && expandsToEncloseOverhangingFloats())
-    setHeight(floatBottom() + borderBottom() + paddingBottom());
 
   if ((isCell || isInline() || isFloatingOrPositioned() || isRoot()) &&
       !hasOverflowClip() && !hasControlClip())
@@ -846,6 +836,12 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
     }
   }
   setNeedsLayout(false);
+}
+
+bool RenderBlock::expandsToEncloseOverhangingFloats() const {
+  return isInlineBlockOrInlineTable() || isFloatingOrPositioned() ||
+         hasOverflowClip() || (parent() && parent()->isFlexibleBox()) ||
+         m_hasColumns || isTableCell() || isFieldset();
 }
 
 void RenderBlock::adjustPositionedBlock(RenderObject* child,
@@ -2145,11 +2141,11 @@ GapRects RenderBlock::selectionGapRects() {
     return GapRects();
 
   // FIXME: this is broken with transforms
-  FloatPoint absContentPoint = localToAbsoluteForContent(FloatPoint());
+  FloatPoint absContentPoint = localToAbsolute(FloatPoint());
   if (hasOverflowClip())
     absContentPoint -= layer()->scrolledContentOffset();
 
-  int lastTop = -borderTopExtra();
+  int lastTop = 0;
   int lastLeft = leftSelectionOffset(this, lastTop);
   int lastRight = rightSelectionOffset(this, lastTop);
 
@@ -2160,7 +2156,7 @@ GapRects RenderBlock::selectionGapRects() {
 
 void RenderBlock::paintSelection(PaintInfo& paintInfo, int tx, int ty) {
   if (shouldPaintSelectionGaps() && paintInfo.phase == PaintPhaseForeground) {
-    int lastTop = -borderTopExtra();
+    int lastTop = 0;
     int lastLeft = leftSelectionOffset(this, lastTop);
     int lastRight = rightSelectionOffset(this, lastTop);
     paintInfo.context->save();
@@ -2250,9 +2246,9 @@ GapRects RenderBlock::fillSelectionGaps(RenderBlock* rootBlock,
   // if the selection extends past our block.
   if (rootBlock == this &&
       (m_selectionState != SelectionBoth && m_selectionState != SelectionEnd))
-    result.uniteCenter(fillVerticalSelectionGap(
-        lastTop, lastLeft, lastRight, ty + height() + borderBottomExtra(),
-        rootBlock, blockX, blockY, paintInfo));
+    result.uniteCenter(fillVerticalSelectionGap(lastTop, lastLeft, lastRight,
+                                                ty + height(), rootBlock,
+                                                blockX, blockY, paintInfo));
   return result;
 }
 
@@ -3581,11 +3577,9 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
   // Now hit test our background
   if (!inlineFlow && (hitTestAction == HitTestBlockBackground ||
                       hitTestAction == HitTestChildBlockBackground)) {
-    int topExtra = borderTopExtra();
-    IntRect boundsRect(tx, ty - topExtra, width(),
-                       height() + topExtra + borderBottomExtra());
+    IntRect boundsRect(tx, ty, width(), height());
     if (visibleToHitTesting() && boundsRect.contains(_x, _y)) {
-      updateHitTestResult(result, IntPoint(_x - tx, _y - ty + topExtra));
+      updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
       return true;
     }
   }
@@ -3713,8 +3707,7 @@ VisiblePosition RenderBlock::positionForCoordinates(int x, int y) {
     return RenderFlow::positionForCoordinates(x, y);
 
   int top = borderTop();
-  int bottom = top + borderTopExtra() + paddingTop() + contentHeight() +
-               paddingBottom() + borderBottomExtra();
+  int bottom = top + paddingTop() + contentHeight() + paddingBottom();
 
   int left = borderLeft();
   int right = left + paddingLeft() + contentWidth() + paddingRight();
@@ -3847,8 +3840,6 @@ VisiblePosition RenderBlock::positionForCoordinates(int x, int y) {
 }
 
 void RenderBlock::offsetForContents(int& tx, int& ty) const {
-  ty -= borderTopExtra();
-
   if (hasOverflowClip())
     m_layer->addScrolledContentOffset(tx, ty);
 

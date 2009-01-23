@@ -2469,7 +2469,6 @@ FloatPoint RenderObject::localToAbsolute(FloatPoint localPoint,
                                          bool useTransforms) const {
   RenderObject* o = parent();
   if (o) {
-    localPoint.move(0.0f, static_cast<float>(o->borderTopExtra()));
     if (o->hasOverflowClip())
       localPoint -= o->layer()->scrolledContentOffset();
     return o->localToAbsolute(localPoint, fixed, useTransforms);
@@ -2485,7 +2484,6 @@ FloatPoint RenderObject::absoluteToLocal(FloatPoint containerPoint,
   if (o) {
     FloatPoint localPoint =
         o->absoluteToLocal(containerPoint, fixed, useTransforms);
-    localPoint.move(0.0f, -static_cast<float>(o->borderTopExtra()));
     if (o->hasOverflowClip())
       localPoint += o->layer()->scrolledContentOffset();
     return localPoint;
@@ -2498,7 +2496,6 @@ FloatQuad RenderObject::localToAbsoluteQuad(const FloatQuad& localQuad,
   RenderObject* o = parent();
   if (o) {
     FloatQuad quad = localQuad;
-    quad.move(0.0f, static_cast<float>(o->borderTopExtra()));
     if (o->hasOverflowClip())
       quad -= o->layer()->scrolledContentOffset();
     return o->localToAbsoluteQuad(quad, fixed);
@@ -2511,8 +2508,6 @@ IntSize RenderObject::offsetFromContainer(RenderObject* o) const {
   ASSERT(o == container());
 
   IntSize offset;
-  offset.expand(0, o->borderTopExtra());
-
   if (o->hasOverflowClip())
     offset -= o->layer()->scrolledContentOffset();
 
@@ -2528,7 +2523,7 @@ IntRect RenderObject::localCaretRect(InlineBox*,
   return IntRect();
 }
 
-int RenderObject::paddingTop() const {
+int RenderObject::paddingTop(bool) const {
   int w = 0;
   Length padding = m_style->paddingTop();
   if (padding.isPercent())
@@ -2536,7 +2531,7 @@ int RenderObject::paddingTop() const {
   return padding.calcMinValue(w);
 }
 
-int RenderObject::paddingBottom() const {
+int RenderObject::paddingBottom(bool) const {
   int w = 0;
   Length padding = style()->paddingBottom();
   if (padding.isPercent())
@@ -2544,7 +2539,7 @@ int RenderObject::paddingBottom() const {
   return padding.calcMinValue(w);
 }
 
-int RenderObject::paddingLeft() const {
+int RenderObject::paddingLeft(bool) const {
   int w = 0;
   Length padding = style()->paddingLeft();
   if (padding.isPercent())
@@ -2552,7 +2547,7 @@ int RenderObject::paddingLeft() const {
   return padding.calcMinValue(w);
 }
 
-int RenderObject::paddingRight() const {
+int RenderObject::paddingRight(bool) const {
   int w = 0;
   Length padding = style()->paddingRight();
   if (padding.isPercent())

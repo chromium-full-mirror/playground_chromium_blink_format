@@ -734,7 +734,7 @@ void RenderContainer::addLineBoxRects(Vector<IntRect>& rects,
                                       unsigned end,
                                       bool) {
   if (!m_firstChild && (isInline() || isAnonymousBlock())) {
-    FloatPoint absPos = localToAbsoluteForContent(FloatPoint());
+    FloatPoint absPos = localToAbsolute(FloatPoint());
     absoluteRects(rects, absPos.x(), absPos.y());
     return;
   }
@@ -746,7 +746,7 @@ void RenderContainer::addLineBoxRects(Vector<IntRect>& rects,
   for (RenderObject *child = childAt(start); child && offset < end;
        child = child->nextSibling(), ++offset) {
     if (child->isText() || child->isInline() || child->isAnonymousBlock()) {
-      FloatPoint absPos = child->localToAbsoluteForContent(FloatPoint());
+      FloatPoint absPos = child->localToAbsolute(FloatPoint());
       child->absoluteRects(rects, absPos.x(), absPos.y());
     }
   }

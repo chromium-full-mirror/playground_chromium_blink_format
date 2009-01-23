@@ -470,6 +470,8 @@ class RenderBlock : public RenderFlow {
   void calcColumnWidth();
   int layoutColumns(int endOfContent = -1);
 
+  bool expandsToEncloseOverhangingFloats() const;
+
  protected:
   struct FloatingObject {
     enum Type { FloatLeft, FloatRight };

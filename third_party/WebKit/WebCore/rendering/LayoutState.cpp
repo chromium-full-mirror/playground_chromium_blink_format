@@ -96,7 +96,7 @@ LayoutState::LayoutState(RenderObject* root)
 {
   RenderObject* container = root->container();
   FloatPoint absContentPoint =
-      container->localToAbsoluteForContent(FloatPoint(), false, true);
+      container->localToAbsolute(FloatPoint(), false, true);
   m_offset = IntSize(absContentPoint.x(), absContentPoint.y());
 }
 

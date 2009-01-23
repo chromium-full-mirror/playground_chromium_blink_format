@@ -381,7 +381,7 @@ void RenderLayer::updateLayerPosition() {
   clearClipRects();
 
   int x = renderer()->x();
-  int y = renderer()->y() - renderer()->borderTopExtra();
+  int y = renderer()->y();
 
   if (!renderer()->isPositioned() && renderer()->parent()) {
     // We must adjust our position by walking up the render tree looking for the
@@ -396,7 +396,6 @@ void RenderLayer::updateLayerPosition() {
       }
       curr = curr->parentBox();
     }
-    y += curr->borderTopExtra();
     if (curr->isTableRow()) {
       // Put ourselves into the row coordinate space.
       x -= curr->x();
@@ -441,8 +440,7 @@ void RenderLayer::updateLayerPosition() {
     setHeight(inlineFlow->boundingBoxHeight());
   } else {
     setWidth(renderer()->width());
-    setHeight(renderer()->height() + renderer()->borderTopExtra() +
-              renderer()->borderBottomExtra());
+    setHeight(renderer()->height());
   }
 
   if (!renderer()->hasOverflowClip()) {
@@ -1910,7 +1908,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   int x = layerBounds.x();
   int y = layerBounds.y();
   int tx = x - renderer()->x();
-  int ty = y - renderer()->y() + renderer()->borderTopExtra();
+  int ty = y - renderer()->y();
 
   // Ensure our lists are up-to-date.
   updateZOrderLists();
@@ -2176,8 +2174,7 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   if (fgRect.contains(hitTestPoint) &&
       renderer()->hitTest(
           request, result, hitTestPoint, layerBounds.x() - renderer()->x(),
-          layerBounds.y() - renderer()->y() + renderer()->borderTopExtra(),
-          HitTestDescendants)) {
+          layerBounds.y() - renderer()->y(), HitTestDescendants)) {
     // For positioned generated content, we might still not have a
     // node by the time we get to the layer level, since none of
     // the content in the layer has an element. So just walk up
@@ -2206,10 +2203,9 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // Next we want to see if the mouse is inside this layer but not any of its
   // children.
   if (bgRect.contains(hitTestPoint) &&
-      renderer()->hitTest(
-          request, result, hitTestPoint, layerBounds.x() - renderer()->x(),
-          layerBounds.y() - renderer()->y() + renderer()->borderTopExtra(),
-          HitTestSelf)) {
+      renderer()->hitTest(request, result, hitTestPoint,
+                          layerBounds.x() - renderer()->x(),
+                          layerBounds.y() - renderer()->y(), HitTestSelf)) {
     if (!result.innerNode() || !result.innerNonSharedNode()) {
       Node* e = enclosingElement();
       if (!result.innerNode())
@@ -2483,10 +2479,8 @@ IntRect RenderLayer::boundingBox(const RenderLayer* rootLayer) const {
          child = child->nextSibling()) {
       if (child->isTableCell()) {
         IntRect bbox = RenderBox::toRenderBox(child)->borderBoxRect();
-        bbox.move(0, child->borderTopExtra());
         result.unite(bbox);
         IntRect overflowRect = renderer()->overflowRect(false);
-        overflowRect.move(0, child->borderTopExtra());
         if (bbox != overflowRect)
           result.unite(overflowRect);
       }
@@ -2505,14 +2499,7 @@ IntRect RenderLayer::boundingBox(const RenderLayer* rootLayer) const {
 
     // We have to adjust the x/y of this result so that it is in the coordinate
     // space of the layer.
-    // We also have to add in intrinsicPaddingTop here, since borderBoxRect(),
-    // in order to play well with methods like
-    // floatRect that deal with child content, uses an origin of (0,0) that is
-    // at the child content box (so
-    // border box returns a y coord of -borderTopExtra().  The layer, however,
-    // uses the outer box.  This is all
-    // really confusing.
-    result.move(m_x, m_y + renderer()->borderTopExtra());
+    result.move(m_x, m_y);
   }
 
   // Convert the bounding box to an absolute position.  We can do this easily by

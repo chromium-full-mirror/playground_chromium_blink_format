@@ -41,9 +41,6 @@ class RenderFieldset : public RenderBlock {
 
   virtual void calcPrefWidths();
   virtual bool avoidsFloats() const { return true; }
-  virtual bool expandsToEncloseOverhangingFloats() const {
-    return style()->height().isAuto();
-  }
   virtual bool stretchesToMinIntrinsicWidth() const { return true; }
 
   RenderBox* findLegend() const;

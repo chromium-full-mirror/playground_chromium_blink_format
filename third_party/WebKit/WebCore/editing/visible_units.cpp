@@ -505,8 +505,7 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
 
   if (root) {
     // FIXME: Can be wrong for multi-column layout and with transforms.
-    FloatPoint absPos =
-        containingBlock->localToAbsoluteForContent(FloatPoint());
+    FloatPoint absPos = containingBlock->localToAbsolute(FloatPoint());
     if (containingBlock->hasOverflowClip())
       absPos -= containingBlock->layer()->scrolledContentOffset();
     RenderObject* renderer =
@@ -612,8 +611,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
 
   if (root) {
     // FIXME: Can be wrong for multi-column layout and with transforms.
-    FloatPoint absPos =
-        containingBlock->localToAbsoluteForContent(FloatPoint());
+    FloatPoint absPos = containingBlock->localToAbsolute(FloatPoint());
     if (containingBlock->hasOverflowClip())
       absPos -= containingBlock->layer()->scrolledContentOffset();
     RenderObject* renderer =

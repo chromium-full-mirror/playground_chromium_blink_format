@@ -739,12 +739,11 @@ IntRect RenderFlow::localCaretRect(InlineBox* inlineBox,
 
       int myRight = x + caretWidth;
       // FIXME: why call localToAbsoluteForContent() twice here, too?
-      FloatPoint absRightPoint =
-          localToAbsoluteForContent(FloatPoint(myRight, 0));
+      FloatPoint absRightPoint = localToAbsolute(FloatPoint(myRight, 0));
 
       int containerRight = containingBlock()->x() + containingBlockWidth();
       FloatPoint absContainerPoint =
-          localToAbsoluteForContent(FloatPoint(containerRight, 0));
+          localToAbsolute(FloatPoint(containerRight, 0));
 
       *extraWidthToEndOfLine = absContainerPoint.x() - absRightPoint.x();
     }
