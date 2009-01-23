@@ -52,12 +52,18 @@ class SharedTimerQt : public QObject {
 
  private:
   SharedTimerQt(QObject* parent);
+  ~SharedTimerQt();
   QBasicTimer m_timer;
   void (*m_timerFunction)();
 };
 
 SharedTimerQt::SharedTimerQt(QObject* parent)
     : QObject(parent), m_timerFunction(0) {}
+
+SharedTimerQt::~SharedTimerQt() {
+  if (m_timer.isActive())
+    (m_timerFunction)();
+}
 
 SharedTimerQt* SharedTimerQt::inst() {
   static QPointer<SharedTimerQt> timer;
