@@ -188,8 +188,7 @@ void HTMLFormControlElement::recalcStyle(StyleChange change) {
 bool HTMLFormControlElement::isFocusable() const {
   if (disabled() || !renderer() ||
       (renderer()->style() && renderer()->style()->visibility() != VISIBLE) ||
-      !renderer()->isBox() ||
-      RenderBox::toRenderBox(renderer())->size().isEmpty())
+      !renderer()->isBox() || toRenderBox(renderer())->size().isEmpty())
     return false;
   return true;
 }

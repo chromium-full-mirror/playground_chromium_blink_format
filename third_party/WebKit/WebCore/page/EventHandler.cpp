@@ -428,8 +428,7 @@ bool EventHandler::handleMouseDraggedEvent(
     RenderObject* renderer = targetNode->renderer();
     while (renderer &&
            (!renderer->isBox() ||
-            !RenderBox::toRenderBox(renderer)->canBeProgramaticallyScrolled(
-                false))) {
+            !toRenderBox(renderer)->canBeProgramaticallyScrolled(false))) {
       if (!renderer->parent() && renderer->node() == renderer->document() &&
           renderer->document()->ownerElement())
         renderer = renderer->document()->ownerElement()->renderer();
@@ -640,7 +639,7 @@ void EventHandler::autoscrollTimerFired(Timer<EventHandler>*) {
       stopAutoscrollTimer();
       return;
     }
-    RenderBox::toRenderBox(r)->autoscroll();
+    toRenderBox(r)->autoscroll();
   } else {
     // we verify that the main frame hasn't received the order to stop the
     // panScroll
@@ -704,9 +703,10 @@ void EventHandler::updateAutoscrollRenderer() {
   if (Node* nodeAtPoint = hitTest.innerNode())
     m_autoscrollRenderer = nodeAtPoint->renderer();
 
-  while (m_autoscrollRenderer && (!m_autoscrollRenderer->isBox() ||
-                                  !RenderBox::toRenderBox(m_autoscrollRenderer)
-                                       ->canBeProgramaticallyScrolled(false)))
+  while (
+      m_autoscrollRenderer &&
+      (!m_autoscrollRenderer->isBox() ||
+       !toRenderBox(m_autoscrollRenderer)->canBeProgramaticallyScrolled(false)))
     m_autoscrollRenderer = m_autoscrollRenderer->parent();
 }
 
@@ -799,7 +799,7 @@ void EventHandler::stopAutoscrollTimer(bool rendererIsBeingDestroyed) {
   if (autoscrollRenderer()) {
     if (!rendererIsBeingDestroyed &&
         (m_autoscrollInProgress || m_panScrollInProgress))
-      RenderBox::toRenderBox(autoscrollRenderer())->stopAutoscroll();
+      toRenderBox(autoscrollRenderer())->stopAutoscroll();
 #if ENABLE(PAN_SCROLLING)
     if (m_panScrollInProgress) {
       m_frame->view()->removePanScrollIcon();
@@ -840,7 +840,7 @@ bool EventHandler::scrollOverflow(ScrollDirection direction,
   if (node) {
     RenderObject* r = node->renderer();
     if (r && r->isBox() && !r->isListBox())
-      return RenderBox::toRenderBox(r)->scroll(direction, granularity);
+      return toRenderBox(r)->scroll(direction, granularity);
   }
 
   return false;

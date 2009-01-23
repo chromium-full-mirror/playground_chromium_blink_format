@@ -539,9 +539,7 @@ IntRect RenderFlow::absoluteClippedOverflowRect() {
          inlineFlow = inlineFlow->parent()) {
       if (inlineFlow->style()->position() == RelativePosition &&
           inlineFlow->hasLayer())
-        RenderBox::toRenderBox(inlineFlow)
-            ->layer()
-            ->relativePositionOffset(left, top);
+        toRenderBox(inlineFlow)->layer()->relativePositionOffset(left, top);
     }
 
     IntRect r(-ow + left, -ow + top, boundingBox.width() + ow * 2,

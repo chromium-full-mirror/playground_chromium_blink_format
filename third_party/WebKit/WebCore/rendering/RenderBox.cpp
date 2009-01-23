@@ -1632,7 +1632,7 @@ IntSize RenderBox::offsetFromContainer(RenderObject* o) const {
   }
 
   if (o->hasOverflowClip())
-    offset -= RenderBox::toRenderBox(o)->layer()->scrolledContentOffset();
+    offset -= toRenderBox(o)->layer()->scrolledContentOffset();
 
   if (style()->position() == AbsolutePosition)
     offset += offsetForPositionedInContainer(o);
@@ -1791,7 +1791,7 @@ void RenderBox::computeAbsoluteRepaintRect(IntRect& rect, bool fixed) {
   // its controlClipRect will be wrong. For overflow clip we use the values
   // cached by the layer.
   if (o->hasOverflowClip()) {
-    RenderBox* containerBox = RenderBox::toRenderBox(o);
+    RenderBox* containerBox = toRenderBox(o);
 
     // o->height() is inaccurate if we're in the middle of a layout of |o|, so
     // use the
@@ -2448,8 +2448,7 @@ int RenderBox::containingBlockWidthForPositioned(
     return max(0, (fromRight - fromLeft));
   }
 
-  const RenderBox* containingBlockBox =
-      RenderBox::toConstRenderBox(containingBlock);
+  const RenderBox* containingBlockBox = toRenderBox(containingBlock);
   return containingBlockBox->width() - containingBlockBox->borderLeft() -
          containingBlockBox->borderRight() -
          containingBlockBox->verticalScrollbarWidth();
@@ -2457,8 +2456,7 @@ int RenderBox::containingBlockWidthForPositioned(
 
 int RenderBox::containingBlockHeightForPositioned(
     const RenderObject* containingBlock) const {
-  const RenderBox* containingBlockBox =
-      RenderBox::toConstRenderBox(containingBlock);
+  const RenderBox* containingBlockBox = toRenderBox(containingBlock);
 
   int heightResult;
   if (containingBlock->isInlineFlow()) {
@@ -2509,7 +2507,7 @@ void RenderBox::calcAbsoluteHorizontal() {
 
   // We don't use containingBlock(), since we may be positioned by an enclosing
   // relative positioned inline.
-  const RenderBox* containerBlock = RenderBox::toRenderBox(container());
+  const RenderBox* containerBlock = toRenderBox(container());
 
   const int containerWidth = containingBlockWidthForPositioned(containerBlock);
 
@@ -2846,7 +2844,7 @@ void RenderBox::calcAbsoluteVertical() {
 
   // We don't use containingBlock(), since we may be positioned by an enclosing
   // relpositioned inline.
-  const RenderBox* containerBlock = RenderBox::toConstRenderBox(container());
+  const RenderBox* containerBlock = toRenderBox(container());
 
   const int containerHeight =
       containingBlockHeightForPositioned(containerBlock);
@@ -3089,7 +3087,7 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
 
   // We don't use containingBlock(), since we may be positioned by an enclosing
   // relative positioned inline.
-  const RenderBox* containerBlock = RenderBox::toConstRenderBox(container());
+  const RenderBox* containerBlock = toRenderBox(container());
 
   const int containerWidth = containingBlockWidthForPositioned(containerBlock);
 
@@ -3271,7 +3269,7 @@ void RenderBox::calcAbsoluteVerticalReplaced() {
 
   // We don't use containingBlock(), since we may be positioned by an enclosing
   // relpositioned inline.
-  const RenderBox* containerBlock = RenderBox::toConstRenderBox(container());
+  const RenderBox* containerBlock = toRenderBox(container());
 
   const int containerHeight =
       containingBlockHeightForPositioned(containerBlock);

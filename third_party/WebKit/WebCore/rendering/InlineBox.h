@@ -268,7 +268,7 @@ class InlineBox {
   }
 
   // Use with caution! The type is not checked!
-  RenderBox* renderBox() const { return RenderBox::toRenderBox(m_object); }
+  RenderBox* renderBox() const { return toRenderBox(m_object); }
 
  public:
   RenderObject* m_object;

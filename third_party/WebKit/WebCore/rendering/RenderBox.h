@@ -37,15 +37,6 @@ class RenderBox : public RenderObject {
 
   virtual const char* renderName() const { return "RenderBox"; }
 
-  static RenderBox* toRenderBox(RenderObject* o) {
-    ASSERT(!o || o->isBox());
-    return static_cast<RenderBox*>(o);
-  }
-  static const RenderBox* toConstRenderBox(const RenderObject* o) {
-    ASSERT(!o || o->isBox());
-    return static_cast<const RenderBox*>(o);
-  }
-
   int x() const { return m_frameRect.x(); }
   int y() const { return m_frameRect.y(); }
   int width() const { return m_frameRect.width(); }
@@ -88,18 +79,9 @@ class RenderBox : public RenderObject {
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
 
   // Use this with caution! No type checking is done!
-  RenderBox* previousSiblingBox() const {
-    ASSERT(!previousSibling() || previousSibling()->isBox());
-    return toRenderBox(previousSibling());
-  }
-  RenderBox* nextSiblingBox() const {
-    ASSERT(!nextSibling() || nextSibling()->isBox());
-    return toRenderBox(nextSibling());
-  }
-  RenderBox* parentBox() const {
-    ASSERT(!parent() || parent()->isBox());
-    return toRenderBox(parent());
-  }
+  RenderBox* previousSiblingBox() const;
+  RenderBox* nextSiblingBox() const;
+  RenderBox* parentBox() const;
 
   // The height of a block when you include normal flow overflow spillage out of
   // the bottom
@@ -568,6 +550,28 @@ class RenderBox : public RenderObject {
   static bool s_wasFloating;
   static bool s_hadOverflowClip;
 };
+
+inline RenderBox* toRenderBox(RenderObject* o) {
+  ASSERT(!o || o->isBox());
+  return static_cast<RenderBox*>(o);
+}
+
+inline const RenderBox* toRenderBox(const RenderObject* o) {
+  ASSERT(!o || o->isBox());
+  return static_cast<const RenderBox*>(o);
+}
+
+inline RenderBox* RenderBox::previousSiblingBox() const {
+  return toRenderBox(previousSibling());
+}
+
+inline RenderBox* RenderBox::nextSiblingBox() const {
+  return toRenderBox(nextSibling());
+}
+
+inline RenderBox* RenderBox::parentBox() const {
+  return toRenderBox(parent());
+}
 
 }  // namespace WebCore
 
