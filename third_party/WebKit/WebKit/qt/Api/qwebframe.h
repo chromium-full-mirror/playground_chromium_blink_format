@@ -162,6 +162,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
 
   void render(QPainter* painter, const QRegion& clip);
   void render(QPainter* painter);
+  void renderContents(QPainter* painter, const QRegion& contents);
 
   void setTextSizeMultiplier(qreal factor);
   qreal textSizeMultiplier() const;
