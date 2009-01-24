@@ -127,6 +127,14 @@ class RenderFlow : public RenderContainer {
 
   IntRect linesBoundingBox() const;
 
+  virtual IntRect borderBoundingBox() const {
+    if (isInlineFlow()) {
+      IntRect boundingBox = linesBoundingBox();
+      return IntRect(0, 0, boundingBox.width(), boundingBox.height());
+    }
+    return borderBoxRect();
+  }
+
  private:
   // An inline can be split with blocks occurring in between the inline content.
   // When this occurs we need a pointer to our next object.  We can basically be
