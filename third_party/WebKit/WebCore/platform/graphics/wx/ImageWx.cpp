@@ -139,8 +139,11 @@ void BitmapImage::draw(GraphicsContext* ctxt,
     adjustedDestRect.setHeight(adjustedDestRect.height() * currHeight /
                                selfSize.height());
 
+  gc->PushState();
+  gc->Clip(dst.x(), dst.y(), dst.width(), dst.height());
   gc->DrawBitmap(*bitmap, adjustedDestRect.x(), adjustedDestRect.y(),
                  adjustedDestRect.width(), adjustedDestRect.height());
+  gc->PopState();
 #else
   IntRect srcIntRect(src);
   IntRect dstIntRect(dst);
