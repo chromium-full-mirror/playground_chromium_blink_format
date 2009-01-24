@@ -715,14 +715,9 @@ VisiblePosition AccessibilityObject::nextSentenceEndPosition(
   // parser will not
   // see this empty line.  Instead, return the end position of the empty line.
   VisiblePosition endPosition;
-  VisiblePosition startOfLinePosition = startOfLine(nextVisiblePos);
-  VisiblePosition endOfLinePosition = endOfLine(nextVisiblePos);
 
-  String lineString;
-  if (startOfLinePosition.isNotNull() && endOfLinePosition.isNotNull())
-    lineString =
-        plainText(makeRange(startOfLinePosition, endOfLinePosition).get());
-
+  String lineString = plainText(
+      makeRange(startOfLine(nextVisiblePos), endOfLine(nextVisiblePos)).get());
   if (lineString.isEmpty())
     endPosition = nextVisiblePos;
   else
@@ -745,14 +740,10 @@ VisiblePosition AccessibilityObject::previousSentenceStartPosition(
 
   // treat empty line as a separate sentence.
   VisiblePosition startPosition;
-  VisiblePosition startOfLinePosition = startOfLine(previousVisiblePos);
-  VisiblePosition endOfLinePosition = endOfLine(previousVisiblePos);
 
-  String lineString;
-  if (startOfLinePosition.isNotNull() && endOfLinePosition.isNotNull())
-    lineString =
-        plainText(makeRange(startOfLinePosition, endOfLinePosition).get());
-
+  String lineString = plainText(
+      makeRange(startOfLine(previousVisiblePos), endOfLine(previousVisiblePos))
+          .get());
   if (lineString.isEmpty())
     startPosition = previousVisiblePos;
   else
