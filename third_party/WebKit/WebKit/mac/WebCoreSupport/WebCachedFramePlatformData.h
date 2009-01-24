@@ -27,12 +27,12 @@
  */
 
 #import <objc/objc-runtime.h>
-#import <WebCore/CachedPagePlatformData.h>
+#import <WebCore/CachedFramePlatformData.h>
 #import <wtf/RetainPtr.h>
 
-class WebCachedPagePlatformData : public WebCore::CachedPagePlatformData {
+class WebCachedFramePlatformData : public WebCore::CachedFramePlatformData {
  public:
-  WebCachedPagePlatformData(id webDocumentView)
+  WebCachedFramePlatformData(id webDocumentView)
       : m_webDocumentView(webDocumentView) {}
 
   virtual void clear() {

@@ -25,23 +25,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef CachedPagePlatformData_h
-#define CachedPagePlatformData_h
+#ifndef WebCachedFramePlatformData_h
+#define WebCachedFramePlatformData_h
 
-namespace WebCore {
+#include "WebDataSource.h"
 
-// The purpose of this class is to give each platform a vessel to store platform
-// data when a page
-// goes into the Back/Forward page cache, and perform some action with that data
-// when the page comes out.
-// Each platform should subclass this class as neccessary
+#include <WebCore/CachedFramePlatformData.h>
 
-class CachedPagePlatformData {
+class WebCachedFramePlatformData : public WebCore::CachedFramePlatformData {
  public:
-  virtual ~CachedPagePlatformData() {}
-  virtual void clear() {}
+  WebCachedFramePlatformData(IWebDataSource* webDataSource)
+      : m_webDataSource(webDataSource) {}
+
+  IWebDataSource* webDataSource() { return m_webDataSource.get(); }
+
+ private:
+  COMPtr<IWebDataSource> m_webDataSource;
 };
 
-}  // namespace WebCore
-
-#endif  // CachedPagePlatformData_h
+#endif  // CachedFramePlatformData_h

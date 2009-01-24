@@ -35,7 +35,7 @@
 #include "EmbeddedWidget.h"
 #include "MarshallingHelpers.h"
 #include "NotImplemented.h"
-#include "WebCachedPagePlatformData.h"
+#include "WebCachedFramePlatformData.h"
 #include "WebChromeClient.h"
 #include "WebDocumentLoader.h"
 #include "WebError.h"
@@ -547,10 +547,10 @@ void WebFrameLoaderClient::savePlatformDataToCachedPage(
 
   ASSERT(coreFrame->loader()->documentLoader() == cachedPage->documentLoader());
 
-  WebCachedPagePlatformData* webPlatformData =
-      new WebCachedPagePlatformData(static_cast<IWebDataSource*>(
+  WebCachedFramePlatformData* webPlatformData =
+      new WebCachedFramePlatformData(static_cast<IWebDataSource*>(
           getWebDataSource(coreFrame->loader()->documentLoader())));
-  cachedPage->setCachedPagePlatformData(webPlatformData);
+  cachedPage->setCachedFramePlatformData(webPlatformData);
 #else
   notImplemented();
 #endif
