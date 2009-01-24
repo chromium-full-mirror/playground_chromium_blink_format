@@ -23,14 +23,12 @@
 #define WMLOptGroupElement_h
 
 #if ENABLE(WML)
-#include "FormControlElement.h"
+#include "WMLFormControlElement.h"
 #include "OptionGroupElement.h"
-#include "WMLElement.h"
 
 namespace WebCore {
 
-class WMLOptGroupElement : public WMLElement,
-                           public FormControlElement,
+class WMLOptGroupElement : public WMLFormControlElement,
                            public OptionGroupElement {
  public:
   WMLOptGroupElement(const QualifiedName& tagName, Document*);
@@ -38,10 +36,7 @@ class WMLOptGroupElement : public WMLElement,
 
   String title() const { return m_title; }
 
-  virtual bool valueMatchesRenderer() const { return m_valueMatchesRenderer; }
-  virtual void setValueMatchesRenderer(bool b = true) {
-    m_valueMatchesRenderer = b;
-  }
+  virtual const AtomicString& type() const;
 
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
@@ -77,7 +72,6 @@ class WMLOptGroupElement : public WMLElement,
   void recalcSelectOptions();
 
  private:
-  bool m_valueMatchesRenderer;
   String m_title;
   RefPtr<RenderStyle> m_style;
 };

@@ -438,7 +438,7 @@ String Frame::searchForLabelsBeforeElement(const Vector<String>& labels,
        n = n->traversePreviousNode()) {
     if (n->hasTagName(formTag) ||
         (n->isHTMLElement() &&
-         static_cast<HTMLElement*>(n)->isGenericFormElement())) {
+         static_cast<Element*>(n)->isFormControlElement())) {
       // We hit another form element or the start of the form - bail out
       break;
     } else if (n->hasTagName(tdTag) && !startingTableCell) {
@@ -1219,7 +1219,7 @@ static HTMLFormElement* scanForForm(Node* start) {
     if (n->hasTagName(formTag))
       return static_cast<HTMLFormElement*>(n);
     else if (n->isHTMLElement() &&
-             static_cast<HTMLElement*>(n)->isGenericFormElement())
+             static_cast<Element*>(n)->isFormControlElement())
       return static_cast<HTMLFormControlElement*>(n)->form();
     else if (n->hasTagName(frameTag) || n->hasTagName(iframeTag)) {
       Node* childDoc = static_cast<HTMLFrameElementBase*>(n)->contentDocument();
@@ -1245,7 +1245,7 @@ HTMLFormElement* Frame::currentForm() const {
     if (n->hasTagName(formTag))
       return static_cast<HTMLFormElement*>(n);
     else if (n->isHTMLElement() &&
-             static_cast<HTMLElement*>(n)->isGenericFormElement())
+             static_cast<Element*>(n)->isFormControlElement())
       return static_cast<HTMLFormControlElement*>(n)->form();
   }
 

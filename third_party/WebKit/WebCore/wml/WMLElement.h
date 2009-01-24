@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  *
  * This library is free software; you can redistribute it and/or
@@ -33,7 +33,6 @@ class WMLElement : public StyledElement {
   WMLElement(const QualifiedName& tagName, Document*);
 
   virtual bool isWMLElement() const { return true; }
-  virtual bool isWMLEventHandlingElement() const { return false; }
   virtual bool isWMLTaskElement() const { return false; }
 
   virtual bool mapToEntry(const QualifiedName& attrName,

@@ -23,23 +23,20 @@
 #define WMLOptionElement_h
 
 #if ENABLE(WML)
-#include "FormControlElement.h"
 #include "OptionElement.h"
+#include "WMLFormControlElement.h"
 #include "WMLEventHandlingElement.h"
 
 namespace WebCore {
 
-class WMLOptionElement : public WMLEventHandlingElement,
-                         public FormControlElement,
+class WMLOptionElement : public WMLFormControlElement,
+                         public WMLEventHandlingElement,
                          public OptionElement {
  public:
   WMLOptionElement(const QualifiedName& tagName, Document*);
   virtual ~WMLOptionElement();
 
-  virtual bool valueMatchesRenderer() const { return m_valueMatchesRenderer; }
-  virtual void setValueMatchesRenderer(bool b = true) {
-    m_valueMatchesRenderer = b;
-  }
+  virtual const AtomicString& type() const;
 
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
@@ -68,7 +65,6 @@ class WMLOptionElement : public WMLEventHandlingElement,
 
  private:
   OptionElementData m_data;
-  bool m_valueMatchesRenderer;
   RefPtr<RenderStyle> m_style;
 };
 }

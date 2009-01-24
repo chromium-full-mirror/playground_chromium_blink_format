@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  *
  * This library is free software; you can redistribute it and/or
@@ -27,21 +27,21 @@
 #include <wtf/Assertions.h>
 
 #if ENABLE(WML)
-#include "WMLInputElement.h"
-#include "WMLNames.h"
+#include "WMLFormControlElement.h"
 #endif
 
 namespace WebCore {
 
 FormControlElement* toFormControlElement(Element* element) {
-  if (element->isHTMLElement()) {
-    if (static_cast<HTMLElement*>(element)->isGenericFormElement())
-      return static_cast<HTMLFormControlElement*>(element);
-  }
+  if (!element->isFormControlElement())
+    return 0;
+
+  if (element->isHTMLElement())
+    return static_cast<HTMLFormControlElement*>(element);
 
 #if ENABLE(WML)
-  if (element->isWMLElement() && element->hasTagName(WMLNames::inputTag))
-    return static_cast<WMLInputElement*>(element);
+  if (element->isWMLElement())
+    return static_cast<WMLFormControlElement*>(element);
 #endif
 
   return 0;

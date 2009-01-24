@@ -142,6 +142,8 @@ class Element : public ContainerNode {
 
   void normalizeAttributes();
 
+  virtual bool isFormControlElement() const { return false; }
+  virtual bool isFormControlElementWithState() const { return false; }
   virtual bool isInputTypeHidden() const { return false; }
   virtual bool isPasswordField() const { return false; }
 

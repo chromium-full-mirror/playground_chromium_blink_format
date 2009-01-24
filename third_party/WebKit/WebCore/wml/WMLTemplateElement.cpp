@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  *
  * This library is free software; you can redistribute it and/or
@@ -36,7 +36,7 @@ using namespace WMLNames;
 
 WMLTemplateElement::WMLTemplateElement(const QualifiedName& tagName,
                                        Document* doc)
-    : WMLEventHandlingElement(tagName, doc) {}
+    : WMLElement(tagName, doc) {}
 
 WMLTemplateElement::~WMLTemplateElement() {}
 
@@ -50,7 +50,7 @@ void WMLTemplateElement::parseMappedAttribute(MappedAttribute* attr) {
   else if (attr->name() == ontimerAttr)
     eventType = WMLIntrinsicEventOnTimer;
   else {
-    WMLEventHandlingElement::parseMappedAttribute(attr);
+    WMLElement::parseMappedAttribute(attr);
     return;
   }
 

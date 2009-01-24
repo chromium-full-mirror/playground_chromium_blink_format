@@ -35,9 +35,14 @@ using namespace WMLNames;
 
 WMLOptGroupElement::WMLOptGroupElement(const QualifiedName& tagName,
                                        Document* doc)
-    : WMLElement(tagName, doc), m_valueMatchesRenderer(false) {}
+    : WMLFormControlElement(tagName, doc) {}
 
 WMLOptGroupElement::~WMLOptGroupElement() {}
+
+const AtomicString& WMLOptGroupElement::type() const {
+  DEFINE_STATIC_LOCAL(const AtomicString, optgroup, ("optgroup"));
+  return optgroup;
+}
 
 bool WMLOptGroupElement::insertBefore(PassRefPtr<Node> newChild,
                                       Node* refChild,

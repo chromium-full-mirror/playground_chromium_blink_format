@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  *
  * This library is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@
 #define WMLEventHandlingElement_h
 
 #if ENABLE(WML)
-#include "WMLElement.h"
 #include "WMLIntrinsicEventHandler.h"
 
 #include <wtf/OwnPtr.h>
@@ -31,14 +30,13 @@
 
 namespace WebCore {
 
+class WMLElement;
 class WMLDoElement;
 
-class WMLEventHandlingElement : public WMLElement {
+class WMLEventHandlingElement {
  public:
-  WMLEventHandlingElement(const QualifiedName& tagName, Document*);
-  virtual ~WMLEventHandlingElement();
-
-  virtual bool isWMLEventHandlingElement() const { return true; }
+  WMLEventHandlingElement();
+  ~WMLEventHandlingElement();
 
   WMLIntrinsicEventHandler* eventHandler() const {
     return m_eventHandler.get();
@@ -46,12 +44,14 @@ class WMLEventHandlingElement : public WMLElement {
   void createEventHandlerIfNeeded();
 
   Vector<WMLDoElement*>& doElements() { return m_doElements; }
-  void registerDoElement(WMLDoElement*);
+  void registerDoElement(WMLDoElement*, Document*);
 
  private:
   OwnPtr<WMLIntrinsicEventHandler> m_eventHandler;
   Vector<WMLDoElement*> m_doElements;
 };
+
+WMLEventHandlingElement* toWMLEventHandlingElement(WMLElement*);
 }
 
 #endif

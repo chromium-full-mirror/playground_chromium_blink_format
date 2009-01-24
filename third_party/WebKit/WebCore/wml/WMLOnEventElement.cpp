@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  *
  * This library is free software; you can redistribute it and/or
@@ -69,12 +69,11 @@ void WMLOnEventElement::registerTask(WMLTaskElement* task) {
   if (!parent || !parent->isWMLElement())
     return;
 
-  WMLElement* parentElement = static_cast<WMLElement*>(parent);
-  if (!parentElement->isWMLEventHandlingElement())
+  WMLEventHandlingElement* eventHandlingElement =
+      toWMLEventHandlingElement(static_cast<WMLElement*>(parent));
+  if (!eventHandlingElement)
     return;
 
-  WMLEventHandlingElement* eventHandlingElement =
-      static_cast<WMLEventHandlingElement*>(parentElement);
   eventHandlingElement->createEventHandlerIfNeeded();
 
   RefPtr<WMLIntrinsicEvent> event = WMLIntrinsicEvent::createWithTask(task);

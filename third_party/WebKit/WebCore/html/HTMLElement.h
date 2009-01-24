@@ -92,8 +92,6 @@ class HTMLElement : public StyledElement {
 
   virtual void accessKeyAction(bool sendToAnyElement);
 
-  virtual bool isGenericFormElement() const { return false; }
-
   virtual HTMLTagStatus endTagRequirement() const;
   virtual int tagPriority() const;
   virtual bool childAllowed(

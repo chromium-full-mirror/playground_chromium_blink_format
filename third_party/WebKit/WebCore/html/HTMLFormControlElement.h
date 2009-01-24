@@ -25,6 +25,7 @@
 #define HTMLFormControlElement_h
 
 #include "FormControlElement.h"
+#include "FormControlElementWithState.h"
 #include "HTMLElement.h"
 
 namespace WebCore {
@@ -84,7 +85,7 @@ class HTMLFormControlElement : public HTMLElement, public FormControlElement {
   virtual const AtomicString& name() const;
   void setName(const AtomicString& name);
 
-  virtual bool isGenericFormElement() const { return true; }
+  virtual bool isFormControlElement() const { return true; }
   virtual bool isRadioButton() const { return false; }
 
   /* Override in derived classes to get the encoded name=value pair for
@@ -115,23 +116,22 @@ class HTMLFormControlElement : public HTMLElement, public FormControlElement {
   bool m_valueMatchesRenderer;
 };
 
-class HTMLFormControlElementWithState : public HTMLFormControlElement {
+class HTMLFormControlElementWithState : public HTMLFormControlElement,
+                                        public FormControlElementWithState {
  public:
   HTMLFormControlElementWithState(const QualifiedName& tagName,
                                   Document*,
                                   HTMLFormElement*);
   virtual ~HTMLFormControlElementWithState();
 
-  virtual void finishParsingChildren();
+  virtual bool isFormControlElementWithState() const { return true; }
 
-  virtual bool saveState(String& value) const = 0;
+  virtual FormControlElement* toFormControlElement() { return this; }
+  virtual void finishParsingChildren();
 
  protected:
   virtual void willMoveToNewOwnerDocument();
   virtual void didMoveToNewOwnerDocument();
-
- private:
-  virtual void restoreState(const String& value) = 0;
 };
 
 }  // namespace
