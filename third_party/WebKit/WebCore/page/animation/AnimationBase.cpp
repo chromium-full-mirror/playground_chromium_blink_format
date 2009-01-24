@@ -674,7 +674,8 @@ AnimationBase::AnimationBase(const Animation* transition,
       m_animation(const_cast<Animation*>(transition)),
       m_compAnim(compAnim),
       m_transformFunctionListValid(false),
-      m_nextIterationDuration(-1) {
+      m_nextIterationDuration(-1),
+      m_next(0) {
   // Compute the total duration
   m_totalDuration = -1;
   if (m_animation->iterationCount() > 0)
@@ -683,7 +684,7 @@ AnimationBase::AnimationBase(const Animation* transition,
 
 AnimationBase::~AnimationBase() {
   if (m_animState == AnimationStateStartWaitStyleAvailable)
-    m_compAnim->setWaitingForStyleAvailable(false);
+    m_compAnim->removeFromStyleAvailableWaitList(this);
 }
 
 bool AnimationBase::propertiesEqual(int prop,
@@ -763,7 +764,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
   // animation, regardless of state.
   if (input == AnimationStateInputMakeNew) {
     if (m_animState == AnimationStateStartWaitStyleAvailable)
-      m_compAnim->setWaitingForStyleAvailable(false);
+      m_compAnim->removeFromStyleAvailableWaitList(this);
     m_animState = AnimationStateNew;
     m_startTime = 0;
     m_pauseTime = -1;
@@ -776,7 +777,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
 
   if (input == AnimationStateInputRestartAnimation) {
     if (m_animState == AnimationStateStartWaitStyleAvailable)
-      m_compAnim->setWaitingForStyleAvailable(false);
+      m_compAnim->removeFromStyleAvailableWaitList(this);
     m_animState = AnimationStateNew;
     m_startTime = 0;
     m_pauseTime = -1;
@@ -791,7 +792,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
 
   if (input == AnimationStateInputEndAnimation) {
     if (m_animState == AnimationStateStartWaitStyleAvailable)
-      m_compAnim->setWaitingForStyleAvailable(false);
+      m_compAnim->removeFromStyleAvailableWaitList(this);
     m_animState = AnimationStateDone;
     endAnimation(true);
     return;
@@ -840,7 +841,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         // Start timer has fired, tell the animation to start and wait for it to
         // respond with start time
         m_animState = AnimationStateStartWaitStyleAvailable;
-        m_compAnim->setWaitingForStyleAvailable(true);
+        m_compAnim->addToStyleAvailableWaitList(this);
 
         // Trigger a render so we can start the animation
         if (m_object)
@@ -856,8 +857,6 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
     case AnimationStateStartWaitStyleAvailable:
       ASSERT(input == AnimationStateInputStyleAvailable ||
              input == AnimationStateInputPlayStatePaused);
-
-      m_compAnim->setWaitingForStyleAvailable(false);
 
       // Start timer has fired, tell the animation to start and wait for it to
       // respond with start time

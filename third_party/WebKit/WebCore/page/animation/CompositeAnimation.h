@@ -37,6 +37,7 @@
 namespace WebCore {
 
 class CompositeAnimationPrivate;
+class AnimationBase;
 class AnimationController;
 class KeyframeAnimation;
 class RenderObject;
@@ -63,16 +64,12 @@ class CompositeAnimation : public RefCounted<CompositeAnimation> {
 
   AnimationController* animationController();
 
-  void setWaitingForStyleAvailable(bool);
-  bool isWaitingForStyleAvailable() const;
-
   void suspendAnimations();
   void resumeAnimations();
   bool isSuspended() const;
 
   bool hasAnimations() const;
 
-  void styleAvailable();
   void setAnimating(bool);
   bool isAnimatingProperty(int property, bool isRunningNow) const;
 
@@ -87,6 +84,9 @@ class CompositeAnimation : public RefCounted<CompositeAnimation> {
   bool pauseAnimationAtTime(const AtomicString& name, double t);
   bool pauseTransitionAtTime(int property, double t);
   unsigned numberOfActiveAnimations() const;
+
+  void addToStyleAvailableWaitList(AnimationBase*);
+  void removeFromStyleAvailableWaitList(AnimationBase*);
 
  private:
   CompositeAnimation(AnimationController* animationController);
