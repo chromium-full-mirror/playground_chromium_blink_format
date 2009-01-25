@@ -276,7 +276,7 @@ inline void InlineIterator::increment(InlineBidiResolver* resolver) {
     return;
   if (obj->isText()) {
     pos++;
-    if (pos >= static_cast<RenderText*>(obj)->textLength()) {
+    if (pos >= toRenderText(obj)->textLength()) {
       obj = bidiNext(block, obj, resolver);
       pos = 0;
       nextBreakablePosition = -1;
@@ -301,7 +301,7 @@ inline UChar InlineIterator::current() const {
   if (!obj || !obj->isText())
     return 0;
 
-  RenderText* text = static_cast<RenderText*>(obj);
+  RenderText* text = toRenderText(obj);
   if (pos >= text->textLength())
     return 0;
 
@@ -354,12 +354,12 @@ static void checkMidpoints(InlineIterator& lBreak) {
         if (endpoint.obj->isText()) {
           // Don't shave a character off the endpoint if it was from a soft
           // hyphen.
-          RenderText* textObj = static_cast<RenderText*>(endpoint.obj);
+          RenderText* textObj = toRenderText(endpoint.obj);
           if (endpoint.pos + 1 < textObj->textLength()) {
             if (textObj->characters()[endpoint.pos + 1] == softHyphen)
               return;
           } else if (startpoint.obj->isText()) {
-            RenderText* startText = static_cast<RenderText*>(startpoint.obj);
+            RenderText* startText = toRenderText(startpoint.obj);
             if (startText->textLength() &&
                 startText->characters()[0] == softHyphen)
               return;
@@ -592,7 +592,7 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
     // correct static x position.  They have no effect on the width.
     // Similarly, line break boxes have no effect on the width.
     if (r->m_object->isText()) {
-      RenderText* rt = static_cast<RenderText*>(r->m_object);
+      RenderText* rt = toRenderText(r->m_object);
 
       if (textAlign == JUSTIFY && r != trailingSpaceRun) {
         const UChar* characters = rt->characters();
@@ -717,8 +717,7 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
       int spaceAdd = 0;
       if (r->m_object->isText() && !r->m_compact) {
         unsigned spaces = 0;
-        const UChar* characters =
-            static_cast<RenderText*>(r->m_object)->characters();
+        const UChar* characters = toRenderText(r->m_object)->characters();
         for (int i = r->m_start; i < r->m_stop; i++) {
           UChar c = characters[i];
           if (c == ' ' || c == '\n' || c == '\t')
@@ -1026,7 +1025,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
           trailingSpaceRun = resolver.logicallyLastRun();
           RenderObject* lastObject = trailingSpaceRun->m_object;
           if (lastObject->isText()) {
-            RenderText* lastText = static_cast<RenderText*>(lastObject);
+            RenderText* lastText = toRenderText(lastObject);
             const UChar* characters = lastText->characters();
             int firstSpace = trailingSpaceRun->stop();
             while (firstSpace > trailingSpaceRun->start()) {
@@ -1317,8 +1316,7 @@ RootInlineBox* RenderBlock::determineStartPosition(
             (!prevRootBox->endsWithBreak() ||
              prevRootBox->lineBreakObj()->isText() &&
                  prevRootBox->lineBreakPos() >=
-                     static_cast<RenderText*>(prevRootBox->lineBreakObj())
-                         ->textLength()))
+                     toRenderText(prevRootBox->lineBreakObj())->textLength()))
           // The previous line didn't break cleanly or broke at a newline
           // that has been deleted, so treat it as dirty too.
           curr = prevRootBox;
@@ -1681,8 +1679,8 @@ static bool shouldSkipWhitespaceAfterStartObject(RenderBlock* block,
                                                  RenderObject* o) {
   RenderObject* next = bidiNext(block, o);
   if (next && !next->isBR() && next->isText() &&
-      static_cast<RenderText*>(next)->textLength() > 0) {
-    RenderText* nextText = static_cast<RenderText*>(next);
+      toRenderText(next)->textLength() > 0) {
+    RenderText* nextText = toRenderText(next);
     UChar nextChar = nextText->characters()[0];
     if (nextText->style()->isCollapsibleWhiteSpace(nextChar)) {
       addMidpoint(InlineIterator(0, o, 0));
@@ -1938,7 +1936,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
       if (!pos)
         appliedStartWidth = false;
 
-      RenderText* t = static_cast<RenderText*>(o);
+      RenderText* t = toRenderText(o);
 
       int strlen = t->textLength();
       int len = strlen - pos;
@@ -1991,9 +1989,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
             else
               beforeSoftHyphen = InlineIterator(
                   0, last,
-                  last->isText()
-                      ? static_cast<RenderText*>(last)->textLength() - 1
-                      : 0);
+                  last->isText() ? toRenderText(last)->textLength() - 1 : 0);
             // Two consecutive soft hyphens. Avoid overlapping midpoints.
             if (sNumMidpoints && smidpoints->at(sNumMidpoints - 1).obj == o &&
                 smidpoints->at(sNumMidpoints - 1).pos == pos)
@@ -2100,9 +2096,8 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
             if (lineWasTooWide || w + tmpW > width) {
               if (lBreak.obj && shouldPreserveNewline(lBreak.obj) &&
                   lBreak.obj->isText() &&
-                  !static_cast<RenderText*>(lBreak.obj)->isWordBreak() &&
-                  static_cast<RenderText*>(lBreak.obj)
-                          ->characters()[lBreak.pos] == '\n') {
+                  !toRenderText(lBreak.obj)->isWordBreak() &&
+                  toRenderText(lBreak.obj)->characters()[lBreak.pos] == '\n') {
                 if (!stoppedIgnoringSpaces && pos > 0) {
                   // We need to stop right before the newline and then start up
                   // again.
@@ -2229,7 +2224,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
           checkForBreak = true;
         else {
           checkForBreak = false;
-          RenderText* nextText = static_cast<RenderText*>(next);
+          RenderText* nextText = toRenderText(next);
           if (nextText->textLength()) {
             UChar c = nextText->characters()[0];
             if (c == ' ' || c == '\t' ||
@@ -2365,7 +2360,7 @@ end:
     //    lBreak.pos--;
     else if (lBreak.obj == 0 && trailingSpaceObject->isText()) {
       // Add a new end midpoint that stops right at the very end.
-      RenderText* text = static_cast<RenderText*>(trailingSpaceObject);
+      RenderText* text = toRenderText(trailingSpaceObject);
       unsigned length = text->textLength();
       unsigned pos = length >= 2 ? length - 2 : UINT_MAX;
       InlineIterator endMid(0, trailingSpaceObject, pos);
@@ -2386,8 +2381,7 @@ end:
     // For soft hyphens on line breaks, we have to chop out the midpoints that
     // made us
     // ignore the hyphen so that it will render at the end of the line.
-    UChar c =
-        static_cast<RenderText*>(lBreak.obj)->characters()[lBreak.pos - 1];
+    UChar c = toRenderText(lBreak.obj)->characters()[lBreak.pos - 1];
     if (c == softHyphen)
       chopMidpointsAt(lBreak.obj, lBreak.pos - 2);
   }

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
+ * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,6 +35,7 @@
 #include "TextBoundaries.h"
 #include "TextBreakIterator.h"
 #include "TextIterator.h"
+#include "VisiblePosition.h"
 #include "htmlediting.h"
 
 namespace WebCore {
@@ -319,7 +321,7 @@ static VisiblePosition startPositionForLine(const VisiblePosition& c) {
   int startOffset = 0;
   if (startBox->isInlineTextBox()) {
     InlineTextBox* startTextBox = static_cast<InlineTextBox*>(startBox);
-    startOffset = startTextBox->m_start;
+    startOffset = startTextBox->start();
   }
 
   VisiblePosition visPos = VisiblePosition(startNode, startOffset, DOWNSTREAM);
@@ -393,9 +395,9 @@ static VisiblePosition endPositionForLine(const VisiblePosition& c) {
     endOffset = 0;
   } else if (endBox->isInlineTextBox()) {
     InlineTextBox* endTextBox = static_cast<InlineTextBox*>(endBox);
-    endOffset = endTextBox->m_start;
+    endOffset = endTextBox->start();
     if (!endTextBox->isLineBreak())
-      endOffset += endTextBox->m_len;
+      endOffset += endTextBox->len();
   }
 
   return VisiblePosition(endNode, endOffset, VP_UPSTREAM_IF_POSSIBLE);
@@ -725,8 +727,8 @@ VisiblePosition startOfParagraph(const VisiblePosition& c) {
 
     if (r->isText()) {
       if (style->preserveNewline()) {
-        const UChar* chars = static_cast<RenderText*>(r)->characters();
-        int i = static_cast<RenderText*>(r)->textLength();
+        const UChar* chars = toRenderText(r)->characters();
+        int i = toRenderText(r)->textLength();
         int o = offset;
         if (n == startNode && o < i)
           i = max(0, o);
@@ -791,9 +793,9 @@ VisiblePosition endOfParagraph(const VisiblePosition& c) {
     // caret.
     // We should probably do this in other cases such as startOfParagraph.
     if (r->isText() && r->caretMaxRenderedOffset() > 0) {
-      int length = static_cast<RenderText*>(r)->textLength();
+      int length = toRenderText(r)->textLength();
       if (style->preserveNewline()) {
-        const UChar* chars = static_cast<RenderText*>(r)->characters();
+        const UChar* chars = toRenderText(r)->characters();
         int o = n == startNode ? offset : 0;
         for (int i = o; i < length; ++i)
           if (chars[i] == '\n')

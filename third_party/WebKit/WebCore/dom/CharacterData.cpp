@@ -24,7 +24,6 @@
 #include "CharacterData.h"
 
 #include "CString.h"
-#include "Document.h"
 #include "EventNames.h"
 #include "ExceptionCode.h"
 #include "MutationEvent.h"
@@ -57,7 +56,7 @@ void CharacterData::setData(const String& data, ExceptionCode&) {
     detach();
     attach();
   } else if (renderer())
-    static_cast<RenderText*>(renderer())->setText(m_data);
+    toRenderText(renderer())->setText(m_data);
 
   dispatchModifiedEvent(oldStr.get());
 
@@ -85,8 +84,7 @@ void CharacterData::appendData(const String& arg, ExceptionCode&) {
     detach();
     attach();
   } else if (renderer())
-    static_cast<RenderText*>(renderer())
-        ->setTextWithOffset(m_data, oldStr->length(), 0);
+    toRenderText(renderer())->setTextWithOffset(m_data, oldStr->length(), 0);
 
   dispatchModifiedEvent(oldStr.get());
 }
@@ -108,7 +106,7 @@ void CharacterData::insertData(unsigned offset,
     detach();
     attach();
   } else if (renderer())
-    static_cast<RenderText*>(renderer())->setTextWithOffset(m_data, offset, 0);
+    toRenderText(renderer())->setTextWithOffset(m_data, offset, 0);
 
   dispatchModifiedEvent(oldStr.get());
 
@@ -138,8 +136,7 @@ void CharacterData::deleteData(unsigned offset,
     detach();
     attach();
   } else if (renderer())
-    static_cast<RenderText*>(renderer())
-        ->setTextWithOffset(m_data, offset, count);
+    toRenderText(renderer())->setTextWithOffset(m_data, offset, count);
 
   dispatchModifiedEvent(oldStr.get());
 
@@ -171,8 +168,7 @@ void CharacterData::replaceData(unsigned offset,
     detach();
     attach();
   } else if (renderer())
-    static_cast<RenderText*>(renderer())
-        ->setTextWithOffset(m_data, offset, count);
+    toRenderText(renderer())->setTextWithOffset(m_data, offset, count);
 
   dispatchModifiedEvent(oldStr.get());
 

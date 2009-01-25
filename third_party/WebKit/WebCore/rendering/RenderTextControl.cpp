@@ -32,6 +32,7 @@
 #include "HTMLFormControlElement.h"
 #include "HTMLNames.h"
 #include "HitTestResult.h"
+#include "RenderText.h"
 #include "ScrollbarTheme.h"
 #include "SelectionController.h"
 #include "TextControlInnerElements.h"
@@ -375,9 +376,8 @@ String RenderTextControl::textWithHardLineBreaks() {
   if (!renderer)
     return "";
 
-  InlineBox* box = renderer->isText()
-                       ? static_cast<RenderText*>(renderer)->firstTextBox()
-                       : renderer->inlineBoxWrapper();
+  InlineBox* box = renderer->isText() ? toRenderText(renderer)->firstTextBox()
+                                      : renderer->inlineBoxWrapper();
   if (!box)
     return "";
 

@@ -274,7 +274,7 @@ void RenderFlow::dirtyLinesFromChangedChild(RenderObject* child) {
       if (wrapper)
         box = wrapper->root();
     } else if (curr->isText()) {
-      InlineTextBox* textBox = static_cast<RenderText*>(curr)->lastTextBox();
+      InlineTextBox* textBox = toRenderText(curr)->lastTextBox();
       if (textBox)
         box = textBox->root();
     } else if (curr->isInlineFlow()) {
@@ -414,7 +414,7 @@ void RenderFlow::paintLines(PaintInfo& paintInfo, int tx, int ty) {
     return;
 
   PaintInfo info(paintInfo);
-  RenderFlowSequencedSet outlineObjects;
+  ListHashSet<RenderFlow*> outlineObjects;
   info.outlineObjects = &outlineObjects;
 
   // See if our root lines intersect with the dirty rect.  If so, then we paint
@@ -456,8 +456,8 @@ void RenderFlow::paintLines(PaintInfo& paintInfo, int tx, int ty) {
 
   if (info.phase == PaintPhaseOutline || info.phase == PaintPhaseSelfOutline ||
       info.phase == PaintPhaseChildOutlines) {
-    RenderFlowSequencedSet::iterator end = info.outlineObjects->end();
-    for (RenderFlowSequencedSet::iterator it = info.outlineObjects->begin();
+    ListHashSet<RenderFlow*>::iterator end = info.outlineObjects->end();
+    for (ListHashSet<RenderFlow*>::iterator it = info.outlineObjects->begin();
          it != end; ++it) {
       RenderFlow* flow = *it;
       flow->paintOutline(info.context, tx, ty);
