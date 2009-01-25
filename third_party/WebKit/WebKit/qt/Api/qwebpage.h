@@ -151,6 +151,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
     InsertParagraphSeparator,
     InsertLineSeparator,
 
+    SelectAll,
+
     WebActionCount
   };
 
