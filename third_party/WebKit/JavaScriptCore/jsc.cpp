@@ -93,10 +93,10 @@ static JSValuePtr functionReadline(ExecState*,
                                    JSObject*,
                                    JSValuePtr,
                                    const ArgList&);
-static JSValuePtr functionQuit(ExecState*,
-                               JSObject*,
-                               JSValuePtr,
-                               const ArgList&);
+static NO_RETURN JSValuePtr functionQuit(ExecState*,
+                                         JSObject*,
+                                         JSValuePtr,
+                                         const ArgList&);
 
 struct Options {
   Options() : interactive(false), dump(false) {}
@@ -310,11 +310,6 @@ JSValuePtr functionQuit(ExecState* exec,
                         const ArgList&) {
   cleanupGlobalData(&exec->globalData());
   exit(EXIT_SUCCESS);
-#if !COMPILER(MSVC) && !PLATFORM(WIN_CE)
-  // MSVC knows that exit(0) never returns, so it flags this return statement as
-  // unreachable.
-  return jsUndefined();
-#endif
 }
 
 // Use SEH for Release builds only to get rid of the crash report dialog
@@ -461,7 +456,7 @@ static void runInteractive(GlobalObject* globalObject) {
   printf("\n");
 }
 
-static void printUsageStatement() {
+static NO_RETURN void printUsageStatement() {
   fprintf(stderr, "Usage: jsc [options] [files] [-- arguments]\n");
   fprintf(stderr, "  -d         Dumps bytecode (debug builds only)\n");
   fprintf(stderr, "  -f         Specifies a source file (deprecated)\n");
