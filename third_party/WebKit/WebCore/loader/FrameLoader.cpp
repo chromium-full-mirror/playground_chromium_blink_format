@@ -296,7 +296,7 @@ void FrameLoader::init() {
   m_creatingInitialEmptyDocument = true;
   setPolicyDocumentLoader(
       m_client
-          ->createDocumentLoader(ResourceRequest(String("")), SubstituteData())
+          ->createDocumentLoader(ResourceRequest(KURL("")), SubstituteData())
           .get());
   setProvisionalDocumentLoader(m_policyDocumentLoader.get());
   setState(FrameStateProvisional);
@@ -461,7 +461,7 @@ bool FrameLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
   KURL scriptURL;
   KURL url;
   if (protocolIs(urlString, "javascript")) {
-    scriptURL = KURL(urlString);
+    scriptURL = completeURL(urlString);  // completeURL() encodes the URL.
     url = blankURL();
   } else
     url = completeURL(urlString);
