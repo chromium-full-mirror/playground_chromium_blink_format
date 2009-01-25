@@ -301,7 +301,8 @@ void PluginStream::destroyStream() {
       m_stream.url = "";
       m_stream.notifyData = m_notifyData;
 
-      m_pluginFuncs->newstream(m_instance, "", &m_stream, false,
+      static char emptyMimeType[] = "";
+      m_pluginFuncs->newstream(m_instance, emptyMimeType, &m_stream, false,
                                &m_transferMode);
       m_pluginFuncs->destroystream(m_instance, &m_stream, m_reason);
 
