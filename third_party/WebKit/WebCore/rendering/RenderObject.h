@@ -154,6 +154,10 @@ class RenderObject : public CachedResourceClient {
                              RenderObject* startPoint,
                              bool checkParent = true);
 
+  // Convenience function for getting to the nearest enclosing box of a
+  // RenderObject.
+  RenderBox* enclosingBox() const;
+
   virtual IntRect getOverflowClipRect(int /*tx*/, int /*ty*/) {
     return IntRect(0, 0, 0, 0);
   }
