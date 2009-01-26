@@ -44,7 +44,7 @@ CFDictionaryValueCallBacks
         0, IUnknownRetainCallback, IUnknownReleaseCallback, 0, 0};
 
 KURL MarshallingHelpers::BSTRToKURL(BSTR urlStr) {
-  return KURL(String(urlStr, SysStringLen(urlStr)));
+  return KURL(KURL(), String(urlStr, SysStringLen(urlStr)));
 }
 
 BSTR MarshallingHelpers::KURLToBSTR(const KURL& url) {

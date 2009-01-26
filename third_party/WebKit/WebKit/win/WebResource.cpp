@@ -27,6 +27,7 @@
 #include "WebKitDLL.h"
 #include "WebResource.h"
 
+#include "MarshallingHelpers.h"
 #include "MemoryStream.h"
 
 #pragma warning(push, 0)
@@ -109,7 +110,7 @@ HRESULT STDMETHODCALLTYPE WebResource::initWithData(
     /* [in] */ BSTR textEncodingName,
     /* [in] */ BSTR frameName) {
   m_data = data;
-  m_url = KURL(String(url));
+  m_url = MarshallingHelpers::BSTRToKURL(url);
   m_mimeType = String(mimeType);
   m_textEncodingName = String(textEncodingName);
   m_frameName = String(frameName);

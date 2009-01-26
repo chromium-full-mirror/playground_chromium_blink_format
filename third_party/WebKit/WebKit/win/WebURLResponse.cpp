@@ -313,9 +313,9 @@ HRESULT STDMETHODCALLTYPE WebURLResponse::initWithURL(
     /* [in] */ BSTR mimeType,
     /* [in] */ int expectedContentLength,
     /* [in] */ BSTR textEncodingName) {
-  m_response =
-      ResourceResponse(KURL(url), String(mimeType), expectedContentLength,
-                       String(textEncodingName), String());
+  m_response = ResourceResponse(MarshallingHelpers::BSTRToKURL(url),
+                                String(mimeType), expectedContentLength,
+                                String(textEncodingName), String());
   return S_OK;
 }
 
