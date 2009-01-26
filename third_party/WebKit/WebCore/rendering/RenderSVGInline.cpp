@@ -43,7 +43,7 @@ InlineBox* RenderSVGInline::createInlineBox(bool unusedMakePlaceHolderBox,
 
   ASSERT(!(!unusedIsRootLineBox && (isReplaced() || unusedMakePlaceHolderBox)));
 
-  ASSERT(isInlineFlow());
+  ASSERT(isRenderInline());
 
   InlineFlowBox* flowBox = new (renderArena()) SVGInlineFlowBox(this);
 

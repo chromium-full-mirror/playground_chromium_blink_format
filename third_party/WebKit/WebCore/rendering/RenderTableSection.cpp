@@ -1153,7 +1153,7 @@ bool RenderTableSection::nodeAtPoint(const HitTestRequest& request,
     // table-specific hit-test method (which we should do for performance
     // reasons anyway),
     // then we can remove this check.
-    if (!child->hasLayer() && !child->isInlineFlow() &&
+    if (!child->hasLayer() && !child->isRenderInline() &&
         child->nodeAtPoint(request, result, xPos, yPos, tx, ty, action)) {
       updateHitTestResult(result, IntPoint(xPos - tx, yPos - ty));
       return true;

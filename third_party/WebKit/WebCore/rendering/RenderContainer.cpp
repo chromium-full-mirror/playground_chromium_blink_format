@@ -324,7 +324,7 @@ void RenderContainer::updateBeforeAfterContentForContainer(
   if (!newContentWanted)
     return;
 
-  if (isInlineFlow() && !pseudoElementStyle->isDisplayInlineType() &&
+  if (isRenderInline() && !pseudoElementStyle->isDisplayInlineType() &&
       pseudoElementStyle->floating() == FNONE &&
       !(pseudoElementStyle->position() == AbsolutePosition ||
         pseudoElementStyle->position() == FixedPosition))

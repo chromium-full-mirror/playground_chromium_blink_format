@@ -3615,7 +3615,7 @@ bool RenderBlock::hitTestContents(const HitTestRequest& request,
       // table-specific hit-test method (which we should do for performance
       // reasons anyway), then we can remove this check.
       if (!child->hasLayer() && !child->isFloating() &&
-          !child->isInlineFlow() &&
+          !child->isRenderInline() &&
           child->nodeAtPoint(request, result, x, y, tx, ty, childHitTest)) {
         updateHitTestResult(result, IntPoint(x - tx, y - ty));
         return true;
@@ -4198,7 +4198,7 @@ RenderObject* InlineMinMaxIterator::next() {
       result = current->firstChild();
     if (!result) {
       // We hit the end of our inline. (It was empty, e.g., <span></span>.)
-      if (!oldEndOfInline && current->isInlineFlow()) {
+      if (!oldEndOfInline && current->isRenderInline()) {
         result = current;
         endOfInline = true;
         break;
@@ -4209,7 +4209,7 @@ RenderObject* InlineMinMaxIterator::next() {
         if (result)
           break;
         current = current->parent();
-        if (current && current != parent && current->isInlineFlow()) {
+        if (current && current != parent && current->isRenderInline()) {
           result = current;
           endOfInline = true;
           break;
@@ -4222,7 +4222,7 @@ RenderObject* InlineMinMaxIterator::next() {
 
     if (!result->isPositioned() &&
         (result->isText() || result->isFloating() || result->isReplaced() ||
-         result->isInlineFlow()))
+         result->isRenderInline()))
       break;
 
     current = result;
@@ -4353,7 +4353,7 @@ void RenderBlock::calcInlinePrefWidths() {
 
       if (!child->isText()) {
         // Case (1) and (2).  Inline replaced and inline flow elements.
-        if (child->isInlineFlow()) {
+        if (child->isRenderInline()) {
           // Add in padding/border/margin from the appropriate side of
           // the element.
           int bpm = getBorderPaddingMargin(static_cast<RenderFlow*>(child),
@@ -4538,7 +4538,7 @@ void RenderBlock::calcInlinePrefWidths() {
     }
 
     oldAutoWrap = autoWrap;
-    if (!child->isInlineFlow())
+    if (!child->isRenderInline())
       previousLeaf = child;
   }
 

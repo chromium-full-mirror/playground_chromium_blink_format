@@ -144,7 +144,7 @@ static RenderObject* getParentOfFirstLineBox(RenderBlock* curr,
       continue;
 
     if (currChild->isInline() &&
-        (!currChild->isInlineFlow() ||
+        (!currChild->isRenderInline() ||
          curr->generatesLineBoxesForInlineChild(currChild)))
       return curr;
 

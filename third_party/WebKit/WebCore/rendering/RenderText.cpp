@@ -910,7 +910,7 @@ void RenderText::setTextWithOffset(PassRefPtr<StringImpl> text,
 }
 
 static inline bool isInlineFlowOrEmptyText(RenderObject* o) {
-  if (o->isInlineFlow())
+  if (o->isRenderInline())
     return true;
   if (!o->isText())
     return false;

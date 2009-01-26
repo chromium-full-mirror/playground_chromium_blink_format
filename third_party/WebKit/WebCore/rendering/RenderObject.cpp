@@ -1975,7 +1975,7 @@ IntRect RenderObject::getAbsoluteRepaintRectWithOutline(int ow) {
   if (virtualContinuation() && !isInline())
     r.inflateY(toRenderBox(this)->collapsedMarginTop());
 
-  if (isInlineFlow()) {
+  if (isRenderInline()) {
     for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
       if (!curr->isText())
         r.unite(curr->getAbsoluteRepaintRectWithOutline(ow));
@@ -2248,7 +2248,7 @@ void RenderObject::styleWillChange(RenderStyle::Diff diff,
         isFloatingOrPositioned() &&
         (!newStyle->isFloating() && newStyle->position() != AbsolutePosition &&
          newStyle->position() != FixedPosition) &&
-        parent() && (parent()->isBlockFlow() || parent()->isInlineFlow());
+        parent() && (parent()->isBlockFlow() || parent()->isRenderInline());
 
     // reset style flags
     if (diff == RenderStyle::Layout ||
@@ -2780,7 +2780,7 @@ RenderStyle* RenderObject::firstLineStyle() const {
     if (firstLineBlock)
       s = firstLineBlock->getCachedPseudoStyle(RenderStyle::FIRST_LINE,
                                                style());
-  } else if (!obj->isAnonymous() && obj->isInlineFlow()) {
+  } else if (!obj->isAnonymous() && obj->isRenderInline()) {
     RenderStyle* parentStyle = obj->parent()->firstLineStyle();
     if (parentStyle != obj->parent()->style()) {
       // A first-line style is in effect. We need to cache a first-line style

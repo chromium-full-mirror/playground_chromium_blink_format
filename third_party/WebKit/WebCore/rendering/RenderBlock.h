@@ -61,7 +61,6 @@ class RenderBlock : public RenderFlow {
   virtual bool isBlockFlow() const {
     return (!isInline() || isReplaced()) && !isTable();
   }
-  virtual bool isInlineFlow() const { return isInline() && !isReplaced(); }
   virtual bool isInlineBlockOrInlineTable() const {
     return isInline() && isReplaced();
   }

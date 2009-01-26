@@ -268,7 +268,6 @@ class RenderObject : public CachedResourceClient {
   virtual bool isImage() const { return false; }
   virtual bool isInlineBlockOrInlineTable() const { return false; }
   virtual bool isInlineContinuation() const;
-  virtual bool isInlineFlow() const { return false; }
   virtual bool isListBox() const { return false; }
   virtual bool isListItem() const { return false; }
   virtual bool isListMarker() const { return false; }

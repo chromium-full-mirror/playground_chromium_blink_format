@@ -434,7 +434,7 @@ void RenderLayer::updateLayerPosition() {
 
   setPos(x, y);
 
-  if (renderer()->isInlineFlow()) {
+  if (renderer()->isRenderInline()) {
     RenderFlow* inlineFlow = static_cast<RenderFlow*>(renderer());
     IntRect lineBox = inlineFlow->linesBoundingBox();
     setWidth(lineBox.width());
@@ -2429,7 +2429,7 @@ bool RenderLayer::intersectsDamageRect(const IntRect& layerBounds,
   // can go ahead and return true.
   RenderView* view = renderer()->view();
   ASSERT(view);
-  if (view && !renderer()->isInlineFlow()) {
+  if (view && !renderer()->isRenderInline()) {
     IntRect b = layerBounds;
     b.inflate(view->maximalOutlineSize());
     if (b.intersects(damageRect))
@@ -2459,7 +2459,7 @@ IntRect RenderLayer::boundingBox(const RenderLayer* rootLayer) const {
   // layer for both hit testing and painting those
   // floats.
   IntRect result;
-  if (renderer()->isInlineFlow()) {
+  if (renderer()->isRenderInline()) {
     // Go from our first line box to our last line box.
     RenderInline* inlineFlow = static_cast<RenderInline*>(renderer());
     InlineFlowBox* firstBox = inlineFlow->firstLineBox();
