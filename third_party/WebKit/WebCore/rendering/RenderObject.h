@@ -408,8 +408,6 @@ class RenderObject : public CachedResourceClient {
   RenderObject* container() const;
   RenderObject* hoverAncestor() const;
 
-  virtual void markAllDescendantsWithFloatsForLayout(
-      RenderBox* floatToRemove = 0);
   void markContainingBlocksForLayout(bool scheduleRelayout = true,
                                      RenderObject* newRoot = 0);
   void setNeedsLayout(bool b, bool markParents = true);

@@ -319,7 +319,8 @@ void RenderTable::layout() {
     // FIXME: What about a form that has a display value that makes it a table
     // section?
     if (child->needsLayout() &&
-        !(child->element() && child->element()->hasTagName(formTag)))
+        !(child->element() && child->element()->hasTagName(formTag) &&
+          !child->isTableSection()))
       child->layout();
     if (child->isTableSection()) {
       RenderTableSection* section = static_cast<RenderTableSection*>(child);

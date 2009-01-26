@@ -490,8 +490,6 @@ bool RenderObject::hasStaticY() const {
          style()->top().isStatic();
 }
 
-void RenderObject::markAllDescendantsWithFloatsForLayout(RenderBox*) {}
-
 void RenderObject::setPrefWidthsDirty(bool b, bool markParents) {
   bool alreadyDirty = m_prefWidthsDirty;
   m_prefWidthsDirty = b;
@@ -2475,7 +2473,8 @@ void RenderObject::removeFromObjectLists() {
     }
 
     if (outermostBlock)
-      outermostBlock->markAllDescendantsWithFloatsForLayout(toRenderBox(this));
+      outermostBlock->markAllDescendantsWithFloatsForLayout(toRenderBox(this),
+                                                            false);
   }
 
   if (isPositioned()) {
