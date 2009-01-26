@@ -97,8 +97,6 @@ class RenderFlow : public RenderContainer {
                     int ty,
                     HitTestAction);
 
-  virtual IntRect absoluteClippedOverflowRect();
-
   virtual int lowestPosition(bool includeOverflowInterior = true,
                              bool includeSelf = true) const;
   virtual int rightmostPosition(bool includeOverflowInterior = true,
@@ -124,16 +122,6 @@ class RenderFlow : public RenderContainer {
   void calcMargins(int containerWidth);
 
   void checkConsistency() const;
-
-  IntRect linesBoundingBox() const;
-
-  virtual IntRect borderBoundingBox() const {
-    if (isRenderInline()) {
-      IntRect boundingBox = linesBoundingBox();
-      return IntRect(0, 0, boundingBox.width(), boundingBox.height());
-    }
-    return borderBoxRect();
-  }
 
  private:
   // An inline can be split with blocks occurring in between the inline content.

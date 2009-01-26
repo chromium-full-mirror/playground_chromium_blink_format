@@ -2468,7 +2468,7 @@ int RenderBox::containingBlockHeightForPositioned(
   int heightResult;
   if (containingBlock->isRenderInline()) {
     ASSERT(containingBlock->isRelPositioned());
-    heightResult = static_cast<const RenderFlow*>(containingBlock)
+    heightResult = static_cast<const RenderInline*>(containingBlock)
                        ->linesBoundingBox()
                        .height();
   } else
