@@ -252,6 +252,25 @@ QWebSettings* QWebSettings::globalSettings() {
     cache and the web page icon database, local database storage and offline
     applications storage.
 
+    \section1 Web Application Support
+
+    WebKit provides support for features specified in \l{HTML 5} that improve
+   the
+    performance and capabilities of Web applications. These include client-side
+    (offline) storage and the use of a Web application cache.
+
+    Client-side (offline) storage is an improvement over the use of cookies to
+    store persistent data in Web applications. Applications can configure and
+    enable the use of an offline storage database by calling the
+    setOfflineStoragePath() with an appropriate file path, and can limit the
+   quota
+    for each application by calling setOfflineStorageDefaultQuota().
+
+    The performance of Web applications can be enhanced with the use of an
+    offline cache. This can be enabled by calling
+   setOfflineWebApplicationCache()
+    with an appropriate file path.
+
     \sa QWebPage::settings(), QWebView::settings(), {Browser}
 */
 
