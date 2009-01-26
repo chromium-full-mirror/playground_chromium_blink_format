@@ -1296,12 +1296,8 @@ bool XMLHttpRequest::accessControlCheck(const ResourceResponse& response) {
   if (accessControlOriginString == "*" && !m_includeCredentials)
     return true;
 
-  KURL accessControlOriginURL(accessControlOriginString);
-  if (!accessControlOriginURL.isValid())
-    return false;
-
   RefPtr<SecurityOrigin> accessControlOrigin =
-      SecurityOrigin::create(accessControlOriginURL);
+      SecurityOrigin::createFromString(accessControlOriginString);
   if (!accessControlOrigin->isSameSchemeHostPort(
           scriptExecutionContext()->securityOrigin()))
     return false;

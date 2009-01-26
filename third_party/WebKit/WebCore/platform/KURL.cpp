@@ -322,9 +322,7 @@ static void checkEncodedString(const String& url) {
   for (unsigned i = 0; i < url.length(); ++i)
     ASSERT(!(url[i] & ~0x7F));
 
-  // FIXME: The first character should be checked with isSchemeFirstChar(), but
-  // some layout tests currently trigger this assertion.
-  ASSERT(!url.length() || url[0] != '/');
+  ASSERT(!url.length() || isSchemeFirstChar(url[0]));
 }
 #else
 static inline void checkEncodedString(const String&) {}
@@ -350,12 +348,14 @@ void KURL::invalidate() {
 
 KURL::KURL(const char* url) {
   parse(url, 0);
+  ASSERT(url == m_string);
 }
 
 KURL::KURL(const String& url) {
   checkEncodedString(url);
 
   parse(url);
+  ASSERT(url == m_string);
 }
 
 KURL::KURL(const KURL& base, const String& relative) {
