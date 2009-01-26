@@ -41,8 +41,7 @@ struct BidiRun : BidiCharacterRun {
           WTF::Unicode::Direction dir)
       : BidiCharacterRun(start, stop, context, dir),
         m_object(object),
-        m_box(0),
-        m_compact(false) {}
+        m_box(0) {}
 
   void destroy();
 
@@ -61,7 +60,6 @@ struct BidiRun : BidiCharacterRun {
  public:
   RenderObject* m_object;
   InlineBox* m_box;
-  bool m_compact;
 };
 
 }  // namespace WebCore

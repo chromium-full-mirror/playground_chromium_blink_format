@@ -392,8 +392,8 @@ void RenderFlow::paintLines(PaintInfo& paintInfo, int tx, int ty) {
 
   bool inlineFlow = isInlineFlow();
   if (inlineFlow)
-    ASSERT(m_layer);  // The only way a compact/run-in/inline could paint like
-                      // this is if it has a layer.
+    ASSERT(m_layer);  // The only way an inline could paint like this is if it
+                      // has a layer.
 
   // If we have no lines then we have no work to do.
   if (!firstLineBox())
@@ -478,8 +478,8 @@ bool RenderFlow::hitTestLines(const HitTestRequest& request,
 
   bool inlineFlow = isInlineFlow();
   if (inlineFlow)
-    ASSERT(m_layer);  // The only way a compact/run-in/inline could paint like
-                      // this is if it has a layer.
+    ASSERT(m_layer);  // The only way an inline can hit test like this is if it
+                      // has a layer.
 
   // If we have no lines then we have no work to do.
   if (!firstLineBox())
@@ -515,9 +515,8 @@ bool RenderFlow::hitTestLines(const HitTestRequest& request,
 
 IntRect RenderFlow::absoluteClippedOverflowRect() {
   if (isInlineFlow()) {
-    // Only compacts and run-ins are allowed in here during layout.
-    ASSERT(!view() || !view()->layoutStateEnabled() || isCompact() ||
-           isRunIn());
+    // Only run-ins are allowed in here during layout.
+    ASSERT(!view() || !view()->layoutStateEnabled() || isRunIn());
 
     if (!firstLineBox() && !continuation())
       return IntRect();
@@ -608,7 +607,7 @@ IntRect RenderFlow::linesBoundingBox() const {
         rightSide = curr->xPos() + curr->width();
     }
     result.setWidth(rightSide - leftSide);
-    result.setX(isCompact() ? leftSide : leftSide - x());
+    result.setX(leftSide);
     result.setHeight(lastLineBox()->yPos() + lastLineBox()->height() -
                      firstLineBox()->yPos());
     result.setY(firstLineBox()->yPos());

@@ -40,11 +40,11 @@ class RenderBox : public RenderObject {
   int x() const { return m_frameRect.x(); }
   int y() const { return m_frameRect.y(); }
   int width() const {
-    ASSERT(!isInlineFlow() || isCompact());
+    ASSERT(!isInlineFlow());
     return m_frameRect.width();
   }
   int height() const {
-    ASSERT(!isInlineFlow() || isCompact());
+    ASSERT(!isInlineFlow());
     return m_frameRect.height();
   }
 
@@ -55,7 +55,7 @@ class RenderBox : public RenderObject {
 
   IntPoint location() const { return m_frameRect.location(); }
   IntSize size() const {
-    ASSERT(!isInlineFlow() || isCompact());
+    ASSERT(!isInlineFlow());
     return m_frameRect.size();
   }
 
@@ -68,7 +68,7 @@ class RenderBox : public RenderObject {
   void move(int dx, int dy) { m_frameRect.move(dx, dy); }
 
   IntRect frameRect() const {
-    ASSERT(!isInlineFlow() || isCompact());
+    ASSERT(!isInlineFlow());
     return m_frameRect;
   }
   void setFrameRect(const IntRect& rect) { m_frameRect = rect; }

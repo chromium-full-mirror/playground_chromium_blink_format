@@ -332,9 +332,6 @@ class RenderObject : public CachedResourceClient {
   bool isText() const { return m_isText; }
   bool isBox() const { return m_isBox; }
   bool isInline() const { return m_inline; }  // inline object
-  bool isCompact() const {
-    return style()->display() == COMPACT;
-  }  // compact object
   bool isRunIn() const {
     return style()->display() == RUN_IN;
   }  // run-in object
