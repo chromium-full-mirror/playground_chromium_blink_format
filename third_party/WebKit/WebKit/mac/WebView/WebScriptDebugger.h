@@ -30,6 +30,7 @@
 #define WebScriptDebugger_h
 
 #include <debugger/Debugger.h>
+#include <runtime/Protect.h>
 
 #include <wtf/RetainPtr.h>
 
@@ -49,6 +50,8 @@ NSString* toNSString(const JSC::UString&);
 class WebScriptDebugger : public JSC::Debugger {
  public:
   WebScriptDebugger(JSC::JSGlobalObject*);
+
+  void initGlobalCallFrame(const JSC::DebuggerCallFrame&);
 
   virtual void sourceParsed(JSC::ExecState*,
                             const JSC::SourceCode&,
@@ -76,9 +79,17 @@ class WebScriptDebugger : public JSC::Debugger {
                                   intptr_t sourceID,
                                   int lineno);
 
+  JSC::JSGlobalObject* globalObject() const { return m_globalObject.get(); }
+  WebScriptCallFrame* globalCallFrame() const {
+    return m_globalCallFrame.get();
+  }
+
  private:
   bool m_callingDelegate;
   RetainPtr<WebScriptCallFrame> m_topCallFrame;
+
+  JSC::ProtectedPtr<JSC::JSGlobalObject> m_globalObject;
+  RetainPtr<WebScriptCallFrame> m_globalCallFrame;
 };
 
 #endif  // WebScriptDebugger_h
