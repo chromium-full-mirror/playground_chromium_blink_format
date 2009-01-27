@@ -69,8 +69,8 @@ class RenderView : public RenderBlock {
 
   virtual bool hasOverhangingFloats() { return false; }
 
-  virtual void computeRectForRepaint(IntRect&,
-                                     RenderBox* repaintContainer,
+  virtual void computeRectForRepaint(RenderBox* repaintContainer,
+                                     IntRect&,
                                      bool fixed = false);
   virtual void repaintViewRectangle(const IntRect&, bool immediate = false);
 

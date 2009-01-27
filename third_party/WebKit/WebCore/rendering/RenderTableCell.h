@@ -107,8 +107,8 @@ class RenderTableCell : public RenderBlock {
                                   RenderObject* backgroundObject);
 
   virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
-  virtual void computeRectForRepaint(IntRect&,
-                                     RenderBox* repaintContainer,
+  virtual void computeRectForRepaint(RenderBox* repaintContainer,
+                                     IntRect&,
                                      bool fixed = false);
   virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
                                      bool fixed = false,

@@ -290,8 +290,8 @@ class RenderBox : public RenderObject {
                                bool includeSelf = true) const;
 
   virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
-  virtual void computeRectForRepaint(IntRect&,
-                                     RenderBox* repaintContainer,
+  virtual void computeRectForRepaint(RenderBox* repaintContainer,
+                                     IntRect&,
                                      bool fixed = false);
   IntSize offsetForPositionedInContainer(RenderObject*) const;
   virtual FloatQuad localToContainerQuad(const FloatQuad&,

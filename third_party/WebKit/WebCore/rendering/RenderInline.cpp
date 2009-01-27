@@ -469,7 +469,7 @@ IntRect RenderInline::clippedOverflowRectForRepaint(
     r = intersection(repaintRect, boxRect);
   }
   ASSERT(repaintContainer != this);
-  cb->computeRectForRepaint(r, repaintContainer);
+  cb->computeRectForRepaint(repaintContainer, r);
 
   if (ow) {
     for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {

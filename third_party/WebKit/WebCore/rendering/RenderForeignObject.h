@@ -44,8 +44,8 @@ class RenderForeignObject : public RenderSVGBlock {
   }
   virtual bool calculateLocalTransform();
 
-  virtual void computeRectForRepaint(IntRect&,
-                                     RenderBox* repaintContainer,
+  virtual void computeRectForRepaint(RenderBox* repaintContainer,
+                                     IntRect&,
                                      bool fixed = false);
   virtual bool requiresLayer() const { return false; }
   virtual void layout();

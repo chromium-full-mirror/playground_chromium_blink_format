@@ -752,13 +752,13 @@ class RenderObject : public CachedResourceClient {
   // repainting
   // that rect in view coordinates.
   void computeAbsoluteRepaintRect(IntRect& r, bool fixed = false) {
-    return computeRectForRepaint(r, 0, fixed);
+    return computeRectForRepaint(0, r, fixed);
   }
   // Given a rect in the object's coordinate space, compute a rect suitable for
   // repainting
   // that rect in the coordinate space of repaintContainer.
-  virtual void computeRectForRepaint(IntRect&,
-                                     RenderBox* repaintContainer,
+  virtual void computeRectForRepaint(RenderBox* repaintContainer,
+                                     IntRect&,
                                      bool fixed = false);
 
   virtual unsigned int length() const { return 1; }

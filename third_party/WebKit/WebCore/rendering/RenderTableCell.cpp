@@ -202,12 +202,12 @@ IntRect RenderTableCell::clippedOverflowRectForRepaint(
     // repaint containers. https://bugs.webkit.org/show_bug.cgi?id=23308
     r.move(v->layoutDelta());
   }
-  computeRectForRepaint(r, repaintContainer);
+  computeRectForRepaint(repaintContainer, r);
   return r;
 }
 
-void RenderTableCell::computeRectForRepaint(IntRect& r,
-                                            RenderBox* repaintContainer,
+void RenderTableCell::computeRectForRepaint(RenderBox* repaintContainer,
+                                            IntRect& r,
                                             bool fixed) {
   if (repaintContainer == this)
     return;
@@ -217,7 +217,7 @@ void RenderTableCell::computeRectForRepaint(IntRect& r,
     r.move(-parentBox()->x(), -parentBox()->y());  // Rows are in the same
                                                    // coordinate space, so don't
                                                    // add their offset in.
-  RenderBlock::computeRectForRepaint(r, repaintContainer, fixed);
+  RenderBlock::computeRectForRepaint(repaintContainer, r, fixed);
 }
 
 FloatPoint RenderTableCell::localToAbsolute(FloatPoint localPoint,

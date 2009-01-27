@@ -2007,8 +2007,8 @@ IntRect RenderObject::clippedOverflowRectForRepaint(
   return IntRect();
 }
 
-void RenderObject::computeRectForRepaint(IntRect& rect,
-                                         RenderBox* repaintContainer,
+void RenderObject::computeRectForRepaint(RenderBox* repaintContainer,
+                                         IntRect& rect,
                                          bool fixed) {
   if (repaintContainer == this)
     return;
@@ -2040,7 +2040,7 @@ void RenderObject::computeRectForRepaint(IntRect& rect,
         return;
     }
 
-    o->computeRectForRepaint(rect, repaintContainer, fixed);
+    o->computeRectForRepaint(repaintContainer, rect, fixed);
   }
 }
 

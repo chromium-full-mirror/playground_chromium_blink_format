@@ -1740,12 +1740,12 @@ IntRect RenderBox::clippedOverflowRectForRepaint(RenderBox* repaintContainer) {
       r.inflate(v->maximalOutlineSize());
     }
   }
-  computeRectForRepaint(r, repaintContainer);
+  computeRectForRepaint(repaintContainer, r);
   return r;
 }
 
-void RenderBox::computeRectForRepaint(IntRect& rect,
-                                      RenderBox* repaintContainer,
+void RenderBox::computeRectForRepaint(RenderBox* repaintContainer,
+                                      IntRect& rect,
                                       bool fixed) {
   if (RenderView* v = view()) {
     // LayoutState is only valid for root-relative repainting
@@ -1837,7 +1837,7 @@ void RenderBox::computeRectForRepaint(IntRect& rect,
   } else
     rect.setLocation(topLeft);
 
-  o->computeRectForRepaint(rect, repaintContainer, fixed);
+  o->computeRectForRepaint(repaintContainer, rect, fixed);
 }
 
 void RenderBox::repaintDuringLayoutIfMoved(const IntRect& rect) {
