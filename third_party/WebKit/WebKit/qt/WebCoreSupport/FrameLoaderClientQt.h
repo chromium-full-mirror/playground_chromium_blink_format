@@ -217,8 +217,8 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
 
   virtual String userAgent(const WebCore::KURL&);
 
-  virtual void savePlatformDataToCachedPage(WebCore::CachedPage*);
-  virtual void transitionToCommittedFromCachedPage(WebCore::CachedPage*);
+  virtual void savePlatformDataToCachedFrame(WebCore::CachedFrame*);
+  virtual void transitionToCommittedFromCachedFrame(WebCore::CachedFrame*);
   virtual void transitionToCommittedForNewPage();
 
   virtual bool canCachePage() const;

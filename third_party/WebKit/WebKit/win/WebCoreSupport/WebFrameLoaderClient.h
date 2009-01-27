@@ -118,7 +118,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       const WebCore::SubstituteData&);
   virtual void setTitle(const WebCore::String& title, const WebCore::KURL&);
 
-  virtual void savePlatformDataToCachedPage(WebCore::CachedPage*);
+  virtual void savePlatformDataToCachedFrame(WebCore::CachedFrame*);
+  virtual void transitionToCommittedFromCachedFrame(WebCore::CachedFrame*);
   virtual void transitionToCommittedForNewPage();
 
   virtual bool canCachePage() const;

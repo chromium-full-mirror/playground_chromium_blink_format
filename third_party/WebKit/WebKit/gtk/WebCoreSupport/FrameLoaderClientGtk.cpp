@@ -576,10 +576,6 @@ void FrameLoaderClient::detachedFromParent3() {
   notImplemented();
 }
 
-void FrameLoaderClient::loadedFromCachedPage() {
-  notImplemented();
-}
-
 void FrameLoaderClient::dispatchDidHandleOnloadEvents() {
   notImplemented();
 }
@@ -852,9 +848,9 @@ void FrameLoaderClient::updateGlobalHistory() {
   notImplemented();
 }
 
-void FrameLoaderClient::savePlatformDataToCachedPage(CachedPage*) {}
+void FrameLoaderClient::savePlatformDataToCachedFrame(CachedFrame*) {}
 
-void FrameLoaderClient::transitionToCommittedFromCachedPage(CachedPage*) {}
+void FrameLoaderClient::transitionToCommittedFromCachedFrame(CachedFrame*) {}
 
 void FrameLoaderClient::transitionToCommittedForNewPage() {
   WebKitWebView* containingWindow = getViewFromFrame(m_frame);

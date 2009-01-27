@@ -188,11 +188,11 @@ bool FrameLoaderClientQt::hasWebView() const {
   return true;
 }
 
-void FrameLoaderClientQt::savePlatformDataToCachedPage(CachedPage*) {
+void FrameLoaderClientQt::savePlatformDataToCachedFrame(CachedFrame*) {
   notImplemented();
 }
 
-void FrameLoaderClientQt::transitionToCommittedFromCachedPage(CachedPage*) {}
+void FrameLoaderClientQt::transitionToCommittedFromCachedFrame(CachedFrame*) {}
 
 void FrameLoaderClientQt::transitionToCommittedForNewPage() {
   ASSERT(m_frame);

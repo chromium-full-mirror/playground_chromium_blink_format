@@ -1269,8 +1269,6 @@ String WebFrame::userAgent(const KURL& url) {
   return d->webView->userAgentForKURL(url);
 }
 
-void WebFrame::transitionToCommittedFromCachedPage(CachedPage*) {}
-
 void WebFrame::saveViewStateToItem(HistoryItem*) {}
 
 ResourceError WebFrame::cancelledError(const ResourceRequest& request) {

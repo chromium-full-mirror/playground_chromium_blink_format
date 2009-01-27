@@ -59,8 +59,7 @@ class CachedPage : public RefCounted<CachedPage> {
 
   double timeStamp() const { return m_timeStamp; }
 
-  void setCachedFramePlatformData(CachedFramePlatformData*);
-  CachedFramePlatformData* cachedFramePlatformData();
+  CachedFrame* cachedMainFrame() { return &m_cachedMainFrame; }
 
  private:
   CachedPage(Page*);

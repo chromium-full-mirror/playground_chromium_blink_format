@@ -45,7 +45,7 @@ class NSView;
 namespace WebCore {
 
 class AuthenticationChallenge;
-class CachedPage;
+class CachedFrame;
 class Color;
 class DocumentLoader;
 class Element;
@@ -223,8 +223,8 @@ class FrameLoaderClient {
 
   virtual String userAgent(const KURL&) = 0;
 
-  virtual void savePlatformDataToCachedPage(CachedPage*) = 0;
-  virtual void transitionToCommittedFromCachedPage(CachedPage*) = 0;
+  virtual void savePlatformDataToCachedFrame(CachedFrame*) = 0;
+  virtual void transitionToCommittedFromCachedFrame(CachedFrame*) = 0;
   virtual void transitionToCommittedForNewPage() = 0;
 
   virtual bool canCachePage() const = 0;

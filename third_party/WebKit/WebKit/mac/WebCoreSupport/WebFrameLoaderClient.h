@@ -40,7 +40,7 @@
 
 namespace WebCore {
 class AuthenticationChallenge;
-class CachedPage;
+class CachedFrame;
 class HistoryItem;
 class String;
 class ResourceLoader;
@@ -203,8 +203,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual WebCore::String userAgent(const WebCore::KURL&);
 
-  virtual void savePlatformDataToCachedPage(WebCore::CachedPage*);
-  virtual void transitionToCommittedFromCachedPage(WebCore::CachedPage*);
+  virtual void savePlatformDataToCachedFrame(WebCore::CachedFrame*);
+  virtual void transitionToCommittedFromCachedFrame(WebCore::CachedFrame*);
   virtual void transitionToCommittedForNewPage();
 
   virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
