@@ -899,6 +899,10 @@ bool QWebFrame::event(QEvent* e) {
     \sa render()
 */
 void QWebFrame::print(QPrinter* printer) const {
+  QPainter painter;
+  if (!painter.begin(printer))
+    return;
+
   const qreal zoomFactorX = printer->logicalDpiX() / qt_defaultDpi();
   const qreal zoomFactorY = printer->logicalDpiY() / qt_defaultDpi();
 
@@ -945,7 +949,6 @@ void QWebFrame::print(QPrinter* printer) const {
     ascending = false;
   }
 
-  QPainter painter(printer);
   painter.scale(zoomFactorX, zoomFactorY);
   GraphicsContext ctx(&painter);
 
