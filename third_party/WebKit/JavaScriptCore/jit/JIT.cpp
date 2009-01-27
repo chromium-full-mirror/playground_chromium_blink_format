@@ -897,7 +897,7 @@ void JIT::privateCompileMainPass() {
 
         // Now handle the immediate cases - undefined & null
         isImmediate.link(this);
-        and32(Imm32(~JSImmediate::ExtendedTagBitUndefined), X86::eax);
+        andPtr(Imm32(~JSImmediate::ExtendedTagBitUndefined), X86::eax);
         addJump(jePtr(X86::eax, ImmPtr(JSValuePtr::encode(jsNull()))),
                 target + 2);
 
@@ -922,7 +922,7 @@ void JIT::privateCompileMainPass() {
 
         // Now handle the immediate cases - undefined & null
         isImmediate.link(this);
-        and32(Imm32(~JSImmediate::ExtendedTagBitUndefined), X86::eax);
+        andPtr(Imm32(~JSImmediate::ExtendedTagBitUndefined), X86::eax);
         addJump(jnePtr(X86::eax, ImmPtr(JSValuePtr::encode(jsNull()))),
                 target + 2);
 
@@ -1310,7 +1310,7 @@ void JIT::privateCompileMainPass() {
 
         isImmediate.link(this);
 
-        and32(Imm32(~JSImmediate::ExtendedTagBitUndefined), X86::eax);
+        andPtr(Imm32(~JSImmediate::ExtendedTagBitUndefined), X86::eax);
         sete32(Imm32(JSImmediate::FullTagTypeNull), X86::eax);
 
         wasNotImmediate.link(this);
@@ -1335,7 +1335,7 @@ void JIT::privateCompileMainPass() {
 
         isImmediate.link(this);
 
-        and32(Imm32(~JSImmediate::ExtendedTagBitUndefined), X86::eax);
+        andPtr(Imm32(~JSImmediate::ExtendedTagBitUndefined), X86::eax);
         setne32(Imm32(JSImmediate::FullTagTypeNull), X86::eax);
 
         wasNotImmediate.link(this);
