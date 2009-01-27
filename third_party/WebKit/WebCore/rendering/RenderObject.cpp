@@ -1802,6 +1802,11 @@ IntRect RenderObject::paintingRootRect(IntRect& topLevelRect) {
 
 void RenderObject::paint(PaintInfo& /*paintInfo*/, int /*tx*/, int /*ty*/) {}
 
+RenderBox* RenderObject::containerForRepaint() const {
+  // For now, all repaints are root-relative.
+  return 0;
+}
+
 void RenderObject::repaint(bool immediate) {
   // Can't use view(), since we might be unrooted.
   RenderObject* o = this;
@@ -1809,9 +1814,11 @@ void RenderObject::repaint(bool immediate) {
     o = o->parent();
   if (!o->isRenderView())
     return;
+
   RenderView* view = static_cast<RenderView*>(o);
   if (view->printing())
     return;  // Don't repaint if we're printing.
+
   view->repaintViewRectangle(absoluteClippedOverflowRect(), immediate);
 }
 
@@ -1822,11 +1829,17 @@ void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
     o = o->parent();
   if (!o->isRenderView())
     return;
+
   RenderView* view = static_cast<RenderView*>(o);
   if (view->printing())
     return;  // Don't repaint if we're printing.
+
   IntRect absRect(r);
+
+  // FIXME: layoutDelta needs to be applied in parts before/after transforms and
+  // repaint containers. https://bugs.webkit.org/show_bug.cgi?id=23308
   absRect.move(view->layoutDelta());
+
   computeAbsoluteRepaintRect(absRect);
   view->repaintViewRectangle(absRect, immediate);
 }
@@ -1968,9 +1981,10 @@ bool RenderObject::checkForRepaintDuringLayout() const {
   return !document()->view()->needsFullRepaint() && !hasLayer();
 }
 
-IntRect RenderObject::getAbsoluteRepaintRectWithOutline(int ow) {
-  IntRect r(absoluteClippedOverflowRect());
-  r.inflate(ow);
+IntRect RenderObject::rectWithOutlineForRepaint(RenderBox* repaintContainer,
+                                                int outlineWidth) {
+  IntRect r(clippedOverflowRectForRepaint(repaintContainer));
+  r.inflate(outlineWidth);
 
   if (virtualContinuation() && !isInline())
     r.inflateY(toRenderBox(this)->collapsedMarginTop());
@@ -1978,20 +1992,27 @@ IntRect RenderObject::getAbsoluteRepaintRectWithOutline(int ow) {
   if (isRenderInline()) {
     for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
       if (!curr->isText())
-        r.unite(curr->getAbsoluteRepaintRectWithOutline(ow));
+        r.unite(
+            curr->rectWithOutlineForRepaint(repaintContainer, outlineWidth));
     }
   }
 
   return r;
 }
 
-IntRect RenderObject::absoluteClippedOverflowRect() {
+IntRect RenderObject::clippedOverflowRectForRepaint(
+    RenderBox* repaintContainer) {
   if (parent())
-    return parent()->absoluteClippedOverflowRect();
+    return parent()->clippedOverflowRectForRepaint(repaintContainer);
   return IntRect();
 }
 
-void RenderObject::computeAbsoluteRepaintRect(IntRect& rect, bool fixed) {
+void RenderObject::computeRectForRepaint(IntRect& rect,
+                                         RenderBox* repaintContainer,
+                                         bool fixed) {
+  if (repaintContainer == this)
+    return;
+
   if (RenderObject* o = parent()) {
     if (o->isBlockFlow()) {
       RenderBlock* cb = static_cast<RenderBlock*>(o);
@@ -2019,7 +2040,7 @@ void RenderObject::computeAbsoluteRepaintRect(IntRect& rect, bool fixed) {
         return;
     }
 
-    o->computeAbsoluteRepaintRect(rect, fixed);
+    o->computeRectForRepaint(rect, repaintContainer, fixed);
   }
 }
 
@@ -2361,14 +2382,18 @@ FloatPoint RenderObject::absoluteToLocal(FloatPoint containerPoint,
   return FloatPoint();
 }
 
-FloatQuad RenderObject::localToAbsoluteQuad(const FloatQuad& localQuad,
-                                            bool fixed) const {
+FloatQuad RenderObject::localToContainerQuad(const FloatQuad& localQuad,
+                                             RenderBox* repaintContainer,
+                                             bool fixed) const {
+  if (repaintContainer == this)
+    return localQuad;
+
   RenderObject* o = parent();
   if (o) {
     FloatQuad quad = localQuad;
     if (o->hasOverflowClip())
       quad -= toRenderBox(o)->layer()->scrolledContentOffset();
-    return o->localToAbsoluteQuad(quad, fixed);
+    return o->localToContainerQuad(quad, repaintContainer, fixed);
   }
 
   return FloatQuad();

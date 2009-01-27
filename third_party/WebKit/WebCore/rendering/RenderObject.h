@@ -27,6 +27,7 @@
 #define RenderObject_h
 
 #include "CachedResourceClient.h"
+#include "FloatQuad.h"
 #include "Document.h"
 #include "RenderStyle.h"
 
@@ -632,9 +633,17 @@ class RenderObject : public CachedResourceClient {
                                      bool fixed = false,
                                      bool useTransforms = false) const;
 
-  // Convert a local quad to an absolute quad, taking transforms into account.
-  virtual FloatQuad localToAbsoluteQuad(const FloatQuad&,
-                                        bool fixed = false) const;
+  // Convert a local quad to absolute coordinates, taking transforms into
+  // account.
+  FloatQuad localToAbsoluteQuad(const FloatQuad& quad,
+                                bool fixed = false) const {
+    return localToContainerQuad(quad, 0, fixed);
+  }
+  // Convert a local quad into the coordinate system of container, taking
+  // transforms into account.
+  virtual FloatQuad localToContainerQuad(const FloatQuad&,
+                                         RenderBox* repaintContainer,
+                                         bool fixed = false) const;
 
   // Return the offset from the container() renderer (excluding transforms)
   virtual IntSize offsetFromContainer(RenderObject*) const;
@@ -700,6 +709,13 @@ class RenderObject : public CachedResourceClient {
                   int adjbw1,
                   int adjbw2);
 
+  // Return the RenderBox in the container chain which is responsible for
+  // painting this object, or 0
+  // if painting is root-relative. This is the container that should be passed
+  // to the 'forRepaint'
+  // methods.
+  RenderBox* containerForRepaint() const;
+
   // Repaint the entire object.  Called when, e.g., the color of a border
   // changes, or when a border
   // style changes.
@@ -724,14 +740,26 @@ class RenderObject : public CachedResourceClient {
   // Returns the rect that should be repainted whenever this object changes.
   // The rect is in the view's
   // coordinate space.  This method deals with outlines and overflow.
-  virtual IntRect absoluteClippedOverflowRect();
+  IntRect absoluteClippedOverflowRect() {
+    return clippedOverflowRectForRepaint(0);
+  }
+  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
 
-  IntRect getAbsoluteRepaintRectWithOutline(int ow);
+  IntRect rectWithOutlineForRepaint(RenderBox* repaintContainer,
+                                    int outlineWidth);
 
-  // Given a rect in the object's coordinate space, this method converts the
-  // rectangle to the view's
-  // coordinate space.
-  virtual void computeAbsoluteRepaintRect(IntRect&, bool fixed = false);
+  // Given a rect in the object's coordinate space, compute a rect suitable for
+  // repainting
+  // that rect in view coordinates.
+  void computeAbsoluteRepaintRect(IntRect& r, bool fixed = false) {
+    return computeRectForRepaint(r, 0, fixed);
+  }
+  // Given a rect in the object's coordinate space, compute a rect suitable for
+  // repainting
+  // that rect in the coordinate space of repaintContainer.
+  virtual void computeRectForRepaint(IntRect&,
+                                     RenderBox* repaintContainer,
+                                     bool fixed = false);
 
   virtual unsigned int length() const { return 1; }
 
@@ -910,7 +938,8 @@ class RenderObject : public CachedResourceClient {
   }
 
   virtual void addFocusRingRects(GraphicsContext*, int /*tx*/, int /*ty*/){};
-  virtual IntRect absoluteOutlineBounds() const { return IntRect(); }
+
+  IntRect absoluteOutlineBounds() const { return outlineBoundsForRepaint(0); }
 
  protected:
   // Overrides should call the superclass at the end
@@ -941,6 +970,11 @@ class RenderObject : public CachedResourceClient {
   void adjustRectForOutlineAndShadow(IntRect&) const;
 
   void arenaDelete(RenderArena*, void* objectBase);
+
+  virtual IntRect outlineBoundsForRepaint(
+      RenderBox* /*repaintContainer*/) const {
+    return IntRect();
+  }
 
  private:
   RefPtr<RenderStyle> m_style;

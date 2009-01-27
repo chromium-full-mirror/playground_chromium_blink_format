@@ -106,16 +106,16 @@ class RenderTableCell : public RenderBlock {
                                   int ty,
                                   RenderObject* backgroundObject);
 
-  virtual IntRect absoluteClippedOverflowRect();
-  virtual void computeAbsoluteRepaintRect(IntRect&, bool fixed = false);
+  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
+  virtual void computeRectForRepaint(IntRect&,
+                                     RenderBox* repaintContainer,
+                                     bool fixed = false);
   virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
                                      bool fixed = false,
                                      bool useTransforms = false) const;
   virtual FloatPoint absoluteToLocal(FloatPoint containerPoint,
                                      bool fixed = false,
                                      bool useTransforms = false) const;
-  virtual FloatQuad localToAbsoluteQuad(const FloatQuad&,
-                                        bool fixed = false) const;
 
   virtual int baselinePosition(bool firstLine = false,
                                bool isRootLineBox = false) const;
@@ -139,6 +139,10 @@ class RenderTableCell : public RenderBlock {
  protected:
   virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
   virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+
+  virtual FloatQuad localToContainerQuad(const FloatQuad&,
+                                         RenderBox* repaintContainer,
+                                         bool fixed = false) const;
 
  private:
   int m_row;

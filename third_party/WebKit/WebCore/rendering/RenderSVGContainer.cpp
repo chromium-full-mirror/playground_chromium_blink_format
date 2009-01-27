@@ -349,12 +349,13 @@ TransformationMatrix RenderSVGContainer::viewportTransform() const {
   return TransformationMatrix();
 }
 
-IntRect RenderSVGContainer::absoluteClippedOverflowRect() {
+IntRect RenderSVGContainer::clippedOverflowRectForRepaint(
+    RenderBox* repaintContainer) {
   FloatRect repaintRect;
 
   for (RenderObject* current = firstChild(); current != 0;
        current = current->nextSibling())
-    repaintRect.unite(current->absoluteClippedOverflowRect());
+    repaintRect.unite(current->clippedOverflowRectForRepaint(repaintContainer));
 
 #if ENABLE(SVG_FILTERS)
   // Filters can expand the bounding box
@@ -426,7 +427,9 @@ bool RenderSVGContainer::nodeAtPoint(const HitTestRequest& request,
   return false;
 }
 
-IntRect RenderSVGContainer::absoluteOutlineBounds() const {
+IntRect RenderSVGContainer::outlineBoundsForRepaint(
+    RenderBox* /*repaintContainer*/) const {
+  // FIXME: handle non-root repaintContainer
   IntRect result = m_absoluteBounds;
   adjustRectForOutlineAndShadow(result);
   return result;

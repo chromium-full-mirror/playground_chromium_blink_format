@@ -52,7 +52,7 @@ class RenderSVGHiddenContainer : public RenderSVGContainer {
   virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
-  virtual IntRect absoluteClippedOverflowRect();
+  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
   virtual void absoluteRects(Vector<IntRect>& rects,
                              int tx,
                              int ty,

@@ -149,7 +149,8 @@ void RenderTableCell::setOverrideSize(int size) {
   RenderBlock::setOverrideSize(size);
 }
 
-IntRect RenderTableCell::absoluteClippedOverflowRect() {
+IntRect RenderTableCell::clippedOverflowRectForRepaint(
+    RenderBox* repaintContainer) {
   // If the table grid is dirty, we cannot get reliable information about
   // adjoining cells,
   // so we ignore outside borders. This should not be a problem because it means
@@ -158,7 +159,7 @@ IntRect RenderTableCell::absoluteClippedOverflowRect() {
   // current rect, which
   // includes any outside borders of this cell.
   if (!table()->collapseBorders() || table()->needsSectionRecalc())
-    return RenderBlock::absoluteClippedOverflowRect();
+    return RenderBlock::clippedOverflowRectForRepaint(repaintContainer);
 
   bool rtl = table()->style()->direction() == RTL;
   int outlineSize = style()->outlineSize();
@@ -195,21 +196,28 @@ IntRect RenderTableCell::absoluteClippedOverflowRect() {
   IntRect r(-left, -top, left + max(width() + right, overflowWidth(false)),
             top + max(height() + bottom, overflowHeight(false)));
 
-  if (RenderView* v = view())
+  if (RenderView* v = view()) {
+    // FIXME: layoutDelta needs to be applied in parts before/after transforms
+    // and
+    // repaint containers. https://bugs.webkit.org/show_bug.cgi?id=23308
     r.move(v->layoutDelta());
-
-  computeAbsoluteRepaintRect(r);
+  }
+  computeRectForRepaint(r, repaintContainer);
   return r;
 }
 
-void RenderTableCell::computeAbsoluteRepaintRect(IntRect& r, bool fixed) {
+void RenderTableCell::computeRectForRepaint(IntRect& r,
+                                            RenderBox* repaintContainer,
+                                            bool fixed) {
+  if (repaintContainer == this)
+    return;
   r.setY(r.y());
   RenderView* v = view();
   if ((!v || !v->layoutStateEnabled()) && parent())
     r.move(-parentBox()->x(), -parentBox()->y());  // Rows are in the same
                                                    // coordinate space, so don't
                                                    // add their offset in.
-  RenderBlock::computeAbsoluteRepaintRect(r, fixed);
+  RenderBlock::computeRectForRepaint(r, repaintContainer, fixed);
 }
 
 FloatPoint RenderTableCell::localToAbsolute(FloatPoint localPoint,
@@ -235,14 +243,18 @@ FloatPoint RenderTableCell::absoluteToLocal(FloatPoint containerPoint,
   return localPoint;
 }
 
-FloatQuad RenderTableCell::localToAbsoluteQuad(const FloatQuad& localQuad,
-                                               bool fixed) const {
+FloatQuad RenderTableCell::localToContainerQuad(const FloatQuad& localQuad,
+                                                RenderBox* repaintContainer,
+                                                bool fixed) const {
+  if (repaintContainer == this)
+    return localQuad;
+
   FloatQuad quad = localQuad;
   if (parent()) {
     // Rows are in the same coordinate space, so don't add their offset in.
     quad.move(-parentBox()->x(), -parentBox()->y());
   }
-  return RenderBlock::localToAbsoluteQuad(quad, fixed);
+  return RenderBlock::localToContainerQuad(quad, repaintContainer, fixed);
 }
 
 int RenderTableCell::baselinePosition(bool /*firstLine*/,

@@ -54,7 +54,7 @@ class RenderReplaced : public RenderBox {
   virtual int overflowTop(bool includeInterior = true) const;
   virtual IntRect overflowRect(bool includeInterior = true) const;
 
-  virtual IntRect absoluteClippedOverflowRect();
+  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
 
   virtual unsigned caretMaxRenderedOffset() const;
   virtual VisiblePosition positionForCoordinates(int x, int y);

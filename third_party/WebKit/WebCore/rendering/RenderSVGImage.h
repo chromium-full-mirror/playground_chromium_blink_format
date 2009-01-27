@@ -45,7 +45,7 @@ class RenderSVGImage : public RenderImage {
   }
 
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
-  virtual IntRect absoluteClippedOverflowRect();
+  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
   virtual void absoluteRects(Vector<IntRect>&,
                              int tx,
                              int ty,

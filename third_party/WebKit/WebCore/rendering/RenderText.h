@@ -139,7 +139,7 @@ class RenderText : public RenderObject {
     return style()->marginRight().calcMinValue(0);
   }
 
-  virtual IntRect absoluteClippedOverflowRect();
+  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
 
   InlineTextBox* firstTextBox() const { return m_firstTextBox; }
   InlineTextBox* lastTextBox() const { return m_lastTextBox; }

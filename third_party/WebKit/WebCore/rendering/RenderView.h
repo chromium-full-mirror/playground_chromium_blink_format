@@ -50,8 +50,6 @@ class RenderView : public RenderBlock {
   virtual FloatPoint absoluteToLocal(FloatPoint containerPoint,
                                      bool fixed = false,
                                      bool useTransforms = false) const;
-  virtual FloatQuad localToAbsoluteQuad(const FloatQuad&,
-                                        bool fixed = false) const;
 
   int docHeight() const;
   int docWidth() const;
@@ -71,7 +69,9 @@ class RenderView : public RenderBlock {
 
   virtual bool hasOverhangingFloats() { return false; }
 
-  virtual void computeAbsoluteRepaintRect(IntRect&, bool fixed = false);
+  virtual void computeRectForRepaint(IntRect&,
+                                     RenderBox* repaintContainer,
+                                     bool fixed = false);
   virtual void repaintViewRectangle(const IntRect&, bool immediate = false);
 
   virtual void paint(PaintInfo&, int tx, int ty);
@@ -175,6 +175,11 @@ class RenderView : public RenderBlock {
     ASSERT(m_layoutStateDisableCount > 0);
     m_layoutStateDisableCount--;
   }
+
+ protected:
+  virtual FloatQuad localToContainerQuad(const FloatQuad&,
+                                         RenderBox* repaintContainer,
+                                         bool fixed = false) const;
 
  private:
   // selectionRect should never be called on a RenderView
