@@ -4605,8 +4605,6 @@ bool FrameLoader::loadProvisionalItemFromCachedPage() {
 void FrameLoader::cachePageForHistoryItem(HistoryItem* item) {
   if (Page* page = m_frame->page()) {
     RefPtr<CachedPage> cachedPage = CachedPage::create(page);
-    m_client->savePlatformDataToCachedFrame(cachedPage->cachedMainFrame());
-
     pageCache()->add(item, cachedPage.release());
   }
 }
