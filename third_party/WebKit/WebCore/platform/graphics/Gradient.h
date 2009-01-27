@@ -29,6 +29,7 @@
 
 #include "FloatPoint.h"
 #include "Generator.h"
+#include "GraphicsTypes.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/Vector.h>
 
@@ -89,6 +90,9 @@ class Gradient : public Generator {
 
   void setStopsSorted(bool s) { m_stopsSorted = s; }
 
+  void setSpreadMethod(GradientSpreadMethod);
+  GradientSpreadMethod spreadMethod() { return m_spreadMethod; }
+
   virtual void fill(GraphicsContext*, const FloatRect&);
 
  private:
@@ -108,6 +112,7 @@ class Gradient : public Generator {
   mutable Vector<ColorStop> m_stops;
   mutable bool m_stopsSorted;
   mutable int m_lastStop;
+  GradientSpreadMethod m_spreadMethod;
 
   PlatformGradient m_gradient;
 };

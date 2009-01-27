@@ -52,9 +52,6 @@ class SVGPaintServerGradient : public SVGPaintServer {
   void setGradient(PassRefPtr<Gradient>);
   Gradient* gradient() const;
 
-  GradientSpreadMethod spreadMethod() const;
-  void setGradientSpreadMethod(const GradientSpreadMethod&);
-
   // Gradient start and end points are percentages when used in boundingBox
   // mode.
   // For instance start point with value (0,0) is top-left and end point with
@@ -87,7 +84,6 @@ class SVGPaintServerGradient : public SVGPaintServer {
  private:
   Vector<SVGGradientStop> m_stops;
   RefPtr<Gradient> m_gradient;
-  GradientSpreadMethod m_spreadMethod;
   bool m_boundingBoxMode;
   TransformationMatrix m_gradientTransform;
   const SVGGradientElement* m_ownerElement;
