@@ -26,6 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef AccessibilityObjectWrapper_h
+#define AccessibilityObjectWrapper_h
+
 #import <wtf/RefPtr.h>
 
 #ifdef __OBJC__
@@ -52,3 +55,5 @@ class VisiblePosition;
 - (NSView*)attachmentView;
 
 @end
+
+#endif  // AccessibilityObjectWrapper_h
