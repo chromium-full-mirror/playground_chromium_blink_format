@@ -732,12 +732,13 @@ void EventHandler::allowDHTMLDrag(bool& flagDHTML, bool& flagUA) const {
 }
 
 HitTestResult EventHandler::hitTestResultAtPoint(const IntPoint& point,
-                                                 bool allowShadowContent) {
+                                                 bool allowShadowContent,
+                                                 bool clipToVisible) {
   HitTestResult result(point);
   if (!m_frame->contentRenderer())
     return result;
-  m_frame->contentRenderer()->layer()->hitTest(HitTestRequest(true, true),
-                                               result);
+  m_frame->contentRenderer()->layer()->hitTest(
+      HitTestRequest(true, true, false, false, clipToVisible), result);
 
   while (true) {
     Node* n = result.innerNode();
@@ -758,8 +759,9 @@ HitTestResult EventHandler::hitTestResultAtPoint(const IntPoint& point,
         result.localPoint().y() + view->scrollY() - renderWidget->borderTop() -
             renderWidget->paddingTop());
     HitTestResult widgetHitTestResult(widgetPoint);
-    frame->contentRenderer()->layer()->hitTest(HitTestRequest(true, true),
-                                               widgetHitTestResult);
+    frame->contentRenderer()->layer()->hitTest(
+        HitTestRequest(true, true, false, false, clipToVisible),
+        widgetHitTestResult);
     result = widgetHitTestResult;
   }
 
@@ -777,7 +779,7 @@ HitTestResult EventHandler::hitTestResultAtPoint(const IntPoint& point,
         resultFrame->view()->contentsToWindow(result.point());
     IntPoint mainFramePoint = mainFrame->view()->windowToContents(windowPoint);
     result = mainFrame->eventHandler()->hitTestResultAtPoint(
-        mainFramePoint, allowShadowContent);
+        mainFramePoint, allowShadowContent, clipToVisible);
   }
 
   if (!allowShadowContent)
