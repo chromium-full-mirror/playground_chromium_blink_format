@@ -66,7 +66,7 @@ bool RenderTableCol::canHaveChildren() const {
 }
 
 IntRect RenderTableCol::clippedOverflowRectForRepaint(
-    RenderBox* /*repaintContainer*/) {
+    RenderBox* repaintContainer) {
   // For now, just repaint the whole table.
   // FIXME: Find a better way to do this, e.g., need to repaint all the cells
   // that we
@@ -76,7 +76,7 @@ IntRect RenderTableCol::clippedOverflowRectForRepaint(
   if (table && !table->isTable())
     table = table->parent();
   if (table && table->isTable())
-    return table->absoluteClippedOverflowRect();
+    return table->clippedOverflowRectForRepaint(repaintContainer);
 
   return IntRect();
 }

@@ -156,8 +156,8 @@ void RenderTableRow::layout() {
   // up for
   // the fact that we did not repaint in setStyle() because we had a layout
   // hint.
-  // We cannot call repaint() because our absoluteClippedOverflowRect() is taken
-  // from the
+  // We cannot call repaint() because our clippedOverflowRectForRepaint() is
+  // taken from the
   // parent table, and being mid-layout, that is invalid. Instead, we repaint
   // our cells.
   if (selfNeedsLayout() && checkForRepaintDuringLayout()) {
