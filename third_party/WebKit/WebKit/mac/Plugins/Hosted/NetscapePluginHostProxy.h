@@ -49,6 +49,8 @@ class NetscapePluginHostProxy {
 
   NetscapePluginInstanceProxy* pluginInstance(uint32_t pluginID);
 
+  void setMenuBarVisible(bool);
+
  private:
   ~NetscapePluginHostProxy();
   void pluginHostDied();
@@ -70,6 +72,8 @@ class NetscapePluginHostProxy {
 #endif
   mach_port_t m_pluginHostPort;
   RetainPtr<CFMachPortRef> m_deadNameNotificationPort;
+
+  bool m_menuBarIsVisible;
 };
 
 }  // namespace WebKit
