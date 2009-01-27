@@ -889,7 +889,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         // for its original
         // position and size, and so we can use that to make a repaint happen
         // now.
-        v->repaintViewRectangle(m_layer->repaintRect());
+        repaintUsingContainer(containerForRepaint(), m_layer->repaintRect());
       }
     }
 

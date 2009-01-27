@@ -141,13 +141,7 @@ bool RenderSVGImage::calculateLocalTransform() {
 void RenderSVGImage::layout() {
   ASSERT(needsLayout());
 
-  IntRect oldBounds;
-  IntRect oldOutlineBox;
-  bool checkForRepaint = checkForRepaintDuringLayout();
-  if (checkForRepaint) {
-    oldBounds = absoluteClippedOverflowRect();
-    oldOutlineBox = absoluteOutlineBounds();
-  }
+  LayoutRepainter repainter(*this, checkForRepaintDuringLayout());
 
   calculateLocalTransform();
 
@@ -164,8 +158,7 @@ void RenderSVGImage::layout() {
 
   calculateAbsoluteBounds();
 
-  if (checkForRepaint)
-    repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
+  repainter.repaintAfterLayout();
 
   setNeedsLayout(false);
 }

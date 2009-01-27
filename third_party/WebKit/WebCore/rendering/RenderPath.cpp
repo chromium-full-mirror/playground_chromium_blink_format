@@ -145,13 +145,11 @@ bool RenderPath::calculateLocalTransform() {
 }
 
 void RenderPath::layout() {
-  IntRect oldBounds;
-  IntRect oldOutlineBox;
-  bool checkForRepaint = checkForRepaintDuringLayout() && selfNeedsLayout();
-  if (checkForRepaint) {
-    oldBounds = m_absoluteBounds;
-    oldOutlineBox = absoluteOutlineBounds();
-  }
+  // FIXME: using m_absoluteBounds breaks if containerForRepaint() is not the
+  // root
+  LayoutRepainter repainter(*this,
+                            checkForRepaintDuringLayout() && selfNeedsLayout(),
+                            &m_absoluteBounds);
 
   calculateLocalTransform();
 
@@ -159,8 +157,7 @@ void RenderPath::layout() {
 
   m_absoluteBounds = absoluteClippedOverflowRect();
 
-  if (checkForRepaint)
-    repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
+  repainter.repaintAfterLayout();
 
   setNeedsLayout(false);
 }

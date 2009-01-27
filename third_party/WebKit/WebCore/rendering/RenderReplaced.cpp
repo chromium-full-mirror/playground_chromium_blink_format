@@ -74,13 +74,7 @@ void RenderReplaced::styleDidChange(RenderStyle::Diff diff,
 void RenderReplaced::layout() {
   ASSERT(needsLayout());
 
-  IntRect oldBounds;
-  IntRect oldOutlineBox;
-  bool checkForRepaint = checkForRepaintDuringLayout();
-  if (checkForRepaint) {
-    oldBounds = absoluteClippedOverflowRect();
-    oldOutlineBox = absoluteOutlineBounds();
-  }
+  LayoutRepainter repainter(*this, checkForRepaintDuringLayout());
 
   setHeight(minimumReplacedHeight());
 
@@ -88,8 +82,7 @@ void RenderReplaced::layout() {
   calcHeight();
   adjustOverflowForBoxShadow();
 
-  if (checkForRepaint)
-    repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
+  repainter.repaintAfterLayout();
 
   setNeedsLayout(false);
 }

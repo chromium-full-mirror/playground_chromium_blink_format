@@ -79,13 +79,10 @@ void RenderSVGText::layout() {
   // code which is not (yet) SVG aware
   setNeedsLayout(true);
 
-  IntRect oldBounds;
-  IntRect oldOutlineBox;
-  bool checkForRepaint = checkForRepaintDuringLayout();
-  if (checkForRepaint) {
-    oldBounds = m_absoluteBounds;
-    oldOutlineBox = absoluteOutlineBounds();
-  }
+  // FIXME: using m_absoluteBounds breaks if containerForRepaint() is not the
+  // root
+  LayoutRepainter repainter(*this, checkForRepaintDuringLayout(),
+                            &m_absoluteBounds);
 
   // Best guess for a relative starting point
   SVGTextElement* text = static_cast<SVGTextElement*>(element());
@@ -99,9 +96,7 @@ void RenderSVGText::layout() {
 
   m_absoluteBounds = absoluteClippedOverflowRect();
 
-  bool repainted = false;
-  if (checkForRepaint)
-    repainted = repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
+  repainter.repaintAfterLayout();
 
   setNeedsLayout(false);
 }
