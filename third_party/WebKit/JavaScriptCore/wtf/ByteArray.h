@@ -65,7 +65,7 @@ class ByteArray : public RefCountedBase {
   static PassRefPtr<ByteArray> create(size_t size);
 
  private:
-  ByteArray(size_t size) : RefCountedBase(1), m_size(size) {}
+  ByteArray(size_t size) : m_size(size) {}
   size_t m_size;
   unsigned char m_data[sizeof(size_t)];
 };
