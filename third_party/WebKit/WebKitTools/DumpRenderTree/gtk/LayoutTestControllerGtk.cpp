@@ -99,6 +99,11 @@ void LayoutTestController::keepWebHistory() {
   // FIXME: implement
 }
 
+size_t LayoutTestController::webHistoryItemCount() {
+  // FIXME: implement
+  return 0;
+}
+
 void LayoutTestController::notifyDone() {
   if (m_waitToDump && !topLoadingFrame && !WorkQueue::shared()->count())
     dump();
