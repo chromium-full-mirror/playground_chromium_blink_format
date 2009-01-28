@@ -40,7 +40,6 @@
 #include "RenderFlexibleBox.h"
 #include "RenderInline.h"
 #include "RenderLayer.h"
-#include "RenderReplica.h"
 #include "RenderTableCell.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
@@ -246,7 +245,9 @@ void RenderBox::styleDidChange(RenderStyle::Diff diff,
     }
   }
 
-  setHasTransform(style()->hasTransform());
+  // FIXME: we should make transforms really work on inline flows eventually.
+  if (!isInline() || isReplaced())
+    setHasTransform(style()->hasTransform());
   setHasReflection(style()->boxReflect());
 
   if (requiresLayer()) {
