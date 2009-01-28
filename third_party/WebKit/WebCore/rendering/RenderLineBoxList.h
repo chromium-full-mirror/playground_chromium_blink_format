@@ -64,7 +64,7 @@ class RenderLineBoxList {
 };
 
 #ifdef NDEBUG
-inline void RenderLineBoxList::checkConsistency(RenderObject*) const {}
+inline void RenderLineBoxList::checkConsistency() const {}
 #endif
 
 }  // namespace WebCore
