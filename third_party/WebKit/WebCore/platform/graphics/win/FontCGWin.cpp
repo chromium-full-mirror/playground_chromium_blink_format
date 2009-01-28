@@ -337,10 +337,11 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
                       int numGlyphs,
                       const FloatPoint& point) const {
   CGContextRef cgContext = graphicsContext->platformContext();
+  bool shouldUseFontSmoothing = WebCoreShouldUseFontSmoothing();
 
   if (font->platformData().useGDI()) {
     static bool canUsePlatformNativeGlyphs = wkCanUsePlatformNativeGlyphs();
-    if (!canUsePlatformNativeGlyphs ||
+    if (!canUsePlatformNativeGlyphs || !shouldUseFontSmoothing ||
         (graphicsContext->textDrawingMode() & cTextStroke)) {
       drawGDIGlyphs(graphicsContext, font, glyphBuffer, from, numGlyphs, point);
       return;
@@ -348,7 +349,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
   }
 
   uint32_t oldFontSmoothingStyle =
-      wkSetFontSmoothingStyle(cgContext, WebCoreShouldUseFontSmoothing());
+      wkSetFontSmoothingStyle(cgContext, shouldUseFontSmoothing);
 
   const FontPlatformData& platformData = font->platformData();
 
