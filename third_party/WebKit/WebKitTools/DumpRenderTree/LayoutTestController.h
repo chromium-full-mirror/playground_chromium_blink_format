@@ -43,7 +43,6 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                         JSObjectRef windowObject,
                         JSValueRef* exception);
 
-  // Controller Methods - platfrom independant implementations
   void addDisallowedURL(JSStringRef url);
   void clearAllDatabases();
   void clearBackForwardList();
@@ -53,6 +52,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void display();
   bool isCommandEnabled(JSStringRef name);
   void keepWebHistory();
+  size_t webHistoryItemCount();
   void notifyDone();
   JSStringRef pathToLocalResource(JSContextRef, JSStringRef url);
   void queueBackNavigation(int howFarBackward);
