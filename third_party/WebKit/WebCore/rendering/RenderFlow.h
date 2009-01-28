@@ -39,10 +39,7 @@ namespace WebCore {
 class RenderFlow : public RenderContainer {
  public:
   RenderFlow(Node* node)
-      : RenderContainer(node),
-        m_firstLineBox(0),
-        m_lastLineBox(0),
-        m_lineHeight(-1) {}
+      : RenderContainer(node), m_firstLineBox(0), m_lastLineBox(0) {}
 #ifndef NDEBUG
   virtual ~RenderFlow();
 #endif
@@ -64,8 +61,6 @@ class RenderFlow : public RenderContainer {
   virtual void destroy();
 
   virtual void dirtyLinesFromChangedChild(RenderObject* child);
-
-  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
 
   InlineFlowBox* firstLineBox() const { return m_firstLineBox; }
   InlineFlowBox* lastLineBox() const { return m_lastLineBox; }
@@ -107,8 +102,6 @@ class RenderFlow : public RenderContainer {
   // For inline flows, each box represents a portion of that inline.
   InlineFlowBox* m_firstLineBox;
   InlineFlowBox* m_lastLineBox;
-
-  mutable int m_lineHeight;
 };
 
 #ifdef NDEBUG

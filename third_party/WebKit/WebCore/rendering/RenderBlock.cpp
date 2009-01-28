@@ -134,7 +134,8 @@ RenderBlock::RenderBlock(Node* node)
       m_overflowHeight(0),
       m_overflowWidth(0),
       m_overflowLeft(0),
-      m_overflowTop(0) {
+      m_overflowTop(0),
+      m_lineHeight(-1) {
   setChildrenInline(true);
 }
 
@@ -4734,14 +4735,24 @@ bool RenderBlock::hasLineIfEmpty() const {
                            element()->shadowParentNode()->hasTagName(inputTag));
 }
 
-int RenderBlock::lineHeight(bool b, bool isRootLineBox) const {
+int RenderBlock::lineHeight(bool firstLine, bool isRootLineBox) const {
   // Inline blocks are replaced elements. Otherwise, just pass off to
   // the base class.  If we're being queried as though we're the root line
   // box, then the fact that we're an inline-block is irrelevant, and we behave
   // just like a block.
   if (isReplaced() && !isRootLineBox)
     return height() + marginTop() + marginBottom();
-  return RenderFlow::lineHeight(b, isRootLineBox);
+
+  if (firstLine && document()->usesFirstLineRules()) {
+    RenderStyle* s = style(firstLine);
+    if (s != style())
+      return s->computedLineHeight();
+  }
+
+  if (m_lineHeight == -1)
+    m_lineHeight = style()->computedLineHeight();
+
+  return m_lineHeight;
 }
 
 int RenderBlock::baselinePosition(bool b, bool isRootLineBox) const {

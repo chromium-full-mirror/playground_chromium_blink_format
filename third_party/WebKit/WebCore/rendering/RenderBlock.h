@@ -680,6 +680,8 @@ class RenderBlock : public RenderFlow {
   int m_overflowWidth;
   int m_overflowLeft;
   int m_overflowTop;
+
+  mutable int m_lineHeight;
 };
 
 }  // namespace WebCore
