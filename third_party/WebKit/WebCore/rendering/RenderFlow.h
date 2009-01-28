@@ -72,10 +72,6 @@ class RenderFlow : public RenderContainer {
                     int ty,
                     HitTestAction);
 
-  virtual IntRect localCaretRect(InlineBox*,
-                                 int caretOffset,
-                                 int* extraWidthToEndOfLine = 0);
-
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
   void paintOutlineForLine(GraphicsContext*,
                            int tx,
