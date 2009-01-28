@@ -42,16 +42,12 @@ const int cDefaultHeight = 150;
 RenderReplaced::RenderReplaced(Node* node)
     : RenderBox(node),
       m_intrinsicSize(cDefaultWidth, cDefaultHeight),
-      m_selectionState(SelectionNone),
       m_hasOverflow(false) {
   setReplaced(true);
 }
 
 RenderReplaced::RenderReplaced(Node* node, const IntSize& intrinsicSize)
-    : RenderBox(node),
-      m_intrinsicSize(intrinsicSize),
-      m_selectionState(SelectionNone),
-      m_hasOverflow(false) {
+    : RenderBox(node), m_intrinsicSize(intrinsicSize), m_hasOverflow(false) {
   setReplaced(true);
 }
 
@@ -280,7 +276,7 @@ IntRect RenderReplaced::localSelectionRect(bool checkWhetherSelected) const {
 }
 
 void RenderReplaced::setSelectionState(SelectionState s) {
-  m_selectionState = s;
+  RenderBox::setSelectionState(s);
   if (m_inlineBoxWrapper) {
     RootInlineBox* line = m_inlineBoxWrapper->root();
     if (line)

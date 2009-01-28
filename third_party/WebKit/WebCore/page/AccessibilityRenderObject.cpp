@@ -58,6 +58,7 @@
 #include "RenderFieldset.h"
 #include "RenderFileUploadControl.h"
 #include "RenderImage.h"
+#include "RenderInline.h"
 #include "RenderListBox.h"
 #include "RenderListMarker.h"
 #include "RenderMenuList.h"
@@ -437,9 +438,12 @@ Element* AccessibilityRenderObject::anchorElement() const {
   // earlier continuation, though.
   for (currRenderer = m_renderer; currRenderer && !currRenderer->element();
        currRenderer = currRenderer->parent()) {
-    RenderFlow* continuation = currRenderer->virtualContinuation();
-    if (continuation)
-      return cache->get(continuation)->anchorElement();
+    if (currRenderer->isRenderBlock()) {
+      RenderInline* continuation =
+          static_cast<RenderBlock*>(currRenderer)->inlineContinuation();
+      if (continuation)
+        return cache->get(continuation)->anchorElement();
+    }
   }
 
   // bail if none found
@@ -908,7 +912,8 @@ IntRect AccessibilityRenderObject::boundingBoxRect() const {
   if (!obj)
     return IntRect();
 
-  if (obj->isInlineContinuation())
+  if (obj->element())  // If we are a continuation, we want to make sure to use
+                       // the primary renderer.
     obj = obj->element()->renderer();
 
   // FIXME: This doesn't work correctly with transforms.

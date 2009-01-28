@@ -471,9 +471,7 @@ String listMarkerText(EListStyleType type, int value) {
 }
 
 RenderListMarker::RenderListMarker(RenderListItem* item)
-    : RenderBox(item->document()),
-      m_listItem(item),
-      m_selectionState(SelectionNone) {
+    : RenderBox(item->document()), m_listItem(item) {
   // init RenderObject attributes
   setInline(true);    // our object is Inline
   setReplaced(true);  // pretend to be replaced
@@ -882,7 +880,7 @@ IntRect RenderListMarker::getRelativeMarkerRect() {
 }
 
 void RenderListMarker::setSelectionState(SelectionState state) {
-  m_selectionState = state;
+  RenderBox::setSelectionState(state);
   if (InlineBox* box = inlineBoxWrapper())
     if (RootInlineBox* root = box->root())
       root->setHasSelectedChildren(state != SelectionNone);

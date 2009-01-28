@@ -26,6 +26,7 @@
 
 #include "Document.h"
 #include "Element.h"
+#include "FloatQuad.h"
 #include "Frame.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
@@ -128,18 +129,21 @@ RenderBlock::RenderBlock(Node* node)
     : RenderFlow(node),
       m_floatingObjects(0),
       m_positionedObjects(0),
+      m_inlineContinuation(0),
       m_maxMargin(0),
       m_overflowHeight(0),
       m_overflowWidth(0),
       m_overflowLeft(0),
-      m_overflowTop(0) {}
+      m_overflowTop(0) {
+  setChildrenInline(true);
+}
 
 RenderBlock::~RenderBlock() {
   delete m_floatingObjects;
   delete m_positionedObjects;
   delete m_maxMargin;
 
-  if (m_hasColumns)
+  if (hasColumns())
     delete gColumnInfoMap->take(this);
 
   if (gPercentHeightDescendantsMap) {
@@ -163,6 +167,15 @@ RenderBlock::~RenderBlock() {
       delete descendantSet;
     }
   }
+}
+
+void RenderBlock::destroy() {
+  // Detach our continuation first.
+  if (m_inlineContinuation)
+    m_inlineContinuation->destroy();
+  m_inlineContinuation = 0;
+
+  RenderFlow::destroy();
 }
 
 void RenderBlock::styleWillChange(RenderStyle::Diff diff,
@@ -281,7 +294,7 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
   // So, if our children are currently inline and a block child has to be
   // inserted, we move all our
   // inline children into anonymous block boxes.
-  if (m_childrenInline && !newChild->isInline() &&
+  if (childrenInline() && !newChild->isInline() &&
       !newChild->isFloatingOrPositioned()) {
     // This is a block with inline content. Wrap the inline content in anonymous
     // blocks.
@@ -293,7 +306,7 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
       ASSERT(beforeChild->isAnonymousBlock());
       ASSERT(beforeChild->parent() == this);
     }
-  } else if (!m_childrenInline &&
+  } else if (!childrenInline() &&
              (newChild->isFloatingOrPositioned() || newChild->isInline())) {
     // If we're inserting an inline child but all of our children are blocks,
     // then we have to make sure
@@ -395,7 +408,7 @@ void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
   ASSERT(isInlineBlockOrInlineTable() || !isInline());
   ASSERT(!insertionPoint || insertionPoint->parent() == this);
 
-  m_childrenInline = false;
+  setChildrenInline(false);
 
   RenderObject* child = firstChild();
   if (!child)
@@ -439,7 +452,8 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
   RenderObject* next = oldChild->nextSibling();
   bool canDeleteAnonymousBlocks =
       !documentBeingDestroyed() && !isInline() && !oldChild->isInline() &&
-      !oldChild->virtualContinuation() &&
+      (!oldChild->isRenderBlock() ||
+       !static_cast<RenderBlock*>(oldChild)->inlineContinuation()) &&
       (!prev || (prev->isAnonymousBlock() && prev->childrenInline())) &&
       (!next || (next->isAnonymousBlock() && next->childrenInline()));
   if (canDeleteAnonymousBlocks && prev && next) {
@@ -471,7 +485,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     setNeedsLayoutAndPrefWidthsRecalc();
     RenderBlock* anonBlock =
         static_cast<RenderBlock*>(removeChildNode(child, false));
-    m_childrenInline = true;
+    setChildrenInline(true);
     RenderObject* o = anonBlock->firstChild();
     while (o) {
       RenderObject* no = o;
@@ -673,7 +687,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
                             m_everHadLayout && checkForRepaintDuringLayout());
   LayoutStateMaintainer statePusher(
       view(), this, IntSize(x(), y()),
-      m_hasColumns || hasTransform() || hasReflection());
+      hasColumns() || hasTransform() || hasReflection());
 
   int oldWidth = width();
   int oldColumnWidth = desiredColumnWidth();
@@ -715,8 +729,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   if (!isCell) {
     initMaxMarginValues();
 
-    m_topMarginQuirk = style()->marginTop().quirk();
-    m_bottomMarginQuirk = style()->marginBottom().quirk();
+    setTopMarginQuirk(style()->marginTop().quirk());
+    setBottomMarginQuirk(style()->marginBottom().quirk());
 
     Node* node = element();
     if (node && node->hasTagName(formTag) &&
@@ -864,7 +878,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
 bool RenderBlock::expandsToEncloseOverhangingFloats() const {
   return isInlineBlockOrInlineTable() || isFloatingOrPositioned() ||
          hasOverflowClip() || (parent() && parent()->isFlexibleBox()) ||
-         m_hasColumns || isTableCell() || isFieldset();
+         hasColumns() || isTableCell() || isFieldset();
 }
 
 void RenderBlock::adjustPositionedBlock(RenderBox* child,
@@ -1038,7 +1052,7 @@ void RenderBlock::collapseMargins(RenderBox* child,
     // has an example of this, a <dt> with 0.8em author-specified inside
     // a <dl> inside a <td>.
     if (!marginInfo.determinedTopQuirk() && !topQuirk && (posTop - negTop)) {
-      m_topMarginQuirk = false;
+      setTopMarginQuirk(false);
       marginInfo.setDeterminedTopQuirk(true);
     }
 
@@ -1048,7 +1062,7 @@ void RenderBlock::collapseMargins(RenderBox* child,
       // This deals with the <td><div><p> case.
       // Don't do this for a block that split two inlines though.  You do
       // still apply margins in this case.
-      m_topMarginQuirk = true;
+      setTopMarginQuirk(true);
   }
 
   if (marginInfo.quirkContainer() && marginInfo.atTopOfBlock() &&
@@ -1205,7 +1219,7 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
     // floats.  They need
     // to shift over as necessary to dodge any floats that might get in the way.
     if (child->avoidsFloats()) {
-      int leftOff = leftOffset(height());
+      int leftOff = leftOffset(height(), false);
       if (style()->textAlign() != WEBKIT_CENTER &&
           child->style()->marginLeft().type() != Auto) {
         if (child->marginLeft() < 0)
@@ -1225,7 +1239,7 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
         // function.
         child->calcHorizontalMargins(child->style()->marginLeft(),
                                      child->style()->marginRight(),
-                                     lineWidth(child->y()));
+                                     lineWidth(child->y(), false));
         chPos = leftOff + child->marginLeft();
       }
     }
@@ -1236,7 +1250,7 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
         width() - borderRight() - paddingRight() - verticalScrollbarWidth();
     int chPos = xPos - (child->width() + child->marginRight());
     if (child->avoidsFloats()) {
-      int rightOff = rightOffset(height());
+      int rightOff = rightOffset(height(), false);
       if (style()->textAlign() != WEBKIT_CENTER &&
           child->style()->marginRight().type() != Auto) {
         if (child->marginRight() < 0)
@@ -1256,7 +1270,7 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
         // function.
         toRenderBox(child)->calcHorizontalMargins(child->style()->marginLeft(),
                                                   child->style()->marginRight(),
-                                                  lineWidth(child->y()));
+                                                  lineWidth(child->y(), false));
         chPos = rightOff - child->marginRight() - child->width();
       }
     }
@@ -1274,13 +1288,13 @@ void RenderBlock::setCollapsedBottomMargin(const MarginInfo& marginInfo) {
                         max(maxBottomNegMargin(), marginInfo.negMargin()));
 
     if (!marginInfo.bottomQuirk())
-      m_bottomMarginQuirk = false;
+      setBottomMarginQuirk(false);
 
     if (marginInfo.bottomQuirk() && marginBottom() == 0)
       // We have no bottom margin and our last child has a quirky margin.
       // We will pick up this quirky margin and pass it through.
       // This deals with the <td><div><p> case.
-      m_bottomMarginQuirk = true;
+      setBottomMarginQuirk(true);
   }
 }
 
@@ -1530,7 +1544,7 @@ bool RenderBlock::layoutOnlyPositionedObjects() {
 
   LayoutStateMaintainer statePusher(
       view(), this, IntSize(x(), y()),
-      m_hasColumns || hasTransform() || hasReflection());
+      hasColumns() || hasTransform() || hasReflection());
 
   if (needsPositionedMovementLayout()) {
     tryLayoutDoingPositionedMovementOnly();
@@ -1865,7 +1879,7 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, int tx, int ty) {
 
   // 2. paint contents
   if (paintPhase != PaintPhaseSelfOutline) {
-    if (m_hasColumns)
+    if (hasColumns())
       paintColumns(paintInfo, scrolledX, scrolledY);
     else
       paintContents(paintInfo, scrolledX, scrolledY);
@@ -1874,7 +1888,7 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, int tx, int ty) {
   // 3. paint selection
   // FIXME: Make this work with multi column layouts.  For now don't fill gaps.
   bool isPrinting = document()->printing();
-  if (!isPrinting && !m_hasColumns)
+  if (!isPrinting && !hasColumns())
     paintSelection(
         paintInfo, scrolledX,
         scrolledY);  // Fill in gaps in selection on lines and between blocks.
@@ -1882,7 +1896,7 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, int tx, int ty) {
   // 4. paint floats.
   if (paintPhase == PaintPhaseFloat || paintPhase == PaintPhaseSelection ||
       paintPhase == PaintPhaseTextClip) {
-    if (m_hasColumns)
+    if (hasColumns())
       paintColumns(paintInfo, scrolledX, scrolledY, true);
     else
       paintFloats(paintInfo, scrolledX, scrolledY,
@@ -1900,16 +1914,17 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, int tx, int ty) {
   // 6. paint continuation outlines.
   if ((paintPhase == PaintPhaseOutline ||
        paintPhase == PaintPhaseChildOutlines)) {
-    if (continuation() && continuation()->hasOutline() &&
-        continuation()->style()->visibility() == VISIBLE) {
-      RenderFlow* inlineFlow =
-          static_cast<RenderFlow*>(continuation()->element()->renderer());
-      if (!inlineFlow->hasLayer())
-        containingBlock()->addContinuationWithOutline(inlineFlow);
-      else if (!inlineFlow->firstLineBox())
-        inlineFlow->paintOutline(paintInfo.context,
-                                 tx - x() + inlineFlow->containingBlock()->x(),
-                                 ty - y() + inlineFlow->containingBlock()->y());
+    if (inlineContinuation() && inlineContinuation()->hasOutline() &&
+        inlineContinuation()->style()->visibility() == VISIBLE) {
+      RenderInline* inlineRenderer = static_cast<RenderInline*>(
+          inlineContinuation()->element()->renderer());
+      if (!inlineRenderer->hasLayer())
+        containingBlock()->addContinuationWithOutline(inlineRenderer);
+      else if (!inlineRenderer->firstLineBox())
+        inlineRenderer->paintOutline(
+            paintInfo.context,
+            tx - x() + inlineRenderer->containingBlock()->x(),
+            ty - y() + inlineRenderer->containingBlock()->y());
     }
     paintContinuationOutlines(paintInfo, tx, ty);
   }
@@ -1992,11 +2007,11 @@ static ContinuationOutlineTableMap* continuationOutlineTable() {
   return &table;
 }
 
-void RenderBlock::addContinuationWithOutline(RenderFlow* flow) {
+void RenderBlock::addContinuationWithOutline(RenderInline* flow) {
   // We can't make this work if the inline is in a layer.  We'll just rely on
   // the broken
   // way of painting.
-  ASSERT(!flow->layer());
+  ASSERT(!flow->layer() && !flow->isInlineContinuation());
 
   ContinuationOutlineTableMap* table = continuationOutlineTable();
   ListHashSet<RenderFlow*>* continuations = table->get(this);
@@ -2046,9 +2061,9 @@ void RenderBlock::setSelectionState(SelectionState s) {
 
   if ((s == SelectionStart && selectionState() == SelectionEnd) ||
       (s == SelectionEnd && selectionState() == SelectionStart))
-    m_selectionState = SelectionBoth;
+    RenderFlow::setSelectionState(SelectionBoth);
   else
-    m_selectionState = s;
+    RenderFlow::setSelectionState(s);
 
   RenderBlock* cb = containingBlock();
   if (cb && !cb->isRenderView())
@@ -2056,7 +2071,7 @@ void RenderBlock::setSelectionState(SelectionState s) {
 }
 
 bool RenderBlock::shouldPaintSelectionGaps() const {
-  return m_selectionState != SelectionNone &&
+  return selectionState() != SelectionNone &&
          style()->visibility() == VISIBLE && isSelectionRoot();
 }
 
@@ -2176,7 +2191,7 @@ GapRects RenderBlock::fillSelectionGaps(RenderBlock* rootBlock,
                        // someday.
     return result;
 
-  if (m_hasColumns || hasTransform()) {
+  if (hasColumns() || hasTransform()) {
     // FIXME: We should learn how to gap fill multiple columns and transforms
     // eventually.
     lastTop = (ty - blockY) + height();
@@ -2195,7 +2210,7 @@ GapRects RenderBlock::fillSelectionGaps(RenderBlock* rootBlock,
   // Go ahead and fill the vertical gap all the way to the bottom of our block
   // if the selection extends past our block.
   if (rootBlock == this &&
-      (m_selectionState != SelectionBoth && m_selectionState != SelectionEnd))
+      (selectionState() != SelectionBoth && selectionState() != SelectionEnd))
     result.uniteCenter(fillVerticalSelectionGap(lastTop, lastLeft, lastRight,
                                                 ty + height(), rootBlock,
                                                 blockX, blockY, paintInfo));
@@ -2464,7 +2479,7 @@ void RenderBlock::getHorizontalSelectionGapInfo(SelectionState state,
 }
 
 int RenderBlock::leftSelectionOffset(RenderBlock* rootBlock, int yPos) {
-  int left = leftOffset(yPos);
+  int left = leftOffset(yPos, false);
   if (left == borderLeft() + paddingLeft()) {
     if (rootBlock != this)
       // The border can potentially be further extended by our
@@ -2483,7 +2498,7 @@ int RenderBlock::leftSelectionOffset(RenderBlock* rootBlock, int yPos) {
 }
 
 int RenderBlock::rightSelectionOffset(RenderBlock* rootBlock, int yPos) {
-  int right = rightOffset(yPos);
+  int right = rightOffset(yPos, false);
   if (right == (contentWidth() + (borderLeft() + paddingLeft()))) {
     if (rootBlock != this)
       // The border can potentially be further extended by our
@@ -2789,7 +2804,7 @@ int RenderBlock::leftRelOffset(int y,
     }
   }
 
-  if (applyTextIndent && m_firstLine && style()->direction() == LTR) {
+  if (applyTextIndent && style()->direction() == LTR) {
     int cw = 0;
     if (style()->textIndent().isPercent())
       cw = containingBlock()->availableWidth();
@@ -2824,7 +2839,7 @@ int RenderBlock::rightRelOffset(int y,
     }
   }
 
-  if (applyTextIndent && m_firstLine && style()->direction() == RTL) {
+  if (applyTextIndent && style()->direction() == RTL) {
     int cw = 0;
     if (style()->textIndent().isPercent())
       cw = containingBlock()->availableWidth();
@@ -2834,8 +2849,8 @@ int RenderBlock::rightRelOffset(int y,
   return right;
 }
 
-int RenderBlock::lineWidth(int y) const {
-  int result = rightOffset(y) - leftOffset(y);
+int RenderBlock::lineWidth(int y, bool firstLine) const {
+  int result = rightOffset(y, firstLine) - leftOffset(y, firstLine);
   return (result < 0) ? 0 : result;
 }
 
@@ -2937,7 +2952,7 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
     }
   }
 
-  if (m_hasColumns) {
+  if (hasColumns()) {
     Vector<IntRect>* colRects = columnRects();
     for (unsigned i = 0; i < colRects->size(); i++)
       bottom = max(bottom, colRects->at(i).bottom() + relativeOffset);
@@ -3019,7 +3034,7 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
     }
   }
 
-  if (m_hasColumns) {
+  if (hasColumns()) {
     // This only matters for LTR
     if (style()->direction() == LTR)
       right = max(columnRects()->last().right() + relativeOffset, right);
@@ -3111,7 +3126,7 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
     }
   }
 
-  if (m_hasColumns) {
+  if (hasColumns()) {
     // This only matters for RTL
     if (style()->direction() == RTL)
       left = min(columnRects()->last().x() + relativeOffset, left);
@@ -3491,7 +3506,7 @@ int RenderBlock::getClearDelta(RenderBox* child) {
   // forces even almost strict mode not to work)
   int result = clearSet ? max(0, bottom - child->y()) : 0;
   if (!result && child->avoidsFloats() && child->style()->width().isFixed() &&
-      child->minPrefWidth() > lineWidth(child->y()) &&
+      child->minPrefWidth() > lineWidth(child->y(), false) &&
       child->minPrefWidth() <= availableWidth() && document()->inStrictMode())
     result = max(0, floatBottom() - child->y());
   return result;
@@ -3552,12 +3567,12 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
       m_layer->subtractScrolledContentOffset(scrolledX, scrolledY);
 
     // Hit test contents if we don't have columns.
-    if (!m_hasColumns && hitTestContents(request, result, _x, _y, scrolledX,
+    if (!hasColumns() && hitTestContents(request, result, _x, _y, scrolledX,
                                          scrolledY, hitTestAction))
       return true;
 
     // Hit test our columns if we do have them.
-    if (m_hasColumns && hitTestColumns(request, result, _x, _y, scrolledX,
+    if (hasColumns() && hitTestColumns(request, result, _x, _y, scrolledX,
                                        scrolledY, hitTestAction))
       return true;
 
@@ -3853,7 +3868,7 @@ void RenderBlock::offsetForContents(int& tx, int& ty) const {
   if (hasOverflowClip())
     m_layer->addScrolledContentOffset(tx, ty);
 
-  if (m_hasColumns) {
+  if (hasColumns()) {
     IntPoint contentsPoint(tx, ty);
     adjustPointToColumnContents(contentsPoint);
     tx = contentsPoint.x();
@@ -3864,7 +3879,7 @@ void RenderBlock::offsetForContents(int& tx, int& ty) const {
 int RenderBlock::availableWidth() const {
   // If we have multiple columns, then the available width is reduced to our
   // column width.
-  if (m_hasColumns)
+  if (hasColumns())
     return desiredColumnWidth();
   return contentWidth();
 }
@@ -3929,20 +3944,20 @@ void RenderBlock::calcColumnWidth() {
 
 void RenderBlock::setDesiredColumnCountAndWidth(int count, int width) {
   if (count == 1) {
-    if (m_hasColumns) {
+    if (hasColumns()) {
       delete gColumnInfoMap->take(this);
-      m_hasColumns = false;
+      setHasColumns(false);
     }
   } else {
     ColumnInfo* info;
-    if (m_hasColumns)
+    if (hasColumns())
       info = gColumnInfoMap->get(this);
     else {
       if (!gColumnInfoMap)
         gColumnInfoMap = new ColumnInfoMap;
       info = new ColumnInfo;
       gColumnInfoMap->add(this, info);
-      m_hasColumns = true;
+      setHasColumns(true);
     }
     info->m_desiredColumnCount = count;
     info->m_desiredColumnWidth = width;
@@ -3950,26 +3965,26 @@ void RenderBlock::setDesiredColumnCountAndWidth(int count, int width) {
 }
 
 int RenderBlock::desiredColumnWidth() const {
-  if (!m_hasColumns)
+  if (!hasColumns())
     return contentWidth();
   return gColumnInfoMap->get(this)->m_desiredColumnWidth;
 }
 
 unsigned RenderBlock::desiredColumnCount() const {
-  if (!m_hasColumns)
+  if (!hasColumns())
     return 1;
   return gColumnInfoMap->get(this)->m_desiredColumnCount;
 }
 
 Vector<IntRect>* RenderBlock::columnRects() const {
-  if (!m_hasColumns)
+  if (!hasColumns())
     return 0;
   return &gColumnInfoMap->get(this)->m_columnRects;
 }
 
 int RenderBlock::layoutColumns(int endOfContent) {
   // Don't do anything if we have no columns
-  if (!m_hasColumns)
+  if (!hasColumns())
     return -1;
 
   ColumnInfo* info = gColumnInfoMap->get(this);
@@ -4030,9 +4045,9 @@ int RenderBlock::layoutColumns(int endOfContent) {
     RenderObject::PaintInfo paintInfo(&context, pageRect, PaintPhaseForeground,
                                       false, 0, 0);
 
-    m_hasColumns = false;
+    setHasColumns(false);
     paintObject(paintInfo, 0, 0);
-    m_hasColumns = true;
+    setHasColumns(true);
 
     int adjustedBottom = v->bestTruncatedAt();
     if (adjustedBottom <= currY)
@@ -4091,7 +4106,7 @@ int RenderBlock::layoutColumns(int endOfContent) {
 
 void RenderBlock::adjustPointToColumnContents(IntPoint& point) const {
   // Just bail if we have no columns.
-  if (!m_hasColumns)
+  if (!hasColumns())
     return;
 
   Vector<IntRect>* colRects = columnRects();
@@ -4121,7 +4136,7 @@ void RenderBlock::adjustPointToColumnContents(IntPoint& point) const {
 
 void RenderBlock::adjustRectForColumns(IntRect& r) const {
   // Just bail if we have no columns.
-  if (!m_hasColumns)
+  if (!hasColumns())
     return;
 
   Vector<IntRect>* colRects = columnRects();
@@ -5200,6 +5215,96 @@ void RenderBlock::setMaxBottomMargins(int pos, int neg) {
   }
   m_maxMargin->m_bottomPos = pos;
   m_maxMargin->m_bottomNeg = neg;
+}
+
+void RenderBlock::absoluteRects(Vector<IntRect>& rects,
+                                int tx,
+                                int ty,
+                                bool topLevel) {
+  // For blocks inside inlines, we go ahead and include margins so that we run
+  // right up to the
+  // inline boxes above and below us (thus getting merged with them to form a
+  // single irregular
+  // shape).
+  if (topLevel && inlineContinuation()) {
+    rects.append(
+        IntRect(tx, ty - collapsedMarginTop(), width(),
+                height() + collapsedMarginTop() + collapsedMarginBottom()));
+    inlineContinuation()->absoluteRects(
+        rects, tx - x() + inlineContinuation()->containingBlock()->x(),
+        ty - y() + inlineContinuation()->containingBlock()->y(), topLevel);
+  } else
+    rects.append(IntRect(tx, ty, width(), height()));
+}
+
+void RenderBlock::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
+  // For blocks inside inlines, we go ahead and include margins so that we run
+  // right up to the
+  // inline boxes above and below us (thus getting merged with them to form a
+  // single irregular
+  // shape).
+  if (topLevel && inlineContinuation()) {
+    FloatRect localRect(
+        0, -collapsedMarginTop(), width(),
+        height() + collapsedMarginTop() + collapsedMarginBottom());
+    quads.append(localToAbsoluteQuad(localRect));
+    inlineContinuation()->absoluteQuads(quads, topLevel);
+  } else
+    quads.append(
+        RenderBox::localToAbsoluteQuad(FloatRect(0, 0, width(), height())));
+}
+
+IntRect RenderBlock::rectWithOutlineForRepaint(RenderBox* repaintContainer,
+                                               int outlineWidth) {
+  IntRect r(
+      RenderFlow::rectWithOutlineForRepaint(repaintContainer, outlineWidth));
+  if (inlineContinuation())
+    r.inflateY(collapsedMarginTop());
+  return r;
+}
+
+RenderObject* RenderBlock::hoverAncestor() const {
+  return inlineContinuation() ? inlineContinuation()
+                              : RenderFlow::hoverAncestor();
+}
+
+void RenderBlock::updateDragState(bool dragOn) {
+  RenderFlow::updateDragState(dragOn);
+  if (inlineContinuation())
+    inlineContinuation()->updateDragState(dragOn);
+}
+
+RenderStyle* RenderBlock::outlineStyleForRepaint() const {
+  return inlineContinuation() ? inlineContinuation()->style() : style();
+}
+
+void RenderBlock::childBecameNonInline(RenderObject*) {
+  makeChildrenNonInline();
+  if (isAnonymousBlock() && parent())
+    parent()->removeLeftoverAnonymousBlock(this);
+  // |this| may be dead here
+}
+
+void RenderBlock::updateHitTestResult(HitTestResult& result,
+                                      const IntPoint& point) {
+  if (result.innerNode())
+    return;
+
+  Node* node = element();
+  if (inlineContinuation())
+    // We are in the margins of block elements that are part of a continuation.
+    // In
+    // this case we're actually still inside the enclosing inline element that
+    // was
+    // split.  Go ahead and set our inner node accordingly.
+    node = inlineContinuation()->element();
+
+  if (node) {
+    result.setInnerNode(node);
+    if (!result.innerNonSharedNode())
+      result.setInnerNonSharedNode(node);
+    result.setLocalPoint(point);
+  }
 }
 
 const char* RenderBlock::renderName() const {

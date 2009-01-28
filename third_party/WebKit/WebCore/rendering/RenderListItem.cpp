@@ -245,7 +245,8 @@ void RenderListItem::positionListMarker() {
     RootInlineBox* root = m_marker->inlineBoxWrapper()->root();
 
     if (style()->direction() == LTR) {
-      int leftLineOffset = leftRelOffset(yOffset, leftOffset(yOffset));
+      int leftLineOffset =
+          leftRelOffset(yOffset, leftOffset(yOffset, false), false);
       markerXPos = leftLineOffset - xOffset - paddingLeft() - borderLeft() +
                    m_marker->marginLeft();
       m_marker->inlineBoxWrapper()->adjustPosition(markerXPos - markerOldX, 0);
@@ -254,7 +255,8 @@ void RenderListItem::positionListMarker() {
         adjustOverflow = true;
       }
     } else {
-      int rightLineOffset = rightRelOffset(yOffset, rightOffset(yOffset));
+      int rightLineOffset =
+          rightRelOffset(yOffset, rightOffset(yOffset, false), false);
       markerXPos = rightLineOffset - xOffset + paddingRight() + borderRight() +
                    m_marker->marginLeft();
       m_marker->inlineBoxWrapper()->adjustPosition(markerXPos - markerOldX, 0);

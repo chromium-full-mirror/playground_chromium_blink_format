@@ -185,7 +185,7 @@ class RenderBox : public RenderObject {
   virtual int borderLeft() const { return style()->borderLeftWidth(); }
   virtual int borderRight() const { return style()->borderRightWidth(); }
 
-  // The following seven functions are used to implement collapsing margins.
+  // The following five functions are used to implement collapsing margins.
   // All objects know their maximal positive and negative margins.  The
   // formula for computing a collapsed margin is |maxPosMargin| -
   // |maxNegmargin|.
@@ -201,8 +201,6 @@ class RenderBox : public RenderObject {
   int collapsedMarginBottom() const {
     return maxBottomMargin(true) - maxBottomMargin(false);
   }
-  virtual bool isTopMarginQuirk() const { return false; }
-  virtual bool isBottomMarginQuirk() const { return false; }
   virtual int maxTopMargin(bool positive) const {
     return positive ? std::max(0, marginTop()) : -std::min(0, marginTop());
   }
@@ -424,6 +422,8 @@ class RenderBox : public RenderObject {
   }
 
   IntRect maskClipRect();
+
+  virtual void childBecameNonInline(RenderObject* /*child*/) {}
 
 #if ENABLE(SVG)
   virtual TransformationMatrix localTransform() const;

@@ -268,7 +268,6 @@ class RenderObject : public CachedResourceClient {
   virtual bool isFrameSet() const { return false; }
   virtual bool isImage() const { return false; }
   virtual bool isInlineBlockOrInlineTable() const { return false; }
-  virtual bool isInlineContinuation() const;
   virtual bool isListBox() const { return false; }
   virtual bool isListItem() const { return false; }
   virtual bool isListMarker() const { return false; }
@@ -295,10 +294,12 @@ class RenderObject : public CachedResourceClient {
 
   bool isHTMLMarquee() const;
 
-  virtual bool childrenInline() const { return false; }
-  virtual void setChildrenInline(bool) {}
-
-  virtual RenderFlow* virtualContinuation() const { return 0; }
+  bool childrenInline() const { return m_childrenInline; }
+  void setChildrenInline(bool b = true) { m_childrenInline = b; }
+  bool hasColumns() const { return m_hasColumns; }
+  void setHasColumns(bool b = true) { m_hasColumns = b; }
+  bool cellWidthChanged() const { return m_cellWidthChanged; }
+  void setCellWidthChanged(bool b = true) { m_cellWidthChanged = b; }
 
 #if ENABLE(SVG)
   virtual bool isSVGRoot() const { return false; }
@@ -321,7 +322,10 @@ class RenderObject : public CachedResourceClient {
     return m_isAnonymous && style()->display() == BLOCK &&
            style()->styleType() == RenderStyle::NOPSEUDO && !isListMarker();
   }
-
+  bool isInlineContinuation() const {
+    return isInline() && isBox() &&
+           (element() ? element()->renderer() != this : false);
+  }
   bool isFloating() const { return m_floating; }
   bool isPositioned() const {
     return m_positioned;
@@ -383,7 +387,7 @@ class RenderObject : public CachedResourceClient {
       RenderStyle::PseudoId,
       RenderStyle* parentStyle = 0) const;
 
-  void updateDragState(bool dragOn);
+  virtual void updateDragState(bool dragOn);
 
   RenderView* view() const;
 
@@ -403,7 +407,7 @@ class RenderObject : public CachedResourceClient {
     * positioned elements
     */
   RenderObject* container() const;
-  RenderObject* hoverAncestor() const;
+  virtual RenderObject* hoverAncestor() const { return parent(); }
 
   void markContainingBlocksForLayout(bool scheduleRelayout = true,
                                      RenderObject* newRoot = 0);
@@ -586,7 +590,7 @@ class RenderObject : public CachedResourceClient {
                            int tx,
                            int ty,
                            HitTestAction);
-  void updateHitTestResult(HitTestResult&, const IntPoint&);
+  virtual void updateHitTestResult(HitTestResult&, const IntPoint&);
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
   VisiblePosition positionForPoint(const IntPoint&);
@@ -677,6 +681,11 @@ class RenderObject : public CachedResourceClient {
     return firstLine ? firstLineStyle() : style();
   }
 
+  // Anonymous blocks that are part of of a continuation chain will return their
+  // inline continuation's outline style instead.
+  // This is typically only relevant when repainting.
+  virtual RenderStyle* outlineStyleForRepaint() const { return style(); }
+
   void getTextDecorationColors(int decorations,
                                Color& underline,
                                Color& overline,
@@ -751,9 +760,8 @@ class RenderObject : public CachedResourceClient {
     return clippedOverflowRectForRepaint(0);
   }
   virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
-
-  IntRect rectWithOutlineForRepaint(RenderBox* repaintContainer,
-                                    int outlineWidth);
+  virtual IntRect rectWithOutlineForRepaint(RenderBox* repaintContainer,
+                                            int outlineWidth);
 
   // Given a rect in the object's coordinate space, compute a rect suitable for
   // repainting
@@ -792,6 +800,9 @@ class RenderObject : public CachedResourceClient {
   // phase's dirty-rect checks.
   int maximalOutlineSize(PaintPhase) const;
 
+  void setHasMarkupTruncation(bool b = true) { m_hasMarkupTruncation = b; }
+  bool hasMarkupTruncation() const { return m_hasMarkupTruncation; }
+
   enum SelectionState {
     SelectionNone,    // The object is not selected.
     SelectionStart,   // The object either contains the start of a selection run
@@ -806,12 +817,14 @@ class RenderObject : public CachedResourceClient {
   // The current selection state for an object.  For blocks, the state refers to
   // the state of the leaf
   // descendants (as described above in the SelectionState enum declaration).
-  virtual SelectionState selectionState() const { return SelectionNone; }
+  SelectionState selectionState() const {
+    return static_cast<SelectionState>(m_selectionState);
+    ;
+  }
 
   // Sets the selection state for an object.
   virtual void setSelectionState(SelectionState state) {
-    if (parent())
-      parent()->setSelectionState(state);
+    m_selectionState = state;
   }
 
   // A single rectangle that encompasses all of the selected objects within this
@@ -823,7 +836,7 @@ class RenderObject : public CachedResourceClient {
   virtual bool canBeSelectionLeaf() const { return false; }
 
   // Whether or not a block has selected children.
-  virtual bool hasSelectedChildren() const { return false; }
+  bool hasSelectedChildren() const { return m_selectionState != SelectionNone; }
 
   // Obtains the selection colors that should be used when painting a selection.
   Color selectionBackgroundColor() const;
@@ -884,6 +897,11 @@ class RenderObject : public CachedResourceClient {
   }
 
   virtual void calcVerticalMargins() {}
+  bool isTopMarginQuirk() const { return m_topMarginQuirk; }
+  bool isBottomMarginQuirk() const { return m_bottomMarginQuirk; }
+  void setTopMarginQuirk(bool b = true) { m_topMarginQuirk = b; }
+  void setBottomMarginQuirk(bool b = true) { m_bottomMarginQuirk = b; }
+
   void removeFromObjectLists();
 
   // When performing a global document tear-down, the renderer of the document
@@ -1031,6 +1049,9 @@ class RenderObject : public CachedResourceClient {
 #endif
   mutable int m_verticalPosition;
 
+  // 31 bits have been used here.  Count the bits before you add any and update
+  // the comment
+  // with the new total.
   bool m_needsLayout : 1;
   bool m_needsPositionedMovementLayout : 1;
   bool m_normalChildNeedsLayout : 1;
@@ -1060,6 +1081,19 @@ class RenderObject : public CachedResourceClient {
  public:
   bool m_hasCounterNodeMap : 1;
   bool m_everHadLayout : 1;
+
+ private:
+  // These bitfields are moved here from subclasses to pack them together
+  // from RenderBlock
+  bool m_childrenInline : 1;
+  bool m_topMarginQuirk : 1;
+  bool m_bottomMarginQuirk : 1;
+  bool m_hasMarkupTruncation : 1;
+  unsigned m_selectionState : 3;  // SelectionState
+  bool m_hasColumns : 1;
+
+  // from RenderTableCell
+  bool m_cellWidthChanged : 1;
 
  private:
   // Store state between styleWillChange and styleDidChange

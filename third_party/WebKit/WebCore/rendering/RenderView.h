@@ -176,6 +176,8 @@ class RenderView : public RenderBlock {
     m_layoutStateDisableCount--;
   }
 
+  virtual void updateHitTestResult(HitTestResult&, const IntPoint&);
+
  protected:
   virtual FloatQuad localToContainerQuad(const FloatQuad&,
                                          RenderBox* repaintContainer,
