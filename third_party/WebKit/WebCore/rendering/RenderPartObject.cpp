@@ -104,7 +104,7 @@ static const String& activeXType() {
 
 static inline bool havePlugin(const PluginData* pluginData,
                               const String& type) {
-  return pluginData && pluginData->supportsMimeType(type);
+  return pluginData && !type.isEmpty() && pluginData->supportsMimeType(type);
 }
 
 static String serviceTypeForClassId(const String& classId,
@@ -116,9 +116,6 @@ static String serviceTypeForClassId(const String& classId,
 
   static ClassIdToTypeMap* map = createClassIdToTypeMap();
   String type = map->get(classId);
-
-  if (type.isEmpty())
-    return activeXType();
 
   // If we do have a plug-in that supports generic ActiveX content and don't
   // have a plug-in
