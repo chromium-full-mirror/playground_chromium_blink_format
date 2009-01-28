@@ -94,6 +94,10 @@ class RenderInline : public RenderFlow {
     return IntRect(0, 0, boundingBox.width(), boundingBox.height());
   }
 
+  virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
+                                     bool isRootLineBox,
+                                     bool isOnlyRun = false);
+
   virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
 
   RenderBox* continuation() const { return m_continuation; }

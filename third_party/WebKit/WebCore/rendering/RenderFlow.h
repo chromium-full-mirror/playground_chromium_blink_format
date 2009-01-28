@@ -61,9 +61,6 @@ class RenderFlow : public RenderContainer {
   InlineFlowBox* firstLineBox() const { return m_lineBoxes.firstLineBox(); }
   InlineFlowBox* lastLineBox() const { return m_lineBoxes.lastLineBox(); }
 
-  virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
-                                     bool isRootLineBox,
-                                     bool isOnlyRun = false);
   virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
 
   void paintLines(PaintInfo&, int tx, int ty);

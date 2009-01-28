@@ -560,6 +560,12 @@ void RenderInline::updateHitTestResult(HitTestResult& result,
   }
 }
 
+InlineBox* RenderInline::createInlineBox(bool, bool, bool) {
+  InlineFlowBox* flowBox = new (renderArena()) InlineFlowBox(this);
+  m_lineBoxes.appendLineBox(flowBox);
+  return flowBox;
+}
+
 int RenderInline::lineHeight(bool firstLine, bool /*isRootLineBox*/) const {
   if (firstLine && document()->usesFirstLineRules()) {
     RenderStyle* s = style(firstLine);
