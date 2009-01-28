@@ -87,7 +87,8 @@ Settings::Settings(Page* page)
       m_shouldPaintCustomScrollbars(false),
       m_zoomsTextOnly(false),
       m_enforceCSSMIMETypeInStrictMode(true),
-      m_maximumDecodedImageSize(std::numeric_limits<size_t>::max()) {
+      m_maximumDecodedImageSize(std::numeric_limits<size_t>::max()),
+      m_allowScriptsToCloseWindows(false) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
@@ -373,5 +374,9 @@ void Settings::setShouldPaintNativeControls(bool shouldPaintNativeControls) {
   gShouldPaintNativeControls = shouldPaintNativeControls;
 }
 #endif
+
+void Settings::setAllowScriptsToCloseWindows(bool allowScriptsToCloseWindows) {
+  m_allowScriptsToCloseWindows = allowScriptsToCloseWindows;
+}
 
 }  // namespace WebCore

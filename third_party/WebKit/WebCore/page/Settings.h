@@ -242,6 +242,11 @@ class Settings {
   static bool shouldPaintNativeControls() { return gShouldPaintNativeControls; }
 #endif
 
+  void setAllowScriptsToCloseWindows(bool);
+  bool allowScriptsToCloseWindows() const {
+    return m_allowScriptsToCloseWindows;
+  }
+
  private:
   Page* m_page;
 
@@ -293,6 +298,7 @@ class Settings {
   bool m_zoomsTextOnly : 1;
   bool m_enforceCSSMIMETypeInStrictMode : 1;
   size_t m_maximumDecodedImageSize;
+  bool m_allowScriptsToCloseWindows : 1;
 
 #if USE(SAFARI_THEME)
   static bool gShouldPaintNativeControls;
