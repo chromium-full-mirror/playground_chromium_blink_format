@@ -88,8 +88,6 @@ class RenderFlow : public RenderContainer {
                            const IntRect& nextLine);
   void paintOutline(GraphicsContext*, int tx, int ty);
 
-  void calcMargins(int containerWidth);
-
  protected:
   RenderLineBoxList m_lineBoxes;
 };

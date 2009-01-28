@@ -106,6 +106,11 @@ class RenderInline : public RenderFlow {
 
   virtual void updateHitTestResult(HitTestResult&, const IntPoint&);
 
+  void calcMargins(int containerWidth) {
+    m_marginLeft = style()->marginLeft().calcMinValue(containerWidth);
+    m_marginRight = style()->marginRight().calcMinValue(containerWidth);
+  }
+
  protected:
   virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
 
