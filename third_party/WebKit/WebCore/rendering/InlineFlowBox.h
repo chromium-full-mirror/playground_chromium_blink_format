@@ -94,6 +94,10 @@ class InlineFlowBox : public InlineRunBox {
   virtual void attachLine();
   virtual void adjustPosition(int dx, int dy);
 
+  virtual void extractLineBoxFromRenderObject();
+  virtual void attachLineBoxToRenderObject();
+  virtual void removeLineBoxFromRenderObject();
+
   virtual void clearTruncation();
 
   virtual void paintBoxDecorations(RenderObject::PaintInfo&, int tx, int ty);

@@ -173,6 +173,10 @@ class RootInlineBox : public InlineFlowBox {
     return m_overflow ? &m_overflow->floats : 0;
   }
 
+  virtual void extractLineBoxFromRenderObject();
+  virtual void attachLineBoxToRenderObject();
+  virtual void removeLineBoxFromRenderObject();
+
  protected:
   // Normally we are only as tall as the style on our block dictates, but we
   // might have content
