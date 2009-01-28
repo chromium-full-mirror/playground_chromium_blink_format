@@ -72,7 +72,6 @@ class RenderFlow : public RenderContainer {
                     int ty,
                     HitTestAction);
 
-  virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
   void paintOutlineForLine(GraphicsContext*,
                            int tx,
                            int ty,

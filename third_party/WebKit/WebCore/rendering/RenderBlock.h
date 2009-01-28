@@ -467,6 +467,8 @@ class RenderBlock : public RenderFlow {
                                  int caretOffset,
                                  int* extraWidthToEndOfLine = 0);
 
+  virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
+
  private:
   void adjustPointToColumnContents(IntPoint&) const;
   void adjustForBorderFit(int x, int& left, int& right)
