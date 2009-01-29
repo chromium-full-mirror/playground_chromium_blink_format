@@ -72,14 +72,6 @@ class RenderFlow : public RenderContainer {
                     int ty,
                     HitTestAction);
 
-  void paintOutlineForLine(GraphicsContext*,
-                           int tx,
-                           int ty,
-                           const IntRect& prevLine,
-                           const IntRect& thisLine,
-                           const IntRect& nextLine);
-  void paintOutline(GraphicsContext*, int tx, int ty);
-
  protected:
   RenderLineBoxList m_lineBoxes;
 };

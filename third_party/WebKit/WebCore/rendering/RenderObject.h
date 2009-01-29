@@ -37,6 +37,7 @@ class AnimationController;
 class HitTestResult;
 class InlineBox;
 class InlineFlowBox;
+class RenderInline;
 class RenderBlock;
 class RenderFlow;
 class RenderLayer;
@@ -475,7 +476,7 @@ class RenderObject : public CachedResourceClient {
               PaintPhase newPhase,
               bool newForceBlackText,
               RenderObject* newPaintingRoot,
-              ListHashSet<RenderFlow*>* newOutlineObjects)
+              ListHashSet<RenderInline*>* newOutlineObjects)
         : context(newContext),
           rect(newRect),
           phase(newPhase),
@@ -489,9 +490,9 @@ class RenderObject : public CachedResourceClient {
     bool forceBlackText;
     RenderObject*
         paintingRoot;  // used to draw just one element and its visual kids
-    ListHashSet<RenderFlow*>* outlineObjects;  // used to list outlines that
-                                               // should be painted by a block
-                                               // with inline children
+    ListHashSet<RenderInline*>* outlineObjects;  // used to list outlines that
+                                                 // should be painted by a block
+                                                 // with inline children
   };
 
   virtual void paint(PaintInfo&, int tx, int ty);
