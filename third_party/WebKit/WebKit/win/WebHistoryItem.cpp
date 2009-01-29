@@ -93,6 +93,7 @@ static CFStringRef titleKey = CFSTR("title");
 static CFStringRef visitCountKey = CFSTR("visitCount");
 static CFStringRef lastVisitWasFailureKey = CFSTR("lastVisitWasFailure");
 static CFStringRef lastVisitWasHTTPNonGetKey = CFSTR("lastVisitWasHTTPNonGet");
+static CFStringRef redirectURLsKey = CFSTR("redirectURLs");
 
 HRESULT STDMETHODCALLTYPE
 WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
@@ -138,6 +139,16 @@ WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
   bool lastVisitWasHTTPNonGet =
       lastVisitWasHTTPNonGetRef && CFBooleanGetValue(lastVisitWasHTTPNonGetRef);
 
+  std::auto_ptr<Vector<String>> redirectURLsVector;
+  if (CFArrayRef redirectURLsRef = static_cast<CFArrayRef>(
+          CFDictionaryGetValue(dictionaryRef, redirectURLsKey))) {
+    CFIndex size = CFArrayGetCount(redirectURLsRef);
+    redirectURLs = std::auto_ptr<Vector<String>>(new Vector<String>(size));
+    for (CFIndex i = 0; i < size; ++i)
+      (*redirectURLsVector)[i] = String(
+          static_cast<CFStringRef>(CFArrayGetValueAtIndex(redirectURLsRef, i)));
+  }
+
   historyItemWrappers().remove(m_historyItem.get());
   m_historyItem = HistoryItem::create(urlStringRef, titleRef, lastVisitedTime);
   historyItemWrappers().set(m_historyItem.get(), this);
@@ -150,6 +161,9 @@ WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
       (protocolIs(m_historyItem->urlString(), "http") ||
        protocolIs(m_historyItem->urlString(), "https")))
     m_historyItem->setLastVisitWasHTTPNonGet(true);
+
+  if (redirectURLsVector)
+    core(_private)->setRedirectURLs(redirectURLsVector);
 
   return S_OK;
 }
@@ -164,8 +178,8 @@ WebHistoryItem::dictionaryRepresentation(void** dictionary) {
     return E_FAIL;
 
   int keyCount = 0;
-  CFTypeRef keys[6];
-  CFTypeRef values[6];
+  CFTypeRef keys[7];
+  CFTypeRef values[7];
 
   if (!m_historyItem->urlString().isEmpty()) {
     keys[keyCount] = urlKey;
@@ -194,6 +208,22 @@ WebHistoryItem::dictionaryRepresentation(void** dictionary) {
            m_historyItem->urlString().startsWith("https:", false));
     keys[keyCount] = lastVisitWasHTTPNonGetKey;
     values[keyCount++] = CFRetain(kCFBooleanTrue);
+  }
+
+  if (Vector<String>* redirectURLs = m_historyItem->redirectURLs()) {
+    size_t size = redirectURLs->size();
+
+    CFStringRef* items = new CFStringRef[size];
+    for (size_t i = 0; i < size; ++i)
+      items[i] = redirectURLs->at(i).createCFString();
+    CFArrayRef result =
+        CFArrayCreate(0, (const void**)items, size, &kCFTypeArrayCallBacks);
+    for (size_t i = 0; i < size; ++i)
+      CFRelease(items[i]);
+    delete[] items;
+
+    keys[keyCount] = redirectURLsKey;
+    values[keyCount++] = result;
   }
 
   *dictionaryRef = CFDictionaryCreate(0, keys, values, keyCount,
