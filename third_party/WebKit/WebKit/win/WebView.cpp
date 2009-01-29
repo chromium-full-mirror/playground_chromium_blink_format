@@ -2698,7 +2698,7 @@ HRESULT STDMETHODCALLTYPE WebView::setCustomTextEncodingName(
   if (oldEncoding != encodingName &&
       (!oldEncoding || !encodingName || _tcscmp(oldEncoding, encodingName))) {
     if (Frame* coreFrame = core(m_mainFrame))
-      coreFrame->loader()->reloadAllowingStaleData(
+      coreFrame->loader()->reloadWithOverrideEncoding(
           String(encodingName, SysStringLen(encodingName)));
   }
 

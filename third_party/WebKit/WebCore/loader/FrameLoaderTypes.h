@@ -51,7 +51,6 @@ enum FrameLoadType {
   FrameLoadTypeForward,
   FrameLoadTypeIndexedBackForward,  // a multi-item hop in the backforward list
   FrameLoadTypeReload,
-  FrameLoadTypeReloadAllowingStaleData,
   FrameLoadTypeSame,  // user loads same URL again (but not reload button)
   FrameLoadTypeRedirectWithLockedHistory,
   FrameLoadTypeReplace,
