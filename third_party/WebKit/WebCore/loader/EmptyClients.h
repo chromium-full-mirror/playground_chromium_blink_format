@@ -263,26 +263,28 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void finishedLoading(DocumentLoader*) {}
 
   virtual ResourceError cancelledError(const ResourceRequest&) {
-    return ResourceError();
+    ResourceError error("", 0, "", "");
+    error.setIsCancellation(true);
+    return error;
   }
   virtual ResourceError blockedError(const ResourceRequest&) {
-    return ResourceError();
+    return ResourceError("", 0, "", "");
   }
   virtual ResourceError cannotShowURLError(const ResourceRequest&) {
-    return ResourceError();
+    return ResourceError("", 0, "", "");
   }
   virtual ResourceError interruptForPolicyChangeError(const ResourceRequest&) {
-    return ResourceError();
+    return ResourceError("", 0, "", "");
   }
 
   virtual ResourceError cannotShowMIMETypeError(const ResourceResponse&) {
-    return ResourceError();
+    return ResourceError("", 0, "", "");
   }
   virtual ResourceError fileDoesNotExistError(const ResourceResponse&) {
-    return ResourceError();
+    return ResourceError("", 0, "", "");
   }
   virtual ResourceError pluginWillHandleLoadError(const ResourceResponse&) {
-    return ResourceError();
+    return ResourceError("", 0, "", "");
   }
 
   virtual bool shouldFallBack(const ResourceError&) { return false; }
