@@ -110,8 +110,6 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
     return false;
 
   context->save();
-  context->translate(patternBoundaries().x(), patternBoundaries().y());
-  context->concatCTM(patternTransform());
 
   ASSERT(!m_pattern);
 
@@ -157,6 +155,11 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
     context->setStrokePattern(m_pattern);
     applyStrokeStyleToContext(context, object->style(), object);
   }
+
+  TransformationMatrix matrix;
+  matrix.translate(patternBoundaries().x(), patternBoundaries().y());
+  matrix.multiply(patternTransform());
+  m_pattern->setPatternSpaceTransform(matrix);
 
   if (isPaintingText) {
     context->setTextDrawingMode(isFilled ? cTextFill : cTextStroke);

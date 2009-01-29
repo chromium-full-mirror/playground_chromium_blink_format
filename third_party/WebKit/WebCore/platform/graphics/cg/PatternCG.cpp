@@ -49,10 +49,11 @@ static void patternReleaseCallback(void* info) {
 }
 
 CGPatternRef Pattern::createPlatformPattern(
-    const TransformationMatrix& transform) const {
+    const TransformationMatrix& userSpaceTransformation) const {
   IntRect tileRect = tileImage()->rect();
 
-  TransformationMatrix patternTransform = transform;
+  TransformationMatrix patternTransform = m_patternSpaceTransformation;
+  patternTransform.multiply(userSpaceTransformation);
   patternTransform.scale(1, -1);
   patternTransform.translate(0, -tileRect.height());
 

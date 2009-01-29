@@ -30,6 +30,7 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
+#include "TransformationMatrix.h"
 
 #if PLATFORM(CG)
 typedef struct CGPattern* CGPatternRef;
@@ -68,8 +69,14 @@ class Pattern : public RefCounted<Pattern> {
 
   Image* tileImage() const { return m_tileImage.get(); }
 
+  // Pattern space is an abstract space that maps to the default user space by
+  // the transformation 'userSpaceTransformation'
   PlatformPatternPtr createPlatformPattern(
-      const TransformationMatrix& patternTransform) const;
+      const TransformationMatrix& userSpaceTransformation) const;
+  void setPatternSpaceTransform(
+      const TransformationMatrix& patternSpaceTransformation) {
+    m_patternSpaceTransformation = patternSpaceTransformation;
+  }
 
  private:
   Pattern(Image*, bool repeatX, bool repeatY);
@@ -77,6 +84,7 @@ class Pattern : public RefCounted<Pattern> {
   RefPtr<Image> m_tileImage;
   bool m_repeatX;
   bool m_repeatY;
+  TransformationMatrix m_patternSpaceTransformation;
 };
 
 }  // namespace
