@@ -47,6 +47,11 @@ class Document;
 class DocumentLoader;
 class Frame;
 
+enum ApplicationCacheUpdateOption {
+  ApplicationCacheUpdateWithBrowsingContext,
+  ApplicationCacheUpdateWithoutBrowsingContext
+};
+
 class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
  public:
   ApplicationCacheGroup(const KURL& manifestURL, bool isCopy = false);
@@ -69,8 +74,15 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
   unsigned storageID() const { return m_storageID; }
   void clearStorageID();
 
-  void update(Frame*);
+  void update(Frame*, ApplicationCacheUpdateOption);  // FIXME: Frame should not
+                                                      // bee needed when
+                                                      // updating witout
+                                                      // browsing context.
   void cacheDestroyed(ApplicationCache*);
+
+  bool cacheIsBeingUpdated(const ApplicationCache* cache) const {
+    return cache == m_cacheBeingUpdated;
+  }
 
   ApplicationCache* newestCache() const { return m_newestCache.get(); }
   void setNewestCache(PassRefPtr<ApplicationCache>);
@@ -87,9 +99,10 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
 
  private:
   typedef void (DOMApplicationCache::*ListenerFunction)();
-  void callListenersOnAssociatedDocuments(ListenerFunction);
-  void callListeners(ListenerFunction,
-                     const Vector<RefPtr<DocumentLoader>>& loaders);
+  void postListenerTask(ListenerFunction, const HashSet<DocumentLoader*>&);
+  void postListenerTask(ListenerFunction,
+                        const Vector<RefPtr<DocumentLoader>>& loaders);
+  void postListenerTask(ListenerFunction, DocumentLoader*);
 
   virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&);
   virtual void didReceiveData(ResourceHandle*,
@@ -104,6 +117,7 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
   void didFinishLoadingManifest();
 
   void startLoadingEntry();
+  void deliverDelayedMainResources();
   void checkIfLoadIsComplete();
   void cacheUpdateFailed();
   void manifestNotFound();
@@ -117,10 +131,10 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
   KURL m_manifestURL;
   UpdateStatus m_updateStatus;
 
-  // This is the newest cache in the group.
+  // This is the newest complete cache in the group.
   RefPtr<ApplicationCache> m_newestCache;
 
-  // The caches in this cache group.
+  // All complete caches in this cache group.
   HashSet<ApplicationCache*> m_caches;
 
   // The cache being updated (if any). Note that cache updating does not
@@ -129,10 +143,9 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
   // Idle.
   RefPtr<ApplicationCache> m_cacheBeingUpdated;
 
-  // When a cache group does not yet have a complete cache, this contains the
-  // document loaders
-  // that should be associated with the cache once it has been downloaded.
-  HashSet<DocumentLoader*> m_cacheCandidates;
+  // List of pending master entries, used during the update process to ensure
+  // that new master entries are cached.
+  HashSet<DocumentLoader*> m_pendingMasterResourceLoaders;
 
   // These are all the document loaders that are associated with a cache in this
   // group.
@@ -151,6 +164,10 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
   // storing may fail for multiple reasons, such as exceeding disk quota.
   unsigned m_storageID;
   bool m_isObsolete;
+
+  // During update, this is used to handle asynchronously arriving results.
+  enum CompletionType { None, NoUpdate, Failure, Completed };
+  CompletionType m_completionType;
 
   // Whether this cache group is a copy that's only used for transferring the
   // cache to another file.
