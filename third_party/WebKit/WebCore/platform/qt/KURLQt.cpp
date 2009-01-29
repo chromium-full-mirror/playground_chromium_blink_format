@@ -20,6 +20,7 @@
 #include "config.h"
 #include "KURL.h"
 #include "CString.h"
+#include "TextEncoding.h"
 
 #include "NotImplemented.h"
 #include "qurl.h"
@@ -34,7 +35,7 @@ static inline char toHex(char c) {
 #endif
 
 KURL::KURL(const QUrl& url) {
-  *this = KURL(url.toEncoded().constData());
+  *this = KURL(KURL(), url.toEncoded().constData(), UTF8Encoding());
 }
 
 KURL::operator QUrl() const {
