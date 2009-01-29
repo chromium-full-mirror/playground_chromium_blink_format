@@ -75,7 +75,7 @@ void ApplicationCache::addResource(
   if (m_storageID) {
     ASSERT(!resource->storageID());
     ASSERT(resource->type() & (ApplicationCacheResource::Dynamic |
-                               ApplicationCacheResource::Implicit));
+                               ApplicationCacheResource::Master));
 
     // Add the resource to the storage.
     cacheStorage().store(resource.get(), this);
