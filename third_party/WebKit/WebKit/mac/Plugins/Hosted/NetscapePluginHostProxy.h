@@ -39,7 +39,9 @@ class NetscapePluginInstanceProxy;
 
 class NetscapePluginHostProxy {
  public:
-  NetscapePluginHostProxy(mach_port_t clientPort, mach_port_t pluginHostPort);
+  NetscapePluginHostProxy(mach_port_t clientPort,
+                          mach_port_t pluginHostPort,
+                          const ProcessSerialNumber& pluginHostPSN);
 
   mach_port_t port() const { return m_pluginHostPort; }
   mach_port_t clientPort() const { return m_clientPort; }
@@ -55,6 +57,9 @@ class NetscapePluginHostProxy {
  private:
   ~NetscapePluginHostProxy();
   void pluginHostDied();
+
+  void beginModal();
+  void endModal();
 
   static void deadNameNotificationCallback(CFMachPortRef port,
                                            void* msg,
@@ -75,9 +80,9 @@ class NetscapePluginHostProxy {
   RetainPtr<CFMachPortRef> m_deadNameNotificationPort;
 
   RetainPtr<NSWindow*> m_placeholderWindow;
-  unsigned m_modalCount;
-
+  unsigned m_isModal;
   bool m_menuBarIsVisible;
+  const ProcessSerialNumber m_pluginHostPSN;
 };
 
 }  // namespace WebKit
