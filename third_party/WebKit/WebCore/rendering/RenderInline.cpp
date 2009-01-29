@@ -312,7 +312,7 @@ void RenderInline::splitFlow(RenderObject* beforeChild,
 }
 
 void RenderInline::paint(PaintInfo& paintInfo, int tx, int ty) {
-  paintLines(paintInfo, tx, ty);
+  m_lineBoxes.paint(this, paintInfo, tx, ty);
 }
 
 void RenderInline::absoluteRects(Vector<IntRect>& rects,
@@ -383,7 +383,8 @@ bool RenderInline::nodeAtPoint(const HitTestRequest& request,
                                int tx,
                                int ty,
                                HitTestAction hitTestAction) {
-  return hitTestLines(request, result, x, y, tx, ty, hitTestAction);
+  return m_lineBoxes.hitTest(this, request, result, x, y, tx, ty,
+                             hitTestAction);
 }
 
 VisiblePosition RenderInline::positionForCoordinates(int x, int y) {
