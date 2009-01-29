@@ -399,11 +399,11 @@ int RenderBox::clientHeight() const {
 // the
 // object has overflow:hidden/scroll/auto specified and also has overflow.
 int RenderBox::scrollWidth() const {
-  return hasOverflowClip() ? m_layer->scrollWidth() : clientWidth();
+  return hasOverflowClip() ? m_layer->scrollWidth() : overflowWidth();
 }
 
 int RenderBox::scrollHeight() const {
-  return hasOverflowClip() ? m_layer->scrollHeight() : clientHeight();
+  return hasOverflowClip() ? m_layer->scrollHeight() : overflowHeight();
 }
 
 int RenderBox::scrollLeft() const {
