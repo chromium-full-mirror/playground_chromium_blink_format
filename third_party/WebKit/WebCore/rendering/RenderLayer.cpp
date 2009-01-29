@@ -1150,7 +1150,7 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
   ExceptionCode ec;
 
   if (difference.width()) {
-    if (element && element->isControl()) {
+    if (element && element->isFormControlElement()) {
       // Make implicit margins from the theme explicit (see
       // <http://bugs.webkit.org/show_bug.cgi?id=9547>).
       style->setProperty(
@@ -1174,7 +1174,7 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
   }
 
   if (difference.height()) {
-    if (element && element->isControl()) {
+    if (element && element->isFormControlElement()) {
       // Make implicit margins from the theme explicit (see
       // <http://bugs.webkit.org/show_bug.cgi?id=9547>).
       style->setProperty(

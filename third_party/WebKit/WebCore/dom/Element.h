@@ -144,8 +144,6 @@ class Element : public ContainerNode {
 
   virtual bool isFormControlElement() const { return false; }
   virtual bool isFormControlElementWithState() const { return false; }
-  virtual bool isInputTypeHidden() const { return false; }
-  virtual bool isPasswordField() const { return false; }
 
   String nodeNamePreservingCase() const;
 

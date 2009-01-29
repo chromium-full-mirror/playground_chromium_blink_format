@@ -214,8 +214,15 @@ bool AccessibilityRenderObject::isPasswordField() const {
   ASSERT(m_renderer);
   if (!m_renderer->element() || !m_renderer->element()->isHTMLElement())
     return false;
-  return static_cast<HTMLElement*>(m_renderer->element())->isPasswordField() &&
-         ariaRoleAttribute() == UnknownRole;
+  if (ariaRoleAttribute() != UnknownRole)
+    return false;
+
+  InputElement* inputElement =
+      toInputElement(static_cast<Element*>(m_renderer->element()));
+  if (!inputElement)
+    return false;
+
+  return inputElement->isPasswordField();
 }
 
 bool AccessibilityRenderObject::isCheckboxOrRadio() const {
@@ -297,12 +304,28 @@ bool AccessibilityRenderObject::isPressed() const {
 
 bool AccessibilityRenderObject::isIndeterminate() const {
   ASSERT(m_renderer);
-  return m_renderer->node() && m_renderer->node()->isIndeterminate();
+  if (!m_renderer->node() || !m_renderer->node()->isElementNode())
+    return false;
+
+  InputElement* inputElement =
+      toInputElement(static_cast<Element*>(m_renderer->node()));
+  if (!inputElement)
+    return false;
+
+  return inputElement->isIndeterminate();
 }
 
 bool AccessibilityRenderObject::isChecked() const {
   ASSERT(m_renderer);
-  return m_renderer->node() && m_renderer->node()->isChecked();
+  if (!m_renderer->node() || !m_renderer->node()->isElementNode())
+    return false;
+
+  InputElement* inputElement =
+      toInputElement(static_cast<Element*>(m_renderer->node()));
+  if (!inputElement)
+    return false;
+
+  return inputElement->isChecked();
 }
 
 bool AccessibilityRenderObject::isHovered() const {
@@ -399,7 +422,8 @@ bool AccessibilityRenderObject::isControl() const {
     return false;
 
   Node* node = m_renderer->element();
-  return node && (node->isControl() ||
+  return node && ((node->isElementNode() &&
+                   static_cast<Element*>(node)->isFormControlElement()) ||
                   AccessibilityObject::isARIAControl(ariaRoleAttribute()));
 }
 
@@ -1417,7 +1441,16 @@ void AccessibilityRenderObject::setValue(const String& string) {
 }
 
 bool AccessibilityRenderObject::isEnabled() const {
-  return m_renderer->element() ? m_renderer->element()->isEnabled() : true;
+  ASSERT(m_renderer);
+  if (!m_renderer->element() || !m_renderer->element()->isElementNode())
+    return true;
+
+  FormControlElement* formControlElement =
+      toFormControlElement(static_cast<Element*>(m_renderer->element()));
+  if (!formControlElement)
+    return true;
+
+  return formControlElement->isEnabled();
 }
 
 RenderView* AccessibilityRenderObject::topRenderer() const {
@@ -2183,12 +2216,19 @@ bool AccessibilityRenderObject::ariaRoleHasPresentationalChildren() const {
 }
 
 bool AccessibilityRenderObject::canSetFocusAttribute() const {
+  ASSERT(m_renderer);
+
   // NOTE: It would be more accurate to ask the document whether
   // setFocusedNode() would
   // do anything.  For example, it setFocusedNode() will do nothing if the
   // current focused
   // node will not relinquish the focus.
-  if (!m_renderer->element() || !m_renderer->element()->isEnabled())
+  if (!m_renderer->element() || !m_renderer->element()->isElementNode())
+    return false;
+
+  FormControlElement* formControlElement =
+      toFormControlElement(static_cast<Element*>(m_renderer->element()));
+  if (formControlElement && !formControlElement->isEnabled())
     return false;
 
   switch (roleValue()) {
