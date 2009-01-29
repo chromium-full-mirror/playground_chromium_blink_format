@@ -69,7 +69,9 @@ class RenderBlock : public RenderFlow {
   }
 
   void makeChildrenNonInline(RenderObject* insertionPoint = 0);
+
   void deleteLineBoxTree();
+  virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
 
   // The height (and width) of a block when you include overflow spillage out of
   // the bottom

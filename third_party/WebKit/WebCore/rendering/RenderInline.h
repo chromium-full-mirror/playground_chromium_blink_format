@@ -97,6 +97,7 @@ class RenderInline : public RenderFlow {
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
                                      bool isRootLineBox,
                                      bool isOnlyRun = false);
+  virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
 
   virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
 
