@@ -52,8 +52,6 @@ class RenderFlow : public RenderContainer {
   RenderLineBoxList* lineBoxes() { return &m_lineBoxes; }
   const RenderLineBoxList* lineBoxes() const { return &m_lineBoxes; }
 
-  virtual void dirtyLinesFromChangedChild(RenderObject* child);
-
   InlineFlowBox* firstLineBox() const { return m_lineBoxes.firstLineBox(); }
   InlineFlowBox* lastLineBox() const { return m_lineBoxes.lastLineBox(); }
 

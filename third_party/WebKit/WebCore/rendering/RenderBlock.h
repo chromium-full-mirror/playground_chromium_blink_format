@@ -72,6 +72,9 @@ class RenderBlock : public RenderFlow {
 
   void deleteLineBoxTree();
   virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
+  virtual void dirtyLinesFromChangedChild(RenderObject* child) {
+    m_lineBoxes.dirtyLinesFromChangedChild(this, child);
+  }
 
   // The height (and width) of a block when you include overflow spillage out of
   // the bottom
