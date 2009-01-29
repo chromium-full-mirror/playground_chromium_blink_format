@@ -34,7 +34,8 @@ class GraphicsContextPlatformPrivate {
 #if PLATFORM(WIN)
         ,
         m_hdc(0),
-        m_transparencyCount(0)
+        m_transparencyCount(0),
+        m_shouldIncludeChildWindows(false)
 #endif
         ,
         m_userToDeviceTransformKnownToBeIdentity(false) {
@@ -73,6 +74,7 @@ class GraphicsContextPlatformPrivate {
 
   HDC m_hdc;
   unsigned m_transparencyCount;
+  bool m_shouldIncludeChildWindows;
 #endif
 
   CGContextRef m_cgContext;

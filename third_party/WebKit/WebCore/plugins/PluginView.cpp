@@ -595,7 +595,8 @@ PluginView::PluginView(Frame* parentFrame,
       ,
       m_pluginWndProc(0),
       m_lastMessage(0),
-      m_isCallingPluginWndProc(false)
+      m_isCallingPluginWndProc(false),
+      m_wmPrintHDC(0)
 #endif
 #if (PLATFORM(QT) && PLATFORM(WIN_OS)) || defined(XP_MACOSX)
       ,

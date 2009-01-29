@@ -750,9 +750,6 @@ class WebView : public IWebView,
   bool keyPress(WPARAM, LPARAM, bool systemKeyDown = false);
   bool inResizer(LPARAM lParam);
   void paint(HDC, LPARAM);
-  void paintIntoBackingStore(WebCore::FrameView*,
-                             HDC bitmapDC,
-                             const WebCore::IntRect& dirtyRect);
   void paintIntoWindow(HDC bitmapDC,
                        HDC windowDC,
                        const WebCore::IntRect& dirtyRect);
@@ -764,9 +761,6 @@ class WebView : public IWebView,
                           int dy,
                           const WebCore::IntRect& scrollViewRect,
                           const WebCore::IntRect& clipRect);
-  void updateBackingStore(WebCore::FrameView*,
-                          HDC = 0,
-                          bool backingStoreCompletelyDirty = false);
   void deleteBackingStore();
   void repaint(const WebCore::IntRect&,
                bool contentChanged,
@@ -850,6 +844,16 @@ class WebView : public IWebView,
   bool canResetZoom(bool isTextOnly);
   HRESULT resetZoom(bool isTextOnly);
   bool active();
+
+  enum WindowsToPaint { PaintWebViewOnly, PaintWebViewAndChildren };
+  void paintIntoBackingStore(WebCore::FrameView*,
+                             HDC bitmapDC,
+                             const WebCore::IntRect& dirtyRect,
+                             WindowsToPaint);
+  void updateBackingStore(WebCore::FrameView*,
+                          HDC = 0,
+                          bool backingStoreCompletelyDirty = false,
+                          WindowsToPaint = PaintWebViewOnly);
 
  protected:
   HIMC getIMMContext();
