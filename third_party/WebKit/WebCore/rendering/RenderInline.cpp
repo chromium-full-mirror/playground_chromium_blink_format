@@ -104,7 +104,7 @@ void RenderInline::styleDidChange(RenderStyle::Diff diff,
   // need to pass its style on to anyone else.
   for (RenderInline* currCont = inlineContinuation(); currCont;
        currCont = currCont->inlineContinuation()) {
-    RenderBox* nextCont = currCont->continuation();
+    RenderContainer* nextCont = currCont->continuation();
     currCont->setContinuation(0);
     currCont->setStyle(style());
     currCont->setContinuation(nextCont);
@@ -130,8 +130,44 @@ static inline bool isAfterContent(RenderObject* child) {
   return true;
 }
 
-void RenderInline::addChildToFlow(RenderObject* newChild,
-                                  RenderObject* beforeChild) {
+void RenderInline::addChild(RenderObject* newChild, RenderObject* beforeChild) {
+  if (continuation())
+    return addChildToContinuation(newChild, beforeChild);
+  return addChildIgnoringContinuation(newChild, beforeChild);
+}
+
+static RenderContainer* nextContinuation(RenderObject* renderer) {
+  if (renderer->isInline() && !renderer->isReplaced())
+    return static_cast<RenderInline*>(renderer)->continuation();
+  return static_cast<RenderBlock*>(renderer)->inlineContinuation();
+}
+
+RenderContainer* RenderInline::continuationBefore(RenderObject* beforeChild) {
+  if (beforeChild && beforeChild->parent() == this)
+    return this;
+
+  RenderContainer* curr = nextContinuation(this);
+  RenderContainer* nextToLast = this;
+  RenderContainer* last = this;
+  while (curr) {
+    if (beforeChild && beforeChild->parent() == curr) {
+      if (curr->firstChild() == beforeChild)
+        return last;
+      return curr;
+    }
+
+    nextToLast = last;
+    last = curr;
+    curr = nextContinuation(curr);
+  }
+
+  if (!beforeChild && !last->firstChild())
+    return nextToLast;
+  return last;
+}
+
+void RenderInline::addChildIgnoringContinuation(RenderObject* newChild,
+                                                RenderObject* beforeChild) {
   // Make sure we don't append things after :after-generated content if we have
   // it.
   if (!beforeChild && isAfterContent(lastChild()))
@@ -152,7 +188,7 @@ void RenderInline::addChildToFlow(RenderObject* newChild,
     RenderBlock* newBox =
         new (renderArena()) RenderBlock(document() /* anonymous box */);
     newBox->setStyle(newStyle.release());
-    RenderBox* oldContinuation = continuation();
+    RenderContainer* oldContinuation = continuation();
     setContinuation(newBox);
 
     // Someone may have put a <p> inside a <q>, causing a split.  When this
@@ -172,7 +208,7 @@ void RenderInline::addChildToFlow(RenderObject* newChild,
     return;
   }
 
-  RenderContainer::addChild(newChild, beforeChild);
+  RenderFlow::addChild(newChild, beforeChild);
 
   newChild->setNeedsLayoutAndPrefWidthsRecalc();
 }
@@ -187,7 +223,7 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
                                 RenderBlock* toBlock,
                                 RenderBlock* middleBlock,
                                 RenderObject* beforeChild,
-                                RenderBox* oldCont) {
+                                RenderContainer* oldCont) {
   // Create a clone of this inline.
   RenderInline* clone = cloneInline(this);
   clone->setContinuation(oldCont);
@@ -198,7 +234,7 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
   while (o) {
     RenderObject* tmp = o;
     o = tmp->nextSibling();
-    clone->addChildToFlow(removeChildNode(tmp), 0);
+    clone->addChildIgnoringContinuation(removeChildNode(tmp), 0);
     tmp->setNeedsLayoutAndPrefWidthsRecalc();
   }
 
@@ -227,11 +263,11 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
       clone = cloneInline(curr);
 
       // Insert our child clone as the first child.
-      clone->addChildToFlow(cloneChild, 0);
+      clone->addChildIgnoringContinuation(cloneChild, 0);
 
       // Hook the clone up as a continuation of |curr|.
       RenderInline* inlineCurr = static_cast<RenderInline*>(curr);
-      RenderBox* oldCont = inlineCurr->continuation();
+      oldCont = inlineCurr->continuation();
       inlineCurr->setContinuation(clone);
       clone->setContinuation(oldCont);
 
@@ -249,7 +285,7 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
       while (o) {
         RenderObject* tmp = o;
         o = tmp->nextSibling();
-        clone->addChildToFlow(curr->removeChildNode(tmp), 0);
+        clone->addChildIgnoringContinuation(curr->removeChildNode(tmp), 0);
         tmp->setNeedsLayoutAndPrefWidthsRecalc();
       }
     }
@@ -277,7 +313,7 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
 void RenderInline::splitFlow(RenderObject* beforeChild,
                              RenderBlock* newBlockBox,
                              RenderObject* newChild,
-                             RenderBox* oldCont) {
+                             RenderContainer* oldCont) {
   RenderBlock* pre = 0;
   RenderBlock* block = containingBlock();
 
@@ -324,12 +360,11 @@ void RenderInline::splitFlow(RenderObject* beforeChild,
   // time in makeChildrenNonInline by just setting this explicitly up front.
   newBlockBox->setChildrenInline(false);
 
-  // We don't just call addChild, since it would pass things off to the
-  // continuation, so we call addChildToFlow explicitly instead.  We delayed
-  // adding the newChild until now so that the |newBlockBox| would be fully
+  // We delayed adding the newChild until now so that the |newBlockBox| would be
+  // fully
   // connected, thus allowing newChild access to a renderArena should it need
   // to wrap itself in additional boxes (e.g., table construction).
-  newBlockBox->addChildToFlow(newChild, 0);
+  newBlockBox->addChild(newChild);
 
   // Always just do a full layout in order to ensure that line boxes (especially
   // wrappers for images)
@@ -339,6 +374,51 @@ void RenderInline::splitFlow(RenderObject* beforeChild,
   pre->setNeedsLayoutAndPrefWidthsRecalc();
   block->setNeedsLayoutAndPrefWidthsRecalc();
   post->setNeedsLayoutAndPrefWidthsRecalc();
+}
+
+void RenderInline::addChildToContinuation(RenderObject* newChild,
+                                          RenderObject* beforeChild) {
+  RenderContainer* flow = continuationBefore(beforeChild);
+  ASSERT(!beforeChild || beforeChild->parent()->isRenderBlock() ||
+         beforeChild->parent()->isRenderInline());
+  RenderContainer* beforeChildParent = 0;
+  if (beforeChild)
+    beforeChildParent = static_cast<RenderContainer*>(beforeChild->parent());
+  else {
+    RenderContainer* cont = nextContinuation(flow);
+    if (cont)
+      beforeChildParent = cont;
+    else
+      beforeChildParent = flow;
+  }
+
+  if (newChild->isFloatingOrPositioned())
+    return beforeChildParent->addChildIgnoringContinuation(newChild,
+                                                           beforeChild);
+
+  // A continuation always consists of two potential candidates: an inline or an
+  // anonymous
+  // block box holding block children.
+  bool childInline = newChild->isInline();
+  bool bcpInline = beforeChildParent->isInline();
+  bool flowInline = flow->isInline();
+
+  if (flow == beforeChildParent)
+    return flow->addChildIgnoringContinuation(newChild, beforeChild);
+  else {
+    // The goal here is to match up if we can, so that we can coalesce and
+    // create the
+    // minimal # of continuations needed for the inline.
+    if (childInline == bcpInline)
+      return beforeChildParent->addChildIgnoringContinuation(newChild,
+                                                             beforeChild);
+    else if (flowInline == childInline)
+      return flow->addChildIgnoringContinuation(
+          newChild, 0);  // Just treat like an append.
+    else
+      return beforeChildParent->addChildIgnoringContinuation(newChild,
+                                                             beforeChild);
+  }
 }
 
 void RenderInline::paint(PaintInfo& paintInfo, int tx, int ty) {
@@ -556,7 +636,7 @@ void RenderInline::updateDragState(bool dragOn) {
 void RenderInline::childBecameNonInline(RenderObject* child) {
   // We have to split the parent flow.
   RenderBlock* newBox = createAnonymousBlock();
-  RenderBox* oldContinuation = continuation();
+  RenderContainer* oldContinuation = continuation();
   setContinuation(newBox);
   RenderObject* beforeChild = child->nextSibling();
   removeChildNode(child);

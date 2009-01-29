@@ -46,6 +46,10 @@ class RenderContainer : public RenderBox {
 
   virtual bool canHaveChildren() const;
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
+  virtual void addChildIgnoringContinuation(RenderObject* newChild,
+                                            RenderObject* beforeChild = 0) {
+    return addChild(newChild, beforeChild);
+  }
   virtual void removeChild(RenderObject*);
 
   virtual void destroy();

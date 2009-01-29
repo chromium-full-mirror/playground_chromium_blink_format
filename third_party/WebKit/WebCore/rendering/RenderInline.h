@@ -42,17 +42,21 @@ class RenderInline : public RenderFlow {
 
   virtual bool isRenderInline() const { return true; }
 
-  virtual void addChildToFlow(RenderObject* newChild,
+  virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
+  void addChildToContinuation(RenderObject* newChild,
                               RenderObject* beforeChild);
+  virtual void addChildIgnoringContinuation(RenderObject* newChild,
+                                            RenderObject* beforeChild = 0);
+
   void splitInlines(RenderBlock* fromBlock,
                     RenderBlock* toBlock,
                     RenderBlock* middleBlock,
                     RenderObject* beforeChild,
-                    RenderBox* oldCont);
+                    RenderContainer* oldCont);
   void splitFlow(RenderObject* beforeChild,
                  RenderBlock* newBlockBox,
                  RenderObject* newChild,
-                 RenderBox* oldCont);
+                 RenderContainer* oldCont);
 
   virtual void layout() {}  // Do nothing for layout()
 
@@ -104,9 +108,9 @@ class RenderInline : public RenderFlow {
 
   virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
 
-  RenderBox* continuation() const { return m_continuation; }
+  RenderContainer* continuation() const { return m_continuation; }
   RenderInline* inlineContinuation() const;
-  void setContinuation(RenderBox* c) { m_continuation = c; }
+  void setContinuation(RenderContainer* c) { m_continuation = c; }
 
   virtual void updateDragState(bool dragOn);
 
@@ -134,12 +138,13 @@ class RenderInline : public RenderFlow {
                            const IntRect& prevLine,
                            const IntRect& thisLine,
                            const IntRect& nextLine);
+  RenderContainer* continuationBefore(RenderObject* beforeChild);
 
  private:
-  RenderBox* m_continuation;  // Can be either a block or an inline.
-                              // <b><i><p>Hello</p></i></b>. In this example the
-                              // <i> will have a block as its continuation but
-                              // the
+  RenderContainer* m_continuation;  // Can be either a block or an inline.
+                                    // <b><i><p>Hello</p></i></b>. In this
+                                    // example the <i> will have a block as its
+                                    // continuation but the
   // <b> will just have an inline as its continuation.
   mutable int m_lineHeight;
 };
