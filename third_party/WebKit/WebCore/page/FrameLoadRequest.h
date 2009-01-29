@@ -32,16 +32,14 @@ namespace WebCore {
 
 struct FrameLoadRequest {
  public:
-  FrameLoadRequest() : m_lockHistory(false) {}
+  FrameLoadRequest() {}
 
   FrameLoadRequest(const ResourceRequest& resourceRequest)
-      : m_resourceRequest(resourceRequest), m_lockHistory(false) {}
+      : m_resourceRequest(resourceRequest) {}
 
   FrameLoadRequest(const ResourceRequest& resourceRequest,
                    const String& frameName)
-      : m_resourceRequest(resourceRequest),
-        m_frameName(frameName),
-        m_lockHistory(false) {}
+      : m_resourceRequest(resourceRequest), m_frameName(frameName) {}
 
   bool isEmpty() const { return m_resourceRequest.isEmpty(); }
 
@@ -51,13 +49,9 @@ struct FrameLoadRequest {
   const String& frameName() const { return m_frameName; }
   void setFrameName(const String& frameName) { m_frameName = frameName; }
 
-  bool lockHistory() const { return m_lockHistory; }
-  void setLockHistory(bool lock) { m_lockHistory = lock; }
-
  private:
   ResourceRequest m_resourceRequest;
   String m_frameName;
-  bool m_lockHistory;
 };
 }
 
