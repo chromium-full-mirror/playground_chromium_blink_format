@@ -126,7 +126,7 @@ RenderBlock::MarginInfo::MarginInfo(RenderBlock* block, int top, int bottom) {
 // -------------------------------------------------------------------------------------------------------
 
 RenderBlock::RenderBlock(Node* node)
-    : RenderFlow(node),
+    : RenderContainer(node),
       m_floatingObjects(0),
       m_positionedObjects(0),
       m_inlineContinuation(0),
@@ -207,7 +207,7 @@ void RenderBlock::destroy() {
 
   m_lineBoxes.deleteLineBoxes(renderArena());
 
-  RenderFlow::destroy();
+  RenderContainer::destroy();
 }
 
 void RenderBlock::styleWillChange(RenderStyle::Diff diff,
@@ -243,12 +243,12 @@ void RenderBlock::styleWillChange(RenderStyle::Diff diff,
     }
   }
 
-  RenderFlow::styleWillChange(diff, newStyle);
+  RenderContainer::styleWillChange(diff, newStyle);
 }
 
 void RenderBlock::styleDidChange(RenderStyle::Diff diff,
                                  const RenderStyle* oldStyle) {
-  RenderFlow::styleDidChange(diff, oldStyle);
+  RenderContainer::styleDidChange(diff, oldStyle);
 
   // FIXME: We could save this call when the change only affected non-inherited
   // properties
@@ -419,7 +419,7 @@ void RenderBlock::deleteLineBoxTree() {
 
 void RenderBlock::dirtyLineBoxes(bool fullLayout, bool isRootLineBox) {
   if (!isRootLineBox && isReplaced())
-    return RenderFlow::dirtyLineBoxes(fullLayout, isRootLineBox);
+    return RenderContainer::dirtyLineBoxes(fullLayout, isRootLineBox);
 
   if (fullLayout)
     m_lineBoxes.deleteLineBoxes(renderArena());
@@ -520,7 +520,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     next->destroy();
   }
 
-  RenderFlow::removeChild(oldChild);
+  RenderContainer::removeChild(oldChild);
 
   RenderObject* child = prev ? prev : next;
   if (canDeleteAnonymousBlocks && child && !child->previousSibling() &&
@@ -2106,9 +2106,9 @@ void RenderBlock::setSelectionState(SelectionState s) {
 
   if ((s == SelectionStart && selectionState() == SelectionEnd) ||
       (s == SelectionEnd && selectionState() == SelectionStart))
-    RenderFlow::setSelectionState(SelectionBoth);
+    RenderContainer::setSelectionState(SelectionBoth);
   else
-    RenderFlow::setSelectionState(s);
+    RenderContainer::setSelectionState(s);
 
   RenderBlock* cb = containingBlock();
   if (cb && !cb->isRenderView())
@@ -3480,7 +3480,7 @@ void RenderBlock::addIntrudingFloats(RenderBlock* prev, int xoff, int yoff) {
 bool RenderBlock::avoidsFloats() const {
   // Floats can't intrude into our box if we have a non-auto column count or
   // width.
-  return RenderFlow::avoidsFloats() || !style()->hasAutoColumnCount() ||
+  return RenderContainer::avoidsFloats() || !style()->hasAutoColumnCount() ||
          !style()->hasAutoColumnWidth();
 }
 
@@ -3777,7 +3777,7 @@ Position RenderBlock::positionForRenderer(RenderObject* renderer,
 
 VisiblePosition RenderBlock::positionForCoordinates(int x, int y) {
   if (isTable())
-    return RenderFlow::positionForCoordinates(x, y);
+    return RenderContainer::positionForCoordinates(x, y);
 
   int top = borderTop();
   int bottom = top + paddingTop() + contentHeight() + paddingBottom();
@@ -3907,7 +3907,7 @@ VisiblePosition RenderBlock::positionForCoordinates(int x, int y) {
                                               contentsY - renderer->y());
   }
 
-  return RenderFlow::positionForCoordinates(x, y);
+  return RenderContainer::positionForCoordinates(x, y);
 }
 
 void RenderBlock::offsetForContents(int& tx, int& ty) const {
@@ -4468,7 +4468,7 @@ void RenderBlock::calcInlinePrefWidths() {
         if (child->isRenderInline()) {
           // Add in padding/border/margin from the appropriate side of
           // the element.
-          int bpm = getBorderPaddingMargin(static_cast<RenderFlow*>(child),
+          int bpm = getBorderPaddingMargin(static_cast<RenderContainer*>(child),
                                            childIterator.endOfInline);
           childMin += bpm;
           childMax += bpm;
@@ -4836,12 +4836,12 @@ int RenderBlock::baselinePosition(bool b, bool isRootLineBox) const {
       return marginTop() + baselinePos;
     return height() + marginTop() + marginBottom();
   }
-  return RenderFlow::baselinePosition(b, isRootLineBox);
+  return RenderContainer::baselinePosition(b, isRootLineBox);
 }
 
 int RenderBlock::getBaselineOfFirstLineBox() const {
   if (!isBlockFlow())
-    return RenderFlow::getBaselineOfFirstLineBox();
+    return RenderContainer::getBaselineOfFirstLineBox();
 
   if (childrenInline()) {
     if (firstLineBox())
@@ -4864,11 +4864,11 @@ int RenderBlock::getBaselineOfFirstLineBox() const {
 
 int RenderBlock::getBaselineOfLastLineBox() const {
   if (!isBlockFlow())
-    return RenderFlow::getBaselineOfLastLineBox();
+    return RenderContainer::getBaselineOfLastLineBox();
 
   if (childrenInline()) {
     if (!firstLineBox() && hasLineIfEmpty())
-      return RenderFlow::baselinePosition(true, true) + borderTop() +
+      return RenderContainer::baselinePosition(true, true) + borderTop() +
              paddingTop();
     if (lastLineBox())
       return lastLineBox()->yPos() + lastLineBox()->baseline();
@@ -4885,7 +4885,7 @@ int RenderBlock::getBaselineOfLastLineBox() const {
       }
     }
     if (!haveNormalFlowChild && hasLineIfEmpty())
-      return RenderFlow::baselinePosition(true, true) + borderTop() +
+      return RenderContainer::baselinePosition(true, true) + borderTop() +
              paddingTop();
   }
 
@@ -5316,8 +5316,8 @@ void RenderBlock::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
 
 IntRect RenderBlock::rectWithOutlineForRepaint(RenderBox* repaintContainer,
                                                int outlineWidth) {
-  IntRect r(
-      RenderFlow::rectWithOutlineForRepaint(repaintContainer, outlineWidth));
+  IntRect r(RenderContainer::rectWithOutlineForRepaint(repaintContainer,
+                                                       outlineWidth));
   if (inlineContinuation())
     r.inflateY(collapsedMarginTop());
   return r;
@@ -5325,11 +5325,11 @@ IntRect RenderBlock::rectWithOutlineForRepaint(RenderBox* repaintContainer,
 
 RenderObject* RenderBlock::hoverAncestor() const {
   return inlineContinuation() ? inlineContinuation()
-                              : RenderFlow::hoverAncestor();
+                              : RenderContainer::hoverAncestor();
 }
 
 void RenderBlock::updateDragState(bool dragOn) {
-  RenderFlow::updateDragState(dragOn);
+  RenderContainer::updateDragState(dragOn);
   if (inlineContinuation())
     inlineContinuation()->updateDragState(dragOn);
 }

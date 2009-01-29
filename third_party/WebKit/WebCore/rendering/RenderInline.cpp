@@ -38,7 +38,7 @@ using namespace std;
 namespace WebCore {
 
 RenderInline::RenderInline(Node* node)
-    : RenderFlow(node), m_continuation(0), m_lineHeight(-1) {
+    : RenderContainer(node), m_continuation(0), m_lineHeight(-1) {
   setChildrenInline(true);
 }
 
@@ -80,7 +80,7 @@ void RenderInline::destroy() {
 
   m_lineBoxes.deleteLineBoxes(renderArena());
 
-  RenderFlow::destroy();
+  RenderContainer::destroy();
 }
 
 RenderInline* RenderInline::inlineContinuation() const {
@@ -91,7 +91,7 @@ RenderInline* RenderInline::inlineContinuation() const {
 
 void RenderInline::styleDidChange(RenderStyle::Diff diff,
                                   const RenderStyle* oldStyle) {
-  RenderFlow::styleDidChange(diff, oldStyle);
+  RenderContainer::styleDidChange(diff, oldStyle);
 
   setInline(true);
   setHasReflection(false);
@@ -208,12 +208,12 @@ void RenderInline::addChildIgnoringContinuation(RenderObject* newChild,
     return;
   }
 
-  RenderFlow::addChild(newChild, beforeChild);
+  RenderContainer::addChild(newChild, beforeChild);
 
   newChild->setNeedsLayoutAndPrefWidthsRecalc();
 }
 
-RenderInline* RenderInline::cloneInline(RenderFlow* src) {
+RenderInline* RenderInline::cloneInline(RenderInline* src) {
   RenderInline* o = new (src->renderArena()) RenderInline(src->element());
   o->setStyle(src->style());
   return o;
@@ -244,8 +244,8 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
   // We have been reparented and are now under the fromBlock.  We need
   // to walk up our inline parent chain until we hit the containing block.
   // Once we hit the containing block we're done.
-  RenderFlow* curr = static_cast<RenderFlow*>(parent());
-  RenderFlow* currChild = this;
+  RenderContainer* curr = static_cast<RenderContainer*>(parent());
+  RenderContainer* currChild = this;
 
   // FIXME: Because splitting is O(n^2) as tags nest pathologically, we cap the
   // depth at which we're willing to clone.
@@ -257,10 +257,11 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
   unsigned splitDepth = 1;
   const unsigned cMaxSplitDepth = 200;
   while (curr && curr != fromBlock) {
+    ASSERT(curr->isRenderInline());
     if (splitDepth < cMaxSplitDepth) {
       // Create a new clone.
       RenderInline* cloneChild = clone;
-      clone = cloneInline(curr);
+      clone = cloneInline(static_cast<RenderInline*>(curr));
 
       // Insert our child clone as the first child.
       clone->addChildIgnoringContinuation(cloneChild, 0);
@@ -292,7 +293,7 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
 
     // Keep walking up the chain.
     currChild = curr;
-    curr = static_cast<RenderFlow*>(curr->parent());
+    curr = static_cast<RenderContainer*>(curr->parent());
     splitDepth++;
   }
 
@@ -463,14 +464,14 @@ void RenderInline::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
 }
 
 int RenderInline::offsetLeft() const {
-  int x = RenderFlow::offsetLeft();
+  int x = RenderContainer::offsetLeft();
   if (firstLineBox())
     x += firstLineBox()->xPos();
   return x;
 }
 
 int RenderInline::offsetTop() const {
-  int y = RenderFlow::offsetTop();
+  int y = RenderContainer::offsetTop();
   if (firstLineBox())
     y += firstLineBox()->yPos();
   return y;
@@ -512,7 +513,7 @@ VisiblePosition RenderInline::positionForCoordinates(int x, int y) {
     c = static_cast<RenderBlock*>(c)->inlineContinuation();
   }
 
-  return RenderFlow::positionForCoordinates(x, y);
+  return RenderContainer::positionForCoordinates(x, y);
 }
 
 IntRect RenderInline::linesBoundingBox() const {
@@ -618,8 +619,8 @@ IntRect RenderInline::clippedOverflowRectForRepaint(
 
 IntRect RenderInline::rectWithOutlineForRepaint(RenderBox* repaintContainer,
                                                 int outlineWidth) {
-  IntRect r(
-      RenderFlow::rectWithOutlineForRepaint(repaintContainer, outlineWidth));
+  IntRect r(RenderContainer::rectWithOutlineForRepaint(repaintContainer,
+                                                       outlineWidth));
   for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
     if (!curr->isText())
       r.unite(curr->rectWithOutlineForRepaint(repaintContainer, outlineWidth));
@@ -628,7 +629,7 @@ IntRect RenderInline::rectWithOutlineForRepaint(RenderBox* repaintContainer,
 }
 
 void RenderInline::updateDragState(bool dragOn) {
-  RenderFlow::updateDragState(dragOn);
+  RenderContainer::updateDragState(dragOn);
   if (continuation())
     continuation()->updateDragState(dragOn);
 }
@@ -698,6 +699,50 @@ int RenderInline::lineHeight(bool firstLine, bool /*isRootLineBox*/) const {
     m_lineHeight = style()->computedLineHeight();
 
   return m_lineHeight;
+}
+
+IntSize RenderInline::relativePositionedInlineOffset(
+    const RenderObject* child) const {
+  ASSERT(isRelPositioned());
+  if (!isRelPositioned())
+    return IntSize();
+
+  // When we have an enclosing relpositioned inline, we need to add in the
+  // offset of the first line
+  // box from the rest of the content, but only in the cases where we know we're
+  // positioned
+  // relative to the inline itself.
+
+  IntSize offset;
+  int sx;
+  int sy;
+  if (firstLineBox()) {
+    sx = firstLineBox()->xPos();
+    sy = firstLineBox()->yPos();
+  } else {
+    sx = staticX();
+    sy = staticY();
+  }
+
+  if (!child->hasStaticX())
+    offset.setWidth(sx);
+  // This is not terribly intuitive, but we have to match other browsers.
+  // Despite being a block display type inside
+  // an inline, we still keep our x locked to the left of the relative
+  // positioned inline.  Arguably the correct
+  // behavior would be to go flush left to the block that contains the inline,
+  // but that isn't what other browsers
+  // do.
+  else if (!child->style()->isOriginalDisplayInlineType())
+    // Avoid adding in the left border/padding of the containing block twice.
+    // Subtract it out.
+    offset.setWidth(sx - (child->containingBlock()->borderLeft() +
+                          child->containingBlock()->paddingLeft()));
+
+  if (!child->hasStaticY())
+    offset.setHeight(sy);
+
+  return offset;
 }
 
 void RenderInline::addFocusRingRects(GraphicsContext* graphicsContext,

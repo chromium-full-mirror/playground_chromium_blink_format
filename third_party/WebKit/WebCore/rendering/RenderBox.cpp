@@ -1458,50 +1458,6 @@ int RenderBox::containingBlockWidth() const {
   return cb->availableWidth();
 }
 
-IntSize RenderBox::offsetForPositionedInContainer(
-    RenderObject* container) const {
-  if (!container->isRelPositioned() || !container->isRenderInline())
-    return IntSize();
-
-  // When we have an enclosing relpositioned inline, we need to add in the
-  // offset of the first line
-  // box from the rest of the content, but only in the cases where we know we're
-  // positioned
-  // relative to the inline itself.
-
-  IntSize offset;
-  RenderFlow* flow = static_cast<RenderFlow*>(container);
-  int sx;
-  int sy;
-  if (flow->firstLineBox()) {
-    sx = flow->firstLineBox()->xPos();
-    sy = flow->firstLineBox()->yPos();
-  } else {
-    sx = flow->staticX();
-    sy = flow->staticY();
-  }
-
-  if (!hasStaticX())
-    offset.setWidth(sx);
-  // This is not terribly intuitive, but we have to match other browsers.
-  // Despite being a block display type inside
-  // an inline, we still keep our x locked to the left of the relative
-  // positioned inline.  Arguably the correct
-  // behavior would be to go flush left to the block that contains the inline,
-  // but that isn't what other browsers
-  // do.
-  else if (!style()->isOriginalDisplayInlineType())
-    // Avoid adding in the left border/padding of the containing block twice.
-    // Subtract it out.
-    offset.setWidth(sx - (containingBlock()->borderLeft() +
-                          containingBlock()->paddingLeft()));
-
-  if (!hasStaticY())
-    offset.setHeight(sy);
-
-  return offset;
-}
-
 FloatPoint RenderBox::localToAbsolute(FloatPoint localPoint,
                                       bool fixed,
                                       bool useTransforms) const {
@@ -1607,8 +1563,10 @@ IntSize RenderBox::offsetFromContainer(RenderObject* o) const {
   if (o->hasOverflowClip())
     offset -= toRenderBox(o)->layer()->scrolledContentOffset();
 
-  if (style()->position() == AbsolutePosition)
-    offset += offsetForPositionedInContainer(o);
+  if (style()->position() == AbsolutePosition && o->isRelPositioned() &&
+      o->isRenderInline())
+    offset +=
+        static_cast<RenderInline*>(o)->relativePositionedInlineOffset(this);
 
   return offset;
 }
@@ -1757,8 +1715,10 @@ void RenderBox::computeRectForRepaint(RenderBox* repaintContainer,
     topLeft.move(x(), y());
   }
 
-  if (style()->position() == AbsolutePosition)
-    topLeft += offsetForPositionedInContainer(o);
+  if (style()->position() == AbsolutePosition && o->isRelPositioned() &&
+      o->isRenderInline())
+    topLeft +=
+        static_cast<RenderInline*>(o)->relativePositionedInlineOffset(this);
   else if (style()->position() == RelativePosition && m_layer) {
     // Apply the relative position offset when invalidating a rectangle.  The
     // layer
@@ -2409,7 +2369,8 @@ int RenderBox::containingBlockWidthForPositioned(
   if (containingBlock->isRenderInline()) {
     ASSERT(containingBlock->isRelPositioned());
 
-    const RenderFlow* flow = static_cast<const RenderFlow*>(containingBlock);
+    const RenderInline* flow =
+        static_cast<const RenderInline*>(containingBlock);
     InlineFlowBox* first = flow->firstLineBox();
     InlineFlowBox* last = flow->lastLineBox();
 
@@ -2794,12 +2755,12 @@ void RenderBox::calcAbsoluteHorizontalValues(Length width,
   // Use computed values to calculate the horizontal position.
 
   // FIXME: This hack is needed to calculate the xPos for a 'rtl' relatively
-  // positioned, inline containing block because right now, it is using the xPos
+  // positioned, inline because right now, it is using the xPos
   // of the first line box when really it should use the last line box.  When
   // this is fixed elsewhere, this block should be removed.
   if (containerBlock->isInline() &&
       containerBlock->style()->direction() == RTL) {
-    const RenderFlow* flow = static_cast<const RenderFlow*>(containerBlock);
+    const RenderInline* flow = static_cast<const RenderInline*>(containerBlock);
     InlineFlowBox* firstLine = flow->firstLineBox();
     InlineFlowBox* lastLine = flow->lastLineBox();
     if (firstLine && lastLine && firstLine != lastLine) {
@@ -3229,7 +3190,7 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
   // this is fixed elsewhere, this block should be removed.
   if (containerBlock->isInline() &&
       containerBlock->style()->direction() == RTL) {
-    const RenderFlow* flow = static_cast<const RenderFlow*>(containerBlock);
+    const RenderInline* flow = static_cast<const RenderInline*>(containerBlock);
     InlineFlowBox* firstLine = flow->firstLineBox();
     InlineFlowBox* lastLine = flow->lastLineBox();
     if (firstLine && lastLine && firstLine != lastLine) {

@@ -39,7 +39,7 @@
 #include "HTMLNames.h"
 #include "KeyboardEvent.h"
 #include "MouseEvent.h"
-#include "RenderFlow.h"
+#include "RenderBox.h"
 #include "WMLNames.h"
 
 namespace WebCore {

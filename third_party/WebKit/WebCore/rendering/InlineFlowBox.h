@@ -26,6 +26,7 @@
 namespace WebCore {
 
 class HitTestResult;
+class RenderLineBoxList;
 
 struct HitTestRequest;
 
@@ -56,8 +57,6 @@ class InlineFlowBox : public InlineRunBox {
 #ifndef NDEBUG
   virtual ~InlineFlowBox();
 #endif
-
-  RenderFlow* flowObject();
 
   virtual bool isInlineFlowBox() { return true; }
 
@@ -139,6 +138,8 @@ class InlineFlowBox : public InlineRunBox {
                            int y,
                            int tx,
                            int ty);
+
+  virtual RenderLineBoxList* rendererLineBoxes() const;
 
   int marginBorderPaddingLeft();
   int marginBorderPaddingRight();

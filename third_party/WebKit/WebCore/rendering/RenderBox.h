@@ -291,7 +291,6 @@ class RenderBox : public RenderObject {
   virtual void computeRectForRepaint(RenderBox* repaintContainer,
                                      IntRect&,
                                      bool fixed = false);
-  IntSize offsetForPositionedInContainer(RenderObject*) const;
   virtual FloatQuad localToContainerQuad(const FloatQuad&,
                                          RenderBox* repaintContainer,
                                          bool fixed = false) const;
