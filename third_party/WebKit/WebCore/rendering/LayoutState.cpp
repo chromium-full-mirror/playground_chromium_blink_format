@@ -60,8 +60,8 @@ LayoutState::LayoutState(LayoutState* prev,
   } else if (renderer->isPositioned() && !fixed) {
     if (RenderObject* container = renderer->container()) {
       if (container->isRelPositioned() && container->isRenderInline())
-        m_offset += static_cast<RenderInline*>(container)
-                        ->relativePositionedInlineOffset(renderer);
+        m_offset +=
+            toRenderInline(container)->relativePositionedInlineOffset(renderer);
     }
   }
 

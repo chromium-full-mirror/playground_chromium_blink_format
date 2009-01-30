@@ -1565,8 +1565,7 @@ IntSize RenderBox::offsetFromContainer(RenderObject* o) const {
 
   if (style()->position() == AbsolutePosition && o->isRelPositioned() &&
       o->isRenderInline())
-    offset +=
-        static_cast<RenderInline*>(o)->relativePositionedInlineOffset(this);
+    offset += toRenderInline(o)->relativePositionedInlineOffset(this);
 
   return offset;
 }
@@ -1717,8 +1716,7 @@ void RenderBox::computeRectForRepaint(RenderBox* repaintContainer,
 
   if (style()->position() == AbsolutePosition && o->isRelPositioned() &&
       o->isRenderInline())
-    topLeft +=
-        static_cast<RenderInline*>(o)->relativePositionedInlineOffset(this);
+    topLeft += toRenderInline(o)->relativePositionedInlineOffset(this);
   else if (style()->position() == RelativePosition && m_layer) {
     // Apply the relative position offset when invalidating a rectangle.  The
     // layer
@@ -2369,8 +2367,7 @@ int RenderBox::containingBlockWidthForPositioned(
   if (containingBlock->isRenderInline()) {
     ASSERT(containingBlock->isRelPositioned());
 
-    const RenderInline* flow =
-        static_cast<const RenderInline*>(containingBlock);
+    const RenderInline* flow = toRenderInline(containingBlock);
     InlineFlowBox* first = flow->firstLineBox();
     InlineFlowBox* last = flow->lastLineBox();
 
@@ -2404,9 +2401,7 @@ int RenderBox::containingBlockHeightForPositioned(
   int heightResult;
   if (containingBlock->isRenderInline()) {
     ASSERT(containingBlock->isRelPositioned());
-    heightResult = static_cast<const RenderInline*>(containingBlock)
-                       ->linesBoundingBox()
-                       .height();
+    heightResult = toRenderInline(containingBlock)->linesBoundingBox().height();
   } else
     heightResult = containingBlockBox->height();
 
@@ -2760,7 +2755,7 @@ void RenderBox::calcAbsoluteHorizontalValues(Length width,
   // this is fixed elsewhere, this block should be removed.
   if (containerBlock->isInline() &&
       containerBlock->style()->direction() == RTL) {
-    const RenderInline* flow = static_cast<const RenderInline*>(containerBlock);
+    const RenderInline* flow = toRenderInline(containerBlock);
     InlineFlowBox* firstLine = flow->firstLineBox();
     InlineFlowBox* lastLine = flow->lastLineBox();
     if (firstLine && lastLine && firstLine != lastLine) {
@@ -3190,7 +3185,7 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
   // this is fixed elsewhere, this block should be removed.
   if (containerBlock->isInline() &&
       containerBlock->style()->direction() == RTL) {
-    const RenderInline* flow = static_cast<const RenderInline*>(containerBlock);
+    const RenderInline* flow = toRenderInline(containerBlock);
     InlineFlowBox* firstLine = flow->firstLineBox();
     InlineFlowBox* lastLine = flow->lastLineBox();
     if (firstLine && lastLine && firstLine != lastLine) {

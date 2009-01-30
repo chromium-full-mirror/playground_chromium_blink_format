@@ -295,14 +295,14 @@ void RenderContainer::updateBeforeAfterContentForContainer(
   // only want to generate
   // :after content and not :before content.
   if (newContentWanted && type == RenderStyle::BEFORE && isRenderInline() &&
-      static_cast<RenderInline*>(this)->isInlineContinuation())
+      toRenderInline(this)->isInlineContinuation())
     newContentWanted = false;
 
   // Similarly, if we're the beginning of a <q>, and there's an inline
   // continuation for our object,
   // then we don't generate the :after content.
   if (newContentWanted && type == RenderStyle::AFTER && isRenderInline() &&
-      static_cast<RenderInline*>(this)->continuation())
+      toRenderInline(this)->continuation())
     newContentWanted = false;
 
   // If we don't want generated content any longer, or if we have generated
