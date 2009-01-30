@@ -1215,7 +1215,7 @@ bool AccessibilityRenderObject::isLoaded() const {
 int AccessibilityRenderObject::layoutCount() const {
   if (!m_renderer->isRenderView())
     return 0;
-  return static_cast<RenderView*>(m_renderer)->frameView()->layoutCount();
+  return toRenderView(m_renderer)->frameView()->layoutCount();
 }
 
 String AccessibilityRenderObject::text() const {

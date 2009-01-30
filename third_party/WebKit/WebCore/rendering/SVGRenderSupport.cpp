@@ -169,7 +169,7 @@ void clampImageBufferSizeToViewport(RenderObject* object, IntSize& size) {
   if (!object || !object->isRenderView())
     return;
 
-  RenderView* view = static_cast<RenderView*>(object);
+  RenderView* view = toRenderView(object);
   if (!view->frameView())
     return;
 

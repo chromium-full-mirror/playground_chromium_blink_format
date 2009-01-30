@@ -1814,8 +1814,7 @@ void RenderObject::repaintUsingContainer(RenderBox* repaintContainer,
                                          const IntRect& r,
                                          bool immediate) {
   if (!repaintContainer || repaintContainer->isRenderView()) {
-    RenderView* v =
-        repaintContainer ? static_cast<RenderView*>(repaintContainer) : view();
+    RenderView* v = repaintContainer ? toRenderView(repaintContainer) : view();
     v->repaintViewRectangle(r, immediate);
   } else {
     // Handle container-relative repaints eventually.
@@ -1831,7 +1830,7 @@ void RenderObject::repaint(bool immediate) {
   if (!o->isRenderView())
     return;
 
-  RenderView* view = static_cast<RenderView*>(o);
+  RenderView* view = toRenderView(o);
   if (view->printing())
     return;  // Don't repaint if we're printing.
 
@@ -1849,7 +1848,7 @@ void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
   if (!o->isRenderView())
     return;
 
-  RenderView* view = static_cast<RenderView*>(o);
+  RenderView* view = toRenderView(o);
   if (view->printing())
     return;  // Don't repaint if we're printing.
 
@@ -2422,7 +2421,7 @@ IntRect RenderObject::localCaretRect(InlineBox*,
 }
 
 RenderView* RenderObject::view() const {
-  return static_cast<RenderView*>(document()->renderer());
+  return toRenderView(document()->renderer());
 }
 
 bool RenderObject::hasOutlineAnnotation() const {
@@ -2718,7 +2717,7 @@ int RenderObject::baselinePosition(bool firstLine, bool isRootLineBox) const {
 
 void RenderObject::scheduleRelayout() {
   if (isRenderView()) {
-    FrameView* view = static_cast<RenderView*>(this)->frameView();
+    FrameView* view = toRenderView(this)->frameView();
     if (view)
       view->scheduleRelayout();
   } else if (parent()) {
@@ -2971,7 +2970,7 @@ int RenderObject::maximalOutlineSize(PaintPhase p) const {
   if (p != PaintPhaseOutline && p != PaintPhaseSelfOutline &&
       p != PaintPhaseChildOutlines)
     return 0;
-  return static_cast<RenderView*>(document()->renderer())->maximalOutlineSize();
+  return toRenderView(document()->renderer())->maximalOutlineSize();
 }
 
 int RenderObject::caretMinOffset() const {
