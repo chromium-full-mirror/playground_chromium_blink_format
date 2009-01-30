@@ -93,6 +93,7 @@ class ScriptController {
 
   void setProcessingTimerCallback(bool b) { m_processingTimerCallback = b; }
   bool processingUserGesture() const;
+  bool anyPageIsProcessingUserGesture() const;
 
   bool isEnabled();
 
@@ -147,6 +148,9 @@ class ScriptController {
   void initScript();
 
   void disconnectPlatformScriptObjects();
+
+  bool processingUserGestureEvent() const;
+  bool isJavaScriptAnchorNavigation() const;
 
   JSC::ProtectedPtr<JSDOMWindowShell> m_windowShell;
   HashSet<JSDOMWindow*> m_liveFormerWindows;

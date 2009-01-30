@@ -76,8 +76,9 @@ class HTMLFormElement : public HTMLElement {
   void removeImgElement(HTMLImageElement*);
 
   bool prepareSubmit(Event*);
-  void submit();
-  void submit(Event*, bool activateSubmitButton = false);
+  void submit(Event* = 0,
+              bool activateSubmitButton = false,
+              bool lockHistory = false);
   void reset();
 
   // Used to indicate a malformed state to keep from applying the bottom margin

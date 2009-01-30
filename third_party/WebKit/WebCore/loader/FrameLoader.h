@@ -158,12 +158,13 @@ class FrameLoader : Noncopyable
       PassRefPtr<FormState>);
 
   void loadPostRequest(
-      const ResourceRequest& inRequest,
+      const ResourceRequest&,
       const String& referrer,  // Called by loadFrameRequestWithFormAndValues(),
                                // calls loadWithNavigationAction
       const String& frameName,
-      Event* event,
-      PassRefPtr<FormState> prpFormState);
+      FrameLoadType,
+      Event*,
+      PassRefPtr<FormState>);
 
   void loadURL(const KURL& newURL,
                const String& referrer,
@@ -173,8 +174,8 @@ class FrameLoader : Noncopyable
                                          // else dispatches to navigation policy
                                          // delegate
                FrameLoadType,
-               Event* event,
-               PassRefPtr<FormState> prpFormState);
+               Event*,
+               PassRefPtr<FormState>);
   void loadURLIntoChildFrame(const KURL&, const String& referer, Frame*);
 
   void loadFrameRequestWithFormAndValues(
@@ -380,9 +381,10 @@ class FrameLoader : Noncopyable
                   const String& target,
                   const String& contentType,
                   const String& boundary,
-                  Event*);
+                  Event*,
+                  bool lockHistory);
   void submitFormAgain();
-  void submitForm(const FrameLoadRequest&, Event*);
+  void submitForm(const FrameLoadRequest&, Event*, bool lockHistory);
 
   void stop();
   void stopLoading(bool sendUnload);
