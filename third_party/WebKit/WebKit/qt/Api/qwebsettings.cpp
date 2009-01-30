@@ -736,7 +736,8 @@ qint64 QWebSettings::offlineStorageDefaultQuota() {
 
     \sa offlineWebApplicationCachePath()
 */
-void QWebSettings::setOfflineWebApplicationCachePath(const QString& path) {
+void QWEBKIT_EXPORT
+qt_websettings_setOfflineWebApplicationCachePath(const QString& path) {
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   WebCore::cacheStorage().setCacheDirectory(path);
 #endif
@@ -750,7 +751,7 @@ void QWebSettings::setOfflineWebApplicationCachePath(const QString& path) {
 
     \sa setOfflineWebApplicationCachePath()
 */
-QString QWebSettings::offlineWebApplicationCachePath() {
+QString QWEBKIT_EXPORT qt_websettings_offlineWebApplicationCachePath() {
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   return WebCore::cacheStorage().cacheDirectory();
 #else
