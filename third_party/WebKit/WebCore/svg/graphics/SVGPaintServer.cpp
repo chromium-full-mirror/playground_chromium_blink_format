@@ -37,6 +37,10 @@
 #include "SVGStyledElement.h"
 #include "SVGURIReference.h"
 
+#if PLATFORM(SKIA)
+#include "PlatformContextSkia.h"
+#endif
+
 namespace WebCore {
 
 SVGPaintServer::SVGPaintServer() {}
@@ -184,11 +188,11 @@ void SVGPaintServer::renderPath(GraphicsContext*& context,
     context->strokePath();
 }
 
-void SVGPaintServer::teardown(GraphicsContext*&,
+#if PLATFORM(SKIA)
+void SVGPaintServer::teardown(GraphicsContext*& context,
                               const RenderObject*,
                               SVGPaintTargetType,
                               bool) const {
-#if PLATFORM(SKIA)
   // FIXME: Move this into the GraphicsContext
   // WebKit implicitly expects us to reset the path.
   // For example in fillAndStrokePath() of RenderPath.cpp the path is
@@ -197,8 +201,13 @@ void SVGPaintServer::teardown(GraphicsContext*&,
   context->beginPath();
   context->platformContext()->setGradient(0);
   context->platformContext()->setPattern(0);
-#endif
 }
+#else
+void SVGPaintServer::teardown(GraphicsContext*&,
+                              const RenderObject*,
+                              SVGPaintTargetType,
+                              bool) const {}
+#endif
 
 DashArray dashArrayFromRenderingStyle(const RenderStyle* style) {
   DashArray array;
