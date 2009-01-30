@@ -31,6 +31,7 @@
 #include "Frame.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
+#include "FormControlElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLMediaElement.h"
 #include "HTMLNames.h"
@@ -910,7 +911,7 @@ void RenderThemeSafari::adjustMenuListStyle(CSSStyleSelector* selector,
   // Set the foreground color to black or gray when we have the aqua look.
   // Cast to RGB32 is to work around a compiler bug.
   style->setColor(e->isFormControlElement() &&
-                          static_cast<FormControlElement*>(e)->isEnabled()
+                          toFormControlElement(e)->isEnabled()
                       ? static_cast<RGBA32>(Color::black)
                       : Color::darkGray);
 
