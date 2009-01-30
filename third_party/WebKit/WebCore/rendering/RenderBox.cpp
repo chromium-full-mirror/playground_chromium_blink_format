@@ -181,7 +181,7 @@ void RenderBox::styleDidChange(RenderStyle::Diff diff,
   // during the style change (it's used by clippedOverflowRectForRepaint()).
   if (style()->outlineWidth() > 0 &&
       style()->outlineSize() > maximalOutlineSize(PaintPhaseOutline))
-    static_cast<RenderView*>(document()->renderer())
+    toRenderView(document()->renderer())
         ->setMaximalOutlineSize(style()->outlineSize());
 
   RenderObject::styleDidChange(diff, oldStyle);
@@ -1031,8 +1031,7 @@ bool RenderBox::repaintLayerRectsForImage(WrappedImagePtr image,
           int rw;
           int rh;
 
-          if (FrameView* frameView =
-                  static_cast<RenderView*>(layerRenderer)->frameView()) {
+          if (FrameView* frameView = toRenderView(layerRenderer)->frameView()) {
             rw = frameView->contentsWidth();
             rh = frameView->contentsHeight();
           } else {
@@ -2295,7 +2294,7 @@ int RenderBox::availableHeightUsing(const Length& h) const {
     return calcContentBoxHeight(h.value());
 
   if (isRenderView())
-    return static_cast<const RenderView*>(this)->frameView()->visibleHeight();
+    return toRenderView(this)->frameView()->visibleHeight();
 
   // We need to stop here, since we don't want to increase the height of the
   // table
