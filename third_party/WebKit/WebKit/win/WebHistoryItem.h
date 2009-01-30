@@ -105,6 +105,7 @@ class WebHistoryItem : public IWebHistoryItem, IWebHistoryItemPrivate {
   virtual HRESULT STDMETHODCALLTYPE setLastVisitWasFailure(BOOL wasFailure);
   virtual HRESULT STDMETHODCALLTYPE lastVisitWasHTTPNonGet(BOOL* HTTPNonGet);
   virtual HRESULT STDMETHODCALLTYPE setLastVisitWasHTTPNonGet(BOOL HTTPNonGet);
+  virtual HRESULT STDMETHODCALLTYPE redirectURLs(IEnumVARIANT**);
 
   // WebHistoryItem
   WebCore::HistoryItem* historyItem() const;
