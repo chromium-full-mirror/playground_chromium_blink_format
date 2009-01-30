@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,28 +35,21 @@ using namespace JSC;
 
 namespace WebCore {
 
-struct IdentifierRep {
-  IdentifierRep(int number) : m_isString(false) { m_value.m_number = number; }
+typedef HashSet<IdentifierRep*> IdentifierSet;
 
-  IdentifierRep(const char* name) : m_isString(true) {
-    m_value.m_string = strdup(name);
-  }
-
-  union {
-    const char* m_string;
-    int m_number;
-  } m_value;
-  bool m_isString;
-};
+static IdentifierSet& identifierSet() {
+  DEFINE_STATIC_LOCAL(IdentifierSet, identifierSet, ());
+  return identifierSet;
+}
 
 typedef HashMap<int, IdentifierRep*> IntIdentifierMap;
 
 static IntIdentifierMap& intIdentifierMap() {
-  DEFINE_STATIC_LOCAL(IntIdentifierMap, intIdenifierMap, ());
-  return intIdenifierMap;
+  DEFINE_STATIC_LOCAL(IntIdentifierMap, intIdentifierMap, ());
+  return intIdentifierMap;
 }
 
-IdentifierRep* identifierRep(int intID) {
+IdentifierRep* IdentifierRep::get(int intID) {
   if (intID == 0 || intID == -1) {
     static IdentifierRep* negativeOneAndZeroIdentifiers[2];
 
@@ -75,6 +68,8 @@ IdentifierRep* identifierRep(int intID) {
   if (result.second) {
     ASSERT(!result.first->second);
     result.first->second = new IdentifierRep(intID);
+
+    identifierSet().add(result.first->second);
   }
 
   return result.first->second;
@@ -87,7 +82,7 @@ static StringIdentifierMap& stringIdentifierMap() {
   return stringIdentifierMap;
 }
 
-IdentifierRep* identifierRep(const char* name) {
+IdentifierRep* IdentifierRep::get(const char* name) {
   ASSERT(name);
   if (!name)
     return 0;
@@ -98,9 +93,15 @@ IdentifierRep* identifierRep(const char* name) {
   if (result.second) {
     ASSERT(!result.first->second);
     result.first->second = new IdentifierRep(name);
+
+    identifierSet().add(result.first->second);
   }
 
   return result.first->second;
+}
+
+bool IdentifierRep::isValid(IdentifierRep* identifier) {
+  return identifierSet().contains(identifier);
 }
 
 }  // namespace WebCore
