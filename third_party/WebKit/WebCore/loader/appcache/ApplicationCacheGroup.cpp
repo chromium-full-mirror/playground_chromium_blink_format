@@ -166,6 +166,14 @@ void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
   if (!protocolHostAndPortAreEqual(manifestURL, request.url()))
     return;
 
+  // Don't change anything on disk if private browsing is enabled.
+  if (!frame->settings() || frame->settings()->privateBrowsingEnabled()) {
+    postListenerTask(&DOMApplicationCache::callCheckingListener,
+                     documentLoader);
+    postListenerTask(&DOMApplicationCache::callErrorListener, documentLoader);
+    return;
+  }
+
   ApplicationCacheGroup* group =
       cacheStorage().findOrCreateCacheGroup(manifestURL);
 
@@ -398,6 +406,18 @@ void ApplicationCacheGroup::update(Frame* frame,
         postListenerTask(&DOMApplicationCache::callDownloadingListener,
                          frame->loader()->documentLoader());
     }
+    return;
+  }
+
+  // Don't change anything on disk if private browsing is enabled.
+  if (!frame->settings() || frame->settings()->privateBrowsingEnabled()) {
+    ASSERT(m_pendingMasterResourceLoaders.isEmpty());
+    ASSERT(m_pendingEntries.isEmpty());
+    ASSERT(!m_cacheBeingUpdated);
+    postListenerTask(&DOMApplicationCache::callCheckingListener,
+                     frame->loader()->documentLoader());
+    postListenerTask(&DOMApplicationCache::callNoUpdateListener,
+                     frame->loader()->documentLoader());
     return;
   }
 

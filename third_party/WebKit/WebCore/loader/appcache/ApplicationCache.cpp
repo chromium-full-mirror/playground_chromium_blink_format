@@ -136,12 +136,12 @@ bool ApplicationCache::addDynamicEntry(const String& url) {
                          KURL(url).protocol()))
     return false;
 
-  // FIXME: Implement
+  // FIXME: Implement (be sure to respect private browsing state).
   return true;
 }
 
 void ApplicationCache::removeDynamicEntry(const String&) {
-  // FIXME: Implement
+  // FIXME: Implement (be sure to respect private browsing state).
 }
 
 void ApplicationCache::setOnlineWhitelist(const Vector<KURL>& onlineWhitelist) {
