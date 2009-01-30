@@ -1051,7 +1051,9 @@ bool ApplyStyleCommand::isHTMLStyleNode(CSSMutableStyleDeclaration* style,
        it != end; ++it) {
     switch ((*it).id()) {
       case CSSPropertyFontWeight:
-        if (elem->hasLocalName(bTag))
+        // IE inserts "strong" tags for execCommand("bold"), so we remove them,
+        // even though they're not strictly presentational
+        if (elem->hasLocalName(bTag) || elem->hasLocalName(strongTag))
           return true;
         break;
       case CSSPropertyVerticalAlign:
@@ -1059,7 +1061,9 @@ bool ApplyStyleCommand::isHTMLStyleNode(CSSMutableStyleDeclaration* style,
           return true;
         break;
       case CSSPropertyFontStyle:
-        if (elem->hasLocalName(iTag))
+        // IE inserts "em" tags for execCommand("italic"), so we remove them,
+        // even though they're not strictly presentational
+        if (elem->hasLocalName(iTag) || elem->hasLocalName(emTag))
           return true;
     }
   }
