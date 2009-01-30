@@ -101,7 +101,7 @@ static void webkit_accessible_finalize(GObject* object) {
 static const gchar* webkit_accessible_get_name(AtkObject* object) {
   // TODO: Deal with later changes.
   if (!object->name)
-    atk_object_set_name(object, core(object)->title().utf8().data());
+    atk_object_set_name(object, core(object)->stringValue().utf8().data());
   return object->name;
 }
 
