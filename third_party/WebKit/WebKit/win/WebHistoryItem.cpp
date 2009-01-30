@@ -163,7 +163,7 @@ WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
        protocolIs(m_historyItem->urlString(), "https")))
     m_historyItem->setLastVisitWasHTTPNonGet(true);
 
-  if (redirectURLsVector)
+  if (redirectURLsVector.get())
     m_historyItem->setRedirectURLs(redirectURLsVector);
 
   return S_OK;
