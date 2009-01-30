@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2009 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,6 +28,19 @@
 #include "ResourceError.h"
 
 namespace WebCore {
+
+ResourceError ResourceErrorBase::copy() const {
+  lazyInit();
+
+  ResourceError errorCopy;
+  errorCopy.m_domain = m_domain.copy();
+  errorCopy.m_errorCode = m_errorCode;
+  errorCopy.m_failingURL = m_failingURL.copy();
+  errorCopy.m_localizedDescription = m_localizedDescription.copy();
+  errorCopy.m_isNull = m_isNull;
+  errorCopy.m_isCancellation = m_isCancellation;
+  return errorCopy;
+}
 
 void ResourceErrorBase::lazyInit() const {
   const_cast<ResourceError*>(static_cast<const ResourceError*>(this))
@@ -58,4 +72,5 @@ bool ResourceErrorBase::compare(const ResourceError& a,
 
   return platformCompare(a, b);
 }
-}
+
+}  // namespace WebCore

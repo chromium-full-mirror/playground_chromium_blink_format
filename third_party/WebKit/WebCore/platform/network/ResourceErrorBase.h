@@ -34,6 +34,10 @@ class ResourceError;
 
 class ResourceErrorBase {
  public:
+  // Makes a deep copy. Useful for when you need to use a ResourceError on
+  // another thread.
+  ResourceError copy() const;
+
   bool isNull() const { return m_isNull; }
 
   const String& domain() const {
@@ -58,7 +62,7 @@ class ResourceErrorBase {
   }
   bool isCancellation() const { return m_isCancellation; }
 
-  static bool compare(const ResourceError& a, const ResourceError& b);
+  static bool compare(const ResourceError&, const ResourceError&);
 
  protected:
   ResourceErrorBase()
@@ -104,4 +108,4 @@ inline bool operator!=(const ResourceError& a, const ResourceError& b) {
 
 }  // namespace WebCore
 
-#endif  // ResourceErrorBase_h_
+#endif  // ResourceErrorBase_h
