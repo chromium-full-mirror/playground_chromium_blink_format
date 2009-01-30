@@ -1567,7 +1567,7 @@ void RenderLayer::updateScrollInfoAfterLayout() {
         m_inOverflowRelayout = true;
         renderer()->setNeedsLayout(true);
         if (renderer()->isRenderBlock())
-          static_cast<RenderBlock*>(renderer())->layoutBlock(true);
+          toRenderBlock(renderer())->layoutBlock(true);
         else
           renderer()->layout();
         m_inOverflowRelayout = false;

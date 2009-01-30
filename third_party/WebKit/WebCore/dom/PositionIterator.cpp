@@ -151,8 +151,7 @@ bool PositionIterator::isCandidate() const {
 
   if (!m_parent->hasTagName(htmlTag) && renderer->isBlockFlow() &&
       !Position::hasRenderedNonAnonymousDescendantsWithHeight(renderer) &&
-      (static_cast<RenderBlock*>(renderer)->height() ||
-       m_parent->hasTagName(bodyTag)))
+      (toRenderBlock(renderer)->height() || m_parent->hasTagName(bodyTag)))
     return atStartOfNode() && !Position::nodeIsUserSelectNone(m_parent);
 
   return false;

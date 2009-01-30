@@ -664,7 +664,7 @@ RenderBlock* RenderObject::containingBlock() const {
   if (!o || !o->isRenderBlock())
     return 0;  // Probably doesn't happen any more, but leave just in case. -dwh
 
-  return static_cast<RenderBlock*>(o);
+  return toRenderBlock(o);
 }
 
 int RenderObject::containingBlockWidth() const {
@@ -2035,7 +2035,7 @@ void RenderObject::computeRectForRepaint(RenderBox* repaintContainer,
 
   if (RenderObject* o = parent()) {
     if (o->isBlockFlow()) {
-      RenderBlock* cb = static_cast<RenderBlock*>(o);
+      RenderBlock* cb = toRenderBlock(o);
       if (cb->hasColumns())
         cb->adjustRectForColumns(rect);
     }
@@ -2500,7 +2500,7 @@ void RenderObject::removeFromObjectLists() {
     RenderObject* p;
     for (p = parent(); p; p = p->parent()) {
       if (p->isRenderBlock())
-        static_cast<RenderBlock*>(p)->removePositionedObject(toRenderBox(this));
+        toRenderBlock(p)->removePositionedObject(toRenderBox(this));
     }
   }
 }
@@ -2854,8 +2854,8 @@ void RenderObject::getTextDecorationColors(int decorations,
     }
     curr = curr->parent();
     if (curr && curr->isRenderBlock() &&
-        static_cast<RenderBlock*>(curr)->inlineContinuation())
-      curr = static_cast<RenderBlock*>(curr)->inlineContinuation();
+        toRenderBlock(curr)->inlineContinuation())
+      curr = toRenderBlock(curr)->inlineContinuation();
   } while (curr && decorations && (!quirksMode || !curr->element() ||
                                    (!curr->element()->hasTagName(aTag) &&
                                     !curr->element()->hasTagName(fontTag))));

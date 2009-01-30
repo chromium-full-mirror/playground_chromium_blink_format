@@ -613,7 +613,7 @@ bool Editor::hasBidiSelection() const {
   if (style->direction() == RTL)
     return true;
 
-  return static_cast<RenderBlock*>(renderer)->containsNonZeroBidiLevel();
+  return toRenderBlock(renderer)->containsNonZeroBidiLevel();
 }
 
 TriState Editor::selectionUnorderedListState() const {

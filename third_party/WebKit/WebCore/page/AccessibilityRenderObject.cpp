@@ -464,7 +464,7 @@ Element* AccessibilityRenderObject::anchorElement() const {
        currRenderer = currRenderer->parent()) {
     if (currRenderer->isRenderBlock()) {
       RenderInline* continuation =
-          static_cast<RenderBlock*>(currRenderer)->inlineContinuation();
+          toRenderBlock(currRenderer)->inlineContinuation();
       if (continuation)
         return cache->get(continuation)->anchorElement();
     }
@@ -1166,8 +1166,7 @@ bool AccessibilityRenderObject::accessibilityIsIgnored() const {
     return false;
 
   if (m_renderer->isBlockFlow() && m_renderer->childrenInline())
-    return !static_cast<RenderBlock*>(m_renderer)->firstLineBox() &&
-           !mouseButtonListener();
+    return !toRenderBlock(m_renderer)->firstLineBox() && !mouseButtonListener();
 
   // ignore images seemingly used as spacers
   if (isImage()) {

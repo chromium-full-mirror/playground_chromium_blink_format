@@ -89,8 +89,7 @@ void RenderTextControl::styleDidChange(RenderStyle::Diff diff,
   RenderBlock::styleDidChange(diff, oldStyle);
 
   if (m_innerText) {
-    RenderBlock* textBlockRenderer =
-        static_cast<RenderBlock*>(m_innerText->renderer());
+    RenderBlock* textBlockRenderer = toRenderBlock(m_innerText->renderer());
     RefPtr<RenderStyle> textBlockStyle = createInnerTextStyle(style());
     // We may have set the width and the height in the old style in layout().
     // Reset them now to avoid getting a spurious layout hint.
