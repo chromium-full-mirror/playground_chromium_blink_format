@@ -57,6 +57,8 @@ class ProxyInstance : public JSC::Bindings::Instance {
                      const JSC::Bindings::Field*,
                      JSC::JSValuePtr) const;
 
+  void invalidate();
+
  private:
   ProxyInstance(PassRefPtr<JSC::Bindings::RootObject>,
                 NetscapePluginInstanceProxy*,
