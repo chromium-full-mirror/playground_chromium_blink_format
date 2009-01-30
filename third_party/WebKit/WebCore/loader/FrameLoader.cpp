@@ -3024,11 +3024,8 @@ void FrameLoader::commitProvisionalLoad(PassRefPtr<CachedPage> prpCachedPage) {
   // the back/forward cache.
   // We are doing this here because we know for sure that a new page is about to
   // be loaded.
-  if (canCachePage() && !m_currentHistoryItem->isInPageCache()) {
-    if (Document* document = m_frame->document())
-      document->suspendActiveDOMObjects();
+  if (canCachePage() && !m_currentHistoryItem->isInPageCache())
     cachePageForHistoryItem(m_currentHistoryItem.get());
-  }
 
   if (m_loadType != FrameLoadTypeReplace)
     closeOldDataSources();
@@ -3321,7 +3318,6 @@ void FrameLoader::open(CachedPage& cachedPage) {
   updatePolicyBaseURL();
 
   cachedPage.restore(m_frame->page());
-  document->resumeActiveDOMObjects();
 
   // It is necessary to update any platform script objects after restoring the
   // cached page.
@@ -3580,11 +3576,7 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
     }
 
     case FrameStateComplete:
-      // Even if already complete, we might have set a previous item on a frame
-      // that
-      // didn't do any data loading on the past transaction. Make sure to clear
-      // these out.
-      m_client->frameLoadCompleted();
+      frameLoadCompleted();
       return;
   }
 
@@ -3643,7 +3635,14 @@ void FrameLoader::didFirstVisuallyNonEmptyLayout() {
 }
 
 void FrameLoader::frameLoadCompleted() {
+  // Note: Can be called multiple times.
+
   m_client->frameLoadCompleted();
+
+  // Even if already complete, we might have set a previous item on a frame that
+  // didn't do any data loading on the past transaction. Make sure to clear
+  // these out.
+  setPreviousHistoryItem(0);
 
   // After a canceled provisional load, firstLayoutDone is false.
   // Reset it to true if we're displaying a page.

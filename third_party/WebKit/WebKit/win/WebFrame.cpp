@@ -1238,10 +1238,7 @@ String WebFrame::generatedMIMETypeForURLScheme(
   return String();
 }
 
-void WebFrame::frameLoadCompleted() {
-  if (Frame* coreFrame = core(this))
-    coreFrame->loader()->setPreviousHistoryItem(0);
-}
+void WebFrame::frameLoadCompleted() {}
 
 void WebFrame::restoreViewState() {}
 
