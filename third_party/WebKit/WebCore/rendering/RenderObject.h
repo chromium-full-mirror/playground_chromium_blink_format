@@ -1011,10 +1011,12 @@ class RenderObject : public CachedResourceClient {
           m_repaintContainer(0),
           m_checkForRepaint(checkForRepaint) {
       if (m_checkForRepaint) {
-        m_oldBounds =
-            oldBounds ? *oldBounds : m_object.absoluteClippedOverflowRect();
-        m_oldOutlineBox = m_object.absoluteOutlineBounds();
         m_repaintContainer = m_object.containerForRepaint();
+        m_oldBounds =
+            oldBounds
+                ? *oldBounds
+                : m_object.clippedOverflowRectForRepaint(m_repaintContainer);
+        m_oldOutlineBox = m_object.outlineBoundsForRepaint(m_repaintContainer);
       }
     }
 
