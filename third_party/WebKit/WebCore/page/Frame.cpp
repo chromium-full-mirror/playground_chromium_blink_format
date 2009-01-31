@@ -1876,7 +1876,7 @@ void Frame::createView(const IntSize& viewportSize,
                        ScrollbarMode horizontalScrollbarMode,
                        ScrollbarMode verticalScrollbarMode) {
   ASSERT(this);
-  ASSERT(m_page.get());
+  ASSERT(m_page);
 
   bool isMainFrame = this == m_page->mainFrame();
 
