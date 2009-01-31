@@ -78,7 +78,8 @@ class HTMLFormElement : public HTMLElement {
   bool prepareSubmit(Event*);
   void submit(Event* = 0,
               bool activateSubmitButton = false,
-              bool lockHistory = false);
+              bool lockHistory = false,
+              bool lockBackForwardList = false);
   void reset();
 
   // Used to indicate a malformed state to keep from applying the bottom margin

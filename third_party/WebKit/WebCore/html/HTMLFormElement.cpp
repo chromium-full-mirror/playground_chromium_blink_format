@@ -274,7 +274,8 @@ bool HTMLFormElement::prepareSubmit(Event* event) {
 
 void HTMLFormElement::submit(Event* event,
                              bool activateSubmitButton,
-                             bool lockHistory) {
+                             bool lockHistory,
+                             bool lockBackForwardList) {
   FrameView* view = document()->view();
   Frame* frame = document()->frame();
   if (!view || !frame)
@@ -343,19 +344,19 @@ void HTMLFormElement::submit(Event* event,
       }
       frame->loader()->submitForm("POST", m_url, data, m_target,
                                   m_formDataBuilder.encodingType(), String(),
-                                  event, lockHistory);
+                                  event, lockHistory, lockBackForwardList);
     } else {
       Vector<char> boundary = m_formDataBuilder.generateUniqueBoundaryString();
-      frame->loader()->submitForm("POST", m_url,
-                                  createFormData(boundary.data()), m_target,
-                                  m_formDataBuilder.encodingType(),
-                                  boundary.data(), event, lockHistory);
+      frame->loader()->submitForm(
+          "POST", m_url, createFormData(boundary.data()), m_target,
+          m_formDataBuilder.encodingType(), boundary.data(), event, lockHistory,
+          lockBackForwardList);
     }
   } else {
     m_formDataBuilder.setIsMultiPartForm(false);
     frame->loader()->submitForm("GET", m_url, createFormData(CString()),
                                 m_target, String(), String(), event,
-                                lockHistory);
+                                lockHistory, lockBackForwardList);
   }
 
   if (needButtonActivation && firstSuccessfulSubmitButton)

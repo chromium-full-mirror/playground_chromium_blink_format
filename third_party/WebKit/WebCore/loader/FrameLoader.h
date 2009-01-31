@@ -180,7 +180,9 @@ class FrameLoader : Noncopyable
 
   void loadFrameRequestWithFormAndValues(
       const FrameLoadRequest&,
-      bool lockHistory,  // Called by submitForm, calls loadPostRequest()
+      bool lockHistory,
+      bool
+          lockBackForwardList,  // Called by submitForm, calls loadPostRequest()
       Event*,
       HTMLFormElement*,
       const HashMap<String, String>& formValues);
@@ -318,6 +320,7 @@ class FrameLoader : Noncopyable
                         double delay,
                         double fireDate,
                         bool lockHistory,
+                        bool lockBackForwardList,
                         bool isJavaScriptFormAction);
   bool shouldReload(const KURL& currentURL, const KURL& destinationURL);
 #if ENABLE(WML)
@@ -353,19 +356,25 @@ class FrameLoader : Noncopyable
   void changeLocation(const String& url,
                       const String& referrer,
                       bool lockHistory = true,
+                      bool lockBackForwardList = true,
                       bool userGesture = false,
                       bool refresh = false);
   void changeLocation(const KURL&,
                       const String& referrer,
                       bool lockHistory = true,
+                      bool lockBackForwardList = true,
                       bool userGesture = false,
                       bool refresh = false);
   void urlSelected(const ResourceRequest&,
                    const String& target,
                    Event*,
                    bool lockHistory,
+                   bool lockBackForwardList,
                    bool userGesture);
-  void urlSelected(const FrameLoadRequest&, Event*, bool lockHistory);
+  void urlSelected(const FrameLoadRequest&,
+                   Event*,
+                   bool lockHistory,
+                   bool lockBackForwardList);
 
   bool requestFrame(HTMLFrameOwnerElement*,
                     const String& url,
@@ -382,9 +391,13 @@ class FrameLoader : Noncopyable
                   const String& contentType,
                   const String& boundary,
                   Event*,
-                  bool lockHistory);
+                  bool lockHistory,
+                  bool lockBackForwardList);
   void submitFormAgain();
-  void submitForm(const FrameLoadRequest&, Event*, bool lockHistory);
+  void submitForm(const FrameLoadRequest&,
+                  Event*,
+                  bool lockHistory,
+                  bool lockBackForwardList);
 
   void stop();
   void stopLoading(bool sendUnload);
@@ -406,6 +419,7 @@ class FrameLoader : Noncopyable
   void scheduleLocationChange(const String& url,
                               const String& referrer,
                               bool lockHistory = true,
+                              bool lockBackForwardList = true,
                               bool userGesture = false);
   void scheduleRefresh(bool userGesture = false);
   void scheduleHistoryNavigation(int steps);
