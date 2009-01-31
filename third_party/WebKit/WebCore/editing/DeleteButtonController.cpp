@@ -161,6 +161,13 @@ void DeleteButtonController::createDeletionUI() {
   style->setProperty(CSSPropertyWebkitUserDrag, CSSValueNone);
   style->setProperty(CSSPropertyWebkitUserSelect, CSSValueNone);
   style->setProperty(CSSPropertyWebkitUserModify, CSSValueNone);
+  style->setProperty(CSSPropertyVisibility, CSSValueHidden);
+  style->setProperty(CSSPropertyPosition, CSSValueAbsolute);
+  style->setProperty(CSSPropertyCursor, CSSValueDefault);
+  style->setProperty(CSSPropertyTop, "0");
+  style->setProperty(CSSPropertyRight, "0");
+  style->setProperty(CSSPropertyBottom, "0");
+  style->setProperty(CSSPropertyLeft, "0");
 
   RefPtr<HTMLDivElement> outline =
       new HTMLDivElement(divTag, m_target->document());
@@ -171,10 +178,6 @@ void DeleteButtonController::createDeletionUI() {
 
   style = outline->getInlineStyleDecl();
   style->setProperty(CSSPropertyPosition, CSSValueAbsolute);
-  style->setProperty(CSSPropertyCursor, CSSValueDefault);
-  style->setProperty(CSSPropertyWebkitUserDrag, CSSValueNone);
-  style->setProperty(CSSPropertyWebkitUserSelect, CSSValueNone);
-  style->setProperty(CSSPropertyWebkitUserModify, CSSValueNone);
   style->setProperty(CSSPropertyZIndex, String::number(-1000000));
   style->setProperty(
       CSSPropertyTop,
@@ -195,6 +198,7 @@ void DeleteButtonController::createDeletionUI() {
                                             "px solid rgba(0, 0, 0, 0.6)");
   style->setProperty(CSSPropertyWebkitBorderRadius,
                      String::number(borderRadius) + "px");
+  style->setProperty(CSSPropertyVisibility, CSSValueVisible);
 
   ExceptionCode ec = 0;
   container->appendChild(outline.get(), ec);
@@ -211,10 +215,6 @@ void DeleteButtonController::createDeletionUI() {
 
   style = button->getInlineStyleDecl();
   style->setProperty(CSSPropertyPosition, CSSValueAbsolute);
-  style->setProperty(CSSPropertyCursor, CSSValueDefault);
-  style->setProperty(CSSPropertyWebkitUserDrag, CSSValueNone);
-  style->setProperty(CSSPropertyWebkitUserSelect, CSSValueNone);
-  style->setProperty(CSSPropertyWebkitUserModify, CSSValueNone);
   style->setProperty(CSSPropertyZIndex, String::number(1000000));
   style->setProperty(
       CSSPropertyTop,
@@ -228,6 +228,7 @@ void DeleteButtonController::createDeletionUI() {
           "px");
   style->setProperty(CSSPropertyWidth, String::number(buttonWidth) + "px");
   style->setProperty(CSSPropertyHeight, String::number(buttonHeight) + "px");
+  style->setProperty(CSSPropertyVisibility, CSSValueVisible);
 
   RefPtr<Image> buttonImage = Image::loadPlatformResource("deleteButton");
   if (buttonImage->isNull())
