@@ -93,6 +93,9 @@ class Settings {
   void setJavaScriptEnabled(bool);
   bool isJavaScriptEnabled() const { return m_isJavaScriptEnabled; }
 
+  void setWebSecurityEnabled(bool);
+  bool isWebSecurityEnabled() const { return m_isWebSecurityEnabled; }
+
   void setJavaScriptCanOpenWindowsAutomatically(bool);
   bool JavaScriptCanOpenWindowsAutomatically() const {
     return m_javaScriptCanOpenWindowsAutomatically;
@@ -273,6 +276,7 @@ class Settings {
   bool m_databasesEnabled : 1;
   bool m_localStorageEnabled : 1;
   bool m_isJavaScriptEnabled : 1;
+  bool m_isWebSecurityEnabled : 1;
   bool m_javaScriptCanOpenWindowsAutomatically : 1;
   bool m_shouldPrintBackgrounds : 1;
   bool m_textAreasAreResizable : 1;

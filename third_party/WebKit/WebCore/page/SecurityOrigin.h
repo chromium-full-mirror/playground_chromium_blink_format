@@ -90,6 +90,11 @@ class SecurityOrigin : public ThreadSafeShared<SecurityOrigin> {
   //       with older versions of WebKit.
   void grantLoadLocalResources();
 
+  // Explicitly grant the ability to access very other SecurityOrigin.
+  //
+  // WARNING: This is an extremely powerful ability.  Use with caution!
+  void grantUniversalAccess();
+
   bool isSecureTransitionTo(const KURL&) const;
 
   // The local SecurityOrigin is the most privileged SecurityOrigin.
@@ -133,6 +138,7 @@ class SecurityOrigin : public ThreadSafeShared<SecurityOrigin> {
   String m_domain;
   unsigned short m_port;
   bool m_noAccess;
+  bool m_universalAccess;
   bool m_domainWasSetInDOM;
   bool m_canLoadLocalResources;
 };

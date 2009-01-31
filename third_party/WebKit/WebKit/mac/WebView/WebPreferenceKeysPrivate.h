@@ -56,6 +56,7 @@
   @"WebKitShrinksStandaloneImagesToFit"
 #define WebKitJavaEnabledPreferenceKey @"WebKitJavaEnabled"
 #define WebKitJavaScriptEnabledPreferenceKey @"WebKitJavaScriptEnabled"
+#define WebKitWebSecurityEnabledPreferenceKey @"WebKitWebSecurityEnabled"
 #define WebKitJavaScriptCanOpenWindowsAutomaticallyPreferenceKey \
   @"WebKitJavaScriptCanOpenWindowsAutomatically"
 #define WebKitPluginsEnabledPreferenceKey @"WebKitPluginsEnabled"

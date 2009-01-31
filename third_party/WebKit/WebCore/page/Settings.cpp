@@ -61,6 +61,7 @@ Settings::Settings(Page* page)
       m_databasesEnabled(false),
       m_localStorageEnabled(false),
       m_isJavaScriptEnabled(false),
+      m_isWebSecurityEnabled(true),
       m_javaScriptCanOpenWindowsAutomatically(false),
       m_shouldPrintBackgrounds(false),
       m_textAreasAreResizable(false)
@@ -180,6 +181,10 @@ void Settings::setLoadsImagesAutomatically(bool loadsImagesAutomatically) {
 
 void Settings::setJavaScriptEnabled(bool isJavaScriptEnabled) {
   m_isJavaScriptEnabled = isJavaScriptEnabled;
+}
+
+void Settings::setWebSecurityEnabled(bool isWebSecurityEnabled) {
+  m_isWebSecurityEnabled = isWebSecurityEnabled;
 }
 
 void Settings::setJavaEnabled(bool isJavaEnabled) {

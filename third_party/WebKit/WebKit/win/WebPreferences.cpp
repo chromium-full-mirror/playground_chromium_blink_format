@@ -232,6 +232,8 @@ void WebPreferences::initializeDefaultSettings() {
                        kCFBooleanTrue);
   CFDictionaryAddValue(defaults, CFSTR(WebKitJavaScriptEnabledPreferenceKey),
                        kCFBooleanTrue);
+  CFDictionaryAddValue(defaults, CFSTR(WebKitWebSecurityEnabledPreferenceKey),
+                       kCFBooleanTrue);
   CFDictionaryAddValue(
       defaults, CFSTR(WebKitJavaScriptCanOpenWindowsAutomaticallyPreferenceKey),
       kCFBooleanTrue);
@@ -794,6 +796,18 @@ HRESULT STDMETHODCALLTYPE WebPreferences::isJavaScriptEnabled(
 HRESULT STDMETHODCALLTYPE WebPreferences::setJavaScriptEnabled(
     /* [in] */ BOOL enabled) {
   setBoolValue(CFSTR(WebKitJavaScriptEnabledPreferenceKey), enabled);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebPreferences::isWebSecurityEnabled(
+    /* [retval][out] */ BOOL* enabled) {
+  *enabled = boolValueForKey(CFSTR(WebKitWebSecurityEnabledPreferenceKey));
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebPreferences::setWebSecurityEnabled(
+    /* [in] */ BOOL enabled) {
+  setBoolValue(CFSTR(WebKitWebSecurityEnabledPreferenceKey), enabled);
   return S_OK;
 }
 
