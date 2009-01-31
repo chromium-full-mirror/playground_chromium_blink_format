@@ -299,6 +299,25 @@ void RenderBox::styleDidChange(RenderStyle::Diff diff,
     document()->setTextColor(style()->color());
 }
 
+void RenderBox::layout() {
+  ASSERT(needsLayout());
+
+  RenderObject* child = firstChild();
+  if (!child) {
+    setNeedsLayout(false);
+    return;
+  }
+
+  LayoutStateMaintainer statePusher(view(), this, IntSize(x(), y()));
+  while (child) {
+    child->layoutIfNeeded();
+    ASSERT(!child->needsLayout());
+    child = child->nextSibling();
+  }
+  statePusher.pop();
+  setNeedsLayout(false);
+}
+
 int RenderBox::offsetLeft() const {
   RenderBox* offsetPar = offsetParent();
   if (!offsetPar)

@@ -37,6 +37,10 @@ class RenderBox : public RenderObject {
 
   virtual const char* renderName() const { return "RenderBox"; }
 
+  // Use this with caution! No type checking is done!
+  RenderBox* firstChildBox() const;
+  RenderBox* lastChildBox() const;
+
   int x() const { return m_frameRect.x(); }
   int y() const { return m_frameRect.y(); }
   int width() const {
@@ -221,6 +225,7 @@ class RenderBox : public RenderObject {
   // rect in the reflection.
   IntRect reflectedRect(const IntRect&) const;
 
+  virtual void layout();
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
@@ -593,6 +598,14 @@ inline RenderBox* RenderBox::nextSiblingBox() const {
 
 inline RenderBox* RenderBox::parentBox() const {
   return toRenderBox(parent());
+}
+
+inline RenderBox* RenderBox::firstChildBox() const {
+  return toRenderBox(firstChild());
+}
+
+inline RenderBox* RenderBox::lastChildBox() const {
+  return toRenderBox(lastChild());
 }
 
 }  // namespace WebCore

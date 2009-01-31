@@ -22,7 +22,6 @@
 #define RenderContainer_h
 
 #include "RenderBox.h"
-#include "RenderObjectChildList.h"
 
 namespace WebCore {
 
@@ -32,29 +31,19 @@ class RenderContainer : public RenderBox {
   RenderContainer(Node*);
   virtual ~RenderContainer();
 
-  virtual RenderObject* firstChild() const { return m_children.firstChild(); }
-  virtual RenderObject* lastChild() const { return m_children.lastChild(); }
-
-  // Use this with caution! No type checking is done!
-  RenderBox* firstChildBox() const {
-    ASSERT(!firstChild() || firstChild()->isBox());
-    return toRenderBox(firstChild());
+  virtual RenderObjectChildList* virtualChildren() { return children(); }
+  virtual const RenderObjectChildList* virtualChildren() const {
+    return children();
   }
-  RenderBox* lastChildBox() const {
-    ASSERT(!lastChild() || lastChild()->isBox());
-    return toRenderBox(lastChild());
-  }
+  const RenderObjectChildList* children() const { return &m_children; }
+  RenderObjectChildList* children() { return &m_children; }
 
-  virtual bool canHaveChildren() const;
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
   virtual void addChildIgnoringContinuation(RenderObject* newChild,
                                             RenderObject* beforeChild = 0) {
     return addChild(newChild, beforeChild);
   }
   virtual void removeChild(RenderObject*);
-
-  virtual void destroy();
-  void destroyLeftoverChildren();
 
   virtual RenderObject* removeChildNode(RenderObject*, bool fullRemove = true);
   virtual void appendChildNode(RenderObject*, bool fullAppend = true);
@@ -69,10 +58,7 @@ class RenderContainer : public RenderBox {
     appendChildNode(child->parent()->removeChildNode(child, false), false);
   }
 
-  virtual void layout();
   virtual void calcPrefWidths() { setPrefWidthsDirty(false); }
-
-  virtual void removeLeftoverAnonymousBlock(RenderBlock* child);
 
   RenderObject* beforeAfterContainer(RenderStyle::PseudoId);
   virtual void updateBeforeAfterContent(RenderStyle::PseudoId);

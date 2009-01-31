@@ -226,10 +226,6 @@ bool RenderObject::isHTMLMarquee() const {
          element()->hasTagName(marqueeTag);
 }
 
-bool RenderObject::canHaveChildren() const {
-  return false;
-}
-
 void RenderObject::addChild(RenderObject*, RenderObject*) {
   ASSERT_NOT_REACHED();
 }
@@ -2509,6 +2505,11 @@ bool RenderObject::documentBeingDestroyed() const {
 }
 
 void RenderObject::destroy() {
+  // Destroy any leftover anonymous children.
+  RenderObjectChildList* children = virtualChildren();
+  if (children)
+    children->destroyLeftoverChildren();
+
   // If this renderer is being autoscrolled, stop the autoscroll timer
   if (document()->frame() &&
       document()->frame()->eventHandler()->autoscrollRenderer() == this)
@@ -2727,7 +2728,16 @@ void RenderObject::scheduleRelayout() {
   }
 }
 
-void RenderObject::removeLeftoverAnonymousBlock(RenderBlock*) {}
+void RenderObject::layout() {
+  ASSERT(needsLayout());
+  RenderObject* child = firstChild();
+  while (child) {
+    child->layoutIfNeeded();
+    ASSERT(!child->needsLayout());
+    child = child->nextSibling();
+  }
+  setNeedsLayout(false);
+}
 
 InlineBox* RenderObject::createInlineBox(bool, bool unusedIsRootLineBox, bool) {
   ASSERT_UNUSED(unusedIsRootLineBox, !unusedIsRootLineBox);

@@ -44,38 +44,6 @@ RenderContainer::RenderContainer(Node* node) : RenderBox(node) {}
 
 RenderContainer::~RenderContainer() {}
 
-void RenderContainer::destroy() {
-  destroyLeftoverChildren();
-  RenderBox::destroy();
-}
-
-void RenderContainer::destroyLeftoverChildren() {
-  while (m_children.firstChild()) {
-    if (m_children.firstChild()->isListMarker() ||
-        (m_children.firstChild()->style()->styleType() ==
-             RenderStyle::FIRST_LETTER &&
-         !m_children.firstChild()->isText()))
-      m_children.firstChild()->remove();  // List markers are owned by their
-                                          // enclosing list and so don't get
-                                          // destroyed by this container.
-                                          // Similarly, first letters are
-                                          // destroyed by their remaining text
-                                          // fragment.
-    else {
-      // Destroy any anonymous children remaining in the render tree, as well as
-      // implicit (shadow) DOM elements like those used in the engine-based text
-      // fields.
-      if (m_children.firstChild()->element())
-        m_children.firstChild()->element()->setRenderer(0);
-      m_children.firstChild()->destroy();
-    }
-  }
-}
-
-bool RenderContainer::canHaveChildren() const {
-  return true;
-}
-
 static void updateListMarkerNumbers(RenderObject* child) {
   for (RenderObject* r = child; r; r = r->nextSibling())
     if (r->isListItem())
@@ -87,7 +55,8 @@ void RenderContainer::addChild(RenderObject* newChild,
   bool needsTable = false;
 
   if (newChild->isListItem())
-    updateListMarkerNumbers(beforeChild ? beforeChild : m_children.lastChild());
+    updateListMarkerNumbers(beforeChild ? beforeChild
+                                        : children()->lastChild());
   else if (newChild->isTableCol() &&
            newChild->style()->display() == TABLE_COLUMN_GROUP)
     needsTable = !isTable();
@@ -104,7 +73,7 @@ void RenderContainer::addChild(RenderObject* newChild,
     // change we recurse infinitely when trying to render the CSS2 test page:
     // http://www.bath.ac.uk/%7Epy8ieh/internet/eviltests/htmlbodyheadrendering2.html.
     // See Radar 2925291.
-    if (needsTable && isTableCell() && !m_children.firstChild() &&
+    if (needsTable && isTableCell() && !children()->firstChild() &&
         !newChild->isTableCell())
       needsTable = false;
   }
@@ -112,7 +81,7 @@ void RenderContainer::addChild(RenderObject* newChild,
   if (needsTable) {
     RenderTable* table;
     RenderObject* afterChild =
-        beforeChild ? beforeChild->previousSibling() : m_children.lastChild();
+        beforeChild ? beforeChild->previousSibling() : children()->lastChild();
     if (afterChild && afterChild->isAnonymous() && afterChild->isTable())
       table = static_cast<RenderTable*>(afterChild);
     else {
@@ -192,10 +161,10 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild,
   if (oldChild->nextSibling())
     oldChild->nextSibling()->setPreviousSibling(oldChild->previousSibling());
 
-  if (m_children.firstChild() == oldChild)
-    m_children.setFirstChild(oldChild->nextSibling());
-  if (m_children.lastChild() == oldChild)
-    m_children.setLastChild(oldChild->previousSibling());
+  if (children()->firstChild() == oldChild)
+    children()->setFirstChild(oldChild->nextSibling());
+  if (children()->lastChild() == oldChild)
+    children()->setLastChild(oldChild->previousSibling());
 
   oldChild->setPreviousSibling(0);
   oldChild->setNextSibling(0);
@@ -317,8 +286,8 @@ void RenderContainer::updateBeforeAfterContentForContainer(
     if (child && child->style()->styleType() == type) {
       oldContentPresent = false;
       child->destroy();
-      child = (type == RenderStyle::BEFORE) ? m_children.firstChild()
-                                            : m_children.lastChild();
+      child = (type == RenderStyle::BEFORE) ? children()->firstChild()
+                                            : children()->lastChild();
     }
   }
 
@@ -376,7 +345,7 @@ void RenderContainer::updateBeforeAfterContentForContainer(
   }
 
   RenderObject* insertBefore =
-      (type == RenderStyle::BEFORE) ? m_children.firstChild() : 0;
+      (type == RenderStyle::BEFORE) ? children()->firstChild() : 0;
 
   // Generated content consists of a single container that houses multiple
   // children (specified
@@ -468,15 +437,15 @@ void RenderContainer::appendChildNode(RenderObject* newChild, bool fullAppend) {
           !newChild->isTableCell()));
 
   newChild->setParent(this);
-  RenderObject* lChild = m_children.lastChild();
+  RenderObject* lChild = children()->lastChild();
 
   if (lChild) {
     newChild->setPreviousSibling(lChild);
     lChild->setNextSibling(newChild);
   } else
-    m_children.setFirstChild(newChild);
+    children()->setFirstChild(newChild);
 
-  m_children.setLastChild(newChild);
+  children()->setLastChild(newChild);
 
   if (fullAppend) {
     // Keep our layer hierarchy updated.  Optimize for the common case where we
@@ -530,8 +499,8 @@ void RenderContainer::insertChildNode(RenderObject* child,
   ASSERT(!isBlockFlow() || (!child->isTableSection() && !child->isTableRow() &&
                             !child->isTableCell()));
 
-  if (beforeChild == m_children.firstChild())
-    m_children.setFirstChild(child);
+  if (beforeChild == children()->firstChild())
+    children()->setFirstChild(child);
 
   RenderObject* prev = beforeChild->previousSibling();
   child->setNextSibling(beforeChild);
@@ -576,68 +545,10 @@ void RenderContainer::insertChildNode(RenderObject* child,
     document()->axObjectCache()->childrenChanged(this);
 }
 
-void RenderContainer::layout() {
-  ASSERT(needsLayout());
-
-  LayoutStateMaintainer statePusher(view(), this, IntSize(x(), y()));
-
-  RenderObject* child = m_children.firstChild();
-  while (child) {
-    child->layoutIfNeeded();
-    ASSERT(child->isRenderInline() || !child->needsLayout());
-    child = child->nextSibling();
-  }
-
-  statePusher.pop();
-  setNeedsLayout(false);
-}
-
-void RenderContainer::removeLeftoverAnonymousBlock(RenderBlock* child) {
-  ASSERT(child->isAnonymousBlock());
-  ASSERT(!child->childrenInline());
-
-  if (child->inlineContinuation())
-    return;
-
-  RenderObject* firstAnChild = child->m_children.firstChild();
-  RenderObject* lastAnChild = child->m_children.lastChild();
-  if (firstAnChild) {
-    RenderObject* o = firstAnChild;
-    while (o) {
-      o->setParent(this);
-      o = o->nextSibling();
-    }
-    firstAnChild->setPreviousSibling(child->previousSibling());
-    lastAnChild->setNextSibling(child->nextSibling());
-    if (child->previousSibling())
-      child->previousSibling()->setNextSibling(firstAnChild);
-    if (child->nextSibling())
-      child->nextSibling()->setPreviousSibling(lastAnChild);
-  } else {
-    if (child->previousSibling())
-      child->previousSibling()->setNextSibling(child->nextSibling());
-    if (child->nextSibling())
-      child->nextSibling()->setPreviousSibling(child->previousSibling());
-  }
-  if (child == m_children.firstChild())
-    m_children.setFirstChild(firstAnChild);
-  if (child == m_children.lastChild())
-    m_children.setLastChild(lastAnChild);
-  child->setParent(0);
-  child->setPreviousSibling(0);
-  child->setNextSibling(0);
-  if (!child->isText()) {
-    RenderContainer* c = static_cast<RenderContainer*>(child);
-    c->m_children.setFirstChild(0);
-    c->m_next = 0;
-  }
-  child->destroy();
-}
-
 VisiblePosition RenderContainer::positionForCoordinates(int xPos, int yPos) {
   // no children...return this render object's element, if there is one, and
   // offset 0
-  if (!m_children.firstChild())
+  if (!children()->firstChild())
     return VisiblePosition(element(), 0, DOWNSTREAM);
 
   if (isTable() && element()) {
@@ -663,7 +574,7 @@ VisiblePosition RenderContainer::positionForCoordinates(int xPos, int yPos) {
     newX += x();
     newY += y();
   }
-  for (RenderObject* renderObject = m_children.firstChild(); renderObject;
+  for (RenderObject* renderObject = children()->firstChild(); renderObject;
        renderObject = renderObject->nextSibling()) {
     if (!renderObject->firstChild() && !renderObject->isInline() &&
             !renderObject->isBlockFlow() ||
@@ -735,13 +646,13 @@ void RenderContainer::addLineBoxRects(Vector<IntRect>& rects,
                                       unsigned start,
                                       unsigned end,
                                       bool) {
-  if (!m_children.firstChild() && (isInline() || isAnonymousBlock())) {
+  if (!children()->firstChild() && (isInline() || isAnonymousBlock())) {
     FloatPoint absPos = localToAbsolute(FloatPoint());
     absoluteRects(rects, absPos.x(), absPos.y());
     return;
   }
 
-  if (!m_children.firstChild())
+  if (!children()->firstChild())
     return;
 
   unsigned offset = start;
@@ -758,12 +669,12 @@ void RenderContainer::collectAbsoluteLineBoxQuads(Vector<FloatQuad>& quads,
                                                   unsigned start,
                                                   unsigned end,
                                                   bool /*useSelectionHeight*/) {
-  if (!m_children.firstChild() && (isInline() || isAnonymousBlock())) {
+  if (!children()->firstChild() && (isInline() || isAnonymousBlock())) {
     absoluteQuads(quads);
     return;
   }
 
-  if (!m_children.firstChild())
+  if (!children()->firstChild())
     return;
 
   unsigned offset = start;

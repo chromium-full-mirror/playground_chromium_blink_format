@@ -54,7 +54,7 @@ void RenderInline::destroy() {
   // connected to the rest of the tree, so that they will
   // properly dirty line boxes that they are removed from.  Effects that do
   // :before/:after only on hover could crash otherwise.
-  RenderContainer::destroyLeftoverChildren();
+  children()->destroyLeftoverChildren();
 
   if (!documentBeingDestroyed()) {
     if (firstLineBox()) {
