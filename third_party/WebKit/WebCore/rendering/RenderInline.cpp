@@ -660,7 +660,7 @@ void RenderInline::updateHitTestResult(HitTestResult& result,
       RenderBlock* firstBlock = node->renderer()->containingBlock();
 
       // Get our containing block.
-      RenderBox* block = toRenderBox(this);
+      RenderBox* block = this;
       if (isInline())
         block = containingBlock();
 

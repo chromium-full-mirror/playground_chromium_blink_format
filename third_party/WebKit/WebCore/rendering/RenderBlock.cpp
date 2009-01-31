@@ -1313,9 +1313,9 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
         // so that we can just pass the content width in directly to the
         // |calcHorizontalMargins|
         // function.
-        toRenderBox(child)->calcHorizontalMargins(child->style()->marginLeft(),
-                                                  child->style()->marginRight(),
-                                                  lineWidth(child->y(), false));
+        child->calcHorizontalMargins(child->style()->marginLeft(),
+                                     child->style()->marginRight(),
+                                     lineWidth(child->y(), false));
         chPos = rightOff - child->marginRight() - child->width();
       }
     }
