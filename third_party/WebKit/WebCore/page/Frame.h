@@ -187,11 +187,6 @@ class Frame : public RefCounted<Frame> {
  private:
   void lifeSupportTimerFired(Timer<Frame>*);
 
-  // === to be moved into Document
-
- public:
-  bool isFrameSet() const;
-
   // === to be moved into EventHandler
 
  public:
