@@ -80,7 +80,7 @@ bool GeolocationServiceGtk::startUpdating(PositionOptions* options) {
   g_object_unref(master);
 
   if (!client) {
-    setError(PositionError::LOCATION_PROVIDER_ERROR,
+    setError(PositionError::UNKNOWN_ERROR,
              "Could not connect to location provider.");
     return false;
   }
@@ -99,7 +99,7 @@ bool GeolocationServiceGtk::startUpdating(PositionOptions* options) {
       &error.outPtr());
 
   if (!result) {
-    setError(PositionError::LOCATION_PROVIDER_ERROR, error->message);
+    setError(PositionError::UNKNOWN_ERROR, error->message);
     g_object_unref(client);
     return false;
   }
@@ -107,7 +107,7 @@ bool GeolocationServiceGtk::startUpdating(PositionOptions* options) {
   m_geocluePosition =
       geoclue_master_client_create_position(client, &error.outPtr());
   if (!m_geocluePosition) {
-    setError(PositionError::LOCATION_PROVIDER_ERROR, error->message);
+    setError(PositionError::UNKNOWN_ERROR, error->message);
     g_object_unref(client);
     return false;
   }
@@ -118,7 +118,7 @@ bool GeolocationServiceGtk::startUpdating(PositionOptions* options) {
   m_geoclueClient = client;
   updateLocationInformation();
 
-  return result;
+  return true;
 }
 
 void GeolocationServiceGtk::stopUpdating() {
@@ -160,20 +160,14 @@ void GeolocationServiceGtk::updateLocationInformation() {
       m_geocluePosition, &m_timestamp, &m_latitude, &m_longitude, &m_altitude,
       &accuracy.outPtr(), &error.outPtr());
   if (error) {
-    setError(PositionError::POSITION_NOT_FOUND_ERROR, error->message);
+    setError(PositionError::POSITION_UNAVAILABLE, error->message);
     return;
-  } else if (fields & GEOCLUE_POSITION_FIELDS_LATITUDE &&
-             fields & GEOCLUE_POSITION_FIELDS_LONGITUDE) {
-    setError(PositionError::POSITION_NOT_FOUND_ERROR,
+  } else if (!(fields & GEOCLUE_POSITION_FIELDS_LATITUDE &&
+               fields & GEOCLUE_POSITION_FIELDS_LONGITUDE)) {
+    setError(PositionError::POSITION_UNAVAILABLE,
              "Position could not be determined.");
     return;
   }
-
-  // The m_altitudeAccuracy accuracy is likely to be wrong
-  GeoclueAccuracyLevel level;
-  geoclue_accuracy_get_details(accuracy.get(), &level, &m_accuracy,
-                               &m_altitudeAccuracy);
-  updatePosition();
 }
 
 void GeolocationServiceGtk::updatePosition() {
@@ -192,9 +186,9 @@ void GeolocationServiceGtk::position_changed(GeocluePosition*,
                                              double altitude,
                                              GeoclueAccuracy* accuracy,
                                              GeolocationServiceGtk* that) {
-  if (fields & GEOCLUE_POSITION_FIELDS_LATITUDE &&
-      fields & GEOCLUE_POSITION_FIELDS_LONGITUDE) {
-    that->setError(PositionError::POSITION_NOT_FOUND_ERROR,
+  if (!(fields & GEOCLUE_POSITION_FIELDS_LATITUDE &&
+        fields & GEOCLUE_POSITION_FIELDS_LONGITUDE)) {
+    that->setError(PositionError::POSITION_UNAVAILABLE,
                    "Position could not be determined.");
     return;
   }
