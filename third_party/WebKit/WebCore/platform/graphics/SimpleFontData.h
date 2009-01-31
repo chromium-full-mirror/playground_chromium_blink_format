@@ -213,6 +213,19 @@ class SimpleFontData : public FontData {
 #endif
 };
 
+#if !PLATFORM(QT)
+ALWAYS_INLINE float SimpleFontData::widthForGlyph(Glyph glyph) const {
+  float width = m_glyphToWidthMap.widthForGlyph(glyph);
+  if (width != cGlyphWidthUnknown)
+    return width;
+
+  width = platformWidthForGlyph(glyph);
+  m_glyphToWidthMap.setWidthForGlyph(glyph, width);
+
+  return width;
+}
+#endif
+
 }  // namespace WebCore
 
 #endif  // SimpleFontData_h
