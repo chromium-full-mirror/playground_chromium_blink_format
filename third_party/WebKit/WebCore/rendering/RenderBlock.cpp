@@ -1501,13 +1501,14 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
         markDescendantsWithFloats = true;
     }
 
-    if (markDescendantsWithFloats)
-      toRenderBlock(child)->markAllDescendantsWithFloatsForLayout();
+    if (child->isRenderBlock()) {
+      if (markDescendantsWithFloats)
+        toRenderBlock(child)->markAllDescendantsWithFloatsForLayout();
 
-    if (child->isRenderBlock())
       previousFloatBottom =
           max(previousFloatBottom,
               oldRect.y() + toRenderBlock(child)->floatBottom());
+    }
 
     bool childHadLayout = child->m_everHadLayout;
     bool childNeededLayout = child->needsLayout();
