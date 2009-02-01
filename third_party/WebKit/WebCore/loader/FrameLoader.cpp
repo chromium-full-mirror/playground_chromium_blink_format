@@ -5876,4 +5876,8 @@ void FrameLoader::switchOutLowBandwidthDisplayIfReady() {
 
 #endif
 
+bool FrameLoaderClient::hasHTMLView() const {
+  return true;
+}
+
 }  // namespace WebCore
