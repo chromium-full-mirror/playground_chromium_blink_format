@@ -1628,7 +1628,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::setInPrintingMode(
     return S_OK;
 
   Frame* coreFrame = core(this);
-  if (!coreFrame)
+  if (!coreFrame || !coreFrame->document())
     return E_FAIL;
 
   m_inPrintingMode = !!value;
@@ -1638,7 +1638,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::setInPrintingMode(
   // according to the paper size
   float minLayoutWidth = 0.0f;
   float maxLayoutWidth = 0.0f;
-  if (m_inPrintingMode && !coreFrame->isFrameSet()) {
+  if (m_inPrintingMode && !coreFrame->document()->isFrameSet()) {
     if (!printDC) {
       ASSERT_NOT_REACHED();
       return E_POINTER;
@@ -1859,10 +1859,10 @@ HRESULT STDMETHODCALLTYPE WebFrame::isFrameSet(
   *result = FALSE;
 
   Frame* coreFrame = core(this);
-  if (!coreFrame)
+  if (!coreFrame || !coreFrame->document())
     return E_FAIL;
 
-  *result = coreFrame->isFrameSet() ? TRUE : FALSE;
+  *result = coreFrame->document()->isFrameSet() ? TRUE : FALSE;
   return S_OK;
 }
 

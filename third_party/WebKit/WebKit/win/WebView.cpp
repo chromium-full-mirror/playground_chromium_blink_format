@@ -4076,11 +4076,6 @@ HRESULT WebView::notifyPreferencesChanged(IWebNotification* notification) {
     return hr;
   settings->setJavaScriptEnabled(!!enabled);
 
-  hr = preferences->isWebSecurityEnabled(&enabled);
-  if (FAILED(hr))
-    return hr;
-  settings->setWebSecurityEnabled(!!enabled);
-
   hr = preferences->javaScriptCanOpenWindowsAutomatically(&enabled);
   if (FAILED(hr))
     return hr;
@@ -4241,6 +4236,11 @@ HRESULT WebView::notifyPreferencesChanged(IWebNotification* notification) {
   if (FAILED(hr))
     return hr;
   settings->setLocalStorageEnabled(enabled);
+
+  hr = prefsPrivate->isWebSecurityEnabled(&enabled);
+  if (FAILED(hr))
+    return hr;
+  settings->setWebSecurityEnabled(!!enabled);
 
 #if USE(SAFARI_THEME)
   hr = prefsPrivate->shouldPaintNativeControls(&enabled);
