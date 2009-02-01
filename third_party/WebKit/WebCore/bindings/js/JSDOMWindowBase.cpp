@@ -305,7 +305,7 @@ static Frame* createWindow(ExecState* exec,
     else if (!url.isEmpty())
       newFrame->loader()->scheduleLocationChange(
           completedURL.string(), activeFrame->loader()->outgoingReferrer(),
-          false, userGesture);
+          false, false, userGesture);
   }
 
   return newFrame;
@@ -934,7 +934,7 @@ JSValuePtr windowProtoFuncOpen(ExecState* exec,
          (targetedWindow && targetedWindow->allowsAccessFrom(exec)))) {
       bool userGesture = activeFrame->script()->processingUserGesture();
       frame->loader()->scheduleLocationChange(
-          completedURL, activeFrame->loader()->outgoingReferrer(), false,
+          completedURL, activeFrame->loader()->outgoingReferrer(), false, false,
           userGesture);
     }
     return toJS(exec, frame->domWindow());

@@ -485,7 +485,7 @@ bool FrameLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
   Frame* frame = ownerElement->contentFrame();
   if (frame)
     frame->loader()->scheduleLocationChange(url.string(), m_outgoingReferrer,
-                                            true, userGestureHint());
+                                            true, true, userGestureHint());
   else
     frame = loadSubframe(ownerElement, url, frameName, m_outgoingReferrer);
 
