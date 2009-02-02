@@ -53,7 +53,7 @@ class NetscapePluginInstanceProxy;
       attributeKeys:(NSArray*)keys
     attributeValues:(NSArray*)values
        loadManually:(BOOL)loadManually
-         DOMElement:(DOMElement*)anElement;
+            element:(PassRefPtr<WebCore::HTMLPlugInElement>)element;
 
 - (void)pluginHostDied;
 @end
