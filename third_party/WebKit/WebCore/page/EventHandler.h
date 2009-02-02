@@ -101,7 +101,7 @@ class EventHandler : Noncopyable {
 
   HitTestResult hitTestResultAtPoint(const IntPoint&,
                                      bool allowShadowContent,
-                                     bool clipToVisible = true);
+                                     bool ignoreClipping = false);
 
   bool mousePressed() const { return m_mousePressed; }
   void setMousePressed(bool pressed) { m_mousePressed = pressed; }

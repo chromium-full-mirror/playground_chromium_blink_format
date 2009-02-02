@@ -2061,7 +2061,7 @@ bool RenderLayer::hitTest(const HitTestRequest& request,
   renderer()->document()->updateLayout();
 
   IntRect boundsRect(m_x, m_y, width(), height());
-  if (request.clipToVisible)
+  if (!request.ignoreClipping())
     boundsRect.intersect(frameVisibleRect(renderer()));
 
   RenderLayer* insideLayer =
@@ -2231,7 +2231,7 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // after a drag has
   // exited the WebView, and so hit testing over a scrollbar hits the content
   // document.
-  if ((request.active || request.mouseUp) && renderer()->isRenderView()) {
+  if ((request.active() || request.mouseUp()) && renderer()->isRenderView()) {
     renderer()->updateHitTestResult(result, hitTestPoint);
     return this;
   }
@@ -2561,14 +2561,14 @@ static RenderObject* commonAncestor(RenderObject* obj1, RenderObject* obj2) {
 
 void RenderLayer::updateHoverActiveState(const HitTestRequest& request,
                                          HitTestResult& result) {
-  // We don't update :hover/:active state when the result is marked as readonly.
-  if (request.readonly)
+  // We don't update :hover/:active state when the result is marked as readOnly.
+  if (request.readOnly())
     return;
 
   Document* doc = renderer()->document();
 
   Node* activeNode = doc->activeNode();
-  if (activeNode && !request.active) {
+  if (activeNode && !request.active()) {
     // We are clearing the :active chain because the mouse has been released.
     for (RenderObject* curr = activeNode->renderer(); curr;
          curr = curr->parent()) {
@@ -2578,7 +2578,7 @@ void RenderLayer::updateHoverActiveState(const HitTestRequest& request,
     doc->setActiveNode(0);
   } else {
     Node* newActiveNode = result.innerNode();
-    if (!activeNode && newActiveNode && request.active) {
+    if (!activeNode && newActiveNode && request.active()) {
       // We are setting the :active chain and freezing it. If future moves
       // happen, they
       // will need to reference this chain.
@@ -2597,7 +2597,7 @@ void RenderLayer::updateHoverActiveState(const HitTestRequest& request,
   // :hover/:active to only apply to elements that are in the :active chain that
   // we froze
   // at the time the mouse went down.
-  bool mustBeInActiveChain = request.active && request.mouseMove;
+  bool mustBeInActiveChain = request.active() && request.mouseMove();
 
   // Check to see if the hovered node has changed.  If not, then we don't need
   // to
@@ -2632,7 +2632,7 @@ void RenderLayer::updateHoverActiveState(const HitTestRequest& request,
   for (RenderObject* curr = newHoverObj; curr; curr = curr->hoverAncestor()) {
     if (curr->element() && !curr->isText() &&
         (!mustBeInActiveChain || curr->element()->inActiveChain())) {
-      curr->element()->setActive(request.active);
+      curr->element()->setActive(request.active());
       curr->element()->setHovered(true);
     }
   }

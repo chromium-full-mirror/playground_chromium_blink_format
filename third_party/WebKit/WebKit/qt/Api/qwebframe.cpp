@@ -883,7 +883,7 @@ QWebHitTestResult QWebFrame::hitTestContent(const QPoint& pos) const {
 
   HitTestResult result = d->frame->eventHandler()->hitTestResultAtPoint(
       d->frame->view()->windowToContents(pos), /*allowShadowContent*/ false,
-      /*clipToVisible*/ false);
+      /*ignoreClipping*/ true);
   return QWebHitTestResult(new QWebHitTestResultPrivate(result));
 }
 

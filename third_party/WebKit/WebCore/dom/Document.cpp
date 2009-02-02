@@ -930,7 +930,7 @@ Element* Document::elementFromPoint(int x, int y) const {
   if (!renderer())
     return 0;
 
-  HitTestRequest request(true, true);
+  HitTestRequest request(HitTestRequest::ReadOnly | HitTestRequest::Active);
   HitTestResult result(IntPoint(x, y));
   renderView()->layer()->hitTest(request, result);
 
@@ -2066,7 +2066,7 @@ MouseEventWithHitTestResults Document::prepareMouseEvent(
   HitTestResult result(documentPoint);
   renderView()->layer()->hitTest(request, result);
 
-  if (!request.readonly)
+  if (!request.readOnly())
     updateRendering();
 
   return MouseEventWithHitTestResults(event, result);

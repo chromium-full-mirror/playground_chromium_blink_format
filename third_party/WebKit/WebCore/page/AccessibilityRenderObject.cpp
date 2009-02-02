@@ -1737,7 +1737,7 @@ VisiblePosition AccessibilityRenderObject::visiblePositionForPoint(
 #else
     ourpoint = point;
 #endif
-    HitTestRequest request(true, true);
+    HitTestRequest request(HitTestRequest::ReadOnly | HitTestRequest::Active);
     HitTestResult result(ourpoint);
     renderView->layer()->hitTest(request, result);
     innerNode = result.innerNode();
@@ -1908,7 +1908,7 @@ AccessibilityObject* AccessibilityRenderObject::doAccessibilityHitTest(
 
   RenderLayer* layer = toRenderBox(m_renderer)->layer();
 
-  HitTestRequest request(true, true);
+  HitTestRequest request(HitTestRequest::ReadOnly | HitTestRequest::Active);
   HitTestResult hitTestResult = HitTestResult(point);
   layer->hitTest(request, hitTestResult);
   if (!hitTestResult.innerNode())
