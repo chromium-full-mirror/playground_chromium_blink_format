@@ -26,6 +26,7 @@
 
 #include "Document.h"
 #include "HTMLNames.h"
+#include "NodeRenderStyle.h"
 #include "RenderStyle.h"
 #include "WMLNames.h"
 
