@@ -165,7 +165,7 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void redirectDataToPlugin(WebCore::Widget* pluginWidget);
   virtual WebCore::Widget* createJavaAppletWidget(
       const WebCore::IntSize&,
-      WebCore::Element*,
+      WebCore::HTMLAppletElement*,
       const WebCore::KURL& baseURL,
       const WTF::Vector<WebCore::String>& paramNames,
       const WTF::Vector<WebCore::String>& paramValues);

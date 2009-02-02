@@ -235,7 +235,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       int marginWidth,
       int marginHeight);
   virtual WebCore::Widget* createPlugin(const WebCore::IntSize&,
-                                        WebCore::Element*,
+                                        WebCore::HTMLPlugInElement*,
                                         const WebCore::KURL&,
                                         const Vector<WebCore::String>&,
                                         const Vector<WebCore::String>&,
@@ -245,7 +245,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual WebCore::Widget* createJavaAppletWidget(
       const WebCore::IntSize&,
-      WebCore::Element*,
+      WebCore::HTMLAppletElement*,
       const WebCore::KURL& baseURL,
       const Vector<WebCore::String>& paramNames,
       const Vector<WebCore::String>& paramValues);

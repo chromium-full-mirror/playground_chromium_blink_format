@@ -53,7 +53,9 @@ class FormState;
 class Frame;
 class FrameLoader;
 class HistoryItem;
+class HTMLAppletElement;
 class HTMLFrameOwnerElement;
+class HTMLPlugInElement;
 class IntSize;
 class KURL;
 class NavigationAction;
@@ -247,7 +249,7 @@ class FrameLoaderClient {
                                         int marginWidth,
                                         int marginHeight) = 0;
   virtual Widget* createPlugin(const IntSize&,
-                               Element*,
+                               HTMLPlugInElement*,
                                const KURL&,
                                const Vector<String>&,
                                const Vector<String>&,
@@ -256,7 +258,7 @@ class FrameLoaderClient {
   virtual void redirectDataToPlugin(Widget* pluginWidget) = 0;
 
   virtual Widget* createJavaAppletWidget(const IntSize&,
-                                         Element*,
+                                         HTMLAppletElement*,
                                          const KURL& baseURL,
                                          const Vector<String>& paramNames,
                                          const Vector<String>& paramValues) = 0;

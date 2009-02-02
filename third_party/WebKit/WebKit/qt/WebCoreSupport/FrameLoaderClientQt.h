@@ -235,7 +235,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
                                         int marginWidth,
                                         int marginHeight);
   virtual Widget* createPlugin(const IntSize&,
-                               Element*,
+                               HTMLPlugInElement*,
                                const KURL&,
                                const Vector<String>&,
                                const Vector<String>&,
@@ -244,7 +244,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void redirectDataToPlugin(Widget* pluginWidget);
 
   virtual Widget* createJavaAppletWidget(const IntSize&,
-                                         Element*,
+                                         HTMLAppletElement*,
                                          const KURL& baseURL,
                                          const Vector<String>& paramNames,
                                          const Vector<String>& paramValues);

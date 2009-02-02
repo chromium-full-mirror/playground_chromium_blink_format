@@ -313,7 +313,7 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
 
   virtual WebCore::Widget* createJavaAppletWidget(
       const WebCore::IntSize&,
-      WebCore::Element*,
+      WebCore::HTMLAppletElement*,
       const WebCore::KURL& baseURL,
       const Vector<WebCore::String>& paramNames,
       const Vector<WebCore::String>& paramValues);

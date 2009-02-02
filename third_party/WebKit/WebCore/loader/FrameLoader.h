@@ -55,6 +55,7 @@ class FormData;
 class Frame;
 class FrameLoaderClient;
 class HistoryItem;
+class HTMLAppletElement;
 class HTMLFormElement;
 class HTMLFrameOwnerElement;
 class IconLoader;
@@ -461,7 +462,7 @@ class FrameLoader : Noncopyable
   String userAgent(const KURL&) const;
 
   Widget* createJavaAppletWidget(const IntSize&,
-                                 Element*,
+                                 HTMLAppletElement*,
                                  const HashMap<String, String>& args);
 
   void dispatchWindowObjectAvailable();

@@ -29,10 +29,12 @@
 #include "FrameLoader.h"
 #include "FrameView.h"
 #include "FrameTree.h"
+#include "HTMLAppletElement.h"
 #include "HTMLFormElement.h"
 #include "HTMLFrameElement.h"
 #include "HTMLFrameOwnerElement.h"
 #include "HTMLNames.h"
+#include "HTMLPlugInElement.h"
 #include "JSDOMWindow.h"
 #include "Language.h"
 #include "MIMETypeRegistry.h"
@@ -398,7 +400,7 @@ void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(
 }
 
 Widget* FrameLoaderClient::createPlugin(const IntSize& pluginSize,
-                                        Element* element,
+                                        HTMLPlugInElement* element,
                                         const KURL& url,
                                         const Vector<String>& paramNames,
                                         const Vector<String>& paramValues,
@@ -451,7 +453,7 @@ void FrameLoaderClient::redirectDataToPlugin(Widget* pluginWidget) {
 
 Widget* FrameLoaderClient::createJavaAppletWidget(
     const IntSize&,
-    Element*,
+    HTMLAppletElement*,
     const KURL& baseURL,
     const Vector<String>& paramNames,
     const Vector<String>& paramValues) {

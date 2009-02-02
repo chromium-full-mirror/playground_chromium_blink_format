@@ -335,7 +335,7 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
     return 0;
   }
   virtual Widget* createPlugin(const IntSize&,
-                               Element*,
+                               HTMLPlugInElement*,
                                const KURL&,
                                const Vector<String>&,
                                const Vector<String>&,
@@ -344,7 +344,7 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
     return 0;
   }
   virtual Widget* createJavaAppletWidget(const IntSize&,
-                                         Element*,
+                                         HTMLAppletElement*,
                                          const KURL&,
                                          const Vector<String>&,
                                          const Vector<String>&) {

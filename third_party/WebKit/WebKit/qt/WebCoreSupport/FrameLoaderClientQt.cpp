@@ -45,7 +45,9 @@
 #include "RenderPart.h"
 #include "ResourceRequest.h"
 #include "HistoryItem.h"
+#include "HTMLAppletElement.h"
 #include "HTMLFormElement.h"
+#include "HTMLPlugInElement.h"
 #include "NotImplemented.h"
 #include "QNetworkReplyHandler.h"
 #include "ResourceHandleInternal.h"
@@ -1038,7 +1040,7 @@ class QtPluginWidget : public Widget {
 };
 
 Widget* FrameLoaderClientQt::createPlugin(const IntSize& pluginSize,
-                                          Element* element,
+                                          HTMLPlugInElement* element,
                                           const KURL& url,
                                           const Vector<String>& paramNames,
                                           const Vector<String>& paramValues,
@@ -1132,7 +1134,7 @@ void FrameLoaderClientQt::redirectDataToPlugin(Widget* pluginWidget) {
 
 Widget* FrameLoaderClientQt::createJavaAppletWidget(
     const IntSize&,
-    Element*,
+    HTMLAppletElement*,
     const KURL& baseURL,
     const Vector<String>& paramNames,
     const Vector<String>& paramValues) {
