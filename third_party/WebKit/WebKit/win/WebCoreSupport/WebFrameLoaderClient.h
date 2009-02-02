@@ -133,7 +133,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       int marginWidth,
       int marginHeight);
   virtual WebCore::Widget* createPlugin(const WebCore::IntSize&,
-                                        WebCore::Element*,
+                                        WebCore::HTMLPlugInElement*,
                                         const WebCore::KURL&,
                                         const Vector<WebCore::String>&,
                                         const Vector<WebCore::String>&,

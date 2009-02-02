@@ -53,9 +53,11 @@
 #include <WebCore/FrameLoader.h>
 #include <WebCore/FrameTree.h>
 #include <WebCore/FrameView.h>
+#include <WebCore/HTMLAppletElement.h>
 #include <WebCore/HTMLFrameElement.h>
 #include <WebCore/HTMLFrameOwnerElement.h>
 #include <WebCore/HTMLNames.h>
+#include <WebCore/HTMLPlugInElement.h>
 #include <WebCore/HistoryItem.h>
 #include <WebCore/Page.h>
 #include <WebCore/PluginPackage.h>
@@ -667,7 +669,7 @@ void WebFrameLoaderClient::loadURLIntoChild(const KURL& originalURL,
 }
 
 Widget* WebFrameLoaderClient::createPlugin(const IntSize& pluginSize,
-                                           Element* element,
+                                           HTMLPlugInElement* element,
                                            const KURL& url,
                                            const Vector<String>& paramNames,
                                            const Vector<String>& paramValues,
