@@ -176,6 +176,16 @@ class FrameView : public ScrollView {
 
   void setIsVisuallyNonEmpty() { m_isVisuallyNonEmpty = true; }
 
+  void forceLayout(bool allowSubtree = false);
+  void forceLayoutWithPageWidthRange(float minPageWidth,
+                                     float maxPageWidth,
+                                     bool adjustViewSize);
+
+  void adjustPageHeight(float* newBottom,
+                        float oldTop,
+                        float oldBottom,
+                        float bottomLimit);
+
  private:
   void reset();
   void init();
