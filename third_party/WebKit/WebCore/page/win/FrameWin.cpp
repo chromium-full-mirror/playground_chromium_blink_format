@@ -88,8 +88,8 @@ void computePageRectsForFrame(Frame* frame,
   float printedPagesHeight = 0.0f;
   do {
     float proposedBottom = min(docHeight, printedPagesHeight + pageHeight);
-    frame->adjustPageHeight(&proposedBottom, printedPagesHeight, proposedBottom,
-                            printedPagesHeight);
+    frame->view()->adjustPageHeight(&proposedBottom, printedPagesHeight,
+                                    proposedBottom, printedPagesHeight);
     currPageHeight = max(1.0f, proposedBottom - printedPagesHeight);
 
     pages.append(IntRect(0, printedPagesHeight, currPageWidth, currPageHeight));
