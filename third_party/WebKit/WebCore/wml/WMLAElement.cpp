@@ -146,7 +146,7 @@ void WMLAElement::defaultEventHandler(Event* event) {
       KURL url =
           document()->completeURL(parseURL(getAttribute(HTMLNames::hrefAttr)));
       document()->frame()->loader()->urlSelected(url, target(), event, false,
-                                                 true);
+                                                 false, true);
     }
 
     event->setDefaultHandled();
