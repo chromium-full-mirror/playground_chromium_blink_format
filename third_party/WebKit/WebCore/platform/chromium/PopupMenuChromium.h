@@ -44,7 +44,8 @@ class PopupListBox;
 
 // FIXME: Our FramelessScrollView classes should probably implement HostWindow!
 
-// This class holds a PopupListBox (see cpp file).  Its sole purpose is to be
+// The PopupContainer class holds a PopupListBox (see cpp file).  Its sole
+// purpose is to be
 // able to draw a border around its child.  All its paint/event handling is
 // just forwarded to the child listBox (with the appropriate transforms).
 // NOTE: this class is exposed so it can be instantiated direcly for the
@@ -52,10 +53,31 @@ class PopupListBox;
 // autofill popup should not be focused when shown and we want to forward the
 // key events to it (through handleKeyEvent).
 
+struct PopupContainerSettings {
+  // Whether the popup should get the focus when displayed.
+  bool focusOnShow;
+
+  // Whether the PopupMenuClient should be told to change its text when a
+  // new item is selected by using the arrow keys.
+  bool setTextOnIndexChange;
+
+  // Whether the selection should be accepted when the popup menu is
+  // closed (through ESC being pressed or the focus going away).
+  // Note that when TAB is pressed, the selection is always accepted
+  // regardless of this setting.
+  bool acceptOnAbandon;
+
+  // Whether the we should move the selection to the first/last item when
+  // the user presses down/up arrow keys and the last/first item is
+  // selected.
+  bool loopSelectionNavigation;
+};
+
 class PopupContainer : public FramelessScrollView,
                        public RefCounted<PopupContainer> {
  public:
-  static PassRefPtr<PopupContainer> create(PopupMenuClient*, bool focusOnShow);
+  static PassRefPtr<PopupContainer> create(PopupMenuClient*,
+                                           const PopupContainerSettings&);
 
   // Whether a key event should be sent to this popup.
   virtual bool isInterestedInEventForKey(int keyCode);
@@ -85,22 +107,6 @@ class PopupContainer : public FramelessScrollView,
   // Compute size of widget and children.
   void layout();
 
-  // Sets whether the PopupMenuClient should be told to change its text when a
-  // new item is selected (by using the arrow keys).  Default is true.
-  void setTextOnIndexChange(bool);
-
-  // Sets whether the selection should be accepted when the popup menu is
-  // closed (through ESC being pressed or the focus going away).  Default
-  // is true.  Note that when TAB is pressed, the selection is always
-  // accepted regardless of this setting.
-  void setAcceptOnAbandon(bool);
-
-  // Sets whether we should move the selection to the first/last item
-  // when the user presses down/up arrow keys and the last/first item is
-  // selected.  Default is false, causing the first/last item to stay
-  // selected.
-  void setLoopSelectionNavigation(bool);
-
   PopupListBox* listBox() const { return m_listBox.get(); }
 
   // Refresh the popup values from the PopupMenuClient.
@@ -109,7 +115,7 @@ class PopupContainer : public FramelessScrollView,
  private:
   friend class WTF::RefCounted<PopupContainer>;
 
-  PopupContainer(PopupMenuClient*, bool focusOnShow);
+  PopupContainer(PopupMenuClient*, const PopupContainerSettings&);
   ~PopupContainer();
 
   // Paint the border.
@@ -117,8 +123,7 @@ class PopupContainer : public FramelessScrollView,
 
   RefPtr<PopupListBox> m_listBox;
 
-  // Whether the window showing this popup should be focused when shown.
-  bool m_focusOnShow;
+  PopupContainerSettings m_settings;
 };
 
 }  // namespace WebCore
