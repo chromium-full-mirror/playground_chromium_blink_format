@@ -682,7 +682,10 @@ class RenderObject : public CachedResourceClient {
   virtual int maxPrefWidth() const { return 0; }
 
   RenderStyle* style() const { return m_style.get(); }
-  RenderStyle* firstLineStyle() const;
+  RenderStyle* firstLineStyle() const {
+    return document()->usesFirstLineRules() ? firstLineStyleSlowCase()
+                                            : style();
+  }
   RenderStyle* style(bool firstLine) const {
     return firstLine ? firstLineStyle() : style();
   }
@@ -1042,6 +1045,8 @@ class RenderObject : public CachedResourceClient {
   };
 
  private:
+  RenderStyle* firstLineStyleSlowCase() const;
+
   RefPtr<RenderStyle> m_style;
 
   Node* m_node;
@@ -1105,6 +1110,10 @@ class RenderObject : public CachedResourceClient {
   // Store state between styleWillChange and styleDidChange
   static bool s_affectsParentBlock;
 };
+
+inline bool RenderObject::documentBeingDestroyed() const {
+  return !document()->renderer();
+}
 
 inline void RenderObject::setNeedsLayout(bool b, bool markParents) {
   bool alreadyNeededLayout = m_needsLayout;

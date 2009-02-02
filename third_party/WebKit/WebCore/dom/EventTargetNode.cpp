@@ -2,7 +2,8 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
+ * reserved.
  *           (C) 2007, 2008 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -60,12 +61,6 @@
 namespace WebCore {
 
 static HashSet<EventTargetNode*>* gNodesDispatchingSimulatedClicks = 0;
-
-EventTargetNode::EventTargetNode(Document* doc,
-                                 bool isElement,
-                                 bool isContainer,
-                                 bool isText)
-    : Node(doc, isElement, isContainer, isText) {}
 
 EventTargetNode::~EventTargetNode() {
   if (!eventListeners().isEmpty() && !inDocument())
@@ -193,9 +188,8 @@ void EventTargetNode::removeEventListener(const AtomicString& eventType,
   }
 }
 
-void EventTargetNode::removeAllEventListeners() {
-  if (!hasRareData())
-    return;
+void EventTargetNode::removeAllEventListenersSlowCase() {
+  ASSERT(hasRareData());
 
   RegisteredEventListenerVector* listeners = rareData()->listeners();
   if (!listeners)

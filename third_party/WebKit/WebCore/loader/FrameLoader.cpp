@@ -1325,7 +1325,7 @@ void FrameLoader::gotoAnchor() {
   // and possibly repaint because :target pseudo class may have been
   // set (see bug 11321).
   if (!m_URL.hasRef() &&
-      !(m_frame->document() && m_frame->document()->getCSSTarget()))
+      !(m_frame->document() && m_frame->document()->cssTarget()))
     return;
 
   String ref = m_URL.ref();

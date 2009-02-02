@@ -1,7 +1,5 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
- * Copyright (C) 2005 Apple Computer, Inc.
+ * Copyright (C) 2005, 2006, 2009 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,6 +17,7 @@
  * Boston, MA 02110-1301, USA.
  *
  */
+
 #ifndef QualifiedName_h
 #define QualifiedName_h
 
@@ -37,10 +36,11 @@ class QualifiedName {
  public:
   class QualifiedNameImpl : public RefCounted<QualifiedNameImpl> {
    public:
-    static PassRefPtr<QualifiedNameImpl> create(const AtomicString& p,
-                                                const AtomicString& l,
-                                                const AtomicString& n) {
-      return adoptRef(new QualifiedNameImpl(p, l, n));
+    static PassRefPtr<QualifiedNameImpl> create(
+        const AtomicString& prefix,
+        const AtomicString& localName,
+        const AtomicString& namespaceURI) {
+      return adoptRef(new QualifiedNameImpl(prefix, localName, namespaceURI));
     }
 
     AtomicString m_prefix;
@@ -48,22 +48,27 @@ class QualifiedName {
     AtomicString m_namespace;
 
    private:
-    QualifiedNameImpl(const AtomicString& p,
-                      const AtomicString& l,
-                      const AtomicString& n)
-        : m_prefix(p), m_localName(l), m_namespace(n) {}
+    QualifiedNameImpl(const AtomicString& prefix,
+                      const AtomicString& localName,
+                      const AtomicString& namespaceURI)
+        : m_prefix(prefix), m_localName(localName), m_namespace(namespaceURI) {}
   };
 
   QualifiedName(const AtomicString& prefix,
                 const AtomicString& localName,
                 const AtomicString& namespaceURI);
-  ~QualifiedName();
+  ~QualifiedName() { deref(); }
 #ifdef QNAME_DEFAULT_CONSTRUCTOR
   QualifiedName() : m_impl(0) {}
 #endif
 
-  QualifiedName(const QualifiedName&);
-  const QualifiedName& operator=(const QualifiedName&);
+  QualifiedName(const QualifiedName& other) : m_impl(other.m_impl) { ref(); }
+  const QualifiedName& operator=(const QualifiedName& other) {
+    other.ref();
+    deref();
+    m_impl = other.m_impl;
+    return *this;
+  }
 
   bool operator==(const QualifiedName& other) const {
     return m_impl == other.m_impl;
@@ -78,7 +83,9 @@ class QualifiedName {
   }
 
   bool hasPrefix() const { return m_impl->m_prefix != nullAtom; }
-  void setPrefix(const AtomicString& prefix);
+  void setPrefix(const AtomicString& prefix) {
+    *this = QualifiedName(prefix, localName(), namespaceURI());
+  }
 
   const AtomicString& prefix() const { return m_impl->m_prefix; }
   const AtomicString& localName() const { return m_impl->m_localName; }
@@ -92,7 +99,7 @@ class QualifiedName {
   static void init();
 
  private:
-  void ref() { m_impl->ref(); }
+  void ref() const { m_impl->ref(); }
   void deref();
 
   QualifiedNameImpl* m_impl;
@@ -176,6 +183,7 @@ namespace WTF {
 
 template <typename T>
 struct DefaultHash;
+
 template <>
 struct DefaultHash<WebCore::QualifiedName> {
   typedef WebCore::QualifiedNameHash Hash;

@@ -114,6 +114,11 @@ class ContainerNode : public EventTargetNode {
   Node* m_lastChild;
 };
 
+inline ContainerNode::ContainerNode(Document* document, bool isElement)
+    : EventTargetNode(document, isElement, true),
+      m_firstChild(0),
+      m_lastChild(0) {}
+
 inline unsigned Node::containerChildNodeCount() const {
   ASSERT(isContainerNode());
   return static_cast<const ContainerNode*>(this)->childNodeCount();
