@@ -90,10 +90,6 @@ HDC GraphicsContext::getWindowsContext(const IntRect& dstRect,
   return hdc;
 }
 
-bool GraphicsContext::inTransparencyLayer() const {
-  return m_data->m_transparencyCount;
-}
-
 void GraphicsContext::releaseWindowsContext(HDC hdc,
                                             const IntRect& dstRect,
                                             bool supportAlphaBlend,

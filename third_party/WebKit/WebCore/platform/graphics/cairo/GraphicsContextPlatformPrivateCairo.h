@@ -53,7 +53,8 @@ class GraphicsContextPlatformPrivate {
         // implementation is complete
         ,
         m_hdc(0),
-        m_transparencyCount(0)
+        m_transparencyCount(0),
+        m_shouldIncludeChildWindows(false)
 #endif
   {
   }
@@ -95,6 +96,7 @@ class GraphicsContextPlatformPrivate {
 #elif PLATFORM(WIN)
   HDC m_hdc;
   unsigned m_transparencyCount;
+  bool m_shouldIncludeChildWindows;
 #endif
 };
 

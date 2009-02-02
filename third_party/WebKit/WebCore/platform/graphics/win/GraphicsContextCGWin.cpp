@@ -79,10 +79,6 @@ GraphicsContext::GraphicsContext(HDC hdc, bool hasAlpha)
   }
 }
 
-bool GraphicsContext::inTransparencyLayer() const {
-  return m_data->m_transparencyCount;
-}
-
 // FIXME: Is it possible to merge getWindowsContext and createWindowsBitmap into
 // a single API
 // suitable for all clients?
@@ -184,14 +180,6 @@ void GraphicsContext::releaseWindowsContext(HDC hdc,
   }
 
   m_data->restore();
-}
-
-void GraphicsContext::setShouldIncludeChildWindows(bool include) {
-  m_data->m_shouldIncludeChildWindows = include;
-}
-
-bool GraphicsContext::shouldIncludeChildWindows() const {
-  return m_data->m_shouldIncludeChildWindows;
 }
 
 GraphicsContext::WindowsBitmap::WindowsBitmap(HDC hdc, IntSize size)
