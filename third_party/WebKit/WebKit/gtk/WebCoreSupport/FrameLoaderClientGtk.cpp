@@ -435,7 +435,7 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
 
   childFrame->tree()->setName(name);
   childFrame->init();
-  childFrame->loader()->loadURL(url, referrer, String(),
+  childFrame->loader()->loadURL(url, referrer, String(), false,
                                 FrameLoadTypeRedirectWithLockedBackForwardList,
                                 0, 0);
 
