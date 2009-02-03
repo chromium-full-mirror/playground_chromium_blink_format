@@ -58,13 +58,6 @@ class RenderContainer : public RenderBox {
     appendChildNode(child->parent()->removeChildNode(child, false), false);
   }
 
-  RenderObject* beforeAfterContainer(RenderStyle::PseudoId);
-  virtual void updateBeforeAfterContent(RenderStyle::PseudoId);
-  void updateBeforeAfterContentForContainer(RenderStyle::PseudoId,
-                                            RenderContainer*);
-  bool isAfterContent(RenderObject* child) const;
-  virtual void invalidateCounters();
-
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
   virtual void addLineBoxRects(Vector<IntRect>&,
