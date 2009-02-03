@@ -872,7 +872,7 @@ JSValuePtr convertQVariantToValue(ExecState* exec,
     qMemCopy(wtfByteArray->data(), qtByteArray.constData(),
              qtByteArray.length());
     return new (exec) JSC::JSByteArray(
-        exec, JSByteArray::createStructure(jsNull()), wtfByteArray.get());
+        exec, JSC::JSByteArray::createStructure(jsNull()), wtfByteArray.get());
   }
 
   if (type == QMetaType::QObjectStar || type == QMetaType::QWidgetStar) {
