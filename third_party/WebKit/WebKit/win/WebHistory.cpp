@@ -747,7 +747,7 @@ void WebHistory::visitedURL(const KURL& url,
 
   addItemToDateCaches(entry);
 
-  m_lastVisitedEntry = entry;
+  m_lastVisitedEntry.query(entry);
 
   COMPtr<IWebHistoryItemPrivate> entryPrivate(Query, entry);
   if (!entryPrivate)
