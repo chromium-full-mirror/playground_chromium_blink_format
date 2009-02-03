@@ -52,6 +52,7 @@ class RenderTableSection : public RenderContainer {
   virtual void layout();
 
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
+  virtual void removeChild(RenderObject* oldChild);
 
   virtual int getBaselineOfFirstLineBox() const;
 
@@ -135,8 +136,6 @@ class RenderTableSection : public RenderContainer {
   }
 
   int getBaseline(int row) { return m_grid[row].baseline; }
-
-  virtual RenderObject* removeChildNode(RenderObject*, bool fullRemove = true);
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,

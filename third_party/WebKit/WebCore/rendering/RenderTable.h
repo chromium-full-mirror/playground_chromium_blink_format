@@ -72,6 +72,8 @@ class RenderTable : public RenderBlock {
 
   // overrides
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
+  virtual void removeChild(RenderObject* oldChild);
+
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
   virtual void paintMask(PaintInfo& paintInfo, int tx, int ty);
@@ -139,8 +141,6 @@ class RenderTable : public RenderBlock {
     m_needsSectionRecalc = true;
     setNeedsLayout(true);
   }
-
-  virtual RenderObject* removeChildNode(RenderObject*, bool fullRemove = true);
 
   RenderTableSection* sectionAbove(const RenderTableSection*,
                                    bool skipEmptySections = false) const;

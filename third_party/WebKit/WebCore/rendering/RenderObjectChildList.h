@@ -48,6 +48,17 @@ class RenderObjectChildList {
 
   void destroyLeftoverChildren();
 
+  RenderObject* removeChildNode(RenderObject* owner,
+                                RenderObject*,
+                                bool fullRemove = true);
+  void appendChildNode(RenderObject* owner,
+                       RenderObject*,
+                       bool fullAppend = true);
+  void insertChildNode(RenderObject* owner,
+                       RenderObject* child,
+                       RenderObject* before,
+                       bool fullInsert = true);
+
   void updateBeforeAfterContent(RenderObject* owner,
                                 RenderStyle::PseudoId type,
                                 RenderObject* styledObject = 0);
