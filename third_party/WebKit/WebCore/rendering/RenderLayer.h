@@ -51,7 +51,6 @@
 
 namespace WebCore {
 
-class TransformationMatrix;
 class CachedResource;
 class HitTestRequest;
 class HitTestResult;
@@ -64,6 +63,12 @@ class RenderTable;
 class RenderText;
 class RenderView;
 class Scrollbar;
+class TransformationMatrix;
+
+#if USE(ACCELERATED_COMPOSITING)
+class RenderLayerBacking;
+class RenderLayerCompositor;
+#endif
 
 class ClipRects {
  public:
@@ -196,6 +201,16 @@ class RenderLayer : public ScrollbarClient {
 
   void repaintIncludingDescendants();
 
+#if USE(ACCELERATED_COMPOSITING)
+  // Indicate that the layer contents need to be repainted. Only has an effect
+  // if layer compositing is being used,
+  void setBackingNeedsRepaint();
+  void setBackingNeedsRepaintInRect(const IntRect& r);  // r is in the
+                                                        // coordinate space of
+                                                        // the layer's render
+                                                        // object
+#endif
+
   void styleChanged(RenderStyle::Diff, const RenderStyle*);
 
   RenderMarquee* marquee() const { return m_marquee; }
@@ -206,7 +221,7 @@ class RenderLayer : public ScrollbarClient {
   bool requiresSlowRepaints() const;
 
   bool isTransparent() const;
-  RenderLayer* transparentAncestor();
+  RenderLayer* transparentPaintingAncestor();
   void beginTransparencyLayers(GraphicsContext*, const RenderLayer* rootLayer);
 
   bool hasReflection() const { return renderer()->hasReflection(); }
@@ -306,6 +321,10 @@ class RenderLayer : public ScrollbarClient {
   bool inResizeMode() const { return m_inResizeMode; }
   void setInResizeMode(bool b) { m_inResizeMode = b; }
 
+#if USE(ACCELERATED_COMPOSITING)
+  RenderLayerCompositor* compositor() const;
+#endif
+
   void updateLayerPosition();
   void updateLayerPositions(bool doFullRepaint = false,
                             bool checkForRepaint = true);
@@ -395,8 +414,12 @@ class RenderLayer : public ScrollbarClient {
                             const IntRect& damageRect,
                             const RenderLayer* rootLayer) const;
 
-  // Returns a bounding box for this layer only.
+  // Bounding box relative to some ancestor layer.
   IntRect boundingBox(const RenderLayer* rootLayer) const;
+  // Bounding box in the coordinates of this layer.
+  IntRect localBoundingBox() const;
+  // Bounding box relative to the root.
+  IntRect absoluteBoundingBox() const;
 
   void updateHoverActiveState(const HitTestRequest&, HitTestResult&);
 
@@ -411,6 +434,7 @@ class RenderLayer : public ScrollbarClient {
   void setStaticY(int staticY) { m_staticY = staticY; }
 
   bool hasTransform() const { return renderer()->hasTransform(); }
+  // Note that this transform has the transform-origin baked in.
   TransformationMatrix* transform() const { return m_transform.get(); }
 
   void destroy(RenderArena*);
@@ -422,6 +446,21 @@ class RenderLayer : public ScrollbarClient {
   // Overridden to prevent the normal delete from being called.
   void operator delete(void*, size_t);
 
+#if USE(ACCELERATED_COMPOSITING)
+  bool isComposited() const { return m_backing != 0; }
+  RenderLayerBacking* backing() const { return m_backing; }
+  RenderLayerBacking* ensureBacking();
+  void clearBacking();
+#else
+  bool isComposited() const { return false; }
+#endif
+
+  bool paintsWithTransparency() const {
+    return isTransparent() && !isComposited();
+  }
+
+  bool paintsWithTransform() const { return transform() && !isComposited(); }
+
  private:
   // The normal operator new is disallowed on all render objects.
   void* operator new(size_t) throw();
@@ -429,11 +468,13 @@ class RenderLayer : public ScrollbarClient {
  private:
   void setNextSibling(RenderLayer* next) { m_next = next; }
   void setPreviousSibling(RenderLayer* prev) { m_previous = prev; }
-  void setParent(RenderLayer* parent) { m_parent = parent; }
+  void setParent(RenderLayer* parent);
   void setFirstChild(RenderLayer* first) { m_first = first; }
   void setLastChild(RenderLayer* last) { m_last = last; }
 
   void collectLayers(Vector<RenderLayer*>*&, Vector<RenderLayer*>*&);
+
+  void updateLayerListsIfNeeded();
 
   void paintLayer(RenderLayer* rootLayer,
                   GraphicsContext*,
@@ -449,6 +490,7 @@ class RenderLayer : public ScrollbarClient {
                             const IntRect& hitTestRect,
                             const IntPoint& hitTestPoint,
                             bool appliedTransform = false);
+
   void computeScrollDimensions(bool* needHBar = 0, bool* needVBar = 0);
 
   bool shouldBeOverflowOnly() const;
@@ -478,6 +520,15 @@ class RenderLayer : public ScrollbarClient {
 
   void updateScrollCornerStyle();
   void updateResizerStyle();
+
+#if USE(ACCELERATED_COMPOSITING)
+  bool hasCompositingDescendant() const { return m_hasCompositingDescendant; }
+  void setHasCompositingDescendant(bool b) { m_hasCompositingDescendant = b; }
+#endif
+
+ private:
+  friend class RenderLayerBacking;
+  friend class RenderLayerCompositor;
 
  protected:
   RenderBox* m_renderer;
@@ -564,6 +615,10 @@ class RenderLayer : public ScrollbarClient {
   bool m_visibleDescendantStatusDirty : 1;
   bool m_hasVisibleDescendant : 1;
 
+#if USE(ACCELERATED_COMPOSITING)
+  bool m_hasCompositingDescendant : 1;
+#endif
+
   RenderMarquee* m_marquee;  // Used by layers with overflow:marquee
 
   // Cached normal flow values for absolute positioned elements with static
@@ -579,6 +634,10 @@ class RenderLayer : public ScrollbarClient {
   // Renderers to hold our custom scroll corner and resizer.
   RenderScrollbarPart* m_scrollCorner;
   RenderScrollbarPart* m_resizer;
+
+#if USE(ACCELERATED_COMPOSITING)
+  OwnPtr<RenderLayerBacking> m_backing;
+#endif
 };
 
 }  // namespace WebCore
