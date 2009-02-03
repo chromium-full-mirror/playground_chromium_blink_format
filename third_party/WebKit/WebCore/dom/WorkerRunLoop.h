@@ -34,16 +34,20 @@
 #if ENABLE(WORKERS)
 
 #include "ScriptExecutionContext.h"
+#include "SharedTimer.h"
 #include <wtf/MessageQueue.h>
+#include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
 class WorkerContext;
+class WorkerSharedTimer;
 
 class WorkerRunLoop {
  public:
-  WorkerRunLoop() {}
+  WorkerRunLoop();
+  ~WorkerRunLoop();
 
   // Blocking call. Waits for tasks and timers, invokes the callbacks.
   void run(WorkerContext*);
@@ -55,6 +59,7 @@ class WorkerRunLoop {
 
  private:
   MessageQueue<RefPtr<ScriptExecutionContext::Task>> m_messageQueue;
+  OwnPtr<WorkerSharedTimer> m_sharedTimer;
 };
 
 }  // namespace WebCore
