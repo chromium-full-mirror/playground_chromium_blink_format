@@ -162,7 +162,7 @@ void WorkerThreadableLoader::MainThreadBridge::clearClientWrapper() {
       ->clearClient();
 }
 
-void workerContextDidSendData(
+static void workerContextDidSendData(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper,
     unsigned long long bytesSent,
@@ -179,7 +179,7 @@ void WorkerThreadableLoader::MainThreadBridge::didSendData(
                          bytesSent, totalBytesToBeSent));
 }
 
-void workerContextDidReceiveResponse(
+static void workerContextDidReceiveResponse(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper,
     auto_ptr<CrossThreadResourceResponseData> responseData) {
@@ -194,7 +194,7 @@ void WorkerThreadableLoader::MainThreadBridge::didReceiveResponse(
       &workerContextDidReceiveResponse, m_workerClientWrapper, response));
 }
 
-void workerContextDidReceiveData(
+static void workerContextDidReceiveData(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper,
     auto_ptr<Vector<char>> vectorData) {
@@ -213,7 +213,7 @@ void WorkerThreadableLoader::MainThreadBridge::didReceiveData(
       &workerContextDidReceiveData, m_workerClientWrapper, vector));
 }
 
-void workerContextDidFinishLoading(
+static void workerContextDidFinishLoading(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper,
     int identifier) {
@@ -227,7 +227,7 @@ void WorkerThreadableLoader::MainThreadBridge::didFinishLoading(
       &workerContextDidFinishLoading, m_workerClientWrapper, identifier));
 }
 
-void workerContextDidFail(
+static void workerContextDidFail(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper) {
   ASSERT_UNUSED(context, context->isWorkerContext());
@@ -239,7 +239,7 @@ void WorkerThreadableLoader::MainThreadBridge::didFail() {
       createCallbackTask(&workerContextDidFail, m_workerClientWrapper));
 }
 
-void workerContextDidGetCancelled(
+static void workerContextDidGetCancelled(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper) {
   ASSERT_UNUSED(context, context->isWorkerContext());
@@ -251,7 +251,7 @@ void WorkerThreadableLoader::MainThreadBridge::didGetCancelled() {
       createCallbackTask(&workerContextDidGetCancelled, m_workerClientWrapper));
 }
 
-void workerContextDidReceiveAuthenticationCancellation(
+static void workerContextDidReceiveAuthenticationCancellation(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper,
     auto_ptr<CrossThreadResourceResponseData> responseData) {
