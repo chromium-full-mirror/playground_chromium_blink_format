@@ -58,8 +58,6 @@ class RenderContainer : public RenderBox {
     appendChildNode(child->parent()->removeChildNode(child, false), false);
   }
 
-  virtual VisiblePosition positionForCoordinates(int x, int y);
-
   virtual void addLineBoxRects(Vector<IntRect>&,
                                unsigned startOffset = 0,
                                unsigned endOffset = UINT_MAX,

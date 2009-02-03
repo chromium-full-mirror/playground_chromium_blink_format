@@ -429,6 +429,8 @@ class RenderBox : public RenderObject {
 
   virtual void childBecameNonInline(RenderObject* /*child*/) {}
 
+  virtual VisiblePosition positionForCoordinates(int x, int y);
+
 #if ENABLE(SVG)
   virtual TransformationMatrix localTransform() const;
 #endif
