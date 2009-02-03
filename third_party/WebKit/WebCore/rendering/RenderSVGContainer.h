@@ -65,8 +65,6 @@ class RenderSVGContainer : public RenderObject {
     appendChildNode(child->parent()->removeChildNode(child, false), false);
   }
 
-  virtual void calcPrefWidths() { setPrefWidthsDirty(false); }
-
   // Some containers do not want it's children
   // to be drawn, because they may be 'referenced'
   // Example: <marker> children in SVG

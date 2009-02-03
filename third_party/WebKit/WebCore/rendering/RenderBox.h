@@ -543,7 +543,7 @@ class RenderBox : public RenderObject {
   // object.
   // These values are used in shrink-to-fit layout systems.
   // These include tables, positioned objects, floats and flexible boxes.
-  virtual void calcPrefWidths() = 0;
+  virtual void calcPrefWidths() { setPrefWidthsDirty(false); }
 
  private:
   // The width/height of the contents + borders + padding.  The x/y location is

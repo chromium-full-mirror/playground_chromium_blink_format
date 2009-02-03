@@ -58,8 +58,6 @@ class RenderContainer : public RenderBox {
     appendChildNode(child->parent()->removeChildNode(child, false), false);
   }
 
-  virtual void calcPrefWidths() { setPrefWidthsDirty(false); }
-
   RenderObject* beforeAfterContainer(RenderStyle::PseudoId);
   virtual void updateBeforeAfterContent(RenderStyle::PseudoId);
   void updateBeforeAfterContentForContainer(RenderStyle::PseudoId,
