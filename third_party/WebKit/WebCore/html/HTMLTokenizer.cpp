@@ -147,7 +147,7 @@ inline void Token::addAttribute(AtomicString& attrName,
         MappedAttribute::create(attrName, attributeValue);
     if (!attrs) {
       attrs = NamedMappedAttrMap::create();
-      attrs->reserveCapacity(10);
+      attrs->reserveInitialCapacity(10);
     }
     attrs->insertAttribute(a.release(), viewSourceMode);
   }

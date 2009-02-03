@@ -78,8 +78,8 @@ Lexer::Lexer(JSGlobalData* globalData)
       m_nextOffset3(0),
       m_globalData(globalData),
       m_mainTable(JSC::mainTable) {
-  m_buffer8.reserveCapacity(initialReadBufferCapacity);
-  m_buffer16.reserveCapacity(initialReadBufferCapacity);
+  m_buffer8.reserveInitialCapacity(initialReadBufferCapacity);
+  m_buffer16.reserveInitialCapacity(initialReadBufferCapacity);
 }
 
 Lexer::~Lexer() {
@@ -879,11 +879,11 @@ void Lexer::clear() {
   m_identifiers.clear();
 
   Vector<char> newBuffer8;
-  newBuffer8.reserveCapacity(initialReadBufferCapacity);
+  newBuffer8.reserveInitialCapacity(initialReadBufferCapacity);
   m_buffer8.swap(newBuffer8);
 
   Vector<UChar> newBuffer16;
-  newBuffer16.reserveCapacity(initialReadBufferCapacity);
+  newBuffer16.reserveInitialCapacity(initialReadBufferCapacity);
   m_buffer16.swap(newBuffer16);
 
   m_isReparsing = false;

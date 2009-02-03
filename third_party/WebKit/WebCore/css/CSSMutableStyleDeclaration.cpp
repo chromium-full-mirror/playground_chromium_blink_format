@@ -91,7 +91,7 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
       m_iteratorCount(0)
 #endif
 {
-  m_properties.reserveCapacity(numProperties);
+  m_properties.reserveInitialCapacity(numProperties);
   for (int i = 0; i < numProperties; ++i) {
     ASSERT(properties[i]);
     m_properties.append(*properties[i]);
@@ -762,7 +762,7 @@ void CSSMutableStyleDeclaration::removePropertiesInSet(const int* set,
     toRemove.add(set[i]);
 
   Vector<CSSProperty> newProperties;
-  newProperties.reserveCapacity(m_properties.size());
+  newProperties.reserveInitialCapacity(m_properties.size());
 
   unsigned size = m_properties.size();
   for (unsigned n = 0; n < size; ++n) {

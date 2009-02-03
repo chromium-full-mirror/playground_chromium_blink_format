@@ -137,7 +137,7 @@ PassRefPtr<CSSMutableStyleDeclaration> CSSStyleDeclaration::copyPropertiesInSet(
     const int* set,
     unsigned length) const {
   Vector<CSSProperty> list;
-  list.reserveCapacity(length);
+  list.reserveInitialCapacity(length);
   unsigned variableDependentValueCount = 0;
   for (unsigned i = 0; i < length; i++) {
     RefPtr<CSSValue> value = getPropertyCSSValue(set[i]);

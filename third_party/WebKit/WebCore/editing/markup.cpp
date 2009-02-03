@@ -745,7 +745,7 @@ static String joinMarkups(const Vector<String>& preMarkups,
     length += postMarkups[i].length();
 
   Vector<UChar> result;
-  result.reserveCapacity(length);
+  result.reserveInitialCapacity(length);
 
   for (size_t i = preCount; i > 0; --i)
     append(result, preMarkups[i - 1]);

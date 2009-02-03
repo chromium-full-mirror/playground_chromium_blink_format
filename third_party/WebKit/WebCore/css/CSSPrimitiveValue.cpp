@@ -758,7 +758,7 @@ String CSSPrimitiveValue::cssText() const {
 
       Rect* rectVal = getRectValue();
       Vector<UChar> result;
-      result.reserveCapacity(32);
+      result.reserveInitialCapacity(32);
       append(result, rectParen);
 
       append(result, rectVal->top()->cssText());
@@ -787,7 +787,7 @@ String CSSPrimitiveValue::cssText() const {
       Color color(rgbColor);
 
       Vector<UChar> result;
-      result.reserveCapacity(32);
+      result.reserveInitialCapacity(32);
       if (color.hasAlpha())
         append(result, rgbaParen);
       else
