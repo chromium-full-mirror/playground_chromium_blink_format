@@ -57,6 +57,11 @@ struct GenericWorkerTaskTraits<std::auto_ptr<T>> {
   typedef std::auto_ptr<T> ParamType;
 };
 
+template <typename T>
+struct GenericWorkerTaskTraits<PassRefPtr<T>> {
+  typedef PassRefPtr<T> ParamType;
+};
+
 template <typename P1, typename MP1>
 class GenericWorkerTask1 : public ScriptExecutionContext::Task {
  public:
