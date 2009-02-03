@@ -83,6 +83,12 @@ static const PopupContainerSettings dropDownSettings = {
 class PopupListBox : public FramelessScrollView,
                      public RefCounted<PopupListBox> {
  public:
+  static PassRefPtr<PopupListBox> create(
+      PopupMenuClient* client,
+      const PopupContainerSettings& settings) {
+    return adoptRef(new PopupListBox(client, settings));
+  }
+
   // FramelessScrollView
   virtual void paint(GraphicsContext*, const IntRect&);
   virtual bool handleMouseDownEvent(const PlatformMouseEvent&);
@@ -316,11 +322,7 @@ PassRefPtr<PopupContainer> PopupContainer::create(
 
 PopupContainer::PopupContainer(PopupMenuClient* client,
                                const PopupContainerSettings& settings)
-    : m_listBox(new PopupListBox(client, settings)), m_settings(settings) {
-  // FrameViews are created with a refcount of 1 so it needs releasing after we
-  // assign it to a RefPtr.
-  m_listBox->deref();
-
+    : m_listBox(PopupListBox::create(client, settings)), m_settings(settings) {
   setScrollbarModes(ScrollbarAlwaysOff, ScrollbarAlwaysOff);
 }
 
@@ -350,11 +352,11 @@ void PopupContainer::showPopup(FrameView* view) {
     chromeClient->popupOpened(this, widgetRect, m_settings.focusOnShow);
   }
 
-  // Must get called after we have a client and containingWindow.
-  addChild(m_listBox.get());
+  if (!m_listBox->parent())
+    addChild(m_listBox.get());
 
-  // Enable scrollbars after the listbox is inserted into the hierarchy, so
-  // it has a proper WidgetClient.
+  // Enable scrollbars after the listbox is inserted into the hierarchy,
+  // so it has a proper WidgetClient.
   m_listBox->setVerticalScrollbarMode(ScrollbarAuto);
 
   m_listBox->scrollToRevealSelection();
@@ -363,12 +365,6 @@ void PopupContainer::showPopup(FrameView* view) {
 }
 
 void PopupContainer::hidePopup() {
-  invalidate();
-
-  m_listBox->disconnectClient();
-  removeChild(m_listBox.get());
-  m_listBox = 0;
-
   if (client())
     client()->popupClosed(this);
 }
@@ -814,12 +810,10 @@ void PopupListBox::abandon() {
 
   m_selectedIndex = m_originalIndex;
 
+  m_popupClient->hidePopup();
+
   if (m_willAcceptOnAbandon)
     m_popupClient->valueChanged(m_selectedIndex);
-
-  // valueChanged may have torn down the popup!
-  if (m_popupClient)
-    m_popupClient->hidePopup();
 }
 
 int PopupListBox::pointToRowIndex(const IntPoint& point) {
@@ -849,13 +843,11 @@ void PopupListBox::acceptIndex(int index) {
   if (isSelectableItem(index)) {
     RefPtr<PopupListBox> keepAlive(this);
 
-    // Tell the <select> PopupMenuClient what index was selected, and hide
-    // ourself.
-    m_popupClient->valueChanged(index);
+    // Hide ourselves first since valueChanged may have numerous side-effects.
+    m_popupClient->hidePopup();
 
-    // valueChanged may have torn down the popup!
-    if (m_popupClient)
-      m_popupClient->hidePopup();
+    // Tell the <select> PopupMenuClient what index was selected.
+    m_popupClient->valueChanged(index);
   }
 }
 
@@ -1100,15 +1092,14 @@ PopupMenu::~PopupMenu() {
 }
 
 void PopupMenu::show(const IntRect& r, FrameView* v, int index) {
-  p.popup = PopupContainer::create(client(), dropDownSettings);
+  if (!p.popup)
+    p.popup = PopupContainer::create(client(), dropDownSettings);
   p.popup->show(r, v, index);
 }
 
 void PopupMenu::hide() {
-  if (p.popup) {
+  if (p.popup)
     p.popup->hidePopup();
-    p.popup = 0;
-  }
 }
 
 void PopupMenu::updateFromElement() {
