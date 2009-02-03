@@ -34,8 +34,11 @@ class PageGroup;
 
 @interface WebHistory (WebInternal)
 - (void)_visitedURL:(NSURL*)URL
-          withTitle:(NSString*)title
-             method:(NSString*)method
-         wasFailure:(BOOL)wasFailure;
+            withTitle:(NSString*)title
+               method:(NSString*)method
+           wasFailure:(BOOL)wasFailure
+    serverRedirectURL:(NSString*)serverRedirectURL
+     isClientRedirect:(BOOL)isClientRedirect;
+- (void)_visitedURLForRedirectWithoutHistoryItem:(NSURL*)url;
 - (void)_addVisitedLinksToPageGroup:(WebCore::PageGroup&)group;
 @end

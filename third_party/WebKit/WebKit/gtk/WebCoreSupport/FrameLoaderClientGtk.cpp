@@ -435,7 +435,8 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
 
   childFrame->tree()->setName(name);
   childFrame->init();
-  childFrame->loader()->loadURL(url, referrer, String(), FrameLoadTypeRedirect,
+  childFrame->loader()->loadURL(url, referrer, String(),
+                                FrameLoadTypeRedirectWithLockedBackForwardList,
                                 0, 0);
 
   // The frame's onload handler may have removed it from the document.
@@ -849,6 +850,10 @@ void FrameLoaderClient::startDownload(const ResourceRequest&) {
 }
 
 void FrameLoaderClient::updateGlobalHistory() {
+  notImplemented();
+}
+
+void FrameLoaderClient::updateGlobalHistoryForRedirectWithoutHistoryItem() {
   notImplemented();
 }
 

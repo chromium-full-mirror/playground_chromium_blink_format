@@ -181,7 +181,8 @@ void JSLocation::setHref(ExecState* exec, JSValuePtr value) {
     return;
 
   KURL url = activeFrame->loader()->completeURL(value.toString(exec));
-  navigateIfAllowed(exec, frame, url, false, false);
+  navigateIfAllowed(exec, frame, url,
+                    !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
 void JSLocation::setProtocol(ExecState* exec, JSValuePtr value) {
@@ -191,7 +192,8 @@ void JSLocation::setProtocol(ExecState* exec, JSValuePtr value) {
   KURL url = frame->loader()->url();
   url.setProtocol(value.toString(exec));
 
-  navigateIfAllowed(exec, frame, url, false, false);
+  navigateIfAllowed(exec, frame, url,
+                    !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
 void JSLocation::setHost(ExecState* exec, JSValuePtr value) {
@@ -201,7 +203,8 @@ void JSLocation::setHost(ExecState* exec, JSValuePtr value) {
   KURL url = frame->loader()->url();
   url.setHostAndPort(value.toString(exec));
 
-  navigateIfAllowed(exec, frame, url, false, false);
+  navigateIfAllowed(exec, frame, url,
+                    !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
 void JSLocation::setHostname(ExecState* exec, JSValuePtr value) {
@@ -211,7 +214,8 @@ void JSLocation::setHostname(ExecState* exec, JSValuePtr value) {
   KURL url = frame->loader()->url();
   url.setHost(value.toString(exec));
 
-  navigateIfAllowed(exec, frame, url, false, false);
+  navigateIfAllowed(exec, frame, url,
+                    !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
 void JSLocation::setPort(ExecState* exec, JSValuePtr value) {
@@ -227,7 +231,8 @@ void JSLocation::setPort(ExecState* exec, JSValuePtr value) {
     port = 0;
   url.setPort(port);
 
-  navigateIfAllowed(exec, frame, url, false, false);
+  navigateIfAllowed(exec, frame, url,
+                    !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
 void JSLocation::setPathname(ExecState* exec, JSValuePtr value) {
@@ -237,7 +242,8 @@ void JSLocation::setPathname(ExecState* exec, JSValuePtr value) {
   KURL url = frame->loader()->url();
   url.setPath(value.toString(exec));
 
-  navigateIfAllowed(exec, frame, url, false, false);
+  navigateIfAllowed(exec, frame, url,
+                    !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
 void JSLocation::setSearch(ExecState* exec, JSValuePtr value) {
@@ -247,7 +253,8 @@ void JSLocation::setSearch(ExecState* exec, JSValuePtr value) {
   KURL url = frame->loader()->url();
   url.setQuery(value.toString(exec));
 
-  navigateIfAllowed(exec, frame, url, false, false);
+  navigateIfAllowed(exec, frame, url,
+                    !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
 void JSLocation::setHash(ExecState* exec, JSValuePtr value) {
@@ -263,7 +270,8 @@ void JSLocation::setHash(ExecState* exec, JSValuePtr value) {
     return;
   url.setRef(str);
 
-  navigateIfAllowed(exec, frame, url, false, false);
+  navigateIfAllowed(exec, frame, url,
+                    !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
 JSValuePtr JSLocation::replace(ExecState* exec, const ArgList& args) {
@@ -320,7 +328,7 @@ JSValuePtr JSLocation::assign(ExecState* exec, const ArgList& args) {
   // We want a new history item if this JS was called via a user gesture
   navigateIfAllowed(exec, frame, activeFrame->loader()->completeURL(
                                      args.at(exec, 0).toString(exec)),
-                    false, false);
+                    !frame->script()->anyPageIsProcessingUserGesture(), false);
   return jsUndefined();
 }
 

@@ -155,6 +155,7 @@ class FrameLoader : Noncopyable
   void loadWithNavigationAction(
       const ResourceRequest&,
       const NavigationAction&,  // Calls loadWithDocumentLoader()
+      bool lockHistory,
       FrameLoadType,
       PassRefPtr<FormState>);
 
@@ -163,6 +164,7 @@ class FrameLoader : Noncopyable
       const String& referrer,  // Called by loadFrameRequestWithFormAndValues(),
                                // calls loadWithNavigationAction
       const String& frameName,
+      bool lockHistory,
       FrameLoadType,
       Event*,
       PassRefPtr<FormState>);
@@ -174,6 +176,7 @@ class FrameLoader : Noncopyable
                                          // calls loadWithNavigationAction or
                                          // else dispatches to navigation policy
                                          // delegate
+               bool lockHistory,
                FrameLoadType,
                Event*,
                PassRefPtr<FormState>);
@@ -188,13 +191,17 @@ class FrameLoader : Noncopyable
       HTMLFormElement*,
       const HashMap<String, String>& formValues);
 
-  void load(const ResourceRequest&);  // Called by WebFrame, calls
-                                      // (ResourceRequest, SubstituteData)
+  void load(const ResourceRequest&, bool lockHistory);  // Called by WebFrame,
+                                                        // calls
+                                                        // (ResourceRequest,
+                                                        // SubstituteData)
   void load(const ResourceRequest&,
-            const SubstituteData&);  // Called both by WebFrame and internally,
-                                     // calls (DocumentLoader*)
+            const SubstituteData&,
+            bool lockHistory);  // Called both by WebFrame and internally, calls
+                                // (DocumentLoader*)
   void load(const ResourceRequest&,
-            const String& frameName);  // Called by WebPluginController
+            const String& frameName,
+            bool lockHistory);  // Called by WebPluginController
 
   void loadArchive(PassRefPtr<Archive> archive);
 
@@ -320,7 +327,6 @@ class FrameLoader : Noncopyable
   void clientRedirected(const KURL&,
                         double delay,
                         double fireDate,
-                        bool lockHistory,
                         bool lockBackForwardList,
                         bool isJavaScriptFormAction);
   bool shouldReload(const KURL& currentURL, const KURL& destinationURL);
@@ -613,7 +619,7 @@ class FrameLoader : Noncopyable
   void updateHistoryForBackForwardNavigation();
   void updateHistoryForReload();
   void updateHistoryForStandardLoad();
-  void updateHistoryForRedirectWithLockedHistory();
+  void updateHistoryForRedirectWithLockedBackForwardList();
   void updateHistoryForClientRedirect();
   void updateHistoryForCommit();
   void updateHistoryForAnchorScroll();

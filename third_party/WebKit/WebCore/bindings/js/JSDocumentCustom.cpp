@@ -72,7 +72,8 @@ void JSDocument::setLocation(ExecState* exec, JSValuePtr value) {
 
   bool userGesture = activeFrame->script()->processingUserGesture();
   frame->loader()->scheduleLocationChange(
-      str, activeFrame->loader()->outgoingReferrer(), false, false,
+      str, activeFrame->loader()->outgoingReferrer(),
+      !activeFrame->script()->anyPageIsProcessingUserGesture(), false,
       userGesture);
 }
 

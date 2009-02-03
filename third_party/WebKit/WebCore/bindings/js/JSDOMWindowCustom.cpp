@@ -155,7 +155,8 @@ void JSDOMWindow::setLocation(ExecState* exec, JSValuePtr value) {
     bool userGesture = activeFrame->script()->processingUserGesture();
     // We want a new history item if this JS was called via a user gesture
     impl()->frame()->loader()->scheduleLocationChange(
-        dstUrl, activeFrame->loader()->outgoingReferrer(), false, false,
+        dstUrl, activeFrame->loader()->outgoingReferrer(),
+        !activeFrame->script()->anyPageIsProcessingUserGesture(), false,
         userGesture);
   }
 }

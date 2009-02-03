@@ -203,7 +203,8 @@ bool DragController::performDrag(DragData* dragData) {
 
   m_client->willPerformDragDestinationAction(DragDestinationActionLoad,
                                              dragData);
-  m_page->mainFrame()->loader()->load(ResourceRequest(dragData->asURL()));
+  m_page->mainFrame()->loader()->load(ResourceRequest(dragData->asURL()),
+                                      false);
   return true;
 }
 

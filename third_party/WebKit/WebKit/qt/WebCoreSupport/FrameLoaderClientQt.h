@@ -185,6 +185,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void finishedLoading(DocumentLoader*);
 
   virtual void updateGlobalHistory();
+  virtual void updateGlobalHistoryForRedirectWithoutHistoryItem();
   virtual bool shouldGoToHistoryItem(HistoryItem*) const;
 
   virtual ResourceError cancelledError(const ResourceRequest&);
