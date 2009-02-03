@@ -952,7 +952,7 @@ PassRefPtr<Frame> FrameLoaderClientQt::createFrame(
   FrameLoadType childLoadType = FrameLoadTypeRedirectWithLockedBackForwardList;
 
   childFrame->loader()->loadURL(frameData.url, frameData.referrer, String(),
-                                childLoadType, 0, 0);
+                                false, childLoadType, 0, 0);
 
   // The frame's onload handler may have removed it from the document.
   if (!childFrame->tree()->parent())
