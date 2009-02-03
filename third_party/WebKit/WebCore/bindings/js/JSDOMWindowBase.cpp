@@ -300,7 +300,7 @@ static Frame* createWindow(ExecState* exec,
 
     if (created)
       newFrame->loader()->changeLocation(
-          completedURL, activeFrame->loader()->outgoingReferrer(), false,
+          completedURL, activeFrame->loader()->outgoingReferrer(), false, false,
           userGesture);
     else if (!url.isEmpty())
       newFrame->loader()->scheduleLocationChange(
