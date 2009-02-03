@@ -99,6 +99,7 @@ class NetscapePluginInstanceProxy
 
   // NPRuntime
   bool getWindowNPObject(uint32_t& objectID);
+  bool getPluginElementNPObject(uint32_t& objectID);
   void releaseObject(uint32_t objectID);
 
   bool evaluate(uint32_t objectID,

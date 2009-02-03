@@ -88,6 +88,7 @@ class HTMLPlugInElement;
 - (WebDataSource*)dataSource;
 - (WebView*)webView;
 - (NSWindow*)currentWindow;
+- (WebCore::HTMLPlugInElement*)element;
 
 - (void)removeTrackingRect;
 - (void)resetTrackingRect;
