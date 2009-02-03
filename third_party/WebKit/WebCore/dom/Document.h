@@ -79,6 +79,7 @@ class EventListener;
 class FormControlElementWithState;
 class Frame;
 class FrameView;
+class HitTestRequest;
 class HTMLCanvasElement;
 class HTMLDocument;
 class HTMLElement;
@@ -127,7 +128,6 @@ class XPathResult;
 #if ENABLE(DASHBOARD_SUPPORT)
 struct DashboardRegionValue;
 #endif
-struct HitTestRequest;
 
 typedef int ExceptionCode;
 
