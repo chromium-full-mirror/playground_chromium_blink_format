@@ -239,7 +239,8 @@ void PluginView::performRequest(PluginRequest* request) {
       stream->start();
     } else {
       m_parentFrame->loader()->load(
-          request->frameLoadRequest().resourceRequest(), targetFrameName);
+          request->frameLoadRequest().resourceRequest(), targetFrameName,
+          false);
 
       // FIXME: <rdar://problem/4807469> This should be sent when the document
       // has finished loading
