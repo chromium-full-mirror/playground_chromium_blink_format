@@ -410,6 +410,10 @@ void FrameLoaderClientWx::updateGlobalHistory() {
   notImplemented();
 }
 
+void FrameLoaderClientWx::updateGlobalHistoryForRedirectWithoutHistoryItem() {
+  notImplemented();
+}
+
 bool FrameLoaderClientWx::shouldGoToHistoryItem(WebCore::HistoryItem*) const {
   notImplemented();
   return true;
@@ -701,7 +705,7 @@ ObjectContentType FrameLoaderClientWx::objectContentType(
 }
 
 Widget* FrameLoaderClientWx::createPlugin(const IntSize&,
-                                          Element*,
+                                          HTMLPlugInElement*,
                                           const KURL&,
                                           const Vector<String>&,
                                           const Vector<String>&,
@@ -724,7 +728,7 @@ ResourceError FrameLoaderClientWx::pluginWillHandleLoadError(
 
 Widget* FrameLoaderClientWx::createJavaAppletWidget(
     const IntSize&,
-    Element*,
+    HTMLAppletElement*,
     const KURL& baseURL,
     const Vector<String>& paramNames,
     const Vector<String>& paramValues) {

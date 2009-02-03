@@ -148,6 +148,7 @@ class FrameLoaderClientWx : public FrameLoaderClient {
   virtual void transitionToCommittedForNewPage();
 
   virtual void updateGlobalHistory();
+  virtual void updateGlobalHistoryForRedirectWithoutHistoryItem();
   virtual bool shouldGoToHistoryItem(HistoryItem*) const;
   virtual void saveScrollPositionAndViewStateToItem(HistoryItem*);
   virtual bool canCachePage() const;
@@ -235,7 +236,7 @@ class FrameLoaderClientWx : public FrameLoaderClient {
                                         int marginWidth,
                                         int marginHeight);
   virtual Widget* createPlugin(const IntSize&,
-                               Element*,
+                               HTMLPlugInElement*,
                                const KURL&,
                                const Vector<String>&,
                                const Vector<String>&,
@@ -245,7 +246,7 @@ class FrameLoaderClientWx : public FrameLoaderClient {
   virtual ResourceError pluginWillHandleLoadError(const ResourceResponse&);
 
   virtual Widget* createJavaAppletWidget(const IntSize&,
-                                         Element*,
+                                         HTMLAppletElement*,
                                          const KURL& baseURL,
                                          const Vector<String>& paramNames,
                                          const Vector<String>& paramValues);
