@@ -85,14 +85,14 @@ void EventTargetNode::insertedIntoDocument() {
   if (!eventListeners().isEmpty())
     document()->unregisterDisconnectedNodeWithEventListeners(this);
 
-  Node::insertedIntoDocument();
+  setInDocument(true);
 }
 
 void EventTargetNode::removedFromDocument() {
   if (!eventListeners().isEmpty())
     document()->registerDisconnectedNodeWithEventListeners(this);
 
-  Node::removedFromDocument();
+  setInDocument(false);
 }
 
 void EventTargetNode::willMoveToNewOwnerDocument() {

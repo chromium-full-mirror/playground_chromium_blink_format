@@ -588,15 +588,14 @@ void ContainerNode::detach() {
 }
 
 void ContainerNode::insertedIntoDocument() {
-  setInDocument(true);
+  EventTargetNode::insertedIntoDocument();
   insertedIntoTree(false);
   for (Node* child = m_firstChild; child; child = child->nextSibling())
     child->insertedIntoDocument();
 }
 
 void ContainerNode::removedFromDocument() {
-  if (document()->cssTarget() == this)
-    document()->setCSSTarget(0);
+  EventTargetNode::removedFromDocument();
   setInDocument(false);
   removedFromTree(false);
   for (Node* child = m_firstChild; child; child = child->nextSibling())
