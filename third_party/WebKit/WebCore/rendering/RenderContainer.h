@@ -45,15 +45,6 @@ class RenderContainer : public RenderBox {
   }
   virtual void removeChild(RenderObject*);
 
-  virtual void addLineBoxRects(Vector<IntRect>&,
-                               unsigned startOffset = 0,
-                               unsigned endOffset = UINT_MAX,
-                               bool useSelectionHeight = false);
-  virtual void collectAbsoluteLineBoxQuads(Vector<FloatQuad>&,
-                                           unsigned startOffset = 0,
-                                           unsigned endOffset = UINT_MAX,
-                                           bool useSelectionHeight = false);
-
  protected:
   RenderObjectChildList m_children;
 };

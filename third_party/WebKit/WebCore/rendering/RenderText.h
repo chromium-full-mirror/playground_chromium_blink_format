@@ -63,16 +63,16 @@ class RenderText : public RenderObject {
                              int tx,
                              int ty,
                              bool topLevel = true);
-  virtual void addLineBoxRects(Vector<IntRect>&,
-                               unsigned startOffset = 0,
-                               unsigned endOffset = UINT_MAX,
-                               bool useSelectionHeight = false);
+  virtual void absoluteRectsForRange(Vector<IntRect>&,
+                                     unsigned startOffset = 0,
+                                     unsigned endOffset = UINT_MAX,
+                                     bool useSelectionHeight = false);
 
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
-  virtual void collectAbsoluteLineBoxQuads(Vector<FloatQuad>&,
-                                           unsigned startOffset = 0,
-                                           unsigned endOffset = UINT_MAX,
-                                           bool useSelectionHeight = false);
+  virtual void absoluteQuadsForRange(Vector<FloatQuad>&,
+                                     unsigned startOffset = 0,
+                                     unsigned endOffset = UINT_MAX,
+                                     bool useSelectionHeight = false);
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
