@@ -178,6 +178,9 @@ class RenderView : public RenderBlock {
 
   virtual void updateHitTestResult(HitTestResult&, const IntPoint&);
 
+  void didMoveOnscreen();
+  void willMoveOffscreen();
+
  protected:
   virtual FloatQuad localToContainerQuad(const FloatQuad&,
                                          RenderBox* repaintContainer,

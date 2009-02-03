@@ -657,4 +657,12 @@ void RenderView::updateHitTestResult(HitTestResult& result,
   }
 }
 
+void RenderView::didMoveOnscreen() {
+  // FIXME: will call into RenderLayerCompositor
+}
+
+void RenderView::willMoveOffscreen() {
+  // FIXME: will call into RenderLayerCompositor
+}
+
 }  // namespace WebCore
