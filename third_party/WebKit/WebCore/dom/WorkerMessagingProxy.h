@@ -59,17 +59,17 @@ class WorkerMessagingProxy : Noncopyable {
   void workerObjectDestroyed();
   void workerContextDestroyed();
 
-  void terminate();
-
   void confirmWorkerThreadMessage(bool hasPendingActivity);
   void reportWorkerThreadActivity(bool hasPendingActivity);
   bool workerThreadHasPendingActivity() const;
 
+  // Only use these methods on the worker object thread.
+  void terminate();
+  bool askedToTerminate() const { return m_askedToTerminate; }
+
  private:
-  friend class GenericWorkerTaskBase;
   friend class MessageWorkerTask;
   friend class WorkerContextDestroyedTask;
-  friend class WorkerExceptionTask;
   friend class WorkerThreadActivityReportTask;
 
   ~WorkerMessagingProxy();
@@ -78,7 +78,6 @@ class WorkerMessagingProxy : Noncopyable {
   void reportWorkerThreadActivityInternal(bool confirmingMessage,
                                           bool hasPendingActivity);
   Worker* workerObject() const { return m_workerObject; }
-  bool askedToTerminate() { return m_askedToTerminate; }
 
   RefPtr<ScriptExecutionContext> m_scriptExecutionContext;
   Worker* m_workerObject;
