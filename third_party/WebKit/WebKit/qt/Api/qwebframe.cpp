@@ -223,7 +223,7 @@ QWebFrame::QWebFrame(QWebPage* parent, QWebFrameData* frameData)
 
   if (!frameData->url.isEmpty()) {
     WebCore::ResourceRequest request(frameData->url, frameData->referrer);
-    d->frame->loader()->load(request, frameData->name);
+    d->frame->loader()->load(request, frameData->name, false);
   }
 }
 
@@ -469,7 +469,7 @@ void QWebFrame::load(const QWebNetworkRequest& req) {
     request.setHTTPBody(
         WebCore::FormData::create(postData.constData(), postData.size()));
 
-  d->frame->loader()->load(request);
+  d->frame->loader()->load(request, false);
 
   if (d->parentFrame())
     d->page->d->insideOpenCall = false;
@@ -528,7 +528,7 @@ void QWebFrame::load(const QNetworkRequest& req,
     request.setHTTPBody(
         WebCore::FormData::create(body.constData(), body.size()));
 
-  d->frame->loader()->load(request);
+  d->frame->loader()->load(request, false);
 
   if (d->parentFrame())
     d->page->d->insideOpenCall = false;
@@ -558,7 +558,7 @@ void QWebFrame::setHtml(const QString& html, const QUrl& baseUrl) {
       WebCore::SharedBuffer::create(utf8.constData(), utf8.length());
   WebCore::SubstituteData substituteData(data, WebCore::String("text/html"),
                                          WebCore::String("utf-8"), kurl);
-  d->frame->loader()->load(request, substituteData);
+  d->frame->loader()->load(request, substituteData, false);
 }
 
 /*!
@@ -584,7 +584,7 @@ void QWebFrame::setContent(const QByteArray& data,
     actualMimeType = QLatin1String("text/html");
   WebCore::SubstituteData substituteData(
       buffer, WebCore::String(actualMimeType), WebCore::String(), kurl);
-  d->frame->loader()->load(request, substituteData);
+  d->frame->loader()->load(request, substituteData, false);
 }
 
 /*!

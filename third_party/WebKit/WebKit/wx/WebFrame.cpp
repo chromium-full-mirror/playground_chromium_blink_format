@@ -212,7 +212,7 @@ void wxWebFrame::LoadURL(const wxString& url) {
         kurl.setPath("//" + kurl.path());
       }
     }
-    m_impl->frame->loader()->load(kurl);
+    m_impl->frame->loader()->load(kurl, false);
   }
 }
 
