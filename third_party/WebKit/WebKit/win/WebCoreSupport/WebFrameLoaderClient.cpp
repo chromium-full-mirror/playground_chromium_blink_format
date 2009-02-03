@@ -690,7 +690,7 @@ void WebFrameLoaderClient::loadURLIntoChild(const KURL& originalURL,
   String frameName = core(childFrame)->tree()->name();
   core(childFrame)
       ->loader()
-      ->loadURL(url, referrer, frameName, childLoadType, 0, 0);
+      ->loadURL(url, referrer, frameName, false, childLoadType, 0, 0);
 }
 
 Widget* WebFrameLoaderClient::createPlugin(const IntSize& pluginSize,
