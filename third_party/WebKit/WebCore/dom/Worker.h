@@ -47,7 +47,6 @@ class Document;
 class ScriptExecutionContext;
 class String;
 class WorkerMessagingProxy;
-class WorkerTask;
 
 typedef int ExceptionCode;
 

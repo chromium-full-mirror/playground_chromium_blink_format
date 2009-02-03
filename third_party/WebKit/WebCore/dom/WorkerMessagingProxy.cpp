@@ -33,14 +33,14 @@
 #include "DOMWindow.h"
 #include "Document.h"
 #include "MessageEvent.h"
+#include "ScriptExecutionContext.h"
 #include "Worker.h"
 #include "WorkerContext.h"
-#include "WorkerTask.h"
 #include "WorkerThread.h"
 
 namespace WebCore {
 
-class MessageWorkerContextTask : public WorkerTask {
+class MessageWorkerContextTask : public ScriptExecutionContext::Task {
  public:
   static PassRefPtr<MessageWorkerContextTask> create(const String& message) {
     return adoptRef(new MessageWorkerContextTask(message));
@@ -49,7 +49,10 @@ class MessageWorkerContextTask : public WorkerTask {
  private:
   MessageWorkerContextTask(const String& message) : m_message(message.copy()) {}
 
-  virtual void performTask(WorkerContext* context) {
+  virtual void performTask(ScriptExecutionContext* scriptContext) {
+    ASSERT(scriptContext->isWorkerContext());
+    WorkerContext* context = static_cast<WorkerContext*>(scriptContext);
+
     RefPtr<Event> evt = MessageEvent::create(m_message, "", "", 0, 0);
 
     if (context->onmessage()) {
@@ -215,18 +218,22 @@ void WorkerMessagingProxy::postMessageToWorkerObject(const String& message) {
 }
 
 void WorkerMessagingProxy::postMessageToWorkerContext(const String& message) {
+  postTaskToWorkerContext(MessageWorkerContextTask::create(message));
+}
+
+void WorkerMessagingProxy::postTaskToWorkerContext(
+    PassRefPtr<ScriptExecutionContext::Task> task) {
   if (m_askedToTerminate)
     return;
 
   if (m_workerThread) {
     ++m_unconfirmedMessageCount;
-    m_workerThread->runLoop().postTask(
-        MessageWorkerContextTask::create(message));
+    m_workerThread->runLoop().postTask(task);
   } else
-    m_queuedEarlyTasks.append(MessageWorkerContextTask::create(message));
+    m_queuedEarlyTasks.append(task);
 }
 
-void WorkerMessagingProxy::postTaskToParentContext(
+void WorkerMessagingProxy::postTaskToWorkerObject(
     PassRefPtr<ScriptExecutionContext::Task> task) {
   m_scriptExecutionContext->postTask(task);
 }

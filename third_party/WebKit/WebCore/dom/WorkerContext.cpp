@@ -40,7 +40,6 @@
 #include "WorkerLocation.h"
 #include "WorkerMessagingProxy.h"
 #include "WorkerNavigator.h"
-#include "WorkerTask.h"
 #include "WorkerThread.h"
 #include <wtf/RefPtr.h>
 
@@ -129,7 +128,7 @@ void WorkerContext::addMessage(MessageDestination destination,
                                const String& message,
                                unsigned lineNumber,
                                const String& sourceURL) {
-  postTaskToParentContext(createCallbackTask(
+  postTaskToWorkerObject(createCallbackTask(
       &addMessageTask, m_thread->messagingProxy(), destination, source, level,
       message, lineNumber, sourceURL));
 }
@@ -200,32 +199,12 @@ bool WorkerContext::dispatchEvent(PassRefPtr<Event> event, ExceptionCode& ec) {
   return !event->defaultPrevented();
 }
 
-class ScriptExecutionContextTaskWorkerTask : public WorkerTask {
- public:
-  static PassRefPtr<ScriptExecutionContextTaskWorkerTask> create(
-      PassRefPtr<ScriptExecutionContext::Task> task) {
-    return adoptRef(new ScriptExecutionContextTaskWorkerTask(task));
-  }
-
- private:
-  ScriptExecutionContextTaskWorkerTask(
-      PassRefPtr<ScriptExecutionContext::Task> task)
-      : m_task(task) {}
-
-  virtual void performTask(WorkerContext* context) {
-    m_task->performTask(context);
-  }
-
-  RefPtr<ScriptExecutionContext::Task> m_task;
-};
-
 void WorkerContext::postTask(PassRefPtr<Task> task) {
-  thread()->runLoop().postTask(
-      ScriptExecutionContextTaskWorkerTask::create(task));
+  thread()->runLoop().postTask(task);
 }
 
-void WorkerContext::postTaskToParentContext(PassRefPtr<Task> task) {
-  thread()->messagingProxy()->postTaskToParentContext(task);
+void WorkerContext::postTaskToWorkerObject(PassRefPtr<Task> task) {
+  thread()->messagingProxy()->postTaskToWorkerObject(task);
 }
 
 }  // namespace WebCore
