@@ -95,6 +95,8 @@ class JSByteArray : public JSObject {
 
   size_t length() const { return m_storage->length(); }
 
+  WTF::ByteArray* storage() const { return m_storage.get(); }
+
  private:
   enum VPtrStealingHackType { VPtrStealingHack };
   JSByteArray(VPtrStealingHackType)
