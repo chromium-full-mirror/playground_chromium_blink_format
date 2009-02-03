@@ -41,6 +41,7 @@
 
 namespace WebCore {
 
+class ScheduledAction;
 class WorkerLocation;
 class WorkerNavigator;
 class WorkerThread;
@@ -94,6 +95,9 @@ class WorkerContext : public RefCounted<WorkerContext>,
   void postTaskToWorkerObject(PassRefPtr<Task>);  // Executes the task on the
                                                   // worker object's thread
                                                   // asynchronously.
+
+  int installTimeout(ScheduledAction*, int timeout, bool singleShot);
+  void removeTimeout(int timeoutId);
 
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,
