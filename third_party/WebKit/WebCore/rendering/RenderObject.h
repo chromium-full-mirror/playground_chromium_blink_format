@@ -192,6 +192,10 @@ class RenderObject : public CachedResourceClient {
 #ifndef NDEBUG
   void setHasAXObject(bool flag) { m_hasAXObject = flag; }
   bool hasAXObject() const { return m_hasAXObject; }
+  bool isSetNeedsLayoutForbidden() const { return m_setNeedsLayoutForbidden; }
+  void setNeedsLayoutIsForbidden(bool flag) {
+    m_setNeedsLayoutForbidden = flag;
+  }
 #endif
 
   // Obtains the nearest enclosing block (including this block) that contributes
@@ -1030,6 +1034,7 @@ class RenderObject : public CachedResourceClient {
 
 #ifndef NDEBUG
   bool m_hasAXObject;
+  bool m_setNeedsLayoutForbidden : 1;
 #endif
   mutable int m_verticalPosition;
 
@@ -1092,6 +1097,7 @@ inline void RenderObject::setNeedsLayout(bool b, bool markParents) {
   bool alreadyNeededLayout = m_needsLayout;
   m_needsLayout = b;
   if (b) {
+    ASSERT(!isSetNeedsLayoutForbidden());
     if (!alreadyNeededLayout) {
       if (markParents)
         markContainingBlocksForLayout();
@@ -1110,6 +1116,7 @@ inline void RenderObject::setChildNeedsLayout(bool b, bool markParents) {
   bool alreadyNeededLayout = m_normalChildNeedsLayout;
   m_normalChildNeedsLayout = b;
   if (b) {
+    ASSERT(!isSetNeedsLayoutForbidden());
     if (!alreadyNeededLayout && markParents)
       markContainingBlocksForLayout();
   } else {
@@ -1166,10 +1173,12 @@ inline void RenderObject::markContainingBlocksForLayout(bool scheduleRelayout,
       if (o->m_posChildNeedsLayout)
         return;
       o->m_posChildNeedsLayout = true;
+      ASSERT(!o->isSetNeedsLayoutForbidden());
     } else {
       if (o->m_normalChildNeedsLayout)
         return;
       o->m_normalChildNeedsLayout = true;
+      ASSERT(!o->isSetNeedsLayoutForbidden());
     }
 
     if (o == newRoot)

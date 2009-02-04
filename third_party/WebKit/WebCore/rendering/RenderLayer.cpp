@@ -1629,7 +1629,7 @@ void RenderLayer::updateScrollInfoAfterLayout() {
       if (!m_inOverflowRelayout) {
         // Our proprietary overflow: overlay value doesn't trigger a layout.
         m_inOverflowRelayout = true;
-        renderer()->setNeedsLayout(true);
+        renderer()->setNeedsLayout(true, false);
         if (renderer()->isRenderBlock())
           toRenderBlock(renderer())->layoutBlock(true);
         else

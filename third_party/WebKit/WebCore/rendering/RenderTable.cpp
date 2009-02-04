@@ -308,6 +308,7 @@ void RenderTable::layout() {
       calculatedHeight += section->calcRowHeight();
       if (collapsing)
         section->recalcOuterBorder();
+      ASSERT(!section->needsLayout());
     }
   }
 
@@ -372,12 +373,11 @@ void RenderTable::layout() {
 
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {
-    if (!child->isTableSection())
-      continue;
-    // FIXME: Distribute extra height between all table body sections instead of
-    // giving it all to the first one.
-    static_cast<RenderTableSection*>(child)->layoutRows(
-        child == m_firstBody ? max(0, th - calculatedHeight) : 0);
+    if (child->isTableSection())
+      // FIXME: Distribute extra height between all table body sections instead
+      // of giving it all to the first one.
+      static_cast<RenderTableSection*>(child)->layoutRows(
+          child == m_firstBody ? max(0, th - calculatedHeight) : 0);
   }
 
   if (!m_firstBody && th > calculatedHeight && !style()->htmlHacks()) {
