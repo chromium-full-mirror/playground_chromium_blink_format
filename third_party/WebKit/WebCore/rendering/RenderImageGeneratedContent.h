@@ -27,9 +27,8 @@
 #define RenderImageGeneratedContent_h
 
 #include "RenderImage.h"
+#include "StyleImage.h"
 #include <wtf/RefPtr.h>
-
-#include "RenderStyle.h"
 
 namespace WebCore {
 
@@ -74,6 +73,7 @@ class RenderImageGeneratedContent : public RenderImage {
  private:
   RefPtr<StyleImage> m_styleImage;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderImageGeneratedContent_h
