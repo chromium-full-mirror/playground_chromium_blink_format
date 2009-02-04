@@ -546,8 +546,10 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
       paintCustomHighlight(tx, ty, style()->highlight(), true);
 #endif
     context->drawImage(m_image->image(this, marker.size()), marker.location());
-    if (selectionState() != SelectionNone)
+    if (selectionState() != SelectionNone) {
+      // FIXME: selectionRect() is in absolute, not painting coordinates.
       context->fillRect(selectionRect(), selectionBackgroundColor());
+    }
     return;
   }
 
@@ -558,8 +560,10 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
     paintCustomHighlight(tx, ty, style()->highlight(), true);
 #endif
 
-  if (selectionState() != SelectionNone)
+  if (selectionState() != SelectionNone) {
+    // FIXME: selectionRect() is in absolute, not painting coordinates.
     context->fillRect(selectionRect(), selectionBackgroundColor());
+  }
 
   const Color color(style()->color());
   context->setStrokeColor(color);
@@ -887,7 +891,8 @@ void RenderListMarker::setSelectionState(SelectionState state) {
   containingBlock()->setSelectionState(state);
 }
 
-IntRect RenderListMarker::selectionRect(bool clipToVisibleContent) {
+IntRect RenderListMarker::selectionRectForRepaint(RenderBox* repaintContainer,
+                                                  bool clipToVisibleContent) {
   ASSERT(!needsLayout());
 
   if (selectionState() == SelectionNone || !inlineBoxWrapper())
@@ -897,11 +902,10 @@ IntRect RenderListMarker::selectionRect(bool clipToVisibleContent) {
   IntRect rect(0, root->selectionTop() - y(), width(), root->selectionHeight());
 
   if (clipToVisibleContent)
-    computeAbsoluteRepaintRect(rect);
-  else {
-    FloatPoint absPos = localToAbsolute();
-    rect.move(absPos.x(), absPos.y());
-  }
+    computeRectForRepaint(repaintContainer, rect);
+  else
+    rect = localToContainerQuad(FloatRect(rect), repaintContainer)
+               .enclosingBoundingBox();
 
   return rect;
 }

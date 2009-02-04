@@ -124,7 +124,8 @@ class RenderText : public RenderObject {
 
   virtual bool canBeSelectionLeaf() const { return true; }
   virtual void setSelectionState(SelectionState s);
-  virtual IntRect selectionRect(bool clipToVisibleContent = true);
+  virtual IntRect selectionRectForRepaint(RenderBox* repaintContainer,
+                                          bool clipToVisibleContent = true);
   virtual IntRect localCaretRect(InlineBox*,
                                  int caretOffset,
                                  int* extraWidthToEndOfLine = 0);

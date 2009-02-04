@@ -41,7 +41,10 @@ class RenderBR : public RenderText {
 
   virtual const char* renderName() const { return "RenderBR"; }
 
-  virtual IntRect selectionRect(bool) { return IntRect(); }
+  virtual IntRect selectionRectForRepaint(RenderBox* /*repaintContainer*/,
+                                          bool /*clipToVisibleContent*/) {
+    return IntRect();
+  }
 
   virtual unsigned width(unsigned /*from*/,
                          unsigned /*len*/,

@@ -241,7 +241,8 @@ VisiblePosition RenderReplaced::positionForCoordinates(int xPos, int yPos) {
   return RenderBox::positionForCoordinates(xPos, yPos);
 }
 
-IntRect RenderReplaced::selectionRect(bool clipToVisibleContent) {
+IntRect RenderReplaced::selectionRectForRepaint(RenderBox* repaintContainer,
+                                                bool clipToVisibleContent) {
   ASSERT(!needsLayout());
 
   if (!isSelected())
@@ -249,11 +250,10 @@ IntRect RenderReplaced::selectionRect(bool clipToVisibleContent) {
 
   IntRect rect = localSelectionRect();
   if (clipToVisibleContent)
-    computeAbsoluteRepaintRect(rect);
-  else {
-    FloatPoint absPos = localToAbsolute(FloatPoint());
-    rect.move(absPos.x(), absPos.y());
-  }
+    computeRectForRepaint(repaintContainer, rect);
+  else
+    rect = localToContainerQuad(FloatRect(rect), repaintContainer)
+               .enclosingBoundingBox();
 
   return rect;
 }
