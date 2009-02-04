@@ -65,13 +65,14 @@ class RenderImageGeneratedContent : public RenderImage {
     return m_styleImage->imageSize(this, multiplier);
   }
 
-    |m_styleImage| can be 0 if we get a callback for a background image from RenderObject::setStyle.
-    virtual WrappedImagePtr imagePtr() const {
-      return m_styleImage ? m_styleImage->data() : 0;
-    }
+  // |m_styleImage| can be 0 if we get a callback for a background image from
+  // RenderObject::setStyle.
+  virtual WrappedImagePtr imagePtr() const {
+    return m_styleImage ? m_styleImage->data() : 0;
+  }
 
-   private:
-    RefPtr<StyleImage> m_styleImage;
+ private:
+  RefPtr<StyleImage> m_styleImage;
 };
 }
 
