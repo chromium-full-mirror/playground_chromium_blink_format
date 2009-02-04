@@ -357,7 +357,8 @@ class VectorBuffer : private VectorBufferBase<T> {
   VectorBuffer() : Base(inlineBuffer(), inlineCapacity) {}
 
   VectorBuffer(size_t capacity) : Base(inlineBuffer(), inlineCapacity) {
-    allocateBuffer(capacity);
+    if (capacity > inlineCapacity)
+      Base::allocateBuffer(capacity);
   }
 
   ~VectorBuffer() { deallocateBuffer(buffer()); }
@@ -365,6 +366,10 @@ class VectorBuffer : private VectorBufferBase<T> {
   void allocateBuffer(size_t newCapacity) {
     if (newCapacity > inlineCapacity)
       Base::allocateBuffer(newCapacity);
+    else {
+      m_buffer = inlineBuffer();
+      m_capacity = inlineCapacity;
+    }
   }
 
   void deallocateBuffer(T* bufferToDeallocate) {
