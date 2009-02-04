@@ -2000,7 +2000,7 @@ void RenderObject::showTreeForThis() const {
 Color RenderObject::selectionBackgroundColor() const {
   Color color;
   if (style()->userSelect() != SELECT_NONE) {
-    RenderStyle* pseudoStyle = getCachedPseudoStyle(RenderStyle::SELECTION);
+    RenderStyle* pseudoStyle = getCachedPseudoStyle(SELECTION);
     if (pseudoStyle && pseudoStyle->backgroundColor().isValid())
       color = pseudoStyle->backgroundColor().blendWithWhite();
     else
@@ -2017,7 +2017,7 @@ Color RenderObject::selectionForegroundColor() const {
   if (style()->userSelect() == SELECT_NONE)
     return color;
 
-  if (RenderStyle* pseudoStyle = getCachedPseudoStyle(RenderStyle::SELECTION)) {
+  if (RenderStyle* pseudoStyle = getCachedPseudoStyle(SELECTION)) {
     color = pseudoStyle->textFillColor();
     if (!color.isValid())
       color = pseudoStyle->color();
@@ -2660,16 +2660,14 @@ RenderStyle* RenderObject::firstLineStyleSlowCase() const {
   const RenderObject* renderer = isText() ? parent() : this;
   if (renderer->isBlockFlow()) {
     if (RenderBlock* firstLineBlock = renderer->firstLineBlock())
-      style =
-          firstLineBlock->getCachedPseudoStyle(RenderStyle::FIRST_LINE, style);
+      style = firstLineBlock->getCachedPseudoStyle(FIRST_LINE, style);
   } else if (!renderer->isAnonymous() && renderer->isRenderInline()) {
     RenderStyle* parentStyle = renderer->parent()->firstLineStyle();
     if (parentStyle != renderer->parent()->style()) {
       // A first-line style is in effect. Cache a first-line style for
       // ourselves.
-      style->setHasPseudoStyle(RenderStyle::FIRST_LINE_INHERITED);
-      style = renderer->getCachedPseudoStyle(RenderStyle::FIRST_LINE_INHERITED,
-                                             parentStyle);
+      style->setHasPseudoStyle(FIRST_LINE_INHERITED);
+      style = renderer->getCachedPseudoStyle(FIRST_LINE_INHERITED, parentStyle);
     }
   }
 
@@ -2677,10 +2675,9 @@ RenderStyle* RenderObject::firstLineStyleSlowCase() const {
 }
 
 RenderStyle* RenderObject::getCachedPseudoStyle(
-    RenderStyle::PseudoId pseudo,
+    PseudoId pseudo,
     RenderStyle* parentStyle) const {
-  if (pseudo < RenderStyle::FIRST_INTERNAL_PSEUDOID &&
-      !style()->hasPseudoStyle(pseudo))
+  if (pseudo < FIRST_INTERNAL_PSEUDOID && !style()->hasPseudoStyle(pseudo))
     return 0;
 
   RenderStyle* cachedStyle = style()->getCachedPseudoStyle(pseudo);
@@ -2694,10 +2691,9 @@ RenderStyle* RenderObject::getCachedPseudoStyle(
 }
 
 PassRefPtr<RenderStyle> RenderObject::getUncachedPseudoStyle(
-    RenderStyle::PseudoId pseudo,
+    PseudoId pseudo,
     RenderStyle* parentStyle) const {
-  if (pseudo < RenderStyle::FIRST_INTERNAL_PSEUDOID &&
-      !style()->hasPseudoStyle(pseudo))
+  if (pseudo < FIRST_INTERNAL_PSEUDOID && !style()->hasPseudoStyle(pseudo))
     return 0;
 
   if (!parentStyle)
@@ -2710,10 +2706,10 @@ PassRefPtr<RenderStyle> RenderObject::getUncachedPseudoStyle(
     return 0;
 
   RefPtr<RenderStyle> result;
-  if (pseudo == RenderStyle::FIRST_LINE_INHERITED) {
+  if (pseudo == FIRST_LINE_INHERITED) {
     result = document()->styleSelector()->styleForElement(
         static_cast<Element*>(node), parentStyle, false);
-    result->setStyleType(RenderStyle::FIRST_LINE_INHERITED);
+    result->setStyleType(FIRST_LINE_INHERITED);
   } else
     result = document()->styleSelector()->pseudoStyleForElement(
         pseudo, static_cast<Element*>(node), parentStyle);

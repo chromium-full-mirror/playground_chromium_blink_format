@@ -89,7 +89,7 @@ class CSSStyleSelector : Noncopyable {
   void initElementAndPseudoState(Element*);
   void initForStyleResolve(Element*,
                            RenderStyle* parentStyle = 0,
-                           RenderStyle::PseudoId = RenderStyle::NOPSEUDO);
+                           PseudoId = NOPSEUDO);
   PassRefPtr<RenderStyle> styleForElement(Element*,
                                           RenderStyle* parentStyle = 0,
                                           bool allowSharing = true,
@@ -98,7 +98,7 @@ class CSSStyleSelector : Noncopyable {
                                   const RenderStyle*,
                                   KeyframeList& list);
 
-  PassRefPtr<RenderStyle> pseudoStyleForElement(RenderStyle::PseudoId,
+  PassRefPtr<RenderStyle> pseudoStyleForElement(PseudoId,
                                                 Element*,
                                                 RenderStyle* parentStyle = 0);
 
@@ -228,7 +228,7 @@ class CSSStyleSelector : Noncopyable {
     SelectorMatch checkSelector(CSSSelector*,
                                 Element*,
                                 HashSet<AtomicStringImpl*>* selectorAttrs,
-                                RenderStyle::PseudoId& dynamicPseudo,
+                                PseudoId& dynamicPseudo,
                                 bool isAncestor,
                                 bool isSubSelector,
                                 RenderStyle* = 0,
@@ -236,14 +236,13 @@ class CSSStyleSelector : Noncopyable {
     bool checkOneSelector(CSSSelector*,
                           Element*,
                           HashSet<AtomicStringImpl*>* selectorAttrs,
-                          RenderStyle::PseudoId& dynamicPseudo,
+                          PseudoId& dynamicPseudo,
                           bool isAncestor,
                           bool isSubSelector,
                           RenderStyle*,
                           RenderStyle* elementParentStyle) const;
     PseudoState checkPseudoState(Element*, bool checkVisited = true) const;
-    bool checkScrollbarPseudoClass(CSSSelector*,
-                                   RenderStyle::PseudoId& dynamicPseudo) const;
+    bool checkScrollbarPseudoClass(CSSSelector*, PseudoId& dynamicPseudo) const;
 
     void allVisitedStateChanged();
     void visitedStateChanged(LinkHash visitedHash);
@@ -251,7 +250,7 @@ class CSSStyleSelector : Noncopyable {
     Document* m_document;
     bool m_strictParsing;
     bool m_collectRulesOnly;
-    RenderStyle::PseudoId m_pseudoStyle;
+    PseudoId m_pseudoStyle;
     bool m_documentIsHTML;
     mutable HashSet<LinkHash, LinkHashHash> m_linksCheckedForVisitedState;
   };
@@ -312,7 +311,7 @@ class CSSStyleSelector : Noncopyable {
   MediaQueryEvaluator* m_medium;
   RefPtr<RenderStyle> m_rootDefaultStyle;
 
-  RenderStyle::PseudoId m_dynamicPseudo;
+  PseudoId m_dynamicPseudo;
 
   SelectorChecker m_checker;
 

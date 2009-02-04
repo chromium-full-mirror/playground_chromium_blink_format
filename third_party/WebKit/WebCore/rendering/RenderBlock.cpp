@@ -277,13 +277,13 @@ void RenderBlock::styleDidChange(RenderStyle::Diff diff,
   // Update pseudos for :before and :after now.
   if (!isAnonymous() && document()->usesBeforeAfterRules() &&
       canHaveChildren()) {
-    updateBeforeAfterContent(RenderStyle::BEFORE);
-    updateBeforeAfterContent(RenderStyle::AFTER);
+    updateBeforeAfterContent(BEFORE);
+    updateBeforeAfterContent(AFTER);
   }
   updateFirstLetter();
 }
 
-void RenderBlock::updateBeforeAfterContent(RenderStyle::PseudoId pseudoId) {
+void RenderBlock::updateBeforeAfterContent(PseudoId pseudoId) {
   // If this is an anonymous wrapper, then the parent applies its own
   // pseudo-element style to it.
   if (parent() && parent()->createsAnonymousWrapper())
@@ -4977,8 +4977,7 @@ RenderBlock* RenderBlock::firstLineBlock() const {
   RenderBlock* firstLineBlock = const_cast<RenderBlock*>(this);
   bool hasPseudo = false;
   while (true) {
-    hasPseudo =
-        firstLineBlock->style()->hasPseudoStyle(RenderStyle::FIRST_LINE);
+    hasPseudo = firstLineBlock->style()->hasPseudoStyle(FIRST_LINE);
     if (hasPseudo)
       break;
     RenderObject* parentBlock = firstLineBlock->parent();
@@ -5000,7 +4999,7 @@ void RenderBlock::updateFirstLetter() {
   if (!document()->usesFirstLetterRules())
     return;
   // Don't recurse
-  if (style()->styleType() == RenderStyle::FIRST_LETTER)
+  if (style()->styleType() == FIRST_LETTER)
     return;
 
   // FIXME: We need to destroy the first-letter object if it is no longer the
@@ -5013,9 +5012,8 @@ void RenderBlock::updateFirstLetter() {
     // We only honor first-letter if the firstLetterBlock can have children in
     // the DOM. This correctly
     // prevents form controls from honoring first-letter.
-    hasPseudoStyle =
-        firstLetterBlock->style()->hasPseudoStyle(RenderStyle::FIRST_LETTER) &&
-        firstLetterBlock->canHaveChildren();
+    hasPseudoStyle = firstLetterBlock->style()->hasPseudoStyle(FIRST_LETTER) &&
+                     firstLetterBlock->canHaveChildren();
     if (hasPseudoStyle)
       break;
     RenderObject* parentBlock = firstLetterBlock->parent();
@@ -5035,7 +5033,7 @@ void RenderBlock::updateFirstLetter() {
          (!currChild->isReplaced() || currChild->isFloatingOrPositioned()) &&
          !currChild->isText()) {
     if (currChild->isFloatingOrPositioned()) {
-      if (currChild->style()->styleType() == RenderStyle::FIRST_LETTER)
+      if (currChild->style()->styleType() == FIRST_LETTER)
         break;
       currChild = currChild->nextSibling();
     } else
@@ -5054,9 +5052,9 @@ void RenderBlock::updateFirstLetter() {
   // If the child already has style, then it has already been created, so we
   // just want
   // to update it.
-  if (currChild->style()->styleType() == RenderStyle::FIRST_LETTER) {
+  if (currChild->style()->styleType() == FIRST_LETTER) {
     RenderStyle* pseudo = firstLetterBlock->getCachedPseudoStyle(
-        RenderStyle::FIRST_LETTER, firstLetterContainer->firstLineStyle());
+        FIRST_LETTER, firstLetterContainer->firstLineStyle());
     currChild->setStyle(pseudo);
     for (RenderObject* genChild = currChild->firstChild(); genChild;
          genChild = genChild->nextSibling()) {
@@ -5068,7 +5066,7 @@ void RenderBlock::updateFirstLetter() {
 
   // If the child does not already have style, we create it here.
   if (currChild->isText() && !currChild->isBR() &&
-      currChild->parent()->style()->styleType() != RenderStyle::FIRST_LETTER) {
+      currChild->parent()->style()->styleType() != FIRST_LETTER) {
     // Our layout state is not valid for the repaints we are going to trigger by
     // adding and removing children of firstLetterContainer.
     view()->disableLayoutState();
@@ -5078,7 +5076,7 @@ void RenderBlock::updateFirstLetter() {
     // Create our pseudo style now that we have our firstLetterContainer
     // determined.
     RenderStyle* pseudoStyle = firstLetterBlock->getCachedPseudoStyle(
-        RenderStyle::FIRST_LETTER, firstLetterContainer->firstLineStyle());
+        FIRST_LETTER, firstLetterContainer->firstLineStyle());
 
     // Force inline display (except for floating first-letters)
     pseudoStyle->setDisplay(pseudoStyle->isFloating() ? BLOCK : INLINE);

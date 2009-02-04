@@ -3460,7 +3460,7 @@ int RenderBox::leftmostPosition(bool /*includeOverflowInterior*/,
 }
 
 bool RenderBox::isAfterContent(RenderObject* child) const {
-  return (child && child->style()->styleType() == RenderStyle::AFTER &&
+  return (child && child->style()->styleType() == AFTER &&
           (!child->isText() || child->isBR()));
 }
 

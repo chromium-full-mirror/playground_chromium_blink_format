@@ -74,7 +74,7 @@ class MediaControlShadowRootElement : public HTMLDivElement {
 
 class MediaTextDisplayElement : public HTMLDivElement {
  public:
-  MediaTextDisplayElement(Document*, RenderStyle::PseudoId, HTMLMediaElement*);
+  MediaTextDisplayElement(Document*, PseudoId, HTMLMediaElement*);
   void attachToParent(Element*);
   void update();
 
@@ -94,7 +94,7 @@ class MediaTimeDisplayElement : public MediaTextDisplayElement {
 class MediaControlInputElement : public HTMLInputElement {
  public:
   MediaControlInputElement(Document*,
-                           RenderStyle::PseudoId,
+                           PseudoId,
                            const String& type,
                            HTMLMediaElement*);
   void attachToParent(Element*);

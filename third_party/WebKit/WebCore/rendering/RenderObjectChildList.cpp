@@ -49,7 +49,7 @@ static void updateListMarkerNumbers(RenderObject* child) {
 void RenderObjectChildList::destroyLeftoverChildren() {
   while (firstChild()) {
     if (firstChild()->isListMarker() ||
-        (firstChild()->style()->styleType() == RenderStyle::FIRST_LETTER &&
+        (firstChild()->style()->styleType() == FIRST_LETTER &&
          !firstChild()->isText()))
       firstChild()->remove();  // List markers are owned by their enclosing list
                                // and so don't get destroyed by this container.
@@ -259,8 +259,8 @@ void RenderObjectChildList::insertChildNode(RenderObject* owner,
 }
 
 static RenderObject* beforeAfterContainer(RenderObject* container,
-                                          RenderStyle::PseudoId type) {
-  if (type == RenderStyle::BEFORE) {
+                                          PseudoId type) {
+  if (type == BEFORE) {
     RenderObject* first = container;
     do {
       // Skip list markers.
@@ -268,18 +268,17 @@ static RenderObject* beforeAfterContainer(RenderObject* container,
       while (first && first->isListMarker())
         first = first->nextSibling();
     } while (first && first->isAnonymous() &&
-             first->style()->styleType() == RenderStyle::NOPSEUDO);
+             first->style()->styleType() == NOPSEUDO);
     if (first && first->style()->styleType() != type)
       return 0;
     return first;
   }
-  if (type == RenderStyle::AFTER) {
+  if (type == AFTER) {
     RenderObject* last = container;
     do {
       last = last->lastChild();
     } while (last && last->isAnonymous() &&
-             last->style()->styleType() == RenderStyle::NOPSEUDO &&
-             !last->isListMarker());
+             last->style()->styleType() == NOPSEUDO && !last->isListMarker());
     if (last && last->style()->styleType() != type)
       return 0;
     return last;
@@ -316,23 +315,21 @@ static void invalidateCountersInContainer(RenderObject* container) {
 
 void RenderObjectChildList::invalidateCounters(RenderObject* owner) {
   ASSERT(!owner->documentBeingDestroyed());
-  invalidateCountersInContainer(
-      beforeAfterContainer(owner, RenderStyle::BEFORE));
-  invalidateCountersInContainer(
-      beforeAfterContainer(owner, RenderStyle::AFTER));
+  invalidateCountersInContainer(beforeAfterContainer(owner, BEFORE));
+  invalidateCountersInContainer(beforeAfterContainer(owner, AFTER));
 }
 
 void RenderObjectChildList::updateBeforeAfterContent(
     RenderObject* owner,
-    RenderStyle::PseudoId type,
+    PseudoId type,
     RenderObject* styledObject) {
   // Double check that the document did in fact use generated content rules.
   // Otherwise we should not have been called.
   ASSERT(owner->document()->usesBeforeAfterRules());
 
   // In CSS2, before/after pseudo-content cannot nest.  Check this first.
-  if (owner->style()->styleType() == RenderStyle::BEFORE ||
-      owner->style()->styleType() == RenderStyle::AFTER)
+  if (owner->style()->styleType() == BEFORE ||
+      owner->style()->styleType() == AFTER)
     return;
 
   if (!styledObject)
@@ -351,15 +348,15 @@ void RenderObjectChildList::updateBeforeAfterContent(
   // For <q><p/></q>, if this object is the inline continuation of the <q>, we
   // only want to generate
   // :after content and not :before content.
-  if (newContentWanted && type == RenderStyle::BEFORE &&
-      owner->isRenderInline() && toRenderInline(owner)->isInlineContinuation())
+  if (newContentWanted && type == BEFORE && owner->isRenderInline() &&
+      toRenderInline(owner)->isInlineContinuation())
     newContentWanted = false;
 
   // Similarly, if we're the beginning of a <q>, and there's an inline
   // continuation for our object,
   // then we don't generate the :after content.
-  if (newContentWanted && type == RenderStyle::AFTER &&
-      owner->isRenderInline() && toRenderInline(owner)->continuation())
+  if (newContentWanted && type == AFTER && owner->isRenderInline() &&
+      toRenderInline(owner)->continuation())
     newContentWanted = false;
 
   // If we don't want generated content any longer, or if we have generated
@@ -374,9 +371,8 @@ void RenderObjectChildList::updateBeforeAfterContent(
     if (child && child->style()->styleType() == type) {
       oldContentPresent = false;
       child->destroy();
-      child = (type == RenderStyle::BEFORE)
-                  ? owner->virtualChildren()->firstChild()
-                  : owner->virtualChildren()->lastChild();
+      child = (type == BEFORE) ? owner->virtualChildren()->firstChild()
+                               : owner->virtualChildren()->lastChild();
     }
   }
 
@@ -427,15 +423,14 @@ void RenderObjectChildList::updateBeforeAfterContent(
         } else
           // Must be a first-letter container. updateFirstLetter() will take
           // care of it.
-          ASSERT(genChild->style()->styleType() == RenderStyle::FIRST_LETTER);
+          ASSERT(genChild->style()->styleType() == FIRST_LETTER);
       }
     }
     return;  // We've updated the generated content. That's all we needed to do.
   }
 
-  RenderObject* insertBefore = (type == RenderStyle::BEFORE)
-                                   ? owner->virtualChildren()->firstChild()
-                                   : 0;
+  RenderObject* insertBefore =
+      (type == BEFORE) ? owner->virtualChildren()->firstChild() : 0;
 
   // Generated content consists of a single container that houses multiple
   // children (specified

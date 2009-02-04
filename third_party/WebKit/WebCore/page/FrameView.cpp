@@ -283,22 +283,21 @@ PassRefPtr<Scrollbar> FrameView::createScrollbar(
   // Try the <body> element first as a scrollbar source.
   Element* body = doc->body();
   if (body && body->renderer() &&
-      body->renderer()->style()->hasPseudoStyle(RenderStyle::SCROLLBAR))
+      body->renderer()->style()->hasPseudoStyle(SCROLLBAR))
     return RenderScrollbar::createCustomScrollbar(this, orientation,
                                                   body->renderBox());
 
   // If the <body> didn't have a custom style, then the root element might.
   Element* docElement = doc->documentElement();
   if (docElement && docElement->renderer() &&
-      docElement->renderer()->style()->hasPseudoStyle(RenderStyle::SCROLLBAR))
+      docElement->renderer()->style()->hasPseudoStyle(SCROLLBAR))
     return RenderScrollbar::createCustomScrollbar(this, orientation,
                                                   docElement->renderBox());
 
   // If we have an owning iframe/frame element, then it can set the custom
   // scrollbar also.
   RenderPart* frameRenderer = m_frame->ownerRenderer();
-  if (frameRenderer &&
-      frameRenderer->style()->hasPseudoStyle(RenderStyle::SCROLLBAR))
+  if (frameRenderer && frameRenderer->style()->hasPseudoStyle(SCROLLBAR))
     return RenderScrollbar::createCustomScrollbar(this, orientation,
                                                   frameRenderer);
 

@@ -1371,7 +1371,7 @@ PassRefPtr<Scrollbar> RenderLayer::createScrollbar(
                                      ->shadowAncestorNode()
                                      ->renderer()
                                      ->style()
-                                     ->hasPseudoStyle(RenderStyle::SCROLLBAR);
+                                     ->hasPseudoStyle(SCROLLBAR);
   if (hasCustomScrollbarStyle)
     widget = RenderScrollbar::createCustomScrollbar(
         this, orientation,
@@ -2953,8 +2953,8 @@ void RenderLayer::updateScrollCornerStyle() {
           : renderer();
   RefPtr<RenderStyle> corner =
       renderer()->hasOverflowClip()
-          ? actualRenderer->getUncachedPseudoStyle(
-                RenderStyle::SCROLLBAR_CORNER, actualRenderer->style())
+          ? actualRenderer->getUncachedPseudoStyle(SCROLLBAR_CORNER,
+                                                   actualRenderer->style())
           : 0;
   if (corner) {
     if (!m_scrollCorner) {
@@ -2974,11 +2974,10 @@ void RenderLayer::updateResizerStyle() {
       renderer()->node()->isElementNode()
           ? renderer()->node()->shadowAncestorNode()->renderer()
           : renderer();
-  RefPtr<RenderStyle> resizer =
-      renderer()->hasOverflowClip()
-          ? actualRenderer->getUncachedPseudoStyle(RenderStyle::RESIZER,
-                                                   actualRenderer->style())
-          : 0;
+  RefPtr<RenderStyle> resizer = renderer()->hasOverflowClip()
+                                    ? actualRenderer->getUncachedPseudoStyle(
+                                          RESIZER, actualRenderer->style())
+                                    : 0;
   if (resizer) {
     if (!m_resizer) {
       m_resizer = new (renderer()->renderArena())

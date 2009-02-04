@@ -523,8 +523,7 @@ PassRefPtr<RenderStyle> RenderTextControlSingleLine::createInnerTextStyle(
     const RenderStyle* startStyle) const {
   RefPtr<RenderStyle> textBlockStyle;
   if (placeholderShouldBeVisible()) {
-    RenderStyle* pseudoStyle =
-        getCachedPseudoStyle(RenderStyle::INPUT_PLACEHOLDER);
+    RenderStyle* pseudoStyle = getCachedPseudoStyle(INPUT_PLACEHOLDER);
     textBlockStyle = RenderStyle::clone(pseudoStyle);
   } else {
     textBlockStyle = RenderStyle::create();
@@ -585,13 +584,11 @@ PassRefPtr<RenderStyle> RenderTextControlSingleLine::createResultsButtonStyle(
 
   RefPtr<RenderStyle> resultsBlockStyle;
   if (input->maxResults() < 0)
-    resultsBlockStyle = getCachedPseudoStyle(RenderStyle::SEARCH_DECORATION);
+    resultsBlockStyle = getCachedPseudoStyle(SEARCH_DECORATION);
   else if (!input->maxResults())
-    resultsBlockStyle =
-        getCachedPseudoStyle(RenderStyle::SEARCH_RESULTS_DECORATION);
+    resultsBlockStyle = getCachedPseudoStyle(SEARCH_RESULTS_DECORATION);
   else
-    resultsBlockStyle =
-        getCachedPseudoStyle(RenderStyle::SEARCH_RESULTS_BUTTON);
+    resultsBlockStyle = getCachedPseudoStyle(SEARCH_RESULTS_BUTTON);
 
   if (!resultsBlockStyle)
     resultsBlockStyle = RenderStyle::create();
@@ -608,7 +605,7 @@ PassRefPtr<RenderStyle> RenderTextControlSingleLine::createCancelButtonStyle(
   RefPtr<RenderStyle> cancelBlockStyle;
 
   if (RefPtr<RenderStyle> pseudoStyle =
-          getCachedPseudoStyle(RenderStyle::SEARCH_CANCEL_BUTTON))
+          getCachedPseudoStyle(SEARCH_CANCEL_BUTTON))
     // We may be sharing style with another search field, but we must not share
     // the cancel button style.
     cancelBlockStyle = RenderStyle::clone(pseudoStyle.get());
@@ -787,8 +784,7 @@ PassRefPtr<Scrollbar> RenderTextControlSingleLine::createScrollbar(
     ScrollbarOrientation orientation,
     ScrollbarControlSize controlSize) {
   RefPtr<Scrollbar> widget;
-  bool hasCustomScrollbarStyle =
-      style()->hasPseudoStyle(RenderStyle::SCROLLBAR);
+  bool hasCustomScrollbarStyle = style()->hasPseudoStyle(SCROLLBAR);
   if (hasCustomScrollbarStyle)
     widget = RenderScrollbar::createCustomScrollbar(client, orientation, this);
   else

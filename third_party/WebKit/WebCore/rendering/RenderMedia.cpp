@@ -143,7 +143,7 @@ void RenderMedia::createControlsShadowRoot() {
 
 void RenderMedia::createPanel() {
   ASSERT(!m_panel);
-  RenderStyle* style = getCachedPseudoStyle(RenderStyle::MEDIA_CONTROLS_PANEL);
+  RenderStyle* style = getCachedPseudoStyle(MEDIA_CONTROLS_PANEL);
   m_panel = new HTMLDivElement(HTMLNames::divTag, document());
   RenderObject* renderer = m_panel->createRenderer(renderArena(), style);
   if (renderer) {
@@ -184,8 +184,7 @@ void RenderMedia::createSeekForwardButton() {
 
 void RenderMedia::createTimelineContainer() {
   ASSERT(!m_timelineContainer);
-  RenderStyle* style =
-      getCachedPseudoStyle(RenderStyle::MEDIA_CONTROLS_TIMELINE_CONTAINER);
+  RenderStyle* style = getCachedPseudoStyle(MEDIA_CONTROLS_TIMELINE_CONTAINER);
   m_timelineContainer = new HTMLDivElement(HTMLNames::divTag, document());
   RenderObject* renderer =
       m_timelineContainer->createRenderer(renderArena(), style);

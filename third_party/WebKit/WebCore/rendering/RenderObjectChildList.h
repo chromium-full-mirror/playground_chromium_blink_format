@@ -26,7 +26,7 @@
 #ifndef RenderObjectChildList_h
 #define RenderObjectChildList_h
 
-#include "RenderStyle.h"
+#include "RenderStyleConstants.h"
 
 namespace WebCore {
 
@@ -60,7 +60,7 @@ class RenderObjectChildList {
                        bool fullInsert = true);
 
   void updateBeforeAfterContent(RenderObject* owner,
-                                RenderStyle::PseudoId type,
+                                PseudoId type,
                                 RenderObject* styledObject = 0);
   void invalidateCounters(RenderObject* owner);
 

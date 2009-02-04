@@ -159,7 +159,7 @@ class RenderBlock : public RenderContainer {
   virtual void borderFitAdjust(int& x, int& w)
       const;  // Shrink the box in which the border paints if border-fit is set.
 
-  virtual void updateBeforeAfterContent(RenderStyle::PseudoId pseudoId);
+  virtual void updateBeforeAfterContent(PseudoId);
 
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
                                      bool isRootLineBox,
