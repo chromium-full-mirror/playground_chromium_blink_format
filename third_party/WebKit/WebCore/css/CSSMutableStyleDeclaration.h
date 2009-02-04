@@ -199,7 +199,7 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
   Vector<CSSProperty>::const_iterator findPropertyWithId(int propertyId) const;
   Vector<CSSProperty>::iterator findPropertyWithId(int propertyId);
 
-  Vector<CSSProperty> m_properties;
+  Vector<CSSProperty, 4> m_properties;
 
   Node* m_node;
   unsigned m_variableDependentValueCount : 24;
