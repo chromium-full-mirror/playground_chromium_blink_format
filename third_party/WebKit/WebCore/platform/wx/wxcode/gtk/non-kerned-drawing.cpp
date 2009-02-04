@@ -49,9 +49,9 @@ void drawTextWithSpacing(GraphicsContext* graphicsContext,
   wxDC* dc = graphicsContext->platformContext();
 #endif
 
-  wxFont wxfont = font->getWxFont();
-  if (wxfont.IsOk())
-    dc->SetFont(wxfont);
+  wxFont* wxfont = font->getWxFont();
+  if (wxfont && wxfont->IsOk())
+    dc->SetFont(*wxfont);
   dc->SetTextForeground(color);
 
   // convert glyphs to wxString
