@@ -152,9 +152,8 @@ void RenderLayerCompositor::updateCompositingLayers(RenderLayer* updateRoot) {
   ASSERT(!m_compositingLayersNeedUpdate);
 }
 
-bool RenderLayerCompositor::updateLayerCompositingState(
-    RenderLayer* layer,
-    RenderStyle::Diff diff) {
+bool RenderLayerCompositor::updateLayerCompositingState(RenderLayer* layer,
+                                                        StyleDifference diff) {
   bool needsLayer = needsToBeComposited(layer);
   bool layerChanged = false;
   if (needsLayer) {
@@ -192,7 +191,7 @@ bool RenderLayerCompositor::updateLayerCompositingState(
 
   if (layer->backing()->updateGraphicsLayers(
           needsContentsCompositingLayer(layer), clippedByAncestor(layer),
-          clipsCompositingDescendants(layer), diff >= RenderStyle::Repaint))
+          clipsCompositingDescendants(layer), diff >= StyleDifferenceRepaint))
     layerChanged = true;
 
   return layerChanged;
@@ -488,7 +487,7 @@ void RenderLayerCompositor::parentInRootLayer(RenderLayer* layer) {
 void RenderLayerCompositor::rebuildCompositingLayerTree(
     RenderLayer* layer,
     struct CompositingState& ioCompState) {
-  updateLayerCompositingState(layer, RenderStyle::Equal);
+  updateLayerCompositingState(layer, StyleDifferenceEqual);
 
   // host the document layer in the RenderView's root layer
   if (layer->isDocumentLayer())

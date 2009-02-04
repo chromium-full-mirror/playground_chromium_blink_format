@@ -60,8 +60,8 @@ class RenderButton : public RenderFlexibleBox {
   virtual bool canHaveChildren() const;
 
  protected:
-  virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
   virtual bool hasLineIfEmpty() const { return true; }
 

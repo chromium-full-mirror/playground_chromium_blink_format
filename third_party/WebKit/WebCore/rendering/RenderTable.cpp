@@ -67,7 +67,7 @@ RenderTable::~RenderTable() {
   delete m_tableLayout;
 }
 
-void RenderTable::styleDidChange(RenderStyle::Diff diff,
+void RenderTable::styleDidChange(StyleDifference diff,
                                  const RenderStyle* oldStyle) {
   RenderBlock::styleDidChange(diff, oldStyle);
 

@@ -77,7 +77,7 @@ class RenderTextControlSingleLine : public RenderTextControl,
   void createSubtreeIfNeeded();
   virtual void updateFromElement();
   virtual void cacheSelection(int start, int end);
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
   virtual PassRefPtr<RenderStyle> createInnerTextStyle(
       const RenderStyle* startStyle) const;

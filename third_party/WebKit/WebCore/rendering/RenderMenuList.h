@@ -72,7 +72,7 @@ class RenderMenuList : public RenderFlexibleBox, private PopupMenuClient {
   String text() const;
 
  private:
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
   // PopupMenuClient methods
   virtual String itemText(unsigned listIndex) const;

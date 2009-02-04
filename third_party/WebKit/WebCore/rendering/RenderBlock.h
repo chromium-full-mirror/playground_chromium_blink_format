@@ -477,8 +477,8 @@ class RenderBlock : public RenderContainer {
   void markLinesDirtyInVerticalRange(int top, int bottom);
 
  protected:
-  virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
   void newLine(EClear);
   virtual bool hasLineIfEmpty() const;

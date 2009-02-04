@@ -220,11 +220,11 @@ void RenderBlock::destroy() {
   RenderContainer::destroy();
 }
 
-void RenderBlock::styleWillChange(RenderStyle::Diff diff,
+void RenderBlock::styleWillChange(StyleDifference diff,
                                   const RenderStyle* newStyle) {
   setReplaced(newStyle->isDisplayReplacedType());
 
-  if (style() && parent() && diff == RenderStyle::Layout &&
+  if (style() && parent() && diff == StyleDifferenceLayout &&
       style()->position() != newStyle->position()) {
     if (newStyle->position() == StaticPosition)
       // Clear our positioned objects list. Our absolutely positioned
@@ -256,7 +256,7 @@ void RenderBlock::styleWillChange(RenderStyle::Diff diff,
   RenderContainer::styleWillChange(diff, newStyle);
 }
 
-void RenderBlock::styleDidChange(RenderStyle::Diff diff,
+void RenderBlock::styleDidChange(StyleDifference diff,
                                  const RenderStyle* oldStyle) {
   RenderContainer::styleDidChange(diff, oldStyle);
 

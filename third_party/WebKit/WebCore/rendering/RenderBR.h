@@ -75,7 +75,7 @@ class RenderBR : public RenderText {
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
  protected:
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
  private:
   mutable int m_lineHeight;

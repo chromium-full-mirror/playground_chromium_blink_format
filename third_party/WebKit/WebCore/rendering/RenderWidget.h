@@ -66,7 +66,7 @@ class RenderWidget : public RenderReplaced {
                            HitTestAction);
 
  protected:
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
  private:
   void setWidgetGeometry(const IntRect&);

@@ -38,7 +38,7 @@ RenderSVGGradientStop::RenderSVGGradientStop(SVGStopElement* element)
 
 RenderSVGGradientStop::~RenderSVGGradientStop() {}
 
-void RenderSVGGradientStop::styleDidChange(RenderStyle::Diff diff,
+void RenderSVGGradientStop::styleDidChange(StyleDifference diff,
                                            const RenderStyle* oldStyle) {
   RenderObject::styleDidChange(diff, oldStyle);
 

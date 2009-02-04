@@ -57,7 +57,7 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
   bool allowsMultipleFiles();
 
  protected:
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
  private:
   int maxFilenameWidth() const;

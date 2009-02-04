@@ -69,7 +69,7 @@ class RenderReplaced : public RenderBox {
   bool isSelected() const;
 
  protected:
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
   void setIntrinsicSize(const IntSize&);
   virtual void intrinsicSizeChanged();

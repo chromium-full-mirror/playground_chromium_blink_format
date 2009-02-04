@@ -100,7 +100,7 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   virtual void setScrollTop(int);
 
  protected:
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
  private:
   // ScrollbarClient interface.

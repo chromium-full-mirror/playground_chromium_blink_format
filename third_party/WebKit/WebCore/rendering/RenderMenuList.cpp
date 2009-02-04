@@ -120,7 +120,7 @@ void RenderMenuList::removeChild(RenderObject* oldChild) {
     m_innerBlock->removeChild(oldChild);
 }
 
-void RenderMenuList::styleDidChange(RenderStyle::Diff diff,
+void RenderMenuList::styleDidChange(StyleDifference diff,
                                     const RenderStyle* oldStyle) {
   RenderBlock::styleDidChange(diff, oldStyle);
 

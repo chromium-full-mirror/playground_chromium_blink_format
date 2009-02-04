@@ -92,7 +92,7 @@ class RenderTextControl : public RenderBlock {
                             RenderStyle* textBlockStyle) const;
   void setInnerTextValue(const String&);
 
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
   void createSubtreeIfNeeded(TextControlInnerElement* innerBlock);
   void hitInnerTextBlock(HitTestResult&, int x, int y, int tx, int ty);

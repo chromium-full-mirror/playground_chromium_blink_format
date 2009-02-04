@@ -65,7 +65,7 @@ class RenderLayerCompositor {
 
   // Update the compositing state of the given layer. Returns true if that state
   // changed
-  bool updateLayerCompositingState(RenderLayer*, RenderStyle::Diff);
+  bool updateLayerCompositingState(RenderLayer*, StyleDifference);
 
   // Return the bounding box required for compositing layer and its childern,
   // relative to ancestorLayer.

@@ -438,8 +438,8 @@ class RenderBox : public RenderObject {
 #endif
 
  protected:
-  virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
   void paintFillLayer(const PaintInfo&,
                       const Color&,

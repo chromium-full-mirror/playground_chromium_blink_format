@@ -56,7 +56,7 @@ RenderReplaced::~RenderReplaced() {
     gOverflowRectMap->remove(this);
 }
 
-void RenderReplaced::styleDidChange(RenderStyle::Diff diff,
+void RenderReplaced::styleDidChange(StyleDifference diff,
                                     const RenderStyle* oldStyle) {
   RenderBox::styleDidChange(diff, oldStyle);
 

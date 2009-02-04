@@ -50,7 +50,7 @@ class RenderSVGGradientStop : public RenderObject {
   }
 
  protected:
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
  private:
   SVGGradientElement* gradientElement() const;

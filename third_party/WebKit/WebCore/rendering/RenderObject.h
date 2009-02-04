@@ -948,9 +948,9 @@ class RenderObject : public CachedResourceClient {
 
  protected:
   // Overrides should call the superclass at the end
-  virtual void styleWillChange(RenderStyle::Diff, const RenderStyle* newStyle);
+  virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
   // Overrides should call the superclass at the start
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
   virtual void printBoxDecorations(GraphicsContext*,
                                    int /*x*/,

@@ -211,7 +211,7 @@ class RenderLayer : public ScrollbarClient {
                                                         // object
 #endif
 
-  void styleChanged(RenderStyle::Diff, const RenderStyle*);
+  void styleChanged(StyleDifference, const RenderStyle*);
 
   RenderMarquee* marquee() const { return m_marquee; }
   void suspendMarquees();

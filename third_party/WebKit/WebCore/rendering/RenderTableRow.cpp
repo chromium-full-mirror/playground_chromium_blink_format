@@ -55,7 +55,7 @@ void RenderTableRow::destroy() {
     recalcSection->setNeedsCellRecalc();
 }
 
-void RenderTableRow::styleWillChange(RenderStyle::Diff diff,
+void RenderTableRow::styleWillChange(StyleDifference diff,
                                      const RenderStyle* newStyle) {
   if (section() && style() && style()->height() != newStyle->height())
     section()->setNeedsCellRecalc();

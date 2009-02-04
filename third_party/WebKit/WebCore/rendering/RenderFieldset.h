@@ -46,7 +46,7 @@ class RenderFieldset : public RenderBlock {
   RenderBox* findLegend() const;
 
  protected:
-  virtual void styleDidChange(RenderStyle::Diff, const RenderStyle* oldStyle);
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
  private:
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
