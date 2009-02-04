@@ -65,7 +65,6 @@ class Editor;
 class EventHandler;
 class FrameLoader;
 class FrameLoaderClient;
-class FramePrivate;
 class FrameTree;
 class HTMLFrameOwnerElement;
 class HTMLTableCellElement;
@@ -133,8 +132,6 @@ class Frame : public RefCounted<Frame> {
                   bool,
                   ScrollbarMode = ScrollbarAuto,
                   ScrollbarMode = ScrollbarAuto);
-
-  friend class FramePrivate;
 
  private:
   Frame(Page*, HTMLFrameOwnerElement*, FrameLoaderClient*);
