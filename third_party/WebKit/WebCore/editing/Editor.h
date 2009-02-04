@@ -167,6 +167,9 @@ class Editor {
 
   bool clientIsEditable() const;
 
+  void setShouldStyleWithCSS(bool flag) { m_shouldStyleWithCSS = flag; }
+  bool shouldStyleWithCSS() const { return m_shouldStyleWithCSS; }
+
   class Command {
    public:
     Command();
@@ -317,6 +320,7 @@ class Editor {
   Vector<CompositionUnderline> m_customCompositionUnderlines;
   bool m_ignoreCompositionSelectionChange;
   bool m_shouldStartNewKillRingSequence;
+  bool m_shouldStyleWithCSS;
 
   bool canDeleteRange(Range*) const;
   bool canSmartReplaceWithPasteboard(Pasteboard*);

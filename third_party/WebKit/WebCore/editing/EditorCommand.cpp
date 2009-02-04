@@ -1274,6 +1274,17 @@ static bool executeStrikethrough(Frame* frame,
                             "line-through");
 }
 
+static bool executeStyleWithCSS(Frame* frame,
+                                Event*,
+                                EditorCommandSource,
+                                const String& value) {
+  if (value != "false" && value != "true")
+    return false;
+
+  frame->editor()->setShouldStyleWithCSS(value == "true" ? true : false);
+  return true;
+}
+
 static bool executeSubscript(Frame* frame,
                              Event*,
                              EditorCommandSource source,
@@ -1534,6 +1545,10 @@ static TriState stateOrderedList(Frame* frame, Event*) {
 
 static TriState stateStrikethrough(Frame* frame, Event*) {
   return stateStyle(frame, CSSPropertyTextDecoration, "line-through");
+}
+
+static TriState stateStyleWithCSS(Frame* frame, Event*) {
+  return frame->editor()->shouldStyleWithCSS() ? TrueTriState : FalseTriState;
 }
 
 static TriState stateSubscript(Frame* frame, Event*) {
@@ -2002,6 +2017,10 @@ static const CommandMap& createCommandMap() {
       {"Strikethrough",
        {executeStrikethrough, supported, enabledInRichlyEditableText,
         stateStrikethrough, valueNull, notTextInsertion,
+        doNotAllowExecutionWhenDisabled}},
+      {"StyleWithCSS",
+       {executeStyleWithCSS, supported, enabledInRichlyEditableText,
+        stateStyleWithCSS, valueNull, notTextInsertion,
         doNotAllowExecutionWhenDisabled}},
       {"Subscript",
        {executeSubscript, supported, enabledInRichlyEditableText,
