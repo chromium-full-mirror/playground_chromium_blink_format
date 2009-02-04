@@ -108,7 +108,10 @@ UniscribeHelper::UniscribeHelper(const UChar* input,
       m_letterSpacing(0),
       m_spaceWidth(0),
       m_wordSpacing(0),
-      m_ascent(0) {
+      m_ascent(0),
+      m_disableFontFallback(false)
+
+{
   m_logfont.lfFaceName[0] = 0;
 }
 
@@ -508,7 +511,10 @@ bool UniscribeHelper::shape(const UChar* input,
   HDC tempDC = 0;
   HGDIOBJ oldFont = 0;
   HRESULT hr;
-  bool lastFallbackTried = false;
+  // When used to fill up glyph pages for simple scripts in non-BMP,
+  // we don't want any font fallback in this class. The simple script
+  // font path can take care of font fallback.
+  bool lastFallbackTried = m_disableFontFallback;
   bool result;
 
   int generatedGlyphs = 0;
@@ -570,7 +576,8 @@ bool UniscribeHelper::shape(const UChar* input,
       tempDC = 0;
     }
 
-    if (nextWinFontData(&hfont, &scriptCache, &fontProperties, &ascent)) {
+    if (!m_disableFontFallback &&
+        nextWinFontData(&hfont, &scriptCache, &fontProperties, &ascent)) {
       // The primary font does not support this run. Try next font.
       // In case of web page rendering, they come from fonts specified in
       // CSS stylesheets.
@@ -682,6 +689,13 @@ void UniscribeHelper::fillShapes() {
     // the fallback list and then script-specific last resort font.
     Shaping& shaping = m_shapes[i];
     if (!shape(&m_input[startItem], itemLength, numGlyphs, m_runs[i], shaping))
+      continue;
+
+    // At the moment, the only time m_disableFontFallback is set is
+    // when we look up glyph indices for non-BMP code ranges. So,
+    // we can skip the glyph placement. When that becomes not the case
+    // any more, we have to add a new flag to control glyph placement.
+    if (m_disableFontFallback)
       continue;
 
     // Compute placements. Note that offsets is documented incorrectly
