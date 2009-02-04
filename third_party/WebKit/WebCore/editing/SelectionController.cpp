@@ -904,8 +904,9 @@ bool SelectionController::recomputeCaretRect() {
     return false;
 
   if (RenderView* view = toRenderView(m_frame->document()->renderer())) {
-    view->repaintViewRectangle(oldAbsRepaintRect, false);
-    view->repaintViewRectangle(m_absCaretBounds, false);
+    // FIXME: make caret repainting container-aware.
+    view->repaintRectangleInViewAndCompositedLayers(oldAbsRepaintRect, false);
+    view->repaintRectangleInViewAndCompositedLayers(m_absCaretBounds, false);
   }
 
   return true;
@@ -936,7 +937,8 @@ void SelectionController::invalidateCaretRect() {
 
   if (!caretRectChanged) {
     if (RenderView* view = toRenderView(d->renderer()))
-      view->repaintViewRectangle(caretRepaintRect(), false);
+      view->repaintRectangleInViewAndCompositedLayers(caretRepaintRect(),
+                                                      false);
   }
 }
 
@@ -1225,7 +1227,8 @@ void SelectionController::focusedOrActiveStateChanged() {
   // RenderObject::selectionForegroundColor() check if the frame is active,
   // we have to update places those colors were painted.
   if (RenderView* view = toRenderView(m_frame->document()->renderer()))
-    view->repaintViewRectangle(enclosingIntRect(m_frame->selectionBounds()));
+    view->repaintRectangleInViewAndCompositedLayers(
+        enclosingIntRect(m_frame->selectionBounds()));
 
   // Caret appears in the active frame.
   if (activeAndFocused)

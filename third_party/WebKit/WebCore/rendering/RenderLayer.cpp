@@ -180,15 +180,9 @@ RenderLayer::RenderLayer(RenderBox* renderer)
       m_marquee(0),
       m_staticX(0),
       m_staticY(0),
-      m_transform(0),
       m_reflection(0),
       m_scrollCorner(0),
-      m_resizer(0)
-#if USE(ACCELERATED_COMPOSITING)
-      ,
-      m_backing(0)
-#endif
-{
+      m_resizer(0) {
   if (!renderer->firstChild() && renderer->style()) {
     m_visibleContentStatusDirty = false;
     m_hasVisibleContent = renderer->style()->visibility() == VISIBLE;
@@ -234,6 +228,7 @@ RenderLayer::~RenderLayer() {
 
 #if USE(ACCELERATED_COMPOSITING)
 RenderLayerCompositor* RenderLayer::compositor() const {
+  ASSERT(renderer()->view());
   return renderer()->view()->compositor();
 }
 #endif  // USE(ACCELERATED_COMPOSITING)
@@ -307,6 +302,9 @@ void RenderLayer::updateLayerPositions(bool doFullRepaint,
     child->updateLayerPositions(doFullRepaint, checkForRepaint);
 
 #if USE(ACCELERATED_COMPOSITING)
+  if (!parent())
+    compositor()->updateRootLayerPosition();
+
   if (isComposited())
     backing()->updateAfterLayout();
 #endif
@@ -694,7 +692,8 @@ void RenderLayer::addChild(RenderLayer* child, RenderLayer* beforeChild) {
 
 RenderLayer* RenderLayer::removeChild(RenderLayer* oldChild) {
 #if USE(ACCELERATED_COMPOSITING)
-  compositor()->layerWillBeRemoved(this, oldChild);
+  if (!renderer()->documentBeingDestroyed())
+    compositor()->layerWillBeRemoved(this, oldChild);
 #endif
 
   // remove the child
@@ -2617,7 +2616,8 @@ void RenderLayer::clearClipRects() {
 
 #if USE(ACCELERATED_COMPOSITING)
 RenderLayerBacking* RenderLayer::ensureBacking() {
-  m_backing.adopt(new RenderLayerBacking(this));
+  if (!m_backing)
+    m_backing.set(new RenderLayerBacking(this));
   return m_backing.get();
 }
 

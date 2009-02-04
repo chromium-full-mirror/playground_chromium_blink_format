@@ -448,7 +448,7 @@ class RenderLayer : public ScrollbarClient {
 
 #if USE(ACCELERATED_COMPOSITING)
   bool isComposited() const { return m_backing != 0; }
-  RenderLayerBacking* backing() const { return m_backing; }
+  RenderLayerBacking* backing() const { return m_backing.get(); }
   RenderLayerBacking* ensureBacking();
   void clearBacking();
 #else

@@ -28,6 +28,7 @@
 #if USE(ACCELERATED_COMPOSITING)
 
 #include "AnimationController.h"
+#include "CSSPropertyNames.h"
 #include "CSSStyleSelector.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
@@ -175,7 +176,7 @@ void RenderLayerBacking::updateGraphicsLayerGeometry() {
   m_compositingContentOffsetDirty = true;
 
   RenderLayer* compAncestor =
-      compositor()->enclosingCompositingLayer(m_owningLayer, false);
+      compositor()->ancestorCompositingLayer(m_owningLayer);
 
   // We compute everything relative to the enclosing compositing layer.
   IntRect ancestorCompositingBounds;
@@ -703,9 +704,7 @@ void RenderLayerBacking::paintIntoLayer(
     return;
   }
 
-  if (m_owningLayer->isStackingContext() &&
-      (m_owningLayer->m_zOrderListsDirty || m_owningLayer->m_overflowListDirty))
-    compositor()->updateCompositingLayers(m_owningLayer);
+  m_owningLayer->updateLayerListsIfNeeded();
 
   // Calculate the clip rects we should use.
   IntRect layerBounds, damageRect, clipRectToApply, outlineRect;
@@ -989,13 +988,13 @@ bool RenderLayerBacking::startTransition(double beginTime,
 void RenderLayerBacking::notifyTransitionStarted(const GraphicsLayer*,
                                                  AnimatedPropertyID property,
                                                  double time) {
-  renderer()->notifyTransitionStarted(graphicsLayerToCSSProperty(property),
-                                      time);
+  renderer()->animation()->notifyTransitionStarted(
+      renderer(), graphicsLayerToCSSProperty(property), time);
 }
 
 void RenderLayerBacking::notifyAnimationStarted(const GraphicsLayer*,
                                                 double time) {
-  renderer()->notifyAnimationStarted(time);
+  renderer()->animation()->notifyAnimationStarted(renderer(), time);
 }
 
 void RenderLayerBacking::animationFinished(const String& name,
