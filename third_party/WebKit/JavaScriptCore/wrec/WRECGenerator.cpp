@@ -68,13 +68,6 @@ void Generator::generateEnter() {
   peek(output, 3);
 #endif
 #endif
-
-#ifndef NDEBUG
-  // ASSERT that the output register is not null.
-  Jump outputNotNull = jnzPtr(output);
-  breakpoint();
-  outputNotNull.link(this);
-#endif
 }
 
 void Generator::generateReturnSuccess() {
@@ -98,20 +91,20 @@ void Generator::generateSaveIndex() {
 void Generator::generateIncrementIndex(Jump* failure) {
   peek(index);
   if (failure)
-    *failure = je32(length, index);
+    *failure = branch32(Equal, length, index);
   add32(Imm32(1), index);
   poke(index);
 }
 
 void Generator::generateLoadCharacter(JumpList& failures) {
-  failures.append(je32(length, index));
+  failures.append(branch32(Equal, length, index));
   load16(BaseIndex(input, index, TimesTwo), character);
 }
 
 // For the sake of end-of-line assertions, we treat one-past-the-end as if it
 // were part of the input string.
 void Generator::generateJumpIfNotEndOfInput(Label target) {
-  jle32(index, length, target);
+  branch32(LessThanOrEqual, index, length, target);
 }
 
 void Generator::generateReturnFailure() {
@@ -142,7 +135,8 @@ void Generator::generateBackreferenceQuantifier(JumpList& failures,
 
   load32(Address(output, (2 * subpatternId) * sizeof(int)), character);
   Jump skipIfEmpty =
-      je32(Address(output, ((2 * subpatternId) + 1) * sizeof(int)), character);
+      branch32(Equal, Address(output, ((2 * subpatternId) + 1) * sizeof(int)),
+               character);
 
   ASSERT(quantifierType == Quantifier::Greedy ||
          quantifierType == Quantifier::NonGreedy);
@@ -176,7 +170,7 @@ void Generator::generateNonGreedyQuantifier(JumpList& failures,
   Label alternativeFailed(this);
   pop(index);
   if (max != Quantifier::Infinity)
-    je32(repeatCount, Imm32(max), quantifierFailed);
+    branch32(Equal, repeatCount, Imm32(max), quantifierFailed);
 
   // (1) Read an atom.
   if (min)
@@ -188,7 +182,7 @@ void Generator::generateNonGreedyQuantifier(JumpList& failures,
 
   // (2) Keep reading if we're under the minimum.
   if (min > 1)
-    jl32(repeatCount, Imm32(min), readAtom);
+    branch32(LessThan, repeatCount, Imm32(min), readAtom);
 
   // (3) Test the rest of the alternative.
   if (!min)
@@ -224,7 +218,7 @@ void Generator::generateGreedyQuantifier(JumpList& failures,
   else if (max == 1)
     doneReadingAtomsList.append(jump());
   else {
-    jne32(repeatCount, Imm32(max), readAtom);
+    branch32(NotEqual, repeatCount, Imm32(max), readAtom);
     doneReadingAtomsList.append(jump());
   }
 
@@ -241,7 +235,7 @@ void Generator::generateGreedyQuantifier(JumpList& failures,
 
   // (2) Verify that we have enough atoms.
   doneReadingAtomsList.link(this);
-  jl32(repeatCount, Imm32(min), quantifierFailed);
+  branch32(LessThan, repeatCount, Imm32(min), quantifierFailed);
 
   // (3) Test the rest of the alternative.
   push(index);
@@ -283,7 +277,7 @@ bool Generator::generatePatternCharacterPair(JumpList& failures,
 
   // Optimistically consume 2 characters.
   add32(Imm32(2), index);
-  failures.append(jg32(index, length));
+  failures.append(branch32(GreaterThan, index, length));
 
   // Load the characters we just consumed, offset -2 characters from index.
   load32(BaseIndex(input, index, TimesTwo, -2 * 2), character);
@@ -312,7 +306,7 @@ bool Generator::generatePatternCharacterPair(JumpList& failures,
   }
   int pair = ch1 | (ch2 << 16);
 
-  failures.append(jne32(character, Imm32(pair)));
+  failures.append(branch32(NotEqual, character, Imm32(pair)));
   return true;
 }
 
@@ -334,14 +328,14 @@ void Generator::generatePatternCharacter(JumpList& failures, int ch) {
     } else if (!isASCII(ch) && ((lower = Unicode::toLower(ch)) !=
                                 (upper = Unicode::toUpper(ch)))) {
       // handle unicode case sentitive characters - branch to success on upper
-      isUpper = je32(character, Imm32(upper));
+      isUpper = branch32(Equal, character, Imm32(upper));
       hasUpper = true;
       ch = lower;
     }
   }
 
   // checks for ch, or lower case version of ch, if insensitive
-  failures.append(jne32(character, Imm32((unsigned short)ch)));
+  failures.append(branch32(NotEqual, character, Imm32((unsigned short)ch)));
 
   if (m_parser.ignoreCase() && hasUpper) {
     // for unicode case insensitive matches, branch here if upper matches.
@@ -371,7 +365,8 @@ void Generator::generateCharacterClassInvertedRange(
     // if there is anything else to check, check that first, if it falls through
     // jmp to failure.
     if ((*matchIndex < matchCount) && (matches[*matchIndex] < lo)) {
-      Jump loOrAbove = jge32(character, Imm32((unsigned short)lo));
+      Jump loOrAbove =
+          branch32(GreaterThanOrEqual, character, Imm32((unsigned short)lo));
 
       // generate code for all ranges before this one
       if (which)
@@ -379,15 +374,16 @@ void Generator::generateCharacterClassInvertedRange(
                                             matchIndex, matches, matchCount);
 
       while ((*matchIndex < matchCount) && (matches[*matchIndex] < lo)) {
-        matchDest.append(
-            je32(character, Imm32((unsigned short)matches[*matchIndex])));
+        matchDest.append(branch32(Equal, character,
+                                  Imm32((unsigned short)matches[*matchIndex])));
         ++*matchIndex;
       }
       failures.append(jump());
 
       loOrAbove.link(this);
     } else if (which) {
-      Jump loOrAbove = jge32(character, Imm32((unsigned short)lo));
+      Jump loOrAbove =
+          branch32(GreaterThanOrEqual, character, Imm32((unsigned short)lo));
 
       generateCharacterClassInvertedRange(failures, matchDest, ranges, which,
                                           matchIndex, matches, matchCount);
@@ -395,12 +391,13 @@ void Generator::generateCharacterClassInvertedRange(
 
       loOrAbove.link(this);
     } else
-      failures.append(jl32(character, Imm32((unsigned short)lo)));
+      failures.append(branch32(LessThan, character, Imm32((unsigned short)lo)));
 
     while ((*matchIndex < matchCount) && (matches[*matchIndex] <= hi))
       ++*matchIndex;
 
-    matchDest.append(jle32(character, Imm32((unsigned short)hi)));
+    matchDest.append(
+        branch32(LessThanOrEqual, character, Imm32((unsigned short)hi)));
     // fall through to here, the value is above hi.
 
     // shuffle along & loop around if there are any more matches to handle.
@@ -415,12 +412,12 @@ void Generator::generateCharacterClassInverted(
     const CharacterClass& charClass) {
   Jump unicodeFail;
   if (charClass.numMatchesUnicode || charClass.numRangesUnicode) {
-    Jump isAscii = jle32(character, Imm32(0x7f));
+    Jump isAscii = branch32(LessThanOrEqual, character, Imm32(0x7f));
 
     if (charClass.numMatchesUnicode) {
       for (unsigned i = 0; i < charClass.numMatchesUnicode; ++i) {
         UChar ch = charClass.matchesUnicode[i];
-        matchDest.append(je32(character, Imm32(ch)));
+        matchDest.append(branch32(Equal, character, Imm32(ch)));
       }
     }
 
@@ -429,8 +426,8 @@ void Generator::generateCharacterClassInverted(
         UChar lo = charClass.rangesUnicode[i].begin;
         UChar hi = charClass.rangesUnicode[i].end;
 
-        Jump below = jl32(character, Imm32(lo));
-        matchDest.append(jle32(character, Imm32(hi)));
+        Jump below = branch32(LessThan, character, Imm32(lo));
+        matchDest.append(branch32(LessThanOrEqual, character, Imm32(hi)));
         below.link(this);
       }
     }
@@ -446,8 +443,9 @@ void Generator::generateCharacterClassInverted(
         failures, matchDest, charClass.ranges, charClass.numRanges, &matchIndex,
         charClass.matches, charClass.numMatches);
     while (matchIndex < charClass.numMatches)
-      matchDest.append(je32(
-          character, Imm32((unsigned short)charClass.matches[matchIndex++])));
+      matchDest.append(
+          branch32(Equal, character,
+                   Imm32((unsigned short)charClass.matches[matchIndex++])));
 
     failures.link(this);
   } else if (charClass.numMatches) {
@@ -464,13 +462,13 @@ void Generator::generateCharacterClassInverted(
         if (isASCIIUpper(ch))
           continue;
       }
-      matchDest.append(je32(character, Imm32((unsigned short)ch)));
+      matchDest.append(branch32(Equal, character, Imm32((unsigned short)ch)));
     }
 
     if (unsigned countAZaz = matchesAZaz.size()) {
       or32(Imm32(32), character);
       for (unsigned i = 0; i < countAZaz; ++i)
-        matchDest.append(je32(character, Imm32(matchesAZaz[i])));
+        matchDest.append(branch32(Equal, character, Imm32(matchesAZaz[i])));
     }
   }
 
@@ -556,7 +554,7 @@ void Generator::generateAssertionBOL(JumpList& failures) {
     JumpList previousIsNewline;
 
     // begin of input == success
-    previousIsNewline.append(je32(index, Imm32(0)));
+    previousIsNewline.append(branch32(Equal, index, Imm32(0)));
 
     // now check prev char against newline characters.
     load16(BaseIndex(input, index, TimesTwo, -2), character);
@@ -567,7 +565,7 @@ void Generator::generateAssertionBOL(JumpList& failures) {
 
     previousIsNewline.link(this);
   } else
-    failures.append(jne32(index, Imm32(0)));
+    failures.append(branch32(NotEqual, index, Imm32(0)));
 }
 
 void Generator::generateAssertionEOL(JumpList& failures) {
@@ -579,7 +577,7 @@ void Generator::generateAssertionEOL(JumpList& failures) {
     failures.append(jump());
     nextIsNewline.link(this);
   } else {
-    failures.append(jne32(length, index));
+    failures.append(branch32(NotEqual, length, index));
   }
 }
 
@@ -590,7 +588,7 @@ void Generator::generateAssertionWordBoundary(JumpList& failures, bool invert) {
   // (1) Check if the previous value was a word char
 
   // (1.1) check for begin of input
-  Jump atBegin = je32(index, Imm32(0));
+  Jump atBegin = branch32(Equal, index, Imm32(0));
   // (1.2) load the last char, and chck if is word character
   load16(BaseIndex(input, index, TimesTwo, -2), character);
   JumpList previousIsWord;
@@ -647,15 +645,16 @@ void Generator::generateBackreference(JumpList& failures,
   skipIncrement.link(this);
 
   // check if we're at the end of backref (if we are, success!)
-  Jump endOfBackRef = je32(
-      Address(output, ((2 * subpatternId) + 1) * sizeof(int)), repeatCount);
+  Jump endOfBackRef =
+      branch32(Equal, Address(output, ((2 * subpatternId) + 1) * sizeof(int)),
+               repeatCount);
 
   load16(BaseIndex(input, repeatCount, MacroAssembler::TimesTwo), character);
 
   // check if we've run out of input (this would be a can o'fail)
-  Jump endOfInput = je32(length, index);
+  Jump endOfInput = branch32(Equal, length, index);
 
-  je16(character, BaseIndex(input, index, TimesTwo), topOfLoop);
+  branch16(Equal, BaseIndex(input, index, TimesTwo), character, topOfLoop);
 
   endOfInput.link(this);
 
