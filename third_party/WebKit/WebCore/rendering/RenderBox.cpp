@@ -98,6 +98,33 @@ void RenderBox::destroy() {
   RenderObject::destroy();
 }
 
+void RenderBox::removeFloatingOrPositionedChildFromBlockLists() {
+  ASSERT(isFloatingOrPositioned());
+
+  if (documentBeingDestroyed())
+    return;
+
+  if (isFloating()) {
+    RenderBlock* outermostBlock = containingBlock();
+    for (RenderBlock* p = outermostBlock; p && !p->isRenderView();
+         p = p->containingBlock()) {
+      if (p->containsFloat(this))
+        outermostBlock = p;
+    }
+
+    if (outermostBlock)
+      outermostBlock->markAllDescendantsWithFloatsForLayout(this, false);
+  }
+
+  if (isPositioned()) {
+    RenderObject* p;
+    for (p = parent(); p; p = p->parent()) {
+      if (p->isRenderBlock())
+        toRenderBlock(p)->removePositionedObject(this);
+    }
+  }
+}
+
 void RenderBox::styleWillChange(RenderStyle::Diff diff,
                                 const RenderStyle* newStyle) {
   s_wasFloating = isFloating();
@@ -167,7 +194,7 @@ void RenderBox::styleWillChange(RenderStyle::Diff diff,
         if (isFloating() && !isPositioned() &&
             (newStyle->position() == AbsolutePosition ||
              newStyle->position() == FixedPosition))
-          removeFromObjectLists();
+          removeFloatingOrPositionedChildFromBlockLists();
       }
     }
   }

@@ -2184,13 +2184,13 @@ void RenderObject::styleWillChange(RenderStyle::Diff diff,
     if (isFloating() && (m_style->floating() != newStyle->floating()))
       // For changes in float styles, we need to conceivably remove ourselves
       // from the floating objects list.
-      removeFromObjectLists();
+      toRenderBox(this)->removeFloatingOrPositionedChildFromBlockLists();
     else if (isPositioned() && (newStyle->position() != AbsolutePosition &&
                                 newStyle->position() != FixedPosition))
       // For changes in positioning styles, we need to conceivably remove
       // ourselves
       // from the positioned objects list.
-      removeFromObjectLists();
+      toRenderBox(this)->removeFloatingOrPositionedChildFromBlockLists();
 
     s_affectsParentBlock =
         isFloatingOrPositioned() &&
@@ -2401,32 +2401,6 @@ RenderObject* RenderObject::container() const {
 bool RenderObject::isSelectionBorder() const {
   SelectionState st = selectionState();
   return st == SelectionStart || st == SelectionEnd || st == SelectionBoth;
-}
-
-void RenderObject::removeFromObjectLists() {
-  if (documentBeingDestroyed())
-    return;
-
-  if (isFloating()) {
-    RenderBlock* outermostBlock = containingBlock();
-    for (RenderBlock* p = outermostBlock; p && !p->isRenderView();
-         p = p->containingBlock()) {
-      if (p->containsFloat(this))
-        outermostBlock = p;
-    }
-
-    if (outermostBlock)
-      outermostBlock->markAllDescendantsWithFloatsForLayout(toRenderBox(this),
-                                                            false);
-  }
-
-  if (isPositioned()) {
-    RenderObject* p;
-    for (p = parent(); p; p = p->parent()) {
-      if (p->isRenderBlock())
-        toRenderBlock(p)->removePositionedObject(toRenderBox(this));
-    }
-  }
 }
 
 void RenderObject::destroy() {

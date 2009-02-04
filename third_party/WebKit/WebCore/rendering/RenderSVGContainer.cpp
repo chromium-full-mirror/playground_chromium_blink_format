@@ -53,7 +53,8 @@ void RenderSVGContainer::removeChild(RenderObject* oldChild) {
   // cannot affect the positioned object list, and the floating object list is
   // irrelevant (since the list gets cleared on
   // layout anyway).
-  oldChild->removeFromObjectLists();
+  if (oldChild->isFloatingOrPositioned())
+    toRenderBox(oldChild)->removeFloatingOrPositionedChildFromBlockLists();
 
   children()->removeChildNode(this, oldChild);
 }
