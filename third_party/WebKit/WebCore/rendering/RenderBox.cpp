@@ -65,7 +65,7 @@ bool RenderBox::s_wasFloating = false;
 bool RenderBox::s_hadOverflowClip = false;
 
 RenderBox::RenderBox(Node* node)
-    : RenderObject(node),
+    : RenderBoxModelObject(node),
       m_marginLeft(0),
       m_marginRight(0),
       m_marginTop(0),
@@ -95,7 +95,7 @@ void RenderBox::destroy() {
        style()->maxHeight().isPercent()))
     RenderBlock::removePercentHeightDescendant(this);
 
-  RenderObject::destroy();
+  RenderBoxModelObject::destroy();
 }
 
 void RenderBox::removeFloatingOrPositionedChildFromBlockLists() {
@@ -199,7 +199,7 @@ void RenderBox::styleWillChange(StyleDifference diff,
     }
   }
 
-  RenderObject::styleWillChange(diff, newStyle);
+  RenderBoxModelObject::styleWillChange(diff, newStyle);
 }
 
 void RenderBox::styleDidChange(StyleDifference diff,
@@ -212,7 +212,7 @@ void RenderBox::styleDidChange(StyleDifference diff,
     toRenderView(document()->renderer())
         ->setMaximalOutlineSize(style()->outlineSize());
 
-  RenderObject::styleDidChange(diff, oldStyle);
+  RenderBoxModelObject::styleDidChange(diff, oldStyle);
 
   if (needsLayout() && oldStyle &&
       (oldStyle->height().isPercent() || oldStyle->minHeight().isPercent() ||

@@ -124,7 +124,7 @@ class RenderObject : public CachedResourceClient {
   RenderObject(Node*);
   virtual ~RenderObject();
 
-  virtual const char* renderName() const { return "RenderObject"; }
+  virtual const char* renderName() const = 0;
 
   RenderObject* parent() const { return m_parent; }
   bool isDescendantOf(const RenderObject*) const;
