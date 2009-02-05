@@ -178,7 +178,7 @@ void RenderTable::addChild(RenderObject* child, RenderObject* beforeChild) {
            beforeChild->style()->display() != TABLE_CAPTION)
       beforeChild = beforeChild->parent();
 
-    RenderContainer::addChild(child, beforeChild);
+    RenderBox::addChild(child, beforeChild);
     return;
   }
 
@@ -214,7 +214,7 @@ void RenderTable::addChild(RenderObject* child, RenderObject* beforeChild) {
 }
 
 void RenderTable::removeChild(RenderObject* oldChild) {
-  RenderContainer::removeChild(oldChild);
+  RenderBox::removeChild(oldChild);
   setNeedsSectionRecalc();
 }
 

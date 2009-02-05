@@ -28,7 +28,7 @@
 
 #include "DeprecatedPtrList.h"
 #include "GapRects.h"
-#include "RenderContainer.h"
+#include "RenderBox.h"
 #include "RenderLineBoxList.h"
 #include "RootInlineBox.h"
 #include <wtf/ListHashSet.h>
@@ -47,10 +47,17 @@ typedef BidiResolver<InlineIterator, BidiRun> InlineBidiResolver;
 
 enum CaretType { CursorCaret, DragCaret };
 
-class RenderBlock : public RenderContainer {
+class RenderBlock : public RenderBox {
  public:
   RenderBlock(Node*);
   virtual ~RenderBlock();
+
+  virtual RenderObjectChildList* virtualChildren() { return children(); }
+  virtual const RenderObjectChildList* virtualChildren() const {
+    return children();
+  }
+  const RenderObjectChildList* children() const { return &m_children; }
+  RenderObjectChildList* children() { return &m_children; }
 
   virtual void destroy();
 
@@ -685,6 +692,7 @@ class RenderBlock : public RenderContainer {
   MaxMargin* m_maxMargin;
 
  protected:
+  RenderObjectChildList m_children;
   RenderLineBoxList m_lineBoxes;  // All of the root line boxes created for this
                                   // block flow.  For example,
                                   // <div>Hello<br>world.</div> will have two

@@ -142,8 +142,7 @@ void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
 
   FloatPoint absPos = localToAbsolute();
 
-  TransformationMatrix htmlParentCtm =
-      root->RenderContainer::absoluteTransform();
+  TransformationMatrix htmlParentCtm = root->RenderBox::absoluteTransform();
 
   // Don't use relativeBBox here, as it's unites the selection rects. Makes it
   // hard
@@ -171,8 +170,7 @@ void RenderSVGText::absoluteQuads(Vector<FloatQuad>& quads, bool) {
 
   FloatPoint absPos = localToAbsolute();
 
-  TransformationMatrix htmlParentCtm =
-      root->RenderContainer::absoluteTransform();
+  TransformationMatrix htmlParentCtm = root->RenderBox::absoluteTransform();
 
   // Don't use relativeBBox here, as it's unites the selection rects. Makes it
   // hard

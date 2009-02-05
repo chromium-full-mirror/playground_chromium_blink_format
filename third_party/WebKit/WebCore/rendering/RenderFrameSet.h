@@ -23,7 +23,7 @@
 #ifndef RenderFrameSet_h
 #define RenderFrameSet_h
 
-#include "RenderContainer.h"
+#include "RenderBox.h"
 
 namespace WebCore {
 
@@ -54,10 +54,17 @@ struct FrameEdgeInfo {
   Vector<bool> m_allowBorder;
 };
 
-class RenderFrameSet : public RenderContainer {
+class RenderFrameSet : public RenderBox {
  public:
   RenderFrameSet(HTMLFrameSetElement*);
   virtual ~RenderFrameSet();
+
+  virtual RenderObjectChildList* virtualChildren() { return children(); }
+  virtual const RenderObjectChildList* virtualChildren() const {
+    return children();
+  }
+  const RenderObjectChildList* children() const { return &m_children; }
+  RenderObjectChildList* children() { return &m_children; }
 
   virtual const char* renderName() const { return "RenderFrameSet"; }
   virtual bool isFrameSet() const { return true; }
@@ -115,6 +122,8 @@ class RenderFrameSet : public RenderContainer {
 
   void paintRowBorder(const PaintInfo& paintInfo, const IntRect& rect);
   void paintColumnBorder(const PaintInfo& paintInfo, const IntRect& rect);
+
+  RenderObjectChildList m_children;
 
   GridAxis m_rows;
   GridAxis m_cols;

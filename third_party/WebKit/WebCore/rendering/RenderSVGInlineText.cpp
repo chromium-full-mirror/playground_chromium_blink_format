@@ -130,8 +130,7 @@ IntRect RenderSVGInlineText::computeRepaintRectForRange(
   // from the RenderSVGRoot object.
   // But do take the containingBlocks's container position into account, ie. SVG
   // text in scrollable <div>.
-  TransformationMatrix htmlParentCtm =
-      root->RenderContainer::absoluteTransform();
+  TransformationMatrix htmlParentCtm = root->RenderBox::absoluteTransform();
 
   FloatRect fixedRect(
       narrowPrecisionToFloat(rect.x() + absPos.x() - htmlParentCtm.e()),

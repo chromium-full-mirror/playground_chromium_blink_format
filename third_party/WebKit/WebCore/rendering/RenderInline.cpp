@@ -39,7 +39,7 @@ using namespace std;
 namespace WebCore {
 
 RenderInline::RenderInline(Node* node)
-    : RenderContainer(node), m_continuation(0), m_lineHeight(-1) {
+    : RenderBox(node), m_continuation(0), m_lineHeight(-1) {
   setChildrenInline(true);
 }
 
@@ -59,7 +59,7 @@ void RenderInline::destroy() {
 
   if (!documentBeingDestroyed()) {
     if (firstLineBox()) {
-      // We can't wait for RenderContainer::destroy to clear the selection,
+      // We can't wait for RenderBox::destroy to clear the selection,
       // because by then we will have nuked the line boxes.
       // FIXME: The SelectionController should be responsible for this when it
       // is notified of DOM mutations.
@@ -81,7 +81,7 @@ void RenderInline::destroy() {
 
   m_lineBoxes.deleteLineBoxes(renderArena());
 
-  RenderContainer::destroy();
+  RenderBox::destroy();
 }
 
 RenderInline* RenderInline::inlineContinuation() const {
@@ -92,7 +92,7 @@ RenderInline* RenderInline::inlineContinuation() const {
 
 void RenderInline::styleDidChange(StyleDifference diff,
                                   const RenderStyle* oldStyle) {
-  RenderContainer::styleDidChange(diff, oldStyle);
+  RenderBox::styleDidChange(diff, oldStyle);
 
   setInline(true);
   setHasReflection(false);
@@ -105,7 +105,7 @@ void RenderInline::styleDidChange(StyleDifference diff,
   // need to pass its style on to anyone else.
   for (RenderInline* currCont = inlineContinuation(); currCont;
        currCont = currCont->inlineContinuation()) {
-    RenderContainer* nextCont = currCont->continuation();
+    RenderBox* nextCont = currCont->continuation();
     currCont->setContinuation(0);
     currCont->setStyle(style());
     currCont->setContinuation(nextCont);
@@ -137,19 +137,19 @@ void RenderInline::addChild(RenderObject* newChild, RenderObject* beforeChild) {
   return addChildIgnoringContinuation(newChild, beforeChild);
 }
 
-static RenderContainer* nextContinuation(RenderObject* renderer) {
+static RenderBox* nextContinuation(RenderObject* renderer) {
   if (renderer->isInline() && !renderer->isReplaced())
     return toRenderInline(renderer)->continuation();
   return toRenderBlock(renderer)->inlineContinuation();
 }
 
-RenderContainer* RenderInline::continuationBefore(RenderObject* beforeChild) {
+RenderBox* RenderInline::continuationBefore(RenderObject* beforeChild) {
   if (beforeChild && beforeChild->parent() == this)
     return this;
 
-  RenderContainer* curr = nextContinuation(this);
-  RenderContainer* nextToLast = this;
-  RenderContainer* last = this;
+  RenderBox* curr = nextContinuation(this);
+  RenderBox* nextToLast = this;
+  RenderBox* last = this;
   while (curr) {
     if (beforeChild && beforeChild->parent() == curr) {
       if (curr->firstChild() == beforeChild)
@@ -189,7 +189,7 @@ void RenderInline::addChildIgnoringContinuation(RenderObject* newChild,
     RenderBlock* newBox =
         new (renderArena()) RenderBlock(document() /* anonymous box */);
     newBox->setStyle(newStyle.release());
-    RenderContainer* oldContinuation = continuation();
+    RenderBox* oldContinuation = continuation();
     setContinuation(newBox);
 
     // Someone may have put a <p> inside a <q>, causing a split.  When this
@@ -209,7 +209,7 @@ void RenderInline::addChildIgnoringContinuation(RenderObject* newChild,
     return;
   }
 
-  RenderContainer::addChild(newChild, beforeChild);
+  RenderBox::addChild(newChild, beforeChild);
 
   newChild->setNeedsLayoutAndPrefWidthsRecalc();
 }
@@ -224,7 +224,7 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
                                 RenderBlock* toBlock,
                                 RenderBlock* middleBlock,
                                 RenderObject* beforeChild,
-                                RenderContainer* oldCont) {
+                                RenderBox* oldCont) {
   // Create a clone of this inline.
   RenderInline* clone = cloneInline(this);
   clone->setContinuation(oldCont);
@@ -246,8 +246,8 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
   // We have been reparented and are now under the fromBlock.  We need
   // to walk up our inline parent chain until we hit the containing block.
   // Once we hit the containing block we're done.
-  RenderContainer* curr = static_cast<RenderContainer*>(parent());
-  RenderContainer* currChild = this;
+  RenderBox* curr = static_cast<RenderBox*>(parent());
+  RenderBox* currChild = this;
 
   // FIXME: Because splitting is O(n^2) as tags nest pathologically, we cap the
   // depth at which we're willing to clone.
@@ -289,14 +289,14 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
         RenderObject* tmp = o;
         o = tmp->nextSibling();
         clone->addChildIgnoringContinuation(
-            curr->children()->removeChildNode(curr, tmp), 0);
+            inlineCurr->children()->removeChildNode(curr, tmp), 0);
         tmp->setNeedsLayoutAndPrefWidthsRecalc();
       }
     }
 
     // Keep walking up the chain.
     currChild = curr;
-    curr = static_cast<RenderContainer*>(curr->parent());
+    curr = static_cast<RenderBox*>(curr->parent());
     splitDepth++;
   }
 
@@ -318,7 +318,7 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
 void RenderInline::splitFlow(RenderObject* beforeChild,
                              RenderBlock* newBlockBox,
                              RenderObject* newChild,
-                             RenderContainer* oldCont) {
+                             RenderBox* oldCont) {
   RenderBlock* pre = 0;
   RenderBlock* block = containingBlock();
 
@@ -384,14 +384,14 @@ void RenderInline::splitFlow(RenderObject* beforeChild,
 
 void RenderInline::addChildToContinuation(RenderObject* newChild,
                                           RenderObject* beforeChild) {
-  RenderContainer* flow = continuationBefore(beforeChild);
+  RenderBox* flow = continuationBefore(beforeChild);
   ASSERT(!beforeChild || beforeChild->parent()->isRenderBlock() ||
          beforeChild->parent()->isRenderInline());
-  RenderContainer* beforeChildParent = 0;
+  RenderBox* beforeChildParent = 0;
   if (beforeChild)
-    beforeChildParent = static_cast<RenderContainer*>(beforeChild->parent());
+    beforeChildParent = static_cast<RenderBox*>(beforeChild->parent());
   else {
-    RenderContainer* cont = nextContinuation(flow);
+    RenderBox* cont = nextContinuation(flow);
     if (cont)
       beforeChildParent = cont;
     else
@@ -469,14 +469,14 @@ void RenderInline::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
 }
 
 int RenderInline::offsetLeft() const {
-  int x = RenderContainer::offsetLeft();
+  int x = RenderBox::offsetLeft();
   if (firstLineBox())
     x += firstLineBox()->xPos();
   return x;
 }
 
 int RenderInline::offsetTop() const {
-  int y = RenderContainer::offsetTop();
+  int y = RenderBox::offsetTop();
   if (firstLineBox())
     y += firstLineBox()->yPos();
   return y;
@@ -518,7 +518,7 @@ VisiblePosition RenderInline::positionForCoordinates(int x, int y) {
     c = toRenderBlock(c)->inlineContinuation();
   }
 
-  return RenderContainer::positionForCoordinates(x, y);
+  return RenderBox::positionForCoordinates(x, y);
 }
 
 IntRect RenderInline::linesBoundingBox() const {
@@ -600,6 +600,7 @@ IntRect RenderInline::clippedOverflowRectForRepaint(
     IntRect repaintRect(x, y, r.width(), r.height());
     r = intersection(repaintRect, boxRect);
   }
+
   // FIXME: need to ensure that we compute the correct repaint rect when the
   // repaint container
   // is an inline.
@@ -627,8 +628,8 @@ IntRect RenderInline::clippedOverflowRectForRepaint(
 
 IntRect RenderInline::rectWithOutlineForRepaint(RenderBox* repaintContainer,
                                                 int outlineWidth) {
-  IntRect r(RenderContainer::rectWithOutlineForRepaint(repaintContainer,
-                                                       outlineWidth));
+  IntRect r(
+      RenderBox::rectWithOutlineForRepaint(repaintContainer, outlineWidth));
   for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
     if (!curr->isText())
       r.unite(curr->rectWithOutlineForRepaint(repaintContainer, outlineWidth));
@@ -637,7 +638,7 @@ IntRect RenderInline::rectWithOutlineForRepaint(RenderBox* repaintContainer,
 }
 
 void RenderInline::updateDragState(bool dragOn) {
-  RenderContainer::updateDragState(dragOn);
+  RenderBox::updateDragState(dragOn);
   if (continuation())
     continuation()->updateDragState(dragOn);
 }
@@ -645,7 +646,7 @@ void RenderInline::updateDragState(bool dragOn) {
 void RenderInline::childBecameNonInline(RenderObject* child) {
   // We have to split the parent flow.
   RenderBlock* newBox = createAnonymousBlock();
-  RenderContainer* oldContinuation = continuation();
+  RenderBox* oldContinuation = continuation();
   setContinuation(newBox);
   RenderObject* beforeChild = child->nextSibling();
   children()->removeChildNode(this, child);

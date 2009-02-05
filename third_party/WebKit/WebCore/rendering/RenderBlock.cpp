@@ -136,7 +136,7 @@ RenderBlock::MarginInfo::MarginInfo(RenderBlock* block, int top, int bottom) {
 // -------------------------------------------------------------------------------------------------------
 
 RenderBlock::RenderBlock(Node* node)
-    : RenderContainer(node),
+    : RenderBox(node),
       m_floatingObjects(0),
       m_positionedObjects(0),
       m_inlineContinuation(0),
@@ -194,7 +194,7 @@ void RenderBlock::destroy() {
 
   if (!documentBeingDestroyed()) {
     if (firstLineBox()) {
-      // We can't wait for RenderContainer::destroy to clear the selection,
+      // We can't wait for RenderBox::destroy to clear the selection,
       // because by then we will have nuked the line boxes.
       // FIXME: The SelectionController should be responsible for this when it
       // is notified of DOM mutations.
@@ -217,7 +217,7 @@ void RenderBlock::destroy() {
 
   m_lineBoxes.deleteLineBoxes(renderArena());
 
-  RenderContainer::destroy();
+  RenderBox::destroy();
 }
 
 void RenderBlock::styleWillChange(StyleDifference diff,
@@ -253,12 +253,12 @@ void RenderBlock::styleWillChange(StyleDifference diff,
     }
   }
 
-  RenderContainer::styleWillChange(diff, newStyle);
+  RenderBox::styleWillChange(diff, newStyle);
 }
 
 void RenderBlock::styleDidChange(StyleDifference diff,
                                  const RenderStyle* oldStyle) {
-  RenderContainer::styleDidChange(diff, oldStyle);
+  RenderBox::styleDidChange(diff, oldStyle);
 
   // FIXME: We could save this call when the change only affected non-inherited
   // properties
@@ -374,13 +374,13 @@ void RenderBlock::addChild(RenderObject* newChild, RenderObject* beforeChild) {
     if (newChild->isInline()) {
       // No suitable existing anonymous box - create a new one.
       RenderBlock* newBox = createAnonymousBlock();
-      RenderContainer::addChild(newBox, beforeChild);
+      RenderBox::addChild(newBox, beforeChild);
       newBox->addChild(newChild);
       return;
     }
   }
 
-  RenderContainer::addChild(newChild, beforeChild);
+  RenderBox::addChild(newChild, beforeChild);
 
   if (madeBoxesNonInline && parent() && isAnonymousBlock() &&
       parent()->isRenderBlock())
@@ -437,7 +437,7 @@ void RenderBlock::deleteLineBoxTree() {
 
 void RenderBlock::dirtyLineBoxes(bool fullLayout, bool isRootLineBox) {
   if (!isRootLineBox && isReplaced())
-    return RenderContainer::dirtyLineBoxes(fullLayout, isRootLineBox);
+    return RenderBox::dirtyLineBoxes(fullLayout, isRootLineBox);
 
   if (fullLayout)
     m_lineBoxes.deleteLineBoxes(renderArena());
@@ -450,7 +450,7 @@ InlineBox* RenderBlock::createInlineBox(bool makePlaceHolderBox,
                                         bool /*isOnlyRun*/) {
   if (!isRootLineBox &&
       (isReplaced() || makePlaceHolderBox))  // Inline tables and inline blocks
-    return RenderContainer::createInlineBox(
+    return RenderBox::createInlineBox(
         false, isRootLineBox);  // (or positioned element placeholders).
   InlineFlowBox* flowBox = new (renderArena()) RootInlineBox(this);
   m_lineBoxes.appendLineBox(flowBox);
@@ -583,7 +583,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     next->destroy();
   }
 
-  RenderContainer::removeChild(oldChild);
+  RenderBox::removeChild(oldChild);
 
   RenderObject* child = prev ? prev : next;
   if (canDeleteAnonymousBlocks && child && !child->previousSibling() &&
@@ -2175,9 +2175,9 @@ void RenderBlock::setSelectionState(SelectionState s) {
 
   if ((s == SelectionStart && selectionState() == SelectionEnd) ||
       (s == SelectionEnd && selectionState() == SelectionStart))
-    RenderContainer::setSelectionState(SelectionBoth);
+    RenderBox::setSelectionState(SelectionBoth);
   else
-    RenderContainer::setSelectionState(s);
+    RenderBox::setSelectionState(s);
 
   RenderBlock* cb = containingBlock();
   if (cb && !cb->isRenderView())
@@ -3550,7 +3550,7 @@ void RenderBlock::addIntrudingFloats(RenderBlock* prev, int xoff, int yoff) {
 bool RenderBlock::avoidsFloats() const {
   // Floats can't intrude into our box if we have a non-auto column count or
   // width.
-  return RenderContainer::avoidsFloats() || !style()->hasAutoColumnCount() ||
+  return RenderBox::avoidsFloats() || !style()->hasAutoColumnCount() ||
          !style()->hasAutoColumnWidth();
 }
 
@@ -3847,7 +3847,7 @@ Position RenderBlock::positionForRenderer(RenderObject* renderer,
 
 VisiblePosition RenderBlock::positionForCoordinates(int x, int y) {
   if (isTable())
-    return RenderContainer::positionForCoordinates(x, y);
+    return RenderBox::positionForCoordinates(x, y);
 
   int top = borderTop();
   int bottom = top + paddingTop() + contentHeight() + paddingBottom();
@@ -3977,7 +3977,7 @@ VisiblePosition RenderBlock::positionForCoordinates(int x, int y) {
                                               contentsY - renderer->y());
   }
 
-  return RenderContainer::positionForCoordinates(x, y);
+  return RenderBox::positionForCoordinates(x, y);
 }
 
 void RenderBlock::offsetForContents(int& tx, int& ty) const {
@@ -4538,7 +4538,7 @@ void RenderBlock::calcInlinePrefWidths() {
         if (child->isRenderInline()) {
           // Add in padding/border/margin from the appropriate side of
           // the element.
-          int bpm = getBorderPaddingMargin(static_cast<RenderContainer*>(child),
+          int bpm = getBorderPaddingMargin(static_cast<RenderBox*>(child),
                                            childIterator.endOfInline);
           childMin += bpm;
           childMax += bpm;
@@ -4906,12 +4906,12 @@ int RenderBlock::baselinePosition(bool b, bool isRootLineBox) const {
       return marginTop() + baselinePos;
     return height() + marginTop() + marginBottom();
   }
-  return RenderContainer::baselinePosition(b, isRootLineBox);
+  return RenderBox::baselinePosition(b, isRootLineBox);
 }
 
 int RenderBlock::getBaselineOfFirstLineBox() const {
   if (!isBlockFlow())
-    return RenderContainer::getBaselineOfFirstLineBox();
+    return RenderBox::getBaselineOfFirstLineBox();
 
   if (childrenInline()) {
     if (firstLineBox())
@@ -4934,11 +4934,11 @@ int RenderBlock::getBaselineOfFirstLineBox() const {
 
 int RenderBlock::getBaselineOfLastLineBox() const {
   if (!isBlockFlow())
-    return RenderContainer::getBaselineOfLastLineBox();
+    return RenderBox::getBaselineOfLastLineBox();
 
   if (childrenInline()) {
     if (!firstLineBox() && hasLineIfEmpty())
-      return RenderContainer::baselinePosition(true, true) + borderTop() +
+      return RenderBox::baselinePosition(true, true) + borderTop() +
              paddingTop();
     if (lastLineBox())
       return lastLineBox()->yPos() + lastLineBox()->baseline();
@@ -4955,7 +4955,7 @@ int RenderBlock::getBaselineOfLastLineBox() const {
       }
     }
     if (!haveNormalFlowChild && hasLineIfEmpty())
-      return RenderContainer::baselinePosition(true, true) + borderTop() +
+      return RenderBox::baselinePosition(true, true) + borderTop() +
              paddingTop();
   }
 
@@ -5382,8 +5382,8 @@ void RenderBlock::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
 
 IntRect RenderBlock::rectWithOutlineForRepaint(RenderBox* repaintContainer,
                                                int outlineWidth) {
-  IntRect r(RenderContainer::rectWithOutlineForRepaint(repaintContainer,
-                                                       outlineWidth));
+  IntRect r(
+      RenderBox::rectWithOutlineForRepaint(repaintContainer, outlineWidth));
   if (inlineContinuation())
     r.inflateY(collapsedMarginTop());
   return r;
@@ -5391,11 +5391,11 @@ IntRect RenderBlock::rectWithOutlineForRepaint(RenderBox* repaintContainer,
 
 RenderObject* RenderBlock::hoverAncestor() const {
   return inlineContinuation() ? inlineContinuation()
-                              : RenderContainer::hoverAncestor();
+                              : RenderBox::hoverAncestor();
 }
 
 void RenderBlock::updateDragState(bool dragOn) {
-  RenderContainer::updateDragState(dragOn);
+  RenderBox::updateDragState(dragOn);
   if (inlineContinuation())
     inlineContinuation()->updateDragState(dragOn);
 }
@@ -5438,8 +5438,8 @@ IntRect RenderBlock::localCaretRect(InlineBox* inlineBox,
                                     int* extraWidthToEndOfLine) {
   // Do the normal calculation in most cases.
   if (firstChild())
-    return RenderContainer::localCaretRect(inlineBox, caretOffset,
-                                           extraWidthToEndOfLine);
+    return RenderBox::localCaretRect(inlineBox, caretOffset,
+                                     extraWidthToEndOfLine);
 
   // This is a special case:
   // The element is not an inline element, and it's empty. So we have to

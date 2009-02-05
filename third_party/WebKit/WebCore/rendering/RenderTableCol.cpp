@@ -36,7 +36,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-RenderTableCol::RenderTableCol(Node* node) : RenderContainer(node), m_span(1) {
+RenderTableCol::RenderTableCol(Node* node) : RenderBox(node), m_span(1) {
   // init RenderObject attributes
   setInline(true);  // our object is not Inline
   updateFromElement();
