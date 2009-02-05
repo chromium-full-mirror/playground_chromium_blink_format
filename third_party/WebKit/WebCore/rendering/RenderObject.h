@@ -38,6 +38,7 @@ class AnimationController;
 class HitTestResult;
 class InlineBox;
 class InlineFlowBox;
+class RenderBoxModelObject;
 class RenderInline;
 class RenderBlock;
 class RenderFlow;
@@ -654,7 +655,7 @@ class RenderObject : public CachedResourceClient {
   // Convert a local quad into the coordinate system of container, taking
   // transforms into account.
   virtual FloatQuad localToContainerQuad(const FloatQuad&,
-                                         RenderBox* repaintContainer,
+                                         RenderBoxModelObject* repaintContainer,
                                          bool fixed = false) const;
 
   // Return the offset from the container() renderer (excluding transforms)
@@ -733,11 +734,11 @@ class RenderObject : public CachedResourceClient {
   // if painting is root-relative. This is the container that should be passed
   // to the 'forRepaint'
   // methods.
-  RenderBox* containerForRepaint() const;
+  RenderBoxModelObject* containerForRepaint() const;
   // Actually do the repaint of rect r for this object which has been computed
   // in the coordinate space
   // of repaintContainer. If repaintContainer is 0, repaint via the view.
-  void repaintUsingContainer(RenderBox* repaintContainer,
+  void repaintUsingContainer(RenderBoxModelObject* repaintContainer,
                              const IntRect& r,
                              bool immediate = false);
 
@@ -751,7 +752,7 @@ class RenderObject : public CachedResourceClient {
   void repaintRectangle(const IntRect&, bool immediate = false);
 
   // Repaint only if our old bounds and new bounds are different.
-  bool repaintAfterLayoutIfNeeded(RenderBox* repaintContainer,
+  bool repaintAfterLayoutIfNeeded(RenderBoxModelObject* repaintContainer,
                                   const IntRect& oldBounds,
                                   const IntRect& oldOutlineBox);
 
@@ -769,9 +770,11 @@ class RenderObject : public CachedResourceClient {
   IntRect absoluteClippedOverflowRect() {
     return clippedOverflowRectForRepaint(0);
   }
-  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
-  virtual IntRect rectWithOutlineForRepaint(RenderBox* repaintContainer,
-                                            int outlineWidth);
+  virtual IntRect clippedOverflowRectForRepaint(
+      RenderBoxModelObject* repaintContainer);
+  virtual IntRect rectWithOutlineForRepaint(
+      RenderBoxModelObject* repaintContainer,
+      int outlineWidth);
 
   // Given a rect in the object's coordinate space, compute a rect suitable for
   // repainting
@@ -782,7 +785,7 @@ class RenderObject : public CachedResourceClient {
   // Given a rect in the object's coordinate space, compute a rect suitable for
   // repainting
   // that rect in the coordinate space of repaintContainer.
-  virtual void computeRectForRepaint(RenderBox* repaintContainer,
+  virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect&,
                                      bool fixed = false);
 
@@ -844,7 +847,7 @@ class RenderObject : public CachedResourceClient {
     return selectionRectForRepaint(0, clipToVisibleContent);
   }
   virtual IntRect selectionRectForRepaint(
-      RenderBox* /*repaintContainer*/,
+      RenderBoxModelObject* /*repaintContainer*/,
       bool /*clipToVisibleContent*/ = true) {
     return IntRect();
   }
@@ -990,7 +993,7 @@ class RenderObject : public CachedResourceClient {
   void arenaDelete(RenderArena*, void* objectBase);
 
   virtual IntRect outlineBoundsForRepaint(
-      RenderBox* /*repaintContainer*/) const {
+      RenderBoxModelObject* /*repaintContainer*/) const {
     return IntRect();
   }
 
@@ -1024,7 +1027,7 @@ class RenderObject : public CachedResourceClient {
 
    private:
     RenderObject& m_object;
-    RenderBox* m_repaintContainer;
+    RenderBoxModelObject* m_repaintContainer;
     IntRect m_oldBounds;
     IntRect m_oldOutlineBox;
     bool m_checkForRepaint;

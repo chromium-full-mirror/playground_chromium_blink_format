@@ -65,7 +65,7 @@ void RenderSVGHiddenContainer::paint(PaintInfo&, int, int) {
 }
 
 IntRect RenderSVGHiddenContainer::clippedOverflowRectForRepaint(
-    RenderBox* /*repaintContainer*/) {
+    RenderBoxModelObject* /*repaintContainer*/) {
   return IntRect();
 }
 

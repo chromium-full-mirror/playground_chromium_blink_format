@@ -74,7 +74,7 @@ class RenderView : public RenderBlock {
 
   virtual bool hasOverhangingFloats() { return false; }
 
-  virtual void computeRectForRepaint(RenderBox* repaintContainer,
+  virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect&,
                                      bool fixed = false);
   virtual void repaintViewRectangle(const IntRect&, bool immediate = false);
@@ -206,7 +206,7 @@ class RenderView : public RenderBlock {
 
  protected:
   virtual FloatQuad localToContainerQuad(const FloatQuad&,
-                                         RenderBox* repaintContainer,
+                                         RenderBoxModelObject* repaintContainer,
                                          bool fixed = false) const;
 
  private:

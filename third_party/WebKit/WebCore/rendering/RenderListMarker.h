@@ -62,8 +62,9 @@ class RenderListMarker : public RenderBox {
   bool isInside() const;
 
   virtual void setSelectionState(SelectionState);
-  virtual IntRect selectionRectForRepaint(RenderBox* repaintContainer,
-                                          bool clipToVisibleContent = true);
+  virtual IntRect selectionRectForRepaint(
+      RenderBoxModelObject* repaintContainer,
+      bool clipToVisibleContent = true);
   virtual bool canBeSelectionLeaf() const { return true; }
 
   void updateMargins();

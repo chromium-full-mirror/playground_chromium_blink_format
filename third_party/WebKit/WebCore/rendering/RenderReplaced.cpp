@@ -241,8 +241,9 @@ VisiblePosition RenderReplaced::positionForCoordinates(int xPos, int yPos) {
   return RenderBox::positionForCoordinates(xPos, yPos);
 }
 
-IntRect RenderReplaced::selectionRectForRepaint(RenderBox* repaintContainer,
-                                                bool clipToVisibleContent) {
+IntRect RenderReplaced::selectionRectForRepaint(
+    RenderBoxModelObject* repaintContainer,
+    bool clipToVisibleContent) {
   ASSERT(!needsLayout());
 
   if (!isSelected())
@@ -378,7 +379,7 @@ IntRect RenderReplaced::overflowRect(bool) const {
 }
 
 IntRect RenderReplaced::clippedOverflowRectForRepaint(
-    RenderBox* repaintContainer) {
+    RenderBoxModelObject* repaintContainer) {
   if (style()->visibility() != VISIBLE &&
       !enclosingLayer()->hasVisibleContent())
     return IntRect();

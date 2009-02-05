@@ -60,7 +60,8 @@ class RenderPath : public RenderObject {
   virtual TransformationMatrix localTransform() const;
 
   virtual void layout();
-  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
+  virtual IntRect clippedOverflowRectForRepaint(
+      RenderBoxModelObject* repaintContainer);
   virtual bool requiresLayer() const { return false; }
   virtual int lineHeight(bool b, bool isRootLineBox = false) const;
   virtual int baselinePosition(bool b, bool isRootLineBox = false) const;
@@ -87,7 +88,8 @@ class RenderPath : public RenderObject {
 
  private:
   FloatPoint mapAbsolutePointToLocal(const FloatPoint&) const;
-  virtual IntRect outlineBoundsForRepaint(RenderBox* repaintContainer) const;
+  virtual IntRect outlineBoundsForRepaint(
+      RenderBoxModelObject* repaintContainer) const;
 
   mutable Path m_path;
   mutable FloatRect m_fillBBox;

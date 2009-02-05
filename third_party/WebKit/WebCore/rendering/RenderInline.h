@@ -93,9 +93,11 @@ class RenderInline : public RenderBox {
                              bool topLevel = true);
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
-  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
-  virtual IntRect rectWithOutlineForRepaint(RenderBox* repaintContainer,
-                                            int outlineWidth);
+  virtual IntRect clippedOverflowRectForRepaint(
+      RenderBoxModelObject* repaintContainer);
+  virtual IntRect rectWithOutlineForRepaint(
+      RenderBoxModelObject* repaintContainer,
+      int outlineWidth);
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 

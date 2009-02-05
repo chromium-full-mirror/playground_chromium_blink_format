@@ -47,7 +47,7 @@ namespace WebCore {
 RenderSVGText::RenderSVGText(SVGTextElement* node) : RenderSVGBlock(node) {}
 
 IntRect RenderSVGText::clippedOverflowRectForRepaint(
-    RenderBox* /*repaintContainer*/) {
+    RenderBoxModelObject* /*repaintContainer*/) {
   // FIXME: handle non-root repaintContainer
   FloatRect repaintRect = absoluteTransform().mapRect(relativeBBox(true));
 

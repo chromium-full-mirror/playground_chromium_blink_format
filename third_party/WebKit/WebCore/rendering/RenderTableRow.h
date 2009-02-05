@@ -62,7 +62,8 @@ class RenderTableRow : public RenderBox {
   virtual int lineHeight(bool, bool) const { return 0; }
   virtual void position(InlineBox*) {}
   virtual void layout();
-  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
+  virtual IntRect clippedOverflowRectForRepaint(
+      RenderBoxModelObject* repaintContainer);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,

@@ -44,8 +44,9 @@ class RenderSVGInlineText : public RenderText {
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
   virtual bool requiresLayer() const { return false; }
-  virtual IntRect selectionRectForRepaint(RenderBox* repaintContainer,
-                                          bool clipToVisibleContent = true);
+  virtual IntRect selectionRectForRepaint(
+      RenderBoxModelObject* repaintContainer,
+      bool clipToVisibleContent = true);
   virtual bool isSVGText() const { return true; }
   virtual InlineTextBox* createInlineTextBox();
 
@@ -57,7 +58,7 @@ class RenderSVGInlineText : public RenderText {
   virtual void destroy();
 
  private:
-  IntRect computeRepaintRectForRange(RenderBox* repaintContainer,
+  IntRect computeRepaintRectForRange(RenderBoxModelObject* repaintContainer,
                                      int startPos,
                                      int endPos);
 };

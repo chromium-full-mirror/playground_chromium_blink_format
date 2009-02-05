@@ -1813,7 +1813,7 @@ IntRect RenderObject::paintingRootRect(IntRect& topLevelRect) {
 
 void RenderObject::paint(PaintInfo& /*paintInfo*/, int /*tx*/, int /*ty*/) {}
 
-RenderBox* RenderObject::containerForRepaint() const {
+RenderBoxModelObject* RenderObject::containerForRepaint() const {
 #if USE(ACCELERATED_COMPOSITING)
   if (RenderView* v = view()) {
     if (v->usesCompositing()) {
@@ -1826,7 +1826,7 @@ RenderBox* RenderObject::containerForRepaint() const {
   return 0;
 }
 
-void RenderObject::repaintUsingContainer(RenderBox* repaintContainer,
+void RenderObject::repaintUsingContainer(RenderBoxModelObject* repaintContainer,
                                          const IntRect& r,
                                          bool immediate) {
   if (!repaintContainer || repaintContainer->isRenderView()) {
@@ -1858,7 +1858,7 @@ void RenderObject::repaint(bool immediate) {
   if (view->printing())
     return;  // Don't repaint if we're printing.
 
-  RenderBox* repaintContainer = containerForRepaint();
+  RenderBoxModelObject* repaintContainer = containerForRepaint();
   repaintUsingContainer(repaintContainer ? repaintContainer : view,
                         clippedOverflowRectForRepaint(repaintContainer),
                         immediate);
@@ -1882,15 +1882,16 @@ void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
   // repaint containers. https://bugs.webkit.org/show_bug.cgi?id=23308
   dirtyRect.move(view->layoutDelta());
 
-  RenderBox* repaintContainer = containerForRepaint();
+  RenderBoxModelObject* repaintContainer = containerForRepaint();
   computeRectForRepaint(repaintContainer, dirtyRect);
   repaintUsingContainer(repaintContainer ? repaintContainer : view, dirtyRect,
                         immediate);
 }
 
-bool RenderObject::repaintAfterLayoutIfNeeded(RenderBox* repaintContainer,
-                                              const IntRect& oldBounds,
-                                              const IntRect& oldOutlineBox) {
+bool RenderObject::repaintAfterLayoutIfNeeded(
+    RenderBoxModelObject* repaintContainer,
+    const IntRect& oldBounds,
+    const IntRect& oldOutlineBox) {
   RenderView* v = view();
   if (v->printing())
     return false;  // Don't repaint if we're printing.
@@ -2036,21 +2037,22 @@ bool RenderObject::checkForRepaintDuringLayout() const {
   return !document()->view()->needsFullRepaint() && !hasLayer();
 }
 
-IntRect RenderObject::rectWithOutlineForRepaint(RenderBox* repaintContainer,
-                                                int outlineWidth) {
+IntRect RenderObject::rectWithOutlineForRepaint(
+    RenderBoxModelObject* repaintContainer,
+    int outlineWidth) {
   IntRect r(clippedOverflowRectForRepaint(repaintContainer));
   r.inflate(outlineWidth);
   return r;
 }
 
 IntRect RenderObject::clippedOverflowRectForRepaint(
-    RenderBox* repaintContainer) {
+    RenderBoxModelObject* repaintContainer) {
   if (parent())
     return parent()->clippedOverflowRectForRepaint(repaintContainer);
   return IntRect();
 }
 
-void RenderObject::computeRectForRepaint(RenderBox* repaintContainer,
+void RenderObject::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                          IntRect& rect,
                                          bool fixed) {
   if (repaintContainer == this)
@@ -2411,9 +2413,10 @@ FloatPoint RenderObject::absoluteToLocal(FloatPoint containerPoint,
   return FloatPoint();
 }
 
-FloatQuad RenderObject::localToContainerQuad(const FloatQuad& localQuad,
-                                             RenderBox* repaintContainer,
-                                             bool fixed) const {
+FloatQuad RenderObject::localToContainerQuad(
+    const FloatQuad& localQuad,
+    RenderBoxModelObject* repaintContainer,
+    bool fixed) const {
   if (repaintContainer == this)
     return localQuad;
 

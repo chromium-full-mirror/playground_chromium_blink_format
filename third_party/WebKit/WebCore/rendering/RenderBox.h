@@ -94,7 +94,7 @@ class RenderBox : public RenderBoxModelObject {
 
   // Bounds of the outline box in absolute coords. Respects transforms
   virtual IntRect outlineBoundsForRepaint(
-      RenderBox* /*repaintContainer*/) const;
+      RenderBoxModelObject* /*repaintContainer*/) const;
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
 
   // Use this with caution! No type checking is done!
@@ -290,12 +290,13 @@ class RenderBox : public RenderBoxModelObject {
   virtual int leftmostPosition(bool includeOverflowInterior = true,
                                bool includeSelf = true) const;
 
-  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
-  virtual void computeRectForRepaint(RenderBox* repaintContainer,
+  virtual IntRect clippedOverflowRectForRepaint(
+      RenderBoxModelObject* repaintContainer);
+  virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect&,
                                      bool fixed = false);
   virtual FloatQuad localToContainerQuad(const FloatQuad&,
-                                         RenderBox* repaintContainer,
+                                         RenderBoxModelObject* repaintContainer,
                                          bool fixed = false) const;
 
   virtual void repaintDuringLayoutIfMoved(const IntRect&);
@@ -336,12 +337,6 @@ class RenderBox : public RenderBoxModelObject {
   int availableHeightUsing(const Length&) const;
 
   void calcVerticalMargins();
-
-  int relativePositionOffsetX() const;
-  int relativePositionOffsetY() const;
-  IntSize relativePositionOffset() const {
-    return IntSize(relativePositionOffsetX(), relativePositionOffsetY());
-  }
 
   RenderLayer* layer() const { return m_layer; }
   virtual bool requiresLayer() const {

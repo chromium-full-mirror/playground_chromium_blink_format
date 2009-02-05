@@ -64,7 +64,8 @@ class RenderSVGText : public RenderSVGBlock {
                              bool topLevel = true);
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
-  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
+  virtual IntRect clippedOverflowRectForRepaint(
+      RenderBoxModelObject* repaintContainer);
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
 
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,

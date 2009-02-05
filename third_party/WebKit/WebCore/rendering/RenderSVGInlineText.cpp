@@ -74,7 +74,7 @@ void RenderSVGInlineText::absoluteQuads(Vector<FloatQuad>& quads, bool) {
 }
 
 IntRect RenderSVGInlineText::selectionRectForRepaint(
-    RenderBox* repaintContainer,
+    RenderBoxModelObject* repaintContainer,
     bool /*clipToVisibleContent*/) {
   ASSERT(!needsLayout());
 
@@ -107,7 +107,7 @@ IntRect RenderSVGInlineText::selectionRectForRepaint(
 }
 
 IntRect RenderSVGInlineText::computeRepaintRectForRange(
-    RenderBox* /*repaintContainer*/,
+    RenderBoxModelObject* /*repaintContainer*/,
     int startPos,
     int endPos) {
   RenderBlock* cb = containingBlock();

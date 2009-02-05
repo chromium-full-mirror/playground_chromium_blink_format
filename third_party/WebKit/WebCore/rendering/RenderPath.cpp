@@ -163,7 +163,7 @@ void RenderPath::layout() {
 }
 
 IntRect RenderPath::clippedOverflowRectForRepaint(
-    RenderBox* /*repaintContainer*/) {
+    RenderBoxModelObject* /*repaintContainer*/) {
   // FIXME: handle non-root repaintContainer
   FloatRect repaintRect = absoluteTransform().mapRect(relativeBBox(true));
 
@@ -486,7 +486,7 @@ FloatRect RenderPath::drawMarkersIfNeeded(GraphicsContext* context,
 }
 
 IntRect RenderPath::outlineBoundsForRepaint(
-    RenderBox* /*repaintContainer*/) const {
+    RenderBoxModelObject* /*repaintContainer*/) const {
   // FIXME: handle non-root repaintContainer
   IntRect result = m_absoluteBounds;
   adjustRectForOutlineAndShadow(result);

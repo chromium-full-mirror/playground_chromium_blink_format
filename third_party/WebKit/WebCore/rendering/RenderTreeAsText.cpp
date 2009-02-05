@@ -459,9 +459,9 @@ static void write(TextStream& ts,
       ts << " scrollX " << l.scrollXOffset();
     if (l.scrollYOffset())
       ts << " scrollY " << l.scrollYOffset();
-    if (l.renderer()->clientWidth() != l.scrollWidth())
+    if (l.renderBox() && l.renderBox()->clientWidth() != l.scrollWidth())
       ts << " scrollWidth " << l.scrollWidth();
-    if (l.renderer()->clientHeight() != l.scrollHeight())
+    if (l.renderBox() && l.renderBox()->clientHeight() != l.scrollHeight())
       ts << " scrollHeight " << l.scrollHeight();
   }
 

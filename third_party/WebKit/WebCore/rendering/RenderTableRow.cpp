@@ -173,7 +173,7 @@ void RenderTableRow::layout() {
 }
 
 IntRect RenderTableRow::clippedOverflowRectForRepaint(
-    RenderBox* repaintContainer) {
+    RenderBoxModelObject* repaintContainer) {
   // For now, just repaint the whole table.
   // FIXME: Find a better way to do this, e.g., need to repaint all the cells
   // that we

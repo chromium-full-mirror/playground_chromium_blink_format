@@ -526,7 +526,7 @@ FloatQuad RenderBox::absoluteContentQuad() const {
 }
 
 IntRect RenderBox::outlineBoundsForRepaint(
-    RenderBox* /*repaintContainer*/) const {
+    RenderBoxModelObject* /*repaintContainer*/) const {
   IntRect box = borderBoundingBox();
   adjustRectForOutlineAndShadow(box);
 
@@ -1565,9 +1565,10 @@ FloatPoint RenderBox::absoluteToLocal(FloatPoint containerPoint,
   return FloatPoint();
 }
 
-FloatQuad RenderBox::localToContainerQuad(const FloatQuad& localQuad,
-                                          RenderBox* repaintContainer,
-                                          bool fixed) const {
+FloatQuad RenderBox::localToContainerQuad(
+    const FloatQuad& localQuad,
+    RenderBoxModelObject* repaintContainer,
+    bool fixed) const {
   if (repaintContainer == this)
     return localQuad;
 
@@ -1675,7 +1676,8 @@ void RenderBox::deleteLineBoxWrapper() {
   }
 }
 
-IntRect RenderBox::clippedOverflowRectForRepaint(RenderBox* repaintContainer) {
+IntRect RenderBox::clippedOverflowRectForRepaint(
+    RenderBoxModelObject* repaintContainer) {
   if (style()->visibility() != VISIBLE &&
       !enclosingLayer()->hasVisibleContent())
     return IntRect();
@@ -1706,7 +1708,7 @@ IntRect RenderBox::clippedOverflowRectForRepaint(RenderBox* repaintContainer) {
   return r;
 }
 
-void RenderBox::computeRectForRepaint(RenderBox* repaintContainer,
+void RenderBox::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                       IntRect& rect,
                                       bool fixed) {
   if (RenderView* v = view()) {
@@ -1819,31 +1821,6 @@ void RenderBox::repaintDuringLayoutIfMoved(const IntRect& rect) {
     repaint();
     repaintOverhangingFloats(true);
   }
-}
-
-int RenderBox::relativePositionOffsetX() const {
-  if (!style()->left().isAuto()) {
-    if (!style()->right().isAuto() &&
-        containingBlock()->style()->direction() == RTL)
-      return -style()->right().calcValue(containingBlockWidth());
-    return style()->left().calcValue(containingBlockWidth());
-  }
-  if (!style()->right().isAuto())
-    return -style()->right().calcValue(containingBlockWidth());
-  return 0;
-}
-
-int RenderBox::relativePositionOffsetY() const {
-  if (!style()->top().isAuto()) {
-    if (!style()->top().isPercent() ||
-        containingBlock()->style()->height().isFixed())
-      return style()->top().calcValue(containingBlockHeight());
-  } else if (!style()->bottom().isAuto()) {
-    if (!style()->bottom().isPercent() ||
-        containingBlock()->style()->height().isFixed())
-      return -style()->bottom().calcValue(containingBlockHeight());
-  }
-  return 0;
 }
 
 void RenderBox::calcWidth() {

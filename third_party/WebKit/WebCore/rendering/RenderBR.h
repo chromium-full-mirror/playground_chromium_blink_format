@@ -41,8 +41,9 @@ class RenderBR : public RenderText {
 
   virtual const char* renderName() const { return "RenderBR"; }
 
-  virtual IntRect selectionRectForRepaint(RenderBox* /*repaintContainer*/,
-                                          bool /*clipToVisibleContent*/) {
+  virtual IntRect selectionRectForRepaint(
+      RenderBoxModelObject* /*repaintContainer*/,
+      bool /*clipToVisibleContent*/) {
     return IntRect();
   }
 

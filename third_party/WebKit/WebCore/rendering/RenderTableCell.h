@@ -106,8 +106,9 @@ class RenderTableCell : public RenderBlock {
                                   int ty,
                                   RenderObject* backgroundObject);
 
-  virtual IntRect clippedOverflowRectForRepaint(RenderBox* repaintContainer);
-  virtual void computeRectForRepaint(RenderBox* repaintContainer,
+  virtual IntRect clippedOverflowRectForRepaint(
+      RenderBoxModelObject* repaintContainer);
+  virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect&,
                                      bool fixed = false);
   virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
@@ -141,7 +142,7 @@ class RenderTableCell : public RenderBlock {
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
   virtual FloatQuad localToContainerQuad(const FloatQuad&,
-                                         RenderBox* repaintContainer,
+                                         RenderBoxModelObject* repaintContainer,
                                          bool fixed = false) const;
 
  private:

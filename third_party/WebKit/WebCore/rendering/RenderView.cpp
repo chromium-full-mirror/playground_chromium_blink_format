@@ -151,9 +151,10 @@ FloatPoint RenderView::absoluteToLocal(FloatPoint containerPoint,
   return containerPoint;
 }
 
-FloatQuad RenderView::localToContainerQuad(const FloatQuad& localQuad,
-                                           RenderBox* repaintContainer,
-                                           bool fixed) const {
+FloatQuad RenderView::localToContainerQuad(
+    const FloatQuad& localQuad,
+    RenderBoxModelObject* repaintContainer,
+    bool fixed) const {
   // If a container was specified, and was not 0 or the RenderView,
   // then we should have found it by now.
   ASSERT_UNUSED(repaintContainer,
@@ -287,7 +288,7 @@ void RenderView::repaintRectangleInViewAndCompositedLayers(const IntRect& ur,
 #endif
 }
 
-void RenderView::computeRectForRepaint(RenderBox* repaintContainer,
+void RenderView::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                        IntRect& rect,
                                        bool fixed) {
   // If a container was specified, and was not 0 or the RenderView,
