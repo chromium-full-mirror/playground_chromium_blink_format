@@ -1135,7 +1135,9 @@ void Element::updateFocusAppearance(bool /*restorePreviousSelection*/) {
       frame->revealSelection();
     }
   }
-#if ENABLE(DIRECTIONAL_PAD_NAVIGATION)
+// FIXME: I'm not sure all devices will want this off, but this is
+// currently turned off for Andriod.
+#if !ENABLE(DIRECTIONAL_PAD_NAVIGATION)
   else if (renderer() && !renderer()->isWidget())
     renderer()->enclosingLayer()->scrollRectToVisible(getRect());
 #endif
