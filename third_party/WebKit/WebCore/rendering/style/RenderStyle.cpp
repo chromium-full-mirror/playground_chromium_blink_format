@@ -667,7 +667,7 @@ void RenderStyle::setContent(CounterContent* c, bool add) {
 
 void RenderStyle::applyTransform(TransformationMatrix& transform,
                                  const IntSize& borderBoxSize,
-                                 bool includeTransformOrigin) const {
+                                 ApplyTransformOrigin applyOrigin) const {
   // transform-origin brackets the transform with translate operations.
   // Optimize for the case where the only transform is a translation, since the
   // transform-origin is irrelevant
@@ -676,7 +676,7 @@ void RenderStyle::applyTransform(TransformationMatrix& transform,
   unsigned s =
       rareNonInheritedData->m_transform->m_operations.operations().size();
   unsigned i;
-  if (includeTransformOrigin) {
+  if (applyOrigin == IncludeTransformOrigin) {
     for (i = 0; i < s; i++) {
       TransformOperation::OperationType type =
           rareNonInheritedData->m_transform->m_operations.operations()[i]

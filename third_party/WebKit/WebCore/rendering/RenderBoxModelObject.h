@@ -53,6 +53,8 @@ class RenderBoxModelObject : public RenderObject {
   }
 
  private:
+  virtual bool isBoxModelObject() const { return true; }
+
   friend class RenderView;
 
   RenderLayer* m_layer;
@@ -60,6 +62,20 @@ class RenderBoxModelObject : public RenderObject {
   // Used to store state between styleWillChange and styleDidChange
   static bool s_wasFloating;
 };
+
+inline RenderBoxModelObject* toRenderBoxModelObject(RenderObject* o) {
+  ASSERT(!o || o->isBoxModelObject());
+  return static_cast<RenderBoxModelObject*>(o);
+}
+
+inline const RenderBoxModelObject* toRenderBoxModelObject(
+    const RenderObject* o) {
+  ASSERT(!o || o->isBoxModelObject());
+  return static_cast<const RenderBoxModelObject*>(o);
+}
+
+// This will catch anyone doing an unnecessary cast.
+void toRenderBoxModelObject(const RenderBox*);
 
 }  // namespace WebCore
 

@@ -113,7 +113,8 @@ void RenderLayerBacking::updateLayerTransform() {
   // baked into it, and we don't want that.
   TransformationMatrix t;
   if (m_owningLayer->hasTransform())
-    style->applyTransform(t, renderer()->borderBoxRect().size(), false);
+    style->applyTransform(t, renderer()->borderBoxRect().size(),
+                          RenderStyle::ExcludeTransformOrigin);
 
   m_graphicsLayer->setTransform(t);
 }

@@ -30,6 +30,7 @@
 #define AnimationControllerPrivate_h
 
 #include "AtomicString.h"
+#include "CSSPropertyNames.h"
 #include "PlatformString.h"
 #include "Timer.h"
 #include <wtf/HashMap.h>
@@ -73,7 +74,7 @@ class AnimationControllerPrivate {
   void resumeAnimations(Document*);
 
   bool isAnimatingPropertyOnRenderer(RenderObject*,
-                                     int property,
+                                     CSSPropertyID,
                                      bool isRunningNow) const;
 
   bool pauseAnimationAtTime(RenderObject*, const String& name, double t);

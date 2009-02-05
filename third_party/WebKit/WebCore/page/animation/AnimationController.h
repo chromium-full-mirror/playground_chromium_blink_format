@@ -29,6 +29,7 @@
 #ifndef AnimationController_h
 #define AnimationController_h
 
+#include "CSSPropertyNames.h"
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -67,7 +68,7 @@ class AnimationController {
   unsigned numberOfActiveAnimations() const;  // To be used only for testing
 
   bool isAnimatingPropertyOnRenderer(RenderObject*,
-                                     int property,
+                                     CSSPropertyID,
                                      bool isRunningNow = true) const;
 
   void suspendAnimations(Document*);
@@ -75,6 +76,8 @@ class AnimationController {
 
   void beginAnimationUpdate();
   void endAnimationUpdate();
+
+  static bool supportsAcceleratedAnimationOfProperty(CSSPropertyID);
 
  private:
   AnimationControllerPrivate* m_data;

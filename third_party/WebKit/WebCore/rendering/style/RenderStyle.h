@@ -881,9 +881,12 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return !rareNonInheritedData->m_transform->m_operations.operations()
                 .isEmpty();
   }
+
+  enum ApplyTransformOrigin { IncludeTransformOrigin, ExcludeTransformOrigin };
   void applyTransform(TransformationMatrix&,
                       const IntSize& borderBoxSize,
-                      bool includeTransformOrigin = true) const;
+                      ApplyTransformOrigin = IncludeTransformOrigin) const;
+
   bool hasMask() const {
     return rareNonInheritedData->m_mask.hasImage() ||
            rareNonInheritedData->m_maskBoxImage.hasImage();
