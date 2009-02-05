@@ -259,7 +259,8 @@ PassRefPtr<SecurityOrigin> SecurityOrigin::createFromDatabaseIdentifier(
   String protocol = databaseIdentifier.substring(0, separator1);
   String host =
       databaseIdentifier.substring(separator1 + 1, separator2 - separator1 - 1);
-  return create(KURL(protocol + "://" + host + ":" + String::number(port)));
+  return create(
+      KURL(KURL(), protocol + "://" + host + ":" + String::number(port)));
 }
 
 String SecurityOrigin::databaseIdentifier() const {
