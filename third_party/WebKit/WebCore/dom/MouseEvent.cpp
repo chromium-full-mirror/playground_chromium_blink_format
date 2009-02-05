@@ -43,7 +43,7 @@ MouseEvent::MouseEvent(const AtomicString& eventType,
                        bool shiftKey,
                        bool metaKey,
                        unsigned short button,
-                       PassRefPtr<EventTargetNode> relatedTarget,
+                       PassRefPtr<EventTarget> relatedTarget,
                        PassRefPtr<Clipboard> clipboard,
                        bool isSimulated)
     : MouseRelatedEvent(eventType,
@@ -81,7 +81,7 @@ void MouseEvent::initMouseEvent(const AtomicString& type,
                                 bool shiftKey,
                                 bool metaKey,
                                 unsigned short button,
-                                PassRefPtr<EventTargetNode> relatedTarget) {
+                                PassRefPtr<EventTarget> relatedTarget) {
   if (dispatched())
     return;
 
@@ -128,7 +128,7 @@ Node* MouseEvent::toElement() const {
   // MSIE extension - "the object toward which the user is moving the mouse
   // pointer"
   if (type() == eventNames().mouseoutEvent)
-    return relatedTarget();
+    return relatedTarget() ? relatedTarget()->toNode() : 0;
 
   return target() ? target()->toNode() : 0;
 }
@@ -137,7 +137,7 @@ Node* MouseEvent::fromElement() const {
   // MSIE extension - "object from which activation or the mouse pointer is
   // exiting during the event" (huh?)
   if (type() != eventNames().mouseoutEvent)
-    return relatedTarget();
+    return relatedTarget() ? relatedTarget()->toNode() : 0;
 
   return target() ? target()->toNode() : 0;
 }

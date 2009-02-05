@@ -32,7 +32,7 @@
 #include "JSDOMWindow.h"
 #include "JSEvent.h"
 #include "JSEventTarget.h"
-#include "JSEventTargetNode.h"
+#include "JSNode.h"
 #include "ScriptController.h"
 #include <runtime/FunctionConstructor.h>
 #include <runtime/JSLock.h>
@@ -337,7 +337,7 @@ void JSLazyEventListener::parseCode() const {
 
     JSValuePtr thisObj = toJS(exec, m_originalNode);
     if (thisObj.isObject()) {
-      static_cast<JSEventTargetNode*>(asObject(thisObj))
+      static_cast<JSNode*>(asObject(thisObj))
           ->pushEventHandlerScope(exec, scope);
       listenerAsFunction->setScope(scope);
     }

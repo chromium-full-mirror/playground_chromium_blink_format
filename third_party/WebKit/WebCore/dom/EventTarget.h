@@ -40,8 +40,8 @@ class AtomicString;
 class DOMApplicationCache;
 class Event;
 class EventListener;
-class EventTargetNode;
 class MessagePort;
+class Node;
 class ScriptExecutionContext;
 class SVGElementInstance;
 class Worker;
@@ -54,7 +54,7 @@ typedef int ExceptionCode;
 class EventTarget {
  public:
   virtual MessagePort* toMessagePort();
-  virtual EventTargetNode* toNode();
+  virtual Node* toNode();
   virtual XMLHttpRequest* toXMLHttpRequest();
   virtual XMLHttpRequestUpload* toXMLHttpRequestUpload();
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)

@@ -43,7 +43,7 @@ using namespace JSC;
 namespace WebCore {
 
 void JSDocument::mark() {
-  JSEventTargetNode::mark();
+  JSNode::mark();
   markDOMNodesForDocument(impl());
   markActiveObjectsForContext(*Heap::heap(this)->globalData(), impl());
 }

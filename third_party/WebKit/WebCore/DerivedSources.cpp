@@ -68,7 +68,6 @@
 #include "JSEntityReference.cpp"
 #include "JSEvent.cpp"
 #include "JSEventException.cpp"
-#include "JSEventTargetNode.cpp"
 #include "JSFile.cpp"
 #include "JSFileList.cpp"
 #include "JSHistory.cpp"

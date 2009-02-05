@@ -37,7 +37,7 @@ namespace WebCore {
 typedef int ExceptionCode;
 
 class EventListener;
-class EventTargetNode;
+class Node;
 class Node;
 class String;
 
@@ -56,7 +56,7 @@ class XPathResult : public RefCounted<XPathResult> {
     FIRST_ORDERED_NODE_TYPE = 9
   };
 
-  static PassRefPtr<XPathResult> create(EventTargetNode* eventTarget,
+  static PassRefPtr<XPathResult> create(Node* eventTarget,
                                         const XPath::Value& value) {
     return adoptRef(new XPathResult(eventTarget, value));
   }
@@ -79,7 +79,7 @@ class XPathResult : public RefCounted<XPathResult> {
   void invalidateIteratorState();
 
  private:
-  XPathResult(EventTargetNode*, const XPath::Value&);
+  XPathResult(Node*, const XPath::Value&);
 
   XPath::Value m_value;
   unsigned m_nodeSetPosition;
@@ -87,7 +87,7 @@ class XPathResult : public RefCounted<XPathResult> {
       m_nodeSet;  // FIXME: why duplicate the node set stored in m_value?
   unsigned short m_resultType;
   bool m_invalidIteratorState;
-  RefPtr<EventTargetNode> m_eventTarget;
+  RefPtr<Node> m_eventTarget;
   RefPtr<EventListener> m_eventListener;
 };
 }

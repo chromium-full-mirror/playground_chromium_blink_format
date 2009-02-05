@@ -42,7 +42,7 @@ static int gEventDispatchForbidden = 0;
 
 EventTarget::~EventTarget() {}
 
-EventTargetNode* EventTarget::toNode() {
+Node* EventTarget::toNode() {
   return 0;
 }
 
