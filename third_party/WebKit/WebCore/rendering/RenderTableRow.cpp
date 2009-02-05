@@ -215,8 +215,8 @@ bool RenderTableRow::nodeAtPoint(const HitTestRequest& request,
 }
 
 void RenderTableRow::paint(PaintInfo& paintInfo, int tx, int ty) {
-  ASSERT(m_layer);
-  if (!m_layer)
+  ASSERT(hasLayer());
+  if (!layer())
     return;
 
   for (RenderObject* child = firstChild(); child;

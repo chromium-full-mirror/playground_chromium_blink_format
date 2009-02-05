@@ -90,12 +90,20 @@ RenderInline* RenderInline::inlineContinuation() const {
   return toRenderBlock(m_continuation)->inlineContinuation();
 }
 
+void RenderInline::updateBoxModelInfoFromStyle() {
+  RenderBoxModelObject::updateBoxModelInfoFromStyle();
+
+  setInline(true);  // Needed for run-ins, since run-in is considered a block
+                    // display type.
+
+  // FIXME: Support transforms and reflections on inline flows someday.
+  setHasTransform(false);
+  setHasReflection(false);
+}
+
 void RenderInline::styleDidChange(StyleDifference diff,
                                   const RenderStyle* oldStyle) {
   RenderBox::styleDidChange(diff, oldStyle);
-
-  setInline(true);
-  setHasReflection(false);
 
   // Ensure that all of the split inlines pick up the new style. We
   // only do this if we're an inline, since we don't want to propagate
@@ -712,7 +720,7 @@ int RenderInline::lineHeight(bool firstLine, bool /*isRootLineBox*/) const {
 }
 
 IntSize RenderInline::relativePositionedInlineOffset(
-    const RenderObject* child) const {
+    const RenderBox* child) const {
   ASSERT(isRelPositioned());
   if (!isRelPositioned())
     return IntSize();
@@ -730,11 +738,11 @@ IntSize RenderInline::relativePositionedInlineOffset(
     sx = firstLineBox()->xPos();
     sy = firstLineBox()->yPos();
   } else {
-    sx = staticX();
-    sy = staticY();
+    sx = layer()->staticX();
+    sy = layer()->staticY();
   }
 
-  if (!child->hasStaticX())
+  if (!child->style()->hasStaticX())
     offset.setWidth(sx);
   // This is not terribly intuitive, but we have to match other browsers.
   // Despite being a block display type inside
@@ -749,7 +757,7 @@ IntSize RenderInline::relativePositionedInlineOffset(
     offset.setWidth(sx - (child->containingBlock()->borderLeft() +
                           child->containingBlock()->paddingLeft()));
 
-  if (!child->hasStaticY())
+  if (!child->style()->hasStaticY())
     offset.setHeight(sy);
 
   return offset;

@@ -221,15 +221,6 @@ class RenderObject : public CachedResourceClient {
   // style from this RenderObject.
   RenderBlock* createAnonymousBlock();
 
-  // Whether or not a positioned element requires normal flow x/y to be computed
-  // to determine its position.
-  bool hasStaticX() const;
-  bool hasStaticY() const;
-  virtual void setStaticX(int /*staticX*/) {}
-  virtual void setStaticY(int /*staticY*/) {}
-  virtual int staticX() const { return 0; }
-  virtual int staticY() const { return 0; }
-
   // RenderObject tree manipulation
   //////////////////////////////////////////
   virtual bool canHaveChildren() const { return virtualChildren(); }
@@ -1174,7 +1165,8 @@ inline void RenderObject::markContainingBlocksForLayout(bool scheduleRelayout,
   while (o) {
     if (!last->isText() && (last->style()->position() == FixedPosition ||
                             last->style()->position() == AbsolutePosition)) {
-      if (last->hasStaticY()) {
+      if ((last->style()->top().isAuto() && last->style()->bottom().isAuto()) ||
+          last->style()->top().isStatic()) {
         RenderObject* parent = last->parent();
         if (!parent->normalChildNeedsLayout()) {
           parent->setChildNeedsLayout(true, false);

@@ -217,6 +217,16 @@ class RenderBox : public RenderBoxModelObject {
                              bool topLevel = true);
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
+  virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
+                                     bool fixed = false,
+                                     bool useTransforms = false) const;
+  virtual FloatPoint absoluteToLocal(FloatPoint containerPoint,
+                                     bool fixed = false,
+                                     bool useTransforms = false) const;
+  virtual FloatQuad localToContainerQuad(const FloatQuad&,
+                                         RenderBoxModelObject* repaintContainer,
+                                         bool fixed = false) const;
+
   IntRect reflectionBox() const;
   int reflectionOffset() const;
   // Given a rect in the object's coordinate space, returns the corresponding
@@ -242,13 +252,6 @@ class RenderBox : public RenderBoxModelObject {
   virtual int overrideWidth() const;
   virtual int overrideHeight() const;
   virtual void setOverrideSize(int);
-
-  virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
-                                     bool fixed = false,
-                                     bool useTransforms = false) const;
-  virtual FloatPoint absoluteToLocal(FloatPoint containerPoint,
-                                     bool fixed = false,
-                                     bool useTransforms = false) const;
 
   virtual IntSize offsetFromContainer(RenderObject*) const;
 
@@ -295,9 +298,6 @@ class RenderBox : public RenderBoxModelObject {
   virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect&,
                                      bool fixed = false);
-  virtual FloatQuad localToContainerQuad(const FloatQuad&,
-                                         RenderBoxModelObject* repaintContainer,
-                                         bool fixed = false) const;
 
   virtual void repaintDuringLayoutIfMoved(const IntRect&);
 
@@ -337,12 +337,6 @@ class RenderBox : public RenderBoxModelObject {
   int availableHeightUsing(const Length&) const;
 
   void calcVerticalMargins();
-
-  RenderLayer* layer() const { return m_layer; }
-  virtual bool requiresLayer() const {
-    return isRoot() || isPositioned() || isRelPositioned() || isTransparent() ||
-           hasOverflowClip() || hasTransform() || hasMask() || hasReflection();
-  }
 
   virtual int verticalScrollbarWidth() const;
   int horizontalScrollbarHeight() const;
@@ -392,11 +386,6 @@ class RenderBox : public RenderBoxModelObject {
                                   int scaledWidth,
                                   int scaledHeight) const;
 
-  virtual int staticX() const;
-  virtual int staticY() const;
-  virtual void setStaticX(int staticX);
-  virtual void setStaticY(int staticY);
-
   virtual IntRect getOverflowClipRect(int tx, int ty);
   virtual IntRect getClipRect(int tx, int ty);
 
@@ -433,6 +422,7 @@ class RenderBox : public RenderBoxModelObject {
  protected:
   virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
+  virtual void updateBoxModelInfoFromStyle();
 
   void paintFillLayer(const PaintInfo&,
                       const Color&,
@@ -563,15 +553,11 @@ class RenderBox : public RenderBoxModelObject {
   // The preferred width of the element if it never breaks any lines at all.
   int m_maxPrefWidth;
 
-  // A pointer to our layer if we have one.
-  RenderLayer* m_layer;
-
   // For inline replaced elements, the inline box that owns us.
   InlineBox* m_inlineBoxWrapper;
 
  private:
   // Used to store state between styleWillChange and styleDidChange
-  static bool s_wasFloating;
   static bool s_hadOverflowClip;
 };
 

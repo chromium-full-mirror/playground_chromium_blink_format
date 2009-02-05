@@ -385,8 +385,8 @@ static void appendRunsForObject(int start,
                                 RenderObject* obj,
                                 InlineBidiResolver& resolver) {
   if (start > end || obj->isFloating() ||
-      (obj->isPositioned() && !obj->hasStaticX() && !obj->hasStaticY() &&
-       !obj->container()->isRenderInline()))
+      (obj->isPositioned() && !obj->style()->hasStaticX() &&
+       !obj->style()->hasStaticY() && !obj->container()->isRenderInline()))
     return;
 
   bool haveNextMidpoint = (sCurrMidpoint < sNumMidpoints);
@@ -885,7 +885,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
                                     // This way we'll repaint like
                                     // we're supposed to.
       RenderView* v = view();
-      if (v && !v->doingFullRepaint() && m_layer) {
+      if (v && !v->doingFullRepaint() && hasLayer()) {
         // Because we waited until we were already inside layout to discover
         // that the block really needed a full layout, we missed our chance to
         // repaint the layer
@@ -893,7 +893,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         // for its original
         // position and size, and so we can use that to make a repaint happen
         // now.
-        repaintUsingContainer(containerForRepaint(), m_layer->repaintRect());
+        repaintUsingContainer(containerForRepaint(), layer()->repaintRect());
       }
     }
 
@@ -1573,25 +1573,27 @@ void RenderBlock::skipTrailingWhitespace(InlineIterator& iterator) {
         // position as though we were an inline.  Set |staticX| and |staticY| on
         // the relative positioned
         // inline so that we can obtain the value later.
-        c->setStaticX(style()->direction() == LTR
-                          ? leftOffset(height(), false)
-                          : rightOffset(height(), false));
-        c->setStaticY(height());
+        toRenderInline(c)->layer()->setStaticX(
+            style()->direction() == LTR ? leftOffset(height(), false)
+                                        : rightOffset(height(), false));
+        toRenderInline(c)->layer()->setStaticY(height());
       }
 
-      if (object->hasStaticX()) {
-        if (object->style()->isOriginalDisplayInlineType())
-          object->setStaticX(style()->direction() == LTR
-                                 ? leftOffset(height(), false)
-                                 : width() - rightOffset(height(), false));
+      RenderBox* box = toRenderBox(object);
+      if (box->style()->hasStaticX()) {
+        if (box->style()->isOriginalDisplayInlineType())
+          box->layer()->setStaticX(style()->direction() == LTR
+                                       ? leftOffset(height(), false)
+                                       : width() -
+                                             rightOffset(height(), false));
         else
-          object->setStaticX(style()->direction() == LTR
-                                 ? borderLeft() + paddingLeft()
-                                 : borderRight() + paddingRight());
+          box->layer()->setStaticX(style()->direction() == LTR
+                                       ? borderLeft() + paddingLeft()
+                                       : borderRight() + paddingRight());
       }
 
-      if (object->hasStaticY())
-        object->setStaticY(height());
+      if (box->style()->hasStaticY())
+        box->layer()->setStaticY(height());
     }
     iterator.increment();
   }
@@ -1618,25 +1620,27 @@ int RenderBlock::skipLeadingWhitespace(InlineBidiResolver& resolver,
         // position as though we were an inline.  Set |staticX| and |staticY| on
         // the relative positioned
         // inline so that we can obtain the value later.
-        c->setStaticX(style()->direction() == LTR
-                          ? leftOffset(height(), firstLine)
-                          : rightOffset(height(), firstLine));
-        c->setStaticY(height());
+        toRenderInline(c)->layer()->setStaticX(
+            style()->direction() == LTR ? leftOffset(height(), firstLine)
+                                        : rightOffset(height(), firstLine));
+        toRenderInline(c)->layer()->setStaticY(height());
       }
 
-      if (object->hasStaticX()) {
+      RenderBox* box = toRenderBox(object);
+      if (box->style()->hasStaticX()) {
         if (object->style()->isOriginalDisplayInlineType())
-          object->setStaticX(style()->direction() == LTR
-                                 ? leftOffset(height(), firstLine)
-                                 : width() - rightOffset(height(), firstLine));
+          box->layer()->setStaticX(style()->direction() == LTR
+                                       ? leftOffset(height(), firstLine)
+                                       : width() -
+                                             rightOffset(height(), firstLine));
         else
-          object->setStaticX(style()->direction() == LTR
-                                 ? borderLeft() + paddingLeft()
-                                 : borderRight() + paddingRight());
+          box->layer()->setStaticX(style()->direction() == LTR
+                                       ? borderLeft() + paddingLeft()
+                                       : borderRight() + paddingRight());
       }
 
-      if (object->hasStaticY())
-        object->setStaticY(height());
+      if (box->style()->hasStaticY())
+        box->layer()->setStaticY(height());
     }
     resolver.increment();
   }
@@ -1815,20 +1819,21 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
       } else if (o->isPositioned()) {
         // If our original display wasn't an inline type, then we can
         // go ahead and determine our static x position now.
-        bool isInlineType = o->style()->isOriginalDisplayInlineType();
-        bool needToSetStaticX = o->hasStaticX();
-        if (o->hasStaticX() && !isInlineType) {
-          o->setStaticX(o->parent()->style()->direction() == LTR
-                            ? borderLeft() + paddingLeft()
-                            : borderRight() + paddingRight());
+        RenderBox* box = toRenderBox(o);
+        bool isInlineType = box->style()->isOriginalDisplayInlineType();
+        bool needToSetStaticX = box->style()->hasStaticX();
+        if (box->style()->hasStaticX() && !isInlineType) {
+          box->layer()->setStaticX(o->parent()->style()->direction() == LTR
+                                       ? borderLeft() + paddingLeft()
+                                       : borderRight() + paddingRight());
           needToSetStaticX = false;
         }
 
         // If our original display was an INLINE type, then we can go ahead
         // and determine our static y position now.
-        bool needToSetStaticY = o->hasStaticY();
-        if (o->hasStaticY() && isInlineType) {
-          o->setStaticY(height());
+        bool needToSetStaticY = box->style()->hasStaticY();
+        if (box->style()->hasStaticY() && isInlineType) {
+          box->layer()->setStaticY(height());
           needToSetStaticY = false;
         }
 
