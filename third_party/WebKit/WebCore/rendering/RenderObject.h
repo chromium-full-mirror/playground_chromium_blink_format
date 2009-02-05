@@ -581,7 +581,7 @@ class RenderObject : public CachedResourceClient {
   virtual void updateWidgetPosition();
 
 #if ENABLE(DASHBOARD_SUPPORT)
-  void addDashboardRegions(Vector<DashboardRegionValue>&);
+  virtual void addDashboardRegions(Vector<DashboardRegionValue>&);
   void collectDashboardRegions(Vector<DashboardRegionValue>&);
 #endif
 
