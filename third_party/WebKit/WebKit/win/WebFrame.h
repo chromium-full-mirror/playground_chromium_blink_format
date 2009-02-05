@@ -324,6 +324,7 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual WebCore::String overrideMediaType() const;
 
   virtual void windowObjectCleared();
+  virtual void documentElementAvailable();
   virtual void didPerformFirstNavigation() const;
 
   virtual void registerForIconNotification(bool listen);

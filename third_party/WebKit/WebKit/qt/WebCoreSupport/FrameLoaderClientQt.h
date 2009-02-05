@@ -255,6 +255,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual String overrideMediaType() const;
 
   virtual void windowObjectCleared();
+  virtual void documentElementAvailable();
   virtual void didPerformFirstNavigation() const;
 
   virtual void registerForIconNotification(bool);

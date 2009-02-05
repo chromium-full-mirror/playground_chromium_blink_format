@@ -517,6 +517,8 @@ void FrameLoaderClient::windowObjectCleared() {
   // The Win port has an example of how we might do this.
 }
 
+void FrameLoaderClient::documentElementAvailable() {}
+
 void FrameLoaderClient::didPerformFirstNavigation() const {}
 
 void FrameLoaderClient::registerForIconNotification(bool) {

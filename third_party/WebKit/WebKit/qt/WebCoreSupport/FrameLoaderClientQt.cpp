@@ -535,6 +535,10 @@ void FrameLoaderClientQt::windowObjectCleared() {
     emit m_webFrame->javaScriptWindowObjectCleared();
 }
 
+void FrameLoaderClient::documentElementAvailable() {
+  return;
+}
+
 void FrameLoaderClientQt::didPerformFirstNavigation() const {
   if (m_frame->tree()->parent() || !m_webFrame)
     return;

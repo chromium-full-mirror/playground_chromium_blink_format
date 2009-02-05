@@ -472,6 +472,7 @@ class FrameLoader : Noncopyable
                                  const HashMap<String, String>& args);
 
   void dispatchWindowObjectAvailable();
+  void dispatchDocumentElementAvailable();
   void restoreDocumentState();
 
   Frame* opener();
