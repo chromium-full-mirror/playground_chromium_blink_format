@@ -55,13 +55,3 @@ PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
 }
 
 }  // namespace WebCore
-
-namespace WTF {
-
-#if !defined(__linux__)
-void scheduleDispatchFunctionsOnMainThread() {
-  notImplemented();
-}
-#endif
-
-}  // namespace WTF
