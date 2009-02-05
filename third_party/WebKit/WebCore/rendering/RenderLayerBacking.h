@@ -128,9 +128,6 @@ class RenderLayerBacking : public GraphicsLayerClient {
   void invalidateDrawingOptimizations();
 
   // GraphicsLayerClient interface
-  virtual void notifyTransitionStarted(const GraphicsLayer*,
-                                       AnimatedPropertyID,
-                                       double startTime);
   virtual void notifyAnimationStarted(const GraphicsLayer*, double startTime);
 
   virtual void paintContents(const GraphicsLayer*,

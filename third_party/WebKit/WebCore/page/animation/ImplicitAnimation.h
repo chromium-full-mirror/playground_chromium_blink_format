@@ -53,12 +53,15 @@ class ImplicitAnimation : public AnimationBase {
   int animatingProperty() const { return m_animatingProperty; }
 
   virtual void onAnimationEnd(double elapsedTime);
+  virtual bool startAnimation(double beginTime);
+  virtual void endAnimation(bool reset);
 
   virtual void animate(CompositeAnimation*,
                        RenderObject*,
                        RenderStyle* currentStyle,
                        RenderStyle* targetStyle,
                        RefPtr<RenderStyle>& animatedStyle);
+  virtual void getAnimatedStyle(RefPtr<RenderStyle>& animatedStyle);
   virtual void reset(RenderStyle* to);
 
   void setOverridden(bool);
@@ -72,8 +75,10 @@ class ImplicitAnimation : public AnimationBase {
 
   void blendPropertyValueInStyle(int, RenderStyle* currentStyle);
 
+  virtual double willNeedService();
+
  protected:
-  bool shouldSendEventForListener(Document::ListenerType);
+  bool shouldSendEventForListener(Document::ListenerType) const;
   bool sendTransitionEvent(const AtomicString&, double elapsedTime);
 
   void validateTransformFunctionList();

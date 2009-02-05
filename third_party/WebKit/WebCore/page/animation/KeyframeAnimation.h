@@ -55,6 +55,7 @@ class KeyframeAnimation : public AnimationBase {
                        const RenderStyle* currentStyle,
                        const RenderStyle* targetStyle,
                        RefPtr<RenderStyle>& animatedStyle);
+  virtual void getAnimatedStyle(RefPtr<RenderStyle>& animatedStyle);
 
   const AtomicString& name() const { return m_keyframes.animationName(); }
   int index() const { return m_index; }
@@ -67,16 +68,19 @@ class KeyframeAnimation : public AnimationBase {
   }
   RenderStyle* unanimatedStyle() const { return m_unanimatedStyle.get(); }
 
+  virtual double willNeedService();
+
  protected:
   virtual void onAnimationStart(double elapsedTime);
   virtual void onAnimationIteration(double elapsedTime);
   virtual void onAnimationEnd(double elapsedTime);
+  virtual bool startAnimation(double beginTime);
   virtual void endAnimation(bool reset);
 
   virtual void overrideAnimations();
   virtual void resumeOverriddenAnimations();
 
-  bool shouldSendEventForListener(Document::ListenerType inListenerType);
+  bool shouldSendEventForListener(Document::ListenerType inListenerType) const;
   bool sendAnimationEvent(const AtomicString&, double elapsedTime);
 
   virtual bool affectsProperty(int) const;
@@ -90,6 +94,12 @@ class KeyframeAnimation : public AnimationBase {
                     CompositeAnimation*,
                     RenderStyle* unanimatedStyle);
   virtual ~KeyframeAnimation();
+
+  // Get the styles surrounding the current animation time and the progress
+  // between them
+  void getKeyframeAnimationInterval(const RenderStyle*& fromStyle,
+                                    const RenderStyle*& fromStyle,
+                                    double& progress) const;
 
   // The keyframes that we are blending.
   KeyframeList m_keyframes;

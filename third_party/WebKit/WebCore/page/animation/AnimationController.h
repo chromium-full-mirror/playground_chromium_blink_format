@@ -52,9 +52,11 @@ class AnimationController {
   void cancelAnimations(RenderObject*);
   PassRefPtr<RenderStyle> updateAnimations(RenderObject*,
                                            RenderStyle* newStyle);
+  PassRefPtr<RenderStyle> getAnimatedStyleForRenderer(RenderObject*);
 
-  void setAnimationStartTime(RenderObject*, double t);
-  void setTransitionStartTime(RenderObject*, int property, double t);
+  // This is called when an accelerated animation or transition has actually
+  // started to animate.
+  void notifyAnimationStarted(RenderObject*, double startTime);
 
   bool pauseAnimationAtTime(RenderObject*,
                             const String& name,
@@ -66,22 +68,10 @@ class AnimationController {
 
   bool isAnimatingPropertyOnRenderer(RenderObject*,
                                      int property,
-                                     bool isRunningNow) const;
+                                     bool isRunningNow = true) const;
 
   void suspendAnimations(Document*);
   void resumeAnimations(Document*);
-
-  void startUpdateRenderingDispatcher();
-  void addEventToDispatch(PassRefPtr<Element>,
-                          const AtomicString& eventType,
-                          const String& name,
-                          double elapsedTime);
-  void addNodeChangeToDispatch(PassRefPtr<Node>);
-
-  void addToStyleAvailableWaitList(AnimationBase*);
-  void removeFromStyleAvailableWaitList(AnimationBase*);
-
-  double beginAnimationUpdateTime();
 
   void beginAnimationUpdate();
   void endAnimationUpdate();

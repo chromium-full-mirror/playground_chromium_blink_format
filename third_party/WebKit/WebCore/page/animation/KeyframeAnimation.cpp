@@ -29,12 +29,14 @@
 #include "config.h"
 #include "KeyframeAnimation.h"
 
-#include "AnimationController.h"
+#include "AnimationControllerPrivate.h"
 #include "CSSPropertyNames.h"
 #include "CSSStyleSelector.h"
 #include "CompositeAnimation.h"
 #include "EventNames.h"
-#include "RenderObject.h"
+#include "RenderLayer.h"
+#include "RenderLayerBacking.h"
+#include <wtf/UnusedParam.h>
 
 namespace WebCore {
 
@@ -63,6 +65,50 @@ KeyframeAnimation::~KeyframeAnimation() {
   // get called
   if (!postActive())
     updateStateMachine(AnimationStateInputEndAnimation, -1);
+}
+
+void KeyframeAnimation::getKeyframeAnimationInterval(
+    const RenderStyle*& fromStyle,
+    const RenderStyle*& toStyle,
+    double& prog) const {
+  // Find the first key
+  double elapsedTime = getElapsedTime();
+
+  double t =
+      m_animation->duration() ? (elapsedTime / m_animation->duration()) : 1;
+  int i = static_cast<int>(t);
+  t -= i;
+  if (m_animation->direction() && (i & 1))
+    t = 1 - t;
+
+  double scale = 1;
+  double offset = 0;
+  Vector<KeyframeValue>::const_iterator endKeyframes =
+      m_keyframes.endKeyframes();
+  for (Vector<KeyframeValue>::const_iterator it = m_keyframes.beginKeyframes();
+       it != endKeyframes; ++it) {
+    if (t < it->key()) {
+      // The first key should always be 0, so we should never succeed on the
+      // first key
+      if (!fromStyle)
+        break;
+      scale = 1.0 / (it->key() - offset);
+      toStyle = it->style();
+      break;
+    }
+
+    offset = it->key();
+    fromStyle = it->style();
+  }
+
+  if (!fromStyle || !toStyle)
+    return;
+
+  const TimingFunction* timingFunction = 0;
+  if (fromStyle->animations() && fromStyle->animations()->size() > 0)
+    timingFunction = &(fromStyle->animations()->animation(0)->timingFunction());
+
+  prog = progress(scale, offset, timingFunction);
 }
 
 void KeyframeAnimation::animate(CompositeAnimation*,
@@ -99,37 +145,11 @@ void KeyframeAnimation::animate(CompositeAnimation*,
   // are animating between.
   // We should cache the last pair or something.
 
-  // Find the first key
-  double elapsedTime = getElapsedTime();
-
-  double t =
-      m_animation->duration() ? (elapsedTime / m_animation->duration()) : 1;
-  int i = static_cast<int>(t);
-  t -= i;
-  if (m_animation->direction() && (i & 1))
-    t = 1 - t;
-
+  // Get the from/to styles and progress between
   const RenderStyle* fromStyle = 0;
   const RenderStyle* toStyle = 0;
-  double scale = 1;
-  double offset = 0;
-  Vector<KeyframeValue>::const_iterator endKeyframes =
-      m_keyframes.endKeyframes();
-  for (Vector<KeyframeValue>::const_iterator it = m_keyframes.beginKeyframes();
-       it != endKeyframes; ++it) {
-    if (t < it->key()) {
-      // The first key should always be 0, so we should never succeed on the
-      // first key
-      if (!fromStyle)
-        break;
-      scale = 1.0 / (it->key() - offset);
-      toStyle = it->style();
-      break;
-    }
-
-    offset = it->key();
-    fromStyle = it->style();
-  }
+  double progress;
+  getKeyframeAnimationInterval(fromStyle, toStyle, progress);
 
   // If either style is 0 we have an invalid case, just stop the animation.
   if (!fromStyle || !toStyle) {
@@ -142,19 +162,35 @@ void KeyframeAnimation::animate(CompositeAnimation*,
   if (!animatedStyle)
     animatedStyle = RenderStyle::clone(targetStyle);
 
-  const TimingFunction* timingFunction = 0;
-  if (fromStyle->animations() && fromStyle->animations()->size() > 0)
-    timingFunction = &(fromStyle->animations()->animation(0)->timingFunction());
-
-  double prog = progress(scale, offset, timingFunction);
-
   HashSet<int>::const_iterator endProperties = m_keyframes.endProperties();
   for (HashSet<int>::const_iterator it = m_keyframes.beginProperties();
        it != endProperties; ++it) {
-    if (blendProperties(this, *it, animatedStyle.get(), fromStyle, toStyle,
-                        prog))
+    bool needsAnim = blendProperties(this, *it, animatedStyle.get(), fromStyle,
+                                     toStyle, progress);
+    if (needsAnim || m_fallbackAnimating)
       setAnimating();
   }
+}
+
+void KeyframeAnimation::getAnimatedStyle(RefPtr<RenderStyle>& animatedStyle) {
+  // Get the from/to styles and progress between
+  const RenderStyle* fromStyle = 0;
+  const RenderStyle* toStyle = 0;
+  double progress;
+  getKeyframeAnimationInterval(fromStyle, toStyle, progress);
+
+  // If either style is 0 we have an invalid case
+  if (!fromStyle || !toStyle)
+    return;
+
+  if (!animatedStyle)
+    animatedStyle = RenderStyle::clone(m_object->style());
+
+  HashSet<int>::const_iterator endProperties = m_keyframes.endProperties();
+  for (HashSet<int>::const_iterator it = m_keyframes.beginProperties();
+       it != endProperties; ++it)
+    blendProperties(this, *it, animatedStyle.get(), fromStyle, toStyle,
+                    progress);
 }
 
 bool KeyframeAnimation::hasAnimationForProperty(int property) const {
@@ -168,14 +204,39 @@ bool KeyframeAnimation::hasAnimationForProperty(int property) const {
   return false;
 }
 
-void KeyframeAnimation::endAnimation(bool) {
-  // Restore the original (unanimated) style
-  if (m_object)
+bool KeyframeAnimation::startAnimation(double beginTime) {
+#if USE(ACCELERATED_COMPOSITING)
+  if (m_object && m_object->hasLayer()) {
+    RenderLayer* layer = toRenderBox(m_object)->layer();
+    if (layer->isComposited())
+      return layer->backing()->startAnimation(beginTime, m_animation.get(),
+                                              m_keyframes);
+  }
+#else
+  UNUSED_PARAM(beginTime);
+#endif
+  return false;
+}
+
+void KeyframeAnimation::endAnimation(bool reset) {
+  if (m_object) {
+#if USE(ACCELERATED_COMPOSITING)
+    if (m_object->hasLayer()) {
+      RenderLayer* layer = toRenderBox(m_object)->layer();
+      if (layer->isComposited())
+        layer->backing()->animationFinished(m_keyframes.animationName(), 0,
+                                            reset);
+    }
+#else
+    UNUSED_PARAM(reset);
+#endif
+    // Restore the original (unanimated) style
     setChanged(m_object->element());
+  }
 }
 
 bool KeyframeAnimation::shouldSendEventForListener(
-    Document::ListenerType listenerType) {
+    Document::ListenerType listenerType) const {
   return m_object->document()->hasListenerType(listenerType);
 }
 
@@ -219,7 +280,7 @@ bool KeyframeAnimation::sendAnimationEvent(const AtomicString& eventType,
       return false;
 
     // Schedule event handling
-    m_object->animation()->addEventToDispatch(
+    m_compAnim->animationControllerPriv()->addEventToDispatch(
         element, eventType, m_keyframes.animationName(), elapsedTime);
 
     // Restore the original (unanimated) style
@@ -309,6 +370,34 @@ void KeyframeAnimation::validateTransformFunctionList() {
 
   // Keyframes are valid
   m_transformFunctionListValid = true;
+}
+
+double KeyframeAnimation::willNeedService() {
+  double t = AnimationBase::willNeedService();
+#if USE(ACCELERATED_COMPOSITING)
+  if (t != 0 || preActive())
+    return t;
+
+  // A return value of 0 means we need service. But if we only have accelerated
+  // animations we
+  // only need service at the end of the transition
+  HashSet<int>::const_iterator endProperties = m_keyframes.endProperties();
+  bool acceleratedPropertiesOnly = true;
+
+  for (HashSet<int>::const_iterator it = m_keyframes.beginProperties();
+       it != endProperties; ++it) {
+    if (!animationOfPropertyIsAccelerated(*it)) {
+      acceleratedPropertiesOnly = false;
+      break;
+    }
+  }
+
+  if (acceleratedPropertiesOnly) {
+    bool isLooping;
+    getTimeToNextEvent(t, isLooping);
+  }
+#endif
+  return t;
 }
 
 }  // namespace WebCore
