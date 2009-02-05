@@ -50,7 +50,7 @@ class CachedFrame : public RefCounted<CachedFrame> {
   }
   ~CachedFrame();
 
-  void restore(Frame*);
+  void restore();
   void clear();
 
   Document* document() const { return m_document.get(); }

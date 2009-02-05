@@ -29,6 +29,9 @@
 #include "CachedFrame.h"
 #include "FocusController.h"
 #include "Frame.h"
+#ifndef NDEBUG
+#include "FrameView.h"
+#endif
 #include "Page.h"
 #include <wtf/CurrentTime.h>
 #include <wtf/RefCountedLeakCounter.h>
@@ -62,8 +65,9 @@ CachedPage::~CachedPage() {
 }
 
 void CachedPage::restore(Page* page) {
-  ASSERT(page && page->mainFrame());
-  m_cachedMainFrame->restore(page->mainFrame());
+  ASSERT(page && page->mainFrame() &&
+         page->mainFrame() == m_cachedMainFrame->view()->frame());
+  m_cachedMainFrame->restore();
 
   // Restore the focus appearance for the focused element.
   // FIXME: Right now we don't support pages w/ frames in the b/f cache.  This

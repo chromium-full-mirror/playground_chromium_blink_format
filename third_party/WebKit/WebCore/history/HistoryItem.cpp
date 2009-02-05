@@ -44,7 +44,6 @@ HistoryItem::HistoryItem()
     : m_lastVisitedTime(0),
       m_lastVisitWasHTTPNonGet(false),
       m_lastVisitWasFailure(false),
-      m_isInPageCache(false),
       m_isTargetItem(false),
       m_visitCount(0) {}
 
@@ -57,7 +56,6 @@ HistoryItem::HistoryItem(const String& urlString,
       m_lastVisitedTime(time),
       m_lastVisitWasHTTPNonGet(false),
       m_lastVisitWasFailure(false),
-      m_isInPageCache(false),
       m_isTargetItem(false),
       m_visitCount(0) {
   iconDatabase()->retainIconForPageURL(m_urlString);
@@ -74,7 +72,6 @@ HistoryItem::HistoryItem(const String& urlString,
       m_lastVisitedTime(time),
       m_lastVisitWasHTTPNonGet(false),
       m_lastVisitWasFailure(false),
-      m_isInPageCache(false),
       m_isTargetItem(false),
       m_visitCount(0) {
   iconDatabase()->retainIconForPageURL(m_urlString);
@@ -92,14 +89,13 @@ HistoryItem::HistoryItem(const KURL& url,
       m_lastVisitedTime(0),
       m_lastVisitWasHTTPNonGet(false),
       m_lastVisitWasFailure(false),
-      m_isInPageCache(false),
       m_isTargetItem(false),
       m_visitCount(0) {
   iconDatabase()->retainIconForPageURL(m_urlString);
 }
 
 HistoryItem::~HistoryItem() {
-  ASSERT(!m_isInPageCache);
+  ASSERT(!m_cachedPage);
   iconDatabase()->releaseIconForPageURL(m_urlString);
 }
 
@@ -116,10 +112,11 @@ inline HistoryItem::HistoryItem(const HistoryItem& item)
       m_lastVisitWasHTTPNonGet(item.m_lastVisitWasHTTPNonGet),
       m_scrollPoint(item.m_scrollPoint),
       m_lastVisitWasFailure(item.m_lastVisitWasFailure),
-      m_isInPageCache(item.m_isInPageCache),
       m_isTargetItem(item.m_isTargetItem),
       m_visitCount(item.m_visitCount),
       m_formContentType(item.m_formContentType) {
+  ASSERT(!item.m_cachedPage);
+
   if (item.m_formData)
     m_formData = item.m_formData->copy();
 
