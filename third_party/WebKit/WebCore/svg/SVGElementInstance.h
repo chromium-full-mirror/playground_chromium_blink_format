@@ -56,7 +56,7 @@ class SVGElementInstance : public TreeShared<SVGElementInstance>,
 
   virtual ScriptExecutionContext* scriptExecutionContext() const;
 
-  virtual EventTargetNode* toNode() { return shadowTreeElement(); }
+  virtual Node* toNode() { return shadowTreeElement(); }
   virtual SVGElementInstance* toSVGElementInstance() { return this; }
 
   virtual void addEventListener(const AtomicString& eventType,

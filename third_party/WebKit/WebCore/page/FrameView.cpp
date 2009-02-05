@@ -63,7 +63,7 @@ double FrameView::sCurrentPaintTimeStamp = 0.0;
 
 struct ScheduledEvent {
   RefPtr<Event> m_event;
-  RefPtr<EventTargetNode> m_eventTarget;
+  RefPtr<Node> m_eventTarget;
 };
 
 FrameView::FrameView(Frame* frame)
@@ -922,7 +922,7 @@ void FrameView::setShouldUpdateWhileOffscreen(bool shouldUpdateWhileOffscreen) {
 }
 
 void FrameView::scheduleEvent(PassRefPtr<Event> event,
-                              PassRefPtr<EventTargetNode> eventTarget) {
+                              PassRefPtr<Node> eventTarget) {
   if (!m_enqueueEvents) {
     ExceptionCode ec = 0;
     eventTarget->dispatchEvent(event, ec);
@@ -1018,7 +1018,7 @@ void FrameView::updateOverflowStatus(bool horizontalOverflow,
     scheduleEvent(
         OverflowEvent::create(horizontalOverflowChanged, horizontalOverflow,
                               verticalOverflowChanged, verticalOverflow),
-        EventTargetNodeCast(m_viewportRenderer->element()));
+        m_viewportRenderer->element());
   }
 }
 

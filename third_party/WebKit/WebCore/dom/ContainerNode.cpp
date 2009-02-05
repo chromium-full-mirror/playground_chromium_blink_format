@@ -285,7 +285,7 @@ bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
 void ContainerNode::willRemove() {
   for (Node* n = m_firstChild; n != 0; n = n->nextSibling())
     n->willRemove();
-  EventTargetNode::willRemove();
+  Node::willRemove();
 }
 
 static ExceptionCode willRemoveChild(Node* child) {
@@ -573,7 +573,7 @@ void ContainerNode::attach() {
 
   for (Node* child = m_firstChild; child; child = child->nextSibling())
     child->attach();
-  EventTargetNode::attach();
+  Node::attach();
 
   if (s_attachDepth == 1 && s_postAttachCallbackQueue)
     dispatchPostAttachCallbacks();
@@ -584,18 +584,18 @@ void ContainerNode::detach() {
   for (Node* child = m_firstChild; child; child = child->nextSibling())
     child->detach();
   setHasChangedChild(false);
-  EventTargetNode::detach();
+  Node::detach();
 }
 
 void ContainerNode::insertedIntoDocument() {
-  EventTargetNode::insertedIntoDocument();
+  Node::insertedIntoDocument();
   insertedIntoTree(false);
   for (Node* child = m_firstChild; child; child = child->nextSibling())
     child->insertedIntoDocument();
 }
 
 void ContainerNode::removedFromDocument() {
-  EventTargetNode::removedFromDocument();
+  Node::removedFromDocument();
   setInDocument(false);
   removedFromTree(false);
   for (Node* child = m_firstChild; child; child = child->nextSibling())
@@ -774,7 +774,7 @@ void ContainerNode::setFocus(bool received) {
   if (focused() == received)
     return;
 
-  EventTargetNode::setFocus(received);
+  Node::setFocus(received);
 
   // note that we need to recalc the style
   setChanged();
@@ -784,7 +784,7 @@ void ContainerNode::setActive(bool down, bool pause) {
   if (down == active())
     return;
 
-  EventTargetNode::setActive(down);
+  Node::setActive(down);
 
   // note that we need to recalc the style
   // FIXME: Move to Element
@@ -833,7 +833,7 @@ void ContainerNode::setHovered(bool over) {
   if (over == hovered())
     return;
 
-  EventTargetNode::setHovered(over);
+  Node::setHovered(over);
 
   // note that we need to recalc the style
   // FIXME: Move to Element
@@ -873,10 +873,9 @@ static void dispatchChildInsertionEvents(Node* child, ExceptionCode& ec) {
     c->insertedIntoTree(true);
 
   if (c->parentNode() &&
-      doc->hasListenerType(Document::DOMNODEINSERTED_LISTENER) &&
-      c->isEventTargetNode()) {
+      doc->hasListenerType(Document::DOMNODEINSERTED_LISTENER)) {
     ec = 0;
-    EventTargetNodeCast(c.get())->dispatchEvent(
+    c->dispatchEvent(
         MutationEvent::create(eventNames().DOMNodeInsertedEvent, true, false,
                               c->parentNode(), String(), String(), String(), 0),
         ec);
@@ -888,15 +887,11 @@ static void dispatchChildInsertionEvents(Node* child, ExceptionCode& ec) {
   if (c->inDocument() &&
       doc->hasListenerType(Document::DOMNODEINSERTEDINTODOCUMENT_LISTENER))
     for (; c; c = c->traverseNextNode(child)) {
-      if (!c->isEventTargetNode())
-        continue;
-
       ec = 0;
-      EventTargetNodeCast(c.get())->dispatchEvent(
-          MutationEvent::create(eventNames().DOMNodeInsertedIntoDocumentEvent,
-                                false, false, 0, String(), String(), String(),
-                                0),
-          ec);
+      c->dispatchEvent(MutationEvent::create(
+                           eventNames().DOMNodeInsertedIntoDocumentEvent, false,
+                           false, 0, String(), String(), String(), 0),
+                       ec);
       if (ec)
         return;
     }
@@ -912,10 +907,9 @@ static void dispatchChildRemovalEvents(Node* child, ExceptionCode& ec) {
 
   // dispatch pre-removal mutation events
   if (c->parentNode() &&
-      doc->hasListenerType(Document::DOMNODEREMOVED_LISTENER) &&
-      c->isEventTargetNode()) {
+      doc->hasListenerType(Document::DOMNODEREMOVED_LISTENER)) {
     ec = 0;
-    EventTargetNodeCast(c.get())->dispatchEvent(
+    c->dispatchEvent(
         MutationEvent::create(eventNames().DOMNodeRemovedEvent, true, false,
                               c->parentNode(), String(), String(), String(), 0),
         ec);
@@ -927,14 +921,11 @@ static void dispatchChildRemovalEvents(Node* child, ExceptionCode& ec) {
   if (c->inDocument() &&
       doc->hasListenerType(Document::DOMNODEREMOVEDFROMDOCUMENT_LISTENER))
     for (; c; c = c->traverseNextNode(child)) {
-      if (!c->isEventTargetNode())
-        continue;
       ec = 0;
-      EventTargetNodeCast(c.get())->dispatchEvent(
-          MutationEvent::create(eventNames().DOMNodeRemovedFromDocumentEvent,
-                                false, false, 0, String(), String(), String(),
-                                0),
-          ec);
+      c->dispatchEvent(MutationEvent::create(
+                           eventNames().DOMNodeRemovedFromDocumentEvent, false,
+                           false, 0, String(), String(), String(), 0),
+                       ec);
       if (ec)
         return;
     }

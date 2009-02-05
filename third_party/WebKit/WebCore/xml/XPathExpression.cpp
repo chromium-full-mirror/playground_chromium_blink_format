@@ -70,9 +70,8 @@ PassRefPtr<XPathResult> XPathExpression::evaluate(Node* contextNode,
     return 0;
   }
 
-  EventTargetNode* eventTarget =
-      contextNode->ownerDocument() ? contextNode->ownerDocument()
-                                   : static_cast<EventTargetNode*>(contextNode);
+  Node* eventTarget =
+      contextNode->ownerDocument() ? contextNode->ownerDocument() : contextNode;
 
   EvaluationContext& evaluationContext = Expression::evaluationContext();
   evaluationContext.node = contextNode;

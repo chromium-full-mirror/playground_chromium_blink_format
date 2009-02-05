@@ -211,7 +211,6 @@ class Node : public EventTarget, public TreeShared<Node> {
   virtual bool isCommentNode() const { return false; }
   virtual bool isCharacterDataNode() const { return false; }
   bool isDocumentNode() const;
-  bool isEventTargetNode() const { return true; }
   virtual bool isShadowNode() const { return false; }
   virtual Node* shadowParentNode() { return 0; }
   Node* shadowAncestorNode();

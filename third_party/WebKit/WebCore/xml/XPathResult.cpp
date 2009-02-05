@@ -31,7 +31,7 @@
 
 #include "EventListener.h"
 #include "EventNames.h"
-#include "EventTargetNode.h"
+#include "Node.h"
 #include "ExceptionCode.h"
 #include "XPathEvaluator.h"
 #include "XPathException.h"
@@ -54,7 +54,7 @@ class InvalidatingEventListener : public EventListener {
   XPathResult* m_result;
 };
 
-XPathResult::XPathResult(EventTargetNode* eventTarget, const Value& value)
+XPathResult::XPathResult(Node* eventTarget, const Value& value)
     : m_value(value), m_eventTarget(eventTarget) {
   m_eventListener = InvalidatingEventListener::create(this);
   m_eventTarget->addEventListener(eventNames().DOMSubtreeModifiedEvent,
