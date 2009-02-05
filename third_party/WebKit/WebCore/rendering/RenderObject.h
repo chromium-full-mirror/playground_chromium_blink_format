@@ -236,6 +236,10 @@ class RenderObject : public CachedResourceClient {
     return true;
   }
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
+  virtual void addChildIgnoringContinuation(RenderObject* newChild,
+                                            RenderObject* beforeChild = 0) {
+    return addChild(newChild, beforeChild);
+  }
   virtual void removeChild(RenderObject*);
   virtual bool createsAnonymousWrapper() const { return false; }
   //////////////////////////////////////////

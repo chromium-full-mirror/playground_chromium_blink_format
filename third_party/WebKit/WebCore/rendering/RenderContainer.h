@@ -38,13 +38,6 @@ class RenderContainer : public RenderBox {
   const RenderObjectChildList* children() const { return &m_children; }
   RenderObjectChildList* children() { return &m_children; }
 
-  virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
-  virtual void addChildIgnoringContinuation(RenderObject* newChild,
-                                            RenderObject* beforeChild = 0) {
-    return addChild(newChild, beforeChild);
-  }
-  virtual void removeChild(RenderObject*);
-
  protected:
   RenderObjectChildList m_children;
 };
