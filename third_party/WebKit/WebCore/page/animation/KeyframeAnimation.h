@@ -98,7 +98,7 @@ class KeyframeAnimation : public AnimationBase {
   // Get the styles surrounding the current animation time and the progress
   // between them
   void getKeyframeAnimationInterval(const RenderStyle*& fromStyle,
-                                    const RenderStyle*& fromStyle,
+                                    const RenderStyle*& toStyle,
                                     double& progress) const;
 
   // The keyframes that we are blending.
