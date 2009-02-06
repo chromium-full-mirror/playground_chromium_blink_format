@@ -1837,14 +1837,12 @@ void RenderObject::repaintUsingContainer(RenderBoxModelObject* repaintContainer,
 }
 
 void RenderObject::repaint(bool immediate) {
-  // Can't use view(), since we might be unrooted.
-  RenderObject* o = this;
-  while (o->parent())
-    o = o->parent();
-  if (!o->isRenderView())
+  // Don't repaint if we're unrooted (note that view() still returns the view
+  // when unrooted)
+  RenderView* view;
+  if (!isRooted(&view))
     return;
 
-  RenderView* view = toRenderView(o);
   if (view->printing())
     return;  // Don't repaint if we're printing.
 
@@ -1855,14 +1853,12 @@ void RenderObject::repaint(bool immediate) {
 }
 
 void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
-  // Can't use view(), since we might be unrooted.
-  RenderObject* o = this;
-  while (o->parent())
-    o = o->parent();
-  if (!o->isRenderView())
+  // Don't repaint if we're unrooted (note that view() still returns the view
+  // when unrooted)
+  RenderView* view;
+  if (!isRooted(&view))
     return;
 
-  RenderView* view = toRenderView(o);
   if (view->printing())
     return;  // Don't repaint if we're printing.
 
@@ -2445,6 +2441,20 @@ IntRect RenderObject::localCaretRect(InlineBox*,
 
 RenderView* RenderObject::view() const {
   return toRenderView(document()->renderer());
+}
+
+bool RenderObject::isRooted(RenderView** view) {
+  RenderObject* o = this;
+  while (o->parent())
+    o = o->parent();
+
+  if (!o->isRenderView())
+    return false;
+
+  if (view)
+    *view = toRenderView(o);
+
+  return true;
 }
 
 bool RenderObject::hasOutlineAnnotation() const {
