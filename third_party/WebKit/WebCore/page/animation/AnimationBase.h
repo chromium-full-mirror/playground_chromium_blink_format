@@ -199,6 +199,10 @@ class AnimationBase : public RefCounted<AnimationBase> {
     updateStateMachine(AnimationBase::AnimationStateInputStyleAvailable, -1);
   }
 
+#if USE(ACCELERATED_COMPOSITING)
+  static bool animationOfPropertyIsAccelerated(int prop);
+#endif
+
  protected:
   virtual void overrideAnimations() {}
   virtual void resumeOverriddenAnimations() {}
@@ -230,10 +234,6 @@ class AnimationBase : public RefCounted<AnimationBase> {
                               const RenderStyle* a,
                               const RenderStyle* b,
                               double progress);
-
-#if USE(ACCELERATED_COMPOSITING)
-  static bool animationOfPropertyIsAccelerated(int prop);
-#endif
 
   static void setChanged(Node*);
 
