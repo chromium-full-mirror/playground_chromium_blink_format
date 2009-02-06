@@ -37,6 +37,7 @@
 
 namespace WebCore {
 
+class KeyframeList;
 class RenderLayerCompositor;
 
 // RenderLayerBacking controls the compositing behavior for a single
@@ -141,7 +142,7 @@ class RenderLayerBacking : public GraphicsLayerClient {
   void createGraphicsLayer();
   void destroyGraphicsLayer();
 
-  RenderBox* renderer() const { return m_owningLayer->renderer(); }
+  RenderBoxModelObject* renderer() const { return m_owningLayer->renderer(); }
   RenderLayerCompositor* compositor() const {
     return m_owningLayer->compositor();
   }
