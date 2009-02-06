@@ -535,7 +535,7 @@ void FrameLoaderClientQt::windowObjectCleared() {
     emit m_webFrame->javaScriptWindowObjectCleared();
 }
 
-void FrameLoaderClient::documentElementAvailable() {
+void FrameLoaderClientQt::documentElementAvailable() {
   return;
 }
 
