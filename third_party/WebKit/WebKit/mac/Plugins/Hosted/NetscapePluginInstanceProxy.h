@@ -259,6 +259,8 @@ class NetscapePluginInstanceProxy
   void stopAllStreams();
   void processRequestsAndWaitForReply();
 
+  void cleanup();
+
   NetscapePluginHostProxy* m_pluginHostProxy;
   WebHostedNetscapePluginView* m_pluginView;
 

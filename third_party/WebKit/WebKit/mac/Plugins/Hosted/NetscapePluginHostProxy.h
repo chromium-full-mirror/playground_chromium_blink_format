@@ -56,6 +56,8 @@ class NetscapePluginHostProxy {
 
   void applicationDidBecomeActive();
 
+  bool processRequests();
+
  private:
   ~NetscapePluginHostProxy();
   void pluginHostDied();
@@ -73,6 +75,8 @@ class NetscapePluginHostProxy {
   PluginInstanceMap m_instances;
 
   mach_port_t m_clientPort;
+  mach_port_t m_portSet;
+
 #ifdef USE_LIBDISPATCH
   dispatch_source_t m_clientPortSource;
 #else
