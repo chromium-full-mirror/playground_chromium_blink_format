@@ -58,8 +58,8 @@ ScriptController::createScriptInstanceForWidget(WebCore::Widget* widget) {
   QWidget* platformWidget = widget->platformWidget();
   if (!platformWidget)
     return 0;
-  return JSC::Bindings::QtInstance::getQtInstance(platformWidget,
-                                                  bindingRootObject());
+  return JSC::Bindings::QtInstance::getQtInstance(
+      platformWidget, bindingRootObject(), QScriptEngine::QtOwnership);
 }
 }
 // vim: ts=4 sw=4 et

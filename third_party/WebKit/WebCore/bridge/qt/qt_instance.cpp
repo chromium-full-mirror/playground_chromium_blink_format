@@ -97,12 +97,15 @@ void QtRuntimeObjectImp::removeFromCache() {
 }
 
 // QtInstance
-QtInstance::QtInstance(QObject* o, PassRefPtr<RootObject> rootObject)
+QtInstance::QtInstance(QObject* o,
+                       PassRefPtr<RootObject> rootObject,
+                       QScriptEngine::ValueOwnership ownership)
     : Instance(rootObject),
       m_class(0),
       m_object(o),
       m_hashkey(o),
-      m_defaultMethod(0) {}
+      m_defaultMethod(0),
+      m_ownership(ownership) {}
 
 QtInstance::~QtInstance() {
   JSLock lock(false);
@@ -115,11 +118,26 @@ QtInstance::~QtInstance() {
 
   foreach (QtField* f, m_fields.values()) { delete f; }
   m_fields.clear();
+
+  if (m_object) {
+    switch (m_ownership) {
+      case QScriptEngine::QtOwnership:
+        break;
+      case QScriptEngine::AutoOwnership:
+        if (m_object->parent())
+          break;
+      // fall through!
+      case QScriptEngine::ScriptOwnership:
+        delete m_object;
+        break;
+    }
+  }
 }
 
 PassRefPtr<QtInstance> QtInstance::getQtInstance(
     QObject* o,
-    PassRefPtr<RootObject> rootObject) {
+    PassRefPtr<RootObject> rootObject,
+    QScriptEngine::ValueOwnership ownership) {
   JSLock lock(false);
 
   foreach (QtInstance* instance, cachedInstances.values(o)) {
@@ -127,7 +145,7 @@ PassRefPtr<QtInstance> QtInstance::getQtInstance(
       return instance;
   }
 
-  RefPtr<QtInstance> ret = QtInstance::create(o, rootObject);
+  RefPtr<QtInstance> ret = QtInstance::create(o, rootObject, ownership);
   cachedInstances.insert(o, ret.get());
 
   return ret.release();
