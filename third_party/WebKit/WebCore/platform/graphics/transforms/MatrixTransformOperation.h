@@ -26,6 +26,7 @@
 #define MatrixTransformOperation_h
 
 #include "TransformOperation.h"
+#include "TransformationMatrix.h"
 
 namespace WebCore {
 
@@ -38,6 +39,11 @@ class MatrixTransformOperation : public TransformOperation {
                                                      double e,
                                                      double f) {
     return adoptRef(new MatrixTransformOperation(a, b, c, d, e, f));
+  }
+
+  static PassRefPtr<MatrixTransformOperation> create(
+      const TransformationMatrix& t) {
+    return adoptRef(new MatrixTransformOperation(t));
   }
 
  private:
@@ -76,6 +82,14 @@ class MatrixTransformOperation : public TransformOperation {
                            double e,
                            double f)
       : m_a(a), m_b(b), m_c(c), m_d(d), m_e(e), m_f(f) {}
+
+  MatrixTransformOperation(const TransformationMatrix& t)
+      : m_a(t.a()),
+        m_b(t.b()),
+        m_c(t.c()),
+        m_d(t.d()),
+        m_e(t.e()),
+        m_f(t.f()) {}
 
   double m_a;
   double m_b;

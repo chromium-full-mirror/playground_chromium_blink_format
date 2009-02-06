@@ -38,6 +38,14 @@ class TranslateTransformOperation : public TransformOperation {
     return adoptRef(new TranslateTransformOperation(tx, ty, type));
   }
 
+  double x(const IntSize& borderBoxSize) const {
+    return m_x.calcFloatValue(borderBoxSize.width());
+  }
+  double y(const IntSize& borderBoxSize) const {
+    return m_y.calcFloatValue(borderBoxSize.height());
+  }
+
+ private:
   virtual bool isIdentity() const {
     return m_x.calcFloatValue(1) == 0 && m_y.calcFloatValue(1) == 0;
   }
@@ -65,7 +73,6 @@ class TranslateTransformOperation : public TransformOperation {
                                                double progress,
                                                bool blendToIdentity = false);
 
- private:
   TranslateTransformOperation(const Length& tx,
                               const Length& ty,
                               OperationType type)
