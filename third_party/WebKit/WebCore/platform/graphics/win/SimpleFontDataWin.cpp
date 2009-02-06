@@ -88,6 +88,7 @@ void SimpleFontData::initGDIFont() {
 void SimpleFontData::platformCommonDestroy() {
   // We don't hash this on Win32, so it's effectively owned by us.
   delete m_smallCapsFontData;
+  m_smallCapsFontData = 0;
 
   ScriptFreeCache(&m_scriptCache);
   delete m_scriptFontProperties;
