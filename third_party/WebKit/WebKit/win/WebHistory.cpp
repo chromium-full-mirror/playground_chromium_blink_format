@@ -740,7 +740,7 @@ void WebHistory::visitedURL(const KURL& url,
                                         lastVisited)))
       return;
 
-    item->setVisitCount(1);
+    item->recordInitialVisit();
 
     CFDictionarySetValue(m_entriesByURL.get(), urlString.get(), entry);
   }
