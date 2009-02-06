@@ -917,7 +917,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
 
   // return the first found Animation (including 'all' transitions)
-  const Animation* transitionForProperty(int property);
+  const Animation* transitionForProperty(int property) const;
 
   int lineClamp() const { return rareNonInheritedData->lineClamp; }
   bool textSizeAdjust() const { return rareInheritedData->textSizeAdjust; }
