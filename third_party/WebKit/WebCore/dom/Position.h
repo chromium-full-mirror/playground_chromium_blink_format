@@ -40,9 +40,10 @@ class Node;
 class Range;
 class RenderObject;
 
-enum EUsingComposedCharacters {
-  NotUsingComposedCharacters = false,
-  UsingComposedCharacters = true
+enum PositionMoveType {
+  CodePoint,        // Move by a single code point.
+  Character,        // Move to the next Unicode character break.
+  BackwardDeletion  // Subject to platform conventions.
 };
 
 // FIXME: Reduce the number of operations we have on a Position.
@@ -77,11 +78,11 @@ class Position {
   // note that even when
   // using composed characters, the result may be inside a single user-visible
   // character if a ligature is formed.
-  Position previous(EUsingComposedCharacters usingComposedCharacters =
-                        NotUsingComposedCharacters) const;
-  Position next(EUsingComposedCharacters usingComposedCharacters =
-                    NotUsingComposedCharacters) const;
+  Position previous(PositionMoveType = CodePoint) const;
+  Position next(PositionMoveType = CodePoint) const;
   static int uncheckedPreviousOffset(const Node*, int current);
+  static int uncheckedPreviousOffsetForBackwardDeletion(const Node*,
+                                                        int current);
   static int uncheckedNextOffset(const Node*, int current);
 
   bool atStart() const;

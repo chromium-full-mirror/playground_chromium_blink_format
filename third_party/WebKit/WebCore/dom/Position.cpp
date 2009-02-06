@@ -94,8 +94,7 @@ PassRefPtr<CSSComputedStyleDeclaration> Position::computedStyle() const {
   return WebCore::computedStyle(elem);
 }
 
-Position Position::previous(
-    EUsingComposedCharacters usingComposedCharacters) const {
+Position Position::previous(PositionMoveType moveType) const {
   Node* n = node();
   if (!n)
     return *this;
@@ -106,9 +105,9 @@ Position Position::previous(
 
   if (o > 0) {
     Node* child = n->childNode(o - 1);
-    if (child) {
+    if (child)
       return Position(child, maxDeepOffset(child));
-    }
+
     // There are two reasons child might be 0:
     //   1) The node is node like a text node that is not an element, and
     //   therefore has no children.
@@ -116,8 +115,14 @@ Position Position::previous(
     //   2) The old offset was a bogus offset like (<br>, 1), and there is no
     //   child.
     //      Going from 1 to 0 is correct.
-    return Position(
-        n, usingComposedCharacters ? uncheckedPreviousOffset(n, o) : o - 1);
+    switch (moveType) {
+      case CodePoint:
+        return Position(n, o - 1);
+      case Character:
+        return Position(n, uncheckedPreviousOffset(n, o));
+      case BackwardDeletion:
+        return Position(n, uncheckedPreviousOffsetForBackwardDeletion(n, o));
+    }
   }
 
   Node* parent = n->parentNode();
@@ -127,8 +132,9 @@ Position Position::previous(
   return Position(parent, n->nodeIndex());
 }
 
-Position Position::next(
-    EUsingComposedCharacters usingComposedCharacters) const {
+Position Position::next(PositionMoveType moveType) const {
+  ASSERT(moveType != BackwardDeletion);
+
   Node* n = node();
   if (!n)
     return *this;
@@ -150,7 +156,7 @@ Position Position::next(
     //   child.
     //      Going from 0 to 1 is correct.
     return Position(
-        n, usingComposedCharacters ? uncheckedNextOffset(n, o) : o + 1);
+        n, (moveType == Character) ? uncheckedNextOffset(n, o) : o + 1);
   }
 
   Node* parent = n->parentNode();
@@ -162,6 +168,13 @@ Position Position::next(
 
 int Position::uncheckedPreviousOffset(const Node* n, int current) {
   return n->renderer() ? n->renderer()->previousOffset(current) : current - 1;
+}
+
+int Position::uncheckedPreviousOffsetForBackwardDeletion(const Node* n,
+                                                         int current) {
+  return n->renderer()
+             ? n->renderer()->previousOffsetForBackwardDeletion(current)
+             : current - 1;
 }
 
 int Position::uncheckedNextOffset(const Node* n, int current) {
