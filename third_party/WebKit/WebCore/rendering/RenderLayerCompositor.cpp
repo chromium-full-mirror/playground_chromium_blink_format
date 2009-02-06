@@ -478,7 +478,7 @@ void RenderLayerCompositor::rebuildCompositingLayerTree(
   updateLayerCompositingState(layer, StyleDifferenceEqual);
 
   // host the document layer in the RenderView's root layer
-  if (layer->isDocumentLayer())
+  if (layer->isRootLayer())
     parentInRootLayer(layer);
 
   CompositingState childState = ioCompState;
@@ -670,7 +670,7 @@ bool RenderLayerCompositor::requiresCompositingLayer(
 #if VERBOSE_COMPOSITINGLAYER
   bool gotReason = false;
 
-  if (!gotReason && inCompositingMode() && layer->isDocumentLayer()) {
+  if (!gotReason && inCompositingMode() && layer->isRootLayer()) {
     fprintf(stderr,
             "RenderLayer %p requires compositing layer because: it's the "
             "document root\n",
@@ -707,8 +707,8 @@ bool RenderLayerCompositor::requiresCompositingLayer(
             layer);
 #endif
 
-  // the root layer always has a compositing layer (for now).
-  return (inCompositingMode() && layer->isDocumentLayer()) ||
+  // The root layer always has a compositing layer, but it may not have backing.
+  return (inCompositingMode() && layer->isRootLayer()) ||
          requiresCompositingLayerForTransform(layer->renderer()) ||
          clipsCompositingDescendants(layer) ||
          requiresCompositingForAnimation(layer);

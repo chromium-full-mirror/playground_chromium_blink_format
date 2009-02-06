@@ -649,7 +649,7 @@ FloatPoint RenderLayerBacking::contentsToGraphicsLayerCoordinates(
 }
 
 bool RenderLayerBacking::paintingGoesToWindow() const {
-  return m_owningLayer->isDocumentLayer();
+  return m_owningLayer->isRootLayer();
 }
 
 void RenderLayerBacking::setContentsNeedDisplay() {
