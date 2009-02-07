@@ -175,11 +175,11 @@ TransformationMatrix SVGPreserveAspectRatio::getCTM(double logicX,
   double svgar = physWidth / physHeight;
 
   if (align() == SVG_PRESERVEASPECTRATIO_NONE) {
-    temp.scale(physWidth / logicWidth, physHeight / logicHeight);
+    temp.scaleNonUniform(physWidth / logicWidth, physHeight / logicHeight);
     temp.translate(-logicX, -logicY);
   } else if (vpar < svgar && (meetOrSlice() == SVG_MEETORSLICE_MEET) ||
              vpar >= svgar && (meetOrSlice() == SVG_MEETORSLICE_SLICE)) {
-    temp.scale(physHeight / logicHeight, physHeight / logicHeight);
+    temp.scaleNonUniform(physHeight / logicHeight, physHeight / logicHeight);
 
     if (align() == SVG_PRESERVEASPECTRATIO_XMINYMIN ||
         align() == SVG_PRESERVEASPECTRATIO_XMINYMID ||
@@ -196,7 +196,7 @@ TransformationMatrix SVGPreserveAspectRatio::getCTM(double logicX,
           -logicX - (logicWidth - physWidth * logicHeight / physHeight),
           -logicY);
   } else {
-    temp.scale(physWidth / logicWidth, physWidth / logicWidth);
+    temp.scaleNonUniform(physWidth / logicWidth, physWidth / logicWidth);
 
     if (align() == SVG_PRESERVEASPECTRATIO_XMINYMIN ||
         align() == SVG_PRESERVEASPECTRATIO_XMIDYMIN ||

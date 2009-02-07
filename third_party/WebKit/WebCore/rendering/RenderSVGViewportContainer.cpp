@@ -165,7 +165,7 @@ bool RenderSVGViewportContainer::nodeAtPoint(const HitTestRequest& request,
     TransformationMatrix ctm = RenderObject::absoluteTransform();
     ctm.translate(viewport().x(), viewport().y());
     double localX, localY;
-    ctm.inverse().map(_x - _tx, _y - _ty, &localX, &localY);
+    ctm.inverse().map(_x - _tx, _y - _ty, localX, localY);
     if (!overflowBox.contains((int)localX, (int)localY))
       return false;
   }

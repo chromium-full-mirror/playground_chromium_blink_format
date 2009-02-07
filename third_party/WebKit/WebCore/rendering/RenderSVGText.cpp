@@ -125,7 +125,7 @@ bool RenderSVGText::nodeAtPoint(const HitTestRequest& request,
          (style()->svgStyle()->hasFill() || !hitRules.requireFill))) {
       TransformationMatrix totalTransform = absoluteTransform();
       double localX, localY;
-      totalTransform.inverse().map(_x, _y, &localX, &localY);
+      totalTransform.inverse().map(_x, _y, localX, localY);
       FloatPoint hitPoint(_x, _y);
       return RenderBlock::nodeAtPoint(request, result, (int)localX, (int)localY,
                                       _tx, _ty, hitTestAction);

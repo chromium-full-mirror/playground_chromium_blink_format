@@ -66,7 +66,7 @@ void SVGResourceClipper::applyClip(GraphicsContext* context,
     if (clipData.bboxUnits) {
       TransformationMatrix transform;
       transform.translate(boundingBox.x(), boundingBox.y());
-      transform.scale(boundingBox.width(), boundingBox.height());
+      transform.scaleNonUniform(boundingBox.width(), boundingBox.height());
       clipPath.transform(transform);
     }
     context->addPath(clipPath);

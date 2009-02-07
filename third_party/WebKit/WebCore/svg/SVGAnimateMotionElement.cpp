@@ -141,7 +141,7 @@ void SVGAnimateMotionElement::resetToBaseValue(const String&) {
   TransformationMatrix* transform = target->supplementalTransform();
   if (!transform)
     return;
-  transform->reset();
+  transform->makeIdentity();
 }
 
 bool SVGAnimateMotionElement::calculateFromAndToValues(const String& fromString,
@@ -172,7 +172,7 @@ void SVGAnimateMotionElement::calculateAnimatedValue(float percentage,
     return;
 
   if (!isAdditive())
-    transform->reset();
+    transform->makeIdentity();
 
   // FIXME: Implement accumulate.
 

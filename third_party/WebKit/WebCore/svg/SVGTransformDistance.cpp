@@ -78,7 +78,7 @@ SVGTransformDistance::SVGTransformDistance(const SVGTransform& fromSVGTransform,
           toSVGTransform.scale().width() - fromSVGTransform.scale().width();
       float scaleY =
           toSVGTransform.scale().height() - fromSVGTransform.scale().height();
-      m_transform.scale(scaleX, scaleY);
+      m_transform.scaleNonUniform(scaleX, scaleY);
       return;
     }
     case SVGTransform::SVG_TRANSFORM_SKEWX:
@@ -198,7 +198,7 @@ void SVGTransformDistance::addSVGTransform(const SVGTransform& transform,
                                    : transform.scale().width();
       float scaleY = absoluteValue ? fabsf(transform.scale().height())
                                    : transform.scale().height();
-      m_transform.scale(scaleX, scaleY);
+      m_transform.scaleNonUniform(scaleX, scaleY);
       return;
     }
     case SVGTransform::SVG_TRANSFORM_SKEWX:
