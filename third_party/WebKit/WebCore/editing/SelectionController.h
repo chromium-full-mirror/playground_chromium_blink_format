@@ -78,7 +78,9 @@ class SelectionController : Noncopyable {
 
   bool contains(const IntPoint&);
 
-  Selection::EState state() const { return m_sel.state(); }
+  Selection::SelectionType selectionType() const {
+    return m_sel.selectionType();
+  }
 
   EAffinity affinity() const { return m_sel.affinity(); }
 

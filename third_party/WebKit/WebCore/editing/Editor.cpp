@@ -756,14 +756,14 @@ bool Editor::dispatchCPPEvent(const AtomicString& eventType,
 }
 
 void Editor::applyStyle(CSSStyleDeclaration* style, EditAction editingAction) {
-  switch (m_frame->selection()->state()) {
-    case Selection::NONE:
+  switch (m_frame->selection()->selectionType()) {
+    case Selection::NoSelection:
       // do nothing
       break;
-    case Selection::CARET:
+    case Selection::CaretSelection:
       m_frame->computeAndSetTypingStyle(style, editingAction);
       break;
-    case Selection::RANGE:
+    case Selection::RangeSelection:
       if (m_frame->document() && style)
         applyCommand(ApplyStyleCommand::create(m_frame->document(), style,
                                                editingAction));
@@ -777,12 +777,12 @@ bool Editor::shouldApplyStyle(CSSStyleDeclaration* style, Range* range) {
 
 void Editor::applyParagraphStyle(CSSStyleDeclaration* style,
                                  EditAction editingAction) {
-  switch (m_frame->selection()->state()) {
-    case Selection::NONE:
+  switch (m_frame->selection()->selectionType()) {
+    case Selection::NoSelection:
       // do nothing
       break;
-    case Selection::CARET:
-    case Selection::RANGE:
+    case Selection::CaretSelection:
+    case Selection::RangeSelection:
       if (m_frame->document() && style)
         applyCommand(
             ApplyStyleCommand::create(m_frame->document(), style, editingAction,

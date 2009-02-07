@@ -1247,26 +1247,22 @@ HTMLFormElement* Frame::currentForm() const {
   return start ? scanForForm(start) : 0;
 }
 
-// FIXME: should this go in SelectionController?
 void Frame::revealSelection(
     const RenderLayer::ScrollAlignment& alignment) const {
   IntRect rect;
 
-  switch (selection()->state()) {
-    case Selection::NONE:
+  switch (selection()->selectionType()) {
+    case Selection::NoSelection:
       return;
-
-    case Selection::CARET:
+    case Selection::CaretSelection:
       rect = selection()->absoluteCaretBounds();
       break;
-
-    case Selection::RANGE:
+    case Selection::RangeSelection:
       rect = enclosingIntRect(selectionBounds(false));
       break;
   }
 
   Position start = selection()->start();
-
   ASSERT(start.node());
   if (start.node() && start.node()->renderer()) {
     // FIXME: This code only handles scrolling the startContainer's layer, but

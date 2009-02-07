@@ -400,12 +400,12 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity,
   Selection selectionToDelete;
   Selection selectionAfterUndo;
 
-  switch (endingSelection().state()) {
-    case Selection::RANGE:
+  switch (endingSelection().selectionType()) {
+    case Selection::RangeSelection:
       selectionToDelete = endingSelection();
       selectionAfterUndo = selectionToDelete;
       break;
-    case Selection::CARET: {
+    case Selection::CaretSelection: {
       if (breakOutOfEmptyMailBlockquotedParagraph()) {
         typingAddedToOpenCommand();
         return;
@@ -480,7 +480,7 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity,
                                                 selectionToDelete.extent());
       break;
     }
-    case Selection::NONE:
+    case Selection::NoSelection:
       ASSERT_NOT_REACHED();
       break;
   }
@@ -509,12 +509,12 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity,
   Selection selectionToDelete;
   Selection selectionAfterUndo;
 
-  switch (endingSelection().state()) {
-    case Selection::RANGE:
+  switch (endingSelection().selectionType()) {
+    case Selection::RangeSelection:
       selectionToDelete = endingSelection();
       selectionAfterUndo = selectionToDelete;
       break;
-    case Selection::CARET: {
+    case Selection::CaretSelection: {
       m_smartDelete = false;
 
       // Handle delete at beginning-of-block case.
@@ -580,7 +580,7 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity,
       }
       break;
     }
-    case Selection::NONE:
+    case Selection::NoSelection:
       ASSERT_NOT_REACHED();
       break;
   }
