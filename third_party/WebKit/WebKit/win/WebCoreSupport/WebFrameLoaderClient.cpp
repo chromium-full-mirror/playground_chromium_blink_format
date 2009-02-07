@@ -41,6 +41,7 @@
 #include "WebError.h"
 #include "WebFrame.h"
 #include "WebHistory.h"
+#include "WebHistoryItem.h"
 #include "WebMutableURLRequest.h"
 #include "WebNotificationCenter.h"
 #include "WebScriptDebugServer.h"
@@ -508,12 +509,11 @@ void WebFrameLoaderClient::updateGlobalHistoryRedirectLinks() {
   if (!history)
     return;
 
-  DocumentLoader* loader = core(m_webFrame.get())->loader()->documentLoader();
+  DocumentLoader* loader = core(m_webFrame)->loader()->documentLoader();
 
   if (!loader->clientRedirectSourceForHistory().isNull()) {
-    COMPtr<IWebHistoryItem> iWebHistoryItem;
-    if (!FAILED(history->itemForURLString(
-            loader->clientRedirectSourceForHistory(), &iWebHistoryItem))) {
+    if (COMPtr<IWebHistoryItem> iWebHistoryItem = history->itemForURLString(
+            loader->clientRedirectSourceForHistory())) {
       COMPtr<WebHistoryItem> webHistoryItem(Query, iWebHistoryItem);
       webHistoryItem->historyItem()->addRedirectURL(
           loader->clientRedirectDestinationForHistory());
@@ -521,9 +521,8 @@ void WebFrameLoaderClient::updateGlobalHistoryRedirectLinks() {
   }
 
   if (!loader->serverRedirectSourceForHistory().isNull()) {
-    COMPtr<IWebHistoryItem> iWebHistoryItem;
-    if (!FAILED(history->itemForURLString(
-            loader->serverRedirectSourceForHistory(), &iWebHistoryItem))) {
+    if (COMPtr<IWebHistoryItem> iWebHistoryItem = history->itemForURLString(
+            loader->serverRedirectSourceForHistory())) {
       COMPtr<WebHistoryItem> webHistoryItem(Query, iWebHistoryItem);
       webHistoryItem->historyItem()->addRedirectURL(
           loader->serverRedirectDestinationForHistory());

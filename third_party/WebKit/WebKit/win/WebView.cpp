@@ -4706,7 +4706,8 @@ void WebView::releaseIMMContext(HIMC hIMC) {
 
 void WebView::prepareCandidateWindow(Frame* targetFrame, HIMC hInputContext) {
   IntRect caret;
-  if (RefPtr<Range> range = targetFrame->selection()->selection().toRange()) {
+  if (RefPtr<Range> range =
+          targetFrame->selection()->selection().toNormalizedRange()) {
     ExceptionCode ec = 0;
     RefPtr<Range> tempRange = range->cloneRange(ec);
     caret = targetFrame->firstRectForRange(tempRange.get());
@@ -4878,7 +4879,7 @@ bool WebView::onIMERequestCharPosition(Frame* targetFrame,
   if (RefPtr<Range> range =
           targetFrame->editor()->hasComposition()
               ? targetFrame->editor()->compositionRange()
-              : targetFrame->selection()->selection().toRange()) {
+              : targetFrame->selection()->selection().toNormalizedRange()) {
     ExceptionCode ec = 0;
     RefPtr<Range> tempRange = range->cloneRange(ec);
     tempRange->setStart(tempRange->startContainer(ec),
@@ -4898,7 +4899,7 @@ bool WebView::onIMERequestCharPosition(Frame* targetFrame,
 bool WebView::onIMERequestReconvertString(Frame* targetFrame,
                                           RECONVERTSTRING* reconvertString,
                                           LRESULT* result) {
-  RefPtr<Range> selectedRange = targetFrame->selection()->toRange();
+  RefPtr<Range> selectedRange = targetFrame->selection()->toNormalizedRange();
   String text = selectedRange->text();
   if (!reconvertString) {
     *result = sizeof(RECONVERTSTRING) + text.length() * sizeof(UChar);
