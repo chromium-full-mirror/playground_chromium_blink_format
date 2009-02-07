@@ -988,8 +988,8 @@ String createMarkup(const Range* range,
   // FIXME: Do this for all fully selected blocks, not just the body.
   Node* fullySelectedRoot =
       body &&
-              *Selection::selectionFromContentsOfNode(body).toRange() ==
-                  *updatedRange
+              *Selection::selectionFromContentsOfNode(body)
+                      .toNormalizedRange() == *updatedRange
           ? body
           : 0;
   if (annotate && fullySelectedRoot)

@@ -189,9 +189,9 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
 #endif
     case ContextMenuItemTagSpellingGuess:
       ASSERT(frame->selectedText().length());
-      if (frame->editor()->shouldInsertText(item->title(),
-                                            frame->selection()->toRange().get(),
-                                            EditorInsertActionPasted)) {
+      if (frame->editor()->shouldInsertText(
+              item->title(), frame->selection()->toNormalizedRange().get(),
+              EditorInsertActionPasted)) {
         Document* document = frame->document();
         RefPtr<ReplaceSelectionCommand> command =
             ReplaceSelectionCommand::create(
@@ -240,7 +240,7 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
       break;
     case ContextMenuItemTagStartSpeaking: {
       ExceptionCode ec;
-      RefPtr<Range> selectedRange = frame->selection()->toRange();
+      RefPtr<Range> selectedRange = frame->selection()->toNormalizedRange();
       if (!selectedRange || selectedRange->collapsed(ec)) {
         Document* document = result.innerNonSharedNode()->document();
         selectedRange = document->createRange();

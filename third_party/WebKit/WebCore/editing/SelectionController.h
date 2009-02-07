@@ -122,7 +122,9 @@ class SelectionController : Noncopyable {
   bool isCaretOrRange() const { return m_sel.isCaretOrRange(); }
   bool isInPasswordField() const;
 
-  PassRefPtr<Range> toRange() const { return m_sel.toRange(); }
+  PassRefPtr<Range> toNormalizedRange() const {
+    return m_sel.toNormalizedRange();
+  }
 
   void debugRenderer(RenderObject*, bool selected) const;
 

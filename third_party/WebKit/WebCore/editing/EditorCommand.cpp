@@ -215,13 +215,13 @@ static bool expandSelectionToGranularity(Frame* frame,
                                          TextGranularity granularity) {
   Selection selection = frame->selection()->selection();
   selection.expandUsingGranularity(granularity);
-  RefPtr<Range> newRange = selection.toRange();
+  RefPtr<Range> newRange = selection.toNormalizedRange();
   if (!newRange)
     return false;
   ExceptionCode ec = 0;
   if (newRange->collapsed(ec))
     return false;
-  RefPtr<Range> oldRange = frame->selection()->selection().toRange();
+  RefPtr<Range> oldRange = frame->selection()->selection().toNormalizedRange();
   EAffinity affinity = frame->selection()->affinity();
   if (!frame->editor()->client()->shouldChangeSelectedRange(
           oldRange.get(), newRange.get(), affinity, false))
@@ -420,7 +420,7 @@ static bool executeDeleteToMark(Frame* frame,
                                 Event*,
                                 EditorCommandSource,
                                 const String&) {
-  RefPtr<Range> mark = frame->mark().toRange();
+  RefPtr<Range> mark = frame->mark().toNormalizedRange();
   if (mark) {
     SelectionController* selection = frame->selection();
     bool selected = selection->setSelectedRange(
@@ -1239,7 +1239,7 @@ static bool executeSelectToMark(Frame* frame,
                                 Event*,
                                 EditorCommandSource,
                                 const String&) {
-  RefPtr<Range> mark = frame->mark().toRange();
+  RefPtr<Range> mark = frame->mark().toNormalizedRange();
   RefPtr<Range> selection = frame->editor()->selectedRange();
   if (!mark || !selection) {
     systemBeep();

@@ -271,7 +271,7 @@ Settings* Frame::settings() const {
 }
 
 String Frame::selectedText() const {
-  return plainText(selection()->toRange().get());
+  return plainText(selection()->toNormalizedRange().get());
 }
 
 IntRect Frame::firstRectForRange(Range* range) const {
@@ -853,12 +853,13 @@ bool Frame::shouldChangeSelection(const Selection& oldSelection,
                                   EAffinity affinity,
                                   bool stillSelecting) const {
   return editor()->client()->shouldChangeSelectedRange(
-      oldSelection.toRange().get(), newSelection.toRange().get(), affinity,
-      stillSelecting);
+      oldSelection.toNormalizedRange().get(),
+      newSelection.toNormalizedRange().get(), affinity, stillSelecting);
 }
 
 bool Frame::shouldDeleteSelection(const Selection& selection) const {
-  return editor()->client()->shouldDeleteRange(selection.toRange().get());
+  return editor()->client()->shouldDeleteRange(
+      selection.toNormalizedRange().get());
 }
 
 bool Frame::isContentEditable() const {
@@ -969,7 +970,7 @@ PassRefPtr<CSSComputedStyleDeclaration> Frame::selectionComputedStyle(
   if (selection()->isNone())
     return 0;
 
-  RefPtr<Range> range(selection()->toRange());
+  RefPtr<Range> range(selection()->toNormalizedRange());
   Position pos = range->editingStartPosition();
 
   Element* elem = pos.element();
@@ -1192,7 +1193,7 @@ void Frame::selectionTextRects(Vector<FloatRect>& rects,
   if (!root)
     return;
 
-  RefPtr<Range> selectedRange = selection()->toRange();
+  RefPtr<Range> selectedRange = selection()->toNormalizedRange();
 
   Vector<IntRect> intRects;
   selectedRange->addLineBoxRects(intRects, true);
@@ -1417,7 +1418,8 @@ bool Frame::findString(const String& target,
   // Compare ranges instead of selection objects to ignore the way that the
   // current selection was made.
   if (startInSelection &&
-      *Selection(resultRange.get()).toRange() == *selection.toRange()) {
+      *Selection(resultRange.get()).toNormalizedRange() ==
+          *selection.toNormalizedRange()) {
     searchRange = rangeOfContents(document());
     if (forward)
       setStart(searchRange.get(), selection.visibleEnd());
@@ -1728,9 +1730,9 @@ void Frame::respondToChangedSelection(const Selection& oldSelection,
       // This only erases markers that are in the first unit (word or sentence)
       // of the selection.
       // Perhaps peculiar, but it matches AppKit.
-      if (RefPtr<Range> wordRange = newAdjacentWords.toRange())
+      if (RefPtr<Range> wordRange = newAdjacentWords.toNormalizedRange())
         document()->removeMarkers(wordRange.get(), DocumentMarker::Spelling);
-      if (RefPtr<Range> sentenceRange = newSelectedSentence.toRange())
+      if (RefPtr<Range> sentenceRange = newSelectedSentence.toNormalizedRange())
         document()->removeMarkers(sentenceRange.get(), DocumentMarker::Grammar);
     }
 

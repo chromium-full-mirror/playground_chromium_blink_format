@@ -334,7 +334,7 @@ void Editor::replaceSelectionWithText(const String& text,
 PassRefPtr<Range> Editor::selectedRange() {
   if (!m_frame)
     return 0;
-  return m_frame->selection()->toRange();
+  return m_frame->selection()->toNormalizedRange();
 }
 
 bool Editor::shouldDeleteRange(Range* range) const {
@@ -431,7 +431,7 @@ const SimpleFontData* Editor::fontForSelection(bool& hasMultipleFonts) const {
 
   const SimpleFontData* font = 0;
 
-  RefPtr<Range> range = m_frame->selection()->toRange();
+  RefPtr<Range> range = m_frame->selection()->toNormalizedRange();
   Node* startNode = range->editingStartPosition().node();
   if (startNode) {
     Node* pastEnd = range->pastLastNode();
@@ -797,7 +797,8 @@ void Editor::applyStyleToSelection(CSSStyleDeclaration* style,
     return;
 
   if (client() &&
-      client()->shouldApplyStyle(style, m_frame->selection()->toRange().get()))
+      client()->shouldApplyStyle(
+          style, m_frame->selection()->toNormalizedRange().get()))
     applyStyle(style, editingAction);
 }
 
@@ -807,7 +808,8 @@ void Editor::applyParagraphStyleToSelection(CSSStyleDeclaration* style,
     return;
 
   if (client() &&
-      client()->shouldApplyStyle(style, m_frame->selection()->toRange().get()))
+      client()->shouldApplyStyle(
+          style, m_frame->selection()->toNormalizedRange().get()))
     applyParagraphStyle(style, editingAction);
 }
 
@@ -1033,7 +1035,7 @@ bool Editor::insertTextWithoutSendingTextEvent(const String& text,
   Selection selection = selectionForCommand(triggeringEvent);
   if (!selection.isContentEditable())
     return false;
-  RefPtr<Range> range = selection.toRange();
+  RefPtr<Range> range = selection.toNormalizedRange();
 
   if (!shouldInsertText(text, range.get(), EditorInsertActionTyped))
     return true;
@@ -1066,7 +1068,7 @@ bool Editor::insertLineBreak() {
   if (!canEdit())
     return false;
 
-  if (!shouldInsertText("\n", m_frame->selection()->toRange().get(),
+  if (!shouldInsertText("\n", m_frame->selection()->toNormalizedRange().get(),
                         EditorInsertActionTyped))
     return true;
 
@@ -1082,7 +1084,7 @@ bool Editor::insertParagraphSeparator() {
   if (!canEditRichly())
     return insertLineBreak();
 
-  if (!shouldInsertText("\n", m_frame->selection()->toRange().get(),
+  if (!shouldInsertText("\n", m_frame->selection()->toNormalizedRange().get(),
                         EditorInsertActionTyped))
     return true;
 
@@ -1408,7 +1410,7 @@ void Editor::ignoreSpelling() {
   if (!client())
     return;
 
-  RefPtr<Range> selectedRange = frame()->selection()->toRange();
+  RefPtr<Range> selectedRange = frame()->selection()->toNormalizedRange();
   if (selectedRange)
     frame()->document()->removeMarkers(selectedRange.get(),
                                        DocumentMarker::Spelling);
@@ -1946,7 +1948,8 @@ bool Editor::isSelectionUngrammatical() {
   return false;
 #else
   Vector<String> ignoredGuesses;
-  return isRangeUngrammatical(client(), frame()->selection()->toRange().get(),
+  return isRangeUngrammatical(client(),
+                              frame()->selection()->toNormalizedRange().get(),
                               ignoredGuesses);
 #endif
 }
@@ -1958,8 +1961,8 @@ Vector<String> Editor::guessesForUngrammaticalSelection() {
   Vector<String> guesses;
   // Ignore the result of isRangeUngrammatical; we just want the guesses,
   // whether or not there are any
-  isRangeUngrammatical(client(), frame()->selection()->toRange().get(),
-                       guesses);
+  isRangeUngrammatical(
+      client(), frame()->selection()->toNormalizedRange().get(), guesses);
   return guesses;
 #endif
 }
@@ -2049,7 +2052,7 @@ static void markMisspellingsOrBadGrammar(Editor* editor,
   if (!editor->isContinuousSpellCheckingEnabled())
     return;
 
-  RefPtr<Range> searchRange(selection.toRange());
+  RefPtr<Range> searchRange(selection.toNormalizedRange());
   if (!searchRange)
     return;
 
@@ -2099,7 +2102,7 @@ PassRefPtr<Range> Editor::rangeForPoint(const IntPoint& windowPoint) {
   IntPoint framePoint = frameView->windowToContents(windowPoint);
   Selection selection(frame->visiblePositionForPoint(framePoint));
   return avoidIntersectionWithNode(
-      selection.toRange().get(),
+      selection.toNormalizedRange().get(),
       deleteButtonController() ? deleteButtonController()->containerElement()
                                : 0);
 }

@@ -489,7 +489,7 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity,
       document()->frame()->shouldDeleteSelection(selectionToDelete)) {
     if (killRing)
       document()->frame()->editor()->addToKillRing(
-          selectionToDelete.toRange().get(), false);
+          selectionToDelete.toNormalizedRange().get(), false);
     // Make undo select everything that has been deleted, unless an undo will
     // undo more than just this deletion.
     // FIXME: This behaves like TextEdit except for the case where you open with
@@ -589,7 +589,7 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity,
       document()->frame()->shouldDeleteSelection(selectionToDelete)) {
     if (killRing)
       document()->frame()->editor()->addToKillRing(
-          selectionToDelete.toRange().get(), false);
+          selectionToDelete.toNormalizedRange().get(), false);
     // make undo select what was deleted
     setStartingSelection(selectionAfterUndo);
     CompositeEditCommand::deleteSelection(selectionToDelete, m_smartDelete);

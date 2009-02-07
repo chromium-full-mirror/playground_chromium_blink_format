@@ -152,7 +152,7 @@ ReplacementFragment::ReplacementFragment(Document* document,
   RefPtr<Node> holder = insertFragmentForTestRendering(styleNode);
 
   RefPtr<Range> range =
-      Selection::selectionFromContentsOfNode(holder.get()).toRange();
+      Selection::selectionFromContentsOfNode(holder.get()).toNormalizedRange();
   String text = plainText(range.get());
   // Give the root a chance to change the text.
   RefPtr<BeforeTextInsertedEvent> evt = BeforeTextInsertedEvent::create(text);
@@ -163,7 +163,8 @@ ReplacementFragment::ReplacementFragment(Document* document,
     restoreTestRenderingNodesToFragment(holder.get());
     removeNode(holder);
 
-    m_fragment = createFragmentFromText(selection.toRange().get(), evt->text());
+    m_fragment = createFragmentFromText(selection.toNormalizedRange().get(),
+                                        evt->text());
     if (!m_fragment->firstChild())
       return;
     holder = insertFragmentForTestRendering(styleNode);

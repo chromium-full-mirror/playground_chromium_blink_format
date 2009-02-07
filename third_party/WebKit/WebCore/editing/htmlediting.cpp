@@ -302,6 +302,11 @@ Node* enclosingBlock(Node* node) {
   return static_cast<Element*>(enclosingNodeOfType(Position(node, 0), isBlock));
 }
 
+// Internally editing uses "invalid" positions for historical reasons.  For
+// example, in <div><img /></div>, Editing might use (img, 1) for the position
+// after <img>, but we have to convert that to (div, 1) before handing the
+// position to a Range object.  Ideally all internal positions should
+// be "range compliant" for simplicity.
 Position rangeCompliantEquivalent(const Position& pos) {
   if (pos.isNull())
     return Position();

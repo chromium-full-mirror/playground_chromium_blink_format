@@ -215,8 +215,8 @@ static void createAndAppendTextDirectionSubMenu(
 
 static bool selectionContainsPossibleWord(Frame* frame) {
   // Current algorithm: look for a character that's not just a separator.
-  for (TextIterator it(frame->selection()->toRange().get()); !it.atEnd();
-       it.advance()) {
+  for (TextIterator it(frame->selection()->toNormalizedRange().get());
+       !it.atEnd(); it.advance()) {
     int length = it.length();
     const UChar* characters = it.characters();
     for (int i = 0; i < length; ++i)

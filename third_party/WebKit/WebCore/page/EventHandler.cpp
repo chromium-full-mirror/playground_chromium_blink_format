@@ -1728,7 +1728,7 @@ bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
         ExceptionCode ec = 0;
         Node* n = node->isShadowNode() ? node->shadowParentNode() : node;
         if (m_frame->selection()->isRange() &&
-            m_frame->selection()->toRange()->compareNode(n, ec) ==
+            m_frame->selection()->toNormalizedRange()->compareNode(n, ec) ==
                 Range::NODE_INSIDE &&
             n->isDescendantOf(m_frame->document()->focusedNode()))
           return false;

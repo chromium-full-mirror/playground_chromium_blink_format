@@ -234,7 +234,8 @@ void InputElement::handleBeforeTextInsertedEvent(InputElementData& data,
   int oldLength = numGraphemeClusters(data.inputElement()->value().impl());
   ASSERT(oldLength <= data.maxLength());
   int selectionLength = numGraphemeClusters(
-      plainText(document->frame()->selection()->selection().toRange().get())
+      plainText(
+          document->frame()->selection()->selection().toNormalizedRange().get())
           .impl());
   ASSERT(oldLength >= selectionLength);
   int maxNewLength = data.maxLength() - (oldLength - selectionLength);
