@@ -2533,7 +2533,11 @@ void FrameLoader::load(const ResourceRequest& request,
   m_loadType = FrameLoadTypeStandard;
   RefPtr<DocumentLoader> loader =
       m_client->createDocumentLoader(request, substituteData);
-  loader->setURLForHistoryReflectsClientRedirect(lockHistory);
+  if (lockHistory && m_documentLoader)
+    loader->setClientRedirectSourceForHistory(
+        m_documentLoader->didCreateGlobalHistoryEntry()
+            ? m_documentLoader->urlForHistory()
+            : m_documentLoader->clientRedirectSourceForHistory());
   load(loader.get());
 }
 
@@ -2562,7 +2566,11 @@ void FrameLoader::loadWithNavigationAction(const ResourceRequest& request,
                                            PassRefPtr<FormState> formState) {
   RefPtr<DocumentLoader> loader =
       m_client->createDocumentLoader(request, SubstituteData());
-  loader->setURLForHistoryReflectsClientRedirect(lockHistory);
+  if (lockHistory && m_documentLoader)
+    loader->setClientRedirectSourceForHistory(
+        m_documentLoader->didCreateGlobalHistoryEntry()
+            ? m_documentLoader->urlForHistory()
+            : m_documentLoader->clientRedirectSourceForHistory());
 
   loader->setTriggeringAction(action);
   if (m_documentLoader)
@@ -2981,10 +2989,6 @@ void FrameLoader::setDocumentLoader(DocumentLoader* loader) {
   m_documentLoader = loader;
 }
 
-DocumentLoader* FrameLoader::documentLoader() const {
-  return m_documentLoader.get();
-}
-
 void FrameLoader::setPolicyDocumentLoader(DocumentLoader* loader) {
   if (m_policyDocumentLoader == loader)
     return;
@@ -3000,14 +3004,6 @@ void FrameLoader::setPolicyDocumentLoader(DocumentLoader* loader) {
   m_policyDocumentLoader = loader;
 }
 
-DocumentLoader* FrameLoader::policyDocumentLoader() const {
-  return m_policyDocumentLoader.get();
-}
-
-DocumentLoader* FrameLoader::provisionalDocumentLoader() const {
-  return m_provisionalDocumentLoader.get();
-}
-
 void FrameLoader::setProvisionalDocumentLoader(DocumentLoader* loader) {
   ASSERT(!loader || !m_provisionalDocumentLoader);
   ASSERT(!loader || loader->frameLoader() == this);
@@ -3017,10 +3013,6 @@ void FrameLoader::setProvisionalDocumentLoader(DocumentLoader* loader) {
     m_provisionalDocumentLoader->detachFromFrame();
 
   m_provisionalDocumentLoader = loader;
-}
-
-FrameState FrameLoader::state() const {
-  return m_state;
 }
 
 double FrameLoader::timeOfLastCompletedLoad() {
@@ -5194,13 +5186,12 @@ void FrameLoader::updateHistoryForStandardLoad() {
     m_navigationDuringLoad = false;
   }
 
-  bool didUpdateGlobalHistory = false;
   if (!frameNavigationDuringLoad && !documentLoader()->isClientRedirect()) {
     if (!historyURL.isEmpty()) {
       addBackForwardItemClippedAtTarget(true);
       if (!needPrivacy) {
         m_client->updateGlobalHistory();
-        didUpdateGlobalHistory = true;
+        m_documentLoader->setDidCreateGlobalHistoryEntry(true);
       }
       if (Page* page = m_frame->page())
         page->setGlobalHistoryItem(
@@ -5216,8 +5207,9 @@ void FrameLoader::updateHistoryForStandardLoad() {
     if (Page* page = m_frame->page())
       page->group().addVisitedLink(historyURL);
 
-    if (!didUpdateGlobalHistory && !url().isEmpty())
-      m_client->updateGlobalHistoryForRedirectWithoutHistoryItem();
+    if (!m_documentLoader->didCreateGlobalHistoryEntry() &&
+        documentLoader()->unreachableURL().isEmpty() && !url().isEmpty())
+      m_client->updateGlobalHistoryRedirectLinks();
   }
 }
 
@@ -5293,14 +5285,13 @@ void FrameLoader::updateHistoryForRedirectWithLockedBackForwardList() {
   bool needPrivacy = !settings || settings->privateBrowsingEnabled();
   const KURL& historyURL = documentLoader()->urlForHistory();
 
-  bool didUpdateGlobalHistory = false;
   if (documentLoader()->isClientRedirect()) {
     if (!m_currentHistoryItem && !m_frame->tree()->parent()) {
       if (!historyURL.isEmpty()) {
         addBackForwardItemClippedAtTarget(true);
         if (!needPrivacy) {
           m_client->updateGlobalHistory();
-          didUpdateGlobalHistory = true;
+          m_documentLoader->setDidCreateGlobalHistoryEntry(true);
         }
         if (Page* page = m_frame->page())
           page->setGlobalHistoryItem(
@@ -5322,8 +5313,9 @@ void FrameLoader::updateHistoryForRedirectWithLockedBackForwardList() {
     if (Page* page = m_frame->page())
       page->group().addVisitedLink(historyURL);
 
-    if (!didUpdateGlobalHistory && !url().isEmpty())
-      m_client->updateGlobalHistoryForRedirectWithoutHistoryItem();
+    if (!m_documentLoader->didCreateGlobalHistoryEntry() &&
+        documentLoader()->unreachableURL().isEmpty() && !url().isEmpty())
+      m_client->updateGlobalHistoryRedirectLinks();
   }
 }
 

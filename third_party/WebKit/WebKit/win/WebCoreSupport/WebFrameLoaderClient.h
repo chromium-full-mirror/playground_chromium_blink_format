@@ -111,7 +111,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void finishedLoading(WebCore::DocumentLoader*);
 
   virtual void updateGlobalHistory();
-  virtual void updateGlobalHistoryForRedirectWithoutHistoryItem();
+  virtual void updateGlobalHistoryRedirectLinks();
   virtual bool shouldGoToHistoryItem(WebCore::HistoryItem*) const;
 
   virtual PassRefPtr<WebCore::DocumentLoader> createDocumentLoader(

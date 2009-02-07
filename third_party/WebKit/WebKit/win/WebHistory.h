@@ -120,10 +120,7 @@ class WebHistory : public IWebHistory, public IWebHistoryPrivate {
   void visitedURL(const WebCore::KURL&,
                   const WebCore::String& title,
                   const WebCore::String& httpMethod,
-                  bool wasFailure,
-                  const WebCore::KURL& serverRedirectURL,
-                  bool isClientRedirect);
-  void visitedURLForRedirectWithoutHistoryItem(const WebCore::KURL&);
+                  bool wasFailure);
   void addVisitedLinksToPageGroup(WebCore::PageGroup&);
 
  private:
@@ -160,7 +157,6 @@ class WebHistory : public IWebHistory, public IWebHistoryPrivate {
   RetainPtr<CFMutableArrayRef> m_datesWithEntries;
   RetainPtr<CFMutableArrayRef> m_entriesByDate;
   COMPtr<WebPreferences> m_preferences;
-  COMPtr<WebHistoryItem> m_lastVisitedEntry;
 };
 
 #endif

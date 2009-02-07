@@ -156,7 +156,7 @@ DocumentLoader::DocumentLoader(const ResourceRequest& req,
       m_substituteResourceDeliveryTimer(
           this,
           &DocumentLoader::substituteResourceDeliveryTimerFired),
-      m_urlForHistoryReflectsClientRedirect(false)
+      m_didCreateGlobalHistoryEntry(false)
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
       ,
       m_candidateApplicationCacheGroup(0)
