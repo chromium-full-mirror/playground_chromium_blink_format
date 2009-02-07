@@ -556,7 +556,7 @@ void FrameLoaderClientQt::updateGlobalHistory() {
         m_frame->loader()->documentLoader()->urlForHistory().prettyURL());
 }
 
-void FrameLoaderClientQt::updateGlobalHistoryForRedirectWithoutHistoryItem() {}
+void FrameLoaderClientQt::updateGlobalHistoryRedirectLinks() {}
 
 bool FrameLoaderClientQt::shouldGoToHistoryItem(
     WebCore::HistoryItem* item) const {
