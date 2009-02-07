@@ -94,7 +94,25 @@ void Image::drawPattern(GraphicsContext* ctxt,
                         const FloatPoint& phase,
                         CompositeOperator op,
                         const FloatRect& destRect) {
-  notImplemented();
+  QPixmap* framePixmap = nativeImageForCurrentFrame();
+  if (!framePixmap)  // If it's too early we won't have an image yet.
+    return;
+
+  QPixmap pixmap = *framePixmap;
+  QRect tr = QRectF(tileRect).toRect();
+  if (tr.x() || tr.y() || tr.width() != pixmap.width() ||
+      tr.height() != pixmap.height()) {
+    pixmap = pixmap.copy(tr);
+  }
+
+  QBrush b(pixmap);
+  b.setMatrix(patternTransform);
+  ctxt->save();
+  ctxt->setCompositeOperation(op);
+  QPainter* p = ctxt->platformContext();
+  p->setBrushOrigin(phase);
+  p->fillRect(destRect, b);
+  ctxt->restore();
 }
 
 void BitmapImage::initPlatformData() {}
@@ -130,33 +148,6 @@ void BitmapImage::draw(GraphicsContext* ctxt,
   // http://www.meyerweb.com/eric/css/edge/complexspiral/demo.html
   painter->drawPixmap(dst, *image, src);
 
-  ctxt->restore();
-}
-
-void BitmapImage::drawPattern(GraphicsContext* ctxt,
-                              const FloatRect& tileRect,
-                              const TransformationMatrix& patternTransform,
-                              const FloatPoint& phase,
-                              CompositeOperator op,
-                              const FloatRect& destRect) {
-  QPixmap* framePixmap = nativeImageForCurrentFrame();
-  if (!framePixmap)  // If it's too early we won't have an image yet.
-    return;
-
-  QPixmap pixmap = *framePixmap;
-  QRect tr = QRectF(tileRect).toRect();
-  if (tr.x() || tr.y() || tr.width() != pixmap.width() ||
-      tr.height() != pixmap.height()) {
-    pixmap = pixmap.copy(tr);
-  }
-
-  QBrush b(pixmap);
-  b.setMatrix(patternTransform);
-  ctxt->save();
-  ctxt->setCompositeOperation(op);
-  QPainter* p = ctxt->platformContext();
-  p->setBrushOrigin(phase);
-  p->fillRect(destRect, b);
   ctxt->restore();
 }
 
