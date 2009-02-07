@@ -756,6 +756,18 @@ static String joinMarkups(const Vector<String>& preMarkups,
   return String::adopt(result);
 }
 
+bool isSpecialAncestorBlock(Node* node) {
+  if (!node || !isBlock(node))
+    return false;
+
+  return node->hasTagName(listingTag) || node->hasTagName(olTag) ||
+         node->hasTagName(preTag) || node->hasTagName(tableTag) ||
+         node->hasTagName(ulTag) || node->hasTagName(xmpTag) ||
+         node->hasTagName(h1Tag) || node->hasTagName(h2Tag) ||
+         node->hasTagName(h3Tag) || node->hasTagName(h4Tag) ||
+         node->hasTagName(h5Tag);
+}
+
 // FIXME: Shouldn't we omit style info when annotate ==
 // DoNotAnnotateForInterchange?
 // FIXME: At least, annotation and style info should probably not be included in
@@ -927,12 +939,7 @@ String createMarkup(const Range* range,
         table = table->parentNode();
       if (table)
         specialCommonAncestor = table;
-    } else if (commonAncestorBlock->hasTagName(listingTag) ||
-               commonAncestorBlock->hasTagName(olTag) ||
-               commonAncestorBlock->hasTagName(preTag) ||
-               commonAncestorBlock->hasTagName(tableTag) ||
-               commonAncestorBlock->hasTagName(ulTag) ||
-               commonAncestorBlock->hasTagName(xmpTag))
+    } else if (isSpecialAncestorBlock(commonAncestorBlock))
       specialCommonAncestor = commonAncestorBlock;
   }
 

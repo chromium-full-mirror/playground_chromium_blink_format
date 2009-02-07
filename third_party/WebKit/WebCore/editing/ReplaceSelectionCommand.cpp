@@ -436,6 +436,19 @@ void ReplaceSelectionCommand::removeNodeAndPruneAncestors(Node* node) {
     m_firstNodeInserted =
         m_lastLeafInserted && m_lastLeafInserted->inDocument() ? afterFirst : 0;
 }
+bool isHeaderElement(Node* a) {
+  if (!a)
+    return false;
+
+  return a->hasTagName(h1Tag) || a->hasTagName(h2Tag) || a->hasTagName(h3Tag) ||
+         a->hasTagName(h4Tag) || a->hasTagName(h5Tag);
+}
+
+bool haveSameTagName(Node* a, Node* b) {
+  return a && b && a->isElementNode() && b->isElementNode() &&
+         static_cast<Element*>(a)->tagName() ==
+             static_cast<Element*>(b)->tagName();
+}
 
 bool ReplaceSelectionCommand::shouldMerge(const VisiblePosition& source,
                                           const VisiblePosition& destination) {
@@ -445,6 +458,7 @@ bool ReplaceSelectionCommand::shouldMerge(const VisiblePosition& source,
   Node* sourceNode = source.deepEquivalent().node();
   Node* destinationNode = destination.deepEquivalent().node();
   Node* sourceBlock = enclosingBlock(sourceNode);
+  Node* destinationBlock = enclosingBlock(destinationNode);
   return !enclosingNodeOfType(source.deepEquivalent(),
                               &isMailPasteAsQuotationNode) &&
          sourceBlock && (!sourceBlock->hasTagName(blockquoteTag) ||
@@ -453,6 +467,8 @@ bool ReplaceSelectionCommand::shouldMerge(const VisiblePosition& source,
              enclosingListChild(destinationNode) &&
          enclosingTableCell(source.deepEquivalent()) ==
              enclosingTableCell(destination.deepEquivalent()) &&
+         (!isHeaderElement(sourceBlock) ||
+          haveSameTagName(sourceBlock, destinationBlock)) &&
          // Don't merge to or from a position before or after a block because it
          // would
          // be a no-op and cause infinite recursion.
