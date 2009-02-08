@@ -59,6 +59,7 @@ class QualifiedName;
 class RegisteredEventListener;
 class RenderArena;
 class RenderBox;
+class RenderBoxModelObject;
 class RenderObject;
 class RenderStyle;
 class StringBuilder;
@@ -421,10 +422,9 @@ class Node : public EventTarget, public TreeShared<Node> {
   RenderObject* previousRenderer();
   void setRenderer(RenderObject* renderer) { m_renderer = renderer; }
 
-  // Use with caution. Does no type checking.  Mostly a convenience method for
-  // shadow nodes of form controls, where we know exactly
-  // what kind of renderer we made.
+  // Use these two methods with caution.
   RenderBox* renderBox() const;
+  RenderBoxModelObject* renderBoxModelObject() const;
 
   void checkSetPrefix(const AtomicString& prefix, ExceptionCode&);
   bool isDescendantOf(const Node*) const;

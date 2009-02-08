@@ -58,8 +58,11 @@ class RenderLineBoxList {
   void dirtyLineBoxes();
   void dirtyLinesFromChangedChild(RenderObject* parent, RenderObject* child);
 
-  void paint(RenderBox*, RenderObject::PaintInfo&, int x, int y) const;
-  bool hitTest(RenderBox*,
+  void paint(RenderBoxModelObject*,
+             RenderObject::PaintInfo&,
+             int x,
+             int y) const;
+  bool hitTest(RenderBoxModelObject*,
                const HitTestRequest&,
                HitTestResult&,
                int x,

@@ -146,22 +146,22 @@ class InlineFlowBox : public InlineRunBox {
   int marginRight();
   int borderLeft() {
     if (includeLeftEdge())
-      return renderBox()->borderLeft();
+      return object()->style()->borderLeftWidth();
     return 0;
   }
   int borderRight() {
     if (includeRightEdge())
-      return renderBox()->borderRight();
+      return object()->style()->borderRightWidth();
     return 0;
   }
   int paddingLeft() {
     if (includeLeftEdge())
-      return renderBox()->paddingLeft();
+      return boxModelObject()->paddingLeft();
     return 0;
   }
   int paddingRight() {
     if (includeRightEdge())
-      return renderBox()->paddingRight();
+      return boxModelObject()->paddingRight();
     return 0;
   }
 

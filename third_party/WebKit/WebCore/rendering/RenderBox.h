@@ -76,10 +76,7 @@ class RenderBox : public RenderBoxModelObject {
   void setFrameRect(const IntRect& rect) { m_frameRect = rect; }
 
   IntRect borderBoxRect() const { return IntRect(0, 0, width(), height()); }
-  virtual IntRect borderBoundingBox() const {
-    return borderBoxRect();
-  }  // This will work on inlines to return the bounding box of all of the
-     // lines' border boxes.
+  virtual IntRect borderBoundingBox() const { return borderBoxRect(); }
 
   // The content area of the box (excludes padding and border).
   IntRect contentBoxRect() const {
@@ -134,9 +131,6 @@ class RenderBox : public RenderBoxModelObject {
   // line).
   virtual int offsetWidth() const { return width(); }
   virtual int offsetHeight() const { return height(); }
-  virtual int offsetLeft() const;
-  virtual int offsetTop() const;
-  virtual RenderBox* offsetParent() const;
 
   // More IE extensions.  clientWidth and clientHeight represent the interior of
   // an object
@@ -162,30 +156,10 @@ class RenderBox : public RenderBoxModelObject {
   virtual void setScrollLeft(int);
   virtual void setScrollTop(int);
 
-  bool hasHorizontalBordersPaddingOrMargin() const {
-    return hasHorizontalBordersOrPadding() || marginLeft() != 0 ||
-           marginRight() != 0;
-  }
-  bool hasHorizontalBordersOrPadding() const {
-    return borderLeft() != 0 || borderRight() != 0 || paddingLeft() != 0 ||
-           paddingRight() != 0;
-  }
-
-  int marginTop() const { return m_marginTop; }
-  int marginBottom() const { return m_marginBottom; }
-  int marginLeft() const { return m_marginLeft; }
-  int marginRight() const { return m_marginRight; }
-
-  // Virtual since table cells override
-  virtual int paddingTop(bool includeIntrinsicPadding = true) const;
-  virtual int paddingBottom(bool includeIntrinsicPadding = true) const;
-  virtual int paddingLeft(bool includeIntrinsicPadding = true) const;
-  virtual int paddingRight(bool includeIntrinsicPadding = true) const;
-
-  virtual int borderTop() const { return style()->borderTopWidth(); }
-  virtual int borderBottom() const { return style()->borderBottomWidth(); }
-  virtual int borderLeft() const { return style()->borderLeftWidth(); }
-  virtual int borderRight() const { return style()->borderRightWidth(); }
+  virtual int marginTop() const { return m_marginTop; }
+  virtual int marginBottom() const { return m_marginBottom; }
+  virtual int marginLeft() const { return m_marginLeft; }
+  virtual int marginRight() const { return m_marginRight; }
 
   // The following five functions are used to implement collapsing margins.
   // All objects know their maximal positive and negative margins.  The
@@ -371,21 +345,6 @@ class RenderBox : public RenderBoxModelObject {
                                  int caretOffset,
                                  int* extraWidthToEndOfLine = 0);
 
-  virtual void paintFillLayerExtended(const PaintInfo&,
-                                      const Color&,
-                                      const FillLayer*,
-                                      int clipY,
-                                      int clipHeight,
-                                      int tx,
-                                      int ty,
-                                      int width,
-                                      int height,
-                                      InlineFlowBox* = 0,
-                                      CompositeOperator = CompositeSourceOver);
-  IntSize calculateBackgroundSize(const FillLayer*,
-                                  int scaledWidth,
-                                  int scaledHeight) const;
-
   virtual IntRect getOverflowClipRect(int tx, int ty);
   virtual IntRect getClipRect(int tx, int ty);
 
@@ -408,8 +367,6 @@ class RenderBox : public RenderBoxModelObject {
   }
 
   IntRect maskClipRect();
-
-  virtual void childBecameNonInline(RenderObject* /*child*/) {}
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
@@ -482,23 +439,14 @@ class RenderBox : public RenderBoxModelObject {
                                  const FillLayer* layers,
                                  bool drawingBackground);
 
-  void calculateBackgroundImageGeometry(const FillLayer*,
-                                        int tx,
-                                        int ty,
-                                        int w,
-                                        int h,
-                                        IntRect& destRect,
-                                        IntPoint& phase,
-                                        IntSize& tileSize);
-
   int containingBlockWidthForPositioned(
-      const RenderObject* containingBlock) const;
+      const RenderBoxModelObject* containingBlock) const;
   int containingBlockHeightForPositioned(
-      const RenderObject* containingBlock) const;
+      const RenderBoxModelObject* containingBlock) const;
 
   void calcAbsoluteVertical();
   void calcAbsoluteHorizontalValues(Length width,
-                                    const RenderBox* cb,
+                                    const RenderBoxModelObject* cb,
                                     TextDirection containerDirection,
                                     int containerWidth,
                                     int bordersPlusPadding,
@@ -511,7 +459,7 @@ class RenderBox : public RenderBoxModelObject {
                                     int& marginRightValue,
                                     int& xPos);
   void calcAbsoluteVerticalValues(Length height,
-                                  const RenderBox* cb,
+                                  const RenderBoxModelObject* cb,
                                   int containerHeight,
                                   int bordersPlusPadding,
                                   Length top,

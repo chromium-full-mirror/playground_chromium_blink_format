@@ -136,7 +136,7 @@ void RenderLineBoxList::dirtyLineBoxes() {
     curr->dirtyLineBoxes();
 }
 
-void RenderLineBoxList::paint(RenderBox* renderer,
+void RenderLineBoxList::paint(RenderBoxModelObject* renderer,
                               RenderObject::PaintInfo& paintInfo,
                               int tx,
                               int ty) const {
@@ -229,7 +229,7 @@ void RenderLineBoxList::paint(RenderBox* renderer,
   }
 }
 
-bool RenderLineBoxList::hitTest(RenderBox* renderer,
+bool RenderLineBoxList::hitTest(RenderBoxModelObject* renderer,
                                 const HitTestRequest& request,
                                 HitTestResult& result,
                                 int x,

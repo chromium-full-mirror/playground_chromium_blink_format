@@ -106,7 +106,7 @@ class RenderView : public RenderBlock {
     m_forcedPageBreak = false;
   }
   void setBestTruncatedAt(int y,
-                          RenderBox* forRenderer,
+                          RenderBoxModelObject* forRenderer,
                           bool forcedBreak = false);
   int bestTruncatedAt() const { return m_bestTruncatedAt; }
 

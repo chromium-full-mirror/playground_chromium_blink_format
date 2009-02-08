@@ -91,8 +91,8 @@ void RenderSVGTextPath::absoluteRects(Vector<IntRect>& rects, int, int) {
   if (!object)
     return;
 
-  int xRef = object->x() + x();
-  int yRef = object->y() + y();
+  int xRef = object->x();
+  int yRef = object->y();
 
   for (InlineRunBox* curr = firstBox; curr; curr = curr->nextLineBox()) {
     FloatRect rect(xRef + curr->xPos(), yRef + curr->yPos(), curr->width(),
@@ -113,8 +113,8 @@ void RenderSVGTextPath::absoluteQuads(Vector<FloatQuad>& quads, bool) {
   if (!object)
     return;
 
-  int xRef = object->x() + x();
-  int yRef = object->y() + y();
+  int xRef = object->x();
+  int yRef = object->y();
 
   for (InlineRunBox* curr = firstBox; curr; curr = curr->nextLineBox()) {
     FloatRect rect(xRef + curr->xPos(), yRef + curr->yPos(), curr->width(),
