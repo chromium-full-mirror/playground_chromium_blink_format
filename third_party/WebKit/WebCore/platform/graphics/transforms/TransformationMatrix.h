@@ -30,6 +30,10 @@
 #include <CoreGraphics/CGAffineTransform.h>
 #endif
 
+#if PLATFORM(QT)
+#include <QMatrix>
+#endif
+
 #include <string.h>  //for memcpy
 
 namespace WebCore {
@@ -330,6 +334,10 @@ class TransformationMatrix {
 
 #if PLATFORM(CG)
   operator CGAffineTransform() const;
+#endif
+
+#if PLATFORM(QT)
+  operator QMatrix() const;
 #endif
 
  private:
