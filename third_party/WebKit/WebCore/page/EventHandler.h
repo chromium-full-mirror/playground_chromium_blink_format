@@ -232,7 +232,9 @@ class EventHandler : Noncopyable {
   void handleKeyboardSelectionMovement(KeyboardEvent*);
 
   Cursor selectCursor(const MouseEventWithHitTestResults&, Scrollbar*);
+#if ENABLE(PAN_SCROLLING)
   void setPanScrollCursor();
+#endif
 
   void hoverTimerFired(Timer<EventHandler>*);
 
