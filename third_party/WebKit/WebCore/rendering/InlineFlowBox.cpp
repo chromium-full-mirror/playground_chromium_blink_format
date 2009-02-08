@@ -323,7 +323,7 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
           max(x + text->width() + visualOverflowRight, rightPosition);
       m_maxHorizontalVisualOverflow =
           max(max(visualOverflowRight, -visualOverflowLeft),
-              m_maxHorizontalVisualOverflow);
+              (int)m_maxHorizontalVisualOverflow);
       x += text->width();
     } else {
       if (curr->object()->isPositioned()) {
@@ -463,6 +463,8 @@ void InlineFlowBox::computeLogicalBoxHeights(int& maxPositionTop,
     if (curr->object()->isPositioned())
       continue;  // Positioned placeholders don't affect calculations.
 
+    bool isInlineFlow = curr->isInlineFlowBox();
+
     curr->setHeight(curr->object()->lineHeight(m_firstLine));
     curr->setBaseline(curr->object()->baselinePosition(m_firstLine));
     curr->setYPos(curr->object()->verticalPositionHint(m_firstLine));
@@ -472,7 +474,8 @@ void InlineFlowBox::computeLogicalBoxHeights(int& maxPositionTop,
     } else if (curr->yPos() == PositionBottom) {
       if (maxPositionBottom < curr->height())
         maxPositionBottom = curr->height();
-    } else if (curr->hasTextChildren() ||
+    } else if ((!isInlineFlow ||
+                static_cast<InlineFlowBox*>(curr)->hasTextChildren()) ||
                curr->boxModelObject()->hasHorizontalBordersOrPadding() ||
                strictMode) {
       int ascent = curr->baseline() - curr->yPos();
@@ -507,7 +510,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
     // Adjust boxes to use their real box y/height and not the logical height
     // (as dictated by
     // line-height).
-    if (curr->isInlineFlowBox())
+    bool isInlineFlow = curr->isInlineFlowBox();
+    if (isInlineFlow)
       static_cast<InlineFlowBox*>(curr)->placeBoxesVertically(
           y, maxHeight, maxAscent, strictMode, topPosition, bottomPosition,
           selectionTop, selectionBottom);
@@ -518,7 +522,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
     else if (curr->yPos() == PositionBottom)
       curr->setYPos(y + maxHeight - curr->height());
     else {
-      if (!curr->hasTextChildren() &&
+      if ((isInlineFlow &&
+           !static_cast<InlineFlowBox*>(curr)->hasTextChildren()) &&
           !curr->boxModelObject()->hasHorizontalBordersOrPadding() &&
           !strictMode)
         childAffectsTopBottomPos = false;

@@ -35,7 +35,10 @@ class InlineFlowBox : public InlineRunBox {
       : InlineRunBox(obj),
         m_firstChild(0),
         m_lastChild(0),
-        m_maxHorizontalVisualOverflow(0)
+        m_maxHorizontalVisualOverflow(0),
+        m_includeLeftEdge(false),
+        m_includeRightEdge(false),
+        m_hasTextChildren(true)
 #ifndef NDEBUG
         ,
         m_hasBadChildList(false)
@@ -202,7 +205,7 @@ class InlineFlowBox : public InlineRunBox {
 
   virtual void setVerticalOverflowPositions(int /*top*/, int /*bottom*/) {}
   virtual void setVerticalSelectionPositions(int /*top*/, int /*bottom*/) {}
-  int maxHorizontalVisualOverflow() const {
+  short maxHorizontalVisualOverflow() const {
     return m_maxHorizontalVisualOverflow;
   }
 
@@ -218,13 +221,19 @@ class InlineFlowBox : public InlineRunBox {
                                int ellipsisWidth,
                                bool&);
 
+  bool hasTextChildren() const { return m_hasTextChildren; }
+
   void checkConsistency() const;
   void setHasBadChildList();
 
  private:
   InlineBox* m_firstChild;
   InlineBox* m_lastChild;
-  int m_maxHorizontalVisualOverflow;
+  short m_maxHorizontalVisualOverflow;
+
+  bool m_includeLeftEdge : 1;
+  bool m_includeRightEdge : 1;
+  bool m_hasTextChildren : 1;
 
 #ifndef NDEBUG
   bool m_hasBadChildList;
