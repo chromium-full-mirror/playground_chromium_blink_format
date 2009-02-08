@@ -56,6 +56,7 @@ class GraphicsContext;
 class HitTestResult;
 class InspectorClient;
 class JavaScriptCallFrame;
+class StorageArea;
 class Node;
 class Page;
 class ResourceRequest;
@@ -66,6 +67,7 @@ class SharedBuffer;
 
 struct ConsoleMessage;
 struct InspectorDatabaseResource;
+struct InspectorDOMStorageResource;
 struct InspectorResource;
 
 class InspectorController
@@ -77,6 +79,7 @@ class InspectorController
   typedef HashMap<long long, RefPtr<InspectorResource>> ResourcesMap;
   typedef HashMap<RefPtr<Frame>, ResourcesMap*> FrameResourcesMap;
   typedef HashSet<RefPtr<InspectorDatabaseResource>> DatabaseResourcesSet;
+  typedef HashSet<RefPtr<InspectorDOMStorageResource>> DOMStorageResourcesSet;
 
   typedef enum {
     CurrentPanel,
@@ -265,6 +268,11 @@ class InspectorController
                        const String& name,
                        const String& version);
 #endif
+#if ENABLE(DOM_STORAGE)
+  void didUseDOMStorage(StorageArea* storageArea,
+                        bool isLocalStorage,
+                        Frame* frame);
+#endif
 
   const ResourcesMap& resources() const { return m_resources; }
 
@@ -336,6 +344,10 @@ class InspectorController
   JSObjectRef addDatabaseScriptResource(InspectorDatabaseResource*);
   void removeDatabaseScriptResource(InspectorDatabaseResource*);
 #endif
+#if ENABLE(DOM_STORAGE)
+  JSObjectRef addDOMStorageScriptResource(InspectorDOMStorageResource*);
+  void removeDOMStorageScriptResource(InspectorDOMStorageResource*);
+#endif
 
   JSValueRef callSimpleFunction(JSContextRef,
                                 JSObjectRef thisObject,
@@ -376,6 +388,9 @@ class InspectorController
   HashMap<String, unsigned> m_counts;
 #if ENABLE(DATABASE)
   DatabaseResourcesSet m_databaseResources;
+#endif
+#if ENABLE(DOM_STORAGE)
+  DOMStorageResourcesSet m_domStorageResources;
 #endif
   JSObjectRef m_scriptObject;
   JSObjectRef m_controllerScriptObject;
