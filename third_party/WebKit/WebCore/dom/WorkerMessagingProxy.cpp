@@ -177,8 +177,8 @@ class WorkerThreadActivityReportTask : public ScriptExecutionContext::Task {
         m_hasPendingActivity(hasPendingActivity) {}
 
   virtual void performTask(ScriptExecutionContext*) {
-    m_messagingProxy->reportWorkerThreadActivityInternal(m_confirmingMessage,
-                                                         m_hasPendingActivity);
+    m_messagingProxy->reportPendingActivityInternal(m_confirmingMessage,
+                                                    m_hasPendingActivity);
   }
 
   WorkerMessagingProxy* m_messagingProxy;
@@ -238,9 +238,10 @@ void WorkerMessagingProxy::postTaskToWorkerObject(
   m_scriptExecutionContext->postTask(task);
 }
 
-void WorkerMessagingProxy::postWorkerException(const String& errorMessage,
-                                               int lineNumber,
-                                               const String& sourceURL) {
+void WorkerMessagingProxy::postExceptionToWorkerObject(
+    const String& errorMessage,
+    int lineNumber,
+    const String& sourceURL) {
   m_scriptExecutionContext->postTask(
       WorkerExceptionTask::create(errorMessage, lineNumber, sourceURL, this));
 }
@@ -267,7 +268,7 @@ void WorkerMessagingProxy::workerThreadCreated(
 void WorkerMessagingProxy::workerObjectDestroyed() {
   m_workerObject = 0;
   if (m_workerThread)
-    terminate();
+    terminateWorkerContext();
   else
     workerContextDestroyedInternal();
 }
@@ -287,7 +288,7 @@ void WorkerMessagingProxy::workerContextDestroyedInternal() {
     delete this;
 }
 
-void WorkerMessagingProxy::terminate() {
+void WorkerMessagingProxy::terminateWorkerContext() {
   if (m_askedToTerminate)
     return;
   m_askedToTerminate = true;
@@ -299,16 +300,16 @@ void WorkerMessagingProxy::terminate() {
 void WorkerMessagingProxy::confirmWorkerThreadMessage(bool hasPendingActivity) {
   m_scriptExecutionContext->postTask(
       WorkerThreadActivityReportTask::create(this, true, hasPendingActivity));
-  // Will execute reportWorkerThreadActivityInternal() on context's thread.
+  // Will execute reportPendingActivityInternal() on context's thread.
 }
 
-void WorkerMessagingProxy::reportWorkerThreadActivity(bool hasPendingActivity) {
+void WorkerMessagingProxy::reportPendingActivity(bool hasPendingActivity) {
   m_scriptExecutionContext->postTask(
       WorkerThreadActivityReportTask::create(this, false, hasPendingActivity));
-  // Will execute reportWorkerThreadActivityInternal() on context's thread.
+  // Will execute reportPendingActivityInternal() on context's thread.
 }
 
-void WorkerMessagingProxy::reportWorkerThreadActivityInternal(
+void WorkerMessagingProxy::reportPendingActivityInternal(
     bool confirmingMessage,
     bool hasPendingActivity) {
   if (confirmingMessage && !m_askedToTerminate) {
@@ -319,7 +320,7 @@ void WorkerMessagingProxy::reportWorkerThreadActivityInternal(
   m_workerThreadHadPendingActivity = hasPendingActivity;
 }
 
-bool WorkerMessagingProxy::workerThreadHasPendingActivity() const {
+bool WorkerMessagingProxy::hasPendingActivity() const {
   return (m_unconfirmedMessageCount || m_workerThreadHadPendingActivity) &&
          !m_askedToTerminate;
 }
