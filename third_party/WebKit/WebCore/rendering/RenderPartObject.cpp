@@ -44,8 +44,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-RenderPartObject::RenderPartObject(HTMLFrameOwnerElement* element)
-    : RenderPart(element) {
+RenderPartObject::RenderPartObject(Node* element) : RenderPart(element) {
   // init RenderObject attributes
   setInline(true);
   m_hasFallbackContent = false;

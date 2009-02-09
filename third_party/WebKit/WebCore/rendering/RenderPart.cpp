@@ -37,7 +37,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-RenderPart::RenderPart(HTMLFrameOwnerElement* node) : RenderWidget(node) {
+RenderPart::RenderPart(Node* node) : RenderWidget(node) {
   // init RenderObject attributes
   setInline(false);
 }
