@@ -437,7 +437,8 @@ void ReplaceSelectionCommand::removeNodeAndPruneAncestors(Node* node) {
     m_firstNodeInserted =
         m_lastLeafInserted && m_lastLeafInserted->inDocument() ? afterFirst : 0;
 }
-bool isHeaderElement(Node* a) {
+
+static bool isHeaderElement(Node* a) {
   if (!a)
     return false;
 
@@ -445,7 +446,7 @@ bool isHeaderElement(Node* a) {
          a->hasTagName(h4Tag) || a->hasTagName(h5Tag);
 }
 
-bool haveSameTagName(Node* a, Node* b) {
+static bool haveSameTagName(Node* a, Node* b) {
   return a && b && a->isElementNode() && b->isElementNode() &&
          static_cast<Element*>(a)->tagName() ==
              static_cast<Element*>(b)->tagName();
