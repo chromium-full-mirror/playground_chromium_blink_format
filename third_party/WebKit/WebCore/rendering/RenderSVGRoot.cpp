@@ -27,17 +27,12 @@
 #include "RenderSVGRoot.h"
 
 #include "GraphicsContext.h"
-#include "RenderPath.h"
 #include "RenderSVGContainer.h"
 #include "RenderView.h"
 #include "SVGLength.h"
 #include "SVGRenderSupport.h"
-#include "SVGResourceClipper.h"
-#include "SVGResourceFilter.h"
-#include "SVGResourceMasker.h"
 #include "SVGSVGElement.h"
 #include "SVGStyledElement.h"
-#include "SVGURIReference.h"
 
 using namespace std;
 
@@ -166,7 +161,6 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
   calcViewport();
 
-  SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
   // A value of zero disables rendering of the element.
   if (viewport().width() <= 0. || viewport().height() <= 0.)
     return;
@@ -197,6 +191,7 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   if (childPaintInfo.phase == PaintPhaseForeground)
     prepareToRenderSVGContent(this, childPaintInfo, boundingBox, filter);
 
+  SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
   childPaintInfo.context->concatCTM(
       svg->viewBoxToViewTransform(width(), height()));
   RenderBox::paint(childPaintInfo, 0, 0);
@@ -220,28 +215,23 @@ FloatRect RenderSVGRoot::viewport() const {
 }
 
 void RenderSVGRoot::calcViewport() {
-  SVGElement* svgelem = static_cast<SVGElement*>(element());
-  if (svgelem->hasTagName(SVGNames::svgTag)) {
-    SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
+  SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
 
-    if (!selfNeedsLayout() && !svg->hasRelativeValues())
-      return;
+  if (!selfNeedsLayout() && !svg->hasRelativeValues())
+    return;
 
-    float w, h;
-    SVGLength width = svg->width();
-    if (width.unitType() == LengthTypePercentage && svg->hasSetContainerSize())
-      w = svg->relativeWidthValue();
-    else
-      w = width.value(svg);
-
-    SVGLength height = svg->height();
-    if (height.unitType() == LengthTypePercentage && svg->hasSetContainerSize())
-      h = svg->relativeHeightValue();
-    else
-      h = height.value(svg);
-
-    m_viewport = FloatRect(0, 0, w, h);
+  SVGLength width = svg->width();
+  SVGLength height = svg->height();
+  if (!svg->hasSetContainerSize()) {
+    m_viewport = FloatRect(0, 0, width.value(svg), height.value(svg));
+    return;
   }
+  m_viewport = FloatRect(0, 0, (width.unitType() == LengthTypePercentage)
+                                   ? svg->relativeWidthValue()
+                                   : width.value(svg),
+                         (height.unitType() == LengthTypePercentage)
+                             ? svg->relativeHeightValue()
+                             : height.value(svg));
 }
 
 IntRect RenderSVGRoot::clippedOverflowRectForRepaint(
