@@ -58,6 +58,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   MediaPlayer* player() const { return m_player.get(); }
 
   virtual bool isVideo() const { return false; }
+  virtual bool hasVideo() const { return false; }
 
   void scheduleLoad();
 
@@ -137,6 +138,9 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void setVolume(float, ExceptionCode&);
   bool muted() const;
   void setMuted(bool);
+  void togglePlayState(ExceptionCode& ec);
+  void beginScrubbing();
+  void endScrubbing();
 
   bool canPlay() const;
 
