@@ -121,8 +121,8 @@ class Editor {
   bool shouldDeleteRange(Range*) const;
   bool shouldApplyStyle(CSSStyleDeclaration*, Range*);
 
-  void respondToChangedSelection(const Selection& oldSelection);
-  void respondToChangedContents(const Selection& endingSelection);
+  void respondToChangedSelection(const VisibleSelection& oldSelection);
+  void respondToChangedContents(const VisibleSelection& endingSelection);
 
   TriState selectionHasStyle(CSSStyleDeclaration*) const;
   const SimpleFontData* fontForSelection(bool&) const;
@@ -217,8 +217,8 @@ class Editor {
   Vector<String> guessesForMisspelledSelection();
   Vector<String> guessesForUngrammaticalSelection();
   void markMisspellingsAfterTypingToPosition(const VisiblePosition&);
-  void markMisspellings(const Selection&);
-  void markBadGrammar(const Selection&);
+  void markMisspellings(const VisibleSelection&);
+  void markBadGrammar(const VisibleSelection&);
   void advanceToNextMisspelling(bool startBeforeSelection = false);
   void showSpellingGuessPanel();
   bool spellingPanelIsShowing();
@@ -286,7 +286,7 @@ class Editor {
 
   void clear();
 
-  Selection selectionForCommand(Event*);
+  VisibleSelection selectionForCommand(Event*);
 
   void appendToKillRing(const String&);
   void prependToKillRing(const String&);

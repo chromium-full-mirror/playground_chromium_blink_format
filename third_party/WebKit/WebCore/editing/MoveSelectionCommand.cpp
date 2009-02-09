@@ -43,7 +43,7 @@ MoveSelectionCommand::MoveSelectionCommand(
 }
 
 void MoveSelectionCommand::doApply() {
-  Selection selection = endingSelection();
+  VisibleSelection selection = endingSelection();
   ASSERT(selection.isRange());
 
   Position pos = m_position;
@@ -77,7 +77,7 @@ void MoveSelectionCommand::doApply() {
   if (!pos.node()->inDocument())
     pos = endingSelection().start();
 
-  setEndingSelection(Selection(pos, endingSelection().affinity()));
+  setEndingSelection(VisibleSelection(pos, endingSelection().affinity()));
   applyCommandToComposite(ReplaceSelectionCommand::create(
       positionNode->document(), m_fragment, true, m_smartMove));
 }

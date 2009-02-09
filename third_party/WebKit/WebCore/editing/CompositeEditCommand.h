@@ -62,7 +62,7 @@ class CompositeEditCommand : public EditCommand {
                        bool mergeBlocksAfterDelete = true,
                        bool replace = false,
                        bool expandForSpecialElements = true);
-  void deleteSelection(const Selection&,
+  void deleteSelection(const VisibleSelection&,
                        bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true,
                        bool replace = false,

@@ -425,8 +425,8 @@ VisiblePosition VisiblePosition::honorEditableBoundaryAtOrBefore(
   // both are non-editable
   // FIXME: In the non-editable case, just because the new position is
   // non-editable doesn't mean movement
-  // to it is allowed.  Selection::adjustForEditableContent has this problem
-  // too.
+  // to it is allowed.  VisibleSelection::adjustForEditableContent has this
+  // problem too.
   if (highestEditableRoot(pos.deepEquivalent()) == highestRoot)
     return pos;
 
@@ -457,8 +457,8 @@ VisiblePosition VisiblePosition::honorEditableBoundaryAtOrAfter(
   // both are non-editable
   // FIXME: In the non-editable case, just because the new position is
   // non-editable doesn't mean movement
-  // to it is allowed.  Selection::adjustForEditableContent has this problem
-  // too.
+  // to it is allowed.  VisibleSelection::adjustForEditableContent has this
+  // problem too.
   if (highestEditableRoot(pos.deepEquivalent()) == highestRoot)
     return pos;
 

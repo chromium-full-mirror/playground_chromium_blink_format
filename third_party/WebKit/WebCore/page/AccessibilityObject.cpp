@@ -204,8 +204,8 @@ const AtomicString& AccessibilityObject::accessKey() const {
   return nullAtom;
 }
 
-Selection AccessibilityObject::selection() const {
-  return Selection();
+VisibleSelection AccessibilityObject::selection() const {
+  return VisibleSelection();
 }
 
 PlainTextRange AccessibilityObject::selectedTextRange() const {
@@ -309,7 +309,7 @@ AccessibilityObject::visiblePositionRangeForUnorderedPositions(
 
   // use selection order to see if the positions are in order
   else
-    alreadyInOrder = Selection(visiblePos1, visiblePos2).isBaseFirst();
+    alreadyInOrder = VisibleSelection(visiblePos1, visiblePos2).isBaseFirst();
 
   if (alreadyInOrder) {
     startPos = visiblePos1;

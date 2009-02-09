@@ -57,7 +57,7 @@ class TypingCommand : public CompositeEditCommand {
                          bool insertedTextIsComposition = false);
   static void insertText(Document*,
                          const String&,
-                         const Selection&,
+                         const VisibleSelection&,
                          bool selectInsertedText = false,
                          bool insertedTextIsComposition = false);
   static void insertLineBreak(Document*);

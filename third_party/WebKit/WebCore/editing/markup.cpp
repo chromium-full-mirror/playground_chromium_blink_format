@@ -52,7 +52,7 @@
 #include "ProcessingInstruction.h"
 #include "QualifiedName.h"
 #include "Range.h"
-#include "Selection.h"
+#include "VisibleSelection.h"
 #include "TextIterator.h"
 #include "htmlediting.h"
 #include "visible_units.h"
@@ -988,7 +988,7 @@ String createMarkup(const Range* range,
   // FIXME: Do this for all fully selected blocks, not just the body.
   Node* fullySelectedRoot =
       body &&
-              *Selection::selectionFromContentsOfNode(body)
+              *VisibleSelection::selectionFromContentsOfNode(body)
                       .toNormalizedRange() == *updatedRange
           ? body
           : 0;

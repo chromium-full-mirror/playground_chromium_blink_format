@@ -190,13 +190,13 @@ void EventHandler::clear() {
 void EventHandler::selectClosestWordFromMouseEvent(
     const MouseEventWithHitTestResults& result) {
   Node* innerNode = result.targetNode();
-  Selection newSelection;
+  VisibleSelection newSelection;
 
   if (innerNode && innerNode->renderer() && m_mouseDownMayStartSelect) {
     VisiblePosition pos(
         innerNode->renderer()->positionForPoint(result.localPoint()));
     if (pos.isNotNull()) {
-      newSelection = Selection(pos);
+      newSelection = VisibleSelection(pos);
       newSelection.expandUsingGranularity(WordGranularity);
     }
 
@@ -221,13 +221,13 @@ void EventHandler::selectClosestWordOrLinkFromMouseEvent(
   Node* innerNode = result.targetNode();
 
   if (innerNode && innerNode->renderer() && m_mouseDownMayStartSelect) {
-    Selection newSelection;
+    VisibleSelection newSelection;
     Element* URLElement = result.hitTestResult().URLElement();
     VisiblePosition pos(
         innerNode->renderer()->positionForPoint(result.localPoint()));
     if (pos.isNotNull() &&
         pos.deepEquivalent().node()->isDescendantOf(URLElement))
-      newSelection = Selection::selectionFromContentsOfNode(URLElement);
+      newSelection = VisibleSelection::selectionFromContentsOfNode(URLElement);
 
     if (newSelection.isRange()) {
       m_frame->setSelectionGranularity(WordGranularity);
@@ -266,11 +266,11 @@ bool EventHandler::handleMousePressEventTripleClick(
   if (!(innerNode && innerNode->renderer() && m_mouseDownMayStartSelect))
     return false;
 
-  Selection newSelection;
+  VisibleSelection newSelection;
   VisiblePosition pos(
       innerNode->renderer()->positionForPoint(event.localPoint()));
   if (pos.isNotNull()) {
-    newSelection = Selection(pos);
+    newSelection = VisibleSelection(pos);
     newSelection.expandUsingGranularity(ParagraphGranularity);
   }
   if (newSelection.isRange()) {
@@ -311,7 +311,7 @@ bool EventHandler::handleMousePressEventSingleClick(
     visiblePos = VisiblePosition(innerNode, 0, DOWNSTREAM);
   Position pos = visiblePos.deepEquivalent();
 
-  Selection newSelection = m_frame->selection()->selection();
+  VisibleSelection newSelection = m_frame->selection()->selection();
   if (extendSelection && newSelection.isCaretOrRange()) {
     m_frame->selection()->setLastChangeWasHorizontalExtension(false);
 
@@ -323,15 +323,15 @@ bool EventHandler::handleMousePressEventSingleClick(
     short before = Range::compareBoundaryPoints(pos.node(), pos.offset(),
                                                 start.node(), start.offset());
     if (before <= 0)
-      newSelection = Selection(pos, end);
+      newSelection = VisibleSelection(pos, end);
     else
-      newSelection = Selection(start, pos);
+      newSelection = VisibleSelection(start, pos);
 
     if (m_frame->selectionGranularity() != CharacterGranularity)
       newSelection.expandUsingGranularity(m_frame->selectionGranularity());
     m_beganSelectingText = true;
   } else {
-    newSelection = Selection(visiblePos);
+    newSelection = VisibleSelection(visiblePos);
     m_frame->setSelectionGranularity(CharacterGranularity);
   }
 
@@ -520,7 +520,7 @@ void EventHandler::updateSelectionForMouseDrag(Node* targetNode,
   // Restart the selection if this is the first mouse move. This work is usually
   // done in handleMousePressEvent, but not if the mouse press was on an
   // existing selection.
-  Selection newSelection = m_frame->selection()->selection();
+  VisibleSelection newSelection = m_frame->selection()->selection();
 
 #if ENABLE(SVG)
   // Special case to limit selection to the containing block for SVG text.
@@ -535,7 +535,7 @@ void EventHandler::updateSelectionForMouseDrag(Node* targetNode,
 
   if (!m_beganSelectingText) {
     m_beganSelectingText = true;
-    newSelection = Selection(targetPosition);
+    newSelection = VisibleSelection(targetPosition);
   }
 
   newSelection.setExtent(targetPosition);
@@ -589,12 +589,12 @@ bool EventHandler::handleMouseReleaseEvent(
   if (m_mouseDownWasSingleClickInSelection && !m_beganSelectingText &&
       m_dragStartPos == event.event().pos() &&
       m_frame->selection()->isRange()) {
-    Selection newSelection;
+    VisibleSelection newSelection;
     Node* node = event.targetNode();
     if (node && node->isContentEditable() && node->renderer()) {
       VisiblePosition pos =
           node->renderer()->positionForPoint(event.localPoint());
-      newSelection = Selection(pos);
+      newSelection = VisibleSelection(pos);
     }
     if (m_frame->shouldChangeSelection(newSelection))
       m_frame->selection()->setSelection(newSelection);

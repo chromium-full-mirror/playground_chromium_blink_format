@@ -213,7 +213,7 @@ static bool executeInsertNode(Frame* frame, PassRefPtr<Node> content) {
 
 static bool expandSelectionToGranularity(Frame* frame,
                                          TextGranularity granularity) {
-  Selection selection = frame->selection()->selection();
+  VisibleSelection selection = frame->selection()->selection();
   selection.expandUsingGranularity(granularity);
   RefPtr<Range> newRange = selection.toNormalizedRange();
   if (!newRange)
@@ -1305,8 +1305,8 @@ static bool executeSwapWithMark(Frame* frame,
                                 Event*,
                                 EditorCommandSource,
                                 const String&) {
-  const Selection& mark = frame->mark();
-  const Selection& selection = frame->selection()->selection();
+  const VisibleSelection& mark = frame->mark();
+  const VisibleSelection& selection = frame->selection()->selection();
   if (mark.isNone() || selection.isNone()) {
     systemBeep();
     return false;
@@ -1438,7 +1438,8 @@ static bool enabledVisibleSelection(Frame* frame,
                                     EditorCommandSource) {
   // The term "visible" here includes a caret in editable text or a range in any
   // text.
-  const Selection& selection = frame->editor()->selectionForCommand(event);
+  const VisibleSelection& selection =
+      frame->editor()->selectionForCommand(event);
   return (selection.isCaret() && selection.isContentEditable()) ||
          selection.isRange();
 }
@@ -1446,7 +1447,8 @@ static bool enabledVisibleSelection(Frame* frame,
 static bool enabledVisibleSelectionAndMark(Frame* frame,
                                            Event* event,
                                            EditorCommandSource) {
-  const Selection& selection = frame->editor()->selectionForCommand(event);
+  const VisibleSelection& selection =
+      frame->editor()->selectionForCommand(event);
   return ((selection.isCaret() && selection.isContentEditable()) ||
           selection.isRange()) &&
          frame->mark().isCaretOrRange();
@@ -1455,7 +1457,8 @@ static bool enabledVisibleSelectionAndMark(Frame* frame,
 static bool enableCaretInEditableText(Frame* frame,
                                       Event* event,
                                       EditorCommandSource) {
-  const Selection& selection = frame->editor()->selectionForCommand(event);
+  const VisibleSelection& selection =
+      frame->editor()->selectionForCommand(event);
   return selection.isCaret() && selection.isContentEditable();
 }
 

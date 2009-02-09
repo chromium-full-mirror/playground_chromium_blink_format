@@ -28,7 +28,7 @@
 
 #include "EditAction.h"
 #include "Element.h"
-#include "Selection.h"
+#include "VisibleSelection.h"
 
 namespace WebCore {
 
@@ -47,8 +47,10 @@ class EditCommand : public RefCounted<EditCommand> {
 
   virtual EditAction editingAction() const;
 
-  const Selection& startingSelection() const { return m_startingSelection; }
-  const Selection& endingSelection() const { return m_endingSelection; }
+  const VisibleSelection& startingSelection() const {
+    return m_startingSelection;
+  }
+  const VisibleSelection& endingSelection() const { return m_endingSelection; }
 
   Element* startingRootEditableElement() const {
     return m_startingRootEditableElement.get();
@@ -67,8 +69,8 @@ class EditCommand : public RefCounted<EditCommand> {
 
   Document* document() const { return m_document.get(); }
 
-  void setStartingSelection(const Selection&);
-  void setEndingSelection(const Selection&);
+  void setStartingSelection(const VisibleSelection&);
+  void setEndingSelection(const VisibleSelection&);
 
   PassRefPtr<CSSMutableStyleDeclaration> styleAtPosition(const Position&);
   void updateLayout() const;
@@ -79,8 +81,8 @@ class EditCommand : public RefCounted<EditCommand> {
   virtual void doReapply();  // calls doApply()
 
   RefPtr<Document> m_document;
-  Selection m_startingSelection;
-  Selection m_endingSelection;
+  VisibleSelection m_startingSelection;
+  VisibleSelection m_endingSelection;
   RefPtr<Element> m_startingRootEditableElement;
   RefPtr<Element> m_endingRootEditableElement;
   CompositeEditCommand* m_parent;

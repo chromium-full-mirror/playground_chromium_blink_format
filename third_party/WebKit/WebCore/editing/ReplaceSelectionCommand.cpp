@@ -64,7 +64,7 @@ class ReplacementFragment : Noncopyable {
   ReplacementFragment(Document*,
                       DocumentFragment*,
                       bool matchStyle,
-                      const Selection&);
+                      const VisibleSelection&);
 
   Node* firstChild() const;
   Node* lastChild() const;
@@ -115,7 +115,7 @@ static bool isInterchangeConvertedSpaceSpan(const Node* node) {
 ReplacementFragment::ReplacementFragment(Document* document,
                                          DocumentFragment* fragment,
                                          bool matchStyle,
-                                         const Selection& selection)
+                                         const VisibleSelection& selection)
     : m_document(document),
       m_fragment(fragment),
       m_matchStyle(matchStyle),
@@ -152,7 +152,8 @@ ReplacementFragment::ReplacementFragment(Document* document,
   RefPtr<Node> holder = insertFragmentForTestRendering(styleNode);
 
   RefPtr<Range> range =
-      Selection::selectionFromContentsOfNode(holder.get()).toNormalizedRange();
+      VisibleSelection::selectionFromContentsOfNode(holder.get())
+          .toNormalizedRange();
   String text = plainText(range.get());
   // Give the root a chance to change the text.
   RefPtr<BeforeTextInsertedEvent> evt = BeforeTextInsertedEvent::create(text);
@@ -789,7 +790,7 @@ void ReplaceSelectionCommand::mergeEndIfNeeded() {
 }
 
 void ReplaceSelectionCommand::doApply() {
-  Selection selection = endingSelection();
+  VisibleSelection selection = endingSelection();
   ASSERT(selection.isCaretOrRange());
   ASSERT(selection.start().node());
   if (selection.isNone() || !selection.start().node())
@@ -1198,9 +1199,9 @@ void ReplaceSelectionCommand::completeHTMLReplacement(
     return;
 
   if (m_selectReplacement)
-    setEndingSelection(Selection(start, end, SEL_DEFAULT_AFFINITY));
+    setEndingSelection(VisibleSelection(start, end, SEL_DEFAULT_AFFINITY));
   else
-    setEndingSelection(Selection(end, SEL_DEFAULT_AFFINITY));
+    setEndingSelection(VisibleSelection(end, SEL_DEFAULT_AFFINITY));
 }
 
 EditAction ReplaceSelectionCommand::editingAction() const {

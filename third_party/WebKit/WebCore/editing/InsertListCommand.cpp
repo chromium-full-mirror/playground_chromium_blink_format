@@ -63,7 +63,8 @@ InsertListCommand::InsertListCommand(Document* document,
       m_forceCreateList(false) {}
 
 bool InsertListCommand::modifyRange() {
-  Selection selection = selectionForParagraphIteration(endingSelection());
+  VisibleSelection selection =
+      selectionForParagraphIteration(endingSelection());
   ASSERT(selection.isRange());
   VisiblePosition startOfSelection = selection.visibleStart();
   VisiblePosition endOfSelection = selection.visibleEnd();
@@ -107,7 +108,7 @@ bool InsertListCommand::modifyRange() {
   doApply();
   // Fetch the end of the selection, for the reason mentioned above.
   endOfSelection = endingSelection().visibleEnd();
-  setEndingSelection(Selection(startOfSelection, endOfSelection));
+  setEndingSelection(VisibleSelection(startOfSelection, endOfSelection));
   m_forceCreateList = false;
   return true;
 }
@@ -132,7 +133,8 @@ void InsertListCommand::doApply() {
   // consistent and
   // then use a left margin/padding rule here.
   if (visibleEnd != visibleStart && isStartOfParagraph(visibleEnd))
-    setEndingSelection(Selection(visibleStart, visibleEnd.previous(true)));
+    setEndingSelection(
+        VisibleSelection(visibleStart, visibleEnd.previous(true)));
 
   if (endingSelection().isRange() && modifyRange())
     return;

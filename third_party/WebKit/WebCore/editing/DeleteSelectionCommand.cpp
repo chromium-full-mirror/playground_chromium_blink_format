@@ -87,11 +87,12 @@ DeleteSelectionCommand::DeleteSelectionCommand(Document* document,
       m_typingStyle(0),
       m_deleteIntoBlockquoteStyle(0) {}
 
-DeleteSelectionCommand::DeleteSelectionCommand(const Selection& selection,
-                                               bool smartDelete,
-                                               bool mergeBlocksAfterDelete,
-                                               bool replace,
-                                               bool expandForSpecialElements)
+DeleteSelectionCommand::DeleteSelectionCommand(
+    const VisibleSelection& selection,
+    bool smartDelete,
+    bool mergeBlocksAfterDelete,
+    bool replace,
+    bool expandForSpecialElements)
     : CompositeEditCommand(selection.start().node()->document()),
       m_hasSelectionToDelete(true),
       m_smartDelete(smartDelete),
@@ -840,7 +841,7 @@ void DeleteSelectionCommand::calculateTypingStyleAfterDelete() {
 }
 
 void DeleteSelectionCommand::clearTransientState() {
-  m_selectionToDelete = Selection();
+  m_selectionToDelete = VisibleSelection();
   m_upstreamStart.clear();
   m_downstreamStart.clear();
   m_upstreamEnd.clear();
@@ -906,7 +907,7 @@ void DeleteSelectionCommand::doApply() {
   // want to replace it with a placeholder BR!
   if (handleSpecialCaseBRDelete()) {
     calculateTypingStyleAfterDelete();
-    setEndingSelection(Selection(m_endingPosition, affinity));
+    setEndingSelection(VisibleSelection(m_endingPosition, affinity));
     clearTransientState();
     rebalanceWhitespace();
     return;
@@ -930,7 +931,7 @@ void DeleteSelectionCommand::doApply() {
 
   calculateTypingStyleAfterDelete();
 
-  setEndingSelection(Selection(m_endingPosition, affinity));
+  setEndingSelection(VisibleSelection(m_endingPosition, affinity));
   clearTransientState();
 }
 

@@ -27,8 +27,8 @@
 #define SelectionController_h
 
 #include "IntRect.h"
-#include "Selection.h"
 #include "Range.h"
+#include "VisibleSelection.h"
 #include <wtf/Noncopyable.h>
 
 namespace WebCore {
@@ -63,8 +63,8 @@ class SelectionController : Noncopyable {
               EAffinity,
               bool userTriggered = false);
 
-  const Selection& selection() const { return m_sel; }
-  void setSelection(const Selection&,
+  const VisibleSelection& selection() const { return m_sel; }
+  void setSelection(const VisibleSelection&,
                     bool closeTyping = true,
                     bool clearTypingStyle = true,
                     bool userTriggered = false);
@@ -78,7 +78,7 @@ class SelectionController : Noncopyable {
 
   bool contains(const IntPoint&);
 
-  Selection::SelectionType selectionType() const {
+  VisibleSelection::SelectionType selectionType() const {
     return m_sel.selectionType();
   }
 
@@ -177,7 +177,7 @@ class SelectionController : Noncopyable {
   Frame* m_frame;
   int m_xPosForVerticalArrowNavigation;
 
-  Selection m_sel;
+  VisibleSelection m_sel;
 
   IntRect m_caretRect;       // caret rect in coords local to the renderer
                              // responsible for painting the caret

@@ -1305,7 +1305,7 @@ const AtomicString& AccessibilityRenderObject::accessKey() const {
   return static_cast<Element*>(node)->getAttribute(accesskeyAttr);
 }
 
-Selection AccessibilityRenderObject::selection() const {
+VisibleSelection AccessibilityRenderObject::selection() const {
   return m_renderer->document()->frame()->selection()->selection();
 }
 
@@ -1350,8 +1350,8 @@ void AccessibilityRenderObject::setSelectedTextRange(
     return;
   Node* node = m_renderer->element();
   frame->selection()->setSelection(
-      Selection(Position(node, range.start),
-                Position(node, range.start + range.length), DOWNSTREAM));
+      VisibleSelection(Position(node, range.start),
+                       Position(node, range.start + range.length), DOWNSTREAM));
 }
 
 KURL AccessibilityRenderObject::url() const {
@@ -1600,7 +1600,7 @@ VisiblePositionRange AccessibilityRenderObject::visiblePositionRangeForLine(
   // starting at an empty line.  The resulting selection in that case
   // will be a caret at visiblePos.
   SelectionController selection;
-  selection.setSelection(Selection(visiblePos));
+  selection.setSelection(VisibleSelection(visiblePos));
   selection.modify(SelectionController::EXTEND, SelectionController::RIGHT,
                    LineBoundary);
 
@@ -1715,7 +1715,7 @@ void AccessibilityRenderObject::setSelectedVisiblePositionRange(
   if (range.start == range.end) {
     m_renderer->document()->frame()->selection()->moveTo(range.start, true);
   } else {
-    Selection newSelection = Selection(range.start, range.end);
+    VisibleSelection newSelection = VisibleSelection(range.start, range.end);
     m_renderer->document()->frame()->selection()->setSelection(newSelection);
   }
 }
@@ -1827,7 +1827,7 @@ PlainTextRange AccessibilityRenderObject::doAXRangeForLine(
   // starting at an empty line.  The resulting selection in that case
   // will be a caret at visiblePos.
   SelectionController selection;
-  selection.setSelection(Selection(visiblePos));
+  selection.setSelection(VisibleSelection(visiblePos));
   selection.modify(SelectionController::EXTEND, SelectionController::LEFT,
                    LineBoundary);
   selection.modify(SelectionController::EXTEND, SelectionController::RIGHT,

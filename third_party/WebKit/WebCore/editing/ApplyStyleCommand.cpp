@@ -353,7 +353,7 @@ void ApplyStyleCommand::updateStartEnd(const Position& newStart,
   if (!m_useEndingSelection && (newStart != m_start || newEnd != m_end))
     m_useEndingSelection = true;
 
-  setEndingSelection(Selection(newStart, newEnd, VP_DEFAULT_AFFINITY));
+  setEndingSelection(VisibleSelection(newStart, newEnd, VP_DEFAULT_AFFINITY));
   m_start = newStart;
   m_end = newEnd;
 }
@@ -1614,7 +1614,7 @@ void ApplyStyleCommand::surroundNodeRangeWithElement(
   // the node
   // range so that the endingSelection() is canonicalized.  See the comments at
   // the end of
-  // Selection::validate().
+  // VisibleSelection::validate().
 }
 
 void ApplyStyleCommand::addBlockStyle(const StyleChange& styleChange,

@@ -28,7 +28,7 @@
 namespace WebCore {
 
 class FormControlElement;
-class Selection;
+class VisibleSelection;
 class TextControlInnerElement;
 class TextControlInnerTextElement;
 
@@ -58,7 +58,7 @@ class RenderTextControl : public RenderBlock {
   void setSelectionEnd(int);
   void select();
   void setSelectionRange(int start, int end);
-  Selection selection(int start, int end) const;
+  VisibleSelection selection(int start, int end) const;
 
   virtual void subtreeHasChanged();
   String text();

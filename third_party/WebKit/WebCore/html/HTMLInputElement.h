@@ -33,7 +33,7 @@ namespace WebCore {
 class FileList;
 class HTMLImageLoader;
 class KURL;
-class Selection;
+class VisibleSelection;
 
 class HTMLInputElement : public HTMLFormControlElementWithState,
                          public InputElement {
@@ -208,7 +208,7 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   void addSearchResult();
   void onSearch();
 
-  Selection selection() const;
+  VisibleSelection selection() const;
 
   virtual String constrainValue(const String& proposedValue) const;
 

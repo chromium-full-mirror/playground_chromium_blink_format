@@ -51,7 +51,7 @@ class RenderObject;
 class RenderListBox;
 class RenderTextControl;
 class RenderView;
-class Selection;
+class VisibleSelection;
 class String;
 class Widget;
 
@@ -157,7 +157,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
 
   virtual KURL url() const;
   virtual PlainTextRange selectedTextRange() const;
-  virtual Selection selection() const;
+  virtual VisibleSelection selection() const;
   virtual String stringValue() const;
   virtual String ariaAccessiblityName(const String&) const;
   virtual String ariaLabeledByAttribute() const;

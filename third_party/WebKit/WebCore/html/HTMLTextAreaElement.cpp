@@ -37,7 +37,7 @@
 #include "Page.h"
 #include "RenderStyle.h"
 #include "RenderTextControlMultiLine.h"
-#include "Selection.h"
+#include "VisibleSelection.h"
 #include "Text.h"
 #include <wtf/StdLibExtras.h>
 
@@ -371,9 +371,9 @@ void HTMLTextAreaElement::setRows(int rows) {
   setAttribute(rowsAttr, String::number(rows));
 }
 
-Selection HTMLTextAreaElement::selection() const {
+VisibleSelection HTMLTextAreaElement::selection() const {
   if (!renderer() || m_cachedSelectionStart < 0 || m_cachedSelectionEnd < 0)
-    return Selection();
+    return VisibleSelection();
   return static_cast<RenderTextControl*>(renderer())
       ->selection(m_cachedSelectionStart, m_cachedSelectionEnd);
 }

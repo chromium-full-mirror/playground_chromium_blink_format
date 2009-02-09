@@ -43,7 +43,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
                                                expandForSpecialElements));
   }
   static PassRefPtr<DeleteSelectionCommand> create(
-      const Selection& selection,
+      const VisibleSelection& selection,
       bool smartDelete = false,
       bool mergeBlocksAfterDelete = true,
       bool replace = false,
@@ -59,7 +59,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
                          bool mergeBlocksAfterDelete,
                          bool replace,
                          bool expandForSpecialElements);
-  DeleteSelectionCommand(const Selection&,
+  DeleteSelectionCommand(const VisibleSelection&,
                          bool smartDelete,
                          bool mergeBlocksAfterDelete,
                          bool replace,
@@ -95,7 +95,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
 
   // This data is transient and should be cleared at the end of the doApply
   // function.
-  Selection m_selectionToDelete;
+  VisibleSelection m_selectionToDelete;
   Position m_upstreamStart;
   Position m_downstreamStart;
   Position m_upstreamEnd;

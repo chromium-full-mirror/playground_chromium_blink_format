@@ -54,7 +54,7 @@ Node* DOMSelection::anchorNode() const {
   if (!m_frame)
     return 0;
 
-  const Selection& selection = m_frame->selection()->selection();
+  const VisibleSelection& selection = m_frame->selection()->selection();
   Position anchor =
       selection.isBaseFirst() ? selection.start() : selection.end();
   anchor = rangeCompliantEquivalent(anchor);
@@ -72,7 +72,7 @@ int DOMSelection::anchorOffset() const {
   if (!m_frame)
     return 0;
 
-  const Selection& selection = m_frame->selection()->selection();
+  const VisibleSelection& selection = m_frame->selection()->selection();
   Position anchor =
       selection.isBaseFirst() ? selection.start() : selection.end();
   anchor = rangeCompliantEquivalent(anchor);
@@ -90,7 +90,7 @@ Node* DOMSelection::focusNode() const {
   if (!m_frame)
     return 0;
 
-  const Selection& selection = m_frame->selection()->selection();
+  const VisibleSelection& selection = m_frame->selection()->selection();
   Position focus =
       selection.isBaseFirst() ? selection.end() : selection.start();
   focus = rangeCompliantEquivalent(focus);
@@ -108,7 +108,7 @@ int DOMSelection::focusOffset() const {
   if (!m_frame)
     return 0;
 
-  const Selection& selection = m_frame->selection()->selection();
+  const VisibleSelection& selection = m_frame->selection()->selection();
   Position focus =
       selection.isBaseFirst() ? selection.end() : selection.start();
   focus = rangeCompliantEquivalent(focus);
@@ -162,7 +162,7 @@ void DOMSelection::collapseToEnd() {
   if (!m_frame)
     return;
 
-  const Selection& selection = m_frame->selection()->selection();
+  const VisibleSelection& selection = m_frame->selection()->selection();
   m_frame->selection()->moveTo(VisiblePosition(selection.end(), DOWNSTREAM));
 }
 
@@ -170,7 +170,7 @@ void DOMSelection::collapseToStart() {
   if (!m_frame)
     return;
 
-  const Selection& selection = m_frame->selection()->selection();
+  const VisibleSelection& selection = m_frame->selection()->selection();
   m_frame->selection()->moveTo(VisiblePosition(selection.start(), DOWNSTREAM));
 }
 
@@ -293,7 +293,7 @@ PassRefPtr<Range> DOMSelection::getRangeAt(int index, ExceptionCode& ec) {
   // If you're hitting this, you've added broken multi-range selection support
   ASSERT(rangeCount() == 1);
 
-  const Selection& selection = m_frame->selection()->selection();
+  const VisibleSelection& selection = m_frame->selection()->selection();
   return selection.firstRange();
 }
 
@@ -312,7 +312,7 @@ void DOMSelection::addRange(Range* r) {
   SelectionController* selection = m_frame->selection();
 
   if (selection->isNone()) {
-    selection->setSelection(Selection(r));
+    selection->setSelection(VisibleSelection(r));
     return;
   }
 
@@ -324,11 +324,11 @@ void DOMSelection::addRange(Range* r) {
     if (r->compareBoundaryPoints(Range::START_TO_END, range.get(), ec) > -1) {
       if (r->compareBoundaryPoints(Range::END_TO_END, range.get(), ec) == -1)
         // The original range and r intersect.
-        selection->setSelection(
-            Selection(r->startPosition(), range->endPosition(), DOWNSTREAM));
+        selection->setSelection(VisibleSelection(
+            r->startPosition(), range->endPosition(), DOWNSTREAM));
       else
         // r contains the original range.
-        selection->setSelection(Selection(r));
+        selection->setSelection(VisibleSelection(r));
     }
   } else {
     // We don't support discontiguous selection. We don't do anything if r and
@@ -336,11 +336,11 @@ void DOMSelection::addRange(Range* r) {
     if (r->compareBoundaryPoints(Range::END_TO_START, range.get(), ec) < 1) {
       if (r->compareBoundaryPoints(Range::END_TO_END, range.get(), ec) == -1)
         // The original range contains r.
-        selection->setSelection(Selection(range.get()));
+        selection->setSelection(VisibleSelection(range.get()));
       else
         // The original range and r intersect.
-        selection->setSelection(
-            Selection(range->startPosition(), r->endPosition(), DOWNSTREAM));
+        selection->setSelection(VisibleSelection(range->startPosition(),
+                                                 r->endPosition(), DOWNSTREAM));
     }
   }
 }

@@ -291,8 +291,8 @@ GapRects RootInlineBox::fillLineSelectionGap(
     for (InlineBox* box = firstBox->nextLeafChild(); box;
          box = box->nextLeafChild()) {
       if (box->selectionState() != RenderObject::SelectionNone) {
-        if (isPreviousBoxSelected)  // Selection may be non-contiguous, see
-                                    // comment above.
+        if (isPreviousBoxSelected)  // VisibleSelection may be non-contiguous,
+                                    // see comment above.
           result.uniteCenter(block()->fillHorizontalSelectionGap(
               box->parent()->object(), lastX + tx, selTop + ty,
               box->xPos() - lastX, selHeight, paintInfo));

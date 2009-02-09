@@ -106,7 +106,8 @@ static bool isDeletableElement(const Node* node) {
   return false;
 }
 
-static HTMLElement* enclosingDeletableElement(const Selection& selection) {
+static HTMLElement* enclosingDeletableElement(
+    const VisibleSelection& selection) {
   if (!selection.isContentEditable())
     return 0;
 
@@ -134,7 +135,7 @@ static HTMLElement* enclosingDeletableElement(const Selection& selection) {
 }
 
 void DeleteButtonController::respondToChangedSelection(
-    const Selection& oldSelection) {
+    const VisibleSelection& oldSelection) {
   if (!enabled())
     return;
 
