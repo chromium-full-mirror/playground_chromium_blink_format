@@ -40,11 +40,6 @@
 #include "SVGRenderSupport.h"
 #include "SVGRenderTreeAsText.h"
 
-#if PLATFORM(CG)
-#include <wtf/MathExtras.h>
-#include <wtf/RetainPtr.h>
-#endif
-
 using namespace std;
 
 namespace WebCore {
@@ -118,9 +113,6 @@ void SVGPaintServerGradient::setGradientTransform(
 }
 
 #if PLATFORM(CG)
-// Helper function for text painting in CG
-// This Cg specific code should move to GraphicsContext and Font* in a next
-// step.
 static inline const RenderObject* findTextRootObject(
     const RenderObject* start) {
   while (start && !start->isSVGText())
@@ -163,7 +155,7 @@ static inline bool createMaskAndSwapContextForTextGradient(
   return true;
 }
 
-static inline void clipToTextMask(
+static inline TransformationMatrix clipToTextMask(
     GraphicsContext* context,
     OwnPtr<ImageBuffer>& imageBuffer,
     const RenderObject* object,
@@ -185,11 +177,13 @@ static inline void clipToTextMask(
   context->clipToImageBuffer(textBoundary, imageBuffer.get());
   context->concatCTM(transform);
 
+  TransformationMatrix matrix;
   if (gradientServer->boundingBoxMode()) {
-    context->translate(maskBBox.x(), maskBBox.y());
-    context->scale(FloatSize(maskBBox.width(), maskBBox.height()));
+    matrix.translate(maskBBox.x(), maskBBox.y());
+    matrix.scaleNonUniform(maskBBox.width(), maskBBox.height());
   }
-  context->concatCTM(gradientServer->gradientTransform());
+  matrix.multiply(gradientServer->gradientTransform());
+  return matrix;
 }
 #endif
 
@@ -229,6 +223,7 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
     applyStrokeStyleToContext(context, object->style(), object);
   }
 
+  TransformationMatrix matrix;
   if (boundingBoxMode() && !isPaintingText) {
     FloatRect bbox = object->relativeBBox(false);
     // Don't use gradientes for 1d objects like horizontal/vertical
@@ -238,18 +233,11 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
       context->setStrokeColor(color);
       return true;
     }
-    context->translate(bbox.x(), bbox.y());
-    context->scale(FloatSize(bbox.width(), bbox.height()));
-
-    // With scaling the context, the strokeThickness is scaled too. We have to
-    // undo this.
-    float strokeThickness = std::max(
-        (context->strokeThickness() / ((bbox.width() + bbox.height()) / 2) -
-         0.001f),
-        0.f);
-    context->setStrokeThickness(strokeThickness);
+    matrix.translate(bbox.x(), bbox.y());
+    matrix.scaleNonUniform(bbox.width(), bbox.height());
   }
-  context->concatCTM(gradientTransform());
+  matrix.multiply(gradientTransform());
+  m_gradient->setGradientSpaceTransform(matrix);
 
   return true;
 }
@@ -266,11 +254,15 @@ void SVGPaintServerGradient::teardown(GraphicsContext*& context,
     context = m_savedContext;
     m_savedContext = 0;
 
-    clipToTextMask(context, m_imageBuffer, object, this);
+    TransformationMatrix matrix =
+        clipToTextMask(context, m_imageBuffer, object, this);
+    m_gradient->setGradientSpaceTransform(matrix);
+    context->setFillGradient(m_gradient);
 
-    // finally fill the text clip with the shading
-    CGContextDrawShading(context->platformContext(),
-                         m_gradient->platformGradient());
+    FloatRect maskBBox = const_cast<RenderObject*>(findTextRootObject(object))
+                             ->relativeBBox(false);
+
+    context->fillRect(maskBBox);
 
     m_imageBuffer.clear();  // we're done with our text mask buffer
   }
