@@ -3831,7 +3831,7 @@ void FrameLoader::addExtraFieldsToRequest(ResourceRequest& request,
                                           bool mainResource,
                                           bool cookiePolicyURLFromRequest) {
   // These modifications are only necessary for HTTP and HTTPS.
-  if (!request.url().protocolInHTTPFamily())
+  if (!request.url().isEmpty() && !request.url().protocolInHTTPFamily())
     return;
 
   applyUserAgent(request);
