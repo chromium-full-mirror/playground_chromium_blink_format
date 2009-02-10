@@ -53,7 +53,6 @@
 #include <CFNetwork/CFURLCachePriv.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <JavaScriptCore/JavaScriptCore.h>
-#include <WebCore/COMPtr.h>
 #include <WebKit/ForEachCoClass.h>
 #include <WebKit/WebKit.h>
 
@@ -539,7 +538,7 @@ static void dumpBackForwardListForAllWindows() {
   unsigned count = openWindows().size();
   for (unsigned i = 0; i < count; i++) {
     HWND window = openWindows()[i];
-    IWebView* webView = windowToWebViewMap().get(window);
+    IWebView* webView = windowToWebViewMap().get(window).get();
     dumpBackForwardList(webView);
   }
 }
@@ -962,8 +961,8 @@ Vector<HWND>& openWindows() {
   return vector;
 }
 
-HashMap<HWND, IWebView*>& windowToWebViewMap() {
-  static HashMap<HWND, IWebView*> map;
+WindowToWebViewMap& windowToWebViewMap() {
+  static WindowToWebViewMap map;
   return map;
 }
 
