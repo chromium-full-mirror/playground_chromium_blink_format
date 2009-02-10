@@ -270,7 +270,11 @@ void FrameLoaderClientQt::dispatchDidChangeLocationWithinPage() {
     printf("%s - didChangeLocationWithinPageForFrame\n",
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
 
-  notImplemented();
+  if (!m_webFrame)
+    return;
+
+  emit m_webFrame->urlChanged(m_webFrame->url());
+  m_webFrame->page()->d->updateNavigationActions();
 }
 
 void FrameLoaderClientQt::dispatchWillClose() {
