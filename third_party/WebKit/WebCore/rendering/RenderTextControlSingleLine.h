@@ -67,9 +67,9 @@ class RenderTextControlSingleLine : public RenderTextControl,
                            HitTestAction);
   void forwardEvent(Event*);
 
- private:
-  virtual void capsLockStateMayHaveChanged();
+  void capsLockStateMayHaveChanged();
 
+ private:
   int textBlockWidth() const;
   virtual int preferredContentWidth(float charWidth) const;
   virtual void adjustControlHeightBasedOnLineHeight(int lineHeight);

@@ -941,8 +941,6 @@ class RenderObject : public CachedResourceClient {
       parent()->removeChild(this);
   }
 
-  virtual void capsLockStateMayHaveChanged() {}
-
   AnimationController* animation() const;
 
   bool visibleToHitTesting() const {
