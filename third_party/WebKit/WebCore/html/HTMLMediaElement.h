@@ -170,6 +170,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void seek(float time, ExceptionCode& ec);
   void checkIfSeekNeeded();
 
+  bool processingUserGesture() const;
+
   String pickMedia();
   void updateVolume();
   void updatePlayState();
@@ -179,6 +181,14 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   float effectiveLoopEnd() const;
   bool activelyPlaying() const;
   bool endedPlayback() const;
+
+  // Control media load restrictions. This is a effectively a compile time
+  // choice at the moment
+  //  because there are no accessor methods.
+  enum LoadRestrictions {
+    NoLoadRestriction = 0,
+    RequireUserGestureLoadRestriction = 1 << 0,
+  };
 
  protected:
   Timer<HTMLMediaElement> m_loadTimer;
@@ -219,6 +229,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   bool m_inActiveDocument;
 
   OwnPtr<MediaPlayer> m_player;
+
+  LoadRestrictions m_loadRestrictions;
 };
 
 }  // namespace
