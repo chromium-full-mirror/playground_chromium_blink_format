@@ -60,7 +60,7 @@ class InlineFlowBox : public InlineRunBox {
   virtual ~InlineFlowBox();
 #endif
 
-  virtual bool isInlineFlowBox() { return true; }
+  virtual int height() const;
 
   InlineFlowBox* prevFlowBox() const {
     return static_cast<InlineFlowBox*>(m_prevLine);
@@ -227,6 +227,8 @@ class InlineFlowBox : public InlineRunBox {
   void setHasBadChildList();
 
  private:
+  virtual bool isInlineFlowBox() const { return true; }
+
   InlineBox* m_firstChild;
   InlineBox* m_lastChild;
   short m_maxHorizontalVisualOverflow;

@@ -45,9 +45,12 @@ struct LastGlyphInfo {
 
 class SVGRootInlineBox : public RootInlineBox {
  public:
-  SVGRootInlineBox(RenderObject* obj) : RootInlineBox(obj) {}
+  SVGRootInlineBox(RenderObject* obj) : RootInlineBox(obj), m_height(0) {}
 
   virtual bool isSVGRootInlineBox() { return true; }
+
+  virtual int height() const { return m_height; }
+  void setHeight(int h) { m_height = h; }
 
   virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
 
@@ -93,6 +96,7 @@ class SVGRootInlineBox : public RootInlineBox {
       RenderObject* start);
 
  private:
+  int m_height;
   Vector<SVGChar> m_svgChars;
   Vector<SVGTextChunk> m_svgTextChunks;
 };

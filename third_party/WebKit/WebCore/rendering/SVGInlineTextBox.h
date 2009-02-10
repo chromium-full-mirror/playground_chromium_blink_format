@@ -37,6 +37,9 @@ class SVGInlineTextBox : public InlineTextBox {
  public:
   SVGInlineTextBox(RenderObject* obj);
 
+  virtual int height() const { return m_height; }
+  void setHeight(int h) { m_height = h; }
+
   virtual int selectionTop();
   virtual int selectionHeight();
 
@@ -98,6 +101,8 @@ class SVGInlineTextBox : public InlineTextBox {
  private:
   friend class RenderSVGInlineText;
   bool svgCharacterHitsPosition(int x, int y, int& offset) const;
+
+  int m_height;
 };
 
 }  // namespace WebCore

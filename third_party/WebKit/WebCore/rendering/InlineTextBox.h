@@ -52,6 +52,8 @@ class InlineTextBox : public InlineRunBox {
     return static_cast<InlineTextBox*>(prevLineBox());
   }
 
+  virtual int height() const;
+
   unsigned start() const { return m_start; }
   unsigned end() const { return m_len ? m_start + m_len - 1 : m_start; }
   unsigned len() const { return m_len; }

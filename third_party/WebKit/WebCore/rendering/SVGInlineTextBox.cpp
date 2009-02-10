@@ -42,7 +42,8 @@ using std::max;
 
 namespace WebCore {
 
-SVGInlineTextBox::SVGInlineTextBox(RenderObject* obj) : InlineTextBox(obj) {}
+SVGInlineTextBox::SVGInlineTextBox(RenderObject* obj)
+    : InlineTextBox(obj), m_height(0) {}
 
 int SVGInlineTextBox::selectionTop() {
   return m_y;

@@ -31,7 +31,10 @@ namespace WebCore {
 
 class SVGInlineFlowBox : public InlineFlowBox {
  public:
-  SVGInlineFlowBox(RenderObject* obj) : InlineFlowBox(obj) {}
+  SVGInlineFlowBox(RenderObject* obj) : InlineFlowBox(obj), m_height(0) {}
+
+  virtual int height() const { return m_height; }
+  void setHeight(int h) { m_height = h; }
 
   virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
   virtual int placeBoxesHorizontally(int x,
@@ -39,6 +42,9 @@ class SVGInlineFlowBox : public InlineFlowBox {
                                      int& rightPosition,
                                      bool& needsWordSpacing);
   virtual int verticallyAlignBoxes(int heightOfBlock);
+
+ private:
+  int m_height;
 };
 
 }  // namespace WebCore

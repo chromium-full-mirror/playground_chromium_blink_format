@@ -35,8 +35,8 @@ class EllipsisBox : public InlineBox {
               const AtomicString& ellipsisStr,
               InlineFlowBox* parent,
               int width,
-              int y,
               int height,
+              int y,
               int baseline,
               bool firstLine,
               InlineBox* markupBox)
@@ -44,7 +44,6 @@ class EllipsisBox : public InlineBox {
                   0,
                   y,
                   width,
-                  height,
                   baseline,
                   firstLine,
                   true,
@@ -53,6 +52,7 @@ class EllipsisBox : public InlineBox {
                   0,
                   0,
                   parent),
+        m_height(height),
         m_str(ellipsisStr),
         m_markupBox(markupBox) {}
 
@@ -65,6 +65,9 @@ class EllipsisBox : public InlineBox {
                            int ty);
 
  private:
+  virtual int height() const { return m_height; }
+
+  int m_height;
   AtomicString m_str;
   InlineBox* m_markupBox;
 };
