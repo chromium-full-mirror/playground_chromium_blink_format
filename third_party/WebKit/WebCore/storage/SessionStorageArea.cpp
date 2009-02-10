@@ -79,9 +79,8 @@ void SessionStorageArea::dispatchStorageEvent(const String& key,
   Vector<RefPtr<Frame>> frames;
   for (Frame* frame = m_page->mainFrame(); frame;
        frame = frame->tree()->traverseNext()) {
-    if (Document* document = frame->document())
-      if (document->securityOrigin()->equal(securityOrigin()))
-        frames.append(frame);
+    if (frame->document()->securityOrigin()->equal(securityOrigin()))
+      frames.append(frame);
   }
 
   for (unsigned i = 0; i < frames.size(); ++i) {

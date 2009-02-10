@@ -135,8 +135,7 @@ void ScheduledAction::execute(Document* document) {
   // for all possible entry points that might possibly execute script, but this
   // seems
   // to be a bit too low-level.
-  if (Document* document = frame->document())
-    document->updateRendering();
+  frame->document()->updateRendering();
 
   frame->script()->setProcessingTimerCallback(false);
 }

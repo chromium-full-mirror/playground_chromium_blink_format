@@ -629,10 +629,7 @@ PassRefPtr<LegacyWebArchive> LegacyWebArchive::create(
         (childFrame =
              static_cast<HTMLFrameOwnerElement*>(*it)->contentFrame())) {
       RefPtr<LegacyWebArchive> subframeArchive;
-      if (Document* document = childFrame->document())
-        subframeArchive = LegacyWebArchive::create(document);
-      else
-        subframeArchive = create(childFrame);
+      subframeArchive = LegacyWebArchive::create(childFrame->document());
 
       if (subframeArchive)
         subframeArchives.append(subframeArchive);

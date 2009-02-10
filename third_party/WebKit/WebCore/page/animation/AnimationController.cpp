@@ -158,7 +158,7 @@ void AnimationControllerPrivate::updateRenderingDispatcherFired(
 
   m_nodeChangesToDispatch.clear();
 
-  if (m_frame && m_frame->document())
+  if (m_frame)
     m_frame->document()->updateRendering();
 }
 

@@ -116,9 +116,8 @@ static inline String canonicalizedTitle(const String& title, Frame* frame) {
   buffer.shrink(builderIndex + 1);
 
   // Replace the backslashes with currency symbols if the encoding requires it.
-  if (frame->document())
-    frame->document()->displayBufferModifiedByEncoding(buffer.characters(),
-                                                       buffer.length());
+  frame->document()->displayBufferModifiedByEncoding(buffer.characters(),
+                                                     buffer.length());
 
   return String::adopt(buffer);
 }
@@ -296,7 +295,7 @@ void DocumentLoader::stopLoading() {
     // still  parsing. Failure to do so can cause a world leak.
     Document* doc = m_frame->document();
 
-    if (loading || (doc && doc->parsing()))
+    if (loading || doc->parsing())
       m_frame->loader()->stopLoading(false);
   }
 
@@ -463,13 +462,12 @@ bool DocumentLoader::isLoadingInAPISense() const {
       return true;
     if (!m_subresourceLoaders.isEmpty())
       return true;
-    if (Document* doc = m_frame->document()) {
-      if (doc->docLoader()->requestCount())
+    Document* doc = m_frame->document();
+    if (doc->docLoader()->requestCount())
+      return true;
+    if (Tokenizer* tok = doc->tokenizer())
+      if (tok->processingData())
         return true;
-      if (Tokenizer* tok = doc->tokenizer())
-        if (tok->processingData())
-          return true;
-    }
   }
   return frameLoader()->subframeIsLoading();
 }
@@ -546,8 +544,6 @@ PassRefPtr<ArchiveResource> DocumentLoader::subresource(const KURL& url) const {
     return 0;
 
   Document* doc = m_frame->document();
-  if (!doc)
-    return archiveResourceForURL(url);
 
   CachedResource* resource = doc->docLoader()->cachedResource(url);
   if (!resource ||
@@ -563,8 +559,6 @@ void DocumentLoader::getSubresources(
     return;
 
   Document* document = m_frame->document();
-  if (!document)
-    return;
 
   const DocLoader::DocumentResourceMap& allResources =
       document->docLoader()->allCachedResources();
