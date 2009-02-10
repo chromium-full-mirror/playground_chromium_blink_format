@@ -114,8 +114,6 @@ class RenderText : public RenderObject {
   int firstRunX() const;
   int firstRunY() const;
 
-  virtual int verticalPositionHint(bool firstLine) const;
-
   void setText(PassRefPtr<StringImpl>, bool force = false);
   void setTextWithOffset(PassRefPtr<StringImpl>,
                          unsigned offset,

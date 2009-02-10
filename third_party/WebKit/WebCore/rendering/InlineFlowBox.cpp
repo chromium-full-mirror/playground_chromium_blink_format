@@ -428,6 +428,14 @@ void InlineFlowBox::adjustMaxAscentAndDescent(int& maxAscent,
   }
 }
 
+static int verticalPositionForBox(InlineBox* curr, bool firstLine) {
+  if (curr->object()->isText())
+    return curr->parent()->yPos();
+  if (curr->object()->isBox())
+    return toRenderBox(curr->object())->verticalPosition(firstLine);
+  return toRenderInline(curr->object())->verticalPositionFromCache(firstLine);
+}
+
 void InlineFlowBox::computeLogicalBoxHeights(int& maxPositionTop,
                                              int& maxPositionBottom,
                                              int& maxAscent,
@@ -455,7 +463,7 @@ void InlineFlowBox::computeLogicalBoxHeights(int& maxPositionTop,
 
     int lineHeight = curr->object()->lineHeight(m_firstLine);
     int baseline = curr->object()->baselinePosition(m_firstLine);
-    curr->setYPos(curr->object()->verticalPositionHint(m_firstLine));
+    curr->setYPos(verticalPositionForBox(curr, m_firstLine));
     if (curr->yPos() == PositionTop) {
       if (maxPositionTop < lineHeight)
         maxPositionTop = lineHeight;

@@ -150,6 +150,9 @@ class RenderInline : public RenderBoxModelObject {
 
   virtual void imageChanged(WrappedImagePtr, const IntRect* = 0);
 
+  int verticalPositionFromCache(bool firstLine) const;
+  void invalidateVerticalPosition() { m_verticalPosition = PositionUndefined; }
+
 #if ENABLE(DASHBOARD_SUPPORT)
   virtual void addDashboardRegions(Vector<DashboardRegionValue>&);
 #endif
@@ -183,6 +186,7 @@ class RenderInline : public RenderBoxModelObject {
                                          // its continuation but the
   // <b> will just have an inline as its continuation.
   mutable int m_lineHeight;
+  mutable int m_verticalPosition;
 };
 
 inline RenderInline* toRenderInline(RenderObject* o) {
