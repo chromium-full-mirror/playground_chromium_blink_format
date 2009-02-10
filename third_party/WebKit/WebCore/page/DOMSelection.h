@@ -51,7 +51,7 @@ class DOMSelection : public RefCounted<DOMSelection> {
   Frame* frame() const;
   void disconnectFrame();
 
-  // Safari VisibleSelection Object API
+  // Safari Selection Object API
   // These methods return the valid equivalents of internal editing positions.
   Node* baseNode() const;
   Node* extentNode() const;
@@ -68,7 +68,7 @@ class DOMSelection : public RefCounted<DOMSelection> {
               const String& direction,
               const String& granularity);
 
-  // Mozilla VisibleSelection Object API
+  // Mozilla Selection Object API
   // In Firefox, anchor/focus are the equal to the start/end of the selection,
   // but reflect the direction in which the selection was made by the user.
   // That does
@@ -94,10 +94,8 @@ class DOMSelection : public RefCounted<DOMSelection> {
 
   String toString();
 
-  // Microsoft VisibleSelection Object API
+  // Microsoft Selection Object API
   void empty();
-  // void clear();
-  // TextRange *createRange();
 
  private:
   DOMSelection(Frame*);
