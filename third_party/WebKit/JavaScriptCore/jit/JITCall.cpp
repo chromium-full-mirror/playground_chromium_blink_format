@@ -56,7 +56,7 @@ void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
 
 void JIT::linkCall(JSFunction* callee,
                    CodeBlock* calleeCodeBlock,
-                   void* ctiCode,
+                   JITCode ctiCode,
                    CallLinkInfo* callLinkInfo,
                    int callerArgCount) {
   // Currently we only link calls with the exact number of arguments.
@@ -66,7 +66,7 @@ void JIT::linkCall(JSFunction* callee,
     calleeCodeBlock->addCaller(callLinkInfo);
 
     DataLabelPtr::patch(callLinkInfo->hotPathBegin, callee);
-    Jump::patch(callLinkInfo->hotPathOther, ctiCode);
+    Jump::patch(callLinkInfo->hotPathOther, ctiCode.addressForCall());
   }
 
   // patch the instruction that jumps out to the cold path, so that we only try

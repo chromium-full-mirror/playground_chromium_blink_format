@@ -32,6 +32,7 @@
 
 #include "EvalCodeCache.h"
 #include "Instruction.h"
+#include "JITCode.h"
 #include "JSGlobalObject.h"
 #include "JumpTable.h"
 #include "Nodes.h"
@@ -67,7 +68,7 @@ struct HandlerInfo {
 #if ENABLE(JIT)
 // The code, and the associated pool from which it was allocated.
 struct JITCodeRef {
-  void* code;
+  JITCode code;
 #ifndef NDEBUG
   unsigned codeSize;
 #endif
@@ -154,11 +155,16 @@ struct GlobalResolveInfo {
   unsigned bytecodeOffset;
 };
 
-struct PC {
-  PC(ptrdiff_t nativePCOffset, unsigned bytecodeIndex)
-      : nativePCOffset(nativePCOffset), bytecodeIndex(bytecodeIndex) {}
+// This structure is used to map from a call return location
+// (given as an offset in bytes into the JIT code) back to
+// the bytecode index of the corresponding bytecode operation.
+// This is then used to look up the corresponding handler.
+struct CallReturnOffsetToBytecodeIndex {
+  CallReturnOffsetToBytecodeIndex(unsigned callReturnOffset,
+                                  unsigned bytecodeIndex)
+      : callReturnOffset(callReturnOffset), bytecodeIndex(bytecodeIndex) {}
 
-  ptrdiff_t nativePCOffset;
+  unsigned callReturnOffset;
   unsigned bytecodeIndex;
 };
 
@@ -173,8 +179,8 @@ inline void* getCallLinkInfoReturnLocation(CallLinkInfo* callLinkInfo) {
   return callLinkInfo->callReturnLocation;
 }
 
-inline ptrdiff_t getNativePCOffset(PC* pc) {
-  return pc->nativePCOffset;
+inline unsigned getCallReturnOffset(CallReturnOffsetToBytecodeIndex* pc) {
+  return pc->callReturnOffset;
 }
 
 // Binary chop algorithm, calls valueAtPosition on pre-sorted elements in array,
@@ -309,11 +315,11 @@ class CodeBlock {
 
   unsigned getBytecodeIndex(CallFrame* callFrame, void* nativePC) {
     reparseForExceptionInfoIfNecessary(callFrame);
-    ptrdiff_t nativePCOffset = reinterpret_cast<void**>(nativePC) -
-                               reinterpret_cast<void**>(m_jitCode.code);
-    return binaryChop<PC, ptrdiff_t, getNativePCOffset>(
-               m_exceptionInfo->m_pcVector.begin(),
-               m_exceptionInfo->m_pcVector.size(), nativePCOffset)
+    return binaryChop<CallReturnOffsetToBytecodeIndex, unsigned,
+                      getCallReturnOffset>(
+               m_exceptionInfo->m_callReturnIndexVector.begin(),
+               m_exceptionInfo->m_callReturnIndexVector.size(),
+               m_jitCode.code.offsetOf(nativePC))
         ->bytecodeIndex;
   }
 
@@ -330,7 +336,7 @@ class CodeBlock {
 
 #if ENABLE(JIT)
   void setJITCode(JITCodeRef& jitCode);
-  void* jitCode() { return m_jitCode.code; }
+  JITCode jitCode() { return m_jitCode.code; }
   ExecutablePool* executablePool() { return m_jitCode.executablePool.get(); }
 #endif
 
@@ -438,9 +444,9 @@ class CodeBlock {
   }
 
 #if ENABLE(JIT)
-  Vector<PC>& pcVector() {
+  Vector<CallReturnOffsetToBytecodeIndex>& callReturnIndexVector() {
     ASSERT(m_exceptionInfo);
-    return m_exceptionInfo->m_pcVector;
+    return m_exceptionInfo->m_callReturnIndexVector;
   }
 #endif
 
@@ -627,7 +633,7 @@ class CodeBlock {
     Vector<GetByIdExceptionInfo> m_getByIdExceptionInfo;
 
 #if ENABLE(JIT)
-    Vector<PC> m_pcVector;
+    Vector<CallReturnOffsetToBytecodeIndex> m_callReturnIndexVector;
 #endif
   };
   OwnPtr<ExceptionInfo> m_exceptionInfo;

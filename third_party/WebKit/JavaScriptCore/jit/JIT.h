@@ -27,17 +27,18 @@
 #define JIT_h
 
 #include <wtf/Platform.h>
-#include <bytecode/SamplingTool.h>
 
 #if ENABLE(JIT)
 
 #define WTF_USE_CTI_REPATCH_PIC 1
 
 #include "Interpreter.h"
+#include "JITCode.h"
 #include "Opcode.h"
 #include "RegisterFile.h"
 #include "MacroAssembler.h"
 #include "Profiler.h"
+#include <bytecode/SamplingTool.h>
 #include <wtf/AlwaysInline.h>
 #include <wtf/Vector.h>
 
@@ -191,25 +192,6 @@ struct StructureStubCompilationInfo {
 };
 
 extern "C" {
-JSValueEncodedAsPointer* ctiTrampoline(
-#if PLATFORM(X86_64)
-    // FIXME: (bug #22910) this will force all arguments onto the stack
-    // (regparm(0) does not appear to have any effect).
-    // We can allow register passing here, and move the writes of these values
-    // into the trampoline.
-    void*,
-    void*,
-    void*,
-    void*,
-    void*,
-    void*,
-#endif
-    void* code,
-    RegisterFile*,
-    CallFrame*,
-    JSValuePtr* exception,
-    Profiler**,
-    JSGlobalData*);
 void ctiVMThrowTrampoline();
 };
 
@@ -423,23 +405,10 @@ class JIT : private MacroAssembler {
 
   static void linkCall(JSFunction* callee,
                        CodeBlock* calleeCodeBlock,
-                       void* ctiCode,
+                       JITCode ctiCode,
                        CallLinkInfo* callLinkInfo,
                        int callerArgCount);
   static void unlinkCall(CallLinkInfo*);
-
-  inline static JSValuePtr execute(void* code,
-                                   RegisterFile* registerFile,
-                                   CallFrame* callFrame,
-                                   JSGlobalData* globalData,
-                                   JSValuePtr* exception) {
-    return JSValuePtr::decode(ctiTrampoline(
-#if PLATFORM(X86_64)
-        0, 0, 0, 0, 0, 0,
-#endif
-        code, registerFile, callFrame, exception,
-        Profiler::enabledProfilerReference(), globalData));
-  }
 
  private:
   JIT(JSGlobalData*, CodeBlock* = 0);

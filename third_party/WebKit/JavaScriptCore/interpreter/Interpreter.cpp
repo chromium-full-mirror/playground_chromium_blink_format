@@ -988,8 +988,8 @@ JSValuePtr Interpreter::execute(ProgramNode* programNode,
 #if ENABLE(JIT)
     if (!codeBlock->jitCode())
       JIT::compile(scopeChain->globalData, codeBlock);
-    result = JIT::execute(codeBlock->jitCode(), &m_registerFile, newCallFrame,
-                          scopeChain->globalData, exception);
+    result = codeBlock->jitCode().execute(&m_registerFile, newCallFrame,
+                                          scopeChain->globalData, exception);
 #else
     result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif
@@ -1067,8 +1067,8 @@ JSValuePtr Interpreter::execute(FunctionBodyNode* functionBodyNode,
 #if ENABLE(JIT)
     if (!codeBlock->jitCode())
       JIT::compile(scopeChain->globalData, codeBlock);
-    result = JIT::execute(codeBlock->jitCode(), &m_registerFile, newCallFrame,
-                          scopeChain->globalData, exception);
+    result = codeBlock->jitCode().execute(&m_registerFile, newCallFrame,
+                                          scopeChain->globalData, exception);
 #else
     result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif
@@ -1184,8 +1184,8 @@ JSValuePtr Interpreter::execute(EvalNode* evalNode,
 #if ENABLE(JIT)
     if (!codeBlock->jitCode())
       JIT::compile(scopeChain->globalData, codeBlock);
-    result = JIT::execute(codeBlock->jitCode(), &m_registerFile, newCallFrame,
-                          scopeChain->globalData, exception);
+    result = codeBlock->jitCode().execute(&m_registerFile, newCallFrame,
+                                          scopeChain->globalData, exception);
 #else
     result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif
@@ -5295,7 +5295,7 @@ void* Interpreter::cti_vm_dontLazyLinkCall(STUB_ARGS) {
   ctiPatchCallByReturnAddress(
       ARG_returnAddress2, ARG_globalData->interpreter->m_ctiVirtualCallLink);
 
-  return codeBlock->jitCode();
+  return codeBlock->jitCode().addressForCall();
 }
 
 void* Interpreter::cti_vm_lazyLinkCall(STUB_ARGS) {
@@ -5312,7 +5312,7 @@ void* Interpreter::cti_vm_lazyLinkCall(STUB_ARGS) {
   JIT::linkCall(callee, codeBlock, codeBlock->jitCode(), callLinkInfo,
                 ARG_int3);
 
-  return codeBlock->jitCode();
+  return codeBlock->jitCode().addressForCall();
 }
 
 JSObject* Interpreter::cti_op_push_activation(STUB_ARGS) {
