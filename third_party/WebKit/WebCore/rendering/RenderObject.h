@@ -964,6 +964,9 @@ class RenderObject : public CachedResourceClient {
 
   IntRect absoluteOutlineBounds() const { return outlineBoundsForRepaint(0); }
 
+  bool replacedHasOverflow() const { return m_replacedHasOverflow; }
+  void setReplacedHasOverflow(bool b = true) { m_replacedHasOverflow = b; }
+
  protected:
   // Overrides should call the superclass at the end
   virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
@@ -1052,9 +1055,7 @@ class RenderObject : public CachedResourceClient {
 #endif
   mutable int m_verticalPosition;
 
-  // 31 bits have been used here.  Count the bits before you add any and update
-  // the comment
-  // with the new total.
+  // 32 bits have been used here. THERE ARE NO FREE BITS AVAILABLE.
   bool m_needsLayout : 1;
   bool m_needsPositionedMovementLayout : 1;
   bool m_normalChildNeedsLayout : 1;
@@ -1097,6 +1098,9 @@ class RenderObject : public CachedResourceClient {
 
   // from RenderTableCell
   bool m_cellWidthChanged : 1;
+
+  // from RenderReplaced
+  bool m_replacedHasOverflow : 1;
 
  private:
   // Store state between styleWillChange and styleDidChange
