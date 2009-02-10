@@ -452,14 +452,6 @@ void RenderInline::absoluteRects(Vector<IntRect>& rects,
     rects.append(IntRect(tx + curr->xPos(), ty + curr->yPos(), curr->width(),
                          curr->height()));
 
-  for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
-    if (curr->isBox()) {
-      RenderBox* box = toRenderBox(curr);
-      curr->absoluteRects(rects, tx + box->x(), ty + box->y(), false);
-    } else
-      curr->absoluteRects(rects, tx, ty, false);
-  }
-
   if (continuation() && topLevel) {
     if (continuation()->isBox()) {
       RenderBox* box = toRenderBox(continuation());
@@ -477,11 +469,6 @@ void RenderInline::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
     FloatRect localRect(curr->xPos(), curr->yPos(), curr->width(),
                         curr->height());
     quads.append(localToAbsoluteQuad(localRect));
-  }
-
-  for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
-    if (!curr->isText())
-      curr->absoluteQuads(quads, false);
   }
 
   if (continuation() && topLevel)

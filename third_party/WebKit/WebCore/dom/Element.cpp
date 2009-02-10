@@ -30,6 +30,8 @@
 #include "AXObjectCache.h"
 #include "CSSStyleSelector.h"
 #include "CString.h"
+#include "ClientRect.h"
+#include "ClientRectList.h"
 #include "Document.h"
 #include "Editor.h"
 #include "ElementRareData.h"
@@ -45,6 +47,7 @@
 #include "Page.h"
 #include "PlatformString.h"
 #include "RenderBlock.h"
+#include "SVGNames.h"
 #include "SelectionController.h"
 #include "TextIterator.h"
 #include "XMLNames.h"
@@ -391,6 +394,40 @@ int Element::scrollHeight() {
   if (RenderBox* rend = renderBox())
     return adjustForAbsoluteZoom(rend->scrollHeight(), rend);
   return 0;
+}
+
+PassRefPtr<ClientRectList> Element::getClientRects() const {
+  document()->updateLayoutIgnorePendingStylesheets();
+
+  RenderBoxModelObject* renderBoxModelObject = this->renderBoxModelObject();
+  if (!renderBoxModelObject)
+    return ClientRectList::create();
+
+  // FIXME: Handle SVG elements.
+  // FIXME: Handle table/inline-table with a caption.
+
+  Vector<FloatQuad> quads;
+  renderBoxModelObject->absoluteQuads(quads);
+  return ClientRectList::create(quads);
+}
+
+PassRefPtr<ClientRect> Element::getBoundingClientRect() const {
+  document()->updateLayoutIgnorePendingStylesheets();
+  RenderBoxModelObject* renderBoxModelObject = this->renderBoxModelObject();
+  if (!renderBoxModelObject)
+    return ClientRect::create();
+
+  Vector<FloatQuad> quads;
+  renderBoxModelObject->absoluteQuads(quads);
+
+  if (quads.isEmpty())
+    return ClientRect::create();
+
+  IntRect result = quads[0].enclosingBoundingBox();
+  for (size_t i = 1; i < quads.size(); ++i)
+    result.unite(quads[i].enclosingBoundingBox());
+
+  return ClientRect::create(result);
 }
 
 static inline bool shouldIgnoreAttributeCase(const Element* e) {
