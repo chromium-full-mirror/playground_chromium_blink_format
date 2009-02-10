@@ -99,8 +99,14 @@ String Navigator::language() const {
 String Navigator::userAgent() const {
   if (!m_frame)
     return String();
-  return m_frame->loader()->userAgent(
-      m_frame->document() ? m_frame->document()->url() : KURL());
+
+  // If the frame is already detached, FrameLoader::userAgent may malfunction,
+  // because it calls a client method
+  // that uses frame's WebView (at least, in Mac WebKit).
+  if (!m_frame->page())
+    return String();
+
+  return m_frame->loader()->userAgent(m_frame->document()->url());
 }
 
 PluginArray* Navigator::plugins() const {
@@ -116,6 +122,9 @@ MimeTypeArray* Navigator::mimeTypes() const {
 }
 
 bool Navigator::cookieEnabled() const {
+  if (!m_frame)
+    return false;
+
   if (m_frame->page() && !m_frame->page()->cookieEnabled())
     return false;
 
@@ -123,8 +132,9 @@ bool Navigator::cookieEnabled() const {
 }
 
 bool Navigator::javaEnabled() const {
-  if (!m_frame)
+  if (!m_frame || !m_frame->settings())
     return false;
+
   return m_frame->settings()->isJavaEnabled();
 }
 
