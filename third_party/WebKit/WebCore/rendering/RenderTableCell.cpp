@@ -259,8 +259,11 @@ FloatQuad RenderTableCell::localToContainerQuad(
   return RenderBlock::localToContainerQuad(quad, repaintContainer, fixed);
 }
 
-int RenderTableCell::baselinePosition(bool /*firstLine*/,
-                                      bool /*isRootLineBox*/) const {
+int RenderTableCell::baselinePosition(bool firstLine,
+                                      bool isRootLineBox) const {
+  if (isRootLineBox)
+    return RenderBox::baselinePosition(firstLine, isRootLineBox);
+
   // <http://www.w3.org/TR/2007/CR-CSS21-20070719/tables.html#height-layout>:
   // The baseline of a cell is the baseline of
   // the first in-flow line box in the cell, or the first in-flow table-row in

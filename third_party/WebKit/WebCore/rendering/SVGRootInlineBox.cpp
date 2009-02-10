@@ -847,7 +847,6 @@ static void applyTextAnchorToTextChunk(SVGTextChunk& chunk) {
 
     InlineBox* curBox = range.box;
     ASSERT(curBox->isInlineTextBox());
-    ASSERT(curBox->parent() && curBox->parent()->isRootInlineBox());
 
     // Move target box
     if (chunk.isVerticalText)
@@ -1082,8 +1081,6 @@ void SVGRootInlineBox::layoutInlineBoxes(InlineFlowBox* start,
                                          int& highY) {
   for (InlineBox* curr = start->firstChild(); curr; curr = curr->nextOnLine()) {
     RenderStyle* style = curr->object()->style();
-    const Font& font = style->font();
-
     if (curr->object()->isText()) {
       SVGInlineTextBox* textBox = static_cast<SVGInlineTextBox*>(curr);
       unsigned length = textBox->len();
@@ -1117,7 +1114,6 @@ void SVGRootInlineBox::layoutInlineBoxes(InlineFlowBox* start,
       curr->setWidth(enclosedStringRect.width());
 
       curr->setYPos(minY - block()->y());
-      curr->setBaseline(font.ascent());
       textBox->setHeight(enclosedStringRect.height());
 
       if (minX < lowX)
@@ -1150,7 +1146,6 @@ void SVGRootInlineBox::layoutInlineBoxes(InlineFlowBox* start,
       curr->setWidth(maxX - minX);
 
       curr->setYPos(minY - block()->y());
-      curr->setBaseline(font.ascent());
       static_cast<SVGInlineFlowBox*>(curr)->setHeight(maxY - minY);
 
       if (minX < lowX)
