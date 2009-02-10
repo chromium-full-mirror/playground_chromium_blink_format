@@ -21,7 +21,6 @@
 
 #include "config.h"
 
-#if ENABLE(SVG)
 #include <math.h>
 #include "FloatPoint.h"
 #include "FloatPoint3D.h"
@@ -47,5 +46,3 @@ void FloatPoint3D::normalize() {
 }
 
 }  // namespace WebCore
-
-#endif  // ENABLE(SVG)
