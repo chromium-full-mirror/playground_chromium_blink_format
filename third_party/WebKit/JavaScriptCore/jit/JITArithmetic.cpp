@@ -409,7 +409,7 @@ void JIT::compileBinaryArithOp(OpcodeID opcodeID,
   if (opcodeID == op_add)
     addSlowCase(branchAdd32(Overflow, X86::edx, X86::eax));
   else if (opcodeID == op_sub)
-    addSlowCase(branchSub32(Zero, X86::edx, X86::eax));
+    addSlowCase(branchSub32(Overflow, X86::edx, X86::eax));
   else {
     ASSERT(opcodeID == op_mul);
     addSlowCase(branchMul32(Overflow, X86::edx, X86::eax));
