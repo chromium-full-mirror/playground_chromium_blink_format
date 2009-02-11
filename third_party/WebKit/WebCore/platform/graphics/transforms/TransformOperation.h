@@ -44,10 +44,22 @@ class TransformOperation : public RefCounted<TransformOperation> {
     TRANSLATE_Y,
     TRANSLATE,
     ROTATE,
+    ROTATE_Z = ROTATE,
     SKEW_X,
     SKEW_Y,
     SKEW,
     MATRIX,
+#if ENABLE(3D_TRANSFORMS)
+    SCALE_Z,
+    SCALE_3D,
+    TRANSLATE_Z,
+    TRANSLATE_3D,
+    ROTATE_X,
+    ROTATE_Y,
+    ROTATE_3D,
+    MATRIX_3D,
+    PERSPECTIVE,
+#endif
     IDENTITY,
     NONE
   };
@@ -59,6 +71,8 @@ class TransformOperation : public RefCounted<TransformOperation> {
 
   virtual bool isIdentity() const = 0;
 
+  // Return true if the borderBoxSize was used in the computation, false
+  // otherwise.
   virtual bool apply(TransformationMatrix&,
                      const IntSize& borderBoxSize) const = 0;
 
@@ -69,6 +83,15 @@ class TransformOperation : public RefCounted<TransformOperation> {
 
   virtual OperationType getOperationType() const = 0;
   virtual bool isSameType(const TransformOperation&) const { return false; }
+
+#if ENABLE(3D_TRANSFORMS)
+  bool is3DOperation() const {
+    OperationType opType = getOperationType();
+    return opType == SCALE_Z || opType == SCALE_3D || opType == TRANSLATE_Z ||
+           opType == TRANSLATE_3D || opType == ROTATE_X || opType == ROTATE_Y ||
+           opType == ROTATE_3D || opType == MATRIX_3D || opType == PERSPECTIVE;
+  }
+#endif
 };
 
 }  // namespace WebCore

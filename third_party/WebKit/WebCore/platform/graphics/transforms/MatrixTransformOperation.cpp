@@ -24,6 +24,8 @@
 
 #include <algorithm>
 
+using namespace std;
+
 namespace WebCore {
 
 PassRefPtr<TransformOperation> MatrixTransformOperation::blend(
@@ -44,7 +46,7 @@ PassRefPtr<TransformOperation> MatrixTransformOperation::blend(
   }
 
   if (blendToIdentity)
-    std::swap(fromT, toT);
+    swap(fromT, toT);
 
   toT.blend(fromT, progress);
   return MatrixTransformOperation::create(toT.a(), toT.b(), toT.c(), toT.d(),
