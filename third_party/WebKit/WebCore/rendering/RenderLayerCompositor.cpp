@@ -173,7 +173,7 @@ bool RenderLayerCompositor::updateLayerCompositingState(RenderLayer* layer,
 
   if (layerChanged) {
     // Invalidate the parent in this region.
-    RenderLayer* compLayer = ancestorCompositingLayer(layer);
+    RenderLayer* compLayer = layer->ancestorCompositingLayer();
     if (compLayer) {
       // We can't reliably compute a dirty rect, because style may have changed
       // already,
@@ -207,7 +207,7 @@ IntRect RenderLayerCompositor::calculateCompositedBounds(
     const RenderLayer* ancestorLayer,
     IntRect* layerBoundingBox) {
   IntRect boundingBoxRect, unionBounds;
-  boundingBoxRect = unionBounds = layer->boundingBox(layer);
+  boundingBoxRect = unionBounds = layer->localBoundingBox();
 
   ASSERT(layer->isStackingContext() ||
          (!layer->m_posZOrderList || layer->m_posZOrderList->size() == 0));
@@ -282,7 +282,7 @@ void RenderLayerCompositor::layerWillBeRemoved(RenderLayer* parent,
   if (parent->renderer()->documentBeingDestroyed())
     return;
 
-  RenderLayer* compLayer = parent->renderer()->enclosingCompositingLayer();
+  RenderLayer* compLayer = parent->enclosingCompositingLayer();
   if (compLayer) {
     IntRect ancestorRect = calculateCompositedBounds(child, compLayer);
     compLayer->setBackingNeedsRepaintInRect(ancestorRect);
@@ -421,14 +421,6 @@ void RenderLayerCompositor::setForcedCompositingLayer(RenderLayer* layer,
     if (layer->backing())
       layer->backing()->forceCompositingLayer(false);
   }
-}
-
-RenderLayer* RenderLayerCompositor::ancestorCompositingLayer(
-    const RenderLayer* layer) const {
-  if (!layer->parent())
-    return 0;
-
-  return layer->parent()->renderer()->enclosingCompositingLayer();
 }
 
 void RenderLayerCompositor::setCompositingParent(RenderLayer* childLayer,
@@ -727,7 +719,7 @@ bool RenderLayerCompositor::clippedByAncestor(RenderLayer* layer) const {
   if (!layer->isComposited() || !layer->parent())
     return false;
 
-  RenderLayer* compositingAncestor = ancestorCompositingLayer(layer);
+  RenderLayer* compositingAncestor = layer->ancestorCompositingLayer();
 
   // We need ancestor clipping if something clips between this layer and its
   // compositing, stacking context ancestor
