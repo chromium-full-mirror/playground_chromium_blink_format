@@ -491,7 +491,7 @@ void RenderLayer::updateLayerPosition() {
   // FIXME: We'd really like to just get rid of the concept of a layer rectangle
   // and rely on the renderers.
 
-  setPos(x, y);
+  setLocation(x, y);
 
   if (renderer()->isRenderInline()) {
     RenderInline* inlineFlow = toRenderInline(renderer());
@@ -799,8 +799,8 @@ void RenderLayer::insertOnlyThisLayer() {
 }
 
 void RenderLayer::convertToLayerCoords(const RenderLayer* ancestorLayer,
-                                       int& x,
-                                       int& y) const {
+                                       int& xPos,
+                                       int& yPos) const {
   if (ancestorLayer == this)
     return;
 
@@ -808,8 +808,8 @@ void RenderLayer::convertToLayerCoords(const RenderLayer* ancestorLayer,
     // Add in the offset of the view.  We can obtain this by calling
     // localToAbsolute() on the RenderView.
     FloatPoint absPos = renderer()->localToAbsolute(FloatPoint(), true);
-    x += absPos.x();
-    y += absPos.y();
+    xPos += absPos.x();
+    yPos += absPos.y();
     return;
   }
 
@@ -822,10 +822,10 @@ void RenderLayer::convertToLayerCoords(const RenderLayer* ancestorLayer,
   if (!parentLayer)
     return;
 
-  parentLayer->convertToLayerCoords(ancestorLayer, x, y);
+  parentLayer->convertToLayerCoords(ancestorLayer, xPos, yPos);
 
-  x += xPos();
-  y += yPos();
+  xPos += x();
+  yPos += y();
 }
 
 void RenderLayer::panScrollFromPoint(const IntPoint& sourcePoint) {
