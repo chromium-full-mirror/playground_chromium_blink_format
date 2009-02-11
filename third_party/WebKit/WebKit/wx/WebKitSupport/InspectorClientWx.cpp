@@ -54,6 +54,11 @@ String InspectorClientWx::localizedStringsURL() {
   return String();
 }
 
+String InspectorClientWx::hiddenPanels() {
+  notImplemented();
+  return String();
+}
+
 void InspectorClientWx::showWindow() {
   notImplemented();
 }

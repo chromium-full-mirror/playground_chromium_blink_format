@@ -529,6 +529,8 @@ class EmptyInspectorClient : public InspectorClient {
 
   virtual String localizedStringsURL() { return String(); }
 
+  virtual String hiddenPanels() { return String(); }
+
   virtual void showWindow() {}
   virtual void closeWindow() {}
 

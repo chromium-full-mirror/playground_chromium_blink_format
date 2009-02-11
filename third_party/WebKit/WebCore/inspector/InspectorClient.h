@@ -44,6 +44,8 @@ class InspectorClient {
 
   virtual String localizedStringsURL() = 0;
 
+  virtual String hiddenPanels() = 0;
+
   virtual void showWindow() = 0;
   virtual void closeWindow() = 0;
 

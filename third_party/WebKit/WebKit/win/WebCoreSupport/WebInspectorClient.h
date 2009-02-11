@@ -51,6 +51,8 @@ class WebInspectorClient : public WebCore::InspectorClient,
 
   virtual WebCore::String localizedStringsURL();
 
+  virtual WebCore::String hiddenPanels();
+
   virtual void showWindow();
   virtual void closeWindow();
   virtual bool windowVisible();

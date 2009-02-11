@@ -206,6 +206,11 @@ String WebInspectorClient::localizedStringsURL() {
   return CFURLGetString(url.get());
 }
 
+String WebInspectorClient::hiddenPanels() {
+  // FIXME: implement this
+  return String();
+}
+
 void WebInspectorClient::showWindow() {
   showWindowWithoutNotifications();
   m_inspectedWebView->page()->inspectorController()->setWindowVisible(true);
