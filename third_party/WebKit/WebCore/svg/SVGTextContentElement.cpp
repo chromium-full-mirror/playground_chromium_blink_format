@@ -329,7 +329,7 @@ static Vector<SVGInlineTextBox*> findInlineTextBoxInTextChunks(
     for (; boxIt != boxEnd; ++boxIt) {
       SVGInlineTextBox* textBox = static_cast<SVGInlineTextBox*>(boxIt->box);
 
-      Node* textElement = textBox->textRenderer()->parent()->element();
+      Node* textElement = textBox->textRenderer()->parent()->node();
       ASSERT(textElement);
 
       if (textElement == element || textElement->parent() == element)

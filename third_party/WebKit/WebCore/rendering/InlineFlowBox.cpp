@@ -372,7 +372,7 @@ int InlineFlowBox::verticallyAlignBoxes(int heightOfBlock) {
   // !style()->htmlHacks(),
   // because that would match almost strict mode as well.
   RenderObject* curr = renderer();
-  while (curr && !curr->element())
+  while (curr && !curr->node())
     curr = curr->container();
   bool strictMode = (curr && curr->document()->inStrictMode());
 
@@ -661,7 +661,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
           // paint us atomically.
           RenderBlock* block = renderer()->containingBlock()->containingBlock();
           block->addContinuationWithOutline(
-              toRenderInline(renderer()->element()->renderer()));
+              toRenderInline(renderer()->node()->renderer()));
         } else if (!inlineFlow->isInlineContinuation())
           paintInfo.outlineObjects->add(inlineFlow);
       }
@@ -948,7 +948,7 @@ static bool shouldDrawTextDecoration(RenderObject* obj) {
     if (curr->isText() && !curr->isBR()) {
       if (!curr->style()->collapseWhiteSpace())
         return true;
-      Node* currElement = curr->element();
+      Node* currElement = curr->node();
       if (!currElement)
         return true;
       if (!currElement->isTextNode())

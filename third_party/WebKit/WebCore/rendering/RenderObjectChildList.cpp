@@ -59,8 +59,8 @@ void RenderObjectChildList::destroyLeftoverChildren() {
       // Destroy any anonymous children remaining in the render tree, as well as
       // implicit (shadow) DOM elements like those used in the engine-based text
       // fields.
-      if (firstChild()->element())
-        firstChild()->element()->setRenderer(0);
+      if (firstChild()->node())
+        firstChild()->node()->setRenderer(0);
       firstChild()->destroy();
     }
   }

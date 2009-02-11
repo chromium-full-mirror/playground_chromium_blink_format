@@ -232,7 +232,7 @@ Position VisiblePosition::leftVisuallyDistinctCandidate() const {
       break;
     }
 
-    p = Position(renderer->element(), offset);
+    p = Position(renderer->node(), offset);
 
     if (p.isCandidate() && p.downstream() != downstreamStart || p.atStart() ||
         p.atEnd())
@@ -386,7 +386,7 @@ Position VisiblePosition::rightVisuallyDistinctCandidate() const {
       break;
     }
 
-    p = Position(renderer->element(), offset);
+    p = Position(renderer->node(), offset);
 
     if (p.isCandidate() && p.downstream() != downstreamStart || p.atStart() ||
         p.atEnd())

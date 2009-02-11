@@ -122,7 +122,7 @@ float SVGRenderStyle::cssPrimitiveToLength(const RenderObject* item,
     return defaultValue;
 
   if (cssType == CSSPrimitiveValue::CSS_PERCENTAGE) {
-    SVGStyledElement* element = static_cast<SVGStyledElement*>(item->element());
+    SVGStyledElement* element = static_cast<SVGStyledElement*>(item->node());
     SVGElement* viewportElement = (element ? element->viewportElement() : 0);
     if (viewportElement) {
       float result = primitive->getFloatValue() / 100.0f;

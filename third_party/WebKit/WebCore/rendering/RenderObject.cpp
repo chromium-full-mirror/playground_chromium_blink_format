@@ -199,6 +199,7 @@ RenderObject::RenderObject(Node* node)
 #ifndef NDEBUG
   renderObjectCounter.increment();
 #endif
+  ASSERT(node);
 }
 
 RenderObject::~RenderObject() {
@@ -219,16 +220,15 @@ bool RenderObject::isDescendantOf(const RenderObject* obj) const {
 }
 
 bool RenderObject::isBody() const {
-  return node()->hasTagName(bodyTag);
+  return node() && node()->hasTagName(bodyTag);
 }
 
 bool RenderObject::isHR() const {
-  return element() && element()->hasTagName(hrTag);
+  return node() && node()->hasTagName(hrTag);
 }
 
 bool RenderObject::isHTMLMarquee() const {
-  return element() && element()->renderer() == this &&
-         element()->hasTagName(marqueeTag);
+  return node() && node()->renderer() == this && node()->hasTagName(marqueeTag);
 }
 
 static void updateListMarkerNumbers(RenderObject* child) {
@@ -381,8 +381,8 @@ bool RenderObject::isEditable() const {
   if (isText())
     textRenderer = toRenderText(const_cast<RenderObject*>(this));
 
-  return style()->visibility() == VISIBLE && element() &&
-         element()->isContentEditable() &&
+  return style()->visibility() == VISIBLE && node() &&
+         node()->isContentEditable() &&
          ((isBlockFlow() && !firstChild()) || isReplaced() || isBR() ||
           (textRenderer && textRenderer->firstTextBox()));
 }
@@ -1642,14 +1642,13 @@ void RenderObject::addPDFURLRect(GraphicsContext* context,
                                  const IntRect& rect) {
   if (rect.isEmpty())
     return;
-  Node* node = element();
-  if (!node || !node->isLink() || !node->isElementNode())
+  Node* n = node();
+  if (!n || !n->isLink() || !n->isElementNode())
     return;
-  const AtomicString& href =
-      static_cast<Element*>(node)->getAttribute(hrefAttr);
+  const AtomicString& href = static_cast<Element*>(n)->getAttribute(hrefAttr);
   if (href.isNull())
     return;
-  context->setURLForRect(node->document()->completeURL(href), rect);
+  context->setURLForRect(n->document()->completeURL(href), rect);
 }
 
 void RenderObject::paintOutline(GraphicsContext* graphicsContext,
@@ -2072,8 +2071,8 @@ void RenderObject::dirtyLinesFromChangedChild(RenderObject*) {}
 #ifndef NDEBUG
 
 void RenderObject::showTreeForThis() const {
-  if (element())
-    element()->showTreeForThis();
+  if (node())
+    node()->showTreeForThis();
 }
 
 #endif  // NDEBUG
@@ -2119,7 +2118,7 @@ Node* RenderObject::draggableNode(bool dhtmlOK,
     return 0;
 
   for (const RenderObject* curr = this; curr; curr = curr->parent()) {
-    Node* elt = curr->element();
+    Node* elt = curr->node();
     if (elt && elt->nodeType() == Node::TEXT_NODE) {
       // Since there's no way for the author to address the -webkit-user-drag
       // style for a text node,
@@ -2497,7 +2496,7 @@ bool RenderObject::isRooted(RenderView** view) {
 }
 
 bool RenderObject::hasOutlineAnnotation() const {
-  return element() && element()->isLink() && document()->printing();
+  return node() && node()->isLink() && document()->printing();
 }
 
 RenderObject* RenderObject::container() const {
@@ -2620,7 +2619,7 @@ void RenderObject::arenaDelete(RenderArena* arena, void* base) {
 }
 
 VisiblePosition RenderObject::positionForCoordinates(int, int) {
-  return VisiblePosition(element(), caretMinOffset(), DOWNSTREAM);
+  return VisiblePosition(node(), caretMinOffset(), DOWNSTREAM);
 }
 
 VisiblePosition RenderObject::positionForPoint(const IntPoint& point) {
@@ -2631,7 +2630,7 @@ void RenderObject::updateDragState(bool dragOn) {
   bool valueChanged = (dragOn != m_isDragging);
   m_isDragging = dragOn;
   if (valueChanged && style()->affectedByDragRules())
-    element()->setChanged();
+    node()->setChanged();
   for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling())
     curr->updateDragState(dragOn);
 }
@@ -2673,11 +2672,11 @@ void RenderObject::updateHitTestResult(HitTestResult& result,
   if (result.innerNode())
     return;
 
-  Node* node = element();
-  if (node) {
-    result.setInnerNode(node);
+  Node* n = node();
+  if (n) {
+    result.setInnerNode(n);
     if (!result.innerNonSharedNode())
-      result.setInnerNonSharedNode(node);
+      result.setInnerNonSharedNode(n);
     result.setLocalPoint(point);
   }
 }
@@ -2785,20 +2784,20 @@ PassRefPtr<RenderStyle> RenderObject::getUncachedPseudoStyle(
   if (!parentStyle)
     parentStyle = style();
 
-  Node* node = element();
-  while (node && !node->isElementNode())
-    node = node->parentNode();
-  if (!node)
+  Node* n = node();
+  while (n && !n->isElementNode())
+    n = n->parentNode();
+  if (!n)
     return 0;
 
   RefPtr<RenderStyle> result;
   if (pseudo == FIRST_LINE_INHERITED) {
     result = document()->styleSelector()->styleForElement(
-        static_cast<Element*>(node), parentStyle, false);
+        static_cast<Element*>(n), parentStyle, false);
     result->setStyleType(FIRST_LINE_INHERITED);
   } else
     result = document()->styleSelector()->pseudoStyleForElement(
-        pseudo, static_cast<Element*>(node), parentStyle);
+        pseudo, static_cast<Element*>(n), parentStyle);
   return result.release();
 }
 
@@ -2845,9 +2844,9 @@ void RenderObject::getTextDecorationColors(int decorations,
     if (curr && curr->isRenderBlock() &&
         toRenderBlock(curr)->inlineContinuation())
       curr = toRenderBlock(curr)->inlineContinuation();
-  } while (curr && decorations && (!quirksMode || !curr->element() ||
-                                   (!curr->element()->hasTagName(aTag) &&
-                                    !curr->element()->hasTagName(fontTag))));
+  } while (curr && decorations && (!quirksMode || !curr->node() ||
+                                   (!curr->node()->hasTagName(aTag) &&
+                                    !curr->node()->hasTagName(fontTag))));
 
   // If we bailed out, use the element we bailed out at (typically a <font> or
   // <a> element).
@@ -2969,7 +2968,7 @@ int RenderObject::caretMinOffset() const {
 
 int RenderObject::caretMaxOffset() const {
   if (isReplaced())
-    return element() ? max(1U, element()->childNodeCount()) : 1;
+    return node() ? max(1U, node()->childNodeCount()) : 1;
   if (isHR())
     return 1;
   return 0;
@@ -3053,9 +3052,9 @@ RenderBoxModelObject* RenderObject::offsetParent() const {
   float currZoom = style()->effectiveZoom();
   RenderObject* curr = parent();
   while (curr &&
-         (!curr->element() || (!curr->isPositioned() &&
-                               !curr->isRelPositioned() && !curr->isBody()))) {
-    Node* element = curr->element();
+         (!curr->node() || (!curr->isPositioned() && !curr->isRelPositioned() &&
+                            !curr->isBody()))) {
+    Node* element = curr->node();
     if (!skipTables && element) {
       bool isTableElement = element->hasTagName(tableTag) ||
                             element->hasTagName(tdTag) ||

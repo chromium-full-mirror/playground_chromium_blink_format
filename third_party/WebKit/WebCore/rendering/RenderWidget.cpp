@@ -111,9 +111,9 @@ RenderWidget::~RenderWidget() {
 }
 
 void RenderWidget::setWidgetGeometry(const IntRect& frame) {
-  if (element() && m_widget->frameRect() != frame) {
+  if (node() && m_widget->frameRect() != frame) {
     RenderArena* arena = ref();
-    RefPtr<Node> protectedElement(element());
+    RefPtr<Node> protectedElement(node());
     m_widget->setFrameRect(frame);
     deref(arena);
   }
@@ -244,9 +244,9 @@ void RenderWidget::updateWidgetPosition() {
     }
 
     RenderArena* arena = ref();
-    element()->ref();
+    node()->ref();
     m_widget->setFrameRect(newBounds);
-    element()->deref();
+    node()->deref();
     deref(arena);
   }
 }
@@ -280,7 +280,7 @@ bool RenderWidget::nodeAtPoint(const HitTestRequest& request,
 
   // Check to see if we are really over the widget itself (and not just in the
   // border/padding area).
-  if (inside && !hadResult && result.innerNode() == element())
+  if (inside && !hadResult && result.innerNode() == node())
     result.setIsOverWidget(contentBoxRect().contains(result.localPoint()));
   return inside;
 }

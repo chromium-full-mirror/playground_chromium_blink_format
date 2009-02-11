@@ -108,9 +108,9 @@ FloatRect RenderSVGViewportContainer::viewport() const {
 }
 
 void RenderSVGViewportContainer::calcViewport() {
-  SVGElement* svgelem = static_cast<SVGElement*>(element());
+  SVGElement* svgelem = static_cast<SVGElement*>(node());
   if (svgelem->hasTagName(SVGNames::svgTag)) {
-    SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
+    SVGSVGElement* svg = static_cast<SVGSVGElement*>(node());
 
     if (!selfNeedsLayout() && !svg->hasRelativeValues())
       return;
@@ -124,7 +124,7 @@ void RenderSVGViewportContainer::calcViewport() {
     if (!selfNeedsLayout())
       return;
 
-    SVGMarkerElement* svg = static_cast<SVGMarkerElement*>(element());
+    SVGMarkerElement* svg = static_cast<SVGMarkerElement*>(node());
     float w = svg->markerWidth().value(svg);
     float h = svg->markerHeight().value(svg);
     m_viewport = FloatRect(0, 0, w, h);
@@ -132,11 +132,11 @@ void RenderSVGViewportContainer::calcViewport() {
 }
 
 TransformationMatrix RenderSVGViewportContainer::viewportTransform() const {
-  if (element()->hasTagName(SVGNames::svgTag)) {
-    SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
+  if (node()->hasTagName(SVGNames::svgTag)) {
+    SVGSVGElement* svg = static_cast<SVGSVGElement*>(node());
     return svg->viewBoxToViewTransform(viewport().width(), viewport().height());
-  } else if (element()->hasTagName(SVGNames::markerTag)) {
-    SVGMarkerElement* marker = static_cast<SVGMarkerElement*>(element());
+  } else if (node()->hasTagName(SVGNames::markerTag)) {
+    SVGMarkerElement* marker = static_cast<SVGMarkerElement*>(node());
     return marker->viewBoxToViewTransform(viewport().width(),
                                           viewport().height());
   }
@@ -175,7 +175,7 @@ bool RenderSVGViewportContainer::nodeAtPoint(const HitTestRequest& request,
 
   // Respect parent translation offset for non-outermost <svg> elements.
   // Outermost <svg> element is handled by RenderSVGRoot.
-  if (element()->hasTagName(SVGNames::svgTag)) {
+  if (node()->hasTagName(SVGNames::svgTag)) {
     sx = _tx;
     sy = _ty;
   }

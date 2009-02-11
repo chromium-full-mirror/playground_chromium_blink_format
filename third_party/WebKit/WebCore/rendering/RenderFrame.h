@@ -39,7 +39,7 @@ class RenderFrame : public RenderPart {
   virtual bool isFrame() const { return true; }
 
   HTMLFrameElement* element() const {
-    return static_cast<HTMLFrameElement*>(RenderPart::element());
+    return static_cast<HTMLFrameElement*>(RenderPart::node());
   }
 
   FrameEdgeInfo edgeInfo() const;

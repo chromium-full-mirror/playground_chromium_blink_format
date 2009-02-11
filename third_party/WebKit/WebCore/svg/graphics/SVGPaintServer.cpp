@@ -80,7 +80,7 @@ SVGPaintServer* SVGPaintServer::fillPaintServer(const RenderStyle* style,
     AtomicString id(SVGURIReference::getTarget(fill->uri()));
     fillPaintServer = getPaintServerById(item->document(), id);
 
-    SVGElement* svgElement = static_cast<SVGElement*>(item->element());
+    SVGElement* svgElement = static_cast<SVGElement*>(item->node());
     ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
 
     if (item->isRenderPath() && fillPaintServer)
@@ -124,7 +124,7 @@ SVGPaintServer* SVGPaintServer::strokePaintServer(const RenderStyle* style,
     AtomicString id(SVGURIReference::getTarget(stroke->uri()));
     strokePaintServer = getPaintServerById(item->document(), id);
 
-    SVGElement* svgElement = static_cast<SVGElement*>(item->element());
+    SVGElement* svgElement = static_cast<SVGElement*>(item->node());
     ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
 
     if (item->isRenderPath() && strokePaintServer)

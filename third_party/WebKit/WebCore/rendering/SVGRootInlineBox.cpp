@@ -957,10 +957,10 @@ void SVGRootInlineBox::computePerCharacterLayoutInformation() {
 void SVGRootInlineBox::buildLayoutInformation(InlineFlowBox* start,
                                               SVGCharacterLayoutInfo& info) {
   if (start->isRootInlineBox()) {
-    ASSERT(start->renderer()->element()->hasTagName(SVGNames::textTag));
+    ASSERT(start->renderer()->node()->hasTagName(SVGNames::textTag));
 
     SVGTextPositioningElement* positioningElement =
-        static_cast<SVGTextPositioningElement*>(start->renderer()->element());
+        static_cast<SVGTextPositioningElement*>(start->renderer()->node());
     ASSERT(positioningElement);
     ASSERT(positioningElement->parentNode());
 
@@ -977,18 +977,17 @@ void SVGRootInlineBox::buildLayoutInformation(InlineFlowBox* start,
       ASSERT(curr->isInlineFlowBox());
       InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(curr);
 
-      if (!flowBox->renderer()->element())
+      if (!flowBox->renderer()->node())
         continue;  // Skip generated content.
 
-      bool isAnchor =
-          flowBox->renderer()->element()->hasTagName(SVGNames::aTag);
+      bool isAnchor = flowBox->renderer()->node()->hasTagName(SVGNames::aTag);
       bool isTextPath =
-          flowBox->renderer()->element()->hasTagName(SVGNames::textPathTag);
+          flowBox->renderer()->node()->hasTagName(SVGNames::textPathTag);
 
       if (!isTextPath && !isAnchor) {
         SVGTextPositioningElement* positioningElement =
             static_cast<SVGTextPositioningElement*>(
-                flowBox->renderer()->element());
+                flowBox->renderer()->node());
         ASSERT(positioningElement);
         ASSERT(positioningElement->parentNode());
 
@@ -998,7 +997,7 @@ void SVGRootInlineBox::buildLayoutInformation(InlineFlowBox* start,
 
         // Handle text-anchor/textLength on path, which is special.
         SVGTextContentElement* textContent = 0;
-        Node* node = flowBox->renderer()->element();
+        Node* node = flowBox->renderer()->node();
         if (node && node->isSVGElement())
           textContent = static_cast<SVGTextContentElement*>(node);
         ASSERT(textContent);
@@ -1138,7 +1137,7 @@ void SVGRootInlineBox::layoutInlineBoxes(InlineFlowBox* start,
 
       InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(curr);
 
-      if (!flowBox->renderer()->element())
+      if (!flowBox->renderer()->node())
         continue;  // Skip generated content.
 
       layoutInlineBoxes(flowBox, it, minX, maxX, minY, maxY);
@@ -1279,9 +1278,8 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
     }
 
     // Take letter & word spacing and kerning into account
-    float spacing =
-        font.letterSpacing() +
-        calculateKerning(textBox->renderer()->element()->renderer());
+    float spacing = font.letterSpacing() +
+                    calculateKerning(textBox->renderer()->node()->renderer());
 
     const UChar* currentCharacter =
         text->characters() + (textBox->direction() == RTL
@@ -1486,10 +1484,10 @@ void SVGRootInlineBox::buildTextChunks(Vector<SVGChar>& svgChars,
 
       RenderText* text = textBox->textRenderer();
       ASSERT(text);
-      ASSERT(text->element());
+      ASSERT(text->node());
 
       SVGTextContentElement* textContent = 0;
-      Node* node = text->element()->parent();
+      Node* node = text->node()->parent();
       while (node && node->isSVGElement() && !textContent) {
         if (static_cast<SVGElement*>(node)->isTextContent())
           textContent = static_cast<SVGTextContentElement*>(node);
@@ -1650,11 +1648,11 @@ void SVGRootInlineBox::buildTextChunks(Vector<SVGChar>& svgChars,
       ASSERT(curr->isInlineFlowBox());
       InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(curr);
 
-      if (!flowBox->renderer()->element())
+      if (!flowBox->renderer()->node())
         continue;  // Skip generated content.
 
       bool isTextPath =
-          flowBox->renderer()->element()->hasTagName(SVGNames::textPathTag);
+          flowBox->renderer()->node()->hasTagName(SVGNames::textPathTag);
 
 #if DEBUG_CHUNK_BUILDING > 1
       fprintf(stderr, " -> Handle inline flow box (%p), isTextPath=%i\n",

@@ -139,7 +139,7 @@ const Path& RenderPath::path() const {
 
 bool RenderPath::calculateLocalTransform() {
   TransformationMatrix oldTransform = m_localTransform;
-  m_localTransform = static_cast<SVGStyledTransformableElement*>(element())
+  m_localTransform = static_cast<SVGStyledTransformableElement*>(node())
                          ->animatedLocalTransform();
   return (m_localTransform != oldTransform);
 }
@@ -153,7 +153,7 @@ void RenderPath::layout() {
 
   calculateLocalTransform();
 
-  setPath(static_cast<SVGStyledTransformableElement*>(element())->toPathData());
+  setPath(static_cast<SVGStyledTransformableElement*>(node())->toPathData());
 
   m_absoluteBounds = absoluteClippedOverflowRect();
 
@@ -232,7 +232,7 @@ void RenderPath::paint(PaintInfo& paintInfo, int, int) {
       paintInfo.context->setShouldAntialias(false);
     fillAndStrokePath(m_path, paintInfo.context, style(), this);
 
-    if (static_cast<SVGStyledElement*>(element())->supportsMarkers())
+    if (static_cast<SVGStyledElement*>(node())->supportsMarkers())
       m_markerBounds =
           drawMarkersIfNeeded(paintInfo.context, paintInfo.rect, m_path);
 
@@ -423,7 +423,7 @@ FloatRect RenderPath::drawMarkersIfNeeded(GraphicsContext* context,
                                           const Path& path) const {
   Document* doc = document();
 
-  SVGElement* svgElement = static_cast<SVGElement*>(element());
+  SVGElement* svgElement = static_cast<SVGElement*>(node());
   ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
 
   SVGStyledElement* styledElement = static_cast<SVGStyledElement*>(svgElement);

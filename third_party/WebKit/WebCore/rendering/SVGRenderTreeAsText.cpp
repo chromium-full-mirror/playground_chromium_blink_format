@@ -452,9 +452,9 @@ void write(TextStream& ts, const RenderSVGContainer& container, int indent) {
   writeIndent(ts, indent);
   ts << container.renderName();
 
-  if (container.element()) {
+  if (container.node()) {
     String tagName =
-        getTagName(static_cast<SVGStyledElement*>(container.element()));
+        getTagName(static_cast<SVGStyledElement*>(container.node()));
     if (!tagName.isEmpty())
       ts << " {" << tagName << "}";
   }
@@ -470,8 +470,8 @@ void write(TextStream& ts, const RenderSVGRoot& root, int indent) {
   writeIndent(ts, indent);
   ts << root.renderName();
 
-  if (root.element()) {
-    String tagName = getTagName(static_cast<SVGStyledElement*>(root.element()));
+  if (root.node()) {
+    String tagName = getTagName(static_cast<SVGStyledElement*>(root.node()));
     if (!tagName.isEmpty())
       ts << " {" << tagName << "}";
   }
@@ -487,8 +487,8 @@ void write(TextStream& ts, const RenderSVGText& text, int indent) {
   writeIndent(ts, indent);
   ts << text.renderName();
 
-  if (text.element()) {
-    String tagName = getTagName(static_cast<SVGStyledElement*>(text.element()));
+  if (text.node()) {
+    String tagName = getTagName(static_cast<SVGStyledElement*>(text.node()));
     if (!tagName.isEmpty())
       ts << " {" << tagName << "}";
   }
@@ -504,8 +504,8 @@ void write(TextStream& ts, const RenderSVGInlineText& text, int indent) {
   writeIndent(ts, indent);
   ts << text.renderName();
 
-  if (text.element()) {
-    String tagName = getTagName(static_cast<SVGStyledElement*>(text.element()));
+  if (text.node()) {
+    String tagName = getTagName(static_cast<SVGStyledElement*>(text.node()));
     if (!tagName.isEmpty())
       ts << " {" << tagName << "}";
   }
@@ -521,8 +521,8 @@ void write(TextStream& ts, const RenderPath& path, int indent) {
   writeIndent(ts, indent);
   ts << path.renderName();
 
-  if (path.element()) {
-    String tagName = getTagName(static_cast<SVGStyledElement*>(path.element()));
+  if (path.node()) {
+    String tagName = getTagName(static_cast<SVGStyledElement*>(path.node()));
     if (!tagName.isEmpty())
       ts << " {" << tagName << "}";
   }

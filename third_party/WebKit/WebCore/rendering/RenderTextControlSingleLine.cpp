@@ -276,8 +276,7 @@ bool RenderTextControlSingleLine::nodeAtPoint(const HitTestRequest& request,
                                       hitTestAction))
     return false;
 
-  if (result.innerNode() != element() &&
-      result.innerNode() != m_innerBlock.get())
+  if (result.innerNode() != node() && result.innerNode() != m_innerBlock.get())
     return false;
 
   hitInnerTextBlock(result, xPos, yPos, tx, ty);

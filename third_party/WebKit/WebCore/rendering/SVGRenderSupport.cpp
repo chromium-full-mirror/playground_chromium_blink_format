@@ -49,7 +49,7 @@ void prepareToRenderSVGContent(RenderObject* object,
   UNUSED_PARAM(rootFilter);
 #endif
 
-  SVGElement* svgElement = static_cast<SVGElement*>(object->element());
+  SVGElement* svgElement = static_cast<SVGElement*>(object->node());
   ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
   ASSERT(object);
 

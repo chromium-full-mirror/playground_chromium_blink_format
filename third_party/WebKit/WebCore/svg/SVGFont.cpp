@@ -296,10 +296,10 @@ struct SVGTextRunWalker {
     bool haveAltGlyph = false;
     SVGGlyphIdentifier altGlyphIdentifier;
     if (RenderObject* renderObject = run.referencingRenderObject()) {
-      if (renderObject->element() &&
-          renderObject->element()->hasTagName(SVGNames::altGlyphTag)) {
+      if (renderObject->node() &&
+          renderObject->node()->hasTagName(SVGNames::altGlyphTag)) {
         SVGGlyphElement* glyphElement =
-            static_cast<SVGAltGlyphElement*>(renderObject->element())
+            static_cast<SVGAltGlyphElement*>(renderObject->node())
                 ->glyphElement();
         if (glyphElement) {
           haveAltGlyph = true;
@@ -468,8 +468,7 @@ static float floatWidthOfSubStringUsingSVGFont(const Font* font,
     if (RenderObject* renderObject = run.referencingRenderObject()) {
       isVerticalText = isVerticalWritingMode(renderObject->style()->svgStyle());
 
-      if (SVGElement* element =
-              static_cast<SVGElement*>(renderObject->element()))
+      if (SVGElement* element = static_cast<SVGElement*>(renderObject->node()))
         language = element->getAttribute(XMLNames::langAttr);
     }
 
@@ -574,8 +573,8 @@ void Font::drawTextUsingSVGFont(GraphicsContext* context,
       isVerticalText = isVerticalWritingMode(
           run.referencingRenderObject()->style()->svgStyle());
 
-      if (SVGElement* element = static_cast<SVGElement*>(
-              run.referencingRenderObject()->element()))
+      if (SVGElement* element =
+              static_cast<SVGElement*>(run.referencingRenderObject()->node()))
         language = element->getAttribute(XMLNames::langAttr);
     }
 

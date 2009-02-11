@@ -133,7 +133,7 @@ void RenderSVGImage::adjustRectsForAspectRatio(
 
 bool RenderSVGImage::calculateLocalTransform() {
   TransformationMatrix oldTransform = m_localTransform;
-  m_localTransform = static_cast<SVGStyledTransformableElement*>(element())
+  m_localTransform = static_cast<SVGStyledTransformableElement*>(node())
                          ->animatedLocalTransform();
   return (m_localTransform != oldTransform);
 }

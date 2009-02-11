@@ -95,7 +95,7 @@ void AnimationControllerPrivate::updateAnimationTimer(
         needsService = t;
       if (needsService == 0) {
         if (callSetChanged) {
-          Node* node = it->first->element();
+          Node* node = it->first->node();
           ASSERT(!node ||
                  (node->document() && !node->document()->inPageCache()));
           node->setChanged(AnimationStyleChange);
@@ -453,7 +453,7 @@ void AnimationController::cancelAnimations(RenderObject* renderer) {
     return;
 
   if (m_data->clear(renderer)) {
-    Node* node = renderer->element();
+    Node* node = renderer->node();
     ASSERT(!node || (node->document() && !node->document()->inPageCache()));
     node->setChanged(AnimationStyleChange);
   }
@@ -479,8 +479,7 @@ PassRefPtr<RenderStyle> AnimationController::updateAnimations(
   // have changed, we reset the animation.  We then do a blend to get new values
   // and we return
   // a new style.
-  ASSERT(
-      renderer->element());  // FIXME: We do not animate generated content yet.
+  ASSERT(renderer->node());  // FIXME: We do not animate generated content yet.
 
   RefPtr<CompositeAnimation> rendererAnimations =
       m_data->accessCompositeAnimation(renderer);

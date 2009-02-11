@@ -43,7 +43,7 @@ RenderSVGTextPath::RenderSVGTextPath(Node* n)
 
 Path RenderSVGTextPath::layoutPath() const {
   SVGTextPathElement* textPathElement =
-      static_cast<SVGTextPathElement*>(element());
+      static_cast<SVGTextPathElement*>(node());
   String pathId = SVGURIReference::getTarget(textPathElement->href());
   Element* targetElement = textPathElement->document()->getElementById(pathId);
   if (!targetElement || !targetElement->hasTagName(SVGNames::pathTag))
@@ -65,18 +65,18 @@ Path RenderSVGTextPath::layoutPath() const {
 }
 
 float RenderSVGTextPath::startOffset() const {
-  return static_cast<SVGTextPathElement*>(element())
+  return static_cast<SVGTextPathElement*>(node())
       ->startOffset()
       .valueAsPercentage();
 }
 
 bool RenderSVGTextPath::exactAlignment() const {
-  return static_cast<SVGTextPathElement*>(element())->spacing() ==
+  return static_cast<SVGTextPathElement*>(node())->spacing() ==
          SVG_TEXTPATH_SPACINGTYPE_EXACT;
 }
 
 bool RenderSVGTextPath::stretchMethod() const {
-  return static_cast<SVGTextPathElement*>(element())->method() ==
+  return static_cast<SVGTextPathElement*>(node())->method() ==
          SVG_TEXTPATH_METHODTYPE_STRETCH;
 }
 

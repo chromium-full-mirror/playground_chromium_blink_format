@@ -85,8 +85,8 @@ static bool getStartEndListChildren(const VisibleSelection& selection,
   // sublist
   if (endListChild->renderer()->isListItem()) {
     RenderObject* r = endListChild->renderer()->nextSibling();
-    if (r && isListElement(r->element()))
-      endListChild = r->element();
+    if (r && isListElement(r->node()))
+      endListChild = r->node();
   }
 
   start = startListChild;
@@ -186,7 +186,7 @@ void IncreaseSelectionListLevelCommand::doApply() {
   if (!canIncreaseListLevel(endingSelection(), startListChild, endListChild))
     return;
 
-  Node* previousItem = startListChild->renderer()->previousSibling()->element();
+  Node* previousItem = startListChild->renderer()->previousSibling()->node();
   if (isListElement(previousItem)) {
     // move nodes up into preceding list
     appendSiblingNodeRange(startListChild, endListChild,
@@ -277,10 +277,10 @@ void DecreaseSelectionListLevelCommand::doApply() {
 
   Node* previousItem =
       startListChild->renderer()->previousSibling()
-          ? startListChild->renderer()->previousSibling()->element()
+          ? startListChild->renderer()->previousSibling()->node()
           : 0;
   Node* nextItem = endListChild->renderer()->nextSibling()
-                       ? endListChild->renderer()->nextSibling()->element()
+                       ? endListChild->renderer()->nextSibling()->node()
                        : 0;
   Element* listNode = startListChild->parentElement();
 

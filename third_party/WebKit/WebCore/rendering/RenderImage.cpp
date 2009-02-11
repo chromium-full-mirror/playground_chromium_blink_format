@@ -418,8 +418,8 @@ void RenderImage::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
                                                                contentSize);
     IntRect rect(IntPoint(tx + leftBorder + leftPad, ty + topBorder + topPad),
                  contentSize);
-    HTMLImageElement* imageElt = (element() && element()->hasTagName(imgTag))
-                                     ? static_cast<HTMLImageElement*>(element())
+    HTMLImageElement* imageElt = (node() && node()->hasTagName(imgTag))
+                                     ? static_cast<HTMLImageElement*>(node())
                                      : 0;
     CompositeOperator compositeOperator =
         imageElt ? imageElt->compositeOperator() : CompositeSourceOver;
@@ -433,8 +433,8 @@ int RenderImage::minimumReplacedHeight() const {
 }
 
 HTMLMapElement* RenderImage::imageMap() {
-  HTMLImageElement* i = element() && element()->hasTagName(imgTag)
-                            ? static_cast<HTMLImageElement*>(element())
+  HTMLImageElement* i = node() && node()->hasTagName(imgTag)
+                            ? static_cast<HTMLImageElement*>(node())
                             : 0;
   return i ? i->document()->getImageMap(i->useMap()) : 0;
 }
@@ -449,7 +449,7 @@ bool RenderImage::nodeAtPoint(const HitTestRequest& request,
   bool inside = RenderReplaced::nodeAtPoint(request, result, _x, _y, _tx, _ty,
                                             hitTestAction);
 
-  if (inside && element()) {
+  if (inside && node()) {
     int tx = _tx + x();
     int ty = _ty + y();
 
@@ -458,7 +458,7 @@ bool RenderImage::nodeAtPoint(const HitTestRequest& request,
       // we're a client side image map
       inside = map->mapMouseEvent(
           _x - tx, _y - ty, IntSize(contentWidth(), contentHeight()), result);
-      result.setInnerNonSharedNode(element());
+      result.setInnerNonSharedNode(node());
     }
   }
 
@@ -466,16 +466,16 @@ bool RenderImage::nodeAtPoint(const HitTestRequest& request,
 }
 
 void RenderImage::updateAltText() {
-  if (!element())
+  if (!node())
     return;
 
-  if (element()->hasTagName(inputTag))
-    m_altText = static_cast<HTMLInputElement*>(element())->altText();
-  else if (element()->hasTagName(imgTag))
-    m_altText = static_cast<HTMLImageElement*>(element())->altText();
+  if (node()->hasTagName(inputTag))
+    m_altText = static_cast<HTMLInputElement*>(node())->altText();
+  else if (node()->hasTagName(imgTag))
+    m_altText = static_cast<HTMLImageElement*>(node())->altText();
 #if ENABLE(WML)
-  else if (element()->hasTagName(WMLNames::imgTag))
-    m_altText = static_cast<WMLImageElement*>(element())->altText();
+  else if (node()->hasTagName(WMLNames::imgTag))
+    m_altText = static_cast<WMLImageElement*>(node())->altText();
 #endif
 }
 

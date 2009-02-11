@@ -878,6 +878,9 @@ void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
                                          RenderStyle* style,
                                          const Font& font,
                                          bool background) {
+  if (!renderer()->node())
+    return;
+
   Vector<DocumentMarker> markers =
       renderer()->document()->markersForNode(renderer()->node());
   Vector<DocumentMarker>::iterator markerIt = markers.begin();
