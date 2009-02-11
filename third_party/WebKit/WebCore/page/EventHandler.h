@@ -329,9 +329,12 @@ class EventHandler : Noncopyable {
   void updateSelectionForMouseDrag(Node* targetNode,
                                    const IntPoint& localPoint);
 
+  bool capturesDragging() const { return m_capturesDragging; }
+
   Frame* m_frame;
 
   bool m_mousePressed;
+  bool m_capturesDragging;
   RefPtr<Node> m_mousePressNode;
 
   bool m_mouseDownMayStartSelect;
