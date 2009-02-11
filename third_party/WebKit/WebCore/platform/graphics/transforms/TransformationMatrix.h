@@ -34,6 +34,8 @@
 #include <QMatrix>
 #elif PLATFORM(SKIA)
 #include <SkMatrix.h>
+#elif PLATFORM(WX) && USE(WXGC)
+#include <wx/graphics.h>
 #endif
 
 #include <string.h>  //for memcpy
@@ -342,6 +344,8 @@ class TransformationMatrix {
   operator QMatrix() const;
 #elif PLATFORM(SKIA)
   operator SkMatrix() const;
+#elif PLATFORM(WX) && USE(WXGC)
+  operator wxGraphicsMatrix() const;
 #endif
 
  private:

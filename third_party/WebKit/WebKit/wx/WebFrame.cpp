@@ -39,15 +39,16 @@
 #include "RenderTreeAsText.h"
 #include "RenderObject.h"
 #include "RenderView.h"
-
-#include "EditorClientWx.h"
-#include "FrameLoaderClientWx.h"
-
 #include "ScriptController.h"
 #include "ScriptValue.h"
+#include "TextEncoding.h"
+
 #include "JSDOMBinding.h"
 #include <runtime/JSValue.h>
 #include <runtime/UString.h>
+
+#include "EditorClientWx.h"
+#include "FrameLoaderClientWx.h"
 
 #include "wx/wxprec.h"
 #ifndef WX_PRECOMP
@@ -138,8 +139,9 @@ void wxWebFrame::SetPageSource(const wxString& source,
                                const wxString& baseUrl) {
   if (m_impl->frame && m_impl->frame->loader()) {
     WebCore::FrameLoader* loader = m_impl->frame->loader();
-    loader->begin(
-        WebCore::KURL(static_cast<const char*>(baseUrl.mb_str(wxConvUTF8))));
+    loader->begin(WebCore::KURL(
+        WebCore::KURL(), static_cast<const char*>(baseUrl.mb_str(wxConvUTF8)),
+        WebCore::UTF8Encoding()));
     loader->write(static_cast<const WebCore::String>(source));
     loader->end();
   }
@@ -197,8 +199,9 @@ bool wxWebFrame::FindString(const wxString& string,
 
 void wxWebFrame::LoadURL(const wxString& url) {
   if (m_impl->frame && m_impl->frame->loader()) {
-    WebCore::KURL kurl =
-        WebCore::KURL(static_cast<const char*>(url.mb_str(wxConvUTF8)));
+    WebCore::KURL kurl = WebCore::KURL(
+        WebCore::KURL(), static_cast<const char*>(url.mb_str(wxConvUTF8)),
+        WebCore::UTF8Encoding());
     // NB: This is an ugly fix, but CURL won't load sub-resources if the
     // protocol is omitted; sadly, it will not emit an error, either, so
     // there's no way for us to catch this problem the correct way yet.
