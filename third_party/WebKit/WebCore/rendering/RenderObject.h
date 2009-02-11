@@ -204,11 +204,6 @@ class RenderObject : public CachedResourceClient {
   // normal flow object.
   void handleDynamicFloatPositionChange();
 
-  // This function is a convenience helper for creating an anonymous block that
-  // inherits its
-  // style from this RenderObject.
-  RenderBlock* createAnonymousBlock();
-
   // RenderObject tree manipulation
   //////////////////////////////////////////
   virtual bool canHaveChildren() const { return virtualChildren(); }
