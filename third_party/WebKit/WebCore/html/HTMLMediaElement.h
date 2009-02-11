@@ -231,6 +231,10 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   OwnPtr<MediaPlayer> m_player;
 
   LoadRestrictions m_loadRestrictions;
+
+  // Not all media engines provide enough information about a file to be able to
+  // support progress events so setting m_sendProgressEvents disables them
+  bool m_sendProgressEvents;
 };
 
 }  // namespace

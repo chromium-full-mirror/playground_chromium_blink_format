@@ -84,7 +84,8 @@ HTMLMediaElement::HTMLMediaElement(const QualifiedName& tagName, Document* doc)
       m_pausedInternal(false),
       m_inActiveDocument(true),
       m_player(0),
-      m_loadRestrictions(NoLoadRestriction) {
+      m_loadRestrictions(NoLoadRestriction),
+      m_sendProgressEvents(true) {
   document()->registerForDocumentActivationCallbacks(this);
   document()->registerForMediaVolumeCallbacks(this);
 }
@@ -162,6 +163,9 @@ void HTMLMediaElement::scheduleLoad() {
 
 void HTMLMediaElement::initAndDispatchProgressEvent(
     const AtomicString& eventName) {
+  if (!m_sendProgressEvents)
+    return;
+
   bool totalKnown = m_player && m_player->totalBytesKnown();
   unsigned loaded = m_player ? m_player->bytesLoaded() : 0;
   unsigned total = m_player ? m_player->totalBytes() : 0;
@@ -276,7 +280,8 @@ void HTMLMediaElement::load(ExceptionCode& ec) {
   if (m_begun) {
     m_begun = false;
     m_error = MediaError::create(MediaError::MEDIA_ERR_ABORTED);
-    initAndDispatchProgressEvent(eventNames().abortEvent);
+    if (m_sendProgressEvents)
+      initAndDispatchProgressEvent(eventNames().abortEvent);
     if (m_loadNestingLevel < m_terminateLoadBelowNestingLevel)
       goto end;
   }
@@ -320,7 +325,8 @@ void HTMLMediaElement::load(ExceptionCode& ec) {
 
   // 9
   m_begun = true;
-  dispatchProgressEvent(eventNames().loadstartEvent, false, 0, 0);
+  if (m_sendProgressEvents)
+    dispatchProgressEvent(eventNames().loadstartEvent, false, 0, 0);
   if (m_loadNestingLevel < m_terminateLoadBelowNestingLevel)
     goto end;
 
@@ -336,11 +342,14 @@ void HTMLMediaElement::load(ExceptionCode& ec) {
     renderer()->updateFromElement();
 
   // 14
-  m_previousProgressTime = WTF::currentTime();
-  m_previousProgress = 0;
-  if (m_begun)
-    // 350ms is not magic, it is in the spec!
-    m_progressEventTimer.startRepeating(0.350);
+  if (m_sendProgressEvents) {
+    m_previousProgressTime = WTF::currentTime();
+    m_previousProgress = 0;
+    if (m_begun)
+      // 350ms is not magic, it is in the spec!
+      m_progressEventTimer.startRepeating(0.350);
+  }
+
 end:
   ASSERT(m_loadNestingLevel);
   m_loadNestingLevel--;
