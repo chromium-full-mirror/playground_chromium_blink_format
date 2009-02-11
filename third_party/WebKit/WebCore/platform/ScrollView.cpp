@@ -478,7 +478,7 @@ void ScrollView::scrollContents(const IntSize& scrollDelta) {
         panIconDirtySquareLocation,
         IntSize(panIconDirtySquareSizeLength, panIconDirtySquareSizeLength));
     panScrollIconDirtyRect.intersect(clipRect);
-    hostWindow()->repaint(panScrollIconDirtyRect, true, true);
+    hostWindow()->repaint(panScrollIconDirtyRect, true);
   }
 
   if (canBlitOnScroll() && !rootPreventsBlitting()) {  // The main frame can
