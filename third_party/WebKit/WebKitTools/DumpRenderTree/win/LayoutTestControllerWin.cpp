@@ -137,7 +137,7 @@ size_t LayoutTestController::webHistoryItemCount() {
     return 0;
 
   COMPtr<IWebHistory> sharedHistory;
-  if (FAILED(history->optionalSharedHistory(&sharedHistory)))
+  if (FAILED(history->optionalSharedHistory(&sharedHistory)) || !sharedHistory)
     return 0;
 
   COMPtr<IWebHistoryPrivate> sharedHistoryPrivate;
