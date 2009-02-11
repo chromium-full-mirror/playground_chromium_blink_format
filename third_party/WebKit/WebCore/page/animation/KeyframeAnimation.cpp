@@ -167,7 +167,7 @@ void KeyframeAnimation::animate(CompositeAnimation*,
        it != endProperties; ++it) {
     bool needsAnim = blendProperties(this, *it, animatedStyle.get(), fromStyle,
                                      toStyle, progress);
-    if (needsAnim || m_fallbackAnimating)
+    if (needsAnim)
       setAnimating();
   }
 }

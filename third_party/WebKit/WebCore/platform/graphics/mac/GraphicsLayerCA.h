@@ -122,7 +122,7 @@ class GraphicsLayerCA : public GraphicsLayer {
   }
 
   void setBasicAnimation(AnimatedPropertyID,
-                         const String& component,
+                         TransformOperation::OperationType,
                          short index,
                          void* fromVal,
                          void* toVal,
@@ -130,7 +130,7 @@ class GraphicsLayerCA : public GraphicsLayer {
                          const Animation*,
                          double time);
   void setKeyframeAnimation(AnimatedPropertyID,
-                            const String& component,
+                            TransformOperation::OperationType,
                             short index,
                             void* keys,
                             void* values,

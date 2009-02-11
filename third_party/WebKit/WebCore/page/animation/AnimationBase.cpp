@@ -798,7 +798,7 @@ bool AnimationBase::blendProperties(const AnimationBase* anim,
   if (wrapper) {
     wrapper->blend(anim, dst, a, b, progress);
 #if USE(ACCELERATED_COMPOSITING)
-    return !wrapper->animationIsAccelerated();
+    return !wrapper->animationIsAccelerated() || anim->isFallbackAnimating();
 #else
     return true;
 #endif
