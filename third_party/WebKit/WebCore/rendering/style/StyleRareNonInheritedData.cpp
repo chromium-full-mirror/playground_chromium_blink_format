@@ -42,7 +42,12 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
       matchNearestMailBlockquoteColor(
           RenderStyle::initialMatchNearestMailBlockquoteColor()),
       m_appearance(RenderStyle::initialAppearance()),
-      m_borderFit(RenderStyle::initialBorderFit()),
+      m_borderFit(RenderStyle::initialBorderFit())
+#if USE(ACCELERATED_COMPOSITING)
+      ,
+      m_runningAcceleratedAnimation(false)
+#endif
+      ,
       m_boxShadow(0),
       m_animations(0),
       m_transitions(0),
@@ -71,7 +76,12 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       marginBottomCollapse(o.marginBottomCollapse),
       matchNearestMailBlockquoteColor(o.matchNearestMailBlockquoteColor),
       m_appearance(o.m_appearance),
-      m_borderFit(o.m_borderFit),
+      m_borderFit(o.m_borderFit)
+#if USE(ACCELERATED_COMPOSITING)
+      ,
+      m_runningAcceleratedAnimation(o.m_runningAcceleratedAnimation)
+#endif
+      ,
       m_boxShadow(o.m_boxShadow ? new ShadowData(*o.m_boxShadow) : 0),
       m_boxReflect(o.m_boxReflect),
       m_animations(o.m_animations ? new AnimationList(*o.m_animations) : 0),
@@ -114,8 +124,11 @@ bool StyleRareNonInheritedData::operator==(
          marginTopCollapse == o.marginTopCollapse &&
          marginBottomCollapse == o.marginBottomCollapse &&
          matchNearestMailBlockquoteColor == o.matchNearestMailBlockquoteColor &&
-         m_appearance == o.m_appearance && m_borderFit == o.m_borderFit &&
-         shadowDataEquivalent(o) && reflectionDataEquivalent(o) &&
+         m_appearance == o.m_appearance && m_borderFit == o.m_borderFit
+#if USE(ACCELERATED_COMPOSITING)
+         && !m_runningAcceleratedAnimation && !o.m_runningAcceleratedAnimation
+#endif
+         && shadowDataEquivalent(o) && reflectionDataEquivalent(o) &&
          animationDataEquivalent(o) && transitionDataEquivalent(o) &&
          m_mask == o.m_mask && m_maskBoxImage == o.m_maskBoxImage
 #if ENABLE(XBL)

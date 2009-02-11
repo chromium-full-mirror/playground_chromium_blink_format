@@ -922,6 +922,14 @@ class RenderStyle : public RefCounted<RenderStyle> {
   // return the first found Animation (including 'all' transitions)
   const Animation* transitionForProperty(int property) const;
 
+#if USE(ACCELERATED_COMPOSITING)
+  // When set, this ensures that styles compare as different. Used during
+  // accelerated animations.
+  bool isRunningAcceleratedAnimation() const {
+    return rareNonInheritedData->m_runningAcceleratedAnimation;
+  }
+#endif
+
   int lineClamp() const { return rareNonInheritedData->lineClamp; }
   bool textSizeAdjust() const { return rareInheritedData->textSizeAdjust; }
   ETextSecurity textSecurity() const {
@@ -1434,6 +1442,12 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   void adjustAnimations();
   void adjustTransitions();
+
+#if USE(ACCELERATED_COMPOSITING)
+  void setIsRunningAcceleratedAnimation(bool b = true) {
+    SET_VAR(rareNonInheritedData, m_runningAcceleratedAnimation, b);
+  }
+#endif
 
   void setLineClamp(int c) { SET_VAR(rareNonInheritedData, lineClamp, c); }
   void setTextSizeAdjust(bool b) {

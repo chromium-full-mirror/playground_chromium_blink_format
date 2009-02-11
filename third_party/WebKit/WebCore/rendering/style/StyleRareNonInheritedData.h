@@ -111,7 +111,10 @@ class StyleRareNonInheritedData : public RefCounted<StyleRareNonInheritedData> {
                                             // been added.
   unsigned m_appearance : 6;                // EAppearance
   unsigned m_borderFit : 1;                 // EBorderFit
-  OwnPtr<ShadowData> m_boxShadow;           // For box-shadow decorations.
+#if USE(ACCELERATED_COMPOSITING)
+  bool m_runningAcceleratedAnimation : 1;
+#endif
+  OwnPtr<ShadowData> m_boxShadow;  // For box-shadow decorations.
 
   RefPtr<StyleReflection> m_boxReflect;
 
