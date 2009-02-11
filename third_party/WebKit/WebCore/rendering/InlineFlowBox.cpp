@@ -1029,7 +1029,9 @@ void InlineFlowBox::paintTextDecorations(RenderObject::PaintInfo& paintInfo,
                           (!paintOverline || overline.alpha() == 255) &&
                           (!paintLineThrough || linethrough.alpha() == 255);
 
-    int baselinePos = baseline();
+    int baselinePos = renderer()->style(m_firstLine)->font().ascent();
+    if (!isRootInlineBox())
+      baselinePos += borderTop() + paddingTop();
 
     bool setClip = false;
     int extraOffset = 0;
