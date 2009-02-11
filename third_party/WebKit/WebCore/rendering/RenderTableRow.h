@@ -60,7 +60,6 @@ class RenderTableRow : public RenderBox {
 
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
   virtual int lineHeight(bool, bool) const { return 0; }
-  virtual void position(InlineBox*) {}
   virtual void layout();
   virtual IntRect clippedOverflowRectForRepaint(
       RenderBoxModelObject* repaintContainer);

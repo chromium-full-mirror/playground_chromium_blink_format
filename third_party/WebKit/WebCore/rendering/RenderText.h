@@ -80,7 +80,7 @@ class RenderText : public RenderObject {
   unsigned textLength() const {
     return m_text->length();
   }  // non virtual implementation of length()
-  virtual void position(InlineBox*);
+  void positionLineBox(InlineBox*);
 
   virtual unsigned width(unsigned from,
                          unsigned len,

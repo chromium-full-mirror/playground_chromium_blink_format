@@ -233,7 +233,7 @@ class RenderBox : public RenderBoxModelObject {
                              const Length& marginRight,
                              int containerWidth);
 
-  virtual void position(InlineBox*);
+  void positionLineBox(InlineBox*);
 
   virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
 
