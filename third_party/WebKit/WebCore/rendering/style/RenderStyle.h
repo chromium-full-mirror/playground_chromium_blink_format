@@ -348,6 +348,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
       return true;
     return background->m_background.hasImage();
   }
+  bool hasBackgroundImage() const {
+    return background->m_background.hasImage();
+  }
   bool hasFixedBackgroundImage() const {
     return background->m_background.hasFixedImage();
   }
