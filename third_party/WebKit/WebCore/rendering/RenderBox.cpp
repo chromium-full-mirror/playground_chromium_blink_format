@@ -2575,8 +2575,6 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
       int staticPosition =
           layer()->staticX() + containerWidth +
           toRenderBoxModelObject(containerBlock)->borderRight();
-      if (po->isBox())
-        po -= toRenderBox(po)->width();
       for (; po && po != containerBlock; po = po->parent()) {
         if (po->isBox())
           staticPosition += toRenderBox(po)->x();
