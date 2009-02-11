@@ -1472,7 +1472,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
 
   bool inheritedNotEqual(RenderStyle*) const;
 
-  StyleDifference diff(const RenderStyle*) const;
+  StyleDifference diff(const RenderStyle*,
+                       unsigned& changedContextSensitiveProperties) const;
 
   bool isDisplayReplacedType() const {
     return display() == INLINE_BLOCK || display() == INLINE_BOX ||

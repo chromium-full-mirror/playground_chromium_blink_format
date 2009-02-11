@@ -1014,6 +1014,9 @@ class RenderObject : public CachedResourceClient {
 
  private:
   RenderStyle* firstLineStyleSlowCase() const;
+  StyleDifference adjustStyleDifference(
+      StyleDifference,
+      unsigned contextSensitiveProperties) const;
 
   RefPtr<RenderStyle> m_style;
 
