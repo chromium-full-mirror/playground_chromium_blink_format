@@ -202,12 +202,15 @@ __declspec(naked) void ctiVMThrowTrampoline() {
 
 #endif
 
-void ctiSetReturnAddress(void** where, void* what) {
-  *where = what;
+void ctiSetReturnAddress(void** addressOfReturnAddress,
+                         void* newDestinationToReturnTo) {
+  *addressOfReturnAddress = newDestinationToReturnTo;
 }
 
-void ctiPatchCallByReturnAddress(void* where, void* what) {
-  MacroAssembler::Jump::patch(where, what);
+void ctiPatchCallByReturnAddress(
+    MacroAssembler::ProcessorReturnAddress returnAddress,
+    void* newCalleeFunction) {
+  returnAddress.relinkCallerToFunction(newCalleeFunction);
 }
 
 JIT::JIT(JSGlobalData* globalData, CodeBlock* codeBlock)
@@ -1915,20 +1918,21 @@ void JIT::privateCompile() {
       ASSERT(record.jumpTable.simpleJumpTable->branchOffsets.size() ==
              record.jumpTable.simpleJumpTable->ctiOffsets.size());
 
-      record.jumpTable.simpleJumpTable->ctiDefault = patchBuffer.addressOf(
+      record.jumpTable.simpleJumpTable->ctiDefault = patchBuffer.locationOf(
           m_labels[bytecodeIndex + 3 + record.defaultOffset]);
 
       for (unsigned j = 0;
            j < record.jumpTable.simpleJumpTable->branchOffsets.size(); ++j) {
         unsigned offset = record.jumpTable.simpleJumpTable->branchOffsets[j];
         record.jumpTable.simpleJumpTable->ctiOffsets[j] =
-            offset ? patchBuffer.addressOf(m_labels[bytecodeIndex + 3 + offset])
-                   : record.jumpTable.simpleJumpTable->ctiDefault;
+            offset
+                ? patchBuffer.locationOf(m_labels[bytecodeIndex + 3 + offset])
+                : record.jumpTable.simpleJumpTable->ctiDefault;
       }
     } else {
       ASSERT(record.type == SwitchRecord::String);
 
-      record.jumpTable.stringJumpTable->ctiDefault = patchBuffer.addressOf(
+      record.jumpTable.stringJumpTable->ctiDefault = patchBuffer.locationOf(
           m_labels[bytecodeIndex + 3 + record.defaultOffset]);
 
       StringJumpTable::StringOffsetTable::iterator end =
@@ -1938,15 +1942,16 @@ void JIT::privateCompile() {
            it != end; ++it) {
         unsigned offset = it->second.branchOffset;
         it->second.ctiOffset =
-            offset ? patchBuffer.addressOf(m_labels[bytecodeIndex + 3 + offset])
-                   : record.jumpTable.stringJumpTable->ctiDefault;
+            offset
+                ? patchBuffer.locationOf(m_labels[bytecodeIndex + 3 + offset])
+                : record.jumpTable.stringJumpTable->ctiDefault;
       }
     }
   }
 
   for (size_t i = 0; i < m_codeBlock->numberOfExceptionHandlers(); ++i) {
     HandlerInfo& handler = m_codeBlock->exceptionHandler(i);
-    handler.nativeCode = patchBuffer.addressOf(m_labels[handler.target]);
+    handler.nativeCode = patchBuffer.locationOf(m_labels[handler.target]);
   }
 
   for (Vector<CallRecord>::iterator iter = m_calls.begin();
@@ -1968,16 +1973,16 @@ void JIT::privateCompile() {
   // Link absolute addresses for jsr
   for (Vector<JSRInfo>::iterator iter = m_jsrSites.begin();
        iter != m_jsrSites.end(); ++iter)
-    patchBuffer.setPtr(iter->storeLocation,
-                       patchBuffer.addressOf(iter->target));
+    patchBuffer.patch(iter->storeLocation,
+                      patchBuffer.locationOf(iter->target).addressForJSR());
 
   for (unsigned i = 0; i < m_codeBlock->numberOfStructureStubInfos(); ++i) {
     StructureStubInfo& info = m_codeBlock->structureStubInfo(i);
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
-    info.callReturnLocation = patchBuffer.addressOf(
+    info.callReturnLocation = patchBuffer.locationOf(
         m_propertyAccessCompilationInfo[i].callReturnLocation);
     info.hotPathBegin =
-        patchBuffer.addressOf(m_propertyAccessCompilationInfo[i].hotPathBegin);
+        patchBuffer.locationOf(m_propertyAccessCompilationInfo[i].hotPathBegin);
 #else
     info.callReturnLocation = 0;
     info.hotPathBegin = 0;
@@ -1986,13 +1991,13 @@ void JIT::privateCompile() {
   for (unsigned i = 0; i < m_codeBlock->numberOfCallLinkInfos(); ++i) {
     CallLinkInfo& info = m_codeBlock->callLinkInfo(i);
 #if ENABLE(JIT_OPTIMIZE_CALL)
-    info.callReturnLocation = patchBuffer.addressOf(
+    info.callReturnLocation = patchBuffer.locationOf(
         m_callStructureStubCompilationInfo[i].callReturnLocation);
-    info.hotPathBegin = patchBuffer.addressOf(
+    info.hotPathBegin = patchBuffer.locationOf(
         m_callStructureStubCompilationInfo[i].hotPathBegin);
-    info.hotPathOther = patchBuffer.addressOf(
+    info.hotPathOther = patchBuffer.locationOf(
         m_callStructureStubCompilationInfo[i].hotPathOther);
-    info.coldPathOther = patchBuffer.addressOf(
+    info.coldPathOther = patchBuffer.locationOf(
         m_callStructureStubCompilationInfo[i].coldPathOther);
 #else
     info.callReturnLocation = 0;
@@ -2063,7 +2068,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   Jump hasCodeBlock1 = branchTestPtr(NonZero, X86::eax);
   pop(X86::ebx);
   restoreArgumentReference();
-  Jump callJSFunction1 = call();
+  Call callJSFunction1 = call();
   emitGetJITStubArg(1, X86::ecx);
   emitGetJITStubArg(3, X86::edx);
   push(X86::ebx);
@@ -2077,7 +2082,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   emitPutJITStubArg(X86::ebx, 2);
   emitPutJITStubArg(X86::eax, 4);
   restoreArgumentReference();
-  Jump callArityCheck1 = call();
+  Call callArityCheck1 = call();
   move(X86::edx, callFrameRegister);
   emitGetJITStubArg(1, X86::ecx);
   emitGetJITStubArg(3, X86::edx);
@@ -2089,7 +2094,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   pop(X86::ebx);
   emitPutJITStubArg(X86::ebx, 2);
   restoreArgumentReference();
-  Jump callDontLazyLinkCall = call();
+  Call callDontLazyLinkCall = call();
   push(X86::ebx);
 
   jump(X86::eax);
@@ -2102,7 +2107,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   Jump hasCodeBlock2 = branchTestPtr(NonZero, X86::eax);
   pop(X86::ebx);
   restoreArgumentReference();
-  Jump callJSFunction2 = call();
+  Call callJSFunction2 = call();
   emitGetJITStubArg(1, X86::ecx);
   emitGetJITStubArg(3, X86::edx);
   push(X86::ebx);
@@ -2116,7 +2121,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   emitPutJITStubArg(X86::ebx, 2);
   emitPutJITStubArg(X86::eax, 4);
   restoreArgumentReference();
-  Jump callArityCheck2 = call();
+  Call callArityCheck2 = call();
   move(X86::edx, callFrameRegister);
   emitGetJITStubArg(1, X86::ecx);
   emitGetJITStubArg(3, X86::edx);
@@ -2128,7 +2133,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   pop(X86::ebx);
   emitPutJITStubArg(X86::ebx, 2);
   restoreArgumentReference();
-  Jump callLazyLinkCall = call();
+  Call callLazyLinkCall = call();
   push(X86::ebx);
 
   jump(X86::eax);
@@ -2141,7 +2146,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   Jump hasCodeBlock3 = branchTestPtr(NonZero, X86::eax);
   pop(X86::ebx);
   restoreArgumentReference();
-  Jump callJSFunction3 = call();
+  Call callJSFunction3 = call();
   emitGetJITStubArg(1, X86::ecx);
   emitGetJITStubArg(3, X86::edx);
   push(X86::ebx);
@@ -2155,7 +2160,7 @@ void JIT::privateCompileCTIMachineTrampolines() {
   emitPutJITStubArg(X86::ebx, 2);
   emitPutJITStubArg(X86::eax, 4);
   restoreArgumentReference();
-  Jump callArityCheck3 = call();
+  Call callArityCheck3 = call();
   move(X86::edx, callFrameRegister);
   emitGetJITStubArg(1, X86::ecx);
   emitGetJITStubArg(3, X86::edx);
@@ -2178,53 +2183,38 @@ void JIT::privateCompileCTIMachineTrampolines() {
   PatchBuffer patchBuffer(code);
 
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
-  patchBuffer.link(
-      array_failureCases1,
-      reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_array_fail));
-  patchBuffer.link(
-      array_failureCases2,
-      reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_array_fail));
-  patchBuffer.link(
-      array_failureCases3,
-      reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_array_fail));
-  patchBuffer.link(
-      string_failureCases1,
-      reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_string_fail));
-  patchBuffer.link(
-      string_failureCases2,
-      reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_string_fail));
-  patchBuffer.link(
-      string_failureCases3,
-      reinterpret_cast<void*>(Interpreter::cti_op_get_by_id_string_fail));
+  patchBuffer.linkTailRecursive(array_failureCases1,
+                                Interpreter::cti_op_get_by_id_array_fail);
+  patchBuffer.linkTailRecursive(array_failureCases2,
+                                Interpreter::cti_op_get_by_id_array_fail);
+  patchBuffer.linkTailRecursive(array_failureCases3,
+                                Interpreter::cti_op_get_by_id_array_fail);
+  patchBuffer.linkTailRecursive(string_failureCases1,
+                                Interpreter::cti_op_get_by_id_string_fail);
+  patchBuffer.linkTailRecursive(string_failureCases2,
+                                Interpreter::cti_op_get_by_id_string_fail);
+  patchBuffer.linkTailRecursive(string_failureCases3,
+                                Interpreter::cti_op_get_by_id_string_fail);
 
   m_interpreter->m_ctiArrayLengthTrampoline =
-      patchBuffer.addressOf(arrayLengthBegin);
+      patchBuffer.trampolineAt(arrayLengthBegin);
   m_interpreter->m_ctiStringLengthTrampoline =
-      patchBuffer.addressOf(stringLengthBegin);
+      patchBuffer.trampolineAt(stringLengthBegin);
 #endif
-  patchBuffer.link(callArityCheck1, reinterpret_cast<void*>(
-                                        Interpreter::cti_op_call_arityCheck));
-  patchBuffer.link(callArityCheck2, reinterpret_cast<void*>(
-                                        Interpreter::cti_op_call_arityCheck));
-  patchBuffer.link(callArityCheck3, reinterpret_cast<void*>(
-                                        Interpreter::cti_op_call_arityCheck));
-  patchBuffer.link(callJSFunction1, reinterpret_cast<void*>(
-                                        Interpreter::cti_op_call_JSFunction));
-  patchBuffer.link(callJSFunction2, reinterpret_cast<void*>(
-                                        Interpreter::cti_op_call_JSFunction));
-  patchBuffer.link(callJSFunction3, reinterpret_cast<void*>(
-                                        Interpreter::cti_op_call_JSFunction));
-  patchBuffer.link(
-      callDontLazyLinkCall,
-      reinterpret_cast<void*>(Interpreter::cti_vm_dontLazyLinkCall));
-  patchBuffer.link(callLazyLinkCall,
-                   reinterpret_cast<void*>(Interpreter::cti_vm_lazyLinkCall));
+  patchBuffer.link(callArityCheck1, Interpreter::cti_op_call_arityCheck);
+  patchBuffer.link(callArityCheck2, Interpreter::cti_op_call_arityCheck);
+  patchBuffer.link(callArityCheck3, Interpreter::cti_op_call_arityCheck);
+  patchBuffer.link(callJSFunction1, Interpreter::cti_op_call_JSFunction);
+  patchBuffer.link(callJSFunction2, Interpreter::cti_op_call_JSFunction);
+  patchBuffer.link(callJSFunction3, Interpreter::cti_op_call_JSFunction);
+  patchBuffer.link(callDontLazyLinkCall, Interpreter::cti_vm_dontLazyLinkCall);
+  patchBuffer.link(callLazyLinkCall, Interpreter::cti_vm_lazyLinkCall);
 
   m_interpreter->m_ctiVirtualCallPreLink =
-      patchBuffer.addressOf(virtualCallPreLinkBegin);
+      patchBuffer.trampolineAt(virtualCallPreLinkBegin);
   m_interpreter->m_ctiVirtualCallLink =
-      patchBuffer.addressOf(virtualCallLinkBegin);
-  m_interpreter->m_ctiVirtualCall = patchBuffer.addressOf(virtualCallBegin);
+      patchBuffer.trampolineAt(virtualCallLinkBegin);
+  m_interpreter->m_ctiVirtualCall = patchBuffer.trampolineAt(virtualCallBegin);
 }
 
 void JIT::emitGetVariableObjectRegister(RegisterID variableObject,

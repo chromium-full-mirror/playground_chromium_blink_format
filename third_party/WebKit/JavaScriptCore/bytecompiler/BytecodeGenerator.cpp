@@ -1706,7 +1706,8 @@ RegisterID* BytecodeGenerator::emitCatch(RegisterID* targetRegister,
 #if ENABLE(JIT)
   HandlerInfo info = {start->offsetFrom(0), end->offsetFrom(0),
                       instructions().size(),
-                      m_dynamicScopeDepth + m_baseScopeDepth, 0};
+                      m_dynamicScopeDepth + m_baseScopeDepth,
+                      MacroAssembler::CodeLocationLabel()};
 #else
   HandlerInfo info = {start->offsetFrom(0), end->offsetFrom(0),
                       instructions().size(),
@@ -1862,9 +1863,6 @@ static void prepareJumpTableForStringSwitch(StringJumpTable& jumpTable,
         static_cast<StringNode*>(nodes[i])->value().ustring().rep();
     OffsetLocation location;
     location.branchOffset = labels[i]->offsetFrom(switchAddress);
-#if ENABLE(JIT)
-    location.ctiOffset = 0;
-#endif
     jumpTable.offsetTable.add(clause, location);
   }
 }

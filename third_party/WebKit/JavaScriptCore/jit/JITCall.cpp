@@ -50,8 +50,7 @@ void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
   // (and, if a new JSFunction happened to be constructed at the same location,
   // we could get a false positive
   // match).  Reset the check so it no longer matches.
-  DataLabelPtr::patch(callLinkInfo->hotPathBegin,
-                      JSValuePtr::encode(jsImpossibleValue()));
+  callLinkInfo->hotPathBegin.repatch(JSValuePtr::encode(jsImpossibleValue()));
 }
 
 void JIT::linkCall(JSFunction* callee,
@@ -65,16 +64,14 @@ void JIT::linkCall(JSFunction* callee,
 
     calleeCodeBlock->addCaller(callLinkInfo);
 
-    DataLabelPtr::patch(callLinkInfo->hotPathBegin, callee);
-    Jump::patch(callLinkInfo->hotPathOther, ctiCode.addressForCall());
+    callLinkInfo->hotPathBegin.repatch(callee);
+    callLinkInfo->hotPathOther.relink(ctiCode.addressForCall());
   }
 
   // patch the instruction that jumps out to the cold path, so that we only try
   // to link once.
-  void* patchCheck = reinterpret_cast<void*>(
-      reinterpret_cast<ptrdiff_t>(callLinkInfo->hotPathBegin) +
-      patchOffsetOpCallCompareToJump);
-  Jump::patch(patchCheck, callLinkInfo->coldPathOther);
+  callLinkInfo->hotPathBegin.jumpAtOffset(patchOffsetOpCallCompareToJump)
+      .relink(callLinkInfo->coldPathOther);
 }
 
 void JIT::compileOpCallInitializeCallFrame() {

@@ -122,13 +122,13 @@ typedef int(JIT_STUB* CTIHelper_b)(STUB_ARGS);
 typedef VoidPtrPair(JIT_STUB* CTIHelper_2)(STUB_ARGS);
 
 struct CallRecord {
-  MacroAssembler::Jump from;
+  MacroAssembler::Call from;
   unsigned bytecodeIndex;
   void* to;
 
   CallRecord() {}
 
-  CallRecord(MacroAssembler::Jump from, unsigned bytecodeIndex, void* to = 0)
+  CallRecord(MacroAssembler::Call from, unsigned bytecodeIndex, void* to = 0)
       : from(from), bytecodeIndex(bytecodeIndex), to(to) {}
 };
 
@@ -180,14 +180,14 @@ struct SwitchRecord {
 };
 
 struct PropertyStubCompilationInfo {
-  MacroAssembler::Jump callReturnLocation;
+  MacroAssembler::Call callReturnLocation;
   MacroAssembler::Label hotPathBegin;
 };
 
 struct StructureStubCompilationInfo {
   MacroAssembler::DataLabelPtr hotPathBegin;
-  MacroAssembler::Jump hotPathOther;
-  MacroAssembler::Jump callReturnLocation;
+  MacroAssembler::Call hotPathOther;
+  MacroAssembler::Call callReturnLocation;
   MacroAssembler::Label coldPathOther;
 };
 
@@ -195,8 +195,11 @@ extern "C" {
 void ctiVMThrowTrampoline();
 };
 
-void ctiSetReturnAddress(void** where, void* what);
-void ctiPatchCallByReturnAddress(void* where, void* what);
+void ctiSetReturnAddress(void** addressOfReturnAddress,
+                         void* newDestinationToReturnTo);
+void ctiPatchCallByReturnAddress(
+    MacroAssembler::ProcessorReturnAddress returnAddress,
+    void* newCalleeFunction);
 
 class JIT : private MacroAssembler {
   using MacroAssembler::Jump;
@@ -279,7 +282,7 @@ class JIT : private MacroAssembler {
                                  StructureStubInfo* stubInfo,
                                  Structure* structure,
                                  size_t cachedOffset,
-                                 void* returnAddress) {
+                                 ProcessorReturnAddress returnAddress) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdSelf(stubInfo, structure, cachedOffset,
                                   returnAddress);
@@ -292,7 +295,7 @@ class JIT : private MacroAssembler {
                                   Structure* structure,
                                   Structure* prototypeStructure,
                                   size_t cachedOffset,
-                                  void* returnAddress) {
+                                  ProcessorReturnAddress returnAddress) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdProto(stubInfo, structure, prototypeStructure,
                                    cachedOffset, returnAddress, callFrame);
@@ -352,7 +355,7 @@ class JIT : private MacroAssembler {
                                   StructureChain* chain,
                                   size_t count,
                                   size_t cachedOffset,
-                                  void* returnAddress) {
+                                  ProcessorReturnAddress returnAddress) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdChain(stubInfo, structure, chain, count,
                                    cachedOffset, returnAddress, callFrame);
@@ -363,7 +366,7 @@ class JIT : private MacroAssembler {
                                     StructureStubInfo* stubInfo,
                                     Structure* structure,
                                     size_t cachedOffset,
-                                    void* returnAddress) {
+                                    ProcessorReturnAddress returnAddress) {
     JIT jit(globalData, codeBlock);
     jit.privateCompilePutByIdReplace(stubInfo, structure, cachedOffset,
                                      returnAddress);
@@ -376,7 +379,7 @@ class JIT : private MacroAssembler {
                                        Structure* newStructure,
                                        size_t cachedOffset,
                                        StructureChain* chain,
-                                       void* returnAddress) {
+                                       ProcessorReturnAddress returnAddress) {
     JIT jit(globalData, codeBlock);
     jit.privateCompilePutByIdTransition(stubInfo, oldStructure, newStructure,
                                         cachedOffset, chain, returnAddress);
@@ -390,15 +393,15 @@ class JIT : private MacroAssembler {
   static void patchGetByIdSelf(StructureStubInfo*,
                                Structure*,
                                size_t cachedOffset,
-                               void* returnAddress);
+                               ProcessorReturnAddress returnAddress);
   static void patchPutByIdReplace(StructureStubInfo*,
                                   Structure*,
                                   size_t cachedOffset,
-                                  void* returnAddress);
+                                  ProcessorReturnAddress returnAddress);
 
   static void compilePatchGetArrayLength(JSGlobalData* globalData,
                                          CodeBlock* codeBlock,
-                                         void* returnAddress) {
+                                         ProcessorReturnAddress returnAddress) {
     JIT jit(globalData, codeBlock);
     return jit.privateCompilePatchGetArrayLength(returnAddress);
   }
@@ -420,12 +423,12 @@ class JIT : private MacroAssembler {
   void privateCompileGetByIdSelf(StructureStubInfo*,
                                  Structure*,
                                  size_t cachedOffset,
-                                 void* returnAddress);
+                                 ProcessorReturnAddress returnAddress);
   void privateCompileGetByIdProto(StructureStubInfo*,
                                   Structure*,
                                   Structure* prototypeStructure,
                                   size_t cachedOffset,
-                                  void* returnAddress,
+                                  ProcessorReturnAddress returnAddress,
                                   CallFrame* callFrame);
 #if USE(CTI_REPATCH_PIC)
   void privateCompileGetByIdSelfList(StructureStubInfo*,
@@ -454,21 +457,21 @@ class JIT : private MacroAssembler {
                                   StructureChain*,
                                   size_t count,
                                   size_t cachedOffset,
-                                  void* returnAddress,
+                                  ProcessorReturnAddress returnAddress,
                                   CallFrame* callFrame);
   void privateCompilePutByIdReplace(StructureStubInfo*,
                                     Structure*,
                                     size_t cachedOffset,
-                                    void* returnAddress);
+                                    ProcessorReturnAddress returnAddress);
   void privateCompilePutByIdTransition(StructureStubInfo*,
                                        Structure*,
                                        Structure*,
                                        size_t cachedOffset,
                                        StructureChain*,
-                                       void* returnAddress);
+                                       ProcessorReturnAddress returnAddress);
 
   void privateCompileCTIMachineTrampolines();
-  void privateCompilePatchGetArrayLength(void* returnAddress);
+  void privateCompilePatchGetArrayLength(ProcessorReturnAddress returnAddress);
 
   void addSlowCase(Jump);
   void addJump(Jump, int);
@@ -647,28 +650,28 @@ class JIT : private MacroAssembler {
   void restoreArgumentReference();
   void restoreArgumentReferenceForTrampoline();
 
-  Jump emitNakedCall(RegisterID);
-  Jump emitNakedCall(void* function);
-  Jump emitCTICall_internal(void*);
-  Jump emitCTICall(CTIHelper_j helper) {
+  Call emitNakedCall(RegisterID);
+  Call emitNakedCall(void* function);
+  Call emitCTICall_internal(void*);
+  Call emitCTICall(CTIHelper_j helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  Jump emitCTICall(CTIHelper_o helper) {
+  Call emitCTICall(CTIHelper_o helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  Jump emitCTICall(CTIHelper_p helper) {
+  Call emitCTICall(CTIHelper_p helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  Jump emitCTICall(CTIHelper_v helper) {
+  Call emitCTICall(CTIHelper_v helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  Jump emitCTICall(CTIHelper_s helper) {
+  Call emitCTICall(CTIHelper_s helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  Jump emitCTICall(CTIHelper_b helper) {
+  Call emitCTICall(CTIHelper_b helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
-  Jump emitCTICall(CTIHelper_2 helper) {
+  Call emitCTICall(CTIHelper_2 helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }
 

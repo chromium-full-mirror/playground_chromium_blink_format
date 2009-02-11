@@ -1125,7 +1125,10 @@ class X86Assembler {
         (reinterpret_cast<ptrdiff_t>(code) + from.m_offset);
   }
 
-  static ptrdiff_t getCallReturnOffset(JmpSrc call) { return call.m_offset; }
+  static unsigned getCallReturnOffset(JmpSrc call) {
+    ASSERT(call.m_offset >= 0);
+    return call.m_offset;
+  }
 
   static void* getRelocatedAddress(void* code, JmpSrc jump) {
     return reinterpret_cast<void*>(reinterpret_cast<ptrdiff_t>(code) +

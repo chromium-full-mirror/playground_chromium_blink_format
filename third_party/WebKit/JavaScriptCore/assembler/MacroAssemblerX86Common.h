@@ -480,19 +480,9 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
 
   void breakpoint() { m_assembler.int3(); }
 
-  Jump call() { return Jump(m_assembler.call()); }
+  Call call() { return Call(m_assembler.call(), true); }
 
-  // FIXME: why does this return a Jump object? - it can't be linked.
-  // This may be to get a reference to the return address of the call.
-  //
-  // This should probably be handled by a separate label type to a regular
-  // jump.  Todo: add a CallLabel type, for the regular call - can be linked
-  // like a jump (possibly a subclass of jump?, or possibly casts to a Jump).
-  // Also add a CallReturnLabel type for this to return (just a more JmpDsty
-  // form of label, can get the void* after the code has been linked, but can't
-  // try to link it like a Jump object), and let the CallLabel be cast into a
-  // CallReturnLabel.
-  Jump call(RegisterID target) { return Jump(m_assembler.call(target)); }
+  Call call(RegisterID target) { return Call(m_assembler.call(target), false); }
 
   void ret() { m_assembler.ret(); }
 
