@@ -68,7 +68,7 @@ static inline float cumulativeCharacterRangeLength(
     return 0.0f;
 
   float textLength = 0.0f;
-  RenderStyle* style = textBox->textObject()->style();
+  RenderStyle* style = textBox->textRenderer()->style();
 
   bool usesFullRange = (startPosition == -1 && length == -1);
 
@@ -134,7 +134,7 @@ struct SVGInlineTextBoxQueryWalker {
                             const TransformationMatrix&,
                             const Vector<SVGChar>::iterator& start,
                             const Vector<SVGChar>::iterator& end) {
-    RenderStyle* style = textBox->textObject()->style();
+    RenderStyle* style = textBox->textRenderer()->style();
     bool isVerticalText = style->svgStyle()->writingMode() == WM_TBRL ||
                           style->svgStyle()->writingMode() == WM_TB;
 
@@ -329,7 +329,7 @@ static Vector<SVGInlineTextBox*> findInlineTextBoxInTextChunks(
     for (; boxIt != boxEnd; ++boxIt) {
       SVGInlineTextBox* textBox = static_cast<SVGInlineTextBox*>(boxIt->box);
 
-      Node* textElement = textBox->textObject()->parent()->element();
+      Node* textElement = textBox->textRenderer()->parent()->element();
       ASSERT(textElement);
 
       if (textElement == element || textElement->parent() == element)

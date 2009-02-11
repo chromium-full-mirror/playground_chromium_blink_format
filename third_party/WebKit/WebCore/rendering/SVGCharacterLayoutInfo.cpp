@@ -265,7 +265,7 @@ void SVGCharacterLayoutInfo::addLayoutInformation(InlineFlowBox* flowBox,
                          curx == 0.0f && cury == 0.0f;
 
   RenderSVGTextPath* textPath =
-      static_cast<RenderSVGTextPath*>(flowBox->object());
+      static_cast<RenderSVGTextPath*>(flowBox->renderer());
   Path path = textPath->layoutPath();
 
   float baselineShift = calculateBaselineShift(textPath);

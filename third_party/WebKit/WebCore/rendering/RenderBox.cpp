@@ -922,7 +922,7 @@ void RenderBox::paintCustomHighlight(int tx,
   InlineBox* boxWrap = inlineBoxWrapper();
   RootInlineBox* r = boxWrap ? boxWrap->root() : 0;
   if (r) {
-    FloatRect rootRect(tx + r->xPos(), ty + r->selectionTop(), r->width(),
+    FloatRect rootRect(tx + r->x(), ty + r->selectionTop(), r->width(),
                        r->selectionHeight());
     FloatRect imageRect(tx + x(), rootRect.y(), width(), rootRect.height());
     page->chrome()->client()->paintCustomHighlight(node(), type, imageRect,
@@ -1125,7 +1125,7 @@ void RenderBox::position(InlineBox* box) {
       // our object was inline originally, since otherwise it would have ended
       // up underneath
       // the inlines.
-      layer()->setStaticX(box->xPos());
+      layer()->setStaticX(box->x());
       setChildNeedsLayout(true, false);  // Just go ahead and mark the
                                          // positioned object as needing layout,
                                          // so it will update its position
@@ -1137,8 +1137,8 @@ void RenderBox::position(InlineBox* box) {
       // got
       // wrapped in an anonymous block, which is what would have happened had we
       // been
-      // in flow).  This value was cached in the yPos() of the box.
-      layer()->setStaticY(box->yPos());
+      // in flow).  This value was cached in the y() of the box.
+      layer()->setStaticY(box->y());
       setChildNeedsLayout(true, false);  // Just go ahead and mark the
                                          // positioned object as needing layout,
                                          // so it will update its position
@@ -1149,7 +1149,7 @@ void RenderBox::position(InlineBox* box) {
     box->remove();
     box->destroy(renderArena());
   } else if (isReplaced()) {
-    setLocation(box->xPos(), box->yPos());
+    setLocation(box->x(), box->y());
     m_inlineBoxWrapper = box;
   }
 }
@@ -1874,11 +1874,11 @@ int RenderBox::containingBlockWidthForPositioned(
   int fromLeft;
   int fromRight;
   if (containingBlock->style()->direction() == LTR) {
-    fromLeft = first->xPos() + first->borderLeft();
-    fromRight = last->xPos() + last->width() - last->borderRight();
+    fromLeft = first->x() + first->borderLeft();
+    fromRight = last->x() + last->width() - last->borderRight();
   } else {
-    fromRight = first->xPos() + first->width() - first->borderRight();
-    fromLeft = last->xPos() + last->borderLeft();
+    fromRight = first->x() + first->width() - first->borderRight();
+    fromLeft = last->x() + last->borderLeft();
   }
 
   return max(0, (fromRight - fromLeft));
@@ -2256,7 +2256,7 @@ void RenderBox::calcAbsoluteHorizontalValues(
     InlineFlowBox* lastLine = flow->lastLineBox();
     if (firstLine && lastLine && firstLine != lastLine) {
       xPos = leftValue + marginLeftValue + lastLine->borderLeft() +
-             (lastLine->xPos() - firstLine->xPos());
+             (lastLine->x() - firstLine->x());
       return;
     }
   }
@@ -2696,7 +2696,7 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
     InlineFlowBox* lastLine = flow->lastLineBox();
     if (firstLine && lastLine && firstLine != lastLine) {
       m_frameRect.setX(leftValue + m_marginLeft + lastLine->borderLeft() +
-                       (lastLine->xPos() - firstLine->xPos()));
+                       (lastLine->x() - firstLine->x()));
       return;
     }
   }

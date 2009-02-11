@@ -424,7 +424,7 @@ static inline void writeSVGInlineTextBox(TextStream& ts,
 
       ts << ": "
          << quoteAndEscapeNonPrintables(
-                String(textBox->textObject()->text())
+                String(textBox->textRenderer()->text())
                     .substring(textBox->start() + range.startOffset, offset))
          << "\n";
 

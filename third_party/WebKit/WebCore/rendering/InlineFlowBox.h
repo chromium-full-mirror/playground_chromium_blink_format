@@ -161,16 +161,16 @@ class InlineFlowBox : public InlineRunBox {
   }
   int borderLeft() const {
     if (includeLeftEdge())
-      return object()->style()->borderLeftWidth();
+      return renderer()->style()->borderLeftWidth();
     return 0;
   }
   int borderRight() const {
     if (includeRightEdge())
-      return object()->style()->borderRightWidth();
+      return renderer()->style()->borderRightWidth();
     return 0;
   }
-  int borderTop() const { return object()->style()->borderTopWidth(); }
-  int borderBottom() const { return object()->style()->borderBottomWidth(); }
+  int borderTop() const { return renderer()->style()->borderTopWidth(); }
+  int borderBottom() const { return renderer()->style()->borderBottomWidth(); }
   int paddingLeft() const {
     if (includeLeftEdge())
       return boxModelObject()->paddingLeft();
@@ -192,7 +192,7 @@ class InlineFlowBox : public InlineRunBox {
   }
 
   int baseline() const {
-    return object()->style(m_firstLine)->font().ascent() + borderTop() +
+    return renderer()->style(m_firstLine)->font().ascent() + borderTop() +
            paddingTop();
   }
 

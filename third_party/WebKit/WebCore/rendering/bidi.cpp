@@ -542,7 +542,7 @@ RootInlineBox* RenderBlock::constructLine(unsigned runCount,
       // then we need to construct inline boxes as necessary to properly enclose
       // the
       // run's inline box.
-      if (!parentBox || parentBox->object() != r->m_object->parent())
+      if (!parentBox || parentBox->renderer() != r->m_object->parent())
         // Create new inline boxes all the way back to the appropriate insertion
         // point.
         parentBox = createLineBoxes(r->m_object->parent(), firstLine);
@@ -770,7 +770,7 @@ void RenderBlock::computeVerticalPositionsForLine(RootInlineBox* lineBox,
     // Align positioned boxes with the top of the line box.  This is
     // a reasonable approximation of an appropriate y position.
     if (r->m_object->isPositioned())
-      r->m_box->setYPos(height());
+      r->m_box->setY(height());
 
     // Position is used to properly position both replaced elements and
     // to update the static normal flow x/y of positioned elements.
@@ -942,9 +942,9 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       // A line break can be either the first or the last object on a line,
       // depending on its direction.
       if (InlineBox* lastLeafChild = lastRootBox()->lastLeafChild()) {
-        RenderObject* lastObject = lastLeafChild->object();
+        RenderObject* lastObject = lastLeafChild->renderer();
         if (!lastObject->isBR())
-          lastObject = lastRootBox()->firstLeafChild()->object();
+          lastObject = lastRootBox()->firstLeafChild()->renderer();
         if (lastObject->isBR()) {
           EClear clear = lastObject->style()->clear();
           if (clear != CNONE)
@@ -2425,9 +2425,9 @@ void RenderBlock::checkLinesForTextOverflow() {
   // "contentWidth()"
   bool ltr = style()->direction() == LTR;
   for (RootInlineBox* curr = firstRootBox(); curr; curr = curr->nextRootBox()) {
-    int blockEdge = ltr ? rightOffset(curr->yPos(), curr == firstRootBox())
-                        : leftOffset(curr->yPos(), curr == firstRootBox());
-    int lineBoxEdge = ltr ? curr->xPos() + curr->width() : curr->xPos();
+    int blockEdge = ltr ? rightOffset(curr->y(), curr == firstRootBox())
+                        : leftOffset(curr->y(), curr == firstRootBox());
+    int lineBoxEdge = ltr ? curr->x() + curr->width() : curr->x();
     if ((ltr && lineBoxEdge > blockEdge) || (!ltr && lineBoxEdge < blockEdge)) {
       // This line spills out of our box in the appropriate direction.  Now we
       // need to see if the line

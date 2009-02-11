@@ -449,8 +449,8 @@ void RenderInline::absoluteRects(Vector<IntRect>& rects,
                                  int ty,
                                  bool topLevel) {
   for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox())
-    rects.append(IntRect(tx + curr->xPos(), ty + curr->yPos(), curr->width(),
-                         curr->height()));
+    rects.append(
+        IntRect(tx + curr->x(), ty + curr->y(), curr->width(), curr->height()));
 
   if (continuation() && topLevel) {
     if (continuation()->isBox()) {
@@ -466,8 +466,7 @@ void RenderInline::absoluteRects(Vector<IntRect>& rects,
 
 void RenderInline::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
   for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox()) {
-    FloatRect localRect(curr->xPos(), curr->yPos(), curr->width(),
-                        curr->height());
+    FloatRect localRect(curr->x(), curr->y(), curr->width(), curr->height());
     quads.append(localToAbsoluteQuad(localRect));
   }
 
@@ -478,14 +477,14 @@ void RenderInline::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
 int RenderInline::offsetLeft() const {
   int x = RenderBoxModelObject::offsetLeft();
   if (firstLineBox())
-    x += firstLineBox()->xPos();
+    x += firstLineBox()->x();
   return x;
 }
 
 int RenderInline::offsetTop() const {
   int y = RenderBoxModelObject::offsetTop();
   if (firstLineBox())
-    y += firstLineBox()->yPos();
+    y += firstLineBox()->y();
   return y;
 }
 
@@ -576,16 +575,16 @@ IntRect RenderInline::linesBoundingBox() const {
     int rightSide = 0;
     for (InlineRunBox* curr = firstLineBox(); curr;
          curr = curr->nextLineBox()) {
-      if (curr == firstLineBox() || curr->xPos() < leftSide)
-        leftSide = curr->xPos();
-      if (curr == firstLineBox() || curr->xPos() + curr->width() > rightSide)
-        rightSide = curr->xPos() + curr->width();
+      if (curr == firstLineBox() || curr->x() < leftSide)
+        leftSide = curr->x();
+      if (curr == firstLineBox() || curr->x() + curr->width() > rightSide)
+        rightSide = curr->x() + curr->width();
     }
     result.setWidth(rightSide - leftSide);
     result.setX(leftSide);
-    result.setHeight(lastLineBox()->yPos() + lastLineBox()->height() -
-                     firstLineBox()->yPos());
-    result.setY(firstLineBox()->yPos());
+    result.setHeight(lastLineBox()->y() + lastLineBox()->height() -
+                     firstLineBox()->y());
+    result.setY(firstLineBox()->y());
   }
 
   return result;
@@ -849,8 +848,8 @@ IntSize RenderInline::relativePositionedInlineOffset(
   int sx;
   int sy;
   if (firstLineBox()) {
-    sx = firstLineBox()->xPos();
-    sy = firstLineBox()->yPos();
+    sx = firstLineBox()->x();
+    sy = firstLineBox()->y();
   } else {
     sx = layer()->staticX();
     sy = layer()->staticY();
@@ -889,8 +888,8 @@ void RenderInline::addFocusRingRects(GraphicsContext* graphicsContext,
                                      int tx,
                                      int ty) {
   for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox())
-    graphicsContext->addFocusRingRect(IntRect(
-        tx + curr->xPos(), ty + curr->yPos(), curr->width(), curr->height()));
+    graphicsContext->addFocusRingRect(
+        IntRect(tx + curr->x(), ty + curr->y(), curr->width(), curr->height()));
 
   for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
     if (!curr->isText() && !curr->isListMarker()) {
@@ -946,8 +945,7 @@ void RenderInline::paintOutline(GraphicsContext* graphicsContext,
 
   rects.append(IntRect());
   for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox())
-    rects.append(
-        IntRect(curr->xPos(), curr->yPos(), curr->width(), curr->height()));
+    rects.append(IntRect(curr->x(), curr->y(), curr->width(), curr->height()));
 
   rects.append(IntRect());
 

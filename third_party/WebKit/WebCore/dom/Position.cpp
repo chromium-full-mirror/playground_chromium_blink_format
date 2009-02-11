@@ -424,7 +424,7 @@ Position Position::upstream() const {
           if (!otherBox)
             break;
           if (otherBox == lastTextBox ||
-              otherBox->object() == textRenderer &&
+              otherBox->renderer() == textRenderer &&
                   static_cast<InlineTextBox*>(otherBox)->start() > textOffset)
             continuesOnNextLine = false;
         }
@@ -435,7 +435,7 @@ Position Position::upstream() const {
           if (!otherBox)
             break;
           if (otherBox == lastTextBox ||
-              otherBox->object() == textRenderer &&
+              otherBox->renderer() == textRenderer &&
                   static_cast<InlineTextBox*>(otherBox)->start() > textOffset)
             continuesOnNextLine = false;
         }
@@ -551,7 +551,7 @@ Position Position::downstream() const {
           if (!otherBox)
             break;
           if (otherBox == lastTextBox ||
-              otherBox->object() == textRenderer &&
+              otherBox->renderer() == textRenderer &&
                   static_cast<InlineTextBox*>(otherBox)->start() >= textOffset)
             continuesOnNextLine = false;
         }
@@ -562,7 +562,7 @@ Position Position::downstream() const {
           if (!otherBox)
             break;
           if (otherBox == lastTextBox ||
-              otherBox->object() == textRenderer &&
+              otherBox->renderer() == textRenderer &&
                   static_cast<InlineTextBox*>(otherBox)->start() >= textOffset)
             continuesOnNextLine = false;
         }

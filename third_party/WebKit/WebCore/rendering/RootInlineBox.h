@@ -62,7 +62,7 @@ class RootInlineBox : public InlineFlowBox {
   }
   virtual int bottomOverflow() const {
     return m_overflow ? m_overflow->m_bottomOverflow
-                      : m_y + m_object->style(m_firstLine)->font().height();
+                      : m_y + m_renderer->style(m_firstLine)->font().height();
   }
   virtual int leftOverflow() const {
     return m_overflow ? m_overflow->m_leftOverflow : m_x;
@@ -169,7 +169,7 @@ class RootInlineBox : public InlineFlowBox {
   Vector<RenderBox*>& floats() {
     ASSERT(!isDirty());
     if (!m_overflow)
-      m_overflow = new (m_object->renderArena()) Overflow(this);
+      m_overflow = new (m_renderer->renderArena()) Overflow(this);
     return m_overflow->floats;
   }
 
@@ -240,7 +240,7 @@ inline void RootInlineBox::setHorizontalOverflowPositions(int left, int right) {
   if (!m_overflow) {
     if (left == m_x && right == m_x + m_width)
       return;
-    m_overflow = new (m_object->renderArena()) Overflow(this);
+    m_overflow = new (m_renderer->renderArena()) Overflow(this);
   }
   m_overflow->m_leftOverflow = left;
   m_overflow->m_rightOverflow = right;
@@ -248,10 +248,10 @@ inline void RootInlineBox::setHorizontalOverflowPositions(int left, int right) {
 
 inline void RootInlineBox::setVerticalSelectionPositions(int top, int bottom) {
   if (!m_overflow) {
-    const Font& font = m_object->style(m_firstLine)->font();
+    const Font& font = m_renderer->style(m_firstLine)->font();
     if (top == m_y && bottom == m_y + font.height())
       return;
-    m_overflow = new (m_object->renderArena()) Overflow(this);
+    m_overflow = new (m_renderer->renderArena()) Overflow(this);
   }
   m_overflow->m_selectionTop = top;
   m_overflow->m_selectionBottom = bottom;

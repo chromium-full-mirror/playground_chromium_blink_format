@@ -74,21 +74,21 @@ void InlineBox::operator delete(void* ptr, size_t sz) {
 
 #ifndef NDEBUG
 void InlineBox::showTreeForThis() const {
-  if (m_object)
-    m_object->showTreeForThis();
+  if (m_renderer)
+    m_renderer->showTreeForThis();
 }
 #endif
 
 int InlineBox::height() const {
-  return toRenderBox(m_object)->height();
+  return toRenderBox(m_renderer)->height();
 }
 
 int InlineBox::caretMinOffset() const {
-  return m_object->caretMinOffset();
+  return m_renderer->caretMinOffset();
 }
 
 int InlineBox::caretMaxOffset() const {
-  return m_object->caretMaxOffset();
+  return m_renderer->caretMaxOffset();
 }
 
 unsigned InlineBox::caretMaxRenderedOffset() const {
@@ -104,31 +104,31 @@ void InlineBox::dirtyLineBoxes() {
 
 void InlineBox::deleteLine(RenderArena* arena) {
   if (!m_extracted)
-    m_object->setInlineBoxWrapper(0);
+    m_renderer->setInlineBoxWrapper(0);
   destroy(arena);
 }
 
 void InlineBox::extractLine() {
   m_extracted = true;
-  m_object->setInlineBoxWrapper(0);
+  m_renderer->setInlineBoxWrapper(0);
 }
 
 void InlineBox::attachLine() {
   m_extracted = false;
-  m_object->setInlineBoxWrapper(this);
+  m_renderer->setInlineBoxWrapper(this);
 }
 
 void InlineBox::adjustPosition(int dx, int dy) {
   m_x += dx;
   m_y += dy;
-  if (m_object->isReplaced()) {
-    RenderBox* box = toRenderBox(m_object);
+  if (m_renderer->isReplaced()) {
+    RenderBox* box = toRenderBox(m_renderer);
     box->move(dx, dy);
   }
 }
 
 void InlineBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
-  if (!object()->shouldPaintWithinRoot(paintInfo) ||
+  if (!renderer()->shouldPaintWithinRoot(paintInfo) ||
       (paintInfo.phase != PaintPhaseForeground &&
        paintInfo.phase != PaintPhaseSelection))
     return;
@@ -142,16 +142,16 @@ void InlineBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
                        paintInfo.phase == PaintPhaseTextClip;
   RenderObject::PaintInfo info(paintInfo);
   info.phase = preservePhase ? paintInfo.phase : PaintPhaseBlockBackground;
-  object()->paint(info, tx, ty);
+  renderer()->paint(info, tx, ty);
   if (!preservePhase) {
     info.phase = PaintPhaseChildBlockBackgrounds;
-    object()->paint(info, tx, ty);
+    renderer()->paint(info, tx, ty);
     info.phase = PaintPhaseFloat;
-    object()->paint(info, tx, ty);
+    renderer()->paint(info, tx, ty);
     info.phase = PaintPhaseForeground;
-    object()->paint(info, tx, ty);
+    renderer()->paint(info, tx, ty);
     info.phase = PaintPhaseOutline;
-    object()->paint(info, tx, ty);
+    renderer()->paint(info, tx, ty);
   }
 }
 
@@ -166,7 +166,7 @@ bool InlineBox::nodeAtPoint(const HitTestRequest& request,
   // own stacking context.  (See Appendix E.2, section 6.4 on inline block/table
   // elements in the CSS2.1
   // specification.)
-  return object()->hitTest(request, result, IntPoint(x, y), tx, ty);
+  return renderer()->hitTest(request, result, IntPoint(x, y), tx, ty);
 }
 
 const RootInlineBox* InlineBox::root() const {
@@ -228,14 +228,14 @@ InlineBox* InlineBox::prevLeafChild() {
 }
 
 RenderObject::SelectionState InlineBox::selectionState() {
-  return object()->selectionState();
+  return renderer()->selectionState();
 }
 
 bool InlineBox::canAccommodateEllipsis(bool ltr,
                                        int blockEdge,
                                        int ellipsisWidth) {
   // Non-replaced elements can always accommodate an ellipsis.
-  if (!m_object || !m_object->isReplaced())
+  if (!m_renderer || !m_renderer->isReplaced())
     return true;
 
   IntRect boxRect(m_x, 0, m_width, 10);
