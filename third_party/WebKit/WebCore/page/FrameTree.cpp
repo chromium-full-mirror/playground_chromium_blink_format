@@ -77,10 +77,6 @@ void FrameTree::appendChild(PassRefPtr<Frame> child) {
 
 void FrameTree::removeChild(Frame* child) {
   child->tree()->m_parent = 0;
-  child->setView(0);
-  if (child->ownerElement())
-    child->page()->decrementFrameCount();
-  child->pageDestroyed();
 
   // Slightly tricky way to prevent deleting the child until we are done with
   // it, w/o

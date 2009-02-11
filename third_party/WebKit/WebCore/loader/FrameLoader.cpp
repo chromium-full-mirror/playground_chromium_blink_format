@@ -3007,8 +3007,7 @@ void FrameLoader::commitProvisionalLoad(PassRefPtr<CachedPage> prpCachedPage) {
   // the back/forward cache.
   // We are doing this here because we know for sure that a new page is about to
   // be loaded.
-  if (canCachePage() && !m_currentHistoryItem->isInPageCache())
-    cachePageForHistoryItem(m_currentHistoryItem.get());
+  cachePageForHistoryItem(m_currentHistoryItem.get());
 
   if (m_loadType != FrameLoadTypeReplace)
     closeOldDataSources();
@@ -3050,7 +3049,43 @@ void FrameLoader::commitProvisionalLoad(PassRefPtr<CachedPage> prpCachedPage) {
       m_frame->tree()->name().string().utf8().data(),
       m_URL.string().utf8().data());
 
-  opened();
+  if (m_loadType == FrameLoadTypeStandard &&
+      m_documentLoader->isClientRedirect())
+    updateHistoryForClientRedirect();
+
+  if (m_documentLoader->isLoadingFromCachedPage()) {
+    m_frame->document()->documentDidBecomeActive();
+
+    // Force a layout to update view size and thereby update scrollbars.
+    m_client->forceLayout();
+
+    const ResponseVector& responses = m_documentLoader->responses();
+    size_t count = responses.size();
+    for (size_t i = 0; i < count; i++) {
+      const ResourceResponse& response = responses[i];
+      // FIXME: If the WebKit client changes or cancels the request, this is not
+      // respected.
+      ResourceError error;
+      unsigned long identifier;
+      ResourceRequest request(response.url());
+      requestFromDelegate(request, identifier, error);
+      // FIXME: If we get a resource with more than 2B bytes, this code won't do
+      // the right thing.
+      // However, with today's computers and networking speeds, this won't
+      // happen in practice.
+      // Could be an issue with a giant local file.
+      sendRemainingDelegateMessages(
+          identifier, response,
+          static_cast<int>(response.expectedContentLength()), error);
+    }
+
+    pageCache()->remove(m_currentHistoryItem.get());
+
+    m_documentLoader->setPrimaryLoadComplete(true);
+
+    // FIXME: Why only this frame and not parent frames?
+    checkLoadCompleteForThisFrame();
+  }
 }
 
 void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
@@ -3245,6 +3280,7 @@ void FrameLoader::closeOldDataSources() {
 }
 
 void FrameLoader::open(CachedPage& cachedPage) {
+  ASSERT(!m_frame->tree()->parent());
   ASSERT(m_frame->page());
   ASSERT(m_frame->page()->mainFrame() == m_frame);
 
@@ -3253,18 +3289,24 @@ void FrameLoader::open(CachedPage& cachedPage) {
   // We still have to close the previous part page.
   closeURL();
 
-  m_isComplete = false;
-
-  // Don't re-emit the load event.
-  m_didCallImplicitClose = true;
-
   // Delete old status bar messages (if it _was_ activated on last URL).
   if (m_frame->script()->isEnabled()) {
     m_frame->setJSStatusBarText(String());
     m_frame->setJSDefaultStatusBarText(String());
   }
 
-  KURL url = cachedPage.url();
+  open(*cachedPage.cachedMainFrame());
+
+  checkCompleted();
+}
+
+void FrameLoader::open(CachedFrame& cachedFrame) {
+  m_isComplete = false;
+
+  // Don't re-emit the load event.
+  m_didCallImplicitClose = true;
+
+  KURL url = cachedFrame.url();
 
   if ((url.protocolIs("http") || url.protocolIs("https")) &&
       !url.host().isEmpty() && url.path().isEmpty())
@@ -3277,7 +3319,7 @@ void FrameLoader::open(CachedPage& cachedPage) {
 
   clear();
 
-  Document* document = cachedPage.document();
+  Document* document = cachedFrame.document();
   ASSERT(document);
   document->setInPageCache(false);
 
@@ -3286,13 +3328,17 @@ void FrameLoader::open(CachedPage& cachedPage) {
   m_didCallImplicitClose = false;
   m_outgoingReferrer = url.string();
 
-  FrameView* view = cachedPage.mainFrameView();
+  FrameView* view = cachedFrame.view();
+
+  // When navigating to a CachedFrame its FrameView should never be null.  If it
+  // is we'll crash in creative ways downstream.
+  ASSERT(view);
   if (view)
     view->setWasScrolledByUser(false);
   m_frame->setView(view);
 
   m_frame->setDocument(document);
-  m_frame->setDOMWindow(cachedPage.domWindow());
+  m_frame->setDOMWindow(cachedFrame.domWindow());
   m_frame->domWindow()->setURL(document->url());
   m_frame->domWindow()->setSecurityOrigin(document->securityOrigin());
 
@@ -3300,13 +3346,7 @@ void FrameLoader::open(CachedPage& cachedPage) {
 
   updatePolicyBaseURL();
 
-  cachedPage.restore(m_frame->page());
-
-  // It is necessary to update any platform script objects after restoring the
-  // cached page.
-  m_frame->script()->updatePlatformScriptObjects();
-
-  checkCompleted();
+  cachedFrame.restore();
 }
 
 bool FrameLoader::isStopping() const {
@@ -3650,6 +3690,17 @@ void FrameLoader::detachChildren() {
   }
 }
 
+void FrameLoader::closeAndRemoveChild(Frame* child) {
+  child->tree()->detachFromParent();
+
+  child->setView(0);
+  if (child->ownerElement())
+    child->page()->decrementFrameCount();
+  child->pageDestroyed();
+
+  m_frame->tree()->removeChild(child);
+}
+
 void FrameLoader::recursiveCheckLoadComplete() {
   Vector<RefPtr<Frame>, 10> frames;
 
@@ -3758,7 +3809,7 @@ void FrameLoader::detachFromParent() {
   setDocumentLoader(0);
   m_client->detachedFromParent3();
   if (Frame* parent = m_frame->tree()->parent()) {
-    parent->tree()->removeChild(m_frame);
+    parent->loader()->closeAndRemoveChild(m_frame);
     parent->loader()->scheduleCheckCompleted();
   } else {
     m_frame->setView(0);
@@ -4159,46 +4210,6 @@ bool FrameLoader::shouldScrollToAnchor(bool isFormSubmission,
          && !m_frame->document()->isFrameSet();
 }
 
-void FrameLoader::opened() {
-  if (m_loadType == FrameLoadTypeStandard &&
-      m_documentLoader->isClientRedirect())
-    updateHistoryForClientRedirect();
-
-  if (m_documentLoader->isLoadingFromCachedPage()) {
-    m_frame->document()->documentDidBecomeActive();
-
-    // Force a layout to update view size and thereby update scrollbars.
-    m_client->forceLayout();
-
-    const ResponseVector& responses = m_documentLoader->responses();
-    size_t count = responses.size();
-    for (size_t i = 0; i < count; i++) {
-      const ResourceResponse& response = responses[i];
-      // FIXME: If the WebKit client changes or cancels the request, this is not
-      // respected.
-      ResourceError error;
-      unsigned long identifier;
-      ResourceRequest request(response.url());
-      requestFromDelegate(request, identifier, error);
-      // FIXME: If we get a resource with more than 2B bytes, this code won't do
-      // the right thing.
-      // However, with today's computers and networking speeds, this won't
-      // happen in practice.
-      // Could be an issue with a giant local file.
-      sendRemainingDelegateMessages(
-          identifier, response,
-          static_cast<int>(response.expectedContentLength()), error);
-    }
-
-    pageCache()->remove(m_currentHistoryItem.get());
-
-    m_documentLoader->setPrimaryLoadComplete(true);
-
-    // FIXME: Why only this frame and not parent frames?
-    checkLoadCompleteForThisFrame();
-  }
-}
-
 void FrameLoader::checkNewWindowPolicy(const NavigationAction& action,
                                        const ResourceRequest& request,
                                        PassRefPtr<FormState> formState,
@@ -4562,6 +4573,9 @@ bool FrameLoader::loadProvisionalItemFromCachedPage() {
 }
 
 void FrameLoader::cachePageForHistoryItem(HistoryItem* item) {
+  if (!canCachePage() || item->isInPageCache())
+    return;
+
   if (Page* page = m_frame->page()) {
     RefPtr<CachedPage> cachedPage = CachedPage::create(page);
     pageCache()->add(item, cachedPage.release());

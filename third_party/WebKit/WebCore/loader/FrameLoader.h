@@ -45,6 +45,7 @@ namespace WebCore {
 
 class Archive;
 class AuthenticationChallenge;
+class CachedFrame;
 class CachedPage;
 class CachedResource;
 class Document;
@@ -354,6 +355,7 @@ class FrameLoader : Noncopyable
   void checkLoadComplete();
   void detachFromParent();
   void detachChildren();
+  void closeAndRemoveChild(Frame*);
 
   void addExtraFieldsToSubresourceRequest(ResourceRequest&);
   void addExtraFieldsToMainResourceRequest(ResourceRequest&);
@@ -733,7 +735,8 @@ class FrameLoader : Noncopyable
 
   void closeOldDataSources();
   void open(CachedPage&);
-  void opened();
+  void open(CachedFrame&);
+
   void updateHistoryAfterClientRedirect();
 
   void clear(bool clearWindowProperties = true, bool clearScriptObjects = true);
