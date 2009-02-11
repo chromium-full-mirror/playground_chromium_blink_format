@@ -80,7 +80,7 @@ class RenderTable : public RenderBlock {
   virtual void layout();
   virtual void calcPrefWidths();
 
-  virtual int getBaselineOfFirstLineBox() const;
+  virtual int firstLineBoxBaseline() const;
 
   virtual RenderBlock* firstLineBlock() const;
   virtual void updateFirstLetter();

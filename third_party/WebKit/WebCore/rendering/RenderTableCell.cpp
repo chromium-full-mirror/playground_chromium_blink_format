@@ -270,7 +270,7 @@ int RenderTableCell::baselinePosition(bool firstLine,
   // the cell, whichever comes first. If there
   // is no such line box or table-row, the baseline is the bottom of content
   // edge of the cell box.
-  int firstLineBaseline = getBaselineOfFirstLineBox();
+  int firstLineBaseline = firstLineBoxBaseline();
   if (firstLineBaseline != -1)
     return firstLineBaseline;
   return paddingTop() + borderTop() + contentHeight();

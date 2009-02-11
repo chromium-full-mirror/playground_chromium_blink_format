@@ -338,8 +338,8 @@ class RenderBlock : public RenderBox {
   void calcInlinePrefWidths();
   void calcBlockPrefWidths();
 
-  virtual int getBaselineOfFirstLineBox() const;
-  virtual int getBaselineOfLastLineBox() const;
+  virtual int firstLineBoxBaseline() const;
+  virtual int lastLineBoxBaseline() const;
 
   RootInlineBox* firstRootBox() const {
     return static_cast<RootInlineBox*>(firstLineBox());

@@ -4912,7 +4912,7 @@ int RenderBlock::baselinePosition(bool b, bool isRootLineBox) const {
         (layer() && (layer()->marquee() || layer()->verticalScrollbar() ||
                      layer()->scrollYOffset() != 0))
             ? -1
-            : getBaselineOfLastLineBox();
+            : lastLineBoxBaseline();
     if (baselinePos != -1 &&
         baselinePos <= borderTop() + paddingTop() + contentHeight())
       return marginTop() + baselinePos;
@@ -4921,9 +4921,9 @@ int RenderBlock::baselinePosition(bool b, bool isRootLineBox) const {
   return RenderBox::baselinePosition(b, isRootLineBox);
 }
 
-int RenderBlock::getBaselineOfFirstLineBox() const {
+int RenderBlock::firstLineBoxBaseline() const {
   if (!isBlockFlow())
-    return RenderBox::getBaselineOfFirstLineBox();
+    return -1;
 
   if (childrenInline()) {
     if (firstLineBox())
@@ -4934,7 +4934,7 @@ int RenderBlock::getBaselineOfFirstLineBox() const {
     for (RenderBox* curr = firstChildBox(); curr;
          curr = curr->nextSiblingBox()) {
       if (!curr->isFloatingOrPositioned()) {
-        int result = curr->getBaselineOfFirstLineBox();
+        int result = curr->firstLineBoxBaseline();
         if (result != -1)
           return curr->y() + result;  // Translate to our coordinate space.
       }
@@ -4944,9 +4944,9 @@ int RenderBlock::getBaselineOfFirstLineBox() const {
   return -1;
 }
 
-int RenderBlock::getBaselineOfLastLineBox() const {
+int RenderBlock::lastLineBoxBaseline() const {
   if (!isBlockFlow())
-    return RenderBox::getBaselineOfLastLineBox();
+    return -1;
 
   if (childrenInline()) {
     if (!firstLineBox() && hasLineIfEmpty())
@@ -4962,7 +4962,7 @@ int RenderBlock::getBaselineOfLastLineBox() const {
          curr = curr->previousSiblingBox()) {
       if (!curr->isFloatingOrPositioned()) {
         haveNormalFlowChild = true;
-        int result = curr->getBaselineOfLastLineBox();
+        int result = curr->lastLineBoxBaseline();
         if (result != -1)
           return curr->y() + result;  // Translate to our coordinate space.
       }

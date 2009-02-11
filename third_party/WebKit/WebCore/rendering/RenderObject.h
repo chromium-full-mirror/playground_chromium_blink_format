@@ -178,9 +178,6 @@ class RenderObject : public CachedResourceClient {
   }
   bool hasClip() { return isPositioned() && style()->hasClip(); }
 
-  virtual int getBaselineOfFirstLineBox() const { return -1; }
-  virtual int getBaselineOfLastLineBox() const { return -1; }
-
   virtual bool isEmpty() const { return firstChild() == 0; }
 
   virtual bool isEdited() const { return false; }

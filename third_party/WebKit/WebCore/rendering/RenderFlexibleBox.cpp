@@ -385,9 +385,10 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
 
       // Update our height and overflow height.
       if (style()->boxAlign() == BBASELINE) {
-        int ascent = child->marginTop() + child->getBaselineOfFirstLineBox();
+        int ascent = child->firstLineBoxBaseline();
         if (ascent == -1)
-          ascent = child->marginTop() + child->height() + child->marginBottom();
+          ascent = child->height() + child->marginBottom();
+        ascent += child->marginTop();
         int descent =
             (child->marginTop() + child->height() + child->marginBottom()) -
             ascent;
@@ -463,10 +464,10 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
                          2);
           break;
         case BBASELINE: {
-          int ascent = child->marginTop() + child->getBaselineOfFirstLineBox();
+          int ascent = child->firstLineBoxBaseline();
           if (ascent == -1)
-            ascent =
-                child->marginTop() + child->height() + child->marginBottom();
+            ascent = child->height() + child->marginBottom();
+          ascent += child->marginTop();
           childY += child->marginTop() + (maxAscent - ascent);
           break;
         }
