@@ -49,7 +49,6 @@ class TransformOperation : public RefCounted<TransformOperation> {
     SKEW_Y,
     SKEW,
     MATRIX,
-#if ENABLE(3D_TRANSFORMS)
     SCALE_Z,
     SCALE_3D,
     TRANSLATE_Z,
@@ -59,7 +58,6 @@ class TransformOperation : public RefCounted<TransformOperation> {
     ROTATE_3D,
     MATRIX_3D,
     PERSPECTIVE,
-#endif
     IDENTITY,
     NONE
   };

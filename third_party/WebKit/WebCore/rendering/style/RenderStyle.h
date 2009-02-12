@@ -880,9 +880,22 @@ class RenderStyle : public RefCounted<RenderStyle> {
   Length transformOriginY() const {
     return rareNonInheritedData->m_transform->m_y;
   }
+  float transformOriginZ() const {
+    return rareNonInheritedData->m_transform->m_z;
+  }
   bool hasTransform() const {
     return !rareNonInheritedData->m_transform->m_operations.operations()
                 .isEmpty();
+  }
+
+  // Return true if any transform related property (currently transform,
+  // transformStyle3D or perspective)
+  // indicates that we are transforming
+  bool hasTransformRelatedProperty() const {
+    return hasTransform() ||
+           rareNonInheritedData->m_transformStyle3D ==
+               TransformStyle3DPreserve3D ||
+           rareNonInheritedData->m_perspective > 0;
   }
 
   enum ApplyTransformOrigin { IncludeTransformOrigin, ExcludeTransformOrigin };
@@ -921,6 +934,20 @@ class RenderStyle : public RefCounted<RenderStyle> {
 
   // return the first found Animation (including 'all' transitions)
   const Animation* transitionForProperty(int property) const;
+
+  ETransformStyle3D transformStyle3D() const {
+    return rareNonInheritedData->m_transformStyle3D;
+  }
+  EBackfaceVisibility backfaceVisibility() const {
+    return rareNonInheritedData->m_backfaceVisibility;
+  }
+  float perspective() const { return rareNonInheritedData->m_perspective; }
+  Length perspectiveOriginX() const {
+    return rareNonInheritedData->m_perspectiveOriginX;
+  }
+  Length perspectiveOriginY() const {
+    return rareNonInheritedData->m_perspectiveOriginY;
+  }
 
 #if USE(ACCELERATED_COMPOSITING)
   // When set, this ensures that styles compare as different. Used during
@@ -1417,6 +1444,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setTransformOriginY(Length l) {
     SET_VAR(rareNonInheritedData.access()->m_transform, m_y, l);
   }
+  void setTransformOriginZ(float f) {
+    SET_VAR(rareNonInheritedData.access()->m_transform, m_z, f);
+  }
   // End CSS3 Setters
 
   // Apple-specific property setters
@@ -1442,6 +1472,22 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   void adjustAnimations();
   void adjustTransitions();
+
+  void setTransformStyle3D(ETransformStyle3D b) {
+    SET_VAR(rareNonInheritedData, m_transformStyle3D, b);
+  }
+  void setBackfaceVisibility(EBackfaceVisibility b) {
+    SET_VAR(rareNonInheritedData, m_backfaceVisibility, b);
+  }
+  void setPerspective(float p) {
+    SET_VAR(rareNonInheritedData, m_perspective, p);
+  }
+  void setPerspectiveOriginX(Length l) {
+    SET_VAR(rareNonInheritedData, m_perspectiveOriginX, l);
+  }
+  void setPerspectiveOriginY(Length l) {
+    SET_VAR(rareNonInheritedData, m_perspectiveOriginY, l);
+  }
 
 #if USE(ACCELERATED_COMPOSITING)
   void setIsRunningAcceleratedAnimation(bool b = true) {
@@ -1662,6 +1708,16 @@ class RenderStyle : public RefCounted<RenderStyle> {
   static Length initialTransformOriginX() { return Length(50.0, Percent); }
   static Length initialTransformOriginY() { return Length(50.0, Percent); }
   static EPointerEvents initialPointerEvents() { return PE_AUTO; }
+  static float initialTransformOriginZ() { return 0; }
+  static ETransformStyle3D initialTransformStyle3D() {
+    return TransformStyle3DFlat;
+  }
+  static EBackfaceVisibility initialBackfaceVisibility() {
+    return BackfaceVisibilityVisible;
+  }
+  static float initialPerspective() { return 0; }
+  static Length initialPerspectiveOriginX() { return Length(50.0, Percent); }
+  static Length initialPerspectiveOriginY() { return Length(50.0, Percent); }
 
   // Keep these at the end.
   static int initialLineClamp() { return -1; }

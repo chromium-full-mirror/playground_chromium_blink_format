@@ -51,7 +51,12 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
       m_boxShadow(0),
       m_animations(0),
       m_transitions(0),
-      m_mask(FillLayer(MaskFillLayer))
+      m_mask(FillLayer(MaskFillLayer)),
+      m_transformStyle3D(RenderStyle::initialTransformStyle3D()),
+      m_backfaceVisibility(RenderStyle::initialBackfaceVisibility()),
+      m_perspective(RenderStyle::initialPerspective()),
+      m_perspectiveOriginX(RenderStyle::initialPerspectiveOriginX()),
+      m_perspectiveOriginY(RenderStyle::initialPerspectiveOriginY())
 #if ENABLE(XBL)
       ,
       bindingURI(0)
@@ -87,7 +92,12 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       m_animations(o.m_animations ? new AnimationList(*o.m_animations) : 0),
       m_transitions(o.m_transitions ? new AnimationList(*o.m_transitions) : 0),
       m_mask(o.m_mask),
-      m_maskBoxImage(o.m_maskBoxImage)
+      m_maskBoxImage(o.m_maskBoxImage),
+      m_transformStyle3D(o.m_transformStyle3D),
+      m_backfaceVisibility(o.m_backfaceVisibility),
+      m_perspective(o.m_perspective),
+      m_perspectiveOriginX(o.m_perspectiveOriginX),
+      m_perspectiveOriginY(o.m_perspectiveOriginY)
 #if ENABLE(XBL)
       ,
       bindingURI(o.bindingURI ? o.bindingURI->copy() : 0)
@@ -134,7 +144,11 @@ bool StyleRareNonInheritedData::operator==(
 #if ENABLE(XBL)
          && bindingsEquivalent(o)
 #endif
-      ;
+         && (m_transformStyle3D == o.m_transformStyle3D) &&
+         (m_backfaceVisibility == o.m_backfaceVisibility) &&
+         (m_perspective == o.m_perspective) &&
+         (m_perspectiveOriginX == o.m_perspectiveOriginX) &&
+         (m_perspectiveOriginY == o.m_perspectiveOriginY);
 }
 
 bool StyleRareNonInheritedData::contentDataEquivalent(
