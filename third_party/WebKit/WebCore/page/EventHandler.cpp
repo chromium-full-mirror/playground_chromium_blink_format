@@ -1781,7 +1781,14 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
     if (e.isAccepted())
       return true;
 
-    if (node->renderer()) {
+    // If we don't have a renderer, send the wheel event to the first node we
+    // find with a renderer.
+    // This is needed for <option> and <optgroup> elements so that <select>s get
+    // a wheel scroll.
+    while (node && !node->renderer())
+      node = node->parent();
+
+    if (node && node->renderer()) {
       // Just break up into two scrolls if we need to.  Diagonal movement on
       // a MacBook pro is an example of a 2-dimensional mouse wheel event (where
       // both deltaX and deltaY can be set).
