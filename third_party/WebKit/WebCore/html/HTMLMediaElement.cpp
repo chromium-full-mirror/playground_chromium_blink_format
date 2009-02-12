@@ -85,6 +85,7 @@ HTMLMediaElement::HTMLMediaElement(const QualifiedName& tagName, Document* doc)
       m_inActiveDocument(true),
       m_player(0),
       m_loadRestrictions(NoLoadRestriction),
+      m_processingMediaPlayerCallback(0),
       m_sendProgressEvents(true) {
   document()->registerForDocumentActivationCallbacks(this);
   document()->registerForMediaVolumeCallbacks(this);
@@ -357,12 +358,19 @@ end:
 }
 
 void HTMLMediaElement::mediaPlayerNetworkStateChanged(MediaPlayer*) {
-  if (!m_begun || m_networkState == EMPTY)
+  if (!m_begun)
+    return;
+
+  beginProcessingMediaPlayerCallback();
+  setNetworkState(m_player->networkState());
+  endProcessingMediaPlayerCallback();
+}
+
+void HTMLMediaElement::setNetworkState(MediaPlayer::NetworkState state) {
+  if (m_networkState == EMPTY)
     return;
 
   m_terminateLoadBelowNestingLevel = m_loadNestingLevel;
-
-  MediaPlayer::NetworkState state = m_player->networkState();
 
   // 3.14.9.4. Loading the media resource
   // 14
@@ -443,8 +451,12 @@ void HTMLMediaElement::mediaPlayerNetworkStateChanged(MediaPlayer*) {
 }
 
 void HTMLMediaElement::mediaPlayerReadyStateChanged(MediaPlayer*) {
+  beginProcessingMediaPlayerCallback();
+
   MediaPlayer::ReadyState state = m_player->readyState();
   setReadyState((ReadyState)state);
+
+  endProcessingMediaPlayerCallback();
 }
 
 void HTMLMediaElement::setReadyState(ReadyState state) {
@@ -894,6 +906,8 @@ void HTMLMediaElement::checkIfSeekNeeded() {
 }
 
 void HTMLMediaElement::mediaPlayerTimeChanged(MediaPlayer*) {
+  beginProcessingMediaPlayerCallback();
+
   if (readyState() >= CAN_PLAY)
     m_seeking = false;
 
@@ -911,11 +925,21 @@ void HTMLMediaElement::mediaPlayerTimeChanged(MediaPlayer*) {
   }
 
   updatePlayState();
+
+  endProcessingMediaPlayerCallback();
 }
 
 void HTMLMediaElement::mediaPlayerRepaint(MediaPlayer*) {
+  beginProcessingMediaPlayerCallback();
   if (renderer())
     renderer()->repaint();
+  endProcessingMediaPlayerCallback();
+}
+
+void HTMLMediaElement::mediaPlayerVolumeChanged(MediaPlayer*) {
+  beginProcessingMediaPlayerCallback();
+  updateVolume();
+  endProcessingMediaPlayerCallback();
 }
 
 PassRefPtr<TimeRanges> HTMLMediaElement::buffered() const {
@@ -976,10 +1000,13 @@ void HTMLMediaElement::updateVolume() {
   if (!m_player)
     return;
 
-  Page* page = document()->page();
-  float volumeMultiplier = page ? page->mediaVolume() : 1;
+  // Avoid recursion when the player reports volume changes.
+  if (!processingMediaPlayerCallback()) {
+    Page* page = document()->page();
+    float volumeMultiplier = page ? page->mediaVolume() : 1;
 
-  m_player->setVolume(m_muted ? 0 : m_volume * volumeMultiplier);
+    m_player->setVolume(m_muted ? 0 : m_volume * volumeMultiplier);
+  }
 
   if (renderer())
     renderer()->updateFromElement();

@@ -156,12 +156,14 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void dispatchEventAsync(const AtomicString& eventName);
 
   void setReadyState(ReadyState);
+  void setNetworkState(MediaPlayer::NetworkState state);
 
  private:  // MediaPlayerObserver
   virtual void mediaPlayerNetworkStateChanged(MediaPlayer*);
   virtual void mediaPlayerReadyStateChanged(MediaPlayer*);
   virtual void mediaPlayerTimeChanged(MediaPlayer*);
   virtual void mediaPlayerRepaint(MediaPlayer*);
+  virtual void mediaPlayerVolumeChanged(MediaPlayer*);
 
  private:
   void loadTimerFired(Timer<HTMLMediaElement>*);
@@ -171,6 +173,16 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void checkIfSeekNeeded();
 
   bool processingUserGesture() const;
+  bool processingMediaPlayerCallback() const {
+    return m_processingMediaPlayerCallback > 0;
+  }
+  void beginProcessingMediaPlayerCallback() {
+    ++m_processingMediaPlayerCallback;
+  }
+  void endProcessingMediaPlayerCallback() {
+    ASSERT(m_processingMediaPlayerCallback);
+    --m_processingMediaPlayerCallback;
+  }
 
   String selectMediaURL(String& mediaMIMEType);
   void updateVolume();
@@ -231,6 +243,11 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   OwnPtr<MediaPlayer> m_player;
 
   LoadRestrictions m_loadRestrictions;
+
+  // counter incremented while processing a callback from the media player, so
+  // we can avoid
+  //  calling the media engine recursively
+  int m_processingMediaPlayerCallback;
 
   // Not all media engines provide enough information about a file to be able to
   // support progress events so setting m_sendProgressEvents disables them
