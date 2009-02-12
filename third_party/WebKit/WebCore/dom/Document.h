@@ -258,9 +258,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   virtual PassRefPtr<Element> createElementNS(const String& namespaceURI,
                                               const String& qualifiedName,
                                               ExceptionCode&);
-  PassRefPtr<Element> createElement(const QualifiedName&,
-                                    bool createdByParser,
-                                    ExceptionCode& ec);
+  PassRefPtr<Element> createElement(const QualifiedName&, bool createdByParser);
   Element* getElementById(const AtomicString&) const;
   bool hasElementWithId(AtomicStringImpl* id) const;
   bool containsMultipleElementsWithId(const AtomicString& elementId) {
