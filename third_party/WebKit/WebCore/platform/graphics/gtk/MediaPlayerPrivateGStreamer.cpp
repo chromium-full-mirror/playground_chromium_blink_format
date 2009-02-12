@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2007, 2009 Apple Inc.  All rights reserved.
  * Copyright (C) 2007 Collabora Ltd.  All rights reserved.
  * Copyright (C) 2007 Alp Toker <alp@atoker.com>
  *
@@ -101,6 +101,15 @@ gboolean mediaPlayerPrivateBufferingCallback(GstBus* bus,
   return true;
 }
 
+MediaPlayerPrivateInterface* MediaPlayerPrivate::create(MediaPlayer* player) {
+  return new MediaPlayerPrivate(player);
+}
+
+void MediaPlayerPrivate::registerMediaEngine(MediaEngineRegistrar registrar) {
+  if (isAvailable())
+    registrar(create, getSupportedTypes, supportsType);
+}
+
 MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
     : m_player(player),
       m_playBin(0),
@@ -137,7 +146,7 @@ MediaPlayerPrivate::~MediaPlayerPrivate() {
   }
 }
 
-void MediaPlayerPrivate::load(String url) {
+void MediaPlayerPrivate::load(const String& url) {
   LOG_VERBOSE(Media, "Load %s", url.utf8().data());
   if (m_networkState != MediaPlayer::Loading) {
     m_networkState = MediaPlayer::Loading;
@@ -169,7 +178,7 @@ void MediaPlayerPrivate::pause() {
   m_startedPlaying = false;
 }
 
-float MediaPlayerPrivate::duration() {
+float MediaPlayerPrivate::duration() const {
   if (!m_playBin)
     return 0.0;
 
@@ -270,7 +279,7 @@ bool MediaPlayerPrivate::seeking() const {
 }
 
 // Returns the size of the video
-IntSize MediaPlayerPrivate::naturalSize() {
+IntSize MediaPlayerPrivate::naturalSize() const {
   if (!hasVideo())
     return IntSize();
 
@@ -283,7 +292,7 @@ IntSize MediaPlayerPrivate::naturalSize() {
   return IntSize(x, y);
 }
 
-bool MediaPlayerPrivate::hasVideo() {
+bool MediaPlayerPrivate::hasVideo() const {
   gint currentVideo = -1;
   if (m_playBin)
     g_object_get(G_OBJECT(m_playBin), "current-video", &currentVideo, NULL);
@@ -331,22 +340,22 @@ int MediaPlayerPrivate::dataRate() const {
   return 1;
 }
 
-MediaPlayer::NetworkState MediaPlayerPrivate::networkState() {
+MediaPlayer::NetworkState MediaPlayerPrivate::networkState() const {
   return m_networkState;
 }
 
-MediaPlayer::ReadyState MediaPlayerPrivate::readyState() {
+MediaPlayer::ReadyState MediaPlayerPrivate::readyState() const {
   return m_readyState;
 }
 
-float MediaPlayerPrivate::maxTimeBuffered() {
+float MediaPlayerPrivate::maxTimeBuffered() const {
   notImplemented();
   LOG_VERBOSE(Media, "maxTimeBuffered");
   // rtsp streams are not buffered
   return m_isStreaming ? 0 : maxTimeLoaded();
 }
 
-float MediaPlayerPrivate::maxTimeSeekable() {
+float MediaPlayerPrivate::maxTimeSeekable() const {
   // TODO
   LOG_VERBOSE(Media, "maxTimeSeekable");
   if (m_isStreaming)
@@ -355,14 +364,14 @@ float MediaPlayerPrivate::maxTimeSeekable() {
   return maxTimeLoaded();
 }
 
-float MediaPlayerPrivate::maxTimeLoaded() {
+float MediaPlayerPrivate::maxTimeLoaded() const {
   // TODO
   LOG_VERBOSE(Media, "maxTimeLoaded");
   notImplemented();
   return duration();
 }
 
-unsigned MediaPlayerPrivate::bytesLoaded() {
+unsigned MediaPlayerPrivate::bytesLoaded() const {
   notImplemented();
   LOG_VERBOSE(Media, "bytesLoaded");
   /*if (!m_playBin)
@@ -374,13 +383,13 @@ unsigned MediaPlayerPrivate::bytesLoaded() {
   return 1;  // totalBytes() * maxTime / dur;
 }
 
-bool MediaPlayerPrivate::totalBytesKnown() {
+bool MediaPlayerPrivate::totalBytesKnown() const {
   notImplemented();
   LOG_VERBOSE(Media, "totalBytesKnown");
   return totalBytes() > 0;
 }
 
-unsigned MediaPlayerPrivate::totalBytes() {
+unsigned MediaPlayerPrivate::totalBytes() const {
   notImplemented();
   LOG_VERBOSE(Media, "totalBytes");
   if (!m_playBin)
@@ -541,9 +550,20 @@ void MediaPlayerPrivate::paint(GraphicsContext* context, const IntRect& rect) {
 }
 
 void MediaPlayerPrivate::getSupportedTypes(HashSet<String>& types) {
-  // FIXME: do the real thing
+  // FIXME: query the engine to see what types are supported
   notImplemented();
   types.add(String("video/x-theora+ogg"));
+}
+
+MediaPlayer::SupportsType MediaPlayerPrivate::supportsType(
+    const String& type,
+    const String& codecs) {
+  // FIXME: query the engine to see what types are supported
+  notImplemented();
+  return type == "video/x-theora+ogg"
+             ? (!codecs.isEmpty() ? MediaPlayer::MayBeSupported
+                                  : MediaPlayer::IsSupported)
+             : MediaPlayer::IsNotSupported;
 }
 
 void MediaPlayerPrivate::createGSTPlayBin(String url) {

@@ -172,7 +172,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   bool processingUserGesture() const;
 
-  String pickMedia();
+  String selectMediaURL(String& mediaMIMEType);
   void updateVolume();
   void updatePlayState();
   float effectiveStart() const;

@@ -262,6 +262,7 @@ void HTMLMediaElement::load(ExceptionCode& ec) {
   }
 
   String mediaSrc;
+  String mediaMIMEType;
 
   // 3.14.9.4. Loading the media resource
   // 1
@@ -311,7 +312,7 @@ void HTMLMediaElement::load(ExceptionCode& ec) {
   }
 
   // 6
-  mediaSrc = pickMedia();
+  mediaSrc = selectMediaURL(mediaMIMEType);
   if (mediaSrc.isEmpty()) {
     ec = INVALID_STATE_ERR;
     goto end;
@@ -334,7 +335,7 @@ void HTMLMediaElement::load(ExceptionCode& ec) {
   m_player.clear();
   m_player.set(new MediaPlayer(this));
   updateVolume();
-  m_player->load(m_currentSrc);
+  m_player->load(m_currentSrc, mediaMIMEType);
   if (m_loadNestingLevel < m_terminateLoadBelowNestingLevel)
     goto end;
 
@@ -818,7 +819,7 @@ bool HTMLMediaElement::canPlay() const {
   return paused() || ended() || networkState() < LOADED_METADATA;
 }
 
-String HTMLMediaElement::pickMedia() {
+String HTMLMediaElement::selectMediaURL(String& mediaMIMEType) {
   // 3.14.9.2. Location of the media resource
   String mediaSrc = getAttribute(srcAttr);
   if (mediaSrc.isEmpty()) {
@@ -837,15 +838,17 @@ String HTMLMediaElement::pickMedia() {
         }
         if (source->hasAttribute(typeAttr)) {
           String type = source->type().stripWhiteSpace();
+          String codecs =
+              MIMETypeRegistry::getParameterFromMIMEType(type, "codecs");
+          String simpleType =
+              MIMETypeRegistry::stripParametersFromMIMEType(type);
 
-          // "type" can have parameters after a semi-colon, strip them before
-          // checking with the type registry
-          int semi = type.find(';');
-          if (semi != -1)
-            type = type.left(semi).stripWhiteSpace();
-
-          if (!MIMETypeRegistry::isSupportedMediaMIMEType(type))
+          if (!MediaPlayer::supportsType(simpleType, codecs))
             continue;
+
+          // return type with all parameters in place so the media engine can
+          // use them
+          mediaMIMEType = type;
         }
         mediaSrc = source->src().string();
         break;
