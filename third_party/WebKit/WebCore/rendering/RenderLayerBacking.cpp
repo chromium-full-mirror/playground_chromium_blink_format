@@ -77,7 +77,7 @@ void RenderLayerBacking::createGraphicsLayer() {
     if (renderer()->node()->isHTMLElement() && renderer()->node()->hasID())
       m_graphicsLayer->setName(
           renderer()->renderName() + String(" ") +
-          static_cast<HTMLElement*>(renderer()->element())->id());
+          static_cast<HTMLElement*>(renderer()->node())->id());
     else
       m_graphicsLayer->setName(renderer()->renderName());
   }
@@ -260,12 +260,12 @@ void RenderLayerBacking::updateGraphicsLayerGeometry() {
   if (m_owningLayer->hasTransform()) {
     const IntRect borderBox = toRenderBox(renderer())->borderBoxRect();
 
-    IntRect layerBounds = IntRect(m_owningLayer->xPos(), m_owningLayer->yPos(),
+    IntRect layerBounds = IntRect(m_owningLayer->x(), m_owningLayer->y(),
                                   borderBox.width(), borderBox.height());
     // Convert to absolute coords to match bbox.
     int x = 0, y = 0;
     m_owningLayer->convertToLayerCoords(compAncestor, x, y);
-    layerBounds.move(x - m_owningLayer->xPos(), y - m_owningLayer->yPos());
+    layerBounds.move(x - m_owningLayer->x(), y - m_owningLayer->y());
 
     // Update properties that depend on layer dimensions
     FloatPoint3D transformOrigin = computeTransformOrigin(borderBox);
