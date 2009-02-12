@@ -68,11 +68,9 @@ class RenderSVGText : public RenderSVGBlock {
       RenderBoxModelObject* repaintContainer);
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
 
-  virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
-                                     bool isRootLineBox,
-                                     bool isOnlyRun = false);
-
  private:
+  virtual RootInlineBox* createRootBox();
+
   TransformationMatrix m_localTransform;
   IntRect m_absoluteBounds;
 };

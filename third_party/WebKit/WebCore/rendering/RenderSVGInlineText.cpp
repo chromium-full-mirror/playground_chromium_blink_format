@@ -140,7 +140,7 @@ IntRect RenderSVGInlineText::computeRepaintRectForRange(
   return enclosingIntRect(absoluteTransform().mapRect(fixedRect));
 }
 
-InlineTextBox* RenderSVGInlineText::createInlineTextBox() {
+InlineTextBox* RenderSVGInlineText::createTextBox() {
   return new (renderArena()) SVGInlineTextBox(this);
 }
 

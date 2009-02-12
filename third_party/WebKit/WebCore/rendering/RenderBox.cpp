@@ -1106,7 +1106,11 @@ IntSize RenderBox::offsetFromContainer(RenderObject* o) const {
   return offset;
 }
 
-void RenderBox::dirtyLineBoxes(bool fullLayout, bool /*isRootLineBox*/) {
+InlineBox* RenderBox::createInlineBox() {
+  return new (renderArena()) InlineBox(this);
+}
+
+void RenderBox::dirtyLineBoxes(bool fullLayout) {
   if (m_inlineBoxWrapper) {
     if (fullLayout) {
       m_inlineBoxWrapper->destroy(renderArena());

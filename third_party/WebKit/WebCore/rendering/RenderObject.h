@@ -439,11 +439,6 @@ class RenderObject : public CachedResourceClient {
   void updateFillImages(const FillLayer*, const FillLayer*);
   void updateImage(StyleImage*, StyleImage*);
 
-  virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
-                                     bool isRootLineBox,
-                                     bool isOnlyRun = false);
-  virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
-
   // For inline replaced elements, this function returns the inline box that
   // owns us.  Enables
   // the replaced RenderObject to quickly determine what line it is contained on

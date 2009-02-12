@@ -33,23 +33,8 @@ namespace WebCore {
 
 RenderSVGInline::RenderSVGInline(Node* n) : RenderInline(n) {}
 
-InlineBox* RenderSVGInline::createInlineBox(bool unusedMakePlaceHolderBox,
-                                            bool unusedIsRootLineBox,
-                                            bool) {
-#if ASSERT_DISABLED
-  UNUSED_PARAM(unusedIsRootLineBox);
-  UNUSED_PARAM(unusedMakePlaceHolderBox);
-#endif
-
-  ASSERT(!(!unusedIsRootLineBox && (isReplaced() || unusedMakePlaceHolderBox)));
-
-  ASSERT(isRenderInline());
-
-  InlineFlowBox* flowBox = new (renderArena()) SVGInlineFlowBox(this);
-
-  m_lineBoxes.appendLineBox(flowBox);
-
-  return flowBox;
+InlineFlowBox* RenderSVGInline::createFlowBox() {
+  return new (renderArena()) SVGInlineFlowBox(this);
 }
 }
 

@@ -117,10 +117,8 @@ class RenderInline : public RenderBoxModelObject {
     return IntRect(0, 0, boundingBox.width(), boundingBox.height());
   }
 
-  virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
-                                     bool isRootLineBox,
-                                     bool isOnlyRun = false);
-  virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
+  InlineFlowBox* createInlineFlowBox();
+  void dirtyLineBoxes(bool fullLayout);
   virtual void dirtyLinesFromChangedChild(RenderObject* child) {
     m_lineBoxes.dirtyLinesFromChangedChild(this, child);
   }
@@ -160,6 +158,7 @@ class RenderInline : public RenderBoxModelObject {
  protected:
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
   virtual void updateBoxModelInfoFromStyle();
+  virtual InlineFlowBox* createFlowBox();  // Subclassed by SVG
 
   static RenderInline* cloneInline(RenderInline* src);
 

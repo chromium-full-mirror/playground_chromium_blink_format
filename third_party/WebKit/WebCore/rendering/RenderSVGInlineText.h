@@ -48,7 +48,6 @@ class RenderSVGInlineText : public RenderText {
       RenderBoxModelObject* repaintContainer,
       bool clipToVisibleContent = true);
   virtual bool isSVGText() const { return true; }
-  virtual InlineTextBox* createInlineTextBox();
 
   virtual IntRect localCaretRect(InlineBox*,
                                  int caretOffset,
@@ -58,6 +57,7 @@ class RenderSVGInlineText : public RenderText {
   virtual void destroy();
 
  private:
+  virtual InlineTextBox* createTextBox();
   IntRect computeRepaintRectForRange(RenderBoxModelObject* repaintContainer,
                                      int startPos,
                                      int endPos);

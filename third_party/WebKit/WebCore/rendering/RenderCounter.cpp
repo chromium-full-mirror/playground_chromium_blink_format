@@ -253,12 +253,6 @@ PassRefPtr<StringImpl> RenderCounter::originalText() const {
   return text.impl();
 }
 
-void RenderCounter::dirtyLineBoxes(bool fullLayout, bool dummy) {
-  if (prefWidthsDirty())
-    calcPrefWidths(0);
-  RenderText::dirtyLineBoxes(fullLayout, dummy);
-}
-
 void RenderCounter::calcPrefWidths(int lead) {
   setTextInternal(originalText());
   RenderText::calcPrefWidths(lead);

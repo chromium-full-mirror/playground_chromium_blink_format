@@ -65,8 +65,6 @@ class RenderBR : public RenderText {
                                bool isRootLineBox = false) const;
 
   // overrides
-  virtual InlineBox* createInlineBox(bool, bool, bool isOnlyRun = false);
-
   virtual bool isBR() const { return true; }
 
   virtual int caretMinOffset() const;

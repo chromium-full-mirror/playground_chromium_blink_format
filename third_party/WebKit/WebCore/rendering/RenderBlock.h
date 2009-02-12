@@ -86,7 +86,6 @@ class RenderBlock : public RenderBox {
   InlineFlowBox* lastLineBox() const { return m_lineBoxes.lastLineBox(); }
 
   void deleteLineBoxTree();
-  virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
   virtual void dirtyLinesFromChangedChild(RenderObject* child) {
     m_lineBoxes.dirtyLinesFromChangedChild(this, child);
   }
@@ -168,9 +167,7 @@ class RenderBlock : public RenderBox {
 
   virtual void updateBeforeAfterContent(PseudoId);
 
-  virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
-                                     bool isRootLineBox,
-                                     bool isOnlyRun = false);
+  RootInlineBox* createRootInlineBox();
 
   // Called to lay out the legend for a fieldset.
   virtual RenderObject* layoutLegend(bool /*relayoutChildren*/) { return 0; }
@@ -498,6 +495,8 @@ class RenderBlock : public RenderBox {
   void newLine(EClear);
   virtual bool hasLineIfEmpty() const;
   bool layoutOnlyPositionedObjects();
+
+  virtual RootInlineBox* createRootBox();  // Subclassed by SVG.
 
  private:
   Position positionForBox(InlineBox*, bool start = true) const;

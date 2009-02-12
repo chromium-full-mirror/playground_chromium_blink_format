@@ -1026,7 +1026,7 @@ int RenderText::lineHeight(bool firstLine, bool) const {
   return parent()->lineHeight(firstLine, true);
 }
 
-void RenderText::dirtyLineBoxes(bool fullLayout, bool) {
+void RenderText::dirtyLineBoxes(bool fullLayout) {
   if (fullLayout)
     deleteTextBoxes();
   else if (!m_linesDirty) {
@@ -1036,14 +1036,12 @@ void RenderText::dirtyLineBoxes(bool fullLayout, bool) {
   m_linesDirty = false;
 }
 
-InlineTextBox* RenderText::createInlineTextBox() {
+InlineTextBox* RenderText::createTextBox() {
   return new (renderArena()) InlineTextBox(this);
 }
 
-InlineBox* RenderText::createInlineBox(bool, bool unusedIsRootLineBox, bool) {
-  ASSERT_UNUSED(unusedIsRootLineBox, !unusedIsRootLineBox);
-
-  InlineTextBox* textBox = createInlineTextBox();
+InlineTextBox* RenderText::createInlineTextBox() {
+  InlineTextBox* textBox = createTextBox();
   if (!m_firstTextBox)
     m_firstTextBox = m_lastTextBox = textBox;
   else {

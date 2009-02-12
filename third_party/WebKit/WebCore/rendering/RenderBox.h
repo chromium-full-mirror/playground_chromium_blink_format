@@ -235,7 +235,8 @@ class RenderBox : public RenderBoxModelObject {
 
   void positionLineBox(InlineBox*);
 
-  virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
+  InlineBox* createInlineBox();
+  void dirtyLineBoxes(bool fullLayout);
 
   // For inline replaced elements, this function returns the inline box that
   // owns us.  Enables

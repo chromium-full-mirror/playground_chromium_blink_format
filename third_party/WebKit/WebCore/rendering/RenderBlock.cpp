@@ -435,26 +435,14 @@ void RenderBlock::deleteLineBoxTree() {
   m_lineBoxes.deleteLineBoxTree(renderArena());
 }
 
-void RenderBlock::dirtyLineBoxes(bool fullLayout, bool isRootLineBox) {
-  if (!isRootLineBox && isReplaced())
-    return RenderBox::dirtyLineBoxes(fullLayout, isRootLineBox);
-
-  if (fullLayout)
-    m_lineBoxes.deleteLineBoxes(renderArena());
-  else
-    m_lineBoxes.dirtyLineBoxes();
+RootInlineBox* RenderBlock::createRootBox() {
+  return new (renderArena()) RootInlineBox(this);
 }
 
-InlineBox* RenderBlock::createInlineBox(bool makePlaceHolderBox,
-                                        bool isRootLineBox,
-                                        bool /*isOnlyRun*/) {
-  if (!isRootLineBox &&
-      (isReplaced() || makePlaceHolderBox))  // Inline tables and inline blocks
-    return RenderBox::createInlineBox(
-        false, isRootLineBox);  // (or positioned element placeholders).
-  InlineFlowBox* flowBox = new (renderArena()) RootInlineBox(this);
-  m_lineBoxes.appendLineBox(flowBox);
-  return flowBox;
+RootInlineBox* RenderBlock::createRootInlineBox() {
+  RootInlineBox* rootBox = createRootBox();
+  m_lineBoxes.appendLineBox(rootBox);
+  return rootBox;
 }
 
 void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
