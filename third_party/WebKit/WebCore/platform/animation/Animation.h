@@ -102,7 +102,7 @@ class Animation : public RefCounted<Animation> {
     m_delay = c;
     m_delaySet = true;
   }
-  void setDirection(bool d) {
+  void setDirection(AnimationDirection d) {
     m_direction = d;
     m_directionSet = true;
   }

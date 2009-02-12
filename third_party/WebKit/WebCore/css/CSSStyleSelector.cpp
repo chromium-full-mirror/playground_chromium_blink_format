@@ -5774,7 +5774,9 @@ void CSSStyleSelector::mapAnimationDirection(Animation* layer,
   }
 
   CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
-  layer->setDirection(primitiveValue->getIdent() == CSSValueAlternate);
+  layer->setDirection(primitiveValue->getIdent() == CSSValueAlternate
+                          ? Animation::AnimationDirectionAlternate
+                          : Animation::AnimationDirectionNormal);
 }
 
 void CSSStyleSelector::mapAnimationDuration(Animation* animation,
