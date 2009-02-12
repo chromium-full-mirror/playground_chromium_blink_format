@@ -228,6 +228,16 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       /* [in] */ IDOMElement* element,
       /* [retval][out] */ BOOL* result);
 
+  virtual HRESULT STDMETHODCALLTYPE pauseAnimation(BSTR animationName,
+                                                   IDOMNode*,
+                                                   double secondsFromNow,
+                                                   BOOL* animationWasRunning);
+  virtual HRESULT STDMETHODCALLTYPE pauseTransition(BSTR propertyName,
+                                                    IDOMNode*,
+                                                    double secondsFromNow,
+                                                    BOOL* transitionWasRunning);
+  virtual HRESULT STDMETHODCALLTYPE numberOfActiveAnimations(UINT*);
+
   // IWebDocumentText
   virtual HRESULT STDMETHODCALLTYPE supportsTextEncoding(
       /* [retval][out] */ BOOL* result);
