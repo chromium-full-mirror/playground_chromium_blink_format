@@ -210,7 +210,7 @@ void RenderFieldset::paintBorderMinusLegend(GraphicsContext* graphicsContext,
 
   if (render_t) {
     if (lx >= borderLeftWidth)
-      drawBorder(
+      drawLineForBoxSide(
           graphicsContext, tx, ty, tx + min(lx, w),
           ty + style->borderTopWidth(), BSTop, tc, style->color(), ts,
           (render_l && (ls == DOTTED || ls == DASHED || ls == DOUBLE)
@@ -220,26 +220,28 @@ void RenderFieldset::paintBorderMinusLegend(GraphicsContext* graphicsContext,
                ? borderRightWidth
                : 0));
     if (lx + lw <= w - borderRightWidth)
-      drawBorder(graphicsContext, tx + max(0, lx + lw), ty, tx + w,
-                 ty + style->borderTopWidth(), BSTop, tc, style->color(), ts,
-                 (lx + lw <= 0 && render_l &&
-                          (ls == DOTTED || ls == DASHED || ls == DOUBLE)
-                      ? borderLeftWidth
-                      : 0),
-                 (render_r && (rs == DOTTED || rs == DASHED || rs == DOUBLE)
-                      ? borderRightWidth
-                      : 0));
+      drawLineForBoxSide(
+          graphicsContext, tx + max(0, lx + lw), ty, tx + w,
+          ty + style->borderTopWidth(), BSTop, tc, style->color(), ts,
+          (lx + lw <= 0 && render_l &&
+                   (ls == DOTTED || ls == DASHED || ls == DOUBLE)
+               ? borderLeftWidth
+               : 0),
+          (render_r && (rs == DOTTED || rs == DASHED || rs == DOUBLE)
+               ? borderRightWidth
+               : 0));
   }
 
   if (render_b)
-    drawBorder(graphicsContext, tx, ty + h - style->borderBottomWidth(), tx + w,
-               ty + h, BSBottom, bc, style->color(), bs,
-               (render_l && (ls == DOTTED || ls == DASHED || ls == DOUBLE)
-                    ? style->borderLeftWidth()
-                    : 0),
-               (render_r && (rs == DOTTED || rs == DASHED || rs == DOUBLE)
-                    ? style->borderRightWidth()
-                    : 0));
+    drawLineForBoxSide(
+        graphicsContext, tx, ty + h - style->borderBottomWidth(), tx + w,
+        ty + h, BSBottom, bc, style->color(), bs,
+        (render_l && (ls == DOTTED || ls == DASHED || ls == DOUBLE)
+             ? style->borderLeftWidth()
+             : 0),
+        (render_r && (rs == DOTTED || rs == DASHED || rs == DOUBLE)
+             ? style->borderRightWidth()
+             : 0));
 
   if (render_l) {
     const Color& lc = style->borderLeftColor();
@@ -259,10 +261,10 @@ void RenderFieldset::paintBorderMinusLegend(GraphicsContext* graphicsContext,
       startY = lb;
     }
 
-    drawBorder(graphicsContext, tx, startY, tx + borderLeftWidth, ty + h,
-               BSLeft, lc, style->color(), ls,
-               ignore_top ? 0 : style->borderTopWidth(),
-               ignore_bottom ? 0 : style->borderBottomWidth());
+    drawLineForBoxSide(graphicsContext, tx, startY, tx + borderLeftWidth,
+                       ty + h, BSLeft, lc, style->color(), ls,
+                       ignore_top ? 0 : style->borderTopWidth(),
+                       ignore_bottom ? 0 : style->borderBottomWidth());
   }
 
   if (render_r) {
@@ -283,10 +285,10 @@ void RenderFieldset::paintBorderMinusLegend(GraphicsContext* graphicsContext,
       startY = lb;
     }
 
-    drawBorder(graphicsContext, tx + w - borderRightWidth, startY, tx + w,
-               ty + h, BSRight, rc, style->color(), rs,
-               ignore_top ? 0 : style->borderTopWidth(),
-               ignore_bottom ? 0 : style->borderBottomWidth());
+    drawLineForBoxSide(graphicsContext, tx + w - borderRightWidth, startY,
+                       tx + w, ty + h, BSRight, rc, style->color(), rs,
+                       ignore_top ? 0 : style->borderTopWidth(),
+                       ignore_bottom ? 0 : style->borderBottomWidth());
   }
 }
 

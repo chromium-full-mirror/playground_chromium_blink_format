@@ -978,55 +978,56 @@ void RenderInline::paintOutlineForLine(GraphicsContext* graphicsContext,
   int r = tx + thisline.right() + offset;
 
   // left edge
-  drawBorder(graphicsContext, l - ow,
-             t - (lastline.isEmpty() || thisline.x() < lastline.x() ||
-                          (lastline.right() - 1) <= thisline.x()
-                      ? ow
-                      : 0),
-             l, b + (nextline.isEmpty() || thisline.x() <= nextline.x() ||
-                             (nextline.right() - 1) <= thisline.x()
-                         ? ow
-                         : 0),
-             BSLeft, oc, style()->color(), os,
-             (lastline.isEmpty() || thisline.x() < lastline.x() ||
-                      (lastline.right() - 1) <= thisline.x()
-                  ? ow
-                  : -ow),
-             (nextline.isEmpty() || thisline.x() <= nextline.x() ||
-                      (nextline.right() - 1) <= thisline.x()
-                  ? ow
-                  : -ow));
+  drawLineForBoxSide(graphicsContext, l - ow,
+                     t - (lastline.isEmpty() || thisline.x() < lastline.x() ||
+                                  (lastline.right() - 1) <= thisline.x()
+                              ? ow
+                              : 0),
+                     l,
+                     b + (nextline.isEmpty() || thisline.x() <= nextline.x() ||
+                                  (nextline.right() - 1) <= thisline.x()
+                              ? ow
+                              : 0),
+                     BSLeft, oc, style()->color(), os,
+                     (lastline.isEmpty() || thisline.x() < lastline.x() ||
+                              (lastline.right() - 1) <= thisline.x()
+                          ? ow
+                          : -ow),
+                     (nextline.isEmpty() || thisline.x() <= nextline.x() ||
+                              (nextline.right() - 1) <= thisline.x()
+                          ? ow
+                          : -ow));
 
   // right edge
-  drawBorder(graphicsContext, r,
-             t - (lastline.isEmpty() || lastline.right() < thisline.right() ||
-                          (thisline.right() - 1) <= lastline.x()
-                      ? ow
-                      : 0),
-             r + ow,
-             b + (nextline.isEmpty() || nextline.right() <= thisline.right() ||
-                          (thisline.right() - 1) <= nextline.x()
-                      ? ow
-                      : 0),
-             BSRight, oc, style()->color(), os,
-             (lastline.isEmpty() || lastline.right() < thisline.right() ||
-                      (thisline.right() - 1) <= lastline.x()
-                  ? ow
-                  : -ow),
-             (nextline.isEmpty() || nextline.right() <= thisline.right() ||
-                      (thisline.right() - 1) <= nextline.x()
-                  ? ow
-                  : -ow));
+  drawLineForBoxSide(
+      graphicsContext, r,
+      t - (lastline.isEmpty() || lastline.right() < thisline.right() ||
+                   (thisline.right() - 1) <= lastline.x()
+               ? ow
+               : 0),
+      r + ow, b + (nextline.isEmpty() || nextline.right() <= thisline.right() ||
+                           (thisline.right() - 1) <= nextline.x()
+                       ? ow
+                       : 0),
+      BSRight, oc, style()->color(), os,
+      (lastline.isEmpty() || lastline.right() < thisline.right() ||
+               (thisline.right() - 1) <= lastline.x()
+           ? ow
+           : -ow),
+      (nextline.isEmpty() || nextline.right() <= thisline.right() ||
+               (thisline.right() - 1) <= nextline.x()
+           ? ow
+           : -ow));
   // upper edge
   if (thisline.x() < lastline.x())
-    drawBorder(
+    drawLineForBoxSide(
         graphicsContext, l - ow, t - ow,
         min(r + ow, (lastline.isEmpty() ? 1000000 : tx + lastline.x())), t,
         BSTop, oc, style()->color(), os, ow,
         (!lastline.isEmpty() && tx + lastline.x() + 1 < r + ow) ? -ow : ow);
 
   if (lastline.right() < thisline.right())
-    drawBorder(
+    drawLineForBoxSide(
         graphicsContext,
         max(lastline.isEmpty() ? -1000000 : tx + lastline.right(), l - ow),
         t - ow, r + ow, t, BSTop, oc, style()->color(), os,
@@ -1034,14 +1035,14 @@ void RenderInline::paintOutlineForLine(GraphicsContext* graphicsContext,
 
   // lower edge
   if (thisline.x() < nextline.x())
-    drawBorder(
+    drawLineForBoxSide(
         graphicsContext, l - ow, b,
         min(r + ow, !nextline.isEmpty() ? tx + nextline.x() + 1 : 1000000),
         b + ow, BSBottom, oc, style()->color(), os, ow,
         (!nextline.isEmpty() && tx + nextline.x() + 1 < r + ow) ? -ow : ow);
 
   if (nextline.right() < thisline.right())
-    drawBorder(
+    drawLineForBoxSide(
         graphicsContext,
         max(!nextline.isEmpty() ? tx + nextline.right() : -1000000, l - ow), b,
         r + ow, b + ow, BSBottom, oc, style()->color(), os,

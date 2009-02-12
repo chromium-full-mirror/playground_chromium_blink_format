@@ -778,7 +778,7 @@ static EBorderStyle collapsedBorderStyle(EBorderStyle style) {
 
 struct CollapsedBorder {
   CollapsedBorderValue borderValue;
-  RenderObject::BorderSide side;
+  BoxSide side;
   bool shouldPaint;
   int x1;
   int y1;
@@ -792,7 +792,7 @@ class CollapsedBorders {
   CollapsedBorders() : m_count(0) {}
 
   void addBorder(const CollapsedBorderValue& borderValue,
-                 RenderObject::BorderSide borderSide,
+                 BoxSide borderSide,
                  bool shouldPaint,
                  int x1,
                  int y1,
@@ -915,9 +915,9 @@ void RenderTableCell::paintCollapsedBorder(GraphicsContext* graphicsContext,
   for (CollapsedBorder* border = borders.nextBorder(); border;
        border = borders.nextBorder()) {
     if (border->borderValue == *table()->currentBorderStyle())
-      drawBorder(graphicsContext, border->x1, border->y1, border->x2,
-                 border->y2, border->side, border->borderValue.color(),
-                 style()->color(), border->style, 0, 0);
+      drawLineForBoxSide(graphicsContext, border->x1, border->y1, border->x2,
+                         border->y2, border->side, border->borderValue.color(),
+                         style()->color(), border->style, 0, 0);
   }
 }
 

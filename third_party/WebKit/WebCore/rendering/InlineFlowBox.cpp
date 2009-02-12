@@ -732,8 +732,8 @@ void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
       img && img->canRender(renderer()->style()->effectiveZoom());
   if ((!hasFillImage && !renderer()->style()->hasBorderRadius()) ||
       (!prevLineBox() && !nextLineBox()) || !parent())
-    renderer()->paintFillLayerExtended(paintInfo, c, fillLayer, my, mh, tx, ty,
-                                       w, h, this, op);
+    boxModelObject()->paintFillLayerExtended(paintInfo, c, fillLayer, my, mh,
+                                             tx, ty, w, h, this, op);
   else {
     // We have a fill image that spans multiple lines.
     // We need to adjust _tx and _ty by the width of all previous lines.
@@ -756,8 +756,8 @@ void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
       totalWidth += curr->width();
     paintInfo.context->save();
     paintInfo.context->clip(IntRect(tx, ty, width(), height()));
-    renderer()->paintFillLayerExtended(paintInfo, c, fillLayer, my, mh, startX,
-                                       ty, totalWidth, h, this, op);
+    boxModelObject()->paintFillLayerExtended(
+        paintInfo, c, fillLayer, my, mh, startX, ty, totalWidth, h, this, op);
     paintInfo.context->restore();
   }
 }
@@ -769,14 +769,14 @@ void InlineFlowBox::paintBoxShadow(GraphicsContext* context,
                                    int w,
                                    int h) {
   if ((!prevLineBox() && !nextLineBox()) || !parent())
-    renderer()->paintBoxShadow(context, tx, ty, w, h, s);
+    boxModelObject()->paintBoxShadow(context, tx, ty, w, h, s);
   else {
     // FIXME: We can do better here in the multi-line case. We want to push a
     // clip so that the shadow doesn't
     // protrude incorrectly at the edges, and we want to possibly include
     // shadows cast from the previous/following lines
-    renderer()->paintBoxShadow(context, tx, ty, w, h, s, includeLeftEdge(),
-                               includeRightEdge());
+    boxModelObject()->paintBoxShadow(context, tx, ty, w, h, s,
+                                     includeLeftEdge(), includeRightEdge());
   }
 }
 
@@ -832,8 +832,9 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
       // only box for this object.  In those
       // cases only a single call to draw is required.
       if (!hasBorderImage || (!prevLineBox() && !nextLineBox()))
-        renderer()->paintBorder(context, tx, ty, w, h, renderer()->style(),
-                                includeLeftEdge(), includeRightEdge());
+        boxModelObject()->paintBorder(context, tx, ty, w, h,
+                                      renderer()->style(), includeLeftEdge(),
+                                      includeRightEdge());
       else {
         // We have a border image that spans multiple lines.
         // We need to adjust _tx and _ty by the width of all previous lines.
@@ -857,8 +858,8 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
           totalWidth += curr->width();
         context->save();
         context->clip(IntRect(tx, ty, width(), height()));
-        renderer()->paintBorder(context, startX, ty, totalWidth, h,
-                                renderer()->style());
+        boxModelObject()->paintBorder(context, startX, ty, totalWidth, h,
+                                      renderer()->style());
         context->restore();
       }
     }
@@ -915,9 +916,9 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
   // The simple case is where we are the only box for this object.  In those
   // cases only a single call to draw is required.
   if (!prevLineBox() && !nextLineBox()) {
-    renderer()->paintNinePieceImage(paintInfo.context, tx, ty, w, h,
-                                    renderer()->style(), maskNinePieceImage,
-                                    compositeOp);
+    boxModelObject()->paintNinePieceImage(paintInfo.context, tx, ty, w, h,
+                                          renderer()->style(),
+                                          maskNinePieceImage, compositeOp);
   } else {
     // We have a mask image that spans multiple lines.
     // We need to adjust _tx and _ty by the width of all previous lines.
@@ -930,9 +931,9 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
       totalWidth += curr->width();
     paintInfo.context->save();
     paintInfo.context->clip(IntRect(tx, ty, width(), height()));
-    renderer()->paintNinePieceImage(paintInfo.context, startX, ty, totalWidth,
-                                    h, renderer()->style(), maskNinePieceImage,
-                                    compositeOp);
+    boxModelObject()->paintNinePieceImage(paintInfo.context, startX, ty,
+                                          totalWidth, h, renderer()->style(),
+                                          maskNinePieceImage, compositeOp);
     paintInfo.context->restore();
   }
 

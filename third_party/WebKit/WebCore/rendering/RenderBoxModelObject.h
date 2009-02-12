@@ -97,6 +97,30 @@ class RenderBoxModelObject : public RenderObject {
 
   virtual void childBecameNonInline(RenderObject* /*child*/) {}
 
+  void paintBorder(GraphicsContext*,
+                   int tx,
+                   int ty,
+                   int w,
+                   int h,
+                   const RenderStyle*,
+                   bool begin = true,
+                   bool end = true);
+  bool paintNinePieceImage(GraphicsContext*,
+                           int tx,
+                           int ty,
+                           int w,
+                           int h,
+                           const RenderStyle*,
+                           const NinePieceImage&,
+                           CompositeOperator = CompositeSourceOver);
+  void paintBoxShadow(GraphicsContext*,
+                      int tx,
+                      int ty,
+                      int w,
+                      int h,
+                      const RenderStyle*,
+                      bool begin = true,
+                      bool end = true);
   virtual void paintFillLayerExtended(const PaintInfo&,
                                       const Color&,
                                       const FillLayer*,

@@ -90,6 +90,11 @@ enum HitTestAction {
   HitTestForeground
 };
 
+// Sides used when drawing borders and outlines.  This is in RenderObject rather
+// than RenderBoxModelObject since outlines can
+// be drawn by SVG around bounding boxes.
+enum BoxSide { BSTop, BSBottom, BSLeft, BSRight };
+
 #if ENABLE(DASHBOARD_SUPPORT)
 struct DashboardRegionValue {
   bool operator==(const DashboardRegionValue& o) const {
@@ -370,6 +375,30 @@ class RenderObject : public CachedResourceClient {
   bool hasTransform() const { return m_hasTransform; }
   bool hasMask() const { return style() && style()->hasMask(); }
 
+  void drawLineForBoxSide(GraphicsContext*,
+                          int x1,
+                          int y1,
+                          int x2,
+                          int y2,
+                          BoxSide,
+                          Color,
+                          const Color& textcolor,
+                          EBorderStyle,
+                          int adjbw1,
+                          int adjbw2);
+  void drawArcForBoxSide(GraphicsContext*,
+                         int x,
+                         int y,
+                         float thickness,
+                         IntSize radius,
+                         int angleStart,
+                         int angleSpan,
+                         BoxSide,
+                         Color,
+                         const Color& textcolor,
+                         EBorderStyle,
+                         bool firstCorner);
+
  public:
   // The pseudo element style can be cached or uncached.  Use the cached method
   // if the pseudo element doesn't respect
@@ -476,46 +505,6 @@ class RenderObject : public CachedResourceClient {
   };
 
   virtual void paint(PaintInfo&, int tx, int ty);
-  void paintBorder(GraphicsContext*,
-                   int tx,
-                   int ty,
-                   int w,
-                   int h,
-                   const RenderStyle*,
-                   bool begin = true,
-                   bool end = true);
-  bool paintNinePieceImage(GraphicsContext*,
-                           int tx,
-                           int ty,
-                           int w,
-                           int h,
-                           const RenderStyle*,
-                           const NinePieceImage&,
-                           CompositeOperator = CompositeSourceOver);
-  void paintBoxShadow(GraphicsContext*,
-                      int tx,
-                      int ty,
-                      int w,
-                      int h,
-                      const RenderStyle*,
-                      bool begin = true,
-                      bool end = true);
-
-  // RenderBox implements this.
-  virtual void paintBoxDecorations(PaintInfo&, int /*tx*/, int /*ty*/) {}
-  virtual void paintMask(PaintInfo&, int /*tx*/, int /*ty*/) {}
-  virtual void paintFillLayerExtended(const PaintInfo&,
-                                      const Color&,
-                                      const FillLayer*,
-                                      int /*clipY*/,
-                                      int /*clipH*/,
-                                      int /*tx*/,
-                                      int /*ty*/,
-                                      int /*width*/,
-                                      int /*height*/,
-                                      InlineFlowBox* = 0,
-                                      CompositeOperator = CompositeSourceOver) {
-  }
 
   /*
    * Calculates the actual width of the object (only for non inline
@@ -666,32 +655,6 @@ class RenderObject : public CachedResourceClient {
                                Color& overline,
                                Color& linethrough,
                                bool quirksMode = false);
-
-  enum BorderSide { BSTop, BSBottom, BSLeft, BSRight };
-
-  void drawBorderArc(GraphicsContext*,
-                     int x,
-                     int y,
-                     float thickness,
-                     IntSize radius,
-                     int angleStart,
-                     int angleSpan,
-                     BorderSide,
-                     Color,
-                     const Color& textcolor,
-                     EBorderStyle,
-                     bool firstCorner);
-  void drawBorder(GraphicsContext*,
-                  int x1,
-                  int y1,
-                  int x2,
-                  int y2,
-                  BorderSide,
-                  Color,
-                  const Color& textcolor,
-                  EBorderStyle,
-                  int adjbw1,
-                  int adjbw2);
 
   // Return the RenderBox in the container chain which is responsible for
   // painting this object, or 0
