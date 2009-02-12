@@ -2723,14 +2723,6 @@ void RenderObject::layout() {
   setNeedsLayout(false);
 }
 
-InlineBox* RenderObject::inlineBoxWrapper() const {
-  return 0;
-}
-
-void RenderObject::setInlineBoxWrapper(InlineBox*) {}
-
-void RenderObject::deleteLineBoxWrapper() {}
-
 RenderStyle* RenderObject::firstLineStyleSlowCase() const {
   ASSERT(document()->usesFirstLineRules());
 

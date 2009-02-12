@@ -51,8 +51,8 @@ static Node* nextRenderedEditable(Node* node) {
     RenderObject* renderer = node->renderer();
     if (!renderer)
       continue;
-    if (renderer->inlineBoxWrapper() ||
-        renderer->isText() && toRenderText(renderer)->firstTextBox())
+    if ((renderer->isBox() && toRenderBox(renderer)->inlineBoxWrapper()) ||
+        (renderer->isText() && toRenderText(renderer)->firstTextBox()))
       return node;
   }
   return 0;
@@ -66,8 +66,8 @@ static Node* previousRenderedEditable(Node* node) {
     RenderObject* renderer = node->renderer();
     if (!renderer)
       continue;
-    if (renderer->inlineBoxWrapper() ||
-        renderer->isText() && toRenderText(renderer)->firstTextBox())
+    if ((renderer->isBox() && toRenderBox(renderer)->inlineBoxWrapper()) ||
+        (renderer->isText() && toRenderText(renderer)->firstTextBox()))
       return node;
   }
   return 0;
@@ -880,7 +880,8 @@ void Position::getInlineBoxAndOffset(EAffinity affinity,
   caretOffset = offset();
   RenderObject* renderer = node()->renderer();
   if (!renderer->isText()) {
-    inlineBox = renderer->inlineBoxWrapper();
+    inlineBox =
+        renderer->isBox() ? toRenderBox(renderer)->inlineBoxWrapper() : 0;
     if (!inlineBox ||
         caretOffset > inlineBox->caretMinOffset() &&
             caretOffset < inlineBox->caretMaxOffset())

@@ -83,7 +83,8 @@ RenderObject* RenderObjectChildList::removeChildNode(RenderObject* owner,
   }
 
   // If we have a line box wrapper, delete it.
-  oldChild->deleteLineBoxWrapper();
+  if (oldChild->isBox())
+    toRenderBox(oldChild)->deleteLineBoxWrapper();
 
   if (!owner->documentBeingDestroyed() && fullRemove) {
     // if we remove visible child from an invisible parent, we don't know the

@@ -243,11 +243,11 @@ class RenderBox : public RenderBoxModelObject {
   // the replaced RenderObject to quickly determine what line it is contained on
   // and to easily
   // iterate over structures on the line.
-  virtual InlineBox* inlineBoxWrapper() const { return m_inlineBoxWrapper; }
-  virtual void setInlineBoxWrapper(InlineBox* boxWrapper) {
+  InlineBox* inlineBoxWrapper() const { return m_inlineBoxWrapper; }
+  void setInlineBoxWrapper(InlineBox* boxWrapper) {
     m_inlineBoxWrapper = boxWrapper;
   }
-  virtual void deleteLineBoxWrapper();
+  void deleteLineBoxWrapper();
 
   virtual int lowestPosition(bool includeOverflowInterior = true,
                              bool includeSelf = true) const;

@@ -306,7 +306,7 @@ void RenderLineBoxList::dirtyLinesFromChangedChild(RenderObject* container,
       continue;
 
     if (curr->isReplaced()) {
-      InlineBox* wrapper = curr->inlineBoxWrapper();
+      InlineBox* wrapper = toRenderBox(curr)->inlineBoxWrapper();
       if (wrapper)
         box = wrapper->root();
     } else if (curr->isText()) {
