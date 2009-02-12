@@ -522,6 +522,8 @@ JSValuePtr jsDOMWindowBaseAudio(ExecState* exec,
   return getDOMConstructor<JSAudioConstructor>(
       exec, static_cast<JSDOMWindowBase*>(asObject(slot.slotBase())));
 #else
+  UNUSED_PARAM(exec);
+  UNUSED_PARAM(slot);
   return jsUndefined();
 #endif
 }
@@ -535,6 +537,8 @@ JSValuePtr jsDOMWindowBaseWorker(ExecState* exec,
     return jsUndefined();
   return getDOMConstructor<JSWorkerConstructor>(exec);
 #else
+  UNUSED_PARAM(exec);
+  UNUSED_PARAM(slot);
   return jsUndefined();
 #endif
 }
@@ -548,6 +552,8 @@ JSValuePtr jsDOMWindowBaseXSLTProcessor(ExecState* exec,
     return jsUndefined();
   return getDOMConstructor<JSXSLTProcessorConstructor>(exec);
 #else
+  UNUSED_PARAM(exec);
+  UNUSED_PARAM(slot);
   return jsUndefined();
 #endif
 }
