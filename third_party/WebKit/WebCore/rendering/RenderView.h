@@ -72,8 +72,6 @@ class RenderView : public RenderBlock {
 
   FrameView* frameView() const { return m_frameView; }
 
-  virtual bool hasOverhangingFloats() { return false; }
-
   virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect&,
                                      bool fixed = false);

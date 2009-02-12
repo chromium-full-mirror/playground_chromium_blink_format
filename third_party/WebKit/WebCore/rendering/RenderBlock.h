@@ -249,15 +249,15 @@ class RenderBlock : public RenderBox {
                                              bool inLayout = true);
   void markPositionedObjectsForLayout();
 
-  virtual bool containsFloats() {
+  bool containsFloats() {
     return m_floatingObjects && !m_floatingObjects->isEmpty();
   }
-  virtual bool containsFloat(RenderObject*);
+  bool containsFloat(RenderObject*);
 
   virtual bool avoidsFloats() const;
 
-  virtual bool hasOverhangingFloats() {
-    return !hasColumns() && floatBottom() > height();
+  bool hasOverhangingFloats() {
+    return parent() && !hasColumns() && floatBottom() > height();
   }
   void addIntrudingFloats(RenderBlock* prev, int xoffset, int yoffset);
   int addOverhangingFloats(RenderBlock* child,

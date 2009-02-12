@@ -1238,7 +1238,8 @@ void RenderBlock::collapseMargins(RenderBox* child,
       // So go ahead and mark the item as dirty.
       child->setChildNeedsLayout(true, false);
 
-    if (!child->avoidsFloats() && child->containsFloats())
+    if (!child->avoidsFloats() && child->isBlockFlow() &&
+        toRenderBlock(child)->containsFloats())
       toRenderBlock(child)->markAllDescendantsWithFloatsForLayout();
 
     // Our guess was wrong. Make the child lay itself out again.
@@ -1301,7 +1302,8 @@ void RenderBlock::clearFloatsIfNeeded(RenderBox* child,
     // change (because it has more available line width).
     // So go ahead and mark the item as dirty.
     child->setChildNeedsLayout(true, false);
-  if (!child->avoidsFloats() && child->containsFloats())
+  if (!child->avoidsFloats() && child->isBlockFlow() &&
+      toRenderBlock(child)->containsFloats())
     toRenderBlock(child)->markAllDescendantsWithFloatsForLayout();
   child->layoutIfNeeded();
 }
@@ -1557,7 +1559,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
 
     bool markDescendantsWithFloats = false;
     if (yPosEstimate != oldRect.y() && !child->avoidsFloats() &&
-        child->containsFloats())
+        child->isBlockFlow() && toRenderBlock(child)->containsFloats())
       markDescendantsWithFloats = true;
     else if (!child->avoidsFloats() || child->shrinkToAvoidFloats()) {
       // If an element might be affected by the presence of floats, then always
@@ -1609,7 +1611,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
     // If the child has overhanging floats that intrude into following siblings
     // (or possibly out
     // of this block), then the parent gets notified of the floats now.
-    if (child->containsFloats())
+    if (child->isBlockFlow() && toRenderBlock(child)->containsFloats())
       maxFloatBottom =
           max(maxFloatBottom,
               addOverhangingFloats(toRenderBlock(child), -child->x(),
@@ -3340,8 +3342,9 @@ void RenderBlock::clearFloats() {
   // to avoid floats.
   bool parentHasFloats = false;
   RenderObject* prev = previousSibling();
-  while (prev && (!prev->isBox() || !prev->isRenderBlock() ||
-                  prev->avoidsFloats() || prev->isFloatingOrPositioned())) {
+  while (prev &&
+         (prev->isFloatingOrPositioned() || !prev->isBox() ||
+          !prev->isRenderBlock() || toRenderBlock(prev)->avoidsFloats())) {
     if (prev->isFloating())
       parentHasFloats = true;
     prev = prev->previousSibling();
@@ -3577,12 +3580,14 @@ void RenderBlock::markAllDescendantsWithFloatsForLayout(
   if (!childrenInline()) {
     for (RenderObject* child = firstChild(); child;
          child = child->nextSibling()) {
-      if (child->isRenderBlock() && !child->isFloatingOrPositioned() &&
-          ((floatToRemove ? child->containsFloat(floatToRemove)
-                          : child->containsFloats()) ||
-           child->shrinkToAvoidFloats()))
-        toRenderBlock(child)->markAllDescendantsWithFloatsForLayout(
-            floatToRemove, inLayout);
+      if (child->isFloatingOrPositioned() || !child->isRenderBlock())
+        continue;
+      RenderBlock* childBlock = toRenderBlock(child);
+      if ((floatToRemove ? childBlock->containsFloat(floatToRemove)
+                         : childBlock->containsFloats()) ||
+          childBlock->shrinkToAvoidFloats())
+        childBlock->markAllDescendantsWithFloatsForLayout(floatToRemove,
+                                                          inLayout);
     }
   }
 }
@@ -4746,7 +4751,8 @@ void RenderBlock::calcBlockPrefWidths() {
       continue;
     }
 
-    if (child->isFloating() || child->avoidsFloats()) {
+    if (child->isFloating() ||
+        (child->isBox() && toRenderBox(child)->avoidsFloats())) {
       int floatTotalWidth = floatLeftWidth + floatRightWidth;
       if (child->style()->clear() & CLEFT) {
         m_maxPrefWidth = max(floatTotalWidth, m_maxPrefWidth);
@@ -4781,7 +4787,7 @@ void RenderBlock::calcBlockPrefWidths() {
     w = child->maxPrefWidth() + margin;
 
     if (!child->isFloating()) {
-      if (child->avoidsFloats()) {
+      if (child->isBox() && toRenderBox(child)->avoidsFloats()) {
         // Determine a left and right max value based off whether or not the
         // floats can fit in the
         // margins of the object.  For negative margins, we will attempt to
