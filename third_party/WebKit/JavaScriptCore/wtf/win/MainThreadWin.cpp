@@ -52,11 +52,9 @@ LRESULT CALLBACK ThreadingWindowWndProc(HWND hWnd,
   return 0;
 }
 
-void initializeMainThread() {
+void initializeMainThreadPlatform() {
   if (threadingWindowHandle)
     return;
-
-  mainThreadFunctionQueueMutex();
 
   WNDCLASSEX wcex;
   memset(&wcex, 0, sizeof(WNDCLASSEX));
@@ -77,4 +75,4 @@ void scheduleDispatchFunctionsOnMainThread() {
   PostMessage(threadingWindowHandle, threadingFiredMessage, 0, 0);
 }
 
-}  // namespace WebCore
+}  // namespace WTF
