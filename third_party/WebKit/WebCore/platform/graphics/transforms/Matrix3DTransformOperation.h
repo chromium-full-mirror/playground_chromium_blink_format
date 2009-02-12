@@ -28,8 +28,6 @@
 
 #include "TransformOperation.h"
 
-#if ENABLE(3D_TRANSFORMS)
-
 namespace WebCore {
 
 class Matrix3DTransformOperation : public TransformOperation {
@@ -72,7 +70,5 @@ class Matrix3DTransformOperation : public TransformOperation {
 };
 
 }  // namespace WebCore
-
-#endif  // ENABLE(3D_TRANSFORMS)
 
 #endif  // Matrix3DTransformOperation_h

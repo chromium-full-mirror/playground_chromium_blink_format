@@ -88,12 +88,8 @@ class TranslateTransformOperation : public TransformOperation {
                               const Length& tz,
                               OperationType type)
       : m_x(tx), m_y(ty), m_z(tz), m_type(type) {
-#if ENABLE(3D_TRANSFORMS)
     ASSERT(type == TRANSLATE_X || type == TRANSLATE_Y || type == TRANSLATE_Z ||
            type == TRANSLATE || type == TRANSLATE_3D);
-#else
-    ASSERT(type == TRANSLATE_X || type == TRANSLATE_Y || type == TRANSLATE);
-#endif
   }
 
   Length m_x;

@@ -26,8 +26,6 @@
 #include "config.h"
 #include "PerspectiveTransformOperation.h"
 
-#if ENABLE(3D_TRANSFORMS)
-
 #include <algorithm>
 
 using namespace std;
@@ -65,5 +63,3 @@ PassRefPtr<TransformOperation> PerspectiveTransformOperation::blend(
 }
 
 }  // namespace WebCore
-
-#endif  // ENABLE(3D_TRANSFORMS)

@@ -86,6 +86,11 @@ class CSSPrimitiveValue : public CSSValue {
     CSS_TURN = 108
   };
 
+  static bool isUnitTypeLength(int type) {
+    return type > CSSPrimitiveValue::CSS_PERCENTAGE &&
+           type < CSSPrimitiveValue::CSS_DEG;
+  }
+
   static PassRefPtr<CSSPrimitiveValue> createIdentifier(int ident);
   static PassRefPtr<CSSPrimitiveValue> createColor(unsigned rgbValue);
   static PassRefPtr<CSSPrimitiveValue> create(double value, UnitTypes type);

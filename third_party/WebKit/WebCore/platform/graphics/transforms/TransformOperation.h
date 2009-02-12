@@ -82,14 +82,12 @@ class TransformOperation : public RefCounted<TransformOperation> {
   virtual OperationType getOperationType() const = 0;
   virtual bool isSameType(const TransformOperation&) const { return false; }
 
-#if ENABLE(3D_TRANSFORMS)
   bool is3DOperation() const {
     OperationType opType = getOperationType();
     return opType == SCALE_Z || opType == SCALE_3D || opType == TRANSLATE_Z ||
            opType == TRANSLATE_3D || opType == ROTATE_X || opType == ROTATE_Y ||
            opType == ROTATE_3D || opType == MATRIX_3D || opType == PERSPECTIVE;
   }
-#endif
 };
 
 }  // namespace WebCore

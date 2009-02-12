@@ -43,7 +43,6 @@ class TransformOperations {
       m_operations[i]->apply(t, sz);
   }
 
-#if ENABLE(3D_TRANSFORMS)
   // Return true if any of the operation types are 3D operation types (even if
   // the
   // values describe affine transforms)
@@ -53,7 +52,6 @@ class TransformOperations {
         return true;
     return false;
   }
-#endif
 
   Vector<RefPtr<TransformOperation>>& operations() { return m_operations; }
   const Vector<RefPtr<TransformOperation>>& operations() const {
