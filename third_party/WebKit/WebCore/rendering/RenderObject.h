@@ -175,14 +175,6 @@ class RenderObject : public CachedResourceClient {
   // RenderObject.
   RenderBox* enclosingBox() const;
 
-  virtual IntRect getOverflowClipRect(int /*tx*/, int /*ty*/) {
-    return IntRect(0, 0, 0, 0);
-  }
-  virtual IntRect getClipRect(int /*tx*/, int /*ty*/) {
-    return IntRect(0, 0, 0, 0);
-  }
-  bool hasClip() { return isPositioned() && style()->hasClip(); }
-
   virtual bool isEmpty() const { return firstChild() == 0; }
 
   virtual bool isEdited() const { return false; }
@@ -366,11 +358,8 @@ class RenderObject : public CachedResourceClient {
 
   bool isSelectionBorder() const;
 
+  bool hasClip() const { return isPositioned() && style()->hasClip(); }
   bool hasOverflowClip() const { return m_hasOverflowClip; }
-  virtual bool hasControlClip() const { return false; }
-  virtual IntRect controlClipRect(int /*tx*/, int /*ty*/) const {
-    return IntRect();
-  }
 
   bool hasTransform() const { return m_hasTransform; }
   bool hasMask() const { return style() && style()->hasMask(); }

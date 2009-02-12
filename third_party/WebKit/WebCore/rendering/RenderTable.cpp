@@ -1177,8 +1177,8 @@ int RenderTable::firstLineBoxBaseline() const {
          firstNonEmptySection->firstLineBoxBaseline();
 }
 
-IntRect RenderTable::getOverflowClipRect(int tx, int ty) {
-  IntRect rect = RenderBlock::getOverflowClipRect(tx, ty);
+IntRect RenderTable::overflowClipRect(int tx, int ty) {
+  IntRect rect = RenderBlock::overflowClipRect(tx, ty);
 
   // If we have a caption, expand the clip to include the caption.
   // FIXME: Technically this is wrong, but it's virtually impossible to fix this

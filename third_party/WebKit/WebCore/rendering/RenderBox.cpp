@@ -936,7 +936,7 @@ void RenderBox::paintCustomHighlight(int tx,
 
 #endif
 
-IntRect RenderBox::getOverflowClipRect(int tx, int ty) {
+IntRect RenderBox::overflowClipRect(int tx, int ty) {
   // FIXME: When overflow-clip (CSS3) is implemented, we'll obtain the property
   // here.
 
@@ -957,7 +957,7 @@ IntRect RenderBox::getOverflowClipRect(int tx, int ty) {
   return IntRect(clipX, clipY, clipWidth, clipHeight);
 }
 
-IntRect RenderBox::getClipRect(int tx, int ty) {
+IntRect RenderBox::clipRect(int tx, int ty) {
   int clipX = tx;
   int clipY = ty;
   int clipWidth = width();

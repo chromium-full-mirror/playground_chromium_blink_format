@@ -158,7 +158,7 @@ class RenderTable : public RenderBlock {
 
   bool hasSections() const { return m_head || m_foot || m_firstBody; }
 
-  virtual IntRect getOverflowClipRect(int tx, int ty);
+  virtual IntRect overflowClipRect(int tx, int ty);
 
   void recalcSectionsIfNeeded() const {
     if (m_needsSectionRecalc)
