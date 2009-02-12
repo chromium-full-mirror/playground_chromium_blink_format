@@ -210,9 +210,9 @@ class RenderBox : public RenderBoxModelObject {
   virtual int minPrefWidth() const;
   virtual int maxPrefWidth() const;
 
-  virtual int overrideSize() const;
-  virtual int overrideWidth() const;
-  virtual int overrideHeight() const;
+  int overrideSize() const;
+  int overrideWidth() const;
+  int overrideHeight() const;
   virtual void setOverrideSize(int);
 
   virtual IntSize offsetFromContainer(RenderObject*) const;
