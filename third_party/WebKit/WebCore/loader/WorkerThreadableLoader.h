@@ -45,6 +45,7 @@
 
 namespace WebCore {
 
+class ResourceError;
 class ResourceRequest;
 class WorkerContext;
 class WorkerMessagingProxy;
@@ -134,8 +135,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
     virtual void didReceiveResponse(const ResourceResponse&);
     virtual void didReceiveData(const char*, int lengthReceived);
     virtual void didFinishLoading(int identifier);
-    virtual void didFail();
-    virtual void didGetCancelled();
+    virtual void didFail(const ResourceError&);
     virtual void didReceiveAuthenticationCancellation(const ResourceResponse&);
 
     // Only to be used on the main thread.

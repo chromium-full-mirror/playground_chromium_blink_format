@@ -1215,23 +1215,23 @@ void XMLHttpRequest::processSyncLoadResults(unsigned long identifier,
     ec = XMLHttpRequestException::NETWORK_ERR;
 }
 
-void XMLHttpRequest::didFail() {
+void XMLHttpRequest::didFail(const ResourceError& error) {
   // If we are already in an error state, for instance we called abort(), bail
   // out early.
   if (m_error)
     return;
 
-  internalAbort();
+  if (error.isCancellation()) {
+    abortError();
+    return;
+  }
+
   networkError();
 }
 
-void XMLHttpRequest::didGetCancelled() {
-  // If we are already in an error state, for instance we called abort(), bail
-  // out early.
-  if (m_error)
-    return;
-
-  abortError();
+void XMLHttpRequest::didFailWillSendRequestCheck() {
+  internalAbort();
+  networkError();
 }
 
 void XMLHttpRequest::didFinishLoading(unsigned long identifier) {

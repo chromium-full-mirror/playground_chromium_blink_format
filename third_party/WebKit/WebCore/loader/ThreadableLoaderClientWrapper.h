@@ -69,14 +69,9 @@ class ThreadableLoaderClientWrapper
       m_client->didFinishLoading(identifier);
   }
 
-  void didFail() {
+  void didFail(const ResourceError& error) {
     if (m_client)
-      m_client->didFail();
-  }
-
-  void didGetCancelled() {
-    if (m_client)
-      m_client->didGetCancelled();
+      m_client->didFail(error);
   }
 
   void didReceiveAuthenticationCancellation(const ResourceResponse& response) {

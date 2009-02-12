@@ -46,6 +46,7 @@ PassRefPtr<DocumentThreadableLoader> DocumentThreadableLoader::create(
     const ResourceRequest& request,
     LoadCallbacks callbacksSetting,
     ContentSniff contentSniff) {
+  ASSERT(document);
   RefPtr<DocumentThreadableLoader> loader =
       adoptRef(new DocumentThreadableLoader(document, client, request,
                                             callbacksSetting, contentSniff));
@@ -92,7 +93,7 @@ void DocumentThreadableLoader::willSendRequest(SubresourceLoader*,
   // cross-domain requests.
   if (!m_document->securityOrigin()->canRequest(request.url())) {
     RefPtr<DocumentThreadableLoader> protect(this);
-    m_client->didFail();
+    m_client->didFailWillSendRequestCheck();
     cancel();
   }
 }
@@ -128,10 +129,7 @@ void DocumentThreadableLoader::didFinishLoading(SubresourceLoader* loader) {
 void DocumentThreadableLoader::didFail(SubresourceLoader*,
                                        const ResourceError& error) {
   ASSERT(m_client);
-  if (error.isCancellation())
-    m_client->didGetCancelled();
-  else
-    m_client->didFail();
+  m_client->didFail(error);
 }
 
 void DocumentThreadableLoader::receivedCancellation(

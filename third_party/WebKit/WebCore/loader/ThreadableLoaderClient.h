@@ -33,6 +33,7 @@
 
 namespace WebCore {
 
+class ResourceError;
 class ResourceResponse;
 
 class ThreadableLoaderClient {
@@ -43,8 +44,8 @@ class ThreadableLoaderClient {
   virtual void didReceiveResponse(const ResourceResponse&) {}
   virtual void didReceiveData(const char*, int /*lengthReceived*/) {}
   virtual void didFinishLoading(unsigned long /*identifier*/) {}
-  virtual void didFail() {}
-  virtual void didGetCancelled() {}
+  virtual void didFail(const ResourceError&) {}
+  virtual void didFailWillSendRequestCheck() {}
 
   virtual void didReceiveAuthenticationCancellation(const ResourceResponse&) {}
 
