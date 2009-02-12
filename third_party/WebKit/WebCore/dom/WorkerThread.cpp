@@ -35,7 +35,7 @@
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"
 #include "WorkerContext.h"
-#include "WorkerMessagingProxy.h"
+#include "WorkerObjectProxy.h"
 
 #include <utility>
 #include <wtf/Noncopyable.h>
@@ -72,17 +72,17 @@ PassRefPtr<WorkerThread> WorkerThread::create(
     const KURL& scriptURL,
     const String& userAgent,
     const String& sourceCode,
-    WorkerMessagingProxy* messagingProxy) {
+    WorkerObjectProxy* workerObjectProxy) {
   return adoptRef(
-      new WorkerThread(scriptURL, userAgent, sourceCode, messagingProxy));
+      new WorkerThread(scriptURL, userAgent, sourceCode, workerObjectProxy));
 }
 
 WorkerThread::WorkerThread(const KURL& scriptURL,
                            const String& userAgent,
                            const String& sourceCode,
-                           WorkerMessagingProxy* messagingProxy)
+                           WorkerObjectProxy* workerObjectProxy)
     : m_threadID(0),
-      m_messagingProxy(messagingProxy),
+      m_workerObjectProxy(workerObjectProxy),
       m_startupData(
           WorkerThreadStartupData::create(scriptURL, userAgent, sourceCode)) {}
 
@@ -130,9 +130,8 @@ void* WorkerThread::workerThread() {
   // created.
   m_startupData.clear();
 
-  m_messagingProxy->confirmWorkerThreadMessage(
-      m_workerContext->hasPendingActivity());  // This wasn't really a message,
-                                               // but it counts as one for GC.
+  m_workerObjectProxy->reportPendingActivity(
+      m_workerContext->hasPendingActivity());
 
   // Blocks until terminated.
   m_runLoop.run(m_workerContext.get());

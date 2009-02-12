@@ -33,6 +33,8 @@
 
 #if ENABLE(WORKERS)
 
+#include "Console.h"
+
 namespace WebCore {
 
 class String;
@@ -47,6 +49,13 @@ class WorkerObjectProxy {
   virtual void postExceptionToWorkerObject(const String& errorMessage,
                                            int lineNumber,
                                            const String& sourceURL) = 0;
+
+  virtual void postConsoleMessageToWorkerObject(MessageDestination,
+                                                MessageSource,
+                                                MessageLevel,
+                                                const String& message,
+                                                int lineNumber,
+                                                const String& sourceURL) = 0;
 
   virtual void reportPendingActivity(bool hasPendingActivity) = 0;
 
