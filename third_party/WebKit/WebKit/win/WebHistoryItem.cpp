@@ -187,7 +187,7 @@ WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
       if (CFGetTypeID(dailyCount) == CFNumberGetTypeID())
         CFNumberGetValue(dailyCount, kCFNumberIntType, &(*dailyVector)[i]);
       if ((*dailyVector)[i] < 0)
-        (*dailyVector)[i];
+        (*dailyVector)[i] = 0;
     }
     for (CFIndex i = 0; i < weeklySize; ++i) {
       CFNumberRef weeklyCount =
@@ -195,7 +195,7 @@ WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
       if (CFGetTypeID(weeklyCount) == CFNumberGetTypeID())
         CFNumberGetValue(weeklyCount, kCFNumberIntType, &(*weeklyVector)[i]);
       if ((*weeklyVector)[i] < 0)
-        (*weeklyVector)[i];
+        (*weeklyVector)[i] = 0;
     }
   }
 
