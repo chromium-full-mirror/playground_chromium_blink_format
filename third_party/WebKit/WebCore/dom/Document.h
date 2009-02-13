@@ -100,6 +100,7 @@ class RegisteredEventListener;
 class RenderArena;
 class RenderView;
 class SecurityOrigin;
+class SegmentedString;
 class Settings;
 class StyleSheet;
 class StyleSheetList;
@@ -481,7 +482,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void implicitClose();
   void cancelParsing();
 
-  void prepareToWrite(Document* ownerDocument);
+  void write(const SegmentedString& text, Document* ownerDocument = 0);
   void write(const String& text, Document* ownerDocument = 0);
   void writeln(const String& text, Document* ownerDocument = 0);
   void finishParsing();

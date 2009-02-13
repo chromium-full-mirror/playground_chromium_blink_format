@@ -165,9 +165,7 @@ static inline void documentWrite(ExecState* exec,
 
   Document* activeDocument =
       asJSDOMWindow(exec->lexicalGlobalObject())->impl()->document();
-  document->prepareToWrite(activeDocument);
-  if (Tokenizer* tokenizer = document->tokenizer())
-    tokenizer->write(segmentedString, false);
+  document->write(segmentedString, activeDocument);
 }
 
 JSValuePtr JSHTMLDocument::write(ExecState* exec, const ArgList& args) {
