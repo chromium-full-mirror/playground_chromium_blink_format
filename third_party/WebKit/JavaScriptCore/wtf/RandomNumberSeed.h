@@ -57,6 +57,15 @@ inline void initializeRandomNumberGenerator() {
   srand(static_cast<unsigned>(time(0)));
 #endif
 }
+
+inline void initializeWeakRandomNumberGenerator() {
+#if COMPILER(MSVC) && defined(_CRT_RAND_S)
+  // We need to initialise windows rand() explicitly for Math.random
+  unsigned seed = 0;
+  rand_s(&seed);
+  srand(seed);
+#endif
+}
 }
 
 #endif

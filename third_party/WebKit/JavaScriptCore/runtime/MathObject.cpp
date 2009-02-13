@@ -28,6 +28,7 @@
 #include <wtf/Assertions.h>
 #include <wtf/MathExtras.h>
 #include <wtf/RandomNumber.h>
+#include <wtf/RandomNumberSeed.h>
 
 namespace JSC {
 
@@ -161,6 +162,7 @@ MathObject::MathObject(ExecState* exec, PassRefPtr<Structure> structure)
   putDirectWithoutTransition(Identifier(exec, "SQRT2"),
                              jsNumber(exec, sqrt(2.0)),
                              DontDelete | DontEnum | ReadOnly);
+  WTF::initializeWeakRandomNumberGenerator();
 }
 
 // ECMA 15.8
@@ -308,7 +310,7 @@ JSValuePtr mathProtoFuncRandom(ExecState* exec,
                                JSObject*,
                                JSValuePtr,
                                const ArgList&) {
-  return jsNumber(exec, WTF::randomNumber());
+  return jsNumber(exec, WTF::weakRandomNumber());
 }
 
 JSValuePtr mathProtoFuncRound(ExecState* exec,
