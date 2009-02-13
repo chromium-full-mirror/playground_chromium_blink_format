@@ -2205,8 +2205,6 @@ void RenderObject::getTextDecorationColors(int decorations,
   }
 }
 
-void RenderObject::updateWidgetPosition() {}
-
 #if ENABLE(DASHBOARD_SUPPORT)
 void RenderObject::addDashboardRegions(Vector<DashboardRegionValue>& regions) {
   // Convert the style regions to absolute coordinates.

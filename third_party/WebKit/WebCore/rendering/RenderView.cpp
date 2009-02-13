@@ -31,6 +31,7 @@
 #include "HitTestResult.h"
 #include "RenderLayer.h"
 #include "RenderSelectionInfo.h"
+#include "RenderWidget.h"
 
 #if USE(ACCELERATED_COMPOSITING)
 #include "RenderLayerCompositor.h"
@@ -574,16 +575,16 @@ bool RenderView::printing() const {
 }
 
 void RenderView::updateWidgetPositions() {
-  RenderObjectSet::iterator end = m_widgets.end();
-  for (RenderObjectSet::iterator it = m_widgets.begin(); it != end; ++it)
+  RenderWidgetSet::iterator end = m_widgets.end();
+  for (RenderWidgetSet::iterator it = m_widgets.begin(); it != end; ++it)
     (*it)->updateWidgetPosition();
 }
 
-void RenderView::addWidget(RenderObject* o) {
+void RenderView::addWidget(RenderWidget* o) {
   m_widgets.add(o);
 }
 
-void RenderView::removeWidget(RenderObject* o) {
+void RenderView::removeWidget(RenderWidget* o) {
   m_widgets.remove(o);
 }
 

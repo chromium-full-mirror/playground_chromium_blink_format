@@ -133,8 +133,8 @@ class RenderView : public RenderBlock {
   void setPrintRect(const IntRect& r) { m_printRect = r; }
 
   void updateWidgetPositions();
-  void addWidget(RenderObject*);
-  void removeWidget(RenderObject*);
+  void addWidget(RenderWidget*);
+  void removeWidget(RenderWidget*);
 
   // layoutDelta is used transiently during layout to store how far an object
   // has moved from its
@@ -226,9 +226,9 @@ class RenderView : public RenderBlock {
                              // checks on blocks/tables.
   IntRect m_printRect;       // Used when printing.
 
-  typedef HashSet<RenderObject*> RenderObjectSet;
+  typedef HashSet<RenderWidget*> RenderWidgetSet;
 
-  RenderObjectSet m_widgets;
+  RenderWidgetSet m_widgets;
 
  private:
   int m_bestTruncatedAt;
