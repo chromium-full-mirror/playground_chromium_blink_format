@@ -266,11 +266,6 @@ QWebSettings* QWebSettings::globalSettings() {
    quota
     for each application by calling setOfflineStorageDefaultQuota().
 
-    The performance of Web applications can be enhanced with the use of an
-    offline cache. This can be enabled by calling
-   setOfflineWebApplicationCache()
-    with an appropriate file path.
-
     \sa QWebPage::settings(), QWebView::settings(), {Browser}
 */
 
