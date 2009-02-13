@@ -440,7 +440,7 @@ int RenderMedia::lowestPosition(bool includeOverflowInterior,
     return bottom;
 
   return max(bottom, m_controlsShadowRoot->renderBox()->y() +
-                         m_controlsShadowRoot->renderer()->lowestPosition(
+                         m_controlsShadowRoot->renderBox()->lowestPosition(
                              includeOverflowInterior, includeSelf));
 }
 
@@ -452,7 +452,7 @@ int RenderMedia::rightmostPosition(bool includeOverflowInterior,
     return right;
 
   return max(right, m_controlsShadowRoot->renderBox()->x() +
-                        m_controlsShadowRoot->renderer()->rightmostPosition(
+                        m_controlsShadowRoot->renderBox()->rightmostPosition(
                             includeOverflowInterior, includeSelf));
 }
 
@@ -464,7 +464,7 @@ int RenderMedia::leftmostPosition(bool includeOverflowInterior,
     return left;
 
   return min(left, m_controlsShadowRoot->renderBox()->x() +
-                       m_controlsShadowRoot->renderer()->leftmostPosition(
+                       m_controlsShadowRoot->renderBox()->leftmostPosition(
                            includeOverflowInterior, includeSelf));
 }
 

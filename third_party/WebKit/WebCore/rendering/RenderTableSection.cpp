@@ -687,11 +687,12 @@ int RenderTableSection::lowestPosition(bool includeOverflowInterior,
     return bottom;
 
   for (RenderObject* row = firstChild(); row; row = row->nextSibling()) {
-    for (RenderObject* cell = row->firstChild(); cell;
-         cell = cell->nextSibling()) {
-      if (cell->isTableCell())
-        bottom = max(bottom, static_cast<RenderTableCell*>(cell)->y() +
-                                 cell->lowestPosition(false));
+    for (RenderObject* curr = row->firstChild(); curr;
+         curr = curr->nextSibling()) {
+      if (curr->isTableCell()) {
+        RenderTableCell* cell = static_cast<RenderTableCell*>(curr);
+        bottom = max(bottom, cell->y() + cell->lowestPosition(false));
+      }
     }
   }
 
@@ -706,11 +707,12 @@ int RenderTableSection::rightmostPosition(bool includeOverflowInterior,
     return right;
 
   for (RenderObject* row = firstChild(); row; row = row->nextSibling()) {
-    for (RenderObject* cell = row->firstChild(); cell;
-         cell = cell->nextSibling()) {
-      if (cell->isTableCell())
-        right = max(right, static_cast<RenderTableCell*>(cell)->x() +
-                               cell->rightmostPosition(false));
+    for (RenderObject* curr = row->firstChild(); curr;
+         curr = curr->nextSibling()) {
+      if (curr->isTableCell()) {
+        RenderTableCell* cell = static_cast<RenderTableCell*>(curr);
+        right = max(right, cell->x() + cell->rightmostPosition(false));
+      }
     }
   }
 
@@ -724,11 +726,12 @@ int RenderTableSection::leftmostPosition(bool includeOverflowInterior,
     return left;
 
   for (RenderObject* row = firstChild(); row; row = row->nextSibling()) {
-    for (RenderObject* cell = row->firstChild(); cell;
-         cell = cell->nextSibling()) {
-      if (cell->isTableCell())
-        left = min(left, static_cast<RenderTableCell*>(cell)->x() +
-                             cell->leftmostPosition(false));
+    for (RenderObject* curr = row->firstChild(); curr;
+         curr = curr->nextSibling()) {
+      if (curr->isTableCell()) {
+        RenderTableCell* cell = static_cast<RenderTableCell*>(curr);
+        left = min(left, cell->x() + cell->leftmostPosition(false));
+      }
     }
   }
 

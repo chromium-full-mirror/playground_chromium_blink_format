@@ -3030,8 +3030,10 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
     // have to get to
     // the abs div.
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
-      if (!c->isFloatingOrPositioned() && !c->isText() && !c->isRenderInline())
-        bottom = max(bottom, toRenderBox(c)->y() + c->lowestPosition(false));
+      if (!c->isFloatingOrPositioned() && c->isBox()) {
+        RenderBox* childBox = toRenderBox(c);
+        bottom = max(bottom, childBox->y() + childBox->lowestPosition(false));
+      }
     }
   }
 
@@ -3111,8 +3113,10 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
     // have to get to
     // the abs div.
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
-      if (!c->isFloatingOrPositioned() && c->isBox() && !c->isRenderInline())
-        right = max(right, toRenderBox(c)->x() + c->rightmostPosition(false));
+      if (!c->isFloatingOrPositioned() && c->isBox()) {
+        RenderBox* childBox = toRenderBox(c);
+        right = max(right, childBox->x() + childBox->rightmostPosition(false));
+      }
     }
   }
 
@@ -3203,8 +3207,10 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
     // have to get to
     // the abs div.
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
-      if (!c->isFloatingOrPositioned() && c->isBox() && !c->isRenderInline())
-        left = min(left, toRenderBox(c)->x() + c->leftmostPosition(false));
+      if (!c->isFloatingOrPositioned() && c->isBox()) {
+        RenderBox* childBox = toRenderBox(c);
+        left = min(left, childBox->x() + childBox->leftmostPosition(false));
+      }
     }
   }
 
