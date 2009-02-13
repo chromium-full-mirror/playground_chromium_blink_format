@@ -762,8 +762,8 @@ void RenderLayerBacking::paintIntoLayer(
 
   int x = layerBounds.x();  // layerBounds is computed relative to rootLayer
   int y = layerBounds.y();
-  int tx = x - toRenderBox(renderer())->x();
-  int ty = y - toRenderBox(renderer())->y();
+  int tx = x - m_owningLayer->renderBoxX();
+  int ty = y - m_owningLayer->renderBoxY();
 
   // If this layer's renderer is a child of the paintingRoot, we render
   // unconditionally, which
