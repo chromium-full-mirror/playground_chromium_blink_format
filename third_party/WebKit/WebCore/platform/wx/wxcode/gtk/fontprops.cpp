@@ -94,8 +94,6 @@ void GetTextExtent(const wxFont& font,
                    wxCoord* height,
                    wxCoord* descent,
                    wxCoord* externalLeading) {
-  ASSERT(font && font->Ok());
-
   if (width)
     *width = 0;
   if (height)
@@ -113,14 +111,14 @@ void GetTextExtent(const wxFont& font,
 // it will need to be implemented before merging into wx unless we craft a new
 // API.
 #if USE(WXGC)
-  PangoFont* pangoFont = WebCore::createPangoFontForFont(font);
+  PangoFont* pangoFont = WebCore::createPangoFontForFont(&font);
   PangoContext* pangoContext = pango_cairo_font_map_create_context(
       PANGO_CAIRO_FONT_MAP(WebCore::pangoFontMap()));
   PangoGlyph pangoGlyph = WebCore::pango_font_get_glyph(
       pangoFont, pangoContext, (gunichar)g_utf8_get_char(str.ToUTF8()));
   cairo_glyph_t cglyph = {pangoGlyph, 0, 0};
   cairo_text_extents_t extents;
-  cairo_scaled_font_t* scaled_font = WebCore::createScaledFontForFont(font);
+  cairo_scaled_font_t* scaled_font = WebCore::createScaledFontForFont(&font);
   cairo_scaled_font_glyph_extents(scaled_font, &cglyph, 1, &extents);
 
   if (cairo_scaled_font_status(scaled_font) == CAIRO_STATUS_SUCCESS &&
