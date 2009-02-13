@@ -499,7 +499,7 @@ void WebFrameLoaderClient::updateGlobalHistory() {
 
   DocumentLoader* loader = core(m_webFrame)->loader()->documentLoader();
   history->visitedURL(loader->urlForHistory(), loader->title(),
-                      loader->request().httpMethod(),
+                      loader->originalRequestCopy().httpMethod(),
                       loader->urlForHistoryReflectsFailure());
   updateGlobalHistoryRedirectLinks();
 }
