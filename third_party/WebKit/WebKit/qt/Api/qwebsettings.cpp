@@ -725,8 +725,9 @@ qint64 QWebSettings::offlineStorageDefaultQuota() {
   return QWebSettings::globalSettings()->d->offlineStorageDefaultQuota;
 }
 
-/*!
+/*
     \internal
+    \relates QWebSettings
 
     Sets the path for HTML5 offline web application cache storage to \a path.
 
@@ -743,8 +744,9 @@ qt_websettings_setOfflineWebApplicationCachePath(const QString& path) {
 #endif
 }
 
-/*!
+/*
     \internal
+    \relates QWebSettings
 
     Returns the path of the HTML5 offline web application cache storage
     or an empty string if the feature is disabled.
@@ -761,6 +763,7 @@ QString QWEBKIT_EXPORT qt_websettings_offlineWebApplicationCachePath() {
 
 /*
     \since 4.5
+    \relates QWebSettings
 
     Sets the path for HTML5 local storage databases to \a path.
 
@@ -770,7 +773,6 @@ QString QWEBKIT_EXPORT qt_websettings_offlineWebApplicationCachePath() {
 
     \sa localStorageDatabasePath()
 */
-
 void QWEBKIT_EXPORT
 qt_websettings_setLocalStorageDatabasePath(QWebSettings* settings,
                                            const QString& path) {
@@ -781,6 +783,7 @@ qt_websettings_setLocalStorageDatabasePath(QWebSettings* settings,
 
 /*
     \since 4.5
+    \relates QWebSettings
 
     Returns the path for HTML5 local storage databases
     or an empty string if the feature is disabled.
