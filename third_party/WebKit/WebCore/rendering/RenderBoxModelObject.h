@@ -95,6 +95,8 @@ class RenderBoxModelObject : public RenderObject {
            paddingRight() != 0;
   }
 
+  virtual int containingBlockWidthForContent() const;
+
   virtual void childBecameNonInline(RenderObject* /*child*/) {}
 
   void paintBorder(GraphicsContext*,

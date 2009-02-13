@@ -5513,7 +5513,8 @@ IntRect RenderBlock::localCaretRect(InlineBox* inlineBox,
       // FIXME: why call localToAbsoluteForContent() twice here, too?
       FloatPoint absRightPoint = localToAbsolute(FloatPoint(myRight, 0));
 
-      int containerRight = containingBlock()->x() + containingBlockWidth();
+      int containerRight =
+          containingBlock()->x() + containingBlockWidthForContent();
       FloatPoint absContainerPoint =
           localToAbsolute(FloatPoint(containerRight, 0));
 

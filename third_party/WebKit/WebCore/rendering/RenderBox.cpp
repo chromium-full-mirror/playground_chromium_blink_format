@@ -984,10 +984,8 @@ IntRect RenderBox::clipRect(int tx, int ty) {
   return IntRect(clipX, clipY, clipWidth, clipHeight);
 }
 
-int RenderBox::containingBlockWidth() const {
+int RenderBox::containingBlockWidthForContent() const {
   RenderBlock* cb = containingBlock();
-  if (!cb)
-    return 0;
   if (shrinkToAvoidFloats())
     return cb->lineWidth(y(), false);
   return cb->availableWidth();
@@ -1344,7 +1342,7 @@ void RenderBox::calcWidth() {
       (treatAsReplaced) ? Length(calcReplacedWidth(), Fixed) : style()->width();
 
   RenderBlock* cb = containingBlock();
-  int containerWidth = max(0, containingBlockWidth());
+  int containerWidth = max(0, containingBlockWidthForContent());
 
   Length marginLeft = style()->marginLeft();
   Length marginRight = style()->marginRight();
@@ -1735,7 +1733,7 @@ int RenderBox::calcReplacedWidthUsing(Length width) const {
     case Percent: {
       const int cw = isPositioned() ? containingBlockWidthForPositioned(
                                           toRenderBoxModelObject(container()))
-                                    : containingBlockWidth();
+                                    : containingBlockWidthForContent();
       if (cw > 0)
         return calcContentBoxWidth(width.calcMinValue(cw));
     }

@@ -495,7 +495,7 @@ int RenderInline::marginLeft() const {
   if (margin.isFixed())
     return margin.value();
   if (margin.isPercent())
-    return margin.calcMinValue(max(0, containingBlockWidth()));
+    return margin.calcMinValue(max(0, containingBlock()->availableWidth()));
   return 0;
 }
 
@@ -506,7 +506,7 @@ int RenderInline::marginRight() const {
   if (margin.isFixed())
     return margin.value();
   if (margin.isPercent())
-    return margin.calcMinValue(max(0, containingBlockWidth()));
+    return margin.calcMinValue(max(0, containingBlock()->availableWidth()));
   return 0;
 }
 

@@ -264,7 +264,7 @@ class RenderBox : public RenderBoxModelObject {
 
   virtual void repaintDuringLayoutIfMoved(const IntRect&);
 
-  virtual int containingBlockWidth() const;
+  virtual int containingBlockWidthForContent() const;
 
   virtual void calcWidth();
   virtual void calcHeight();
