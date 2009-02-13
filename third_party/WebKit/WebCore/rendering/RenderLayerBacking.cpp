@@ -197,8 +197,9 @@ void RenderLayerBacking::updateGraphicsLayerGeometry() {
     // If the compositing ancestor has a layer to clip children, we parent in
     // that, and therefore
     // position relative to it.
-    graphicsLayerParentLocation =
-        compAncestor->renderer()->overflowClipRect(0, 0).location();
+    graphicsLayerParentLocation = toRenderBox(compAncestor->renderer())
+                                      ->overflowClipRect(0, 0)
+                                      .location();
   } else
     graphicsLayerParentLocation = ancestorCompositingBounds.location();
 
@@ -249,7 +250,7 @@ void RenderLayerBacking::updateGraphicsLayerGeometry() {
 
   // If we have a layer that clips children, position it.
   if (m_clippingLayer) {
-    IntRect clippingBox = renderer()->overflowClipRect(0, 0);
+    IntRect clippingBox = toRenderBox(renderer())->overflowClipRect(0, 0);
     m_clippingLayer->setPosition(
         FloatPoint() +
         (clippingBox.location() - localCompositingBounds.location()));
