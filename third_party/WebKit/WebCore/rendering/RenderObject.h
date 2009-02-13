@@ -303,8 +303,6 @@ class RenderObject : public CachedResourceClient {
   virtual TransformationMatrix absoluteTransform() const;
 #endif
 
-  virtual bool isEditable() const;
-
   bool isAnonymous() const { return m_isAnonymous; }
   void setIsAnonymous(bool b) { m_isAnonymous = b; }
   bool isAnonymousBlock() const {
