@@ -46,6 +46,7 @@ class ArgList;
 class CommonIdentifiers;
 class Heap;
 class IdentifierTable;
+class Instruction;
 class Interpreter;
 class JSGlobalObject;
 class JSObject;
@@ -70,6 +71,10 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   // Will start tracking threads that use the heap, which is resource-heavy.
   void makeUsableFromMultipleThreads() { heap.makeUsableFromMultipleThreads(); }
 #endif
+
+  const Vector<Instruction>& numericCompareFunction(ExecState*);
+  Vector<Instruction> lazyNumericCompareFunction;
+  bool initializingLazyNumericCompareFunction;
 
   Interpreter* interpreter;
 

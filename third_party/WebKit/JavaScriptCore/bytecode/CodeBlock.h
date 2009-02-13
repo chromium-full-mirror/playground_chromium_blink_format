@@ -318,6 +318,11 @@ class CodeBlock {
         ->bytecodeIndex;
   }
 
+  void setIsNumericCompareFunction(bool isNumericCompareFunction) {
+    m_isNumericCompareFunction = isNumericCompareFunction;
+  }
+  bool isNumericCompareFunction() { return m_isNumericCompareFunction; }
+
   bool functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
                                          int& functionRegisterIndex);
 #endif
@@ -597,6 +602,7 @@ class CodeBlock {
   bool m_needsFullScopeChain;
   bool m_usesEval;
   bool m_usesArguments;
+  bool m_isNumericCompareFunction;
 
   CodeType m_codeType;
 

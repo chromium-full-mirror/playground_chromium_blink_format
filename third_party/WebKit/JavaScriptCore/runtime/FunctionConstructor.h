@@ -27,6 +27,8 @@
 namespace JSC {
 
 class FunctionPrototype;
+class ProgramNode;
+class FunctionBodyNode;
 
 class FunctionConstructor : public InternalFunction {
  public:
@@ -43,6 +45,8 @@ JSObject* constructFunction(ExecState*,
                             const UString& sourceURL,
                             int lineNumber);
 JSObject* constructFunction(ExecState*, const ArgList&);
+
+FunctionBodyNode* extractFunctionBody(ProgramNode*);
 
 }  // namespace JSC
 
