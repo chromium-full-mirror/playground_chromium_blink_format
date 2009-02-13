@@ -107,6 +107,7 @@ class QWebHitTestResultPrivate {
   QUrl linkUrl;
   QString linkTitle;
   QPointer<QWebFrame> linkTargetFrame;
+  QString linkTarget;
   QString alternateText;
   QUrl imageUrl;
   QPixmap pixmap;

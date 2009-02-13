@@ -2367,8 +2367,8 @@ void tst_QWebFrame::popupFocus() {
 
 void tst_QWebFrame::hitTestContent() {
   QString html(
-      "<html><body><p>A paragraph</p><br/><br/><br/><a "
-      "href=\"about:blank\">link text</a></body></html>");
+      "<html><body><p>A paragraph</p><br/><br/><br/><a href=\"about:blank\" "
+      "target=\"_foo\">link text</a></body></html>");
 
   QWebPage page;
   QWebFrame* frame = page.mainFrame();
@@ -2376,6 +2376,7 @@ void tst_QWebFrame::hitTestContent() {
   page.setViewportSize(QSize(200, 0));  // no height so link is not visible
   QWebHitTestResult result = frame->hitTestContent(QPoint(10, 100));
   QCOMPARE(result.linkText(), QString("link text"));
+  QCOMPARE(result.linkTarget(), QString("_foo"));
 }
 
 void tst_QWebFrame::jsByteArray() {
