@@ -172,7 +172,7 @@ class CSSParser {
                             RefPtr<CSSValue>&);
   bool parsePerspectiveOrigin(int propId,
                               int& propId1,
-                              int& propId,
+                              int& propId2,
                               RefPtr<CSSValue>&,
                               RefPtr<CSSValue>&);
   bool parseVariable(CSSVariablesDeclaration*,
