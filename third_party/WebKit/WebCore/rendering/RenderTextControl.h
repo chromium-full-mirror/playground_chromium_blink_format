@@ -37,6 +37,7 @@ class RenderTextControl : public RenderBlock {
   virtual ~RenderTextControl();
 
   virtual const char* renderName() const { return "RenderTextControl"; }
+  virtual bool isTextControl() const { return true; }
   virtual bool hasControlClip() const { return false; }
   virtual IntRect controlClipRect(int tx, int ty) const;
   virtual void calcHeight();
@@ -119,6 +120,19 @@ class RenderTextControl : public RenderBlock {
   bool m_userEdited;
   RefPtr<TextControlInnerTextElement> m_innerText;
 };
+
+inline RenderTextControl* toRenderTextControl(RenderObject* o) {
+  ASSERT(!o || o->isTextControl());
+  return static_cast<RenderTextControl*>(o);
+}
+
+inline const RenderTextControl* toRenderTextControl(const RenderObject* o) {
+  ASSERT(!o || o->isTextControl());
+  return static_cast<const RenderTextControl*>(o);
+}
+
+// This will catch anyone doing an unnecessary cast.
+void toRenderTextControl(const RenderTextControl*);
 
 }  // namespace WebCore
 

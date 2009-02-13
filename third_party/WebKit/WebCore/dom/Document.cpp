@@ -2531,13 +2531,12 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
     // edited
     RenderObject* r =
         static_cast<RenderObject*>(oldFocusedNode.get()->renderer());
-    if (r && (r->isTextArea() || r->isTextField()) &&
-        static_cast<RenderTextControl*>(r)->isEdited()) {
+    if (r && r->isTextControl() && toRenderTextControl(r)->isEdited()) {
       oldFocusedNode->dispatchEventForType(eventNames().changeEvent, true,
                                            false);
       if ((r = static_cast<RenderObject*>(oldFocusedNode.get()->renderer()))) {
-        if (r->isTextArea() || r->isTextField())
-          static_cast<RenderTextControl*>(r)->setEdited(false);
+        if (r->isTextControl())
+          toRenderTextControl(r)->setEdited(false);
       }
     }
 

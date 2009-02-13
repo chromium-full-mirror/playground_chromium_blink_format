@@ -124,7 +124,7 @@ void InputElement::updateSelectionRange(InputElementData& data,
     return;
 
   if (RenderTextControl* renderer =
-          static_cast<RenderTextControl*>(data.element()->renderer()))
+          toRenderTextControl(data.element()->renderer()))
     renderer->setSelectionRange(start, end);
 }
 

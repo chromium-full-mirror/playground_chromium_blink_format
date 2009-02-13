@@ -157,7 +157,7 @@ void WMLInputElement::restoreState(const String& state) {
 }
 
 void WMLInputElement::select() {
-  if (RenderTextControl* r = static_cast<RenderTextControl*>(renderer()))
+  if (RenderTextControl* r = toRenderTextControl(renderer()))
     r->select();
 }
 
@@ -252,8 +252,7 @@ void WMLInputElement::defaultEventHandler(Event* evt) {
     else if (renderer() &&
              !isConformedToInputMask(
                  textEvent->data()[0],
-                 static_cast<RenderTextControl*>(renderer())->text().length() +
-                     1))
+                 toRenderTextControl(renderer())->text().length() + 1))
       // If the inputed char doesn't conform to the input mask, stop handling
       return;
   }
@@ -446,8 +445,7 @@ bool WMLInputElement::isConformedToInputMask(UChar inChar,
   if (isUserInput) {
     unsigned cursorPosition = 0;
     if (renderer())
-      cursorPosition =
-          static_cast<RenderTextControl*>(renderer())->selectionStart();
+      cursorPosition = toRenderTextControl(renderer())->selectionStart();
     else
       cursorPosition = m_data.cachedSelectionStart();
 
