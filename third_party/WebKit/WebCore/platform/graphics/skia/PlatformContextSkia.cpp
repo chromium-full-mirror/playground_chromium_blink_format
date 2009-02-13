@@ -431,8 +431,12 @@ void PlatformContextSkia::setUseAntialiasing(bool enable) {
   m_state->m_useAntialiasing = enable;
 }
 
-SkColor PlatformContextSkia::fillColor() const {
-  return m_state->m_fillColor;
+SkColor PlatformContextSkia::effectiveFillColor() const {
+  return m_state->applyAlpha(m_state->m_fillColor);
+}
+
+SkColor PlatformContextSkia::effectiveStrokeColor() const {
+  return m_state->applyAlpha(m_state->m_strokeColor);
 }
 
 void PlatformContextSkia::beginPath() {
