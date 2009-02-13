@@ -206,7 +206,8 @@ void CompositeAnimationPrivate::updateTransitions(RenderObject* renderer,
           // the _current_ value
           // of the property, so that restarted transitions use the correct
           // starting point.
-          if (AnimationBase::animationOfPropertyIsAccelerated(prop)) {
+          if (AnimationBase::animationOfPropertyIsAccelerated(prop) &&
+              !implAnim->isFallbackAnimating()) {
             if (!modifiedCurrentStyle)
               modifiedCurrentStyle = RenderStyle::clone(currentStyle);
 

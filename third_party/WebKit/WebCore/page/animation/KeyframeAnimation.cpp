@@ -385,7 +385,7 @@ double KeyframeAnimation::willNeedService() {
 
   for (HashSet<int>::const_iterator it = m_keyframes.beginProperties();
        it != endProperties; ++it) {
-    if (!animationOfPropertyIsAccelerated(*it)) {
+    if (!animationOfPropertyIsAccelerated(*it) || isFallbackAnimating()) {
       acceleratedPropertiesOnly = false;
       break;
     }
