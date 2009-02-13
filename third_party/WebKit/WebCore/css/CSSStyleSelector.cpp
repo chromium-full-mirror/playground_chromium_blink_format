@@ -2097,8 +2097,9 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
            subSel = subSel->tagHistory()) {
         // :not cannot nest. I don't really know why this is a
         // restriction in CSS3, but it is, so let's honor it.
-        if (subSel->simpleSelector())
-          break;
+        // the parser enforces that this never occurs
+        ASSERT(!subSel->simpleSelector());
+
         if (!checkOneSelector(subSel, e, selectorAttrs, dynamicPseudo,
                               isAncestor, true, elementStyle,
                               elementParentStyle))
