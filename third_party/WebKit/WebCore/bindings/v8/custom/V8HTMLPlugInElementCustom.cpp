@@ -48,12 +48,12 @@ NAMED_PROPERTY_GETTER(HTMLPlugInElement) {
       V8Proxy::DOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
-    return v8::Undefined();
+    return deferToInterceptor();
 
   v8::Local<v8::Object> instance =
       v8::Local<v8::Object>::New(scriptInstance->instance());
   if (instance.IsEmpty())
-    return v8::Undefined();
+    return deferToInterceptor();
 
   return NPObjectGetNamedProperty(instance, name);
 }
@@ -64,12 +64,12 @@ NAMED_PROPERTY_SETTER(HTMLPlugInElement) {
       V8Proxy::DOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
-    return v8::Undefined();
+    return deferToInterceptor();
 
   v8::Local<v8::Object> instance =
       v8::Local<v8::Object>::New(scriptInstance->instance());
   if (instance.IsEmpty())
-    return v8::Undefined();
+    return deferToInterceptor();
 
   return NPObjectSetNamedProperty(instance, name, value);
 }
@@ -85,12 +85,12 @@ INDEXED_PROPERTY_GETTER(HTMLPlugInElement) {
       V8Proxy::DOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
-    return v8::Undefined();
+    return deferToInterceptor();
 
   v8::Local<v8::Object> instance =
       v8::Local<v8::Object>::New(scriptInstance->instance());
   if (instance.IsEmpty())
-    return v8::Undefined();
+    return deferToInterceptor();
 
   return NPObjectGetIndexedProperty(instance, index);
 }
@@ -101,12 +101,12 @@ INDEXED_PROPERTY_SETTER(HTMLPlugInElement) {
       V8Proxy::DOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
-    return v8::Undefined();
+    return deferToInterceptor();
 
   v8::Local<v8::Object> instance =
       v8::Local<v8::Object>::New(scriptInstance->instance());
   if (instance.IsEmpty())
-    return v8::Undefined();
+    return deferToInterceptor();
 
   return NPObjectSetIndexedProperty(instance, index, value);
 }
