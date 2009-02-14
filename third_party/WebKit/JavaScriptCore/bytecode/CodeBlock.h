@@ -318,14 +318,14 @@ class CodeBlock {
         ->bytecodeIndex;
   }
 
+  bool functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
+                                         int& functionRegisterIndex);
+#endif
+
   void setIsNumericCompareFunction(bool isNumericCompareFunction) {
     m_isNumericCompareFunction = isNumericCompareFunction;
   }
   bool isNumericCompareFunction() { return m_isNumericCompareFunction; }
-
-  bool functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
-                                         int& functionRegisterIndex);
-#endif
 
   Vector<Instruction>& instructions() { return m_instructions; }
 #ifndef NDEBUG
