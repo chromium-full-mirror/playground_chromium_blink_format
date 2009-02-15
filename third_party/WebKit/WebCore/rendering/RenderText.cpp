@@ -426,7 +426,6 @@ IntRect RenderText::localCaretRect(InlineBox* inlineBox,
       left = max(left, rootLeft);
   }
 
-  const int caretWidth = 1;
   return IntRect(left, top, caretWidth, height);
 }
 

@@ -95,6 +95,8 @@ enum HitTestAction {
 // be drawn by SVG around bounding boxes.
 enum BoxSide { BSTop, BSBottom, BSLeft, BSRight };
 
+const int caretWidth = 1;
+
 #if ENABLE(DASHBOARD_SUPPORT)
 struct DashboardRegionValue {
   bool operator==(const DashboardRegionValue& o) const {
