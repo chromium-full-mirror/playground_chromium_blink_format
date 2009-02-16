@@ -3900,10 +3900,22 @@ void* FastMallocZone::zoneRealloc(malloc_zone_t*, void*, size_t) {
 
 extern "C" {
 malloc_introspection_t jscore_fastmalloc_introspection = {
-    &FastMallocZone::enumerate,   &FastMallocZone::goodSize,
-    &FastMallocZone::check,       &FastMallocZone::print,
-    &FastMallocZone::log,         &FastMallocZone::forceLock,
-    &FastMallocZone::forceUnlock, &FastMallocZone::statistics};
+  &FastMallocZone::enumerate,
+  &FastMallocZone::goodSize,
+  &FastMallocZone::check,
+  &FastMallocZone::print,
+  &FastMallocZone::log,
+  &FastMallocZone::forceLock,
+  &FastMallocZone::forceUnlock,
+  &FastMallocZone::statistics
+
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
+  ,
+  0  // zone_locked will not be called on the zone unless it advertises itself
+     // as version five or higher.
+#endif
+
+};
 }
 
 FastMallocZone::FastMallocZone(TCMalloc_PageHeap* pageHeap,
@@ -3913,6 +3925,7 @@ FastMallocZone::FastMallocZone(TCMalloc_PageHeap* pageHeap,
       m_threadHeaps(threadHeaps),
       m_centralCaches(centralCaches) {
   memset(&m_zone, 0, sizeof(m_zone));
+  m_zone.version = 4;
   m_zone.zone_name = "JavaScriptCore FastMalloc";
   m_zone.size = &FastMallocZone::size;
   m_zone.malloc = &FastMallocZone::zoneMalloc;
