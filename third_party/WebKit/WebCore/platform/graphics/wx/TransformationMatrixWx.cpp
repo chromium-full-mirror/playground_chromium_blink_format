@@ -38,8 +38,11 @@ namespace WebCore {
 
 #if USE(WXGC)
 TransformationMatrix::operator wxGraphicsMatrix() const {
-  wxGraphicsMatrix matrix;
-  matrix.Set(a(), b(), c(), d(), e(), f());
+  wxGraphicsRenderer* renderer = wxGraphicsRenderer::GetDefaultRenderer();
+  ASSERT(renderer);
+
+  wxGraphicsMatrix matrix =
+      renderer->CreateMatrix(a(), b(), c(), d(), e(), f());
   return matrix;
 }
 #endif
