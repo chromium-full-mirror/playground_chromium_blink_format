@@ -37,9 +37,8 @@ class InsertListCommand : public CompositeEditCommand {
   enum Type { OrderedList, UnorderedList };
 
   static PassRefPtr<InsertListCommand> create(Document* document,
-                                              Type listType,
-                                              const String& listID) {
-    return adoptRef(new InsertListCommand(document, listType, listID));
+                                              Type listType) {
+    return adoptRef(new InsertListCommand(document, listType));
   }
 
   static PassRefPtr<HTMLElement> insertList(Document*, Type);
@@ -47,7 +46,7 @@ class InsertListCommand : public CompositeEditCommand {
   virtual bool preservesTypingStyle() const { return true; }
 
  private:
-  InsertListCommand(Document*, Type, const String&);
+  InsertListCommand(Document*, Type);
 
   virtual void doApply();
   virtual EditAction editingAction() const { return EditActionInsertList; }
@@ -56,7 +55,6 @@ class InsertListCommand : public CompositeEditCommand {
   bool modifyRange();
   RefPtr<HTMLElement> m_listElement;
   Type m_type;
-  String m_id;
   bool m_forceCreateList;
 };
 

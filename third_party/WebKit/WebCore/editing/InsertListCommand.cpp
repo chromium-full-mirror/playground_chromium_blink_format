@@ -40,7 +40,7 @@ using namespace HTMLNames;
 PassRefPtr<HTMLElement> InsertListCommand::insertList(Document* document,
                                                       Type type) {
   RefPtr<InsertListCommand> insertCommand =
-      new InsertListCommand(document, type, "");
+      new InsertListCommand(document, type);
   insertCommand->apply();
   return insertCommand->m_listElement;
 }
@@ -54,13 +54,8 @@ HTMLElement* InsertListCommand::fixOrphanedListChild(Node* node) {
   return listElement.get();
 }
 
-InsertListCommand::InsertListCommand(Document* document,
-                                     Type type,
-                                     const String& id)
-    : CompositeEditCommand(document),
-      m_type(type),
-      m_id(id),
-      m_forceCreateList(false) {}
+InsertListCommand::InsertListCommand(Document* document, Type type)
+    : CompositeEditCommand(document), m_type(type), m_forceCreateList(false) {}
 
 bool InsertListCommand::modifyRange() {
   VisibleSelection selection =
@@ -267,8 +262,6 @@ void InsertListCommand::doApply() {
           m_type == OrderedList ? createOrderedListElement(document())
                                 : createUnorderedListElement(document());
       m_listElement = listElement;
-      if (!m_id.isEmpty())
-        listElement->setId(m_id);
       appendNode(listItemElement, listElement);
 
       if (start == end && isBlock(start.deepEquivalent().node())) {
