@@ -239,8 +239,8 @@ class CSSParser {
   CSSParserValueList* m_valueList;
   CSSProperty** m_parsedProperties;
   CSSSelectorList* m_selectorListForParseSelector;
-  int m_numParsedProperties;
-  int m_maxParsedProperties;
+  unsigned m_numParsedProperties;
+  unsigned m_maxParsedProperties;
 
   int m_inParseShorthand;
   int m_currentShorthand;
