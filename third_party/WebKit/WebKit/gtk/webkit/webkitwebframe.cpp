@@ -362,8 +362,8 @@ void webkit_web_frame_load_uri(WebKitWebFrame* frame, const gchar* uri) {
   if (!coreFrame)
     return;
 
-  coreFrame->loader()->load(ResourceRequest(KURL(String::fromUTF8(uri))),
-                            false);
+  coreFrame->loader()->load(
+      ResourceRequest(KURL(KURL(), String::fromUTF8(uri))), false);
 }
 
 /**
@@ -395,14 +395,13 @@ void webkit_web_frame_load_string(WebKitWebFrame* frame,
   if (!coreFrame)
     return;
 
-  KURL url(baseUri ? String::fromUTF8(baseUri) : "");
+  KURL url(KURL(), baseUri ? String::fromUTF8(baseUri) : "");
   RefPtr<SharedBuffer> sharedBuffer =
       SharedBuffer::create(content, strlen(content));
   SubstituteData substituteData(
       sharedBuffer.release(),
       contentMimeType ? String(contentMimeType) : "text/html",
-      contentEncoding ? String(contentEncoding) : "UTF-8", KURL("about:blank"),
-      url);
+      contentEncoding ? String(contentEncoding) : "UTF-8", blankURL(), url);
 
   coreFrame->loader()->load(ResourceRequest(url), substituteData, false);
 }
