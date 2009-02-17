@@ -28,6 +28,10 @@
 
 #if ENABLE(VIDEO)
 
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+#include "MediaPlayerProxy.h"
+#endif
+
 #include "IntRect.h"
 #include "StringHash.h"
 #include <wtf/HashSet.h>
@@ -138,6 +142,14 @@ class MediaPlayer : Noncopyable {
   void timeChanged();
 
   void repaint();
+
+  MediaPlayerClient* mediaPlayerClient() const { return m_mediaPlayerClient; }
+
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  void setPoster(const String& url);
+  void deliverNotification(MediaPlayerProxyNotificationType notification);
+  void setMediaPlayerProxy(WebMediaPlayerProxy* proxy);
+#endif
 
  private:
   static void initializeMediaEngines();

@@ -48,7 +48,13 @@
 #include "MediaPlayer.h"
 #include "Page.h"
 #include "RenderVideo.h"
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+#include "RenderPartObject.h"
+#endif
 #include "TimeRanges.h"
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+#include "Widget.h"
+#endif
 #include <wtf/CurrentTime.h>
 #include <wtf/MathExtras.h>
 
@@ -86,7 +92,12 @@ HTMLMediaElement::HTMLMediaElement(const QualifiedName& tagName, Document* doc)
       m_player(0),
       m_loadRestrictions(NoLoadRestriction),
       m_processingMediaPlayerCallback(0),
-      m_sendProgressEvents(true) {
+      m_sendProgressEvents(true)
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+      ,
+      m_needWidgetUpdate(false)
+#endif
+{
   document()->registerForDocumentActivationCallbacks(this);
   document()->registerForMediaVolumeCallbacks(this);
 }
@@ -109,7 +120,9 @@ void HTMLMediaElement::attributeChanged(Attribute* attr, bool preserveDecls) {
     // change to src attribute triggers load()
     if (inDocument() && m_networkState == EMPTY)
       scheduleLoad();
-  } else if (attrName == controlsAttr) {
+  }
+#if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  else if (attrName == controlsAttr) {
     if (!isVideo() && attached() && (controls() != (renderer() != 0))) {
       detach();
       attach();
@@ -117,15 +130,29 @@ void HTMLMediaElement::attributeChanged(Attribute* attr, bool preserveDecls) {
     if (renderer())
       renderer()->updateFromElement();
   }
+#endif
 }
 
 bool HTMLMediaElement::rendererIsNeeded(RenderStyle* style) {
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  UNUSED_PARAM(style);
+  Frame* frame = document()->frame();
+  if (!frame)
+    return false;
+
+  return true;
+#else
   return controls() ? HTMLElement::rendererIsNeeded(style) : false;
+#endif
 }
 
 RenderObject* HTMLMediaElement::createRenderer(RenderArena* arena,
                                                RenderStyle*) {
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  return new (arena) RenderPartObject(this);
+#else
   return new (arena) RenderMedia(this);
+#endif
 }
 
 void HTMLMediaElement::insertedIntoDocument() {
@@ -144,6 +171,10 @@ void HTMLMediaElement::removedFromDocument() {
 
 void HTMLMediaElement::attach() {
   ASSERT(!attached());
+
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  m_needWidgetUpdate = true;
+#endif
 
   HTMLElement::attach();
 
@@ -332,9 +363,12 @@ void HTMLMediaElement::load(ExceptionCode& ec) {
   if (m_loadNestingLevel < m_terminateLoadBelowNestingLevel)
     goto end;
 
-  // 10, 11, 12, 13
+// 10, 11, 12, 13
+#if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
   m_player.clear();
   m_player.set(new MediaPlayer(this));
+#endif
+
   updateVolume();
   m_player->load(m_currentSrc, mediaMIMEType);
   if (m_loadNestingLevel < m_terminateLoadBelowNestingLevel)
@@ -367,8 +401,11 @@ void HTMLMediaElement::mediaPlayerNetworkStateChanged(MediaPlayer*) {
 }
 
 void HTMLMediaElement::setNetworkState(MediaPlayer::NetworkState state) {
-  if (m_networkState == EMPTY)
+  if (m_networkState == EMPTY) {
+    // just update the cached state and leave, we can't do anything
+    m_networkState = EMPTY;
     return;
+  }
 
   m_terminateLoadBelowNestingLevel = m_loadNestingLevel;
 
@@ -1086,11 +1123,21 @@ void HTMLMediaElement::mediaVolumeDidChange() {
 }
 
 void HTMLMediaElement::defaultEventHandler(Event* event) {
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  RenderObject* r = renderer();
+  if (!r || !r->isWidget())
+    return;
+
+  Widget* widget = static_cast<RenderWidget*>(r)->widget();
+  if (widget)
+    widget->handleEvent(event);
+#else
   if (renderer() && renderer()->isMedia())
     static_cast<RenderMedia*>(renderer())->forwardEvent(event);
   if (event->defaultHandled())
     return;
   HTMLElement::defaultEventHandler(event);
+#endif
 }
 
 bool HTMLMediaElement::processingUserGesture() const {
@@ -1100,6 +1147,42 @@ bool HTMLMediaElement::processingUserGesture() const {
   // return 'true' for safety if we don't know the answer
   return loader ? loader->userGestureHint() : true;
 }
+
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+void HTMLMediaElement::deliverNotification(
+    MediaPlayerProxyNotificationType notification) {
+  if (notification == MediaPlayerNotificationPlayPauseButtonPressed) {
+    ExceptionCode ec;
+    togglePlayState(ec);
+    return;
+  }
+
+  if (m_player)
+    m_player->deliverNotification(notification);
+}
+
+void HTMLMediaElement::setMediaPlayerProxy(WebMediaPlayerProxy* proxy) {
+  if (m_player)
+    m_player->setMediaPlayerProxy(proxy);
+}
+
+String HTMLMediaElement::initialURL() {
+  String ignoredType;
+  String initialSrc = selectMediaURL(ignoredType);
+  m_currentSrc = initialSrc;
+  return initialSrc;
+}
+
+void HTMLMediaElement::finishParsingChildren() {
+  HTMLElement::finishParsingChildren();
+  if (!m_player)
+    m_player.set(new MediaPlayer(this));
+
+  document()->updateRendering();
+  if (m_needWidgetUpdate && renderer())
+    static_cast<RenderPartObject*>(renderer())->updateWidget(true);
+}
+#endif
 }
 
 #endif

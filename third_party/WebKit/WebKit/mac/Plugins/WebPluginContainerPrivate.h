@@ -28,6 +28,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+@class WebMediaPlayerProxy;
+#endif
+
 @interface NSObject (WebPlugInContainerPrivate)
 
 - (id)_webPluginContainerCheckIfAllowedToLoadRequest:(NSURLRequest*)Request
@@ -37,5 +41,13 @@
 
 - (void)_webPluginContainerCancelCheckIfAllowedToLoadRequest:
     (id)checkIdentifier;
+
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+- (void)_webPluginContainerSetMediaPlayerProxy:(WebMediaPlayerProxy*)proxy
+                                    forElement:(DOMElement*)element;
+
+- (void)_webPluginContainerPostMediaPlayerNotification:(int)notification
+                                            forElement:(DOMElement*)element;
+#endif
 
 @end

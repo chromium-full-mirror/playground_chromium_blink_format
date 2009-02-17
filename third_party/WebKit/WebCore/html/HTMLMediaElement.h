@@ -31,7 +31,10 @@
 #include "HTMLElement.h"
 #include "MediaPlayer.h"
 #include "Timer.h"
-#include "VoidCallback.h"
+
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+#include "MediaPlayerProxy.h"
+#endif
 
 namespace WebCore {
 
@@ -144,6 +147,16 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   bool canPlay() const;
 
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  void setNeedWidgetUpdate(bool needWidgetUpdate) {
+    m_needWidgetUpdate = needWidgetUpdate;
+  }
+  void deliverNotification(MediaPlayerProxyNotificationType notification);
+  void setMediaPlayerProxy(WebMediaPlayerProxy* proxy);
+  String initialURL();
+  virtual void finishParsingChildren();
+#endif
+
  protected:
   float getTimeOffsetAttribute(const QualifiedName&, float valueOnError) const;
   void setTimeOffsetAttribute(const QualifiedName&, float value);
@@ -252,6 +265,10 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   // Not all media engines provide enough information about a file to be able to
   // support progress events so setting m_sendProgressEvents disables them
   bool m_sendProgressEvents;
+
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  bool m_needWidgetUpdate;
+#endif
 };
 
 }  // namespace
