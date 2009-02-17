@@ -62,6 +62,8 @@ class FontPlatformData {
   ~FontPlatformData();
 
   FontPlatformData(const FontDescription&, const AtomicString&);
+  FontPlatformData(float size, bool bold, bool italic)
+      : m_fontState(UNINITIALIZED), m_font(0) {}
 
   FontPlatformData() : m_fontState(UNINITIALIZED), m_font(0) {}
 
