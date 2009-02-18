@@ -1293,7 +1293,7 @@ void XMLHttpRequest::didSendData(unsigned long long bytesSent,
 
 bool XMLHttpRequest::accessControlCheck(const ResourceResponse& response) {
   const String& accessControlOriginString =
-      response.httpHeaderField("Access-Control-Origin");
+      response.httpHeaderField("Access-Control-Allow-Origin");
   if (accessControlOriginString == "*" && !m_includeCredentials)
     return true;
 
@@ -1305,7 +1305,7 @@ bool XMLHttpRequest::accessControlCheck(const ResourceResponse& response) {
 
   if (m_includeCredentials) {
     const String& accessControlCredentialsString =
-        response.httpHeaderField("Access-Control-Credentials");
+        response.httpHeaderField("Access-Control-Allow-Credentials");
     if (accessControlCredentialsString != "true")
       return false;
   }
