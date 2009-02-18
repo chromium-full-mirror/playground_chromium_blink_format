@@ -460,6 +460,8 @@ backforward list.
 - (void)setMemoryCacheDelegateCallsEnabled:(BOOL)suspend;
 - (BOOL)areMemoryCacheDelegateCallsEnabled;
 
++ (NSCursor*)_pointingHandCursor;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)
