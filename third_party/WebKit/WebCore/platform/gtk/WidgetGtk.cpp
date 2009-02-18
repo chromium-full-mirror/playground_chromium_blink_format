@@ -41,20 +41,15 @@
 
 namespace WebCore {
 
-class WidgetPrivate {
- public:
-  GdkCursor* cursor;
-};
+static GdkCursor* lastSetCursor;
 
-Widget::Widget(PlatformWidget widget) : m_data(new WidgetPrivate) {
+Widget::Widget(PlatformWidget widget) {
   init(widget);
-  m_data->cursor = 0;
 }
 
 Widget::~Widget() {
   ASSERT(!parent());
   releasePlatformWidget();
-  delete m_data;
 }
 
 void Widget::setFocus() {
@@ -63,16 +58,12 @@ void Widget::setFocus() {
                        : GTK_WIDGET(root()->hostWindow()->platformWindow()));
 }
 
-Cursor Widget::cursor() {
-  return Cursor(m_data->cursor);
-}
-
 static GdkDrawable* gdkDrawable(PlatformWidget widget) {
   return widget ? widget->window : 0;
 }
 
 void Widget::setCursor(const Cursor& cursor) {
-  GdkCursor* pcur = cursor.impl();
+  GdkCursor* platformCursor = cursor.impl();
 
   // http://bugs.webkit.org/show_bug.cgi?id=16388
   // [GTK] Widget::setCursor() gets called frequently
@@ -80,15 +71,15 @@ void Widget::setCursor(const Cursor& cursor) {
   // gdk_window_set_cursor() in certain GDK backends seems to be an
   // expensive operation, so avoid it if possible.
 
-  if (pcur == m_data->cursor)
+  if (platformCursor == lastSetCursor)
     return;
 
   gdk_window_set_cursor(
       gdkDrawable(platformWidget())
           ? GDK_WINDOW(gdkDrawable(platformWidget()))
           : GTK_WIDGET(root()->hostWindow()->platformWindow())->window,
-      pcur);
-  m_data->cursor = pcur;
+      platformCursor);
+  lastSetCursor = platformCursor;
 }
 
 void Widget::show() {
