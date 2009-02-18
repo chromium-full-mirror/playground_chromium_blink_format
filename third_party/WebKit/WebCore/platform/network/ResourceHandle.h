@@ -199,7 +199,7 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
 #if USE(SOUP)
   bool startData(String urlString);
   bool startHttp(String urlString);
-  bool startGio(String urlString);
+  bool startGio(KURL url);
 #endif
 
   void scheduleFailure(FailureType);
