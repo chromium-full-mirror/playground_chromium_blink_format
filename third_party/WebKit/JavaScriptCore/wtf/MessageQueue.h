@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2009 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -51,6 +52,8 @@ class MessageQueue : Noncopyable {
   void append(const DataType&);
   void prepend(const DataType&);
   bool waitForMessage(DataType&);
+  template <typename Predicate>
+  MessageQueueWaitResult waitForMessageFiltered(DataType&, Predicate&);
   MessageQueueWaitResult waitForMessageTimed(DataType&, double absoluteTime);
   void kill();
 
@@ -96,6 +99,26 @@ inline bool MessageQueue<DataType>::waitForMessage(DataType& result) {
   result = m_queue.first();
   m_queue.removeFirst();
   return true;
+}
+
+template <typename DataType>
+template <typename Predicate>
+inline MessageQueueWaitResult MessageQueue<DataType>::waitForMessageFiltered(
+    DataType& result,
+    Predicate& predicate) {
+  MutexLocker lock(m_mutex);
+
+  DequeConstIterator<DataType> found = m_queue.end();
+  while (!m_killed && (found = m_queue.findIf(predicate)) == m_queue.end())
+    m_condition.wait(m_mutex);
+
+  if (m_killed)
+    return MessageQueueTerminated;
+
+  ASSERT(found != m_queue.end());
+  result = *found;
+  m_queue.remove(found);
+  return MessageQueueMessageReceived;
 }
 
 template <typename DataType>
@@ -153,7 +176,7 @@ inline bool MessageQueue<DataType>::killed() const {
   MutexLocker lock(m_mutex);
   return m_killed;
 }
-}
+}  // namespace WTF
 
 using WTF::MessageQueue;
 // MessageQueueWaitResult enum and all its values.

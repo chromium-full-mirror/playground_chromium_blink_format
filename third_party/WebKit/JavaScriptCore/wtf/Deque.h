@@ -101,6 +101,9 @@ class Deque {
 
   void clear();
 
+  template <typename Predicate>
+  iterator findIf(Predicate&);
+
  private:
   friend class DequeIteratorBase<T>;
 
@@ -443,6 +446,17 @@ inline void Deque<T>::clear() {
   m_start = 0;
   m_end = 0;
   checkValidity();
+}
+
+template <typename T>
+template <typename Predicate>
+inline DequeIterator<T> Deque<T>::findIf(Predicate& predicate) {
+  iterator end_iterator = end();
+  for (iterator it = begin(); it != end_iterator; ++it) {
+    if (predicate(*it))
+      return it;
+  }
+  return end_iterator;
 }
 
 template <typename T>
