@@ -89,16 +89,6 @@ const SimpleFontData* FontCache::getFontDataForCharacters(
   return ret;
 }
 
-const AtomicString& FontCache::alternateFamilyName(
-    const AtomicString& familyName) {
-  notImplemented();
-
-  // This is just to stop GCC emitting a warning about returning a reference
-  // to a temporary variable
-  static AtomicString a;
-  return a;
-}
-
 FontPlatformData* FontCache::getSimilarFontPlatformData(const Font& font) {
   return 0;
 }
