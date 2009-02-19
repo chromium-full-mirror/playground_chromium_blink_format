@@ -250,6 +250,11 @@ class Settings {
     return m_allowScriptsToCloseWindows;
   }
 
+  void setNeedsIChatMemoryCacheCallsQuirk(bool);
+  bool needsIChatMemoryCacheCallsQuirk() const {
+    return m_needsIChatMemoryCacheCallsQuirk;
+  }
+
  private:
   Page* m_page;
 
@@ -303,6 +308,7 @@ class Settings {
   bool m_enforceCSSMIMETypeInStrictMode : 1;
   size_t m_maximumDecodedImageSize;
   bool m_allowScriptsToCloseWindows : 1;
+  bool m_needsIChatMemoryCacheCallsQuirk : 1;
 
 #if USE(SAFARI_THEME)
   static bool gShouldPaintNativeControls;
