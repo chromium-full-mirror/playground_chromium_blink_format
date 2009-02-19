@@ -53,6 +53,8 @@ void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
   callLinkInfo->hotPathBegin.repatch(JSValuePtr::encode(jsImpossibleValue()));
 }
 
+// void JIT::linkCall(JSFunction* , CodeBlock* , JITCode , CallLinkInfo*
+// callLinkInfo, int )
 void JIT::linkCall(JSFunction* callee,
                    CodeBlock* calleeCodeBlock,
                    JITCode ctiCode,
@@ -208,11 +210,6 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
 
 #else
 
-static NO_RETURN void unreachable() {
-  ASSERT_NOT_REACHED();
-  exit(1);
-}
-
 void JIT::compileOpCall(OpcodeID opcodeID,
                         Instruction* instruction,
                         unsigned callLinkInfoIndex) {
@@ -290,7 +287,7 @@ void JIT::compileOpCall(OpcodeID opcodeID,
 
   // Call to the callee
   m_callStructureStubCompilationInfo[callLinkInfoIndex].hotPathOther =
-      emitNakedCall(reinterpret_cast<void*>(unreachable));
+      emitNakedCall(reinterpret_cast<void*>(0));
 
   if (opcodeID == op_call_eval)
     wasEval.link(this);

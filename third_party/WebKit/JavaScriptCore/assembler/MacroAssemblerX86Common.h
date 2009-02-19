@@ -457,9 +457,11 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
 
   void breakpoint() { m_assembler.int3(); }
 
-  Call call() { return Call(m_assembler.call(), true); }
+  Call nearCall() { return Call(m_assembler.call(), Call::LinkableNear); }
 
-  Call call(RegisterID target) { return Call(m_assembler.call(target), false); }
+  Call call(RegisterID target) {
+    return Call(m_assembler.call(target), Call::None);
+  }
 
   void ret() { m_assembler.ret(); }
 

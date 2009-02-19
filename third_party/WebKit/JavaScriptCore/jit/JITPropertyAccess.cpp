@@ -300,7 +300,9 @@ void JIT::privateCompilePutByIdTransition(
   Call callTarget;
 
   // emit a call only if storage realloc is needed
-  if (transitionWillNeedStorageRealloc(oldStructure, newStructure)) {
+  bool willNeedStorageRealloc =
+      transitionWillNeedStorageRealloc(oldStructure, newStructure);
+  if (willNeedStorageRealloc) {
     pop(X86::ebx);
 #if PLATFORM(X86_64)
     move(Imm32(newStructure->propertyStorageCapacity()), regT1);
@@ -331,23 +333,17 @@ void JIT::privateCompilePutByIdTransition(
 
   ret();
 
-  Jump failureJump;
-  bool plantedFailureJump = false;
-  if (!failureCases.empty()) {
-    failureCases.link(this);
-    restoreArgumentReferenceForTrampoline();
-    failureJump = jump();
-    plantedFailureJump = true;
-  }
+  ASSERT(!failureCases.empty());
+  failureCases.link(this);
+  restoreArgumentReferenceForTrampoline();
+  Call failureCall = tailRecursiveCall();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
   PatchBuffer patchBuffer(code);
 
-  if (plantedFailureJump)
-    patchBuffer.linkTailRecursive(failureJump,
-                                  Interpreter::cti_op_put_by_id_fail);
+  patchBuffer.link(failureCall, Interpreter::cti_op_put_by_id_fail);
 
-  if (transitionWillNeedStorageRealloc(oldStructure, newStructure))
+  if (willNeedStorageRealloc)
     patchBuffer.link(callTarget, resizePropertyStorage);
 
   stubInfo->stubRoutine = patchBuffer.entry();
@@ -455,13 +451,14 @@ void JIT::privateCompileGetByIdSelf(StructureStubInfo* stubInfo,
   loadPtr(Address(regT0, cachedOffset * sizeof(JSValuePtr)), regT0);
   ret();
 
+  Call failureCases1Call = makeTailRecursiveCall(failureCases1);
+  Call failureCases2Call = makeTailRecursiveCall(failureCases2);
+
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
   PatchBuffer patchBuffer(code);
 
-  patchBuffer.linkTailRecursive(failureCases1,
-                                Interpreter::cti_op_get_by_id_self_fail);
-  patchBuffer.linkTailRecursive(failureCases2,
-                                Interpreter::cti_op_get_by_id_self_fail);
+  patchBuffer.link(failureCases1Call, Interpreter::cti_op_get_by_id_self_fail);
+  patchBuffer.link(failureCases2Call, Interpreter::cti_op_get_by_id_self_fail);
 
   stubInfo->stubRoutine = patchBuffer.entry();
 
@@ -876,13 +873,14 @@ void JIT::privateCompilePutByIdReplace(StructureStubInfo* stubInfo,
   storePtr(regT1, Address(regT0, cachedOffset * sizeof(JSValuePtr)));
   ret();
 
+  Call failureCases1Call = makeTailRecursiveCall(failureCases1);
+  Call failureCases2Call = makeTailRecursiveCall(failureCases2);
+
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
   PatchBuffer patchBuffer(code);
 
-  patchBuffer.linkTailRecursive(failureCases1,
-                                Interpreter::cti_op_put_by_id_fail);
-  patchBuffer.linkTailRecursive(failureCases2,
-                                Interpreter::cti_op_put_by_id_fail);
+  patchBuffer.link(failureCases1Call, Interpreter::cti_op_put_by_id_fail);
+  patchBuffer.link(failureCases2Call, Interpreter::cti_op_put_by_id_fail);
 
   stubInfo->stubRoutine = patchBuffer.entry();
 

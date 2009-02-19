@@ -47,6 +47,8 @@ inline bool CAN_SIGN_EXTEND_32_64(intptr_t value) {
 inline bool CAN_SIGN_EXTEND_U32_64(intptr_t value) {
   return value == (intptr_t)(uint32_t)value;
 }
+
+#define REPTACH_OFFSET_CALL_R11 3
 #endif
 
 namespace X86 {
@@ -920,8 +922,12 @@ class X86Assembler {
     return m_formatter.immediateRel32();
   }
 
-  void jmp_r(RegisterID dst) {
+  // Return a JmpSrc so we have a label to the jump, so we can use this
+  // To make a tail recursive call on x86-64.  The MacroAssembler
+  // really shouldn't wrap this as a Jump, since it can't be linked. :-/
+  JmpSrc jmp_r(RegisterID dst) {
     m_formatter.oneByteOp(OP_GROUP5_Ev, GROUP5_OP_JMPN, dst);
+    return JmpSrc(m_formatter.size());
   }
 
   void jmp_m(int offset, RegisterID base) {
@@ -1101,7 +1107,7 @@ class X86Assembler {
 
   // Linking & patching:
 
-  void link(JmpSrc from, JmpDst to) {
+  void linkJump(JmpSrc from, JmpDst to) {
     ASSERT(to.m_offset != -1);
     ASSERT(from.m_offset != -1);
 
@@ -1109,20 +1115,64 @@ class X86Assembler {
                            from.m_offset)[-1] = to.m_offset - from.m_offset;
   }
 
-  static void patchAddress(void* code, JmpDst position, void* value) {
-    ASSERT(position.m_offset != -1);
-
-    reinterpret_cast<void**>(reinterpret_cast<ptrdiff_t>(code) +
-                             position.m_offset)[-1] = value;
-  }
-
-  static void link(void* code, JmpSrc from, void* to) {
+  static void linkJump(void* code, JmpSrc from, void* to) {
     ASSERT(from.m_offset != -1);
     ptrdiff_t linkOffset = reinterpret_cast<ptrdiff_t>(to) -
                            (reinterpret_cast<ptrdiff_t>(code) + from.m_offset);
     ASSERT(linkOffset == static_cast<int>(linkOffset));
     reinterpret_cast<int*>(reinterpret_cast<ptrdiff_t>(code) +
                            from.m_offset)[-1] = linkOffset;
+  }
+
+  static void patchJump(intptr_t where, void* destination) {
+    intptr_t offset = reinterpret_cast<intptr_t>(destination) - where;
+    ASSERT(offset == static_cast<int32_t>(offset));
+    reinterpret_cast<int32_t*>(where)[-1] = static_cast<int32_t>(offset);
+  }
+
+#if PLATFORM(X86_64)
+  // FIXME: transition these functions out of here - the assembler
+  // shouldn't know that that this is mov/call pair using r11. :-/
+  static void patchMacroAssemblerCall(intptr_t where, void* destination) {
+    patchAddress(reinterpret_cast<void*>(where - REPTACH_OFFSET_CALL_R11),
+                 JmpDst(0), destination);
+  }
+#else
+  static void patchMacroAssemblerCall(intptr_t where, void* destination) {
+    intptr_t offset = reinterpret_cast<intptr_t>(destination) - where;
+    ASSERT(offset == static_cast<int32_t>(offset));
+    reinterpret_cast<int32_t*>(where)[-1] = static_cast<int32_t>(offset);
+  }
+#endif
+
+  void linkCall(JmpSrc from, JmpDst to) {
+    ASSERT(to.m_offset != -1);
+    ASSERT(from.m_offset != -1);
+
+    reinterpret_cast<int*>(reinterpret_cast<ptrdiff_t>(m_formatter.data()) +
+                           from.m_offset)[-1] = to.m_offset - from.m_offset;
+  }
+
+  static void linkCall(void* code, JmpSrc from, void* to) {
+    ASSERT(from.m_offset != -1);
+    ptrdiff_t linkOffset = reinterpret_cast<ptrdiff_t>(to) -
+                           (reinterpret_cast<ptrdiff_t>(code) + from.m_offset);
+    ASSERT(linkOffset == static_cast<int>(linkOffset));
+    reinterpret_cast<int*>(reinterpret_cast<ptrdiff_t>(code) +
+                           from.m_offset)[-1] = linkOffset;
+  }
+
+  static void patchCall(intptr_t where, void* destination) {
+    intptr_t offset = reinterpret_cast<intptr_t>(destination) - where;
+    ASSERT(offset == static_cast<int32_t>(offset));
+    reinterpret_cast<int32_t*>(where)[-1] = static_cast<int32_t>(offset);
+  }
+
+  static void patchAddress(void* code, JmpDst position, void* value) {
+    ASSERT(position.m_offset != -1);
+
+    reinterpret_cast<void**>(reinterpret_cast<ptrdiff_t>(code) +
+                             position.m_offset)[-1] = value;
   }
 
   static unsigned getCallReturnOffset(JmpSrc call) {
@@ -1160,12 +1210,6 @@ class X86Assembler {
 
   static void patchPointer(intptr_t where, intptr_t value) {
     reinterpret_cast<intptr_t*>(where)[-1] = value;
-  }
-
-  static void patchBranchOffset(intptr_t where, void* destination) {
-    intptr_t offset = reinterpret_cast<intptr_t>(destination) - where;
-    ASSERT(offset == static_cast<int32_t>(offset));
-    reinterpret_cast<int32_t*>(where)[-1] = static_cast<int32_t>(offset);
   }
 
   void* executableCopy(ExecutablePool* allocator) {

@@ -43,6 +43,7 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
   using MacroAssemblerX86Common::load32;
   using MacroAssemblerX86Common::store32;
   using MacroAssemblerX86Common::branch32;
+  using MacroAssemblerX86Common::call;
 
   void add32(Imm32 imm, RegisterID src, RegisterID dest) {
     m_assembler.leal_mr(imm.m_value, src, dest);
@@ -72,6 +73,14 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
   Jump branch32(Condition cond, AbsoluteAddress left, Imm32 right) {
     m_assembler.cmpl_im(right.m_value, left.m_ptr);
     return Jump(m_assembler.jCC(cond));
+  }
+
+  Call call() { return Call(m_assembler.call(), Call::Linkable); }
+
+  Call tailRecursiveCall() { return Call::fromTailJump(jump()); }
+
+  Call makeTailRecursiveCall(Jump oldJump) {
+    return Call::fromTailJump(oldJump);
   }
 
   Jump branchPtrWithPatch(Condition cond,
