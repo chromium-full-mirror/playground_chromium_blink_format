@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -91,7 +91,7 @@ HTMLMediaElement::HTMLMediaElement(const QualifiedName& tagName, Document* doc)
       m_pausedInternal(false),
       m_inActiveDocument(true),
       m_player(0),
-      m_loadRestrictions(NoLoadRestriction),
+      m_restrictions(NoRestrictions),
       m_processingMediaPlayerCallback(0),
       m_sendProgressEvents(true)
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
@@ -215,7 +215,8 @@ void HTMLMediaElement::dispatchEventAsync(const AtomicString& eventName) {
 
 void HTMLMediaElement::loadTimerFired(Timer<HTMLMediaElement>*) {
   ExceptionCode ec;
-  load(ec);
+
+  loadInternal(ec);
 }
 
 void HTMLMediaElement::asyncEventTimerFired(Timer<HTMLMediaElement>*) {
@@ -288,12 +289,16 @@ float HTMLMediaElement::bufferingRate() {
 }
 
 void HTMLMediaElement::load(ExceptionCode& ec) {
-  if ((m_loadRestrictions & RequireUserGestureLoadRestriction) &&
+  if (m_restrictions & RequireUserGestureForLoadRestriction &&
       !processingUserGesture()) {
     ec = INVALID_STATE_ERR;
     return;
   }
 
+  loadInternal(ec);
+}
+
+void HTMLMediaElement::loadInternal(ExceptionCode& ec) {
   String mediaSrc;
   String mediaMIMEType;
 
@@ -368,6 +373,9 @@ void HTMLMediaElement::load(ExceptionCode& ec) {
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
   m_player.clear();
   m_player.set(new MediaPlayer(this));
+#else
+  if (!m_player)
+    m_player.set(new MediaPlayer(this));
 #endif
 
   updateVolume();
@@ -402,7 +410,7 @@ void HTMLMediaElement::mediaPlayerNetworkStateChanged(MediaPlayer*) {
 }
 
 void HTMLMediaElement::setNetworkState(MediaPlayer::NetworkState state) {
-  if (m_networkState == EMPTY) {
+  if (state == MediaPlayer::Empty) {
     // just update the cached state and leave, we can't do anything
     m_networkState = EMPTY;
     return;
@@ -464,10 +472,12 @@ void HTMLMediaElement::setNetworkState(MediaPlayer::NetworkState state) {
       return;
 
     m_loadedFirstFrame = true;
+#if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
     if (renderer()) {
       ASSERT(!renderer()->isImage());
       static_cast<RenderVideo*>(renderer())->videoSizeChanged();
     }
+#endif
 
     dispatchEventForType(eventNames().loadedfirstframeEvent, false, true);
     if (m_loadNestingLevel < m_terminateLoadBelowNestingLevel)
@@ -684,6 +694,16 @@ void HTMLMediaElement::setAutoplay(bool b) {
 }
 
 void HTMLMediaElement::play(ExceptionCode& ec) {
+  if (m_restrictions & RequireUserGestureForRateChangeRestriction &&
+      !processingUserGesture()) {
+    ec = INVALID_STATE_ERR;
+    return;
+  }
+
+  playInternal(ec);
+}
+
+void HTMLMediaElement::playInternal(ExceptionCode& ec) {
   // 3.14.9.7. Playing the media resource
   if (!m_player || networkState() == EMPTY) {
     ec = 0;
@@ -709,6 +729,16 @@ void HTMLMediaElement::play(ExceptionCode& ec) {
 }
 
 void HTMLMediaElement::pause(ExceptionCode& ec) {
+  if (m_restrictions & RequireUserGestureForRateChangeRestriction &&
+      !processingUserGesture()) {
+    ec = INVALID_STATE_ERR;
+    return;
+  }
+
+  pauseInternal(ec);
+}
+
+void HTMLMediaElement::pauseInternal(ExceptionCode& ec) {
   // 3.14.9.7. Playing the media resource
   if (!m_player || networkState() == EMPTY) {
     ec = 0;
@@ -832,29 +862,32 @@ void HTMLMediaElement::setMuted(bool muted) {
 }
 
 void HTMLMediaElement::togglePlayState(ExceptionCode& ec) {
+  // We can safely call the internal play/pause methods, which don't check
+  // restrictions, because
+  // this method is only called from the built-in media controller
   if (canPlay())
-    play(ec);
+    playInternal(ec);
   else
-    pause(ec);
+    pauseInternal(ec);
 }
 
 void HTMLMediaElement::beginScrubbing() {
   if (!paused()) {
     if (ended()) {
-      // because a media element stays in non-paused state when it reaches end,
+      // Because a media element stays in non-paused state when it reaches end,
       // playback resumes
-      //  when the slider is dragged from the end to another position unless we
-      //  pause first. do
-      //  a "hard pause" so an event is generated, since we want to stay paused
-      //  after scrubbing finishes
+      // when the slider is dragged from the end to another position unless we
+      // pause first. Do
+      // a "hard pause" so an event is generated, since we want to stay paused
+      // after scrubbing finishes.
       ExceptionCode ec;
       pause(ec);
     } else {
-      // not at the end but we still want to pause playback so the media engine
+      // Not at the end but we still want to pause playback so the media engine
       // doesn't try to
-      //  continue playing during scrubbing. pause without generating an event
-      //  as we will
-      //  unpause after scrubbing finishes
+      // continue playing during scrubbing. Pause without generating an event as
+      // we will
+      // unpause after scrubbing finishes.
       setPausedInternal(true);
     }
   }
