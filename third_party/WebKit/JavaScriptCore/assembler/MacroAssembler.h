@@ -162,6 +162,10 @@ class MacroAssembler : public MacroAssemblerBase {
     return load32WithAddressOffsetPatch(address, dest);
   }
 
+  void setPtr(Condition cond, RegisterID left, Imm32 right, RegisterID dest) {
+    set32(cond, left, right, dest);
+  }
+
   void storePtr(RegisterID src, ImplicitAddress address) {
     store32(src, address);
   }
