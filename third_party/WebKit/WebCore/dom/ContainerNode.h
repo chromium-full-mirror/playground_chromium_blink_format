@@ -88,8 +88,8 @@ class ContainerNode : public Node {
 
  protected:
   static void queuePostAttachCallback(NodeCallback, Node*);
-  static void suspendPostAttachCallbacks();
-  static void resumePostAttachCallbacks();
+  void suspendPostAttachCallbacks();
+  void resumePostAttachCallbacks();
 
   template <class GenericNode, class GenericNodeContainer>
   friend void appendChildToContainer(GenericNode* child,
