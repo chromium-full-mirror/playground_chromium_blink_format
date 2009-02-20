@@ -32,6 +32,7 @@
 #include "ArgList.h"
 #include "JSCell.h"
 #include "JSValue.h"
+#include "JSObject.h"
 #include "Opcode.h"
 #include "RegisterFile.h"
 #include <wtf/HashMap.h>
@@ -421,10 +422,6 @@ class Interpreter {
   }
 
 #if ENABLE(JIT)
-  static void throwStackOverflowPreviousFrame(CallFrame**,
-                                              JSGlobalData*,
-                                              void*& returnAddress);
-
   void tryCTICacheGetByID(CallFrame*,
                           CodeBlock*,
                           void* returnAddress,
