@@ -36,19 +36,17 @@ namespace WebCore {
 
 class CStringBuffer : public RefCounted<CStringBuffer> {
  public:
+  const char* data() { return m_vector.data(); }
+  size_t length() { return m_vector.size(); }
+
+ private:
+  friend class CString;
+
   static PassRefPtr<CStringBuffer> create(unsigned length) {
     return adoptRef(new CStringBuffer(length));
   }
-
-  char* data() { return m_vector.data(); }
-  size_t length() const { return m_vector.size(); }
-
-  PassRefPtr<SharedBuffer> releaseBuffer() {
-    return SharedBuffer::adoptVector(m_vector);
-  }
-
- private:
   CStringBuffer(unsigned length) : m_vector(length) {}
+  char* mutableData() { return m_vector.data(); }
 
   Vector<char> m_vector;
 };
@@ -60,6 +58,7 @@ class CString {
   CString() {}
   CString(const char*);
   CString(const char*, unsigned length);
+  CString(CStringBuffer* buffer) : m_buffer(buffer) {}
   static CString newUninitialized(size_t length, char*& characterBuffer);
 
   const char* data() const;
@@ -68,7 +67,7 @@ class CString {
 
   bool isNull() const { return !m_buffer; }
 
-  PassRefPtr<SharedBuffer> releaseBuffer();
+  CStringBuffer* buffer() const { return m_buffer.get(); }
 
  private:
   void copyBufferIfNeeded();
