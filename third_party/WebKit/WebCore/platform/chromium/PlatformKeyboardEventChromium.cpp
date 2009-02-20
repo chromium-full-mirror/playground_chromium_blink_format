@@ -43,7 +43,7 @@ void PlatformKeyboardEvent::disambiguateKeyDownEvent(
 #if PLATFORM(WIN_OS)
   // No KeyDown events on Windows to disambiguate.
   ASSERT_NOT_REACHED();
-#elif PLATFORM(DARWIN)
+#else
   // Can only change type from KeyDown to RawKeyDown or Char, as we lack
   // information for other conversions.
   ASSERT(m_type == KeyDown);
@@ -58,6 +58,7 @@ void PlatformKeyboardEvent::disambiguateKeyDownEvent(
   } else {
     m_keyIdentifier = String();
     m_windowsVirtualKeyCode = 0;
+#if PLATFORM(DARWIN)
     if (m_text.length() == 1 &&
         (m_text[0U] >= 0xF700 && m_text[0U] <= 0xF7FF)) {
       // According to NSEvents.h, OpenStep reserves the range 0xF700-0xF8FF for
@@ -67,6 +68,7 @@ void PlatformKeyboardEvent::disambiguateKeyDownEvent(
       m_text = String();
       m_unmodifiedText = String();
     }
+#endif
   }
 #endif
 }
