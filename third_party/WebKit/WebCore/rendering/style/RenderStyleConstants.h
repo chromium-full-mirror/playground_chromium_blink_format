@@ -255,7 +255,7 @@ enum EListStyleType {
   LNONE
 };
 
-enum ContentType {
+enum StyleContentType {
   CONTENT_NONE,
   CONTENT_OBJECT,
   CONTENT_TEXT,

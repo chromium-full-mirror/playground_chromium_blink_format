@@ -41,7 +41,7 @@ struct ContentData : Noncopyable {
 
   void clear();
 
-  ContentType m_type;
+  StyleContentType m_type;
   union {
     StyleImage* m_image;
     StringImpl* m_text;
