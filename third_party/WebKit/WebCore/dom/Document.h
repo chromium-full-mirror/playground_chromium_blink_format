@@ -505,6 +505,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   KURL completeURL(const String&) const;
 
+  virtual String userAgent(const KURL&) const;
+
   // from cachedObjectClient
   virtual void setCSSStyleSheet(const String& url,
                                 const String& charset,

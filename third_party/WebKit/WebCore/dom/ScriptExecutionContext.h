@@ -59,6 +59,8 @@ class ScriptExecutionContext {
   const KURL& url() const { return virtualURL(); }
   KURL completeURL(const String& url) const { return virtualCompleteURL(url); }
 
+  virtual String userAgent(const KURL&) const = 0;
+
   SecurityOrigin* securityOrigin() const { return m_securityOrigin.get(); }
 
   virtual void reportException(const String& errorMessage,

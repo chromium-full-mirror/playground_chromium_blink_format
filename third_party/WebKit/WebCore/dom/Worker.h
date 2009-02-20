@@ -43,7 +43,6 @@ namespace WebCore {
 
 class CachedResource;
 class CachedScript;
-class Document;
 class ScriptExecutionContext;
 class String;
 class WorkerContextProxy;
@@ -56,16 +55,15 @@ class Worker : public RefCounted<Worker>,
                public EventTarget {
  public:
   static PassRefPtr<Worker> create(const String& url,
-                                   Document* document,
+                                   ScriptExecutionContext* context,
                                    ExceptionCode& ec) {
-    return adoptRef(new Worker(url, document, ec));
+    return adoptRef(new Worker(url, context, ec));
   }
   ~Worker();
 
   virtual ScriptExecutionContext* scriptExecutionContext() const {
     return ActiveDOMObject::scriptExecutionContext();
   }
-  Document* document() const;
 
   virtual Worker* toWorker() { return this; }
 
@@ -106,7 +104,7 @@ class Worker : public RefCounted<Worker>,
   EventListener* onerror() const { return m_onErrorListener.get(); }
 
  private:
-  Worker(const String&, Document*, ExceptionCode&);
+  Worker(const String&, ScriptExecutionContext*, ExceptionCode&);
 
   virtual void notifyFinished(CachedResource*);
 
