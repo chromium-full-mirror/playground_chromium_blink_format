@@ -1441,7 +1441,7 @@ void RenderObject::showTreeForThis() const {
 Color RenderObject::selectionBackgroundColor() const {
   Color color;
   if (style()->userSelect() != SELECT_NONE) {
-    RenderStyle* pseudoStyle = getCachedPseudoStyle(SELECTION);
+    RefPtr<RenderStyle> pseudoStyle = getUncachedPseudoStyle(SELECTION);
     if (pseudoStyle && pseudoStyle->backgroundColor().isValid())
       color = pseudoStyle->backgroundColor().blendWithWhite();
     else
@@ -1458,7 +1458,7 @@ Color RenderObject::selectionForegroundColor() const {
   if (style()->userSelect() == SELECT_NONE)
     return color;
 
-  if (RenderStyle* pseudoStyle = getCachedPseudoStyle(SELECTION)) {
+  if (RefPtr<RenderStyle> pseudoStyle = getUncachedPseudoStyle(SELECTION)) {
     color = pseudoStyle->textFillColor();
     if (!color.isValid())
       color = pseudoStyle->color();

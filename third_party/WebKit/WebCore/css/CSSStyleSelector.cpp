@@ -1897,6 +1897,7 @@ CSSStyleSelector::SelectorChecker::checkSelector(
       // pseudo classes (but nothing else)
       // to follow the pseudo elements.
       if (elementStyle && dynamicPseudo != NOPSEUDO &&
+          dynamicPseudo != SELECTION &&
           !((RenderScrollbar::scrollbarForStyleResolve() ||
              dynamicPseudo == SCROLLBAR_CORNER || dynamicPseudo == RESIZER) &&
             sel->m_match == CSSSelector::PseudoClass))
@@ -2113,6 +2114,9 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
       // specialized rules for each
       // (since there are no elements involved).
       return checkScrollbarPseudoClass(sel, dynamicPseudo);
+    } else if (dynamicPseudo == SELECTION) {
+      if (sel->pseudoType() == CSSSelector::PseudoWindowInactive)
+        return !m_document->page()->focusController()->isActive();
     }
 
     // Normal element pseudo class checking.
