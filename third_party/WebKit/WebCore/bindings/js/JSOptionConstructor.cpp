@@ -20,6 +20,7 @@
 #include "config.h"
 #include "JSOptionConstructor.h"
 
+#include "HTMLNames.h"
 #include "HTMLOptionElement.h"
 #include "JSHTMLOptionElement.h"
 #include "ScriptExecutionContext.h"
@@ -51,14 +52,12 @@ static JSObject* constructHTMLOptionElement(ExecState* exec,
   Document* document =
       static_cast<JSOptionConstructor*>(constructor)->document();
 
-  ExceptionCode ec = 0;
-
   RefPtr<HTMLOptionElement> element = static_pointer_cast<HTMLOptionElement>(
-      document->createElement("option", ec));
-  RefPtr<Text> text;
-  if (ec == 0)
-    text = document->createTextNode("");
-  if (ec == 0 && !args.at(exec, 0).isUndefined())
+      document->createElement(HTMLNames::optionTag, false));
+
+  ExceptionCode ec = 0;
+  RefPtr<Text> text = document->createTextNode("");
+  if (!args.at(exec, 0).isUndefined())
     text->setData(args.at(exec, 0).toString(exec), ec);
   if (ec == 0)
     element->appendChild(text.release(), ec);
