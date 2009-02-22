@@ -34,6 +34,7 @@
 
 #include "Interpreter.h"
 #include "JITCode.h"
+#include "JITStubs.h"
 #include "Opcode.h"
 #include "RegisterFile.h"
 #include "MacroAssembler.h"
@@ -721,7 +722,7 @@ class JIT : private MacroAssembler {
                                      RegisterID variableObject,
                                      int index);
 
-  void emitSlowScriptCheck();
+  void emitTimeoutCheck();
 #ifndef NDEBUG
   void printBytecodeOperandTypes(unsigned src1, unsigned src2);
 #endif

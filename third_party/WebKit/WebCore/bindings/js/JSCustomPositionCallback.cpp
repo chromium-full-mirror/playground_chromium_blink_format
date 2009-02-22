@@ -71,9 +71,9 @@ void JSCustomPositionCallback::handleEvent(Geoposition* geoposition,
   ArgList args;
   args.append(toJS(exec, geoposition));
 
-  globalObject->startTimeoutCheck();
+  globalObject->globalData()->timeoutChecker.start();
   call(exec, function, callType, callData, m_callback, args);
-  globalObject->stopTimeoutCheck();
+  globalObject->globalData()->timeoutChecker.stop();
 
   if (exec->hadException()) {
     reportCurrentException(exec);

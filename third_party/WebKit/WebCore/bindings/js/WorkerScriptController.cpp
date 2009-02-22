@@ -85,11 +85,11 @@ ScriptValue WorkerScriptController::evaluate(
   JSLock lock(false);
 
   ExecState* exec = m_workerContextWrapper->globalExec();
-  m_workerContextWrapper->startTimeoutCheck();
+  m_workerContextWrapper->globalData()->timeoutChecker.start();
   Completion comp =
       JSC::evaluate(exec, exec->dynamicGlobalObject()->globalScopeChain(),
                     sourceCode.jsSourceCode(), m_workerContextWrapper);
-  m_workerContextWrapper->stopTimeoutCheck();
+  m_workerContextWrapper->globalData()->timeoutChecker.stop();
 
   m_workerContext->thread()->workerObjectProxy()->reportPendingActivity(
       m_workerContext->hasPendingActivity());
@@ -112,8 +112,8 @@ void WorkerScriptController::forbidExecution() {
   // just rely on it reaching the worker thread's processor sooner or later.
   MutexLocker lock(m_sharedDataMutex);
   m_executionForbidden = true;
-  m_globalData->interpreter->setTimeoutTime(
-      1);  // 1 ms is the smallest timeout that can be set.
+  m_globalData->timeoutChecker.setTimeoutInterval(
+      1);  // 1ms is the smallest timeout that can be set.
 }
 
 }  // namespace WebCore
