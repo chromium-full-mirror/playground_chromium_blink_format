@@ -213,7 +213,7 @@ GList* webkit_web_back_forward_list_get_forward_list_with_limit(
     forwardItems = g_list_prepend(forwardItems, g_object_ref(webHistoryItem));
   }
 
-  return g_list_reverse(forwardItems);
+  return forwardItems;
 }
 
 /**
@@ -246,8 +246,9 @@ GList* webkit_web_back_forward_list_get_back_list_with_limit(
     backItems = g_list_prepend(backItems, g_object_ref(webHistoryItem));
   }
 
-  return g_list_reverse(backItems);
+  return backItems;
 }
+
 /**
  * webkit_web_back_forward_list_get_back_item:
  * @web_back_forward_list: a #WebBackForwardList
