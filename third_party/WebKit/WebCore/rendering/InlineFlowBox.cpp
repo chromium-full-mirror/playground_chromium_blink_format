@@ -1069,16 +1069,19 @@ void InlineFlowBox::paintTextDecorations(RenderObject::PaintInfo& paintInfo,
 
       if (paintUnderline) {
         context->setStrokeColor(underline);
+        context->setStrokeStyle(SolidStroke);
         // Leave one pixel of white between the baseline and the underline.
         context->drawLineForText(IntPoint(tx, ty + baselinePos + 1), w,
                                  isPrinting);
       }
       if (paintOverline) {
         context->setStrokeColor(overline);
+        context->setStrokeStyle(SolidStroke);
         context->drawLineForText(IntPoint(tx, ty), w, isPrinting);
       }
       if (paintLineThrough) {
         context->setStrokeColor(linethrough);
+        context->setStrokeStyle(SolidStroke);
         context->drawLineForText(IntPoint(tx, ty + 2 * baselinePos / 3), w,
                                  isPrinting);
       }
