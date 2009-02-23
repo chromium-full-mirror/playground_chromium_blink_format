@@ -1814,23 +1814,61 @@ void RenderBlock::paint(PaintInfo& paintInfo, int tx, int ty) {
   }
 }
 
-void RenderBlock::paintColumns(PaintInfo& paintInfo,
-                               int tx,
-                               int ty,
-                               bool paintingFloats) {
-  // We need to do multiple passes, breaking up our child painting into strips.
-  GraphicsContext* context = paintInfo.context;
-  int currXOffset = 0;
-  int currYOffset = 0;
-  int ruleAdd = borderLeft() + paddingLeft();
-  int ruleX = 0;
-  int colGap = columnGap();
+void RenderBlock::paintColumnRules(PaintInfo& paintInfo, int tx, int ty) {
   const Color& ruleColor = style()->columnRuleColor();
   bool ruleTransparent = style()->columnRuleIsTransparent();
   EBorderStyle ruleStyle = style()->columnRuleStyle();
   int ruleWidth = style()->columnRuleWidth();
-  bool renderRule = !paintingFloats && ruleStyle > BHIDDEN &&
-                    !ruleTransparent && ruleWidth <= colGap;
+  int colGap = columnGap();
+  bool renderRule =
+      ruleStyle > BHIDDEN && !ruleTransparent && ruleWidth <= colGap;
+  if (!renderRule)
+    return;
+
+  // We need to do multiple passes, breaking up our child painting into strips.
+  int currXOffset = 0;
+  int ruleAdd = borderLeft() + paddingLeft();
+  int ruleX = 0;
+  Vector<IntRect>* colRects = columnRects();
+  unsigned colCount = colRects->size();
+  for (unsigned i = 0; i < colCount; i++) {
+    // For each rect, we clip to the rect, and then we adjust our coords.
+    IntRect colRect = colRects->at(i);
+
+    // Move to the next position.
+    if (style()->direction() == LTR) {
+      ruleX += colRect.width() + colGap / 2;
+      currXOffset += colRect.width() + colGap;
+    } else {
+      ruleX -= (colRect.width() + colGap / 2);
+      currXOffset -= (colRect.width() + colGap);
+    }
+
+    // Now paint the column rule.
+    if (i < colCount - 1) {
+      int ruleStart = tx + ruleX - ruleWidth / 2 + ruleAdd;
+      int ruleEnd = ruleStart + ruleWidth;
+      int ruleTop = ty + borderTop() + paddingTop();
+      int ruleBottom = ruleTop + contentHeight();
+      drawLineForBoxSide(paintInfo.context, ruleStart, ruleTop, ruleEnd,
+                         ruleBottom,
+                         style()->direction() == LTR ? BSLeft : BSRight,
+                         ruleColor, style()->color(), ruleStyle, 0, 0);
+    }
+
+    ruleX = currXOffset;
+  }
+}
+
+void RenderBlock::paintColumnContents(PaintInfo& paintInfo,
+                                      int tx,
+                                      int ty,
+                                      bool paintingFloats) {
+  // We need to do multiple passes, breaking up our child painting into strips.
+  GraphicsContext* context = paintInfo.context;
+  int currXOffset = 0;
+  int currYOffset = 0;
+  int colGap = columnGap();
   Vector<IntRect>* colRects = columnRects();
   unsigned colCount = colRects->size();
   for (unsigned i = 0; i < colCount; i++) {
@@ -1858,31 +1896,14 @@ void RenderBlock::paintColumns(PaintInfo& paintInfo,
       paintContents(info, finalX, finalY);
 
     // Move to the next position.
-    if (style()->direction() == LTR) {
-      ruleX += colRect.width() + colGap / 2;
+    if (style()->direction() == LTR)
       currXOffset += colRect.width() + colGap;
-    } else {
-      ruleX -= (colRect.width() + colGap / 2);
+    else
       currXOffset -= (colRect.width() + colGap);
-    }
 
     currYOffset -= colRect.height();
 
     context->restore();
-
-    // Now paint the column rule.
-    if (renderRule && paintInfo.phase == PaintPhaseForeground &&
-        i < colCount - 1) {
-      int ruleStart = ruleX - ruleWidth / 2 + ruleAdd;
-      int ruleEnd = ruleStart + ruleWidth;
-      drawLineForBoxSide(paintInfo.context, tx + ruleStart,
-                         ty + borderTop() + paddingTop(), tx + ruleEnd,
-                         ty + borderTop() + paddingTop() + contentHeight(),
-                         style()->direction() == LTR ? BSLeft : BSRight,
-                         ruleColor, style()->color(), ruleStyle, 0, 0);
-    }
-
-    ruleX = currXOffset;
   }
 }
 
@@ -1974,8 +1995,11 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, int tx, int ty) {
   // 1. paint background, borders etc
   if ((paintPhase == PaintPhaseBlockBackground ||
        paintPhase == PaintPhaseChildBlockBackground) &&
-      hasBoxDecorations() && style()->visibility() == VISIBLE) {
-    paintBoxDecorations(paintInfo, tx, ty);
+      style()->visibility() == VISIBLE) {
+    if (hasBoxDecorations())
+      paintBoxDecorations(paintInfo, tx, ty);
+    if (hasColumns())
+      paintColumnRules(paintInfo, tx, ty);
   }
 
   if (paintPhase == PaintPhaseMask && style()->visibility() == VISIBLE) {
@@ -1997,7 +2021,7 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, int tx, int ty) {
   // 2. paint contents
   if (paintPhase != PaintPhaseSelfOutline) {
     if (hasColumns())
-      paintColumns(paintInfo, scrolledX, scrolledY);
+      paintColumnContents(paintInfo, scrolledX, scrolledY);
     else
       paintContents(paintInfo, scrolledX, scrolledY);
   }
@@ -2014,7 +2038,7 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, int tx, int ty) {
   if (paintPhase == PaintPhaseFloat || paintPhase == PaintPhaseSelection ||
       paintPhase == PaintPhaseTextClip) {
     if (hasColumns())
-      paintColumns(paintInfo, scrolledX, scrolledY, true);
+      paintColumnContents(paintInfo, scrolledX, scrolledY, true);
     else
       paintFloats(paintInfo, scrolledX, scrolledY,
                   paintPhase == PaintPhaseSelection ||
