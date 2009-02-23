@@ -153,7 +153,7 @@ RenderLayer::RenderLayer(RenderBoxModelObject* renderer)
       m_inResizeMode(false),
       m_posZOrderList(0),
       m_negZOrderList(0),
-      m_overflowList(0),
+      m_normalFlowList(0),
       m_clipRects(0)
 #ifndef NDEBUG
       ,
@@ -162,8 +162,8 @@ RenderLayer::RenderLayer(RenderBoxModelObject* renderer)
       ,
       m_scrollDimensionsDirty(true),
       m_zOrderListsDirty(true),
-      m_overflowListDirty(true),
-      m_isOverflowOnly(shouldBeOverflowOnly()),
+      m_normalFlowListDirty(true),
+      m_isNormalFlowOnly(shouldBeNormalFlowOnly()),
       m_usedTransparency(false),
       m_paintingInsideReflection(false),
       m_inOverflowRelayout(false),
@@ -204,7 +204,7 @@ RenderLayer::~RenderLayer() {
 
   delete m_posZOrderList;
   delete m_negZOrderList;
-  delete m_overflowList;
+  delete m_normalFlowList;
   delete m_marquee;
 
 #if USE(ACCELERATED_COMPOSITING)
@@ -350,7 +350,7 @@ void RenderLayer::setHasVisibleContent(bool b) {
     RenderBoxModelObject* repaintContainer = renderer()->containerForRepaint();
     m_repaintRect = renderer()->clippedOverflowRectForRepaint(repaintContainer);
     m_outlineBox = renderer()->outlineBoundsForRepaint(repaintContainer);
-    if (!isOverflowOnly())
+    if (!isNormalFlowOnly())
       dirtyStackingContextZOrderLists();
   }
   if (parent())
@@ -578,12 +578,12 @@ RenderLayer* RenderLayer::enclosingCompositingLayer(bool includeSelf) const {
   // list,
   // so we have to check whether the parent is a stacking context, or whether
   // the child is overflow-only.
-  bool inOverflowList = isOverflowOnly();
+  bool inNormalFlowList = isNormalFlowOnly();
   for (RenderLayer* curr = parent(); curr; curr = curr->parent()) {
-    if (curr->isComposited() && (inOverflowList || curr->isStackingContext()))
+    if (curr->isComposited() && (inNormalFlowList || curr->isStackingContext()))
       return curr;
 
-    inOverflowList = curr->isOverflowOnly();
+    inNormalFlowList = curr->isNormalFlowOnly();
   }
 
   return 0;
@@ -735,10 +735,10 @@ void RenderLayer::addChild(RenderLayer* child, RenderLayer* beforeChild) {
 
   child->setParent(this);
 
-  if (child->isOverflowOnly())
-    dirtyOverflowList();
+  if (child->isNormalFlowOnly())
+    dirtyNormalFlowList();
 
-  if (!child->isOverflowOnly() || child->firstChild()) {
+  if (!child->isNormalFlowOnly() || child->firstChild()) {
     // Dirty the z-order list in which we are contained.  The stackingContext()
     // can be null in the
     // case where we're building up generated content layers.  This is ok, since
@@ -773,9 +773,9 @@ RenderLayer* RenderLayer::removeChild(RenderLayer* oldChild) {
   if (m_last == oldChild)
     m_last = oldChild->previousSibling();
 
-  if (oldChild->isOverflowOnly())
-    dirtyOverflowList();
-  if (!oldChild->isOverflowOnly() || oldChild->firstChild()) {
+  if (oldChild->isNormalFlowOnly())
+    dirtyNormalFlowList();
+  if (!oldChild->isNormalFlowOnly() || oldChild->firstChild()) {
     // Dirty the z-order list in which we are contained.  When called via the
     // reattachment process in removeOnlyThisLayer, the layer may already be
     // disconnected
@@ -2167,9 +2167,9 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   }
 
   // Paint any child layers that have overflow.
-  if (m_overflowList)
-    for (Vector<RenderLayer*>::iterator it = m_overflowList->begin();
-         it != m_overflowList->end(); ++it)
+  if (m_normalFlowList)
+    for (Vector<RenderLayer*>::iterator it = m_normalFlowList->begin();
+         it != m_normalFlowList->end(); ++it)
       it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
                         paintRestriction, paintingRoot, false,
                         temporaryClipRects);
@@ -2322,9 +2322,9 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   }
 
   // Now check our overflow objects.
-  if (m_overflowList) {
-    for (int i = m_overflowList->size() - 1; i >= 0; --i) {
-      insideLayer = m_overflowList->at(i)->hitTestLayer(
+  if (m_normalFlowList) {
+    for (int i = m_normalFlowList->size() - 1; i >= 0; --i) {
+      insideLayer = m_normalFlowList->at(i)->hitTestLayer(
           rootLayer, request, result, hitTestRect, hitTestPoint);
       if (insideLayer)
         return insideLayer;
@@ -2849,10 +2849,10 @@ void RenderLayer::dirtyStackingContextZOrderLists() {
     sc->dirtyZOrderLists();
 }
 
-void RenderLayer::dirtyOverflowList() {
-  if (m_overflowList)
-    m_overflowList->clear();
-  m_overflowListDirty = true;
+void RenderLayer::dirtyNormalFlowList() {
+  if (m_normalFlowList)
+    m_normalFlowList->clear();
+  m_normalFlowListDirty = true;
 
 #if USE(ACCELERATED_COMPOSITING)
   if (!renderer()->documentBeingDestroyed())
@@ -2880,21 +2880,21 @@ void RenderLayer::updateZOrderLists() {
   m_zOrderListsDirty = false;
 }
 
-void RenderLayer::updateOverflowList() {
-  if (!m_overflowListDirty)
+void RenderLayer::updateNormalFlowList() {
+  if (!m_normalFlowListDirty)
     return;
 
   for (RenderLayer* child = firstChild(); child; child = child->nextSibling()) {
     // Ignore non-overflow layers and reflections.
-    if (child->isOverflowOnly() &&
+    if (child->isNormalFlowOnly() &&
         (!m_reflection || reflectionLayer() != child)) {
-      if (!m_overflowList)
-        m_overflowList = new Vector<RenderLayer*>;
-      m_overflowList->append(child);
+      if (!m_normalFlowList)
+        m_normalFlowList = new Vector<RenderLayer*>;
+      m_normalFlowList->append(child);
     }
   }
 
-  m_overflowListDirty = false;
+  m_normalFlowListDirty = false;
 }
 
 void RenderLayer::collectLayers(Vector<RenderLayer*>*& posBuffer,
@@ -2905,7 +2905,7 @@ void RenderLayer::collectLayers(Vector<RenderLayer*>*& posBuffer,
   // get put in zorder lists.
   if ((m_hasVisibleContent ||
        (m_hasVisibleDescendant && isStackingContext())) &&
-      !isOverflowOnly()) {
+      !isNormalFlowOnly()) {
     // Determine which buffer the child should be in.
     Vector<RenderLayer*>*& buffer = (zIndex() >= 0) ? posBuffer : negBuffer;
 
@@ -2933,13 +2933,13 @@ void RenderLayer::collectLayers(Vector<RenderLayer*>*& posBuffer,
 void RenderLayer::updateLayerListsIfNeeded() {
 #if USE(ACCELERATED_COMPOSITING)
   if (compositor()->inCompositingMode()) {
-    if ((isStackingContext() && m_zOrderListsDirty) || m_overflowListDirty)
+    if ((isStackingContext() && m_zOrderListsDirty) || m_normalFlowListDirty)
       compositor()->updateCompositingLayers(this);
     return;
   }
 #endif
   updateZOrderLists();
-  updateOverflowList();
+  updateNormalFlowList();
 }
 
 void RenderLayer::repaintIncludingDescendants() {
@@ -2980,19 +2980,19 @@ void RenderLayer::setBackingNeedsRepaintInRect(const IntRect& r) {
 }
 #endif
 
-bool RenderLayer::shouldBeOverflowOnly() const {
+bool RenderLayer::shouldBeNormalFlowOnly() const {
   return (renderer()->hasOverflowClip() || renderer()->hasReflection()) &&
          !renderer()->isPositioned() && !renderer()->isRelPositioned() &&
          !renderer()->hasTransform() && !isTransparent();
 }
 
 void RenderLayer::styleChanged(StyleDifference diff, const RenderStyle*) {
-  bool isOverflowOnly = shouldBeOverflowOnly();
-  if (isOverflowOnly != m_isOverflowOnly) {
-    m_isOverflowOnly = isOverflowOnly;
+  bool isNormalFlowOnly = shouldBeNormalFlowOnly();
+  if (isNormalFlowOnly != m_isNormalFlowOnly) {
+    m_isNormalFlowOnly = isNormalFlowOnly;
     RenderLayer* p = parent();
     if (p)
-      p->dirtyOverflowList();
+      p->dirtyNormalFlowList();
     dirtyStackingContextZOrderLists();
   }
 

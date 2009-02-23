@@ -219,7 +219,7 @@ class RenderLayer : public ScrollbarClient {
   RenderMarquee* marquee() const { return m_marquee; }
   void suspendMarquees();
 
-  bool isOverflowOnly() const { return m_isOverflowOnly; }
+  bool isNormalFlowOnly() const { return m_isNormalFlowOnly; }
 
   bool requiresSlowRepaints() const;
 
@@ -359,9 +359,9 @@ class RenderLayer : public ScrollbarClient {
   Vector<RenderLayer*>* posZOrderList() const { return m_posZOrderList; }
   Vector<RenderLayer*>* negZOrderList() const { return m_negZOrderList; }
 
-  void dirtyOverflowList();
-  void updateOverflowList();
-  Vector<RenderLayer*>* overflowList() const { return m_overflowList; }
+  void dirtyNormalFlowList();
+  void updateNormalFlowList();
+  Vector<RenderLayer*>* normalFlowList() const { return m_normalFlowList; }
 
   bool hasVisibleContent() const { return m_hasVisibleContent; }
   void setHasVisibleContent(bool);
@@ -518,7 +518,7 @@ class RenderLayer : public ScrollbarClient {
 
   void computeScrollDimensions(bool* needHBar = 0, bool* needVBar = 0);
 
-  bool shouldBeOverflowOnly() const;
+  bool shouldBeNormalFlowOnly() const;
 
   virtual void valueChanged(Scrollbar*);
   virtual void invalidateScrollbarRect(Scrollbar*, const IntRect&);
@@ -610,7 +610,7 @@ class RenderLayer : public ScrollbarClient {
   // This list contains child layers that cannot create stacking contexts.  For
   // now it is just
   // overflow layers, but that may change in the future.
-  Vector<RenderLayer*>* m_overflowList;
+  Vector<RenderLayer*>* m_normalFlowList;
 
   ClipRects*
       m_clipRects;  // Cached clip rects used when painting and hit testing.
@@ -620,8 +620,8 @@ class RenderLayer : public ScrollbarClient {
 
   bool m_scrollDimensionsDirty : 1;
   bool m_zOrderListsDirty : 1;
-  bool m_overflowListDirty : 1;
-  bool m_isOverflowOnly : 1;
+  bool m_normalFlowListDirty : 1;
+  bool m_isNormalFlowOnly : 1;
 
   bool m_usedTransparency : 1;  // Tracks whether we need to close a transparent
                                 // layer, i.e., whether
