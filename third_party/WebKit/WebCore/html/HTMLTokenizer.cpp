@@ -1679,12 +1679,12 @@ inline bool HTMLTokenizer::continueProcessing(int& processedCount,
   return true;
 }
 
-bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
+void HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
   if (!m_buffer)
-    return false;
+    return;
 
   if (m_parserStopped)
-    return false;
+    return;
 
   SegmentedString source(str);
   if (m_executingScript)
@@ -1701,7 +1701,7 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
         m_preloadScanner->write(source);
 #endif
     }
-    return false;
+    return;
   }
 
 #if PRELOAD_SCANNER_ENABLED
@@ -1716,7 +1716,7 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
 
   // Once a timer is set, it has control of when the tokenizer continues.
   if (m_timer.isActive())
-    return false;
+    return;
 
   bool wasInWrite = m_inWrite;
   m_inWrite = true;
@@ -1860,11 +1860,8 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
   m_state = state;
 
   if (m_noMoreData && !m_inWrite && !state.loadingExtScript() &&
-      !m_executingScript && !m_timer.isActive()) {
+      !m_executingScript && !m_timer.isActive())
     end();  // this actually causes us to be deleted
-    return true;
-  }
-  return false;
 }
 
 void HTMLTokenizer::stopParsing() {

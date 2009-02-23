@@ -57,7 +57,7 @@ class FTPDirectoryTokenizer : public HTMLTokenizer {
  public:
   FTPDirectoryTokenizer(HTMLDocument*);
 
-  virtual bool write(const SegmentedString&, bool appendData);
+  virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
 
   virtual bool isWaitingForScripts() const { return false; }
@@ -418,7 +418,7 @@ void FTPDirectoryTokenizer::createBasicDocument() {
   bodyElement->appendChild(m_tableElement, ec);
 }
 
-bool FTPDirectoryTokenizer::write(const SegmentedString& s,
+void FTPDirectoryTokenizer::write(const SegmentedString& s,
                                   bool /*appendData*/) {
   // Make sure we have the table element to append to by loading the template
   // set in the pref, or
@@ -459,7 +459,7 @@ bool FTPDirectoryTokenizer::write(const SegmentedString& s,
 
   if (!foundNewLine) {
     m_dest = m_buffer;
-    return false;
+    return;
   }
 
   UChar* start = m_buffer;
@@ -480,8 +480,6 @@ bool FTPDirectoryTokenizer::write(const SegmentedString& s,
   // Copy the partial line we have left to the carryover buffer
   if (cursor - start > 1)
     m_carryOver.append(String(start, cursor - start - 1));
-
-  return false;
 }
 
 void FTPDirectoryTokenizer::finish() {

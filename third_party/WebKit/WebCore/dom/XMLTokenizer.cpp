@@ -88,22 +88,21 @@ void XMLTokenizer::setCurrentNode(Node* n) {
   m_currentNodeIsReferenced = nodeNeedsReference;
 }
 
-bool XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
+void XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
   String parseString = s.toString();
 
   if (m_sawXSLTransform || !m_sawFirstElement)
     m_originalSourceForTransform += parseString;
 
   if (m_parserStopped || m_sawXSLTransform)
-    return false;
+    return;
 
   if (m_parserPaused) {
     m_pendingSrc.append(s);
-    return false;
+    return;
   }
 
   doWrite(s.toString());
-  return false;
 }
 
 void XMLTokenizer::handleError(ErrorType type,

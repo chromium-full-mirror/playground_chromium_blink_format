@@ -146,7 +146,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   HTMLTokenizer(DocumentFragment*);
   virtual ~HTMLTokenizer();
 
-  virtual bool write(const SegmentedString&, bool appendData);
+  virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
   virtual void setForceSynchronous(bool force);
   virtual bool isWaitingForScripts() const;

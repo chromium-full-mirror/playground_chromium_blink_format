@@ -65,7 +65,7 @@ class ImageTokenizer : public Tokenizer {
  public:
   ImageTokenizer(ImageDocument* doc) : m_doc(doc) {}
 
-  virtual bool write(const SegmentedString&, bool appendData);
+  virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
   virtual bool isWaitingForScripts() const;
 
@@ -90,9 +90,8 @@ class ImageDocumentElement : public HTMLImageElement {
 
 // --------
 
-bool ImageTokenizer::write(const SegmentedString&, bool) {
+void ImageTokenizer::write(const SegmentedString&, bool) {
   ASSERT_NOT_REACHED();
-  return false;
 }
 
 bool ImageTokenizer::writeRawData(const char*, int) {
