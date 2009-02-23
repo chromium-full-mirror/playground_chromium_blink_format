@@ -48,6 +48,13 @@ class ClipboardChromium : public Clipboard, public CachedResourceClient {
                                               PassRefPtr<ChromiumDataObject>,
                                               ClipboardAccessPolicy);
 
+  // Returns the file name (not including the extension). This removes any
+  // invalid file system characters as well as making sure the
+  // path + extension is not bigger than allowed by the file system.
+  // This may change the file extension in dataObject.
+  static String validateFileName(const String& title,
+                                 ChromiumDataObject* dataObject);
+
   virtual void clearData(const String& type);
   void clearAllData();
   String getData(const String& type, bool& success) const;
