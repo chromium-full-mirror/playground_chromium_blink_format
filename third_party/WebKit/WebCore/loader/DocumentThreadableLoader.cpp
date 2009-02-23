@@ -93,7 +93,7 @@ void DocumentThreadableLoader::willSendRequest(SubresourceLoader*,
   // cross-domain requests.
   if (!m_document->securityOrigin()->canRequest(request.url())) {
     RefPtr<DocumentThreadableLoader> protect(this);
-    m_client->didFailWillSendRequestCheck();
+    m_client->didFailRedirectCheck();
     cancel();
   }
 }

@@ -249,6 +249,18 @@ void WorkerThreadableLoader::MainThreadBridge::didFail(
       createCallbackTask(&workerContextDidFail, m_workerClientWrapper, error));
 }
 
+static void workerContextDidFailRedirectCheck(
+    ScriptExecutionContext* context,
+    RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper) {
+  ASSERT_UNUSED(context, context->isWorkerContext());
+  workerClientWrapper->didFailRedirectCheck();
+}
+
+void WorkerThreadableLoader::MainThreadBridge::didFailRedirectCheck() {
+  m_messagingProxy.postTaskToWorkerContext(createCallbackTask(
+      &workerContextDidFailRedirectCheck, m_workerClientWrapper));
+}
+
 static void workerContextDidReceiveAuthenticationCancellation(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper,

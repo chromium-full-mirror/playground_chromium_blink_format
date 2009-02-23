@@ -1229,7 +1229,7 @@ void XMLHttpRequest::didFail(const ResourceError& error) {
   networkError();
 }
 
-void XMLHttpRequest::didFailWillSendRequestCheck() {
+void XMLHttpRequest::didFailRedirectCheck() {
   internalAbort();
   networkError();
 }
