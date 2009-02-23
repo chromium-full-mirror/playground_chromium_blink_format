@@ -30,6 +30,10 @@
 #include "HTTPHeaderMap.h"
 #include <wtf/OwnPtr.h>
 
+#if USE(SOUP)
+typedef struct _SoupSession SoupSession;
+#endif
+
 #if PLATFORM(CF)
 typedef const struct __CFData* CFDataRef;
 #endif
@@ -176,6 +180,10 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
 
 #if PLATFORM(QT) || USE(CURL) || USE(SOUP)
   ResourceHandleInternal* getInternal() { return d.get(); }
+#endif
+
+#if USE(SOUP)
+  static SoupSession* defaultSession();
 #endif
 
   // Used to work around the fact that you don't get any more NSURLConnection
