@@ -89,7 +89,7 @@ class ModePredicate {
 
   bool isDefaultMode() const { return m_defaultMode; }
 
-  bool operator()(PassRefPtr<WorkerRunLoop::Task> task) {
+  bool operator()(PassRefPtr<WorkerRunLoop::Task> task) const {
     return m_defaultMode || m_mode == task->mode();
   }
 
@@ -145,23 +145,20 @@ MessageQueueWaitResult WorkerRunLoop::runInMode(WorkerContext* context,
   return result;
 }
 
-MessageQueueWaitResult WorkerRunLoop::runInMode(WorkerContext* context,
-                                                ModePredicate& predicate) {
+MessageQueueWaitResult WorkerRunLoop::runInMode(
+    WorkerContext* context,
+    const ModePredicate& predicate) {
   ASSERT(context);
   ASSERT(context->thread());
   ASSERT(context->thread()->threadID() == currentThread());
 
+  double absoluteTime = (predicate.isDefaultMode() && m_sharedTimer->isActive())
+                            ? m_sharedTimer->fireTime()
+                            : MessageQueue<RefPtr<Task>>::infiniteTime();
   RefPtr<Task> task;
-  MessageQueueWaitResult result;
-  if (predicate.isDefaultMode()) {
-    if (m_sharedTimer->isActive())
-      result =
-          m_messageQueue.waitForMessageTimed(task, m_sharedTimer->fireTime());
-    else
-      result = m_messageQueue.waitForMessage(task) ? MessageQueueMessageReceived
-                                                   : MessageQueueTerminated;
-  } else
-    result = m_messageQueue.waitForMessageFiltered(task, predicate);
+  MessageQueueWaitResult result =
+      m_messageQueue.waitForMessageFilteredWithTimeout(task, predicate,
+                                                       absoluteTime);
 
   switch (result) {
     case MessageQueueTerminated:
