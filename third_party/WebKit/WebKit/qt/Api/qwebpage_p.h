@@ -80,6 +80,9 @@ class QWebPagePrivate {
 
   void _q_onLoadProgressChanged(int);
   void _q_webActionTriggered(bool checked);
+#ifndef NDEBUG
+  void _q_cleanupLeakMessages();
+#endif
   void updateAction(QWebPage::WebAction action);
   void updateNavigationActions();
   void updateEditorActions();
