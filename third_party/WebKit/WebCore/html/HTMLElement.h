@@ -46,8 +46,6 @@ class HTMLElement : public StyledElement {
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttribute*);
 
-  virtual PassRefPtr<Node> cloneNode(bool deep);
-
   PassRefPtr<HTMLCollection> children();
 
   String id() const;
