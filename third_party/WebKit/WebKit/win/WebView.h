@@ -731,6 +731,9 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE setMemoryCacheDelegateCallsEnabled(
       /* [in] */ BOOL enabled);
 
+  virtual HRESULT STDMETHODCALLTYPE setJavaScriptURLsAreAllowed(
+      /* [in] */ BOOL areAllowed);
+
   // WebView
   bool shouldUseEmbeddedView(const WebCore::String& mimeType) const;
 

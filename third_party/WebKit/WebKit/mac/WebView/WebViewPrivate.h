@@ -460,6 +460,8 @@ backforward list.
 - (void)setMemoryCacheDelegateCallsEnabled:(BOOL)suspend;
 - (BOOL)areMemoryCacheDelegateCallsEnabled;
 
+- (void)_setJavaScriptURLsAreAllowed:(BOOL)setJavaScriptURLsAreAllowed;
+
 + (NSCursor*)_pointingHandCursor;
 
 @end

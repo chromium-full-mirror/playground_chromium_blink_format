@@ -251,6 +251,9 @@ class Page : Noncopyable {
     return m_areMemoryCacheClientCallsEnabled;
   }
 
+  void setJavaScriptURLsAreAllowed(bool);
+  bool javaScriptURLsAreAllowed() const;
+
  private:
   void initGroup();
 
@@ -282,6 +285,8 @@ class Page : Noncopyable {
   bool m_cookieEnabled;
   bool m_areMemoryCacheClientCallsEnabled;
   float m_mediaVolume;
+
+  bool m_javaScriptURLsAreAllowed;
 
   InspectorController* m_parentInspectorController;
 

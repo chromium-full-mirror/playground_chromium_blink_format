@@ -5186,6 +5186,11 @@ HRESULT WebView::setMemoryCacheDelegateCallsEnabled(BOOL enabled) {
   return S_OK;
 }
 
+HRESULT WebView::setJavaScriptURLsAreAllowed(BOOL areAllowed) {
+  m_page->setJavaScriptURLsAreAllowed(areAllowed);
+  return S_OK;
+}
+
 class EnumTextMatches : public IEnumTextMatches {
   long m_ref;
   UINT m_index;
