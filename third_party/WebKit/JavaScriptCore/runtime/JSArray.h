@@ -139,6 +139,10 @@ inline JSArray* asArray(JSValuePtr value) {
   return static_cast<JSArray*>(asObject(value));
 }
 
+inline bool isJSArray(JSGlobalData* globalData, JSValuePtr v) {
+  return v.isCell() && v.asCell()->vptr() == globalData->jsArrayVPtr;
+}
+
 }  // namespace JSC
 
 #endif  // JSArray_h

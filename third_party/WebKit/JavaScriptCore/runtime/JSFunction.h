@@ -38,9 +38,9 @@ class JSActivation;
 class JSGlobalObject;
 
 class JSFunction : public InternalFunction {
-  friend class Interpreter;
   friend class JIT;
   friend class JITStubs;
+  friend class VPtrSet;
 
   typedef InternalFunction Base;
 

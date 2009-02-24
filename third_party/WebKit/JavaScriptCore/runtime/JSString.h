@@ -75,7 +75,7 @@ JSString* jsOwnedString(ExecState*, const UString&);
 
 class JSString : public JSCell {
   friend class JIT;
-  friend class Interpreter;
+  friend class VPtrSet;
 
  public:
   JSString(JSGlobalData* globalData, const UString& value)
@@ -239,6 +239,10 @@ ALWAYS_INLINE bool JSString::getStringPropertySlot(ExecState* exec,
   }
 
   return false;
+}
+
+inline bool isJSString(JSGlobalData* globalData, JSValuePtr v) {
+  return v.isCell() && v.asCell()->vptr() == globalData->jsStringVPtr;
 }
 
 // --- JSValue inlines ----------------------------

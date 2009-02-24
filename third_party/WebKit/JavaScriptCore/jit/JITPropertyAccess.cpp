@@ -399,7 +399,7 @@ void JIT::privateCompilePatchGetArrayLength(
 
   // Check eax is an array
   Jump failureCases1 =
-      branchPtr(NotEqual, Address(regT0), ImmPtr(m_interpreter->m_jsArrayVptr));
+      branchPtr(NotEqual, Address(regT0), ImmPtr(m_globalData->jsArrayVPtr));
 
   // Checks out okay! - get the length from the storage
   loadPtr(Address(regT0, FIELD_OFFSET(JSArray, m_storage)), regT2);

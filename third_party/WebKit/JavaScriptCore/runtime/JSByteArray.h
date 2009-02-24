@@ -33,7 +33,7 @@
 namespace JSC {
 
 class JSByteArray : public JSObject {
-  friend class Interpreter;
+  friend class VPtrSet;
 
  public:
   bool canAccessIndex(unsigned i) { return i < m_storage->length(); }
@@ -110,6 +110,11 @@ JSByteArray* asByteArray(JSValuePtr value);
 inline JSByteArray* asByteArray(JSValuePtr value) {
   return static_cast<JSByteArray*>(asCell(value));
 }
+
+inline bool isJSByteArray(JSGlobalData* globalData, JSValuePtr v) {
+  return v.isCell() && v.asCell()->vptr() == globalData->jsByteArrayVPtr;
 }
 
-#endif
+}  // namespace JSC
+
+#endif  // JSByteArray_h

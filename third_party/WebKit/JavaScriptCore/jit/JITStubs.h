@@ -36,6 +36,8 @@
 
 namespace JSC {
 
+class ExecutablePool;
+class JSGlobalData;
 class JSObject;
 class JSPropertyNameIterator;
 class JSValueEncodedAsPointer;
@@ -94,7 +96,10 @@ union VoidPtrPairValue {
   return pair.i
 #endif
 
-struct JITStubs {
+class JITStubs {
+ public:
+  JITStubs(JSGlobalData*);
+
   static JSObject* JIT_STUB cti_op_construct_JSConstruct(STUB_ARGS);
   static JSObject* JIT_STUB cti_op_convert_this(STUB_ARGS);
   static JSObject* JIT_STUB cti_op_new_array(STUB_ARGS);
@@ -221,6 +226,21 @@ struct JITStubs {
                               void* returnAddress,
                               JSValuePtr baseValue,
                               const PutPropertySlot&);
+
+  void* ctiArrayLengthTrampoline() { return m_ctiArrayLengthTrampoline; }
+  void* ctiStringLengthTrampoline() { return m_ctiStringLengthTrampoline; }
+  void* ctiVirtualCallPreLink() { return m_ctiVirtualCallPreLink; }
+  void* ctiVirtualCallLink() { return m_ctiVirtualCallLink; }
+  void* ctiVirtualCall() { return m_ctiVirtualCall; }
+
+ private:
+  RefPtr<ExecutablePool> m_executablePool;
+
+  void* m_ctiArrayLengthTrampoline;
+  void* m_ctiStringLengthTrampoline;
+  void* m_ctiVirtualCallPreLink;
+  void* m_ctiVirtualCallLink;
+  void* m_ctiVirtualCall;
 };
 
 }  // namespace JSC

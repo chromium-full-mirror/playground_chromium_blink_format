@@ -68,6 +68,18 @@ namespace JSC {
 #define CTI_SAMPLER 0
 #endif
 
+JITStubs::JITStubs(JSGlobalData* globalData)
+    : m_ctiArrayLengthTrampoline(0),
+      m_ctiStringLengthTrampoline(0),
+      m_ctiVirtualCallPreLink(0),
+      m_ctiVirtualCallLink(0),
+      m_ctiVirtualCall(0) {
+  JIT::compileCTIMachineTrampolines(
+      globalData, &m_executablePool, &m_ctiArrayLengthTrampoline,
+      &m_ctiStringLengthTrampoline, &m_ctiVirtualCallPreLink,
+      &m_ctiVirtualCallLink, &m_ctiVirtualCall);
+}
+
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
 
 NEVER_INLINE void JITStubs::tryCachePutByID(CallFrame* callFrame,
@@ -160,27 +172,27 @@ NEVER_INLINE void JITStubs::tryCacheGetByID(CallFrame* callFrame,
     return;
   }
 
-  Interpreter* interpreter = callFrame->interpreter();
+  JSGlobalData* globalData = &callFrame->globalData();
 
-  if (interpreter->isJSArray(baseValue) &&
+  if (isJSArray(globalData, baseValue) &&
       propertyName == callFrame->propertyNames().length) {
 #if USE(CTI_REPATCH_PIC)
     JIT::compilePatchGetArrayLength(callFrame->scopeChain()->globalData,
                                     codeBlock, returnAddress);
 #else
-    ctiPatchCallByReturnAddress(returnAddress,
-                                interpreter->m_ctiArrayLengthTrampoline);
+    ctiPatchCallByReturnAddress(
+        returnAddress, globalData->jitStubs.ctiArrayLengthTrampoline());
 #endif
     return;
   }
 
-  if (interpreter->isJSString(baseValue) &&
+  if (isJSString(globalData, baseValue) &&
       propertyName == callFrame->propertyNames().length) {
     // The tradeoff of compiling an patched inline string length access routine
     // does not seem
     // to pay off, so we currently only do this for arrays.
-    ctiPatchCallByReturnAddress(returnAddress,
-                                interpreter->m_ctiStringLengthTrampoline);
+    ctiPatchCallByReturnAddress(
+        returnAddress, globalData->jitStubs.ctiStringLengthTrampoline());
     return;
   }
 
@@ -964,13 +976,14 @@ VoidPtrPair JITStubs::cti_op_call_arityCheck(STUB_ARGS) {
 void* JITStubs::cti_vm_dontLazyLinkCall(STUB_ARGS) {
   BEGIN_STUB_FUNCTION();
 
+  JSGlobalData* globalData = ARG_globalData;
   JSFunction* callee = asFunction(ARG_src1);
   CodeBlock* codeBlock = &callee->body()->bytecode(callee->scope().node());
   if (!codeBlock->jitCode())
-    JIT::compile(ARG_globalData, codeBlock);
+    JIT::compile(globalData, codeBlock);
 
-  ctiPatchNearCallByReturnAddress(
-      ARG_returnAddress2, ARG_globalData->interpreter->m_ctiVirtualCallLink);
+  ctiPatchNearCallByReturnAddress(ARG_returnAddress2,
+                                  globalData->jitStubs.ctiVirtualCallLink());
 
   return codeBlock->jitCode().addressForCall();
 }
@@ -1210,7 +1223,7 @@ JSValueEncodedAsPointer* JITStubs::cti_op_get_by_val(STUB_ARGS) {
   BEGIN_STUB_FUNCTION();
 
   CallFrame* callFrame = ARG_callFrame;
-  Interpreter* interpreter = ARG_globalData->interpreter;
+  JSGlobalData* globalData = ARG_globalData;
 
   JSValuePtr baseValue = ARG_src1;
   JSValuePtr subscript = ARG_src2;
@@ -1219,16 +1232,16 @@ JSValueEncodedAsPointer* JITStubs::cti_op_get_by_val(STUB_ARGS) {
 
   if (LIKELY(subscript.isUInt32Fast())) {
     uint32_t i = subscript.getUInt32Fast();
-    if (interpreter->isJSArray(baseValue)) {
+    if (isJSArray(globalData, baseValue)) {
       JSArray* jsArray = asArray(baseValue);
       if (jsArray->canGetIndex(i))
         result = jsArray->getIndex(i);
       else
         result = jsArray->JSArray::get(callFrame, i);
-    } else if (interpreter->isJSString(baseValue) &&
+    } else if (isJSString(globalData, baseValue) &&
                asString(baseValue)->canGetIndex(i))
       result = asString(baseValue)->getIndex(ARG_globalData, i);
-    else if (interpreter->isJSByteArray(baseValue) &&
+    else if (isJSByteArray(globalData, baseValue) &&
              asByteArray(baseValue)->canAccessIndex(i)) {
       // All fast byte array accesses are safe from exceptions so return
       // immediately to avoid exception checks.
@@ -1251,7 +1264,7 @@ JSValueEncodedAsPointer* JITStubs::cti_op_get_by_val_byte_array(STUB_ARGS) {
   BEGIN_STUB_FUNCTION();
 
   CallFrame* callFrame = ARG_callFrame;
-  Interpreter* interpreter = ARG_globalData->interpreter;
+  JSGlobalData* globalData = ARG_globalData;
 
   JSValuePtr baseValue = ARG_src1;
   JSValuePtr subscript = ARG_src2;
@@ -1260,7 +1273,7 @@ JSValueEncodedAsPointer* JITStubs::cti_op_get_by_val_byte_array(STUB_ARGS) {
 
   if (LIKELY(subscript.isUInt32Fast())) {
     uint32_t i = subscript.getUInt32Fast();
-    if (interpreter->isJSByteArray(baseValue) &&
+    if (isJSByteArray(globalData, baseValue) &&
         asByteArray(baseValue)->canAccessIndex(i)) {
       // All fast byte array accesses are safe from exceptions so return
       // immediately to avoid exception checks.
@@ -1268,7 +1281,7 @@ JSValueEncodedAsPointer* JITStubs::cti_op_get_by_val_byte_array(STUB_ARGS) {
     }
 
     result = baseValue.get(callFrame, i);
-    if (!interpreter->isJSByteArray(baseValue))
+    if (!isJSByteArray(globalData, baseValue))
       ctiPatchCallByReturnAddress(STUB_RETURN_ADDRESS,
                                   reinterpret_cast<void*>(cti_op_get_by_val));
   } else {
@@ -1348,7 +1361,7 @@ void JITStubs::cti_op_put_by_val(STUB_ARGS) {
   BEGIN_STUB_FUNCTION();
 
   CallFrame* callFrame = ARG_callFrame;
-  Interpreter* interpreter = ARG_globalData->interpreter;
+  JSGlobalData* globalData = ARG_globalData;
 
   JSValuePtr baseValue = ARG_src1;
   JSValuePtr subscript = ARG_src2;
@@ -1356,13 +1369,13 @@ void JITStubs::cti_op_put_by_val(STUB_ARGS) {
 
   if (LIKELY(subscript.isUInt32Fast())) {
     uint32_t i = subscript.getUInt32Fast();
-    if (interpreter->isJSArray(baseValue)) {
+    if (isJSArray(globalData, baseValue)) {
       JSArray* jsArray = asArray(baseValue);
       if (jsArray->canSetIndex(i))
         jsArray->setIndex(i, value);
       else
         jsArray->JSArray::put(callFrame, i, value);
-    } else if (interpreter->isJSByteArray(baseValue) &&
+    } else if (isJSByteArray(globalData, baseValue) &&
                asByteArray(baseValue)->canAccessIndex(i)) {
       JSByteArray* jsByteArray = asByteArray(baseValue);
       ctiPatchCallByReturnAddress(
@@ -1400,12 +1413,11 @@ void JITStubs::cti_op_put_by_val_array(STUB_ARGS) {
   BEGIN_STUB_FUNCTION();
 
   CallFrame* callFrame = ARG_callFrame;
-
   JSValuePtr baseValue = ARG_src1;
   int i = ARG_int2;
   JSValuePtr value = ARG_src3;
 
-  ASSERT(ARG_globalData->interpreter->isJSArray(baseValue));
+  ASSERT(isJSArray(ARG_globalData, baseValue));
 
   if (LIKELY(i >= 0))
     asArray(baseValue)->JSArray::put(callFrame, i, value);
@@ -1429,7 +1441,7 @@ void JITStubs::cti_op_put_by_val_byte_array(STUB_ARGS) {
   BEGIN_STUB_FUNCTION();
 
   CallFrame* callFrame = ARG_callFrame;
-  Interpreter* interpreter = ARG_globalData->interpreter;
+  JSGlobalData* globalData = ARG_globalData;
 
   JSValuePtr baseValue = ARG_src1;
   JSValuePtr subscript = ARG_src2;
@@ -1437,7 +1449,7 @@ void JITStubs::cti_op_put_by_val_byte_array(STUB_ARGS) {
 
   if (LIKELY(subscript.isUInt32Fast())) {
     uint32_t i = subscript.getUInt32Fast();
-    if (interpreter->isJSByteArray(baseValue) &&
+    if (isJSByteArray(globalData, baseValue) &&
         asByteArray(baseValue)->canAccessIndex(i)) {
       JSByteArray* jsByteArray = asByteArray(baseValue);
 
@@ -1455,7 +1467,7 @@ void JITStubs::cti_op_put_by_val_byte_array(STUB_ARGS) {
       }
     }
 
-    if (!interpreter->isJSByteArray(baseValue))
+    if (!isJSByteArray(globalData, baseValue))
       ctiPatchCallByReturnAddress(STUB_RETURN_ADDRESS,
                                   reinterpret_cast<void*>(cti_op_put_by_val));
     baseValue.put(callFrame, i, value);
@@ -2023,8 +2035,7 @@ JSValueEncodedAsPointer* JITStubs::cti_op_is_number(STUB_ARGS) {
 JSValueEncodedAsPointer* JITStubs::cti_op_is_string(STUB_ARGS) {
   BEGIN_STUB_FUNCTION();
 
-  return JSValuePtr::encode(
-      jsBoolean(ARG_globalData->interpreter->isJSString(ARG_src1)));
+  return JSValuePtr::encode(jsBoolean(isJSString(ARG_globalData, ARG_src1)));
 }
 
 JSValueEncodedAsPointer* JITStubs::cti_op_is_object(STUB_ARGS) {

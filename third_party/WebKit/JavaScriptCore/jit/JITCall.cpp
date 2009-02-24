@@ -159,7 +159,7 @@ void JIT::compileOpCall(OpcodeID opcodeID, Instruction* instruction, unsigned) {
   // Check for JSFunctions.
   emitJumpSlowCaseIfNotJSCell(regT2);
   addSlowCase(branchPtr(NotEqual, Address(regT2),
-                        ImmPtr(m_interpreter->m_jsFunctionVptr)));
+                        ImmPtr(m_globalData->jsFunctionVPtr)));
 
   // First, in the case of a construct, allocate the new object.
   if (opcodeID == op_construct) {
@@ -178,7 +178,7 @@ void JIT::compileOpCall(OpcodeID opcodeID, Instruction* instruction, unsigned) {
          callFrameRegister);
   move(Imm32(argCount), regT1);
 
-  emitNakedCall(m_interpreter->m_ctiVirtualCall);
+  emitNakedCall(m_globalData->jitStubs.ctiVirtualCall());
 
   if (opcodeID == op_call_eval)
     wasEval.link(this);
@@ -317,8 +317,8 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
 
   // Fast check for JS function.
   Jump callLinkFailNotObject = emitJumpIfNotJSCell(regT2);
-  Jump callLinkFailNotJSFunction = branchPtr(
-      NotEqual, Address(regT2), ImmPtr(m_interpreter->m_jsFunctionVptr));
+  Jump callLinkFailNotJSFunction =
+      branchPtr(NotEqual, Address(regT2), ImmPtr(m_globalData->jsFunctionVPtr));
 
   // First, in the case of a construct, allocate the new object.
   if (opcodeID == op_construct) {
@@ -339,7 +339,7 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
          callFrameRegister);
 
   m_callStructureStubCompilationInfo[callLinkInfoIndex].callReturnLocation =
-      emitNakedCall(m_interpreter->m_ctiVirtualCallPreLink);
+      emitNakedCall(m_globalData->jitStubs.ctiVirtualCallPreLink());
 
   Jump storeResultForFirstRun = jump();
 
@@ -359,7 +359,7 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
   // Check for JSFunctions.
   Jump isNotObject = emitJumpIfNotJSCell(regT2);
   Jump isJSFunction =
-      branchPtr(Equal, Address(regT2), ImmPtr(m_interpreter->m_jsFunctionVptr));
+      branchPtr(Equal, Address(regT2), ImmPtr(m_globalData->jsFunctionVPtr));
 
   // This handles host functions
   isNotObject.link(this);
@@ -390,7 +390,7 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
          callFrameRegister);
   move(Imm32(argCount), regT1);
 
-  emitNakedCall(m_interpreter->m_ctiVirtualCall);
+  emitNakedCall(m_globalData->jitStubs.ctiVirtualCall());
 
   // Put the return value in dst. In the interpreter, op_ret does this.
   wasNotJSFunction.link(this);

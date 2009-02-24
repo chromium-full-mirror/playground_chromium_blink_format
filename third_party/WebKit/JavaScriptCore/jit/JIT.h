@@ -426,9 +426,20 @@ class JIT : private MacroAssembler {
                                         cachedOffset, chain, returnAddress);
   }
 
-  static void compileCTIMachineTrampolines(JSGlobalData* globalData) {
+  static void compileCTIMachineTrampolines(
+      JSGlobalData* globalData,
+      RefPtr<ExecutablePool>* executablePool,
+      void** ctiArrayLengthTrampoline,
+      void** ctiStringLengthTrampoline,
+      void** ctiVirtualCallPreLink,
+      void** ctiVirtualCallLink,
+      void** ctiVirtualCall)
+
+  {
     JIT jit(globalData);
-    jit.privateCompileCTIMachineTrampolines();
+    jit.privateCompileCTIMachineTrampolines(
+        executablePool, ctiArrayLengthTrampoline, ctiStringLengthTrampoline,
+        ctiVirtualCallPreLink, ctiVirtualCallLink, ctiVirtualCall);
   }
 
   static void patchGetByIdSelf(StructureStubInfo*,
@@ -511,7 +522,13 @@ class JIT : private MacroAssembler {
                                        StructureChain*,
                                        ProcessorReturnAddress returnAddress);
 
-  void privateCompileCTIMachineTrampolines();
+  void privateCompileCTIMachineTrampolines(
+      RefPtr<ExecutablePool>* executablePool,
+      void** ctiArrayLengthTrampoline,
+      void** ctiStringLengthTrampoline,
+      void** ctiVirtualCallPreLink,
+      void** ctiVirtualCallLink,
+      void** ctiVirtualCall);
   void privateCompilePatchGetArrayLength(ProcessorReturnAddress returnAddress);
 
   void addSlowCase(Jump);

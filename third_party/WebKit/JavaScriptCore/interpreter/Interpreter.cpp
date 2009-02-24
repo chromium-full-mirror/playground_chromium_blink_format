@@ -385,54 +385,9 @@ NEVER_INLINE JSValuePtr Interpreter::callEval(CallFrame* callFrame,
   return result;
 }
 
-Interpreter::Interpreter()
-    : m_sampler(0)
-#if ENABLE(JIT)
-      ,
-      m_ctiArrayLengthTrampoline(0),
-      m_ctiStringLengthTrampoline(0),
-      m_ctiVirtualCallPreLink(0),
-      m_ctiVirtualCallLink(0),
-      m_ctiVirtualCall(0)
-#endif
-      ,
-      m_reentryDepth(0) {
+Interpreter::Interpreter() : m_sampler(0), m_reentryDepth(0) {
   privateExecute(InitializeAndReturn, 0, 0, 0);
-
-  // Bizarrely, calling fastMalloc here is faster than allocating space on the
-  // stack.
-  void* storage = fastMalloc(sizeof(CollectorBlock));
-
-  JSCell* jsArray = new (storage) JSArray(JSArray::createStructure(jsNull()));
-  m_jsArrayVptr = jsArray->vptr();
-  jsArray->~JSCell();
-
-  JSCell* jsByteArray =
-      new (storage) JSByteArray(JSByteArray::VPtrStealingHack);
-  m_jsByteArrayVptr = jsByteArray->vptr();
-  jsByteArray->~JSCell();
-
-  JSCell* jsString = new (storage) JSString(JSString::VPtrStealingHack);
-  m_jsStringVptr = jsString->vptr();
-  jsString->~JSCell();
-
-  JSCell* jsFunction =
-      new (storage) JSFunction(JSFunction::createStructure(jsNull()));
-  m_jsFunctionVptr = jsFunction->vptr();
-  jsFunction->~JSCell();
-
-  fastFree(storage);
 }
-
-void Interpreter::initialize(JSGlobalData* globalData) {
-#if ENABLE(JIT)
-  JIT::compileCTIMachineTrampolines(globalData);
-#else
-  UNUSED_PARAM(globalData);
-#endif
-}
-
-Interpreter::~Interpreter() {}
 
 #ifndef NDEBUG
 
@@ -1144,13 +1099,14 @@ NEVER_INLINE void Interpreter::tryCacheGetByID(CallFrame* callFrame,
     return;
   }
 
-  if (isJSArray(baseValue) &&
+  JSGlobalData* globalData = &callFrame->globalData();
+  if (isJSArray(globalData, baseValue) &&
       propertyName == callFrame->propertyNames().length) {
     vPC[0] = getOpcode(op_get_array_length);
     return;
   }
 
-  if (isJSString(baseValue) &&
+  if (isJSString(globalData, baseValue) &&
       propertyName == callFrame->propertyNames().length) {
     vPC[0] = getOpcode(op_get_string_length);
     return;
@@ -2551,7 +2507,7 @@ JSValuePtr Interpreter::privateExecute(ExecutionFlag flag,
 
       int base = vPC[2].u.operand;
       JSValuePtr baseValue = callFrame[base].jsValue(callFrame);
-      if (LIKELY(isJSArray(baseValue))) {
+      if (LIKELY(isJSArray(globalData, baseValue))) {
         int dst = vPC[1].u.operand;
         callFrame[dst] =
             JSValuePtr(jsNumber(callFrame, asArray(baseValue)->length()));
@@ -2573,7 +2529,7 @@ JSValuePtr Interpreter::privateExecute(ExecutionFlag flag,
 
       int base = vPC[2].u.operand;
       JSValuePtr baseValue = callFrame[base].jsValue(callFrame);
-      if (LIKELY(isJSString(baseValue))) {
+      if (LIKELY(isJSString(globalData, baseValue))) {
         int dst = vPC[1].u.operand;
         callFrame[dst] = JSValuePtr(
             jsNumber(callFrame, asString(baseValue)->value().size()));
@@ -2770,15 +2726,16 @@ JSValuePtr Interpreter::privateExecute(ExecutionFlag flag,
 
       if (LIKELY(subscript.isUInt32Fast())) {
         uint32_t i = subscript.getUInt32Fast();
-        if (isJSArray(baseValue)) {
+        if (isJSArray(globalData, baseValue)) {
           JSArray* jsArray = asArray(baseValue);
           if (jsArray->canGetIndex(i))
             result = jsArray->getIndex(i);
           else
             result = jsArray->JSArray::get(callFrame, i);
-        } else if (isJSString(baseValue) && asString(baseValue)->canGetIndex(i))
+        } else if (isJSString(globalData, baseValue) &&
+                   asString(baseValue)->canGetIndex(i))
           result = asString(baseValue)->getIndex(&callFrame->globalData(), i);
-        else if (isJSByteArray(baseValue) &&
+        else if (isJSByteArray(globalData, baseValue) &&
                  asByteArray(baseValue)->canAccessIndex(i))
           result = asByteArray(baseValue)->getIndex(callFrame, i);
         else
@@ -2813,14 +2770,14 @@ JSValuePtr Interpreter::privateExecute(ExecutionFlag flag,
 
       if (LIKELY(subscript.isUInt32Fast())) {
         uint32_t i = subscript.getUInt32Fast();
-        if (isJSArray(baseValue)) {
+        if (isJSArray(globalData, baseValue)) {
           JSArray* jsArray = asArray(baseValue);
           if (jsArray->canSetIndex(i))
             jsArray->setIndex(i, callFrame[value].jsValue(callFrame));
           else
             jsArray->JSArray::put(callFrame, i,
                                   callFrame[value].jsValue(callFrame));
-        } else if (isJSByteArray(baseValue) &&
+        } else if (isJSByteArray(globalData, baseValue) &&
                    asByteArray(baseValue)->canAccessIndex(i)) {
           JSByteArray* jsByteArray = asByteArray(baseValue);
           double dValue = 0;

@@ -31,6 +31,7 @@
 
 #include "Collector.h"
 #include "ExecutableAllocator.h"
+#include "JITStubs.h"
 #include "JSValue.h"
 #include "SmallStrings.h"
 #include "TimeoutChecker.h"
@@ -58,6 +59,7 @@ class ScopeNode;
 class Structure;
 class UString;
 struct HashTable;
+struct VPtrSet;
 
 class JSGlobalData : public RefCounted<JSGlobalData> {
  public:
@@ -68,7 +70,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   static bool sharedInstanceExists();
   static JSGlobalData& sharedInstance();
 
-  static PassRefPtr<JSGlobalData> create();
+  static PassRefPtr<JSGlobalData> create(bool isShared = false);
   static PassRefPtr<JSGlobalData> createLeaked();
   ~JSGlobalData();
 
@@ -79,18 +81,6 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   bool isSharedInstance;
   ClientData* clientData;
-
-  Interpreter* interpreter;
-  TimeoutChecker timeoutChecker;
-
-  JSValuePtr exception;
-#if ENABLE(JIT)
-  void* exceptionLocation;
-#endif
-
-  const Vector<Instruction>& numericCompareFunction(ExecState*);
-  Vector<Instruction> lazyNumericCompareFunction;
-  bool initializingLazyNumericCompareFunction;
 
   const HashTable* arrayTable;
   const HashTable* dateTable;
@@ -110,6 +100,11 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   RefPtr<Structure> numberStructure;
 #endif
 
+  void* jsArrayVPtr;
+  void* jsByteArrayVPtr;
+  void* jsStringVPtr;
+  void* jsFunctionVPtr;
+
   IdentifierTable* identifierTable;
   CommonIdentifiers* propertyNames;
   const ArgList* emptyList;  // Lists are supposed to be allocated on the stack
@@ -118,10 +113,30 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
                              // mark.
   SmallStrings smallStrings;
 
-  HashMap<OpaqueJSClass*, OpaqueJSClassContextData*> opaqueJSClassData;
+#if ENABLE(ASSEMBLER)
+  ExecutableAllocator executableAllocator;
+#endif
 
   Lexer* lexer;
   Parser* parser;
+  Interpreter* interpreter;
+#if ENABLE(JIT)
+  JITStubs jitStubs;
+#endif
+  TimeoutChecker timeoutChecker;
+  Heap heap;
+
+  JSValuePtr exception;
+#if ENABLE(JIT)
+  void* exceptionLocation;
+#endif
+
+  const Vector<Instruction>& numericCompareFunction(ExecState*);
+  Vector<Instruction> lazyNumericCompareFunction;
+  bool initializingLazyNumericCompareFunction;
+
+  HashMap<OpaqueJSClass*, OpaqueJSClassContextData*> opaqueJSClassData;
+
   HashSet<ParserRefCounted*>* newParserObjects;
   HashCountedSet<ParserRefCounted*>* parserObjectExtraRefCounts;
 
@@ -132,19 +147,8 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   ScopeNode* scopeNodeBeingReparsed;
 
-  Heap heap;
-#if ENABLE(ASSEMBLER)
-  PassRefPtr<ExecutablePool> poolForSize(size_t n) {
-    return m_executableAllocator.poolForSize(n);
-  }
-#endif
-
  private:
-  JSGlobalData(bool isShared = false);
-#if ENABLE(ASSEMBLER)
-  ExecutableAllocator m_executableAllocator;
-#endif
-
+  JSGlobalData(bool isShared, const VPtrSet&);
   static JSGlobalData*& sharedInstanceInternal();
 };
 }  // namespace JSC
