@@ -55,6 +55,7 @@ namespace WebCore {
 // WorkerMessagingProxy will not be true in multi-process implementation.
 WorkerThreadableLoader::WorkerThreadableLoader(WorkerContext* workerContext,
                                                ThreadableLoaderClient* client,
+                                               const String& taskMode,
                                                const ResourceRequest& request,
                                                LoadCallbacks callbacksSetting,
                                                ContentSniff contentSniff)
@@ -63,6 +64,7 @@ WorkerThreadableLoader::WorkerThreadableLoader(WorkerContext* workerContext,
           client,
           *(static_cast<WorkerMessagingProxy*>(
               m_workerContext->thread()->workerObjectProxy())),
+          taskMode,
           request,
           callbacksSetting,
           contentSniff))) {}
@@ -78,12 +80,14 @@ void WorkerThreadableLoader::cancel() {
 WorkerThreadableLoader::MainThreadBridge::MainThreadBridge(
     ThreadableLoaderClient* workerClient,
     WorkerMessagingProxy& messagingProxy,
+    const String& taskMode,
     const ResourceRequest& request,
     LoadCallbacks callbacksSetting,
     ContentSniff contentSniff)
     : m_workerClientWrapper(
           ThreadableLoaderClientWrapper::create(workerClient)),
-      m_messagingProxy(messagingProxy) {
+      m_messagingProxy(messagingProxy),
+      m_taskMode(taskMode.copy()) {
   ASSERT(workerClient);
   m_messagingProxy.postTaskToWorkerObject(
       createCallbackTask(&MainThreadBridge::mainThreadCreateLoader, this,
@@ -182,9 +186,10 @@ static void workerContextDidSendData(
 void WorkerThreadableLoader::MainThreadBridge::didSendData(
     unsigned long long bytesSent,
     unsigned long long totalBytesToBeSent) {
-  m_messagingProxy.postTaskToWorkerContext(
+  m_messagingProxy.postTaskForModeToWorkerContext(
       createCallbackTask(&workerContextDidSendData, m_workerClientWrapper,
-                         bytesSent, totalBytesToBeSent));
+                         bytesSent, totalBytesToBeSent),
+      m_taskMode);
 }
 
 static void workerContextDidReceiveResponse(
@@ -198,8 +203,10 @@ static void workerContextDidReceiveResponse(
 
 void WorkerThreadableLoader::MainThreadBridge::didReceiveResponse(
     const ResourceResponse& response) {
-  m_messagingProxy.postTaskToWorkerContext(createCallbackTask(
-      &workerContextDidReceiveResponse, m_workerClientWrapper, response));
+  m_messagingProxy.postTaskForModeToWorkerContext(
+      createCallbackTask(&workerContextDidReceiveResponse,
+                         m_workerClientWrapper, response),
+      m_taskMode);
 }
 
 static void workerContextDidReceiveData(
@@ -217,8 +224,10 @@ void WorkerThreadableLoader::MainThreadBridge::didReceiveData(
       new Vector<char>(lengthReceived));  // needs to be an auto_ptr for usage
                                           // with createCallbackTask.
   memcpy(vector->data(), data, lengthReceived);
-  m_messagingProxy.postTaskToWorkerContext(createCallbackTask(
-      &workerContextDidReceiveData, m_workerClientWrapper, vector));
+  m_messagingProxy.postTaskForModeToWorkerContext(
+      createCallbackTask(&workerContextDidReceiveData, m_workerClientWrapper,
+                         vector),
+      m_taskMode);
 }
 
 static void workerContextDidFinishLoading(
@@ -231,8 +240,10 @@ static void workerContextDidFinishLoading(
 
 void WorkerThreadableLoader::MainThreadBridge::didFinishLoading(
     int identifier) {
-  m_messagingProxy.postTaskToWorkerContext(createCallbackTask(
-      &workerContextDidFinishLoading, m_workerClientWrapper, identifier));
+  m_messagingProxy.postTaskForModeToWorkerContext(
+      createCallbackTask(&workerContextDidFinishLoading, m_workerClientWrapper,
+                         identifier),
+      m_taskMode);
 }
 
 static void workerContextDidFail(
@@ -245,8 +256,9 @@ static void workerContextDidFail(
 
 void WorkerThreadableLoader::MainThreadBridge::didFail(
     const ResourceError& error) {
-  m_messagingProxy.postTaskToWorkerContext(
-      createCallbackTask(&workerContextDidFail, m_workerClientWrapper, error));
+  m_messagingProxy.postTaskForModeToWorkerContext(
+      createCallbackTask(&workerContextDidFail, m_workerClientWrapper, error),
+      m_taskMode);
 }
 
 static void workerContextDidFailRedirectCheck(
@@ -257,8 +269,10 @@ static void workerContextDidFailRedirectCheck(
 }
 
 void WorkerThreadableLoader::MainThreadBridge::didFailRedirectCheck() {
-  m_messagingProxy.postTaskToWorkerContext(createCallbackTask(
-      &workerContextDidFailRedirectCheck, m_workerClientWrapper));
+  m_messagingProxy.postTaskForModeToWorkerContext(
+      createCallbackTask(&workerContextDidFailRedirectCheck,
+                         m_workerClientWrapper),
+      m_taskMode);
 }
 
 static void workerContextDidReceiveAuthenticationCancellation(
@@ -272,9 +286,10 @@ static void workerContextDidReceiveAuthenticationCancellation(
 
 void WorkerThreadableLoader::MainThreadBridge::
     didReceiveAuthenticationCancellation(const ResourceResponse& response) {
-  m_messagingProxy.postTaskToWorkerContext(
+  m_messagingProxy.postTaskForModeToWorkerContext(
       createCallbackTask(&workerContextDidReceiveAuthenticationCancellation,
-                         m_workerClientWrapper, response));
+                         m_workerClientWrapper, response),
+      m_taskMode);
 }
 
 }  // namespace WebCore

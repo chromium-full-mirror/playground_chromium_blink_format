@@ -77,6 +77,8 @@ class WorkerMessagingProxy : public WorkerContextProxy,
 
   void postTaskToWorkerObject(PassRefPtr<ScriptExecutionContext::Task>);
   void postTaskToWorkerContext(PassRefPtr<ScriptExecutionContext::Task>);
+  void postTaskForModeToWorkerContext(PassRefPtr<ScriptExecutionContext::Task>,
+                                      const String& mode);
 
   void workerThreadCreated(PassRefPtr<WorkerThread>);
 

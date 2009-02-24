@@ -33,6 +33,7 @@
 
 #if ENABLE(WORKERS)
 
+#include "PlatformString.h"
 #include "ThreadableLoader.h"
 #include "ThreadableLoaderClient.h"
 #include "ThreadableLoaderClientWrapper.h"
@@ -58,11 +59,12 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
   static PassRefPtr<WorkerThreadableLoader> create(
       WorkerContext* worker,
       ThreadableLoaderClient* client,
+      const String& taskMode,
       const ResourceRequest& request,
       LoadCallbacks callbacksSetting,
       ContentSniff contentSniff) {
-    return adoptRef(new WorkerThreadableLoader(worker, client, request,
-                                               callbacksSetting, contentSniff));
+    return adoptRef(new WorkerThreadableLoader(
+        worker, client, taskMode, request, callbacksSetting, contentSniff));
   }
 
   ~WorkerThreadableLoader();
@@ -109,6 +111,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
     // All executed on the worker context's thread.
     MainThreadBridge(ThreadableLoaderClient*,
                      WorkerMessagingProxy&,
+                     const String& taskMode,
                      const ResourceRequest&,
                      LoadCallbacks,
                      ContentSniff);
@@ -149,10 +152,14 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
 
     // May be used on either thread.
     WorkerMessagingProxy& m_messagingProxy;
+
+    // For use on the main thread.
+    String m_taskMode;
   };
 
   WorkerThreadableLoader(WorkerContext*,
                          ThreadableLoaderClient*,
+                         const String& taskMode,
                          const ResourceRequest&,
                          LoadCallbacks,
                          ContentSniff);
