@@ -44,7 +44,7 @@ garbage collector to collect soon, hoping to reclaim that large non-GC memory
 region.
 */
 JS_EXPORT void JSReportExtraMemoryCost(JSContextRef ctx, size_t size)
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 #ifdef __cplusplus
 }

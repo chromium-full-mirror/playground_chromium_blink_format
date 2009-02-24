@@ -143,7 +143,7 @@ typedef enum {
     @param fileNames
 */
 - (void)chooseFilenames:(NSArray*)fileNames
-    WEBKIT_OBJC_METHOD_ANNOTATION(AVAILABLE_AFTER_WEBKIT_VERSION_3_1);
+    WEBKIT_OBJC_METHOD_ANNOTATION(AVAILABLE_IN_WEBKIT_VERSION_4_0);
 
 /*!
     @method cancel
@@ -457,7 +457,7 @@ typedef enum {
     runOpenPanelForFileButtonWithResultListener:
         (id<WebOpenPanelResultListener>)resultListener
                              allowMultipleFiles:(BOOL)allowMultipleFiles
-    WEBKIT_OBJC_METHOD_ANNOTATION(AVAILABLE_AFTER_WEBKIT_VERSION_3_1);
+    WEBKIT_OBJC_METHOD_ANNOTATION(AVAILABLE_IN_WEBKIT_VERSION_4_0);
 
 /*!
     @method webView:mouseDidMoveOverElement:modifierFlags:

@@ -79,7 +79,7 @@ extern NSString* WebPlugInContainingElementKey;
  dictionary.
  */
 extern NSString* WebPlugInShouldLoadMainResourceKey
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 /*!
     @protocol WebPlugInViewFactory

@@ -615,7 +615,7 @@ JS_EXPORT JSObjectRef JSObjectMakeArray(JSContextRef ctx,
                                         size_t argumentCount,
                                         const JSValueRef arguments[],
                                         JSValueRef* exception)
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 /*!
  @function
@@ -633,7 +633,7 @@ JS_EXPORT JSObjectRef JSObjectMakeDate(JSContextRef ctx,
                                        size_t argumentCount,
                                        const JSValueRef arguments[],
                                        JSValueRef* exception)
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 /*!
  @function
@@ -651,7 +651,7 @@ JS_EXPORT JSObjectRef JSObjectMakeError(JSContextRef ctx,
                                         size_t argumentCount,
                                         const JSValueRef arguments[],
                                         JSValueRef* exception)
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 /*!
  @function
@@ -669,7 +669,7 @@ JS_EXPORT JSObjectRef JSObjectMakeRegExp(JSContextRef ctx,
                                          size_t argumentCount,
                                          const JSValueRef arguments[],
                                          JSValueRef* exception)
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 /*!
 @function

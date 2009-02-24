@@ -51,7 +51,7 @@ behavior.
 @result The created JSContextGroup.
 */
 JS_EXPORT JSContextGroupRef JSContextGroupCreate()
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 /*!
 @function
@@ -60,7 +60,7 @@ JS_EXPORT JSContextGroupRef JSContextGroupCreate()
 @result A JSContextGroup that is the same as group.
 */
 JS_EXPORT JSContextGroupRef JSContextGroupRetain(JSContextGroupRef group)
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 /*!
 @function
@@ -68,7 +68,7 @@ JS_EXPORT JSContextGroupRef JSContextGroupRetain(JSContextGroupRef group)
 @param group The JSContextGroup to release.
 */
 JS_EXPORT void JSContextGroupRelease(JSContextGroupRef group)
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 /*!
 @function
@@ -108,7 +108,7 @@ context
 */
 JS_EXPORT JSGlobalContextRef JSGlobalContextCreateInGroup(
     JSContextGroupRef group,
-    JSClassRef globalObjectClass) AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    JSClassRef globalObjectClass) AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 /*!
 @function
@@ -141,7 +141,7 @@ belongs.
 @result ctx's group.
 */
 JS_EXPORT JSContextGroupRef JSContextGetGroup(JSContextRef ctx)
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    AVAILABLE_IN_WEBKIT_VERSION_4_0;
 
 #ifdef __cplusplus
 }
