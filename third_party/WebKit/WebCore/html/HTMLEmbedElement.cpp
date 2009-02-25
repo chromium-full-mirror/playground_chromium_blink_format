@@ -131,7 +131,7 @@ bool HTMLEmbedElement::rendererIsNeeded(RenderStyle* style) {
     return false;
   }
 
-  return true;
+  return HTMLPlugInElement::rendererIsNeeded(style);
 }
 
 RenderObject* HTMLEmbedElement::createRenderer(RenderArena* arena,
