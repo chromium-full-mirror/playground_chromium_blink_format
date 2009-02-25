@@ -659,7 +659,7 @@ static bool requiresCompositingLayerForTransform(RenderObject* renderer) {
   return renderer->hasTransform() &&
          (style->transform().has3DOperation() ||
           style->transformStyle3D() == TransformStyle3DPreserve3D ||
-          style->perspective() > 0);
+          style->hasPerspective());
 }
 
 #define VERBOSE_COMPOSITINGLAYER 0
@@ -819,9 +819,8 @@ void RenderLayerCompositor::ensureRootPlatformLayer() {
 bool RenderLayerCompositor::layerHas3DContent(const RenderLayer* layer) const {
   const RenderStyle* style = layer->renderer()->style();
 
-  if (style &&
-      (style->transformStyle3D() == TransformStyle3DPreserve3D ||
-       style->perspective() > 0 || style->transform().has3DOperation()))
+  if (style && (style->transformStyle3D() == TransformStyle3DPreserve3D ||
+                style->hasPerspective() || style->transform().has3DOperation()))
     return true;
 
   if (layer->isStackingContext()) {

@@ -32,6 +32,7 @@
 #include "RenderLayer.h"
 #include "RenderSelectionInfo.h"
 #include "RenderWidget.h"
+#include "TransformState.h"
 
 #if USE(ACCELERATED_COMPOSITING)
 #include "RenderLayerCompositor.h"
@@ -134,22 +135,18 @@ void RenderView::layout() {
   setNeedsLayout(false);
 }
 
-FloatPoint RenderView::localToAbsolute(FloatPoint localPoint,
-                                       bool fixed,
-                                       bool) const {
+void RenderView::mapLocalToAbsolutePoint(bool fixed,
+                                         bool /*useTransforms*/,
+                                         TransformState& transformState) const {
   if (fixed && m_frameView)
-    localPoint += m_frameView->scrollOffset();
-
-  return localPoint;
+    transformState.move(m_frameView->scrollOffset());
 }
 
-FloatPoint RenderView::absoluteToLocal(FloatPoint containerPoint,
-                                       bool fixed,
-                                       bool) const {
+void RenderView::mapAbsoluteToLocalPoint(bool fixed,
+                                         bool /*useTransforms*/,
+                                         TransformState& transformState) const {
   if (fixed && m_frameView)
-    containerPoint -= m_frameView->scrollOffset();
-
-  return containerPoint;
+    transformState.move(-m_frameView->scrollOffset());
 }
 
 FloatQuad RenderView::localToContainerQuad(

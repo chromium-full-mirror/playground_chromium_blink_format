@@ -455,6 +455,7 @@ class RenderLayer : public ScrollbarClient {
   // Returns true if the layer has a -webkit-perspective.
   // Note that this transform has the perspective-origin baked in.
   TransformationMatrix perspectiveTransform() const;
+  FloatPoint perspectiveOrigin() const;
 
   void destroy(RenderArena*);
 

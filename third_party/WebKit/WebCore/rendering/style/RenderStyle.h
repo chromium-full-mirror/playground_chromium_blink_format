@@ -942,6 +942,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return rareNonInheritedData->m_backfaceVisibility;
   }
   float perspective() const { return rareNonInheritedData->m_perspective; }
+  bool hasPerspective() const {
+    return rareNonInheritedData->m_perspective > 0;
+  }
   Length perspectiveOriginX() const {
     return rareNonInheritedData->m_perspectiveOriginX;
   }

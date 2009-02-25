@@ -44,6 +44,7 @@
 #include "RenderTableCell.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
+#include "TransformState.h"
 #include <algorithm>
 #include <math.h>
 
@@ -1027,18 +1028,18 @@ int RenderBox::containingBlockWidthForContent() const {
   return cb->availableWidth();
 }
 
-FloatPoint RenderBox::localToAbsolute(FloatPoint localPoint,
-                                      bool fixed,
-                                      bool useTransforms) const {
+void RenderBox::mapLocalToAbsolutePoint(bool fixed,
+                                        bool useTransforms,
+                                        TransformState& transformState) const {
   if (RenderView* v = view()) {
     if (v->layoutStateEnabled()) {
       LayoutState* layoutState = v->layoutState();
       IntSize offset = layoutState->m_offset;
       offset.expand(x(), y());
-      localPoint += offset;
       if (style()->position() == RelativePosition && layer())
-        localPoint += layer()->relativePositionOffset();
-      return localPoint;
+        offset += layer()->relativePositionOffset();
+      transformState.move(offset);
+      return;
     }
   }
 
@@ -1047,23 +1048,53 @@ FloatPoint RenderBox::localToAbsolute(FloatPoint localPoint,
 
   RenderObject* o = container();
   if (o) {
-    if (useTransforms && layer() && layer()->transform()) {
+    if (hasLayer() && layer()->transform())
       fixed = false;  // Elements with transforms act as a containing block for
                       // fixed position descendants
-      localPoint = layer()->transform()->mapPoint(localPoint);
-    }
 
-    localPoint += offsetFromContainer(o);
+    IntSize containerOffset = offsetFromContainer(o);
+    if (useTransforms) {
+      TransformationMatrix transformFromContainer;
+      transformFromContainer.translate(containerOffset.width(),
+                                       containerOffset.height());
+      if (hasLayer() && layer()->transform())
+        transformFromContainer.multLeft(*layer()->transform());
 
-    return o->localToAbsolute(localPoint, fixed, useTransforms);
+      // If either the container or this have transform-style: preserve-3d, we
+      // need to stay in 3d space by
+      // accumulating the transform.
+      bool accumulateTransform =
+          (o->style()->transformStyle3D() == TransformStyle3DPreserve3D ||
+           style()->transformStyle3D() == TransformStyle3DPreserve3D);
+      if (o->style()->hasPerspective()) {
+        // Perpsective on the container affects us, so we have to factor it in
+        // here.
+        ASSERT(o->hasLayer());
+        FloatPoint perspectiveOrigin =
+            toRenderBox(o)->layer()->perspectiveOrigin();
+
+        TransformationMatrix perspectiveMatrix;
+        perspectiveMatrix.applyPerspective(o->style()->perspective());
+
+        transformFromContainer.translateRight3d(-perspectiveOrigin.x(),
+                                                -perspectiveOrigin.y(), 0);
+        transformFromContainer.multiply(perspectiveMatrix);
+        transformFromContainer.translateRight3d(perspectiveOrigin.x(),
+                                                perspectiveOrigin.y(), 0);
+      }
+
+      transformState.applyTransform(transformFromContainer,
+                                    accumulateTransform);
+    } else
+      transformState.move(containerOffset.width(), containerOffset.height());
+
+    o->mapLocalToAbsolutePoint(fixed, useTransforms, transformState);
   }
-
-  return FloatPoint();
 }
 
-FloatPoint RenderBox::absoluteToLocal(FloatPoint containerPoint,
-                                      bool fixed,
-                                      bool useTransforms) const {
+void RenderBox::mapAbsoluteToLocalPoint(bool fixed,
+                                        bool useTransforms,
+                                        TransformState& transformState) const {
   // We don't expect absoluteToLocal() to be called during layout (yet)
   ASSERT(!view() || !view()->layoutStateEnabled());
 
@@ -1075,15 +1106,44 @@ FloatPoint RenderBox::absoluteToLocal(FloatPoint containerPoint,
 
   RenderObject* o = container();
   if (o) {
-    FloatPoint localPoint =
-        o->absoluteToLocal(containerPoint, fixed, useTransforms);
-    localPoint -= offsetFromContainer(o);
-    if (useTransforms && layer() && layer()->transform())
-      localPoint = layer()->transform()->inverse().mapPoint(localPoint);
-    return localPoint;
-  }
+    o->mapAbsoluteToLocalPoint(fixed, useTransforms, transformState);
 
-  return FloatPoint();
+    IntSize containerOffset = offsetFromContainer(o);
+    if (useTransforms) {
+      TransformationMatrix transformFromContainer;
+      transformFromContainer.translate(containerOffset.width(),
+                                       containerOffset.height());
+      if (hasLayer() && layer()->transform())
+        transformFromContainer.multLeft(*layer()->transform());
+
+      // If either the container or this have transform-style: preserve-3d, we
+      // need to stay in 3d space by
+      // accumulating the transform.
+      bool accumulateTransform =
+          (o->style()->transformStyle3D() == TransformStyle3DPreserve3D ||
+           style()->transformStyle3D() == TransformStyle3DPreserve3D);
+      if (o->style()->hasPerspective()) {
+        // Perpsective on the container affects us, so we have to factor it in
+        // here.
+        ASSERT(o->hasLayer());
+        FloatPoint perspectiveOrigin =
+            toRenderBox(o)->layer()->perspectiveOrigin();
+
+        TransformationMatrix perspectiveMatrix;
+        perspectiveMatrix.applyPerspective(o->style()->perspective());
+
+        transformFromContainer.translateRight3d(-perspectiveOrigin.x(),
+                                                -perspectiveOrigin.y(), 0);
+        transformFromContainer.multiply(perspectiveMatrix);
+        transformFromContainer.translateRight3d(perspectiveOrigin.x(),
+                                                perspectiveOrigin.y(), 0);
+      }
+
+      transformState.applyTransform(transformFromContainer,
+                                    accumulateTransform);
+    } else
+      transformState.move(-containerOffset.width(), -containerOffset.height());
+  }
 }
 
 FloatQuad RenderBox::localToContainerQuad(

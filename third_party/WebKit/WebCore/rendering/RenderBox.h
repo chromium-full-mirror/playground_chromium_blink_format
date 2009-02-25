@@ -179,12 +179,6 @@ class RenderBox : public RenderBoxModelObject {
                              bool topLevel = true);
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
-  virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
-                                     bool fixed = false,
-                                     bool useTransforms = false) const;
-  virtual FloatPoint absoluteToLocal(FloatPoint containerPoint,
-                                     bool fixed = false,
-                                     bool useTransforms = false) const;
   virtual FloatQuad localToContainerQuad(const FloatQuad&,
                                          RenderBoxModelObject* repaintContainer,
                                          bool fixed = false) const;
@@ -426,6 +420,13 @@ class RenderBox : public RenderBoxModelObject {
   virtual bool shouldCalculateSizeAsReplaced() const {
     return isReplaced() && !isInlineBlockOrInlineTable();
   }
+
+  virtual void mapLocalToAbsolutePoint(bool fixed,
+                                       bool useTransforms,
+                                       TransformState&) const;
+  virtual void mapAbsoluteToLocalPoint(bool fixed,
+                                       bool useTransforms,
+                                       TransformState&) const;
 
  private:
   bool includeVerticalScrollbarSize() const {

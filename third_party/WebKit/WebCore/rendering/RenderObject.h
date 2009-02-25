@@ -31,6 +31,7 @@
 #include "Document.h"
 #include "RenderObjectChildList.h"
 #include "RenderStyle.h"
+#include "TransformationMatrix.h"
 
 namespace WebCore {
 
@@ -43,6 +44,7 @@ class RenderInline;
 class RenderBlock;
 class RenderFlow;
 class RenderLayer;
+class TransformState;
 class VisiblePosition;
 
 /*
@@ -560,12 +562,12 @@ class RenderObject : public CachedResourceClient {
   // Convert the given local point to absolute coordinates
   // FIXME: Temporary. If useTransforms is true, take transforms into account.
   // Eventually localToAbsolute() will always be transform-aware.
-  virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
-                                     bool fixed = false,
-                                     bool useTransforms = false) const;
-  virtual FloatPoint absoluteToLocal(FloatPoint,
-                                     bool fixed = false,
-                                     bool useTransforms = false) const;
+  FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
+                             bool fixed = false,
+                             bool useTransforms = false) const;
+  FloatPoint absoluteToLocal(FloatPoint,
+                             bool fixed = false,
+                             bool useTransforms = false) const;
 
   // Convert a local quad to absolute coordinates, taking transforms into
   // account.
@@ -827,6 +829,16 @@ class RenderObject : public CachedResourceClient {
     return style()->visibility() == VISIBLE &&
            style()->pointerEvents() != PE_NONE;
   }
+
+  // Map points through elements, potentially via 3d transforms. You should
+  // never need to call these directly; use
+  // localToAbsolute/absoluteToLocal instead.
+  virtual void mapLocalToAbsolutePoint(bool fixed,
+                                       bool useTransforms,
+                                       TransformState&) const;
+  virtual void mapAbsoluteToLocalPoint(bool fixed,
+                                       bool useTransforms,
+                                       TransformState&) const;
 
   virtual void addFocusRingRects(GraphicsContext*, int /*tx*/, int /*ty*/){};
 

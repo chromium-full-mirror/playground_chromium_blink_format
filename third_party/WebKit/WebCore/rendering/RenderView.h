@@ -49,12 +49,6 @@ class RenderView : public RenderBlock {
   virtual void calcWidth();
   virtual void calcHeight();
   virtual void calcPrefWidths();
-  virtual FloatPoint localToAbsolute(FloatPoint localPoint = FloatPoint(),
-                                     bool fixed = false,
-                                     bool useTransforms = false) const;
-  virtual FloatPoint absoluteToLocal(FloatPoint containerPoint,
-                                     bool fixed = false,
-                                     bool useTransforms = false) const;
 
   int docHeight() const;
   int docWidth() const;
@@ -206,6 +200,13 @@ class RenderView : public RenderBlock {
   virtual FloatQuad localToContainerQuad(const FloatQuad&,
                                          RenderBoxModelObject* repaintContainer,
                                          bool fixed = false) const;
+
+  virtual void mapLocalToAbsolutePoint(bool fixed,
+                                       bool useTransforms,
+                                       TransformState&) const;
+  virtual void mapAbsoluteToLocalPoint(bool fixed,
+                                       bool useTransforms,
+                                       TransformState&) const;
 
  private:
   bool shouldRepaint(const IntRect& r) const;
