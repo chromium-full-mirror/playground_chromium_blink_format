@@ -46,6 +46,9 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
                                  public ThreadableLoader,
                                  private SubresourceLoaderClient {
  public:
+  static void loadResourceSynchronously(Document*,
+                                        const ResourceRequest&,
+                                        ThreadableLoaderClient&);
   static PassRefPtr<DocumentThreadableLoader> create(Document*,
                                                      ThreadableLoaderClient*,
                                                      const ResourceRequest&,
