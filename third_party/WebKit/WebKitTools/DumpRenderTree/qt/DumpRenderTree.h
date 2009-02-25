@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Nikolas Zimmermann <zimmermann@kde.org>
+ * Copyright (C) 2009 Torch Mobile Inc. http://www.torchmobile.com/
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -85,6 +86,7 @@ class DumpRenderTree : public QObject {
 
  private:
   QString dumpFramesAsText(QWebFrame* frame);
+  QString dumpBackForwardList();
   LayoutTestController* m_controller;
 
   QWebPage* m_page;
