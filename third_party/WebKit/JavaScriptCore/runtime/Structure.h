@@ -101,18 +101,10 @@ class Structure : public RefCounted<Structure> {
   const TypeInfo& typeInfo() const { return m_typeInfo; }
 
   JSValuePtr storedPrototype() const { return m_prototype; }
-  JSValuePtr prototypeForLookup(ExecState*);
+  JSValuePtr prototypeForLookup(ExecState*) const;
+  StructureChain* prototypeChain(ExecState*) const;
 
   Structure* previousID() const { return m_previous.get(); }
-
-  StructureChain* createCachedPrototypeChain();
-  void setCachedPrototypeChain(
-      PassRefPtr<StructureChain> cachedPrototypeChain) {
-    m_cachedPrototypeChain = cachedPrototypeChain;
-  }
-  StructureChain* cachedPrototypeChain() const {
-    return m_cachedPrototypeChain.get();
-  }
 
   void growPropertyStorageCapacity();
   size_t propertyStorageCapacity() const { return m_propertyStorageCapacity; }
@@ -143,7 +135,10 @@ class Structure : public RefCounted<Structure> {
 
   size_t put(const Identifier& propertyName, unsigned attributes);
   size_t remove(const Identifier& propertyName);
-  void getEnumerablePropertyNamesInternal(PropertyNameArray&);
+  void getEnumerableNamesFromPropertyTable(PropertyNameArray&);
+  void getEnumerableNamesFromClassInfoTable(ExecState*,
+                                            const ClassInfo*,
+                                            PropertyNameArray&);
 
   void expandPropertyMapHashTable();
   void rehashPropertyMapHashTable();
@@ -171,6 +166,8 @@ class Structure : public RefCounted<Structure> {
     return m_offset == noOffset ? 0 : m_offset + 1;
   }
 
+  bool isValid(ExecState*, StructureChain* cachedPrototypeChain) const;
+
   static const unsigned emptyEntryIndex = 0;
 
   static const signed char s_maxTransitionLength = 64;
@@ -180,7 +177,7 @@ class Structure : public RefCounted<Structure> {
   TypeInfo m_typeInfo;
 
   JSValuePtr m_prototype;
-  RefPtr<StructureChain> m_cachedPrototypeChain;
+  mutable RefPtr<StructureChain> m_cachedPrototypeChain;
 
   RefPtr<Structure> m_previous;
   RefPtr<UString::Rep> m_nameInPrevious;
