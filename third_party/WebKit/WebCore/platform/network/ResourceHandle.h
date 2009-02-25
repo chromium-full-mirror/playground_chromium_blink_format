@@ -82,7 +82,7 @@ class KURL;
 class ResourceError;
 class ResourceHandleClient;
 class ResourceHandleInternal;
-class ResourceRequest;
+struct ResourceRequest;
 class ResourceResponse;
 class SchedulePair;
 class SharedBuffer;
