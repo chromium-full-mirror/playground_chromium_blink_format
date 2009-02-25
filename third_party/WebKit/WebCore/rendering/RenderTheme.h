@@ -29,6 +29,7 @@
 #else
 #include "ThemeTypes.h"
 #endif
+#include "ScrollTypes.h"
 
 namespace WebCore {
 
@@ -165,6 +166,10 @@ class RenderTheme {
   virtual int popupInternalPaddingRight(RenderStyle*) const { return 0; }
   virtual int popupInternalPaddingTop(RenderStyle*) const { return 0; }
   virtual int popupInternalPaddingBottom(RenderStyle*) const { return 0; }
+
+  virtual ScrollbarControlSize scrollbarControlSizeForPart(ControlPart) {
+    return RegularScrollbar;
+  }
 
   // Method for painting the caps lock indicator
   virtual bool paintCapsLockIndicator(RenderObject*,

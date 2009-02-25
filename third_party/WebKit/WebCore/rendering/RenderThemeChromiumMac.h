@@ -82,6 +82,10 @@ class RenderThemeChromiumMac : public RenderTheme {
   virtual int popupInternalPaddingTop(RenderStyle*) const;
   virtual int popupInternalPaddingBottom(RenderStyle*) const;
 
+  virtual ScrollbarControlSize scrollbarControlSizeForPart(ControlPart) {
+    return SmallScrollbar;
+  }
+
   virtual bool paintCapsLockIndicator(RenderObject*,
                                       const RenderObject::PaintInfo&,
                                       const IntRect&);
