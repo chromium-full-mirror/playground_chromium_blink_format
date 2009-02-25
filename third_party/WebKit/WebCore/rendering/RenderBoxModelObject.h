@@ -62,6 +62,7 @@ class RenderBoxModelObject : public RenderObject {
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
   virtual void updateBoxModelInfoFromStyle();
 
+  bool hasSelfPaintingLayer() const;
   RenderLayer* layer() const { return m_layer; }
   virtual bool requiresLayer() const {
     return isRoot() || isPositioned() || isRelPositioned() || isTransparent() ||

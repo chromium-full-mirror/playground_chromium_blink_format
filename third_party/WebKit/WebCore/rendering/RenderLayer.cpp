@@ -2111,13 +2111,6 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
                                       false, paintingRootForRenderer, 0);
     renderer()->paint(paintInfo, tx, ty);
 
-    // Our scrollbar widgets paint exactly when we tell them to, so that they
-    // work properly with
-    // z-index.  We paint after we painted the background/border, so that the
-    // scrollbars will
-    // sit above the background/border.
-    paintOverflowControls(p, x, y, damageRect);
-
     // Restore the clip.
     restoreClip(p, paintDirtyRect, damageRect);
   }
@@ -2169,10 +2162,12 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   // Paint any child layers that have overflow.
   if (m_normalFlowList)
     for (Vector<RenderLayer*>::iterator it = m_normalFlowList->begin();
-         it != m_normalFlowList->end(); ++it)
-      it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
-                        paintRestriction, paintingRoot, false,
-                        temporaryClipRects);
+         it != m_normalFlowList->end(); ++it) {
+      if (it[0]->isSelfPaintingLayer())
+        it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
+                          paintRestriction, paintingRoot, false,
+                          temporaryClipRects);
+    }
 
   // Now walk the sorted list of children with positive z-indices.
   if (m_posZOrderList)
@@ -2324,8 +2319,9 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // Now check our overflow objects.
   if (m_normalFlowList) {
     for (int i = m_normalFlowList->size() - 1; i >= 0; --i) {
-      insideLayer = m_normalFlowList->at(i)->hitTestLayer(
-          rootLayer, request, result, hitTestRect, hitTestPoint);
+      if (m_normalFlowList->at(i)->isSelfPaintingLayer())
+        insideLayer = m_normalFlowList->at(i)->hitTestLayer(
+            rootLayer, request, result, hitTestRect, hitTestPoint);
       if (insideLayer)
         return insideLayer;
     }
@@ -2981,9 +2977,15 @@ void RenderLayer::setBackingNeedsRepaintInRect(const IntRect& r) {
 #endif
 
 bool RenderLayer::shouldBeNormalFlowOnly() const {
-  return (renderer()->hasOverflowClip() || renderer()->hasReflection()) &&
+  return (renderer()->hasOverflowClip() || renderer()->hasReflection() ||
+          renderer()->hasMask()) &&
          !renderer()->isPositioned() && !renderer()->isRelPositioned() &&
          !renderer()->hasTransform() && !isTransparent();
+}
+
+bool RenderLayer::isSelfPaintingLayer() const {
+  return !isNormalFlowOnly() || renderer()->hasReflection() ||
+         renderer()->hasMask() || renderer()->isTableRow();
 }
 
 void RenderLayer::styleChanged(StyleDifference diff, const RenderStyle*) {

@@ -75,10 +75,18 @@ class RenderTable : public RenderBlock {
   virtual void removeChild(RenderObject* oldChild);
 
   virtual void paint(PaintInfo&, int tx, int ty);
+  virtual void paintObject(PaintInfo&, int tx, int ty);
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
   virtual void paintMask(PaintInfo& paintInfo, int tx, int ty);
   virtual void layout();
   virtual void calcPrefWidths();
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
+                           int xPos,
+                           int yPos,
+                           int tx,
+                           int ty,
+                           HitTestAction);
 
   virtual int firstLineBoxBaseline() const;
 

@@ -340,7 +340,12 @@ class RenderBox : public RenderBoxModelObject {
   virtual IntRect controlClipRect(int /*tx*/, int /*ty*/) const {
     return IntRect();
   }
+  bool pushContentsClip(PaintInfo&, int tx, int ty);
+  void popContentsClip(PaintInfo&, PaintPhase originalPhase, int tx, int ty);
 
+  virtual void paintObject(PaintInfo&, int /*tx*/, int /*ty*/) {
+    ASSERT_NOT_REACHED();
+  }
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
   virtual void paintMask(PaintInfo& paintInfo, int tx, int ty);
   virtual void imageChanged(WrappedImagePtr, const IntRect* = 0);

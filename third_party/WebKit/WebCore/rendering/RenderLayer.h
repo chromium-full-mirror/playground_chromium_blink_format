@@ -220,6 +220,7 @@ class RenderLayer : public ScrollbarClient {
   void suspendMarquees();
 
   bool isNormalFlowOnly() const { return m_isNormalFlowOnly; }
+  bool isSelfPaintingLayer() const;
 
   bool requiresSlowRepaints() const;
 
