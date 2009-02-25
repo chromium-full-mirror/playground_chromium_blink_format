@@ -39,8 +39,10 @@ class AccessibilityObjectWrapper
   AccessibilityObject* accessibilityObject() const { return m_object; }
 
  protected:
-  AccessibilityObjectWrapper(AccessibilityObject* obj)
-      : RefCounted<AccessibilityObjectWrapper>(0), m_object(obj) {}
+  AccessibilityObjectWrapper(AccessibilityObject* obj) : m_object(obj) {
+    // FIXME: Remove this once our immediate subclass no longer uses COM.
+    m_refCount = 0;
+  }
   AccessibilityObjectWrapper() : m_object(0) {}
 
   AccessibilityObject* m_object;
