@@ -168,6 +168,14 @@ void KeyframeAnimation::animate(CompositeAnimation*,
                                      toStyle, progress);
     if (needsAnim)
       setAnimating();
+    else {
+#if USE(ACCELERATED_COMPOSITING)
+      // If we are running an accelerated animation, set a flag in the style
+      // to indicate it. This can be used to make sure we get an updated
+      // style for hit testing, etc.
+      animatedStyle->setIsRunningAcceleratedAnimation();
+#endif
+    }
   }
 }
 
