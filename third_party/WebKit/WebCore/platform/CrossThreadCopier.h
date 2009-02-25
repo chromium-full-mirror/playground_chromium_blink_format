@@ -31,8 +31,6 @@
 #ifndef CrossThreadCopier_h
 #define CrossThreadCopier_h
 
-#if ENABLE(WORKERS)
-
 #include <memory>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
@@ -113,7 +111,5 @@ struct CrossThreadCopier
     : public CrossThreadCopierBase<WTF::IsConvertibleToInteger<T>::value, T> {};
 
 }  // namespace WebCore
-
-#endif  // ENABLE(WORKERS)
 
 #endif  // CrossThreadCopier_h

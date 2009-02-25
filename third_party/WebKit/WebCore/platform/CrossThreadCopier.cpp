@@ -30,8 +30,6 @@
 
 #include "config.h"
 
-#if ENABLE(WORKERS)
-
 #include "CrossThreadCopier.h"
 
 #include "PlatformString.h"
@@ -64,5 +62,3 @@ CrossThreadCopierBase<false, ResourceResponse>::copy(
 }
 
 }  // namespace WebCore
-
-#endif  // ENABLE(WORKERS)
