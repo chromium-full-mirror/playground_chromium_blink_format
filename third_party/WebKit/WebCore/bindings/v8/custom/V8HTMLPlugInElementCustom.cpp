@@ -48,12 +48,12 @@ NAMED_PROPERTY_GETTER(HTMLPlugInElement) {
       V8Proxy::DOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
-    return deferToInterceptor();
+    return notHandledByInterceptor();
 
   v8::Local<v8::Object> instance =
       v8::Local<v8::Object>::New(scriptInstance->instance());
   if (instance.IsEmpty())
-    return deferToInterceptor();
+    return notHandledByInterceptor();
 
   return NPObjectGetNamedProperty(instance, name);
 }
@@ -64,12 +64,12 @@ NAMED_PROPERTY_SETTER(HTMLPlugInElement) {
       V8Proxy::DOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
-    return deferToInterceptor();
+    return notHandledByInterceptor();
 
   v8::Local<v8::Object> instance =
       v8::Local<v8::Object>::New(scriptInstance->instance());
   if (instance.IsEmpty())
-    return deferToInterceptor();
+    return notHandledByInterceptor();
 
   return NPObjectSetNamedProperty(instance, name, value);
 }
@@ -85,12 +85,12 @@ INDEXED_PROPERTY_GETTER(HTMLPlugInElement) {
       V8Proxy::DOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
-    return deferToInterceptor();
+    return notHandledByInterceptor();
 
   v8::Local<v8::Object> instance =
       v8::Local<v8::Object>::New(scriptInstance->instance());
   if (instance.IsEmpty())
-    return deferToInterceptor();
+    return notHandledByInterceptor();
 
   return NPObjectGetIndexedProperty(instance, index);
 }
@@ -101,12 +101,12 @@ INDEXED_PROPERTY_SETTER(HTMLPlugInElement) {
       V8Proxy::DOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
-    return deferToInterceptor();
+    return notHandledByInterceptor();
 
   v8::Local<v8::Object> instance =
       v8::Local<v8::Object>::New(scriptInstance->instance());
   if (instance.IsEmpty())
-    return deferToInterceptor();
+    return notHandledByInterceptor();
 
   return NPObjectSetIndexedProperty(instance, index, value);
 }
