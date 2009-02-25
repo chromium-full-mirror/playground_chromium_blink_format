@@ -52,6 +52,8 @@ class MessagePort;
 class Navigator;
 class PostMessageTimer;
 class Screen;
+class WebKitPoint;
+class Node;
 
 #if ENABLE(DOM_STORAGE)
 class SessionStorage;
@@ -176,6 +178,13 @@ class DOMWindow : public RefCounted<DOMWindow> {
                                              const String& pseudoElt,
                                              bool authorOnly = true) const;
   double devicePixelRatio() const;
+
+  PassRefPtr<WebKitPoint> webkitConvertPointFromPageToNode(
+      Node* node,
+      const WebKitPoint* p) const;
+  PassRefPtr<WebKitPoint> webkitConvertPointFromNodeToPage(
+      Node* node,
+      const WebKitPoint* p) const;
 
 #if ENABLE(DATABASE)
   // HTML 5 client-side database
