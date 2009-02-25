@@ -56,20 +56,26 @@ struct CrossThreadResourceRequestData;
 class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
                                public ThreadableLoader {
  public:
+  static void loadResourceSynchronously(WorkerContext*,
+                                        const ResourceRequest&,
+                                        ThreadableLoaderClient&);
   static PassRefPtr<WorkerThreadableLoader> create(
-      WorkerContext* worker,
+      WorkerContext* workerContext,
       ThreadableLoaderClient* client,
       const String& taskMode,
       const ResourceRequest& request,
       LoadCallbacks callbacksSetting,
       ContentSniff contentSniff) {
-    return adoptRef(new WorkerThreadableLoader(
-        worker, client, taskMode, request, callbacksSetting, contentSniff));
+    return adoptRef(new WorkerThreadableLoader(workerContext, client, taskMode,
+                                               request, callbacksSetting,
+                                               contentSniff));
   }
 
   ~WorkerThreadableLoader();
 
   virtual void cancel();
+
+  bool done() const { return m_workerClientWrapper->done(); }
 
   using RefCounted<WorkerThreadableLoader>::ref;
   using RefCounted<WorkerThreadableLoader>::deref;
@@ -109,7 +115,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
   class MainThreadBridge : ThreadableLoaderClient {
    public:
     // All executed on the worker context's thread.
-    MainThreadBridge(ThreadableLoaderClient*,
+    MainThreadBridge(PassRefPtr<ThreadableLoaderClientWrapper>,
                      WorkerMessagingProxy&,
                      const String& taskMode,
                      const ResourceRequest&,
@@ -165,6 +171,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
                          ContentSniff);
 
   RefPtr<WorkerContext> m_workerContext;
+  RefPtr<ThreadableLoaderClientWrapper> m_workerClientWrapper;
   MainThreadBridge& m_bridge;
 };
 

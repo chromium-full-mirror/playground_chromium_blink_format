@@ -99,7 +99,7 @@ class ModePredicate {
 };
 
 WorkerRunLoop::WorkerRunLoop()
-    : m_sharedTimer(new WorkerSharedTimer), m_nestedCount(0) {}
+    : m_sharedTimer(new WorkerSharedTimer), m_nestedCount(0), m_uniqueId(0) {}
 
 WorkerRunLoop::~WorkerRunLoop() {
   ASSERT(!m_nestedCount);

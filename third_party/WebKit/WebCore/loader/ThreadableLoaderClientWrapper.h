@@ -46,7 +46,12 @@ class ThreadableLoaderClientWrapper
     return adoptRef(new ThreadableLoaderClientWrapper(client));
   }
 
-  void clearClient() { m_client = 0; }
+  void clearClient() {
+    m_done = true;
+    m_client = 0;
+  }
+
+  bool done() const { return m_done; }
 
   void didSendData(unsigned long long bytesSent,
                    unsigned long long totalBytesToBeSent) {
@@ -65,16 +70,19 @@ class ThreadableLoaderClientWrapper
   }
 
   void didFinishLoading(unsigned long identifier) {
+    m_done = true;
     if (m_client)
       m_client->didFinishLoading(identifier);
   }
 
   void didFail(const ResourceError& error) {
+    m_done = true;
     if (m_client)
       m_client->didFail(error);
   }
 
   void didFailRedirectCheck() {
+    m_done = true;
     if (m_client)
       m_client->didFailRedirectCheck();
   }
@@ -86,9 +94,10 @@ class ThreadableLoaderClientWrapper
 
  protected:
   ThreadableLoaderClientWrapper(ThreadableLoaderClient* client)
-      : m_client(client) {}
+      : m_client(client), m_done(false) {}
 
   ThreadableLoaderClient* m_client;
+  bool m_done;
 };
 
 }  // namespace WebCore

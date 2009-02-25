@@ -62,6 +62,8 @@ class WorkerRunLoop {
   void postTaskForMode(PassRefPtr<ScriptExecutionContext::Task>,
                        const String& mode);
 
+  unsigned long createUniqueId() { return ++m_uniqueId; }
+
   static String defaultMode();
   class Task;
 
@@ -72,6 +74,7 @@ class WorkerRunLoop {
   MessageQueue<RefPtr<Task>> m_messageQueue;
   OwnPtr<WorkerSharedTimer> m_sharedTimer;
   int m_nestedCount;
+  unsigned long m_uniqueId;
 };
 
 }  // namespace WebCore
