@@ -107,6 +107,7 @@ struct _WebKitWebViewPrivate {
   GtkAdjustment* verticalAdjustment;
 
   gboolean zoomFullContent;
+  char* customEncoding;
 };
 
 #define WEBKIT_WEB_FRAME_GET_PRIVATE(obj)                    \
