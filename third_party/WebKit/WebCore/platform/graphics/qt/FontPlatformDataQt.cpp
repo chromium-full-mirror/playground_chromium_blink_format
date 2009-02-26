@@ -55,8 +55,10 @@ FontPlatformData::FontPlatformData(const FontDescription& description,
 FontPlatformData::FontPlatformData(const QFont& font, bool bold)
     : m_size(font.pointSize()), m_bold(bold), m_oblique(false), m_font(font) {}
 
+#if ENABLE(SVG_FONTS)
 FontPlatformData::FontPlatformData(float size, bool bold, bool oblique)
     : m_size(size), m_bold(bold), m_oblique(oblique) {}
+#endif
 
 FontPlatformData::FontPlatformData()
     : m_size(0.0f), m_bold(false), m_oblique(false) {}
