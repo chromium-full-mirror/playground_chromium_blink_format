@@ -47,6 +47,7 @@
 
 #if USE(SOUP)
 #include <libsoup/soup.h>
+class Frame;
 #endif
 
 #if PLATFORM(QT)
@@ -125,7 +126,8 @@ class ResourceHandleInternal : Noncopyable {
         m_buffer(0),
         m_bufsize(0),
         m_total(0),
-        m_idleHandler(0)
+        m_idleHandler(0),
+        m_frame(0)
 #endif
 #if PLATFORM(QT)
         ,
@@ -199,6 +201,7 @@ class ResourceHandleInternal : Noncopyable {
   char* m_buffer;
   gsize m_bufsize, m_total;
   guint m_idleHandler;
+  Frame* m_frame;
 #endif
 #if PLATFORM(QT)
 #if QT_VERSION < 0x040400
