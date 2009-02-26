@@ -3940,7 +3940,8 @@ static VisiblePosition positionForPointWithInlineChildren(
   }
 
   // Can't reach this.  We have a root line box, but it has no kids.
-  ASSERT_NOT_REACHED();
+  // FIXME: This should ASSERT_NOT_REACHED(), but clicking on placeholder text
+  // seems to hit this codepath.
   return VisiblePosition(block->node(), 0, DOWNSTREAM);
 }
 
