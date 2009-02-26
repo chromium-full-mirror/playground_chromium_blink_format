@@ -61,8 +61,8 @@ bool AccessibilityTableCell::isTableCell() const {
   if (!m_renderer)
     return false;
 
-  AccessibilityObject* renderTable =
-      axObjectCache()->get(static_cast<RenderTableCell*>(m_renderer)->table());
+  AccessibilityObject* renderTable = axObjectCache()->getOrCreate(
+      static_cast<RenderTableCell*>(m_renderer)->table());
   if (!renderTable->isDataTable())
     return false;
 
@@ -143,7 +143,7 @@ AccessibilityObject* AccessibilityTableCell::titleUIElement() const {
   if (!cellElement || !cellElement->hasTagName(thTag))
     return 0;
 
-  return axObjectCache()->get(headerCell);
+  return axObjectCache()->getOrCreate(headerCell);
 }
 
 }  // namespace WebCore

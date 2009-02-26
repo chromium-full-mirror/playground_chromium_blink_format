@@ -90,7 +90,7 @@ IntRect AccessibilityListBoxOption::elementRect() const {
 
   IntRect parentRect = listBoxRenderer->document()
                            ->axObjectCache()
-                           ->get(listBoxRenderer)
+                           ->getOrCreate(listBoxRenderer)
                            ->boundingBoxRect();
   int index = listBoxOptionIndex();
   if (index != -1)
@@ -143,7 +143,7 @@ AccessibilityObject* AccessibilityListBoxOption::parentObject() const {
   if (!parentNode)
     return 0;
 
-  return m_optionElement->document()->axObjectCache()->get(
+  return m_optionElement->document()->axObjectCache()->getOrCreate(
       parentNode->renderer());
 }
 

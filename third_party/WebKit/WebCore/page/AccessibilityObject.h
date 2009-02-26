@@ -258,6 +258,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual AccessibilityObject* nextSibling() const;
   virtual AccessibilityObject* parentObject() const;
   virtual AccessibilityObject* parentObjectUnignored() const;
+  virtual AccessibilityObject* parentObjectIfExists() const;
   virtual AccessibilityObject* observableObject() const;
   virtual void linkedUIElements(AccessibilityChildrenVector&) const;
   virtual AccessibilityObject* titleUIElement() const;
@@ -409,7 +410,6 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   mutable bool m_haveChildren;
 
   virtual void clearChildren();
-  virtual void removeAXObjectID();
   virtual bool isDetached() const { return true; }
 
 #if PLATFORM(MAC)

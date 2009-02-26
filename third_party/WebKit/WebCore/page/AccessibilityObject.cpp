@@ -74,7 +74,6 @@ AccessibilityObject::~AccessibilityObject() {
 }
 
 void AccessibilityObject::detach() {
-  removeAXObjectID();
 #if HAVE(ACCESSIBILITY)
   setWrapper(0);
 #endif
@@ -106,6 +105,10 @@ AccessibilityObject* AccessibilityObject::parentObjectUnignored() const {
        parent = parent->parentObject())
     ;
   return parent;
+}
+
+AccessibilityObject* AccessibilityObject::parentObjectIfExists() const {
+  return 0;
 }
 
 int AccessibilityObject::layoutCount() const {
@@ -533,7 +536,7 @@ static bool replacedNodeNeedsCharacter(Node* replacedNode) {
 
   // create an AX object, but skip it if it is not supposed to be seen
   AccessibilityObject* object =
-      replacedNode->renderer()->document()->axObjectCache()->get(
+      replacedNode->renderer()->document()->axObjectCache()->getOrCreate(
           replacedNode->renderer());
   if (object->accessibilityIsIgnored())
     return false;
@@ -793,7 +796,7 @@ AccessibilityObject* AccessibilityObject::accessibilityObjectForPosition(
   if (!obj)
     return 0;
 
-  return obj->document()->axObjectCache()->get(obj);
+  return obj->document()->axObjectCache()->getOrCreate(obj);
 }
 
 int AccessibilityObject::lineForPosition(
@@ -966,10 +969,6 @@ unsigned AccessibilityObject::axObjectID() const {
 
 void AccessibilityObject::setAXObjectID(unsigned axObjectID) {
   m_id = axObjectID;
-}
-
-void AccessibilityObject::removeAXObjectID() {
-  return;
 }
 
 const String& AccessibilityObject::actionVerb() const {

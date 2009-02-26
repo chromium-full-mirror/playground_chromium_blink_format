@@ -143,7 +143,7 @@ AccessibilityObject* AccessibilityListBox::listBoxOptionAccessibilityObject(
     return 0;
 
   AccessibilityObject* listBoxObject =
-      m_renderer->document()->axObjectCache()->get(ListBoxOptionRole);
+      m_renderer->document()->axObjectCache()->getOrCreate(ListBoxOptionRole);
   static_cast<AccessibilityListBoxOption*>(listBoxObject)
       ->setHTMLElement(element);
 
@@ -174,7 +174,7 @@ AccessibilityObject* AccessibilityListBox::doAccessibilityHitTest(
       return listBoxOptionAccessibilityObject(listItems[i]);
   }
 
-  return axObjectCache()->get(m_renderer);
+  return axObjectCache()->getOrCreate(m_renderer);
 }
 
 }  // namespace WebCore
