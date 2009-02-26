@@ -79,8 +79,7 @@ String MIMETypeRegistry::getMIMETypeForPath(const String& path) {
 }
 
 bool MIMETypeRegistry::isSupportedImageMIMEType(const String& mimeType) {
-  return !mimeType.isEmpty() &&
-         ChromiumBridge::isSupportedImageMIMEType(mimeType.latin1().data());
+  return ChromiumBridge::isSupportedImageMIMEType(mimeType);
 }
 
 bool MIMETypeRegistry::isSupportedImageResourceMIMEType(
@@ -95,13 +94,11 @@ bool MIMETypeRegistry::isSupportedImageMIMETypeForEncoding(
 }
 
 bool MIMETypeRegistry::isSupportedJavaScriptMIMEType(const String& mimeType) {
-  return !mimeType.isEmpty() && ChromiumBridge::isSupportedJavascriptMIMEType(
-                                    mimeType.latin1().data());
+  return ChromiumBridge::isSupportedJavaScriptMIMEType(mimeType);
 }
 
 bool MIMETypeRegistry::isSupportedNonImageMIMEType(const String& mimeType) {
-  return !mimeType.isEmpty() &&
-         ChromiumBridge::isSupportedNonImageMIMEType(mimeType.latin1().data());
+  return ChromiumBridge::isSupportedNonImageMIMEType(mimeType);
 }
 
 bool MIMETypeRegistry::isSupportedMediaMIMEType(const String& mimeType) {
