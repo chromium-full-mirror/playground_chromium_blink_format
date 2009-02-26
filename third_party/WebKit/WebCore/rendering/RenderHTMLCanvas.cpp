@@ -31,13 +31,16 @@
 #include "HTMLCanvasElement.h"
 #include "HTMLNames.h"
 #include "RenderView.h"
+#include "FrameView.h"
 
 namespace WebCore {
 
 using namespace HTMLNames;
 
 RenderHTMLCanvas::RenderHTMLCanvas(HTMLCanvasElement* element)
-    : RenderReplaced(element, element->size()) {}
+    : RenderReplaced(element, element->size()) {
+  view()->frameView()->setIsVisuallyNonEmpty();
+}
 
 void RenderHTMLCanvas::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
   IntRect rect = contentBoxRect();
