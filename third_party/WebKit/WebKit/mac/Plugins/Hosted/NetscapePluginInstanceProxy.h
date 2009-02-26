@@ -100,6 +100,8 @@ class NetscapePluginInstanceProxy
   void keyEvent(NSView* pluginView, NSEvent*, NPCocoaEventType);
   void insertText(NSString*);
 
+  void print(CGContextRef, unsigned width, unsigned height);
+
   void startTimers(bool throttleTimers);
   void stopTimers();
 
