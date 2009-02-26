@@ -83,7 +83,7 @@ void setCookies(Document* document,
       ++it;
   }
 #endif
-  jar->setCookiesFromUrl(cookies, p);
+  jar->setCookiesFromUrl(cookies, u);
 #else
   QCookieJar::cookieJar()->setCookies(u, p, (QString)value);
 #endif
