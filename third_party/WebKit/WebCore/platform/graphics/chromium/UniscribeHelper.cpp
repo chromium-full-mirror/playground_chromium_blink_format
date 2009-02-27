@@ -290,7 +290,6 @@ void UniscribeHelper::draw(GraphicsContext* graphicsContext,
   int curX = x;
   bool firstRun = true;
   bool useWindowsDrawing = windowsCanHandleTextDrawing(graphicsContext);
-  PlatformGraphicsContext* context = graphicsContext->platformContext();
 
   for (size_t screenIndex = 0; screenIndex < m_runs.size(); screenIndex++) {
     int itemIndex = m_screenOrder[screenIndex];
@@ -394,8 +393,8 @@ void UniscribeHelper::draw(GraphicsContext* graphicsContext,
           SkPoint origin;
           origin.fX = curX + +innerOffset;
           origin.fY = y + m_ascent - shaping.m_ascentOffset;
-          textOutOk = paintSkiaText(context, shaping.m_hfont, glyphCount,
-                                    &shaping.m_glyphs[fromGlyph],
+          textOutOk = paintSkiaText(graphicsContext, shaping.m_hfont,
+                                    glyphCount, &shaping.m_glyphs[fromGlyph],
                                     &shaping.m_advance[fromGlyph],
                                     &shaping.m_offsets[fromGlyph], &origin);
         }

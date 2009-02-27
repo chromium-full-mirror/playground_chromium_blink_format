@@ -132,8 +132,8 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
         // the top, like Windows.
         SkPoint origin = {x, point.y()};
         success =
-            paintSkiaText(context, font->platformData().hfont(), numGlyphs,
-                          reinterpret_cast<const WORD*>(&glyphs[0]),
+            paintSkiaText(graphicsContext, font->platformData().hfont(),
+                          numGlyphs, reinterpret_cast<const WORD*>(&glyphs[0]),
                           &advances[0], 0, &origin);
       }
 
