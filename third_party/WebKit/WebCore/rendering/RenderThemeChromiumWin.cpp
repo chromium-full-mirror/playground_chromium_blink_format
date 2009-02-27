@@ -38,7 +38,7 @@
 #include "RenderBox.h"
 #include "ScrollbarTheme.h"
 #include "SkiaUtils.h"
-#include "ThemeHelperChromiumWin.h"
+#include "TransparencyWin.h"
 #include "UserAgentStyleSheets.h"
 #include "WindowsVersion.h"
 
@@ -51,6 +51,48 @@
   SIZEOF_STRUCT_WITH_SPECIFIED_LAST_MEMBER(NONCLIENTMETRICS, lfMessageFont)
 
 namespace WebCore {
+
+namespace {
+
+bool canvasHasMultipleLayers(const SkCanvas* canvas) {
+  SkCanvas::LayerIter iter(const_cast<SkCanvas*>(canvas), false);
+  iter.next();          // There is always at least one layer.
+  return !iter.done();  // There is > 1 layer if the the iterator can stil
+                        // advance.
+}
+
+class ThemePainter : public TransparencyWin {
+ public:
+  ThemePainter(GraphicsContext* context, const IntRect& r) {
+    TransformMode transformMode = getTransformMode(context->getCTM());
+    init(context, getLayerMode(context, transformMode), transformMode, r);
+  }
+
+ private:
+  static LayerMode getLayerMode(GraphicsContext* context,
+                                TransformMode transformMode) {
+    if (context->platformContext()
+            ->isDrawingToImageBuffer())  // Might have transparent background.
+      return WhiteLayer;
+    else if (canvasHasMultipleLayers(
+                 context->platformContext()
+                     ->canvas()))  // Needs antialiasing help.
+      return OpaqueCompositeLayer;
+    else  // Nothing interesting.
+      return transformMode == KeepTransform ? NoLayer : OpaqueCompositeLayer;
+  }
+
+  static TransformMode getTransformMode(const TransformationMatrix& matrix) {
+    if (matrix.b() != 0 || matrix.c() != 0)  // Skew.
+      return Untransform;
+    else if (matrix.a() != 1.0 || matrix.d() != 1.0)  // Scale.
+      return ScaleTransform;
+    else  // Nothing interesting.
+      return KeepTransform;
+  }
+};
+
+}  // namespace
 
 static void getNonClientMetrics(NONCLIENTMETRICS* metrics) {
   static UINT size = WebCore::isVistaOrNewer()
@@ -354,10 +396,10 @@ bool RenderThemeChromiumWin::paintButton(RenderObject* o,
                                          const IntRect& r) {
   const ThemeData& themeData = getThemeData(o);
 
-  WebCore::ThemeHelperWin helper(i.context, r);
-  ChromiumBridge::paintButton(helper.context(), themeData.m_part,
+  WebCore::ThemePainter painter(i.context, r);
+  ChromiumBridge::paintButton(painter.context(), themeData.m_part,
                               themeData.m_state, themeData.m_classicState,
-                              helper.rect());
+                              painter.drawRect());
   return false;
 }
 
@@ -426,10 +468,10 @@ bool RenderThemeChromiumWin::paintMenuList(RenderObject* o,
                r.height() - (spacingTop + spacingBottom));
 
   // Get the correct theme data for a textfield and paint the menu.
-  WebCore::ThemeHelperWin helper(i.context, rect);
-  ChromiumBridge::paintMenuList(helper.context(), CP_DROPDOWNBUTTON,
+  WebCore::ThemePainter painter(i.context, rect);
+  ChromiumBridge::paintMenuList(painter.context(), CP_DROPDOWNBUTTON,
                                 determineState(o), determineClassicState(o),
-                                helper.rect());
+                                painter.drawRect());
   return false;
 }
 
@@ -559,11 +601,11 @@ bool RenderThemeChromiumWin::paintTextFieldInternal(
 
   const ThemeData& themeData = getThemeData(o);
 
-  WebCore::ThemeHelperWin helper(i.context, r);
-  ChromiumBridge::paintTextField(helper.context(), themeData.m_part,
-                                 themeData.m_state, themeData.m_classicState,
-                                 helper.rect(), o->style()->backgroundColor(),
-                                 true, drawEdges);
+  WebCore::ThemePainter painter(i.context, r);
+  ChromiumBridge::paintTextField(
+      painter.context(), themeData.m_part, themeData.m_state,
+      themeData.m_classicState, painter.drawRect(),
+      o->style()->backgroundColor(), true, drawEdges);
   return false;
 }
 
