@@ -168,9 +168,11 @@ class WorkerThreadActivityReportTask : public ScriptExecutionContext::Task {
   bool m_hasPendingActivity;
 };
 
+#if !PLATFORM(CHROMIUM)
 WorkerContextProxy* WorkerContextProxy::create(Worker* worker) {
   return new WorkerMessagingProxy(worker);
 }
+#endif
 
 WorkerMessagingProxy::WorkerMessagingProxy(Worker* workerObject)
     : m_scriptExecutionContext(workerObject->scriptExecutionContext()),
