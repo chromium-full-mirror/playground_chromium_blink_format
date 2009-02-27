@@ -57,6 +57,8 @@ class WorkerObjectProxy {
                                                 int lineNumber,
                                                 const String& sourceURL) = 0;
 
+  virtual void confirmMessageFromWorkerObject(bool hasPendingActivity) = 0;
+
   virtual void reportPendingActivity(bool hasPendingActivity) = 0;
 
   virtual void workerContextDestroyed() = 0;

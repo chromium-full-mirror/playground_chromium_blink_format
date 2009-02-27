@@ -72,6 +72,7 @@ class WorkerMessagingProxy : public WorkerContextProxy,
                                                 const String& message,
                                                 int lineNumber,
                                                 const String& sourceURL);
+  virtual void confirmMessageFromWorkerObject(bool hasPendingActivity);
   virtual void reportPendingActivity(bool hasPendingActivity);
   virtual void workerContextDestroyed();
 
@@ -81,8 +82,6 @@ class WorkerMessagingProxy : public WorkerContextProxy,
                                       const String& mode);
 
   void workerThreadCreated(PassRefPtr<WorkerThread>);
-
-  void confirmWorkerThreadMessage(bool hasPendingActivity);
 
   // Only use this method on the worker object thread.
   bool askedToTerminate() const { return m_askedToTerminate; }
