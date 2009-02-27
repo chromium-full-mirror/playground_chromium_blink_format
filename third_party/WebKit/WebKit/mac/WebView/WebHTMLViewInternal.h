@@ -60,6 +60,7 @@ class KeyboardEvent;
 - (void)setPromisedDragTIFFDataSource:(WebCore::CachedImage*)source;
 - (void)_web_layoutIfNeededRecursive;
 - (void)_destroyAllWebPlugins;
+- (BOOL)_isResigningFirstResponder;
 
 #if USE(ACCELERATED_COMPOSITING)
 - (void)attachRootLayer:(CALayer*)layer;
