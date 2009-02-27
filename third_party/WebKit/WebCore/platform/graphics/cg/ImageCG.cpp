@@ -72,7 +72,6 @@ BitmapImage::BitmapImage(CGImageRef cgImage, ImageObserver* observer)
       m_repetitionCountStatus(Unknown),
       m_repetitionsComplete(0),
       m_isSolidColor(false),
-      m_checkedForSolidColor(false),
       m_animationFinished(true),
       m_allDataReceived(true),
       m_haveSize(true),
@@ -97,7 +96,6 @@ BitmapImage::BitmapImage(CGImageRef cgImage, ImageObserver* observer)
 // Drawing Routines
 
 void BitmapImage::checkForSolidColor() {
-  m_checkedForSolidColor = true;
   if (frameCount() > 1)
     m_isSolidColor = false;
   else {
