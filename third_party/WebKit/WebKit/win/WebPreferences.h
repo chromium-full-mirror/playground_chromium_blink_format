@@ -352,6 +352,12 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setWebSecurityEnabled(
       /* [in] */ BOOL enabled);
 
+  virtual HRESULT STDMETHODCALLTYPE allowUniversalAccessFromFileUrls(
+      /* [retval][out] */ BOOL* allowAccess);
+
+  virtual HRESULT STDMETHODCALLTYPE setAllowUniversalAccessFromFileUrls(
+      /* [in] */ BOOL allowAccess);
+
   // WebPreferences
 
   // This method accesses a different preference key than

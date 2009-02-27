@@ -235,6 +235,9 @@ void WebPreferences::initializeDefaultSettings() {
   CFDictionaryAddValue(defaults, CFSTR(WebKitWebSecurityEnabledPreferenceKey),
                        kCFBooleanTrue);
   CFDictionaryAddValue(
+      defaults, CFSTR(WebKitAllowUniversalAccessFromFileUrlsPreferenceKey),
+      kCFBooleanTrue);
+  CFDictionaryAddValue(
       defaults, CFSTR(WebKitJavaScriptCanOpenWindowsAutomaticallyPreferenceKey),
       kCFBooleanTrue);
   CFDictionaryAddValue(defaults, CFSTR(WebKitPluginsEnabledPreferenceKey),
@@ -808,6 +811,20 @@ HRESULT STDMETHODCALLTYPE WebPreferences::isWebSecurityEnabled(
 HRESULT STDMETHODCALLTYPE WebPreferences::setWebSecurityEnabled(
     /* [in] */ BOOL enabled) {
   setBoolValue(CFSTR(WebKitWebSecurityEnabledPreferenceKey), enabled);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebPreferences::allowUniversalAccessFromFileUrls(
+    /* [retval][out] */ BOOL* allowAccess) {
+  *allowAccess = boolValueForKey(
+      CFSTR(WebKitAllowUniversalAccessFromFileUrlsPreferenceKey));
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebPreferences::setAllowUniversalAccessFromFileUrls(
+    /* [in] */ BOOL allowAccess) {
+  setBoolValue(CFSTR(WebKitAllowUniversalAccessFromFileUrlsPreferenceKey),
+               allowAccess);
   return S_OK;
 }
 
