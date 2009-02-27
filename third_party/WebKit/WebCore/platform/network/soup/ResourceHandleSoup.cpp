@@ -54,9 +54,7 @@
 #include <unistd.h>
 
 #if PLATFORM(GTK)
-#if GLIB_CHECK_VERSION(2, 12, 0)
 #define USE_GLIB_BASE64
-#endif
 #endif
 
 namespace WebCore {
