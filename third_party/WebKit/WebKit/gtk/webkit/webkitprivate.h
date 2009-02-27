@@ -108,6 +108,8 @@ struct _WebKitWebViewPrivate {
 
   gboolean zoomFullContent;
   char* customEncoding;
+
+  gboolean disposing;
 };
 
 #define WEBKIT_WEB_FRAME_GET_PRIVATE(obj)                    \
