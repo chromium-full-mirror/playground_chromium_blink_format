@@ -2128,10 +2128,12 @@ void* JITStubs::cti_op_switch_imm(STUB_ARGS) {
         .ctiForValue(scrutinee.getInt32Fast())
         .addressForSwitch();
   else {
-    int32_t value;
-    if (scrutinee.numberToInt32(value))
+    double value;
+    int32_t intValue;
+    if (scrutinee.getNumber(value) &&
+        ((intValue = static_cast<int32_t>(value)) == value))
       return codeBlock->immediateSwitchJumpTable(tableIndex)
-          .ctiForValue(value)
+          .ctiForValue(intValue)
           .addressForSwitch();
     else
       return codeBlock->immediateSwitchJumpTable(tableIndex)
