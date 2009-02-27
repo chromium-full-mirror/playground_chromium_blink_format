@@ -55,7 +55,7 @@
 #define WebKitJavaScriptEnabledPreferenceKey "WebKitJavaScriptEnabled"
 #define WebKitWebSecurityEnabledPreferenceKey "WebKitWebSecurityEnabled"
 #define WebKitAllowUniversalAccessFromFileUrlsPreferenceKey \
-  @"WebKitAllowUniversalAccessFromFileUrls"
+  "WebKitAllowUniversalAccessFromFileUrls"
 #define WebKitJavaScriptCanOpenWindowsAutomaticallyPreferenceKey \
   "WebKitJavaScriptCanOpenWindowsAutomatically"
 #define WebKitPluginsEnabledPreferenceKey "WebKitPluginsEnabled"
