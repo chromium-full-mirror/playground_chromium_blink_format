@@ -93,7 +93,7 @@ class ScriptValue {
   bool isUndefined() const { return m_value->IsUndefined(); }
 
   void clear() {
-    if (!m_value.IsEmpty())
+    if (m_value.IsEmpty())
       return;
 
 #ifndef NDEBUG
