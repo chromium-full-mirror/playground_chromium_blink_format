@@ -285,6 +285,11 @@ void FrameLoaderClient::dispatchDecidePolicyForMIMEType(
   if (!policyFunction)
     return;
 
+  if (resourceRequest.isNull()) {
+    (core(m_frame)->loader()->*policyFunction)(PolicyIgnore);
+    return;
+  }
+
   WebKitWebView* page = getViewFromFrame(m_frame);
   WebKitNetworkRequest* request =
       webkit_network_request_new(resourceRequest.url().string().utf8().data());
@@ -320,6 +325,12 @@ void FrameLoaderClient::dispatchDecidePolicyForNewWindowAction(
   ASSERT(policyFunction);
   if (!policyFunction)
     return;
+
+  if (resourceRequest.isNull()) {
+    (core(m_frame)->loader()->*policyFunction)(PolicyIgnore);
+    return;
+  }
+
   // FIXME: I think Qt version marshals this to another thread so when we
   // have multi-threaded download, we might need to do the same
   (core(m_frame)->loader()->*policyFunction)(PolicyUse);
@@ -333,6 +344,11 @@ void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(
   ASSERT(policyFunction);
   if (!policyFunction)
     return;
+
+  if (resourceRequest.isNull()) {
+    (core(m_frame)->loader()->*policyFunction)(PolicyIgnore);
+    return;
+  }
 
   WebKitWebView* webView = getViewFromFrame(m_frame);
   WebKitNetworkRequest* request =
