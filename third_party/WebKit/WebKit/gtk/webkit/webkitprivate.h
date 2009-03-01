@@ -107,6 +107,7 @@ struct _WebKitWebViewPrivate {
   GtkAdjustment* verticalAdjustment;
 
   gboolean zoomFullContent;
+  char* encoding;
   char* customEncoding;
 
   gboolean disposing;
