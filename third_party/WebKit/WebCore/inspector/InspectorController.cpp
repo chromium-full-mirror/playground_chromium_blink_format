@@ -2573,8 +2573,7 @@ JSObjectRef InspectorController::addDOMStorageScriptResource(
 
   JSValueRef domainValue = JSValueMakeString(
       m_scriptContext,
-      jsStringRef(resource->frame->document()->securityOrigin()->domain())
-          .get());
+      jsStringRef(resource->frame->document()->securityOrigin()->host()).get());
   JSValueRef isLocalStorageValue =
       JSValueMakeBoolean(m_scriptContext, resource->isLocalStorage);
 
@@ -3057,9 +3056,8 @@ void InspectorController::didUseDOMStorage(StorageArea* storageArea,
   for (DOMStorageResourcesSet::iterator it = m_domStorageResources.begin();
        it != domStorageEnd; ++it) {
     InspectorDOMStorageResource* resource = it->get();
-    if (equalIgnoringCase(
-            resource->frame->document()->securityOrigin()->domain(),
-            frame->document()->securityOrigin()->domain()) &&
+    if (equalIgnoringCase(resource->frame->document()->securityOrigin()->host(),
+                          frame->document()->securityOrigin()->host()) &&
         resource->isLocalStorage == isLocalStorage)
       return;
   }
