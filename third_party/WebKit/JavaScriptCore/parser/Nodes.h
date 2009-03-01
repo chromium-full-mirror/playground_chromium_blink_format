@@ -199,6 +199,8 @@ class StatementNode : public Node {
   virtual bool isReturnNode() const JSC_FAST_CALL { return false; }
   virtual bool isExprStatement() const JSC_FAST_CALL { return false; }
 
+  virtual bool isBlock() const JSC_FAST_CALL { return false; }
+
  private:
   int m_lastLine;
 };
@@ -1938,6 +1940,8 @@ class BlockNode : public StatementNode {
                                    RegisterID* = 0) JSC_FAST_CALL;
 
   StatementVector& children() { return m_children; }
+
+  virtual bool isBlock() const JSC_FAST_CALL { return true; }
 
  private:
   StatementVector m_children;
