@@ -60,6 +60,7 @@ extern gchar* webkit_web_frame_dump_render_tree(WebKitWebFrame* frame);
 extern void webkit_web_settings_add_extra_plugin_directory(
     WebKitWebView* view,
     const gchar* directory);
+extern gchar* webkit_web_frame_get_response_mime_type(WebKitWebFrame* frame);
 }
 
 volatile bool done;
@@ -225,11 +226,16 @@ static void invalidateAnyPreviousWaitToDumpWatchdog() {
 
 void dump() {
   invalidateAnyPreviousWaitToDumpWatchdog();
+
+  bool dumpAsText = gLayoutTestController->dumpAsText();
   if (dumpTree) {
     char* result = 0;
+    gchar* responseMimeType =
+        webkit_web_frame_get_response_mime_type(mainFrame);
 
-    bool dumpAsText = gLayoutTestController->dumpAsText();
-    // FIXME: Also dump text resuls as text.
+    dumpAsText = g_ascii_strcasecmp(responseMimeType, "text/plain");
+    g_free(responseMimeType);
+
     gLayoutTestController->setDumpAsText(dumpAsText);
     if (gLayoutTestController->dumpAsText())
       result = dumpFramesAsText(mainFrame);
