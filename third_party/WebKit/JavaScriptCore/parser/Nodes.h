@@ -199,9 +199,6 @@ class StatementNode : public Node {
   virtual bool isReturnNode() const JSC_FAST_CALL { return false; }
   virtual bool isExprStatement() const JSC_FAST_CALL { return false; }
 
-  virtual bool isBlock() const JSC_FAST_CALL { return false; }
-  virtual bool isLoop() const JSC_FAST_CALL { return false; }
-
  private:
   int m_lastLine;
 };
@@ -1942,8 +1939,6 @@ class BlockNode : public StatementNode {
 
   StatementVector& children() { return m_children; }
 
-  virtual bool isBlock() const JSC_FAST_CALL { return true; }
-
  private:
   StatementVector m_children;
 };
@@ -2054,8 +2049,6 @@ class DoWhileNode : public StatementNode {
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
 
-  virtual bool isLoop() const JSC_FAST_CALL { return true; }
-
  private:
   RefPtr<StatementNode> m_statement;
   RefPtr<ExpressionNode> m_expr;
@@ -2074,8 +2067,6 @@ class WhileNode : public StatementNode {
 
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
-
-  virtual bool isLoop() const JSC_FAST_CALL { return true; }
 
  private:
   RefPtr<ExpressionNode> m_expr;
@@ -2105,8 +2096,6 @@ class ForNode : public StatementNode {
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
 
-  virtual bool isLoop() const JSC_FAST_CALL { return true; }
-
  private:
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -2133,8 +2122,6 @@ class ForInNode : public StatementNode, public ThrowableExpressionData {
 
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
-
-  virtual bool isLoop() const JSC_FAST_CALL { return true; }
 
  private:
   Identifier m_ident;
