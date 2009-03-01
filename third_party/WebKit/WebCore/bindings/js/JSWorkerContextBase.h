@@ -52,6 +52,10 @@ class JSWorkerContextBase : public JSDOMGlobalObject {
   WorkerContext* impl() const { return m_impl.get(); }
   virtual ScriptExecutionContext* scriptExecutionContext() const;
 
+  bool getOwnPropertySlot(JSC::ExecState*,
+                          const JSC::Identifier&,
+                          JSC::PropertySlot&);
+
  private:
   RefPtr<WorkerContext> m_impl;
 };

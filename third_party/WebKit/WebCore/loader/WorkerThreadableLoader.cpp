@@ -255,13 +255,13 @@ void WorkerThreadableLoader::MainThreadBridge::didReceiveData(
 static void workerContextDidFinishLoading(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper,
-    int identifier) {
+    unsigned long identifier) {
   ASSERT_UNUSED(context, context->isWorkerContext());
   workerClientWrapper->didFinishLoading(identifier);
 }
 
 void WorkerThreadableLoader::MainThreadBridge::didFinishLoading(
-    int identifier) {
+    unsigned long identifier) {
   m_messagingProxy.postTaskForModeToWorkerContext(
       createCallbackTask(&workerContextDidFinishLoading, m_workerClientWrapper,
                          identifier),

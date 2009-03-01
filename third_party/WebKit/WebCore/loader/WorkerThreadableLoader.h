@@ -143,7 +143,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
                              unsigned long long totalBytesToBeSent);
     virtual void didReceiveResponse(const ResourceResponse&);
     virtual void didReceiveData(const char*, int lengthReceived);
-    virtual void didFinishLoading(int identifier);
+    virtual void didFinishLoading(unsigned long identifier);
     virtual void didFail(const ResourceError&);
     virtual void didFailRedirectCheck();
     virtual void didReceiveAuthenticationCancellation(const ResourceResponse&);
