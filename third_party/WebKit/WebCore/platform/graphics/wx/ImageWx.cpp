@@ -248,7 +248,9 @@ void BitmapImage::drawPattern(GraphicsContext* ctxt,
   startAnimation();
 }
 
-void BitmapImage::checkForSolidColor() {}
+void BitmapImage::checkForSolidColor() {
+  m_checkedForSolidColor = true;
+}
 
 void BitmapImage::invalidatePlatformData() {}
 }
