@@ -62,6 +62,10 @@ class AccessibilityUIElement {
   void getLinkedUIElements(Vector<AccessibilityUIElement>&);
   void getDocumentLinks(Vector<AccessibilityUIElement>&);
   void getChildren(Vector<AccessibilityUIElement>&);
+  void getChildrenWithRange(Vector<AccessibilityUIElement>&,
+                            unsigned location,
+                            unsigned length);
+
   AccessibilityUIElement getChildAtIndex(unsigned);
   AccessibilityUIElement titleUIElement();
   AccessibilityUIElement parentElement();
