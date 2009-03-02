@@ -163,7 +163,6 @@ void ImageBuffer::putImageData(ImageData* source,
 
   QImage image =
       m_data.m_pixmap.toImage().convertToFormat(QImage::Format_ARGB32);
-  ASSERT(image);
 
   unsigned char* srcRows =
       source->data()->data()->data() + originy * srcBytesPerRow + originx * 4;
