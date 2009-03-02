@@ -71,7 +71,7 @@ class RenderText : public RenderObject {
                                      unsigned endOffset = UINT_MAX,
                                      bool useSelectionHeight = false);
 
-  virtual VisiblePosition positionForCoordinates(int x, int y);
+  virtual VisiblePosition positionForPoint(const IntPoint&);
 
   const UChar* characters() const { return m_text->characters(); }
   unsigned textLength() const {

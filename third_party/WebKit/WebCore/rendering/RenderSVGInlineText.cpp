@@ -151,7 +151,7 @@ IntRect RenderSVGInlineText::localCaretRect(InlineBox*, int, int*) {
   return IntRect();
 }
 
-VisiblePosition RenderSVGInlineText::positionForCoordinates(int x, int y) {
+VisiblePosition RenderSVGInlineText::positionForPoint(const IntPoint& point) {
   SVGInlineTextBox* textBox = static_cast<SVGInlineTextBox*>(firstTextBox());
 
   if (!textBox || textLength() == 0)
@@ -173,7 +173,8 @@ VisiblePosition RenderSVGInlineText::positionForCoordinates(int x, int y) {
   // nearest offset to your click is contained in another box.
   for (SVGInlineTextBox* box = textBox; box;
        box = static_cast<SVGInlineTextBox*>(box->nextTextBox())) {
-    if (box->svgCharacterHitsPosition(x + object->x(), y + object->y(),
+    if (box->svgCharacterHitsPosition(point.x() + object->x(),
+                                      point.y() + object->y(),
                                       closestOffsetInBox)) {
       // If we're not at the end/start of the box, stop looking for other
       // selected boxes.

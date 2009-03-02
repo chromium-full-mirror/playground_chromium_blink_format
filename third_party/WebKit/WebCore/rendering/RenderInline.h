@@ -108,7 +108,7 @@ class RenderInline : public RenderBoxModelObject {
                                      IntRect& rect,
                                      bool fixed);
 
-  virtual VisiblePosition positionForCoordinates(int x, int y);
+  virtual VisiblePosition positionForPoint(const IntPoint&);
 
   IntRect linesBoundingBox() const;
 

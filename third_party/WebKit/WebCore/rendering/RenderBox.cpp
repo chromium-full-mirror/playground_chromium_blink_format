@@ -3003,11 +3003,14 @@ bool RenderBox::isAfterContent(RenderObject* child) const {
           (!child->isText() || child->isBR()));
 }
 
-VisiblePosition RenderBox::positionForCoordinates(int xPos, int yPos) {
+VisiblePosition RenderBox::positionForPoint(const IntPoint& point) {
   // no children...return this render object's element, if there is one, and
   // offset 0
   if (!firstChild())
     return VisiblePosition(node(), 0, DOWNSTREAM);
+
+  int xPos = point.x();
+  int yPos = point.y();
 
   if (isTable() && node()) {
     int right = contentWidth() + borderRight() + paddingRight() + borderLeft() +

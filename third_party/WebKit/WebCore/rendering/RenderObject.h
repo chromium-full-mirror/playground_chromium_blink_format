@@ -535,8 +535,8 @@ class RenderObject : public CachedResourceClient {
                            HitTestAction);
   virtual void updateHitTestResult(HitTestResult&, const IntPoint&);
 
-  virtual VisiblePosition positionForCoordinates(int x, int y);
-  VisiblePosition positionForPoint(const IntPoint&);
+  VisiblePosition positionForCoordinates(int x, int y);
+  virtual VisiblePosition positionForPoint(const IntPoint&);
 
   virtual void dirtyLinesFromChangedChild(RenderObject*);
 
