@@ -155,7 +155,7 @@ inline bool operator!=(const Color& a, const Color& b) {
 Color focusRingColor();
 
 #if PLATFORM(CG)
-CGColorRef cgColor(const Color&);
+CGColorRef createCGColor(const Color&);
 #endif
 
 }  // namespace WebCore

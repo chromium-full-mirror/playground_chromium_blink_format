@@ -766,7 +766,7 @@ void GraphicsContext::setPlatformShadow(const IntSize& size,
   if (!color.isValid())
     CGContextSetShadow(context, CGSizeMake(width, height), blurRadius);
   else {
-    CGColorRef colorCG = cgColor(color);
+    CGColorRef colorCG = createCGColor(color);
     CGContextSetShadowWithColor(context, CGSizeMake(width, height), blurRadius,
                                 colorCG);
     CGColorRelease(colorCG);
