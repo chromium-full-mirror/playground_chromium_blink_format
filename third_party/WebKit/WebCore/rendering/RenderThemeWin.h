@@ -116,7 +116,10 @@ class RenderThemeWin : public RenderTheme {
                                 const IntRect& r);
   virtual void adjustSliderThumbSize(RenderObject*) const;
 
-  virtual void adjustButtonInnerStyle(RenderStyle*) const;
+  virtual int buttonInternalPaddingLeft() const;
+  virtual int buttonInternalPaddingRight() const;
+  virtual int buttonInternalPaddingTop() const;
+  virtual int buttonInternalPaddingBottom() const;
 
   virtual void adjustSearchFieldStyle(CSSStyleSelector*,
                                       RenderStyle*,
