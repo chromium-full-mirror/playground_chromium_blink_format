@@ -58,7 +58,9 @@ class FrameLoaderClientWx;
 #define WXDLLIMPEXP_WEBKIT
 #endif  // SWIG
 
+#ifndef SWIG
 extern WXDLLIMPEXP_WEBKIT const wxChar* wxWebViewNameStr;
+#endif
 
 class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   // ChromeClientWx needs to get the Page* stored by the wxWebView

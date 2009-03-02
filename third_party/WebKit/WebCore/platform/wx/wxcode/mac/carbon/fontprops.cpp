@@ -37,13 +37,18 @@ static inline float scaleEmToUnits(float x, unsigned unitsPerEm) {
 
 wxFontProperties::wxFontProperties(wxFont* font)
     : m_ascent(0), m_descent(0), m_lineGap(0), m_lineSpacing(0), m_xHeight(0) {
-  ATSFontRef fontRef;
   CGFontRef cgFont;
+
+#ifdef wxOSX_USE_CORE_TEXT&& wxOSX_USE_CORE_TEXT
+  cgFont = CTFontCopyGraphicsFont((CTFontRef)font->MacGetCTFont(), NULL);
+#else
+  ATSFontRef fontRef;
 
   fontRef = FMGetATSFontRefFromFont(font->MacGetATSUFontID());
 
   if (fontRef)
     cgFont = CGFontCreateWithPlatformFont((void*)&fontRef);
+#endif
 
   if (cgFont) {
     int iAscent;
@@ -91,7 +96,7 @@ void GetTextExtent(const wxFont& font,
 
     // we need the scale here ...
 
-    Fixed atsuSize = IntToFixed(int(/*m_scaleY*/ 1 * font.MacGetFontSize()));
+    Fixed atsuSize = IntToFixed(int(/*m_scaleY*/ 1 * font.GetPointSize()));
     // RGBColor atsuColor = MAC_WXCOLORREF( m_textForegroundColor.GetPixel() ) ;
     ATSUAttributeTag atsuTags[] = {
         kATSUSizeTag  //,
