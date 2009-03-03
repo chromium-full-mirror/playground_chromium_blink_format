@@ -85,12 +85,10 @@ bool RenderTextControlMultiLine::nodeAtPoint(const HitTestRequest& request,
                                       hitTestAction))
     return false;
 
-  if (result.innerNode() == node()) {
+  if (result.innerNode() == node())
     hitInnerTextBlock(result, x, y, tx, ty);
-    return true;
-  }
 
-  return false;
+  return true;
 }
 
 void RenderTextControlMultiLine::forwardEvent(Event* event) {
