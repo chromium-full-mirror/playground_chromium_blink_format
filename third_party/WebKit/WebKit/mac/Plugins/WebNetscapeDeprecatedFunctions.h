@@ -27,6 +27,10 @@
 
 #import <CoreServices/CoreServices.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern OSErr WebGetDiskFragment(const FSSpec* fileSpec,
                                 UInt32 offset,
                                 UInt32 length,
@@ -38,5 +42,9 @@ extern OSErr WebGetDiskFragment(const FSSpec* fileSpec,
 extern OSErr WebCloseConnection(CFragConnectionID* connID);
 extern SInt16 WebLMGetCurApRefNum(void);
 extern void WebLMSetCurApRefNum(SInt16 value);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ENABLE(NETSCAPE_PLUGIN_API) && !defined(__LP64__) */
