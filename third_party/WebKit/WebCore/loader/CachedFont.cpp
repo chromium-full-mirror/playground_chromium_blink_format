@@ -31,7 +31,8 @@
 #include "CachedResourceClientWalker.h"
 #include "DOMImplementation.h"
 #include "FontPlatformData.h"
-#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK)
+#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK) || \
+    (PLATFORM(CHROMIUM) && PLATFORM(WIN_OS))
 #include "FontCustomPlatformData.h"
 #endif
 #include "TextResourceDecoder.h"
@@ -60,7 +61,8 @@ CachedFont::CachedFont(const String& url)
 }
 
 CachedFont::~CachedFont() {
-#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK)
+#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK) || \
+    (PLATFORM(CHROMIUM) && PLATFORM(WIN_OS))
   delete m_fontData;
 #endif
 }
@@ -95,7 +97,8 @@ void CachedFont::beginLoadIfNeeded(DocLoader* dl) {
 }
 
 bool CachedFont::ensureCustomFontData() {
-#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK)
+#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK) || \
+    (PLATFORM(CHROMIUM) && PLATFORM(WIN_OS))
 #if ENABLE(SVG_FONTS)
   ASSERT(!m_isSVGFont);
 #endif
@@ -117,7 +120,8 @@ FontPlatformData CachedFont::platformDataFromCustomData(
   if (m_externalSVGDocument)
     return FontPlatformData(size, bold, italic);
 #endif
-#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK)
+#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK) || \
+    (PLATFORM(CHROMIUM) && PLATFORM(WIN_OS))
   ASSERT(m_fontData);
   return m_fontData->fontPlatformData(static_cast<int>(size), bold, italic,
                                       renderingMode);
@@ -174,7 +178,8 @@ SVGFontElement* CachedFont::getSVGFontById(const String& fontName) const {
 #endif
 
 void CachedFont::allClientsRemoved() {
-#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK)
+#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK) || \
+    (PLATFORM(CHROMIUM) && PLATFORM(WIN_OS))
   if (m_fontData) {
     delete m_fontData;
     m_fontData = 0;
