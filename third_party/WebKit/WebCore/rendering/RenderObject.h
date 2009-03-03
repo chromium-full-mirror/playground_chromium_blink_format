@@ -840,6 +840,10 @@ class RenderObject : public CachedResourceClient {
                                        bool useTransforms,
                                        TransformState&) const;
 
+  TransformationMatrix transformFromContainer(
+      const RenderObject* container,
+      const IntSize& offsetInContainer) const;
+
   virtual void addFocusRingRects(GraphicsContext*, int /*tx*/, int /*ty*/){};
 
   IntRect absoluteOutlineBounds() const { return outlineBoundsForRepaint(0); }

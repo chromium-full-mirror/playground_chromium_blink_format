@@ -1039,37 +1039,12 @@ void RenderBox::mapLocalToAbsolutePoint(bool fixed,
 
     IntSize containerOffset = offsetFromContainer(o);
     if (useTransforms) {
-      TransformationMatrix transformFromContainer;
-      transformFromContainer.translate(containerOffset.width(),
-                                       containerOffset.height());
-      if (hasLayer() && layer()->transform())
-        transformFromContainer.multLeft(*layer()->transform());
-
-      // If either the container or this have transform-style: preserve-3d, we
-      // need to stay in 3d space by
-      // accumulating the transform.
+      TransformationMatrix containerTransform =
+          transformFromContainer(o, containerOffset);
       bool accumulateTransform =
           (o->style()->transformStyle3D() == TransformStyle3DPreserve3D ||
            style()->transformStyle3D() == TransformStyle3DPreserve3D);
-      if (o->style()->hasPerspective()) {
-        // Perpsective on the container affects us, so we have to factor it in
-        // here.
-        ASSERT(o->hasLayer());
-        FloatPoint perspectiveOrigin =
-            toRenderBox(o)->layer()->perspectiveOrigin();
-
-        TransformationMatrix perspectiveMatrix;
-        perspectiveMatrix.applyPerspective(o->style()->perspective());
-
-        transformFromContainer.translateRight3d(-perspectiveOrigin.x(),
-                                                -perspectiveOrigin.y(), 0);
-        transformFromContainer.multiply(perspectiveMatrix);
-        transformFromContainer.translateRight3d(perspectiveOrigin.x(),
-                                                perspectiveOrigin.y(), 0);
-      }
-
-      transformState.applyTransform(transformFromContainer,
-                                    accumulateTransform);
+      transformState.applyTransform(containerTransform, accumulateTransform);
     } else
       transformState.move(containerOffset.width(), containerOffset.height());
 
@@ -1095,37 +1070,12 @@ void RenderBox::mapAbsoluteToLocalPoint(bool fixed,
 
     IntSize containerOffset = offsetFromContainer(o);
     if (useTransforms) {
-      TransformationMatrix transformFromContainer;
-      transformFromContainer.translate(containerOffset.width(),
-                                       containerOffset.height());
-      if (hasLayer() && layer()->transform())
-        transformFromContainer.multLeft(*layer()->transform());
-
-      // If either the container or this have transform-style: preserve-3d, we
-      // need to stay in 3d space by
-      // accumulating the transform.
+      TransformationMatrix containerTransform =
+          transformFromContainer(o, containerOffset);
       bool accumulateTransform =
           (o->style()->transformStyle3D() == TransformStyle3DPreserve3D ||
            style()->transformStyle3D() == TransformStyle3DPreserve3D);
-      if (o->style()->hasPerspective()) {
-        // Perpsective on the container affects us, so we have to factor it in
-        // here.
-        ASSERT(o->hasLayer());
-        FloatPoint perspectiveOrigin =
-            toRenderBox(o)->layer()->perspectiveOrigin();
-
-        TransformationMatrix perspectiveMatrix;
-        perspectiveMatrix.applyPerspective(o->style()->perspective());
-
-        transformFromContainer.translateRight3d(-perspectiveOrigin.x(),
-                                                -perspectiveOrigin.y(), 0);
-        transformFromContainer.multiply(perspectiveMatrix);
-        transformFromContainer.translateRight3d(perspectiveOrigin.x(),
-                                                perspectiveOrigin.y(), 0);
-      }
-
-      transformState.applyTransform(transformFromContainer,
-                                    accumulateTransform);
+      transformState.applyTransform(containerTransform, accumulateTransform);
     } else
       transformState.move(-containerOffset.width(), -containerOffset.height());
   }
