@@ -104,8 +104,11 @@ class Geolocation : public RefCounted<Geolocation>,
 
   void handleError(PositionError*);
 
+  // GeolocationServiceClient
   virtual void geolocationServicePositionChanged(GeolocationService*);
   virtual void geolocationServiceErrorOccurred(GeolocationService*);
+
+  bool shouldAllowGeolocation();
 
   typedef HashSet<RefPtr<GeoNotifier>> GeoNotifierSet;
   typedef HashMap<int, RefPtr<GeoNotifier>> GeoNotifierMap;
@@ -114,6 +117,8 @@ class Geolocation : public RefCounted<Geolocation>,
   GeoNotifierMap m_watchers;
   Frame* m_frame;
   OwnPtr<GeolocationService> m_service;
+
+  enum { Unknown, Yes, No } m_allowGeolocation;
 };
 
 }  // namespace WebCore

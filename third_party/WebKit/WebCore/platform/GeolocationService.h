@@ -38,8 +38,8 @@ class PositionOptions;
 class GeolocationServiceClient {
  public:
   virtual ~GeolocationServiceClient() {}
-  virtual void geolocationServicePositionChanged(GeolocationService*) {}
-  virtual void geolocationServiceErrorOccurred(GeolocationService*) {}
+  virtual void geolocationServicePositionChanged(GeolocationService*) = 0;
+  virtual void geolocationServiceErrorOccurred(GeolocationService*) = 0;
 };
 
 class GeolocationService : public Noncopyable {
