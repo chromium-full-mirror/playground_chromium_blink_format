@@ -64,7 +64,7 @@ JSQuarantinedObjectWrapper::JSQuarantinedObjectWrapper(
     JSObject* unwrappedObject,
     PassRefPtr<Structure> structure)
     : JSObject(structure),
-      m_unwrappedGlobalObject(unwrappedExec->dynamicGlobalObject()),
+      m_unwrappedGlobalObject(unwrappedExec->lexicalGlobalObject()),
       m_unwrappedObject(unwrappedObject) {
   ASSERT_ARG(unwrappedExec, unwrappedExec);
   ASSERT_ARG(unwrappedObject, unwrappedObject);
@@ -76,7 +76,7 @@ JSQuarantinedObjectWrapper::~JSQuarantinedObjectWrapper() {}
 bool JSQuarantinedObjectWrapper::allowsUnwrappedAccessFrom(
     ExecState* exec) const {
   return m_unwrappedGlobalObject->profileGroup() ==
-         exec->dynamicGlobalObject()->profileGroup();
+         exec->lexicalGlobalObject()->profileGroup();
 }
 
 ExecState* JSQuarantinedObjectWrapper::unwrappedExecState() const {
