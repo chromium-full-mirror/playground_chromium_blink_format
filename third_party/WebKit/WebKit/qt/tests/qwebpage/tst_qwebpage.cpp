@@ -952,6 +952,7 @@ void tst_QWebPage::textSelection() {
            QString::fromLatin1("The quick brown fox"));
 
   // these actions must exist
+  QVERIFY(page->action(QWebPage::SelectAll) != 0);
   QVERIFY(page->action(QWebPage::SelectNextChar) != 0);
   QVERIFY(page->action(QWebPage::SelectPreviousChar) != 0);
   QVERIFY(page->action(QWebPage::SelectNextWord) != 0);
@@ -966,6 +967,7 @@ void tst_QWebPage::textSelection() {
   QVERIFY(page->action(QWebPage::SelectEndOfDocument) != 0);
 
   // right now they are disabled because contentEditable is false
+  QCOMPARE(page->action(QWebPage::SelectAll)->isEnabled(), false);
   QCOMPARE(page->action(QWebPage::SelectNextChar)->isEnabled(), false);
   QCOMPARE(page->action(QWebPage::SelectPreviousChar)->isEnabled(), false);
   QCOMPARE(page->action(QWebPage::SelectNextWord)->isEnabled(), false);
@@ -983,6 +985,7 @@ void tst_QWebPage::textSelection() {
   page->setContentEditable(true);
 
   // here the actions are enabled after contentEditable is true
+  QCOMPARE(page->action(QWebPage::SelectAll)->isEnabled(), true);
   QCOMPARE(page->action(QWebPage::SelectNextChar)->isEnabled(), true);
   QCOMPARE(page->action(QWebPage::SelectPreviousChar)->isEnabled(), true);
   QCOMPARE(page->action(QWebPage::SelectNextWord)->isEnabled(), true);
