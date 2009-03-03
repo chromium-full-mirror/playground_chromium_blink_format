@@ -1515,6 +1515,7 @@ void InspectorController::highlight(Node* node) {
 void InspectorController::hideHighlight() {
   if (!enabled())
     return;
+  m_highlightedNode = 0;
   m_client->hideHighlight();
 }
 
