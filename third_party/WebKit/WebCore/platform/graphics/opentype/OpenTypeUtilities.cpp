@@ -53,9 +53,9 @@ struct EOTPrefix {
   unsigned fontDataSize;
   unsigned version;
   unsigned flags;
-  UInt8 fontPANOSE[10];
-  UInt8 charset;
-  UInt8 italic;
+  uint8_t fontPANOSE[10];
+  uint8_t charset;
+  uint8_t italic;
   unsigned weight;
   unsigned short fsType;
   unsigned short magicNumber;
@@ -72,6 +72,15 @@ struct TableDirectoryEntry {
   BigEndianULong offset;
   BigEndianULong length;
 };
+
+#if !PLATFORM(CG)
+// Fixed type is not defined on non-CG platforms. |version| in sfntHeader
+// and headTable and |fontRevision| in headTable are of Fixed, but they're
+// not actually refered to anywhere. Therefore, we just have to match
+// the size (4 bytes). For the definition of Fixed type, see
+// http://developer.apple.com/documentation/mac/Legacy/GXEnvironment/GXEnvironment-356.html#HEADING356-6.
+typedef int32_t Fixed;
+#endif
 
 struct sfntHeader {
   Fixed version;
@@ -99,9 +108,9 @@ struct OS2Table {
   BigEndianUShort strikeoutSize;
   BigEndianUShort strikeoutPosition;
   BigEndianUShort familyClass;
-  UInt8 panose[10];
+  uint8_t panose[10];
   BigEndianULong unicodeRange[4];
-  UInt8 vendID[4];
+  uint8_t vendID[4];
   BigEndianUShort fsSelection;
   BigEndianUShort firstCharIndex;
   BigEndianUShort lastCharIndex;
@@ -156,7 +165,7 @@ struct nameTable {
 
 #pragma pack()
 
-static void appendBigEndianStringToEOTHeader(Vector<UInt8, 512>& eotHeader,
+static void appendBigEndianStringToEOTHeader(Vector<uint8_t, 512>& eotHeader,
                                              const BigEndianUShort* string,
                                              unsigned short length) {
   size_t size = eotHeader.size();
@@ -171,7 +180,7 @@ static void appendBigEndianStringToEOTHeader(Vector<UInt8, 512>& eotHeader,
 }
 
 bool getEOTHeader(SharedBuffer* fontData,
-                  Vector<UInt8, 512>& eotHeader,
+                  Vector<uint8_t, 512>& eotHeader,
                   size_t& overlayDst,
                   size_t& overlaySrc,
                   size_t& overlayLength) {
@@ -334,7 +343,7 @@ bool getEOTHeader(SharedBuffer* fontData,
   appendBigEndianStringToEOTHeader(eotHeader, fullName, fullNameLength);
 
   unsigned short padding = 0;
-  eotHeader.append(reinterpret_cast<UInt8*>(&padding), sizeof(padding));
+  eotHeader.append(reinterpret_cast<uint8_t*>(&padding), sizeof(padding));
 
   prefix->eotSize = eotHeader.size() + fontData->size();
 
