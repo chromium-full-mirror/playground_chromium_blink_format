@@ -42,6 +42,8 @@ JSOptionConstructor::JSOptionConstructor(ExecState* exec,
   m_document = static_cast<JSDocument*>(
       asObject(toJS(exec, static_cast<Document*>(context))));
 
+  putDirect(exec->propertyNames().prototype,
+            JSHTMLOptionElementPrototype::self(exec), None);
   putDirect(exec->propertyNames().length, jsNumber(exec, 4),
             ReadOnly | DontDelete | DontEnum);
 }
