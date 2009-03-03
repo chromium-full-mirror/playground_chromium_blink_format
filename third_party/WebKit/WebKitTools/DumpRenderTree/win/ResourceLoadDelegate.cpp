@@ -76,7 +76,16 @@ static wstring descriptionSuitableForTestResult(IWebURLRequest* request) {
   wstring url = urlSuitableForTestResult(wstringFromBSTR(urlBSTR));
   ::SysFreeString(urlBSTR);
 
-  return L"<NSURLRequest " + url + L">";
+  BSTR mainDocumentURLBSTR;
+  if (FAILED(request->mainDocumentURL(&mainDocumentURLBSTR)))
+    return wstring();
+
+  wstring mainDocumentURL =
+      urlSuitableForTestResult(wstringFromBSTR(mainDocumentURLBSTR));
+  ::SysFreeString(mainDocumentURLBSTR);
+
+  return L"<NSURLRequest URL " + url + L", main document URL " +
+         mainDocumentURL + L">";
 }
 
 static wstring descriptionSuitableForTestResult(IWebURLResponse* response) {
