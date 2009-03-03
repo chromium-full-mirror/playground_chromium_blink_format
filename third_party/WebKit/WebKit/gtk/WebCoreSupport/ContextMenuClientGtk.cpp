@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2008 Nuanti Ltd.
+ *  Copyright (C) 2009 Gustavo Noronha Silva <gns@gnome.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,6 +22,7 @@
 #include "ContextMenu.h"
 #include "ContextMenuClientGtk.h"
 
+#include "CString.h"
 #include "HitTestResult.h"
 #include "KURL.h"
 #include "NotImplemented.h"
@@ -166,7 +168,21 @@ void ContextMenuClient::contextMenuItemSelected(ContextMenuItem*,
 }
 
 void ContextMenuClient::downloadURL(const KURL& url) {
-  notImplemented();
+  WebKitNetworkRequest* network_request =
+      webkit_network_request_new(url.string().utf8().data());
+  WebKitDownload* download = webkit_download_new(network_request);
+  g_object_unref(network_request);
+
+  gboolean handled;
+  g_signal_emit_by_name(m_webView, "download-requested", download, &handled);
+
+  if (!handled) {
+    webkit_download_cancel(download);
+    g_object_unref(download);
+    return;
+  }
+
+  webkit_download_start(download);
 }
 
 void ContextMenuClient::copyImageToClipboard(const HitTestResult&) {

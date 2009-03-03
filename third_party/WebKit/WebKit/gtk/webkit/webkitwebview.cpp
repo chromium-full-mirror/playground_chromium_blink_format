@@ -27,6 +27,7 @@
 
 #include "config.h"
 
+#include "webkitdownload.h"
 #include "webkitwebview.h"
 #include "webkitenumtypes.h"
 #include "webkitmarshal.h"
@@ -135,6 +136,7 @@ enum {
   COPY_CLIPBOARD,
   PASTE_CLIPBOARD,
   CUT_CLIPBOARD,
+  DOWNLOAD_REQUESTED,
   LAST_SIGNAL
 };
 
@@ -1163,6 +1165,23 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
       G_STRUCT_OFFSET(WebKitWebViewClass, window_object_cleared), NULL, NULL,
       webkit_marshal_VOID__OBJECT_POINTER_POINTER, G_TYPE_NONE, 3,
       WEBKIT_TYPE_WEB_FRAME, G_TYPE_POINTER, G_TYPE_POINTER);
+
+  /**
+   * WebKitWebView::download-requested:
+   * @web_view: the object on which the signal is emitted
+   * @download: the message text
+   * @return: TRUE if the download was handled.
+   *
+   * A new Download is being requested. By default, if the signal is
+   * not handled, the download is cancelled.
+   *
+   * Since: 1.1.2
+   */
+  webkit_web_view_signals[DOWNLOAD_REQUESTED] = g_signal_new(
+      "download-requested", G_TYPE_FROM_CLASS(webViewClass),
+      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
+      g_signal_accumulator_true_handled, NULL, webkit_marshal_BOOLEAN__OBJECT,
+      G_TYPE_BOOLEAN, 1, G_TYPE_OBJECT);
 
   /**
    * WebKitWebView::load-started:
