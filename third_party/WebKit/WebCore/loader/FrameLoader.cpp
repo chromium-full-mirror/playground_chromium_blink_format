@@ -1301,6 +1301,9 @@ void FrameLoader::loadDone() {
 }
 
 void FrameLoader::checkCompleted() {
+  if (m_frame->view())
+    m_frame->view()->checkStopDelayingDeferredRepaints();
+
   // Any frame that hasn't completed yet?
   for (Frame* child = m_frame->tree()->firstChild(); child;
        child = child->tree()->nextSibling())
