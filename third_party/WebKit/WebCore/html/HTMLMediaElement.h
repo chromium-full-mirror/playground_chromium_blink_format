@@ -93,6 +93,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   PassRefPtr<TimeRanges> buffered() const;
   void load(ExceptionCode&);
 
+  String canPlayType(const String& mimeType) const;
+
   // ready state
   enum ReadyState {
     DATA_UNAVAILABLE,
@@ -202,7 +204,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
     --m_processingMediaPlayerCallback;
   }
 
-  String selectMediaURL(String& mediaMIMEType);
+  String selectMediaURL(ContentType& contentType);
   void updateVolume();
   void updatePlayState();
   float effectiveStart() const;

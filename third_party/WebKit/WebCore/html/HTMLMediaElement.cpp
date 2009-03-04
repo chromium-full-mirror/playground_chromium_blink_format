@@ -288,6 +288,27 @@ float HTMLMediaElement::bufferingRate() {
   // return m_player->dataRate();
 }
 
+String HTMLMediaElement::canPlayType(const String& mimeType) const {
+  MediaPlayer::SupportsType support =
+      MediaPlayer::supportsType(ContentType(mimeType));
+  String canPlay;
+
+  // 4.8.10.3
+  switch (support) {
+    case MediaPlayer::IsNotSupported:
+      canPlay = "no";
+      break;
+    case MediaPlayer::MayBeSupported:
+      canPlay = "maybe";
+      break;
+    case MediaPlayer::IsSupported:
+      canPlay = "probably";
+      break;
+  }
+
+  return canPlay;
+}
+
 void HTMLMediaElement::load(ExceptionCode& ec) {
   if (m_restrictions & RequireUserGestureForLoadRestriction &&
       !processingUserGesture()) {
@@ -300,7 +321,7 @@ void HTMLMediaElement::load(ExceptionCode& ec) {
 
 void HTMLMediaElement::loadInternal(ExceptionCode& ec) {
   String mediaSrc;
-  String mediaMIMEType;
+  ContentType contentType("");
 
   // 3.14.9.4. Loading the media resource
   // 1
@@ -350,7 +371,7 @@ void HTMLMediaElement::loadInternal(ExceptionCode& ec) {
   }
 
   // 6
-  mediaSrc = selectMediaURL(mediaMIMEType);
+  mediaSrc = selectMediaURL(contentType);
   if (mediaSrc.isEmpty()) {
     ec = INVALID_STATE_ERR;
     goto end;
@@ -379,7 +400,7 @@ void HTMLMediaElement::loadInternal(ExceptionCode& ec) {
 #endif
 
   updateVolume();
-  m_player->load(m_currentSrc, mediaMIMEType);
+  m_player->load(m_currentSrc, contentType);
   if (m_loadNestingLevel < m_terminateLoadBelowNestingLevel)
     goto end;
 
@@ -902,7 +923,7 @@ bool HTMLMediaElement::canPlay() const {
   return paused() || ended() || networkState() < LOADED_METADATA;
 }
 
-String HTMLMediaElement::selectMediaURL(String& mediaMIMEType) {
+String HTMLMediaElement::selectMediaURL(ContentType& contentType) {
   // 3.14.9.2. Location of the media resource
   String mediaSrc = getAttribute(srcAttr);
   if (mediaSrc.isEmpty()) {
@@ -920,14 +941,13 @@ String HTMLMediaElement::selectMediaURL(String& mediaMIMEType) {
             continue;
         }
         if (source->hasAttribute(typeAttr)) {
-          ContentType contentType(source->type());
-          if (!MediaPlayer::supportsType(contentType.type(),
-                                         contentType.parameter("codecs")))
+          ContentType type(source->type());
+          if (!MediaPlayer::supportsType(type))
             continue;
 
           // return type with all parameters in place so the media engine can
           // use them
-          mediaMIMEType = contentType.raw();
+          contentType = type;
         }
         mediaSrc = source->src().string();
         break;
@@ -1197,7 +1217,7 @@ void HTMLMediaElement::setMediaPlayerProxy(WebMediaPlayerProxy* proxy) {
 }
 
 String HTMLMediaElement::initialURL() {
-  String ignoredType;
+  ContentType ignoredType;
   String initialSrc = selectMediaURL(ignoredType);
   m_currentSrc = initialSrc;
   return initialSrc;
