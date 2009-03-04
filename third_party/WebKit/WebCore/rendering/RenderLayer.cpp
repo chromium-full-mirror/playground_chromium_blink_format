@@ -2645,9 +2645,24 @@ bool RenderLayer::hitTestContents(const HitTestRequest& request,
                                   const IntRect& layerBounds,
                                   const IntPoint& hitTestPoint,
                                   HitTestFilter hitTestFilter) const {
-  return renderer()->hitTest(request, result, hitTestPoint,
-                             layerBounds.x() - renderBoxX(),
-                             layerBounds.y() - renderBoxY(), hitTestFilter);
+  if (!renderer()->hitTest(request, result, hitTestPoint,
+                           layerBounds.x() - renderBoxX(),
+                           layerBounds.y() - renderBoxY(), hitTestFilter))
+    return false;
+
+  // For positioned generated content, we might still not have a
+  // node by the time we get to the layer level, since none of
+  // the content in the layer has an element. So just walk up
+  // the tree.
+  if (!result.innerNode() || !result.innerNonSharedNode()) {
+    Node* e = enclosingElement();
+    if (!result.innerNode())
+      result.setInnerNode(e);
+    if (!result.innerNonSharedNode())
+      result.setInnerNonSharedNode(e);
+  }
+
+  return true;
 }
 
 void RenderLayer::updateClipRects(const RenderLayer* rootLayer) {
