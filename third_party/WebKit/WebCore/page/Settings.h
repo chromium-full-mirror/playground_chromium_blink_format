@@ -96,9 +96,9 @@ class Settings {
   void setWebSecurityEnabled(bool);
   bool isWebSecurityEnabled() const { return m_isWebSecurityEnabled; }
 
-  void setAllowUniversalAccessFromFileUrls(bool);
-  bool allowUniversalAccessFromFileUrls() const {
-    return m_allowUniversalAccessFromFileUrls;
+  void setAllowUniversalAccessFromFileURLs(bool);
+  bool allowUniversalAccessFromFileURLs() const {
+    return m_allowUniversalAccessFromFileURLs;
   }
 
   void setJavaScriptCanOpenWindowsAutomatically(bool);
@@ -282,7 +282,7 @@ class Settings {
   bool m_localStorageEnabled : 1;
   bool m_isJavaScriptEnabled : 1;
   bool m_isWebSecurityEnabled : 1;
-  bool m_allowUniversalAccessFromFileUrls : 1;
+  bool m_allowUniversalAccessFromFileURLs : 1;
   bool m_javaScriptCanOpenWindowsAutomatically : 1;
   bool m_shouldPrintBackgrounds : 1;
   bool m_textAreasAreResizable : 1;

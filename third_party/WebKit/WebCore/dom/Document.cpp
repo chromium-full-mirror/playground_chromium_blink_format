@@ -4197,7 +4197,7 @@ void Document::initSecurityContext() {
       // sites.
       securityOrigin()->grantUniversalAccess();
 
-    } else if (settings->allowUniversalAccessFromFileUrls() &&
+    } else if (settings->allowUniversalAccessFromFileURLs() &&
                securityOrigin()->isLocal()) {
       // Some clients want file:// URLs to have universal access, but that
       // setting is dangerous for other clients.
