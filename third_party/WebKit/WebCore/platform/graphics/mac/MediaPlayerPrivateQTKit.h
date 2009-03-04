@@ -129,6 +129,10 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   void startEndPointTimerIfNeeded();
   void disableUnsupportedTracks(unsigned& enabledTrackCount);
 
+  bool metaDataAvailable() const {
+    return m_qtMovie && m_networkState >= MediaPlayer::LoadedMetaData;
+  }
+
   MediaPlayer* m_player;
   RetainPtr<QTMovie> m_qtMovie;
   RetainPtr<QTMovieView> m_qtMovieView;
