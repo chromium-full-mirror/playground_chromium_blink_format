@@ -1132,9 +1132,7 @@ RenderBox* RenderBlock::handleRunInChild(RenderBox* child, bool& handled) {
   return 0;
 }
 
-void RenderBlock::collapseMargins(RenderBox* child,
-                                  MarginInfo& marginInfo,
-                                  int yPosEstimate) {
+int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
   // Get our max pos and neg top margins.
   int posTop = child->maxTopMargin(true);
   int negTop = child->maxTopMargin(false);
@@ -1228,37 +1226,17 @@ void RenderBlock::collapseMargins(RenderBox* child,
     marginInfo.setSelfCollapsingBlockClearedFloat(false);
   }
 
-  view()->addLayoutDelta(IntSize(0, yPosEstimate - ypos));
-  child->setLocation(child->x(), ypos);
-  if (ypos != yPosEstimate) {
-    if (child->shrinkToAvoidFloats())
-      // The child's width depends on the line width.
-      // When the child shifts to clear an item, its width can
-      // change (because it has more available line width).
-      // So go ahead and mark the item as dirty.
-      child->setChildNeedsLayout(true, false);
-
-    if (!child->avoidsFloats() && child->isBlockFlow() &&
-        toRenderBlock(child)->containsFloats())
-      toRenderBlock(child)->markAllDescendantsWithFloatsForLayout();
-
-    // Our guess was wrong. Make the child lay itself out again.
-    child->layoutIfNeeded();
-  }
+  return ypos;
 }
 
-void RenderBlock::clearFloatsIfNeeded(RenderBox* child,
-                                      MarginInfo& marginInfo,
-                                      int oldTopPosMargin,
-                                      int oldTopNegMargin) {
-  int heightIncrease = getClearDelta(child);
+int RenderBlock::clearFloatsIfNeeded(RenderBox* child,
+                                     MarginInfo& marginInfo,
+                                     int oldTopPosMargin,
+                                     int oldTopNegMargin,
+                                     int yPos) {
+  int heightIncrease = getClearDelta(child, yPos);
   if (!heightIncrease)
-    return;
-
-  // The child needs to be lowered.  Move the child so that it just clears the
-  // float.
-  view()->addLayoutDelta(IntSize(0, -heightIncrease));
-  child->setLocation(child->x(), child->y() + heightIncrease);
+    return yPos;
 
   if (child->isSelfCollapsingBlock()) {
     // For self-collapsing blocks that clear, they can still collapse their
@@ -1293,19 +1271,7 @@ void RenderBlock::clearFloatsIfNeeded(RenderBox* child,
     marginInfo.setAtTopOfBlock(false);
   }
 
-  // If our value of clear caused us to be repositioned vertically to be
-  // underneath a float, we might have to do another layout to take into account
-  // the extra space we now have available.
-  if (child->shrinkToAvoidFloats())
-    // The child's width depends on the line width.
-    // When the child shifts to clear an item, its width can
-    // change (because it has more available line width).
-    // So go ahead and mark the item as dirty.
-    child->setChildNeedsLayout(true, false);
-  if (!child->avoidsFloats() && child->isBlockFlow() &&
-      toRenderBlock(child)->containsFloats())
-    toRenderBlock(child)->markAllDescendantsWithFloatsForLayout();
-  child->layoutIfNeeded();
+  return yPos + heightIncrease;
 }
 
 int RenderBlock::estimateVerticalPosition(RenderBox* child,
@@ -1319,6 +1285,7 @@ int RenderBlock::estimateVerticalPosition(RenderBox* child,
                                                   : child->collapsedMarginTop();
     yPosEstimate += max(marginInfo.margin(), childMarginTop);
   }
+  yPosEstimate += getClearDelta(child, yPosEstimate);
   return yPosEstimate;
 }
 
@@ -1566,7 +1533,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
       // mark it for
       // layout.
       int fb = max(previousFloatBottom, floatBottom());
-      if (fb > height() || fb > yPosEstimate)
+      if (fb > yPosEstimate)
         markDescendantsWithFloats = true;
     }
 
@@ -1586,10 +1553,31 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
 
     // Now determine the correct ypos based off examination of collapsing margin
     // values.
-    collapseMargins(child, marginInfo, yPosEstimate);
+    int yBeforeClear = collapseMargins(child, marginInfo);
 
     // Now check for clear.
-    clearFloatsIfNeeded(child, marginInfo, oldTopPosMargin, oldTopNegMargin);
+    int yAfterClear = clearFloatsIfNeeded(child, marginInfo, oldTopPosMargin,
+                                          oldTopNegMargin, yBeforeClear);
+
+    view()->addLayoutDelta(IntSize(0, yPosEstimate - yAfterClear));
+    child->setLocation(child->x(), yAfterClear);
+
+    // Now we have a final y position.  See if it really does end up being
+    // different from our estimate.
+    if (yAfterClear != yPosEstimate) {
+      if (child->shrinkToAvoidFloats()) {
+        // The child's width depends on the line width.
+        // When the child shifts to clear an item, its width can
+        // change (because it has more available line width).
+        // So go ahead and mark the item as dirty.
+        child->setChildNeedsLayout(true, false);
+      }
+      if (!child->avoidsFloats() && child->isBlockFlow() &&
+          toRenderBlock(child)->containsFloats())
+        toRenderBlock(child)->markAllDescendantsWithFloatsForLayout();
+      // Our guess was wrong. Make the child lay itself out again.
+      child->layoutIfNeeded();
+    }
 
     // We are no longer at the top of the block if we encounter a non-empty
     // child.
@@ -3603,7 +3591,7 @@ void RenderBlock::markAllDescendantsWithFloatsForLayout(
   }
 }
 
-int RenderBlock::getClearDelta(RenderBox* child) {
+int RenderBlock::getClearDelta(RenderBox* child, int yPos) {
   // There is no need to compute clearance if we have no floats.
   if (!containsFloats())
     return 0;
@@ -3634,11 +3622,11 @@ int RenderBlock::getClearDelta(RenderBox* child) {
   // Do not allow tables to wrap in quirks or even in almost strict mode
   // (ebay on the PLT, finance.yahoo.com in the real world, versiontracker.com
   // forces even almost strict mode not to work)
-  int result = clearSet ? max(0, bottom - child->y()) : 0;
+  int result = clearSet ? max(0, bottom - yPos) : 0;
   if (!result && child->avoidsFloats() && child->style()->width().isFixed() &&
-      child->minPrefWidth() > lineWidth(child->y(), false) &&
+      child->minPrefWidth() > lineWidth(yPos, false) &&
       child->minPrefWidth() <= availableWidth() && document()->inStrictMode())
-    result = max(0, floatBottom() - child->y());
+    result = max(0, floatBottom() - yPos);
   return result;
 }
 
