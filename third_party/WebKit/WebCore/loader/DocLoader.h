@@ -102,10 +102,6 @@ class DocLoader {
     m_allowStaleResources = allowStaleResources;
   }
 
-#if USE(LOW_BANDWIDTH_DISPLAY)
-  void replaceDocument(Document* doc) { m_doc = doc; }
-#endif
-
   void incrementRequestCount();
   void decrementRequestCount();
   int requestCount();

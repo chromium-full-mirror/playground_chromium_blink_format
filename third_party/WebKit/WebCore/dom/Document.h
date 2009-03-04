@@ -362,11 +362,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
    * any @imports that they may be loading).
    */
   bool haveStylesheetsLoaded() const {
-    return m_pendingStylesheets <= 0 || m_ignorePendingStylesheets
-#if USE(LOW_BANDWIDTH_DISPLAY)
-           || m_inLowBandwidthDisplay
-#endif
-        ;
+    return m_pendingStylesheets <= 0 || m_ignorePendingStylesheets;
   }
 
   /**
@@ -898,14 +894,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void setUseSecureKeyboardEntryWhenActive(bool);
   bool useSecureKeyboardEntryWhenActive() const;
 
-#if USE(LOW_BANDWIDTH_DISPLAY)
-  void setDocLoader(DocLoader* loader) { m_docLoader = loader; }
-  bool inLowBandwidthDisplay() const { return m_inLowBandwidthDisplay; }
-  void setLowBandwidthDisplay(bool lowBandWidth) {
-    m_inLowBandwidthDisplay = lowBandWidth;
-  }
-#endif
-
   void addNodeListCache() { ++m_numNodeListCaches; }
   void removeNodeListCache() {
     ASSERT(m_numNodeListCaches > 0);
@@ -1294,10 +1282,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 #endif
 
   bool m_usingGeolocation;
-
-#if USE(LOW_BANDWIDTH_DISPLAY)
-  bool m_inLowBandwidthDisplay;
-#endif
 };
 
 inline bool Document::hasElementWithId(AtomicStringImpl* id) const {
