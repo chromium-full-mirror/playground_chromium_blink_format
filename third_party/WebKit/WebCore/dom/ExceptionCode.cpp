@@ -64,7 +64,8 @@ static const char* const rangeExceptionNames[] = {"BAD_BOUNDARYPOINTS_ERR",
 
 static const char* const eventExceptionNames[] = {"UNSPECIFIED_EVENT_TYPE_ERR"};
 
-static const char* const xmlHttpRequestExceptionNames[] = {"NETWORK_ERR"};
+static const char* const xmlHttpRequestExceptionNames[] = {"NETWORK_ERR",
+                                                           "ABORT_ERR"};
 
 #if ENABLE(XPATH)
 static const char* const xpathExceptionNames[] = {"INVALID_EXPRESSION_ERR",
