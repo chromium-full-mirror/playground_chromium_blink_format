@@ -25,19 +25,17 @@
  *
  */
 
-#ifndef RenderThemeChromiumGtk_h
-#define RenderThemeChromiumGtk_h
+#ifndef RenderThemeChromiumLinux_h
+#define RenderThemeChromiumLinux_h
 
 #include "RenderTheme.h"
 
-#include <gtk/gtk.h>
-
 namespace WebCore {
 
-class RenderThemeChromiumGtk : public RenderTheme {
+class RenderThemeChromiumLinux : public RenderTheme {
  public:
-  RenderThemeChromiumGtk();
-  ~RenderThemeChromiumGtk() {}
+  RenderThemeChromiumLinux();
+  ~RenderThemeChromiumLinux() {}
 
   virtual String extraDefaultStyleSheet();
   virtual String extraQuirksStyleSheet();
@@ -148,20 +146,7 @@ class RenderThemeChromiumGtk : public RenderTheme {
   virtual Color inactiveListBoxSelectionForegroundColor() const;
 
  private:
-  // Hold the state
-  GtkWidget* gtkEntry() const;
-  GtkWidget* gtkTreeView() const;
-
-  // Unmapped GdkWindow having a container. This is holding all our fake widgets
-  GtkContainer* gtkContainer() const;
-
- private:
   int menuListInternalPadding(RenderStyle*, int paddingType) const;
-
-  mutable GtkWidget* m_gtkWindow;
-  mutable GtkContainer* m_gtkContainer;
-  mutable GtkWidget* m_gtkEntry;
-  mutable GtkWidget* m_gtkTreeView;
 };
 
 }  // namespace WebCore
