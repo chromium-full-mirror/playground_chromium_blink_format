@@ -107,7 +107,7 @@ void Image::drawPattern(GraphicsContext* ctxt,
   }
 
   QBrush b(pixmap);
-  b.setMatrix(patternTransform);
+  b.setTransform(patternTransform);
   ctxt->save();
   ctxt->setCompositeOperation(op);
   QPainter* p = ctxt->platformContext();
