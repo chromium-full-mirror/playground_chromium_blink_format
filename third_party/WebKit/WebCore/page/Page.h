@@ -262,7 +262,7 @@ class Page : Noncopyable {
   OwnPtr<DragController> m_dragController;
   OwnPtr<FocusController> m_focusController;
   OwnPtr<ContextMenuController> m_contextMenuController;
-  OwnPtr<InspectorController> m_inspectorController;
+  RefPtr<InspectorController> m_inspectorController;
   OwnPtr<Settings> m_settings;
   OwnPtr<ProgressTracker> m_progress;
 
