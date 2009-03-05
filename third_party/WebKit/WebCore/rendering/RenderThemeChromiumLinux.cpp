@@ -364,19 +364,19 @@ int RenderThemeChromiumLinux::popupInternalPaddingBottom(
   return menuListInternalPadding(style, BottomPadding);
 }
 
-void RenderThemeChromiumLinux::buttonInternalPaddingLeft() const {
+int RenderThemeChromiumLinux::buttonInternalPaddingLeft() const {
   return 3;
 }
 
-void RenderThemeChromiumLinux::buttonInternalPaddingRight() const {
+int RenderThemeChromiumLinux::buttonInternalPaddingRight() const {
   return 3;
 }
 
-void RenderThemeChromiumLinux::buttonInternalPaddingTop() const {
+int RenderThemeChromiumLinux::buttonInternalPaddingTop() const {
   return 1;
 }
 
-void RenderThemeChromiumLinux::buttonInternalPaddingBottom() const {
+int RenderThemeChromiumLinux::buttonInternalPaddingBottom() const {
   return 1;
 }
 
