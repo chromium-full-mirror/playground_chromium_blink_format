@@ -311,9 +311,12 @@ namespace WTF {
 #define CHECK_CONDITION ASSERT
 
 #if PLATFORM(DARWIN)
+class Span;
+class TCMalloc_Central_FreeListPadded;
 class TCMalloc_PageHeap;
 class TCMalloc_ThreadCache;
-class TCMalloc_Central_FreeListPadded;
+template <typename T>
+class PageHeapAllocator;
 
 class FastMallocZone {
  public:
@@ -338,7 +341,9 @@ class FastMallocZone {
  private:
   FastMallocZone(TCMalloc_PageHeap*,
                  TCMalloc_ThreadCache**,
-                 TCMalloc_Central_FreeListPadded*);
+                 TCMalloc_Central_FreeListPadded*,
+                 PageHeapAllocator<Span>*,
+                 PageHeapAllocator<TCMalloc_ThreadCache>*);
   static size_t size(malloc_zone_t*, const void*);
   static void* zoneMalloc(malloc_zone_t*, size_t);
   static void* zoneCalloc(malloc_zone_t*, size_t numItems, size_t size);
@@ -354,6 +359,8 @@ class FastMallocZone {
   TCMalloc_PageHeap* m_pageHeap;
   TCMalloc_ThreadCache** m_threadHeaps;
   TCMalloc_Central_FreeListPadded* m_centralCaches;
+  PageHeapAllocator<Span>* m_spanAllocator;
+  PageHeapAllocator<TCMalloc_ThreadCache>* m_pageHeapAllocator;
 };
 
 #endif
@@ -828,6 +835,9 @@ class PageHeapAllocator {
   char* free_area_;
   size_t free_avail_;
 
+  // Linked list of all regions allocated by this allocator
+  void* allocated_regions_;
+
   // Free list of already carved objects
   void* free_list_;
 
@@ -838,6 +848,7 @@ class PageHeapAllocator {
   void Init() {
     ASSERT(kAlignedSize <= kAllocIncrement);
     inuse_ = 0;
+    allocated_regions_ = 0;
     free_area_ = NULL;
     free_avail_ = 0;
     free_list_ = NULL;
@@ -852,10 +863,15 @@ class PageHeapAllocator {
     } else {
       if (free_avail_ < kAlignedSize) {
         // Need more room
-        free_area_ = reinterpret_cast<char*>(MetaDataAlloc(kAllocIncrement));
-        if (free_area_ == NULL)
+        char* new_allocation =
+            reinterpret_cast<char*>(MetaDataAlloc(kAllocIncrement));
+        if (!new_allocation)
           CRASH();
-        free_avail_ = kAllocIncrement;
+
+        *(void**)new_allocation = allocated_regions_;
+        allocated_regions_ = new_allocation;
+        free_area_ = new_allocation + kAlignedSize;
+        free_avail_ = kAllocIncrement - kAlignedSize;
       }
       result = free_area_;
       free_area_ += kAlignedSize;
@@ -872,6 +888,20 @@ class PageHeapAllocator {
   }
 
   int inuse() const { return inuse_; }
+
+#if defined(WTF_CHANGES) && PLATFORM(DARWIN)
+  template <class Recorder>
+  void recordAdministrativeRegions(Recorder& recorder,
+                                   const RemoteMemoryReader& reader) {
+    vm_address_t adminAllocation =
+        reinterpret_cast<vm_address_t>(allocated_regions_);
+    while (adminAllocation) {
+      recorder.recordRegion(adminAllocation, kAllocIncrement);
+      adminAllocation =
+          *reader(reinterpret_cast<vm_address_t*>(adminAllocation));
+    }
+  }
+#endif
 };
 
 // -------------------------------------------------------------------------
@@ -3706,6 +3736,9 @@ class FreeObjectFinder {
 
   void visit(void* ptr) { m_freeObjects.add(ptr); }
   bool isFreeObject(void* ptr) const { return m_freeObjects.contains(ptr); }
+  bool isFreeObject(vm_address_t ptr) const {
+    return isFreeObject(reinterpret_cast<void*>(ptr));
+  }
   size_t freeObjectCount() const { return m_freeObjects.size(); }
 
   void findFreeObjects(TCMalloc_ThreadCache* threadCache) {
@@ -3758,7 +3791,9 @@ class PageMapMemoryUsageRecorder {
   vm_range_recorder_t* m_recorder;
   const RemoteMemoryReader& m_reader;
   const FreeObjectFinder& m_freeObjectFinder;
-  mutable HashSet<void*> m_seenPointers;
+
+  HashSet<void*> m_seenPointers;
+  Vector<Span*> m_coalescedSpans;
 
  public:
   PageMapMemoryUsageRecorder(task_t task,
@@ -3774,61 +3809,135 @@ class PageMapMemoryUsageRecorder {
         m_reader(reader),
         m_freeObjectFinder(freeObjectFinder) {}
 
-  int visit(void* ptr) const {
-    if (!ptr)
-      return 1;
+  ~PageMapMemoryUsageRecorder() { ASSERT(!m_coalescedSpans.size()); }
 
-    Span* span = m_reader(reinterpret_cast<Span*>(ptr));
-    if (m_seenPointers.contains(ptr))
-      return span->length;
-    m_seenPointers.add(ptr);
+  void recordPendingRegions() {
+    Span* lastSpan = m_coalescedSpans[m_coalescedSpans.size() - 1];
+    vm_range_t ptrRange = {m_coalescedSpans[0]->start << kPageShift, 0};
+    ptrRange.size = (lastSpan->start << kPageShift) - ptrRange.address +
+                    (lastSpan->length * kPageSize);
 
-    // Mark the memory used for the Span itself as an administrative region
-    vm_range_t ptrRange = {reinterpret_cast<vm_address_t>(ptr), sizeof(Span)};
-    if (m_typeMask &
-        (MALLOC_PTR_REGION_RANGE_TYPE | MALLOC_ADMIN_REGION_RANGE_TYPE))
-      (*m_recorder)(m_task, m_context, MALLOC_ADMIN_REGION_RANGE_TYPE,
-                    &ptrRange, 1);
-
-    ptrRange.address = span->start << kPageShift;
-    ptrRange.size = span->length * kPageSize;
-
-    // Mark the memory region the span represents as candidates for containing
+    // Mark the memory region the spans represent as a candidate for containing
     // pointers
-    if (m_typeMask &
-        (MALLOC_PTR_REGION_RANGE_TYPE | MALLOC_ADMIN_REGION_RANGE_TYPE))
+    if (m_typeMask & MALLOC_PTR_REGION_RANGE_TYPE)
       (*m_recorder)(m_task, m_context, MALLOC_PTR_REGION_RANGE_TYPE, &ptrRange,
                     1);
 
-    if (!span->free && (m_typeMask & MALLOC_PTR_IN_USE_RANGE_TYPE)) {
-      // If it's an allocated large object span, mark it as in use
-      if (span->sizeclass == 0 &&
-          !m_freeObjectFinder.isFreeObject(
-              reinterpret_cast<void*>(ptrRange.address)))
-        (*m_recorder)(m_task, m_context, MALLOC_PTR_IN_USE_RANGE_TYPE,
-                      &ptrRange, 1);
-      else if (span->sizeclass) {
-        const size_t byteSize = ByteSizeForClass(span->sizeclass);
-        unsigned totalObjects = (span->length << kPageShift) / byteSize;
-        ASSERT(span->refcount <= totalObjects);
-        char* ptr = reinterpret_cast<char*>(span->start << kPageShift);
+    if (!(m_typeMask & MALLOC_PTR_IN_USE_RANGE_TYPE)) {
+      m_coalescedSpans.clear();
+      return;
+    }
+
+    Vector<vm_range_t, 1024> allocatedPointers;
+    for (size_t i = 0; i < m_coalescedSpans.size(); ++i) {
+      Span* theSpan = m_coalescedSpans[i];
+      if (theSpan->free)
+        continue;
+
+      vm_address_t spanStartAddress = theSpan->start << kPageShift;
+      vm_size_t spanSizeInBytes = theSpan->length * kPageSize;
+
+      if (!theSpan->sizeclass) {
+        // If it's an allocated large object span, mark it as in use
+        if (!m_freeObjectFinder.isFreeObject(spanStartAddress))
+          allocatedPointers.append(
+              (vm_range_t){spanStartAddress, spanSizeInBytes});
+      } else {
+        const size_t objectSize = ByteSizeForClass(theSpan->sizeclass);
 
         // Mark each allocated small object within the span as in use
-        for (unsigned i = 0; i < totalObjects; i++) {
-          char* thisObject = ptr + (i * byteSize);
-          if (m_freeObjectFinder.isFreeObject(thisObject))
-            continue;
-
-          vm_range_t objectRange = {reinterpret_cast<vm_address_t>(thisObject),
-                                    byteSize};
-          (*m_recorder)(m_task, m_context, MALLOC_PTR_IN_USE_RANGE_TYPE,
-                        &objectRange, 1);
+        const vm_address_t endOfSpan = spanStartAddress + spanSizeInBytes;
+        for (vm_address_t object = spanStartAddress;
+             object + objectSize <= endOfSpan; object += objectSize) {
+          if (!m_freeObjectFinder.isFreeObject(object))
+            allocatedPointers.append((vm_range_t){object, objectSize});
         }
       }
     }
 
+    (*m_recorder)(m_task, m_context, MALLOC_PTR_IN_USE_RANGE_TYPE,
+                  allocatedPointers.data(), allocatedPointers.size());
+
+    m_coalescedSpans.clear();
+  }
+
+  int visit(void* ptr) {
+    if (!ptr)
+      return 1;
+
+    Span* span = m_reader(reinterpret_cast<Span*>(ptr));
+    if (!span->start)
+      return 1;
+
+    if (m_seenPointers.contains(ptr))
+      return span->length;
+    m_seenPointers.add(ptr);
+
+    if (!m_coalescedSpans.size()) {
+      m_coalescedSpans.append(span);
+      return span->length;
+    }
+
+    Span* previousSpan = m_coalescedSpans[m_coalescedSpans.size() - 1];
+    vm_address_t previousSpanStartAddress = previousSpan->start << kPageShift;
+    vm_size_t previousSpanSizeInBytes = previousSpan->length * kPageSize;
+
+    // If the new span is adjacent to the previous span, do nothing for now.
+    vm_address_t spanStartAddress = span->start << kPageShift;
+    if (spanStartAddress ==
+        previousSpanStartAddress + previousSpanSizeInBytes) {
+      m_coalescedSpans.append(span);
+      return span->length;
+    }
+
+    // New span is not adjacent to previous span, so record the spans coalesced
+    // so far.
+    recordPendingRegions();
+    m_coalescedSpans.append(span);
+
     return span->length;
   }
+};
+
+class AdminRegionRecorder {
+  task_t m_task;
+  void* m_context;
+  unsigned m_typeMask;
+  vm_range_recorder_t* m_recorder;
+  const RemoteMemoryReader& m_reader;
+
+  Vector<vm_range_t, 1024> m_pendingRegions;
+
+ public:
+  AdminRegionRecorder(task_t task,
+                      void* context,
+                      unsigned typeMask,
+                      vm_range_recorder_t* recorder,
+                      const RemoteMemoryReader& reader)
+      : m_task(task),
+        m_context(context),
+        m_typeMask(typeMask),
+        m_recorder(recorder),
+        m_reader(reader) {}
+
+  void recordRegion(vm_address_t ptr, size_t size) {
+    if (m_typeMask & MALLOC_ADMIN_REGION_RANGE_TYPE)
+      m_pendingRegions.append((vm_range_t){ptr, size});
+  }
+
+  void visit(void* ptr, size_t size) {
+    recordRegion(reinterpret_cast<vm_address_t>(ptr), size);
+  }
+
+  void recordPendingRegions() {
+    if (m_pendingRegions.size()) {
+      (*m_recorder)(m_task, m_context, MALLOC_ADMIN_REGION_RANGE_TYPE,
+                    m_pendingRegions.data(), m_pendingRegions.size());
+      m_pendingRegions.clear();
+    }
+  }
+
+  ~AdminRegionRecorder() { ASSERT(!m_pendingRegions.size()); }
 };
 
 kern_return_t FastMallocZone::enumerate(task_t task,
@@ -3858,11 +3967,26 @@ kern_return_t FastMallocZone::enumerate(task_t task,
 
   TCMalloc_PageHeap::PageMap* pageMap = &pageHeap->pagemap_;
   PageMapFreeObjectFinder pageMapFinder(memoryReader, finder);
-  pageMap->visit(pageMapFinder, memoryReader);
+  pageMap->visitValues(pageMapFinder, memoryReader);
 
   PageMapMemoryUsageRecorder usageRecorder(task, context, typeMask, recorder,
                                            memoryReader, finder);
-  pageMap->visit(usageRecorder, memoryReader);
+  pageMap->visitValues(usageRecorder, memoryReader);
+  usageRecorder.recordPendingRegions();
+
+  AdminRegionRecorder adminRegionRecorder(task, context, typeMask, recorder,
+                                          memoryReader);
+  pageMap->visitAllocations(adminRegionRecorder, memoryReader);
+
+  PageHeapAllocator<Span>* spanAllocator = memoryReader(mzone->m_spanAllocator);
+  PageHeapAllocator<TCMalloc_ThreadCache>* pageHeapAllocator =
+      memoryReader(mzone->m_pageHeapAllocator);
+
+  spanAllocator->recordAdministrativeRegions(adminRegionRecorder, memoryReader);
+  pageHeapAllocator->recordAdministrativeRegions(adminRegionRecorder,
+                                                 memoryReader);
+
+  adminRegionRecorder.recordPendingRegions();
 
   return 0;
 }
@@ -3918,12 +4042,17 @@ malloc_introspection_t jscore_fastmalloc_introspection = {
 };
 }
 
-FastMallocZone::FastMallocZone(TCMalloc_PageHeap* pageHeap,
-                               TCMalloc_ThreadCache** threadHeaps,
-                               TCMalloc_Central_FreeListPadded* centralCaches)
+FastMallocZone::FastMallocZone(
+    TCMalloc_PageHeap* pageHeap,
+    TCMalloc_ThreadCache** threadHeaps,
+    TCMalloc_Central_FreeListPadded* centralCaches,
+    PageHeapAllocator<Span>* spanAllocator,
+    PageHeapAllocator<TCMalloc_ThreadCache>* pageHeapAllocator)
     : m_pageHeap(pageHeap),
       m_threadHeaps(threadHeaps),
-      m_centralCaches(centralCaches) {
+      m_centralCaches(centralCaches),
+      m_spanAllocator(spanAllocator),
+      m_pageHeapAllocator(pageHeapAllocator) {
   memset(&m_zone, 0, sizeof(m_zone));
   m_zone.version = 4;
   m_zone.zone_name = "JavaScriptCore FastMalloc";
@@ -3941,7 +4070,8 @@ FastMallocZone::FastMallocZone(TCMalloc_PageHeap* pageHeap,
 void FastMallocZone::init() {
   static FastMallocZone zone(
       pageheap, &thread_heaps,
-      static_cast<TCMalloc_Central_FreeListPadded*>(central_cache));
+      static_cast<TCMalloc_Central_FreeListPadded*>(central_cache),
+      &span_allocator, &threadheap_allocator);
 }
 
 #endif
