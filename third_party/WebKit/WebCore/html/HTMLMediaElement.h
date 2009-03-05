@@ -89,7 +89,6 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
     LOADED
   };
   NetworkState networkState() const;
-  float bufferingRate();
   PassRefPtr<TimeRanges> buffered() const;
   void load(ExceptionCode&);
 
@@ -252,8 +251,6 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   unsigned m_previousProgress;
   double m_previousProgressTime;
   bool m_sentStalledEvent;
-
-  float m_bufferingRate;
 
   unsigned m_loadNestingLevel;
   unsigned m_terminateLoadBelowNestingLevel;
