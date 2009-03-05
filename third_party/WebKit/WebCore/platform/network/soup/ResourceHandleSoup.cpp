@@ -47,7 +47,6 @@
 #include <gio/gio.h>
 #include <gtk/gtk.h>
 #include <libsoup/soup.h>
-#include <libsoup/soup-message.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -85,7 +84,7 @@ WebCoreSynchronousLoader::WebCoreSynchronousLoader(ResourceError& error,
                                                    ResourceResponse& response,
                                                    Vector<char>& data)
     : m_error(error), m_response(response), m_data(data), m_finished(false) {
-  m_mainLoop = g_main_loop_new(NULL, false);
+  m_mainLoop = g_main_loop_new(0, false);
 }
 
 WebCoreSynchronousLoader::~WebCoreSynchronousLoader() {
@@ -161,15 +160,15 @@ ResourceHandle::~ResourceHandle() {}
 static void fillResponseFromMessage(SoupMessage* msg,
                                     ResourceResponse* response) {
   SoupMessageHeadersIter iter;
-  const char* name = NULL;
-  const char* value = NULL;
+  const char* name = 0;
+  const char* value = 0;
   soup_message_headers_iter_init(&iter, msg->response_headers);
   while (soup_message_headers_iter_next(&iter, &name, &value))
     response->setHTTPHeaderField(name, value);
 
   String contentType =
       soup_message_headers_get(msg->response_headers, "Content-Type");
-  char* uri = soup_uri_to_string(soup_message_get_uri(msg), FALSE);
+  char* uri = soup_uri_to_string(soup_message_get_uri(msg), false);
   response->setUrl(KURL(uri));
   g_free(uri);
   response->setMimeType(extractMIMETypeFromMediaType(contentType));
@@ -192,7 +191,7 @@ static void restartedCallback(SoupMessage* msg, gpointer data) {
   if (d->m_cancelled)
     return;
 
-  char* uri = soup_uri_to_string(soup_message_get_uri(msg), FALSE);
+  char* uri = soup_uri_to_string(soup_message_get_uri(msg), false);
   String location = String(uri);
   g_free(uri);
   KURL newURL = KURL(handle->request().url(), location);
@@ -266,13 +265,15 @@ static void finishedCallback(SoupSession* session,
     return;
 
   if (SOUP_STATUS_IS_TRANSPORT_ERROR(msg->status_code)) {
-    char* uri = soup_uri_to_string(soup_message_get_uri(msg), FALSE);
+    char* uri = soup_uri_to_string(soup_message_get_uri(msg), false);
     ResourceError error("webkit-network-error", ERROR_TRANSPORT, uri,
                         String::fromUTF8(msg->reason_phrase));
     g_free(uri);
     client->didFail(handle.get(), error);
     return;
-  } else if (!SOUP_STATUS_IS_SUCCESSFUL(msg->status_code)) {
+  }
+
+  if (!SOUP_STATUS_IS_SUCCESSFUL(msg->status_code)) {
     fillResponseFromMessage(msg, &d->m_response);
     client->didReceiveResponse(handle.get(), d->m_response);
 
@@ -297,7 +298,7 @@ static gboolean parseDataUrl(gpointer callback_data) {
 
   ASSERT(client);
   if (!client)
-    return FALSE;
+    return false;
 
   String url = handle->request().url().string();
   ASSERT(url.startsWith("data:", false));
@@ -305,14 +306,14 @@ static gboolean parseDataUrl(gpointer callback_data) {
   int index = url.find(',');
   if (index == -1) {
     client->cannotShowURL(handle);
-    return FALSE;
+    return false;
   }
 
   String mediaType = url.substring(5, index - 5);
   String data = url.substring(index + 1);
 
-  bool base64 = mediaType.endsWith(";base64", false);
-  if (base64)
+  bool isBase64 = mediaType.endsWith(";base64", false);
+  if (isBase64)
     mediaType = mediaType.left(mediaType.length() - 7);
 
   if (mediaType.isEmpty())
@@ -324,7 +325,7 @@ static gboolean parseDataUrl(gpointer callback_data) {
   ResourceResponse response;
   response.setMimeType(mimeType);
 
-  if (base64) {
+  if (isBase64) {
     data = decodeURLEscapeSequences(data);
     response.setTextEncodingName(charset);
     client->didReceiveResponse(handle, response);
@@ -358,7 +359,7 @@ static gboolean parseDataUrl(gpointer callback_data) {
 
   client->didFinishLoading(handle);
 
-  return FALSE;
+  return false;
 }
 
 bool ResourceHandle::startData(String urlString) {
@@ -387,9 +388,9 @@ static void ensureSessionIsInitialized(SoupSession* session) {
   else
     setDefaultCookieJar(jar);
 
-  const char* webkit_debug = g_getenv("WEBKIT_DEBUG");
-  if (!soup_session_get_feature(session, SOUP_TYPE_LOGGER) && webkit_debug &&
-      !strcmp(webkit_debug, "network")) {
+  const char* webkitDebug = g_getenv("WEBKIT_DEBUG");
+  if (!soup_session_get_feature(session, SOUP_TYPE_LOGGER) && webkitDebug &&
+      !strcmp(webkitDebug, "network")) {
     SoupLogger* logger = soup_logger_new(
         static_cast<SoupLoggerLogLevel>(SOUP_LOGGER_LOG_BODY), -1);
     soup_logger_attach(logger, session);
@@ -478,7 +479,7 @@ bool ResourceHandle::startHttp(String urlString) {
           FileMapping* fileMapping = g_slice_new(FileMapping);
 
           fileMapping->ptr =
-              mmap(NULL, statBuf.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+              mmap(0, statBuf.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
           if (fileMapping->ptr == MAP_FAILED) {
             ResourceError error("webkit-network-error",
                                 ERROR_UNABLE_TO_OPEN_FILE, urlString,
@@ -518,7 +519,7 @@ static gboolean reportUnknownProtocolError(gpointer callback_data) {
 
   if (d->m_cancelled || !client) {
     handle->deref();
-    return FALSE;
+    return false;
   }
 
   KURL url = handle->request().url();
@@ -527,7 +528,7 @@ static gboolean reportUnknownProtocolError(gpointer callback_data) {
   client->didFail(handle, error);
 
   handle->deref();
-  return FALSE;
+  return false;
 }
 
 bool ResourceHandle::start(Frame* frame) {
@@ -549,23 +550,23 @@ bool ResourceHandle::start(Frame* frame) {
 
   if (equalIgnoringCase(protocol, "data"))
     return startData(urlString);
-  else if ((equalIgnoringCase(protocol, "http") ||
-            equalIgnoringCase(protocol, "https")) &&
-           SOUP_URI_VALID_FOR_HTTP(soup_uri_new(urlString.utf8().data())))
+
+  if ((equalIgnoringCase(protocol, "http") ||
+       equalIgnoringCase(protocol, "https")) &&
+      SOUP_URI_VALID_FOR_HTTP(soup_uri_new(urlString.utf8().data())))
     return startHttp(urlString);
-  else if (equalIgnoringCase(protocol, "file") ||
-           equalIgnoringCase(protocol, "ftp") ||
-           equalIgnoringCase(protocol, "ftps"))
+
+  if (equalIgnoringCase(protocol, "file") ||
+      equalIgnoringCase(protocol, "ftp") || equalIgnoringCase(protocol, "ftps"))
     // FIXME: should we be doing any other protocols here?
     return startGio(url);
-  else {
-    // Error must not be reported immediately, but through an idle function.
-    // Despite error, we should return true so a proper handle is created,
-    // to which this failure can be reported.
-    ref();
-    d->m_idleHandler = g_idle_add(reportUnknownProtocolError, this);
-    return true;
-  }
+
+  // Error must not be reported immediately, but through an idle function.
+  // Despite error, we should return true so a proper handle is created,
+  // to which this failure can be reported.
+  ref();
+  d->m_idleHandler = g_idle_add(reportUnknownProtocolError, this);
+  return true;
 }
 
 void ResourceHandle::cancel() {
@@ -639,20 +640,23 @@ static void cleanupGioOperation(ResourceHandleInternal* d) {
   if (d->m_gfile) {
     g_object_set_data(G_OBJECT(d->m_gfile), "webkit-resource", 0);
     g_object_unref(d->m_gfile);
-    d->m_gfile = NULL;
+    d->m_gfile = 0;
   }
+
   if (d->m_cancellable) {
     g_object_unref(d->m_cancellable);
-    d->m_cancellable = NULL;
+    d->m_cancellable = 0;
   }
-  if (d->m_input_stream) {
-    g_object_set_data(G_OBJECT(d->m_input_stream), "webkit-resource", 0);
-    g_object_unref(d->m_input_stream);
-    d->m_input_stream = NULL;
+
+  if (d->m_inputStream) {
+    g_object_set_data(G_OBJECT(d->m_inputStream), "webkit-resource", 0);
+    g_object_unref(d->m_inputStream);
+    d->m_inputStream = 0;
   }
+
   if (d->m_buffer) {
     g_free(d->m_buffer);
-    d->m_buffer = NULL;
+    d->m_buffer = 0;
   }
 }
 
@@ -665,7 +669,7 @@ static void closeCallback(GObject* source, GAsyncResult* res, gpointer) {
   ResourceHandleInternal* d = handle->getInternal();
   ResourceHandleClient* client = handle->client();
 
-  g_input_stream_close_finish(d->m_input_stream, res, NULL);
+  g_input_stream_close_finish(d->m_inputStream, res, 0);
   cleanupGioOperation(d);
   client->didFinishLoading(handle);
 }
@@ -685,33 +689,34 @@ static void readCallback(GObject* source, GAsyncResult* res, gpointer) {
     return;
   }
 
-  gssize nread;
   GError* error = 0;
 
-  nread = g_input_stream_read_finish(d->m_input_stream, res, &error);
+  gssize bytesRead = g_input_stream_read_finish(d->m_inputStream, res, &error);
   if (error) {
     ResourceError resourceError = networkErrorForFile(d->m_gfile, error);
     g_error_free(error);
     cleanupGioOperation(d);
     client->didFail(handle.get(), resourceError);
     return;
-  } else if (!nread) {
-    g_input_stream_close_async(d->m_input_stream, G_PRIORITY_DEFAULT, NULL,
-                               closeCallback, NULL);
+  }
+
+  if (!bytesRead) {
+    g_input_stream_close_async(d->m_inputStream, G_PRIORITY_DEFAULT, 0,
+                               closeCallback, 0);
     return;
   }
 
-  d->m_total += nread;
-  client->didReceiveData(handle.get(), d->m_buffer, nread, d->m_total);
+  d->m_total += bytesRead;
+  client->didReceiveData(handle.get(), d->m_buffer, bytesRead, d->m_total);
 
   if (d->m_cancelled) {
     cleanupGioOperation(d);
     return;
   }
 
-  g_input_stream_read_async(d->m_input_stream, d->m_buffer, d->m_bufsize,
+  g_input_stream_read_async(d->m_inputStream, d->m_buffer, d->m_bufferSize,
                             G_PRIORITY_DEFAULT, d->m_cancellable, readCallback,
-                            NULL);
+                            0);
 }
 
 static void openCallback(GObject* source, GAsyncResult* res, gpointer) {
@@ -728,9 +733,8 @@ static void openCallback(GObject* source, GAsyncResult* res, gpointer) {
     return;
   }
 
-  GFileInputStream* in;
-  GError* error = NULL;
-  in = g_file_read_finish(G_FILE(source), res, &error);
+  GError* error = 0;
+  GFileInputStream* in = g_file_read_finish(G_FILE(source), res, &error);
   if (error) {
     ResourceError resourceError = networkErrorForFile(d->m_gfile, error);
     g_error_free(error);
@@ -739,14 +743,14 @@ static void openCallback(GObject* source, GAsyncResult* res, gpointer) {
     return;
   }
 
-  d->m_input_stream = G_INPUT_STREAM(in);
-  d->m_bufsize = 8192;
-  d->m_buffer = static_cast<char*>(g_malloc(d->m_bufsize));
+  d->m_inputStream = G_INPUT_STREAM(in);
+  d->m_bufferSize = 8192;
+  d->m_buffer = static_cast<char*>(g_malloc(d->m_bufferSize));
   d->m_total = 0;
-  g_object_set_data(G_OBJECT(d->m_input_stream), "webkit-resource", handle);
-  g_input_stream_read_async(d->m_input_stream, d->m_buffer, d->m_bufsize,
+  g_object_set_data(G_OBJECT(d->m_inputStream), "webkit-resource", handle);
+  g_input_stream_read_async(d->m_inputStream, d->m_buffer, d->m_bufferSize,
                             G_PRIORITY_DEFAULT, d->m_cancellable, readCallback,
-                            NULL);
+                            0);
 }
 
 static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
@@ -769,7 +773,7 @@ static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
   response.setUrl(KURL(uri));
   g_free(uri);
 
-  GError* error = NULL;
+  GError* error = 0;
   GFileInfo* info = g_file_query_info_finish(d->m_gfile, res, &error);
 
   if (error) {
@@ -807,7 +811,7 @@ static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
   client->didReceiveResponse(handle, response);
 
   g_file_read_async(d->m_gfile, G_PRIORITY_DEFAULT, d->m_cancellable,
-                    openCallback, NULL);
+                    openCallback, 0);
 }
 
 bool ResourceHandle::startGio(KURL url) {
@@ -839,7 +843,7 @@ bool ResourceHandle::startGio(KURL url) {
                           "," G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE
                           "," G_FILE_ATTRIBUTE_STANDARD_SIZE,
                           G_FILE_QUERY_INFO_NONE, G_PRIORITY_DEFAULT,
-                          d->m_cancellable, queryInfoCallback, NULL);
+                          d->m_cancellable, queryInfoCallback, 0);
   return true;
 }
 
