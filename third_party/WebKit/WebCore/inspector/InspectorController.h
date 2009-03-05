@@ -162,7 +162,12 @@ class InspectorController : public RefCounted<InspectorController>
     } m_simpleContent;
   };
 
-  InspectorController(Page*, InspectorClient*);
+  static PassRefPtr<InspectorController> create(
+      Page* page,
+      InspectorClient* inspectorClient) {
+    return adoptRef(new InspectorController(page, inspectorClient));
+  }
+
   ~InspectorController();
 
   void inspectedPageDestroyed();
@@ -319,6 +324,7 @@ class InspectorController : public RefCounted<InspectorController>
   const String& platform() const;
 
  private:
+  InspectorController(Page*, InspectorClient*);
   void focusNode();
 
   void addConsoleMessage(JSC::ExecState*, ConsoleMessage*);
