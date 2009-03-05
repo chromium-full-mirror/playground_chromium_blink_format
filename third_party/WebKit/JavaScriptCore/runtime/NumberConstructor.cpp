@@ -88,33 +88,33 @@ bool NumberConstructor::getOwnPropertySlot(ExecState* exec,
       exec, ExecState::numberTable(exec), this, propertyName, slot);
 }
 
-JSValuePtr numberConstructorNaNValue(ExecState* exec,
-                                     const Identifier&,
-                                     const PropertySlot&) {
+static JSValuePtr numberConstructorNaNValue(ExecState* exec,
+                                            const Identifier&,
+                                            const PropertySlot&) {
   return jsNaN(exec);
 }
 
-JSValuePtr numberConstructorNegInfinity(ExecState* exec,
-                                        const Identifier&,
-                                        const PropertySlot&) {
+static JSValuePtr numberConstructorNegInfinity(ExecState* exec,
+                                               const Identifier&,
+                                               const PropertySlot&) {
   return jsNumber(exec, -Inf);
 }
 
-JSValuePtr numberConstructorPosInfinity(ExecState* exec,
-                                        const Identifier&,
-                                        const PropertySlot&) {
+static JSValuePtr numberConstructorPosInfinity(ExecState* exec,
+                                               const Identifier&,
+                                               const PropertySlot&) {
   return jsNumber(exec, Inf);
 }
 
-JSValuePtr numberConstructorMaxValue(ExecState* exec,
-                                     const Identifier&,
-                                     const PropertySlot&) {
+static JSValuePtr numberConstructorMaxValue(ExecState* exec,
+                                            const Identifier&,
+                                            const PropertySlot&) {
   return jsNumber(exec, 1.7976931348623157E+308);
 }
 
-JSValuePtr numberConstructorMinValue(ExecState* exec,
-                                     const Identifier&,
-                                     const PropertySlot&) {
+static JSValuePtr numberConstructorMinValue(ExecState* exec,
+                                            const Identifier&,
+                                            const PropertySlot&) {
   return jsNumber(exec, 5E-324);
 }
 
