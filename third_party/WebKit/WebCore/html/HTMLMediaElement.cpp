@@ -76,7 +76,6 @@ HTMLMediaElement::HTMLMediaElement(const QualifiedName& tagName, Document* doc)
       m_begun(false),
       m_loadedFirstFrame(false),
       m_autoplaying(true),
-      m_currentLoop(0),
       m_volume(1.0f),
       m_muted(false),
       m_paused(true),
@@ -355,7 +354,6 @@ void HTMLMediaElement::loadInternal(ExceptionCode& ec) {
       m_player->pause();
       m_player->seek(0);
     }
-    m_currentLoop = 0;
     dispatchEventForType(eventNames().emptiedEvent, false, true);
     if (m_loadNestingLevel < m_terminateLoadBelowNestingLevel)
       goto end;
@@ -458,7 +456,6 @@ void HTMLMediaElement::setNetworkState(MediaPlayer::NetworkState state) {
 
   if (state >= MediaPlayer::LoadedMetaData &&
       m_networkState < LOADED_METADATA) {
-    m_player->seek(effectiveStart());
     m_networkState = LOADED_METADATA;
 
     dispatchEventForType(eventNames().durationchangeEvent, false, true);
@@ -583,22 +580,8 @@ void HTMLMediaElement::seek(float time, ExceptionCode& ec) {
     return;
   }
 
-  // 2
-  float minTime;
-  if (currentLoop() == 0)
-    minTime = effectiveStart();
-  else
-    minTime = effectiveLoopStart();
-
-  // 3
-  float maxTime =
-      currentLoop() == playCount() - 1 ? effectiveEnd() : effectiveLoopEnd();
-
-  // 4
-  time = min(time, maxTime);
-
-  // 5
-  time = max(time, minTime);
+  time = min(time, duration());
+  time = max(time, 0.0f);
 
   // 6
   RefPtr<TimeRanges> seekableRanges = seekable();
@@ -621,10 +604,8 @@ void HTMLMediaElement::seek(float time, ExceptionCode& ec) {
   // the new playback position is available,
   // and, if it is, decoded enough data to play back that position, the seeking
   // DOM attribute must be set to false.
-  if (m_player) {
-    m_player->setEndTime(maxTime);
+  if (m_player)
     m_player->seek(time);
-  }
 }
 
 HTMLMediaElement::ReadyState HTMLMediaElement::readyState() const {
@@ -718,8 +699,7 @@ void HTMLMediaElement::playInternal(ExceptionCode& ec) {
   }
   ExceptionCode unused;
   if (endedPlayback()) {
-    m_currentLoop = 0;
-    seek(effectiveStart(), unused);
+    seek(0, unused);
   }
   setPlaybackRate(defaultPlaybackRate(), unused);
 
@@ -763,64 +743,12 @@ void HTMLMediaElement::pauseInternal(ExceptionCode& ec) {
   updatePlayState();
 }
 
-unsigned HTMLMediaElement::playCount() const {
-  bool ok;
-  unsigned count = getAttribute(playcountAttr).string().toUInt(&ok);
-  return (count > 0 && ok) ? count : 1;
+bool HTMLMediaElement::loop() const {
+  return hasAttribute(loopAttr);
 }
 
-void HTMLMediaElement::setPlayCount(unsigned count, ExceptionCode& ec) {
-  if (!count) {
-    ec = INDEX_SIZE_ERR;
-    return;
-  }
-  setAttribute(playcountAttr, String::number(count));
-  checkIfSeekNeeded();
-}
-
-float HTMLMediaElement::start() const {
-  return getTimeOffsetAttribute(startAttr, 0);
-}
-
-void HTMLMediaElement::setStart(float time) {
-  setTimeOffsetAttribute(startAttr, time);
-  checkIfSeekNeeded();
-}
-
-float HTMLMediaElement::end() const {
-  return getTimeOffsetAttribute(endAttr,
-                                std::numeric_limits<float>::infinity());
-}
-
-void HTMLMediaElement::setEnd(float time) {
-  setTimeOffsetAttribute(endAttr, time);
-  checkIfSeekNeeded();
-}
-
-float HTMLMediaElement::loopStart() const {
-  return getTimeOffsetAttribute(loopstartAttr, start());
-}
-
-void HTMLMediaElement::setLoopStart(float time) {
-  setTimeOffsetAttribute(loopstartAttr, time);
-  checkIfSeekNeeded();
-}
-
-float HTMLMediaElement::loopEnd() const {
-  return getTimeOffsetAttribute(loopendAttr, end());
-}
-
-void HTMLMediaElement::setLoopEnd(float time) {
-  setTimeOffsetAttribute(loopendAttr, time);
-  checkIfSeekNeeded();
-}
-
-unsigned HTMLMediaElement::currentLoop() const {
-  return m_currentLoop;
-}
-
-void HTMLMediaElement::setCurrentLoop(unsigned currentLoop) {
-  m_currentLoop = currentLoop;
+void HTMLMediaElement::setLoop(bool b) {
+  setBooleanAttribute(loopAttr, b);
 }
 
 bool HTMLMediaElement::controls() const {
@@ -943,39 +871,6 @@ String HTMLMediaElement::selectMediaURL(ContentType& contentType) {
   return mediaSrc;
 }
 
-void HTMLMediaElement::checkIfSeekNeeded() {
-  // 3.14.9.5. Offsets into the media resource
-  // 1
-  if (playCount() <= m_currentLoop)
-    m_currentLoop = playCount() - 1;
-
-  // 2
-  if (networkState() <= LOADING)
-    return;
-
-  // 3
-  ExceptionCode ec;
-  float time = currentTime();
-  if (!m_currentLoop && time < effectiveStart())
-    seek(effectiveStart(), ec);
-
-  // 4
-  if (m_currentLoop && time < effectiveLoopStart())
-    seek(effectiveLoopStart(), ec);
-
-  // 5
-  if (m_currentLoop < playCount() - 1 && time > effectiveLoopEnd()) {
-    seek(effectiveLoopStart(), ec);
-    m_currentLoop++;
-  }
-
-  // 6
-  if (m_currentLoop == playCount() - 1 && time > effectiveEnd())
-    seek(effectiveEnd(), ec);
-
-  updatePlayState();
-}
-
 void HTMLMediaElement::mediaPlayerTimeChanged(MediaPlayer*) {
   beginProcessingMediaPlayerCallback();
 
@@ -983,16 +878,15 @@ void HTMLMediaElement::mediaPlayerTimeChanged(MediaPlayer*) {
     m_seeking = false;
 
   float now = currentTime();
-  if (m_currentLoop < playCount() - 1 && now >= effectiveLoopEnd()) {
-    ExceptionCode ec;
-    seek(effectiveLoopStart(), ec);
-    m_currentLoop++;
-    dispatchEventForType(eventNames().timeupdateEvent, false, true);
-  }
-
-  if (m_currentLoop == playCount() - 1 && now >= effectiveEnd()) {
-    dispatchEventForType(eventNames().timeupdateEvent, false, true);
-    dispatchEventForType(eventNames().endedEvent, false, true);
+  if (now >= duration()) {
+    if (loop()) {
+      ExceptionCode ec;
+      seek(0, ec);
+      dispatchEventForType(eventNames().timeupdateEvent, false, true);
+    } else {
+      dispatchEventForType(eventNames().timeupdateEvent, false, true);
+      dispatchEventForType(eventNames().endedEvent, false, true);
+    }
   }
 
   updatePlayState();
@@ -1032,30 +926,6 @@ PassRefPtr<TimeRanges> HTMLMediaElement::seekable() const {
   return TimeRanges::create(0, m_player->maxTimeSeekable());
 }
 
-float HTMLMediaElement::effectiveStart() const {
-  if (!m_player)
-    return 0;
-  return min(start(), m_player->duration());
-}
-
-float HTMLMediaElement::effectiveEnd() const {
-  if (!m_player)
-    return 0;
-  return min(max(end(), max(start(), loopStart())), m_player->duration());
-}
-
-float HTMLMediaElement::effectiveLoopStart() const {
-  if (!m_player)
-    return 0;
-  return min(loopStart(), m_player->duration());
-}
-
-float HTMLMediaElement::effectiveLoopEnd() const {
-  if (!m_player)
-    return 0;
-  return min(max(start(), max(loopStart(), loopEnd())), m_player->duration());
-}
-
 bool HTMLMediaElement::activelyPlaying() const {
   return !paused() && readyState() >= CAN_PLAY &&
          !endedPlayback();  // && !stoppedDueToErrors() &&
@@ -1063,8 +933,8 @@ bool HTMLMediaElement::activelyPlaying() const {
 }
 
 bool HTMLMediaElement::endedPlayback() const {
-  return networkState() >= LOADED_METADATA && currentTime() >= effectiveEnd() &&
-         currentLoop() == playCount() - 1;
+  return networkState() >= LOADED_METADATA && currentTime() >= duration() &&
+         !loop();
 }
 
 void HTMLMediaElement::updateVolume() {
@@ -1093,10 +963,7 @@ void HTMLMediaElement::updatePlayState() {
     return;
   }
 
-  m_player->setEndTime(currentLoop() == playCount() - 1 ? effectiveEnd()
-                                                        : effectiveLoopEnd());
-
-  bool shouldBePlaying = activelyPlaying() && currentTime() < effectiveEnd();
+  bool shouldBePlaying = activelyPlaying();
   if (shouldBePlaying && m_player->paused())
     m_player->play();
   else if (!shouldBePlaying && !m_player->paused())
