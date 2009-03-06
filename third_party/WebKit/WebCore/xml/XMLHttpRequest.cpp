@@ -876,6 +876,10 @@ void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
       m_inPreflight ? DoNotSendLoadCallbacks : SendLoadCallbacks;
   ContentSniff contentSniff =
       request.url().isLocalFile() ? SniffContent : DoNotSniffContent;
+
+  if (m_upload)
+    request.setReportUploadProgress(true);
+
   m_loader = ThreadableLoader::create(scriptExecutionContext(), this, request,
                                       callbacks, contentSniff);
 

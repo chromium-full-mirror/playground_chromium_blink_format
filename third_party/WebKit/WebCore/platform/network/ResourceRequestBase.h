@@ -124,11 +124,20 @@ class ResourceRequestBase {
 
   bool isConditional() const;
 
+  // Whether the associated ResourceHandleClient needs to be notified of
+  // upload progress made for that resource.
+  bool reportUploadProgress() const { return m_reportUploadProgress; }
+  void setReportUploadProgress(bool reportUploadProgress) {
+    m_reportUploadProgress = reportUploadProgress;
+  }
+
  protected:
   // Used when ResourceRequest is initialized from a platform representation of
   // the request
   ResourceRequestBase()
-      : m_resourceRequestUpdated(false), m_platformRequestUpdated(true) {}
+      : m_resourceRequestUpdated(false),
+        m_platformRequestUpdated(true),
+        m_reportUploadProgress(false) {}
 
   ResourceRequestBase(const KURL& url, ResourceRequestCachePolicy policy)
       : m_url(url),
@@ -137,7 +146,8 @@ class ResourceRequestBase {
         m_httpMethod("GET"),
         m_allowHTTPCookies(true),
         m_resourceRequestUpdated(true),
-        m_platformRequestUpdated(false) {}
+        m_platformRequestUpdated(false),
+        m_reportUploadProgress(false) {}
 
   void updatePlatformRequest() const;
   void updateResourceRequest() const;
@@ -154,6 +164,7 @@ class ResourceRequestBase {
   bool m_allowHTTPCookies;
   mutable bool m_resourceRequestUpdated;
   mutable bool m_platformRequestUpdated;
+  bool m_reportUploadProgress;
 
  private:
   const ResourceRequest& asResourceRequest() const;
