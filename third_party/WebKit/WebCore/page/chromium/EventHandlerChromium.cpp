@@ -151,7 +151,11 @@ bool EventHandler::passWidgetMouseDownEventToWidget(
 }
 
 unsigned EventHandler::accessKeyModifiers() {
+#if PLATFORM(DARWIN)
+  return PlatformKeyboardEvent::CtrlKey | PlatformKeyboardEvent::AltKey;
+#else
   return PlatformKeyboardEvent::AltKey;
+#endif
 }
 
 }  // namespace WebCore
