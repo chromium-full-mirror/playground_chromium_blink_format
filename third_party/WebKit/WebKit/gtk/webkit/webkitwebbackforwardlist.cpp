@@ -429,6 +429,8 @@ void webkit_web_back_forward_list_set_limit(
  * @history_item: the #WebKitWebHistoryItem to add
  *
  * Adds the item to the #WebKitWebBackForwardList.
+ *
+ * Since: 1.1.1
  */
 void webkit_web_back_forward_list_add_item(
     WebKitWebBackForwardList* webBackForwardList,
