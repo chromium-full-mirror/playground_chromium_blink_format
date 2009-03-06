@@ -52,6 +52,7 @@ class TextResourceDecoder : public RefCounted<TextResourceDecoder> {
   String decode(const char* data, size_t length);
   String flush();
 
+  void useLenientXMLDecoding() { m_useLenientXMLDecoding = true; }
   bool sawError() const { return m_sawError; }
 
  private:
@@ -81,6 +82,7 @@ class TextResourceDecoder : public RefCounted<TextResourceDecoder> {
   bool m_checkedForBOM;
   bool m_checkedForCSSCharset;
   bool m_checkedForHeadCharset;
+  bool m_useLenientXMLDecoding;  // Don't stop on XML decoding errors.
   bool m_sawError;
 };
 }
