@@ -46,45 +46,54 @@ struct WorkerThreadStartupData : Noncopyable {
   static std::auto_ptr<WorkerThreadStartupData> create(
       const KURL& scriptURL,
       const String& userAgent,
+      const String& encoding,
       const String& sourceCode) {
-    return std::auto_ptr<WorkerThreadStartupData>(
-        new WorkerThreadStartupData(scriptURL, userAgent, sourceCode));
+    return std::auto_ptr<WorkerThreadStartupData>(new WorkerThreadStartupData(
+        scriptURL, userAgent, encoding, sourceCode));
   }
 
   KURL m_scriptURL;
   String m_userAgent;
+  String m_encoding;
   String m_sourceCode;
 
  private:
   WorkerThreadStartupData(const KURL& scriptURL,
                           const String& userAgent,
+                          const String& encoding,
                           const String& sourceCode);
 };
 
 WorkerThreadStartupData::WorkerThreadStartupData(const KURL& scriptURL,
                                                  const String& userAgent,
+                                                 const String& encoding,
                                                  const String& sourceCode)
     : m_scriptURL(scriptURL.copy()),
       m_userAgent(userAgent.copy()),
+      m_encoding(encoding.copy()),
       m_sourceCode(sourceCode.copy()) {}
 
 PassRefPtr<WorkerThread> WorkerThread::create(
     const KURL& scriptURL,
     const String& userAgent,
+    const String& encoding,
     const String& sourceCode,
     WorkerObjectProxy* workerObjectProxy) {
-  return adoptRef(
-      new WorkerThread(scriptURL, userAgent, sourceCode, workerObjectProxy));
+  return adoptRef(new WorkerThread(scriptURL, userAgent, encoding, sourceCode,
+                                   workerObjectProxy));
 }
 
 WorkerThread::WorkerThread(const KURL& scriptURL,
                            const String& userAgent,
+                           const String& encoding,
                            const String& sourceCode,
                            WorkerObjectProxy* workerObjectProxy)
     : m_threadID(0),
       m_workerObjectProxy(workerObjectProxy),
-      m_startupData(
-          WorkerThreadStartupData::create(scriptURL, userAgent, sourceCode)) {}
+      m_startupData(WorkerThreadStartupData::create(scriptURL,
+                                                    userAgent,
+                                                    encoding,
+                                                    sourceCode)) {}
 
 WorkerThread::~WorkerThread() {}
 
@@ -110,7 +119,8 @@ void* WorkerThread::workerThread() {
   {
     MutexLocker lock(m_threadCreationMutex);
     m_workerContext = WorkerContext::create(m_startupData->m_scriptURL,
-                                            m_startupData->m_userAgent, this);
+                                            m_startupData->m_userAgent,
+                                            m_startupData->m_encoding, this);
     if (m_runLoop.terminated()) {
       // The worker was terminated before the thread had a chance to run. Since
       // the context didn't exist yet,

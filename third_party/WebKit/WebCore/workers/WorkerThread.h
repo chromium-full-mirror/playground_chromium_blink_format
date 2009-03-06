@@ -46,6 +46,7 @@ class WorkerThread : public RefCounted<WorkerThread> {
  public:
   static PassRefPtr<WorkerThread> create(const KURL& scriptURL,
                                          const String& userAgent,
+                                         const String& encoding,
                                          const String& sourceCode,
                                          WorkerObjectProxy*);
   ~WorkerThread();
@@ -60,6 +61,7 @@ class WorkerThread : public RefCounted<WorkerThread> {
  private:
   WorkerThread(const KURL&,
                const String& userAgent,
+               const String& encoding,
                const String& sourceCode,
                WorkerObjectProxy*);
 

@@ -48,6 +48,7 @@ class WorkerContextProxy {
 
   virtual void startWorkerContext(const KURL& scriptURL,
                                   const String& userAgent,
+                                  const String& encoding,
                                   const String& sourceCode) = 0;
 
   virtual void terminateWorkerContext() = 0;
