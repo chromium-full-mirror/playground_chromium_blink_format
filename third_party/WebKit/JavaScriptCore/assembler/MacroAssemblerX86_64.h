@@ -217,8 +217,14 @@ class MacroAssemblerX86_64 : public MacroAssemblerX86Common {
   }
 
   void storePtr(ImmPtr imm, ImplicitAddress address) {
-    move(imm, scratchRegister);
-    storePtr(scratchRegister, address);
+    intptr_t ptr = imm.asIntptr();
+    if (CAN_SIGN_EXTEND_32_64(ptr))
+      m_assembler.movq_i32m(static_cast<int>(ptr), address.offset,
+                            address.base);
+    else {
+      move(imm, scratchRegister);
+      storePtr(scratchRegister, address);
+    }
   }
 
   DataLabel32 storePtrWithAddressOffsetPatch(RegisterID src, Address address) {
