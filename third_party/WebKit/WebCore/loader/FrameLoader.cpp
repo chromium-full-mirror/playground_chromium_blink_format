@@ -154,15 +154,16 @@ struct ScheduledRedirection {
     historyNavigation,
     locationChangeDuringLoad
   };
-  Type type;
-  double delay;
-  String url;
-  String referrer;
-  int historySteps;
-  bool lockHistory;
-  bool lockBackForwardList;
-  bool wasUserGesture;
-  bool wasRefresh;
+
+  const Type type;
+  const double delay;
+  const String url;
+  const String referrer;
+  const int historySteps;
+  const bool lockHistory;
+  const bool lockBackForwardList;
+  const bool wasUserGesture;
+  const bool wasRefresh;
 
   ScheduledRedirection(double delay,
                        const String& url,
@@ -177,7 +178,9 @@ struct ScheduledRedirection {
         lockHistory(lockHistory),
         lockBackForwardList(lockBackForwardList),
         wasUserGesture(wasUserGesture),
-        wasRefresh(refresh) {}
+        wasRefresh(refresh) {
+    ASSERT(!url.isEmpty());
+  }
 
   ScheduledRedirection(Type locationChangeType,
                        const String& url,
@@ -194,13 +197,18 @@ struct ScheduledRedirection {
         lockHistory(lockHistory),
         lockBackForwardList(lockBackForwardList),
         wasUserGesture(wasUserGesture),
-        wasRefresh(refresh) {}
+        wasRefresh(refresh) {
+    ASSERT(locationChangeType == locationChange ||
+           locationChangeType == locationChangeDuringLoad);
+    ASSERT(!url.isEmpty());
+  }
 
   explicit ScheduledRedirection(int historyNavigationSteps)
       : type(historyNavigation),
         delay(0),
         historySteps(historyNavigationSteps),
         lockHistory(false),
+        lockBackForwardList(false),
         wasUserGesture(false),
         wasRefresh(false) {}
 };
@@ -1395,6 +1403,9 @@ void FrameLoader::scheduleHTTPRedirection(double delay, const String& url) {
   if (!m_frame->page())
     return;
 
+  if (url.isEmpty())
+    return;
+
   // We want a new history item if the refresh timeout is > 1 second.
   if (!m_scheduledRedirection || delay <= m_scheduledRedirection->delay)
     scheduleRedirection(
@@ -1407,6 +1418,9 @@ void FrameLoader::scheduleLocationChange(const String& url,
                                          bool lockBackForwardList,
                                          bool wasUserGesture) {
   if (!m_frame->page())
+    return;
+
+  if (url.isEmpty())
     return;
 
   // If the URL we're going to navigate to is the same as the current one,
@@ -1442,6 +1456,9 @@ void FrameLoader::scheduleLocationChange(const String& url,
 
 void FrameLoader::scheduleRefresh(bool wasUserGesture) {
   if (!m_frame->page())
+    return;
+
+  if (m_URL.isEmpty())
     return;
 
   ScheduledRedirection::Type type = ScheduledRedirection::locationChange;
@@ -1567,13 +1584,14 @@ void FrameLoader::loadURLIntoChildFrame(const KURL& url,
                                         const String& referer,
                                         Frame* childFrame) {
   ASSERT(childFrame);
+
   HistoryItem* parentItem = currentHistoryItem();
   FrameLoadType loadType = this->loadType();
   FrameLoadType childLoadType = FrameLoadTypeRedirectWithLockedBackForwardList;
 
   KURL workingURL = url;
 
-  // If we're moving in the backforward list, we might want to replace the
+  // If we're moving in the back/forward list, we might want to replace the
   // content
   // of this child frame with whatever was there at that point.
   if (parentItem && parentItem->children().size() &&
