@@ -1207,7 +1207,7 @@ unsigned RenderText::caretMaxRenderedOffset() const {
 int RenderText::previousOffset(int current) const {
   StringImpl* si = m_text.get();
   TextBreakIterator* iterator =
-      characterBreakIterator(si->characters(), si->length());
+      cursorMovementIterator(si->characters(), si->length());
   if (!iterator)
     return current - 1;
 
@@ -1342,7 +1342,7 @@ int RenderText::previousOffsetForBackwardDeletion(int current) const {
 int RenderText::nextOffset(int current) const {
   StringImpl* si = m_text.get();
   TextBreakIterator* iterator =
-      characterBreakIterator(si->characters(), si->length());
+      cursorMovementIterator(si->characters(), si->length());
   if (!iterator)
     return current + 1;
 

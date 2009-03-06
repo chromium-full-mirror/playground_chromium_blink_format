@@ -66,6 +66,10 @@ TextBreakIterator* characterBreakIterator(const UChar* string, int length) {
   return static_cast<TextBreakIterator*>(iterator);
 }
 
+TextBreakIterator* cursorMovementIterator(const UChar* string, int length) {
+  return characterBreakIterator(string, length);
+}
+
 TextBreakIterator* lineBreakIterator(const UChar* string, int length) {
   static QTextBoundaryFinder* iterator = 0;
   if (!string)
@@ -241,6 +245,10 @@ TextBreakIterator* characterBreakIterator(const UChar* string, int length) {
       QString(reinterpret_cast<const QChar*>(string), length));
 
   return iterator;
+}
+
+TextBreakIterator* cursorMovementIterator(const UChar* string, int length) {
+  return characterBreakIterator(string, length);
 }
 
 TextBreakIterator* lineBreakIterator(const UChar*, int) {
