@@ -197,21 +197,10 @@ _documentFragmentWithMarkupString:(NSString*)markupString
                     baseURLString:(NSString*)baseURLString;
 - (DOMDocumentFragment*)_documentFragmentWithNodesAsParagraphs:(NSArray*)nodes;
 
-- (void)_replaceSelectionWithFragment:(DOMDocumentFragment*)fragment
-                    selectReplacement:(BOOL)selectReplacement
-                         smartReplace:(BOOL)smartReplace
-                           matchStyle:(BOOL)matchStyle;
 - (void)_replaceSelectionWithNode:(DOMNode*)node
                 selectReplacement:(BOOL)selectReplacement
                      smartReplace:(BOOL)smartReplace
                        matchStyle:(BOOL)matchStyle;
-- (void)_replaceSelectionWithMarkupString:(NSString*)markupString
-                            baseURLString:(NSString*)baseURLString
-                        selectReplacement:(BOOL)selectReplacement
-                             smartReplace:(BOOL)smartReplace;
-- (void)_replaceSelectionWithText:(NSString*)text
-                selectReplacement:(BOOL)selectReplacement
-                     smartReplace:(BOOL)smartReplace;
 
 - (void)_insertParagraphSeparatorInQuotedContent;
 

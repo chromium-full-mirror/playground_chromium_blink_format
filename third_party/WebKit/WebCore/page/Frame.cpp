@@ -1692,12 +1692,15 @@ void Frame::respondToChangedSelection(const VisibleSelection& oldSelection,
           VisibleSelection(startOfWord(oldStart, LeftWordIfOnBoundary),
                            endOfWord(oldStart, RightWordIfOnBoundary));
       if (oldAdjacentWords != newAdjacentWords) {
-        editor()->markMisspellings(oldAdjacentWords);
         if (isContinuousGrammarCheckingEnabled) {
           VisibleSelection oldSelectedSentence = VisibleSelection(
               startOfSentence(oldStart), endOfSentence(oldStart));
-          if (oldSelectedSentence != newSelectedSentence)
-            editor()->markBadGrammar(oldSelectedSentence);
+          editor()->markMisspellingsAndBadGrammar(
+              oldAdjacentWords, oldSelectedSentence != newSelectedSentence,
+              oldSelectedSentence);
+        } else {
+          editor()->markMisspellingsAndBadGrammar(oldAdjacentWords, false,
+                                                  oldAdjacentWords);
         }
       }
     }

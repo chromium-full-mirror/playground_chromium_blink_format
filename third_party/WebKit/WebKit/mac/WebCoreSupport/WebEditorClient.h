@@ -117,6 +117,11 @@ class WebEditorClient : public WebCore::EditorClient {
                                     WTF::Vector<WebCore::GrammarDetail>&,
                                     int* badGrammarLocation,
                                     int* badGrammarLength);
+  virtual void checkSpellingAndGrammarOfParagraph(
+      const UChar* text,
+      int length,
+      bool checkGrammar,
+      WTF::Vector<WebCore::TextCheckingResult>& results);
   virtual void updateSpellingUIWithGrammarString(const WebCore::String&,
                                                  const WebCore::GrammarDetail&);
   virtual void updateSpellingUIWithMisspelledWord(const WebCore::String&);
