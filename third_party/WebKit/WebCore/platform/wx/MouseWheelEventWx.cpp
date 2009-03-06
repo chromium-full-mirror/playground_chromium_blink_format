@@ -48,6 +48,6 @@ PlatformWheelEvent::PlatformWheelEvent(const wxMouseEvent& event,
       m_isAccepted(false) {
   // FIXME: retrieve the user setting for the number of lines to scroll on each
   // wheel event
-  m_deltaY *= (float)cScrollbarPixelsPerLineStep;
+  m_deltaY *= static_cast<float>(cScrollbarPixelsPerLineStep);
 }
 }
