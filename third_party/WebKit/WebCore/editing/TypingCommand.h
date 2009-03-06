@@ -112,7 +112,6 @@ class TypingCommand : public CompositeEditCommand {
   ETypingCommand m_commandType;
   String m_textToInsert;
   bool m_openForMoreTyping;
-  bool m_applyEditing;
   bool m_selectInsertedText;
   bool m_smartDelete;
   TextGranularity m_granularity;
