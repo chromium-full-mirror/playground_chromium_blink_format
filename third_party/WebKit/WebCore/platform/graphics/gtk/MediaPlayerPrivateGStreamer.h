@@ -98,7 +98,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   unsigned totalBytes() const;
 
   void setVisible(bool);
-  void setRect(const IntRect&);
+  void setSize(const IntSize&);
 
   void loadStateChanged();
   void rateChanged();
@@ -141,7 +141,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   MediaPlayer::ReadyState m_readyState;
   bool m_startedPlaying;
   mutable bool m_isStreaming;
-  IntRect m_rect;
+  IntSize m_size;
   bool m_visible;
   cairo_surface_t* m_surface;
 };

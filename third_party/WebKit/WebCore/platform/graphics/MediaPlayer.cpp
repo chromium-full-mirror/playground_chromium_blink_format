@@ -97,7 +97,7 @@ class NullMediaPlayerPrivate : public MediaPlayerPrivateInterface {
   virtual unsigned totalBytes() const { return 0; }
   virtual unsigned bytesLoaded() const { return 0; }
 
-  virtual void setRect(const IntRect&) {}
+  virtual void setSize(const IntSize&) {}
 
   virtual void paint(GraphicsContext*, const IntRect&) {}
 
@@ -340,9 +340,9 @@ unsigned MediaPlayer::totalBytes() {
   return m_private->totalBytes();
 }
 
-void MediaPlayer::setRect(const IntRect& r) {
-  m_rect = r;
-  m_private->setRect(r);
+void MediaPlayer::setSize(const IntSize& size) {
+  m_size = size;
+  m_private->setSize(size);
 }
 
 bool MediaPlayer::visible() const {

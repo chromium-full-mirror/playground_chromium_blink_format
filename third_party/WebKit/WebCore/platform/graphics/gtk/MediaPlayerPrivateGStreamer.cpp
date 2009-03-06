@@ -123,7 +123,7 @@ MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
       m_readyState(MediaPlayer::DataUnavailable),
       m_startedPlaying(false),
       m_isStreaming(false),
-      m_rect(IntRect()),
+      m_size(IntSize()),
       m_visible(true) {
   static bool gstInitialized = false;
   // FIXME: We should pass the arguments from the command line
@@ -518,8 +518,8 @@ void MediaPlayerPrivate::loadingFailed() {
   }
 }
 
-void MediaPlayerPrivate::setRect(const IntRect& rect) {
-  m_rect = rect;
+void MediaPlayerPrivate::setSize(const IntSize& size) {
+  m_size = size;
 }
 
 void MediaPlayerPrivate::setVisible(bool visible) {
@@ -537,7 +537,7 @@ void MediaPlayerPrivate::paint(GraphicsContext* context, const IntRect& rect) {
   if (!m_visible)
     return;
 
-  // TODO: m_rect vs rect?
+  // TODO: m_size vs rect?
   cairo_t* cr = context->platformContext();
 
   cairo_save(cr);
