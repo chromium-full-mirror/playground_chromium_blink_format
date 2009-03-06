@@ -120,6 +120,7 @@ class ResourceHandleInternal : Noncopyable {
         ,
         m_msg(0),
         m_cancelled(false),
+        m_reportedHeaders(false),
         m_gfile(0),
         m_inputStream(0),
         m_cancellable(0),
@@ -195,6 +196,7 @@ class ResourceHandleInternal : Noncopyable {
   SoupMessage* m_msg;
   ResourceResponse m_response;
   bool m_cancelled;
+  bool m_reportedHeaders;
   GFile* m_gfile;
   GInputStream* m_inputStream;
   GCancellable* m_cancellable;
