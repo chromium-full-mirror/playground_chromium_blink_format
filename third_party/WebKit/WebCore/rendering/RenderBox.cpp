@@ -2606,8 +2606,7 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
       RenderObject* po = parent();
       // 'staticX' should already have been set through layout of the parent.
       int staticPosition =
-          layer()->staticX() + containerWidth +
-          toRenderBoxModelObject(containerBlock)->borderRight();
+          layer()->staticX() + containerWidth + containerBlock->borderRight();
       for (; po && po != containerBlock; po = po->parent()) {
         if (po->isBox())
           staticPosition += toRenderBox(po)->x();

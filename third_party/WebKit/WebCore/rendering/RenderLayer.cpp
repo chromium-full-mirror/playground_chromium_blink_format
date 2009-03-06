@@ -634,13 +634,12 @@ FloatPoint RenderLayer::perspectiveOrigin() const {
 }
 
 RenderLayer* RenderLayer::stackingContext() const {
-  RenderLayer* curr = parent();
-  for (; curr && !curr->renderer()->isRenderView() &&
-         !curr->renderer()->isRoot() &&
-         curr->renderer()->style()->hasAutoZIndex();
-       curr = curr->parent()) {
-  }
-  return curr;
+  RenderLayer* layer = parent();
+  while (layer && !layer->renderer()->isRenderView() &&
+         !layer->renderer()->isRoot() &&
+         layer->renderer()->style()->hasAutoZIndex())
+    layer = layer->parent();
+  return layer;
 }
 
 RenderLayer* RenderLayer::enclosingPositionedAncestor() const {
@@ -916,7 +915,7 @@ void RenderLayer::removeOnlyThisLayer() {
     current = next;
   }
 
-  destroy(renderer()->renderArena());
+  m_renderer->destroyLayer();
 }
 
 void RenderLayer::insertOnlyThisLayer() {

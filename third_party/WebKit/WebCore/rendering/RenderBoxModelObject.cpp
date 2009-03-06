@@ -45,12 +45,26 @@ bool RenderBoxModelObject::s_wasFloating = false;
 RenderBoxModelObject::RenderBoxModelObject(Node* node)
     : RenderObject(node), m_layer(0) {}
 
-RenderBoxModelObject::~RenderBoxModelObject() {}
+RenderBoxModelObject::~RenderBoxModelObject() {
+  // Our layer should have been destroyed and cleared by now
+  ASSERT(!hasLayer());
+  ASSERT(!m_layer);
+}
+
+void RenderBoxModelObject::destroyLayer() {
+  ASSERT(hasLayer());
+  ASSERT(m_layer);
+  m_layer->destroy(renderArena());
+  m_layer = 0;
+  setHasLayer(false);
+}
 
 void RenderBoxModelObject::destroy() {
   // This must be done before we destroy the RenderObject.
   if (m_layer)
     m_layer->clearClipRects();
+
+  // RenderObject::destroy calls back to destroyLayer() for layer destruction
   RenderObject::destroy();
 }
 
@@ -94,14 +108,12 @@ void RenderBoxModelObject::styleDidChange(StyleDifference diff,
         m_layer->updateLayerPositions();
     }
   } else if (layer() && layer()->parent()) {
-    RenderLayer* layer = m_layer;
-    m_layer = 0;
-    setHasLayer(false);
     setHasTransform(false);  // Either a transform wasn't specified or the
                              // object doesn't support transforms, so just null
                              // out the bit.
     setHasReflection(false);
-    layer->removeOnlyThisLayer();
+    m_layer
+        ->removeOnlyThisLayer();  // calls destroyLayer() which clears m_layer
     if (s_wasFloating && isFloating())
       setChildNeedsLayout(true);
   }
