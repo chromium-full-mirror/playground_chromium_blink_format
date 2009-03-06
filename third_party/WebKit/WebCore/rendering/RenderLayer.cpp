@@ -2479,13 +2479,17 @@ RenderLayer* RenderLayer::hitTestLayer(
                         localPoint, true, newTransformState.get(), zOffset);
   }
 
+  // Ensure our lists and 3d status are up-to-date.
+  updateLayerListsIfNeeded();
+  update3DTransformedDescendantStatus();
+
   RefPtr<HitTestingTransformState> localTransformState;
   if (appliedTransform) {
     // We computed the correct state in the caller (above code), so just
     // reference it.
     ASSERT(transformState);
     localTransformState = const_cast<HitTestingTransformState*>(transformState);
-  } else if (transformState || m_has3DTransformedDescendant) {
+  } else if (transformState || m_has3DTransformedDescendant || preserves3D()) {
     // We need transform state for the first time, or to offset the container
     // state, so create it here.
     localTransformState = createLocalTransformState(
@@ -2510,10 +2514,6 @@ RenderLayer* RenderLayer::hitTestLayer(
   IntRect outlineRect;
   calculateRects(rootLayer, hitTestRect, layerBounds, bgRect, fgRect,
                  outlineRect);
-
-  // Ensure our lists and 3d status are up-to-date.
-  updateLayerListsIfNeeded();
-  update3DTransformedDescendantStatus();
 
   // The following are used for keeping track of the z-depth of the hit point of
   // 3d-transformed
