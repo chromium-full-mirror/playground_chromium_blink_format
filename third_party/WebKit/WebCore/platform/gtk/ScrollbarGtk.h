@@ -61,6 +61,7 @@ class ScrollbarGtk : public Scrollbar {
 
  private:
   static void gtkValueChanged(GtkAdjustment*, ScrollbarGtk*);
+  IntPoint getLocationInParentWindow(const IntRect&);
   GtkAdjustment* m_adjustment;
 };
 }
