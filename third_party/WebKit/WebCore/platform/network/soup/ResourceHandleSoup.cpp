@@ -33,6 +33,7 @@
 #include "DocLoader.h"
 #include "Frame.h"
 #include "HTTPParsers.h"
+#include "Logging.h"
 #include "MIMETypeRegistry.h"
 #include "NotImplemented.h"
 #include "Page.h"
@@ -409,9 +410,8 @@ static void ensureSessionIsInitialized(SoupSession* session) {
   else
     setDefaultCookieJar(jar);
 
-  const char* webkitDebug = g_getenv("WEBKIT_DEBUG");
-  if (!soup_session_get_feature(session, SOUP_TYPE_LOGGER) && webkitDebug &&
-      !strcmp(webkitDebug, "network")) {
+  if (!soup_session_get_feature(session, SOUP_TYPE_LOGGER) &&
+      LogNetwork.state == WTFLogChannelOn) {
     SoupLogger* logger = soup_logger_new(
         static_cast<SoupLoggerLogLevel>(SOUP_LOGGER_LOG_BODY), -1);
     soup_logger_attach(logger, session);
