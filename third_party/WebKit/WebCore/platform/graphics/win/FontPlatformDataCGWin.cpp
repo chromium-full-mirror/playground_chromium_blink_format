@@ -133,7 +133,7 @@ void FontPlatformData::platformDataInit(HFONT font,
       ASSERT(m_cgFont);
     }
   }
-  if (m_useGDI && wkCanUsePlatformNativeGlyphs()) {
+  if (m_useGDI) {
     LOGFONT* logfont = static_cast<LOGFONT*>(malloc(sizeof(LOGFONT)));
     GetObject(font, sizeof(*logfont), logfont);
     wkSetFontPlatformInfo(m_cgFont.get(), logfont, free);

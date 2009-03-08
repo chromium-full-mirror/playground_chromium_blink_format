@@ -108,12 +108,7 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(
   ASSERT(m_fontReference);
   ASSERT(T2embedLibrary());
 
-  static bool canUsePlatformNativeGlyphs = wkCanUsePlatformNativeGlyphs();
-  LOGFONT _logFont;
-
-  LOGFONT& logFont = canUsePlatformNativeGlyphs
-                         ? *static_cast<LOGFONT*>(malloc(sizeof(LOGFONT)))
-                         : _logFont;
+  LOGFONT& logFont = *static_cast<LOGFONT*>(malloc(sizeof(LOGFONT)));
   if (m_name.isNull())
     TTGetNewFontName(&m_fontReference, logFont.lfFaceName, LF_FACESIZE, 0, 0);
   else
@@ -137,8 +132,7 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(
   logFont.lfWeight = bold ? 700 : 400;
 
   HFONT hfont = CreateFontIndirect(&logFont);
-  if (canUsePlatformNativeGlyphs)
-    wkSetFontPlatformInfo(m_cgFont, &logFont, free);
+  wkSetFontPlatformInfo(m_cgFont, &logFont, free);
   return FontPlatformData(hfont, m_cgFont, size, bold, italic,
                           renderingMode == AlternateRenderingMode);
 }
