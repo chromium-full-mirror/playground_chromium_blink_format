@@ -542,10 +542,7 @@ class FrameLoader : Noncopyable {
   // being the primary one.  After they're no longer needed there, they can be
   // removed!
   HistoryItem* currentHistoryItem();
-  HistoryItem* previousHistoryItem();
-  HistoryItem* provisionalHistoryItem();
   void setCurrentHistoryItem(PassRefPtr<HistoryItem>);
-  void setPreviousHistoryItem(PassRefPtr<HistoryItem>);
   void setProvisionalHistoryItem(PassRefPtr<HistoryItem>);
 
   void continueLoadWithData(SharedBuffer*,
