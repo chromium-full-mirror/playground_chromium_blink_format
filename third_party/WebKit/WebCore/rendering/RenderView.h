@@ -25,12 +25,13 @@
 #define RenderView_h
 
 #include "FrameView.h"
-#include "Frame.h"
 #include "LayoutState.h"
 #include "RenderBlock.h"
 #include <wtf/OwnPtr.h>
 
 namespace WebCore {
+
+class RenderWidget;
 
 #if USE(ACCELERATED_COMPOSITING)
 class RenderLayerCompositor;
@@ -58,11 +59,7 @@ class RenderView : public RenderBlock {
   int viewHeight() const;
   int viewWidth() const;
 
-  float zoomFactor() const {
-    return m_frameView->frame() && m_frameView->frame()->shouldApplyPageZoom()
-               ? m_frameView->frame()->zoomFactor()
-               : 1.0f;
-  }
+  float zoomFactor() const;
 
   FrameView* frameView() const { return m_frameView; }
 
