@@ -99,21 +99,6 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-const RenderLayer::ScrollAlignment RenderLayer::gAlignCenterIfNeeded = {
-    RenderLayer::noScroll, RenderLayer::alignCenter,
-    RenderLayer::alignToClosestEdge};
-const RenderLayer::ScrollAlignment RenderLayer::gAlignToEdgeIfNeeded = {
-    RenderLayer::noScroll, RenderLayer::alignToClosestEdge,
-    RenderLayer::alignToClosestEdge};
-const RenderLayer::ScrollAlignment RenderLayer::gAlignCenterAlways = {
-    RenderLayer::alignCenter, RenderLayer::alignCenter,
-    RenderLayer::alignCenter};
-const RenderLayer::ScrollAlignment RenderLayer::gAlignTopAlways = {
-    RenderLayer::alignTop, RenderLayer::alignTop, RenderLayer::alignTop};
-const RenderLayer::ScrollAlignment RenderLayer::gAlignBottomAlways = {
-    RenderLayer::alignBottom, RenderLayer::alignBottom,
-    RenderLayer::alignBottom};
-
 const int MinimumWidthWhileResizing = 100;
 const int MinimumHeightWhileResizing = 40;
 
@@ -1240,19 +1225,19 @@ IntRect RenderLayer::getRectToExpose(const IntRect& visibleRect,
     // If the rectangle is fully visible, use the specified visible behavior.
     // If the rectangle is partially visible, but over a certain threshold,
     // then treat it as fully visible to avoid unnecessary horizontal scrolling
-    scrollX = getVisibleBehavior(alignX);
+    scrollX = ScrollAlignment::getVisibleBehavior(alignX);
   else if (intersectWidth == visibleRect.width()) {
     // If the rect is bigger than the visible area, don't bother trying to
     // center. Other alignments will work.
-    scrollX = getVisibleBehavior(alignX);
+    scrollX = ScrollAlignment::getVisibleBehavior(alignX);
     if (scrollX == alignCenter)
       scrollX = noScroll;
   } else if (intersectWidth > 0)
     // If the rectangle is partially visible, but not above the minimum
     // threshold, use the specified partial behavior
-    scrollX = getPartialBehavior(alignX);
+    scrollX = ScrollAlignment::getPartialBehavior(alignX);
   else
-    scrollX = getHiddenBehavior(alignX);
+    scrollX = ScrollAlignment::getHiddenBehavior(alignX);
   // If we're trying to align to the closest edge, and the exposeRect is further
   // right
   // than the visibleRect, and not bigger than the visible area, then align with
@@ -1280,18 +1265,18 @@ IntRect RenderLayer::getRectToExpose(const IntRect& visibleRect,
   int intersectHeight = intersection(visibleRect, exposeRectY).height();
   if (intersectHeight == exposeRect.height())
     // If the rectangle is fully visible, use the specified visible behavior.
-    scrollY = getVisibleBehavior(alignY);
+    scrollY = ScrollAlignment::getVisibleBehavior(alignY);
   else if (intersectHeight == visibleRect.height()) {
     // If the rect is bigger than the visible area, don't bother trying to
     // center. Other alignments will work.
-    scrollY = getVisibleBehavior(alignY);
+    scrollY = ScrollAlignment::getVisibleBehavior(alignY);
     if (scrollY == alignCenter)
       scrollY = noScroll;
   } else if (intersectHeight > 0)
     // If the rectangle is partially visible, use the specified partial behavior
-    scrollY = getPartialBehavior(alignY);
+    scrollY = ScrollAlignment::getPartialBehavior(alignY);
   else
-    scrollY = getHiddenBehavior(alignY);
+    scrollY = ScrollAlignment::getHiddenBehavior(alignY);
   // If we're trying to align to the closest edge, and the exposeRect is further
   // down
   // than the visibleRect, and not bigger than the visible area, then align with
@@ -1329,7 +1314,8 @@ void RenderLayer::autoscroll() {
   IntPoint currentDocumentPosition = frameView->windowToContents(
       frame->eventHandler()->currentMousePosition());
   scrollRectToVisible(IntRect(currentDocumentPosition, IntSize(1, 1)), false,
-                      gAlignToEdgeIfNeeded, gAlignToEdgeIfNeeded);
+                      ScrollAlignment::alignToEdgeIfNeeded,
+                      ScrollAlignment::alignToEdgeIfNeeded);
 }
 
 void RenderLayer::resize(const PlatformMouseEvent& evt,

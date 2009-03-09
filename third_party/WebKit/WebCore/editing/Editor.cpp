@@ -1030,7 +1030,7 @@ bool Editor::insertTextWithoutSendingTextEvent(const String& text,
       if (Frame* editedFrame = document->frame())
         if (Page* page = editedFrame->page())
           page->focusController()->focusedOrMainFrame()->revealSelection(
-              RenderLayer::gAlignToEdgeIfNeeded);
+              ScrollAlignment::alignToEdgeIfNeeded);
     }
   }
 
@@ -2508,7 +2508,7 @@ void Editor::revealSelectionAfterEditingOperation() {
   if (m_ignoreCompositionSelectionChange)
     return;
 
-  m_frame->revealSelection(RenderLayer::gAlignToEdgeIfNeeded);
+  m_frame->revealSelection(ScrollAlignment::alignToEdgeIfNeeded);
 }
 
 void Editor::setIgnoreCompositionSelectionChange(bool ignore) {

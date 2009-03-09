@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2003, 2009 Apple Inc. All rights reserved.
  *
  * Portions are Copyright (C) 1998 Netscape Communications Corporation.
  *
@@ -44,8 +44,9 @@
 #ifndef RenderLayer_h
 #define RenderLayer_h
 
-#include "ScrollbarClient.h"
 #include "RenderBox.h"
+#include "ScrollBehavior.h"
+#include "ScrollbarClient.h"
 #include "Timer.h"
 #include <wtf/OwnPtr.h>
 
@@ -150,39 +151,7 @@ class ClipRects {
 
 class RenderLayer : public ScrollbarClient {
  public:
-  enum ScrollBehavior {
-    noScroll,
-    alignCenter,
-    alignTop,
-    alignBottom,
-    alignLeft,
-    alignRight,
-    alignToClosestEdge
-  };
-
-  struct ScrollAlignment {
-    ScrollBehavior m_rectVisible;
-    ScrollBehavior m_rectHidden;
-    ScrollBehavior m_rectPartial;
-  };
-
   friend class RenderReplica;
-
-  static const ScrollAlignment gAlignCenterIfNeeded;
-  static const ScrollAlignment gAlignToEdgeIfNeeded;
-  static const ScrollAlignment gAlignCenterAlways;
-  static const ScrollAlignment gAlignTopAlways;
-  static const ScrollAlignment gAlignBottomAlways;
-
-  static ScrollBehavior getVisibleBehavior(const ScrollAlignment& s) {
-    return s.m_rectVisible;
-  }
-  static ScrollBehavior getPartialBehavior(const ScrollAlignment& s) {
-    return s.m_rectPartial;
-  }
-  static ScrollBehavior getHiddenBehavior(const ScrollAlignment& s) {
-    return s.m_rectHidden;
-  }
 
   RenderLayer(RenderBoxModelObject*);
   ~RenderLayer();
@@ -279,8 +248,8 @@ class RenderLayer : public ScrollbarClient {
   void scrollRectToVisible(
       const IntRect&,
       bool scrollToAnchor = false,
-      const ScrollAlignment& alignX = gAlignCenterIfNeeded,
-      const ScrollAlignment& alignY = gAlignCenterIfNeeded);
+      const ScrollAlignment& alignX = ScrollAlignment::alignCenterIfNeeded,
+      const ScrollAlignment& alignY = ScrollAlignment::alignCenterIfNeeded);
 
   IntRect getRectToExpose(const IntRect& visibleRect,
                           const IntRect& exposeRect,
