@@ -2436,16 +2436,6 @@ RenderLayer* RenderLayer::hitTestLayer(
     if (!newTransformState->m_accumulatedTransform.isInvertible())
       return 0;
 
-    // Check for hit test on backface if backface-visibility is 'hidden'
-    if (renderer()->style()->backfaceVisibility() == BackfaceVisibilityHidden) {
-      TransformationMatrix invertedMatrix =
-          newTransformState->m_accumulatedTransform.inverse();
-      // If the z-vector of the matrix is negative, the back is facing towards
-      // the viewer.
-      if (invertedMatrix.m33() < 0)
-        return 0;
-    }
-
     // Compute the point and the hit test rect in the coords of this layer by
     // using the values
     // from the transformState, which store the point and quad in the coords of
@@ -2480,6 +2470,17 @@ RenderLayer* RenderLayer::hitTestLayer(
     // state, so create it here.
     localTransformState = createLocalTransformState(
         rootLayer, containerLayer, hitTestRect, hitTestPoint, transformState);
+  }
+
+  // Check for hit test on backface if backface-visibility is 'hidden'
+  if (localTransformState &&
+      renderer()->style()->backfaceVisibility() == BackfaceVisibilityHidden) {
+    TransformationMatrix invertedMatrix =
+        localTransformState->m_accumulatedTransform.inverse();
+    // If the z-vector of the matrix is negative, the back is facing towards the
+    // viewer.
+    if (invertedMatrix.m33() < 0)
+      return 0;
   }
 
   RefPtr<HitTestingTransformState> unflattenedTransformState =
