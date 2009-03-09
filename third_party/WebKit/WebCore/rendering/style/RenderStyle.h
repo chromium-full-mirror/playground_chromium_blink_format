@@ -938,6 +938,11 @@ class RenderStyle : public RefCounted<RenderStyle> {
   ETransformStyle3D transformStyle3D() const {
     return rareNonInheritedData->m_transformStyle3D;
   }
+  bool preserves3D() const {
+    return rareNonInheritedData->m_transformStyle3D ==
+           TransformStyle3DPreserve3D;
+  }
+
   EBackfaceVisibility backfaceVisibility() const {
     return rareNonInheritedData->m_backfaceVisibility;
   }

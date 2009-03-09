@@ -1013,9 +1013,13 @@ int RenderBox::containingBlockWidthForContent() const {
   return cb->availableWidth();
 }
 
-void RenderBox::mapLocalToAbsolutePoint(bool fixed,
-                                        bool useTransforms,
-                                        TransformState& transformState) const {
+void RenderBox::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
+                                    bool fixed,
+                                    bool useTransforms,
+                                    TransformState& transformState) const {
+  if (repaintContainer == this)
+    return;
+
   if (RenderView* v = view()) {
     if (v->layoutStateEnabled()) {
       LayoutState* layoutState = v->layoutState();
@@ -1032,24 +1036,27 @@ void RenderBox::mapLocalToAbsolutePoint(bool fixed,
     fixed = true;
 
   RenderObject* o = container();
-  if (o) {
-    if (hasLayer() && layer()->transform())
-      fixed = false;  // Elements with transforms act as a containing block for
-                      // fixed position descendants
+  if (!o)
+    return;
 
-    IntSize containerOffset = offsetFromContainer(o);
-    if (useTransforms) {
-      TransformationMatrix containerTransform =
-          transformFromContainer(o, containerOffset);
-      bool accumulateTransform =
-          (o->style()->transformStyle3D() == TransformStyle3DPreserve3D ||
-           style()->transformStyle3D() == TransformStyle3DPreserve3D);
-      transformState.applyTransform(containerTransform, accumulateTransform);
-    } else
-      transformState.move(containerOffset.width(), containerOffset.height());
+  bool hasTransform = hasLayer() && layer()->transform();
+  if (hasTransform)
+    fixed = false;  // Elements with transforms act as a containing block for
+                    // fixed position descendants
 
-    o->mapLocalToAbsolutePoint(fixed, useTransforms, transformState);
-  }
+  IntSize containerOffset = offsetFromContainer(o);
+
+  bool preserve3D =
+      useTransforms && (o->style()->preserves3D() || style()->preserves3D());
+  if (useTransforms && hasTransform)
+    transformState.applyTransform(transformFromContainer(o, containerOffset),
+                                  preserve3D);
+  else
+    transformState.move(containerOffset.width(), containerOffset.height(),
+                        preserve3D);
+
+  o->mapLocalToContainer(repaintContainer, fixed, useTransforms,
+                         transformState);
 }
 
 void RenderBox::mapAbsoluteToLocalPoint(bool fixed,
@@ -1061,49 +1068,27 @@ void RenderBox::mapAbsoluteToLocalPoint(bool fixed,
   if (style()->position() == FixedPosition)
     fixed = true;
 
-  if (useTransforms && layer() && layer()->transform())
-    fixed = false;
+  bool hasTransform = hasLayer() && layer()->transform();
+  if (hasTransform)
+    fixed = false;  // Elements with transforms act as a containing block for
+                    // fixed position descendants
 
   RenderObject* o = container();
-  if (o) {
-    o->mapAbsoluteToLocalPoint(fixed, useTransforms, transformState);
+  if (!o)
+    return;
 
-    IntSize containerOffset = offsetFromContainer(o);
-    if (useTransforms) {
-      TransformationMatrix containerTransform =
-          transformFromContainer(o, containerOffset);
-      bool accumulateTransform =
-          (o->style()->transformStyle3D() == TransformStyle3DPreserve3D ||
-           style()->transformStyle3D() == TransformStyle3DPreserve3D);
-      transformState.applyTransform(containerTransform, accumulateTransform);
-    } else
-      transformState.move(-containerOffset.width(), -containerOffset.height());
-  }
-}
+  o->mapAbsoluteToLocalPoint(fixed, useTransforms, transformState);
 
-FloatQuad RenderBox::localToContainerQuad(
-    const FloatQuad& localQuad,
-    RenderBoxModelObject* repaintContainer,
-    bool fixed) const {
-  if (repaintContainer == this)
-    return localQuad;
+  IntSize containerOffset = offsetFromContainer(o);
 
-  if (style()->position() == FixedPosition)
-    fixed = true;
-
-  RenderObject* o = container();
-  if (o) {
-    FloatQuad quad = localQuad;
-    if (layer() && layer()->transform()) {
-      fixed = false;  // Elements with transforms act as a containing block for
-                      // fixed position descendants
-      quad = layer()->transform()->mapQuad(quad);
-    }
-    quad += offsetFromContainer(o);
-    return o->localToContainerQuad(quad, repaintContainer, fixed);
-  }
-
-  return FloatQuad();
+  bool preserve3D =
+      useTransforms && (o->style()->preserves3D() || style()->preserves3D());
+  if (useTransforms && hasTransform)
+    transformState.applyTransform(transformFromContainer(o, containerOffset),
+                                  preserve3D);
+  else
+    transformState.move(-containerOffset.width(), -containerOffset.height(),
+                        preserve3D);
 }
 
 IntSize RenderBox::offsetFromContainer(RenderObject* o) const {

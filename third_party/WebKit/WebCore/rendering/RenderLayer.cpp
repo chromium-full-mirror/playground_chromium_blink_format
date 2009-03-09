@@ -2378,9 +2378,6 @@ PassRefPtr<HitTestingTransformState> RenderLayer::createLocalTransformState(
     convertToLayerCoords(rootLayer, offsetX, offsetY);
   }
 
-  // FIXME: need to have transformFromContainer be able to use
-  // getAnimatedStyleForRenderer()
-  // when doing accelerated animations.
   TransformationMatrix containerTransform = renderer()->transformFromContainer(
       containerLayer ? containerLayer->renderer() : 0,
       IntSize(offsetX, offsetY));

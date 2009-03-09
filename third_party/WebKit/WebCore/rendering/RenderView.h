@@ -194,13 +194,10 @@ class RenderView : public RenderBlock {
 #endif
 
  protected:
-  virtual FloatQuad localToContainerQuad(const FloatQuad&,
-                                         RenderBoxModelObject* repaintContainer,
-                                         bool fixed = false) const;
-
-  virtual void mapLocalToAbsolutePoint(bool fixed,
-                                       bool useTransforms,
-                                       TransformState&) const;
+  virtual void mapLocalToContainer(RenderBoxModelObject* repaintContainer,
+                                   bool useTransforms,
+                                   bool fixed,
+                                   TransformState&) const;
   virtual void mapAbsoluteToLocalPoint(bool fixed,
                                        bool useTransforms,
                                        TransformState&) const;

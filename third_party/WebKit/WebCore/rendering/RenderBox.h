@@ -179,10 +179,6 @@ class RenderBox : public RenderBoxModelObject {
                              bool topLevel = true);
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
-  virtual FloatQuad localToContainerQuad(const FloatQuad&,
-                                         RenderBoxModelObject* repaintContainer,
-                                         bool fixed = false) const;
-
   IntRect reflectionBox() const;
   int reflectionOffset() const;
   // Given a rect in the object's coordinate space, returns the corresponding
@@ -421,9 +417,10 @@ class RenderBox : public RenderBoxModelObject {
     return isReplaced() && !isInlineBlockOrInlineTable();
   }
 
-  virtual void mapLocalToAbsolutePoint(bool fixed,
-                                       bool useTransforms,
-                                       TransformState&) const;
+  virtual void mapLocalToContainer(RenderBoxModelObject* repaintContainer,
+                                   bool useTransforms,
+                                   bool fixed,
+                                   TransformState&) const;
   virtual void mapAbsoluteToLocalPoint(bool fixed,
                                        bool useTransforms,
                                        TransformState&) const;
