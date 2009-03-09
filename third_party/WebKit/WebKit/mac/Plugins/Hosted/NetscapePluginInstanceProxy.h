@@ -130,6 +130,9 @@ class NetscapePluginInstanceProxy
                  mach_msg_type_number_t argumentsLength,
                  data_t& resultData,
                  mach_msg_type_number_t& resultLength);
+  bool enumerate(uint32_t objectID,
+                 data_t& resultData,
+                 mach_msg_type_number_t& resultLength);
 
   bool getProperty(uint32_t objectID,
                    const JSC::Identifier& propertyName,

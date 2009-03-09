@@ -83,6 +83,8 @@ class ProxyInstance : public JSC::Bindings::Instance {
                                        JSC::PreferredPrimitiveType) const;
   virtual JSC::JSValuePtr valueOf(JSC::ExecState*) const;
 
+  virtual void getPropertyNames(JSC::ExecState*, JSC::PropertyNameArray&);
+
   JSC::JSValuePtr stringValue(JSC::ExecState*) const;
   JSC::JSValuePtr numberValue(JSC::ExecState*) const;
   JSC::JSValuePtr booleanValue() const;
