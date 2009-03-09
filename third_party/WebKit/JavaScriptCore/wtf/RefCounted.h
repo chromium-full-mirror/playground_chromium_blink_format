@@ -71,6 +71,9 @@ class RefCountedBase : Noncopyable {
   }
 
  protected:
+  template <class T>
+  friend class CrossThreadRefCounted;
+
   int m_refCount;
 #ifndef NDEBUG
   bool m_deletionHasBegun;

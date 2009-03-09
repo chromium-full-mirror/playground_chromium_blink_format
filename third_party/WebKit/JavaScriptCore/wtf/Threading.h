@@ -230,10 +230,9 @@ inline int atomicDecrement(int volatile* addend) {
 
 #endif
 
-template <class T>
-class ThreadSafeShared : Noncopyable {
+class ThreadSafeSharedBase : Noncopyable {
  public:
-  ThreadSafeShared(int initialRefCount = 1) : m_refCount(initialRefCount) {}
+  ThreadSafeSharedBase(int initialRefCount = 1) : m_refCount(initialRefCount) {}
 
   void ref() {
 #if USE(LOCKFREE_THREADSAFESHARED)
@@ -242,19 +241,6 @@ class ThreadSafeShared : Noncopyable {
     MutexLocker locker(m_mutex);
     ++m_refCount;
 #endif
-  }
-
-  void deref() {
-#if USE(LOCKFREE_THREADSAFESHARED)
-    if (atomicDecrement(&m_refCount) <= 0)
-#else
-    {
-      MutexLocker locker(m_mutex);
-      --m_refCount;
-    }
-    if (m_refCount <= 0)
-#endif
-      delete static_cast<T*>(this);
   }
 
   bool hasOneRef() { return refCount() == 1; }
@@ -266,11 +252,45 @@ class ThreadSafeShared : Noncopyable {
     return static_cast<int const volatile&>(m_refCount);
   }
 
+ protected:
+  // Returns whether the pointer should be freed or not.
+  bool derefBase() {
+#if USE(LOCKFREE_THREADSAFESHARED)
+    if (atomicDecrement(&m_refCount) <= 0)
+      return true;
+#else
+    int refCount;
+    {
+      MutexLocker locker(m_mutex);
+      --m_refCount;
+      refCount = m_refCount;
+    }
+    if (refCount <= 0)
+      return true;
+#endif
+    return false;
+  }
+
  private:
+  template <class T>
+  friend class CrossThreadRefCounted;
+
   int m_refCount;
 #if !USE(LOCKFREE_THREADSAFESHARED)
   mutable Mutex m_mutex;
 #endif
+};
+
+template <class T>
+class ThreadSafeShared : public ThreadSafeSharedBase {
+ public:
+  ThreadSafeShared(int initialRefCount = 1)
+      : ThreadSafeSharedBase(initialRefCount) {}
+
+  void deref() {
+    if (derefBase())
+      delete static_cast<T*>(this);
+  }
 };
 
 // This function must be called from the main thread. It is safe to call it
