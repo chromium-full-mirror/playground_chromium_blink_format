@@ -1153,6 +1153,8 @@ String createMarkup(const Node* node,
     deleteButton->disable();
   }
 
+  document->updateLayoutIgnorePendingStylesheets();
+
   appendMarkup(result, const_cast<Node*>(node), includeChildren, nodes);
 
   if (deleteButton)
