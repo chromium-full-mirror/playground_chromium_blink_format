@@ -1506,7 +1506,7 @@ void RenderLayer::invalidateScrollbarRect(Scrollbar* scrollbar,
   RenderBox* box = renderBox();
   ASSERT(box);
   if (scrollbar == m_vBar.get())
-    scrollRect.move(box->width() - box->borderRight() - box->width(),
+    scrollRect.move(box->width() - box->borderRight() - scrollbar->width(),
                     box->borderTop());
   else
     scrollRect.move(box->borderLeft(),
