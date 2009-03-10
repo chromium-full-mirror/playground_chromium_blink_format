@@ -65,6 +65,7 @@ class InspectorResource : public RefCounted<InspectorResource> {
   Type type() const;
   void setScriptObject(JSContextRef, JSObjectRef);
   void setXMLHttpRequestProperties(const JSC::UString& data);
+  void setScriptProperties(const JSC::UString& data);
 
   String sourceString() const;
 

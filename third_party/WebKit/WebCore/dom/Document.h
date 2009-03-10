@@ -934,6 +934,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   virtual void resourceRetrievedByXMLHttpRequest(
       unsigned long identifier,
       const ScriptString& sourceString);
+  virtual void scriptImported(unsigned long, const String&);
   virtual void postTask(PassRefPtr<Task>);  // Executes the task on context's
                                             // thread asynchronously.
 

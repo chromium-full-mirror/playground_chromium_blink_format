@@ -80,6 +80,22 @@ ScriptValue WorkerScriptController::evaluate(
     if (m_executionForbidden)
       return noValue();
   }
+  ScriptValue exception;
+  ScriptValue result = evaluate(sourceCode, &exception);
+  if (exception.jsValue()) {
+    JSLock lock(false);
+    reportException(m_workerContextWrapper->globalExec(), exception.jsValue());
+  }
+  return result;
+}
+
+ScriptValue WorkerScriptController::evaluate(const ScriptSourceCode& sourceCode,
+                                             ScriptValue* exception) {
+  {
+    MutexLocker lock(m_sharedDataMutex);
+    if (m_executionForbidden)
+      return noValue();
+  }
 
   initScriptIfNeeded();
   JSLock lock(false);
@@ -98,8 +114,12 @@ ScriptValue WorkerScriptController::evaluate(
     return comp.value();
 
   if (comp.complType() == Throw)
-    reportException(exec, comp.value());
+    *exception = comp.value();
   return noValue();
+}
+
+void WorkerScriptController::setException(ScriptValue exception) {
+  m_workerContextWrapper->globalExec()->setException(exception.jsValue());
 }
 
 void WorkerScriptController::forbidExecution() {

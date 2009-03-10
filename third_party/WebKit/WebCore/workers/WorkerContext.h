@@ -90,6 +90,8 @@ class WorkerContext : public RefCounted<WorkerContext>,
   virtual void resourceRetrievedByXMLHttpRequest(
       unsigned long identifier,
       const ScriptString& sourceString);
+  virtual void scriptImported(unsigned long identifier,
+                              const String& sourceString);
 
   virtual WorkerContext* toWorkerContext() { return this; }
 
@@ -118,6 +120,11 @@ class WorkerContext : public RefCounted<WorkerContext>,
   typedef Vector<RefPtr<EventListener>> ListenerVector;
   typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
   EventListenersMap& eventListeners() { return m_eventListeners; }
+
+  void importScripts(const Vector<String>& urls,
+                     const String& callerURL,
+                     int callerLine,
+                     ExceptionCode&);
 
   using RefCounted<WorkerContext>::ref;
   using RefCounted<WorkerContext>::deref;

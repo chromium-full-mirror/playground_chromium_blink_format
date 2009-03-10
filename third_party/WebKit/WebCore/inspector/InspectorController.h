@@ -270,6 +270,8 @@ class InspectorController : public RefCounted<InspectorController>
                       const ResourceError&);
   void resourceRetrievedByXMLHttpRequest(unsigned long identifier,
                                          const JSC::UString& sourceString);
+  void scriptImported(unsigned long identifier,
+                      const JSC::UString& sourceString);
 
 #if ENABLE(DATABASE)
   void didOpenDatabase(Database*,

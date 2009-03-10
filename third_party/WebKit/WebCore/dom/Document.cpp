@@ -4400,6 +4400,12 @@ void Document::resourceRetrievedByXMLHttpRequest(
         identifier, sourceString);
 }
 
+void Document::scriptImported(unsigned long identifier,
+                              const String& sourceString) {
+  if (page())
+    page()->inspectorController()->scriptImported(identifier, sourceString);
+}
+
 class ScriptExecutionContextTaskTimer : public TimerBase {
  public:
   ScriptExecutionContextTaskTimer(PassRefPtr<Document> context,

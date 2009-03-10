@@ -76,6 +76,7 @@ class ScriptExecutionContext {
   virtual void resourceRetrievedByXMLHttpRequest(
       unsigned long identifier,
       const ScriptString& sourceString) = 0;
+  virtual void scriptImported(unsigned long, const String&) = 0;
 
   // Active objects are not garbage collected even if inaccessible, e.g. because
   // their activity may result in callbacks being invoked.
