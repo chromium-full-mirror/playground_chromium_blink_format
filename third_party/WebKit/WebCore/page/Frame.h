@@ -305,7 +305,7 @@ class Frame : public RefCounted<Frame> {
 
   void revealSelection(
       const ScrollAlignment& = ScrollAlignment::alignCenterIfNeeded,
-      bool revealExtent);
+      bool revealExtent = false);
   void setSelectionFromNone();
 
   void setUseSecureKeyboardEntry(bool);
