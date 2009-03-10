@@ -304,9 +304,8 @@ class Frame : public RefCounted<Frame> {
   HTMLFormElement* currentForm() const;
 
   void revealSelection(
-      const ScrollAlignment& = ScrollAlignment::alignCenterIfNeeded) const;
-  void revealCaret(
-      const ScrollAlignment& = ScrollAlignment::alignCenterIfNeeded) const;
+      const ScrollAlignment& = ScrollAlignment::alignCenterIfNeeded,
+      bool revealExtent);
   void setSelectionFromNone();
 
   void setUseSecureKeyboardEntry(bool);

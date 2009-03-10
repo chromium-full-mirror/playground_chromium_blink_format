@@ -1232,7 +1232,9 @@ HTMLFormElement* Frame::currentForm() const {
   return start ? scanForForm(start) : 0;
 }
 
-void Frame::revealSelection(const ScrollAlignment& alignment) const {
+void Frame::revealSelection(const ScrollAlignment& alignment,
+                            bool revealExtent);
+{
   IntRect rect;
 
   switch (selection()->selectionType()) {
@@ -1242,7 +1244,9 @@ void Frame::revealSelection(const ScrollAlignment& alignment) const {
       rect = selection()->absoluteCaretBounds();
       break;
     case VisibleSelection::RangeSelection:
-      rect = enclosingIntRect(selectionBounds(false));
+      rect = revealExtent
+                 ? VisiblePosition(selection()->extent()).absoluteCaretBounds()
+                 : enclosingIntRect(selectionBounds(false));
       break;
   }
 
@@ -1254,19 +1258,6 @@ void Frame::revealSelection(const ScrollAlignment& alignment) const {
     // See <rdar://problem/4799899>.
     if (RenderLayer* layer = start.node()->renderer()->enclosingLayer())
       layer->scrollRectToVisible(rect, false, alignment, alignment);
-  }
-}
-
-void Frame::revealCaret(const ScrollAlignment& alignment) const {
-  if (selection()->isNone())
-    return;
-
-  Position extent = selection()->extent();
-  if (extent.node() && extent.node()->renderer()) {
-    IntRect extentRect = VisiblePosition(extent).absoluteCaretBounds();
-    RenderLayer* layer = extent.node()->renderer()->enclosingLayer();
-    if (layer)
-      layer->scrollRectToVisible(extentRect, false, alignment, alignment);
   }
 }
 
