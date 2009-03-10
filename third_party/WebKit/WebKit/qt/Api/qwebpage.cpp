@@ -1714,7 +1714,7 @@ bool QWebPage::acceptNavigationRequest(QWebFrame* frame,
         return true;
 
       case DelegateExternalLinks:
-        if (WebCore::FrameLoader::shouldTreatSchemeAsLocal(
+        if (WebCore::FrameLoader::shouldTreatURLSchemeAsLocal(
                 request.url().scheme()))
           return true;
         emit linkClicked(request.url());
