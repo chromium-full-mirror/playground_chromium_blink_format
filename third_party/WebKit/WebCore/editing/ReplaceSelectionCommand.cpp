@@ -991,7 +991,7 @@ void ReplaceSelectionCommand::doApply() {
   // didn't have a br after it, so the inserted content ended up in the same
   // paragraph.
   if (startBlock && insertionPos.node() == startBlock->parentNode() &&
-      (unsigned)insertionPos.offset() < startBlock->nodeIndex() &&
+      (unsigned)insertionPos.m_offset < startBlock->nodeIndex() &&
       !isStartOfParagraph(startOfInsertedContent))
     insertNodeAt(createBreakElement(document()).get(),
                  startOfInsertedContent.deepEquivalent());

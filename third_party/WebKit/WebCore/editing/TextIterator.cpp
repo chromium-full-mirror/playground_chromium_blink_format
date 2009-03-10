@@ -1530,7 +1530,7 @@ PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(
         Position runEnd = VisiblePosition(runStart).next().deepEquivalent();
         if (runEnd.isNotNull()) {
           ExceptionCode ec = 0;
-          textRunRange->setEnd(runEnd.node(), runEnd.offset(), ec);
+          textRunRange->setEnd(runEnd.node(), runEnd.m_offset, ec);
           ASSERT(!ec);
         }
       }

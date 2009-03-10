@@ -91,8 +91,8 @@ int comparePositions(const Position& a, const Position& b) {
   ASSERT(nodeA);
   Node* nodeB = b.node();
   ASSERT(nodeB);
-  int offsetA = a.offset();
-  int offsetB = b.offset();
+  int offsetA = a.m_offset;
+  int offsetB = b.m_offset;
 
   Node* shadowAncestorA = nodeA->shadowAncestorNode();
   if (shadowAncestorA == nodeA)
@@ -313,7 +313,7 @@ Position rangeCompliantEquivalent(const Position& pos) {
 
   Node* node = pos.node();
 
-  if (pos.offset() <= 0) {
+  if (pos.m_offset <= 0) {
     if (node->parentNode() &&
         (editingIgnoresContent(node) || isTableElement(node)))
       return positionBeforeNode(node);
@@ -321,10 +321,10 @@ Position rangeCompliantEquivalent(const Position& pos) {
   }
 
   if (node->offsetInCharacters())
-    return Position(node, min(node->maxCharacterOffset(), pos.offset()));
+    return Position(node, min(node->maxCharacterOffset(), pos.m_offset));
 
   int maxCompliantOffset = node->childNodeCount();
-  if (pos.offset() > maxCompliantOffset) {
+  if (pos.m_offset > maxCompliantOffset) {
     if (node->parentNode())
       return positionAfterNode(node);
 
@@ -334,12 +334,12 @@ Position rangeCompliantEquivalent(const Position& pos) {
   }
 
   // Editing should never generate positions like this.
-  if ((pos.offset() < maxCompliantOffset) && editingIgnoresContent(node)) {
+  if ((pos.m_offset < maxCompliantOffset) && editingIgnoresContent(node)) {
     ASSERT_NOT_REACHED();
     return node->parentNode() ? positionBeforeNode(node) : Position(node, 0);
   }
 
-  if (pos.offset() == maxCompliantOffset &&
+  if (pos.m_offset == maxCompliantOffset &&
       (editingIgnoresContent(node) || isTableElement(node)))
     return positionAfterNode(node);
 
@@ -536,7 +536,7 @@ Node* isFirstPositionAfterTable(const VisiblePosition& visiblePosition) {
   Position upstream(visiblePosition.deepEquivalent().upstream());
   if (upstream.node() && upstream.node()->renderer() &&
       upstream.node()->renderer()->isTable() &&
-      upstream.offset() == maxDeepOffset(upstream.node()))
+      upstream.m_offset == maxDeepOffset(upstream.node()))
     return upstream.node();
 
   return 0;
@@ -545,7 +545,7 @@ Node* isFirstPositionAfterTable(const VisiblePosition& visiblePosition) {
 Node* isLastPositionBeforeTable(const VisiblePosition& visiblePosition) {
   Position downstream(visiblePosition.deepEquivalent().downstream());
   if (downstream.node() && downstream.node()->renderer() &&
-      downstream.node()->renderer()->isTable() && downstream.offset() == 0)
+      downstream.node()->renderer()->isTable() && downstream.m_offset == 0)
     return downstream.node();
 
   return 0;

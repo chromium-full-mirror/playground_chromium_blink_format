@@ -451,8 +451,8 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity,
 
       if (granularity == CharacterGranularity &&
           selectionToDelete.end().node() == selectionToDelete.start().node() &&
-          selectionToDelete.end().offset() -
-                  selectionToDelete.start().offset() >
+          selectionToDelete.end().m_offset -
+                  selectionToDelete.start().m_offset >
               1) {
         // If there are multiple Unicode code points to be deleted, adjust the
         // range to match platform conventions.
@@ -535,7 +535,7 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity,
       // When deleting tables: Select the table first, then perform the deletion
       if (downstreamEnd.node() && downstreamEnd.node()->renderer() &&
           downstreamEnd.node()->renderer()->isTable() &&
-          downstreamEnd.offset() == 0) {
+          downstreamEnd.m_offset == 0) {
         setEndingSelection(VisibleSelection(
             endingSelection().end(),
             Position(downstreamEnd.node(), maxDeepOffset(downstreamEnd.node())),
@@ -568,11 +568,11 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity,
           int extraCharacters;
           if (selectionToDelete.start().node() ==
               selectionToDelete.end().node())
-            extraCharacters = selectionToDelete.end().offset() -
-                              selectionToDelete.start().offset();
+            extraCharacters = selectionToDelete.end().m_offset -
+                              selectionToDelete.start().m_offset;
           else
-            extraCharacters = selectionToDelete.end().offset();
-          extent = Position(extent.node(), extent.offset() + extraCharacters);
+            extraCharacters = selectionToDelete.end().m_offset;
+          extent = Position(extent.node(), extent.m_offset + extraCharacters);
         }
         selectionAfterUndo.setWithoutValidation(startingSelection().start(),
                                                 extent);

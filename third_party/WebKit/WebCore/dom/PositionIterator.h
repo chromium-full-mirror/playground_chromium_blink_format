@@ -40,8 +40,8 @@ class PositionIterator {
 
   PositionIterator(const Position& pos)
       : m_parent(pos.node()),
-        m_child(m_parent->childNode(pos.offset())),
-        m_offset(m_child ? 0 : pos.offset()) {}
+        m_child(m_parent->childNode(pos.m_offset)),
+        m_offset(m_child ? 0 : pos.m_offset) {}
   operator Position() const;
 
   void increment();

@@ -375,8 +375,8 @@ static void updatePositionForNodeRemoval(Node* node, Position& position) {
   if (position.isNull())
     return;
   if (node->parent() == position.node() &&
-      node->nodeIndex() < (unsigned)position.offset())
-    position = Position(position.node(), position.offset() - 1);
+      node->nodeIndex() < (unsigned)position.m_offset)
+    position = Position(position.node(), position.m_offset - 1);
   if (position.node() == node || position.node()->isDescendantOf(node))
     position = positionBeforeNode(node);
 }
@@ -454,9 +454,9 @@ static void updatePositionForTextRemoval(Node* node,
                                          int count,
                                          Position& position) {
   if (position.node() == node) {
-    if (position.offset() > offset + count)
-      position = Position(position.node(), position.offset() - count);
-    else if (position.offset() > offset)
+    if (position.m_offset > offset + count)
+      position = Position(position.node(), position.m_offset - count);
+    else if (position.m_offset > offset)
       position = Position(position.node(), offset);
   }
 }
@@ -473,7 +473,7 @@ void DeleteSelectionCommand::deleteTextFromNode(PassRefPtr<Text> node,
 }
 
 void DeleteSelectionCommand::handleGeneralDelete() {
-  int startOffset = m_upstreamStart.offset();
+  int startOffset = m_upstreamStart.m_offset;
   Node* startNode = m_upstreamStart.node();
 
   // Never remove the start block unless it's a table, in which case we won't
@@ -505,17 +505,17 @@ void DeleteSelectionCommand::handleGeneralDelete() {
     // The selection to delete is all in one node.
     if (!startNode->renderer() ||
         (startOffset == 0 &&
-         m_downstreamEnd.offset() >= maxDeepOffset(startNode))) {
+         m_downstreamEnd.m_offset >= maxDeepOffset(startNode))) {
       // just delete
       removeNode(startNode);
-    } else if (m_downstreamEnd.offset() - startOffset > 0) {
+    } else if (m_downstreamEnd.m_offset - startOffset > 0) {
       if (startNode->isTextNode()) {
         // in a text node that needs to be trimmed
         Text* text = static_cast<Text*>(startNode);
         deleteTextFromNode(text, startOffset,
-                           m_downstreamEnd.offset() - startOffset);
+                           m_downstreamEnd.m_offset - startOffset);
       } else {
-        removeChildrenInRange(startNode, startOffset, m_downstreamEnd.offset());
+        removeChildrenInRange(startNode, startOffset, m_downstreamEnd.m_offset);
         m_endingPosition = m_upstreamStart;
       }
     }
@@ -548,16 +548,16 @@ void DeleteSelectionCommand::handleGeneralDelete() {
         // so the
         // check above will work
         if (node->parentNode() == m_downstreamEnd.node()) {
-          ASSERT(node->nodeIndex() < (unsigned)m_downstreamEnd.offset());
+          ASSERT(node->nodeIndex() < (unsigned)m_downstreamEnd.m_offset);
           m_downstreamEnd =
-              Position(m_downstreamEnd.node(), m_downstreamEnd.offset() - 1);
+              Position(m_downstreamEnd.node(), m_downstreamEnd.m_offset - 1);
         }
         removeNode(node.get());
         node = nextNode.get();
       } else {
         Node* n = node->lastDescendant();
         if (m_downstreamEnd.node() == n &&
-            m_downstreamEnd.offset() >= caretMaxOffset(n)) {
+            m_downstreamEnd.m_offset >= caretMaxOffset(n)) {
           removeNode(node.get());
           node = 0;
         } else
@@ -568,8 +568,8 @@ void DeleteSelectionCommand::handleGeneralDelete() {
     if (m_downstreamEnd.node() != startNode &&
         !m_upstreamStart.node()->isDescendantOf(m_downstreamEnd.node()) &&
         m_downstreamEnd.node()->inDocument() &&
-        m_downstreamEnd.offset() >= caretMinOffset(m_downstreamEnd.node())) {
-      if (m_downstreamEnd.offset() >= maxDeepOffset(m_downstreamEnd.node()) &&
+        m_downstreamEnd.m_offset >= caretMinOffset(m_downstreamEnd.node())) {
+      if (m_downstreamEnd.m_offset >= maxDeepOffset(m_downstreamEnd.node()) &&
           !canHaveChildrenForEditing(m_downstreamEnd.node())) {
         // The node itself is fully selected, not just its contents.  Delete it.
         removeNode(m_downstreamEnd.node());
@@ -577,8 +577,8 @@ void DeleteSelectionCommand::handleGeneralDelete() {
         if (m_downstreamEnd.node()->isTextNode()) {
           // in a text node that needs to be trimmed
           Text* text = static_cast<Text*>(m_downstreamEnd.node());
-          if (m_downstreamEnd.offset() > 0) {
-            deleteTextFromNode(text, 0, m_downstreamEnd.offset());
+          if (m_downstreamEnd.m_offset > 0) {
+            deleteTextFromNode(text, 0, m_downstreamEnd.m_offset);
             m_downstreamEnd = Position(text, 0);
           }
           // Remove children of m_downstreamEnd.node() that come after
@@ -602,7 +602,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
               offset = n->nodeIndex() + 1;
           }
           removeChildrenInRange(m_downstreamEnd.node(), offset,
-                                m_downstreamEnd.offset());
+                                m_downstreamEnd.m_offset);
           m_downstreamEnd = Position(m_downstreamEnd.node(), offset);
         }
       }
@@ -619,7 +619,7 @@ void DeleteSelectionCommand::fixupWhitespace() {
     Text* textNode = static_cast<Text*>(m_leadingWhitespace.node());
     ASSERT(!textNode->renderer() ||
            textNode->renderer()->style()->collapseWhiteSpace());
-    replaceTextInNode(textNode, m_leadingWhitespace.offset(), 1,
+    replaceTextInNode(textNode, m_leadingWhitespace.m_offset, 1,
                       nonBreakingSpaceString());
   }
   if (m_trailingWhitespace.isNotNull() &&
@@ -627,7 +627,7 @@ void DeleteSelectionCommand::fixupWhitespace() {
     Text* textNode = static_cast<Text*>(m_trailingWhitespace.node());
     ASSERT(!textNode->renderer() ||
            textNode->renderer()->style()->collapseWhiteSpace());
-    replaceTextInNode(textNode, m_trailingWhitespace.offset(), 1,
+    replaceTextInNode(textNode, m_trailingWhitespace.m_offset, 1,
                       nonBreakingSpaceString());
   }
 }
