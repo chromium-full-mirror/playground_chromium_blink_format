@@ -174,6 +174,9 @@ class AbstractMacroAssembler {
     Label(AbstractMacroAssembler<AssemblerType>* masm)
         : m_label(masm->m_assembler.label()) {}
 
+    bool isUsed() const { return m_label.isUsed(); }
+    void used() { m_label.used(); }
+
    private:
     JmpDst m_label;
   };
