@@ -2657,8 +2657,11 @@ bool RenderLayer::hitTestContents(const HitTestRequest& request,
                                   HitTestFilter hitTestFilter) const {
   if (!renderer()->hitTest(request, result, hitTestPoint,
                            layerBounds.x() - renderBoxX(),
-                           layerBounds.y() - renderBoxY(), hitTestFilter))
+                           layerBounds.y() - renderBoxY(), hitTestFilter)) {
+    // It's wrong to set innerNode, but then claim that you didn't hit anything.
+    ASSERT(!result.innerNode());
     return false;
+  }
 
   // For positioned generated content, we might still not have a
   // node by the time we get to the layer level, since none of

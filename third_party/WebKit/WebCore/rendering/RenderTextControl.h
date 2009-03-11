@@ -96,7 +96,7 @@ class RenderTextControl : public RenderBlock {
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
   void createSubtreeIfNeeded(TextControlInnerElement* innerBlock);
-  void hitInnerTextBlock(HitTestResult&, int x, int y, int tx, int ty);
+  void hitInnerTextElement(HitTestResult&, int x, int y, int tx, int ty);
   void forwardEvent(Event*);
 
   int textBlockWidth() const;
