@@ -74,6 +74,7 @@ struct _WebKitWebSettingsPrivate {
   gchar* user_stylesheet_uri;
   gfloat zoom_step;
   gboolean enable_developer_extras;
+  gboolean enable_private_browsing;
 };
 
 #define WEBKIT_WEB_SETTINGS_GET_PRIVATE(obj)                    \
@@ -103,7 +104,8 @@ enum {
   PROP_RESIZABLE_TEXT_AREAS,
   PROP_USER_STYLESHEET_URI,
   PROP_ZOOM_STEP,
-  PROP_ENABLE_DEVELOPER_EXTRAS
+  PROP_ENABLE_DEVELOPER_EXTRAS,
+  PROP_ENABLE_PRIVATE_BROWSING
 };
 
 static void webkit_web_settings_finalize(GObject* object);
@@ -282,6 +284,18 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
                            "Enables special extensions that help developers",
                            FALSE, flags));
 
+  /**
+  * WebKitWebSettings:enable-private-browsing:
+  *
+  * Whether to enable private browsing mode.
+  *
+  * Since 1.1.2
+  */
+  g_object_class_install_property(
+      gobject_class, PROP_ENABLE_PRIVATE_BROWSING,
+      g_param_spec_boolean("enable-private-browsing", "Enable Private Browsing",
+                           "Enables private browsing mode", FALSE, flags));
+
   g_type_class_add_private(klass, sizeof(WebKitWebSettingsPrivate));
 }
 
@@ -384,6 +398,9 @@ static void webkit_web_settings_set_property(GObject* object,
     case PROP_ENABLE_DEVELOPER_EXTRAS:
       priv->enable_developer_extras = g_value_get_boolean(value);
       break;
+    case PROP_ENABLE_PRIVATE_BROWSING:
+      priv->enable_private_browsing = g_value_get_boolean(value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       break;
@@ -461,6 +478,9 @@ static void webkit_web_settings_get_property(GObject* object,
     case PROP_ENABLE_DEVELOPER_EXTRAS:
       g_value_set_boolean(value, priv->enable_developer_extras);
       break;
+    case PROP_ENABLE_PRIVATE_BROWSING:
+      g_value_set_boolean(value, priv->enable_private_browsing);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       break;
@@ -505,7 +525,8 @@ WebKitWebSettings* webkit_web_settings_copy(WebKitWebSettings* web_settings) {
       priv->enable_scripts, "enable-plugins", priv->enable_plugins,
       "resizable-text-areas", priv->resizable_text_areas, "user-stylesheet-uri",
       priv->user_stylesheet_uri, "zoom-step", priv->zoom_step,
-      "enable-developer-extras", priv->enable_developer_extras, NULL));
+      "enable-developer-extras", priv->enable_developer_extras,
+      "enable-private-browsing", priv->enable_private_browsing, NULL));
 
   return copy;
 }

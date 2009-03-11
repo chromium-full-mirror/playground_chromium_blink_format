@@ -1691,7 +1691,8 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       *fantasyFontFamily, *monospaceFontFamily, *sansSerifFontFamily,
       *serifFontFamily, *userStylesheetUri;
   gboolean autoLoadImages, autoShrinkImages, printBackgrounds, enableScripts,
-      enablePlugins, enableDeveloperExtras, resizableTextAreas;
+      enablePlugins, enableDeveloperExtras, resizableTextAreas,
+      enablePrivateBrowsing;
 
   g_object_get(
       webSettings, "default-encoding", &defaultEncoding, "cursive-font-family",
@@ -1703,7 +1704,8 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       "print-backgrounds", &printBackgrounds, "enable-scripts", &enableScripts,
       "enable-plugins", &enablePlugins, "resizable-text-areas",
       &resizableTextAreas, "user-stylesheet-uri", &userStylesheetUri,
-      "enable-developer-extras", &enableDeveloperExtras, NULL);
+      "enable-developer-extras", &enableDeveloperExtras,
+      "enable-private-browsing", &enablePrivateBrowsing, NULL);
 
   settings->setDefaultTextEncodingName(defaultEncoding);
   settings->setCursiveFontFamily(cursiveFontFamily);
@@ -1720,6 +1722,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setTextAreasAreResizable(resizableTextAreas);
   settings->setUserStyleSheetLocation(KURL(KURL(), userStylesheetUri));
   settings->setDeveloperExtrasEnabled(enableDeveloperExtras);
+  settings->setPrivateBrowsingEnabled(enablePrivateBrowsing);
 
   g_free(defaultEncoding);
   g_free(cursiveFontFamily);
@@ -1793,6 +1796,8 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
         KURL(KURL(), g_value_get_string(&value)));
   else if (name == g_intern_string("enable-developer-extras"))
     settings->setDeveloperExtrasEnabled(g_value_get_boolean(&value));
+  else if (name == g_intern_string("enable-private-browsing"))
+    settings->setPrivateBrowsingEnabled(g_value_get_boolean(&value));
   else if (!g_object_class_find_property(G_OBJECT_GET_CLASS(webSettings), name))
     g_warning("Unexpected setting '%s'", name);
   g_value_unset(&value);
