@@ -1233,8 +1233,7 @@ HTMLFormElement* Frame::currentForm() const {
 }
 
 void Frame::revealSelection(const ScrollAlignment& alignment,
-                            bool revealExtent);
-{
+                            bool revealExtent) {
   IntRect rect;
 
   switch (selection()->selectionType()) {
