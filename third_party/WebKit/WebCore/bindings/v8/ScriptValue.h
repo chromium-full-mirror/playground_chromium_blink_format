@@ -92,6 +92,8 @@ class ScriptValue {
 
   bool isUndefined() const { return m_value->IsUndefined(); }
 
+  bool hasNoValue() const { return m_value.IsEmpty(); }
+
   void clear() {
     if (m_value.IsEmpty())
       return;
