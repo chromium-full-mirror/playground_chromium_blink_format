@@ -88,7 +88,8 @@ class RenderTextControlSingleLine : public RenderTextControl,
   PassRefPtr<RenderStyle> createCancelButtonStyle(
       const RenderStyle* startStyle) const;
 
-  void updateCancelButtonVisibility(RenderStyle*) const;
+  void updateCancelButtonVisibility() const;
+  EVisibility visibilityForCancelButton() const;
   const AtomicString& autosaveName() const;
 
   void startSearchEventTimer();
