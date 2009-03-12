@@ -107,7 +107,7 @@ class PlatformWheelEvent {
   PlatformWheelEvent(NSEvent*);
 #endif
 #if PLATFORM(WIN)
-  PlatformWheelEvent(HWND, WPARAM, LPARAM, bool isHorizontal);
+  PlatformWheelEvent(HWND, WPARAM, LPARAM, bool isMouseHWheel);
 #endif
 #if PLATFORM(GTK)
   PlatformWheelEvent(GdkEventScroll*);
