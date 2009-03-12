@@ -47,7 +47,7 @@ bool LocalStorageThread::start() {
     return true;
 
   m_threadID = createThread(LocalStorageThread::localStorageThreadStart, this,
-                            "WebCore::LocalStorage");
+                            "WebCore: LocalStorage");
 
   return m_threadID;
 }

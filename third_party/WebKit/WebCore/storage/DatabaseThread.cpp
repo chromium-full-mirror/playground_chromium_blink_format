@@ -52,7 +52,7 @@ bool DatabaseThread::start() {
     return true;
 
   m_threadID = createThread(DatabaseThread::databaseThreadStart, this,
-                            "WebCore::Database");
+                            "WebCore: Database");
 
   return m_threadID;
 }
