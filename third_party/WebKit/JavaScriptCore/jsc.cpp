@@ -436,7 +436,12 @@ static bool runWithScripts(GlobalObject* globalObject,
   return success;
 }
 
-static void runInteractive(GlobalObject* globalObject) {
+static
+#if !HAVE(READLINE)
+    NO_RETURN
+#endif
+    void
+    runInteractive(GlobalObject* globalObject) {
   while (true) {
 #if HAVE(READLINE)
     char* line = readline(interactivePrompt);
