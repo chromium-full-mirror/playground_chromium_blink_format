@@ -40,12 +40,12 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS((obj), WEBKIT_TYPE_DOWNLOAD, WebKitDownloadClass))
 
 typedef enum {
-  WEBKIT_DOWNLOAD_STATE_ERROR = -1,
-  WEBKIT_DOWNLOAD_STATE_CREATED = 0,
-  WEBKIT_DOWNLOAD_STATE_STARTED,
-  WEBKIT_DOWNLOAD_STATE_CANCELLED,
-  WEBKIT_DOWNLOAD_STATE_FINISHED
-} WebKitDownloadState;
+  WEBKIT_DOWNLOAD_STATUS_ERROR = -1,
+  WEBKIT_DOWNLOAD_STATUS_CREATED = 0,
+  WEBKIT_DOWNLOAD_STATUS_STARTED,
+  WEBKIT_DOWNLOAD_STATUS_CANCELLED,
+  WEBKIT_DOWNLOAD_STATUS_FINISHED
+} WebKitDownloadStatus;
 
 typedef enum {
   WEBKIT_DOWNLOAD_ERROR_CANCELLED_BY_USER,
@@ -102,8 +102,8 @@ WEBKIT_API guint64 webkit_download_get_total_size(WebKitDownload* download);
 
 WEBKIT_API guint64 webkit_download_get_current_size(WebKitDownload* download);
 
-WEBKIT_API WebKitDownloadState
-webkit_download_get_state(WebKitDownload* download);
+WEBKIT_API WebKitDownloadStatus
+webkit_download_get_status(WebKitDownload* download);
 
 G_END_DECLS
 
