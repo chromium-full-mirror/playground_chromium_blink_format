@@ -964,10 +964,19 @@ void ReplaceSelectionCommand::doApply() {
   fragment.removeNode(refNode);
   insertNodeAtAndUpdateNodesInserted(refNode, insertionPos);
 
+  // Mutation events (bug 22634) may have already removed the inserted content
+  if (!refNode->inDocument())
+    return;
+
   while (node) {
     Node* next = node->nextSibling();
     fragment.removeNode(node);
     insertNodeAfterAndUpdateNodesInserted(node, refNode.get());
+
+    // Mutation events (bug 22634) may have already removed the inserted content
+    if (!node->inDocument())
+      return;
+
     refNode = node;
     node = next;
   }
@@ -1032,9 +1041,14 @@ void ReplaceSelectionCommand::doApply() {
     // what
     // comes after and prevent that from happening.
     VisiblePosition endOfInsertedContent = positionAtEndOfInsertedContent();
-    if (startOfParagraph(endOfInsertedContent) == startOfParagraphToMove)
+    if (startOfParagraph(endOfInsertedContent) == startOfParagraphToMove) {
       insertNodeAt(createBreakElement(document()).get(),
                    endOfInsertedContent.deepEquivalent());
+      // Mutation events (bug 22634) triggered by inserting the <br> might have
+      // removed the content we're about to move
+      if (!startOfParagraphToMove.deepEquivalent().node()->inDocument())
+        return;
+    }
 
     // FIXME: Maintain positions for the start and end of inserted content
     // instead of keeping nodes.  The nodes are
