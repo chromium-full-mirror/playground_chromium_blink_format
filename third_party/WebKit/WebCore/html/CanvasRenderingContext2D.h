@@ -351,6 +351,7 @@ class CanvasRenderingContext2D : Noncopyable {
 
 #if ENABLE(DASHBOARD_SUPPORT)
   void clearPathForDashboardBackwardCompatibilityMode();
+  void prepareGradientForDashboard(CanvasGradient* gradient) const;
 #endif
 
   void checkOrigin(const KURL&);
