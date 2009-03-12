@@ -150,6 +150,8 @@ ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
   return establishIdentifierForThread(threadRef);
 }
 
+void setThreadNameInternal(const char*) {}
+
 int waitForThreadCompletion(ThreadIdentifier threadID, void** result) {
   ASSERT(threadID);
 

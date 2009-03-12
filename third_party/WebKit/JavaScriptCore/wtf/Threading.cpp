@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,17 +29,20 @@
 namespace WTF {
 
 struct NewThreadContext {
-  NewThreadContext(ThreadFunction entryPoint, void* data)
-      : entryPoint(entryPoint), data(data) {}
+  NewThreadContext(ThreadFunction entryPoint, void* data, const char* name)
+      : entryPoint(entryPoint), data(data), name(name) {}
 
   ThreadFunction entryPoint;
   void* data;
+  const char* name;
 
   Mutex creationMutex;
 };
 
 static void* threadEntryPoint(void* contextData) {
   NewThreadContext* context = reinterpret_cast<NewThreadContext*>(contextData);
+
+  setThreadNameInternal(context->name);
 
   // Block until our creating thread has completed any extra setup work
   { MutexLocker locker(context->creationMutex); }
@@ -55,7 +58,7 @@ static void* threadEntryPoint(void* contextData) {
 ThreadIdentifier createThread(ThreadFunction entryPoint,
                               void* data,
                               const char* name) {
-  NewThreadContext* context = new NewThreadContext(entryPoint, data);
+  NewThreadContext* context = new NewThreadContext(entryPoint, data, name);
 
   // Prevent the thread body from executing until we've established the thread
   // identifier
