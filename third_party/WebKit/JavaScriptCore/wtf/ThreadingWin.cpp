@@ -115,7 +115,7 @@
 
 namespace WTF {
 
-// MS_VC_EXCEPTION, THREADNAME_INFO, and setThreadName all come from
+// MS_VC_EXCEPTION, THREADNAME_INFO, and setThreadNameInternal all come from
 // <http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx>.
 static const DWORD MS_VC_EXCEPTION = 0x406D1388;
 
@@ -128,15 +128,11 @@ typedef struct tagTHREADNAME_INFO {
 } THREADNAME_INFO;
 #pragma pack(pop)
 
-static void setThreadName(DWORD dwThreadID, LPCSTR szThreadName) {
-  // Visual Studio has a 31-character limit on thread names. Longer names will
-  // be truncated silently, but we'd like callers to know about the limit.
-  ASSERT_ARG(szThreadName, strlen(szThreadName) <= 31);
-
+void setThreadNameInternal(const char* szThreadName) {
   THREADNAME_INFO info;
   info.dwType = 0x1000;
   info.szName = szThreadName;
-  info.dwThreadID = dwThreadID;
+  info.dwThreadID = GetCurrentThreadId();
   info.dwFlags = 0;
 
   __try {
@@ -171,7 +167,7 @@ void initializeThreading() {
     initializeRandomNumberGenerator();
     initializeMainThread();
     mainThreadIdentifier = currentThread();
-    setThreadName(mainThreadIdentifier, "Main Thread");
+    setThreadNameInternal("Main Thread");
   }
 }
 
@@ -235,16 +231,11 @@ ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
     return 0;
   }
 
-  if (threadName)
-    setThreadName(threadIdentifier, threadName);
-
   threadID = static_cast<ThreadIdentifier>(threadIdentifier);
   storeThreadHandleByIdentifier(threadIdentifier, threadHandle);
 
   return threadID;
 }
-
-void setThreadNameInternal(const char*) {}
 
 int waitForThreadCompletion(ThreadIdentifier threadID, void** result) {
   ASSERT(threadID);
