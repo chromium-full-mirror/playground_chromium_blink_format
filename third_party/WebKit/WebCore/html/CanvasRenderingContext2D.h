@@ -351,9 +351,9 @@ class CanvasRenderingContext2D : Noncopyable {
 
 #if ENABLE(DASHBOARD_SUPPORT)
   void clearPathForDashboardBackwardCompatibilityMode();
-  void prepareGradientForDashboard(CanvasGradient* gradient) const;
 #endif
 
+  void prepareGradientForDashboard(CanvasGradient* gradient) const;
   void checkOrigin(const KURL&);
 
   HTMLCanvasElement* m_canvas;
