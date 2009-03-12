@@ -134,7 +134,6 @@ class Element : public ContainerNode {
 
   // DOM methods overridden from parent classes
   virtual NodeType nodeType() const;
-  virtual PassRefPtr<Node> cloneNode(bool deep);
   virtual String nodeName() const;
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
@@ -143,7 +142,8 @@ class Element : public ContainerNode {
                                Node* afterChange = 0,
                                int childCountDelta = 0);
 
-  PassRefPtr<Element> cloneElement();
+  PassRefPtr<Element> cloneElementWithChildren();
+  PassRefPtr<Element> cloneElementWithoutChildren();
 
   void normalizeAttributes();
 
@@ -244,6 +244,11 @@ class Element : public ContainerNode {
   virtual const AtomicString& virtualNamespaceURI() const {
     return namespaceURI();
   }
+
+  // cloneNode is private so that non-virtual cloneElementWithChildren and
+  // cloneElementWithoutChildren
+  // are used instead.
+  virtual PassRefPtr<Node> cloneNode(bool deep);
 
   QualifiedName m_tagName;
   virtual NodeRareData* createRareData();

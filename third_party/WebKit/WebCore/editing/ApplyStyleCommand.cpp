@@ -1718,8 +1718,9 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
                                  createHTMLElement(document(), supTag));
 
   if (m_styledInlineElement)
-    surroundNodeRangeWithElement(startNode, endNode,
-                                 m_styledInlineElement->cloneElement());
+    surroundNodeRangeWithElement(
+        startNode, endNode,
+        m_styledInlineElement->cloneElementWithoutChildren());
 }
 
 float ApplyStyleCommand::computedFontSize(const Node* node) {

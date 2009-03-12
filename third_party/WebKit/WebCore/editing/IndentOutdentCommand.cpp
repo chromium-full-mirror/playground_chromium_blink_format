@@ -166,7 +166,7 @@ void IndentOutdentCommand::indentRegion() {
       } else {
         // Clone the list element, insert it before the current paragraph, and
         // move the paragraph into it.
-        RefPtr<Element> clonedList = listNode->cloneElement();
+        RefPtr<Element> clonedList = listNode->cloneElementWithoutChildren();
         insertNodeBefore(
             clonedList,
             enclosingListChild(endOfCurrentParagraph.deepEquivalent().node()));
