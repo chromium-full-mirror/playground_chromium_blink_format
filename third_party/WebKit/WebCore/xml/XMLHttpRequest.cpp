@@ -738,6 +738,7 @@ void XMLHttpRequest::networkError() {
     if (m_upload)
       m_upload->dispatchErrorEvent();
   }
+  internalAbort();
 }
 
 void XMLHttpRequest::abortError() {
@@ -962,7 +963,6 @@ void XMLHttpRequest::didFail(const ResourceError& error) {
 }
 
 void XMLHttpRequest::didFailRedirectCheck() {
-  internalAbort();
   networkError();
 }
 
@@ -1074,7 +1074,7 @@ void XMLHttpRequest::didReceiveAuthenticationCancellation(
 }
 
 void XMLHttpRequest::didReceiveData(const char* data, int len) {
-  if (m_inPreflight)
+  if (m_inPreflight || m_error)
     return;
 
   if (m_state < HEADERS_RECEIVED)
