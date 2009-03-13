@@ -99,7 +99,7 @@ v8::Local<v8::Function> V8LazyEventListener::getListenerFunction() {
     // handler is named "evt".
     String code = "(function (evt) {\n";
     code.append(m_code);
-    code.append("})");
+    code.append("\n})");
 
     v8::Handle<v8::String> codeExternalString = v8ExternalString(code);
     v8::Handle<v8::Script> script = V8Proxy::CompileScript(
@@ -181,7 +181,7 @@ v8::Local<v8::Function> V8LazyEventListener::getWrappedListenerFunction() {
     code.append("      with (this) {\n");
     code.append("        return (function(evt){");
     code.append(m_code);
-    code.append("}).call(this, evt);\n");
+    code.append("\n}).call(this, evt);\n");
     code.append("      }\n");
     code.append("    }\n");
     code.append("  }\n");
