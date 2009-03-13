@@ -55,7 +55,10 @@ class V8AbstractEventListener : public EventListener {
   Frame* frame() { return m_frame; }
 
   virtual void handleEvent(Event*, bool isWindowEvent);
-  void invokeEventHandler(v8::Handle<v8::Context>, Event*, bool isWindowEvent);
+  void invokeEventHandler(v8::Handle<v8::Context>,
+                          Event*,
+                          v8::Handle<v8::Value> jsEvent,
+                          bool isWindowEvent);
 
   // Returns the listener object, either a function or an object.
   virtual v8::Local<v8::Object> getListenerObject() {

@@ -54,13 +54,8 @@ V8AbstractEventListener::V8AbstractEventListener(Frame* frame, bool isInline)
 void V8AbstractEventListener::invokeEventHandler(
     v8::Handle<v8::Context> context,
     Event* event,
+    v8::Handle<v8::Value> jsEvent,
     bool isWindowEvent) {
-  // Enter the V8 context in which to perform the event handling.
-  v8::Context::Scope scope(context);
-
-  // Get the V8 wrapper for the event object.
-  v8::Handle<v8::Value> jsEvent = V8Proxy::EventToV8Object(event);
-
   // For compatibility, we store the event object as a property on the window
   // called "event".  Because this is the global namespace, we save away any
   // existing "event" property, and then restore it after executing the
@@ -138,7 +133,13 @@ void V8AbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
   // function returns.
   RefPtr<Frame> protectFrame(m_frame);
 
-  invokeEventHandler(context, event, isWindowEvent);
+  // Enter the V8 context in which to perform the event handling.
+  v8::Context::Scope scope(context);
+
+  // Get the V8 wrapper for the event object.
+  v8::Handle<v8::Value> jsEvent = V8Proxy::EventToV8Object(event);
+
+  invokeEventHandler(context, event, jsEvent, isWindowEvent);
 
   Document::updateDocumentsRendering();
 }
