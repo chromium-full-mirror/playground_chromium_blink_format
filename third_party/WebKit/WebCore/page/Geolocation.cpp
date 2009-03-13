@@ -58,7 +58,8 @@ void Geolocation::GeoNotifier::timerFired(Timer<GeoNotifier>*) {
 Geolocation::Geolocation(Frame* frame)
     : m_frame(frame),
       m_service(GeolocationService::create(this)),
-      m_allowGeolocation(Unknown) {
+      m_allowGeolocation(Unknown),
+      m_shouldClearCache(false) {
   ASSERT(m_frame->document());
   m_frame->document()->setUsingGeolocation(true);
 }
@@ -74,15 +75,6 @@ void Geolocation::getCurrentPosition(
     PositionOptions* options) {
   RefPtr<GeoNotifier> notifier =
       GeoNotifier::create(successCallback, errorCallback, options);
-
-  if (!shouldAllowGeolocation()) {
-    if (notifier->m_errorCallback) {
-      RefPtr<PositionError> error = WebCore::PositionError::create(
-          PositionError::PERMISSION_DENIED, "Disallowed Geolocation");
-      notifier->m_errorCallback->handleEvent(error.get());
-    }
-    return;
-  }
 
   if (!m_service->startUpdating(options)) {
     if (notifier->m_errorCallback) {
@@ -101,15 +93,6 @@ int Geolocation::watchPosition(PassRefPtr<PositionCallback> successCallback,
                                PositionOptions* options) {
   RefPtr<GeoNotifier> notifier =
       GeoNotifier::create(successCallback, errorCallback, options);
-
-  if (!shouldAllowGeolocation()) {
-    if (notifier->m_errorCallback) {
-      RefPtr<PositionError> error = WebCore::PositionError::create(
-          PositionError::PERMISSION_DENIED, "Disallowed Geolocation");
-      notifier->m_errorCallback->handleEvent(error.get());
-    }
-    return 0;
-  }
 
   if (!m_service->startUpdating(options)) {
     if (notifier->m_errorCallback) {
@@ -142,6 +125,18 @@ void Geolocation::suspend() {
 void Geolocation::resume() {
   if (hasListeners())
     m_service->resume();
+}
+
+void Geolocation::setIsAllowed(bool allowed) {
+  m_allowGeolocation = allowed ? Yes : No;
+
+  if (isAllowed())
+    geolocationServicePositionChanged(m_service.get());
+  else {
+    WTF::RefPtr<WebCore::PositionError> error = WebCore::PositionError::create(
+        PositionError::PERMISSION_DENIED, "User disallowed GeoLocation");
+    handleError(error.get());
+  }
 }
 
 void Geolocation::sendErrorToOneShots(PositionError* error) {
@@ -223,9 +218,30 @@ void Geolocation::handleError(PositionError* error) {
   m_oneShots.clear();
 }
 
+void Geolocation::requestPermission() {
+  if (m_allowGeolocation > Unknown)
+    return;
+
+  if (!m_frame)
+    return;
+
+  Page* page = m_frame->page();
+  if (!page)
+    return;
+
+  // Ask the chrome: it maintains the geolocation challenge policy itself.
+  page->chrome()->requestGeolocationPermissionForFrame(m_frame, this);
+
+  m_allowGeolocation = InProgress;
+}
+
 void Geolocation::geolocationServicePositionChanged(
     GeolocationService* service) {
   ASSERT(service->lastPosition());
+
+  requestPermission();
+  if (!isAllowed())
+    return;
 
   sendPositionToOneShots(service->lastPosition());
   sendPositionToWatchers(service->lastPosition());
@@ -240,20 +256,6 @@ void Geolocation::geolocationServiceErrorOccurred(GeolocationService* service) {
   ASSERT(service->lastError());
 
   handleError(service->lastError());
-}
-
-bool Geolocation::shouldAllowGeolocation() {
-  if (!m_frame)
-    return false;
-
-  Page* page = m_frame->page();
-  if (!page)
-    return false;
-
-  if (m_allowGeolocation == Unknown)
-    m_allowGeolocation =
-        page->chrome()->shouldAllowGeolocationForFrame(m_frame) ? Yes : No;
-  return m_allowGeolocation == Yes;
 }
 
 }  // namespace WebCore

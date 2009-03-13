@@ -38,6 +38,7 @@ class ChromeClient;
 class ContextMenu;
 class FloatRect;
 class Frame;
+class Geolocation;
 class HitTestResult;
 class IntRect;
 class Page;
@@ -129,7 +130,7 @@ class Chrome : public HostWindow {
   void enableSuddenTermination();
   void disableSuddenTermination();
 
-  bool shouldAllowGeolocationForFrame(Frame*);
+  void requestGeolocationPermissionForFrame(Frame*, Geolocation*);
 
   void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
 

@@ -165,7 +165,8 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void setNeedsOneShotDrawingSynchronization();
 #endif
 
-  virtual bool shouldAllowGeolocationForFrame(WebCore::Frame*);
+  virtual void requestGeolocationPermissionForFrame(WebCore::Frame*,
+                                                    WebCore::Geolocation*);
 
  private:
   WebView* m_webView;
