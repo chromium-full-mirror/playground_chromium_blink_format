@@ -68,6 +68,8 @@ class ThemePainter : public TransparencyWin {
     init(context, getLayerMode(context, transformMode), transformMode, r);
   }
 
+  ~ThemePainter() { composite(); }
+
  private:
   static LayerMode getLayerMode(GraphicsContext* context,
                                 TransformMode transformMode) {

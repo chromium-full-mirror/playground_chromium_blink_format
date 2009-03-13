@@ -196,6 +196,7 @@ void TransparencyAwareFontPainter::initializeForGDI(
 TransparencyAwareFontPainter::~TransparencyAwareFontPainter() {
   if (!m_useGDI)
     return;  // Nothing to do.
+  m_transparency.composite();
   if (m_createdTransparencyLayer)
     m_graphicsContext->endTransparencyLayer();
 
