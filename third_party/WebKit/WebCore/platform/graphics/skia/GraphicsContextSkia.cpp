@@ -633,9 +633,10 @@ void GraphicsContext::drawRect(const IntRect& rect) {
     return;
 
   SkRect r = rect;
-  if (!isRectSkiaSafe(getCTM(), r))
+  if (!isRectSkiaSafe(getCTM(), r)) {
     // See the fillRect below.
     ClipRectToCanvas(*platformContext()->canvas(), r, &r);
+  }
 
   platformContext()->drawRect(r);
 }
@@ -675,9 +676,10 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
     return;
 
   SkRect r = rect;
-  if (!isRectSkiaSafe(getCTM(), r))
+  if (!isRectSkiaSafe(getCTM(), r)) {
     // See the other version of fillRect below.
     ClipRectToCanvas(*platformContext()->canvas(), r, &r);
+  }
 
   const GraphicsContextState& state = m_common->state;
   ColorSpace colorSpace = state.fillColorSpace;
