@@ -60,6 +60,7 @@ class WebNetscapePluginEventHandlerCocoa
   bool sendKeyEvent(NSEvent*, NPCocoaEventType);
   bool sendEvent(NPCocoaEvent*);
 
+#ifndef __LP64__
   void installKeyEventHandler();
   void removeKeyEventHandler();
 
@@ -69,6 +70,7 @@ class WebNetscapePluginEventHandlerCocoa
   OSStatus handleTSMEvent(EventRef);
 
   EventHandlerRef m_keyEventHandler;
+#endif
 };
 
 #endif  // WebNetscapePluginEventHandlerCocoa_h
