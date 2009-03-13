@@ -567,9 +567,10 @@ static bool handleStyleSpansBeforeInsertion(ReplacementFragment& fragment,
                                             const Position& insertionPos) {
   Node* topNode = fragment.firstChild();
 
-  // Handling this case is more complicated (see handleStyleSpans) and doesn't
-  // receive the optimization.
-  if (isMailPasteAsQuotationNode(topNode))
+  // Handling the case where we are doing Paste as Quotation or pasting into
+  // quoted content is more complicated (see handleStyleSpans)
+  // and doesn't receive the optimization.
+  if (isMailPasteAsQuotationNode(topNode) || nearestMailBlockquote(topNode))
     return false;
 
   // Either there are no style spans in the fragment or a WebKit client has
@@ -653,15 +654,19 @@ void ReplaceSelectionCommand::handleStyleSpans() {
           ->copy();
   Node* context = sourceDocumentStyleSpan->parentNode();
 
-  // If Mail wraps the fragment with a Paste as Quotation blockquote, styles
-  // from that element are
-  // allowed to override those from the source document, see
-  // <rdar://problem/4930986>.
-  if (isMailPasteAsQuotationNode(context)) {
+  // If Mail wraps the fragment with a Paste as Quotation blockquote, or if
+  // you're pasting into a quoted region,
+  // styles from blockquoteNode are allowed to override those from the source
+  // document, see <rdar://problem/4930986> and <rdar://problem/5089327>.
+  Node* blockquoteNode = isMailPasteAsQuotationNode(context)
+                             ? context
+                             : nearestMailBlockquote(context);
+  if (blockquoteNode) {
     RefPtr<CSSMutableStyleDeclaration> blockquoteStyle =
-        computedStyle(context)->copyInheritableProperties();
+        computedStyle(blockquoteNode)->copyInheritableProperties();
     RefPtr<CSSMutableStyleDeclaration> parentStyle =
-        computedStyle(context->parentNode())->copyInheritableProperties();
+        computedStyle(blockquoteNode->parentNode())
+            ->copyInheritableProperties();
     parentStyle->diff(blockquoteStyle.get());
 
     CSSMutableStyleDeclaration::const_iterator end = blockquoteStyle->end();
@@ -672,7 +677,7 @@ void ReplaceSelectionCommand::handleStyleSpans() {
       sourceDocumentStyle->removeProperty(property.id());
     }
 
-    context = context->parentNode();
+    context = blockquoteNode->parentNode();
   }
 
   RefPtr<CSSMutableStyleDeclaration> contextStyle =
