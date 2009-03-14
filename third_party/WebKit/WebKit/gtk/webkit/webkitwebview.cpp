@@ -1349,8 +1349,8 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
       G_STRUCT_OFFSET(WebKitWebViewClass, script_confirm),
       g_signal_accumulator_true_handled, NULL,
-      webkit_marshal_BOOLEAN__OBJECT_STRING_BOOLEAN, G_TYPE_BOOLEAN, 3,
-      WEBKIT_TYPE_WEB_FRAME, G_TYPE_STRING, G_TYPE_BOOLEAN);
+      webkit_marshal_BOOLEAN__OBJECT_STRING_POINTER, G_TYPE_BOOLEAN, 3,
+      WEBKIT_TYPE_WEB_FRAME, G_TYPE_STRING, G_TYPE_POINTER);
 
   /**
    * WebKitWebView::script-prompt:
