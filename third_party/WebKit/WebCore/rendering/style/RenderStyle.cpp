@@ -596,8 +596,8 @@ void RenderStyle::setContent(PassRefPtr<StyleImage> image, bool add) {
 
   OwnPtr<ContentData>& content = rareNonInheritedData.access()->m_content;
   ContentData* lastContent = content.get();
-  while (lastContent && lastContent->m_next)
-    lastContent = lastContent->m_next;
+  while (lastContent && lastContent->next())
+    lastContent = lastContent->next();
 
   bool reuseContent = !add;
   ContentData* newContentData;
@@ -608,33 +608,29 @@ void RenderStyle::setContent(PassRefPtr<StyleImage> image, bool add) {
     newContentData = new ContentData;
 
   if (lastContent && !reuseContent)
-    lastContent->m_next = newContentData;
+    lastContent->setNext(newContentData);
   else
     content.set(newContentData);
 
-  newContentData->m_content.m_image = image.releaseRef();
-  newContentData->m_type = CONTENT_OBJECT;
+  newContentData->setImage(image);
 }
 
-void RenderStyle::setContent(StringImpl* s, bool add) {
+void RenderStyle::setContent(PassRefPtr<StringImpl> s, bool add) {
   if (!s)
     return;  // The string is null. Nothing to do. Just bail.
 
   OwnPtr<ContentData>& content = rareNonInheritedData.access()->m_content;
   ContentData* lastContent = content.get();
-  while (lastContent && lastContent->m_next)
-    lastContent = lastContent->m_next;
+  while (lastContent && lastContent->next())
+    lastContent = lastContent->next();
 
   bool reuseContent = !add;
   if (add && lastContent) {
-    if (lastContent->m_type == CONTENT_TEXT) {
+    if (lastContent->isText()) {
       // We can augment the existing string and share this ContentData node.
-      StringImpl* oldStr = lastContent->m_content.m_text;
-      String newStr = oldStr;
-      newStr.append(s);
-      newStr.impl()->ref();
-      oldStr->deref();
-      lastContent->m_content.m_text = newStr.impl();
+      String newStr = lastContent->text();
+      newStr.append(s.get());
+      lastContent->setText(newStr.impl());
       return;
     }
   }
@@ -647,13 +643,11 @@ void RenderStyle::setContent(StringImpl* s, bool add) {
     newContentData = new ContentData;
 
   if (lastContent && !reuseContent)
-    lastContent->m_next = newContentData;
+    lastContent->setNext(newContentData);
   else
     content.set(newContentData);
 
-  newContentData->m_content.m_text = s;
-  newContentData->m_content.m_text->ref();
-  newContentData->m_type = CONTENT_TEXT;
+  newContentData->setText(s);
 }
 
 void RenderStyle::setContent(CounterContent* c, bool add) {
@@ -662,8 +656,8 @@ void RenderStyle::setContent(CounterContent* c, bool add) {
 
   OwnPtr<ContentData>& content = rareNonInheritedData.access()->m_content;
   ContentData* lastContent = content.get();
-  while (lastContent && lastContent->m_next)
-    lastContent = lastContent->m_next;
+  while (lastContent && lastContent->next())
+    lastContent = lastContent->next();
 
   bool reuseContent = !add;
   ContentData* newContentData = 0;
@@ -674,12 +668,11 @@ void RenderStyle::setContent(CounterContent* c, bool add) {
     newContentData = new ContentData;
 
   if (lastContent && !reuseContent)
-    lastContent->m_next = newContentData;
+    lastContent->setNext(newContentData);
   else
     content.set(newContentData);
 
-  newContentData->m_content.m_counter = c;
-  newContentData->m_type = CONTENT_COUNTER;
+  newContentData->setCounter(c);
 }
 
 void RenderStyle::applyTransform(TransformationMatrix& transform,

@@ -1534,7 +1534,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
             *const_cast<RenderStyle*>(otherStyle)->rareNonInheritedData);
   }
   void clearContent();
-  void setContent(StringImpl*, bool add = false);
+  void setContent(PassRefPtr<StringImpl>, bool add = false);
   void setContent(PassRefPtr<StyleImage>, bool add = false);
   void setContent(CounterContent*, bool add = false);
 

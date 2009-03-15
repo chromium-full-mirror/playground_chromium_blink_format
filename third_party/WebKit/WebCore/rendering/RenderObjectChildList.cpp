@@ -441,15 +441,14 @@ void RenderObjectChildList::updateBeforeAfterContent(
 
   // Walk our list of generated content and create render objects for each.
   for (const ContentData* content = pseudoElementStyle->contentData(); content;
-       content = content->m_next) {
+       content = content->next()) {
     RenderObject* renderer = 0;
-    switch (content->m_type) {
+    switch (content->type()) {
       case CONTENT_NONE:
         break;
       case CONTENT_TEXT:
-        renderer = new (owner->renderArena())
-            RenderTextFragment(owner->document() /* anonymous object */,
-                               content->m_content.m_text);
+        renderer = new (owner->renderArena()) RenderTextFragment(
+            owner->document() /* anonymous object */, content->text());
         renderer->setStyle(pseudoElementStyle);
         break;
       case CONTENT_OBJECT: {
@@ -458,14 +457,14 @@ void RenderObjectChildList::updateBeforeAfterContent(
         RefPtr<RenderStyle> style = RenderStyle::create();
         style->inheritFrom(pseudoElementStyle);
         image->setStyle(style.release());
-        if (StyleImage* styleImage = content->m_content.m_image)
+        if (StyleImage* styleImage = content->image())
           image->setStyleImage(styleImage);
         renderer = image;
         break;
       }
       case CONTENT_COUNTER:
         renderer = new (owner->renderArena())
-            RenderCounter(owner->document(), *content->m_content.m_counter);
+            RenderCounter(owner->document(), *content->counter());
         renderer->setStyle(pseudoElementStyle);
         break;
     }
