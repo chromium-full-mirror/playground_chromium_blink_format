@@ -315,7 +315,7 @@ void FrameLoaderClient::dispatchDecidePolicyForMIMEType(
   if (canShowMIMEType(mimeType))
     webkit_web_policy_decision_use(policyDecision);
   else
-    webkit_web_policy_decision_download(policyDecision);
+    webkit_web_policy_decision_ignore(policyDecision);
 }
 
 void FrameLoaderClient::dispatchDecidePolicyForNewWindowAction(
