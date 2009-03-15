@@ -95,9 +95,8 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
     return true;
 
   RefPtr<Node> next = refChild;
-  RefPtr<Node> prev = refChild->previousSibling();
+  RefPtr<Node> refChildPreviousSibling = refChild->previousSibling();
 
-  int childCountDelta = 0;
   RefPtr<Node> child = isFragment ? newChild->firstChild() : newChild;
   while (child) {
     RefPtr<Node> nextChild = isFragment ? child->nextSibling() : 0;
@@ -126,8 +125,6 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
     ASSERT(!child->nextSibling());
     ASSERT(!child->previousSibling());
 
-    childCountDelta++;
-
     // Add child before "next".
     forbidEventDispatch();
     Node* prev = next->previousSibling();
@@ -147,6 +144,7 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
     allowEventDispatch();
 
     // Dispatch the mutation events.
+    childrenChanged(false, refChildPreviousSibling.get(), next.get(), 1);
     dispatchChildInsertionEvents(child.get(), ec);
 
     // Add child to the rendering tree.
@@ -161,8 +159,6 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
   }
 
   document()->setDocumentChanged(true);
-  if (childCountDelta)
-    childrenChanged(false, prev.get(), next.get(), childCountDelta);
   dispatchSubtreeModifiedEvent();
   return true;
 }
@@ -461,7 +457,6 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
     return true;
 
   // Now actually add the child(ren)
-  int childCountDelta = 0;
   RefPtr<Node> prev = lastChild();
   RefPtr<Node> child = isFragment ? newChild->firstChild() : newChild;
   while (child) {
@@ -483,7 +478,6 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
     }
 
     // Append child to the end of the list
-    childCountDelta++;
     forbidEventDispatch();
     child->setParent(this);
     if (m_lastChild) {
@@ -495,6 +489,7 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
     allowEventDispatch();
 
     // Dispatch the mutation events
+    childrenChanged(false, prev.get(), 0, 1);
     dispatchChildInsertionEvents(child.get(), ec);
 
     // Add child to the rendering tree
@@ -509,7 +504,6 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
   }
 
   document()->setDocumentChanged(true);
-  childrenChanged(false, prev.get(), 0, childCountDelta);
   dispatchSubtreeModifiedEvent();
   return true;
 }
