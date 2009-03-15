@@ -50,7 +50,7 @@ struct ContentData : Noncopyable {
 
   StyleContentType type() const { return m_type; }
 
-  bool ContentData::dataEquivalent(const ContentData&) const;
+  bool dataEquivalent(const ContentData&) const;
 
   StyleImage* image() const { return m_content.m_image; }
   void setImage(PassRefPtr<StyleImage> image) {
