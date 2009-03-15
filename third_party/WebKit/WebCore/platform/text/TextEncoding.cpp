@@ -188,6 +188,8 @@ const TextEncoding& TextEncoding::closestByteBasedEquivalent() const {
 // should be done for UTF-32. In case of UTF-7, it is a byte-based encoding,
 // but it's fraught with problems and we'd rather steer clear of it.
 const TextEncoding& TextEncoding::encodingForFormSubmission() const {
+  if (noExtendedTextEncodingNameUsed())
+    return *this;
   if (isNonByteBasedEncoding() || *this == UTF7Encoding())
     return UTF8Encoding();
   return *this;
