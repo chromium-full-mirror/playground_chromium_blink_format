@@ -926,7 +926,7 @@ VisiblePosition previousParagraphPosition(const VisiblePosition& p, int x) {
   do {
     VisiblePosition n = previousLinePosition(pos, x);
     if (n.isNull() || n == pos)
-      return p;
+      break;
     pos = n;
   } while (inSameParagraph(p, pos));
   return pos;
@@ -937,7 +937,7 @@ VisiblePosition nextParagraphPosition(const VisiblePosition& p, int x) {
   do {
     VisiblePosition n = nextLinePosition(pos, x);
     if (n.isNull() || n == pos)
-      return p;
+      break;
     pos = n;
   } while (inSameParagraph(p, pos));
   return pos;
