@@ -1180,7 +1180,7 @@ double AnimationBase::willNeedService() {
   if (m_animState == AnimationStateStartWaitTimer) {
     double timeFromNow = m_animation->delay() -
                          (beginAnimationUpdateTime() - m_requestedStartTime);
-    return (float)((timeFromNow > 0) ? timeFromNow : 0);
+    return max(timeFromNow, 0.0);
   }
 
   fireAnimationEventsIfNeeded();

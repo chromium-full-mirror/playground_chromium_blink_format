@@ -445,7 +445,7 @@ void AnimationControllerPrivate::startTimeResponse(double t) {
   }
 
   m_responseWaiters = 0;
-  m_responseWaiters = 0;
+  m_lastResponseWaiter = 0;
 }
 
 AnimationController::AnimationController(Frame* frame)
