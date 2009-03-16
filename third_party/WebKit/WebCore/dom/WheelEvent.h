@@ -32,8 +32,8 @@ namespace WebCore {
 class WheelEvent : public MouseRelatedEvent {
  public:
   static PassRefPtr<WheelEvent> create() { return adoptRef(new WheelEvent); }
-  static PassRefPtr<WheelEvent> create(float wheelDeltaX,
-                                       float wheelDeltaY,
+  static PassRefPtr<WheelEvent> create(float wheelTicksX,
+                                       float wheelTicksY,
                                        PassRefPtr<AbstractView> view,
                                        int screenX,
                                        int screenY,
@@ -43,7 +43,7 @@ class WheelEvent : public MouseRelatedEvent {
                                        bool altKey,
                                        bool shiftKey,
                                        bool metaKey) {
-    return adoptRef(new WheelEvent(wheelDeltaX, wheelDeltaY, view, screenX,
+    return adoptRef(new WheelEvent(wheelTicksX, wheelTicksY, view, screenX,
                                    screenY, pageX, pageY, ctrlKey, altKey,
                                    shiftKey, metaKey));
   }
@@ -73,8 +73,8 @@ class WheelEvent : public MouseRelatedEvent {
 
  private:
   WheelEvent();
-  WheelEvent(float wheelDeltaX,
-             float wheelDeltaY,
+  WheelEvent(float wheelTicksX,
+             float wheelTicksY,
              PassRefPtr<AbstractView>,
              int screenX,
              int screenY,

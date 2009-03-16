@@ -30,8 +30,8 @@ namespace WebCore {
 
 WheelEvent::WheelEvent() : m_wheelDeltaX(0), m_wheelDeltaY(0) {}
 
-WheelEvent::WheelEvent(float wheelDeltaX,
-                       float wheelDeltaY,
+WheelEvent::WheelEvent(float wheelTicksX,
+                       float wheelTicksY,
                        PassRefPtr<AbstractView> view,
                        int screenX,
                        int screenY,
@@ -54,17 +54,10 @@ WheelEvent::WheelEvent(float wheelDeltaX,
                         altKey,
                         shiftKey,
                         metaKey),
-      m_wheelDeltaX(lroundf(wheelDeltaX) * 120),
-      m_wheelDeltaY(lroundf(wheelDeltaY) *
-                    120)  // Normalize to the Windows 120 multiple
-{
-  // Rounding delta to zero makes no sense and breaks Google Maps,
-  // <http://bugs.webkit.org/show_bug.cgi?id=16078>.
-  if (wheelDeltaX && !m_wheelDeltaX)
-    m_wheelDeltaX = (wheelDeltaX > 0) ? 120 : -120;
-  if (wheelDeltaY && !m_wheelDeltaY)
-    m_wheelDeltaY = (wheelDeltaY > 0) ? 120 : -120;
-}
+      m_wheelDeltaX(lroundf(wheelTicksX * 120)),
+      m_wheelDeltaY(
+          lroundf(wheelTicksY * 120))  // Normalize to the Windows 120 multiple
+{}
 
 void WheelEvent::initWheelEvent(int wheelDeltaX,
                                 int wheelDeltaY,
