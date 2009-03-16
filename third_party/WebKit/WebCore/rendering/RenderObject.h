@@ -802,7 +802,7 @@ class RenderObject : public CachedResourceClient {
   virtual void imageChanged(WrappedImagePtr, const IntRect* = 0) {}
   virtual bool willRenderImage(CachedImage*);
 
-  virtual void selectionStartEnd(int& spos, int& epos) const;
+  void selectionStartEnd(int& spos, int& epos) const;
 
   RenderObject* paintingRootForChildren(PaintInfo& paintInfo) const {
     // if we're the painting root, kids draw normally, and see root of 0
