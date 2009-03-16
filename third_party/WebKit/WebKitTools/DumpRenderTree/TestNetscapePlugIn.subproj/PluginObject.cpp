@@ -648,7 +648,10 @@ static bool pluginInvokeDefault(NPObject* obj,
   return true;
 }
 
-static void pluginInvalidate(NPObject* obj) {}
+static void pluginInvalidate(NPObject* header) {
+  PluginObject* plugin = reinterpret_cast<PluginObject*>(header);
+  plugin->testObject = 0;
+}
 
 static NPObject* pluginAllocate(NPP npp, NPClass* theClass) {
   PluginObject* newInstance = (PluginObject*)malloc(sizeof(PluginObject));
@@ -679,7 +682,8 @@ static NPObject* pluginAllocate(NPP npp, NPClass* theClass) {
 
 static void pluginDeallocate(NPObject* header) {
   PluginObject* plugin = reinterpret_cast<PluginObject*>(header);
-  browser->releaseobject(plugin->testObject);
+  if (plugin->testObject)
+    browser->releaseobject(plugin->testObject);
 
   free(plugin->firstUrl);
   free(plugin->firstHeaders);
