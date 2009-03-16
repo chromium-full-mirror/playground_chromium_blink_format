@@ -44,22 +44,17 @@ JSMessageChannelConstructor::JSMessageChannelConstructor(
     ScriptExecutionContext* scriptExecutionContext)
     : DOMObject(JSMessageChannelConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())),
-      m_scriptExecutionContext(scriptExecutionContext) {
-  if (m_scriptExecutionContext->isDocument())
-    m_contextWrapper =
-        toJS(exec, static_cast<Document*>(scriptExecutionContext));
-#if ENABLE(WORKERS)
-  else if (m_scriptExecutionContext->isWorkerContext())
-    m_contextWrapper = toJSDOMGlobalObject(scriptExecutionContext);
-#endif
-  else
-    ASSERT_NOT_REACHED();
-
+      m_globalObject(toJSDOMGlobalObject(scriptExecutionContext)) {
   putDirect(exec->propertyNames().prototype,
             JSMessageChannelPrototype::self(exec), None);
 }
 
 JSMessageChannelConstructor::~JSMessageChannelConstructor() {}
+
+ScriptExecutionContext* JSMessageChannelConstructor::scriptExecutionContext()
+    const {
+  return m_globalObject->scriptExecutionContext();
+}
 
 ConstructType JSMessageChannelConstructor::getConstructData(
     ConstructData& constructData) {
@@ -78,8 +73,8 @@ JSObject* JSMessageChannelConstructor::construct(ExecState* exec,
 
 void JSMessageChannelConstructor::mark() {
   DOMObject::mark();
-  if (!m_contextWrapper.marked())
-    m_contextWrapper.mark();
+  if (!m_globalObject->marked())
+    m_globalObject->mark();
 }
 
 }  // namespace WebCore

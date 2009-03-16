@@ -38,7 +38,7 @@ class JSAudioConstructor : public DOMObject {
  public:
   JSAudioConstructor(JSC::ExecState*, ScriptExecutionContext*);
 
-  Document* document() const { return m_document->impl(); }
+  Document* document() const;
 
   static const JSC::ClassInfo s_info;
 
@@ -49,7 +49,7 @@ class JSAudioConstructor : public DOMObject {
 
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
 
-  JSDocument* m_document;
+  JSDOMGlobalObject* m_globalObject;
 };
 
 }  // namespace WebCore

@@ -37,9 +37,7 @@ class JSMessageChannelConstructor : public DOMObject {
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
   static const JSC::ClassInfo s_info;
 
-  ScriptExecutionContext* scriptExecutionContext() const {
-    return m_scriptExecutionContext;
-  }
+  ScriptExecutionContext* scriptExecutionContext() const;
 
   virtual bool implementsHasInstance() const { return true; }
   static JSC::JSObject* construct(JSC::ExecState*,
@@ -50,8 +48,7 @@ class JSMessageChannelConstructor : public DOMObject {
   virtual void mark();
 
  private:
-  ScriptExecutionContext* m_scriptExecutionContext;
-  JSC::JSValuePtr m_contextWrapper;
+  JSDOMGlobalObject* m_globalObject;
 };
 
 }  // namespace WebCore
