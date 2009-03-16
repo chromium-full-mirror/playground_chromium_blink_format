@@ -624,7 +624,11 @@ void FrameLoaderClient::dispatchWillPerformClientRedirect(const KURL&,
 }
 
 void FrameLoaderClient::dispatchDidChangeLocationWithinPage() {
-  notImplemented();
+  WebKitWebFramePrivate* priv = m_frame->priv;
+  g_free(priv->uri);
+  priv->uri =
+      g_strdup(core(m_frame)->loader()->url().prettyURL().utf8().data());
+  g_object_notify(G_OBJECT(m_frame), "uri");
 }
 
 void FrameLoaderClient::dispatchWillClose() {
@@ -640,12 +644,19 @@ void FrameLoaderClient::dispatchDidReceiveIcon() {
 void FrameLoaderClient::dispatchDidStartProvisionalLoad() {}
 
 void FrameLoaderClient::dispatchDidReceiveTitle(const String& title) {
-  g_signal_emit_by_name(m_frame, "title-changed", title.utf8().data());
+  WebKitWebFramePrivate* priv = m_frame->priv;
+  g_free(priv->title);
+  priv->title = g_strdup(title.utf8().data());
+
+  g_signal_emit_by_name(m_frame, "title-changed", priv->title);
+  g_object_notify(G_OBJECT(m_frame), "title");
 
   WebKitWebView* webView = getViewFromFrame(m_frame);
-  if (m_frame == webkit_web_view_get_main_frame(webView))
+  if (m_frame == webkit_web_view_get_main_frame(webView)) {
     g_signal_emit_by_name(webView, "title-changed", m_frame,
                           title.utf8().data());
+    g_object_notify(G_OBJECT(webView), "title");
+  }
 }
 
 void FrameLoaderClient::dispatchDidCommitLoad() {
@@ -653,16 +664,29 @@ void FrameLoaderClient::dispatchDidCommitLoad() {
    * This means the URI is valid and successfully identify the page that's going
    * to be loaded.
    */
-  WebKitWebFramePrivate* frameData = WEBKIT_WEB_FRAME_GET_PRIVATE(m_frame);
-  g_free(frameData->uri);
-  frameData->uri =
+  g_object_freeze_notify(G_OBJECT(m_frame));
+
+  WebKitWebFramePrivate* priv = m_frame->priv;
+  g_free(priv->uri);
+  priv->uri =
       g_strdup(core(m_frame)->loader()->url().prettyURL().utf8().data());
+  g_free(priv->title);
+  priv->title = NULL;
+  g_object_notify(G_OBJECT(m_frame), "uri");
+  g_object_notify(G_OBJECT(m_frame), "title");
 
   g_signal_emit_by_name(m_frame, "load-committed");
 
   WebKitWebView* webView = getViewFromFrame(m_frame);
-  if (m_frame == webkit_web_view_get_main_frame(webView))
+  if (m_frame == webkit_web_view_get_main_frame(webView)) {
+    g_object_freeze_notify(G_OBJECT(webView));
+    g_object_notify(G_OBJECT(webView), "uri");
+    g_object_notify(G_OBJECT(webView), "title");
+    g_object_thaw_notify(G_OBJECT(webView));
     g_signal_emit_by_name(webView, "load-committed", m_frame);
+  }
+
+  g_object_thaw_notify(G_OBJECT(m_frame));
 }
 
 void FrameLoaderClient::dispatchDidFinishDocumentLoad() {
