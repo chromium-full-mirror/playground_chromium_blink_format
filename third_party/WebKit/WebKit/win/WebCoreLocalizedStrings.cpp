@@ -171,12 +171,12 @@ String WebCore::contextMenuItemTagOutline() {
   return String(LPCTSTR_UI_STRING("Outline", "Outline context menu item"));
 }
 String WebCore::contextMenuItemTagWritingDirectionMenu() {
-  return String(LPCTSTR_UI_STRING("Writing Direction",
-                                  "Writing direction context sub-menu item"));
+  return String(LPCTSTR_UI_STRING("Paragraph Direction",
+                                  "Paragraph direction context sub-menu item"));
 }
 String WebCore::contextMenuItemTagTextDirectionMenu() {
-  return String(LPCTSTR_UI_STRING("Text Direction",
-                                  "Text direction context sub-menu item"));
+  return String(LPCTSTR_UI_STRING("Selection Direction",
+                                  "Selection direction context sub-menu item"));
 }
 String WebCore::contextMenuItemTagDefaultDirection() {
   return String(LPCTSTR_UI_STRING(
