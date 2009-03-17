@@ -49,6 +49,7 @@ class ScriptValue {
   String toString(ScriptState* scriptState) const {
     return m_value.get().toString(scriptState);
   }
+  bool isEqual(ScriptState*, const ScriptValue&) const;
   bool isNull() const;
   bool isUndefined() const;
   bool hasNoValue() const { return m_value == JSC::noValue(); }

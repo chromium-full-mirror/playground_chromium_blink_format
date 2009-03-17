@@ -39,6 +39,7 @@
 
 namespace WebCore {
 class ScriptValue;
+class ScriptString;
 
 class ScriptFunctionCall {
  public:
@@ -48,8 +49,10 @@ class ScriptFunctionCall {
   virtual ~ScriptFunctionCall(){};
 
   void appendArgument(const ScriptObject&);
+  void appendArgument(const ScriptString&);
   void appendArgument(const ScriptValue&);
   void appendArgument(const String&);
+  void appendArgument(unsigned int);
   void appendArgument(bool);
   ScriptValue call(bool& hadException);
   ScriptObject construct(bool& hadException);
