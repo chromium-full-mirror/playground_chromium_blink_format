@@ -138,6 +138,9 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
   virtual NSCachedURLResponse* willCacheResponse(ResourceHandle*,
                                                  NSCachedURLResponse*);
 #endif
+#if USE(CFNETWORK)
+  virtual bool shouldCacheResponse(ResourceHandle*, CFCachedURLResponseRef);
+#endif
 
   ResourceHandle* handle() const { return m_handle.get(); }
   bool sendResourceLoadCallbacks() const { return m_sendResourceLoadCallbacks; }

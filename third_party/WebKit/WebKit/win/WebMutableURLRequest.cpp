@@ -33,6 +33,7 @@
 #include <CFNetwork/CFURLRequestPriv.h>
 #pragma warning(push, 0)
 #include <WebCore/BString.h>
+#include <WebCore/COMPtr.h>
 #include <WebCore/CString.h>
 #include <WebCore/FormData.h>
 #include <WebCore/NotImplemented.h>
@@ -225,6 +226,20 @@ HRESULT STDMETHODCALLTYPE WebMutableURLRequest::isEmpty(
   return S_OK;
 }
 
+HRESULT STDMETHODCALLTYPE WebMutableURLRequest::isEqual(
+    /* [in] */ IWebURLRequest* other,
+    /* [out, retval] */ BOOL* result) {
+  COMPtr<WebMutableURLRequest> requestImpl(Query, other);
+
+  if (!requestImpl) {
+    *result = FALSE;
+    return S_OK;
+  }
+
+  *result = m_request == requestImpl->resourceRequest();
+  return S_OK;
+}
+
 // IWebMutableURLRequest
 // --------------------------------------------------------
 
@@ -290,10 +305,12 @@ HRESULT STDMETHODCALLTYPE WebMutableURLRequest::setURL(
 }
 
 HRESULT STDMETHODCALLTYPE WebMutableURLRequest::setValue(
-    /* [in] */ BSTR /*value*/,
-    /* [in] */ BSTR /*field*/) {
-  ASSERT_NOT_REACHED();
-  return E_NOTIMPL;
+    /* [in] */ BSTR value,
+    /* [in] */ BSTR field) {
+  String valueString(value, SysStringLen(value));
+  String fieldString(field, SysStringLen(field));
+  m_request.setHTTPHeaderField(fieldString, valueString);
+  return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE

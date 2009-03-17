@@ -372,6 +372,15 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
     return response;
   }
 #endif
+#if USE(CFNETWORK)
+  virtual bool shouldCacheResponse(DocumentLoader*,
+                                   unsigned long,
+                                   const ResourceResponse&,
+                                   const unsigned char*,
+                                   unsigned long long) {
+    return true;
+  }
+#endif
 };
 
 class EmptyEditorClient : public EditorClient {
