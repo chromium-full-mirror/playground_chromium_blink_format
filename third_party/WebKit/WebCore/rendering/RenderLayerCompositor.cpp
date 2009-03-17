@@ -165,27 +165,37 @@ bool RenderLayerCompositor::updateLayerCompositingState(RenderLayer* layer,
                                                         StyleDifference diff) {
   bool needsLayer = needsToBeComposited(layer);
   bool layerChanged = false;
+
+  RenderBoxModelObject* repaintContainer = 0;
+  IntRect repaintRect;
+
   if (needsLayer) {
     enableCompositingMode();
     if (!layer->backing()) {
+      // Get the repaint container before we make backing for this layer
+      repaintContainer = layer->renderer()->containerForRepaint();
+      repaintRect = calculateCompositedBounds(
+          layer, repaintContainer ? repaintContainer->layer() : layer->root());
+
       layer->ensureBacking();
       layerChanged = true;
     }
   } else {
     if (layer->backing()) {
       layer->clearBacking();
+      // Get the repaint container now that we've cleared the backing
+      repaintContainer = layer->renderer()->containerForRepaint();
+      repaintRect = calculateCompositedBounds(
+          layer, repaintContainer ? repaintContainer->layer() : layer->root());
       layerChanged = true;
     }
   }
 
   if (layerChanged) {
-    // Invalidate the parent in this region.
-    RenderLayer* compLayer = layer->ancestorCompositingLayer();
-    if (compLayer) {
-      // We can't reliably compute a dirty rect, because style may have changed
-      // already,
-      // so just dirty the whole parent layer
-      compLayer->setBackingNeedsRepaint();
+    // Invalidate the destination into which this layer used to render.
+    layer->renderer()->repaintUsingContainer(repaintContainer, repaintRect);
+
+    if (!repaintContainer || repaintContainer == m_renderView) {
       // The contents of this layer may be moving between the window
       // and a GraphicsLayer, so we need to make sure the window system
       // synchronizes those changes on the screen.
@@ -335,8 +345,7 @@ void RenderLayerCompositor::computeCompositingRequirements(
 
   // Clear the flag
   layer->setHasCompositingDescendant(false);
-
-  setForcedCompositingLayer(layer, ioCompState.m_subtreeIsCompositing);
+  layer->setMustOverlayCompositedLayers(ioCompState.m_subtreeIsCompositing);
 
   const bool isCompositingLayer = needsToBeComposited(layer);
   ioCompState.m_subtreeIsCompositing = isCompositingLayer;
@@ -369,7 +378,7 @@ void RenderLayerCompositor::computeCompositingRequirements(
         // underneath our contents)
         if (childState.m_subtreeIsCompositing) {
           // make |this| compositing
-          setForcedCompositingLayer(layer, true);
+          layer->setMustOverlayCompositedLayers(true);
           childState.m_compositingAncestor = layer;
         }
       }
@@ -405,7 +414,7 @@ void RenderLayerCompositor::computeCompositingRequirements(
   if (childState.m_subtreeIsCompositing &&
       (layer->renderer()->hasTransform() ||
        layer->renderer()->style()->opacity() < 1))
-    setForcedCompositingLayer(layer, true);
+    layer->setMustOverlayCompositedLayers(true);
 
   // Subsequent layers in the parent stacking context also need to composite.
   if (childState.m_subtreeIsCompositing)
@@ -415,17 +424,6 @@ void RenderLayerCompositor::computeCompositingRequirements(
   // this can affect the answer to needsToBeComposited() when clipping,
   // but that's ok here.
   layer->setHasCompositingDescendant(childState.m_subtreeIsCompositing);
-}
-
-void RenderLayerCompositor::setForcedCompositingLayer(RenderLayer* layer,
-                                                      bool force) {
-  if (force) {
-    layer->ensureBacking();
-    layer->backing()->forceCompositingLayer();
-  } else {
-    if (layer->backing())
-      layer->backing()->forceCompositingLayer(false);
-  }
 }
 
 void RenderLayerCompositor::setCompositingParent(RenderLayer* childLayer,
@@ -649,18 +647,7 @@ bool RenderLayerCompositor::has3DContent() const {
 bool RenderLayerCompositor::needsToBeComposited(
     const RenderLayer* layer) const {
   return requiresCompositingLayer(layer) ||
-         (layer->backing() && layer->backing()->forcedCompositingLayer());
-}
-
-static bool requiresCompositingLayerForTransform(RenderObject* renderer) {
-  RenderStyle* style = renderer->style();
-  // Note that we ask the renderer if it has a transform, because the style may
-  // have transforms,
-  // but the renderer may be an inline that doesn't suppport them.
-  return renderer->hasTransform() &&
-         (style->transform().has3DOperation() ||
-          style->transformStyle3D() == TransformStyle3DPreserve3D ||
-          style->hasPerspective());
+         layer->mustOverlayCompositedLayers();
 }
 
 #define VERBOSE_COMPOSITINGLAYER 0
@@ -684,7 +671,7 @@ bool RenderLayerCompositor::requiresCompositingLayer(
     gotReason = true;
   }
 
-  if (!gotReason && requiresCompositingLayerForTransform(layer->renderer())) {
+  if (!gotReason && requiresCompositingForTransform(layer->renderer())) {
     fprintf(stderr,
             "RenderLayer %p requires compositing layer because: it has 3d "
             "transform, perspective, backface, or animating transform\n",
@@ -710,7 +697,7 @@ bool RenderLayerCompositor::requiresCompositingLayer(
     gotReason = true;
   }
 
-  if (!gotReason && requiresCompositingForAnimation(layer)) {
+  if (!gotReason && requiresCompositingForAnimation(layer->renderer())) {
     fprintf(stderr,
             "RenderLayer %p requires compositing layer because: it has a "
             "running transition for opacity or transform\n",
@@ -725,11 +712,11 @@ bool RenderLayerCompositor::requiresCompositingLayer(
 
   // The root layer always has a compositing layer, but it may not have backing.
   return (inCompositingMode() && layer->isRootLayer()) ||
-         requiresCompositingLayerForTransform(layer->renderer()) ||
+         requiresCompositingForTransform(layer->renderer()) ||
          layer->renderer()->style()->backfaceVisibility() ==
              BackfaceVisibilityHidden ||
          clipsCompositingDescendants(layer) ||
-         requiresCompositingForAnimation(layer);
+         requiresCompositingForAnimation(layer->renderer());
 }
 
 // Return true if the given layer has some ancestor in the RenderLayer hierarchy
@@ -778,14 +765,26 @@ bool RenderLayerCompositor::clipsCompositingDescendants(
          layer->renderer()->hasOverflowClip();
 }
 
+bool RenderLayerCompositor::requiresCompositingForTransform(
+    RenderObject* renderer) {
+  RenderStyle* style = renderer->style();
+  // Note that we ask the renderer if it has a transform, because the style may
+  // have transforms,
+  // but the renderer may be an inline that doesn't suppport them.
+  return renderer->hasTransform() &&
+         (style->transform().has3DOperation() ||
+          style->transformStyle3D() == TransformStyle3DPreserve3D ||
+          style->hasPerspective());
+}
+
 bool RenderLayerCompositor::requiresCompositingForAnimation(
-    const RenderLayer* layer) const {
-  AnimationController* animController = layer->renderer()->animation();
+    RenderObject* renderer) {
+  AnimationController* animController = renderer->animation();
   if (animController)
-    return animController->isAnimatingPropertyOnRenderer(layer->renderer(),
+    return animController->isAnimatingPropertyOnRenderer(renderer,
                                                          CSSPropertyOpacity) ||
            animController->isAnimatingPropertyOnRenderer(
-               layer->renderer(), CSSPropertyWebkitTransform);
+               renderer, CSSPropertyWebkitTransform);
   return false;
 }
 

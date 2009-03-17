@@ -892,10 +892,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   // transformStyle3D or perspective)
   // indicates that we are transforming
   bool hasTransformRelatedProperty() const {
-    return hasTransform() ||
-           rareNonInheritedData->m_transformStyle3D ==
-               TransformStyle3DPreserve3D ||
-           rareNonInheritedData->m_perspective > 0;
+    return hasTransform() || preserves3D() || hasPerspective();
   }
 
   enum ApplyTransformOrigin { IncludeTransformOrigin, ExcludeTransformOrigin };

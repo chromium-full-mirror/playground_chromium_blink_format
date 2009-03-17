@@ -164,7 +164,8 @@ RenderLayer::RenderLayer(RenderBoxModelObject* renderer)
       m_has3DTransformedDescendant(false)
 #if USE(ACCELERATED_COMPOSITING)
       ,
-      m_hasCompositingDescendant(false)
+      m_hasCompositingDescendant(false),
+      m_mustOverlayCompositedLayers(false)
 #endif
       ,
       m_marquee(0),
