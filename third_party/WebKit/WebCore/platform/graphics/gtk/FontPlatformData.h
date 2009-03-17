@@ -80,6 +80,7 @@ class FontPlatformData {
                    int size,
                    bool bold,
                    bool italic);
+  FontPlatformData(const FontPlatformData&);
 
   ~FontPlatformData();
 
@@ -101,6 +102,7 @@ class FontPlatformData {
   }
 
   bool operator==(const FontPlatformData&) const;
+  FontPlatformData& operator=(const FontPlatformData&);
   bool isHashTableDeletedValue() const {
 #if defined(USE_FREETYPE)
     return m_pattern == hashTableDeletedFontValue();
