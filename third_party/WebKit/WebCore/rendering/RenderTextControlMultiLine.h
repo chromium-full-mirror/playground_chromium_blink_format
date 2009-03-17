@@ -34,7 +34,6 @@ class RenderTextControlMultiLine : public RenderTextControl {
   virtual bool isTextArea() const { return true; }
 
   virtual void subtreeHasChanged();
-  virtual void layout();
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
