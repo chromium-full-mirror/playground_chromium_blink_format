@@ -306,6 +306,9 @@ class TransformationMatrix {
             m43() == 0 && m44() == 1);
   }
 
+  // Throw away the non-affine parts of the matrix (lossy!)
+  void makeAffine();
+
   bool operator==(const TransformationMatrix& m2) const {
     return (m_matrix[0][0] == m2.m_matrix[0][0] &&
             m_matrix[0][1] == m2.m_matrix[0][1] &&

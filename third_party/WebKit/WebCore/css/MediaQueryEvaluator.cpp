@@ -502,12 +502,23 @@ static bool transform_3dMediaFeatureEval(CSSValue* value,
                                          RenderStyle*,
                                          Frame*,
                                          MediaFeaturePrefix op) {
+  bool returnValueIfNoParameter;
+  int have3dRendering;
+
+#if ENABLE(3D_RENDERING)
+  returnValueIfNoParameter = true;
+  have3dRendering = 1;
+#else
+  returnValueIfNoParameter = false;
+  have3dRendering = 0;
+#endif
+
   if (value) {
     float number;
     return numberValue(value, number) &&
-           compareValue(0, static_cast<int>(number), op);
+           compareValue(have3dRendering, static_cast<int>(number), op);
   }
-  return false;
+  return returnValueIfNoParameter;
 }
 
 static void createFunctionMap() {

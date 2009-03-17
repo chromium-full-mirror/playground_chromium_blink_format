@@ -1850,6 +1850,7 @@ TransformationMatrix RenderObject::transformFromContainer(
   if (hasLayer() && (layer = toRenderBox(this)->layer()) && layer->transform())
     containerTransform.multLeft(layer->currentTransform());
 
+#if ENABLE(3D_RENDERING)
   if (containerObject && containerObject->style()->hasPerspective()) {
     // Perpsective on the container affects us, so we have to factor it in here.
     ASSERT(containerObject->hasLayer());
@@ -1865,6 +1866,9 @@ TransformationMatrix RenderObject::transformFromContainer(
     containerTransform.translateRight3d(perspectiveOrigin.x(),
                                         perspectiveOrigin.y(), 0);
   }
+#else
+  UNUSED_PARAM(containerObject);
+#endif
 
   return containerTransform;
 }

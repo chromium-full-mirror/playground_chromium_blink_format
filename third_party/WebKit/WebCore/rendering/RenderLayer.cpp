@@ -333,6 +333,7 @@ void RenderLayer::updateTransform() {
     m_transform->makeIdentity();
     box->style()->applyTransform(*m_transform, box->borderBoxRect().size(),
                                  RenderStyle::IncludeTransformOrigin);
+    makeMatrixRenderable(*m_transform);
   }
 
   if (had3DTransform != has3DTransform())
@@ -350,6 +351,7 @@ TransformationMatrix RenderLayer::currentTransform() const {
         renderer()->animation()->getAnimatedStyleForRenderer(renderer());
     style->applyTransform(currTransform, renderBox()->borderBoxRect().size(),
                           RenderStyle::IncludeTransformOrigin);
+    makeMatrixRenderable(currTransform);
     return currTransform;
   }
 #endif

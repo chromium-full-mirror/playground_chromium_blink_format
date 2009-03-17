@@ -110,9 +110,11 @@ void RenderLayerBacking::updateLayerTransform() {
   // transform-origin
   // baked into it, and we don't want that.
   TransformationMatrix t;
-  if (m_owningLayer->hasTransform())
+  if (m_owningLayer->hasTransform()) {
     style->applyTransform(t, toRenderBox(renderer())->borderBoxRect().size(),
                           RenderStyle::ExcludeTransformOrigin);
+    makeMatrixRenderable(t);
+  }
 
   m_graphicsLayer->setTransform(t);
 }
