@@ -207,12 +207,15 @@ bool HTMLOptionElement::disabled() const {
           static_cast<HTMLFormControlElement*>(parentNode())->disabled());
 }
 
-void HTMLOptionElement::insertedIntoDocument() {
-  HTMLSelectElement* select;
-  if (selected() && (select = ownerSelectElement()))
+void HTMLOptionElement::insertedIntoTree(bool deep) {
+  if (HTMLSelectElement* select = ownerSelectElement()) {
+    select->setRecalcListItems();
+    if (selected())
+      select->setSelectedIndex(index(), false);
     select->scrollToSelection();
+  }
 
-  HTMLFormControlElement::insertedIntoDocument();
+  HTMLFormControlElement::insertedIntoTree(deep);
 }
 
 }  // namespace

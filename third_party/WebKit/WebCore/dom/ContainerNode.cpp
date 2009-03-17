@@ -882,6 +882,8 @@ static void dispatchChildInsertionEvents(Node* child, ExceptionCode& ec) {
   else
     c->insertedIntoTree(true);
 
+  doc->incDOMTreeVersion();
+
   if (c->parentNode() &&
       doc->hasListenerType(Document::DOMNODEINSERTED_LISTENER)) {
     ec = 0;
@@ -914,6 +916,8 @@ static void dispatchChildRemovalEvents(Node* child, ExceptionCode& ec) {
   // update auxiliary doc info (e.g. iterators) to note that node is being
   // removed
   doc->nodeWillBeRemoved(child);
+
+  doc->incDOMTreeVersion();
 
   // dispatch pre-removal mutation events
   if (c->parentNode() &&
