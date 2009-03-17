@@ -52,6 +52,7 @@
 #include "Pen.h"
 #include "NotImplemented.h"
 
+#include <QBrush>
 #include <QDebug>
 #include <QGradient>
 #include <QPainter>
@@ -490,12 +491,14 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
     // line.
     if (isVerticalLine) {
       p->fillRect(FloatRect(p1.x() - width / 2, p1.y() - width, width, width),
-                  color);
-      p->fillRect(FloatRect(p2.x() - width / 2, p2.y(), width, width), color);
+                  QColor(color));
+      p->fillRect(FloatRect(p2.x() - width / 2, p2.y(), width, width),
+                  QColor(color));
     } else {
       p->fillRect(FloatRect(p1.x() - width, p1.y() - width / 2, width, width),
-                  color);
-      p->fillRect(FloatRect(p2.x(), p2.y() - width / 2, width, width), color);
+                  QColor(color));
+      p->fillRect(FloatRect(p2.x(), p2.y() - width / 2, width, width),
+                  QColor(color));
     }
 
     // Example: 80 pixels with a width of 30 pixels.
