@@ -33,7 +33,9 @@ class String;
 
 bool isSimpleCrossOriginAccessRequest(const String& method,
                                       const HTTPHeaderMap&);
-bool isOnAccessControlSimpleRequestHeaderWhitelist(const String&);
+bool isOnAccessControlSimpleRequestMethodWhitelist(const String&);
+bool isOnAccessControlSimpleRequestHeaderWhitelist(const String& name,
+                                                   const String& value);
 bool isOnAccessControlResponseHeaderWhitelist(const String&);
 
 bool passesAccessControlCheck(const ResourceResponse&,

@@ -117,7 +117,8 @@ bool CrossOriginPreflightResultCacheItem::parse(
 
 bool CrossOriginPreflightResultCacheItem::allowsCrossOriginMethod(
     const String& method) const {
-  return m_methods.contains(method) || method == "GET" || method == "POST";
+  return m_methods.contains(method) ||
+         isOnAccessControlSimpleRequestMethodWhitelist(method);
 }
 
 bool CrossOriginPreflightResultCacheItem::allowsCrossOriginHeaders(
@@ -126,7 +127,7 @@ bool CrossOriginPreflightResultCacheItem::allowsCrossOriginHeaders(
   for (HTTPHeaderMap::const_iterator it = requestHeaders.begin(); it != end;
        ++it) {
     if (!m_headers.contains(it->first) &&
-        !isOnAccessControlSimpleRequestHeaderWhitelist(it->first))
+        !isOnAccessControlSimpleRequestHeaderWhitelist(it->first, it->second))
       return false;
   }
   return true;
