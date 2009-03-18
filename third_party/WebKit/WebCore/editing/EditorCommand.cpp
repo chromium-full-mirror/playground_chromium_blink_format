@@ -1155,6 +1155,42 @@ static bool executeMoveWordRightAndModifySelection(Frame* frame,
   return true;
 }
 
+static bool executeMoveToLeftEndOfLine(Frame* frame,
+                                       Event*,
+                                       EditorCommandSource,
+                                       const String&) {
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::LEFT, LineBoundary, true);
+  return true;
+}
+
+static bool executeMoveToLeftEndOfLineAndModifySelection(Frame* frame,
+                                                         Event*,
+                                                         EditorCommandSource,
+                                                         const String&) {
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::LEFT, LineBoundary, true);
+  return true;
+}
+
+static bool executeMoveToRightEndOfLine(Frame* frame,
+                                        Event*,
+                                        EditorCommandSource,
+                                        const String&) {
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::RIGHT, LineBoundary, true);
+  return true;
+}
+
+static bool executeMoveToRightEndOfLineAndModifySelection(Frame* frame,
+                                                          Event*,
+                                                          EditorCommandSource,
+                                                          const String&) {
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::RIGHT, LineBoundary, true);
+  return true;
+}
+
 static bool executeOutdent(Frame* frame,
                            Event*,
                            EditorCommandSource,
@@ -1733,13 +1769,13 @@ static const CommandMap& createCommandMap() {
        {executeInsertBacktab, supportedFromMenuOrKeyBinding,
         enabledInEditableText, stateNone, valueNull, isTextInsertion,
         doNotAllowExecutionWhenDisabled}},
+      {"InsertHTML",
+       {executeInsertHTML, supported, enabledInEditableText, stateNone,
+        valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"InsertHorizontalRule",
        {executeInsertHorizontalRule, supported, enabledInRichlyEditableText,
         stateNone, valueNull, notTextInsertion,
         doNotAllowExecutionWhenDisabled}},
-      {"InsertHTML",
-       {executeInsertHTML, supported, enabledInEditableText, stateNone,
-        valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"InsertImage",
        {executeInsertImage, supported, enabledInRichlyEditableText, stateNone,
         valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
@@ -1932,6 +1968,22 @@ static const CommandMap& createCommandMap() {
       {"MoveToEndOfSentenceAndModifySelection",
        {executeMoveToEndOfSentenceAndModifySelection,
         supportedFromMenuOrKeyBinding, enabledVisibleSelection, stateNone,
+        valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
+      {"MoveToLeftEndOfLine",
+       {executeMoveToLeftEndOfLine, supportedFromMenuOrKeyBinding,
+        enabledInEditableText, stateNone, valueNull, notTextInsertion,
+        doNotAllowExecutionWhenDisabled}},
+      {"MoveToLeftEndOfLineAndModifySelection",
+       {executeMoveToLeftEndOfLineAndModifySelection,
+        supportedFromMenuOrKeyBinding, enabledInEditableText, stateNone,
+        valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
+      {"MoveToRightEndOfLine",
+       {executeMoveToRightEndOfLine, supportedFromMenuOrKeyBinding,
+        enabledInEditableText, stateNone, valueNull, notTextInsertion,
+        doNotAllowExecutionWhenDisabled}},
+      {"MoveToRightEndOfLineAndModifySelection",
+       {executeMoveToRightEndOfLineAndModifySelection,
+        supportedFromMenuOrKeyBinding, enabledInEditableText, stateNone,
         valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveUp",
        {executeMoveUp, supportedFromMenuOrKeyBinding, enabledInEditableText,
