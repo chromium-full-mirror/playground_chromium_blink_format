@@ -2147,8 +2147,13 @@ RegisterID* ReturnNode::emitBytecode(BytecodeGenerator& generator,
     dst = 0;
   RegisterID* r0 = m_value ? generator.emitNode(dst, m_value.get())
                            : generator.emitLoad(dst, jsUndefined());
+  RefPtr<RegisterID> returnRegister;
   if (generator.scopeDepth()) {
     RefPtr<Label> l0 = generator.newLabel();
+    if (generator.hasFinaliser() && !r0->isTemporary()) {
+      returnRegister = generator.emitMove(generator.newTemporary(), r0);
+      r0 = returnRegister.get();
+    }
     generator.emitJumpScopes(l0.get(), 0);
     generator.emitLabel(l0.get());
   }

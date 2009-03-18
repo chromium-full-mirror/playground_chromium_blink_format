@@ -412,6 +412,7 @@ class BytecodeGenerator {
   void emitDebugHook(DebugHookID, int firstLine, int lastLine);
 
   int scopeDepth() { return m_dynamicScopeDepth + m_finallyDepth; }
+  bool hasFinaliser() { return m_finallyDepth != 0; }
 
   void pushFinallyContext(Label* target, RegisterID* returnAddrDst);
   void popFinallyContext();
