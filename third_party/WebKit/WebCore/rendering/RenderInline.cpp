@@ -452,9 +452,12 @@ void RenderInline::absoluteRects(Vector<IntRect>& rects,
                                  int tx,
                                  int ty,
                                  bool topLevel) {
-  for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox())
-    rects.append(
-        IntRect(tx + curr->x(), ty + curr->y(), curr->width(), curr->height()));
+  if (InlineRunBox* curr = firstLineBox()) {
+    for (; curr; curr = curr->nextLineBox())
+      rects.append(IntRect(tx + curr->x(), ty + curr->y(), curr->width(),
+                           curr->height()));
+  } else
+    rects.append(IntRect(tx, ty, 0, 0));
 
   if (continuation() && topLevel) {
     if (continuation()->isBox()) {
@@ -469,10 +472,13 @@ void RenderInline::absoluteRects(Vector<IntRect>& rects,
 }
 
 void RenderInline::absoluteQuads(Vector<FloatQuad>& quads, bool topLevel) {
-  for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox()) {
-    FloatRect localRect(curr->x(), curr->y(), curr->width(), curr->height());
-    quads.append(localToAbsoluteQuad(localRect));
-  }
+  if (InlineRunBox* curr = firstLineBox()) {
+    for (; curr; curr = curr->nextLineBox()) {
+      FloatRect localRect(curr->x(), curr->y(), curr->width(), curr->height());
+      quads.append(localToAbsoluteQuad(localRect));
+    }
+  } else
+    quads.append(localToAbsoluteQuad(FloatRect()));
 
   if (continuation() && topLevel)
     continuation()->absoluteQuads(quads, topLevel);
