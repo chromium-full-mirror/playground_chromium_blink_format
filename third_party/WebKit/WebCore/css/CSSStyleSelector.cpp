@@ -399,12 +399,14 @@ static void loadSimpleDefaultStyle();
 // with the real UA stylesheet.
 static const char* simpleUserAgentStyleSheet =
     "html,body,div{display:block}body{margin:8px}div:focus,span:focus{outline:"
-    "auto 5px -webkit-focus-ring-color}";
+    "auto 5px "
+    "-webkit-focus-ring-color}a:-webkit-any-link{color:-webkit-link;text-"
+    "decoration:underline}a:-webkit-any-link:active{color:-webkit-activelink}";
 
 static bool elementCanUseSimpleDefaultStyle(Element* e) {
   return e->hasTagName(htmlTag) || e->hasTagName(bodyTag) ||
          e->hasTagName(divTag) || e->hasTagName(spanTag) ||
-         e->hasTagName(brTag);
+         e->hasTagName(brTag) || e->hasTagName(aTag);
 }
 
 static const MediaQueryEvaluator& screenEval() {
