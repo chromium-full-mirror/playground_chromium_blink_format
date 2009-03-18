@@ -106,13 +106,14 @@ void Font::drawComplexText(GraphicsContext* ctx,
     if (ctx->strokeGradient()) {
       QBrush brush(*ctx->strokeGradient()->platformGradient());
       brush.setTransform(ctx->strokeGradient()->gradientSpaceTransform());
-      p->setPen(QPen(brush, 0));
+      p->setPen(QPen(brush, ctx->strokeThickness()));
     } else if (ctx->strokePattern()) {
       TransformationMatrix affine;
       p->setPen(
-          QPen(QBrush(ctx->strokePattern()->createPlatformPattern(affine)), 0));
+          QPen(QBrush(ctx->strokePattern()->createPlatformPattern(affine)),
+               ctx->strokeThickness()));
     } else
-      p->setPen(QColor(ctx->strokeColor()));
+      p->setPen(QPen(QColor(ctx->strokeColor()), ctx->strokeThickness()));
   }
 
   const QString string = fixSpacing(qstring(run));
@@ -178,7 +179,13 @@ void Font::drawComplexText(GraphicsContext* ctx,
     p->drawText(pt, string, flags, run.padding());
     p->restore();
   }
-  p->drawText(pt, string, flags, run.padding());
+  if (ctx->textDrawingMode() & cTextStroke) {
+    QPainterPath path;
+    path.addText(pt, font(), string);
+    p->strokePath(path, p->pen());
+  }
+  if (ctx->textDrawingMode() & cTextFill)
+    p->drawText(pt, string, flags, run.padding());
 }
 
 float Font::floatWidthForComplexText(const TextRun& run) const {
