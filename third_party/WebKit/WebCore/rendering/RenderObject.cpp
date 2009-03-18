@@ -2468,7 +2468,7 @@ RenderBoxModelObject* RenderObject::offsetParent() const {
     currZoom = newZoom;
     curr = curr->parent();
   }
-  return curr && curr->isBox() ? toRenderBox(curr) : 0;
+  return curr && curr->isBoxModelObject() ? toRenderBoxModelObject(curr) : 0;
 }
 
 #if ENABLE(SVG)
