@@ -161,10 +161,10 @@ static bool getPathForGlyph(HDC dc, WORD glyph, SkPath* path) {
       addPolyCurveToPath(polyCurve, path);
       curPoly += sizeof(WORD) * 2 + sizeof(POINTFX) * polyCurve->cpfx;
     }
+    path->close();
     curGlyph += polyHeader->cb;
   }
 
-  path->close();
   return true;
 }
 
