@@ -452,7 +452,7 @@ void MainResourceLoader::handleEmptyLoad(const KURL& url, bool forURLScheme) {
   didReceiveResponse(response);
 }
 
-void MainResourceLoader::handleDataLoadNow(Timer<MainResourceLoader>*) {
+void MainResourceLoader::handleDataLoadNow(MainResourceLoaderTimer*) {
   RefPtr<MainResourceLoader> protect(this);
 
   KURL url = m_substituteData.responseURL();
@@ -465,11 +465,21 @@ void MainResourceLoader::handleDataLoadNow(Timer<MainResourceLoader>*) {
   didReceiveResponse(response);
 }
 
+void MainResourceLoader::startDataLoadTimer() {
+  m_dataLoadTimer.startOneShot(0);
+
+#if HAVE(RUNLOOP_TIMER)
+  if (SchedulePairHashSet* scheduledPairs =
+          m_frame->page()->scheduledRunLoopPairs())
+    m_dataLoadTimer.schedule(*scheduledPairs);
+#endif
+}
+
 void MainResourceLoader::handleDataLoadSoon(ResourceRequest& r) {
   m_initialRequest = r;
 
   if (m_documentLoader->deferMainResourceDataLoad())
-    m_dataLoadTimer.startOneShot(0);
+    startDataLoadTimer();
   else
     handleDataLoadNow(0);
 }
@@ -570,7 +580,7 @@ void MainResourceLoader::setDefersLoading(bool defers) {
 
     if (m_substituteData.isValid() &&
         m_documentLoader->deferMainResourceDataLoad())
-      m_dataLoadTimer.startOneShot(0);
+      startDataLoadTimer();
     else {
       ResourceRequest r(m_initialRequest);
       m_initialRequest = ResourceRequest();
