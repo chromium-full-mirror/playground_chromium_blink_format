@@ -52,6 +52,6 @@ class QWEBKIT_EXPORT QWebDatabase {
 
  private:
   QExplicitlySharedDataPointer<QWebDatabasePrivate> d;
-}
+};
 
 #endif

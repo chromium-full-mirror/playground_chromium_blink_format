@@ -62,6 +62,6 @@ class QWEBKIT_EXPORT QWebSecurityOrigin {
 
  private:
   QExplicitlySharedDataPointer<QWebSecurityOriginPrivate> d;
-}
+};
 
 #endif
