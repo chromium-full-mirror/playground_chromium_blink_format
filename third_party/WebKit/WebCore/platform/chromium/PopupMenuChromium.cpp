@@ -472,6 +472,10 @@ void PopupContainer::refresh() {
   layout();
 }
 
+int PopupContainer::selectedIndex() const {
+  return m_listBox->selectedIndex();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // PopupListBox implementation
 
