@@ -217,11 +217,6 @@ class PluginView : public Widget,
 
   static bool isCallingPlugin();
 
-#if PLATFORM(QT)
-  bool isNPAPIPlugin() const { return m_isNPAPIPlugin; }
-  void setIsNPAPIPlugin(bool b) { m_isNPAPIPlugin = b; }
-#endif
-
  private:
   PluginView(Frame* parentFrame,
              const IntSize&,
@@ -310,10 +305,6 @@ class PluginView : public Widget,
   bool m_isWindowed;
   bool m_isTransparent;
   bool m_haveInitialized;
-
-#if PLATFORM(QT)
-  bool m_isNPAPIPlugin;
-#endif
 
 #if PLATFORM(GTK) || defined(Q_WS_X11)
   bool m_needsXEmbed;
