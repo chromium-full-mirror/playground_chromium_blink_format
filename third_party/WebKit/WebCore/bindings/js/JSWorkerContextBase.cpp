@@ -63,7 +63,7 @@ static void setJSWorkerContextBaseXMLHttpRequest(ExecState*,
 
 namespace WebCore {
 
-ASSERT_CLASS_FITS_IN_CELL(JSWorkerContextBase)
+ASSERT_CLASS_FITS_IN_CELL(JSWorkerContextBase);
 
 JSWorkerContextBase::JSWorkerContextBase(PassRefPtr<JSC::Structure> structure,
                                          PassRefPtr<WorkerContext> impl)
