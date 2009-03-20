@@ -159,6 +159,7 @@ class RenderBlock : public RenderBox {
 
   void addPercentHeightDescendant(RenderBox*);
   static void removePercentHeightDescendant(RenderBox*);
+  HashSet<RenderBox*>* percentHeightDescendants() const;
 
   virtual void positionListMarker() {}
 
