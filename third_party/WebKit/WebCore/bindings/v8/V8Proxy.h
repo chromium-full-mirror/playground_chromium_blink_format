@@ -47,6 +47,11 @@ inline static v8::Local<v8::Boolean> deletionNotHandledByInterceptor() {
   return v8::Local<v8::Boolean>();
 }
 
+// FIXME: Remove once migration is complete.
+inline static DOMWrapperMap<void>& domObjectMap() {
+  return GetDOMObjectMap();
+}
+
 inline v8::Handle<v8::Primitive> throwError(
     const char* message,
     V8Proxy::ErrorType type = V8Proxy::TYPE_ERROR) {
