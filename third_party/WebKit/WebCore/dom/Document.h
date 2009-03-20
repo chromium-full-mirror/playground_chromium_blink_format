@@ -503,7 +503,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   KURL completeURL(const String&) const;
 
   virtual String userAgent(const KURL&) const;
-  virtual String encoding() const;
 
   // from cachedObjectClient
   virtual void setCSSStyleSheet(const String& url,
@@ -946,6 +945,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                                            // loss for direct calls.
   virtual KURL virtualCompleteURL(const String&)
       const;  // Same as completeURL() for the same reason as above.
+
+  String encoding() const;
 
   CSSStyleSelector* m_styleSelector;
   bool m_didCalculateStyleSelector;
