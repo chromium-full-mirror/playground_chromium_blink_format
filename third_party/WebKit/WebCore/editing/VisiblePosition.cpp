@@ -79,7 +79,7 @@ VisiblePosition VisiblePosition::previous(bool stayInEditableContent) const {
   Position pos = previousVisuallyDistinctCandidate(m_deepPosition);
 
   // return null visible position if there is no previous visible position
-  if (pos.atStart())
+  if (pos.atStartOfTree())
     return VisiblePosition();
 
   VisiblePosition prev = VisiblePosition(pos, DOWNSTREAM);
@@ -234,15 +234,16 @@ Position VisiblePosition::leftVisuallyDistinctCandidate() const {
 
     p = Position(renderer->node(), offset);
 
-    if (p.isCandidate() && p.downstream() != downstreamStart || p.atStart() ||
-        p.atEnd())
+    if (p.isCandidate() && p.downstream() != downstreamStart ||
+        p.atStartOfTree() || p.atEndOfTree())
       return p;
   }
 }
 
 VisiblePosition VisiblePosition::left(bool stayInEditableContent) const {
   Position pos = leftVisuallyDistinctCandidate();
-  if (pos.atStart() || pos.atEnd())
+  // FIXME: Why can't we move left from the last position in a tree?
+  if (pos.atStartOfTree() || pos.atEndOfTree())
     return VisiblePosition();
 
   VisiblePosition left = VisiblePosition(pos, DOWNSTREAM);
@@ -388,15 +389,16 @@ Position VisiblePosition::rightVisuallyDistinctCandidate() const {
 
     p = Position(renderer->node(), offset);
 
-    if (p.isCandidate() && p.downstream() != downstreamStart || p.atStart() ||
-        p.atEnd())
+    if (p.isCandidate() && p.downstream() != downstreamStart ||
+        p.atStartOfTree() || p.atEndOfTree())
       return p;
   }
 }
 
 VisiblePosition VisiblePosition::right(bool stayInEditableContent) const {
   Position pos = rightVisuallyDistinctCandidate();
-  if (pos.atStart() || pos.atEnd())
+  // FIXME: Why can't we move left from the last position in a tree?
+  if (pos.atStartOfTree() || pos.atEndOfTree())
     return VisiblePosition();
 
   VisiblePosition right = VisiblePosition(pos, DOWNSTREAM);

@@ -538,8 +538,7 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity,
           downstreamEnd.m_offset == 0) {
         setEndingSelection(VisibleSelection(
             endingSelection().end(),
-            Position(downstreamEnd.node(), maxDeepOffset(downstreamEnd.node())),
-            DOWNSTREAM));
+            lastDeepEditingPositionForNode(downstreamEnd.node()), DOWNSTREAM));
         typingAddedToOpenCommand();
         return;
       }

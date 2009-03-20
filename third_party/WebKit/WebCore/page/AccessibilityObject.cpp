@@ -479,7 +479,7 @@ static VisiblePosition startOfStyleRange(const VisiblePosition visiblePos) {
   return VisiblePosition(startRenderer->node(), 0, VP_DEFAULT_AFFINITY);
 }
 
-static VisiblePosition endOfStyleRange(const VisiblePosition visiblePos) {
+static VisiblePosition endOfStyleRange(const VisiblePosition& visiblePos) {
   RenderObject* renderer = visiblePos.deepEquivalent().node()->renderer();
   RenderObject* endRenderer = renderer;
   RenderStyle* style = renderer->style();
@@ -499,9 +499,7 @@ static VisiblePosition endOfStyleRange(const VisiblePosition visiblePos) {
     endRenderer = r;
   }
 
-  return VisiblePosition(endRenderer->node(),
-                         maxDeepOffset(endRenderer->node()),
-                         VP_DEFAULT_AFFINITY);
+  return lastDeepEditingPositionForNode(endRenderer->node());
 }
 
 VisiblePositionRange AccessibilityObject::styleRangeForPosition(

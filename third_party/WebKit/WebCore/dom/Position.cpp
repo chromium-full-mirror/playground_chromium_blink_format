@@ -106,7 +106,7 @@ Position Position::previous(PositionMoveType moveType) const {
   if (o > 0) {
     Node* child = n->childNode(o - 1);
     if (child)
-      return Position(child, maxDeepOffset(child));
+      return lastDeepEditingPositionForNode(child);
 
     // There are two reasons child might be 0:
     //   1) The node is node like a text node that is not an element, and
@@ -144,9 +144,9 @@ Position Position::next(PositionMoveType moveType) const {
   ASSERT(o >= 0);
 
   Node* child = n->childNode(o);
-  if (child || !n->hasChildNodes() && o < maxDeepOffset(n)) {
+  if (child || !n->hasChildNodes() && o < lastOffsetForEditing(n)) {
     if (child)
-      return Position(child, 0);
+      return firstDeepEditingPositionForNode(child);
 
     // There are two reasons child might be 0:
     //   1) The node is node like a text node that is not an element, and
@@ -181,20 +181,28 @@ int Position::uncheckedNextOffset(const Node* n, int current) {
   return n->renderer() ? n->renderer()->nextOffset(current) : current + 1;
 }
 
-bool Position::atStart() const {
-  Node* n = node();
-  if (!n)
+bool Position::atFirstEditingPositionForNode() const {
+  if (isNull())
     return true;
-
-  return m_offset <= 0 && n->parent() == 0;
+  return m_offset <= 0;
 }
 
-bool Position::atEnd() const {
-  Node* n = node();
-  if (!n)
+bool Position::atLastEditingPositionForNode() const {
+  if (isNull())
     return true;
+  return m_offset >= lastOffsetForEditing(node());
+}
 
-  return n->parent() == 0 && m_offset >= maxDeepOffset(n);
+bool Position::atStartOfTree() const {
+  if (isNull())
+    return true;
+  return !node()->parentNode() && m_offset <= 0;
+}
+
+bool Position::atEndOfTree() const {
+  if (isNull())
+    return true;
+  return !node()->parentNode() && m_offset >= lastOffsetForEditing(node());
 }
 
 int Position::renderedOffset() const {
@@ -233,7 +241,7 @@ Position Position::previousCharacterPosition(EAffinity affinity) const {
   bool rendered = isCandidate();
 
   Position currentPos = *this;
-  while (!currentPos.atStart()) {
+  while (!currentPos.atStartOfTree()) {
     currentPos = currentPos.previous();
 
     if (currentPos.node()->rootEditableElement() != fromRootEditableElement)
@@ -260,7 +268,7 @@ Position Position::nextCharacterPosition(EAffinity affinity) const {
   bool rendered = isCandidate();
 
   Position currentPos = *this;
-  while (!currentPos.atEnd()) {
+  while (!currentPos.atEndOfTree()) {
     currentPos = currentPos.next();
 
     if (currentPos.node()->rootEditableElement() != fromRootEditableElement)
@@ -276,7 +284,7 @@ Position Position::nextCharacterPosition(EAffinity affinity) const {
   return *this;
 }
 
-// Whether or not [node, 0] and [node, maxDeepOffset(node)] are their own
+// Whether or not [node, 0] and [node, lastOffsetForEditing(node)] are their own
 // VisiblePositions.
 // If true, adjacent candidates are visually distinct.
 // FIXME: Disregard nodes with renderers that have no height, as we do in
@@ -381,7 +389,7 @@ Position Position::upstream() const {
     // ignored.
     if (editingIgnoresContent(currentNode) || isTableElement(currentNode)) {
       if (currentPos.atEndOfNode())
-        return Position(currentNode, maxDeepOffset(currentNode));
+        return lastDeepEditingPositionForNode(currentNode);
       continue;
     }
 
@@ -612,13 +620,14 @@ bool Position::isCandidate() const {
     return inRenderedText() && !nodeIsUserSelectNone(node());
 
   if (isTableElement(node()) || editingIgnoresContent(node()))
-    return (m_offset == 0 || m_offset == maxDeepOffset(node())) &&
+    return (atFirstEditingPositionForNode() ||
+            atLastEditingPositionForNode()) &&
            !nodeIsUserSelectNone(node()->parent());
 
   if (!node()->hasTagName(htmlTag) && renderer->isBlockFlow() &&
       !hasRenderedNonAnonymousDescendantsWithHeight(renderer) &&
       (toRenderBox(renderer)->height() || node()->hasTagName(bodyTag)))
-    return m_offset == 0 && !nodeIsUserSelectNone(node());
+    return atFirstEditingPositionForNode() && !nodeIsUserSelectNone(node());
 
   return false;
 }
@@ -1051,6 +1060,19 @@ Position startPosition(const Range* r) {
 
 Position endPosition(const Range* r) {
   return r ? r->endPosition() : Position();
+}
+
+// NOTE: first/lastDeepEditingPositionForNode can return "editing positions"
+// (like [img, 0])
+// for elements which editing "ignores".  the rest of the editing code will
+// treat [img, 0]
+// as "the last position before the img"
+Position firstDeepEditingPositionForNode(Node* node) {
+  return Position(node, 0);
+}
+
+Position lastDeepEditingPositionForNode(Node* node) {
+  return Position(node, lastOffsetForEditing(node));
 }
 
 }  // namespace WebCore
