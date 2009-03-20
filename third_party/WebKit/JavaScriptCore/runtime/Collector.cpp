@@ -364,6 +364,10 @@ scan:
     // new block
     size_t numBlocks = heap.numBlocks;
     if (usedBlocks == numBlocks) {
+      static const size_t maxNumBlocks =
+          ULONG_MAX / sizeof(CollectorBlock*) / GROWTH_FACTOR;
+      if (numBlocks > maxNumBlocks)
+        CRASH();
       numBlocks = max(MIN_ARRAY_SIZE, numBlocks * GROWTH_FACTOR);
       heap.numBlocks = numBlocks;
       heap.blocks = static_cast<CollectorBlock**>(
