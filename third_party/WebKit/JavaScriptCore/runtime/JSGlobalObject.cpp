@@ -488,7 +488,11 @@ void JSGlobalObject::reset(JSValuePtr prototype) {
 // Set prototype, and also insert the object prototype at the end of the chain.
 void JSGlobalObject::resetPrototype(JSValuePtr prototype) {
   setPrototype(prototype);
-  lastInPrototypeChain(this)->setPrototype(d()->objectPrototype);
+
+  JSObject* oldLastInPrototypeChain = lastInPrototypeChain(this);
+  JSObject* objectPrototype = d()->objectPrototype;
+  if (oldLastInPrototypeChain != objectPrototype)
+    oldLastInPrototypeChain->setPrototype(objectPrototype);
 }
 
 void JSGlobalObject::mark() {
