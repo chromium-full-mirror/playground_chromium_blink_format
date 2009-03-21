@@ -74,7 +74,7 @@ class PutPropertySlot;
 #endif
 
 // The Mac compilers are fine with this,
-#if PLATFORM(MAC)
+#if !COMPILER(MSVC)
 struct VoidPtrPair {
   void* first;
   void* second;
@@ -83,6 +83,9 @@ struct VoidPtrPair {
   VoidPtrPair pair = {a, b}; \
   return pair
 #else
+#if PLATFORM(X86_64)
+#error MSVC version of RETURN_PAIR is not 64-bits safe
+#endif
 typedef uint64_t VoidPtrPair;
 union VoidPtrPairValue {
   struct {
