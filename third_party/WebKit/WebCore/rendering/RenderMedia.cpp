@@ -393,7 +393,7 @@ void RenderMedia::opacityAnimationTimerFired(Timer<RenderMedia>*) {
 void RenderMedia::forwardEvent(Event* event) {
   if (event->isMouseEvent() && m_controlsShadowRoot) {
     MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
-    IntPoint point(mouseEvent->pageX(), mouseEvent->pageY());
+    IntPoint point(mouseEvent->absoluteLocation());
     if (m_muteButton && m_muteButton->hitTest(point))
       m_muteButton->defaultEventHandler(event);
 

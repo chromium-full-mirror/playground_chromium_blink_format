@@ -2684,20 +2684,23 @@ bool Node::dispatchMouseEvent(const AtomicString& eventType,
   // relatedTarget to be silently ignored.
   RefPtr<Node> relatedTarget = relatedTargetArg;
 
+  int adjustedPageX = pageX;
+  int adjustedPageY = pageY;
   if (Frame* frame = document()->frame()) {
     float pageZoom = frame->pageZoomFactor();
     if (pageZoom != 1.0f) {
       // Adjust our pageX and pageY to account for the page zoom.
-      pageX = lroundf(pageX / pageZoom);
-      pageY = lroundf(pageY / pageZoom);
+      adjustedPageX = lroundf(pageX / pageZoom);
+      adjustedPageY = lroundf(pageY / pageZoom);
     }
   }
 
-  RefPtr<Event> mouseEvent = MouseEvent::create(
+  RefPtr<MouseEvent> mouseEvent = MouseEvent::create(
       eventType, true, cancelable, document()->defaultView(), detail, screenX,
-      screenY, pageX, pageY, ctrlKey, altKey, shiftKey, metaKey, button,
-      relatedTarget, 0, isSimulated);
+      screenY, adjustedPageX, adjustedPageY, ctrlKey, altKey, shiftKey, metaKey,
+      button, relatedTarget, 0, isSimulated);
   mouseEvent->setUnderlyingEvent(underlyingEvent.get());
+  mouseEvent->setAbsoluteLocation(IntPoint(pageX, pageY));
 
   dispatchEvent(mouseEvent, ec);
   bool defaultHandled = mouseEvent->defaultHandled();
@@ -2739,10 +2742,24 @@ void Node::dispatchWheelEvent(PlatformWheelEvent& e) {
 
   IntPoint pos = view->windowToContents(e.pos());
 
+  int adjustedPageX = pos.x();
+  int adjustedPageY = pos.y();
+  if (Frame* frame = document()->frame()) {
+    float pageZoom = frame->pageZoomFactor();
+    if (pageZoom != 1.0f) {
+      // Adjust our pageX and pageY to account for the page zoom.
+      adjustedPageX = lroundf(pos.x() / pageZoom);
+      adjustedPageY = lroundf(pos.y() / pageZoom);
+    }
+  }
+
   RefPtr<WheelEvent> we = WheelEvent::create(
       e.wheelTicksX(), e.wheelTicksY(), document()->defaultView(), e.globalX(),
-      e.globalY(), pos.x(), pos.y(), e.ctrlKey(), e.altKey(), e.shiftKey(),
-      e.metaKey());
+      e.globalY(), adjustedPageX, adjustedPageY, e.ctrlKey(), e.altKey(),
+      e.shiftKey(), e.metaKey());
+
+  we->setAbsoluteLocation(IntPoint(pos.x(), pos.y()));
+
   ExceptionCode ec = 0;
   if (!dispatchEvent(we.release(), ec))
     e.accept();
