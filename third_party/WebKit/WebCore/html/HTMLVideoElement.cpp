@@ -159,7 +159,7 @@ void HTMLVideoElement::updatePosterImage() {
 #endif
 
   m_shouldShowPosterImage =
-      !poster().isEmpty() && m_networkState < LOADED_FIRST_FRAME;
+      !poster().isEmpty() && readyState() < HAVE_CURRENT_DATA;
 
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
   if (attached() && oldShouldShowPosterImage != m_shouldShowPosterImage) {

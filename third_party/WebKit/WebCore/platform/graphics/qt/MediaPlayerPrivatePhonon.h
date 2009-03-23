@@ -51,19 +51,21 @@ class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
   Q_ENUMS(ReadyState NetworkState PhononState)
 
   enum ReadyState {
-    DataUnavailable,
-    CanShowCurrentFrame,
-    CanPlay,
-    CanPlayThrough
+    HaveNothing,
+    HaveMetadata,
+    HaveCurrentData,
+    HaveFutureData,
+    HaveEnoughData
   };
 
   enum NetworkState {
     Empty,
-    LoadFailed,
+    Idle,
     Loading,
-    LoadedMetaData,
-    LoadedFirstFrame,
-    Loaded
+    Loaded,
+    FormatError,
+    NetworkError,
+    DecodeError
   };
 
   enum PhononState {

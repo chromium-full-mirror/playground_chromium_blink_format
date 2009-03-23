@@ -51,7 +51,7 @@ void HTMLSourceElement::insertedIntoDocument() {
   if (parentNode() && (parentNode()->hasTagName(audioTag) ||
                        parentNode()->hasTagName(videoTag))) {
     HTMLMediaElement* media = static_cast<HTMLMediaElement*>(parentNode());
-    if (media->networkState() == HTMLMediaElement::EMPTY)
+    if (media->networkState() == HTMLMediaElement::NETWORK_EMPTY)
       media->scheduleLoad();
   }
 }

@@ -38,9 +38,10 @@
 
 namespace WebCore {
 
+class Event;
 class MediaError;
-class TimeRanges;
 class KURL;
+class TimeRanges;
 
 class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
  public:
@@ -82,11 +83,11 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   String currentSrc() const;
 
   enum NetworkState {
-    EMPTY,
-    LOADING,
-    LOADED_METADATA,
-    LOADED_FIRST_FRAME,
-    LOADED
+    NETWORK_EMPTY,
+    NETWORK_IDLE,
+    NETWORK_LOADING,
+    NETWORK_LOADED,
+    NETWORK_NO_SOURCE
   };
   NetworkState networkState() const;
   PassRefPtr<TimeRanges> buffered() const;
@@ -96,10 +97,11 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   // ready state
   enum ReadyState {
-    DATA_UNAVAILABLE,
-    CAN_SHOW_CURRENT_FRAME,
-    CAN_PLAY,
-    CAN_PLAY_THROUGH
+    HAVE_NOTHING,
+    HAVE_METADATA,
+    HAVE_CURRENT_DATA,
+    HAVE_FUTURE_DATA,
+    HAVE_ENOUGH_DATA
   };
   ReadyState readyState() const;
   bool seeking() const;
@@ -110,9 +112,9 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   float duration() const;
   bool paused() const;
   float defaultPlaybackRate() const;
-  void setDefaultPlaybackRate(float, ExceptionCode&);
+  void setDefaultPlaybackRate(float);
   float playbackRate() const;
-  void setPlaybackRate(float, ExceptionCode&);
+  void setPlaybackRate(float);
   PassRefPtr<TimeRanges> played() const;
   PassRefPtr<TimeRanges> seekable() const;
   bool ended() const;
@@ -120,8 +122,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void setAutoplay(bool b);
   bool loop() const;
   void setLoop(bool b);
-  void play(ExceptionCode&);
-  void pause(ExceptionCode&);
+  void play();
+  void pause();
 
   // controls
   bool controls() const;
@@ -130,7 +132,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void setVolume(float, ExceptionCode&);
   bool muted() const;
   void setMuted(bool);
-  void togglePlayState(ExceptionCode& ec);
+  void togglePlayState();
   void beginScrubbing();
   void endScrubbing();
 
@@ -154,11 +156,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   virtual void documentDidBecomeActive();
   virtual void mediaVolumeDidChange();
 
-  void initAndDispatchProgressEvent(const AtomicString& eventName);
-  void dispatchEventAsync(const AtomicString& eventName);
-
-  void setReadyState(ReadyState);
-  void setNetworkState(MediaPlayer::NetworkState state);
+  void setReadyState(MediaPlayer::ReadyState);
+  void setNetworkState(MediaPlayer::NetworkState);
 
  private:  // MediaPlayerObserver
   virtual void mediaPlayerNetworkStateChanged(MediaPlayer*);
@@ -166,18 +165,41 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   virtual void mediaPlayerTimeChanged(MediaPlayer*);
   virtual void mediaPlayerRepaint(MediaPlayer*);
   virtual void mediaPlayerVolumeChanged(MediaPlayer*);
+  virtual void mediaPlayerDurationChanged(MediaPlayer*);
+  virtual void mediaPlayerRateChanged(MediaPlayer*);
+  virtual void mediaPlayerSizeChanged(MediaPlayer*);
 
  private:
   void loadTimerFired(Timer<HTMLMediaElement>*);
   void asyncEventTimerFired(Timer<HTMLMediaElement>*);
   void progressEventTimerFired(Timer<HTMLMediaElement>*);
-  void seek(float time, ExceptionCode& ec);
+  void playbackProgressTimerFired(Timer<HTMLMediaElement>*);
+  void startPlaybackProgressTimer();
+  void startProgressEventTimer();
+  void stopPeriodicTimers();
+
+  void seek(float time, ExceptionCode&);
   void checkIfSeekNeeded();
 
+  void scheduleTimeupdateEvent(bool periodicEvent);
+  void scheduleProgressEvent(const AtomicString& eventName);
+  void scheduleEvent(const AtomicString& eventName);
+  void enqueueEvent(RefPtr<Event> event);
+
+  // loading
+  void selectMediaResource();
+  void loadResource(String url, ContentType& contentType);
+  void loadNextSourceChild();
+  void userCancelledLoad();
+  String nextSourceChild(ContentType* contentType = 0);
+  bool havePotentialSourceChild();
+  void noneSupported();
+  void mediaEngineError(PassRefPtr<MediaError> err);
+
   // These "internal" functions do not check user gesture restrictions.
-  void loadInternal(ExceptionCode& ec);
-  void playInternal(ExceptionCode& ec);
-  void pauseInternal(ExceptionCode& ec);
+  void loadInternal();
+  void playInternal();
+  void pauseInternal();
 
   bool processingUserGesture() const;
   bool processingMediaPlayerCallback() const {
@@ -191,11 +213,12 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
     --m_processingMediaPlayerCallback;
   }
 
-  String selectMediaURL(ContentType& contentType);
   void updateVolume();
   void updatePlayState();
-  bool activelyPlaying() const;
+  bool potentiallyPlaying() const;
   bool endedPlayback() const;
+  bool stoppedDueToErrors() const;
+  bool pausedForUserInteraction() const;
 
   // Restrictions to change default behaviors. This is a effectively a compile
   // time choice at the moment
@@ -210,8 +233,10 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   Timer<HTMLMediaElement> m_loadTimer;
   Timer<HTMLMediaElement> m_asyncEventTimer;
   Timer<HTMLMediaElement> m_progressEventTimer;
-  Vector<AtomicString> m_asyncEventsToDispatch;
+  Timer<HTMLMediaElement> m_playbackProgressTimer;
+  Vector<RefPtr<Event>> m_pendingEvents;
 
+  float m_playbackRate;
   float m_defaultPlaybackRate;
   NetworkState m_networkState;
   ReadyState m_readyState;
@@ -219,28 +244,26 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   RefPtr<MediaError> m_error;
 
-  bool m_begun;
-  bool m_loadedFirstFrame;
-  bool m_autoplaying;
-
-  unsigned m_currentLoop;
   float m_volume;
-  bool m_muted;
-
-  bool m_paused;
-  bool m_seeking;
-
   float m_currentTimeDuringSeek;
 
   unsigned m_previousProgress;
   double m_previousProgressTime;
-  bool m_sentStalledEvent;
 
-  unsigned m_loadNestingLevel;
-  unsigned m_terminateLoadBelowNestingLevel;
+  // the last time a timeupdate event was sent (wall clock)
+  double m_lastTimeUpdateEventWallTime;
 
-  bool m_pausedInternal;
-  bool m_inActiveDocument;
+  // the last time a timeupdate event was sent in movie time
+  float m_lastTimeUpdateEventMovieTime;
+
+  // loading state
+  enum LoadState {
+    WaitingForSource,
+    LoadingFromSrcAttr,
+    LoadingFromSourceElement
+  };
+  LoadState m_loadState;
+  Node* m_currentSourceNode;
 
   OwnPtr<MediaPlayer> m_player;
 
@@ -251,12 +274,29 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   //  calling the media engine recursively
   int m_processingMediaPlayerCallback;
 
+  bool m_processingLoad : 1;
+  bool m_delayingTheLoadEvent : 1;
+  bool m_haveFiredLoadedData : 1;
+  bool m_inActiveDocument : 1;
+  bool m_autoplaying : 1;
+  bool m_muted : 1;
+  bool m_paused : 1;
+  bool m_seeking : 1;
+
+  // data has not been loaded since sending a "stalled" event
+  bool m_sentStalledEvent : 1;
+
+  // time has not changed since sending an "ended" event
+  bool m_sentEndEvent : 1;
+
+  bool m_pausedInternal : 1;
+
   // Not all media engines provide enough information about a file to be able to
   // support progress events so setting m_sendProgressEvents disables them
-  bool m_sendProgressEvents;
+  bool m_sendProgressEvents : 1;
 
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-  bool m_needWidgetUpdate;
+  bool m_needWidgetUpdate : 1;
 #endif
 };
 
