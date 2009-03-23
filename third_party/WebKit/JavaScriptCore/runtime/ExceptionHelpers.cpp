@@ -45,6 +45,10 @@ class InterruptedExecutionError : public JSObject {
       : JSObject(globalData->interruptedExecutionErrorStructure) {}
 
   virtual bool isWatchdogException() const { return true; }
+
+  virtual UString toString(ExecState*) const {
+    return "JavaScript execution exceeded timeout.";
+  }
 };
 
 JSValuePtr createInterruptedExecutionException(JSGlobalData* globalData) {

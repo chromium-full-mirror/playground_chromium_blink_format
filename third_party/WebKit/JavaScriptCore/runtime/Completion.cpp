@@ -80,7 +80,7 @@ Completion evaluate(ExecState* exec,
 
   if (exception) {
     if (exception.isObject() && asObject(exception)->isWatchdogException())
-      return Completion(Interrupted, result);
+      return Completion(Interrupted, exception);
     return Completion(Throw, exception);
   }
   return Completion(Normal, result);
