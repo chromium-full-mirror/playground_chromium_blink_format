@@ -28,8 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef V8NodeFilter_h
-#define V8NodeFilter_h
+#ifndef V8NodeFilterCondition_h
+#define V8NodeFilterCondition_h
 
 #include "NodeFilterCondition.h"
 #include <v8.h>
@@ -55,4 +55,4 @@ class V8NodeFilterCondition : public NodeFilterCondition {
 
 }  // namespace WebCore
 
-#endif  // V8NodeFilter_h
+#endif  // V8NodeFilterCondition_h
