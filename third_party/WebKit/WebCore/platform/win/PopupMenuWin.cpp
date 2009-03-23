@@ -534,6 +534,9 @@ void PopupMenu::paint(const IntRect& damageRect, HDC hdc) {
     if (itemStyle.isVisible()) {
       int textX =
           max(0, client()->clientPaddingLeft() - client()->clientInsetLeft());
+      if (theme()->popupOptionSupportsTextIndent() &&
+          itemStyle.textDirection() == LTR)
+        textX += itemStyle.textIndent().calcMinValue(itemRect.width());
       int textY = itemRect.y() + itemFont.ascent() +
                   (itemRect.height() - itemFont.height()) / 2;
       context.drawBidiText(itemFont, textRun, IntPoint(textX, textY));

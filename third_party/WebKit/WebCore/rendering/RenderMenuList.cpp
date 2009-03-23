@@ -149,7 +149,16 @@ void RenderMenuList::updateOptionsWidth() {
       continue;
 
     String text = optionElement->textIndentedToRespectGroupLabel();
-    if (!text.isEmpty())
+    if (theme()->popupOptionSupportsTextIndent()) {
+      // Add in the option's text indent.  We can't calculate percentage values
+      // for now.
+      float optionWidth = 0;
+      if (RenderStyle* optionStyle = element->renderStyle())
+        optionWidth += optionStyle->textIndent().calcMinValue(0);
+      if (!text.isEmpty())
+        optionWidth += style()->font().floatWidth(text);
+      maxOptionWidth = max(maxOptionWidth, optionWidth);
+    } else if (!text.isEmpty())
       maxOptionWidth = max(maxOptionWidth, style()->font().floatWidth(text));
   }
 
@@ -339,7 +348,8 @@ PopupMenuStyle RenderMenuList::itemStyle(unsigned listIndex) const {
   RenderStyle* style = element->renderStyle() ? element->renderStyle()
                                               : element->computedStyle();
   return style ? PopupMenuStyle(style->color(), itemBackgroundColor(listIndex),
-                                style->font(), style->visibility() == VISIBLE)
+                                style->font(), style->visibility() == VISIBLE,
+                                style->textIndent(), style->direction())
                : menuStyle();
 }
 
@@ -368,7 +378,8 @@ Color RenderMenuList::itemBackgroundColor(unsigned listIndex) const {
 PopupMenuStyle RenderMenuList::menuStyle() const {
   RenderStyle* s = m_innerBlock ? m_innerBlock->style() : style();
   return PopupMenuStyle(s->color(), s->backgroundColor(), s->font(),
-                        s->visibility() == VISIBLE);
+                        s->visibility() == VISIBLE, s->textIndent(),
+                        s->direction());
 }
 
 HostWindow* RenderMenuList::hostWindow() const {

@@ -720,7 +720,8 @@ PopupMenuStyle RenderTextControlSingleLine::itemStyle(unsigned) const {
 
 PopupMenuStyle RenderTextControlSingleLine::menuStyle() const {
   return PopupMenuStyle(style()->color(), style()->backgroundColor(),
-                        style()->font(), style()->visibility() == VISIBLE);
+                        style()->font(), style()->visibility() == VISIBLE,
+                        style()->textIndent(), style()->direction());
 }
 
 int RenderTextControlSingleLine::clientInsetLeft() const {

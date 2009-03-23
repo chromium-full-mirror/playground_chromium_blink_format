@@ -116,6 +116,8 @@ class RenderThemeWin : public RenderTheme {
                                 const IntRect& r);
   virtual void adjustSliderThumbSize(RenderObject*) const;
 
+  virtual bool popupOptionSupportsTextIndent() const { return true; }
+
   virtual int buttonInternalPaddingLeft() const;
   virtual int buttonInternalPaddingRight() const;
   virtual int buttonInternalPaddingTop() const;
