@@ -4299,11 +4299,18 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         Rect* rect = primitiveValue->getRectValue();
         if (!rect)
           return;
-        top = convertToLength(rect->top(), style());
-        right = convertToLength(rect->right(), style());
-        bottom = convertToLength(rect->bottom(), style());
-        left = convertToLength(rect->left(), style());
 
+        top = Length(
+            rect->top()->computeLengthIntForLength(style(), zoomFactor), Fixed);
+        right = Length(
+            rect->right()->computeLengthIntForLength(style(), zoomFactor),
+            Fixed);
+        bottom = Length(
+            rect->bottom()->computeLengthIntForLength(style(), zoomFactor),
+            Fixed);
+        left =
+            Length(rect->left()->computeLengthIntForLength(style(), zoomFactor),
+                   Fixed);
       } else if (primitiveValue->getIdent() != CSSValueAuto) {
         return;
       }
