@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -74,10 +74,11 @@ class TextEncoding {
 
  private:
   UChar backslashAsCurrencySymbol() const;
+  bool isNonByteBasedEncoding() const;
+  bool isUTF7Encoding() const;
 
   const char* m_name;
   UChar m_backslashAsCurrencySymbol;
-  bool isNonByteBasedEncoding() const;
 };
 
 inline bool operator==(const TextEncoding& a, const TextEncoding& b) {
