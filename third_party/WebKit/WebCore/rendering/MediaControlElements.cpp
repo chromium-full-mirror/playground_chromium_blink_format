@@ -71,13 +71,25 @@ MediaControlShadowRootElement::MediaControlShadowRootElement(
   setInDocument(true);
 }
 
+void MediaControlShadowRootElement::updateStyle() {
+  if (renderer()) {
+    RenderStyle* timelineContainerStyle =
+        m_mediaElement->renderer()->getCachedPseudoStyle(
+            MEDIA_CONTROLS_TIMELINE_CONTAINER);
+    renderer()->setStyle(timelineContainerStyle);
+  }
+}
+
 // ----------------------------
 
 MediaTextDisplayElement::MediaTextDisplayElement(Document* doc,
                                                  PseudoId pseudo,
                                                  HTMLMediaElement* mediaElement)
-    : HTMLDivElement(divTag, doc), m_mediaElement(mediaElement) {
-  RenderStyle* style = m_mediaElement->renderer()->getCachedPseudoStyle(pseudo);
+    : HTMLDivElement(divTag, doc),
+      m_mediaElement(mediaElement),
+      m_pseudoStyleId(pseudo) {
+  RenderStyle* style =
+      m_mediaElement->renderer()->getCachedPseudoStyle(m_pseudoStyleId);
   RenderObject* renderer =
       createRenderer(m_mediaElement->renderer()->renderArena(), style);
   if (renderer) {
@@ -99,6 +111,14 @@ void MediaTextDisplayElement::update() {
     renderer()->updateFromElement();
 }
 
+void MediaTextDisplayElement::updateStyle() {
+  if (renderer() && m_mediaElement->renderer()) {
+    RenderStyle* style =
+        m_mediaElement->renderer()->getCachedPseudoStyle(m_pseudoStyleId);
+    renderer()->setStyle(style);
+  }
+}
+
 MediaTimeDisplayElement::MediaTimeDisplayElement(Document* doc,
                                                  HTMLMediaElement* element,
                                                  bool currentTime)
@@ -115,9 +135,12 @@ MediaControlInputElement::MediaControlInputElement(
     PseudoId pseudo,
     const String& type,
     HTMLMediaElement* mediaElement)
-    : HTMLInputElement(inputTag, doc), m_mediaElement(mediaElement) {
+    : HTMLInputElement(inputTag, doc),
+      m_mediaElement(mediaElement),
+      m_pseudoStyleId(pseudo) {
   setInputType(type);
-  RenderStyle* style = m_mediaElement->renderer()->getCachedPseudoStyle(pseudo);
+  RenderStyle* style =
+      m_mediaElement->renderer()->getCachedPseudoStyle(m_pseudoStyleId);
   RenderObject* renderer =
       createRenderer(m_mediaElement->renderer()->renderArena(), style);
   if (renderer) {
@@ -136,6 +159,14 @@ void MediaControlInputElement::attachToParent(Element* parent) {
 void MediaControlInputElement::update() {
   if (renderer())
     renderer()->updateFromElement();
+}
+
+void MediaControlInputElement::updateStyle() {
+  if (renderer() && m_mediaElement->renderer()) {
+    RenderStyle* style =
+        m_mediaElement->renderer()->getCachedPseudoStyle(m_pseudoStyleId);
+    renderer()->setStyle(style);
+  }
 }
 
 bool MediaControlInputElement::hitTest(const IntPoint& absPoint) {
