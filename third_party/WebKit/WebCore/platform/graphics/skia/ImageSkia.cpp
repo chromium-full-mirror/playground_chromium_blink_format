@@ -436,8 +436,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
     return;  // Nothing to draw.
 
   paintSkBitmap(ctxt->platformContext(), *bm, enclosingIntRect(normSrcRect),
-                enclosingIntRect(normDstRect),
-                WebCoreCompositeToSkiaComposite(compositeOp));
+                normDstRect, WebCoreCompositeToSkiaComposite(compositeOp));
 }
 
 // FIXME: These should go into BitmapImageSingleFrameSkia.cpp
@@ -453,7 +452,7 @@ void BitmapImageSingleFrameSkia::draw(GraphicsContext* ctxt,
     return;  // Nothing to draw.
 
   paintSkBitmap(ctxt->platformContext(), m_nativeImage,
-                enclosingIntRect(normSrcRect), enclosingIntRect(normDstRect),
+                enclosingIntRect(normSrcRect), normDstRect,
                 WebCoreCompositeToSkiaComposite(compositeOp));
 }
 
