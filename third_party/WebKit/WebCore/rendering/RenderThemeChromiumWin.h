@@ -71,6 +71,8 @@ class RenderThemeChromiumWin : public RenderTheme {
 
   virtual int minimumMenuListSize(RenderStyle*) const;
 
+  virtual void adjustSliderThumbSize(RenderObject*) const;
+
   virtual bool paintCheckbox(RenderObject* o,
                              const RenderObject::PaintInfo& i,
                              const IntRect& r) {
@@ -97,6 +99,16 @@ class RenderThemeChromiumWin : public RenderTheme {
                              const RenderObject::PaintInfo& i,
                              const IntRect& r) {
     return paintTextField(o, i, r);
+  }
+
+  virtual bool paintSliderTrack(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&);
+
+  virtual bool paintSliderThumb(RenderObject* o,
+                                const RenderObject::PaintInfo& i,
+                                const IntRect& r) {
+    return paintSliderTrack(o, i, r);
   }
 
   virtual bool paintSearchField(RenderObject*,
@@ -149,6 +161,7 @@ class RenderThemeChromiumWin : public RenderTheme {
 
  private:
   unsigned determineState(RenderObject*);
+  unsigned determineSliderThumbState(RenderObject*);
   unsigned determineClassicState(RenderObject*);
 
   ThemeData getThemeData(RenderObject*);

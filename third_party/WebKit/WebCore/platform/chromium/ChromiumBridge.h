@@ -180,6 +180,11 @@ class ChromiumBridge {
                              const Color&,
                              bool fillContentArea,
                              bool drawEdges);
+  static void paintTrackbar(GraphicsContext*,
+                            int part,
+                            int state,
+                            int classicState,
+                            const IntRect&);
 #endif
 
   // Trace Event --------------------------------------------------------
