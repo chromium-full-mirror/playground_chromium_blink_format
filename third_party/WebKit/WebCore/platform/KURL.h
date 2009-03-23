@@ -125,6 +125,8 @@ class KURL {
   String ref() const;
   bool hasRef() const;
 
+  String baseAsString() const;
+
   String prettyURL() const;
   String fileSystemPath() const;
 
