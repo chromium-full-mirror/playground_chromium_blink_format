@@ -917,7 +917,11 @@ Element* Document::elementFromPoint(int x, int y) const {
     return 0;
 
   HitTestRequest request(HitTestRequest::ReadOnly | HitTestRequest::Active);
-  HitTestResult result(IntPoint(x, y));
+
+  float zoomFactor = frame() ? frame()->pageZoomFactor() : 1.0f;
+
+  HitTestResult result(
+      roundedIntPoint(FloatPoint(x * zoomFactor, y * zoomFactor)));
   renderView()->layer()->hitTest(request, result);
 
   Node* n = result.innerNode();
