@@ -121,8 +121,8 @@ class KURL {
   String pass() const;
   String path() const;
   String lastPathComponent() const;
-  String query() const;  // Includes the "?".
-  String ref() const;    // Does *not* include the "#".
+  String query() const;
+  String ref() const;
   bool hasRef() const;
 
   String prettyURL() const;
