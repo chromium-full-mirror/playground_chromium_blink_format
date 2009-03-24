@@ -551,6 +551,10 @@ class RenderLayer : public ScrollbarClient {
   void updateReflectionStyle();
   bool paintingInsideReflection() const { return m_paintingInsideReflection; }
 
+  void parentClipRects(const RenderLayer* rootLayer,
+                       ClipRects&,
+                       bool temporaryClipRects = false) const;
+
   RenderLayer* enclosingTransformedAncestor() const;
 
   // Convert a point in absolute coords into layer coords, taking transforms
