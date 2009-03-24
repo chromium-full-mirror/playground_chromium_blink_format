@@ -3917,10 +3917,8 @@ static VisiblePosition positionForPointRespectingEditingBoundaries(
   // left or right of the child
   int childMidX = child->width() / 2;
   if (xInChildCoords < childMidX)
-    return VisiblePosition(ancestor->node(), childNode->nodeIndex(),
-                           DOWNSTREAM);
-  return VisiblePosition(ancestor->node(), childNode->nodeIndex() + 1,
-                         UPSTREAM);
+    return ancestor->createVisiblePosition(childNode->nodeIndex(), DOWNSTREAM);
+  return ancestor->createVisiblePosition(childNode->nodeIndex() + 1, UPSTREAM);
 }
 
 static VisiblePosition positionForPointWithInlineChildren(
@@ -3929,7 +3927,7 @@ static VisiblePosition positionForPointWithInlineChildren(
   ASSERT(block->childrenInline());
 
   if (!block->firstRootBox())
-    return VisiblePosition(block->node(), 0, DOWNSTREAM);
+    return block->createVisiblePosition(0, DOWNSTREAM);
 
   InlineBox* closestBox = 0;
   // look for the closest line box in the root box which is at the passed-in y
@@ -3967,7 +3965,7 @@ static VisiblePosition positionForPointWithInlineChildren(
   // Can't reach this.  We have a root line box, but it has no kids.
   // FIXME: This should ASSERT_NOT_REACHED(), but clicking on placeholder text
   // seems to hit this codepath.
-  return VisiblePosition(block->node(), 0, DOWNSTREAM);
+  return block->createVisiblePosition(0, DOWNSTREAM);
 }
 
 VisiblePosition RenderBlock::positionForPoint(const IntPoint& point) {
@@ -3981,9 +3979,9 @@ VisiblePosition RenderBlock::positionForPoint(const IntPoint& point) {
 
   if (isReplaced()) {
     if (point.y() < 0 || point.y() < height() && point.x() < 0)
-      return VisiblePosition(node(), caretMinOffset(), DOWNSTREAM);
+      return createVisiblePosition(caretMinOffset(), DOWNSTREAM);
     if (point.y() >= height() || point.y() >= 0 && point.x() >= width())
-      return VisiblePosition(node(), caretMaxOffset(), DOWNSTREAM);
+      return createVisiblePosition(caretMaxOffset(), DOWNSTREAM);
   }
 
   if (childrenInline()) {
