@@ -166,6 +166,12 @@ class Settings {
     return m_needsKeyboardEventDisambiguationQuirks;
   }
 
+  void setNeedsLeopardMailQuirks(bool);
+  bool needsLeopardMailQuirks() const { return m_needsLeopardMailQuirks; }
+
+  void setNeedsTigerMailQuirks(bool);
+  bool needsTigerMailQuirks() const { return m_needsTigerMailQuirks; }
+
   void setDOMPasteAllowed(bool);
   bool isDOMPasteAllowed() const { return m_isDOMPasteAllowed; }
 
@@ -210,11 +216,6 @@ class Settings {
   void setLocalStorageDatabasePath(const String&);
   const String& localStorageDatabasePath() const {
     return m_localStorageDatabasePath;
-  }
-
-  void disableRangeMutationForOldAppleMail(bool);
-  bool rangeMutationDisabledForOldAppleMail() const {
-    return m_rangeMutationDisabledForOldAppleMail;
   }
 
   void setApplicationChromeMode(bool);
@@ -291,6 +292,8 @@ class Settings {
 #endif
   bool m_needsAdobeFrameReloadingQuirk : 1;
   bool m_needsKeyboardEventDisambiguationQuirks : 1;
+  bool m_needsLeopardMailQuirks : 1;
+  bool m_needsTigerMailQuirks : 1;
   bool m_isDOMPasteAllowed : 1;
   bool m_shrinksStandaloneImagesToFit : 1;
   bool m_usesPageCache : 1;
@@ -303,7 +306,6 @@ class Settings {
   bool m_webArchiveDebugModeEnabled : 1;
   bool m_inApplicationChromeMode : 1;
   bool m_offlineWebApplicationCacheEnabled : 1;
-  bool m_rangeMutationDisabledForOldAppleMail : 1;
   bool m_shouldPaintCustomScrollbars : 1;
   bool m_zoomsTextOnly : 1;
   bool m_enforceCSSMIMETypeInStrictMode : 1;
