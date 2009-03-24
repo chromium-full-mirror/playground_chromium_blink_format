@@ -337,7 +337,7 @@ WorkerContextExecutionProxy::FindOrCreateEventListener(
   if (!object->IsObject())
     return 0;
 
-  for (size_t index = ; index < m_listeners.size(); ++index) {
+  for (size_t index = 0; index < m_listeners.size(); ++index) {
     V8EventListener* el = m_listeners[index];
     if (el->isInline() == isInline && el->getListenerObject() == object)
       return el;
@@ -346,8 +346,9 @@ WorkerContextExecutionProxy::FindOrCreateEventListener(
     return NULL;
 
   // Create a new one, and add to cache.
-  RefPtr<V8EventListener> listener = V8WorkerContextEventListener::create(
-      this, v8::Local<v8::Object>::Cast(object), isInline);
+  RefPtr<V8WorkerContextEventListener> listener =
+      V8WorkerContextEventListener::create(
+          this, v8::Local<v8::Object>::Cast(object), isInline);
   m_listeners.append(listener.get());
 
   return listener.release();
@@ -355,7 +356,7 @@ WorkerContextExecutionProxy::FindOrCreateEventListener(
 
 void WorkerContextExecutionProxy::RemoveEventListener(
     V8EventListener* listener) {
-  for (size_t index = ; index < m_listeners.size(); ++index) {
+  for (size_t index = 0; index < m_listeners.size(); ++index) {
     if (m_listeners[index] == listener) {
       m_listeners.remove(index);
       return;
