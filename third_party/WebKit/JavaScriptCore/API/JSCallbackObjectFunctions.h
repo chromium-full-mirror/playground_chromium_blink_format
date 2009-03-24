@@ -97,7 +97,7 @@ JSCallbackObject<Base>::~JSCallbackObject() {
 template <class Base>
 UString JSCallbackObject<Base>::className() const {
   UString thisClassName = classRef()->className();
-  if (!thisClassName.isNull())
+  if (!thisClassName.isEmpty())
     return thisClassName;
 
   return Base::className();
