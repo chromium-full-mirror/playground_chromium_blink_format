@@ -2522,7 +2522,7 @@ VisiblePosition RenderObject::createVisiblePosition(int offset,
 }
 
 VisiblePosition RenderObject::createVisiblePosition(const Position& position) {
-  if (position.container)
+  if (position.isNotNull())
     return VisiblePosition(position);
 
   ASSERT(!node());
