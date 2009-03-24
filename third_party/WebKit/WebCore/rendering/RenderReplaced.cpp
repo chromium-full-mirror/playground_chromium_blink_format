@@ -141,8 +141,7 @@ void RenderReplaced::paint(PaintInfo& paintInfo, int tx, int ty) {
   paintReplaced(paintInfo, tx, ty);
 
   if (clipToBorderRadius)
-    ;
-  paintInfo.context->restore();
+    paintInfo.context->restore();
 
   // The selection tint never gets clipped by border-radius rounding, since we
   // want it to run right up to the edges of
