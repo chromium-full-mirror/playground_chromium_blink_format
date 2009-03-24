@@ -2972,6 +2972,7 @@ void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
 
 static Length convertToLength(CSSPrimitiveValue* primitiveValue,
                               RenderStyle* style,
+                              double multiplier = 1,
                               bool* ok = 0) {
   // This function is tolerant of a null style value. The only place style is
   // used is in
@@ -2990,7 +2991,8 @@ static Length convertToLength(CSSPrimitiveValue* primitiveValue,
       if (ok)
         *ok = false;
     } else if (CSSPrimitiveValue::isUnitTypeLength(type))
-      l = Length(primitiveValue->computeLengthIntForLength(style), Fixed);
+      l = Length(primitiveValue->computeLengthIntForLength(style, multiplier),
+                 Fixed);
     else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
       l = Length(primitiveValue->getDoubleValue(), Percent);
     else if (type == CSSPrimitiveValue::CSS_NUMBER)
@@ -4299,18 +4301,10 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         Rect* rect = primitiveValue->getRectValue();
         if (!rect)
           return;
-
-        top = Length(
-            rect->top()->computeLengthIntForLength(style(), zoomFactor), Fixed);
-        right = Length(
-            rect->right()->computeLengthIntForLength(style(), zoomFactor),
-            Fixed);
-        bottom = Length(
-            rect->bottom()->computeLengthIntForLength(style(), zoomFactor),
-            Fixed);
-        left =
-            Length(rect->left()->computeLengthIntForLength(style(), zoomFactor),
-                   Fixed);
+        top = convertToLength(rect->top(), style(), zoomFactor);
+        right = convertToLength(rect->right(), style(), zoomFactor);
+        bottom = convertToLength(rect->bottom(), style(), zoomFactor);
+        left = convertToLength(rect->left(), style(), zoomFactor);
       } else if (primitiveValue->getIdent() != CSSValueAuto) {
         return;
       }
@@ -5274,7 +5268,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         }
       } else {
         bool ok = true;
-        Length l = convertToLength(primitiveValue, style(), &ok);
+        Length l = convertToLength(primitiveValue, style(), 1, &ok);
         if (ok)
           m_style->setMarqueeIncrement(l);
       }
@@ -6404,7 +6398,7 @@ static TransformOperation::OperationType getTransformOperationType(
 
 bool CSSStyleSelector::createTransformOperations(
     CSSValue* inValue,
-    RenderStyle* inStyle,
+    RenderStyle* style,
     TransformOperations& outOperations) {
   TransformOperations operations;
   if (inValue && !inValue->isPrimitiveValue()) {
@@ -6484,16 +6478,16 @@ bool CSSStyleSelector::createTransformOperations(
           Length ty = Length(0, Fixed);
           if (val->operationType() ==
               WebKitCSSTransformValue::TranslateYTransformOperation)
-            ty = convertToLength(firstValue, inStyle, &ok);
+            ty = convertToLength(firstValue, style, 1, &ok);
           else {
-            tx = convertToLength(firstValue, inStyle, &ok);
+            tx = convertToLength(firstValue, style, 1, &ok);
             if (val->operationType() !=
                 WebKitCSSTransformValue::TranslateXTransformOperation) {
               if (val->length() > 1) {
                 CSSPrimitiveValue* secondValue =
                     static_cast<CSSPrimitiveValue*>(
                         val->itemWithoutBoundsCheck(1));
-                ty = convertToLength(secondValue, inStyle, &ok);
+                ty = convertToLength(secondValue, style, 1, &ok);
               }
             }
           }
@@ -6514,24 +6508,24 @@ bool CSSStyleSelector::createTransformOperations(
           Length tz = Length(0, Fixed);
           if (val->operationType() ==
               WebKitCSSTransformValue::TranslateZTransformOperation)
-            tz = convertToLength(firstValue, inStyle, &ok);
+            tz = convertToLength(firstValue, style, 1, &ok);
           else if (val->operationType() ==
                    WebKitCSSTransformValue::TranslateYTransformOperation)
-            ty = convertToLength(firstValue, inStyle, &ok);
+            ty = convertToLength(firstValue, style, 1, &ok);
           else {
-            tx = convertToLength(firstValue, inStyle, &ok);
+            tx = convertToLength(firstValue, style, 1, &ok);
             if (val->operationType() !=
                 WebKitCSSTransformValue::TranslateXTransformOperation) {
               if (val->length() > 2) {
                 CSSPrimitiveValue* thirdValue = static_cast<CSSPrimitiveValue*>(
                     val->itemWithoutBoundsCheck(2));
-                tz = convertToLength(thirdValue, inStyle, &ok);
+                tz = convertToLength(thirdValue, style, 1, &ok);
               }
               if (val->length() > 1) {
                 CSSPrimitiveValue* secondValue =
                     static_cast<CSSPrimitiveValue*>(
                         val->itemWithoutBoundsCheck(1));
-                ty = convertToLength(secondValue, inStyle, &ok);
+                ty = convertToLength(secondValue, style, 1, &ok);
               }
             }
           }
