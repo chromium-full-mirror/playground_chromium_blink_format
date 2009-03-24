@@ -71,6 +71,8 @@ class CrossOriginPreflightResultCache : Noncopyable {
                         const String& method,
                         const HTTPHeaderMap& requestHeaders);
 
+  void empty();
+
  private:
   CrossOriginPreflightResultCache() {}
 
