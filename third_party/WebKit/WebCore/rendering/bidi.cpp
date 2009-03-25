@@ -2328,8 +2328,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
   }
 
 end:
-
-  if (lBreak == resolver.position() && !lBreak.obj->isBR()) {
+  if (lBreak == resolver.position() && (!lBreak.obj || !lBreak.obj->isBR())) {
     // we just add as much as possible
     if (style()->whiteSpace() == PRE) {
       // FIXME: Don't really understand this case.
