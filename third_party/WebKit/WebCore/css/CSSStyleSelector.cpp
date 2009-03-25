@@ -4727,6 +4727,10 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           m_fontDirty = true;
       } else if (isInitial) {
         Settings* settings = m_checker.m_document->settings();
+        ASSERT(settings);  // If we're doing style resolution, this document
+                           // should always be in a frame and thus have settings
+        if (!settings)
+          return;
         FontDescription fontDescription;
         fontDescription.setGenericFamily(FontDescription::StandardFamily);
         fontDescription.setRenderingMode(settings->fontRenderingMode());
@@ -4757,6 +4761,11 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         if (fontDescription.isAbsoluteSize()) {
           // Make sure the rendering mode and printer font settings are updated.
           Settings* settings = m_checker.m_document->settings();
+          ASSERT(settings);  // If we're doing style resolution, this document
+                             // should always be in a frame and thus have
+                             // settings
+          if (!settings)
+            return;
           fontDescription.setRenderingMode(settings->fontRenderingMode());
           fontDescription.setUsePrinterFont(m_checker.m_document->printing());
 
