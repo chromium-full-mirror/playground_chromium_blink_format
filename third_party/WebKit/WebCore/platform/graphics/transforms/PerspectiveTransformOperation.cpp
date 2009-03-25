@@ -47,9 +47,6 @@ PassRefPtr<TransformOperation> PerspectiveTransformOperation::blend(
   double fromP = fromOp ? fromOp->m_p : 0;
   double toP = m_p;
 
-  if (blendToIdentity)
-    swap(fromP, toP);
-
   TransformationMatrix fromT;
   TransformationMatrix toT;
   fromT.applyPerspective(fromP);

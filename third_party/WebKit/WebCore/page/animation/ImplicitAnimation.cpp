@@ -67,7 +67,7 @@ bool ImplicitAnimation::shouldSendEventForListener(
 
 void ImplicitAnimation::animate(CompositeAnimation*,
                                 RenderObject*,
-                                RenderStyle*,
+                                const RenderStyle*,
                                 RenderStyle* targetStyle,
                                 RefPtr<RenderStyle>& animatedStyle) {
   // If we get this far and the animation is done, it means we are cleaning up a

@@ -58,7 +58,7 @@ class ImplicitAnimation : public AnimationBase {
 
   virtual void animate(CompositeAnimation*,
                        RenderObject*,
-                       RenderStyle* currentStyle,
+                       const RenderStyle* currentStyle,
                        RenderStyle* targetStyle,
                        RefPtr<RenderStyle>& animatedStyle);
   virtual void getAnimatedStyle(RefPtr<RenderStyle>& animatedStyle);

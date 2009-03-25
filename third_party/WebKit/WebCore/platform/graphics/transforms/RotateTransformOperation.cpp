@@ -56,9 +56,6 @@ PassRefPtr<TransformOperation> RotateTransformOperation::blend(
 
   const RotateTransformOperation* toOp = this;
 
-  if (blendToIdentity)
-    swap(fromOp, toOp);
-
   // Create the 2 rotation matrices
   TransformationMatrix fromT;
   TransformationMatrix toT;

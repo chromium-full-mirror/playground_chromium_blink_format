@@ -53,7 +53,7 @@ class KeyframeAnimation : public AnimationBase {
   virtual void animate(CompositeAnimation*,
                        RenderObject*,
                        const RenderStyle* currentStyle,
-                       const RenderStyle* targetStyle,
+                       RenderStyle* targetStyle,
                        RefPtr<RenderStyle>& animatedStyle);
   virtual void getAnimatedStyle(RefPtr<RenderStyle>& animatedStyle);
 

@@ -113,7 +113,7 @@ void KeyframeAnimation::getKeyframeAnimationInterval(
 void KeyframeAnimation::animate(CompositeAnimation*,
                                 RenderObject*,
                                 const RenderStyle*,
-                                const RenderStyle* targetStyle,
+                                RenderStyle* targetStyle,
                                 RefPtr<RenderStyle>& animatedStyle) {
   // Fire the start timeout if needed
   fireAnimationEventsIfNeeded();

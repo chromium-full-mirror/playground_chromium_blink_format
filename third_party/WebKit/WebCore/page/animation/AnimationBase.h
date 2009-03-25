@@ -149,9 +149,9 @@ class AnimationBase : public RefCounted<AnimationBase> {
   virtual void animate(CompositeAnimation*,
                        RenderObject*,
                        const RenderStyle* /*currentStyle*/,
-                       const RenderStyle* /*targetStyle*/,
-                       RefPtr<RenderStyle>& /*animatedStyle*/) {}
-  virtual void getAnimatedStyle(RefPtr<RenderStyle>& /*animatedStyle*/) {}
+                       RenderStyle* /*targetStyle*/,
+                       RefPtr<RenderStyle>& /*animatedStyle*/) = 0;
+  virtual void getAnimatedStyle(RefPtr<RenderStyle>& /*animatedStyle*/) = 0;
 
   virtual bool shouldFireEvents() const { return false; }
 
