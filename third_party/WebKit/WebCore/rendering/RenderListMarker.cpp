@@ -164,7 +164,7 @@ static int toArmenianUnder10000(int number,
 
   int lowerOffset = upper ? 0 : 0x0030;
 
-  if (int thousands = number / 1000)
+  if (int thousands = number / 1000) {
     if (thousands == 7) {
       letters[length++] = 0x0548 + lowerOffset;
       letters[length++] = 0x0552 + lowerOffset;
@@ -175,6 +175,7 @@ static int toArmenianUnder10000(int number,
       if (addCircumflex)
         letters[length++] = 0x0302;
     }
+  }
 
   if (int hundreds = (number / 100) % 10) {
     letters[length++] = (0x0543 - 1 + lowerOffset) + hundreds;

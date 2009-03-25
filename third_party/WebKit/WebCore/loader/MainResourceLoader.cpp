@@ -276,7 +276,7 @@ void MainResourceLoader::continueAfterContentPolicy(PolicyAction contentPolicy,
   if (!reachedTerminalState())
     ResourceLoader::didReceiveResponse(r);
 
-  if (frameLoader() && !frameLoader()->isStopping())
+  if (frameLoader() && !frameLoader()->isStopping()) {
     if (m_substituteData.isValid()) {
       if (m_substituteData.content()->size())
         didReceiveData(m_substituteData.content()->data(),
@@ -287,6 +287,7 @@ void MainResourceLoader::continueAfterContentPolicy(PolicyAction contentPolicy,
     } else if (shouldLoadAsEmptyDocument(url) ||
                frameLoader()->representationExistsForURLScheme(url.protocol()))
       didFinishLoading();
+  }
 }
 
 void MainResourceLoader::callContinueAfterContentPolicy(void* argument,
