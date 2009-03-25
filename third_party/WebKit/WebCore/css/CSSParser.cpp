@@ -2400,8 +2400,13 @@ bool CSSParser::parseFillProperty(int propId,
         case CSSPropertyWebkitBackgroundOrigin:
         case CSSPropertyWebkitMaskClip:
         case CSSPropertyWebkitMaskOrigin:
+          // The first three values here are deprecated and should not be
+          // allowed to apply when we drop the -webkit-
+          // from the property names.
           if (val->id == CSSValueBorder || val->id == CSSValuePadding ||
-              val->id == CSSValueContent || val->id == CSSValueText) {
+              val->id == CSSValueContent || val->id == CSSValueBorderBox ||
+              val->id == CSSValuePaddingBox || val->id == CSSValueContentBox ||
+              val->id == CSSValueText) {
             currValue = CSSPrimitiveValue::createIdentifier(val->id);
             m_valueList->next();
           }
