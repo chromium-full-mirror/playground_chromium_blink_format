@@ -6400,6 +6400,8 @@ bool CSSStyleSelector::createTransformOperations(
     CSSValue* inValue,
     RenderStyle* style,
     TransformOperations& outOperations) {
+  float zoomFactor = style ? style->effectiveZoom() : 1;
+
   TransformOperations operations;
   if (inValue && !inValue->isPrimitiveValue()) {
     CSSValueList* list = static_cast<CSSValueList*>(inValue);
@@ -6478,16 +6480,16 @@ bool CSSStyleSelector::createTransformOperations(
           Length ty = Length(0, Fixed);
           if (val->operationType() ==
               WebKitCSSTransformValue::TranslateYTransformOperation)
-            ty = convertToLength(firstValue, style, 1, &ok);
+            ty = convertToLength(firstValue, style, zoomFactor, &ok);
           else {
-            tx = convertToLength(firstValue, style, 1, &ok);
+            tx = convertToLength(firstValue, style, zoomFactor, &ok);
             if (val->operationType() !=
                 WebKitCSSTransformValue::TranslateXTransformOperation) {
               if (val->length() > 1) {
                 CSSPrimitiveValue* secondValue =
                     static_cast<CSSPrimitiveValue*>(
                         val->itemWithoutBoundsCheck(1));
-                ty = convertToLength(secondValue, style, 1, &ok);
+                ty = convertToLength(secondValue, style, zoomFactor, &ok);
               }
             }
           }
@@ -6508,24 +6510,24 @@ bool CSSStyleSelector::createTransformOperations(
           Length tz = Length(0, Fixed);
           if (val->operationType() ==
               WebKitCSSTransformValue::TranslateZTransformOperation)
-            tz = convertToLength(firstValue, style, 1, &ok);
+            tz = convertToLength(firstValue, style, zoomFactor, &ok);
           else if (val->operationType() ==
                    WebKitCSSTransformValue::TranslateYTransformOperation)
-            ty = convertToLength(firstValue, style, 1, &ok);
+            ty = convertToLength(firstValue, style, zoomFactor, &ok);
           else {
-            tx = convertToLength(firstValue, style, 1, &ok);
+            tx = convertToLength(firstValue, style, zoomFactor, &ok);
             if (val->operationType() !=
                 WebKitCSSTransformValue::TranslateXTransformOperation) {
               if (val->length() > 2) {
                 CSSPrimitiveValue* thirdValue = static_cast<CSSPrimitiveValue*>(
                     val->itemWithoutBoundsCheck(2));
-                tz = convertToLength(thirdValue, style, 1, &ok);
+                tz = convertToLength(thirdValue, style, zoomFactor, &ok);
               }
               if (val->length() > 1) {
                 CSSPrimitiveValue* secondValue =
                     static_cast<CSSPrimitiveValue*>(
                         val->itemWithoutBoundsCheck(1));
-                ty = convertToLength(secondValue, style, 1, &ok);
+                ty = convertToLength(secondValue, style, zoomFactor, &ok);
               }
             }
           }
