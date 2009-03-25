@@ -347,6 +347,7 @@ void RenderInline::splitFlow(RenderObject* beforeChild,
     // We can reuse this block and make it the preBlock of the next
     // continuation.
     pre = block;
+    pre->removePositionedObjects(0);
     block = block->containingBlock();
   } else {
     // No anonymous block available for use.  Make one.
