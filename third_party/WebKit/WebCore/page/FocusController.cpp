@@ -271,7 +271,7 @@ bool FocusController::setFocusedNode(Node* node,
     return true;
   }
 
-  RefPtr<Document> newDocument = node ? node->document() : 0;
+  RefPtr<Document> newDocument = node->document();
 
   if (newDocument && newDocument->focusedNode() == node) {
     m_page->editorClient()->setInputMethodState(node->shouldUseInputMethod());
