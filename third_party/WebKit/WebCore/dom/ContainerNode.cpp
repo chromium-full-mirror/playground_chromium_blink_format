@@ -680,6 +680,7 @@ bool ContainerNode::getUpperLeftCorner(FloatPoint& point) const {
       if (!o)
         break;
     }
+    ASSERT(o);
 
     if (!o->isInline() || o->isReplaced()) {
       point = o->localToAbsolute();
@@ -743,6 +744,7 @@ bool ContainerNode::getLowerRightCorner(FloatPoint& point) const {
       }
       o = prev;
     }
+    ASSERT(o);
     if (o->isText() || o->isReplaced()) {
       point = o->container()->localToAbsolute();
       if (o->isText()) {

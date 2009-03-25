@@ -338,7 +338,6 @@ void InsertParagraphSeparatorCommand::doApply() {
     insertionPosition = Position(insertionPosition.node(), 0);
     if (!insertionPosition.isRenderedCharacter()) {
       // Clear out all whitespace and insert one non-breaking space
-      ASSERT(insertionPosition.node());
       ASSERT(insertionPosition.node()->isTextNode());
       ASSERT(
           !insertionPosition.node()->renderer() ||

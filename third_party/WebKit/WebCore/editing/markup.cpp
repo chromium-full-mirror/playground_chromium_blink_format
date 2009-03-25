@@ -427,9 +427,8 @@ static void appendStartMarkup(
           escapeContentText(useRenderedText ? renderedText(node, range)
                                             : stringValueForRange(node, range),
                             false);
-      if (annotate)
-        markup = convertHTMLTextToInterchangeFormat(
-            markup, static_cast<const Text*>(node));
+      markup = convertHTMLTextToInterchangeFormat(
+          markup, static_cast<const Text*>(node));
       append(result, markup);
       break;
     }
