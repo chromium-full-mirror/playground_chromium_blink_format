@@ -55,6 +55,20 @@ struct SliderRange {
 
   explicit SliderRange(HTMLInputElement*);
   double clampValue(double value);
+
+  // Map value into 0-1 range
+  double proportionFromValue(double value) {
+    if (minimum == maximum)
+      return 0;
+
+    return (value - minimum) / (maximum - minimum);
+  }
+
+  // Map from 0-1 range to value
+  double valueFromProportion(double proportion) {
+    return minimum + proportion * (maximum - minimum);
+  }
+
   double valueFromElement(HTMLInputElement*, bool* wasClamped = 0);
 };
 
@@ -98,8 +112,7 @@ double SliderRange::valueFromElement(HTMLInputElement* element,
 // As with SliderRange, this could be on HTMLInputElement instead of here.
 static double sliderPosition(HTMLInputElement* element) {
   SliderRange range(element);
-  double value = range.valueFromElement(element);
-  return (value - range.minimum) / (range.maximum - range.minimum);
+  return range.proportionFromValue(range.valueFromElement(element));
 }
 
 class SliderThumbElement : public HTMLDivElement {
@@ -407,8 +420,7 @@ void RenderSlider::setValueForPosition(int position) {
   double fraction = static_cast<double>(position) / trackSize();
   if (style()->appearance() == SliderVerticalPart)
     fraction = 1 - fraction;
-  double value = range.clampValue(range.minimum +
-                                  fraction * (range.maximum - range.minimum));
+  double value = range.clampValue(range.valueFromProportion(fraction));
   element->setValueFromRenderer(String::number(value));
 
   // Also update the position if appropriate.
