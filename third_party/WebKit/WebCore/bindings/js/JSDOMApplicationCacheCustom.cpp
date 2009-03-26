@@ -45,36 +45,36 @@ namespace WebCore {
 void JSDOMApplicationCache::mark() {
   DOMObject::mark();
 
-  if (JSUnprotectedEventListener* listener =
-          static_cast<JSUnprotectedEventListener*>(m_impl->onchecking()))
+  if (JSEventListener* listener =
+          static_cast<JSEventListener*>(m_impl->onchecking()))
     listener->mark();
 
-  if (JSUnprotectedEventListener* listener =
-          static_cast<JSUnprotectedEventListener*>(m_impl->onerror()))
+  if (JSEventListener* listener =
+          static_cast<JSEventListener*>(m_impl->onerror()))
     listener->mark();
 
-  if (JSUnprotectedEventListener* listener =
-          static_cast<JSUnprotectedEventListener*>(m_impl->onnoupdate()))
+  if (JSEventListener* listener =
+          static_cast<JSEventListener*>(m_impl->onnoupdate()))
     listener->mark();
 
-  if (JSUnprotectedEventListener* listener =
-          static_cast<JSUnprotectedEventListener*>(m_impl->ondownloading()))
+  if (JSEventListener* listener =
+          static_cast<JSEventListener*>(m_impl->ondownloading()))
     listener->mark();
 
-  if (JSUnprotectedEventListener* listener =
-          static_cast<JSUnprotectedEventListener*>(m_impl->onprogress()))
+  if (JSEventListener* listener =
+          static_cast<JSEventListener*>(m_impl->onprogress()))
     listener->mark();
 
-  if (JSUnprotectedEventListener* listener =
-          static_cast<JSUnprotectedEventListener*>(m_impl->onupdateready()))
+  if (JSEventListener* listener =
+          static_cast<JSEventListener*>(m_impl->onupdateready()))
     listener->mark();
 
-  if (JSUnprotectedEventListener* listener =
-          static_cast<JSUnprotectedEventListener*>(m_impl->oncached()))
+  if (JSEventListener* listener =
+          static_cast<JSEventListener*>(m_impl->oncached()))
     listener->mark();
 
-  if (JSUnprotectedEventListener* listener =
-          static_cast<JSUnprotectedEventListener*>(m_impl->onobsolete()))
+  if (JSEventListener* listener =
+          static_cast<JSEventListener*>(m_impl->onobsolete()))
     listener->mark();
 
   typedef DOMApplicationCache::EventListenersMap EventListenersMap;
@@ -84,8 +84,7 @@ void JSDOMApplicationCache::mark() {
        mapIter != eventListeners.end(); ++mapIter) {
     for (ListenerVector::iterator vecIter = mapIter->second.begin();
          vecIter != mapIter->second.end(); ++vecIter) {
-      JSUnprotectedEventListener* listener =
-          static_cast<JSUnprotectedEventListener*>(vecIter->get());
+      JSEventListener* listener = static_cast<JSEventListener*>(vecIter->get());
       listener->mark();
     }
   }
@@ -141,9 +140,8 @@ JSValuePtr JSDOMApplicationCache::addEventListener(ExecState* exec,
       toJSDOMGlobalObject(impl()->scriptExecutionContext());
   if (!globalObject)
     return jsUndefined();
-  RefPtr<JSUnprotectedEventListener> listener =
-      globalObject->findOrCreateJSUnprotectedEventListener(exec,
-                                                           args.at(exec, 1));
+  RefPtr<JSEventListener> listener =
+      globalObject->findOrCreateJSEventListener(exec, args.at(exec, 1));
   if (!listener)
     return jsUndefined();
   impl()->addEventListener(args.at(exec, 0).toString(exec), listener.release(),
@@ -157,8 +155,8 @@ JSValuePtr JSDOMApplicationCache::removeEventListener(ExecState* exec,
       toJSDOMGlobalObject(impl()->scriptExecutionContext());
   if (!globalObject)
     return jsUndefined();
-  JSUnprotectedEventListener* listener =
-      globalObject->findJSUnprotectedEventListener(exec, args.at(exec, 1));
+  JSEventListener* listener =
+      globalObject->findJSEventListener(exec, args.at(exec, 1));
   if (!listener)
     return jsUndefined();
   impl()->removeEventListener(args.at(exec, 0).toString(exec), listener,

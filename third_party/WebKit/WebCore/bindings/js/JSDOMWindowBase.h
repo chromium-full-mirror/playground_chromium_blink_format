@@ -38,7 +38,7 @@ class JSDOMWindow;
 class JSDOMWindowShell;
 class JSProtectedEventListener;
 class JSLocation;
-class JSUnprotectedEventListener;
+class JSEventListener;
 class ScheduledAction;
 class SecurityOrigin;
 

@@ -45,16 +45,14 @@ class JSAbstractEventListener : public EventListener {
   bool m_isInline;
 };
 
-class JSUnprotectedEventListener : public JSAbstractEventListener {
+class JSEventListener : public JSAbstractEventListener {
  public:
-  static PassRefPtr<JSUnprotectedEventListener> create(
-      JSC::JSObject* listener,
-      JSDOMGlobalObject* globalObject,
-      bool isInline) {
-    return adoptRef(
-        new JSUnprotectedEventListener(listener, globalObject, isInline));
+  static PassRefPtr<JSEventListener> create(JSC::JSObject* listener,
+                                            JSDOMGlobalObject* globalObject,
+                                            bool isInline) {
+    return adoptRef(new JSEventListener(listener, globalObject, isInline));
   }
-  virtual ~JSUnprotectedEventListener();
+  virtual ~JSEventListener();
 
   virtual JSC::JSObject* listenerObj() const;
   virtual JSDOMGlobalObject* globalObject() const;
@@ -62,9 +60,7 @@ class JSUnprotectedEventListener : public JSAbstractEventListener {
   void mark();
 
  private:
-  JSUnprotectedEventListener(JSC::JSObject* listener,
-                             JSDOMGlobalObject*,
-                             bool isInline);
+  JSEventListener(JSC::JSObject* listener, JSDOMGlobalObject*, bool isInline);
 
   JSC::JSObject* m_listener;
   JSDOMGlobalObject* m_globalObject;
