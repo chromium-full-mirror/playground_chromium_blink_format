@@ -137,6 +137,10 @@ class ClipRects {
     return *this;
   }
 
+  static IntRect infiniteRect() {
+    return IntRect(INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
+  }
+
  private:
   // The normal operator new is disallowed on all render objects.
   void* operator new(size_t) throw();

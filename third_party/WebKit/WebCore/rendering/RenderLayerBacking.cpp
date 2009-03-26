@@ -214,26 +214,24 @@ void RenderLayerBacking::updateGraphicsLayerGeometry() {
     // layer. Note that we call it with temporaryClipRects = true because
     // normally when computing clip rects
     // for a compositing layer, rootLayer is the layer itself.
-    IntRect infiniteRect(INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
-    IntRect layerBounds, backgroundRect, foregroundRect, outlineRect;
-    m_owningLayer->calculateRects(compAncestor, infiniteRect, layerBounds,
-                                  backgroundRect, foregroundRect, outlineRect,
-                                  true);
+    ClipRects parentRects;
+    m_owningLayer->parentClipRects(compAncestor, parentRects, true);
+    IntRect parentClipRect = parentRects.overflowClipRect();
 
     m_ancestorClippingLayer->setPosition(
         FloatPoint() +
-        (backgroundRect.location() - graphicsLayerParentLocation));
-    m_ancestorClippingLayer->setSize(backgroundRect.size());
+        (parentClipRect.location() - graphicsLayerParentLocation));
+    m_ancestorClippingLayer->setSize(parentClipRect.size());
 
     // backgroundRect is relative to compAncestor, so subtract deltaX/deltaY to
     // get back to local coords.
-    IntSize rendererOffset(backgroundRect.location().x() - deltaX,
-                           backgroundRect.location().y() - deltaY);
+    IntSize rendererOffset(parentClipRect.location().x() - deltaX,
+                           parentClipRect.location().y() - deltaY);
     m_ancestorClippingLayer->setOffsetFromRenderer(rendererOffset);
 
     // The primary layer is then parented in, and positioned relative to this
     // clipping layer.
-    graphicsLayerParentLocation = backgroundRect.location();
+    graphicsLayerParentLocation = parentClipRect.location();
   }
 
   m_graphicsLayer->setPosition(
