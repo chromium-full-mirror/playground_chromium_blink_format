@@ -2490,7 +2490,9 @@ QWebPluginFactory* QWebPage::pluginFactory() const {
    operation system.
     \o %Security% expands to U if SSL is enabled, otherwise N. SSL is enabled if
    QSslSocket::supportsSsl() returns true.
-    \o %Locale% is replaced with QLocale::name().
+    \o %Locale% is replaced with QLocale::name(). The locale is determined from
+   the view of the QWebPage. If no view is set on the QWebPage,
+    then a default constructed QLocale is used instead.
     \o %WebKitVersion% currently expands to 527+
     \o %AppVersion% expands to
    QCoreApplication::applicationName()/QCoreApplication::applicationVersion() if
