@@ -304,7 +304,7 @@ void HTMLSelectElement::parseMappedAttribute(MappedAttribute* attr) {
 
     m_size = max(size, 1);
     if ((oldUsesMenuList != usesMenuList() ||
-         !oldUsesMenuList && m_size != oldSize) &&
+         (!oldUsesMenuList && m_size != oldSize)) &&
         attached()) {
       detach();
       attach();

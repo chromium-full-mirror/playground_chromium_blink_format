@@ -1043,9 +1043,10 @@ inline bool objectIsRelayoutBoundary(const RenderObject* obj) {
   // height()
   // may depend on their contents.
   return obj->isTextControl() ||
-         obj->hasOverflowClip() && !obj->style()->width().isIntrinsicOrAuto() &&
-             !obj->style()->height().isIntrinsicOrAuto() &&
-             !obj->style()->height().isPercent() && !obj->isTableCell()
+         (obj->hasOverflowClip() &&
+          !obj->style()->width().isIntrinsicOrAuto() &&
+          !obj->style()->height().isIntrinsicOrAuto() &&
+          !obj->style()->height().isPercent() && !obj->isTableCell())
 #if ENABLE(SVG)
          || obj->isSVGRoot()
 #endif

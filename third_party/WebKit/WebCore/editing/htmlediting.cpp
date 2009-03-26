@@ -866,7 +866,7 @@ unsigned numEnclosingMailBlockquotes(const Position& p) {
 }
 
 bool isMailBlockquote(const Node* node) {
-  if (!node || !node->isElementNode() && !node->hasTagName(blockquoteTag))
+  if (!node || (!node->isElementNode() && !node->hasTagName(blockquoteTag)))
     return false;
 
   return static_cast<const Element*>(node)->getAttribute("type") == "cite";
@@ -900,9 +900,9 @@ bool lineBreakExistsAtPosition(const VisiblePosition& visiblePosition) {
 
   Position downstream(visiblePosition.deepEquivalent().downstream());
   return downstream.node()->hasTagName(brTag) ||
-         downstream.node()->isTextNode() &&
-             downstream.node()->renderer()->style()->preserveNewline() &&
-             visiblePosition.characterAfter() == '\n';
+         (downstream.node()->isTextNode() &&
+          downstream.node()->renderer()->style()->preserveNewline() &&
+          visiblePosition.characterAfter() == '\n');
 }
 
 // Modifies selections that have an end point at the edge of a table

@@ -168,7 +168,7 @@ bool StyleRareNonInheritedData::contentDataEquivalent(
 
 bool StyleRareNonInheritedData::shadowDataEquivalent(
     const StyleRareNonInheritedData& o) const {
-  if (!m_boxShadow && o.m_boxShadow || m_boxShadow && !o.m_boxShadow)
+  if ((!m_boxShadow && o.m_boxShadow) || (m_boxShadow && !o.m_boxShadow))
     return false;
   if (m_boxShadow && o.m_boxShadow && (*m_boxShadow != *o.m_boxShadow))
     return false;
@@ -187,7 +187,7 @@ bool StyleRareNonInheritedData::reflectionDataEquivalent(
 
 bool StyleRareNonInheritedData::animationDataEquivalent(
     const StyleRareNonInheritedData& o) const {
-  if (!m_animations && o.m_animations || m_animations && !o.m_animations)
+  if ((!m_animations && o.m_animations) || (m_animations && !o.m_animations))
     return false;
   if (m_animations && o.m_animations && (*m_animations != *o.m_animations))
     return false;
@@ -196,7 +196,8 @@ bool StyleRareNonInheritedData::animationDataEquivalent(
 
 bool StyleRareNonInheritedData::transitionDataEquivalent(
     const StyleRareNonInheritedData& o) const {
-  if (!m_transitions && o.m_transitions || m_transitions && !o.m_transitions)
+  if ((!m_transitions && o.m_transitions) ||
+      (m_transitions && !o.m_transitions))
     return false;
   if (m_transitions && o.m_transitions && (*m_transitions != *o.m_transitions))
     return false;

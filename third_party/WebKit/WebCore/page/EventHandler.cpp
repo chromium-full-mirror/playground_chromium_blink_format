@@ -1826,7 +1826,7 @@ bool EventHandler::sendContextMenuEvent(const PlatformMouseEvent& event) {
       // easier to use the contextual menu items
       // available for text selections.  But only if we're above text.
       (m_frame->selection()->isContentEditable() ||
-       mev.targetNode() && mev.targetNode()->isTextNode())) {
+       (mev.targetNode() && mev.targetNode()->isTextNode()))) {
     m_mouseDownMayStartSelect =
         true;  // context menu events are always allowed to perform a selection
     selectClosestWordOrLinkFromMouseEvent(mev);

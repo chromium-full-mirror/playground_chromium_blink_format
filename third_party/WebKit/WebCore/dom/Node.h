@@ -357,7 +357,7 @@ class Node : public EventTarget, public TreeShared<Node> {
   // node returns itself.
   Document* document() const {
     ASSERT(this);
-    ASSERT(m_document || nodeType() == DOCUMENT_TYPE_NODE && !inDocument());
+    ASSERT(m_document || (nodeType() == DOCUMENT_TYPE_NODE && !inDocument()));
     return m_document.get();
   }
   void setDocument(Document*);

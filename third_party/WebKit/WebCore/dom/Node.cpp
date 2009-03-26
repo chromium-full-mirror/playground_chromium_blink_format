@@ -1306,7 +1306,7 @@ bool Node::isBlockFlow() const {
 
 bool Node::isBlockFlowOrBlockTable() const {
   return renderer() && (renderer()->isBlockFlow() ||
-                        renderer()->isTable() && !renderer()->isInline());
+                        (renderer()->isTable() && !renderer()->isInline()));
 }
 
 bool Node::isEditableBlock() const {

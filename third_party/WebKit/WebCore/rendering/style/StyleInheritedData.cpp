@@ -59,7 +59,7 @@ StyleInheritedData::StyleInheritedData(const StyleInheritedData& o)
 static bool cursorDataEquivalent(const CursorList* c1, const CursorList* c2) {
   if (c1 == c2)
     return true;
-  if (!c1 && c2 || c1 && !c2)
+  if ((!c1 && c2) || (c1 && !c2))
     return false;
   return (*c1 == *c2);
 }

@@ -1303,9 +1303,9 @@ RootInlineBox* RenderBlock::determineStartPosition(
         // We have a previous line.
         if (!dirtiedByFloat &&
             (!prevRootBox->endsWithBreak() ||
-             prevRootBox->lineBreakObj()->isText() &&
-                 prevRootBox->lineBreakPos() >=
-                     toRenderText(prevRootBox->lineBreakObj())->textLength()))
+             (prevRootBox->lineBreakObj()->isText() &&
+              prevRootBox->lineBreakPos() >=
+                  toRenderText(prevRootBox->lineBreakObj())->textLength())))
           // The previous line didn't break cleanly or broke at a newline
           // that has been deleted, so treat it as dirty too.
           curr = prevRootBox;
@@ -1719,7 +1719,7 @@ static inline unsigned textWidth(RenderText* text,
                                  int xPos,
                                  bool isFixedPitch,
                                  bool collapseWhiteSpace) {
-  if (isFixedPitch || !from && len == text->textLength())
+  if (isFixedPitch || (!from && len == text->textLength()))
     return text->width(from, len, font, xPos);
   return font.width(
       TextRun(text->characters() + from, len, !collapseWhiteSpace, xPos));

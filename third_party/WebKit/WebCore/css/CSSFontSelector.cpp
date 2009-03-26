@@ -93,7 +93,7 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
   RefPtr<CSSValue> unicodeRange =
       style->getPropertyCSSValue(CSSPropertyUnicodeRange);
   if (!fontFamily || !src || !fontFamily->isValueList() ||
-      !src->isValueList() || unicodeRange && !unicodeRange->isValueList())
+      !src->isValueList() || (unicodeRange && !unicodeRange->isValueList()))
     return;
 
   CSSValueList* familyList = static_cast<CSSValueList*>(fontFamily.get());

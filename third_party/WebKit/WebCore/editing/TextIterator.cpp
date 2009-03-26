@@ -258,7 +258,7 @@ void TextIterator::advance() {
           parentNode = m_node->shadowParentNode();
         }
         while (!next && parentNode) {
-          if (pastEnd && parentNode == m_endContainer ||
+          if ((pastEnd && parentNode == m_endContainer) ||
               m_endContainer->isDescendantOf(parentNode))
             return;
           bool haveRenderer = m_node->renderer();
@@ -896,7 +896,7 @@ void SimplifiedBackwardsTextIterator::advance() {
       // where [container, 0] is where we started iterating.
       if (!m_handledNode && canHaveChildrenForEditing(m_node) &&
           m_node->parentNode() &&
-          (!m_node->lastChild() || m_node == m_endNode && m_endOffset == 0)) {
+          (!m_node->lastChild() || (m_node == m_endNode && m_endOffset == 0))) {
         exitNode();
         if (m_positionNode) {
           m_handledNode = true;
