@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2003, 2008 Apple Inc. All rights reserved.
+ *  Copyright (C) 2003, 2008, 2009 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,8 @@
 
 namespace WebCore {
 
+class Node;
+
 class JSLazyEventListener : public JSProtectedEventListener {
  public:
   enum LazyEventListenerType {
@@ -36,8 +38,6 @@ class JSLazyEventListener : public JSProtectedEventListener {
 #endif
   };
 
-  virtual bool wasCreatedFromMarkup() const { return true; }
-
   static PassRefPtr<JSLazyEventListener> create(LazyEventListenerType type,
                                                 const String& functionName,
                                                 const String& code,
@@ -47,9 +47,8 @@ class JSLazyEventListener : public JSProtectedEventListener {
     return adoptRef(new JSLazyEventListener(type, functionName, code,
                                             globalObject, node, lineNumber));
   }
-  virtual JSC::JSObject* listenerObj() const;
 
- protected:
+ private:
   JSLazyEventListener(LazyEventListenerType,
                       const String& functionName,
                       const String& code,
@@ -57,7 +56,9 @@ class JSLazyEventListener : public JSProtectedEventListener {
                       Node*,
                       int lineNumber);
 
- private:
+  virtual JSC::JSObject* function() const;
+  virtual bool wasCreatedFromMarkup() const { return true; }
+
   void parseCode() const;
 
   mutable String m_functionName;
