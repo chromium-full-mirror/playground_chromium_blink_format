@@ -99,7 +99,8 @@ IWebFrame* frame;
 HWND webViewWindow;
 
 LayoutTestController* gLayoutTestController = 0;
-CFRunLoopTimerRef waitToDumpWatchdog = 0;
+
+UINT_PTR waitToDumpWatchdog = 0;
 
 const unsigned maxViewWidth = 800;
 const unsigned maxViewHeight = 600;
@@ -543,7 +544,17 @@ static void dumpBackForwardListForAllWindows() {
   }
 }
 
+static void invalidateAnyPreviousWaitToDumpWatchdog() {
+  if (!waitToDumpWatchdog)
+    return;
+
+  KillTimer(0, waitToDumpWatchdog);
+  waitToDumpWatchdog = 0;
+}
+
 void dump() {
+  invalidateAnyPreviousWaitToDumpWatchdog();
+
   COMPtr<IWebDataSource> dataSource;
   if (SUCCEEDED(frame->dataSource(&dataSource))) {
     COMPtr<IWebURLResponse> response;
