@@ -36,7 +36,7 @@ class Event;
 class Frame;
 class JSDOMWindow;
 class JSDOMWindowShell;
-class JSEventListener;
+class JSProtectedEventListener;
 class JSLocation;
 class JSUnprotectedEventListener;
 class ScheduledAction;
