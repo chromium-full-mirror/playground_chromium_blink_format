@@ -261,7 +261,16 @@ inline void BidiResolver<Iterator, Run>::moveRunToBeginning(Run* run) {
 template <class Iterator, class Run>
 void BidiResolver<Iterator, Run>::appendRun() {
   if (!emptyRun && !eor.atEnd()) {
-    addRun(new Run(sor.offset(), eor.offset() + 1, context(), m_direction));
+    unsigned startOffset = sor.offset();
+    unsigned endOffset = eor.offset();
+
+    if (!endOfLine.atEnd() && endOffset >= endOfLine.offset()) {
+      reachedEndOfLine = true;
+      endOffset = endOfLine.offset();
+    }
+
+    if (endOffset >= startOffset)
+      addRun(new Run(startOffset, endOffset + 1, context(), m_direction));
 
     eor.increment();
     sor = eor;
