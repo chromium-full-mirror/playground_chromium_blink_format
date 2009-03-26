@@ -22,31 +22,23 @@
 #include "config.h"
 #include "ScriptController.h"
 
-#include "Console.h"
-#include "DOMWindow.h"
-#include "Document.h"
 #include "Event.h"
 #include "EventNames.h"
 #include "Frame.h"
-#include "FrameLoader.h"
 #include "GCController.h"
-#include "JSDOMWindow.h"
+#include "HTMLPlugInElement.h"
 #include "JSDocument.h"
-#include "JSEventListener.h"
-#include "npruntime_impl.h"
+#include "JSLazyEventListener.h"
 #include "NP_jsobject.h"
 #include "Page.h"
 #include "PageGroup.h"
-#include "runtime_root.h"
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"
 #include "Settings.h"
-
-#include <runtime/Completion.h>
+#include "npruntime_impl.h"
+#include "runtime_root.h"
 #include <debugger/Debugger.h>
 #include <runtime/JSLock.h>
-
-#include "HTMLPlugInElement.h"
 
 using namespace JSC;
 
@@ -157,6 +149,7 @@ PassRefPtr<EventListener> ScriptController::createInlineEventListener(
 }
 
 #if ENABLE(SVG)
+
 PassRefPtr<EventListener> ScriptController::createSVGEventHandler(
     const String& functionName,
     const String& code,
@@ -167,6 +160,7 @@ PassRefPtr<EventListener> ScriptController::createSVGEventHandler(
       JSLazyEventListener::SVGLazyEventListener, functionName, code,
       m_windowShell->window(), node, m_handlerLineno);
 }
+
 #endif
 
 void ScriptController::initScript() {
@@ -302,6 +296,7 @@ PassRefPtr<Bindings::RootObject> ScriptController::createRootObject(
 }
 
 #if ENABLE(NETSCAPE_PLUGIN_API)
+
 NPObject* ScriptController::windowScriptNPObject() {
   if (!m_windowScriptNPObject) {
     if (isEnabled()) {
@@ -333,6 +328,7 @@ NPObject* ScriptController::createScriptObjectForPluginElement(
   // Wrap the JSObject in an NPObject
   return _NPN_CreateScriptObject(0, object, bindingRootObject());
 }
+
 #endif
 
 JSObject* ScriptController::jsObjectForPluginElement(
@@ -352,9 +348,11 @@ JSObject* ScriptController::jsObjectForPluginElement(
 }
 
 #if !PLATFORM(MAC)
+
 void ScriptController::updatePlatformScriptObjects() {}
 
 void ScriptController::disconnectPlatformScriptObjects() {}
+
 #endif
 
 void ScriptController::cleanupScriptObjectsForPlugin(void* nativeHandle) {
