@@ -296,6 +296,8 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE registerURLSchemeAsLocal(
       /* [in] */ BSTR scheme);
 
+  virtual HRESULT STDMETHODCALLTYPE close();
+
   // IWebIBActions
 
   virtual HRESULT STDMETHODCALLTYPE takeStringURLFrom(
@@ -772,7 +774,6 @@ class WebView : public IWebView,
   void frameRect(RECT* rect);
   void closeWindow();
   void closeWindowSoon();
-  void close();
   bool didClose() const { return m_didClose; }
 
   bool transparent() const { return m_transparent; }

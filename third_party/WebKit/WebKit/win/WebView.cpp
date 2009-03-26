@@ -602,9 +602,9 @@ WebCacheModel WebView::maxCacheModelInAnyInstance() {
   return cacheModel;
 }
 
-void WebView::close() {
+HRESULT STDMETHODCALLTYPE WebView::close() {
   if (m_didClose)
-    return;
+    return S_OK;
 
   m_didClose = true;
 
@@ -667,6 +667,7 @@ void WebView::close() {
   }
 
   deleteBackingStore();
+  return S_OK;
 }
 
 void WebView::repaint(const WebCore::IntRect& windowRect,
