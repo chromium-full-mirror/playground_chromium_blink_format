@@ -557,6 +557,8 @@ void QWebPagePrivate::updateEditorActions() {
   updateAction(QWebPage::ToggleBold);
   updateAction(QWebPage::ToggleItalic);
   updateAction(QWebPage::ToggleUnderline);
+  updateAction(QWebPage::InsertParagraphSeparator);
+  updateAction(QWebPage::InsertLineSeparator);
 }
 
 void QWebPagePrivate::timerEvent(QTimerEvent* ev) {
@@ -1921,6 +1923,13 @@ QAction* QWebPage::action(WebAction action) const {
 
     case InspectElement:
       text = contextMenuItemTagInspectElement();
+      break;
+
+    case InsertParagraphSeparator:
+      text = tr("Insert a new paragraph");
+      break;
+    case InsertLineSeparator:
+      text = tr("Insert a new line");
       break;
 
     case NoWebAction:

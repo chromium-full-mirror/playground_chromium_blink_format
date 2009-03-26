@@ -1031,6 +1031,8 @@ void tst_QWebPage::textEditing() {
   QVERIFY(page->action(QWebPage::ToggleBold) != 0);
   QVERIFY(page->action(QWebPage::ToggleItalic) != 0);
   QVERIFY(page->action(QWebPage::ToggleUnderline) != 0);
+  QVERIFY(page->action(QWebPage::InsertParagraphSeparator) != 0);
+  QVERIFY(page->action(QWebPage::InsertLineSeparator) != 0);
 
   // right now they are disabled because contentEditable is false
   QCOMPARE(page->action(QWebPage::DeleteStartOfWord)->isEnabled(), false);
@@ -1043,6 +1045,9 @@ void tst_QWebPage::textEditing() {
   QCOMPARE(page->action(QWebPage::ToggleBold)->isEnabled(), false);
   QCOMPARE(page->action(QWebPage::ToggleItalic)->isEnabled(), false);
   QCOMPARE(page->action(QWebPage::ToggleUnderline)->isEnabled(), false);
+  QCOMPARE(page->action(QWebPage::InsertParagraphSeparator)->isEnabled(),
+           false);
+  QCOMPARE(page->action(QWebPage::InsertLineSeparator)->isEnabled(), false);
 
   // make it editable before navigating the cursor
   page->setContentEditable(true);
@@ -1058,6 +1063,8 @@ void tst_QWebPage::textEditing() {
   QCOMPARE(page->action(QWebPage::ToggleBold)->isEnabled(), true);
   QCOMPARE(page->action(QWebPage::ToggleItalic)->isEnabled(), true);
   QCOMPARE(page->action(QWebPage::ToggleUnderline)->isEnabled(), true);
+  QCOMPARE(page->action(QWebPage::InsertParagraphSeparator)->isEnabled(), true);
+  QCOMPARE(page->action(QWebPage::InsertLineSeparator)->isEnabled(), true);
 
   delete page;
 }
