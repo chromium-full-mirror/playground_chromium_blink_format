@@ -188,6 +188,7 @@ class RenderThemeQt : public RenderTheme {
   void paintMediaBackground(QPainter* painter, const IntRect& r) const;
   QColor getMediaControlForegroundColor(RenderObject* o = 0) const;
 #endif
+  void computeSizeBasedOnStyle(RenderStyle* renderStyle) const;
 
  private:
   bool supportsFocus(ControlPart) const;
@@ -204,6 +205,8 @@ class RenderThemeQt : public RenderTheme {
 
   QStyle* m_fallbackStyle;
   QStyle* fallbackStyle();
+
+  int m_frameLineWidth;
 };
 
 class StylePainter {

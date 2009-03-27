@@ -41,6 +41,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QPushButton>
+#include <QLineEdit>
 #include <QStyleFactory>
 #include <QStyleOptionButton>
 #include <QStyleOptionFrameV2>
@@ -117,6 +118,12 @@ RenderThemeQt::RenderThemeQt() : RenderTheme() {
 #endif
 
   m_fallbackStyle = 0;
+
+  // this will need to be regenerated when the style changes
+  QLineEdit lineEdit;
+  QStyleOptionFrameV2 opt;
+  m_frameLineWidth = QApplication::style()->pixelMetric(
+      QStyle::PM_DefaultFrameWidth, &opt, &lineEdit);
 }
 
 RenderThemeQt::~RenderThemeQt() {
@@ -256,7 +263,7 @@ int RenderThemeQt::minimumMenuListSize(RenderStyle*) const {
   return 7 * fm.width(QLatin1Char('x'));
 }
 
-static void computeSizeBasedOnStyle(RenderStyle* renderStyle) {
+void RenderThemeQt::computeSizeBasedOnStyle(RenderStyle* renderStyle) const {
   // If the width and height are both specified, then we have nothing to do.
   if (!renderStyle->width().isIntrinsicOrAuto() &&
       !renderStyle->height().isAuto())
@@ -320,12 +327,14 @@ static void computeSizeBasedOnStyle(RenderStyle* renderStyle) {
       int h = qMax(fm.lineSpacing(), 14) + 2 * verticalMargin;
       int w = fm.width(QLatin1Char('x')) * 17 + 2 * horizontalMargin;
       QStyleOptionFrameV2 opt;
-      opt.lineWidth =
-          applicationStyle->pixelMetric(QStyle::PM_DefaultFrameWidth, &opt, 0);
+      opt.lineWidth = m_frameLineWidth;
       QSize sz = applicationStyle->sizeFromContents(
           QStyle::CT_LineEdit, &opt,
           QSize(w, h).expandedTo(QApplication::globalStrut()), 0);
       size.setHeight(sz.height());
+
+      renderStyle->setPaddingLeft(Length(opt.lineWidth, Fixed));
+      renderStyle->setPaddingRight(Length(opt.lineWidth, Fixed));
       break;
     }
     default:
@@ -468,6 +477,9 @@ void RenderThemeQt::adjustTextFieldStyle(CSSStyleSelector*,
                                          Element*) const {
   style->setBackgroundColor(Color::transparent);
   style->setColor(QApplication::palette().text().color());
+  style->resetBorder();
+  style->resetPadding();
+  computeSizeBasedOnStyle(style);
 }
 
 bool RenderThemeQt::paintTextField(RenderObject* o,
@@ -482,8 +494,7 @@ bool RenderThemeQt::paintTextField(RenderObject* o,
     panel.initFrom(p.widget);
 
   panel.rect = r;
-  panel.lineWidth =
-      p.style->pixelMetric(QStyle::PM_DefaultFrameWidth, &panel, p.widget);
+  panel.lineWidth = m_frameLineWidth;
   panel.state |= QStyle::State_Sunken;
   panel.features = QStyleOptionFrameV2::None;
 
