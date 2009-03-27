@@ -253,12 +253,12 @@ String contextMenuItemTagDefaultDirection() {
 }
 
 String contextMenuItemTagLeftToRight() {
-  return QCoreApplication::translate("QWebPage", "LTR",
+  return QCoreApplication::translate("QWebPage", "Left to Right",
                                      "Left to Right context menu item");
 }
 
 String contextMenuItemTagRightToLeft() {
-  return QCoreApplication::translate("QWebPage", "RTL",
+  return QCoreApplication::translate("QWebPage", "Right to Left",
                                      "Right to Left context menu item");
 }
 
