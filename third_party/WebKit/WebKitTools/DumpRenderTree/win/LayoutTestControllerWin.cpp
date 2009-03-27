@@ -273,7 +273,7 @@ void LayoutTestController::setCustomPolicyDelegate(bool setDelegate,
     policyDelegate->setPermissive(permissive);
     webView->setPolicyDelegate(policyDelegate);
   } else
-    webView->setPolicyDelegate(NULL);
+    webView->setPolicyDelegate(0);
 }
 
 void LayoutTestController::setIconDatabaseEnabled(bool iconDatabaseEnabled) {

@@ -36,8 +36,7 @@ static JSValueRef getFocusedElementCallback(JSContextRef context,
                                             JSStringRef propertyName,
                                             JSValueRef* exception) {
   AccessibilityController* controller =
-      reinterpret_cast<AccessibilityController*>(
-          JSObjectGetPrivate(thisObject));
+      static_cast<AccessibilityController*>(JSObjectGetPrivate(thisObject));
   return AccessibilityUIElement::makeJSAccessibilityUIElement(
       context, controller->focusedElement());
 }
@@ -47,8 +46,7 @@ static JSValueRef getRootElementCallback(JSContextRef context,
                                          JSStringRef propertyName,
                                          JSValueRef* exception) {
   AccessibilityController* controller =
-      reinterpret_cast<AccessibilityController*>(
-          JSObjectGetPrivate(thisObject));
+      static_cast<AccessibilityController*>(JSObjectGetPrivate(thisObject));
   return AccessibilityUIElement::makeJSAccessibilityUIElement(
       context, controller->rootElement());
 }

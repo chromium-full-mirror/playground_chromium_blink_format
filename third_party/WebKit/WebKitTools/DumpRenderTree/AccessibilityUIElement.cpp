@@ -30,9 +30,9 @@
 
 // Static Functions
 
-static AccessibilityUIElement* toAXElement(JSObjectRef object) {
+static inline AccessibilityUIElement* toAXElement(JSObjectRef object) {
   // FIXME: We should ASSERT that it is the right class here.
-  return reinterpret_cast<AccessibilityUIElement*>(JSObjectGetPrivate(object));
+  return static_cast<AccessibilityUIElement*>(JSObjectGetPrivate(object));
 }
 
 static JSValueRef allAttributesCallback(JSContextRef context,
