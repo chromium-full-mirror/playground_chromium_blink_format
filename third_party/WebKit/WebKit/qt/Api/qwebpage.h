@@ -153,6 +153,22 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
     SelectAll,
 
+    PasteAndMatchStyle,
+    RemoveFormat,
+
+    ToggleStrikethrough,
+    ToggleSubscript,
+    ToggleSuperscript,
+    InsertUnorderedList,
+    InsertOrderedList,
+    Indent,
+    Outdent,
+
+    AlignCenter,
+    AlignJustified,
+    AlignLeft,
+    AlignRight,
+
     WebActionCount
   };
 
