@@ -1605,15 +1605,20 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
               addOverhangingFloats(toRenderBlock(child), -child->x(),
                                    -child->y(), !childNeededLayout));
 
-    // Update our overflow in case the child spills out the block.
-    m_overflowTop = min(m_overflowTop, child->y() + child->overflowTop(false));
-    m_overflowHeight =
-        max(m_overflowHeight,
-            height() + child->overflowHeight(false) - child->height());
-    m_overflowWidth =
-        max(child->x() + child->overflowWidth(false), m_overflowWidth);
-    m_overflowLeft =
-        min(child->x() + child->overflowLeft(false), m_overflowLeft);
+    // Update our visual overflow in case the child spills out the block, but
+    // only if we were going to paint
+    // the child block ourselves.
+    if (!child->hasSelfPaintingLayer()) {
+      m_overflowTop =
+          min(m_overflowTop, child->y() + child->overflowTop(false));
+      m_overflowHeight =
+          max(m_overflowHeight,
+              height() + child->overflowHeight(false) - child->height());
+      m_overflowWidth =
+          max(child->x() + child->overflowWidth(false), m_overflowWidth);
+      m_overflowLeft =
+          min(child->x() + child->overflowLeft(false), m_overflowLeft);
+    }
 
     IntSize childOffset(child->x() - oldRect.x(), child->y() - oldRect.y());
     if (childOffset.width() || childOffset.height()) {
@@ -3027,6 +3032,10 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
     // a tiny rel div buried somewhere deep in our child tree.  In this case we
     // have to get to
     // the abs div.
+    // See the last test case in https://bugs.webkit.org/show_bug.cgi?id=9314
+    // for why this is a problem.
+    // For inline children, we miss relative positioned boxes that might be
+    // buried inside <span>s.
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
       if (!c->isFloatingOrPositioned() && c->isBox()) {
         RenderBox* childBox = toRenderBox(c);
@@ -3088,11 +3097,13 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
   }
 
   if (!includeSelf) {
-    bottom = max(bottom, borderTop() + paddingTop() + paddingBottom());
+    bottom = max(bottom,
+                 borderTop() + paddingTop() + paddingBottom() + relativeOffset);
     if (childrenInline()) {
       if (lastLineBox()) {
         int childBottomEdge = lastLineBox()->y() + lastLineBox()->height();
-        bottom = max(bottom, childBottomEdge + paddingBottom());
+        bottom =
+            max(bottom, childBottomEdge + paddingBottom() + relativeOffset);
       }
     } else {
       // Find the last normal flow child.
@@ -3102,7 +3113,8 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
       if (currBox) {
         int childBottomEdge =
             currBox->y() + currBox->height() + currBox->collapsedMarginBottom();
-        bottom = max(bottom, childBottomEdge + paddingBottom());
+        bottom =
+            max(bottom, childBottomEdge + paddingBottom() + relativeOffset);
       }
     }
   }
@@ -3187,7 +3199,8 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
   }
 
   if (!includeSelf) {
-    right = max(right, borderLeft() + paddingLeft() + paddingRight());
+    right = max(right,
+                borderLeft() + paddingLeft() + paddingRight() + relativeOffset);
     if (childrenInline()) {
       for (InlineRunBox* currBox = firstLineBox(); currBox;
            currBox = currBox->nextLineBox()) {
@@ -3201,7 +3214,7 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
             node() == node()->rootEditableElement() &&
             style()->direction() == LTR && !paddingRight())
           childRightEdge += 1;
-        right = max(right, childRightEdge + paddingRight());
+        right = max(right, childRightEdge + paddingRight() + relativeOffset);
       }
     } else {
       // Walk all normal flow children.
@@ -3211,7 +3224,7 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
           continue;
         int childRightEdge =
             currBox->x() + currBox->width() + currBox->marginRight();
-        right = max(right, childRightEdge + paddingRight());
+        right = max(right, childRightEdge + paddingRight() + relativeOffset);
       }
     }
   }
@@ -3297,7 +3310,7 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
   if (!includeSelf && firstLineBox()) {
     for (InlineRunBox* currBox = firstLineBox(); currBox;
          currBox = currBox->nextLineBox())
-      left = min(left, (int)currBox->x());
+      left = min(left, (int)currBox->x() + relativeOffset);
   }
 
   return left;
