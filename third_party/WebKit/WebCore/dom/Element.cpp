@@ -361,14 +361,14 @@ int Element::clientHeight() {
   return 0;
 }
 
-int Element::scrollLeft() {
+int Element::scrollLeft() const {
   document()->updateLayoutIgnorePendingStylesheets();
   if (RenderBox* rend = renderBox())
     return adjustForAbsoluteZoom(rend->scrollLeft(), rend);
   return 0;
 }
 
-int Element::scrollTop() {
+int Element::scrollTop() const {
   document()->updateLayoutIgnorePendingStylesheets();
   if (RenderBox* rend = renderBox())
     return adjustForAbsoluteZoom(rend->scrollTop(), rend);
@@ -389,14 +389,14 @@ void Element::setScrollTop(int newTop) {
         static_cast<int>(newTop * rend->style()->effectiveZoom()));
 }
 
-int Element::scrollWidth() {
+int Element::scrollWidth() const {
   document()->updateLayoutIgnorePendingStylesheets();
   if (RenderBox* rend = renderBox())
     return adjustForAbsoluteZoom(rend->scrollWidth(), rend);
   return 0;
 }
 
-int Element::scrollHeight() {
+int Element::scrollHeight() const {
   document()->updateLayoutIgnorePendingStylesheets();
   if (RenderBox* rend = renderBox())
     return adjustForAbsoluteZoom(rend->scrollHeight(), rend);
