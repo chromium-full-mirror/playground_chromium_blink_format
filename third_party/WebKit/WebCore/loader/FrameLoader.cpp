@@ -434,16 +434,6 @@ bool FrameLoader::canHandleRequest(const ResourceRequest& request) {
   return m_client->canHandleRequest(request);
 }
 
-void FrameLoader::changeLocation(const String& url,
-                                 const String& referrer,
-                                 bool lockHistory,
-                                 bool lockBackForwardList,
-                                 bool userGesture,
-                                 bool refresh) {
-  changeLocation(completeURL(url), referrer, lockHistory, lockBackForwardList,
-                 userGesture, refresh);
-}
-
 void FrameLoader::changeLocation(const KURL& url,
                                  const String& referrer,
                                  bool lockHistory,
@@ -462,35 +452,28 @@ void FrameLoader::changeLocation(const KURL& url,
               userGesture);
 }
 
-void FrameLoader::urlSelected(const FrameLoadRequest& request,
-                              Event* event,
-                              bool lockHistory,
-                              bool lockBackForwardList) {
-  FrameLoadRequest copy = request;
-  if (copy.resourceRequest().httpReferrer().isEmpty())
-    copy.resourceRequest().setHTTPReferrer(m_outgoingReferrer);
-  addHTTPOriginIfNeeded(copy.resourceRequest(), outgoingOrigin());
-
-  loadFrameRequestWithFormAndValues(copy, lockHistory, lockBackForwardList,
-                                    event, 0, HashMap<String, String>());
-}
-
 void FrameLoader::urlSelected(const ResourceRequest& request,
-                              const String& _target,
-                              Event* triggeringEvent,
+                              const String& passedTarget,
+                              PassRefPtr<Event> triggeringEvent,
                               bool lockHistory,
                               bool lockBackForwardList,
                               bool userGesture) {
   if (executeIfJavaScriptURL(request.url(), userGesture, false))
     return;
 
-  String target = _target;
+  String target = passedTarget;
   if (target.isEmpty())
     target = m_frame->document()->baseTarget();
 
   FrameLoadRequest frameRequest(request, target);
 
-  urlSelected(frameRequest, triggeringEvent, lockHistory, lockBackForwardList);
+  if (frameRequest.resourceRequest().httpReferrer().isEmpty())
+    frameRequest.resourceRequest().setHTTPReferrer(m_outgoingReferrer);
+  addHTTPOriginIfNeeded(frameRequest.resourceRequest(), outgoingOrigin());
+
+  loadFrameRequestWithFormAndValues(frameRequest, lockHistory,
+                                    lockBackForwardList, triggeringEvent, 0,
+                                    HashMap<String, String>());
 }
 
 bool FrameLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
@@ -591,7 +574,7 @@ void FrameLoader::submitForm(const char* action,
                              const String& target,
                              const String& contentType,
                              const String& boundary,
-                             Event* event,
+                             PassRefPtr<Event> event,
                              bool lockHistory,
                              bool lockBackForwardList) {
   ASSERT(formData);
@@ -1416,11 +1399,6 @@ KURL FrameLoader::baseURL() const {
   return m_frame->document()->baseURL();
 }
 
-String FrameLoader::baseTarget() const {
-  ASSERT(m_frame->document());
-  return m_frame->document()->baseTarget();
-}
-
 KURL FrameLoader::completeURL(const String& url) {
   ASSERT(m_frame->document());
   return m_frame->document()->completeURL(url);
@@ -1458,7 +1436,7 @@ void FrameLoader::scheduleLocationChange(const String& url,
   // fragment part, we don't need to schedule the location change.
   KURL parsedURL(url);
   if (parsedURL.hasRef() && equalIgnoringRef(m_URL, parsedURL)) {
-    changeLocation(url, referrer, lockHistory, lockBackForwardList,
+    changeLocation(completeURL(url), referrer, lockHistory, lockBackForwardList,
                    wasUserGesture);
     return;
   }
@@ -1579,7 +1557,7 @@ void FrameLoader::redirectionTimerFired(Timer<FrameLoader>*) {
     case ScheduledRedirection::redirection:
     case ScheduledRedirection::locationChange:
     case ScheduledRedirection::locationChangeDuringLoad:
-      changeLocation(redirection->url, redirection->referrer,
+      changeLocation(completeURL(redirection->url), redirection->referrer,
                      redirection->lockHistory, redirection->lockBackForwardList,
                      redirection->wasUserGesture, redirection->wasRefresh);
       return;
@@ -1634,7 +1612,7 @@ void FrameLoader::loadURLIntoChildFrame(const KURL& url,
       // this is needed is Radar 3213556.
       workingURL = KURL(childItem->originalURLString());
       childLoadType = loadType;
-      childFrame->loader()->setProvisionalHistoryItem(childItem);
+      childFrame->loader()->m_provisionalHistoryItem = childItem;
     }
   }
 
@@ -1949,11 +1927,6 @@ bool FrameLoader::userGestureHint() {
       ->processingUserGesture();  // FIXME: Use pageIsProcessingUserGesture.
 }
 
-void FrameLoader::didNotOpenURL(const KURL& url) {
-  if (m_submittedFormURL == url)
-    m_submittedFormURL = KURL();
-}
-
 void FrameLoader::resetMultipleFormSubmissionProtection() {
   m_submittedFormURL = KURL();
 }
@@ -1991,7 +1964,7 @@ bool FrameLoader::canCachePageContainingThisFrame() {
          && !m_frame->document()->hasOpenDatabases()
 #endif
          && !m_frame->document()->usingGeolocation() && m_currentHistoryItem &&
-         !isQuickRedirectComing() && !m_documentLoader->isLoadingInAPISense() &&
+         !m_quickRedirectComing && !m_documentLoader->isLoadingInAPISense() &&
          !m_documentLoader->isStopping() &&
          m_frame->document()->canSuspendActiveDOMObjects()
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
@@ -2168,7 +2141,7 @@ bool FrameLoader::logCanCacheFrameDecision(int indentLevel) {
       PCLOG("   -No current history item");
       cannotCache = true;
     }
-    if (isQuickRedirectComing()) {
+    if (m_quickRedirectComing) {
       PCLOG("   -Quick redirect is coming");
       cannotCache = true;
     }
@@ -2347,7 +2320,7 @@ void FrameLoader::loadFrameRequestWithFormAndValues(
     const FrameLoadRequest& request,
     bool lockHistory,
     bool lockBackForwardList,
-    Event* event,
+    PassRefPtr<Event> event,
     HTMLFormElement* submitForm,
     const HashMap<String, String>& formValues) {
   RefPtr<FormState> formState;
@@ -2401,7 +2374,7 @@ void FrameLoader::loadURL(const KURL& newURL,
                           const String& frameName,
                           bool lockHistory,
                           FrameLoadType newLoadType,
-                          Event* event,
+                          PassRefPtr<Event> event,
                           PassRefPtr<FormState> prpFormState) {
   RefPtr<FormState> formState = prpFormState;
   bool isFormSubmission = formState;
@@ -3429,8 +3402,19 @@ void FrameLoader::finishedLoadingDocument(DocumentLoader* loader) {
 
   ArchiveResource* mainResource = archive->mainResource();
   loader->setParsedArchiveData(mainResource->data());
-  continueLoadWithData(mainResource->data(), mainResource->mimeType(),
-                       mainResource->textEncoding(), mainResource->url());
+
+  m_responseMIMEType = mainResource->mimeType();
+  didOpenURL(mainResource->url());
+
+  String userChosenEncoding = documentLoader()->overrideEncoding();
+  bool encodingIsUserChosen = !userChosenEncoding.isNull();
+  setEncoding(
+      encodingIsUserChosen ? userChosenEncoding : mainResource->textEncoding(),
+      encodingIsUserChosen);
+
+  ASSERT(m_frame->document());
+
+  addData(mainResource->data()->data(), mainResource->data()->size());
 }
 
 bool FrameLoader::isReplacing() const {
@@ -3675,10 +3659,6 @@ bool FrameLoader::firstLayoutDone() const {
   return m_firstLayoutDone;
 }
 
-bool FrameLoader::isQuickRedirectComing() const {
-  return m_quickRedirectComing;
-}
-
 void FrameLoader::detachChildren() {
   // FIXME: Is it really necessary to do this in reverse order?
   Frame* previous;
@@ -3736,7 +3716,7 @@ int FrameLoader::numPendingOrLoadingRequests(bool recurse) const {
 }
 
 void FrameLoader::submitForm(const FrameLoadRequest& request,
-                             Event* event,
+                             PassRefPtr<Event> event,
                              bool lockHistory,
                              bool lockBackForwardList) {
   // FIXME: We'd like to remove this altogether and fix the multiple form
@@ -3910,7 +3890,7 @@ void FrameLoader::loadPostRequest(const ResourceRequest& inRequest,
                                   const String& frameName,
                                   bool lockHistory,
                                   FrameLoadType loadType,
-                                  Event* event,
+                                  PassRefPtr<Event> event,
                                   PassRefPtr<FormState> prpFormState) {
   RefPtr<FormState> formState = prpFormState;
 
@@ -4105,8 +4085,9 @@ void FrameLoader::receivedMainResourceError(const ResourceError& error,
   }
 
   if (m_state == FrameStateProvisional && m_provisionalDocumentLoader) {
-    KURL failedURL = m_provisionalDocumentLoader->originalRequestCopy().url();
-    didNotOpenURL(failedURL);
+    if (m_submittedFormURL ==
+        m_provisionalDocumentLoader->originalRequestCopy().url())
+      m_submittedFormURL = KURL();
 
     // We might have made a page cache item, but now we're bailing out due to an
     // error before we ever
@@ -5334,20 +5315,8 @@ void FrameLoader::saveDocumentAndScrollState() {
   }
 }
 
-// FIXME: These 3 setter/getters are here for a dwindling number of users in
-// WebKit, WebFrame
-// being the primary one.  After they're no longer needed there, they can be
-// removed!
 HistoryItem* FrameLoader::currentHistoryItem() {
   return m_currentHistoryItem.get();
-}
-
-void FrameLoader::setCurrentHistoryItem(PassRefPtr<HistoryItem> item) {
-  m_currentHistoryItem = item;
-}
-
-void FrameLoader::setProvisionalHistoryItem(PassRefPtr<HistoryItem> item) {
-  m_provisionalHistoryItem = item;
 }
 
 void FrameLoader::setMainDocumentError(DocumentLoader* loader,
@@ -5579,26 +5548,6 @@ void FrameLoader::didChangeTitle(DocumentLoader* loader) {
         true);  // update observers with new DOMDocument
     m_client->dispatchDidReceiveTitle(loader->title());
   }
-}
-
-void FrameLoader::continueLoadWithData(SharedBuffer* buffer,
-                                       const String& mimeType,
-                                       const String& textEncoding,
-                                       const KURL& url) {
-  m_responseMIMEType = mimeType;
-  didOpenURL(url);
-
-  String encoding;
-  if (m_frame)
-    encoding = documentLoader()->overrideEncoding();
-  bool userChosen = !encoding.isNull();
-  if (encoding.isNull())
-    encoding = textEncoding;
-  setEncoding(encoding, userChosen);
-
-  ASSERT(m_frame->document());
-
-  addData(buffer->data(), buffer->size());
 }
 
 void FrameLoader::registerURLSchemeAsLocal(const String& scheme) {
