@@ -32,18 +32,13 @@
 #include "TextEncodingDetector.h"
 
 #include "TextEncoding.h"
-#include <wtf/UnusedParam.h>
 
 namespace WebCore {
 
-bool detectTextEncoding(const char* data,
-                        size_t len,
-                        const char* hintEncodingName,
+bool detectTextEncoding(const char*,
+                        size_t,
+                        const char*,
                         TextEncoding* detectedEncoding) {
-  UNUSED_PARAM(data)
-  UNUSED_PARAM(len)
-  UNUSED_PARAM(hintEncodingName)
-
   *detectedEncoding = TextEncoding();
   return false;
 }
