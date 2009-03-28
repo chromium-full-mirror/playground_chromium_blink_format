@@ -211,8 +211,10 @@ void JSGlobalObject::reset(JSValuePtr prototype) {
                                                             // is created.
   d()->prototypeFunctionStructure =
       PrototypeFunction::createStructure(d()->functionPrototype);
+  PrototypeFunction* callFunction = 0;
   d()->functionPrototype->addFunctionProperties(
-      exec, d()->prototypeFunctionStructure.get());
+      exec, d()->prototypeFunctionStructure.get(), &callFunction);
+  d()->callFunction = callFunction;
   d()->objectPrototype = new (exec)
       ObjectPrototype(exec, ObjectPrototype::createStructure(jsNull()),
                       d()->prototypeFunctionStructure.get());
@@ -517,6 +519,7 @@ void JSGlobalObject::mark() {
   markIfNeeded(d()->URIErrorConstructor);
 
   markIfNeeded(d()->evalFunction);
+  markIfNeeded(d()->callFunction);
 
   markIfNeeded(d()->objectPrototype);
   markIfNeeded(d()->functionPrototype);

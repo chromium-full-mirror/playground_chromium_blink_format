@@ -59,7 +59,8 @@ FunctionPrototype::FunctionPrototype(ExecState* exec,
 
 void FunctionPrototype::addFunctionProperties(
     ExecState* exec,
-    Structure* prototypeFunctionStructure) {
+    Structure* prototypeFunctionStructure,
+    PrototypeFunction** callFunction) {
   putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().toString,
@@ -70,11 +71,10 @@ void FunctionPrototype::addFunctionProperties(
                                          exec->propertyNames().apply,
                                          functionProtoFuncApply),
       DontEnum);
-  putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
-                                         exec->propertyNames().call,
-                                         functionProtoFuncCall),
-      DontEnum);
+  *callFunction = new (exec)
+      PrototypeFunction(exec, prototypeFunctionStructure, 1,
+                        exec->propertyNames().call, functionProtoFuncCall);
+  putDirectFunctionWithoutTransition(exec, *callFunction, DontEnum);
 }
 
 static JSValuePtr callFunctionPrototype(ExecState*,

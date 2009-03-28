@@ -387,6 +387,7 @@ class BytecodeGenerator {
   PassRefPtr<Label> emitJump(Label* target);
   PassRefPtr<Label> emitJumpIfTrue(RegisterID* cond, Label* target);
   PassRefPtr<Label> emitJumpIfFalse(RegisterID* cond, Label* target);
+  PassRefPtr<Label> emitJumpIfNotFunctionCall(RegisterID* cond, Label* target);
   PassRefPtr<Label> emitJumpScopes(Label* target, int targetScopeDepth);
 
   PassRefPtr<Label> emitJumpSubroutine(RegisterID* retAddrDst, Label*);

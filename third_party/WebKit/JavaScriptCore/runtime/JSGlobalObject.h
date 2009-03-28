@@ -40,6 +40,7 @@ class FunctionPrototype;
 class GlobalEvalFunction;
 class NativeErrorConstructor;
 class ProgramCodeBlock;
+class PrototypeFunction;
 class RegExpConstructor;
 class RegExpPrototype;
 class RegisterFile;
@@ -100,6 +101,7 @@ class JSGlobalObject : public JSVariableObject {
     NativeErrorConstructor* URIErrorConstructor;
 
     GlobalEvalFunction* evalFunction;
+    PrototypeFunction* callFunction;
 
     ObjectPrototype* objectPrototype;
     FunctionPrototype* functionPrototype;
