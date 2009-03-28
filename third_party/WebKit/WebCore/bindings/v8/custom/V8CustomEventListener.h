@@ -51,8 +51,6 @@ class V8EventListener : public V8AbstractEventListener {
     return adoptRef(new V8EventListener(frame, listener, isInline));
   }
 
-  virtual bool isInline() const { return m_isInline; }
-
   // Detach the listener from its owner frame.
   void disconnectFrame() { m_frame = 0; }
 
@@ -66,6 +64,7 @@ class V8EventListener : public V8AbstractEventListener {
       v8::Handle<v8::Value> jsEvent,
       Event*,
       bool isWindowEvent);
+  virtual bool virtualIsInline() const { return m_isInline; }
 };
 
 }  // namespace WebCore
