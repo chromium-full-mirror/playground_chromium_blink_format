@@ -482,9 +482,7 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
 
   childFrame->tree()->setName(name);
   childFrame->init();
-  childFrame->loader()->loadURL(url, referrer, String(), false,
-                                FrameLoadTypeRedirectWithLockedBackForwardList,
-                                0, 0);
+  childFrame->loader()->loadURLIntoChildFrame(url, referrer, childFrame.get());
 
   // The frame's onload handler may have removed it from the document.
   if (!childFrame->tree()->parent())
