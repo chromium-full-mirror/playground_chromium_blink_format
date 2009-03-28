@@ -372,8 +372,7 @@ void FrameLoaderClientWx::didFinishLoad() {
 }
 
 void FrameLoaderClientWx::prepareForDataSourceReplacement() {
-  if (m_frame && m_frame->loader())
-    m_frame->loader()->detachChildren();
+  notImplemented();
 }
 
 void FrameLoaderClientWx::setTitle(const String& title, const KURL&) {
