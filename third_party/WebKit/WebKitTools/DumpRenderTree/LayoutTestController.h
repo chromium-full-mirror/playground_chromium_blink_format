@@ -58,8 +58,9 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void queueBackNavigation(int howFarBackward);
   void queueForwardNavigation(int howFarForward);
   void queueLoad(JSStringRef url, JSStringRef target);
+  void queueLoadingScript(JSStringRef script);
+  void queueNonLoadingScript(JSStringRef script);
   void queueReload();
-  void queueScript(JSStringRef url);
   void setAcceptsEditing(bool acceptsEditing);
   void setAuthorAndUserStylesEnabled(bool);
   void setCustomPolicyDelegate(bool setDelegate, bool permissive);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2007, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -50,7 +50,7 @@ static wstring jsStringRefToWString(JSStringRef jsStr) {
   return buffer.data();
 }
 
-void LoadItem::invoke() const {
+bool LoadItem::invoke() const {
   wstring targetString = jsStringRefToWString(target());
 
   COMPtr<IWebFrame> targetFrame;
@@ -61,13 +61,13 @@ void LoadItem::invoke() const {
     bool failed = FAILED(frame->findFrameNamed(targetBSTR, &targetFrame));
     SysFreeString(targetBSTR);
     if (failed)
-      return;
+      return false;
   }
 
   COMPtr<IWebURLRequest> request;
   if (FAILED(CoCreateInstance(CLSID_WebURLRequest, 0, CLSCTX_ALL,
                               IID_IWebURLRequest, (void**)&request)))
-    return;
+    return false;
 
   wstring urlString = jsStringRefToWString(url());
   BSTR urlBSTR = SysAllocString(urlString.c_str());
@@ -75,25 +75,29 @@ void LoadItem::invoke() const {
       request->initWithURL(urlBSTR, WebURLRequestUseProtocolCachePolicy, 60));
   SysFreeString(urlBSTR);
   if (failed)
-    return;
+    return false;
 
   targetFrame->loadRequest(request.get());
+  return true;
 }
 
-void ReloadItem::invoke() const {
+bool ReloadItem::invoke() const {
   COMPtr<IWebView> webView;
   if (FAILED(frame->webView(&webView)))
-    return;
+    return false;
 
   COMPtr<IWebIBActions> webActions;
-  if (SUCCEEDED(webView->QueryInterface(&webActions)))
-    webActions->reload(0);
+  if (FAILED(webView->QueryInterface(&webActions)))
+    return false;
+
+  webActions->reload(0);
+  return true;
 }
 
-void ScriptItem::invoke() const {
+bool ScriptItem::invoke() const {
   COMPtr<IWebView> webView;
   if (FAILED(frame->webView(&webView)))
-    return;
+    return false;
 
   wstring scriptString = jsStringRefToWString(script());
 
@@ -102,31 +106,34 @@ void ScriptItem::invoke() const {
   webView->stringByEvaluatingJavaScriptFromString(scriptBSTR, &result);
   SysFreeString(result);
   SysFreeString(scriptBSTR);
+
+  return true;
 }
 
-void BackForwardItem::invoke() const {
+bool BackForwardItem::invoke() const {
   COMPtr<IWebView> webView;
   if (FAILED(frame->webView(&webView)))
-    return;
+    return false;
 
   BOOL result;
   if (m_howFar == 1) {
     webView->goForward(&result);
-    return;
+    return true;
   }
 
   if (m_howFar == -1) {
     webView->goBack(&result);
-    return;
+    return true;
   }
 
   COMPtr<IWebBackForwardList> bfList;
   if (FAILED(webView->backForwardList(&bfList)))
-    return;
+    return false;
 
   COMPtr<IWebHistoryItem> item;
   if (FAILED(bfList->itemAtIndex(m_howFar, &item)))
-    return;
+    return false;
 
   webView->goToBackForwardItem(item.get(), &result);
+  return true;
 }

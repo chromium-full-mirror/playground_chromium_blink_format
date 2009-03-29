@@ -172,16 +172,6 @@ JSStringRef LayoutTestController::pathToLocalResource(JSContextRef context,
   return JSStringCreateWithCharacters(localPath.c_str(), localPath.length());
 }
 
-void LayoutTestController::queueBackNavigation(int howFarBack) {
-  // Same as on mac.  This can be shared.
-  WorkQueue::shared()->queue(new BackItem(howFarBack));
-}
-
-void LayoutTestController::queueForwardNavigation(int howFarForward) {
-  // Same as on mac.  This can be shared.
-  WorkQueue::shared()->queue(new ForwardItem(howFarForward));
-}
-
 static wstring jsStringRefToWString(JSStringRef jsStr) {
   size_t length = JSStringGetLength(jsStr);
   Vector<WCHAR> buffer(length + 1);
@@ -219,14 +209,6 @@ void LayoutTestController::queueLoad(JSStringRef url, JSStringRef target) {
       JSStringCreateWithCharacters(wAbsoluteURL.data(), wAbsoluteURL.length()));
 
   WorkQueue::shared()->queue(new LoadItem(jsAbsoluteURL.get(), target));
-}
-
-void LayoutTestController::queueReload() {
-  WorkQueue::shared()->queue(new ReloadItem);
-}
-
-void LayoutTestController::queueScript(JSStringRef script) {
-  WorkQueue::shared()->queue(new ScriptItem(script));
 }
 
 void LayoutTestController::setAcceptsEditing(bool acceptsEditing) {
