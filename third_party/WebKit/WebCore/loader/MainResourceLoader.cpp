@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  *
@@ -31,12 +31,8 @@
 #include "config.h"
 #include "MainResourceLoader.h"
 
-#if ENABLE(OFFLINE_WEB_APPLICATIONS)
-#include "ApplicationCache.h"
-#include "ApplicationCacheGroup.h"
-#include "ApplicationCacheResource.h"
-#endif
 #include "DocumentLoader.h"
+#include "FormState.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameLoaderClient.h"
@@ -45,6 +41,12 @@
 #include "ResourceError.h"
 #include "ResourceHandle.h"
 #include "Settings.h"
+
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+#include "ApplicationCache.h"
+#include "ApplicationCacheGroup.h"
+#include "ApplicationCacheResource.h"
+#endif
 
 // FIXME: More that is in common with SubresourceLoader should move up into
 // ResourceLoader.
