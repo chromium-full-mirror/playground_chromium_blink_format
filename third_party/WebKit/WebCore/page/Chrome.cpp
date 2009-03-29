@@ -142,13 +142,14 @@ Page* Chrome::createWindow(Frame* frame,
                            const FrameLoadRequest& request,
                            const WindowFeatures& features) const {
   Page* newPage = m_client->createWindow(frame, request, features);
-#if ENABLE(DOM_STORAGE)
 
+#if ENABLE(DOM_STORAGE)
   if (newPage) {
     if (SessionStorage* oldSessionStorage = m_page->sessionStorage(false))
       newPage->setSessionStorage(oldSessionStorage->copy(newPage));
   }
 #endif
+
   return newPage;
 }
 

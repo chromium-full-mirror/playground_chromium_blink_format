@@ -29,15 +29,12 @@
 #define Document_h
 
 #include "Attr.h"
+#include "CheckedRadioButtons.h"
 #include "Color.h"
 #include "DocumentMarker.h"
 #include "HTMLCollection.h"
-#include "HTMLFormElement.h"
 #include "ScriptExecutionContext.h"
-#include "StringHash.h"
 #include "Timer.h"
-#include <wtf/HashCountedSet.h>
-#include <wtf/ListHashSet.h>
 
 // FIXME: We should move Mac off of the old Frame-based user stylesheet loading
 // code and onto the new code in Page. We can't do that until the code in Page
@@ -51,8 +48,6 @@
 namespace WebCore {
 
 class AXObjectCache;
-class Attr;
-class Attribute;
 class CDATASection;
 class CachedCSSStyleSheet;
 class CanvasRenderingContext2D;
@@ -1155,9 +1150,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void registerDisconnectedNodeWithEventListeners(Node*);
   void unregisterDisconnectedNodeWithEventListeners(Node*);
 
-  HTMLFormElement::CheckedRadioButtons& checkedRadioButtons() {
-    return m_checkedRadioButtons;
-  }
+  CheckedRadioButtons& checkedRadioButtons() { return m_checkedRadioButtons; }
 
 #if ENABLE(SVG)
   const SVGDocumentExtensions* svgExtensions();
@@ -1221,7 +1214,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   int m_selfOnlyRefCount;
 
-  HTMLFormElement::CheckedRadioButtons m_checkedRadioButtons;
+  CheckedRadioButtons m_checkedRadioButtons;
 
   typedef HashMap<AtomicStringImpl*, HTMLCollection::CollectionInfo*>
       NamedCollectionMap;

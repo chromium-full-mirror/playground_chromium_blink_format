@@ -30,7 +30,7 @@
 
 #include "CharacterNames.h"
 #include "Document.h"
-#include "Element.h"
+#include "HTMLElement.h"
 #include "HTMLNames.h"
 #include "htmlediting.h"
 #include "InlineTextBox.h"

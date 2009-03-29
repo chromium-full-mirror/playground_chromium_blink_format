@@ -27,8 +27,9 @@
 #define RenderObject_h
 
 #include "CachedResourceClient.h"
-#include "FloatQuad.h"
 #include "Document.h"
+#include "Element.h"
+#include "FloatQuad.h"
 #include "RenderObjectChildList.h"
 #include "RenderStyle.h"
 #include "TextAffinity.h"

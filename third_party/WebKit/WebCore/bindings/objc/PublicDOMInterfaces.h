@@ -419,7 +419,7 @@ WEBKIT_VERSION_1_3
 @property(readonly, copy)
     NSString* baseURI AVAILABLE_WEBKIT_VERSION_3_0_AND_LATER;
 @property(readonly, retain)
-    DOMNode* parentElement AVAILABLE_WEBKIT_VERSION_3_0_AND_LATER;
+    DOMElement* parentElement AVAILABLE_WEBKIT_VERSION_3_0_AND_LATER;
 @property(readonly)
     BOOL isContentEditable AVAILABLE_WEBKIT_VERSION_3_0_AND_LATER;
 - (DOMNode*)insertBefore:(DOMNode*)newChild:(DOMNode*)refChild;
