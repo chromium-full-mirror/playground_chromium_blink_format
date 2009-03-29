@@ -633,7 +633,6 @@ bool CSSParser::parseValue(int propId, bool important) {
                               // open-quote |
       // close-quote | no-open-quote | no-close-quote ]+ | inherit
       return parseContent(propId, important);
-      break;
 
     case CSSPropertyWhiteSpace:  // normal | pre | nowrap | inherit
       if (id == CSSValueNormal || id == CSSValuePre || id == CSSValuePreWrap ||
@@ -2152,7 +2151,16 @@ bool CSSParser::parseContent(int propId, bool important) {
         if (args->size() != 1)
           return false;
         CSSParserValue* a = args->current();
+        if (a->unit != CSSPrimitiveValue::CSS_IDENT)
+          return false;
         String attrName = a->string;
+        // CSS allows identifiers with "-" at the start, like
+        // "-webkit-mask-image".
+        // But HTML attribute names can't have those characters, and we should
+        // not
+        // even parse them inside attr().
+        if (attrName[0] == '-')
+          return false;
         if (document()->isHTMLDocument())
           attrName = attrName.lower();
         parsedValue =
