@@ -105,7 +105,8 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
                                 CFURLRequestRef cfRequest,
                                 CFURLResponseRef cfRedirectResponse,
                                 const void* clientInfo) {
-  ResourceHandle* handle = (ResourceHandle*)clientInfo;
+  ResourceHandle* handle =
+      static_cast<ResourceHandle*>(const_cast<void*>(clientInfo));
 
   if (!cfRedirectResponse) {
     CFRetain(cfRequest);
@@ -128,7 +129,8 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
 void didReceiveResponse(CFURLConnectionRef conn,
                         CFURLResponseRef cfResponse,
                         const void* clientInfo) {
-  ResourceHandle* handle = (ResourceHandle*)clientInfo;
+  ResourceHandle* handle =
+      static_cast<ResourceHandle*>(const_cast<void*>(clientInfo));
 
   LOG(Network, "CFNet - didReceiveResponse(conn=%p, handle=%p) (%s)", conn,
       handle, handle->request().url().string().utf8().data());
@@ -141,7 +143,8 @@ void didReceiveData(CFURLConnectionRef conn,
                     CFDataRef data,
                     CFIndex originalLength,
                     const void* clientInfo) {
-  ResourceHandle* handle = (ResourceHandle*)clientInfo;
+  ResourceHandle* handle =
+      static_cast<ResourceHandle*>(const_cast<void*>(clientInfo));
   const UInt8* bytes = CFDataGetBytePtr(data);
   CFIndex length = CFDataGetLength(data);
 
@@ -158,7 +161,8 @@ static void didSendBodyData(CFURLConnectionRef conn,
                             CFIndex totalBytesWritten,
                             CFIndex totalBytesExpectedToWrite,
                             const void* clientInfo) {
-  ResourceHandle* handle = (ResourceHandle*)clientInfo;
+  ResourceHandle* handle =
+      static_cast<ResourceHandle*>(const_cast<void*>(clientInfo));
   if (!handle || !handle->client())
     return;
   handle->client()->didSendData(handle, totalBytesWritten,
@@ -180,7 +184,8 @@ static Boolean shouldUseCredentialStorageCallback(CFURLConnectionRef conn,
 }
 
 void didFinishLoading(CFURLConnectionRef conn, const void* clientInfo) {
-  ResourceHandle* handle = (ResourceHandle*)clientInfo;
+  ResourceHandle* handle =
+      static_cast<ResourceHandle*>(const_cast<void*>(clientInfo));
 
   LOG(Network, "CFNet - didFinishLoading(conn=%p, handle=%p) (%s)", conn,
       handle, handle->request().url().string().utf8().data());
@@ -192,7 +197,8 @@ void didFinishLoading(CFURLConnectionRef conn, const void* clientInfo) {
 void didFail(CFURLConnectionRef conn,
              CFErrorRef error,
              const void* clientInfo) {
-  ResourceHandle* handle = (ResourceHandle*)clientInfo;
+  ResourceHandle* handle =
+      static_cast<ResourceHandle*>(const_cast<void*>(clientInfo));
 
   LOG(Network, "CFNet - didFail(conn=%p, handle=%p, error = %p) (%s)", conn,
       handle, error, handle->request().url().string().utf8().data());
@@ -204,7 +210,8 @@ void didFail(CFURLConnectionRef conn,
 CFCachedURLResponseRef willCacheResponse(CFURLConnectionRef conn,
                                          CFCachedURLResponseRef cachedResponse,
                                          const void* clientInfo) {
-  ResourceHandle* handle = (ResourceHandle*)clientInfo;
+  ResourceHandle* handle =
+      static_cast<ResourceHandle*>(const_cast<void*>(clientInfo));
 
   if (handle->client() &&
       !handle->client()->shouldCacheResponse(handle, cachedResponse))
@@ -232,7 +239,8 @@ CFCachedURLResponseRef willCacheResponse(CFURLConnectionRef conn,
 void didReceiveChallenge(CFURLConnectionRef conn,
                          CFURLAuthChallengeRef challenge,
                          const void* clientInfo) {
-  ResourceHandle* handle = (ResourceHandle*)clientInfo;
+  ResourceHandle* handle =
+      static_cast<ResourceHandle*>(const_cast<void*>(clientInfo));
   ASSERT(handle);
   LOG(Network, "CFNet - didReceiveChallenge(conn=%p, handle=%p (%s)", conn,
       handle, handle->request().url().string().utf8().data());
@@ -565,7 +573,8 @@ CFURLRequestRef WebCoreSynchronousLoader::willSendRequest(
     CFURLRequestRef cfRequest,
     CFURLResponseRef cfRedirectResponse,
     const void* clientInfo) {
-  WebCoreSynchronousLoader* loader = (WebCoreSynchronousLoader*)clientInfo;
+  WebCoreSynchronousLoader* loader =
+      static_cast<WebCoreSynchronousLoader*>(const_cast<void*>(clientInfo));
 
   // FIXME: This needs to be fixed to follow the redirect correctly even for
   // cross-domain requests.
@@ -589,7 +598,8 @@ CFURLRequestRef WebCoreSynchronousLoader::willSendRequest(
 void WebCoreSynchronousLoader::didReceiveResponse(CFURLConnectionRef,
                                                   CFURLResponseRef cfResponse,
                                                   const void* clientInfo) {
-  WebCoreSynchronousLoader* loader = (WebCoreSynchronousLoader*)clientInfo;
+  WebCoreSynchronousLoader* loader =
+      static_cast<WebCoreSynchronousLoader*>(const_cast<void*>(clientInfo));
 
   loader->m_response = cfResponse;
 }
@@ -598,7 +608,8 @@ void WebCoreSynchronousLoader::didReceiveData(CFURLConnectionRef,
                                               CFDataRef data,
                                               CFIndex originalLength,
                                               const void* clientInfo) {
-  WebCoreSynchronousLoader* loader = (WebCoreSynchronousLoader*)clientInfo;
+  WebCoreSynchronousLoader* loader =
+      static_cast<WebCoreSynchronousLoader*>(const_cast<void*>(clientInfo));
 
   if (!loader->m_data)
     loader->m_data.adoptCF(
@@ -612,7 +623,8 @@ void WebCoreSynchronousLoader::didReceiveData(CFURLConnectionRef,
 
 void WebCoreSynchronousLoader::didFinishLoading(CFURLConnectionRef,
                                                 const void* clientInfo) {
-  WebCoreSynchronousLoader* loader = (WebCoreSynchronousLoader*)clientInfo;
+  WebCoreSynchronousLoader* loader =
+      static_cast<WebCoreSynchronousLoader*>(const_cast<void*>(clientInfo));
 
   loader->m_isDone = true;
 }
@@ -620,7 +632,8 @@ void WebCoreSynchronousLoader::didFinishLoading(CFURLConnectionRef,
 void WebCoreSynchronousLoader::didFail(CFURLConnectionRef,
                                        CFErrorRef error,
                                        const void* clientInfo) {
-  WebCoreSynchronousLoader* loader = (WebCoreSynchronousLoader*)clientInfo;
+  WebCoreSynchronousLoader* loader =
+      static_cast<WebCoreSynchronousLoader*>(const_cast<void*>(clientInfo));
 
   loader->m_error = error;
   loader->m_isDone = true;
@@ -630,7 +643,8 @@ void WebCoreSynchronousLoader::didReceiveChallenge(
     CFURLConnectionRef conn,
     CFURLAuthChallengeRef challenge,
     const void* clientInfo) {
-  WebCoreSynchronousLoader* loader = (WebCoreSynchronousLoader*)clientInfo;
+  WebCoreSynchronousLoader* loader =
+      static_cast<WebCoreSynchronousLoader*>(const_cast<void*>(clientInfo));
 
   // FIXME: Mac uses credentials from URL here, should we do the same?
   CFURLConnectionUseCredential(conn, 0, challenge);
