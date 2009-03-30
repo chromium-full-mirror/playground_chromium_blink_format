@@ -39,6 +39,10 @@ namespace WebCore {
 
 Screen::Screen(Frame* frame) : m_frame(frame) {}
 
+Frame* Screen::frame() const {
+  return m_frame;
+}
+
 void Screen::disconnectFrame() {
   m_frame = 0;
 }

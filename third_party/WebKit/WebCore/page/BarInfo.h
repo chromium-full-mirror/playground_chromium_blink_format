@@ -51,7 +51,10 @@ class BarInfo : public RefCounted<BarInfo> {
     return adoptRef(new BarInfo(frame, type));
   }
 
+  Frame* frame() const;
   void disconnectFrame();
+
+  Type type() const;
 
   bool visible() const;
 

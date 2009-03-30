@@ -50,6 +50,10 @@ namespace WebCore {
 
 Console::Console(Frame* frame) : m_frame(frame) {}
 
+Frame* Console::frame() const {
+  return m_frame;
+}
+
 void Console::disconnectFrame() {
   m_frame = 0;
 }

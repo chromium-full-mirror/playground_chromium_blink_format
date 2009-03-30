@@ -77,6 +77,7 @@ class Console : public RefCounted<Console> {
     return adoptRef(new Console(frame));
   }
 
+  Frame* frame() const;
   void disconnectFrame();
 
   void addMessage(MessageSource,
