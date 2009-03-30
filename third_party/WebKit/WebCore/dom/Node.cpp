@@ -79,6 +79,7 @@
 #include "htmlediting.h"
 #include <wtf/HashSet.h>
 #include <wtf/RefCountedLeakCounter.h>
+#include <wtf/UnusedParam.h>
 
 #if ENABLE(DOM_STORAGE)
 #include "StorageEvent.h"
@@ -2205,9 +2206,10 @@ void Node::didMoveToNewOwnerDocument() {
 
 static inline void updateSVGElementInstancesAfterEventListenerChange(
     Node* referenceNode) {
+#if !ENABLE(SVG)
+  UNUSED_PARAM(referenceNode);
+#else
   ASSERT(referenceNode);
-
-#if ENABLE(SVG)
   if (!referenceNode->isSVGElement())
     return;
 

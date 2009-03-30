@@ -1741,6 +1741,7 @@ bool CSSParser::parseValue(int propId, bool important) {
     case CSSPropertyTextLineThrough:
     case CSSPropertyTextOverline:
     case CSSPropertyTextUnderline:
+    case CSSPropertyWebkitVariableDeclarationBlock:
       return false;
 #if ENABLE(SVG)
     default:
