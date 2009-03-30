@@ -2382,14 +2382,17 @@ void FrameLoader::loadURL(const KURL& newURL,
 
   ASSERT(newLoadType != FrameLoadTypeSame);
 
+  Frame* targetFrame = findFrameForNavigation(frameName);
+  if (targetFrame && targetFrame != m_frame) {
+    targetFrame->loader()->loadURL(newURL, referrer, String(), lockHistory,
+                                   newLoadType, event, formState.release());
+    return;
+  }
+
   NavigationAction action(newURL, newLoadType, isFormSubmission, event);
 
-  if (!frameName.isEmpty()) {
-    if (Frame* targetFrame = findFrameForNavigation(frameName))
-      targetFrame->loader()->loadURL(newURL, referrer, String(), lockHistory,
-                                     newLoadType, event, formState);
-    else
-      checkNewWindowPolicy(action, request, formState, frameName);
+  if (!targetFrame && !frameName.isEmpty()) {
+    checkNewWindowPolicy(action, request, formState.release(), frameName);
     return;
   }
 
@@ -2403,7 +2406,7 @@ void FrameLoader::loadURL(const KURL& newURL,
   if (shouldScrollToAnchor(isFormSubmission, newLoadType, newURL)) {
     oldDocumentLoader->setTriggeringAction(action);
     stopPolicyCheck();
-    checkNavigationPolicy(request, oldDocumentLoader.get(), formState,
+    checkNavigationPolicy(request, oldDocumentLoader.get(), formState.release(),
                           callContinueFragmentScrollAfterNavigationPolicy,
                           this);
   } else {
@@ -2411,7 +2414,7 @@ void FrameLoader::loadURL(const KURL& newURL,
     // this flag
     bool isRedirect = m_quickRedirectComing;
     loadWithNavigationAction(request, action, lockHistory, newLoadType,
-                             formState);
+                             formState.release());
     if (isRedirect) {
       m_quickRedirectComing = false;
       if (m_provisionalDocumentLoader)
