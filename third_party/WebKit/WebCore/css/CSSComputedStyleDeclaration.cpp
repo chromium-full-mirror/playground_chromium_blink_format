@@ -1351,14 +1351,14 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyWebkitMarqueeSpeed:
     case CSSPropertyWebkitMask:
     case CSSPropertyWebkitPaddingStart:
-    case CSSPropertyWebkitTextStroke:
-    case CSSPropertyWebkitTransition:
-    case CSSPropertyWebkitVariableDeclarationBlock:
     case CSSPropertyWebkitPerspectiveOriginX:
     case CSSPropertyWebkitPerspectiveOriginY:
+    case CSSPropertyWebkitTextStroke:
     case CSSPropertyWebkitTransformOriginX:
     case CSSPropertyWebkitTransformOriginY:
     case CSSPropertyWebkitTransformOriginZ:
+    case CSSPropertyWebkitTransition:
+    case CSSPropertyWebkitVariableDeclarationBlock:
       break;
 #if ENABLE(SVG)
     // FIXME: This default case ruins the point of using an enum for
