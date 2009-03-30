@@ -560,7 +560,7 @@ XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
 
   for (Element* element = elemStack.last(); !elemStack.isEmpty();
        elemStack.removeLast()) {
-    if (NamedAttrMap* attrs = element->attributes()) {
+    if (NamedNodeMap* attrs = element->attributes()) {
       for (unsigned i = 0; i < attrs->length(); i++) {
         Attribute* attr = attrs->attributeItem(i);
         if (attr->localName() == "xmlns")

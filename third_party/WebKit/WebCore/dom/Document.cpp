@@ -656,7 +656,7 @@ PassRefPtr<Node> Document::importNode(Node* importedNode,
       if (ec)
         return 0;
 
-      NamedAttrMap* attrs = oldElement->attributes(true);
+      NamedNodeMap* attrs = oldElement->attributes(true);
       if (attrs) {
         unsigned length = attrs->length();
         for (unsigned i = 0; i < length; i++) {

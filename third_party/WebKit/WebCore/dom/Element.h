@@ -35,10 +35,10 @@ namespace WebCore {
 class Attr;
 class Attribute;
 class CSSStyleDeclaration;
-class ElementRareData;
-class IntSize;
 class ClientRect;
 class ClientRectList;
+class ElementRareData;
+class IntSize;
 
 class Element : public ContainerNode {
  public:
@@ -156,14 +156,14 @@ class Element : public ContainerNode {
   void setAttribute(const QualifiedName&, const AtomicString& value);
   void setBooleanAttribute(const QualifiedName& name, bool);
 
-  virtual NamedAttrMap* attributes() const;
-  NamedAttrMap* attributes(bool readonly) const;
+  virtual NamedNodeMap* attributes() const;
+  NamedNodeMap* attributes(bool readonly) const;
 
   // This method is called whenever an attribute is added, changed or removed.
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
 
   // not part of the DOM
-  void setAttributeMap(PassRefPtr<NamedAttrMap>);
+  void setAttributeMap(PassRefPtr<NamedNodeMap>);
 
   virtual void copyNonAttributeProperties(const Element* /*source*/) {}
 
@@ -257,7 +257,7 @@ class Element : public ContainerNode {
   ElementRareData* rareData() const;
   ElementRareData* ensureRareData();
 
-  mutable RefPtr<NamedAttrMap> namedAttrMap;
+  mutable RefPtr<NamedNodeMap> namedAttrMap;
 };
 
 inline bool Node::hasTagName(const QualifiedName& name) const {
@@ -268,7 +268,7 @@ inline bool Node::hasAttributes() const {
   return isElementNode() && static_cast<const Element*>(this)->hasAttributes();
 }
 
-inline NamedAttrMap* Node::attributes() const {
+inline NamedNodeMap* Node::attributes() const {
   return isElementNode() ? static_cast<const Element*>(this)->attributes() : 0;
 }
 

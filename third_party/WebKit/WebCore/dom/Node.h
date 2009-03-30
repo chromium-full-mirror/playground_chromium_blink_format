@@ -50,7 +50,7 @@ class Frame;
 class IntRect;
 class KeyboardEvent;
 class NSResolver;
-class NamedAttrMap;
+class NamedNodeMap;
 class NodeList;
 class NodeRareData;
 class PlatformKeyboardEvent;
@@ -140,7 +140,7 @@ class Node : public EventTarget, public TreeShared<Node> {
     return isContainerNode() ? containerLastChild() : 0;
   }
   bool hasAttributes() const;
-  NamedAttrMap* attributes() const;
+  NamedNodeMap* attributes() const;
 
   virtual KURL baseURI() const;
 
