@@ -158,9 +158,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                                          const WebCore::String& name,
                                          WebCore::HTMLFrameOwnerElement*,
                                          const WebCore::String& referrer);
-  void loadURLIntoChild(const WebCore::KURL&,
-                        const WebCore::String& referrer,
-                        WebFrame* childFrame);
   void receivedData(const char*, int, const WebCore::String&);
   WebHistory* webHistory() const;
 
