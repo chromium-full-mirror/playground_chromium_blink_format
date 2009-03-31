@@ -80,11 +80,14 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
 
   // Public methods to be called by WebMediaPlayer
   FrameView* frameView();
+  void repaint();
   void networkStateChanged();
   void readyStateChanged();
-  void timeChanged();
   void volumeChanged();
-  void repaint();
+  void timeChanged();
+  void sizeChanged();
+  void rateChanged();
+  void durationChanged();
 
  private:
   MediaPlayerPrivate(MediaPlayer*);
@@ -92,7 +95,6 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   static void getSupportedTypes(HashSet<String>&);
   static MediaPlayer::SupportsType supportsType(const String& type,
                                                 const String& codecs);
-  static bool isAvailable();
 
   MediaPlayer* m_player;
   void* m_data;
