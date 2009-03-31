@@ -96,6 +96,7 @@ class WXDLLIMPEXP_WEBKIT wxWebFrame {
   friend class WebCore::EditorClientWx;
   friend class wxWebView;
 
+ public:
   wxWebFrame(wxWebView* container,
              wxWebFrame* parent = NULL,
              WebViewFrameData* data = NULL);
