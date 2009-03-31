@@ -51,6 +51,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   bool checkDTD(const Node* newChild);
 
   void attributeChanged(Attribute*, bool preserveDecls);
+  void parseMappedAttribute(MappedAttribute*);
 
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
@@ -90,9 +91,11 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
     NETWORK_NO_SOURCE
   };
   NetworkState networkState() const;
+  bool autobuffer() const;
+  void setAutobuffer(bool);
+
   PassRefPtr<TimeRanges> buffered() const;
   void load(ExceptionCode&);
-
   String canPlayType(const String& mimeType) const;
 
   // ready state

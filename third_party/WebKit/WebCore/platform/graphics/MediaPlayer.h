@@ -132,6 +132,9 @@ class MediaPlayer : Noncopyable {
 
   int dataRate() const;
 
+  bool autobuffer() const;
+  void setAutobuffer(bool);
+
   void paint(GraphicsContext*, const IntRect&);
 
   enum NetworkState {
@@ -183,6 +186,7 @@ class MediaPlayer : Noncopyable {
   bool m_visible;
   float m_rate;
   float m_volume;
+  bool m_autobuffer;
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
   WebMediaPlayerProxy* m_playerProxy;  // not owned or used, passed to m_private
 #endif
