@@ -332,6 +332,7 @@ class FrameLoader : Noncopyable {
 
   void stop();
   void stopLoading(bool sendUnload);
+  bool closeURL();
 
   void didExplicitOpen();
 
@@ -441,6 +442,7 @@ class FrameLoader : Noncopyable {
   void saveDocumentAndScrollState();
 
   HistoryItem* currentHistoryItem();
+  void setCurrentHistoryItem(PassRefPtr<HistoryItem>);
 
   enum LocalLoadPolicy {
     AllowLocalLoadsForAll,  // No restriction on local loads.
@@ -696,8 +698,6 @@ class FrameLoader : Noncopyable {
                   PassRefPtr<Event>,
                   bool lockHistory,
                   bool lockBackForwardList);
-
-  bool closeURL();
 
   KURL historyURL(int distance);
 
