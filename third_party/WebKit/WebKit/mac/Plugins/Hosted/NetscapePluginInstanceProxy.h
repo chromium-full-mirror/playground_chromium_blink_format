@@ -99,6 +99,7 @@ class NetscapePluginInstanceProxy
   void mouseEvent(NSView* pluginView, NSEvent*, NPCocoaEventType);
   void keyEvent(NSView* pluginView, NSEvent*, NPCocoaEventType);
   void insertText(NSString*);
+  bool wheelEvent(NSView* pluginView, NSEvent*);
 
   void print(CGContextRef, unsigned width, unsigned height);
 
