@@ -492,6 +492,11 @@ bool KURL::hasRef() const {
   return m_url.m_parsed.ref.len >= 0;
 }
 
+String KURL::baseAsString() const {
+  // FIXME: There is probably a more efficient way to do this?
+  return string().left(pathAfterLastSlash());
+}
+
 String KURL::query() const {
   if (m_url.m_parsed.query.len >= 0)
     return m_url.componentString(m_url.m_parsed.query);
