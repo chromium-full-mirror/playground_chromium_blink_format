@@ -1855,7 +1855,8 @@ TransformationMatrix RenderObject::transformFromContainer(
   containerTransform.translate(offsetInContainer.width(),
                                offsetInContainer.height());
   RenderLayer* layer;
-  if (hasLayer() && (layer = toRenderBox(this)->layer()) && layer->transform())
+  if (hasLayer() && (layer = toRenderBoxModelObject(this)->layer()) &&
+      layer->transform())
     containerTransform.multLeft(layer->currentTransform());
 
 #if ENABLE(3D_RENDERING)
