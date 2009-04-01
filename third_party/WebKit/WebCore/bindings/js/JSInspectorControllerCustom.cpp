@@ -106,10 +106,11 @@ JSValuePtr JSInspectorController::addResourceSourceToFrame(
   if (args.size() < 2)
     return jsUndefined();
 
-  bool ok = false;
-  unsigned identifier = args.at(exec, 0).toUInt32(exec, ok);
-  if (!ok)
+  double number;
+  if (!args.at(exec, 0).getNumber(number))
     return jsUndefined();
+
+  long long identifier = static_cast<long long>(number);
 
   RefPtr<InspectorResource> resource = impl()->resources().get(identifier);
   ASSERT(resource);
@@ -120,7 +121,7 @@ JSValuePtr JSInspectorController::addResourceSourceToFrame(
   if (sourceString.isEmpty())
     return jsUndefined();
 
-  return jsBoolean(impl()->addSourceToFrame(resource->mimeType, sourceString,
+  return jsBoolean(impl()->addSourceToFrame(resource->mimeType(), sourceString,
                                             toNode(args.at(exec, 1))));
 }
 
@@ -156,16 +157,14 @@ JSValuePtr JSInspectorController::getResourceDocumentNode(ExecState* exec,
   if (!resource)
     return jsUndefined();
 
-  Frame* frame = resource->frame.get();
+  Frame* frame = resource->frame();
   Document* document = frame->document();
 
   if (document->isPluginDocument() || document->isImageDocument() ||
       document->isMediaDocument())
     return jsUndefined();
 
-  // FIXME: I am not sure if this is actually needed. Can we just use exec?
-  ExecState* resourceExec =
-      toJSDOMWindowShell(resource->frame.get())->window()->globalExec();
+  ExecState* resourceExec = toJSDOMWindowShell(frame)->window()->globalExec();
 
   JSLock lock(false);
   return JSInspectedObjectWrapper::wrap(resourceExec,

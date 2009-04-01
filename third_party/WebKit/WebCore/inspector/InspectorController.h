@@ -64,6 +64,7 @@ struct ResourceRequest;
 class ResourceResponse;
 class ResourceError;
 class ScriptCallStack;
+class ScriptString;
 class SharedBuffer;
 
 class ConsoleMessage;
@@ -269,9 +270,8 @@ class InspectorController : public RefCounted<InspectorController>
                       unsigned long identifier,
                       const ResourceError&);
   void resourceRetrievedByXMLHttpRequest(unsigned long identifier,
-                                         const JSC::UString& sourceString);
-  void scriptImported(unsigned long identifier,
-                      const JSC::UString& sourceString);
+                                         const ScriptString& sourceString);
+  void scriptImported(unsigned long identifier, const String& sourceString);
 
 #if ENABLE(DATABASE)
   void didOpenDatabase(Database*,
@@ -333,22 +333,6 @@ class InspectorController : public RefCounted<InspectorController>
 
   void addResource(InspectorResource*);
   void removeResource(InspectorResource*);
-
-  JSObjectRef addScriptResource(InspectorResource*);
-  void removeScriptResource(InspectorResource*);
-
-  JSObjectRef addAndUpdateScriptResource(InspectorResource*);
-  void updateScriptResourceRequest(InspectorResource*);
-  void updateScriptResourceResponse(InspectorResource*);
-  void updateScriptResourceType(InspectorResource*);
-  void updateScriptResource(InspectorResource*, int length);
-  void updateScriptResource(InspectorResource*,
-                            bool finished,
-                            bool failed = false);
-  void updateScriptResource(InspectorResource*,
-                            double startTime,
-                            double responseReceivedTime,
-                            double endTime);
 
   void pruneResources(ResourcesMap*, DocumentLoader* loaderToKeep = 0);
   void removeAllResources(ResourcesMap* map) { pruneResources(map); }
