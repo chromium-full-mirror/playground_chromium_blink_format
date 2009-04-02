@@ -139,9 +139,9 @@ class HistoryItem : public RefCounted<HistoryItem> {
   }
 
   void addChildItem(PassRefPtr<HistoryItem>);
-  HistoryItem* childItemWithName(const String&) const;
+  void setChildItem(PassRefPtr<HistoryItem>);
+  HistoryItem* childItemWithTarget(const String&) const;
   HistoryItem* targetItem();
-  HistoryItem* recurseToFindTargetItem();
   const HistoryItemVector& children() const;
   bool hasChildren() const;
 
@@ -192,7 +192,7 @@ class HistoryItem : public RefCounted<HistoryItem> {
               const String& alternateTitle,
               double lastVisited);
   HistoryItem(const KURL& url,
-              const String& target,
+              const String& frameName,
               const String& parent,
               const String& title);
 
@@ -201,6 +201,8 @@ class HistoryItem : public RefCounted<HistoryItem> {
   void padDailyCountsForNewVisit(double time);
   void collapseDailyVisitsToWeekly();
   void recordVisitAtTime(double);
+
+  HistoryItem* findTargetItem();
 
   String m_urlString;
   String m_originalURLString;
@@ -216,7 +218,7 @@ class HistoryItem : public RefCounted<HistoryItem> {
   IntPoint m_scrollPoint;
   Vector<String> m_documentState;
 
-  HistoryItemVector m_subItems;
+  HistoryItemVector m_children;
 
   bool m_lastVisitWasFailure;
   bool m_isTargetItem;

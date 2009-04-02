@@ -69,7 +69,6 @@ class SubstituteData;
 class TextResourceDecoder;
 class Widget;
 
-struct FormSubmission;
 struct FrameLoadRequest;
 struct ScheduledRedirection;
 struct WindowFeatures;
@@ -130,45 +129,45 @@ class FrameLoader : Noncopyable {
 
   Frame* frame() const { return m_frame; }
 
-  // FIXME: This is not cool, people. We should aim to consolidate these variety
-  // of loading related methods into a smaller set,
-  // and try to reuse more of the same logic by extracting common code paths.
+  // FIXME: This is not cool, people. There are too many different functions
+  // that all start loads.
+  // We should aim to consolidate these into a smaller set of functions, and try
+  // to reuse more of
+  // the logic by extracting common code paths.
+
   void prepareForLoadStart();
   void setupForReplace();
   void setupForReplaceByMIMEType(const String& newMIMEType);
 
   void loadURLIntoChildFrame(const KURL&, const String& referer, Frame*);
 
-  void loadFrameRequestWithFormAndValues(
-      const FrameLoadRequest&,
-      bool lockHistory,
-      bool
-          lockBackForwardList,  // Called by submitForm, calls loadPostRequest()
-      PassRefPtr<Event>,
-      HTMLFormElement*,
-      const HashMap<String, String>& formValues);
+  void loadFrameRequest(const FrameLoadRequest&,
+                        bool lockHistory,
+                        bool lockBackForwardList,  // Called by submitForm,
+                                                   // calls loadPostRequest and
+                                                   // loadURL.
+                        PassRefPtr<Event>,
+                        PassRefPtr<FormState>);
 
   void load(const ResourceRequest&, bool lockHistory);  // Called by WebFrame,
                                                         // calls
-                                                        // (ResourceRequest,
-                                                        // SubstituteData)
+                                                        // load(ResourceRequest,
+                                                        // SubstituteData).
   void load(const ResourceRequest&,
             const SubstituteData&,
             bool lockHistory);  // Called both by WebFrame and internally, calls
-                                // (DocumentLoader*)
+                                // load(DocumentLoader*).
   void load(const ResourceRequest&,
             const String& frameName,
-            bool lockHistory);  // Called by WebPluginController
+            bool lockHistory);  // Called by WebPluginController.
 
-  void loadArchive(PassRefPtr<Archive> archive);
+  void loadArchive(PassRefPtr<Archive>);
 
-  // Returns true for any non-local URL. If Document parameter is supplied, its
+  // Returns true for any non-local URL. If document parameter is supplied, its
   // local load policy dictates,
   // otherwise if referrer is non-empty and represents a local file, then the
   // local load is allowed.
-  static bool canLoad(const KURL&,
-                      const String& referrer,
-                      const Document* theDocument = 0);
+  static bool canLoad(const KURL&, const String& referrer, const Document* = 0);
   static void reportLocalLoadFailed(Frame*, const String& url);
 
   static bool shouldHideReferrer(const KURL&, const String& referrer);
@@ -199,13 +198,9 @@ class FrameLoader : Noncopyable {
   String referrer() const;
   String outgoingReferrer() const;
   String outgoingOrigin() const;
-  void loadEmptyDocumentSynchronously();
 
   DocumentLoader* activeDocumentLoader() const;
   DocumentLoader* documentLoader() const { return m_documentLoader.get(); }
-  DocumentLoader* policyDocumentLoader() const {
-    return m_policyDocumentLoader.get();
-  }
   DocumentLoader* provisionalDocumentLoader() const {
     return m_provisionalDocumentLoader.get();
   }
@@ -250,8 +245,6 @@ class FrameLoader : Noncopyable {
   bool canShowMIMEType(const String& MIMEType) const;
   bool representationExistsForURLScheme(const String& URLScheme);
   String generatedMIMETypeForURLScheme(const String& URLScheme);
-
-  void notifyIconChanged();
 
   void checkNavigationPolicy(const ResourceRequest&,
                              NavigationPolicyDecisionFunction function,
@@ -315,7 +308,6 @@ class FrameLoader : Noncopyable {
                    bool lockHistory,
                    bool lockBackForwardList,
                    bool userGesture);
-
   bool requestFrame(HTMLFrameOwnerElement*,
                     const String& url,
                     const AtomicString& frameName);
@@ -326,9 +318,10 @@ class FrameLoader : Noncopyable {
                   const String& target,
                   const String& contentType,
                   const String& boundary,
-                  PassRefPtr<Event>,
                   bool lockHistory,
-                  bool lockBackForwardList);
+                  bool lockBackForwardList,
+                  PassRefPtr<Event>,
+                  PassRefPtr<FormState>);
 
   void stop();
   void stopLoading(bool sendUnload);
@@ -406,8 +399,6 @@ class FrameLoader : Noncopyable {
 
   const KURL& url() const { return m_URL; }
 
-  void updateBaseURLForEmptyDocument();
-
   void setResponseMIMEType(const String&);
   const String& responseMIMEType() const;
 
@@ -416,10 +407,6 @@ class FrameLoader : Noncopyable {
   void loadDone();
   void finishedParsing();
   void checkCompleted();
-
-  void clearRecordedFormValues();
-  void setFormAboutToBeSubmitted(PassRefPtr<HTMLFormElement> element);
-  void recordFormValue(const String& name, const String& value);
 
   bool isComplete() const;
 
@@ -631,6 +618,11 @@ class FrameLoader : Noncopyable {
   void dispatchDidFinishLoading(DocumentLoader*, unsigned long identifier);
 
   static bool isLocationChange(const ScheduledRedirection&);
+  void scheduleFormSubmission(const FrameLoadRequest&,
+                              bool lockHistory,
+                              bool lockBackForwardList,
+                              PassRefPtr<Event>,
+                              PassRefPtr<FormState>);
 
   void loadWithDocumentLoader(
       DocumentLoader*,
@@ -640,27 +632,25 @@ class FrameLoader : Noncopyable {
 
   void loadWithNavigationAction(
       const ResourceRequest&,
-      const NavigationAction&,  // Calls loadWithDocumentLoader()
+      const NavigationAction&,  // Calls loadWithDocumentLoader
       bool lockHistory,
       FrameLoadType,
       PassRefPtr<FormState>);
 
-  void loadPostRequest(
-      const ResourceRequest&,
-      const String& referrer,  // Called by loadFrameRequestWithFormAndValues(),
-                               // calls loadWithNavigationAction
-      const String& frameName,
-      bool lockHistory,
-      FrameLoadType,
-      PassRefPtr<Event>,
-      PassRefPtr<FormState>);
-
-  void loadURL(const KURL& newURL,
+  void loadPostRequest(const ResourceRequest&,
+                       const String& referrer,  // Called by loadFrameRequest,
+                                                // calls
+                                                // loadWithNavigationAction
+                       const String& frameName,
+                       bool lockHistory,
+                       FrameLoadType,
+                       PassRefPtr<Event>,
+                       PassRefPtr<FormState>);
+  void loadURL(const KURL&,
                const String& referrer,
-               const String& frameName,  // Called by
-                                         // loadFrameRequestWithFormAndValues(),
-                                         // calls loadWithNavigationAction or
-                                         // else dispatches to navigation policy
+               const String& frameName,  // Called by loadFrameRequest, calls
+                                         // loadWithNavigationAction or
+                                         // dispatches to navigation policy
                                          // delegate
                bool lockHistory,
                FrameLoadType,
@@ -671,8 +661,7 @@ class FrameLoader : Noncopyable {
   void clientRedirected(const KURL&,
                         double delay,
                         double fireDate,
-                        bool lockBackForwardList,
-                        bool isJavaScriptFormAction);
+                        bool lockBackForwardList);
   bool shouldReload(const KURL& currentURL, const KURL& destinationURL);
 
   void sendRemainingDelegateMessages(unsigned long identifier,
@@ -692,12 +681,6 @@ class FrameLoader : Noncopyable {
                       const KURL&,
                       const String& name,
                       const String& referrer);
-
-  void submitFormAgain();
-  void submitForm(const FrameLoadRequest&,
-                  PassRefPtr<Event>,
-                  bool lockHistory,
-                  bool lockBackForwardList);
 
   KURL historyURL(int distance);
 
@@ -756,11 +739,8 @@ class FrameLoader : Noncopyable {
   bool m_quickRedirectComing;
   bool m_sentRedirectNotification;
   bool m_inStopAllLoaders;
-  bool m_navigationDuringLoad;
 
   String m_outgoingReferrer;
-
-  OwnPtr<FormSubmission> m_deferredFormSubmission;
 
   bool m_isExecutingJavaScriptFormAction;
   bool m_isRunningScript;
@@ -791,8 +771,6 @@ class FrameLoader : Noncopyable {
 
   bool m_containsPlugIns;
 
-  RefPtr<HTMLFormElement> m_formAboutToBeSubmitted;
-  HashMap<String, String> m_formValuesAboutToBeSubmitted;
   KURL m_submittedFormURL;
 
   Timer<FrameLoader> m_redirectionTimer;

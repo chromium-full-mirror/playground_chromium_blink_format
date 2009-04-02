@@ -1276,8 +1276,14 @@ void WebFrame::dispatchWillSubmitForm(FramePolicyFunction function,
   COMPtr<IDOMElement> formElement(
       AdoptCOM, DOMElement::createInstance(formState->form()));
 
+  HashMap<String, String> formValuesMap;
+  const StringPairVector& textFieldValues = formState->textFieldValues();
+  size_t size = textFieldValues.size();
+  for (size_t i = 0; i < size; ++i)
+    formValuesMap.add(textFieldValues[i].first, textFieldValues[i].second);
+
   COMPtr<IPropertyBag> formValuesPropertyBag(
-      AdoptCOM, COMPropertyBag<String>::createInstance(formState->values()));
+      AdoptCOM, COMPropertyBag<String>::createInstance(formValuesMap));
 
   COMPtr<WebFrame> sourceFrame(kit(formState->sourceFrame()));
   if (SUCCEEDED(formDelegate->willSubmitForm(
