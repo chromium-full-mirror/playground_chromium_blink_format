@@ -3461,12 +3461,4 @@ void RenderLayer::updateReflectionStyle() {
   m_reflection->setStyle(newStyle.release());
 }
 
-void RenderLayer::suspendMarquees() {
-  if (m_marquee)
-    m_marquee->suspend();
-
-  for (RenderLayer* curr = firstChild(); curr; curr = curr->nextSibling())
-    curr->suspendMarquees();
-}
-
 }  // namespace WebCore
