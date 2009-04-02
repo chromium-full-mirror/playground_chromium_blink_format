@@ -73,6 +73,11 @@ class CachedImage : public CachedResource, public ImageObserver {
   virtual void data(PassRefPtr<SharedBuffer> data, bool allDataReceived);
   virtual void error();
 
+  virtual void httpStatusCodeError() { m_httpStatusCodeErrorOccurred = true; }
+  bool httpStatusCodeErrorOccurred() const {
+    return m_httpStatusCodeErrorOccurred;
+  }
+
   virtual bool schedule() const { return true; }
 
   void checkNotify();
@@ -103,6 +108,7 @@ class CachedImage : public CachedResource, public ImageObserver {
 
   RefPtr<Image> m_image;
   Timer<CachedImage> m_decodedDataDeletionTimer;
+  bool m_httpStatusCodeErrorOccurred;
 };
 }
 
