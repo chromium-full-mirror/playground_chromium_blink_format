@@ -274,7 +274,7 @@ void XMLHttpRequest::callReadyStateChangeListener() {
 
   dispatchReadyStateChangeEvent();
 
-  if (m_state == DONE)
+  if (m_state == DONE && !m_error)
     dispatchLoadEvent();
 }
 
@@ -749,9 +749,7 @@ void XMLHttpRequest::genericError() {
   clearRequest();
   m_error = true;
 
-  // The spec says we should "Synchronously switch the state to DONE." and then
-  // "Synchronously dispatch a readystatechange event on the object"
-  // but this does not match Firefox.
+  changeState(DONE);
 }
 
 void XMLHttpRequest::networkError() {
