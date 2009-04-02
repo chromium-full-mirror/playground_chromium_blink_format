@@ -43,6 +43,8 @@ class TransformState : Noncopyable {
     ApplyTransformDirection,
     UnapplyInverseTransformDirection
   };
+  enum TransformAccumulation { FlattenTransform, AccumulateTransform };
+
   // If quad is non-null, it will be mapped
   TransformState(TransformDirection mappingDirection,
                  const FloatPoint& p,
@@ -55,13 +57,14 @@ class TransformState : Noncopyable {
       m_lastPlanarQuad = *quad;
   }
 
-  void move(const IntSize& s, bool accumulateTransform = false) {
-    move(s.width(), s.height(), accumulateTransform);
+  void move(const IntSize& s,
+            TransformAccumulation accumulate = FlattenTransform) {
+    move(s.width(), s.height(), accumulate);
   }
 
-  void move(int x, int y, bool accumulateTransform = false);
+  void move(int x, int y, TransformAccumulation = FlattenTransform);
   void applyTransform(const TransformationMatrix& transformFromContainer,
-                      bool accumulateTransform = false);
+                      TransformAccumulation = FlattenTransform);
   void flatten();
 
   // Return the coords of the point or quad in the last flattened layer
@@ -97,11 +100,11 @@ class HitTestingTransformState : public RefCounted<HitTestingTransformState> {
     return adoptRef(new HitTestingTransformState(other));
   }
 
-  void move(const IntSize& s) { move(s.width(), s.height()); }
-
-  void move(int x, int y);
+  enum TransformAccumulation { FlattenTransform, AccumulateTransform };
+  void translate(int x, int y, TransformAccumulation);
   void applyTransform(const TransformationMatrix& transformFromContainer,
-                      bool accumulateTransform);
+                      TransformAccumulation);
+
   FloatPoint mappedPoint() const;
   FloatQuad mappedQuad() const;
   void flatten();
@@ -123,6 +126,8 @@ class HitTestingTransformState : public RefCounted<HitTestingTransformState> {
         m_lastPlanarQuad(other.m_lastPlanarQuad),
         m_accumulatedTransform(other.m_accumulatedTransform),
         m_accumulatingTransform(other.m_accumulatingTransform) {}
+
+  void flattenWithTransform(const TransformationMatrix&);
 };
 
 }  // namespace WebCore

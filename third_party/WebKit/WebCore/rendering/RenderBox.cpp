@@ -1054,12 +1054,16 @@ void RenderBox::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
 
   bool preserve3D =
       useTransforms && (o->style()->preserves3D() || style()->preserves3D());
-  if (useTransforms && hasTransform)
-    transformState.applyTransform(transformFromContainer(o, containerOffset),
-                                  preserve3D);
-  else
+  if (useTransforms && hasTransform) {
+    TransformationMatrix t;
+    getTransformFromContainer(o, containerOffset, t);
+    transformState.applyTransform(t, preserve3D
+                                         ? TransformState::AccumulateTransform
+                                         : TransformState::FlattenTransform);
+  } else
     transformState.move(containerOffset.width(), containerOffset.height(),
-                        preserve3D);
+                        preserve3D ? TransformState::AccumulateTransform
+                                   : TransformState::FlattenTransform);
 
   o->mapLocalToContainer(repaintContainer, fixed, useTransforms,
                          transformState);
@@ -1089,12 +1093,16 @@ void RenderBox::mapAbsoluteToLocalPoint(bool fixed,
 
   bool preserve3D =
       useTransforms && (o->style()->preserves3D() || style()->preserves3D());
-  if (useTransforms && hasTransform)
-    transformState.applyTransform(transformFromContainer(o, containerOffset),
-                                  preserve3D);
-  else
+  if (useTransforms && hasTransform) {
+    TransformationMatrix t;
+    getTransformFromContainer(o, containerOffset, t);
+    transformState.applyTransform(t, preserve3D
+                                         ? TransformState::AccumulateTransform
+                                         : TransformState::FlattenTransform);
+  } else
     transformState.move(-containerOffset.width(), -containerOffset.height(),
-                        preserve3D);
+                        preserve3D ? TransformState::AccumulateTransform
+                                   : TransformState::FlattenTransform);
 }
 
 IntSize RenderBox::offsetFromContainer(RenderObject* o) const {
