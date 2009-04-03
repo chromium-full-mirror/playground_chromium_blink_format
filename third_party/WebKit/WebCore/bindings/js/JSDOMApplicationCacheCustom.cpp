@@ -116,7 +116,7 @@ JSValuePtr JSDOMApplicationCache::addEventListener(ExecState* exec,
   if (!globalObject)
     return jsUndefined();
   RefPtr<JSEventListener> listener =
-      globalObject->findOrCreateJSEventListener(args.at(exec, 1));
+      globalObject->findOrCreateJSEventListener(exec, args.at(exec, 1));
   if (!listener)
     return jsUndefined();
   impl()->addEventListener(args.at(exec, 0).toString(exec), listener.release(),
@@ -131,7 +131,7 @@ JSValuePtr JSDOMApplicationCache::removeEventListener(ExecState* exec,
   if (!globalObject)
     return jsUndefined();
   JSEventListener* listener =
-      globalObject->findJSEventListener(args.at(exec, 1));
+      globalObject->findJSEventListener(exec, args.at(exec, 1));
   if (!listener)
     return jsUndefined();
   impl()->removeEventListener(args.at(exec, 0).toString(exec), listener,

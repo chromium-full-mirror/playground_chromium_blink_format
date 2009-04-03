@@ -306,7 +306,7 @@ JSValuePtr JSDOMWindow::addEventListener(ExecState* exec, const ArgList& args) {
     return jsUndefined();
 
   if (RefPtr<JSProtectedEventListener> listener =
-          findOrCreateJSProtectedEventListener(args.at(exec, 1)))
+          findOrCreateJSProtectedEventListener(exec, args.at(exec, 1)))
     frame->document()->addWindowEventListener(
         AtomicString(args.at(exec, 0).toString(exec)), listener.release(),
         args.at(exec, 2).toBoolean(exec));

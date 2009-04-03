@@ -64,16 +64,20 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
   // Finds or creates a wrapper of a JS EventListener. JS EventListener object
   // is GC-protected.
   PassRefPtr<JSProtectedEventListener> findOrCreateJSProtectedEventListener(
+      JSC::ExecState*,
       JSC::JSValuePtr,
       bool isInline = false);
 
   // Finds a wrapper of a GC-unprotected JS EventListener, returns 0 if no
   // existing one.
-  JSEventListener* findJSEventListener(JSC::JSValuePtr, bool isInline = false);
+  JSEventListener* findJSEventListener(JSC::ExecState*,
+                                       JSC::JSValuePtr,
+                                       bool isInline = false);
 
   // Finds or creates a wrapper of a JS EventListener. JS EventListener object
   // is *NOT* GC-protected.
   PassRefPtr<JSEventListener> findOrCreateJSEventListener(
+      JSC::ExecState*,
       JSC::JSValuePtr,
       bool isInline = false);
 
