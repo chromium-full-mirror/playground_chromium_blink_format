@@ -297,10 +297,12 @@ bool EventHandler::handleMousePressEventSingleClick(
 
   // Don't restart the selection when the mouse is pressed on an
   // existing selection so we can allow for text dragging.
-  IntPoint vPoint = m_frame->view()->windowToContents(event.event().pos());
-  if (!extendSelection && m_frame->selection()->contains(vPoint)) {
-    m_mouseDownWasSingleClickInSelection = true;
-    return false;
+  if (FrameView* view = m_frame->view()) {
+    IntPoint vPoint = view->windowToContents(event.event().pos());
+    if (!extendSelection && m_frame->selection()->contains(vPoint)) {
+      m_mouseDownWasSingleClickInSelection = true;
+      return false;
+    }
   }
 
   VisiblePosition visiblePos(
@@ -453,8 +455,10 @@ bool EventHandler::eventMayStartDrag(const PlatformMouseEvent& event) const {
   // way we setMouseDownMayStartDrag
   // in handleMousePressEvent
 
-  if (!m_frame->contentRenderer() || !m_frame->contentRenderer()->hasLayer() ||
-      event.button() != LeftButton || event.clickCount() != 1)
+  if (!m_frame->contentRenderer() || !m_frame->contentRenderer()->hasLayer())
+    return false;
+
+  if (event.button() != LeftButton || event.clickCount() != 1)
     return false;
 
   bool DHTMLFlag;
@@ -463,8 +467,12 @@ bool EventHandler::eventMayStartDrag(const PlatformMouseEvent& event) const {
   if (!DHTMLFlag && !UAFlag)
     return false;
 
+  FrameView* view = m_frame->view();
+  if (!view)
+    return false;
+
   HitTestRequest request(HitTestRequest::ReadOnly);
-  HitTestResult result(m_frame->view()->windowToContents(event.pos()));
+  HitTestResult result(view->windowToContents(event.pos()));
   m_frame->contentRenderer()->layer()->hitTest(request, result);
   bool srcIsDHTML;
   return result.innerNode() &&
@@ -618,12 +626,14 @@ void EventHandler::handleAutoscroll(RenderObject* renderer) {
 #if ENABLE(PAN_SCROLLING)
   if (m_panScrollInProgress) {
     m_panScrollStartPos = currentMousePosition();
-    m_frame->view()->addPanScrollIcon(m_panScrollStartPos);
-    // If we're not in the top frame we notify it that we are using the
-    // panScroll
-    if (m_frame != m_frame->page()->mainFrame())
-      m_frame->page()->mainFrame()->eventHandler()->setPanScrollInProgress(
-          true);
+    if (FrameView* view = m_frame->view())
+      view->addPanScrollIcon(m_panScrollStartPos);
+    // If we're not in the top frame we notify it that we doing a panScroll.
+    if (Page* page = m_frame->page()) {
+      Frame* mainFrame = page->mainFrame();
+      if (m_frame != mainFrame)
+        mainFrame->eventHandler()->setPanScrollInProgress(true);
+    }
   }
 #endif
 
@@ -646,9 +656,11 @@ void EventHandler::autoscrollTimerFired(Timer<EventHandler>*) {
   } else {
     // we verify that the main frame hasn't received the order to stop the
     // panScroll
-    if (!m_frame->page()->mainFrame()->eventHandler()->panScrollInProgress()) {
-      stopAutoscrollTimer();
-      return;
+    if (Page* page = m_frame->page()) {
+      if (!page->mainFrame()->eventHandler()->panScrollInProgress()) {
+        stopAutoscrollTimer();
+        return;
+      }
     }
 #if ENABLE(PAN_SCROLLING)
     setPanScrollCursor();
@@ -658,7 +670,12 @@ void EventHandler::autoscrollTimerFired(Timer<EventHandler>*) {
 }
 
 #if ENABLE(PAN_SCROLLING)
+
 void EventHandler::setPanScrollCursor() {
+  FrameView* view = m_frame->view();
+  if (!view)
+    return;
+
   // At the original click location we draw a 4 arrowed icon. Over this icon
   // there won't be any scroll
   // So we don't want to change the cursor over this area
@@ -674,25 +691,26 @@ void EventHandler::setPanScrollCursor() {
 
   if (north) {
     if (east)
-      m_frame->view()->setCursor(northEastPanningCursor());
+      view->setCursor(northEastPanningCursor());
     else if (west)
-      m_frame->view()->setCursor(northWestPanningCursor());
+      view->setCursor(northWestPanningCursor());
     else
-      m_frame->view()->setCursor(northPanningCursor());
+      view->setCursor(northPanningCursor());
   } else if (south) {
     if (east)
-      m_frame->view()->setCursor(southEastPanningCursor());
+      view->setCursor(southEastPanningCursor());
     else if (west)
-      m_frame->view()->setCursor(southWestPanningCursor());
+      view->setCursor(southWestPanningCursor());
     else
-      m_frame->view()->setCursor(southPanningCursor());
+      view->setCursor(southPanningCursor());
   } else if (east)
-    m_frame->view()->setCursor(eastPanningCursor());
+    view->setCursor(eastPanningCursor());
   else if (west)
-    m_frame->view()->setCursor(westPanningCursor());
+    view->setCursor(westPanningCursor());
   else
-    m_frame->view()->setCursor(middlePanningCursor());
+    view->setCursor(middlePanningCursor());
 }
+
 #endif  // ENABLE(PAN_SCROLLING)
 
 RenderObject* EventHandler::autoscrollRenderer() const {
@@ -720,14 +738,22 @@ void EventHandler::setAutoscrollRenderer(RenderObject* renderer) {
 }
 
 void EventHandler::allowDHTMLDrag(bool& flagDHTML, bool& flagUA) const {
-  if (!m_frame) {
-    flagDHTML = false;
-    flagUA = false;
-    return;
-  }
+  flagDHTML = false;
+  flagUA = false;
 
-  unsigned mask = m_frame->page()->dragController()->delegateDragSourceAction(
-      m_frame->view()->contentsToWindow(m_mouseDownPos));
+  if (!m_frame)
+    return;
+
+  Page* page = m_frame->page();
+  if (!page)
+    return;
+
+  FrameView* view = m_frame->view();
+  if (!view)
+    return;
+
+  unsigned mask = page->dragController()->delegateDragSourceAction(
+      view->contentsToWindow(m_mouseDownPos));
   flagDHTML = (mask & DragSourceActionDHTML) != DragSourceActionNone;
   flagUA = ((mask & DragSourceActionImage) || (mask & DragSourceActionLink) ||
             (mask & DragSourceActionSelection));
@@ -775,14 +801,19 @@ HitTestResult EventHandler::hitTestResultAtPoint(const IntPoint& point,
   Frame* resultFrame = result.innerNonSharedNode()
                            ? result.innerNonSharedNode()->document()->frame()
                            : 0;
-  Frame* mainFrame = m_frame->page()->mainFrame();
-  if (m_frame != mainFrame && resultFrame && resultFrame != mainFrame &&
-      !resultFrame->editor()->insideVisibleArea(result.point())) {
-    IntPoint windowPoint =
-        resultFrame->view()->contentsToWindow(result.point());
-    IntPoint mainFramePoint = mainFrame->view()->windowToContents(windowPoint);
-    result = mainFrame->eventHandler()->hitTestResultAtPoint(
-        mainFramePoint, allowShadowContent, ignoreClipping);
+  if (Page* page = m_frame->page()) {
+    Frame* mainFrame = page->mainFrame();
+    if (m_frame != mainFrame && resultFrame && resultFrame != mainFrame &&
+        !resultFrame->editor()->insideVisibleArea(result.point())) {
+      FrameView* resultView = resultFrame->view();
+      FrameView* mainView = mainFrame->view();
+      if (resultView && mainView) {
+        IntPoint windowPoint = resultView->contentsToWindow(result.point());
+        IntPoint mainFramePoint = mainView->windowToContents(windowPoint);
+        result = mainFrame->eventHandler()->hitTestResultAtPoint(
+            mainFramePoint, allowShadowContent, ignoreClipping);
+      }
+    }
   }
 
   if (!allowShadowContent)
@@ -810,8 +841,10 @@ void EventHandler::stopAutoscrollTimer(bool rendererIsBeingDestroyed) {
       toRenderBox(autoscrollRenderer())->stopAutoscroll();
 #if ENABLE(PAN_SCROLLING)
     if (m_panScrollInProgress) {
-      m_frame->view()->removePanScrollIcon();
-      m_frame->view()->setCursor(pointerCursor());
+      if (FrameView* view = m_frame->view()) {
+        view->removePanScrollIcon();
+        view->setCursor(pointerCursor());
+      }
     }
 #endif
 
@@ -821,10 +854,15 @@ void EventHandler::stopAutoscrollTimer(bool rendererIsBeingDestroyed) {
   m_autoscrollTimer.stop();
 
   m_panScrollInProgress = false;
-  // If we're not in the top frame we notify it that we are not using the
-  // panScroll anymore
-  if (m_frame->page() && m_frame != m_frame->page()->mainFrame())
-    m_frame->page()->mainFrame()->eventHandler()->setPanScrollInProgress(false);
+
+  // If we're not in the top frame we notify it that we are not doing a
+  // panScroll any more.
+  if (Page* page = m_frame->page()) {
+    Frame* mainFrame = page->mainFrame();
+    if (m_frame != mainFrame)
+      mainFrame->eventHandler()->setPanScrollInProgress(false);
+  }
+
   m_autoscrollInProgress = false;
 }
 
@@ -967,12 +1005,14 @@ Cursor EventHandler::selectCursor(const MouseEventWithHitTestResults& event,
       if ((event.isOverLink() || isSubmitImage(node)) &&
           (!editable || editableLinkEnabled))
         return handCursor();
-      RenderLayer* layer = renderer ? renderer->enclosingLayer() : 0;
       bool inResizer = false;
-      if (m_frame->view() && layer &&
-          layer->isPointInResizeControl(
-              m_frame->view()->windowToContents(event.event().pos())))
-        inResizer = true;
+      if (renderer) {
+        if (RenderLayer* layer = renderer->enclosingLayer()) {
+          if (FrameView* view = m_frame->view())
+            inResizer = layer->isPointInResizeControl(
+                view->windowToContents(event.event().pos()));
+        }
+      }
       if ((editable ||
            (renderer && renderer->isText() && node->canStartSelection())) &&
           !inResizer && !scrollbar)
@@ -1063,7 +1103,12 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   m_mouseDownMayStartDrag = false;
   m_mouseDownMayStartSelect = false;
   m_mouseDownMayStartAutoscroll = false;
-  m_mouseDownPos = m_frame->view()->windowToContents(mouseEvent.pos());
+  if (FrameView* view = m_frame->view())
+    m_mouseDownPos = view->windowToContents(mouseEvent.pos());
+  else {
+    invalidateClick();
+    return false;
+  }
   m_mouseDownWasInSubframe = false;
 
   HitTestRequest request(HitTestRequest::Active);
@@ -1076,12 +1121,14 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
 
   m_mousePressNode = mev.targetNode();
 
-  InspectorController* inspector = m_frame->page()->inspectorController();
-  if (inspector && inspector->enabled() &&
-      inspector->searchingForNodeInPage()) {
-    inspector->handleMousePressOnNode(m_mousePressNode.get());
-    invalidateClick();
-    return true;
+  if (Page* page = m_frame->page()) {
+    InspectorController* inspector = page->inspectorController();
+    if (inspector && inspector->enabled() &&
+        inspector->searchingForNodeInPage()) {
+      inspector->handleMousePressOnNode(m_mousePressNode.get());
+      invalidateClick();
+      return true;
+    }
   }
 
   Frame* subframe = subframeForHitTestResult(mev);
@@ -1098,7 +1145,8 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   }
 
 #if ENABLE(PAN_SCROLLING)
-  if (m_frame->page()->mainFrame()->eventHandler()->panScrollInProgress() ||
+  Page* page = m_frame->page();
+  if (page && page->mainFrame()->eventHandler()->panScrollInProgress() ||
       m_autoscrollInProgress) {
     stopAutoscrollTimer();
     invalidateClick();
@@ -1130,15 +1178,17 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   m_clickCount = mouseEvent.clickCount();
   m_clickNode = mev.targetNode();
 
-  RenderLayer* layer =
-      m_clickNode->renderer() ? m_clickNode->renderer()->enclosingLayer() : 0;
-  IntPoint p = m_frame->view()->windowToContents(mouseEvent.pos());
-  if (layer && layer->isPointInResizeControl(p)) {
-    layer->setInResizeMode(true);
-    m_resizeLayer = layer;
-    m_offsetFromResizeCorner = layer->offsetFromResizeCorner(p);
-    invalidateClick();
-    return true;
+  if (FrameView* view = m_frame->view()) {
+    RenderLayer* layer =
+        m_clickNode->renderer() ? m_clickNode->renderer()->enclosingLayer() : 0;
+    IntPoint p = view->windowToContents(mouseEvent.pos());
+    if (layer && layer->isPointInResizeControl(p)) {
+      layer->setInResizeMode(true);
+      m_resizeLayer = layer;
+      m_offsetFromResizeCorner = layer->offsetFromResizeCorner(p);
+      invalidateClick();
+      return true;
+    }
   }
 
   bool swallowEvent =
@@ -1155,7 +1205,6 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
         mev.scrollbar() == m_lastScrollbarUnderMouse.get();
     HitTestRequest request(HitTestRequest::ReadOnly | HitTestRequest::Active);
     mev = prepareMouseEvent(request, mouseEvent);
-
     if (wasLastScrollBar && mev.scrollbar() != m_lastScrollbarUnderMouse.get())
       m_lastScrollbarUnderMouse = 0;
   }
@@ -1179,7 +1228,8 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
       mev = prepareMouseEvent(request, mouseEvent);
     }
 
-    Scrollbar* scrollbar = m_frame->view()->scrollbarUnderMouse(mouseEvent);
+    FrameView* view = m_frame->view();
+    Scrollbar* scrollbar = view ? view->scrollbarUnderMouse(mouseEvent) : 0;
     if (!scrollbar)
       scrollbar = mev.scrollbar();
     if (scrollbar && passMousePressEventToScrollbar(mev, scrollbar))
@@ -1302,8 +1352,8 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent,
   if (m_resizeLayer && m_resizeLayer->inResizeMode())
     m_resizeLayer->resize(mouseEvent, m_offsetFromResizeCorner);
   else {
-    if (m_frame->view())
-      scrollbar = m_frame->view()->scrollbarUnderMouse(mouseEvent);
+    if (FrameView* view = m_frame->view())
+      scrollbar = view->scrollbarUnderMouse(mouseEvent);
 
     if (!scrollbar)
       scrollbar = mev.scrollbar();
@@ -1345,10 +1395,13 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent,
       scrollbar->mouseMoved(scrollbar->transformEvent(
           mouseEvent));  // Handle hover effects on platforms that support
                          // visual feedback on scrollbar hovering.
-    if ((!m_resizeLayer || !m_resizeLayer->inResizeMode()) &&
-        !m_frame->page()->mainFrame()->eventHandler()->panScrollInProgress() &&
-        m_frame->view())
-      m_frame->view()->setCursor(selectCursor(mev, scrollbar));
+    if (Page* page = m_frame->page()) {
+      if ((!m_resizeLayer || !m_resizeLayer->inResizeMode()) &&
+          !page->mainFrame()->eventHandler()->panScrollInProgress()) {
+        if (FrameView* view = m_frame->view())
+          view->setCursor(selectCursor(mev, scrollbar));
+      }
+    }
   }
 
   m_lastMouseMoveEventSubframe = newSubframe;
@@ -1437,9 +1490,14 @@ bool EventHandler::dispatchDragEvent(const AtomicString& eventType,
                                      Node* dragTarget,
                                      const PlatformMouseEvent& event,
                                      Clipboard* clipboard) {
-  m_frame->view()->resetDeferredRepaintDelay();
+  FrameView* view = m_frame->view();
 
-  IntPoint contentsPos = m_frame->view()->windowToContents(event.pos());
+  // FIXME: We might want to dispatch a dragleave even if the view is gone.
+  if (!view)
+    return false;
+
+  view->resetDeferredRepaintDelay();
+  IntPoint contentsPos = view->windowToContents(event.pos());
 
   RefPtr<MouseEvent> me = MouseEvent::create(
       eventType, true, true, m_frame->document()->defaultView(), 0,
@@ -1447,7 +1505,7 @@ bool EventHandler::dispatchDragEvent(const AtomicString& eventType,
       event.ctrlKey(), event.altKey(), event.shiftKey(), event.metaKey(), 0, 0,
       clipboard);
 
-  ExceptionCode ec = 0;
+  ExceptionCode ec;
   dragTarget->dispatchEvent(me.get(), ec);
   return me->defaultPrevented();
 }
@@ -1569,7 +1627,10 @@ MouseEventWithHitTestResults EventHandler::prepareMouseEvent(
   ASSERT(m_frame);
   ASSERT(m_frame->document());
 
-  IntPoint documentPoint = m_frame->view()->windowToContents(mev.pos());
+  FrameView* view = m_frame->view();
+  // FIXME: Is it really OK to use the wrong coordinates here when view is 0?
+  // Historically the code would just crash; this is clearly no worse than that.
+  IntPoint documentPoint = view ? view->windowToContents(mev.pos()) : mev.pos();
   return m_frame->document()->prepareMouseEvent(request, documentPoint, mev);
 }
 
@@ -1688,7 +1749,8 @@ bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
                                       int clickCount,
                                       const PlatformMouseEvent& mouseEvent,
                                       bool setUnder) {
-  m_frame->view()->resetDeferredRepaintDelay();
+  if (FrameView* view = m_frame->view())
+    view->resetDeferredRepaintDelay();
 
   updateMouseEventTargetNode(targetNode, mouseEvent, setUnder);
 
@@ -1732,15 +1794,18 @@ bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
 
       renderer = renderer->parent();
     }
+
     // If focus shift is blocked, we eat the event.  Note we should never clear
     // swallowEvent
     // if the page already set it (e.g., by canceling default behavior).
-    if (node && node->isMouseFocusable()) {
-      if (!m_frame->page()->focusController()->setFocusedNode(node, m_frame))
-        swallowEvent = true;
-    } else if (!node || !node->focused()) {
-      if (!m_frame->page()->focusController()->setFocusedNode(0, m_frame))
-        swallowEvent = true;
+    if (Page* page = m_frame->page()) {
+      if (node && node->isMouseFocusable()) {
+        if (!page->focusController()->setFocusedNode(node, m_frame))
+          swallowEvent = true;
+      } else if (!node || !node->focused()) {
+        if (!page->focusController()->setFocusedNode(0, m_frame))
+          swallowEvent = true;
+      }
     }
   }
 
@@ -1756,7 +1821,10 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
 
   RefPtr<FrameView> protector(m_frame->view());
 
-  IntPoint vPoint = m_frame->view()->windowToContents(e.pos());
+  FrameView* view = m_frame->view();
+  if (!view)
+    return false;
+  IntPoint vPoint = view->windowToContents(e.pos());
 
   HitTestRequest request(HitTestRequest::ReadOnly);
   HitTestResult result(vPoint);
@@ -1797,9 +1865,14 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
     }
   }
 
-  if (!e.isAccepted())
-    m_frame->view()->wheelEvent(e);
+  if (e.isAccepted())
+    return true;
 
+  view = m_frame->view();
+  if (!view)
+    return false;
+
+  view->wheelEvent(e);
   return e.isAccepted();
 }
 
@@ -1894,11 +1967,12 @@ void EventHandler::hoverTimerFired(Timer<EventHandler>*) {
   ASSERT(m_frame->document());
 
   if (RenderView* renderer = m_frame->contentRenderer()) {
-    HitTestRequest request(HitTestRequest::MouseMove);
-    HitTestResult result(
-        m_frame->view()->windowToContents(m_currentMousePosition));
-    renderer->layer()->hitTest(request, result);
-    m_frame->document()->updateRendering();
+    if (FrameView* view = m_frame->view()) {
+      HitTestRequest request(HitTestRequest::MouseMove);
+      HitTestResult result(view->windowToContents(m_currentMousePosition));
+      renderer->layer()->hitTest(request, result);
+      m_frame->document()->updateRendering();
+    }
   }
 }
 
@@ -1941,17 +2015,20 @@ bool EventHandler::needsKeyboardEventDisambiguationQuirks() const {
 
 bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
 #if ENABLE(PAN_SCROLLING)
-  if (m_frame->page()->mainFrame()->eventHandler()->panScrollInProgress() ||
-      m_autoscrollInProgress) {
-    String escKeyId = "U+001B";
-    // If a key is pressed while the autoscroll/panScroll is in progress then we
-    // want to stop
-    if (initialKeyEvent.keyIdentifier() == escKeyId &&
-        initialKeyEvent.type() == PlatformKeyboardEvent::KeyUp)
-      stopAutoscrollTimer();
+  if (Page* page = m_frame->page()) {
+    if (page->mainFrame()->eventHandler()->panScrollInProgress() ||
+        m_autoscrollInProgress) {
+      static const char* const escapeKeyIdentifier = "U+001B";
 
-    // If we were in autoscroll/panscroll mode, we swallow the key event
-    return true;
+      // If a key is pressed while the autoscroll/panScroll is in progress then
+      // we want to stop
+      if (initialKeyEvent.keyIdentifier() == escKeyId &&
+          initialKeyEvent.type() == PlatformKeyboardEvent::KeyUp)
+        stopAutoscrollTimer();
+
+      // If we were in autoscroll/panscroll mode, we swallow the key event
+      return true;
+    }
   }
 #endif
 
@@ -1962,7 +2039,8 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
   if (!node)
     return false;
 
-  m_frame->view()->resetDeferredRepaintDelay();
+  if (FrameView* view = m_frame->view())
+    view->resetDeferredRepaintDelay();
 
   // FIXME: what is this doing here, in keyboard event handler?
   m_frame->loader()->resetMultipleFormSubmissionProtection();
@@ -2121,8 +2199,10 @@ bool EventHandler::dragHysteresisExceeded(
 
 bool EventHandler::dragHysteresisExceeded(
     const IntPoint& dragViewportLocation) const {
-  IntPoint dragLocation =
-      m_frame->view()->windowToContents(dragViewportLocation);
+  FrameView* view = m_frame->view();
+  if (!view)
+    return false;
+  IntPoint dragLocation = view->windowToContents(dragViewportLocation);
   IntSize delta = dragLocation - m_mouseDownPos;
 
   int threshold = GeneralDragHysteresis;
@@ -2144,9 +2224,9 @@ void EventHandler::freeClipboard() {
 bool EventHandler::shouldDragAutoNode(Node* node, const IntPoint& point) const {
   if (!node || node->hasChildNodes() || !m_frame->view())
     return false;
-  return m_frame->page() &&
-         m_frame->page()->dragController()->mayStartDragAtEventLocation(m_frame,
-                                                                        point);
+  Page* page = m_frame->page();
+  return page &&
+         page->dragController()->mayStartDragAtEventLocation(m_frame, point);
 }
 
 void EventHandler::dragSourceMovedTo(const PlatformMouseEvent& event) {
@@ -2247,7 +2327,8 @@ bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
     return !mouseDownMayStartSelect() && !m_mouseDownMayStartAutoscroll;
 
   // We are starting a text/image/url drag, so the cursor should be an arrow
-  m_frame->view()->setCursor(pointerCursor());
+  if (FrameView* view = m_frame->view())
+    view->setCursor(pointerCursor());
 
   if (!dragHysteresisExceeded(event.event().pos()))
     return true;
@@ -2307,8 +2388,8 @@ bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
   }
 
   if (m_mouseDownMayStartDrag) {
-    DragController* dragController =
-        m_frame->page() ? m_frame->page()->dragController() : 0;
+    Page* page = m_frame->page();
+    DragController* dragController = page ? page->dragController() : 0;
     bool startedDrag =
         dragController &&
         dragController->startDrag(m_frame, dragState().m_dragClipboard.get(),
@@ -2355,7 +2436,8 @@ bool EventHandler::handleTextInputEvent(const String& text,
   if (!target)
     return false;
 
-  m_frame->view()->resetDeferredRepaintDelay();
+  if (FrameView* view = m_frame->view())
+    view->resetDeferredRepaintDelay();
 
   RefPtr<TextEvent> event = TextEvent::create(m_frame->domWindow(), text);
   event->setUnderlyingEvent(underlyingEvent);
@@ -2468,23 +2550,22 @@ unsigned EventHandler::pendingFrameUnloadEventCount() {
 }
 
 void EventHandler::addPendingFrameUnloadEventCount() {
-  m_pendingFrameUnloadEventCount += 1;
-  m_frame->page()->changePendingUnloadEventCount(1);
-  return;
+  ++m_pendingFrameUnloadEventCount;
+  if (Page* page = m_frame->page())
+    page->changePendingUnloadEventCount(1);
 }
 
 void EventHandler::removePendingFrameUnloadEventCount() {
-  ASSERT((-1 + (int)m_pendingFrameUnloadEventCount) >= 0);
-  m_pendingFrameUnloadEventCount -= 1;
-  m_frame->page()->changePendingUnloadEventCount(-1);
-  return;
+  ASSERT(m_pendingFrameUnloadEventCount >= 1);
+  --m_pendingFrameUnloadEventCount;
+  if (Page* page = m_frame->page())
+    page->changePendingUnloadEventCount(-1);
 }
 
 void EventHandler::clearPendingFrameUnloadEventCount() {
-  m_frame->page()->changePendingUnloadEventCount(
-      -((int)m_pendingFrameUnloadEventCount));
+  if (Page* page = m_frame->page())
+    page->changePendingUnloadEventCount(-(int)m_pendingFrameUnloadEventCount);
   m_pendingFrameUnloadEventCount = 0;
-  return;
 }
 
 void EventHandler::sendResizeEvent() {
@@ -2506,23 +2587,23 @@ unsigned EventHandler::pendingFrameBeforeUnloadEventCount() {
 }
 
 void EventHandler::addPendingFrameBeforeUnloadEventCount() {
-  m_pendingFrameBeforeUnloadEventCount += 1;
-  m_frame->page()->changePendingBeforeUnloadEventCount(1);
-  return;
+  ++m_pendingFrameBeforeUnloadEventCount;
+  if (Page* page = m_frame->page())
+    page->changePendingBeforeUnloadEventCount(1);
 }
 
 void EventHandler::removePendingFrameBeforeUnloadEventCount() {
-  ASSERT((-1 + (int)m_pendingFrameBeforeUnloadEventCount) >= 0);
-  m_pendingFrameBeforeUnloadEventCount -= 1;
-  m_frame->page()->changePendingBeforeUnloadEventCount(-1);
-  return;
+  ASSERT(m_pendingFrameBeforeUnloadEventCount >= 1);
+  --m_pendingFrameBeforeUnloadEventCount;
+  if (Page* page = m_frame->page())
+    page->changePendingBeforeUnloadEventCount(-1);
 }
 
 void EventHandler::clearPendingFrameBeforeUnloadEventCount() {
-  m_frame->page()->changePendingBeforeUnloadEventCount(
-      -((int)m_pendingFrameBeforeUnloadEventCount));
+  if (Page* page = m_frame->page())
+    page->changePendingBeforeUnloadEventCount(
+        -(int)m_pendingFrameBeforeUnloadEventCount);
   m_pendingFrameBeforeUnloadEventCount = 0;
-  return;
 }
 
 bool EventHandler::passMousePressEventToScrollbar(
