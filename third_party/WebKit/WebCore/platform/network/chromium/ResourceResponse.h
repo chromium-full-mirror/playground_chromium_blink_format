@@ -60,8 +60,8 @@ class ResourceResponse : public ResourceResponseBase {
     m_isContentFiltered = isContentFiltered;
   }
 
-  int64 getAppCacheID() const { return m_appCacheID; }
-  void setAppCacheID(int64 id) { m_appCacheID = id; }
+  long long getAppCacheID() const { return m_appCacheID; }
+  void setAppCacheID(long long id) { m_appCacheID = id; }
 
  private:
   friend class ResourceResponseBase;
@@ -79,7 +79,7 @@ class ResourceResponse : public ResourceResponseBase {
 
   // The id of the appcache this response was retrieved from, or zero if
   // the response was not retrieved from an appcache.
-  int64 m_appCacheID;
+  long long m_appCacheID;
 };
 
 }  // namespace WebCore
