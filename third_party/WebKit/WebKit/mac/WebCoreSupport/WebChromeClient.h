@@ -163,6 +163,7 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void attachRootGraphicsLayer(WebCore::Frame*,
                                        WebCore::GraphicsLayer*);
   virtual void setNeedsOneShotDrawingSynchronization();
+  virtual void scheduleViewUpdate();
 #endif
 
   virtual void requestGeolocationPermissionForFrame(WebCore::Frame*,

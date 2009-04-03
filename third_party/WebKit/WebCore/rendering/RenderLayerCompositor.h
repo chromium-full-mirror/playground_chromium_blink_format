@@ -60,6 +60,8 @@ class RenderLayerCompositor {
     return m_compositingLayersNeedUpdate;
   }
 
+  void scheduleViewUpdate();
+
   // Rebuild the tree of compositing layers
   void updateCompositingLayers(RenderLayer* updateRoot = 0);
 
