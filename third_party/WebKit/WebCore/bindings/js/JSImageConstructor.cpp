@@ -42,8 +42,10 @@ JSImageConstructor::JSImageConstructor(ExecState* exec,
       m_globalObject(toJSDOMGlobalObject(context)) {
   ASSERT(context->isDocument());
 
-  putDirect(exec->propertyNames().prototype,
-            JSHTMLImageElementPrototype::self(exec), None);
+  putDirect(
+      exec->propertyNames().prototype,
+      JSHTMLImageElementPrototype::self(exec, exec->lexicalGlobalObject()),
+      None);
 }
 
 Document* JSImageConstructor::document() const {

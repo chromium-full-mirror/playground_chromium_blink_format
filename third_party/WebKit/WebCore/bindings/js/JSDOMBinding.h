@@ -74,6 +74,11 @@ void markDOMNodesForDocument(Document*);
 void markActiveObjectsForContext(JSC::JSGlobalData&, ScriptExecutionContext*);
 void markDOMObjectWrapper(JSC::JSGlobalData& globalData, void* object);
 
+JSC::Structure* getCachedDOMStructure(JSDOMGlobalObject*,
+                                      const JSC::ClassInfo*);
+JSC::Structure* cacheDOMStructure(JSDOMGlobalObject*,
+                                  PassRefPtr<JSC::Structure>,
+                                  const JSC::ClassInfo*);
 JSC::Structure* getCachedDOMStructure(JSC::ExecState*, const JSC::ClassInfo*);
 JSC::Structure* cacheDOMStructure(JSC::ExecState*,
                                   PassRefPtr<JSC::Structure>,
@@ -85,18 +90,28 @@ void cacheDOMConstructor(JSC::ExecState*,
                          JSC::JSObject* constructor);
 
 template <class WrapperClass>
-inline JSC::Structure* getDOMStructure(JSC::ExecState* exec) {
+inline JSC::Structure* getDOMStructure(JSC::ExecState* exec,
+                                       JSDOMGlobalObject* globalObject) {
   if (JSC::Structure* structure =
-          getCachedDOMStructure(exec, &WrapperClass::s_info))
+          getCachedDOMStructure(globalObject, &WrapperClass::s_info))
     return structure;
   return cacheDOMStructure(
-      exec, WrapperClass::createStructure(WrapperClass::createPrototype(exec)),
+      globalObject, WrapperClass::createStructure(
+                        WrapperClass::createPrototype(exec, globalObject)),
       &WrapperClass::s_info);
 }
 template <class WrapperClass>
-inline JSC::JSObject* getDOMPrototype(JSC::ExecState* exec) {
+inline JSC::Structure* getDOMStructure(JSC::ExecState* exec) {
+  return getDOMStructure<WrapperClass>(
+      exec, static_cast<JSDOMGlobalObject*>(exec->lexicalGlobalObject()));
+}
+template <class WrapperClass>
+inline JSC::JSObject* getDOMPrototype(JSC::ExecState* exec,
+                                      JSC::JSGlobalObject* globalObject) {
   return static_cast<JSC::JSObject*>(
-      asObject(getDOMStructure<WrapperClass>(exec)->storedPrototype()));
+      asObject(getDOMStructure<WrapperClass>(
+                   exec, static_cast<JSDOMGlobalObject*>(globalObject))
+                   ->storedPrototype()));
 }
 #define CREATE_DOM_OBJECT_WRAPPER(exec, className, object) \
   createDOMObjectWrapper<JS##className>(exec, static_cast<className*>(object))

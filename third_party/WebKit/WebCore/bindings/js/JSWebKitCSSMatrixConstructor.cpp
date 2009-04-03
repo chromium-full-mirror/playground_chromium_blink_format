@@ -40,7 +40,8 @@ JSWebKitCSSMatrixConstructor::JSWebKitCSSMatrixConstructor(ExecState* exec)
     : DOMObject(JSWebKitCSSMatrixConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())) {
   putDirect(exec->propertyNames().prototype,
-            JSWebKitCSSMatrixPrototype::self(exec), None);
+            JSWebKitCSSMatrixPrototype::self(exec, exec->lexicalGlobalObject()),
+            None);
   putDirect(exec->propertyNames().length, jsNumber(exec, 1),
             ReadOnly | DontDelete | DontEnum);
 }

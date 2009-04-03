@@ -54,8 +54,9 @@ class RuntimeArray : public JSObject {
 
   static const ClassInfo s_info;
 
-  static ArrayPrototype* createPrototype(ExecState* exec) {
-    return exec->lexicalGlobalObject()->arrayPrototype();
+  static ArrayPrototype* createPrototype(ExecState*,
+                                         JSGlobalObject* globalObject) {
+    return globalObject->arrayPrototype();
   }
 
   static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {

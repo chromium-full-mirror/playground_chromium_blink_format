@@ -46,7 +46,8 @@ JSMessageChannelConstructor::JSMessageChannelConstructor(
           exec->lexicalGlobalObject()->objectPrototype())),
       m_globalObject(toJSDOMGlobalObject(scriptExecutionContext)) {
   putDirect(exec->propertyNames().prototype,
-            JSMessageChannelPrototype::self(exec), None);
+            JSMessageChannelPrototype::self(exec, exec->lexicalGlobalObject()),
+            None);
 }
 
 JSMessageChannelConstructor::~JSMessageChannelConstructor() {}

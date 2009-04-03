@@ -58,8 +58,9 @@ class RuntimeObjectImp : public JSObject {
 
   static const ClassInfo s_info;
 
-  static ObjectPrototype* createPrototype(ExecState* exec) {
-    return exec->lexicalGlobalObject()->objectPrototype();
+  static ObjectPrototype* createPrototype(ExecState*,
+                                          JSGlobalObject* globalObject) {
+    return globalObject->objectPrototype();
   }
 
   static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {

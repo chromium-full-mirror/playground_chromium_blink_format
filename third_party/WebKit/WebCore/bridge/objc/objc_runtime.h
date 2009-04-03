@@ -107,8 +107,9 @@ class ObjcFallbackObjectImp : public JSObject {
 
   const Identifier& propertyName() const { return _item; }
 
-  static ObjectPrototype* createPrototype(ExecState* exec) {
-    return exec->lexicalGlobalObject()->objectPrototype();
+  static ObjectPrototype* createPrototype(ExecState*,
+                                          JSGlobalObject* globalObject) {
+    return globalObject->objectPrototype();
   }
 
   static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {

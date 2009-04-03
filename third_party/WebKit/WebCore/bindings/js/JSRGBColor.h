@@ -41,8 +41,10 @@ class JSRGBColor : public DOMObject {
 
   unsigned impl() const { return m_color; }
 
-  static JSC::ObjectPrototype* createPrototype(JSC::ExecState* exec) {
-    return exec->lexicalGlobalObject()->objectPrototype();
+  static JSC::ObjectPrototype* createPrototype(
+      JSC::ExecState*,
+      JSC::JSGlobalObject* globalObject) {
+    return globalObject->objectPrototype();
   }
 
   static PassRefPtr<JSC::Structure> createStructure(JSC::JSValuePtr prototype) {

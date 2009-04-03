@@ -40,8 +40,9 @@ class RuntimeMethod : public InternalFunction {
 
   static const ClassInfo s_info;
 
-  static FunctionPrototype* createPrototype(ExecState* exec) {
-    return exec->lexicalGlobalObject()->functionPrototype();
+  static FunctionPrototype* createPrototype(ExecState*,
+                                            JSGlobalObject* globalObject) {
+    return globalObject->functionPrototype();
   }
 
   static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {
