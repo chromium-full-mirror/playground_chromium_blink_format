@@ -104,7 +104,6 @@ void Pasteboard::writeSelection(Range* selectedRange,
                                 bool canSmartCopyOrDelete,
                                 Frame* frame) {
   GtkClipboard* clipboard = m_helper->getClipboard(frame);
-#if GTK_CHECK_VERSION(2, 10, 0)
   gchar* text = g_strdup(frame->selectedText().utf8().data());
   gchar* markup = g_strdup(
       createMarkup(selectedRange, 0, AnnotateForInterchange).utf8().data());
@@ -117,10 +116,6 @@ void Pasteboard::writeSelection(Range* selectedRange,
                               clipboard_get_contents_cb,
                               clipboard_clear_contents_cb, data);
   gtk_target_table_free(targets, n_targets);
-#else
-  gtk_clipboard_set_text(clipboard, frame->selectedText().utf8().data(),
-                         frame->selectedText().utf8().length());
-#endif
 }
 
 void Pasteboard::writeURL(const KURL& url, const String&, Frame* frame) {
@@ -170,11 +165,7 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     PassRefPtr<Range> context,
     bool allowPlainText,
     bool& chosePlainText) {
-#if GTK_CHECK_VERSION(2, 10, 0)
   GdkAtom textHtml = gdk_atom_intern_static_string("text/html");
-#else
-  GdkAtom textHtml = gdk_atom_intern("text/html", false);
-#endif
   GtkClipboard* clipboard = m_helper->getClipboard(frame);
   chosePlainText = false;
 

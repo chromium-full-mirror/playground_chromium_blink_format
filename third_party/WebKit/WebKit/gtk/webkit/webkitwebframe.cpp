@@ -587,8 +587,6 @@ gchar* webkit_web_frame_dump_render_tree(WebKitWebFrame* frame) {
   return g_strdup(string.utf8().data());
 }
 
-#if GTK_CHECK_VERSION(2, 10, 0)
-
 static void begin_print(GtkPrintOperation* op,
                         GtkPrintContext* context,
                         gpointer user_data) {
@@ -659,14 +657,6 @@ void webkit_web_frame_print(WebKitWebFrame* frame) {
     gtk_widget_show(dialog);
   }
 }
-
-#else
-
-void webkit_web_frame_print(WebKitWebFrame*) {
-  g_warning("Printing support is not available in older versions of GTK+");
-}
-
-#endif
 
 bool webkit_web_frame_pause_animation(WebKitWebFrame* frame,
                                       const gchar* name,

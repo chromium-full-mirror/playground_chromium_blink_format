@@ -157,7 +157,6 @@ void EditorClient::respondToChangedContents() {
   notImplemented();
 }
 
-#if GTK_CHECK_VERSION(2, 10, 0)
 static void clipboard_get_contents_cb(GtkClipboard* clipboard,
                                       GtkSelectionData* selection_data,
                                       guint info,
@@ -189,7 +188,6 @@ static void clipboard_clear_contents_cb(GtkClipboard* clipboard,
   frame->selection()->setBase(frame->selection()->extent(),
                               frame->selection()->affinity());
 }
-#endif
 
 void EditorClient::respondToChangedSelection() {
   WebKitWebViewPrivate* priv = m_webView->priv;
@@ -201,7 +199,6 @@ void EditorClient::respondToChangedSelection() {
   if (targetFrame->editor()->ignoreCompositionSelectionChange())
     return;
 
-#if GTK_CHECK_VERSION(2, 10, 0)
   GtkClipboard* clipboard =
       gtk_widget_get_clipboard(GTK_WIDGET(m_webView), GDK_SELECTION_PRIMARY);
   if (targetFrame->selection()->isRange()) {
@@ -215,7 +212,6 @@ void EditorClient::respondToChangedSelection() {
     gtk_target_table_free(targets, targetCount);
   } else if (gtk_clipboard_get_owner(clipboard) == G_OBJECT(m_webView))
     gtk_clipboard_clear(clipboard);
-#endif
 
   if (!targetFrame->editor()->hasComposition())
     return;
