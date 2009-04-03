@@ -118,6 +118,10 @@ bool JSLocation::customPut(ExecState* exec,
   if (!frame)
     return true;
 
+  if (propertyName == exec->propertyNames().toString ||
+      propertyName == exec->propertyNames().valueOf)
+    return true;
+
   bool sameDomainAccess = allowsAccessFromFrame(exec, frame);
 
   const HashEntry* entry =
@@ -152,6 +156,15 @@ bool JSLocation::customGetPropertyNames(ExecState* exec, PropertyNameArray&) {
   if (!allowsAccessFromFrame(exec, impl()->frame()))
     return true;
   return false;
+}
+
+void JSLocation::defineGetter(ExecState* exec,
+                              const Identifier& propertyName,
+                              JSObject* getterFunction) {
+  if (propertyName == exec->propertyNames().toString ||
+      propertyName == exec->propertyNames().valueOf)
+    return;
+  Base::defineGetter(exec, propertyName, getterFunction);
 }
 
 static void navigateIfAllowed(ExecState* exec,
@@ -340,6 +353,25 @@ JSValuePtr JSLocation::toString(ExecState* exec, const ArgList&) {
     return jsUndefined();
 
   return jsString(exec, impl()->toString());
+}
+
+bool JSLocationPrototype::customPut(ExecState* exec,
+                                    const Identifier& propertyName,
+                                    JSValuePtr,
+                                    PutPropertySlot&) {
+  if (propertyName == exec->propertyNames().toString ||
+      propertyName == exec->propertyNames().valueOf)
+    return true;
+  return false;
+}
+
+void JSLocationPrototype::defineGetter(ExecState* exec,
+                                       const Identifier& propertyName,
+                                       JSObject* getterFunction) {
+  if (propertyName == exec->propertyNames().toString ||
+      propertyName == exec->propertyNames().valueOf)
+    return;
+  Base::defineGetter(exec, propertyName, getterFunction);
 }
 
 }  // namespace WebCore
