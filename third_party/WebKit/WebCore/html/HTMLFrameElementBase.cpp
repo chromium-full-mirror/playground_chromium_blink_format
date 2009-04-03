@@ -44,9 +44,8 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLFrameElementBase::HTMLFrameElementBase(const QualifiedName& tagName,
-                                           Document* doc,
-                                           bool createdByParser)
-    : HTMLFrameOwnerElement(tagName, doc, createdByParser),
+                                           Document* document)
+    : HTMLFrameOwnerElement(tagName, document),
       m_scrolling(ScrollbarAuto),
       m_marginWidth(-1),
       m_marginHeight(-1),

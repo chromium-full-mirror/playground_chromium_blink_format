@@ -647,11 +647,9 @@ void FrameLoader::submitForm(const char* action,
   if (Page* targetPage = targetFrame->page()) {
     Frame* mainFrame = targetPage->mainFrame();
     if (mainFrame != targetFrame) {
-      HTMLFrameOwnerElement* owner = targetFrame->ownerElement();
       Document* document = mainFrame->document();
-      if (owner && !owner->createdByParser() &&
-          (!mainFrame->loader()->isComplete() ||
-           document && document->processingLoadEvent()))
+      if (!mainFrame->loader()->isComplete() ||
+          document && document->processingLoadEvent())
         lockBackForwardList = true;
     }
   }

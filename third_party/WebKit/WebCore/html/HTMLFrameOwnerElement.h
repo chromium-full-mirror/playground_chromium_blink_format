@@ -35,9 +35,7 @@ class SVGDocument;
 
 class HTMLFrameOwnerElement : public HTMLElement {
  protected:
-  HTMLFrameOwnerElement(const QualifiedName& tagName,
-                        Document*,
-                        bool createdByParser);
+  HTMLFrameOwnerElement(const QualifiedName& tagName, Document*);
 
  public:
   virtual ~HTMLFrameOwnerElement();
@@ -53,8 +51,6 @@ class HTMLFrameOwnerElement : public HTMLElement {
     return m_contentFrame;
   }
 
-  bool createdByParser() const { return m_createdByParser; }
-
   virtual ScrollbarMode scrollingMode() const { return ScrollbarAuto; }
 
 #if ENABLE(SVG)
@@ -64,7 +60,6 @@ class HTMLFrameOwnerElement : public HTMLElement {
  private:
   friend class Frame;
   Frame* m_contentFrame;
-  bool m_createdByParser;
 };
 
 }  // namespace WebCore

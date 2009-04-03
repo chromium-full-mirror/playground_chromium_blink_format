@@ -34,9 +34,8 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLFrameElement::HTMLFrameElement(const QualifiedName& tagName,
-                                   Document* doc,
-                                   bool createdByParser)
-    : HTMLFrameElementBase(tagName, doc, createdByParser),
+                                   Document* document)
+    : HTMLFrameElementBase(tagName, document),
       m_frameBorder(true),
       m_frameBorderSet(false) {
   ASSERT(hasTagName(frameTag));

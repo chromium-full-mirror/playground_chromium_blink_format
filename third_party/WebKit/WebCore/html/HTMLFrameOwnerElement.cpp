@@ -33,11 +33,8 @@
 namespace WebCore {
 
 HTMLFrameOwnerElement::HTMLFrameOwnerElement(const QualifiedName& tagName,
-                                             Document* document,
-                                             bool createdByParser)
-    : HTMLElement(tagName, document),
-      m_contentFrame(0),
-      m_createdByParser(createdByParser) {}
+                                             Document* document)
+    : HTMLElement(tagName, document), m_contentFrame(0) {}
 
 void HTMLFrameOwnerElement::willRemove() {
   if (Frame* frame = contentFrame()) {
