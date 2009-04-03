@@ -34,7 +34,9 @@
 #if ENABLE(WORKERS)
 
 #include <v8.h>
+#include "V8EventListenerList.h"
 #include "V8Index.h"
+#include <wtf/OwnPtr.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -106,7 +108,7 @@ class WorkerContextExecutionProxy {
   v8::Persistent<v8::Context> m_context;
   int m_recursion;
 
-  Vector<V8WorkerContextEventListener*> m_listeners;
+  OwnPtr<V8EventListenerList> m_listeners;
   Vector<Event*> m_events;
 };
 
