@@ -2022,7 +2022,7 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
 
       // If a key is pressed while the autoscroll/panScroll is in progress then
       // we want to stop
-      if (initialKeyEvent.keyIdentifier() == escKeyId &&
+      if (initialKeyEvent.keyIdentifier() == escapeKeyIdentifier &&
           initialKeyEvent.type() == PlatformKeyboardEvent::KeyUp)
         stopAutoscrollTimer();
 
