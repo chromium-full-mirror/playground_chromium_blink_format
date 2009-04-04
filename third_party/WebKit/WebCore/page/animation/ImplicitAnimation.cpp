@@ -239,6 +239,13 @@ bool ImplicitAnimation::isTargetPropertyEqual(int prop,
 
 void ImplicitAnimation::blendPropertyValueInStyle(int prop,
                                                   RenderStyle* currentStyle) {
+  // We should never add a transition with a 0 duration and delay. But if we
+  // ever did
+  // it would have a null toStyle. So just in case, let's check that here. (See
+  // <https://bugs.webkit.org/show_bug.cgi?id=24787>
+  if (!m_toStyle)
+    return;
+
   blendProperties(this, prop, currentStyle, m_fromStyle.get(), m_toStyle.get(),
                   progress(1, 0, 0));
 }
