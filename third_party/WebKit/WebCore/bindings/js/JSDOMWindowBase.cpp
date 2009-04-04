@@ -189,10 +189,7 @@ void JSDOMWindowBase::updateDocument() {
                                DontDelete | ReadOnly);
 }
 
-JSDOMWindowBase::~JSDOMWindowBase() {
-  if (d()->impl->frame())
-    d()->impl->frame()->script()->clearFormerWindow(asJSDOMWindow(this));
-}
+JSDOMWindowBase::~JSDOMWindowBase() {}
 
 ScriptExecutionContext* JSDOMWindowBase::scriptExecutionContext() const {
   return d()->impl->document();
