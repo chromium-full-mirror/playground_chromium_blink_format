@@ -23,11 +23,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
+#include "fontprops.h"
+
 #include <ApplicationServices/ApplicationServices.h>
 
 #include <wx/defs.h>
 #include <wx/gdicmn.h>
-#include "fontprops.h"
+
+#ifdef BUILDING_ON_TIGER
+void (*wkGetFontMetrics)(CGFontRef,
+                         int* ascent,
+                         int* descent,
+                         int* lineGap,
+                         unsigned* unitsPerEm);
+#endif
 
 const float smallCapsFontSizeMultiplier = 0.7f;
 const float contextDPI = 72.0f;
@@ -54,7 +64,7 @@ wxFontProperties::wxFontProperties(wxFont* font)
     int iAscent;
     int iDescent;
     int iLineGap;
-    float unitsPerEm;
+    unsigned unitsPerEm;
 #ifdef BUILDING_ON_TIGER
     wkGetFontMetrics(cgFont, &iAscent, &iDescent, &iLineGap, &unitsPerEm);
 #else
