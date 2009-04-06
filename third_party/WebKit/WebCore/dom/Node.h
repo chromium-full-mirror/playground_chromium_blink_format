@@ -664,6 +664,13 @@ class Node : public EventTarget, public TreeShared<Node> {
   void dispatchWebKitTransitionEvent(const AtomicString& eventType,
                                      const String& propertyName,
                                      double elapsedTime);
+  void dispatchMutationEvent(const AtomicString& type,
+                             bool canBubble,
+                             PassRefPtr<Node> relatedNode,
+                             const String& prevValue,
+                             const String& newValue,
+                             ExceptionCode&);
+
   bool dispatchGenericEvent(PassRefPtr<Event>);
 
   virtual void handleLocalEvents(Event*, bool useCapture);
