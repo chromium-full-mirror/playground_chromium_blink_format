@@ -31,7 +31,6 @@
 #include "ChromiumBridge.h"
 #include "CSSStyleSheet.h"
 #include "CSSValueKeywords.h"
-#include "Document.h"
 #include "FontSelector.h"
 #include "FontUtilsChromiumWin.h"
 #include "GraphicsContext.h"
@@ -197,21 +196,7 @@ static float systemFontSize(const LOGFONT& font) {
 // FIXME: The only case where we know we don't match IE is for ANSI encodings.
 // IE uses MS Shell Dlg there, which we render incorrectly at certain pixel
 // sizes (e.g. 15px). So, for now we just use Arial.
-static wchar_t* defaultGUIFont(Document* document) {
-  UScriptCode dominantScript = document->dominantScript();
-  const wchar_t* family = NULL;
-
-  // FIXME: Special-casing of Latin/Greeek/Cyrillic should go away once
-  // GetFontFamilyForScript is enhanced to support GenericFamilyType for
-  // real. For now, we make sure that we use Arial to match IE for those
-  // scripts.
-  if (dominantScript != USCRIPT_LATIN && dominantScript != USCRIPT_CYRILLIC &&
-      dominantScript != USCRIPT_GREEK &&
-      dominantScript != USCRIPT_INVALID_CODE) {
-    family = getFontFamilyForScript(dominantScript, FontDescription::NoFamily);
-    if (family)
-      return const_cast<wchar_t*>(family);
-  }
+static wchar_t* defaultGUIFont() {
   return L"Arial";
 }
 
@@ -319,7 +304,6 @@ double RenderThemeChromiumWin::caretBlinkInterval() const {
 
 void RenderThemeChromiumWin::systemFont(
     int propId,
-    Document* document,
     FontDescription& fontDescription) const {
   // This logic owes much to RenderThemeSafari.cpp.
   FontDescription* cachedDesc = NULL;
@@ -356,12 +340,12 @@ void RenderThemeChromiumWin::systemFont(
     case CSSValueWebkitMiniControl:
     case CSSValueWebkitSmallControl:
     case CSSValueWebkitControl:
-      faceName = defaultGUIFont(document);
+      faceName = defaultGUIFont();
       // Why 2 points smaller?  Because that's what Gecko does.
       fontSize = defaultFontSize - pointsToPixels(2);
       break;
     default:
-      faceName = defaultGUIFont(document);
+      faceName = defaultGUIFont();
       fontSize = defaultFontSize;
       break;
   }

@@ -67,7 +67,7 @@ class RenderThemeChromiumWin : public RenderTheme {
   virtual double caretBlinkInterval() const;
 
   // System fonts.
-  virtual void systemFont(int propId, Document*, FontDescription&) const;
+  virtual void systemFont(int propId, FontDescription&) const;
 
   virtual int minimumMenuListSize(RenderStyle*) const;
 

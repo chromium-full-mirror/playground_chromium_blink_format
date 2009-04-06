@@ -152,11 +152,4 @@ FontPlatformData* FontCache::createFontPlatformData(
   return result;
 }
 
-AtomicString FontCache::getGenericFontForScript(
-    UScriptCode script,
-    const FontDescription& descript) {
-  notImplemented();
-  return AtomicString();
-}
-
 }  // namespace WebCore
