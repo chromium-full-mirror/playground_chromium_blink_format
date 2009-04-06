@@ -184,8 +184,8 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   QSize contentsSize() const;
 
   QWebElement documentElement() const;
-  QWebElementSelection selectElements(const QString& query) const;
-  QWebElement selectElement(const QString& query) const;
+  QWebElementSelection findAllElements(const QString& query) const;
+  QWebElement findFirstElement(const QString& query) const;
 
   QWebHitTestResult hitTestContent(const QPoint& pos) const;
 

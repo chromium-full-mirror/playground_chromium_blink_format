@@ -186,7 +186,7 @@ class MainWindow : public QMainWindow {
                               QLineEdit::Normal, "a", &ok);
     if (ok && !str.isEmpty()) {
       QWebElementSelection result =
-          view->page()->mainFrame()->selectElements(str);
+          view->page()->mainFrame()->findAllElements(str);
       foreach (QWebElement e, result)
         e.setStyleProperty("background-color", "yellow");
       statusBar()->showMessage(

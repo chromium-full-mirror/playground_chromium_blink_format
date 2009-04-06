@@ -50,8 +50,8 @@ class QWEBKIT_EXPORT QWebElement {
 
   bool isNull() const;
 
-  QWebElementSelection select(const QString& query) const;
-  QWebElement selectFirst(const QString& query) const;
+  QWebElementSelection findAll(const QString& query) const;
+  QWebElement findFirst(const QString& query) const;
 
   void setText(const QString& text);
   QString text() const;
