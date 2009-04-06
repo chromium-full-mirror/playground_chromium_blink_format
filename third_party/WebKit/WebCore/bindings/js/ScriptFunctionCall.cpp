@@ -44,7 +44,7 @@ namespace WebCore {
 
 ScriptFunctionCall::ScriptFunctionCall(ScriptState* exec,
                                        const ScriptObject& thisObject,
-                                       const char* name)
+                                       const String& name)
     : m_exec(exec), m_thisObject(thisObject), m_name(name) {}
 
 void ScriptFunctionCall::appendArgument(const ScriptObject& argument) {

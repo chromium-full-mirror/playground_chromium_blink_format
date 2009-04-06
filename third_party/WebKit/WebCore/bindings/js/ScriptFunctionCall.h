@@ -50,7 +50,7 @@ class ScriptFunctionCall {
  public:
   ScriptFunctionCall(ScriptState* exec,
                      const ScriptObject& thisObject,
-                     const char* name);
+                     const String& name);
   virtual ~ScriptFunctionCall(){};
 
   void appendArgument(const ScriptObject&);
