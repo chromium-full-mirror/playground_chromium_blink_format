@@ -1804,6 +1804,10 @@ static void webkit_web_view_screen_changed(WebKitWebView* webView,
                                            GdkScreen* previousScreen,
                                            gpointer userdata) {
   WebKitWebViewPrivate* priv = webView->priv;
+
+  if (priv->disposing)
+    return;
+
   WebKitWebSettings* webSettings = priv->webSettings;
   Settings* settings = core(webView)->settings();
   gdouble DPI = webViewGetDPI(webView);
