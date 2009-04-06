@@ -253,6 +253,9 @@ QVariant convertValueToQVariant(ExecState* exec,
                                 JSValuePtr value,
                                 QMetaType::Type hint,
                                 int* distance);
+JSValuePtr convertQVariantToValue(ExecState* exec,
+                                  PassRefPtr<RootObject> root,
+                                  const QVariant& variant);
 
 }  // namespace Bindings
 }  // namespace JSC
