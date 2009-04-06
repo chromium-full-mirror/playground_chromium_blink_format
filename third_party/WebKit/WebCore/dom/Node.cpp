@@ -2502,7 +2502,7 @@ doneWithDefault:
   return !event->defaultPrevented();
 }
 
-bool Node::dispatchSubtreeModifiedEvent() {
+void Node::dispatchSubtreeModifiedEvent() {
   ASSERT(!eventDispatchForbidden());
 
   document()->incDOMTreeVersion();
@@ -2512,9 +2512,10 @@ bool Node::dispatchSubtreeModifiedEvent() {
                                       // changing.
 
   if (!document()->hasListenerType(Document::DOMSUBTREEMODIFIED_LISTENER))
-    return false;
+    return;
+
   ExceptionCode ec = 0;
-  return dispatchEvent(
+  dispatchEvent(
       MutationEvent::create(eventNames().DOMSubtreeModifiedEvent, true, false,
                             0, String(), String(), String(), 0),
       ec);
@@ -2550,7 +2551,7 @@ void Node::dispatchWindowEvent(const AtomicString& eventType,
   }
 }
 
-bool Node::dispatchUIEvent(const AtomicString& eventType,
+void Node::dispatchUIEvent(const AtomicString& eventType,
                            int detail,
                            PassRefPtr<Event> underlyingEvent) {
   ASSERT(!eventDispatchForbidden());
@@ -2564,7 +2565,7 @@ bool Node::dispatchUIEvent(const AtomicString& eventType,
   RefPtr<UIEvent> evt = UIEvent::create(eventType, true, cancelable,
                                         document()->defaultView(), detail);
   evt->setUnderlyingEvent(underlyingEvent);
-  return dispatchEvent(evt.release(), ec);
+  dispatchEvent(evt.release(), ec);
 }
 
 bool Node::dispatchKeyEvent(const PlatformKeyboardEvent& key) {
@@ -2767,23 +2768,23 @@ void Node::dispatchWheelEvent(PlatformWheelEvent& e) {
     e.accept();
 }
 
-bool Node::dispatchWebKitAnimationEvent(const AtomicString& eventType,
+void Node::dispatchWebKitAnimationEvent(const AtomicString& eventType,
                                         const String& animationName,
                                         double elapsedTime) {
   ASSERT(!eventDispatchForbidden());
 
   ExceptionCode ec = 0;
-  return dispatchEvent(
+  dispatchEvent(
       WebKitAnimationEvent::create(eventType, animationName, elapsedTime), ec);
 }
 
-bool Node::dispatchWebKitTransitionEvent(const AtomicString& eventType,
+void Node::dispatchWebKitTransitionEvent(const AtomicString& eventType,
                                          const String& propertyName,
                                          double elapsedTime) {
   ASSERT(!eventDispatchForbidden());
 
   ExceptionCode ec = 0;
-  return dispatchEvent(
+  dispatchEvent(
       WebKitTransitionEvent::create(eventType, propertyName, elapsedTime), ec);
 }
 
@@ -2804,15 +2805,15 @@ bool Node::dispatchEventForType(const AtomicString& eventType,
                        ec);
 }
 
-bool Node::dispatchProgressEvent(const AtomicString& eventType,
+void Node::dispatchProgressEvent(const AtomicString& eventType,
                                  bool lengthComputableArg,
                                  unsigned loadedArg,
                                  unsigned totalArg) {
   ASSERT(!eventDispatchForbidden());
   ExceptionCode ec = 0;
-  return dispatchEvent(ProgressEvent::create(eventType, lengthComputableArg,
-                                             loadedArg, totalArg),
-                       ec);
+  dispatchEvent(ProgressEvent::create(eventType, lengthComputableArg, loadedArg,
+                                      totalArg),
+                ec);
 }
 
 void Node::dispatchStorageEvent(const AtomicString& eventType,

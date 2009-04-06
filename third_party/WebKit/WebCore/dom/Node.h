@@ -616,12 +616,12 @@ class Node : public EventTarget, public TreeShared<Node> {
   EventListener* inlineEventListenerForType(
       const AtomicString& eventType) const;
 
-  bool dispatchSubtreeModifiedEvent();
+  void dispatchSubtreeModifiedEvent();
   void dispatchWindowEvent(PassRefPtr<Event>);
   void dispatchWindowEvent(const AtomicString& eventType,
                            bool canBubble,
                            bool cancelable);
-  bool dispatchUIEvent(const AtomicString& eventType,
+  void dispatchUIEvent(const AtomicString& eventType,
                        int detail = 0,
                        PassRefPtr<Event> underlyingEvent = 0);
   bool dispatchKeyEvent(const PlatformKeyboardEvent&);
@@ -649,7 +649,7 @@ class Node : public EventTarget, public TreeShared<Node> {
   void dispatchSimulatedClick(PassRefPtr<Event> underlyingEvent,
                               bool sendMouseEvents = false,
                               bool showPressedLook = true);
-  bool dispatchProgressEvent(const AtomicString& eventType,
+  void dispatchProgressEvent(const AtomicString& eventType,
                              bool lengthComputableArg,
                              unsigned loadedArg,
                              unsigned totalArg);
@@ -658,10 +658,10 @@ class Node : public EventTarget, public TreeShared<Node> {
                             const String& oldValue,
                             const String& newValue,
                             Frame* source);
-  bool dispatchWebKitAnimationEvent(const AtomicString& eventType,
+  void dispatchWebKitAnimationEvent(const AtomicString& eventType,
                                     const String& animationName,
                                     double elapsedTime);
-  bool dispatchWebKitTransitionEvent(const AtomicString& eventType,
+  void dispatchWebKitTransitionEvent(const AtomicString& eventType,
                                      const String& propertyName,
                                      double elapsedTime);
   bool dispatchGenericEvent(PassRefPtr<Event>);
