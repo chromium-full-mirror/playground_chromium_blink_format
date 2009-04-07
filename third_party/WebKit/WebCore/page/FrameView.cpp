@@ -1441,4 +1441,11 @@ void FrameView::adjustPageHeight(float* newBottom,
     *newBottom = oldBottom;
 }
 
+IntSize FrameView::minimumContentsSize() const {
+  RenderView* root = m_frame->contentRenderer();
+  if (!root)
+    return ScrollView::minimumContentsSize();
+  return IntSize(root->docWidth(), root->docHeight());
+}
+
 }  // namespace WebCore

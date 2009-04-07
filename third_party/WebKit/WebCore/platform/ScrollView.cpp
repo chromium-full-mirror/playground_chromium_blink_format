@@ -337,22 +337,24 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
           hasHorizontalScrollbar != oldHasHorizontal)
         visibleContentsResized();
 
+      IntSize docSize = minimumContentsSize();
+
       scrollsVertically =
           (vScroll == ScrollbarAlwaysOn) ||
-          (vScroll == ScrollbarAuto && contentsHeight() > height());
+          (vScroll == ScrollbarAuto && docSize.height() > height());
       if (scrollsVertically)
         scrollsHorizontally = (hScroll == ScrollbarAlwaysOn) ||
                               (hScroll == ScrollbarAuto &&
-                               contentsWidth() + scrollbarThickness > width());
+                               docSize.width() + scrollbarThickness > width());
       else {
         scrollsHorizontally =
             (hScroll == ScrollbarAlwaysOn) ||
-            (hScroll == ScrollbarAuto && contentsWidth() > width());
+            (hScroll == ScrollbarAuto && docSize.width() > width());
         if (scrollsHorizontally)
           scrollsVertically =
               (vScroll == ScrollbarAlwaysOn) ||
               (vScroll == ScrollbarAuto &&
-               contentsHeight() + scrollbarThickness > height());
+               docSize.height() + scrollbarThickness > height());
       }
     } else {
       scrollsHorizontally = (hScroll == ScrollbarAuto)
