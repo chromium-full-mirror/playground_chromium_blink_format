@@ -56,7 +56,7 @@ class JSLazyEventListener : public JSProtectedEventListener {
                       Node*,
                       int lineNumber);
 
-  virtual JSC::JSObject* function() const;
+  virtual JSC::JSObject* jsFunction() const;
   virtual bool wasCreatedFromMarkup() const { return true; }
 
   void parseCode() const;

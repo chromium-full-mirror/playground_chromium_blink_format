@@ -38,7 +38,7 @@ class EventListener : public RefCounted<EventListener> {
   virtual bool wasCreatedFromMarkup() const { return false; }
 
 #if USE(JSC)
-  virtual JSC::JSObject* function() const { return 0; }
+  virtual JSC::JSObject* jsFunction() const { return 0; }
   virtual void mark() {}
 #endif
 
