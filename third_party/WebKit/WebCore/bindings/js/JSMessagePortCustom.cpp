@@ -58,7 +58,7 @@ void JSMessagePort::mark() {
        mapIter != eventListeners.end(); ++mapIter) {
     for (ListenerVector::iterator vecIter = mapIter->second.begin();
          vecIter != mapIter->second.end(); ++vecIter)
-      (*vecIter)->mark();
+      (*vecIter)->markJSFunction();
   }
 }
 

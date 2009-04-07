@@ -39,7 +39,8 @@ class EventListener : public RefCounted<EventListener> {
 
 #if USE(JSC)
   virtual JSC::JSObject* jsFunction() const { return 0; }
-  virtual void mark() {}
+  virtual void clearJSFunction() {}
+  virtual void markJSFunction() {}
 #endif
 
   bool isInline() const { return virtualIsInline(); }
@@ -51,7 +52,7 @@ class EventListener : public RefCounted<EventListener> {
 #if USE(JSC)
 inline void markIfNotNull(EventListener* listener) {
   if (listener)
-    listener->mark();
+    listener->markJSFunction();
 }
 #endif
 }
