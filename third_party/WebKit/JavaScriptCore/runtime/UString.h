@@ -77,7 +77,10 @@ class UString {
   struct Rep : Noncopyable {
     friend class JIT;
 
-    static PassRefPtr<Rep> create(UChar*, int);
+    static PassRefPtr<Rep> create(UChar* buffer, int length) {
+      return adoptRef(new BaseString(buffer, length));
+    }
+
     static PassRefPtr<Rep> createCopying(const UChar*, int);
     static PassRefPtr<Rep> create(PassRefPtr<Rep> base, int offset, int length);
 
@@ -146,20 +149,42 @@ class UString {
              // case in destroy() guarantees that these do not get deleted.
     mutable unsigned _hash;
     PtrAndFlags<IdentifierTable, UStringFlags> m_identifierTableAndFlags;
-    void* m_baseString;  // If "this" is a BaseString instance, it is 0.
-                         // BaseString* otherwise.
 
     static BaseString& null() { return *nullBaseString; }
     static BaseString& empty() { return *emptyBaseString; }
 
+   protected:
+    Rep(int length) : offset(0), len(length), rc(1), _hash(0), m_nothing(0) {}
+
+    Rep(PassRefPtr<BaseString> base, int offsetInBase, int length)
+        : offset(offsetInBase),
+          len(length),
+          rc(1),
+          _hash(0),
+          m_baseString(base.releaseRef()) {
+      checkConsistency();
+    }
+
+    union {
+      // If !baseIsSelf()
+      BaseString* m_baseString;
+      // If baseIsSelf()
+      void* m_nothing;
+    };
+
    private:
+    // For SmallStringStorage which allocates an array and does initialization
+    // manually.
+    Rep() {}
+
+    friend class SmallStringsStorage;
     friend void initializeUString();
     static BaseString* nullBaseString;
     static BaseString* emptyBaseString;
   };
 
   struct BaseString : public Rep {
-    BaseString() { m_identifierTableAndFlags.setFlag(BaseStringFlag); }
+    bool isShared() { return rc != 1; }
 
     // potentially shared data.
     UChar* buf;
@@ -169,6 +194,23 @@ class UString {
     int usedCapacity;
 
     size_t reportedCost;
+
+   private:
+    BaseString(UChar* buffer, int length)
+        : Rep(length),
+          buf(buffer),
+          preCapacity(0),
+          usedPreCapacity(0),
+          capacity(length),
+          usedCapacity(length),
+          reportedCost(0) {
+      m_identifierTableAndFlags.setFlag(BaseStringFlag);
+      checkConsistency();
+    }
+
+    friend struct Rep;
+    friend class SmallStringsStorage;
+    friend void initializeUString();
   };
 
  public:
@@ -322,6 +364,22 @@ int compare(const UString&, const UString&);
 
 bool equal(const UString::Rep*, const UString::Rep*);
 
+inline PassRefPtr<UString::Rep>
+UString::Rep::create(PassRefPtr<UString::Rep> rep, int offset, int length) {
+  ASSERT(rep);
+  rep->checkConsistency();
+
+  int repOffset = rep->offset;
+
+  PassRefPtr<BaseString> base = rep->baseString();
+
+  ASSERT(-(offset + repOffset) <= base->usedPreCapacity);
+  ASSERT(offset + repOffset + length <= base->usedCapacity);
+
+  // Steal the single reference this Rep was created with.
+  return adoptRef(new Rep(base, repOffset + offset, length));
+}
+
 inline UChar* UString::Rep::data() const {
   const BaseString* base = baseString();
   return base->buf + base->preCapacity + offset;
@@ -337,15 +395,16 @@ inline void UString::Rep::setStatic(bool v) {
 
 inline void UString::Rep::setBaseString(PassRefPtr<BaseString> base) {
   ASSERT(base != this);
+  ASSERT(!baseIsSelf());
   m_baseString = base.releaseRef();
 }
 
 inline UString::BaseString* UString::Rep::baseString() {
-  return reinterpret_cast<BaseString*>(baseIsSelf() ? this : m_baseString);
+  return baseIsSelf() ? reinterpret_cast<BaseString*>(this) : m_baseString;
 }
 
 inline const UString::BaseString* UString::Rep::baseString() const {
-  return const_cast<const BaseString*>(const_cast<Rep*>(this)->baseString());
+  return const_cast<Rep*>(this)->baseString();
 }
 
 #ifdef NDEBUG
