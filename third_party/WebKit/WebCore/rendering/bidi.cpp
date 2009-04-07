@@ -677,8 +677,8 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
       // left.
       if (style()->direction() == LTR) {
         if (totWidth > availableWidth && trailingSpaceRun)
-          trailingSpaceRun->m_box->setWidth(trailingSpaceRun->m_box->width() -
-                                            totWidth + availableWidth);
+          trailingSpaceRun->m_box->setWidth(max(
+              0, trailingSpaceRun->m_box->width() - totWidth + availableWidth));
       } else {
         if (trailingSpaceRun)
           trailingSpaceRun->m_box->setWidth(0);
@@ -700,8 +700,8 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
       // for right to left fall through to right aligned
       if (style()->direction() == LTR) {
         if (totWidth > availableWidth && trailingSpaceRun)
-          trailingSpaceRun->m_box->setWidth(trailingSpaceRun->m_box->width() -
-                                            totWidth + availableWidth);
+          trailingSpaceRun->m_box->setWidth(max(
+              0, trailingSpaceRun->m_box->width() - totWidth + availableWidth));
         break;
       }
     case RIGHT:
@@ -719,8 +719,8 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
           x += availableWidth - totWidth;
       } else {
         if (totWidth > availableWidth && trailingSpaceRun) {
-          trailingSpaceRun->m_box->setWidth(trailingSpaceRun->m_box->width() -
-                                            totWidth + availableWidth);
+          trailingSpaceRun->m_box->setWidth(max(
+              0, trailingSpaceRun->m_box->width() - totWidth + availableWidth));
           totWidth -= trailingSpaceRun->m_box->width();
         } else
           x += availableWidth - totWidth;
@@ -733,7 +733,7 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
         totWidth -= trailingSpaceRun->m_box->width();
         trailingSpaceWidth = min(trailingSpaceRun->m_box->width(),
                                  (availableWidth - totWidth + 1) / 2);
-        trailingSpaceRun->m_box->setWidth(trailingSpaceWidth);
+        trailingSpaceRun->m_box->setWidth(max(0, trailingSpaceWidth));
       }
       if (style()->direction() == LTR)
         x += max((availableWidth - totWidth) / 2, 0);
@@ -1023,7 +1023,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         if (!previousLineBrokeCleanly && resolver.runCount() &&
             resolver.logicallyLastRun()
                 ->m_object->style()
-                ->breakOnlyAfterWhiteSpace()) {
+                ->breakOnlyAfterWhiteSpace() &&
+            resolver.logicallyLastRun()->m_object->style()->autoWrap()) {
           trailingSpaceRun = resolver.logicallyLastRun();
           RenderObject* lastObject = trailingSpaceRun->m_object;
           if (lastObject->isText()) {
