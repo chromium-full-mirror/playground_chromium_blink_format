@@ -186,6 +186,8 @@ class RenderLayer : public ScrollbarClient {
                                                         // coordinate space of
                                                         // the layer's render
                                                         // object
+  void repaintIncludingNonCompositingDescendants(
+      RenderBoxModelObject* repaintContainer);
 #endif
 
   void styleChanged(StyleDifference, const RenderStyle*);

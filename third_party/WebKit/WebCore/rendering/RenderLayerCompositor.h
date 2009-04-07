@@ -66,8 +66,14 @@ class RenderLayerCompositor {
   void updateCompositingLayers(RenderLayer* updateRoot = 0);
 
   // Update the compositing state of the given layer. Returns true if that state
-  // changed
-  bool updateLayerCompositingState(RenderLayer*);
+  // changed.
+  enum CompositingChangeRepaint {
+    CompositingChangeRepaintNow,
+    CompositingChangeWillRepaintLater
+  };
+  bool updateLayerCompositingState(
+      RenderLayer*,
+      CompositingChangeRepaint = CompositingChangeRepaintNow);
 
   // Whether layer's backing needs a graphics layer to do clipping by an
   // ancestor (non-stacking-context parent with overflow).
@@ -85,6 +91,10 @@ class RenderLayerCompositor {
   IntRect calculateCompositedBounds(const RenderLayer* layer,
                                     const RenderLayer* ancestorLayer,
                                     IntRect* layerBoundingBox = 0);
+
+  // Repaint the appropriate layers when the given RenderLayer starts or stops
+  // being composited.
+  void repaintOnCompositingChange(RenderLayer*);
 
   // Notify us that a layer has been added or removed
   void layerWasAdded(RenderLayer* parent, RenderLayer* child);

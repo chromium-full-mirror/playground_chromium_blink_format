@@ -3298,6 +3298,20 @@ void RenderLayer::setBackingNeedsRepaintInRect(const IntRect& r) {
   } else
     backing()->setContentsNeedDisplayInRect(r);
 }
+
+// Since we're only painting non-composited layers, we know that they all share
+// the same repaintContainer.
+void RenderLayer::repaintIncludingNonCompositingDescendants(
+    RenderBoxModelObject* repaintContainer) {
+  renderer()->repaintUsingContainer(
+      repaintContainer,
+      renderer()->clippedOverflowRectForRepaint(repaintContainer));
+
+  for (RenderLayer* curr = firstChild(); curr; curr = curr->nextSibling()) {
+    if (!curr->isComposited())
+      curr->repaintIncludingNonCompositingDescendants(repaintContainer);
+  }
+}
 #endif
 
 bool RenderLayer::shouldBeNormalFlowOnly() const {

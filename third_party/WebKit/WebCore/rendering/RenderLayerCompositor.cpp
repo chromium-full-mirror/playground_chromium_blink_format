@@ -174,20 +174,18 @@ void RenderLayerCompositor::updateCompositingLayers(RenderLayer* updateRoot) {
   ASSERT(updateRoot || !m_compositingLayersNeedUpdate);
 }
 
-bool RenderLayerCompositor::updateLayerCompositingState(RenderLayer* layer) {
+bool RenderLayerCompositor::updateLayerCompositingState(
+    RenderLayer* layer,
+    CompositingChangeRepaint shouldRepaint) {
   bool needsLayer = needsToBeComposited(layer);
   bool layerChanged = false;
-
-  RenderBoxModelObject* repaintContainer = 0;
-  IntRect repaintRect;
 
   if (needsLayer) {
     enableCompositingMode();
     if (!layer->backing()) {
-      // Get the repaint container before we make backing for this layer
-      repaintContainer = layer->renderer()->containerForRepaint();
-      repaintRect = calculateCompositedBounds(
-          layer, repaintContainer ? repaintContainer->layer() : layer->root());
+      // If we need to repaint, do so before making backing
+      if (shouldRepaint == CompositingChangeRepaintNow)
+        repaintOnCompositingChange(layer);
 
       layer->ensureBacking();
       layerChanged = true;
@@ -195,23 +193,11 @@ bool RenderLayerCompositor::updateLayerCompositingState(RenderLayer* layer) {
   } else {
     if (layer->backing()) {
       layer->clearBacking();
-      // Get the repaint container now that we've cleared the backing
-      repaintContainer = layer->renderer()->containerForRepaint();
-      repaintRect = calculateCompositedBounds(
-          layer, repaintContainer ? repaintContainer->layer() : layer->root());
       layerChanged = true;
-    }
-  }
 
-  if (layerChanged) {
-    // Invalidate the destination into which this layer used to render.
-    layer->renderer()->repaintUsingContainer(repaintContainer, repaintRect);
-
-    if (!repaintContainer || repaintContainer == m_renderView) {
-      // The contents of this layer may be moving between the window
-      // and a GraphicsLayer, so we need to make sure the window system
-      // synchronizes those changes on the screen.
-      m_renderView->frameView()->setNeedsOneShotDrawingSynchronization();
+      // If we need to repaint, do so now that we've removed the backing
+      if (shouldRepaint == CompositingChangeRepaintNow)
+        repaintOnCompositingChange(layer);
     }
   }
 
@@ -222,6 +208,21 @@ bool RenderLayerCompositor::updateLayerCompositingState(RenderLayer* layer) {
     layerChanged = true;
 
   return layerChanged;
+}
+
+void RenderLayerCompositor::repaintOnCompositingChange(RenderLayer* layer) {
+  RenderBoxModelObject* repaintContainer =
+      layer->renderer()->containerForRepaint();
+  if (!repaintContainer)
+    repaintContainer = m_renderView;
+
+  layer->repaintIncludingNonCompositingDescendants(repaintContainer);
+  if (repaintContainer == m_renderView) {
+    // The contents of this layer may be moving between the window
+    // and a GraphicsLayer, so we need to make sure the window system
+    // synchronizes those changes on the screen.
+    m_renderView->frameView()->setNeedsOneShotDrawingSynchronization();
+  }
 }
 
 // The bounds of the GraphicsLayer created for a compositing layer is the union
@@ -357,11 +358,15 @@ void RenderLayerCompositor::computeCompositingRequirements(
   layer->setHasCompositingDescendant(false);
   layer->setMustOverlayCompositedLayers(ioCompState.m_subtreeIsCompositing);
 
-  const bool isCompositingLayer = needsToBeComposited(layer);
-  ioCompState.m_subtreeIsCompositing = isCompositingLayer;
+  const bool willBeComposited = needsToBeComposited(layer);
+  // If we are going to become composited, repaint the old rendering destination
+  if (!layer->isComposited() && willBeComposited)
+    repaintOnCompositingChange(layer);
+
+  ioCompState.m_subtreeIsCompositing = willBeComposited;
 
   CompositingState childState = ioCompState;
-  if (isCompositingLayer)
+  if (willBeComposited)
     childState.m_compositingAncestor = layer;
 
   // The children of this stacking context don't need to composite, unless there
@@ -472,12 +477,15 @@ void RenderLayerCompositor::parentInRootLayer(RenderLayer* layer) {
 void RenderLayerCompositor::rebuildCompositingLayerTree(
     RenderLayer* layer,
     struct CompositingState& ioCompState) {
+  bool wasComposited = layer->isComposited();
+
   // Make the layer compositing if necessary, and set up clipping and content
   // layers.
   // Note that we can only do work here that is independent of whether the
   // descendant layers
-  // have been processed.
-  updateLayerCompositingState(layer);
+  // have been processed. computeCompositingRequirements() will already have
+  // done the repaint if necessary.
+  updateLayerCompositingState(layer, CompositingChangeWillRepaintLater);
 
   // host the document layer in the RenderView's root layer
   if (layer->isRootLayer())
@@ -558,6 +566,11 @@ void RenderLayerCompositor::rebuildCompositingLayerTree(
     // Do work here that requires that we've processed all of the descendant
     // layers
     layerBacking->updateGraphicsLayerGeometry();
+  } else if (wasComposited) {
+    // We stopped being a compositing layer. Now that our descendants have been
+    // udated, we can
+    // repaint our new rendering destination.
+    repaintOnCompositingChange(layer);
   }
 }
 
