@@ -1045,7 +1045,7 @@ void Range::insertNode(PassRefPtr<Node> prpNewNode, ExceptionCode& ec) {
     // currently required
     // to pass Acid3. We might later decide to remove this.
     if (collapsed)
-      m_end.setToChild(newText.get());
+      m_end.setToBeforeChild(newText.get());
   } else {
     RefPtr<Node> lastChild;
     if (collapsed)
@@ -1418,8 +1418,8 @@ void Range::selectNodeContents(Node* refNode, ExceptionCode& ec) {
     }
   }
 
-  m_start.setToStart(refNode);
-  m_end.setToEnd(refNode);
+  m_start.setToStartOfNode(refNode);
+  m_end.setToEndOfNode(refNode);
 }
 
 void Range::surroundContents(PassRefPtr<Node> passNewParent,
@@ -1771,7 +1771,7 @@ static inline void boundaryNodeWillBeRemoved(RangeBoundaryPoint& boundary,
 
   for (Node* n = boundary.container(); n; n = n->parentNode()) {
     if (n == nodeToBeRemoved) {
-      boundary.setToChild(nodeToBeRemoved);
+      boundary.setToBeforeChild(nodeToBeRemoved);
       return;
     }
   }
