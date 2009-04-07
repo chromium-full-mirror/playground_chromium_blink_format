@@ -37,4 +37,9 @@
 + (void)getTraits:(Vector<unsigned>&)traitsMasks
          inFamily:(NSString*)desiredFamily;
 
+// This older version of the interface is relied upon by some clients. WebCore
+// doesn't use it.
++ (NSFont*)fontWithFamily:(NSString*)desiredFamily
+                   traits:(NSFontTraitMask)desiredTraits
+                     size:(float)size;
 @end
