@@ -61,10 +61,19 @@ static int lastNonComplexContextLineBreak(const UChar* characters, int length) {
   return -1;
 }
 
+enum BoundarySearchContextAvailability {
+  DontHaveMoreContext,
+  MayHaveMoreContext
+};
+
+typedef unsigned (*BoundarySearchFunction)(const UChar*,
+                                           unsigned length,
+                                           unsigned offset,
+                                           BoundarySearchContextAvailability,
+                                           bool& needMoreContext);
+
 static VisiblePosition previousBoundary(const VisiblePosition& c,
-                                        unsigned (*searchFunction)(const UChar*,
-                                                                   unsigned,
-                                                                   unsigned)) {
+                                        BoundarySearchFunction searchFunction) {
   Position pos = c.deepEquivalent();
   Node* n = pos.node();
   if (!n)
@@ -118,6 +127,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
   bool inTextSecurityMode =
       start.node() && start.node()->renderer() &&
       start.node()->renderer()->style()->textSecurity() != TSNONE;
+  bool needMoreContext = false;
   while (!it.atEnd()) {
     // iterate to get chunks until the searchFunction returns a non-zero value.
     if (!inTextSecurityMode)
@@ -129,12 +139,21 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
       iteratorString = iteratorString.impl()->secure('x');
       string.prepend(iteratorString.characters(), iteratorString.length());
     }
-
     next = searchFunction(string.data(), string.size(),
-                          string.size() - suffixLength);
+                          string.size() - suffixLength, MayHaveMoreContext,
+                          needMoreContext);
     if (next != 0)
       break;
     it.advance();
+  }
+  if (needMoreContext) {
+    // The last search returned the beginning of the buffer and asked for more
+    // context,
+    // but there is no earlier text. Force a search with what's available.
+    next = searchFunction(string.data(), string.size(),
+                          string.size() - suffixLength, DontHaveMoreContext,
+                          needMoreContext);
+    ASSERT(!needMoreContext);
   }
 
   if (it.atEnd() && next == 0) {
@@ -159,9 +178,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
 }
 
 static VisiblePosition nextBoundary(const VisiblePosition& c,
-                                    unsigned (*searchFunction)(const UChar*,
-                                                               unsigned,
-                                                               unsigned)) {
+                                    BoundarySearchFunction searchFunction) {
   Position pos = c.deepEquivalent();
   Node* n = pos.node();
   if (!n)
@@ -208,6 +225,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
   bool inTextSecurityMode =
       start.node() && start.node()->renderer() &&
       start.node()->renderer()->style()->textSecurity() != TSNONE;
+  bool needMoreContext = false;
   while (!it.atEnd()) {
     // Keep asking the iterator for chunks until the search function
     // returns an end value not equal to the length of the string passed to it.
@@ -220,11 +238,19 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
       iteratorString = iteratorString.impl()->secure('x');
       string.append(iteratorString.characters(), iteratorString.length());
     }
-
-    next = searchFunction(string.data(), string.size(), prefixLength);
+    next = searchFunction(string.data(), string.size(), prefixLength,
+                          MayHaveMoreContext, needMoreContext);
     if (next != string.size())
       break;
     it.advance();
+  }
+  if (needMoreContext) {
+    // The last search returned the end of the buffer and asked for more
+    // context,
+    // but there is no further text. Force a search with what's available.
+    next = searchFunction(string.data(), string.size(), prefixLength,
+                          DontHaveMoreContext, needMoreContext);
+    ASSERT(!needMoreContext);
   }
 
   if (it.atEnd() && next == string.size()) {
@@ -251,12 +277,19 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
 
 // ---------
 
-static unsigned startWordBoundary(const UChar* characters,
-                                  unsigned length,
-                                  unsigned offset) {
+static unsigned startWordBoundary(
+    const UChar* characters,
+    unsigned length,
+    unsigned offset,
+    BoundarySearchContextAvailability mayHaveMoreContext,
+    bool& needMoreContext) {
   ASSERT(offset);
-  if (lastNonComplexContextLineBreak(characters, offset) == -1)
+  if (mayHaveMoreContext &&
+      lastNonComplexContextLineBreak(characters, offset) == -1) {
+    needMoreContext = true;
     return 0;
+  }
+  needMoreContext = false;
   int start, end;
   findWordBoundary(characters, length, offset - 1, &start, &end);
   return start;
@@ -278,13 +311,20 @@ VisiblePosition startOfWord(const VisiblePosition& c, EWordSide side) {
   return previousBoundary(p, startWordBoundary);
 }
 
-static unsigned endWordBoundary(const UChar* characters,
-                                unsigned length,
-                                unsigned offset) {
+static unsigned endWordBoundary(
+    const UChar* characters,
+    unsigned length,
+    unsigned offset,
+    BoundarySearchContextAvailability mayHaveMoreContext,
+    bool& needMoreContext) {
   ASSERT(offset <= length);
-  if (firstNonComplexContextLineBreak(characters + offset, length - offset) ==
-      static_cast<int>(length - offset))
+  if (mayHaveMoreContext &&
+      firstNonComplexContextLineBreak(characters + offset, length - offset) ==
+          static_cast<int>(length - offset)) {
+    needMoreContext = true;
     return length;
+  }
+  needMoreContext = false;
   int start, end;
   findWordBoundary(characters, length, offset, &start, &end);
   return end;
@@ -305,11 +345,18 @@ VisiblePosition endOfWord(const VisiblePosition& c, EWordSide side) {
   return nextBoundary(p, endWordBoundary);
 }
 
-static unsigned previousWordPositionBoundary(const UChar* characters,
-                                             unsigned length,
-                                             unsigned offset) {
-  if (lastNonComplexContextLineBreak(characters, offset) == -1)
+static unsigned previousWordPositionBoundary(
+    const UChar* characters,
+    unsigned length,
+    unsigned offset,
+    BoundarySearchContextAvailability mayHaveMoreContext,
+    bool& needMoreContext) {
+  if (mayHaveMoreContext &&
+      lastNonComplexContextLineBreak(characters, offset) == -1) {
+    needMoreContext = true;
     return 0;
+  }
+  needMoreContext = false;
   return findNextWordFromIndex(characters, length, offset, false);
 }
 
@@ -318,12 +365,19 @@ VisiblePosition previousWordPosition(const VisiblePosition& c) {
   return c.honorEditableBoundaryAtOrAfter(prev);
 }
 
-static unsigned nextWordPositionBoundary(const UChar* characters,
-                                         unsigned length,
-                                         unsigned offset) {
-  if (firstNonComplexContextLineBreak(characters + offset, length - offset) ==
-      static_cast<int>(length - offset))
+static unsigned nextWordPositionBoundary(
+    const UChar* characters,
+    unsigned length,
+    unsigned offset,
+    BoundarySearchContextAvailability mayHaveMoreContext,
+    bool& needMoreContext) {
+  if (mayHaveMoreContext &&
+      firstNonComplexContextLineBreak(characters + offset, length - offset) ==
+          static_cast<int>(length - offset)) {
+    needMoreContext = true;
     return length;
+  }
+  needMoreContext = false;
   return findNextWordFromIndex(characters, length, offset, true);
 }
 
@@ -719,7 +773,9 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
 
 static unsigned startSentenceBoundary(const UChar* characters,
                                       unsigned length,
-                                      unsigned) {
+                                      unsigned,
+                                      BoundarySearchContextAvailability,
+                                      bool&) {
   TextBreakIterator* iterator = sentenceBreakIterator(characters, length);
   // FIXME: The following function can return -1; we don't handle that.
   return textBreakPreceding(iterator, length);
@@ -731,7 +787,9 @@ VisiblePosition startOfSentence(const VisiblePosition& c) {
 
 static unsigned endSentenceBoundary(const UChar* characters,
                                     unsigned length,
-                                    unsigned) {
+                                    unsigned,
+                                    BoundarySearchContextAvailability,
+                                    bool&) {
   TextBreakIterator* iterator = sentenceBreakIterator(characters, length);
   return textBreakNext(iterator);
 }
@@ -742,9 +800,12 @@ VisiblePosition endOfSentence(const VisiblePosition& c) {
   return nextBoundary(c, endSentenceBoundary);
 }
 
-static unsigned previousSentencePositionBoundary(const UChar* characters,
-                                                 unsigned length,
-                                                 unsigned) {
+static unsigned previousSentencePositionBoundary(
+    const UChar* characters,
+    unsigned length,
+    unsigned,
+    BoundarySearchContextAvailability,
+    bool&) {
   // FIXME: This is identical to startSentenceBoundary. I'm pretty sure that's
   // not right.
   TextBreakIterator* iterator = sentenceBreakIterator(characters, length);
@@ -759,7 +820,9 @@ VisiblePosition previousSentencePosition(const VisiblePosition& c) {
 
 static unsigned nextSentencePositionBoundary(const UChar* characters,
                                              unsigned length,
-                                             unsigned) {
+                                             unsigned,
+                                             BoundarySearchContextAvailability,
+                                             bool&) {
   // FIXME: This is identical to endSentenceBoundary.  This isn't right, it
   // needs to
   // move to the equivlant position in the following sentence.
