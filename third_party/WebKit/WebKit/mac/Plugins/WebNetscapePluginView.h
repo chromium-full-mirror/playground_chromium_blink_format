@@ -200,9 +200,9 @@ typedef union PluginPort {
                                       scheme:(const char*)scheme
                                        realm:(const char*)realm
                                     username:(char**)username
-                              usernameLength:(uint32_t*)usernameLength
+                              usernameLength:(uint32*)usernameLength
                                     password:(char**)password
-                              passwordLength:(uint32_t*)passwordLength;
+                              passwordLength:(uint32*)passwordLength;
 @end
 
 #endif
