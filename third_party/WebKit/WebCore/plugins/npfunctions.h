@@ -102,7 +102,7 @@ typedef NPError (*NPN_SetValueForURLProcPtr)(NPP npp,
                                              NPNURLVariable variable,
                                              const char* url,
                                              const char* value,
-                                             uint32_t* len);
+                                             uint32_t len);
 typedef NPError (*NPN_GetAuthenticationInfoPtr)(NPP npp,
                                                 const char* protocol,
                                                 const char* host,

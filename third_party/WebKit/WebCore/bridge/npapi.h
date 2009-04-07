@@ -840,6 +840,26 @@ void NPN_PopPopupsEnabledState(NPP instance);
 void NPN_PluginThreadAsyncCall(NPP instance,
                                void (*func)(void*),
                                void* userData);
+NPError NPN_GetValueForURL(NPP instance,
+                           NPNURLVariable variable,
+                           const char* url,
+                           char** value,
+                           uint32_t* len);
+NPError NPN_SetValueForURL(NPP instance,
+                           NPNURLVariable variable,
+                           const char* url,
+                           const char* value,
+                           uint32_t len);
+NPError NPN_GetAuthenticationInfo(NPP instance,
+                                  const char* protocol,
+                                  const char* host,
+                                  int32_t port,
+                                  const char* scheme,
+                                  const char* realm,
+                                  char** username,
+                                  uint32_t* ulen,
+                                  char** password,
+                                  uint32_t* plen);
 uint32 NPN_ScheduleTimer(NPP instance,
                          uint32 interval,
                          NPBool repeat,
