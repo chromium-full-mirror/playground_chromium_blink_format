@@ -103,14 +103,14 @@ void ConsoleMessage::addToConsole(ScriptState* scriptState,
     messageConstructor.appendArgument(m_message);
 
   bool hadException = false;
-  ScriptObject message = messageConstructor.construct(hadException);
+  ScriptObject message = messageConstructor.construct(hadException, false);
   if (hadException)
     return;
 
   ScriptFunctionCall addMessageToConsole(scriptState, webInspector,
                                          "addMessageToConsole");
   addMessageToConsole.appendArgument(message);
-  addMessageToConsole.call(hadException);
+  addMessageToConsole.call(hadException, false);
 }
 
 bool ConsoleMessage::isEqual(ScriptState* state, ConsoleMessage* msg) const {

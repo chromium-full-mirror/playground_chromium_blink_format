@@ -32,6 +32,7 @@
 #include "ScriptObject.h"
 
 #include "JSDOMBinding.h"
+#include "JSInspectorController.h"
 
 #include <runtime/JSLock.h>
 
@@ -49,6 +50,14 @@ static JSValuePtr createEmptyObject(ScriptState* scriptState) {
 ScriptObject::ScriptObject(ScriptState* scriptState)
     : ScriptValue(createEmptyObject(scriptState)) {}
 
+static bool handleException(ScriptState* scriptState) {
+  if (!scriptState->hadException())
+    return true;
+
+  reportException(scriptState, scriptState->exception());
+  return false;
+}
+
 bool ScriptObject::set(ScriptState* scriptState,
                        const String& name,
                        const String& value) {
@@ -56,7 +65,7 @@ bool ScriptObject::set(ScriptState* scriptState,
   PutPropertySlot slot;
   jsObject()->put(scriptState, Identifier(scriptState, name),
                   jsString(scriptState, value), slot);
-  return !scriptState->hadException();
+  return handleException(scriptState);
 }
 
 bool ScriptObject::set(ScriptState* scriptState,
@@ -66,7 +75,7 @@ bool ScriptObject::set(ScriptState* scriptState,
   PutPropertySlot slot;
   jsObject()->put(scriptState, Identifier(scriptState, name), value.jsObject(),
                   slot);
-  return !scriptState->hadException();
+  return handleException(scriptState);
 }
 
 bool ScriptObject::set(ScriptState* scriptState,
@@ -76,7 +85,7 @@ bool ScriptObject::set(ScriptState* scriptState,
   PutPropertySlot slot;
   jsObject()->put(scriptState, Identifier(scriptState, name),
                   jsString(scriptState, value), slot);
-  return !scriptState->hadException();
+  return handleException(scriptState);
 }
 
 bool ScriptObject::set(ScriptState* scriptState,
@@ -86,7 +95,7 @@ bool ScriptObject::set(ScriptState* scriptState,
   PutPropertySlot slot;
   jsObject()->put(scriptState, Identifier(scriptState, name),
                   jsNumber(scriptState, value), slot);
-  return !scriptState->hadException();
+  return handleException(scriptState);
 }
 
 bool ScriptObject::set(ScriptState* scriptState,
@@ -96,7 +105,7 @@ bool ScriptObject::set(ScriptState* scriptState,
   PutPropertySlot slot;
   jsObject()->put(scriptState, Identifier(scriptState, name),
                   jsNumber(scriptState, value), slot);
-  return !scriptState->hadException();
+  return handleException(scriptState);
 }
 
 bool ScriptObject::set(ScriptState* scriptState, const char* name, int value) {
@@ -104,7 +113,7 @@ bool ScriptObject::set(ScriptState* scriptState, const char* name, int value) {
   PutPropertySlot slot;
   jsObject()->put(scriptState, Identifier(scriptState, name),
                   jsNumber(scriptState, value), slot);
-  return !scriptState->hadException();
+  return handleException(scriptState);
 }
 
 bool ScriptObject::set(ScriptState* scriptState, const char* name, bool value) {
@@ -112,7 +121,41 @@ bool ScriptObject::set(ScriptState* scriptState, const char* name, bool value) {
   PutPropertySlot slot;
   jsObject()->put(scriptState, Identifier(scriptState, name), jsBoolean(value),
                   slot);
-  return !scriptState->hadException();
+  return handleException(scriptState);
+}
+
+bool ScriptGlobalObject::set(ScriptState* scriptState,
+                             const char* name,
+                             const ScriptObject& value) {
+  JSLock lock(false);
+  scriptState->lexicalGlobalObject()->putDirect(Identifier(scriptState, name),
+                                                value.jsObject());
+  return handleException(scriptState);
+}
+
+bool ScriptGlobalObject::set(ScriptState* scriptState,
+                             const char* name,
+                             InspectorController* value) {
+  JSLock lock(false);
+  scriptState->lexicalGlobalObject()->putDirect(Identifier(scriptState, name),
+                                                toJS(scriptState, value));
+  return handleException(scriptState);
+}
+
+bool ScriptGlobalObject::getObject(ScriptState* scriptState,
+                                   const char* name,
+                                   ScriptObject& value) {
+  JSLock lock(false);
+  JSValuePtr jsValue = scriptState->lexicalGlobalObject()->get(
+      scriptState, Identifier(scriptState, name));
+  if (!jsValue)
+    return false;
+
+  if (!jsValue.isObject())
+    return false;
+
+  value = ScriptObject(asObject(jsValue));
+  return true;
 }
 
 }  // namespace WebCore

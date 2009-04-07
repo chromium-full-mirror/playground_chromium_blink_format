@@ -139,7 +139,7 @@ JSValuePtr JSInspectorController::addSourceToFrame(ExecState* exec,
     return jsUndefined();
 
   return jsBoolean(impl()->addSourceToFrame(mimeType, sourceString,
-                                            toNode(args.at(exec, 1))));
+                                            toNode(args.at(exec, 2))));
 }
 
 JSValuePtr JSInspectorController::getResourceDocumentNode(ExecState* exec,
