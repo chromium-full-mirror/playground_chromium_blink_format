@@ -103,16 +103,16 @@ typedef NPError (*NPN_SetValueForURLProcPtr)(NPP npp,
                                              const char* url,
                                              const char* value,
                                              uint32 len);
-typedef NPError (*NPN_GetAuthenticationInfoPtr)(NPP npp,
-                                                const char* protocol,
-                                                const char* host,
-                                                int32 port,
-                                                const char* scheme,
-                                                const char* realm,
-                                                char** username,
-                                                uint32* ulen,
-                                                char** password,
-                                                uint32* plen);
+typedef NPError (*NPN_GetAuthenticationInfoProcPtr)(NPP npp,
+                                                    const char* protocol,
+                                                    const char* host,
+                                                    int32 port,
+                                                    const char* scheme,
+                                                    const char* realm,
+                                                    char** username,
+                                                    uint32* ulen,
+                                                    char** password,
+                                                    uint32* plen);
 
 typedef uint32 (*NPN_ScheduleTimerProcPtr)(NPP npp,
                                            uint32 interval,
@@ -273,7 +273,7 @@ typedef struct _NPNetscapeFuncs {
   NPN_ConstructProcPtr construct;
   NPN_GetValueForURLProcPtr getvalueforurl;
   NPN_SetValueForURLProcPtr setvalueforurl;
-  NPN_GetAuthenticationInfoPtr getauthenticationinfo;
+  NPN_GetAuthenticationInfoProcPtr getauthenticationinfo;
   NPN_ScheduleTimerProcPtr scheduletimer;
   NPN_UnscheduleTimerProcPtr unscheduletimer;
   NPN_PopUpContextMenuProcPtr popupcontextmenu;
