@@ -1465,7 +1465,7 @@ void InspectorController::didParseSource(ExecState*, const SourceCode& source) {
                               "parsedScriptSource");
   function.appendArgument(static_cast<long long>(source.provider()->asID()));
   function.appendArgument(source.provider()->url());
-  function.appendArgument(source.data());
+  function.appendArgument(JSC::UString(source.data(), source.length()));
   function.appendArgument(source.firstLine());
   function.call();
 }
@@ -1477,7 +1477,7 @@ void InspectorController::failedToParseSource(ExecState*,
   ScriptFunctionCall function(m_scriptState, m_webInspector,
                               "failedToParseScriptSource");
   function.appendArgument(source.provider()->url());
-  function.appendArgument(source.data());
+  function.appendArgument(JSC::UString(source.data(), source.length()));
   function.appendArgument(source.firstLine());
   function.appendArgument(errorLine);
   function.appendArgument(errorMessage);
