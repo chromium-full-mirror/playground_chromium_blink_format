@@ -35,8 +35,6 @@ namespace WebCore {
 
 static void parseCacheHeader(const String& header,
                              Vector<pair<String, String>>& result);
-static void parseCacheControlDirectiveValues(const String& directives,
-                                             Vector<String>& result);
 
 auto_ptr<ResourceResponse> ResourceResponseBase::adopt(
     auto_ptr<CrossThreadResourceResponseData> data) {
@@ -227,19 +225,13 @@ void ResourceResponseBase::parseCacheControlDirectives() const {
 
   size_t directivesSize = directives.size();
   for (size_t i = 0; i < directivesSize; ++i) {
-    Vector<String> directiveValues;
-    if ((equalIgnoringCase(directives[i].first, "private") ||
-         equalIgnoringCase(directives[i].first, "no-cache")) &&
-        !directives[i].second.isEmpty())
-      parseCacheControlDirectiveValues(directives[i].second, directiveValues);
-    else
-      directiveValues.append(directives[i].second);
-    for (size_t i = 0; i < directiveValues.size(); ++i) {
-      if (equalIgnoringCase(directiveValues[i], "no-cache"))
-        m_cacheControlContainsNoCache = true;
-      else if (equalIgnoringCase(directiveValues[i], "must-revalidate"))
-        m_cacheControlContainsMustRevalidate = true;
-    }
+    // The no-cache directive can have a value, which is ignored here. This
+    // means that in very rare cases, responses that could be taken from cache
+    // won't be.
+    if (equalIgnoringCase(directives[i].first, "no-cache"))
+      m_cacheControlContainsNoCache = true;
+    else if (equalIgnoringCase(directives[i].first, "must-revalidate"))
+      m_cacheControlContainsMustRevalidate = true;
   }
 }
 
@@ -420,13 +412,5 @@ static void parseCacheHeader(const String& header,
       return;
     }
   }
-}
-
-static void parseCacheControlDirectiveValues(const String& directives,
-                                             Vector<String>& result) {
-  directives.split(',', false, result);
-  unsigned max = result.size();
-  for (unsigned i = 0; i < max; ++i)
-    result[i] = result[i].stripWhiteSpace();
 }
 }

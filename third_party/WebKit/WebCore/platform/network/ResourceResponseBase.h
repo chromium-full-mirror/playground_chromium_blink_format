@@ -88,7 +88,7 @@ class ResourceResponseBase {
   bool cacheControlContainsNoCache() const {
     if (!m_haveParsedCacheControl)
       parseCacheControlDirectives();
-    return m_cacheControlContainsMustRevalidate;
+    return m_cacheControlContainsNoCache;
   }
   bool cacheControlContainsMustRevalidate() const {
     if (!m_haveParsedCacheControl)
