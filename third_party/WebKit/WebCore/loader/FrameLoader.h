@@ -463,6 +463,8 @@ class FrameLoader : Noncopyable {
 
   void applyUserAgent(ResourceRequest& request);
 
+  bool shouldInterruptLoadForXFrameOptions(const String&, const KURL&);
+
  private:
   PassRefPtr<HistoryItem> createHistoryItem(bool useOriginal);
   PassRefPtr<HistoryItem> createHistoryItemTree(Frame* targetFrame,
