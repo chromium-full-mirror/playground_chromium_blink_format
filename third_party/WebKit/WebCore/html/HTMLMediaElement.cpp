@@ -42,6 +42,7 @@
 #include "HTMLSourceElement.h"
 #include "HTMLVideoElement.h"
 #include <limits>
+#include "MediaDocument.h"
 #include "MediaError.h"
 #include "MediaList.h"
 #include "MediaQueryEvaluator.h"
@@ -1178,6 +1179,16 @@ void HTMLMediaElement::mediaPlayerSizeChanged(MediaPlayer*) {
     static_cast<RenderVideo*>(renderer())->videoSizeChanged();
 #endif
   endProcessingMediaPlayerCallback();
+}
+
+void HTMLMediaElement::mediaPlayerSawUnsupportedTracks(MediaPlayer*) {
+  // The MediaPlayer came across content it cannot completely handle.
+  // This is normally acceptable except when we are in a standalone
+  // MediaDocument. If so, tell the document what has happened.
+  if (ownerDocument()->isMediaDocument()) {
+    MediaDocument* mediaDocument = static_cast<MediaDocument*>(ownerDocument());
+    mediaDocument->mediaElementSawUnsupportedTracks();
+  }
 }
 
 PassRefPtr<TimeRanges> HTMLMediaElement::buffered() const {

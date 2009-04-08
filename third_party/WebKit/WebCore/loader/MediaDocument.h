@@ -40,11 +40,15 @@ class MediaDocument : public HTMLDocument {
 
   virtual void defaultEventHandler(Event*);
 
+  void mediaElementSawUnsupportedTracks();
+
  private:
   MediaDocument(Frame*);
 
   virtual bool isMediaDocument() const { return true; }
   virtual Tokenizer* createTokenizer();
+
+  void replaceVideoWithEmbed();
 };
 }
 

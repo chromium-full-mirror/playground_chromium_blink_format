@@ -128,6 +128,8 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   float maxTimeLoaded() const;
   void disableUnsupportedTracks();
 
+  void sawUnsupportedTracks();
+
   bool metaDataAvailable() const {
     return m_qtMovie && m_readyState >= MediaPlayer::HaveMetadata;
   }
@@ -146,6 +148,8 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   bool m_visible;
   IntRect m_rect;
   unsigned m_enabledTrackCount;
+  unsigned m_totalTrackCount;
+  bool m_hasUnsupportedTracks;
   float m_duration;
 #if DRAW_FRAME_RATE
   int m_frameCountWhilePlaying;
