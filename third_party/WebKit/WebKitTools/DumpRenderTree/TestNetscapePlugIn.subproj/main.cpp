@@ -181,6 +181,12 @@ NPError NPP_New(NPMIMEType pluginType,
     obj->eventModel = NPEventModelCocoa;
   }
 
+  if (strcasecmp(pluginType,
+                 "application/x-webkit-test-netscape-wildcard-plugin") == 0) {
+    log(instance, "NPAPI Wildcard plugin instance loaded");
+    fflush(stdout);
+  }
+
   browser->setvalue(instance, NPPVpluginEventModel, (void*)obj->eventModel);
   return NPERR_NO_ERROR;
 }
