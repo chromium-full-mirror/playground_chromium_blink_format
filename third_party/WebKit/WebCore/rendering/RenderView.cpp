@@ -121,11 +121,13 @@ void RenderView::layout() {
   if (needsLayout())
     RenderBlock::layout();
 
-  m_docWidth = calcDocWidth();
-  m_docHeight = calcDocHeight();
+  // Reset overflowWidth and overflowHeight, since they act as a lower bound for
+  // docWidth() and docHeight().
+  setOverflowWidth(width());
+  setOverflowHeight(height());
 
-  setOverflowWidth(max(width(), m_docWidth));
-  setOverflowHeight(max(height(), m_docHeight));
+  setOverflowWidth(docWidth());
+  setOverflowHeight(docHeight());
 
   ASSERT(layoutDelta() == IntSize());
   ASSERT(m_layoutStateDisableCount == 0);
@@ -582,13 +584,8 @@ IntRect RenderView::viewRect() const {
   return IntRect();
 }
 
-int RenderView::calcDocHeight() const {
-  // Exclude our own height, since it always matches the viewport height.  We
-  // want to know the height
-  // of the document if it is potentially smaller than the viewport (this value
-  // will be used when trying
-  // to figure out if scrollbars are needed).
-  int h = max(0, lowestPosition(true, false));
+int RenderView::docHeight() const {
+  int h = lowestPosition();
 
   // FIXME: This doesn't do any margin collapsing.
   // Instead of this dh computation we should keep the result
@@ -603,13 +600,8 @@ int RenderView::calcDocHeight() const {
   return h;
 }
 
-int RenderView::calcDocWidth() const {
-  // Exclude our own width, since it always matches the viewport width.  We want
-  // to know the width
-  // of the document if it is potentially smaller than the viewport (this value
-  // will be used when trying
-  // to figure out if scrollbars are needed).
-  int w = max(0, rightmostPosition(true, false));
+int RenderView::docWidth() const {
+  int w = rightmostPosition();
 
   for (RenderBox* c = firstChildBox(); c; c = c->nextSiblingBox()) {
     int dw = c->width() + c->marginLeft() + c->marginRight();

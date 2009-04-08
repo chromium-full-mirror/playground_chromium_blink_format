@@ -161,10 +161,6 @@ class ScrollView : public Widget, public ScrollbarClient {
   // values).
   IntSize contentsSize()
       const;  // Always at least as big as the visibleWidth()/visibleHeight().
-  virtual IntSize minimumContentsSize() const {
-    return contentsSize();
-  }  // Allows a subclass to indicate a smaller size than the viewport (used for
-     // scrollbar checking).
   int contentsWidth() const { return contentsSize().width(); }
   int contentsHeight() const { return contentsSize().height(); }
   virtual void setContentsSize(const IntSize&);
@@ -319,7 +315,8 @@ class ScrollView : public Widget, public ScrollbarClient {
   int m_scrollbarsAvoidingResizer;
   bool m_scrollbarsSuppressed;
 
-  bool m_inUpdateScrollbars;
+  bool m_updatingScrollbarAttributes;
+  unsigned m_updateScrollbarsPass;
 
   IntPoint m_panScrollIconPoint;
   bool m_drawPanScrollIcon;

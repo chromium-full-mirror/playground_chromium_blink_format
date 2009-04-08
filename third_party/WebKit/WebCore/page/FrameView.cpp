@@ -308,14 +308,14 @@ PassRefPtr<Scrollbar> FrameView::createScrollbar(
   Document* doc = m_frame->document();
 
   // Try the <body> element first as a scrollbar source.
-  Element* body = doc->body();
+  Element* body = doc ? doc->body() : 0;
   if (body && body->renderer() &&
       body->renderer()->style()->hasPseudoStyle(SCROLLBAR))
     return RenderScrollbar::createCustomScrollbar(this, orientation,
                                                   body->renderBox());
 
   // If the <body> didn't have a custom style, then the root element might.
-  Element* docElement = doc->documentElement();
+  Element* docElement = doc ? doc->documentElement() : 0;
   if (docElement && docElement->renderer() &&
       docElement->renderer()->style()->hasPseudoStyle(SCROLLBAR))
     return RenderScrollbar::createCustomScrollbar(this, orientation,
@@ -1431,7 +1431,7 @@ void FrameView::adjustPageHeight(float* newBottom,
     // Use a context with painting disabled.
     GraphicsContext context((PlatformGraphicsContext*)0);
     root->setTruncatedAt((int)floorf(oldBottom));
-    IntRect dirtyRect(0, (int)floorf(oldTop), root->docWidth(),
+    IntRect dirtyRect(0, (int)floorf(oldTop), root->overflowWidth(),
                       (int)ceilf(oldBottom - oldTop));
     root->layer()->paint(&context, dirtyRect);
     *newBottom = root->bestTruncatedAt();
@@ -1439,13 +1439,6 @@ void FrameView::adjustPageHeight(float* newBottom,
       *newBottom = oldBottom;
   } else
     *newBottom = oldBottom;
-}
-
-IntSize FrameView::minimumContentsSize() const {
-  RenderView* root = m_frame->contentRenderer();
-  if (!root)
-    return ScrollView::minimumContentsSize();
-  return IntSize(root->docWidth(), root->docHeight());
 }
 
 }  // namespace WebCore

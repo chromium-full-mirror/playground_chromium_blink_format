@@ -56,9 +56,6 @@ class RenderView : public RenderBlock {
   int viewHeight() const;
   int viewWidth() const;
 
-  int docWidth() const { return m_docWidth; }
-  int docHeight() const { return m_docHeight; }
-
   float zoomFactor() const;
 
   FrameView* frameView() const { return m_frameView; }
@@ -205,8 +202,8 @@ class RenderView : public RenderBlock {
  private:
   bool shouldRepaint(const IntRect& r) const;
 
-  int calcDocHeight() const;
-  int calcDocWidth() const;
+  int docHeight() const;
+  int docWidth() const;
 
  protected:
   FrameView* m_frameView;
@@ -229,9 +226,6 @@ class RenderView : public RenderBlock {
   RenderWidgetSet m_widgets;
 
  private:
-  int m_docWidth;
-  int m_docHeight;
-
   int m_bestTruncatedAt;
   int m_truncatorWidth;
   bool m_forcedPageBreak;
