@@ -86,6 +86,7 @@ class JSArray : public JSObject {
   }
 
   void fillArgList(ExecState*, ArgList&);
+  void copyToRegisters(ExecState*, Register*, uint32_t);
 
   static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType));

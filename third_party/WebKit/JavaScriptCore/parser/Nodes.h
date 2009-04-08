@@ -44,6 +44,7 @@
 
 namespace JSC {
 
+class ArgumentListNode;
 class CodeBlock;
 class BytecodeGenerator;
 class FuncDeclNode;
@@ -176,6 +177,7 @@ class ExpressionNode : public Node {
   virtual bool isBracketAccessorNode() const JSC_FAST_CALL { return false; }
   virtual bool isDotAccessorNode() const JSC_FAST_CALL { return false; }
   virtual bool isFuncExprNode() const JSC_FAST_CALL { return false; }
+  virtual bool isSimpleArray() const JSC_FAST_CALL { return false; }
 
   virtual ExpressionNode* stripUnaryPlus() { return this; }
 
@@ -467,6 +469,9 @@ class ArrayNode : public ExpressionNode {
 
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
+
+  virtual bool isSimpleArray() const JSC_FAST_CALL;
+  PassRefPtr<ArgumentListNode> toArgumentList(JSGlobalData*) const;
 
  private:
   RefPtr<ElementNode> m_element;
@@ -798,6 +803,26 @@ class CallFunctionCallDotNode : public FunctionCallDotNode {
                           unsigned divot,
                           unsigned startOffset,
                           unsigned endOffset) JSC_FAST_CALL
+      : FunctionCallDotNode(globalData,
+                            base,
+                            ident,
+                            args,
+                            divot,
+                            startOffset,
+                            endOffset) {}
+  virtual RegisterID* emitBytecode(BytecodeGenerator&,
+                                   RegisterID* = 0) JSC_FAST_CALL;
+};
+
+class ApplyFunctionCallDotNode : public FunctionCallDotNode {
+ public:
+  ApplyFunctionCallDotNode(JSGlobalData* globalData,
+                           ExpressionNode* base,
+                           const Identifier& ident,
+                           ArgumentsNode* args,
+                           unsigned divot,
+                           unsigned startOffset,
+                           unsigned endOffset) JSC_FAST_CALL
       : FunctionCallDotNode(globalData,
                             base,
                             ident,

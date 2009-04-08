@@ -534,6 +534,16 @@ void JIT::privateCompileMainPass() {
         compileOpCall(opcodeID, currentInstruction, callLinkInfoIndex++);
         NEXT_OPCODE(op_call_eval);
       }
+      case op_load_varargs: {
+        emitPutJITStubArgConstant(currentInstruction[2].u.operand, 1);
+        emitCTICall(JITStubs::cti_op_load_varargs);
+        emitPutVirtualRegister(currentInstruction[1].u.operand);
+        NEXT_OPCODE(op_load_varargs);
+      }
+      case op_call_varargs: {
+        compileOpCallVarargs(currentInstruction);
+        NEXT_OPCODE(op_call_varargs);
+      }
       case op_construct: {
         compileOpCall(opcodeID, currentInstruction, callLinkInfoIndex++);
         NEXT_OPCODE(op_construct);
@@ -1817,6 +1827,10 @@ void JIT::privateCompileSlowCases() {
         compileOpCallSlowCase(currentInstruction, iter, callLinkInfoIndex++,
                               opcodeID);
         NEXT_OPCODE(op_call_eval);
+      }
+      case op_call_varargs: {
+        compileOpCallVarargsSlowCase(currentInstruction, iter);
+        NEXT_OPCODE(op_call_varargs);
       }
       case op_construct: {
         compileOpCallSlowCase(currentInstruction, iter, callLinkInfoIndex++,

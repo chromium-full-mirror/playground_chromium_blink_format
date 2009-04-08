@@ -69,6 +69,7 @@ class JSGlobalObject : public JSVariableObject {
           URIErrorConstructor(0),
           evalFunction(0),
           callFunction(0),
+          applyFunction(0),
           objectPrototype(0),
           functionPrototype(0),
           arrayPrototype(0),
@@ -103,6 +104,7 @@ class JSGlobalObject : public JSVariableObject {
 
     GlobalEvalFunction* evalFunction;
     PrototypeFunction* callFunction;
+    PrototypeFunction* applyFunction;
 
     ObjectPrototype* objectPrototype;
     FunctionPrototype* functionPrototype;

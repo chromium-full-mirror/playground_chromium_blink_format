@@ -60,17 +60,17 @@ FunctionPrototype::FunctionPrototype(ExecState* exec,
 void FunctionPrototype::addFunctionProperties(
     ExecState* exec,
     Structure* prototypeFunctionStructure,
-    PrototypeFunction** callFunction) {
+    PrototypeFunction** callFunction,
+    PrototypeFunction** applyFunction) {
   putDirectFunctionWithoutTransition(
       exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
                                          exec->propertyNames().toString,
                                          functionProtoFuncToString),
       DontEnum);
-  putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 2,
-                                         exec->propertyNames().apply,
-                                         functionProtoFuncApply),
-      DontEnum);
+  *applyFunction = new (exec)
+      PrototypeFunction(exec, prototypeFunctionStructure, 2,
+                        exec->propertyNames().apply, functionProtoFuncApply);
+  putDirectFunctionWithoutTransition(exec, *applyFunction, DontEnum);
   *callFunction = new (exec)
       PrototypeFunction(exec, prototypeFunctionStructure, 1,
                         exec->propertyNames().call, functionProtoFuncCall);

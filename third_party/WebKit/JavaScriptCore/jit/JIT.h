@@ -556,13 +556,17 @@ class JIT : private MacroAssembler {
   void compileOpCall(OpcodeID,
                      Instruction* instruction,
                      unsigned callLinkInfoIndex);
+  void compileOpCallVarargs(Instruction* instruction);
   void compileOpCallInitializeCallFrame();
   void compileOpCallSetupArgs(Instruction*);
+  void compileOpCallVarargsSetupArgs(Instruction*);
   void compileOpCallEvalSetupArgs(Instruction*);
   void compileOpCallSlowCase(Instruction* instruction,
                              Vector<SlowCaseEntry>::iterator& iter,
                              unsigned callLinkInfoIndex,
                              OpcodeID opcodeID);
+  void compileOpCallVarargsSlowCase(Instruction* instruction,
+                                    Vector<SlowCaseEntry>::iterator& iter);
   void compileOpConstructSetupArgs(Instruction*);
   enum CompileOpStrictEqType { OpStrictEq, OpNStrictEq };
   void compileOpStrictEq(Instruction* instruction, CompileOpStrictEqType type);
