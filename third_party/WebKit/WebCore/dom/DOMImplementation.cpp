@@ -352,7 +352,7 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
   // PDF is one image type for which a plugin can override built-in support.
   // We do not want QuickTime to take over all image types, obviously.
   if ((type == "application/pdf" || type == "text/pdf") && pluginData &&
-      pluginData->supportsMimeTypeIgnoringWildCards(type))
+      pluginData->supportsMimeType(type))
     return PluginDocument::create(frame);
   if (Image::supportsType(type))
     return ImageDocument::create(frame);
@@ -370,8 +370,7 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
   // fundamental type that the browser is expected to handle,
   // and also serves as an optimization to prevent loading the plug-in database
   // in the common case.
-  if (type != "text/plain" && pluginData &&
-      pluginData->supportsMimeTypeIgnoringWildCards(type))
+  if (type != "text/plain" && pluginData && pluginData->supportsMimeType(type))
     return PluginDocument::create(frame);
   if (isTextMIMEType(type))
     return TextDocument::create(frame);

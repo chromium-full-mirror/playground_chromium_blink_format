@@ -58,7 +58,6 @@ class PluginData : public RefCounted<PluginData> {
   const Vector<MimeClassInfo*>& mimes() const { return m_mimes; }
 
   bool supportsMimeType(const String& mimeType) const;
-  bool supportsMimeTypeIgnoringWildCards(const String& mimeType) const;
   String pluginNameForMimeType(const String& mimeType) const;
 
   static void refresh();

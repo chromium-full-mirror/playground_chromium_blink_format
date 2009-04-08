@@ -109,14 +109,6 @@ NPError NPP_New(NPMIMEType pluginType,
         obj->onURLNotify = _strdup(argv[i]);
     }
 
-    if (_stricmp(pluginType,
-                 "application/x-webkit-test-netscape-wildcard-plugin") == 0) {
-      printf(
-          "CONSOLE MESSAGE: line 0: PLUGIN: NPAPI Wildcard plugin instance "
-          "loaded\n");
-      fflush(stdout);
-    }
-
     instance->pdata = obj;
   }
 
