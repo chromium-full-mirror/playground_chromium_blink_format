@@ -65,7 +65,6 @@ XMLHttpRequestStaticData::XMLHttpRequestStaticData()
   m_forbiddenRequestHeaders.add("accept-encoding");
   m_forbiddenRequestHeaders.add("access-control-request-headers");
   m_forbiddenRequestHeaders.add("access-control-request-method");
-  m_forbiddenRequestHeaders.add("authorization");
   m_forbiddenRequestHeaders.add("connection");
   m_forbiddenRequestHeaders.add("content-length");
   m_forbiddenRequestHeaders.add("content-transfer-encoding");
