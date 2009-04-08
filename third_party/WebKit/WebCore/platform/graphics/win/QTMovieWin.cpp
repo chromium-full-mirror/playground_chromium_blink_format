@@ -457,7 +457,7 @@ void QTMovieWin::getNaturalSize(int& width, int& height) {
   };
 
   if (m_private->m_movie)
-    GetMovieBox(m_private->m_movie, &rect);
+    GetMovieNaturalBoundsRect(m_private->m_movie, &rect);
   width = rect.right - rect.left;
   height = rect.bottom - rect.top;
 }
