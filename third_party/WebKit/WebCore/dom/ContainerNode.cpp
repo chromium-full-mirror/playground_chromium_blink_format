@@ -509,6 +509,7 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
 }
 
 ContainerNode* ContainerNode::addChild(PassRefPtr<Node> newChild) {
+  ASSERT(newChild);
   // This function is only used during parsing.
   // It does not send any DOM mutation events.
 
