@@ -39,6 +39,7 @@
   IBOutlet id username;
   IBOutlet id imageView;
   IBOutlet id remember;
+  IBOutlet id separateRealmLabel;
   BOOL nibLoaded;
   BOOL usingSheet;
   id callback;
