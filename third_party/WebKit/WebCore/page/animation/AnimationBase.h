@@ -45,7 +45,7 @@ class RenderStyle;
 class TimingFunction;
 
 class AnimationBase : public RefCounted<AnimationBase> {
-  friend class CompositeAnimationPrivate;
+  friend class CompositeAnimation;
 
  public:
   AnimationBase(const Animation* transition,
@@ -142,7 +142,7 @@ class AnimationBase : public RefCounted<AnimationBase> {
   // firing
   // (e.g. a software animation)
   void setAnimating(bool inAnimating = true) { m_isAnimating = inAnimating; }
-  virtual double willNeedService();
+  virtual double timeToNextService();
 
   double progress(double scale, double offset, const TimingFunction*) const;
 

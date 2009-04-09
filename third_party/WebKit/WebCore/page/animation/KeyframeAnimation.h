@@ -68,7 +68,7 @@ class KeyframeAnimation : public AnimationBase {
   }
   RenderStyle* unanimatedStyle() const { return m_unanimatedStyle.get(); }
 
-  virtual double willNeedService();
+  virtual double timeToNextService();
 
  protected:
   virtual void onAnimationStart(double elapsedTime);

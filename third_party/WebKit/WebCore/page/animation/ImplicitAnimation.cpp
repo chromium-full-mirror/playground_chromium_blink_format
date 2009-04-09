@@ -189,7 +189,7 @@ bool ImplicitAnimation::sendTransitionEvent(const AtomicString& eventType,
         return false;
 
       // Schedule event handling
-      m_compAnim->animationControllerPriv()->addEventToDispatch(
+      m_compAnim->animationController()->addEventToDispatch(
           element, eventType, propertyName, elapsedTime);
 
       // Restore the original (unanimated) style
@@ -285,8 +285,8 @@ void ImplicitAnimation::validateTransformFunctionList() {
   m_transformFunctionListValid = true;
 }
 
-double ImplicitAnimation::willNeedService() {
-  double t = AnimationBase::willNeedService();
+double ImplicitAnimation::timeToNextService() {
+  double t = AnimationBase::timeToNextService();
 #if USE(ACCELERATED_COMPOSITING)
   if (t != 0 || preActive())
     return t;

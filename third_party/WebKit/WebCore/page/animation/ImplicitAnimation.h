@@ -75,7 +75,7 @@ class ImplicitAnimation : public AnimationBase {
 
   void blendPropertyValueInStyle(int, RenderStyle* currentStyle);
 
-  virtual double willNeedService();
+  virtual double timeToNextService();
 
  protected:
   bool shouldSendEventForListener(Document::ListenerType) const;
