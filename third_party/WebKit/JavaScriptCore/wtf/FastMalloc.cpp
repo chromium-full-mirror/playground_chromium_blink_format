@@ -78,6 +78,7 @@
 #include "FastMalloc.h"
 
 #include "Assertions.h"
+#include <limits>
 #if ENABLE(JSC_MULTIPLE_THREADS)
 #include <pthread.h>
 #endif
@@ -145,6 +146,18 @@ void fastMallocAllow() {
 
 namespace WTF {
 
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+
+namespace Internal {
+
+void fastMallocMatchFailed(void*) {
+  CRASH();
+}
+
+}  // namespace Internal
+
+#endif
+
 void* fastZeroedMalloc(size_t n) {
   void* result = fastMalloc(n);
   memset(result, 0, n);
@@ -174,12 +187,34 @@ namespace WTF {
 
 void* tryFastMalloc(size_t n) {
   ASSERT(!isForbidden());
+
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  if (std::numeric_limits<size_t>::max() - sizeof(AllocAlignmentInteger) <=
+      n)  // If overflow would occur...
+    return 0;
+
+  void* result = malloc(n + sizeof(AllocAlignmentInteger));
+  if (!result)
+    return 0;
+
+  *static_cast<AllocAlignmentInteger*>(result) = Internal::AllocTypeMalloc;
+  result = static_cast<AllocAlignmentInteger*>(result) + 1;
+
+  return result;
+#else
   return malloc(n);
+#endif
 }
 
 void* fastMalloc(size_t n) {
   ASSERT(!isForbidden());
+
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  void* result = tryFastMalloc(n);
+#else
   void* result = malloc(n);
+#endif
+
   if (!result)
     CRASH();
   return result;
@@ -187,12 +222,38 @@ void* fastMalloc(size_t n) {
 
 void* tryFastCalloc(size_t n_elements, size_t element_size) {
   ASSERT(!isForbidden());
+
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  size_t totalBytes = n_elements * element_size;
+  if (n_elements > 1 && element_size &&
+          (totalBytes / element_size) != n_elements ||
+      (std::numeric_limits<size_t>::max() - sizeof(AllocAlignmentInteger) <=
+       totalBytes))
+    return 0;
+
+  totalBytes += sizeof(AllocAlignmentInteger);
+  void* result = malloc(totalBytes);
+  if (!result)
+    return 0;
+
+  memset(result, 0, totalBytes);
+  *static_cast<AllocAlignmentInteger*>(result) = Internal::AllocTypeMalloc;
+  result = static_cast<AllocAlignmentInteger*>(result) + 1;
+  return result;
+#else
   return calloc(n_elements, element_size);
+#endif
 }
 
 void* fastCalloc(size_t n_elements, size_t element_size) {
   ASSERT(!isForbidden());
+
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  void* result = tryFastCalloc(n_elements, element_size);
+#else
   void* result = calloc(n_elements, element_size);
+#endif
+
   if (!result)
     CRASH();
   return result;
@@ -200,17 +261,56 @@ void* fastCalloc(size_t n_elements, size_t element_size) {
 
 void fastFree(void* p) {
   ASSERT(!isForbidden());
+
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  if (!p)
+    return;
+
+  AllocAlignmentInteger* header = Internal::fastMallocMatchValidationValue(p);
+  if (*header != Internal::AllocTypeMalloc)
+    Internal::fastMallocMatchFailed(p);
+  free(header);
+#else
   free(p);
+#endif
 }
 
 void* tryFastRealloc(void* p, size_t n) {
   ASSERT(!isForbidden());
+
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  if (p) {
+    if (std::numeric_limits<size_t>::max() - sizeof(AllocAlignmentInteger) <=
+        n)  // If overflow would occur...
+      return 0;
+    AllocAlignmentInteger* header = Internal::fastMallocMatchValidationValue(p);
+    if (*header != Internal::AllocTypeMalloc)
+      Internal::fastMallocMatchFailed(p);
+    void* result = realloc(header, n + sizeof(AllocAlignmentInteger));
+    if (!result)
+      return 0;
+
+    // This should not be needed because the value is already there:
+    // *static_cast<AllocAlignmentInteger*>(result) = Internal::AllocTypeMalloc;
+    result = static_cast<AllocAlignmentInteger*>(result) + 1;
+    return result;
+  } else {
+    return fastMalloc(n);
+  }
+#else
   return realloc(p, n);
+#endif
 }
 
 void* fastRealloc(void* p, size_t n) {
   ASSERT(!isForbidden());
+
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  void* result = tryFastRealloc(p, n);
+#else
   void* result = realloc(p, n);
+#endif
+
   if (!result)
     CRASH();
   return result;
@@ -251,6 +351,7 @@ extern "C" const int jscore_fastmalloc_introspection = 0;
 #include "TCSystemAlloc.h"
 #include <algorithm>
 #include <errno.h>
+#include <limits>
 #include <new>
 #include <pthread.h>
 #include <stdarg.h>
@@ -3356,7 +3457,21 @@ ALWAYS_INLINE
 #endif
     void*
     malloc(size_t size) {
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  if (std::numeric_limits<size_t>::max() - sizeof(AllocAlignmentInteger) <=
+      size)  // If overflow would occur...
+    return 0;
+  size += sizeof(AllocAlignmentInteger);
   void* result = do_malloc(size);
+  if (!result)
+    return 0;
+
+  *static_cast<AllocAlignmentInteger*>(result) = Internal::AllocTypeMalloc;
+  result = static_cast<AllocAlignmentInteger*>(result) + 1;
+#else
+  void* result = do_malloc(size);
+#endif
+
 #ifndef WTF_CHANGES
   MallocHook::InvokeNewHook(result, size);
 #endif
@@ -3371,7 +3486,18 @@ extern "C"
 #ifndef WTF_CHANGES
   MallocHook::InvokeDeleteHook(ptr);
 #endif
+
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  if (!ptr)
+    return;
+
+  AllocAlignmentInteger* header = Internal::fastMallocMatchValidationValue(ptr);
+  if (*header != Internal::AllocTypeMalloc)
+    Internal::fastMallocMatchFailed(ptr);
+  do_free(header);
+#else
   do_free(ptr);
+#endif
 }
 
 #ifndef WTF_CHANGES
@@ -3393,16 +3519,32 @@ ALWAYS_INLINE
 #endif
     void*
     calloc(size_t n, size_t elem_size) {
-  const size_t totalBytes = n * elem_size;
+  size_t totalBytes = n * elem_size;
 
   // Protect against overflow
   if (n > 1 && elem_size && (totalBytes / elem_size) != n)
     return 0;
 
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  if (std::numeric_limits<size_t>::max() - sizeof(AllocAlignmentInteger) <=
+      totalBytes)  // If overflow would occur...
+    return 0;
+
+  totalBytes += sizeof(AllocAlignmentInteger);
+  void* result = do_malloc(totalBytes);
+  if (!result)
+    return 0;
+
+  memset(result, 0, totalBytes);
+  *static_cast<AllocAlignmentInteger*>(result) = Internal::AllocTypeMalloc;
+  result = static_cast<AllocAlignmentInteger*>(result) + 1;
+#else
   void* result = do_malloc(totalBytes);
   if (result != NULL) {
     memset(result, 0, totalBytes);
   }
+#endif
+
 #ifndef WTF_CHANGES
   MallocHook::InvokeNewHook(result, totalBytes);
 #endif
@@ -3443,9 +3585,13 @@ ALWAYS_INLINE
     void*
     realloc(void* old_ptr, size_t new_size) {
   if (old_ptr == NULL) {
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+    void* result = malloc(new_size);
+#else
     void* result = do_malloc(new_size);
 #ifndef WTF_CHANGES
     MallocHook::InvokeNewHook(result, new_size);
+#endif
 #endif
     return result;
   }
@@ -3456,6 +3602,18 @@ ALWAYS_INLINE
     free(old_ptr);
     return NULL;
   }
+
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+  if (std::numeric_limits<size_t>::max() - sizeof(AllocAlignmentInteger) <=
+      new_size)  // If overflow would occur...
+    return 0;
+  new_size += sizeof(AllocAlignmentInteger);
+  AllocAlignmentInteger* header =
+      Internal::fastMallocMatchValidationValue(old_ptr);
+  if (*header != Internal::AllocTypeMalloc)
+    Internal::fastMallocMatchFailed(old_ptr);
+  old_ptr = header;
+#endif
 
   // Get the size of the old entry
   const PageID p = reinterpret_cast<uintptr_t>(old_ptr) >> kPageShift;
@@ -3493,8 +3651,16 @@ ALWAYS_INLINE
     // that we already know the sizeclass of old_ptr.  The benefit
     // would be small, so don't bother.
     do_free(old_ptr);
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+    new_ptr = static_cast<AllocAlignmentInteger*>(new_ptr) + 1;
+#endif
     return new_ptr;
   } else {
+#if ENABLE(FAST_MALLOC_MATCH_VALIDATION)
+    old_ptr =
+        pByte +
+        sizeof(AllocAlignmentInteger);  // Set old_ptr back to the user pointer.
+#endif
     return old_ptr;
   }
 }
