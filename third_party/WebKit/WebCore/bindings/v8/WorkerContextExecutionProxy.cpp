@@ -38,6 +38,7 @@
 #include "V8Proxy.h"
 #include "Event.h"
 #include "V8WorkerContextEventListener.h"
+#include "V8WorkerContextObjectEventListener.h"
 #include "WorkerContext.h"
 #include "WorkerLocation.h"
 #include "WorkerNavigator.h"
@@ -101,7 +102,7 @@ void WorkerContextExecutionProxy::dispose() {
   v8::HandleScope scope;
   v8::Persistent<v8::Object> wrapper = domObjectMap().get(m_workerContext);
   if (!wrapper.IsEmpty())
-    V8Proxy::SetDOMWrapper(wrapper, V8ClassIndex::INVALID_CLASS_INDEX, NULL);
+    V8Proxy::SetDOMWrapper(wrapper, V8ClassIndex::INVALID_CLASS_INDEX, 0);
   domObjectMap().forget(m_workerContext);
 }
 
@@ -109,7 +110,9 @@ WorkerContextExecutionProxy* WorkerContextExecutionProxy::retrieve() {
   v8::Handle<v8::Context> context = v8::Context::GetCurrent();
   v8::Handle<v8::Object> global = context->Global();
   global = V8Proxy::LookupDOMWrapper(V8ClassIndex::WORKERCONTEXT, global);
-  ASSERT(!global.IsEmpty());
+  // Return 0 if the current executing context is not the worker context.
+  if (global.IsEmpty())
+    return 0;
   WorkerContext* workerContext = V8Proxy::ToNativeObject<WorkerContext>(
       V8ClassIndex::WORKERCONTEXT, global);
   return workerContext->script()->proxy();
@@ -122,7 +125,7 @@ void WorkerContextExecutionProxy::initContextIfNeeded() {
 
   // Create a new environment
   v8::Persistent<v8::ObjectTemplate> globalTemplate;
-  m_context = v8::Context::New(NULL, globalTemplate);
+  m_context = v8::Context::New(0, globalTemplate);
 
   // Starting from now, use local context only.
   v8::Local<v8::Context> context = v8::Local<v8::Context>::New(m_context);
@@ -343,10 +346,11 @@ v8::Local<v8::Value> WorkerContextExecutionProxy::runScript(
 }
 
 PassRefPtr<V8EventListener>
-WorkerContextExecutionProxy::FindOrCreateEventListener(
+WorkerContextExecutionProxy::findOrCreateEventListenerHelper(
     v8::Local<v8::Value> object,
     bool isInline,
-    bool findOnly) {
+    bool findOnly,
+    bool createObjectEventListener) {
   if (!object->IsObject())
     return 0;
 
@@ -355,9 +359,13 @@ WorkerContextExecutionProxy::FindOrCreateEventListener(
     return listener;
 
   // Create a new one, and add to cache.
-  RefPtr<V8WorkerContextEventListener> newListener =
-      V8WorkerContextEventListener::create(
-          this, v8::Local<v8::Object>::Cast(object), isInline);
+  RefPtr<V8EventListener> newListener;
+  if (createObjectEventListener)
+    newListener = V8WorkerContextObjectEventListener::create(
+        this, v8::Local<v8::Object>::Cast(object), isInline);
+  else
+    newListener = V8WorkerContextEventListener::create(
+        this, v8::Local<v8::Object>::Cast(object), isInline);
   {
     // Need to use lock since V8EventListenerList::add() creates HandleScope.
     v8::Locker locker;
@@ -365,6 +373,22 @@ WorkerContextExecutionProxy::FindOrCreateEventListener(
   }
 
   return newListener.release();
+}
+
+PassRefPtr<V8EventListener>
+WorkerContextExecutionProxy::FindOrCreateEventListener(
+    v8::Local<v8::Value> object,
+    bool isInline,
+    bool findOnly) {
+  return findOrCreateEventListenerHelper(object, isInline, findOnly, false);
+}
+
+PassRefPtr<V8EventListener>
+WorkerContextExecutionProxy::findOrCreateObjectEventListener(
+    v8::Local<v8::Value> object,
+    bool isInline,
+    bool findOnly) {
+  return findOrCreateEventListenerHelper(object, isInline, findOnly, true);
 }
 
 void WorkerContextExecutionProxy::RemoveEventListener(
