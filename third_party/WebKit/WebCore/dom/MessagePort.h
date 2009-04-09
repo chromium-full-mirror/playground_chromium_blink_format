@@ -30,6 +30,7 @@
 #include "AtomicStringHash.h"
 #include "EventListener.h"
 #include "EventTarget.h"
+#include "MessagePortProxy.h"
 
 #include <wtf/HashMap.h>
 #include <wtf/MessageQueue.h>
@@ -46,7 +47,7 @@ class ScriptExecutionContext;
 class String;
 class WorkerContext;
 
-class MessagePort : public RefCounted<MessagePort>, public EventTarget {
+class MessagePort : public MessagePortProxy, public EventTarget {
  public:
   static PassRefPtr<MessagePort> create(
       ScriptExecutionContext* scriptExecutionContext) {
@@ -65,11 +66,16 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   void start();
   void close();
 
+  // Implementations of MessagePortProxy APIs
+  virtual void entangle(MessagePortProxy*);
+  virtual void unentangle();
+  virtual void deliverMessage(const String& message, PassRefPtr<MessagePort>);
+  virtual void queueCloseEvent();
+
   bool queueIsOpen() const { return m_queueIsOpen; }
 
-  MessagePort* entangledPort() { return m_entangledPort; }
-  static void entangle(MessagePort*, MessagePort*);
-  void unentangle();
+  MessagePortProxy* entangledPort() { return m_entangledPort; }
+  static void entangle(MessagePortProxy*, MessagePortProxy*);
 
   void contextDestroyed();
   void attachToContext(ScriptExecutionContext*);
@@ -77,7 +83,6 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
 
   virtual MessagePort* toMessagePort() { return this; }
 
-  void queueCloseEvent();
   void dispatchMessages();
 
   virtual void addEventListener(const AtomicString& eventType,
@@ -92,8 +97,8 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
   EventListenersMap& eventListeners() { return m_eventListeners; }
 
-  using RefCounted<MessagePort>::ref;
-  using RefCounted<MessagePort>::deref;
+  using RefCounted<MessagePortProxy>::ref;
+  using RefCounted<MessagePortProxy>::deref;
 
   bool hasPendingActivity();
 
@@ -119,7 +124,7 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
 
   void dispatchCloseEvent();
 
-  MessagePort* m_entangledPort;
+  MessagePortProxy* m_entangledPort;
 
   // FIXME: EventData is necessary to pass messages to other threads. In single
   // threaded case, we can just queue a created event.
