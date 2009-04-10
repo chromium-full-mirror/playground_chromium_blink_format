@@ -43,7 +43,6 @@ class InspectorController;
 class ScriptObject : public ScriptValue {
  public:
   ScriptObject(JSC::JSObject*);
-  ScriptObject(ScriptState*);
   ScriptObject() {}
   JSC::JSObject* jsObject() const { return asObject(jsValue()); }
 
@@ -54,6 +53,8 @@ class ScriptObject : public ScriptValue {
   bool set(ScriptState*, const char* name, long long);
   bool set(ScriptState*, const char* name, int);
   bool set(ScriptState*, const char* name, bool);
+
+  static ScriptObject createNew(ScriptState*);
 };
 
 class ScriptGlobalObject {

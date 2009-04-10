@@ -287,7 +287,7 @@ JSValuePtr JSInspectorController::setSetting(ExecState* exec,
 
   InspectorController::Setting setting;
 
-  JSValuePtr value = args.at(exec, 0);
+  JSValuePtr value = args.at(exec, 1);
   if (value.isUndefined() || value.isNull()) {
     // Do nothing. The setting is already NoType.
     ASSERT(setting.type() == InspectorController::Setting::NoType);
