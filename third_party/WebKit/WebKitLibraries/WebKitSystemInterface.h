@@ -221,6 +221,7 @@ void WKGetWheelEventDeltas(NSEvent*,
 
 BOOL WKAppVersionCheckLessThan(NSString*, int, double);
 
+unsigned WKQTIncludeOnlyModernMediaFileTypes(void);
 int WKQTMovieDataRate(QTMovie* movie);
 float WKQTMovieMaxTimeLoaded(QTMovie* movie);
 void WKQTMovieViewSetDrawSynchronously(QTMovieView* view, BOOL sync);
@@ -285,6 +286,8 @@ void WKSoftwareCARendererRender(WKSoftwareCARendererRef, CGContextRef, CGRect);
 
 CFRunLoopSourceRef WKCreateMIGServerSource(mig_subsystem_t subsystem,
                                            mach_port_t serverPort);
+
+NSUInteger WKGetInputPanelWindowStyle(void);
 
 #endif
 
