@@ -49,6 +49,7 @@ ScriptCachedFrameData::ScriptCachedFrameData(Frame* frame) {
   ScriptController* scriptController = frame->script();
   if (scriptController->haveWindowShell()) {
     m_window = scriptController->windowShell()->window();
+    scriptController->attachDebugger(0);
   }
 }
 
@@ -66,8 +67,7 @@ void ScriptCachedFrameData::restore(Frame* frame) {
   JSLock lock(false);
 
   ScriptController* scriptController = frame->script();
-  if (scriptController->haveWindowShell()) {
-    JSDOMWindowShell* windowShell = scriptController->windowShell();
+  if (JSDOMWindowShell* windowShell = scriptController->windowShell()) {
     if (m_window) {
       windowShell->setWindow(m_window.get());
     } else {
