@@ -151,6 +151,7 @@ extern void (*wkPopupMenu)(NSMenu*,
                            NSView*,
                            int selectedItem,
                            NSFont*);
+extern unsigned (*wkQTIncludeOnlyModernMediaFileTypes)(void);
 extern int (*wkQTMovieDataRate)(QTMovie*);
 extern float (*wkQTMovieMaxTimeLoaded)(QTMovie*);
 extern void (*wkQTMovieViewSetDrawSynchronously)(QTMovieView*, BOOL);
