@@ -6340,7 +6340,7 @@ void CSSStyleSelector::SelectorChecker::allVisitedStateChanged() {
     return;
   for (Node* node = m_document; node; node = node->traverseNextNode()) {
     if (node->isLink())
-      node->setChanged();
+      node->setNeedsStyleRecalc();
   }
 }
 
@@ -6351,7 +6351,7 @@ void CSSStyleSelector::SelectorChecker::visitedStateChanged(
   for (Node* node = m_document; node; node = node->traverseNextNode()) {
     const AtomicString* attr = linkAttribute(node);
     if (attr && visitedLinkHash(m_document->baseURL(), *attr) == visitedHash)
-      node->setChanged();
+      node->setNeedsStyleRecalc();
   }
 }
 

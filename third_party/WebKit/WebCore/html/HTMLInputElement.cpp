@@ -530,7 +530,7 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
     // We only need to setChanged if the form is looking at the default value
     // right now.
     if (m_data.value().isNull())
-      setChanged();
+      setNeedsStyleRecalc();
     setValueMatchesRenderer(false);
   } else if (attr->name() == checkedAttr) {
     m_defaultChecked = !attr->isNull();
@@ -596,14 +596,14 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
       detach();
       attach();
     }
-    setChanged();
+    setNeedsStyleRecalc();
   } else if (attr->name() == placeholderAttr) {
     if (isTextField())
       InputElement::updatePlaceholderVisibility(m_data, document(), true);
   } else if (attr->name() == autosaveAttr || attr->name() == incrementalAttr ||
              attr->name() == minAttr || attr->name() == maxAttr ||
              attr->name() == multipleAttr || attr->name() == precisionAttr)
-    setChanged();
+    setNeedsStyleRecalc();
   else
     HTMLFormControlElementWithState::parseMappedAttribute(attr);
 }
@@ -802,7 +802,7 @@ void HTMLInputElement::setChecked(bool nowChecked, bool sendChangeEvent) {
 
   m_useDefaultChecked = false;
   m_checked = nowChecked;
-  setChanged();
+  setNeedsStyleRecalc();
 
   checkedRadioButtons(this).addButton(this);
 
@@ -825,7 +825,7 @@ void HTMLInputElement::setIndeterminate(bool _indeterminate) {
 
   m_indeterminate = _indeterminate;
 
-  setChanged();
+  setNeedsStyleRecalc();
 
   if (renderer() && renderer()->style()->hasAppearance())
     theme()->stateChanged(renderer(), CheckedState);
@@ -916,12 +916,12 @@ void HTMLInputElement::setValue(const String& value) {
       if (isTextField()) {
         InputElement::updatePlaceholderVisibility(m_data, document());
         if (inDocument())
-          document()->updateRendering();
+          document()->updateStyleIfNeeded();
       }
     }
     if (renderer())
       renderer()->updateFromElement();
-    setChanged();
+    setNeedsStyleRecalc();
   } else
     setAttribute(valueAttr, constrainValue(value));
 
@@ -1449,7 +1449,7 @@ void HTMLInputElement::setAutofilled(bool b) {
     return;
 
   m_autofilled = b;
-  setChanged();
+  setNeedsStyleRecalc();
 }
 
 FileList* HTMLInputElement::files() {

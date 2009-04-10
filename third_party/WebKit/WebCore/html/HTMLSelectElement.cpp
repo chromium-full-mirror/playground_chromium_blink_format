@@ -95,7 +95,7 @@ bool HTMLSelectElement::checkDTD(const Node* newChild) {
 }
 
 void HTMLSelectElement::recalcStyle(StyleChange ch) {
-  if (hasChangedChild() && renderer()) {
+  if (childNeedsStyleRecalc() && renderer()) {
     if (usesMenuList())
       static_cast<RenderMenuList*>(renderer())->setOptionsChanged(true);
     else
@@ -287,7 +287,7 @@ void HTMLSelectElement::restoreState(const String& state) {
       static_cast<HTMLOptionElement*>(items[i])->setSelectedState(state[i] ==
                                                                   'X');
 
-  setChanged();
+  setNeedsStyleRecalc();
 }
 
 void HTMLSelectElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -509,7 +509,7 @@ void HTMLSelectElement::setRecalcListItems() {
   }
   if (!inDocument())
     m_collectionInfo.reset();
-  setChanged();
+  setNeedsStyleRecalc();
 }
 
 void HTMLSelectElement::reset() {
@@ -532,7 +532,7 @@ void HTMLSelectElement::reset() {
   if (!optionSelected && firstOption && usesMenuList())
     firstOption->setSelectedState(true);
 
-  setChanged();
+  setNeedsStyleRecalc();
 }
 
 void HTMLSelectElement::dispatchFocusEvent() {
@@ -985,7 +985,7 @@ void HTMLSelectElement::typeAheadFind(KeyboardEvent* event) {
       setSelectedIndex(listToOptionIndex(index));
       if (!usesMenuList())
         listBoxOnChange();
-      setChanged();
+      setNeedsStyleRecalc();
       return;
     }
   }

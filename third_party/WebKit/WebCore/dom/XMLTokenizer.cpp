@@ -288,7 +288,7 @@ void XMLTokenizer::insertErrorMessageBlock() {
         ec);
   }
 #endif
-  doc->updateRendering();
+  doc->updateStyleIfNeeded();
 }
 
 void XMLTokenizer::notifyFinished(CachedResource* unusedResource) {

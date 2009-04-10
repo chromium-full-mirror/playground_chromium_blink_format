@@ -301,7 +301,7 @@ static bool setTableCellsChanged(Node* n) {
   }
 
   if (cellChanged)
-    n->setChanged();
+    n->setNeedsStyleRecalc();
 
   return cellChanged;
 }
@@ -453,7 +453,7 @@ void HTMLTableElement::parseMappedAttribute(MappedAttribute* attr) {
     for (Node* child = firstChild(); child; child = child->nextSibling())
       cellChanged |= setTableCellsChanged(child);
     if (cellChanged)
-      setChanged();
+      setNeedsStyleRecalc();
   }
 }
 

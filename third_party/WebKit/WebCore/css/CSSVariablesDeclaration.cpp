@@ -72,7 +72,7 @@ String CSSVariablesDeclaration::removeVariable(const String& variableName,
       }
     }
 
-    setChanged();
+    setNeedsStyleRecalc();
   }
 
   // FIXME: Communicate this change so that the document will update.
@@ -92,7 +92,7 @@ void CSSVariablesDeclaration::setVariable(const String& variableName,
                                              // add) with the parsed Value*.
     excCode = SYNTAX_ERR;
   else
-    setChanged();
+    setNeedsStyleRecalc();
 }
 
 void CSSVariablesDeclaration::addParsedVariable(
@@ -168,7 +168,7 @@ void CSSVariablesDeclaration::setCssText(const String&) {
   // FIXME: It's not clear if this is actually settable.
 }
 
-void CSSVariablesDeclaration::setChanged() {
+void CSSVariablesDeclaration::setNeedsStyleRecalc() {
   // FIXME: Make this much better (it has the same problem
   // CSSMutableStyleDeclaration does).
   StyleBase* root = this;

@@ -291,7 +291,7 @@ void HTMLTextAreaElement::setValue(const String& value) {
   m_value = normalizedValue;
   setValueMatchesRenderer();
   if (inDocument())
-    document()->updateRendering();
+    document()->updateStyleIfNeeded();
   if (renderer())
     renderer()->updateFromElement();
 
@@ -301,7 +301,7 @@ void HTMLTextAreaElement::setValue(const String& value) {
     setSelectionRange(endOfString, endOfString);
   }
 
-  setChanged();
+  setNeedsStyleRecalc();
   notifyFormStateChanged(this);
 }
 

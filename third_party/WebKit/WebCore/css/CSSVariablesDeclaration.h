@@ -79,7 +79,7 @@ class CSSVariablesDeclaration : public StyleBase {
                           const Vector<String>& names,
                           const Vector<RefPtr<CSSValue>>& values);
 
-  void setChanged();
+  void setNeedsStyleRecalc();
 
  protected:
   Vector<String> m_variableNames;

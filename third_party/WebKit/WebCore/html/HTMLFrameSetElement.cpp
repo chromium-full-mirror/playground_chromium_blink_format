@@ -87,13 +87,13 @@ void HTMLFrameSetElement::parseMappedAttribute(MappedAttribute* attr) {
       if (m_rows)
         delete[] m_rows;
       m_rows = newLengthArray(attr->value().string(), m_totalRows);
-      setChanged();
+      setNeedsStyleRecalc();
     }
   } else if (attr->name() == colsAttr) {
     if (!attr->isNull()) {
       delete[] m_cols;
       m_cols = newLengthArray(attr->value().string(), m_totalCols);
-      setChanged();
+      setNeedsStyleRecalc();
     }
   } else if (attr->name() == frameborderAttr) {
     if (!attr->isNull()) {
@@ -185,9 +185,9 @@ void HTMLFrameSetElement::defaultEventHandler(Event* evt) {
 }
 
 void HTMLFrameSetElement::recalcStyle(StyleChange ch) {
-  if (changed() && renderer()) {
+  if (needsStyleRecalc() && renderer()) {
     renderer()->setNeedsLayout(true);
-    setChanged(NoStyleChange);
+    setNeedsStyleRecalc(NoStyleChange);
   }
   HTMLElement::recalcStyle(ch);
 }

@@ -128,14 +128,14 @@ void ScheduledAction::execute(Document* document) {
 
   // Update our document's rendering following the execution of the timeout
   // callback.
-  // FIXME: Why not use updateDocumentsRendering to update rendering of all
+  // FIXME: Why not use updateStyleForAllDocuments to update rendering of all
   // documents?
   // FIXME: Is this really the right point to do the update? We need a place
   // that works
   // for all possible entry points that might possibly execute script, but this
   // seems
   // to be a bit too low-level.
-  frame->document()->updateRendering();
+  frame->document()->updateStyleIfNeeded();
 
   frame->script()->setProcessingTimerCallback(false);
 }

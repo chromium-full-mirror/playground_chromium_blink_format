@@ -707,7 +707,7 @@ void Element::detach() {
 void Element::recalcStyle(StyleChange change) {
   RenderStyle* currentStyle = renderStyle();
   bool hasParentStyle = parentNode() ? parentNode()->renderStyle() : false;
-  bool hasPositionalRules = changed() && currentStyle &&
+  bool hasPositionalRules = needsStyleRecalc() && currentStyle &&
                             currentStyle->childrenAffectedByPositionalRules();
   bool hasDirectAdjacentRules =
       currentStyle && currentStyle->childrenAffectedByDirectAdjacentRules();
@@ -717,11 +717,11 @@ void Element::recalcStyle(StyleChange change) {
     hasParentStyle = true;
 #endif
 
-  if ((change > NoChange || changed())) {
+  if ((change > NoChange || needsStyleRecalc())) {
     if (hasRareData())
       rareData()->resetComputedStyle();
   }
-  if (hasParentStyle && (change >= Inherit || changed())) {
+  if (hasParentStyle && (change >= Inherit || needsStyleRecalc())) {
     RefPtr<RenderStyle> newStyle =
         document()->styleSelector()->styleForElement(this);
     StyleChange ch = diff(currentStyle, newStyle.get());
@@ -731,8 +731,8 @@ void Element::recalcStyle(StyleChange change) {
       attach();  // FIXME: The style gets computed twice by calling attach. We
                  // could do better if we passed the style along.
       // attach recalulates the style for all children. No need to do it twice.
-      setChanged(NoStyleChange);
-      setHasChangedChild(false);
+      setNeedsStyleRecalc(NoStyleChange);
+      setChildNeedsStyleRecalc(false);
       return;
     }
 
@@ -760,7 +760,8 @@ void Element::recalcStyle(StyleChange change) {
 
     if (ch != NoChange) {
       setRenderStyle(newStyle);
-    } else if (changed() && (styleChangeType() != AnimationStyleChange) &&
+    } else if (needsStyleRecalc() &&
+               (styleChangeType() != AnimationStyleChange) &&
                (document()->usesSiblingRules() ||
                 document()->usesDescendantRules())) {
       // Although no change occurred, we use the new style so that the cousin
@@ -794,19 +795,19 @@ void Element::recalcStyle(StyleChange change) {
   bool forceCheckOfNextElementSibling = false;
   for (Node* n = firstChild(); n; n = n->nextSibling()) {
     bool childRulesChanged =
-        n->changed() && n->styleChangeType() == FullStyleChange;
+        n->needsStyleRecalc() && n->styleChangeType() == FullStyleChange;
     if (forceCheckOfNextElementSibling && n->isElementNode())
-      n->setChanged();
-    if (change >= Inherit || n->isTextNode() || n->hasChangedChild() ||
-        n->changed())
+      n->setNeedsStyleRecalc();
+    if (change >= Inherit || n->isTextNode() || n->childNeedsStyleRecalc() ||
+        n->needsStyleRecalc())
       n->recalcStyle(change);
     if (n->isElementNode())
       forceCheckOfNextElementSibling =
           childRulesChanged && hasDirectAdjacentRules;
   }
 
-  setChanged(NoStyleChange);
-  setHasChangedChild(false);
+  setNeedsStyleRecalc(NoStyleChange);
+  setChildNeedsStyleRecalc(false);
 }
 
 bool Element::childTypeAllowed(NodeType type) {
@@ -830,7 +831,8 @@ static void checkForSiblingStyleChanges(Element* e,
                                         Node* beforeChange,
                                         Node* afterChange,
                                         int childCountDelta) {
-  if (!style || (e->changed() && style->childrenAffectedByPositionalRules()))
+  if (!style ||
+      (e->needsStyleRecalc() && style->childrenAffectedByPositionalRules()))
     return;
 
   // :first-child.  In the parser callback case, we don't have to check
@@ -860,13 +862,13 @@ static void checkForSiblingStyleChanges(Element* e,
         firstElementAfterInsertion && firstElementAfterInsertion->attached() &&
         firstElementAfterInsertion->renderStyle() &&
         firstElementAfterInsertion->renderStyle()->firstChildState())
-      firstElementAfterInsertion->setChanged();
+      firstElementAfterInsertion->setNeedsStyleRecalc();
 
     // We also have to handle node removal.
     if (childCountDelta < 0 && newFirstChild == firstElementAfterInsertion &&
         newFirstChild && newFirstChild->renderStyle() &&
         !newFirstChild->renderStyle()->firstChildState())
-      newFirstChild->setChanged();
+      newFirstChild->setNeedsStyleRecalc();
   }
 
   // :last-child.  In the parser callback case, we don't have to check anything,
@@ -893,7 +895,7 @@ static void checkForSiblingStyleChanges(Element* e,
         lastElementBeforeInsertion && lastElementBeforeInsertion->attached() &&
         lastElementBeforeInsertion->renderStyle() &&
         lastElementBeforeInsertion->renderStyle()->lastChildState())
-      lastElementBeforeInsertion->setChanged();
+      lastElementBeforeInsertion->setNeedsStyleRecalc();
 
     // We also have to handle node removal.  The parser callback case is similar
     // to node removal as well in that we need to change the last child
@@ -902,7 +904,7 @@ static void checkForSiblingStyleChanges(Element* e,
         newLastChild == lastElementBeforeInsertion && newLastChild &&
         newLastChild->renderStyle() &&
         !newLastChild->renderStyle()->lastChildState())
-      newLastChild->setChanged();
+      newLastChild->setNeedsStyleRecalc();
   }
 
   // The + selector.  We need to invalidate the first element following the
@@ -917,7 +919,7 @@ static void checkForSiblingStyleChanges(Element* e,
              firstElementAfterInsertion->nextSibling()) {
     };
     if (firstElementAfterInsertion && firstElementAfterInsertion->attached())
-      firstElementAfterInsertion->setChanged();
+      firstElementAfterInsertion->setNeedsStyleRecalc();
   }
 
   // Forward positional selectors include the ~ selector, nth-child,
@@ -935,11 +937,11 @@ static void checkForSiblingStyleChanges(Element* e,
   // this has happened.
   if ((style->childrenAffectedByForwardPositionalRules() && afterChange) ||
       (style->childrenAffectedByBackwardPositionalRules() && beforeChange))
-    e->setChanged();
+    e->setNeedsStyleRecalc();
 
   // :empty selector.
   if (style->affectedByEmpty() && (!style->emptyState() || e->hasChildNodes()))
-    e->setChanged();
+    e->setNeedsStyleRecalc();
 }
 
 void Element::childrenChanged(bool changedByParser,

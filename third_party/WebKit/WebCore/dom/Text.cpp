@@ -249,7 +249,7 @@ void Text::recalcStyle(StyleChange change) {
     if (renderer())
       renderer()->setStyle(parentNode()->renderer()->style());
   }
-  if (changed()) {
+  if (needsStyleRecalc()) {
     if (renderer()) {
       if (renderer()->isText())
         toRenderText(renderer())->setText(m_data);
@@ -259,7 +259,7 @@ void Text::recalcStyle(StyleChange change) {
       attach();
     }
   }
-  setChanged(NoStyleChange);
+  setNeedsStyleRecalc(NoStyleChange);
 }
 
 // DOM Section 1.1.1

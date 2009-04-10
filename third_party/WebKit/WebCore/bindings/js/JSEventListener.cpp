@@ -130,7 +130,7 @@ void JSAbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
     }
 
     if (scriptExecutionContext->isDocument())
-      Document::updateDocumentsRendering();
+      Document::updateStyleForAllDocuments();
     deref();
   }
 }

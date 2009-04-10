@@ -60,8 +60,8 @@ class AnimationControllerPrivate {
   void animationTimerFired(Timer<AnimationControllerPrivate>*);
   void updateAnimationTimer(bool callSetChanged = false);
 
-  void updateRenderingDispatcherFired(Timer<AnimationControllerPrivate>*);
-  void startUpdateRenderingDispatcher();
+  void updateStyleIfNeededDispatcherFired(Timer<AnimationControllerPrivate>*);
+  void startupdateStyleIfNeededDispatcher();
   void addEventToDispatch(PassRefPtr<Element> element,
                           const AtomicString& eventType,
                           const String& name,
@@ -111,7 +111,7 @@ class AnimationControllerPrivate {
 
   RenderObjectAnimationMap m_compositeAnimations;
   Timer<AnimationControllerPrivate> m_animationTimer;
-  Timer<AnimationControllerPrivate> m_updateRenderingDispatcher;
+  Timer<AnimationControllerPrivate> m_updateStyleIfNeededDispatcher;
   Frame* m_frame;
 
   class EventToDispatch {

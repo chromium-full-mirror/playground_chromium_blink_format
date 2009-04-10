@@ -269,7 +269,7 @@ void InputElement::parseMaxLengthAttribute(InputElementData& data,
   if (oldMaxLength != maxLength)
     updateValueIfNeeded(data);
 
-  data.element()->setChanged();
+  data.element()->setNeedsStyleRecalc();
 }
 
 void InputElement::updateValueIfNeeded(InputElementData& data) {

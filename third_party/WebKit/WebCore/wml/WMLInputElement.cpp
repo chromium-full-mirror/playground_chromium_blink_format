@@ -125,10 +125,10 @@ void WMLInputElement::setValue(const String& value) {
   setValueMatchesRenderer(false);
   m_data.setValue(constrainValue(value));
   if (inDocument())
-    document()->updateRendering();
+    document()->updateStyleIfNeeded();
   if (renderer())
     renderer()->updateFromElement();
-  setChanged();
+  setNeedsStyleRecalc();
 
   unsigned max = m_data.value().length();
   if (document()->focusedNode() == this)
@@ -176,7 +176,7 @@ void WMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
     // We only need to setChanged if the form is looking at the default value
     // right now.
     if (m_data.value().isNull())
-      setChanged();
+      setNeedsStyleRecalc();
     setValueMatchesRenderer(false);
   } else if (attr->name() == HTMLNames::maxlengthAttr)
     InputElement::parseMaxLengthAttribute(m_data, attr);

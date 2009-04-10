@@ -131,7 +131,7 @@ void SVGUseElement::svgAttributeChanged(const QualifiedName& attrName) {
     buildPendingResource();
 
     if (m_shadowTreeRootElement)
-      m_shadowTreeRootElement->setChanged();
+      m_shadowTreeRootElement->setNeedsStyleRecalc();
   }
 }
 
@@ -148,7 +148,7 @@ void SVGUseElement::childrenChanged(bool changedByParser,
   buildPendingResource();
 
   if (m_shadowTreeRootElement)
-    m_shadowTreeRootElement->setChanged();
+    m_shadowTreeRootElement->setNeedsStyleRecalc();
 }
 
 static bool shadowTreeContainsChangedNodes(SVGElementInstance* target) {
@@ -164,12 +164,12 @@ static bool shadowTreeContainsChangedNodes(SVGElementInstance* target) {
 }
 
 void SVGUseElement::recalcStyle(StyleChange change) {
-  if (attached() && changed() &&
+  if (attached() && needsStyleRecalc() &&
       shadowTreeContainsChangedNodes(m_targetElementInstance.get())) {
     buildPendingResource();
 
     if (m_shadowTreeRootElement)
-      m_shadowTreeRootElement->setChanged();
+      m_shadowTreeRootElement->setNeedsStyleRecalc();
   }
 
   SVGStyledElement::recalcStyle(change);
@@ -185,7 +185,7 @@ void SVGUseElement::recalcStyle(StyleChange change) {
   // attach() will crash
   // as the shadow tree root element has no (direct) parent node. Yes, shadow
   // trees are tricky.
-  if (change >= Inherit || m_shadowTreeRootElement->changed()) {
+  if (change >= Inherit || m_shadowTreeRootElement->needsStyleRecalc()) {
     RefPtr<RenderStyle> newStyle = document()->styleSelector()->styleForElement(
         m_shadowTreeRootElement.get());
     StyleChange ch =
@@ -196,8 +196,8 @@ void SVGUseElement::recalcStyle(StyleChange change) {
       attachShadowTree();
 
       // attach recalulates the style for all children. No need to do it twice.
-      m_shadowTreeRootElement->setChanged(NoStyleChange);
-      m_shadowTreeRootElement->setHasChangedChild(false);
+      m_shadowTreeRootElement->setNeedsStyleRecalc(NoStyleChange);
+      m_shadowTreeRootElement->setChildNeedsStyleRecalc(false);
       return;
     }
   }

@@ -195,7 +195,7 @@ bool ImplicitAnimation::sendTransitionEvent(const AtomicString& eventType,
       // Restore the original (unanimated) style
       if (eventType == eventNames().webkitTransitionEndEvent &&
           element->renderer())
-        setChanged(element.get());
+        setNeedsStyleRecalc(element.get());
 
       return true;  // Did dispatch an event
     }

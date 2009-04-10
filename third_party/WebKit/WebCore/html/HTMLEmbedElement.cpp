@@ -162,7 +162,7 @@ void HTMLEmbedElement::attach() {
 }
 
 void HTMLEmbedElement::updateWidget() {
-  document()->updateRendering();
+  document()->updateStyleIfNeeded();
   if (m_needWidgetUpdate && renderer() && !isImageType())
     static_cast<RenderPartObject*>(renderer())->updateWidget(true);
 }

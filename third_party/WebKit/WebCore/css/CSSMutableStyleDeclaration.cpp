@@ -425,12 +425,12 @@ String CSSMutableStyleDeclaration::removeProperty(int propertyID,
   m_properties.remove(foundProperty - m_properties.data());
 
   if (notifyChanged)
-    setChanged();
+    setNeedsStyleRecalc();
 
   return value;
 }
 
-void CSSMutableStyleDeclaration::setChanged() {
+void CSSMutableStyleDeclaration::setNeedsStyleRecalc() {
   if (m_node) {
     // FIXME: Ideally, this should be factored better and there
     // should be a subclass of CSSMutableStyleDeclaration just
@@ -439,10 +439,10 @@ void CSSMutableStyleDeclaration::setChanged() {
         m_node->isStyledElement() &&
         this == static_cast<StyledElement*>(m_node)->inlineStyleDecl();
     if (isInlineStyleDeclaration) {
-      m_node->setChanged(InlineStyleChange);
+      m_node->setNeedsStyleRecalc(InlineStyleChange);
       static_cast<StyledElement*>(m_node)->invalidateStyleAttribute();
     } else
-      m_node->setChanged(FullStyleChange);
+      m_node->setNeedsStyleRecalc(FullStyleChange);
     return;
   }
 
@@ -509,7 +509,7 @@ bool CSSMutableStyleDeclaration::setProperty(int propertyID,
     // compatibility,
     // see <http://bugs.webkit.org/show_bug.cgi?id=7296>.
   } else if (notifyChanged)
-    setChanged();
+    setNeedsStyleRecalc();
 
   return success;
 }
@@ -537,7 +537,7 @@ bool CSSMutableStyleDeclaration::setProperty(int propertyID,
                        important);
   setPropertyInternal(property);
   if (notifyChanged)
-    setChanged();
+    setNeedsStyleRecalc();
   return true;
 }
 
@@ -550,7 +550,7 @@ void CSSMutableStyleDeclaration::setStringProperty(
 
   setPropertyInternal(CSSProperty(
       propertyId, CSSPrimitiveValue::create(value, type), important));
-  setChanged();
+  setNeedsStyleRecalc();
 }
 
 void CSSMutableStyleDeclaration::setImageProperty(int propertyId,
@@ -560,7 +560,7 @@ void CSSMutableStyleDeclaration::setImageProperty(int propertyId,
 
   setPropertyInternal(
       CSSProperty(propertyId, CSSImageValue::create(url), important));
-  setChanged();
+  setNeedsStyleRecalc();
 }
 
 void CSSMutableStyleDeclaration::parseDeclaration(
@@ -570,7 +570,7 @@ void CSSMutableStyleDeclaration::parseDeclaration(
   m_properties.clear();
   CSSParser parser(useStrictParsing());
   parser.parseDeclaration(this, styleDeclaration);
-  setChanged();
+  setNeedsStyleRecalc();
 }
 
 void CSSMutableStyleDeclaration::addParsedProperties(
@@ -591,8 +591,8 @@ void CSSMutableStyleDeclaration::addParsedProperties(
         m_variableDependentValueCount++;
     }
   }
-  // FIXME: This probably should have a call to setChanged() if something
-  // changed. We may also wish to add
+  // FIXME: This probably should have a call to setNeedsStyleRecalc() if
+  // something changed. We may also wish to add
   // a notifyChanged argument to this function to follow the model of other
   // functions in this class.
 }
@@ -681,7 +681,7 @@ void CSSMutableStyleDeclaration::setCssText(const String& text,
   CSSParser parser(useStrictParsing());
   parser.parseDeclaration(this, text);
   // FIXME: Detect syntax errors and set ec.
-  setChanged();
+  setNeedsStyleRecalc();
 }
 
 void CSSMutableStyleDeclaration::merge(CSSMutableStyleDeclaration* other,
@@ -699,8 +699,8 @@ void CSSMutableStyleDeclaration::merge(CSSMutableStyleDeclaration* other,
     } else
       m_properties.append(toMerge);
   }
-  // FIXME: This probably should have a call to setChanged() if something
-  // changed. We may also wish to add
+  // FIXME: This probably should have a call to setNeedsStyleRecalc() if
+  // something changed. We may also wish to add
   // a notifyChanged argument to this function to follow the model of other
   // functions in this class.
 }
@@ -781,7 +781,7 @@ void CSSMutableStyleDeclaration::removePropertiesInSet(const int* set,
   m_properties = newProperties;
 
   if (changed && notifyChanged)
-    setChanged();
+    setNeedsStyleRecalc();
 }
 
 PassRefPtr<CSSMutableStyleDeclaration>

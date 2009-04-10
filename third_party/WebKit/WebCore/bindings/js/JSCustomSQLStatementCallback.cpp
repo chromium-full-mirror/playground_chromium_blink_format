@@ -85,6 +85,6 @@ void JSCustomSQLStatementCallback::handleEvent(SQLTransaction* transaction,
     raisedException = true;
   }
 
-  Document::updateDocumentsRendering();
+  Document::updateStyleForAllDocuments();
 }
 }
