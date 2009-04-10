@@ -22,6 +22,7 @@
 #include <wtf/Assertions.h>
 #include "FrameLoaderTypes.h"
 
+#include <glib/gi18n-lib.h>
 #include "webkitwebnavigationaction.h"
 #include "webkitprivate.h"
 #include "webkitenumtypes.h"
@@ -177,7 +178,8 @@ static void webkit_web_navigation_action_class_init(
   g_object_class_install_property(
       objectClass, PROP_REASON,
       g_param_spec_enum(
-          "reason", "Reason", "The reason why this navigation is occurring",
+          "reason", _("Reason"),
+          _("The reason why this navigation is occurring"),
           WEBKIT_TYPE_WEB_NAVIGATION_REASON, WEBKIT_WEB_NAVIGATION_REASON_OTHER,
           (GParamFlags)(WEBKIT_PARAM_READWRITE | G_PARAM_CONSTRUCT)));
 
@@ -191,8 +193,8 @@ static void webkit_web_navigation_action_class_init(
   g_object_class_install_property(
       objectClass, PROP_ORIGINAL_URI,
       g_param_spec_string(
-          "original-uri", "Original URI",
-          "The URI that was requested as the target for the navigation", "",
+          "original-uri", _("Original URI"),
+          _("The URI that was requested as the target for the navigation"), "",
           (GParamFlags)(WEBKIT_PARAM_READWRITE | G_PARAM_CONSTRUCT)));
   /**
    * WebKitWebNavigationAction:button:
@@ -204,8 +206,8 @@ static void webkit_web_navigation_action_class_init(
   g_object_class_install_property(
       objectClass, PROP_BUTTON,
       g_param_spec_int(
-          "button", "Button", "The button used to click", -1, G_MAXINT, -1,
-          (GParamFlags)(WEBKIT_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY)));
+          "button", _("Button"), _("The button used to click"), -1, G_MAXINT,
+          -1, (GParamFlags)(WEBKIT_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY)));
 
   /**
    * WebKitWebNavigationAction:modifier-state:
@@ -217,9 +219,10 @@ static void webkit_web_navigation_action_class_init(
   g_object_class_install_property(
       objectClass, PROP_MODIFIER_STATE,
       g_param_spec_int(
-          "modifier-state", "Modifier state",
-          "A bitmask representing the state of the modifier keys", 0, G_MAXINT,
-          0, (GParamFlags)(WEBKIT_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY)));
+          "modifier-state", _("Modifier state"),
+          _("A bitmask representing the state of the modifier keys"), 0,
+          G_MAXINT, 0,
+          (GParamFlags)(WEBKIT_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY)));
 
   g_type_class_add_private(requestClass,
                            sizeof(WebKitWebNavigationActionPrivate));

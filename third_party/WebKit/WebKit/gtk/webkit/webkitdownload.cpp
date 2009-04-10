@@ -464,7 +464,7 @@ void webkit_download_cancel(WebKitDownload* download) {
   gboolean handled;
   g_signal_emit_by_name(download, "error", 0,
                         WEBKIT_DOWNLOAD_ERROR_CANCELLED_BY_USER,
-                        "User cancelled the download", &handled);
+                        _("User cancelled the download"), &handled);
 }
 
 /**

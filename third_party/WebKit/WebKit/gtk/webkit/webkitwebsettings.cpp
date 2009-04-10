@@ -25,6 +25,7 @@
 #include "webkitwebsettings.h"
 #include "webkitprivate.h"
 
+#include <glib/gi18n-lib.h>
 #include "FileSystem.h"
 #include "PluginDatabase.h"
 
@@ -130,74 +131,76 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
 
   g_object_class_install_property(
       gobject_class, PROP_DEFAULT_ENCODING,
-      g_param_spec_string("default-encoding", "Default Encoding",
-                          "The default encoding used to display text.",
+      g_param_spec_string("default-encoding", _("Default Encoding"),
+                          _("The default encoding used to display text."),
                           "iso-8859-1", flags));
 
   g_object_class_install_property(
       gobject_class, PROP_CURSIVE_FONT_FAMILY,
       g_param_spec_string(
-          "cursive-font-family", "Cursive Font Family",
-          "The default Cursive font family used to display text.", "serif",
+          "cursive-font-family", _("Cursive Font Family"),
+          _("The default Cursive font family used to display text."), "serif",
           flags));
 
   g_object_class_install_property(
       gobject_class, PROP_DEFAULT_FONT_FAMILY,
-      g_param_spec_string("default-font-family", "Default Font Family",
-                          "The default font family used to display text.",
+      g_param_spec_string("default-font-family", _("Default Font Family"),
+                          _("The default font family used to display text."),
                           "sans-serif", flags));
 
   g_object_class_install_property(
       gobject_class, PROP_FANTASY_FONT_FAMILY,
       g_param_spec_string(
-          "fantasy-font-family", "Fantasy Font Family",
-          "The default Fantasy font family used to display text.", "serif",
+          "fantasy-font-family", _("Fantasy Font Family"),
+          _("The default Fantasy font family used to display text."), "serif",
           flags));
 
   g_object_class_install_property(
       gobject_class, PROP_MONOSPACE_FONT_FAMILY,
       g_param_spec_string(
-          "monospace-font-family", "Monospace Font Family",
-          "The default font family used to display monospace text.",
+          "monospace-font-family", _("Monospace Font Family"),
+          _("The default font family used to display monospace text."),
           "monospace", flags));
 
   g_object_class_install_property(
       gobject_class, PROP_SANS_SERIF_FONT_FAMILY,
       g_param_spec_string(
-          "sans-serif-font-family", "Sans Serif Font Family",
-          "The default Sans Serif font family used to display text.",
+          "sans-serif-font-family", _("Sans Serif Font Family"),
+          _("The default Sans Serif font family used to display text."),
           "sans-serif", flags));
 
   g_object_class_install_property(
       gobject_class, PROP_SERIF_FONT_FAMILY,
-      g_param_spec_string("serif-font-family", "Serif Font Family",
-                          "The default Serif font family used to display text.",
-                          "serif", flags));
+      g_param_spec_string(
+          "serif-font-family", _("Serif Font Family"),
+          _("The default Serif font family used to display text."), "serif",
+          flags));
 
   g_object_class_install_property(
       gobject_class, PROP_DEFAULT_FONT_SIZE,
-      g_param_spec_int("default-font-size", "Default Font Size",
-                       "The default font size used to display text.", 5,
+      g_param_spec_int("default-font-size", _("Default Font Size"),
+                       _("The default font size used to display text."), 5,
                        G_MAXINT, 12, flags));
 
   g_object_class_install_property(
       gobject_class, PROP_DEFAULT_MONOSPACE_FONT_SIZE,
-      g_param_spec_int("default-monospace-font-size",
-                       "Default Monospace Font Size",
-                       "The default font size used to display monospace text.",
-                       5, G_MAXINT, 10, flags));
+      g_param_spec_int(
+          "default-monospace-font-size", _("Default Monospace Font Size"),
+          _("The default font size used to display monospace text."), 5,
+          G_MAXINT, 10, flags));
 
   g_object_class_install_property(
       gobject_class, PROP_MINIMUM_FONT_SIZE,
-      g_param_spec_int("minimum-font-size", "Minimum Font Size",
-                       "The minimum font size used to display text.", 1,
+      g_param_spec_int("minimum-font-size", _("Minimum Font Size"),
+                       _("The minimum font size used to display text."), 1,
                        G_MAXINT, 5, flags));
 
   g_object_class_install_property(
       gobject_class, PROP_MINIMUM_LOGICAL_FONT_SIZE,
-      g_param_spec_int("minimum-logical-font-size", "Minimum Logical Font Size",
-                       "The minimum logical font size used to display text.", 1,
-                       G_MAXINT, 5, flags));
+      g_param_spec_int("minimum-logical-font-size",
+                       _("Minimum Logical Font Size"),
+                       _("The minimum logical font size used to display text."),
+                       1, G_MAXINT, 5, flags));
 
   /**
   * WebKitWebSettings:enforce-96-dpi:
@@ -212,47 +215,49 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   */
   g_object_class_install_property(
       gobject_class, PROP_ENFORCE_96_DPI,
-      g_param_spec_boolean("enforce-96-dpi", "Enforce 96 DPI",
-                           "Enforce a resolution of 96 DPI", FALSE, flags));
+      g_param_spec_boolean("enforce-96-dpi", _("Enforce 96 DPI"),
+                           _("Enforce a resolution of 96 DPI"), FALSE, flags));
 
   g_object_class_install_property(
       gobject_class, PROP_AUTO_LOAD_IMAGES,
-      g_param_spec_boolean("auto-load-images", "Auto Load Images",
-                           "Load images automatically.", TRUE, flags));
+      g_param_spec_boolean("auto-load-images", _("Auto Load Images"),
+                           _("Load images automatically."), TRUE, flags));
 
   g_object_class_install_property(
       gobject_class, PROP_AUTO_SHRINK_IMAGES,
-      g_param_spec_boolean("auto-shrink-images", "Auto Shrink Images",
-                           "Automatically shrink standalone images to fit.",
+      g_param_spec_boolean("auto-shrink-images", _("Auto Shrink Images"),
+                           _("Automatically shrink standalone images to fit."),
                            TRUE, flags));
 
   g_object_class_install_property(
       gobject_class, PROP_PRINT_BACKGROUNDS,
-      g_param_spec_boolean("print-backgrounds", "Print Backgrounds",
-                           "Whether background images should be printed.", TRUE,
-                           flags));
+      g_param_spec_boolean("print-backgrounds", _("Print Backgrounds"),
+                           _("Whether background images should be printed."),
+                           TRUE, flags));
 
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_SCRIPTS,
-      g_param_spec_boolean("enable-scripts", "Enable Scripts",
-                           "Enable embedded scripting languages.", TRUE,
+      g_param_spec_boolean("enable-scripts", _("Enable Scripts"),
+                           _("Enable embedded scripting languages."), TRUE,
                            flags));
 
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_PLUGINS,
-      g_param_spec_boolean("enable-plugins", "Enable Plugins",
-                           "Enable embedded plugin objects.", TRUE, flags));
+      g_param_spec_boolean("enable-plugins", _("Enable Plugins"),
+                           _("Enable embedded plugin objects."), TRUE, flags));
 
   g_object_class_install_property(
       gobject_class, PROP_RESIZABLE_TEXT_AREAS,
-      g_param_spec_boolean("resizable-text-areas", "Resizable Text Areas",
-                           "Whether text areas are resizable.", TRUE, flags));
+      g_param_spec_boolean("resizable-text-areas", _("Resizable Text Areas"),
+                           _("Whether text areas are resizable."), TRUE,
+                           flags));
 
   g_object_class_install_property(
       gobject_class, PROP_USER_STYLESHEET_URI,
       g_param_spec_string(
-          "user-stylesheet-uri", "User Stylesheet URI",
-          "The URI of a stylesheet that is applied to every page.", 0, flags));
+          "user-stylesheet-uri", _("User Stylesheet URI"),
+          _("The URI of a stylesheet that is applied to every page."), 0,
+          flags));
 
   /**
   * WebKitWebSettings:zoom-step:
@@ -263,9 +268,9 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   */
   g_object_class_install_property(
       gobject_class, PROP_ZOOM_STEP,
-      g_param_spec_float("zoom-step", "Zoom Stepping Value",
-                         "The value by which the zoom level is changed when "
-                         "zooming in or out.",
+      g_param_spec_float("zoom-step", _("Zoom Stepping Value"),
+                         _("The value by which the zoom level is changed when "
+                           "zooming in or out."),
                          0.0f, G_MAXFLOAT, 0.1f, flags));
 
   /**
@@ -280,9 +285,9 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_DEVELOPER_EXTRAS,
-      g_param_spec_boolean("enable-developer-extras", "Enable Developer Extras",
-                           "Enables special extensions that help developers",
-                           FALSE, flags));
+      g_param_spec_boolean(
+          "enable-developer-extras", _("Enable Developer Extras"),
+          _("Enables special extensions that help developers"), FALSE, flags));
 
   /**
   * WebKitWebSettings:enable-private-browsing:
@@ -298,8 +303,9 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_PRIVATE_BROWSING,
-      g_param_spec_boolean("enable-private-browsing", "Enable Private Browsing",
-                           "Enables private browsing mode", FALSE, flags));
+      g_param_spec_boolean("enable-private-browsing",
+                           _("Enable Private Browsing"),
+                           _("Enables private browsing mode"), FALSE, flags));
 
   g_type_class_add_private(klass, sizeof(WebKitWebSettingsPrivate));
 }

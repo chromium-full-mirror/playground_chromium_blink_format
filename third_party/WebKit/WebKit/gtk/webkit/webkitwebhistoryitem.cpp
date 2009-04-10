@@ -23,6 +23,7 @@
 #include "webkitprivate.h"
 
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 
 #include "CString.h"
 #include "HistoryItem.h"
@@ -158,8 +159,9 @@ static void webkit_web_history_item_class_init(
   */
   g_object_class_install_property(
       gobject_class, PROP_TITLE,
-      g_param_spec_string("title", "Title", "The title of the history item",
-                          NULL, WEBKIT_PARAM_READABLE));
+      g_param_spec_string("title", _("Title"),
+                          _("The title of the history item"), NULL,
+                          WEBKIT_PARAM_READABLE));
 
   /**
   * WebKitWebHistoryItem:alternate-title:
@@ -170,8 +172,8 @@ static void webkit_web_history_item_class_init(
   */
   g_object_class_install_property(
       gobject_class, PROP_ALTERNATE_TITLE,
-      g_param_spec_string("alternate-title", "Alternate Title",
-                          "The alternate title of the history item", NULL,
+      g_param_spec_string("alternate-title", _("Alternate Title"),
+                          _("The alternate title of the history item"), NULL,
                           WEBKIT_PARAM_READWRITE));
 
   /**
@@ -183,8 +185,8 @@ static void webkit_web_history_item_class_init(
   */
   g_object_class_install_property(
       gobject_class, PROP_URI,
-      g_param_spec_string("uri", "URI", "The URI of the history item", NULL,
-                          WEBKIT_PARAM_READABLE));
+      g_param_spec_string("uri", _("URI"), _("The URI of the history item"),
+                          NULL, WEBKIT_PARAM_READABLE));
 
   /**
   * WebKitWebHistoryItem:original-uri:
@@ -195,8 +197,8 @@ static void webkit_web_history_item_class_init(
   */
   g_object_class_install_property(
       gobject_class, PROP_ORIGINAL_URI,
-      g_param_spec_string("original-uri", "Original URI",
-                          "The original URI of the history item", NULL,
+      g_param_spec_string("original-uri", _("Original URI"),
+                          _("The original URI of the history item"), NULL,
                           WEBKIT_PARAM_READABLE));
 
   /**
@@ -208,9 +210,10 @@ static void webkit_web_history_item_class_init(
    */
   g_object_class_install_property(
       gobject_class, PROP_LAST_VISITED_TIME,
-      g_param_spec_double("last-visited-time", "Last visited Time",
-                          "The time at which the history item was last visited",
-                          0, G_MAXDOUBLE, 0, WEBKIT_PARAM_READABLE));
+      g_param_spec_double(
+          "last-visited-time", _("Last visited Time"),
+          _("The time at which the history item was last visited"), 0,
+          G_MAXDOUBLE, 0, WEBKIT_PARAM_READABLE));
 
   g_type_class_add_private(gobject_class, sizeof(WebKitWebHistoryItemPrivate));
 }
