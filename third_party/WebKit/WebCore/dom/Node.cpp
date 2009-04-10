@@ -627,7 +627,8 @@ void Node::setNeedsStyleRecalc(StyleChangeType changeType) {
     for (Node* p = parentNode(); p && !p->childNeedsStyleRecalc();
          p = p->parentNode())
       p->setChildNeedsStyleRecalc(true);
-    document()->scheduleStyleRecalc();
+    if (document()->childNeedsStyleRecalc())
+      document()->scheduleStyleRecalc();
   }
 }
 
@@ -663,7 +664,8 @@ void Node::lazyAttach() {
     for (Node* p = parentNode(); p && !p->childNeedsStyleRecalc();
          p = p->parentNode())
       p->setChildNeedsStyleRecalc(true);
-    document()->scheduleStyleRecalc();
+    if (document()->childNeedsStyleRecalc())
+      document()->scheduleStyleRecalc();
   }
 }
 

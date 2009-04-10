@@ -158,7 +158,6 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
     child = nextChild.release();
   }
 
-  document()->scheduleStyleRecalc();
   dispatchSubtreeModifiedEvent();
   return true;
 }
@@ -273,7 +272,6 @@ bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
     child = nextChild.release();
   }
 
-  document()->scheduleStyleRecalc();
   if (childCountDelta)
     childrenChanged(false, prev.get(), next.get(), childCountDelta);
   dispatchSubtreeModifiedEvent();
@@ -363,8 +361,6 @@ bool ContainerNode::removeChild(Node* oldChild, ExceptionCode& ec) {
   child->setParent(0);
 
   allowEventDispatch();
-
-  document()->scheduleStyleRecalc();
 
   // Dispatch post-removal mutation events
   childrenChanged(false, prev, next, -1);
@@ -503,7 +499,6 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
     child = nextChild.release();
   }
 
-  document()->scheduleStyleRecalc();
   dispatchSubtreeModifiedEvent();
   return true;
 }

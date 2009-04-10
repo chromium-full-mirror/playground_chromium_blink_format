@@ -599,6 +599,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   void scheduleStyleRecalc();
   void unscheduleStyleRecalc();
+  void styleRecalcTimerFired(Timer<Document>*);
 
   void attachNodeIterator(NodeIterator*);
   void detachNodeIterator(NodeIterator*);
@@ -1048,7 +1049,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_loadingSheet;
   bool visuallyOrdered;
   bool m_bParsing;
-  bool m_docNeedsStyleRecalc;
+  Timer<Document> m_styleRecalcTimer;
   bool m_inStyleRecalc;
   bool m_closeAfterStyleRecalc;
   bool m_usesDescendantRules;
