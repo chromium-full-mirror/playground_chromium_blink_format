@@ -129,8 +129,6 @@ static FontDescription smallSystemFont;
 static FontDescription menuFont;
 static FontDescription labelFont;
 
-bool RenderThemeChromiumWin::m_findInPageMode = false;
-
 // Internal static helper functions.  We don't put them in an anonymous
 // namespace so they have easier access to the WebCore namespace.
 
@@ -260,8 +258,6 @@ bool RenderThemeChromiumWin::supportsFocusRing(const RenderStyle* style) const {
 Color RenderThemeChromiumWin::platformActiveSelectionBackgroundColor() const {
   if (ChromiumBridge::layoutTestMode())
     return Color("#0000FF");  // Royal blue.
-  if (m_findInPageMode)
-    return Color(255, 150, 50, 200);  // Orange.
   COLORREF color = GetSysColor(COLOR_HIGHLIGHT);
   return Color(GetRValue(color), GetGValue(color), GetBValue(color), 255);
 }
@@ -269,8 +265,6 @@ Color RenderThemeChromiumWin::platformActiveSelectionBackgroundColor() const {
 Color RenderThemeChromiumWin::platformInactiveSelectionBackgroundColor() const {
   if (ChromiumBridge::layoutTestMode())
     return Color("#999999");  // Medium gray.
-  if (m_findInPageMode)
-    return Color(255, 150, 50, 200);  // Orange.
   COLORREF color = GetSysColor(COLOR_GRAYTEXT);
   return Color(GetRValue(color), GetGValue(color), GetBValue(color), 255);
 }
@@ -286,8 +280,12 @@ Color RenderThemeChromiumWin::platformInactiveSelectionForegroundColor() const {
   return Color::white;
 }
 
-Color RenderThemeChromiumWin::platformTextSearchHighlightColor() const {
-  return Color(255, 255, 150);
+Color RenderThemeChromiumWin::platformActiveTextSearchHighlightColor() const {
+  return Color(255, 150, 50);  // Orange.
+}
+
+Color RenderThemeChromiumWin::platformInactiveTextSearchHighlightColor() const {
+  return Color(255, 255, 150);  // Yellow.
 }
 
 double RenderThemeChromiumWin::caretBlinkInterval() const {
@@ -833,15 +831,6 @@ int RenderThemeChromiumWin::menuListInternalPadding(RenderStyle* style,
     padding += ScrollbarTheme::nativeTheme()->scrollbarThickness();
 
   return padding;
-}
-
-// static
-void RenderThemeChromiumWin::setFindInPageMode(bool enable) {
-  if (m_findInPageMode == enable)
-    return;
-
-  m_findInPageMode = enable;
-  theme()->platformColorsDidChange();
 }
 
 }  // namespace WebCore

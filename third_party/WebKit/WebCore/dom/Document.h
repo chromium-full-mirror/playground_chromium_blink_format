@@ -814,6 +814,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                     unsigned startOffset,
                     int delta,
                     DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
+  void setMarkersActive(Range*, bool);
+  void setMarkersActive(Node*, unsigned startOffset, unsigned endOffset, bool);
 
   DocumentMarker* markerContainingPoint(
       const IntPoint&,

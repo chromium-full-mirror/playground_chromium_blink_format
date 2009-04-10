@@ -867,7 +867,9 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
 
   // Optionally highlight the text
   if (renderer()->document()->frame()->markedTextMatchesAreHighlighted()) {
-    Color color = theme()->platformTextSearchHighlightColor();
+    Color color = marker.activeMatch
+                      ? theme()->platformActiveTextSearchHighlightColor()
+                      : theme()->platformInactiveTextSearchHighlightColor();
     pt->save();
     updateGraphicsContext(pt, color, color, 0);  // Don't draw text at all!
     pt->clip(IntRect(tx + m_x, ty + y, m_width, h));
