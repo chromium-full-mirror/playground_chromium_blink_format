@@ -77,7 +77,7 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
 
   JSC::DebuggerCallFrame m_debuggerCallFrame;
   RefPtr<JavaScriptCallFrame> m_caller;
-  int m_sourceID;
+  intptr_t m_sourceID;
   int m_line;
   bool m_isValid;
 };
