@@ -38,7 +38,9 @@ namespace WebCore {
 
 class UniscribeController {
  public:
-  UniscribeController(const Font*, const TextRun&);
+  UniscribeController(const Font*,
+                      const TextRun&,
+                      HashSet<const SimpleFontData*>* fallbackFonts = 0);
 
   // Advance and measure/place up to the specified character.
   void advance(unsigned to, GlyphBuffer* = 0);
@@ -70,6 +72,7 @@ class UniscribeController {
 
   const Font& m_font;
   const TextRun& m_run;
+  HashSet<const SimpleFontData*>* m_fallbackFonts;
 
   SCRIPT_CONTROL m_control;
   SCRIPT_STATE m_state;

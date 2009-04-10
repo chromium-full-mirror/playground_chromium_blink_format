@@ -191,6 +191,10 @@ static void setPangoAttributes(const Font* font,
   pango_attr_list_unref(list);
 }
 
+bool Font::canReturnFallbackFontsForComplexText() {
+  return false;
+}
+
 void Font::drawComplexText(GraphicsContext* context,
                            const TextRun& run,
                            const FloatPoint& point,
@@ -307,7 +311,9 @@ static PangoLayout* getDefaultPangoLayout(const TextRun& run) {
   return layout;
 }
 
-float Font::floatWidthForComplexText(const TextRun& run) const {
+float Font::floatWidthForComplexText(
+    const TextRun& run,
+    HashSet<const SimpleFontData*>* /* fallbackFonts */) const {
   if (run.length() == 0)
     return 0.0f;
 

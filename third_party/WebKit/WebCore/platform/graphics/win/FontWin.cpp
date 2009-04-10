@@ -37,6 +37,10 @@
 
 namespace WebCore {
 
+bool Font::canReturnFallbackFontsForComplexText() {
+  return true;
+}
+
 FloatRect Font::selectionRectForComplexText(const TextRun& run,
                                             const IntPoint& point,
                                             int h,
@@ -93,8 +97,10 @@ void Font::drawComplexText(GraphicsContext* context,
   drawGlyphBuffer(context, glyphBuffer, run, startPoint);
 }
 
-float Font::floatWidthForComplexText(const TextRun& run) const {
-  UniscribeController controller(this, run);
+float Font::floatWidthForComplexText(
+    const TextRun& run,
+    HashSet<const SimpleFontData*>* fallbackFonts) const {
+  UniscribeController controller(this, run, fallbackFonts);
   controller.advance(run.length());
   return controller.runWidthSoFar();
 }

@@ -224,18 +224,24 @@ void Font::drawText(GraphicsContext* context,
   return drawComplexText(context, run, point, from, to);
 }
 
-float Font::floatWidth(const TextRun& run) const {
+float Font::floatWidth(const TextRun& run,
+                       HashSet<const SimpleFontData*>* fallbackFonts) const {
 #if ENABLE(SVG_FONTS)
   if (primaryFont()->isSVGFont())
     return floatWidthUsingSVGFont(run);
 #endif
 
 #if USE(FONT_FAST_PATH)
-  if (canUseGlyphCache(run))
-    return floatWidthForSimpleText(run, 0);
+  if (canUseGlyphCache(run)) {
+    // If the complex text implementation cannot return fallback fonts, avoid
+    // returning them for simple text as well.
+    static bool returnFallbackFonts = canReturnFallbackFontsForComplexText();
+    return floatWidthForSimpleText(run, 0,
+                                   returnFallbackFonts ? fallbackFonts : 0);
+  }
 #endif
 
-  return floatWidthForComplexText(run);
+  return floatWidthForComplexText(run, fallbackFonts);
 }
 
 float Font::floatWidth(const TextRun& run,

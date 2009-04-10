@@ -114,9 +114,11 @@ CoreTextController::CoreTextRun::CoreTextRun(const SimpleFontData* fontData,
       reinterpret_cast<const CFIndex*>(CFDataGetBytePtr(m_indicesData.get()));
 }
 
-CoreTextController::CoreTextController(const Font* font,
-                                       const TextRun& run,
-                                       bool mayUseNaturalWritingDirection)
+CoreTextController::CoreTextController(
+    const Font* font,
+    const TextRun& run,
+    bool mayUseNaturalWritingDirection,
+    HashSet<const SimpleFontData*>* fallbackFonts)
     : m_font(*font),
       m_run(run),
       m_mayUseNaturalWritingDirection(mayUseNaturalWritingDirection),
@@ -128,6 +130,7 @@ CoreTextController::CoreTextController(const Font* font,
       m_currentRun(0),
       m_glyphInCurrentRun(0),
       m_finalRoundingWidth(0),
+      m_fallbackFonts(fallbackFonts),
       m_lastRoundingGlyph(0) {
   m_padding = m_run.padding();
   if (!m_padding)
@@ -428,6 +431,9 @@ void CoreTextController::collectCoreTextRunsForCharacters(
                                       length, m_run.ltr()));
     return;
   }
+
+  if (m_fallbackFonts && fontData != m_font.primaryFont())
+    m_fallbackFonts->add(fontData);
 
   RetainPtr<CFStringRef> string(
       AdoptCF,

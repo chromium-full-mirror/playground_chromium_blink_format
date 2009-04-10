@@ -63,6 +63,9 @@ class InlineTextBox : public InlineRunBox {
 
   void offsetRun(int d) { m_start += d; }
 
+  void setFallbackFonts(const HashSet<const SimpleFontData*>&);
+  void takeFallbackFonts(Vector<const SimpleFontData*>&);
+
  private:
   virtual int selectionTop();
   virtual int selectionHeight();

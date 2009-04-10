@@ -96,8 +96,10 @@ void Font::drawComplexText(GraphicsContext* context,
   drawGlyphBuffer(context, glyphBuffer, run, startPoint);
 }
 
-float Font::floatWidthForComplexText(const TextRun& run) const {
-  CoreTextController controller(this, run, true);
+float Font::floatWidthForComplexText(
+    const TextRun& run,
+    HashSet<const SimpleFontData*>* fallbackFonts) const {
+  CoreTextController controller(this, run, true, fallbackFonts);
   return controller.totalWidth();
 }
 
