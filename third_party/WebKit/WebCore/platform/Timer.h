@@ -27,6 +27,7 @@
 #define Timer_h
 
 #include <wtf/Noncopyable.h>
+#include <wtf/Threading.h>
 
 namespace WebCore {
 
@@ -82,6 +83,10 @@ class TimerBase : Noncopyable {
   int m_heapIndex;          // -1 if not in heap
   unsigned
       m_heapInsertionOrder;  // Used to keep order among equal-fire-time timers
+
+#ifndef NDEBUG
+  ThreadIdentifier m_thread;
+#endif
 
   friend class TimerHeapElement;
   friend class ThreadTimers;

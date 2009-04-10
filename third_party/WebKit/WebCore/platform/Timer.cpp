@@ -211,7 +211,15 @@ inline int operator-(TimerHeapIterator a, TimerHeapIterator b) {
 // ----------------
 
 TimerBase::TimerBase()
-    : m_nextFireTime(0), m_repeatInterval(0), m_heapIndex(-1) {}
+    : m_nextFireTime(0),
+      m_repeatInterval(0),
+      m_heapIndex(-1)
+#ifndef NDEBUG
+      ,
+      m_thread(currentThread())
+#endif
+{
+}
 
 TimerBase::~TimerBase() {
   stop();
@@ -219,11 +227,15 @@ TimerBase::~TimerBase() {
 }
 
 void TimerBase::start(double nextFireInterval, double repeatInterval) {
+  ASSERT(m_thread == currentThread());
+
   m_repeatInterval = repeatInterval;
   setNextFireTime(currentTime() + nextFireInterval);
 }
 
 void TimerBase::stop() {
+  ASSERT(m_thread == currentThread());
+
   m_repeatInterval = 0;
   setNextFireTime(0);
 
@@ -233,6 +245,8 @@ void TimerBase::stop() {
 }
 
 bool TimerBase::isActive() const {
+  ASSERT(m_thread == currentThread());
+
   return m_nextFireTime || timersReadyToFire().contains(this);
 }
 
@@ -311,6 +325,8 @@ void TimerBase::heapPopMin() {
 }
 
 void TimerBase::setNextFireTime(double newTime) {
+  ASSERT(m_thread == currentThread());
+
   // Keep heap valid while changing the next-fire time.
 
   timersReadyToFire().remove(this);
