@@ -3313,7 +3313,8 @@ void Document::addMarker(Range* range,
     RefPtr<Range> textPiece = markedText.range();
     int exception = 0;
     DocumentMarker marker = {type, textPiece->startOffset(exception),
-                             textPiece->endOffset(exception), description};
+                             textPiece->endOffset(exception), description,
+                             false};
     addMarker(textPiece->startContainer(exception), marker);
   }
 }
@@ -3789,8 +3790,7 @@ void Document::setMarkersActive(Node* node,
     return;
 
   Vector<DocumentMarker>& markers = vectorPair->first;
-  Vector<IntRect>& rects = vectorPair->second;
-  ASSERT(markers.size() == rects.size());
+  ASSERT(markers.size() == vectorPair->second.size());
 
   bool docDirty = false;
   for (size_t i = 0; i != markers.size(); ++i) {
