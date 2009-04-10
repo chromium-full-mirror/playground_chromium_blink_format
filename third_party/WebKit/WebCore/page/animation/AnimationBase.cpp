@@ -1092,7 +1092,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
                            beginAnimationUpdateTime());
         m_fallbackAnimating = true;
       } else {
-        bool started = startAnimation(0);
+        bool started = startAnimation(m_startTime);
         m_compAnim->animationController()->addToStartTimeResponseWaitList(
             this, started);
         m_fallbackAnimating = !started;
