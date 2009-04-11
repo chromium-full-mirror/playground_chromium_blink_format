@@ -348,6 +348,7 @@ class InspectorController : public RefCounted<InspectorController>
                                    int errorLine,
                                    const JSC::UString& errorMessage);
   virtual void didPause();
+  virtual void didContinue();
 #endif
 
   Page* m_inspectedPage;

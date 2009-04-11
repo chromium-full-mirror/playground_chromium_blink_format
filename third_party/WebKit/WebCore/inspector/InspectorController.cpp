@@ -1488,6 +1488,10 @@ void InspectorController::didPause() {
   callSimpleFunction(m_scriptState, m_webInspector, "pausedScript");
 }
 
+void InspectorController::didContinue() {
+  callSimpleFunction(m_scriptState, m_webInspector, "resumedScript");
+}
+
 #endif
 
 }  // namespace WebCore

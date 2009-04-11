@@ -423,6 +423,8 @@ void JavaScriptDebugServer::pauseIfNeeded(Page* page) {
   setJavaScriptPaused(page->group(), false);
 
   m_paused = false;
+
+  dispatchFunctionToListeners(&JavaScriptDebugListener::didContinue, page);
 }
 
 void JavaScriptDebugServer::callEvent(

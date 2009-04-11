@@ -51,6 +51,7 @@ class JavaScriptDebugListener {
                                    int errorLine,
                                    const JSC::UString& errorMessage) = 0;
   virtual void didPause() = 0;
+  virtual void didContinue() = 0;
 };
 
 }  // namespace WebCore

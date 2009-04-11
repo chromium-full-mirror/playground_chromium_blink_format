@@ -4358,6 +4358,13 @@ void FrameLoader::continueLoadAfterNavigationPolicy(
   if (!m_frame->page())
     return;
 
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+  if (Page* page = m_frame->page()) {
+    if (page->mainFrame() == m_frame)
+      page->inspectorController()->resumeDebugger();
+  }
+#endif
+
   setProvisionalDocumentLoader(m_policyDocumentLoader.get());
   m_loadType = type;
   setState(FrameStateProvisional);
