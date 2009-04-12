@@ -125,7 +125,7 @@ inline JSC::JSObject* getDOMConstructor(JSC::ExecState* exec) {
 
 template <class ConstructorClass>
 inline JSC::JSObject* getDOMConstructor(JSC::ExecState* exec,
-                                        JSDOMGlobalObject* globalObject) {
+                                        const JSDOMGlobalObject* globalObject) {
   if (JSC::JSObject* constructor =
           globalObject->constructors().get(&ConstructorClass::s_info))
     return constructor;
