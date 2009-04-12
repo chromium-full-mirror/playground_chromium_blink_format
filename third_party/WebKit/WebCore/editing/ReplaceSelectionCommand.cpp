@@ -374,7 +374,7 @@ bool ReplaceSelectionCommand::shouldMergeStart(
   if (prev.isNull())
     return false;
 
-  if (!m_movingParagraph &&
+  if (!m_movingParagraph && isStartOfParagraph(startOfInsertedContent) &&
       hasMatchingQuoteLevel(prev, positionAtEndOfInsertedContent()))
     return true;
 
