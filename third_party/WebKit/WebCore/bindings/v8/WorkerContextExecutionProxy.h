@@ -99,6 +99,7 @@ class WorkerContextExecutionProxy {
   static void setIsWebWorkersEnabled(bool);
 
  private:
+  void initV8IfNeeded();
   void initContextIfNeeded();
   void dispose();
   PassRefPtr<V8EventListener> findOrCreateEventListenerHelper(
