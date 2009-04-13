@@ -45,7 +45,7 @@ ScrollView::ScrollView()
       m_canBlitOnScroll(true),
       m_scrollbarsAvoidingResizer(0),
       m_scrollbarsSuppressed(false),
-      m_updatingScrollbarAttributes(false),
+      m_inUpdateScrollbars(false),
       m_updateScrollbarsPass(0),
       m_drawPanScrollIcon(false),
       m_useFixedLayout(false) {
@@ -313,7 +313,7 @@ bool ScrollView::scroll(ScrollDirection direction,
 static const unsigned cMaxUpdateScrollbarsPass = 2;
 
 void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
-  if (m_updatingScrollbarAttributes || prohibitsScrolling() || platformWidget())
+  if (m_inUpdateScrollbars || prohibitsScrolling() || platformWidget())
     return;
 
   bool hasHorizontalScrollbar = m_horizontalScrollbar;
@@ -336,6 +336,16 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
     if (hasVerticalScrollbar != newHasVerticalScrollbar)
       setHasVerticalScrollbar(newHasVerticalScrollbar);
   } else {
+    // If we came in here with the view already needing a layout, then go ahead
+    // and do that
+    // first.  (This will be the common case, e.g., when the page changes due to
+    // window resizing for example).
+    // This layout will not re-enter updateScrollers and does not count towards
+    // our max layout pass total.
+    m_inUpdateScrollbars = true;
+    visibleContentsResized();
+    m_inUpdateScrollbars = false;
+
     bool sendContentResizedNotification = false;
 
     IntSize docSize = contentsSize();
@@ -366,6 +376,7 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
     if (sendContentResizedNotification &&
         m_updateScrollbarsPass < cMaxUpdateScrollbarsPass) {
       m_updateScrollbarsPass++;
+      contentsResized();
       visibleContentsResized();
       IntSize newDocSize = contentsSize();
       if (newDocSize == docSize) {
@@ -384,7 +395,7 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
   if (m_updateScrollbarsPass)
     return;
 
-  m_updatingScrollbarAttributes = true;
+  m_inUpdateScrollbars = true;
   IntSize maxScrollPosition(contentsWidth() - visibleWidth(),
                             contentsHeight() - visibleHeight());
   IntSize scroll = desiredOffset.shrunkTo(maxScrollPosition);
@@ -456,7 +467,7 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
     scrollContents(scrollDelta);
   }
 
-  m_updatingScrollbarAttributes = false;
+  m_inUpdateScrollbars = false;
 }
 
 const int panIconSizeLength = 20;

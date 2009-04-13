@@ -220,7 +220,10 @@ class FrameView : public ScrollView {
 
   virtual void repaintContentRectangle(const IntRect&, bool immediate);
   virtual void contentsResized() { setNeedsLayout(); }
-  virtual void visibleContentsResized() { layout(); }
+  virtual void visibleContentsResized() {
+    if (needsLayout())
+      layout();
+  }
 
   void deferredRepaintTimerFired(Timer<FrameView>*);
   void doDeferredRepaints();

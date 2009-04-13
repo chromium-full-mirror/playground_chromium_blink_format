@@ -61,6 +61,7 @@ class KeyboardEvent;
 - (void)_web_layoutIfNeededRecursive;
 - (void)_destroyAllWebPlugins;
 - (BOOL)_isResigningFirstResponder;
+- (BOOL)_needsLayout;
 
 #if USE(ACCELERATED_COMPOSITING)
 - (void)attachRootLayer:(CALayer*)layer;
