@@ -38,13 +38,19 @@ class Coordinates : public RefCounted<Coordinates> {
  public:
   static PassRefPtr<Coordinates> create(double latitude,
                                         double longitude,
+                                        bool providesAltitude,
                                         double altitude,
                                         double accuracy,
+                                        bool providesAltitudeAccuracy,
                                         double altitudeAccuracy,
+                                        bool providesHeading,
                                         double heading,
+                                        bool providesSpeed,
                                         double speed) {
-    return adoptRef(new Coordinates(latitude, longitude, altitude, accuracy,
-                                    altitudeAccuracy, heading, speed));
+    return adoptRef(
+        new Coordinates(latitude, longitude, providesAltitude, altitude,
+                        accuracy, providesAltitudeAccuracy, altitudeAccuracy,
+                        providesHeading, heading, providesSpeed, speed));
   }
 
   double latitude() const { return m_latitude; }
@@ -55,15 +61,26 @@ class Coordinates : public RefCounted<Coordinates> {
   double heading() const { return m_heading; }
   double speed() const { return m_speed; }
 
+  bool canProvideAltitude() const { return m_canProvideAltitude; }
+  bool canProvideAltitudeAccuracy() const {
+    return m_canProvideAltitudeAccuracy;
+  }
+  bool canProvideHeading() const { return m_canProvideHeading; }
+  bool canProvideSpeed() const { return m_canProvideSpeed; }
+
   String toString() const;
 
  private:
   Coordinates(double latitude,
               double longitude,
+              bool providesAltitude,
               double altitude,
               double accuracy,
+              bool providesAltitudeAccuracy,
               double altitudeAccuracy,
+              bool providesHeading,
               double heading,
+              bool providesSpeed,
               double speed)
       : m_latitude(latitude),
         m_longitude(longitude),
@@ -71,7 +88,11 @@ class Coordinates : public RefCounted<Coordinates> {
         m_accuracy(accuracy),
         m_altitudeAccuracy(altitudeAccuracy),
         m_heading(heading),
-        m_speed(speed) {}
+        m_speed(speed),
+        m_canProvideAltitude(providesAltitude),
+        m_canProvideAltitudeAccuracy(providesAltitudeAccuracy),
+        m_canProvideHeading(providesHeading),
+        m_canProvideSpeed(providesSpeed) {}
 
   double m_latitude;
   double m_longitude;
@@ -80,6 +101,11 @@ class Coordinates : public RefCounted<Coordinates> {
   double m_altitudeAccuracy;
   double m_heading;
   double m_speed;
+
+  bool m_canProvideAltitude;
+  bool m_canProvideAltitudeAccuracy;
+  bool m_canProvideHeading;
+  bool m_canProvideSpeed;
 };
 
 }  // namespace WebCore
