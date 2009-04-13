@@ -87,7 +87,7 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
   JSListenersMap& jsInlineEventListeners();
 
   void setCurrentEvent(Event*);
-  Event* currentEvent();
+  Event* currentEvent() const;
 
   virtual void mark();
 

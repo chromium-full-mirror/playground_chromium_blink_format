@@ -60,18 +60,6 @@ static JSValuePtr windowProtoFuncShowModalDialog(ExecState*,
                                                  JSObject*,
                                                  JSValuePtr,
                                                  const ArgList&);
-static JSValuePtr windowProtoFuncNotImplemented(ExecState*,
-                                                JSObject*,
-                                                JSValuePtr,
-                                                const ArgList&);
-
-static JSValuePtr jsDOMWindowBaseCrypto(ExecState*,
-                                        const Identifier&,
-                                        const PropertySlot&);
-static JSValuePtr jsDOMWindowBaseEvent(ExecState*,
-                                       const Identifier&,
-                                       const PropertySlot&);
-static void setJSDOMWindowBaseEvent(ExecState*, JSObject*, JSValuePtr);
 
 #include "JSDOMWindowBase.lut.h"
 
@@ -88,14 +76,6 @@ const ClassInfo JSDOMWindowBase::s_info = {"Window", 0, &JSDOMWindowBaseTable,
   open                          windowProtoFuncOpen DontDelete|Function 3
   showModalDialog               windowProtoFuncShowModalDialog
 DontDelete|Function 1
-# Not implemented
-  captureEvents                 windowProtoFuncNotImplemented
-DontDelete|Function 0
-  releaseEvents                 windowProtoFuncNotImplemented
-DontDelete|Function 0
-# -- Attributes --
-  crypto                        jsDOMWindowBaseCrypto DontDelete|ReadOnly
-  event                         jsDOMWindowBaseEvent DontDelete
 @end
 */
 
@@ -354,41 +334,6 @@ static JSValuePtr showModalDialog(ExecState* exec,
 
   return returnValue ? returnValue : jsUndefined();
 }
-
-}  // namespace WebCore
-
-using namespace WebCore;
-
-JSValuePtr jsDOMWindowBaseCrypto(ExecState*,
-                                 const Identifier&,
-                                 const PropertySlot&) {
-  return jsUndefined();  // FIXME: implement this
-}
-
-JSValuePtr jsDOMWindowBaseEvent(ExecState* exec,
-                                const Identifier&,
-                                const PropertySlot& slot) {
-  if (!static_cast<JSDOMWindowBase*>(asObject(slot.slotBase()))
-           ->allowsAccessFrom(exec))
-    return jsUndefined();
-  if (!static_cast<JSDOMWindowBase*>(asObject(slot.slotBase()))->currentEvent())
-    return jsUndefined();
-  return toJS(
-      exec,
-      static_cast<JSDOMWindowBase*>(asObject(slot.slotBase()))->currentEvent());
-}
-
-void setJSDOMWindowBaseEvent(ExecState* exec,
-                             JSObject* thisObject,
-                             JSValuePtr value) {
-  if (!static_cast<JSDOMWindowBase*>(thisObject)->allowsAccessFrom(exec))
-    return;
-  // Shadowing a built-in Event
-  static_cast<JSDOMWindowBase*>(thisObject)
-      ->putDirect(Identifier(exec, "Event"), value);
-}
-
-namespace WebCore {
 
 JSValuePtr JSDOMWindowBase::childFrameGetter(ExecState* exec,
                                              const Identifier& propertyName,
@@ -738,15 +683,6 @@ JSValuePtr windowProtoFuncShowModalDialog(ExecState* exec,
       valueToStringWithUndefinedOrNullCheck(exec, args.at(exec, 0)),
       args.at(exec, 1),
       valueToStringWithUndefinedOrNullCheck(exec, args.at(exec, 2)));
-}
-
-JSValuePtr windowProtoFuncNotImplemented(ExecState* exec,
-                                         JSObject*,
-                                         JSValuePtr thisValue,
-                                         const ArgList&) {
-  if (!toJSDOMWindow(thisValue))
-    return throwError(exec, TypeError);
-  return jsUndefined();
 }
 
 namespace WebCore {

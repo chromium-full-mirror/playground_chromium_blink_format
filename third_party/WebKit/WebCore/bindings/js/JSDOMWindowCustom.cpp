@@ -31,6 +31,7 @@
 #include "History.h"
 #include "JSAudioConstructor.h"
 #include "JSDOMWindowShell.h"
+#include "JSEvent.h"
 #include "JSEventListener.h"
 #include "JSHistory.h"
 #include "JSImageConstructor.h"
@@ -204,6 +205,17 @@ void JSDOMWindow::setLocation(ExecState* exec, JSValuePtr value) {
         !activeFrame->script()->anyPageIsProcessingUserGesture(), false,
         userGesture);
   }
+}
+
+JSValuePtr JSDOMWindow::crypto(ExecState*) const {
+  return jsUndefined();
+}
+
+JSValuePtr JSDOMWindow::event(ExecState* exec) const {
+  Event* event = currentEvent();
+  if (!event)
+    return jsUndefined();
+  return toJS(exec, event);
 }
 
 JSValuePtr JSDOMWindow::image(ExecState* exec) const {
@@ -387,6 +399,14 @@ JSValuePtr JSDOMWindow::removeEventListener(ExecState* exec,
         AtomicString(args.at(exec, 0).toString(exec)), listener,
         args.at(exec, 2).toBoolean(exec));
 
+  return jsUndefined();
+}
+
+JSValuePtr JSDOMWindow::captureEvents(ExecState*, const ArgList&) {
+  return jsUndefined();
+}
+
+JSValuePtr JSDOMWindow::releaseEvents(ExecState*, const ArgList&) {
   return jsUndefined();
 }
 
