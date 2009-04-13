@@ -102,7 +102,7 @@ class Settings {
   }
 
   void setJavaScriptCanOpenWindowsAutomatically(bool);
-  bool JavaScriptCanOpenWindowsAutomatically() const {
+  bool javaScriptCanOpenWindowsAutomatically() const {
     return m_javaScriptCanOpenWindowsAutomatically;
   }
 
