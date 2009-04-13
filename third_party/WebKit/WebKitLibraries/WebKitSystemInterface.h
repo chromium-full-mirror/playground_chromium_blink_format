@@ -294,6 +294,9 @@ NSUInteger WKGetInputPanelWindowStyle(void);
 @class CAPropertyAnimation;
 void WKSetCAAnimationValueFunction(CAPropertyAnimation*, NSString* function);
 
+unsigned WKInitializeMaximumHTTPConnectionCountPerHost(
+    unsigned preferredConnectionCount);
+
 #ifdef __cplusplus
 }
 #endif

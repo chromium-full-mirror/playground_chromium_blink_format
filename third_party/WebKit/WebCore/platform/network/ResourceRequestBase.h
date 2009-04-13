@@ -192,6 +192,8 @@ struct CrossThreadResourceRequestData {
   bool m_allowHTTPCookies;
 };
 
+unsigned initializeMaximumHTTPConnectionCountPerHost();
+
 }  // namespace WebCore
 
 #endif  // ResourceRequestBase_h

@@ -166,6 +166,8 @@ extern void (*wkSignalCFReadStreamEnd)(CFReadStreamRef stream);
 extern void (*wkSignalCFReadStreamError)(CFReadStreamRef stream,
                                          CFStreamError* error);
 extern void (*wkSignalCFReadStreamHasBytes)(CFReadStreamRef stream);
+extern unsigned (*wkInitializeMaximumHTTPConnectionCountPerHost)(
+    unsigned preferredConnectionCount);
 
 #ifndef BUILDING_ON_TIGER
 extern void (*wkGetGlyphsForCharacters)(CGFontRef,

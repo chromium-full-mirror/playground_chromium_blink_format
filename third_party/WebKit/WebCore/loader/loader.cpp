@@ -48,8 +48,7 @@ namespace WebCore {
 
 #if REQUEST_MANAGEMENT_ENABLED
 // Match the parallel connection count used by the networking layer
-// FIXME should not hardcode something like this
-static const unsigned maxRequestsInFlightPerHost = 4;
+static unsigned maxRequestsInFlightPerHost;
 // Having a limit might still help getting more important resources first
 static const unsigned maxRequestsInFlightForNonHTTPProtocols = 20;
 #else
@@ -60,7 +59,9 @@ static const unsigned maxRequestsInFlightForNonHTTPProtocols = 10000;
 Loader::Loader()
     : m_nonHTTPProtocolHost(AtomicString(),
                             maxRequestsInFlightForNonHTTPProtocols),
-      m_requestTimer(this, &Loader::requestTimerFired) {}
+      m_requestTimer(this, &Loader::requestTimerFired) {
+  maxRequestsInFlightPerHost = initializeMaximumHTTPConnectionCountPerHost();
+}
 
 Loader::~Loader() {
   ASSERT_NOT_REACHED();
