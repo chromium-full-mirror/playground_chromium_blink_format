@@ -645,35 +645,15 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   }
   void addListenerTypeIfNeeded(const AtomicString& eventType);
 
-  CSSStyleDeclaration* getOverrideStyle(Element*, const String& pseudoElt);
-
-  void handleWindowEvent(Event*, bool useCapture);
-  void setWindowInlineEventListenerForType(const AtomicString& eventType,
-                                           PassRefPtr<EventListener>);
-  EventListener* windowInlineEventListenerForType(
-      const AtomicString& eventType);
-  void removeWindowInlineEventListenerForType(const AtomicString& eventType);
-
   void setWindowInlineEventListenerForTypeAndAttribute(
       const AtomicString& eventType,
       Attribute*);
 
-  void addWindowEventListener(const AtomicString& eventType,
-                              PassRefPtr<EventListener>,
-                              bool useCapture);
-  void removeWindowEventListener(const AtomicString& eventType,
-                                 EventListener*,
-                                 bool useCapture);
-  bool hasWindowEventListener(const AtomicString& eventType);
-
-  void addPendingFrameUnloadEventCount();
-  void removePendingFrameUnloadEventCount();
-  void addPendingFrameBeforeUnloadEventCount();
-  void removePendingFrameBeforeUnloadEventCount();
-
   PassRefPtr<EventListener> createEventListener(const String& functionName,
                                                 const String& code,
                                                 Node*);
+
+  CSSStyleDeclaration* getOverrideStyle(Element*, const String& pseudoElt);
 
   /**
    * Searches through the document, starting from fromNode, for the next
@@ -1031,8 +1011,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                                                   // (<link>, <style>,
                                                   // <?xml-stylesheet>)
 
-  RegisteredEventListenerVector m_windowEventListeners;
-
   typedef HashMap<FormElementKey,
                   Vector<String>,
                   FormElementKeyHash,
@@ -1153,7 +1131,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void setDashboardRegions(const Vector<DashboardRegionValue>&);
 #endif
 
-  void removeAllEventListenersFromAllNodes();
+  void removeAllEventListeners();
 
   void registerDisconnectedNodeWithEventListeners(Node*);
   void unregisterDisconnectedNodeWithEventListeners(Node*);
