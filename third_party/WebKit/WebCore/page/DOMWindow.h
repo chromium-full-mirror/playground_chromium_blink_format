@@ -91,6 +91,12 @@ class DOMWindow : public RefCounted<DOMWindow> {
   static void adjustWindowRect(const FloatRect& screen,
                                FloatRect& window,
                                const FloatRect& pendingChanges);
+  static void parseModalDialogFeatures(const String& featuresArg,
+                                       HashMap<String, String>& map);
+
+  static bool allowPopUp(Frame* activeFrame);
+  static bool canShowModalDialog(const Frame*);
+  static bool canShowModalDialogNow(const Frame*);
 
   // DOM Level 0
   Screen* screen() const;
