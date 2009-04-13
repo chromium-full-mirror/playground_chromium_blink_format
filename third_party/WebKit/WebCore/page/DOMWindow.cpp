@@ -1040,7 +1040,7 @@ bool DOMWindow::hasEventListener(const AtomicString& eventType) {
   return false;
 }
 
-inline void DOMWindow::setInlineEventListenerForType(
+void DOMWindow::setInlineEventListenerForType(
     const AtomicString& eventType,
     PassRefPtr<EventListener> eventListener) {
   removeInlineEventListenerForType(eventType);
