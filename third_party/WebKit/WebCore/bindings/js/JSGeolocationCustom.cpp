@@ -112,7 +112,7 @@ JSValuePtr JSGeolocation::getCurrentPosition(ExecState* exec,
 
   m_impl->getCurrentPosition(positionCallback.release(),
                              positionErrorCallback.release(),
-                             positionOptions.get());
+                             positionOptions.release());
 
   return jsUndefined();
 }
@@ -156,7 +156,7 @@ JSValuePtr JSGeolocation::watchPosition(ExecState* exec, const ArgList& args) {
 
   int watchID = m_impl->watchPosition(positionCallback.release(),
                                       positionErrorCallback.release(),
-                                      positionOptions.get());
+                                      positionOptions.release());
   return jsNumber(exec, watchID);
 }
 

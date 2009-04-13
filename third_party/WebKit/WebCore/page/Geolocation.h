@@ -38,6 +38,7 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -59,10 +60,10 @@ class Geolocation : public RefCounted<Geolocation>,
 
   void getCurrentPosition(PassRefPtr<PositionCallback>,
                           PassRefPtr<PositionErrorCallback>,
-                          PositionOptions*);
+                          PassRefPtr<PositionOptions>);
   int watchPosition(PassRefPtr<PositionCallback>,
                     PassRefPtr<PositionErrorCallback>,
-                    PositionOptions*);
+                    PassRefPtr<PositionOptions>);
   void clearWatch(int watchId);
 
   void suspend();
@@ -84,21 +85,23 @@ class Geolocation : public RefCounted<Geolocation>,
     static PassRefPtr<GeoNotifier> create(
         PassRefPtr<PositionCallback> positionCallback,
         PassRefPtr<PositionErrorCallback> positionErrorCallback,
-        PositionOptions* options) {
+        PassRefPtr<PositionOptions> options) {
       return adoptRef(
           new GeoNotifier(positionCallback, positionErrorCallback, options));
     }
 
+    void startTimer();
     void timerFired(Timer<GeoNotifier>*);
 
     RefPtr<PositionCallback> m_successCallback;
     RefPtr<PositionErrorCallback> m_errorCallback;
+    RefPtr<PositionOptions> m_options;
     Timer<GeoNotifier> m_timer;
 
    private:
     GeoNotifier(PassRefPtr<PositionCallback>,
                 PassRefPtr<PositionErrorCallback>,
-                PositionOptions*);
+                PassRefPtr<PositionOptions>);
   };
 
   bool hasListeners() const {
@@ -109,6 +112,11 @@ class Geolocation : public RefCounted<Geolocation>,
   void sendErrorToWatchers(PositionError*);
   void sendPositionToOneShots(Geoposition*);
   void sendPositionToWatchers(Geoposition*);
+
+  static void startTimer(Vector<RefPtr<GeoNotifier>>&);
+  void startTimersForOneShots();
+  void startTimersForWatchers();
+  void startTimers();
 
   void handleError(PositionError*);
 
