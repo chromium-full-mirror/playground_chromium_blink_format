@@ -1093,8 +1093,8 @@ Cursor EventHandler::selectCursor(const MouseEventWithHitTestResults& event,
   return pointerCursor();
 }
 
-IntPoint documentPointForWindowPoint(Frame* frame,
-                                     const IntPoint& windowPoint) {
+static IntPoint documentPointForWindowPoint(Frame* frame,
+                                            const IntPoint& windowPoint) {
   FrameView* view = frame->view();
   // FIXME: Is it really OK to use the wrong coordinates here when view is 0?
   // Historically the code would just crash; this is clearly no worse than that.
