@@ -188,7 +188,8 @@ void Font::drawComplexText(GraphicsContext* ctx,
     p->drawText(pt, string, flags, run.padding());
 }
 
-float Font::floatWidthForComplexText(const TextRun& run) const {
+float Font::floatWidthForComplexText(const TextRun& run,
+                                     HashSet<const SimpleFontData*>*) const {
   if (!run.length())
     return 0;
   const QString string = fixSpacing(qstring(run));
