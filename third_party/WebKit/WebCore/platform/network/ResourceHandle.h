@@ -28,6 +28,7 @@
 
 #include "AuthenticationChallenge.h"
 #include "HTTPHeaderMap.h"
+#include "ThreadableLoader.h"
 #include <wtf/OwnPtr.h>
 
 #if USE(SOUP)
@@ -111,6 +112,7 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
       bool mightDownloadFromHandle = false);
 
   static void loadResourceSynchronously(const ResourceRequest&,
+                                        StoredCredentials,
                                         ResourceError&,
                                         ResourceResponse&,
                                         Vector<char>& data,
@@ -123,6 +125,8 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
   ~ResourceHandle();
 
 #if PLATFORM(MAC) || USE(CFNETWORK)
+  void willSendRequest(ResourceRequest&,
+                       const ResourceResponse& redirectResponse);
   bool shouldUseCredentialStorage();
 #endif
 #if PLATFORM(MAC) || USE(CFNETWORK) || USE(CURL)

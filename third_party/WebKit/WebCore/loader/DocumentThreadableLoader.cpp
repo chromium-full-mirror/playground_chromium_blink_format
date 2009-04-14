@@ -46,7 +46,8 @@ namespace WebCore {
 void DocumentThreadableLoader::loadResourceSynchronously(
     Document* document,
     const ResourceRequest& request,
-    ThreadableLoaderClient& client) {
+    ThreadableLoaderClient& client,
+    StoredCredentials storedCredentials) {
   bool sameOriginRequest =
       document->securityOrigin()->canRequest(request.url());
 
@@ -56,7 +57,7 @@ void DocumentThreadableLoader::loadResourceSynchronously(
   unsigned long identifier = std::numeric_limits<unsigned long>::max();
   if (document->frame())
     identifier = document->frame()->loader()->loadResourceSynchronously(
-        request, error, response, data);
+        request, storedCredentials, error, response, data);
 
   // No exception for file:/// resources, see <rdar://problem/4962298>.
   // Also, if we have an HTTP response, then it wasn't a network error in fact.
@@ -89,11 +90,12 @@ PassRefPtr<DocumentThreadableLoader> DocumentThreadableLoader::create(
     ThreadableLoaderClient* client,
     const ResourceRequest& request,
     LoadCallbacks callbacksSetting,
-    ContentSniff contentSniff) {
+    ContentSniff contentSniff,
+    StoredCredentials storedCredentials) {
   ASSERT(document);
-  RefPtr<DocumentThreadableLoader> loader =
-      adoptRef(new DocumentThreadableLoader(document, client, request,
-                                            callbacksSetting, contentSniff));
+  RefPtr<DocumentThreadableLoader> loader = adoptRef(
+      new DocumentThreadableLoader(document, client, request, callbacksSetting,
+                                   contentSniff, storedCredentials));
   if (!loader->m_loader)
     loader = 0;
   return loader.release();
@@ -104,8 +106,13 @@ DocumentThreadableLoader::DocumentThreadableLoader(
     ThreadableLoaderClient* client,
     const ResourceRequest& request,
     LoadCallbacks callbacksSetting,
-    ContentSniff contentSniff)
-    : m_client(client), m_document(document) {
+    ContentSniff contentSniff,
+    StoredCredentials storedCredentials)
+    : m_client(client),
+      m_document(document),
+      m_allowStoredCredentials(storedCredentials == AllowStoredCredentials),
+      m_sameOriginRequest(
+          document->securityOrigin()->canRequest(request.url())) {
   ASSERT(document);
   ASSERT(client);
   m_loader = SubresourceLoader::create(document->frame(), this, request, false,
@@ -128,10 +135,11 @@ void DocumentThreadableLoader::cancel() {
   m_client = 0;
 }
 
-void DocumentThreadableLoader::willSendRequest(SubresourceLoader*,
+void DocumentThreadableLoader::willSendRequest(SubresourceLoader* loader,
                                                ResourceRequest& request,
                                                const ResourceResponse&) {
   ASSERT(m_client);
+  ASSERT_UNUSED(loader, loader == m_loader);
 
   // FIXME: This needs to be fixed to follow the redirect correctly even for
   // cross-domain requests.
@@ -143,43 +151,77 @@ void DocumentThreadableLoader::willSendRequest(SubresourceLoader*,
 }
 
 void DocumentThreadableLoader::didSendData(
-    SubresourceLoader*,
+    SubresourceLoader* loader,
     unsigned long long bytesSent,
     unsigned long long totalBytesToBeSent) {
   ASSERT(m_client);
+  ASSERT_UNUSED(loader, loader == m_loader);
+
   m_client->didSendData(bytesSent, totalBytesToBeSent);
 }
 
 void DocumentThreadableLoader::didReceiveResponse(
-    SubresourceLoader*,
+    SubresourceLoader* loader,
     const ResourceResponse& response) {
   ASSERT(m_client);
+  ASSERT_UNUSED(loader, loader == m_loader);
+
   m_client->didReceiveResponse(response);
 }
 
-void DocumentThreadableLoader::didReceiveData(SubresourceLoader*,
+void DocumentThreadableLoader::didReceiveData(SubresourceLoader* loader,
                                               const char* data,
                                               int lengthReceived) {
   ASSERT(m_client);
+  ASSERT_UNUSED(loader, loader == m_loader);
+
   m_client->didReceiveData(data, lengthReceived);
 }
 
 void DocumentThreadableLoader::didFinishLoading(SubresourceLoader* loader) {
-  ASSERT(loader);
+  ASSERT(loader == m_loader);
   ASSERT(m_client);
   m_client->didFinishLoading(loader->identifier());
 }
 
-void DocumentThreadableLoader::didFail(SubresourceLoader*,
+void DocumentThreadableLoader::didFail(SubresourceLoader* loader,
                                        const ResourceError& error) {
   ASSERT(m_client);
+  ASSERT_UNUSED(loader, loader == m_loader);
+
   m_client->didFail(error);
 }
 
+bool DocumentThreadableLoader::getShouldUseCredentialStorage(
+    SubresourceLoader* loader,
+    bool& shouldUseCredentialStorage) {
+  ASSERT_UNUSED(loader, loader == m_loader);
+
+  if (!m_allowStoredCredentials) {
+    shouldUseCredentialStorage = false;
+    return true;
+  }
+
+  return false;  // Only FrameLoaderClient can ultimately permit credential use.
+}
+
+void DocumentThreadableLoader::didReceiveAuthenticationChallenge(
+    SubresourceLoader* loader,
+    const AuthenticationChallenge&) {
+  ASSERT(loader == m_loader);
+  // Users are not prompted for credentials for cross-origin requests.
+  if (!m_sameOriginRequest) {
+    RefPtr<DocumentThreadableLoader> protect(this);
+    m_client->didFail(loader->blockedError());
+    cancel();
+  }
+}
+
 void DocumentThreadableLoader::receivedCancellation(
-    SubresourceLoader*,
+    SubresourceLoader* loader,
     const AuthenticationChallenge& challenge) {
   ASSERT(m_client);
+  ASSERT_UNUSED(loader, loader == m_loader);
   m_client->didReceiveAuthenticationCancellation(challenge.failureResponse());
 }
 

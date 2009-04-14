@@ -645,8 +645,13 @@ void XMLHttpRequest::loadRequestSynchronously(ResourceRequest& request,
 
   m_loader = 0;
   m_exceptionCode = 0;
+  StoredCredentials storedCredentials =
+      (m_sameOriginRequest || m_includeCredentials)
+          ? AllowStoredCredentials
+          : DoNotAllowStoredCredentials;
+
   ThreadableLoader::loadResourceSynchronously(scriptExecutionContext(), request,
-                                              *this);
+                                              *this, storedCredentials);
   if (!m_exceptionCode && m_error)
     m_exceptionCode = XMLHttpRequestException::NETWORK_ERR;
   ec = m_exceptionCode;
@@ -668,12 +673,17 @@ void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
       m_inPreflight ? DoNotSendLoadCallbacks : SendLoadCallbacks;
   ContentSniff contentSniff =
       request.url().isLocalFile() ? SniffContent : DoNotSniffContent;
+  StoredCredentials storedCredentials =
+      (m_sameOriginRequest || m_includeCredentials)
+          ? AllowStoredCredentials
+          : DoNotAllowStoredCredentials;
 
   if (m_upload)
     request.setReportUploadProgress(true);
 
-  m_loader = ThreadableLoader::create(scriptExecutionContext(), this, request,
-                                      callbacks, contentSniff);
+  m_loader =
+      ThreadableLoader::create(scriptExecutionContext(), this, request,
+                               callbacks, contentSniff, storedCredentials);
 
   if (m_loader) {
     // Neither this object nor the JavaScript wrapper should be deleted while

@@ -48,12 +48,14 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
  public:
   static void loadResourceSynchronously(Document*,
                                         const ResourceRequest&,
-                                        ThreadableLoaderClient&);
+                                        ThreadableLoaderClient&,
+                                        StoredCredentials);
   static PassRefPtr<DocumentThreadableLoader> create(Document*,
                                                      ThreadableLoaderClient*,
                                                      const ResourceRequest&,
                                                      LoadCallbacks,
-                                                     ContentSniff);
+                                                     ContentSniff,
+                                                     StoredCredentials);
   virtual ~DocumentThreadableLoader();
 
   virtual void cancel();
@@ -70,7 +72,8 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
                            ThreadableLoaderClient*,
                            const ResourceRequest&,
                            LoadCallbacks,
-                           ContentSniff);
+                           ContentSniff,
+                           StoredCredentials);
   virtual void willSendRequest(SubresourceLoader*,
                                ResourceRequest&,
                                const ResourceResponse& redirectResponse);
@@ -85,12 +88,19 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
   virtual void didFinishLoading(SubresourceLoader*);
   virtual void didFail(SubresourceLoader*, const ResourceError&);
 
+  virtual bool getShouldUseCredentialStorage(SubresourceLoader*,
+                                             bool& shouldUseCredentialStorage);
+  virtual void didReceiveAuthenticationChallenge(
+      SubresourceLoader*,
+      const AuthenticationChallenge&);
   virtual void receivedCancellation(SubresourceLoader*,
                                     const AuthenticationChallenge&);
 
   RefPtr<SubresourceLoader> m_loader;
   ThreadableLoaderClient* m_client;
   Document* m_document;
+  bool m_allowStoredCredentials;
+  bool m_sameOriginRequest;
 };
 
 }  // namespace WebCore

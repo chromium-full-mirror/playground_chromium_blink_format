@@ -53,12 +53,36 @@
 
 namespace WebCore {
 
+class WebCoreCredentialStorage {
+ public:
+  static void set(CFURLProtectionSpaceRef protectionSpace,
+                  CFURLCredentialRef credential) {
+    if (!m_storage)
+      m_storage = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+                                            &kCFTypeDictionaryKeyCallBacks,
+                                            &kCFTypeDictionaryValueCallBacks);
+    CFDictionarySetValue(m_storage, protectionSpace, credential);
+  }
+
+  static CFURLCredentialRef get(CFURLProtectionSpaceRef protectionSpace) {
+    if (!m_storage)
+      return 0;
+    return (CFURLCredentialRef)CFDictionaryGetValue(m_storage, protectionSpace);
+  }
+
+ private:
+  static CFMutableDictionaryRef m_storage;
+};
+
+CFMutableDictionaryRef WebCoreCredentialStorage::m_storage;
+
 static CFStringRef WebCoreSynchronousLoaderRunLoopMode =
     CFSTR("WebCoreSynchronousLoaderRunLoopMode");
 
 class WebCoreSynchronousLoader {
  public:
   static RetainPtr<CFDataRef> load(const ResourceRequest&,
+                                   StoredCredentials,
                                    ResourceResponse&,
                                    ResourceError&);
 
@@ -82,9 +106,14 @@ class WebCoreSynchronousLoader {
   static void didReceiveChallenge(CFURLConnectionRef,
                                   CFURLAuthChallengeRef,
                                   const void* clientInfo);
+  static Boolean shouldUseCredentialStorage(CFURLConnectionRef,
+                                            const void* clientInfo);
 
   bool m_isDone;
   RetainPtr<CFURLRef> m_url;
+  RetainPtr<CFStringRef> m_user;
+  RetainPtr<CFStringRef> m_pass;
+  bool m_allowStoredCredentials;
   ResourceResponse& m_response;
   RetainPtr<CFMutableDataRef> m_data;
   ResourceError& m_error;
@@ -117,8 +146,7 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
       handle->request().url().string().utf8().data());
 
   ResourceRequest request(cfRequest);
-  if (handle->client())
-    handle->client()->willSendRequest(handle, request, cfRedirectResponse);
+  handle->willSendRequest(request, cfRedirectResponse);
 
   cfRequest = request.cfURLRequest();
 
@@ -385,7 +413,7 @@ bool ResourceHandle::start(Frame* frame) {
                                      0,
                                      0,
                                      0,
-                                     willSendRequest,
+                                     WebCore::willSendRequest,
                                      didReceiveResponse,
                                      didReceiveData,
                                      NULL,
@@ -427,6 +455,16 @@ bool ResourceHandle::supportsBufferedData() {
   return false;
 }
 
+void ResourceHandle::willSendRequest(ResourceRequest& request,
+                                     const ResourceResponse& redirectResponse) {
+  const KURL& url = request.url();
+  d->m_user = url.user();
+  d->m_pass = url.pass();
+  request.removeCredentials();
+
+  client()->willSendRequest(this, request, redirectResponse);
+}
+
 bool ResourceHandle::shouldUseCredentialStorage() {
   LOG(Network, "CFNet - shouldUseCredentialStorage()");
   if (client())
@@ -445,6 +483,39 @@ void ResourceHandle::didReceiveAuthenticationChallenge(
   // we make sure that is actually present
   ASSERT(challenge.cfURLAuthChallengeRef());
 
+  if (!d->m_user.isNull() && !d->m_pass.isNull()) {
+    RetainPtr<CFStringRef> user(AdoptCF, d->m_user.createCFString());
+    RetainPtr<CFStringRef> pass(AdoptCF, d->m_pass.createCFString());
+    RetainPtr<CFURLCredentialRef> credential(
+        AdoptCF,
+        CFURLCredentialCreate(kCFAllocatorDefault, user.get(), pass.get(), 0,
+                              kCFURLCredentialPersistenceNone));
+    WebCoreCredentialStorage::set(
+        CFURLAuthChallengeGetProtectionSpace(challenge.cfURLAuthChallengeRef()),
+        credential.get());
+    CFURLConnectionUseCredential(d->m_connection.get(), credential.get(),
+                                 challenge.cfURLAuthChallengeRef());
+    d->m_user = String();
+    d->m_pass = String();
+    // FIXME: Per the specification, the user shouldn't be asked for credentials
+    // if there were incorrect ones provided explicitly.
+    return;
+  }
+
+  if (!challenge.previousFailureCount() &&
+      (!client() || client()->shouldUseCredentialStorage(this))) {
+    CFURLCredentialRef credential =
+        WebCoreCredentialStorage::get(CFURLAuthChallengeGetProtectionSpace(
+            challenge.cfURLAuthChallengeRef()));
+    if (credential) {
+      ASSERT(CFURLCredentialGetPersistence(credential) ==
+             kCFURLCredentialPersistenceNone);
+      CFURLConnectionUseCredential(d->m_connection.get(), credential,
+                                   challenge.cfURLAuthChallengeRef());
+      return;
+    }
+  }
+
   d->m_currentCFChallenge = challenge.cfURLAuthChallengeRef();
   d->m_currentWebChallenge =
       AuthenticationChallenge(d->m_currentCFChallenge, this);
@@ -462,10 +533,24 @@ void ResourceHandle::receivedCredential(
   if (challenge != d->m_currentWebChallenge)
     return;
 
-  CFURLCredentialRef cfCredential = createCF(credential);
-  CFURLConnectionUseCredential(d->m_connection.get(), cfCredential,
-                               challenge.cfURLAuthChallengeRef());
-  CFRelease(cfCredential);
+  if (credential.persistence() == CredentialPersistenceForSession) {
+    // Manage per-session credentials internally, because once
+    // NSURLCredentialPersistencePerSession is used, there is no way
+    // to ignore it for a particular request (short of removing it altogether).
+    Credential webCredential(credential.user(), credential.password(),
+                             CredentialPersistenceNone);
+    RetainPtr<CFURLCredentialRef> cfCredential(AdoptCF,
+                                               createCF(webCredential));
+    WebCoreCredentialStorage::set(
+        CFURLAuthChallengeGetProtectionSpace(challenge.cfURLAuthChallengeRef()),
+        cfCredential.get());
+    CFURLConnectionUseCredential(d->m_connection.get(), cfCredential.get(),
+                                 challenge.cfURLAuthChallengeRef());
+  } else {
+    RetainPtr<CFURLCredentialRef> cfCredential(AdoptCF, createCF(credential));
+    CFURLConnectionUseCredential(d->m_connection.get(), cfCredential.get(),
+                                 challenge.cfURLAuthChallengeRef());
+  }
 
   clearAuthentication();
 }
@@ -504,15 +589,17 @@ CFURLConnectionRef ResourceHandle::releaseConnectionForDownload() {
   return d->m_connection.releaseRef();
 }
 
-void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
-                                               ResourceError& error,
-                                               ResourceResponse& response,
-                                               Vector<char>& vector,
-                                               Frame*) {
+void ResourceHandle::loadResourceSynchronously(
+    const ResourceRequest& request,
+    StoredCredentials storedCredentials,
+    ResourceError& error,
+    ResourceResponse& response,
+    Vector<char>& vector,
+    Frame*) {
   ASSERT(!request.isEmpty());
 
-  RetainPtr<CFDataRef> data =
-      WebCoreSynchronousLoader::load(request, response, error);
+  RetainPtr<CFDataRef> data = WebCoreSynchronousLoader::load(
+      request, storedCredentials, response, error);
 
   if (!error.isNull()) {
     response = ResourceResponse(request.url(), String(), 0, String(), String());
@@ -597,6 +684,17 @@ CFURLRequestRef WebCoreSynchronousLoader::willSendRequest(
 
   loader->m_url = CFURLRequestGetURL(cfRequest);
 
+  if (cfRedirectResponse) {
+    // Take user/pass out of the URL.
+    loader->m_user.adoptCF(CFURLCopyUserName(loader->m_url.get()));
+    loader->m_pass.adoptCF(CFURLCopyPassword(loader->m_url.get()));
+    if (loader->m_user || loader->m_pass) {
+      ResourceRequest requestWithoutCredentials = cfRequest;
+      requestWithoutCredentials.removeCredentials();
+      return requestWithoutCredentials.createCFURLRequest();
+    }
+  }
+
   CFRetain(cfRequest);
   return cfRequest;
 }
@@ -651,12 +749,47 @@ void WebCoreSynchronousLoader::didReceiveChallenge(
   WebCoreSynchronousLoader* loader =
       static_cast<WebCoreSynchronousLoader*>(const_cast<void*>(clientInfo));
 
-  // FIXME: Mac uses credentials from URL here, should we do the same?
+  if (loader->m_user && loader->m_pass) {
+    RetainPtr<CFURLCredentialRef> credential(
+        AdoptCF, CFURLCredentialCreate(
+                     kCFAllocatorDefault, loader->m_user.get(),
+                     loader->m_pass.get(), 0, kCFURLCredentialPersistenceNone));
+    WebCoreCredentialStorage::set(
+        CFURLAuthChallengeGetProtectionSpace(challenge), credential.get());
+    CFURLConnectionUseCredential(conn, credential.get(), challenge);
+    loader->m_user = 0;
+    loader->m_pass = 0;
+    return;
+  }
+  if (!CFURLAuthChallengeGetPreviousFailureCount(challenge) &&
+      m_allowStoredCredentials) {
+    CFURLCredentialRef credential = WebCoreCredentialStorage::get(
+        CFURLAuthChallengeGetProtectionSpace(challenge));
+    if (credential) {
+      ASSERT(CFURLCredentialGetPersistence(credential) ==
+             kCFURLCredentialPersistenceNone);
+      CFURLConnectionUseCredential(conn, credential, challenge);
+      return;
+    }
+  }
+  // FIXME: The user should be asked for credentials, as in async case.
   CFURLConnectionUseCredential(conn, 0, challenge);
+}
+
+Boolean WebCoreSynchronousLoader::shouldUseCredentialStorage(
+    CFURLConnectionRef,
+    const void* clientInfo) {
+  WebCoreSynchronousLoader* loader =
+      static_cast<WebCoreSynchronousLoader*>(const_cast<void*>(clientInfo));
+
+  // FIXME: We should ask FrameLoaderClient whether using credential storage is
+  // globally forbidden.
+  return loader->m_allowStoredCredentials;
 }
 
 RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
     const ResourceRequest& request,
+    StoredCredentials storedCredentials,
     ResourceResponse& response,
     ResourceError& error) {
   ASSERT(response.isNull());
@@ -664,6 +797,14 @@ RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
 
   WebCoreSynchronousLoader loader(response, error);
 
+  KURL url = request.url();
+
+  // Take user/pass out of the URL.
+  loader.m_user.adoptCF(url.user().createCFString());
+  loader.m_pass.adoptCF(url.pass().createCFString());
+  loader.m_allowStoredCredentials =
+      (storedCredentials == AllowStoredCredentials);
+  request.removeCredentials();
   RetainPtr<CFURLRequestRef> cfRequest(AdoptCF,
                                        makeFinalRequest(request, true));
 
@@ -681,7 +822,7 @@ RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
                                      0,
                                      didReceiveChallenge,
                                      0,
-                                     0,
+                                     shouldUseCredentialStorage,
                                      0};
 
   RetainPtr<CFURLConnectionRef> connection(

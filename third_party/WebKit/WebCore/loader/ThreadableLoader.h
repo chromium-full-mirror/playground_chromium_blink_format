@@ -47,18 +47,22 @@ enum LoadCallbacks { SendLoadCallbacks, DoNotSendLoadCallbacks };
 
 enum ContentSniff { SniffContent, DoNotSniffContent };
 
+enum StoredCredentials { AllowStoredCredentials, DoNotAllowStoredCredentials };
+
 // Useful for doing loader operations from any thread (not threadsafe,
 // just able to run on threads other than the main thread).
 class ThreadableLoader : Noncopyable {
  public:
   static void loadResourceSynchronously(ScriptExecutionContext*,
                                         const ResourceRequest&,
-                                        ThreadableLoaderClient&);
+                                        ThreadableLoaderClient&,
+                                        StoredCredentials);
   static PassRefPtr<ThreadableLoader> create(ScriptExecutionContext*,
                                              ThreadableLoaderClient*,
                                              const ResourceRequest&,
                                              LoadCallbacks,
-                                             ContentSniff);
+                                             ContentSniff,
+                                             StoredCredentials);
 
   virtual void cancel() = 0;
   void ref() { refThreadableLoader(); }

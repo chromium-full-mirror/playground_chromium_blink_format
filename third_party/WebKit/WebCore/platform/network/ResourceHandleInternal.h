@@ -145,6 +145,10 @@ class ResourceHandleInternal : Noncopyable {
 #endif
         ,
         m_failureTimer(loader, &ResourceHandle::fireFailure) {
+    const KURL& url = m_request.url();
+    m_user = url.user();
+    m_pass = url.pass();
+    m_request.removeCredentials();
   }
 
   ~ResourceHandleInternal();
@@ -153,6 +157,10 @@ class ResourceHandleInternal : Noncopyable {
   ResourceHandleClient* m_client;
 
   ResourceRequest m_request;
+
+  // Suggested credentials for the current redirection step.
+  String m_user;
+  String m_pass;
 
   int status;
 

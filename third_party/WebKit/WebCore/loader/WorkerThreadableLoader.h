@@ -58,17 +58,19 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
  public:
   static void loadResourceSynchronously(WorkerContext*,
                                         const ResourceRequest&,
-                                        ThreadableLoaderClient&);
+                                        ThreadableLoaderClient&,
+                                        StoredCredentials);
   static PassRefPtr<WorkerThreadableLoader> create(
       WorkerContext* workerContext,
       ThreadableLoaderClient* client,
       const String& taskMode,
       const ResourceRequest& request,
       LoadCallbacks callbacksSetting,
-      ContentSniff contentSniff) {
-    return adoptRef(new WorkerThreadableLoader(workerContext, client, taskMode,
-                                               request, callbacksSetting,
-                                               contentSniff));
+      ContentSniff contentSniff,
+      StoredCredentials storedCredentials) {
+    return adoptRef(new WorkerThreadableLoader(
+        workerContext, client, taskMode, request, callbacksSetting,
+        contentSniff, storedCredentials));
   }
 
   ~WorkerThreadableLoader();
@@ -120,7 +122,8 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
                      const String& taskMode,
                      const ResourceRequest&,
                      LoadCallbacks,
-                     ContentSniff);
+                     ContentSniff,
+                     StoredCredentials);
     void cancel();
     void destroy();
 
@@ -137,7 +140,8 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
         MainThreadBridge*,
         std::auto_ptr<CrossThreadResourceRequestData>,
         LoadCallbacks,
-        ContentSniff);
+        ContentSniff,
+        StoredCredentials);
     static void mainThreadCancel(ScriptExecutionContext*, MainThreadBridge*);
     virtual void didSendData(unsigned long long bytesSent,
                              unsigned long long totalBytesToBeSent);
@@ -168,7 +172,8 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
                          const String& taskMode,
                          const ResourceRequest&,
                          LoadCallbacks,
-                         ContentSniff);
+                         ContentSniff,
+                         StoredCredentials);
 
   RefPtr<WorkerContext> m_workerContext;
   RefPtr<ThreadableLoaderClientWrapper> m_workerClientWrapper;

@@ -66,6 +66,8 @@ class ResourceRequestBase {
   const KURL& url() const;
   void setURL(const KURL& url);
 
+  void removeCredentials();
+
   ResourceRequestCachePolicy cachePolicy() const;
   void setCachePolicy(ResourceRequestCachePolicy cachePolicy);
 

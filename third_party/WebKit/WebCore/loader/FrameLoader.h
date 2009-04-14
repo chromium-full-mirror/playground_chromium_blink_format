@@ -34,6 +34,7 @@
 #include "CachePolicy.h"
 #include "FrameLoaderTypes.h"
 #include "ResourceRequest.h"
+#include "ThreadableLoader.h"
 #include "Timer.h"
 
 namespace WebCore {
@@ -180,6 +181,7 @@ class FrameLoader : Noncopyable {
                       bool& created);
 
   unsigned long loadResourceSynchronously(const ResourceRequest&,
+                                          StoredCredentials,
                                           ResourceError&,
                                           ResourceResponse&,
                                           Vector<char>& data);

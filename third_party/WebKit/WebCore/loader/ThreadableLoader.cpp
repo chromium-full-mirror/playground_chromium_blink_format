@@ -45,40 +45,44 @@ PassRefPtr<ThreadableLoader> ThreadableLoader::create(
     ThreadableLoaderClient* client,
     const ResourceRequest& request,
     LoadCallbacks callbacksSetting,
-    ContentSniff contentSniff) {
+    ContentSniff contentSniff,
+    StoredCredentials storedCredentials) {
   ASSERT(client);
   ASSERT(context);
 
 #if ENABLE(WORKERS)
   if (context->isWorkerContext())
-    return WorkerThreadableLoader::create(
-        static_cast<WorkerContext*>(context), client,
-        WorkerRunLoop::defaultMode(), request, callbacksSetting, contentSniff);
+    return WorkerThreadableLoader::create(static_cast<WorkerContext*>(context),
+                                          client, WorkerRunLoop::defaultMode(),
+                                          request, callbacksSetting,
+                                          contentSniff, storedCredentials);
 #endif  // ENABLE(WORKERS)
 
   ASSERT(context->isDocument());
   return DocumentThreadableLoader::create(static_cast<Document*>(context),
                                           client, request, callbacksSetting,
-                                          contentSniff);
+                                          contentSniff, storedCredentials);
 }
 
 void ThreadableLoader::loadResourceSynchronously(
     ScriptExecutionContext* context,
     const ResourceRequest& request,
-    ThreadableLoaderClient& client) {
+    ThreadableLoaderClient& client,
+    StoredCredentials storedCredentials) {
   ASSERT(context);
 
 #if ENABLE(WORKERS)
   if (context->isWorkerContext()) {
     WorkerThreadableLoader::loadResourceSynchronously(
-        static_cast<WorkerContext*>(context), request, client);
+        static_cast<WorkerContext*>(context), request, client,
+        storedCredentials);
     return;
   }
 #endif  // ENABLE(WORKERS)
 
   ASSERT(context->isDocument());
   DocumentThreadableLoader::loadResourceSynchronously(
-      static_cast<Document*>(context), request, client);
+      static_cast<Document*>(context), request, client, storedCredentials);
 }
 
 }  // namespace WebCore
