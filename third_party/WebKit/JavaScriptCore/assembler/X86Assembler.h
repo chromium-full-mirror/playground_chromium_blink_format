@@ -672,6 +672,24 @@ class X86Assembler {
     m_formatter.oneByteOp(OP_CMP_EvGv, src, base, index, scale, offset);
   }
 
+  void cmpw_im(int imm,
+               int offset,
+               RegisterID base,
+               RegisterID index,
+               int scale) {
+    if (CAN_SIGN_EXTEND_8_32(imm)) {
+      m_formatter.prefix(PRE_OPERAND_SIZE);
+      m_formatter.oneByteOp(OP_GROUP1_EvIb, GROUP1_OP_CMP, base, index, scale,
+                            offset);
+      m_formatter.immediate8(imm);
+    } else {
+      m_formatter.prefix(PRE_OPERAND_SIZE);
+      m_formatter.oneByteOp(OP_GROUP1_EvIz, GROUP1_OP_CMP, base, index, scale,
+                            offset);
+      m_formatter.immediate16(imm);
+    }
+  }
+
   void testl_rr(RegisterID src, RegisterID dst) {
     m_formatter.oneByteOp(OP_TEST_EvGv, src, dst);
   }
@@ -721,6 +739,11 @@ class X86Assembler {
     m_formatter.immediate32(imm);
   }
 #endif
+
+  void testw_rr(RegisterID src, RegisterID dst) {
+    m_formatter.prefix(PRE_OPERAND_SIZE);
+    m_formatter.oneByteOp(OP_TEST_EvGv, src, dst);
+  }
 
   void testb_i8r(int imm, RegisterID dst) {
     m_formatter.oneByteOp8(OP_GROUP3_EbIb, GROUP3_OP_TEST, dst);
@@ -1500,6 +1523,8 @@ class X86Assembler {
     // ensured space.
 
     void immediate8(int imm) { m_buffer.putByteUnchecked(imm); }
+
+    void immediate16(int imm) { m_buffer.putShortUnchecked(imm); }
 
     void immediate32(int imm) { m_buffer.putIntUnchecked(imm); }
 
