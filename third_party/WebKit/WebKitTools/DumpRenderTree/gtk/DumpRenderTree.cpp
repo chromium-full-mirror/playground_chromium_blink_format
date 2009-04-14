@@ -311,6 +311,11 @@ static void setDefaultsToConsistentStateValuesForTesting() {
                "monospace-font-family", "Courier", "serif-font-family", "Times",
                "sans-serif-font-family", "Helvetica", "default-font-size", 16,
                "default-monospace-font-size", 13, "minimum-font-size", 1, NULL);
+
+  /* Disable the default auth dialog for testing */
+  SoupSession* session = webkit_get_default_session();
+  soup_session_remove_feature_by_type(session, WEBKIT_TYPE_SOUP_AUTH_DIALOG);
+
 #if PLATFORM(X11)
   webkit_web_settings_add_extra_plugin_directory(webView, TEST_PLUGIN_DIR);
 #endif
