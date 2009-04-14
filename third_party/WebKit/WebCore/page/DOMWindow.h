@@ -242,6 +242,9 @@ class DOMWindow : public RefCounted<DOMWindow> {
                            bool useCapture);
   bool hasEventListener(const AtomicString& eventType);
   void removeAllEventListeners();
+  const RegisteredEventListenerVector& eventListeners() const {
+    return m_eventListeners;
+  }
 
   void setInlineEventListenerForType(const AtomicString& eventType,
                                      PassRefPtr<EventListener>);

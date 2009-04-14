@@ -59,6 +59,17 @@ class RegisteredEventListener : public RefCounted<RegisteredEventListener> {
 
 typedef Vector<RefPtr<RegisteredEventListener>> RegisteredEventListenerVector;
 
+inline void markEventListeners(const RegisteredEventListenerVector& listeners) {
+  for (size_t i = 0; i < listeners.size(); ++i)
+    listeners[i]->listener()->markJSFunction();
+}
+
+inline void invalidateEventListeners(
+    const RegisteredEventListenerVector& listeners) {
+  for (size_t i = 0; i < listeners.size(); ++i)
+    listeners[i]->listener()->clearJSFunction();
+}
+
 }  // namespace WebCore
 
 #endif  // RegisteredEventListener_h
