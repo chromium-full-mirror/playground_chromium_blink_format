@@ -56,6 +56,10 @@ DOMWrapperMap<void>& getDOMObjectMap();
 // pending activity.
 DOMWrapperMap<void>& getActiveDOMObjectMap();
 
+// This should be called to remove all DOM objects associated with the current
+// thread when it is tearing down.
+void removeAllDOMObjectsInCurrentThread();
+
 #if ENABLE(SVG)
 // A map for SVGElementInstances to its JS wrapper.
 DOMWrapperMap<SVGElementInstance>& getDOMSVGElementInstanceMap();
