@@ -643,27 +643,20 @@ PassRefPtr<Node> CompositeEditCommand::addBlockPlaceholderIfNeeded(
   return 0;
 }
 
-// Removes '\n's and brs that will collapse when content is inserted just before
-// them.
-// FIXME: We shouldn't really have to remove placeholders, but removing them is
-// a workaround for 9661.
-void CompositeEditCommand::removePlaceholderAt(
-    const VisiblePosition& visiblePosition) {
-  if (visiblePosition.isNull())
-    return;
+// Assumes that the position is at a placeholder and does the removal without
+// much checking.
+void CompositeEditCommand::removePlaceholderAt(const Position& p) {
+  ASSERT(lineBreakExistsAtPosition(p));
 
-  Position p = visiblePosition.deepEquivalent().downstream();
-  // If a br or '\n' is at the end of a block and not at the start of a
-  // paragraph,
-  // then it is superfluous, so adding content before a br or '\n' that is at
-  // the start of a paragraph will render it superfluous.
-  // FIXME: This doesn't remove placeholders at the end of anonymous blocks.
-  if (isEndOfBlock(visiblePosition) && isStartOfParagraph(visiblePosition)) {
-    if (p.node()->hasTagName(brTag) && p.m_offset == 0)
-      removeNode(p.node());
-    else if (lineBreakExistsAtPosition(visiblePosition))
-      deleteTextFromNode(static_cast<Text*>(p.node()), p.m_offset, 1);
+  // We are certain that the position is at a line break, but it may be a br or
+  // a preserved newline.
+  if (p.anchorNode()->hasTagName(brTag)) {
+    removeNode(p.anchorNode());
+    return;
   }
+
+  deleteTextFromNode(static_cast<Text*>(p.anchorNode()),
+                     p.offsetInContainerNode(), 1);
 }
 
 PassRefPtr<Node> CompositeEditCommand::insertNewDefaultParagraphElementAt(
@@ -918,7 +911,7 @@ void CompositeEditCommand::moveParagraphs(
     // expects this behavior).
     else if (isBlock(node))
       removeNodeAndPruneAncestors(node);
-    else if (lineBreakExistsAtPosition(caretAfterDelete)) {
+    else if (lineBreakExistsAtVisiblePosition(caretAfterDelete)) {
       // There is a preserved '\n' at caretAfterDelete.
       Text* textNode = static_cast<Text*>(node);
       if (textNode->length() == 1)
@@ -1055,7 +1048,7 @@ bool CompositeEditCommand::breakOutOfEmptyMailBlockquotedParagraph() {
   setEndingSelection(VisibleSelection(atBR));
 
   // If this is an empty paragraph there must be a line break here.
-  if (!lineBreakExistsAtPosition(caret))
+  if (!lineBreakExistsAtVisiblePosition(caret))
     return false;
 
   Position caretPos(caret.deepEquivalent());
@@ -1121,7 +1114,7 @@ Position CompositeEditCommand::positionAvoidingSpecialElementBoundary(
       // probably be safe to move the line break so that we could still avoid
       // the anchor here.
       Position downstream(visiblePos.deepEquivalent().downstream());
-      if (lineBreakExistsAtPosition(visiblePos) &&
+      if (lineBreakExistsAtVisiblePosition(visiblePos) &&
           downstream.node()->isDescendantOf(enclosingAnchor))
         return original;
 

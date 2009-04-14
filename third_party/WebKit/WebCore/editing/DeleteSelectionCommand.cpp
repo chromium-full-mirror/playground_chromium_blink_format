@@ -810,7 +810,8 @@ void DeleteSelectionCommand::calculateTypingStyleAfterDelete() {
     m_typingStyle = 0;
   VisiblePosition visibleEnd(m_endingPosition);
   if (m_typingStyle && isStartOfParagraph(visibleEnd) &&
-      isEndOfParagraph(visibleEnd) && lineBreakExistsAtPosition(visibleEnd)) {
+      isEndOfParagraph(visibleEnd) &&
+      lineBreakExistsAtVisiblePosition(visibleEnd)) {
     // Apply style to the placeholder that is now holding open the empty
     // paragraph.
     // This makes sure that the paragraph has the right height, and that the
@@ -879,7 +880,7 @@ void DeleteSelectionCommand::doApply() {
   m_needPlaceholder =
       isStartOfParagraph(m_selectionToDelete.visibleStart()) &&
       isEndOfParagraph(m_selectionToDelete.visibleEnd()) &&
-      !lineBreakExistsAtPosition(m_selectionToDelete.visibleEnd());
+      !lineBreakExistsAtVisiblePosition(m_selectionToDelete.visibleEnd());
   if (m_needPlaceholder) {
     // Don't need a placeholder when deleting a selection that starts just
     // before a table

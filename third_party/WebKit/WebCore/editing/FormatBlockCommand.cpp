@@ -130,7 +130,7 @@ void FormatBlockCommand::doApply() {
 
   VisiblePosition destination(Position(placeholder.get(), 0));
   if (paragraphStart == paragraphEnd &&
-      !lineBreakExistsAtPosition(paragraphStart)) {
+      !lineBreakExistsAtVisiblePosition(paragraphStart)) {
     setEndingSelection(destination);
     return;
   }
