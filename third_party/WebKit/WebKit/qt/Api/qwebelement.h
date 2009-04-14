@@ -56,8 +56,10 @@ class QWEBKIT_EXPORT QWebElement {
   void setPlainText(const QString& text);
   QString toPlainText() const;
 
-  void setHtml(const QString& html);
-  QString html() const;
+  enum XmlScope { InnerXml, OuterXml };
+
+  void setXml(XmlScope scope, const QString& markup);
+  QString toXml(XmlScope scope) const;
 
   void setAttribute(const QString& name, const QString& value);
   void setAttributeNS(const QString& namespaceUri,
