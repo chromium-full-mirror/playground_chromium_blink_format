@@ -104,6 +104,8 @@ class tst_QWebPage : public QObject {
   void textSelection();
   void textEditing();
 
+  void requestCache();
+
  private:
  private:
   QWebView* m_view;
@@ -1145,6 +1147,48 @@ void tst_QWebPage::textEditing() {
   QCOMPARE(page->action(QWebPage::RemoveFormat)->isEnabled(), true);
 
   delete page;
+}
+
+void tst_QWebPage::requestCache() {
+  TestPage page;
+  QSignalSpy loadSpy(&page, SIGNAL(loadFinished(bool)));
+
+  page.mainFrame()->setUrl(
+      QString("data:text/html,<a href=\"data:text/html,Reached\" "
+              "target=\"_blank\">Click me</a>"));
+  QTRY_COMPARE(loadSpy.count(), 1);
+  QTRY_COMPARE(page.navigations.count(), 1);
+
+  page.mainFrame()->setUrl(
+      QString("data:text/html,<a href=\"data:text/html,Reached\" "
+              "target=\"_blank\">Click me2</a>"));
+  QTRY_COMPARE(loadSpy.count(), 2);
+  QTRY_COMPARE(page.navigations.count(), 2);
+
+  page.triggerAction(QWebPage::Stop);
+  QVERIFY(page.history()->canGoBack());
+  page.triggerAction(QWebPage::Back);
+
+  QTRY_COMPARE(loadSpy.count(), 3);
+  QTRY_COMPARE(page.navigations.count(), 3);
+  QCOMPARE(page.navigations.at(0)
+               .request
+               .attribute(QNetworkRequest::CacheLoadControlAttribute,
+                          QNetworkRequest::PreferNetwork)
+               .toInt(),
+           (int)QNetworkRequest::PreferNetwork);
+  QCOMPARE(page.navigations.at(1)
+               .request
+               .attribute(QNetworkRequest::CacheLoadControlAttribute,
+                          QNetworkRequest::PreferNetwork)
+               .toInt(),
+           (int)QNetworkRequest::PreferNetwork);
+  QCOMPARE(page.navigations.at(2)
+               .request
+               .attribute(QNetworkRequest::CacheLoadControlAttribute,
+                          QNetworkRequest::PreferNetwork)
+               .toInt(),
+           (int)QNetworkRequest::PreferCache);
 }
 
 QTEST_MAIN(tst_QWebPage)
