@@ -22,14 +22,7 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(Q_OS_WIN)
-#if defined(QT_NODLL)
-#undef QT_MAKEDLL
-#undef QT_DLL
-#elif defined(QT_MAKEDLL) /* create a Qt DLL library */
-#if defined(QT_DLL)
-#undef QT_DLL
-#endif
+#if defined(QT_MAKEDLL) /* create a Qt DLL library */
 #if defined(BUILD_WEBKIT)
 #define QWEBKIT_EXPORT Q_DECL_EXPORT
 #else
@@ -37,7 +30,6 @@
 #endif
 #elif defined(QT_DLL) /* use a Qt DLL library */
 #define QWEBKIT_EXPORT Q_DECL_IMPORT
-#endif
 #endif
 
 #if !defined(QWEBKIT_EXPORT)
