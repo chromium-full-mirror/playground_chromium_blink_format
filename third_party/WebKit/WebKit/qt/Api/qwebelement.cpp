@@ -62,9 +62,9 @@ class QWebElementPrivate {
     The element's attributes can be read using attribute() and changed using
    setAttribute().
 
-    The content of the child elements can be converted to text() and html(), and
-   it is possible to
-    replace the content using setText() and setHtml().
+    The content of the child elements can be converted to toPlainText() and
+   html(), and it is possible to
+    replace the content using setPlainText() and setHtml().
 
     Depending on the type of the underlying element there may be extra
    functionality available, not
@@ -154,7 +154,7 @@ QWebElement QWebElement::findFirst(const QString& query) const {
 
     This is equivalent to setting the HTML innerText property.
 */
-void QWebElement::setText(const QString& text) {
+void QWebElement::setPlainText(const QString& text) {
   if (!m_element || !m_element->isHTMLElement())
     return;
   ExceptionCode exception = 0;
@@ -167,7 +167,7 @@ void QWebElement::setText(const QString& text) {
 
     This is equivalent to reading the HTML innerText property.
 */
-QString QWebElement::text() const {
+QString QWebElement::toPlainText() const {
   if (!m_element || !m_element->isHTMLElement())
     return QString();
   return static_cast<HTMLElement*>(m_element)->innerText();
