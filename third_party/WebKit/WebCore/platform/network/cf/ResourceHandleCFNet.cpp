@@ -804,9 +804,11 @@ RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
   loader.m_pass.adoptCF(url.pass().createCFString());
   loader.m_allowStoredCredentials =
       (storedCredentials == AllowStoredCredentials);
-  request.removeCredentials();
-  RetainPtr<CFURLRequestRef> cfRequest(AdoptCF,
-                                       makeFinalRequest(request, true));
+
+  ResourceRequest requestWithoutCredentials(request);
+  requestWithoutCredentials.removeCredentials();
+  RetainPtr<CFURLRequestRef> cfRequest(
+      AdoptCF, makeFinalRequest(requestWithoutCredentials, true));
 
   CFURLConnectionClient_V3 client = {3,
                                      &loader,
