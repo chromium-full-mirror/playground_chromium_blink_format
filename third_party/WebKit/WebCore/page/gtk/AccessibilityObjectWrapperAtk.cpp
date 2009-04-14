@@ -375,11 +375,18 @@ static void atk_action_interface_init(AtkActionIface* iface) {
 // Text
 
 static gchar* webkit_accessible_text_get_text(AtkText* text,
-                                              gint start_offset,
-                                              gint end_offset) {
-  String ret = core(text)->doAXStringForRange(
-      PlainTextRange(start_offset, end_offset - start_offset));
-  // TODO: Intentionally copied?
+                                              gint startOffset,
+                                              gint endOffset) {
+  AccessibilityObject* coreObject = core(text);
+  String ret;
+  unsigned start = startOffset;
+  int length = endOffset - startOffset;
+
+  if (coreObject->isTextControl())
+    ret = coreObject->doAXStringForRange(PlainTextRange(start, length));
+  else
+    ret = coreObject->textUnderElement().substring(start, length);
+
   return g_strdup(ret.utf8().data());
 }
 
@@ -468,7 +475,12 @@ static void webkit_accessible_text_get_character_extents(AtkText* text,
 }
 
 static gint webkit_accessible_text_get_character_count(AtkText* text) {
-  return core(text)->textLength();
+  AccessibilityObject* coreObject = core(text);
+
+  if (coreObject->isTextControl())
+    return coreObject->textLength();
+  else
+    return coreObject->textUnderElement().length();
 }
 
 static gint webkit_accessible_text_get_offset_at_point(AtkText* text,
