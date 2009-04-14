@@ -36,6 +36,12 @@ using namespace JSC;
 
 namespace WebCore {
 
+void JSSVGElementInstance::mark() {
+  Base::mark();
+
+  markEventListeners(impl()->eventListeners());
+}
+
 JSValuePtr JSSVGElementInstance::addEventListener(ExecState* exec,
                                                   const ArgList& args) {
   JSDOMGlobalObject* globalObject =
@@ -43,8 +49,8 @@ JSValuePtr JSSVGElementInstance::addEventListener(ExecState* exec,
   if (!globalObject)
     return jsUndefined();
 
-  if (RefPtr<JSProtectedEventListener> listener =
-          globalObject->findOrCreateJSProtectedEventListener(args.at(exec, 1)))
+  if (RefPtr<JSEventListener> listener =
+          globalObject->findOrCreateJSEventListener(args.at(exec, 1)))
     impl()->addEventListener(args.at(exec, 0).toString(exec),
                              listener.release(),
                              args.at(exec, 2).toBoolean(exec));
@@ -59,8 +65,8 @@ JSValuePtr JSSVGElementInstance::removeEventListener(ExecState* exec,
   if (!globalObject)
     return jsUndefined();
 
-  if (JSProtectedEventListener* listener =
-          globalObject->findJSProtectedEventListener(args.at(exec, 1)))
+  if (JSEventListener* listener =
+          globalObject->findJSEventListener(args.at(exec, 1)))
     impl()->removeEventListener(args.at(exec, 0).toString(exec), listener,
                                 args.at(exec, 2).toBoolean(exec));
 

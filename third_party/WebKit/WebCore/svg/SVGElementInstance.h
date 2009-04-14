@@ -66,6 +66,9 @@ class SVGElementInstance : public TreeShared<SVGElementInstance>,
                                    EventListener*,
                                    bool useCapture);
   virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
+  const RegisteredEventListenerVector& eventListeners() const {
+    return correspondingElement()->eventListeners();
+  }
 
   SVGElement* correspondingElement() const { return m_element.get(); }
   SVGUseElement* correspondingUseElement() const { return m_useElement; }
