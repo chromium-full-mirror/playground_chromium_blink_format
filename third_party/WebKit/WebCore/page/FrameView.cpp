@@ -951,8 +951,9 @@ bool FrameView::needsLayout() const {
   RenderView* root = m_frame->contentRenderer();
   Document* document = m_frame->document();
   return layoutPending() || (root && root->needsLayout()) || m_layoutRoot ||
-         document->childNeedsStyleRecalc()  // can occur when using WebKit ObjC
-                                            // interface
+         (document && document->childNeedsStyleRecalc())  // can occur when
+                                                          // using WebKit ObjC
+                                                          // interface
          || m_frame->needsReapplyStyles();
 }
 
