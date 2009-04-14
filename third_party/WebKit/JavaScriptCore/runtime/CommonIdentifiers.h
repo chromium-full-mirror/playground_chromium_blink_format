@@ -38,7 +38,7 @@
                               macro(toExponential) macro(toFixed)              \
                                   macro(toLocaleString) macro(toPrecision)     \
                                       macro(toString) macro(UTC)               \
-                                          macro(valueOf)
+                                          macro(valueOf) macro(displayName)
 
 namespace JSC {
 
