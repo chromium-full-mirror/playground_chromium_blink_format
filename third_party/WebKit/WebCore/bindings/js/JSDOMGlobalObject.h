@@ -32,6 +32,7 @@
 namespace WebCore {
 
 class Event;
+class JSProtectedEventListener;
 class JSEventListener;
 class ScriptExecutionContext;
 
@@ -56,6 +57,16 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
 
   virtual ScriptExecutionContext* scriptExecutionContext() const = 0;
 
+  // Finds a wrapper of a JS EventListener, returns 0 if no existing one.
+  JSProtectedEventListener* findJSProtectedEventListener(JSC::JSValuePtr,
+                                                         bool isInline = false);
+
+  // Finds or creates a wrapper of a JS EventListener. JS EventListener object
+  // is GC-protected.
+  PassRefPtr<JSProtectedEventListener> findOrCreateJSProtectedEventListener(
+      JSC::JSValuePtr,
+      bool isInline = false);
+
   // Finds a wrapper of a GC-unprotected JS EventListener, returns 0 if no
   // existing one.
   JSEventListener* findJSEventListener(JSC::JSValuePtr, bool isInline = false);
@@ -66,8 +77,12 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
       JSC::JSValuePtr,
       bool isInline = false);
 
+  typedef HashMap<JSC::JSObject*, JSProtectedEventListener*>
+      ProtectedListenersMap;
   typedef HashMap<JSC::JSObject*, JSEventListener*> JSListenersMap;
 
+  ProtectedListenersMap& jsProtectedEventListeners();
+  ProtectedListenersMap& jsProtectedInlineEventListeners();
   JSListenersMap& jsEventListeners();
   JSListenersMap& jsInlineEventListeners();
 
@@ -84,6 +99,8 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
     JSDOMStructureMap structures;
     JSDOMConstructorMap constructors;
 
+    JSDOMGlobalObject::ProtectedListenersMap jsProtectedEventListeners;
+    JSDOMGlobalObject::ProtectedListenersMap jsProtectedInlineEventListeners;
     JSDOMGlobalObject::JSListenersMap jsEventListeners;
     JSDOMGlobalObject::JSListenersMap jsInlineEventListeners;
 
