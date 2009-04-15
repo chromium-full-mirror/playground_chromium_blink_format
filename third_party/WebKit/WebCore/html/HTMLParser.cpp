@@ -128,7 +128,6 @@ HTMLParser::HTMLParser(HTMLDocument* doc, bool reportErrors)
       m_blockStack(0),
       m_blocksInStack(0),
       m_hasPElementInScope(NotInScope),
-      m_head(0),
       m_inBody(false),
       m_haveContent(false),
       m_haveFrameSet(false),
@@ -144,7 +143,6 @@ HTMLParser::HTMLParser(DocumentFragment* frag)
       m_blockStack(0),
       m_blocksInStack(0),
       m_hasPElementInScope(NotInScope),
-      m_head(0),
       m_inBody(true),
       m_haveContent(false),
       m_haveFrameSet(false),
@@ -522,8 +520,7 @@ bool HTMLParser::handleError(Node* n,
            elt->hasLocalName(baseTag))) {
         if (!m_head) {
           m_head = new HTMLHeadElement(headTag, m_document);
-          e = m_head;
-          insertNode(e);
+          insertNode(m_head.get());
           handled = true;
         }
       } else {
@@ -1621,7 +1618,7 @@ void HTMLParser::createHead() {
   m_head = new HTMLHeadElement(headTag, m_document);
   HTMLElement* body = m_document->body();
   ExceptionCode ec = 0;
-  m_document->documentElement()->insertBefore(m_head, body, ec);
+  m_document->documentElement()->insertBefore(m_head.get(), body, ec);
   if (ec)
     m_head = 0;
 
@@ -1629,7 +1626,7 @@ void HTMLParser::createHead() {
   // current block.
   if (m_head && !body) {
     pushBlock(m_head->localName(), m_head->tagPriority());
-    setCurrent(m_head);
+    setCurrent(m_head.get());
   }
 }
 
