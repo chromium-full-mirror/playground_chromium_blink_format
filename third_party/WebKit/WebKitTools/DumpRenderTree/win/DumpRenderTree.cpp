@@ -1068,6 +1068,28 @@ IWebView* createWebViewAndOffscreenWindow(HWND* webViewWindow) {
   return webView;
 }
 
+RetainPtr<CFURLCacheRef> sharedCFURLCache() {
+  HMODULE module = GetModuleHandle(TEXT("CFNetwork_debug.dll"));
+  if (!module)
+    module = GetModuleHandle(TEXT("CFNetwork.dll"));
+  if (!module)
+    return 0;
+
+  typedef CFURLCacheRef (*CFURLCacheCopySharedURLCacheProcPtr)(void);
+  if (CFURLCacheCopySharedURLCacheProcPtr copyCache =
+          reinterpret_cast<CFURLCacheCopySharedURLCacheProcPtr>(
+              GetProcAddress(module, "CFURLCacheCopySharedURLCache")))
+    return RetainPtr<CFURLCacheRef>(AdoptCF, copyCache());
+
+  typedef CFURLCacheRef (*CFURLCacheSharedURLCacheProcPtr)(void);
+  if (CFURLCacheSharedURLCacheProcPtr sharedCache =
+          reinterpret_cast<CFURLCacheSharedURLCacheProcPtr>(
+              GetProcAddress(module, "CFURLCacheSharedURLCache")))
+    return sharedCache();
+
+  return 0;
+}
+
 int main(int argc, char* argv[]) {
   leakChecking = false;
 
@@ -1124,7 +1146,8 @@ int main(int argc, char* argv[]) {
   if (FAILED(webView->mainFrame(&frame)))
     return -1;
 
-  CFURLCacheRemoveAllCachedResponses(CFURLCacheSharedURLCache());
+  RetainPtr<CFURLCacheRef> urlCache = sharedCFURLCache();
+  CFURLCacheRemoveAllCachedResponses(urlCache.get());
 
 #ifdef _DEBUG
   _CrtMemState entryToMainMemCheckpoint;
