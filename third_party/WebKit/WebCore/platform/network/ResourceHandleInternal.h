@@ -137,11 +137,7 @@ class ResourceHandleInternal : Noncopyable {
 #endif
 #if PLATFORM(MAC)
         ,
-        m_startWhenScheduled(false),
-        m_currentMacChallenge(nil)
-#elif USE(CFNETWORK)
-        ,
-        m_currentCFChallenge(0)
+        m_startWhenScheduled(false)
 #endif
         ,
         m_failureTimer(loader, &ResourceHandle::fireFailure) {
@@ -221,13 +217,7 @@ class ResourceHandleInternal : Noncopyable {
 #endif
   QWebFrame* m_frame;
 #endif
-#if PLATFORM(MAC)
-  NSURLAuthenticationChallenge* m_currentMacChallenge;
-#endif
-#if USE(CFNETWORK)
-  CFURLAuthChallengeRef m_currentCFChallenge;
-#endif
-  AuthenticationChallenge m_currentWebChallenge;
+  AuthenticationChallenge m_currentChallenge;
 
   ResourceHandle::FailureType m_failureType;
   Timer<ResourceHandle> m_failureTimer;
