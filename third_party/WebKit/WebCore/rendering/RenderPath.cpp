@@ -61,9 +61,8 @@ class BoundingRectStrokeStyleApplier : public StrokeStyleApplier {
   RenderStyle* m_style;
 };
 
-// RenderPath
 RenderPath::RenderPath(SVGStyledTransformableElement* node)
-    : RenderObject(node) {}
+    : RenderSVGModelObject(node) {}
 
 TransformationMatrix RenderPath::localTransform() const {
   return m_localTransform;
