@@ -32,6 +32,7 @@
 
 #include "Arguments.h"
 #include "BatchedTransitionOptimizer.h"
+#include "CallFrameClosure.h"
 #include "CodeBlock.h"
 #include "DebuggerCallFrame.h"
 #include "EvalCodeCache.h"
@@ -830,7 +831,7 @@ JSValuePtr Interpreter::execute(FunctionBodyNode* functionBodyNode,
   return result;
 }
 
-Interpreter::CallFrameClosure Interpreter::prepareForRepeatCall(
+CallFrameClosure Interpreter::prepareForRepeatCall(
     FunctionBodyNode* functionBodyNode,
     CallFrame* callFrame,
     JSFunction* function,

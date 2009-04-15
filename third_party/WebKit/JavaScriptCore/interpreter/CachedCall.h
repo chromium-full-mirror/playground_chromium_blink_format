@@ -26,6 +26,7 @@
 #ifndef CachedCall_h
 #define CachedCall_h
 
+#include "CallFrameClosure.h"
 #include "Interpreter.h"
 
 namespace JSC {
@@ -62,7 +63,7 @@ class CachedCall : Noncopyable {
   Interpreter* m_interpreter;
   JSValuePtr* m_exception;
   DynamicGlobalObjectScope m_globalObjectScope;
-  Interpreter::CallFrameClosure m_closure;
+  CallFrameClosure m_closure;
 };
 }
 
