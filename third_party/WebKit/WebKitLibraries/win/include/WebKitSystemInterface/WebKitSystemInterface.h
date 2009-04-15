@@ -83,4 +83,7 @@ CFArrayRef wkCFURLRequestCopyHTTPRequestBodyParts(CFURLRequestRef);
 void wkCFURLRequestSetHTTPRequestBodyParts(CFMutableURLRequestRef,
                                            CFArrayRef bodyParts);
 
+unsigned wkInitializeMaximumHTTPConnectionCountPerHost(
+    unsigned preferredConnectionCount);
+
 #endif  // WebKitSystemInterface_h
