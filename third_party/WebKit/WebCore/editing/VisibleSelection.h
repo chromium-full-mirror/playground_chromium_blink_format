@@ -42,7 +42,9 @@ class VisibleSelection {
   VisibleSelection();
 
   VisibleSelection(const Position&, EAffinity);
-  VisibleSelection(const Position&, const Position&, EAffinity);
+  VisibleSelection(const Position&,
+                   const Position&,
+                   EAffinity = SEL_DEFAULT_AFFINITY);
 
   VisibleSelection(const Range*, EAffinity = SEL_DEFAULT_AFFINITY);
 
