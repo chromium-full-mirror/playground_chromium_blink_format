@@ -30,6 +30,7 @@
 #include "ResourceRequest.h"
 
 #include <CFNetwork/CFURLRequestPriv.h>
+#include <WebKitSystemInterface/WebKitSystemInterface.h>
 
 namespace WebCore {
 
@@ -201,5 +202,11 @@ void ResourceRequest::doUpdateResourceRequest() {
   }
 
   m_httpBody = httpBodyFromRequest(m_cfRequest.get());
+}
+
+unsigned initializeMaximumHTTPConnectionCountPerHost() {
+  static const unsigned preferredConnectionCount = 6;
+  return wkInitializeMaximumHTTPConnectionCountPerHost(
+      preferredConnectionCount);
 }
 }
