@@ -36,6 +36,7 @@
 
 class SkPaint;
 class SkTypeface;
+typedef uint32_t SkFontID;
 
 namespace WebCore {
 
@@ -83,6 +84,12 @@ class FontPlatformData {
   // Setup a Skia painting context to use this font.
   // -------------------------------------------------------------------------
   void setupPaint(SkPaint*) const;
+
+  // -------------------------------------------------------------------------
+  // Return Skia's unique id for this font. This encodes both the style and
+  // the font's file name so refers to a single face.
+  // -------------------------------------------------------------------------
+  SkFontID uniqueID() const;
 
   unsigned hash() const;
   float size() const { return m_textSize; }
