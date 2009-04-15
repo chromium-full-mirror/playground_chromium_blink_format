@@ -332,12 +332,12 @@ class DOMWindow : public RefCounted<DOMWindow> {
   }
 #endif
 
- private:
-  DOMWindow(Frame*);
-
   void removeInlineEventListenerForType(const AtomicString& eventType);
   EventListener* inlineEventListenerForType(
       const AtomicString& eventType) const;
+
+ private:
+  DOMWindow(Frame*);
 
   void addPendingFrameUnloadEventCount();
   void removePendingFrameUnloadEventCount();
