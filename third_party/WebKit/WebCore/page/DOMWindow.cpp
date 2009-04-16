@@ -1065,7 +1065,7 @@ void DOMWindow::removeInlineEventListenerForType(
   }
 }
 
-inline EventListener* DOMWindow::inlineEventListenerForType(
+EventListener* DOMWindow::inlineEventListenerForType(
     const AtomicString& eventType) const {
   size_t size = m_eventListeners.size();
   for (size_t i = 0; i < size; ++i) {
