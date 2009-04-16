@@ -41,12 +41,8 @@ class QWEBKIT_EXPORT QWebElement {
   QWebElement& operator=(const QWebElement&);
   ~QWebElement();
 
-  inline bool operator==(const QWebElement& o) const {
-    return m_element == o.m_element;
-  }
-  inline bool operator!=(const QWebElement& o) const {
-    return m_element != o.m_element;
-  }
+  bool operator==(const QWebElement& o) const;
+  bool operator!=(const QWebElement& o) const;
 
   bool isNull() const;
 
