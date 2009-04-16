@@ -178,6 +178,8 @@ class SelectionController : Noncopyable {
   void focusedOrActiveStateChanged();
   bool caretRendersInsideNode(Node*) const;
 
+  IntRect absoluteBoundsForLocalRect(const IntRect&) const;
+
   Frame* m_frame;
   int m_xPosForVerticalArrowNavigation;
 
@@ -186,6 +188,7 @@ class SelectionController : Noncopyable {
   IntRect m_caretRect;       // caret rect in coords local to the renderer
                              // responsible for painting the caret
   IntRect m_absCaretBounds;  // absolute bounding rect for the caret
+  IntRect m_absoluteCaretRepaintBounds;
 
   bool m_needsLayout : 1;  // true if the caret and expectedVisible rectangles
                            // need to be calculated
