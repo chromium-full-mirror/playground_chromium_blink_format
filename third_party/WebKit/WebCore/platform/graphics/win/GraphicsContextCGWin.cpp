@@ -28,7 +28,6 @@
 #include "GraphicsContext.h"
 
 #include "TransformationMatrix.h"
-#include "NotImplemented.h"
 #include "Path.h"
 
 #include <CoreGraphics/CGBitmapContext.h>
