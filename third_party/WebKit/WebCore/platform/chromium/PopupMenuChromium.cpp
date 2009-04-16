@@ -798,7 +798,7 @@ void PopupListBox::paintRow(GraphicsContext* gc,
 }
 
 Font PopupListBox::getRowFont(int rowIndex) {
-  Font itemFont = m_popupClient->itemStyle(rowIndex).font();
+  Font itemFont = m_popupClient->menuStyle().font();
   if (m_popupClient->itemIsLabel(rowIndex)) {
     // Bold-ify labels (ie, an <optgroup> heading).
     FontDescription d = itemFont.fontDescription();
