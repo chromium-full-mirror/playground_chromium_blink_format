@@ -476,7 +476,8 @@ bool ResourceHandle::shouldUseCredentialStorage() {
 void ResourceHandle::didReceiveAuthenticationChallenge(
     const AuthenticationChallenge& challenge) {
   LOG(Network, "CFNet - didReceiveAuthenticationChallenge()");
-  ASSERT(d->m_currentChallenge.isNull());
+  ASSERT(!d->m_currentCFChallenge);
+  ASSERT(d->m_currentWebChallenge.isNull());
   // Since CFURLConnection networking relies on keeping a reference to the
   // original CFURLAuthChallengeRef,
   // we make sure that is actually present
@@ -515,11 +516,12 @@ void ResourceHandle::didReceiveAuthenticationChallenge(
     }
   }
 
-  d->m_currentChallenge =
-      AuthenticationChallenge(challenge.cfURLAuthChallengeRef(), this);
+  d->m_currentCFChallenge = challenge.cfURLAuthChallengeRef();
+  d->m_currentWebChallenge =
+      AuthenticationChallenge(d->m_currentCFChallenge, this);
 
   if (client())
-    client()->didReceiveAuthenticationChallenge(this, d->m_currentChallenge);
+    client()->didReceiveAuthenticationChallenge(this, d->m_currentWebChallenge);
 }
 
 void ResourceHandle::receivedCredential(
@@ -528,7 +530,7 @@ void ResourceHandle::receivedCredential(
   LOG(Network, "CFNet - receivedCredential()");
   ASSERT(!challenge.isNull());
   ASSERT(challenge.cfURLAuthChallengeRef());
-  if (challenge != d->m_currentChallenge)
+  if (challenge != d->m_currentWebChallenge)
     return;
 
   if (credential.persistence() == CredentialPersistenceForSession) {
@@ -558,7 +560,7 @@ void ResourceHandle::receivedRequestToContinueWithoutCredential(
   LOG(Network, "CFNet - receivedRequestToContinueWithoutCredential()");
   ASSERT(!challenge.isNull());
   ASSERT(challenge.cfURLAuthChallengeRef());
-  if (challenge != d->m_currentChallenge)
+  if (challenge != d->m_currentWebChallenge)
     return;
 
   CFURLConnectionUseCredential(d->m_connection.get(), 0,
@@ -570,7 +572,7 @@ void ResourceHandle::receivedRequestToContinueWithoutCredential(
 void ResourceHandle::receivedCancellation(
     const AuthenticationChallenge& challenge) {
   LOG(Network, "CFNet - receivedCancellation()");
-  if (challenge != d->m_currentChallenge)
+  if (challenge != d->m_currentWebChallenge)
     return;
 
   if (client())
