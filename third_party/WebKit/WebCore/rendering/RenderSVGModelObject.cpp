@@ -39,6 +39,16 @@ namespace WebCore {
 RenderSVGModelObject::RenderSVGModelObject(SVGStyledElement* node)
     : RenderObject(node) {}
 
+FloatRect RenderSVGModelObject::filterBoundingBox() const {
+#if ENABLE(SVG_FILTERS)
+  SVGResourceFilter* filter =
+      getFilterById(document(), style()->svgStyle()->filter());
+  if (filter)
+    return filter->filterBBoxForItemBBox(objectBoundingBox());
+#endif
+  return FloatRect();
+}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG)
