@@ -87,6 +87,10 @@ class ScriptValue {
     return m_value == value.m_value;
   }
 
+  bool isEqual(ScriptState*, const ScriptValue& value) const {
+    return m_value == value.m_value;
+  }
+
   bool operator!=(const ScriptValue value) const { return !operator==(value); }
 
   bool isNull() const { return m_value->IsNull(); }
