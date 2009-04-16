@@ -270,6 +270,7 @@ class BytecodeGenerator {
   RegisterID* emitLoad(RegisterID* dst, JSValuePtr);
   RegisterID* emitUnexpectedLoad(RegisterID* dst, bool);
   RegisterID* emitUnexpectedLoad(RegisterID* dst, double);
+  RegisterID* emitLoadGlobalObject(RegisterID* dst, JSObject* globalObject);
 
   RegisterID* emitUnaryOp(OpcodeID, RegisterID* dst, RegisterID* src);
   RegisterID* emitBinaryOp(OpcodeID,
@@ -594,6 +595,7 @@ class BytecodeGenerator {
   int m_nextGlobalIndex;
   int m_nextParameterIndex;
   int m_nextConstantIndex;
+  unsigned m_globalConstantIndex;
 
   int m_globalVarStorageOffset;
 
