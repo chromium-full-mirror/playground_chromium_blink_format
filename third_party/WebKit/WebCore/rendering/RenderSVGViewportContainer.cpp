@@ -2,8 +2,7 @@
     Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2007 Rob Buis <buis@kde.org>
                   2007 Eric Seidel <eric@webkit.org>
-
-    This file is part of the KDE project
+                  2009 Google, Inc.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -144,10 +143,22 @@ TransformationMatrix RenderSVGViewportContainer::viewportTransform() const {
   return TransformationMatrix();
 }
 
+TransformationMatrix RenderSVGViewportContainer::localToParentTransform()
+    const {
+  TransformationMatrix viewportTranslation;
+  viewportTranslation.translate(viewport().x(), viewport().y());
+  return viewportTransform() * viewportTranslation;
+  // If this class were ever given a localTransform(), then the above would
+  // read:
+  // return viewportTransform() * localTransform() * viewportTranslation;
+}
+
+// FIXME: This method should be removed as soon as callers to
+// RenderBox::absoluteTransform() can be removed.
 TransformationMatrix RenderSVGViewportContainer::absoluteTransform() const {
-  TransformationMatrix ctm = RenderObject::absoluteTransform();
-  ctm.translate(viewport().x(), viewport().y());
-  return viewportTransform() * ctm;
+  // This would apply localTransform() twice if localTransform() were not the
+  // identity.
+  return localToParentTransform() * RenderSVGContainer::absoluteTransform();
 }
 
 bool RenderSVGViewportContainer::nodeAtPoint(const HitTestRequest& request,

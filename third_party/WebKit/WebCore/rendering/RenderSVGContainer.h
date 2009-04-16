@@ -66,9 +66,13 @@ class RenderSVGContainer : public RenderSVGModelObject {
   virtual FloatRect objectBoundingBox() const;
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
-  virtual bool calculateLocalTransform();
-  virtual TransformationMatrix localTransform() const;
-  virtual TransformationMatrix viewportTransform() const;
+  // FIXME: This only exists to allow computeContainerBoundingBox's broken
+  // transformation
+  // Once localToParentTransform() is landed, this will be removed, and layout
+  // test results updated.
+  virtual TransformationMatrix viewportTransform() const {
+    return TransformationMatrix();
+  }
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
@@ -79,6 +83,7 @@ class RenderSVGContainer : public RenderSVGModelObject {
                            HitTestAction);
 
  protected:
+  virtual bool calculateLocalTransform();
   virtual void applyContentTransforms(PaintInfo&);
   virtual void applyAdditionalTransforms(PaintInfo&);
 
@@ -94,7 +99,6 @@ class RenderSVGContainer : public RenderSVGModelObject {
 
  protected:
   IntRect m_absoluteBounds;
-  TransformationMatrix m_localTransform;
 };
 
 }  // namespace WebCore

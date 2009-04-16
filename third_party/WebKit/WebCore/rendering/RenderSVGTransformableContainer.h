@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2007 Eric Seidel <eric@webkit.org
+    Copyright (C) 2007 Eric Seidel <eric@webkit.org>
+                  2009 Google, Inc.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,7 +31,15 @@ class RenderSVGTransformableContainer : public RenderSVGContainer {
  public:
   RenderSVGTransformableContainer(SVGStyledTransformableElement*);
 
+  virtual TransformationMatrix localToParentTransform() const;
+
   virtual bool calculateLocalTransform();
+  // FIXME: This can be made non-virtual once SVGRenderTreeAsText stops using
+  // localTransform()
+  virtual TransformationMatrix localTransform() const;
+
+ private:
+  TransformationMatrix m_localTransform;
 };
 }
 

@@ -57,8 +57,10 @@ class RenderSVGHiddenContainer : public RenderSVGContainer {
                              bool topLevel = true);
   virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
 
-  virtual TransformationMatrix absoluteTransform() const;
-  virtual TransformationMatrix localTransform() const;
+  // FIXME: This override only exists to match existing LayoutTest results.
+  virtual TransformationMatrix absoluteTransform() const {
+    return TransformationMatrix();
+  }
 
   virtual FloatRect objectBoundingBox() const;
   virtual FloatRect repaintRectInLocalCoordinates() const;

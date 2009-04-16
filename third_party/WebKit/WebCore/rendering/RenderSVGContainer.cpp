@@ -49,10 +49,6 @@ void RenderSVGContainer::setDrawsContents(bool drawsContents) {
   m_drawsContents = drawsContents;
 }
 
-TransformationMatrix RenderSVGContainer::localTransform() const {
-  return m_localTransform;
-}
-
 bool RenderSVGContainer::calculateLocalTransform() {
   // subclasses can override this to add transform support
   return false;
@@ -151,10 +147,6 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
       style()->outlineWidth() && style()->visibility() == VISIBLE)
     paintOutline(paintInfo.context, m_absoluteBounds.x(), m_absoluteBounds.y(),
                  m_absoluteBounds.width(), m_absoluteBounds.height(), style());
-}
-
-TransformationMatrix RenderSVGContainer::viewportTransform() const {
-  return TransformationMatrix();
 }
 
 IntRect RenderSVGContainer::clippedOverflowRectForRepaint(
