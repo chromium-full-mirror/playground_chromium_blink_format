@@ -128,7 +128,7 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
   SVGResourceFilter* filter = 0;
   PaintInfo savedInfo(paintInfo);
 
-  FloatRect boundingBox = relativeBBox(true);
+  FloatRect boundingBox = repaintRectInLocalCoordinates();
   if (paintInfo.phase == PaintPhaseForeground)
     prepareToRenderSVGContent(this, paintInfo, boundingBox, filter);
 
@@ -193,24 +193,14 @@ void RenderSVGContainer::absoluteQuads(Vector<FloatQuad>& quads, bool) {
   quads.append(absoluteClippedOverflowRect());
 }
 
-FloatRect RenderSVGContainer::relativeBBox(bool includeStroke) const {
-  FloatRect rect;
+FloatRect RenderSVGContainer::objectBoundingBox() const {
+  return computeContainerBoundingBox(this, false);
+}
 
-  RenderObject* current = firstChild();
-  for (; current != 0; current = current->nextSibling()) {
-    FloatRect childBBox = current->relativeBBox(includeStroke);
-    FloatRect mappedBBox = current->localTransform().mapRect(childBBox);
-
-    // <svg> can have a viewBox contributing to the bbox
-    if (current->isSVGContainer())
-      mappedBBox = static_cast<RenderSVGContainer*>(current)
-                       ->viewportTransform()
-                       .mapRect(mappedBBox);
-
-    rect.unite(mappedBBox);
-  }
-
-  return rect;
+// RenderSVGContainer is used for <g> elements which do not themselves have a
+// width or height, so we union all of our child rects as our repaint rect.
+FloatRect RenderSVGContainer::repaintRectInLocalCoordinates() const {
+  return computeContainerBoundingBox(this, true);
 }
 
 bool RenderSVGContainer::nodeAtPoint(const HitTestRequest& request,

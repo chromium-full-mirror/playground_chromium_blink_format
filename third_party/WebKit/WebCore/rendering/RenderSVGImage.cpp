@@ -226,7 +226,11 @@ bool RenderSVGImage::nodeAtPoint(const HitTestRequest&,
   return false;
 }
 
-FloatRect RenderSVGImage::relativeBBox(bool) const {
+FloatRect RenderSVGImage::objectBoundingBox() const {
+  return m_localBounds;
+}
+
+FloatRect RenderSVGImage::repaintRectInLocalCoordinates() const {
   return m_localBounds;
 }
 
@@ -241,7 +245,8 @@ void RenderSVGImage::imageChanged(WrappedImagePtr image, const IntRect* rect) {
 
 void RenderSVGImage::calculateAbsoluteBounds() {
   // FIXME: broken with CSS transforms
-  FloatRect absoluteRect = absoluteTransform().mapRect(relativeBBox(true));
+  FloatRect absoluteRect =
+      absoluteTransform().mapRect(repaintRectInLocalCoordinates());
 
 #if ENABLE(SVG_FILTERS)
   // Filters can expand the bounding box
@@ -268,7 +273,7 @@ void RenderSVGImage::addFocusRingRects(GraphicsContext* graphicsContext,
                                        int) {
   // this is called from paint() after the localTransform has already been
   // applied
-  IntRect contentRect = enclosingIntRect(relativeBBox());
+  IntRect contentRect = enclosingIntRect(repaintRectInLocalCoordinates());
   graphicsContext->addFocusRingRect(contentRect);
 }
 

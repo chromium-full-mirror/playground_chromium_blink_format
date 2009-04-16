@@ -60,7 +60,9 @@ class RenderSVGHiddenContainer : public RenderSVGContainer {
   virtual TransformationMatrix absoluteTransform() const;
   virtual TransformationMatrix localTransform() const;
 
-  virtual FloatRect relativeBBox(bool includeStroke = true) const;
+  virtual FloatRect objectBoundingBox() const;
+  virtual FloatRect repaintRectInLocalCoordinates() const;
+
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,

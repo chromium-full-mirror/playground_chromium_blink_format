@@ -1,7 +1,6 @@
 /*
- * This file is part of the WebKit project.
- *
  * Copyright (C) 2006 Apple Computer, Inc.
+ * Copyright (C) 2009 Google, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -49,6 +48,9 @@ class RenderForeignObject : public RenderSVGBlock {
                                      bool fixed = false);
   virtual bool requiresLayer() const { return false; }
   virtual void layout();
+
+  virtual FloatRect objectBoundingBox() const;
+  virtual FloatRect repaintRectInLocalCoordinates() const;
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,

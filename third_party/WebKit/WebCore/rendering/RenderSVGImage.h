@@ -44,7 +44,9 @@ class RenderSVGImage : public RenderImage {
     return m_localTransform;
   }
 
-  virtual FloatRect relativeBBox(bool includeStroke = true) const;
+  virtual FloatRect objectBoundingBox() const;
+  virtual FloatRect repaintRectInLocalCoordinates() const;
+
   virtual IntRect clippedOverflowRectForRepaint(
       RenderBoxModelObject* repaintContainer);
   virtual void absoluteRects(Vector<IntRect>&,

@@ -66,7 +66,9 @@ class RenderSVGText : public RenderSVGBlock {
 
   virtual IntRect clippedOverflowRectForRepaint(
       RenderBoxModelObject* repaintContainer);
-  virtual FloatRect relativeBBox(bool includeStroke = true) const;
+
+  virtual FloatRect objectBoundingBox() const;
+  virtual FloatRect repaintRectInLocalCoordinates() const;
 
  private:
   virtual RootInlineBox* createRootBox();

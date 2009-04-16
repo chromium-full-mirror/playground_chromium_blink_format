@@ -49,7 +49,8 @@ RenderSVGText::RenderSVGText(SVGTextElement* node) : RenderSVGBlock(node) {}
 IntRect RenderSVGText::clippedOverflowRectForRepaint(
     RenderBoxModelObject* /*repaintContainer*/) {
   // FIXME: handle non-root repaintContainer
-  FloatRect repaintRect = absoluteTransform().mapRect(relativeBBox(true));
+  FloatRect repaintRect =
+      absoluteTransform().mapRect(repaintRectInLocalCoordinates());
 
 #if ENABLE(SVG_FILTERS)
   // Filters can expand the bounding box
@@ -141,8 +142,8 @@ void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
 
   TransformationMatrix htmlParentCtm = root->RenderBox::absoluteTransform();
 
-  // Don't use relativeBBox here, as it's unites the selection rects. Makes it
-  // hard
+  // Don't use objectBoundingBox here, as it's unites the selection rects. Makes
+  // it hard
   // to spot errors, if there are any using WebInspector. Individually feed them
   // into 'rects'.
   for (InlineRunBox* runBox = firstLineBox(); runBox;
@@ -169,8 +170,8 @@ void RenderSVGText::absoluteQuads(Vector<FloatQuad>& quads, bool) {
 
   TransformationMatrix htmlParentCtm = root->RenderBox::absoluteTransform();
 
-  // Don't use relativeBBox here, as it's unites the selection rects. Makes it
-  // hard
+  // Don't use objectBoundingBox here, as it's unites the selection rects. Makes
+  // it hard
   // to spot errors, if there are any using WebInspector. Individually feed them
   // into 'rects'.
   for (InlineRunBox* runBox = firstLineBox(); runBox;
@@ -194,8 +195,8 @@ void RenderSVGText::paint(PaintInfo& paintInfo, int, int) {
   RenderBlock::paint(pi, 0, 0);
 }
 
-FloatRect RenderSVGText::relativeBBox(bool includeStroke) const {
-  FloatRect repaintRect;
+FloatRect RenderSVGText::objectBoundingBox() const {
+  FloatRect boundingBox;
 
   for (InlineRunBox* runBox = firstLineBox(); runBox;
        runBox = runBox->nextLineBox()) {
@@ -203,12 +204,19 @@ FloatRect RenderSVGText::relativeBBox(bool includeStroke) const {
 
     InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(runBox);
     for (InlineBox* box = flowBox->firstChild(); box; box = box->nextOnLine())
-      repaintRect.unite(
+      boundingBox.unite(
           FloatRect(box->x(), box->y(), box->width(), box->height()));
   }
 
+  boundingBox.move(x(), y());
+  return boundingBox;
+}
+
+FloatRect RenderSVGText::repaintRectInLocalCoordinates() const {
+  FloatRect repaintRect = objectBoundingBox();
+
   // SVG needs to include the strokeWidth(), not the textStrokeWidth().
-  if (includeStroke && style()->svgStyle()->hasStroke()) {
+  if (style()->svgStyle()->hasStroke()) {
     float strokeWidth = SVGRenderStyle::cssPrimitiveToLength(
         this, style()->svgStyle()->strokeWidth(), 0.0f);
 
@@ -225,8 +233,6 @@ FloatRect RenderSVGText::relativeBBox(bool includeStroke) const {
 
     repaintRect.inflate(strokeWidth);
   }
-
-  repaintRect.move(x(), y());
   return repaintRect;
 }
 }

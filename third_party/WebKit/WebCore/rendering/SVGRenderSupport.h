@@ -1,9 +1,8 @@
 /**
- * This file is part of the DOM implementation for WebKit.
- *
  * Copyright (C) 2007 Rob Buis <buis@kde.org>
  *           (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
  *           (C) 2007 Eric Seidel <eric@webkit.org>
+ * Copyright (C) 2009 Google, Inc.  All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -45,6 +44,11 @@ class ImageBuffer;
 void renderSubtreeToImage(ImageBuffer*, RenderObject*);
 
 void clampImageBufferSizeToViewport(RenderObject*, IntSize&);
+
+// Used to share the "walk all the children" logic between objectBoundingBox
+// and repaintRectInLocalCoordinates in RenderSVGRoot and RenderSVGContainer
+FloatRect computeContainerBoundingBox(const RenderObject* container,
+                                      bool includeAllPaintedContent);
 }
 
 #endif
