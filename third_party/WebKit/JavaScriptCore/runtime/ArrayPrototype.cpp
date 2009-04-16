@@ -785,8 +785,24 @@ JSValuePtr arrayProtoFuncMap(ExecState* exec,
       thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
 
   JSArray* resultArray = constructEmptyArray(exec, length);
+  unsigned k = 0;
+  if (callType == CallTypeJS && isJSArray(&exec->globalData(), thisObj)) {
+    JSFunction* f = asFunction(function);
+    JSArray* array = asArray(thisObj);
+    CachedCall cachedCall(exec, f, 3, exec->exceptionSlot());
+    for (; k < length && !exec->hadException(); ++k) {
+      if (UNLIKELY(!array->canGetIndex(k)))
+        break;
 
-  for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
+      cachedCall.setThis(applyThis);
+      cachedCall.setArgument(0, array->getIndex(k));
+      cachedCall.setArgument(1, jsNumber(exec, k));
+      cachedCall.setArgument(2, thisObj);
+
+      resultArray->JSArray::put(exec, k, cachedCall.call());
+    }
+  }
+  for (; k < length && !exec->hadException(); ++k) {
     PropertySlot slot(thisObj);
     if (!thisObj->getPropertySlot(exec, k, slot))
       continue;
@@ -832,7 +848,25 @@ JSValuePtr arrayProtoFuncEvery(ExecState* exec,
 
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
-  for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
+  unsigned k = 0;
+  if (callType == CallTypeJS && isJSArray(&exec->globalData(), thisObj)) {
+    JSFunction* f = asFunction(function);
+    JSArray* array = asArray(thisObj);
+    CachedCall cachedCall(exec, f, 3, exec->exceptionSlot());
+    for (; k < length && !exec->hadException(); ++k) {
+      if (UNLIKELY(!array->canGetIndex(k)))
+        break;
+
+      cachedCall.setThis(applyThis);
+      cachedCall.setArgument(0, array->getIndex(k));
+      cachedCall.setArgument(1, jsNumber(exec, k));
+      cachedCall.setArgument(2, thisObj);
+
+      if (!cachedCall.call().toBoolean(exec))
+        return jsBoolean(false);
+    }
+  }
+  for (; k < length && !exec->hadException(); ++k) {
     PropertySlot slot(thisObj);
 
     if (!thisObj->getPropertySlot(exec, k, slot))
@@ -875,7 +909,24 @@ JSValuePtr arrayProtoFuncForEach(ExecState* exec,
 
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
-  for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
+  unsigned k = 0;
+  if (callType == CallTypeJS && isJSArray(&exec->globalData(), thisObj)) {
+    JSFunction* f = asFunction(function);
+    JSArray* array = asArray(thisObj);
+    CachedCall cachedCall(exec, f, 3, exec->exceptionSlot());
+    for (; k < length && !exec->hadException(); ++k) {
+      if (UNLIKELY(!array->canGetIndex(k)))
+        break;
+
+      cachedCall.setThis(applyThis);
+      cachedCall.setArgument(0, array->getIndex(k));
+      cachedCall.setArgument(1, jsNumber(exec, k));
+      cachedCall.setArgument(2, thisObj);
+
+      cachedCall.call();
+    }
+  }
+  for (; k < length && !exec->hadException(); ++k) {
     PropertySlot slot(thisObj);
     if (!thisObj->getPropertySlot(exec, k, slot))
       continue;
@@ -910,7 +961,25 @@ JSValuePtr arrayProtoFuncSome(ExecState* exec,
 
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length).toUInt32(exec);
-  for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
+  unsigned k = 0;
+  if (callType == CallTypeJS && isJSArray(&exec->globalData(), thisObj)) {
+    JSFunction* f = asFunction(function);
+    JSArray* array = asArray(thisObj);
+    CachedCall cachedCall(exec, f, 3, exec->exceptionSlot());
+    for (; k < length && !exec->hadException(); ++k) {
+      if (UNLIKELY(!array->canGetIndex(k)))
+        break;
+
+      cachedCall.setThis(applyThis);
+      cachedCall.setArgument(0, array->getIndex(k));
+      cachedCall.setArgument(1, jsNumber(exec, k));
+      cachedCall.setArgument(2, thisObj);
+
+      if (cachedCall.call().toBoolean(exec))
+        return jsBoolean(true);
+    }
+  }
+  for (; k < length && !exec->hadException(); ++k) {
     PropertySlot slot(thisObj);
     if (!thisObj->getPropertySlot(exec, k, slot))
       continue;
