@@ -348,6 +348,8 @@ bool HTMLParser::insertNode(Node* n, bool flat) {
       // table.
       ASSERT(localName == formTag);
       reportError(FormInsideTablePartError, &m_current->localName());
+      HTMLFormElement* form = static_cast<HTMLFormElement*>(n);
+      form->setDemoted(true);
     } else {
       // The pushBlock function transfers ownership of current to the block
       // stack

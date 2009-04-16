@@ -51,6 +51,7 @@ class HTMLFormElement : public HTMLElement {
   virtual int tagPriority() const { return 3; }
 
   virtual void attach();
+  virtual bool rendererIsNeeded(RenderStyle*);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
@@ -88,6 +89,9 @@ class HTMLFormElement : public HTMLElement {
   // of the form.
   void setMalformed(bool malformed) { m_malformed = malformed; }
   bool isMalformed() const { return m_malformed; }
+
+  void setDemoted(bool demoted) { m_demoted = demoted; }
+  bool isDemoted() const { return m_demoted; }
 
   virtual bool isURLAttribute(Attribute*) const;
 
@@ -148,6 +152,7 @@ class HTMLFormElement : public HTMLElement {
   bool m_doingsubmit : 1;
   bool m_inreset : 1;
   bool m_malformed : 1;
+  bool m_demoted : 1;
   AtomicString m_name;
 };
 
