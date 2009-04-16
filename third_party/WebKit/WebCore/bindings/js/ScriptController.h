@@ -82,13 +82,9 @@ class ScriptController {
 
   PassRefPtr<EventListener> createInlineEventListener(
       const String& functionName,
+      const String& eventParameterName,
       const String& code,
       Node*);
-#if ENABLE(SVG)
-  PassRefPtr<EventListener> createSVGEventHandler(const String& functionName,
-                                                  const String& code,
-                                                  Node*);
-#endif
   void setEventHandlerLineno(int lineno) { m_handlerLineno = lineno; }
 
   void setProcessingTimerCallback(bool b) { m_processingTimerCallback = b; }
