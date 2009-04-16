@@ -80,12 +80,8 @@ class ScriptController {
 
   ScriptValue evaluate(const ScriptSourceCode&);
 
-  PassRefPtr<EventListener> createInlineEventListener(
-      const String& functionName,
-      const String& eventParameterName,
-      const String& code,
-      Node*);
-  void setEventHandlerLineno(int lineno) { m_handlerLineno = lineno; }
+  void setEventHandlerLineNumber(int lineno) { m_handlerLineNumber = lineno; }
+  int eventHandlerLineNumber() { return m_handlerLineNumber; }
 
   void setProcessingTimerCallback(bool b) { m_processingTimerCallback = b; }
   bool processingUserGesture() const;
@@ -149,7 +145,7 @@ class ScriptController {
 
   JSC::ProtectedPtr<JSDOMWindowShell> m_windowShell;
   Frame* m_frame;
-  int m_handlerLineno;
+  int m_handlerLineNumber;
   const String* m_sourceURL;
 
   bool m_processingTimerCallback;

@@ -25,10 +25,15 @@
 #include "Frame.h"
 #include "JSNode.h"
 #include <runtime/FunctionConstructor.h>
+#include <wtf/RefCountedLeakCounter.h>
 
 using namespace JSC;
 
 namespace WebCore {
+
+#ifndef NDEBUG
+static WTF::RefCountedLeakCounter eventListenerCounter("JSLazyEventListener");
+#endif
 
 JSLazyEventListener::JSLazyEventListener(const String& functionName,
                                          const String& eventParameterName,
@@ -36,7 +41,8 @@ JSLazyEventListener::JSLazyEventListener(const String& functionName,
                                          JSDOMGlobalObject* globalObject,
                                          Node* node,
                                          int lineNumber)
-    : JSProtectedEventListener(0, globalObject, true),
+    : JSAbstractEventListener(true),
+      m_globalObject(globalObject),
       m_functionName(functionName),
       m_eventParameterName(eventParameterName),
       m_code(code),
@@ -55,6 +61,28 @@ JSLazyEventListener::JSLazyEventListener(const String& functionName,
   // case.
   if (m_lineNumber == 0)
     m_lineNumber = 1;
+
+  if (m_jsFunction) {
+    JSDOMWindow::ProtectedListenersMap& listeners =
+        isInline() ? m_globalObject->jsProtectedInlineEventListeners()
+                   : m_globalObject->jsProtectedEventListeners();
+    listeners.set(m_jsFunction, this);
+  }
+#ifndef NDEBUG
+  eventListenerCounter.increment();
+#endif
+}
+
+JSLazyEventListener::~JSLazyEventListener() {
+  if (m_jsFunction && m_globalObject) {
+    JSDOMWindow::ProtectedListenersMap& listeners =
+        isInline() ? m_globalObject->jsProtectedInlineEventListeners()
+                   : m_globalObject->jsProtectedEventListeners();
+    listeners.remove(m_jsFunction);
+  }
+#ifndef NDEBUG
+  eventListenerCounter.decrement();
+#endif
 }
 
 JSObject* JSLazyEventListener::jsFunction() const {
@@ -126,6 +154,10 @@ void JSLazyEventListener::parseCode() const {
         m_globalObject->jsProtectedInlineEventListeners();
     listeners.set(m_jsFunction, const_cast<JSLazyEventListener*>(this));
   }
+}
+
+JSDOMGlobalObject* JSLazyEventListener::globalObject() const {
+  return m_globalObject;
 }
 
 }  // namespace WebCore

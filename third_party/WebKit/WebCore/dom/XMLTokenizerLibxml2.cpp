@@ -736,7 +736,7 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
 
   ScriptController* jsProxy = m_doc->frame() ? m_doc->frame()->script() : 0;
   if (jsProxy && m_doc->frame()->script()->isEnabled())
-    jsProxy->setEventHandlerLineno(lineNumber());
+    jsProxy->setEventHandlerLineNumber(lineNumber());
 
   handleElementAttributes(newElement.get(), libxmlAttributes, nb_attributes,
                           ec);
@@ -746,7 +746,7 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
   }
 
   if (jsProxy)
-    jsProxy->setEventHandlerLineno(0);
+    jsProxy->setEventHandlerLineNumber(0);
 
   newElement->beginParsingChildren();
 

@@ -1956,7 +1956,7 @@ PassRefPtr<Node> HTMLTokenizer::processToken() {
   if (scriptController && scriptController->isEnabled())
     // FIXME: Why isn't this m_currentScriptTagStartLineNumber?  I suspect this
     // is wrong.
-    scriptController->setEventHandlerLineno(
+    scriptController->setEventHandlerLineNumber(
         m_currentTagStartLineNumber + 1);  // Script line numbers are 1 based.
   if (m_dest > m_buffer) {
     m_currentToken.text =
@@ -1966,7 +1966,7 @@ PassRefPtr<Node> HTMLTokenizer::processToken() {
   } else if (m_currentToken.tagName == nullAtom) {
     m_currentToken.reset();
     if (scriptController)
-      scriptController->setEventHandlerLineno(
+      scriptController->setEventHandlerLineNumber(
           m_lineNumber + 1);  // Script line numbers are 1 based.
     return 0;
   }
@@ -1987,7 +1987,7 @@ PassRefPtr<Node> HTMLTokenizer::processToken() {
   }
   m_currentToken.reset();
   if (scriptController)
-    scriptController->setEventHandlerLineno(0);
+    scriptController->setEventHandlerLineNumber(0);
 
   return n.release();
 }
