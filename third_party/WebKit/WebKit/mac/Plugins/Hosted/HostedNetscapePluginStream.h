@@ -55,6 +55,11 @@ class HostedNetscapePluginStream
     return adoptRef(
         new HostedNetscapePluginStream(instance, streamID, request));
   }
+  static PassRefPtr<HostedNetscapePluginStream> create(
+      NetscapePluginInstanceProxy* instance,
+      WebCore::FrameLoader* frameLoader) {
+    return adoptRef(new HostedNetscapePluginStream(instance, frameLoader));
+  }
 
   uint32_t streamID() const { return m_streamID; }
 
@@ -63,6 +68,8 @@ class HostedNetscapePluginStream
                       const char* bytes,
                       int length);
   void didFinishLoading(WebCore::NetscapePlugInStreamLoader*);
+  void didFail(WebCore::NetscapePlugInStreamLoader*,
+               const WebCore::ResourceError&);
 
   void start();
   void stop();
@@ -76,6 +83,8 @@ class HostedNetscapePluginStream
   HostedNetscapePluginStream(NetscapePluginInstanceProxy*,
                              uint32_t streamID,
                              NSURLRequest*);
+  HostedNetscapePluginStream(NetscapePluginInstanceProxy*,
+                             WebCore::FrameLoader*);
 
   void startStream(NSURL*,
                    long long expectedContentLength,
@@ -88,8 +97,6 @@ class HostedNetscapePluginStream
   // NetscapePlugInStreamLoaderClient methods.
   void didReceiveResponse(WebCore::NetscapePlugInStreamLoader*,
                           const WebCore::ResourceResponse&);
-  void didFail(WebCore::NetscapePlugInStreamLoader*,
-               const WebCore::ResourceError&);
   bool wantsAllStreams() const;
 
   RefPtr<NetscapePluginInstanceProxy> m_instance;

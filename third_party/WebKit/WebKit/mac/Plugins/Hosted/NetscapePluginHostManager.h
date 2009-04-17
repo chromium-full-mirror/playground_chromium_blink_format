@@ -50,7 +50,8 @@ class NetscapePluginHostManager {
       NSArray* attributeKeys,
       NSArray* attributeValues,
       NSString* userAgent,
-      NSURL* sourceURL);
+      NSURL* sourceURL,
+      bool fullFrame);
 
   void pluginHostDied(NetscapePluginHostProxy*);
 
