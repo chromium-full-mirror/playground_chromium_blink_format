@@ -56,6 +56,12 @@ class RenderSVGModelObject : public RenderObject {
                                      IntRect&,
                                      bool fixed = false);
 
+  virtual void absoluteRects(Vector<IntRect>& rects,
+                             int tx,
+                             int ty,
+                             bool topLevel = true);
+  virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
+
  protected:
   // Returns the bounding box for the filter associated with this object (if
   // any)
