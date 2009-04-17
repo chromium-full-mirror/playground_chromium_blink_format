@@ -52,7 +52,8 @@ class SQLStatement : public ThreadSafeShared<SQLStatement> {
   static PassRefPtr<SQLStatement> create(const String&,
                                          const Vector<SQLValue>&,
                                          PassRefPtr<SQLStatementCallback>,
-                                         PassRefPtr<SQLStatementErrorCallback>);
+                                         PassRefPtr<SQLStatementErrorCallback>,
+                                         bool readOnly);
 
   bool execute(Database*);
   bool lastExecutionFailedDueToQuota() const;
@@ -71,7 +72,8 @@ class SQLStatement : public ThreadSafeShared<SQLStatement> {
   SQLStatement(const String& statement,
                const Vector<SQLValue>& arguments,
                PassRefPtr<SQLStatementCallback> callback,
-               PassRefPtr<SQLStatementErrorCallback> errorCallback);
+               PassRefPtr<SQLStatementErrorCallback> errorCallback,
+               bool readOnly);
 
   void setFailureDueToQuota();
   void clearFailureDueToQuota();
@@ -83,6 +85,8 @@ class SQLStatement : public ThreadSafeShared<SQLStatement> {
 
   RefPtr<SQLError> m_error;
   RefPtr<SQLResultSet> m_resultSet;
+
+  bool m_readOnly;
 };
 
 }  // namespace WebCore

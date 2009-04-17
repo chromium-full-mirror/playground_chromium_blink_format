@@ -41,6 +41,7 @@
 #include "Page.h"
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
+#include "Settings.h"
 #include "SQLError.h"
 #include "SQLiteTransaction.h"
 #include "SQLResultSet.h"
@@ -100,8 +101,13 @@ void SQLTransaction::executeSQL(
     return;
   }
 
+  bool readOnlyMode = false;
+  Page* page = m_database->document()->page();
+  if (!page || page->settings()->privateBrowsingEnabled())
+    readOnlyMode = true;
+
   RefPtr<SQLStatement> statement = SQLStatement::create(
-      sqlStatement.copy(), arguments, callback, callbackError);
+      sqlStatement.copy(), arguments, callback, callbackError, readOnlyMode);
 
   if (m_database->deleted())
     statement->setDatabaseDeletedError();

@@ -46,19 +46,22 @@ PassRefPtr<SQLStatement> SQLStatement::create(
     const String& statement,
     const Vector<SQLValue>& arguments,
     PassRefPtr<SQLStatementCallback> callback,
-    PassRefPtr<SQLStatementErrorCallback> errorCallback) {
-  return adoptRef(
-      new SQLStatement(statement, arguments, callback, errorCallback));
+    PassRefPtr<SQLStatementErrorCallback> errorCallback,
+    bool readOnly) {
+  return adoptRef(new SQLStatement(statement, arguments, callback,
+                                   errorCallback, readOnly));
 }
 
 SQLStatement::SQLStatement(const String& statement,
                            const Vector<SQLValue>& arguments,
                            PassRefPtr<SQLStatementCallback> callback,
-                           PassRefPtr<SQLStatementErrorCallback> errorCallback)
+                           PassRefPtr<SQLStatementErrorCallback> errorCallback,
+                           bool readOnly)
     : m_statement(statement.copy()),
       m_arguments(arguments),
       m_statementCallback(callback),
-      m_statementErrorCallback(errorCallback) {}
+      m_statementErrorCallback(errorCallback),
+      m_readOnly(readOnly) {}
 
 bool SQLStatement::execute(Database* db) {
   ASSERT(!m_resultSet);
@@ -72,6 +75,9 @@ bool SQLStatement::execute(Database* db) {
   // so if there is still an error, return false.
   if (m_error)
     return false;
+
+  if (m_readOnly)
+    db->setAuthorizerReadOnly();
 
   SQLiteDatabase* database = &db->m_sqliteDatabase;
 

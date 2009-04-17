@@ -41,9 +41,13 @@ DatabaseAuthorizer::DatabaseAuthorizer() : m_securityEnabled(false) {
 void DatabaseAuthorizer::reset() {
   m_lastActionWasInsert = false;
   m_lastActionChangedDatabase = false;
+  m_readOnly = false;
 }
 
 int DatabaseAuthorizer::createTable(const String& tableName) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   m_lastActionChangedDatabase = true;
   return denyBasedOnTableName(tableName);
 }
@@ -53,6 +57,9 @@ int DatabaseAuthorizer::createTempTable(const String& tableName) {
 }
 
 int DatabaseAuthorizer::dropTable(const String& tableName) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   return denyBasedOnTableName(tableName);
 }
 
@@ -62,11 +69,17 @@ int DatabaseAuthorizer::dropTempTable(const String& tableName) {
 
 int DatabaseAuthorizer::allowAlterTable(const String&,
                                         const String& tableName) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   m_lastActionChangedDatabase = true;
   return denyBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::createIndex(const String&, const String& tableName) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   m_lastActionChangedDatabase = true;
   return denyBasedOnTableName(tableName);
 }
@@ -77,6 +90,9 @@ int DatabaseAuthorizer::createTempIndex(const String&,
 }
 
 int DatabaseAuthorizer::dropIndex(const String&, const String& tableName) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   return denyBasedOnTableName(tableName);
 }
 
@@ -85,6 +101,9 @@ int DatabaseAuthorizer::dropTempIndex(const String&, const String& tableName) {
 }
 
 int DatabaseAuthorizer::createTrigger(const String&, const String& tableName) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   m_lastActionChangedDatabase = true;
   return denyBasedOnTableName(tableName);
 }
@@ -95,6 +114,9 @@ int DatabaseAuthorizer::createTempTrigger(const String&,
 }
 
 int DatabaseAuthorizer::dropTrigger(const String&, const String& tableName) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   return denyBasedOnTableName(tableName);
 }
 
@@ -104,25 +126,40 @@ int DatabaseAuthorizer::dropTempTrigger(const String&,
 }
 
 int DatabaseAuthorizer::createVTable(const String&, const String&) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   m_lastActionChangedDatabase = true;
   return m_securityEnabled ? SQLAuthDeny : SQLAuthAllow;
 }
 
 int DatabaseAuthorizer::dropVTable(const String&, const String&) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   return m_securityEnabled ? SQLAuthDeny : SQLAuthAllow;
 }
 
 int DatabaseAuthorizer::allowDelete(const String& tableName) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   return denyBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::allowInsert(const String& tableName) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   m_lastActionChangedDatabase = true;
   m_lastActionWasInsert = true;
   return denyBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::allowUpdate(const String& tableName, const String&) {
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
   m_lastActionChangedDatabase = true;
   return denyBasedOnTableName(tableName);
 }
@@ -167,6 +204,10 @@ void DatabaseAuthorizer::disable() {
 
 void DatabaseAuthorizer::enable() {
   m_securityEnabled = true;
+}
+
+void DatabaseAuthorizer::setReadOnly() {
+  m_readOnly = true;
 }
 
 int DatabaseAuthorizer::denyBasedOnTableName(const String& tableName) {

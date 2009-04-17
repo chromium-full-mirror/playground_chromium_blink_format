@@ -87,6 +87,7 @@ class Database : public ThreadSafeShared<Database> {
 
   void disableAuthorizer();
   void enableAuthorizer();
+  void setAuthorizerReadOnly();
 
   Vector<String> tableNames();
 
