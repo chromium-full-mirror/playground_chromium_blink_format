@@ -482,6 +482,12 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
 
   childFrame->tree()->setName(name);
   childFrame->init();
+
+  // The creation of the frame may have run arbitrary JavaScript that removed it
+  // from the page already.
+  if (!childFrame->page())
+    return 0;
+
   childFrame->loader()->loadURLIntoChildFrame(url, referrer, childFrame.get());
 
   // The frame's onload handler may have removed it from the document.
