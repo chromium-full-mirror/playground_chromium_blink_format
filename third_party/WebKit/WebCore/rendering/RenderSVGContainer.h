@@ -66,14 +66,6 @@ class RenderSVGContainer : public RenderSVGModelObject {
   virtual FloatRect objectBoundingBox() const;
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
-  // FIXME: This only exists to allow computeContainerBoundingBox's broken
-  // transformation
-  // Once localToParentTransform() is landed, this will be removed, and layout
-  // test results updated.
-  virtual TransformationMatrix viewportTransform() const {
-    return TransformationMatrix();
-  }
-
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,

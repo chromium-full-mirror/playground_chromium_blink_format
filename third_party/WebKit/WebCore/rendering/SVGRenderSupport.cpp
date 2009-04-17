@@ -193,24 +193,8 @@ FloatRect computeContainerBoundingBox(const RenderObject* container,
     FloatRect childBBox = includeAllPaintedContent
                               ? current->repaintRectInLocalCoordinates()
                               : current->objectBoundingBox();
-
-    // FIXME: We should just call localToParentTransform()
-    // however, localToParentTransform() respects the viewport translation, and
-    // this method hast not historically done so
-    // I'll fix this, and update the LayoutTests in a separate patch.
-    // Note: A renderer will have either a localTransform or a
-    // viewportTransform, no renders have both.
     FloatRect childBBoxInLocalCoords =
-        current->localTransform().mapRect(childBBox);
-
-    if (current->isSVGContainer())
-      childBBoxInLocalCoords = static_cast<RenderSVGContainer*>(current)
-                                   ->viewportTransform()
-                                   .mapRect(childBBoxInLocalCoords);
-
-    // FIXME: We're not including the viewport translation (e.g. the x, y offset
-    // of a nested <svg>), the result of this function is wrong.
-
+        current->localToParentTransform().mapRect(childBBox);
     boundingBox.unite(childBBoxInLocalCoords);
   }
 
