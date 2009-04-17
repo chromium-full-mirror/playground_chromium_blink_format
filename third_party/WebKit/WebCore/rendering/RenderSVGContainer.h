@@ -54,8 +54,6 @@ class RenderSVGContainer : public RenderSVGModelObject {
   virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
-  virtual IntRect clippedOverflowRectForRepaint(
-      RenderBoxModelObject* repaintContainer);
   virtual void absoluteRects(Vector<IntRect>& rects,
                              int tx,
                              int ty,

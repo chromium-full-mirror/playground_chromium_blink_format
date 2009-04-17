@@ -75,6 +75,10 @@ class RenderSVGRoot : public RenderBox {
                            int ty,
                            HitTestAction);
 
+  virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
+                                     IntRect& repaintRect,
+                                     bool fixed);
+
  private:
   void calcViewport();
   void applyContentTransforms(PaintInfo&, int parentX, int parentY);
