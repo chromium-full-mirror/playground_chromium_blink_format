@@ -51,6 +51,7 @@ class WebNetscapePluginEventHandlerCarbon
   virtual void keyDown(NSEvent*);
   virtual void keyUp(NSEvent*);
   virtual void flagsChanged(NSEvent*);
+  virtual void syntheticKeyDownWithCommandModifier(int keyCode, char character);
 
   virtual void windowFocusChanged(bool hasFocus);
   virtual void focusChanged(bool hasFocus);
