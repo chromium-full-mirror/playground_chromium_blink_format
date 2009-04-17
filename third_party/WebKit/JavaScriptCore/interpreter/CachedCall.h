@@ -52,7 +52,7 @@ class CachedCall : Noncopyable {
   JSValuePtr call() { return m_interpreter->execute(m_closure, m_exception); }
   void setThis(JSValuePtr v) { m_closure.setArgument(0, v); }
   void setArgument(int n, JSValuePtr v) { m_closure.setArgument(n + 1, v); }
-
+  CallFrame* newCallFrame() { return m_closure.newCallFrame; }
   ~CachedCall() {
     if (m_valid)
       m_interpreter->endRepeatCall(m_closure);
