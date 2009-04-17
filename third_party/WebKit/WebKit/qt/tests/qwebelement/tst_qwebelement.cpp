@@ -288,8 +288,8 @@ void tst_QWebElement::iteration() {
 
   QList<QWebElement> foreachList;
   foreach (QWebElement p, paras) { foreachList.append(p); }
-  QVERIFY(foreachList.length() == 2);
-  QCOMPARE(foreachList.length(), referenceList.length());
+  QVERIFY(foreachList.count() == 2);
+  QCOMPARE(foreachList.count(), referenceList.count());
   QCOMPARE(foreachList.at(0), referenceList.at(0));
   QCOMPARE(foreachList.at(1), referenceList.at(1));
 
@@ -297,8 +297,8 @@ void tst_QWebElement::iteration() {
   for (int i = 0; i < paras.count(); ++i) {
     forLoopList.append(paras.at(i));
   }
-  QVERIFY(foreachList.length() == 2);
-  QCOMPARE(foreachList.length(), referenceList.length());
+  QVERIFY(foreachList.count() == 2);
+  QCOMPARE(foreachList.count(), referenceList.count());
   QCOMPARE(foreachList.at(0), referenceList.at(0));
   QCOMPARE(foreachList.at(1), referenceList.at(1));
 
