@@ -585,9 +585,13 @@ HRESULT WebHistory::data(IStream** stream) {
 
   *stream = 0;
 
-  COMPtr<MemoryStream> result(
-      AdoptCOM,
-      MemoryStream::createInstance(SharedBuffer::wrapCFData(data().get())));
+  RetainPtr<CFDataRef> historyData = data();
+  if (!historyData)
+    return S_OK;
+
+  COMPtr<MemoryStream> result(AdoptCOM,
+                              MemoryStream::createInstance(
+                                  SharedBuffer::wrapCFData(historyData.get())));
   return result.copyRefTo(stream);
 }
 
@@ -988,6 +992,9 @@ void WebHistory::addVisitedLinksToPageGroup(PageGroup& group) {
 }
 
 RetainPtr<CFDataRef> WebHistory::data() const {
+  if (!CFArrayGetCount(m_entriesByDate.get()))
+    return 0;
+
   WebHistoryWriter writer(m_entriesByDate.get());
   writer.writePropertyList();
   return writer.releaseData();
