@@ -239,6 +239,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   Timer<HTMLMediaElement> m_progressEventTimer;
   Timer<HTMLMediaElement> m_playbackProgressTimer;
   Vector<RefPtr<Event>> m_pendingEvents;
+  RefPtr<TimeRanges> m_playedTimeRanges;
 
   float m_playbackRate;
   float m_defaultPlaybackRate;
@@ -249,7 +250,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   RefPtr<MediaError> m_error;
 
   float m_volume;
-  float m_currentTimeDuringSeek;
+  float m_lastSeekTime;
 
   unsigned m_previousProgress;
   double m_previousProgressTime;
@@ -272,6 +273,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   OwnPtr<MediaPlayer> m_player;
 
   BehaviorRestrictions m_restrictions;
+
+  bool m_playing;
 
   // counter incremented while processing a callback from the media player, so
   // we can avoid
