@@ -38,6 +38,9 @@
 
 #include <wx/defs.h>
 #include <wx/bitmap.h>
+#if USE(WXGC)
+#include <wx/graphics.h>
+#endif
 #include <wx/image.h>
 #include <wx/rawbmp.h>
 
@@ -211,7 +214,15 @@ NativeImagePtr ImageSource::createFrameAtIndex(size_t index) {
   bmp->UseAlpha();
 #endif
   ASSERT(bmp->IsOk());
+
+#if USE(WXGC)
+  wxGraphicsBitmap* bitmap = new wxGraphicsBitmap(
+      wxGraphicsRenderer::GetDefaultRenderer()->CreateBitmap(*bmp));
+  delete bmp;
+  return bitmap;
+#else
   return bmp;
+#endif
 }
 
 float ImageSource::frameDurationAtIndex(size_t index) {
