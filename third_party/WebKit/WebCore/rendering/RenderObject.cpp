@@ -1673,12 +1673,16 @@ void RenderObject::styleWillChange(StyleDifference diff,
     // If our z-index changes value or our visibility changes,
     // we need to dirty our stacking context's z-order list.
     if (newStyle) {
-#if ENABLE(DASHBOARD_SUPPORT)
-      if (m_style->visibility() != newStyle->visibility() ||
+      bool visibilityChanged =
+          m_style->visibility() != newStyle->visibility() ||
           m_style->zIndex() != newStyle->zIndex() ||
-          m_style->hasAutoZIndex() != newStyle->hasAutoZIndex())
+          m_style->hasAutoZIndex() != newStyle->hasAutoZIndex();
+#if ENABLE(DASHBOARD_SUPPORT)
+      if (visibilityChanged)
         document()->setDashboardRegionsDirty(true);
 #endif
+      if (visibilityChanged && AXObjectCache::accessibilityEnabled())
+        document()->axObjectCache()->childrenChanged(this);
 
       // Keep layer hierarchy visibility bits up to date if visibility changes.
       if (m_style->visibility() != newStyle->visibility()) {
