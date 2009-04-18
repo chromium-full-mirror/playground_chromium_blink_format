@@ -420,7 +420,7 @@ IntRect RenderText::localCaretRect(InlineBox* inlineBox,
   int caretWidthRightOfOffset = caretWidth - caretWidthLeftOfOffset;
 
   int rootLeft = box->root()->x();
-  //    int rootRight = rootLeft + box->root()->width();
+  int rootRight = rootLeft + box->root()->width();
   // FIXME: should we use the width of the root inline box or the
   // width of the containing block for this?
   if (extraWidthToEndOfLine)
@@ -434,19 +434,17 @@ IntRect RenderText::localCaretRect(InlineBox* inlineBox,
     else
       left = max(left, rootLeft);
   } else {
-    /*
-        // If there is no wrapping, the caret can leave its containing block,
-       but not its root line box.
-        if (cb->style()->direction() == LTR) {
-            int rightEdge = max(cb->width(), rootRight);
-            left = min(left, rightEdge - caretWidthRightOfOffset);
-            left = max(left, rootLeft);
-        } else {
-            int leftEdge = min(cb->x(), rootLeft);
-            left = max(left, leftEdge);
-            left = min(left, rootRight - caretWidth);
-        }
-        */
+    // If there is no wrapping, the caret can leave its containing block, but
+    // not its root line box.
+    if (cb->style()->direction() == LTR) {
+      int rightEdge = max(cb->width(), rootRight);
+      left = min(left, rightEdge - caretWidthRightOfOffset);
+      left = max(left, rootLeft);
+    } else {
+      int leftEdge = min(cb->x(), rootLeft);
+      left = max(left, leftEdge);
+      left = min(left, rootRight - caretWidth);
+    }
   }
 
   return IntRect(left, top, caretWidth, height);
