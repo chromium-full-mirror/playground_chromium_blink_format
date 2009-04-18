@@ -337,6 +337,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   virtual bool isImageDocument() const { return false; }
 #if ENABLE(SVG)
   virtual bool isSVGDocument() const { return false; }
+#else
+  static bool isSVGDocument() const { return false; }
 #endif
   virtual bool isPluginDocument() const { return false; }
   virtual bool isMediaDocument() const { return false; }
@@ -644,14 +646,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
     m_listenerTypes = m_listenerTypes | listenerType;
   }
   void addListenerTypeIfNeeded(const AtomicString& eventType);
-
-  void setWindowInlineEventListenerForTypeAndAttribute(
-      const AtomicString& eventType,
-      Attribute*);
-
-  PassRefPtr<EventListener> createEventListener(const String& functionName,
-                                                const String& code,
-                                                Node*);
 
   CSSStyleDeclaration* getOverrideStyle(Element*, const String& pseudoElt);
 

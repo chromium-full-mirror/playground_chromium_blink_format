@@ -30,6 +30,7 @@
 #include "FormDataList.h"
 #include "HTMLFormElement.h"
 #include "HTMLNames.h"
+#include "JSLazyEventListener.h"
 #include "KeyboardEvent.h"
 #include "RenderButton.h"
 #include <wtf/StdLibExtras.h>
@@ -87,9 +88,11 @@ void HTMLButtonElement::parseMappedAttribute(MappedAttribute* attr) {
     // not Opera.
     // See http://bugs.webkit.org/show_bug.cgi?id=12071
   } else if (attr->name() == onfocusAttr) {
-    setInlineEventListenerForTypeAndAttribute(eventNames().focusEvent, attr);
+    setInlineEventListener(eventNames().focusEvent,
+                           createInlineEventListener(this, attr));
   } else if (attr->name() == onblurAttr) {
-    setInlineEventListenerForTypeAndAttribute(eventNames().blurEvent, attr);
+    setInlineEventListener(eventNames().blurEvent,
+                           createInlineEventListener(this, attr));
   } else
     HTMLFormControlElement::parseMappedAttribute(attr);
 }

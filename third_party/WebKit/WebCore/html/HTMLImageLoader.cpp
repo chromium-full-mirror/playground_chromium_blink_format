@@ -42,7 +42,7 @@ void HTMLImageLoader::dispatchLoadEvent() {
         element()->hasTagName(HTMLNames::objectTag);  // An <object> considers a
                                                       // 404 to be an error and
                                                       // should fire onerror.
-  element()->dispatchEventForType(
+  element()->dispatchEvent(
       errorOccurred ? eventNames().errorEvent : eventNames().loadEvent, false,
       false);
 }
