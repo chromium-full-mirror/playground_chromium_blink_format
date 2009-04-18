@@ -491,7 +491,10 @@ concatenate(PassRefPtr<UString::Rep> r, const UChar* tData, int tSize) {
     rep = UString::Rep::createCopying(tData, tSize);
   } else if (rep == base && !base->isShared()) {
     // this is direct and has refcount of 1 (so we can just alter it directly)
-    if (!expandCapacity(rep.get(), thisOffset + length))
+    int newCapacity = thisOffset + length;
+    if (newCapacity < thisOffset)
+      CRASH();
+    if (!expandCapacity(rep.get(), newCapacity))
       rep = &UString::Rep::null();
     if (rep->data()) {
       copyChars(rep->data() + thisSize, tData, tSize);
@@ -502,7 +505,10 @@ concatenate(PassRefPtr<UString::Rep> r, const UChar* tData, int tSize) {
              thisSize >= minShareSize) {
     // this reaches the end of the buffer - extend it if it's long enough to
     // append to
-    if (!expandCapacity(rep.get(), thisOffset + length))
+    int newCapacity = thisOffset + length;
+    if (newCapacity < thisOffset)
+      CRASH();
+    if (!expandCapacity(rep.get(), newCapacity))
       rep = &UString::Rep::null();
     if (rep->data()) {
       copyChars(rep->data() + thisSize, tData, tSize);
@@ -549,7 +555,10 @@ static ALWAYS_INLINE PassRefPtr<UString::Rep> concatenate(
     // t is empty, we'll just return *this below.
   } else if (rep == base && !base->isShared()) {
     // this is direct and has refcount of 1 (so we can just alter it directly)
-    expandCapacity(rep.get(), thisOffset + length);
+    int newCapacity = thisOffset + length;
+    if (newCapacity < thisOffset)
+      CRASH();
+    expandCapacity(rep.get(), newCapacity);
     UChar* d = rep->data();
     if (d) {
       for (int i = 0; i < tSize; ++i)
@@ -561,7 +570,10 @@ static ALWAYS_INLINE PassRefPtr<UString::Rep> concatenate(
   } else if (thisOffset + thisSize == base->usedCapacity &&
              thisSize >= minShareSize) {
     // this string reaches the end of the buffer - extend it
-    expandCapacity(rep.get(), thisOffset + length);
+    int newCapacity = thisOffset + length;
+    if (newCapacity < thisOffset)
+      CRASH();
+    expandCapacity(rep.get(), newCapacity);
     UChar* d = rep->data();
     if (d) {
       for (int i = 0; i < tSize; ++i)
@@ -629,8 +641,12 @@ PassRefPtr<UString::Rep> concatenate(UString::Rep* a, UString::Rep* b) {
     //   string does more harm than good
     // - however, if b qualifies for prepend and is longer than a, we'd rather
     // prepend
+
     UString x(a);
-    x.expandCapacity(aOffset + length);
+    int capacity = aOffset + length;
+    if (capacity < aOffset)
+      CRASH();
+    x.expandCapacity(capacity);
     if (!a->data() || !x.data())
       return 0;
     copyChars(a->data() + aSize, b->data(), bSize);
@@ -979,7 +995,10 @@ UString& UString::append(const UString& t) {
     // t is empty
   } else if (m_rep == base && !base->isShared()) {
     // this is direct and has refcount of 1 (so we can just alter it directly)
-    expandCapacity(thisOffset + length);
+    int newCapacity = thisOffset + length;
+    if (newCapacity < thisOffset)
+      CRASH();
+    expandCapacity(newCapacity);
     if (data()) {
       copyChars(m_rep->data() + thisSize, t.data(), tSize);
       m_rep->len = length;
@@ -989,7 +1008,10 @@ UString& UString::append(const UString& t) {
              thisSize >= minShareSize) {
     // this reaches the end of the buffer - extend it if it's long enough to
     // append to
-    expandCapacity(thisOffset + length);
+    int newCapacity = thisOffset + length;
+    if (newCapacity < thisOffset)
+      CRASH();
+    expandCapacity(newCapacity);
     if (data()) {
       copyChars(m_rep->data() + thisSize, t.data(), tSize);
       m_rep = Rep::create(m_rep, 0, length);
@@ -1047,7 +1069,10 @@ UString& UString::append(UChar c) {
     }
   } else if (m_rep == base && !base->isShared()) {
     // this is direct and has refcount of 1 (so we can just alter it directly)
-    expandCapacity(thisOffset + length + 1);
+    int newCapacity = thisOffset + length + 1;
+    if (newCapacity < thisOffset)
+      CRASH();
+    expandCapacity(newCapacity);
     UChar* d = m_rep->data();
     if (d) {
       d[length] = c;
@@ -1057,7 +1082,10 @@ UString& UString::append(UChar c) {
   } else if (thisOffset + length == base->usedCapacity &&
              length >= minShareSize) {
     // this reaches the end of the string - extend it and share
-    expandCapacity(thisOffset + length + 1);
+    int newCapacity = thisOffset + length + 1;
+    if (newCapacity < thisOffset)
+      CRASH();
+    expandCapacity(newCapacity);
     UChar* d = m_rep->data();
     if (d) {
       d[length] = c;
