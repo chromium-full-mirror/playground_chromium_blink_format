@@ -804,17 +804,24 @@ PassRefPtr<Element> Document::createElement(const QualifiedName& qName,
     e = SVGElementFactory::createSVGElement(qName, this, createdByParser);
 #endif
 #if ENABLE(WML)
-  else if (qName.namespaceURI() == WMLNames::wmlNamespaceURI || isWMLDocument())
+  else if (qName.namespaceURI() == WMLNames::wmlNamespaceURI)
     e = WMLElementFactory::createWMLElement(qName, this, createdByParser);
+  else if (isWMLDocument())
+    e = WMLElementFactory::createWMLElement(
+        QualifiedName(nullAtom, qName.localName(), WMLNames::wmlNamespaceURI),
+        this, createdByParser);
 #endif
 
   if (!e)
     e = new Element(qName, document());
 
-  // <image> uses imgTag so we need a special rule.
-  ASSERT((qName.matches(imageTag) && e->tagQName().matches(imgTag) &&
-          e->tagQName().prefix() == qName.prefix()) ||
-         qName == e->tagQName());
+// <image> uses imgTag so we need a special rule.
+#if ENABLE(WML)
+  if (!isWMLDocument())
+#endif
+    ASSERT((qName.matches(imageTag) && e->tagQName().matches(imgTag) &&
+            e->tagQName().prefix() == qName.prefix()) ||
+           qName == e->tagQName());
 
   return e.release();
 }
