@@ -744,6 +744,8 @@ void Vector<T, inlineCapacity>::append(const U* data, size_t dataSize) {
     if (!begin())
       return;
   }
+  if (newSize < m_size)
+    CRASH();
   T* dest = end();
   for (size_t i = 0; i < dataSize; ++i)
     new (&dest[i]) T(data[i]);
@@ -809,6 +811,8 @@ void Vector<T, inlineCapacity>::insert(size_t position,
     if (!begin())
       return;
   }
+  if (newSize < m_size)
+    CRASH();
   T* spot = begin() + position;
   TypeOperations::moveOverlapping(spot, end(), spot + dataSize);
   for (size_t i = 0; i < dataSize; ++i)
