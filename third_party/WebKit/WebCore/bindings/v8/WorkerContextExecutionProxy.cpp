@@ -418,7 +418,7 @@ WorkerContextExecutionProxy::findOrCreateEventListenerHelper(
 }
 
 PassRefPtr<V8EventListener>
-WorkerContextExecutionProxy::FindOrCreateEventListener(
+WorkerContextExecutionProxy::findOrCreateEventListener(
     v8::Local<v8::Value> object,
     bool isInline,
     bool findOnly) {
