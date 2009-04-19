@@ -67,8 +67,11 @@ inline void markEventListeners(const RegisteredEventListenerVector& listeners) {
 
 inline void invalidateEventListeners(
     const RegisteredEventListenerVector& listeners) {
+  // For efficiency's sake, we just set the "removed" bit, instead of
+  // actually removing the event listener. The node that owns these
+  // listeners is about to be deleted, anyway.
   for (size_t i = 0; i < listeners.size(); ++i)
-    listeners[i]->listener()->clearJSFunction();
+    listeners[i]->setRemoved(true);
 }
 #endif
 
