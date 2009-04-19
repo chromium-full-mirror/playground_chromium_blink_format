@@ -64,7 +64,6 @@ MediaControlShadowRootElement::MediaControlShadowRootElement(
   RenderMediaControlShadowRoot* renderer =
       new (mediaElement->renderer()->renderArena())
           RenderMediaControlShadowRoot(this);
-  renderer->setParent(mediaElement->renderer());
   renderer->setStyle(rootStyle.release());
   setRenderer(renderer);
   setAttached();
