@@ -77,12 +77,6 @@ JSLazyEventListener::JSLazyEventListener(const String& functionName,
 }
 
 JSLazyEventListener::~JSLazyEventListener() {
-  if (m_jsFunction && m_globalObject) {
-    JSDOMWindow::ProtectedListenersMap& listeners =
-        isInline() ? m_globalObject->jsProtectedInlineEventListeners()
-                   : m_globalObject->jsProtectedEventListeners();
-    listeners.remove(m_jsFunction);
-  }
 #ifndef NDEBUG
   eventListenerCounter.decrement();
 #endif
@@ -150,13 +144,6 @@ void JSLazyEventListener::parseCode() const {
   m_functionName = String();
   m_code = String();
   m_eventParameterName = String();
-
-  if (m_jsFunction) {
-    ASSERT(isInline());
-    JSDOMWindow::ProtectedListenersMap& listeners =
-        m_globalObject->jsProtectedInlineEventListeners();
-    listeners.set(m_jsFunction, const_cast<JSLazyEventListener*>(this));
-  }
 }
 
 JSDOMGlobalObject* JSLazyEventListener::globalObject() const {
