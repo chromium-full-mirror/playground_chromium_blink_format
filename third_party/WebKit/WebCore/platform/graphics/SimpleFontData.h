@@ -73,6 +73,8 @@ class SimpleFontData : public FontData {
   int descent() const { return m_descent; }
   int lineSpacing() const { return m_lineSpacing; }
   int lineGap() const { return m_lineGap; }
+  float maxCharWidth() const { return m_maxCharWidth; }
+  float avgCharWidth() const { return m_avgCharWidth; }
   float xHeight() const { return m_xHeight; }
   unsigned unitsPerEm() const { return m_unitsPerEm; }
 
@@ -142,7 +144,10 @@ class SimpleFontData : public FontData {
  private:
   void platformInit();
   void platformGlyphInit();
+  void platformCharWidthInit();
   void platformDestroy();
+
+  void initCharWidths();
 
   void commonInit();
 
@@ -157,6 +162,8 @@ class SimpleFontData : public FontData {
   int m_descent;
   int m_lineSpacing;
   int m_lineGap;
+  float m_maxCharWidth;
+  float m_avgCharWidth;
   float m_xHeight;
   unsigned m_unitsPerEm;
 

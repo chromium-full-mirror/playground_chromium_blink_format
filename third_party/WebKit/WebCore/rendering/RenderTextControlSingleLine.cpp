@@ -40,6 +40,7 @@
 #include "SearchPopupMenu.h"
 #include "SelectionController.h"
 #include "Settings.h"
+#include "SimpleFontData.h"
 #include "TextControlInnerElements.h"
 
 using namespace std;
@@ -420,6 +421,9 @@ int RenderTextControlSingleLine::preferredContentWidth(float charWidth) const {
     factor = 20;
 
   int result = static_cast<int>(ceilf(charWidth * factor));
+
+  // For text inputs, IE adds some extra width.
+  result += style()->font().primaryFont()->maxCharWidth() - charWidth;
 
   if (RenderBox* resultsRenderer =
           m_resultsButton ? m_resultsButton->renderBox() : 0)
