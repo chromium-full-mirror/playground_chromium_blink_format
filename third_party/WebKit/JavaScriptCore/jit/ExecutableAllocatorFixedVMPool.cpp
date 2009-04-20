@@ -39,6 +39,16 @@
 #include <unistd.h>
 #include <wtf/AVLTree.h>
 
+// On Mac OS X, the VM subsystem allows tagging memory requested from mmap and
+// vm_map
+// in order to aid tools that inspect system memory use.
+#if defined(VM_MEMORY_JAVASCRIPT_JIT_EXECUTABLE_ALLOCATOR)
+#define TAG_FOR_EXECUTABLEALLOCATOR_MEMORY \
+  VM_MAKE_TAG(VM_MEMORY_JAVASCRIPT_JIT_EXECUTABLE_ALLOCATOR)
+#else
+#define TAG_FOR_EXECUTABLEALLOCATOR_MEMORY VM_MAKE_TAG(64)
+#endif
+
 using namespace WTF;
 
 namespace JSC {
@@ -299,15 +309,10 @@ class FixedVMPoolAllocator {
  public:
   FixedVMPoolAllocator(size_t commonSize, size_t totalHeapSize)
       : commonSize(commonSize), countFreedSinceLastCoalesce(0) {
-#if defined(VM_MEMORY_JAVASCRIPT_JIT_EXECUTABLE_ALLOCATOR)
-#define OPTIONAL_TAG VM_MAKE_TAG(VM_MEMORY_JAVASCRIPT_JIT_EXECUTABLE_ALLOCATOR)
-#else
-#define OPTIONAL_TAG -1
-#endif
-
     // Allocate two gigabytes of memory.
-    void* base = mmap(NULL, totalHeapSize, PROT_READ | PROT_WRITE | PROT_EXEC,
-                      MAP_PRIVATE | MAP_ANON, OPTIONAL_TAG, 0);
+    void* base =
+        mmap(NULL, totalHeapSize, PROT_READ | PROT_WRITE | PROT_EXEC,
+             MAP_PRIVATE | MAP_ANON, TAG_FOR_EXECUTABLEALLOCATOR_MEMORY, 0);
     if (!base)
       CRASH();
 
@@ -446,5 +451,7 @@ void ExecutablePool::systemRelease(
   allocator->free(allocation.pages, allocation.size);
 }
 }
+
+#undef TAG_FOR_EXECUTABLEALLOCATOR_MEMORY
 
 #endif  // HAVE(ASSEMBLER)
