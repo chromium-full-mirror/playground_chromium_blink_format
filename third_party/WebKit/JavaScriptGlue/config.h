@@ -3,3 +3,5 @@
 #endif
 
 #include <wtf/Platform.h>
+
+#define JS_EXPORTDATA
