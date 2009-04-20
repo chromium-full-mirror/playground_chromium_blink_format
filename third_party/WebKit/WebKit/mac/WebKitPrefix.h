@@ -99,3 +99,6 @@ typedef float CGFloat;
  * support is disabled. */
 #undef try
 #undef catch
+
+#define JS_EXPORTDATA
+#define WEBKIT_EXPORTDATA
