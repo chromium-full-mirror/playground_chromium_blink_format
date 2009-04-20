@@ -60,11 +60,8 @@ void RenderSVGContainer::layout() {
   // Arbitrary affine transforms are incompatible with LayoutState.
   view()->disableLayoutState();
 
-  // FIXME: using m_absoluteBounds breaks if containerForRepaint() is not the
-  // root
   LayoutRepainter repainter(*this,
-                            checkForRepaintDuringLayout() && selfWillPaint(),
-                            &m_absoluteBounds);
+                            checkForRepaintDuringLayout() || selfWillPaint());
 
   calculateLocalTransform();
 
@@ -82,8 +79,6 @@ void RenderSVGContainer::layout() {
     child->layoutIfNeeded();
     ASSERT(!child->needsLayout());
   }
-
-  m_absoluteBounds = absoluteClippedOverflowRect();
 
   repainter.repaintAfterLayout();
 
@@ -204,14 +199,6 @@ bool RenderSVGContainer::nodeAtPoint(const HitTestRequest& request,
   // under the pointer (i.e., there is no target element), the event is not
   // dispatched."
   return false;
-}
-
-IntRect RenderSVGContainer::outlineBoundsForRepaint(
-    RenderBoxModelObject* /*repaintContainer*/) const {
-  // FIXME: handle non-root repaintContainer
-  IntRect result = m_absoluteBounds;
-  adjustRectForOutlineAndShadow(result);
-  return result;
 }
 }
 

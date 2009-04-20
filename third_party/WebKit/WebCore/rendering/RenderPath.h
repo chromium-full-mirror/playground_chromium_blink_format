@@ -47,18 +47,16 @@ class RenderPath : public RenderSVGModelObject {
   virtual FloatRect objectBoundingBox() const;
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
+  virtual TransformationMatrix localToParentTransform() const;
+
   const Path& path() const;
   void setPath(const Path&);
 
   virtual bool isRenderPath() const { return true; }
   virtual const char* renderName() const { return "RenderPath"; }
 
-  bool calculateLocalTransform();
-  virtual TransformationMatrix localTransform() const;
-
   virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);
-
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
 
   virtual bool nodeAtPoint(const HitTestRequest&,
@@ -75,15 +73,15 @@ class RenderPath : public RenderSVGModelObject {
 
  private:
   FloatPoint mapAbsolutePointToLocal(const FloatPoint&) const;
-  virtual IntRect outlineBoundsForRepaint(
-      RenderBoxModelObject* repaintContainer) const;
+
+  bool calculateLocalTransform();
+  virtual TransformationMatrix localTransform() const;
 
   mutable Path m_path;
   mutable FloatRect m_cachedLocalFillBBox;
   mutable FloatRect m_cachedLocalRepaintRect;
   FloatRect m_markerBounds;
   TransformationMatrix m_localTransform;
-  IntRect m_absoluteBounds;
 };
 }
 

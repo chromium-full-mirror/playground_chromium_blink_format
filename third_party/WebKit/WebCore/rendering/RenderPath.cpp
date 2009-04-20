@@ -63,6 +63,10 @@ class BoundingRectStrokeStyleApplier : public StrokeStyleApplier {
 RenderPath::RenderPath(SVGStyledTransformableElement* node)
     : RenderSVGModelObject(node) {}
 
+TransformationMatrix RenderPath::localToParentTransform() const {
+  return m_localTransform;
+}
+
 TransformationMatrix RenderPath::localTransform() const {
   return m_localTransform;
 }
@@ -149,17 +153,12 @@ bool RenderPath::calculateLocalTransform() {
 }
 
 void RenderPath::layout() {
-  // FIXME: using m_absoluteBounds breaks if containerForRepaint() is not the
-  // root
   LayoutRepainter repainter(*this,
-                            checkForRepaintDuringLayout() && selfNeedsLayout(),
-                            &m_absoluteBounds);
+                            checkForRepaintDuringLayout() && selfNeedsLayout());
 
   calculateLocalTransform();
 
   setPath(static_cast<SVGStyledTransformableElement*>(node())->toPathData());
-
-  m_absoluteBounds = absoluteClippedOverflowRect();
 
   repainter.repaintAfterLayout();
 
@@ -452,14 +451,6 @@ FloatRect RenderPath::drawMarkersIfNeeded(GraphicsContext* context,
     bounds.unite(endMarker->cachedBounds());
 
   return bounds;
-}
-
-IntRect RenderPath::outlineBoundsForRepaint(
-    RenderBoxModelObject* /*repaintContainer*/) const {
-  // FIXME: handle non-root repaintContainer
-  IntRect result = m_absoluteBounds;
-  adjustRectForOutlineAndShadow(result);
-  return result;
 }
 }
 

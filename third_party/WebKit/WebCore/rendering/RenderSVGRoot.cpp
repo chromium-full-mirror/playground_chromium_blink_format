@@ -87,16 +87,12 @@ void RenderSVGRoot::layout() {
   // Arbitrary affine transforms are incompatible with LayoutState.
   view()->disableLayoutState();
 
-  // FIXME: using m_absoluteBounds breaks if containerForRepaint() is not the
-  // root
   LayoutRepainter repainter(*this,
-                            checkForRepaintDuringLayout() && selfNeedsLayout(),
-                            &m_absoluteBounds);
+                            checkForRepaintDuringLayout() && selfNeedsLayout());
 
   calcWidth();
   calcHeight();
 
-  m_absoluteBounds = absoluteClippedOverflowRect();
   SVGSVGElement* svg = static_cast<SVGSVGElement*>(node());
   setWidth(static_cast<int>(width() * svg->currentScale()));
   setHeight(static_cast<int>(height() * svg->currentScale()));
@@ -208,9 +204,8 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   if ((childPaintInfo.phase == PaintPhaseOutline ||
        childPaintInfo.phase == PaintPhaseSelfOutline) &&
       style()->outlineWidth() && style()->visibility() == VISIBLE)
-    paintOutline(childPaintInfo.context, m_absoluteBounds.x(),
-                 m_absoluteBounds.y(), m_absoluteBounds.width(),
-                 m_absoluteBounds.height(), style());
+    paintOutline(childPaintInfo.context, parentX, parentY, width(), height(),
+                 style());
 }
 
 FloatRect RenderSVGRoot::viewport() const {
@@ -237,14 +232,22 @@ void RenderSVGRoot::calcViewport() {
                              : height.value(svg));
 }
 
-TransformationMatrix RenderSVGRoot::localToParentTransform() const {
+// Commonly, when calling a RenderBox:: method, RenderSVGRoot wants to include
+// all of the coordinate space transform *except* for the CSS parent offset.
+TransformationMatrix
+RenderSVGRoot::localToParentTransformWithoutCSSParentOffset() const {
   TransformationMatrix ctm;
-  ctm.translate(x(), y());
   SVGSVGElement* svg = static_cast<SVGSVGElement*>(node());
   ctm.scale(svg->currentScale());
   ctm.translate(svg->currentTranslate().x(), svg->currentTranslate().y());
   ctm.translate(viewport().x(), viewport().y());
   return svg->viewBoxToViewTransform(width(), height()) * ctm;
+}
+
+TransformationMatrix RenderSVGRoot::localToParentTransform() const {
+  TransformationMatrix offsetTranslation;
+  offsetTranslation.translate(x(), y());
+  return localToParentTransformWithoutCSSParentOffset() * offsetTranslation;
 }
 
 // FIXME: This method should be removed as soon as callers to
@@ -272,16 +275,10 @@ void RenderSVGRoot::computeRectForRepaint(
     RenderBoxModelObject* repaintContainer,
     IntRect& repaintRect,
     bool fixed) {
-  // Apply our viewbox transform, and then call RenderBox's method to handle all
-  // the normal CSS Box model bits
-  TransformationMatrix localToParent = localToParentTransform();
-
-  // Undo the x(),y() translation included in localToParentTransform() because
-  // RenderBox::computeRectForRepaint() expects it to be included in repaintRect
-  localToParent.translateRight(-x(), -y());
-
-  // Apply our localToParent transform and pass the rect off to our RenderBox
-  repaintRect = localToParent.mapRect(repaintRect);
+  // Apply our local transforms (except for x/y translation) and call
+  // RenderBox's method to handle all the normal CSS Box model bits
+  repaintRect =
+      localToParentTransformWithoutCSSParentOffset().mapRect(repaintRect);
   RenderBox::computeRectForRepaint(repaintContainer, repaintRect, fixed);
 }
 
