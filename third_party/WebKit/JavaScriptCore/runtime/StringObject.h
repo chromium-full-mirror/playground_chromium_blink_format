@@ -49,7 +49,7 @@ class StringObject : public JSWrapperObject {
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
+  static const JS_EXPORTDATA ClassInfo info;
 
   JSString* internalValue() const {
     return asString(JSWrapperObject::internalValue());

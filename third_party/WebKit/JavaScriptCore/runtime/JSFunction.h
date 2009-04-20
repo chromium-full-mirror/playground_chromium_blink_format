@@ -70,7 +70,7 @@ class JSFunction : public InternalFunction {
 
   virtual void mark();
 
-  static const ClassInfo info;
+  static JS_EXPORTDATA const ClassInfo info;
 
   static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {
     return Structure::create(prototype,
