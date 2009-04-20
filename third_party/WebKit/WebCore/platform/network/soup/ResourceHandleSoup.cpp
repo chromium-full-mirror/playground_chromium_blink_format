@@ -377,8 +377,11 @@ static void finishedCallback(SoupSession* session,
 static gboolean parseDataUrl(gpointer callback_data) {
   ResourceHandle* handle = static_cast<ResourceHandle*>(callback_data);
   ResourceHandleClient* client = handle->client();
+  ResourceHandleInternal* d = handle->getInternal();
+  if (d->m_cancelled)
+    return false;
 
-  handle->getInternal()->m_idleHandler = 0;
+  d->m_idleHandler = 0;
 
   ASSERT(client);
   if (!client)
@@ -414,6 +417,9 @@ static gboolean parseDataUrl(gpointer callback_data) {
     response.setTextEncodingName(charset);
     client->didReceiveResponse(handle, response);
 
+    if (d->m_cancelled)
+      return false;
+
 // Use the GLib Base64 if available, since WebCore's decoder isn't
 // general-purpose and fails on Acid3 test 97 (whitespace).
 #ifdef USE_GLIB_BASE64
@@ -435,10 +441,17 @@ static gboolean parseDataUrl(gpointer callback_data) {
     data = decodeURLEscapeSequences(data, TextEncoding(charset));
     response.setTextEncodingName("UTF-16");
     client->didReceiveResponse(handle, response);
+
+    if (d->m_cancelled)
+      return false;
+
     if (data.length() > 0)
       client->didReceiveData(handle,
                              reinterpret_cast<const char*>(data.characters()),
                              data.length() * sizeof(UChar), 0);
+
+    if (d->m_cancelled)
+      return false;
   }
 
   client->didFinishLoading(handle);
