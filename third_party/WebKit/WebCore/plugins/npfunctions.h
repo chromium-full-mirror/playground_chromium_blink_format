@@ -121,6 +121,13 @@ typedef uint32 (*NPN_ScheduleTimerProcPtr)(NPP npp,
                                                              uint32 timerID));
 typedef void (*NPN_UnscheduleTimerProcPtr)(NPP npp, uint32 timerID);
 typedef NPError (*NPN_PopUpContextMenuProcPtr)(NPP instance, NPMenu* menu);
+typedef NPBool (*NPN_ConvertPointProcPtr)(NPP npp,
+                                          double sourceX,
+                                          double sourceY,
+                                          NPCoordinateSpace sourceSpace,
+                                          double* destX,
+                                          double* destY,
+                                          NPCoordinateSpace destSpace);
 
 typedef void (*NPN_ReleaseVariantValueProcPtr)(NPVariant* variant);
 
@@ -277,6 +284,7 @@ typedef struct _NPNetscapeFuncs {
   NPN_ScheduleTimerProcPtr scheduletimer;
   NPN_UnscheduleTimerProcPtr unscheduletimer;
   NPN_PopUpContextMenuProcPtr popupcontextmenu;
+  NPN_ConvertPointProcPtr convertpoint;
 } NPNetscapeFuncs;
 
 typedef struct _NPPluginFuncs {

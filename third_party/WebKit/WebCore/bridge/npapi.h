@@ -475,6 +475,8 @@ typedef struct _NPCocoaEvent {
       uint16 keyCode;
     } key;
     struct {
+      CGContextRef context;
+
       double x;
       double y;
       double width;
@@ -531,6 +533,14 @@ typedef NPNSMenu NPMenu;
 #else
 typedef void* NPMenu;
 #endif
+
+typedef enum {
+  NPCoordinateSpacePlugin = 1,
+  NPCoordinateSpaceWindow,
+  NPCoordinateSpaceFlippedWindow,
+  NPCoordinateSpaceScreen,
+  NPCoordinateSpaceFlippedScreen
+} NPCoordinateSpace;
 
 #if defined(XP_MAC) || defined(XP_MACOSX)
 
@@ -866,6 +876,13 @@ uint32 NPN_ScheduleTimer(NPP instance,
                          void (*timerFunc)(NPP npp, uint32 timerID));
 void NPN_UnscheduleTimer(NPP instance, uint32 timerID);
 NPError NPN_PopUpContextMenu(NPP instance, NPMenu* menu);
+NPBool NPN_ConvertPoint(NPP instance,
+                        double sourceX,
+                        double sourceY,
+                        NPCoordinateSpace sourceSpace,
+                        double* destX,
+                        double* destY,
+                        NPCoordinateSpace destSpace);
 
 #ifdef __cplusplus
 } /* end extern "C" */

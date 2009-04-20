@@ -196,6 +196,12 @@ class NetscapePluginInstanceProxy
                              mach_msg_type_number_t& usernameLength,
                              data_t& passwordData,
                              mach_msg_type_number_t& passwordLength);
+  bool convertPoint(double sourceX,
+                    double sourceY,
+                    NPCoordinateSpace sourceSpace,
+                    double& destX,
+                    double& destY,
+                    NPCoordinateSpace destSpace);
 
   PassRefPtr<JSC::Bindings::Instance> createBindingsInstance(
       PassRefPtr<JSC::Bindings::RootObject>);
