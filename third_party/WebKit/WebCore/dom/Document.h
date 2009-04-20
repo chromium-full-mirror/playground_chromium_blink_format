@@ -29,6 +29,7 @@
 #define Document_h
 
 #include "Attr.h"
+#include "CachedResourceHandle.h"
 #include "CheckedRadioButtons.h"
 #include "Color.h"
 #include "DocumentMarker.h"
@@ -51,6 +52,7 @@ namespace WebCore {
 class AXObjectCache;
 class CDATASection;
 class CachedCSSStyleSheet;
+class CachedScript;
 class CanvasRenderingContext2D;
 class CharacterData;
 class CSSStyleDeclaration;
@@ -93,6 +95,7 @@ class Range;
 class RegisteredEventListener;
 class RenderArena;
 class RenderView;
+class ScriptElementData;
 class SecurityOrigin;
 class SegmentedString;
 class Settings;
@@ -809,6 +812,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   int docID() const { return m_docID; }
 
+  void executeScriptSoon(ScriptElementData*,
+                         CachedResourceHandle<CachedScript>);
+
 #if ENABLE(XSLT)
   void applyXSLTransform(ProcessingInstruction* pi);
   void setTransformSource(void* doc);
@@ -922,6 +928,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
       const;  // Same as completeURL() for the same reason as above.
 
   String encoding() const;
+
+  void executeScriptSoonTimerFired(Timer<Document>*);
 
   CSSStyleSelector* m_styleSelector;
   bool m_didCalculateStyleSelector;
@@ -1056,6 +1064,10 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_processingLoadEvent;
   double m_startTime;
   bool m_overMinimumLayoutThreshold;
+
+  Vector<std::pair<ScriptElementData*, CachedResourceHandle<CachedScript>>>
+      m_scriptsToExecuteSoon;
+  Timer<Document> m_executeScriptSoonTimer;
 
 #if ENABLE(XSLT)
   void* m_transformSource;

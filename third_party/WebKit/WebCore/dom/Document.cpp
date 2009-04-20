@@ -102,6 +102,7 @@
 #include "RenderView.h"
 #include "RenderWidget.h"
 #include "ScriptController.h"
+#include "ScriptElement.h"
 #include "SecurityOrigin.h"
 #include "SegmentedString.h"
 #include "SelectionController.h"
@@ -312,7 +313,8 @@ Document::Document(Frame* frame, bool isXHTML)
       m_title(""),
       m_titleSetExplicitly(false),
       m_updateFocusAppearanceTimer(this,
-                                   &Document::updateFocusAppearanceTimerFired)
+                                   &Document::updateFocusAppearanceTimerFired),
+      m_executeScriptSoonTimer(this, &Document::executeScriptSoonTimerFired)
 #if ENABLE(XSLT)
       ,
       m_transformSource(0)
@@ -453,6 +455,11 @@ Document::~Document() {
   ASSERT(!m_savedRenderer);
   ASSERT(m_ranges.isEmpty());
   ASSERT(!m_styleRecalcTimer.isActive());
+
+  for (size_t i = 0; i < m_scriptsToExecuteSoon.size(); ++i)
+    m_scriptsToExecuteSoon[i]
+        .first->element()
+        ->deref();  // Balances ref() in executeScriptSoon().
 
   removeAllEventListeners();
 
@@ -4134,6 +4141,36 @@ void Document::updateFocusAppearanceTimerFired(Timer<Document>*) {
   Element* element = static_cast<Element*>(node);
   if (element->isFocusable())
     element->updateFocusAppearance(false);
+}
+
+void Document::executeScriptSoonTimerFired(Timer<Document>* timer) {
+  ASSERT_ARG(timer, timer == &m_executeScriptSoonTimer);
+
+  Vector<pair<ScriptElementData*, CachedResourceHandle<CachedScript>>> scripts;
+  scripts.swap(m_scriptsToExecuteSoon);
+  size_t size = scripts.size();
+  for (size_t i = 0; i < size; ++i) {
+    scripts[i].first->execute(scripts[i].second.get());
+    scripts[i].first->element()->deref();  // Balances ref() in
+                                           // executeScriptSoon().
+  }
+}
+
+void Document::executeScriptSoon(
+    ScriptElementData* data,
+    CachedResourceHandle<CachedScript> cachedScript) {
+  ASSERT_ARG(data, data);
+
+  Element* element = data->element();
+  ASSERT(element);
+  ASSERT(element->document() == this);
+  ASSERT(element->inDocument());
+
+  m_scriptsToExecuteSoon.append(make_pair(data, cachedScript));
+  element->ref();  // Balanced by deref()s in executeScriptSoonTimerFired() and
+                   // ~Document().
+  if (!m_executeScriptSoonTimer.isActive())
+    m_executeScriptSoonTimer.startOneShot(0);
 }
 
 // FF method for accessing the selection added for compatability.

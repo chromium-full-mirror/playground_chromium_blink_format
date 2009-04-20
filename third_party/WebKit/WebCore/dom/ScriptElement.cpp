@@ -133,6 +133,7 @@ ScriptElementData::ScriptElementData(ScriptElement* scriptElement,
       m_element(element),
       m_cachedScript(0),
       m_createdByParser(false),
+      m_requested(false),
       m_evaluated(false),
       m_firedLoad(false) {
   ASSERT(m_scriptElement);
@@ -155,6 +156,7 @@ void ScriptElementData::requestScript(const String& sourceUrl) {
   ASSERT(!m_cachedScript);
   m_cachedScript =
       document->docLoader()->requestScript(sourceUrl, scriptCharset());
+  m_requested = true;
 
   // m_createdByParser is never reset - always resied at the initial value set
   // while parsing.
@@ -193,26 +195,24 @@ void ScriptElementData::stopLoadRequest() {
   }
 }
 
-void ScriptElementData::notifyFinished(CachedResource* o) {
-  CachedScript* cs = static_cast<CachedScript*>(o);
-  ASSERT(cs == m_cachedScript);
-
-  // Evaluating the script could lead to a garbage collection which can
-  // delete the script element so we need to protect it and us with it!
-  RefPtr<Element> protector(m_element);
-
-  if (cs->errorOccurred())
+void ScriptElementData::execute(CachedScript* cachedScript) {
+  ASSERT(cachedScript);
+  if (cachedScript->errorOccurred())
     m_scriptElement->dispatchErrorEvent();
   else {
-    evaluateScript(ScriptSourceCode(cs));
+    evaluateScript(ScriptSourceCode(cachedScript));
     m_scriptElement->dispatchLoadEvent();
   }
+}
 
+void ScriptElementData::notifyFinished(CachedResource* o) {
+  ASSERT_ARG(o, o == m_cachedScript);
+  m_element->document()->executeScriptSoon(this, m_cachedScript);
   stopLoadRequest();
 }
 
 bool ScriptElementData::ignoresLoadRequest() const {
-  return m_evaluated || m_cachedScript || m_createdByParser ||
+  return m_evaluated || m_requested || m_createdByParser ||
          !m_element->inDocument();
 }
 
