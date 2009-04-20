@@ -107,7 +107,7 @@ class NetscapePluginInstanceProxy
   void insertText(NSString*);
   bool wheelEvent(NSView* pluginView, NSEvent*);
   void syntheticKeyDownWithCommandModifier(int keyCode, char character);
-
+  void flagsChanged(NSEvent*);
   void print(CGContextRef, unsigned width, unsigned height);
 
   void startTimers(bool throttleTimers);
