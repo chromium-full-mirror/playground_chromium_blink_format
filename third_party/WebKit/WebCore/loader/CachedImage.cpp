@@ -294,6 +294,7 @@ void CachedImage::data(PassRefPtr<SharedBuffer> data, bool allDataReceived) {
 void CachedImage::error() {
   clear();
   m_errorOccurred = true;
+  m_data.clear();
   notifyObservers();
   m_loading = false;
   checkNotify();
