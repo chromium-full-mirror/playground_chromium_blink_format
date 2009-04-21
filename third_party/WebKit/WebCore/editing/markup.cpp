@@ -790,6 +790,17 @@ static bool isSpecialAncestorBlock(Node* node) {
          node->hasTagName(h5Tag);
 }
 
+static bool shouldIncludeWrapperForFullySelectedRoot(
+    Node* fullySelectedRoot,
+    CSSMutableStyleDeclaration* style) {
+  if (fullySelectedRoot->isElementNode() &&
+      static_cast<Element*>(fullySelectedRoot)->hasAttribute(backgroundAttr))
+    return true;
+
+  return style->getPropertyCSSValue(CSSPropertyBackgroundImage) ||
+         style->getPropertyCSSValue(CSSPropertyBackgroundColor);
+}
+
 // FIXME: Shouldn't we omit style info when annotate ==
 // DoNotAnnotateForInterchange?
 // FIXME: At least, annotation and style info should probably not be included in
@@ -1008,10 +1019,6 @@ String createMarkup(const Range* range,
     specialCommonAncestor = enclosingAnchor;
 
   Node* body = enclosingNodeWithTag(Position(commonAncestor, 0), bodyTag);
-  // FIXME: Only include markup for a fully selected root (and ancestors of
-  // lastClosed up to that root) if
-  // there are styles/attributes on those nodes that need to be included to
-  // preserve the appearance of the copied markup.
   // FIXME: Do this for all fully selected blocks, not just the body.
   Node* fullySelectedRoot =
       body &&
@@ -1019,8 +1026,14 @@ String createMarkup(const Range* range,
                       .toNormalizedRange() == *updatedRange
           ? body
           : 0;
-  if (annotate && fullySelectedRoot)
-    specialCommonAncestor = fullySelectedRoot;
+  RefPtr<CSSMutableStyleDeclaration> fullySelectedRootStyle =
+      fullySelectedRoot ? styleFromMatchedRulesAndInlineDecl(fullySelectedRoot)
+                        : 0;
+  if (annotate && fullySelectedRoot) {
+    if (shouldIncludeWrapperForFullySelectedRoot(fullySelectedRoot,
+                                                 fullySelectedRootStyle.get()))
+      specialCommonAncestor = fullySelectedRoot;
+  }
 
   if (specialCommonAncestor && lastClosed) {
     // Also include all of the ancestors of lastClosed up to this special
@@ -1028,26 +1041,26 @@ String createMarkup(const Range* range,
     for (Node* ancestor = lastClosed->parentNode(); ancestor;
          ancestor = ancestor->parentNode()) {
       if (ancestor == fullySelectedRoot && !convertBlocksToInlines) {
-        RefPtr<CSSMutableStyleDeclaration> style =
-            styleFromMatchedRulesAndInlineDecl(fullySelectedRoot);
-
         // Bring the background attribute over, but not as an attribute because
         // a background attribute on a div
         // appears to have no effect.
-        if (!style->getPropertyCSSValue(CSSPropertyBackgroundImage) &&
+        if (!fullySelectedRootStyle->getPropertyCSSValue(
+                CSSPropertyBackgroundImage) &&
             static_cast<Element*>(fullySelectedRoot)
                 ->hasAttribute(backgroundAttr))
-          style->setProperty(CSSPropertyBackgroundImage,
-                             "url('" +
-                                 static_cast<Element*>(fullySelectedRoot)
-                                     ->getAttribute(backgroundAttr) +
-                                 "')");
+          fullySelectedRootStyle->setProperty(
+              CSSPropertyBackgroundImage,
+              "url('" +
+                  static_cast<Element*>(fullySelectedRoot)
+                      ->getAttribute(backgroundAttr) +
+                  "')");
 
-        if (style->length()) {
+        if (fullySelectedRootStyle->length()) {
           Vector<UChar> openTag;
           DEFINE_STATIC_LOCAL(const String, divStyle, ("<div style=\""));
           append(openTag, divStyle);
-          appendAttributeValue(openTag, style->cssText(), documentIsHTML);
+          appendAttributeValue(openTag, fullySelectedRootStyle->cssText(),
+                               documentIsHTML);
           openTag.append('\"');
           openTag.append('>');
           preMarkups.append(String::adopt(openTag));
