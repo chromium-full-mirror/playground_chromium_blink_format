@@ -30,6 +30,7 @@
 
 #include "COMPtr.h"
 #include <CoreFoundation/CoreFoundation.h>
+#include <wtf/OwnArrayPtr.h>
 #include <wtf/RetainPtr.h>
 
 namespace WebCore {
@@ -127,6 +128,9 @@ class WebHistory : public IWebHistory, public IWebHistoryPrivate {
 
   COMPtr<IWebHistoryItem> itemForURLString(const WebCore::String&) const;
 
+  typedef int64_t DateKey;
+  typedef HashMap<DateKey, RetainPtr<CFMutableArrayRef>> DateToEntriesMap;
+
  private:
   enum NotificationType {
     kWebHistoryItemsAddedNotification = 0,
@@ -148,9 +152,9 @@ class WebHistory : public IWebHistory, public IWebHistoryPrivate {
   HRESULT removeItemForURLString(CFStringRef urlString);
   HRESULT addItemToDateCaches(IWebHistoryItem* entry);
   HRESULT removeItemFromDateCaches(IWebHistoryItem* entry);
-  HRESULT insertItem(IWebHistoryItem* entry, int dateIndex);
+  HRESULT insertItem(IWebHistoryItem* entry, DateKey);
   HRESULT ageLimitDate(CFAbsoluteTime* time);
-  bool findIndex(int* index, CFAbsoluteTime forDay);
+  bool findKey(DateKey*, CFAbsoluteTime forDay);
   static CFAbsoluteTime timeToDate(CFAbsoluteTime time);
   BSTR getNotificationString(NotificationType notifyType);
   HRESULT itemForURLString(CFStringRef urlString, IWebHistoryItem** item) const;
@@ -158,8 +162,8 @@ class WebHistory : public IWebHistory, public IWebHistoryPrivate {
 
   ULONG m_refCount;
   RetainPtr<CFMutableDictionaryRef> m_entriesByURL;
-  RetainPtr<CFMutableArrayRef> m_datesWithEntries;
-  RetainPtr<CFMutableArrayRef> m_entriesByDate;
+  DateToEntriesMap m_entriesByDate;
+  OwnArrayPtr<DATE> m_orderedLastVisitedDays;
   COMPtr<WebPreferences> m_preferences;
 };
 
