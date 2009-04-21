@@ -29,33 +29,16 @@
 #ifndef RegisterFile_h
 #define RegisterFile_h
 
+#include "Collector.h"
 #include "ExecutableAllocator.h"
 #include "Register.h"
-#include "Collector.h"
 #include <wtf/Noncopyable.h>
+#include <wtf/VMTags.h>
 
 #if HAVE(MMAP)
 #include <errno.h>
 #include <stdio.h>
 #include <sys/mman.h>
-#endif
-
-#if PLATFORM(DARWIN)
-#include <mach/vm_statistics.h>
-#endif
-
-#if PLATFORM(DARWIN)
-// On Mac OS X, the VM subsystem allows tagging memory requested from mmap and
-// vm_map
-// in order to aid tools that inspect system memory use.
-#if defined(VM_MEMORY_JAVASCRIPT_JIT_REGISTER_FILE)
-#define TAG_FOR_REGISTERFILE_MEMORY \
-  VM_MAKE_TAG(VM_MEMORY_JAVASCRIPT_JIT_REGISTER_FILE)
-#else
-#define TAG_FOR_REGISTERFILE_MEMORY VM_MAKE_TAG(65)
-#endif
-#else
-#define TAG_FOR_REGISTERFILE_MEMORY -1
 #endif
 
 namespace JSC {
@@ -192,7 +175,7 @@ inline RegisterFile::RegisterFile(size_t capacity, size_t maxGlobals)
 #if HAVE(MMAP)
   m_buffer = static_cast<Register*>(
       mmap(0, bufferLength, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON,
-           TAG_FOR_REGISTERFILE_MEMORY, 0));
+           VM_TAG_FOR_REGISTERFILE_MEMORY, 0));
   if (m_buffer == MAP_FAILED) {
     fprintf(stderr, "Could not allocate register file: %d\n", errno);
     CRASH();
@@ -254,7 +237,5 @@ inline bool RegisterFile::grow(Register* newEnd) {
 }
 
 }  // namespace JSC
-
-#undef TAG_FOR_REGISTERFILE_MEMORY
 
 #endif  // RegisterFile_h
