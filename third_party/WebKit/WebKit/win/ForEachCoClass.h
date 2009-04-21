@@ -39,11 +39,11 @@
           WebHistoryItem) macro(WebIconDatabase) macro(WebJavaScriptCollector) \
           macro(WebKitStatistics) macro(WebMutableURLRequest)                  \
               macro(WebNotificationCenter) macro(WebPreferences)               \
-                  macro(WebScrollBar) macro(WebScriptDebugServer)              \
-                      macro(WebTextRenderer) macro(WebURLCredential)           \
-                          macro(WebURLProtectionSpace) macro(WebURLRequest)    \
-                              macro(WebURLResponse) macro(WebView)             \
-                                  macro(WebArchive) macro(WebCoreStatistics)   \
+                  macro(WebScrollBar) macro(WebTextRenderer)                   \
+                      macro(WebURLCredential) macro(WebURLProtectionSpace)     \
+                          macro(WebURLRequest) macro(WebURLResponse)           \
+                              macro(WebView) macro(WebArchive)                 \
+                                  macro(WebCoreStatistics)                     \
                                       macro(WebCookieManager)  // end of macro
 
 // Everything below this point is deprecated. Please do not use.
