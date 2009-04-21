@@ -589,9 +589,8 @@ HRESULT WebHistory::data(IStream** stream) {
   if (!historyData)
     return S_OK;
 
-  COMPtr<MemoryStream> result(AdoptCOM,
-                              MemoryStream::createInstance(
-                                  SharedBuffer::wrapCFData(historyData.get())));
+  COMPtr<MemoryStream> result =
+      MemoryStream::createInstance(SharedBuffer::wrapCFData(historyData.get()));
   return result.copyRefTo(stream);
 }
 

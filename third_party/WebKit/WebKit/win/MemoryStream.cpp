@@ -43,10 +43,9 @@ MemoryStream::~MemoryStream() {
   gClassNameCount.remove("MemoryStream");
 }
 
-MemoryStream* MemoryStream::createInstance(PassRefPtr<SharedBuffer> buffer) {
-  MemoryStream* instance = new MemoryStream(buffer);
-  instance->AddRef();
-  return instance;
+COMPtr<MemoryStream> MemoryStream::createInstance(
+    PassRefPtr<SharedBuffer> buffer) {
+  return new MemoryStream(buffer);
 }
 
 // IUnknown -------------------------------------------------------------------
@@ -237,6 +236,8 @@ HRESULT STDMETHODCALLTYPE MemoryStream::Stat(
 
 HRESULT STDMETHODCALLTYPE MemoryStream::Clone(
     /* [out] */ IStream** ppstm) {
-  *ppstm = MemoryStream::createInstance(m_buffer);
+  MemoryStream::createInstance(m_buffer).releaseRef().copyRefTo(ppstm);
+  // FIXME: MSDN says we should be returning STG_E_INSUFFICIENT_MEMORY instead
+  // of E_OUTOFMEMORY here.
   return (*ppstm) ? S_OK : E_OUTOFMEMORY;
 }
