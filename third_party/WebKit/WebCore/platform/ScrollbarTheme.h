@@ -91,6 +91,10 @@ class ScrollbarTheme {
   virtual bool shouldCenterOnThumb(Scrollbar*, const PlatformMouseEvent&) {
     return false;
   }
+  virtual bool shouldSnapBackToDragOrigin(Scrollbar*,
+                                          const PlatformMouseEvent&) {
+    return false;
+  }
   virtual int thumbPosition(Scrollbar*) {
     return 0;
   }  // The position of the thumb relative to the track.
