@@ -35,11 +35,12 @@ ASSERT_CLASS_FITS_IN_CELL(JSOptionConstructor);
 const ClassInfo JSOptionConstructor::s_info = {"OptionConstructor", 0, 0, 0};
 
 JSOptionConstructor::JSOptionConstructor(ExecState* exec,
-                                         ScriptExecutionContext* context)
+                                         JSDOMGlobalObject* globalObject)
     : DOMObject(JSOptionConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())),
-      m_globalObject(toJSDOMGlobalObject(context)) {
-  ASSERT(context->isDocument());
+      m_globalObject(globalObject) {
+  ASSERT(globalObject->scriptExecutionContext());
+  ASSERT(globalObject->scriptExecutionContext()->isDocument());
 
   putDirect(
       exec->propertyNames().prototype,

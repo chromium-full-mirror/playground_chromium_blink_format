@@ -113,8 +113,8 @@ inline JSC::JSObject* getDOMConstructor(JSC::ExecState* exec,
   if (JSC::JSObject* constructor =
           globalObject->constructors().get(&ConstructorClass::s_info))
     return constructor;
-  JSC::JSObject* constructor =
-      new (exec) ConstructorClass(exec, globalObject->scriptExecutionContext());
+  JSC::JSObject* constructor = new (exec)
+      ConstructorClass(exec, const_cast<JSDOMGlobalObject*>(globalObject));
   ASSERT(!globalObject->constructors().contains(&ConstructorClass::s_info));
   globalObject->constructors().set(&ConstructorClass::s_info, constructor);
   return constructor;

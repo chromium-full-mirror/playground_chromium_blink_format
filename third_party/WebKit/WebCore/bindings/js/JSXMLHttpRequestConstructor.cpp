@@ -36,10 +36,10 @@ const ClassInfo JSXMLHttpRequestConstructor::s_info = {
 
 JSXMLHttpRequestConstructor::JSXMLHttpRequestConstructor(
     ExecState* exec,
-    ScriptExecutionContext* scriptExecutionContext)
+    JSDOMGlobalObject* globalObject)
     : DOMObject(JSXMLHttpRequestConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())),
-      m_globalObject(toJSDOMGlobalObject(scriptExecutionContext)) {
+      m_globalObject(globalObject) {
   putDirect(exec->propertyNames().prototype,
             JSXMLHttpRequestPrototype::self(exec, exec->lexicalGlobalObject()),
             None);

@@ -40,10 +40,10 @@ const ClassInfo JSMessageChannelConstructor::s_info = {
 
 JSMessageChannelConstructor::JSMessageChannelConstructor(
     ExecState* exec,
-    ScriptExecutionContext* scriptExecutionContext)
+    JSDOMGlobalObject* globalObject)
     : DOMObject(JSMessageChannelConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())),
-      m_globalObject(toJSDOMGlobalObject(scriptExecutionContext)) {
+      m_globalObject(globalObject) {
   putDirect(exec->propertyNames().prototype,
             JSMessageChannelPrototype::self(exec, exec->lexicalGlobalObject()),
             None);

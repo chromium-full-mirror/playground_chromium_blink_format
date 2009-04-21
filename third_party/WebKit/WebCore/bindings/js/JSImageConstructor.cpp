@@ -36,11 +36,12 @@ ASSERT_CLASS_FITS_IN_CELL(JSImageConstructor);
 const ClassInfo JSImageConstructor::s_info = {"ImageConstructor", 0, 0, 0};
 
 JSImageConstructor::JSImageConstructor(ExecState* exec,
-                                       ScriptExecutionContext* context)
+                                       JSDOMGlobalObject* globalObject)
     : DOMObject(JSImageConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())),
-      m_globalObject(toJSDOMGlobalObject(context)) {
-  ASSERT(context->isDocument());
+      m_globalObject(globalObject) {
+  ASSERT(globalObject->scriptExecutionContext());
+  ASSERT(globalObject->scriptExecutionContext()->isDocument());
 
   putDirect(
       exec->propertyNames().prototype,
