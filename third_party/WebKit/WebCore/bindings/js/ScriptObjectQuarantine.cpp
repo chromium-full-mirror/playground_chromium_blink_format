@@ -34,8 +34,6 @@
 #include "Database.h"
 #include "Document.h"
 #include "Frame.h"
-#include "JSDatabase.h"
-#include "JSStorage.h"
 #include "JSDOMBinding.h"
 #include "JSInspectedObjectWrapper.h"
 #include "JSNode.h"
@@ -43,6 +41,14 @@
 #include "ScriptValue.h"
 
 #include <runtime/JSLock.h>
+
+#if ENABLE(DATABASE)
+#include "JSDatabase.h"
+#endif
+
+#if ENABLE(DOM_STORAGE)
+#include "JSStorage.h"
+#endif
 
 using namespace JSC;
 
@@ -55,6 +61,7 @@ ScriptValue quarantineValue(ScriptState* scriptState,
       JSInspectedObjectWrapper::wrap(scriptState, value.jsValue()));
 }
 
+#if ENABLE(DATABASE)
 bool getQuarantinedScriptObject(Database* database,
                                 ScriptObject& quarantinedObject) {
   ASSERT(database);
@@ -71,7 +78,9 @@ bool getQuarantinedScriptObject(Database* database,
 
   return true;
 }
+#endif
 
+#if ENABLE(DOM_STORAGE)
 bool getQuarantinedScriptObject(Frame* frame,
                                 Storage* storage,
                                 ScriptObject& quarantinedObject) {
@@ -86,6 +95,7 @@ bool getQuarantinedScriptObject(Frame* frame,
 
   return true;
 }
+#endif
 
 bool getQuarantinedScriptObject(Node* node, ScriptObject& quarantinedObject) {
   ExecState* exec = scriptStateFromNode(node);
