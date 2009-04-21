@@ -75,7 +75,7 @@ class DOMWindow : public RefCounted<DOMWindow> {
   }
   virtual ~DOMWindow();
 
-  Frame* frame() { return m_frame; }
+  Frame* frame() const { return m_frame; }
   void disconnectFrame();
 
   void clear();
@@ -87,6 +87,11 @@ class DOMWindow : public RefCounted<DOMWindow> {
 
   void setURL(const KURL& url) { m_url = url; }
   KURL url() const { return m_url; }
+
+  unsigned pendingUnloadEventListeners() const;
+
+  static bool dispatchAllPendingBeforeUnloadEvents();
+  static void dispatchAllPendingUnloadEvents();
 
   static void adjustWindowRect(const FloatRect& screen,
                                FloatRect& window,
@@ -232,7 +237,7 @@ class DOMWindow : public RefCounted<DOMWindow> {
   void resizeBy(float x, float y) const;
   void resizeTo(float width, float height) const;
 
-  void handleEvent(Event*, bool useCapture);
+  void handleEvent(Event*, bool useCapture, RegisteredEventListenerVector* = 0);
 
   // Used for standard DOM addEventListener / removeEventListener APIs.
   void addEventListener(const AtomicString& eventType,
@@ -339,11 +344,6 @@ class DOMWindow : public RefCounted<DOMWindow> {
 
  private:
   DOMWindow(Frame*);
-
-  void addPendingFrameUnloadEventCount();
-  void removePendingFrameUnloadEventCount();
-  void addPendingFrameBeforeUnloadEventCount();
-  void removePendingFrameBeforeUnloadEventCount();
 
   RefPtr<SecurityOrigin> m_securityOrigin;
   KURL m_url;

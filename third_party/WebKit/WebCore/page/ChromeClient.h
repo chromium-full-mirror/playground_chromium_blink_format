@@ -169,9 +169,6 @@ class ChromeClient {
       String& generatedFilename);
   virtual String generateReplacementFile(const String& path);
 
-  virtual void enableSuddenTermination();
-  virtual void disableSuddenTermination();
-
   virtual bool paintCustomScrollbar(GraphicsContext*,
                                     const FloatRect&,
                                     ScrollbarControlSize,
