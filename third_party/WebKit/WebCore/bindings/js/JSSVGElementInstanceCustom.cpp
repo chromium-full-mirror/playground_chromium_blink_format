@@ -45,8 +45,7 @@ void JSSVGElementInstance::mark() {
   JSNode* correspondingWrapper =
       getCachedDOMNodeWrapper(impl()->correspondingElement()->document(),
                               impl()->correspondingElement());
-  ASSERT(correspondingWrapper);
-  if (!correspondingWrapper->marked())
+  if (correspondingWrapper && !correspondingWrapper->marked())
     correspondingWrapper->mark();
 }
 
