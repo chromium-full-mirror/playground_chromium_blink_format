@@ -256,8 +256,8 @@ class Element : public ContainerNode {
  protected:
   ElementRareData* rareData() const;
   ElementRareData* ensureRareData();
-  void setWindowInlineEventListener(const AtomicString& eventType,
-                                    PassRefPtr<EventListener>);
+  void setWindowAttributeEventListener(const AtomicString& eventType,
+                                       PassRefPtr<EventListener>);
 
   mutable RefPtr<NamedNodeMap> namedAttrMap;
 };

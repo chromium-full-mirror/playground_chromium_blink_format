@@ -42,10 +42,10 @@ class EventListener : public RefCounted<EventListener> {
   virtual void markJSFunction() {}
 #endif
 
-  bool isInline() const { return virtualIsInline(); }
+  bool isAttribute() const { return virtualisAttribute(); }
 
  private:
-  virtual bool virtualIsInline() const { return false; }
+  virtual bool virtualisAttribute() const { return false; }
 };
 
 #if USE(JSC)

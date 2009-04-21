@@ -145,8 +145,8 @@ void JSLazyEventListener::parseCode() const {
   m_eventParameterName = String();
 }
 
-PassRefPtr<JSLazyEventListener> createInlineEventListener(Node* node,
-                                                          Attribute* attr) {
+PassRefPtr<JSLazyEventListener> createAttributeEventListener(Node* node,
+                                                             Attribute* attr) {
   ASSERT(node);
 
   Document* document = node->document();
@@ -174,8 +174,8 @@ PassRefPtr<JSLazyEventListener> createInlineEventListener(Node* node,
       scriptController->eventHandlerLineNumber());
 }
 
-PassRefPtr<JSLazyEventListener> createInlineEventListener(Frame* frame,
-                                                          Attribute* attr) {
+PassRefPtr<JSLazyEventListener> createAttributeEventListener(Frame* frame,
+                                                             Attribute* attr) {
   if (!frame)
     return 0;
 

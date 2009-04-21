@@ -243,10 +243,10 @@ class DOMWindow : public RefCounted<DOMWindow> {
                            bool useCapture);
 
   // Used for legacy "onEvent" property APIs.
-  void setInlineEventListener(const AtomicString& eventType,
-                              PassRefPtr<EventListener>);
-  void clearInlineEventListener(const AtomicString& eventType);
-  EventListener* getInlineEventListener(const AtomicString& eventType) const;
+  void setAttributeEventListener(const AtomicString& eventType,
+                                 PassRefPtr<EventListener>);
+  void clearAttributeEventListener(const AtomicString& eventType);
+  EventListener* getAttributeEventListener(const AtomicString& eventType) const;
 
   const RegisteredEventListenerVector& eventListeners() const {
     return m_eventListeners;
