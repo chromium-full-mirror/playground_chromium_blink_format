@@ -185,7 +185,7 @@ class MainWindow : public QMainWindow {
         QInputDialog::getText(this, "Select elements", "Choose elements",
                               QLineEdit::Normal, "a", &ok);
     if (ok && !str.isEmpty()) {
-      QWebElementSelection result =
+      QWebElementCollection result =
           view->page()->mainFrame()->findAllElements(str);
       foreach (QWebElement e, result)
         e.setStyleProperty("background-color", "yellow");
