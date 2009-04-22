@@ -30,11 +30,12 @@
 #include "DocLoader.h"
 #include "Document.h"
 #include "Frame.h"
-#include "loader.h"
 #include "Node.h"
 #include "XMLTokenizer.h"
+#include "XMLTokenizerScope.h"
 #include "XSLImportRule.h"
 #include "XSLTProcessor.h"
+#include "loader.h"
 
 #include <libxml/uri.h>
 #include <libxslt/xsltutils.h>
@@ -145,7 +146,6 @@ bool XSLStyleSheet::parseString(const String& string, bool) {
   const UChar BOM = 0xFEFF;
   const unsigned char BOMHighByte =
       *reinterpret_cast<const unsigned char*>(&BOM);
-  setLoaderForLibXMLCallbacks(docLoader());
   if (!m_stylesheetDocTaken)
     xmlFreeDoc(m_stylesheetDoc);
   m_stylesheetDocTaken = false;
@@ -153,8 +153,9 @@ bool XSLStyleSheet::parseString(const String& string, bool) {
   Console* console = 0;
   if (Frame* frame = ownerDocument()->frame())
     console = frame->domWindow()->console();
-  xmlSetStructuredErrorFunc(console, XSLTProcessor::parseErrorFunc);
-  xmlSetGenericErrorFunc(console, XSLTProcessor::genericErrorFunc);
+
+  XMLTokenizerScope scope(docLoader(), XSLTProcessor::genericErrorFunc,
+                          XSLTProcessor::parseErrorFunc, console);
 
   const char* buffer = reinterpret_cast<const char*>(string.characters());
   int size = string.length() * sizeof(UChar);
@@ -182,10 +183,6 @@ bool XSLStyleSheet::parseString(const String& string, bool) {
 
   loadChildSheets();
 
-  xmlSetStructuredErrorFunc(0, 0);
-  xmlSetGenericErrorFunc(0, 0);
-
-  setLoaderForLibXMLCallbacks(0);
   return m_stylesheetDoc;
 }
 

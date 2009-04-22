@@ -188,7 +188,6 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
 
 #if ENABLE(XSLT)
 void* xmlDocPtrForString(DocLoader*, const String& source, const String& url);
-void setLoaderForLibXMLCallbacks(DocLoader*);
 #endif
 
 HashMap<String, String> parseAttributes(const String&, bool& attrsOK);
