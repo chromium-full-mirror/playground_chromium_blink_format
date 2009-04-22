@@ -116,7 +116,7 @@ pendingBeforeUnloadEventListenerMap() {
   return eventListenerMap;
 }
 
-static bool shouldAddPendingBeforeUnloadListener(DOMWindow* window) {
+static bool allowsPendingBeforeUnloadListeners(DOMWindow* window) {
   ASSERT_ARG(window, window);
   Frame* frame = window->frame();
   Page* page = frame->page();
@@ -1174,7 +1174,7 @@ void DOMWindow::addEventListener(const AtomicString& eventType,
     addPendingEventListener(pendingUnloadEventListenerMap(), this,
                             registeredListener.get());
   else if (eventType == eventNames().beforeunloadEvent &&
-           shouldAddPendingBeforeUnloadListener(this))
+           allowsPendingBeforeUnloadListeners(this))
     addPendingEventListener(pendingBeforeUnloadEventListenerMap(), this,
                             registeredListener.get());
 }
@@ -1189,7 +1189,8 @@ void DOMWindow::removeEventListener(const AtomicString& eventType,
         r.useCapture() == useCapture) {
       if (eventType == eventNames().unloadEvent)
         removePendingEventListener(pendingUnloadEventListenerMap(), this, &r);
-      else if (eventType == eventNames().beforeunloadEvent)
+      else if (eventType == eventNames().beforeunloadEvent &&
+               allowsPendingBeforeUnloadListeners(this))
         removePendingEventListener(pendingBeforeUnloadEventListenerMap(), this,
                                    &r);
       r.setRemoved(true);
@@ -1232,7 +1233,8 @@ void DOMWindow::clearAttributeEventListener(const AtomicString& eventType) {
     if (r.eventType() == eventType && r.listener()->isAttribute()) {
       if (eventType == eventNames().unloadEvent)
         removePendingEventListener(pendingUnloadEventListenerMap(), this, &r);
-      else if (eventType == eventNames().beforeunloadEvent)
+      else if (eventType == eventNames().beforeunloadEvent &&
+               allowsPendingBeforeUnloadListeners(this))
         removePendingEventListener(pendingBeforeUnloadEventListenerMap(), this,
                                    &r);
       r.setRemoved(true);
