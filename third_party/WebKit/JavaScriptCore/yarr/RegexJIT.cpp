@@ -378,7 +378,7 @@ class RegexGenerator : private MacroAssembler {
     bool isBackTrackGenerated;
   };
 
-  void genertateAssertionBOL(TermGenerationState& state) {
+  void generateAssertionBOL(TermGenerationState& state) {
     PatternTerm& term = state.term();
 
     if (m_pattern.m_multiline) {
@@ -404,7 +404,7 @@ class RegexGenerator : private MacroAssembler {
     }
   }
 
-  void genertateAssertionEOL(TermGenerationState& state) {
+  void generateAssertionEOL(TermGenerationState& state) {
     PatternTerm& term = state.term();
 
     if (m_pattern.m_multiline) {
@@ -444,7 +444,7 @@ class RegexGenerator : private MacroAssembler {
                         m_pattern.wordcharCharacterClass());
   }
 
-  void genertateAssertionWordBoundary(TermGenerationState& state) {
+  void generateAssertionWordBoundary(TermGenerationState& state) {
     const RegisterID character = regT0;
     PatternTerm& term = state.term();
 
@@ -492,7 +492,7 @@ class RegexGenerator : private MacroAssembler {
     wordCharThenNonWordChar.link(this);
   }
 
-  void genertatePatternCharacterSingle(TermGenerationState& state) {
+  void generatePatternCharacterSingle(TermGenerationState& state) {
     const RegisterID character = regT0;
     UChar ch = state.term().patternCharacter;
 
@@ -508,7 +508,7 @@ class RegexGenerator : private MacroAssembler {
     }
   }
 
-  void genertatePatternCharacterPair(TermGenerationState& state) {
+  void generatePatternCharacterPair(TermGenerationState& state) {
     const RegisterID character = regT0;
     UChar ch1 = state.term().patternCharacter;
     UChar ch2 = state.lookaheadTerm().patternCharacter;
@@ -538,7 +538,7 @@ class RegexGenerator : private MacroAssembler {
           this);
   }
 
-  void genertatePatternCharacterFixed(TermGenerationState& state) {
+  void generatePatternCharacterFixed(TermGenerationState& state) {
     const RegisterID character = regT0;
     const RegisterID countRegister = regT1;
     PatternTerm& term = state.term();
@@ -571,7 +571,7 @@ class RegexGenerator : private MacroAssembler {
     branch32(NotEqual, countRegister, index).linkTo(loop, this);
   }
 
-  void genertatePatternCharacterGreedy(TermGenerationState& state) {
+  void generatePatternCharacterGreedy(TermGenerationState& state) {
     const RegisterID character = regT0;
     const RegisterID countRegister = regT1;
     PatternTerm& term = state.term();
@@ -611,7 +611,7 @@ class RegexGenerator : private MacroAssembler {
     state.setBacktrackGenerated(backtrackBegin);
   }
 
-  void genertatePatternCharacterNonGreedy(TermGenerationState& state) {
+  void generatePatternCharacterNonGreedy(TermGenerationState& state) {
     const RegisterID character = regT0;
     const RegisterID countRegister = regT1;
     PatternTerm& term = state.term();
@@ -650,7 +650,7 @@ class RegexGenerator : private MacroAssembler {
     state.setBacktrackGenerated(backtrackBegin);
   }
 
-  void genertateCharacterClassSingle(TermGenerationState& state) {
+  void generateCharacterClassSingle(TermGenerationState& state) {
     const RegisterID character = regT0;
     PatternTerm& term = state.term();
 
@@ -666,7 +666,7 @@ class RegexGenerator : private MacroAssembler {
     }
   }
 
-  void genertateCharacterClassFixed(TermGenerationState& state) {
+  void generateCharacterClassFixed(TermGenerationState& state) {
     const RegisterID character = regT0;
     const RegisterID countRegister = regT1;
     PatternTerm& term = state.term();
@@ -693,7 +693,7 @@ class RegexGenerator : private MacroAssembler {
     branch32(NotEqual, countRegister, index).linkTo(loop, this);
   }
 
-  void genertateCharacterClassGreedy(TermGenerationState& state) {
+  void generateCharacterClassGreedy(TermGenerationState& state) {
     const RegisterID character = regT0;
     const RegisterID countRegister = regT1;
     PatternTerm& term = state.term();
@@ -734,7 +734,7 @@ class RegexGenerator : private MacroAssembler {
     state.setBacktrackGenerated(backtrackBegin);
   }
 
-  void genertateCharacterClassNonGreedy(TermGenerationState& state) {
+  void generateCharacterClassNonGreedy(TermGenerationState& state) {
     const RegisterID character = regT0;
     const RegisterID countRegister = regT1;
     PatternTerm& term = state.term();
@@ -1056,15 +1056,15 @@ class RegexGenerator : private MacroAssembler {
 
     switch (term.type) {
       case PatternTerm::TypeAssertionBOL:
-        genertateAssertionBOL(state);
+        generateAssertionBOL(state);
         break;
 
       case PatternTerm::TypeAssertionEOL:
-        genertateAssertionEOL(state);
+        generateAssertionEOL(state);
         break;
 
       case PatternTerm::TypeAssertionWordBoundary:
-        genertateAssertionWordBoundary(state);
+        generateAssertionWordBoundary(state);
         break;
 
       case PatternTerm::TypePatternCharacter:
@@ -1074,18 +1074,18 @@ class RegexGenerator : private MacroAssembler {
               if (state.isSinglePatternCharacterLookaheadTerm() &&
                   (state.lookaheadTerm().inputPosition ==
                    (term.inputPosition + 1))) {
-                genertatePatternCharacterPair(state);
+                generatePatternCharacterPair(state);
                 state.nextTerm();
               } else
-                genertatePatternCharacterSingle(state);
+                generatePatternCharacterSingle(state);
             } else
-              genertatePatternCharacterFixed(state);
+              generatePatternCharacterFixed(state);
             break;
           case QuantifierGreedy:
-            genertatePatternCharacterGreedy(state);
+            generatePatternCharacterGreedy(state);
             break;
           case QuantifierNonGreedy:
-            genertatePatternCharacterNonGreedy(state);
+            generatePatternCharacterNonGreedy(state);
             break;
         }
         break;
@@ -1094,15 +1094,15 @@ class RegexGenerator : private MacroAssembler {
         switch (term.quantityType) {
           case QuantifierFixedCount:
             if (term.quantityCount == 1)
-              genertateCharacterClassSingle(state);
+              generateCharacterClassSingle(state);
             else
-              genertateCharacterClassFixed(state);
+              generateCharacterClassFixed(state);
             break;
           case QuantifierGreedy:
-            genertateCharacterClassGreedy(state);
+            generateCharacterClassGreedy(state);
             break;
           case QuantifierNonGreedy:
-            genertateCharacterClassNonGreedy(state);
+            generateCharacterClassNonGreedy(state);
             break;
         }
         break;
