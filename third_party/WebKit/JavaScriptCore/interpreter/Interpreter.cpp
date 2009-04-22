@@ -32,12 +32,14 @@
 
 #include "Arguments.h"
 #include "BatchedTransitionOptimizer.h"
+#include "CallFrame.h"
 #include "CallFrameClosure.h"
 #include "CodeBlock.h"
+#include "Collector.h"
+#include "Debugger.h"
 #include "DebuggerCallFrame.h"
 #include "EvalCodeCache.h"
 #include "ExceptionHelpers.h"
-#include "CallFrame.h"
 #include "GlobalEvalFunction.h"
 #include "JSActivation.h"
 #include "JSArray.h"
@@ -48,16 +50,15 @@
 #include "JSStaticScopeObject.h"
 #include "JSString.h"
 #include "ObjectPrototype.h"
+#include "Operations.h"
 #include "Parser.h"
 #include "Profiler.h"
 #include "RegExpObject.h"
 #include "RegExpPrototype.h"
 #include "Register.h"
-#include "Collector.h"
-#include "Debugger.h"
-#include "Operations.h"
 #include "SamplingTool.h"
 #include <stdio.h>
+#include <wtf/Threading.h>
 
 #if ENABLE(JIT)
 #include "JIT.h"
@@ -693,9 +694,11 @@ JSValuePtr Interpreter::execute(ProgramNode* programNode,
                                 JSValuePtr* exception) {
   ASSERT(!scopeChain->globalData->exception);
 
-  if (m_reentryDepth >= MaxReentryDepth) {
-    *exception = createStackOverflowError(callFrame);
-    return jsNull();
+  if (m_reentryDepth >= MaxSecondaryThreadReentryDepth) {
+    if (!isMainThread() || m_reentryDepth >= MaxMainThreadReentryDepth) {
+      *exception = createStackOverflowError(callFrame);
+      return jsNull();
+    }
   }
 
   CodeBlock* codeBlock = &programNode->bytecode(scopeChain);
@@ -766,9 +769,11 @@ JSValuePtr Interpreter::execute(FunctionBodyNode* functionBodyNode,
                                 JSValuePtr* exception) {
   ASSERT(!scopeChain->globalData->exception);
 
-  if (m_reentryDepth >= MaxReentryDepth) {
-    *exception = createStackOverflowError(callFrame);
-    return jsNull();
+  if (m_reentryDepth >= MaxSecondaryThreadReentryDepth) {
+    if (!isMainThread() || m_reentryDepth >= MaxMainThreadReentryDepth) {
+      *exception = createStackOverflowError(callFrame);
+      return jsNull();
+    }
   }
 
   Register* oldEnd = m_registerFile.end();
@@ -840,9 +845,11 @@ CallFrameClosure Interpreter::prepareForRepeatCall(
     JSValuePtr* exception) {
   ASSERT(!scopeChain->globalData->exception);
 
-  if (m_reentryDepth >= MaxReentryDepth) {
-    *exception = createStackOverflowError(callFrame);
-    return CallFrameClosure();
+  if (m_reentryDepth >= MaxSecondaryThreadReentryDepth) {
+    if (!isMainThread() || m_reentryDepth >= MaxMainThreadReentryDepth) {
+      *exception = createStackOverflowError(callFrame);
+      return CallFrameClosure();
+    }
   }
 
   Register* oldEnd = m_registerFile.end();
@@ -938,9 +945,11 @@ JSValuePtr Interpreter::execute(EvalNode* evalNode,
                                 JSValuePtr* exception) {
   ASSERT(!scopeChain->globalData->exception);
 
-  if (m_reentryDepth >= MaxReentryDepth) {
-    *exception = createStackOverflowError(callFrame);
-    return jsNull();
+  if (m_reentryDepth >= MaxSecondaryThreadReentryDepth) {
+    if (!isMainThread() || m_reentryDepth >= MaxMainThreadReentryDepth) {
+      *exception = createStackOverflowError(callFrame);
+      return jsNull();
+    }
   }
 
   DynamicGlobalObjectScope globalObjectScope(

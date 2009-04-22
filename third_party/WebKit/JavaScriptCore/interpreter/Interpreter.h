@@ -63,7 +63,7 @@ enum DebugHookID {
   WillExecuteStatement
 };
 
-enum { MaxReentryDepth = 64 };
+enum { MaxMainThreadReentryDepth = 256, MaxSecondaryThreadReentryDepth = 32 };
 
 class Interpreter {
   friend class JIT;
