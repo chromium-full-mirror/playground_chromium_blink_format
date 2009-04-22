@@ -120,10 +120,10 @@ HRESULT STDMETHODCALLTYPE WebActionPropertyBag::Read(LPCOLESTR pszPropName,
   }
   if (isEqual(pszPropName, WebActionElementKey)) {
     if (const MouseEvent* mouseEvent = findMouseEvent(m_action.event())) {
-      IntPoint point(mouseEvent->clientX(), mouseEvent->clientY());
       V_VT(pVar) = VT_UNKNOWN;
       V_UNKNOWN(pVar) = WebElementPropertyBag::createInstance(
-          m_frame->eventHandler()->hitTestResultAtPoint(point, false));
+          m_frame->eventHandler()->hitTestResultAtPoint(
+              mouseEvent->absoluteLocation(), false));
       return S_OK;
     }
   }
