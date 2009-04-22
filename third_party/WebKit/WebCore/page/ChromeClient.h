@@ -20,6 +20,7 @@
 #ifndef ChromeClient_h
 #define ChromeClient_h
 
+#include "Cursor.h"
 #include "GraphicsContext.h"
 #include "FocusDirection.h"
 #include "ScrollTypes.h"
@@ -187,6 +188,8 @@ class ChromeClient {
   virtual void requestGeolocationPermissionForFrame(Frame*, Geolocation*) {}
 
   virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>) = 0;
+
+  virtual bool setCursor(PlatformCursorHandle) { return false; }
 
   // Notification that the given form element has changed. This function
   // will be called frequently, so handling should be very fast.

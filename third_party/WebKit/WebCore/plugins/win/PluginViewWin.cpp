@@ -597,8 +597,6 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
   } else
     return;
 
-  HCURSOR currentCursor = ::GetCursor();
-
   JSC::JSLock::DropAllLocks dropAllLocks(false);
   if (!dispatchNPEvent(npEvent))
     event->setDefaultHandled();
