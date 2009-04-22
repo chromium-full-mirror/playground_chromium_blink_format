@@ -567,10 +567,7 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
           break;
       }
   } else if (event->type() == eventNames().mousedownEvent) {
-    // Focus the plugin
-    if (Page* page = m_parentFrame->page())
-      page->focusController()->setFocusedFrame(m_parentFrame);
-    m_parentFrame->document()->setFocusedNode(m_element);
+    focusPluginElement();
     switch (event->button()) {
       case 0:
         npEvent.event = WM_LBUTTONDOWN;
