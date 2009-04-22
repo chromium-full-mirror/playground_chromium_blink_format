@@ -112,9 +112,15 @@ HRESULT STDMETHODCALLTYPE DOMNode::QueryInterface(REFIID riid,
 // DOMNode --------------------------------------------------------------------
 
 HRESULT STDMETHODCALLTYPE DOMNode::nodeName(
-    /* [retval][out] */ BSTR* /*result*/) {
-  ASSERT_NOT_REACHED();
-  return E_NOTIMPL;
+    /* [retval][out] */ BSTR* result) {
+  if (!result)
+    return E_POINTER;
+
+  if (!m_node)
+    return E_FAIL;
+
+  *result = BString(m_node->nodeName()).release();
+  return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::nodeValue(
