@@ -129,7 +129,9 @@ int RegExp::match(const UString& s,
 #else
   if (m_regExpBytecode) {
 #endif
-    int offsetVectorSize = (m_numSubpatterns + 1) * 2;
+    int offsetVectorSize =
+        (m_numSubpatterns + 1) *
+        3;  // FIXME: should be 2 - but adding temporary fallback to pcre.
     int* offsetVector = new int[offsetVectorSize];
     ASSERT(offsetVector);
     for (int j = 0; j < offsetVectorSize; ++j)
@@ -143,7 +145,7 @@ int RegExp::match(const UString& s,
 
 #if ENABLE(YARR_JIT)
     int result = Yarr::executeRegex(m_regExpJITCode, s.data(), startOffset,
-                                    s.size(), offsetVector);
+                                    s.size(), offsetVector, offsetVectorSize);
 #else
     int result = Yarr::interpretRegex(m_regExpBytecode.get(), s.data(),
                                       startOffset, s.size(), offsetVector);
