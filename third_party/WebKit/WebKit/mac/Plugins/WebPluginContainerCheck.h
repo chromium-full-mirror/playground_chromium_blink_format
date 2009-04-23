@@ -53,15 +53,15 @@
 
 + (id)checkWithRequest:(NSURLRequest*)request
                 target:(NSString*)target
-          resultObject:(id<WebPluginContainerCheckController>)obj
+          resultObject:(id)obj
               selector:(SEL)selector
-            controller:(id)controller;
+            controller:(id<WebPluginContainerCheckController>)controller;
 
 - (id)initWithRequest:(NSURLRequest*)request
                target:(NSString*)target
-         resultObject:(id<WebPluginContainerCheckController>)obj
+         resultObject:(id)obj
              selector:(SEL)selector
-           controller:(id)controller;
+           controller:(id<WebPluginContainerCheckController>)controller;
 
 - (void)start;
 
