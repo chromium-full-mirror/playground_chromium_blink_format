@@ -142,6 +142,10 @@ class BitmapImage : public Image {
   virtual bool getHBITMAPOfSize(HBITMAP, LPSIZE);
 #endif
 
+#if PLATFORM(GTK)
+  virtual GdkPixbuf* getGdkPixbuf();
+#endif
+
   virtual NativeImagePtr nativeImageForCurrentFrame() {
     return frameAtIndex(currentFrame());
   }
