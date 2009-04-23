@@ -117,6 +117,9 @@ void ResourceRequest::doUpdatePlatformRequest() {
     cfRequest = CFURLRequestCreateMutableCopy(0, m_cfRequest.get());
     CFURLRequestSetURL(cfRequest, url.get());
     CFURLRequestSetMainDocumentURL(cfRequest, mainDocumentURL.get());
+    CFURLRequestSetCachePolicy(cfRequest,
+                               (CFURLRequestCachePolicy)cachePolicy());
+    CFURLRequestSetTimeoutInterval(cfRequest, timeoutInterval());
   } else {
     cfRequest = CFURLRequestCreateMutable(
         0, url.get(), (CFURLRequestCachePolicy)cachePolicy(), timeoutInterval(),
