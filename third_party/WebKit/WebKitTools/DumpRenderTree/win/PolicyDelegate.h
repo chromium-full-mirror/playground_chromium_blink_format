@@ -72,12 +72,10 @@ class PolicyDelegate : public IWebPolicyDelegate {
   virtual HRESULT STDMETHODCALLTYPE unableToImplementPolicyWithError(
       /* [in] */ IWebView* webView,
       /* [in] */ IWebError* error,
-      /* [in] */ IWebFrame* frame)
+      /* [in] */ IWebFrame* frame);
 
-      // PolicyDelegate
-      void setPermissive(bool permissive) {
-    m_permissiveDelegate = permissive;
-  }
+  // PolicyDelegate
+  void setPermissive(bool permissive) { m_permissiveDelegate = permissive; }
   void setControllerToNotifyDone(LayoutTestController* controller) {
     m_controllerToNotifyDone = controller;
   }
