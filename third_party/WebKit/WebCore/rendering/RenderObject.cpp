@@ -2509,7 +2509,8 @@ VisiblePosition RenderObject::createVisiblePosition(int offset,
       if (renderer == parent)
         break;
       if (Node* node = renderer->node())
-        return VisiblePosition(node, numeric_limits<int>::max(), DOWNSTREAM);
+        return VisiblePosition(lastDeepEditingPositionForNode(node),
+                               DOWNSTREAM);
     }
 
     // Use the parent itself unless it too is anonymous.
