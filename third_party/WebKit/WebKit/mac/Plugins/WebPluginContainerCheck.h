@@ -30,13 +30,21 @@
 
 @class NSURLRequest;
 @class NSString;
-@class WebPluginController;
+@class WebFrame;
+@class WebView;
 @class WebPolicyDecisionListener;
+
+@protocol WebPluginContainerCheckController<NSObject>
+- (void)_webPluginContainerCancelCheckIfAllowedToLoadRequest:
+    (id)checkIdentifier;
+- (WebFrame*)webFrame;
+- (WebView*)webView;
+@end
 
 @interface WebPluginContainerCheck : NSObject {
   NSURLRequest* _request;
   NSString* _target;
-  WebPluginController* _controller;
+  id<WebPluginContainerCheckController> _controller;
   id _resultObject;
   SEL _resultSelector;
   BOOL _done;
@@ -45,15 +53,15 @@
 
 + (id)checkWithRequest:(NSURLRequest*)request
                 target:(NSString*)target
-          resultObject:(id)obj
+          resultObject:(id<WebPluginContainerCheckController>)obj
               selector:(SEL)selector
-            controller:(WebPluginController*)controller;
+            controller:(id)controller;
 
 - (id)initWithRequest:(NSURLRequest*)request
                target:(NSString*)target
-         resultObject:(id)obj
+         resultObject:(id<WebPluginContainerCheckController>)obj
              selector:(SEL)selector
-           controller:(WebPluginController*)controller;
+           controller:(id)controller;
 
 - (void)start;
 
