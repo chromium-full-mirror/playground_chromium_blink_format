@@ -923,13 +923,13 @@ void QWebElement::append(QWebElement element) {
 }
 
 /*!
-    Appends the result of parsing \a html as the element's last child.
+    Appends the result of parsing \a markup as the element's last child.
 
     Calling this function on a null element does nothing.
 
     \sa prepend(), insertBefore(), insertAfter()
 */
-void QWebElement::append(const QString& html) {
+void QWebElement::append(const QString& markup) {
   if (!m_element)
     return;
 
@@ -938,7 +938,7 @@ void QWebElement::append(const QString& html) {
 
   HTMLElement* htmlElement = static_cast<HTMLElement*>(m_element);
   RefPtr<DocumentFragment> fragment =
-      htmlElement->createContextualFragment(html);
+      htmlElement->createContextualFragment(markup);
 
   ExceptionCode exception = 0;
   m_element->appendChild(fragment, exception);
@@ -965,13 +965,13 @@ void QWebElement::prepend(QWebElement element) {
 }
 
 /*!
-    Prepends the result of parsing \a html as the element's first child.
+    Prepends the result of parsing \a markup as the element's first child.
 
     Calling this function on a null element does nothing.
 
     \sa append(), insertBefore(), insertAfter()
 */
-void QWebElement::prepend(const QString& html) {
+void QWebElement::prepend(const QString& markup) {
   if (!m_element)
     return;
 
@@ -980,7 +980,7 @@ void QWebElement::prepend(const QString& html) {
 
   HTMLElement* htmlElement = static_cast<HTMLElement*>(m_element);
   RefPtr<DocumentFragment> fragment =
-      htmlElement->createContextualFragment(html);
+      htmlElement->createContextualFragment(markup);
 
   ExceptionCode exception = 0;
   m_element->insertBefore(fragment, m_element->firstChild(), exception);
@@ -1008,13 +1008,13 @@ void QWebElement::insertBefore(QWebElement element) {
 }
 
 /*!
-    Inserts the result of parsing \a html before this element.
+    Inserts the result of parsing \a markup before this element.
 
     Calling this function on a null element does nothing.
 
     \sa append(), prepend(), insertAfter()
 */
-void QWebElement::insertBefore(const QString& html) {
+void QWebElement::insertBefore(const QString& markup) {
   if (!m_element)
     return;
 
@@ -1026,7 +1026,7 @@ void QWebElement::insertBefore(const QString& html) {
 
   HTMLElement* htmlElement = static_cast<HTMLElement*>(m_element);
   RefPtr<DocumentFragment> fragment =
-      htmlElement->createContextualFragment(html);
+      htmlElement->createContextualFragment(markup);
 
   ExceptionCode exception = 0;
   m_element->parent()->insertBefore(fragment, m_element, exception);
@@ -1058,13 +1058,13 @@ void QWebElement::insertAfter(QWebElement element) {
 }
 
 /*!
-    Inserts the result of parsing \a html after this element.
+    Inserts the result of parsing \a markup after this element.
 
     Calling this function on a null element does nothing.
 
     \sa append(), prepend(), insertBefore()
 */
-void QWebElement::insertAfter(const QString& html) {
+void QWebElement::insertAfter(const QString& markup) {
   if (!m_element)
     return;
 
@@ -1076,7 +1076,7 @@ void QWebElement::insertAfter(const QString& html) {
 
   HTMLElement* htmlElement = static_cast<HTMLElement*>(m_element);
   RefPtr<DocumentFragment> fragment =
-      htmlElement->createContextualFragment(html);
+      htmlElement->createContextualFragment(markup);
 
   ExceptionCode exception = 0;
   m_element->parent()->insertBefore(fragment, m_element->nextSibling(),
