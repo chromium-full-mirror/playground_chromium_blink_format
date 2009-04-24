@@ -107,6 +107,8 @@ TextIterator::TextIterator()
       m_endContainer(0),
       m_endOffset(0),
       m_positionNode(0),
+      m_textCharacters(0),
+      m_textLength(0),
       m_lastCharacter(0),
       m_emitCharactersBetweenAllVisiblePositions(false),
       m_enterTextControls(false) {}
@@ -120,6 +122,8 @@ TextIterator::TextIterator(const Range* r,
       m_endContainer(0),
       m_endOffset(0),
       m_positionNode(0),
+      m_textCharacters(0),
+      m_textLength(0),
       m_emitCharactersBetweenAllVisiblePositions(
           emitCharactersBetweenAllVisiblePositions),
       m_enterTextControls(enterTextControls) {
