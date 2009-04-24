@@ -43,7 +43,7 @@
 #include "HTMLImageElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
-#include "JSLazyEventListener.h"
+#include "ScriptEventListener.h"
 #include "MIMETypeRegistry.h"
 #include "Page.h"
 #include "RenderTextControl.h"
