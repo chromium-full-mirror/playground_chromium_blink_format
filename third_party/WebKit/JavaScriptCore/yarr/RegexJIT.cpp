@@ -1009,7 +1009,7 @@ class RegexGenerator : private MacroAssembler {
     unsigned parenthesesFrameLocation = term.frameLocation;
     unsigned alternativeFrameLocation =
         parenthesesFrameLocation +
-        RegexStackSpaceForBackTrackInfoParentheticalAssertionOnce;
+        RegexStackSpaceForBackTrackInfoParentheticalAssertion;
 
     int countCheckedAfterAssertion = state.checkedTotal - term.inputPosition;
 

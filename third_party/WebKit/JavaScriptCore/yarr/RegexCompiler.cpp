@@ -642,7 +642,7 @@ class RegexPatternConstructor {
           currentCallFrameSize = setupDisjunctionOffsets(
               term.parentheses.disjunction,
               currentCallFrameSize +
-                  RegexStackSpaceForBackTrackInfoParentheticalAssertionOnce,
+                  RegexStackSpaceForBackTrackInfoParentheticalAssertion,
               currentInputPosition);
           break;
       }
