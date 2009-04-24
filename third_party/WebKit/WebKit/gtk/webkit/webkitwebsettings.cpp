@@ -77,6 +77,8 @@ struct _WebKitWebSettingsPrivate {
   gboolean enable_developer_extras;
   gboolean enable_private_browsing;
   gboolean enable_spell_checking;
+  gchar* spell_checking_languages;
+  GSList* spell_checking_languages_list;
 };
 
 #define WEBKIT_WEB_SETTINGS_GET_PRIVATE(obj)                    \
@@ -108,7 +110,8 @@ enum {
   PROP_ZOOM_STEP,
   PROP_ENABLE_DEVELOPER_EXTRAS,
   PROP_ENABLE_PRIVATE_BROWSING,
-  PROP_ENABLE_SPELL_CHECKING
+  PROP_ENABLE_SPELL_CHECKING,
+  PROP_SPELL_CHECKING_LANGUAGES
 };
 
 static void webkit_web_settings_finalize(GObject* object);
@@ -322,6 +325,28 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
                            _("Enables check-as-you-type spell checking"), FALSE,
                            flags));
 
+  /**
+  * WebKitWebSettings:spell-checking-languages:
+  *
+  * The languages to be used for spell checking, separated by commas.
+  *
+  * The locale string typically is in the form lang_COUNTRY, where lang
+  * is an ISO-639 language code, and COUNTRY is an ISO-3166 country code.
+  * For instance, sv_FI for Swedish as written in Finland or pt_BR
+  * for Portuguese as written in Brazil.
+  *
+  * If no value is specified then the value returned by
+  * pango_language_get_default will be used.
+  *
+  * Since 1.1.6
+  */
+  g_object_class_install_property(
+      gobject_class, PROP_SPELL_CHECKING_LANGUAGES,
+      g_param_spec_string(
+          "spell-checking-languages", _("Languages to use for spell checking"),
+          _("Comma separated list of languages to use for spell checking"), 0,
+          flags));
+
   g_type_class_add_private(klass, sizeof(WebKitWebSettingsPrivate));
 }
 
@@ -341,6 +366,9 @@ static void webkit_web_settings_finalize(GObject* object) {
   g_free(priv->sans_serif_font_family);
   g_free(priv->serif_font_family);
   g_free(priv->user_stylesheet_uri);
+  g_free(priv->spell_checking_languages);
+
+  g_slist_free(priv->spell_checking_languages_list);
 
   G_OBJECT_CLASS(webkit_web_settings_parent_class)->finalize(object);
 }
@@ -351,6 +379,8 @@ static void webkit_web_settings_set_property(GObject* object,
                                              GParamSpec* pspec) {
   WebKitWebSettings* web_settings = WEBKIT_WEB_SETTINGS(object);
   WebKitWebSettingsPrivate* priv = web_settings->priv;
+  SpellLanguage* lang;
+  GSList* spellLanguages = NULL;
 
   switch (prop_id) {
     case PROP_DEFAULT_ENCODING:
@@ -429,6 +459,33 @@ static void webkit_web_settings_set_property(GObject* object,
       break;
     case PROP_ENABLE_SPELL_CHECKING:
       priv->enable_spell_checking = g_value_get_boolean(value);
+      break;
+    case PROP_SPELL_CHECKING_LANGUAGES:
+      priv->spell_checking_languages = g_strdup(g_value_get_string(value));
+
+      if (priv->spell_checking_languages) {
+        char** langs = g_strsplit(priv->spell_checking_languages, ",", -1);
+        for (int i = 0; langs[i]; i++) {
+          lang = g_slice_new0(SpellLanguage);
+          lang->config = enchant_broker_init();
+          lang->speller = enchant_broker_request_dict(lang->config, langs[i]);
+
+          spellLanguages = g_slist_append(spellLanguages, lang);
+        }
+
+        g_strfreev(langs);
+      } else {
+        const char* language =
+            pango_language_to_string(gtk_get_default_language());
+
+        lang = g_slice_new0(SpellLanguage);
+        lang->config = enchant_broker_init();
+        lang->speller = enchant_broker_request_dict(lang->config, language);
+
+        spellLanguages = g_slist_append(spellLanguages, lang);
+      }
+      g_slist_free(priv->spell_checking_languages_list);
+      priv->spell_checking_languages_list = spellLanguages;
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -513,6 +570,9 @@ static void webkit_web_settings_get_property(GObject* object,
     case PROP_ENABLE_SPELL_CHECKING:
       g_value_set_boolean(value, priv->enable_spell_checking);
       break;
+    case PROP_SPELL_CHECKING_LANGUAGES:
+      g_value_set_string(value, priv->spell_checking_languages);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       break;
@@ -559,7 +619,10 @@ WebKitWebSettings* webkit_web_settings_copy(WebKitWebSettings* web_settings) {
       priv->user_stylesheet_uri, "zoom-step", priv->zoom_step,
       "enable-developer-extras", priv->enable_developer_extras,
       "enable-private-browsing", priv->enable_private_browsing,
-      "enable-spell-checking", priv->enable_spell_checking, NULL));
+      "enable-spell-checking", priv->enable_spell_checking,
+      "spell-checking-languages", priv->spell_checking_languages,
+      "spell-checking-languages-list", priv->spell_checking_languages_list,
+      NULL));
 
   return copy;
 }
@@ -579,5 +642,24 @@ void webkit_web_settings_add_extra_plugin_directory(WebKitWebView* webView,
 
   PluginDatabase::installedPlugins()->addExtraPluginDirectory(
       filenameToString(directory));
+}
+
+/**
+ * webkit_web_settings_get_spell_languages:
+ * @web_view: a #WebKitWebView
+ *
+ * Internal use only. Retrieves a GSList of SpellLanguages from the
+ * #WebKitWebSettings of @web_view.
+ *
+ * Since: 1.1.6
+ */
+GSList* webkit_web_settings_get_spell_languages(WebKitWebView* web_view) {
+  g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(web_view), 0);
+
+  WebKitWebSettings* settings = webkit_web_view_get_settings(web_view);
+  WebKitWebSettingsPrivate* priv = settings->priv;
+  GSList* list = priv->spell_checking_languages_list;
+
+  return list;
 }
 }
