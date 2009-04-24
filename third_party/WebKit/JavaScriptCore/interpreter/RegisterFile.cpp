@@ -54,7 +54,7 @@ void RegisterFile::releaseExcessCapacity() {
   }
 #elif HAVE(VIRTUALALLOC)
   VirtualFree(memoryToRelease, size, MEM_DECOMMIT);
-  m_commitEnd = memoryToRelease;
+  m_commitEnd = reinterpret_cast<Register*>(memoryToRelease);
 #endif
 }
 
