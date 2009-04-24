@@ -216,6 +216,12 @@ void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
     // to paint itself.  That way it will composite properly with z-indexed
     // layers.
     m_widget->paint(paintInfo.context, paintInfo.rect);
+
+    if (m_widget->isFrameView() && paintInfo.overlapTestRequests &&
+        !static_cast<FrameView*>(m_widget)->useSlowRepaints()) {
+      ASSERT(!paintInfo.overlapTestRequests->contains(this));
+      paintInfo.overlapTestRequests->set(this, m_widget->frameRect());
+    }
   }
 
   if (clipToBorderRadius)
@@ -226,6 +232,12 @@ void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
     // FIXME: selectionRect() is in absolute, not painting coordinates.
     paintInfo.context->fillRect(selectionRect(), selectionBackgroundColor());
   }
+}
+
+void RenderWidget::setOverlapTestResult(bool isOverlapped) {
+  ASSERT(m_widget);
+  ASSERT(m_widget->isFrameView());
+  static_cast<FrameView*>(m_widget)->setIsOverlapped(isOverlapped);
 }
 
 void RenderWidget::deref(RenderArena* arena) {

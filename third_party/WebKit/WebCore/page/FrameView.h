@@ -151,6 +151,7 @@ class FrameView : public ScrollView {
   void setMediaType(const String&);
 
   void setUseSlowRepaints();
+  void setIsOverlapped(bool);
 
   void addSlowRepaintObject();
   void removeSlowRepaintObject();
@@ -207,6 +208,7 @@ class FrameView : public ScrollView {
 
   virtual bool isFrameView() const;
 
+  friend class RenderWidget;
   bool useSlowRepaints() const;
 
   void applyOverflowToViewport(RenderObject*,
@@ -246,6 +248,7 @@ class FrameView : public ScrollView {
   ScrollbarMode m_vmode;
   ScrollbarMode m_hmode;
   bool m_useSlowRepaints;
+  bool m_isOverlapped;
   unsigned m_slowRepaintObjectCount;
 
   int m_borderX, m_borderY;

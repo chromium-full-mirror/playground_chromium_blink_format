@@ -42,6 +42,7 @@ class AnimationController;
 class HitTestResult;
 class InlineBox;
 class InlineFlowBox;
+class OverlapTestRequestClient;
 class Position;
 class RenderBoxModelObject;
 class RenderInline;
@@ -499,6 +500,8 @@ class RenderObject : public CachedResourceClient {
   virtual int baselinePosition(bool firstLine,
                                bool isRootLineBox = false) const;
 
+  typedef HashMap<OverlapTestRequestClient*, IntRect> OverlapTestRequestMap;
+
   /*
    * Paint the object and its children, clipped by (x|y|w|h).
    * (tx|ty) is the calculated position of the parent
@@ -509,13 +512,15 @@ class RenderObject : public CachedResourceClient {
               PaintPhase newPhase,
               bool newForceBlackText,
               RenderObject* newPaintingRoot,
-              ListHashSet<RenderInline*>* newOutlineObjects)
+              ListHashSet<RenderInline*>* newOutlineObjects,
+              OverlapTestRequestMap* overlapTestRequests = 0)
         : context(newContext),
           rect(newRect),
           phase(newPhase),
           forceBlackText(newForceBlackText),
           paintingRoot(newPaintingRoot),
-          outlineObjects(newOutlineObjects) {}
+          outlineObjects(newOutlineObjects),
+          overlapTestRequests(overlapTestRequests) {}
 
     GraphicsContext* context;
     IntRect rect;
@@ -526,6 +531,7 @@ class RenderObject : public CachedResourceClient {
     ListHashSet<RenderInline*>* outlineObjects;  // used to list outlines that
                                                  // should be painted by a block
                                                  // with inline children
+    OverlapTestRequestMap* overlapTestRequests;
   };
 
   virtual void paint(PaintInfo&, int tx, int ty);

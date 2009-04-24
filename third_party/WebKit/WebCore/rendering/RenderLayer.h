@@ -501,6 +501,7 @@ class RenderLayer : public ScrollbarClient {
                   bool haveTransparency,
                   PaintRestriction,
                   RenderObject* paintingRoot,
+                  RenderObject::OverlapTestRequestMap* = 0,
                   bool appliedTransform = false,
                   bool temporaryClipRects = false);
 
