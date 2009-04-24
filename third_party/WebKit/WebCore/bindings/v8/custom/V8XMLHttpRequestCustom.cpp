@@ -73,7 +73,7 @@ ACCESSOR_GETTER(XMLHttpRequestOnabort) {
     v8::Local<v8::Object> v8Listener = listener->getListenerObject();
     return v8Listener;
   }
-  return v8::Undefined();
+  return v8::Null();
 }
 
 ACCESSOR_SETTER(XMLHttpRequestOnabort) {
@@ -112,7 +112,7 @@ ACCESSOR_GETTER(XMLHttpRequestOnerror) {
     v8::Local<v8::Object> v8Listener = listener->getListenerObject();
     return v8Listener;
   }
-  return v8::Undefined();
+  return v8::Null();
 }
 
 ACCESSOR_SETTER(XMLHttpRequestOnerror) {
@@ -151,7 +151,7 @@ ACCESSOR_GETTER(XMLHttpRequestOnload) {
     v8::Local<v8::Object> v8Listener = listener->getListenerObject();
     return v8Listener;
   }
-  return v8::Undefined();
+  return v8::Null();
 }
 
 ACCESSOR_SETTER(XMLHttpRequestOnload) {
@@ -190,7 +190,7 @@ ACCESSOR_GETTER(XMLHttpRequestOnloadstart) {
     v8::Local<v8::Object> v8Listener = listener->getListenerObject();
     return v8Listener;
   }
-  return v8::Undefined();
+  return v8::Null();
 }
 
 ACCESSOR_SETTER(XMLHttpRequestOnloadstart) {
@@ -229,7 +229,7 @@ ACCESSOR_GETTER(XMLHttpRequestOnprogress) {
     v8::Local<v8::Object> v8Listener = listener->getListenerObject();
     return v8Listener;
   }
-  return v8::Undefined();
+  return v8::Null();
 }
 
 ACCESSOR_SETTER(XMLHttpRequestOnprogress) {
@@ -268,7 +268,7 @@ ACCESSOR_GETTER(XMLHttpRequestOnreadystatechange) {
     v8::Local<v8::Object> v8Listener = listener->getListenerObject();
     return v8Listener;
   }
-  return v8::Undefined();
+  return v8::Null();
 }
 
 ACCESSOR_SETTER(XMLHttpRequestOnreadystatechange) {
