@@ -120,6 +120,9 @@ class RegisterFile : Noncopyable {
   static const size_t defaultCapacity = 524288;
   static const size_t defaultMaxGlobals = 8192;
   static const size_t commitSize = 1 << 14;
+  // Allow 8k of excess registers before we start trying to reap the
+  // registerfile
+  static const ptrdiff_t maxExcessCapacity = 8 * 1024;
 
   RegisterFile(size_t capacity = defaultCapacity,
                size_t maxGlobals = defaultMaxGlobals);
@@ -149,12 +152,15 @@ class RegisterFile : Noncopyable {
   void markCallFrames(Heap* heap) { heap->markConservatively(m_start, m_end); }
 
  private:
+  void releaseExcessCapacity();
   size_t m_numGlobals;
   const size_t m_maxGlobals;
   Register* m_start;
   Register* m_end;
   Register* m_max;
   Register* m_buffer;
+  Register* m_maxUsed;
+
 #if HAVE(VIRTUALALLOC)
   Register* m_commitEnd;
 #endif
@@ -203,12 +209,15 @@ inline RegisterFile::RegisterFile(size_t capacity, size_t maxGlobals)
 #endif
   m_start = m_buffer + maxGlobals;
   m_end = m_start;
+  m_maxUsed = m_end;
   m_max = m_start + capacity;
 }
 
 inline void RegisterFile::shrink(Register* newEnd) {
   if (newEnd < m_end)
     m_end = newEnd;
+  if (m_end == m_start && (m_maxUsed - m_start) > maxExcessCapacity)
+    releaseExcessCapacity();
 }
 
 inline bool RegisterFile::grow(Register* newEnd) {
@@ -231,6 +240,9 @@ inline bool RegisterFile::grow(Register* newEnd) {
         reinterpret_cast<char*>(m_commitEnd) + size);
   }
 #endif
+
+  if (newEnd > m_maxUsed)
+    m_maxUsed = newEnd;
 
   m_end = newEnd;
   return true;
