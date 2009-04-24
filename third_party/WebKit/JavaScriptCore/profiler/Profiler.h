@@ -36,46 +36,40 @@
 
 namespace JSC {
 
-class CallIdentifier;
-class ExecState;
-class JSGlobalData;
-class JSObject;
-class JSValuePtr;
-class ProfileGenerator;
-class UString;
+    class CallIdentifier;
+    class ExecState;
+    class JSGlobalData;
+    class JSObject;
+    class JSValuePtr;
+    class ProfileGenerator;
+    class UString;
 
-class Profiler {
- public:
-  static Profiler** enabledProfilerReference() {
-    return &s_sharedEnabledProfilerReference;
-  }
+    class Profiler {
+    public:
+        static Profiler** enabledProfilerReference()
+        {
+            return &s_sharedEnabledProfilerReference;
+        }
 
-  static Profiler* profiler();
-  static CallIdentifier createCallIdentifier(JSGlobalData*,
-                                             JSValuePtr,
-                                             const UString& sourceURL,
-                                             int lineNumber);
+        static Profiler* profiler(); 
+        static CallIdentifier createCallIdentifier(JSGlobalData*, JSValuePtr, const UString& sourceURL, int lineNumber);
 
-  void startProfiling(ExecState*, const UString& title);
-  PassRefPtr<Profile> stopProfiling(ExecState*, const UString& title);
+        void startProfiling(ExecState*, const UString& title);
+        PassRefPtr<Profile> stopProfiling(ExecState*, const UString& title);
 
-  void willExecute(ExecState*, JSValuePtr function);
-  void willExecute(ExecState*,
-                   const UString& sourceURL,
-                   int startingLineNumber);
-  void didExecute(ExecState*, JSValuePtr function);
-  void didExecute(ExecState*, const UString& sourceURL, int startingLineNumber);
+        void willExecute(ExecState*, JSValuePtr function);
+        void willExecute(ExecState*, const UString& sourceURL, int startingLineNumber);
+        void didExecute(ExecState*, JSValuePtr function);
+        void didExecute(ExecState*, const UString& sourceURL, int startingLineNumber);
 
-  const Vector<RefPtr<ProfileGenerator>>& currentProfiles() {
-    return m_currentProfiles;
-  };
+        const Vector<RefPtr<ProfileGenerator> >& currentProfiles() { return m_currentProfiles; };
 
- private:
-  Vector<RefPtr<ProfileGenerator>> m_currentProfiles;
-  static Profiler* s_sharedProfiler;
-  static Profiler* s_sharedEnabledProfilerReference;
-};
+    private:
+        Vector<RefPtr<ProfileGenerator> > m_currentProfiles;
+        static Profiler* s_sharedProfiler;
+        static Profiler* s_sharedEnabledProfilerReference;
+    };
 
-}  // namespace JSC
+} // namespace JSC
 
-#endif  // Profiler_h
+#endif // Profiler_h

@@ -217,6 +217,34 @@ static JSValueRef getChildren(JSContextRef ctx,
   return result;
 }
 
+static JSValueRef getParent(JSContextRef ctx,
+                            JSObjectRef thisObject,
+                            JSStringRef,
+                            JSValueRef*) {
+  JSC::JSLock lock(false);
+
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
+    return JSValueMakeUndefined(ctx);
+
+  ProfileNode* profileNode =
+      static_cast<ProfileNode*>(JSObjectGetPrivate(thisObject));
+  return toRef(toJS(toJS(ctx), profileNode->parent()));
+}
+
+static JSValueRef getHead(JSContextRef ctx,
+                          JSObjectRef thisObject,
+                          JSStringRef,
+                          JSValueRef*) {
+  JSC::JSLock lock(false);
+
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
+    return JSValueMakeUndefined(ctx);
+
+  ProfileNode* profileNode =
+      static_cast<ProfileNode*>(JSObjectGetPrivate(thisObject));
+  return toRef(toJS(toJS(ctx), profileNode->head()));
+}
+
 static JSValueRef getVisible(JSContextRef ctx,
                              JSObjectRef thisObject,
                              JSStringRef,
@@ -229,6 +257,20 @@ static JSValueRef getVisible(JSContextRef ctx,
   ProfileNode* profileNode =
       static_cast<ProfileNode*>(JSObjectGetPrivate(thisObject));
   return JSValueMakeBoolean(ctx, profileNode->visible());
+}
+
+static JSValueRef getCallUID(JSContextRef ctx,
+                             JSObjectRef thisObject,
+                             JSStringRef,
+                             JSValueRef*) {
+  JSC::JSLock lock(false);
+
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
+    return JSValueMakeUndefined(ctx);
+
+  ProfileNode* profileNode =
+      static_cast<ProfileNode*>(JSObjectGetPrivate(thisObject));
+  return JSValueMakeNumber(ctx, profileNode->callIdentifier().hash());
 }
 
 static void finalize(JSObjectRef object) {
@@ -249,7 +291,10 @@ JSClassRef ProfileNodeClass() {
       {"selfPercent", getSelfPercent, 0, kJSPropertyAttributeNone},
       {"numberOfCalls", getNumberOfCalls, 0, kJSPropertyAttributeNone},
       {"children", getChildren, 0, kJSPropertyAttributeNone},
+      {"parent", getParent, 0, kJSPropertyAttributeNone},
+      {"head", getHead, 0, kJSClassAttributeNone},
       {"visible", getVisible, 0, kJSPropertyAttributeNone},
+      {"callUID", getCallUID, 0, kJSPropertyAttributeNone},
       {0, 0, 0, 0}};
 
   static JSClassDefinition classDefinition = {0,

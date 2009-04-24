@@ -22,7 +22,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+ 
 #ifndef Profile_h
 #define Profile_h
 
@@ -33,61 +33,40 @@
 
 namespace JSC {
 
-class Profile : public RefCounted<Profile> {
- public:
-  static PassRefPtr<Profile> create(const UString& title, unsigned uid);
-  virtual ~Profile();
+    class Profile : public RefCounted<Profile> {
+    public:
+        static PassRefPtr<Profile> create(const UString& title, unsigned uid);
+        virtual ~Profile();
 
-  const UString& title() const { return m_title; }
-  ProfileNode* head() const { return m_head.get(); }
-  void setHead(PassRefPtr<ProfileNode> head) { m_head = head; }
-  double totalTime() const { return m_head->totalTime(); }
-  unsigned int uid() const { return m_uid; }
+        const UString& title() const { return m_title; }
+        ProfileNode* head() const { return m_head.get(); }
+        void setHead(PassRefPtr<ProfileNode> head) { m_head = head; }
+        double totalTime() const { return m_head->totalTime(); }
+        unsigned int uid() const { return m_uid; }
 
-  void forEach(void (ProfileNode::*)());
-  void sortTotalTimeDescending() {
-    forEach(&ProfileNode::sortTotalTimeDescending);
-  }
-  void sortTotalTimeAscending() {
-    forEach(&ProfileNode::sortTotalTimeAscending);
-  }
-  void sortSelfTimeDescending() {
-    forEach(&ProfileNode::sortSelfTimeDescending);
-  }
-  void sortSelfTimeAscending() { forEach(&ProfileNode::sortSelfTimeAscending); }
-  void sortCallsDescending() { forEach(&ProfileNode::sortCallsDescending); }
-  void sortCallsAscending() { forEach(&ProfileNode::sortCallsAscending); }
-  void sortFunctionNameDescending() {
-    forEach(&ProfileNode::sortFunctionNameDescending);
-  }
-  void sortFunctionNameAscending() {
-    forEach(&ProfileNode::sortFunctionNameAscending);
-  }
+        void forEach(void (ProfileNode::*)());
 
-  void focus(const ProfileNode*);
-  void exclude(const ProfileNode*);
-  void restoreAll();
-
-  virtual Profile* heavyProfile() = 0;
-  virtual Profile* treeProfile() = 0;
+        void focus(const ProfileNode*);
+        void exclude(const ProfileNode*);
+        void restoreAll();
 
 #ifndef NDEBUG
-  void debugPrintData() const;
-  void debugPrintDataSampleStyle() const;
+        void debugPrintData() const;
+        void debugPrintDataSampleStyle() const;
 #endif
 
- protected:
-  Profile(const UString& title, unsigned uid);
+    protected:
+        Profile(const UString& title, unsigned uid);
 
- private:
-  void removeProfileStart();
-  void removeProfileEnd();
+    private:
+        void removeProfileStart();
+        void removeProfileEnd();
+ 
+        UString m_title;
+        RefPtr<ProfileNode> m_head;
+        unsigned int m_uid;
+    };
 
-  UString m_title;
-  RefPtr<ProfileNode> m_head;
-  unsigned int m_uid;
-};
+} // namespace JSC
 
-}  // namespace JSC
-
-#endif  // Profile_h
+#endif // Profile_h
