@@ -76,6 +76,36 @@ TextStream& operator<<(TextStream& ts, TextStreamSeparator& sep) {
   return ts;
 }
 
+template <typename ValueType>
+static void writeNameValuePair(TextStream& ts,
+                               const char* name,
+                               ValueType value) {
+  ts << " [" << name << "=" << value << "]";
+}
+
+template <typename ValueType>
+static void writeNameAndQuotedValue(TextStream& ts,
+                                    const char* name,
+                                    ValueType value) {
+  ts << " [" << name << "=\"" << value << "\"]";
+}
+
+static void writeIfNotEmpty(TextStream& ts,
+                            const char* name,
+                            const String& value) {
+  if (!value.isEmpty())
+    writeNameValuePair(ts, name, value);
+}
+
+template <typename ValueType>
+static void writeIfNotDefault(TextStream& ts,
+                              const char* name,
+                              ValueType value,
+                              ValueType defaultValue) {
+  if (value != defaultValue)
+    writeNameValuePair(ts, name, value);
+}
+
 TextStream& operator<<(TextStream& ts, const IntPoint& p) {
   return ts << "(" << p.x() << "," << p.y() << ")";
 }
@@ -214,13 +244,11 @@ static void writeStyle(TextStream& ts, const RenderObject& object) {
   const SVGRenderStyle* svgStyle = style->svgStyle();
 
   if (!object.localTransform().isIdentity())
-    ts << " [transform=" << object.localTransform() << "]";
-  if (svgStyle->imageRendering() != SVGRenderStyle::initialImageRendering()) {
-    unsigned imageRenderingAsInteger = svgStyle->imageRendering();
-    ts << " [image rendering=" << imageRenderingAsInteger << "]";
-  }
-  if (style->opacity() != RenderStyle::initialOpacity())
-    ts << " [opacity=" << style->opacity() << "]";
+    writeNameValuePair(ts, "transform", object.localTransform());
+  writeIfNotDefault(ts, "image rendering", svgStyle->imageRendering(),
+                    SVGRenderStyle::initialImageRendering());
+  writeIfNotDefault(ts, "opacity", style->opacity(),
+                    RenderStyle::initialOpacity());
   if (object.isRenderPath()) {
     const RenderPath& path = static_cast<const RenderPath&>(object);
     SVGPaintServer* strokePaintServer =
@@ -237,20 +265,15 @@ static void writeStyle(TextStream& ts, const RenderObject& object) {
       double strokeWidth = SVGRenderStyle::cssPrimitiveToLength(
           &path, svgStyle->strokeWidth(), 1.0f);
 
-      if (svgStyle->strokeOpacity() != 1.0f)
-        ts << s << "[opacity=" << svgStyle->strokeOpacity() << "]";
-      if (strokeWidth != 1.0f)
-        ts << s << "[stroke width=" << strokeWidth << "]";
-      if (svgStyle->strokeMiterLimit() != 4)
-        ts << s << "[miter limit=" << svgStyle->strokeMiterLimit() << "]";
-      if (svgStyle->capStyle() != 0)
-        ts << s << "[line cap=" << svgStyle->capStyle() << "]";
-      if (svgStyle->joinStyle() != 0)
-        ts << s << "[line join=" << svgStyle->joinStyle() << "]";
-      if (dashOffset != 0.0f)
-        ts << s << "[dash offset=" << dashOffset << "]";
+      writeIfNotDefault(ts, "opacity", svgStyle->strokeOpacity(), 1.0f);
+      writeIfNotDefault(ts, "stroke width", strokeWidth, 1.0);
+      writeIfNotDefault(ts, "miter limit", svgStyle->strokeMiterLimit(), 4.0f);
+      writeIfNotDefault(ts, "line cap", svgStyle->capStyle(), ButtCap);
+      writeIfNotDefault(ts, "line join", svgStyle->joinStyle(), MiterJoin);
+      writeIfNotDefault(ts, "dash offset", dashOffset, 0.0);
       if (!dashArray.isEmpty())
-        ts << s << "[dash array=" << dashArray << "]";
+        writeNameValuePair(ts, "dash array", dashArray);
+
       ts << "}]";
     }
     SVGPaintServer* fillPaintServer =
@@ -261,54 +284,42 @@ static void writeStyle(TextStream& ts, const RenderObject& object) {
       if (fillPaintServer)
         ts << s << *fillPaintServer;
 
-      if (style->svgStyle()->fillOpacity() != 1.0f)
-        ts << s << "[opacity=" << style->svgStyle()->fillOpacity() << "]";
-      if (style->svgStyle()->fillRule() != RULE_NONZERO)
-        ts << s << "[fill rule=" << style->svgStyle()->fillRule() << "]";
+      writeIfNotDefault(ts, "opacity", svgStyle->fillOpacity(), 1.0f);
+      writeIfNotDefault(ts, "fill rule", svgStyle->fillRule(), RULE_NONZERO);
       ts << "}]";
     }
   }
+
   if (!svgStyle->clipPath().isEmpty())
-    ts << " [clip path=\"" << svgStyle->clipPath() << "\"]";
-  if (!svgStyle->startMarker().isEmpty())
-    ts << " [start marker=" << svgStyle->startMarker() << "]";
-  if (!svgStyle->midMarker().isEmpty())
-    ts << " [middle marker=" << svgStyle->midMarker() << "]";
-  if (!svgStyle->endMarker().isEmpty())
-    ts << " [end marker=" << svgStyle->endMarker() << "]";
-  if (!svgStyle->filter().isEmpty())
-    ts << " [filter=" << svgStyle->filter() << "]";
+    writeNameAndQuotedValue(ts, "clip path", svgStyle->clipPath());
+  writeIfNotEmpty(ts, "start marker", svgStyle->startMarker());
+  writeIfNotEmpty(ts, "middle marker", svgStyle->midMarker());
+  writeIfNotEmpty(ts, "end marker", svgStyle->endMarker());
+  writeIfNotEmpty(ts, "filter", svgStyle->filter());
+}
+
+static TextStream& writePositionAndStyle(TextStream& ts,
+                                         const RenderObject& object) {
+  ts << " "
+     << object.absoluteTransform().mapRect(
+            object.repaintRectInLocalCoordinates());
+  writeStyle(ts, object);
+  return ts;
 }
 
 static TextStream& operator<<(TextStream& ts, const RenderPath& path) {
-  ts << " "
-     << path.absoluteTransform().mapRect(path.repaintRectInLocalCoordinates());
-
-  writeStyle(ts, path);
-
-  ts << " [data=\"" << path.path().debugString() << "\"]";
-
+  writePositionAndStyle(ts, path);
+  writeNameAndQuotedValue(ts, "data", path.path().debugString());
   return ts;
 }
 
 static TextStream& operator<<(TextStream& ts,
                               const RenderSVGContainer& container) {
-  ts << " "
-     << container.absoluteTransform().mapRect(
-            container.repaintRectInLocalCoordinates());
-
-  writeStyle(ts, container);
-
-  return ts;
+  return writePositionAndStyle(ts, container);
 }
 
 static TextStream& operator<<(TextStream& ts, const RenderSVGRoot& root) {
-  ts << " "
-     << root.absoluteTransform().mapRect(root.repaintRectInLocalCoordinates());
-
-  writeStyle(ts, root);
-
-  return ts;
+  return writePositionAndStyle(ts, root);
 }
 
 static TextStream& operator<<(TextStream& ts, const RenderSVGText& text) {
@@ -324,7 +335,7 @@ static TextStream& operator<<(TextStream& ts, const RenderSVGText& text) {
 
   if (text.parent() &&
       (text.parent()->style()->color() != text.style()->color()))
-    ts << " [color=" << text.style()->color().name() << "]";
+    writeNameValuePair(ts, "color", text.style()->color().name());
 
   return ts;
 }
