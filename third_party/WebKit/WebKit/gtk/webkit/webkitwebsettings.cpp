@@ -315,14 +315,14 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   /**
   * WebKitWebSettings:enable-spell-checking:
   *
-  * Whether to enable check-as-you-type spell checking.
+  * Whether to enable spell checking while typing.
   *
   * Since 1.1.6
   */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_SPELL_CHECKING,
       g_param_spec_boolean("enable-spell-checking", _("Enable Spell Checking"),
-                           _("Enables check-as-you-type spell checking"), FALSE,
+                           _("Enables spell checking while typing"), FALSE,
                            flags));
 
   /**
@@ -336,7 +336,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   * for Portuguese as written in Brazil.
   *
   * If no value is specified then the value returned by
-  * pango_language_get_default will be used.
+  * gtk_get_default_language will be used.
   *
   * Since 1.1.6
   */
