@@ -543,6 +543,9 @@ class RegexPatternConstructor {
       m_alternative->lastTerm().quantify(
           (max == UINT_MAX) ? max : max - min,
           greedy ? QuantifierGreedy : QuantifierNonGreedy);
+      if (m_alternative->lastTerm().type ==
+          PatternTerm::TypeParenthesesSubpattern)
+        m_alternative->lastTerm().parentheses.isCopy = true;
     }
   }
 
@@ -607,7 +610,7 @@ class RegexPatternConstructor {
           // Note: for fixed once parentheses we will ensure at least the
           // minimum is available; others are on their own.
           term.frameLocation = currentCallFrameSize;
-          if (term.quantityCount == 1) {
+          if ((term.quantityCount == 1) && !term.parentheses.isCopy) {
             if (term.quantityType == QuantifierFixedCount) {
               currentCallFrameSize = setupDisjunctionOffsets(
                   term.parentheses.disjunction, currentCallFrameSize,
