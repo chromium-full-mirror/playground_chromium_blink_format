@@ -1054,6 +1054,16 @@ class RenderStyle : public RefCounted<RenderStyle> {
 
   void setBackgroundColor(const Color& v) { SET_VAR(background, m_color, v) }
 
+  void setBackgroundXPosition(Length l) {
+    SET_VAR(background, m_background.m_xPosition, l)
+  }
+  void setBackgroundYPosition(Length l) {
+    SET_VAR(background, m_background.m_yPosition, l)
+  }
+  void setBackgroundSize(LengthSize l) {
+    SET_VAR(background, m_background.m_size, l)
+  }
+
   void setBorderImage(const NinePieceImage& b) {
     SET_VAR(surround, border.image, b)
   }
@@ -1215,6 +1225,15 @@ class RenderStyle : public RefCounted<RenderStyle> {
 
   void setMaskBoxImage(const NinePieceImage& b) {
     SET_VAR(rareNonInheritedData, m_maskBoxImage, b)
+  }
+  void setMaskXPosition(Length l) {
+    SET_VAR(rareNonInheritedData, m_mask.m_xPosition, l)
+  }
+  void setMaskYPosition(Length l) {
+    SET_VAR(rareNonInheritedData, m_mask.m_yPosition, l)
+  }
+  void setMaskSize(LengthSize l) {
+    SET_VAR(rareNonInheritedData, m_mask.m_size, l)
   }
 
   void setBorderCollapse(bool collapse) {

@@ -116,6 +116,14 @@ static inline Length blendFunc(const AnimationBase*,
   return to.blend(from, progress);
 }
 
+static inline LengthSize blendFunc(const AnimationBase* anim,
+                                   const LengthSize& from,
+                                   const LengthSize& to,
+                                   double progress) {
+  return LengthSize(blendFunc(anim, from.width(), to.width(), progress),
+                    blendFunc(anim, from.height(), to.height(), progress));
+}
+
 static inline IntSize blendFunc(const AnimationBase* anim,
                                 const IntSize& from,
                                 const IntSize& to,
@@ -497,9 +505,30 @@ static void ensurePropertyMap() {
         &RenderStyle::setPaddingBottom));
     gPropertyWrappers->append(new PropertyWrapper<const Color&>(
         CSSPropertyColor, &RenderStyle::color, &RenderStyle::setColor));
+
     gPropertyWrappers->append(new PropertyWrapper<const Color&>(
         CSSPropertyBackgroundColor, &RenderStyle::backgroundColor,
         &RenderStyle::setBackgroundColor));
+    gPropertyWrappers->append(new PropertyWrapper<Length>(
+        CSSPropertyBackgroundPositionX, &RenderStyle::backgroundXPosition,
+        &RenderStyle::setBackgroundXPosition));
+    gPropertyWrappers->append(new PropertyWrapper<Length>(
+        CSSPropertyBackgroundPositionY, &RenderStyle::backgroundYPosition,
+        &RenderStyle::setBackgroundYPosition));
+    gPropertyWrappers->append(new PropertyWrapper<LengthSize>(
+        CSSPropertyWebkitBackgroundSize, &RenderStyle::backgroundSize,
+        &RenderStyle::setBackgroundSize));
+
+    gPropertyWrappers->append(new PropertyWrapper<Length>(
+        CSSPropertyWebkitMaskPositionX, &RenderStyle::maskXPosition,
+        &RenderStyle::setMaskXPosition));
+    gPropertyWrappers->append(new PropertyWrapper<Length>(
+        CSSPropertyWebkitMaskPositionY, &RenderStyle::maskYPosition,
+        &RenderStyle::setMaskYPosition));
+    gPropertyWrappers->append(new PropertyWrapper<LengthSize>(
+        CSSPropertyWebkitMaskSize, &RenderStyle::maskSize,
+        &RenderStyle::setMaskSize));
+
     gPropertyWrappers->append(
         new PropertyWrapper<int>(CSSPropertyFontSize, &RenderStyle::fontSize,
                                  &RenderStyle::setBlendedFontSize));
@@ -637,21 +666,14 @@ static void ensurePropertyMap() {
 
     // TODO:
     //
-    //  CSSPropertyBackground, CSSPropertyBackgroundPosition
     //  CSSPropertyMinWidth, CSSPropertyMaxWidth, CSSPropertyMinHeight,
     //  CSSPropertyMaxHeight
     //  CSSPropertyTextIndent
     //  CSSPropertyVerticalAlign
-    //  CSSPropertyWebkitBackgroundOrigin
-    //  CSSPropertyWebkitBackgroundSize
-    //  CSSPropertyWebkitMaskPosition
-    //  CSSPropertyWebkitMaskOrigin
-    //  CSSPropertyWebkitMaskSize
     //
     // Compound properties that have components that should be animatable:
     //
     //  CSSPropertyWebkitColumns
-    //  CSSPropertyWebkitMask
     //  CSSPropertyWebkitBoxReflect
 
     // Make sure unused slots have a value
@@ -687,7 +709,10 @@ static void addPropertyWrapper(int propertyID, PropertyWrapperBase* wrapper) {
 
 static void addShorthandProperties() {
   static const int animatableShorthandProperties[] = {
-      CSSPropertyBackground,  // for background-color
+      CSSPropertyBackground,  // for background-color, background-position
+      CSSPropertyBackgroundPosition,
+      CSSPropertyWebkitMask,  // for mask-position
+      CSSPropertyWebkitMaskPosition,
       CSSPropertyBorderTop,
       CSSPropertyBorderRight,
       CSSPropertyBorderBottom,
