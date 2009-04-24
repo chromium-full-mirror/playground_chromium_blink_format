@@ -37,8 +37,8 @@ namespace WebCore {
 
 V8EventListener::V8EventListener(Frame* frame,
                                  v8::Local<v8::Object> listener,
-                                 bool isInline)
-    : V8AbstractEventListener(frame, isInline) {
+                                 bool isAttribute)
+    : V8AbstractEventListener(frame, isAttribute) {
   m_listener = v8::Persistent<v8::Object>::New(listener);
 #ifndef NDEBUG
   V8Proxy::RegisterGlobalHandle(EVENT_LISTENER, this, m_listener);

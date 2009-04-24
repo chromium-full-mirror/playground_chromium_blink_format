@@ -62,7 +62,7 @@ class V8LazyEventListener : public V8AbstractEventListener {
   V8LazyEventListener(Frame*, const String& code, const String& functionName);
   virtual ~V8LazyEventListener();
 
-  virtual bool virtualIsInline() const { return true; }
+  virtual bool virtualisAttribute() const { return true; }
 
   String m_code;
   String m_functionName;
