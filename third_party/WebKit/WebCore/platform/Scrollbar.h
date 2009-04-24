@@ -138,6 +138,9 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
 
   virtual void styleChanged() {}
 
+ private:
+  virtual bool isScrollbar() const { return true; }
+
  protected:
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();

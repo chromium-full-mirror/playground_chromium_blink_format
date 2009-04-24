@@ -160,6 +160,7 @@ class Widget {
 
   virtual bool isFrameView() const { return false; }
   virtual bool isPluginView() const { return false; }
+  virtual bool isScrollbar() const { return false; }
 
   void removeFromParent();
   virtual void setParent(ScrollView* view);
