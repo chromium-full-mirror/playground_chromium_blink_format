@@ -29,7 +29,6 @@
 #include "CharacterNames.h"
 #include "Document.h"
 #include "GraphicsContext.h"
-#include "ListMarkerBox.h"
 #include "RenderLayer.h"
 #include "RenderListItem.h"
 #include "RenderView.h"
@@ -507,9 +506,9 @@ void RenderListMarker::styleDidChange(StyleDifference diff,
 }
 
 InlineBox* RenderListMarker::createInlineBox() {
-  ListMarkerBox* box = new (renderArena()) ListMarkerBox(this);
-  m_inlineBoxWrapper = box;
-  return box;
+  InlineBox* result = RenderBox::createInlineBox();
+  result->setIsText(isText());
+  return result;
 }
 
 bool RenderListMarker::isImage() const {

@@ -60,8 +60,6 @@ class InlineFlowBox : public InlineRunBox {
   virtual ~InlineFlowBox();
 #endif
 
-  virtual int height() const;
-
   InlineFlowBox* prevFlowBox() const {
     return static_cast<InlineFlowBox*>(m_prevLine);
   }

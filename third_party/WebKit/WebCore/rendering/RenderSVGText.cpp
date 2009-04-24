@@ -103,7 +103,9 @@ void RenderSVGText::layout() {
 }
 
 RootInlineBox* RenderSVGText::createRootBox() {
-  return new (renderArena()) SVGRootInlineBox(this);
+  RootInlineBox* box = new (renderArena()) SVGRootInlineBox(this);
+  box->setIsSVG(true);
+  return box;
 }
 
 bool RenderSVGText::nodeAtPoint(const HitTestRequest& request,

@@ -141,7 +141,9 @@ IntRect RenderSVGInlineText::computeRepaintRectForRange(
 }
 
 InlineTextBox* RenderSVGInlineText::createTextBox() {
-  return new (renderArena()) SVGInlineTextBox(this);
+  InlineTextBox* box = new (renderArena()) SVGInlineTextBox(this);
+  box->setIsSVG(true);
+  return box;
 }
 
 IntRect RenderSVGInlineText::localCaretRect(InlineBox*, int, int*) {

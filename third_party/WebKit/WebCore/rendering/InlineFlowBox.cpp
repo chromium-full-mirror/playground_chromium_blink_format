@@ -50,22 +50,6 @@ InlineFlowBox::~InlineFlowBox() {
 
 #endif
 
-int InlineFlowBox::height() const {
-  const Font& font = renderer()->style(m_firstLine)->font();
-  int result = font.height();
-  bool strictMode = renderer()->document()->inStrictMode();
-  RenderBoxModelObject* box = boxModelObject();
-  result += box->borderTop() + box->paddingTop() + box->borderBottom() +
-            box->paddingBottom();
-  if (!strictMode && !hasTextChildren() &&
-      !box->hasHorizontalBordersOrPadding()) {
-    int bottomOverflow = root()->bottomOverflow();
-    if (y() + result > bottomOverflow)
-      result = bottomOverflow - y();
-  }
-  return result;
-}
-
 int InlineFlowBox::getFlowSpacingWidth() {
   int totWidth = marginBorderPaddingLeft() + marginBorderPaddingRight();
   for (InlineBox* curr = firstChild(); curr; curr = curr->nextOnLine()) {
@@ -633,11 +617,11 @@ void InlineFlowBox::placeBoxesVertically(int yPos,
     curr->setY(newY);
 
     if (childAffectsTopBottomPos) {
+      int boxHeight = curr->height();
       selectionTop = min(selectionTop, newY);
-      selectionBottom = max(selectionBottom, newY + curr->height());
+      selectionBottom = max(selectionBottom, newY + boxHeight);
       topPosition = min(topPosition, newY + overflowTop);
-      bottomPosition =
-          max(bottomPosition, newY + curr->height() + overflowBottom);
+      bottomPosition = max(bottomPosition, newY + boxHeight + overflowBottom);
     }
   }
 
@@ -914,7 +898,7 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
         for (InlineRunBox* curr = this; curr; curr = curr->nextLineBox())
           totalWidth += curr->width();
         context->save();
-        context->clip(IntRect(tx, ty, width(), height()));
+        context->clip(IntRect(tx, ty, w, h));
         boxModelObject()->paintBorder(context, startX, ty, totalWidth, h,
                                       renderer()->style());
         context->restore();
@@ -987,7 +971,7 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
     for (InlineRunBox* curr = this; curr; curr = curr->nextLineBox())
       totalWidth += curr->width();
     paintInfo.context->save();
-    paintInfo.context->clip(IntRect(tx, ty, width(), height()));
+    paintInfo.context->clip(IntRect(tx, ty, w, h));
     boxModelObject()->paintNinePieceImage(paintInfo.context, startX, ty,
                                           totalWidth, h, renderer()->style(),
                                           maskNinePieceImage, compositeOp);

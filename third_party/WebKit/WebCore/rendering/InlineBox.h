@@ -46,12 +46,17 @@ class InlineBox {
         m_constructed(false),
         m_bidiEmbeddingLevel(0),
         m_dirty(false),
-        m_extracted(false),
+        m_extracted(false)
+#if ENABLE(SVG)
+        ,
+        m_isSVG(false)
+#endif
+        ,
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
         m_hasEllipsisBox(false),
         m_dirOverride(false),
-        m_treatAsText(true),
+        m_isText(false),
         m_determinedIfNextOnLineExists(false),
         m_determinedIfPrevOnLineExists(false),
         m_nextOnLineExists(false),
@@ -86,12 +91,17 @@ class InlineBox {
         m_constructed(constructed),
         m_bidiEmbeddingLevel(0),
         m_dirty(dirty),
-        m_extracted(extracted),
+        m_extracted(extracted)
+#if ENABLE(SVG)
+        ,
+        m_isSVG(false)
+#endif
+        ,
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
         m_hasEllipsisBox(false),
         m_dirOverride(false),
-        m_treatAsText(true),
+        m_isText(false),
         m_determinedIfNextOnLineExists(false),
         m_determinedIfPrevOnLineExists(false),
         m_nextOnLineExists(false),
@@ -144,8 +154,11 @@ class InlineBox {
   virtual bool isRootInlineBox() const { return false; }
 #if ENABLE(SVG)
   virtual bool isSVGRootInlineBox() { return false; }
+  bool isSVG() const { return m_isSVG; }
+  void setIsSVG(bool b) { m_isSVG = b; }
 #endif
-  virtual bool isText() const { return false; }
+  bool isText() const { return m_isText; }
+  void setIsText(bool b) { m_isText = b; }
 
   bool isConstructed() { return m_constructed; }
   virtual void setConstructed() {
@@ -199,7 +212,7 @@ class InlineBox {
   void setY(int y) { m_y = y; }
   int y() const { return m_y; }
 
-  virtual int height() const;
+  int height() const;
 
   virtual int topOverflow() const { return y(); }
   virtual int bottomOverflow() const { return y() + height(); }
@@ -255,6 +268,11 @@ class InlineBox {
     return 0;
   }
 
+ protected:
+#if ENABLE(SVG)
+  virtual int svgBoxHeight() const { return 0; }
+#endif
+
  public:
   RenderObject* m_renderer;
 
@@ -283,6 +301,10 @@ class InlineBox {
   bool m_dirty : 1;
   bool m_extracted : 1;
 
+#if ENABLE(SVG)
+  bool m_isSVG : 1;
+#endif
+
   // for RootInlineBox
   bool m_endsWithBreak : 1;        // Whether the line ends with a <br>.
   bool m_hasSelectedChildren : 1;  // Whether we have any children selected
@@ -293,14 +315,15 @@ class InlineBox {
   // for InlineTextBox
  public:
   bool m_dirOverride : 1;
-  bool m_treatAsText : 1;  // Whether or not to treat a <br> as text for the
-                           // purposes of line height.
+  bool m_isText : 1;  // Whether or not this object represents text with a
+                      // non-zero height. Includes non-image list markers, text
+                      // boxes.
  protected:
   mutable bool m_determinedIfNextOnLineExists : 1;
   mutable bool m_determinedIfPrevOnLineExists : 1;
   mutable bool m_nextOnLineExists : 1;
   mutable bool m_prevOnLineExists : 1;
-  int m_toAdd : 13;  // for justified text
+  int m_toAdd : 12;  // for justified text
 
 #ifndef NDEBUG
  private:

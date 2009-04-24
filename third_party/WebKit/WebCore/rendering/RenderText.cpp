@@ -1091,6 +1091,7 @@ InlineTextBox* RenderText::createInlineTextBox() {
     textBox->setPreviousLineBox(m_lastTextBox);
     m_lastTextBox = textBox;
   }
+  textBox->setIsText(true);
   return textBox;
 }
 
