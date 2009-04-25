@@ -388,6 +388,10 @@
 
 #endif
 
+#if defined(MADV_FREE)
+#define HAVE_MADV_FREE 1
+#endif
+
 /* ENABLE macro defaults */
 
 /* fastMalloc match validation allows for runtime verification that

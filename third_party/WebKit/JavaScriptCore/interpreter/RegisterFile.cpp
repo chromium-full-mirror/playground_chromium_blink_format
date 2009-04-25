@@ -49,7 +49,7 @@ void RegisterFile::releaseExcessCapacity() {
       ~(commitSize - 1));
   ptrdiff_t size =
       reinterpret_cast<char*>(m_end) - reinterpret_cast<char*>(memoryToRelease);
-#if HAVE(MMAP) && !HAVE(VIRTUALALLOC)
+#if HAVE(MMAP) && HAVE(MADV_FREE) && !HAVE(VIRTUALALLOC)
   while (madvise(memoryToRelease, size, MADV_FREE) == -1 && errno == EAGAIN) {
   }
 #elif HAVE(VIRTUALALLOC)
