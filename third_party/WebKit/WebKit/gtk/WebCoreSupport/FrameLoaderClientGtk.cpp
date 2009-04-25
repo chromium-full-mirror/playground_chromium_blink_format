@@ -50,16 +50,18 @@
 #include "ProgressTracker.h"
 #include "JSDOMBinding.h"
 #include "ScriptController.h"
-#include "webkitwebview.h"
+#include "webkiterror.h"
 #include "webkitnetworkrequest.h"
+#include "webkitprivate.h"
 #include "webkitwebframe.h"
 #include "webkitwebnavigationaction.h"
 #include "webkitwebpolicydecision.h"
-#include "webkitprivate.h"
+#include "webkitwebview.h"
 
 #include <JavaScriptCore/APICast.h>
 #include <gio/gio.h>
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 #include <stdio.h>
 #if PLATFORM(UNIX)
 #include <sys/utsname.h>
@@ -908,50 +910,62 @@ void FrameLoaderClient::download(ResourceHandle* handle,
   startDownload(request);
 }
 
-ResourceError FrameLoaderClient::cancelledError(const ResourceRequest&) {
-  notImplemented();
-  ResourceError error("", 0, "", "");
-  error.setIsCancellation(true);
-  return error;
+ResourceError FrameLoaderClient::cancelledError(
+    const ResourceRequest& request) {
+  return ResourceError(g_quark_to_string(WEBKIT_NETWORK_ERROR),
+                       WEBKIT_NETWORK_ERROR_CANCELLED, request.url().string(),
+                       _("Load request cancelled"));
 }
 
-ResourceError FrameLoaderClient::blockedError(const ResourceRequest&) {
-  notImplemented();
-  return ResourceError("", 0, "", "");
+ResourceError FrameLoaderClient::blockedError(const ResourceRequest& request) {
+  return ResourceError(g_quark_to_string(WEBKIT_POLICY_ERROR),
+                       WEBKIT_POLICY_ERROR_CANNOT_USE_RESTRICTED_PORT,
+                       request.url().string(),
+                       _("Not allowed to use restricted network port"));
 }
 
-ResourceError FrameLoaderClient::cannotShowURLError(const ResourceRequest&) {
-  notImplemented();
-  return ResourceError("", 0, "", "");
+ResourceError FrameLoaderClient::cannotShowURLError(
+    const ResourceRequest& request) {
+  return ResourceError(g_quark_to_string(WEBKIT_POLICY_ERROR),
+                       WEBKIT_POLICY_ERROR_CANNOT_SHOW_URL,
+                       request.url().string(), _("URL cannot be shown"));
 }
 
 ResourceError FrameLoaderClient::interruptForPolicyChangeError(
-    const ResourceRequest&) {
-  notImplemented();
-  return ResourceError("", 0, "", "");
+    const ResourceRequest& request) {
+  return ResourceError(
+      g_quark_to_string(WEBKIT_POLICY_ERROR),
+      WEBKIT_POLICY_ERROR_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE,
+      request.url().string(), _("Frame load was interrupted"));
 }
 
 ResourceError FrameLoaderClient::cannotShowMIMETypeError(
-    const ResourceResponse&) {
-  notImplemented();
-  return ResourceError("", 0, "", "");
+    const ResourceResponse& response) {
+  return ResourceError(
+      g_quark_to_string(WEBKIT_POLICY_ERROR),
+      WEBKIT_POLICY_ERROR_CANNOT_SHOW_MIME_TYPE, response.url().string(),
+      _("Content with the specified MIME type cannot be shown"));
 }
 
 ResourceError FrameLoaderClient::fileDoesNotExistError(
-    const ResourceResponse&) {
-  notImplemented();
-  return ResourceError("", 0, "", "");
+    const ResourceResponse& response) {
+  return ResourceError(g_quark_to_string(WEBKIT_NETWORK_ERROR),
+                       WEBKIT_NETWORK_ERROR_FILE_DOES_NOT_EXIST,
+                       response.url().string(), _("File does not exist"));
 }
 
 ResourceError FrameLoaderClient::pluginWillHandleLoadError(
-    const ResourceResponse&) {
-  notImplemented();
-  return ResourceError("", 0, "", "");
+    const ResourceResponse& response) {
+  return ResourceError(g_quark_to_string(WEBKIT_PLUGIN_ERROR),
+                       WEBKIT_PLUGIN_ERROR_WILL_HANDLE_LOAD,
+                       response.url().string(), _("Plugin will handle load"));
 }
 
-bool FrameLoaderClient::shouldFallBack(const ResourceError&) {
-  notImplemented();
-  return false;
+bool FrameLoaderClient::shouldFallBack(const ResourceError& error) {
+  // FIXME: Needs to check domain.
+  // FIXME: Mac checks for WebKitErrorPlugInWillHandleLoad here to avoid
+  // loading plugin content twice. Do we need it?
+  return error.errorCode() != WEBKIT_NETWORK_ERROR_CANCELLED;
 }
 
 bool FrameLoaderClient::canCachePage() const {
