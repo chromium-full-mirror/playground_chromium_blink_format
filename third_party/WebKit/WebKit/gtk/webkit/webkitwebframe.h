@@ -92,6 +92,12 @@ WEBKIT_API void webkit_web_frame_load_string(WebKitWebFrame* frame,
                                              const gchar* encoding,
                                              const gchar* base_uri);
 
+WEBKIT_API void webkit_web_frame_load_alternate_string(
+    WebKitWebFrame* frame,
+    const gchar* content,
+    const gchar* base_url,
+    const gchar* unreachable_url);
+
 WEBKIT_API void webkit_web_frame_load_request(WebKitWebFrame* frame,
                                               WebKitNetworkRequest* request);
 
