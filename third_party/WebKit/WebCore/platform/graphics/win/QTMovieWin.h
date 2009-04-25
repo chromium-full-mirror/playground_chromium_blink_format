@@ -84,7 +84,9 @@ class QTMOVIEWIN_API QTMovieWin {
   void setVisible(bool);
   void paint(HDC, int x, int y);
 
-  void disableUnsupportedTracks(unsigned& enabledTrackCount);
+  void disableUnsupportedTracks(unsigned& enabledTrackCount,
+                                unsigned& totalTrackCount);
+  void setDisabled(bool);
 
   bool hasVideo() const;
 
@@ -95,6 +97,7 @@ class QTMOVIEWIN_API QTMovieWin {
 
  private:
   QTMovieWinPrivate* m_private;
+  bool m_disabled;
   friend class QTMovieWinPrivate;
 };
 

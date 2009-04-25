@@ -44,11 +44,13 @@ class MediaDocument : public HTMLDocument {
 
  private:
   MediaDocument(Frame*);
+  virtual ~MediaDocument();
+  Timer<MediaDocument> m_replaceMediaElementTimer;
 
   virtual bool isMediaDocument() const { return true; }
   virtual Tokenizer* createTokenizer();
 
-  void replaceVideoWithEmbed();
+  void replaceMediaElementTimerFired(Timer<MediaDocument>*);
 };
 }
 

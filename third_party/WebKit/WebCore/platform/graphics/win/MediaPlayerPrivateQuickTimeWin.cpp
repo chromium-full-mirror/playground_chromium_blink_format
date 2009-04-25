@@ -68,6 +68,8 @@ MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
       m_networkState(MediaPlayer::Empty),
       m_readyState(MediaPlayer::HaveNothing),
       m_enabledTrackCount(0),
+      m_totalTrackCount(0),
+      m_hasUnsupportedTracks(false),
       m_startedPlaying(false),
       m_isStreaming(false)
 #if DRAW_FRAME_RATE
@@ -294,10 +296,17 @@ void MediaPlayerPrivate::updateStates() {
   long loadState = m_qtMovie ? m_qtMovie->loadState() : QTMovieLoadStateError;
 
   if (loadState >= QTMovieLoadStateLoaded &&
-      m_readyState < MediaPlayer::HaveMetadata &&
-      !m_player->inMediaDocument()) {
-    m_qtMovie->disableUnsupportedTracks(m_enabledTrackCount);
-    if (!m_enabledTrackCount)
+      m_readyState < MediaPlayer::HaveMetadata) {
+    m_qtMovie->disableUnsupportedTracks(m_enabledTrackCount, m_totalTrackCount);
+    if (m_player->inMediaDocument()) {
+      if (!m_enabledTrackCount || m_enabledTrackCount != m_totalTrackCount) {
+        // This is a type of media that we do not handle directly with a <video>
+        // element, eg. QuickTime VR, a movie with a sprite track, etc. Tell the
+        // MediaPlayerClient that we won't support it.
+        sawUnsupportedTracks();
+        return;
+      }
+    } else if (!m_enabledTrackCount)
       loadState = QTMovieLoadStateError;
   }
 
@@ -320,6 +329,14 @@ void MediaPlayerPrivate::updateStates() {
     m_networkState = MediaPlayer::Loading;
     m_readyState = MediaPlayer::HaveNothing;
   } else {
+    if (m_player->inMediaDocument()) {
+      // Something went wrong in the loading of media within a standalone file.
+      // This can occur with chained ref movies that eventually resolve to a
+      // file we don't support.
+      sawUnsupportedTracks();
+      return;
+    }
+
     float loaded = maxTimeLoaded();
     if (!loaded)
       m_readyState = MediaPlayer::HaveNothing;
@@ -345,7 +362,16 @@ void MediaPlayerPrivate::updateStates() {
     m_player->readyStateChanged();
 }
 
+void MediaPlayerPrivate::sawUnsupportedTracks() {
+  m_qtMovie->setDisabled(true);
+  m_hasUnsupportedTracks = true;
+  m_player->mediaPlayerClient()->mediaPlayerSawUnsupportedTracks(m_player);
+}
+
 void MediaPlayerPrivate::didEnd() {
+  if (m_hasUnsupportedTracks)
+    return;
+
   m_startedPlaying = false;
 #if DRAW_FRAME_RATE
   m_timeStoppedPlaying = GetTickCount();
@@ -355,18 +381,19 @@ void MediaPlayerPrivate::didEnd() {
 }
 
 void MediaPlayerPrivate::setSize(const IntSize& size) {
-  if (m_qtMovie)
-    m_qtMovie->setSize(size.width(), size.height());
+  if (m_hasUnsupportedTracks || !m_qtMovie)
+    return;
+  m_qtMovie->setSize(size.width(), size.height());
 }
 
 void MediaPlayerPrivate::setVisible(bool b) {
-  if (!m_qtMovie)
+  if (m_hasUnsupportedTracks || !m_qtMovie)
     return;
   m_qtMovie->setVisible(b);
 }
 
 void MediaPlayerPrivate::paint(GraphicsContext* p, const IntRect& r) {
-  if (p->paintingDisabled() || !m_qtMovie)
+  if (p->paintingDisabled() || !m_qtMovie || m_hasUnsupportedTracks)
     return;
   HDC hdc = p->getWindowsContext(r);
   m_qtMovie->paint(hdc, r.x(), r.y());
@@ -443,22 +470,34 @@ MediaPlayer::SupportsType MediaPlayerPrivate::supportsType(
 }
 
 void MediaPlayerPrivate::movieEnded(QTMovieWin* movie) {
+  if (m_hasUnsupportedTracks)
+    return;
+
   ASSERT(m_qtMovie.get() == movie);
   didEnd();
 }
 
 void MediaPlayerPrivate::movieLoadStateChanged(QTMovieWin* movie) {
+  if (m_hasUnsupportedTracks)
+    return;
+
   ASSERT(m_qtMovie.get() == movie);
   updateStates();
 }
 
 void MediaPlayerPrivate::movieTimeChanged(QTMovieWin* movie) {
+  if (m_hasUnsupportedTracks)
+    return;
+
   ASSERT(m_qtMovie.get() == movie);
   updateStates();
   m_player->timeChanged();
 }
 
 void MediaPlayerPrivate::movieNewImageAvailable(QTMovieWin* movie) {
+  if (m_hasUnsupportedTracks)
+    return;
+
   ASSERT(m_qtMovie.get() == movie);
 #if DRAW_FRAME_RATE
   if (m_startedPlaying) {
