@@ -29,6 +29,7 @@
 
 #include <webkit/webkitdefines.h>
 #include <webkit/webkitdownload.h>
+#include <webkit/webkitnetworkrequest.h>
 #include <webkit/webkitwebview.h>
 #include <webkit/webkitwebframe.h>
 #include <webkit/webkitwebpolicydecision.h>
@@ -169,6 +170,9 @@ WebKitWebWindowFeatures* webkit_web_window_features_new_from_core_features(
     const WebCore::WindowFeatures& features);
 
 void webkit_web_view_notify_ready(WebKitWebView* web_view);
+
+void webkit_web_view_request_download(WebKitWebView* web_view,
+                                      WebKitNetworkRequest* request);
 
 WebKitWebPolicyDecision* webkit_web_policy_decision_new(
     WebKitWebFrame*,
