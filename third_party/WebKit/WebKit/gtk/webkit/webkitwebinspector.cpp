@@ -150,7 +150,7 @@ static void webkit_web_inspector_class_init(WebKitWebInspectorClass* klass) {
    */
   webkit_web_inspector_signals[INSPECT_WEB_VIEW] =
       g_signal_new("inspect-web-view", G_TYPE_FROM_CLASS(klass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
+                   (GSignalFlags)G_SIGNAL_RUN_LAST, 0,
                    webkit_inspect_web_view_request_handled, NULL,
                    webkit_marshal_OBJECT__OBJECT, WEBKIT_TYPE_WEB_VIEW, 1,
                    WEBKIT_TYPE_WEB_VIEW);
@@ -166,11 +166,10 @@ static void webkit_web_inspector_class_init(WebKitWebInspectorClass* klass) {
    *
    * Since: 1.0.3
    */
-  webkit_web_inspector_signals[SHOW_WINDOW] =
-      g_signal_new("show-window", G_TYPE_FROM_CLASS(klass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
-                   g_signal_accumulator_true_handled, NULL,
-                   webkit_marshal_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
+  webkit_web_inspector_signals[SHOW_WINDOW] = g_signal_new(
+      "show-window", G_TYPE_FROM_CLASS(klass), (GSignalFlags)G_SIGNAL_RUN_LAST,
+      0, g_signal_accumulator_true_handled, NULL, webkit_marshal_BOOLEAN__VOID,
+      G_TYPE_BOOLEAN, 0);
 
   /**
    * WebKitWebInspector::attach-window:
@@ -182,11 +181,10 @@ static void webkit_web_inspector_class_init(WebKitWebInspectorClass* klass) {
    *
    * Since: 1.0.3
    */
-  webkit_web_inspector_signals[ATTACH_WINDOW] =
-      g_signal_new("attach-window", G_TYPE_FROM_CLASS(klass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
-                   g_signal_accumulator_true_handled, NULL,
-                   webkit_marshal_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
+  webkit_web_inspector_signals[ATTACH_WINDOW] = g_signal_new(
+      "attach-window", G_TYPE_FROM_CLASS(klass),
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, g_signal_accumulator_true_handled,
+      NULL, webkit_marshal_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
 
   /**
    * WebKitWebInspector::detach-window:
@@ -197,11 +195,10 @@ static void webkit_web_inspector_class_init(WebKitWebInspectorClass* klass) {
    *
    * Since: 1.0.3
    */
-  webkit_web_inspector_signals[DETACH_WINDOW] =
-      g_signal_new("detach-window", G_TYPE_FROM_CLASS(klass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
-                   g_signal_accumulator_true_handled, NULL,
-                   webkit_marshal_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
+  webkit_web_inspector_signals[DETACH_WINDOW] = g_signal_new(
+      "detach-window", G_TYPE_FROM_CLASS(klass),
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, g_signal_accumulator_true_handled,
+      NULL, webkit_marshal_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
 
   /**
    * WebKitWebInspector::close-window:
@@ -221,11 +218,10 @@ static void webkit_web_inspector_class_init(WebKitWebInspectorClass* klass) {
    *
    * Since: 1.0.3
    */
-  webkit_web_inspector_signals[CLOSE_WINDOW] =
-      g_signal_new("close-window", G_TYPE_FROM_CLASS(klass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
-                   g_signal_accumulator_true_handled, NULL,
-                   webkit_marshal_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
+  webkit_web_inspector_signals[CLOSE_WINDOW] = g_signal_new(
+      "close-window", G_TYPE_FROM_CLASS(klass), (GSignalFlags)G_SIGNAL_RUN_LAST,
+      0, g_signal_accumulator_true_handled, NULL, webkit_marshal_BOOLEAN__VOID,
+      G_TYPE_BOOLEAN, 0);
 
   /**
    * WebKitWebInspector::finished:
@@ -237,10 +233,9 @@ static void webkit_web_inspector_class_init(WebKitWebInspectorClass* klass) {
    *
    * Since: 1.0.3
    */
-  webkit_web_inspector_signals[FINISHED] =
-      g_signal_new("finished", G_TYPE_FROM_CLASS(klass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
-                   NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+  webkit_web_inspector_signals[FINISHED] = g_signal_new(
+      "finished", G_TYPE_FROM_CLASS(klass), (GSignalFlags)G_SIGNAL_RUN_LAST, 0,
+      NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   /*
    * properties

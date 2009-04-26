@@ -1102,7 +1102,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[CREATE_WEB_VIEW] =
       g_signal_new("create-web-view", G_TYPE_FROM_CLASS(webViewClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
+                   (GSignalFlags)G_SIGNAL_RUN_LAST,
                    G_STRUCT_OFFSET(WebKitWebViewClass, create_web_view),
                    webkit_create_web_view_request_handled, NULL,
                    webkit_marshal_OBJECT__OBJECT, WEBKIT_TYPE_WEB_VIEW, 1,
@@ -1129,7 +1129,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[WEB_VIEW_READY] =
       g_signal_new("web-view-ready", G_TYPE_FROM_CLASS(webViewClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST),
+                   (GSignalFlags)G_SIGNAL_RUN_LAST,
                    G_STRUCT_OFFSET(WebKitWebViewClass, web_view_ready),
                    g_signal_accumulator_true_handled, NULL,
                    webkit_marshal_BOOLEAN__VOID, G_TYPE_BOOLEAN, 0);
@@ -1148,7 +1148,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[NAVIGATION_REQUESTED] = g_signal_new(
       "navigation-requested", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
+      (GSignalFlags)G_SIGNAL_RUN_LAST,
       G_STRUCT_OFFSET(WebKitWebViewClass, navigation_requested),
       webkit_navigation_request_handled, NULL,
       webkit_marshal_ENUM__OBJECT_OBJECT, WEBKIT_TYPE_NAVIGATION_RESPONSE, 2,
@@ -1181,10 +1181,9 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[NEW_WINDOW_POLICY_DECISION_REQUESTED] = g_signal_new(
       "new-window-policy-decision-requested", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
-      g_signal_accumulator_true_handled, NULL,
-      webkit_marshal_BOOLEAN__OBJECT_OBJECT_OBJECT_OBJECT, G_TYPE_BOOLEAN, 4,
-      WEBKIT_TYPE_WEB_FRAME, WEBKIT_TYPE_NETWORK_REQUEST,
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, g_signal_accumulator_true_handled,
+      NULL, webkit_marshal_BOOLEAN__OBJECT_OBJECT_OBJECT_OBJECT, G_TYPE_BOOLEAN,
+      4, WEBKIT_TYPE_WEB_FRAME, WEBKIT_TYPE_NETWORK_REQUEST,
       WEBKIT_TYPE_WEB_NAVIGATION_ACTION, WEBKIT_TYPE_WEB_POLICY_DECISION);
 
   /**
@@ -1205,10 +1204,9 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[NAVIGATION_POLICY_DECISION_REQUESTED] = g_signal_new(
       "navigation-policy-decision-requested", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
-      g_signal_accumulator_true_handled, NULL,
-      webkit_marshal_BOOLEAN__OBJECT_OBJECT_OBJECT_OBJECT, G_TYPE_BOOLEAN, 4,
-      WEBKIT_TYPE_WEB_FRAME, WEBKIT_TYPE_NETWORK_REQUEST,
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, g_signal_accumulator_true_handled,
+      NULL, webkit_marshal_BOOLEAN__OBJECT_OBJECT_OBJECT_OBJECT, G_TYPE_BOOLEAN,
+      4, WEBKIT_TYPE_WEB_FRAME, WEBKIT_TYPE_NETWORK_REQUEST,
       WEBKIT_TYPE_WEB_NAVIGATION_ACTION, WEBKIT_TYPE_WEB_POLICY_DECISION);
 
   /**
@@ -1231,10 +1229,9 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[MIME_TYPE_POLICY_DECISION_REQUESTED] = g_signal_new(
       "mime-type-policy-decision-requested", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
-      g_signal_accumulator_true_handled, NULL,
-      webkit_marshal_BOOLEAN__OBJECT_OBJECT_STRING_OBJECT, G_TYPE_BOOLEAN, 4,
-      WEBKIT_TYPE_WEB_FRAME, WEBKIT_TYPE_NETWORK_REQUEST, G_TYPE_STRING,
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, g_signal_accumulator_true_handled,
+      NULL, webkit_marshal_BOOLEAN__OBJECT_OBJECT_STRING_OBJECT, G_TYPE_BOOLEAN,
+      4, WEBKIT_TYPE_WEB_FRAME, WEBKIT_TYPE_NETWORK_REQUEST, G_TYPE_STRING,
       WEBKIT_TYPE_WEB_POLICY_DECISION);
 
   /**
@@ -1254,7 +1251,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[WINDOW_OBJECT_CLEARED] = g_signal_new(
       "window-object-cleared", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
+      (GSignalFlags)G_SIGNAL_RUN_LAST,
       G_STRUCT_OFFSET(WebKitWebViewClass, window_object_cleared), NULL, NULL,
       webkit_marshal_VOID__OBJECT_POINTER_POINTER, G_TYPE_NONE, 3,
       WEBKIT_TYPE_WEB_FRAME, G_TYPE_POINTER, G_TYPE_POINTER);
@@ -1279,9 +1276,8 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[DOWNLOAD_REQUESTED] = g_signal_new(
       "download-requested", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
-      g_signal_accumulator_true_handled, NULL, webkit_marshal_BOOLEAN__OBJECT,
-      G_TYPE_BOOLEAN, 1, G_TYPE_OBJECT);
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, g_signal_accumulator_true_handled,
+      NULL, webkit_marshal_BOOLEAN__OBJECT, G_TYPE_BOOLEAN, 1, G_TYPE_OBJECT);
 
   /**
    * WebKitWebView::load-started:
@@ -1292,7 +1288,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[LOAD_STARTED] = g_signal_new(
       "load-started", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, WEBKIT_TYPE_WEB_FRAME);
 
   /**
@@ -1304,7 +1300,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[LOAD_COMMITTED] = g_signal_new(
       "load-committed", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, WEBKIT_TYPE_WEB_FRAME);
 
   /**
@@ -1312,10 +1308,10 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * @web_view: the #WebKitWebView
    * @progress: the global progress
    */
-  webkit_web_view_signals[LOAD_PROGRESS_CHANGED] = g_signal_new(
-      "load-progress-changed", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
-      g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
+  webkit_web_view_signals[LOAD_PROGRESS_CHANGED] =
+      g_signal_new("load-progress-changed", G_TYPE_FROM_CLASS(webViewClass),
+                   (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                   g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
 
   /**
    * WebKitWebView::load-error
@@ -1338,7 +1334,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
 
   webkit_web_view_signals[LOAD_FINISHED] = g_signal_new(
       "load-finished", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, WEBKIT_TYPE_WEB_FRAME);
 
   /**
@@ -1353,8 +1349,8 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[TITLE_CHANGED] =
       g_signal_new("title-changed", G_TYPE_FROM_CLASS(webViewClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
-                   NULL, webkit_marshal_VOID__OBJECT_STRING, G_TYPE_NONE, 2,
+                   (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                   webkit_marshal_VOID__OBJECT_STRING, G_TYPE_NONE, 2,
                    WEBKIT_TYPE_WEB_FRAME, G_TYPE_STRING);
 
   /**
@@ -1367,8 +1363,8 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[HOVERING_OVER_LINK] =
       g_signal_new("hovering-over-link", G_TYPE_FROM_CLASS(webViewClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
-                   NULL, webkit_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
+                   (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                   webkit_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
                    G_TYPE_STRING, G_TYPE_STRING);
 
   /**
@@ -1382,7 +1378,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[POPULATE_POPUP] = g_signal_new(
       "populate-popup", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, GTK_TYPE_MENU);
 
   /**
@@ -1406,24 +1402,24 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[PRINT_REQUESTED] = g_signal_new(
       "print-requested", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
-      g_signal_accumulator_true_handled, NULL, webkit_marshal_BOOLEAN__OBJECT,
-      G_TYPE_BOOLEAN, 1, WEBKIT_TYPE_WEB_FRAME);
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, g_signal_accumulator_true_handled,
+      NULL, webkit_marshal_BOOLEAN__OBJECT, G_TYPE_BOOLEAN, 1,
+      WEBKIT_TYPE_WEB_FRAME);
 
   webkit_web_view_signals[STATUS_BAR_TEXT_CHANGED] = g_signal_new(
       "status-bar-text-changed", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
       g_cclosure_marshal_VOID__STRING, G_TYPE_NONE, 1, G_TYPE_STRING);
 
   webkit_web_view_signals[ICOND_LOADED] =
       g_signal_new("icon-loaded", G_TYPE_FROM_CLASS(webViewClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
-                   NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                   (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                   g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   webkit_web_view_signals[SELECTION_CHANGED] =
       g_signal_new("selection-changed", G_TYPE_FROM_CLASS(webViewClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
-                   NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                   (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                   g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   /**
    * WebKitWebView::console-message:
@@ -1438,7 +1434,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[CONSOLE_MESSAGE] =
       g_signal_new("console-message", G_TYPE_FROM_CLASS(webViewClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
+                   (GSignalFlags)G_SIGNAL_RUN_LAST,
                    G_STRUCT_OFFSET(WebKitWebViewClass, console_message),
                    g_signal_accumulator_true_handled, NULL,
                    webkit_marshal_BOOLEAN__STRING_INT_STRING, G_TYPE_BOOLEAN, 3,
@@ -1456,7 +1452,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[SCRIPT_ALERT] =
       g_signal_new("script-alert", G_TYPE_FROM_CLASS(webViewClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
+                   (GSignalFlags)G_SIGNAL_RUN_LAST,
                    G_STRUCT_OFFSET(WebKitWebViewClass, script_alert),
                    g_signal_accumulator_true_handled, NULL,
                    webkit_marshal_BOOLEAN__OBJECT_STRING, G_TYPE_BOOLEAN, 2,
@@ -1475,7 +1471,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[SCRIPT_CONFIRM] = g_signal_new(
       "script-confirm", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
+      (GSignalFlags)G_SIGNAL_RUN_LAST,
       G_STRUCT_OFFSET(WebKitWebViewClass, script_confirm),
       g_signal_accumulator_true_handled, NULL,
       webkit_marshal_BOOLEAN__OBJECT_STRING_POINTER, G_TYPE_BOOLEAN, 3,
@@ -1496,7 +1492,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
   webkit_web_view_signals[SCRIPT_PROMPT] = g_signal_new(
       "script-prompt", G_TYPE_FROM_CLASS(webViewClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
+      (GSignalFlags)G_SIGNAL_RUN_LAST,
       G_STRUCT_OFFSET(WebKitWebViewClass, script_prompt),
       g_signal_accumulator_true_handled, NULL,
       webkit_marshal_BOOLEAN__OBJECT_STRING_STRING_STRING, G_TYPE_BOOLEAN, 4,

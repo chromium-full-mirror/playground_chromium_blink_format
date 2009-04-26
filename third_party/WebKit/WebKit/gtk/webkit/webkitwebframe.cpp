@@ -151,15 +151,14 @@ static void webkit_web_frame_class_init(WebKitWebFrameClass* frameClass) {
   /*
    * signals
    */
-  webkit_web_frame_signals[CLEARED] =
-      g_signal_new("cleared", G_TYPE_FROM_CLASS(frameClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
-                   NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+  webkit_web_frame_signals[CLEARED] = g_signal_new(
+      "cleared", G_TYPE_FROM_CLASS(frameClass), (GSignalFlags)G_SIGNAL_RUN_LAST,
+      0, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   webkit_web_frame_signals[LOAD_COMMITTED] =
       g_signal_new("load-committed", G_TYPE_FROM_CLASS(frameClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
-                   NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                   (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                   g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   /**
    * WebKitWebFrame::load-done
@@ -172,18 +171,18 @@ static void webkit_web_frame_class_init(WebKitWebFrameClass* frameClass) {
    */
   webkit_web_frame_signals[LOAD_DONE] = g_signal_new(
       "load-done", G_TYPE_FROM_CLASS(frameClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
       g_cclosure_marshal_VOID__BOOLEAN, G_TYPE_NONE, 1, G_TYPE_BOOLEAN);
 
-  webkit_web_frame_signals[TITLE_CHANGED] = g_signal_new(
-      "title-changed", G_TYPE_FROM_CLASS(frameClass),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
-      webkit_marshal_VOID__STRING, G_TYPE_NONE, 1, G_TYPE_STRING);
+  webkit_web_frame_signals[TITLE_CHANGED] =
+      g_signal_new("title-changed", G_TYPE_FROM_CLASS(frameClass),
+                   (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                   webkit_marshal_VOID__STRING, G_TYPE_NONE, 1, G_TYPE_STRING);
 
   webkit_web_frame_signals[HOVERING_OVER_LINK] =
       g_signal_new("hovering-over-link", G_TYPE_FROM_CLASS(frameClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
-                   NULL, webkit_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
+                   (GSignalFlags)G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                   webkit_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
                    G_TYPE_STRING, G_TYPE_STRING);
 
   /*

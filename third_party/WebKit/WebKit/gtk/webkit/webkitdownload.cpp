@@ -234,12 +234,11 @@ static void webkit_download_class_init(WebKitDownloadClass* downloadClass) {
    *
    * Since: 1.1.2
    */
-  webkit_download_signals[ERROR] =
-      g_signal_new("error", G_TYPE_FROM_CLASS(downloadClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
-                   g_signal_accumulator_true_handled, NULL,
-                   webkit_marshal_BOOLEAN__INT_INT_STRING, G_TYPE_BOOLEAN, 3,
-                   G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING);
+  webkit_download_signals[ERROR] = g_signal_new(
+      "error", G_TYPE_FROM_CLASS(downloadClass),
+      (GSignalFlags)G_SIGNAL_RUN_LAST, 0, g_signal_accumulator_true_handled,
+      NULL, webkit_marshal_BOOLEAN__INT_INT_STRING, G_TYPE_BOOLEAN, 3,
+      G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING);
 
   // Properties.
 
