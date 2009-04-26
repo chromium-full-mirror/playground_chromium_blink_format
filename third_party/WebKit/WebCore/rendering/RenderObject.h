@@ -884,6 +884,7 @@ class RenderObject : public CachedResourceClient {
                                        bool useTransforms,
                                        TransformState&) const;
 
+  bool shouldUseTransformFromContainer(const RenderObject* container) const;
   void getTransformFromContainer(const RenderObject* container,
                                  const IntSize& offsetInContainer,
                                  TransformationMatrix&) const;

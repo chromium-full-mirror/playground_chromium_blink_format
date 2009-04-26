@@ -1055,7 +1055,7 @@ void RenderBox::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
 
   bool preserve3D =
       useTransforms && (o->style()->preserves3D() || style()->preserves3D());
-  if (useTransforms && hasTransform) {
+  if (useTransforms && shouldUseTransformFromContainer(o)) {
     TransformationMatrix t;
     getTransformFromContainer(o, containerOffset, t);
     transformState.applyTransform(t, preserve3D
@@ -1094,7 +1094,7 @@ void RenderBox::mapAbsoluteToLocalPoint(bool fixed,
 
   bool preserve3D =
       useTransforms && (o->style()->preserves3D() || style()->preserves3D());
-  if (useTransforms && hasTransform) {
+  if (useTransforms && shouldUseTransformFromContainer(o)) {
     TransformationMatrix t;
     getTransformFromContainer(o, containerOffset, t);
     transformState.applyTransform(t, preserve3D
