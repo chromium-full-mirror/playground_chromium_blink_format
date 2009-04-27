@@ -480,8 +480,6 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
   // referencing the prototype object - let's speculatively load it's table nice
   // and early!)
   JSObject* protoObject = asObject(structure->prototypeForLookup(callFrame));
-  PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
-  loadPtr(static_cast<void*>(protoPropertyStorage), regT1);
 
   // Check eax is an object of the right Structure.
   Jump failureCases1 = checkStructure(regT0, structure);
@@ -499,6 +497,8 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
 #endif
 
   // Checks out okay! - getDirectOffset
+  PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
+  loadPtr(static_cast<void*>(protoPropertyStorage), regT1);
   loadPtr(Address(regT1, cachedOffset * sizeof(JSValuePtr)), regT0);
 
   Jump success = jump();
@@ -533,8 +533,6 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
   // referencing the prototype object - let's speculatively load it's table nice
   // and early!)
   JSObject* protoObject = asObject(structure->prototypeForLookup(callFrame));
-  PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
-  loadPtr(protoPropertyStorage, regT1);
 
   // Check eax is an object of the right Structure.
   Jump failureCases1 = emitJumpIfNotJSCell(regT0);
@@ -547,6 +545,8 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
                 ImmPtr(prototypeStructure));
 
   // Checks out okay! - getDirectOffset
+  PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
+  loadPtr(protoPropertyStorage, regT1);
   loadPtr(Address(regT1, cachedOffset * sizeof(JSValuePtr)), regT0);
 
   ret();
@@ -620,8 +620,6 @@ void JIT::privateCompileGetByIdProtoList(
   // referencing the prototype object - let's speculatively load it's table nice
   // and early!)
   JSObject* protoObject = asObject(structure->prototypeForLookup(callFrame));
-  PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
-  loadPtr(protoPropertyStorage, regT1);
 
   // Check eax is an object of the right Structure.
   Jump failureCases1 = checkStructure(regT0, structure);
@@ -639,6 +637,8 @@ void JIT::privateCompileGetByIdProtoList(
 #endif
 
   // Checks out okay! - getDirectOffset
+  PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
+  loadPtr(protoPropertyStorage, regT1);
   loadPtr(Address(regT1, cachedOffset * sizeof(JSValuePtr)), regT0);
 
   Jump success = jump();
