@@ -1646,7 +1646,7 @@ void Document::implicitClose() {
     f->animation()->resumeAnimations(this);
 
   ImageLoader::dispatchPendingLoadEvents();
-  dispatchWindowEvent(eventNames().loadEvent, false, false);
+  dispatchLoadEvent();
   if (f)
     f->loader()->handledOnloadEvents();
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
@@ -2737,6 +2737,33 @@ DOMWindow* Document::domWindow() const {
   if (!frame())
     return 0;
   return frame()->domWindow();
+}
+
+void Document::setWindowAttributeEventListener(
+    const AtomicString& eventType,
+    PassRefPtr<EventListener> listener) {
+  DOMWindow* domWindow = this->domWindow();
+  if (!domWindow)
+    return;
+  domWindow->setAttributeEventListener(eventType, listener);
+}
+
+void Document::dispatchWindowEvent(const AtomicString& eventType,
+                                   bool canBubbleArg,
+                                   bool cancelableArg) {
+  ASSERT(!eventDispatchForbidden());
+  DOMWindow* domWindow = this->domWindow();
+  if (!domWindow)
+    return;
+  domWindow->dispatchEvent(eventType, canBubbleArg, cancelableArg);
+}
+
+void Document::dispatchLoadEvent() {
+  ASSERT(!eventDispatchForbidden());
+  DOMWindow* domWindow = this->domWindow();
+  if (!domWindow)
+    return;
+  domWindow->dispatchLoadEvent();
 }
 
 PassRefPtr<Event> Document::createEvent(const String& eventType,

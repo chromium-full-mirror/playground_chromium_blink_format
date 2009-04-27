@@ -1327,13 +1327,4 @@ unsigned Element::childElementCount() const {
   return count;
 }
 
-void Element::setWindowAttributeEventListener(
-    const AtomicString& eventType,
-    PassRefPtr<EventListener> listener) {
-  DOMWindow* domWindow = document()->domWindow();
-  if (!domWindow)
-    return;
-  domWindow->setAttributeEventListener(eventType, listener);
-}
-
 }  // namespace WebCore

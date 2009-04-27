@@ -129,31 +129,31 @@ void HTMLBodyElement::parseMappedAttribute(MappedAttribute* attr) {
     if (attached())
       document()->recalcStyle(Force);
   } else if (attr->name() == onloadAttr)
-    setWindowAttributeEventListener(
+    document()->setWindowAttributeEventListener(
         eventNames().loadEvent,
         createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onbeforeunloadAttr)
-    setWindowAttributeEventListener(
+    document()->setWindowAttributeEventListener(
         eventNames().beforeunloadEvent,
         createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onunloadAttr)
-    setWindowAttributeEventListener(
+    document()->setWindowAttributeEventListener(
         eventNames().unloadEvent,
         createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onblurAttr)
-    setWindowAttributeEventListener(
+    document()->setWindowAttributeEventListener(
         eventNames().blurEvent,
         createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onfocusAttr)
-    setWindowAttributeEventListener(
+    document()->setWindowAttributeEventListener(
         eventNames().focusEvent,
         createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onresizeAttr)
-    setWindowAttributeEventListener(
+    document()->setWindowAttributeEventListener(
         eventNames().resizeEvent,
         createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onscrollAttr)
-    setWindowAttributeEventListener(
+    document()->setWindowAttributeEventListener(
         eventNames().scrollEvent,
         createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onstorageAttr) {

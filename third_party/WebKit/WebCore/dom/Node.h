@@ -617,10 +617,6 @@ class Node : public EventTarget, public TreeShared<Node> {
   }
 
   void dispatchSubtreeModifiedEvent();
-  void dispatchWindowEvent(PassRefPtr<Event>);
-  void dispatchWindowEvent(const AtomicString& eventType,
-                           bool canBubble,
-                           bool cancelable);
   void dispatchUIEvent(const AtomicString& eventType,
                        int detail = 0,
                        PassRefPtr<Event> underlyingEvent = 0);
