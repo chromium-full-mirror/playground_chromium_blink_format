@@ -46,6 +46,10 @@ Node* EventTarget::toNode() {
   return 0;
 }
 
+DOMWindow* EventTarget::toDOMWindow() {
+  return 0;
+}
+
 XMLHttpRequest* EventTarget::toXMLHttpRequest() {
   return 0;
 }

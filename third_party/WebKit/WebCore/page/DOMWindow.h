@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2009 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,6 +26,7 @@
 #ifndef DOMWindow_h
 #define DOMWindow_h
 
+#include "EventTarget.h"
 #include "KURL.h"
 #include "PlatformString.h"
 #include "RegisteredEventListener.h"
@@ -68,12 +69,15 @@ class DOMApplicationCache;
 
 typedef int ExceptionCode;
 
-class DOMWindow : public RefCounted<DOMWindow> {
+class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
  public:
   static PassRefPtr<DOMWindow> create(Frame* frame) {
     return adoptRef(new DOMWindow(frame));
   }
   virtual ~DOMWindow();
+
+  virtual DOMWindow* toDOMWindow() { return this; }
+  virtual ScriptExecutionContext* scriptExecutionContext() const;
 
   Frame* frame() const { return m_frame; }
   void disconnectFrame();
@@ -239,13 +243,13 @@ class DOMWindow : public RefCounted<DOMWindow> {
 
   void handleEvent(Event*, bool useCapture, RegisteredEventListenerVector* = 0);
 
-  // Used for standard DOM addEventListener / removeEventListener APIs.
-  void addEventListener(const AtomicString& eventType,
-                        PassRefPtr<EventListener>,
-                        bool useCapture);
-  void removeEventListener(const AtomicString& eventType,
-                           EventListener*,
-                           bool useCapture);
+  virtual void addEventListener(const AtomicString& eventType,
+                                PassRefPtr<EventListener>,
+                                bool useCapture);
+  virtual void removeEventListener(const AtomicString& eventType,
+                                   EventListener*,
+                                   bool useCapture);
+  virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
 
   // Used for legacy "onEvent" property APIs.
   void setAttributeEventListener(const AtomicString& eventType,
@@ -342,8 +346,14 @@ class DOMWindow : public RefCounted<DOMWindow> {
   }
 #endif
 
+  using RefCounted<DOMWindow>::ref;
+  using RefCounted<DOMWindow>::deref;
+
  private:
   DOMWindow(Frame*);
+
+  virtual void refEventTarget() { ref(); }
+  virtual void derefEventTarget() { deref(); }
 
   RefPtr<SecurityOrigin> m_securityOrigin;
   KURL m_url;
@@ -374,4 +384,4 @@ class DOMWindow : public RefCounted<DOMWindow> {
 
 }  // namespace WebCore
 
-#endif
+#endif  // DOMWindow_h
