@@ -247,8 +247,6 @@ JSC::JSValuePtr objectToStringFunctionGetter(
     const JSC::Identifier& propertyName,
     const JSC::PropertySlot&);
 
-ScriptState* scriptStateFromNode(Node*);
-
 }  // namespace WebCore
 
 #endif  // JSDOMBinding_h
