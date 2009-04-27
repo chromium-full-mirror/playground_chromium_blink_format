@@ -252,7 +252,6 @@ void CachedResource::setResourceToRevalidate(CachedResource* resource) {
 
 void CachedResource::clearResourceToRevalidate() {
   ASSERT(m_resourceToRevalidate);
-  ASSERT(m_resourceToRevalidate->m_isBeingRevalidated);
   m_resourceToRevalidate->m_isBeingRevalidated = false;
   m_resourceToRevalidate->deleteIfPossible();
   m_handlesToRevalidate.clear();
@@ -262,6 +261,7 @@ void CachedResource::clearResourceToRevalidate() {
 
 void CachedResource::switchClientsToRevalidatedResource() {
   ASSERT(m_resourceToRevalidate);
+  ASSERT(m_resourceToRevalidate->inCache());
   ASSERT(!inCache());
 
   HashSet<CachedResourceHandleBase*>::iterator end =
