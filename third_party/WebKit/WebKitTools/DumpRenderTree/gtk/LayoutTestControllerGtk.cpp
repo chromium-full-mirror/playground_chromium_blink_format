@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 #include <glib.h>
+#include <libsoup/soup.h>
 #include <webkit/webkit.h>
 
 extern "C" {
@@ -116,19 +117,23 @@ JSStringRef LayoutTestController::pathToLocalResource(JSContextRef context,
 }
 
 void LayoutTestController::queueLoad(JSStringRef url, JSStringRef target) {
-  const gchar* baseURI = webkit_web_frame_get_uri(mainFrame);
-  gchar* lastSlash = g_strrstr(baseURI, "/");
-
-  GString* absoluteURLCString =
-      g_string_new_len(baseURI, static_cast<gssize>(lastSlash - baseURI + 1));
-
   gchar* relativeURL = JSStringCopyUTF8CString(url);
-  g_string_append(absoluteURLCString, relativeURL);
+  SoupURI* baseURI = soup_uri_new(webkit_web_frame_get_uri(mainFrame));
+
+  SoupURI* absoluteURI = soup_uri_new_with_base(baseURI, relativeURL);
+  soup_uri_free(baseURI);
   g_free(relativeURL);
 
+  gchar* absoluteCString;
+  if (absoluteURI) {
+    absoluteCString = soup_uri_to_string(absoluteURI, FALSE);
+    soup_uri_free(absoluteURI);
+  } else
+    absoluteCString = JSStringCopyUTF8CString(url);
+
   JSRetainPtr<JSStringRef> absoluteURL(
-      Adopt, JSStringCreateWithUTF8CString(absoluteURLCString->str));
-  g_string_free(absoluteURLCString, true);
+      Adopt, JSStringCreateWithUTF8CString(absoluteCString));
+  g_free(absoluteCString);
 
   WorkQueue::shared()->queue(new LoadItem(absoluteURL.get(), target));
 }
