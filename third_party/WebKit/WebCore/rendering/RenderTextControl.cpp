@@ -23,6 +23,7 @@
 #include "config.h"
 #include "RenderTextControl.h"
 
+#include "AXObjectCache.h"
 #include "CharacterNames.h"
 #include "Editor.h"
 #include "Event.h"
@@ -186,8 +187,8 @@ void RenderTextControl::setInnerTextValue(const String& innerTextValue) {
       if (Frame* frame = document()->frame()) {
         frame->editor()->clearUndoRedoOperations();
 
-        VisibleSelection newSelection(frame->selection()->end());
-        frame->editor()->respondToChangedContents(newSelection);
+        if (AXObjectCache::accessibilityEnabled())
+          document()->axObjectCache()->postNotification(this, "AXValueChanged");
       }
     }
 
