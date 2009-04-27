@@ -59,7 +59,8 @@ typedef union PluginPort {
 #define WebNetscapePluginView WebNetscapePluginDocumentView
 
 @interface WebNetscapePluginView
-    : WebBaseNetscapePluginView<WebPluginManualLoader> {
+    : WebBaseNetscapePluginView<WebPluginManualLoader,
+                                WebPluginContainerCheckController> {
   RefPtr<WebNetscapePluginStream> _manualStream;
 #ifndef BUILDING_ON_TIGER
   RetainPtr<CALayer> _pluginLayer;
@@ -102,6 +103,9 @@ typedef union PluginPort {
 
   BOOL _isFlash;
   BOOL _isSilverlight;
+
+  NSMutableDictionary* _containerChecksInProgress;
+  uint32 _currentContainerCheckRequestID;
 }
 
 + (WebNetscapePluginView*)currentPluginView;
@@ -143,6 +147,12 @@ typedef union PluginPort {
 - (void)didCallPlugInFunction;
 
 - (void)handleMouseMoved:(NSEvent*)event;
+- (uint32)checkIfAllowedToLoadURL:(const char*)url
+                            frame:(const char*)frame
+                     callbackFunc:(void (*)(NPP npp,
+                                            uint32 checkID,
+                                            NPBool allowed))callbackFunc;
+- (void)cancelCheckIfAllowedToLoadURL:(uint32)checkID;
 
 @end
 

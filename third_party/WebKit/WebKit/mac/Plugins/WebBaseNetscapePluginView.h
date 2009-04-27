@@ -44,8 +44,7 @@ namespace WebCore {
 class HTMLPlugInElement;
 }
 
-@interface WebBaseNetscapePluginView
-    : NSView<WebPluginContainerCheckController> {
+@interface WebBaseNetscapePluginView : NSView {
   RetainPtr<WebNetscapePluginPackage> _pluginPackage;
 
   WebFrame* _webFrame;
@@ -103,13 +102,6 @@ class HTMLPlugInElement;
 
 - (void)addWindowObservers;
 - (void)removeWindowObservers;
-
-- (uint32)checkIfAllowedToLoadURL:(const char*)url
-                            frame:(const char*)frame
-                     callbackFunc:(void (*)(NPP npp,
-                                            uint32 checkID,
-                                            NPBool allowed))callbackFunc;
-- (void)cancelCheckIfAllowedToLoadURL:(uint32)checkID;
 
 - (BOOL)convertFromX:(double)sourceX
                 andY:(double)sourceY
