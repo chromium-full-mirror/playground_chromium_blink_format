@@ -122,11 +122,25 @@ static void createAndAppendSpellingAndGrammarSubMenu(
   ContextMenuItem grammarWithSpelling(
       CheckableActionType, ContextMenuItemTagCheckGrammarWithSpelling,
       contextMenuItemTagCheckGrammarWithSpelling());
+#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
+    !defined(BUILDING_ON_LEOPARD)
+  ContextMenuItem correctSpelling(
+      CheckableActionType, ContextMenuItemTagCorrectSpellingAutomatically,
+      contextMenuItemTagCorrectSpellingAutomatically());
+#endif
 
   spellingAndGrammarMenu.appendItem(showSpellingPanel);
   spellingAndGrammarMenu.appendItem(checkSpelling);
+#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
+    !defined(BUILDING_ON_LEOPARD)
+  spellingAndGrammarMenu.appendItem(*separatorItem());
+#endif
   spellingAndGrammarMenu.appendItem(checkAsYouType);
   spellingAndGrammarMenu.appendItem(grammarWithSpelling);
+#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
+    !defined(BUILDING_ON_LEOPARD)
+  spellingAndGrammarMenu.appendItem(correctSpelling);
+#endif
 
   spellingAndGrammarMenuItem.setSubMenu(&spellingAndGrammarMenu);
 }
@@ -210,6 +224,62 @@ static void createAndAppendTextDirectionSubMenu(
   textDirectionMenu.appendItem(rtl);
 
   textDirectionMenuItem.setSubMenu(&textDirectionMenu);
+}
+#endif
+
+#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
+    !defined(BUILDING_ON_LEOPARD)
+static void createAndAppendSubstitutionsSubMenu(
+    const HitTestResult& result,
+    ContextMenuItem& substitutionsMenuItem) {
+  ContextMenu substitutionsMenu(result);
+
+  ContextMenuItem showSubstitutions(ActionType,
+                                    ContextMenuItemTagShowSubstitutions,
+                                    contextMenuItemTagShowSubstitutions(true));
+  ContextMenuItem smartCopyPaste(CheckableActionType,
+                                 ContextMenuItemTagSmartCopyPaste,
+                                 contextMenuItemTagSmartCopyPaste());
+  ContextMenuItem smartQuotes(CheckableActionType,
+                              ContextMenuItemTagSmartQuotes,
+                              contextMenuItemTagSmartQuotes());
+  ContextMenuItem smartDashes(CheckableActionType,
+                              ContextMenuItemTagSmartDashes,
+                              contextMenuItemTagSmartDashes());
+  ContextMenuItem smartLinks(CheckableActionType, ContextMenuItemTagSmartLinks,
+                             contextMenuItemTagSmartLinks());
+  ContextMenuItem textReplacement(CheckableActionType,
+                                  ContextMenuItemTagTextReplacement,
+                                  contextMenuItemTagTextReplacement());
+
+  substitutionsMenu.appendItem(showSubstitutions);
+  substitutionsMenu.appendItem(*separatorItem());
+  substitutionsMenu.appendItem(smartCopyPaste);
+  substitutionsMenu.appendItem(smartQuotes);
+  substitutionsMenu.appendItem(smartDashes);
+  substitutionsMenu.appendItem(smartLinks);
+  substitutionsMenu.appendItem(textReplacement);
+
+  substitutionsMenuItem.setSubMenu(&substitutionsMenu);
+}
+
+static void createAndAppendTransformationsSubMenu(
+    const HitTestResult& result,
+    ContextMenuItem& transformationsMenuItem) {
+  ContextMenu transformationsMenu(result);
+
+  ContextMenuItem makeUpperCase(ActionType, ContextMenuItemTagMakeUpperCase,
+                                contextMenuItemTagMakeUpperCase());
+  ContextMenuItem makeLowerCase(ActionType, ContextMenuItemTagMakeLowerCase,
+                                contextMenuItemTagMakeLowerCase());
+  ContextMenuItem capitalize(ActionType, ContextMenuItemTagCapitalize,
+                             contextMenuItemTagCapitalize());
+
+  transformationsMenu.appendItem(makeUpperCase);
+  transformationsMenu.appendItem(makeLowerCase);
+  transformationsMenu.appendItem(capitalize);
+
+  transformationsMenuItem.setSubMenu(&transformationsMenu);
 }
 #endif
 
@@ -465,6 +535,21 @@ void ContextMenu::populate() {
       createAndAppendSpellingSubMenu(m_hitTestResult, SpellingMenuItem);
       appendItem(SpellingMenuItem);
 #endif
+#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
+    !defined(BUILDING_ON_LEOPARD)
+      ContextMenuItem substitutionsMenuItem(
+          SubmenuType, ContextMenuItemTagSubstitutionsMenu,
+          contextMenuItemTagSubstitutionsMenu());
+      createAndAppendSubstitutionsSubMenu(m_hitTestResult,
+                                          substitutionsMenuItem);
+      appendItem(substitutionsMenuItem);
+      ContextMenuItem transformationsMenuItem(
+          SubmenuType, ContextMenuItemTagTransformationsMenu,
+          contextMenuItemTagTransformationsMenu());
+      createAndAppendTransformationsSubMenu(m_hitTestResult,
+                                            transformationsMenuItem);
+      appendItem(transformationsMenuItem);
+#endif
       ContextMenuItem FontMenuItem(SubmenuType, ContextMenuItemTagFontMenu,
                                    contextMenuItemTagFontMenu());
       createAndAppendFontSubMenu(m_hitTestResult, FontMenuItem);
@@ -666,6 +751,55 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
     case ContextMenuItemTagCheckSpellingWhileTyping:
       shouldCheck = frame->editor()->isContinuousSpellCheckingEnabled();
       break;
+#if PLATFORM(MAC)
+    case ContextMenuItemTagSubstitutionsMenu:
+    case ContextMenuItemTagTransformationsMenu:
+      break;
+    case ContextMenuItemTagShowSubstitutions:
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
+      if (frame->editor()->substitutionsPanelIsShowing())
+        item.setTitle(contextMenuItemTagShowSubstitutions(false));
+      else
+        item.setTitle(contextMenuItemTagShowSubstitutions(true));
+      shouldEnable = frame->editor()->canEdit();
+#endif
+      break;
+    case ContextMenuItemTagMakeUpperCase:
+    case ContextMenuItemTagMakeLowerCase:
+    case ContextMenuItemTagCapitalize:
+      shouldEnable = frame->editor()->canEdit();
+      break;
+    case ContextMenuItemTagCorrectSpellingAutomatically:
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
+      shouldCheck = frame->editor()->isAutomaticSpellingCorrectionEnabled();
+#endif
+      break;
+    case ContextMenuItemTagSmartCopyPaste:
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
+      shouldCheck = frame->editor()->smartInsertDeleteEnabled();
+#endif
+      break;
+    case ContextMenuItemTagSmartQuotes:
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
+      shouldCheck = frame->editor()->isAutomaticQuoteSubstitutionEnabled();
+#endif
+      break;
+    case ContextMenuItemTagSmartDashes:
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
+      shouldCheck = frame->editor()->isAutomaticDashSubstitutionEnabled();
+#endif
+      break;
+    case ContextMenuItemTagSmartLinks:
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
+      shouldCheck = frame->editor()->isAutomaticLinkDetectionEnabled();
+#endif
+      break;
+    case ContextMenuItemTagTextReplacement:
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
+      shouldCheck = frame->editor()->isAutomaticTextReplacementEnabled();
+#endif
+      break;
+#endif
 #if PLATFORM(GTK)
     case ContextMenuItemTagGoBack:
       shouldEnable = frame->loader()->canGoBackOrForward(-1);

@@ -323,8 +323,10 @@ void TypingCommand::markMisspellingsAfterTyping() {
 }
 
 void TypingCommand::typingAddedToOpenCommand() {
-  markMisspellingsAfterTyping();
   document()->frame()->editor()->appliedEditing(this);
+  // Since the spellchecking code may also perform corrections and other
+  // replacements, it should happen after the typing changes.
+  markMisspellingsAfterTyping();
 }
 
 void TypingCommand::insertText(const String& text, bool selectInsertedText) {

@@ -79,6 +79,14 @@
   @"WebKitPrivateBrowsingEnabled"
 #define WebContinuousSpellCheckingEnabled @"WebContinuousSpellCheckingEnabled"
 #define WebGrammarCheckingEnabled @"WebGrammarCheckingEnabled"
+#define WebAutomaticQuoteSubstitutionEnabled \
+  @"WebAutomaticQuoteSubstitutionEnabled"
+#define WebAutomaticLinkDetectionEnabled @"WebAutomaticLinkDetectionEnabled"
+#define WebAutomaticDashSubstitutionEnabled \
+  @"WebAutomaticDashSubstitutionEnabled"
+#define WebAutomaticTextReplacementEnabled @"WebAutomaticTextReplacementEnabled"
+#define WebAutomaticSpellingCorrectionEnabled \
+  @"WebAutomaticSpellingCorrectionEnabled"
 #define WebKitDOMPasteAllowedPreferenceKey @"WebKitDOMPasteAllowedPreferenceKey"
 #define WebKitUsesPageCachePreferenceKey @"WebKitUsesPageCachePreferenceKey"
 #define WebKitFTPDirectoryTemplatePath @"WebKitFTPDirectoryTemplatePath"
