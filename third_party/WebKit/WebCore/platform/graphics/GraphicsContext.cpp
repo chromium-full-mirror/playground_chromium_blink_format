@@ -314,8 +314,8 @@ void GraphicsContext::drawBidiText(const Font& font,
 
   bidiResolver.setStatus(
       BidiStatus(paragraphDirection, paragraphDirection, paragraphDirection,
-                 new BidiContext(run.ltr() ? 0 : 1, paragraphDirection,
-                                 run.directionalOverride())));
+                 BidiContext::create(run.ltr() ? 0 : 1, paragraphDirection,
+                                     run.directionalOverride())));
 
   bidiResolver.setPosition(TextRunIterator(&run, 0));
   bidiResolver.createBidiRunsForLine(TextRunIterator(&run, run.length()));
