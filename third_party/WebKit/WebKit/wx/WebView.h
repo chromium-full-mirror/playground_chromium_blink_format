@@ -144,6 +144,7 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   void IncreaseTextSize();
   bool CanDecreaseTextSize() const;
   void DecreaseTextSize();
+  void ResetTextSize();
   void MakeEditable(bool enable);
   bool IsEditable() const { return m_isEditable; }
 
