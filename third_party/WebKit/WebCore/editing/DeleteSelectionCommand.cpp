@@ -219,9 +219,15 @@ void DeleteSelectionCommand::initializePositionData() {
   // that such a selection actually ends at the start of the next paragraph.
   // This matches TextEdit behavior
   // for indented paragraphs.
+  // Only apply this rule if the endingSelection is a range selection.  If it is
+  // a caret, then other operations have created
+  // the selection we're deleting (like the process of creating a selection to
+  // delete during a backspace), and the user isn't in the situation described
+  // above.
   if (numEnclosingMailBlockquotes(start) != numEnclosingMailBlockquotes(end) &&
       isStartOfParagraph(visibleEnd) &&
-      isStartOfParagraph(VisiblePosition(start))) {
+      isStartOfParagraph(VisiblePosition(start)) &&
+      endingSelection().isRange()) {
     m_mergeBlocksAfterDelete = false;
     m_pruneStartBlockIfNecessary = true;
   }
