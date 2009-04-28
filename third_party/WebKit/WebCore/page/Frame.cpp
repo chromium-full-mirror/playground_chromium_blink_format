@@ -72,6 +72,7 @@
 #include "TextResourceDecoder.h"
 #include "XMLNames.h"
 #include "ScriptController.h"
+#include "htmlediting.h"
 #include "npruntime_impl.h"
 #include "visible_units.h"
 #include <wtf/RefCountedLeakCounter.h>
@@ -576,6 +577,15 @@ void Frame::setFocusedNodeIfNeeded() {
   if (selection()->isNone() || !selection()->isFocusedAndActive())
     return;
 
+  bool caretBrowsing = settings() && settings()->caretBrowsingEnabled();
+  if (caretBrowsing) {
+    Node* anchor = enclosingAnchorElement(selection()->base());
+    if (anchor) {
+      page()->focusController()->setFocusedNode(anchor, this);
+      return;
+    }
+  }
+
   Node* target = selection()->rootEditableElement();
   if (target) {
     RenderObject* renderer = target->renderer();
@@ -599,14 +609,18 @@ void Frame::setFocusedNodeIfNeeded() {
     }
     document()->setFocusedNode(0);
   }
+
+  if (caretBrowsing)
+    page()->focusController()->setFocusedNode(0, this);
 }
 
 void Frame::selectionLayoutChanged() {
   bool caretRectChanged = selection()->recomputeCaretRect();
 
 #if ENABLE(TEXT_CARET)
+  bool caretBrowsing = settings() && settings()->caretBrowsingEnabled();
   bool shouldBlink = m_caretVisible && selection()->isCaret() &&
-                     selection()->isContentEditable();
+                     (selection()->isContentEditable() || caretBrowsing);
 
   // If the caret moved, stop the blink timer so we can restart with a
   // black caret in the new location.
@@ -1333,7 +1347,8 @@ void Frame::setSelectionFromNone() {
   // Put a caret inside the body if the entire frame is editable (either the
   // entire WebView is editable or designMode is on for this document).
   Document* doc = document();
-  if (!selection()->isNone() || !isContentEditable())
+  bool caretBrowsing = settings() && settings()->caretBrowsingEnabled();
+  if (!selection()->isNone() || !(isContentEditable() || caretBrowsing))
     return;
 
   Node* node = doc->documentElement();
@@ -1670,7 +1685,8 @@ void Frame::respondToChangedSelection(const VisibleSelection& oldSelection,
   if (isContinuousSpellCheckingEnabled) {
     VisibleSelection newAdjacentWords;
     VisibleSelection newSelectedSentence;
-    if (selection()->selection().isContentEditable()) {
+    bool caretBrowsing = settings() && settings()->caretBrowsingEnabled();
+    if (selection()->selection().isContentEditable() || caretBrowsing) {
       VisiblePosition newStart(selection()->selection().visibleStart());
       newAdjacentWords =
           VisibleSelection(startOfWord(newStart, LeftWordIfOnBoundary),
