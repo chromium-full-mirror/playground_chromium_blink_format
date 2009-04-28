@@ -372,6 +372,10 @@ static CFURLRequestRef makeFinalRequest(const ResourceRequest& request,
                          kCFBooleanTrue);
     CFDictionaryAddValue(sslProps.get(), kCFStreamSSLAllowsExpiredRoots,
                          kCFBooleanTrue);
+    CFDictionaryAddValue(sslProps.get(), kCFStreamSSLAllowsExpiredCertificates,
+                         kCFBooleanTrue);
+    CFDictionaryAddValue(sslProps.get(), kCFStreamSSLValidatesCertificateChain,
+                         kCFBooleanFalse);
   }
 
   HashMap<String, RetainPtr<CFDataRef>>::iterator clientCert =
