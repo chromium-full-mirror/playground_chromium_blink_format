@@ -69,11 +69,6 @@ class RenderSVGModelObject : public RenderObject {
                                    bool useTransforms,
                                    bool fixed,
                                    TransformState&) const;
-
- protected:
-  // Returns the bounding box for the filter associated with this object (if
-  // any)
-  FloatRect filterBoundingBox() const;
 };
 }
 

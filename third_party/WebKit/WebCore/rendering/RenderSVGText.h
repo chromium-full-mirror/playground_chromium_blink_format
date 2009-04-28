@@ -41,8 +41,7 @@ class RenderSVGText : public RenderSVGBlock {
 
   virtual bool isSVGText() const { return true; }
 
-  bool calculateLocalTransform();
-  virtual TransformationMatrix localTransform() const {
+  virtual TransformationMatrix localToParentTransform() const {
     return m_localTransform;
   }
 
@@ -66,11 +65,22 @@ class RenderSVGText : public RenderSVGBlock {
 
   virtual IntRect clippedOverflowRectForRepaint(
       RenderBoxModelObject* repaintContainer);
+  virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
+                                     IntRect&,
+                                     bool fixed = false);
 
   virtual FloatRect objectBoundingBox() const;
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
  private:
+  bool calculateLocalTransform();
+
+  // FIXME: This can be removed when localTransform() is removed from
+  // RenderObject
+  virtual TransformationMatrix localTransform() const {
+    return m_localTransform;
+  }
+
   virtual RootInlineBox* createRootBox();
 
   TransformationMatrix m_localTransform;

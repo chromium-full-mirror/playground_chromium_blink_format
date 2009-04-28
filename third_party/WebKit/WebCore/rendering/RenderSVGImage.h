@@ -51,6 +51,10 @@ class RenderSVGImage : public RenderImage {
 
   virtual IntRect clippedOverflowRectForRepaint(
       RenderBoxModelObject* repaintContainer);
+  virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
+                                     IntRect&,
+                                     bool fixed = false);
+
   virtual void absoluteRects(Vector<IntRect>&,
                              int tx,
                              int ty,

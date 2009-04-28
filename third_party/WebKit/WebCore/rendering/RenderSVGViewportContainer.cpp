@@ -75,26 +75,12 @@ void RenderSVGViewportContainer::paint(PaintInfo& paintInfo,
   RenderSVGContainer::paint(paintInfo, parentX, parentY);
 }
 
-void RenderSVGViewportContainer::applyContentTransforms(PaintInfo& paintInfo) {
-  if (!viewport().isEmpty()) {
-    if (style()->overflowX() != OVISIBLE)
-      paintInfo.context->clip(enclosingIntRect(viewport()));  // FIXME:
-                                                              // Eventually
-                                                              // we'll want
-                                                              // float-precision
-                                                              // clipping
+void RenderSVGViewportContainer::applyViewportClip(PaintInfo& paintInfo) {
+  if (style()->overflowX() != OVISIBLE)
+    paintInfo.context->clip(enclosingIntRect(
+        viewport()));  // FIXME: Eventually we'll want float-precision clipping
 
-    paintInfo.context->concatCTM(
-        TransformationMatrix().translate(viewport().x(), viewport().y()));
-  }
-
-  RenderSVGContainer::applyContentTransforms(paintInfo);
-}
-
-void RenderSVGViewportContainer::applyAdditionalTransforms(
-    PaintInfo& paintInfo) {
-  paintInfo.context->concatCTM(viewportTransform());
-  RenderSVGContainer::applyAdditionalTransforms(paintInfo);
+  RenderSVGContainer::applyViewportClip(paintInfo);
 }
 
 FloatRect RenderSVGViewportContainer::viewport() const {

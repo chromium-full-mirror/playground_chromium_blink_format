@@ -130,7 +130,7 @@ FloatRect RenderPath::repaintRectInLocalCoordinates() const {
 
   // Markers and filters can paint outside of the stroke path
   m_cachedLocalRepaintRect.unite(m_markerBounds);
-  m_cachedLocalRepaintRect.unite(filterBoundingBox());
+  m_cachedLocalRepaintRect.unite(filterBoundingBoxForRenderer(this));
 
   return m_cachedLocalRepaintRect;
 }
@@ -192,7 +192,7 @@ void RenderPath::paint(PaintInfo& paintInfo, int, int) {
     return;
 
   paintInfo.context->save();
-  paintInfo.context->concatCTM(localTransform());
+  paintInfo.context->concatCTM(localToParentTransform());
 
   SVGResourceFilter* filter = 0;
 

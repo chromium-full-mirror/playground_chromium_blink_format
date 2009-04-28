@@ -68,8 +68,7 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
  private:
   void calcViewport();
 
-  virtual void applyContentTransforms(PaintInfo&);
-  virtual void applyAdditionalTransforms(PaintInfo&);
+  virtual void applyViewportClip(PaintInfo&);
 
   FloatRect m_viewport;
 };

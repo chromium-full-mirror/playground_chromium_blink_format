@@ -65,8 +65,6 @@ class RenderSVGRoot : public RenderBox {
   virtual TransformationMatrix localTransform() const;
   virtual TransformationMatrix absoluteTransform() const;
 
-  FloatRect viewport() const;
-
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,
@@ -81,12 +79,18 @@ class RenderSVGRoot : public RenderBox {
 
  private:
   void calcViewport();
-  void applyContentTransforms(PaintInfo&, int parentX, int parentY);
+  const FloatSize& viewportSize() const;
 
-  TransformationMatrix localToParentTransformWithoutCSSParentOffset() const;
+  bool selfWillPaint() const;
+
+  IntSize parentOriginToBorderBox() const;
+  IntSize borderOriginToContentBox() const;
+  TransformationMatrix localToRepaintContainerTransform(
+      const IntPoint& parentOriginInContainer) const;
+  TransformationMatrix localToBorderBoxTransform() const;
 
   RenderObjectChildList m_children;
-  FloatRect m_viewport;
+  FloatSize m_viewportSize;
 };
 
 }  // namespace WebCore
