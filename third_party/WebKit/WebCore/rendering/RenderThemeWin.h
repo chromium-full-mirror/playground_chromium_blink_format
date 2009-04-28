@@ -173,6 +173,30 @@ class RenderThemeWin : public RenderTheme {
 
   virtual bool supportsFocusRing(const RenderStyle*) const;
 
+#if ENABLE(VIDEO)
+  virtual bool paintMediaFullscreenButton(RenderObject*,
+                                          const RenderObject::PaintInfo&,
+                                          const IntRect&);
+  virtual bool paintMediaPlayButton(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&);
+  virtual bool paintMediaMuteButton(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&);
+  virtual bool paintMediaSeekBackButton(RenderObject*,
+                                        const RenderObject::PaintInfo&,
+                                        const IntRect&);
+  virtual bool paintMediaSeekForwardButton(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&);
+  virtual bool paintMediaSliderTrack(RenderObject*,
+                                     const RenderObject::PaintInfo&,
+                                     const IntRect&);
+  virtual bool paintMediaSliderThumb(RenderObject*,
+                                     const RenderObject::PaintInfo&,
+                                     const IntRect&);
+#endif
+
  private:
   void addIntrinsicMargins(RenderStyle*) const;
   void close();
