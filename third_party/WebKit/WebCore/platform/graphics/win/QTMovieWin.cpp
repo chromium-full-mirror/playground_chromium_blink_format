@@ -90,6 +90,7 @@ class QTMovieWinPrivate : Noncopyable {
   void createGWorld();
   void deleteGWorld();
   void clearGWorld();
+  void cacheMovieScale();
 
   void setSize(int, int);
 
@@ -111,6 +112,11 @@ class QTMovieWinPrivate : Noncopyable {
   int m_gWorldHeight;
   GWorldPtr m_savedGWorld;
   long m_loadError;
+  float m_widthScaleFactor;
+  float m_heightScaleFactor;
+#if !ASSERT_DISABLED
+  bool m_scaleCached;
+#endif
 };
 
 QTMovieWinPrivate::QTMovieWinPrivate()
@@ -131,7 +137,15 @@ QTMovieWinPrivate::QTMovieWinPrivate()
       m_gWorldWidth(0),
       m_gWorldHeight(0),
       m_savedGWorld(0),
-      m_loadError(0) {}
+      m_loadError(0),
+      m_widthScaleFactor(1),
+      m_heightScaleFactor(1)
+#if !ASSERT_DISABLED
+      ,
+      m_scaleCached(false)
+#endif
+{
+}
 
 QTMovieWinPrivate::~QTMovieWinPrivate() {
   endTask();
@@ -172,6 +186,27 @@ void QTMovieWinPrivate::endTask() {
   updateTaskTimer();
 }
 
+void QTMovieWinPrivate::cacheMovieScale() {
+  Rect naturalRect;
+  Rect initialRect;
+
+  GetMovieNaturalBoundsRect(m_movie, &naturalRect);
+  GetMovieBox(m_movie, &initialRect);
+
+  int naturalWidth = naturalRect.right - naturalRect.left;
+  int naturalHeight = naturalRect.bottom - naturalRect.top;
+
+  if (naturalWidth)
+    m_widthScaleFactor = (initialRect.right - initialRect.left) / naturalWidth;
+  if (naturalHeight)
+    m_heightScaleFactor =
+        (initialRect.bottom - initialRect.top) / naturalHeight;
+#if !ASSERT_DISABLED
+  m_scaleCached = true;
+  ;
+#endif
+}
+
 void QTMovieWinPrivate::task() {
   ASSERT(m_tasking);
 
@@ -185,20 +220,23 @@ void QTMovieWinPrivate::task() {
   // GetMovieLoadState documentation says that you should not call it more often
   // than every quarter of a second.
   if (systemTime() >= m_lastLoadStateCheckTime + 0.25 || m_loadError) {
-    // If load fails QT's load state is kMovieLoadStateComplete.
+    // If load fails QT's load state is QTMovieLoadStateComplete.
     // This is different from QTKit API and seems strange.
     long loadState =
-        m_loadError ? kMovieLoadStateError : GetMovieLoadState(m_movie);
+        m_loadError ? QTMovieLoadStateError : GetMovieLoadState(m_movie);
     if (loadState != m_loadState) {
       // we only need to erase the movie gworld when the load state changes to
       // loaded while it
       //  is visible as the gworld is destroyed/created when visibility changes
       if (loadState >= QTMovieLoadStateLoaded &&
-          m_loadState < QTMovieLoadStateLoaded && m_visible)
-        clearGWorld();
+          m_loadState < QTMovieLoadStateLoaded) {
+        if (m_visible)
+          clearGWorld();
+        cacheMovieScale();
+      }
 
       m_loadState = loadState;
-      if (!m_movieController && m_loadState >= kMovieLoadStateLoaded)
+      if (!m_movieController && m_loadState >= QTMovieLoadStateLoaded)
         createMovieController();
       m_client->movieLoadStateChanged(m_movieWin);
       if (m_movieWin->m_disabled) {
@@ -258,7 +296,7 @@ void QTMovieWinPrivate::registerDrawingCallback() {
 
 void QTMovieWinPrivate::drawingComplete() {
   if (!m_gWorld || m_movieWin->m_disabled ||
-      m_loadState < kMovieLoadStateLoaded)
+      m_loadState < QTMovieLoadStateLoaded)
     return;
   m_client->movieNewImageAvailable(m_movieWin);
 }
@@ -281,7 +319,7 @@ void QTMovieWinPrivate::updateGWorld() {
 
 void QTMovieWinPrivate::createGWorld() {
   ASSERT(!m_gWorld);
-  if (!m_movie)
+  if (!m_movie || m_loadState < QTMovieLoadStateLoaded)
     return;
 
   m_gWorldWidth = max(cGWorldMinWidth, m_width);
@@ -329,8 +367,17 @@ void QTMovieWinPrivate::setSize(int width, int height) {
     return;
   m_width = width;
   m_height = height;
-  if (!m_movie)
+
+  // Do not change movie box before reaching load state loaded as we grab
+  // the initial size when task() sees that state for the first time, and
+  // we need the initial size to be able to scale movie properly.
+  if (!m_movie || m_loadState < QTMovieLoadStateLoaded)
     return;
+
+#if !ASSERT_DISABLED
+  ASSERT(m_scaleCached);
+#endif
+
   Rect bounds;
   bounds.top = 0;
   bounds.left = 0;
@@ -463,8 +510,8 @@ void QTMovieWin::getNaturalSize(int& width, int& height) {
 
   if (m_private->m_movie)
     GetMovieNaturalBoundsRect(m_private->m_movie, &rect);
-  width = rect.right - rect.left;
-  height = rect.bottom - rect.top;
+  width = (rect.right - rect.left) * m_private->m_widthScaleFactor;
+  height = (rect.bottom - rect.top) * m_private->m_heightScaleFactor;
 }
 
 void QTMovieWin::setSize(int width, int height) {
