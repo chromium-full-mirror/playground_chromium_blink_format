@@ -124,6 +124,8 @@ class StyledElement : public Element {
   // svgAttributeChanged (called when element.className.baseValue is set)
   void classAttributeChanged(const AtomicString& newClassString);
 
+  virtual void didMoveToNewOwnerDocument();
+
   RefPtr<CSSMutableStyleDeclaration> m_inlineStyleDecl;
 };
 

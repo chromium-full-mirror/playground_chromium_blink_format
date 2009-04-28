@@ -73,6 +73,9 @@ class HTMLBodyElement : public HTMLElement {
 
  protected:
   RefPtr<CSSMutableStyleDeclaration> m_linkDecl;
+
+ private:
+  virtual void didMoveToNewOwnerDocument();
 };
 
 }  // namespace
