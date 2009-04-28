@@ -347,6 +347,13 @@ static JSValueRef getDescriptionCallback(JSContextRef context,
   return JSValueMakeString(context, description.get());
 }
 
+static JSValueRef getChildrenCountCallback(JSContextRef context,
+                                           JSObjectRef thisObject,
+                                           JSStringRef propertyName,
+                                           JSValueRef* exception) {
+  return JSValueMakeNumber(context, toAXElement(thisObject)->childrenCount());
+}
+
 static JSValueRef getWidthCallback(JSContextRef context,
                                    JSObjectRef thisObject,
                                    JSStringRef propertyName,
@@ -439,6 +446,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"minValue", getMinValueCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"maxValue", getMaxValueCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"childrenCount", getChildrenCountCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"insertionPointLineNumber", getInsertionPointLineNumberCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

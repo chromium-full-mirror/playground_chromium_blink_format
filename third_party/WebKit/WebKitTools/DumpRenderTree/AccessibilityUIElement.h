@@ -67,6 +67,7 @@ class AccessibilityUIElement {
                             unsigned length);
 
   AccessibilityUIElement getChildAtIndex(unsigned);
+  int childrenCount();
   AccessibilityUIElement titleUIElement();
   AccessibilityUIElement parentElement();
 
