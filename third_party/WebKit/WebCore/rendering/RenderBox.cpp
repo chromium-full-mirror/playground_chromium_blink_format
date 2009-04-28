@@ -1606,7 +1606,7 @@ void RenderBox::calcHeight() {
         maxH = heightResult;
       heightResult = min(maxH, heightResult);
       heightResult = max(minH, heightResult);
-    } else
+    } else {
       // The only times we don't check min/max height are when a fixed length
       // has
       // been given as an override.  Just use that.  The value has already been
@@ -1614,6 +1614,7 @@ void RenderBox::calcHeight() {
       // for box-sizing.
       heightResult = h.value() + borderTop() + borderBottom() + paddingTop() +
                      paddingBottom();
+    }
 
     setHeight(heightResult);
   }
