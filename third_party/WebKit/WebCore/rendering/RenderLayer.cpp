@@ -2210,7 +2210,7 @@ void RenderLayer::paintLayer(
 
   // We want to paint our layer, but only if we intersect the damage rect.
   bool shouldPaint = intersectsDamageRect(layerBounds, damageRect, rootLayer) &&
-                     m_hasVisibleContent;
+                     m_hasVisibleContent && isSelfPaintingLayer();
   if (shouldPaint && !selectionOnly && !damageRect.isEmpty()) {
     // Begin transparency layers lazily now that we know we have to paint
     // something.
@@ -2278,12 +2278,10 @@ void RenderLayer::paintLayer(
   // Paint any child layers that have overflow.
   if (m_normalFlowList)
     for (Vector<RenderLayer*>::iterator it = m_normalFlowList->begin();
-         it != m_normalFlowList->end(); ++it) {
-      if (it[0]->isSelfPaintingLayer())
-        it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
-                          paintRestriction, paintingRoot, overlapTestRequests,
-                          false, temporaryClipRects);
-    }
+         it != m_normalFlowList->end(); ++it)
+      it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
+                        paintRestriction, paintingRoot, overlapTestRequests,
+                        false, temporaryClipRects);
 
   // Now walk the sorted list of children with positive z-indices.
   if (m_posZOrderList)
@@ -2638,9 +2636,6 @@ RenderLayer* RenderLayer::hitTestLayer(
   if (m_normalFlowList) {
     for (int i = m_normalFlowList->size() - 1; i >= 0; --i) {
       RenderLayer* currLayer = m_normalFlowList->at(i);
-      if (!currLayer->isSelfPaintingLayer())
-        continue;
-
       HitTestResult tempResult(result.point());
       RenderLayer* hitLayer = currLayer->hitTestLayer(
           rootLayer, this, request, tempResult, hitTestRect, hitTestPoint,
@@ -2658,7 +2653,7 @@ RenderLayer* RenderLayer::hitTestLayer(
 
   // Next we want to see if the mouse pos is inside the child RenderObjects of
   // the layer.
-  if (fgRect.contains(hitTestPoint)) {
+  if (fgRect.contains(hitTestPoint) && isSelfPaintingLayer()) {
     // Hit test with a temporary HitTestResult, because we onlyl want to commit
     // to 'result' if we know we're frontmost.
     HitTestResult tempResult(result.point());
@@ -2698,7 +2693,7 @@ RenderLayer* RenderLayer::hitTestLayer(
   if (candidateLayer)
     return candidateLayer;
 
-  if (bgRect.contains(hitTestPoint)) {
+  if (bgRect.contains(hitTestPoint) && isSelfPaintingLayer()) {
     HitTestResult tempResult(result.point());
     if (hitTestContents(request, tempResult, layerBounds, hitTestPoint,
                         HitTestSelf) &&
