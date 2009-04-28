@@ -290,8 +290,8 @@ void ScrollView::platformSetScrollbarModes() {
     needsAdjust = true;
   }
 
-  if (m_data->vScrollbarMode != horizontalScrollbarMode()) {
-    m_data->vScrollbarMode = horizontalScrollbarMode();
+  if (m_data->vScrollbarMode != verticalScrollbarMode()) {
+    m_data->vScrollbarMode = verticalScrollbarMode();
     needsAdjust = true;
   }
 
