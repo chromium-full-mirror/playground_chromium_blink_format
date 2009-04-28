@@ -53,6 +53,10 @@ class RenderSVGText : public RenderSVGBlock {
                            int tx,
                            int ty,
                            HitTestAction);
+  virtual bool nodeAtFloatPoint(const HitTestRequest&,
+                                HitTestResult&,
+                                const FloatPoint& pointInParent,
+                                HitTestAction);
 
   virtual bool requiresLayer() const { return false; }
   virtual void layout();

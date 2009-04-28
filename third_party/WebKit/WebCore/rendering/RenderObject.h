@@ -300,6 +300,10 @@ class RenderObject : public CachedResourceClient {
   void setCellWidthChanged(bool b = true) { m_cellWidthChanged = b; }
 
 #if ENABLE(SVG)
+  // FIXME: Until all SVG renders can be subclasses of RenderSVGModelObject we
+  // have
+  // to add SVG renderer methods to RenderObject with an ASSERT_NOT_REACHED()
+  // default implementation.
   virtual bool isSVGRoot() const { return false; }
   virtual bool isSVGContainer() const { return false; }
   virtual bool isSVGHiddenContainer() const { return false; }
@@ -341,6 +345,14 @@ class RenderObject : public CachedResourceClient {
   // FIXME: This is only virtual so that RenderSVGHiddenContainer can override
   // it to match old LayoutTest results.
   virtual TransformationMatrix absoluteTransform() const;
+
+  // SVG uses FloatPoint precise hit testing, and passes the point in parent
+  // coordinates instead of in repaint container coordinates.  Eventually the
+  // rest of the rendering tree will move to a similar model.
+  virtual bool nodeAtFloatPoint(const HitTestRequest&,
+                                HitTestResult&,
+                                const FloatPoint& pointInParent,
+                                HitTestAction);
 #endif
 
   bool isAnonymous() const { return m_isAnonymous; }

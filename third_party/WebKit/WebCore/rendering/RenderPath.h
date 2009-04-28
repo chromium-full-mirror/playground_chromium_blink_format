@@ -59,13 +59,10 @@ class RenderPath : public RenderSVGModelObject {
   virtual void paint(PaintInfo&, int parentX, int parentY);
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
 
-  virtual bool nodeAtPoint(const HitTestRequest&,
-                           HitTestResult&,
-                           int x,
-                           int y,
-                           int tx,
-                           int ty,
-                           HitTestAction);
+  virtual bool nodeAtFloatPoint(const HitTestRequest&,
+                                HitTestResult&,
+                                const FloatPoint& pointInParent,
+                                HitTestAction);
 
   FloatRect drawMarkersIfNeeded(GraphicsContext*,
                                 const FloatRect&,

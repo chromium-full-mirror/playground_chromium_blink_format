@@ -38,10 +38,11 @@ class RenderForeignObject : public RenderSVGBlock {
 
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
+  virtual TransformationMatrix localToParentTransform() const;
   virtual TransformationMatrix localTransform() const {
     return m_localTransform;
   }
-  virtual bool calculateLocalTransform();
+  bool calculateLocalTransform();
 
   virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect&,
@@ -52,6 +53,10 @@ class RenderForeignObject : public RenderSVGBlock {
   virtual FloatRect objectBoundingBox() const;
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
+  virtual bool nodeAtFloatPoint(const HitTestRequest&,
+                                HitTestResult&,
+                                const FloatPoint& pointInParent,
+                                HitTestAction);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,
@@ -61,10 +66,9 @@ class RenderForeignObject : public RenderSVGBlock {
                            HitTestAction);
 
  private:
-  TransformationMatrix translationForAttributes();
+  TransformationMatrix translationForAttributes() const;
 
   TransformationMatrix m_localTransform;
-  IntRect m_absoluteBounds;
 };
 
 }  // namespace WebCore

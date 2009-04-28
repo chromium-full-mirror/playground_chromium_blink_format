@@ -2581,6 +2581,14 @@ TransformationMatrix RenderObject::absoluteTransform() const {
   return localTransform();
 }
 
+bool RenderObject::nodeAtFloatPoint(const HitTestRequest&,
+                                    HitTestResult&,
+                                    const FloatPoint&,
+                                    HitTestAction) {
+  ASSERT_NOT_REACHED();
+  return false;
+}
+
 #endif  // ENABLE(SVG)
 
 }  // namespace WebCore

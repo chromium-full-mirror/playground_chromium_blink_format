@@ -69,6 +69,16 @@ class RenderSVGModelObject : public RenderObject {
                                    bool useTransforms,
                                    bool fixed,
                                    TransformState&) const;
+
+ private:
+  // This method should never be called, SVG uses a different nodeAtPoint method
+  bool nodeAtPoint(const HitTestRequest& request,
+                   HitTestResult& result,
+                   int xInContainer,
+                   int yInContainer,
+                   int dxParentToContainer,
+                   int dyParentToContainer,
+                   HitTestAction hitTestAction);
 };
 }
 

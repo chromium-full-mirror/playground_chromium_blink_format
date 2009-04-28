@@ -42,7 +42,7 @@ class RenderSVGImage : public RenderImage {
   virtual const char* renderName() const { return "RenderSVGImage"; }
   virtual bool isSVGImage() const { return true; }
 
-  virtual TransformationMatrix localTransform() const {
+  virtual TransformationMatrix localToParentTransform() const {
     return m_localTransform;
   }
 
@@ -72,6 +72,10 @@ class RenderSVGImage : public RenderImage {
 
   bool requiresLayer() const { return false; }
 
+  virtual bool nodeAtFloatPoint(const HitTestRequest&,
+                                HitTestResult&,
+                                const FloatPoint& pointInParent,
+                                HitTestAction);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int _x,
@@ -80,13 +84,14 @@ class RenderSVGImage : public RenderImage {
                            int _ty,
                            HitTestAction);
 
-  bool calculateLocalTransform();
-
  private:
-  void calculateAbsoluteBounds();
+  bool calculateLocalTransform();
+  virtual TransformationMatrix localTransform() const {
+    return m_localTransform;
+  }
+
   TransformationMatrix m_localTransform;
   FloatRect m_localBounds;
-  IntRect m_absoluteBounds;
 };
 
 }  // namespace WebCore

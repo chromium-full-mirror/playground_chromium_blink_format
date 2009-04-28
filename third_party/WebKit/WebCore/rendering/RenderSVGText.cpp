@@ -114,13 +114,10 @@ RootInlineBox* RenderSVGText::createRootBox() {
   return box;
 }
 
-bool RenderSVGText::nodeAtPoint(const HitTestRequest& request,
-                                HitTestResult& result,
-                                int _x,
-                                int _y,
-                                int _tx,
-                                int _ty,
-                                HitTestAction hitTestAction) {
+bool RenderSVGText::nodeAtFloatPoint(const HitTestRequest& request,
+                                     HitTestResult& result,
+                                     const FloatPoint& pointInParent,
+                                     HitTestAction hitTestAction) {
   PointerEventsHitRules hitRules(PointerEventsHitRules::SVG_TEXT_HITTESTING,
                                  style()->pointerEvents());
   bool isVisible = (style()->visibility() == VISIBLE);
@@ -129,15 +126,24 @@ bool RenderSVGText::nodeAtPoint(const HitTestRequest& request,
          (style()->svgStyle()->hasStroke() || !hitRules.requireStroke)) ||
         (hitRules.canHitFill &&
          (style()->svgStyle()->hasFill() || !hitRules.requireFill))) {
-      TransformationMatrix totalTransform = absoluteTransform();
-      double localX, localY;
-      totalTransform.inverse().map(_x, _y, localX, localY);
-      FloatPoint hitPoint(_x, _y);
-      return RenderBlock::nodeAtPoint(request, result, (int)localX, (int)localY,
-                                      _tx, _ty, hitTestAction);
+      FloatPoint localPoint =
+          localToParentTransform().inverse().mapPoint(pointInParent);
+      return RenderBlock::nodeAtPoint(request, result, (int)localPoint.x(),
+                                      (int)localPoint.y(), 0, 0, hitTestAction);
     }
   }
 
+  return false;
+}
+
+bool RenderSVGText::nodeAtPoint(const HitTestRequest&,
+                                HitTestResult&,
+                                int,
+                                int,
+                                int,
+                                int,
+                                HitTestAction) {
+  ASSERT_NOT_REACHED();
   return false;
 }
 
