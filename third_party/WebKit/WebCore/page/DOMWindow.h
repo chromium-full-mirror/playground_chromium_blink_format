@@ -56,6 +56,7 @@ class MessagePort;
 class Navigator;
 class Node;
 class PostMessageTimer;
+class ScheduledAction;
 class Screen;
 class WebKitPoint;
 
@@ -242,8 +243,13 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   void resizeBy(float x, float y) const;
   void resizeTo(float width, float height) const;
 
-  void handleEvent(Event*, bool useCapture, RegisteredEventListenerVector* = 0);
+  // Timers
+  int setTimeout(ScheduledAction*, int timeout);
+  void clearTimeout(int timeoutId);
+  int setInterval(ScheduledAction*, int timeout);
+  void clearInterval(int timeoutId);
 
+  // Events
   // EventTarget API
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,
@@ -252,6 +258,8 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
                                    EventListener*,
                                    bool useCapture);
   virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
+
+  void handleEvent(Event*, bool useCapture, RegisteredEventListenerVector* = 0);
 
   void dispatchEvent(const AtomicString& eventType,
                      bool canBubble,
