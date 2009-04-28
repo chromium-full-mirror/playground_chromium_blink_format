@@ -36,7 +36,8 @@ class NetscapePluginInstanceProxy;
 }
 
 @interface WebHostedNetscapePluginView
-    : WebBaseNetscapePluginView<WebPluginManualLoader> {
+    : WebBaseNetscapePluginView<WebPluginManualLoader,
+                                WebPluginContainerCheckController> {
   RetainPtr<NSArray> _attributeKeys;
   RetainPtr<NSArray> _attributeValues;
 
