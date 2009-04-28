@@ -436,9 +436,8 @@ static bool handleEditingKeyboardEvent(KeyboardEvent* evt) {
   if (!keyEvent)
     return false;
 
-  Node* start = frame->selection()->start().node();
   bool caretBrowsing = frame->settings()->caretBrowsingEnabled();
-  if (caretBrowsing || (start && start->isContentEditable())) {
+  if (caretBrowsing) {
     switch (keyEvent->windowsVirtualKeyCode()) {
       case VK_LEFT:
         frame->selection()->modify(
