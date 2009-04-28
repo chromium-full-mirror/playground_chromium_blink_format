@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reseved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -42,14 +42,16 @@ class WorkerContext;
  */
 class ScheduledAction {
  public:
+  static ScheduledAction* create(JSC::ExecState*, const JSC::ArgList&);
+
+  void execute(ScriptExecutionContext*);
+
+ private:
   ScheduledAction(JSC::ExecState* exec,
                   JSC::JSValuePtr function,
                   const JSC::ArgList&);
   ScheduledAction(const String& code) : m_code(code) {}
 
-  void execute(ScriptExecutionContext*);
-
- private:
   void executeFunctionInContext(JSC::JSGlobalObject*,
                                 JSC::JSValuePtr thisValue);
   void execute(Document*);
