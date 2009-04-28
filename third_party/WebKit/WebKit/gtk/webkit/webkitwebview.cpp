@@ -1867,7 +1867,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       *serifFontFamily, *userStylesheetUri;
   gboolean autoLoadImages, autoShrinkImages, printBackgrounds, enableScripts,
       enablePlugins, enableDeveloperExtras, resizableTextAreas,
-      enablePrivateBrowsing;
+      enablePrivateBrowsing, enableCaretBrowsing;
 
   g_object_get(
       webSettings, "default-encoding", &defaultEncoding, "cursive-font-family",
@@ -1880,7 +1880,8 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       "enable-plugins", &enablePlugins, "resizable-text-areas",
       &resizableTextAreas, "user-stylesheet-uri", &userStylesheetUri,
       "enable-developer-extras", &enableDeveloperExtras,
-      "enable-private-browsing", &enablePrivateBrowsing, NULL);
+      "enable-private-browsing", &enablePrivateBrowsing,
+      "enable-caret-browsing", &enableCaretBrowsing, NULL);
 
   settings->setDefaultTextEncodingName(defaultEncoding);
   settings->setCursiveFontFamily(cursiveFontFamily);
@@ -1898,6 +1899,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setUserStyleSheetLocation(KURL(KURL(), userStylesheetUri));
   settings->setDeveloperExtrasEnabled(enableDeveloperExtras);
   settings->setPrivateBrowsingEnabled(enablePrivateBrowsing);
+  settings->setCaretBrowsingEnabled(enableCaretBrowsing);
 
   g_free(defaultEncoding);
   g_free(cursiveFontFamily);
@@ -1973,6 +1975,8 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
     settings->setDeveloperExtrasEnabled(g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-private-browsing"))
     settings->setPrivateBrowsingEnabled(g_value_get_boolean(&value));
+  else if (name == g_intern_string("enable-caret-browsing"))
+    settings->setCaretBrowsingEnabled(g_value_get_boolean(&value));
   else if (!g_object_class_find_property(G_OBJECT_GET_CLASS(webSettings), name))
     g_warning("Unexpected setting '%s'", name);
   g_value_unset(&value);
