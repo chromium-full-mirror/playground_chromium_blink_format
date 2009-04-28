@@ -963,7 +963,7 @@ QRect QWebFrame::geometry() const {
     \property QWebFrame::contentsSize
     \brief the size of the contents in this frame
 
-    \sa contentsSizeChanged
+    \sa contentsSizeChanged()
 */
 QSize QWebFrame::contentsSize() const {
   FrameView* view = d->frame->view();
@@ -1219,7 +1219,8 @@ QWebFrame* QWebFramePrivate::kit(WebCore::Frame* coreFrame) {
   \fn void QWebFrame::contentsSizeChanged(const QSize &size)
   \since 4.6
 
-  This signal is emitted when the frame's contents size changes.
+  This signal is emitted when the frame's contents size changes
+  to \a size.
 
   \sa contentsSize()
 */
@@ -1401,7 +1402,7 @@ QUrl QWebHitTestResult::linkTitle() const {
   Returns the name of the target frame that will load the link if it is
   activated.
 
-  \sa linkTargetFrame
+  \sa linkTargetFrame()
 */
 QString QWebHitTestResult::linkTarget() const {
   if (!d)
@@ -1412,7 +1413,7 @@ QString QWebHitTestResult::linkTarget() const {
 /*!
     Returns the frame that will load the link if it is activated.
 
-    \sa linkTarget
+    \sa linkTarget()
 */
 QWebFrame* QWebHitTestResult::linkTargetFrame() const {
   if (!d)

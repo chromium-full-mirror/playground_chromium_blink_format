@@ -156,6 +156,7 @@ void QWebNetworkRequestPrivate::setURL(const QUrl& u) {
 
 /*!
   \class QWebNetworkRequest
+  \internal
 
   The QWebNetworkRequest class represents a request for data from the network
   with all the
@@ -202,6 +203,7 @@ QWebNetworkRequest::~QWebNetworkRequest() {
 }
 
 /*!
+  \internal
   The requested URL
 */
 QUrl QWebNetworkRequest::url() const {
@@ -209,6 +211,7 @@ QUrl QWebNetworkRequest::url() const {
 }
 
 /*!
+   \internal
    Sets the URL to request.
 
    Note that setting the URL also sets the "Host" field in the HTTP header.
@@ -218,6 +221,7 @@ void QWebNetworkRequest::setUrl(const QUrl& url) {
 }
 
 /*!
+   \internal
    The http request header information.
 */
 QHttpRequestHeader QWebNetworkRequest::httpHeader() const {
@@ -238,6 +242,7 @@ void QWebNetworkRequest::setHttpHeaderField(const QString& key,
 }
 
 /*!
+    \internal
     Post data sent with HTTP POST requests.
 */
 QByteArray QWebNetworkRequest::postData() const {
@@ -250,6 +255,7 @@ void QWebNetworkRequest::setPostData(const QByteArray& data) {
 
 /*!
   \class QWebNetworkJob
+  \internal
 
   The QWebNetworkJob class represents a network job, that needs to be
   processed by the QWebNetworkInterface.
@@ -278,6 +284,7 @@ QWebNetworkJob::~QWebNetworkJob() {
 }
 
 /*!
+  \internal
   The requested URL
 */
 QUrl QWebNetworkJob::url() const {
@@ -285,6 +292,7 @@ QUrl QWebNetworkJob::url() const {
 }
 
 /*!
+  \internal
   Post data associated with the job
 */
 QByteArray QWebNetworkJob::postData() const {
@@ -292,6 +300,7 @@ QByteArray QWebNetworkJob::postData() const {
 }
 
 /*!
+  \internal
   The HTTP request header that should be used to download the job.
 */
 QHttpRequestHeader QWebNetworkJob::httpHeader() const {
@@ -299,6 +308,7 @@ QHttpRequestHeader QWebNetworkJob::httpHeader() const {
 }
 
 /*!
+  \internal
   The complete network request that should be used to download the job.
 */
 QWebNetworkRequest QWebNetworkJob::request() const {
@@ -306,6 +316,7 @@ QWebNetworkRequest QWebNetworkJob::request() const {
 }
 
 /*!
+  \internal
   The HTTP response header received from the network.
 */
 QHttpResponseHeader QWebNetworkJob::response() const {
@@ -313,6 +324,7 @@ QHttpResponseHeader QWebNetworkJob::response() const {
 }
 
 /*!
+  \internal
   The last error of the Job.
 */
 QString QWebNetworkJob::errorString() const {
@@ -320,6 +332,7 @@ QString QWebNetworkJob::errorString() const {
 }
 
 /*!
+  \internal
   Sets the HTTP reponse header. The response header has to be called before
   emitting QWebNetworkInterface::started.
 */
@@ -332,6 +345,7 @@ void QWebNetworkJob::setErrorString(const QString& errorString) {
 }
 
 /*!
+  \internal
   returns true if the job has been cancelled by the WebKit framework
 */
 bool QWebNetworkJob::cancelled() const {
@@ -339,6 +353,7 @@ bool QWebNetworkJob::cancelled() const {
 }
 
 /*!
+  \internal
   reference the job.
 */
 void QWebNetworkJob::ref() {
@@ -346,6 +361,7 @@ void QWebNetworkJob::ref() {
 }
 
 /*!
+  \internal
   derefence the job.
 
   If the reference count drops to 0 this method also deletes the job.
@@ -361,6 +377,7 @@ bool QWebNetworkJob::deref() {
 }
 
 /*!
+   \internal
    Returns the network interface that is associated with this job.
 */
 QWebNetworkInterface* QWebNetworkJob::networkInterface() const {
@@ -368,6 +385,7 @@ QWebNetworkInterface* QWebNetworkJob::networkInterface() const {
 }
 
 /*!
+   \internal
    Returns the network interface that is associated with this job.
 */
 QWebFrame* QWebNetworkJob::frame() const {
@@ -449,6 +467,9 @@ void QWebNetworkManager::cancel(ResourceHandle* handle) {
   handle->getInternal()->m_job = 0;
 }
 
+/*!
+  \internal
+*/
 void QWebNetworkManager::started(QWebNetworkJob* job) {
   Q_ASSERT(job->d);
   Q_ASSERT(job->status() == QWebNetworkJob::JobCreated ||
@@ -819,6 +840,7 @@ static void gCleanupInterface() {
 }
 
 /*!
+  \internal
   Sets a new default interface that will be used by all of WebKit
   for downloading data from the internet.
 */
@@ -836,6 +858,7 @@ void QWebNetworkInterface::setDefaultInterface(
 }
 
 /*!
+  \internal
   Returns the default interface that will be used by WebKit. If no
   default interface has been set, QtWebkit will create an instance of
   QWebNetworkInterface to do the work.
@@ -848,6 +871,7 @@ QWebNetworkInterface* QWebNetworkInterface::defaultInterface() {
 }
 
 /*!
+  \internal
   Constructs a QWebNetworkInterface object.
 */
 QWebNetworkInterface::QWebNetworkInterface(QObject* parent) : QObject(parent) {
@@ -859,6 +883,7 @@ QWebNetworkInterface::QWebNetworkInterface(QObject* parent) : QObject(parent) {
 }
 
 /*!
+  \internal
   Destructs the QWebNetworkInterface object.
 */
 QWebNetworkInterface::~QWebNetworkInterface() {
@@ -866,6 +891,7 @@ QWebNetworkInterface::~QWebNetworkInterface() {
 }
 
 /*!
+  \internal
   This virtual method gets called whenever QtWebkit needs to add a
   new job to download.
 
@@ -934,6 +960,7 @@ void QWebNetworkInterface::addJob(QWebNetworkJob* job) {
 }
 
 /*!
+  \internal
   This virtual method gets called whenever QtWebkit needs to cancel a
   new job.
 
@@ -948,20 +975,53 @@ void QWebNetworkInterface::cancelJob(QWebNetworkJob* job) {
     QWebNetworkManager::self()->cancelHttpJob(job);
 }
 
+/*!
+  \internal
+*/
 void QWebNetworkInterface::started(QWebNetworkJob* job) {
   Q_ASSERT(s_manager);
   s_manager->queueStart(job);
 }
 
+/*!
+  \internal
+*/
 void QWebNetworkInterface::data(QWebNetworkJob* job, const QByteArray& data) {
   Q_ASSERT(s_manager);
   s_manager->queueData(job, data);
 }
 
+/*!
+  \internal
+*/
 void QWebNetworkInterface::finished(QWebNetworkJob* job, int errorCode) {
   Q_ASSERT(s_manager);
   s_manager->queueFinished(job, errorCode);
 }
+
+/*!
+  \fn void QWebNetworkInterface::sslErrors(QWebFrame *frame, const QUrl& url,
+  const QList<QSslError>& errors, bool *continueAnyway);
+  \internal
+
+   Signal is emitted when an SSL error occurs.
+*/
+
+/*!
+  \fn void QWebNetworkInterface::authenticate(QWebFrame *frame, const QUrl& url,
+  const QString& hostname, quint16 port, QAuthenticator *auth);
+  \internal
+
+  Signal is emitted when network authentication is required.
+*/
+
+/*!
+  \fn void QWebNetworkInterface::authenticateProxy(QWebFrame *frame, const QUrl&
+  url, const QNetworkProxy& proxy, QAuthenticator *auth);
+  \internal
+
+  Signal is emitted when proxy authentication is required.
+*/
 
 /////////////////////////////////////////////////////////////////////////////
 WebCoreHttp::WebCoreHttp(QObject* parent, const HostInfo& hi)
