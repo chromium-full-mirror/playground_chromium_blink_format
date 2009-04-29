@@ -1598,4 +1598,12 @@ void DOMWindow::setOnwebkittransitionend(
                             eventListener);
 }
 
+void DOMWindow::captureEvents() {
+  // Not implemented.
+}
+
+void DOMWindow::releaseEvents() {
+  // Not implemented.
+}
+
 }  // namespace WebCore

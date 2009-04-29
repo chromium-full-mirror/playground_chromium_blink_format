@@ -641,14 +641,6 @@ JSValuePtr JSDOMWindow::removeEventListener(ExecState* exec,
   return jsUndefined();
 }
 
-JSValuePtr JSDOMWindow::captureEvents(ExecState*, const ArgList&) {
-  return jsUndefined();
-}
-
-JSValuePtr JSDOMWindow::releaseEvents(ExecState*, const ArgList&) {
-  return jsUndefined();
-}
-
 DOMWindow* toDOMWindow(JSValuePtr value) {
   if (!value.isObject())
     return 0;
