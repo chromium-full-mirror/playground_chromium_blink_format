@@ -120,6 +120,10 @@ void SimpleFontData::platformInit() {
   }
 }
 
+void SimpleFontData::platformCharWidthInit() {
+  // charwidths are set in platformInit.
+}
+
 void SimpleFontData::platformDestroy() {
   delete m_smallCapsFontData;
   m_smallCapsFontData = 0;
