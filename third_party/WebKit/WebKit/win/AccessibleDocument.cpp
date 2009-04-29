@@ -36,6 +36,10 @@ using namespace WebCore;
 AccessibleDocument::AccessibleDocument(Document* doc)
     : AccessibleBase(doc->axObjectCache()->getOrCreate(doc->renderer())) {}
 
+long AccessibleDocument::role() const {
+  return ROLE_SYSTEM_DOCUMENT;
+}
+
 Document* AccessibleDocument::document() const {
   if (!m_object)
     return 0;
