@@ -143,6 +143,7 @@ class JITStubs {
   static JSValueEncodedAsPointer* JIT_STUB cti_op_get_by_val(STUB_ARGS);
   static JSValueEncodedAsPointer* JIT_STUB
       cti_op_get_by_val_byte_array(STUB_ARGS);
+  static JSValueEncodedAsPointer* JIT_STUB cti_op_get_by_val_string(STUB_ARGS);
   static JSValueEncodedAsPointer* JIT_STUB cti_op_in(STUB_ARGS);
   static JSValueEncodedAsPointer* JIT_STUB cti_op_instanceof(STUB_ARGS);
   static JSValueEncodedAsPointer* JIT_STUB cti_op_is_boolean(STUB_ARGS);
