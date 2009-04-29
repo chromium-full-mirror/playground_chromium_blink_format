@@ -531,6 +531,36 @@ QWebFrame* QWebElement::webFrame() const {
   return QWebFramePrivate::kit(frame);
 }
 
+static bool setupScriptContext(WebCore::Element* element,
+                               JSC::JSValuePtr& thisValue,
+                               ScriptState*& state,
+                               ScriptController*& scriptController) {
+  if (!element)
+    return false;
+
+  Document* document = element->document();
+  if (!document)
+    return false;
+
+  Frame* frame = document->frame();
+  if (!frame)
+    return false;
+
+  scriptController = frame->script();
+  if (!scriptController)
+    return false;
+
+  state = scriptController->globalObject()->globalExec();
+  if (!state)
+    return false;
+
+  thisValue = toJS(state, element);
+  if (!thisValue)
+    return false;
+
+  return true;
+}
+
 static bool setupScriptObject(WebCore::Element* element,
                               ScriptObject& object,
                               ScriptState*& state,
@@ -560,6 +590,41 @@ static bool setupScriptObject(WebCore::Element* element,
 
   object = ScriptObject(thisObject);
   return true;
+}
+
+/*!
+    Executes the \a scriptSource with this element as the `this' object.
+
+    \sa callFunction()
+*/
+QVariant QWebElement::evaluateScript(const QString& scriptSource) {
+  if (scriptSource.isEmpty())
+    return QVariant();
+
+  ScriptState* state = 0;
+  JSC::JSValuePtr thisValue;
+  ScriptController* scriptController = 0;
+
+  if (!setupScriptContext(m_element, thisValue, state, scriptController))
+    return QVariant();
+
+  JSC::ScopeChain& scopeChain =
+      state->dynamicGlobalObject()->globalScopeChain();
+  JSC::UString script((const ushort*)scriptSource.data(),
+                      scriptSource.length());
+  JSC::Completion completion =
+      JSC::evaluate(state, scopeChain, JSC::makeSource(script), thisValue);
+  if ((completion.complType() != JSC::ReturnValue) &&
+      (completion.complType() != JSC::Normal))
+    return QVariant();
+
+  JSC::JSValuePtr result = completion.value();
+  if (!result)
+    return QVariant();
+
+  int distance = 0;
+  return JSC::Bindings::convertValueToQVariant(state, result, QMetaType::Void,
+                                               &distance);
 }
 
 /*!
