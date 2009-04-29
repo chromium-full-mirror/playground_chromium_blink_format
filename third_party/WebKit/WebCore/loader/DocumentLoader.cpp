@@ -549,12 +549,11 @@ PassRefPtr<ArchiveResource> DocumentLoader::subresource(const KURL& url) const {
 
   CachedResource* resource =
       m_frame->document()->docLoader()->cachedResource(url);
-  if (!resource ||
-      resource->preloadResult() == CachedResource::PreloadReferenced)
+  if (!resource)
     return archiveResourceForURL(url);
 
   // FIXME: This has the side effect of making the resource non-purgeable.
-  // It would be better if it didn't have this permanent affect.
+  // It would be better if it didn't have this permanent effect.
   if (!resource->makePurgeable(false))
     return 0;
 
