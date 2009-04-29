@@ -346,7 +346,7 @@ VisiblePosition SelectionController::modifyExtendingForward(
       pos = endOfSentence(VisiblePosition(m_sel.end(), m_sel.affinity()));
       break;
     case LineBoundary:
-      pos = endOfLine(VisiblePosition(m_sel.end(), m_sel.affinity()));
+      pos = logicalEndOfLine(VisiblePosition(m_sel.end(), m_sel.affinity()));
       break;
     case ParagraphBoundary:
       pos = endOfParagraph(VisiblePosition(m_sel.end(), m_sel.affinity()));
@@ -425,7 +425,7 @@ VisiblePosition SelectionController::modifyMovingForward(
       pos = endOfSentence(VisiblePosition(m_sel.end(), m_sel.affinity()));
       break;
     case LineBoundary:
-      pos = endOfLine(VisiblePosition(m_sel.end(), m_sel.affinity()));
+      pos = logicalEndOfLine(VisiblePosition(m_sel.end(), m_sel.affinity()));
       break;
     case ParagraphBoundary:
       pos = endOfParagraph(VisiblePosition(m_sel.end(), m_sel.affinity()));
@@ -508,7 +508,8 @@ VisiblePosition SelectionController::modifyExtendingBackward(
       pos = startOfSentence(VisiblePosition(m_sel.start(), m_sel.affinity()));
       break;
     case LineBoundary:
-      pos = startOfLine(VisiblePosition(m_sel.start(), m_sel.affinity()));
+      pos =
+          logicalStartOfLine(VisiblePosition(m_sel.start(), m_sel.affinity()));
       break;
     case ParagraphBoundary:
       pos = startOfParagraph(VisiblePosition(m_sel.start(), m_sel.affinity()));
@@ -581,7 +582,8 @@ VisiblePosition SelectionController::modifyMovingBackward(
       pos = startOfSentence(VisiblePosition(m_sel.start(), m_sel.affinity()));
       break;
     case LineBoundary:
-      pos = startOfLine(VisiblePosition(m_sel.start(), m_sel.affinity()));
+      pos =
+          logicalStartOfLine(VisiblePosition(m_sel.start(), m_sel.affinity()));
       break;
     case ParagraphBoundary:
       pos = startOfParagraph(VisiblePosition(m_sel.start(), m_sel.affinity()));
