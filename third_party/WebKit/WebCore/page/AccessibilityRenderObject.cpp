@@ -2162,6 +2162,8 @@ AccessibilityRole AccessibilityRenderObject::roleValue() const {
       return ImageMapRole;
     return WebCoreLinkRole;
   }
+  if (m_renderer->isListItem())
+    return ListItemRole;
   if (m_renderer->isListMarker())
     return ListMarkerRole;
   if (node && node->hasTagName(buttonTag))
@@ -2264,6 +2266,7 @@ bool AccessibilityRenderObject::canSetFocusAttribute() const {
     case PopUpButtonRole:
     case CheckBoxRole:
     case RadioButtonRole:
+    case ListItemRole:
       return true;
     default:
       return false;
