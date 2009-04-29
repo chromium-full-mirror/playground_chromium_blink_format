@@ -103,6 +103,7 @@ class tst_QWebPage : public QObject {
   void cursorMovements();
   void textSelection();
   void textEditing();
+  void backActionUpdate();
 
   void requestCache();
 
@@ -1189,6 +1190,22 @@ void tst_QWebPage::requestCache() {
                           QNetworkRequest::PreferNetwork)
                .toInt(),
            (int)QNetworkRequest::PreferCache);
+}
+
+void tst_QWebPage::backActionUpdate() {
+  QWebView view;
+  QWebPage* page = view.page();
+  QAction* action = page->action(QWebPage::Back);
+  QVERIFY(!action->isEnabled());
+  QSignalSpy loadSpy(page, SIGNAL(loadFinished(bool)));
+  QUrl url = QUrl("qrc:///frametest/index.html");
+  page->mainFrame()->load(url);
+  QTRY_COMPARE(loadSpy.count(), 1);
+  QVERIFY(!action->isEnabled());
+  QTest::mouseClick(&view, Qt::LeftButton, 0, QPoint(10, 10));
+  QTRY_COMPARE(loadSpy.count(), 2);
+
+  QVERIFY(action->isEnabled());
 }
 
 QTEST_MAIN(tst_QWebPage)
