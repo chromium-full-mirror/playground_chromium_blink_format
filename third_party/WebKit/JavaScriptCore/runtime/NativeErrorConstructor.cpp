@@ -54,9 +54,9 @@ NativeErrorConstructor::NativeErrorConstructor(
 ErrorInstance* NativeErrorConstructor::construct(ExecState* exec,
                                                  const ArgList& args) {
   ErrorInstance* object = new (exec) ErrorInstance(m_errorStructure);
-  if (!args.at(exec, 0).isUndefined())
+  if (!args.at(0).isUndefined())
     object->putDirect(exec->propertyNames().message,
-                      jsString(exec, args.at(exec, 0).toString(exec)));
+                      jsString(exec, args.at(0).toString(exec)));
   return object;
 }
 

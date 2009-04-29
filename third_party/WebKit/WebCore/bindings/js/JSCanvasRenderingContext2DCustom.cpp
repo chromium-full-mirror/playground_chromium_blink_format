@@ -91,29 +91,27 @@ JSValuePtr JSCanvasRenderingContext2D::setFillColor(ExecState* exec,
   // 5 args = c, m, y, k, a
   switch (args.size()) {
     case 1:
-      if (args.at(exec, 0).isString())
-        context->setFillColor(asString(args.at(exec, 0))->value());
+      if (args.at(0).isString())
+        context->setFillColor(asString(args.at(0))->value());
       else
-        context->setFillColor(args.at(exec, 0).toFloat(exec));
+        context->setFillColor(args.at(0).toFloat(exec));
       break;
     case 2:
-      if (args.at(exec, 0).isString())
-        context->setFillColor(asString(args.at(exec, 0))->value(),
-                              args.at(exec, 1).toFloat(exec));
+      if (args.at(0).isString())
+        context->setFillColor(asString(args.at(0))->value(),
+                              args.at(1).toFloat(exec));
       else
-        context->setFillColor(args.at(exec, 0).toFloat(exec),
-                              args.at(exec, 1).toFloat(exec));
+        context->setFillColor(args.at(0).toFloat(exec),
+                              args.at(1).toFloat(exec));
       break;
     case 4:
-      context->setFillColor(
-          args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-          args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec));
+      context->setFillColor(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                            args.at(2).toFloat(exec), args.at(3).toFloat(exec));
       break;
     case 5:
-      context->setFillColor(
-          args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-          args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec),
-          args.at(exec, 4).toFloat(exec));
+      context->setFillColor(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                            args.at(2).toFloat(exec), args.at(3).toFloat(exec),
+                            args.at(4).toFloat(exec));
       break;
     default:
       return throwError(exec, SyntaxError);
@@ -133,29 +131,29 @@ JSValuePtr JSCanvasRenderingContext2D::setStrokeColor(ExecState* exec,
   // 5 args = c, m, y, k, a
   switch (args.size()) {
     case 1:
-      if (args.at(exec, 0).isString())
-        context->setStrokeColor(asString(args.at(exec, 0))->value());
+      if (args.at(0).isString())
+        context->setStrokeColor(asString(args.at(0))->value());
       else
-        context->setStrokeColor(args.at(exec, 0).toFloat(exec));
+        context->setStrokeColor(args.at(0).toFloat(exec));
       break;
     case 2:
-      if (args.at(exec, 0).isString())
-        context->setStrokeColor(asString(args.at(exec, 0))->value(),
-                                args.at(exec, 1).toFloat(exec));
+      if (args.at(0).isString())
+        context->setStrokeColor(asString(args.at(0))->value(),
+                                args.at(1).toFloat(exec));
       else
-        context->setStrokeColor(args.at(exec, 0).toFloat(exec),
-                                args.at(exec, 1).toFloat(exec));
+        context->setStrokeColor(args.at(0).toFloat(exec),
+                                args.at(1).toFloat(exec));
       break;
     case 4:
       context->setStrokeColor(
-          args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-          args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec));
+          args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+          args.at(2).toFloat(exec), args.at(3).toFloat(exec));
       break;
     case 5:
       context->setStrokeColor(
-          args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-          args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec),
-          args.at(exec, 4).toFloat(exec));
+          args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+          args.at(2).toFloat(exec), args.at(3).toFloat(exec),
+          args.at(4).toFloat(exec));
       break;
     default:
       return throwError(exec, SyntaxError);
@@ -169,14 +167,12 @@ JSValuePtr JSCanvasRenderingContext2D::strokeRect(ExecState* exec,
   CanvasRenderingContext2D* context = impl();
 
   if (args.size() <= 4)
-    context->strokeRect(
-        args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-        args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec));
+    context->strokeRect(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                        args.at(2).toFloat(exec), args.at(3).toFloat(exec));
   else
-    context->strokeRect(
-        args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-        args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec),
-        args.at(exec, 4).toFloat(exec));
+    context->strokeRect(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                        args.at(2).toFloat(exec), args.at(3).toFloat(exec),
+                        args.at(4).toFloat(exec));
 
   return jsUndefined();
 }
@@ -191,7 +187,7 @@ JSValuePtr JSCanvasRenderingContext2D::drawImage(ExecState* exec,
   //     drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)
   // Composite operation is specified with globalCompositeOperation.
   // The img parameter can be a <img> or <canvas> element.
-  JSValuePtr value = args.at(exec, 0);
+  JSValuePtr value = args.at(0);
   if (!value.isObject())
     return throwError(exec, TypeError);
   JSObject* o = asObject(value);
@@ -202,26 +198,23 @@ JSValuePtr JSCanvasRenderingContext2D::drawImage(ExecState* exec,
         static_cast<HTMLImageElement*>(static_cast<JSHTMLElement*>(o)->impl());
     switch (args.size()) {
       case 3:
-        context->drawImage(imgElt, args.at(exec, 1).toFloat(exec),
-                           args.at(exec, 2).toFloat(exec));
+        context->drawImage(imgElt, args.at(1).toFloat(exec),
+                           args.at(2).toFloat(exec));
         break;
       case 5:
-        context->drawImage(imgElt, args.at(exec, 1).toFloat(exec),
-                           args.at(exec, 2).toFloat(exec),
-                           args.at(exec, 3).toFloat(exec),
-                           args.at(exec, 4).toFloat(exec), ec);
+        context->drawImage(imgElt, args.at(1).toFloat(exec),
+                           args.at(2).toFloat(exec), args.at(3).toFloat(exec),
+                           args.at(4).toFloat(exec), ec);
         setDOMException(exec, ec);
         break;
       case 9:
-        context->drawImage(imgElt, FloatRect(args.at(exec, 1).toFloat(exec),
-                                             args.at(exec, 2).toFloat(exec),
-                                             args.at(exec, 3).toFloat(exec),
-                                             args.at(exec, 4).toFloat(exec)),
-                           FloatRect(args.at(exec, 5).toFloat(exec),
-                                     args.at(exec, 6).toFloat(exec),
-                                     args.at(exec, 7).toFloat(exec),
-                                     args.at(exec, 8).toFloat(exec)),
-                           ec);
+        context->drawImage(
+            imgElt,
+            FloatRect(args.at(1).toFloat(exec), args.at(2).toFloat(exec),
+                      args.at(3).toFloat(exec), args.at(4).toFloat(exec)),
+            FloatRect(args.at(5).toFloat(exec), args.at(6).toFloat(exec),
+                      args.at(7).toFloat(exec), args.at(8).toFloat(exec)),
+            ec);
         setDOMException(exec, ec);
         break;
       default:
@@ -232,26 +225,23 @@ JSValuePtr JSCanvasRenderingContext2D::drawImage(ExecState* exec,
         static_cast<HTMLCanvasElement*>(static_cast<JSHTMLElement*>(o)->impl());
     switch (args.size()) {
       case 3:
-        context->drawImage(canvas, args.at(exec, 1).toFloat(exec),
-                           args.at(exec, 2).toFloat(exec));
+        context->drawImage(canvas, args.at(1).toFloat(exec),
+                           args.at(2).toFloat(exec));
         break;
       case 5:
-        context->drawImage(canvas, args.at(exec, 1).toFloat(exec),
-                           args.at(exec, 2).toFloat(exec),
-                           args.at(exec, 3).toFloat(exec),
-                           args.at(exec, 4).toFloat(exec), ec);
+        context->drawImage(canvas, args.at(1).toFloat(exec),
+                           args.at(2).toFloat(exec), args.at(3).toFloat(exec),
+                           args.at(4).toFloat(exec), ec);
         setDOMException(exec, ec);
         break;
       case 9:
-        context->drawImage(canvas, FloatRect(args.at(exec, 1).toFloat(exec),
-                                             args.at(exec, 2).toFloat(exec),
-                                             args.at(exec, 3).toFloat(exec),
-                                             args.at(exec, 4).toFloat(exec)),
-                           FloatRect(args.at(exec, 5).toFloat(exec),
-                                     args.at(exec, 6).toFloat(exec),
-                                     args.at(exec, 7).toFloat(exec),
-                                     args.at(exec, 8).toFloat(exec)),
-                           ec);
+        context->drawImage(
+            canvas,
+            FloatRect(args.at(1).toFloat(exec), args.at(2).toFloat(exec),
+                      args.at(3).toFloat(exec), args.at(4).toFloat(exec)),
+            FloatRect(args.at(5).toFloat(exec), args.at(6).toFloat(exec),
+                      args.at(7).toFloat(exec), args.at(8).toFloat(exec)),
+            ec);
         setDOMException(exec, ec);
         break;
       default:
@@ -268,7 +258,7 @@ JSValuePtr JSCanvasRenderingContext2D::drawImageFromRect(ExecState* exec,
                                                          const ArgList& args) {
   CanvasRenderingContext2D* context = impl();
 
-  JSValuePtr value = args.at(exec, 0);
+  JSValuePtr value = args.at(0);
   if (!value.isObject())
     return throwError(exec, TypeError);
   JSObject* o = asObject(value);
@@ -277,11 +267,11 @@ JSValuePtr JSCanvasRenderingContext2D::drawImageFromRect(ExecState* exec,
     return throwError(exec, TypeError);
   context->drawImageFromRect(
       static_cast<HTMLImageElement*>(static_cast<JSHTMLElement*>(o)->impl()),
-      args.at(exec, 1).toFloat(exec), args.at(exec, 2).toFloat(exec),
-      args.at(exec, 3).toFloat(exec), args.at(exec, 4).toFloat(exec),
-      args.at(exec, 5).toFloat(exec), args.at(exec, 6).toFloat(exec),
-      args.at(exec, 7).toFloat(exec), args.at(exec, 8).toFloat(exec),
-      args.at(exec, 9).toString(exec));
+      args.at(1).toFloat(exec), args.at(2).toFloat(exec),
+      args.at(3).toFloat(exec), args.at(4).toFloat(exec),
+      args.at(5).toFloat(exec), args.at(6).toFloat(exec),
+      args.at(7).toFloat(exec), args.at(8).toFloat(exec),
+      args.at(9).toString(exec));
   return jsUndefined();
 }
 
@@ -291,46 +281,40 @@ JSValuePtr JSCanvasRenderingContext2D::setShadow(ExecState* exec,
 
   switch (args.size()) {
     case 3:
-      context->setShadow(args.at(exec, 0).toFloat(exec),
-                         args.at(exec, 1).toFloat(exec),
-                         args.at(exec, 2).toFloat(exec));
+      context->setShadow(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                         args.at(2).toFloat(exec));
       break;
     case 4:
-      if (args.at(exec, 3).isString())
-        context->setShadow(args.at(exec, 0).toFloat(exec),
-                           args.at(exec, 1).toFloat(exec),
-                           args.at(exec, 2).toFloat(exec),
-                           asString(args.at(exec, 3))->value());
+      if (args.at(3).isString())
+        context->setShadow(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                           args.at(2).toFloat(exec),
+                           asString(args.at(3))->value());
       else
-        context->setShadow(
-            args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-            args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec));
+        context->setShadow(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                           args.at(2).toFloat(exec), args.at(3).toFloat(exec));
       break;
     case 5:
-      if (args.at(exec, 3).isString())
-        context->setShadow(
-            args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-            args.at(exec, 2).toFloat(exec), asString(args.at(exec, 3))->value(),
-            args.at(exec, 4).toFloat(exec));
+      if (args.at(3).isString())
+        context->setShadow(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                           args.at(2).toFloat(exec),
+                           asString(args.at(3))->value(),
+                           args.at(4).toFloat(exec));
       else
-        context->setShadow(
-            args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-            args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec),
-            args.at(exec, 4).toFloat(exec));
+        context->setShadow(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                           args.at(2).toFloat(exec), args.at(3).toFloat(exec),
+                           args.at(4).toFloat(exec));
       break;
     case 7:
-      context->setShadow(
-          args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-          args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec),
-          args.at(exec, 4).toFloat(exec), args.at(exec, 5).toFloat(exec),
-          args.at(exec, 6).toFloat(exec));
+      context->setShadow(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                         args.at(2).toFloat(exec), args.at(3).toFloat(exec),
+                         args.at(4).toFloat(exec), args.at(5).toFloat(exec),
+                         args.at(6).toFloat(exec));
       break;
     case 8:
-      context->setShadow(
-          args.at(exec, 0).toFloat(exec), args.at(exec, 1).toFloat(exec),
-          args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec),
-          args.at(exec, 4).toFloat(exec), args.at(exec, 5).toFloat(exec),
-          args.at(exec, 6).toFloat(exec), args.at(exec, 7).toFloat(exec));
+      context->setShadow(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
+                         args.at(2).toFloat(exec), args.at(3).toFloat(exec),
+                         args.at(4).toFloat(exec), args.at(5).toFloat(exec),
+                         args.at(6).toFloat(exec), args.at(7).toFloat(exec));
       break;
     default:
       return throwError(exec, SyntaxError);
@@ -343,7 +327,7 @@ JSValuePtr JSCanvasRenderingContext2D::createPattern(ExecState* exec,
                                                      const ArgList& args) {
   CanvasRenderingContext2D* context = impl();
 
-  JSValuePtr value = args.at(exec, 0);
+  JSValuePtr value = args.at(0);
   if (!value.isObject())
     return throwError(exec, TypeError);
   JSObject* o = asObject(value);
@@ -351,24 +335,24 @@ JSValuePtr JSCanvasRenderingContext2D::createPattern(ExecState* exec,
   if (o->inherits(&JSHTMLImageElement::s_info)) {
     ExceptionCode ec;
     JSValuePtr pattern = toJS(
-        exec, context
-                  ->createPattern(
-                      static_cast<HTMLImageElement*>(
-                          static_cast<JSHTMLElement*>(o)->impl()),
-                      valueToStringWithNullCheck(exec, args.at(exec, 1)), ec)
-                  .get());
+        exec,
+        context
+            ->createPattern(static_cast<HTMLImageElement*>(
+                                static_cast<JSHTMLElement*>(o)->impl()),
+                            valueToStringWithNullCheck(exec, args.at(1)), ec)
+            .get());
     setDOMException(exec, ec);
     return pattern;
   }
   if (o->inherits(&JSHTMLCanvasElement::s_info)) {
     ExceptionCode ec;
     JSValuePtr pattern = toJS(
-        exec, context
-                  ->createPattern(
-                      static_cast<HTMLCanvasElement*>(
-                          static_cast<JSHTMLElement*>(o)->impl()),
-                      valueToStringWithNullCheck(exec, args.at(exec, 1)), ec)
-                  .get());
+        exec,
+        context
+            ->createPattern(static_cast<HTMLCanvasElement*>(
+                                static_cast<JSHTMLElement*>(o)->impl()),
+                            valueToStringWithNullCheck(exec, args.at(1)), ec)
+            .get());
     setDOMException(exec, ec);
     return pattern;
   }
@@ -385,15 +369,13 @@ JSValuePtr JSCanvasRenderingContext2D::putImageData(ExecState* exec,
 
   ExceptionCode ec = 0;
   if (args.size() >= 7)
-    context->putImageData(
-        toImageData(args.at(exec, 0)), args.at(exec, 1).toFloat(exec),
-        args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec),
-        args.at(exec, 4).toFloat(exec), args.at(exec, 5).toFloat(exec),
-        args.at(exec, 6).toFloat(exec), ec);
+    context->putImageData(toImageData(args.at(0)), args.at(1).toFloat(exec),
+                          args.at(2).toFloat(exec), args.at(3).toFloat(exec),
+                          args.at(4).toFloat(exec), args.at(5).toFloat(exec),
+                          args.at(6).toFloat(exec), ec);
   else
-    context->putImageData(toImageData(args.at(exec, 0)),
-                          args.at(exec, 1).toFloat(exec),
-                          args.at(exec, 2).toFloat(exec), ec);
+    context->putImageData(toImageData(args.at(0)), args.at(1).toFloat(exec),
+                          args.at(2).toFloat(exec), ec);
 
   setDOMException(exec, ec);
   return jsUndefined();
@@ -411,13 +393,11 @@ JSValuePtr JSCanvasRenderingContext2D::fillText(ExecState* exec,
     return throwError(exec, SyntaxError);
 
   if (args.size() == 4)
-    context->fillText(
-        args.at(exec, 0).toString(exec), args.at(exec, 1).toFloat(exec),
-        args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec));
+    context->fillText(args.at(0).toString(exec), args.at(1).toFloat(exec),
+                      args.at(2).toFloat(exec), args.at(3).toFloat(exec));
   else
-    context->fillText(args.at(exec, 0).toString(exec),
-                      args.at(exec, 1).toFloat(exec),
-                      args.at(exec, 2).toFloat(exec));
+    context->fillText(args.at(0).toString(exec), args.at(1).toFloat(exec),
+                      args.at(2).toFloat(exec));
   return jsUndefined();
 }
 
@@ -433,13 +413,11 @@ JSValuePtr JSCanvasRenderingContext2D::strokeText(ExecState* exec,
     return throwError(exec, SyntaxError);
 
   if (args.size() == 4)
-    context->strokeText(
-        args.at(exec, 0).toString(exec), args.at(exec, 1).toFloat(exec),
-        args.at(exec, 2).toFloat(exec), args.at(exec, 3).toFloat(exec));
+    context->strokeText(args.at(0).toString(exec), args.at(1).toFloat(exec),
+                        args.at(2).toFloat(exec), args.at(3).toFloat(exec));
   else
-    context->strokeText(args.at(exec, 0).toString(exec),
-                        args.at(exec, 1).toFloat(exec),
-                        args.at(exec, 2).toFloat(exec));
+    context->strokeText(args.at(0).toString(exec), args.at(1).toFloat(exec),
+                        args.at(2).toFloat(exec));
   return jsUndefined();
 }
 

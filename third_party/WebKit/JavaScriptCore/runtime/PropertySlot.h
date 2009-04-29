@@ -56,7 +56,7 @@ class PropertySlot {
     if (m_getValue == JSC_VALUE_SLOT_MARKER)
       return *m_data.valueSlot;
     if (m_getValue == JSC_REGISTER_SLOT_MARKER)
-      return (*m_data.registerSlot).jsValue(exec);
+      return (*m_data.registerSlot).jsValue();
     return m_getValue(exec, propertyName, *this);
   }
 
@@ -64,7 +64,7 @@ class PropertySlot {
     if (m_getValue == JSC_VALUE_SLOT_MARKER)
       return *m_data.valueSlot;
     if (m_getValue == JSC_REGISTER_SLOT_MARKER)
-      return (*m_data.registerSlot).jsValue(exec);
+      return (*m_data.registerSlot).jsValue();
     return m_getValue(exec, Identifier::from(exec, propertyName), *this);
   }
 

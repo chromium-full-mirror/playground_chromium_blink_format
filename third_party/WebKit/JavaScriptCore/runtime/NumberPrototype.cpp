@@ -182,8 +182,8 @@ JSValuePtr numberProtoFuncToString(ExecState* exec,
   if (!v)
     return throwError(exec, TypeError);
 
-  double radixAsDouble = args.at(exec, 0).toInteger(exec);  // nan -> 0
-  if (radixAsDouble == 10 || args.at(exec, 0).isUndefined())
+  double radixAsDouble = args.at(0).toInteger(exec);  // nan -> 0
+  if (radixAsDouble == 10 || args.at(0).isUndefined())
     return jsString(exec, v.toString(exec));
 
   if (radixAsDouble < 2 || radixAsDouble > 36)
@@ -273,7 +273,7 @@ JSValuePtr numberProtoFuncToFixed(ExecState* exec,
   if (!v)
     return throwError(exec, TypeError);
 
-  JSValuePtr fractionDigits = args.at(exec, 0);
+  JSValuePtr fractionDigits = args.at(0);
   double df = fractionDigits.toInteger(exec);
   if (!(df >= 0 && df <= 20))
     return throwError(exec, RangeError,
@@ -368,7 +368,7 @@ JSValuePtr numberProtoFuncToExponential(ExecState* exec,
   if (isnan(x) || isinf(x))
     return jsString(exec, UString::from(x));
 
-  JSValuePtr fractionalDigitsValue = args.at(exec, 0);
+  JSValuePtr fractionalDigitsValue = args.at(0);
   double df = fractionalDigitsValue.toInteger(exec);
   if (!(df >= 0 && df <= 20))
     return throwError(exec, RangeError,
@@ -438,9 +438,9 @@ JSValuePtr numberProtoFuncToPrecision(ExecState* exec,
   if (!v)
     return throwError(exec, TypeError);
 
-  double doublePrecision = args.at(exec, 0).toIntegerPreserveNaN(exec);
+  double doublePrecision = args.at(0).toIntegerPreserveNaN(exec);
   double x = v.uncheckedGetNumber();
-  if (args.at(exec, 0).isUndefined() || isnan(x) || isinf(x))
+  if (args.at(0).isUndefined() || isnan(x) || isinf(x))
     return jsString(exec, v.toString(exec));
 
   UString s;

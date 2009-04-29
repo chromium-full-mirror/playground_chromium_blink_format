@@ -309,9 +309,9 @@ JSValuePtr stringProtoFuncReplace(ExecState* exec,
   JSString* sourceVal = thisValue.toThisJSString(exec);
   const UString& source = sourceVal->value();
 
-  JSValuePtr pattern = args.at(exec, 0);
+  JSValuePtr pattern = args.at(0);
 
-  JSValuePtr replacement = args.at(exec, 1);
+  JSValuePtr replacement = args.at(1);
   UString replacementString;
   CallData callData;
   CallType callType = replacement.getCallData(callData);
@@ -490,7 +490,7 @@ JSValuePtr stringProtoFuncCharAt(ExecState* exec,
                                  const ArgList& args) {
   UString s = thisValue.toThisString(exec);
   unsigned len = s.size();
-  JSValuePtr a0 = args.at(exec, 0);
+  JSValuePtr a0 = args.at(0);
   if (a0.isUInt32Fast()) {
     uint32_t i = a0.getUInt32Fast();
     if (i < len)
@@ -509,7 +509,7 @@ JSValuePtr stringProtoFuncCharCodeAt(ExecState* exec,
                                      const ArgList& args) {
   UString s = thisValue.toThisString(exec);
   unsigned len = s.size();
-  JSValuePtr a0 = args.at(exec, 0);
+  JSValuePtr a0 = args.at(0);
   if (a0.isUInt32Fast()) {
     uint32_t i = a0.getUInt32Fast();
     if (i < len)
@@ -530,7 +530,7 @@ JSValuePtr stringProtoFuncConcat(ExecState* exec,
 
   ArgList::const_iterator end = args.end();
   for (ArgList::const_iterator it = args.begin(); it != end; ++it)
-    s += (*it).jsValue(exec).toString(exec);
+    s += (*it).jsValue().toString(exec);
   return jsString(exec, s);
 }
 
@@ -541,8 +541,8 @@ JSValuePtr stringProtoFuncIndexOf(ExecState* exec,
   UString s = thisValue.toThisString(exec);
   int len = s.size();
 
-  JSValuePtr a0 = args.at(exec, 0);
-  JSValuePtr a1 = args.at(exec, 1);
+  JSValuePtr a0 = args.at(0);
+  JSValuePtr a1 = args.at(1);
   UString u2 = a0.toString(exec);
   int pos;
   if (a1.isUndefined())
@@ -568,8 +568,8 @@ JSValuePtr stringProtoFuncLastIndexOf(ExecState* exec,
   UString s = thisValue.toThisString(exec);
   int len = s.size();
 
-  JSValuePtr a0 = args.at(exec, 0);
-  JSValuePtr a1 = args.at(exec, 1);
+  JSValuePtr a0 = args.at(0);
+  JSValuePtr a1 = args.at(1);
 
   UString u2 = a0.toString(exec);
   double dpos = a1.toIntegerPreserveNaN(exec);
@@ -586,7 +586,7 @@ JSValuePtr stringProtoFuncMatch(ExecState* exec,
                                 const ArgList& args) {
   UString s = thisValue.toThisString(exec);
 
-  JSValuePtr a0 = args.at(exec, 0);
+  JSValuePtr a0 = args.at(0);
 
   UString u = s;
   RefPtr<RegExp> reg;
@@ -640,7 +640,7 @@ JSValuePtr stringProtoFuncSearch(ExecState* exec,
                                  const ArgList& args) {
   UString s = thisValue.toThisString(exec);
 
-  JSValuePtr a0 = args.at(exec, 0);
+  JSValuePtr a0 = args.at(0);
 
   UString u = s;
   RefPtr<RegExp> reg;
@@ -669,8 +669,8 @@ JSValuePtr stringProtoFuncSlice(ExecState* exec,
   UString s = thisValue.toThisString(exec);
   int len = s.size();
 
-  JSValuePtr a0 = args.at(exec, 0);
-  JSValuePtr a1 = args.at(exec, 1);
+  JSValuePtr a0 = args.at(0);
+  JSValuePtr a1 = args.at(1);
 
   // The arg processing is very much like ArrayProtoFunc::Slice
   double start = a0.toInteger(exec);
@@ -695,8 +695,8 @@ JSValuePtr stringProtoFuncSplit(ExecState* exec,
                                 const ArgList& args) {
   UString s = thisValue.toThisString(exec);
 
-  JSValuePtr a0 = args.at(exec, 0);
-  JSValuePtr a1 = args.at(exec, 1);
+  JSValuePtr a0 = args.at(0);
+  JSValuePtr a1 = args.at(1);
 
   JSArray* result = constructEmptyArray(exec);
   unsigned i = 0;
@@ -761,8 +761,8 @@ JSValuePtr stringProtoFuncSubstr(ExecState* exec,
   UString s = thisValue.toThisString(exec);
   int len = s.size();
 
-  JSValuePtr a0 = args.at(exec, 0);
-  JSValuePtr a1 = args.at(exec, 1);
+  JSValuePtr a0 = args.at(0);
+  JSValuePtr a1 = args.at(1);
 
   double start = a0.toInteger(exec);
   double length = a1.isUndefined() ? len : a1.toInteger(exec);
@@ -786,8 +786,8 @@ JSValuePtr stringProtoFuncSubstring(ExecState* exec,
   UString s = thisValue.toThisString(exec);
   int len = s.size();
 
-  JSValuePtr a0 = args.at(exec, 0);
-  JSValuePtr a1 = args.at(exec, 1);
+  JSValuePtr a0 = args.at(0);
+  JSValuePtr a1 = args.at(1);
 
   double start = a0.toNumber(exec);
   double end = a1.toNumber(exec);
@@ -896,7 +896,7 @@ JSValuePtr stringProtoFuncLocaleCompare(ExecState* exec,
     return jsNumber(exec, 0);
 
   UString s = thisValue.toThisString(exec);
-  JSValuePtr a0 = args.at(exec, 0);
+  JSValuePtr a0 = args.at(0);
   return jsNumber(exec, localeCompare(s, a0.toString(exec)));
 }
 
@@ -977,7 +977,7 @@ JSValuePtr stringProtoFuncFontcolor(ExecState* exec,
                                     JSValuePtr thisValue,
                                     const ArgList& args) {
   UString s = thisValue.toThisString(exec);
-  JSValuePtr a0 = args.at(exec, 0);
+  JSValuePtr a0 = args.at(0);
   return jsNontrivialString(
       exec, "<font color=\"" + a0.toString(exec) + "\">" + s + "</font>");
 }
@@ -987,7 +987,7 @@ JSValuePtr stringProtoFuncFontsize(ExecState* exec,
                                    JSValuePtr thisValue,
                                    const ArgList& args) {
   UString s = thisValue.toThisString(exec);
-  JSValuePtr a0 = args.at(exec, 0);
+  JSValuePtr a0 = args.at(0);
 
   uint32_t smallInteger;
   if (a0.getUInt32(smallInteger) && smallInteger <= 9) {
@@ -1032,7 +1032,7 @@ JSValuePtr stringProtoFuncAnchor(ExecState* exec,
                                  JSValuePtr thisValue,
                                  const ArgList& args) {
   UString s = thisValue.toThisString(exec);
-  JSValuePtr a0 = args.at(exec, 0);
+  JSValuePtr a0 = args.at(0);
   return jsNontrivialString(
       exec, "<a name=\"" + a0.toString(exec) + "\">" + s + "</a>");
 }
@@ -1042,7 +1042,7 @@ JSValuePtr stringProtoFuncLink(ExecState* exec,
                                JSValuePtr thisValue,
                                const ArgList& args) {
   UString s = thisValue.toThisString(exec);
-  JSValuePtr a0 = args.at(exec, 0);
+  JSValuePtr a0 = args.at(0);
   UString linkText = a0.toString(exec);
 
   unsigned linkTextSize = linkText.size();

@@ -31,6 +31,6 @@
 namespace JSC {
 
 JSValuePtr CallFrame::thisValue() {
-  return this[codeBlock()->thisRegister()].jsValue(this);
+  return this[codeBlock()->thisRegister()].jsValue();
 }
 }

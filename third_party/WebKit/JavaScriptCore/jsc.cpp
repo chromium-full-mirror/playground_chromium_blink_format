@@ -230,7 +230,7 @@ JSValuePtr functionPrint(ExecState* exec,
     if (i != 0)
       putchar(' ');
 
-    printf("%s", args.at(exec, i).toString(exec).UTF8String().c_str());
+    printf("%s", args.at(i).toString(exec).UTF8String().c_str());
   }
 
   putchar('\n');
@@ -242,8 +242,7 @@ JSValuePtr functionDebug(ExecState* exec,
                          JSObject*,
                          JSValuePtr,
                          const ArgList& args) {
-  fprintf(stderr, "--> %s\n",
-          args.at(exec, 0).toString(exec).UTF8String().c_str());
+  fprintf(stderr, "--> %s\n", args.at(0).toString(exec).UTF8String().c_str());
   return jsUndefined();
 }
 
@@ -265,7 +264,7 @@ JSValuePtr functionRun(ExecState* exec,
                        JSValuePtr,
                        const ArgList& args) {
   StopWatch stopWatch;
-  UString fileName = args.at(exec, 0).toString(exec);
+  UString fileName = args.at(0).toString(exec);
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
     return throwError(exec, GeneralError, "Could not open file.");
@@ -284,7 +283,7 @@ JSValuePtr functionLoad(ExecState* exec,
                         JSObject*,
                         JSValuePtr,
                         const ArgList& args) {
-  UString fileName = args.at(exec, 0).toString(exec);
+  UString fileName = args.at(0).toString(exec);
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
     return throwError(exec, GeneralError, "Could not open file.");

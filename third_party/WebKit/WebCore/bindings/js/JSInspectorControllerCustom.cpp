@@ -81,13 +81,13 @@ JSValuePtr JSInspectorController::profiles(JSC::ExecState* exec,
   return constructArray(exec, result);
 }
 
-JSValuePtr JSInspectorController::highlightDOMNode(JSC::ExecState* exec,
+JSValuePtr JSInspectorController::highlightDOMNode(JSC::ExecState*,
                                                    const JSC::ArgList& args) {
   if (args.size() < 1)
     return jsUndefined();
 
   JSQuarantinedObjectWrapper* wrapper =
-      JSQuarantinedObjectWrapper::asWrapper(args.at(exec, 0));
+      JSQuarantinedObjectWrapper::asWrapper(args.at(0));
   if (!wrapper)
     return jsUndefined();
 
@@ -101,13 +101,13 @@ JSValuePtr JSInspectorController::highlightDOMNode(JSC::ExecState* exec,
 }
 
 JSValuePtr JSInspectorController::addResourceSourceToFrame(
-    ExecState* exec,
+    ExecState*,
     const ArgList& args) {
   if (args.size() < 2)
     return jsUndefined();
 
   double number;
-  if (!args.at(exec, 0).getNumber(number))
+  if (!args.at(0).getNumber(number))
     return jsUndefined();
 
   long long identifier = static_cast<long long>(number);
@@ -122,7 +122,7 @@ JSValuePtr JSInspectorController::addResourceSourceToFrame(
     return jsUndefined();
 
   return jsBoolean(impl()->addSourceToFrame(resource->mimeType(), sourceString,
-                                            toNode(args.at(exec, 1))));
+                                            toNode(args.at(1))));
 }
 
 JSValuePtr JSInspectorController::addSourceToFrame(ExecState* exec,
@@ -130,16 +130,16 @@ JSValuePtr JSInspectorController::addSourceToFrame(ExecState* exec,
   if (args.size() < 3)
     return jsUndefined();
 
-  String mimeType = args.at(exec, 0).toString(exec);
+  String mimeType = args.at(0).toString(exec);
   if (exec->hadException())
     return jsUndefined();
 
-  String sourceString = args.at(exec, 1).toString(exec);
+  String sourceString = args.at(1).toString(exec);
   if (exec->hadException())
     return jsUndefined();
 
-  return jsBoolean(impl()->addSourceToFrame(mimeType, sourceString,
-                                            toNode(args.at(exec, 2))));
+  return jsBoolean(
+      impl()->addSourceToFrame(mimeType, sourceString, toNode(args.at(2))));
 }
 
 JSValuePtr JSInspectorController::getResourceDocumentNode(ExecState* exec,
@@ -148,7 +148,7 @@ JSValuePtr JSInspectorController::getResourceDocumentNode(ExecState* exec,
     return jsUndefined();
 
   bool ok = false;
-  unsigned identifier = args.at(exec, 0).toUInt32(exec, ok);
+  unsigned identifier = args.at(0).toUInt32(exec, ok);
   if (!ok)
     return jsUndefined();
 
@@ -175,11 +175,11 @@ JSValuePtr JSInspectorController::search(ExecState* exec, const ArgList& args) {
   if (args.size() < 2)
     return jsUndefined();
 
-  Node* node = toNode(args.at(exec, 0));
+  Node* node = toNode(args.at(0));
   if (!node)
     return jsUndefined();
 
-  String target = args.at(exec, 1).toString(exec);
+  String target = args.at(1).toString(exec);
   if (exec->hadException())
     return jsUndefined();
 
@@ -216,7 +216,7 @@ JSValuePtr JSInspectorController::databaseTableNames(ExecState* exec,
     return jsUndefined();
 
   JSQuarantinedObjectWrapper* wrapper =
-      JSQuarantinedObjectWrapper::asWrapper(args.at(exec, 0));
+      JSQuarantinedObjectWrapper::asWrapper(args.at(0));
   if (!wrapper)
     return jsUndefined();
 
@@ -247,7 +247,7 @@ JSValuePtr JSInspectorController::setting(ExecState* exec,
   if (args.size() < 1)
     return jsUndefined();
 
-  String key = args.at(exec, 0).toString(exec);
+  String key = args.at(0).toString(exec);
   if (exec->hadException())
     return jsUndefined();
 
@@ -281,13 +281,13 @@ JSValuePtr JSInspectorController::setSetting(ExecState* exec,
   if (args.size() < 2)
     return jsUndefined();
 
-  String key = args.at(exec, 0).toString(exec);
+  String key = args.at(0).toString(exec);
   if (exec->hadException())
     return jsUndefined();
 
   InspectorController::Setting setting;
 
-  JSValuePtr value = args.at(exec, 1);
+  JSValuePtr value = args.at(1);
   if (value.isUndefined() || value.isNull()) {
     // Do nothing. The setting is already NoType.
     ASSERT(setting.type() == InspectorController::Setting::NoType);
@@ -324,7 +324,7 @@ JSValuePtr JSInspectorController::wrapCallback(ExecState* exec,
   if (args.size() < 1)
     return jsUndefined();
 
-  return JSInspectorCallbackWrapper::wrap(exec, args.at(exec, 0));
+  return JSInspectorCallbackWrapper::wrap(exec, args.at(0));
 }
 
 JSValuePtr JSInspectorController::currentCallFrame(ExecState* exec,

@@ -44,7 +44,7 @@ class JSArray : public JSObject {
  public:
   explicit JSArray(PassRefPtr<Structure>);
   JSArray(PassRefPtr<Structure>, unsigned initialLength);
-  JSArray(ExecState*, PassRefPtr<Structure>, const ArgList& initialValues);
+  JSArray(PassRefPtr<Structure>, const ArgList& initialValues);
   virtual ~JSArray();
 
   virtual bool getOwnPropertySlot(ExecState*,

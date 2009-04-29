@@ -210,7 +210,7 @@ JSObject* JSQuarantinedObjectWrapper::construct(ExecState* exec,
 
   ArgList preparedArgs;
   for (size_t i = 0; i < args.size(); ++i)
-    preparedArgs.append(wrapper->prepareIncomingValue(exec, args.at(exec, i)));
+    preparedArgs.append(wrapper->prepareIncomingValue(exec, args.at(i)));
 
   // FIXME: Would be nice to find a way to reuse the result of
   // m_unwrappedObject->getConstructData
@@ -272,7 +272,7 @@ JSValuePtr JSQuarantinedObjectWrapper::call(ExecState* exec,
 
   ArgList preparedArgs;
   for (size_t i = 0; i < args.size(); ++i)
-    preparedArgs.append(wrapper->prepareIncomingValue(exec, args.at(exec, i)));
+    preparedArgs.append(wrapper->prepareIncomingValue(exec, args.at(i)));
 
   // FIXME: Would be nice to find a way to reuse the result of
   // m_unwrappedObject->getCallData

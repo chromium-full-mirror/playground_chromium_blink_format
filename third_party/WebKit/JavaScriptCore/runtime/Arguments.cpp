@@ -84,9 +84,9 @@ void Arguments::copyToRegisters(ExecState* exec,
         min(min(d->numParameters, d->numArguments), maxSize);
     unsigned i = 0;
     for (; i < parametersLength; ++i)
-      buffer[i] = d->registers[d->firstParameterIndex + i].jsValue(exec);
+      buffer[i] = d->registers[d->firstParameterIndex + i].jsValue();
     for (; i < d->numArguments; ++i)
-      buffer[i] = d->extraArguments[i - d->numParameters].jsValue(exec);
+      buffer[i] = d->extraArguments[i - d->numParameters].jsValue();
     return;
   }
 
@@ -95,13 +95,13 @@ void Arguments::copyToRegisters(ExecState* exec,
   unsigned i = 0;
   for (; i < parametersLength; ++i) {
     if (!d->deletedArguments[i])
-      buffer[i] = d->registers[d->firstParameterIndex + i].jsValue(exec);
+      buffer[i] = d->registers[d->firstParameterIndex + i].jsValue();
     else
       buffer[i] = get(exec, i);
   }
   for (; i < d->numArguments; ++i) {
     if (!d->deletedArguments[i])
-      buffer[i] = d->extraArguments[i - d->numParameters].jsValue(exec);
+      buffer[i] = d->extraArguments[i - d->numParameters].jsValue();
     else
       buffer[i] = get(exec, i);
   }
@@ -129,9 +129,9 @@ void Arguments::fillArgList(ExecState* exec, ArgList& args) {
     unsigned parametersLength = min(d->numParameters, d->numArguments);
     unsigned i = 0;
     for (; i < parametersLength; ++i)
-      args.append(d->registers[d->firstParameterIndex + i].jsValue(exec));
+      args.append(d->registers[d->firstParameterIndex + i].jsValue());
     for (; i < d->numArguments; ++i)
-      args.append(d->extraArguments[i - d->numParameters].jsValue(exec));
+      args.append(d->extraArguments[i - d->numParameters].jsValue());
     return;
   }
 
@@ -139,13 +139,13 @@ void Arguments::fillArgList(ExecState* exec, ArgList& args) {
   unsigned i = 0;
   for (; i < parametersLength; ++i) {
     if (!d->deletedArguments[i])
-      args.append(d->registers[d->firstParameterIndex + i].jsValue(exec));
+      args.append(d->registers[d->firstParameterIndex + i].jsValue());
     else
       args.append(get(exec, i));
   }
   for (; i < d->numArguments; ++i) {
     if (!d->deletedArguments[i])
-      args.append(d->extraArguments[i - d->numParameters].jsValue(exec));
+      args.append(d->extraArguments[i - d->numParameters].jsValue());
     else
       args.append(get(exec, i));
   }
@@ -159,7 +159,7 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
     if (i < d->numParameters) {
       slot.setRegisterSlot(&d->registers[d->firstParameterIndex + i]);
     } else
-      slot.setValue(d->extraArguments[i - d->numParameters].jsValue(exec));
+      slot.setValue(d->extraArguments[i - d->numParameters].jsValue());
     return true;
   }
 
@@ -177,7 +177,7 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
     if (i < d->numParameters) {
       slot.setRegisterSlot(&d->registers[d->firstParameterIndex + i]);
     } else
-      slot.setValue(d->extraArguments[i - d->numParameters].jsValue(exec));
+      slot.setValue(d->extraArguments[i - d->numParameters].jsValue());
     return true;
   }
 

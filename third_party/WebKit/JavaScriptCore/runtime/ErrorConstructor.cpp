@@ -48,9 +48,9 @@ ErrorConstructor::ErrorConstructor(ExecState* exec,
 ErrorInstance* constructError(ExecState* exec, const ArgList& args) {
   ErrorInstance* obj =
       new (exec) ErrorInstance(exec->lexicalGlobalObject()->errorStructure());
-  if (!args.at(exec, 0).isUndefined())
+  if (!args.at(0).isUndefined())
     obj->putDirect(exec->propertyNames().message,
-                   jsString(exec, args.at(exec, 0).toString(exec)));
+                   jsString(exec, args.at(0).toString(exec)));
   return obj;
 }
 

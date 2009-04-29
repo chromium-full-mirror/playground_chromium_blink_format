@@ -56,7 +56,7 @@ static JSObject* constructWorker(ExecState* exec,
   if (args.size() == 0)
     return throwError(exec, SyntaxError, "Not enough arguments");
 
-  UString scriptURL = args.at(exec, 0).toString(exec);
+  UString scriptURL = args.at(0).toString(exec);
   if (exec->hadException())
     return 0;
 

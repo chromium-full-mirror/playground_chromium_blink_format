@@ -260,7 +260,7 @@ class CodeBlock {
   }
 
   ALWAYS_INLINE JSValuePtr getConstant(int index) {
-    return m_constantRegisters[index - m_numVars].getJSValue();
+    return m_constantRegisters[index - m_numVars].jsValue();
   }
 
   ALWAYS_INLINE bool isTemporaryRegisterIndex(int index) {

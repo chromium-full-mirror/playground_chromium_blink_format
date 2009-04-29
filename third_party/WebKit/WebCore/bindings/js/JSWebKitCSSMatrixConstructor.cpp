@@ -51,7 +51,7 @@ static JSObject* constructWebKitCSSMatrix(ExecState* exec,
                                           const ArgList& args) {
   String s;
   if (args.size() >= 1)
-    s = args.at(exec, 0).toString(exec);
+    s = args.at(0).toString(exec);
 
   ExceptionCode ec = 0;
   RefPtr<WebKitCSSMatrix> matrix = WebKitCSSMatrix::create(s, ec);

@@ -112,7 +112,7 @@ JSValuePtr CInstance::invokeMethod(ExecState* exec,
 
   unsigned i;
   for (i = 0; i < count; i++)
-    convertValueToNPVariant(exec, args.at(exec, i), &cArgs[i]);
+    convertValueToNPVariant(exec, args.at(i), &cArgs[i]);
 
   // Invoke the 'C' method.
   NPVariant resultVariant;
@@ -145,7 +145,7 @@ JSValuePtr CInstance::invokeDefaultMethod(ExecState* exec,
 
   unsigned i;
   for (i = 0; i < count; i++)
-    convertValueToNPVariant(exec, args.at(exec, i), &cArgs[i]);
+    convertValueToNPVariant(exec, args.at(i), &cArgs[i]);
 
   // Invoke the 'C' method.
   NPVariant resultVariant;
@@ -180,7 +180,7 @@ JSValuePtr CInstance::invokeConstruct(ExecState* exec, const ArgList& args) {
 
   unsigned i;
   for (i = 0; i < count; i++)
-    convertValueToNPVariant(exec, args.at(exec, i), &cArgs[i]);
+    convertValueToNPVariant(exec, args.at(i), &cArgs[i]);
 
   // Invoke the 'C' method.
   NPVariant resultVariant;

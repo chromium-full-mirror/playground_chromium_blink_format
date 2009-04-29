@@ -36,7 +36,7 @@ JSValuePtr JSSVGLength::convertToSpecifiedUnits(ExecState* exec,
   JSSVGPODTypeWrapper<SVGLength>* wrapper = impl();
 
   SVGLength imp(*wrapper);
-  imp.convertToSpecifiedUnits(args.at(exec, 0).toInt32(exec), context());
+  imp.convertToSpecifiedUnits(args.at(0).toInt32(exec), context());
 
   wrapper->commitChange(imp, context());
   return jsUndefined();

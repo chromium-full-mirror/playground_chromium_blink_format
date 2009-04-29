@@ -53,7 +53,6 @@ class ScriptCallFrame {
   ScriptCallFrame(const JSC::UString& functionName,
                   const JSC::UString& urlString,
                   int lineNumber,
-                  JSC::ExecState*,
                   const JSC::ArgList&,
                   unsigned skipArgumentCount);
   ~ScriptCallFrame();
