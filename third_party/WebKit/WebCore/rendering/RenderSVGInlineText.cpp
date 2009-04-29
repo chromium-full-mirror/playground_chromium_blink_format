@@ -62,14 +62,11 @@ void RenderSVGInlineText::styleDidChange(StyleDifference diff,
     setText(textToTransform.release(), true);
 }
 
-void RenderSVGInlineText::absoluteRects(Vector<IntRect>& rects,
-                                        int,
-                                        int,
-                                        bool) {
+void RenderSVGInlineText::absoluteRects(Vector<IntRect>& rects, int, int) {
   rects.append(computeRepaintRectForRange(0, 0, textLength()));
 }
 
-void RenderSVGInlineText::absoluteQuads(Vector<FloatQuad>& quads, bool) {
+void RenderSVGInlineText::absoluteQuads(Vector<FloatQuad>& quads) {
   quads.append(FloatRect(computeRepaintRectForRange(0, 0, textLength())));
 }
 

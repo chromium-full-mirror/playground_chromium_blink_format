@@ -449,11 +449,8 @@ class RenderBlock : public RenderBox {
   int leftSelectionOffset(RenderBlock* rootBlock, int y);
   int rightSelectionOffset(RenderBlock* rootBlock, int y);
 
-  virtual void absoluteRects(Vector<IntRect>&,
-                             int tx,
-                             int ty,
-                             bool topLevel = true);
-  virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
+  virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
+  virtual void absoluteQuads(Vector<FloatQuad>&);
 
   // Helper methods for computing line counts and heights for line counts.
   RootInlineBox* lineAtIndex(int);

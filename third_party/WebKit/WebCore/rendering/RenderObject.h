@@ -644,7 +644,7 @@ class RenderObject : public CachedResourceClient {
                                      unsigned endOffset = UINT_MAX,
                                      bool useSelectionHeight = false);
 
-  virtual void absoluteRects(Vector<IntRect>&, int, int, bool = true) {}
+  virtual void absoluteRects(Vector<IntRect>&, int, int) {}
   // FIXME: useTransforms should go away eventually
   IntRect absoluteBoundingBoxRect(bool useTransforms = false);
 
@@ -653,7 +653,7 @@ class RenderObject : public CachedResourceClient {
                                      unsigned startOffset = 0,
                                      unsigned endOffset = UINT_MAX,
                                      bool useSelectionHeight = false);
-  virtual void absoluteQuads(Vector<FloatQuad>&, bool /*topLevel*/ = true) {}
+  virtual void absoluteQuads(Vector<FloatQuad>&) {}
 
   // the rect that will be painted if this object is passed as the paintingRoot
   IntRect paintingRootRect(IntRect& topLevelRect);

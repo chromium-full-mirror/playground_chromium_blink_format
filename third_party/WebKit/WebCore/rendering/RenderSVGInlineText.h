@@ -37,11 +37,8 @@ class RenderSVGInlineText : public RenderText {
 
   virtual void styleDidChange(StyleDifference, const RenderStyle*);
 
-  virtual void absoluteRects(Vector<IntRect>& rects,
-                             int tx,
-                             int ty,
-                             bool topLevel = true);
-  virtual void absoluteQuads(Vector<FloatQuad>&, bool topLevel = true);
+  virtual void absoluteRects(Vector<IntRect>& rects, int tx, int ty);
+  virtual void absoluteQuads(Vector<FloatQuad>&);
 
   virtual bool requiresLayer() const { return false; }
   virtual IntRect selectionRectForRepaint(

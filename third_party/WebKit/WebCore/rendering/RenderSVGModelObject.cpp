@@ -103,14 +103,11 @@ IntRect RenderSVGModelObject::outlineBoundsForRepaint(
   return containerRelativeQuad.enclosingBoundingBox();
 }
 
-void RenderSVGModelObject::absoluteRects(Vector<IntRect>& rects,
-                                         int,
-                                         int,
-                                         bool) {
+void RenderSVGModelObject::absoluteRects(Vector<IntRect>& rects, int, int) {
   rects.append(absoluteClippedOverflowRect());
 }
 
-void RenderSVGModelObject::absoluteQuads(Vector<FloatQuad>& quads, bool) {
+void RenderSVGModelObject::absoluteQuads(Vector<FloatQuad>& quads) {
   quads.append(absoluteClippedOverflowRect());
 }
 
