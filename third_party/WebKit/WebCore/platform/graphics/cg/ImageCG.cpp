@@ -203,6 +203,9 @@ void BitmapImage::draw(GraphicsContext* ctxt,
     adjustedDestRect.setHeight(adjustedDestRect.height() * currHeight /
                                selfSize.height());
 
+  // Align to pixel boundaries
+  adjustedDestRect = ctxt->roundToDevicePixels(adjustedDestRect);
+
   // Flip the coords.
   ctxt->setCompositeOperation(compositeOp);
   CGContextTranslateCTM(context, adjustedDestRect.x(),
