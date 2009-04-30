@@ -270,7 +270,7 @@ void Console::count(ScriptCallStack* callStack) {
                                      lastCaller.sourceURL().string());
 }
 
-#if USE(JSC)
+#if ENABLE(JAVASCRIPT_DEBUGGER)
 
 void Console::profile(const JSC::UString& title, ScriptCallStack* callStack) {
   Page* page = this->page();
