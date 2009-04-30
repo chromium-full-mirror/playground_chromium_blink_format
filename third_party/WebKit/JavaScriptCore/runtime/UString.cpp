@@ -979,6 +979,29 @@ UString UString::spliceSubstringsWithSeparators(const Range* substringRanges,
   return UString::Rep::create(buffer, totalLength);
 }
 
+UString UString::replaceRange(int rangeStart,
+                              int rangeLength,
+                              const UString& replacement) const {
+  m_rep->checkConsistency();
+
+  int replacementLength = replacement.size();
+  int totalLength = size() - rangeLength + replacementLength;
+  if (totalLength == 0)
+    return "";
+
+  UChar* buffer = allocChars(totalLength);
+  if (!buffer)
+    return null();
+
+  copyChars(buffer, data(), rangeStart);
+  copyChars(buffer + rangeStart, replacement.data(), replacementLength);
+  int rangeEnd = rangeStart + rangeLength;
+  copyChars(buffer + rangeStart + replacementLength, data() + rangeEnd,
+            size() - rangeEnd);
+
+  return UString::Rep::create(buffer, totalLength);
+}
+
 UString& UString::append(const UString& t) {
   m_rep->checkConsistency();
   t.rep()->checkConsistency();

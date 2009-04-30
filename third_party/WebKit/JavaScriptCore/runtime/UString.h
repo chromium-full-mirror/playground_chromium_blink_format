@@ -249,6 +249,10 @@ class UString {
                                          const UString* separators,
                                          int separatorCount) const;
 
+  UString replaceRange(int rangeStart,
+                       int RangeEnd,
+                       const UString& replacement) const;
+
   UString& append(const UString&);
   UString& append(const char*);
   UString& append(UChar);
