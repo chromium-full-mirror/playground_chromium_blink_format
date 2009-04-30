@@ -463,7 +463,9 @@ Document::~Document() {
 
   removeAllEventListeners();
 
+#if USE(JSC)
   forgetAllDOMNodesForDocument(this);
+#endif
 
   delete m_tokenizer;
   m_document.resetSkippingRef(0);
