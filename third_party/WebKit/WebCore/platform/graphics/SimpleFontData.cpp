@@ -124,6 +124,7 @@ SimpleFontData::SimpleFontData(const FontPlatformData& f,
   platformCharWidthInit();
 }
 
+#if !PLATFORM(QT)
 // Estimates of avgCharWidth and maxCharWidth for platforms that don't support
 // accessing these values from the font.
 void SimpleFontData::initCharWidths() {
@@ -146,7 +147,6 @@ void SimpleFontData::initCharWidths() {
     m_maxCharWidth = max<float>(m_avgCharWidth, m_ascent);
 }
 
-#if !PLATFORM(QT)
 void SimpleFontData::platformGlyphInit() {
   GlyphPage* glyphPageZero = GlyphPageTreeNode::getRootChild(this, 0)->page();
   if (!glyphPageZero) {
