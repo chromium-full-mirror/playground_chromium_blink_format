@@ -47,6 +47,11 @@ namespace WebCore {
 
 class InlineBox;
 
+enum StayInEditableContent {
+  MayLeaveEditableContent,
+  MustStayInEditableContent
+};
+
 class VisiblePosition {
  public:
   // NOTE: UPSTREAM affinity will be used only if pos is at end of a wrapped
@@ -67,6 +72,9 @@ class VisiblePosition {
     return m_affinity;
   }
   void setAffinity(EAffinity affinity) { m_affinity = affinity; }
+
+  // FIXME: Change the following functions' parameter from a boolean to
+  // StayInEditableContent.
 
   // next() and previous() will increment/decrement by a character cluster.
   VisiblePosition next(bool stayInEditableContent = false) const;

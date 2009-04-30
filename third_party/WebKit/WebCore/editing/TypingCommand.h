@@ -108,6 +108,7 @@ class TypingCommand : public CompositeEditCommand {
 
   void markMisspellingsAfterTyping();
   void typingAddedToOpenCommand();
+  bool makeEditableRootEmpty();
 
   ETypingCommand m_commandType;
   String m_textToInsert;

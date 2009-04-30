@@ -82,6 +82,8 @@ class VisibleSelection {
 
   bool isBaseFirst() const { return m_baseIsFirst; }
 
+  bool isAll(StayInEditableContent) const;
+
   void appendTrailingWhitespace();
 
   bool expandUsingGranularity(TextGranularity granularity);

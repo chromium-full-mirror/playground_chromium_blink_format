@@ -121,6 +121,10 @@ class SelectionController : Noncopyable {
   bool isRange() const { return m_sel.isRange(); }
   bool isCaretOrRange() const { return m_sel.isCaretOrRange(); }
   bool isInPasswordField() const;
+  bool isAll(StayInEditableContent stayInEditableContent =
+                 MustStayInEditableContent) const {
+    return m_sel.isAll(stayInEditableContent);
+  }
 
   PassRefPtr<Range> toNormalizedRange() const {
     return m_sel.toNormalizedRange();
