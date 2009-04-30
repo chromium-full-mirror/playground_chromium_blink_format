@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -145,6 +145,8 @@ class WebChromeClient : public WebCore::ChromeClient {
   WebView* webView() const { return m_webView; }
 
   virtual void formStateDidChange(const WebCore::Node*) {}
+
+  virtual WebCore::HTMLParserQuirks* createHTMLParserQuirks() { return 0; }
 
  private:
   COMPtr<IWebUIDelegate> uiDelegate();

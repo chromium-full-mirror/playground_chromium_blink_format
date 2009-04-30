@@ -133,6 +133,8 @@ class ChromeClientQt : public ChromeClient {
 
   virtual void formStateDidChange(const Node*) {}
 
+  virtual HTMLParserQuirks* createHTMLParserQuirks() { return 0; }
+
   QWebPage* m_webPage;
   WebCore::KURL lastHoverURL;
   WebCore::String lastHoverTitle;

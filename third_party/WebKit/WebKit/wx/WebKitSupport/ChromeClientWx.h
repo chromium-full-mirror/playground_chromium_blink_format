@@ -131,6 +131,8 @@ class ChromeClientWx : public ChromeClient {
 
   virtual void formStateDidChange(const Node*) {}
 
+  virtual HTMLParserQuirks* createHTMLParserQuirks() { return 0; }
+
  private:
   wxWebView* m_webView;
 };
