@@ -49,12 +49,6 @@
 
 namespace WebCore {
 
-CALLBACK_FUNC_DECL(InspectorControllerProfiles) {
-  INC_STATS("InspectorController.profiles");
-  notImplemented();
-  return v8::Undefined();
-}
-
 CALLBACK_FUNC_DECL(InspectorControllerHighlightDOMNode) {
   INC_STATS("InspectorController.highlightDOMNode()");
 
@@ -303,30 +297,6 @@ CALLBACK_FUNC_DECL(InspectorControllerSetSetting) {
   inspectorController->setSetting(key, setting);
 
   return v8::Undefined();
-}
-
-CALLBACK_FUNC_DECL(InspectorControllerCurrentCallFrame) {
-  INC_STATS("InspectorController.currentCallFrame()");
-  notImplemented();
-  return v8::Undefined();
-}
-
-CALLBACK_FUNC_DECL(InspectorControllerDebuggerEnabled) {
-  INC_STATS("InspectorController.debuggerEnabled()");
-  notImplemented();
-  return v8::False();
-}
-
-CALLBACK_FUNC_DECL(InspectorControllerPauseOnExceptions) {
-  INC_STATS("InspectorController.pauseOnExceptions()");
-  notImplemented();
-  return v8::False();
-}
-
-CALLBACK_FUNC_DECL(InspectorControllerProfilerEnabled) {
-  INC_STATS("InspectorController.profilerEnabled()");
-  notImplemented();
-  return v8::False();
 }
 
 CALLBACK_FUNC_DECL(InspectorControllerWrapCallback) {
