@@ -463,8 +463,8 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity,
 
       if (granularity == CharacterGranularity &&
           selectionToDelete.end().node() == selectionToDelete.start().node() &&
-          selectionToDelete.end().m_offset -
-                  selectionToDelete.start().m_offset >
+          selectionToDelete.end().deprecatedEditingOffset() -
+                  selectionToDelete.start().deprecatedEditingOffset() >
               1) {
         // If there are multiple Unicode code points to be deleted, adjust the
         // range to match platform conventions.
@@ -547,7 +547,7 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity,
       // When deleting tables: Select the table first, then perform the deletion
       if (downstreamEnd.node() && downstreamEnd.node()->renderer() &&
           downstreamEnd.node()->renderer()->isTable() &&
-          downstreamEnd.m_offset == 0) {
+          downstreamEnd.deprecatedEditingOffset() == 0) {
         setEndingSelection(VisibleSelection(
             endingSelection().end(),
             lastDeepEditingPositionForNode(downstreamEnd.node()), DOWNSTREAM));
@@ -579,11 +579,13 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity,
           int extraCharacters;
           if (selectionToDelete.start().node() ==
               selectionToDelete.end().node())
-            extraCharacters = selectionToDelete.end().m_offset -
-                              selectionToDelete.start().m_offset;
+            extraCharacters =
+                selectionToDelete.end().deprecatedEditingOffset() -
+                selectionToDelete.start().deprecatedEditingOffset();
           else
-            extraCharacters = selectionToDelete.end().m_offset;
-          extent = Position(extent.node(), extent.m_offset + extraCharacters);
+            extraCharacters = selectionToDelete.end().deprecatedEditingOffset();
+          extent = Position(extent.node(),
+                            extent.deprecatedEditingOffset() + extraCharacters);
         }
         selectionAfterUndo.setWithoutValidation(startingSelection().start(),
                                                 extent);

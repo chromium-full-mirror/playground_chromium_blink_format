@@ -75,6 +75,9 @@ class Position {
     return m_offset;
   }
 
+  // New code should not use this function.
+  int deprecatedEditingOffset() const { return m_offset; }
+
   // These are convenience methods which are smart about whether the position is
   // neighbor anchored or parent anchored
   Node* computeNodeBeforePosition() const;
@@ -95,7 +98,11 @@ class Position {
     m_anchorNode = node;
     m_offset = offset;
   }
-  void moveToOffset(int offset) { m_offset = offset; }
+  void moveToOffset(int offset) {
+    // FIXME: This should eventually ASSERT(anchorType() ==
+    // PositionIsOffsetInAnchor);
+    m_offset = offset;
+  }
 
   bool isNull() const { return !m_anchorNode; }
   bool isNotNull() const { return m_anchorNode; }
@@ -174,21 +181,20 @@ class Position {
   Position nextCharacterPosition(EAffinity) const;
 
   RefPtr<Node> m_anchorNode;
-
- public:
   // m_offset can be the offset inside m_anchorNode, or if
   // editingIgnoresContent(m_anchorNode)
   // returns true, then other places in editing will treat m_offset == 0 as
   // "before the anchor"
   // and m_offset > 0 as "after the anchor node".  See rangeCompliantEquivalent
   // for more info.
-  int m_offset;  // FIXME: This should be made private.
+  int m_offset;
 };
 
 inline bool operator==(const Position& a, const Position& b) {
   // FIXME: In <div><img></div> [div, 0] != [img, 0] even though most of the
   // editing code will treat them as identical.
-  return a.anchorNode() == b.anchorNode() && a.m_offset == b.m_offset;
+  return a.anchorNode() == b.anchorNode() &&
+         a.deprecatedEditingOffset() == b.deprecatedEditingOffset();
 }
 
 inline bool operator!=(const Position& a, const Position& b) {

@@ -84,7 +84,7 @@ Node* DOMSelection::anchorNode() const {
 int DOMSelection::anchorOffset() const {
   if (!m_frame)
     return 0;
-  return anchorPosition(visibleSelection()).m_offset;
+  return anchorPosition(visibleSelection()).deprecatedEditingOffset();
 }
 
 Node* DOMSelection::focusNode() const {
@@ -96,7 +96,7 @@ Node* DOMSelection::focusNode() const {
 int DOMSelection::focusOffset() const {
   if (!m_frame)
     return 0;
-  return focusPosition(visibleSelection()).m_offset;
+  return focusPosition(visibleSelection()).deprecatedEditingOffset();
 }
 
 Node* DOMSelection::baseNode() const {
@@ -108,7 +108,7 @@ Node* DOMSelection::baseNode() const {
 int DOMSelection::baseOffset() const {
   if (!m_frame)
     return 0;
-  return basePosition(visibleSelection()).m_offset;
+  return basePosition(visibleSelection()).deprecatedEditingOffset();
 }
 
 Node* DOMSelection::extentNode() const {
@@ -120,7 +120,7 @@ Node* DOMSelection::extentNode() const {
 int DOMSelection::extentOffset() const {
   if (!m_frame)
     return 0;
-  return extentPosition(visibleSelection()).m_offset;
+  return extentPosition(visibleSelection()).deprecatedEditingOffset();
 }
 
 bool DOMSelection::isCollapsed() const {

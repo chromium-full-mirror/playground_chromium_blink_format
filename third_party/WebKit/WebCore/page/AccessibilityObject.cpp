@@ -357,7 +357,8 @@ static VisiblePosition updateAXLineStartForVisiblePosition(
     if (!p.node())
       break;
     renderer = p.node()->renderer();
-    if (!renderer || (renderer->isRenderBlock() && !p.m_offset))
+    if (!renderer ||
+        (renderer->isRenderBlock() && !p.deprecatedEditingOffset()))
       break;
     InlineBox* box;
     int ignoredCaretOffset;
