@@ -45,7 +45,6 @@
 #include "EditorClientQt.h"
 #include "Settings.h"
 #include "Page.h"
-#include "PageGroup.h"
 #include "Pasteboard.h"
 #include "FrameLoader.h"
 #include "FrameLoadRequest.h"
@@ -246,7 +245,6 @@ static inline Qt::DropAction dragOpToDropAction(unsigned actions) {
 QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
     : q(qq), view(0), viewportSize(QSize(0, 0)) {
   WebCore::InitializeLoggingChannelsIfNecessary();
-  WebCore::PageGroup::setShouldTrackVisitedLinks(true);
   JSC::initializeThreading();
   WebCore::FrameLoader::setLocalLoadPolicy(
       WebCore::FrameLoader::AllowLocalLoadsForLocalAndSubstituteData);
