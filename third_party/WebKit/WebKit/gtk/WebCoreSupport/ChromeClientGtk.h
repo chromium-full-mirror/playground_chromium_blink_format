@@ -69,7 +69,9 @@ class ChromeClient : public WebCore::ChromeClient {
 
   virtual void setResizable(bool);
 
-  virtual void addMessageToConsole(const WebCore::String& message,
+  virtual void addMessageToConsole(WebCore::MessageSource source,
+                                   WebCore::MessageLevel level,
+                                   const WebCore::String& message,
                                    unsigned int lineNumber,
                                    const WebCore::String& sourceID);
 

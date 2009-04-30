@@ -24,6 +24,7 @@
 #include "config.h"
 #include "ChromeClientGtk.h"
 
+#include "Console.h"
 #include "FileSystem.h"
 #include "FileChooser.h"
 #include "FloatRect.h"
@@ -224,7 +225,9 @@ bool ChromeClient::runBeforeUnloadConfirmPanel(const WebCore::String& message,
   return runJavaScriptConfirm(frame, message);
 }
 
-void ChromeClient::addMessageToConsole(const WebCore::String& message,
+void ChromeClient::addMessageToConsole(WebCore::MessageSource source,
+                                       WebCore::MessageLevel level,
+                                       const WebCore::String& message,
                                        unsigned int lineNumber,
                                        const WebCore::String& sourceId) {
   gboolean retval;

@@ -27,6 +27,7 @@
 
 #include "config.h"
 #include "ChromeClientWx.h"
+#include "Console.h"
 #include "FileChooser.h"
 #include "FloatRect.h"
 #include "FrameLoadRequest.h"
@@ -173,7 +174,9 @@ void ChromeClientWx::setResizable(bool) {
   notImplemented();
 }
 
-void ChromeClientWx::addMessageToConsole(const String& message,
+void ChromeClientWx::addMessageToConsole(MessageSource source,
+                                         MessageLevel level,
+                                         const String& message,
                                          unsigned int lineNumber,
                                          const String& sourceID) {
   if (m_webView) {

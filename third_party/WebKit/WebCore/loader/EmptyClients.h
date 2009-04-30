@@ -28,6 +28,7 @@
 
 #include "ChromeClient.h"
 #include "ContextMenuClient.h"
+#include "Console.h"
 #include "DocumentLoader.h"
 #include "DragClient.h"
 #include "EditCommand.h"
@@ -100,7 +101,11 @@ class EmptyChromeClient : public ChromeClient {
 
   virtual void setResizable(bool) {}
 
-  virtual void addMessageToConsole(const String&, unsigned, const String&) {}
+  virtual void addMessageToConsole(MessageSource,
+                                   MessageLevel,
+                                   const String&,
+                                   unsigned,
+                                   const String&) {}
 
   virtual bool canRunBeforeUnloadConfirmPanel() { return false; }
   virtual bool runBeforeUnloadConfirmPanel(const String&, Frame*) {

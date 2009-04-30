@@ -156,8 +156,8 @@ void Console::addMessage(MessageSource source,
     return;
 
   if (source == JSMessageSource || source == WMLMessageSource)
-    page->chrome()->client()->addMessageToConsole(message, lineNumber,
-                                                  sourceURL);
+    page->chrome()->client()->addMessageToConsole(source, level, message,
+                                                  lineNumber, sourceURL);
 
   page->inspectorController()->addMessageToConsole(source, level, message,
                                                    lineNumber, sourceURL);
@@ -186,7 +186,8 @@ void Console::addMessage(MessageLevel level,
   String message;
   if (getFirstArgumentAsString(callStack->state(), lastCaller, message))
     page->chrome()->client()->addMessageToConsole(
-        message, lastCaller.lineNumber(), lastCaller.sourceURL().prettyURL());
+        JSMessageSource, level, message, lastCaller.lineNumber(),
+        lastCaller.sourceURL().prettyURL());
 
   page->inspectorController()->addMessageToConsole(JSMessageSource, level,
                                                    callStack);
