@@ -188,6 +188,10 @@ String HTMLScriptElement::languageAttributeValue() const {
   return getAttribute(languageAttr).string();
 }
 
+String HTMLScriptElement::forAttributeValue() const {
+  return getAttribute(forAttr).string();
+}
+
 void HTMLScriptElement::dispatchLoadEvent() {
   ASSERT(!m_data.haveFiredLoadEvent());
   m_data.setHaveFiredLoadEvent(true);

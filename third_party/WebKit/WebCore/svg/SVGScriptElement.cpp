@@ -164,6 +164,10 @@ String SVGScriptElement::languageAttributeValue() const {
   return String();
 }
 
+String SVGScriptElement::forAttributeValue() const {
+  return String();
+}
+
 void SVGScriptElement::dispatchLoadEvent() {
   bool externalResourcesRequired = externalResourcesRequiredBaseValue();
 
