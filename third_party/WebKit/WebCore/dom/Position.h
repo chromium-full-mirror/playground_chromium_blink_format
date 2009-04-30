@@ -49,15 +49,33 @@ enum PositionMoveType {
 
 class Position {
  public:
-  Position() : m_offset(0) {}
+  enum AnchorType {
+    PositionIsOffsetInAnchor,
+    PositionIsAfterAnchor,
+    PositionIsBeforeAnchor
+  };
 
-  // This constructor should be private
-  Position(PassRefPtr<Node> anchorNode, int offset)
-      : m_anchorNode(anchorNode), m_offset(offset) {}
+  Position()
+      : m_offset(0),
+        m_anchorType(PositionIsOffsetInAnchor),
+        m_isLegacyEditingPosition(false) {}
+
+  // For creating legacy editing positions: (Anchor type will be determined from
+  // editingIgnoresContent(node))
+  Position(PassRefPtr<Node> anchorNode, int offset);
+
+  // For creating before/after positions:
+  Position(PassRefPtr<Node> anchorNode, AnchorType);
+  // For creating offset positions:
+  Position(PassRefPtr<Node> anchorNode, int offset, AnchorType);
+
+  AnchorType anchorType() const { return m_anchorType; }
 
   void clear() {
     m_anchorNode.clear();
     m_offset = 0;
+    m_anchorType = PositionIsOffsetInAnchor;
+    m_isLegacyEditingPosition = false;
   }
 
   // These are always DOM compliant values.  Editing positions like [img, 0]
@@ -76,7 +94,10 @@ class Position {
   }
 
   // New code should not use this function.
-  int deprecatedEditingOffset() const { return m_offset; }
+  int deprecatedEditingOffset() const {
+    // This should probably ASSERT(m_isLegacyEditingPosition);
+    return m_offset;
+  }
 
   // These are convenience methods which are smart about whether the position is
   // neighbor anchored or parent anchored
@@ -92,17 +113,11 @@ class Position {
   // will be treated as before ignoredNode (thus node() is really after the
   // position, not containing it).
   Node* node() const { return m_anchorNode.get(); }
-  Element* documentElement() const;
 
-  void moveToPosition(PassRefPtr<Node> node, int offset) {
-    m_anchorNode = node;
-    m_offset = offset;
-  }
-  void moveToOffset(int offset) {
-    // FIXME: This should eventually ASSERT(anchorType() ==
-    // PositionIsOffsetInAnchor);
-    m_offset = offset;
-  }
+  // These should only be used for PositionIsOffsetInAnchor positions, unless
+  // the position is a legacy editing position.
+  void moveToPosition(PassRefPtr<Node> anchorNode, int offset);
+  void moveToOffset(int offset);
 
   bool isNull() const { return !m_anchorNode; }
   bool isNotNull() const { return m_anchorNode; }
@@ -169,16 +184,11 @@ class Position {
  private:
   int renderedOffset() const;
 
-  enum AnchorType {
-    PositionIsOffsetInAnchor,
-    PositionIsAfterAnchor,
-    PositionIsBeforeAnchor
-  };
-
-  AnchorType anchorType() const;
-
   Position previousCharacterPosition(EAffinity) const;
   Position nextCharacterPosition(EAffinity) const;
+
+  static AnchorType anchorTypeForLegacyEditingPosition(Node* anchorNode,
+                                                       int offset);
 
   RefPtr<Node> m_anchorNode;
   // m_offset can be the offset inside m_anchorNode, or if
@@ -188,6 +198,8 @@ class Position {
   // and m_offset > 0 as "after the anchor node".  See rangeCompliantEquivalent
   // for more info.
   int m_offset;
+  AnchorType m_anchorType : 2;
+  bool m_isLegacyEditingPosition : 1;
 };
 
 inline bool operator==(const Position& a, const Position& b) {
