@@ -244,6 +244,7 @@ class Editor {
   bool isAutomaticSpellingCorrectionEnabled();
   void toggleAutomaticSpellingCorrection();
   void markAllMisspellingsAndBadGrammarInRanges(
+      bool markSpelling,
       Range* spellingRange,
       bool markGrammar,
       Range* grammarRange,
