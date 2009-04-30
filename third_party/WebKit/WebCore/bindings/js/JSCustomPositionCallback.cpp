@@ -66,7 +66,7 @@ void JSCustomPositionCallback::handleEvent(Geoposition* geoposition,
 
   RefPtr<JSCustomPositionCallback> protect(this);
 
-  ArgList args;
+  MarkedArgumentBuffer args;
   args.append(toJS(exec, geoposition));
 
   globalObject->globalData()->timeoutChecker.start();

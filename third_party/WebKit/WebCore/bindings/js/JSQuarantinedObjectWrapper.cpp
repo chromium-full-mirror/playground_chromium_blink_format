@@ -208,7 +208,7 @@ JSObject* JSQuarantinedObjectWrapper::construct(ExecState* exec,
   JSQuarantinedObjectWrapper* wrapper =
       static_cast<JSQuarantinedObjectWrapper*>(constructor);
 
-  ArgList preparedArgs;
+  MarkedArgumentBuffer preparedArgs;
   for (size_t i = 0; i < args.size(); ++i)
     preparedArgs.append(wrapper->prepareIncomingValue(exec, args.at(i)));
 
@@ -270,7 +270,7 @@ JSValuePtr JSQuarantinedObjectWrapper::call(ExecState* exec,
 
   JSValuePtr preparedThisValue = wrapper->prepareIncomingValue(exec, thisValue);
 
-  ArgList preparedArgs;
+  MarkedArgumentBuffer preparedArgs;
   for (size_t i = 0; i < args.size(); ++i)
     preparedArgs.append(wrapper->prepareIncomingValue(exec, args.at(i)));
 

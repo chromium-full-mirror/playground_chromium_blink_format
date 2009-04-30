@@ -62,7 +62,7 @@ class Arguments : public JSObject {
 
   virtual void mark();
 
-  void fillArgList(ExecState*, ArgList&);
+  void fillArgList(ExecState*, MarkedArgumentBuffer&);
 
   uint32_t numProvidedArguments(ExecState* exec) const {
     if (UNLIKELY(d->overrodeLength))

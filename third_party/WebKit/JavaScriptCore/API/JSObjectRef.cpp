@@ -138,7 +138,7 @@ JSObjectRef JSObjectMakeFunction(JSContextRef ctx,
   Identifier nameID = name ? name->identifier(&exec->globalData())
                            : Identifier(exec, "anonymous");
 
-  ArgList args;
+  MarkedArgumentBuffer args;
   for (unsigned i = 0; i < parameterCount; i++)
     args.append(jsString(exec, parameterNames[i]->ustring()));
   args.append(jsString(exec, body->ustring()));
@@ -164,7 +164,7 @@ JSObjectRef JSObjectMakeArray(JSContextRef ctx,
 
   JSObject* result;
   if (argumentCount) {
-    ArgList argList;
+    MarkedArgumentBuffer argList;
     for (size_t i = 0; i < argumentCount; ++i)
       argList.append(toJS(arguments[i]));
 
@@ -190,7 +190,7 @@ JSObjectRef JSObjectMakeDate(JSContextRef ctx,
   exec->globalData().heap.registerThread();
   JSLock lock(exec);
 
-  ArgList argList;
+  MarkedArgumentBuffer argList;
   for (size_t i = 0; i < argumentCount; ++i)
     argList.append(toJS(arguments[i]));
 
@@ -213,7 +213,7 @@ JSObjectRef JSObjectMakeError(JSContextRef ctx,
   exec->globalData().heap.registerThread();
   JSLock lock(exec);
 
-  ArgList argList;
+  MarkedArgumentBuffer argList;
   for (size_t i = 0; i < argumentCount; ++i)
     argList.append(toJS(arguments[i]));
 
@@ -236,7 +236,7 @@ JSObjectRef JSObjectMakeRegExp(JSContextRef ctx,
   exec->globalData().heap.registerThread();
   JSLock lock(exec);
 
-  ArgList argList;
+  MarkedArgumentBuffer argList;
   for (size_t i = 0; i < argumentCount; ++i)
     argList.append(toJS(arguments[i]));
 
@@ -430,7 +430,7 @@ JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
   if (!jsThisObject)
     jsThisObject = exec->globalThisValue();
 
-  ArgList argList;
+  MarkedArgumentBuffer argList;
   for (size_t i = 0; i < argumentCount; i++)
     argList.append(toJS(arguments[i]));
 
@@ -472,7 +472,7 @@ JSObjectRef JSObjectCallAsConstructor(JSContextRef ctx,
   if (constructType == ConstructTypeNone)
     return 0;
 
-  ArgList argList;
+  MarkedArgumentBuffer argList;
   for (size_t i = 0; i < argumentCount; i++)
     argList.append(toJS(arguments[i]));
   JSObjectRef result =

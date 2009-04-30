@@ -71,7 +71,7 @@ class ScriptFunctionCall {
   ScriptState* m_exec;
   ScriptObject m_thisObject;
   String m_name;
-  JSC::ArgList m_arguments;
+  JSC::MarkedArgumentBuffer m_arguments;
 };
 
 }  // namespace WebCore

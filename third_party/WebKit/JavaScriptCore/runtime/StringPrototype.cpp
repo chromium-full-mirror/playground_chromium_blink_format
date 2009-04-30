@@ -395,7 +395,7 @@ JSValuePtr stringProtoFuncReplace(ExecState* exec,
 
         if (callType != CallTypeNone) {
           int completeMatchStart = ovector[0];
-          ArgList args;
+          MarkedArgumentBuffer args;
 
           for (unsigned i = 0; i < reg->numSubpatterns() + 1; ++i) {
             int matchStart = ovector[i * 2];
@@ -452,7 +452,7 @@ JSValuePtr stringProtoFuncReplace(ExecState* exec,
     return sourceVal;
 
   if (callType != CallTypeNone) {
-    ArgList args;
+    MarkedArgumentBuffer args;
     args.append(jsSubstring(exec, source, matchPos, matchLen));
     args.append(jsNumber(exec, matchPos));
     args.append(sourceVal);
@@ -530,7 +530,7 @@ JSValuePtr stringProtoFuncConcat(ExecState* exec,
 
   ArgList::const_iterator end = args.end();
   for (ArgList::const_iterator it = args.begin(); it != end; ++it)
-    s += (*it).jsValue().toString(exec);
+    s += (*it).toString(exec);
   return jsString(exec, s);
 }
 
@@ -614,7 +614,7 @@ JSValuePtr stringProtoFuncMatch(ExecState* exec,
   }
 
   // return array of matches
-  ArgList list;
+  MarkedArgumentBuffer list;
   int lastIndex = 0;
   while (pos >= 0) {
     list.append(jsSubstring(exec, u, pos, matchLength));

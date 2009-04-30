@@ -85,7 +85,7 @@ class JSArray : public JSObject {
     return m_storage->m_vector[i] = v;
   }
 
-  void fillArgList(ExecState*, ArgList&);
+  void fillArgList(ExecState*, MarkedArgumentBuffer&);
   void copyToRegisters(ExecState*, Register*, uint32_t);
 
   static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {

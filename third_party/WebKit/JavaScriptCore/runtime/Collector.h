@@ -42,7 +42,7 @@
 
 namespace JSC {
 
-class ArgList;
+class MarkedArgumentBuffer;
 class CollectorBlock;
 class JSCell;
 class JSGlobalData;
@@ -118,9 +118,9 @@ class Heap : Noncopyable {
 
   void markConservatively(void* start, void* end);
 
-  HashSet<ArgList*>& markListSet() {
+  HashSet<MarkedArgumentBuffer*>& markListSet() {
     if (!m_markListSet)
-      m_markListSet = new HashSet<ArgList*>;
+      m_markListSet = new HashSet<MarkedArgumentBuffer*>;
     return *m_markListSet;
   }
 
@@ -160,7 +160,7 @@ class Heap : Noncopyable {
                                          // setGCPrtotectNeedsLocking().
   ProtectCountSet m_protectedValues;
 
-  HashSet<ArgList*>* m_markListSet;
+  HashSet<MarkedArgumentBuffer*>* m_markListSet;
 
 #if ENABLE(JSC_MULTIPLE_THREADS)
   void makeUsableFromMultipleThreads();

@@ -94,7 +94,7 @@ String JSCustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
 
   RefPtr<JSCustomXPathNSResolver> selfProtector(this);
 
-  ArgList args;
+  MarkedArgumentBuffer args;
   args.append(jsString(exec, prefix));
 
   globalObject->globalData()->timeoutChecker.start();
