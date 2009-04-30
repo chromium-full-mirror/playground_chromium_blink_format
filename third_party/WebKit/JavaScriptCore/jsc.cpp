@@ -99,6 +99,17 @@ static NO_RETURN JSValuePtr functionQuit(ExecState*,
                                          JSValuePtr,
                                          const ArgList&);
 
+#if ENABLE(SAMPLING_FLAGS)
+static JSValuePtr functionSetSamplingFlag(ExecState*,
+                                          JSObject*,
+                                          JSValuePtr,
+                                          const ArgList&);
+static JSValuePtr functionClearSamplingFlag(ExecState*,
+                                            JSObject*,
+                                            JSValuePtr,
+                                            const ArgList&);
+#endif
+
 struct Script {
   bool isFile;
   char* argument;
@@ -216,6 +227,19 @@ GlobalObject::GlobalObject(const Vector<UString>& arguments)
           globalExec(), prototypeFunctionStructure(), 0,
           Identifier(globalExec(), "readline"), functionReadline));
 
+#if ENABLE(SAMPLING_FLAGS)
+  putDirectFunction(globalExec(),
+                    new (globalExec()) PrototypeFunction(
+                        globalExec(), prototypeFunctionStructure(), 1,
+                        Identifier(globalExec(), "setSamplingFlag"),
+                        functionSetSamplingFlag));
+  putDirectFunction(globalExec(),
+                    new (globalExec()) PrototypeFunction(
+                        globalExec(), prototypeFunctionStructure(), 1,
+                        Identifier(globalExec(), "clearSamplingFlag"),
+                        functionClearSamplingFlag));
+#endif
+
   JSObject* array = constructEmptyArray(globalExec());
   for (size_t i = 0; i < arguments.size(); ++i)
     array->put(globalExec(), i, jsString(globalExec(), arguments[i]));
@@ -296,6 +320,42 @@ JSValuePtr functionLoad(ExecState* exec,
     exec->setException(result.value());
   return result.value();
 }
+
+#if ENABLE(SAMPLING_FLAGS)
+JSValuePtr functionSetSamplingFlag(ExecState* exec,
+                                   JSObject*,
+                                   JSValuePtr,
+                                   const ArgList& args) {
+  unsigned flag = static_cast<unsigned>(args.at(0).toNumber(exec));
+
+  // Sanitize the input into the range 1..32.
+  if (flag > 32)
+    flag &= 31;
+  if (!flag)
+    flag = 32;
+
+  SamplingFlags::setFlag(flag);
+
+  return jsNull();
+}
+
+JSValuePtr functionClearSamplingFlag(ExecState* exec,
+                                     JSObject*,
+                                     JSValuePtr,
+                                     const ArgList& args) {
+  unsigned flag = static_cast<unsigned>(args.at(0).toNumber(exec));
+
+  // Sanitize the input into the range 1..32.
+  if (flag > 32)
+    flag &= 31;
+  if (!flag)
+    flag = 32;
+
+  SamplingFlags::clearFlag(flag);
+
+  return jsNull();
+}
+#endif
 
 JSValuePtr functionReadline(ExecState* exec,
                             JSObject*,
@@ -391,6 +451,10 @@ static bool runWithScripts(GlobalObject* globalObject,
 #if ENABLE(OPCODE_SAMPLING)
   Interpreter* interpreter = globalObject->globalData()->interpreter;
   interpreter->setSampler(new SamplingTool(interpreter));
+  interpreter->sampler()->setup();
+#endif
+#if ENABLE(SAMPLING_FLAGS)
+  SamplingFlags::start();
 #endif
 
   bool success = true;
@@ -405,9 +469,10 @@ static bool runWithScripts(GlobalObject* globalObject,
       fileName = "[Command Line]";
     }
 
-#if ENABLE(OPCODE_SAMPLING)
-    interpreter->sampler()->start();
+#if ENABLE(SAMPLING_THREAD)
+    SamplingThread::start();
 #endif
+
     Completion completion =
         evaluate(globalObject->globalExec(), globalObject->globalScopeChain(),
                  makeSource(script, fileName));
@@ -421,13 +486,16 @@ static bool runWithScripts(GlobalObject* globalObject,
                completion.value().toString(globalObject->globalExec()).ascii());
     }
 
-    globalObject->globalExec()->clearException();
-
-#if ENABLE(OPCODE_SAMPLING)
-    interpreter->sampler()->stop();
+#if ENABLE(SAMPLING_THREAD)
+    SamplingThread::stop();
 #endif
+
+    globalObject->globalExec()->clearException();
   }
 
+#if ENABLE(SAMPLING_FLAGS)
+  SamplingFlags::stop();
+#endif
 #if ENABLE(OPCODE_SAMPLING)
   interpreter->sampler()->dump(globalObject->globalExec());
   delete interpreter->sampler();

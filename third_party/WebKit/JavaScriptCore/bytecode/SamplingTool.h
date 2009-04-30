@@ -38,6 +38,33 @@
 
 namespace JSC {
 
+class SamplingFlags {
+ public:
+  static void start();
+  static void stop();
+
+#if ENABLE(SAMPLING_FLAGS)
+  static void setFlag(unsigned flag) {
+    ASSERT(flag >= 1);
+    ASSERT(flag <= 32);
+    s_flags |= 1u << (flag - 1);
+  }
+
+  static void clearFlag(unsigned flag) {
+    ASSERT(flag >= 1);
+    ASSERT(flag <= 32);
+    s_flags &= ~(1u << (flag - 1));
+  }
+
+  static void sample();
+#endif
+ private:
+  static uint32_t s_flags;
+#if ENABLE(SAMPLING_FLAGS)
+  static uint64_t s_flagCounts[33];
+#endif
+};
+
 class CodeBlock;
 class ExecState;
 class Interpreter;
@@ -69,6 +96,19 @@ struct ScopeSampleRecord {
 };
 
 typedef WTF::HashMap<ScopeNode*, ScopeSampleRecord*> ScopeSampleRecordMap;
+
+class SamplingThread {
+ public:
+  // Sampling thread state.
+  static bool s_running;
+  static unsigned s_hertz;
+  static ThreadIdentifier s_samplingThread;
+
+  static void start(unsigned hertz = 10000);
+  static void stop();
+
+  static void* threadStartFunc(void*);
+};
 
 class SamplingTool {
  public:
@@ -114,7 +154,6 @@ class SamplingTool {
 
   SamplingTool(Interpreter* interpreter)
       : m_interpreter(interpreter),
-        m_running(false),
         m_codeBlock(0),
         m_sample(0),
         m_sampleCount(0),
@@ -127,8 +166,7 @@ class SamplingTool {
 
   ~SamplingTool() { deleteAllValues(*m_scopeSampleMap); }
 
-  void start(unsigned hertz = 10000);
-  void stop();
+  void setup();
   void dump(ExecState*);
 
   void notifyOfScope(ScopeNode* scope);
@@ -151,6 +189,8 @@ class SamplingTool {
                                    static_cast<intptr_t>(inHostFunction));
   }
 
+  static void sample();
+
  private:
   class Sample {
    public:
@@ -170,15 +210,10 @@ class SamplingTool {
     CodeBlock* m_codeBlock;
   };
 
-  static void* threadStartFunc(void*);
-  void run();
+  void doRun();
+  static SamplingTool* s_samplingTool;
 
   Interpreter* m_interpreter;
-
-  // Sampling thread state.
-  bool m_running;
-  unsigned m_hertz;
-  ThreadIdentifier m_samplingThread;
 
   // State tracked by the main thread, used by the sampling thread.
   CodeBlock* m_codeBlock;
