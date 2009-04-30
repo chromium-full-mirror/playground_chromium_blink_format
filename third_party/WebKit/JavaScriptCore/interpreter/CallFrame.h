@@ -91,7 +91,9 @@ class ExecState : private Register {
   }
   Interpreter* interpreter() { return globalData().interpreter; }
   Heap* heap() { return &globalData().heap; }
-
+#ifndef NDEBUG
+  void dumpCaller();
+#endif
   static const HashTable* arrayTable(CallFrame* callFrame) {
     return callFrame->globalData().arrayTable;
   }
