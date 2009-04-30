@@ -350,8 +350,9 @@ void FrameView::setContentsSize(const IntSize& size) {
 
   m_deferSetNeedsLayouts--;
 
-  if (!m_deferSetNeedsLayouts && m_setNeedsLayoutWasDeferred)
-    layout();
+  if (!m_deferSetNeedsLayouts)
+    m_setNeedsLayoutWasDeferred = false;  // FIXME: Find a way to make the
+                                          // deferred layout actually happen.
 }
 
 void FrameView::adjustViewSize() {
@@ -978,7 +979,8 @@ bool FrameView::needsLayout() const {
          (document && document->childNeedsStyleRecalc())  // can occur when
                                                           // using WebKit ObjC
                                                           // interface
-         || m_frame->needsReapplyStyles() || m_setNeedsLayoutWasDeferred;
+         || m_frame->needsReapplyStyles() ||
+         (m_deferSetNeedsLayouts && m_setNeedsLayoutWasDeferred);
 }
 
 void FrameView::setNeedsLayout() {
