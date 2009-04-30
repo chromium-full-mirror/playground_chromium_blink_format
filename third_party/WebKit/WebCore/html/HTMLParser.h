@@ -27,6 +27,7 @@
 
 #include "QualifiedName.h"
 #include <wtf/Forward.h>
+#include <wtf/OwnPtr.h>
 #include <wtf/RefPtr.h>
 #include "HTMLParserErrorCodes.h"
 
@@ -208,7 +209,7 @@ class HTMLParser : Noncopyable {
   bool m_handlingResidualStyleAcrossBlocks;
   int m_inStrayTableContent;
 
-  HTMLParserQuirks* m_parserQuirks;
+  OwnPtr<HTMLParserQuirks> m_parserQuirks;
 };
 }
 
