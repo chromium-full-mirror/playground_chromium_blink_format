@@ -84,7 +84,9 @@ class ChromeClientQt : public ChromeClient {
 
   virtual void setResizable(bool);
 
-  virtual void addMessageToConsole(const String& message,
+  virtual void addMessageToConsole(MessageSource,
+                                   MessageLevel,
+                                   const String& message,
                                    unsigned int lineNumber,
                                    const String& sourceID);
 
