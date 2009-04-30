@@ -1212,7 +1212,7 @@ static VisiblePosition logicalStartPositionForLine(const VisiblePosition& c) {
     // RootInlineBoxes, like empty editable blocks and bordered blocks.
     Position p = c.deepEquivalent();
     if (p.node()->renderer() && p.node()->renderer()->isRenderBlock() &&
-        !p.m_offset)
+        !p.deprecatedEditingOffset())
       return positionAvoidingFirstPositionInTable(c);
 
     return VisiblePosition();
@@ -1251,7 +1251,7 @@ static VisiblePosition logicalEndPositionForLine(const VisiblePosition& c) {
     // RootInlineBoxes, like empty editable blocks and bordered blocks.
     Position p = c.deepEquivalent();
     if (p.node()->renderer() && p.node()->renderer()->isRenderBlock() &&
-        !p.m_offset)
+        !p.deprecatedEditingOffset())
       return c;
     return VisiblePosition();
   }
