@@ -357,7 +357,7 @@ class NetscapePluginInstanceProxy
   void demarshalValues(JSC::ExecState*,
                        data_t valuesData,
                        mach_msg_type_number_t valuesLength,
-                       JSC::ArgList& result);
+                       JSC::MarkedArgumentBuffer& result);
 
   uint32_t m_objectIDCounter;
   typedef HashMap<uint32_t, JSC::ProtectedPtr<JSC::JSObject>> ObjectMap;
