@@ -1764,7 +1764,7 @@ void QtConnectionObject::execute(void** argv) {
         if (exec) {
           // Build the argument list (up to the formal argument length of the
           // slot)
-          ArgList l;
+          MarkedArgumentBuffer l;
           // ### DropAllLocks?
           int funcArgC = m_funcObject->get(exec, exec->propertyNames().length)
                              .toInt32(exec);
