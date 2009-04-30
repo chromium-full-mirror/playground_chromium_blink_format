@@ -67,16 +67,11 @@
 #define ARG_setCallFrame(newCallFrame) \
   (ARGS[STUB_ARGS_callFrame] = (newCallFrame))
 
-#define ARG_src1 \
-  JSValuePtr::decode(static_cast<JSValueEncodedAsPointer*>(ARGS[1]))
-#define ARG_src2 \
-  JSValuePtr::decode(static_cast<JSValueEncodedAsPointer*>(ARGS[2]))
-#define ARG_src3 \
-  JSValuePtr::decode(static_cast<JSValueEncodedAsPointer*>(ARGS[3]))
-#define ARG_src4 \
-  JSValuePtr::decode(static_cast<JSValueEncodedAsPointer*>(ARGS[4]))
-#define ARG_src5 \
-  JSValuePtr::decode(static_cast<JSValueEncodedAsPointer*>(ARGS[5]))
+#define ARG_src1 JSValuePtr::decode(static_cast<EncodedJSValuePtr>(ARGS[1]))
+#define ARG_src2 JSValuePtr::decode(static_cast<EncodedJSValuePtr>(ARGS[2]))
+#define ARG_src3 JSValuePtr::decode(static_cast<EncodedJSValuePtr>(ARGS[3]))
+#define ARG_src4 JSValuePtr::decode(static_cast<EncodedJSValuePtr>(ARGS[4]))
+#define ARG_src5 JSValuePtr::decode(static_cast<EncodedJSValuePtr>(ARGS[5]))
 #define ARG_id1 static_cast<Identifier*>(ARGS[1])
 #define ARG_id2 static_cast<Identifier*>(ARGS[2])
 #define ARG_id3 static_cast<Identifier*>(ARGS[3])
@@ -114,7 +109,6 @@ struct OperandTypes;
 struct PolymorphicAccessStructureList;
 struct StructureStubInfo;
 
-typedef JSValueEncodedAsPointer*(JIT_STUB* CTIHelper_j)(STUB_ARGS);
 typedef JSObject*(JIT_STUB* CTIHelper_o)(STUB_ARGS);
 typedef JSPropertyNameIterator*(JIT_STUB* CTIHelper_p)(STUB_ARGS);
 typedef void(JIT_STUB* CTIHelper_v)(STUB_ARGS);
@@ -714,9 +708,6 @@ class JIT : private MacroAssembler {
 
   Call emitNakedCall(void* function);
   Call emitCTICall_internal(void*);
-  Call emitCTICall(CTIHelper_j helper) {
-    return emitCTICall_internal(reinterpret_cast<void*>(helper));
-  }
   Call emitCTICall(CTIHelper_o helper) {
     return emitCTICall_internal(reinterpret_cast<void*>(helper));
   }

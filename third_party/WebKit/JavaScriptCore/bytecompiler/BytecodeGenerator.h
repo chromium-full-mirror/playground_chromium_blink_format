@@ -457,18 +457,18 @@ class BytecodeGenerator {
                                           ControlFlowContext* topScope,
                                           ControlFlowContext* bottomScope);
 
-  struct JSValueHashTraits : HashTraits<JSValueEncodedAsPointer*> {
-    static void constructDeletedValue(JSValueEncodedAsPointer*& slot) {
+  struct JSValueHashTraits : HashTraits<EncodedJSValuePtr> {
+    static void constructDeletedValue(EncodedJSValuePtr& slot) {
       slot = JSValuePtr::encode(jsImpossibleValue());
     }
-    static bool isDeletedValue(JSValueEncodedAsPointer* value) {
+    static bool isDeletedValue(EncodedJSValuePtr value) {
       return value == JSValuePtr::encode(jsImpossibleValue());
     }
   };
 
-  typedef HashMap<JSValueEncodedAsPointer*,
+  typedef HashMap<EncodedJSValuePtr,
                   unsigned,
-                  PtrHash<JSValueEncodedAsPointer*>,
+                  PtrHash<EncodedJSValuePtr>,
                   JSValueHashTraits>
       JSValueMap;
 
