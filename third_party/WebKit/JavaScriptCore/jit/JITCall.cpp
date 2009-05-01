@@ -50,7 +50,7 @@ void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
   // (and, if a new JSFunction happened to be constructed at the same location,
   // we could get a false positive
   // match).  Reset the check so it no longer matches.
-  callLinkInfo->hotPathBegin.repatch(JSValuePtr::encode(jsImpossibleValue()));
+  callLinkInfo->hotPathBegin.repatch(JSValue::encode(jsImpossibleValue()));
 }
 
 // void JIT::linkCall(JSFunction* , CodeBlock* , JITCode , CallLinkInfo*
@@ -85,7 +85,7 @@ void JIT::compileOpCallInitializeCallFrame() {
                              FIELD_OFFSET(ScopeChain, m_node)),
           regT1);  // newScopeChain
 
-  storePtr(ImmPtr(JSValuePtr::encode(noValue())),
+  storePtr(ImmPtr(JSValue::encode(noValue())),
            Address(callFrameRegister, RegisterFile::OptionalCalleeArguments *
                                           static_cast<int>(sizeof(Register))));
   storePtr(regT2,
@@ -156,7 +156,7 @@ void JIT::compileOpCall(OpcodeID opcodeID, Instruction* instruction, unsigned) {
 
     emitCTICall(JITStubs::cti_op_call_eval);
     wasEval = branchPtr(NotEqual, regT0,
-                        ImmPtr(JSValuePtr::encode(jsImpossibleValue())));
+                        ImmPtr(JSValue::encode(jsImpossibleValue())));
   }
 
   emitGetVirtualRegister(callee, regT2);
@@ -236,7 +236,7 @@ void JIT::compileOpCall(OpcodeID opcodeID,
 
     emitCTICall(JITStubs::cti_op_call_eval);
     wasEval = branchPtr(NotEqual, regT0,
-                        ImmPtr(JSValuePtr::encode(jsImpossibleValue())));
+                        ImmPtr(JSValue::encode(jsImpossibleValue())));
   }
 
   // This plants a check for a cached JSFunction value, so we can plant a fast
@@ -247,7 +247,7 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   DataLabelPtr addressOfLinkedFunctionCheck;
   Jump jumpToSlow =
       branchPtrWithPatch(NotEqual, regT2, addressOfLinkedFunctionCheck,
-                         ImmPtr(JSValuePtr::encode(jsImpossibleValue())));
+                         ImmPtr(JSValue::encode(jsImpossibleValue())));
   addSlowCase(jumpToSlow);
   ASSERT(differenceBetween(addressOfLinkedFunctionCheck, jumpToSlow) ==
          patchOffsetOpCallCompareToJump);
@@ -272,7 +272,7 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   // Fast version of stack frame initialization, directly relative to edi.
   // Note that this omits to set up RegisterFile::CodeBlock, which is set in the
   // callee
-  storePtr(ImmPtr(JSValuePtr::encode(noValue())),
+  storePtr(ImmPtr(JSValue::encode(noValue())),
            Address(callFrameRegister,
                    (registerOffset + RegisterFile::OptionalCalleeArguments) *
                        static_cast<int>(sizeof(Register))));

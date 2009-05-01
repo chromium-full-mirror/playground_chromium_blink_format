@@ -35,15 +35,15 @@ class ArgList;
 class ExecState;
 class FunctionBodyNode;
 class JSObject;
-class JSValuePtr;
+class JSValue;
 class ScopeChainNode;
 
 enum CallType { CallTypeNone, CallTypeHost, CallTypeJS };
 
-typedef JSValuePtr (*NativeFunction)(ExecState*,
-                                     JSObject*,
-                                     JSValuePtr thisValue,
-                                     const ArgList&);
+typedef JSValue (*NativeFunction)(ExecState*,
+                                  JSObject*,
+                                  JSValue thisValue,
+                                  const ArgList&);
 
 union CallData {
   struct {
@@ -55,12 +55,12 @@ union CallData {
   } js;
 };
 
-JSValuePtr call(ExecState*,
-                JSValuePtr functionObject,
-                CallType,
-                const CallData&,
-                JSValuePtr thisValue,
-                const ArgList&);
+JSValue call(ExecState*,
+             JSValue functionObject,
+             CallType,
+             const CallData&,
+             JSValue thisValue,
+             const ArgList&);
 
 }  // namespace JSC
 

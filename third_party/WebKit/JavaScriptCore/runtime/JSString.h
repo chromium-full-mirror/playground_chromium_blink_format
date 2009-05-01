@@ -103,7 +103,7 @@ class JSString : public JSCell {
   }
   JSString* getIndex(JSGlobalData*, unsigned);
 
-  static PassRefPtr<Structure> createStructure(JSValuePtr proto) {
+  static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(proto, TypeInfo(StringType, NeedsThisConversion));
   }
 
@@ -111,10 +111,8 @@ class JSString : public JSCell {
   enum VPtrStealingHackType { VPtrStealingHack };
   JSString(VPtrStealingHackType) : JSCell(0) {}
 
-  virtual JSValuePtr toPrimitive(ExecState*, PreferredPrimitiveType) const;
-  virtual bool getPrimitiveNumber(ExecState*,
-                                  double& number,
-                                  JSValuePtr& value);
+  virtual JSValue toPrimitive(ExecState*, PreferredPrimitiveType) const;
+  virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue& value);
   virtual bool toBoolean(ExecState*) const;
   virtual double toNumber(ExecState*) const;
   virtual JSObject* toObject(ExecState*) const;
@@ -135,9 +133,9 @@ class JSString : public JSCell {
   UString m_value;
 };
 
-JSString* asString(JSValuePtr);
+JSString* asString(JSValue);
 
-inline JSString* asString(JSValuePtr value) {
+inline JSString* asString(JSValue value) {
   ASSERT(asCell(value)->isString());
   return static_cast<JSString*>(asCell(value));
 }
@@ -241,13 +239,13 @@ ALWAYS_INLINE bool JSString::getStringPropertySlot(ExecState* exec,
   return false;
 }
 
-inline bool isJSString(JSGlobalData* globalData, JSValuePtr v) {
+inline bool isJSString(JSGlobalData* globalData, JSValue v) {
   return v.isCell() && v.asCell()->vptr() == globalData->jsStringVPtr;
 }
 
 // --- JSValue inlines ----------------------------
 
-inline JSString* JSValuePtr::toThisJSString(ExecState* exec) {
+inline JSString* JSValue::toThisJSString(ExecState* exec) {
   return JSImmediate::isImmediate(asValue())
              ? jsString(exec, JSImmediate::toString(asValue()))
              : asCell()->toThisJSString(exec);

@@ -68,7 +68,7 @@ void ScriptFunctionCall::appendArgument(const JSC::UString& argument) {
   m_arguments.append(jsString(m_exec, argument));
 }
 
-void ScriptFunctionCall::appendArgument(JSC::JSValuePtr argument) {
+void ScriptFunctionCall::appendArgument(JSC::JSValue argument) {
   m_arguments.append(argument);
 }
 
@@ -97,7 +97,7 @@ ScriptValue ScriptFunctionCall::call(bool& hadException,
 
   JSLock lock(false);
 
-  JSValuePtr function = thisObject->get(m_exec, Identifier(m_exec, m_name));
+  JSValue function = thisObject->get(m_exec, Identifier(m_exec, m_name));
   if (m_exec->hadException()) {
     if (reportExceptions)
       reportException(m_exec, m_exec->exception());
@@ -111,7 +111,7 @@ ScriptValue ScriptFunctionCall::call(bool& hadException,
   if (callType == CallTypeNone)
     return ScriptValue();
 
-  JSValuePtr result =
+  JSValue result =
       JSC::call(m_exec, function, callType, callData, thisObject, m_arguments);
   if (m_exec->hadException()) {
     if (reportExceptions)
@@ -150,8 +150,8 @@ ScriptObject ScriptFunctionCall::construct(bool& hadException,
   if (constructType == ConstructTypeNone)
     return ScriptObject();
 
-  JSValuePtr result = JSC::construct(m_exec, constructor, constructType,
-                                     constructData, m_arguments);
+  JSValue result = JSC::construct(m_exec, constructor, constructType,
+                                  constructData, m_arguments);
   if (m_exec->hadException()) {
     if (reportExceptions)
       reportException(m_exec, m_exec->exception());

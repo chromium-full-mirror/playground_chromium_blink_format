@@ -45,7 +45,7 @@ class ExecState : private Register {
     return this[RegisterFile::ScopeChain].Register::scopeChain();
   }
 
-  JSValuePtr thisValue();
+  JSValue thisValue();
 
   // Global object in which execution began.
   JSGlobalObject* dynamicGlobalObject();
@@ -75,12 +75,10 @@ class ExecState : private Register {
   // But they're used in many places in legacy code, so they're not going away
   // any time soon.
 
-  void setException(JSValuePtr exception) {
-    globalData().exception = exception;
-  }
+  void setException(JSValue exception) { globalData().exception = exception; }
   void clearException() { globalData().exception = noValue(); }
-  JSValuePtr exception() const { return globalData().exception; }
-  JSValuePtr* exceptionSlot() { return &globalData().exception; }
+  JSValue exception() const { return globalData().exception; }
+  JSValue* exceptionSlot() { return &globalData().exception; }
   bool hadException() const { return globalData().exception; }
 
   const CommonIdentifiers& propertyNames() const {

@@ -35,7 +35,7 @@ class MathObject : public JSObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
-  static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {
+  static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType));
   }
 };

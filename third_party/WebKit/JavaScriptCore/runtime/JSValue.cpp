@@ -31,14 +31,14 @@ namespace JSC {
 static const double D32 = 4294967296.0;
 
 // ECMA 9.4
-double JSValuePtr::toInteger(ExecState* exec) const {
+double JSValue::toInteger(ExecState* exec) const {
   if (isInt32Fast())
     return getInt32Fast();
   double d = toNumber(exec);
   return isnan(d) ? 0.0 : trunc(d);
 }
 
-double JSValuePtr::toIntegerPreserveNaN(ExecState* exec) const {
+double JSValue::toIntegerPreserveNaN(ExecState* exec) const {
   if (isInt32Fast())
     return getInt32Fast();
   return trunc(toNumber(exec));

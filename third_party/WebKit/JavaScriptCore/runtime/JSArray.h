@@ -26,7 +26,7 @@
 
 namespace JSC {
 
-typedef HashMap<unsigned, JSValuePtr> SparseArrayValueMap;
+typedef HashMap<unsigned, JSValue> SparseArrayValueMap;
 
 struct ArrayStorage {
   unsigned m_length;
@@ -35,7 +35,7 @@ struct ArrayStorage {
   SparseArrayValueMap* m_sparseValueMap;
   void* lazyCreationData;  // A JSArray subclass can use this to fill the vector
                            // lazily.
-  JSValuePtr m_vector[1];
+  JSValue m_vector[1];
 };
 
 class JSArray : public JSObject {
@@ -55,7 +55,7 @@ class JSArray : public JSObject {
                                   PropertySlot&);
   virtual void put(ExecState*,
                    unsigned propertyName,
-                   JSValuePtr);  // FIXME: Make protected and add setItem.
+                   JSValue);  // FIXME: Make protected and add setItem.
 
   static JS_EXPORTDATA const ClassInfo info;
 
@@ -64,23 +64,23 @@ class JSArray : public JSObject {
                              // a RegExpMatchArray.
 
   void sort(ExecState*);
-  void sort(ExecState*, JSValuePtr compareFunction, CallType, const CallData&);
+  void sort(ExecState*, JSValue compareFunction, CallType, const CallData&);
   void sortNumeric(ExecState*,
-                   JSValuePtr compareFunction,
+                   JSValue compareFunction,
                    CallType,
                    const CallData&);
 
-  void push(ExecState*, JSValuePtr);
-  JSValuePtr pop();
+  void push(ExecState*, JSValue);
+  JSValue pop();
 
   bool canGetIndex(unsigned i) { return i < m_fastAccessCutoff; }
-  JSValuePtr getIndex(unsigned i) {
+  JSValue getIndex(unsigned i) {
     ASSERT(canGetIndex(i));
     return m_storage->m_vector[i];
   }
 
   bool canSetIndex(unsigned i) { return i < m_fastAccessCutoff; }
-  JSValuePtr setIndex(unsigned i, JSValuePtr v) {
+  JSValue setIndex(unsigned i, JSValue v) {
     ASSERT(canSetIndex(i));
     return m_storage->m_vector[i] = v;
   }
@@ -88,14 +88,14 @@ class JSArray : public JSObject {
   void fillArgList(ExecState*, MarkedArgumentBuffer&);
   void copyToRegisters(ExecState*, Register*, uint32_t);
 
-  static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {
+  static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
  protected:
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValuePtr,
+                   JSValue,
                    PutPropertySlot&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
@@ -111,7 +111,7 @@ class JSArray : public JSObject {
   bool getOwnPropertySlotSlowCase(ExecState*,
                                   unsigned propertyName,
                                   PropertySlot&);
-  void putSlowCase(ExecState*, unsigned propertyName, JSValuePtr);
+  void putSlowCase(ExecState*, unsigned propertyName, JSValue);
 
   bool increaseVectorLength(unsigned newLength);
 
@@ -128,19 +128,19 @@ class JSArray : public JSObject {
   ArrayStorage* m_storage;
 };
 
-JSArray* asArray(JSValuePtr);
+JSArray* asArray(JSValue);
 
 JSArray* constructEmptyArray(ExecState*);
 JSArray* constructEmptyArray(ExecState*, unsigned initialLength);
-JSArray* constructArray(ExecState*, JSValuePtr singleItemValue);
+JSArray* constructArray(ExecState*, JSValue singleItemValue);
 JSArray* constructArray(ExecState*, const ArgList& values);
 
-inline JSArray* asArray(JSValuePtr value) {
+inline JSArray* asArray(JSValue value) {
   ASSERT(asObject(value)->inherits(&JSArray::info));
   return static_cast<JSArray*>(asObject(value));
 }
 
-inline bool isJSArray(JSGlobalData* globalData, JSValuePtr v) {
+inline bool isJSArray(JSGlobalData* globalData, JSValue v) {
   return v.isCell() && v.asCell()->vptr() == globalData->jsArrayVPtr;
 }
 

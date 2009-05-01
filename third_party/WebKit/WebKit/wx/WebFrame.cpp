@@ -173,7 +173,7 @@ wxString wxWebFrame::GetExternalRepresentation() {
 wxString wxWebFrame::RunScript(const wxString& javascript) {
   wxString returnValue = wxEmptyString;
   if (m_impl->frame) {
-    JSC::JSValuePtr result =
+    JSC::JSValue result =
         m_impl->frame->loader()->executeScript(javascript, true).jsValue();
     if (result)
       returnValue = wxString(

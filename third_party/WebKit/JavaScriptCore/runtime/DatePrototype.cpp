@@ -63,178 +63,178 @@ namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(DatePrototype);
 
-static JSValuePtr dateProtoFuncGetDate(ExecState*,
+static JSValue dateProtoFuncGetDate(ExecState*,
+                                    JSObject*,
+                                    JSValue,
+                                    const ArgList&);
+static JSValue dateProtoFuncGetDay(ExecState*,
+                                   JSObject*,
+                                   JSValue,
+                                   const ArgList&);
+static JSValue dateProtoFuncGetFullYear(ExecState*,
+                                        JSObject*,
+                                        JSValue,
+                                        const ArgList&);
+static JSValue dateProtoFuncGetHours(ExecState*,
+                                     JSObject*,
+                                     JSValue,
+                                     const ArgList&);
+static JSValue dateProtoFuncGetMilliSeconds(ExecState*,
+                                            JSObject*,
+                                            JSValue,
+                                            const ArgList&);
+static JSValue dateProtoFuncGetMinutes(ExecState*,
                                        JSObject*,
-                                       JSValuePtr,
+                                       JSValue,
                                        const ArgList&);
-static JSValuePtr dateProtoFuncGetDay(ExecState*,
+static JSValue dateProtoFuncGetMonth(ExecState*,
+                                     JSObject*,
+                                     JSValue,
+                                     const ArgList&);
+static JSValue dateProtoFuncGetSeconds(ExecState*,
+                                       JSObject*,
+                                       JSValue,
+                                       const ArgList&);
+static JSValue dateProtoFuncGetTime(ExecState*,
+                                    JSObject*,
+                                    JSValue,
+                                    const ArgList&);
+static JSValue dateProtoFuncGetTimezoneOffset(ExecState*,
+                                              JSObject*,
+                                              JSValue,
+                                              const ArgList&);
+static JSValue dateProtoFuncGetUTCDate(ExecState*,
+                                       JSObject*,
+                                       JSValue,
+                                       const ArgList&);
+static JSValue dateProtoFuncGetUTCDay(ExecState*,
                                       JSObject*,
-                                      JSValuePtr,
+                                      JSValue,
                                       const ArgList&);
-static JSValuePtr dateProtoFuncGetFullYear(ExecState*,
+static JSValue dateProtoFuncGetUTCFullYear(ExecState*,
                                            JSObject*,
-                                           JSValuePtr,
+                                           JSValue,
                                            const ArgList&);
-static JSValuePtr dateProtoFuncGetHours(ExecState*,
+static JSValue dateProtoFuncGetUTCHours(ExecState*,
                                         JSObject*,
-                                        JSValuePtr,
+                                        JSValue,
                                         const ArgList&);
-static JSValuePtr dateProtoFuncGetMilliSeconds(ExecState*,
+static JSValue dateProtoFuncGetUTCMilliseconds(ExecState*,
                                                JSObject*,
-                                               JSValuePtr,
+                                               JSValue,
                                                const ArgList&);
-static JSValuePtr dateProtoFuncGetMinutes(ExecState*,
+static JSValue dateProtoFuncGetUTCMinutes(ExecState*,
                                           JSObject*,
-                                          JSValuePtr,
+                                          JSValue,
                                           const ArgList&);
-static JSValuePtr dateProtoFuncGetMonth(ExecState*,
+static JSValue dateProtoFuncGetUTCMonth(ExecState*,
                                         JSObject*,
-                                        JSValuePtr,
+                                        JSValue,
                                         const ArgList&);
-static JSValuePtr dateProtoFuncGetSeconds(ExecState*,
+static JSValue dateProtoFuncGetUTCSeconds(ExecState*,
                                           JSObject*,
-                                          JSValuePtr,
+                                          JSValue,
                                           const ArgList&);
-static JSValuePtr dateProtoFuncGetTime(ExecState*,
+static JSValue dateProtoFuncGetYear(ExecState*,
+                                    JSObject*,
+                                    JSValue,
+                                    const ArgList&);
+static JSValue dateProtoFuncSetDate(ExecState*,
+                                    JSObject*,
+                                    JSValue,
+                                    const ArgList&);
+static JSValue dateProtoFuncSetFullYear(ExecState*,
+                                        JSObject*,
+                                        JSValue,
+                                        const ArgList&);
+static JSValue dateProtoFuncSetHours(ExecState*,
+                                     JSObject*,
+                                     JSValue,
+                                     const ArgList&);
+static JSValue dateProtoFuncSetMilliSeconds(ExecState*,
+                                            JSObject*,
+                                            JSValue,
+                                            const ArgList&);
+static JSValue dateProtoFuncSetMinutes(ExecState*,
                                        JSObject*,
-                                       JSValuePtr,
+                                       JSValue,
                                        const ArgList&);
-static JSValuePtr dateProtoFuncGetTimezoneOffset(ExecState*,
-                                                 JSObject*,
-                                                 JSValuePtr,
-                                                 const ArgList&);
-static JSValuePtr dateProtoFuncGetUTCDate(ExecState*,
+static JSValue dateProtoFuncSetMonth(ExecState*,
+                                     JSObject*,
+                                     JSValue,
+                                     const ArgList&);
+static JSValue dateProtoFuncSetSeconds(ExecState*,
+                                       JSObject*,
+                                       JSValue,
+                                       const ArgList&);
+static JSValue dateProtoFuncSetTime(ExecState*,
+                                    JSObject*,
+                                    JSValue,
+                                    const ArgList&);
+static JSValue dateProtoFuncSetUTCDate(ExecState*,
+                                       JSObject*,
+                                       JSValue,
+                                       const ArgList&);
+static JSValue dateProtoFuncSetUTCFullYear(ExecState*,
+                                           JSObject*,
+                                           JSValue,
+                                           const ArgList&);
+static JSValue dateProtoFuncSetUTCHours(ExecState*,
+                                        JSObject*,
+                                        JSValue,
+                                        const ArgList&);
+static JSValue dateProtoFuncSetUTCMilliseconds(ExecState*,
+                                               JSObject*,
+                                               JSValue,
+                                               const ArgList&);
+static JSValue dateProtoFuncSetUTCMinutes(ExecState*,
                                           JSObject*,
-                                          JSValuePtr,
+                                          JSValue,
                                           const ArgList&);
-static JSValuePtr dateProtoFuncGetUTCDay(ExecState*,
+static JSValue dateProtoFuncSetUTCMonth(ExecState*,
+                                        JSObject*,
+                                        JSValue,
+                                        const ArgList&);
+static JSValue dateProtoFuncSetUTCSeconds(ExecState*,
+                                          JSObject*,
+                                          JSValue,
+                                          const ArgList&);
+static JSValue dateProtoFuncSetYear(ExecState*,
+                                    JSObject*,
+                                    JSValue,
+                                    const ArgList&);
+static JSValue dateProtoFuncToDateString(ExecState*,
                                          JSObject*,
-                                         JSValuePtr,
+                                         JSValue,
                                          const ArgList&);
-static JSValuePtr dateProtoFuncGetUTCFullYear(ExecState*,
-                                              JSObject*,
-                                              JSValuePtr,
-                                              const ArgList&);
-static JSValuePtr dateProtoFuncGetUTCHours(ExecState*,
-                                           JSObject*,
-                                           JSValuePtr,
-                                           const ArgList&);
-static JSValuePtr dateProtoFuncGetUTCMilliseconds(ExecState*,
-                                                  JSObject*,
-                                                  JSValuePtr,
-                                                  const ArgList&);
-static JSValuePtr dateProtoFuncGetUTCMinutes(ExecState*,
-                                             JSObject*,
-                                             JSValuePtr,
-                                             const ArgList&);
-static JSValuePtr dateProtoFuncGetUTCMonth(ExecState*,
-                                           JSObject*,
-                                           JSValuePtr,
-                                           const ArgList&);
-static JSValuePtr dateProtoFuncGetUTCSeconds(ExecState*,
-                                             JSObject*,
-                                             JSValuePtr,
-                                             const ArgList&);
-static JSValuePtr dateProtoFuncGetYear(ExecState*,
-                                       JSObject*,
-                                       JSValuePtr,
-                                       const ArgList&);
-static JSValuePtr dateProtoFuncSetDate(ExecState*,
-                                       JSObject*,
-                                       JSValuePtr,
-                                       const ArgList&);
-static JSValuePtr dateProtoFuncSetFullYear(ExecState*,
-                                           JSObject*,
-                                           JSValuePtr,
-                                           const ArgList&);
-static JSValuePtr dateProtoFuncSetHours(ExecState*,
+static JSValue dateProtoFuncToGMTString(ExecState*,
                                         JSObject*,
-                                        JSValuePtr,
+                                        JSValue,
                                         const ArgList&);
-static JSValuePtr dateProtoFuncSetMilliSeconds(ExecState*,
+static JSValue dateProtoFuncToLocaleDateString(ExecState*,
                                                JSObject*,
-                                               JSValuePtr,
+                                               JSValue,
                                                const ArgList&);
-static JSValuePtr dateProtoFuncSetMinutes(ExecState*,
-                                          JSObject*,
-                                          JSValuePtr,
-                                          const ArgList&);
-static JSValuePtr dateProtoFuncSetMonth(ExecState*,
+static JSValue dateProtoFuncToLocaleString(ExecState*,
+                                           JSObject*,
+                                           JSValue,
+                                           const ArgList&);
+static JSValue dateProtoFuncToLocaleTimeString(ExecState*,
+                                               JSObject*,
+                                               JSValue,
+                                               const ArgList&);
+static JSValue dateProtoFuncToString(ExecState*,
+                                     JSObject*,
+                                     JSValue,
+                                     const ArgList&);
+static JSValue dateProtoFuncToTimeString(ExecState*,
+                                         JSObject*,
+                                         JSValue,
+                                         const ArgList&);
+static JSValue dateProtoFuncToUTCString(ExecState*,
                                         JSObject*,
-                                        JSValuePtr,
+                                        JSValue,
                                         const ArgList&);
-static JSValuePtr dateProtoFuncSetSeconds(ExecState*,
-                                          JSObject*,
-                                          JSValuePtr,
-                                          const ArgList&);
-static JSValuePtr dateProtoFuncSetTime(ExecState*,
-                                       JSObject*,
-                                       JSValuePtr,
-                                       const ArgList&);
-static JSValuePtr dateProtoFuncSetUTCDate(ExecState*,
-                                          JSObject*,
-                                          JSValuePtr,
-                                          const ArgList&);
-static JSValuePtr dateProtoFuncSetUTCFullYear(ExecState*,
-                                              JSObject*,
-                                              JSValuePtr,
-                                              const ArgList&);
-static JSValuePtr dateProtoFuncSetUTCHours(ExecState*,
-                                           JSObject*,
-                                           JSValuePtr,
-                                           const ArgList&);
-static JSValuePtr dateProtoFuncSetUTCMilliseconds(ExecState*,
-                                                  JSObject*,
-                                                  JSValuePtr,
-                                                  const ArgList&);
-static JSValuePtr dateProtoFuncSetUTCMinutes(ExecState*,
-                                             JSObject*,
-                                             JSValuePtr,
-                                             const ArgList&);
-static JSValuePtr dateProtoFuncSetUTCMonth(ExecState*,
-                                           JSObject*,
-                                           JSValuePtr,
-                                           const ArgList&);
-static JSValuePtr dateProtoFuncSetUTCSeconds(ExecState*,
-                                             JSObject*,
-                                             JSValuePtr,
-                                             const ArgList&);
-static JSValuePtr dateProtoFuncSetYear(ExecState*,
-                                       JSObject*,
-                                       JSValuePtr,
-                                       const ArgList&);
-static JSValuePtr dateProtoFuncToDateString(ExecState*,
-                                            JSObject*,
-                                            JSValuePtr,
-                                            const ArgList&);
-static JSValuePtr dateProtoFuncToGMTString(ExecState*,
-                                           JSObject*,
-                                           JSValuePtr,
-                                           const ArgList&);
-static JSValuePtr dateProtoFuncToLocaleDateString(ExecState*,
-                                                  JSObject*,
-                                                  JSValuePtr,
-                                                  const ArgList&);
-static JSValuePtr dateProtoFuncToLocaleString(ExecState*,
-                                              JSObject*,
-                                              JSValuePtr,
-                                              const ArgList&);
-static JSValuePtr dateProtoFuncToLocaleTimeString(ExecState*,
-                                                  JSObject*,
-                                                  JSValuePtr,
-                                                  const ArgList&);
-static JSValuePtr dateProtoFuncToString(ExecState*,
-                                        JSObject*,
-                                        JSValuePtr,
-                                        const ArgList&);
-static JSValuePtr dateProtoFuncToTimeString(ExecState*,
-                                            JSObject*,
-                                            JSValuePtr,
-                                            const ArgList&);
-static JSValuePtr dateProtoFuncToUTCString(ExecState*,
-                                           JSObject*,
-                                           JSValuePtr,
-                                           const ArgList&);
 }
 
 #include "DatePrototype.lut.h"
@@ -554,10 +554,10 @@ bool DatePrototype::getOwnPropertySlot(ExecState* exec,
 
 // Functions
 
-JSValuePtr dateProtoFuncToString(ExecState* exec,
-                                 JSObject*,
-                                 JSValuePtr thisValue,
-                                 const ArgList&) {
+JSValue dateProtoFuncToString(ExecState* exec,
+                              JSObject*,
+                              JSValue thisValue,
+                              const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -573,10 +573,10 @@ JSValuePtr dateProtoFuncToString(ExecState* exec,
   return jsNontrivialString(exec, formatDate(t) + " " + formatTime(t, utc));
 }
 
-JSValuePtr dateProtoFuncToUTCString(ExecState* exec,
-                                    JSObject*,
-                                    JSValuePtr thisValue,
-                                    const ArgList&) {
+JSValue dateProtoFuncToUTCString(ExecState* exec,
+                                 JSObject*,
+                                 JSValue thisValue,
+                                 const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -593,10 +593,10 @@ JSValuePtr dateProtoFuncToUTCString(ExecState* exec,
                             formatDateUTCVariant(t) + " " + formatTime(t, utc));
 }
 
-JSValuePtr dateProtoFuncToDateString(ExecState* exec,
-                                     JSObject*,
-                                     JSValuePtr thisValue,
-                                     const ArgList&) {
+JSValue dateProtoFuncToDateString(ExecState* exec,
+                                  JSObject*,
+                                  JSValue thisValue,
+                                  const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -612,10 +612,10 @@ JSValuePtr dateProtoFuncToDateString(ExecState* exec,
   return jsNontrivialString(exec, formatDate(t));
 }
 
-JSValuePtr dateProtoFuncToTimeString(ExecState* exec,
-                                     JSObject*,
-                                     JSValuePtr thisValue,
-                                     const ArgList&) {
+JSValue dateProtoFuncToTimeString(ExecState* exec,
+                                  JSObject*,
+                                  JSValue thisValue,
+                                  const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -631,10 +631,10 @@ JSValuePtr dateProtoFuncToTimeString(ExecState* exec,
   return jsNontrivialString(exec, formatTime(t, utc));
 }
 
-JSValuePtr dateProtoFuncToLocaleString(ExecState* exec,
-                                       JSObject*,
-                                       JSValuePtr thisValue,
-                                       const ArgList& args) {
+JSValue dateProtoFuncToLocaleString(ExecState* exec,
+                                    JSObject*,
+                                    JSValue thisValue,
+                                    const ArgList& args) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -646,10 +646,10 @@ JSValuePtr dateProtoFuncToLocaleString(ExecState* exec,
   return formatLocaleDate(exec, thisDateObj, milli, LocaleDateAndTime, args);
 }
 
-JSValuePtr dateProtoFuncToLocaleDateString(ExecState* exec,
-                                           JSObject*,
-                                           JSValuePtr thisValue,
-                                           const ArgList& args) {
+JSValue dateProtoFuncToLocaleDateString(ExecState* exec,
+                                        JSObject*,
+                                        JSValue thisValue,
+                                        const ArgList& args) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -661,10 +661,10 @@ JSValuePtr dateProtoFuncToLocaleDateString(ExecState* exec,
   return formatLocaleDate(exec, thisDateObj, milli, LocaleDate, args);
 }
 
-JSValuePtr dateProtoFuncToLocaleTimeString(ExecState* exec,
-                                           JSObject*,
-                                           JSValuePtr thisValue,
-                                           const ArgList& args) {
+JSValue dateProtoFuncToLocaleTimeString(ExecState* exec,
+                                        JSObject*,
+                                        JSValue thisValue,
+                                        const ArgList& args) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -676,10 +676,10 @@ JSValuePtr dateProtoFuncToLocaleTimeString(ExecState* exec,
   return formatLocaleDate(exec, thisDateObj, milli, LocaleTime, args);
 }
 
-JSValuePtr dateProtoFuncGetTime(ExecState* exec,
-                                JSObject*,
-                                JSValuePtr thisValue,
-                                const ArgList&) {
+JSValue dateProtoFuncGetTime(ExecState* exec,
+                             JSObject*,
+                             JSValue thisValue,
+                             const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -691,10 +691,10 @@ JSValuePtr dateProtoFuncGetTime(ExecState* exec,
   return jsNumber(exec, milli);
 }
 
-JSValuePtr dateProtoFuncGetFullYear(ExecState* exec,
-                                    JSObject*,
-                                    JSValuePtr thisValue,
-                                    const ArgList&) {
+JSValue dateProtoFuncGetFullYear(ExecState* exec,
+                                 JSObject*,
+                                 JSValue thisValue,
+                                 const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -710,10 +710,10 @@ JSValuePtr dateProtoFuncGetFullYear(ExecState* exec,
   return jsNumber(exec, 1900 + t.year);
 }
 
-JSValuePtr dateProtoFuncGetUTCFullYear(ExecState* exec,
-                                       JSObject*,
-                                       JSValuePtr thisValue,
-                                       const ArgList&) {
+JSValue dateProtoFuncGetUTCFullYear(ExecState* exec,
+                                    JSObject*,
+                                    JSValue thisValue,
+                                    const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -729,10 +729,10 @@ JSValuePtr dateProtoFuncGetUTCFullYear(ExecState* exec,
   return jsNumber(exec, 1900 + t.year);
 }
 
-JSValuePtr dateProtoFuncToGMTString(ExecState* exec,
-                                    JSObject*,
-                                    JSValuePtr thisValue,
-                                    const ArgList&) {
+JSValue dateProtoFuncToGMTString(ExecState* exec,
+                                 JSObject*,
+                                 JSValue thisValue,
+                                 const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -749,10 +749,10 @@ JSValuePtr dateProtoFuncToGMTString(ExecState* exec,
                             formatDateUTCVariant(t) + " " + formatTime(t, utc));
 }
 
-JSValuePtr dateProtoFuncGetMonth(ExecState* exec,
-                                 JSObject*,
-                                 JSValuePtr thisValue,
-                                 const ArgList&) {
+JSValue dateProtoFuncGetMonth(ExecState* exec,
+                              JSObject*,
+                              JSValue thisValue,
+                              const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -768,10 +768,10 @@ JSValuePtr dateProtoFuncGetMonth(ExecState* exec,
   return jsNumber(exec, t.month);
 }
 
-JSValuePtr dateProtoFuncGetUTCMonth(ExecState* exec,
-                                    JSObject*,
-                                    JSValuePtr thisValue,
-                                    const ArgList&) {
+JSValue dateProtoFuncGetUTCMonth(ExecState* exec,
+                                 JSObject*,
+                                 JSValue thisValue,
+                                 const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -787,9 +787,123 @@ JSValuePtr dateProtoFuncGetUTCMonth(ExecState* exec,
   return jsNumber(exec, t.month);
 }
 
-JSValuePtr dateProtoFuncGetDate(ExecState* exec,
+JSValue dateProtoFuncGetDate(ExecState* exec,
+                             JSObject*,
+                             JSValue thisValue,
+                             const ArgList&) {
+  if (!thisValue.isObject(&DateInstance::info))
+    return throwError(exec, TypeError);
+
+  const bool utc = false;
+
+  DateInstance* thisDateObj = asDateInstance(thisValue);
+  double milli = thisDateObj->internalNumber();
+  if (isnan(milli))
+    return jsNaN(exec);
+
+  GregorianDateTime t;
+  thisDateObj->msToGregorianDateTime(milli, utc, t);
+  return jsNumber(exec, t.monthDay);
+}
+
+JSValue dateProtoFuncGetUTCDate(ExecState* exec,
                                 JSObject*,
-                                JSValuePtr thisValue,
+                                JSValue thisValue,
+                                const ArgList&) {
+  if (!thisValue.isObject(&DateInstance::info))
+    return throwError(exec, TypeError);
+
+  const bool utc = true;
+
+  DateInstance* thisDateObj = asDateInstance(thisValue);
+  double milli = thisDateObj->internalNumber();
+  if (isnan(milli))
+    return jsNaN(exec);
+
+  GregorianDateTime t;
+  thisDateObj->msToGregorianDateTime(milli, utc, t);
+  return jsNumber(exec, t.monthDay);
+}
+
+JSValue dateProtoFuncGetDay(ExecState* exec,
+                            JSObject*,
+                            JSValue thisValue,
+                            const ArgList&) {
+  if (!thisValue.isObject(&DateInstance::info))
+    return throwError(exec, TypeError);
+
+  const bool utc = false;
+
+  DateInstance* thisDateObj = asDateInstance(thisValue);
+  double milli = thisDateObj->internalNumber();
+  if (isnan(milli))
+    return jsNaN(exec);
+
+  GregorianDateTime t;
+  thisDateObj->msToGregorianDateTime(milli, utc, t);
+  return jsNumber(exec, t.weekDay);
+}
+
+JSValue dateProtoFuncGetUTCDay(ExecState* exec,
+                               JSObject*,
+                               JSValue thisValue,
+                               const ArgList&) {
+  if (!thisValue.isObject(&DateInstance::info))
+    return throwError(exec, TypeError);
+
+  const bool utc = true;
+
+  DateInstance* thisDateObj = asDateInstance(thisValue);
+  double milli = thisDateObj->internalNumber();
+  if (isnan(milli))
+    return jsNaN(exec);
+
+  GregorianDateTime t;
+  thisDateObj->msToGregorianDateTime(milli, utc, t);
+  return jsNumber(exec, t.weekDay);
+}
+
+JSValue dateProtoFuncGetHours(ExecState* exec,
+                              JSObject*,
+                              JSValue thisValue,
+                              const ArgList&) {
+  if (!thisValue.isObject(&DateInstance::info))
+    return throwError(exec, TypeError);
+
+  const bool utc = false;
+
+  DateInstance* thisDateObj = asDateInstance(thisValue);
+  double milli = thisDateObj->internalNumber();
+  if (isnan(milli))
+    return jsNaN(exec);
+
+  GregorianDateTime t;
+  thisDateObj->msToGregorianDateTime(milli, utc, t);
+  return jsNumber(exec, t.hour);
+}
+
+JSValue dateProtoFuncGetUTCHours(ExecState* exec,
+                                 JSObject*,
+                                 JSValue thisValue,
+                                 const ArgList&) {
+  if (!thisValue.isObject(&DateInstance::info))
+    return throwError(exec, TypeError);
+
+  const bool utc = true;
+
+  DateInstance* thisDateObj = asDateInstance(thisValue);
+  double milli = thisDateObj->internalNumber();
+  if (isnan(milli))
+    return jsNaN(exec);
+
+  GregorianDateTime t;
+  thisDateObj->msToGregorianDateTime(milli, utc, t);
+  return jsNumber(exec, t.hour);
+}
+
+JSValue dateProtoFuncGetMinutes(ExecState* exec,
+                                JSObject*,
+                                JSValue thisValue,
                                 const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
@@ -803,127 +917,13 @@ JSValuePtr dateProtoFuncGetDate(ExecState* exec,
 
   GregorianDateTime t;
   thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsNumber(exec, t.monthDay);
-}
-
-JSValuePtr dateProtoFuncGetUTCDate(ExecState* exec,
-                                   JSObject*,
-                                   JSValuePtr thisValue,
-                                   const ArgList&) {
-  if (!thisValue.isObject(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = true;
-
-  DateInstance* thisDateObj = asDateInstance(thisValue);
-  double milli = thisDateObj->internalNumber();
-  if (isnan(milli))
-    return jsNaN(exec);
-
-  GregorianDateTime t;
-  thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsNumber(exec, t.monthDay);
-}
-
-JSValuePtr dateProtoFuncGetDay(ExecState* exec,
-                               JSObject*,
-                               JSValuePtr thisValue,
-                               const ArgList&) {
-  if (!thisValue.isObject(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = false;
-
-  DateInstance* thisDateObj = asDateInstance(thisValue);
-  double milli = thisDateObj->internalNumber();
-  if (isnan(milli))
-    return jsNaN(exec);
-
-  GregorianDateTime t;
-  thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsNumber(exec, t.weekDay);
-}
-
-JSValuePtr dateProtoFuncGetUTCDay(ExecState* exec,
-                                  JSObject*,
-                                  JSValuePtr thisValue,
-                                  const ArgList&) {
-  if (!thisValue.isObject(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = true;
-
-  DateInstance* thisDateObj = asDateInstance(thisValue);
-  double milli = thisDateObj->internalNumber();
-  if (isnan(milli))
-    return jsNaN(exec);
-
-  GregorianDateTime t;
-  thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsNumber(exec, t.weekDay);
-}
-
-JSValuePtr dateProtoFuncGetHours(ExecState* exec,
-                                 JSObject*,
-                                 JSValuePtr thisValue,
-                                 const ArgList&) {
-  if (!thisValue.isObject(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = false;
-
-  DateInstance* thisDateObj = asDateInstance(thisValue);
-  double milli = thisDateObj->internalNumber();
-  if (isnan(milli))
-    return jsNaN(exec);
-
-  GregorianDateTime t;
-  thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsNumber(exec, t.hour);
-}
-
-JSValuePtr dateProtoFuncGetUTCHours(ExecState* exec,
-                                    JSObject*,
-                                    JSValuePtr thisValue,
-                                    const ArgList&) {
-  if (!thisValue.isObject(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = true;
-
-  DateInstance* thisDateObj = asDateInstance(thisValue);
-  double milli = thisDateObj->internalNumber();
-  if (isnan(milli))
-    return jsNaN(exec);
-
-  GregorianDateTime t;
-  thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsNumber(exec, t.hour);
-}
-
-JSValuePtr dateProtoFuncGetMinutes(ExecState* exec,
-                                   JSObject*,
-                                   JSValuePtr thisValue,
-                                   const ArgList&) {
-  if (!thisValue.isObject(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = false;
-
-  DateInstance* thisDateObj = asDateInstance(thisValue);
-  double milli = thisDateObj->internalNumber();
-  if (isnan(milli))
-    return jsNaN(exec);
-
-  GregorianDateTime t;
-  thisDateObj->msToGregorianDateTime(milli, utc, t);
   return jsNumber(exec, t.minute);
 }
 
-JSValuePtr dateProtoFuncGetUTCMinutes(ExecState* exec,
-                                      JSObject*,
-                                      JSValuePtr thisValue,
-                                      const ArgList&) {
+JSValue dateProtoFuncGetUTCMinutes(ExecState* exec,
+                                   JSObject*,
+                                   JSValue thisValue,
+                                   const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -939,10 +939,10 @@ JSValuePtr dateProtoFuncGetUTCMinutes(ExecState* exec,
   return jsNumber(exec, t.minute);
 }
 
-JSValuePtr dateProtoFuncGetSeconds(ExecState* exec,
-                                   JSObject*,
-                                   JSValuePtr thisValue,
-                                   const ArgList&) {
+JSValue dateProtoFuncGetSeconds(ExecState* exec,
+                                JSObject*,
+                                JSValue thisValue,
+                                const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -958,10 +958,10 @@ JSValuePtr dateProtoFuncGetSeconds(ExecState* exec,
   return jsNumber(exec, t.second);
 }
 
-JSValuePtr dateProtoFuncGetUTCSeconds(ExecState* exec,
-                                      JSObject*,
-                                      JSValuePtr thisValue,
-                                      const ArgList&) {
+JSValue dateProtoFuncGetUTCSeconds(ExecState* exec,
+                                   JSObject*,
+                                   JSValue thisValue,
+                                   const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -977,9 +977,26 @@ JSValuePtr dateProtoFuncGetUTCSeconds(ExecState* exec,
   return jsNumber(exec, t.second);
 }
 
-JSValuePtr dateProtoFuncGetMilliSeconds(ExecState* exec,
+JSValue dateProtoFuncGetMilliSeconds(ExecState* exec,
+                                     JSObject*,
+                                     JSValue thisValue,
+                                     const ArgList&) {
+  if (!thisValue.isObject(&DateInstance::info))
+    return throwError(exec, TypeError);
+
+  DateInstance* thisDateObj = asDateInstance(thisValue);
+  double milli = thisDateObj->internalNumber();
+  if (isnan(milli))
+    return jsNaN(exec);
+
+  double secs = floor(milli / msPerSecond);
+  double ms = milli - secs * msPerSecond;
+  return jsNumber(exec, ms);
+}
+
+JSValue dateProtoFuncGetUTCMilliseconds(ExecState* exec,
                                         JSObject*,
-                                        JSValuePtr thisValue,
+                                        JSValue thisValue,
                                         const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
@@ -994,27 +1011,10 @@ JSValuePtr dateProtoFuncGetMilliSeconds(ExecState* exec,
   return jsNumber(exec, ms);
 }
 
-JSValuePtr dateProtoFuncGetUTCMilliseconds(ExecState* exec,
-                                           JSObject*,
-                                           JSValuePtr thisValue,
-                                           const ArgList&) {
-  if (!thisValue.isObject(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  DateInstance* thisDateObj = asDateInstance(thisValue);
-  double milli = thisDateObj->internalNumber();
-  if (isnan(milli))
-    return jsNaN(exec);
-
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-  return jsNumber(exec, ms);
-}
-
-JSValuePtr dateProtoFuncGetTimezoneOffset(ExecState* exec,
-                                          JSObject*,
-                                          JSValuePtr thisValue,
-                                          const ArgList&) {
+JSValue dateProtoFuncGetTimezoneOffset(ExecState* exec,
+                                       JSObject*,
+                                       JSValue thisValue,
+                                       const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1030,26 +1030,26 @@ JSValuePtr dateProtoFuncGetTimezoneOffset(ExecState* exec,
   return jsNumber(exec, -gmtoffset(t) / minutesPerHour);
 }
 
-JSValuePtr dateProtoFuncSetTime(ExecState* exec,
-                                JSObject*,
-                                JSValuePtr thisValue,
-                                const ArgList& args) {
+JSValue dateProtoFuncSetTime(ExecState* exec,
+                             JSObject*,
+                             JSValue thisValue,
+                             const ArgList& args) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
   double milli = timeClip(args.at(0).toNumber(exec));
-  JSValuePtr result = jsNumber(exec, milli);
+  JSValue result = jsNumber(exec, milli);
   thisDateObj->setInternalValue(result);
   return result;
 }
 
-static JSValuePtr setNewValueFromTimeArgs(ExecState* exec,
-                                          JSValuePtr thisValue,
-                                          const ArgList& args,
-                                          int numArgsToUse,
-                                          bool inputIsUTC) {
+static JSValue setNewValueFromTimeArgs(ExecState* exec,
+                                       JSValue thisValue,
+                                       const ArgList& args,
+                                       int numArgsToUse,
+                                       bool inputIsUTC) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1057,7 +1057,7 @@ static JSValuePtr setNewValueFromTimeArgs(ExecState* exec,
   double milli = thisDateObj->internalNumber();
 
   if (args.isEmpty() || isnan(milli)) {
-    JSValuePtr result = jsNaN(exec);
+    JSValue result = jsNaN(exec);
     thisDateObj->setInternalValue(result);
     return result;
   }
@@ -1069,27 +1069,27 @@ static JSValuePtr setNewValueFromTimeArgs(ExecState* exec,
   thisDateObj->msToGregorianDateTime(milli, inputIsUTC, t);
 
   if (!fillStructuresUsingTimeArgs(exec, args, numArgsToUse, &ms, &t)) {
-    JSValuePtr result = jsNaN(exec);
+    JSValue result = jsNaN(exec);
     thisDateObj->setInternalValue(result);
     return result;
   }
 
-  JSValuePtr result = jsNumber(exec, gregorianDateTimeToMS(t, ms, inputIsUTC));
+  JSValue result = jsNumber(exec, gregorianDateTimeToMS(t, ms, inputIsUTC));
   thisDateObj->setInternalValue(result);
   return result;
 }
 
-static JSValuePtr setNewValueFromDateArgs(ExecState* exec,
-                                          JSValuePtr thisValue,
-                                          const ArgList& args,
-                                          int numArgsToUse,
-                                          bool inputIsUTC) {
+static JSValue setNewValueFromDateArgs(ExecState* exec,
+                                       JSValue thisValue,
+                                       const ArgList& args,
+                                       int numArgsToUse,
+                                       bool inputIsUTC) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
   if (args.isEmpty()) {
-    JSValuePtr result = jsNaN(exec);
+    JSValue result = jsNaN(exec);
     thisDateObj->setInternalValue(result);
     return result;
   }
@@ -1109,132 +1109,132 @@ static JSValuePtr setNewValueFromDateArgs(ExecState* exec,
   }
 
   if (!fillStructuresUsingDateArgs(exec, args, numArgsToUse, &ms, &t)) {
-    JSValuePtr result = jsNaN(exec);
+    JSValue result = jsNaN(exec);
     thisDateObj->setInternalValue(result);
     return result;
   }
 
-  JSValuePtr result = jsNumber(exec, gregorianDateTimeToMS(t, ms, inputIsUTC));
+  JSValue result = jsNumber(exec, gregorianDateTimeToMS(t, ms, inputIsUTC));
   thisDateObj->setInternalValue(result);
   return result;
 }
 
-JSValuePtr dateProtoFuncSetMilliSeconds(ExecState* exec,
+JSValue dateProtoFuncSetMilliSeconds(ExecState* exec,
+                                     JSObject*,
+                                     JSValue thisValue,
+                                     const ArgList& args) {
+  const bool inputIsUTC = false;
+  return setNewValueFromTimeArgs(exec, thisValue, args, 1, inputIsUTC);
+}
+
+JSValue dateProtoFuncSetUTCMilliseconds(ExecState* exec,
                                         JSObject*,
-                                        JSValuePtr thisValue,
+                                        JSValue thisValue,
                                         const ArgList& args) {
-  const bool inputIsUTC = false;
-  return setNewValueFromTimeArgs(exec, thisValue, args, 1, inputIsUTC);
-}
-
-JSValuePtr dateProtoFuncSetUTCMilliseconds(ExecState* exec,
-                                           JSObject*,
-                                           JSValuePtr thisValue,
-                                           const ArgList& args) {
   const bool inputIsUTC = true;
   return setNewValueFromTimeArgs(exec, thisValue, args, 1, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetSeconds(ExecState* exec,
-                                   JSObject*,
-                                   JSValuePtr thisValue,
-                                   const ArgList& args) {
+JSValue dateProtoFuncSetSeconds(ExecState* exec,
+                                JSObject*,
+                                JSValue thisValue,
+                                const ArgList& args) {
   const bool inputIsUTC = false;
   return setNewValueFromTimeArgs(exec, thisValue, args, 2, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetUTCSeconds(ExecState* exec,
-                                      JSObject*,
-                                      JSValuePtr thisValue,
-                                      const ArgList& args) {
+JSValue dateProtoFuncSetUTCSeconds(ExecState* exec,
+                                   JSObject*,
+                                   JSValue thisValue,
+                                   const ArgList& args) {
   const bool inputIsUTC = true;
   return setNewValueFromTimeArgs(exec, thisValue, args, 2, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetMinutes(ExecState* exec,
-                                   JSObject*,
-                                   JSValuePtr thisValue,
-                                   const ArgList& args) {
+JSValue dateProtoFuncSetMinutes(ExecState* exec,
+                                JSObject*,
+                                JSValue thisValue,
+                                const ArgList& args) {
   const bool inputIsUTC = false;
   return setNewValueFromTimeArgs(exec, thisValue, args, 3, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetUTCMinutes(ExecState* exec,
-                                      JSObject*,
-                                      JSValuePtr thisValue,
-                                      const ArgList& args) {
+JSValue dateProtoFuncSetUTCMinutes(ExecState* exec,
+                                   JSObject*,
+                                   JSValue thisValue,
+                                   const ArgList& args) {
   const bool inputIsUTC = true;
   return setNewValueFromTimeArgs(exec, thisValue, args, 3, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetHours(ExecState* exec,
-                                 JSObject*,
-                                 JSValuePtr thisValue,
-                                 const ArgList& args) {
+JSValue dateProtoFuncSetHours(ExecState* exec,
+                              JSObject*,
+                              JSValue thisValue,
+                              const ArgList& args) {
   const bool inputIsUTC = false;
   return setNewValueFromTimeArgs(exec, thisValue, args, 4, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetUTCHours(ExecState* exec,
-                                    JSObject*,
-                                    JSValuePtr thisValue,
-                                    const ArgList& args) {
+JSValue dateProtoFuncSetUTCHours(ExecState* exec,
+                                 JSObject*,
+                                 JSValue thisValue,
+                                 const ArgList& args) {
   const bool inputIsUTC = true;
   return setNewValueFromTimeArgs(exec, thisValue, args, 4, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetDate(ExecState* exec,
-                                JSObject*,
-                                JSValuePtr thisValue,
-                                const ArgList& args) {
+JSValue dateProtoFuncSetDate(ExecState* exec,
+                             JSObject*,
+                             JSValue thisValue,
+                             const ArgList& args) {
   const bool inputIsUTC = false;
   return setNewValueFromDateArgs(exec, thisValue, args, 1, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetUTCDate(ExecState* exec,
-                                   JSObject*,
-                                   JSValuePtr thisValue,
-                                   const ArgList& args) {
+JSValue dateProtoFuncSetUTCDate(ExecState* exec,
+                                JSObject*,
+                                JSValue thisValue,
+                                const ArgList& args) {
   const bool inputIsUTC = true;
   return setNewValueFromDateArgs(exec, thisValue, args, 1, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetMonth(ExecState* exec,
+JSValue dateProtoFuncSetMonth(ExecState* exec,
+                              JSObject*,
+                              JSValue thisValue,
+                              const ArgList& args) {
+  const bool inputIsUTC = false;
+  return setNewValueFromDateArgs(exec, thisValue, args, 2, inputIsUTC);
+}
+
+JSValue dateProtoFuncSetUTCMonth(ExecState* exec,
                                  JSObject*,
-                                 JSValuePtr thisValue,
+                                 JSValue thisValue,
+                                 const ArgList& args) {
+  const bool inputIsUTC = true;
+  return setNewValueFromDateArgs(exec, thisValue, args, 2, inputIsUTC);
+}
+
+JSValue dateProtoFuncSetFullYear(ExecState* exec,
+                                 JSObject*,
+                                 JSValue thisValue,
                                  const ArgList& args) {
   const bool inputIsUTC = false;
-  return setNewValueFromDateArgs(exec, thisValue, args, 2, inputIsUTC);
-}
-
-JSValuePtr dateProtoFuncSetUTCMonth(ExecState* exec,
-                                    JSObject*,
-                                    JSValuePtr thisValue,
-                                    const ArgList& args) {
-  const bool inputIsUTC = true;
-  return setNewValueFromDateArgs(exec, thisValue, args, 2, inputIsUTC);
-}
-
-JSValuePtr dateProtoFuncSetFullYear(ExecState* exec,
-                                    JSObject*,
-                                    JSValuePtr thisValue,
-                                    const ArgList& args) {
-  const bool inputIsUTC = false;
   return setNewValueFromDateArgs(exec, thisValue, args, 3, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetUTCFullYear(ExecState* exec,
-                                       JSObject*,
-                                       JSValuePtr thisValue,
-                                       const ArgList& args) {
+JSValue dateProtoFuncSetUTCFullYear(ExecState* exec,
+                                    JSObject*,
+                                    JSValue thisValue,
+                                    const ArgList& args) {
   const bool inputIsUTC = true;
   return setNewValueFromDateArgs(exec, thisValue, args, 3, inputIsUTC);
 }
 
-JSValuePtr dateProtoFuncSetYear(ExecState* exec,
-                                JSObject*,
-                                JSValuePtr thisValue,
-                                const ArgList& args) {
+JSValue dateProtoFuncSetYear(ExecState* exec,
+                             JSObject*,
+                             JSValue thisValue,
+                             const ArgList& args) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1242,7 +1242,7 @@ JSValuePtr dateProtoFuncSetYear(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
   if (args.isEmpty()) {
-    JSValuePtr result = jsNaN(exec);
+    JSValue result = jsNaN(exec);
     thisDateObj->setInternalValue(result);
     return result;
   }
@@ -1264,21 +1264,21 @@ JSValuePtr dateProtoFuncSetYear(ExecState* exec,
   bool ok = true;
   int32_t year = args.at(0).toInt32(exec, ok);
   if (!ok) {
-    JSValuePtr result = jsNaN(exec);
+    JSValue result = jsNaN(exec);
     thisDateObj->setInternalValue(result);
     return result;
   }
 
   t.year = (year > 99 || year < 0) ? year - 1900 : year;
-  JSValuePtr result = jsNumber(exec, gregorianDateTimeToMS(t, ms, utc));
+  JSValue result = jsNumber(exec, gregorianDateTimeToMS(t, ms, utc));
   thisDateObj->setInternalValue(result);
   return result;
 }
 
-JSValuePtr dateProtoFuncGetYear(ExecState* exec,
-                                JSObject*,
-                                JSValuePtr thisValue,
-                                const ArgList&) {
+JSValue dateProtoFuncGetYear(ExecState* exec,
+                             JSObject*,
+                             JSValue thisValue,
+                             const ArgList&) {
   if (!thisValue.isObject(&DateInstance::info))
     return throwError(exec, TypeError);
 

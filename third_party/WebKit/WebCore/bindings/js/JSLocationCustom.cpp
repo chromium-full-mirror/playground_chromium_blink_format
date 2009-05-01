@@ -38,7 +38,7 @@ using namespace JSC;
 
 namespace WebCore {
 
-static JSValuePtr nonCachingStaticReplaceFunctionGetter(
+static JSValue nonCachingStaticReplaceFunctionGetter(
     ExecState* exec,
     const Identifier& propertyName,
     const PropertySlot&) {
@@ -46,7 +46,7 @@ static JSValuePtr nonCachingStaticReplaceFunctionGetter(
                                       jsLocationPrototypeFunctionReplace);
 }
 
-static JSValuePtr nonCachingStaticReloadFunctionGetter(
+static JSValue nonCachingStaticReloadFunctionGetter(
     ExecState* exec,
     const Identifier& propertyName,
     const PropertySlot&) {
@@ -54,7 +54,7 @@ static JSValuePtr nonCachingStaticReloadFunctionGetter(
                                       jsLocationPrototypeFunctionReload);
 }
 
-static JSValuePtr nonCachingStaticAssignFunctionGetter(
+static JSValue nonCachingStaticAssignFunctionGetter(
     ExecState* exec,
     const Identifier& propertyName,
     const PropertySlot&) {
@@ -112,7 +112,7 @@ bool JSLocation::customGetOwnPropertySlot(ExecState* exec,
 
 bool JSLocation::customPut(ExecState* exec,
                            const Identifier& propertyName,
-                           JSValuePtr value,
+                           JSValue value,
                            PutPropertySlot& slot) {
   Frame* frame = impl()->frame();
   if (!frame)
@@ -182,7 +182,7 @@ static void navigateIfAllowed(ExecState* exec,
   }
 }
 
-void JSLocation::setHref(ExecState* exec, JSValuePtr value) {
+void JSLocation::setHref(ExecState* exec, JSValue value) {
   Frame* frame = impl()->frame();
   ASSERT(frame);
 
@@ -198,7 +198,7 @@ void JSLocation::setHref(ExecState* exec, JSValuePtr value) {
                     !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
-void JSLocation::setProtocol(ExecState* exec, JSValuePtr value) {
+void JSLocation::setProtocol(ExecState* exec, JSValue value) {
   Frame* frame = impl()->frame();
   ASSERT(frame);
 
@@ -209,7 +209,7 @@ void JSLocation::setProtocol(ExecState* exec, JSValuePtr value) {
                     !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
-void JSLocation::setHost(ExecState* exec, JSValuePtr value) {
+void JSLocation::setHost(ExecState* exec, JSValue value) {
   Frame* frame = impl()->frame();
   ASSERT(frame);
 
@@ -220,7 +220,7 @@ void JSLocation::setHost(ExecState* exec, JSValuePtr value) {
                     !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
-void JSLocation::setHostname(ExecState* exec, JSValuePtr value) {
+void JSLocation::setHostname(ExecState* exec, JSValue value) {
   Frame* frame = impl()->frame();
   ASSERT(frame);
 
@@ -231,7 +231,7 @@ void JSLocation::setHostname(ExecState* exec, JSValuePtr value) {
                     !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
-void JSLocation::setPort(ExecState* exec, JSValuePtr value) {
+void JSLocation::setPort(ExecState* exec, JSValue value) {
   Frame* frame = impl()->frame();
   ASSERT(frame);
 
@@ -248,7 +248,7 @@ void JSLocation::setPort(ExecState* exec, JSValuePtr value) {
                     !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
-void JSLocation::setPathname(ExecState* exec, JSValuePtr value) {
+void JSLocation::setPathname(ExecState* exec, JSValue value) {
   Frame* frame = impl()->frame();
   ASSERT(frame);
 
@@ -259,7 +259,7 @@ void JSLocation::setPathname(ExecState* exec, JSValuePtr value) {
                     !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
-void JSLocation::setSearch(ExecState* exec, JSValuePtr value) {
+void JSLocation::setSearch(ExecState* exec, JSValue value) {
   Frame* frame = impl()->frame();
   ASSERT(frame);
 
@@ -270,7 +270,7 @@ void JSLocation::setSearch(ExecState* exec, JSValuePtr value) {
                     !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
-void JSLocation::setHash(ExecState* exec, JSValuePtr value) {
+void JSLocation::setHash(ExecState* exec, JSValue value) {
   Frame* frame = impl()->frame();
   ASSERT(frame);
 
@@ -287,7 +287,7 @@ void JSLocation::setHash(ExecState* exec, JSValuePtr value) {
                     !frame->script()->anyPageIsProcessingUserGesture(), false);
 }
 
-JSValuePtr JSLocation::replace(ExecState* exec, const ArgList& args) {
+JSValue JSLocation::replace(ExecState* exec, const ArgList& args) {
   Frame* frame = impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -305,7 +305,7 @@ JSValuePtr JSLocation::replace(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValuePtr JSLocation::reload(ExecState* exec, const ArgList&) {
+JSValue JSLocation::reload(ExecState* exec, const ArgList&) {
   Frame* frame = impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -326,7 +326,7 @@ JSValuePtr JSLocation::reload(ExecState* exec, const ArgList&) {
   return jsUndefined();
 }
 
-JSValuePtr JSLocation::assign(ExecState* exec, const ArgList& args) {
+JSValue JSLocation::assign(ExecState* exec, const ArgList& args) {
   Frame* frame = impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -345,7 +345,7 @@ JSValuePtr JSLocation::assign(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValuePtr JSLocation::toString(ExecState* exec, const ArgList&) {
+JSValue JSLocation::toString(ExecState* exec, const ArgList&) {
   Frame* frame = impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -357,7 +357,7 @@ JSValuePtr JSLocation::toString(ExecState* exec, const ArgList&) {
 
 bool JSLocationPrototype::customPut(ExecState* exec,
                                     const Identifier& propertyName,
-                                    JSValuePtr,
+                                    JSValue,
                                     PutPropertySlot&) {
   if (propertyName == exec->propertyNames().toString ||
       propertyName == exec->propertyNames().valueOf)

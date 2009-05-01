@@ -87,14 +87,14 @@ bool JSDOMWindowShell::getOwnPropertySlot(ExecState* exec,
 
 void JSDOMWindowShell::put(ExecState* exec,
                            const Identifier& propertyName,
-                           JSValuePtr value,
+                           JSValue value,
                            PutPropertySlot& slot) {
   m_window->put(exec, propertyName, value, slot);
 }
 
 void JSDOMWindowShell::putWithAttributes(ExecState* exec,
                                          const Identifier& propertyName,
-                                         JSValuePtr value,
+                                         JSValue value,
                                          unsigned attributes) {
   m_window->putWithAttributes(exec, propertyName, value, attributes);
 }
@@ -127,13 +127,13 @@ void JSDOMWindowShell::defineSetter(ExecState* exec,
   m_window->defineSetter(exec, propertyName, setterFunction);
 }
 
-JSValuePtr JSDOMWindowShell::lookupGetter(ExecState* exec,
-                                          const Identifier& propertyName) {
+JSValue JSDOMWindowShell::lookupGetter(ExecState* exec,
+                                       const Identifier& propertyName) {
   return m_window->lookupGetter(exec, propertyName);
 }
 
-JSValuePtr JSDOMWindowShell::lookupSetter(ExecState* exec,
-                                          const Identifier& propertyName) {
+JSValue JSDOMWindowShell::lookupSetter(ExecState* exec,
+                                       const Identifier& propertyName) {
   return m_window->lookupSetter(exec, propertyName);
 }
 
@@ -165,7 +165,7 @@ void* JSDOMWindowShell::operator new(size_t size) {
 // Conversion methods
 // ----
 
-JSValuePtr toJS(ExecState*, Frame* frame) {
+JSValue toJS(ExecState*, Frame* frame) {
   if (!frame)
     return jsNull();
   return frame->script()->windowShell();

@@ -32,7 +32,7 @@
 
 namespace JSC {
 
-JSObject* JSImmediate::toThisObject(JSValuePtr v, ExecState* exec) {
+JSObject* JSImmediate::toThisObject(JSValue v, ExecState* exec) {
   ASSERT(isImmediate(v));
   if (isNumber(v))
     return constructNumber(exec, v);
@@ -42,7 +42,7 @@ JSObject* JSImmediate::toThisObject(JSValuePtr v, ExecState* exec) {
   return exec->globalThisValue();
 }
 
-JSObject* JSImmediate::toObject(JSValuePtr v, ExecState* exec) {
+JSObject* JSImmediate::toObject(JSValue v, ExecState* exec) {
   ASSERT(isImmediate(v));
   if (isNumber(v))
     return constructNumber(exec, v);
@@ -55,7 +55,7 @@ JSObject* JSImmediate::toObject(JSValuePtr v, ExecState* exec) {
   return new (exec) JSNotAnObject(exec, exception);
 }
 
-JSObject* JSImmediate::prototype(JSValuePtr v, ExecState* exec) {
+JSObject* JSImmediate::prototype(JSValue v, ExecState* exec) {
   ASSERT(isImmediate(v));
   if (isNumber(v))
     return exec->lexicalGlobalObject()->numberPrototype();
@@ -68,7 +68,7 @@ JSObject* JSImmediate::prototype(JSValuePtr v, ExecState* exec) {
   return new (exec) JSNotAnObject(exec, exception);
 }
 
-UString JSImmediate::toString(JSValuePtr v) {
+UString JSImmediate::toString(JSValue v) {
   ASSERT(isImmediate(v));
   if (isIntegerNumber(v))
     return UString::from(getTruncatedInt32(v));

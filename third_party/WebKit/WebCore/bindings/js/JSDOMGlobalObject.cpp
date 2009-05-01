@@ -70,7 +70,7 @@ void JSDOMGlobalObject::mark() {
   }
 }
 
-JSEventListener* JSDOMGlobalObject::findJSEventListener(JSValuePtr val) {
+JSEventListener* JSDOMGlobalObject::findJSEventListener(JSValue val) {
   if (!val.isObject())
     return 0;
 
@@ -78,7 +78,7 @@ JSEventListener* JSDOMGlobalObject::findJSEventListener(JSValuePtr val) {
 }
 
 PassRefPtr<JSEventListener> JSDOMGlobalObject::findOrCreateJSEventListener(
-    JSValuePtr val) {
+    JSValue val) {
   if (JSEventListener* listener = findJSEventListener(val))
     return listener;
 
@@ -90,7 +90,7 @@ PassRefPtr<JSEventListener> JSDOMGlobalObject::findOrCreateJSEventListener(
 }
 
 PassRefPtr<JSEventListener> JSDOMGlobalObject::createJSAttributeEventListener(
-    JSValuePtr val) {
+    JSValue val) {
   if (!val.isObject())
     return 0;
 

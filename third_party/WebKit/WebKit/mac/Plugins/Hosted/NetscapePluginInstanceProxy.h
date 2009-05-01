@@ -207,12 +207,12 @@ class NetscapePluginInstanceProxy
       PassRefPtr<JSC::Bindings::RootObject>);
   RetainPtr<NSData*> marshalValues(JSC::ExecState*, const JSC::ArgList& args);
   void marshalValue(JSC::ExecState*,
-                    JSC::JSValuePtr value,
+                    JSC::JSValue value,
                     data_t& resultData,
                     mach_msg_type_number_t& resultLength);
-  JSC::JSValuePtr demarshalValue(JSC::ExecState*,
-                                 const char* valueData,
-                                 mach_msg_type_number_t valueLength);
+  JSC::JSValue demarshalValue(JSC::ExecState*,
+                              const char* valueData,
+                              mach_msg_type_number_t valueLength);
 
   void addInstance(ProxyInstance*);
   void removeInstance(ProxyInstance*);
@@ -348,12 +348,12 @@ class NetscapePluginInstanceProxy
 
   void addValueToArray(NSMutableArray*,
                        JSC::ExecState* exec,
-                       JSC::JSValuePtr value);
+                       JSC::JSValue value);
 
   bool demarshalValueFromArray(JSC::ExecState*,
                                NSArray* array,
                                NSUInteger& index,
-                               JSC::JSValuePtr& result);
+                               JSC::JSValue& result);
   void demarshalValues(JSC::ExecState*,
                        data_t valuesData,
                        mach_msg_type_number_t valuesLength,

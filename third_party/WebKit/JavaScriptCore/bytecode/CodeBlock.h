@@ -259,7 +259,7 @@ class CodeBlock {
     return index >= m_numVars && index < m_numVars + m_numConstants;
   }
 
-  ALWAYS_INLINE JSValuePtr getConstant(int index) {
+  ALWAYS_INLINE JSValue getConstant(int index) {
     return m_constantRegisters[index - m_numVars].jsValue();
   }
 
@@ -489,13 +489,13 @@ class CodeBlock {
            (m_rareData && m_rareData->m_functions.size());
   }
 
-  unsigned addUnexpectedConstant(JSValuePtr v) {
+  unsigned addUnexpectedConstant(JSValue v) {
     createRareDataIfNecessary();
     unsigned size = m_rareData->m_unexpectedConstants.size();
     m_rareData->m_unexpectedConstants.append(v);
     return size;
   }
-  JSValuePtr unexpectedConstant(int index) const {
+  JSValue unexpectedConstant(int index) const {
     ASSERT(m_rareData);
     return m_rareData->m_unexpectedConstants[index];
   }
@@ -644,7 +644,7 @@ class CodeBlock {
 
     // Rare Constants
     Vector<RefPtr<FuncDeclNode>> m_functions;
-    Vector<JSValuePtr> m_unexpectedConstants;
+    Vector<JSValue> m_unexpectedConstants;
     Vector<RefPtr<RegExp>> m_regexps;
 
     // Jump Tables

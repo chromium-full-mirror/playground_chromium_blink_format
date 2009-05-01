@@ -70,7 +70,7 @@ void setUpStaticFunctionSlot(ExecState* exec,
                              const Identifier& propertyName,
                              PropertySlot& slot) {
   ASSERT(entry->attributes() & Function);
-  JSValuePtr* location = thisObj->getDirectLocation(propertyName);
+  JSValue* location = thisObj->getDirectLocation(propertyName);
 
   if (!location) {
     PrototypeFunction* function = new (exec) PrototypeFunction(

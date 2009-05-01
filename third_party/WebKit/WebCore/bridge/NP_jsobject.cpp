@@ -119,7 +119,7 @@ bool _NPN_InvokeDefault(NPP,
     JSLock lock(false);
 
     // Call the function object.
-    JSValuePtr function = obj->imp;
+    JSValue function = obj->imp;
     CallData callData;
     CallType callType = function.getCallData(callData);
     if (callType == CallTypeNone)
@@ -129,7 +129,7 @@ bool _NPN_InvokeDefault(NPP,
     getListFromVariantArgs(exec, args, argCount, rootObject, argList);
     ProtectedPtr<JSGlobalObject> globalObject = rootObject->globalObject();
     globalObject->globalData()->timeoutChecker.start();
-    JSValuePtr resultV =
+    JSValue resultV =
         call(exec, function, callType, callData, function, argList);
     globalObject->globalData()->timeoutChecker.stop();
 
@@ -174,7 +174,7 @@ bool _NPN_Invoke(NPP npp,
       return false;
     ExecState* exec = rootObject->globalObject()->globalExec();
     JSLock lock(false);
-    JSValuePtr function =
+    JSValue function =
         obj->imp->get(exec, identifierFromNPIdentifier(i->string()));
     CallData callData;
     CallType callType = function.getCallData(callData);
@@ -186,7 +186,7 @@ bool _NPN_Invoke(NPP npp,
     getListFromVariantArgs(exec, args, argCount, rootObject, argList);
     ProtectedPtr<JSGlobalObject> globalObject = rootObject->globalObject();
     globalObject->globalData()->timeoutChecker.start();
-    JSValuePtr resultV =
+    JSValue resultV =
         call(exec, function, callType, callData, obj->imp, argList);
     globalObject->globalData()->timeoutChecker.stop();
 
@@ -222,7 +222,7 @@ bool _NPN_Evaluate(NPP, NPObject* o, NPString* s, NPVariant* variant) {
     globalObject->globalData()->timeoutChecker.stop();
     ComplType type = completion.complType();
 
-    JSValuePtr result;
+    JSValue result;
     if (type == Normal) {
       result = completion.value();
       if (!result)
@@ -254,7 +254,7 @@ bool _NPN_GetProperty(NPP,
     IdentifierRep* i = static_cast<IdentifierRep*>(propertyName);
 
     JSLock lock(false);
-    JSValuePtr result;
+    JSValue result;
     if (i->isString())
       result = obj->imp->get(exec, identifierFromNPIdentifier(i->string()));
     else
@@ -385,8 +385,7 @@ bool _NPN_HasMethod(NPP, NPObject* o, NPIdentifier methodName) {
 
     ExecState* exec = rootObject->globalObject()->globalExec();
     JSLock lock(false);
-    JSValuePtr func =
-        obj->imp->get(exec, identifierFromNPIdentifier(i->string()));
+    JSValue func = obj->imp->get(exec, identifierFromNPIdentifier(i->string()));
     exec->clearException();
     return !func.isUndefined();
   }
@@ -460,7 +459,7 @@ bool _NPN_Construct(NPP,
     JSLock lock(false);
 
     // Call the constructor object.
-    JSValuePtr constructor = obj->imp;
+    JSValue constructor = obj->imp;
     ConstructData constructData;
     ConstructType constructType = constructor.getConstructData(constructData);
     if (constructType == ConstructTypeNone)
@@ -470,7 +469,7 @@ bool _NPN_Construct(NPP,
     getListFromVariantArgs(exec, args, argCount, rootObject, argList);
     ProtectedPtr<JSGlobalObject> globalObject = rootObject->globalObject();
     globalObject->globalData()->timeoutChecker.start();
-    JSValuePtr resultV =
+    JSValue resultV =
         construct(exec, constructor, constructType, constructData, argList);
     globalObject->globalData()->timeoutChecker.stop();
 

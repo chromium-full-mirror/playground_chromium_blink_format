@@ -94,9 +94,9 @@ bool CInstance::supportsInvokeDefaultMethod() const {
   return _object->_class->invokeDefault;
 }
 
-JSValuePtr CInstance::invokeMethod(ExecState* exec,
-                                   const MethodList& methodList,
-                                   const ArgList& args) {
+JSValue CInstance::invokeMethod(ExecState* exec,
+                                const MethodList& methodList,
+                                const ArgList& args) {
   // Overloading methods are not allowed by NPObjects.  Should only be one
   // name match for a particular method.
   ASSERT(methodList.size() == 1);
@@ -129,14 +129,13 @@ JSValuePtr CInstance::invokeMethod(ExecState* exec,
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
 
-  JSValuePtr resultValue =
+  JSValue resultValue =
       convertNPVariantToValue(exec, &resultVariant, _rootObject.get());
   _NPN_ReleaseVariantValue(&resultVariant);
   return resultValue;
 }
 
-JSValuePtr CInstance::invokeDefaultMethod(ExecState* exec,
-                                          const ArgList& args) {
+JSValue CInstance::invokeDefaultMethod(ExecState* exec, const ArgList& args) {
   if (!_object->_class->invokeDefault)
     return jsUndefined();
 
@@ -161,7 +160,7 @@ JSValuePtr CInstance::invokeDefaultMethod(ExecState* exec,
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
 
-  JSValuePtr resultValue =
+  JSValue resultValue =
       convertNPVariantToValue(exec, &resultVariant, _rootObject.get());
   _NPN_ReleaseVariantValue(&resultVariant);
   return resultValue;
@@ -171,7 +170,7 @@ bool CInstance::supportsConstruct() const {
   return _object->_class->construct;
 }
 
-JSValuePtr CInstance::invokeConstruct(ExecState* exec, const ArgList& args) {
+JSValue CInstance::invokeConstruct(ExecState* exec, const ArgList& args) {
   if (!_object->_class->construct)
     return jsUndefined();
 
@@ -195,14 +194,14 @@ JSValuePtr CInstance::invokeConstruct(ExecState* exec, const ArgList& args) {
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
 
-  JSValuePtr resultValue =
+  JSValue resultValue =
       convertNPVariantToValue(exec, &resultVariant, _rootObject.get());
   _NPN_ReleaseVariantValue(&resultVariant);
   return resultValue;
 }
 
-JSValuePtr CInstance::defaultValue(ExecState* exec,
-                                   PreferredPrimitiveType hint) const {
+JSValue CInstance::defaultValue(ExecState* exec,
+                                PreferredPrimitiveType hint) const {
   if (hint == PreferString)
     return stringValue(exec);
   if (hint == PreferNumber)
@@ -210,24 +209,24 @@ JSValuePtr CInstance::defaultValue(ExecState* exec,
   return valueOf(exec);
 }
 
-JSValuePtr CInstance::stringValue(ExecState* exec) const {
+JSValue CInstance::stringValue(ExecState* exec) const {
   char buf[1024];
   snprintf(buf, sizeof(buf), "NPObject %p, NPClass %p", _object,
            _object->_class);
   return jsString(exec, buf);
 }
 
-JSValuePtr CInstance::numberValue(ExecState* exec) const {
+JSValue CInstance::numberValue(ExecState* exec) const {
   // FIXME: Implement something sensible.
   return jsNumber(exec, 0);
 }
 
-JSValuePtr CInstance::booleanValue() const {
+JSValue CInstance::booleanValue() const {
   // FIXME: Implement something sensible.
   return jsBoolean(false);
 }
 
-JSValuePtr CInstance::valueOf(ExecState* exec) const {
+JSValue CInstance::valueOf(ExecState* exec) const {
   return stringValue(exec);
 }
 

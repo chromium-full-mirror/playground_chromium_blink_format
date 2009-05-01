@@ -45,7 +45,7 @@ void JSDocument::mark() {
   markActiveObjectsForContext(*Heap::heap(this)->globalData(), impl());
 }
 
-JSValuePtr JSDocument::location(ExecState* exec) const {
+JSValue JSDocument::location(ExecState* exec) const {
   Frame* frame = static_cast<Document*>(impl())->frame();
   if (!frame)
     return jsNull();
@@ -62,7 +62,7 @@ JSValuePtr JSDocument::location(ExecState* exec) const {
   return jsLocation;
 }
 
-void JSDocument::setLocation(ExecState* exec, JSValuePtr value) {
+void JSDocument::setLocation(ExecState* exec, JSValue value) {
   Frame* frame = static_cast<Document*>(impl())->frame();
   if (!frame)
     return;
@@ -83,7 +83,7 @@ void JSDocument::setLocation(ExecState* exec, JSValuePtr value) {
       userGesture);
 }
 
-JSValuePtr toJS(ExecState* exec, Document* document) {
+JSValue toJS(ExecState* exec, Document* document) {
   if (!document)
     return jsNull();
 

@@ -156,12 +156,12 @@ SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
 
 extern "C" {
 
-__declspec(naked) EncodedJSValuePtr ctiTrampoline(void* code,
-                                                  RegisterFile*,
-                                                  CallFrame*,
-                                                  JSValuePtr* exception,
-                                                  Profiler**,
-                                                  JSGlobalData*) {
+__declspec(naked) EncodedJSValue ctiTrampoline(void* code,
+                                               RegisterFile*,
+                                               CallFrame*,
+                                               JSValue* exception,
+                                               Profiler**,
+                                               JSGlobalData*) {
   __asm {
             push ebp;
             mov ebp, esp;
@@ -323,7 +323,7 @@ void JIT::privateCompileMainPass() {
         int dst = currentInstruction[1].u.operand;
 
         if (m_codeBlock->isConstantRegisterIndex(src)) {
-          storePtr(ImmPtr(JSValuePtr::encode(getConstantOperand(src))),
+          storePtr(ImmPtr(JSValue::encode(getConstantOperand(src))),
                    Address(callFrameRegister, dst * sizeof(Register)));
           if (dst == m_lastResultBytecodeRegister)
             killLastResultRegister();
@@ -484,7 +484,7 @@ void JIT::privateCompileMainPass() {
                                regT1);  // reload proto
 
         // optimistically load true result
-        move(ImmPtr(JSValuePtr::encode(jsBoolean(true))), regT0);
+        move(ImmPtr(JSValue::encode(jsBoolean(true))), regT0);
 
         Label loop(this);
 
@@ -494,9 +494,9 @@ void JIT::privateCompileMainPass() {
 
         Jump exit = branchPtr(Equal, regT2, regT1);
 
-        branchPtr(NotEqual, regT2, ImmPtr(JSValuePtr::encode(jsNull())), loop);
+        branchPtr(NotEqual, regT2, ImmPtr(JSValue::encode(jsNull())), loop);
 
-        move(ImmPtr(JSValuePtr::encode(jsBoolean(false))), regT0);
+        move(ImmPtr(JSValue::encode(jsBoolean(false))), regT0);
 
         exit.link(this);
 
@@ -759,16 +759,15 @@ void JIT::privateCompileMainPass() {
         unsigned target = currentInstruction[2].u.operand;
         emitGetVirtualRegister(currentInstruction[1].u.operand, regT0);
 
-        Jump isZero =
-            branchPtr(Equal, regT0,
-                      ImmPtr(JSValuePtr::encode(jsNumber(m_globalData, 0))));
+        Jump isZero = branchPtr(
+            Equal, regT0, ImmPtr(JSValue::encode(jsNumber(m_globalData, 0))));
         addJump(emitJumpIfImmediateInteger(regT0), target + 2);
 
-        addJump(branchPtr(Equal, regT0,
-                          ImmPtr(JSValuePtr::encode(jsBoolean(true)))),
-                target + 2);
+        addJump(
+            branchPtr(Equal, regT0, ImmPtr(JSValue::encode(jsBoolean(true)))),
+            target + 2);
         addSlowCase(branchPtr(NotEqual, regT0,
-                              ImmPtr(JSValuePtr::encode(jsBoolean(false)))));
+                              ImmPtr(JSValue::encode(jsBoolean(false)))));
 
         isZero.link(this);
         NEXT_OPCODE(op_loop_if_true);
@@ -885,17 +884,16 @@ void JIT::privateCompileMainPass() {
         unsigned target = currentInstruction[2].u.operand;
         emitGetVirtualRegister(currentInstruction[1].u.operand, regT0);
 
-        addJump(
-            branchPtr(Equal, regT0,
-                      ImmPtr(JSValuePtr::encode(jsNumber(m_globalData, 0)))),
-            target + 2);
+        addJump(branchPtr(Equal, regT0,
+                          ImmPtr(JSValue::encode(jsNumber(m_globalData, 0)))),
+                target + 2);
         Jump isNonZero = emitJumpIfImmediateInteger(regT0);
 
-        addJump(branchPtr(Equal, regT0,
-                          ImmPtr(JSValuePtr::encode(jsBoolean(false)))),
-                target + 2);
+        addJump(
+            branchPtr(Equal, regT0, ImmPtr(JSValue::encode(jsBoolean(false)))),
+            target + 2);
         addSlowCase(branchPtr(NotEqual, regT0,
-                              ImmPtr(JSValuePtr::encode(jsBoolean(true)))));
+                              ImmPtr(JSValue::encode(jsBoolean(true)))));
 
         isNonZero.link(this);
         RECORD_JUMP_TARGET(target + 2);
@@ -921,7 +919,7 @@ void JIT::privateCompileMainPass() {
         // Now handle the immediate cases - undefined & null
         isImmediate.link(this);
         andPtr(Imm32(~JSImmediate::ExtendedTagBitUndefined), regT0);
-        addJump(branchPtr(Equal, regT0, ImmPtr(JSValuePtr::encode(jsNull()))),
+        addJump(branchPtr(Equal, regT0, ImmPtr(JSValue::encode(jsNull()))),
                 target + 2);
 
         wasNotImmediate.link(this);
@@ -948,9 +946,8 @@ void JIT::privateCompileMainPass() {
         // Now handle the immediate cases - undefined & null
         isImmediate.link(this);
         andPtr(Imm32(~JSImmediate::ExtendedTagBitUndefined), regT0);
-        addJump(
-            branchPtr(NotEqual, regT0, ImmPtr(JSValuePtr::encode(jsNull()))),
-            target + 2);
+        addJump(branchPtr(NotEqual, regT0, ImmPtr(JSValue::encode(jsNull()))),
+                target + 2);
 
         wasNotImmediate.link(this);
         RECORD_JUMP_TARGET(target + 2);
@@ -962,9 +959,9 @@ void JIT::privateCompileMainPass() {
         unsigned target = currentInstruction[3].u.operand;
 
         emitGetVirtualRegister(src, regT0);
-        addJump(branchPtr(NotEqual, regT0,
-                          ImmPtr(JSValuePtr::encode(JSValuePtr(ptr)))),
-                target + 3);
+        addJump(
+            branchPtr(NotEqual, regT0, ImmPtr(JSValue::encode(JSValue(ptr)))),
+            target + 3);
 
         RECORD_JUMP_TARGET(target + 3);
         NEXT_OPCODE(op_jneq_ptr);
@@ -975,9 +972,9 @@ void JIT::privateCompileMainPass() {
         NEXT_OPCODE(op_post_inc);
       }
       case op_unexpected_load: {
-        JSValuePtr v =
+        JSValue v =
             m_codeBlock->unexpectedConstant(currentInstruction[2].u.operand);
-        move(ImmPtr(JSValuePtr::encode(v)), regT0);
+        move(ImmPtr(JSValue::encode(v)), regT0);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_unexpected_load);
       }
@@ -1064,16 +1061,15 @@ void JIT::privateCompileMainPass() {
         unsigned target = currentInstruction[2].u.operand;
         emitGetVirtualRegister(currentInstruction[1].u.operand, regT0);
 
-        Jump isZero =
-            branchPtr(Equal, regT0,
-                      ImmPtr(JSValuePtr::encode(jsNumber(m_globalData, 0))));
+        Jump isZero = branchPtr(
+            Equal, regT0, ImmPtr(JSValue::encode(jsNumber(m_globalData, 0))));
         addJump(emitJumpIfImmediateInteger(regT0), target + 2);
 
-        addJump(branchPtr(Equal, regT0,
-                          ImmPtr(JSValuePtr::encode(jsBoolean(true)))),
-                target + 2);
+        addJump(
+            branchPtr(Equal, regT0, ImmPtr(JSValue::encode(jsBoolean(true)))),
+            target + 2);
         addSlowCase(branchPtr(NotEqual, regT0,
-                              ImmPtr(JSValuePtr::encode(jsBoolean(false)))));
+                              ImmPtr(JSValue::encode(jsBoolean(false)))));
 
         isZero.link(this);
         RECORD_JUMP_TARGET(target + 2);
@@ -1329,10 +1325,10 @@ void JIT::privateCompileMainPass() {
         NEXT_OPCODE(op_put_setter);
       }
       case op_new_error: {
-        JSValuePtr message =
+        JSValue message =
             m_codeBlock->unexpectedConstant(currentInstruction[3].u.operand);
         emitPutJITStubArgConstant(currentInstruction[2].u.operand, 1);
-        emitPutJITStubArgConstant(JSValuePtr::encode(message), 2);
+        emitPutJITStubArgConstant(JSValue::encode(message), 2);
         emitPutJITStubArgConstant(m_bytecodeIndex, 3);
         emitCTICall(JITStubs::cti_op_new_error);
         emitPutVirtualRegister(currentInstruction[1].u.operand);

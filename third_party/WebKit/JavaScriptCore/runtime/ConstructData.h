@@ -35,7 +35,7 @@ class ArgList;
 class ExecState;
 class FunctionBodyNode;
 class JSObject;
-class JSValuePtr;
+class JSValue;
 class ScopeChainNode;
 
 enum ConstructType { ConstructTypeNone, ConstructTypeHost, ConstructTypeJS };
@@ -53,7 +53,7 @@ union ConstructData {
 };
 
 JSObject* construct(ExecState*,
-                    JSValuePtr constructor,
+                    JSValue constructor,
                     ConstructType,
                     const ConstructData&,
                     const ArgList&);

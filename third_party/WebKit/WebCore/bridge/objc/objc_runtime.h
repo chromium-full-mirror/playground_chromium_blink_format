@@ -44,10 +44,8 @@ class ObjcField : public Field {
   ObjcField(IvarStructPtr);
   ObjcField(CFStringRef name);
 
-  virtual JSValuePtr valueFromInstance(ExecState*, const Instance*) const;
-  virtual void setValueToInstance(ExecState*,
-                                  const Instance*,
-                                  JSValuePtr) const;
+  virtual JSValue valueFromInstance(ExecState*, const Instance*) const;
+  virtual void setValueToInstance(ExecState*, const Instance*, JSValue) const;
 
  private:
   IvarStructPtr _ivar;
@@ -84,14 +82,14 @@ class ObjcArray : public Array {
 
   virtual void setValueAt(ExecState* exec,
                           unsigned int index,
-                          JSValuePtr aValue) const;
-  virtual JSValuePtr valueAt(ExecState* exec, unsigned int index) const;
+                          JSValue aValue) const;
+  virtual JSValue valueAt(ExecState* exec, unsigned int index) const;
   virtual unsigned int getLength() const;
 
   ObjectStructPtr getObjcArray() const { return _array.get(); }
 
-  static JSValuePtr convertObjcArrayToArray(ExecState* exec,
-                                            ObjectStructPtr anObject);
+  static JSValue convertObjcArrayToArray(ExecState* exec,
+                                         ObjectStructPtr anObject);
 
  private:
   RetainPtr<ObjectStructPtr> _array;
@@ -112,7 +110,7 @@ class ObjcFallbackObjectImp : public JSObject {
     return globalObject->objectPrototype();
   }
 
-  static PassRefPtr<Structure> createStructure(JSValuePtr prototype) {
+  static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
@@ -120,11 +118,11 @@ class ObjcFallbackObjectImp : public JSObject {
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValuePtr,
+                   JSValue,
                    PutPropertySlot&);
   virtual CallType getCallData(CallData&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
-  virtual JSValuePtr defaultValue(ExecState*, PreferredPrimitiveType) const;
+  virtual JSValue defaultValue(ExecState*, PreferredPrimitiveType) const;
 
   virtual bool toBoolean(ExecState*) const;
 

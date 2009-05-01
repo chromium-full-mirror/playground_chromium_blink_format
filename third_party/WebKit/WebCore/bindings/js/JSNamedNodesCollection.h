@@ -52,17 +52,17 @@ class JSNamedNodesCollection : public DOMObject {
     return globalObject->objectPrototype();
   }
 
-  static PassRefPtr<JSC::Structure> createStructure(JSC::JSValuePtr prototype) {
+  static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue prototype) {
     return JSC::Structure::create(prototype, JSC::TypeInfo(JSC::ObjectType));
   }
 
  private:
-  static JSC::JSValuePtr lengthGetter(JSC::ExecState*,
-                                      const JSC::Identifier&,
-                                      const JSC::PropertySlot&);
-  static JSC::JSValuePtr indexGetter(JSC::ExecState*,
-                                     const JSC::Identifier&,
-                                     const JSC::PropertySlot&);
+  static JSC::JSValue lengthGetter(JSC::ExecState*,
+                                   const JSC::Identifier&,
+                                   const JSC::PropertySlot&);
+  static JSC::JSValue indexGetter(JSC::ExecState*,
+                                  const JSC::Identifier&,
+                                  const JSC::PropertySlot&);
 
   OwnPtr<Vector<RefPtr<Node>>> m_nodes;
 };

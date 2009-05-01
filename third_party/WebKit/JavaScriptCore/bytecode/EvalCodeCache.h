@@ -44,7 +44,7 @@ class EvalCodeCache {
   PassRefPtr<EvalNode> get(ExecState* exec,
                            const UString& evalSource,
                            ScopeChainNode* scopeChain,
-                           JSValuePtr& exceptionValue) {
+                           JSValue& exceptionValue) {
     RefPtr<EvalNode> evalNode;
 
     if (evalSource.size() < maxCacheableSourceLength &&

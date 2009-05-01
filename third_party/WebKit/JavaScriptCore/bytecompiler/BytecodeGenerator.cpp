@@ -773,22 +773,22 @@ unsigned BytecodeGenerator::addConstant(const Identifier& ident) {
   return result.first->second;
 }
 
-RegisterID* BytecodeGenerator::addConstant(JSValuePtr v) {
+RegisterID* BytecodeGenerator::addConstant(JSValue v) {
   pair<JSValueMap::iterator, bool> result =
-      m_jsValueMap.add(JSValuePtr::encode(v), m_nextConstantIndex);
+      m_jsValueMap.add(JSValue::encode(v), m_nextConstantIndex);
   if (result.second) {
     RegisterID& constant = m_calleeRegisters[m_nextConstantIndex];
 
     ++m_nextConstantIndex;
 
-    m_codeBlock->addConstantRegister(JSValuePtr(v));
+    m_codeBlock->addConstantRegister(JSValue(v));
     return &constant;
   }
 
   return &registerFor(result.first->second);
 }
 
-unsigned BytecodeGenerator::addUnexpectedConstant(JSValuePtr v) {
+unsigned BytecodeGenerator::addUnexpectedConstant(JSValue v) {
   return m_codeBlock->addUnexpectedConstant(v);
 }
 
@@ -952,7 +952,7 @@ RegisterID* BytecodeGenerator::emitLoad(RegisterID* dst, double number) {
   if (number == HashTraits<double>::emptyValue() ||
       HashTraits<double>::isDeletedValue(number))
     return emitLoad(dst, jsNumber(globalData(), number));
-  JSValuePtr& valueInMap = m_numberMap.add(number, noValue()).first->second;
+  JSValue& valueInMap = m_numberMap.add(number, noValue()).first->second;
   if (!valueInMap)
     valueInMap = jsNumber(globalData(), number);
   return emitLoad(dst, valueInMap);
@@ -964,10 +964,10 @@ RegisterID* BytecodeGenerator::emitLoad(RegisterID* dst,
       m_stringMap.add(identifier.ustring().rep(), 0).first->second;
   if (!stringInMap)
     stringInMap = jsOwnedString(globalData(), identifier.ustring());
-  return emitLoad(dst, JSValuePtr(stringInMap));
+  return emitLoad(dst, JSValue(stringInMap));
 }
 
-RegisterID* BytecodeGenerator::emitLoad(RegisterID* dst, JSValuePtr v) {
+RegisterID* BytecodeGenerator::emitLoad(RegisterID* dst, JSValue v) {
   RegisterID* constantID = addConstant(v);
   if (dst)
     return emitMove(dst, constantID);
@@ -1123,7 +1123,7 @@ RegisterID* BytecodeGenerator::emitResolve(RegisterID* dst,
 RegisterID* BytecodeGenerator::emitGetScopedVar(RegisterID* dst,
                                                 size_t depth,
                                                 int index,
-                                                JSValuePtr globalObject) {
+                                                JSValue globalObject) {
   if (globalObject) {
     emitOpcode(op_get_global_var);
     instructions().append(dst->index());
@@ -1142,7 +1142,7 @@ RegisterID* BytecodeGenerator::emitGetScopedVar(RegisterID* dst,
 RegisterID* BytecodeGenerator::emitPutScopedVar(size_t depth,
                                                 int index,
                                                 RegisterID* value,
-                                                JSValuePtr globalObject) {
+                                                JSValue globalObject) {
   if (globalObject) {
     emitOpcode(op_put_global_var);
     instructions().append(asCell(globalObject));
@@ -1868,7 +1868,7 @@ RegisterID* BytecodeGenerator::emitCatch(RegisterID* targetRegister,
 
 RegisterID* BytecodeGenerator::emitNewError(RegisterID* dst,
                                             ErrorType type,
-                                            JSValuePtr message) {
+                                            JSValue message) {
   emitOpcode(op_new_error);
   instructions().append(dst->index());
   instructions().append(static_cast<int>(type));
@@ -1933,8 +1933,8 @@ static int32_t keyForImmediateSwitch(ExpressionNode* node,
   ASSERT(node->isNumber());
   double value = static_cast<NumberNode*>(node)->value();
   int32_t key = static_cast<int32_t>(value);
-  ASSERT(JSValuePtr::makeInt32Fast(key) &&
-         (JSValuePtr::makeInt32Fast(key).getInt32Fast() == value));
+  ASSERT(JSValue::makeInt32Fast(key) &&
+         (JSValue::makeInt32Fast(key).getInt32Fast() == value));
   ASSERT(key == value);
   ASSERT(key >= min);
   ASSERT(key <= max);

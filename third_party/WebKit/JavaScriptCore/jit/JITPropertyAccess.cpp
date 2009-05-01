@@ -280,7 +280,7 @@ void JIT::privateCompilePutByIdTransition(
   for (RefPtr<Structure>* it = chain->head(); *it; ++it) {
     // null check the prototype
     successCases.append(
-        branchPtr(Equal, regT2, ImmPtr(JSValuePtr::encode(jsNull()))));
+        branchPtr(Equal, regT2, ImmPtr(JSValue::encode(jsNull()))));
 
     // Check the structure id
     failureCases.append(
@@ -329,7 +329,7 @@ void JIT::privateCompilePutByIdTransition(
 
   // write the value
   loadPtr(Address(regT0, FIELD_OFFSET(JSObject, m_propertyStorage)), regT0);
-  storePtr(regT1, Address(regT0, cachedOffset * sizeof(JSValuePtr)));
+  storePtr(regT1, Address(regT0, cachedOffset * sizeof(JSValue)));
 
   ret();
 
@@ -367,7 +367,7 @@ void JIT::patchGetByIdSelf(StructureStubInfo* stubInfo,
       .repatch(structure);
   stubInfo->hotPathBegin
       .dataLabel32AtOffset(patchOffsetGetByIdPropertyMapOffset)
-      .repatch(cachedOffset * sizeof(JSValuePtr));
+      .repatch(cachedOffset * sizeof(JSValue));
 }
 
 void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
@@ -386,7 +386,7 @@ void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
       .repatch(structure);
   stubInfo->hotPathBegin
       .dataLabel32AtOffset(patchOffsetPutByIdPropertyMapOffset)
-      .repatch(cachedOffset * sizeof(JSValuePtr));
+      .repatch(cachedOffset * sizeof(JSValue));
 }
 
 void JIT::privateCompilePatchGetArrayLength(
@@ -447,7 +447,7 @@ void JIT::privateCompileGetByIdSelf(StructureStubInfo* stubInfo,
 
   // Checks out okay! - getDirectOffset
   loadPtr(Address(regT0, FIELD_OFFSET(JSObject, m_propertyStorage)), regT0);
-  loadPtr(Address(regT0, cachedOffset * sizeof(JSValuePtr)), regT0);
+  loadPtr(Address(regT0, cachedOffset * sizeof(JSValue)), regT0);
   ret();
 
   Call failureCases1Call = makeTailRecursiveCall(failureCases1);
@@ -499,7 +499,7 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
   // Checks out okay! - getDirectOffset
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   loadPtr(static_cast<void*>(protoPropertyStorage), regT1);
-  loadPtr(Address(regT1, cachedOffset * sizeof(JSValuePtr)), regT0);
+  loadPtr(Address(regT1, cachedOffset * sizeof(JSValue)), regT0);
 
   Jump success = jump();
 
@@ -547,7 +547,7 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
   // Checks out okay! - getDirectOffset
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   loadPtr(protoPropertyStorage, regT1);
-  loadPtr(Address(regT1, cachedOffset * sizeof(JSValuePtr)), regT0);
+  loadPtr(Address(regT1, cachedOffset * sizeof(JSValue)), regT0);
 
   ret();
 
@@ -573,7 +573,7 @@ void JIT::privateCompileGetByIdSelfList(
     size_t cachedOffset) {
   Jump failureCase = checkStructure(regT0, structure);
   loadPtr(Address(regT0, FIELD_OFFSET(JSObject, m_propertyStorage)), regT0);
-  loadPtr(Address(regT0, cachedOffset * sizeof(JSValuePtr)), regT0);
+  loadPtr(Address(regT0, cachedOffset * sizeof(JSValue)), regT0);
   Jump success = jump();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
@@ -639,7 +639,7 @@ void JIT::privateCompileGetByIdProtoList(
   // Checks out okay! - getDirectOffset
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   loadPtr(protoPropertyStorage, regT1);
-  loadPtr(Address(regT1, cachedOffset * sizeof(JSValuePtr)), regT0);
+  loadPtr(Address(regT1, cachedOffset * sizeof(JSValue)), regT0);
 
   Jump success = jump();
 
@@ -712,7 +712,7 @@ void JIT::privateCompileGetByIdChainList(
 
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   loadPtr(protoPropertyStorage, regT1);
-  loadPtr(Address(regT1, cachedOffset * sizeof(JSValuePtr)), regT0);
+  loadPtr(Address(regT1, cachedOffset * sizeof(JSValue)), regT0);
   Jump success = jump();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
@@ -787,7 +787,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
 
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   loadPtr(protoPropertyStorage, regT1);
-  loadPtr(Address(regT1, cachedOffset * sizeof(JSValuePtr)), regT0);
+  loadPtr(Address(regT1, cachedOffset * sizeof(JSValue)), regT0);
   Jump success = jump();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
@@ -844,7 +844,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
 
   PropertyStorage* protoPropertyStorage = &protoObject->m_propertyStorage;
   loadPtr(protoPropertyStorage, regT1);
-  loadPtr(Address(regT1, cachedOffset * sizeof(JSValuePtr)), regT0);
+  loadPtr(Address(regT1, cachedOffset * sizeof(JSValue)), regT0);
   ret();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
@@ -867,7 +867,7 @@ void JIT::privateCompilePutByIdReplace(StructureStubInfo* stubInfo,
 
   // checks out okay! - putDirectOffset
   loadPtr(Address(regT0, FIELD_OFFSET(JSObject, m_propertyStorage)), regT0);
-  storePtr(regT1, Address(regT0, cachedOffset * sizeof(JSValuePtr)));
+  storePtr(regT1, Address(regT0, cachedOffset * sizeof(JSValue)));
   ret();
 
   Call failureCases1Call = makeTailRecursiveCall(failureCases1);

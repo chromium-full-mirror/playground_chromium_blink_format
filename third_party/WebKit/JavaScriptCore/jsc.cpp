@@ -69,45 +69,27 @@ static void cleanupGlobalData(JSGlobalData*);
 static bool fillBufferWithContentsOfFile(const UString& fileName,
                                          Vector<char>& buffer);
 
-static JSValuePtr functionPrint(ExecState*,
-                                JSObject*,
-                                JSValuePtr,
-                                const ArgList&);
-static JSValuePtr functionDebug(ExecState*,
-                                JSObject*,
-                                JSValuePtr,
-                                const ArgList&);
-static JSValuePtr functionGC(ExecState*, JSObject*, JSValuePtr, const ArgList&);
-static JSValuePtr functionVersion(ExecState*,
-                                  JSObject*,
-                                  JSValuePtr,
-                                  const ArgList&);
-static JSValuePtr functionRun(ExecState*,
-                              JSObject*,
-                              JSValuePtr,
-                              const ArgList&);
-static JSValuePtr functionLoad(ExecState*,
-                               JSObject*,
-                               JSValuePtr,
-                               const ArgList&);
-static JSValuePtr functionReadline(ExecState*,
-                                   JSObject*,
-                                   JSValuePtr,
-                                   const ArgList&);
-static NO_RETURN JSValuePtr functionQuit(ExecState*,
-                                         JSObject*,
-                                         JSValuePtr,
-                                         const ArgList&);
+static JSValue functionPrint(ExecState*, JSObject*, JSValue, const ArgList&);
+static JSValue functionDebug(ExecState*, JSObject*, JSValue, const ArgList&);
+static JSValue functionGC(ExecState*, JSObject*, JSValue, const ArgList&);
+static JSValue functionVersion(ExecState*, JSObject*, JSValue, const ArgList&);
+static JSValue functionRun(ExecState*, JSObject*, JSValue, const ArgList&);
+static JSValue functionLoad(ExecState*, JSObject*, JSValue, const ArgList&);
+static JSValue functionReadline(ExecState*, JSObject*, JSValue, const ArgList&);
+static NO_RETURN JSValue functionQuit(ExecState*,
+                                      JSObject*,
+                                      JSValue,
+                                      const ArgList&);
 
 #if ENABLE(SAMPLING_FLAGS)
-static JSValuePtr functionSetSamplingFlag(ExecState*,
-                                          JSObject*,
-                                          JSValuePtr,
-                                          const ArgList&);
-static JSValuePtr functionClearSamplingFlag(ExecState*,
-                                            JSObject*,
-                                            JSValuePtr,
-                                            const ArgList&);
+static JSValue functionSetSamplingFlag(ExecState*,
+                                       JSObject*,
+                                       JSValue,
+                                       const ArgList&);
+static JSValue functionClearSamplingFlag(ExecState*,
+                                         JSObject*,
+                                         JSValue,
+                                         const ArgList&);
 #endif
 
 struct Script {
@@ -246,10 +228,10 @@ GlobalObject::GlobalObject(const Vector<UString>& arguments)
   putDirect(Identifier(globalExec(), "arguments"), array);
 }
 
-JSValuePtr functionPrint(ExecState* exec,
-                         JSObject*,
-                         JSValuePtr,
-                         const ArgList& args) {
+JSValue functionPrint(ExecState* exec,
+                      JSObject*,
+                      JSValue,
+                      const ArgList& args) {
   for (unsigned i = 0; i < args.size(); ++i) {
     if (i != 0)
       putchar(' ');
@@ -262,31 +244,28 @@ JSValuePtr functionPrint(ExecState* exec,
   return jsUndefined();
 }
 
-JSValuePtr functionDebug(ExecState* exec,
-                         JSObject*,
-                         JSValuePtr,
-                         const ArgList& args) {
+JSValue functionDebug(ExecState* exec,
+                      JSObject*,
+                      JSValue,
+                      const ArgList& args) {
   fprintf(stderr, "--> %s\n", args.at(0).toString(exec).UTF8String().c_str());
   return jsUndefined();
 }
 
-JSValuePtr functionGC(ExecState* exec, JSObject*, JSValuePtr, const ArgList&) {
+JSValue functionGC(ExecState* exec, JSObject*, JSValue, const ArgList&) {
   JSLock lock(false);
   exec->heap()->collect();
   return jsUndefined();
 }
 
-JSValuePtr functionVersion(ExecState*, JSObject*, JSValuePtr, const ArgList&) {
+JSValue functionVersion(ExecState*, JSObject*, JSValue, const ArgList&) {
   // We need this function for compatibility with the Mozilla JS tests but for
   // now
   // we don't actually do any version-specific handling
   return jsUndefined();
 }
 
-JSValuePtr functionRun(ExecState* exec,
-                       JSObject*,
-                       JSValuePtr,
-                       const ArgList& args) {
+JSValue functionRun(ExecState* exec, JSObject*, JSValue, const ArgList& args) {
   StopWatch stopWatch;
   UString fileName = args.at(0).toString(exec);
   Vector<char> script;
@@ -303,10 +282,7 @@ JSValuePtr functionRun(ExecState* exec,
   return jsNumber(globalObject->globalExec(), stopWatch.getElapsedMS());
 }
 
-JSValuePtr functionLoad(ExecState* exec,
-                        JSObject*,
-                        JSValuePtr,
-                        const ArgList& args) {
+JSValue functionLoad(ExecState* exec, JSObject*, JSValue, const ArgList& args) {
   UString fileName = args.at(0).toString(exec);
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
@@ -322,10 +298,10 @@ JSValuePtr functionLoad(ExecState* exec,
 }
 
 #if ENABLE(SAMPLING_FLAGS)
-JSValuePtr functionSetSamplingFlag(ExecState* exec,
-                                   JSObject*,
-                                   JSValuePtr,
-                                   const ArgList& args) {
+JSValue functionSetSamplingFlag(ExecState* exec,
+                                JSObject*,
+                                JSValue,
+                                const ArgList& args) {
   unsigned flag = static_cast<unsigned>(args.at(0).toNumber(exec));
 
   // Sanitize the input into the range 1..32.
@@ -339,10 +315,10 @@ JSValuePtr functionSetSamplingFlag(ExecState* exec,
   return jsNull();
 }
 
-JSValuePtr functionClearSamplingFlag(ExecState* exec,
-                                     JSObject*,
-                                     JSValuePtr,
-                                     const ArgList& args) {
+JSValue functionClearSamplingFlag(ExecState* exec,
+                                  JSObject*,
+                                  JSValue,
+                                  const ArgList& args) {
   unsigned flag = static_cast<unsigned>(args.at(0).toNumber(exec));
 
   // Sanitize the input into the range 1..32.
@@ -357,10 +333,7 @@ JSValuePtr functionClearSamplingFlag(ExecState* exec,
 }
 #endif
 
-JSValuePtr functionReadline(ExecState* exec,
-                            JSObject*,
-                            JSValuePtr,
-                            const ArgList&) {
+JSValue functionReadline(ExecState* exec, JSObject*, JSValue, const ArgList&) {
   Vector<char, 256> line;
   int c;
   while ((c = getchar()) != EOF) {
@@ -373,10 +346,7 @@ JSValuePtr functionReadline(ExecState* exec,
   return jsString(exec, line.data());
 }
 
-JSValuePtr functionQuit(ExecState* exec,
-                        JSObject*,
-                        JSValuePtr,
-                        const ArgList&) {
+JSValue functionQuit(ExecState* exec, JSObject*, JSValue, const ArgList&) {
   cleanupGlobalData(&exec->globalData());
   exit(EXIT_SUCCESS);
 }

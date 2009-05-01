@@ -76,20 +76,19 @@ void JSWorkerContext::mark() {
   }
 }
 
-JSValuePtr JSWorkerContext::self(ExecState*) const {
-  return JSValuePtr(this);
+JSValue JSWorkerContext::self(ExecState*) const {
+  return JSValue(this);
 }
 
-void JSWorkerContext::setSelf(ExecState* exec, JSValuePtr value) {
+void JSWorkerContext::setSelf(ExecState* exec, JSValue value) {
   putDirect(Identifier(exec, "self"), value);
 }
 
-JSValuePtr JSWorkerContext::xmlHttpRequest(ExecState* exec) const {
+JSValue JSWorkerContext::xmlHttpRequest(ExecState* exec) const {
   return getDOMConstructor<JSXMLHttpRequestConstructor>(exec, this);
 }
 
-JSValuePtr JSWorkerContext::importScripts(ExecState* exec,
-                                          const ArgList& args) {
+JSValue JSWorkerContext::importScripts(ExecState* exec, const ArgList& args) {
   if (!args.size())
     return jsUndefined();
 
@@ -103,7 +102,7 @@ JSValuePtr JSWorkerContext::importScripts(ExecState* exec,
   int signedLineNumber;
   intptr_t sourceID;
   UString sourceURL;
-  JSValuePtr function;
+  JSValue function;
   exec->interpreter()->retrieveLastCaller(exec, signedLineNumber, sourceID,
                                           sourceURL, function);
 
@@ -113,8 +112,8 @@ JSValuePtr JSWorkerContext::importScripts(ExecState* exec,
   return jsUndefined();
 }
 
-JSValuePtr JSWorkerContext::addEventListener(ExecState* exec,
-                                             const ArgList& args) {
+JSValue JSWorkerContext::addEventListener(ExecState* exec,
+                                          const ArgList& args) {
   RefPtr<JSEventListener> listener = findOrCreateJSEventListener(args.at(1));
   if (!listener)
     return jsUndefined();
@@ -123,8 +122,8 @@ JSValuePtr JSWorkerContext::addEventListener(ExecState* exec,
   return jsUndefined();
 }
 
-JSValuePtr JSWorkerContext::removeEventListener(ExecState* exec,
-                                                const ArgList& args) {
+JSValue JSWorkerContext::removeEventListener(ExecState* exec,
+                                             const ArgList& args) {
   JSEventListener* listener = findJSEventListener(args.at(1));
   if (!listener)
     return jsUndefined();
@@ -133,7 +132,7 @@ JSValuePtr JSWorkerContext::removeEventListener(ExecState* exec,
   return jsUndefined();
 }
 
-JSValuePtr JSWorkerContext::setTimeout(ExecState* exec, const ArgList& args) {
+JSValue JSWorkerContext::setTimeout(ExecState* exec, const ArgList& args) {
   ScheduledAction* action = ScheduledAction::create(exec, args);
   if (exec->hadException())
     return jsUndefined();
@@ -141,7 +140,7 @@ JSValuePtr JSWorkerContext::setTimeout(ExecState* exec, const ArgList& args) {
   return jsNumber(exec, impl()->setTimeout(action, delay));
 }
 
-JSValuePtr JSWorkerContext::setInterval(ExecState* exec, const ArgList& args) {
+JSValue JSWorkerContext::setInterval(ExecState* exec, const ArgList& args) {
   ScheduledAction* action = ScheduledAction::create(exec, args);
   if (exec->hadException())
     return jsUndefined();

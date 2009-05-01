@@ -51,7 +51,7 @@ class PropertyNameArrayData;
 class Structure : public RefCounted<Structure> {
  public:
   friend class JIT;
-  static PassRefPtr<Structure> create(JSValuePtr prototype,
+  static PassRefPtr<Structure> create(JSValue prototype,
                                       const TypeInfo& typeInfo) {
     return adoptRef(new Structure(prototype, typeInfo));
   }
@@ -76,7 +76,7 @@ class Structure : public RefCounted<Structure> {
       const Identifier& propertyName,
       size_t& offset);
   static PassRefPtr<Structure> changePrototypeTransition(Structure*,
-                                                         JSValuePtr prototype);
+                                                         JSValue prototype);
   static PassRefPtr<Structure> getterSetterTransition(Structure*);
   static PassRefPtr<Structure> toDictionaryTransition(Structure*);
   static PassRefPtr<Structure> fromDictionaryTransition(Structure*);
@@ -92,7 +92,7 @@ class Structure : public RefCounted<Structure> {
   size_t addPropertyWithoutTransition(const Identifier& propertyName,
                                       unsigned attributes);
   size_t removePropertyWithoutTransition(const Identifier& propertyName);
-  void setPrototypeWithoutTransition(JSValuePtr prototype) {
+  void setPrototypeWithoutTransition(JSValue prototype) {
     m_prototype = prototype;
   }
 
@@ -100,8 +100,8 @@ class Structure : public RefCounted<Structure> {
 
   const TypeInfo& typeInfo() const { return m_typeInfo; }
 
-  JSValuePtr storedPrototype() const { return m_prototype; }
-  JSValuePtr prototypeForLookup(ExecState*) const;
+  JSValue storedPrototype() const { return m_prototype; }
+  JSValue prototypeForLookup(ExecState*) const;
   StructureChain* prototypeChain(ExecState*) const;
 
   Structure* previousID() const { return m_previous.get(); }
@@ -131,7 +131,7 @@ class Structure : public RefCounted<Structure> {
   }
 
  private:
-  Structure(JSValuePtr prototype, const TypeInfo&);
+  Structure(JSValue prototype, const TypeInfo&);
 
   size_t put(const Identifier& propertyName, unsigned attributes);
   size_t remove(const Identifier& propertyName);
@@ -176,7 +176,7 @@ class Structure : public RefCounted<Structure> {
 
   TypeInfo m_typeInfo;
 
-  JSValuePtr m_prototype;
+  JSValue m_prototype;
   mutable RefPtr<StructureChain> m_cachedPrototypeChain;
 
   RefPtr<Structure> m_previous;

@@ -127,7 +127,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   TimeoutChecker timeoutChecker;
   Heap heap;
 
-  JSValuePtr exception;
+  JSValue exception;
 #if ENABLE(JIT)
   void* exceptionLocation;
 #endif

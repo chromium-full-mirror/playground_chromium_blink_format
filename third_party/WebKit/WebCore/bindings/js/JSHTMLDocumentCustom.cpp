@@ -57,9 +57,9 @@ bool JSHTMLDocument::canGetItemsForName(ExecState*,
           document->hasExtraNamedItem(atomicPropertyName));
 }
 
-JSValuePtr JSHTMLDocument::nameGetter(ExecState* exec,
-                                      const Identifier& propertyName,
-                                      const PropertySlot& slot) {
+JSValue JSHTMLDocument::nameGetter(ExecState* exec,
+                                   const Identifier& propertyName,
+                                   const PropertySlot& slot) {
   JSHTMLDocument* thisObj =
       static_cast<JSHTMLDocument*>(asObject(slot.slotBase()));
   HTMLDocument* document = static_cast<HTMLDocument*>(thisObj->impl());
@@ -87,23 +87,23 @@ JSValuePtr JSHTMLDocument::nameGetter(ExecState* exec,
 
 // Custom attributes
 
-JSValuePtr JSHTMLDocument::all(ExecState* exec) const {
+JSValue JSHTMLDocument::all(ExecState* exec) const {
   // If "all" has been overwritten, return the overwritten value
-  JSValuePtr v = getDirect(Identifier(exec, "all"));
+  JSValue v = getDirect(Identifier(exec, "all"));
   if (v)
     return v;
 
   return toJS(exec, static_cast<HTMLDocument*>(impl())->all().get());
 }
 
-void JSHTMLDocument::setAll(ExecState* exec, JSValuePtr value) {
+void JSHTMLDocument::setAll(ExecState* exec, JSValue value) {
   // Add "all" to the property map.
   putDirect(Identifier(exec, "all"), value);
 }
 
 // Custom functions
 
-JSValuePtr JSHTMLDocument::open(ExecState* exec, const ArgList& args) {
+JSValue JSHTMLDocument::open(ExecState* exec, const ArgList& args) {
   // For compatibility with other browsers, pass open calls with more than 2
   // parameters to the window.
   if (args.size() > 2) {
@@ -111,7 +111,7 @@ JSValuePtr JSHTMLDocument::open(ExecState* exec, const ArgList& args) {
     if (frame) {
       JSDOMWindowShell* wrapper = toJSDOMWindowShell(frame);
       if (wrapper) {
-        JSValuePtr function = wrapper->get(exec, Identifier(exec, "open"));
+        JSValue function = wrapper->get(exec, Identifier(exec, "open"));
         CallData callData;
         CallType callType = function.getCallData(callData);
         if (callType == CallTypeNone)
@@ -163,13 +163,13 @@ static inline void documentWrite(ExecState* exec,
   document->write(segmentedString, activeDocument);
 }
 
-JSValuePtr JSHTMLDocument::write(ExecState* exec, const ArgList& args) {
+JSValue JSHTMLDocument::write(ExecState* exec, const ArgList& args) {
   documentWrite(exec, args, static_cast<HTMLDocument*>(impl()),
                 DoNotAddNewline);
   return jsUndefined();
 }
 
-JSValuePtr JSHTMLDocument::writeln(ExecState* exec, const ArgList& args) {
+JSValue JSHTMLDocument::writeln(ExecState* exec, const ArgList& args) {
   documentWrite(exec, args, static_cast<HTMLDocument*>(impl()), DoAddNewline);
   return jsUndefined();
 }

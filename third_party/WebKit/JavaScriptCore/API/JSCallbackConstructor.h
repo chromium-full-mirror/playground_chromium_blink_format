@@ -41,7 +41,7 @@ class JSCallbackConstructor : public JSObject {
   JSObjectCallAsConstructorCallback callback() const { return m_callback; }
   static const ClassInfo info;
 
-  static PassRefPtr<Structure> createStructure(JSValuePtr proto) {
+  static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
         proto, TypeInfo(ObjectType,
                         ImplementsHasInstance | HasStandardGetOwnPropertySlot));

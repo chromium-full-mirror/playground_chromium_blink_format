@@ -49,7 +49,7 @@ ScriptCallStack::ScriptCallStack(ExecState* exec,
   int signedLineNumber;
   intptr_t sourceID;
   UString urlString;
-  JSValuePtr function;
+  JSValue function;
 
   exec->interpreter()->retrieveLastCaller(exec, signedLineNumber, sourceID,
                                           urlString, function);
@@ -88,7 +88,7 @@ void ScriptCallStack::initialize() {
   if (!m_caller || m_initialized)
     return;
 
-  JSValuePtr func = m_exec->interpreter()->retrieveCaller(m_exec, m_caller);
+  JSValue func = m_exec->interpreter()->retrieveCaller(m_exec, m_caller);
   while (!func.isNull()) {
     InternalFunction* internalFunction = asInternalFunction(func);
     ArgList emptyArgList;

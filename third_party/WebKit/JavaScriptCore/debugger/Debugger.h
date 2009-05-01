@@ -74,9 +74,9 @@ class Debugger {
 
 // This method exists only for backwards compatibility with existing
 // WebScriptDebugger clients
-JSValuePtr evaluateInGlobalCallFrame(const UString&,
-                                     JSValuePtr& exception,
-                                     JSGlobalObject*);
+JSValue evaluateInGlobalCallFrame(const UString&,
+                                  JSValue& exception,
+                                  JSGlobalObject*);
 
 }  // namespace JSC
 
