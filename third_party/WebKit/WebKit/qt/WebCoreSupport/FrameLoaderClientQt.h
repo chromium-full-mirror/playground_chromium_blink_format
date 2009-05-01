@@ -122,6 +122,9 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
       const WebCore::ResourceRequest&,
       const WebCore::ResourceResponse&,
       int);
+  virtual void dispatchDidLoadResourceByXMLHttpRequest(
+      unsigned long identifier,
+      const WebCore::ScriptString& sourceString);
 
   virtual void dispatchDidHandleOnloadEvents();
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad();

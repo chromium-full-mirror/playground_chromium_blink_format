@@ -64,6 +64,7 @@
 #include <WebCore/PluginView.h>
 #include <WebCore/RenderPart.h>
 #include <WebCore/ResourceHandle.h>
+#include <WebCore/ScriptString.h>
 #pragma warning(pop)
 
 using namespace WebCore;
@@ -255,6 +256,10 @@ void WebFrameLoaderClient::dispatchDidFailLoading(DocumentLoader* loader,
   resourceLoadDelegate->didFailLoadingWithError(
       webView, identifier, webError.get(), getWebDataSource(loader));
 }
+
+void WebFrameLoaderClient::dispatchDidLoadResourceByXMLHttpRequest(
+    unsigned long,
+    const ScriptString&) {}
 
 bool WebFrameLoaderClient::shouldCacheResponse(
     DocumentLoader* loader,

@@ -64,6 +64,7 @@ class ResourceHandle;
 class ResourceLoader;
 struct ResourceRequest;
 class ResourceResponse;
+class ScriptString;
 class SharedBuffer;
 class SubstituteData;
 class String;
@@ -130,6 +131,8 @@ class FrameLoaderClient {
                                                       const ResourceRequest&,
                                                       const ResourceResponse&,
                                                       int length) = 0;
+  virtual void dispatchDidLoadResourceByXMLHttpRequest(unsigned long identifier,
+                                                       const ScriptString&) = 0;
 
   virtual void dispatchDidHandleOnloadEvents() = 0;
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad() = 0;

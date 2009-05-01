@@ -63,6 +63,7 @@ class ResourceError;
 class ResourceLoader;
 class ResourceResponse;
 class ScriptSourceCode;
+class ScriptString;
 class ScriptValue;
 class SecurityOrigin;
 class SharedBuffer;
@@ -227,6 +228,8 @@ class FrameLoader : Noncopyable {
   void didReceiveData(ResourceLoader*, const char*, int, int lengthReceived);
   void didFinishLoad(ResourceLoader*);
   void didFailToLoad(ResourceLoader*, const ResourceError&);
+  void didLoadResourceByXMLHttpRequest(unsigned long identifier,
+                                       const ScriptString& sourceString);
   const ResourceRequest& originalRequest() const;
   const ResourceRequest& initialRequest() const;
   void receivedMainResourceError(const ResourceError&, bool isComplete);

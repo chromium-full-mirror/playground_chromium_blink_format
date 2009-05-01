@@ -211,6 +211,8 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
                                                       int) {
     return false;
   }
+  virtual void dispatchDidLoadResourceByXMLHttpRequest(unsigned long,
+                                                       const ScriptString&) {}
 
   virtual void dispatchDidHandleOnloadEvents() {}
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad() {}

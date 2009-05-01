@@ -54,6 +54,7 @@
 #include "ResourceHandleInternal.h"
 #include "ResourceHandle.h"
 #include "Settings.h"
+#include "ScriptString.h"
 
 #include "qwebpage.h"
 #include "qwebframe.h"
@@ -805,6 +806,12 @@ bool FrameLoaderClientQt::dispatchDidLoadResourceFromMemoryCache(
     int) {
   notImplemented();
   return false;
+}
+
+void FrameLoaderClientQt::dispatchDidLoadResourceByXMLHttpRequest(
+    unsigned long,
+    const WebCore::ScriptString&) {
+  notImplemented();
 }
 
 void FrameLoaderClientQt::dispatchDidFailProvisionalLoad(

@@ -840,7 +840,13 @@ bool FrameLoaderClient::dispatchDidLoadResourceFromMemoryCache(
     DocumentLoader*,
     const ResourceRequest&,
     const ResourceResponse&,
-    int length) {
+    int length) void FrameLoaderClient::
+    dispatchDidLoadResourceByXMLHttpRequest(unsigned long,
+                                            const ScriptString&) {
+  notImplemented();
+}
+
+{
   notImplemented();
   return false;
 }

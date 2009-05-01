@@ -82,6 +82,7 @@
 #include "ResourceRequest.h"
 #include "ScriptController.h"
 #include "ScriptSourceCode.h"
+#include "ScriptString.h"
 #include "ScriptValue.h"
 #include "SecurityOrigin.h"
 #include "SegmentedString.h"
@@ -4068,6 +4069,12 @@ void FrameLoader::didFailToLoad(ResourceLoader* loader,
   if (!error.isNull())
     m_client->dispatchDidFailLoading(loader->documentLoader(),
                                      loader->identifier(), error);
+}
+
+void FrameLoader::didLoadResourceByXMLHttpRequest(
+    unsigned long identifier,
+    const ScriptString& sourceString) {
+  m_client->dispatchDidLoadResourceByXMLHttpRequest(identifier, sourceString);
 }
 
 const ResourceRequest& FrameLoader::originalRequest() const {
