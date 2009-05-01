@@ -399,13 +399,20 @@ static void appendDocumentType(Vector<UChar>& result, const DocumentType* n) {
   append(result, ">");
 }
 
+static void removeExteriorStyles(CSSMutableStyleDeclaration* style) {
+  style->removeProperty(CSSPropertyFloat);
+}
+
+enum RangeFullySelectsNode { DoesFullySelectNode, DoesNotFullySelectNode };
+
 static void appendStartMarkup(
     Vector<UChar>& result,
     const Node* node,
     const Range* range,
     EAnnotateForInterchange annotate,
     bool convertBlocksToInlines = false,
-    HashMap<AtomicStringImpl*, AtomicStringImpl*>* namespaces = 0) {
+    HashMap<AtomicStringImpl*, AtomicStringImpl*>* namespaces = 0,
+    RangeFullySelectsNode rangeFullySelectsNode = DoesFullySelectNode) {
   bool documentIsHTML = node->document()->isHTMLDocument();
   switch (node->nodeType()) {
     case Node::TEXT_NODE: {
@@ -541,6 +548,11 @@ static void appendStartMarkup(
         }
         if (convert)
           style->setProperty(CSSPropertyDisplay, CSSValueInline, true);
+        // If the node is not fully selected by the range, then we don't want to
+        // keep styles that affect its relationship to the nodes around it
+        // only the ones that affect it and the nodes within it.
+        if (rangeFullySelectsNode == DoesNotFullySelectNode)
+          removeExteriorStyles(style.get());
         if (style->length() > 0) {
           DEFINE_STATIC_LOCAL(const String, stylePrefix, (" style=\""));
           append(result, stylePrefix);
@@ -581,10 +593,11 @@ static String getStartMarkup(
     const Range* range,
     EAnnotateForInterchange annotate,
     bool convertBlocksToInlines = false,
-    HashMap<AtomicStringImpl*, AtomicStringImpl*>* namespaces = 0) {
+    HashMap<AtomicStringImpl*, AtomicStringImpl*>* namespaces = 0,
+    RangeFullySelectsNode rangeFullySelectsNode = DoesFullySelectNode) {
   Vector<UChar> result;
   appendStartMarkup(result, node, range, annotate, convertBlocksToInlines,
-                    namespaces);
+                    namespaces, rangeFullySelectsNode);
   return String::adopt(result);
 }
 
@@ -1070,8 +1083,12 @@ String createMarkup(const Range* range,
           markups.append(divCloseTag);
         }
       } else {
+        // Since this node and all the other ancestors are not in the selection
+        // we want to set RangeFullySelectsNode to DoesNotFullySelectNode
+        // so that styles that affect the exterior of the node are not included.
         preMarkups.append(getStartMarkup(ancestor, updatedRange.get(), annotate,
-                                         convertBlocksToInlines));
+                                         convertBlocksToInlines, 0,
+                                         DoesNotFullySelectNode));
         markups.append(getEndMarkup(ancestor));
       }
       if (nodes)
