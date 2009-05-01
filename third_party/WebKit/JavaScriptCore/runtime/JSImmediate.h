@@ -43,11 +43,6 @@ class JSGlobalData;
 class JSObject;
 class UString;
 
-JSValuePtr js0();
-JSValuePtr jsNull();
-JSValuePtr jsBoolean(bool b);
-JSValuePtr jsUndefined();
-JSValuePtr jsImpossibleValue();
 JSValuePtr jsNumber(ExecState* exec, double d);
 JSValuePtr jsNumber(ExecState*, char i);
 JSValuePtr jsNumber(ExecState*, unsigned char i);
@@ -190,11 +185,6 @@ class JSImmediate {
   friend class JIT;
   friend class JSValuePtr;
   friend class JSFastMath;
-  friend JSValuePtr js0();
-  friend JSValuePtr jsNull();
-  friend JSValuePtr jsBoolean(bool b);
-  friend JSValuePtr jsUndefined();
-  friend JSValuePtr jsImpossibleValue();
   friend JSValuePtr jsNumber(ExecState* exec, double d);
   friend JSValuePtr jsNumber(ExecState*, char i);
   friend JSValuePtr jsNumber(ExecState*, unsigned char i);
@@ -594,26 +584,6 @@ ALWAYS_INLINE bool JSImmediate::getTruncatedUInt32(JSValuePtr v, uint32_t& i) {
   return getUInt32(v, i);
 }
 
-inline JSValuePtr js0() {
-  return JSImmediate::zeroImmediate();
-}
-
-inline JSValuePtr jsNull() {
-  return JSImmediate::nullImmediate();
-}
-
-inline JSValuePtr jsBoolean(bool b) {
-  return b ? JSImmediate::trueImmediate() : JSImmediate::falseImmediate();
-}
-
-inline JSValuePtr jsUndefined() {
-  return JSImmediate::undefinedImmediate();
-}
-
-inline JSValuePtr jsImpossibleValue() {
-  return JSImmediate::impossibleValue();
-}
-
 // These are identical logic to the JSValue functions above, and faster than
 // jsNumber(number).toInt32().
 int32_t toInt32(double);
@@ -621,12 +591,24 @@ uint32_t toUInt32(double);
 int32_t toInt32SlowCase(double, bool& ok);
 uint32_t toUInt32SlowCase(double, bool& ok);
 
-inline bool JSValuePtr::isUndefined() const {
-  return asValue() == jsUndefined();
+inline JSValuePtr::JSValuePtr(ImpossibleValueTag) {
+  *this = JSImmediate::impossibleValue();
 }
 
-inline bool JSValuePtr::isNull() const {
-  return asValue() == jsNull();
+inline JSValuePtr::JSValuePtr(JSNullTag) {
+  *this = JSImmediate::nullImmediate();
+}
+
+inline JSValuePtr::JSValuePtr(JSUndefinedTag) {
+  *this = JSImmediate::undefinedImmediate();
+}
+
+inline JSValuePtr::JSValuePtr(JSTrueTag) {
+  *this = JSImmediate::trueImmediate();
+}
+
+inline JSValuePtr::JSValuePtr(JSFalseTag) {
+  *this = JSImmediate::falseImmediate();
 }
 
 inline bool JSValuePtr::isUndefinedOrNull() const {

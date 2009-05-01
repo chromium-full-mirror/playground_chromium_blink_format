@@ -760,7 +760,8 @@ void JIT::privateCompileMainPass() {
         emitGetVirtualRegister(currentInstruction[1].u.operand, regT0);
 
         Jump isZero =
-            branchPtr(Equal, regT0, ImmPtr(JSValuePtr::encode(js0())));
+            branchPtr(Equal, regT0,
+                      ImmPtr(JSValuePtr::encode(jsNumber(m_globalData, 0))));
         addJump(emitJumpIfImmediateInteger(regT0), target + 2);
 
         addJump(branchPtr(Equal, regT0,
@@ -884,8 +885,10 @@ void JIT::privateCompileMainPass() {
         unsigned target = currentInstruction[2].u.operand;
         emitGetVirtualRegister(currentInstruction[1].u.operand, regT0);
 
-        addJump(branchPtr(Equal, regT0, ImmPtr(JSValuePtr::encode(js0()))),
-                target + 2);
+        addJump(
+            branchPtr(Equal, regT0,
+                      ImmPtr(JSValuePtr::encode(jsNumber(m_globalData, 0)))),
+            target + 2);
         Jump isNonZero = emitJumpIfImmediateInteger(regT0);
 
         addJump(branchPtr(Equal, regT0,
@@ -1062,7 +1065,8 @@ void JIT::privateCompileMainPass() {
         emitGetVirtualRegister(currentInstruction[1].u.operand, regT0);
 
         Jump isZero =
-            branchPtr(Equal, regT0, ImmPtr(JSValuePtr::encode(js0())));
+            branchPtr(Equal, regT0,
+                      ImmPtr(JSValuePtr::encode(jsNumber(m_globalData, 0))));
         addJump(emitJumpIfImmediateInteger(regT0), target + 2);
 
         addJump(branchPtr(Equal, regT0,

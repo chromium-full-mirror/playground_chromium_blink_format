@@ -328,7 +328,7 @@ JSValuePtr globalFuncParseInt(ExecState* exec,
       return jsNumber(exec, (d > 0) ? floor(d) : ceil(d));
     if (isnan(d) || isinf(d))
       return jsNaN(&exec->globalData());
-    return js0();
+    return jsNumber(exec, 0);
   }
 
   return jsNumber(exec, parseInt(value.toString(exec), radix));

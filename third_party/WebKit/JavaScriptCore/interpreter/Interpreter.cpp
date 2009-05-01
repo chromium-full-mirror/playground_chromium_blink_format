@@ -1792,7 +1792,7 @@ JSValuePtr Interpreter::privateExecute(ExecutionFlag flag,
       JSValuePtr divisorValue = callFrame[divisor].jsValue();
 
       if (JSValuePtr::areBothInt32Fast(dividendValue, divisorValue) &&
-          divisorValue != js0()) {
+          divisorValue != jsNumber(callFrame, 0)) {
         // We expect the result of the modulus of a number that was
         // representable as an int32 to also be representable
         // as an int32.
