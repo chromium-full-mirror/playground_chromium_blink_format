@@ -926,20 +926,12 @@ PseudoState CSSStyleSelector::SelectorChecker::checkPseudoState(
   if (!checkVisited)
     return PseudoAnyLink;
 
-  Frame* frame = m_document->frame();
-  if (!frame)
-    return PseudoLink;
-
-  Page* page = frame->page();
-  if (!page)
-    return PseudoLink;
-
+#if PLATFORM(QT)
   Vector<UChar, 512> url;
   visitedURL(m_document->baseURL(), *attr, url);
   if (url.isEmpty())
     return PseudoLink;
 
-#if PLATFORM(QT)
   // If the Qt4.4 interface for the history is used, we will have to fallback
   // to the old global history.
   QWebHistoryInterface* interface = QWebHistoryInterface::defaultInterface();
@@ -948,11 +940,24 @@ PseudoState CSSStyleSelector::SelectorChecker::checkPseudoState(
                QString(reinterpret_cast<QChar*>(url.data()), url.size()))
                ? PseudoVisited
                : PseudoLink;
-#endif
 
   LinkHash hash = visitedLinkHash(url.data(), url.size());
   if (!hash)
     return PseudoLink;
+#else
+  LinkHash hash = visitedLinkHash(m_document->baseURL(), *attr);
+  if (!hash)
+    return PseudoLink;
+#endif
+
+  Frame* frame = m_document->frame();
+  if (!frame)
+    return PseudoLink;
+
+  Page* page = frame->page();
+  if (!page)
+    return PseudoLink;
+
   m_linksCheckedForVisitedState.add(hash);
   return page->group().isLinkVisited(hash) ? PseudoVisited : PseudoLink;
 }
