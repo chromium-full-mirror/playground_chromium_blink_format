@@ -836,17 +836,17 @@ void FrameLoaderClient::dispatchDidFailLoading(DocumentLoader*,
   notImplemented();
 }
 
+void FrameLoaderClient::dispatchDidLoadResourceByXMLHttpRequest(
+    unsigned long,
+    const ScriptString&) {
+  notImplemented();
+}
+
 bool FrameLoaderClient::dispatchDidLoadResourceFromMemoryCache(
     DocumentLoader*,
     const ResourceRequest&,
     const ResourceResponse&,
-    int length) void FrameLoaderClient::
-    dispatchDidLoadResourceByXMLHttpRequest(unsigned long,
-                                            const ScriptString&) {
-  notImplemented();
-}
-
-{
+    int length) {
   notImplemented();
   return false;
 }
