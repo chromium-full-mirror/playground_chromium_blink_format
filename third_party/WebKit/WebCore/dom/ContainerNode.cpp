@@ -24,6 +24,7 @@
 #include "config.h"
 #include "ContainerNode.h"
 
+#include "Cache.h"
 #include "ContainerNodeAlgorithms.h"
 #include "DeleteButtonController.h"
 #include "EventNames.h"
@@ -36,6 +37,7 @@
 #include "Page.h"
 #include "RenderTheme.h"
 #include "RootInlineBox.h"
+#include "loader.h"
 #include <wtf/CurrentTime.h>
 
 namespace WebCore {
@@ -536,6 +538,7 @@ void ContainerNode::suspendPostAttachCallbacks() {
         s_shouldReEnableMemoryCacheCallsAfterAttach = true;
       }
     }
+    cache()->loader()->suspendPendingRequests();
   }
   ++s_attachDepth;
 }
@@ -549,6 +552,7 @@ void ContainerNode::resumePostAttachCallbacks() {
       if (Page* page = document()->page())
         page->setMemoryCacheClientCallsEnabled(true);
     }
+    cache()->loader()->resumePendingRequests();
   }
   --s_attachDepth;
 }
@@ -576,13 +580,9 @@ void ContainerNode::dispatchPostAttachCallbacks() {
 }
 
 void ContainerNode::attach() {
-  suspendPostAttachCallbacks();
-
   for (Node* child = m_firstChild; child; child = child->nextSibling())
     child->attach();
   Node::attach();
-
-  resumePostAttachCallbacks();
 }
 
 void ContainerNode::detach() {

@@ -685,6 +685,8 @@ void Element::removedFromDocument() {
 }
 
 void Element::attach() {
+  suspendPostAttachCallbacks();
+
   createRendererIfNeeded();
   ContainerNode::attach();
   if (hasRareData()) {
@@ -695,6 +697,8 @@ void Element::attach() {
       data->setNeedsFocusAppearanceUpdateSoonAfterAttach(false);
     }
   }
+
+  resumePostAttachCallbacks();
 }
 
 void Element::detach() {

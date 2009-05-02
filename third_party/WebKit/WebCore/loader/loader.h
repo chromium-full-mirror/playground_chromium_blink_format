@@ -53,6 +53,10 @@ class Loader : Noncopyable {
   enum Priority { Low, Medium, High };
   void servePendingRequests(Priority minimumPriority = Low);
 
+  bool isSuspendingPendingRequests() { return m_isSuspendingPendingRequests; }
+  void suspendPendingRequests();
+  void resumePendingRequests();
+
  private:
   Priority determinePriority(const CachedResource*) const;
   void scheduleServePendingRequests();
@@ -109,6 +113,8 @@ class Loader : Noncopyable {
   Host m_nonHTTPProtocolHost;
 
   Timer<Loader> m_requestTimer;
+
+  bool m_isSuspendingPendingRequests;
 };
 }
 
