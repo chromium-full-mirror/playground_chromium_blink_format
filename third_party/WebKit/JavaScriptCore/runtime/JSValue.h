@@ -153,6 +153,9 @@ class JSValue {
     return static_cast<float>(toNumber(exec));
   }
 
+  // API Mangled Numbers
+  bool isAPIMangledNumber();
+
   // Garbage collection.
   void mark();
   bool marked() const;
