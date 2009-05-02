@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -60,6 +60,8 @@ class WorkerContext : public RefCounted<WorkerContext>,
 
   virtual bool isWorkerContext() const { return true; }
 
+  virtual WorkerContext* toWorkerContext() { return this; }
+
   virtual ScriptExecutionContext* scriptExecutionContext() const;
 
   const KURL& url() const { return m_url; }
@@ -67,11 +69,9 @@ class WorkerContext : public RefCounted<WorkerContext>,
 
   virtual String userAgent(const KURL&) const;
 
-  WorkerLocation* location() const;
-  WorkerNavigator* navigator() const;
-
   WorkerScriptController* script() { return m_script.get(); }
   void clearScript() { return m_script.clear(); }
+
   WorkerThread* thread() { return m_thread; }
 
   bool hasPendingActivity() const;
@@ -91,11 +91,26 @@ class WorkerContext : public RefCounted<WorkerContext>,
   virtual void scriptImported(unsigned long identifier,
                               const String& sourceString);
 
-  virtual WorkerContext* toWorkerContext() { return this; }
-
-  void postMessage(const String& message);
   virtual void postTask(PassRefPtr<Task>);  // Executes the task on context's
                                             // thread asynchronously.
+
+  // WorkerGlobalScope
+  WorkerContext* self() { return this; }
+  WorkerLocation* location() const;
+
+  // WorkerUtils
+  void importScripts(const Vector<String>& urls,
+                     const String& callerURL,
+                     int callerLine,
+                     ExceptionCode&);
+  WorkerNavigator* navigator() const;
+
+  // DedicatedWorkerGlobalScope
+  void postMessage(const String& message);
+  void setOnmessage(PassRefPtr<EventListener> eventListener) {
+    m_onmessageListener = eventListener;
+  }
+  EventListener* onmessage() const { return m_onmessageListener.get(); }
 
   // Timers
   int setTimeout(ScheduledAction*, int timeout);
@@ -103,8 +118,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
   int setInterval(ScheduledAction*, int timeout);
   void clearInterval(int timeoutId);
 
-  void dispatchMessage(const String&);
-
+  // EventTarget
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,
                                 bool useCapture);
@@ -113,19 +127,11 @@ class WorkerContext : public RefCounted<WorkerContext>,
                                    bool useCapture);
   virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
 
-  void setOnmessage(PassRefPtr<EventListener> eventListener) {
-    m_onmessageListener = eventListener;
-  }
-  EventListener* onmessage() const { return m_onmessageListener.get(); }
-
   typedef Vector<RefPtr<EventListener>> ListenerVector;
   typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
   EventListenersMap& eventListeners() { return m_eventListeners; }
 
-  void importScripts(const Vector<String>& urls,
-                     const String& callerURL,
-                     int callerLine,
-                     ExceptionCode&);
+  void dispatchMessage(const String&);
 
   // These methods are used for GC marking. See JSWorkerContext::mark() in
   // JSWorkerContextCustom.cpp.
@@ -136,12 +142,12 @@ class WorkerContext : public RefCounted<WorkerContext>,
   using RefCounted<WorkerContext>::deref;
 
  private:
+  WorkerContext(const KURL&, const String&, WorkerThread*);
+
   virtual void refScriptExecutionContext() { ref(); }
   virtual void derefScriptExecutionContext() { deref(); }
   virtual void refEventTarget() { ref(); }
   virtual void derefEventTarget() { deref(); }
-
-  WorkerContext(const KURL&, const String&, WorkerThread*);
 
   virtual const KURL& virtualURL() const;
   virtual KURL virtualCompleteURL(const String&) const;

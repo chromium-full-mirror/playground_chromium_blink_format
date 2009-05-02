@@ -44,15 +44,6 @@ using namespace JSC;
 
 namespace WebCore {
 
-bool JSWorkerContext::customGetOwnPropertySlot(ExecState* exec,
-                                               const Identifier& propertyName,
-                                               PropertySlot& slot) {
-  // Look for overrides before looking at any of our own properties.
-  if (JSGlobalObject::getOwnPropertySlot(exec, propertyName, slot))
-    return true;
-  return false;
-}
-
 void JSWorkerContext::mark() {
   Base::mark();
 
@@ -76,12 +67,13 @@ void JSWorkerContext::mark() {
   }
 }
 
-JSValue JSWorkerContext::self(ExecState*) const {
-  return JSValue(this);
-}
-
-void JSWorkerContext::setSelf(ExecState* exec, JSValue value) {
-  putDirect(Identifier(exec, "self"), value);
+bool JSWorkerContext::customGetOwnPropertySlot(ExecState* exec,
+                                               const Identifier& propertyName,
+                                               PropertySlot& slot) {
+  // Look for overrides before looking at any of our own properties.
+  if (JSGlobalObject::getOwnPropertySlot(exec, propertyName, slot))
+    return true;
+  return false;
 }
 
 JSValue JSWorkerContext::xmlHttpRequest(ExecState* exec) const {
