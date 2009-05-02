@@ -79,6 +79,10 @@ class JSValue {
 
   // Numbers
   JSValue(ExecState*, double);
+  JSValue(ExecState*, char);
+  JSValue(ExecState*, unsigned char);
+  JSValue(ExecState*, short);
+  JSValue(ExecState*, unsigned short);
   JSValue(ExecState*, int);
   JSValue(ExecState*, unsigned);
   JSValue(ExecState*, long);
@@ -86,6 +90,10 @@ class JSValue {
   JSValue(ExecState*, long long);
   JSValue(ExecState*, unsigned long long);
   JSValue(JSGlobalData*, double);
+  JSValue(JSGlobalData*, char);
+  JSValue(JSGlobalData*, unsigned char);
+  JSValue(JSGlobalData*, short);
+  JSValue(JSGlobalData*, unsigned short);
   JSValue(JSGlobalData*, int);
   JSValue(JSGlobalData*, unsigned);
   JSValue(JSGlobalData*, long);
@@ -238,6 +246,22 @@ ALWAYS_INLINE JSValue jsNumber(ExecState* exec, double d) {
   return JSValue(exec, d);
 }
 
+ALWAYS_INLINE JSValue jsNumber(ExecState* exec, char i) {
+  return JSValue(exec, i);
+}
+
+ALWAYS_INLINE JSValue jsNumber(ExecState* exec, unsigned char i) {
+  return JSValue(exec, i);
+}
+
+ALWAYS_INLINE JSValue jsNumber(ExecState* exec, short i) {
+  return JSValue(exec, i);
+}
+
+ALWAYS_INLINE JSValue jsNumber(ExecState* exec, unsigned short i) {
+  return JSValue(exec, i);
+}
+
 ALWAYS_INLINE JSValue jsNumber(ExecState* exec, int i) {
   return JSValue(exec, i);
 }
@@ -264,6 +288,22 @@ ALWAYS_INLINE JSValue jsNumber(ExecState* exec, unsigned long long i) {
 
 ALWAYS_INLINE JSValue jsNumber(JSGlobalData* globalData, double d) {
   return JSValue(globalData, d);
+}
+
+ALWAYS_INLINE JSValue jsNumber(JSGlobalData* globalData, char i) {
+  return JSValue(globalData, i);
+}
+
+ALWAYS_INLINE JSValue jsNumber(JSGlobalData* globalData, unsigned char i) {
+  return JSValue(globalData, i);
+}
+
+ALWAYS_INLINE JSValue jsNumber(JSGlobalData* globalData, short i) {
+  return JSValue(globalData, i);
+}
+
+ALWAYS_INLINE JSValue jsNumber(JSGlobalData* globalData, unsigned short i) {
+  return JSValue(globalData, i);
 }
 
 ALWAYS_INLINE JSValue jsNumber(JSGlobalData* globalData, int i) {
