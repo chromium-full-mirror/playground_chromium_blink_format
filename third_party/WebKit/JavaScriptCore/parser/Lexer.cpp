@@ -85,6 +85,31 @@ Lexer::~Lexer() {
   m_mainTable.deleteTable();
 }
 
+ALWAYS_INLINE void Lexer::shift(unsigned p) {
+  // ECMA-262 calls for stripping Cf characters here, but we only do this for
+  // BOM,
+  // see <https://bugs.webkit.org/show_bug.cgi?id=4931>.
+
+  while (p--) {
+    m_current = m_next1;
+    m_next1 = m_next2;
+    m_next2 = m_next3;
+    m_currentOffset = m_nextOffset1;
+    m_nextOffset1 = m_nextOffset2;
+    m_nextOffset2 = m_nextOffset3;
+    do {
+      if (m_position >= m_length) {
+        m_nextOffset3 = m_position;
+        m_position++;
+        m_next3 = -1;
+        break;
+      }
+      m_nextOffset3 = m_position;
+      m_next3 = m_code[m_position++];
+    } while (UNLIKELY(m_next3 == 0xFEFF));
+  }
+}
+
 void Lexer::setCode(const SourceCode& source) {
   yylineno = source.firstLine();
   m_restrKeyword = false;
@@ -106,31 +131,6 @@ void Lexer::setCode(const SourceCode& source) {
   shift(4);
 }
 
-void Lexer::shift(unsigned p) {
-  // ECMA-262 calls for stripping Cf characters here, but we only do this for
-  // BOM,
-  // see <https://bugs.webkit.org/show_bug.cgi?id=4931>.
-
-  while (p--) {
-    m_current = m_next1;
-    m_next1 = m_next2;
-    m_next2 = m_next3;
-    m_currentOffset = m_nextOffset1;
-    m_nextOffset1 = m_nextOffset2;
-    m_nextOffset2 = m_nextOffset3;
-    do {
-      if (m_position >= m_length) {
-        m_nextOffset3 = m_position;
-        m_position++;
-        m_next3 = -1;
-        break;
-      }
-      m_nextOffset3 = m_position;
-      m_next3 = m_code[m_position++];
-    } while (m_next3 == 0xFEFF);
-  }
-}
-
 // called on each new line
 void Lexer::nextLine() {
   yylineno++;
@@ -148,8 +148,8 @@ int Lexer::lex(void* p1, void* p2) {
   int token = 0;
   m_state = Start;
   unsigned short stringType = 0;  // either single or double quotes
-  m_buffer8.clear();
-  m_buffer16.clear();
+  m_buffer8.resize(0);
+  m_buffer16.resize(0);
   m_done = false;
   m_terminator = false;
   m_skipLF = false;
@@ -163,299 +163,302 @@ int Lexer::lex(void* p1, void* p2) {
     m_stackToken = 0;
   }
   int startOffset = m_currentOffset;
-  while (!m_done) {
-    if (m_skipLF && m_current != '\n')  // found \r but not \n afterwards
-      m_skipLF = false;
-    if (m_skipCR && m_current != '\r')  // found \n but not \r afterwards
-      m_skipCR = false;
-    if (m_skipLF || m_skipCR) {  // found \r\n or \n\r -> eat the second one
-      m_skipLF = false;
-      m_skipCR = false;
-      shift(1);
-    }
-    switch (m_state) {
-      case Start:
-        startOffset = m_currentOffset;
-        if (isWhiteSpace()) {
-          // do nothing
-        } else if (m_current == '/' && m_next1 == '/') {
-          shift(1);
-          m_state = InSingleLineComment;
-        } else if (m_current == '/' && m_next1 == '*') {
-          shift(1);
-          m_state = InMultiLineComment;
-        } else if (m_current == -1) {
-          if (!m_terminator && !m_delimited && !m_isReparsing) {
-            // automatic semicolon insertion if program incomplete
-            token = ';';
-            m_stackToken = 0;
-            setDone(Other);
-          } else
-            setDone(Eof);
-        } else if (isLineTerminator()) {
-          nextLine();
-          m_terminator = true;
-          if (m_restrKeyword) {
-            token = ';';
-            setDone(Other);
+  if (!m_done) {
+    while (true) {
+      if (m_skipLF && m_current != '\n')  // found \r but not \n afterwards
+        m_skipLF = false;
+      if (m_skipCR && m_current != '\r')  // found \n but not \r afterwards
+        m_skipCR = false;
+      if (m_skipLF || m_skipCR) {  // found \r\n or \n\r -> eat the second one
+        m_skipLF = false;
+        m_skipCR = false;
+        shift(1);
+      }
+      switch (m_state) {
+        case Start:
+          startOffset = m_currentOffset;
+          if (isWhiteSpace()) {
+            // do nothing
+          } else if (m_current == '/' && m_next1 == '/') {
+            shift(1);
+            m_state = InSingleLineComment;
+          } else if (m_current == '/' && m_next1 == '*') {
+            shift(1);
+            m_state = InMultiLineComment;
+          } else if (m_current == -1) {
+            if (!m_terminator && !m_delimited && !m_isReparsing) {
+              // automatic semicolon insertion if program incomplete
+              token = ';';
+              m_stackToken = 0;
+              setDone(Other);
+            } else
+              setDone(Eof);
+          } else if (isLineTerminator()) {
+            nextLine();
+            m_terminator = true;
+            if (m_restrKeyword) {
+              token = ';';
+              setDone(Other);
+            }
+          } else if (m_current == '"' || m_current == '\'') {
+            m_state = InString;
+            stringType = static_cast<unsigned short>(m_current);
+          } else if (isIdentStart(m_current)) {
+            record16(m_current);
+            m_state = InIdentifierOrKeyword;
+          } else if (m_current == '\\')
+            m_state = InIdentifierStartUnicodeEscapeStart;
+          else if (m_current == '0') {
+            record8(m_current);
+            m_state = InNum0;
+          } else if (isDecimalDigit(m_current)) {
+            record8(m_current);
+            m_state = InNum;
+          } else if (m_current == '.' && isDecimalDigit(m_next1)) {
+            record8(m_current);
+            m_state = InDecimal;
+            // <!-- marks the beginning of a line comment (for www usage)
+          } else if (m_current == '<' && m_next1 == '!' && m_next2 == '-' &&
+                     m_next3 == '-') {
+            shift(3);
+            m_state = InSingleLineComment;
+            // same for -->
+          } else if (m_atLineStart && m_current == '-' && m_next1 == '-' &&
+                     m_next2 == '>') {
+            shift(2);
+            m_state = InSingleLineComment;
+          } else {
+            token = matchPunctuator(lvalp->intValue, m_current, m_next1,
+                                    m_next2, m_next3);
+            if (token != -1)
+              setDone(Other);
+            else
+              setDone(Bad);
           }
-        } else if (m_current == '"' || m_current == '\'') {
-          m_state = InString;
-          stringType = static_cast<unsigned short>(m_current);
-        } else if (isIdentStart(m_current)) {
-          record16(m_current);
-          m_state = InIdentifierOrKeyword;
-        } else if (m_current == '\\')
-          m_state = InIdentifierStartUnicodeEscapeStart;
-        else if (m_current == '0') {
-          record8(m_current);
-          m_state = InNum0;
-        } else if (isDecimalDigit(m_current)) {
-          record8(m_current);
-          m_state = InNum;
-        } else if (m_current == '.' && isDecimalDigit(m_next1)) {
-          record8(m_current);
-          m_state = InDecimal;
-          // <!-- marks the beginning of a line comment (for www usage)
-        } else if (m_current == '<' && m_next1 == '!' && m_next2 == '-' &&
-                   m_next3 == '-') {
-          shift(3);
-          m_state = InSingleLineComment;
-          // same for -->
-        } else if (m_atLineStart && m_current == '-' && m_next1 == '-' &&
-                   m_next2 == '>') {
-          shift(2);
-          m_state = InSingleLineComment;
-        } else {
-          token = matchPunctuator(lvalp->intValue, m_current, m_next1, m_next2,
-                                  m_next3);
-          if (token != -1)
-            setDone(Other);
+          break;
+        case InString:
+          if (m_current == stringType) {
+            shift(1);
+            setDone(String);
+          } else if (isLineTerminator() || m_current == -1)
+            setDone(Bad);
+          else if (m_current == '\\')
+            m_state = InEscapeSequence;
+          else
+            record16(m_current);
+          break;
+        // Escape Sequences inside of strings
+        case InEscapeSequence:
+          if (isOctalDigit(m_current)) {
+            if (m_current >= '0' && m_current <= '3' && isOctalDigit(m_next1) &&
+                isOctalDigit(m_next2)) {
+              record16(convertOctal(m_current, m_next1, m_next2));
+              shift(2);
+              m_state = InString;
+            } else if (isOctalDigit(m_current) && isOctalDigit(m_next1)) {
+              record16(convertOctal('0', m_current, m_next1));
+              shift(1);
+              m_state = InString;
+            } else if (isOctalDigit(m_current)) {
+              record16(convertOctal('0', '0', m_current));
+              m_state = InString;
+            } else
+              setDone(Bad);
+          } else if (m_current == 'x')
+            m_state = InHexEscape;
+          else if (m_current == 'u')
+            m_state = InUnicodeEscape;
+          else if (isLineTerminator()) {
+            nextLine();
+            m_state = InString;
+          } else {
+            record16(singleEscape(static_cast<unsigned short>(m_current)));
+            m_state = InString;
+          }
+          break;
+        case InHexEscape:
+          if (isHexDigit(m_current) && isHexDigit(m_next1)) {
+            m_state = InString;
+            record16(convertHex(m_current, m_next1));
+            shift(1);
+          } else if (m_current == stringType) {
+            record16('x');
+            shift(1);
+            setDone(String);
+          } else {
+            record16('x');
+            record16(m_current);
+            m_state = InString;
+          }
+          break;
+        case InUnicodeEscape:
+          if (isHexDigit(m_current) && isHexDigit(m_next1) &&
+              isHexDigit(m_next2) && isHexDigit(m_next3)) {
+            record16(convertUnicode(m_current, m_next1, m_next2, m_next3));
+            shift(3);
+            m_state = InString;
+          } else if (m_current == stringType) {
+            record16('u');
+            shift(1);
+            setDone(String);
+          } else
+            setDone(Bad);
+          break;
+        case InSingleLineComment:
+          if (isLineTerminator()) {
+            nextLine();
+            m_terminator = true;
+            if (m_restrKeyword) {
+              token = ';';
+              setDone(Other);
+            } else
+              m_state = Start;
+          } else if (m_current == -1)
+            setDone(Eof);
+          break;
+        case InMultiLineComment:
+          if (m_current == -1)
+            setDone(Bad);
+          else if (isLineTerminator())
+            nextLine();
+          else if (m_current == '*' && m_next1 == '/') {
+            m_state = Start;
+            shift(1);
+          }
+          break;
+        case InIdentifierOrKeyword:
+        case InIdentifier:
+          if (isIdentPart(m_current))
+            record16(m_current);
+          else if (m_current == '\\')
+            m_state = InIdentifierPartUnicodeEscapeStart;
+          else
+            setDone(m_state == InIdentifierOrKeyword ? IdentifierOrKeyword
+                                                     : Identifier);
+          break;
+        case InNum0:
+          if (m_current == 'x' || m_current == 'X') {
+            record8(m_current);
+            m_state = InHex;
+          } else if (m_current == '.') {
+            record8(m_current);
+            m_state = InDecimal;
+          } else if (m_current == 'e' || m_current == 'E') {
+            record8(m_current);
+            m_state = InExponentIndicator;
+          } else if (isOctalDigit(m_current)) {
+            record8(m_current);
+            m_state = InOctal;
+          } else if (isDecimalDigit(m_current)) {
+            record8(m_current);
+            m_state = InDecimal;
+          } else
+            setDone(Number);
+          break;
+        case InHex:
+          if (isHexDigit(m_current))
+            record8(m_current);
+          else
+            setDone(Hex);
+          break;
+        case InOctal:
+          if (isOctalDigit(m_current))
+            record8(m_current);
+          else if (isDecimalDigit(m_current)) {
+            record8(m_current);
+            m_state = InDecimal;
+          } else
+            setDone(Octal);
+          break;
+        case InNum:
+          if (isDecimalDigit(m_current))
+            record8(m_current);
+          else if (m_current == '.') {
+            record8(m_current);
+            m_state = InDecimal;
+          } else if (m_current == 'e' || m_current == 'E') {
+            record8(m_current);
+            m_state = InExponentIndicator;
+          } else
+            setDone(Number);
+          break;
+        case InDecimal:
+          if (isDecimalDigit(m_current))
+            record8(m_current);
+          else if (m_current == 'e' || m_current == 'E') {
+            record8(m_current);
+            m_state = InExponentIndicator;
+          } else
+            setDone(Number);
+          break;
+        case InExponentIndicator:
+          if (m_current == '+' || m_current == '-')
+            record8(m_current);
+          else if (isDecimalDigit(m_current)) {
+            record8(m_current);
+            m_state = InExponent;
+          } else
+            setDone(Bad);
+          break;
+        case InExponent:
+          if (isDecimalDigit(m_current))
+            record8(m_current);
+          else
+            setDone(Number);
+          break;
+        case InIdentifierStartUnicodeEscapeStart:
+          if (m_current == 'u')
+            m_state = InIdentifierStartUnicodeEscape;
           else
             setDone(Bad);
-        }
-        break;
-      case InString:
-        if (m_current == stringType) {
-          shift(1);
-          setDone(String);
-        } else if (isLineTerminator() || m_current == -1)
-          setDone(Bad);
-        else if (m_current == '\\')
-          m_state = InEscapeSequence;
-        else
-          record16(m_current);
-        break;
-      // Escape Sequences inside of strings
-      case InEscapeSequence:
-        if (isOctalDigit(m_current)) {
-          if (m_current >= '0' && m_current <= '3' && isOctalDigit(m_next1) &&
-              isOctalDigit(m_next2)) {
-            record16(convertOctal(m_current, m_next1, m_next2));
-            shift(2);
-            m_state = InString;
-          } else if (isOctalDigit(m_current) && isOctalDigit(m_next1)) {
-            record16(convertOctal('0', m_current, m_next1));
-            shift(1);
-            m_state = InString;
-          } else if (isOctalDigit(m_current)) {
-            record16(convertOctal('0', '0', m_current));
-            m_state = InString;
-          } else
+          break;
+        case InIdentifierPartUnicodeEscapeStart:
+          if (m_current == 'u')
+            m_state = InIdentifierPartUnicodeEscape;
+          else
             setDone(Bad);
-        } else if (m_current == 'x')
-          m_state = InHexEscape;
-        else if (m_current == 'u')
-          m_state = InUnicodeEscape;
-        else if (isLineTerminator()) {
-          nextLine();
-          m_state = InString;
-        } else {
-          record16(singleEscape(static_cast<unsigned short>(m_current)));
-          m_state = InString;
-        }
-        break;
-      case InHexEscape:
-        if (isHexDigit(m_current) && isHexDigit(m_next1)) {
-          m_state = InString;
-          record16(convertHex(m_current, m_next1));
-          shift(1);
-        } else if (m_current == stringType) {
-          record16('x');
-          shift(1);
-          setDone(String);
-        } else {
-          record16('x');
-          record16(m_current);
-          m_state = InString;
-        }
-        break;
-      case InUnicodeEscape:
-        if (isHexDigit(m_current) && isHexDigit(m_next1) &&
-            isHexDigit(m_next2) && isHexDigit(m_next3)) {
-          record16(convertUnicode(m_current, m_next1, m_next2, m_next3));
+          break;
+        case InIdentifierStartUnicodeEscape:
+          if (!isHexDigit(m_current) || !isHexDigit(m_next1) ||
+              !isHexDigit(m_next2) || !isHexDigit(m_next3)) {
+            setDone(Bad);
+            break;
+          }
+          token = convertUnicode(m_current, m_next1, m_next2, m_next3);
           shift(3);
-          m_state = InString;
-        } else if (m_current == stringType) {
-          record16('u');
-          shift(1);
-          setDone(String);
-        } else
-          setDone(Bad);
-        break;
-      case InSingleLineComment:
-        if (isLineTerminator()) {
-          nextLine();
-          m_terminator = true;
-          if (m_restrKeyword) {
-            token = ';';
-            setDone(Other);
-          } else
-            m_state = Start;
-        } else if (m_current == -1)
-          setDone(Eof);
-        break;
-      case InMultiLineComment:
-        if (m_current == -1)
-          setDone(Bad);
-        else if (isLineTerminator())
-          nextLine();
-        else if (m_current == '*' && m_next1 == '/') {
-          m_state = Start;
-          shift(1);
-        }
-        break;
-      case InIdentifierOrKeyword:
-      case InIdentifier:
-        if (isIdentPart(m_current))
-          record16(m_current);
-        else if (m_current == '\\')
-          m_state = InIdentifierPartUnicodeEscapeStart;
-        else
-          setDone(m_state == InIdentifierOrKeyword ? IdentifierOrKeyword
-                                                   : Identifier);
-        break;
-      case InNum0:
-        if (m_current == 'x' || m_current == 'X') {
-          record8(m_current);
-          m_state = InHex;
-        } else if (m_current == '.') {
-          record8(m_current);
-          m_state = InDecimal;
-        } else if (m_current == 'e' || m_current == 'E') {
-          record8(m_current);
-          m_state = InExponentIndicator;
-        } else if (isOctalDigit(m_current)) {
-          record8(m_current);
-          m_state = InOctal;
-        } else if (isDecimalDigit(m_current)) {
-          record8(m_current);
-          m_state = InDecimal;
-        } else
-          setDone(Number);
-        break;
-      case InHex:
-        if (isHexDigit(m_current))
-          record8(m_current);
-        else
-          setDone(Hex);
-        break;
-      case InOctal:
-        if (isOctalDigit(m_current))
-          record8(m_current);
-        else if (isDecimalDigit(m_current)) {
-          record8(m_current);
-          m_state = InDecimal;
-        } else
-          setDone(Octal);
-        break;
-      case InNum:
-        if (isDecimalDigit(m_current))
-          record8(m_current);
-        else if (m_current == '.') {
-          record8(m_current);
-          m_state = InDecimal;
-        } else if (m_current == 'e' || m_current == 'E') {
-          record8(m_current);
-          m_state = InExponentIndicator;
-        } else
-          setDone(Number);
-        break;
-      case InDecimal:
-        if (isDecimalDigit(m_current))
-          record8(m_current);
-        else if (m_current == 'e' || m_current == 'E') {
-          record8(m_current);
-          m_state = InExponentIndicator;
-        } else
-          setDone(Number);
-        break;
-      case InExponentIndicator:
-        if (m_current == '+' || m_current == '-')
-          record8(m_current);
-        else if (isDecimalDigit(m_current)) {
-          record8(m_current);
-          m_state = InExponent;
-        } else
-          setDone(Bad);
-        break;
-      case InExponent:
-        if (isDecimalDigit(m_current))
-          record8(m_current);
-        else
-          setDone(Number);
-        break;
-      case InIdentifierStartUnicodeEscapeStart:
-        if (m_current == 'u')
-          m_state = InIdentifierStartUnicodeEscape;
-        else
-          setDone(Bad);
-        break;
-      case InIdentifierPartUnicodeEscapeStart:
-        if (m_current == 'u')
-          m_state = InIdentifierPartUnicodeEscape;
-        else
-          setDone(Bad);
-        break;
-      case InIdentifierStartUnicodeEscape:
-        if (!isHexDigit(m_current) || !isHexDigit(m_next1) ||
-            !isHexDigit(m_next2) || !isHexDigit(m_next3)) {
-          setDone(Bad);
+          if (!isIdentStart(token)) {
+            setDone(Bad);
+            break;
+          }
+          record16(token);
+          m_state = InIdentifier;
           break;
-        }
-        token = convertUnicode(m_current, m_next1, m_next2, m_next3);
-        shift(3);
-        if (!isIdentStart(token)) {
-          setDone(Bad);
+        case InIdentifierPartUnicodeEscape:
+          if (!isHexDigit(m_current) || !isHexDigit(m_next1) ||
+              !isHexDigit(m_next2) || !isHexDigit(m_next3)) {
+            setDone(Bad);
+            break;
+          }
+          token = convertUnicode(m_current, m_next1, m_next2, m_next3);
+          shift(3);
+          if (!isIdentPart(token)) {
+            setDone(Bad);
+            break;
+          }
+          record16(token);
+          m_state = InIdentifier;
           break;
-        }
-        record16(token);
-        m_state = InIdentifier;
-        break;
-      case InIdentifierPartUnicodeEscape:
-        if (!isHexDigit(m_current) || !isHexDigit(m_next1) ||
-            !isHexDigit(m_next2) || !isHexDigit(m_next3)) {
-          setDone(Bad);
-          break;
-        }
-        token = convertUnicode(m_current, m_next1, m_next2, m_next3);
-        shift(3);
-        if (!isIdentPart(token)) {
-          setDone(Bad);
-          break;
-        }
-        record16(token);
-        m_state = InIdentifier;
-        break;
-      default:
-        ASSERT(!"Unhandled state in switch statement");
-    }
+        default:
+          ASSERT(!"Unhandled state in switch statement");
+      }
 
-    // move on to the next character
-    if (!m_done)
+      if (m_state != Start && m_state != InSingleLineComment)
+        m_atLineStart = false;
+      if (m_done)
+        break;
+
       shift(1);
-    if (m_state != Start && m_state != InSingleLineComment)
-      m_atLineStart = false;
+    }
   }
 
   // no identifiers allowed directly after numeric literal, e.g. "3in" is bad
@@ -838,7 +841,7 @@ void Lexer::record16(UChar c) {
 }
 
 bool Lexer::scanRegExp() {
-  m_buffer16.clear();
+  m_buffer16.resize(0);
   bool lastWasEscape = false;
   bool inBrackets = false;
 
@@ -857,7 +860,7 @@ bool Lexer::scanRegExp() {
       lastWasEscape = !lastWasEscape && (m_current == '\\');
     } else {  // end of regexp
       m_pattern = UString(m_buffer16);
-      m_buffer16.clear();
+      m_buffer16.resize(0);
       shift(1);
       break;
     }
