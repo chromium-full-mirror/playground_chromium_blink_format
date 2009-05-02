@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006, 2007, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -149,15 +149,15 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didFailProvisionalLoadWithError(
 HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didCommitLoadForFrame(
     /* [in] */ IWebView* webView,
     /* [in] */ IWebFrame* frame) {
+  if (!done && gLayoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didCommitLoadForFrame\n",
+           descriptionSuitableForTestResult(frame).c_str());
+
   COMPtr<IWebViewPrivate> webViewPrivate;
   HRESULT hr = webView->QueryInterface(&webViewPrivate);
   if (FAILED(hr))
     return hr;
   webViewPrivate->updateFocusedAndActiveState();
-
-  if (!done && gLayoutTestController->dumpFrameLoadCallbacks())
-    printf("%s - didCommitLoadForFrame\n",
-           descriptionSuitableForTestResult(frame).c_str());
 
   return S_OK;
 }
@@ -223,8 +223,12 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didFinishLoadForFrame(
 HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didFailLoadWithError(
     /* [in] */ IWebView* webView,
     /* [in] */ IWebError* error,
-    /* [in] */ IWebFrame* forFrame) {
-  locationChangeDone(error, forFrame);
+    /* [in] */ IWebFrame* frame) {
+  if (!done && gLayoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didFailLoadWithError\n",
+           descriptionSuitableForTestResult(frame).c_str());
+
+  locationChangeDone(error, frame);
   return S_OK;
 }
 
