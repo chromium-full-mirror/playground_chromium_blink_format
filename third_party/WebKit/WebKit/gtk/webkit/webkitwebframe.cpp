@@ -394,7 +394,7 @@ static void webkit_web_frame_load_data(WebKitWebFrame* frame,
   ResourceRequest request(baseKURL);
 
   RefPtr<SharedBuffer> sharedBuffer =
-      SharedBuffer::create(content, g_utf8_strlen(content, -1));
+      SharedBuffer::create(content, strlen(content));
   SubstituteData substituteData(
       sharedBuffer.release(),
       mimeType ? String::fromUTF8(mimeType) : String::fromUTF8("text/html"),
