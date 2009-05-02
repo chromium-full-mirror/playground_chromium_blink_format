@@ -3557,7 +3557,7 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
           item = m_currentHistoryItem;
 
       bool shouldReset = true;
-      if (!pdl->isLoadingInAPISense()) {
+      if (!(pdl->isLoadingInAPISense() && !pdl->isStopping())) {
         m_delegateIsHandlingProvisionalLoadError = true;
         m_client->dispatchDidFailProvisionalLoad(error);
         m_delegateIsHandlingProvisionalLoadError = false;
@@ -3595,7 +3595,7 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
 
     case FrameStateCommittedPage: {
       DocumentLoader* dl = m_documentLoader.get();
-      if (!dl || dl->isLoadingInAPISense())
+      if (!dl || (dl->isLoadingInAPISense() && !dl->isStopping()))
         return;
 
       markLoadComplete();
