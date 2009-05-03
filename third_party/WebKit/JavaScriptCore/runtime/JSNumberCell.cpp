@@ -101,6 +101,10 @@ JSValue jsNumberCell(JSGlobalData* globalData, double d) {
   return new (globalData) JSNumberCell(globalData, d);
 }
 
+JSValue jsAPIMangledNumber(ExecState* exec, double d) {
+  return new (exec) JSNumberCell(JSNumberCell::APIMangled, d);
+}
+
 #else
 
 JSValue jsNumberCell(ExecState*, double) {
