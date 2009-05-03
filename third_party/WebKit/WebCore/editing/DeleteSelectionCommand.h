@@ -92,6 +92,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   bool m_replace;
   bool m_expandForSpecialElements;
   bool m_pruneStartBlockIfNecessary;
+  bool m_startsAtEmptyLine;
 
   // This data is transient and should be cleared at the end of the doApply
   // function.
@@ -111,6 +112,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   RefPtr<Node> m_endRoot;
   RefPtr<Node> m_startTableRow;
   RefPtr<Node> m_endTableRow;
+  RefPtr<Node> m_temporaryPlaceholder;
 };
 
 }  // namespace WebCore
