@@ -155,7 +155,7 @@ JSValue JavaInstance::invokeMethod(ExecState* exec,
   bool handled = false;
   if (rootObject->nativeHandle()) {
     jobject obj = _instance->_instance;
-    JSValue exceptionDescription = noValue();
+    JSValue exceptionDescription;
     const char* callingURL = 0;  // FIXME, need to propagate calling URL to Java
     handled = dispatchJNICall(exec, rootObject->nativeHandle(), obj,
                               jMethod->isStatic(), jMethod->JNIReturnType(),

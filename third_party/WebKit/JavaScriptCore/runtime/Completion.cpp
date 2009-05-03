@@ -74,7 +74,7 @@ Completion evaluate(ExecState* exec,
                           ? exec->dynamicGlobalObject()
                           : thisValue.toObject(exec);
 
-  JSValue exception = noValue();
+  JSValue exception;
   JSValue result = exec->interpreter()->execute(
       programNode.get(), exec, scopeChain.node(), thisObj, &exception);
 

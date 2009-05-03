@@ -387,7 +387,7 @@ JSValue JSCallbackObject<Base>::call(ExecState* exec,
   }
 
   ASSERT_NOT_REACHED();  // getCallData should prevent us from reaching here
-  return noValue();
+  return JSValue();
 }
 
 template <class Base>

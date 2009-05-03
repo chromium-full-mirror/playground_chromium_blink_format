@@ -105,7 +105,7 @@ JSValue jsNumberCell(JSGlobalData* globalData, double d) {
 
 JSValue jsNumberCell(ExecState*, double) {
   ASSERT_NOT_REACHED();
-  return noValue();
+  return JSValue();
 }
 
 #endif

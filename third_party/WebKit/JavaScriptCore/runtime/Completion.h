@@ -39,7 +39,7 @@ enum ComplType { Normal, Break, Continue, ReturnValue, Throw, Interrupted };
  */
 class Completion {
  public:
-  Completion(ComplType type = Normal, JSValue value = noValue())
+  Completion(ComplType type = Normal, JSValue value = JSValue())
       : m_type(type), m_value(value) {}
 
   ComplType complType() const { return m_type; }
@@ -56,7 +56,7 @@ Completion checkSyntax(ExecState*, const SourceCode&);
 Completion evaluate(ExecState*,
                     ScopeChain&,
                     const SourceCode&,
-                    JSValue thisValue = noValue());
+                    JSValue thisValue = JSValue());
 
 }  // namespace JSC
 

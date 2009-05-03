@@ -82,7 +82,7 @@ ScriptValue WorkerScriptController::evaluate(
   {
     MutexLocker lock(m_sharedDataMutex);
     if (m_executionForbidden)
-      return noValue();
+      return JSValue();
   }
   ScriptValue exception;
   ScriptValue result = evaluate(sourceCode, &exception);
@@ -98,7 +98,7 @@ ScriptValue WorkerScriptController::evaluate(const ScriptSourceCode& sourceCode,
   {
     MutexLocker lock(m_sharedDataMutex);
     if (m_executionForbidden)
-      return noValue();
+      return JSValue();
   }
 
   initScriptIfNeeded();
@@ -119,7 +119,7 @@ ScriptValue WorkerScriptController::evaluate(const ScriptSourceCode& sourceCode,
 
   if (comp.complType() == Throw)
     *exception = comp.value();
-  return noValue();
+  return JSValue();
 }
 
 void WorkerScriptController::setException(ScriptValue exception) {

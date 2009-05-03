@@ -292,7 +292,7 @@ inline UString JSValue::toThisString(ExecState* exec) const {
 inline JSValue JSValue::getJSNumber() {
   return JSImmediate::isNumber(asValue())
              ? asValue()
-             : JSImmediate::isImmediate(asValue()) ? noValue()
+             : JSImmediate::isImmediate(asValue()) ? JSValue()
                                                    : asCell()->getJSNumber();
 }
 

@@ -111,7 +111,7 @@ class Instance : public RefCounted<Instance> {
 
   virtual bool supportsConstruct() const { return false; }
   virtual JSValue invokeConstruct(ExecState*, const ArgList&) {
-    return noValue();
+    return JSValue();
   }
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&) {}
