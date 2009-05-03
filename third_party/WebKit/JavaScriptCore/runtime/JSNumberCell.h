@@ -52,7 +52,6 @@ class JSNumberCell : public JSCell {
   friend class JIT;
   friend JSValue jsNumberCell(JSGlobalData*, double);
   friend JSValue jsNumberCell(ExecState*, double);
-  friend JSValue jsAPIMangledNumber(ExecState*, double);
 
  public:
   double value() const { return m_value; }
@@ -67,11 +66,6 @@ class JSNumberCell : public JSCell {
   virtual UString toThisString(ExecState*) const;
   virtual JSObject* toThisObject(ExecState*) const;
   virtual JSValue getJSNumber();
-
-  static const uintptr_t JSAPIMangledMagicNumber = 0xbbadbeef;
-  bool isAPIMangledNumber() const {
-    return m_structure == reinterpret_cast<Structure*>(JSAPIMangledMagicNumber);
-  }
 
   void* operator new(size_t size, ExecState* exec) {
 #ifdef JAVASCRIPTCORE_BUILDING_ALL_IN_ONE_FILE
@@ -99,11 +93,6 @@ class JSNumberCell : public JSCell {
 
   JSNumberCell(ExecState* exec, double value)
       : JSCell(exec->globalData().numberStructure.get()), m_value(value) {}
-
-  enum APIMangledTag { APIMangled };
-  JSNumberCell(APIMangledTag, double value)
-      : JSCell(reinterpret_cast<Structure*>(JSAPIMangledMagicNumber)),
-        m_value(value) {}
 
   virtual bool getUInt32(uint32_t&) const;
   virtual bool getTruncatedInt32(int32_t&) const;
@@ -209,15 +198,6 @@ inline double JSValue::uncheckedGetNumber() const {
   ASSERT(isNumber());
   return JSImmediate::isImmediate(asValue()) ? JSImmediate::toDouble(asValue())
                                              : getDoubleNumber();
-}
-
-JSValue jsAPIMangledNumber(ExecState* exec, double);
-
-inline bool JSValue::isAPIMangledNumber() {
-  ASSERT(isNumber());
-  return JSImmediate::isImmediate(asValue())
-             ? false
-             : asNumberCell(asValue())->isAPIMangledNumber();
 }
 
 #else
