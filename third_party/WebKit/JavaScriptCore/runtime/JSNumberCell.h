@@ -36,6 +36,7 @@ extern const double NaN;
 extern const double Inf;
 
 JSValue jsNumberCell(ExecState*, double);
+JSValue jsAPIMangledNumber(ExecState*, double);
 
 #if !USE(ALTERNATE_JSIMMEDIATE)
 
@@ -210,8 +211,6 @@ inline double JSValue::uncheckedGetNumber() const {
   return JSImmediate::isImmediate(asValue()) ? JSImmediate::toDouble(asValue())
                                              : getDoubleNumber();
 }
-
-JSValue jsAPIMangledNumber(ExecState* exec, double);
 
 inline bool JSValue::isAPIMangledNumber() {
   ASSERT(isNumber());
