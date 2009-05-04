@@ -99,19 +99,15 @@ TransformationMatrix RenderForeignObject::localToParentTransform() const {
 
 void RenderForeignObject::layout() {
   ASSERT(needsLayout());
-
-  // Arbitrary affine transforms are incompatible with LayoutState.
-  view()->disableLayoutState();
+  ASSERT(!view()->layoutStateEnabled());  // RenderSVGRoot disables layoutState
+                                          // for the SVG rendering tree.
 
   LayoutRepainter repainter(*this, checkForRepaintDuringLayout());
-
   calculateLocalTransform();
 
   RenderBlock::layout();
-
   repainter.repaintAfterLayout();
 
-  view()->enableLayoutState();
   setNeedsLayout(false);
 }
 
