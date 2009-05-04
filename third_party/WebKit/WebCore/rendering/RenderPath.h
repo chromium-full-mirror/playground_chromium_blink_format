@@ -69,8 +69,6 @@ class RenderPath : public RenderSVGModelObject {
                                 const Path&) const;
 
  private:
-  FloatPoint mapAbsolutePointToLocal(const FloatPoint&) const;
-
   bool calculateLocalTransform();
   virtual TransformationMatrix localTransform() const;
 
