@@ -42,7 +42,6 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
     return "RenderSVGViewportContainer";
   }
 
-  virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
   virtual TransformationMatrix localToParentTransform() const;
@@ -58,7 +57,7 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
   TransformationMatrix viewportTransform() const;
 
  private:
-  void calcViewport();
+  virtual void calcViewport();
 
   virtual void applyViewportClip(PaintInfo&);
   virtual bool pointIsInsideViewportClip(const FloatPoint& pointInParent);

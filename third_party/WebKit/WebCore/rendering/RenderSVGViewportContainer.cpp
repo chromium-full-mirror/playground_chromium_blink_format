@@ -38,29 +38,6 @@ RenderSVGViewportContainer::RenderSVGViewportContainer(SVGStyledElement* node)
 
 RenderSVGViewportContainer::~RenderSVGViewportContainer() {}
 
-void RenderSVGViewportContainer::layout() {
-  ASSERT(needsLayout());
-  ASSERT(!view()->layoutStateEnabled());  // RenderSVGRoot disables layoutState
-                                          // for the SVG rendering tree.
-
-  calcViewport();
-
-  LayoutRepainter repainter(*this,
-                            checkForRepaintDuringLayout() && selfNeedsLayout());
-
-  for (RenderObject* child = firstChild(); child;
-       child = child->nextSibling()) {
-    if (selfNeedsLayout())
-      child->setNeedsLayout(true);
-
-    child->layoutIfNeeded();
-    ASSERT(!child->needsLayout());
-  }
-  repainter.repaintAfterLayout();
-
-  setNeedsLayout(false);
-}
-
 void RenderSVGViewportContainer::paint(PaintInfo& paintInfo,
                                        int parentX,
                                        int parentY) {
@@ -76,8 +53,6 @@ void RenderSVGViewportContainer::applyViewportClip(PaintInfo& paintInfo) {
   if (style()->overflowX() != OVISIBLE)
     paintInfo.context->clip(enclosingIntRect(
         viewport()));  // FIXME: Eventually we'll want float-precision clipping
-
-  RenderSVGContainer::applyViewportClip(paintInfo);
 }
 
 FloatRect RenderSVGViewportContainer::viewport() const {
