@@ -53,7 +53,7 @@ class HTMLFormCollection : public HTMLCollection {
   virtual void updateNameCache() const;
   virtual unsigned calcLength() const;
 
-  static CollectionInfo* formCollectionInfo(HTMLFormElement*);
+  static CollectionCache* formCollectionInfo(HTMLFormElement*);
 
   Element* getNamedItem(const QualifiedName& attrName,
                         const AtomicString& name) const;

@@ -161,7 +161,7 @@ HTMLTableRowElement* HTMLTableRowsCollection::lastRow(HTMLTableElement* table) {
 
 HTMLTableRowsCollection::HTMLTableRowsCollection(
     PassRefPtr<HTMLTableElement> table)
-    : HTMLCollection(table, Other, 0) {}
+    : HTMLCollection(table, OtherCollection, 0) {}
 
 PassRefPtr<HTMLTableRowsCollection> HTMLTableRowsCollection::create(
     PassRefPtr<HTMLTableElement> table) {

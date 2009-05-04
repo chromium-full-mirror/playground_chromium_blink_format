@@ -30,6 +30,7 @@
 #include "DOMWindow.h"
 #include "Element.h"
 #include "Frame.h"
+#include "HTMLCollection.h"
 #include "HTMLDocument.h"
 #include "InspectorController.h"
 #include "JSDOMWindowCustom.h"

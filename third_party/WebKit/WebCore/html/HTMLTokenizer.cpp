@@ -42,6 +42,7 @@
 #include "HTMLParser.h"
 #include "HTMLScriptElement.h"
 #include "HTMLViewSourceDocument.h"
+#include "MappedAttribute.h"
 #include "Page.h"
 #include "PreloadScanner.h"
 #include "ScriptController.h"

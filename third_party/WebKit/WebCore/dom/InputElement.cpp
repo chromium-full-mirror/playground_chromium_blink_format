@@ -31,6 +31,7 @@
 #include "Frame.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
+#include "MappedAttribute.h"
 #include "Page.h"
 #include "RenderTextControlSingleLine.h"
 #include "SelectionController.h"
