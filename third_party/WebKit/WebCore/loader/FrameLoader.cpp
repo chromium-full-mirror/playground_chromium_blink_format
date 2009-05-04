@@ -1856,7 +1856,7 @@ bool FrameLoader::loadPlugin(RenderPart* renderer,
     widget = m_client->createPlugin(
         IntSize(renderer->contentWidth(), renderer->contentHeight()), element,
         url, paramNames, paramValues, mimeType,
-        m_frame->document()->isPluginDocument());
+        m_frame->document()->isPluginDocument() && !m_containsPlugIns);
     if (widget) {
       renderer->setWidget(widget);
       m_containsPlugIns = true;
