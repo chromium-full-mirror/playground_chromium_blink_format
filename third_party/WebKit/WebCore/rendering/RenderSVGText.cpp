@@ -171,10 +171,6 @@ void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int, int) {
   if (!root)
     return;
 
-  FloatPoint absPos = localToAbsolute();
-
-  TransformationMatrix htmlParentCtm = root->RenderBox::absoluteTransform();
-
   // Don't use objectBoundingBox here, as it's unites the selection rects. Makes
   // it hard
   // to spot errors, if there are any using WebInspector. Individually feed them
@@ -186,10 +182,11 @@ void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int, int) {
     InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(runBox);
     for (InlineBox* box = flowBox->firstChild(); box; box = box->nextOnLine()) {
       FloatRect boxRect(box->x(), box->y(), box->width(), box->height());
-      boxRect.move(narrowPrecisionToFloat(absPos.x() - htmlParentCtm.e()),
-                   narrowPrecisionToFloat(absPos.y() - htmlParentCtm.f()));
-      // FIXME: broken with CSS transforms
-      rects.append(enclosingIntRect(absoluteTransform().mapRect(boxRect)));
+      // FIXME: crawling up the parent chain to map each rect is very
+      // inefficient
+      // we should compute the absoluteTransform outside this loop first.
+      rects.append(
+          enclosingIntRect(localToAbsoluteQuad(boxRect).boundingBox()));
     }
   }
 }
@@ -199,10 +196,6 @@ void RenderSVGText::absoluteQuads(Vector<FloatQuad>& quads) {
   if (!root)
     return;
 
-  FloatPoint absPos = localToAbsolute();
-
-  TransformationMatrix htmlParentCtm = root->RenderBox::absoluteTransform();
-
   // Don't use objectBoundingBox here, as it's unites the selection rects. Makes
   // it hard
   // to spot errors, if there are any using WebInspector. Individually feed them
@@ -214,10 +207,10 @@ void RenderSVGText::absoluteQuads(Vector<FloatQuad>& quads) {
     InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(runBox);
     for (InlineBox* box = flowBox->firstChild(); box; box = box->nextOnLine()) {
       FloatRect boxRect(box->x(), box->y(), box->width(), box->height());
-      boxRect.move(narrowPrecisionToFloat(absPos.x() - htmlParentCtm.e()),
-                   narrowPrecisionToFloat(absPos.y() - htmlParentCtm.f()));
-      // FIXME: broken with CSS transforms
-      quads.append(absoluteTransform().mapRect(boxRect));
+      // FIXME: crawling up the parent chain to map each quad is very
+      // inefficient
+      // we should compute the absoluteTransform outside this loop first.
+      quads.append(localToAbsoluteQuad(boxRect));
     }
   }
 }
