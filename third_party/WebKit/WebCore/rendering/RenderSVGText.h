@@ -70,6 +70,11 @@ class RenderSVGText : public RenderSVGBlock {
                                      IntRect&,
                                      bool fixed = false);
 
+  virtual void mapLocalToContainer(RenderBoxModelObject* repaintContainer,
+                                   bool useTransforms,
+                                   bool fixed,
+                                   TransformState&) const;
+
   virtual FloatRect objectBoundingBox() const;
   virtual FloatRect repaintRectInLocalCoordinates() const;
 

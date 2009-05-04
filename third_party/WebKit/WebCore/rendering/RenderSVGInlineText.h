@@ -58,6 +58,9 @@ class RenderSVGInlineText : public RenderText {
   IntRect computeRepaintRectForRange(RenderBoxModelObject* repaintContainer,
                                      int startPos,
                                      int endPos);
+  FloatQuad computeRepaintQuadForRange(RenderBoxModelObject* repaintContainer,
+                                       int startPos,
+                                       int endPos);
 };
 }
 

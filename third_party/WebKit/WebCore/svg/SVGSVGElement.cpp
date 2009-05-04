@@ -408,7 +408,7 @@ TransformationMatrix SVGSVGElement::getScreenCTM() const {
       // FIXME: This doesn't work correctly with CSS transforms.
       FloatPoint point;
       if (renderer->parent())
-        point = renderer->localToAbsolute(point, true);
+        point = renderer->localToAbsolute(point, false, true);
       rootLocation.move(point.x(), point.y());
     } else
       rootLocation.move(x().value(this), y().value(this));

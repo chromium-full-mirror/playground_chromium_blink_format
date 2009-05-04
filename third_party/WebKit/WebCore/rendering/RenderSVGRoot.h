@@ -77,6 +77,11 @@ class RenderSVGRoot : public RenderBox {
                                      IntRect& repaintRect,
                                      bool fixed);
 
+  virtual void mapLocalToContainer(RenderBoxModelObject* repaintContainer,
+                                   bool useTransforms,
+                                   bool fixed,
+                                   TransformState&) const;
+
  private:
   void calcViewport();
   const FloatSize& viewportSize() const;

@@ -32,6 +32,7 @@
 #include "SVGRenderSupport.h"
 #include "SVGSVGElement.h"
 #include "SVGStyledElement.h"
+#include "TransformState.h"
 
 #if ENABLE(SVG_FILTERS)
 #include "SVGResourceFilter.h"
@@ -281,6 +282,24 @@ void RenderSVGRoot::computeRectForRepaint(
   // RenderBox's method to handle all the normal CSS Box model bits
   repaintRect = localToBorderBoxTransform().mapRect(repaintRect);
   RenderBox::computeRectForRepaint(repaintContainer, repaintRect, fixed);
+}
+
+void RenderSVGRoot::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
+                                        bool fixed,
+                                        bool useTransforms,
+                                        TransformState& transformState) const {
+  ASSERT(!fixed);  // We should have no fixed content in the SVG rendering tree.
+
+  // FIXME: If we don't respect useTransforms we break SVG text rendering.
+  // Seems RenderSVGInlineText has some own broken translation hacks which
+  // depend useTransforms=false
+  // This should instead be ASSERT(useTransforms) once we fix
+  // RenderSVGInlineText
+  if (useTransforms)
+    transformState.applyTransform(localToBorderBoxTransform());
+
+  RenderBox::mapLocalToContainer(repaintContainer, fixed, useTransforms,
+                                 transformState);
 }
 
 bool RenderSVGRoot::nodeAtPoint(const HitTestRequest& request,
