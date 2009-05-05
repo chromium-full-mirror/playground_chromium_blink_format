@@ -1514,6 +1514,7 @@ AccessibilityObject* AccessibilityRenderObject::accessibilityParentForImageMap(
   if (!m_renderer || !map)
     return 0;
 
+  String mapName = map->getName().string().lower();
   RefPtr<HTMLCollection> coll = m_renderer->document()->images();
   for (Node* curr = coll->firstItem(); curr; curr = coll->nextItem()) {
     RenderObject* obj = curr->renderer();
@@ -1523,8 +1524,9 @@ AccessibilityObject* AccessibilityRenderObject::accessibilityParentForImageMap(
     // The HTMLImageElement's useMap() value includes the '#' symbol at the
     // beginning,
     // which has to be stripped off
-    if (static_cast<HTMLImageElement*>(curr)->useMap().substring(1) ==
-        map->getName())
+    String useMapName =
+        static_cast<HTMLImageElement*>(curr)->useMap().substring(1).lower();
+    if (useMapName == mapName)
       return axObjectCache()->getOrCreate(obj);
   }
 
@@ -1935,6 +1937,29 @@ IntRect AccessibilityRenderObject::doAXBoundsForRange(
   return IntRect();
 }
 
+AccessibilityObject* AccessibilityRenderObject::accessibilityImageMapHitTest(
+    HTMLAreaElement* area,
+    const IntPoint& point) const {
+  if (!area)
+    return 0;
+
+  HTMLMapElement* map = static_cast<HTMLMapElement*>(area->parent());
+  AccessibilityObject* parent = accessibilityParentForImageMap(map);
+  if (!parent)
+    return 0;
+
+  AccessibilityObject::AccessibilityChildrenVector children =
+      parent->children();
+
+  unsigned count = children.size();
+  for (unsigned k = 0; k < count; ++k) {
+    if (children[k]->elementRect().contains(point))
+      return children[k].get();
+  }
+
+  return 0;
+}
+
 AccessibilityObject* AccessibilityRenderObject::doAccessibilityHitTest(
     const IntPoint& point) const {
   if (!m_renderer || !m_renderer->hasLayer())
@@ -1948,6 +1973,11 @@ AccessibilityObject* AccessibilityRenderObject::doAccessibilityHitTest(
   if (!hitTestResult.innerNode())
     return 0;
   Node* node = hitTestResult.innerNode()->shadowAncestorNode();
+
+  if (node->hasTagName(areaTag))
+    return accessibilityImageMapHitTest(static_cast<HTMLAreaElement*>(node),
+                                        point);
+
   RenderObject* obj = node->renderer();
   if (!obj)
     return 0;

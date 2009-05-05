@@ -236,6 +236,22 @@ static JSValueRef childAtIndexCallback(JSContextRef context,
       context, toAXElement(thisObject)->getChildAtIndex(indexNumber));
 }
 
+static JSValueRef elementAtPointCallback(JSContextRef context,
+                                         JSObjectRef function,
+                                         JSObjectRef thisObject,
+                                         size_t argumentCount,
+                                         const JSValueRef arguments[],
+                                         JSValueRef* exception) {
+  int x, y;
+  if (argumentCount == 2) {
+    x = JSValueToNumber(context, arguments[0], exception);
+    y = JSValueToNumber(context, arguments[1], exception);
+  }
+
+  return AccessibilityUIElement::makeJSAccessibilityUIElement(
+      context, toAXElement(thisObject)->elementAtPoint(x, y));
+}
+
 static JSValueRef isAttributeSettableCallback(JSContextRef context,
                                               JSObjectRef function,
                                               JSObjectRef thisObject,
@@ -354,6 +370,20 @@ static JSValueRef getChildrenCountCallback(JSContextRef context,
   return JSValueMakeNumber(context, toAXElement(thisObject)->childrenCount());
 }
 
+static JSValueRef getXCallback(JSContextRef context,
+                               JSObjectRef thisObject,
+                               JSStringRef propertyName,
+                               JSValueRef* exception) {
+  return JSValueMakeNumber(context, toAXElement(thisObject)->x());
+}
+
+static JSValueRef getYCallback(JSContextRef context,
+                               JSObjectRef thisObject,
+                               JSStringRef propertyName,
+                               JSValueRef* exception) {
+  return JSValueMakeNumber(context, toAXElement(thisObject)->y());
+}
+
 static JSValueRef getWidthCallback(JSContextRef context,
                                    JSObjectRef thisObject,
                                    JSStringRef propertyName,
@@ -437,6 +467,10 @@ JSClassRef AccessibilityUIElement::getJSClass() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"description", getDescriptionCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"x", getXCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"y", getYCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"width", getWidthCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"height", getHeightCallback, 0,
@@ -473,6 +507,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"boundsForRange", boundsForRangeCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"childAtIndex", childAtIndexCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"elementAtPoint", elementAtPointCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"attributesOfColumnHeaders", attributesOfColumnHeadersCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

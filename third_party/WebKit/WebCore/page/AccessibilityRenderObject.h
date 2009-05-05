@@ -238,6 +238,8 @@ class AccessibilityRenderObject : public AccessibilityObject {
   void addRadioButtonGroupMembers(
       AccessibilityChildrenVector& linkedUIElements) const;
   AccessibilityObject* internalLinkElement() const;
+  AccessibilityObject* accessibilityImageMapHitTest(HTMLAreaElement*,
+                                                    const IntPoint&) const;
   AccessibilityObject* accessibilityParentForImageMap(
       HTMLMapElement* map) const;
 
