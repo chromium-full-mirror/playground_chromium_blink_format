@@ -529,9 +529,9 @@ static int toCSSIdentifier(FontDescription::GenericFamilyType genericFamily) {
     case FontDescription::StandardFamily:
     case FontDescription::NoFamily:
     default:
-      return 0;
       break;
   }
+  return 0;
 }
 
 PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
