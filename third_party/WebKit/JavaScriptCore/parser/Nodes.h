@@ -29,13 +29,13 @@
 
 #include "Error.h"
 #include "JITCode.h"
+#include "Lexer.h"
 #include "Opcode.h"
 #include "ResultType.h"
 #include "SourceCode.h"
 #include "SymbolTable.h"
 #include <wtf/MathExtras.h>
 #include <wtf/OwnPtr.h>
-#include <wtf/Vector.h>
 
 #if PLATFORM(X86) && COMPILER(GCC)
 #define JSC_FAST_CALL __attribute__((regparm(3)))
@@ -107,7 +107,7 @@ struct SwitchInfo {
   SwitchType switchType;
 };
 
-class ParserRefCounted : Noncopyable {
+class ParserRefCounted : public RefCounted<ParserRefCounted> {
  protected:
   ParserRefCounted(JSGlobalData*) JSC_FAST_CALL;
 
@@ -116,20 +116,21 @@ class ParserRefCounted : Noncopyable {
 
   // Nonrecursive destruction.
   virtual void releaseNodes(NodeReleaser&);
-
-  void ref() JSC_FAST_CALL;
-  void deref() JSC_FAST_CALL;
-  bool hasOneRef() JSC_FAST_CALL;
-
-  static void deleteNewObjects(JSGlobalData*) JSC_FAST_CALL;
-
- private:
-  JSGlobalData* m_globalData;
 };
+
+#ifdef NDEBUG
+inline ParserRefCounted::ParserRefCounted(JSGlobalData* globalData) {
+  globalData->parserObjects.append(adoptRef(this));
+}
+
+inline ParserRefCounted::~ParserRefCounted() {}
+#endif
 
 class Node : public ParserRefCounted {
  public:
-  Node(JSGlobalData*) JSC_FAST_CALL;
+  Node(JSGlobalData* globalData) JSC_FAST_CALL
+      : ParserRefCounted(globalData),
+        m_line(globalData->lexer->lineNumber()) {}
 
   /*
       Return value: The register holding the production's value.

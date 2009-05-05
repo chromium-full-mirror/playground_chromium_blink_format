@@ -50,8 +50,8 @@ class PassRefPtr {
   PassRefPtr(const PassRefPtr<U>& o) : m_ptr(o.releaseRef()) {}
 
   ALWAYS_INLINE ~PassRefPtr() {
-    if (T* ptr = m_ptr)
-      ptr->deref();
+    if (UNLIKELY(m_ptr != 0))
+      m_ptr->deref();
   }
 
   template <class U>
