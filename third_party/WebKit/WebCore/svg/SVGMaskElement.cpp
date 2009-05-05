@@ -153,7 +153,7 @@ auto_ptr<ImageBuffer> SVGMaskElement::drawMaskerContent(
   }
 
   IntSize imageSize(lroundf(widthValue), lroundf(heightValue));
-  clampImageBufferSizeToViewport(document()->renderer(), imageSize);
+  clampImageBufferSizeToViewport(document()->view(), imageSize);
 
   if (imageSize.width() < static_cast<int>(widthValue))
     widthValue = imageSize.width();

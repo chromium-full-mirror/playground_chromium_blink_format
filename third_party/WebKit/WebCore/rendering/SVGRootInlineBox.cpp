@@ -423,9 +423,10 @@ struct SVGRootInlineBoxPaintWalker {
     m_savedInfo = m_paintInfo;
     m_paintInfo.context->save();
 
+    // FIXME: Why is this done here instead of in RenderSVGText?
     if (!flowBox->isRootInlineBox())
-      prepareToRenderSVGContent(object, m_paintInfo, m_boundingBox, m_filter,
-                                m_rootFilter);
+      SVGRenderBase::prepareToRenderSVGContent(
+          object, m_paintInfo, m_boundingBox, m_filter, m_rootFilter);
   }
 
   void chunkEndCallback(InlineBox* box) {
@@ -443,8 +444,8 @@ struct SVGRootInlineBoxPaintWalker {
 
     // Finalize text rendering
     if (!flowBox->isRootInlineBox()) {
-      finishRenderSVGContent(object, m_paintInfo, m_boundingBox, m_filter,
-                             m_savedInfo.context);
+      SVGRenderBase::finishRenderSVGContent(object, m_paintInfo, m_boundingBox,
+                                            m_filter, m_savedInfo.context);
       m_filter = 0;
     }
 
@@ -618,7 +619,8 @@ void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
   FloatRect boundingBox(tx + x(), ty + y(), width(), height());
 
   // Initialize text rendering
-  prepareToRenderSVGContent(renderer(), paintInfo, boundingBox, filter);
+  SVGRenderBase::prepareToRenderSVGContent(renderer(), paintInfo, boundingBox,
+                                           filter);
 
   // Render text, chunk-by-chunk
   SVGRootInlineBoxPaintWalker walkerCallback(this, filter, paintInfo, tx, ty);
@@ -632,8 +634,8 @@ void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
   walkTextChunks(&walker);
 
   // Finalize text rendering
-  finishRenderSVGContent(renderer(), paintInfo, boundingBox, filter,
-                         savedInfo.context);
+  SVGRenderBase::finishRenderSVGContent(renderer(), paintInfo, boundingBox,
+                                        filter, savedInfo.context);
   paintInfo.context->restore();
 }
 
