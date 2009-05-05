@@ -1300,7 +1300,8 @@ bool parseXMLDocumentFragment(const String& chunk,
 
   XMLTokenizer tokenizer(fragment, parent);
 
-  tokenizer.initializeParserContext(chunk.utf8().data());
+  CString chunkAsUtf8 = chunk.utf8();
+  tokenizer.initializeParserContext(chunkAsUtf8.data());
 
   xmlParseContent(tokenizer.m_context);
 
@@ -1309,7 +1310,7 @@ bool parseXMLDocumentFragment(const String& chunk,
   // Check if all the chunk has been processed.
   long bytesProcessed = xmlByteConsumed(tokenizer.m_context);
   if (bytesProcessed == -1 ||
-      ((unsigned long)bytesProcessed) == sizeof(UChar) * chunk.length())
+      ((unsigned long)bytesProcessed) != chunkAsUtf8.length())
     return false;
 
   // No error if the chunk is well formed or it is not but we have no error.
