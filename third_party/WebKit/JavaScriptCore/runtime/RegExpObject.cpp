@@ -22,6 +22,7 @@
 #include "config.h"
 #include "RegExpObject.h"
 
+#include "Error.h"
 #include "JSArray.h"
 #include "JSGlobalObject.h"
 #include "JSString.h"
