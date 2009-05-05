@@ -56,6 +56,11 @@ class RenderSVGImage : public RenderImage, SVGRenderBase {
                                      IntRect&,
                                      bool fixed = false);
 
+  virtual void mapLocalToContainer(RenderBoxModelObject* repaintContainer,
+                                   bool useTransforms,
+                                   bool fixed,
+                                   TransformState&) const;
+
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
   virtual void absoluteQuads(Vector<FloatQuad>&);
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
