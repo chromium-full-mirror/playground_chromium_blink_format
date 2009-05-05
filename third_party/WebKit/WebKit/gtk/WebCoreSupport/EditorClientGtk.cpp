@@ -605,6 +605,7 @@ void EditorClient::checkSpellingOfString(const UChar* text,
         g_utf8_strncpy(word, cstart, end - start);
 
         result = enchant_dict_check(lang->speller, word, -1);
+        g_free(word);
         if (result) {
           *misspellingLocation = start;
           *misspellingLength = wordLength;
@@ -617,6 +618,9 @@ void EditorClient::checkSpellingOfString(const UChar* text,
       }
     }
   }
+
+  g_free(attrs);
+  g_free(ctext);
 }
 
 void EditorClient::checkGrammarOfString(const UChar*,
