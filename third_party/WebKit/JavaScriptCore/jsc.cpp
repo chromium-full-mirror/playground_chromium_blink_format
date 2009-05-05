@@ -82,14 +82,14 @@ static NO_RETURN JSValue functionQuit(ExecState*,
                                       const ArgList&);
 
 #if ENABLE(SAMPLING_FLAGS)
-static JSValue functionSetSamplingFlag(ExecState*,
-                                       JSObject*,
-                                       JSValue,
-                                       const ArgList&);
-static JSValue functionClearSamplingFlag(ExecState*,
-                                         JSObject*,
-                                         JSValue,
-                                         const ArgList&);
+static JSValue functionSetSamplingFlags(ExecState*,
+                                        JSObject*,
+                                        JSValue,
+                                        const ArgList&);
+static JSValue functionClearSamplingFlags(ExecState*,
+                                          JSObject*,
+                                          JSValue,
+                                          const ArgList&);
 #endif
 
 struct Script {
@@ -213,13 +213,13 @@ GlobalObject::GlobalObject(const Vector<UString>& arguments)
   putDirectFunction(globalExec(),
                     new (globalExec()) PrototypeFunction(
                         globalExec(), prototypeFunctionStructure(), 1,
-                        Identifier(globalExec(), "setSamplingFlag"),
-                        functionSetSamplingFlag));
+                        Identifier(globalExec(), "setSamplingFlags"),
+                        functionSetSamplingFlags));
   putDirectFunction(globalExec(),
                     new (globalExec()) PrototypeFunction(
                         globalExec(), prototypeFunctionStructure(), 1,
-                        Identifier(globalExec(), "clearSamplingFlag"),
-                        functionClearSamplingFlag));
+                        Identifier(globalExec(), "clearSamplingFlags"),
+                        functionClearSamplingFlags));
 #endif
 
   JSObject* array = constructEmptyArray(globalExec());
@@ -298,37 +298,27 @@ JSValue functionLoad(ExecState* exec, JSObject*, JSValue, const ArgList& args) {
 }
 
 #if ENABLE(SAMPLING_FLAGS)
-JSValue functionSetSamplingFlag(ExecState* exec,
-                                JSObject*,
-                                JSValue,
-                                const ArgList& args) {
-  unsigned flag = static_cast<unsigned>(args.at(0).toNumber(exec));
-
-  // Sanitize the input into the range 1..32.
-  if (flag > 32)
-    flag &= 31;
-  if (!flag)
-    flag = 32;
-
-  SamplingFlags::setFlag(flag);
-
+JSValue functionSetSamplingFlags(ExecState* exec,
+                                 JSObject*,
+                                 JSValue,
+                                 const ArgList& args) {
+  for (unsigned i = 0; i < args.size(); ++i) {
+    unsigned flag = static_cast<unsigned>(args.at(i).toNumber(exec));
+    if ((flag >= 1) && (flag <= 32))
+      SamplingFlags::setFlag(flag);
+  }
   return jsNull();
 }
 
-JSValue functionClearSamplingFlag(ExecState* exec,
-                                  JSObject*,
-                                  JSValue,
-                                  const ArgList& args) {
-  unsigned flag = static_cast<unsigned>(args.at(0).toNumber(exec));
-
-  // Sanitize the input into the range 1..32.
-  if (flag > 32)
-    flag &= 31;
-  if (!flag)
-    flag = 32;
-
-  SamplingFlags::clearFlag(flag);
-
+JSValue functionClearSamplingFlags(ExecState* exec,
+                                   JSObject*,
+                                   JSValue,
+                                   const ArgList& args) {
+  for (unsigned i = 0; i < args.size(); ++i) {
+    unsigned flag = static_cast<unsigned>(args.at(i).toNumber(exec));
+    if ((flag >= 1) && (flag <= 32))
+      SamplingFlags::clearFlag(flag);
+  }
   return jsNull();
 }
 #endif
