@@ -69,7 +69,6 @@ class RenderPath : public RenderSVGModelObject {
                                 const Path&) const;
 
  private:
-  bool calculateLocalTransform();
   virtual TransformationMatrix localTransform() const;
 
   mutable Path m_path;

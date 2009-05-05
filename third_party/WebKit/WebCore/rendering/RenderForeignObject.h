@@ -39,10 +39,6 @@ class RenderForeignObject : public RenderSVGBlock {
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
   virtual TransformationMatrix localToParentTransform() const;
-  virtual TransformationMatrix localTransform() const {
-    return m_localTransform;
-  }
-  bool calculateLocalTransform();
 
   virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect&,
@@ -67,6 +63,10 @@ class RenderForeignObject : public RenderSVGBlock {
 
  private:
   TransformationMatrix translationForAttributes() const;
+
+  virtual TransformationMatrix localTransform() const {
+    return m_localTransform;
+  }
 
   TransformationMatrix m_localTransform;
 };

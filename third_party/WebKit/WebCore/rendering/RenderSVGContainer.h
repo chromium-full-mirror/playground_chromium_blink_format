@@ -63,7 +63,9 @@ class RenderSVGContainer : public RenderSVGModelObject {
                                 HitTestAction);
 
  protected:
-  virtual bool calculateLocalTransform();
+  // Allow RenderSVGTransformableContainer to hook in at the right time in
+  // layout()
+  virtual void calculateLocalTransform() {}
 
   // Allow RenderSVGViewportContainer to hook in at the right times in layout(),
   // paint() and nodeAtFloatPoint()

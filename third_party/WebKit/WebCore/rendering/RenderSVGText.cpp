@@ -69,13 +69,6 @@ void RenderSVGText::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
                                      useTransforms, transformState);
 }
 
-bool RenderSVGText::calculateLocalTransform() {
-  TransformationMatrix oldTransform = m_localTransform;
-  m_localTransform =
-      static_cast<SVGTextElement*>(node())->animatedLocalTransform();
-  return (oldTransform != m_localTransform);
-}
-
 void RenderSVGText::layout() {
   ASSERT(needsLayout());
 
@@ -94,7 +87,7 @@ void RenderSVGText::layout() {
   int yOffset = (int)(text->y()->getFirst().value(text));
   setLocation(xOffset, yOffset);
 
-  calculateLocalTransform();
+  m_localTransform = text->animatedLocalTransform();
 
   RenderBlock::layout();
 

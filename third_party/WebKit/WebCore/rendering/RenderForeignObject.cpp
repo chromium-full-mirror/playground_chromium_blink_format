@@ -86,13 +86,6 @@ void RenderForeignObject::computeRectForRepaint(
   RenderBlock::computeRectForRepaint(repaintContainer, rect, fixed);
 }
 
-bool RenderForeignObject::calculateLocalTransform() {
-  TransformationMatrix oldTransform = m_localTransform;
-  m_localTransform =
-      static_cast<SVGForeignObjectElement*>(node())->animatedLocalTransform();
-  return (oldTransform != m_localTransform);
-}
-
 TransformationMatrix RenderForeignObject::localToParentTransform() const {
   return localTransform() * translationForAttributes();
 }
@@ -103,7 +96,8 @@ void RenderForeignObject::layout() {
                                           // for the SVG rendering tree.
 
   LayoutRepainter repainter(*this, checkForRepaintDuringLayout());
-  calculateLocalTransform();
+  m_localTransform =
+      static_cast<SVGForeignObjectElement*>(node())->animatedLocalTransform();
 
   RenderBlock::layout();
   repainter.repaintAfterLayout();

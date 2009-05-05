@@ -88,7 +88,6 @@ class RenderSVGImage : public RenderImage, SVGRenderBase {
                            HitTestAction);
 
  private:
-  bool calculateLocalTransform();
   virtual TransformationMatrix localTransform() const {
     return m_localTransform;
   }

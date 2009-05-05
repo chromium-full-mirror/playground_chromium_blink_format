@@ -42,11 +42,9 @@ TransformationMatrix RenderSVGTransformableContainer::localTransform() const {
   return m_localTransform;
 }
 
-bool RenderSVGTransformableContainer::calculateLocalTransform() {
-  TransformationMatrix oldTransform = m_localTransform;
+void RenderSVGTransformableContainer::calculateLocalTransform() {
   m_localTransform = static_cast<SVGStyledTransformableElement*>(node())
                          ->animatedLocalTransform();
-  return (m_localTransform != oldTransform);
 }
 }
 
