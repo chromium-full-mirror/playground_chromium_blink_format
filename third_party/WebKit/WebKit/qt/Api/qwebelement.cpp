@@ -52,12 +52,31 @@ class QWebElementPrivate {
    a QWebFrame.
     \preliminary
 
-    QWebElement is the main class to provide easy access to the tree structure
-   of DOM elements.
-    The underlying data is explicitly shared. Creating a copy of a QWebElement
-   object does not
-    create a copy of the underlying element, both instances point to the same
-   element.
+    QWebElement is the main class to provide easy access to the document model.
+    The document model is represented by a tree-like structure of DOM elements.
+    The root of the tree is called the document element and can be accessed
+   using QWebFrame::documentElement().
+
+    You can reach specific elements by using the findAll() and findFirst()
+   functions, which
+    allow the use of CSS selectors to identify elements.
+
+    \snippet webkitsnippets/webelement/main.cpp FindAll
+
+    The first list contains all span elements in the document. The second list
+   contains
+    only the span elements that are children of the paragraph that is classified
+    as "intro" paragraph.
+
+    Alternatively you can manually traverse the document using firstChild() and
+   nextSibling():
+
+    \snippet webkitsnippets/webelement/main.cpp Traversing with QWebElement
+
+    The underlying content of QWebElement is explicitly shared. Creating a copy
+   of a QWebElement
+    does not create a copy of the content, both instances point to the same
+   underlying element.
 
     The element's attributes can be read using attribute() and changed using
    setAttribute().
@@ -142,6 +161,9 @@ bool QWebElement::isNull() const {
 /*!
     Returns a new collection of elements that are children of this element
     and that match the given CSS selector \a selectorQuery.
+
+    The query is specified using
+   \l{http://www.w3.org/TR/REC-CSS2/selector.html#q1}{standard CSS2 selectors}.
 */
 QList<QWebElement> QWebElement::findAll(const QString& selectorQuery) const {
   QList<QWebElement> elements;
@@ -422,7 +444,8 @@ QString QWebElement::namespaceUri() const {
 }
 
 /*!
-    Returns the parent element of this element.
+    Returns the parent element of this element or a null element if this element
+    is the root document element.
 */
 QWebElement QWebElement::parent() const {
   if (m_element)
@@ -1216,6 +1239,10 @@ void QWebElement::removeChildren() {
   m_element->removeAllChildren();
 }
 
+/*!
+    Makes the children of this element children of \a element,
+    and then makes \a element the only child of this element.
+*/
 void QWebElement::encloseContentsWith(const QWebElement& element) {
   if (!m_element || element.isNull())
     return;
@@ -1230,6 +1257,11 @@ void QWebElement::encloseContentsWith(const QWebElement& element) {
   appendInside(other);
 }
 
+/*!
+    Parses the \a markup and makes the children of this element
+    children of the parsed markup. Afterwards the element parsed
+    from the markup becomes the only child of this element.
+*/
 void QWebElement::encloseContentsWith(const QString& markup) {
   if (!m_element)
     return;
