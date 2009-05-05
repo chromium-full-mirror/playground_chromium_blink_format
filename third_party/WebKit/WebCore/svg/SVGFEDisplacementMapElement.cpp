@@ -22,6 +22,7 @@
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "SVGFEDisplacementMapElement.h"
 
+#include "MappedAttribute.h"
 #include "SVGResourceFilter.h"
 
 namespace WebCore {
