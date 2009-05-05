@@ -180,8 +180,15 @@ void InsertParagraphSeparatorCommand::doApply() {
         appendBlockPlaceholder(extraBlock);
       }
       appendNode(blockToInsert, startBlock);
-    } else
-      insertNodeAfter(blockToInsert, startBlock);
+    } else {
+      // If we are pasting a mail blockquote in this, unquoted, area then we
+      // don't want the newline within the blockquote or else it will also be
+      // quoted.
+      Node* highestBlockquote =
+          highestEnclosingNodeOfType(canonicalPos, &isMailBlockquote);
+      insertNodeAfter(blockToInsert,
+                      highestBlockquote ? highestBlockquote : startBlock);
+    }
 
     appendBlockPlaceholder(blockToInsert);
     setEndingSelection(
