@@ -23,6 +23,7 @@
 #include "ObjectPrototype.h"
 
 #include "Error.h"
+#include "JSFunction.h"
 #include "JSString.h"
 #include "PrototypeFunction.h"
 
