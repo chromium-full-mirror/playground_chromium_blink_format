@@ -2288,7 +2288,7 @@ void JIT::privateCompileCTIMachineTrampolines(
                               FIELD_OFFSET(ArgList, m_argCount)));
 
   // Calculate the start of the callframe header, and store in regT1
-  addPtr(Imm32(-RegisterFile::CallFrameHeaderSize * sizeof(Register)),
+  addPtr(Imm32(-RegisterFile::CallFrameHeaderSize * (int)sizeof(Register)),
          callFrameRegister, regT1);
 
   // Calculate start of arguments as callframe header - sizeof(Register) *
