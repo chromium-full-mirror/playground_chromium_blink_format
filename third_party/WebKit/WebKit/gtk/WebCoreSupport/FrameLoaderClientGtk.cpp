@@ -166,6 +166,17 @@ String FrameLoaderClient::userAgent(const KURL&) {
   return m_userAgent;
 }
 
+static void notifyStatus(WebKitWebFrame* frame, WebKitLoadStatus loadStatus) {
+  frame->priv->loadStatus = loadStatus;
+  g_object_notify(G_OBJECT(frame), "load-status");
+
+  WebKitWebView* webView = getViewFromFrame(frame);
+  if (frame == webkit_web_view_get_main_frame(webView)) {
+    webView->priv->loadStatus = loadStatus;
+    g_object_notify(G_OBJECT(webView), "load-status");
+  }
+}
+
 WTF::PassRefPtr<WebCore::DocumentLoader>
 FrameLoaderClient::createDocumentLoader(const WebCore::ResourceRequest& request,
                                         const SubstituteData& substituteData) {
@@ -255,6 +266,8 @@ void FrameLoaderClient::assignIdentifierToInitialRequest(
 void FrameLoaderClient::postProgressStartedNotification() {
   WebKitWebView* webView = getViewFromFrame(m_frame);
   g_signal_emit_by_name(webView, "load-started", m_frame);
+
+  g_object_notify(G_OBJECT(webView), "progress");
 }
 
 void FrameLoaderClient::postProgressEstimateChangedNotification() {
@@ -264,6 +277,8 @@ void FrameLoaderClient::postProgressEstimateChangedNotification() {
   g_signal_emit_by_name(
       webView, "load-progress-changed",
       lround(corePage->progress()->estimatedProgress() * 100));
+
+  g_object_notify(G_OBJECT(webView), "progress");
 }
 
 void FrameLoaderClient::postProgressFinishedNotification() {
@@ -598,6 +613,8 @@ bool FrameLoaderClient::hasWebView() const {
 
 void FrameLoaderClient::dispatchDidFinishLoad() {
   g_signal_emit_by_name(m_frame, "load-done", true);
+
+  notifyStatus(m_frame, WEBKIT_LOAD_FINISHED);
 }
 
 void FrameLoaderClient::frameLoadCompleted() {
@@ -681,7 +698,9 @@ void FrameLoaderClient::dispatchDidReceiveIcon() {
   g_signal_emit_by_name(webView, "icon-loaded", m_frame);
 }
 
-void FrameLoaderClient::dispatchDidStartProvisionalLoad() {}
+void FrameLoaderClient::dispatchDidStartProvisionalLoad() {
+  notifyStatus(m_frame, WEBKIT_LOAD_PROVISIONAL);
+}
 
 void FrameLoaderClient::dispatchDidReceiveTitle(const String& title) {
   WebKitWebFramePrivate* priv = m_frame->priv;

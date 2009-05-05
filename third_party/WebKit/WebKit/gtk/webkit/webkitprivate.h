@@ -119,6 +119,7 @@ struct _WebKitWebViewPrivate {
   GtkAdjustment* verticalAdjustment;
 
   gboolean zoomFullContent;
+  WebKitLoadStatus loadStatus;
   char* encoding;
   char* customEncoding;
 
@@ -136,6 +137,7 @@ struct _WebKitWebFramePrivate {
   gchar* name;
   gchar* title;
   gchar* uri;
+  WebKitLoadStatus loadStatus;
 };
 
 PassRefPtr<WebCore::Frame> webkit_web_frame_init_with_web_view(

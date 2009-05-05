@@ -26,6 +26,7 @@
 
 #include "config.h"
 
+#include "webkitenumtypes.h"
 #include "webkitwebframe.h"
 #include "webkitwebview.h"
 #include "webkitmarshal.h"
@@ -90,7 +91,8 @@ enum {
 
   PROP_NAME,
   PROP_TITLE,
-  PROP_URI
+  PROP_URI,
+  PROP_LOAD_STATUS
 };
 
 static guint webkit_web_frame_signals[LAST_SIGNAL] = {
@@ -114,6 +116,9 @@ static void webkit_web_frame_get_property(GObject* object,
       break;
     case PROP_URI:
       g_value_set_string(value, webkit_web_frame_get_uri(frame));
+      break;
+    case PROP_LOAD_STATUS:
+      g_value_set_enum(value, webkit_web_frame_get_load_status(frame));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -212,6 +217,20 @@ static void webkit_web_frame_class_init(WebKitWebFrameClass* frameClass) {
           "uri", _("URI"),
           _("The current URI of the contents displayed by the frame"), NULL,
           WEBKIT_PARAM_READABLE));
+
+  /**
+  * WebKitWebFrame:load-status:
+  *
+  * Determines the current status of the load.
+  *
+  * Since: 1.1.7
+  */
+  g_object_class_install_property(
+      objectClass, PROP_LOAD_STATUS,
+      g_param_spec_enum("load-status", "Load Status",
+                        "Determines the current status of the load",
+                        WEBKIT_TYPE_LOAD_STATUS, WEBKIT_LOAD_FINISHED,
+                        WEBKIT_PARAM_READABLE));
 
   g_type_class_add_private(frameClass, sizeof(WebKitWebFramePrivate));
 }
@@ -799,5 +818,20 @@ gchar* webkit_web_frame_get_response_mime_type(WebKitWebFrame* frame) {
   DocumentLoader* docLoader = coreFrame->loader()->documentLoader();
   String mimeType = docLoader->responseMIMEType();
   return g_strdup(mimeType.utf8().data());
+}
+
+/**
+ * webkit_web_frame_get_load_status:
+ * @frame: a #WebKitWebView
+ *
+ * Determines the current status of the load.
+ *
+ * Since: 1.1.7
+ */
+WebKitLoadStatus webkit_web_frame_get_load_status(WebKitWebFrame* frame) {
+  g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), WEBKIT_LOAD_FINISHED);
+
+  WebKitWebFramePrivate* priv = frame->priv;
+  return priv->loadStatus;
 }
 }
