@@ -32,7 +32,6 @@
 
 namespace WebCore {
 
-class CollectionCache;
 class Event;
 class FormData;
 class HTMLFormControlElement;
@@ -40,6 +39,8 @@ class HTMLImageElement;
 class HTMLInputElement;
 class HTMLFormCollection;
 class TextEncoding;
+
+struct CollectionCache;
 
 class HTMLFormElement : public HTMLElement {
  public:
