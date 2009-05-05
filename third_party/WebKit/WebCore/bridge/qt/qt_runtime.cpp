@@ -150,6 +150,9 @@ QVariant convertValueToQVariant(ExecState* exec,
                                 QMetaType::Type hint,
                                 int* distance,
                                 HashSet<JSObject*>* visitedObjects) {
+  if (!value)
+    return QVariant();
+
   JSObject* object = 0;
   if (value.isObject()) {
     object = value.toObject(exec);

@@ -500,6 +500,7 @@ class tst_QWebFrame : public QObject {
   void hitTestContent();
   void jsByteArray();
   void ownership();
+  void nullValue();
 
  private:
   QString evalJS(const QString& s) {
@@ -2457,6 +2458,11 @@ void tst_QWebFrame::ownership() {
     QVERIFY(child != 0);
     delete parent;
   }
+}
+
+void tst_QWebFrame::nullValue() {
+  QVariant v = m_view->page()->mainFrame()->evaluateJavaScript("null");
+  QVERIFY(v.isNull());
 }
 
 QTEST_MAIN(tst_QWebFrame)
