@@ -50,9 +50,9 @@ ErrorPrototype::ErrorPrototype(ExecState* exec,
                              DontEnum);
 
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
-                                         exec->propertyNames().toString,
-                                         errorProtoFuncToString),
+      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
+                                             0, exec->propertyNames().toString,
+                                             errorProtoFuncToString),
       DontEnum);
 }
 

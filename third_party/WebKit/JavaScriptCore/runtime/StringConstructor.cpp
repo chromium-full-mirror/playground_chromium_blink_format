@@ -63,9 +63,9 @@ StringConstructor::StringConstructor(ExecState* exec,
 
   // ECMA 15.5.3.2 fromCharCode()
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
-                                         exec->propertyNames().fromCharCode,
-                                         stringFromCharCode),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, prototypeFunctionStructure, 1,
+                exec->propertyNames().fromCharCode, stringFromCharCode),
       DontEnum);
 
   // no. of arguments for constructor

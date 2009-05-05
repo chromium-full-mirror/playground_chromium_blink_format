@@ -211,8 +211,8 @@ void JSGlobalObject::reset(JSValue prototype) {
                                                             // is created.
   d()->prototypeFunctionStructure =
       PrototypeFunction::createStructure(d()->functionPrototype);
-  PrototypeFunction* callFunction = 0;
-  PrototypeFunction* applyFunction = 0;
+  NativeFunctionWrapper* callFunction = 0;
+  NativeFunctionWrapper* applyFunction = 0;
   d()->functionPrototype->addFunctionProperties(
       exec, d()->prototypeFunctionStructure.get(), &callFunction,
       &applyFunction);
@@ -428,60 +428,60 @@ void JSGlobalObject::reset(JSValue prototype) {
       exec->propertyNames().eval, globalFuncEval, this);
   putDirectFunctionWithoutTransition(exec, d()->evalFunction, DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(
+      exec, new (exec) NativeFunctionWrapper(
                 exec, d()->prototypeFunctionStructure.get(), 2,
                 Identifier(exec, "parseInt"), globalFuncParseInt),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(
+      exec, new (exec) NativeFunctionWrapper(
                 exec, d()->prototypeFunctionStructure.get(), 1,
                 Identifier(exec, "parseFloat"), globalFuncParseFloat),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(
+      exec, new (exec) NativeFunctionWrapper(
                 exec, d()->prototypeFunctionStructure.get(), 1,
                 Identifier(exec, "isNaN"), globalFuncIsNaN),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(
+      exec, new (exec) NativeFunctionWrapper(
                 exec, d()->prototypeFunctionStructure.get(), 1,
                 Identifier(exec, "isFinite"), globalFuncIsFinite),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(
+      exec, new (exec) NativeFunctionWrapper(
                 exec, d()->prototypeFunctionStructure.get(), 1,
                 Identifier(exec, "escape"), globalFuncEscape),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(
+      exec, new (exec) NativeFunctionWrapper(
                 exec, d()->prototypeFunctionStructure.get(), 1,
                 Identifier(exec, "unescape"), globalFuncUnescape),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(
+      exec, new (exec) NativeFunctionWrapper(
                 exec, d()->prototypeFunctionStructure.get(), 1,
                 Identifier(exec, "decodeURI"), globalFuncDecodeURI),
       DontEnum);
   putDirectFunctionWithoutTransition(
       exec,
-      new (exec) PrototypeFunction(exec, d()->prototypeFunctionStructure.get(),
-                                   1, Identifier(exec, "decodeURIComponent"),
-                                   globalFuncDecodeURIComponent),
+      new (exec) NativeFunctionWrapper(
+          exec, d()->prototypeFunctionStructure.get(), 1,
+          Identifier(exec, "decodeURIComponent"), globalFuncDecodeURIComponent),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(
+      exec, new (exec) NativeFunctionWrapper(
                 exec, d()->prototypeFunctionStructure.get(), 1,
                 Identifier(exec, "encodeURI"), globalFuncEncodeURI),
       DontEnum);
   putDirectFunctionWithoutTransition(
       exec,
-      new (exec) PrototypeFunction(exec, d()->prototypeFunctionStructure.get(),
-                                   1, Identifier(exec, "encodeURIComponent"),
-                                   globalFuncEncodeURIComponent),
+      new (exec) NativeFunctionWrapper(
+          exec, d()->prototypeFunctionStructure.get(), 1,
+          Identifier(exec, "encodeURIComponent"), globalFuncEncodeURIComponent),
       DontEnum);
 #ifndef NDEBUG
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(
+      exec, new (exec) NativeFunctionWrapper(
                 exec, d()->prototypeFunctionStructure.get(), 1,
                 Identifier(exec, "jscprint"), globalFuncJSCPrint),
       DontEnum);

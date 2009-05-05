@@ -475,6 +475,10 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     return Call(m_assembler.call(target), Call::None);
   }
 
+  void call(Address address) {
+    m_assembler.call_m(address.offset, address.base);
+  }
+
   void ret() { m_assembler.ret(); }
 
   void set32(Condition cond,

@@ -817,10 +817,9 @@ JSValue Interpreter::execute(FunctionBodyNode* functionBodyNode,
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    if (!codeBlock->jitCode())
-      JIT::compile(scopeChain->globalData, codeBlock);
-    result = codeBlock->jitCode().execute(&m_registerFile, newCallFrame,
-                                          scopeChain->globalData, exception);
+    result = functionBodyNode->jitCode(scopeChain)
+                 .execute(&m_registerFile, newCallFrame, scopeChain->globalData,
+                          exception);
 #else
     result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif
@@ -876,8 +875,7 @@ CallFrameClosure Interpreter::prepareForRepeatCall(
   newCallFrame->init(codeBlock, 0, scopeChain,
                      callFrame->addHostCallFrameFlag(), 0, argc, function);
 #if ENABLE(JIT)
-  if (!codeBlock->jitCode())
-    JIT::compile(scopeChain->globalData, codeBlock);
+  functionBodyNode->jitCode(scopeChain);
 #endif
 
   CallFrameClosure result = {callFrame,
@@ -904,6 +902,7 @@ JSValue Interpreter::execute(CallFrameClosure& closure, JSValue* exception) {
 
     m_reentryDepth++;
 #if ENABLE(JIT)
+    ASSERT(closure.codeBlock->jitCode());
     result = closure.codeBlock->jitCode().execute(
         &m_registerFile, closure.newCallFrame, closure.globalData, exception);
 #else

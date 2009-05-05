@@ -179,8 +179,16 @@ ALWAYS_INLINE void JIT::emitPutImmediateToCallFrameHeader(
 
 ALWAYS_INLINE void JIT::emitGetFromCallFrameHeader(
     RegisterFile::CallFrameHeaderEntry entry,
+    RegisterID to,
+    RegisterID from) {
+  loadPtr(Address(from, entry * sizeof(Register)), to);
+  killLastResultRegister();
+}
+
+ALWAYS_INLINE void JIT::emitGetFromCallFrameHeader32(
+    RegisterFile::CallFrameHeaderEntry entry,
     RegisterID to) {
-  loadPtr(Address(callFrameRegister, entry * sizeof(Register)), to);
+  load32(Address(callFrameRegister, entry * sizeof(Register)), to);
   killLastResultRegister();
 }
 

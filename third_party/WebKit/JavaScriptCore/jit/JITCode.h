@@ -65,7 +65,7 @@ class JITCode {
  public:
   JITCode(void* code) : code(code) {}
 
-  operator bool() { return code != 0; }
+  operator bool() const { return code != 0; }
 
   void* addressForCall() { return code; }
 

@@ -44,10 +44,16 @@ class JSFunction : public InternalFunction {
 
   typedef InternalFunction Base;
 
-  JSFunction(PassRefPtr<Structure> structure)
-      : InternalFunction(structure), m_scopeChain(NoScopeChain()) {}
+  JSFunction(PassRefPtr<Structure> structure) : InternalFunction(structure) {
+    clearScopeChain();
+  }
 
  public:
+  JSFunction(ExecState*,
+             PassRefPtr<Structure>,
+             int length,
+             const Identifier&,
+             NativeFunction);
   JSFunction(ExecState*, const Identifier&, FunctionBodyNode*, ScopeChainNode*);
   ~JSFunction();
 
@@ -61,8 +67,8 @@ class JSFunction : public InternalFunction {
   JSObject* construct(ExecState*, const ArgList&);
   JSValue call(ExecState*, JSValue thisValue, const ArgList&);
 
-  void setScope(const ScopeChain& scopeChain) { m_scopeChain = scopeChain; }
-  ScopeChain& scope() { return m_scopeChain; }
+  void setScope(const ScopeChain& scopeChain) { setScopeChain(scopeChain); }
+  ScopeChain& scope() { return scopeChain(); }
 
   void setBody(FunctionBodyNode* body) { m_body = body; }
   void setBody(PassRefPtr<FunctionBodyNode> body) { m_body = body; }
@@ -77,6 +83,11 @@ class JSFunction : public InternalFunction {
                              TypeInfo(ObjectType, ImplementsHasInstance));
   }
 
+#if ENABLE(JIT)
+  bool isHostFunction() const { return m_body && m_body->isHostFunction(); }
+#else
+  bool isHostFunction() const { return false; }
+#endif
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
 
@@ -94,7 +105,29 @@ class JSFunction : public InternalFunction {
                               const PropertySlot&);
 
   RefPtr<FunctionBodyNode> m_body;
-  ScopeChain m_scopeChain;
+  ScopeChain& scopeChain() {
+    ASSERT(!isHostFunction());
+    return *reinterpret_cast<ScopeChain*>(m_data);
+  }
+  void clearScopeChain() {
+    ASSERT(!isHostFunction());
+    new (m_data) ScopeChain(NoScopeChain());
+  }
+  void setScopeChain(ScopeChainNode* sc) {
+    ASSERT(!isHostFunction());
+    new (m_data) ScopeChain(sc);
+  }
+  void setScopeChain(const ScopeChain& sc) {
+    ASSERT(!isHostFunction());
+    *reinterpret_cast<ScopeChain*>(m_data) = sc;
+  }
+  NativeFunction nativeFunction() {
+    return *reinterpret_cast<NativeFunction*>(m_data);
+  }
+  void setNativeFunction(NativeFunction func) {
+    *reinterpret_cast<NativeFunction*>(m_data) = func;
+  }
+  unsigned char m_data[sizeof(void*)];
 };
 
 JSFunction* asFunction(JSValue);

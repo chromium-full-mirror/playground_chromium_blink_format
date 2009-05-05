@@ -61,10 +61,13 @@ void JIT::linkCall(JSFunction* callee,
                    CallLinkInfo* callLinkInfo,
                    int callerArgCount) {
   // Currently we only link calls with the exact number of arguments.
-  if (callerArgCount == calleeCodeBlock->m_numParameters) {
+  // If this is a native call calleeCodeBlock is null so the number of
+  // parameters is unimportant
+  if (!calleeCodeBlock || callerArgCount == calleeCodeBlock->m_numParameters) {
     ASSERT(!callLinkInfo->isLinked());
 
-    calleeCodeBlock->addCaller(callLinkInfo);
+    if (calleeCodeBlock)
+      calleeCodeBlock->addCaller(callLinkInfo);
 
     callLinkInfo->hotPathBegin.repatch(callee);
     callLinkInfo->hotPathOther.relink(ctiCode.addressForCall());
@@ -81,7 +84,7 @@ void JIT::compileOpCallInitializeCallFrame() {
           Address(callFrameRegister, RegisterFile::ArgumentCount *
                                          static_cast<int>(sizeof(Register))));
 
-  loadPtr(Address(regT2, FIELD_OFFSET(JSFunction, m_scopeChain) +
+  loadPtr(Address(regT2, FIELD_OFFSET(JSFunction, m_data) +
                              FIELD_OFFSET(ScopeChain, m_node)),
           regT1);  // newScopeChain
 
@@ -277,7 +280,7 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   storePtr(regT2,
            Address(callFrameRegister, (registerOffset + RegisterFile::Callee) *
                                           static_cast<int>(sizeof(Register))));
-  loadPtr(Address(regT2, FIELD_OFFSET(JSFunction, m_scopeChain) +
+  loadPtr(Address(regT2, FIELD_OFFSET(JSFunction, m_data) +
                              FIELD_OFFSET(ScopeChain, m_node)),
           regT1);  // newScopeChain
   store32(Imm32(argCount),

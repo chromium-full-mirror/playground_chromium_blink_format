@@ -64,16 +64,18 @@ DateConstructor::DateConstructor(ExecState* exec,
 
   putDirectFunctionWithoutTransition(
       exec,
-      new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 1,
-                                   exec->propertyNames().parse, dateParse),
+      new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure, 1,
+                                       exec->propertyNames().parse, dateParse),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 7,
-                                         exec->propertyNames().UTC, dateUTC),
+      exec,
+      new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure, 7,
+                                       exec->propertyNames().UTC, dateUTC),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
-                                         exec->propertyNames().now, dateNow),
+      exec,
+      new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure, 0,
+                                       exec->propertyNames().now, dateNow),
       DontEnum);
 
   putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 7),

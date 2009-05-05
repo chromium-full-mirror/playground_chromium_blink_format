@@ -50,14 +50,14 @@ BooleanPrototype::BooleanPrototype(ExecState* exec,
   setInternalValue(jsBoolean(false));
 
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
-                                         exec->propertyNames().toString,
-                                         booleanProtoFuncToString),
+      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
+                                             0, exec->propertyNames().toString,
+                                             booleanProtoFuncToString),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) PrototypeFunction(exec, prototypeFunctionStructure, 0,
-                                         exec->propertyNames().valueOf,
-                                         booleanProtoFuncValueOf),
+      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
+                                             0, exec->propertyNames().valueOf,
+                                             booleanProtoFuncValueOf),
       DontEnum);
 }
 

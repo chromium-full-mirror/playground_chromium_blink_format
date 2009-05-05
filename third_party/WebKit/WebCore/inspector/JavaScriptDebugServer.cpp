@@ -559,8 +559,11 @@ void JavaScriptDebugServer::recompileAllJSFunctions(
   Heap::iterator heapEnd = globalData->heap.primaryHeapEnd();
   for (Heap::iterator it = globalData->heap.primaryHeapBegin(); it != heapEnd;
        ++it) {
-    if ((*it)->isObject(&JSFunction::info))
-      functions.append(static_cast<JSFunction*>(*it));
+    if ((*it)->isObject(&JSFunction::info)) {
+      JSFunction* function = static_cast<JSFunction*>(*it);
+      if (!function->isHostFunction())
+        functions.append(function);
+    }
   }
 
   typedef HashMap<RefPtr<FunctionBodyNode>, RefPtr<FunctionBodyNode>>

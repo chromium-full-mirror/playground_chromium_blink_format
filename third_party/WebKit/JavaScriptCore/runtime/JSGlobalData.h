@@ -46,6 +46,7 @@ namespace JSC {
 
 class ArgList;
 class CommonIdentifiers;
+class FunctionBodyNode;
 class Heap;
 class IdentifierTable;
 class Instruction;
@@ -123,6 +124,12 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   Interpreter* interpreter;
 #if ENABLE(JIT)
   JITStubs jitStubs;
+  FunctionBodyNode* nativeFunctionThunk() {
+    if (!lazyNativeFunctionThunk)
+      createNativeThunk();
+    return lazyNativeFunctionThunk.get();
+  }
+  RefPtr<FunctionBodyNode> lazyNativeFunctionThunk;
 #endif
   TimeoutChecker timeoutChecker;
   Heap heap;
@@ -151,6 +158,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
  private:
   JSGlobalData(bool isShared, const VPtrSet&);
   static JSGlobalData*& sharedInstanceInternal();
+  void createNativeThunk();
 };
 }  // namespace JSC
 

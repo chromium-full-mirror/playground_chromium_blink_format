@@ -226,6 +226,7 @@ class JITStubs {
   void* ctiVirtualCallPreLink() { return m_ctiVirtualCallPreLink; }
   void* ctiVirtualCallLink() { return m_ctiVirtualCallLink; }
   void* ctiVirtualCall() { return m_ctiVirtualCall; }
+  void* ctiNativeCallThunk() { return m_ctiNativeCallThunk; }
 
  private:
   RefPtr<ExecutablePool> m_executablePool;
@@ -235,6 +236,7 @@ class JITStubs {
   void* m_ctiVirtualCallPreLink;
   void* m_ctiVirtualCallLink;
   void* m_ctiVirtualCall;
+  void* m_ctiNativeCallThunk;
 };
 
 }  // namespace JSC

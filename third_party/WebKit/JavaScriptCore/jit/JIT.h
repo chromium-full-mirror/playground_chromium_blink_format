@@ -427,13 +427,15 @@ class JIT : private MacroAssembler {
       void** ctiStringLengthTrampoline,
       void** ctiVirtualCallPreLink,
       void** ctiVirtualCallLink,
-      void** ctiVirtualCall)
+      void** ctiVirtualCall,
+      void** ctiNativeCallThunk)
 
   {
     JIT jit(globalData);
     jit.privateCompileCTIMachineTrampolines(
-        executablePool, ctiArrayLengthTrampoline, ctiStringLengthTrampoline,
-        ctiVirtualCallPreLink, ctiVirtualCallLink, ctiVirtualCall);
+        executablePool, globalData, ctiArrayLengthTrampoline,
+        ctiStringLengthTrampoline, ctiVirtualCallPreLink, ctiVirtualCallLink,
+        ctiVirtualCall, ctiNativeCallThunk);
   }
 
   static void patchGetByIdSelf(StructureStubInfo*,
@@ -518,11 +520,13 @@ class JIT : private MacroAssembler {
 
   void privateCompileCTIMachineTrampolines(
       RefPtr<ExecutablePool>* executablePool,
+      JSGlobalData* data,
       void** ctiArrayLengthTrampoline,
       void** ctiStringLengthTrampoline,
       void** ctiVirtualCallPreLink,
       void** ctiVirtualCallLink,
-      void** ctiVirtualCall);
+      void** ctiVirtualCall,
+      void** ctiNativeCallThunk);
   void privateCompilePatchGetArrayLength(ProcessorReturnAddress returnAddress);
 
   void addSlowCase(Jump);
@@ -649,7 +653,10 @@ class JIT : private MacroAssembler {
       void* value,
       RegisterFile::CallFrameHeaderEntry entry);
   void emitGetFromCallFrameHeader(RegisterFile::CallFrameHeaderEntry entry,
-                                  RegisterID to);
+                                  RegisterID to,
+                                  RegisterID from = callFrameRegister);
+  void emitGetFromCallFrameHeader32(RegisterFile::CallFrameHeaderEntry entry,
+                                    RegisterID to);
 
   JSValue getConstantOperand(unsigned src);
   int32_t getConstantOperandImmediateInt(unsigned src);

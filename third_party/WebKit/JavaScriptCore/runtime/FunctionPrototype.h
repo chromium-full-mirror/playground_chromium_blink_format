@@ -23,6 +23,7 @@
 #define FunctionPrototype_h
 
 #include "InternalFunction.h"
+#include "NativeFunctionWrapper.h"
 
 namespace JSC {
 
@@ -33,8 +34,8 @@ class FunctionPrototype : public InternalFunction {
   FunctionPrototype(ExecState*, PassRefPtr<Structure>);
   void addFunctionProperties(ExecState*,
                              Structure* prototypeFunctionStructure,
-                             PrototypeFunction** callFunction,
-                             PrototypeFunction** applyFunction);
+                             NativeFunctionWrapper** callFunction,
+                             NativeFunctionWrapper** applyFunction);
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
