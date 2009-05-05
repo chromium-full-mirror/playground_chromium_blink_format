@@ -57,6 +57,7 @@
 #include "Page.h"
 #include "RenderFieldset.h"
 #include "RenderFileUploadControl.h"
+#include "RenderHTMLCanvas.h"
 #include "RenderImage.h"
 #include "RenderInline.h"
 #include "RenderListBox.h"
@@ -1210,6 +1211,13 @@ bool AccessibilityRenderObject::accessibilityIsIgnored() const {
         return true;
     }
 
+    if (node && node->hasTagName(canvasTag)) {
+      RenderHTMLCanvas* canvas = static_cast<RenderHTMLCanvas*>(m_renderer);
+      if (canvas->height() <= 1 || canvas->width() <= 1)
+        return true;
+      return false;
+    }
+
     // check for one-dimensional image
     RenderImage* image = toRenderImage(m_renderer);
     if (image->height() <= 1 || image->width() <= 1)
@@ -2175,6 +2183,9 @@ AccessibilityRole AccessibilityRenderObject::roleValue() const {
       return ButtonRole;
     return ImageRole;
   }
+  if (node && node->hasTagName(canvasTag))
+    return ImageRole;
+
   if (m_renderer->isRenderView())
     return WebAreaRole;
 
