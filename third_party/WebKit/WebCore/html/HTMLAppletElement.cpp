@@ -111,8 +111,6 @@ RenderObject* HTMLAppletElement::createRenderer(RenderArena*,
     const AtomicString& codeBase = getAttribute(codebaseAttr);
     if (!codeBase.isNull())
       args.set("codeBase", codeBase);
-    else
-      args.set("codeBase", document()->baseURL().baseAsString());
 
     const AtomicString& name =
         getAttribute(document()->isHTMLDocument() ? nameAttr : idAttr);
