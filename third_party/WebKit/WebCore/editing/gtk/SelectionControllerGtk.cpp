@@ -34,9 +34,13 @@ void SelectionController::notifyAccessibilityForSelectionChange() {
     AccessibilityObject* accessibilityObject =
         m_frame->document()->axObjectCache()->getOrCreate(focusedNode);
     AtkObject* wrapper = accessibilityObject->wrapper();
-    if (ATK_IS_TEXT(wrapper))
+    if (ATK_IS_TEXT(wrapper)) {
       g_signal_emit_by_name(wrapper, "text-caret-moved",
                             m_sel.start().offsetInContainerNode());
+
+      if (m_sel.isRange())
+        g_signal_emit_by_name(wrapper, "text-selection-changed");
+    }
   }
 }
 
