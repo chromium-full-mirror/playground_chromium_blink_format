@@ -53,6 +53,9 @@ class WXDLLIMPEXP_WEBKIT wxWebBrowserShell : public wxFrame {
 
  protected:
   // event handlers (these functions should _not_ be virtual)
+  void OnCut(wxCommandEvent& event);
+  void OnCopy(wxCommandEvent& event);
+  void OnPaste(wxCommandEvent& event);
   void OnQuit(wxCommandEvent& event);
   void OnAbout(wxCommandEvent& event);
   void OnLoadFile(wxCommandEvent& event);
