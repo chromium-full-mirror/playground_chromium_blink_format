@@ -1158,9 +1158,6 @@ bool AccessibilityRenderObject::accessibilityIsIgnored() const {
     }
   }
 
-  if (m_renderer->isAnonymousBlock())
-    return true;
-
   AccessibilityRole ariaRole = ariaRoleAttribute();
   if (ariaRole == TextAreaRole || ariaRole == StaticTextRole) {
     String ariaText = text();
