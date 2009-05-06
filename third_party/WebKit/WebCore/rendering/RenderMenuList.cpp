@@ -167,7 +167,8 @@ void RenderMenuList::updateOptionsWidth() {
     return;
 
   m_optionsWidth = width;
-  setNeedsLayoutAndPrefWidthsRecalc();
+  if (parent())
+    setNeedsLayoutAndPrefWidthsRecalc();
 }
 
 void RenderMenuList::updateFromElement() {
