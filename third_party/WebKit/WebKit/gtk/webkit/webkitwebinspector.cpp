@@ -62,8 +62,6 @@
 
 using namespace WebKit;
 
-extern "C" {
-
 enum {
   INSPECT_WEB_VIEW,
   SHOW_WINDOW,
@@ -422,5 +420,4 @@ void webkit_web_inspector_set_inspector_client(
   WebKitWebInspectorPrivate* priv = web_inspector->priv;
 
   priv->page = page;
-}
 }
