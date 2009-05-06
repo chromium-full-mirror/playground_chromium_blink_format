@@ -322,7 +322,7 @@ void WebPreferences::initializeDefaultSettings() {
       kCFBooleanFalse);
 
   CFDictionaryAddValue(defaults, CFSTR(WebKitPaintNativeControlsPreferenceKey),
-                       kCFBooleanFalse);
+                       kCFBooleanTrue);
 
   defaultSettings = defaults;
 }
