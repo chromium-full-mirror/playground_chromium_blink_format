@@ -48,8 +48,10 @@ class V8LazyEventListener : public V8AbstractEventListener {
  public:
   static PassRefPtr<V8LazyEventListener> create(Frame* frame,
                                                 const String& code,
-                                                const String& functionName) {
-    return adoptRef(new V8LazyEventListener(frame, code, functionName));
+                                                const String& functionName,
+                                                bool isSVGEvent) {
+    return adoptRef(
+        new V8LazyEventListener(frame, code, functionName, isSVGEvent));
   }
 
   // For lazy event listener, the listener object is the same as its listener
@@ -59,13 +61,17 @@ class V8LazyEventListener : public V8AbstractEventListener {
   }
 
  private:
-  V8LazyEventListener(Frame*, const String& code, const String& functionName);
+  V8LazyEventListener(Frame*,
+                      const String& code,
+                      const String& functionName,
+                      bool isSVGEvent);
   virtual ~V8LazyEventListener();
 
   virtual bool virtualisAttribute() const { return true; }
 
   String m_code;
   String m_functionName;
+  bool m_isSVGEvent;
   bool m_compiled;
 
   // If the event listener is on a non-document dom node, we compile the
