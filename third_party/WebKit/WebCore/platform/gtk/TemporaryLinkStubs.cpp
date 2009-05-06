@@ -54,10 +54,6 @@ Vector<char> loadResourceIntoArray(const char* resourceName) {
 /* Completely empty stubs (mostly to allow DRT to run): */
 /********************************************************/
 
-void PluginView::invalidateRegion(NPRegion) {
-  notImplemented();
-}
-
 namespace WebCore {
 void getSupportedKeySizes(Vector<String>&) {
   notImplemented();

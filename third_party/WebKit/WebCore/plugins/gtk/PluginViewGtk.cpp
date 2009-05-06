@@ -486,6 +486,11 @@ void PluginView::invalidateRect(NPRect* rect) {
   invalidateRect(r);
 }
 
+void PluginView::invalidateRegion(NPRegion) {
+  // TODO: optimize
+  invalidate();
+}
+
 void PluginView::forceRedraw() {
   if (m_isWindowed)
     gtk_widget_queue_draw(platformPluginWidget());
