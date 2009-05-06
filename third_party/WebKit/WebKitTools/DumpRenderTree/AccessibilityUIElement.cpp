@@ -242,7 +242,8 @@ static JSValueRef elementAtPointCallback(JSContextRef context,
                                          size_t argumentCount,
                                          const JSValueRef arguments[],
                                          JSValueRef* exception) {
-  int x, y;
+  int x = 0;
+  int y = 0;
   if (argumentCount == 2) {
     x = JSValueToNumber(context, arguments[0], exception);
     y = JSValueToNumber(context, arguments[1], exception);
