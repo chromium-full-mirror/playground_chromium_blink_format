@@ -35,6 +35,7 @@
 #include "JSGlobalObject.h"
 #include "JSStaticScopeObject.h"
 #include "LabelScope.h"
+#include "Lexer.h"
 #include "Operations.h"
 #include "Parser.h"
 #include "PropertyNameArray.h"
@@ -138,6 +139,12 @@ ALWAYS_INLINE ParserRefCounted::~ParserRefCounted() {
 #endif
 
 void ParserRefCounted::releaseNodes(NodeReleaser&) {}
+
+// ------------------------------ Node
+// -------------------------------------------------
+
+Node::Node(JSGlobalData* globalData)
+    : ParserRefCounted(globalData), m_line(globalData->lexer->lineNumber()) {}
 
 // ------------------------------ ThrowableExpressionData
 // --------------------------------

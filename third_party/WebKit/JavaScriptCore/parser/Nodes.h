@@ -29,7 +29,6 @@
 
 #include "Error.h"
 #include "JITCode.h"
-#include "Lexer.h"
 #include "Opcode.h"
 #include "ResultType.h"
 #include "SourceCode.h"
@@ -128,9 +127,7 @@ inline ParserRefCounted::~ParserRefCounted() {}
 
 class Node : public ParserRefCounted {
  public:
-  Node(JSGlobalData* globalData) JSC_FAST_CALL
-      : ParserRefCounted(globalData),
-        m_line(globalData->lexer->lineNumber()) {}
+  Node(JSGlobalData* globalData) JSC_FAST_CALL;
 
   /*
       Return value: The register holding the production's value.
