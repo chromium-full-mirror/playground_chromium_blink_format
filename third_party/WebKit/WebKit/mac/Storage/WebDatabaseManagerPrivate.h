@@ -26,6 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if ENABLE(DATABASE)
+
 extern NSString* WebDatabaseDirectoryDefaultsKey;
 
 extern NSString* WebDatabaseDisplayNameKey;
@@ -71,3 +73,5 @@ extern NSString* WebDatabaseIdentifierKey;
             withOrigin:(WebSecurityOrigin*)origin;
 
 @end
+
+#endif

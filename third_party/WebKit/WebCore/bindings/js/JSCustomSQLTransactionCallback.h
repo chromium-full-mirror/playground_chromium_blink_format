@@ -29,6 +29,8 @@
 #ifndef JSCustomSQLTransactionCallback_h
 #define JSCustomSQLTransactionCallback_h
 
+#if ENABLE(DATABASE)
+
 #include "SQLTransactionCallback.h"
 
 #include <wtf/PassRefPtr.h>
@@ -62,5 +64,7 @@ class JSCustomSQLTransactionCallback : public SQLTransactionCallback {
   Data* m_data;
 };
 }
+
+#endif  // ENABLE(DATABASE)
 
 #endif  // JSCustomSQLTransactionCallback_h

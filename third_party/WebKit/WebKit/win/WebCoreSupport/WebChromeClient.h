@@ -122,7 +122,9 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void print(WebCore::Frame*);
 
+#if ENABLE(DATABASE)
   virtual void exceededDatabaseQuota(WebCore::Frame*, const WebCore::String&);
+#endif
 
   virtual void populateVisitedLinks();
 

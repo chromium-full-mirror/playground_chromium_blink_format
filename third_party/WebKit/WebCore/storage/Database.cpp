@@ -29,6 +29,7 @@
 #include "config.h"
 #include "Database.h"
 
+#if ENABLE(DATABASE)
 #include "ChangeVersionWrapper.h"
 #include "CString.h"
 #include "DatabaseAuthorizer.h"
@@ -49,6 +50,7 @@
 #include "SQLResultSet.h"
 #include <wtf/MainThread.h>
 #include <wtf/StdLibExtras.h>
+#endif
 
 #if USE(JSC)
 #include "JSDOMWindow.h"
@@ -56,6 +58,13 @@
 #endif
 
 namespace WebCore {
+
+const String& Database::databaseInfoTableName() {
+  DEFINE_STATIC_LOCAL(String, name, ("__WebKitDatabaseInfoTable__"));
+  return name;
+}
+
+#if ENABLE(DATABASE)
 
 static Mutex& guidMutex() {
   // Note: We don't have to use AtomicallyInitializedStatic here because
@@ -75,11 +84,6 @@ typedef HashMap<int, HashSet<Database*>*> GuidDatabaseMap;
 static GuidDatabaseMap& guidToDatabaseMap() {
   DEFINE_STATIC_LOCAL(GuidDatabaseMap, map, ());
   return map;
-}
-
-const String& Database::databaseInfoTableName() {
-  DEFINE_STATIC_LOCAL(String, name, ("__WebKitDatabaseInfoTable__"));
-  return name;
 }
 
 static const String& databaseVersionKey() {
@@ -661,4 +665,6 @@ String Database::stringIdentifier() const {
   // Return a deep copy for ref counting thread safety
   return m_name.copy();
 }
+
+#endif
 }

@@ -29,6 +29,8 @@
 #ifndef DatabaseTracker_h
 #define DatabaseTracker_h
 
+#if ENABLE(DATABASE)
+
 #include "DatabaseDetails.h"
 #include "PlatformString.h"
 #include "SQLiteDatabase.h"
@@ -142,4 +144,5 @@ class DatabaseTracker {
 
 }  // namespace WebCore
 
+#endif  // ENABLE(DATABASE)
 #endif  // DatabaseTracker_h

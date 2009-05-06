@@ -29,6 +29,8 @@
 #include "config.h"
 #include "JSSQLTransaction.h"
 
+#if ENABLE(DATABASE)
+
 #include "DOMWindow.h"
 #include "ExceptionCode.h"
 #include "JSCustomSQLStatementCallback.h"
@@ -113,3 +115,5 @@ JSValue JSSQLTransaction::executeSql(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 }
+
+#endif  // ENABLE(DATABASE)

@@ -2274,7 +2274,9 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
   m_preferences = sharedPreferences;
 
   InitializeLoggingChannelsIfNecessary();
+#if ENABLE(DATABASE)
   WebKitSetWebDatabasesPathIfNecessary();
+#endif
   WebKitSetApplicationCachePathIfNecessary();
 
   m_page = new Page(new WebChromeClient(this), new WebContextMenuClient(this),

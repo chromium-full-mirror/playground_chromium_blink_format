@@ -29,6 +29,8 @@
 #ifndef JSCustomSQLStatementCallback_h
 #define JSCustomSQLStatementCallback_h
 
+#if ENABLE(DATABASE)
+
 #include "SQLStatementCallback.h"
 
 #include <runtime/JSObject.h>
@@ -63,5 +65,7 @@ class JSCustomSQLStatementCallback : public SQLStatementCallback {
   RefPtr<Frame> m_frame;
 };
 }
+
+#endif  // ENABLE(DATABASE)
 
 #endif  // JSCustomSQLStatementCallback_h

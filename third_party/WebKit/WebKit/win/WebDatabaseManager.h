@@ -29,6 +29,8 @@
 #ifndef WebDatabaseManager_h
 #define WebDatabaseManager_h
 
+#if ENABLE(DATABASE)
+
 #include <WebCore/DatabaseTrackerClient.h>
 
 #include "WebKit.h"
@@ -85,5 +87,7 @@ class WebDatabaseManager : public IWebDatabaseManager,
 };
 
 void WebKitSetWebDatabasesPathIfNecessary();
+
+#endif
 
 #endif

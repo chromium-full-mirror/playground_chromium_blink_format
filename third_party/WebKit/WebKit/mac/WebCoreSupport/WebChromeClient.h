@@ -122,10 +122,10 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void setToolTip(const WebCore::String&);
 
   virtual void print(WebCore::Frame*);
-
+#if ENABLE(DATABASE)
   virtual void exceededDatabaseQuota(WebCore::Frame*,
                                      const WebCore::String& databaseName);
-
+#endif
   virtual void populateVisitedLinks();
 
 #if ENABLE(DASHBOARD_SUPPORT)

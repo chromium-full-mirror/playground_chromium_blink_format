@@ -29,6 +29,8 @@
 #ifndef JSCustomSQLStatementErrorCallback_h
 #define JSCustomSQLStatementErrorCallback_h
 
+#if ENABLE(DATABASE)
+
 #include "SQLStatementErrorCallback.h"
 
 #include <runtime/JSObject.h>
@@ -61,5 +63,7 @@ class JSCustomSQLStatementErrorCallback : public SQLStatementErrorCallback {
   RefPtr<Frame> m_frame;
 };
 }
+
+#endif  // ENABLE(DATABASE)
 
 #endif  // JSCustomSQLStatementErrorCallback_h

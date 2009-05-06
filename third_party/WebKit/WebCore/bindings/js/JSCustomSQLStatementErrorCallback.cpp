@@ -29,6 +29,8 @@
 #include "config.h"
 #include "JSCustomSQLStatementErrorCallback.h"
 
+#if ENABLE(DATABASE)
+
 #include "Frame.h"
 #include "ScriptController.h"
 #include "JSSQLError.h"
@@ -107,3 +109,5 @@ bool JSCustomSQLStatementErrorCallback::handleEvent(SQLTransaction* transaction,
   return result.toBoolean(exec);
 }
 }
+
+#endif  // ENABLE(DATABASE)

@@ -106,14 +106,22 @@ int QWebSecurityOrigin::port() const {
     use on the disk.
 */
 qint64 QWebSecurityOrigin::databaseUsage() const {
+#if ENABLE(DATABASE)
   return DatabaseTracker::tracker().usageForOrigin(d->origin.get());
+#else
+  return 0;
+#endif
 }
 
 /*!
     Returns the quota for the databases in the security origin.
 */
 qint64 QWebSecurityOrigin::databaseQuota() const {
+#if ENABLE(DATABASE)
   return DatabaseTracker::tracker().quotaForOrigin(d->origin.get());
+#else
+  return 0;
+#endif
 }
 
 /*!
@@ -126,7 +134,9 @@ qint64 QWebSecurityOrigin::databaseQuota() const {
     to databases in this origin.
 */
 void QWebSecurityOrigin::setDatabaseQuota(qint64 quota) {
+#if ENABLE(DATABASE)
   DatabaseTracker::tracker().setQuota(d->origin.get(), quota);
+#endif
 }
 
 /*!

@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include "JSCustomSQLStatementCallback.h"
+#if ENABLE(DATABASE)
 
 #include "Frame.h"
 #include "ScriptController.h"
@@ -88,3 +89,5 @@ void JSCustomSQLStatementCallback::handleEvent(SQLTransaction* transaction,
   Document::updateStyleForAllDocuments();
 }
 }
+
+#endif  // ENABLE(DATABASE)

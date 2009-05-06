@@ -29,6 +29,8 @@
 #include "config.h"
 #include "DatabaseTracker.h"
 
+#if ENABLE(DATABASE)
+
 #include "ChromeClient.h"
 #include "Database.h"
 #include "DatabaseTrackerClient.h"
@@ -896,3 +898,4 @@ void DatabaseTracker::notifyDatabasesChanged(void*) {
 }
 
 }  // namespace WebCore
+#endif

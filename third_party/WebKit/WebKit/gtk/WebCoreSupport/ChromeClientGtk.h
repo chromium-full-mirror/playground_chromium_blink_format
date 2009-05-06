@@ -112,9 +112,9 @@ class ChromeClient : public WebCore::ChromeClient {
   virtual void setToolTip(const WebCore::String&);
 
   virtual void print(WebCore::Frame*);
-
+#if ENABLE(DATABASE)
   virtual void exceededDatabaseQuota(WebCore::Frame*, const WebCore::String&);
-
+#endif
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
 
   virtual void formStateDidChange(const WebCore::Node*) {}

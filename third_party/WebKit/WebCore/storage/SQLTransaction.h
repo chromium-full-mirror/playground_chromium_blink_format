@@ -28,6 +28,8 @@
 #ifndef SQLTransaction_h
 #define SQLTransaction_h
 
+#if ENABLE(DATABASE)
+
 #include <wtf/Threading.h>
 
 #include "SQLiteTransaction.h"
@@ -139,5 +141,7 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // SQLTransaction_h

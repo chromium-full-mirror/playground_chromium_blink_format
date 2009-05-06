@@ -28,6 +28,8 @@
 #include "config.h"
 #include "OriginQuotaManager.h"
 
+#if ENABLE(DATABASE)
+
 #include "Database.h"
 #include "OriginUsageRecord.h"
 
@@ -113,3 +115,5 @@ unsigned long long OriginQuotaManager::diskUsage(SecurityOrigin* origin) const {
   return usageRecord->diskUsage();
 }
 }
+
+#endif  // ENABLE(DATABASE)

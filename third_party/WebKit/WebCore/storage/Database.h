@@ -29,6 +29,7 @@
 #ifndef Database_h
 #define Database_h
 
+#if ENABLE(DATABASE)
 #include <wtf/MessageQueue.h>
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
@@ -44,7 +45,11 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Deque.h>
+#else
+#include "PlatformString.h"
+#endif
 
+#if ENABLE(DATABASE)
 namespace WebCore {
 
 class DatabaseAuthorizer;
@@ -159,5 +164,16 @@ class Database : public ThreadSafeShared<Database> {
 };
 
 }  // namespace WebCore
+
+#else
+
+namespace WebCore {
+class Database : public ThreadSafeShared<Database> {
+ public:
+  static const String& databaseInfoTableName();
+};
+}  // namespace WebCore
+
+#endif  // ENABLE(DATABASE)
 
 #endif  // Database_h

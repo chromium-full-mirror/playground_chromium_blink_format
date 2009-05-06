@@ -31,10 +31,16 @@
 
 #include "ProgIDMacros.h"
 
+#if ENABLE(DATABASE)
+#define WEB_DATABASE_MANAGER(macro) macro(WebDatabaseManager)
+#else
+#define WEB_DATABASE_MANAGER(macro)
+#endif
+
 // Items may only be added to the end of this macro. No items may be removed
 // from it.
 #define FOR_EACH_COCLASS(macro)                                                \
-  macro(CFDictionaryPropertyBag) macro(WebCache) macro(WebDatabaseManager)     \
+  macro(CFDictionaryPropertyBag) macro(WebCache) WEB_DATABASE_MANAGER(macro)   \
       macro(WebDownload) macro(WebError) macro(WebHistory) macro(              \
           WebHistoryItem) macro(WebIconDatabase) macro(WebJavaScriptCollector) \
           macro(WebKitStatistics) macro(WebMutableURLRequest)                  \

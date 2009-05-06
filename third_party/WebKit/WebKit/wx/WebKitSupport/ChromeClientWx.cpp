@@ -337,9 +337,11 @@ void ChromeClientWx::print(Frame*) {
   notImplemented();
 }
 
+#if ENABLE(DATABASE)
 void ChromeClientWx::exceededDatabaseQuota(Frame*, const String&) {
   notImplemented();
 }
+#endif
 
 void ChromeClientWx::scroll(const IntSize&, const IntRect&, const IntRect&) {
   notImplemented();

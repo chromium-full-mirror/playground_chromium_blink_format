@@ -505,6 +505,7 @@ void WebChromeClient::print(Frame* frame) {
       uiDelegate2->printFrame(m_webView, kit(frame));
 }
 
+#if ENABLE(DATABASE)
 void WebChromeClient::exceededDatabaseQuota(Frame* frame,
                                             const String& databaseIdentifier) {
   COMPtr<WebSecurityOrigin> origin(
@@ -547,6 +548,7 @@ void WebChromeClient::exceededDatabaseQuota(Frame* frame,
     }
   }
 }
+#endif
 
 void WebChromeClient::populateVisitedLinks() {
   WebHistory* history = WebHistory::sharedHistory();

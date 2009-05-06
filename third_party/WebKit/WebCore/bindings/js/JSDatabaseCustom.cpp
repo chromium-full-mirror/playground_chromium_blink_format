@@ -29,6 +29,8 @@
 #include "config.h"
 #include "JSDatabase.h"
 
+#if ENABLE(DATABASE)
+
 #include "DOMWindow.h"
 #include "Database.h"
 #include "Document.h"
@@ -127,3 +129,4 @@ JSValue JSDatabase::transaction(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 }
+#endif  // ENABLE(DATABASE)
