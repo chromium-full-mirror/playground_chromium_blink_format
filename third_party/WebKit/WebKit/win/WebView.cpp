@@ -751,6 +751,10 @@ void WebView::addToDirtyRegion(HRGN newRegion) {
     m_backingStoreDirtyRegion.set(combinedRegion);
   } else
     m_backingStoreDirtyRegion.set(newRegion);
+
+  COMPtr<IWebUIDelegatePrivate5> delegate(Query, m_uiDelegatePrivate);
+  if (delegate)
+    delegate->webViewDidInvalidate(this);
 }
 
 void WebView::scrollBackingStore(FrameView* frameView,
