@@ -26,6 +26,7 @@
 
 #include "config.h"
 #include "Nodes.h"
+#include "NodeConstructors.h"
 
 #include "BytecodeGenerator.h"
 #include "CallFrame.h"
@@ -140,12 +141,6 @@ ALWAYS_INLINE ParserRefCounted::~ParserRefCounted() {
 
 void ParserRefCounted::releaseNodes(NodeReleaser&) {}
 
-// ------------------------------ Node
-// -------------------------------------------------
-
-Node::Node(JSGlobalData* globalData)
-    : ParserRefCounted(globalData), m_line(globalData->lexer->lineNumber()) {}
-
 // ------------------------------ ThrowableExpressionData
 // --------------------------------
 
@@ -184,9 +179,6 @@ RegisterID* ThrowableExpressionData::emitThrowError(
 }
 
 // ------------------------------ StatementNode --------------------------------
-
-StatementNode::StatementNode(JSGlobalData* globalData)
-    : Node(globalData), m_lastLine(-1) {}
 
 void StatementNode::setLoc(int firstLine, int lastLine) {
   m_line = firstLine;
@@ -1729,11 +1721,6 @@ void ConstDeclNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_init);
 }
 
-ConstDeclNode::ConstDeclNode(JSGlobalData* globalData,
-                             const Identifier& ident,
-                             ExpressionNode* init)
-    : ExpressionNode(globalData), m_ident(ident), m_init(init) {}
-
 RegisterID* ConstDeclNode::emitCodeSingle(BytecodeGenerator& generator) {
   if (RegisterID* local = generator.constRegisterFor(m_ident)) {
     if (!m_init)
@@ -1803,12 +1790,6 @@ void BlockNode::releaseNodes(NodeReleaser& releaser) {
   size_t size = m_children.size();
   for (size_t i = 0; i < size; ++i)
     releaser.release(m_children[i]);
-}
-
-BlockNode::BlockNode(JSGlobalData* globalData, SourceElements* children)
-    : StatementNode(globalData) {
-  if (children)
-    children->releaseContentsIntoVector(m_children);
 }
 
 RegisterID* BlockNode::emitBytecode(BytecodeGenerator& generator,
@@ -2050,40 +2031,6 @@ void ForInNode::releaseNodes(NodeReleaser& releaser) {
   releaser.release(m_lexpr);
   releaser.release(m_expr);
   releaser.release(m_statement);
-}
-
-ForInNode::ForInNode(JSGlobalData* globalData,
-                     ExpressionNode* l,
-                     ExpressionNode* expr,
-                     StatementNode* statement)
-    : StatementNode(globalData),
-      m_init(0L),
-      m_lexpr(l),
-      m_expr(expr),
-      m_statement(statement),
-      m_identIsVarDecl(false) {}
-
-ForInNode::ForInNode(JSGlobalData* globalData,
-                     const Identifier& ident,
-                     ExpressionNode* in,
-                     ExpressionNode* expr,
-                     StatementNode* statement,
-                     int divot,
-                     int startOffset,
-                     int endOffset)
-    : StatementNode(globalData),
-      m_ident(ident),
-      m_lexpr(new ResolveNode(globalData, ident, divot - startOffset)),
-      m_expr(expr),
-      m_statement(statement),
-      m_identIsVarDecl(true) {
-  if (in) {
-    AssignResolveNode* node =
-        new AssignResolveNode(globalData, ident, in, true);
-    node->setExceptionSourceCode(divot, divot - startOffset, endOffset - divot);
-    m_init = node;
-  }
-  // for( var foo = bar in baz )
 }
 
 RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator,
@@ -2829,8 +2776,7 @@ FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData)
 #endif
       ,
       m_parameters(0),
-      m_parameterCount(0),
-      m_refCount(0) {
+      m_parameterCount(0) {
 }
 
 FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
@@ -2853,8 +2799,7 @@ FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
 #endif
       ,
       m_parameters(0),
-      m_parameterCount(0),
-      m_refCount(0) {
+      m_parameterCount(0) {
 }
 
 FunctionBodyNode::~FunctionBodyNode() {
