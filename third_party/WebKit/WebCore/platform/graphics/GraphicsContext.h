@@ -395,6 +395,7 @@ class GraphicsContext : Noncopyable {
                              const IntRect&,
                              bool supportAlphaBlend = true,
                              bool mayCreateBitmap = true);
+  bool shouldIncludeChildWindows() const { return false; }
 #endif
 
 #if PLATFORM(QT)
