@@ -224,6 +224,14 @@ void HTMLInputElement::setInputType(const String& t) {
     newType = SEARCH;
   else if (equalIgnoringCase(t, "range"))
     newType = RANGE;
+  else if (equalIgnoringCase(t, "email"))
+    newType = EMAIL;
+  else if (equalIgnoringCase(t, "number"))
+    newType = NUMBER;
+  else if (equalIgnoringCase(t, "tel"))
+    newType = TELEPHONE;
+  else if (equalIgnoringCase(t, "url"))
+    newType = URL;
   else
     newType = TEXT;
 
@@ -307,6 +315,10 @@ const AtomicString& HTMLInputElement::type() const {
       DEFINE_STATIC_LOCAL(const AtomicString, checkbox, ("checkbox"));
       return checkbox;
     }
+    case EMAIL: {
+      DEFINE_STATIC_LOCAL(const AtomicString, email, ("email"));
+      return email;
+    }
     case FILE: {
       DEFINE_STATIC_LOCAL(const AtomicString, file, ("file"));
       return file;
@@ -321,6 +333,10 @@ const AtomicString& HTMLInputElement::type() const {
     }
     case ISINDEX:
       return emptyAtom;
+    case NUMBER: {
+      DEFINE_STATIC_LOCAL(const AtomicString, number, ("number"));
+      return number;
+    }
     case PASSWORD: {
       DEFINE_STATIC_LOCAL(const AtomicString, password, ("password"));
       return password;
@@ -345,9 +361,17 @@ const AtomicString& HTMLInputElement::type() const {
       DEFINE_STATIC_LOCAL(const AtomicString, submit, ("submit"));
       return submit;
     }
+    case TELEPHONE: {
+      DEFINE_STATIC_LOCAL(const AtomicString, telephone, ("tel"));
+      return telephone;
+    }
     case TEXT: {
       DEFINE_STATIC_LOCAL(const AtomicString, text, ("text"));
       return text;
+    }
+    case URL: {
+      DEFINE_STATIC_LOCAL(const AtomicString, url, ("url"));
+      return url;
     }
   }
   return emptyAtom;
@@ -359,15 +383,19 @@ bool HTMLInputElement::saveState(String& result) const {
 
   switch (inputType()) {
     case BUTTON:
+    case EMAIL:
     case FILE:
     case HIDDEN:
     case IMAGE:
     case ISINDEX:
+    case NUMBER:
     case RANGE:
     case RESET:
     case SEARCH:
     case SUBMIT:
+    case TELEPHONE:
     case TEXT:
+    case URL:
       result = value();
       return true;
     case CHECKBOX:
@@ -385,15 +413,19 @@ void HTMLInputElement::restoreState(const String& state) {
   ASSERT(inputType() != PASSWORD);  // should never save/restore password fields
   switch (inputType()) {
     case BUTTON:
+    case EMAIL:
     case FILE:
     case HIDDEN:
     case IMAGE:
     case ISINDEX:
+    case NUMBER:
     case RANGE:
     case RESET:
     case SEARCH:
     case SUBMIT:
+    case TELEPHONE:
     case TEXT:
+    case URL:
       setValue(state);
       break;
     case CHECKBOX:
@@ -480,10 +512,14 @@ void HTMLInputElement::accessKeyAction(bool sendToAnyElement) {
     case HIDDEN:
       // a no-op for this type
       break;
+    case EMAIL:
     case ISINDEX:
+    case NUMBER:
     case PASSWORD:
     case SEARCH:
+    case TELEPHONE:
     case TEXT:
+    case URL:
       // should never restore previous selection here
       focus(false);
       break;
@@ -621,16 +657,20 @@ bool HTMLInputElement::rendererIsNeeded(RenderStyle* style) {
   switch (inputType()) {
     case BUTTON:
     case CHECKBOX:
+    case EMAIL:
     case FILE:
     case IMAGE:
     case ISINDEX:
+    case NUMBER:
     case PASSWORD:
     case RADIO:
     case RANGE:
     case RESET:
     case SEARCH:
     case SUBMIT:
+    case TELEPHONE:
     case TEXT:
+    case URL:
       return HTMLFormControlElementWithState::rendererIsNeeded(style);
     case HIDDEN:
       return false;
@@ -657,10 +697,14 @@ RenderObject* HTMLInputElement::createRenderer(RenderArena* arena,
       return new (arena) RenderImage(this);
     case RANGE:
       return new (arena) RenderSlider(this);
+    case EMAIL:
     case ISINDEX:
+    case NUMBER:
     case PASSWORD:
     case SEARCH:
+    case TELEPHONE:
     case TEXT:
+    case URL:
       return new (arena) RenderTextControlSingleLine(this);
   }
   ASSERT(false);
@@ -733,12 +777,16 @@ bool HTMLInputElement::appendFormData(FormDataList& encoding, bool multipart) {
     return false;
 
   switch (inputType()) {
+    case EMAIL:
     case HIDDEN:
     case ISINDEX:
+    case NUMBER:
     case PASSWORD:
     case RANGE:
     case SEARCH:
+    case TELEPHONE:
     case TEXT:
+    case URL:
       // always successful
       encoding.appendData(name(), value());
       return true;
@@ -885,15 +933,19 @@ String HTMLInputElement::valueWithDefault() const {
     switch (inputType()) {
       case BUTTON:
       case CHECKBOX:
+      case EMAIL:
       case FILE:
       case HIDDEN:
       case IMAGE:
       case ISINDEX:
+      case NUMBER:
       case PASSWORD:
       case RADIO:
       case RANGE:
       case SEARCH:
+      case TELEPHONE:
       case TEXT:
+      case URL:
         break;
       case RESET:
         v = resetButtonDefaultLabel();
@@ -978,12 +1030,16 @@ bool HTMLInputElement::storesValueSeparateFromAttribute() const {
     case RESET:
     case SUBMIT:
       return false;
+    case EMAIL:
     case FILE:
     case ISINDEX:
+    case NUMBER:
     case PASSWORD:
     case RANGE:
     case SEARCH:
+    case TELEPHONE:
     case TEXT:
+    case URL:
       return true;
   }
   return false;
@@ -1170,12 +1226,16 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     if (charCode == '\r') {
       switch (inputType()) {
         case CHECKBOX:
+        case EMAIL:
         case HIDDEN:
         case ISINDEX:
+        case NUMBER:
         case PASSWORD:
         case RANGE:
         case SEARCH:
+        case TELEPHONE:
         case TEXT:
+        case URL:
           // Simulate mouse click on the default form button for enter for these
           // types of elements.
           clickDefaultFormButton = true;
@@ -1303,12 +1363,16 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
           if (!checked())
             clickElement = true;
           break;
+        case EMAIL:
         case HIDDEN:
         case ISINDEX:
+        case NUMBER:
         case PASSWORD:
         case RANGE:
         case SEARCH:
+        case TELEPHONE:
         case TEXT:
+        case URL:
           break;
       }
     }
