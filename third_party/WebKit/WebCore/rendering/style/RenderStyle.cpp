@@ -53,14 +53,7 @@ PassRefPtr<RenderStyle> RenderStyle::clone(const RenderStyle* other) {
 }
 
 RenderStyle::RenderStyle()
-    : box(defaultStyle()->box),
-      visual(defaultStyle()->visual),
-      background(defaultStyle()->background),
-      surround(defaultStyle()->surround),
-      rareNonInheritedData(defaultStyle()->rareNonInheritedData),
-      rareInheritedData(defaultStyle()->rareInheritedData),
-      inherited(defaultStyle()->inherited),
-      m_pseudoState(PseudoUnknown),
+    : m_pseudoState(PseudoUnknown),
       m_affectedByAttributeSelectors(false),
       m_unique(false),
       m_affectedByEmpty(false),
@@ -72,7 +65,14 @@ RenderStyle::RenderStyle()
       m_childrenAffectedByBackwardPositionalRules(false),
       m_firstChildState(false),
       m_lastChildState(false),
-      m_childIndex(0)
+      m_childIndex(0),
+      box(defaultStyle()->box),
+      visual(defaultStyle()->visual),
+      background(defaultStyle()->background),
+      surround(defaultStyle()->surround),
+      rareNonInheritedData(defaultStyle()->rareNonInheritedData),
+      rareInheritedData(defaultStyle()->rareInheritedData),
+      inherited(defaultStyle()->inherited)
 #if ENABLE(SVG)
       ,
       m_svgStyle(defaultStyle()->m_svgStyle)
@@ -116,15 +116,6 @@ RenderStyle::RenderStyle(bool)
 
 RenderStyle::RenderStyle(const RenderStyle& o)
     : RefCounted<RenderStyle>(),
-      inherited_flags(o.inherited_flags),
-      noninherited_flags(o.noninherited_flags),
-      box(o.box),
-      visual(o.visual),
-      background(o.background),
-      surround(o.surround),
-      rareNonInheritedData(o.rareNonInheritedData),
-      rareInheritedData(o.rareInheritedData),
-      inherited(o.inherited),
       m_pseudoState(o.m_pseudoState),
       m_affectedByAttributeSelectors(false),
       m_unique(false),
@@ -137,12 +128,21 @@ RenderStyle::RenderStyle(const RenderStyle& o)
       m_childrenAffectedByBackwardPositionalRules(false),
       m_firstChildState(false),
       m_lastChildState(false),
-      m_childIndex(0)
+      m_childIndex(0),
+      box(o.box),
+      visual(o.visual),
+      background(o.background),
+      surround(o.surround),
+      rareNonInheritedData(o.rareNonInheritedData),
+      rareInheritedData(o.rareInheritedData),
+      inherited(o.inherited)
 #if ENABLE(SVG)
       ,
       m_svgStyle(o.m_svgStyle)
 #endif
-{
+      ,
+      inherited_flags(o.inherited_flags),
+      noninherited_flags(o.noninherited_flags) {
 }
 
 void RenderStyle::inheritFrom(const RenderStyle* inheritParent) {
