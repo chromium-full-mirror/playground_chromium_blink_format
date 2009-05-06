@@ -199,12 +199,13 @@ class RenderText : public RenderObject {
                      HashSet<const SimpleFontData*>* fallbackFonts) const;
   bool isAllASCII() const { return m_isAllASCII; }
 
+  int m_minWidth;  // here to minimize padding in 64-bit.
+
   RefPtr<StringImpl> m_text;
 
   InlineTextBox* m_firstTextBox;
   InlineTextBox* m_lastTextBox;
 
-  int m_minWidth;
   int m_maxWidth;
   int m_beginMinWidth;
   int m_endMinWidth;
