@@ -25,6 +25,7 @@
 #include "WMLFieldSetElement.h"
 
 #include "HTMLNames.h"
+#include "MappedAttribute.h"
 #include "RenderFieldset.h"
 #include "Text.h"
 #include "WMLElementFactory.h"

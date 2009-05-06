@@ -25,6 +25,7 @@
 #include "WMLOptionElement.h"
 
 #include "HTMLNames.h"
+#include "MappedAttribute.h"
 #include "NodeRenderStyle.h"
 #include "RenderStyle.h"
 #include "WMLNames.h"

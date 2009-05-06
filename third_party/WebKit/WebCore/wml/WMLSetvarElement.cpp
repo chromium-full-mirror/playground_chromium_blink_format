@@ -25,6 +25,7 @@
 #include "WMLSetvarElement.h"
 
 #include "HTMLNames.h"
+#include "MappedAttribute.h"
 #include "WMLErrorHandling.h"
 #include "WMLTaskElement.h"
 #include "WMLVariables.h"

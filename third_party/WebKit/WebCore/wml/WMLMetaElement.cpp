@@ -26,6 +26,7 @@
 
 #include "Document.h"
 #include "HTMLNames.h"
+#include "MappedAttribute.h"
 
 namespace WebCore {
 
