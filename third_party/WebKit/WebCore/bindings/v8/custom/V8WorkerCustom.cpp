@@ -98,6 +98,25 @@ CALLBACK_FUNC_DECL(WorkerConstructor) {
   return wrapperObject;
 }
 
+PassRefPtr<EventListener> getEventListener(Worker* worker,
+                                           v8::Local<v8::Value> value,
+                                           bool findOnly) {
+  if (worker->scriptExecutionContext()->isWorkerContext()) {
+    WorkerContextExecutionProxy* workerContextProxy =
+        WorkerContextExecutionProxy::retrieve();
+    ASSERT(workerContextProxy);
+    return workerContextProxy->findOrCreateObjectEventListener(value, false,
+                                                               findOnly);
+  }
+
+  V8Proxy* proxy = V8Proxy::retrieve(worker->scriptExecutionContext());
+  if (proxy)
+    return findOnly ? proxy->FindObjectEventListener(value, false)
+                    : proxy->FindOrCreateObjectEventListener(value, false);
+
+  return 0;
+}
+
 ACCESSOR_GETTER(WorkerOnmessage) {
   INC_STATS(L"DOM.Worker.onmessage._get");
   Worker* worker =
@@ -127,12 +146,7 @@ ACCESSOR_SETTER(WorkerOnmessage) {
     // Clear the listener.
     worker->setOnmessage(0);
   } else {
-    V8Proxy* proxy = V8Proxy::retrieve(worker->scriptExecutionContext());
-    if (!proxy)
-      return;
-
-    RefPtr<EventListener> listener =
-        proxy->FindOrCreateObjectEventListener(value, false);
+    RefPtr<EventListener> listener = getEventListener(worker, value, false);
     if (listener) {
       if (oldListener) {
         v8::Local<v8::Object> oldV8Listener = oldListener->getListenerObject();
@@ -176,12 +190,7 @@ ACCESSOR_SETTER(WorkerOnerror) {
     // Clear the listener.
     worker->setOnerror(0);
   } else {
-    V8Proxy* proxy = V8Proxy::retrieve(worker->scriptExecutionContext());
-    if (!proxy)
-      return;
-
-    RefPtr<EventListener> listener =
-        proxy->FindOrCreateObjectEventListener(value, false);
+    RefPtr<EventListener> listener = getEventListener(worker, value, false);
     if (listener) {
       if (oldListener) {
         v8::Local<v8::Object> oldV8Listener = oldListener->getListenerObject();
@@ -201,12 +210,7 @@ CALLBACK_FUNC_DECL(WorkerAddEventListener) {
   Worker* worker =
       V8Proxy::ToNativeObject<Worker>(V8ClassIndex::WORKER, args.Holder());
 
-  V8Proxy* proxy = V8Proxy::retrieve(worker->scriptExecutionContext());
-  if (!proxy)
-    return v8::Undefined();
-
-  RefPtr<EventListener> listener =
-      proxy->FindOrCreateObjectEventListener(args[1], false);
+  RefPtr<EventListener> listener = getEventListener(worker, args[1], false);
   if (listener) {
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
@@ -223,13 +227,7 @@ CALLBACK_FUNC_DECL(WorkerRemoveEventListener) {
   Worker* worker =
       V8Proxy::ToNativeObject<Worker>(V8ClassIndex::WORKER, args.Holder());
 
-  V8Proxy* proxy = V8Proxy::retrieve(worker->scriptExecutionContext());
-  if (!proxy)
-    return v8::Undefined();  // Probably leaked.
-
-  RefPtr<EventListener> listener =
-      proxy->FindObjectEventListener(args[1], false);
-
+  RefPtr<EventListener> listener = getEventListener(worker, args[1], true);
   if (listener) {
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
