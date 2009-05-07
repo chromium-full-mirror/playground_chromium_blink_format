@@ -52,6 +52,8 @@ struct ResultType {
 
   bool definitelyIsNumber() { return (m_type & TypeBits) == TypeMaybeNumber; }
 
+  bool definitelyIsString() { return (m_type & TypeBits) == TypeMaybeString; }
+
   bool mightBeNumber() { return m_type & TypeMaybeNumber; }
 
   bool isNotNumber() { return !mightBeNumber(); }
@@ -81,7 +83,7 @@ struct ResultType {
   static ResultType forAdd(ResultType op1, ResultType op2) {
     if (op1.definitelyIsNumber() && op2.definitelyIsNumber())
       return numberTypeCanReuse();
-    if (op1.isNotNumber() || op2.isNotNumber())
+    if (op1.definitelyIsString() || op2.definitelyIsString())
       return stringType();
     return stringOrNumberTypeCanReuse();
   }

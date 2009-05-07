@@ -391,6 +391,8 @@ class BytecodeGenerator {
                             unsigned divot,
                             unsigned startOffset,
                             unsigned endOffset);
+  RegisterID* emitStrcat(RegisterID* dst, RegisterID* src, int count);
+  void emitToPrimitive(RegisterID* dst, RegisterID* src);
 
   PassRefPtr<Label> emitLabel(Label*);
   PassRefPtr<Label> emitJump(Label* target);

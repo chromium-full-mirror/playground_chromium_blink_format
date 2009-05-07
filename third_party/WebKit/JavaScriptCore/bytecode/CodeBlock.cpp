@@ -1169,6 +1169,21 @@ void CodeBlock::dump(ExecState* exec,
              registerName(r0).c_str(), registerName(r1).c_str());
       break;
     }
+    case op_strcat: {
+      int r0 = (++it)->u.operand;
+      int r1 = (++it)->u.operand;
+      int count = (++it)->u.operand;
+      printf("[%4d] op_strcat\t %s, %s, %d\n", location,
+             registerName(r0).c_str(), registerName(r1).c_str(), count);
+      break;
+    }
+    case op_to_primitive: {
+      int r0 = (++it)->u.operand;
+      int r1 = (++it)->u.operand;
+      printf("[%4d] op_to_primitive\t %s, %s\n", location,
+             registerName(r0).c_str(), registerName(r1).c_str());
+      break;
+    }
     case op_get_pnames: {
       int r0 = (++it)->u.operand;
       int r1 = (++it)->u.operand;

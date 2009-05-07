@@ -81,6 +81,15 @@ class UString {
       return adoptRef(new BaseString(buffer, length));
     }
 
+    static PassRefPtr<Rep> createEmptyBuffer(size_t size) {
+      // Guard against integer overflow
+      if (size < (std::numeric_limits<size_t>::max() / sizeof(UChar))) {
+        if (void* buf = tryFastMalloc(size * sizeof(UChar)))
+          return adoptRef(new BaseString(static_cast<UChar*>(buf), 0, size));
+      }
+      return adoptRef(new BaseString(0, 0, 0));
+    }
+
     static PassRefPtr<Rep> createCopying(const UChar*, int);
     static PassRefPtr<Rep> create(PassRefPtr<Rep> base, int offset, int length);
 
@@ -197,12 +206,12 @@ class UString {
     size_t reportedCost;
 
    private:
-    BaseString(UChar* buffer, int length)
+    BaseString(UChar* buffer, int length, int additionalCapacity = 0)
         : Rep(length),
           buf(buffer),
           preCapacity(0),
           usedPreCapacity(0),
-          capacity(length),
+          capacity(length + additionalCapacity),
           usedCapacity(length),
           reportedCost(0) {
       m_identifierTableAndFlags.setFlag(BaseStringFlag);
@@ -260,6 +269,8 @@ class UString {
     return append(static_cast<UChar>(static_cast<unsigned char>(c)));
   }
   UString& append(const UChar*, int size);
+  UString& appendNumeric(int);
+  UString& appendNumeric(double);
 
   bool getCString(CStringBuffer&) const;
 
