@@ -65,8 +65,8 @@ class ClassNamesData : Noncopyable {
 
   typedef Vector<AtomicString, 8> ClassNameVector;
   String m_string;
-  bool m_shouldFoldCase;
   ClassNameVector m_vector;
+  bool m_shouldFoldCase;
   bool m_createdVector;
 };
 
