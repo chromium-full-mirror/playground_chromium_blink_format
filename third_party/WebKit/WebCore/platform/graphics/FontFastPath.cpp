@@ -39,9 +39,9 @@ using namespace Unicode;
 
 namespace WebCore {
 
-const GlyphData& Font::glyphDataForCharacter(UChar32 c,
-                                             bool mirror,
-                                             bool forceSmallCaps) const {
+GlyphData Font::glyphDataForCharacter(UChar32 c,
+                                      bool mirror,
+                                      bool forceSmallCaps) const {
   bool useSmallCapsFont = forceSmallCaps;
   if (m_fontDescription.smallCaps()) {
     UChar32 upperC = toUpper(c);
@@ -71,7 +71,7 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c,
     while (true) {
       page = node->page();
       if (page) {
-        const GlyphData& data = page->glyphDataForCharacter(c);
+        GlyphData data = page->glyphDataForCharacter(c);
         if (data.fontData)
           return data;
         if (node->isSystemFallback())
@@ -89,7 +89,7 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c,
     while (true) {
       page = node->page();
       if (page) {
-        const GlyphData& data = page->glyphDataForCharacter(c);
+        GlyphData data = page->glyphDataForCharacter(c);
         if (data.fontData) {
           // The smallCapsFontData function should not normally return 0.
           // But if it does, we will just render the capital letter big.
@@ -102,7 +102,7 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c,
               GlyphPageTreeNode::getRootChild(smallCapsFontData, pageNumber);
           const GlyphPage* smallCapsPage = smallCapsNode->page();
           if (smallCapsPage) {
-            const GlyphData& data = smallCapsPage->glyphDataForCharacter(c);
+            GlyphData data = smallCapsPage->glyphDataForCharacter(c);
             if (data.fontData)
               return data;
           }
@@ -157,10 +157,9 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c,
     // Got the fallback glyph and font.
     GlyphPage* fallbackPage =
         GlyphPageTreeNode::getRootChild(characterFontData, pageNumber)->page();
-    const GlyphData& data =
-        fallbackPage && fallbackPage->glyphDataForCharacter(c).fontData
-            ? fallbackPage->glyphDataForCharacter(c)
-            : characterFontData->missingGlyphData();
+    GlyphData data = fallbackPage && fallbackPage->fontDataForCharacter(c)
+                         ? fallbackPage->glyphDataForCharacter(c)
+                         : characterFontData->missingGlyphData();
     // Cache it so we don't have to do system fallback again next time.
     if (!useSmallCapsFont)
       page->setGlyphDataForCharacter(c, data.glyph, data.fontData);
@@ -170,7 +169,7 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c,
   // Even system fallback can fail; use the missing glyph in that case.
   // FIXME: It would be nicer to use the missing glyph from the last resort font
   // instead.
-  const GlyphData& data = primaryFont()->missingGlyphData();
+  GlyphData data = primaryFont()->missingGlyphData();
   if (!useSmallCapsFont)
     page->setGlyphDataForCharacter(c, data.glyph, data.fontData);
   return data;
