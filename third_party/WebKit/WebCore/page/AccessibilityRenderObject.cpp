@@ -1107,6 +1107,18 @@ void AccessibilityRenderObject::linkedUIElements(
     addRadioButtonGroupMembers(linkedUIElements);
 }
 
+bool AccessibilityRenderObject::exposesTitleUIElement() const {
+  if (!isControl())
+    return false;
+
+  // checkbox or radio buttons don't expose the title ui element unless it has a
+  // title already
+  if (isCheckboxOrRadio() && getAttribute(titleAttr).isEmpty())
+    return false;
+
+  return true;
+}
+
 AccessibilityObject* AccessibilityRenderObject::titleUIElement() const {
   if (!m_renderer)
     return 0;
@@ -1116,9 +1128,7 @@ AccessibilityObject* AccessibilityRenderObject::titleUIElement() const {
     return axObjectCache()->getOrCreate(
         static_cast<RenderFieldset*>(m_renderer)->findLegend());
 
-  // checkbox and radio hide their labels. Only controls get titleUIElements for
-  // now
-  if (isCheckboxOrRadio() || !isControl())
+  if (!exposesTitleUIElement())
     return 0;
 
   Node* element = m_renderer->node();
@@ -1153,7 +1163,7 @@ bool AccessibilityRenderObject::accessibilityIsIgnored() const {
     if (correspondingControl && correspondingControl->renderer()) {
       AccessibilityObject* controlObject =
           axObjectCache()->getOrCreate(correspondingControl->renderer());
-      if (controlObject->isCheckboxOrRadio())
+      if (!controlObject->exposesTitleUIElement())
         return true;
     }
   }
