@@ -441,6 +441,15 @@ static inline void* currentThreadStackBase() {
   stack_t stack;
   pthread_stackseg_np(thread, &stack);
   return stack.ss_sp;
+#elif PLATFORM(SYMBIAN)
+  static void* stackBase = 0;
+  if (stackBase == 0) {
+    TThreadStackInfo info;
+    RThread thread;
+    thread.StackInfo(info);
+    stackBase = (void*)info.iBase;
+  }
+  return (void*)stackBase;
 #elif PLATFORM(UNIX)
   static void* stackBase = 0;
   static size_t stackSize = 0;
@@ -464,15 +473,6 @@ static inline void* currentThreadStackBase() {
     stackThread = thread;
   }
   return static_cast<char*>(stackBase) + stackSize;
-#elif PLATFORM(SYMBIAN)
-  static void* stackBase = 0;
-  if (stackBase == 0) {
-    TThreadStackInfo info;
-    RThread thread;
-    thread.StackInfo(info);
-    stackBase = (void*)info.iBase;
-  }
-  return (void*)stackBase;
 #else
 #error Need a way to get the stack base on this platform
 #endif
