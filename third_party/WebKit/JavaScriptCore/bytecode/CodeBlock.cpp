@@ -1033,11 +1033,10 @@ void CodeBlock::dump(ExecState* exec,
     }
     case op_jnless: {
       int r0 = (++it)->u.operand;
-      JSValue function = JSValue((++it)->u.jsCell);
+      int r1 = (++it)->u.operand;
       int offset = (++it)->u.operand;
       printf("[%4d] jnless\t\t %s, %s, %d(->%d)\n", location,
-             registerName(r0).c_str(),
-             valueToSourceString(exec, function).ascii(), offset,
+             registerName(r0).c_str(), registerName(r1).c_str(), offset,
              locationForOffset(begin, it, offset));
       break;
     }
