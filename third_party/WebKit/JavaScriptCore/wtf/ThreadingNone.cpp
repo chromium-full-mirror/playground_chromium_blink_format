@@ -41,7 +41,7 @@ bool ThreadIdentifier::operator!=(const ThreadIdentifier&) const {
 
 void initializeThreading() {}
 ThreadIdentifier createThreadInternal(ThreadFunction, void*, const char*) {
-  return 0;
+  return ThreadIdentifier();
 }
 void setThreadNameInternal(const char*) {}
 int waitForThreadCompletion(ThreadIdentifier, void**) {
@@ -49,7 +49,7 @@ int waitForThreadCompletion(ThreadIdentifier, void**) {
 }
 void detachThread(ThreadIdentifier) {}
 ThreadIdentifier currentThread() {
-  return 0;
+  return ThreadIdentifier();
 }
 bool isMainThread() {
   return true;
