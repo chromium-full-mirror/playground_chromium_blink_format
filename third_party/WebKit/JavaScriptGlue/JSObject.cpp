@@ -69,6 +69,10 @@ void JSUserObject::SetProperty(CFStringRef propertyName, JSUserObject* value) {
   }
 }
 
+static JSValue JSC_HOST_CALL nativeCallFunction(ExecState* exec,
+                                                JSObject* functionObject,
+                                                JSValue thisValue,
+                                                const ArgList& args);
 static JSValue nativeCallFunction(ExecState* exec,
                                   JSObject* functionObject,
                                   JSValue thisValue,

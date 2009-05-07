@@ -136,10 +136,10 @@ ConstructType NumberConstructor::getConstructData(
 }
 
 // ECMA 15.7.2
-static JSValue callNumberConstructor(ExecState* exec,
-                                     JSObject*,
-                                     JSValue,
-                                     const ArgList& args) {
+static JSValue JSC_HOST_CALL callNumberConstructor(ExecState* exec,
+                                                   JSObject*,
+                                                   JSValue,
+                                                   const ArgList& args) {
   return jsNumber(exec, args.isEmpty() ? 0 : args.at(0).toNumber(exec));
 }
 

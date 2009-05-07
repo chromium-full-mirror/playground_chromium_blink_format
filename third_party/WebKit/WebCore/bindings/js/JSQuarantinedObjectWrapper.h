@@ -108,10 +108,10 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
 
   void transferExceptionToExecState(JSC::ExecState*) const;
 
-  static JSC::JSValue call(JSC::ExecState*,
-                           JSC::JSObject* function,
-                           JSC::JSValue thisValue,
-                           const JSC::ArgList&);
+  static JSC::JSValue JSC_HOST_CALL call(JSC::ExecState*,
+                                         JSC::JSObject* function,
+                                         JSC::JSValue thisValue,
+                                         const JSC::ArgList&);
   static JSC::JSObject* construct(JSC::ExecState*,
                                   JSC::JSObject*,
                                   const JSC::ArgList&);

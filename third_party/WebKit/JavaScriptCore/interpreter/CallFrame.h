@@ -44,6 +44,7 @@ class ExecState : private Register {
   ScopeChainNode* scopeChain() const {
     return this[RegisterFile::ScopeChain].Register::scopeChain();
   }
+  int argumentCount() const { return this[RegisterFile::ArgumentCount].i(); }
 
   JSValue thisValue();
 
@@ -132,7 +133,6 @@ class ExecState : private Register {
     return *this;
   }
 
-  int argumentCount() const { return this[RegisterFile::ArgumentCount].i(); }
   CallFrame* callerFrame() const {
     return this[RegisterFile::CallerFrame].callFrame();
   }

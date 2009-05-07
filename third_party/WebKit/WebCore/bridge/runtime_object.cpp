@@ -211,10 +211,10 @@ JSValue RuntimeObjectImp::defaultValue(ExecState* exec,
   return result;
 }
 
-static JSValue callRuntimeObject(ExecState* exec,
-                                 JSObject* function,
-                                 JSValue,
-                                 const ArgList& args) {
+static JSValue JSC_HOST_CALL callRuntimeObject(ExecState* exec,
+                                               JSObject* function,
+                                               JSValue,
+                                               const ArgList& args) {
   RefPtr<Instance> instance(
       static_cast<RuntimeObjectImp*>(function)->getInternalInstance());
   instance->begin();

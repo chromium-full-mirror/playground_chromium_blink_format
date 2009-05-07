@@ -88,6 +88,10 @@ class JSFunction : public InternalFunction {
 #else
   bool isHostFunction() const { return false; }
 #endif
+  NativeFunction nativeFunction() {
+    return *reinterpret_cast<NativeFunction*>(m_data);
+  }
+
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
 
@@ -120,9 +124,6 @@ class JSFunction : public InternalFunction {
   void setScopeChain(const ScopeChain& sc) {
     ASSERT(!isHostFunction());
     *reinterpret_cast<ScopeChain*>(m_data) = sc;
-  }
-  NativeFunction nativeFunction() {
-    return *reinterpret_cast<NativeFunction*>(m_data);
   }
   void setNativeFunction(NativeFunction func) {
     *reinterpret_cast<NativeFunction*>(m_data) = func;

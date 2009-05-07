@@ -35,18 +35,18 @@ namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(FunctionPrototype);
 
-static JSValue functionProtoFuncToString(ExecState*,
-                                         JSObject*,
-                                         JSValue,
-                                         const ArgList&);
-static JSValue functionProtoFuncApply(ExecState*,
-                                      JSObject*,
-                                      JSValue,
-                                      const ArgList&);
-static JSValue functionProtoFuncCall(ExecState*,
-                                     JSObject*,
-                                     JSValue,
-                                     const ArgList&);
+static JSValue JSC_HOST_CALL functionProtoFuncToString(ExecState*,
+                                                       JSObject*,
+                                                       JSValue,
+                                                       const ArgList&);
+static JSValue JSC_HOST_CALL functionProtoFuncApply(ExecState*,
+                                                    JSObject*,
+                                                    JSValue,
+                                                    const ArgList&);
+static JSValue JSC_HOST_CALL functionProtoFuncCall(ExecState*,
+                                                   JSObject*,
+                                                   JSValue,
+                                                   const ArgList&);
 
 FunctionPrototype::FunctionPrototype(ExecState* exec,
                                      PassRefPtr<Structure> structure)
@@ -77,10 +77,10 @@ void FunctionPrototype::addFunctionProperties(
   putDirectFunctionWithoutTransition(exec, *callFunction, DontEnum);
 }
 
-static JSValue callFunctionPrototype(ExecState*,
-                                     JSObject*,
-                                     JSValue,
-                                     const ArgList&) {
+static JSValue JSC_HOST_CALL callFunctionPrototype(ExecState*,
+                                                   JSObject*,
+                                                   JSValue,
+                                                   const ArgList&) {
   return jsUndefined();
 }
 
@@ -110,10 +110,10 @@ static inline void insertSemicolonIfNeeded(UString& functionBody) {
   }
 }
 
-JSValue functionProtoFuncToString(ExecState* exec,
-                                  JSObject*,
-                                  JSValue thisValue,
-                                  const ArgList&) {
+JSValue JSC_HOST_CALL functionProtoFuncToString(ExecState* exec,
+                                                JSObject*,
+                                                JSValue thisValue,
+                                                const ArgList&) {
   if (thisValue.isObject(&JSFunction::info)) {
     JSFunction* function = asFunction(thisValue);
     if (!function->isHostFunction()) {
@@ -134,10 +134,10 @@ JSValue functionProtoFuncToString(ExecState* exec,
   return throwError(exec, TypeError);
 }
 
-JSValue functionProtoFuncApply(ExecState* exec,
-                               JSObject*,
-                               JSValue thisValue,
-                               const ArgList& args) {
+JSValue JSC_HOST_CALL functionProtoFuncApply(ExecState* exec,
+                                             JSObject*,
+                                             JSValue thisValue,
+                                             const ArgList& args) {
   CallData callData;
   CallType callType = thisValue.getCallData(callData);
   if (callType == CallTypeNone)
@@ -166,10 +166,10 @@ JSValue functionProtoFuncApply(ExecState* exec,
   return call(exec, thisValue, callType, callData, args.at(0), applyArgs);
 }
 
-JSValue functionProtoFuncCall(ExecState* exec,
-                              JSObject*,
-                              JSValue thisValue,
-                              const ArgList& args) {
+JSValue JSC_HOST_CALL functionProtoFuncCall(ExecState* exec,
+                                            JSObject*,
+                                            JSValue thisValue,
+                                            const ArgList& args) {
   CallData callData;
   CallType callType = thisValue.getCallData(callData);
   if (callType == CallTypeNone)

@@ -67,10 +67,10 @@ ConstructType ObjectConstructor::getConstructData(
   return ConstructTypeHost;
 }
 
-static JSValue callObjectConstructor(ExecState* exec,
-                                     JSObject*,
-                                     JSValue,
-                                     const ArgList& args) {
+static JSValue JSC_HOST_CALL callObjectConstructor(ExecState* exec,
+                                                   JSObject*,
+                                                   JSValue,
+                                                   const ArgList& args) {
   return constructObject(exec, args);
 }
 
