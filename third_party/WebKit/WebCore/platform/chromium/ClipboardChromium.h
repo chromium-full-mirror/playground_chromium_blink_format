@@ -86,7 +86,6 @@ class ClipboardChromium : public Clipboard, public CachedResourceClient {
   void resetFromClipboard();
   void setDragImage(CachedImage*, Node*, const IntPoint&);
   RefPtr<ChromiumDataObject> m_dataObject;
-  Frame* m_frame;
 };
 
 }  // namespace WebCore
