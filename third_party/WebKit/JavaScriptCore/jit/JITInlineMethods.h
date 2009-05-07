@@ -218,7 +218,8 @@ ALWAYS_INLINE JIT::Call JIT::emitNakedCall(void* function) {
 #if USE(JIT_STUB_ARGUMENT_REGISTER)
 ALWAYS_INLINE void JIT::restoreArgumentReference() {
   move(stackPointerRegister, firstArgumentRegister);
-  emitPutCTIParam(callFrameRegister, STUB_ARGS_callFrame);
+  emitPutCTIParam(callFrameRegister,
+                  offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
 }
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {
 // In the trampoline on x86-64, the first argument register is not overwritten.
@@ -230,12 +231,14 @@ ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {
 #elif USE(JIT_STUB_ARGUMENT_STACK)
 ALWAYS_INLINE void JIT::restoreArgumentReference() {
   poke(stackPointerRegister);
-  emitPutCTIParam(callFrameRegister, STUB_ARGS_callFrame);
+  emitPutCTIParam(callFrameRegister,
+                  offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
 }
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {}
 #else  // JIT_STUB_ARGUMENT_VA_LIST
 ALWAYS_INLINE void JIT::restoreArgumentReference() {
-  emitPutCTIParam(callFrameRegister, STUB_ARGS_callFrame);
+  emitPutCTIParam(callFrameRegister,
+                  offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
 }
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {}
 #endif

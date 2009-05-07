@@ -1059,7 +1059,9 @@ void JIT::privateCompileMainPass() {
         NEXT_OPCODE(op_push_new_scope);
       }
       case op_catch: {
-        emitGetCTIParam(STUB_ARGS_callFrame, callFrameRegister);
+        emitGetCTIParam(
+            offsetof(struct JITStackFrame, callFrame) / sizeof(void*),
+            callFrameRegister);
         emitPutVirtualRegister(currentInstruction[1].u.operand);
         NEXT_OPCODE(op_catch);
       }
@@ -2244,7 +2246,8 @@ void JIT::privateCompileCTIMachineTrampolines(
   storePtr(regT1, regT2);
   move(ImmPtr(reinterpret_cast<void*>(ctiVMThrowTrampoline)), regT2);
   emitGetFromCallFrameHeader(RegisterFile::CallerFrame, callFrameRegister);
-  emitPutCTIParam(callFrameRegister, STUB_ARGS_callFrame);
+  emitPutCTIParam(callFrameRegister,
+                  offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
   push(regT2);
   ret();
 
