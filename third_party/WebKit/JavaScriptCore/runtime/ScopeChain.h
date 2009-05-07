@@ -43,6 +43,19 @@ class ScopeChainNode {
         refCount(1) {
     ASSERT(globalData);
   }
+#ifndef NDEBUG
+  // Due to the number of subtle and timing dependent bugs that have occurred
+  // due
+  // to deleted but still "valid" ScopeChainNodes we now deliberately clobber
+  // the
+  // contents in debug builds.
+  ~ScopeChainNode() {
+    next = 0;
+    object = 0;
+    globalData = 0;
+    globalThis = 0;
+  }
+#endif
 
   ScopeChainNode* next;
   JSObject* object;
@@ -168,6 +181,9 @@ class ScopeChain {
   ~ScopeChain() {
     if (m_node)
       m_node->deref();
+#ifndef NDEBUG
+    m_node = 0;
+#endif
   }
 
   void swap(ScopeChain&);

@@ -368,7 +368,7 @@ JSValue stringProtoFuncReplace(ExecState* exec,
         cachedCall.setThis(exec->globalThisValue());
         replacements.append(
             cachedCall.call().toString(cachedCall.newCallFrame()));
-        if (exec->hadException() || cachedCall.newCallFrame()->hadException())
+        if (exec->hadException())
           break;
 
         lastIndex = matchIndex + matchLen;
