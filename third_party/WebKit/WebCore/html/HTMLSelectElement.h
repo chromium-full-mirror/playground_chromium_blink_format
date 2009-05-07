@@ -42,7 +42,7 @@ class HTMLSelectElement : public HTMLFormControlElementWithState {
   virtual int tagPriority() const { return 6; }
   virtual bool checkDTD(const Node* newChild);
 
-  virtual const AtomicString& type() const;
+  virtual const AtomicString& formControlType() const;
 
   virtual bool isKeyboardFocusable(KeyboardEvent*) const;
   virtual bool isMouseFocusable() const;
@@ -80,8 +80,8 @@ class HTMLSelectElement : public HTMLFormControlElementWithState {
 
   PassRefPtr<HTMLOptionsCollection> options();
 
-  virtual bool saveState(String& value) const;
-  virtual void restoreState(const String&);
+  virtual bool saveFormControlState(String& value) const;
+  virtual void restoreFormControlState(const String&);
 
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,

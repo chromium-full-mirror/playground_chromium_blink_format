@@ -74,7 +74,6 @@ class Element;
 class EntityReference;
 class Event;
 class EventListener;
-class FormControlElementWithState;
 class Frame;
 class FrameView;
 class HitTestRequest;
@@ -416,10 +415,10 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   // Machinery for saving and restoring state when you leave and then go back to
   // a page.
-  void registerFormElementWithState(FormControlElementWithState* e) {
+  void registerFormElementWithState(Element* e) {
     m_formElementsWithState.add(e);
   }
-  void unregisterFormElementWithState(FormControlElementWithState* e) {
+  void unregisterFormElementWithState(Element* e) {
     m_formElementsWithState.remove(e);
   }
   Vector<String> formElementsState() const;
@@ -1027,7 +1026,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                   FormElementKeyHash,
                   FormElementKeyHashTraits>
       FormElementStateMap;
-  ListHashSet<FormControlElementWithState*> m_formElementsWithState;
+  ListHashSet<Element*> m_formElementsWithState;
   FormElementStateMap m_stateForNewFormElements;
 
   Color m_linkColor;

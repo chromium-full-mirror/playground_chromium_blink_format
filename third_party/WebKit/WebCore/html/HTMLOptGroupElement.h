@@ -37,7 +37,7 @@ class HTMLOptGroupElement : public HTMLFormControlElement,
   HTMLOptGroupElement(const QualifiedName&, Document*, HTMLFormElement* = 0);
 
   virtual bool checkDTD(const Node*);
-  virtual const AtomicString& type() const;
+  virtual const AtomicString& formControlType() const;
   virtual bool isFocusable() const;
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }

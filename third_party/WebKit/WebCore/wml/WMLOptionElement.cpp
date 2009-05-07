@@ -39,7 +39,7 @@ WMLOptionElement::WMLOptionElement(const QualifiedName& tagName, Document* doc)
 
 WMLOptionElement::~WMLOptionElement() {}
 
-const AtomicString& WMLOptionElement::type() const {
+const AtomicString& WMLOptionElement::formControlType() const {
   DEFINE_STATIC_LOCAL(const AtomicString, option, ("option"));
   return option;
 }

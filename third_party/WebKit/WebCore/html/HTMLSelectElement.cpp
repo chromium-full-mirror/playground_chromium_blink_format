@@ -108,7 +108,7 @@ void HTMLSelectElement::recalcStyle(StyleChange ch) {
   HTMLFormControlElementWithState::recalcStyle(ch);
 }
 
-const AtomicString& HTMLSelectElement::type() const {
+const AtomicString& HTMLSelectElement::formControlType() const {
   DEFINE_STATIC_LOCAL(const AtomicString, selectMultiple, ("select-multiple"));
   DEFINE_STATIC_LOCAL(const AtomicString, selectOne, ("select-one"));
   return m_multiple ? selectMultiple : selectOne;
@@ -265,7 +265,7 @@ void HTMLSelectElement::setValue(const String& value) {
     }
 }
 
-bool HTMLSelectElement::saveState(String& value) const {
+bool HTMLSelectElement::saveFormControlState(String& value) const {
   const Vector<HTMLElement*>& items = listItems();
   int l = items.size();
   Vector<char, 1024> characters(l);
@@ -279,7 +279,7 @@ bool HTMLSelectElement::saveState(String& value) const {
   return true;
 }
 
-void HTMLSelectElement::restoreState(const String& state) {
+void HTMLSelectElement::restoreFormControlState(const String& state) {
   recalcListItems();
 
   const Vector<HTMLElement*>& items = listItems();

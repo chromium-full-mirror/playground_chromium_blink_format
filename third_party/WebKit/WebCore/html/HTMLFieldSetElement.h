@@ -46,7 +46,7 @@ class HTMLFieldSetElement : public HTMLFormControlElement {
 
   virtual bool isFocusable() const;
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual const AtomicString& type() const;
+  virtual const AtomicString& formControlType() const;
 
   virtual bool willValidate() const { return false; }
 };

@@ -56,7 +56,7 @@ RenderObject* HTMLButtonElement::createRenderer(RenderArena* arena,
   return new (arena) RenderButton(this);
 }
 
-const AtomicString& HTMLButtonElement::type() const {
+const AtomicString& HTMLButtonElement::formControlType() const {
   switch (m_type) {
     case SUBMIT: {
       DEFINE_STATIC_LOCAL(const AtomicString, submit, ("submit"));

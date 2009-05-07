@@ -27,7 +27,6 @@
 
 namespace WebCore {
 
-class FormControlElement;
 class VisibleSelection;
 class TextControlInnerElement;
 class TextControlInnerTextElement;
@@ -98,8 +97,6 @@ class RenderTextControl : public RenderBlock {
 
   friend class TextIterator;
   HTMLElement* innerTextElement() const;
-
-  FormControlElement* formControlElement() const;
 
  private:
   String finishText(Vector<UChar>&) const;

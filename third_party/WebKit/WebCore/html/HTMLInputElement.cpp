@@ -97,7 +97,7 @@ HTMLInputElement::~HTMLInputElement() {
   removeFromForm();
 }
 
-const AtomicString& HTMLInputElement::name() const {
+const AtomicString& HTMLInputElement::formControlName() const {
   return m_data.name();
 }
 
@@ -304,7 +304,7 @@ void HTMLInputElement::setInputType(const String& t) {
     m_imageLoader.clear();
 }
 
-const AtomicString& HTMLInputElement::type() const {
+const AtomicString& HTMLInputElement::formControlType() const {
   // needs to be lowercase according to DOM spec
   switch (inputType()) {
     case BUTTON: {
@@ -377,7 +377,7 @@ const AtomicString& HTMLInputElement::type() const {
   return emptyAtom;
 }
 
-bool HTMLInputElement::saveState(String& result) const {
+bool HTMLInputElement::saveFormControlState(String& result) const {
   if (!autoComplete())
     return false;
 
@@ -409,7 +409,7 @@ bool HTMLInputElement::saveState(String& result) const {
   return false;
 }
 
-void HTMLInputElement::restoreState(const String& state) {
+void HTMLInputElement::restoreFormControlState(const String& state) {
   ASSERT(inputType() != PASSWORD);  // should never save/restore password fields
   switch (inputType()) {
     case BUTTON:
@@ -570,7 +570,7 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
     // right now.
     if (m_data.value().isNull())
       setNeedsStyleRecalc();
-    setValueMatchesRenderer(false);
+    setFormControlValueMatchesRenderer(false);
   } else if (attr->name() == checkedAttr) {
     m_defaultChecked = !attr->isNull();
     if (m_useDefaultChecked) {
@@ -738,7 +738,7 @@ void HTMLInputElement::attach() {
 
 void HTMLInputElement::detach() {
   HTMLFormControlElementWithState::detach();
-  setValueMatchesRenderer(false);
+  setFormControlValueMatchesRenderer(false);
 }
 
 String HTMLInputElement::altText() const {
@@ -968,7 +968,7 @@ void HTMLInputElement::setValue(const String& value) {
   if (inputType() == FILE && !value.isEmpty())
     return;
 
-  setValueMatchesRenderer(false);
+  setFormControlValueMatchesRenderer(false);
   if (storesValueSeparateFromAttribute()) {
     if (inputType() == FILE)
       m_fileList->clear();
@@ -1016,7 +1016,7 @@ void HTMLInputElement::setFileListFromRenderer(const Vector<String>& paths) {
   for (int i = 0; i < size; i++)
     m_fileList->append(File::create(paths[i]));
 
-  setValueMatchesRenderer();
+  setFormControlValueMatchesRenderer(true);
   InputElement::notifyFormStateChanged(m_data, document());
 }
 

@@ -1047,14 +1047,7 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
         } else
           return false;
 
-        FormControlElement* thisFormControlElement = toFormControlElement(s);
-        FormControlElement* otherFormControlElement =
-            toFormControlElement(m_element);
-        if (thisFormControlElement && otherFormControlElement) {
-          if (thisFormControlElement->isEnabled() !=
-              otherFormControlElement->isEnabled())
-            return false;
-        } else
+        if (s->isEnabledFormControl() != m_element->isEnabledFormControl())
           return false;
       }
 
@@ -2563,7 +2556,7 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
           // "receive focus and be activated."  We will limit matching of this
           // pseudo-class to elements
           // that are non-"hidden" controls.
-          return toFormControlElement(e)->isEnabled();
+          return e->isEnabledFormControl();
         }
         break;
       case CSSSelector::PseudoFullPageMedia:
@@ -2580,22 +2573,18 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
           // "receive focus and be activated."  We will limit matching of this
           // pseudo-class to elements
           // that are non-"hidden" controls.
-          return !toFormControlElement(e)->isEnabled();
+          return !e->isEnabledFormControl();
         }
         break;
       case CSSSelector::PseudoReadOnly: {
         if (!e || !e->isFormControlElement())
           return false;
-        FormControlElement* formControlElement = toFormControlElement(e);
-        return formControlElement->isTextControl() &&
-               formControlElement->isReadOnlyControl();
+        return e->isTextFormControl() && e->isReadOnlyFormControl();
       }
       case CSSSelector::PseudoReadWrite: {
         if (!e || !e->isFormControlElement())
           return false;
-        FormControlElement* formControlElement = toFormControlElement(e);
-        return formControlElement->isTextControl() &&
-               !formControlElement->isReadOnlyControl();
+        return e->isTextFormControl() && !e->isReadOnlyFormControl();
       }
       case CSSSelector::PseudoChecked: {
         if (!e || !e->isFormControlElement())

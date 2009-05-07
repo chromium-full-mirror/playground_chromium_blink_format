@@ -34,7 +34,7 @@ class HTMLLegendElement : public HTMLFormControlElement {
   virtual ~HTMLLegendElement();
 
   virtual bool isFocusable() const;
-  virtual const AtomicString& type() const;
+  virtual const AtomicString& formControlType() const;
   virtual void accessKeyAction(bool sendToAnyElement);
 
   /**

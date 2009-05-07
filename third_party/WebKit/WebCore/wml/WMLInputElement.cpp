@@ -39,7 +39,7 @@
 namespace WebCore {
 
 WMLInputElement::WMLInputElement(const QualifiedName& tagName, Document* doc)
-    : WMLFormControlElementWithState(tagName, doc),
+    : WMLFormControlElement(tagName, doc),
       m_data(this, this),
       m_isPasswordField(false),
       m_isEmptyOk(false),
@@ -56,11 +56,11 @@ static const AtomicString& formatCodes() {
 }
 
 bool WMLInputElement::isKeyboardFocusable(KeyboardEvent*) const {
-  return WMLFormControlElementWithState::isFocusable();
+  return WMLFormControlElement::isFocusable();
 }
 
 bool WMLInputElement::isMouseFocusable() const {
-  return WMLFormControlElementWithState::isFocusable();
+  return WMLFormControlElement::isFocusable();
 }
 
 void WMLInputElement::dispatchFocusEvent() {
@@ -77,7 +77,7 @@ void WMLInputElement::dispatchBlurEvent() {
   }
 
   // update the name variable of WML input elmenet
-  String nameVariable = name();
+  String nameVariable = formControlName();
   if (!nameVariable.isEmpty())
     wmlPageStateForDocument(document())->storeVariable(nameVariable, val);
 
@@ -98,7 +98,7 @@ int WMLInputElement::size() const {
   return m_data.size();
 }
 
-const AtomicString& WMLInputElement::type() const {
+const AtomicString& WMLInputElement::formControlType() const {
   // needs to be lowercase according to DOM spec
   if (m_isPasswordField) {
     DEFINE_STATIC_LOCAL(const AtomicString, password, ("password"));
@@ -109,7 +109,7 @@ const AtomicString& WMLInputElement::type() const {
   return text;
 }
 
-const AtomicString& WMLInputElement::name() const {
+const AtomicString& WMLInputElement::formControlName() const {
   return m_data.name();
 }
 
@@ -123,7 +123,7 @@ String WMLInputElement::value() const {
 
 void WMLInputElement::setValue(const String& value) {
   InputElement::updatePlaceholderVisibility(m_data, document());
-  setValueMatchesRenderer(false);
+  setFormControlValueMatchesRenderer(false);
   m_data.setValue(constrainValue(value));
   if (inDocument())
     document()->updateStyleIfNeeded();
@@ -144,7 +144,7 @@ void WMLInputElement::setValueFromRenderer(const String& value) {
   InputElement::setValueFromRenderer(m_data, document(), value);
 }
 
-bool WMLInputElement::saveState(String& result) const {
+bool WMLInputElement::saveFormControlState(String& result) const {
   if (m_isPasswordField)
     return false;
 
@@ -152,7 +152,7 @@ bool WMLInputElement::saveState(String& result) const {
   return true;
 }
 
-void WMLInputElement::restoreState(const String& state) {
+void WMLInputElement::restoreFormControlState(const String& state) {
   ASSERT(!m_isPasswordField);  // should never save/restore password fields
   setValue(state);
 }
@@ -178,7 +178,7 @@ void WMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
     // right now.
     if (m_data.value().isNull())
       setNeedsStyleRecalc();
-    setValueMatchesRenderer(false);
+    setFormControlValueMatchesRenderer(false);
   } else if (attr->name() == HTMLNames::maxlengthAttr)
     InputElement::parseMaxLengthAttribute(m_data, attr);
   else if (attr->name() == HTMLNames::sizeAttr)
@@ -228,14 +228,14 @@ void WMLInputElement::attach() {
 
 void WMLInputElement::detach() {
   WMLElement::detach();
-  setValueMatchesRenderer(false);
+  setFormControlValueMatchesRenderer(false);
 }
 
 bool WMLInputElement::appendFormData(FormDataList& encoding, bool) {
-  if (name().isEmpty())
+  if (formControlName().isEmpty())
     return false;
 
-  encoding.appendData(name(), value());
+  encoding.appendData(formControlName(), value());
   return true;
 }
 
@@ -346,7 +346,7 @@ void WMLInputElement::didMoveToNewOwnerDocument() {
 }
 
 void WMLInputElement::init() {
-  String nameVariable = name();
+  String nameVariable = formControlName();
   String variableValue;
   WMLPageState* pageSate = wmlPageStateForDocument(document());
   ASSERT(pageSate);

@@ -75,7 +75,7 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   virtual void aboutToUnload();
   virtual bool shouldUseInputMethod() const;
 
-  virtual const AtomicString& name() const;
+  virtual const AtomicString& formControlName() const;
 
   bool autoComplete() const;
 
@@ -86,9 +86,9 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   }
   virtual bool isIndeterminate() const { return indeterminate(); }
 
-  bool readOnly() const { return isReadOnlyControl(); }
+  bool readOnly() const { return isReadOnlyFormControl(); }
 
-  virtual bool isTextControl() const { return isTextField(); }
+  virtual bool isTextFormControl() const { return isTextField(); }
 
   bool isTextButton() const {
     return m_type == SUBMIT || m_type == RESET || m_type == BUTTON;
@@ -108,7 +108,7 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   bool indeterminate() const { return m_indeterminate; }
   void setIndeterminate(bool);
   virtual int size() const;
-  virtual const AtomicString& type() const;
+  virtual const AtomicString& formControlType() const;
   void setType(const String&);
 
   virtual String value() const;
@@ -122,8 +122,8 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   virtual void setValueFromRenderer(const String&);
   void setFileListFromRenderer(const Vector<String>&);
 
-  virtual bool saveState(String& value) const;
-  virtual void restoreState(const String&);
+  virtual bool saveFormControlState(String& value) const;
+  virtual void restoreFormControlState(const String&);
 
   virtual bool canStartSelection() const;
 
