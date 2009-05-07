@@ -1284,15 +1284,11 @@ void BinaryOpNode::releaseNodes(NodeReleaser& releaser) {
 // least one left child that is also an add that can be determined to be
 // operating on strings.
 //
-// Fixme: This method should correctly support concatenation on read-modify
-// nodes (+=)
-//        but disabling this due to performance degradation (op_strcat needs to
-//        be able
-//        to append to the existing string).
-//
-RegisterID* BinaryOpNode::emitStrcat(BytecodeGenerator& generator,
-                                     RegisterID* dst,
-                                     RegisterID* lhs) {
+RegisterID* BinaryOpNode::emitStrcat(
+    BytecodeGenerator& generator,
+    RegisterID* dst,
+    RegisterID* lhs,
+    ReadModifyResolveNode* emitExpressionInfoForMe) {
   ASSERT(isAdd());
   ASSERT(resultDescriptor().definitelyIsString());
 
@@ -1388,6 +1384,15 @@ RegisterID* BinaryOpNode::emitStrcat(BytecodeGenerator& generator,
                                 temporaryRegisters.last().get());
   }
   ASSERT(temporaryRegisters.size() >= 3);
+
+  // Certain read-modify nodes require expression info to be emitted *after*
+  // m_right has been generated.
+  // If this is required the node is passed as 'emitExpressionInfoForMe'; do so
+  // now.
+  if (emitExpressionInfoForMe)
+    generator.emitExpressionInfo(emitExpressionInfoForMe->divot(),
+                                 emitExpressionInfoForMe->startOffset(),
+                                 emitExpressionInfoForMe->endOffset());
 
   // If there is an assignment convert the lhs now.  This will also copy lhs to
   // the temporary register we allocated for it.
@@ -1565,9 +1570,10 @@ static ALWAYS_INLINE RegisterID* emitReadModifyAssignment(
     BytecodeGenerator& generator,
     RegisterID* dst,
     RegisterID* src1,
-    RegisterID* src2,
+    ExpressionNode* m_right,
     Operator oper,
-    OperandTypes types) {
+    OperandTypes types,
+    ReadModifyResolveNode* emitExpressionInfoForMe = 0) {
   OpcodeID opcodeID;
   switch (oper) {
     case OpMultEq:
@@ -1577,6 +1583,9 @@ static ALWAYS_INLINE RegisterID* emitReadModifyAssignment(
       opcodeID = op_div;
       break;
     case OpPlusEq:
+      if (m_right->isAdd() && m_right->resultDescriptor().definitelyIsString())
+        return static_cast<AddNode*>(m_right)->emitStrcat(
+            generator, dst, src1, emitExpressionInfoForMe);
       opcodeID = op_add;
       break;
     case OpMinusEq:
@@ -1608,6 +1617,17 @@ static ALWAYS_INLINE RegisterID* emitReadModifyAssignment(
       return dst;
   }
 
+  RegisterID* src2 = generator.emitNode(m_right);
+
+  // Certain read-modify nodes require expression info to be emitted *after*
+  // m_right has been generated.
+  // If this is required the node is passed as 'emitExpressionInfoForMe'; do so
+  // now.
+  if (emitExpressionInfoForMe)
+    generator.emitExpressionInfo(emitExpressionInfoForMe->divot(),
+                                 emitExpressionInfoForMe->startOffset(),
+                                 emitExpressionInfoForMe->endOffset());
+
   return generator.emitBinaryOp(opcodeID, dst, src1, src2, types);
 }
 
@@ -1615,9 +1635,9 @@ RegisterID* ReadModifyResolveNode::emitBytecode(BytecodeGenerator& generator,
                                                 RegisterID* dst) {
   if (RegisterID* local = generator.registerFor(m_ident)) {
     if (generator.isLocalConstant(m_ident)) {
-      RegisterID* src2 = generator.emitNode(m_right.get());
       return emitReadModifyAssignment(
-          generator, generator.finalDestination(dst), local, src2, m_operator,
+          generator, generator.finalDestination(dst), local, m_right.get(),
+          m_operator,
           OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
     }
 
@@ -1625,17 +1645,15 @@ RegisterID* ReadModifyResolveNode::emitBytecode(BytecodeGenerator& generator,
                                         m_right->isPure(generator))) {
       RefPtr<RegisterID> result = generator.newTemporary();
       generator.emitMove(result.get(), local);
-      RegisterID* src2 = generator.emitNode(m_right.get());
       emitReadModifyAssignment(
-          generator, result.get(), result.get(), src2, m_operator,
+          generator, result.get(), result.get(), m_right.get(), m_operator,
           OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
       generator.emitMove(local, result.get());
       return generator.moveToDestinationIfNeeded(dst, result.get());
     }
 
-    RegisterID* src2 = generator.emitNode(m_right.get());
     RegisterID* result = emitReadModifyAssignment(
-        generator, local, local, src2, m_operator,
+        generator, local, local, m_right.get(), m_operator,
         OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
     return generator.moveToDestinationIfNeeded(dst, result);
   }
@@ -1647,10 +1665,9 @@ RegisterID* ReadModifyResolveNode::emitBytecode(BytecodeGenerator& generator,
       index != missingSymbolMarker()) {
     RefPtr<RegisterID> src1 = generator.emitGetScopedVar(
         generator.tempDestination(dst), depth, index, globalObject);
-    RegisterID* src2 = generator.emitNode(m_right.get());
     RegisterID* result = emitReadModifyAssignment(
         generator, generator.finalDestination(dst, src1.get()), src1.get(),
-        src2, m_operator,
+        m_right.get(), m_operator,
         OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
     generator.emitPutScopedVar(depth, index, result, globalObject);
     return result;
@@ -1661,12 +1678,11 @@ RegisterID* ReadModifyResolveNode::emitBytecode(BytecodeGenerator& generator,
                                m_ident.size(), 0);
   RefPtr<RegisterID> base = generator.emitResolveWithBase(
       generator.newTemporary(), src1.get(), m_ident);
-  RegisterID* src2 = generator.emitNode(m_right.get());
-  generator.emitExpressionInfo(divot(), startOffset(), endOffset());
   RegisterID* result = emitReadModifyAssignment(
-      generator, generator.finalDestination(dst, src1.get()), src1.get(), src2,
-      m_operator,
-      OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
+      generator, generator.finalDestination(dst, src1.get()), src1.get(),
+      m_right.get(), m_operator,
+      OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()),
+      this);
   return generator.emitPutById(base.get(), m_ident, result);
 }
 
@@ -1757,10 +1773,9 @@ RegisterID* ReadModifyDotNode::emitBytecode(BytecodeGenerator& generator,
                                m_subexpressionEndOffset);
   RefPtr<RegisterID> value = generator.emitGetById(
       generator.tempDestination(dst), base.get(), m_ident);
-  RegisterID* change = generator.emitNode(m_right.get());
   RegisterID* updatedValue = emitReadModifyAssignment(
       generator, generator.finalDestination(dst, value.get()), value.get(),
-      change, m_operator,
+      m_right.get(), m_operator,
       OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
 
   generator.emitExpressionInfo(divot(), startOffset(), endOffset());
@@ -1839,10 +1854,9 @@ RegisterID* ReadModifyBracketNode::emitBytecode(BytecodeGenerator& generator,
                                m_subexpressionEndOffset);
   RefPtr<RegisterID> value = generator.emitGetByVal(
       generator.tempDestination(dst), base.get(), property.get());
-  RegisterID* change = generator.emitNode(m_right.get());
   RegisterID* updatedValue = emitReadModifyAssignment(
       generator, generator.finalDestination(dst, value.get()), value.get(),
-      change, m_operator,
+      m_right.get(), m_operator,
       OperandTypes(ResultType::unknownType(), m_right->resultDescriptor()));
 
   generator.emitExpressionInfo(divot(), startOffset(), endOffset());

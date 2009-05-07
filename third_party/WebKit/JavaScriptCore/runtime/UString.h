@@ -162,6 +162,8 @@ class UString {
     static BaseString& null() { return *nullBaseString; }
     static BaseString& empty() { return *emptyBaseString; }
 
+    bool reserveCapacity(int capacity);
+
    protected:
     // constructor for use by BaseString subclass; they are their own bases
     Rep(int length)
@@ -329,6 +331,19 @@ class UString {
   UString(PassRefPtr<Rep> r) : m_rep(r) { ASSERT(m_rep); }
 
   size_t cost() const;
+
+  // Attempt to grow this string such that it can grow to a total length of
+  // 'capacity'
+  // without reallocation.  This may fail a number of reasons - if the
+  // BasicString is
+  // shared and another string is using part of the capacity beyond our end
+  // point, if
+  // the realloc fails, or if this string is empty and has no storage.
+  //
+  // This method returns a boolean indicating success.
+  bool reserveCapacity(int capacity) {
+    return m_rep->reserveCapacity(capacity);
+  }
 
  private:
   void expandCapacity(int requiredLength);

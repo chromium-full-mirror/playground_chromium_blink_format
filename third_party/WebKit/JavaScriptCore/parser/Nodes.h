@@ -53,6 +53,7 @@ class JSFunction;
 class NodeReleaser;
 class ProgramCodeBlock;
 class PropertyListNode;
+class ReadModifyResolveNode;
 class RegisterID;
 class ScopeChainNode;
 
@@ -1043,12 +1044,14 @@ class BinaryOpNode : public ExpressionNode {
   virtual ~BinaryOpNode();
   virtual void releaseNodes(NodeReleaser&);
 
+  RegisterID* emitStrcat(BytecodeGenerator& generator,
+                         RegisterID* dst,
+                         RegisterID* lhs = 0,
+                         ReadModifyResolveNode* emitExpressionInfoForMe = 0);
+
  private:
   virtual RegisterID* emitBytecode(BytecodeGenerator&,
                                    RegisterID* = 0) JSC_FAST_CALL;
-  RegisterID* emitStrcat(BytecodeGenerator& generator,
-                         RegisterID* dst,
-                         RegisterID* lhs = 0);
 
  protected:
   OpcodeID opcodeID() const { return m_opcodeID; }
