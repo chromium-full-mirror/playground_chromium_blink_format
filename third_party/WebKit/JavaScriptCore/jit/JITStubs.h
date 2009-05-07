@@ -113,6 +113,12 @@ struct JITStackFrame {
 };
 #endif
 
+#define STUB_ARGS_code (offsetof(struct JITStackFrame, code) / sizeof(void*))
+#define STUB_ARGS_callFrame \
+  (offsetof(struct JITStackFrame, callFrame) / sizeof(void*))
+
+#define STUB_RETURN_ADDRESS_SLOT (STUB_ARGS[-1])
+
 #if USE(JIT_STUB_ARGUMENT_VA_LIST)
 #define STUB_ARGS_DECLARATION void *args, ...
 #define STUB_ARGS (reinterpret_cast<void**>(vl_args) - 1)
@@ -139,31 +145,6 @@ struct JITStackFrame {
 #endif
 #endif
 
-#if PLATFORM(X86_64)
-#define STUB_ARGS_offset 0x10
-#else
-#define STUB_ARGS_offset 0x0C
-#endif
-
-#define STUB_ARGS_code (STUB_ARGS_offset)
-#define STUB_ARGS_registerFile (STUB_ARGS_offset + 1)
-#define STUB_ARGS_callFrame (STUB_ARGS_offset + 2)
-#define STUB_ARGS_exception (STUB_ARGS_offset + 3)
-#define STUB_ARGS_profilerReference (STUB_ARGS_offset + 4)
-#define STUB_ARGS_globalData (STUB_ARGS_offset + 5)
-
-#define STUB_RETURN_ADDRESS_SLOT (STUB_ARGS[-1])
-
-// The Mac compilers are fine with this,
-#if PLATFORM(MAC)
-struct VoidPtrPair {
-  void* first;
-  void* second;
-};
-#define RETURN_PAIR(a, b)    \
-  VoidPtrPair pair = {a, b}; \
-  return pair
-#else
 typedef uint64_t VoidPtrPair;
 union VoidPtrPairValue {
   struct {
@@ -175,7 +156,6 @@ union VoidPtrPairValue {
 #define RETURN_PAIR(a, b)           \
   VoidPtrPairValue pair = {{a, b}}; \
   return pair.i
-#endif
 
 extern "C" void ctiVMThrowTrampoline();
 extern "C" EncodedJSValue ctiTrampoline(
