@@ -73,6 +73,7 @@
 #include "HTMLMapElement.h"
 #include "HTMLNameCollection.h"
 #include "HTMLNames.h"
+#include "HTMLParser.h"
 #include "HTMLStyleElement.h"
 #include "HTMLTitleElement.h"
 #include "HTTPParsers.h"
@@ -1631,7 +1632,10 @@ void Document::implicitClose() {
   if (!this->body() && isHTMLDocument()) {
     if (Node* documentElement = this->documentElement()) {
       ExceptionCode ec = 0;
-      if (!head()) {
+
+      // The implicit <head> isn't expected in older versions of Mail -
+      // <rdar://problem/6863795>
+      if (!head() && shouldCreateImplicitHead(this)) {
         documentElement->appendChild(new HTMLHeadElement(headTag, this), ec);
         ASSERT(!ec);
       }
