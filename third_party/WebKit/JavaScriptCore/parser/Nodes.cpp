@@ -2769,7 +2769,7 @@ void ScopeNodeData::mark() {
 
 ScopeNode::ScopeNode(JSGlobalData* globalData)
     : StatementNode(globalData), m_features(NoFeatures) {
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(CODEBLOCK_SAMPLING)
   globalData->interpreter->sampler()->notifyOfScope(this);
 #endif
 }
@@ -2785,7 +2785,7 @@ ScopeNode::ScopeNode(JSGlobalData* globalData,
       m_data(new ScopeNodeData(children, varStack, funcStack, numConstants)),
       m_features(features),
       m_source(source) {
-#if ENABLE(OPCODE_SAMPLING)
+#if ENABLE(CODEBLOCK_SAMPLING)
   globalData->interpreter->sampler()->notifyOfScope(this);
 #endif
 }
