@@ -29,6 +29,7 @@
 
 #include "AXObjectCache.h"
 #include "ApplyStyleCommand.h"
+#include "CharacterNames.h"
 #include "CreateLinkCommand.h"
 #include "CSSComputedStyleDeclaration.h"
 #include "CSSMutableStyleDeclaration.h"
@@ -2517,6 +2518,17 @@ void Editor::markBadGrammar(const VisibleSelection& selection) {
 #if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
     !defined(BUILDING_ON_LEOPARD)
 
+static inline bool isAmbiguousBoundaryCharacter(UChar character) {
+  // These are characters that can behave as word boundaries, but can appear
+  // within words.
+  // If they are just typed, i.e. if they are immediately followed by a caret,
+  // we want to delay text checking until the next character has been typed.
+  // FIXME: this is required until 6853027 is fixed and text checking can do
+  // this for us.
+  return character == '\'' || character == rightSingleQuotationMark ||
+         character == hebrewPunctuationGershayim;
+}
+
 void Editor::markAllMisspellingsAndBadGrammarInRanges(
     bool markSpelling,
     Range* spellingRange,
@@ -2543,6 +2555,7 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
   int offsetDueToReplacement = 0;
   int paragraphLength = 0;
   int selectionOffset = 0;
+  int ambiguousBoundaryOffset = -1;
   bool selectionChanged = false;
   bool restoreSelectionAfterChange = false;
   bool adjustSelectionForParagraphBoundaries = false;
@@ -2585,8 +2598,13 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
       if (!ec) {
         selectionOffset = TextIterator::rangeLength(offsetAsRange.get());
         restoreSelectionAfterChange = true;
-        adjustSelectionForParagraphBoundaries =
-            (selectionOffset > paragraphLength) ? true : false;
+        if (selectionOffset > 0 &&
+            (selectionOffset > paragraphLength ||
+             paragraphString[selectionOffset - 1] == newlineCharacter))
+          adjustSelectionForParagraphBoundaries = true;
+        if (selectionOffset > 0 && selectionOffset <= paragraphLength &&
+            isAmbiguousBoundaryCharacter(paragraphString[selectionOffset - 1]))
+          ambiguousBoundaryOffset = selectionOffset - 1;
       }
     }
   }
@@ -2660,6 +2678,20 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
       RefPtr<Range> rangeToReplace = TextIterator::subrange(
           paragraphRange.get(), resultLocation, resultLength);
       VisibleSelection selectionToReplace(rangeToReplace.get(), DOWNSTREAM);
+
+      // avoid correcting text after an ambiguous boundary character has been
+      // typed
+      // FIXME: this is required until 6853027 is fixed and text checking can do
+      // this for us
+      if (ambiguousBoundaryOffset >= 0 &&
+          resultLocation + resultLength == ambiguousBoundaryOffset)
+        doReplacement = false;
+
+      // adding links should be done only immediately after they are typed
+      if (result->type == TextCheckingTypeLink &&
+          selectionOffset > resultLocation + resultLength + 1)
+        doReplacement = false;
+
       if (doReplacement &&
           selectionToReplace != m_frame->selection()->selection()) {
         if (m_frame->shouldChangeSelection(selectionToReplace)) {
@@ -2671,6 +2703,7 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
       }
       if (doReplacement) {
         if (result->type == TextCheckingTypeLink) {
+          restoreSelectionAfterChange = false;
           if (canEditRichly())
             applyCommand(CreateLinkCommand::create(m_frame->document(),
                                                    result->replacement));
