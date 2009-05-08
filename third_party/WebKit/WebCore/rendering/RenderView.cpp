@@ -372,7 +372,8 @@ void RenderView::setMaximalOutlineSize(int o) {
 void RenderView::setSelection(RenderObject* start,
                               int startPos,
                               RenderObject* end,
-                              int endPos) {
+                              int endPos,
+                              SelectionRepaintMode blockRepaintMode) {
   // Make sure both our start and end objects are defined.
   // Check www.msnbc.com and try clicking around to find the case where this
   // happened.
@@ -458,6 +459,8 @@ void RenderView::setSelection(RenderObject* start,
     o = o->nextInPreOrder();
   }
 
+  m_cachedSelectionBounds = IntRect();
+
   // Now that the selection state has been updated for the new objects, walk
   // them again and
   // put them in the new objects list.
@@ -471,7 +474,9 @@ void RenderView::setSelection(RenderObject* start,
         RenderBlockSelectionInfo* blockInfo = newSelectedBlocks.get(cb);
         if (blockInfo)
           break;
-        newSelectedBlocks.set(cb, new RenderBlockSelectionInfo(cb));
+        blockInfo = new RenderBlockSelectionInfo(cb);
+        newSelectedBlocks.set(cb, blockInfo);
+        m_cachedSelectionBounds.unite(blockInfo->rects());
         cb = cb->containingBlock();
       }
     }
@@ -528,7 +533,8 @@ void RenderView::setSelection(RenderObject* start,
     RenderBlockSelectionInfo* oldInfo = i->second;
     if (!newInfo || oldInfo->rects() != newInfo->rects() ||
         oldInfo->state() != newInfo->state()) {
-      oldInfo->repaint();
+      if (blockRepaintMode == RepaintNewXOROld)
+        oldInfo->repaint();
       if (newInfo) {
         newInfo->repaint();
         newSelectedBlocks.remove(block);
@@ -550,7 +556,8 @@ void RenderView::setSelection(RenderObject* start,
 }
 
 void RenderView::clearSelection() {
-  setSelection(0, -1, 0, -1);
+  repaintViewRectangle(m_cachedSelectionBounds);
+  setSelection(0, -1, 0, -1, RepaintNewMinusOld);
 }
 
 void RenderView::selectionStartEnd(int& startPos, int& endPos) const {

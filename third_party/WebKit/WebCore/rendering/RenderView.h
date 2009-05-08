@@ -75,10 +75,12 @@ class RenderView : public RenderBlock {
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
 
+  enum SelectionRepaintMode { RepaintNewXOROld, RepaintNewMinusOld };
   void setSelection(RenderObject* start,
                     int startPos,
                     RenderObject* end,
-                    int endPos);
+                    int endPos,
+                    SelectionRepaintMode = RepaintNewXOROld);
   void clearSelection();
   virtual RenderObject* selectionStart() const { return m_selectionStart; }
   virtual RenderObject* selectionEnd() const { return m_selectionEnd; }
@@ -223,6 +225,8 @@ class RenderView : public RenderBlock {
   RenderWidgetSet m_widgets;
 
  private:
+  IntRect m_cachedSelectionBounds;
+
   int m_bestTruncatedAt;
   int m_truncatorWidth;
   bool m_forcedPageBreak;
