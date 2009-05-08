@@ -62,10 +62,12 @@ Path::Path() {
 #endif
 }
 
-Path::~Path() {}
+Path::~Path() {
+  clear();
+}
 
 Path::Path(const Path& path) {
-  m_path = (PlatformPath*)&path.m_path;
+  m_path = new wxGraphicsPath(*path.m_path);
 }
 
 bool Path::contains(const FloatPoint& point, const WindRule rule) const {
