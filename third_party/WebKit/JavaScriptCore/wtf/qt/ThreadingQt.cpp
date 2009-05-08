@@ -41,14 +41,6 @@
 
 namespace WTF {
 
-bool ThreadIdentifier::operator==(const ThreadIdentifier& another) const {
-  return m_platformId == another.m_platformId;
-}
-
-bool ThreadIdentifier::operator!=(const ThreadIdentifier& another) const {
-  return m_platformId != another.m_platformId;
-}
-
 class ThreadPrivate : public QThread {
  public:
   ThreadPrivate(ThreadFunction entryPoint, void* data);
@@ -72,12 +64,63 @@ static Mutex* atomicallyInitializedStaticMutex;
 
 static ThreadIdentifier mainThreadIdentifier;
 
+static Mutex& threadMapMutex() {
+  static Mutex mutex;
+  return mutex;
+}
+
+static HashMap<ThreadIdentifier, QThread*>& threadMap() {
+  static HashMap<ThreadIdentifier, QThread*> map;
+  return map;
+}
+
+static ThreadIdentifier identifierByQthreadHandle(QThread*& thread) {
+  MutexLocker locker(threadMapMutex());
+
+  HashMap<ThreadIdentifier, QThread*>::iterator i = threadMap().begin();
+  for (; i != threadMap().end(); ++i) {
+    if (i->second == thread)
+      return i->first;
+  }
+
+  return 0;
+}
+
+static ThreadIdentifier establishIdentifierForThread(QThread*& thread) {
+  ASSERT(!identifierByQthreadHandle(thread));
+
+  MutexLocker locker(threadMapMutex());
+
+  static ThreadIdentifier identifierCount = 1;
+
+  threadMap().add(identifierCount, thread);
+
+  return identifierCount++;
+}
+
+static void clearThreadForIdentifier(ThreadIdentifier id) {
+  MutexLocker locker(threadMapMutex());
+
+  ASSERT(threadMap().contains(id));
+
+  threadMap().remove(id);
+}
+
+static QThread* threadForIdentifier(ThreadIdentifier id) {
+  MutexLocker locker(threadMapMutex());
+
+  return threadMap().get(id);
+}
+
 void initializeThreading() {
   if (!atomicallyInitializedStaticMutex) {
     atomicallyInitializedStaticMutex = new Mutex;
+    threadMapMutex();
     initializeRandomNumberGenerator();
-    mainThreadIdentifier =
-        ThreadIdentifier(QCoreApplication::instance()->thread());
+    QThread* mainThread = QCoreApplication::instance()->thread();
+    mainThreadIdentifier = identifierByQthreadHandle(mainThread);
+    if (!mainThreadIdentifier)
+      mainThreadIdentifier = establishIdentifierForThread(mainThread);
     initializeMainThread();
   }
 }
@@ -98,24 +141,25 @@ ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
   if (!thread) {
     LOG_ERROR("Failed to create thread at entry point %p with data %p",
               entryPoint, data);
-    return ThreadIdentifier();
+    return 0;
   }
   thread->start();
 
   QThread* threadRef = static_cast<QThread*>(thread);
 
-  return ThreadIdentifier(threadRef);
+  return establishIdentifierForThread(threadRef);
 }
 
 void setThreadNameInternal(const char*) {}
 
 int waitForThreadCompletion(ThreadIdentifier threadID, void** result) {
-  ASSERT(threadID.IsValid());
+  ASSERT(threadID);
 
-  QThread* thread = threadID.platformId();
+  QThread* thread = threadForIdentifier(threadID);
 
   bool res = thread->wait();
 
+  clearThreadForIdentifier(threadID);
   if (result)
     *result = static_cast<ThreadPrivate*>(thread)->getReturnValue();
 
@@ -125,7 +169,10 @@ int waitForThreadCompletion(ThreadIdentifier threadID, void** result) {
 void detachThread(ThreadIdentifier) {}
 
 ThreadIdentifier currentThread() {
-  return ThreadIdentifier(QThread::currentThread());
+  QThread* currentThread = QThread::currentThread();
+  if (ThreadIdentifier id = identifierByQthreadHandle(currentThread))
+    return id;
+  return establishIdentifierForThread(currentThread);
 }
 
 bool isMainThread() {
