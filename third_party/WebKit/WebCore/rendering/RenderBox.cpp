@@ -1548,6 +1548,7 @@ void RenderBox::calcHeight() {
   if (isTableCell() || (isInline() && !isReplaced()))
     return;
 
+  Length h;
   if (isPositioned())
     calcAbsoluteVertical();
   else {
@@ -1557,7 +1558,6 @@ void RenderBox::calcHeight() {
     if (isTable())
       return;
 
-    Length h;
     bool inHorizontalBox = parent()->isFlexibleBox() &&
                            parent()->style()->boxOrient() == HORIZONTAL;
     bool stretching = parent()->style()->boxAlign() == BSTRETCH;
@@ -1623,8 +1623,22 @@ void RenderBox::calcHeight() {
   // mode.  The <body> always fills the
   // <html> block in quirks mode.  Only apply this quirk if the block is normal
   // flow and no height
-  // is specified.
-  if (stretchesToViewHeight()) {
+  // is specified. When we're printing, we also need this quirk if the body or
+  // root has a percentage
+  // height since we don't set a height in RenderView when we're printing. So
+  // without this quirk, the
+  // height has nothing to be a percentage of, and it ends up being 0. That is
+  // bad.
+  bool printingNeedsBaseHeight =
+      document()->printing() && h.isPercent() && (isRoot() ||
+                                                  isBody() &&
+                                                      document()
+                                                          ->documentElement()
+                                                          ->renderer()
+                                                          ->style()
+                                                          ->height()
+                                                          .isPercent());
+  if (stretchesToViewHeight() || printingNeedsBaseHeight) {
     int margins = collapsedMarginTop() + collapsedMarginBottom();
     int visHeight = document()->printing()
                         ? view()->frameView()->visibleHeight()
