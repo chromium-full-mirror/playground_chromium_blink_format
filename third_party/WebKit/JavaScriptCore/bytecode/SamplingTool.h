@@ -179,14 +179,16 @@ class SamplingTool {
            sizeof(m_opcodeSamplesInCTIFunctions));
   }
 
+  ~SamplingTool() {
 #if ENABLE(CODEBLOCK_SAMPLING)
-  ~SamplingTool() { deleteAllValues(*m_scopeSampleMap); }
-
-  void notifyOfScope(ScopeNode* scope);
+    deleteAllValues(*m_scopeSampleMap);
 #endif
+  }
 
   void setup();
   void dump(ExecState*);
+
+  void notifyOfScope(ScopeNode* scope);
 
   void sample(CodeBlock* codeBlock, Instruction* vPC) {
     ASSERT(!(reinterpret_cast<intptr_t>(vPC) & 0x3));

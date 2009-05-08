@@ -195,12 +195,14 @@ void SamplingTool::sample() {
   s_samplingTool->doRun();
 }
 
-#if ENABLE(CODEBLOCK_SAMPLING)
 void SamplingTool::notifyOfScope(ScopeNode* scope) {
+#if ENABLE(CODEBLOCK_SAMPLING)
   MutexLocker locker(m_scopeSampleMapMutex);
   m_scopeSampleMap->set(scope, new ScopeSampleRecord(scope));
-}
+#else
+  UNUSED_PARAM(scope);
 #endif
+}
 
 void SamplingTool::setup() {
   s_samplingTool = this;
