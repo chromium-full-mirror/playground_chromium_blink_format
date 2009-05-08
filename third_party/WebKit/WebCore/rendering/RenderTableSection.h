@@ -163,13 +163,13 @@ class RenderTableSection : public RenderBox {
   RenderObjectChildList m_children;
 
   Vector<RowStruct> m_grid;
-  int m_gridRows;
   Vector<int> m_rowPos;
+
+  int m_gridRows;
 
   // the current insertion position
   int m_cCol;
   int m_cRow;
-  bool m_needsCellRecalc;
 
   int m_outerBorderLeft;
   int m_outerBorderRight;
@@ -179,6 +179,8 @@ class RenderTableSection : public RenderBox {
   int m_overflowWidth;
   int m_overflowTop;
   int m_overflowHeight;
+
+  bool m_needsCellRecalc;
   bool m_hasOverflowingCell;
 };
 
