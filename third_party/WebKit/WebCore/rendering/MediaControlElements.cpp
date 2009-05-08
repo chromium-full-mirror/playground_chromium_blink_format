@@ -32,9 +32,7 @@
 
 #include "MediaControlElements.h"
 
-#include "Event.h"
 #include "EventNames.h"
-#include "EventHandler.h"
 #include "FloatConversion.h"
 #include "Frame.h"
 #include "HTMLNames.h"
@@ -268,11 +266,12 @@ void MediaControlSeekButtonElement::seekTimerFired(
 // ----------------------------
 
 MediaControlTimelineElement::MediaControlTimelineElement(
-    Document* doc,
+    Document* document,
     HTMLMediaElement* element)
-    : MediaControlInputElement(doc, MEDIA_CONTROLS_TIMELINE, "range", element) {
-  setAttribute(precisionAttr, "float");
-}
+    : MediaControlInputElement(document,
+                               MEDIA_CONTROLS_TIMELINE,
+                               "range",
+                               element) {}
 
 void MediaControlTimelineElement::defaultEventHandler(Event* event) {
   if (event->type() == eventNames().mousedownEvent)
