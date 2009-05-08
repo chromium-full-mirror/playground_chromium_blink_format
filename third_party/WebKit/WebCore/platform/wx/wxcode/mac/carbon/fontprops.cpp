@@ -86,6 +86,9 @@ wxFontProperties::wxFontProperties(wxFont* font)
     m_xHeight = lroundf(xHeight);
     m_lineSpacing = m_ascent + m_descent + m_lineGap;
   }
+
+  if (cgFont)
+    CGFontRelease(cgFont);
 }
 
 void GetTextExtent(const wxFont& font,
