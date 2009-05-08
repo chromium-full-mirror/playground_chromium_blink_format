@@ -163,8 +163,8 @@ class Event : public RefCounted<Event> {
   bool m_defaultHandled;
   bool m_cancelBubble;
 
-  EventTarget* m_currentTarget;
   unsigned short m_eventPhase;
+  EventTarget* m_currentTarget;
   RefPtr<EventTarget> m_target;
   DOMTimeStamp m_createTime;
 
