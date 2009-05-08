@@ -83,6 +83,8 @@ void Parser::reparseInPlace(JSGlobalData* globalData,
   if (usesArguments && !functionBodyNode->usesArguments())
     functionBodyNode->setUsesArguments();
 
+  globalData->parserObjects.shrink(0);
+
   m_source = 0;
   m_sourceElements = 0;
   m_varDeclarations = 0;
