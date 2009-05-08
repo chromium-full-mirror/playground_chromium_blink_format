@@ -94,6 +94,7 @@ void RenderWidget::destroy() {
 
   if (hasLayer()) {
     layer()->clearClipRects();
+    setHasLayer(false);
     destroyLayer();
   }
 

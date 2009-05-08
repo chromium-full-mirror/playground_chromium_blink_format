@@ -887,6 +887,10 @@ void RenderLayer::removeOnlyThisLayer() {
   if (!m_parent)
     return;
 
+  // Mark that we are about to lose our layer. This makes render tree
+  // walks ignore this layer while we're removing it.
+  m_renderer->setHasLayer(false);
+
 #if USE(ACCELERATED_COMPOSITING)
   compositor()->layerWillBeRemoved(m_parent, this);
 #endif
@@ -908,7 +912,8 @@ void RenderLayer::removeOnlyThisLayer() {
     RenderLayer* next = current->nextSibling();
     removeChild(current);
     parent->addChild(current, nextSib);
-    current->updateLayerPositions();
+    current->updateLayerPositions();  // Depends on hasLayer() already being
+                                      // false for proper layout.
     current = next;
   }
 
