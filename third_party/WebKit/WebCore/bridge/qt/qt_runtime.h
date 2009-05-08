@@ -173,10 +173,10 @@ class QtRuntimeMetaMethod : public QtRuntimeMethod {
 
  private:
   virtual CallType getCallData(CallData&);
-  static JSValue call(ExecState* exec,
-                      JSObject* functionObject,
-                      JSValue thisValue,
-                      const ArgList& args);
+  static JSValue JSC_HOST_CALL call(ExecState* exec,
+                                    JSObject* functionObject,
+                                    JSValue thisValue,
+                                    const ArgList& args);
   static JSValue lengthGetter(ExecState*,
                               const Identifier&,
                               const PropertySlot&);
@@ -207,10 +207,10 @@ class QtRuntimeConnectionMethod : public QtRuntimeMethod {
 
  private:
   virtual CallType getCallData(CallData&);
-  static JSValue call(ExecState* exec,
-                      JSObject* functionObject,
-                      JSValue thisValue,
-                      const ArgList& args);
+  static JSValue JSC_HOST_CALL call(ExecState* exec,
+                                    JSObject* functionObject,
+                                    JSValue thisValue,
+                                    const ArgList& args);
   static JSValue lengthGetter(ExecState*,
                               const Identifier&,
                               const PropertySlot&);
