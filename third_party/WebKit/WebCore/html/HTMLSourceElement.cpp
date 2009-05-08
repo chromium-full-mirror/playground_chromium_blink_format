@@ -28,6 +28,7 @@
 #if ENABLE(VIDEO)
 #include "HTMLSourceElement.h"
 
+#include "EventNames.h"
 #include "HTMLDocument.h"
 #include "HTMLMediaElement.h"
 #include "HTMLNames.h"
@@ -40,7 +41,8 @@ using namespace HTMLNames;
 
 HTMLSourceElement::HTMLSourceElement(const QualifiedName& tagName,
                                      Document* doc)
-    : HTMLElement(tagName, doc) {
+    : HTMLElement(tagName, doc),
+      m_errorEventTimer(this, &HTMLSourceElement::errorEventTimerFired) {
   ASSERT(hasTagName(sourceTag));
 }
 
@@ -78,6 +80,21 @@ String HTMLSourceElement::type() const {
 
 void HTMLSourceElement::setType(const String& type) {
   setAttribute(typeAttr, type);
+}
+
+void HTMLSourceElement::scheduleErrorEvent() {
+  if (m_errorEventTimer.isActive())
+    return;
+
+  m_errorEventTimer.startOneShot(0);
+}
+
+void HTMLSourceElement::cancelPendingErrorEvent() {
+  m_errorEventTimer.stop();
+}
+
+void HTMLSourceElement::errorEventTimerFired(Timer<HTMLSourceElement>*) {
+  dispatchEvent(eventNames().errorEvent, false, true);
 }
 }
 #endif

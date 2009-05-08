@@ -38,7 +38,7 @@ class MediaError : public RefCounted<MediaError> {
     MEDIA_ERR_ABORTED = 1,
     MEDIA_ERR_NETWORK,
     MEDIA_ERR_DECODE,
-    MEDIA_ERR_NONE_SUPPORTED
+    MEDIA_ERR_SRC_NOT_SUPPORTED
   };
 
   static PassRefPtr<MediaError> create(Code code) {

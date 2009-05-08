@@ -39,6 +39,7 @@
 namespace WebCore {
 
 class Event;
+class HTMLSourceElement;
 class MediaError;
 class KURL;
 class TimeRanges;
@@ -192,13 +193,17 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   // loading
   void selectMediaResource();
-  void loadResource(String url, ContentType& contentType);
+  void loadResource(const KURL&, ContentType&);
   void loadNextSourceChild();
   void userCancelledLoad();
-  String nextSourceChild(ContentType* contentType = 0);
   bool havePotentialSourceChild();
   void noneSupported();
   void mediaEngineError(PassRefPtr<MediaError> err);
+  void cancelPendingEventsAndCallbacks();
+
+  enum InvalidSourceAction { DoNothing, Complain };
+  bool isSafeToLoadURL(const KURL&, InvalidSourceAction);
+  KURL selectNextSourceChild(ContentType*, InvalidSourceAction);
 
   // These "internal" functions do not check user gesture restrictions.
   void loadInternal();
@@ -268,7 +273,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
     LoadingFromSourceElement
   };
   LoadState m_loadState;
-  Node* m_currentSourceNode;
+  HTMLSourceElement* m_currentSourceNode;
 
   OwnPtr<MediaPlayer> m_player;
 
