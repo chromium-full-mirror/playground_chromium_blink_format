@@ -65,6 +65,10 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
     m_assembler.movl_i32m(imm.m_value, address);
   }
 
+  void store32(RegisterID src, void* address) {
+    m_assembler.movl_rm(src, address);
+  }
+
   Jump branch32(Condition cond, AbsoluteAddress left, RegisterID right) {
     m_assembler.cmpl_rm(right, left.m_ptr);
     return Jump(m_assembler.jCC(cond));

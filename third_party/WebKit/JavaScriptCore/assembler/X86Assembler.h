@@ -870,6 +870,11 @@ class X86Assembler {
     m_formatter.immediate64(reinterpret_cast<int64_t>(addr));
   }
 
+  void movq_EAXm(void* addr) {
+    m_formatter.oneByteOp64(OP_MOV_OvEAX);
+    m_formatter.immediate64(reinterpret_cast<int64_t>(addr));
+  }
+
   void movq_mr(int offset, RegisterID base, RegisterID dst) {
     m_formatter.oneByteOp64(OP_MOV_GvEv, dst, base, offset);
   }
@@ -901,6 +906,13 @@ class X86Assembler {
   }
 
 #else
+  void movl_rm(RegisterID src, void* addr) {
+    if (src == X86::eax)
+      movl_EAXm(addr);
+    else
+      m_formatter.oneByteOp(OP_MOV_EvGv, src, addr);
+  }
+
   void movl_mr(void* addr, RegisterID dst) {
     if (dst == X86::eax)
       movl_mEAX(addr);
@@ -1165,6 +1177,11 @@ class X86Assembler {
     ASSERT(linkOffset == static_cast<int>(linkOffset));
     reinterpret_cast<int*>(reinterpret_cast<ptrdiff_t>(code) +
                            from.m_offset)[-1] = linkOffset;
+  }
+
+  static void patchLoadToLEA(intptr_t where) {
+    char* ptr = reinterpret_cast<char*>(where);
+    ptr[0] = OP_LEA;
   }
 
   static void patchJump(intptr_t where, void* destination) {

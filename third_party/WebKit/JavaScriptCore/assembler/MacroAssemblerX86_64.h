@@ -216,6 +216,16 @@ class MacroAssemblerX86_64 : public MacroAssemblerX86Common {
                         address.scale);
   }
 
+  void storePtr(RegisterID src, void* address) {
+    if (src == X86::eax)
+      m_assembler.movq_EAXm(address);
+    else {
+      swap(X86::eax, src);
+      m_assembler.movq_EAXm(address);
+      swap(X86::eax, src);
+    }
+  }
+
   void storePtr(ImmPtr imm, ImplicitAddress address) {
     intptr_t ptr = imm.asIntptr();
     if (CAN_SIGN_EXTEND_32_64(ptr))

@@ -116,6 +116,7 @@ class Structure : public RefCounted<Structure> {
                           : 0)
                : m_offset + 1;
   }
+  bool isUsingInlineStorage() const;
 
   size_t get(const Identifier& propertyName);
   size_t get(const Identifier& propertyName, unsigned& attributes);
