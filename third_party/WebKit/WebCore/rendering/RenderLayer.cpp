@@ -2271,7 +2271,7 @@ void RenderLayer::paintLayer(
     restoreClip(p, paintDirtyRect, clipRectToApply);
   }
 
-  if (!outlineRect.isEmpty()) {
+  if (!outlineRect.isEmpty() && isSelfPaintingLayer()) {
     // Paint our own outline
     RenderObject::PaintInfo paintInfo(p, outlineRect, PaintPhaseSelfOutline,
                                       false, paintingRootForRenderer, 0);
