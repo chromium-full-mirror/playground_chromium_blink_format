@@ -632,11 +632,13 @@ void HTMLFormElement::documentDidBecomeActive() {
 void HTMLFormElement::willMoveToNewOwnerDocument() {
   if (!m_autocomplete)
     document()->unregisterForDocumentActivationCallbacks(this);
+  HTMLElement::willMoveToNewOwnerDocument();
 }
 
 void HTMLFormElement::didMoveToNewOwnerDocument() {
   if (m_autocomplete)
     document()->registerForDocumentActivationCallbacks(this);
+  HTMLElement::didMoveToNewOwnerDocument();
 }
 
 }  // namespace
