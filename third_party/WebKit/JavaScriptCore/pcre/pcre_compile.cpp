@@ -2354,7 +2354,7 @@ static int calculateCompiledPatternLength(const UChar* pattern,
 
             int d = -1;
             if (safelyCheckNextChar(ptr, patternEnd, '-')) {
-              UChar const* hyptr = ptr++;
+              const UChar* hyptr = ptr++;
               if (safelyCheckNextChar(ptr, patternEnd, '\\')) {
                 ptr++;
                 d = checkEscape(&ptr, patternEnd, &errorcode,

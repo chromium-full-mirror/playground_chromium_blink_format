@@ -53,7 +53,7 @@ enum Attribute {
 };
 
 typedef EncodedJSValue* PropertyStorage;
-typedef EncodedJSValue const* ConstPropertyStorage;
+typedef const EncodedJSValue* ConstPropertyStorage;
 
 class JSObject : public JSCell {
   friend class BatchedTransitionOptimizer;
@@ -170,11 +170,11 @@ class JSObject : public JSCell {
   }
 
   size_t offsetForLocation(JSValue* location) const {
-    return location - reinterpret_cast<JSValue const*>(propertyStorage());
+    return location - reinterpret_cast<const JSValue*>(propertyStorage());
   }
 
-  JSValue const* locationForOffset(size_t offset) const {
-    return reinterpret_cast<JSValue const*>(&propertyStorage()[offset]);
+  const JSValue* locationForOffset(size_t offset) const {
+    return reinterpret_cast<const JSValue*>(&propertyStorage()[offset]);
   }
 
   JSValue* locationForOffset(size_t offset) {
