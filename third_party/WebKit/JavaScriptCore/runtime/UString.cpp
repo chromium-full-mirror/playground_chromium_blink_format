@@ -804,7 +804,8 @@ PassRefPtr<UString::Rep> concatenate(UString::Rep* rep, double d) {
   int decimalPoint;
   int sign;
 
-  char* result = WTF::dtoa(d, 0, &decimalPoint, &sign, NULL);
+  char result[80];
+  WTF::dtoa(result, d, 0, &decimalPoint, &sign, NULL);
   int length = static_cast<int>(strlen(result));
 
   int i = 0;
@@ -854,8 +855,6 @@ PassRefPtr<UString::Rep> concatenate(UString::Rep* rep, double d) {
     buf[i++] = static_cast<char>('0' + exponential % 10);
     buf[i++] = '\0';
   }
-
-  WTF::freedtoa(result);
 
   return concatenate(rep, buf);
 }
@@ -942,7 +941,8 @@ UString UString::from(double d) {
   int decimalPoint;
   int sign;
 
-  char* result = WTF::dtoa(d, 0, &decimalPoint, &sign, NULL);
+  char result[80];
+  WTF::dtoa(result, d, 0, &decimalPoint, &sign, NULL);
   int length = static_cast<int>(strlen(result));
 
   int i = 0;
@@ -992,8 +992,6 @@ UString UString::from(double d) {
     buf[i++] = static_cast<char>('0' + exponential % 10);
     buf[i++] = '\0';
   }
-
-  WTF::freedtoa(result);
 
   return UString(buf);
 }
