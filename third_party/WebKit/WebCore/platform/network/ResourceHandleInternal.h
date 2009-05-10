@@ -138,6 +138,7 @@ class ResourceHandleInternal : Noncopyable {
 #if PLATFORM(MAC)
         ,
         m_startWhenScheduled(false),
+        m_needsSiteSpecificQuirks(false),
         m_currentMacChallenge(nil)
 #elif USE(CFNETWORK)
         ,
@@ -174,6 +175,7 @@ class ResourceHandleInternal : Noncopyable {
   RetainPtr<WebCoreResourceHandleAsDelegate> m_delegate;
   RetainPtr<id> m_proxy;
   bool m_startWhenScheduled;
+  bool m_needsSiteSpecificQuirks;
 #endif
 #if USE(WININET)
   HANDLE m_fileHandle;
