@@ -95,7 +95,7 @@ PassRefPtr<ParsedNode> Parser::parse(ExecState* exec,
     result->setLoc(m_source->firstLine(), m_lastLine);
   }
 
-  exec->globalData().parserObjects.shrink(0);
+  exec->globalData().parserArena.shrink(0);
 
   m_source = 0;
   m_sourceElements = 0;
@@ -122,7 +122,7 @@ PassRefPtr<ParsedNode> Parser::reparse(JSGlobalData* globalData,
     result->setLoc(m_source->firstLine(), m_lastLine);
   }
 
-  globalData->parserObjects.shrink(0);
+  globalData->parserArena.shrink(0);
 
   m_source = 0;
   m_sourceElements = 0;

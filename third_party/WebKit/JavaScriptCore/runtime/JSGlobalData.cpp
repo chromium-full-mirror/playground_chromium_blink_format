@@ -191,7 +191,7 @@ JSGlobalData::~JSGlobalData() {
 
   delete clientData;
 
-  ASSERT(parserObjects.isEmpty());
+  ASSERT(parserArena.isEmpty());
 }
 
 PassRefPtr<JSGlobalData> JSGlobalData::create(bool isShared) {
@@ -233,7 +233,6 @@ JSGlobalData*& JSGlobalData::sharedInstanceInternal() {
 void JSGlobalData::createNativeThunk() {
 #if ENABLE(JIT)
   lazyNativeFunctionThunk = FunctionBodyNode::createNativeThunk(this);
-  parserObjects.shrink(0);
 #endif
 }
 

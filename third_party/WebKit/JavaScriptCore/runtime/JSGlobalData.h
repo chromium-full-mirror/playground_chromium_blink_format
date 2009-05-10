@@ -145,13 +145,12 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   HashMap<OpaqueJSClass*, OpaqueJSClassContextData*> opaqueJSClassData;
 
-  Vector<RefPtr<ParserRefCounted>> parserObjects;
-
   JSGlobalObject* head;
   JSGlobalObject* dynamicGlobalObject;
 
   HashSet<JSObject*> arrayVisitedElements;
 
+  Vector<RefPtr<ParserRefCounted>> parserArena;
   ScopeNode* scopeNodeBeingReparsed;
 
  private:

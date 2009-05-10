@@ -76,14 +76,15 @@ void Parser::reparseInPlace(JSGlobalData* globalData,
   ASSERT(m_sourceElements);
 
   functionBodyNode->adoptData(std::auto_ptr<ScopeNodeData>(new ScopeNodeData(
-      m_sourceElements.get(), m_varDeclarations ? &m_varDeclarations->data : 0,
+      globalData->parserArena, m_sourceElements.get(),
+      m_varDeclarations ? &m_varDeclarations->data : 0,
       m_funcDeclarations ? &m_funcDeclarations->data : 0, m_numConstants)));
   bool usesArguments = functionBodyNode->usesArguments();
   functionBodyNode->setFeatures(m_features);
   if (usesArguments && !functionBodyNode->usesArguments())
     functionBodyNode->setUsesArguments();
 
-  globalData->parserObjects.shrink(0);
+  ASSERT(globalData->parserArena.isEmpty());
 
   m_source = 0;
   m_sourceElements = 0;

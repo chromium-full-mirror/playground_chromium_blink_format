@@ -28,7 +28,7 @@ namespace JSC {
 
 #ifdef NDEBUG
 inline ParserRefCounted::ParserRefCounted(JSGlobalData* globalData) {
-  globalData->parserObjects.append(adoptRef(this));
+  globalData->parserArena.append(adoptRef(this));
 }
 #endif
 
@@ -70,18 +70,27 @@ inline ResolveNode::ResolveNode(JSGlobalData* globalData,
 inline ElementNode::ElementNode(JSGlobalData* globalData,
                                 int elision,
                                 ExpressionNode* node)
-    : ParserRefCounted(globalData), m_elision(elision), m_node(node) {}
+    : ParserRefCounted(globalData),
+      m_next(0),
+      m_elision(elision),
+      m_node(node) {}
 
 inline ElementNode::ElementNode(JSGlobalData* globalData,
                                 ElementNode* l,
                                 int elision,
                                 ExpressionNode* node)
-    : ParserRefCounted(globalData), m_elision(elision), m_node(node) {
+    : ParserRefCounted(globalData),
+      m_next(0),
+      m_elision(elision),
+      m_node(node) {
   l->m_next = this;
 }
 
 inline ArrayNode::ArrayNode(JSGlobalData* globalData, int elision)
-    : ExpressionNode(globalData), m_elision(elision), m_optional(true) {}
+    : ExpressionNode(globalData),
+      m_element(0),
+      m_elision(elision),
+      m_optional(true) {}
 
 inline ArrayNode::ArrayNode(JSGlobalData* globalData, ElementNode* element)
     : ExpressionNode(globalData),
@@ -108,17 +117,17 @@ inline PropertyNode::PropertyNode(JSGlobalData* globalData,
 
 inline PropertyListNode::PropertyListNode(JSGlobalData* globalData,
                                           PropertyNode* node)
-    : Node(globalData), m_node(node) {}
+    : Node(globalData), m_node(node), m_next(0) {}
 
 inline PropertyListNode::PropertyListNode(JSGlobalData* globalData,
                                           PropertyNode* node,
                                           PropertyListNode* list)
-    : Node(globalData), m_node(node) {
+    : Node(globalData), m_node(node), m_next(0) {
   list->m_next = this;
 }
 
 inline ObjectLiteralNode::ObjectLiteralNode(JSGlobalData* globalData)
-    : ExpressionNode(globalData) {}
+    : ExpressionNode(globalData), m_list(0) {}
 
 inline ObjectLiteralNode::ObjectLiteralNode(JSGlobalData* globalData,
                                             PropertyListNode* list)
@@ -140,24 +149,24 @@ inline DotAccessorNode::DotAccessorNode(JSGlobalData* globalData,
 
 inline ArgumentListNode::ArgumentListNode(JSGlobalData* globalData,
                                           ExpressionNode* expr)
-    : Node(globalData), m_expr(expr) {}
+    : Node(globalData), m_next(0), m_expr(expr) {}
 
 inline ArgumentListNode::ArgumentListNode(JSGlobalData* globalData,
                                           ArgumentListNode* listNode,
                                           ExpressionNode* expr)
-    : Node(globalData), m_expr(expr) {
+    : Node(globalData), m_next(0), m_expr(expr) {
   listNode->m_next = this;
 }
 
 inline ArgumentsNode::ArgumentsNode(JSGlobalData* globalData)
-    : ParserRefCounted(globalData) {}
+    : ParserRefCounted(globalData), m_listNode(0) {}
 
 inline ArgumentsNode::ArgumentsNode(JSGlobalData* globalData,
                                     ArgumentListNode* listNode)
     : ParserRefCounted(globalData), m_listNode(listNode) {}
 
 inline NewExprNode::NewExprNode(JSGlobalData* globalData, ExpressionNode* expr)
-    : ExpressionNode(globalData), m_expr(expr) {}
+    : ExpressionNode(globalData), m_expr(expr), m_args(0) {}
 
 inline NewExprNode::NewExprNode(JSGlobalData* globalData,
                                 ExpressionNode* expr,
@@ -851,11 +860,6 @@ inline CommaNode::CommaNode(JSGlobalData* globalData,
                             ExpressionNode* expr2)
     : ExpressionNode(globalData), m_expr1(expr1), m_expr2(expr2) {}
 
-inline VarDeclCommaNode::VarDeclCommaNode(JSGlobalData* globalData,
-                                          ExpressionNode* expr1,
-                                          ExpressionNode* expr2)
-    : CommaNode(globalData, expr1, expr2) {}
-
 inline ConstStatementNode::ConstStatementNode(JSGlobalData* globalData,
                                               ConstDeclNode* next)
     : StatementNode(globalData), m_next(next) {}
@@ -963,12 +967,12 @@ inline TryNode::TryNode(JSGlobalData* globalData,
 
 inline ParameterNode::ParameterNode(JSGlobalData* globalData,
                                     const Identifier& ident)
-    : ParserRefCounted(globalData), m_ident(ident) {}
+    : ParserRefCounted(globalData), m_ident(ident), m_next(0) {}
 
 inline ParameterNode::ParameterNode(JSGlobalData* globalData,
                                     ParameterNode* l,
                                     const Identifier& ident)
-    : ParserRefCounted(globalData), m_ident(ident) {
+    : ParserRefCounted(globalData), m_ident(ident), m_next(0) {
   l->m_next = this;
 }
 
@@ -977,11 +981,8 @@ inline FuncExprNode::FuncExprNode(JSGlobalData* globalData,
                                   FunctionBodyNode* body,
                                   const SourceCode& source,
                                   ParameterNode* parameter)
-    : ExpressionNode(globalData),
-      m_ident(ident),
-      m_parameter(parameter),
-      m_body(body) {
-  m_body->finishParsing(source, m_parameter.get());
+    : ExpressionNode(globalData), m_ident(ident), m_body(body) {
+  m_body->finishParsing(source, parameter);
 }
 
 inline FuncDeclNode::FuncDeclNode(JSGlobalData* globalData,
@@ -989,11 +990,8 @@ inline FuncDeclNode::FuncDeclNode(JSGlobalData* globalData,
                                   FunctionBodyNode* body,
                                   const SourceCode& source,
                                   ParameterNode* parameter)
-    : StatementNode(globalData),
-      m_ident(ident),
-      m_parameter(parameter),
-      m_body(body) {
-  m_body->finishParsing(source, m_parameter.get());
+    : StatementNode(globalData), m_ident(ident), m_body(body) {
+  m_body->finishParsing(source, parameter);
 }
 
 inline CaseClauseNode::CaseClauseNode(JSGlobalData* globalData,
@@ -1010,12 +1008,12 @@ inline CaseClauseNode::CaseClauseNode(JSGlobalData* globalData,
 
 inline ClauseListNode::ClauseListNode(JSGlobalData* globalData,
                                       CaseClauseNode* clause)
-    : ParserRefCounted(globalData), m_clause(clause) {}
+    : ParserRefCounted(globalData), m_clause(clause), m_next(0) {}
 
 inline ClauseListNode::ClauseListNode(JSGlobalData* globalData,
                                       ClauseListNode* clauseList,
                                       CaseClauseNode* clause)
-    : ParserRefCounted(globalData), m_clause(clause) {
+    : ParserRefCounted(globalData), m_clause(clause), m_next(0) {
   clauseList->m_next = this;
 }
 
@@ -1036,7 +1034,7 @@ inline SwitchNode::SwitchNode(JSGlobalData* globalData,
 inline ConstDeclNode::ConstDeclNode(JSGlobalData* globalData,
                                     const Identifier& ident,
                                     ExpressionNode* init)
-    : ExpressionNode(globalData), m_ident(ident), m_init(init) {}
+    : ExpressionNode(globalData), m_ident(ident), m_next(0), m_init(init) {}
 
 inline BlockNode::BlockNode(JSGlobalData* globalData, SourceElements* children)
     : StatementNode(globalData) {
@@ -1065,13 +1063,15 @@ inline ForInNode::ForInNode(JSGlobalData* globalData,
                             int endOffset)
     : StatementNode(globalData),
       m_ident(ident),
-      m_lexpr(new ResolveNode(globalData, ident, divot - startOffset)),
+      m_init(0),
+      m_lexpr(new (globalData)
+                  ResolveNode(globalData, ident, divot - startOffset)),
       m_expr(expr),
       m_statement(statement),
       m_identIsVarDecl(true) {
   if (in) {
     AssignResolveNode* node =
-        new AssignResolveNode(globalData, ident, in, true);
+        new (globalData) AssignResolveNode(globalData, ident, in, true);
     node->setExceptionSourceCode(divot, divot - startOffset, endOffset - divot);
     m_init = node;
   }
