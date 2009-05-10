@@ -288,21 +288,21 @@ Exactly one of IEEE_8087, IEEE_ARM or
   struct BigInt {
     BigInt() : sign(0), wds(0) {}
     BigInt(const BigInt& other) : sign(other.sign), wds(other.wds) {
-      for (int i = 0; i < 32; ++i)
+      for (int i = 0; i < 64; ++i)
         x[i] = other.x[i];
     }
 
     BigInt& operator=(const BigInt& other) {
       sign = other.sign;
       wds = other.wds;
-      for (int i = 0; i < 32; ++i)
+      for (int i = 0; i < 64; ++i)
         x[i] = other.x[i];
       return *this;
     }
 
     int sign;
     int wds;
-    uint32_t x[32];
+    uint32_t x[64];
   };
 
   static void multadd(BigInt & b, int m, int a) /* multiply by m and add a */
