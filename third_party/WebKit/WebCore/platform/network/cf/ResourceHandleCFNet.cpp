@@ -113,10 +113,13 @@ static CFURLResponseRef createCFURLResponseWithDefaultMIMEType(
   // layer to do content sniffing for this URL.
   ASSERT(!ResourceHandle::shouldContentSniffURL(CFURLResponseGetURL(response)));
 
+  static CFStringRef defaultMIMETypeString = defaultMIMEType().createCFString();
+
   return CFURLResponseCreate(kCFAllocatorDefault, CFURLResponseGetURL(response),
-                             (CFStringRef)MIMETypeRegistry::defaultMIMEType(),
+                             defaultMIMETypeString,
                              CFURLResponseGetExpectedContentLength(response),
-                             CFURLResponseGetTextEncodingName(response));
+                             CFURLResponseGetTextEncodingName(response),
+                             CFURLResponseGetRecommendedCachePolicy(response));
 }
 
 CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
