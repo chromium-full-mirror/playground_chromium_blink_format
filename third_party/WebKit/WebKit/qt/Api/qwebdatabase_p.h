@@ -19,8 +19,6 @@
 #ifndef _WEBDATABASE_P_H_
 #define _WEBDATABASE_P_H_
 
-#if ENABLE(DATABASE)
-
 #include <QString>
 #include <QtCore/qshareddata.h>
 
@@ -33,7 +31,5 @@ class QWebDatabasePrivate : public QSharedData {
   WebCore::String name;
   WTF::RefPtr<WebCore::SecurityOrigin> origin;
 };
-
-#endif
 
 #endif

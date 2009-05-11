@@ -155,15 +155,19 @@ QWebSecurityOrigin::QWebSecurityOrigin(QWebSecurityOriginPrivate* priv) {
     Returns a list of all security origins with a database quota defined.
 */
 QList<QWebSecurityOrigin> QWebSecurityOrigin::allOrigins() {
+  QList<QWebSecurityOrigin> webOrigins;
+
+#if ENABLE(DATABASE)
   Vector<RefPtr<SecurityOrigin>> coreOrigins;
   DatabaseTracker::tracker().origins(coreOrigins);
-  QList<QWebSecurityOrigin> webOrigins;
 
   for (unsigned i = 0; i < coreOrigins.size(); ++i) {
     QWebSecurityOriginPrivate* priv =
         new QWebSecurityOriginPrivate(coreOrigins[i].get());
     webOrigins.append(priv);
   }
+#endif
+
   return webOrigins;
 }
 
@@ -171,8 +175,11 @@ QList<QWebSecurityOrigin> QWebSecurityOrigin::allOrigins() {
     Returns a list of all databases defined in the security origin.
 */
 QList<QWebDatabase> QWebSecurityOrigin::databases() const {
-  Vector<String> nameVector;
   QList<QWebDatabase> databases;
+
+#if ENABLE(DATABASE)
+  Vector<String> nameVector;
+
   if (!DatabaseTracker::tracker().databaseNamesForOrigin(d->origin.get(),
                                                          nameVector))
     return databases;
@@ -183,5 +190,7 @@ QList<QWebDatabase> QWebSecurityOrigin::databases() const {
     QWebDatabase webDatabase(priv);
     databases.append(webDatabase);
   }
+#endif
+
   return databases;
 }
