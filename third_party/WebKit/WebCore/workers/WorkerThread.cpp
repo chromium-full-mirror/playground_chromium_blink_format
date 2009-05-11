@@ -81,8 +81,7 @@ WorkerThread::WorkerThread(const KURL& scriptURL,
                            const String& userAgent,
                            const String& sourceCode,
                            WorkerObjectProxy* workerObjectProxy)
-    : m_threadID(0),
-      m_workerObjectProxy(workerObjectProxy),
+    : m_workerObjectProxy(workerObjectProxy),
       m_startupData(
           WorkerThreadStartupData::create(scriptURL, userAgent, sourceCode)) {}
 
@@ -93,13 +92,11 @@ bool WorkerThread::start() {
   // the thread starts.
   MutexLocker lock(m_threadCreationMutex);
 
-  if (m_threadID)
-    return true;
+  if (!m_threadID.isValid())
+    m_threadID =
+        createThread(WorkerThread::workerThreadStart, this, "WebCore: Worker");
 
-  m_threadID =
-      createThread(WorkerThread::workerThreadStart, this, "WebCore: Worker");
-
-  return m_threadID;
+  return m_threadID.isValid();
 }
 
 void* WorkerThread::workerThreadStart(void* thread) {

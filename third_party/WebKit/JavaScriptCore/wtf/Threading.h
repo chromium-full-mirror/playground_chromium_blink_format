@@ -88,12 +88,14 @@
 #include <wtf/GOwnPtr.h>
 typedef struct _GMutex GMutex;
 typedef struct _GCond GCond;
+typedef struct _GThread GThread;
 #endif
 
 #if PLATFORM(QT)
 #include <qglobal.h>
 QT_BEGIN_NAMESPACE
 class QMutex;
+class QThread;
 class QWaitCondition;
 QT_END_NAMESPACE
 #endif
@@ -109,10 +111,73 @@ QT_END_NAMESPACE
 
 namespace WTF {
 
-typedef uint32_t ThreadIdentifier;
+#if USE(PTHREADS)
+typedef pthread_mutex_t PlatformMutex;
+typedef pthread_cond_t PlatformCondition;
+typedef pthread_t PlatformThreadIdentifier;
+#elif PLATFORM(GTK)
+typedef GOwnPtr<GMutex> PlatformMutex;
+typedef GOwnPtr<GCond> PlatformCondition;
+typedef GThread* PlatformThreadIdentifier;
+#elif PLATFORM(QT)
+typedef QT_PREPEND_NAMESPACE(QMutex) * PlatformMutex;
+typedef QT_PREPEND_NAMESPACE(QWaitCondition) * PlatformCondition;
+typedef QT_PREPEND_NAMESPACE(QThread) * PlatformThreadIdentifier;
+#elif PLATFORM(WIN_OS)
+struct PlatformMutex {
+  CRITICAL_SECTION m_internalMutex;
+  size_t m_recursionCount;
+};
+struct PlatformCondition {
+  size_t m_waitersGone;
+  size_t m_waitersBlocked;
+  size_t m_waitersToUnblock;
+  HANDLE m_blockLock;
+  HANDLE m_blockQueue;
+  HANDLE m_unblockLock;
+
+  bool timedWait(PlatformMutex&, DWORD durationMilliseconds);
+  void signal(bool unblockAll);
+};
+typedef unsigned PlatformThreadIdentifier;
+#else
+typedef void* PlatformMutex;
+typedef void* PlatformCondition;
+#endif
+
+// Platform-independent wrapper for thread id. Assignable and copyable.
+// A valid ThreadIdentifier is usually returned from createThread(...) or
+// currentThread() functions.
+// ThreadIdentifier remains valid for as long as its thread is alive and is not
+// automatically invalidated
+// when thread terminates. Since platform-dependent thread ids can be recycled,
+// stale ThreadIdentifier
+// may reference a completely unrelated thread after its original thread
+// terminates.
+class ThreadIdentifier {
+ public:
+  ThreadIdentifier() : m_platformId(0) { ASSERT(!isValid()); }
+
+  explicit ThreadIdentifier(PlatformThreadIdentifier platformId)
+      : m_platformId(platformId) {
+    ASSERT(isValid());
+  }
+
+  bool isValid() const { return m_platformId; }
+  void invalidate() { m_platformId = 0; }
+
+  bool operator==(const ThreadIdentifier&) const;
+  bool operator!=(const ThreadIdentifier&) const;
+
+  PlatformThreadIdentifier platformId() const { return m_platformId; }
+
+ private:
+  PlatformThreadIdentifier m_platformId;
+};
+
 typedef void* (*ThreadFunction)(void* argument);
 
-// Returns 0 if thread creation failed.
+// Returns invalid identifier if thread creation failed.
 // The thread name must be a literal since on some platforms it's passed in to
 // the thread.
 ThreadIdentifier createThread(ThreadFunction, void*, const char* threadName);
@@ -131,36 +196,6 @@ ThreadIdentifier currentThread();
 bool isMainThread();
 int waitForThreadCompletion(ThreadIdentifier, void**);
 void detachThread(ThreadIdentifier);
-
-#if USE(PTHREADS)
-typedef pthread_mutex_t PlatformMutex;
-typedef pthread_cond_t PlatformCondition;
-#elif PLATFORM(GTK)
-typedef GOwnPtr<GMutex> PlatformMutex;
-typedef GOwnPtr<GCond> PlatformCondition;
-#elif PLATFORM(QT)
-typedef QT_PREPEND_NAMESPACE(QMutex) * PlatformMutex;
-typedef QT_PREPEND_NAMESPACE(QWaitCondition) * PlatformCondition;
-#elif PLATFORM(WIN_OS)
-struct PlatformMutex {
-  CRITICAL_SECTION m_internalMutex;
-  size_t m_recursionCount;
-};
-struct PlatformCondition {
-  size_t m_waitersGone;
-  size_t m_waitersBlocked;
-  size_t m_waitersToUnblock;
-  HANDLE m_blockLock;
-  HANDLE m_blockQueue;
-  HANDLE m_unblockLock;
-
-  bool timedWait(PlatformMutex&, DWORD durationMilliseconds);
-  void signal(bool unblockAll);
-};
-#else
-typedef void* PlatformMutex;
-typedef void* PlatformCondition;
-#endif
 
 class Mutex : Noncopyable {
  public:
