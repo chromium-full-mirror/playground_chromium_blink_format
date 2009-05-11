@@ -257,6 +257,10 @@ void ThreadCondition::broadcast() {
 // and then pass it here. We cast it back to pointer. This is an ugly hack which
 // is very temporary
 // and will be removed once next public build of Safari 4 is released.
+// Some versions of GCC require a prototype before a function with external
+// linkage, so we have to
+// add a declaration here before defining the function.
+int waitForThreadCompletion(uint32_t, void**);
 int waitForThreadCompletion(uint32_t threadID, void** result) {
   pthread_t pthreadHandle = reinterpret_cast<pthread_t>(threadID);
 
