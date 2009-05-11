@@ -640,11 +640,12 @@ class JIT : private MacroAssembler {
   void emitPutImmediateToCallFrameHeader(
       void* value,
       RegisterFile::CallFrameHeaderEntry entry);
-  void emitGetFromCallFrameHeader(RegisterFile::CallFrameHeaderEntry entry,
-                                  RegisterID to,
-                                  RegisterID from = callFrameRegister);
+  void emitGetFromCallFrameHeaderPtr(RegisterFile::CallFrameHeaderEntry entry,
+                                     RegisterID to,
+                                     RegisterID from = callFrameRegister);
   void emitGetFromCallFrameHeader32(RegisterFile::CallFrameHeaderEntry entry,
-                                    RegisterID to);
+                                    RegisterID to,
+                                    RegisterID from = callFrameRegister);
 
   JSValue getConstantOperand(unsigned src);
   int32_t getConstantOperandImmediateInt(unsigned src);
