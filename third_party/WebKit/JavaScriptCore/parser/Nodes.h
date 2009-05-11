@@ -30,6 +30,7 @@
 #include "Error.h"
 #include "JITCode.h"
 #include "Opcode.h"
+#include "ParserArena.h"
 #include "ResultType.h"
 #include "SourceCode.h"
 #include "SymbolTable.h"
@@ -106,28 +107,36 @@ struct SwitchInfo {
   SwitchType switchType;
 };
 
-class ParserRefCounted : public RefCounted<ParserRefCounted> {
+class ParserArenaDeletable {
  protected:
-  ParserRefCounted(JSGlobalData*);
+  ParserArenaDeletable() {}
 
  public:
-  virtual ~ParserRefCounted();
+  virtual ~ParserArenaDeletable() {}
 
-  // Placeholder: To be changed to arena allocation.
-  void* operator new(size_t size, JSGlobalData*) { return fastMalloc(size); }
+  // Objects created with this version of new are deleted when the arena is
+  // deleted.
+  void* operator new(size_t, JSGlobalData*);
 
- private:
+  // Objects created with this version of new are not deleted when the arena is
+  // deleted.
+  // Other arrangements must be made.
   void* operator new(size_t);
 };
 
-#ifdef NDEBUG
-inline ParserRefCounted::~ParserRefCounted() {}
-#endif
+class ParserArenaRefCounted : public RefCounted<ParserArenaRefCounted> {
+ protected:
+  ParserArenaRefCounted(JSGlobalData*);
 
-class Node : public ParserRefCounted {
  public:
+  virtual ~ParserArenaRefCounted() { ASSERT(deletionHasBegun()); }
+};
+
+class Node : public ParserArenaDeletable {
+ protected:
   Node(JSGlobalData*);
 
+ public:
   /*
       Return value: The register holding the production's value.
                dst: An optional parameter specifying the most efficient
@@ -397,7 +406,7 @@ class ResolveNode : public ExpressionNode {
   int32_t m_startOffset;
 };
 
-class ElementNode : public ParserRefCounted {
+class ElementNode : public ParserArenaDeletable {
  public:
   ElementNode(JSGlobalData*, int elision, ExpressionNode*);
   ElementNode(JSGlobalData*, ElementNode*, int elision, ExpressionNode*);
@@ -431,7 +440,7 @@ class ArrayNode : public ExpressionNode {
   bool m_optional;
 };
 
-class PropertyNode : public ParserRefCounted {
+class PropertyNode : public ParserArenaDeletable {
  public:
   enum Type { Constant, Getter, Setter };
 
@@ -528,7 +537,7 @@ class ArgumentListNode : public Node {
                                    RegisterID* = 0) JSC_FAST_CALL;
 };
 
-class ArgumentsNode : public ParserRefCounted {
+class ArgumentsNode : public ParserArenaDeletable {
  public:
   ArgumentsNode(JSGlobalData*);
   ArgumentsNode(JSGlobalData*, ArgumentListNode*);
@@ -1464,7 +1473,7 @@ class ConstStatementNode : public StatementNode {
 
 typedef Vector<StatementNode*> StatementVector;
 
-class SourceElements : public ParserRefCounted {
+class SourceElements : public ParserArenaDeletable {
  public:
   SourceElements(JSGlobalData*);
 
@@ -1732,7 +1741,7 @@ class TryNode : public StatementNode {
   bool m_catchHasEval;
 };
 
-class ParameterNode : public ParserRefCounted {
+class ParameterNode : public ParserArenaDeletable {
  public:
   ParameterNode(JSGlobalData*, const Identifier&);
   ParameterNode(JSGlobalData*, ParameterNode*, const Identifier&);
@@ -1744,9 +1753,6 @@ class ParameterNode : public ParserRefCounted {
   Identifier m_ident;
   ParameterNode* m_next;
 };
-
-// Placholder. Later this will become a true arena.
-typedef Vector<RefPtr<ParserRefCounted>> ParserArena;
 
 struct ScopeNodeData {
   typedef DeclarationStacks::VarStack VarStack;
@@ -1767,7 +1773,7 @@ struct ScopeNodeData {
   void mark();
 };
 
-class ScopeNode : public StatementNode {
+class ScopeNode : public StatementNode, public ParserArenaRefCounted {
  public:
   typedef DeclarationStacks::VarStack VarStack;
   typedef DeclarationStacks::FunctionStack FunctionStack;
@@ -1782,7 +1788,7 @@ class ScopeNode : public StatementNode {
             int numConstants) JSC_FAST_CALL;
 
   void adoptData(std::auto_ptr<ScopeNodeData> data) {
-    ASSERT(data->m_arena.find(this) == notFound);
+    ASSERT(!data->m_arena.contains(this));
     ASSERT(!m_data);
     m_data.adopt(data);
   }
@@ -1998,7 +2004,7 @@ class FunctionBodyNode : public ScopeNode {
   OwnPtr<CodeBlock> m_code;
 };
 
-class FuncExprNode : public ExpressionNode {
+class FuncExprNode : public ExpressionNode, public ParserArenaRefCounted {
  public:
   FuncExprNode(JSGlobalData*,
                const Identifier&,
@@ -2020,7 +2026,7 @@ class FuncExprNode : public ExpressionNode {
   RefPtr<FunctionBodyNode> m_body;
 };
 
-class FuncDeclNode : public StatementNode {
+class FuncDeclNode : public StatementNode, public ParserArenaRefCounted {
  public:
   FuncDeclNode(JSGlobalData*,
                const Identifier&,
@@ -2041,7 +2047,7 @@ class FuncDeclNode : public StatementNode {
   RefPtr<FunctionBodyNode> m_body;
 };
 
-class CaseClauseNode : public ParserRefCounted {
+class CaseClauseNode : public ParserArenaDeletable {
  public:
   CaseClauseNode(JSGlobalData*, ExpressionNode*);
   CaseClauseNode(JSGlobalData*, ExpressionNode*, SourceElements*);
@@ -2054,7 +2060,7 @@ class CaseClauseNode : public ParserRefCounted {
   StatementVector m_children;
 };
 
-class ClauseListNode : public ParserRefCounted {
+class ClauseListNode : public ParserArenaDeletable {
  public:
   ClauseListNode(JSGlobalData*, CaseClauseNode*);
   ClauseListNode(JSGlobalData*, ClauseListNode*, CaseClauseNode*);
@@ -2067,7 +2073,7 @@ class ClauseListNode : public ParserRefCounted {
   ClauseListNode* m_next;
 };
 
-class CaseBlockNode : public ParserRefCounted {
+class CaseBlockNode : public ParserArenaDeletable {
  public:
   CaseBlockNode(JSGlobalData*,
                 ClauseListNode* list1,

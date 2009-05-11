@@ -73,6 +73,10 @@ class RefCountedBase : Noncopyable {
   // Helper for generating JIT code. Please do not use for non-JIT purposes.
   int* addressOfCount() { return &m_refCount; }
 
+#ifndef NDEBUG
+  bool deletionHasBegun() const { return m_deletionHasBegun; }
+#endif
+
  private:
   template <class T>
   friend class CrossThreadRefCounted;
