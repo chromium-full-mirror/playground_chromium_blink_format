@@ -37,6 +37,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "Logging.h"
+#include "MIMETypeRegistry.h"
 #include "ResourceError.h"
 #include "ResourceResponse.h"
 
@@ -113,7 +114,7 @@ static CFURLResponseRef createCFURLResponseWithDefaultMIMEType(
   ASSERT(!ResourceHandle::shouldContentSniffURL(CFURLResponseGetURL(response)));
 
   return CFURLResponseCreate(kCFAllocatorDefault, CFURLResponseGetURL(response),
-                             (CFStringRef)ResourceHandle::defaultMIMEType(),
+                             (CFStringRef)MIMETypeRegistry::defaultMIMEType(),
                              CFURLResponseGetExpectedContentLength(response),
                              CFURLResponseGetTextEncodingName(response));
 }
@@ -810,7 +811,7 @@ RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
   RetainPtr<CFURLRequestRef> cfRequest(
       AdoptCF,
       makeFinalRequest(requestWithoutCredentials,
-                       ResourceHandle::shouldContentSniffRequest(request)));
+                       ResourceHandle::shouldContentSniffURL(request.url())));
 
   CFURLConnectionClient_V3 client = {3,
                                      &loader,
