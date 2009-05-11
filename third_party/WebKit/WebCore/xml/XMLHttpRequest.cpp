@@ -675,13 +675,8 @@ void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
   // FIXME: We need to be able to send XMLHttpRequests from onunload,
   // <http://bugs.webkit.org/show_bug.cgi?id=10904>.
   // FIXME: Maybe create can return null for other reasons too?
-  // We need to keep content sniffing enabled for local files due to CFNetwork
-  // not providing a MIME type
-  // for local files otherwise, <rdar://problem/5671813>.
   LoadCallbacks callbacks =
       m_inPreflight ? DoNotSendLoadCallbacks : SendLoadCallbacks;
-  ContentSniff contentSniff =
-      request.url().isLocalFile() ? SniffContent : DoNotSniffContent;
   StoredCredentials storedCredentials =
       (m_sameOriginRequest || m_includeCredentials)
           ? AllowStoredCredentials
@@ -692,7 +687,7 @@ void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
 
   m_loader =
       ThreadableLoader::create(scriptExecutionContext(), this, request,
-                               callbacks, contentSniff, storedCredentials);
+                               callbacks, DoNotSniffContent, storedCredentials);
 
   if (m_loader) {
     // Neither this object nor the JavaScript wrapper should be deleted while
