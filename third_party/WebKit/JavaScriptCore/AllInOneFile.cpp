@@ -84,7 +84,6 @@
 #include "runtime/ObjectPrototype.cpp"
 #include "runtime/Operations.cpp"
 #include "parser/Parser.cpp"
-#include "parser/ParserArena.cpp"
 #include "runtime/PropertySlot.cpp"
 #include "runtime/PropertyNameArray.cpp"
 #include "runtime/RegExp.cpp"
