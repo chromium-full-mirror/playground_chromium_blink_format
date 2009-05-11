@@ -64,7 +64,7 @@ static void navigateIfAllowed(Frame* frame,
   if (url.isEmpty())
     return;
 
-  Frame* activeFrame = ScriptController::retrieveActiveFrame();
+  Frame* activeFrame = V8Proxy::retrieveFrameForEnteredContext();
   if (!activeFrame)
     return;
 
@@ -147,7 +147,7 @@ ACCESSOR_SETTER(LocationHref) {
   if (!frame)
     return;
 
-  Frame* activeFrame = ScriptController::retrieveActiveFrame();
+  Frame* activeFrame = V8Proxy::retrieveFrameForEnteredContext();
   if (!activeFrame)
     return;
 
@@ -313,7 +313,7 @@ CALLBACK_FUNC_DECL(LocationReload) {
   if (!frame)
     return v8::Undefined();
 
-  Frame* activeFrame = ScriptController::retrieveActiveFrame();
+  Frame* activeFrame = V8Proxy::retrieveFrameForEnteredContext();
   if (!activeFrame)
     return v8::Undefined();
 
@@ -336,7 +336,7 @@ CALLBACK_FUNC_DECL(LocationReplace) {
   if (!frame)
     return v8::Undefined();
 
-  Frame* activeFrame = ScriptController::retrieveActiveFrame();
+  Frame* activeFrame = V8Proxy::retrieveFrameForEnteredContext();
   if (!activeFrame)
     return v8::Undefined();
 
@@ -358,7 +358,7 @@ CALLBACK_FUNC_DECL(LocationAssign) {
   if (!frame)
     return v8::Undefined();
 
-  Frame* activeFrame = ScriptController::retrieveActiveFrame();
+  Frame* activeFrame = V8Proxy::retrieveFrameForEnteredContext();
   if (!activeFrame)
     return v8::Undefined();
 
