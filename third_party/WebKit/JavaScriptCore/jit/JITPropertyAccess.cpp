@@ -422,7 +422,9 @@ void JIT::patchGetByIdSelf(StructureStubInfo* stubInfo,
   // this avoids the extra load
   // and makes the subsequent load's offset automatically correct
   if (structure->isUsingInlineStorage())
-    stubInfo->hotPathBegin.instructionAtOffset(patchOffsetGetByIdExternalLoad)
+    stubInfo->hotPathBegin
+        .instructionAtOffset(patchOffsetGetByIdExternalLoad +
+                             patchLengthGetByIdExternalLoadPrefix)
         .patchLoadToLEA();
 
   // Patch the offset into the propoerty map to load from, then patch the
@@ -450,7 +452,9 @@ void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
   // this avoids the extra load
   // and makes the subsequent load's offset automatically correct
   if (structure->isUsingInlineStorage())
-    stubInfo->hotPathBegin.instructionAtOffset(patchOffsetGetByIdExternalLoad)
+    stubInfo->hotPathBegin
+        .instructionAtOffset(patchOffsetPutByIdExternalLoad +
+                             patchLengthPutByIdExternalLoadPrefix)
         .patchLoadToLEA();
 
   // Patch the offset into the propoerty map to load from, then patch the
