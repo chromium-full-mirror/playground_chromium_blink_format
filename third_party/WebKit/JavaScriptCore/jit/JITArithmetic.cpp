@@ -45,48 +45,6 @@
 
 using namespace std;
 
-// All X86 Macs are guaranteed to support at least SSE2
-#if PLATFORM(X86_64) || (PLATFORM(X86) && PLATFORM(MAC))
-
-static inline bool isSSE2Present() {
-  return true;
-}
-
-#else
-
-static bool isSSE2Present() {
-  static const int SSE2FeatureBit = 1 << 26;
-  struct SSE2Check {
-    SSE2Check() {
-      int flags;
-#if COMPILER(MSVC)
-      _asm {
-                mov eax, 1  // cpuid function 1 gives us the standard feature set
-                cpuid;
-                mov flags, edx;
-      }
-#elif COMPILER(GCC)
-      asm("movl $0x1, %%eax;"
-          "pushl %%ebx;"
-          "cpuid;"
-          "popl %%ebx;"
-          "movl %%edx, %0;"
-          : "=g"(flags)
-          :
-          : "%eax", "%ecx", "%edx");
-#else
-      flags = 0;
-#endif
-      present = (flags & SSE2FeatureBit) != 0;
-    }
-    bool present;
-  };
-  static SSE2Check check;
-  return check.present;
-}
-
-#endif
-
 namespace JSC {
 
 void JIT::emit_op_lshift(Instruction* currentInstruction) {
@@ -115,6 +73,7 @@ void JIT::emit_op_lshift(Instruction* currentInstruction) {
   emitFastArithReTagImmediate(regT0, regT0);
   emitPutVirtualRegister(result);
 }
+
 void JIT::emitSlow_op_lshift(Instruction* currentInstruction,
                              Vector<SlowCaseEntry>::iterator& iter) {
   unsigned result = currentInstruction[1].u.operand;
@@ -275,6 +234,7 @@ void JIT::emit_op_jnless(Instruction* currentInstruction) {
     addJump(branch32(GreaterThanOrEqual, regT0, regT1), target + 3);
   }
 }
+
 void JIT::emitSlow_op_jnless(Instruction* currentInstruction,
                              Vector<SlowCaseEntry>::iterator& iter) {
   unsigned op1 = currentInstruction[1].u.operand;
@@ -469,6 +429,7 @@ void JIT::emit_op_jnlesseq(Instruction* currentInstruction) {
     addJump(branch32(GreaterThan, regT0, regT1), target + 3);
   }
 }
+
 void JIT::emitSlow_op_jnlesseq(Instruction* currentInstruction,
                                Vector<SlowCaseEntry>::iterator& iter) {
   unsigned op1 = currentInstruction[1].u.operand;
@@ -663,6 +624,7 @@ void JIT::emit_op_bitand(Instruction* currentInstruction) {
   }
   emitPutVirtualRegister(result);
 }
+
 void JIT::emitSlow_op_bitand(Instruction* currentInstruction,
                              Vector<SlowCaseEntry>::iterator& iter) {
   unsigned result = currentInstruction[1].u.operand;
@@ -687,68 +649,6 @@ void JIT::emitSlow_op_bitand(Instruction* currentInstruction,
     stubCall.call(result);
   }
 }
-
-#if PLATFORM(X86) || PLATFORM(X86_64)
-void JIT::emit_op_mod(Instruction* currentInstruction) {
-  unsigned result = currentInstruction[1].u.operand;
-  unsigned op1 = currentInstruction[2].u.operand;
-  unsigned op2 = currentInstruction[3].u.operand;
-
-  emitGetVirtualRegisters(op1, X86::eax, op2, X86::ecx);
-  emitJumpSlowCaseIfNotImmediateInteger(X86::eax);
-  emitJumpSlowCaseIfNotImmediateInteger(X86::ecx);
-#if USE(ALTERNATE_JSIMMEDIATE)
-  addSlowCase(branchPtr(Equal, X86::ecx,
-                        ImmPtr(JSValue::encode(jsNumber(m_globalData, 0)))));
-  m_assembler.cdq();
-  m_assembler.idivl_r(X86::ecx);
-#else
-  emitFastArithDeTagImmediate(X86::eax);
-  addSlowCase(emitFastArithDeTagImmediateJumpIfZero(X86::ecx));
-  m_assembler.cdq();
-  m_assembler.idivl_r(X86::ecx);
-  signExtend32ToPtr(X86::edx, X86::edx);
-#endif
-  emitFastArithReTagImmediate(X86::edx, X86::eax);
-  emitPutVirtualRegister(result);
-}
-void JIT::emitSlow_op_mod(Instruction* currentInstruction,
-                          Vector<SlowCaseEntry>::iterator& iter) {
-  unsigned result = currentInstruction[1].u.operand;
-
-#if USE(ALTERNATE_JSIMMEDIATE)
-  linkSlowCase(iter);
-  linkSlowCase(iter);
-  linkSlowCase(iter);
-#else
-  Jump notImm1 = getSlowCase(iter);
-  Jump notImm2 = getSlowCase(iter);
-  linkSlowCase(iter);
-  emitFastArithReTagImmediate(X86::eax, X86::eax);
-  emitFastArithReTagImmediate(X86::ecx, X86::ecx);
-  notImm1.link(this);
-  notImm2.link(this);
-#endif
-  JITStubCall stubCall(this, JITStubs::cti_op_mod);
-  stubCall.addArgument(X86::eax);
-  stubCall.addArgument(X86::ecx);
-  stubCall.call(result);
-}
-#else
-void JIT::emit_op_mod(Instruction* currentInstruction) {
-  unsigned result = currentInstruction[1].u.operand;
-  unsigned op1 = currentInstruction[2].u.operand;
-  unsigned op2 = currentInstruction[3].u.operand;
-
-  JITStubCall stubCall(this, JITStubs::cti_op_mod);
-  stubCall.addArgument(op1, regT2);
-  stubCall.addArgument(op2, regT2);
-  stubCall.call(result);
-}
-void JIT::emitSlow_op_mod(Instruction*, Vector<SlowCaseEntry>::iterator&) {
-  ASSERT_NOT_REACHED();
-}
-#endif
 
 void JIT::emit_op_post_inc(Instruction* currentInstruction) {
   unsigned result = currentInstruction[1].u.operand;
@@ -800,6 +700,7 @@ void JIT::emit_op_post_dec(Instruction* currentInstruction) {
   emitPutVirtualRegister(srcDst, regT1);
   emitPutVirtualRegister(result);
 }
+
 void JIT::emitSlow_op_post_dec(Instruction* currentInstruction,
                                Vector<SlowCaseEntry>::iterator& iter) {
   unsigned result = currentInstruction[1].u.operand;
@@ -828,6 +729,7 @@ void JIT::emit_op_pre_inc(Instruction* currentInstruction) {
 #endif
   emitPutVirtualRegister(srcDst);
 }
+
 void JIT::emitSlow_op_pre_inc(Instruction* currentInstruction,
                               Vector<SlowCaseEntry>::iterator& iter) {
   unsigned srcDst = currentInstruction[1].u.operand;
@@ -856,6 +758,7 @@ void JIT::emit_op_pre_dec(Instruction* currentInstruction) {
 #endif
   emitPutVirtualRegister(srcDst);
 }
+
 void JIT::emitSlow_op_pre_dec(Instruction* currentInstruction,
                               Vector<SlowCaseEntry>::iterator& iter) {
   unsigned srcDst = currentInstruction[1].u.operand;
@@ -869,7 +772,83 @@ void JIT::emitSlow_op_pre_dec(Instruction* currentInstruction,
   stubCall.call(srcDst);
 }
 
+/* ------------------------------ BEGIN: OP_MOD ------------------------------
+ */
+
+#if PLATFORM(X86) || PLATFORM(X86_64)
+
+void JIT::emit_op_mod(Instruction* currentInstruction) {
+  unsigned result = currentInstruction[1].u.operand;
+  unsigned op1 = currentInstruction[2].u.operand;
+  unsigned op2 = currentInstruction[3].u.operand;
+
+  emitGetVirtualRegisters(op1, X86::eax, op2, X86::ecx);
+  emitJumpSlowCaseIfNotImmediateInteger(X86::eax);
+  emitJumpSlowCaseIfNotImmediateInteger(X86::ecx);
+#if USE(ALTERNATE_JSIMMEDIATE)
+  addSlowCase(branchPtr(Equal, X86::ecx,
+                        ImmPtr(JSValue::encode(jsNumber(m_globalData, 0)))));
+  m_assembler.cdq();
+  m_assembler.idivl_r(X86::ecx);
+#else
+  emitFastArithDeTagImmediate(X86::eax);
+  addSlowCase(emitFastArithDeTagImmediateJumpIfZero(X86::ecx));
+  m_assembler.cdq();
+  m_assembler.idivl_r(X86::ecx);
+  signExtend32ToPtr(X86::edx, X86::edx);
+#endif
+  emitFastArithReTagImmediate(X86::edx, X86::eax);
+  emitPutVirtualRegister(result);
+}
+
+void JIT::emitSlow_op_mod(Instruction* currentInstruction,
+                          Vector<SlowCaseEntry>::iterator& iter) {
+  unsigned result = currentInstruction[1].u.operand;
+
+#if USE(ALTERNATE_JSIMMEDIATE)
+  linkSlowCase(iter);
+  linkSlowCase(iter);
+  linkSlowCase(iter);
+#else
+  Jump notImm1 = getSlowCase(iter);
+  Jump notImm2 = getSlowCase(iter);
+  linkSlowCase(iter);
+  emitFastArithReTagImmediate(X86::eax, X86::eax);
+  emitFastArithReTagImmediate(X86::ecx, X86::ecx);
+  notImm1.link(this);
+  notImm2.link(this);
+#endif
+  JITStubCall stubCall(this, JITStubs::cti_op_mod);
+  stubCall.addArgument(X86::eax);
+  stubCall.addArgument(X86::ecx);
+  stubCall.call(result);
+}
+
+#else  // PLATFORM(X86) || PLATFORM(X86_64)
+
+void JIT::emit_op_mod(Instruction* currentInstruction) {
+  unsigned result = currentInstruction[1].u.operand;
+  unsigned op1 = currentInstruction[2].u.operand;
+  unsigned op2 = currentInstruction[3].u.operand;
+
+  JITStubCall stubCall(this, JITStubs::cti_op_mod);
+  stubCall.addArgument(op1, regT2);
+  stubCall.addArgument(op2, regT2);
+  stubCall.call(result);
+}
+
+void JIT::emitSlow_op_mod(Instruction*, Vector<SlowCaseEntry>::iterator&) {
+  ASSERT_NOT_REACHED();
+}
+
+#endif  // PLATFORM(X86) || PLATFORM(X86_64)
+
+/* ------------------------------ END: OP_MOD ------------------------------ */
+
 #if !ENABLE(JIT_OPTIMIZE_ARITHMETIC)
+
+/* ------------------------------ BEGIN: !ENABLE(JIT_OPTIMIZE_ARITHMETIC)
+ * (OP_ADD, OP_SUB, OP_MUL) ------------------------------ */
 
 void JIT::emit_op_add(Instruction* currentInstruction) {
   unsigned result = currentInstruction[1].u.operand;
@@ -917,6 +896,9 @@ void JIT::emitSlow_op_sub(Instruction*, Vector<SlowCaseEntry>::iterator&) {
 }
 
 #elif USE(ALTERNATE_JSIMMEDIATE)  // *AND* ENABLE(JIT_OPTIMIZE_ARITHMETIC)
+
+/* ------------------------------ BEGIN: USE(ALTERNATE_JSIMMEDIATE) (OP_ADD,
+ * OP_SUB, OP_MUL) ------------------------------ */
 
 void JIT::compileBinaryArithOp(OpcodeID opcodeID,
                                unsigned,
@@ -1038,6 +1020,7 @@ void JIT::emit_op_add(Instruction* currentInstruction) {
 
   emitPutVirtualRegister(result);
 }
+
 void JIT::emitSlow_op_add(Instruction* currentInstruction,
                           Vector<SlowCaseEntry>::iterator& iter) {
   unsigned result = currentInstruction[1].u.operand;
@@ -1084,6 +1067,7 @@ void JIT::emit_op_mul(Instruction* currentInstruction) {
 
   emitPutVirtualRegister(result);
 }
+
 void JIT::emitSlow_op_mul(Instruction* currentInstruction,
                           Vector<SlowCaseEntry>::iterator& iter) {
   unsigned result = currentInstruction[1].u.operand;
@@ -1117,6 +1101,7 @@ void JIT::emit_op_sub(Instruction* currentInstruction) {
 
   emitPutVirtualRegister(result);
 }
+
 void JIT::emitSlow_op_sub(Instruction* currentInstruction,
                           Vector<SlowCaseEntry>::iterator& iter) {
   unsigned result = currentInstruction[1].u.operand;
@@ -1127,7 +1112,10 @@ void JIT::emitSlow_op_sub(Instruction* currentInstruction,
   compileBinaryArithOpSlowCase(op_sub, iter, result, op1, op2, types);
 }
 
-#else
+#else  // !ENABLE(JIT_OPTIMIZE_ARITHMETIC)
+
+/* ------------------------------ BEGIN: !ENABLE(JIT_OPTIMIZE_ARITHMETIC)
+ * (OP_ADD, OP_SUB, OP_MUL) ------------------------------ */
 
 typedef X86Assembler::JmpSrc JmpSrc;
 typedef X86Assembler::JmpDst JmpDst;
@@ -1471,6 +1459,7 @@ void JIT::emit_op_sub(Instruction* currentInstruction) {
                        currentInstruction[3].u.operand,
                        OperandTypes::fromInt(currentInstruction[4].u.operand));
 }
+
 void JIT::emitSlow_op_sub(Instruction* currentInstruction,
                           Vector<SlowCaseEntry>::iterator& iter) {
   compileBinaryArithOpSlowCase(
@@ -1479,7 +1468,10 @@ void JIT::emitSlow_op_sub(Instruction* currentInstruction,
       OperandTypes::fromInt(currentInstruction[4].u.operand));
 }
 
-#endif
+#endif  // !ENABLE(JIT_OPTIMIZE_ARITHMETIC)
+
+/* ------------------------------ END: OP_ADD, OP_SUB, OP_MUL
+ * ------------------------------ */
 
 }  // namespace JSC
 

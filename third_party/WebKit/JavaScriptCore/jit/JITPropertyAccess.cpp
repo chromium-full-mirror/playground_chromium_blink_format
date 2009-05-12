@@ -173,6 +173,9 @@ void JIT::emit_op_del_by_id(Instruction* currentInstruction) {
 
 #if !ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
 
+/* ------------------------------ BEGIN: !ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
+ * ------------------------------ */
+
 void JIT::compileGetByIdHotPath(int resultVReg,
                                 int baseVReg,
                                 Identifier* ident,
@@ -228,7 +231,10 @@ void JIT::compilePutByIdSlowCase(int,
   ASSERT_NOT_REACHED();
 }
 
-#else
+#else  // !ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
+
+/* ------------------------------ BEGIN: ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
+ * ------------------------------ */
 
 void JIT::compileGetByIdHotPath(int resultVReg,
                                 int baseVReg,
@@ -942,6 +948,9 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
   jumpLocation.relink(entryLabel);
 }
+
+/* ------------------------------ END: !ENABLE /
+ * ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS) ------------------------------ */
 
 #endif  // !ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
 
