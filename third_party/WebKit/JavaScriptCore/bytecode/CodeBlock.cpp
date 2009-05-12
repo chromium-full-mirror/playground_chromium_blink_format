@@ -593,6 +593,10 @@ void CodeBlock::dump(ExecState* exec,
       printf("[%4d] create_arguments\n", location);
       break;
     }
+    case op_init_arguments: {
+      printf("[%4d] init_arguments\n", location);
+      break;
+    }
     case op_convert_this: {
       int r0 = (++it)->u.operand;
       printf("[%4d] convert_this %s\n", location, registerName(r0).c_str());

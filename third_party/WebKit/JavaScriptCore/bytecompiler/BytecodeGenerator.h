@@ -96,6 +96,9 @@ class BytecodeGenerator {
   // require explicit reference counting.
   RegisterID* registerFor(const Identifier&);
 
+  bool willResolveToArguments(const Identifier&);
+  RegisterID* uncheckedRegisterForArguments();
+
   // Behaves as registerFor does, but ignores dynamic scope as
   // dynamic scope should not interfere with const initialisation
   RegisterID* constRegisterFor(const Identifier&);
@@ -554,6 +557,8 @@ class BytecodeGenerator {
   }
 
   RegisterID* emitThrowExpressionTooDeepException();
+
+  void createArgumentsIfNecessary();
 
   bool m_shouldEmitDebugHooks;
   bool m_shouldEmitProfileHooks;
