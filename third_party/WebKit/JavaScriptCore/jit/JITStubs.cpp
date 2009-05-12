@@ -1726,7 +1726,8 @@ int JITStubs::cti_op_load_varargs(STUB_ARGS_DECLARATION) {
   JSValue arguments = callFrame[argsOffset].jsValue();
   uint32_t argCount = 0;
   if (!arguments) {
-    argCount = (uint32_t)(callFrame[RegisterFile::ArgumentCount].u.i) - 1;
+    int providedParams = callFrame[RegisterFile::ArgumentCount].u.i - 1;
+    argCount = providedParams;
     int32_t sizeDelta =
         argsOffset + argCount + RegisterFile::CallFrameHeaderSize;
     Register* newEnd = callFrame->registers() + sizeDelta;
@@ -1735,12 +1736,12 @@ int JITStubs::cti_op_load_varargs(STUB_ARGS_DECLARATION) {
       stackFrame.globalData->exception = createStackOverflowError(callFrame);
       VM_THROW_EXCEPTION();
     }
-    uint32_t expectedParams =
+    int32_t expectedParams =
         asFunction(callFrame[RegisterFile::Callee].jsValue())
             ->body()
             ->parameterCount();
-    uint32_t inplaceArgs = min(argCount, expectedParams);
-    uint32_t i = 0;
+    int32_t inplaceArgs = min(providedParams, expectedParams);
+    int32_t i = 0;
     Register* argStore = callFrame->registers() + argsOffset;
 
     // First step is to copy the "expected" parameters from their normal
@@ -1751,10 +1752,10 @@ int JITStubs::cti_op_load_varargs(STUB_ARGS_DECLARATION) {
                                  expectedParams];
     // Then we copy any additional arguments that may be further up the stack
     // ('-1' to account for 'this')
-    for (; i < argCount; i++)
+    for (; i < providedParams; i++)
       argStore[i] =
           callFrame->registers()[i - RegisterFile::CallFrameHeaderSize -
-                                 expectedParams - argCount - 1];
+                                 expectedParams - providedParams - 1];
   } else if (!arguments.isUndefinedOrNull()) {
     if (!arguments.isObject()) {
       CodeBlock* codeBlock = callFrame->codeBlock();
