@@ -152,19 +152,6 @@ ALWAYS_INLINE void JIT::emitPutJITStubArgFromVirtualRegister(
   killLastResultRegister();
 }
 
-ALWAYS_INLINE void JIT::emitPutCTIParam(void* value, unsigned name) {
-  poke(ImmPtr(value), name);
-}
-
-ALWAYS_INLINE void JIT::emitPutCTIParam(RegisterID from, unsigned name) {
-  poke(from, name);
-}
-
-ALWAYS_INLINE void JIT::emitGetCTIParam(unsigned name, RegisterID to) {
-  peek(to, name);
-  killLastResultRegister();
-}
-
 ALWAYS_INLINE void JIT::emitPutToCallFrameHeader(
     RegisterID from,
     RegisterFile::CallFrameHeaderEntry entry) {
@@ -219,8 +206,8 @@ ALWAYS_INLINE JIT::Call JIT::emitNakedCall(void* function) {
 #if USE(JIT_STUB_ARGUMENT_REGISTER)
 ALWAYS_INLINE void JIT::restoreArgumentReference() {
   move(stackPointerRegister, firstArgumentRegister);
-  emitPutCTIParam(callFrameRegister,
-                  offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
+  poke(callFrameRegister,
+       offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
 }
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {
 // In the trampoline on x86-64, the first argument register is not overwritten.
@@ -232,14 +219,14 @@ ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {
 #elif USE(JIT_STUB_ARGUMENT_STACK)
 ALWAYS_INLINE void JIT::restoreArgumentReference() {
   poke(stackPointerRegister);
-  emitPutCTIParam(callFrameRegister,
-                  offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
+  poke(callFrameRegister,
+       offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
 }
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {}
 #else  // JIT_STUB_ARGUMENT_VA_LIST
 ALWAYS_INLINE void JIT::restoreArgumentReference() {
-  emitPutCTIParam(callFrameRegister,
-                  offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
+  poke(callFrameRegister,
+       offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
 }
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {}
 #endif
