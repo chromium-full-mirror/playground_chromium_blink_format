@@ -113,6 +113,15 @@ ALWAYS_INLINE bool JSValue::equalSlowCaseInline(ExecState* exec,
 }
 
 // ECMA 11.9.3
+ALWAYS_INLINE bool JSValue::strictEqualSlowCaseInline(JSValue v1, JSValue v2) {
+  ASSERT(!JSImmediate::isEitherImmediate(v1, v2));
+
+  if (v1.asCell()->isString() && v2.asCell()->isString())
+    return asString(v1)->value() == asString(v2)->value();
+
+  return v1 == v2;
+}
+
 inline bool JSValue::strictEqual(JSValue v1, JSValue v2) {
   if (JSImmediate::areBothImmediateIntegerNumbers(v1, v2))
     return v1 == v2;
@@ -123,16 +132,7 @@ inline bool JSValue::strictEqual(JSValue v1, JSValue v2) {
   if (JSImmediate::isEitherImmediate(v1, v2))
     return v1 == v2;
 
-  return strictEqualSlowCase(v1, v2);
-}
-
-ALWAYS_INLINE bool JSValue::strictEqualSlowCaseInline(JSValue v1, JSValue v2) {
-  ASSERT(!JSImmediate::isEitherImmediate(v1, v2));
-
-  if (v1.asCell()->isString() && v2.asCell()->isString())
-    return asString(v1)->value() == asString(v2)->value();
-
-  return v1 == v2;
+  return strictEqualSlowCaseInline(v1, v2);
 }
 
 inline bool jsLess(CallFrame* callFrame, JSValue v1, JSValue v2) {
