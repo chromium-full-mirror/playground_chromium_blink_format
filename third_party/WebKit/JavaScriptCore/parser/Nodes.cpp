@@ -2158,7 +2158,8 @@ ScopeNode::ScopeNode(JSGlobalData* globalData)
       ParserArenaRefCounted(globalData),
       m_features(NoFeatures) {
 #if ENABLE(CODEBLOCK_SAMPLING)
-  globalData->interpreter->sampler()->notifyOfScope(this);
+  if (SamplingTool* sampler = globalData->interpreter->sampler())
+    sampler->notifyOfScope(this);
 #endif
 }
 
@@ -2179,7 +2180,8 @@ ScopeNode::ScopeNode(JSGlobalData* globalData,
       m_features(features),
       m_source(source) {
 #if ENABLE(CODEBLOCK_SAMPLING)
-  globalData->interpreter->sampler()->notifyOfScope(this);
+  if (SamplingTool* sampler = globalData->interpreter->sampler())
+    sampler->notifyOfScope(this);
 #endif
 }
 
