@@ -249,6 +249,7 @@ class Editor {
       bool markGrammar,
       Range* grammarRange,
       bool performTextCheckingReplacements);
+  void changeBackToReplacedString(const String& replacedString);
 #endif
   void advanceToNextMisspelling(bool startBeforeSelection = false);
   void showSpellingGuessPanel();

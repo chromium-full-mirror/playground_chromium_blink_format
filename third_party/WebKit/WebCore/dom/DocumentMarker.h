@@ -36,7 +36,13 @@ class String;
 // which is ignored
 // for all types other than type TextMatch.
 struct DocumentMarker {
-  enum MarkerType { AllMarkers = -1, Spelling, Grammar, TextMatch };
+  enum MarkerType {
+    AllMarkers = -1,
+    Spelling,
+    Grammar,
+    TextMatch,
+    Replacement
+  };
 
   MarkerType type;
   unsigned startOffset;

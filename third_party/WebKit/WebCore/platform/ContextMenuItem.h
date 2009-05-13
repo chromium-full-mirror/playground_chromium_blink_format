@@ -139,6 +139,7 @@ enum ContextMenuAction {
   ContextMenuItemTagMakeUpperCase,
   ContextMenuItemTagMakeLowerCase,
   ContextMenuItemTagCapitalize,
+  ContextMenuItemTagChangeBack,
 #endif
   ContextMenuItemBaseApplicationTag = 10000
 };

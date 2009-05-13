@@ -183,6 +183,11 @@ class InlineTextBox : public InlineRunBox {
                             DocumentMarker,
                             RenderStyle*,
                             const Font&);
+  void computeRectForReplacementMarker(int tx,
+                                       int ty,
+                                       DocumentMarker,
+                                       RenderStyle*,
+                                       const Font&);
 };
 
 inline RenderText* InlineTextBox::textRenderer() const {
