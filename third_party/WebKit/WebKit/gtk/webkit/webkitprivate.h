@@ -124,6 +124,7 @@ struct _WebKitWebViewPrivate {
   char* customEncoding;
 
   gboolean disposing;
+  gboolean usePrimaryForPaste;
 };
 
 #define WEBKIT_WEB_FRAME_GET_PRIVATE(obj)                    \
@@ -219,6 +220,8 @@ WEBKIT_API void webkit_web_settings_add_extra_plugin_directory(
     const gchar* directory);
 
 GSList* webkit_web_settings_get_spell_languages(WebKitWebView* web_view);
+
+bool webkit_web_view_use_primary_for_paste(WebKitWebView* web_view);
 }
 
 #endif

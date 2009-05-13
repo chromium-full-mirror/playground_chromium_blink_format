@@ -169,7 +169,7 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     bool allowPlainText,
     bool& chosePlainText) {
   GdkAtom textHtml = gdk_atom_intern_static_string("text/html");
-  GtkClipboard* clipboard = m_helper->getClipboard(frame);
+  GtkClipboard* clipboard = m_helper->getCurrentTarget(frame);
   chosePlainText = false;
 
   if (GtkSelectionData* data =
@@ -205,7 +205,7 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
 }
 
 String Pasteboard::plainText(Frame* frame) {
-  GtkClipboard* clipboard = m_helper->getClipboard(frame);
+  GtkClipboard* clipboard = m_helper->getCurrentTarget(frame);
 
   gchar* utf8 = gtk_clipboard_wait_for_text(clipboard);
 
