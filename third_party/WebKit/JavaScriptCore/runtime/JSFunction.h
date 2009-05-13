@@ -27,6 +27,7 @@
 #include "InternalFunction.h"
 #include "JSVariableObject.h"
 #include "SymbolTable.h"
+#include "Nodes.h"
 #include "JSObject.h"
 
 namespace JSC {
@@ -43,7 +44,9 @@ class JSFunction : public InternalFunction {
 
   typedef InternalFunction Base;
 
-  JSFunction(PassRefPtr<Structure>);
+  JSFunction(PassRefPtr<Structure> structure) : InternalFunction(structure) {
+    clearScopeChain();
+  }
 
  public:
   JSFunction(ExecState*,
@@ -67,7 +70,8 @@ class JSFunction : public InternalFunction {
   void setScope(const ScopeChain& scopeChain) { setScopeChain(scopeChain); }
   ScopeChain& scope() { return scopeChain(); }
 
-  void setBody(PassRefPtr<FunctionBodyNode>);
+  void setBody(FunctionBodyNode* body) { m_body = body; }
+  void setBody(PassRefPtr<FunctionBodyNode> body) { m_body = body; }
   FunctionBodyNode* body() const { return m_body.get(); }
 
   virtual void mark();
@@ -79,6 +83,11 @@ class JSFunction : public InternalFunction {
                              TypeInfo(ObjectType, ImplementsHasInstance));
   }
 
+#if ENABLE(JIT)
+  bool isHostFunction() const { return m_body && m_body->isHostFunction(); }
+#else
+  bool isHostFunction() const { return false; }
+#endif
   NativeFunction nativeFunction() {
     return *reinterpret_cast<NativeFunction*>(m_data);
   }
@@ -99,35 +108,21 @@ class JSFunction : public InternalFunction {
                               const Identifier&,
                               const PropertySlot&);
 
-  bool isHostFunction() const;
-
   RefPtr<FunctionBodyNode> m_body;
   ScopeChain& scopeChain() {
-    // Would like to assert this is not a host function here, but it's hard to
-    // do this without creating unpleasant dependencies for WebCore, which
-    // includes
-    // this header, but not FunctionBodyNode.
+    ASSERT(!isHostFunction());
     return *reinterpret_cast<ScopeChain*>(m_data);
   }
   void clearScopeChain() {
-    // Would like to assert this is not a host function here, but it's hard to
-    // do this without creating unpleasant dependencies for WebCore, which
-    // includes
-    // this header, but not FunctionBodyNode.
+    ASSERT(!isHostFunction());
     new (m_data) ScopeChain(NoScopeChain());
   }
   void setScopeChain(ScopeChainNode* sc) {
-    // Would like to assert this is not a host function here, but it's hard to
-    // do this without creating unpleasant dependencies for WebCore, which
-    // includes
-    // this header, but not FunctionBodyNode.
+    ASSERT(!isHostFunction());
     new (m_data) ScopeChain(sc);
   }
   void setScopeChain(const ScopeChain& sc) {
-    // Would like to assert this is not a host function here, but it's hard to
-    // do this without creating unpleasant dependencies for WebCore, which
-    // includes
-    // this header, but not FunctionBodyNode.
+    ASSERT(!isHostFunction());
     *reinterpret_cast<ScopeChain*>(m_data) = sc;
   }
   void setNativeFunction(NativeFunction func) {

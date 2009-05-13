@@ -23,7 +23,6 @@
 #include "StringPrototype.h"
 
 #include "CachedCall.h"
-#include "Error.h"
 #include "JSArray.h"
 #include "JSFunction.h"
 #include "ObjectPrototype.h"

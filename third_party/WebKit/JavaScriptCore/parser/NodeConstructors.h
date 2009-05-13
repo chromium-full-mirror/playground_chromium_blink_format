@@ -27,14 +27,16 @@
 
 namespace JSC {
 
-inline void* ParserArenaFreeable::operator new(size_t size,
-                                               JSGlobalData* globalData) {
-  return globalData->parser->arena().allocateFreeable(size);
-}
-
 inline void* ParserArenaDeletable::operator new(size_t size,
                                                 JSGlobalData* globalData) {
-  return globalData->parser->arena().allocateDeletable(size);
+  ParserArenaDeletable* deletable =
+      static_cast<ParserArenaDeletable*>(fastMalloc(size));
+  globalData->parser->arena().deleteWithArena(deletable);
+  return deletable;
+}
+
+inline void* ParserArenaDeletable::operator new(size_t size) {
+  return fastMalloc(size);
 }
 
 inline ParserArenaRefCounted::ParserArenaRefCounted(JSGlobalData* globalData) {
@@ -60,12 +62,12 @@ inline BooleanNode::BooleanNode(JSGlobalData* globalData, bool value)
 inline NumberNode::NumberNode(JSGlobalData* globalData, double v)
     : ExpressionNode(globalData, ResultType::numberType()), m_double(v) {}
 
-inline StringNode::StringNode(JSGlobalData* globalData, const Identifier& value)
-    : ExpressionNode(globalData, ResultType::stringType()), m_value(value) {}
+inline StringNode::StringNode(JSGlobalData* globalData, const Identifier& v)
+    : ExpressionNode(globalData, ResultType::stringType()), m_value(v) {}
 
 inline RegExpNode::RegExpNode(JSGlobalData* globalData,
-                              const Identifier& pattern,
-                              const Identifier& flags)
+                              const UString& pattern,
+                              const UString& flags)
     : ExpressionNode(globalData), m_pattern(pattern), m_flags(flags) {}
 
 inline ThisNode::ThisNode(JSGlobalData* globalData)
@@ -114,15 +116,6 @@ inline PropertyNode::PropertyNode(JSGlobalData*,
                                   ExpressionNode* assign,
                                   Type type)
     : m_name(name), m_assign(assign), m_type(type) {}
-
-inline PropertyNode::PropertyNode(JSGlobalData* globalData,
-                                  double name,
-                                  ExpressionNode* assign,
-                                  Type type)
-    : m_name(
-          globalData->parser->arena().makeNumericIdentifier(globalData, name)),
-      m_assign(assign),
-      m_type(type) {}
 
 inline PropertyListNode::PropertyListNode(JSGlobalData* globalData,
                                           PropertyNode* node)
@@ -924,16 +917,14 @@ inline ForNode::ForNode(JSGlobalData* globalData,
 }
 
 inline ContinueNode::ContinueNode(JSGlobalData* globalData)
-    : StatementNode(globalData),
-      m_ident(globalData->propertyNames->nullIdentifier) {}
+    : StatementNode(globalData) {}
 
 inline ContinueNode::ContinueNode(JSGlobalData* globalData,
                                   const Identifier& ident)
     : StatementNode(globalData), m_ident(ident) {}
 
 inline BreakNode::BreakNode(JSGlobalData* globalData)
-    : StatementNode(globalData),
-      m_ident(globalData->propertyNames->nullIdentifier) {}
+    : StatementNode(globalData) {}
 
 inline BreakNode::BreakNode(JSGlobalData* globalData, const Identifier& ident)
     : StatementNode(globalData), m_ident(ident) {}
@@ -1007,10 +998,16 @@ inline FuncDeclNode::FuncDeclNode(JSGlobalData* globalData,
   m_body->finishParsing(source, parameter);
 }
 
+inline CaseClauseNode::CaseClauseNode(JSGlobalData*, ExpressionNode* expr)
+    : m_expr(expr) {}
+
 inline CaseClauseNode::CaseClauseNode(JSGlobalData*,
                                       ExpressionNode* expr,
-                                      SourceElements* statements)
-    : m_expr(expr), m_statements(statements) {}
+                                      SourceElements* children)
+    : m_expr(expr) {
+  if (children)
+    children->releaseContentsIntoVector(m_children);
+}
 
 inline ClauseListNode::ClauseListNode(JSGlobalData*, CaseClauseNode* clause)
     : m_clause(clause), m_next(0) {}
@@ -1038,16 +1035,17 @@ inline ConstDeclNode::ConstDeclNode(JSGlobalData* globalData,
                                     ExpressionNode* init)
     : ExpressionNode(globalData), m_ident(ident), m_next(0), m_init(init) {}
 
-inline BlockNode::BlockNode(JSGlobalData* globalData,
-                            SourceElements* statements)
-    : StatementNode(globalData), m_statements(statements) {}
+inline BlockNode::BlockNode(JSGlobalData* globalData, SourceElements* children)
+    : StatementNode(globalData) {
+  if (children)
+    children->releaseContentsIntoVector(m_children);
+}
 
 inline ForInNode::ForInNode(JSGlobalData* globalData,
                             ExpressionNode* l,
                             ExpressionNode* expr,
                             StatementNode* statement)
     : StatementNode(globalData),
-      m_ident(globalData->propertyNames->nullIdentifier),
       m_init(0),
       m_lexpr(l),
       m_expr(expr),

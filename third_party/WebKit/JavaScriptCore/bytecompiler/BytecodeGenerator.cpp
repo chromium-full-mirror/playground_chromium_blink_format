@@ -295,9 +295,9 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
 
     Vector<RegisterID*, 32> newVars;
     for (size_t i = 0; i < varStack.size(); ++i)
-      if (!globalObject->hasProperty(exec, *varStack[i].first))
+      if (!globalObject->hasProperty(exec, varStack[i].first))
         newVars.append(
-            addGlobalVar(*varStack[i].first,
+            addGlobalVar(varStack[i].first,
                          varStack[i].second & DeclarationStacks::IsConstant));
 
     allocateConstants(programNode->neededConstants());
@@ -312,12 +312,12 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
           funcDecl->makeFunction(exec, scopeChain.node()), DontDelete);
     }
     for (size_t i = 0; i < varStack.size(); ++i) {
-      if (globalObject->hasProperty(exec, *varStack[i].first))
+      if (globalObject->hasProperty(exec, varStack[i].first))
         continue;
       int attributes = DontDelete;
       if (varStack[i].second & DeclarationStacks::IsConstant)
         attributes |= ReadOnly;
-      globalObject->putWithAttributes(exec, *varStack[i].first, jsUndefined(),
+      globalObject->putWithAttributes(exec, varStack[i].first, jsUndefined(),
                                       attributes);
     }
 
@@ -380,7 +380,7 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
 
   const DeclarationStacks::VarStack& varStack = functionBody->varStack();
   for (size_t i = 0; i < varStack.size(); ++i)
-    addVar(*varStack[i].first,
+    addVar(varStack[i].first,
            varStack[i].second & DeclarationStacks::IsConstant);
 
   const Identifier* parameters = functionBody->parameters();
@@ -1952,7 +1952,7 @@ void BytecodeGenerator::emitSubroutineReturn(RegisterID* retAddrSrc) {
 }
 
 void BytecodeGenerator::emitPushNewScope(RegisterID* dst,
-                                         const Identifier& property,
+                                         Identifier& property,
                                          RegisterID* value) {
   ControlFlowContext context;
   context.isFinallyBlock = false;

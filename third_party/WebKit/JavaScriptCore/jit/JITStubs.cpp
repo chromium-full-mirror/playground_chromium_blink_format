@@ -1148,13 +1148,12 @@ void* JITStubs::cti_vm_lazyLinkCall(STUB_ARGS_DECLARATION) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   JSFunction* callee = asFunction(stackFrame.args[0].jsValue());
-  FunctionBodyNode* calleeBody = callee->body();
-  JITCode jitCode = calleeBody->generatedJITCode();
+  JITCode jitCode = callee->body()->generatedJITCode();
   ASSERT(jitCode);
 
   CodeBlock* codeBlock = 0;
-  if (!calleeBody->isHostFunction())
-    codeBlock = &calleeBody->bytecode(callee->scope().node());
+  if (!callee->isHostFunction())
+    codeBlock = &callee->body()->bytecode(callee->scope().node());
 
   CallLinkInfo* callLinkInfo =
       &stackFrame.callFrame->callerFrame()->codeBlock()->getCallLinkInfo(
@@ -1333,8 +1332,7 @@ JSObject* JITStubs::cti_op_construct_JSConstruct(STUB_ARGS_DECLARATION) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   JSFunction* constructor = asFunction(stackFrame.args[0].jsValue());
-  FunctionBodyNode* constructorBody = constructor->body();
-  if (UNLIKELY(constructorBody && constructorBody->isHostFunction())) {
+  if (constructor->isHostFunction()) {
     CallFrame* callFrame = stackFrame.callFrame;
     CodeBlock* codeBlock = callFrame->codeBlock();
     unsigned vPCIndex =

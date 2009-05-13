@@ -23,7 +23,6 @@
 #include "RegExpConstructor.h"
 
 #include "ArrayPrototype.h"
-#include "Error.h"
 #include "JSArray.h"
 #include "JSFunction.h"
 #include "JSString.h"
