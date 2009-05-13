@@ -34,7 +34,7 @@
 namespace WebCore {
 
 class AccessibilityTableCell : public AccessibilityRenderObject {
- private:
+ protected:
   AccessibilityTableCell(RenderObject*);
 
  public:
@@ -47,15 +47,16 @@ class AccessibilityTableCell : public AccessibilityRenderObject {
   virtual bool accessibilityIsIgnored() const;
 
   // fills in the start location and row span of cell
-  void rowIndexRange(pair<int, int>& rowRange);
+  virtual void rowIndexRange(pair<int, int>& rowRange);
   // fills in the start location and column span of cell
-  void columnIndexRange(pair<int, int>& columnRange);
+  virtual void columnIndexRange(pair<int, int>& columnRange);
 
   // if a table cell is not exposed as a table cell, a TH element can
   // serve as its title ui element
   AccessibilityObject* titleUIElement() const;
 
- private:
+ protected:
+  virtual AccessibilityObject* parentTable() const;
   int m_rowIndex;
 };
 
