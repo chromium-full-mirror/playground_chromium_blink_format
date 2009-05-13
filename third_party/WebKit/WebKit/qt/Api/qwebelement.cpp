@@ -923,7 +923,7 @@ QString QWebElement::styleProperty(const QString& name,
 
     DOMWindow* domWindow = m_element->document()->frame()->domWindow();
     if (RefPtr<CSSRuleList> rules =
-            domWindow->getMatchedCSSRules(m_element, ""))
+            domWindow->getMatchedCSSRules(m_element, "")) {
       for (int i = rules->length(); i > 0; --i) {
         CSSStyleRule* rule = static_cast<CSSStyleRule*>(rules->item(i - 1));
 
@@ -933,6 +933,7 @@ QString QWebElement::styleProperty(const QString& name,
         if (style->getPropertyValue(propID).isEmpty())
           style = rule->style();
       }
+    }
 
     return style->getPropertyValue(propID);
   }
