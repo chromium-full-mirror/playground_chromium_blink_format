@@ -25,6 +25,7 @@
 
 #include "CollectorHeapIterator.h"
 #include "Interpreter.h"
+#include "JSFunction.h"
 #include "JSGlobalObject.h"
 #include "Parser.h"
 
