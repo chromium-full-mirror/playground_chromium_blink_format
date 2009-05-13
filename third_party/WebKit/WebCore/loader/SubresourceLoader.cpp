@@ -72,7 +72,8 @@ PassRefPtr<SubresourceLoader> SubresourceLoader::create(
     return 0;
 
   FrameLoader* fl = frame->loader();
-  if (!skipCanLoadCheck && fl->state() == FrameStateProvisional)
+  if (!skipCanLoadCheck && (fl->state() == FrameStateProvisional ||
+                            fl->activeDocumentLoader()->isStopping()))
     return 0;
 
   ResourceRequest newRequest = request;
