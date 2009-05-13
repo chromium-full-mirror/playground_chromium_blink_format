@@ -389,4 +389,12 @@ void fastNonNullDeleteArray(T* p) {
 
 }  // namespace WTF
 
+using WTF::FastAllocBase;
+using WTF::fastDelete;
+using WTF::fastDeleteArray;
+using WTF::fastNew;
+using WTF::fastNewArray;
+using WTF::fastNonNullDelete;
+using WTF::fastNonNullDeleteArray;
+
 #endif  // FastAllocBase_h

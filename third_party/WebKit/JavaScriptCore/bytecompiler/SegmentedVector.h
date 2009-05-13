@@ -44,6 +44,7 @@ class SegmentedVector {
   ~SegmentedVector() { deleteAllSegments(); }
 
   size_t size() const { return m_size; }
+  bool isEmpty() const { return !size(); }
 
   T& at(size_t index) {
     if (index < SegmentSize)

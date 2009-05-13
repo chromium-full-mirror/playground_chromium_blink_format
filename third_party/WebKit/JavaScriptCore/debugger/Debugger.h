@@ -68,6 +68,8 @@ class Debugger {
                                   intptr_t sourceID,
                                   int lineno) = 0;
 
+  void recompileAllJSFunctions(JSGlobalData*, bool callSourceParsed);
+
  private:
   HashSet<JSGlobalObject*> m_globalObjects;
 };

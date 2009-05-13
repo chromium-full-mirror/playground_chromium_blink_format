@@ -116,11 +116,12 @@ JSValue JSC_HOST_CALL functionProtoFuncToString(ExecState* exec,
                                                 const ArgList&) {
   if (thisValue.isObject(&JSFunction::info)) {
     JSFunction* function = asFunction(thisValue);
-    if (!function->isHostFunction()) {
-      UString functionBody = function->body()->toSourceString();
+    FunctionBodyNode* body = function->body();
+    if (!body->isHostFunction()) {
+      UString functionBody = body->toSourceString();
       insertSemicolonIfNeeded(functionBody);
       return jsString(exec, "function " + function->name(&exec->globalData()) +
-                                "(" + function->body()->paramString() + ") " +
+                                "(" + body->paramString() + ") " +
                                 functionBody);
     }
   }
