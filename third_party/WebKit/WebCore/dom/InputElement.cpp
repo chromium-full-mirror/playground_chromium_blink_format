@@ -92,7 +92,7 @@ void InputElement::updatePlaceholderVisibility(InputElementData& data,
   data.setPlaceholderShouldBeVisible(
       data.inputElement()->value().isEmpty() &&
       document->focusedNode() != element &&
-      !data.inputElement()->placeholderValue().isEmpty());
+      !data.inputElement()->placeholder().isEmpty());
 
   if ((oldPlaceholderShouldBeVisible != data.placeholderShouldBeVisible() ||
        placeholderValueChanged) &&
