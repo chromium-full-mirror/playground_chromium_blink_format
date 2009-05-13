@@ -38,7 +38,7 @@
 
 namespace WebCore {
 
-DatabaseThread::DatabaseThread() {
+DatabaseThread::DatabaseThread() : m_threadID(0) {
   m_selfRef = this;
 }
 
@@ -50,13 +50,13 @@ DatabaseThread::~DatabaseThread() {
 bool DatabaseThread::start() {
   MutexLocker lock(m_threadCreationMutex);
 
-  if (m_threadID.isValid())
+  if (m_threadID)
     return true;
 
   m_threadID = createThread(DatabaseThread::databaseThreadStart, this,
                             "WebCore: Database");
 
-  return m_threadID.isValid();
+  return m_threadID;
 }
 
 void DatabaseThread::requestTermination() {
@@ -92,9 +92,9 @@ void* DatabaseThread::databaseThread() {
   }
 
   LOG(StorageAPI,
-      "About to detach thread and clear the ref to DatabaseThread %p, which "
+      "About to detach thread %i and clear the ref to DatabaseThread %p, which "
       "currently has %i ref(s)",
-      this, refCount());
+      m_threadID, this, refCount());
 
   // Detach the thread so its resources are no longer of any concern to anyone
   // else

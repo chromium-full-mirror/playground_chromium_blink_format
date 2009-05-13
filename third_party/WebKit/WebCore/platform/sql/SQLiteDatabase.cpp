@@ -43,7 +43,10 @@ const int SQLResultSchema = SQLITE_SCHEMA;
 const int SQLResultFull = SQLITE_FULL;
 
 SQLiteDatabase::SQLiteDatabase()
-    : m_db(0), m_pageSize(-1), m_transactionInProgress(false) {}
+    : m_db(0),
+      m_pageSize(-1),
+      m_transactionInProgress(false),
+      m_openingThread(0) {}
 
 SQLiteDatabase::~SQLiteDatabase() {
   close();
@@ -81,7 +84,7 @@ void SQLiteDatabase::close() {
     m_db = 0;
   }
 
-  m_openingThread.invalidate();
+  m_openingThread = 0;
 }
 
 void SQLiteDatabase::setFullsync(bool fsync) {

@@ -114,11 +114,7 @@ SamplingTool* SamplingTool::s_samplingTool = 0;
 
 bool SamplingThread::s_running = false;
 unsigned SamplingThread::s_hertz = 10000;
-
-ThreadIdentifier& SamplingThread::samplingThread() {
-  DEFINE_STATIC_LOCAL(ThreadIdentifier, staticSamplingThread, ());
-  return staticSamplingThread;
-}
+ThreadIdentifier SamplingThread::s_samplingThread;
 
 void* SamplingThread::threadStartFunc(void*) {
   while (s_running) {
@@ -140,14 +136,14 @@ void SamplingThread::start(unsigned hertz) {
   s_running = true;
   s_hertz = hertz;
 
-  samplingThread() =
+  s_samplingThread =
       createThread(threadStartFunc, 0, "JavaScriptCore::Sampler");
 }
 
 void SamplingThread::stop() {
   ASSERT(s_running);
   s_running = false;
-  waitForThreadCompletion(samplingThread(), 0);
+  waitForThreadCompletion(s_samplingThread, 0);
 }
 
 void ScopeSampleRecord::sample(CodeBlock* codeBlock, Instruction* vPC) {
