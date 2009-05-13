@@ -100,7 +100,7 @@ static inline QPainter::CompositionMode toQtCompositionMode(
     case CompositeHighlight:
       return QPainter::CompositionMode_SourceOver;
     case CompositePlusLighter:
-      return QPainter::CompositionMode_SourceOver;
+      return QPainter::CompositionMode_Plus;
   }
 
   return QPainter::CompositionMode_SourceOver;
