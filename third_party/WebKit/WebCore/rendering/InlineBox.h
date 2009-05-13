@@ -249,8 +249,10 @@ class InlineBox {
   virtual bool canAccommodateEllipsis(bool ltr,
                                       int blockEdge,
                                       int ellipsisWidth);
+  // visibleLeftEdge, visibleRightEdge are in the parent's coordinate system.
   virtual int placeEllipsisBox(bool ltr,
-                               int blockEdge,
+                               int visibleLeftEdge,
+                               int visibleRightEdge,
                                int ellipsisWidth,
                                bool&);
 

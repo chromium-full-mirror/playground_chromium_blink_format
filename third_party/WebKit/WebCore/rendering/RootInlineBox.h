@@ -102,11 +102,13 @@ class RootInlineBox : public InlineFlowBox {
                               int ellipsisWidth);
   void placeEllipsis(const AtomicString& ellipsisStr,
                      bool ltr,
-                     int blockEdge,
+                     int blockLeftEdge,
+                     int blockRightEdge,
                      int ellipsisWidth,
                      InlineBox* markupBox = 0);
   virtual int placeEllipsisBox(bool ltr,
-                               int blockEdge,
+                               int blockLeftEdge,
+                               int blockRightEdge,
                                int ellipsisWidth,
                                bool& foundBox);
 

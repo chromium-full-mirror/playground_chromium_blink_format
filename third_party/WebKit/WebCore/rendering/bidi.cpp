@@ -2457,10 +2457,11 @@ void RenderBlock::checkLinesForTextOverflow() {
   // "contentWidth()"
   bool ltr = style()->direction() == LTR;
   for (RootInlineBox* curr = firstRootBox(); curr; curr = curr->nextRootBox()) {
-    int blockEdge = ltr ? rightOffset(curr->y(), curr == firstRootBox())
-                        : leftOffset(curr->y(), curr == firstRootBox());
+    int blockRightEdge = rightOffset(curr->y(), curr == firstRootBox());
+    int blockLeftEdge = leftOffset(curr->y(), curr == firstRootBox());
     int lineBoxEdge = ltr ? curr->x() + curr->width() : curr->x();
-    if ((ltr && lineBoxEdge > blockEdge) || (!ltr && lineBoxEdge < blockEdge)) {
+    if ((ltr && lineBoxEdge > blockRightEdge) ||
+        (!ltr && lineBoxEdge < blockLeftEdge)) {
       // This line spills out of our box in the appropriate direction.  Now we
       // need to see if the line
       // can be truncated.  In order for truncation to be possible, the line
@@ -2470,8 +2471,10 @@ void RenderBlock::checkLinesForTextOverflow() {
       // space.
       int width =
           curr == firstRootBox() ? firstLineEllipsisWidth : ellipsisWidth;
+      int blockEdge = ltr ? blockRightEdge : blockLeftEdge;
       if (curr->canAccommodateEllipsis(ltr, blockEdge, lineBoxEdge, width))
-        curr->placeEllipsis(ellipsisStr, ltr, blockEdge, width);
+        curr->placeEllipsis(ellipsisStr, ltr, blockLeftEdge, blockRightEdge,
+                            width);
     }
   }
 }

@@ -230,7 +230,8 @@ class InlineFlowBox : public InlineRunBox {
                                       int blockEdge,
                                       int ellipsisWidth);
   virtual int placeEllipsisBox(bool ltr,
-                               int blockEdge,
+                               int blockLeftEdge,
+                               int blockRightEdge,
                                int ellipsisWidth,
                                bool&);
 

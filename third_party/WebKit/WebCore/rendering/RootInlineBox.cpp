@@ -99,7 +99,8 @@ bool RootInlineBox::canAccommodateEllipsis(bool ltr,
 
 void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
                                   bool ltr,
-                                  int blockEdge,
+                                  int blockLeftEdge,
+                                  int blockRightEdge,
                                   int ellipsisWidth,
                                   InlineBox* markupBox) {
   // Create an ellipsis box.
@@ -113,7 +114,8 @@ void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
   gEllipsisBoxMap->add(this, ellipsisBox);
   m_hasEllipsisBox = true;
 
-  if (ltr && (x() + width() + ellipsisWidth) <= blockEdge) {
+  // FIXME: Do we need an RTL version of this?
+  if (ltr && (x() + width() + ellipsisWidth) <= blockRightEdge) {
     ellipsisBox->m_x = x() + width();
     return;
   }
@@ -124,17 +126,19 @@ void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
   // not painting (as being
   // truncated).
   bool foundBox = false;
-  ellipsisBox->m_x = placeEllipsisBox(ltr, blockEdge, ellipsisWidth, foundBox);
+  ellipsisBox->m_x = placeEllipsisBox(ltr, blockLeftEdge, blockRightEdge,
+                                      ellipsisWidth, foundBox);
 }
 
 int RootInlineBox::placeEllipsisBox(bool ltr,
-                                    int blockEdge,
+                                    int blockLeftEdge,
+                                    int blockRightEdge,
                                     int ellipsisWidth,
                                     bool& foundBox) {
-  int result =
-      InlineFlowBox::placeEllipsisBox(ltr, blockEdge, ellipsisWidth, foundBox);
+  int result = InlineFlowBox::placeEllipsisBox(
+      ltr, blockLeftEdge, blockRightEdge, ellipsisWidth, foundBox);
   if (result == -1)
-    result = ltr ? blockEdge - ellipsisWidth : blockEdge;
+    result = ltr ? blockRightEdge - ellipsisWidth : blockLeftEdge;
   return result;
 }
 

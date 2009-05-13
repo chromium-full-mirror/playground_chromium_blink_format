@@ -95,8 +95,9 @@ class InlineTextBox : public InlineRunBox {
 
  private:
   virtual void clearTruncation() { m_truncation = cNoTruncation; }
-  virtual int placeEllipsisBox(bool ltr,
-                               int blockEdge,
+  virtual int placeEllipsisBox(bool flowIsLTR,
+                               int visibleLeftEdge,
+                               int visibleRightEdge,
                                int ellipsisWidth,
                                bool& foundBox);
 
