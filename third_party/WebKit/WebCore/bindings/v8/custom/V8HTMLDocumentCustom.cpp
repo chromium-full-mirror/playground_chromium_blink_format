@@ -123,7 +123,7 @@ CALLBACK_FUNC_DECL(HTMLDocumentWrite) {
   INC_STATS("DOM.HTMLDocument.write()");
   HTMLDocument* htmlDocument =
       V8Proxy::DOMWrapperToNode<HTMLDocument>(args.Holder());
-  Frame* frame = V8Proxy::retrieveFrameForEnteredContext();
+  Frame* frame = V8Proxy::retrieveFrameForCurrentContext();
   ASSERT(frame);
   htmlDocument->write(writeHelperGetString(args), frame->document());
   return v8::Undefined();
@@ -133,7 +133,7 @@ CALLBACK_FUNC_DECL(HTMLDocumentWriteln) {
   INC_STATS("DOM.HTMLDocument.writeln()");
   HTMLDocument* htmlDocument =
       V8Proxy::DOMWrapperToNode<HTMLDocument>(args.Holder());
-  Frame* frame = V8Proxy::retrieveFrameForEnteredContext();
+  Frame* frame = V8Proxy::retrieveFrameForCurrentContext();
   ASSERT(frame);
   htmlDocument->writeln(writeHelperGetString(args), frame->document());
   return v8::Undefined();
@@ -175,7 +175,7 @@ CALLBACK_FUNC_DECL(HTMLDocumentOpen) {
     }
   }
 
-  Frame* frame = V8Proxy::retrieveFrameForEnteredContext();
+  Frame* frame = V8Proxy::retrieveFrameForCurrentContext();
   htmlDocument->open(frame->document());
   // Return the document.
   return args.Holder();
