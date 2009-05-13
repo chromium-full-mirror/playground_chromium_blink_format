@@ -1959,6 +1959,8 @@ void BytecodeGenerator::emitPushNewScope(RegisterID* dst,
   m_scopeContextStack.append(context);
   m_dynamicScopeDepth++;
 
+  createArgumentsIfNecessary();
+
   emitOpcode(op_push_new_scope);
   instructions().append(dst->index());
   instructions().append(addConstant(property));
