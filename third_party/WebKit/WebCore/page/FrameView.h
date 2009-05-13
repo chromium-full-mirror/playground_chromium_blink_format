@@ -152,6 +152,7 @@ class FrameView : public ScrollView {
 
   void setUseSlowRepaints();
   void setIsOverlapped(bool);
+  void setContentIsOpaque(bool);
 
   void addSlowRepaintObject();
   void removeSlowRepaintObject();
@@ -249,6 +250,7 @@ class FrameView : public ScrollView {
   ScrollbarMode m_hmode;
   bool m_useSlowRepaints;
   bool m_isOverlapped;
+  bool m_contentIsOpaque;
   unsigned m_slowRepaintObjectCount;
 
   int m_borderX, m_borderY;
