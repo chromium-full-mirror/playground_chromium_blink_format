@@ -113,6 +113,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   // playback state
   float currentTime() const;
   void setCurrentTime(float, ExceptionCode&);
+  float startTime() const;
   float duration() const;
   bool paused() const;
   float defaultPlaybackRate() const;

@@ -120,6 +120,8 @@ class MediaPlayer : Noncopyable {
   float currentTime() const;
   void seek(float time);
 
+  float startTime() const;
+
   void setEndTime(float time);
 
   float rate() const;
