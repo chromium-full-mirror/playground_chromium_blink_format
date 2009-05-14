@@ -107,15 +107,10 @@ static HashMap<String, RetainPtr<CFDataRef>>& clientCerts() {
   return certs;
 }
 
-static CFURLResponseRef createCFURLResponseWithDefaultMIMEType(
-    CFURLResponseRef response) {
+static CFURLResponseRef setDefaultMIMEType(CFURLResponseRef response) {
   static CFStringRef defaultMIMETypeString = defaultMIMEType().createCFString();
 
-  return CFURLResponseCreate(kCFAllocatorDefault, CFURLResponseGetURL(response),
-                             defaultMIMETypeString,
-                             CFURLResponseGetExpectedContentLength(response),
-                             CFURLResponseGetTextEncodingName(response),
-                             CFURLResponseGetRecommendedCachePolicy(response));
+  CFURLResponseSetMIMEType(response, defaultMIMETypeString);
 }
 
 CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
@@ -154,16 +149,14 @@ void didReceiveResponse(CFURLConnectionRef conn,
   if (!handle->client())
     return;
 
-  if (CFURLResponseGetMIMEType(cfResponse))
-    handle->client()->didReceiveResponse(handle, cfResponse);
-  else {
+  if (!CFURLResponseGetMIMEType(cfResponse)) {
     // We should never be applying the default MIMEType if we told the
     // networking layer to do content sniffing for handle.
     ASSERT(!handle->shouldContentSniff());
-    RetainPtr<CFURLResponseRef> newResponse(
-        AdoptCF, createCFURLResponseWithDefaultMIMEType(cfResponse));
-    handle->client()->didReceiveResponse(handle, newResponse.get());
+    setDefaultMIMEType(cfResponse);
   }
+
+  handle->client()->didReceiveResponse(handle, cfResponse);
 }
 
 void didReceiveData(CFURLConnectionRef conn,
@@ -849,12 +842,8 @@ RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
 
   CFURLConnectionCancel(connection.get());
 
-  if (error.isNull() && loader.m_response.mimeType().isNull()) {
-    RetainPtr<CFURLResponseRef> cfResponse(
-        AdoptCF, createCFURLResponseWithDefaultMIMEType(
-                     loader.m_response.cfURLResponse()));
-    loader.m_response = cfResponse.get();
-  }
+  if (error.isNull() && loader.m_response.mimeType().isNull())
+    setDefaultMIMEType(loader.m_response.cfURLResponse());
 
   return loader.m_data;
 }
