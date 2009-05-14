@@ -49,9 +49,10 @@ class CanvasObserver {
  public:
   virtual ~CanvasObserver(){};
 
-  virtual void canvasChanged(HTMLCanvasElement* element,
+  virtual void canvasChanged(HTMLCanvasElement*,
                              const FloatRect& changedRect) = 0;
-  virtual void canvasResized(HTMLCanvasElement* element) = 0;
+  virtual void canvasResized(HTMLCanvasElement*) = 0;
+  virtual void canvasDestroyed(HTMLCanvasElement*) = 0;
 };
 
 class HTMLCanvasElement : public HTMLElement {

@@ -51,9 +51,9 @@ class CSSCanvasValue : public CSSImageGeneratorValue, private CanvasObserver {
  private:
   CSSCanvasValue() : m_element(0) {}
 
-  virtual void canvasChanged(HTMLCanvasElement* element,
-                             const FloatRect& changedRect);
-  virtual void canvasResized(HTMLCanvasElement* element);
+  virtual void canvasChanged(HTMLCanvasElement*, const FloatRect& changedRect);
+  virtual void canvasResized(HTMLCanvasElement*);
+  virtual void canvasDestroyed(HTMLCanvasElement*);
 
   HTMLCanvasElement* element(Document*);
 

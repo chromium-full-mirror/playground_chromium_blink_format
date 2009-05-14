@@ -73,7 +73,10 @@ HTMLCanvasElement::HTMLCanvasElement(const QualifiedName& tagName,
   ASSERT(hasTagName(canvasTag));
 }
 
-HTMLCanvasElement::~HTMLCanvasElement() {}
+HTMLCanvasElement::~HTMLCanvasElement() {
+  if (m_observer)
+    m_observer->canvasDestroyed(this);
+}
 
 #if ENABLE(DASHBOARD_SUPPORT)
 
