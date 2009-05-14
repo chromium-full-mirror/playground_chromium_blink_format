@@ -164,6 +164,7 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
   PassRefPtr<SharedBuffer> bufferedData();
   static bool supportsBufferedData();
 
+  bool shouldContentSniff() const;
   static bool shouldContentSniffURL(const KURL&);
 
 #if USE(WININET)
