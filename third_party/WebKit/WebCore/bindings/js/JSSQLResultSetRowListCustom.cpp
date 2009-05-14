@@ -29,6 +29,8 @@
 #include "config.h"
 #include "JSSQLResultSetRowList.h"
 
+#if ENABLE(DATABASE)
+
 #include "ExceptionCode.h"
 #include "SQLValue.h"
 #include "SQLResultSetRowList.h"
@@ -78,3 +80,5 @@ JSValue JSSQLResultSetRowList::item(ExecState* exec, const ArgList& args) {
   return object;
 }
 }
+
+#endif

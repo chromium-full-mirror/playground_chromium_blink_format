@@ -28,6 +28,8 @@
 #include "config.h"
 #include "OriginUsageRecord.h"
 
+#if ENABLE(DATABASE)
+
 #include "FileSystem.h"
 
 namespace WebCore {
@@ -96,3 +98,5 @@ unsigned long long OriginUsageRecord::diskUsage() {
   return m_cachedDiskUsage;
 }
 }
+
+#endif

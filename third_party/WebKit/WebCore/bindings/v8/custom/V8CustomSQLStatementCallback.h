@@ -31,6 +31,8 @@
 #ifndef V8CustomSQLStatementCallback_h
 #define V8CustomSQLStatementCallback_h
 
+#if ENABLE(DATABASE)
+
 #include "SQLStatementCallback.h"
 #include <v8.h>
 #include <wtf/PassRefPtr.h>
@@ -62,5 +64,7 @@ class V8CustomSQLStatementCallback : public SQLStatementCallback {
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // V8CustomSQLStatementCallback_h

@@ -28,6 +28,8 @@
 #ifndef SQLStatementCallback_h
 #define SQLStatementCallback_h
 
+#if ENABLE(DATABASE)
+
 #include <wtf/Threading.h>
 
 namespace WebCore {
@@ -43,5 +45,7 @@ class SQLStatementCallback : public ThreadSafeShared<SQLStatementCallback> {
                            bool& raisedException) = 0;
 };
 }
+
+#endif
 
 #endif  // SQLStatementErrorCallback_h

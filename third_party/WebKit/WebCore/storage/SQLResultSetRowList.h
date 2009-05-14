@@ -29,6 +29,8 @@
 #ifndef SQLResultSetRowList_h
 #define SQLResultSetRowList_h
 
+#if ENABLE(DATABASE)
+
 #include <wtf/PassRefPtr.h>
 #include "SQLValue.h"
 
@@ -55,5 +57,7 @@ class SQLResultSetRowList : public RefCounted<SQLResultSetRowList> {
   Vector<SQLValue> m_result;
 };
 }
+
+#endif
 
 #endif

@@ -28,6 +28,8 @@
 #ifndef OriginUsageRecord_h
 #define OriginUsageRecord_h
 
+#if ENABLE(DATABASE)
+
 #include "PlatformString.h"
 #include "StringHash.h"
 
@@ -68,5 +70,7 @@ class OriginUsageRecord {
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif

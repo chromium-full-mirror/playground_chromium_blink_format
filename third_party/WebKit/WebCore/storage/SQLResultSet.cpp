@@ -29,6 +29,8 @@
 #include "config.h"
 #include "SQLResultSet.h"
 
+#if ENABLE(DATABASE)
+
 #include "ExceptionCode.h"
 #include "SQLValue.h"
 
@@ -72,3 +74,5 @@ void SQLResultSet::setRowsAffected(int count) {
   m_rowsAffected = count;
 }
 }
+
+#endif
