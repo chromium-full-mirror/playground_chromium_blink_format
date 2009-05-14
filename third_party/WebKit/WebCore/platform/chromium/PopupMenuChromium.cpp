@@ -360,10 +360,14 @@ void PopupContainer::showExternal(const IntRect& rect,
 
   listBox()->updateFromElement();
 
+  // Adjust the popup position to account for scrolling.
+  IntPoint location = v->contentsToWindow(rect.location());
+  IntRect popupRect(location, rect.size());
+
   // Get the ChromeClient and pass it the popup menu's listbox data.
   ChromeClientChromium* client = static_cast<ChromeClientChromium*>(
       v->frame()->page()->chrome()->client());
-  client->popupOpened(this, rect, true, true);
+  client->popupOpened(this, popupRect, true, true);
 }
 
 void PopupContainer::hidePopup() {
