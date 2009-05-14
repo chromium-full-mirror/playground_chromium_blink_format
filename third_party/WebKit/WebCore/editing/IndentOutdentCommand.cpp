@@ -237,7 +237,10 @@ void IndentOutdentCommand::outdentParagraph() {
 
   Node* enclosingNode = enclosingNodeOfType(
       visibleStartOfParagraph.deepEquivalent(), &isListOrIndentBlockquote);
-  if (!enclosingNode)
+  if (!enclosingNode ||
+      !isContentEditable(
+          enclosingNode
+              ->parentNode()))  // We can't outdent if there is no place to go!
     return;
 
   // Use InsertListCommand to remove the selection from the list
@@ -257,12 +260,33 @@ void IndentOutdentCommand::outdentParagraph() {
       VisiblePosition(Position(enclosingNode, 0));
   VisiblePosition startOfEnclosingBlock =
       startOfBlock(positionInEnclosingBlock);
-  VisiblePosition endOfEnclosingBlock = endOfBlock(positionInEnclosingBlock);
+  VisiblePosition lastPositionInEnclosingBlock =
+      VisiblePosition(Position(enclosingNode, enclosingNode->childNodeCount()));
+  VisiblePosition endOfEnclosingBlock =
+      endOfBlock(lastPositionInEnclosingBlock);
   if (visibleStartOfParagraph == startOfEnclosingBlock &&
       visibleEndOfParagraph == endOfEnclosingBlock) {
     // The blockquote doesn't contain anything outside the paragraph, so it can
     // be totally removed.
+    Node* splitPoint = enclosingNode->nextSibling();
     removeNodePreservingChildren(enclosingNode);
+    // outdentRegion() assumes it is operating on the first paragraph of an
+    // enclosing blockquote, but if there are multiply nested blockquotes and
+    // we've
+    // just removed one, then this assumption isn't true. By splitting the next
+    // containing blockquote after this node, we keep this assumption true
+    if (splitPoint) {
+      if (Node* splitPointParent = splitPoint->parentNode()) {
+        if (isIndentBlockquote(splitPointParent) &&
+            !isIndentBlockquote(splitPoint) &&
+            isContentEditable(splitPointParent->parentNode()))  // We can't
+                                                                // outdent if
+                                                                // there is no
+                                                                // place to go!
+          splitElement(static_cast<Element*>(splitPointParent), splitPoint);
+      }
+    }
+
     updateLayout();
     visibleStartOfParagraph =
         VisiblePosition(visibleStartOfParagraph.deepEquivalent());
@@ -276,6 +300,7 @@ void IndentOutdentCommand::outdentParagraph() {
         !isEndOfParagraph(visibleEndOfParagraph))
       insertNodeAt(createBreakElement(document()),
                    visibleEndOfParagraph.deepEquivalent());
+
     return;
   }
   Node* enclosingBlockFlow = enclosingBlockFlowElement(visibleStartOfParagraph);
