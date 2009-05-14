@@ -1168,10 +1168,8 @@ PassRefPtr<Node> CompositeEditCommand::splitTreeToNode(Node* start,
       applyCommandToComposite(SplitElementCommand::create(
           static_cast<Element*>(node->parent()), node));
   }
-  if (splitAncestor) {
-    splitElement(static_cast<Element*>(end), node);
-    return node->parent();
-  }
+  if (splitAncestor)
+    return splitTreeToNode(end, end->parent());
   return node.release();
 }
 
