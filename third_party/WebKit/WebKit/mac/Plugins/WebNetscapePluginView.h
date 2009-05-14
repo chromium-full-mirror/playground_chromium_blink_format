@@ -216,6 +216,7 @@ typedef union PluginPort {
                               usernameLength:(uint32*)usernameLength
                                     password:(char**)password
                               passwordLength:(uint32*)passwordLength;
+- (char*)locationForTarget:(const char*)target;
 @end
 
 WKNBrowserContainerCheckFuncs* browserContainerCheckFuncs();

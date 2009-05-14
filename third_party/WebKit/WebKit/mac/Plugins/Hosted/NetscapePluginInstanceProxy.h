@@ -227,8 +227,11 @@ class NetscapePluginInstanceProxy
 
   uint32_t checkIfAllowedToLoadURL(const char* url, const char* target);
   void cancelCheckIfAllowedToLoadURL(uint32_t checkID);
-
   void checkIfAllowedToLoadURLResult(uint32_t checkID, bool allowed);
+
+  void getLocation(const char* target,
+                   data_t& locationData,
+                   mach_msg_type_number_t& locationLength);
 
   // Reply structs
   struct Reply {
