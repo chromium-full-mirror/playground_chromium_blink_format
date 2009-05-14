@@ -463,6 +463,7 @@ inline void JSObject::putDirect(const Identifier& propertyName,
                                 unsigned attributes,
                                 bool checkReadOnly,
                                 PutPropertySlot& slot) {
+  ASSERT(value);
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
   if (m_structure->isDictionary()) {
