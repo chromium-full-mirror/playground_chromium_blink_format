@@ -82,7 +82,6 @@
 #include "HitTestResult.h"
 #include "ImageLoader.h"
 #include "InspectorController.h"
-#include "JSDOMBinding.h"
 #include "ScriptEventListener.h"
 #include "KeyboardEvent.h"
 #include "Logging.h"
