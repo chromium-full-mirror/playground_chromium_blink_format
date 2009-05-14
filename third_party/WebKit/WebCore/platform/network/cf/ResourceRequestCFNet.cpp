@@ -200,7 +200,7 @@ void ResourceRequest::doUpdateResourceRequest() {
           CFArrayGetValueAtIndex(encodingFallbacks.get(), i));
       if (encoding != kCFStringEncodingInvalidId)
         m_responseContentDispositionEncodingFallbackArray.append(
-            CFStringGetNameOfEncoding(encoding));
+            CFStringConvertEncodingToIANACharSetName(encoding));
     }
   }
 
