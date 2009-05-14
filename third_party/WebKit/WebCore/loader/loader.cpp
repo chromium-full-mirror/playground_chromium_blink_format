@@ -253,13 +253,8 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
     if (!request->cachedResource()->accept().isEmpty())
       resourceRequest.setHTTPAccept(request->cachedResource()->accept());
 
-    KURL referrer = docLoader->doc()->url();
-    if ((referrer.protocolIs("http") || referrer.protocolIs("https")) &&
-        referrer.path().isEmpty())
-      referrer.setPath("/");
-    resourceRequest.setHTTPReferrer(referrer.string());
-    FrameLoader::addHTTPOriginIfNeeded(
-        resourceRequest, docLoader->doc()->securityOrigin()->toString());
+    // Do not set the referrer or HTTP origin here. That's handled by
+    // SubresourceLoader::create.
 
     if (resourceIsCacheValidator) {
       CachedResource* resourceToRevalidate =
