@@ -108,7 +108,7 @@ static HTMLMediaElement* parentMediaElement(RenderObject* o) {
 }
 
 bool RenderMediaControls::paintMediaControlsPart(
-    MediaControlElements part,
+    MediaControlElementType part,
     RenderObject* o,
     const RenderObject::PaintInfo& paintInfo,
     const IntRect& r) {

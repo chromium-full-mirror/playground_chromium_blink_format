@@ -34,7 +34,7 @@ namespace WebCore {
 class HTMLMediaElement;
 class RenderMediaControls {
  public:
-  static bool paintMediaControlsPart(MediaControlElements,
+  static bool paintMediaControlsPart(MediaControlElementType,
                                      RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&);
