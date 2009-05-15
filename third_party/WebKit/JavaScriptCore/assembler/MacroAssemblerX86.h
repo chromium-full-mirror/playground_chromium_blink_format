@@ -36,6 +36,8 @@ namespace JSC {
 
 class MacroAssemblerX86 : public MacroAssemblerX86Common {
  public:
+  MacroAssemblerX86() : m_isSSE2Present(isSSE2Present()) {}
+
   static const Scale ScalePtr = TimesFour;
 
   using MacroAssemblerX86Common::add32;
@@ -85,12 +87,12 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
 
   Jump branch32(Condition cond, AbsoluteAddress left, RegisterID right) {
     m_assembler.cmpl_rm(right, left.m_ptr);
-    return Jump(m_assembler.jCC(cond));
+    return Jump(m_assembler.jCC(x86Condition(cond)));
   }
 
   Jump branch32(Condition cond, AbsoluteAddress left, Imm32 right) {
     m_assembler.cmpl_im(right.m_value, left.m_ptr);
-    return Jump(m_assembler.jCC(cond));
+    return Jump(m_assembler.jCC(x86Condition(cond)));
   }
 
   Call call() { return Call(m_assembler.call(), Call::Linkable); }
@@ -107,7 +109,7 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
                           ImmPtr initialRightValue = ImmPtr(0)) {
     m_assembler.cmpl_ir_force32(initialRightValue.asIntptr(), left);
     dataLabel = DataLabelPtr(this);
-    return Jump(m_assembler.jCC(cond));
+    return Jump(m_assembler.jCC(x86Condition(cond)));
   }
 
   Jump branchPtrWithPatch(Condition cond,
@@ -117,13 +119,18 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
     m_assembler.cmpl_im_force32(initialRightValue.asIntptr(), left.offset,
                                 left.base);
     dataLabel = DataLabelPtr(this);
-    return Jump(m_assembler.jCC(cond));
+    return Jump(m_assembler.jCC(x86Condition(cond)));
   }
 
   DataLabelPtr storePtrWithPatch(Address address) {
     m_assembler.movl_i32m(0, address.offset, address.base);
     return DataLabelPtr(this);
   }
+
+  bool supportsFloatingPoint() const { return m_isSSE2Present; }
+
+ private:
+  const bool m_isSSE2Present;
 };
 
 }  // namespace JSC
