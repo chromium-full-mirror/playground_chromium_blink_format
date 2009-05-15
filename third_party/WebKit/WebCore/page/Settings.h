@@ -290,6 +290,11 @@ class Settings {
     return static_cast<EditingBehavior>(m_editingBehavior);
   }
 
+  void setDownloadableBinaryFontsEnabled(bool);
+  bool downloadableBinaryFontsEnabled() const {
+    return m_downloadableBinaryFontsEnabled;
+  }
+
  private:
   Page* m_page;
 
@@ -348,6 +353,7 @@ class Settings {
   bool m_usesEncodingDetector : 1;
   bool m_allowScriptsToCloseWindows : 1;
   unsigned m_editingBehavior : 1;
+  bool m_downloadableBinaryFontsEnabled : 1;
 
 #if USE(SAFARI_THEME)
   static bool gShouldPaintNativeControls;
