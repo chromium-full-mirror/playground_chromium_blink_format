@@ -26,6 +26,8 @@
 #include "config.h"
 #include "JavaScriptCallFrame.h"
 
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+
 #include "PlatformString.h"
 #include <debugger/DebuggerCallFrame.h>
 #include <runtime/JSGlobalObject.h>
@@ -96,3 +98,5 @@ JSValue JavaScriptCallFrame::evaluate(const UString& script,
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(JAVASCRIPT_DEBUGGER)

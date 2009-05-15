@@ -26,6 +26,8 @@
 #include "config.h"
 #include "JavaScriptProfileNode.h"
 
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+
 #include "JSDOMBinding.h"
 #include <profiler/ProfileNode.h>
 #include <JavaScriptCore/APICast.h>
@@ -339,3 +341,5 @@ JSValue toJS(ExecState* exec, ProfileNode* profileNode) {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(JAVASCRIPT_DEBUGGER)

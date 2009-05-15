@@ -31,7 +31,7 @@
 
 #include "PlatformString.h"
 
-#if USE(JSC)
+#if ENABLE(JAVASCRIPT_DEBUGGER)
 #include <profiler/Profile.h>
 #endif
 
@@ -40,7 +40,7 @@
 
 namespace WebCore {
 
-#if USE(JSC)
+#if ENABLE(JAVASCRIPT_DEBUGGER)
 typedef Vector<RefPtr<JSC::Profile>> ProfilesArray;
 #endif
 
@@ -96,7 +96,7 @@ class Console : public RefCounted<Console> {
   void trace(ScriptCallStack*);
   void assertCondition(bool condition, ScriptCallStack*);
   void count(ScriptCallStack*);
-#if USE(JSC)
+#if ENABLE(JAVASCRIPT_DEBUGGER)
   void profile(const JSC::UString&, ScriptCallStack*);
   void profileEnd(const JSC::UString&, ScriptCallStack*);
 #endif
@@ -108,7 +108,7 @@ class Console : public RefCounted<Console> {
   static bool shouldPrintExceptions();
   static void setShouldPrintExceptions(bool);
 
-#if USE(JSC)
+#if ENABLE(JAVASCRIPT_DEBUGGER)
   const ProfilesArray& profiles() const { return m_profiles; }
 #endif
 
@@ -121,7 +121,7 @@ class Console : public RefCounted<Console> {
   Console(Frame*);
 
   Frame* m_frame;
-#if USE(JSC)
+#if ENABLE(JAVASCRIPT_DEBUGGER)
   ProfilesArray m_profiles;
 #endif
 };

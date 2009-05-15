@@ -29,6 +29,8 @@
 #ifndef JavaScriptDebugServer_h
 #define JavaScriptDebugServer_h
 
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+
 #include "Timer.h"
 #include <debugger/Debugger.h>
 #include <wtf/HashMap.h>
@@ -145,5 +147,7 @@ class JavaScriptDebugServer : JSC::Debugger {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(JAVASCRIPT_DEBUGGER)
 
 #endif  // JavaScriptDebugServer_h

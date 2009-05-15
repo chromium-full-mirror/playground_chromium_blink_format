@@ -26,6 +26,8 @@
 #ifndef JavaScriptCallFrame_h
 #define JavaScriptCallFrame_h
 
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+
 #include <interpreter/CallFrame.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -83,5 +85,7 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(JAVASCRIPT_DEBUGGER)
 
 #endif  // JavaScriptCallFrame_h

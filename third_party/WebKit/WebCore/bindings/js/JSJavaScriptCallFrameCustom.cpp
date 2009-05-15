@@ -26,6 +26,8 @@
 #include "config.h"
 #include "JSJavaScriptCallFrame.h"
 
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+
 #include "JavaScriptCallFrame.h"
 #include <runtime/ArrayPrototype.h>
 
@@ -80,3 +82,5 @@ JSValue JSJavaScriptCallFrame::scopeChain(ExecState* exec) const {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(JAVASCRIPT_DEBUGGER)
