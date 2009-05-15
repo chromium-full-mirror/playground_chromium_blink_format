@@ -401,6 +401,15 @@ bool ResourceHandle::start(Frame* frame) {
   if (!frame->page())
     return false;
 
+  if ((d->m_user || d->m_pass) && !d->m_request.url().protocolInHTTPFamily()) {
+    // Credentials for ftp can only be passed in URL, the
+    // didReceiveAuthenticationChallenge delegate call won't be made.
+    KURL urlWithCredentials(d->m_request.url());
+    urlWithCredentials.setUser(d->m_user);
+    urlWithCredentials.setPass(d->m_pass);
+    d->m_request.setURL(urlWithCredentials);
+  }
+
   RetainPtr<CFURLRequestRef> request(
       AdoptCF, makeFinalRequest(d->m_request, d->m_shouldContentSniff));
 
@@ -795,18 +804,24 @@ RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
 
   KURL url = request.url();
 
-  // Take user/pass out of the URL.
   loader.m_user.adoptCF(url.user().createCFString());
   loader.m_pass.adoptCF(url.pass().createCFString());
   loader.m_allowStoredCredentials =
       (storedCredentials == AllowStoredCredentials);
 
-  ResourceRequest requestWithoutCredentials(request);
-  requestWithoutCredentials.removeCredentials();
-  RetainPtr<CFURLRequestRef> cfRequest(
-      AdoptCF,
-      makeFinalRequest(requestWithoutCredentials,
-                       ResourceHandle::shouldContentSniffURL(request.url())));
+  // Take user/pass out of the URL.
+  // Credentials for ftp can only be passed in URL, the
+  // didReceiveAuthenticationChallenge delegate call won't be made.
+  RetainPtr<CFURLRequestRef> cfRequest;
+  if ((loader.m_user || loader.m_pass) && url.protocolInHTTPFamily()) {
+    ResourceRequest requestWithoutCredentials(request);
+    requestWithoutCredentials.removeCredentials();
+    cfRequest.adoptCF(makeFinalRequest(requestWithoutCredentials,
+                                       ResourceHandle::shouldContentSniffURL(
+                                           requestWithoutCredentials.url())));
+  } else
+    cfRequest.adoptCF(makeFinalRequest(
+        request, ResourceHandle::shouldContentSniffURL(request.url())));
 
   CFURLConnectionClient_V3 client = {3,
                                      &loader,
@@ -824,7 +839,6 @@ RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
                                      0,
                                      shouldUseCredentialStorage,
                                      0};
-
   RetainPtr<CFURLConnectionRef> connection(
       AdoptCF,
       CFURLConnectionCreate(kCFAllocatorDefault, cfRequest.get(),
