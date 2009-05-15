@@ -174,8 +174,9 @@ void JIT::compileOpCall(OpcodeID opcodeID, Instruction* instruction, unsigned) {
 
   // First, in the case of a construct, allocate the new object.
   if (opcodeID == op_construct) {
-        JITStubCall(JITStubs::cti_op_construct_JSConstruct.call(registerOffset - RegisterFile::CallFrameHeaderSize - argCount);
-        emitGetVirtualRegister(callee, regT2);
+    JITStubCall(this, JITStubs::cti_op_construct_JSConstruct)
+        .call(registerOffset - RegisterFile::CallFrameHeaderSize - argCount);
+    emitGetVirtualRegister(callee, regT2);
   }
 
   // Speculatively roll the callframe, assuming argCount will match the arity.
@@ -206,9 +207,9 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
 
   linkSlowCase(iter);
   linkSlowCase(iter);
-  JITStubCall stubCall(opcodeID == op_construct
-                           ? JITStubs::cti_op_construct_NotJSConstruct
-                           : JITStubs::cti_op_call_NotJSFunction);
+  JITStubCall stubCall(this, opcodeID == op_construct
+                                 ? JITStubs::cti_op_construct_NotJSConstruct
+                                 : JITStubs::cti_op_call_NotJSFunction);
   stubCall.call(
       dst);  // In the interpreter, the callee puts the return value in dst.
 
