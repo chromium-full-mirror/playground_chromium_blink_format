@@ -217,6 +217,7 @@ class NetscapePluginInstanceProxy
   void addInstance(ProxyInstance*);
   void removeInstance(ProxyInstance*);
 
+  void cleanup();
   void invalidate();
 
   void willCallPluginFunction();
@@ -326,8 +327,6 @@ class NetscapePluginInstanceProxy
 
   void stopAllStreams();
   Reply* processRequestsAndWaitForReply(uint32_t requestID);
-
-  void cleanup();
 
   NetscapePluginHostProxy* m_pluginHostProxy;
   WebHostedNetscapePluginView* m_pluginView;
