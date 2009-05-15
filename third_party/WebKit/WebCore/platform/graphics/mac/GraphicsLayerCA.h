@@ -144,9 +144,8 @@ class GraphicsLayerCA : public GraphicsLayer {
   bool requiresTiledLayer(const FloatSize&) const;
   void swapFromOrToTiledLayer(bool useTiledLayer);
 
-  void setHasContentsLayer(bool);
   void setContentsLayer(WebLayer*);
-  void setContentsLayerFlipped(bool);
+  WebLayer* contentsLayer() const { return m_contentsLayer.get(); }
 
   RetainPtr<WebLayer> m_layer;
   RetainPtr<WebLayer> m_transformLayer;
