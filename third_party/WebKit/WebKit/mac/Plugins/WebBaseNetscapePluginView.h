@@ -110,7 +110,8 @@ class HTMLPlugInElement;
                  toX:(double*)destX
                 andY:(double*)destY
                space:(NPCoordinateSpace)destSpace;
-- (WebCore::CString)locationStringForTarget:(const char*)target;
+- (WebCore::CString)resolvedURLStringForURL:(const char*)url
+                                     target:(const char*)target;
 
 @end
 
