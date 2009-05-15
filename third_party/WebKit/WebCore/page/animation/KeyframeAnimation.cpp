@@ -238,7 +238,8 @@ void KeyframeAnimation::endAnimation(bool reset) {
     UNUSED_PARAM(reset);
 #endif
     // Restore the original (unanimated) style
-    setNeedsStyleRecalc(m_object->node());
+    if (!paused())
+      setNeedsStyleRecalc(m_object->node());
   }
 }
 
