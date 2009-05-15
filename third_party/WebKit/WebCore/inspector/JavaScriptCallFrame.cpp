@@ -66,10 +66,10 @@ String JavaScriptCallFrame::functionName() const {
   ASSERT(m_isValid);
   if (!m_isValid)
     return String();
-  const UString* functionName = m_debuggerCallFrame.functionName();
-  if (!functionName)
+  UString functionName = m_debuggerCallFrame.calculatedFunctionName();
+  if (functionName.isEmpty())
     return String();
-  return *functionName;
+  return functionName;
 }
 
 DebuggerCallFrame::Type JavaScriptCallFrame::type() const {

@@ -47,6 +47,7 @@ class DebuggerCallFrame {
   }
   const ScopeChainNode* scopeChain() const { return m_callFrame->scopeChain(); }
   const UString* functionName() const;
+  UString calculatedFunctionName() const;
   Type type() const;
   JSObject* thisObject() const;
   JSValue evaluate(const UString&, JSValue& exception) const;
