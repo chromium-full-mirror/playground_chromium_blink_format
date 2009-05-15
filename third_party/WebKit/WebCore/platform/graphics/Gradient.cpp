@@ -53,7 +53,8 @@ Gradient::Gradient(const FloatPoint& p0,
       m_r0(r0),
       m_r1(r1),
       m_stopsSorted(false),
-      m_lastStop(0) {
+      m_lastStop(0),
+      m_spreadMethod(SpreadMethodPad) {
   platformInit();
 }
 
