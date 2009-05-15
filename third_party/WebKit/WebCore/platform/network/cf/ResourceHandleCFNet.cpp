@@ -401,7 +401,8 @@ bool ResourceHandle::start(Frame* frame) {
   if (!frame->page())
     return false;
 
-  if ((d->m_user || d->m_pass) && !d->m_request.url().protocolInHTTPFamily()) {
+  if ((!d->m_user.isEmpty() || !d->m_pass.isEmpty()) &&
+      !d->m_request.url().protocolInHTTPFamily()) {
     // Credentials for ftp can only be passed in URL, the
     // didReceiveAuthenticationChallenge delegate call won't be made.
     KURL urlWithCredentials(d->m_request.url());
