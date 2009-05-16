@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2004 Zack Rusin <zack@kde.org>
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
+ * reserved.
  * Copyright (C) 2007 Alexey Proskuryakov <ap@webkit.org>
  * Copyright (C) 2007 Nicholas Shanks <webkit@nickshanks.com>
  *
@@ -52,36 +53,38 @@ namespace WebCore {
 static const int computedProperties[] = {
     CSSPropertyBackgroundAttachment, CSSPropertyBackgroundColor,
     CSSPropertyBackgroundImage,
-    // more specific background-position-x/y are non-standard
-    CSSPropertyBackgroundPosition, CSSPropertyBackgroundRepeat,
-    CSSPropertyBorderBottomColor, CSSPropertyBorderBottomStyle,
-    CSSPropertyBorderBottomWidth, CSSPropertyBorderCollapse,
-    CSSPropertyBorderLeftColor, CSSPropertyBorderLeftStyle,
-    CSSPropertyBorderLeftWidth, CSSPropertyBorderRightColor,
-    CSSPropertyBorderRightStyle, CSSPropertyBorderRightWidth,
-    CSSPropertyBorderTopColor, CSSPropertyBorderTopStyle,
-    CSSPropertyBorderTopWidth, CSSPropertyBottom, CSSPropertyCaptionSide,
-    CSSPropertyClear, CSSPropertyColor, CSSPropertyCursor, CSSPropertyDirection,
-    CSSPropertyDisplay, CSSPropertyEmptyCells, CSSPropertyFloat,
-    CSSPropertyFontFamily, CSSPropertyFontSize, CSSPropertyFontStyle,
-    CSSPropertyFontVariant, CSSPropertyFontWeight, CSSPropertyHeight,
-    CSSPropertyLeft, CSSPropertyLetterSpacing, CSSPropertyLineHeight,
-    CSSPropertyListStyleImage, CSSPropertyListStylePosition,
-    CSSPropertyListStyleType, CSSPropertyMarginBottom, CSSPropertyMarginLeft,
-    CSSPropertyMarginRight, CSSPropertyMarginTop, CSSPropertyMaxHeight,
-    CSSPropertyMaxWidth, CSSPropertyMinHeight, CSSPropertyMinWidth,
-    CSSPropertyOpacity, CSSPropertyOrphans, CSSPropertyOutlineColor,
-    CSSPropertyOutlineStyle, CSSPropertyOutlineWidth, CSSPropertyOverflowX,
-    CSSPropertyOverflowY, CSSPropertyPaddingBottom, CSSPropertyPaddingLeft,
-    CSSPropertyPaddingRight, CSSPropertyPaddingTop, CSSPropertyPageBreakAfter,
+    CSSPropertyBackgroundPosition,  // more-specific background-position-x/y are
+                                    // non-standard
+    CSSPropertyBackgroundRepeat, CSSPropertyBorderBottomColor,
+    CSSPropertyBorderBottomStyle, CSSPropertyBorderBottomWidth,
+    CSSPropertyBorderCollapse, CSSPropertyBorderLeftColor,
+    CSSPropertyBorderLeftStyle, CSSPropertyBorderLeftWidth,
+    CSSPropertyBorderRightColor, CSSPropertyBorderRightStyle,
+    CSSPropertyBorderRightWidth, CSSPropertyBorderTopColor,
+    CSSPropertyBorderTopStyle, CSSPropertyBorderTopWidth, CSSPropertyBottom,
+    CSSPropertyCaptionSide, CSSPropertyClear, CSSPropertyClip, CSSPropertyColor,
+    CSSPropertyCursor, CSSPropertyDirection, CSSPropertyDisplay,
+    CSSPropertyEmptyCells, CSSPropertyFloat, CSSPropertyFontFamily,
+    CSSPropertyFontSize, CSSPropertyFontStyle, CSSPropertyFontVariant,
+    CSSPropertyFontWeight, CSSPropertyHeight, CSSPropertyLeft,
+    CSSPropertyLetterSpacing, CSSPropertyLineHeight, CSSPropertyListStyleImage,
+    CSSPropertyListStylePosition, CSSPropertyListStyleType,
+    CSSPropertyMarginBottom, CSSPropertyMarginLeft, CSSPropertyMarginRight,
+    CSSPropertyMarginTop, CSSPropertyMaxHeight, CSSPropertyMaxWidth,
+    CSSPropertyMinHeight, CSSPropertyMinWidth, CSSPropertyOpacity,
+    CSSPropertyOrphans, CSSPropertyOutlineColor, CSSPropertyOutlineStyle,
+    CSSPropertyOutlineWidth, CSSPropertyOverflowX, CSSPropertyOverflowY,
+    CSSPropertyPaddingBottom, CSSPropertyPaddingLeft, CSSPropertyPaddingRight,
+    CSSPropertyPaddingTop, CSSPropertyPageBreakAfter,
     CSSPropertyPageBreakBefore, CSSPropertyPageBreakInside,
     CSSPropertyPointerEvents, CSSPropertyPosition, CSSPropertyResize,
     CSSPropertyRight, CSSPropertyTableLayout, CSSPropertyTextAlign,
     CSSPropertyTextDecoration, CSSPropertyTextIndent, CSSPropertyTextShadow,
     CSSPropertyTextTransform, CSSPropertyTop, CSSPropertyUnicodeBidi,
     CSSPropertyVerticalAlign, CSSPropertyVisibility, CSSPropertyWhiteSpace,
-    CSSPropertyWidows, CSSPropertyWidth, CSSPropertyWordSpacing,
-    CSSPropertyWordWrap, CSSPropertyZIndex, CSSPropertyZoom,
+    CSSPropertyWidows, CSSPropertyWidth, CSSPropertyWordBreak,
+    CSSPropertyWordSpacing, CSSPropertyWordWrap, CSSPropertyZIndex,
+    CSSPropertyZoom,
 
     CSSPropertyWebkitAnimationDelay, CSSPropertyWebkitAnimationDirection,
     CSSPropertyWebkitAnimationDuration,
@@ -89,8 +92,10 @@ static const int computedProperties[] = {
     CSSPropertyWebkitAnimationTimingFunction, CSSPropertyWebkitAppearance,
     CSSPropertyWebkitBackfaceVisibility, CSSPropertyWebkitBackgroundClip,
     CSSPropertyWebkitBackgroundComposite, CSSPropertyWebkitBackgroundOrigin,
-    CSSPropertyWebkitBackgroundSize, CSSPropertyWebkitBorderFit,
-    CSSPropertyWebkitBorderImage, CSSPropertyWebkitBorderHorizontalSpacing,
+    CSSPropertyWebkitBackgroundSize, CSSPropertyWebkitBorderBottomLeftRadius,
+    CSSPropertyWebkitBorderBottomRightRadius, CSSPropertyWebkitBorderFit,
+    CSSPropertyWebkitBorderHorizontalSpacing, CSSPropertyWebkitBorderImage,
+    CSSPropertyWebkitBorderTopLeftRadius, CSSPropertyWebkitBorderTopRightRadius,
     CSSPropertyWebkitBorderVerticalSpacing, CSSPropertyWebkitBoxAlign,
     CSSPropertyWebkitBoxDirection, CSSPropertyWebkitBoxFlex,
     CSSPropertyWebkitBoxFlexGroup, CSSPropertyWebkitBoxLines,
@@ -101,31 +106,29 @@ static const int computedProperties[] = {
     CSSPropertyWebkitColumnBreakInside, CSSPropertyWebkitColumnCount,
     CSSPropertyWebkitColumnGap, CSSPropertyWebkitColumnRuleColor,
     CSSPropertyWebkitColumnRuleStyle, CSSPropertyWebkitColumnRuleWidth,
-    CSSPropertyWebkitColumnWidth, CSSPropertyWebkitHighlight,
-    CSSPropertyWebkitLineBreak, CSSPropertyWebkitLineClamp,
-    CSSPropertyWebkitMarginBottomCollapse, CSSPropertyWebkitMarginTopCollapse,
-    CSSPropertyWebkitMarqueeDirection, CSSPropertyWebkitMarqueeIncrement,
-    CSSPropertyWebkitMarqueeRepetition, CSSPropertyWebkitMarqueeStyle,
-    CSSPropertyWebkitMaskAttachment, CSSPropertyWebkitMaskBoxImage,
-    CSSPropertyWebkitMaskImage, CSSPropertyWebkitMaskPosition,
-    CSSPropertyWebkitMaskRepeat, CSSPropertyWebkitMaskClip,
-    CSSPropertyWebkitMaskComposite, CSSPropertyWebkitMaskOrigin,
-    CSSPropertyWebkitMaskSize, CSSPropertyWebkitNbspMode,
-    CSSPropertyWebkitPerspective, CSSPropertyWebkitPerspectiveOrigin,
-    CSSPropertyWebkitRtlOrdering, CSSPropertyWebkitTextDecorationsInEffect,
-    CSSPropertyWebkitTextFillColor, CSSPropertyWebkitTextSecurity,
-    CSSPropertyWebkitTextStrokeColor, CSSPropertyWebkitTextStrokeWidth,
-    CSSPropertyWebkitTransform, CSSPropertyWebkitTransformOrigin,
-    CSSPropertyWebkitTransformStyle, CSSPropertyWebkitTransitionDelay,
-    CSSPropertyWebkitTransitionDuration, CSSPropertyWebkitTransitionProperty,
-    CSSPropertyWebkitTransitionTimingFunction, CSSPropertyWebkitUserDrag,
-    CSSPropertyWebkitUserModify, CSSPropertyWebkitUserSelect,
+    CSSPropertyWebkitColumnWidth,
 #if ENABLE(DASHBOARD_SUPPORT)
     CSSPropertyWebkitDashboardRegion,
 #endif
-    CSSPropertyWebkitBorderBottomLeftRadius,
-    CSSPropertyWebkitBorderBottomRightRadius,
-    CSSPropertyWebkitBorderTopLeftRadius, CSSPropertyWebkitBorderTopRightRadius
+    CSSPropertyWebkitHighlight, CSSPropertyWebkitLineBreak,
+    CSSPropertyWebkitLineClamp, CSSPropertyWebkitMarginBottomCollapse,
+    CSSPropertyWebkitMarginTopCollapse, CSSPropertyWebkitMarqueeDirection,
+    CSSPropertyWebkitMarqueeIncrement, CSSPropertyWebkitMarqueeRepetition,
+    CSSPropertyWebkitMarqueeStyle, CSSPropertyWebkitMaskAttachment,
+    CSSPropertyWebkitMaskBoxImage, CSSPropertyWebkitMaskClip,
+    CSSPropertyWebkitMaskComposite, CSSPropertyWebkitMaskImage,
+    CSSPropertyWebkitMaskOrigin, CSSPropertyWebkitMaskPosition,
+    CSSPropertyWebkitMaskRepeat, CSSPropertyWebkitMaskSize,
+    CSSPropertyWebkitNbspMode, CSSPropertyWebkitPerspective,
+    CSSPropertyWebkitPerspectiveOrigin, CSSPropertyWebkitRtlOrdering,
+    CSSPropertyWebkitTextDecorationsInEffect, CSSPropertyWebkitTextFillColor,
+    CSSPropertyWebkitTextSecurity, CSSPropertyWebkitTextStrokeColor,
+    CSSPropertyWebkitTextStrokeWidth, CSSPropertyWebkitTransform,
+    CSSPropertyWebkitTransformOrigin, CSSPropertyWebkitTransformStyle,
+    CSSPropertyWebkitTransitionDelay, CSSPropertyWebkitTransitionDuration,
+    CSSPropertyWebkitTransitionProperty,
+    CSSPropertyWebkitTransitionTimingFunction, CSSPropertyWebkitUserDrag,
+    CSSPropertyWebkitUserModify, CSSPropertyWebkitUserSelect
 
 #if ENABLE(SVG)
     ,
@@ -509,29 +512,30 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
   return getPropertyCSSValue(propertyID, UpdateLayout);
 }
 
-static int toCSSIdentifier(FontDescription::GenericFamilyType genericFamily) {
-  switch (genericFamily) {
-    case FontDescription::SerifFamily:
-      return CSSValueSerif;
-      break;
-    case FontDescription::SansSerifFamily:
-      return CSSValueSansSerif;
-      break;
-    case FontDescription::MonospaceFamily:
-      return CSSValueMonospace;
-      break;
-    case FontDescription::CursiveFamily:
-      return CSSValueCursive;
-      break;
-    case FontDescription::FantasyFamily:
-      return CSSValueFantasy;
-      break;
-    case FontDescription::StandardFamily:
-    case FontDescription::NoFamily:
-    default:
-      break;
-  }
+static int identifierForFamily(const AtomicString& family) {
+  DEFINE_STATIC_LOCAL(AtomicString, cursiveFamily, ("-webkit-cursive"));
+  DEFINE_STATIC_LOCAL(AtomicString, fantasyFamily, ("-webkit-serif"));
+  DEFINE_STATIC_LOCAL(AtomicString, monospaceFamily, ("-webkit-monospace"));
+  DEFINE_STATIC_LOCAL(AtomicString, sansSerifFamily, ("-webkit-sans-serif"));
+  DEFINE_STATIC_LOCAL(AtomicString, serifFamily, ("-webkit-serif"));
+  if (family == cursiveFamily)
+    return CSSValueCursive;
+  if (family == fantasyFamily)
+    return CSSValueFantasy;
+  if (family == monospaceFamily)
+    return CSSValueMonospace;
+  if (family == sansSerifFamily)
+    return CSSValueSansSerif;
+  if (family == serifFamily)
+    return CSSValueSerif;
   return 0;
+}
+
+PassRefPtr<CSSPrimitiveValue> valueForFamily(const AtomicString& family) {
+  if (int familyIdentifier = identifierForFamily(family))
+    return CSSPrimitiveValue::createIdentifier(familyIdentifier);
+  return CSSPrimitiveValue::create(family.string(),
+                                   CSSPrimitiveValue::CSS_STRING);
 }
 
 PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
@@ -737,13 +741,14 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyFloat:
       return CSSPrimitiveValue::create(style->floating());
     case CSSPropertyFontFamily: {
-      // FIXME: This only returns the first family.
-      if (int id = toCSSIdentifier(style->fontDescription().genericFamily()))
-        return CSSPrimitiveValue::createIdentifier(id);
-
-      return CSSPrimitiveValue::create(
-          style->fontDescription().family().family().string(),
-          CSSPrimitiveValue::CSS_STRING);
+      const FontFamily& firstFamily = style->fontDescription().family();
+      if (!firstFamily.next())
+        return valueForFamily(firstFamily.family());
+      RefPtr<CSSValueList> list = CSSValueList::createCommaSeparated();
+      for (const FontFamily* family = &firstFamily; family;
+           family = family->next())
+        list->append(valueForFamily(family->family()));
+      return list.release();
     }
     case CSSPropertyFontSize:
       return CSSPrimitiveValue::create(
@@ -1270,19 +1275,18 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyWebkitBorderTopRightRadius:
       return getBorderRadiusCornerValue(style->borderTopRightRadius());
     case CSSPropertyClip: {
-      if (style->hasClip()) {
-        RefPtr<Rect> rect = Rect::create();
-        rect->setTop(CSSPrimitiveValue::create(style->clip().top().value(),
+      if (!style->hasClip())
+        return CSSPrimitiveValue::createIdentifier(CSSValueAuto);
+      RefPtr<Rect> rect = Rect::create();
+      rect->setTop(CSSPrimitiveValue::create(style->clip().top().value(),
+                                             CSSPrimitiveValue::CSS_PX));
+      rect->setRight(CSSPrimitiveValue::create(style->clip().right().value(),
                                                CSSPrimitiveValue::CSS_PX));
-        rect->setRight(CSSPrimitiveValue::create(style->clip().right().value(),
-                                                 CSSPrimitiveValue::CSS_PX));
-        rect->setBottom(CSSPrimitiveValue::create(
-            style->clip().bottom().value(), CSSPrimitiveValue::CSS_PX));
-        rect->setLeft(CSSPrimitiveValue::create(style->clip().left().value(),
+      rect->setBottom(CSSPrimitiveValue::create(style->clip().bottom().value(),
                                                 CSSPrimitiveValue::CSS_PX));
-        return CSSPrimitiveValue::create(rect.release());
-      }
-      return 0;
+      rect->setLeft(CSSPrimitiveValue::create(style->clip().left().value(),
+                                              CSSPrimitiveValue::CSS_PX));
+      return CSSPrimitiveValue::create(rect.release());
     }
     case CSSPropertyWebkitTransform:
       return computedTransform(renderer, style.get());
@@ -1477,7 +1481,7 @@ String CSSComputedStyleDeclaration::item(unsigned i) const {
 // copyInheritableProperties() function.
 // It is the intersection of the list of inherited CSS properties and the
 // properties for which we have a computed implementation in this file.
-const int inheritableProperties[] = {
+static const int inheritableProperties[] = {
     CSSPropertyBorderCollapse,
     CSSPropertyColor,
     CSSPropertyFontFamily,
@@ -1503,7 +1507,7 @@ const int inheritableProperties[] = {
     CSSPropertyWebkitTextStrokeWidth,
 };
 
-const unsigned numInheritableProperties =
+static const unsigned numInheritableProperties =
     sizeof(inheritableProperties) / sizeof(inheritableProperties[0]);
 
 void CSSComputedStyleDeclaration::removeComputedInheritablePropertiesFrom(
