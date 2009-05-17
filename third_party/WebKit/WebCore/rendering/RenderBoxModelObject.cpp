@@ -850,25 +850,25 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
                           style->borderImage()))
     return;
 
-  const Color& tc = style->borderTopColor();
-  const Color& bc = style->borderBottomColor();
-  const Color& lc = style->borderLeftColor();
-  const Color& rc = style->borderRightColor();
+  const Color& topColor = style->borderTopColor();
+  const Color& bottomColor = style->borderBottomColor();
+  const Color& leftColor = style->borderLeftColor();
+  const Color& rightColor = style->borderRightColor();
 
-  bool tt = style->borderTopIsTransparent();
-  bool bt = style->borderBottomIsTransparent();
-  bool rt = style->borderRightIsTransparent();
-  bool lt = style->borderLeftIsTransparent();
+  bool topTransparent = style->borderTopIsTransparent();
+  bool bottomTransparent = style->borderBottomIsTransparent();
+  bool rightTransparent = style->borderRightIsTransparent();
+  bool leftTransparent = style->borderLeftIsTransparent();
 
-  EBorderStyle ts = style->borderTopStyle();
-  EBorderStyle bs = style->borderBottomStyle();
-  EBorderStyle ls = style->borderLeftStyle();
-  EBorderStyle rs = style->borderRightStyle();
+  EBorderStyle topStyle = style->borderTopStyle();
+  EBorderStyle bottomStyle = style->borderBottomStyle();
+  EBorderStyle leftStyle = style->borderLeftStyle();
+  EBorderStyle rightStyle = style->borderRightStyle();
 
-  bool renderTop = ts > BHIDDEN && !tt;
-  bool renderLeft = ls > BHIDDEN && begin && !lt;
-  bool renderRight = rs > BHIDDEN && end && !rt;
-  bool renderBottom = bs > BHIDDEN && !bt;
+  bool renderTop = topStyle > BHIDDEN && !topTransparent;
+  bool renderLeft = leftStyle > BHIDDEN && begin && !leftTransparent;
+  bool renderRight = rightStyle > BHIDDEN && end && !rightTransparent;
+  bool renderBottom = bottomStyle > BHIDDEN && !bottomTransparent;
 
   // Need sufficient width and height to contain border radius curves.  Sanity
   // check our border radii
@@ -904,25 +904,31 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
 
   int firstAngleStart, secondAngleStart, firstAngleSpan, secondAngleSpan;
   float thickness;
-  bool upperLeftBorderStylesMatch = renderLeft && (ts == ls) && (tc == lc);
-  bool upperRightBorderStylesMatch = renderRight && (ts == rs) && (tc == rc) &&
-                                     (ts != OUTSET) && (ts != RIDGE) &&
-                                     (ts != INSET) && (ts != GROOVE);
-  bool lowerLeftBorderStylesMatch = renderLeft && (bs == ls) && (bc == lc) &&
-                                    (bs != OUTSET) && (bs != RIDGE) &&
-                                    (bs != INSET) && (bs != GROOVE);
-  bool lowerRightBorderStylesMatch = renderRight && (bs == rs) && (bc == rc);
+  bool upperLeftBorderStylesMatch =
+      renderLeft && (topStyle == leftStyle) && (topColor == leftColor);
+  bool upperRightBorderStylesMatch =
+      renderRight && (topStyle == rightStyle) && (topColor == rightColor) &&
+      (topStyle != OUTSET) && (topStyle != RIDGE) && (topStyle != INSET) &&
+      (topStyle != GROOVE);
+  bool lowerLeftBorderStylesMatch =
+      renderLeft && (bottomStyle == leftStyle) && (bottomColor == leftColor) &&
+      (bottomStyle != OUTSET) && (bottomStyle != RIDGE) &&
+      (bottomStyle != INSET) && (bottomStyle != GROOVE);
+  bool lowerRightBorderStylesMatch =
+      renderRight && (bottomStyle == rightStyle) && (bottomColor == rightColor);
 
   if (renderTop) {
     bool ignore_left =
         (renderRadii && topLeft.width() > 0) ||
-        (tc == lc && tt == lt && ts >= OUTSET &&
-         (ls == DOTTED || ls == DASHED || ls == SOLID || ls == OUTSET));
+        (topColor == leftColor && topTransparent == leftTransparent &&
+         topStyle >= OUTSET && (leftStyle == DOTTED || leftStyle == DASHED ||
+                                leftStyle == SOLID || leftStyle == OUTSET));
 
     bool ignore_right =
         (renderRadii && topRight.width() > 0) ||
-        (tc == rc && tt == rt && ts >= OUTSET &&
-         (rs == DOTTED || rs == DASHED || rs == SOLID || rs == INSET));
+        (topColor == rightColor && topTransparent == rightTransparent &&
+         topStyle >= OUTSET && (rightStyle == DOTTED || rightStyle == DASHED ||
+                                rightStyle == SOLID || rightStyle == INSET));
 
     int x = tx;
     int x2 = tx + w;
@@ -932,7 +938,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
     }
 
     drawLineForBoxSide(graphicsContext, x, ty, x2, ty + style->borderTopWidth(),
-                       BSTop, tc, style->color(), ts,
+                       BSTop, topColor, style->color(), topStyle,
                        ignore_left ? 0 : style->borderLeftWidth(),
                        ignore_right ? 0 : style->borderRightWidth());
 
@@ -953,7 +959,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         bool applyLeftInnerClip =
             (style->borderLeftWidth() < topLeft.width()) &&
             (style->borderTopWidth() < topLeft.height()) &&
-            (ts != DOUBLE || style->borderTopWidth() > 6);
+            (topStyle != DOUBLE || style->borderTopWidth() > 6);
         if (applyLeftInnerClip) {
           graphicsContext->save();
           graphicsContext->addInnerRoundedRectClip(
@@ -966,8 +972,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
 
         // Draw upper left arc
         drawArcForBoxSide(graphicsContext, leftX, leftY, thickness, topLeft,
-                          firstAngleStart, firstAngleSpan, BSTop, tc,
-                          style->color(), ts, true);
+                          firstAngleStart, firstAngleSpan, BSTop, topColor,
+                          style->color(), topStyle, true);
         if (applyLeftInnerClip)
           graphicsContext->restore();
       }
@@ -977,7 +983,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         bool applyRightInnerClip =
             (style->borderRightWidth() < topRight.width()) &&
             (style->borderTopWidth() < topRight.height()) &&
-            (ts != DOUBLE || style->borderTopWidth() > 6);
+            (topStyle != DOUBLE || style->borderTopWidth() > 6);
         if (applyRightInnerClip) {
           graphicsContext->save();
           graphicsContext->addInnerRoundedRectClip(
@@ -996,8 +1002,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
 
         // Draw upper right arc
         drawArcForBoxSide(graphicsContext, rightX, leftY, thickness, topRight,
-                          secondAngleStart, secondAngleSpan, BSTop, tc,
-                          style->color(), ts, false);
+                          secondAngleStart, secondAngleSpan, BSTop, topColor,
+                          style->color(), topStyle, false);
         if (applyRightInnerClip)
           graphicsContext->restore();
       }
@@ -1007,13 +1013,16 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
   if (renderBottom) {
     bool ignore_left =
         (renderRadii && bottomLeft.width() > 0) ||
-        (bc == lc && bt == lt && bs >= OUTSET &&
-         (ls == DOTTED || ls == DASHED || ls == SOLID || ls == OUTSET));
+        (bottomColor == leftColor && bottomTransparent == leftTransparent &&
+         bottomStyle >= OUTSET && (leftStyle == DOTTED || leftStyle == DASHED ||
+                                   leftStyle == SOLID || leftStyle == OUTSET));
 
     bool ignore_right =
         (renderRadii && bottomRight.width() > 0) ||
-        (bc == rc && bt == rt && bs >= OUTSET &&
-         (rs == DOTTED || rs == DASHED || rs == SOLID || rs == INSET));
+        (bottomColor == rightColor && bottomTransparent == rightTransparent &&
+         bottomStyle >= OUTSET &&
+         (rightStyle == DOTTED || rightStyle == DASHED || rightStyle == SOLID ||
+          rightStyle == INSET));
 
     int x = tx;
     int x2 = tx + w;
@@ -1023,8 +1032,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
     }
 
     drawLineForBoxSide(graphicsContext, x, ty + h - style->borderBottomWidth(),
-                       x2, ty + h, BSBottom, bc, style->color(), bs,
-                       ignore_left ? 0 : style->borderLeftWidth(),
+                       x2, ty + h, BSBottom, bottomColor, style->color(),
+                       bottomStyle, ignore_left ? 0 : style->borderLeftWidth(),
                        ignore_right ? 0 : style->borderRightWidth());
 
     if (renderRadii) {
@@ -1036,7 +1045,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         bool applyLeftInnerClip =
             (style->borderLeftWidth() < bottomLeft.width()) &&
             (style->borderBottomWidth() < bottomLeft.height()) &&
-            (bs != DOUBLE || style->borderBottomWidth() > 6);
+            (bottomStyle != DOUBLE || style->borderBottomWidth() > 6);
         if (applyLeftInnerClip) {
           graphicsContext->save();
           graphicsContext->addInnerRoundedRectClip(
@@ -1055,8 +1064,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
 
         // Draw lower left arc
         drawArcForBoxSide(graphicsContext, leftX, leftY, thickness, bottomLeft,
-                          firstAngleStart, firstAngleSpan, BSBottom, bc,
-                          style->color(), bs, true);
+                          firstAngleStart, firstAngleSpan, BSBottom,
+                          bottomColor, style->color(), bottomStyle, true);
         if (applyLeftInnerClip)
           graphicsContext->restore();
       }
@@ -1067,7 +1076,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         bool applyRightInnerClip =
             (style->borderRightWidth() < bottomRight.width()) &&
             (style->borderBottomWidth() < bottomRight.height()) &&
-            (bs != DOUBLE || style->borderBottomWidth() > 6);
+            (bottomStyle != DOUBLE || style->borderBottomWidth() > 6);
         if (applyRightInnerClip) {
           graphicsContext->save();
           graphicsContext->addInnerRoundedRectClip(
@@ -1082,7 +1091,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         // Draw lower right arc
         drawArcForBoxSide(graphicsContext, rightX, rightY, thickness,
                           bottomRight, secondAngleStart, secondAngleSpan,
-                          BSBottom, bc, style->color(), bs, false);
+                          BSBottom, bottomColor, style->color(), bottomStyle,
+                          false);
         if (applyRightInnerClip)
           graphicsContext->restore();
       }
@@ -1092,13 +1102,16 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
   if (renderLeft) {
     bool ignore_top =
         (renderRadii && topLeft.height() > 0) ||
-        (tc == lc && tt == lt && ls >= OUTSET &&
-         (ts == DOTTED || ts == DASHED || ts == SOLID || ts == OUTSET));
+        (topColor == leftColor && topTransparent == leftTransparent &&
+         leftStyle >= OUTSET && (topStyle == DOTTED || topStyle == DASHED ||
+                                 topStyle == SOLID || topStyle == OUTSET));
 
     bool ignore_bottom =
         (renderRadii && bottomLeft.height() > 0) ||
-        (bc == lc && bt == lt && ls >= OUTSET &&
-         (bs == DOTTED || bs == DASHED || bs == SOLID || bs == INSET));
+        (bottomColor == leftColor && bottomTransparent == leftTransparent &&
+         leftStyle >= OUTSET &&
+         (bottomStyle == DOTTED || bottomStyle == DASHED ||
+          bottomStyle == SOLID || bottomStyle == INSET));
 
     int y = ty;
     int y2 = ty + h;
@@ -1108,7 +1121,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
     }
 
     drawLineForBoxSide(graphicsContext, tx, y, tx + style->borderLeftWidth(),
-                       y2, BSLeft, lc, style->color(), ls,
+                       y2, BSLeft, leftColor, style->color(), leftStyle,
                        ignore_top ? 0 : style->borderTopWidth(),
                        ignore_bottom ? 0 : style->borderBottomWidth());
 
@@ -1119,9 +1132,10 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
 
       if (!upperLeftBorderStylesMatch && topLeft.width()) {
         int topY = ty;
-        bool applyTopInnerClip = (style->borderLeftWidth() < topLeft.width()) &&
-                                 (style->borderTopWidth() < topLeft.height()) &&
-                                 (ls != DOUBLE || style->borderLeftWidth() > 6);
+        bool applyTopInnerClip =
+            (style->borderLeftWidth() < topLeft.width()) &&
+            (style->borderTopWidth() < topLeft.height()) &&
+            (leftStyle != DOUBLE || style->borderLeftWidth() > 6);
         if (applyTopInnerClip) {
           graphicsContext->save();
           graphicsContext->addInnerRoundedRectClip(
@@ -1134,8 +1148,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
 
         // Draw top left arc
         drawArcForBoxSide(graphicsContext, topX, topY, thickness, topLeft,
-                          firstAngleStart, firstAngleSpan, BSLeft, lc,
-                          style->color(), ls, true);
+                          firstAngleStart, firstAngleSpan, BSLeft, leftColor,
+                          style->color(), leftStyle, true);
         if (applyTopInnerClip)
           graphicsContext->restore();
       }
@@ -1145,7 +1159,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         bool applyBottomInnerClip =
             (style->borderLeftWidth() < bottomLeft.width()) &&
             (style->borderBottomWidth() < bottomLeft.height()) &&
-            (ls != DOUBLE || style->borderLeftWidth() > 6);
+            (leftStyle != DOUBLE || style->borderLeftWidth() > 6);
         if (applyBottomInnerClip) {
           graphicsContext->save();
           graphicsContext->addInnerRoundedRectClip(
@@ -1159,8 +1173,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
 
         // Draw bottom left arc
         drawArcForBoxSide(graphicsContext, topX, bottomY, thickness, bottomLeft,
-                          secondAngleStart, secondAngleSpan, BSLeft, lc,
-                          style->color(), ls, false);
+                          secondAngleStart, secondAngleSpan, BSLeft, leftColor,
+                          style->color(), leftStyle, false);
         if (applyBottomInnerClip)
           graphicsContext->restore();
       }
@@ -1170,13 +1184,17 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
   if (renderRight) {
     bool ignore_top =
         (renderRadii && topRight.height() > 0) ||
-        ((tc == rc) && (tt == rt) && (rs >= DOTTED || rs == INSET) &&
-         (ts == DOTTED || ts == DASHED || ts == SOLID || ts == OUTSET));
+        ((topColor == rightColor) && (topTransparent == rightTransparent) &&
+         (rightStyle >= DOTTED || rightStyle == INSET) &&
+         (topStyle == DOTTED || topStyle == DASHED || topStyle == SOLID ||
+          topStyle == OUTSET));
 
-    bool ignore_bottom =
-        (renderRadii && bottomRight.height() > 0) ||
-        ((bc == rc) && (bt == rt) && (rs >= DOTTED || rs == INSET) &&
-         (bs == DOTTED || bs == DASHED || bs == SOLID || bs == INSET));
+    bool ignore_bottom = (renderRadii && bottomRight.height() > 0) ||
+                         ((bottomColor == rightColor) &&
+                          (bottomTransparent == rightTransparent) &&
+                          (rightStyle >= DOTTED || rightStyle == INSET) &&
+                          (bottomStyle == DOTTED || bottomStyle == DASHED ||
+                           bottomStyle == SOLID || bottomStyle == INSET));
 
     int y = ty;
     int y2 = ty + h;
@@ -1186,8 +1204,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
     }
 
     drawLineForBoxSide(graphicsContext, tx + w - style->borderRightWidth(), y,
-                       tx + w, y2, BSRight, rc, style->color(), rs,
-                       ignore_top ? 0 : style->borderTopWidth(),
+                       tx + w, y2, BSRight, rightColor, style->color(),
+                       rightStyle, ignore_top ? 0 : style->borderTopWidth(),
                        ignore_bottom ? 0 : style->borderBottomWidth());
 
     if (renderRadii &&
@@ -1200,7 +1218,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         bool applyTopInnerClip =
             (style->borderRightWidth() < topRight.width()) &&
             (style->borderTopWidth() < topRight.height()) &&
-            (rs != DOUBLE || style->borderRightWidth() > 6);
+            (rightStyle != DOUBLE || style->borderRightWidth() > 6);
         if (applyTopInnerClip) {
           graphicsContext->save();
           graphicsContext->addInnerRoundedRectClip(
@@ -1213,8 +1231,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
 
         // Draw top right arc
         drawArcForBoxSide(graphicsContext, topX, topY, thickness, topRight,
-                          firstAngleStart, firstAngleSpan, BSRight, rc,
-                          style->color(), rs, true);
+                          firstAngleStart, firstAngleSpan, BSRight, rightColor,
+                          style->color(), rightStyle, true);
         if (applyTopInnerClip)
           graphicsContext->restore();
       }
@@ -1225,7 +1243,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         bool applyBottomInnerClip =
             (style->borderRightWidth() < bottomRight.width()) &&
             (style->borderBottomWidth() < bottomRight.height()) &&
-            (rs != DOUBLE || style->borderRightWidth() > 6);
+            (rightStyle != DOUBLE || style->borderRightWidth() > 6);
         if (applyBottomInnerClip) {
           graphicsContext->save();
           graphicsContext->addInnerRoundedRectClip(
@@ -1240,7 +1258,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         // Draw bottom right arc
         drawArcForBoxSide(graphicsContext, bottomX, bottomY, thickness,
                           bottomRight, secondAngleStart, secondAngleSpan,
-                          BSRight, rc, style->color(), rs, false);
+                          BSRight, rightColor, style->color(), rightStyle,
+                          false);
         if (applyBottomInnerClip)
           graphicsContext->restore();
       }
