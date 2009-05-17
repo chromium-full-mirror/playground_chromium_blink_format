@@ -375,6 +375,7 @@ static void getNextSoftBreak(RootInlineBox*& line,
     }
   }
   breakNode = 0;
+  breakOffset = 0;
 }
 
 String RenderTextControl::textWithHardLineBreaks() {

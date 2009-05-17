@@ -148,7 +148,7 @@ void PluginStream::startStream() {
     String separator(": ");
 
     String statusLine =
-        String::format("HTTP %lu OK\n", m_resourceResponse.httpStatusCode());
+        String::format("HTTP %d OK\n", m_resourceResponse.httpStatusCode());
 
     stringBuilder.append(statusLine.characters(), statusLine.length());
 
