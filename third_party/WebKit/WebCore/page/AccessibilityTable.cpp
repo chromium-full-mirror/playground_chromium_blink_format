@@ -352,14 +352,14 @@ void AccessibilityTable::cells(
   }
 }
 
-const unsigned AccessibilityTable::columnCount() {
+unsigned AccessibilityTable::columnCount() {
   if (!hasChildren())
     addChildren();
 
   return m_columns.size();
 }
 
-const unsigned AccessibilityTable::rowCount() {
+unsigned AccessibilityTable::rowCount() {
   if (!hasChildren())
     addChildren();
 
