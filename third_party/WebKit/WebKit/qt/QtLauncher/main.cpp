@@ -129,11 +129,6 @@ class MainWindow : public QMainWindow {
 #endif
   }
 
-  void newWindow() {
-    MainWindow* mw = new MainWindow;
-    mw->show();
-  }
-
   void zoomIn() {
     int i = zoomLevels.indexOf(currentZoom);
     Q_ASSERT(i >= 0);
@@ -192,6 +187,13 @@ class MainWindow : public QMainWindow {
       statusBar()->showMessage(
           QString("%1 element(s) selected").arg(result.count()), 5000);
     }
+  }
+
+ public slots:
+
+  void newWindow(const QString& url = QString()) {
+    MainWindow* mw = new MainWindow(url);
+    mw->show();
   }
 
  private:
@@ -457,6 +459,11 @@ int main(int argc, char** argv) {
       url = args.at(1);
 
     MainWindow window(url);
+
+    // Opens every given urls in new windows
+    for (int i = 2; i < args.count(); i++)
+      window.newWindow(args.at(i));
+
     window.show();
     return app.exec();
   }
