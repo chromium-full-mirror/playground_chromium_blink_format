@@ -4,7 +4,7 @@
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
  * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2006 Samuel Weinig (sam@webkit.org)
- * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  *
  * This library is free software; you can redistribute it and/or
@@ -325,7 +325,11 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
                                                        bool inViewSourceMode) {
   if (inViewSourceMode) {
     if (type == "text/html" || type == "application/xhtml+xml" ||
-        type == "image/svg+xml" || isTextMIMEType(type) || isXMLMIMEType(type))
+        type == "image/svg+xml" || isTextMIMEType(type) || isXMLMIMEType(type)
+#if ENABLE(XHTMLMP)
+        || type == "application/vnd.wap.xhtml+xml"
+#endif
+        )
       return HTMLViewSourceDocument::create(frame, type);
   }
 
@@ -333,7 +337,11 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
   // initialize the plugin database for those.
   if (type == "text/html")
     return HTMLDocument::create(frame);
-  if (type == "application/xhtml+xml")
+  if (type == "application/xhtml+xml"
+#if ENABLE(XHTMLMP)
+      || type == "application/vnd.wap.xhtml+xml"
+#endif
+      )
     return Document::createXHTML(frame);
 
 #if ENABLE(WML)

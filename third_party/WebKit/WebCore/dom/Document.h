@@ -5,7 +5,7 @@
  *           (C) 2006 Alexey Proskuryakov (ap@webkit.org)
  * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
- * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  *
  * This library is free software; you can redistribute it and/or
@@ -346,6 +346,15 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   virtual bool isMediaDocument() const { return false; }
 #if ENABLE(WML)
   virtual bool isWMLDocument() const { return false; }
+#endif
+#if ENABLE(XHTMLMP)
+  bool isXHTMLMPDocument() const;
+  bool shouldProcessNoscriptElement() const {
+    return m_shouldProcessNoScriptElement;
+  }
+  void setShouldProcessNoscriptElement(bool shouldDo) {
+    m_shouldProcessNoScriptElement = shouldDo;
+  }
 #endif
   virtual bool isFrameSet() const { return false; }
 
@@ -1101,6 +1110,10 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_xmlStandalone;
 
   String m_contentLanguage;
+
+#if ENABLE(XHTMLMP)
+  bool m_shouldProcessNoScriptElement;
+#endif
 
  public:
   bool inPageCache() const { return m_inPageCache; }
