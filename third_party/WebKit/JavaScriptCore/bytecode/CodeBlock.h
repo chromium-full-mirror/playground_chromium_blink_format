@@ -65,36 +65,6 @@ struct HandlerInfo {
 #endif
 };
 
-#if ENABLE(JIT)
-// The code, and the associated pool from which it was allocated.
-struct JITCodeRef {
-  JITCode code;
-#ifndef NDEBUG
-  unsigned codeSize;
-#endif
-  RefPtr<ExecutablePool> executablePool;
-
-  JITCodeRef()
-      : code(0)
-#ifndef NDEBUG
-        ,
-        codeSize(0)
-#endif
-  {
-  }
-
-  JITCodeRef(void* code, PassRefPtr<ExecutablePool> executablePool)
-      : code(code)
-#ifndef NDEBUG
-        ,
-        codeSize(0)
-#endif
-        ,
-        executablePool(executablePool) {
-  }
-};
-#endif
-
 struct ExpressionRangeInfo {
   enum { MaxOffset = (1 << 7) - 1, MaxDivot = (1 << 25) - 1 };
   uint32_t instructionOffset : 25;
@@ -314,7 +284,7 @@ class CodeBlock {
                       getCallReturnOffset>(
                m_exceptionInfo->m_callReturnIndexVector.begin(),
                m_exceptionInfo->m_callReturnIndexVector.size(),
-               m_jitCode.code.offsetOf(nativePC))
+               ownerNode()->generatedJITCode().offsetOf(nativePC))
         ->bytecodeIndex;
   }
 
@@ -335,9 +305,8 @@ class CodeBlock {
 #endif
 
 #if ENABLE(JIT)
-  void setJITCode(JITCodeRef& jitCode);
-  JITCode jitCode() { return m_jitCode.code; }
-  ExecutablePool* executablePool() { return m_jitCode.executablePool.get(); }
+  void setJITCode(JITCode);
+  ExecutablePool* executablePool() { return ownerNode()->getExecutablePool(); }
 #endif
 
   ScopeNode* ownerNode() const { return m_ownerNode; }
@@ -592,9 +561,6 @@ class CodeBlock {
   Vector<Instruction> m_instructions;
 #ifndef NDEBUG
   unsigned m_instructionCount;
-#endif
-#if ENABLE(JIT)
-  JITCodeRef m_jitCode;
 #endif
 
   int m_thisRegister;
