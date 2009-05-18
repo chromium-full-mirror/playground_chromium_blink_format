@@ -754,9 +754,10 @@ JSValue Interpreter::execute(ProgramNode* programNode,
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    result = programNode->jitCode(scopeChain)
-                 .execute(&m_registerFile, newCallFrame, scopeChain->globalData,
-                          exception);
+    if (!codeBlock->jitCode())
+      JIT::compile(scopeChain->globalData, codeBlock);
+    result = codeBlock->jitCode().execute(&m_registerFile, newCallFrame,
+                                          scopeChain->globalData, exception);
 #else
     result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif
@@ -898,7 +899,7 @@ CallFrameClosure Interpreter::prepareForRepeatCall(
   CallFrameClosure result = {callFrame,
                              newCallFrame,
                              function,
-                             functionBodyNode,
+                             codeBlock,
                              scopeChain->globalData,
                              oldEnd,
                              scopeChain,
@@ -919,7 +920,8 @@ JSValue Interpreter::execute(CallFrameClosure& closure, JSValue* exception) {
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    result = closure.functionBody->generatedJITCode().execute(
+    ASSERT(closure.codeBlock->jitCode());
+    result = closure.codeBlock->jitCode().execute(
         &m_registerFile, closure.newCallFrame, closure.globalData, exception);
 #else
     result = privateExecute(Normal, &m_registerFile, closure.newCallFrame,
@@ -1039,9 +1041,10 @@ JSValue Interpreter::execute(EvalNode* evalNode,
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    result = evalNode->jitCode(scopeChain)
-                 .execute(&m_registerFile, newCallFrame, scopeChain->globalData,
-                          exception);
+    if (!codeBlock->jitCode())
+      JIT::compile(scopeChain->globalData, codeBlock);
+    result = codeBlock->jitCode().execute(&m_registerFile, newCallFrame,
+                                          scopeChain->globalData, exception);
 #else
     result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif

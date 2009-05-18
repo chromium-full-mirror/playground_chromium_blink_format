@@ -402,8 +402,8 @@ class JIT : private MacroAssembler {
 
   static void linkCall(JSFunction* callee,
                        CodeBlock* calleeCodeBlock,
-                       JITCode&,
-                       CallLinkInfo*,
+                       JITCode ctiCode,
+                       CallLinkInfo* callLinkInfo,
                        int callerArgCount);
   static void unlinkCall(CallLinkInfo*);
 
