@@ -76,7 +76,9 @@ static void initializeSupportedImageMIMETypes() {
   supportedImageResourceMIMETypes->add("image/bmp");
 
   // Favicons don't have a MIME type in the registry either.
+  supportedImageMIMETypes->add("image/vnd.microsoft.icon");
   supportedImageMIMETypes->add("image/x-icon");
+  supportedImageResourceMIMETypes->add("image/vnd.microsoft.icon");
   supportedImageResourceMIMETypes->add("image/x-icon");
 
   //  We only get one MIME type per UTI, hence our need to add these manually
@@ -113,9 +115,13 @@ static void initializeSupportedImageMIMETypes() {
   // assume that all implementations at least support the following standard
   // image types:
   static const char* types[] = {
-      "image/jpeg",     "image/png", "image/gif", "image/bmp",
-      "image/x-icon",    // ico
-      "image/x-xbitmap"  // xbm
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/bmp",
+      "image/vnd.microsoft.icon",  // ico
+      "image/x-icon",              // ico
+      "image/x-xbitmap"            // xbm
   };
   for (size_t i = 0; i < sizeof(types) / sizeof(types[0]); ++i) {
     supportedImageMIMETypes->add(types[i]);
