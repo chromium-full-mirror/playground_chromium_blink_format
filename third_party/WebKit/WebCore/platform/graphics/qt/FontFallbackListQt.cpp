@@ -40,8 +40,6 @@ FontFallbackList::FontFallbackList()
 
 void FontFallbackList::invalidate(
     WTF::PassRefPtr<WebCore::FontSelector> fontSelector) {
-  releaseFontData();
-  m_fontList.clear();
   m_familyIndex = 0;
   m_pitch = UnknownPitch;
   m_loadingCustomFonts = false;
@@ -49,7 +47,11 @@ void FontFallbackList::invalidate(
   m_generation = 0;
 }
 
-void FontFallbackList::releaseFontData() {}
+void FontFallbackList::releaseFontData() {
+  if (m_fontList.size())
+    delete m_fontList[0].first;
+  m_fontList.clear();
+}
 
 void FontFallbackList::determinePitch(const WebCore::Font* font) const {
   const FontData* fontData = primaryFont(font);
@@ -87,8 +89,15 @@ const FontData* FontFallbackList::fontDataAt(const WebCore::Font* _font,
     family = family->next();
   }
 
-  return new SimpleFontData(FontPlatformData(description), _font->wordSpacing(),
-                            _font->letterSpacing());
+  if (m_fontList.size())
+    return m_fontList[0].first;
+
+  const FontData* result =
+      new SimpleFontData(FontPlatformData(description), _font->wordSpacing(),
+                         _font->letterSpacing());
+  m_fontList.append(
+      pair<const FontData*, bool>(result, result->isCustomFont()));
+  return result;
 }
 
 const FontData* FontFallbackList::fontDataForCharacters(
