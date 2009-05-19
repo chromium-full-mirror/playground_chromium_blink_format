@@ -907,7 +907,7 @@ void InspectorController::didReceiveResponse(DocumentLoader*,
   resource->markResponseReceivedTime();
 
   if (windowVisible())
-    resource->updateScriptObject(m_scriptState);
+    resource->updateScriptObject(m_scriptState, m_webInspector);
 }
 
 void InspectorController::didReceiveContentLength(DocumentLoader*,
@@ -923,7 +923,7 @@ void InspectorController::didReceiveContentLength(DocumentLoader*,
   resource->addLength(lengthReceived);
 
   if (windowVisible())
-    resource->updateScriptObject(m_scriptState);
+    resource->updateScriptObject(m_scriptState, m_webInspector);
 }
 
 void InspectorController::didFinishLoading(DocumentLoader*,
@@ -942,7 +942,7 @@ void InspectorController::didFinishLoading(DocumentLoader*,
   addResource(resource.get());
 
   if (windowVisible())
-    resource->updateScriptObject(m_scriptState);
+    resource->updateScriptObject(m_scriptState, m_webInspector);
 }
 
 void InspectorController::didFailLoading(DocumentLoader*,
@@ -963,7 +963,7 @@ void InspectorController::didFailLoading(DocumentLoader*,
   addResource(resource.get());
 
   if (windowVisible())
-    resource->updateScriptObject(m_scriptState);
+    resource->updateScriptObject(m_scriptState, m_webInspector);
 }
 
 void InspectorController::resourceRetrievedByXMLHttpRequest(
@@ -979,7 +979,7 @@ void InspectorController::resourceRetrievedByXMLHttpRequest(
   resource->setXMLHttpResponseText(sourceString);
 
   if (windowVisible())
-    resource->updateScriptObject(m_scriptState);
+    resource->updateScriptObject(m_scriptState, m_webInspector);
 }
 
 void InspectorController::scriptImported(unsigned long identifier,
@@ -996,7 +996,7 @@ void InspectorController::scriptImported(unsigned long identifier,
   resource->setXMLHttpResponseText(ScriptString(sourceString));
 
   if (windowVisible())
-    resource->updateScriptObject(m_scriptState);
+    resource->updateScriptObject(m_scriptState, m_webInspector);
 }
 
 #if ENABLE(DATABASE)

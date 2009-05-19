@@ -63,12 +63,10 @@ class InspectorDOMStorageResource
  private:
   InspectorDOMStorageResource(Storage*, bool isLocalStorage, Frame*);
 
-  ScriptObject m_scriptObject;
   RefPtr<Storage> m_domStorage;
   bool m_isLocalStorage;
   RefPtr<Frame> m_frame;
-
- private:
+  bool m_scriptObjectCreated;
 };
 
 }  // namespace WebCore
