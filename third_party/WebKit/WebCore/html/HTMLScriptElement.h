@@ -35,7 +35,7 @@ class HTMLScriptElement : public HTMLElement, public ScriptElement {
   HTMLScriptElement(const QualifiedName&, Document*, bool createdByParser);
   ~HTMLScriptElement();
 
-  bool shouldExecuteAsJavaScript() const;
+  virtual bool shouldExecuteAsJavaScript() const;
   virtual String scriptContent() const;
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
