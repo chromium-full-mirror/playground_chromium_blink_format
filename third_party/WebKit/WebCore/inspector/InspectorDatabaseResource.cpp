@@ -35,10 +35,9 @@
 #include "Database.h"
 #include "Document.h"
 #include "Frame.h"
+#include "InspectorFrontend.h"
 #include "JSONObject.h"
-#include "ScriptFunctionCall.h"
 #include "ScriptObjectQuarantine.h"
-#include "ScriptValue.h"
 
 namespace WebCore {
 
@@ -52,17 +51,11 @@ InspectorDatabaseResource::InspectorDatabaseResource(Database* database,
       m_version(version),
       m_scriptObjectCreated(false) {}
 
-void InspectorDatabaseResource::bind(ScriptState* scriptState,
-                                     const ScriptObject& webInspector) {
+void InspectorDatabaseResource::bind(InspectorFrontend* frontend) {
   if (m_scriptObjectCreated)
     return;
 
-  ASSERT(scriptState);
-  ASSERT(!webInspector.hasNoValue());
-  if (!scriptState || webInspector.hasNoValue())
-    return;
-
-  JSONObject jsonObject = JSONObject::createNew(scriptState);
+  JSONObject jsonObject = frontend->newJSONObject();
   ScriptObject database;
   if (!getQuarantinedScriptObject(m_database.get(), database))
     return;
@@ -70,11 +63,8 @@ void InspectorDatabaseResource::bind(ScriptState* scriptState,
   jsonObject.set("domain", m_domain);
   jsonObject.set("name", m_name);
   jsonObject.set("version", m_version);
-
-  ScriptFunctionCall addDatabase(scriptState, webInspector, "addDatabase");
-  addDatabase.appendArgument(jsonObject.scriptObject());
-  addDatabase.call();
-  m_scriptObjectCreated = true;
+  if (frontend->addDatabase(jsonObject))
+    m_scriptObjectCreated = true;
 }
 
 void InspectorDatabaseResource::unbind() {

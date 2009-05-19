@@ -42,6 +42,7 @@
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
+class InspectorFrontend;
 
 class InspectorDatabaseResource : public RefCounted<InspectorDatabaseResource> {
  public:
@@ -53,7 +54,7 @@ class InspectorDatabaseResource : public RefCounted<InspectorDatabaseResource> {
         new InspectorDatabaseResource(database, domain, name, version));
   }
 
-  void bind(ScriptState*, const ScriptObject& webInspector);
+  void bind(InspectorFrontend* frontend);
   void unbind();
 
  private:

@@ -38,7 +38,7 @@
 #include <wtf/Vector.h>
 
 namespace WebCore {
-
+class InspectorFrontend;
 class ScriptCallStack;
 class ScriptString;
 
@@ -56,7 +56,7 @@ class ConsoleMessage {
                  unsigned g,
                  bool storeTrace = false);
 
-  void addToConsole(ScriptState*, const ScriptObject& webInspector);
+  void addToConsole(InspectorFrontend* frontend);
   void incrementCount() { ++m_repeatCount; };
   bool isEqual(ScriptState*, ConsoleMessage* msg) const;
 

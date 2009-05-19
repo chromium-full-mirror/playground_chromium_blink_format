@@ -35,11 +35,10 @@
 #include "DocLoader.h"
 #include "DocumentLoader.h"
 #include "Frame.h"
+#include "InspectorFrontend.h"
 #include "JSONObject.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
-#include "ScriptFunctionCall.h"
-#include "ScriptObject.h"
 #include "TextEncoding.h"
 
 namespace WebCore {
@@ -111,13 +110,10 @@ static void populateHeadersObject(JSONObject* object,
   }
 }
 
-void InspectorResource::createScriptObject(ScriptState* scriptState,
-                                           const ScriptObject& webInspector) {
+void InspectorResource::createScriptObject(InspectorFrontend* frontend) {
   if (!m_scriptObjectCreated) {
-    bool hadException = false;
-
-    JSONObject jsonObject = JSONObject::createNew(scriptState);
-    JSONObject requestHeaders = JSONObject::createNew(scriptState);
+    JSONObject jsonObject = frontend->newJSONObject();
+    JSONObject requestHeaders = frontend->newJSONObject();
     populateHeadersObject(&requestHeaders, m_requestHeaderFields);
     jsonObject.set("requestHeaders", requestHeaders);
     jsonObject.set("requestURL", requestURL());
@@ -126,37 +122,29 @@ void InspectorResource::createScriptObject(ScriptState* scriptState,
     jsonObject.set("lastPathComponent", m_requestURL.lastPathComponent());
     jsonObject.set("isMainResource", m_isMainResource);
     jsonObject.set("cached", m_cached);
-
-    ScriptFunctionCall addResource(scriptState, webInspector, "addResource");
-    addResource.appendArgument(m_identifier);
-    addResource.appendArgument(jsonObject.scriptObject());
-    addResource.call(hadException);
-    if (hadException)
+    if (!frontend->addResource(m_identifier, jsonObject))
       return;
 
     m_scriptObjectCreated = true;
     m_changes.clear(RequestChange);
   }
-  updateScriptObject(scriptState, webInspector);
+  updateScriptObject(frontend);
 }
 
-void InspectorResource::updateScriptObject(ScriptState* scriptState,
-                                           const ScriptObject& webInspector) {
+void InspectorResource::updateScriptObject(InspectorFrontend* frontend) {
   if (!m_scriptObjectCreated)
     return;
 
   if (m_changes.hasChange(NoChange))
     return;
 
-  bool hadException = false;
-
-  JSONObject jsonObject = JSONObject::createNew(scriptState);
+  JSONObject jsonObject = frontend->newJSONObject();
   if (m_changes.hasChange(RequestChange)) {
     jsonObject.set("url", requestURL());
     jsonObject.set("domain", m_requestURL.host());
     jsonObject.set("path", m_requestURL.path());
     jsonObject.set("lastPathComponent", m_requestURL.lastPathComponent());
-    JSONObject requestHeaders = JSONObject::createNew(scriptState);
+    JSONObject requestHeaders = frontend->newJSONObject();
     populateHeadersObject(&requestHeaders, m_requestHeaderFields);
     jsonObject.set("requestHeaders", requestHeaders);
     jsonObject.set("mainResource", m_isMainResource);
@@ -169,7 +157,7 @@ void InspectorResource::updateScriptObject(ScriptState* scriptState,
     jsonObject.set("expectedContentLength", m_expectedContentLength);
     jsonObject.set("statusCode", m_responseStatusCode);
     jsonObject.set("suggestedFilename", m_suggestedFilename);
-    JSONObject responseHeaders = JSONObject::createNew(scriptState);
+    JSONObject responseHeaders = frontend->newJSONObject();
     populateHeadersObject(&responseHeaders, m_responseHeaderFields);
     jsonObject.set("responseHeaders", responseHeaders);
     jsonObject.set("didResponseChange", true);
@@ -200,20 +188,12 @@ void InspectorResource::updateScriptObject(ScriptState* scriptState,
       jsonObject.set("endTime", m_endTime);
     jsonObject.set("didTimingChange", true);
   }
-
-  ScriptFunctionCall updateResource(scriptState, webInspector,
-                                    "updateResource");
-  updateResource.appendArgument(m_identifier);
-  updateResource.appendArgument(jsonObject.scriptObject());
-  updateResource.call(hadException);
-  if (hadException)
+  if (!frontend->updateResource(m_identifier, jsonObject))
     return;
-
   m_changes.clearAll();
 }
 
-void InspectorResource::releaseScriptObject(ScriptState* scriptState,
-                                            const ScriptObject& webInspector,
+void InspectorResource::releaseScriptObject(InspectorFrontend* frontend,
                                             bool callRemoveResource) {
   if (!m_scriptObjectCreated)
     return;
@@ -224,10 +204,7 @@ void InspectorResource::releaseScriptObject(ScriptState* scriptState,
   if (!callRemoveResource)
     return;
 
-  ScriptFunctionCall removeResource(scriptState, webInspector,
-                                    "removeResource");
-  removeResource.appendArgument(m_identifier);
-  removeResource.call();
+  frontend->removeResource(m_identifier);
 }
 
 InspectorResource::Type InspectorResource::type() const {
