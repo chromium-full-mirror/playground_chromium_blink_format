@@ -415,16 +415,12 @@ void JIT::compileGetDirectOffset(RegisterID base,
 }
 
 void JIT::compileGetDirectOffset(JSObject* base,
-                                 RegisterID temp,
                                  RegisterID result,
                                  size_t cachedOffset) {
   if (base->isUsingInlineStorage())
     loadPtr(static_cast<void*>(&base->m_inlineStorage[cachedOffset]), result);
-  else {
-    PropertyStorage* protoPropertyStorage = &base->m_externalStorage;
-    loadPtr(static_cast<void*>(protoPropertyStorage), temp);
-    loadPtr(Address(temp, cachedOffset * sizeof(JSValue)), result);
-  }
+  else
+    loadPtr(static_cast<void*>(&base->m_externalStorage[cachedOffset]), result);
 }
 
 static JSObject* resizePropertyStorage(JSObject* baseObject,
@@ -684,7 +680,7 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
 #endif
 
   // Checks out okay! - getDirectOffset
-  compileGetDirectOffset(protoObject, regT1, regT0, cachedOffset);
+  compileGetDirectOffset(protoObject, regT0, cachedOffset);
 
   Jump success = jump();
 
@@ -785,7 +781,7 @@ void JIT::privateCompileGetByIdProtoList(
 #endif
 
   // Checks out okay! - getDirectOffset
-  compileGetDirectOffset(protoObject, regT1, regT0, cachedOffset);
+  compileGetDirectOffset(protoObject, regT0, cachedOffset);
 
   Jump success = jump();
 
@@ -856,7 +852,7 @@ void JIT::privateCompileGetByIdChainList(
   }
   ASSERT(protoObject);
 
-  compileGetDirectOffset(protoObject, regT1, regT0, cachedOffset);
+  compileGetDirectOffset(protoObject, regT0, cachedOffset);
   Jump success = jump();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
@@ -927,7 +923,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
   }
   ASSERT(protoObject);
 
-  compileGetDirectOffset(protoObject, regT1, regT0, cachedOffset);
+  compileGetDirectOffset(protoObject, regT0, cachedOffset);
   Jump success = jump();
 
   void* code = m_assembler.executableCopy(m_codeBlock->executablePool());
