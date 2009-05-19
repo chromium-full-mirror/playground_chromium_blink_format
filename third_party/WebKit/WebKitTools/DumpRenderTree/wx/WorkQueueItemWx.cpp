@@ -31,10 +31,18 @@
 
 #include "DumpRenderTree.h"
 
-bool LoadItem::invoke() const {}
+bool LoadItem::invoke() const {
+  return false;
+}
 
-bool ReloadItem::invoke() const {}
+bool ReloadItem::invoke() const {
+  return false;
+}
 
-bool ScriptItem::invoke() const {}
+bool ScriptItem::invoke() const {
+  return false;
+}
 
-bool BackForwardItem::invoke() const {}
+bool BackForwardItem::invoke() const {
+  return false;
+}
