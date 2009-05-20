@@ -116,6 +116,9 @@ void Image::drawPattern(GraphicsContext* ctxt,
   p->setBrushOrigin(phase);
   p->fillRect(destRect, b);
   ctxt->restore();
+
+  if (imageObserver())
+    imageObserver()->didDraw(this);
 }
 
 void BitmapImage::initPlatformData() {}
@@ -156,6 +159,9 @@ void BitmapImage::draw(GraphicsContext* ctxt,
   painter->drawPixmap(dst, *image, src);
 
   ctxt->restore();
+
+  if (imageObserver())
+    imageObserver()->didDraw(this);
 }
 
 void BitmapImage::checkForSolidColor() {
