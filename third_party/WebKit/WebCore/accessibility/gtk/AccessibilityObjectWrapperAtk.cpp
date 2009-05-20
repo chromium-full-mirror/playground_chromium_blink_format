@@ -41,6 +41,7 @@
 #include "Editor.h"
 #include "Frame.h"
 #include "FrameView.h"
+#include "HTMLNames.h"
 #include "IntRect.h"
 #include "NotImplemented.h"
 
@@ -251,6 +252,12 @@ static AtkRole webkit_accessible_get_role(AtkObject* object) {
 
   if (!AXObject)
     return ATK_ROLE_UNKNOWN;
+
+  // WebCore does not know about paragraph role
+  Node* node =
+      static_cast<AccessibilityRenderObject*>(AXObject)->renderer()->node();
+  if (node && node->hasTagName(HTMLNames::pTag))
+    return ATK_ROLE_PARAGRAPH;
 
   // Note: Why doesn't WebCore have a password field for this
   if (AXObject->isPasswordField())
