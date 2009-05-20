@@ -768,6 +768,12 @@ String decodeURLEscapeSequences(const String& str,
 
 bool KURL::protocolIs(const char* protocol) const {
   assertProtocolIsGood(protocol);
+
+  // JavaScript URLs are "valid" and should be executed even if KURL decides
+  // they are invalid.
+  // The free function protocolIsJavaScript() should be used instead.
+  ASSERT(strcmp(protocol, "javascript"));
+
   if (m_url.m_parsed.scheme.len <= 0)
     return !protocol;
   return lowerCaseEqualsASCII(
@@ -877,14 +883,8 @@ const KURL& blankURL() {
 }
 
 bool protocolIs(const String& url, const char* protocol) {
-  assertProtocolIsGood(protocol);
-
-  // JavaScript URLs are "valid" and should be executed even if KURL decides
-  // they are invalid.
-  // The free function protocolIsJavaScript() should be used instead.
-  ASSERT(strcmp(protocol, "javascript"));
-
   // Do the comparison without making a new string object.
+  assertProtocolIsGood(protocol);
   for (int i = 0;; ++i) {
     if (!protocol[i])
       return url[i] == ':';
