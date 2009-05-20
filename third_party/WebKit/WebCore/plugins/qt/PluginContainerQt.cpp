@@ -135,6 +135,9 @@ void PluginContainerQt::requestGeometry(const QRect& rect,
 void PluginContainerQt::adjustGeometry() {
   if (m_hasPendingGeometryChange) {
     setGeometry(m_windowRect);
+    // if setMask is set with an empty QRegion, no clipping will
+    // be performed, so in that case we hide the PluginContainer
+    setVisible(!m_clipRegion.isEmpty());
     setMask(m_clipRegion);
     m_hasPendingGeometryChange = false;
   }
