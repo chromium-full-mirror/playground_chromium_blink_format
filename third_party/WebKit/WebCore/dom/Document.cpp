@@ -2648,6 +2648,20 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
   if (!focusChangeBlocked && m_focusedNode &&
       AXObjectCache::accessibilityEnabled())
     axObjectCache()->handleFocusedUIElementChanged();
+#elif PLATFORM(GTK)
+  if (!focusChangeBlocked && m_focusedNode &&
+      AXObjectCache::accessibilityEnabled()) {
+    RenderObject* oldFocusedRenderer = 0;
+    RenderObject* newFocusedRenderer = 0;
+
+    if (oldFocusedNode)
+      oldFocusedRenderer = oldFocusedNode.get()->renderer();
+    if (newFocusedNode)
+      newFocusedRenderer = newFocusedNode.get()->renderer();
+
+    axObjectCache()->handleFocusedUIElementChangedWithRenderers(
+        oldFocusedRenderer, newFocusedRenderer);
+  }
 #endif
 
 SetFocusedNodeDone:

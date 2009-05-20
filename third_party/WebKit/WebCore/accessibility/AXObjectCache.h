@@ -80,6 +80,9 @@ class AXObjectCache {
   void handleActiveDescendantChanged(RenderObject*);
   void handleAriaRoleChanged(RenderObject*);
   void handleFocusedUIElementChanged();
+#if PLATFORM(GTK)
+  void handleFocusedUIElementChangedWithRenderers(RenderObject*, RenderObject*);
+#endif
   static void enableAccessibility() { gAccessibilityEnabled = true; }
   static void enableEnhancedUserInterfaceAccessibility() {
     gAccessibilityEnhancedUserInterfaceEnabled = true;
@@ -115,6 +118,11 @@ inline void AXObjectCache::selectedChildrenChanged(RenderObject*) {}
 inline void AXObjectCache::postNotification(RenderObject*, const String&) {}
 inline void AXObjectCache::postNotificationToElement(RenderObject*,
                                                      const String&) {}
+#if PLATFORM(GTK)
+inline void AXObjectCache::handleFocusedUIElementChangedWithRenderers(
+    RenderObject*,
+    RenderObject*) {}
+#endif
 #endif
 }
 
