@@ -55,8 +55,7 @@ static inline bool allowSettingSrcToJavascriptURL(ExecState* exec,
                                                   const String& name,
                                                   const String& value) {
   if ((element->hasTagName(iframeTag) || element->hasTagName(frameTag)) &&
-      equalIgnoringCase(name, "src") &&
-      protocolIs(parseURL(value), "javascript")) {
+      equalIgnoringCase(name, "src") && protocolIsJavaScript(parseURL(value))) {
     HTMLFrameElementBase* frame = static_cast<HTMLFrameElementBase*>(element);
     if (!checkNodeSecurity(exec, frame->contentDocument()))
       return false;

@@ -297,7 +297,7 @@ void HTMLAnchorElement::parseMappedAttribute(MappedAttribute* attr) {
       }
       if (document()->page() &&
           !document()->page()->javaScriptURLsAreAllowed() &&
-          protocolIs(parsedURL, "javascript")) {
+          protocolIsJavaScript(parsedURL)) {
         setIsLink(false);
         attr->setValue(nullAtom);
       }
