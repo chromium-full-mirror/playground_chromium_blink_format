@@ -134,6 +134,8 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
 
+  virtual bool setCursor(WebCore::PlatformCursorHandle) { return false; }
+
   virtual WebCore::FloatRect customHighlightRect(
       WebCore::Node*,
       const WebCore::AtomicString& type,
