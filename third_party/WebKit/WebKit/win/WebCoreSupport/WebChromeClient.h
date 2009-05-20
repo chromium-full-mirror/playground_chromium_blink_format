@@ -150,6 +150,12 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual WebCore::HTMLParserQuirks* createHTMLParserQuirks() { return 0; }
 
+  virtual void scrollRectIntoView(const WebCore::IntRect&,
+                                  const WebCore::ScrollView*) const {}
+
+  virtual void requestGeolocationPermissionForFrame(WebCore::Frame*,
+                                                    WebCore::Geolocation*);
+
  private:
   COMPtr<IWebUIDelegate> uiDelegate();
   COMPtr<IWebUIDelegate2> uiDelegate2();

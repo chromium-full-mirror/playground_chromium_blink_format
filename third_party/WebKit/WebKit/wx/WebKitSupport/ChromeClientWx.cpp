@@ -350,4 +350,15 @@ void ChromeClientWx::scroll(const IntSize&, const IntRect&, const IntRect&) {
 void ChromeClientWx::runOpenPanel(Frame*, PassRefPtr<FileChooser>) {
   notImplemented();
 }
+
+bool ChromeClientWx::setCursor(PlatformCursorHandle) {
+  notImplemented();
+  return false;
+}
+
+void ChromeClientWx::requestGeolocationPermissionForFrame(Frame*,
+                                                          Geolocation*) {
+  // See the comment in WebCore/page/ChromeClient.h
+  notImplemented();
+}
 }

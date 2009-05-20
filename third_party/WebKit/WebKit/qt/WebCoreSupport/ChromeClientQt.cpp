@@ -400,4 +400,15 @@ void ChromeClientQt::runOpenPanel(Frame* frame,
       fileChooser->chooseFile(file);
   }
 }
+
+bool ChromeClientQt::setCursor(PlatformCursorHandle) {
+  notImplemented();
+  return false;
+}
+
+void ChromeClientQt::requestGeolocationPermissionForFrame(Frame*,
+                                                          Geolocation*) {
+  // See the comment in WebCore/page/ChromeClient.h
+  notImplemented();
+}
 }
