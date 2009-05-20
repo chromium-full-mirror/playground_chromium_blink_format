@@ -78,9 +78,5 @@ void HTMLNoScriptElement::recalcStyle(StyleChange change) {
 bool HTMLNoScriptElement::childShouldCreateRenderer(Node* child) const {
   return document()->shouldProcessNoscriptElement();
 }
-
-PassRefPtr<RenderStyle> HTMLNoScriptElement::styleForRenderer() {
-  return document()->styleSelector()->styleForElement(this, 0, false);
-}
 }
 #endif

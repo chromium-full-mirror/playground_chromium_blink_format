@@ -38,7 +38,6 @@ class HTMLNoScriptElement : public HTMLElement {
   virtual void attach();
   virtual void recalcStyle(StyleChange);
   virtual bool childShouldCreateRenderer(Node*) const;
-  virtual PassRefPtr<RenderStyle> styleForRenderer();
   virtual bool rendererIsNeeded(RenderStyle*) { return true; }
 };
 
