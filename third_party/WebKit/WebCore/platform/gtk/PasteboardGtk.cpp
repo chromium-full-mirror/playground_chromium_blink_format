@@ -131,12 +131,8 @@ void Pasteboard::writeURL(const KURL& url, const String&, Frame* frame) {
 }
 
 void Pasteboard::writeImage(Node* node, const KURL&, const String&) {
-  // TODO: Enable this when Image gets GdkPixbuf support
-
-  /*
-  GtkClipboard* clipboard =
-  gtk_clipboard_get_for_display(gdk_display_get_default(),
-  GDK_SELECTION_CLIPBOARD);
+  GtkClipboard* clipboard = gtk_clipboard_get_for_display(
+      gdk_display_get_default(), GDK_SELECTION_CLIPBOARD);
 
   ASSERT(node && node->renderer() && node->renderer()->isImage());
   RenderImage* renderer = static_cast<RenderImage*>(node->renderer());
@@ -145,10 +141,9 @@ void Pasteboard::writeImage(Node* node, const KURL&, const String&) {
   Image* image = cachedImage->image();
   ASSERT(image);
 
-  gtk_clipboard_set_image(clipboard, image->pixbuf());
-  */
-
-  notImplemented();
+  GdkPixbuf* pixbuf = image->getGdkPixbuf();
+  gtk_clipboard_set_image(clipboard, pixbuf);
+  g_object_unref(pixbuf);
 }
 
 void Pasteboard::clear() {
