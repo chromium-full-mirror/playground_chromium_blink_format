@@ -4,6 +4,8 @@
  * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Nicholas Shanks <webkit@nickshanks.com>
  * Copyright (C) 2008 Eric Seidel <eric@webkit.org>
+ * Copyright (C) 2009 Torch Mobile Inc. All rights reserved.
+ * (http://www.torchmobile.com/)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -710,6 +712,12 @@ bool CSSParser::parseValue(int propId, bool important) {
       if ((id >= CSSValueInline && id <= CSSValueWebkitInlineBox) ||
           id == CSSValueNone)
         valid_primitive = true;
+#if ENABLE(WCSS)
+      else if (id == CSSValueWapMarquee) {
+        addProperty(propId, CSSPrimitiveValue::createIdentifier(id), important);
+        return true;
+      }
+#endif
       break;
 
     case CSSPropertyDirection:  // ltr | rtl | inherit
@@ -1341,6 +1349,30 @@ bool CSSParser::parseValue(int propId, bool important) {
         valid_primitive =
             validUnit(value, FTime | FInteger | FNonNeg, m_strict);
       break;
+#if ENABLE(WCSS)
+    case CSSPropertyWapMarqueeDir:
+      if (id == CSSValueLtr || id == CSSValueRtl)
+        valid_primitive = true;
+      break;
+    case CSSPropertyWapMarqueeStyle:
+      if (id == CSSValueNone || id == CSSValueSlide || id == CSSValueScroll ||
+          id == CSSValueAlternate)
+        valid_primitive = true;
+      break;
+    case CSSPropertyWapMarqueeLoop:
+      if (id == CSSValueInfinite)
+        valid_primitive = true;
+      else
+        valid_primitive = validUnit(value, FInteger | FNonNeg, m_strict);
+      break;
+    case CSSPropertyWapMarqueeSpeed:
+      if (id == CSSValueNormal || id == CSSValueSlow || id == CSSValueFast)
+        valid_primitive = true;
+      else
+        valid_primitive =
+            validUnit(value, FTime | FInteger | FNonNeg, m_strict);
+      break;
+#endif
     case CSSPropertyWebkitUserDrag:  // auto | none | element
       if (id == CSSValueAuto || id == CSSValueNone || id == CSSValueElement)
         valid_primitive = true;
