@@ -121,6 +121,10 @@ bool MIMETypeRegistry::isJavaAppletMIMEType(const String& mimeType) {
          mimeType.startsWith("application/x-java-vm", false);
 }
 
+String MIMETypeRegistry::getMediaMIMETypeForExtension(const String&) {
+  return String();
+}
+
 static HashSet<String>& dummyHashSet() {
   ASSERT_NOT_REACHED();
   static HashSet<String> dummy;
