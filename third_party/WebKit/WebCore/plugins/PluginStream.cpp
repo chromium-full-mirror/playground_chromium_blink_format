@@ -133,7 +133,7 @@ void PluginStream::startStream() {
   // Some plugins (Flash) expect that javascript URLs are passed back decoded as
   // this is the
   // format used when requesting the URL.
-  if (responseURL.protocolIs("javascript"))
+  if (protocolIsJavaScript(responseURL))
     m_stream.url =
         strdup(decodeURLEscapeSequences(responseURL.string()).utf8().data());
   else
