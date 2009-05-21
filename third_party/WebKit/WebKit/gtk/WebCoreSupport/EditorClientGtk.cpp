@@ -627,6 +627,14 @@ void EditorClient::checkSpellingOfString(const UChar* text,
   g_free(ctext);
 }
 
+String EditorClient::getAutoCorrectSuggestionForMisspelledWord(
+    const String& inputWord) {
+  // This method can be implemented using customized algorithms for the
+  // particular browser.
+  // Currently, it computes an empty string.
+  return String();
+}
+
 void EditorClient::checkGrammarOfString(const UChar*,
                                         int,
                                         Vector<GrammarDetail>&,
