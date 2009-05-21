@@ -81,7 +81,7 @@ DragController::DragController(Page* page, DragClient* client)
       m_dragSourceAction(DragSourceActionNone),
       m_didInitiateDrag(false),
       m_isHandlingDrag(false),
-      m_dragOperation(DragOperationNone) {}
+      m_sourceDragOperation(DragOperationNone) {}
 
 DragController::~DragController() {
   m_client->dragControllerDestroyed();
@@ -645,7 +645,7 @@ bool DragController::startDrag(Frame* src,
   IntPoint mouseDraggedPoint = src->view()->windowToContents(dragEvent.pos());
 
   m_draggingImageURL = KURL();
-  m_dragOperation = srcOp;
+  m_sourceDragOperation = srcOp;
 
   DragImageRef dragImage = 0;
   IntPoint dragLoc(0, 0);
