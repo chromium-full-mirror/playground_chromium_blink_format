@@ -174,6 +174,8 @@ class EditorClient {
                                      int length,
                                      int* misspellingLocation,
                                      int* misspellingLength) = 0;
+  virtual String getAutoCorrectSuggestionForMisspelledWord(
+      const String& misspelledWord) = 0;
   virtual void checkGrammarOfString(const UChar*,
                                     int length,
                                     Vector<GrammarDetail>&,

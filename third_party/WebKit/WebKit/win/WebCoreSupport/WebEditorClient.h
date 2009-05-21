@@ -113,6 +113,8 @@ class WebEditorClient : public WebCore::EditorClient {
                                      int length,
                                      int* misspellingLocation,
                                      int* misspellingLength);
+  virtual WebCore::String getAutoCorrectSuggestionForMisspelledWord(
+      const WebCore::String&);
   virtual void checkGrammarOfString(const UChar*,
                                     int length,
                                     Vector<WebCore::GrammarDetail>&,

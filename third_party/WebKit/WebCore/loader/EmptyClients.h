@@ -504,6 +504,9 @@ class EmptyEditorClient : public EditorClient {
   virtual void ignoreWordInSpellDocument(const String&) {}
   virtual void learnWord(const String&) {}
   virtual void checkSpellingOfString(const UChar*, int, int*, int*) {}
+  virtual String getAutoCorrectSuggestionForMisspelledWord(const String&) {
+    return String();
+  }
   virtual void checkGrammarOfString(const UChar*,
                                     int,
                                     Vector<GrammarDetail>&,

@@ -220,7 +220,8 @@ class Editor {
       bool& misspelled,
       bool& ungrammatical);
   void markMisspellingsAfterTypingToPosition(const VisiblePosition&);
-  void markMisspellings(const VisibleSelection&);
+  void markMisspellings(const VisibleSelection&,
+                        RefPtr<Range>& firstMisspellingRange);
   void markBadGrammar(const VisibleSelection&);
   void markMisspellingsAndBadGrammar(const VisibleSelection& spellingSelection,
                                      bool markGrammar,
