@@ -738,7 +738,7 @@ void WebEditorClient::checkSpellingOfString(const UChar* text,
 }
 
 String WebEditorClient::getAutoCorrectSuggestionForMisspelledWord(
-    const String& input_word) {
+    const String& inputWord) {
   // This method can be implemented using customized algorithms for the
   // particular browser.
   // Currently, it computes an empty string.
