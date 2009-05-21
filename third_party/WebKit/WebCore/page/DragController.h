@@ -76,7 +76,7 @@ class DragController {
   const IntPoint& dragOffset() const { return m_dragOffset; }
   DragSourceAction dragSourceAction() const { return m_dragSourceAction; }
 
-  Document* document() const { return m_document; }
+  Document* documentUnderMouse() const { return m_documentUnderMouse; }
   DragDestinationAction dragDestinationAction() const {
     return m_dragDestinationAction;
   }
@@ -113,6 +113,8 @@ class DragController {
   bool dragIsMove(SelectionController*);
   bool isCopyKeyDown();
 
+  void mouseMovedIntoDocument(Document*);
+
   IntRect selectionDraggingRect(Frame*);
   bool doDrag(Frame* src,
               Clipboard* clipboard,
@@ -139,7 +141,8 @@ class DragController {
   Page* m_page;
   DragClient* m_client;
 
-  Document* m_document;       // The document the mouse was last dragged over.
+  Document*
+      m_documentUnderMouse;   // The document the mouse was last dragged over.
   Document* m_dragInitiator;  // The Document (if any) that initiated the drag.
 
   DragDestinationAction m_dragDestinationAction;
