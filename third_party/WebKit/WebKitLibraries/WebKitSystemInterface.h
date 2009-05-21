@@ -1,6 +1,6 @@
 /*
     WebKitSystemInterface.h
-    Copyright (C) 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
+    Copyright (C) 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
 
     Public header file.
 */
@@ -143,6 +143,8 @@ void WKSetCGFontRenderingMode(CGContextRef cgContext, NSFont* font);
 BOOL WKCGContextGetShouldSmoothFonts(CGContextRef cgContext);
 
 #ifdef BUILDING_ON_TIGER
+BOOL WKCGContextIsSafeToClip(CGContextRef);
+
 // CGFontGetAscent, CGFontGetDescent, CGFontGetLeading and CGFontGetUnitsPerEm
 // were not available until Leopard
 void WKGetFontMetrics(CGFontRef font,
@@ -290,6 +292,8 @@ CFRunLoopSourceRef WKCreateMIGServerSource(mig_subsystem_t subsystem,
                                            mach_port_t serverPort);
 
 NSUInteger WKGetInputPanelWindowStyle(void);
+
+UInt8 WKGetNSEventKeyChar(NSEvent*);
 
 #endif
 
