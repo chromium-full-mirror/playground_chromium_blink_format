@@ -69,7 +69,7 @@ WTFLogChannel LogPlugin = {0x02000000, "WebCoreLogLevel", WTFLogChannelOff};
 WTFLogChannel LogArchives = {0x04000000, "WebCoreLogLevel", WTFLogChannelOff};
 
 WTFLogChannel* getChannelFromName(const String& channelName) {
-  if (!channelName.length() >= 2)
+  if (!(channelName.length() >= 2))
     return 0;
 
   if (channelName == String("BackForward"))
