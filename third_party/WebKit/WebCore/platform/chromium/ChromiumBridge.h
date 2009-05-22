@@ -82,9 +82,9 @@ class ChromiumBridge {
 
   // Cookies ------------------------------------------------------------
   static void setCookies(const KURL& url,
-                         const KURL& policyURL,
+                         const KURL& firstPartyForCookies,
                          const String& value);
-  static String cookies(const KURL& url, const KURL& policyURL);
+  static String cookies(const KURL& url, const KURL& firstPartyForCookies);
 
   // DNS ----------------------------------------------------------------
   static void prefetchDNS(const String& hostname);
