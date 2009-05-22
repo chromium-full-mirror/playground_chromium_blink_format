@@ -104,6 +104,8 @@ class EditorClientQt : public EditorClient {
                                      int length,
                                      int* misspellingLocation,
                                      int* misspellingLength);
+  virtual String getAutoCorrectSuggestionForMisspelledWord(
+      const String& misspelledWord);
   virtual void checkGrammarOfString(const UChar*,
                                     int length,
                                     Vector<GrammarDetail>&,
