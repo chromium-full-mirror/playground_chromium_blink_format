@@ -34,7 +34,8 @@
 namespace WebCore {
 
 PlatformMouseEvent::PlatformMouseEvent(const wxMouseEvent& event,
-                                       const wxPoint& globalPoint)
+                                       const wxPoint& globalPoint,
+                                       int clickCount)
     : m_position(event.GetPosition()),
       m_globalPosition(globalPoint),
       m_shiftKey(event.ShiftDown()),
@@ -69,7 +70,7 @@ PlatformMouseEvent::PlatformMouseEvent(const wxMouseEvent& event,
   if (m_eventType == MouseEventMoved)
     m_clickCount = 0;
   else
-    m_clickCount = event.ButtonDClick() ? 2 : 1;
+    m_clickCount = clickCount;
 
   m_timestamp = WTF::currentTime();
 }

@@ -111,7 +111,7 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
                   wxWebViewNameStr);  // For wxWebView internal data passing
 
 #ifndef SWIG
-  ~wxWebView();
+  virtual ~wxWebView();
 #endif
 
   void LoadURL(const wxString& url);
@@ -164,7 +164,7 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
 
   wxWebFrame* GetMainFrame() { return m_mainFrame; }
 
-  wxWebViewDOMElementInfo HitTest(const wxPoint& post) const;
+  wxWebViewDOMElementInfo HitTest(const wxPoint& pos) const;
 
  protected:
   // event handlers (these functions should _not_ be virtual)
