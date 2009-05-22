@@ -30,6 +30,7 @@
 #include "FloatConversion.h"
 #include "FloatRect.h"
 #include "GraphicsContext.h"
+#include "ImageObserver.h"
 #include "TransformationMatrix.h"
 
 #include <math.h>
@@ -175,6 +176,9 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 #endif
 
   ctxt->restore();
+
+  if (ImageObserver* observer = imageObserver())
+    observer->didDraw(this);
 }
 
 void BitmapImage::drawPattern(GraphicsContext* ctxt,
@@ -256,6 +260,9 @@ void BitmapImage::drawPattern(GraphicsContext* ctxt,
   // delete bitmap;
 
   startAnimation();
+
+  if (ImageObserver* observer = imageObserver())
+    observer->didDraw(this);
 }
 
 void BitmapImage::checkForSolidColor() {
