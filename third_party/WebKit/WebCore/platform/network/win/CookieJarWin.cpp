@@ -35,11 +35,8 @@
 
 namespace WebCore {
 
-void setCookies(Document* /*document*/,
-                const KURL& url,
-                const KURL& policyURL,
-                const String& value) {
-  // FIXME: Deal with the policy URL.
+void setCookies(Document* /*document*/, const KURL& url, const String& value) {
+  // FIXME: Deal with document->firstPartyForCookies().
   String str = url.string();
   String val = value;
   InternetSetCookie(str.charactersWithNullTermination(), 0,

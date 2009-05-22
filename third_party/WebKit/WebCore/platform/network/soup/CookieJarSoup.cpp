@@ -23,6 +23,7 @@
 #include "CookieJarSoup.h"
 
 #include "CString.h"
+#include "Document.h"
 #include "KURL.h"
 
 namespace WebCore {
@@ -51,10 +52,7 @@ void setDefaultCookieJar(SoupCookieJar* jar) {
     g_object_ref(cookieJar);
 }
 
-void setCookies(Document* /*document*/,
-                const KURL& url,
-                const KURL& /*policyURL*/,
-                const String& value) {
+void setCookies(Document* /*document*/, const KURL& url, const String& value) {
   SoupCookieJar* jar = defaultCookieJar();
   if (!jar)
     return;

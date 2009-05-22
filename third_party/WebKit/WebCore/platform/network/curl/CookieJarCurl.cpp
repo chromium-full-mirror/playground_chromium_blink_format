@@ -18,6 +18,7 @@
 #include "config.h"
 #include "CookieJar.h"
 
+#include "Document.h"
 #include "KURL.h"
 #include "PlatformString.h"
 #include "StringHash.h"
@@ -28,10 +29,7 @@ namespace WebCore {
 
 static HashMap<String, String> cookieJar;
 
-void setCookies(Document* /*document*/,
-                const KURL& url,
-                const KURL& /*policyURL*/,
-                const String& value) {
+void setCookies(Document* /*document*/, const KURL& url, const String& value) {
   cookieJar.set(url.string(), value);
 }
 

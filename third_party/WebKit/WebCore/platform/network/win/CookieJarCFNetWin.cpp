@@ -66,10 +66,7 @@ static RetainPtr<CFArrayRef> filterCookies(CFArrayRef unfilteredCookies) {
   return filteredCookies;
 }
 
-void setCookies(Document* /*document*/,
-                const KURL& url,
-                const KURL& policyURL,
-                const String& value) {
+void setCookies(Document* document, const KURL& url, const String& value) {
   // <rdar://problem/5632883> CFHTTPCookieStorage stores an empty cookie, which
   // would be sent as "Cookie: =".
   if (value.isEmpty())
@@ -80,7 +77,8 @@ void setCookies(Document* /*document*/,
     return;
 
   RetainPtr<CFURLRef> urlCF(AdoptCF, url.createCFURL());
-  RetainPtr<CFURLRef> policyURLCF(AdoptCF, policyURL.createCFURL());
+  RetainPtr<CFURLRef> firstPartyForCookiesCF(
+      AdoptCF, document->firstPartyForCookies().createCFURL());
 
   // <http://bugs.webkit.org/show_bug.cgi?id=6531>, <rdar://4409034>
   // cookiesWithResponseHeaderFields doesn't parse cookies without a value
@@ -100,7 +98,7 @@ void setCookies(Document* /*document*/,
 
   CFHTTPCookieStorageSetCookies(cookieStorage,
                                 filterCookies(cookiesCF.get()).get(),
-                                urlCF.get(), policyURLCF.get());
+                                urlCF.get(), firstPartyForCookiesCF.get());
 }
 
 String cookies(const Document* /*document*/, const KURL& url) {
