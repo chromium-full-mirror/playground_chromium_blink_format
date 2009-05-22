@@ -39,6 +39,9 @@ class RenderThemeChromiumLinux : public RenderTheme {
 
   virtual String extraDefaultStyleSheet();
   virtual String extraQuirksStyleSheet();
+#if ENABLE(VIDEO)
+  virtual String extraMediaControlsStyleSheet();
+#endif
 
   // A method asking if the theme's controls actually care about redrawing when
   // hovered.
@@ -116,6 +119,13 @@ class RenderThemeChromiumLinux : public RenderTheme {
                                              const RenderObject::PaintInfo&,
                                              const IntRect&);
 
+  virtual bool paintMediaPlayButton(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&);
+  virtual bool paintMediaMuteButton(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&);
+
   // MenuList refers to an unstyled menulist (meaning a menulist without
   // background-color or border set) and MenuListButton refers to a styled
   // menulist (a menulist with background-color or border set). They have
@@ -164,6 +174,7 @@ class RenderThemeChromiumLinux : public RenderTheme {
 
  private:
   int menuListInternalPadding(RenderStyle*, int paddingType) const;
+  bool paintMediaButtonInternal(GraphicsContext*, const IntRect&, Image*);
 };
 
 }  // namespace WebCore

@@ -146,6 +146,13 @@ class RenderThemeChromiumWin : public RenderTheme {
                                              const RenderObject::PaintInfo&,
                                              const IntRect&);
 
+  virtual bool paintMediaPlayButton(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&);
+  virtual bool paintMediaMuteButton(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&);
+
   // MenuList refers to an unstyled menulist (meaning a menulist without
   // background-color or border set) and MenuListButton refers to a styled
   // menulist (a menulist with background-color or border set). They have
@@ -197,6 +204,7 @@ class RenderThemeChromiumWin : public RenderTheme {
                               const RenderObject::PaintInfo&,
                               const IntRect&,
                               bool);
+  bool paintMediaButtonInternal(GraphicsContext*, const IntRect&, Image*);
 
   int menuListInternalPadding(RenderStyle*, int paddingType) const;
 };
