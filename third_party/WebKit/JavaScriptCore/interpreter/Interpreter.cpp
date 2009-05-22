@@ -177,7 +177,8 @@ NEVER_INLINE bool Interpreter::resolveGlobal(CallFrame* callFrame,
   PropertySlot slot(globalObject);
   if (globalObject->getPropertySlot(callFrame, ident, slot)) {
     JSValue result = slot.getValue(callFrame, ident);
-    if (slot.isCacheable() && !globalObject->structure()->isDictionary()) {
+    if (slot.isCacheable() && !globalObject->structure()->isDictionary() &&
+        slot.slotBase() == globalObject) {
       if (vPC[4].u.structure)
         vPC[4].u.structure->deref();
       globalObject->structure()->ref();
