@@ -1135,21 +1135,18 @@ void* JITStubs::cti_vm_dontLazyLinkCall(STUB_ARGS_DECLARATION) {
 
   JSGlobalData* globalData = stackFrame.globalData;
   JSFunction* callee = asFunction(stackFrame.args[0].jsValue());
-  JITCode jitCode = callee->body()->generatedJITCode();
-  ASSERT(jitCode);
 
   ctiPatchNearCallByReturnAddress(stackFrame.args[1].returnAddress(),
                                   globalData->jitStubs.ctiVirtualCallLink());
 
-  return jitCode.addressForCall();
+  return callee->body()->generatedJITCode().addressForCall();
 }
 
 void* JITStubs::cti_vm_lazyLinkCall(STUB_ARGS_DECLARATION) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   JSFunction* callee = asFunction(stackFrame.args[0].jsValue());
-  JITCode jitCode = callee->body()->generatedJITCode();
-  ASSERT(jitCode);
+  JITCode& jitCode = callee->body()->generatedJITCode();
 
   CodeBlock* codeBlock = 0;
   if (!callee->isHostFunction())

@@ -1754,8 +1754,23 @@ class ScopeNode : public StatementNode, public ParserArenaRefCounted {
 
   virtual void mark() {}
 
+#if ENABLE(JIT)
+  JITCode& generatedJITCode() {
+    ASSERT(m_jitCode);
+    return m_jitCode;
+  }
+
+  ExecutablePool* getExecutablePool() { return m_jitCode.getExecutablePool(); }
+
+  void setJITCode(const JITCode jitCode) { m_jitCode = jitCode; }
+#endif
+
  protected:
   void setSource(const SourceCode& source) { m_source = source; }
+
+#if ENABLE(JIT)
+  JITCode m_jitCode;
+#endif
 
  private:
   OwnPtr<ScopeNodeData> m_data;
@@ -1779,6 +1794,14 @@ class ProgramNode : public ScopeNode {
     return *m_code;
   }
 
+#if ENABLE(JIT)
+  JITCode& jitCode(ScopeChainNode* scopeChain) {
+    if (!m_jitCode)
+      generateJITCode(scopeChain);
+    return m_jitCode;
+  }
+#endif
+
  private:
   ProgramNode(JSGlobalData*,
               SourceElements*,
@@ -1790,6 +1813,10 @@ class ProgramNode : public ScopeNode {
 
   void generateBytecode(ScopeChainNode*);
   virtual RegisterID* emitBytecode(BytecodeGenerator&, RegisterID* = 0);
+
+#if ENABLE(JIT)
+  void generateJITCode(ScopeChainNode*);
+#endif
 
   OwnPtr<ProgramCodeBlock> m_code;
 };
@@ -1814,6 +1841,14 @@ class EvalNode : public ScopeNode {
 
   virtual void mark();
 
+#if ENABLE(JIT)
+  JITCode& jitCode(ScopeChainNode* scopeChain) {
+    if (!m_jitCode)
+      generateJITCode(scopeChain);
+    return m_jitCode;
+  }
+#endif
+
  private:
   EvalNode(JSGlobalData*,
            SourceElements*,
@@ -1825,6 +1860,10 @@ class EvalNode : public ScopeNode {
 
   void generateBytecode(ScopeChainNode*);
   virtual RegisterID* emitBytecode(BytecodeGenerator&, RegisterID* = 0);
+
+#if ENABLE(JIT)
+  void generateJITCode(ScopeChainNode*);
+#endif
 
   OwnPtr<EvalCodeBlock> m_code;
 };
@@ -1857,7 +1896,7 @@ class FunctionBodyNode : public ScopeNode {
 
   bool isHostFunction() const {
 #if ENABLE(JIT)
-    return m_jitCode && !m_code;
+    return !!m_jitCode && !m_code;
 #else
     return true;
 #endif
@@ -1872,17 +1911,13 @@ class FunctionBodyNode : public ScopeNode {
 
   CodeBlock& bytecodeForExceptionInfoReparse(ScopeChainNode*, CodeBlock*);
 #if ENABLE(JIT)
-  JITCode generatedJITCode() {
-    ASSERT(m_jitCode);
-    return m_jitCode;
-  }
-
-  JITCode jitCode(ScopeChainNode* scopeChain) {
+  JITCode& jitCode(ScopeChainNode* scopeChain) {
     if (!m_jitCode)
       generateJITCode(scopeChain);
     return m_jitCode;
   }
 #endif
+
   CodeBlock& bytecode(ScopeChainNode* scopeChain) {
     ASSERT(scopeChain);
     if (!m_code)
@@ -1908,8 +1943,6 @@ class FunctionBodyNode : public ScopeNode {
   void generateBytecode(ScopeChainNode*);
 #if ENABLE(JIT)
   void generateJITCode(ScopeChainNode*);
-
-  JITCode m_jitCode;
 #endif
   Identifier* m_parameters;
   size_t m_parameterCount;
