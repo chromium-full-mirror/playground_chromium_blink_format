@@ -172,7 +172,7 @@ void MainResourceLoader::willSendRequest(
   // use the
   // URL of the main frame which doesn't change when we redirect.
   if (frameLoader()->isLoadingMainFrame())
-    newRequest.setMainDocumentURL(newRequest.url());
+    newRequest.setFirstPartyForCookies(newRequest.url());
 
   // If we're fielding a redirect in response to a POST, force a load from
   // origin, since

@@ -35,7 +35,7 @@ class Document;
 String cookies(const Document*, const KURL&);
 void setCookies(Document*,
                 const KURL&,
-                const KURL& policyBaseURL,
+                const KURL& firstPartyForCookies,
                 const String&);
 bool cookiesEnabled(const Document*);
 }

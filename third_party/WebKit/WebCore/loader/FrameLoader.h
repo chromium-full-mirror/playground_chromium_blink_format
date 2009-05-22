@@ -525,8 +525,8 @@ class FrameLoader : Noncopyable {
 
   void receivedFirstData();
 
-  void updatePolicyBaseURL();
-  void setPolicyBaseURL(const KURL&);
+  void updateFirstPartyForCookies();
+  void setFirstPartyForCookies(const KURL&);
 
   void addExtraFieldsToRequest(ResourceRequest&,
                                FrameLoadType loadType,
