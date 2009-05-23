@@ -24,6 +24,8 @@
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "FEComponentTransfer.h"
 
+#include "SVGResourceFilter.h"
+
 namespace WebCore {
 
 FEComponentTransfer::FEComponentTransfer(
@@ -85,7 +87,7 @@ void FEComponentTransfer::setAlphaFunction(
   m_alphaFunc = func;
 }
 
-void FEComponentTransfer::apply() {}
+void FEComponentTransfer::apply(SVGResourceFilter*) {}
 
 void FEComponentTransfer::dump() {}
 

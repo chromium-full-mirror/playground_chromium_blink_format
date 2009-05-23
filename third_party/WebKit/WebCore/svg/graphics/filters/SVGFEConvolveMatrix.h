@@ -26,7 +26,7 @@
 #include "FilterEffect.h"
 #include "FloatPoint.h"
 #include "FloatSize.h"
-
+#include "SVGResourceFilter.h"
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -75,8 +75,8 @@ class FEConvolveMatrix : public FilterEffect {
   bool preserveAlpha() const;
   void setPreserveAlpha(bool);
 
-  virtual void apply();
-  virtual void dump();
+  void apply(SVGResourceFilter*);
+  void dump();
   TextStream& externalRepresentation(TextStream& ts) const;
 
  private:

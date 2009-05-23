@@ -24,6 +24,8 @@
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "FEBlend.h"
 
+#include "SVGResourceFilter.h"
+
 namespace WebCore {
 
 FEBlend::FEBlend(FilterEffect* in, FilterEffect* in2, BlendModeType mode)
@@ -51,7 +53,7 @@ void FEBlend::setBlendMode(BlendModeType mode) {
   m_mode = mode;
 }
 
-void FEBlend::apply() {}
+void FEBlend::apply(SVGResourceFilter*) {}
 
 void FEBlend::dump() {}
 

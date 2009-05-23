@@ -24,6 +24,7 @@
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "SVGFEMorphology.h"
 #include "SVGRenderTreeAsText.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -68,7 +69,7 @@ void FEMorphology::setRadiusY(float radiusY) {
   m_radiusY = radiusY;
 }
 
-void FEMorphology::apply() {}
+void FEMorphology::apply(SVGResourceFilter*) {}
 
 void FEMorphology::dump() {}
 

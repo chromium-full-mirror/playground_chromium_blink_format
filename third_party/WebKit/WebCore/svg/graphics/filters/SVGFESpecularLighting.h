@@ -24,8 +24,9 @@
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "Color.h"
-#include "SVGLightSource.h"
 #include "FilterEffect.h"
+#include "SVGLightSource.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -62,8 +63,8 @@ class FESpecularLighting : public FilterEffect {
   const LightSource* lightSource() const;
   void setLightSource(LightSource*);
 
-  virtual void apply();
-  virtual void dump();
+  void apply(SVGResourceFilter*);
+  void dump();
   TextStream& externalRepresentation(TextStream& ts) const;
 
  private:

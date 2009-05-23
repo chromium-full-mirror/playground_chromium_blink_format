@@ -24,6 +24,8 @@
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "FEColorMatrix.h"
 
+#include "SVGResourceFilter.h"
+
 namespace WebCore {
 
 FEColorMatrix::FEColorMatrix(FilterEffect* in,
@@ -53,7 +55,7 @@ void FEColorMatrix::setValues(const Vector<float>& values) {
   m_values = values;
 }
 
-void FEColorMatrix::apply() {}
+void FEColorMatrix::apply(SVGResourceFilter*) {}
 
 void FEColorMatrix::dump() {}
 

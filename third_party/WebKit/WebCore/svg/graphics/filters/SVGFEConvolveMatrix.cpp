@@ -23,6 +23,7 @@
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "SVGFEConvolveMatrix.h"
+#include "SVGResourceFilter.h"
 #include "SVGRenderTreeAsText.h"
 
 namespace WebCore {
@@ -129,7 +130,7 @@ void FEConvolveMatrix::setPreserveAlpha(bool preserveAlpha) {
   m_preserveAlpha = preserveAlpha;
 }
 
-void FEConvolveMatrix::apply() {}
+void FEConvolveMatrix::apply(SVGResourceFilter*) {}
 
 void FEConvolveMatrix::dump() {}
 

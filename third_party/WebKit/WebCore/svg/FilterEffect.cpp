@@ -24,7 +24,11 @@
 
 namespace WebCore {
 
-FilterEffect::FilterEffect() {}
+FilterEffect::FilterEffect()
+    : m_xBBoxMode(false),
+      m_yBBoxMode(false),
+      m_widthBBoxMode(false),
+      m_heightBBoxMode(false) {}
 
 FilterEffect::~FilterEffect() {}
 

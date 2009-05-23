@@ -24,6 +24,7 @@
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "FilterEffect.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -39,8 +40,8 @@ class FEGaussianBlur : public FilterEffect {
   float stdDeviationY() const;
   void setStdDeviationY(float);
 
-  virtual void apply();
-  virtual void dump();
+  void apply(SVGResourceFilter*);
+  void dump();
   TextStream& externalRepresentation(TextStream& ts) const;
 
  private:

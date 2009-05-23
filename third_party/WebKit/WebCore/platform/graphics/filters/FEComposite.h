@@ -24,7 +24,9 @@
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "FilterEffect.h"
+
 #include "PlatformString.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -63,8 +65,8 @@ class FEComposite : public FilterEffect {
   float k4() const;
   void setK4(float);
 
-  virtual void apply();
-  virtual void dump();
+  void apply(SVGResourceFilter*);
+  void dump();
 
  private:
   FEComposite(FilterEffect*,
