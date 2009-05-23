@@ -38,6 +38,7 @@
 #include "TransformationMatrix.h"
 #include <cairo.h>
 #include <math.h>
+#include <wtf/OwnPtr.h>
 
 namespace WebCore {
 
@@ -165,10 +166,10 @@ void Image::drawPattern(GraphicsContext* context,
   context->save();
 
   IntRect imageSize = enclosingIntRect(tileRect);
-  std::auto_ptr<ImageBuffer> imageSurface =
+  OwnPtr<ImageBuffer> imageSurface =
       ImageBuffer::create(imageSize.size(), false);
 
-  if (!imageSurface.get())
+  if (!imageSurface)
     return;
 
   if (tileRect.size() != size()) {
@@ -176,7 +177,7 @@ void Image::drawPattern(GraphicsContext* context,
     cairo_set_source_surface(clippedImageContext, image, -tileRect.x(),
                              -tileRect.y());
     cairo_paint(clippedImageContext);
-    image = imageSurface.get()->image()->nativeImageForCurrentFrame();
+    image = imageSurface->image()->nativeImageForCurrentFrame();
   }
 
   cairo_pattern_t* pattern = cairo_pattern_create_for_surface(image);

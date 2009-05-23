@@ -39,6 +39,7 @@
 #include <QPainterPath>
 #include <QTransform>
 #include <QString>
+#include <wtf/OwnPtr.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -84,8 +85,7 @@ bool Path::strokeContains(StrokeStyleApplier* applier,
   // FIXME: We should try to use a 'shared Context' instead of creating a new
   // ImageBuffer
   // on each call.
-  std::auto_ptr<ImageBuffer> scratchImage =
-      ImageBuffer::create(IntSize(1, 1), false);
+  OwnPtr<ImageBuffer> scratchImage = ImageBuffer::create(IntSize(1, 1), false);
   GraphicsContext* gc = scratchImage->context();
   QPainterPathStroker stroke;
   applier->strokeStyle(gc);
@@ -115,8 +115,7 @@ FloatRect Path::strokeBoundingRect(StrokeStyleApplier* applier) {
   // FIXME: We should try to use a 'shared Context' instead of creating a new
   // ImageBuffer
   // on each call.
-  std::auto_ptr<ImageBuffer> scratchImage =
-      ImageBuffer::create(IntSize(1, 1), false);
+  OwnPtr<ImageBuffer> scratchImage = ImageBuffer::create(IntSize(1, 1), false);
   GraphicsContext* gc = scratchImage->context();
   QPainterPathStroker stroke;
   if (applier) {
