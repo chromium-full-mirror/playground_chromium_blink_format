@@ -120,7 +120,7 @@ void JSActivation::put(ExecState*,
 }
 
 // FIXME: Make this function honor ReadOnly (const) and DontEnum
-void JSActivation::putWithAttributes(ExecState*,
+void JSActivation::putWithAttributes(ExecState* exec,
                                      const Identifier& propertyName,
                                      JSValue value,
                                      unsigned attributes) {
@@ -134,7 +134,8 @@ void JSActivation::putWithAttributes(ExecState*,
   // expose in the activation object.
   ASSERT(!hasGetterSetterProperties());
   PutPropertySlot slot;
-  putDirect(propertyName, value, attributes, true, slot);
+  JSObject::putWithAttributes(exec, propertyName, value, attributes, true,
+                              slot);
 }
 
 bool JSActivation::deleteProperty(ExecState* exec,

@@ -334,6 +334,8 @@ class BytecodeGenerator {
                                   RegisterID* funcDst,
                                   const Identifier& property);
 
+  void emitMethodCheck();
+
   RegisterID* emitGetById(RegisterID* dst,
                           RegisterID* base,
                           const Identifier& property);

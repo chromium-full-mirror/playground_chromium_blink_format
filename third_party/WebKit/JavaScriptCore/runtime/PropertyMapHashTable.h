@@ -30,16 +30,28 @@ struct PropertyMapEntry {
   UString::Rep* key;
   unsigned offset;
   unsigned attributes;
+  JSCell* specificValue;
   unsigned index;
 
-  PropertyMapEntry(UString::Rep* key, unsigned attributes)
-      : key(key), offset(0), attributes(attributes), index(0) {}
+  PropertyMapEntry(UString::Rep* key,
+                   unsigned attributes,
+                   JSCell* specificValue)
+      : key(key),
+        offset(0),
+        attributes(attributes),
+        specificValue(specificValue),
+        index(0) {}
 
   PropertyMapEntry(UString::Rep* key,
                    unsigned offset,
                    unsigned attributes,
+                   JSCell* specificValue,
                    unsigned index)
-      : key(key), offset(offset), attributes(attributes), index(index) {}
+      : key(key),
+        offset(offset),
+        attributes(attributes),
+        specificValue(specificValue),
+        index(index) {}
 };
 
 // lastIndexUsed is an ever-increasing index used to identify the order items

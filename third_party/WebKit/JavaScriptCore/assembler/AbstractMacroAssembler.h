@@ -762,6 +762,10 @@ class AbstractMacroAssembler {
     return AssemblerType::getDifferenceBetweenLabels(from.m_label, to.m_jmp);
   }
 
+  ptrdiff_t differenceBetween(DataLabelPtr from, DataLabelPtr to) {
+    return AssemblerType::getDifferenceBetweenLabels(from.m_label, to.m_label);
+  }
+
   ptrdiff_t differenceBetween(DataLabelPtr from, Call to) {
     return AssemblerType::getDifferenceBetweenLabels(from.m_label, to.m_jmp);
   }

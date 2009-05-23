@@ -103,6 +103,11 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
     return Call::fromTailJump(oldJump);
   }
 
+  DataLabelPtr moveWithPatch(ImmPtr initialValue, RegisterID dest) {
+    m_assembler.movl_i32r(initialValue.asIntptr(), dest);
+    return DataLabelPtr(this);
+  }
+
   Jump branchPtrWithPatch(Condition cond,
                           RegisterID left,
                           DataLabelPtr& dataLabel,

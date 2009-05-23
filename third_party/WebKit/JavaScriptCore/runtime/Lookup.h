@@ -264,9 +264,12 @@ inline bool lookupPut(ExecState* exec,
   if (!entry)
     return false;
 
-  if (entry->attributes() & Function)  // function: put as override property
-    thisObj->putDirect(propertyName, value);
-  else if (!(entry->attributes() & ReadOnly))
+  if (entry->attributes() & Function) {  // function: put as override property
+    if (LIKELY(value.isCell()))
+      thisObj->putDirectFunction(propertyName, value.asCell());
+    else
+      thisObj->putDirect(propertyName, value);
+  } else if (!(entry->attributes() & ReadOnly))
     entry->propertyPutter()(exec, thisObj, value);
 
   return true;

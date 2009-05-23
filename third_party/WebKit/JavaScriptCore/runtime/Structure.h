@@ -65,11 +65,13 @@ class Structure : public RefCounted<Structure> {
       Structure*,
       const Identifier& propertyName,
       unsigned attributes,
+      JSCell* specificValue,
       size_t& offset);
   static PassRefPtr<Structure> addPropertyTransitionToExistingStructure(
       Structure*,
       const Identifier& propertyName,
       unsigned attributes,
+      JSCell* specificValue,
       size_t& offset);
   static PassRefPtr<Structure> removePropertyTransition(
       Structure*,
@@ -77,6 +79,8 @@ class Structure : public RefCounted<Structure> {
       size_t& offset);
   static PassRefPtr<Structure> changePrototypeTransition(Structure*,
                                                          JSValue prototype);
+  static PassRefPtr<Structure> changeFunctionTransition(Structure*,
+                                                        const Identifier&);
   static PassRefPtr<Structure> getterSetterTransition(Structure*);
   static PassRefPtr<Structure> toDictionaryTransition(Structure*);
   static PassRefPtr<Structure> fromDictionaryTransition(Structure*);
@@ -90,7 +94,8 @@ class Structure : public RefCounted<Structure> {
 
   // These should be used with caution.
   size_t addPropertyWithoutTransition(const Identifier& propertyName,
-                                      unsigned attributes);
+                                      unsigned attributes,
+                                      JSCell* specificValue);
   size_t removePropertyWithoutTransition(const Identifier& propertyName);
   void setPrototypeWithoutTransition(JSValue prototype) {
     m_prototype = prototype;
@@ -119,7 +124,16 @@ class Structure : public RefCounted<Structure> {
   bool isUsingInlineStorage() const;
 
   size_t get(const Identifier& propertyName);
-  size_t get(const Identifier& propertyName, unsigned& attributes);
+  size_t get(const UString::Rep* rep,
+             unsigned& attributes,
+             JSCell*& specificValue);
+  size_t get(const Identifier& propertyName,
+             unsigned& attributes,
+             JSCell*& specificValue) {
+    ASSERT(!propertyName.isNull());
+    return get(propertyName._ustring.rep(), attributes, specificValue);
+  }
+
   void getEnumerablePropertyNames(ExecState*, PropertyNameArray&, JSObject*);
 
   bool hasGetterSetterProperties() const { return m_hasGetterSetterProperties; }
@@ -131,10 +145,14 @@ class Structure : public RefCounted<Structure> {
     return m_propertyTable ? !m_propertyTable->keyCount : m_offset == noOffset;
   }
 
+  JSCell* specificValue() { return m_specificValueInPrevious; }
+
  private:
   Structure(JSValue prototype, const TypeInfo&);
 
-  size_t put(const Identifier& propertyName, unsigned attributes);
+  size_t put(const Identifier& propertyName,
+             unsigned attributes,
+             JSCell* specificValue);
   size_t remove(const Identifier& propertyName);
   void getEnumerableNamesFromPropertyTable(PropertyNameArray&);
   void getEnumerableNamesFromClassInfoTable(ExecState*,
@@ -148,6 +166,8 @@ class Structure : public RefCounted<Structure> {
   void createPropertyMapHashTable(unsigned newTableSize);
   void insertIntoPropertyMapHashTable(const PropertyMapEntry&);
   void checkConsistency();
+
+  bool despecifyFunction(const Identifier&);
 
   PropertyMapHashTable* copyPropertyTable();
   void materializePropertyMap();
@@ -185,6 +205,7 @@ class Structure : public RefCounted<Structure> {
     Structure* singleTransition;
     StructureTransitionTable* table;
   } m_transitions;
+  JSCell* m_specificValueInPrevious;
 
   RefPtr<PropertyNameArrayData> m_cachedPropertyNameArrayData;
 

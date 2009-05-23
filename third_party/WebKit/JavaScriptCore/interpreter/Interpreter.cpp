@@ -4161,6 +4161,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       ++vPC;
       NEXT_INSTRUCTION();
     }
+    DEFINE_OPCODE(op_method_check) {
+      vPC++;
+      NEXT_INSTRUCTION();
+    }
     DEFINE_OPCODE(op_jsr) {
       /* jsr retAddrDst(r) target(offset)
 

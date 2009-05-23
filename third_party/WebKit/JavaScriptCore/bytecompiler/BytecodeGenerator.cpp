@@ -1291,6 +1291,10 @@ RegisterID* BytecodeGenerator::emitResolveFunction(RegisterID* baseDst,
   return baseDst;
 }
 
+void BytecodeGenerator::emitMethodCheck() {
+  emitOpcode(op_method_check);
+}
+
 RegisterID* BytecodeGenerator::emitGetById(RegisterID* dst,
                                            RegisterID* base,
                                            const Identifier& property) {

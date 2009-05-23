@@ -78,7 +78,8 @@ class JSGlobalObject : public JSVariableObject {
           stringPrototype(0),
           numberPrototype(0),
           datePrototype(0),
-          regExpPrototype(0) {}
+          regExpPrototype(0),
+          methodCallDummy(0) {}
 
     virtual ~JSGlobalObjectData() {}
 
@@ -115,6 +116,8 @@ class JSGlobalObject : public JSVariableObject {
     NumberPrototype* numberPrototype;
     DatePrototype* datePrototype;
     RegExpPrototype* regExpPrototype;
+
+    JSObject* methodCallDummy;
 
     RefPtr<Structure> argumentsStructure;
     RefPtr<Structure> arrayStructure;
@@ -223,6 +226,8 @@ class JSGlobalObject : public JSVariableObject {
   NumberPrototype* numberPrototype() const { return d()->numberPrototype; }
   DatePrototype* datePrototype() const { return d()->datePrototype; }
   RegExpPrototype* regExpPrototype() const { return d()->regExpPrototype; }
+
+  JSObject* methodCallDummy() const { return d()->methodCallDummy; }
 
   Structure* argumentsStructure() const {
     return d()->argumentsStructure.get();

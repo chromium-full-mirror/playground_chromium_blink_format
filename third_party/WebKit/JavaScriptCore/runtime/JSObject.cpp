@@ -130,13 +130,15 @@ void JSObject::put(ExecState* exec,
        obj = asObject(prototype)) {
     prototype = obj->prototype();
     if (prototype.isNull()) {
-      putDirect(propertyName, value, 0, true, slot);
+      putDirectInternal(exec->globalData(), propertyName, value, 0, true, slot);
       return;
     }
   }
 
   unsigned attributes;
-  if ((m_structure->get(propertyName, attributes) != WTF::notFound) &&
+  JSCell* specificValue;
+  if ((m_structure->get(propertyName, attributes, specificValue) !=
+       WTF::notFound) &&
       attributes & ReadOnly)
     return;
 
@@ -167,7 +169,7 @@ void JSObject::put(ExecState* exec,
       break;
   }
 
-  putDirect(propertyName, value, 0, true, slot);
+  putDirectInternal(exec->globalData(), propertyName, value, 0, true, slot);
   return;
 }
 
@@ -176,11 +178,21 @@ void JSObject::put(ExecState* exec, unsigned propertyName, JSValue value) {
   put(exec, Identifier::from(exec, propertyName), value, slot);
 }
 
-void JSObject::putWithAttributes(ExecState*,
+void JSObject::putWithAttributes(ExecState* exec,
+                                 const Identifier& propertyName,
+                                 JSValue value,
+                                 unsigned attributes,
+                                 bool checkReadOnly,
+                                 PutPropertySlot& slot) {
+  putDirectInternal(exec->globalData(), propertyName, value, attributes,
+                    checkReadOnly, slot);
+}
+
+void JSObject::putWithAttributes(ExecState* exec,
                                  const Identifier& propertyName,
                                  JSValue value,
                                  unsigned attributes) {
-  putDirect(propertyName, value, attributes);
+  putDirectInternal(exec->globalData(), propertyName, value, attributes);
 }
 
 void JSObject::putWithAttributes(ExecState* exec,
@@ -205,7 +217,9 @@ bool JSObject::hasProperty(ExecState* exec, unsigned propertyName) const {
 // ECMA 8.6.2.5
 bool JSObject::deleteProperty(ExecState* exec, const Identifier& propertyName) {
   unsigned attributes;
-  if (m_structure->get(propertyName, attributes) != WTF::notFound) {
+  JSCell* specificValue;
+  if (m_structure->get(propertyName, attributes, specificValue) !=
+      WTF::notFound) {
     if ((attributes & DontDelete))
       return false;
     removeDirect(propertyName);
@@ -319,7 +333,8 @@ void JSObject::defineGetter(ExecState* exec,
 
   PutPropertySlot slot;
   GetterSetter* getterSetter = new (exec) GetterSetter;
-  putDirect(propertyName, getterSetter, None, true, slot);
+  putDirectInternal(exec->globalData(), propertyName, getterSetter, None, true,
+                    slot);
 
   // putDirect will change our Structure if we add a new property. For
   // getters and setters, though, we also need to change our Structure
@@ -348,7 +363,8 @@ void JSObject::defineSetter(ExecState* exec,
 
   PutPropertySlot slot;
   GetterSetter* getterSetter = new (exec) GetterSetter;
-  putDirect(propertyName, getterSetter, None, true, slot);
+  putDirectInternal(exec->globalData(), propertyName, getterSetter, None, true,
+                    slot);
 
   // putDirect will change our Structure if we add a new property. For
   // getters and setters, though, we also need to change our Structure
@@ -431,7 +447,9 @@ bool JSObject::propertyIsEnumerable(ExecState* exec,
 bool JSObject::getPropertyAttributes(ExecState* exec,
                                      const Identifier& propertyName,
                                      unsigned& attributes) const {
-  if (m_structure->get(propertyName, attributes) != WTF::notFound)
+  JSCell* specificValue;
+  if (m_structure->get(propertyName, attributes, specificValue) !=
+      WTF::notFound)
     return true;
 
   // Look in the static hashtable of properties
@@ -441,6 +459,21 @@ bool JSObject::getPropertyAttributes(ExecState* exec,
     return true;
   }
 
+  return false;
+}
+
+bool JSObject::getPropertySpecificValue(ExecState*,
+                                        const Identifier& propertyName,
+                                        JSCell*& specificValue) const {
+  unsigned attributes;
+  if (m_structure->get(propertyName, attributes, specificValue) !=
+      WTF::notFound)
+    return true;
+
+  // This could be a function within the static table? - should probably
+  // also look in the hash?  This currently should not be a problem, since
+  // we've currently always call 'get' first, which should have populated
+  // the normal storage.
   return false;
 }
 
@@ -498,14 +531,14 @@ void JSObject::removeDirect(const Identifier& propertyName) {
 void JSObject::putDirectFunction(ExecState* exec,
                                  InternalFunction* function,
                                  unsigned attr) {
-  putDirect(Identifier(exec, function->name(&exec->globalData())), function,
-            attr);
+  putDirectFunction(Identifier(exec, function->name(&exec->globalData())),
+                    function, attr);
 }
 
 void JSObject::putDirectFunctionWithoutTransition(ExecState* exec,
                                                   InternalFunction* function,
                                                   unsigned attr) {
-  putDirectWithoutTransition(
+  putDirectFunctionWithoutTransition(
       Identifier(exec, function->name(&exec->globalData())), function, attr);
 }
 

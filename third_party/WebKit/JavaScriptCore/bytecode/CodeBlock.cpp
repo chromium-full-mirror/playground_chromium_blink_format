@@ -950,6 +950,10 @@ void CodeBlock::dump(ExecState* exec,
              registerName(r1).c_str());
       break;
     }
+    case op_method_check: {
+      printf("[%4d] op_method_check\n", location);
+      break;
+    }
     case op_del_by_id: {
       int r0 = (++it)->u.operand;
       int r1 = (++it)->u.operand;
@@ -1503,6 +1507,11 @@ CodeBlock::~CodeBlock() {
     CallLinkInfo* callLinkInfo = &m_callLinkInfos[i];
     if (callLinkInfo->isLinked())
       callLinkInfo->callee->removeCaller(callLinkInfo);
+  }
+
+  for (size_t size = m_methodCallLinkInfos.size(), i = 0; i < size; ++i) {
+    if (Structure* structure = m_methodCallLinkInfos[i].cachedStructure)
+      structure->deref();
   }
 
   unlinkCallers();

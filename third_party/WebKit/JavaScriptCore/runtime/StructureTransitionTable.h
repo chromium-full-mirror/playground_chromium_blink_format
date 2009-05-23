@@ -37,7 +37,7 @@ namespace JSC {
 class Structure;
 
 struct StructureTransitionTableHash {
-  typedef std::pair<RefPtr<UString::Rep>, unsigned> Key;
+  typedef std::pair<RefPtr<UString::Rep>, std::pair<unsigned, JSCell*>> Key;
   static unsigned hash(const Key& p) { return p.first->computedHash(); }
 
   static bool equal(const Key& a, const Key& b) { return a == b; }
@@ -47,18 +47,25 @@ struct StructureTransitionTableHash {
 
 struct StructureTransitionTableHashTraits {
   typedef WTF::HashTraits<RefPtr<UString::Rep>> FirstTraits;
-  typedef WTF::GenericHashTraits<unsigned> SecondTraits;
-  typedef std::pair<FirstTraits::TraitType, SecondTraits::TraitType> TraitType;
+  typedef WTF::GenericHashTraits<unsigned> SecondFirstTraits;
+  typedef WTF::GenericHashTraits<JSCell*> SecondSecondTraits;
+  typedef std::pair<
+      FirstTraits::TraitType,
+      std::pair<SecondFirstTraits::TraitType, SecondSecondTraits::TraitType>>
+      TraitType;
 
-  static const bool emptyValueIsZero =
-      FirstTraits::emptyValueIsZero && SecondTraits::emptyValueIsZero;
+  static const bool emptyValueIsZero = FirstTraits::emptyValueIsZero &&
+                                       SecondFirstTraits::emptyValueIsZero &&
+                                       SecondSecondTraits::emptyValueIsZero;
   static TraitType emptyValue() {
     return std::make_pair(FirstTraits::emptyValue(),
-                          SecondTraits::emptyValue());
+                          std::make_pair(SecondFirstTraits::emptyValue(),
+                                         SecondSecondTraits::emptyValue()));
   }
 
-  static const bool needsDestruction =
-      FirstTraits::needsDestruction || SecondTraits::needsDestruction;
+  static const bool needsDestruction = FirstTraits::needsDestruction ||
+                                       SecondFirstTraits::needsDestruction ||
+                                       SecondSecondTraits::needsDestruction;
 
   static void constructDeletedValue(TraitType& slot) {
     FirstTraits::constructDeletedValue(slot.first);

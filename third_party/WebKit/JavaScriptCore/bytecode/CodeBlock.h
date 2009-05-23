@@ -102,6 +102,14 @@ struct CallLinkInfo {
   bool isLinked() { return callee; }
 };
 
+struct MethodCallLinkInfo {
+  MethodCallLinkInfo() : cachedStructure(0) {}
+
+  MacroAssembler::CodeLocationCall callReturnLocation;
+  MacroAssembler::CodeLocationDataLabelPtr structureLabel;
+  Structure* cachedStructure;
+};
+
 struct FunctionRegisterInfo {
   FunctionRegisterInfo(unsigned bytecodeOffset, int functionRegisterIndex)
       : bytecodeOffset(bytecodeOffset),
@@ -142,6 +150,11 @@ inline void* getStructureStubInfoReturnLocation(
 
 inline void* getCallLinkInfoReturnLocation(CallLinkInfo* callLinkInfo) {
   return callLinkInfo->callReturnLocation.calleeReturnAddressValue();
+}
+
+inline void* getMethodCallLinkInfoReturnLocation(
+    MethodCallLinkInfo* methodCallLinkInfo) {
+  return methodCallLinkInfo->callReturnLocation.calleeReturnAddressValue();
 }
 
 inline unsigned getCallReturnOffset(CallReturnOffsetToBytecodeIndex* pc) {
@@ -278,6 +291,13 @@ class CodeBlock {
         m_callLinkInfos.begin(), m_callLinkInfos.size(), returnAddress));
   }
 
+  MethodCallLinkInfo& getMethodCallLinkInfo(void* returnAddress) {
+    return *(binaryChop<MethodCallLinkInfo, void*,
+                        getMethodCallLinkInfoReturnLocation>(
+        m_methodCallLinkInfos.begin(), m_methodCallLinkInfos.size(),
+        returnAddress));
+  }
+
   unsigned getBytecodeIndex(CallFrame* callFrame, void* nativePC) {
     reparseForExceptionInfoIfNecessary(callFrame);
     return binaryChop<CallReturnOffsetToBytecodeIndex, unsigned,
@@ -365,6 +385,11 @@ class CodeBlock {
   size_t numberOfCallLinkInfos() const { return m_callLinkInfos.size(); }
   void addCallLinkInfo() { m_callLinkInfos.append(CallLinkInfo()); }
   CallLinkInfo& callLinkInfo(int index) { return m_callLinkInfos[index]; }
+
+  void addMethodCallLinkInfos(unsigned n) { m_methodCallLinkInfos.grow(n); }
+  MethodCallLinkInfo& methodCallLinkInfo(int index) {
+    return m_methodCallLinkInfos[index];
+  }
 
   void addFunctionRegisterInfo(unsigned bytecodeOffset, int functionIndex) {
     createRareDataIfNecessary();
@@ -582,6 +607,7 @@ class CodeBlock {
   Vector<StructureStubInfo> m_structureStubInfos;
   Vector<GlobalResolveInfo> m_globalResolveInfos;
   Vector<CallLinkInfo> m_callLinkInfos;
+  Vector<MethodCallLinkInfo> m_methodCallLinkInfos;
   Vector<CallLinkInfo*> m_linkedCallerList;
 #endif
 
