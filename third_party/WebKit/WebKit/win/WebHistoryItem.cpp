@@ -39,6 +39,7 @@
 #include <WebCore/KURL.h>
 #pragma warning(pop)
 
+#include <wtf/PassOwnPtr.h>
 #include <wtf/RetainPtr.h>
 
 using namespace WebCore;
@@ -153,11 +154,11 @@ WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
   bool lastVisitWasHTTPNonGet =
       lastVisitWasHTTPNonGetRef && CFBooleanGetValue(lastVisitWasHTTPNonGetRef);
 
-  std::auto_ptr<Vector<String>> redirectURLsVector;
+  OwnPtr<Vector<String>> redirectURLsVector;
   if (CFArrayRef redirectURLsRef = static_cast<CFArrayRef>(
           CFDictionaryGetValue(dictionaryRef, redirectURLsKey))) {
     CFIndex size = CFArrayGetCount(redirectURLsRef);
-    redirectURLsVector.reset(new Vector<String>(size));
+    redirectURLsVector = PassOwnPtr<Vector<String>>(new Vector<String>(size));
     for (CFIndex i = 0; i < size; ++i)
       (*redirectURLsVector)[i] = String(
           static_cast<CFStringRef>(CFArrayGetValueAtIndex(redirectURLsRef, i)));
@@ -212,8 +213,8 @@ WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
        protocolIs(m_historyItem->urlString(), "https")))
     m_historyItem->setLastVisitWasHTTPNonGet(true);
 
-  if (redirectURLsVector.get())
-    m_historyItem->setRedirectURLs(redirectURLsVector);
+  if (redirectURLsVector)
+    m_historyItem->setRedirectURLs(redirectURLsVector.release());
 
   if (dailyVector.get())
     m_historyItem->adoptVisitCounts(*dailyVector, *weeklyVector);
