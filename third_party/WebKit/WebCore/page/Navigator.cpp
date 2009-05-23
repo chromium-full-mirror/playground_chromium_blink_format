@@ -55,10 +55,12 @@ void Navigator::disconnectFrame() {
     m_mimeTypes->disconnectFrame();
     m_mimeTypes = 0;
   }
+#if ENABLE(GEOLOCATION)
   if (m_geolocation) {
     m_geolocation->disconnectFrame();
     m_geolocation = 0;
   }
+#endif
   m_frame = 0;
 }
 
@@ -140,8 +142,10 @@ bool Navigator::javaEnabled() const {
 }
 
 Geolocation* Navigator::geolocation() const {
+#if ENABLE(GEOLOCATION)
   if (!m_geolocation)
     m_geolocation = Geolocation::create(m_frame);
+#endif
   return m_geolocation.get();
 }
 

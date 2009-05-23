@@ -26,6 +26,8 @@
 #ifndef JSCustomPositionErrorCallback_h
 #define JSCustomPositionErrorCallback_h
 
+#if ENABLE(GEOLOCATION)
+
 #include "PositionErrorCallback.h"
 #include <runtime/JSObject.h>
 #include <runtime/Protect.h>
@@ -58,5 +60,7 @@ class JSCustomPositionErrorCallback : public PositionErrorCallback {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(GEOLOCATION)
 
 #endif  // JSCustomPositionErrorCallback_h
