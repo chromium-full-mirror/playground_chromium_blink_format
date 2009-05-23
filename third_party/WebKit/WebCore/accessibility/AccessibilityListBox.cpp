@@ -68,12 +68,16 @@ void AccessibilityListBox::addChildren() {
 
   m_haveChildren = true;
 
-  const Vector<HTMLElement*>& listItems =
+  const Vector<Element*>& listItems =
       static_cast<HTMLSelectElement*>(selectNode)->listItems();
   unsigned length = listItems.size();
   for (unsigned i = 0; i < length; i++) {
-    AccessibilityObject* listOption =
-        listBoxOptionAccessibilityObject(listItems[i]);
+    // The cast to HTMLElement below is safe because the only other possible
+    // listItem type
+    // would be a WMLElement, but WML builds don't use accessbility features at
+    // all.
+    AccessibilityObject* listOption = listBoxOptionAccessibilityObject(
+        static_cast<HTMLElement*>(listItems[i]));
     if (listOption)
       m_children.append(listOption);
   }
@@ -164,14 +168,19 @@ AccessibilityObject* AccessibilityListBox::doAccessibilityHitTest(
 
   IntRect parentRect = boundingBoxRect();
 
-  const Vector<HTMLElement*>& listItems =
+  const Vector<Element*>& listItems =
       static_cast<HTMLSelectElement*>(node)->listItems();
   unsigned length = listItems.size();
   for (unsigned i = 0; i < length; i++) {
     IntRect rect = static_cast<RenderListBox*>(m_renderer)
                        ->itemBoundingBoxRect(parentRect.x(), parentRect.y(), i);
+    // The cast to HTMLElement below is safe because the only other possible
+    // listItem type
+    // would be a WMLElement, but WML builds don't use accessbility features at
+    // all.
     if (rect.contains(point))
-      return listBoxOptionAccessibilityObject(listItems[i]);
+      return listBoxOptionAccessibilityObject(
+          static_cast<HTMLElement*>(listItems[i]));
   }
 
   return axObjectCache()->getOrCreate(m_renderer);

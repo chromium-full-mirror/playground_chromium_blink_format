@@ -117,7 +117,7 @@ const AtomicString& HTMLSelectElement::formControlType() const {
 int HTMLSelectElement::selectedIndex() const {
   // return the number of the first option selected
   unsigned index = 0;
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   for (unsigned int i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag)) {
       if (static_cast<HTMLOptionElement*>(items[i])->selected())
@@ -132,7 +132,7 @@ int HTMLSelectElement::lastSelectedListIndex() const {
   // return the number of the last option selected
   unsigned index = 0;
   bool found = false;
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   for (unsigned int i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag)) {
       if (static_cast<HTMLOptionElement*>(items[i])->selected()) {
@@ -145,7 +145,7 @@ int HTMLSelectElement::lastSelectedListIndex() const {
 }
 
 void HTMLSelectElement::deselectItems(HTMLOptionElement* excludeElement) {
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   unsigned i;
   for (i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag) && (items[i] != excludeElement)) {
@@ -158,7 +158,7 @@ void HTMLSelectElement::deselectItems(HTMLOptionElement* excludeElement) {
 void HTMLSelectElement::setSelectedIndex(int optionIndex,
                                          bool deselect,
                                          bool fireOnChange) {
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   int listIndex = optionToListIndex(optionIndex);
   HTMLOptionElement* element = 0;
   if (!multiple())
@@ -203,7 +203,7 @@ int HTMLSelectElement::activeSelectionEndListIndex() const {
 
 unsigned HTMLSelectElement::length() const {
   unsigned len = 0;
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   for (unsigned i = 0; i < items.size(); ++i) {
     if (items[i]->hasLocalName(optionTag))
       ++len;
@@ -229,7 +229,7 @@ void HTMLSelectElement::remove(int index) {
   ExceptionCode ec = 0;
   int listIndex = optionToListIndex(index);
 
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   if (listIndex < 0 || index >= int(items.size()))
     return;  // ### what should we do ? remove the last item?
 
@@ -240,7 +240,7 @@ void HTMLSelectElement::remove(int index) {
 
 String HTMLSelectElement::value() {
   unsigned i;
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   for (i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag) &&
         static_cast<HTMLOptionElement*>(items[i])->selected())
@@ -254,7 +254,7 @@ void HTMLSelectElement::setValue(const String& value) {
     return;
   // find the option with value() matching the given parameter
   // and make it the current selection.
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   unsigned optionIndex = 0;
   for (unsigned i = 0; i < items.size(); i++)
     if (items[i]->hasLocalName(optionTag)) {
@@ -267,11 +267,11 @@ void HTMLSelectElement::setValue(const String& value) {
 }
 
 bool HTMLSelectElement::saveFormControlState(String& value) const {
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   int l = items.size();
   Vector<char, 1024> characters(l);
   for (int i = 0; i < l; ++i) {
-    HTMLElement* e = items[i];
+    Element* e = items[i];
     bool selected = e->hasLocalName(optionTag) &&
                     static_cast<HTMLOptionElement*>(e)->selected();
     characters[i] = selected ? 'X' : '.';
@@ -283,7 +283,7 @@ bool HTMLSelectElement::saveFormControlState(String& value) const {
 void HTMLSelectElement::restoreFormControlState(const String& state) {
   recalcListItems();
 
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   int l = items.size();
   for (int i = 0; i < l; i++)
     if (items[i]->hasLocalName(optionTag))
@@ -361,7 +361,7 @@ void HTMLSelectElement::selectAll() {
     return;
 
   // Save the selection so it can be compared to the new selectAll selection
-  // when we call onChange
+  // when dispatching change events
   saveLastSelection();
 
   m_activeSelectionState = true;
@@ -384,7 +384,7 @@ bool HTMLSelectElement::appendFormData(FormDataList& list, bool) {
     return false;
 
   bool successful = false;
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
 
   unsigned i;
   for (i = 0; i < items.size(); i++) {
@@ -415,7 +415,7 @@ bool HTMLSelectElement::appendFormData(FormDataList& list, bool) {
 }
 
 int HTMLSelectElement::optionToListIndex(int optionIndex) const {
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   int listSize = (int)items.size();
   if (optionIndex < 0 || optionIndex >= listSize)
     return -1;
@@ -432,7 +432,7 @@ int HTMLSelectElement::optionToListIndex(int optionIndex) const {
 }
 
 int HTMLSelectElement::listToOptionIndex(int listIndex) const {
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   if (listIndex < 0 || listIndex >= int(items.size()) ||
       !items[listIndex]->hasLocalName(optionTag))
     return -1;
@@ -525,7 +525,7 @@ void HTMLSelectElement::setRecalcListItems() {
 void HTMLSelectElement::reset() {
   bool optionSelected = false;
   HTMLOptionElement* firstOption = 0;
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   unsigned i;
   for (i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag)) {
@@ -547,15 +547,16 @@ void HTMLSelectElement::reset() {
 
 void HTMLSelectElement::dispatchFocusEvent() {
   if (usesMenuList())
-    // Save the selection so it can be compared to the new selection when we
-    // call onChange during dispatchBlurEvent.
+    // Save the selection so it can be compared to the new selection when
+    // dispatching change events during blur event dispatchal
     saveLastSelection();
   HTMLFormControlElementWithState::dispatchFocusEvent();
 }
 
 void HTMLSelectElement::dispatchBlurEvent() {
-  // We only need to fire onChange here for menu lists, because we fire onChange
-  // for list boxes whenever the selection change is actually made.
+  // We only need to fire change events here for menu lists, because we fire
+  // change events for list boxes whenever the selection change is actually
+  // made.
   // This matches other browsers' behavior.
   if (usesMenuList())
     menuListOnChange();
@@ -598,8 +599,8 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
 #if ARROW_KEYS_POP_MENU
     if (keyIdentifier == "Down" || keyIdentifier == "Up") {
       focus();
-      // Save the selection so it can be compared to the new selection when we
-      // call onChange during setSelectedIndex,
+      // Save the selection so it can be compared to the new selection when
+      // dispatching change events during setSelectedIndex,
       // which gets called from RenderMenuList::valueChanged, which gets called
       // after the user makes a selection from the menu.
       saveLastSelection();
@@ -647,8 +648,8 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
 #if ARROW_KEYS_POP_MENU
     if (keyCode == ' ') {
       focus();
-      // Save the selection so it can be compared to the new selection when we
-      // call onChange during setSelectedIndex,
+      // Save the selection so it can be compared to the new selection when
+      // dispatching change events during setSelectedIndex,
       // which gets called from RenderMenuList::valueChanged, which gets called
       // after the user makes a selection from the menu.
       saveLastSelection();
@@ -706,8 +707,8 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
     int listIndex = static_cast<RenderListBox*>(renderer())
                         ->listIndexAtOffset(localOffset.x(), localOffset.y());
     if (listIndex >= 0) {
-      // Save the selection so it can be compared to the new selection when we
-      // call onChange during mouseup, or after autoscroll finishes.
+      // Save the selection so it can be compared to the new selection when
+      // dispatching change events during mouseup, or after autoscroll finishes.
       saveLastSelection();
 
       m_activeSelectionState = true;
@@ -723,7 +724,7 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
       bool multiSelect =
           multiple() && multiSelectKeyPressed && !mouseEvent->shiftKey();
 
-      HTMLElement* clickedElement = listItems()[listIndex];
+      Element* clickedElement = listItems()[listIndex];
       HTMLOptionElement* option = 0;
       if (clickedElement->hasLocalName(optionTag)) {
         option = static_cast<HTMLOptionElement*>(clickedElement);
@@ -773,8 +774,9 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
              static_cast<MouseEvent*>(evt)->button() == LeftButton &&
              document()->frame()->eventHandler()->autoscrollRenderer() !=
                  renderer())
-    // This makes sure we fire onChange for a single click.  For drag selection,
-    // onChange will fire when the autoscroll timer stops.
+    // This makes sure we fire dispatchFormControlChangeEvent for a single
+    // click.  For drag selection, onChange will fire when the autoscroll timer
+    // stops.
     listBoxOnChange();
   else if (evt->type() == eventNames().keydownEvent) {
     if (!evt->isKeyboardEvent())
@@ -798,8 +800,8 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
     }
 
     if (keyIdentifier == "Down" || keyIdentifier == "Up") {
-      // Save the selection so it can be compared to the new selection when we
-      // call onChange immediately after making the new selection.
+      // Save the selection so it can be compared to the new selection when
+      // dispatching change events immediately after making the new selection.
       saveLastSelection();
 
       ASSERT(endIndex >= 0 && (unsigned)endIndex < listItems().size());
@@ -841,7 +843,7 @@ void HTMLSelectElement::setActiveSelectionAnchorIndex(int index) {
 
   // Cache the selection state so we can restore the old selection as the new
   // selection pivots around this anchor index
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   m_cachedStateForActiveSelection.clear();
   for (unsigned i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag)) {
@@ -861,7 +863,7 @@ void HTMLSelectElement::updateListBoxSelection(bool deselectOtherOptions) {
   start = min(m_activeSelectionAnchorIndex, m_activeSelectionEndIndex);
   end = max(m_activeSelectionAnchorIndex, m_activeSelectionEndIndex);
 
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   for (unsigned i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag)) {
       HTMLOptionElement* option = static_cast<HTMLOptionElement*>(items[i]);
@@ -885,24 +887,24 @@ void HTMLSelectElement::menuListOnChange() {
   int selected = selectedIndex();
   if (m_lastOnChangeIndex != selected) {
     m_lastOnChangeIndex = selected;
-    onChange();
+    dispatchFormControlChangeEvent();
   }
 }
 
 void HTMLSelectElement::listBoxOnChange() {
   ASSERT(!usesMenuList());
 
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
 
   // If the cached selection list is empty, or the size has changed, then fire
-  // onChange, and return early.
+  // dispatchFormControlChangeEvent, and return early.
   if (m_lastOnChangeSelection.isEmpty() ||
       m_lastOnChangeSelection.size() != items.size()) {
-    onChange();
+    dispatchFormControlChangeEvent();
     return;
   }
 
-  // Update m_lastOnChangeSelection and fire onChange
+  // Update m_lastOnChangeSelection and fire dispatchFormControlChangeEvent
   bool fireOnChange = false;
   for (unsigned i = 0; i < items.size(); i++) {
     bool selected = false;
@@ -913,11 +915,11 @@ void HTMLSelectElement::listBoxOnChange() {
     m_lastOnChangeSelection[i] = selected;
   }
   if (fireOnChange)
-    onChange();
+    dispatchFormControlChangeEvent();
 }
 
 void HTMLSelectElement::saveLastSelection() {
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
 
   if (usesMenuList()) {
     m_lastOnChangeIndex = selectedIndex();
@@ -975,7 +977,7 @@ void HTMLSelectElement::typeAheadFind(KeyboardEvent* event) {
     }
   }
 
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   int itemCount = items.size();
   if (itemCount < 1)
     return;
@@ -1002,7 +1004,7 @@ void HTMLSelectElement::typeAheadFind(KeyboardEvent* event) {
 }
 
 int HTMLSelectElement::nextSelectableListIndex(int startIndex) {
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   int index = startIndex + 1;
   while (index >= 0 && (unsigned)index < items.size() &&
          (!items[index]->hasLocalName(optionTag) || items[index]->disabled()))
@@ -1013,7 +1015,7 @@ int HTMLSelectElement::nextSelectableListIndex(int startIndex) {
 }
 
 int HTMLSelectElement::previousSelectableListIndex(int startIndex) {
-  const Vector<HTMLElement*>& items = listItems();
+  const Vector<Element*>& items = listItems();
   if (startIndex == -1)
     startIndex = items.size();
   int index = startIndex - 1;
@@ -1105,7 +1107,7 @@ void HTMLSelectElement::setLength(unsigned newLen, ExceptionCode& ec) {
         break;
     } while (++diff);
   } else {
-    const Vector<HTMLElement*>& items = listItems();
+    const Vector<Element*>& items = listItems();
 
     size_t optionIndex = 0;
     for (size_t listIndex = 0; listIndex < items.size(); listIndex++) {
@@ -1136,7 +1138,7 @@ void HTMLSelectElement::insertedIntoTree(bool deep) {
 #ifndef NDEBUG
 
 void HTMLSelectElement::checkListItems() const {
-  Vector<HTMLElement*> items = m_listItems;
+  Vector<Element*> items = m_listItems;
   recalcListItems(false);
   ASSERT(items == m_listItems);
 }

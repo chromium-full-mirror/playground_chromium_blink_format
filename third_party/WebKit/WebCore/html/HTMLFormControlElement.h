@@ -60,7 +60,7 @@ class HTMLFormControlElement : public HTMLElement {
     m_valueMatchesRenderer = b;
   }
 
-  void onChange();
+  virtual void dispatchFormControlChangeEvent();
 
   bool disabled() const;
   void setDisabled(bool);

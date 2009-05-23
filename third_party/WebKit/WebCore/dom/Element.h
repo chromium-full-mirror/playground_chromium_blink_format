@@ -146,9 +146,6 @@ class Element : public ContainerNode {
   PassRefPtr<Element> cloneElementWithoutChildren();
 
   void normalizeAttributes();
-
-  virtual bool isFormControlElement() const { return false; }
-
   String nodeNamePreservingCase() const;
 
   // convenience methods which ignore exceptions
@@ -227,6 +224,7 @@ class Element : public ContainerNode {
   unsigned childElementCount() const;
 
   // FormControlElement API
+  virtual bool isFormControlElement() const { return false; }
   virtual bool isEnabledFormControl() const { return true; }
   virtual bool isReadOnlyFormControl() const { return false; }
   virtual bool isTextFormControl() const { return false; }
@@ -239,6 +237,8 @@ class Element : public ContainerNode {
 
   virtual bool saveFormControlState(String&) const { return false; }
   virtual void restoreFormControlState(const String&) {}
+
+  virtual void dispatchFormControlChangeEvent() {}
 
  private:
   virtual void createAttributeMap() const;
