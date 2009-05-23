@@ -168,7 +168,7 @@ void Image::drawPattern(GraphicsContext* context,
   std::auto_ptr<ImageBuffer> imageSurface =
       ImageBuffer::create(imageSize.size(), false);
 
-  if (!imageSurface)
+  if (!imageSurface.get())
     return;
 
   if (tileRect.size() != size()) {
