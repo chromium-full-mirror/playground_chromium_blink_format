@@ -185,7 +185,7 @@ void AnimationControllerPrivate::updateStyleIfNeededDispatcherFired(
   }
 }
 
-void AnimationControllerPrivate::startupdateStyleIfNeededDispatcher() {
+void AnimationControllerPrivate::startUpdateStyleIfNeededDispatcher() {
   if (!m_updateStyleIfNeededDispatcher.isActive())
     m_updateStyleIfNeededDispatcher.startOneShot(0);
 }
@@ -202,7 +202,7 @@ void AnimationControllerPrivate::addEventToDispatch(
   event.name = name;
   event.elapsedTime = elapsedTime;
 
-  startupdateStyleIfNeededDispatcher();
+  startUpdateStyleIfNeededDispatcher();
 }
 
 void AnimationControllerPrivate::addNodeChangeToDispatch(
@@ -212,7 +212,7 @@ void AnimationControllerPrivate::addNodeChangeToDispatch(
     return;
 
   m_nodeChangesToDispatch.append(node);
-  startupdateStyleIfNeededDispatcher();
+  startUpdateStyleIfNeededDispatcher();
 }
 
 void AnimationControllerPrivate::animationTimerFired(
@@ -286,7 +286,7 @@ bool AnimationControllerPrivate::pauseAnimationAtTime(RenderObject* renderer,
 
   if (compAnim->pauseAnimationAtTime(name, t)) {
     renderer->node()->setNeedsStyleRecalc(AnimationStyleChange);
-    startupdateStyleIfNeededDispatcher();
+    startUpdateStyleIfNeededDispatcher();
     return true;
   }
 
@@ -305,7 +305,7 @@ bool AnimationControllerPrivate::pauseTransitionAtTime(RenderObject* renderer,
 
   if (compAnim->pauseTransitionAtTime(cssPropertyID(property), t)) {
     renderer->node()->setNeedsStyleRecalc(AnimationStyleChange);
-    startupdateStyleIfNeededDispatcher();
+    startUpdateStyleIfNeededDispatcher();
     return true;
   }
 
