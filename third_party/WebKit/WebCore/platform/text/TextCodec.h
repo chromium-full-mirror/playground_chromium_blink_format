@@ -29,6 +29,7 @@
 
 #include <memory>
 #include <wtf/Noncopyable.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/Vector.h>
 #include <wtf/unicode/Unicode.h>
 
@@ -81,7 +82,7 @@ class TextCodec : Noncopyable {
 
 typedef void (*EncodingNameRegistrar)(const char* alias, const char* name);
 
-typedef std::auto_ptr<TextCodec> (
+typedef PassOwnPtr<TextCodec> (
     *NewTextCodecFunction)(const TextEncoding&, const void* additionalData);
 typedef void (*TextCodecRegistrar)(const char* name,
                                    NewTextCodecFunction,

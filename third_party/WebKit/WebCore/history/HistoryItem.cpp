@@ -446,8 +446,8 @@ Vector<String>* HistoryItem::redirectURLs() const {
   return m_redirectURLs.get();
 }
 
-void HistoryItem::setRedirectURLs(std::auto_ptr<Vector<String>> redirectURLs) {
-  m_redirectURLs.adopt(redirectURLs);
+void HistoryItem::setRedirectURLs(PassOwnPtr<Vector<String>> redirectURLs) {
+  m_redirectURLs = redirectURLs;
 }
 
 #ifndef NDEBUG

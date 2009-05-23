@@ -57,7 +57,7 @@ void GeneratedImage::drawPattern(GraphicsContext* context,
                                  CompositeOperator compositeOp,
                                  const FloatRect& destRect) {
   // Create a BitmapImage and call drawPattern on it.
-  auto_ptr<ImageBuffer> imageBuffer = ImageBuffer::create(m_size, false);
+  OwnPtr<ImageBuffer> imageBuffer = ImageBuffer::create(m_size, false);
   ASSERT(imageBuffer.get());
 
   // Fill with the gradient.

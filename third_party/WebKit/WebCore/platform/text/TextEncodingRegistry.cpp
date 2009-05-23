@@ -205,7 +205,7 @@ static void extendTextCodecMaps() {
 #endif
 }
 
-std::auto_ptr<TextCodec> newTextCodec(const TextEncoding& encoding) {
+PassOwnPtr<TextCodec> newTextCodec(const TextEncoding& encoding) {
   MutexLocker lock(encodingRegistryMutex());
 
   ASSERT(textCodecMap);

@@ -30,8 +30,7 @@
 #include "PlatformString.h"
 #include "StringBuffer.h"
 #include <stdio.h>
-
-using std::auto_ptr;
+#include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
 
@@ -40,10 +39,10 @@ void TextCodecUserDefined::registerEncodingNames(
   registrar("x-user-defined", "x-user-defined");
 }
 
-static auto_ptr<TextCodec> newStreamingTextDecoderUserDefined(
+static PassOwnPtr<TextCodec> newStreamingTextDecoderUserDefined(
     const TextEncoding&,
     const void*) {
-  return auto_ptr<TextCodec>(new TextCodecUserDefined);
+  return new TextCodecUserDefined;
 }
 
 void TextCodecUserDefined::registerCodecs(TextCodecRegistrar registrar) {

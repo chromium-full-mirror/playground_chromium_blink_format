@@ -60,6 +60,7 @@
 
 #include <wtf/ByteArray.h>
 #include <wtf/MathExtras.h>
+#include <wtf/OwnPtr.h>
 
 using namespace std;
 
@@ -1523,8 +1524,7 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
     // FIXME: The rect is not big enough for miters on stroked text.
     IntRect maskRect = enclosingIntRect(textRect);
 
-    auto_ptr<ImageBuffer> maskImage =
-        ImageBuffer::create(maskRect.size(), false);
+    OwnPtr<ImageBuffer> maskImage = ImageBuffer::create(maskRect.size(), false);
 
     GraphicsContext* maskImageContext = maskImage->context();
 

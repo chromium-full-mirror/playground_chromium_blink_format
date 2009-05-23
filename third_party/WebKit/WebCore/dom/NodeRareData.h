@@ -28,6 +28,7 @@
 #include "StringHash.h"
 #include "QualifiedName.h"
 #include <wtf/HashSet.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/OwnPtr.h>
 
 namespace WebCore {
@@ -45,6 +46,10 @@ struct NodeListsNodeData {
   typedef HashMap<QualifiedName, DynamicNodeList::Caches*> TagCacheMap;
   TagCacheMap m_tagNodeListCaches;
 
+  static PassOwnPtr<NodeListsNodeData> create() {
+    return new NodeListsNodeData;
+  }
+
   ~NodeListsNodeData() {
     deleteAllValues(m_classNodeListCaches);
     deleteAllValues(m_nameNodeListCaches);
@@ -54,6 +59,9 @@ struct NodeListsNodeData {
   void invalidateCaches();
   void invalidateCachesThatDependOnAttributes();
   bool isEmpty() const;
+
+ private:
+  NodeListsNodeData() {}
 };
 
 class NodeRareData {
@@ -76,8 +84,8 @@ class NodeRareData {
   }
 
   void clearNodeLists() { m_nodeLists.clear(); }
-  void setNodeLists(std::auto_ptr<NodeListsNodeData> lists) {
-    m_nodeLists.set(lists.release());
+  void setNodeLists(PassOwnPtr<NodeListsNodeData> lists) {
+    m_nodeLists = lists;
   }
   NodeListsNodeData* nodeLists() const { return m_nodeLists.get(); }
 

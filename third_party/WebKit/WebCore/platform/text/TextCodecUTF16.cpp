@@ -29,8 +29,7 @@
 #include "CString.h"
 #include "PlatformString.h"
 #include "StringBuffer.h"
-
-using std::auto_ptr;
+#include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
 
@@ -48,14 +47,14 @@ void TextCodecUTF16::registerEncodingNames(EncodingNameRegistrar registrar) {
   registrar("unicodeFFFE", "UTF-16BE");
 }
 
-static auto_ptr<TextCodec> newStreamingTextDecoderUTF16LE(const TextEncoding&,
-                                                          const void*) {
-  return auto_ptr<TextCodec>(new TextCodecUTF16(true));
+static PassOwnPtr<TextCodec> newStreamingTextDecoderUTF16LE(const TextEncoding&,
+                                                            const void*) {
+  return new TextCodecUTF16(true);
 }
 
-static auto_ptr<TextCodec> newStreamingTextDecoderUTF16BE(const TextEncoding&,
-                                                          const void*) {
-  return auto_ptr<TextCodec>(new TextCodecUTF16(false));
+static PassOwnPtr<TextCodec> newStreamingTextDecoderUTF16BE(const TextEncoding&,
+                                                            const void*) {
+  return new TextCodecUTF16(false);
 }
 
 void TextCodecUTF16::registerCodecs(TextCodecRegistrar registrar) {
