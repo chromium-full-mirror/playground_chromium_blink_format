@@ -26,8 +26,6 @@
 #include "config.h"
 #include "Geolocation.h"
 
-#if ENABLE(GEOLOCATION)
-
 #include "Chrome.h"
 #include "Document.h"
 #include "Frame.h"
@@ -295,5 +293,3 @@ void Geolocation::geolocationServiceErrorOccurred(GeolocationService* service) {
 }
 
 }  // namespace WebCore
-
-#endif  // ENABLE(GEOLOCATION)
