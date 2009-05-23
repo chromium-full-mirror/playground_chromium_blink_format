@@ -231,7 +231,8 @@ static void resetWebViewToConsistentStateBeforeTesting() {
   WebKitWebSettings* settings = webkit_web_view_get_settings(webView);
   g_object_set(G_OBJECT(settings), "enable-private-browsing", FALSE,
                "enable-developer-extras", FALSE, "enable-spell-checking", TRUE,
-               NULL);
+               "enable-html5-database", TRUE, "enable-html5-local-storage",
+               TRUE, NULL);
 
   WebKitWebInspector* inspector = webkit_web_view_get_inspector(webView);
   g_object_set(G_OBJECT(inspector), "javascript-profiling-enabled", FALSE,
