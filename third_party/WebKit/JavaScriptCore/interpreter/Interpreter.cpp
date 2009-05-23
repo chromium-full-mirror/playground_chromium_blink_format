@@ -91,6 +91,7 @@ static int depth(CodeBlock* codeBlock, ScopeChain& sc) {
   return sc.localDepth();
 }
 
+#if USE(INTERPRETER)
 NEVER_INLINE bool Interpreter::resolve(CallFrame* callFrame,
                                        Instruction* vPC,
                                        JSValue& exceptionValue) {
@@ -297,6 +298,8 @@ NEVER_INLINE bool Interpreter::resolveBaseAndFunc(CallFrame* callFrame,
   return false;
 }
 
+#endif  // USE(INTERPRETER)
+
 ALWAYS_INLINE CallFrame* Interpreter::slideRegisterWindowForCall(
     CodeBlock* newCodeBlock,
     RegisterFile* registerFile,
@@ -342,6 +345,7 @@ ALWAYS_INLINE CallFrame* Interpreter::slideRegisterWindowForCall(
   return CallFrame::create(r);
 }
 
+#if USE(INTERPRETER)
 static NEVER_INLINE bool isInvalidParamForIn(CallFrame* callFrame,
                                              CodeBlock* codeBlock,
                                              const Instruction* vPC,
@@ -368,6 +372,7 @@ static NEVER_INLINE bool isInvalidParamForInstanceOf(CallFrame* callFrame,
       codeBlock);
   return true;
 }
+#endif
 
 NEVER_INLINE JSValue Interpreter::callEval(CallFrame* callFrame,
                                            RegisterFile* registerFile,
@@ -1096,6 +1101,7 @@ NEVER_INLINE void Interpreter::debug(CallFrame* callFrame,
   }
 }
 
+#if USE(INTERPRETER)
 NEVER_INLINE ScopeChainNode* Interpreter::createExceptionScope(
     CallFrame* callFrame,
     const Instruction* vPC) {
@@ -1289,6 +1295,8 @@ NEVER_INLINE void Interpreter::uncacheGetByID(CodeBlock* codeBlock,
   vPC[4] = 0;
 }
 
+#endif  // USE(INTERPRETER)
+
 JSValue Interpreter::privateExecute(ExecutionFlag flag,
                                     RegisterFile* registerFile,
                                     CallFrame* callFrame,
@@ -1313,6 +1321,12 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
   // Currently with CTI enabled we never interpret functions
   ASSERT_NOT_REACHED();
 #endif
+#if !USE(INTERPRETER)
+  UNUSED_PARAM(registerFile);
+  UNUSED_PARAM(callFrame);
+  UNUSED_PARAM(exception);
+  return JSValue();
+#else
 
   JSGlobalData* globalData = &callFrame->globalData();
   JSValue exceptionValue;
@@ -4258,6 +4272,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 #if !HAVE(COMPUTED_GOTO)
 }  // iterator loop ends
 #endif
+#endif  // USE(INTERPRETER)
 #undef NEXT_INSTRUCTION
 #undef DEFINE_OPCODE
 #undef CHECK_FOR_EXCEPTION

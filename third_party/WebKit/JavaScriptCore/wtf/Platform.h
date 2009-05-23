@@ -337,10 +337,6 @@
 #endif
 #endif /* !defined(HAVE_ACCESSIBILITY) */
 
-#if COMPILER(GCC)
-#define HAVE_COMPUTED_GOTO 1
-#endif
-
 #if PLATFORM(DARWIN)
 
 #define HAVE_ERRNO_H 1
@@ -510,6 +506,16 @@
 #else
 #define JSC_HOST_CALL
 #endif
+#endif
+
+#if COMPILER(GCC) && !ENABLE(JIT)
+#define HAVE_COMPUTED_GOTO 1
+#endif
+
+#if ENABLE(JIT) && (defined(NDEBUG) || defined(COVERAGE))
+#define WTF_USE_INTERPRETER 0
+#else
+#define WTF_USE_INTERPRETER 1
 #endif
 
 /* Yet Another Regex Runtime. */

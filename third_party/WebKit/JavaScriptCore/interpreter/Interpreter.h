@@ -155,7 +155,7 @@ class Interpreter {
                   JSValue* exception);
 
   NEVER_INLINE void debug(CallFrame*, DebugHookID, int firstLine, int lastLine);
-
+#if USE(INTERPRETER)
   NEVER_INLINE bool resolve(CallFrame*, Instruction*, JSValue& exceptionValue);
   NEVER_INLINE bool resolveSkip(CallFrame*,
                                 Instruction*,
@@ -167,8 +167,26 @@ class Interpreter {
   NEVER_INLINE bool resolveBaseAndProperty(CallFrame*,
                                            Instruction*,
                                            JSValue& exceptionValue);
+  NEVER_INLINE bool resolveBaseAndFunc(CallFrame*,
+                                       Instruction*,
+                                       JSValue& exceptionValue);
   NEVER_INLINE ScopeChainNode* createExceptionScope(CallFrame*,
                                                     const Instruction* vPC);
+
+  void tryCacheGetByID(CallFrame*,
+                       CodeBlock*,
+                       Instruction*,
+                       JSValue baseValue,
+                       const Identifier& propertyName,
+                       const PropertySlot&);
+  void uncacheGetByID(CodeBlock*, Instruction* vPC);
+  void tryCachePutByID(CallFrame*,
+                       CodeBlock*,
+                       Instruction*,
+                       JSValue baseValue,
+                       const PutPropertySlot&);
+  void uncachePutByID(CodeBlock*, Instruction* vPC);
+#endif
 
   NEVER_INLINE bool unwindCallFrame(CallFrame*&,
                                     JSValue,
@@ -178,9 +196,6 @@ class Interpreter {
                                            JSValue&,
                                            unsigned bytecodeOffset,
                                            bool);
-  NEVER_INLINE bool resolveBaseAndFunc(CallFrame*,
-                                       Instruction*,
-                                       JSValue& exceptionValue);
 
   static ALWAYS_INLINE CallFrame* slideRegisterWindowForCall(
       CodeBlock*,
@@ -198,20 +213,6 @@ class Interpreter {
 
   void dumpCallFrame(CallFrame*);
   void dumpRegisters(CallFrame*);
-
-  void tryCacheGetByID(CallFrame*,
-                       CodeBlock*,
-                       Instruction*,
-                       JSValue baseValue,
-                       const Identifier& propertyName,
-                       const PropertySlot&);
-  void uncacheGetByID(CodeBlock*, Instruction* vPC);
-  void tryCachePutByID(CallFrame*,
-                       CodeBlock*,
-                       Instruction*,
-                       JSValue baseValue,
-                       const PutPropertySlot&);
-  void uncachePutByID(CodeBlock*, Instruction* vPC);
 
   bool isCallBytecode(Opcode opcode) {
     return opcode == getOpcode(op_call) || opcode == getOpcode(op_construct) ||
