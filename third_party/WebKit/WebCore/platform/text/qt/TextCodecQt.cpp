@@ -61,9 +61,9 @@ void TextCodecQt::registerEncodingNames(EncodingNameRegistrar registrar) {
   }
 }
 
-static std::auto_ptr<TextCodec> newTextCodecQt(const TextEncoding& encoding,
-                                               const void*) {
-  return std::auto_ptr<TextCodec>(new TextCodecQt(encoding));
+static PassOwnPtr<TextCodec> newTextCodecQt(const TextEncoding& encoding,
+                                            const void*) {
+  return new TextCodecQt(encoding);
 }
 
 void TextCodecQt::registerCodecs(TextCodecRegistrar registrar) {
