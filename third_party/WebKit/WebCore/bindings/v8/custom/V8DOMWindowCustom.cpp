@@ -35,6 +35,7 @@
 #include "V8CustomBinding.h"
 #include "V8CustomEventListener.h"
 #include "V8Proxy.h"
+#include "V8Utilities.h"
 
 #include "Base64.h"
 #include "ExceptionCode.h"
@@ -816,28 +817,19 @@ NAMED_PROPERTY_GETTER(DOMWindow) {
   return notHandledByInterceptor();
 }
 
-void V8Custom::WindowSetLocation(DOMWindow* window, const String& v) {
-  if (!window->frame())
+void V8Custom::WindowSetLocation(DOMWindow* window, const String& relativeURL) {
+  Frame* frame = window->frame();
+  if (!frame)
     return;
 
-  Frame* activeFrame = V8Proxy::retrieveFrameForEnteredContext();
-  if (!activeFrame)
+  if (!shouldAllowNavigation(frame))
     return;
 
-  if (!activeFrame->loader()->shouldAllowNavigation(window->frame()))
+  KURL url = completeURL(relativeURL);
+  if (url.isNull())
     return;
 
-  if (!parseURL(v).startsWith("javascript:", false) ||
-      ScriptController::isSafeScript(window->frame())) {
-    String completedUrl = activeFrame->loader()->completeURL(v).string();
-
-    // FIXME: The JSC bindings pass !anyPageIsProcessingUserGesture() for
-    // the lockHistory parameter.  We should probably do something similar.
-
-    window->frame()->loader()->scheduleLocationChange(
-        completedUrl, activeFrame->loader()->outgoingReferrer(), false, false,
-        activeFrame->script()->processingUserGesture());
-  }
+  navigateIfAllowed(frame, url, false, false);
 }
 
 CALLBACK_FUNC_DECL(DOMWindowSetTimeout) {

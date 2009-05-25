@@ -35,6 +35,10 @@
 
 namespace WebCore {
 
+class Frame;
+class KURL;
+class String;
+
 // Use an array to hold dependents. It works like a ref-counted scheme.
 // A value can be added more than once to the DOM object.
 void createHiddenDependency(v8::Local<v8::Object>,
@@ -43,6 +47,14 @@ void createHiddenDependency(v8::Local<v8::Object>,
 void removeHiddenDependency(v8::Local<v8::Object>,
                             v8::Local<v8::Value>,
                             int cacheIndex);
+
+bool processingUserGesture();
+bool shouldAllowNavigation(Frame* frame);
+KURL completeURL(const String& relativeURL);
+void navigateIfAllowed(Frame* frame,
+                       const KURL& url,
+                       bool lockHistory,
+                       bool lockBackForwardList);
 
 }  // namespace WebCore
 
