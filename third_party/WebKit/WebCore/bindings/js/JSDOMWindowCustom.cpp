@@ -526,7 +526,7 @@ JSValue JSDOMWindow::showModalDialog(ExecState* exec, const ArgList& args) {
 JSValue JSDOMWindow::postMessage(ExecState* exec, const ArgList& args) {
   DOMWindow* window = impl();
 
-  DOMWindow* source = asJSDOMWindow(exec->dynamicGlobalObject())->impl();
+  DOMWindow* source = asJSDOMWindow(exec->lexicalGlobalObject())->impl();
   String message = args.at(0).toString(exec);
 
   if (exec->hadException())
