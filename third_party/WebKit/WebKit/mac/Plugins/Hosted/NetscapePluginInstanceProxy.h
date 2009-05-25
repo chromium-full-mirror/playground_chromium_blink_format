@@ -123,7 +123,8 @@ class NetscapePluginInstanceProxy
   bool evaluate(uint32_t objectID,
                 const WebCore::String& script,
                 data_t& resultData,
-                mach_msg_type_number_t& resultLength);
+                mach_msg_type_number_t& resultLength,
+                bool allowPopups);
   bool invoke(uint32_t objectID,
               const JSC::Identifier& methodName,
               data_t argumentsData,

@@ -48,7 +48,8 @@ ScriptController::ScriptController(Frame* frame)
       m_handlerLineNumber(0),
       m_sourceURL(0),
       m_processingTimerCallback(false),
-      m_paused(false)
+      m_paused(false),
+      m_allowPopupsFromPlugin(false)
 #if ENABLE(NETSCAPE_PLUGIN_API)
       ,
       m_windowScriptNPObject(0)
@@ -160,7 +161,8 @@ void ScriptController::initScript() {
 }
 
 bool ScriptController::processingUserGesture() const {
-  return processingUserGestureEvent() || isJavaScriptAnchorNavigation();
+  return m_allowPopupsFromPlugin || processingUserGestureEvent() ||
+         isJavaScriptAnchorNavigation();
 }
 
 bool ScriptController::processingUserGestureEvent() const {

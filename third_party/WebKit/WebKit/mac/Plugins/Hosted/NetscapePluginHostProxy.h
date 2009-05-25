@@ -53,7 +53,9 @@ class NetscapePluginHostProxy {
 
   NetscapePluginInstanceProxy* pluginInstance(uint32_t pluginID);
 
+  bool isMenuBarVisible() const { return m_menuBarIsVisible; }
   void setMenuBarVisible(bool);
+
   void setModal(bool);
 
   void applicationDidBecomeActive();

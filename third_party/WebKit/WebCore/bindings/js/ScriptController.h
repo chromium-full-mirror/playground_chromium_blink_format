@@ -94,6 +94,11 @@ class ScriptController {
   void setPaused(bool b) { m_paused = b; }
   bool isPaused() const { return m_paused; }
 
+  void setAllowPopupsFromPlugin(bool allowPopupsFromPlugin) {
+    m_allowPopupsFromPlugin = allowPopupsFromPlugin;
+  }
+  bool allowPopupsFromPlugin() const { return m_allowPopupsFromPlugin; }
+
   const String* sourceURL() const {
     return m_sourceURL;
   }  // 0 if we are not evaluating any script
@@ -150,6 +155,7 @@ class ScriptController {
 
   bool m_processingTimerCallback;
   bool m_paused;
+  bool m_allowPopupsFromPlugin;
 
   // The root object used for objects bound outside the context of a plugin.
   RefPtr<JSC::Bindings::RootObject> m_bindingRootObject;
