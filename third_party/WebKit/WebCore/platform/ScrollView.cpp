@@ -350,11 +350,22 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
     bool sendContentResizedNotification = false;
 
     IntSize docSize = contentsSize();
+    IntSize frameSize = frameRect().size();
 
-    if (hScroll == ScrollbarAuto)
+    if (hScroll == ScrollbarAuto) {
       newHasHorizontalScrollbar = docSize.width() > visibleWidth();
-    if (vScroll == ScrollbarAuto)
+      if (newHasHorizontalScrollbar && !m_updateScrollbarsPass &&
+          docSize.width() <= frameSize.width() &&
+          docSize.height() <= frameSize.height())
+        newHasHorizontalScrollbar = false;
+    }
+    if (vScroll == ScrollbarAuto) {
       newHasVerticalScrollbar = docSize.height() > visibleHeight();
+      if (newHasVerticalScrollbar && !m_updateScrollbarsPass &&
+          docSize.width() <= frameSize.width() &&
+          docSize.height() <= frameSize.height())
+        newHasVerticalScrollbar = false;
+    }
 
     // If we ever turn one scrollbar off, always turn the other one off too.
     // Never ever
