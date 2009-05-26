@@ -27,43 +27,63 @@
  */
 
 #include "config.h"
-#include "AccessibilityAriaGridRow.h"
+#include "AccessibilityARIAGridCell.h"
 
 #include "AccessibilityObject.h"
-#include "RenderObject.h"
+#include "AccessibilityTableRow.h"
 
 using namespace std;
 
 namespace WebCore {
 
-AccessibilityAriaGridRow::AccessibilityAriaGridRow(RenderObject* renderer)
-    : AccessibilityTableRow(renderer) {}
+AccessibilityARIAGridCell::AccessibilityARIAGridCell(RenderObject* renderer)
+    : AccessibilityTableCell(renderer) {}
 
-AccessibilityAriaGridRow::~AccessibilityAriaGridRow() {}
+AccessibilityARIAGridCell::~AccessibilityARIAGridCell() {}
 
-PassRefPtr<AccessibilityAriaGridRow> AccessibilityAriaGridRow::create(
+PassRefPtr<AccessibilityARIAGridCell> AccessibilityARIAGridCell::create(
     RenderObject* renderer) {
-  return adoptRef(new AccessibilityAriaGridRow(renderer));
+  return adoptRef(new AccessibilityARIAGridCell(renderer));
 }
 
-AccessibilityObject* AccessibilityAriaGridRow::parentTable() const {
+AccessibilityObject* AccessibilityARIAGridCell::parentTable() const {
   AccessibilityObject* parent = parentObjectUnignored();
-  if (!parent->isDataTable())
+  if (!parent || !parent->isTableRow())
+    return 0;
+
+  parent = parent->parentObjectUnignored();
+  if (!parent || !parent->isDataTable())
     return 0;
 
   return parent;
 }
 
-AccessibilityObject* AccessibilityAriaGridRow::headerObject() {
-  AccessibilityChildrenVector rowChildren = children();
-  unsigned childrenCount = rowChildren.size();
-  for (unsigned i = 0; i < childrenCount; ++i) {
-    AccessibilityObject* cell = rowChildren[i].get();
-    if (cell->ariaRoleAttribute() == RowHeaderRole)
-      return cell;
+void AccessibilityARIAGridCell::rowIndexRange(pair<int, int>& rowRange) {
+  AccessibilityObject* parent = parentObjectUnignored();
+  if (!parent || !parent->isTableRow())
+    return;
+
+  // as far as I can tell, grid cells cannot span rows
+  rowRange.first = static_cast<AccessibilityTableRow*>(parent)->rowIndex();
+  rowRange.second = 1;
+}
+
+void AccessibilityARIAGridCell::columnIndexRange(pair<int, int>& columnRange) {
+  AccessibilityObject* parent = parentObjectUnignored();
+  if (!parent || !parent->isTableRow())
+    return;
+
+  AccessibilityChildrenVector siblings = parent->children();
+  unsigned childrenSize = siblings.size();
+  for (unsigned k = 0; k < childrenSize; ++k) {
+    if (siblings[k].get() == this) {
+      columnRange.first = k;
+      break;
+    }
   }
 
-  return 0;
+  // as far as I can tell, grid cells cannot span columns
+  columnRange.second = 1;
 }
 
 }  // namespace WebCore

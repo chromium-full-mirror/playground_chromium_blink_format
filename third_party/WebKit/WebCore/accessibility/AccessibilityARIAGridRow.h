@@ -26,64 +26,25 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "AccessibilityAriaGridCell.h"
+#ifndef AccessibilityARIAGridRow_h
+#define AccessibilityARIAGridRow_h
 
-#include "AccessibilityObject.h"
 #include "AccessibilityTableRow.h"
-
-using namespace std;
 
 namespace WebCore {
 
-AccessibilityAriaGridCell::AccessibilityAriaGridCell(RenderObject* renderer)
-    : AccessibilityTableCell(renderer) {}
+class AccessibilityARIAGridRow : public AccessibilityTableRow {
+ private:
+  AccessibilityARIAGridRow(RenderObject*);
 
-AccessibilityAriaGridCell::~AccessibilityAriaGridCell() {}
+ public:
+  static PassRefPtr<AccessibilityARIAGridRow> create(RenderObject*);
+  virtual ~AccessibilityARIAGridRow();
 
-PassRefPtr<AccessibilityAriaGridCell> AccessibilityAriaGridCell::create(
-    RenderObject* renderer) {
-  return adoptRef(new AccessibilityAriaGridCell(renderer));
-}
-
-AccessibilityObject* AccessibilityAriaGridCell::parentTable() const {
-  AccessibilityObject* parent = parentObjectUnignored();
-  if (!parent || !parent->isTableRow())
-    return 0;
-
-  parent = parent->parentObjectUnignored();
-  if (!parent || !parent->isDataTable())
-    return 0;
-
-  return parent;
-}
-
-void AccessibilityAriaGridCell::rowIndexRange(pair<int, int>& rowRange) {
-  AccessibilityObject* parent = parentObjectUnignored();
-  if (!parent || !parent->isTableRow())
-    return;
-
-  // as far as I can tell, grid cells cannot span rows
-  rowRange.first = static_cast<AccessibilityTableRow*>(parent)->rowIndex();
-  rowRange.second = 1;
-}
-
-void AccessibilityAriaGridCell::columnIndexRange(pair<int, int>& columnRange) {
-  AccessibilityObject* parent = parentObjectUnignored();
-  if (!parent || !parent->isTableRow())
-    return;
-
-  AccessibilityChildrenVector siblings = parent->children();
-  unsigned childrenSize = siblings.size();
-  for (unsigned k = 0; k < childrenSize; ++k) {
-    if (siblings[k].get() == this) {
-      columnRange.first = k;
-      break;
-    }
-  }
-
-  // as far as I can tell, grid cells cannot span columns
-  columnRange.second = 1;
-}
+  virtual AccessibilityObject* headerObject();
+  virtual AccessibilityObject* parentTable() const;
+};
 
 }  // namespace WebCore
+
+#endif  // AccessibilityARIAGridRow_h

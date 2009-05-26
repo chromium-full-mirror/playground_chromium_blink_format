@@ -26,20 +26,20 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef AccessibilityAriaGridCell_h
-#define AccessibilityAriaGridCell_h
+#ifndef AccessibilityARIAGridCell_h
+#define AccessibilityARIAGridCell_h
 
 #include "AccessibilityTableCell.h"
 
 namespace WebCore {
 
-class AccessibilityAriaGridCell : public AccessibilityTableCell {
+class AccessibilityARIAGridCell : public AccessibilityTableCell {
  private:
-  AccessibilityAriaGridCell(RenderObject*);
+  AccessibilityARIAGridCell(RenderObject*);
 
  public:
-  static PassRefPtr<AccessibilityAriaGridCell> create(RenderObject*);
-  virtual ~AccessibilityAriaGridCell();
+  static PassRefPtr<AccessibilityARIAGridCell> create(RenderObject*);
+  virtual ~AccessibilityARIAGridCell();
 
   // fills in the start location and row span of cell
   virtual void rowIndexRange(pair<int, int>& rowRange);
@@ -52,4 +52,4 @@ class AccessibilityAriaGridCell : public AccessibilityTableCell {
 
 }  // namespace WebCore
 
-#endif  // AccessibilityAriaGridCell_h
+#endif  // AccessibilityARIAGridCell_h

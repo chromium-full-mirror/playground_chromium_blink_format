@@ -26,38 +26,44 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef AccessibilityAriaGrid_h
-#define AccessibilityAriaGrid_h
+#include "config.h"
+#include "AccessibilityARIAGridRow.h"
 
-#include "AccessibilityTable.h"
+#include "AccessibilityObject.h"
+#include "RenderObject.h"
+
+using namespace std;
 
 namespace WebCore {
 
-class String;
-class AccessibilityTableCell;
-class AccessibilityTableHeaderContainer;
+AccessibilityARIAGridRow::AccessibilityARIAGridRow(RenderObject* renderer)
+    : AccessibilityTableRow(renderer) {}
 
-class AccessibilityAriaGrid : public AccessibilityTable {
- private:
-  AccessibilityAriaGrid(RenderObject*);
+AccessibilityARIAGridRow::~AccessibilityARIAGridRow() {}
 
- public:
-  static PassRefPtr<AccessibilityAriaGrid> create(RenderObject*);
-  virtual ~AccessibilityAriaGrid();
+PassRefPtr<AccessibilityARIAGridRow> AccessibilityARIAGridRow::create(
+    RenderObject* renderer) {
+  return adoptRef(new AccessibilityARIAGridRow(renderer));
+}
 
-  virtual bool isAriaTable() const { return true; }
+AccessibilityObject* AccessibilityARIAGridRow::parentTable() const {
+  AccessibilityObject* parent = parentObjectUnignored();
+  if (!parent->isDataTable())
+    return 0;
 
-  virtual void addChildren();
+  return parent;
+}
 
-  virtual AccessibilityTableCell* cellForColumnAndRow(unsigned column,
-                                                      unsigned row);
+AccessibilityObject* AccessibilityARIAGridRow::headerObject() {
+  AccessibilityChildrenVector rowChildren = children();
+  unsigned childrenCount = rowChildren.size();
+  for (unsigned i = 0; i < childrenCount; ++i) {
+    AccessibilityObject* cell = rowChildren[i].get();
+    if (cell->ariaRoleAttribute() == RowHeaderRole)
+      return cell;
+  }
 
- private:
-  void addChild(AccessibilityObject* object,
-                HashSet<AccessibilityObject*>& appendedRows,
-                unsigned& columnCount);
-};
+  return 0;
+}
 
 }  // namespace WebCore
-
-#endif  // AccessibilityAriaGrid_h
