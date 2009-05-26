@@ -53,7 +53,7 @@ class V8CustomSQLTransactionErrorCallback : public SQLTransactionErrorCallback {
   }
   virtual ~V8CustomSQLTransactionErrorCallback();
 
-  virtual bool handleEvent(SQLError*);
+  virtual void handleEvent(SQLError*);
 
  private:
   V8CustomSQLTransactionErrorCallback(v8::Local<v8::Object>, Frame*);
