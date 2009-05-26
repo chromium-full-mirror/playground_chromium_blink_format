@@ -104,12 +104,7 @@ void WorkerContextExecutionProxy::dispose() {
          iterator != m_listeners->end(); ++iterator)
       static_cast<V8WorkerContextEventListener*>(*iterator)->disconnect();
 
-    {
-      // Need to use lock since V8EventListenerList::clear() creates
-      // HandleScope.
-      v8::Locker locker;
-      m_listeners->clear();
-    }
+    m_listeners->clear();
   }
 
   // Detach all events from their JS wrappers.
@@ -142,9 +137,6 @@ WorkerContextExecutionProxy* WorkerContextExecutionProxy::retrieve() {
 void WorkerContextExecutionProxy::initV8IfNeeded() {
   static bool v8Initialized = false;
 
-  // Use v8::Locker to guarantee that only one thread can enter the following
-  // one-time initialization code.
-  v8::Locker locker;
   if (v8Initialized)
     return;
 
@@ -154,11 +146,6 @@ void WorkerContextExecutionProxy::initV8IfNeeded() {
 
   // Set up the handler for V8 error message.
   v8::V8::AddMessageListener(handleConsoleMessage);
-
-  // Enable preemption so that one worker will not be blocked by another
-  // long-running worker.
-  const int workerThreadPreemptionIntervalMs = 100;
-  v8::Locker::StartPreemption(workerThreadPreemptionIntervalMs);
 
   v8Initialized = true;
 }
@@ -360,7 +347,6 @@ v8::Local<v8::Value> WorkerContextExecutionProxy::evaluate(
     const String& script,
     const String& fileName,
     int baseLine) {
-  v8::Locker locker;
   v8::HandleScope hs;
 
   initContextIfNeeded();
@@ -426,11 +412,7 @@ WorkerContextExecutionProxy::findOrCreateEventListenerHelper(
   else
     newListener = V8WorkerContextEventListener::create(
         this, v8::Local<v8::Object>::Cast(object), isInline);
-  {
-    // Need to use lock since V8EventListenerList::add() creates HandleScope.
-    v8::Locker locker;
-    m_listeners->add(newListener.get());
-  }
+  m_listeners->add(newListener.get());
 
   return newListener.release();
 }
@@ -453,8 +435,6 @@ WorkerContextExecutionProxy::findOrCreateObjectEventListener(
 
 void WorkerContextExecutionProxy::RemoveEventListener(
     V8EventListener* listener) {
-  // Need to use lock since V8EventListenerList::remove() creates HandleScope.
-  v8::Locker locker;
   m_listeners->remove(listener);
 }
 
