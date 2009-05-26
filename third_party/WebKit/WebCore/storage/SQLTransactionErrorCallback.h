@@ -41,7 +41,7 @@ class SQLTransactionErrorCallback
     : public ThreadSafeShared<SQLTransactionErrorCallback> {
  public:
   virtual ~SQLTransactionErrorCallback() {}
-  virtual bool handleEvent(SQLError*) = 0;
+  virtual void handleEvent(SQLError*) = 0;
 };
 }
 

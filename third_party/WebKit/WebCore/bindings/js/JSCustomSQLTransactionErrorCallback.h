@@ -54,7 +54,7 @@ class JSCustomSQLTransactionErrorCallback : public SQLTransactionErrorCallback {
     return adoptRef(new JSCustomSQLTransactionErrorCallback(callback, frame));
   }
 
-  virtual bool handleEvent(SQLError*);
+  virtual void handleEvent(SQLError*);
 
  private:
   JSCustomSQLTransactionErrorCallback(JSC::JSObject* callback, Frame*);
