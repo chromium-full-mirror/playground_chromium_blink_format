@@ -35,7 +35,6 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/Threading.h>
-#include <wtf/TypeTraits.h>
 
 namespace WTF {
 
@@ -70,6 +69,11 @@ class CrossThreadRefCounted : Noncopyable {
   void ref();
   void deref();
   T* release();
+
+  bool isShared() const {
+    return !m_refCounter.hasOneRef() ||
+           (m_threadSafeRefCounter && !m_threadSafeRefCounter->hasOneRef());
+  }
 
 #ifndef NDEBUG
   bool mayBePassedToAnotherThread() const {
