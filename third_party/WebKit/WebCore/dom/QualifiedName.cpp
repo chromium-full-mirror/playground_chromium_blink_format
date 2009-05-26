@@ -61,7 +61,8 @@ QualifiedName::QualifiedName(const AtomicString& p,
                              const AtomicString& n) {
   if (!gNameCache)
     gNameCache = new QNameSet;
-  QualifiedNameComponents components = {p.impl(), l.impl(), n.impl()};
+  QualifiedNameComponents components = {
+      p.impl(), l.impl(), n.isEmpty() ? nullAtom.impl() : n.impl()};
   pair<QNameSet::iterator, bool> addResult =
       gNameCache->add<QualifiedNameComponents, QNameComponentsTranslator>(
           components);
