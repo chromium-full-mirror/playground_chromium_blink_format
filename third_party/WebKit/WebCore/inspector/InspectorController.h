@@ -222,6 +222,7 @@ class InspectorController : public RefCounted<InspectorController>
   void windowScriptObjectAvailable();
 
   void scriptObjectReady();
+  void setFrontendProxyObject(ScriptState* state, ScriptObject object);
 
   void populateScriptObjects();
   void resetScriptObjects();
