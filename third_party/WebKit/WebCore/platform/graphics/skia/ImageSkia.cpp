@@ -315,7 +315,8 @@ void Image::drawPattern(GraphicsContext* context,
                         const FloatPoint& phase,
                         CompositeOperator compositeOp,
                         const FloatRect& destRect) {
-  if (destRect.isEmpty() || floatSrcRect.isEmpty())
+  FloatRect normSrcRect = normalizeRect(floatSrcRect);
+  if (destRect.isEmpty() || normSrcRect.isEmpty())
     return;  // nothing to draw
 
   NativeImageSkia* bitmap = nativeImageForCurrentFrame();
@@ -326,7 +327,7 @@ void Image::drawPattern(GraphicsContext* context,
   // it will internally reference the old bitmap's pixels, adjusting the row
   // stride so the extra pixels appear as padding to the subsetted bitmap.
   SkBitmap srcSubset;
-  SkIRect srcRect = enclosingIntRect(floatSrcRect);
+  SkIRect srcRect = enclosingIntRect(normSrcRect);
   bitmap->extractSubset(&srcSubset, srcRect);
 
   SkBitmap resampled;
@@ -376,10 +377,10 @@ void Image::drawPattern(GraphicsContext* context,
   // a shifted image, it will shift it from there using the patternTransform.
   float adjustedX =
       phase.x() +
-      floatSrcRect.x() * narrowPrecisionToFloat(patternTransform.a());
+      normSrcRect.x() * narrowPrecisionToFloat(patternTransform.a());
   float adjustedY =
       phase.y() +
-      floatSrcRect.y() * narrowPrecisionToFloat(patternTransform.d());
+      normSrcRect.y() * narrowPrecisionToFloat(patternTransform.d());
   matrix.postTranslate(SkFloatToScalar(adjustedX), SkFloatToScalar(adjustedY));
   shader->setLocalMatrix(matrix);
 
