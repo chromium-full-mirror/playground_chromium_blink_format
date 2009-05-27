@@ -151,7 +151,8 @@ void DragController::dragExited(DragData* dragData) {
 
   if (RefPtr<FrameView> v = mainFrame->view()) {
     ClipboardAccessPolicy policy =
-        m_documentUnderMouse->securityOrigin()->isLocal()
+        (!m_documentUnderMouse ||
+         m_documentUnderMouse->securityOrigin()->isLocal())
             ? ClipboardReadable
             : ClipboardTypesReadable;
     RefPtr<Clipboard> clipboard = dragData->createClipboard(policy);
