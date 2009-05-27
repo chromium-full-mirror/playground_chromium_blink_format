@@ -167,6 +167,8 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
   bool shouldContentSniff() const;
   static bool shouldContentSniffURL(const KURL&);
 
+  static void forceContentSniffing();
+
 #if USE(WININET)
   void setHasReceivedResponse(bool = true);
   bool hasReceivedResponse() const;
