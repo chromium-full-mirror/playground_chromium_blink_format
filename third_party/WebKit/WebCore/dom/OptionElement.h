@@ -41,23 +41,19 @@ class OptionElement {
   virtual String value() const = 0;
 
  protected:
-  OptionElement() {}
-
-  static void setSelectedState(OptionElementData&, bool selected);
-  static String collectOptionText(const OptionElementData&, Document*);
+  static void setSelectedState(OptionElementData&, Element*, bool selected);
+  static String collectOptionText(const OptionElementData&, const Element*);
   static String collectOptionTextRespectingGroupLabel(const OptionElementData&,
-                                                      Document*);
-  static String collectOptionValue(const OptionElementData&, Document*);
+                                                      const Element*);
+  static String collectOptionValue(const OptionElementData&, const Element*);
 };
 
 // HTML/WMLOptionElement hold this struct as member variable
 // and pass it to the static helper functions in OptionElement
 class OptionElementData {
  public:
-  OptionElementData(Element*);
+  OptionElementData();
   ~OptionElementData();
-
-  Element* element() const { return m_element; }
 
   String value() const { return m_value; }
   void setValue(const String& value) { m_value = value; }
@@ -69,7 +65,6 @@ class OptionElementData {
   void setSelected(bool selected) { m_selected = selected; }
 
  private:
-  Element* m_element;
   String m_value;
   String m_label;
   bool m_selected;
