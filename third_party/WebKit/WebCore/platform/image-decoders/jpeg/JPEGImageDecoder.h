@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef JPEG_DECODER_H_
-#define JPEG_DECODER_H_
+#ifndef JPEGImageDecoder_h
+#define JPEGImageDecoder_h
 
 #include "ImageDecoder.h"
 
@@ -67,6 +67,7 @@ class JPEGImageDecoder : public ImageDecoder {
  private:
   mutable JPEGImageReader* m_reader;
 };
-}
+
+}  // namespace WebCore
 
 #endif

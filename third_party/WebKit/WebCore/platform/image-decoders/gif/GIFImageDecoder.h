@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GIF_DECODER_H_
-#define GIF_DECODER_H_
+#ifndef GIFImageDecoder_h
+#define GIFImageDecoder_h
 
 #include "ImageDecoder.h"
 
@@ -62,7 +62,7 @@ class GIFImageDecoder : public ImageDecoder {
 
   enum GIFQuery { GIFFullQuery, GIFSizeQuery, GIFFrameCountQuery };
 
-  void decode(GIFQuery query, unsigned haltAtFrame) const;
+  void decode(GIFQuery, unsigned haltAtFrame) const;
 
   // Callbacks from the GIF reader.
   void sizeNowAvailable(unsigned width, unsigned height);
@@ -85,13 +85,14 @@ class GIFImageDecoder : public ImageDecoder {
 
   // A helper for initFrameBuffer(), this sets the size of the buffer, and
   // fills it with transparent pixels.
-  void prepEmptyFrameBuffer(RGBA32Buffer* buffer) const;
+  void prepEmptyFrameBuffer(RGBA32Buffer*) const;
 
   bool m_frameCountValid;
   bool m_currentBufferSawAlpha;
   mutable int m_repetitionCount;
   mutable GIFImageDecoderPrivate* m_reader;
 };
-}
+
+}  // namespace WebCore
 
 #endif

@@ -170,8 +170,8 @@ struct GIFImageReader {
   int version;           /* Either 89 for GIF89 or 87 for GIF87 */
   unsigned screen_width; /* Logical screen width & height */
   unsigned screen_height;
-  int global_colormap_size;    /* Size of global colormap array. */
-  unsigned int images_decoded; /* Counts completed frames for animated GIFs */
+  int global_colormap_size; /* Size of global colormap array. */
+  unsigned images_decoded;  /* Counts completed frames for animated GIFs */
   int images_count; /* Counted all frames seen so far (including incomplete
                        frames) */
   int loop_count;   /* Netscape specific extension block to control

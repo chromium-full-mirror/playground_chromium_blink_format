@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef BMP_DECODER_H_
-#define BMP_DECODER_H_
+#ifndef BMPImageDecoder_h
+#define BMPImageDecoder_h
 
 #include "ImageDecoder.h"
 
@@ -42,6 +42,7 @@ class BMPImageDecoder : public ImageDecoder {
 
   virtual RGBA32Buffer* frameBufferAtIndex(size_t index);
 };
-}
+
+}  // namespace WebCore
 
 #endif

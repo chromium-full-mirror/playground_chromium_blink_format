@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XBM_DECODER_H_
-#define XBM_DECODER_H_
+#ifndef XBMImageDecoder_h
+#define XBMImageDecoder_h
 
 #include "ImageDecoder.h"
 
@@ -42,6 +42,7 @@ class XBMImageDecoder : public ImageDecoder {
 
   virtual RGBA32Buffer* frameBufferAtIndex(size_t index);
 };
-}
+
+}  // namespace WebCore
 
 #endif

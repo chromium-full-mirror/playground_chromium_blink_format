@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef IMAGE_DECODER_H_
-#define IMAGE_DECODER_H_
+#ifndef ImageDecoder_h
+#define ImageDecoder_h
 
 #include "IntRect.h"
 #include "ImageSource.h"
@@ -43,14 +43,14 @@ typedef Vector<unsigned> RGBA32Array;
 class RGBA32Buffer {
  public:
   enum FrameStatus { FrameEmpty, FramePartial, FrameComplete };
+
   enum FrameDisposalMethod {
     // If you change the numeric values of these, make sure you audit all
     // users, as some users may cast raw values to/from these constants.
-    DisposeNotSpecified = 0,      // Leave frame in framebuffer
-    DisposeKeep = 1,              // Leave frame in framebuffer
-    DisposeOverwriteBgcolor = 2,  // Clear frame to transparent
-    DisposeOverwritePrevious =
-        3,  // Clear frame to previous framebuffer contents
+    DisposeNotSpecified,       // Leave frame in framebuffer
+    DisposeKeep,               // Leave frame in framebuffer
+    DisposeOverwriteBgcolor,   // Clear frame to transparent
+    DisposeOverwritePrevious,  // Clear frame to previous framebuffer contents
   };
 
   RGBA32Buffer()
@@ -133,6 +133,7 @@ class RGBA32Buffer {
 class ImageDecoder {
  public:
   ImageDecoder() : m_sizeAvailable(false), m_failed(false) {}
+
   virtual ~ImageDecoder() {}
 
   // The the filename extension usually associated with an undecoded image of
@@ -188,6 +189,7 @@ class ImageDecoder {
   mutable bool m_failed;
   IntSize m_size;
 };
-}
+
+}  // namespace WebCore
 
 #endif

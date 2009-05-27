@@ -80,7 +80,7 @@ class PNGImageReader {
         m_decodingSizeOnly(false),
         m_interlaceBuffer(0),
         m_hasAlpha(0) {
-    m_png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, decodingFailed,
+    m_png = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, decodingFailed,
                                    decodingWarning);
     m_info = png_create_info_struct(m_png);
     png_set_progressive_read_fn(m_png, decoder, headerAvailable, rowAvailable,
@@ -171,7 +171,7 @@ bool PNGImageDecoder::isSizeAvailable() const {
     decode(true);
   }
 
-  return !m_failed && ImageDecoder::isSizeAvailable();
+  return ImageDecoder::isSizeAvailable();
 }
 
 RGBA32Buffer* PNGImageDecoder::frameBufferAtIndex(size_t index) {

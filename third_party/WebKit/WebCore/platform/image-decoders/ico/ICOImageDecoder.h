@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ICO_DECODER_H_
-#define ICO_DECODER_H_
+#ifndef ICOImageDecoder_h
+#define ICOImageDecoder_h
 
 #include "ImageDecoder.h"
 
@@ -42,6 +42,7 @@ class ICOImageDecoder : public ImageDecoder {
 
   virtual RGBA32Buffer* frameBufferAtIndex(size_t index);
 };
-}
+
+}  // namespace WebCore
 
 #endif

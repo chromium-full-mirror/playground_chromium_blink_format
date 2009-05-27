@@ -113,7 +113,7 @@ bool GIFImageDecoder::isSizeAvailable() const {
     decode(GIFSizeQuery, 0);
   }
 
-  return !m_failed && ImageDecoder::isSizeAvailable();
+  return ImageDecoder::isSizeAvailable();
 }
 
 // The total number of frames for the image.  Will scan the image data for the
