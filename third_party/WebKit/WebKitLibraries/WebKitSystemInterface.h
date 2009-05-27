@@ -143,8 +143,6 @@ void WKSetCGFontRenderingMode(CGContextRef cgContext, NSFont* font);
 BOOL WKCGContextGetShouldSmoothFonts(CGContextRef cgContext);
 
 #ifdef BUILDING_ON_TIGER
-BOOL WKCGContextIsSafeToClip(CGContextRef);
-
 // CGFontGetAscent, CGFontGetDescent, CGFontGetLeading and CGFontGetUnitsPerEm
 // were not available until Leopard
 void WKGetFontMetrics(CGFontRef font,

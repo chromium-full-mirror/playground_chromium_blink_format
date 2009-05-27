@@ -179,7 +179,6 @@ extern void (*wkGetGlyphsForCharacters)(CGFontRef,
 #else
 #define GLYPH_VECTOR_SIZE (50 * 32)
 
-extern BOOL (*wkCGContextIsSafeToClip)(CGContextRef);
 extern void (*wkClearGlyphVector)(void* glyphs);
 extern OSStatus (*wkConvertCharToGlyphs)(void* styleGroup,
                                          const UniChar*,
