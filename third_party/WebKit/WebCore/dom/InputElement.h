@@ -65,8 +65,6 @@ class InputElement {
   static const int s_defaultSize;
 
  protected:
-  InputElement() {}
-
   static void dispatchFocusEvent(InputElementData&, InputElement*, Element*);
   static void dispatchBlurEvent(InputElementData&, InputElement*, Element*);
   static void updatePlaceholderVisibility(InputElementData&,
