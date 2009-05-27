@@ -141,6 +141,7 @@ enum {
   DOWNLOAD_REQUESTED,
   MOVE_CURSOR,
   PRINT_REQUESTED,
+  PLUGIN_WIDGET,
   LAST_SIGNAL
 };
 
@@ -1002,7 +1003,7 @@ static void webkit_web_view_finalize(GObject* object) {
   G_OBJECT_CLASS(webkit_web_view_parent_class)->finalize(object);
 }
 
-static gboolean webkit_create_web_view_request_handled(
+static gboolean webkit_signal_accumulator_object_handled(
     GSignalInvocationHint* ihint,
     GValue* returnAccu,
     const GValue* handlerReturn,
@@ -1131,7 +1132,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
       g_signal_new("create-web-view", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)G_SIGNAL_RUN_LAST,
                    G_STRUCT_OFFSET(WebKitWebViewClass, create_web_view),
-                   webkit_create_web_view_request_handled, NULL,
+                   webkit_signal_accumulator_object_handled, NULL,
                    webkit_marshal_OBJECT__OBJECT, WEBKIT_TYPE_WEB_VIEW, 1,
                    WEBKIT_TYPE_WEB_FRAME);
 
@@ -1618,6 +1619,29 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
                    G_STRUCT_OFFSET(WebKitWebViewClass, move_cursor), NULL, NULL,
                    webkit_marshal_BOOLEAN__ENUM_INT, G_TYPE_BOOLEAN, 2,
                    GTK_TYPE_MOVEMENT_STEP, G_TYPE_INT);
+
+  /**
+   * WebKitWebView::create-plugin-widget:
+   * @web_view: the object which received the signal
+   * @mime_type: the mimetype of the requested object
+   * @url: the url to load
+   * @param: a #GHashTable with additional attributes (strings)
+   *
+   * The #WebKitWebView::create-plugin signal will be emitted to
+   * create a plugin widget for embed or object HTML tags. This
+   * allows to embed a GtkWidget as a plugin into HTML content. In
+   * case of a textual selection of the GtkWidget WebCore will attempt
+   * to set the property value of "webkit-widget-is-selected". This can
+   * be used to draw a visual indicator of the selection.
+   *
+   * Since: 1.1.8
+   */
+  webkit_web_view_signals[PLUGIN_WIDGET] = g_signal_new(
+      "create-plugin-widget", G_TYPE_FROM_CLASS(webViewClass),
+      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0,
+      webkit_signal_accumulator_object_handled, NULL,
+      webkit_marshal_OBJECT__STRING_STRING_POINTER, GTK_TYPE_WIDGET, 3,
+      G_TYPE_STRING, G_TYPE_STRING, G_TYPE_HASH_TABLE);
 
   /*
    * implementations of virtual methods

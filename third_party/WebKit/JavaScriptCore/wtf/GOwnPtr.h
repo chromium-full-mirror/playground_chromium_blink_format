@@ -44,6 +44,8 @@ template <>
 void freeOwnedGPtr<GPatternSpec>(GPatternSpec*);
 template <>
 void freeOwnedGPtr<GDir>(GDir*);
+template <>
+void freeOwnedGPtr<GHashTable>(GHashTable*);
 
 template <typename T>
 class GOwnPtr : Noncopyable {
