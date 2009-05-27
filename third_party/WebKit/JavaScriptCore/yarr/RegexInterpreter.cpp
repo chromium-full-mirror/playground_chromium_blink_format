@@ -1684,6 +1684,9 @@ class ByteCompiler {
                               term.quantityType);
             break;
 
+          case PatternTerm::TypeForwardReference:
+            break;
+
           case PatternTerm::TypeParenthesesSubpattern: {
             unsigned disjunctionAlreadyCheckedCount = 0;
             if ((term.quantityCount == 1) && !term.parentheses.isCopy) {

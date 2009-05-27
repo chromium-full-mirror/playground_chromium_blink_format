@@ -1122,6 +1122,9 @@ class RegexGenerator : private MacroAssembler {
         m_generationFailed = true;
         break;
 
+      case PatternTerm::TypeForwardReference:
+        break;
+
       case PatternTerm::TypeParenthesesSubpattern:
         if ((term.quantityCount == 1) && !term.parentheses.isCopy)
           generateParenthesesSingle(state);

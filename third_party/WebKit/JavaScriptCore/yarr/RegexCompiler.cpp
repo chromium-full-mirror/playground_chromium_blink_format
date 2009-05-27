@@ -464,8 +464,10 @@ class RegexPatternConstructor {
     m_pattern.m_maxBackReference =
         std::max(m_pattern.m_maxBackReference, subpatternId);
 
-    if (subpatternId > m_pattern.m_numSubpatterns)
+    if (subpatternId > m_pattern.m_numSubpatterns) {
+      m_alternative->m_terms.append(PatternTerm::ForwardReference());
       return;
+    }
 
     PatternAlternative* currentAlternative = m_alternative;
     ASSERT(currentAlternative);
@@ -478,8 +480,10 @@ class RegexPatternConstructor {
              (term.type == PatternTerm::TypeParentheticalAssertion));
 
       if ((term.type == PatternTerm::TypeParenthesesSubpattern) &&
-          term.invertOrCapture && (subpatternId == term.subpatternId))
+          term.invertOrCapture && (subpatternId == term.subpatternId)) {
+        m_alternative->m_terms.append(PatternTerm::ForwardReference());
         return;
+      }
     }
 
     m_alternative->m_terms.append(PatternTerm(subpatternId));
@@ -590,6 +594,9 @@ class RegexPatternConstructor {
           term.frameLocation = currentCallFrameSize;
           currentCallFrameSize += RegexStackSpaceForBackTrackInfoBackReference;
           alternative->m_hasFixedSize = false;
+          break;
+
+        case PatternTerm::TypeForwardReference:
           break;
 
         case PatternTerm::TypePatternCharacter:
