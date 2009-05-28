@@ -38,7 +38,6 @@ class JSDOMWindow;
 class JSDOMWindowShell;
 class JSLocation;
 class JSEventListener;
-class ScheduledAction;
 class SecurityOrigin;
 
 class JSDOMWindowBasePrivate;
@@ -46,8 +45,6 @@ class JSDOMWindowBasePrivate;
 // This is the only WebCore JS binding which does not inherit from DOMObject
 class JSDOMWindowBase : public JSDOMGlobalObject {
   typedef JSDOMGlobalObject Base;
-
-  friend class ScheduledAction;
 
  protected:
   JSDOMWindowBase(PassRefPtr<JSC::Structure>,
@@ -70,9 +67,6 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
 
   // Called just before removing this window from the JSDOMWindowShell.
   void willRemoveFromWindowShell();
-
-  // Set a place to put a dialog return value when the window is cleared.
-  void setReturnValueSlot(JSC::JSValue* slot);
 
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
   static const JSC::ClassInfo s_info;
@@ -103,8 +97,6 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
     JSDOMWindowBaseData(PassRefPtr<DOMWindow>, JSDOMWindowShell*);
 
     RefPtr<DOMWindow> impl;
-
-    JSC::JSValue* returnValueSlot;
     JSDOMWindowShell* shell;
   };
 
