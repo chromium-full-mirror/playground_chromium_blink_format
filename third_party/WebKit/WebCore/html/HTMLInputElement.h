@@ -234,6 +234,10 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   virtual void willMoveToNewOwnerDocument();
   virtual void didMoveToNewOwnerDocument();
 
+  void updatePlaceholderVisibility() {
+    InputElement::updatePlaceholderVisibility(m_data, this, this, true);
+  }
+
  private:
   bool storesValueSeparateFromAttribute() const;
 
