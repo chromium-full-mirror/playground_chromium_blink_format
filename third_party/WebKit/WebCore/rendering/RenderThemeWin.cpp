@@ -667,7 +667,7 @@ bool RenderThemeWin::paintMenuList(RenderObject* o,
                                    const IntRect& r) {
   HANDLE theme;
   int part;
-  if (isRunningOnVistaOrLater()) {
+  if (haveTheme && isRunningOnVistaOrLater()) {
     theme = menuListTheme();
     if (documentIsInApplicationChromeMode(o->document()))
       part = CP_READONLY;
