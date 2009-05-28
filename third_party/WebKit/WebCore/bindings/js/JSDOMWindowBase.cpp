@@ -81,8 +81,6 @@ void JSDOMWindowBase::updateDocument() {
                                DontDelete | ReadOnly);
 }
 
-JSDOMWindowBase::~JSDOMWindowBase() {}
-
 ScriptExecutionContext* JSDOMWindowBase::scriptExecutionContext() const {
   return d()->impl->document();
 }
@@ -234,6 +232,9 @@ ExecState* JSDOMWindowBase::globalExec() {
 }
 
 bool JSDOMWindowBase::supportsProfiling() const {
+#if !ENABLE(JAVASCRIPT_DEBUGGER)
+  return false;
+#else
   Frame* frame = impl()->frame();
   if (!frame)
     return false;
@@ -241,10 +242,8 @@ bool JSDOMWindowBase::supportsProfiling() const {
   Page* page = frame->page();
   if (!page)
     return false;
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+
   return page->inspectorController()->profilerEnabled();
-#else
-  return false;
 #endif
 }
 
@@ -265,17 +264,13 @@ bool JSDOMWindowBase::shouldInterruptScript() const {
   return page->chrome()->shouldInterruptJavaScript();
 }
 
-void JSDOMWindowBase::clearHelperObjectProperties() {
-  setCurrentEvent(0);
-}
-
 void JSDOMWindowBase::clear() {
   JSLock lock(false);
 
   if (d()->returnValueSlot && !*d()->returnValueSlot)
     *d()->returnValueSlot = getDirect(Identifier(globalExec(), "returnValue"));
 
-  clearHelperObjectProperties();
+  setCurrentEvent(0);
 }
 
 JSObject* JSDOMWindowBase::toThisObject(ExecState*) const {
@@ -299,8 +294,6 @@ JSGlobalData* JSDOMWindowBase::commonJSGlobalData() {
 void JSDOMWindowBase::setReturnValueSlot(JSValue* slot) {
   d()->returnValueSlot = slot;
 }
-
-void JSDOMWindowBase::disconnectFrame() {}
 
 JSValue toJS(ExecState*, DOMWindow* domWindow) {
   if (!domWindow)

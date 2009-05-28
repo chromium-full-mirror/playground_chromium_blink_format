@@ -55,7 +55,6 @@ class JSDOMWindowShell : public DOMObject {
   static const JSC::ClassInfo s_info;
 
   DOMWindow* impl() const;
-  void disconnectFrame();
   void clear();
 
   void* operator new(size_t);

@@ -55,14 +55,10 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
                   JSDOMWindowShell*);
 
  public:
-  virtual ~JSDOMWindowBase();
-
   void updateDocument();
 
   DOMWindow* impl() const { return d()->impl.get(); }
   virtual ScriptExecutionContext* scriptExecutionContext() const;
-
-  void disconnectFrame();
 
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   const JSC::Identifier&,
@@ -120,8 +116,6 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
   static JSC::JSValue namedItemGetter(JSC::ExecState*,
                                       const JSC::Identifier&,
                                       const JSC::PropertySlot&);
-
-  void clearHelperObjectProperties();
 
   bool allowsAccessFromPrivate(const JSC::JSGlobalObject*) const;
   String crossDomainAccessErrorMessage(const JSC::JSGlobalObject*) const;
