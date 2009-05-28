@@ -49,13 +49,16 @@ String stringValue(Node* node) {
       return node->nodeValue();
     default:
       if (isRootDomNode(node) || node->nodeType() == Node::ELEMENT_NODE) {
-        String str;
+        Vector<UChar> result;
 
-        for (Node* n = node->firstChild(); n; n = n->traverseNextNode(node))
-          if (n->isTextNode())
-            str += n->nodeValue();
+        for (Node* n = node->firstChild(); n; n = n->traverseNextNode(node)) {
+          if (n->isTextNode()) {
+            const String& nodeValue = n->nodeValue();
+            result.append(nodeValue.characters(), nodeValue.length());
+          }
+        }
 
-        return str;
+        return String::adopt(result);
       }
   }
 
