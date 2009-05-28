@@ -222,6 +222,8 @@ WEBKIT_API void webkit_web_settings_add_extra_plugin_directory(
 GSList* webkit_web_settings_get_spell_languages(WebKitWebView* web_view);
 
 bool webkit_web_view_use_primary_for_paste(WebKitWebView* web_view);
+
+GHashTable* webkit_history_items(void);
 }
 
 #endif
