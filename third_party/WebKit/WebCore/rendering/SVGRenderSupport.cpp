@@ -87,7 +87,7 @@ void SVGRenderBase::prepareToRenderSVGContent(
     const FloatRect& boundingBox,
     SVGResourceFilter*& filter,
     SVGResourceFilter* rootFilter) {
-#if !ENABLE(SVG_FILTERS)
+#if !ENABLE(FILTERS)
   UNUSED_PARAM(filter);
   UNUSED_PARAM(rootFilter);
 #endif
@@ -110,7 +110,7 @@ void SVGRenderBase::prepareToRenderSVGContent(
     paintInfo.context->beginTransparencyLayer(opacity);
   }
 
-#if ENABLE(SVG_FILTERS)
+#if ENABLE(FILTERS)
   AtomicString filterId(svgStyle->filter());
 #endif
 
@@ -119,7 +119,7 @@ void SVGRenderBase::prepareToRenderSVGContent(
 
   Document* document = object->document();
 
-#if ENABLE(SVG_FILTERS)
+#if ENABLE(FILTERS)
   SVGResourceFilter* newFilter = getFilterById(document, filterId);
   if (newFilter == rootFilter) {
     // Catch <text filter="url(#foo)">Test<tspan
@@ -134,7 +134,7 @@ void SVGRenderBase::prepareToRenderSVGContent(
   SVGResourceClipper* clipper = getClipperById(document, clipperId);
   SVGResourceMasker* masker = getMaskerById(document, maskerId);
 
-#if ENABLE(SVG_FILTERS)
+#if ENABLE(FILTERS)
   if (filter) {
     filter->addClient(styledElement);
     filter->prepareFilter(paintInfo.context, boundingBox);
@@ -163,7 +163,7 @@ void SVGRenderBase::finishRenderSVGContent(RenderObject* object,
                                            const FloatRect& boundingBox,
                                            SVGResourceFilter*& filter,
                                            GraphicsContext* savedContext) {
-#if !ENABLE(SVG_FILTERS)
+#if !ENABLE(FILTERS)
   UNUSED_PARAM(boundingBox);
   UNUSED_PARAM(filter);
   UNUSED_PARAM(savedContext);
@@ -174,7 +174,7 @@ void SVGRenderBase::finishRenderSVGContent(RenderObject* object,
   const RenderStyle* style = object->style();
   ASSERT(style);
 
-#if ENABLE(SVG_FILTERS)
+#if ENABLE(FILTERS)
   if (filter) {
     filter->applyFilter(paintInfo.context, boundingBox);
     paintInfo.context = savedContext;
@@ -242,7 +242,7 @@ FloatRect SVGRenderBase::computeContainerBoundingBox(
 
 FloatRect SVGRenderBase::filterBoundingBoxForRenderer(
     const RenderObject* object) {
-#if ENABLE(SVG_FILTERS)
+#if ENABLE(FILTERS)
   SVGResourceFilter* filter =
       getFilterById(object->document(), object->style()->svgStyle()->filter());
   if (filter)

@@ -21,7 +21,7 @@
 #ifndef FilterEffect_h
 #define FilterEffect_h
 
-#if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#if ENABLE(FILTERS)
 #include "FloatRect.h"
 #include "ImageBuffer.h"
 #include "SVGResourceFilter.h"
@@ -79,6 +79,6 @@ class FilterEffect : public RefCounted<FilterEffect> {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#endif  // ENABLE(FILTERS)
 
 #endif  // FilterEffect_h

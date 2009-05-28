@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#if ENABLE(FILTERS)
 #include "FEComposite.h"
 
 #include "SVGResourceFilter.h"
@@ -100,4 +100,4 @@ void FEComposite::dump() {}
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#endif  // ENABLE(FILTERS)

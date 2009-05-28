@@ -23,7 +23,7 @@
 #ifndef SVGComponentTransferFunctionElement_h
 #define SVGComponentTransferFunctionElement_h
 
-#if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#if ENABLE(SVG) && ENABLE(FILTERS)
 #include "SVGElement.h"
 #include "SVGNumberList.h"
 #include "FEComponentTransfer.h"
@@ -88,5 +88,5 @@ class SVGComponentTransferFunctionElement : public SVGElement {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#endif  // ENABLE(SVG) && ENABLE(FILTERS)
 #endif

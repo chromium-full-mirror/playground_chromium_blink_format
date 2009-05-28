@@ -22,7 +22,7 @@
 #ifndef SVGFEDisplacementMap_h
 #define SVGFEDisplacementMap_h
 
-#if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#if ENABLE(SVG) && ENABLE(FILTERS)
 #include "PlatformString.h"
 #include "FilterEffect.h"
 #include "SVGResourceFilter.h"
@@ -74,6 +74,6 @@ class FEDisplacementMap : public FilterEffect {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#endif  // ENABLE(SVG) && ENABLE(FILTERS)
 
 #endif  // SVGFEDisplacementMap_h

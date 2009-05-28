@@ -23,7 +23,7 @@
 #ifndef SVGDistantLightSource_h
 #define SVGDistantLightSource_h
 
-#if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#if ENABLE(SVG) && ENABLE(FILTERS)
 #include "SVGLightSource.h"
 
 namespace WebCore {
@@ -45,6 +45,6 @@ class DistantLightSource : public LightSource {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#endif  // ENABLE(SVG) && ENABLE(FILTERS)
 
 #endif  // SVGDistantLightSource_h

@@ -22,7 +22,7 @@
 #ifndef SVGFEGaussianBlur_h
 #define SVGFEGaussianBlur_h
 
-#if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#if ENABLE(SVG) && ENABLE(FILTERS)
 #include "FilterEffect.h"
 #include "SVGResourceFilter.h"
 
@@ -54,6 +54,6 @@ class FEGaussianBlur : public FilterEffect {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#endif  // ENABLE(SVG) && ENABLE(FILTERS)
 
 #endif  // SVGFEGaussianBlur_h

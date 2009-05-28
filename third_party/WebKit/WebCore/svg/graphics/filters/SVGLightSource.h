@@ -23,7 +23,7 @@
 #ifndef SVGLightSource_h
 #define SVGLightSource_h
 
-#if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#if ENABLE(SVG) && ENABLE(FILTERS)
 #include <wtf/RefCounted.h>
 
 namespace WebCore {
@@ -47,6 +47,6 @@ class LightSource : public RefCounted<LightSource> {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#endif  // ENABLE(SVG) && ENABLE(FILTERS)
 
 #endif  // SVGLightSource_h
