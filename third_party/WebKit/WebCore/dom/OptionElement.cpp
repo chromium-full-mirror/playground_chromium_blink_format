@@ -105,8 +105,6 @@ String OptionElement::collectOptionValue(const OptionElementData& data,
 // OptionElementData
 OptionElementData::OptionElementData() : m_selected(false) {}
 
-OptionElementData::~OptionElementData() {}
-
 OptionElement* toOptionElement(Element* element) {
   if (element->isHTMLElement() && element->hasTagName(HTMLNames::optionTag))
     return static_cast<HTMLOptionElement*>(element);

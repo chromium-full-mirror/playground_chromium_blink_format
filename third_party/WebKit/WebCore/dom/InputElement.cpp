@@ -310,8 +310,6 @@ InputElementData::InputElementData()
       m_cachedSelectionStart(-1),
       m_cachedSelectionEnd(-1) {}
 
-InputElementData::~InputElementData() {}
-
 const AtomicString& InputElementData::name() const {
   return m_name.isNull() ? emptyAtom : m_name;
 }

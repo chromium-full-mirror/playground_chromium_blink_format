@@ -54,7 +54,6 @@ class OptionElement {
 class OptionElementData {
  public:
   OptionElementData();
-  ~OptionElementData();
 
   String value() const { return m_value; }
   void setValue(const String& value) { m_value = value; }

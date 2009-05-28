@@ -102,7 +102,6 @@ class InputElement {
 class InputElementData {
  public:
   InputElementData();
-  ~InputElementData();
 
   bool placeholderShouldBeVisible() const {
     return m_placeholderShouldBeVisible;
