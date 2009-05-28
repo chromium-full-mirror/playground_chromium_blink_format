@@ -54,5 +54,8 @@
 - (BOOL)removeItemAtPath:(NSString*)path error:(NSError**)error;
 - (NSDictionary*)attributesOfFileSystemForPath:(NSString*)path
                                          error:(NSError**)error;
+- (NSString*)destinationOfSymbolicLinkAtPath:(NSString*)path
+                                       error:(NSError**)error;
+- (NSDictionary*)attributesOfItemAtPath:(NSString*)path error:(NSError**)error;
 @end
 #endif
