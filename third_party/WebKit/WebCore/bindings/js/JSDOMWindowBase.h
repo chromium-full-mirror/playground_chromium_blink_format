@@ -68,7 +68,8 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
                    JSC::JSValue,
                    JSC::PutPropertySlot&);
 
-  void clear();
+  // Called just before removing this window from the JSDOMWindowShell.
+  void willRemoveFromWindowShell();
 
   // Set a place to put a dialog return value when the window is cleared.
   void setReturnValueSlot(JSC::JSValue* slot);
