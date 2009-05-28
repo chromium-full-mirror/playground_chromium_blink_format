@@ -56,6 +56,7 @@ class WMLOptionElement : public WMLFormControlElement,
   virtual bool selected() const;
   virtual void setSelectedState(bool);
 
+  virtual String text() const;
   virtual String textIndentedToRespectGroupLabel() const;
   virtual String value() const;
 
