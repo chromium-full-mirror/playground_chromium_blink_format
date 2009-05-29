@@ -92,6 +92,8 @@ struct FontPlatformData {
   }
 
   float size() const { return m_size; }
+  bool syntheticBold() const { return m_syntheticBold; }
+  bool syntheticOblique() const { return m_syntheticOblique; }
 
   bool m_syntheticBold;
   bool m_syntheticOblique;
