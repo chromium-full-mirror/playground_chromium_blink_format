@@ -184,7 +184,8 @@ void RenderTextControl::setInnerTextValue(const String& innerTextValue) {
         frame->editor()->clearUndoRedoOperations();
 
         if (AXObjectCache::accessibilityEnabled())
-          document()->axObjectCache()->postNotification(this, "AXValueChanged");
+          document()->axObjectCache()->postNotification(this, "AXValueChanged",
+                                                        false);
       }
     }
 
