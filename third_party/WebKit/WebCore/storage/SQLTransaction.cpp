@@ -108,7 +108,7 @@ void SQLTransaction::executeSQL(
     readOnlyMode = true;
 
   RefPtr<SQLStatement> statement = SQLStatement::create(
-      sqlStatement.copy(), arguments, callback, callbackError, readOnlyMode);
+      sqlStatement, arguments, callback, callbackError, readOnlyMode);
 
   if (m_database->deleted())
     statement->setDatabaseDeletedError();
