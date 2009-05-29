@@ -322,7 +322,7 @@ void FrameLoaderClient::dispatchDecidePolicyForMIMEType(
 
   WebKitWebView* page = getViewFromFrame(m_frame);
   WebKitNetworkRequest* request =
-      webkit_network_request_new(resourceRequest.url().string().utf8().data());
+      webkit_network_request_new_with_core_request(resourceRequest);
 
   WebKitWebPolicyDecision* policyDecision =
       webkit_web_policy_decision_new(m_frame, policyFunction);
@@ -435,7 +435,7 @@ void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(
 
   WebKitWebView* webView = getViewFromFrame(m_frame);
   WebKitNetworkRequest* request =
-      webkit_network_request_new(resourceRequest.url().string().utf8().data());
+      webkit_network_request_new_with_core_request(resourceRequest);
   WebKitNavigationResponse response;
   /*
    * We still support the deprecated navigation-requested signal, if the
@@ -1065,7 +1065,7 @@ void FrameLoaderClient::setMainDocumentError(DocumentLoader*,
 
 void FrameLoaderClient::startDownload(const ResourceRequest& request) {
   WebKitNetworkRequest* networkRequest =
-      webkit_network_request_new(request.url().string().utf8().data());
+      webkit_network_request_new_with_core_request(request);
   WebKitWebView* view = getViewFromFrame(m_frame);
 
   webkit_web_view_request_download(view, networkRequest);
