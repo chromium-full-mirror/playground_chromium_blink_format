@@ -838,6 +838,8 @@ class WebView : public IWebView,
                                                  REFIID,
                                                  void** ppObject);
 
+  void downloadURL(const WebCore::KURL&);
+
  private:
   void setZoomMultiplier(float multiplier, bool isTextOnly);
   float zoomMultiplier(bool isTextOnly);
