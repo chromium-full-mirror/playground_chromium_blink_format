@@ -1586,8 +1586,8 @@ void WebFrame::dispatchDidFailLoad(const ResourceError& error) {
   }
 }
 
-void WebFrame::startDownload(const ResourceRequest& request) {
-  d->webView->downloadURL(request.url());
+void WebFrame::startDownload(const ResourceRequest&) {
+  notImplemented();
 }
 
 Widget* WebFrame::createJavaAppletWidget(const IntSize& pluginSize,

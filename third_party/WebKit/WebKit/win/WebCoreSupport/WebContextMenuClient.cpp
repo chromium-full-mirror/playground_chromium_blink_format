@@ -26,6 +26,7 @@
 #include "config.h"
 #include "WebContextMenuClient.h"
 
+#include "WebDownload.h"
 #include "WebElementPropertyBag.h"
 #include "WebLocalizableStrings.h"
 #include "WebView.h"
@@ -139,7 +140,22 @@ void WebContextMenuClient::contextMenuItemSelected(
 }
 
 void WebContextMenuClient::downloadURL(const KURL& url) {
-  m_webView->downloadURL(url);
+  COMPtr<IWebDownloadDelegate> downloadDelegate;
+  if (FAILED(m_webView->downloadDelegate(&downloadDelegate))) {
+    // If the WebView doesn't successfully provide a download delegate we'll
+    // pass a null one
+    // into the WebDownload - which may or may not decide to use a
+    // DefaultDownloadDelegate
+    LOG_ERROR("Failed to get downloadDelegate from WebView");
+    downloadDelegate = 0;
+  }
+
+  // Its the delegate's job to ref the WebDownload to keep it alive - otherwise
+  // it will be destroyed
+  // when this method returns
+  COMPtr<WebDownload> download;
+  download.adoptRef(WebDownload::createInstance(url, downloadDelegate.get()));
+  download->start();
 }
 
 void WebContextMenuClient::searchWithGoogle(const Frame* frame) {
