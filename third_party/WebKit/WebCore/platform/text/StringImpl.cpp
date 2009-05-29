@@ -248,7 +248,8 @@ bool StringImpl::isLower() {
 }
 
 PassRefPtr<StringImpl> StringImpl::lower() {
-  StringBuffer data(m_length);
+  UChar* data;
+  PassRefPtr<StringImpl> newImpl = createUninitialized(m_length, data);
   int32_t length = m_length;
 
   // Do a faster loop for the case where all the characters are ASCII.
@@ -259,23 +260,23 @@ PassRefPtr<StringImpl> StringImpl::lower() {
     data[i] = toASCIILower(c);
   }
   if (!(ored & ~0x7F))
-    return adopt(data);
+    return newImpl;
 
   // Do a slower implementation for cases that include non-ASCII characters.
   bool error;
-  int32_t realLength =
-      Unicode::toLower(data.characters(), length, m_data, m_length, &error);
+  int32_t realLength = Unicode::toLower(data, length, m_data, m_length, &error);
   if (!error && realLength == length)
-    return adopt(data);
-  data.resize(realLength);
-  Unicode::toLower(data.characters(), realLength, m_data, m_length, &error);
+    return newImpl;
+  newImpl = createUninitialized(realLength, data);
+  Unicode::toLower(data, realLength, m_data, m_length, &error);
   if (error)
     return this;
-  return adopt(data);
+  return newImpl;
 }
 
 PassRefPtr<StringImpl> StringImpl::upper() {
-  StringBuffer data(m_length);
+  UChar* data;
+  PassRefPtr<StringImpl> newImpl = createUninitialized(m_length, data);
   int32_t length = m_length;
 
   // Do a faster loop for the case where all the characters are ASCII.
@@ -286,31 +287,32 @@ PassRefPtr<StringImpl> StringImpl::upper() {
     data[i] = toASCIIUpper(c);
   }
   if (!(ored & ~0x7F))
-    return adopt(data);
+    return newImpl;
 
   // Do a slower implementation for cases that include non-ASCII characters.
   bool error;
-  int32_t realLength =
-      Unicode::toUpper(data.characters(), length, m_data, m_length, &error);
+  int32_t realLength = Unicode::toUpper(data, length, m_data, m_length, &error);
   if (!error && realLength == length)
-    return adopt(data);
-  data.resize(realLength);
-  Unicode::toUpper(data.characters(), realLength, m_data, m_length, &error);
+    return newImpl;
+  newImpl = createUninitialized(realLength, data);
+  Unicode::toUpper(data, realLength, m_data, m_length, &error);
   if (error)
     return this;
-  return adopt(data);
+  return newImpl;
 }
 
 PassRefPtr<StringImpl> StringImpl::secure(UChar aChar) {
-  int length = m_length;
-  StringBuffer data(length);
+  UChar* data;
+  PassRefPtr<StringImpl> newImpl = createUninitialized(m_length, data);
+  int32_t length = m_length;
   for (int i = 0; i < length; ++i)
     data[i] = aChar;
-  return adopt(data);
+  return newImpl;
 }
 
 PassRefPtr<StringImpl> StringImpl::foldCase() {
-  StringBuffer data(m_length);
+  UChar* data;
+  PassRefPtr<StringImpl> newImpl = createUninitialized(m_length, data);
   int32_t length = m_length;
 
   // Do a faster loop for the case where all the characters are ASCII.
@@ -321,19 +323,19 @@ PassRefPtr<StringImpl> StringImpl::foldCase() {
     data[i] = toASCIILower(c);
   }
   if (!(ored & ~0x7F))
-    return adopt(data);
+    return newImpl;
 
   // Do a slower implementation for cases that include non-ASCII characters.
   bool error;
   int32_t realLength =
-      Unicode::foldCase(data.characters(), length, m_data, m_length, &error);
+      Unicode::foldCase(data, length, m_data, m_length, &error);
   if (!error && realLength == length)
-    return adopt(data);
-  data.resize(realLength);
-  Unicode::foldCase(data.characters(), realLength, m_data, m_length, &error);
+    return newImpl;
+  newImpl = createUninitialized(realLength, data);
+  Unicode::foldCase(data, realLength, m_data, m_length, &error);
   if (error)
     return this;
-  return adopt(data);
+  return newImpl;
 }
 
 PassRefPtr<StringImpl> StringImpl::stripWhiteSpace() {
@@ -696,14 +698,16 @@ PassRefPtr<StringImpl> StringImpl::replace(UChar oldC, UChar newC) {
   if (i == m_length)
     return this;
 
-  StringBuffer data(m_length);
+  UChar* data;
+  PassRefPtr<StringImpl> newImpl = createUninitialized(m_length, data);
+
   for (i = 0; i != m_length; ++i) {
     UChar ch = m_data[i];
     if (ch == oldC)
       ch = newC;
     data[i] = ch;
   }
-  return adopt(data);
+  return newImpl;
 }
 
 PassRefPtr<StringImpl> StringImpl::replace(unsigned position,
@@ -714,15 +718,16 @@ PassRefPtr<StringImpl> StringImpl::replace(unsigned position,
   unsigned lengthToInsert = str ? str->length() : 0;
   if (!lengthToReplace && !lengthToInsert)
     return this;
-  StringBuffer buffer(length() - lengthToReplace + lengthToInsert);
-  memcpy(buffer.characters(), characters(), position * sizeof(UChar));
+  UChar* data;
+  PassRefPtr<StringImpl> newImpl =
+      createUninitialized(length() - lengthToReplace + lengthToInsert, data);
+  memcpy(data, characters(), position * sizeof(UChar));
   if (str)
-    memcpy(buffer.characters() + position, str->characters(),
-           lengthToInsert * sizeof(UChar));
-  memcpy(buffer.characters() + position + lengthToInsert,
+    memcpy(data + position, str->characters(), lengthToInsert * sizeof(UChar));
+  memcpy(data + position + lengthToInsert,
          characters() + position + lengthToReplace,
          (length() - position - lengthToReplace) * sizeof(UChar));
-  return adopt(buffer);
+  return newImpl;
 }
 
 PassRefPtr<StringImpl> StringImpl::replace(UChar pattern,
@@ -744,7 +749,9 @@ PassRefPtr<StringImpl> StringImpl::replace(UChar pattern,
   if (!matchCount)
     return this;
 
-  StringBuffer data(m_length - matchCount + (matchCount * repStrLength));
+  UChar* data;
+  PassRefPtr<StringImpl> newImpl = createUninitialized(
+      m_length - matchCount + (matchCount * repStrLength), data);
 
   // Construct the new data
   int srcSegmentEnd;
@@ -754,22 +761,21 @@ PassRefPtr<StringImpl> StringImpl::replace(UChar pattern,
 
   while ((srcSegmentEnd = find(pattern, srcSegmentStart)) >= 0) {
     srcSegmentLength = srcSegmentEnd - srcSegmentStart;
-    memcpy(data.characters() + dstOffset, m_data + srcSegmentStart,
+    memcpy(data + dstOffset, m_data + srcSegmentStart,
            srcSegmentLength * sizeof(UChar));
     dstOffset += srcSegmentLength;
-    memcpy(data.characters() + dstOffset, replacement->m_data,
-           repStrLength * sizeof(UChar));
+    memcpy(data + dstOffset, replacement->m_data, repStrLength * sizeof(UChar));
     dstOffset += repStrLength;
     srcSegmentStart = srcSegmentEnd + 1;
   }
 
   srcSegmentLength = m_length - srcSegmentStart;
-  memcpy(data.characters() + dstOffset, m_data + srcSegmentStart,
+  memcpy(data + dstOffset, m_data + srcSegmentStart,
          srcSegmentLength * sizeof(UChar));
 
-  ASSERT(dstOffset + srcSegmentLength == static_cast<int>(data.length()));
+  ASSERT(dstOffset + srcSegmentLength == static_cast<int>(newImpl->length()));
 
-  return adopt(data);
+  return newImpl;
 }
 
 PassRefPtr<StringImpl> StringImpl::replace(StringImpl* pattern,
@@ -795,7 +801,9 @@ PassRefPtr<StringImpl> StringImpl::replace(StringImpl* pattern,
   if (!matchCount)
     return this;
 
-  StringBuffer data(m_length + matchCount * (repStrLength - patternLength));
+  UChar* data;
+  PassRefPtr<StringImpl> newImpl = createUninitialized(
+      m_length + matchCount * (repStrLength - patternLength), data);
 
   // Construct the new data
   int srcSegmentEnd;
@@ -805,22 +813,21 @@ PassRefPtr<StringImpl> StringImpl::replace(StringImpl* pattern,
 
   while ((srcSegmentEnd = find(pattern, srcSegmentStart)) >= 0) {
     srcSegmentLength = srcSegmentEnd - srcSegmentStart;
-    memcpy(data.characters() + dstOffset, m_data + srcSegmentStart,
+    memcpy(data + dstOffset, m_data + srcSegmentStart,
            srcSegmentLength * sizeof(UChar));
     dstOffset += srcSegmentLength;
-    memcpy(data.characters() + dstOffset, replacement->m_data,
-           repStrLength * sizeof(UChar));
+    memcpy(data + dstOffset, replacement->m_data, repStrLength * sizeof(UChar));
     dstOffset += repStrLength;
     srcSegmentStart = srcSegmentEnd + patternLength;
   }
 
   srcSegmentLength = m_length - srcSegmentStart;
-  memcpy(data.characters() + dstOffset, m_data + srcSegmentStart,
+  memcpy(data + dstOffset, m_data + srcSegmentStart,
          srcSegmentLength * sizeof(UChar));
 
-  ASSERT(dstOffset + srcSegmentLength == static_cast<int>(data.length()));
+  ASSERT(dstOffset + srcSegmentLength == static_cast<int>(newImpl->length()));
 
-  return adopt(data);
+  return newImpl;
 }
 
 bool equal(StringImpl* a, StringImpl* b) {

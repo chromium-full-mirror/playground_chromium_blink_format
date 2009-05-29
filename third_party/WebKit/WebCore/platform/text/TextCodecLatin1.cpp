@@ -122,7 +122,8 @@ String TextCodecLatin1::decode(const char* bytes,
                                bool,
                                bool,
                                bool&) {
-  StringBuffer characters(length);
+  UChar* characters;
+  String result = String::createUninitialized(length, characters);
 
   // Convert the string a fast way and simultaneously do an efficient check to
   // see if it's all ASCII.
@@ -134,7 +135,7 @@ String TextCodecLatin1::decode(const char* bytes,
   }
 
   if (!(ored & 0x80))
-    return String::adopt(characters);
+    return result;
 
   // Convert the slightly slower way when there are non-ASCII characters.
   for (size_t i = 0; i < length; ++i) {
@@ -142,7 +143,7 @@ String TextCodecLatin1::decode(const char* bytes,
     characters[i] = table[c];
   }
 
-  return String::adopt(characters);
+  return result;
 }
 
 static CString encodeComplexWindowsLatin1(const UChar* characters,

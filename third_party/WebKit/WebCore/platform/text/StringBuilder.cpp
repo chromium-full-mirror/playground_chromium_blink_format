@@ -75,9 +75,10 @@ String StringBuilder::toString() const {
   if (count == 1)
     return m_strings[0];
 
-  StringBuffer buffer(m_totalLength);
+  UChar* buffer;
+  String result = String::createUninitialized(m_totalLength, buffer);
 
-  UChar* p = buffer.characters();
+  UChar* p = buffer;
   for (unsigned i = 0; i < count; ++i) {
     StringImpl* string = m_strings[i].impl();
     unsigned length = string->length();
@@ -85,8 +86,8 @@ String StringBuilder::toString() const {
     p += length;
   }
 
-  ASSERT(p == m_totalLength + buffer.characters());
+  ASSERT(p == m_totalLength + buffer);
 
-  return String::adopt(buffer);
+  return result;
 }
 }
