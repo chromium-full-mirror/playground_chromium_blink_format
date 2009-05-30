@@ -99,7 +99,7 @@ bool JSStorage::customPut(ExecState* exec,
       asObject(prototype)->hasProperty(exec, propertyName))
     return false;
 
-  String stringValue = valueToStringWithNullCheck(exec, value);
+  String stringValue = value.toString(exec);
   if (exec->hadException())
     return true;
 
