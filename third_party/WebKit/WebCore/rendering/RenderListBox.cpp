@@ -328,7 +328,7 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
   paintInfo.context->setFillColor(textColor);
 
   Font itemFont = style()->font();
-  if (element->hasTagName(optgroupTag)) {
+  if (isOptionGroupElement(element)) {
     FontDescription d = itemFont.fontDescription();
     d.setWeight(d.bolderWeight());
     itemFont = Font(d, itemFont.letterSpacing(), itemFont.wordSpacing());

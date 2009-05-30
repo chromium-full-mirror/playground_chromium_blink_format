@@ -29,6 +29,7 @@ namespace WebCore {
 class Element;
 class Document;
 class OptionElementData;
+class SelectElement;
 
 class OptionElement {
  public:
@@ -43,6 +44,7 @@ class OptionElement {
 
  protected:
   static void setSelectedState(OptionElementData&, Element*, bool selected);
+  static int optionIndex(SelectElement*, const Element*);
   static String collectOptionText(const OptionElementData&, const Element*);
   static String collectOptionTextRespectingGroupLabel(const OptionElementData&,
                                                       const Element*);
@@ -71,6 +73,7 @@ class OptionElementData {
 };
 
 OptionElement* toOptionElement(Element*);
+bool isOptionElement(Element*);
 }
 
 #endif

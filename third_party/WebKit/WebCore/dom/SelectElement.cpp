@@ -37,6 +37,7 @@
 #include "MappedAttribute.h"
 #include "MouseEvent.h"
 #include "OptionElement.h"
+#include "OptionGroupElement.h"
 #include "Page.h"
 #include "RenderListBox.h"
 #include "RenderMenuList.h"
@@ -44,6 +45,7 @@
 
 #if ENABLE(WML)
 #include "WMLNames.h"
+#include "WMLSelectElement.h"
 #endif
 
 #if PLATFORM(MAC)
@@ -95,22 +97,6 @@ void SelectElement::saveLastSelection(SelectElementData& data,
     OptionElement* optionElement = toOptionElement(items[i]);
     lastOnChangeSelection.append(optionElement && optionElement->selected());
   }
-}
-
-static inline bool isOptionElement(Element* element) {
-  return element->hasLocalName(HTMLNames::optionTag)
-#if ENABLE(WML)
-         || element->hasLocalName(WMLNames::optionTag)
-#endif
-      ;
-}
-
-static inline bool isOptionGroupElement(Element* element) {
-  return element->hasLocalName(HTMLNames::optgroupTag)
-#if ENABLE(WML)
-         || element->hasLocalName(WMLNames::optgroupTag)
-#endif
-      ;
 }
 
 int SelectElement::nextSelectableListIndex(SelectElementData& data,
@@ -961,6 +947,29 @@ void SelectElement::insertedIntoTree(SelectElementData& data,
   recalcListItems(data, element, true);
 }
 
+void SelectElement::accessKeySetSelectedIndex(SelectElementData& data,
+                                              Element* element,
+                                              int index) {
+  // first bring into focus the list box
+  if (!element->focused())
+    element->accessKeyAction(false);
+
+  // if this index is already selected, unselect. otherwise update the selected
+  // index
+  const Vector<Element*>& items = data.listItems(element);
+  int listIndex = optionToListIndex(data, element, index);
+  if (OptionElement* optionElement =
+          (listIndex >= 0 ? toOptionElement(items[listIndex]) : 0)) {
+    if (optionElement->selected())
+      optionElement->setSelectedState(false);
+    else
+      setSelectedIndex(data, element, index, false, true);
+  }
+
+  listBoxOnChange(data, element);
+  scrollToSelection(data, element);
+}
+
 // SelectElementData
 SelectElementData::SelectElementData()
     : m_multiple(false),
@@ -1012,8 +1021,7 @@ SelectElement* toSelectElement(Element* element) {
       return static_cast<HTMLKeygenElement*>(element);
   }
 
-// FIXME: Activate code once WMLSelectElement is available
-#if ENABLE(WML) && 0
+#if ENABLE(WML)
   if (element->isWMLElement() && element->hasTagName(WMLNames::selectTag))
     return static_cast<WMLSelectElement*>(element);
 #endif

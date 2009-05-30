@@ -29,6 +29,7 @@
 #include "NodeRenderStyle.h"
 #include "RenderStyle.h"
 #include "WMLNames.h"
+#include "WMLSelectElement.h"
 
 namespace WebCore {
 
@@ -44,41 +45,31 @@ const AtomicString& WMLOptionElement::formControlType() const {
   return option;
 }
 
-// FIXME: Activate once WMLSelectElement is available
-#if 0
-static inline WMLElement* ownerSelectElement()
-{
-    Node* select = parentNode();
-    while (select && !select->hasTagName(selectTag))
-        select = select->parentNode();
+static inline WMLSelectElement* ownerSelectElement(Element* element) {
+  Node* select = element->parentNode();
+  while (select && !select->hasTagName(selectTag))
+    select = select->parentNode();
 
-    if (!select)
-        return 0;
+  if (!select)
+    return 0;
 
-    return static_cast<WMLSelectElement*>(select);
+  return static_cast<WMLSelectElement*>(select);
 }
-#endif
 
 void WMLOptionElement::accessKeyAction(bool) {
-// FIXME: Activate once WMLSelectElement is available
-#if 0
-    if (WMLSelectElement* select = ownerSelectElement())
-        select->accessKeySetSelectedIndex(index());
-#endif
+  if (WMLSelectElement* select = ownerSelectElement(this))
+    select->accessKeySetSelectedIndex(OptionElement::optionIndex(select, this));
 }
 
 void WMLOptionElement::childrenChanged(bool changedByParser,
                                        Node* beforeChange,
                                        Node* afterChange,
                                        int childCountDelta) {
-// FIXME: Activate once WMLSelectElement is available
-#if 0
-    if (WMLSelectElement* select = ownerSelectElement())
-        select->childrenChanged(changedByParser);
-#endif
+  if (WMLSelectElement* select = ownerSelectElement(this))
+    select->childrenChanged(changedByParser);
 
-  WMLElement::childrenChanged(changedByParser, beforeChange, afterChange,
-                              childCountDelta);
+  WMLFormControlElement::childrenChanged(changedByParser, beforeChange,
+                                         afterChange, childCountDelta);
 }
 
 void WMLOptionElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -94,18 +85,18 @@ void WMLOptionElement::parseMappedAttribute(MappedAttribute* attr) {
     createEventHandlerIfNeeded();
     eventHandler()->registerIntrinsicEvent(WMLIntrinsicEventOnPick, event);
   } else
-    WMLElement::parseMappedAttribute(attr);
+    WMLFormControlElement::parseMappedAttribute(attr);
 }
 
 void WMLOptionElement::attach() {
   if (parentNode()->renderStyle())
     setRenderStyle(styleForRenderer());
-  WMLElement::attach();
+  WMLFormControlElement::attach();
 }
 
 void WMLOptionElement::detach() {
   m_style.clear();
-  WMLElement::detach();
+  WMLFormControlElement::detach();
 }
 
 void WMLOptionElement::setRenderStyle(PassRefPtr<RenderStyle> style) {
@@ -113,14 +104,11 @@ void WMLOptionElement::setRenderStyle(PassRefPtr<RenderStyle> style) {
 }
 
 void WMLOptionElement::insertedIntoDocument() {
-// FIXME: Activate once WMLSelectElement is available
-#if 0
-    WMLSelectElement* select;
-    if (selected() && (select = ownerSelectElement()))
-        select->scrollToSelection();
-#endif
+  WMLSelectElement* select;
+  if (selected() && (select = ownerSelectElement(this)))
+    select->scrollToSelection();
 
-  WMLElement::insertedIntoDocument();
+  WMLFormControlElement::insertedIntoDocument();
 }
 
 bool WMLOptionElement::selected() const {

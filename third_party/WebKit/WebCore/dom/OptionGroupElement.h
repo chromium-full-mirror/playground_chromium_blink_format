@@ -35,6 +35,7 @@ class OptionGroupElement {
 };
 
 OptionGroupElement* toOptionGroupElement(Element*);
+bool isOptionGroupElement(Element*);
 }
 
 #endif

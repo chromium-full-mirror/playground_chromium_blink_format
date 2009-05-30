@@ -124,6 +124,9 @@ class SelectElement {
   static int lastSelectedListIndex(const SelectElementData&, const Element*);
   static void typeAheadFind(SelectElementData&, Element*, KeyboardEvent*);
   static void insertedIntoTree(SelectElementData&, Element*);
+  static void accessKeySetSelectedIndex(SelectElementData&,
+                                        Element*,
+                                        int index);
 
  private:
   static void menuListDefaultEventHandler(SelectElementData&,

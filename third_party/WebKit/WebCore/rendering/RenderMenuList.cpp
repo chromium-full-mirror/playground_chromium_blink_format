@@ -322,12 +322,14 @@ String RenderMenuList::itemText(unsigned listIndex) const {
 bool RenderMenuList::itemIsEnabled(unsigned listIndex) const {
   SelectElement* select = toSelectElement(static_cast<Element*>(node()));
   Element* element = select->listItems()[listIndex];
-  if (!element->hasTagName(optionTag))
+  if (!isOptionElement(element))
     return false;
+
   bool groupEnabled = true;
-  if (element->parentNode() && element->parentNode()->hasTagName(optgroupTag))
-    groupEnabled =
-        static_cast<Element*>(element->parentNode())->isEnabledFormControl();
+  if (Element* parentElement = element->parentElement()) {
+    if (isOptionGroupElement(parentElement))
+      groupEnabled = parentElement->isEnabledFormControl();
+  }
   if (!groupEnabled)
     return false;
 
@@ -427,7 +429,7 @@ bool RenderMenuList::itemIsSeparator(unsigned listIndex) const {
 bool RenderMenuList::itemIsLabel(unsigned listIndex) const {
   SelectElement* select = toSelectElement(static_cast<Element*>(node()));
   Element* element = select->listItems()[listIndex];
-  return element->hasTagName(optgroupTag);
+  return isOptionGroupElement(element);
 }
 
 bool RenderMenuList::itemIsSelected(unsigned listIndex) const {
