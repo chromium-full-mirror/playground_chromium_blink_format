@@ -38,8 +38,6 @@ class String;
 
 class SelectElement {
  public:
-  virtual ~SelectElement() {}
-
   virtual bool multiple() const = 0;
 
   virtual int size() const = 0;
@@ -65,7 +63,10 @@ class SelectElement {
                                 bool fireOnChange = false) = 0;
 
  protected:
+  virtual ~SelectElement() {}
+
   friend class SelectElementData;
+
   static void selectAll(SelectElementData&, Element*);
   static void saveLastSelection(SelectElementData&, Element*);
   static int nextSelectableListIndex(SelectElementData&,
@@ -108,19 +109,19 @@ class SelectElement {
                             Element* excludeElement = 0);
   static bool saveFormControlState(const SelectElementData&,
                                    const Element*,
-                                   String& value);
+                                   String& state);
   static void restoreFormControlState(SelectElementData&,
                                       Element*,
                                       const String& state);
   static void parseMultipleAttribute(SelectElementData&,
                                      Element*,
                                      MappedAttribute*);
-  static bool appendFormData(SelectElementData&, Element*, FormDataList& list);
+  static bool appendFormData(SelectElementData&, Element*, FormDataList&);
   static void reset(SelectElementData&, Element*);
   static void defaultEventHandler(SelectElementData&,
                                   Element*,
                                   Event*,
-                                  HTMLFormElement* htmlForm = 0);
+                                  HTMLFormElement* = 0);
   static int lastSelectedListIndex(const SelectElementData&, const Element*);
   static void typeAheadFind(SelectElementData&, Element*, KeyboardEvent*);
   static void insertedIntoTree(SelectElementData&, Element*);

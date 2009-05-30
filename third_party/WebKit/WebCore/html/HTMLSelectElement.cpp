@@ -26,27 +26,14 @@
 #include "HTMLSelectElement.h"
 
 #include "AXObjectCache.h"
-#include "CSSPropertyNames.h"
-#include "CSSStyleSelector.h"
-#include "Document.h"
-#include "Event.h"
 #include "EventNames.h"
-#include "FormDataList.h"
-#include "Frame.h"
-#include "HTMLFormElement.h"
 #include "HTMLNames.h"
 #include "HTMLOptionElement.h"
 #include "HTMLOptionsCollection.h"
-#include "ScriptEventListener.h"
-#include "KeyboardEvent.h"
 #include "MappedAttribute.h"
-#include "MouseEvent.h"
-#include "Page.h"
 #include "RenderListBox.h"
 #include "RenderMenuList.h"
-#include <math.h>
-#include <wtf/StdLibExtras.h>
-#include <wtf/Vector.h>
+#include "ScriptEventListener.h"
 
 using namespace std;
 
@@ -58,9 +45,9 @@ using namespace HTMLNames;
 static const unsigned maxSelectItems = 10000;
 
 HTMLSelectElement::HTMLSelectElement(const QualifiedName& tagName,
-                                     Document* doc,
-                                     HTMLFormElement* f)
-    : HTMLFormControlElementWithState(tagName, doc, f), m_minwidth(0) {
+                                     Document* document,
+                                     HTMLFormElement* form)
+    : HTMLFormControlElementWithState(tagName, document, form) {
   ASSERT(hasTagName(selectTag) || hasTagName(keygenTag));
 }
 
@@ -134,27 +121,24 @@ void HTMLSelectElement::add(HTMLElement* element,
 }
 
 void HTMLSelectElement::remove(int index) {
-  ExceptionCode ec = 0;
   int listIndex = optionToListIndex(index);
+  if (listIndex < 0)
+    return;
 
-  const Vector<Element*>& items = listItems();
-  if (listIndex < 0 || index >= int(items.size()))
-    return;  // ### what should we do ? remove the last item?
-
-  Element* item = items[listIndex];
+  Element* item = listItems()[listIndex];
   ASSERT(item->parentNode());
+  ExceptionCode ec;
   item->parentNode()->removeChild(item, ec);
 }
 
 String HTMLSelectElement::value() {
-  unsigned i;
   const Vector<Element*>& items = listItems();
-  for (i = 0; i < items.size(); i++) {
+  for (unsigned i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag) &&
         static_cast<HTMLOptionElement*>(items[i])->selected())
       return static_cast<HTMLOptionElement*>(items[i])->value();
   }
-  return String("");
+  return "";
 }
 
 void HTMLSelectElement::setValue(const String& value) {
@@ -164,7 +148,7 @@ void HTMLSelectElement::setValue(const String& value) {
   // and make it the current selection.
   const Vector<Element*>& items = listItems();
   unsigned optionIndex = 0;
-  for (unsigned i = 0; i < items.size(); i++)
+  for (unsigned i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag)) {
       if (static_cast<HTMLOptionElement*>(items[i])->value() == value) {
         setSelectedIndex(optionIndex, true);
@@ -172,6 +156,7 @@ void HTMLSelectElement::setValue(const String& value) {
       }
       optionIndex++;
     }
+  }
 }
 
 bool HTMLSelectElement::saveFormControlState(String& value) const {
@@ -202,8 +187,6 @@ void HTMLSelectElement::parseMappedAttribute(MappedAttribute* attr) {
       attach();
       setRecalcListItems();
     }
-  } else if (attr->name() == widthAttr) {
-    m_minwidth = max(attr->value().toInt(), 0);
   } else if (attr->name() == multipleAttr)
     SelectElement::parseMultipleAttribute(m_data, this, attr);
   else if (attr->name() == accesskeyAttr) {
@@ -307,6 +290,9 @@ void HTMLSelectElement::dispatchBlurEvent() {
 
 void HTMLSelectElement::defaultEventHandler(Event* event) {
   SelectElement::defaultEventHandler(m_data, this, event, form());
+  if (event->defaultHandled())
+    return;
+  HTMLFormControlElementWithState::defaultEventHandler(event);
 }
 
 void HTMLSelectElement::setActiveSelectionAnchorIndex(int index) {
