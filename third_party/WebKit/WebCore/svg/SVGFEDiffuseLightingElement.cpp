@@ -46,8 +46,7 @@ SVGFEDiffuseLightingElement::SVGFEDiffuseLightingElement(
       m_diffuseConstant(this, SVGNames::diffuseConstantAttr, 1.0f),
       m_surfaceScale(this, SVGNames::surfaceScaleAttr, 1.0f),
       m_kernelUnitLengthX(this, SVGNames::kernelUnitLengthAttr),
-      m_kernelUnitLengthY(this, SVGNames::kernelUnitLengthAttr),
-      m_filterEffect(0) {}
+      m_kernelUnitLengthY(this, SVGNames::kernelUnitLengthAttr) {}
 
 SVGFEDiffuseLightingElement::~SVGFEDiffuseLightingElement() {}
 
@@ -69,14 +68,8 @@ void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFilterEffect* SVGFEDiffuseLightingElement::filterEffect(
-    SVGResourceFilter* filter) const {
-  ASSERT_NOT_REACHED();
-  return 0;
-}
-
-bool SVGFEDiffuseLightingElement::build(FilterBuilder* builder) {
-  FilterEffect* input1 = builder->getEffectById(in1());
+bool SVGFEDiffuseLightingElement::build(SVGResourceFilter* filterResource) {
+  FilterEffect* input1 = filterResource->builder()->getEffectById(in1());
 
   if (!input1)
     return false;
@@ -84,10 +77,10 @@ bool SVGFEDiffuseLightingElement::build(FilterBuilder* builder) {
   RefPtr<RenderStyle> filterStyle = styleForRenderer();
   Color color = filterStyle->svgStyle()->lightingColor();
 
-  RefPtr<FilterEffect> addedEffect = FEDiffuseLighting::create(
+  RefPtr<FilterEffect> effect = FEDiffuseLighting::create(
       input1, color, surfaceScale(), diffuseConstant(), kernelUnitLengthX(),
       kernelUnitLengthY(), findLights());
-  builder->add(result(), addedEffect.release());
+  filterResource->addFilterEffect(this, effect.release());
 
   return true;
 }

@@ -36,8 +36,7 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFEColorMatrixElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
-  bool build(FilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement,
@@ -58,8 +57,6 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
                                  SVGNumberList,
                                  Values,
                                  values)
-
-  mutable RefPtr<FEColorMatrix> m_filterEffect;
 };
 
 }  // namespace WebCore

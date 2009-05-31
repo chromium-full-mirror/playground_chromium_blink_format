@@ -47,10 +47,9 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
   virtual void notifyFinished(CachedResource*);
 
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
-  bool build(FilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  protected:
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
@@ -62,7 +61,6 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
                                  preserveAspectRatio)
 
   CachedResourceHandle<CachedImage> m_cachedImage;
-  mutable RefPtr<FEImage> m_filterEffect;
 };
 
 }  // namespace WebCore

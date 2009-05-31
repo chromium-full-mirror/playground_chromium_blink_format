@@ -41,8 +41,7 @@ class SVGFEDiffuseLightingElement
   virtual ~SVGFEDiffuseLightingElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
-  bool build(FilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
@@ -77,8 +76,6 @@ class SVGFEDiffuseLightingElement
                                  kernelUnitLengthY)
 
   LightSource* findLights() const;
-
-  mutable RefPtr<FEDiffuseLighting> m_filterEffect;
 };
 
 }  // namespace WebCore

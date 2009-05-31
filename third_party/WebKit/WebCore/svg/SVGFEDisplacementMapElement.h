@@ -35,8 +35,7 @@ class SVGFEDisplacementMapElement
   static ChannelSelectorType stringToChannel(const String&);
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
-  bool build(FilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement,
@@ -69,8 +68,6 @@ class SVGFEDisplacementMapElement
                                  float,
                                  Scale,
                                  scale)
-
-  mutable RefPtr<FEDisplacementMap> m_filterEffect;
 };
 
 }  // namespace WebCore

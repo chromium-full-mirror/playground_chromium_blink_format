@@ -40,8 +40,7 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
   void setStdDeviation(float stdDeviationX, float stdDeviationY);
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
-  bool build(FilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEGaussianBlurElement,
@@ -62,8 +61,6 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
                                  float,
                                  StdDeviationY,
                                  stdDeviationY)
-
-  mutable RefPtr<FEGaussianBlur> m_filterEffect;
 };
 
 }  // namespace WebCore

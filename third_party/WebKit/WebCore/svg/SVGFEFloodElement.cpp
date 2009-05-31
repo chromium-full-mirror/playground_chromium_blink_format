@@ -35,8 +35,7 @@ namespace WebCore {
 SVGFEFloodElement::SVGFEFloodElement(const QualifiedName& tagName,
                                      Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
-      m_in1(this, SVGNames::inAttr),
-      m_filterEffect(0) {}
+      m_in1(this, SVGNames::inAttr) {}
 
 SVGFEFloodElement::~SVGFEFloodElement() {}
 
@@ -48,14 +47,8 @@ void SVGFEFloodElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFilterEffect* SVGFEFloodElement::filterEffect(
-    SVGResourceFilter* filter) const {
-  ASSERT_NOT_REACHED();
-  return 0;
-}
-
-bool SVGFEFloodElement::build(FilterBuilder* builder) {
-  FilterEffect* input = builder->getEffectById(in1());
+bool SVGFEFloodElement::build(SVGResourceFilter* filterResource) {
+  FilterEffect* input = filterResource->builder()->getEffectById(in1());
 
   if (!input)
     return false;
@@ -65,7 +58,8 @@ bool SVGFEFloodElement::build(FilterBuilder* builder) {
   Color color = filterStyle->svgStyle()->floodColor();
   float opacity = filterStyle->svgStyle()->floodOpacity();
 
-  builder->add(result(), FEFlood::create(input, color, opacity));
+  RefPtr<FilterEffect> effect = FEFlood::create(input, color, opacity);
+  filterResource->addFilterEffect(this, effect.release());
 
   return true;
 }

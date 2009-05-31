@@ -39,8 +39,7 @@ SVGFEColorMatrixElement::SVGFEColorMatrixElement(const QualifiedName& tagName,
       m_type(this, SVGNames::typeAttr, FECOLORMATRIX_TYPE_UNKNOWN),
       m_values(this,
                SVGNames::valuesAttr,
-               SVGNumberList::create(SVGNames::valuesAttr)),
-      m_filterEffect(0) {}
+               SVGNumberList::create(SVGNames::valuesAttr)) {}
 
 SVGFEColorMatrixElement::~SVGFEColorMatrixElement() {}
 
@@ -63,14 +62,8 @@ void SVGFEColorMatrixElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFilterEffect* SVGFEColorMatrixElement::filterEffect(
-    SVGResourceFilter* filter) const {
-  ASSERT_NOT_REACHED();
-  return 0;
-}
-
-bool SVGFEColorMatrixElement::build(FilterBuilder* builder) {
-  FilterEffect* input1 = builder->getEffectById(in1());
+bool SVGFEColorMatrixElement::build(SVGResourceFilter* filterResource) {
+  FilterEffect* input1 = filterResource->builder()->getEffectById(in1());
 
   if (!input1)
     return false;
@@ -83,9 +76,9 @@ bool SVGFEColorMatrixElement::build(FilterBuilder* builder) {
   for (unsigned int i = 0; i < nr; i++)
     _values.append(numbers->getItem(i, ec));
 
-  builder->add(result(),
-               FEColorMatrix::create(
-                   input1, static_cast<ColorMatrixType>(type()), _values));
+  RefPtr<FilterEffect> effect = FEColorMatrix::create(
+      input1, static_cast<ColorMatrixType>(type()), _values);
+  filterResource->addFilterEffect(this, effect.release());
 
   return true;
 }

@@ -44,8 +44,7 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFETurbulenceElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
-  bool build(FilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement,
@@ -84,8 +83,6 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
                                  int,
                                  Type,
                                  type)
-
-  mutable RefPtr<FETurbulence> m_filterEffect;
 };
 
 }  // namespace WebCore

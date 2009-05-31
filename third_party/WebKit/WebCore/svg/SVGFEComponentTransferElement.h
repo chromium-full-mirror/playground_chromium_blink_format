@@ -36,8 +36,7 @@ class SVGFEComponentTransferElement
   virtual ~SVGFEComponentTransferElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
-  bool build(FilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEComponentTransferElement,
@@ -46,8 +45,6 @@ class SVGFEComponentTransferElement
                                  String,
                                  In1,
                                  in1)
-
-  mutable RefPtr<FEComponentTransfer> m_filterEffect;
 };
 
 }  // namespace WebCore

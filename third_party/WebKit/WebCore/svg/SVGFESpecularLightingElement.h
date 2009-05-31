@@ -40,8 +40,7 @@ class SVGFESpecularLightingElement
   virtual ~SVGFESpecularLightingElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
-  bool build(FilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
@@ -80,8 +79,6 @@ class SVGFESpecularLightingElement
                                  float,
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
-
-  mutable RefPtr<FESpecularLighting> m_filterEffect;
 
   LightSource* findLights() const;
 };

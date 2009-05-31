@@ -34,8 +34,7 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFEBlendElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
-  bool build(FilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEBlendElement,
@@ -56,8 +55,6 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
                                  int,
                                  Mode,
                                  mode)
-
-  mutable RefPtr<FEBlend> m_filterEffect;
 };
 
 }  // namespace WebCore

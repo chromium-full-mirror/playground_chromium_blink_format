@@ -35,8 +35,7 @@ class SVGFETileElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFETileElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
-  bool build(FilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETileElement,
@@ -45,8 +44,6 @@ class SVGFETileElement : public SVGFilterPrimitiveStandardAttributes {
                                  String,
                                  In1,
                                  in1)
-
-  mutable RefPtr<FETile> m_filterEffect;
 };
 
 }  // namespace WebCore

@@ -34,11 +34,7 @@ class SVGFEMergeElement : public SVGFilterPrimitiveStandardAttributes {
   SVGFEMergeElement(const QualifiedName&, Document*);
   virtual ~SVGFEMergeElement();
 
-  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
-  bool build(FilterBuilder*);
-
- private:
-  mutable RefPtr<FEMerge> m_filterEffect;
+  virtual bool build(SVGResourceFilter*);
 };
 
 }  // namespace WebCore

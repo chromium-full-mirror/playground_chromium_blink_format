@@ -42,8 +42,7 @@ SVGFETurbulenceElement::SVGFETurbulenceElement(const QualifiedName& tagName,
       m_numOctaves(this, SVGNames::numOctavesAttr, 1),
       m_seed(this, SVGNames::seedAttr),
       m_stitchTiles(this, SVGNames::stitchTilesAttr, SVG_STITCHTYPE_NOSTITCH),
-      m_type(this, SVGNames::typeAttr, FETURBULENCE_TYPE_TURBULENCE),
-      m_filterEffect(0) {}
+      m_type(this, SVGNames::typeAttr, FETURBULENCE_TYPE_TURBULENCE) {}
 
 SVGFETurbulenceElement::~SVGFETurbulenceElement() {}
 
@@ -73,17 +72,11 @@ void SVGFETurbulenceElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFilterEffect* SVGFETurbulenceElement::filterEffect(
-    SVGResourceFilter* filter) const {
-  ASSERT_NOT_REACHED();
-  return 0;
-}
-
-bool SVGFETurbulenceElement::build(FilterBuilder* builder) {
-  RefPtr<FilterEffect> addedEffect = FETurbulence::create(
+bool SVGFETurbulenceElement::build(SVGResourceFilter* filterResource) {
+  RefPtr<FilterEffect> effect = FETurbulence::create(
       static_cast<TurbulanceType>(type()), baseFrequencyX(), baseFrequencyY(),
       numOctaves(), seed(), stitchTiles() == SVG_STITCHTYPE_STITCH);
-  builder->add(result(), addedEffect.release());
+  filterResource->addFilterEffect(this, effect.release());
 
   return true;
 }
