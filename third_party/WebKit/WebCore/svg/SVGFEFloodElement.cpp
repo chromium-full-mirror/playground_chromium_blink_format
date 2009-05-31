@@ -25,10 +25,8 @@
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "SVGFEFloodElement.h"
 
-#include "Attr.h"
-#include "Document.h"
+#include "MappedAttribute.h"
 #include "RenderStyle.h"
-#include "SVGNames.h"
 #include "SVGRenderStyle.h"
 #include "SVGResourceFilter.h"
 
@@ -36,12 +34,18 @@ namespace WebCore {
 
 SVGFEFloodElement::SVGFEFloodElement(const QualifiedName& tagName,
                                      Document* doc)
-    : SVGFilterPrimitiveStandardAttributes(tagName, doc), m_filterEffect(0) {}
+    : SVGFilterPrimitiveStandardAttributes(tagName, doc),
+      m_in1(this, SVGNames::inAttr),
+      m_filterEffect(0) {}
 
 SVGFEFloodElement::~SVGFEFloodElement() {}
 
 void SVGFEFloodElement::parseMappedAttribute(MappedAttribute* attr) {
-  SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
+  const String& value = attr->value();
+  if (attr->name() == SVGNames::inAttr)
+    setIn1BaseValue(value);
+  else
+    SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
 SVGFilterEffect* SVGFEFloodElement::filterEffect(
@@ -51,12 +55,17 @@ SVGFilterEffect* SVGFEFloodElement::filterEffect(
 }
 
 bool SVGFEFloodElement::build(FilterBuilder* builder) {
+  FilterEffect* input = builder->getEffectById(in1());
+
+  if (!input)
+    return false;
+
   RefPtr<RenderStyle> filterStyle = styleForRenderer();
 
   Color color = filterStyle->svgStyle()->floodColor();
   float opacity = filterStyle->svgStyle()->floodOpacity();
 
-  builder->add(result(), FEFlood::create(color, opacity));
+  builder->add(result(), FEFlood::create(input, color, opacity));
 
   return true;
 }

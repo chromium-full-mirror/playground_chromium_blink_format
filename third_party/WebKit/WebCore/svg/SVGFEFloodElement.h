@@ -24,8 +24,8 @@
 #define SVGFEFloodElement_h
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
-#include "SVGFilterPrimitiveStandardAttributes.h"
 #include "SVGFEFlood.h"
+#include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
 class SVGFEFloodElement : public SVGFilterPrimitiveStandardAttributes {
@@ -38,6 +38,13 @@ class SVGFEFloodElement : public SVGFilterPrimitiveStandardAttributes {
   bool build(FilterBuilder*);
 
  private:
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEFloodElement,
+                                 SVGNames::feFloodTagString,
+                                 SVGNames::inAttrString,
+                                 String,
+                                 In1,
+                                 in1)
+
   mutable RefPtr<FEFlood> m_filterEffect;
 };
 
