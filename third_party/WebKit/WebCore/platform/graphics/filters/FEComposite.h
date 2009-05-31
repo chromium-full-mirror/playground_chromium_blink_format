@@ -26,7 +26,7 @@
 #include "FilterEffect.h"
 
 #include "PlatformString.h"
-#include "SVGResourceFilter.h"
+#include "Filter.h"
 
 namespace WebCore {
 
@@ -65,7 +65,7 @@ class FEComposite : public FilterEffect {
   float k4() const;
   void setK4(float);
 
-  void apply(SVGResourceFilter*);
+  void apply(Filter*);
   void dump();
 
  private:

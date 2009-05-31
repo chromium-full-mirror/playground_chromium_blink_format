@@ -25,7 +25,7 @@
 #if ENABLE(FILTERS)
 #include "FilterEffect.h"
 
-#include "SVGResourceFilter.h"
+#include "Filter.h"
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -50,7 +50,7 @@ class FEColorMatrix : public FilterEffect {
   const Vector<float>& values() const;
   void setValues(const Vector<float>&);
 
-  void apply(SVGResourceFilter*);
+  void apply(Filter*);
   void dump();
 
  private:

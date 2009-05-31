@@ -22,12 +22,11 @@
 #define FilterEffect_h
 
 #if ENABLE(FILTERS)
+#include "Filter.h"
 #include "FloatRect.h"
 #include "ImageBuffer.h"
-#include "SVGResourceFilter.h"
 #include "TextStream.h"
 
-#include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 
@@ -58,7 +57,7 @@ class FilterEffect : public RefCounted<FilterEffect> {
     m_effectBuffer.set(effectBuffer);
   }
 
-  virtual void apply(SVGResourceFilter*) = 0;
+  virtual void apply(Filter*) = 0;
   virtual void dump() = 0;
 
   virtual TextStream& externalRepresentation(TextStream&) const;

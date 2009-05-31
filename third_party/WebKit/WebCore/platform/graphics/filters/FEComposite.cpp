@@ -24,7 +24,7 @@
 #if ENABLE(FILTERS)
 #include "FEComposite.h"
 
-#include "SVGResourceFilter.h"
+#include "Filter.h"
 
 namespace WebCore {
 
@@ -94,7 +94,7 @@ void FEComposite::setK4(float k4) {
   m_k4 = k4;
 }
 
-void FEComposite::apply(SVGResourceFilter*) {}
+void FEComposite::apply(Filter*) {}
 
 void FEComposite::dump() {}
 

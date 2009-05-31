@@ -24,7 +24,7 @@
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "SVGFEOffset.h"
 #include "SVGRenderTreeAsText.h"
-#include "SVGResourceFilter.h"
+#include "Filter.h"
 
 namespace WebCore {
 
@@ -53,7 +53,7 @@ void FEOffset::setDy(float dy) {
   m_dy = dy;
 }
 
-void FEOffset::apply(SVGResourceFilter*) {}
+void FEOffset::apply(Filter*) {}
 
 void FEOffset::dump() {}
 

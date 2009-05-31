@@ -25,7 +25,7 @@
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "PlatformString.h"
 #include "FilterEffect.h"
-#include "SVGResourceFilter.h"
+#include "Filter.h"
 
 namespace WebCore {
 
@@ -54,7 +54,7 @@ class FEDisplacementMap : public FilterEffect {
   float scale() const;
   void setScale(float scale);
 
-  void apply(SVGResourceFilter*);
+  void apply(Filter*);
   void dump();
   TextStream& externalRepresentation(TextStream& ts) const;
 
