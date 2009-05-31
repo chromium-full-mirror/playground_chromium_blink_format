@@ -75,6 +75,11 @@ const char* PluginView::userAgent() {
   return 0;
 }
 
+const char* PluginView::userAgentStatic() {
+  notImplemented();
+  return 0;
+}
+
 NPError PluginView::handlePostReadFile(Vector<char>&, uint32, const char*) {
   notImplemented();
 
@@ -82,6 +87,11 @@ NPError PluginView::handlePostReadFile(Vector<char>&, uint32, const char*) {
 }
 
 NPError PluginView::getValue(NPNVariable, void*) {
+  notImplemented();
+  return 0;
+}
+
+NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
   notImplemented();
   return 0;
 }
