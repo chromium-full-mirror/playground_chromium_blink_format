@@ -315,6 +315,10 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   void setOnmouseup(PassRefPtr<EventListener>);
   EventListener* onmousewheel() const;
   void setOnmousewheel(PassRefPtr<EventListener>);
+  EventListener* onoffline() const;
+  void setOnoffline(PassRefPtr<EventListener>);
+  EventListener* ononline() const;
+  void setOnonline(PassRefPtr<EventListener>);
   EventListener* onreset() const;
   void setOnreset(PassRefPtr<EventListener>);
   EventListener* onresize() const;
