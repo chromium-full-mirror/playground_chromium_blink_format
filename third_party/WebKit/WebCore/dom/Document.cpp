@@ -2791,6 +2791,15 @@ void Document::setWindowAttributeEventListener(
   domWindow->setAttributeEventListener(eventType, listener);
 }
 
+void Document::dispatchWindowEvent(PassRefPtr<Event> event) {
+  ASSERT(!eventDispatchForbidden());
+  DOMWindow* domWindow = this->domWindow();
+  if (!domWindow)
+    return;
+  ExceptionCode ec;
+  domWindow->dispatchEvent(event, ec);
+}
+
 void Document::dispatchWindowEvent(const AtomicString& eventType,
                                    bool canBubbleArg,
                                    bool cancelableArg) {

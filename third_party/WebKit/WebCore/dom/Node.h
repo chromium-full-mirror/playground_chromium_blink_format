@@ -651,11 +651,6 @@ class Node : public EventTarget, public TreeShared<Node> {
                              bool lengthComputableArg,
                              unsigned loadedArg,
                              unsigned totalArg);
-  void dispatchStorageEvent(const AtomicString& eventType,
-                            const String& key,
-                            const String& oldValue,
-                            const String& newValue,
-                            Frame* source);
   void dispatchWebKitAnimationEvent(const AtomicString& eventType,
                                     const String& animationName,
                                     double elapsedTime);

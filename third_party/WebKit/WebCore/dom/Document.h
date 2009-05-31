@@ -635,6 +635,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   // DOMWindow if it exists.
   void setWindowAttributeEventListener(const AtomicString& eventType,
                                        PassRefPtr<EventListener>);
+  void dispatchWindowEvent(PassRefPtr<Event>);
   void dispatchWindowEvent(const AtomicString& eventType,
                            bool canBubbleArg,
                            bool cancelableArg);

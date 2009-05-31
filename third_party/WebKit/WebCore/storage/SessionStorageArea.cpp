@@ -33,6 +33,7 @@
 #include "Page.h"
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
+#include "StorageEvent.h"
 #include "StorageMap.h"
 
 namespace WebCore {
@@ -84,11 +85,10 @@ void SessionStorageArea::dispatchStorageEvent(const String& key,
       frames.append(frame);
   }
 
-  for (unsigned i = 0; i < frames.size(); ++i) {
-    if (HTMLElement* body = frames[i]->document()->body())
-      body->dispatchStorageEvent(eventNames().storageEvent, key, oldValue,
-                                 newValue, sourceFrame);
-  }
+  for (unsigned i = 0; i < frames.size(); ++i)
+    frames[i]->document()->dispatchWindowEvent(StorageEvent::create(
+        eventNames().storageEvent, key, oldValue, newValue,
+        sourceFrame->document()->documentURI(), sourceFrame->domWindow()));
 }
 
 }  // namespace WebCore
