@@ -64,12 +64,9 @@ class Expression : public ParseNode, Noncopyable {
 
   void addSubExpression(Expression* expr) {
     m_subExpressions.append(expr);
-    m_isContextNodeSensitive =
-        m_isContextNodeSensitive || expr->m_isContextNodeSensitive;
-    m_isContextPositionSensitive =
-        m_isContextPositionSensitive || expr->m_isContextPositionSensitive;
-    m_isContextSizeSensitive =
-        m_isContextSizeSensitive || expr->m_isContextSizeSensitive;
+    m_isContextNodeSensitive |= expr->m_isContextNodeSensitive;
+    m_isContextPositionSensitive |= expr->m_isContextPositionSensitive;
+    m_isContextSizeSensitive |= expr->m_isContextSizeSensitive;
   }
 
   bool isContextNodeSensitive() const { return m_isContextNodeSensitive; }
