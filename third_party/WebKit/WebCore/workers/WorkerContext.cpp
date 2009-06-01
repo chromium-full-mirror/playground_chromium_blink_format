@@ -59,7 +59,8 @@ WorkerContext::WorkerContext(const KURL& url,
     : m_url(url),
       m_userAgent(userAgent),
       m_script(new WorkerScriptController(this)),
-      m_thread(thread) {
+      m_thread(thread),
+      m_closing(false) {
   setSecurityOrigin(SecurityOrigin::create(url));
 }
 
@@ -98,6 +99,14 @@ WorkerLocation* WorkerContext::location() const {
   if (!m_location)
     m_location = WorkerLocation::create(m_url);
   return m_location.get();
+}
+
+void WorkerContext::close() {
+  if (m_closing)
+    return;
+
+  m_closing = true;
+  m_thread->stop();
 }
 
 WorkerNavigator* WorkerContext::navigator() const {
@@ -148,6 +157,9 @@ void WorkerContext::scriptImported(unsigned long, const String&) {
 }
 
 void WorkerContext::postMessage(const String& message) {
+  if (m_closing)
+    return;
+
   m_thread->workerObjectProxy()->postMessageToWorkerObject(message);
 }
 
@@ -227,6 +239,9 @@ void WorkerContext::clearInterval(int timeoutId) {
 }
 
 void WorkerContext::dispatchMessage(const String& message) {
+  // Since close() stops the thread event loop, this should not ever get called
+  // while closing.
+  ASSERT(!m_closing);
   RefPtr<Event> evt = MessageEvent::create(message, "", "", 0, 0);
 
   if (m_onmessageListener.get()) {

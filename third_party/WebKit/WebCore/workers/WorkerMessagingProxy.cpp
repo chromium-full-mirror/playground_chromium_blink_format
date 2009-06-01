@@ -316,6 +316,7 @@ void WorkerMessagingProxy::workerContextDestroyedInternal() {
   // is not needed for communication
   // in either side any more. However, the Worker object may still exist, and it
   // assumes that the proxy exists, too.
+  m_askedToTerminate = true;
   m_workerThread = 0;
   if (!m_workerObject)
     delete this;

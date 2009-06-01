@@ -97,6 +97,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
   // WorkerGlobalScope
   WorkerContext* self() { return this; }
   WorkerLocation* location() const;
+  void close();
 
   // WorkerUtils
   void importScripts(const Vector<String>& urls,
@@ -163,6 +164,8 @@ class WorkerContext : public RefCounted<WorkerContext>,
 
   RefPtr<EventListener> m_onmessageListener;
   EventListenersMap m_eventListeners;
+
+  bool m_closing;
 };
 
 }  // namespace WebCore
