@@ -109,6 +109,10 @@ class InspectorController : public RefCounted<InspectorController>
 
     Setting() : m_type(NoType) {}
 
+    explicit Setting(bool value) : m_type(BooleanType) {
+      m_simpleContent.m_boolean = value;
+    }
+
     Type type() const { return m_type; }
 
     String string() const {
@@ -254,6 +258,10 @@ class InspectorController : public RefCounted<InspectorController>
                                          const ScriptString& sourceString);
   void scriptImported(unsigned long identifier, const String& sourceString);
 
+  void enableResourceTracking(bool always = false);
+  void disableResourceTracking(bool always = false);
+  bool resourceTrackingEnabled() const { return m_resourceTrackingEnabled; }
+
 #if ENABLE(DATABASE)
   void didOpenDatabase(Database*,
                        const String& domain,
@@ -304,12 +312,12 @@ class InspectorController : public RefCounted<InspectorController>
   void stopUserInitiatedProfiling();
   void toggleRecordButton(bool);
 
-  void enableProfiler(bool skipRecompile = false);
-  void disableProfiler();
+  void enableProfiler(bool always = false, bool skipRecompile = false);
+  void disableProfiler(bool always = false);
   bool profilerEnabled() const { return enabled() && m_profilerEnabled; }
 
-  void enableDebugger();
-  void disableDebugger();
+  void enableDebugger(bool always = false);
+  void disableDebugger(bool always = false);
   bool debuggerEnabled() const { return m_debuggerEnabled; }
 
   JavaScriptCallFrame* currentCallFrame() const;
@@ -338,6 +346,7 @@ class InspectorController : public RefCounted<InspectorController>
 
  private:
   InspectorController(Page*, InspectorClient*);
+
   void focusNode();
 
   void addConsoleMessage(ScriptState*, ConsoleMessage*);
@@ -376,6 +385,8 @@ class InspectorController : public RefCounted<InspectorController>
   unsigned m_groupLevel;
   bool m_searchingForNode;
   ConsoleMessage* m_previousMessage;
+  bool m_resourceTrackingEnabled;
+  bool m_resourceTrackingSettingsLoaded;
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   bool m_debuggerEnabled;
   bool m_attachDebuggerWhenShown;

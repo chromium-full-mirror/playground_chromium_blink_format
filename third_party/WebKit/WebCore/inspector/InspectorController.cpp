@@ -97,6 +97,10 @@ namespace WebCore {
 
 static const char* const UserInitiatedProfileName =
     "org.webkit.profiles.user-initiated";
+static const char* const resourceTrackingEnabledSettingName =
+    "resourceTrackingEnabled";
+static const char* const debuggerEnabledSettingName = "debuggerEnabled";
+static const char* const profilerEnabledSettingName = "profilerEnabled";
 
 bool InspectorController::addSourceToFrame(const String& mimeType,
                                            const String& source,
@@ -171,7 +175,9 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
       m_nextIdentifier(-2),
       m_groupLevel(0),
       m_searchingForNode(false),
-      m_previousMessage(0)
+      m_previousMessage(0),
+      m_resourceTrackingEnabled(false),
+      m_resourceTrackingSettingsLoaded(false)
 #if ENABLE(JAVASCRIPT_DEBUGGER)
       ,
       m_debuggerEnabled(false),
@@ -322,7 +328,7 @@ void InspectorController::focusNode() {
   if (!enabled())
     return;
 
-  ASSERT(m_frontend.get());
+  ASSERT(m_frontend);
   ASSERT(m_nodeToFocus);
 
   m_frontend->updateFocusedNode(m_nodeToFocus.get());
@@ -547,6 +553,17 @@ void InspectorController::scriptObjectReady() {
     return;
   setFrontendProxyObject(m_scriptState, webInspectorObj);
 
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+  Setting debuggerEnabled = setting(debuggerEnabledSettingName);
+  if (debuggerEnabled.type() == Setting::BooleanType &&
+      debuggerEnabled.booleanValue())
+    enableDebugger();
+  Setting profilerEnabled = setting(profilerEnabledSettingName);
+  if (profilerEnabled.type() == Setting::BooleanType &&
+      profilerEnabled.booleanValue())
+    enableProfiler();
+#endif
+
   // Make sure our window is visible now that the page loaded
   showWindow();
 }
@@ -561,7 +578,7 @@ void InspectorController::show() {
     return;
 
   if (!m_page) {
-    if (m_frontend.get())
+    if (m_frontend)
       return;  // We are using custom frontend - no need to create page.
 
     m_page = m_client->createPage();
@@ -618,7 +635,7 @@ void InspectorController::closeWindow() {
 
 void InspectorController::populateScriptObjects() {
   ASSERT(m_frontend);
-  if (!m_frontend.get())
+  if (!m_frontend)
     return;
 
   ResourcesMap::iterator resourcesEnd = m_resources.end();
@@ -813,6 +830,17 @@ void InspectorController::identifierForInitialRequest(
   if (!enabled())
     return;
 
+  if (!m_resourceTrackingSettingsLoaded) {
+    m_resourceTrackingSettingsLoaded = true;
+    Setting resourceTracking = setting(resourceTrackingEnabledSettingName);
+    if (resourceTracking.type() == Setting::BooleanType &&
+        resourceTracking.booleanValue())
+      m_resourceTrackingEnabled = true;
+  }
+
+  if (!m_resourceTrackingEnabled)
+    return;
+
   RefPtr<InspectorResource> resource =
       InspectorResource::create(identifier, loader);
 
@@ -838,7 +866,7 @@ void InspectorController::willSendRequest(
     unsigned long identifier,
     ResourceRequest& request,
     const ResourceResponse& redirectResponse) {
-  if (!enabled())
+  if (!enabled() || !m_resourceTrackingEnabled)
     return;
 
   InspectorResource* resource = m_resources.get(identifier).get();
@@ -859,7 +887,7 @@ void InspectorController::willSendRequest(
 void InspectorController::didReceiveResponse(DocumentLoader*,
                                              unsigned long identifier,
                                              const ResourceResponse& response) {
-  if (!enabled())
+  if (!enabled() || !m_resourceTrackingEnabled)
     return;
 
   InspectorResource* resource = m_resources.get(identifier).get();
@@ -876,7 +904,7 @@ void InspectorController::didReceiveResponse(DocumentLoader*,
 void InspectorController::didReceiveContentLength(DocumentLoader*,
                                                   unsigned long identifier,
                                                   int lengthReceived) {
-  if (!enabled())
+  if (!enabled() || !m_resourceTrackingEnabled)
     return;
 
   InspectorResource* resource = m_resources.get(identifier).get();
@@ -891,7 +919,7 @@ void InspectorController::didReceiveContentLength(DocumentLoader*,
 
 void InspectorController::didFinishLoading(DocumentLoader*,
                                            unsigned long identifier) {
-  if (!enabled())
+  if (!enabled() || !m_resourceTrackingEnabled)
     return;
 
   RefPtr<InspectorResource> resource = m_resources.get(identifier);
@@ -911,7 +939,7 @@ void InspectorController::didFinishLoading(DocumentLoader*,
 void InspectorController::didFailLoading(DocumentLoader*,
                                          unsigned long identifier,
                                          const ResourceError& /*error*/) {
-  if (!enabled())
+  if (!enabled() || !m_resourceTrackingEnabled)
     return;
 
   RefPtr<InspectorResource> resource = m_resources.get(identifier);
@@ -932,7 +960,7 @@ void InspectorController::didFailLoading(DocumentLoader*,
 void InspectorController::resourceRetrievedByXMLHttpRequest(
     unsigned long identifier,
     const ScriptString& sourceString) {
-  if (!enabled())
+  if (!enabled() || !m_resourceTrackingEnabled)
     return;
 
   InspectorResource* resource = m_resources.get(identifier).get();
@@ -947,7 +975,7 @@ void InspectorController::resourceRetrievedByXMLHttpRequest(
 
 void InspectorController::scriptImported(unsigned long identifier,
                                          const String& sourceString) {
-  if (!enabled())
+  if (!enabled() || !m_resourceTrackingEnabled)
     return;
 
   InspectorResource* resource = m_resources.get(identifier).get();
@@ -960,6 +988,37 @@ void InspectorController::scriptImported(unsigned long identifier,
 
   if (windowVisible())
     resource->updateScriptObject(m_frontend.get());
+}
+
+void InspectorController::enableResourceTracking(bool always) {
+  if (!enabled())
+    return;
+
+  if (always)
+    setSetting(resourceTrackingEnabledSettingName, Setting(true));
+
+  if (m_resourceTrackingEnabled)
+    return;
+
+  ASSERT(m_inspectedPage);
+  m_resourceTrackingEnabled = true;
+  if (m_frontend)
+    m_frontend->resourceTrackingWasEnabled();
+
+  m_inspectedPage->mainFrame()->loader()->reload();
+}
+
+void InspectorController::disableResourceTracking(bool always) {
+  if (!enabled())
+    return;
+
+  if (always)
+    setSetting(resourceTrackingEnabledSettingName, Setting(false));
+
+  ASSERT(m_inspectedPage);
+  m_resourceTrackingEnabled = false;
+  if (m_frontend)
+    m_frontend->resourceTrackingWasDisabled();
 }
 
 #if ENABLE(DATABASE)
@@ -1062,7 +1121,7 @@ void InspectorController::startUserInitiatedProfiling(
     return;
 
   if (!profilerEnabled()) {
-    enableProfiler(true);
+    enableProfiler(false, true);
     JavaScriptDebugServer::shared().recompileAllJSFunctions();
   }
 
@@ -1106,7 +1165,10 @@ void InspectorController::toggleRecordButton(bool isProfiling) {
   m_frontend->setRecordingProfile(isProfiling);
 }
 
-void InspectorController::enableProfiler(bool skipRecompile) {
+void InspectorController::enableProfiler(bool always, bool skipRecompile) {
+  if (always)
+    setSetting(profilerEnabledSettingName, Setting(true));
+
   if (m_profilerEnabled)
     return;
 
@@ -1115,11 +1177,14 @@ void InspectorController::enableProfiler(bool skipRecompile) {
   if (!skipRecompile)
     JavaScriptDebugServer::shared().recompileAllJSFunctionsSoon();
 
-  if (m_frontend.get())
+  if (m_frontend)
     m_frontend->profilerWasEnabled();
 }
 
-void InspectorController::disableProfiler() {
+void InspectorController::disableProfiler(bool always) {
+  if (always)
+    setSetting(profilerEnabledSettingName, Setting(false));
+
   if (!m_profilerEnabled)
     return;
 
@@ -1127,18 +1192,24 @@ void InspectorController::disableProfiler() {
 
   JavaScriptDebugServer::shared().recompileAllJSFunctionsSoon();
 
-  if (m_frontend.get())
+  if (m_frontend)
     m_frontend->profilerWasDisabled();
 }
 
-void InspectorController::enableDebugger() {
+void InspectorController::enableDebugger(bool always) {
   if (!enabled())
     return;
+
+  if (always)
+    setSetting(debuggerEnabledSettingName, Setting(true));
 
   if (!m_scriptState || !m_frontend) {
     m_attachDebuggerWhenShown = true;
     return;
   }
+
+  if (m_debuggerEnabled)
+    return;
 
   ASSERT(m_inspectedPage);
 
@@ -1151,9 +1222,12 @@ void InspectorController::enableDebugger() {
   m_frontend->debuggerWasEnabled();
 }
 
-void InspectorController::disableDebugger() {
+void InspectorController::disableDebugger(bool always) {
   if (!enabled())
     return;
+
+  if (always)
+    setSetting(debuggerEnabledSettingName, Setting(false));
 
   ASSERT(m_inspectedPage);
 
@@ -1162,7 +1236,7 @@ void InspectorController::disableDebugger() {
   m_debuggerEnabled = false;
   m_attachDebuggerWhenShown = false;
 
-  if (m_frontend.get())
+  if (m_frontend)
     m_frontend->debuggerWasDisabled();
 }
 

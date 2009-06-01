@@ -171,6 +171,14 @@ void InspectorFrontend::reset() {
   callSimpleFunction("reset");
 }
 
+void InspectorFrontend::resourceTrackingWasEnabled() {
+  callSimpleFunction("resourceTrackingWasEnabled");
+}
+
+void InspectorFrontend::resourceTrackingWasDisabled() {
+  callSimpleFunction("resourceTrackingWasDisabled");
+}
+
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 void InspectorFrontend::debuggerWasEnabled() {
   callSimpleFunction("debuggerWasEnabled");
