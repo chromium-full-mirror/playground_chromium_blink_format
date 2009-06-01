@@ -203,6 +203,11 @@ class FrameView : public ScrollView {
                         float oldBottom,
                         float bottomLimit);
 
+  bool lockedToAnchor() { return m_lockedToAnchor; }
+  void setLockedToAnchor(bool lockedToAnchor) {
+    m_lockedToAnchor = lockedToAnchor;
+  }
+
  private:
   void reset();
   void init();
@@ -304,6 +309,8 @@ class FrameView : public ScrollView {
 
   bool m_isVisuallyNonEmpty;
   bool m_firstVisuallyNonEmptyLayoutCallbackPending;
+
+  bool m_lockedToAnchor;
 };
 
 }  // namespace WebCore

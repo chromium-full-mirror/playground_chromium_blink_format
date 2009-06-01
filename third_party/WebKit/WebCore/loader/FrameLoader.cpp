@@ -1749,10 +1749,13 @@ bool FrameLoader::gotoAnchor(const String& name) {
     renderer = anchorNode->renderer();
     rect = anchorNode->getRect();
   }
-  if (renderer)
+  if (renderer) {
     renderer->enclosingLayer()->scrollRectToVisible(
         rect, true, ScrollAlignment::alignToEdgeIfNeeded,
         ScrollAlignment::alignTopAlways);
+    if (m_frame->view())
+      m_frame->view()->setLockedToAnchor(true);
+  }
 
   return true;
 }
@@ -2311,6 +2314,8 @@ void FrameLoader::completed() {
     child->loader()->parentCompleted();
   if (Frame* parent = m_frame->tree()->parent())
     parent->loader()->checkCompleted();
+  if (m_frame->view())
+    m_frame->view()->setLockedToAnchor(false);
 }
 
 void FrameLoader::started() {
