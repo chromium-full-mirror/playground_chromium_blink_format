@@ -1,6 +1,6 @@
 /*
- * Copyright 2005 Frerich Raabe <raabe@kde.org>
- * Copyright (C) 2006 Apple Computer, Inc.
+ * Copyright (C) 2005 Frerich Raabe <raabe@kde.org>
+ * Copyright (C) 2006, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -70,15 +70,12 @@ PassRefPtr<XPathResult> XPathExpression::evaluate(Node* contextNode,
     return 0;
   }
 
-  Node* eventTarget =
-      contextNode->ownerDocument() ? contextNode->ownerDocument() : contextNode;
-
   EvaluationContext& evaluationContext = Expression::evaluationContext();
   evaluationContext.node = contextNode;
   evaluationContext.size = 1;
   evaluationContext.position = 1;
   RefPtr<XPathResult> result =
-      XPathResult::create(eventTarget, m_topExpression->evaluate());
+      XPathResult::create(contextNode->document(), m_topExpression->evaluate());
   evaluationContext.node = 0;  // Do not hold a reference to the context node,
                                // as this may prevent the whole document from
                                // being destroyed in time.
