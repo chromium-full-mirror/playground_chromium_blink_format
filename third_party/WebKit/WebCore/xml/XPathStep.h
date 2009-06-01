@@ -64,8 +64,7 @@ class Step : public ParseNode, Noncopyable {
       CommentNodeTest,
       ProcessingInstructionNodeTest,
       AnyNodeTest,
-      NameTest,
-      ElementNodeTest  // XPath 2.0
+      NameTest
     };
 
     NodeTest(Kind kind) : m_kind(kind) {}
@@ -76,11 +75,19 @@ class Step : public ParseNode, Noncopyable {
     Kind kind() const { return m_kind; }
     const AtomicString& data() const { return m_data; }
     const AtomicString& namespaceURI() const { return m_namespaceURI; }
+    Vector<Predicate*>& mergedPredicates() { return m_mergedPredicates; }
+    const Vector<Predicate*>& mergedPredicates() const {
+      return m_mergedPredicates;
+    }
 
    private:
     Kind m_kind;
     AtomicString m_data;
     AtomicString m_namespaceURI;
+
+    // When possible, we merge some or all predicates with node test for better
+    // performance.
+    Vector<Predicate*> m_mergedPredicates;
   };
 
   Step(Axis,
@@ -88,19 +95,16 @@ class Step : public ParseNode, Noncopyable {
        const Vector<Predicate*>& predicates = Vector<Predicate*>());
   ~Step();
 
+  void optimize();
+
   void evaluate(Node* context, NodeSet&) const;
 
-  Axis axis() const { return m_axis; }
-  NodeTest nodeTest() const { return m_nodeTest; }
-  const Vector<Predicate*>& predicates() const { return m_predicates; }
-
-  void setAxis(Axis axis) { m_axis = axis; }
-  void setNodeTest(NodeTest nodeTest) { m_nodeTest = nodeTest; }
-  void setPredicates(const Vector<Predicate*>& predicates) {
-    m_predicates = predicates;
-  }
+  const NodeTest& nodeTest() const { return m_nodeTest; }
 
  private:
+  friend void optimizeStepPair(Step*, Step*, bool&);
+  bool predicatesAreContextListInsensitive() const;
+
   void parseNodeTest(const String&);
   void nodesInAxis(Node* context, NodeSet&) const;
   String namespaceFromNodetest(const String& nodeTest) const;
@@ -109,9 +113,11 @@ class Step : public ParseNode, Noncopyable {
   NodeTest m_nodeTest;
   Vector<Predicate*> m_predicates;
 };
+
+void optimizeStepPair(Step*, Step*, bool& dropSecondStep);
 }
 }
 
 #endif  // ENABLE(XPATH)
 
-#endif  // XPath_Step_H
+#endif  // XPathStep_h

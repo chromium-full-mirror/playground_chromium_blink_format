@@ -39,7 +39,11 @@ namespace WebCore {
 namespace XPath {
 
 Filter::Filter(Expression* expr, const Vector<Predicate*>& predicates)
-    : m_expr(expr), m_predicates(predicates) {}
+    : m_expr(expr), m_predicates(predicates) {
+  setIsContextNodeSensitive(m_expr->isContextNodeSensitive());
+  setIsContextPositionSensitive(m_expr->isContextPositionSensitive());
+  setIsContextSizeSensitive(m_expr->isContextSizeSensitive());
+}
 
 Filter::~Filter() {
   delete m_expr;
@@ -76,7 +80,9 @@ Value Filter::evaluate() const {
   return v;
 }
 
-LocationPath::LocationPath() : m_absolute(false) {}
+LocationPath::LocationPath() : m_absolute(false) {
+  setIsContextNodeSensitive(true);
+}
 
 LocationPath::~LocationPath() {
   deleteAllValues(m_steps);
@@ -123,15 +129,39 @@ void LocationPath::evaluate(NodeSet& nodes) const {
 }
 
 void LocationPath::appendStep(Step* step) {
+  unsigned stepCount = m_steps.size();
+  if (stepCount) {
+    bool dropSecondStep;
+    optimizeStepPair(m_steps[stepCount - 1], step, dropSecondStep);
+    if (dropSecondStep) {
+      delete step;
+      return;
+    }
+  }
+  step->optimize();
   m_steps.append(step);
 }
 
 void LocationPath::insertFirstStep(Step* step) {
+  if (m_steps.size()) {
+    bool dropSecondStep;
+    optimizeStepPair(step, m_steps[0], dropSecondStep);
+    if (dropSecondStep) {
+      delete m_steps[0];
+      m_steps[0] = step;
+      return;
+    }
+  }
+  step->optimize();
   m_steps.insert(0, step);
 }
 
 Path::Path(Filter* filter, LocationPath* path)
-    : m_filter(filter), m_path(path) {}
+    : m_filter(filter), m_path(path) {
+  setIsContextNodeSensitive(filter->isContextNodeSensitive());
+  setIsContextPositionSensitive(filter->isContextPositionSensitive());
+  setIsContextSizeSensitive(filter->isContextSizeSensitive());
+}
 
 Path::~Path() {
   delete m_filter;

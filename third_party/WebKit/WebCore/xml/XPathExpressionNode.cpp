@@ -30,7 +30,6 @@
 #if ENABLE(XPATH)
 
 #include "Node.h"
-#include "XPathValue.h"
 #include <wtf/StdLibExtras.h>
 
 namespace WebCore {
@@ -41,7 +40,10 @@ EvaluationContext& Expression::evaluationContext() {
   return evaluationContext;
 }
 
-Expression::Expression() {}
+Expression::Expression()
+    : m_isContextNodeSensitive(false),
+      m_isContextPositionSensitive(false),
+      m_isContextSizeSensitive(false) {}
 
 Expression::~Expression() {
   deleteAllValues(m_subExpressions);
