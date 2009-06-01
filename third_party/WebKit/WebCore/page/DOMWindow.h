@@ -329,6 +329,8 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   void setOnsearch(PassRefPtr<EventListener>);
   EventListener* onselect() const;
   void setOnselect(PassRefPtr<EventListener>);
+  EventListener* onstorage() const;
+  void setOnstorage(PassRefPtr<EventListener>);
   EventListener* onsubmit() const;
   void setOnsubmit(PassRefPtr<EventListener>);
   EventListener* onunload() const;
