@@ -160,11 +160,9 @@ void SVGRenderBase::prepareToRenderSVGContent(
 
 void SVGRenderBase::finishRenderSVGContent(RenderObject* object,
                                            RenderObject::PaintInfo& paintInfo,
-                                           const FloatRect& boundingBox,
                                            SVGResourceFilter*& filter,
                                            GraphicsContext* savedContext) {
 #if !ENABLE(FILTERS)
-  UNUSED_PARAM(boundingBox);
   UNUSED_PARAM(filter);
   UNUSED_PARAM(savedContext);
 #endif

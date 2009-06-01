@@ -444,8 +444,8 @@ struct SVGRootInlineBoxPaintWalker {
 
     // Finalize text rendering
     if (!flowBox->isRootInlineBox()) {
-      SVGRenderBase::finishRenderSVGContent(object, m_paintInfo, m_boundingBox,
-                                            m_filter, m_savedInfo.context);
+      SVGRenderBase::finishRenderSVGContent(object, m_paintInfo, m_filter,
+                                            m_savedInfo.context);
       m_filter = 0;
     }
 
@@ -634,8 +634,8 @@ void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
   walkTextChunks(&walker);
 
   // Finalize text rendering
-  SVGRenderBase::finishRenderSVGContent(renderer(), paintInfo, boundingBox,
-                                        filter, savedInfo.context);
+  SVGRenderBase::finishRenderSVGContent(renderer(), paintInfo, filter,
+                                        savedInfo.context);
   paintInfo.context->restore();
 }
 

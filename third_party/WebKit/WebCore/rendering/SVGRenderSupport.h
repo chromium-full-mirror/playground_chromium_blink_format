@@ -48,7 +48,6 @@ class SVGRenderBase {
                                         SVGResourceFilter* rootFilter = 0);
   static void finishRenderSVGContent(RenderObject*,
                                      RenderObject::PaintInfo&,
-                                     const FloatRect& boundingBox,
                                      SVGResourceFilter*&,
                                      GraphicsContext* savedContext);
 
