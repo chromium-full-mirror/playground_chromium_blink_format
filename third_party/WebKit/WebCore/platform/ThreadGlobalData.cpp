@@ -77,6 +77,10 @@ ThreadGlobalData::ThreadGlobalData()
       m_atomicStringTable(new HashSet<StringImpl*>),
       m_eventNames(new EventNames),
       m_threadTimers(new ThreadTimers)
+#ifndef NDEBUG
+      ,
+      m_isMainThread(isMainThread())
+#endif
 #if USE(ICU_UNICODE) || USE(GLIB_ICU_UNICODE_HYBRID)
       ,
       m_cachedConverterICU(new ICUConverterWrapper)
@@ -100,11 +104,12 @@ ThreadGlobalData::~ThreadGlobalData() {
   delete m_atomicStringTable;
   delete m_threadTimers;
 
-  ASSERT(isMainThread() ||
+  ASSERT(m_isMainThread ||
          m_emptyString->hasOneRef());  // We intentionally don't clean up static
                                        // data on application quit, so there
                                        // will be many strings remaining on the
                                        // main thread.
+
   delete m_emptyString;
 }
 
