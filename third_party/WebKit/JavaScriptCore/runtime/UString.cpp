@@ -64,6 +64,10 @@ namespace JSC {
 extern const double NaN;
 extern const double Inf;
 
+// This number must be at least 2 to avoid sharing empty, null as well as 1
+// character strings from SmallStrings.
+static const int minLengthToShare = 30;
+
 static inline size_t overflowIndicator() {
   return std::numeric_limits<size_t>::max();
 }
@@ -226,7 +230,7 @@ PassRefPtr<UString::Rep> UString::Rep::createFromUTF8(const char* string) {
   return UString::Rep::createCopying(buffer.data(), p - buffer.data());
 }
 
-PassRefPtr<UString::Rep> UString::Rep::share(
+PassRefPtr<UString::Rep> UString::Rep::create(
     UChar* string,
     int length,
     PassRefPtr<UString::SharedUChar> sharedBuffer) {
@@ -376,8 +380,7 @@ void UString::Rep::checkConsistency() const {
 #endif
 
 UString::SharedUChar* UString::BaseString::sharedBuffer() {
-  // Don't share empty, null and 1 character strings from SmallStrings.
-  if (len <= 1)
+  if (len < minLengthToShare)
     return 0;
 
   if (!m_sharedBuffer)

@@ -45,6 +45,8 @@ using namespace Unicode;
 
 namespace WebCore {
 
+static const unsigned minLengthToShare = 20;
+
 static inline UChar* newUCharVector(unsigned n) {
   return static_cast<UChar*>(fastMalloc(sizeof(UChar) * n));
 }
@@ -73,12 +75,7 @@ void StringImpl::operator delete(void* address) {
 
 // This constructor is used only to create the empty string.
 StringImpl::StringImpl()
-    : m_length(0),
-      m_data(0),
-      m_hash(0),
-      m_inTable(false),
-      m_hasTerminatingNullCharacter(false),
-      m_bufferIsInternal(false) {
+    : m_length(0), m_data(0), m_hash(0), m_bufferIsInternal(false) {
   // Ensure that the hash is computed so that AtomicStringHash can call
   // existingHash()
   // with impunity. The empty string is special because it is never entered into
@@ -91,11 +88,7 @@ StringImpl::StringImpl()
 // operation. Because of that, it's the one constructor that doesn't assert the
 // length is non-zero, since we support copying the empty string.
 inline StringImpl::StringImpl(const UChar* characters, unsigned length)
-    : m_length(length),
-      m_hash(0),
-      m_inTable(false),
-      m_hasTerminatingNullCharacter(false),
-      m_bufferIsInternal(false) {
+    : m_length(length), m_hash(0), m_bufferIsInternal(false) {
   UChar* data = newUCharVector(length);
   memcpy(data, characters, length * sizeof(UChar));
   m_data = data;
@@ -103,11 +96,8 @@ inline StringImpl::StringImpl(const UChar* characters, unsigned length)
 
 inline StringImpl::StringImpl(const StringImpl& str,
                               WithTerminatingNullCharacter)
-    : m_length(str.m_length),
-      m_hash(str.m_hash),
-      m_inTable(false),
-      m_hasTerminatingNullCharacter(true),
-      m_bufferIsInternal(false) {
+    : m_length(str.m_length), m_hash(str.m_hash), m_bufferIsInternal(false) {
+  m_sharedBufferAndFlags.setFlag(HasTerminatingNullCharacter);
   UChar* data = newUCharVector(str.m_length + 1);
   memcpy(data, str.m_data, str.m_length * sizeof(UChar));
   data[str.m_length] = 0;
@@ -115,11 +105,7 @@ inline StringImpl::StringImpl(const StringImpl& str,
 }
 
 inline StringImpl::StringImpl(const char* characters, unsigned length)
-    : m_length(length),
-      m_hash(0),
-      m_inTable(false),
-      m_hasTerminatingNullCharacter(false),
-      m_bufferIsInternal(false) {
+    : m_length(length), m_hash(0), m_bufferIsInternal(false) {
   ASSERT(characters);
   ASSERT(length);
 
@@ -135,8 +121,6 @@ inline StringImpl::StringImpl(UChar* characters, unsigned length, AdoptBuffer)
     : m_length(length),
       m_data(characters),
       m_hash(0),
-      m_inTable(false),
-      m_hasTerminatingNullCharacter(false),
       m_bufferIsInternal(false) {
   ASSERT(characters);
   ASSERT(length);
@@ -144,15 +128,12 @@ inline StringImpl::StringImpl(UChar* characters, unsigned length, AdoptBuffer)
 
 // This constructor is only for use by AtomicString.
 StringImpl::StringImpl(const UChar* characters, unsigned length, unsigned hash)
-    : m_length(length),
-      m_hash(hash),
-      m_inTable(true),
-      m_hasTerminatingNullCharacter(false),
-      m_bufferIsInternal(false) {
+    : m_length(length), m_hash(hash), m_bufferIsInternal(false) {
   ASSERT(hash);
   ASSERT(characters);
   ASSERT(length);
 
+  setInTable();
   UChar* data = newUCharVector(length);
   memcpy(data, characters, length * sizeof(UChar));
   m_data = data;
@@ -160,15 +141,12 @@ StringImpl::StringImpl(const UChar* characters, unsigned length, unsigned hash)
 
 // This constructor is only for use by AtomicString.
 StringImpl::StringImpl(const char* characters, unsigned length, unsigned hash)
-    : m_length(length),
-      m_hash(hash),
-      m_inTable(true),
-      m_hasTerminatingNullCharacter(false),
-      m_bufferIsInternal(false) {
+    : m_length(length), m_hash(hash), m_bufferIsInternal(false) {
   ASSERT(hash);
   ASSERT(characters);
   ASSERT(length);
 
+  setInTable();
   UChar* data = newUCharVector(length);
   for (unsigned i = 0; i != length; ++i) {
     unsigned char c = characters[i];
@@ -178,10 +156,15 @@ StringImpl::StringImpl(const char* characters, unsigned length, unsigned hash)
 }
 
 StringImpl::~StringImpl() {
-  if (m_inTable)
+  if (inTable())
     AtomicString::remove(this);
-  if (!m_bufferIsInternal)
-    deleteUCharVector(m_data);
+  if (!m_bufferIsInternal) {
+    SharedUChar* sharedBuffer = m_sharedBufferAndFlags.get();
+    if (sharedBuffer)
+      sharedBuffer->deref();
+    else
+      deleteUCharVector(m_data);
+  }
 }
 
 StringImpl* StringImpl::empty() {
@@ -993,6 +976,30 @@ PassRefPtr<StringImpl> StringImpl::create(const char* string) {
   return create(string, strlen(string));
 }
 
+#if USE(JSC)
+PassRefPtr<StringImpl> StringImpl::create(const JSC::UString& str) {
+  SharedUChar* sharedBuffer =
+      const_cast<JSC::UString*>(&str)->rep()->baseString()->sharedBuffer();
+  if (sharedBuffer) {
+    PassRefPtr<StringImpl> impl = adoptRef(new StringImpl(
+        const_cast<UChar*>(str.data()), str.size(), AdoptBuffer()));
+    sharedBuffer->ref();
+    impl->m_sharedBufferAndFlags.set(sharedBuffer);
+    return impl;
+  }
+  return StringImpl::create(str.data(), str.size());
+}
+
+JSC::UString StringImpl::ustring() {
+  SharedUChar* sharedBuffer = StringImpl::sharedBuffer();
+  if (sharedBuffer)
+    return JSC::UString::Rep::create(const_cast<UChar*>(m_data), m_length,
+                                     sharedBuffer);
+
+  return JSC::UString(m_data, m_length);
+}
+#endif
+
 PassRefPtr<StringImpl> StringImpl::createWithTerminatingNullCharacter(
     const StringImpl& string) {
   return adoptRef(new StringImpl(string, WithTerminatingNullCharacter()));
@@ -1000,6 +1007,18 @@ PassRefPtr<StringImpl> StringImpl::createWithTerminatingNullCharacter(
 
 PassRefPtr<StringImpl> StringImpl::copy() {
   return create(m_data, m_length);
+}
+
+StringImpl::SharedUChar* StringImpl::sharedBuffer() {
+  if (m_length < minLengthToShare || m_bufferIsInternal)
+    return 0;
+
+  if (!m_sharedBufferAndFlags.get())
+    m_sharedBufferAndFlags.set(
+        SharedUChar::create(
+            new OwnFastMallocPtr<UChar>(const_cast<UChar*>(m_data)))
+            .releaseRef());
+  return m_sharedBufferAndFlags.get();
 }
 
 }  // namespace WebCore
