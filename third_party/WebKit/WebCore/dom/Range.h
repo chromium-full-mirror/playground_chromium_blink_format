@@ -82,6 +82,8 @@ class Range : public RefCounted<Range> {
                                      int offsetA,
                                      Node* containerB,
                                      int offsetB);
+  static short compareBoundaryPoints(const RangeBoundaryPoint& boundaryA,
+                                     const RangeBoundaryPoint& boundaryB);
   bool boundaryPointsValid() const;
   bool intersectsNode(Node* refNode, ExceptionCode&);
   void deleteContents(ExceptionCode&);
