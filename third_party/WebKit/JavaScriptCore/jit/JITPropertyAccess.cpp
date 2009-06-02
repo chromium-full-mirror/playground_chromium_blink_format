@@ -660,7 +660,7 @@ void JIT::patchGetByIdSelf(StructureStubInfo* stubInfo,
     stubInfo->hotPathBegin
         .instructionAtOffset(patchOffsetGetByIdExternalLoad +
                              patchLengthGetByIdExternalLoadPrefix)
-        .patchLoadToLEA();
+        .repatchLoadToLEA();
 
   // Patch the offset into the propoerty map to load from, then patch the
   // Structure to look for.
@@ -710,7 +710,7 @@ void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
     stubInfo->hotPathBegin
         .instructionAtOffset(patchOffsetPutByIdExternalLoad +
                              patchLengthPutByIdExternalLoadPrefix)
-        .patchLoadToLEA();
+        .repatchLoadToLEA();
 
   // Patch the offset into the propoerty map to load from, then patch the
   // Structure to look for.

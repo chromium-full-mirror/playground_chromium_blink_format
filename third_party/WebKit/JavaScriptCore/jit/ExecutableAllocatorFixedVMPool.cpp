@@ -317,7 +317,7 @@ class FixedVMPoolAllocator {
     randomLocation += (1 << 24);
     randomLocation <<= 21;
     m_base = mmap(reinterpret_cast<void*>(randomLocation), m_totalHeapSize,
-                  PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON,
+                  INITIAL_PROTECTION_FLAGS, MAP_PRIVATE | MAP_ANON,
                   VM_TAG_FOR_EXECUTABLEALLOCATOR_MEMORY, 0);
     if (!m_base)
       CRASH();
