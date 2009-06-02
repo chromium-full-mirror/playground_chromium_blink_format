@@ -536,11 +536,6 @@ short Range::compareBoundaryPoints(Node* containerA,
   return 0;
 }
 
-short Range::compareBoundaryPoints(const Position& a, const Position& b) {
-  return compareBoundaryPoints(a.node(), a.deprecatedEditingOffset(), b.node(),
-                               b.deprecatedEditingOffset());
-}
-
 bool Range::boundaryPointsValid() const {
   return m_start.container() &&
          compareBoundaryPoints(m_start.container(), m_start.offset(),

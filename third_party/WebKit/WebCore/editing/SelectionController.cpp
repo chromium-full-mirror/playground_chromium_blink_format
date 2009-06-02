@@ -223,10 +223,8 @@ void SelectionController::nodeWillBeRemoved(Node* node) {
       m_sel.setWithoutValidation(m_sel.end(), m_sel.start());
     // FIXME: This could be more efficient if we had an isNodeInRange function
     // on Ranges.
-  } else if (Range::compareBoundaryPoints(m_sel.start(), Position(node, 0)) ==
-                 -1 &&
-             Range::compareBoundaryPoints(m_sel.end(), Position(node, 0)) ==
-                 1) {
+  } else if (comparePositions(m_sel.start(), Position(node, 0)) == -1 &&
+             comparePositions(m_sel.end(), Position(node, 0)) == 1) {
     // If we did nothing here, when this node's renderer was destroyed, the rect
     // that it
     // occupied would be invalidated, but, selection gaps that change as a
