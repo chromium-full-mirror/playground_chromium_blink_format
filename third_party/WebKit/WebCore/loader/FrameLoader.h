@@ -193,7 +193,7 @@ class FrameLoader : Noncopyable {
   bool canHandleRequest(const ResourceRequest&);
 
   // Also not cool.
-  void stopAllLoaders(DatabasePolicy databasePolicy = DatabasePolicyStop);
+  void stopAllLoaders();
   void stopForUserCancel(bool deferCheckLoadComplete = false);
 
   bool isLoadingMainResource() const { return m_isLoadingMainResource; }
@@ -335,8 +335,7 @@ class FrameLoader : Noncopyable {
                   PassRefPtr<FormState>);
 
   void stop();
-  void stopLoading(bool sendUnload,
-                   DatabasePolicy databasePolicy = DatabasePolicyStop);
+  void stopLoading(bool sendUnload);
   bool closeURL();
 
   void didExplicitOpen();
