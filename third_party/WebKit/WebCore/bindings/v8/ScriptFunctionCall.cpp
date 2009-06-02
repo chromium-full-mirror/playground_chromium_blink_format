@@ -151,7 +151,7 @@ ScriptObject ScriptFunctionCall::construct(bool& hadException,
     args[i] = m_arguments[i].v8Value();
 
   v8::Local<v8::Object> result =
-      SafeAllocation::NewInstance(constructor, m_arguments.size(), args.get());
+      SafeAllocation::newInstance(constructor, m_arguments.size(), args.get());
   if (!scope.success()) {
     hadException = true;
     return ScriptObject();
