@@ -399,6 +399,12 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   void setOnstalled(PassRefPtr<EventListener>);
   EventListener* onsuspend() const;
   void setOnsuspend(PassRefPtr<EventListener>);
+  EventListener* oninput() const;
+  void setOninput(PassRefPtr<EventListener>);
+  EventListener* onmessage() const;
+  void setOnmessage(PassRefPtr<EventListener>);
+  EventListener* oncontextmenu() const;
+  void setOncontextmenu(PassRefPtr<EventListener>);
 
   void captureEvents();
   void releaseEvents();
