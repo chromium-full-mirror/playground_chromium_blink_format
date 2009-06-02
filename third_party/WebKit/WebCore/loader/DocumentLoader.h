@@ -95,7 +95,7 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
 
   void replaceRequestURLForAnchorScroll(const KURL&);
   bool isStopping() const { return m_isStopping; }
-  void stopLoading();
+  void stopLoading(DatabasePolicy databasePolicy = DatabasePolicyStop);
   void setCommitted(bool committed) { m_committed = committed; }
   bool isCommitted() const { return m_committed; }
   bool isLoading() const { return m_loading; }
