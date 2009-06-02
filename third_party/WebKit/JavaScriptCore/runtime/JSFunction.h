@@ -39,7 +39,6 @@ class JSGlobalObject;
 
 class JSFunction : public InternalFunction {
   friend class JIT;
-  friend class JITStubs;
   friend class VPtrSet;
 
   typedef InternalFunction Base;
@@ -92,11 +91,11 @@ class JSFunction : public InternalFunction {
     return *reinterpret_cast<NativeFunction*>(m_data);
   }
 
- private:
-  virtual const ClassInfo* classInfo() const { return &info; }
-
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);
+
+ private:
+  virtual const ClassInfo* classInfo() const { return &info; }
 
   static JSValue argumentsGetter(ExecState*,
                                  const Identifier&,

@@ -67,7 +67,6 @@ enum { MaxMainThreadReentryDepth = 256, MaxSecondaryThreadReentryDepth = 32 };
 
 class Interpreter : public WTF::FastAllocBase {
   friend class JIT;
-  friend class JITStubs;
   friend class CachedCall;
 
  public:
@@ -129,6 +128,18 @@ class Interpreter : public WTF::FastAllocBase {
   void setSampler(SamplingTool* sampler) { m_sampler = sampler; }
   SamplingTool* sampler() { return m_sampler; }
 
+  NEVER_INLINE JSValue callEval(CallFrame*,
+                                RegisterFile*,
+                                Register* argv,
+                                int argc,
+                                int registerOffset,
+                                JSValue& exceptionValue);
+  NEVER_INLINE HandlerInfo* throwException(CallFrame*&,
+                                           JSValue&,
+                                           unsigned bytecodeOffset,
+                                           bool);
+  NEVER_INLINE void debug(CallFrame*, DebugHookID, int firstLine, int lastLine);
+
  private:
   enum ExecutionFlag { Normal, InitializeAndReturn };
 
@@ -141,12 +152,6 @@ class Interpreter : public WTF::FastAllocBase {
   void endRepeatCall(CallFrameClosure&);
   JSValue execute(CallFrameClosure&, JSValue* exception);
 
-  NEVER_INLINE JSValue callEval(CallFrame*,
-                                RegisterFile*,
-                                Register* argv,
-                                int argc,
-                                int registerOffset,
-                                JSValue& exceptionValue);
   JSValue execute(EvalNode*,
                   CallFrame*,
                   JSObject* thisObject,
@@ -154,7 +159,6 @@ class Interpreter : public WTF::FastAllocBase {
                   ScopeChainNode*,
                   JSValue* exception);
 
-  NEVER_INLINE void debug(CallFrame*, DebugHookID, int firstLine, int lastLine);
 #if USE(INTERPRETER)
   NEVER_INLINE bool resolve(CallFrame*, Instruction*, JSValue& exceptionValue);
   NEVER_INLINE bool resolveSkip(CallFrame*,
@@ -192,10 +196,6 @@ class Interpreter : public WTF::FastAllocBase {
                                     JSValue,
                                     unsigned& bytecodeOffset,
                                     CodeBlock*&);
-  NEVER_INLINE HandlerInfo* throwException(CallFrame*&,
-                                           JSValue&,
-                                           unsigned bytecodeOffset,
-                                           bool);
 
   static ALWAYS_INLINE CallFrame* slideRegisterWindowForCall(
       CodeBlock*,

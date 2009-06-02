@@ -30,6 +30,7 @@
 #define Register_h
 
 #include "JSValue.h"
+#include <wtf/Assertions.h>
 #include <wtf/VectorTraits.h>
 
 namespace JSC {
@@ -50,32 +51,31 @@ class Register {
  public:
   Register();
   Register(JSValue);
+  Register(Arguments*);
 
   JSValue jsValue() const;
 
   bool marked() const;
   void mark();
 
+  int32_t i() const;
+  void* v() const;
+
  private:
   friend class ExecState;
   friend class Interpreter;
-  friend class JITStubs;
 
   // Only CallFrame, Interpreter, and JITStubs should use these functions.
 
   Register(intptr_t);
 
   Register(JSActivation*);
-  Register(Arguments*);
   Register(CallFrame*);
   Register(CodeBlock*);
   Register(JSFunction*);
   Register(JSPropertyNameIterator*);
   Register(ScopeChainNode*);
   Register(Instruction*);
-
-  intptr_t i() const;
-  void* v() const;
 
   JSActivation* activation() const;
   Arguments* arguments() const;
@@ -159,11 +159,15 @@ ALWAYS_INLINE Register::Register(JSPropertyNameIterator* propertyNameIterator) {
 }
 
 ALWAYS_INLINE Register::Register(intptr_t i) {
+  // See comment on 'i()' below.
+  ASSERT(i == static_cast<int32_t>(i));
   u.i = i;
 }
 
-ALWAYS_INLINE intptr_t Register::i() const {
-  return u.i;
+// Read 'i' as a 32-bit integer; we only use it to hold 32-bit values,
+// and we only write 32-bits when writing the arg count from JIT code.
+ALWAYS_INLINE int32_t Register::i() const {
+  return static_cast<int32_t>(u.i);
 }
 
 ALWAYS_INLINE void* Register::v() const {
