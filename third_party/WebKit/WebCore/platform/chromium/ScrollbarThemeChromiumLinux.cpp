@@ -78,6 +78,16 @@ static void drawBox(SkCanvas* canvas,
   drawVertLine(canvas, rect.x(), rect.y(), bottom, paint);
 }
 
+IntRect ScrollbarThemeChromium::trackRect(Scrollbar* scrollbar, bool) {
+  IntSize bs = buttonSize(scrollbar);
+  int thickness = scrollbarThickness(scrollbar->controlSize());
+  if (scrollbar->orientation() == HorizontalScrollbar)
+    return IntRect(scrollbar->x() + bs.width(), scrollbar->y(),
+                   scrollbar->width(), thickness);
+  return IntRect(scrollbar->x(), scrollbar->y() + bs.height(), thickness,
+                 scrollbar->height());
+}
+
 bool ScrollbarThemeChromium::shouldSnapBackToDragOrigin(
     Scrollbar*,
     const PlatformMouseEvent&) {
