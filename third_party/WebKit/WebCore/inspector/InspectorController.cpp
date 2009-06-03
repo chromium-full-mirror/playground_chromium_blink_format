@@ -806,13 +806,17 @@ void InspectorController::didLoadResourceFromMemoryCache(
   if (m_knownResources.contains(cachedResource->url()))
     return;
 
+  ASSERT(m_inspectedPage);
+  bool isMainResource = loader->frame() == m_inspectedPage->mainFrame() &&
+                        cachedResource->url() == loader->requestURL();
+  ensureResourceTrackingSettingsLoaded();
+  if (!isMainResource && !m_resourceTrackingEnabled)
+    return;
+
   RefPtr<InspectorResource> resource = InspectorResource::createCached(
       m_nextIdentifier--, loader, cachedResource);
 
-  ASSERT(m_inspectedPage);
-
-  if (loader->frame() == m_inspectedPage->mainFrame() &&
-      cachedResource->url() == loader->requestURL()) {
+  if (isMainResource) {
     m_mainResource = resource;
     resource->markMainResource();
   }
@@ -829,16 +833,12 @@ void InspectorController::identifierForInitialRequest(
     const ResourceRequest& request) {
   if (!enabled())
     return;
+  ASSERT(m_inspectedPage);
 
-  if (!m_resourceTrackingSettingsLoaded) {
-    m_resourceTrackingSettingsLoaded = true;
-    Setting resourceTracking = setting(resourceTrackingEnabledSettingName);
-    if (resourceTracking.type() == Setting::BooleanType &&
-        resourceTracking.booleanValue())
-      m_resourceTrackingEnabled = true;
-  }
-
-  if (!m_resourceTrackingEnabled)
+  bool isMainResource =
+      m_inspectedPage->mainFrame() && request.url() == loader->requestURL();
+  ensureResourceTrackingSettingsLoaded();
+  if (!isMainResource && !m_resourceTrackingEnabled)
     return;
 
   RefPtr<InspectorResource> resource =
@@ -846,10 +846,7 @@ void InspectorController::identifierForInitialRequest(
 
   resource->updateRequest(request);
 
-  ASSERT(m_inspectedPage);
-
-  if (loader->frame() == m_inspectedPage->mainFrame() &&
-      request.url() == loader->requestURL()) {
+  if (isMainResource) {
     m_mainResource = resource;
     resource->markMainResource();
   }
@@ -1019,6 +1016,17 @@ void InspectorController::disableResourceTracking(bool always) {
   m_resourceTrackingEnabled = false;
   if (m_frontend)
     m_frontend->resourceTrackingWasDisabled();
+}
+
+void InspectorController::ensureResourceTrackingSettingsLoaded() {
+  if (m_resourceTrackingSettingsLoaded)
+    return;
+  m_resourceTrackingSettingsLoaded = true;
+
+  Setting resourceTracking = setting(resourceTrackingEnabledSettingName);
+  if (resourceTracking.type() == Setting::BooleanType &&
+      resourceTracking.booleanValue())
+    m_resourceTrackingEnabled = true;
 }
 
 #if ENABLE(DATABASE)

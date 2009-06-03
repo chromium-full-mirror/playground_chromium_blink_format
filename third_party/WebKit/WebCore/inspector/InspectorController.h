@@ -261,6 +261,7 @@ class InspectorController : public RefCounted<InspectorController>
   void enableResourceTracking(bool always = false);
   void disableResourceTracking(bool always = false);
   bool resourceTrackingEnabled() const { return m_resourceTrackingEnabled; }
+  void ensureResourceTrackingSettingsLoaded();
 
 #if ENABLE(DATABASE)
   void didOpenDatabase(Database*,
