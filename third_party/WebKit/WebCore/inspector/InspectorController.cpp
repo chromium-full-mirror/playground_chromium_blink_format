@@ -376,7 +376,13 @@ void InspectorController::setWindowVisible(bool visible, bool attached) {
       showPanel(m_showAfterVisible);
   } else {
 #if ENABLE(JAVASCRIPT_DEBUGGER)
+    // If the window is being closed with the debugger enabled,
+    // remember this state to re-enable debugger on the next window
+    // opening.
+    bool debuggerWasEnabled = m_debuggerEnabled;
     disableDebugger();
+    if (debuggerWasEnabled)
+      m_attachDebuggerWhenShown = true;
 #endif
     resetScriptObjects();
   }
@@ -1204,20 +1210,9 @@ void InspectorController::disableProfiler(bool always) {
     m_frontend->profilerWasDisabled();
 }
 
-void InspectorController::enableDebugger(bool always) {
-  if (!enabled())
-    return;
-
+void InspectorController::enableDebuggerFromFrontend(bool always) {
   if (always)
     setSetting(debuggerEnabledSettingName, Setting(true));
-
-  if (!m_scriptState || !m_frontend) {
-    m_attachDebuggerWhenShown = true;
-    return;
-  }
-
-  if (m_debuggerEnabled)
-    return;
 
   ASSERT(m_inspectedPage);
 
@@ -1225,9 +1220,22 @@ void InspectorController::enableDebugger(bool always) {
   JavaScriptDebugServer::shared().clearBreakpoints();
 
   m_debuggerEnabled = true;
-  m_attachDebuggerWhenShown = false;
-
   m_frontend->debuggerWasEnabled();
+}
+
+void InspectorController::enableDebugger() {
+  if (!enabled())
+    return;
+
+  if (m_debuggerEnabled)
+    return;
+
+  if (!m_scriptState || !m_frontend) {
+    m_attachDebuggerWhenShown = true;
+  } else {
+    m_frontend->attachDebuggerWhenShown();
+    m_attachDebuggerWhenShown = false;
+  }
 }
 
 void InspectorController::disableDebugger(bool always) {
