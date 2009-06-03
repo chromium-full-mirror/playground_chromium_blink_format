@@ -93,8 +93,7 @@ struct ScheduledEvent {
 };
 
 FrameView::FrameView(Frame* frame)
-    : m_refCount(1),
-      m_frame(frame),
+    : m_frame(frame),
       m_vmode(ScrollbarAuto),
       m_hmode(ScrollbarAuto),
       m_slowRepaintObjectCount(0),
@@ -116,36 +115,20 @@ FrameView::FrameView(Frame* frame)
       m_setNeedsLayoutWasDeferred(false),
       m_lockedToAnchor(false) {
   init();
-  show();
 }
 
-FrameView::FrameView(Frame* frame, const IntSize& initialSize)
-    : m_refCount(1),
-      m_frame(frame),
-      m_vmode(ScrollbarAuto),
-      m_hmode(ScrollbarAuto),
-      m_slowRepaintObjectCount(0),
-      m_layoutTimer(this, &FrameView::layoutTimerFired),
-      m_layoutRoot(0),
-      m_postLayoutTasksTimer(this, &FrameView::postLayoutTimerFired),
-      m_needToInitScrollbars(true),
-      m_isTransparent(false),
-      m_baseBackgroundColor(Color::white),
-      m_mediaType("screen"),
-      m_enqueueEvents(0),
-      m_overflowStatusDirty(true),
-      m_viewportRenderer(0),
-      m_wasScrolledByUser(false),
-      m_inProgrammaticScroll(false),
-      m_deferredRepaintTimer(this, &FrameView::deferredRepaintTimerFired),
-      m_shouldUpdateWhileOffscreen(true),
-      m_deferSetNeedsLayouts(0),
-      m_setNeedsLayoutWasDeferred(false),
-      m_lockedToAnchor(false) {
-  init();
-  Widget::setFrameRect(
-      IntRect(x(), y(), initialSize.width(), initialSize.height()));
-  show();
+PassRefPtr<FrameView> FrameView::create(Frame* frame) {
+  RefPtr<FrameView> view = adoptRef(new FrameView(frame));
+  view->show();
+  return view.release();
+}
+
+PassRefPtr<FrameView> FrameView::create(Frame* frame,
+                                        const IntSize& initialSize) {
+  RefPtr<FrameView> view = adoptRef(new FrameView(frame));
+  view->Widget::setFrameRect(IntRect(view->pos(), initialSize));
+  view->show();
+  return view.release();
 }
 
 FrameView::~FrameView() {
@@ -160,7 +143,6 @@ FrameView::~FrameView() {
                                      // lose the connection to the HostWindow.
   setHasVerticalScrollbar(false);
 
-  ASSERT(m_refCount == 0);
   ASSERT(m_scheduledEvents.isEmpty());
   ASSERT(!m_enqueueEvents);
 

@@ -27,17 +27,12 @@
 #define HostWindow_h
 
 #include <wtf/Noncopyable.h>
-#include "IntRect.h"
 #include "Widget.h"
 
 namespace WebCore {
 
-class IntPoint;
-class IntRect;
-
 class HostWindow : Noncopyable {
  public:
-  HostWindow() {}
   virtual ~HostWindow() {}
 
   // The repaint method asks the host window to repaint a rect in the window's

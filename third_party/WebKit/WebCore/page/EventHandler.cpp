@@ -125,6 +125,20 @@ static inline void scrollAndAcceptEvent(float delta,
     e.accept();
 }
 
+#if !PLATFORM(MAC)
+
+inline bool EventHandler::eventLoopHandleMouseUp(
+    const MouseEventWithHitTestResults&) {
+  return false;
+}
+
+inline bool EventHandler::eventLoopHandleMouseDragged(
+    const MouseEventWithHitTestResults&) {
+  return false;
+}
+
+#endif
+
 EventHandler::EventHandler(Frame* frame)
     : m_frame(frame),
       m_mousePressed(false),

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,21 +27,14 @@
 #define EventHandler_h
 
 #include "DragActions.h"
-#include "FocusDirection.h"
 #include "PlatformMouseEvent.h"
 #include "ScrollTypes.h"
 #include "Timer.h"
 #include <wtf/Forward.h>
-#include <wtf/Noncopyable.h>
-#include <wtf/Platform.h>
 #include <wtf/RefPtr.h>
 
-#if PLATFORM(MAC)
-#include "WebCoreKeyboardUIMode.h"
-#ifndef __OBJC__
-class NSEvent;
+#if PLATFORM(MAC) && !defined(__OBJC__)
 class NSView;
-#endif
 #endif
 
 namespace WebCore {
@@ -51,7 +44,6 @@ class Clipboard;
 class Cursor;
 class Event;
 class FloatPoint;
-class FloatRect;
 class Frame;
 class HitTestRequest;
 class HitTestResult;
@@ -68,7 +60,6 @@ class Scrollbar;
 class String;
 class SVGElementInstance;
 class TextEvent;
-class VisiblePosition;
 class Widget;
 
 extern const int LinkDragHysteresis;
@@ -169,7 +160,7 @@ class EventHandler : Noncopyable {
   void sendResizeEvent();
   void sendScrollEvent();
 
-#if PLATFORM(MAC)
+#if PLATFORM(MAC) && defined(__OBJC__)
   PassRefPtr<KeyboardEvent> currentKeyboardEvent() const;
 
   void mouseDown(NSEvent*);
@@ -179,11 +170,14 @@ class EventHandler : Noncopyable {
   bool keyEvent(NSEvent*);
   bool wheelEvent(NSEvent*);
 
+  bool sendContextMenuEvent(NSEvent*);
+  bool eventMayStartDrag(NSEvent*);
+
   void sendFakeEventsAfterWidgetTracking(NSEvent* initiatingEvent);
 
   void setActivationEventNumber(int num) { m_activationEventNumber = num; }
 
-  NSEvent* currentNSEvent();
+  static NSEvent* currentNSEvent();
 #endif
 
  private:
@@ -206,10 +200,9 @@ class EventHandler : Noncopyable {
   PassRefPtr<Clipboard> createDraggingClipboard() const;
 
   bool eventActivatedView(const PlatformMouseEvent&) const;
-  void selectClosestWordFromMouseEvent(
-      const MouseEventWithHitTestResults& event);
+  void selectClosestWordFromMouseEvent(const MouseEventWithHitTestResults&);
   void selectClosestWordOrLinkFromMouseEvent(
-      const MouseEventWithHitTestResults& event);
+      const MouseEventWithHitTestResults&);
 
   bool handleMouseDoubleClickEvent(const PlatformMouseEvent&);
 
@@ -300,20 +293,10 @@ class EventHandler : Noncopyable {
 
   void allowDHTMLDrag(bool& flagDHTML, bool& flagUA) const;
 
-// The following are called at the beginning of handleMouseUp and handleDrag.
-// If they return true it indicates that they have consumed the event.
-#if PLATFORM(MAC)
+  // The following are called at the beginning of handleMouseUp and handleDrag.
+  // If they return true it indicates that they have consumed the event.
   bool eventLoopHandleMouseUp(const MouseEventWithHitTestResults&);
   bool eventLoopHandleMouseDragged(const MouseEventWithHitTestResults&);
-  NSView* mouseDownViewIfStillGood();
-#else
-  bool eventLoopHandleMouseUp(const MouseEventWithHitTestResults&) {
-    return false;
-  }
-  bool eventLoopHandleMouseDragged(const MouseEventWithHitTestResults&) {
-    return false;
-  }
-#endif
 
   bool invertSenseOfTabsToLinks(KeyboardEvent*) const;
 
@@ -321,6 +304,12 @@ class EventHandler : Noncopyable {
                                    const IntPoint& localPoint);
 
   bool capturesDragging() const { return m_capturesDragging; }
+
+#if PLATFORM(MAC) && defined(__OBJC__)
+  NSView* mouseDownViewIfStillGood();
+
+  PlatformMouseEvent currentPlatformMouseEvent() const;
+#endif
 
   Frame* m_frame;
 
@@ -345,6 +334,7 @@ class EventHandler : Noncopyable {
   bool m_autoscrollInProgress;
   bool m_mouseDownMayStartAutoscroll;
   bool m_mouseDownWasInSubframe;
+
 #if ENABLE(SVG)
   bool m_svgPan;
   RefPtr<SVGElementInstance> m_instanceUnderMouse;

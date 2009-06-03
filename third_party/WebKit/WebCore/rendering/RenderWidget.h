@@ -1,8 +1,6 @@
 /*
- * This file is part of the HTML widget for KDE.
- *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006, 2009 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -33,31 +31,31 @@ class Widget;
 
 class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
  public:
-  RenderWidget(Node*);
   virtual ~RenderWidget();
 
-  virtual bool isWidget() const { return true; }
-
-  virtual void paint(PaintInfo&, int tx, int ty);
-
-  virtual void destroy();
-  virtual void layout();
-
   Widget* widget() const { return m_widget; }
+  virtual void setWidget(Widget*);
+
   static RenderWidget* find(const Widget*);
-
-  RenderArena* ref() {
-    ++m_refCount;
-    return renderArena();
-  }
-  void deref(RenderArena*);
-
-  virtual void setSelectionState(SelectionState);
 
   void updateWidgetPosition();
 
-  virtual void setWidget(Widget*);
+ protected:
+  RenderWidget(Node*);
 
+  FrameView* frameView() const { return m_frameView; }
+
+  void clearWidget();
+
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
+  virtual void layout();
+
+ private:
+  virtual bool isWidget() const { return true; }
+
+  virtual void paint(PaintInfo&, int x, int y);
+  virtual void destroy();
+  virtual void setSelectionState(SelectionState);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,
@@ -65,23 +63,19 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
                            int tx,
                            int ty,
                            HitTestAction);
-
- protected:
-  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
-
- private:
-  void setWidgetGeometry(const IntRect&);
-
-  virtual void deleteWidget();
-
-  // OverlapTestRequestClient
+  virtual void deleteWidget(Widget*);
   virtual void setOverlapTestResult(bool);
 
- protected:
-  Widget* m_widget;
-  FrameView* m_view;
+  void setWidgetGeometry(const IntRect&);
 
- private:
+  RenderArena* ref() {
+    ++m_refCount;
+    return renderArena();
+  }
+  void deref(RenderArena*);
+
+  Widget* m_widget;
+  FrameView* m_frameView;
   int m_refCount;
 };
 

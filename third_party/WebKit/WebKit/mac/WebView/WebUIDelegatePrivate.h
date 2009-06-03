@@ -156,4 +156,14 @@ enum {
     requestGeolocationPermission:(WebGeolocation*)geolocation
                   securityOrigin:(WebSecurityOrigin*)origin;
 
+/*!
+    @method webView:printFrame:
+    @abstract Informs that a WebFrame needs to be printed
+    @param webView The WebView sending the delegate method
+    @param frameView The WebFrame needing to be printed
+    @discussion This method is called when a script or user requests the page to
+   be printed.
+*/
+- (void)webView:(WebView*)sender printFrame:(WebFrame*)frame;
+
 @end
