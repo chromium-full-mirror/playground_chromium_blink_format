@@ -75,7 +75,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 void PluginView::updatePluginWidget() {
-  if (!parent() || !m_isWindowed)
+  if (!parent() || !m_isWindowed || !platformPluginWidget())
     return;
 
   ASSERT(parent()->isFrameView());
@@ -89,23 +89,19 @@ void PluginView::updatePluginWidget() {
   m_clipRect = windowClipRect();
   m_clipRect.move(-m_windowRect.x(), -m_windowRect.y());
 
-  if (!platformPluginWidget())
+  if (m_windowRect == oldWindowRect && m_clipRect == oldClipRect)
     return;
 
-  PluginContainerQt* container =
-      static_cast<PluginContainerQt*>(platformPluginWidget());
+  // do not call setNPWindowIfNeeded immediately, will be called on paint()
+  m_hasPendingGeometryChange = true;
 
-  container->requestGeometry(m_windowRect, QRegion(m_clipRect));
-
-  // in order to move/resize the plugin window at the same time as the rest of
-  // frame
-  // during e.g. scrolling, we set the mask and geometry in the paint()
-  // function, but
-  // as paint() isn't called when the plugin window is outside the frame which
-  // can
-  // be caused by a scroll, we need to move/resize immediately.
+  // in order to move/resize the plugin window at the same time as the
+  // rest of frame during e.g. scrolling, we set the window geometry
+  // in the paint() function, but as paint() isn't called when the
+  // plugin window is outside the frame which can be caused by a
+  // scroll, we need to move/resize immediately.
   if (!m_windowRect.intersects(frameView->frameRect()))
-    container->adjustGeometry();
+    setNPWindowIfNeeded();
 }
 
 void PluginView::setFocus() {
@@ -147,7 +143,7 @@ void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
     return;
 
   if (m_isWindowed && platformPluginWidget())
-    static_cast<PluginContainerQt*>(platformPluginWidget())->adjustGeometry();
+    setNPWindowIfNeeded();
 }
 
 void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
@@ -163,46 +159,47 @@ void PluginView::setParent(ScrollView* parent) {
 
   if (parent)
     init();
-  else {
-    if (!platformPluginWidget())
-      return;
-  }
 }
 
-void PluginView::setNPWindowRect(const IntRect& rect) {
-  if (!m_isStarted || !parent())
+void PluginView::setNPWindowRect(const IntRect&) {
+  // Ignored as we don't want to move immediately.
+}
+
+void PluginView::setNPWindowIfNeeded() {
+  if (!m_isStarted || !parent() || !m_plugin->pluginFuncs()->setwindow)
     return;
 
-  IntPoint p =
-      static_cast<FrameView*>(parent())->contentsToWindow(rect.location());
-  m_npWindow.x = p.x();
-  m_npWindow.y = p.y();
-
-  m_npWindow.width = rect.width();
-  m_npWindow.height = rect.height();
-
-  m_npWindow.clipRect.left = 0;
-  m_npWindow.clipRect.top = 0;
-  m_npWindow.clipRect.right = rect.width();
-  m_npWindow.clipRect.bottom = rect.height();
-
-  if (m_npWindow.x < 0 || m_npWindow.y < 0 || m_npWindow.width <= 0 ||
-      m_npWindow.height <= 0)
+  // On Unix, only call plugin if it's full-page or windowed
+  if (m_mode != NP_FULL && m_mode != NP_EMBED)
     return;
 
-  if (m_plugin->pluginFuncs()->setwindow) {
-    PluginView::setCurrentPluginView(this);
-    JSC::JSLock::DropAllLocks dropAllLocks(false);
-    setCallingPlugin(true);
-    m_plugin->pluginFuncs()->setwindow(m_instance, &m_npWindow);
-    setCallingPlugin(false);
-    PluginView::setCurrentPluginView(0);
+  if (!m_hasPendingGeometryChange)
+    return;
+  m_hasPendingGeometryChange = false;
 
-    if (!m_isWindowed)
-      return;
+  m_npWindow.x = m_windowRect.x();
+  m_npWindow.y = m_windowRect.y();
+  m_npWindow.width = m_windowRect.width();
+  m_npWindow.height = m_windowRect.height();
 
-    ASSERT(platformPluginWidget());
-  }
+  m_npWindow.clipRect.left = m_clipRect.x();
+  m_npWindow.clipRect.top = m_clipRect.y();
+  m_npWindow.clipRect.right = m_clipRect.width();
+  m_npWindow.clipRect.bottom = m_clipRect.height();
+
+  ASSERT(platformPluginWidget());
+  platformPluginWidget()->setGeometry(m_windowRect);
+  // if setMask is set with an empty QRegion, no clipping will
+  // be performed, so in that case we hide the plugin view
+  platformPluginWidget()->setVisible(!m_clipRect.isEmpty());
+  platformPluginWidget()->setMask(QRegion(m_clipRect));
+
+  PluginView::setCurrentPluginView(this);
+  JSC::JSLock::DropAllLocks dropAllLocks(false);
+  setCallingPlugin(true);
+  m_plugin->pluginFuncs()->setwindow(m_instance, &m_npWindow);
+  setCallingPlugin(false);
+  PluginView::setCurrentPluginView(0);
 }
 
 void PluginView::setParentVisible(bool visible) {
@@ -447,6 +444,8 @@ void PluginView::init() {
     return;
   m_haveInitialized = true;
 
+  m_hasPendingGeometryChange = false;
+
   if (!m_plugin) {
     ASSERT(m_status == PluginStatusCanNotFindPlugin);
     return;
@@ -496,8 +495,10 @@ void PluginView::init() {
   m_npWindow.type = NPWindowTypeWindow;
   m_npWindow.window = (void*)platformPluginWidget()->winId();
 
-  if (!(m_plugin->quirks().contains(PluginQuirkDeferFirstSetWindowCall)))
-    setNPWindowRect(frameRect());
+  if (!(m_plugin->quirks().contains(PluginQuirkDeferFirstSetWindowCall))) {
+    updatePluginWidget();
+    setNPWindowIfNeeded();
+  }
 
   m_status = PluginStatusLoadedSuccessfully;
 }

@@ -31,8 +31,6 @@ class PluginContainerQt : public QX11EmbedContainer {
   PluginContainerQt(PluginView*, QWidget* parent);
   ~PluginContainerQt();
 
-  void requestGeometry(const QRect&, const QRegion& clip = QRegion());
-  void adjustGeometry();
   void redirectWheelEventsToParent(bool enable = true);
 
  protected:
@@ -47,11 +45,6 @@ class PluginContainerQt : public QX11EmbedContainer {
  private:
   PluginView* m_pluginView;
   QWidget* m_clientWrapper;
-
-  QRect m_windowRect;
-  QRegion m_clipRegion;
-
-  bool m_hasPendingGeometryChange;
 };
 
 class PluginClientWrapper : public QWidget {
