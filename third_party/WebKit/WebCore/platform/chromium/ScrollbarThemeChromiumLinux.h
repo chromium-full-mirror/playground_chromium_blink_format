@@ -50,6 +50,7 @@ class ScrollbarThemeChromiumLinux : public ScrollbarThemeChromium {
   virtual void paintThumb(GraphicsContext*, Scrollbar*, const IntRect&);
 
   virtual IntSize buttonSize(Scrollbar*);
+  virtual int minimumThumbLength(Scrollbar*);
 };
 }  // namespace WebCore
 
