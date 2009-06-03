@@ -312,4 +312,14 @@ bool Font::isSVGFont() const {
 FontSelector* Font::fontSelector() const {
   return m_fontList ? m_fontList->fontSelector() : 0;
 }
+
+static bool shouldUseFontSmoothing;
+
+void Font::setShouldUseSmoothing(bool shouldUseSmoothing) {
+  shouldUseFontSmoothing = shouldUseSmoothing;
+}
+
+bool Font::shouldUseSmoothing() {
+  return shouldUseFontSmoothing;
+}
 }

@@ -152,6 +152,9 @@ class Font {
   QFont font() const;
 #endif
 
+  static void setShouldUseSmoothing(bool);
+  static bool shouldUseSmoothing();
+
  private:
 #if ENABLE(SVG_FONTS)
   void drawTextUsingSVGFont(GraphicsContext*,
