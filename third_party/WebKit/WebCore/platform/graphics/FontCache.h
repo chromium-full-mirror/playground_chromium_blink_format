@@ -90,6 +90,7 @@ class FontCache {
 
  private:
   FontCache();
+  ~FontCache();
 
   // These methods are implemented by each platform.
   FontPlatformData* getSimilarFontPlatformData(const Font&);
