@@ -151,6 +151,9 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
   // List of pending master entries, used during the update process to ensure
   // that new master entries are cached.
   HashSet<DocumentLoader*> m_pendingMasterResourceLoaders;
+  // How many of the above pending master entries have not yet finished
+  // downloading.
+  int m_downloadingPendingMasterResourceLoadersCount;
 
   // These are all the document loaders that are associated with a cache in this
   // group.
