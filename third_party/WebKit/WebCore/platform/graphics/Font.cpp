@@ -316,6 +316,7 @@ FontSelector* Font::fontSelector() const {
 static bool shouldUseFontSmoothing = true;
 
 void Font::setShouldUseSmoothing(bool shouldUseSmoothing) {
+  ASSERT(isMainThread());
   shouldUseFontSmoothing = shouldUseSmoothing;
 }
 
