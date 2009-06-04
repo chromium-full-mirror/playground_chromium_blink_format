@@ -133,7 +133,6 @@
 #endif
 
 // SPI for DumpRenderTree
-- (void)_updateFocusedAndActiveState;
 - (BOOL)_isUsingAcceleratedCompositing;
 
 // SPI for printing (should be converted to API someday). When the WebHTMLView

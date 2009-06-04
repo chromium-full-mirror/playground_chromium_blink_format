@@ -71,7 +71,8 @@ SelectionController::SelectionController(Frame* frame,
       m_lastChangeWasHorizontalExtension(false),
       m_isDragCaretController(isDragCaretController),
       m_isCaretBlinkingSuspended(false),
-      m_focused(false) {}
+      m_focused(frame && frame->page() &&
+                frame->page()->focusController()->focusedFrame() == frame) {}
 
 void SelectionController::moveTo(const VisiblePosition& pos,
                                  bool userTriggered) {

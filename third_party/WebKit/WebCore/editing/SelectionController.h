@@ -146,6 +146,7 @@ class SelectionController : Noncopyable {
 
   // Focus
   void setFocused(bool);
+  bool isFocused() const { return m_focused; }
   bool isFocusedAndActive() const;
   void pageActivationChanged();
 
