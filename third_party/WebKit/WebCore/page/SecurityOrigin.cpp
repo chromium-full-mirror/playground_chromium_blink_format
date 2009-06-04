@@ -267,6 +267,9 @@ String SecurityOrigin::databaseIdentifier() const {
 }
 
 bool SecurityOrigin::equal(const SecurityOrigin* other) const {
+  if (other == this)
+    return true;
+
   if (!isSameSchemeHostPort(other))
     return false;
 
