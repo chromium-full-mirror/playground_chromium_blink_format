@@ -224,18 +224,6 @@ class JIT : private MacroAssembler {
   // offset.
   static const int patchGetByIdDefaultOffset = 256;
 
-#if USE(JIT_STUB_ARGUMENT_REGISTER)
-#if PLATFORM(X86_64)
-  static const int ctiArgumentInitSize = 6;
-#else
-  static const int ctiArgumentInitSize = 2;
-#endif
-#elif USE(JIT_STUB_ARGUMENT_STACK)
-  static const int ctiArgumentInitSize = 4;
-#else  // JIT_STUB_ARGUMENT_VA_LIST
-  static const int ctiArgumentInitSize = 0;
-#endif
-
 #if PLATFORM(X86_64)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.
@@ -254,9 +242,9 @@ class JIT : private MacroAssembler {
   static const int patchOffsetGetByIdPropertyMapOffset = 31;
   static const int patchOffsetGetByIdPutResult = 31;
 #if ENABLE(OPCODE_SAMPLING)
-  static const int patchOffsetGetByIdSlowCaseCall = 61 + ctiArgumentInitSize;
+  static const int patchOffsetGetByIdSlowCaseCall = 66;
 #else
-  static const int patchOffsetGetByIdSlowCaseCall = 38 + ctiArgumentInitSize;
+  static const int patchOffsetGetByIdSlowCaseCall = 44;
 #endif
   static const int patchOffsetOpCallCompareToJump = 9;
 
@@ -280,10 +268,14 @@ class JIT : private MacroAssembler {
   static const int patchLengthGetByIdExternalLoadPrefix = 0;
   static const int patchOffsetGetByIdPropertyMapOffset = 22;
   static const int patchOffsetGetByIdPutResult = 22;
-#if ENABLE(OPCODE_SAMPLING)
-  static const int patchOffsetGetByIdSlowCaseCall = 31 + ctiArgumentInitSize;
+#if ENABLE(OPCODE_SAMPLING) && USE(JIT_STUB_ARGUMENT_VA_LIST)
+  static const int patchOffsetGetByIdSlowCaseCall = 31;
+#elif ENABLE(OPCODE_SAMPLING)
+  static const int patchOffsetGetByIdSlowCaseCall = 33;
+#elif USE(JIT_STUB_ARGUMENT_VA_LIST)
+  static const int patchOffsetGetByIdSlowCaseCall = 21;
 #else
-  static const int patchOffsetGetByIdSlowCaseCall = 21 + ctiArgumentInitSize;
+  static const int patchOffsetGetByIdSlowCaseCall = 23;
 #endif
   static const int patchOffsetOpCallCompareToJump = 6;
 

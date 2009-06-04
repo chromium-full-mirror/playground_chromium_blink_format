@@ -73,8 +73,7 @@ union JITStubArg {
 
 #if PLATFORM(X86_64)
 struct JITStackFrame {
-  JITStubArg padding;  // Used by JIT_STUB_ARGUMENT_STACK stub function calling
-                       // convention
+  JITStubArg padding;  // Unused
   JITStubArg args[8];
 
   void* savedRBX;
@@ -98,8 +97,7 @@ struct JITStackFrame {
 };
 #else
 struct JITStackFrame {
-  JITStubArg padding;  // Used by JIT_STUB_ARGUMENT_STACK stub function calling
-                       // convention
+  JITStubArg padding;  // Unused
   JITStubArg args[6];
 
   void* savedEBX;
@@ -124,12 +122,16 @@ struct JITStackFrame {
 #if USE(JIT_STUB_ARGUMENT_VA_LIST)
 #define STUB_ARGS_DECLARATION void *args, ...
 #define STUB_ARGS (reinterpret_cast<void**>(vl_args) - 1)
-#else  // JIT_STUB_ARGUMENT_REGISTER or JIT_STUB_ARGUMENT_STACK
+
+#if COMPILER(MSVC)
+#define JIT_STUB __cdecl
+#else
+#define JIT_STUB
+#endif
+#else
 #define STUB_ARGS_DECLARATION void** args
 #define STUB_ARGS (args)
-#endif
 
-#if USE(JIT_STUB_ARGUMENT_REGISTER)
 #if PLATFORM(X86_64)
 #define JIT_STUB
 #elif COMPILER(MSVC)
@@ -138,12 +140,6 @@ struct JITStackFrame {
 #define JIT_STUB __attribute__((fastcall))
 #else
 #error Need to support register calling convention in this compiler
-#endif
-#else  // JIT_STUB_ARGUMENT_VA_LIST or JIT_STUB_ARGUMENT_STACK
-#if COMPILER(MSVC)
-#define JIT_STUB __cdecl
-#else
-#define JIT_STUB
 #endif
 #endif
 
