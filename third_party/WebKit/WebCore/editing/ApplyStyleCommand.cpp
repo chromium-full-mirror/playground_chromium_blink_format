@@ -269,7 +269,7 @@ static bool isUnstyledStyleSpan(const Node* node) {
 
   const HTMLElement* elem = static_cast<const HTMLElement*>(node);
   CSSMutableStyleDeclaration* inlineStyleDecl = elem->inlineStyleDecl();
-  return (!inlineStyleDecl || inlineStyleDecl->length() == 0) &&
+  return (!inlineStyleDecl || inlineStyleDecl->isEmpty()) &&
          elem->getAttribute(classAttr) == styleSpanClassString();
 }
 
@@ -279,7 +279,7 @@ static bool isSpanWithoutAttributesOrUnstyleStyleSpan(const Node* node) {
 
   const HTMLElement* elem = static_cast<const HTMLElement*>(node);
   NamedNodeMap* attributes = elem->attributes(true);  // readonly
-  if (attributes->length() == 0)
+  if (attributes->isEmpty())
     return true;
 
   return isUnstyledStyleSpan(node);
@@ -443,7 +443,7 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclaration* style) {
   VisiblePosition beyondEnd(endOfParagraph(visibleEnd).next());
   while (paragraphStart.isNotNull() && paragraphStart != beyondEnd) {
     StyleChange styleChange(style, paragraphStart.deepEquivalent());
-    if (styleChange.cssStyle().length() > 0 || m_removeOnly) {
+    if (styleChange.cssStyle().length() || m_removeOnly) {
       RefPtr<Node> block =
           enclosingBlock(paragraphStart.deepEquivalent().node());
       RefPtr<Node> newBlock = moveParagraphContentsToNewBlockIfNecessary(
@@ -603,7 +603,7 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
                                    false, false);
       setNodeAttribute(element.get(), styleAttr, inlineStyleDecl->cssText());
     }
-    if (inlineStyleDecl->length() == 0) {
+    if (inlineStyleDecl->isEmpty()) {
       removeNodeAttribute(element.get(), styleAttr);
       // FIXME: should this be isSpanWithoutAttributesOrUnstyleStyleSpan?  Need
       // a test.
@@ -1024,12 +1024,16 @@ void ApplyStyleCommand::applyInlineStyleToRange(
 
 // This function maps from styling tags to CSS styles.  Used for knowing which
 // styling tags should be removed when toggling styles.
-bool ApplyStyleCommand::isHTMLStyleNode(CSSMutableStyleDeclaration* style,
-                                        HTMLElement* elem) {
+bool ApplyStyleCommand::implicitlyStyledElementShouldBeRemovedWhenApplyingStyle(
+    HTMLElement* elem,
+    CSSMutableStyleDeclaration* style) {
   CSSMutableStyleDeclaration::const_iterator end = style->end();
   for (CSSMutableStyleDeclaration::const_iterator it = style->begin();
        it != end; ++it) {
-    switch ((*it).id()) {
+    const CSSProperty& property = *it;
+    // FIXME: This should probably be re-written to lookup the tagname in a
+    // hash and match against an expected property/value pair.
+    switch (property.id()) {
       case CSSPropertyFontWeight:
         // IE inserts "strong" tags for execCommand("bold"), so we remove them,
         // even though they're not strictly presentational
@@ -1045,19 +1049,37 @@ bool ApplyStyleCommand::isHTMLStyleNode(CSSMutableStyleDeclaration* style,
         // even though they're not strictly presentational
         if (elem->hasLocalName(iTag) || elem->hasLocalName(emTag))
           return true;
+        break;
     }
   }
-
   return false;
 }
 
-void ApplyStyleCommand::removeHTMLStyleNode(HTMLElement* elem) {
-  // This node can be removed.
-  // EDIT FIXME: This does not handle the case where the node
-  // has attributes. But how often do people add attributes to <B> tags?
-  // Not so often I think.
-  ASSERT(elem);
-  removeNodePreservingChildren(elem);
+void ApplyStyleCommand::replaceWithSpanOrRemoveIfWithoutAttributes(
+    HTMLElement*& elem) {
+  bool removeNode = false;
+
+  // Similar to isSpanWithoutAttributesOrUnstyleStyleSpan, but does not look for
+  // Apple-style-span.
+  NamedNodeMap* attributes = elem->attributes(true);  // readonly
+  if (!attributes || attributes->isEmpty())
+    removeNode = true;
+  else if (attributes->length() == 1 && elem->hasAttribute(styleAttr)) {
+    // Remove the element even if it has just style='' (this might be
+    // redundantly checked later too)
+    CSSMutableStyleDeclaration* inlineStyleDecl = elem->inlineStyleDecl();
+    if (!inlineStyleDecl || inlineStyleDecl->isEmpty())
+      removeNode = true;
+  }
+
+  if (removeNode)
+    removeNodePreservingChildren(elem);
+  else {
+    HTMLElement* newSpanElement =
+        replaceNodeWithSpanPreservingChildrenAndAttributes(elem);
+    ASSERT(newSpanElement && newSpanElement->inDocument());
+    elem = newSpanElement;
+  }
 }
 
 void ApplyStyleCommand::removeHTMLFontStyle(CSSMutableStyleDeclaration* style,
@@ -1134,7 +1156,7 @@ void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
 
   // No need to serialize <foo style=""> if we just removed the last css
   // property
-  if (decl->length() == 0)
+  if (decl->isEmpty())
     removeNodeAttribute(elem, styleAttr);
 
   if (isSpanWithoutAttributesOrUnstyleStyleSpan(elem))
@@ -1219,7 +1241,7 @@ void ApplyStyleCommand::applyTextDecorationStyle(
     CSSMutableStyleDeclaration* style) {
   ASSERT(node);
 
-  if (!style || !style->cssText().length())
+  if (!style || style->cssText().isEmpty())
     return;
 
   if (node->isTextNode()) {
@@ -1234,7 +1256,7 @@ void ApplyStyleCommand::applyTextDecorationStyle(
   HTMLElement* element = static_cast<HTMLElement*>(node);
 
   StyleChange styleChange(style, Position(element, 0));
-  if (styleChange.cssStyle().length() > 0) {
+  if (styleChange.cssStyle().length()) {
     String cssText = styleChange.cssStyle();
     CSSMutableStyleDeclaration* decl = element->inlineStyleDecl();
     if (decl)
@@ -1342,9 +1364,15 @@ void ApplyStyleCommand::removeInlineStyle(
       if (m_styledInlineElement &&
           elem->hasTagName(m_styledInlineElement->tagQName()))
         removeNodePreservingChildren(elem);
-      if (isHTMLStyleNode(style.get(), elem))
-        removeHTMLStyleNode(elem);
-      else {
+
+      if (implicitlyStyledElementShouldBeRemovedWhenApplyingStyle(elem,
+                                                                  style.get()))
+        replaceWithSpanOrRemoveIfWithoutAttributes(elem);
+
+      // If the node was converted to a span, the span may still contain
+      // relevant
+      // styles which must be removed (e.g. <b style='font-weight: bold'>)
+      if (elem->inDocument()) {
         removeHTMLFontStyle(style.get(), elem);
         removeHTMLBidiEmbeddingStyle(style.get(), elem);
         removeCSSStyle(style.get(), elem);
@@ -1704,7 +1732,7 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
     }
   }
 
-  if (styleChange.cssStyle().length() > 0) {
+  if (styleChange.cssStyle().length()) {
     RefPtr<Element> styleElement = createStyleSpanElement(document());
     styleElement->setAttribute(styleAttr, styleChange.cssStyle());
     surroundNodeRangeWithElement(startNode, endNode, styleElement.release());

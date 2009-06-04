@@ -33,6 +33,7 @@
 namespace WebCore {
 
 class CSSStyleDeclaration;
+class HTMLElement;
 class Text;
 
 class CompositeEditCommand : public EditCommand {
@@ -89,6 +90,8 @@ class CompositeEditCommand : public EditCommand {
   void removeNodeAttribute(PassRefPtr<Element>, const QualifiedName& attribute);
   void removeChildrenInRange(PassRefPtr<Node>, unsigned from, unsigned to);
   virtual void removeNode(PassRefPtr<Node>);
+  HTMLElement* replaceNodeWithSpanPreservingChildrenAndAttributes(
+      PassRefPtr<Node>);
   void removeNodePreservingChildren(PassRefPtr<Node>);
   void removeNodeAndPruneAncestors(PassRefPtr<Node>);
   void prune(PassRefPtr<Node>);
