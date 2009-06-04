@@ -118,7 +118,7 @@ class PlatformWheelEvent {
   PlatformWheelEvent(const wxMouseEvent&, const wxPoint&);
 #endif
 
- private:
+ protected:
   IntPoint m_position;
   IntPoint m_globalPosition;
   float m_deltaX;
