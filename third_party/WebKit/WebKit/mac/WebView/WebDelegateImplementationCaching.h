@@ -29,6 +29,8 @@
 // This header contains WebView declarations that can be used anywhere in
 // WebKit, but are neither SPI nor API.
 
+#import "WebTypesInternal.h"
+
 @class WebView;
 
 struct WebResourceDelegateImplementationCache {
