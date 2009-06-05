@@ -74,4 +74,7 @@ void QWebPopup::activeChanged(int index) {
 
   m_client->valueChanged(index);
 }
-}
+
+}  // namespace WebCore
+
+#include "moc_QWebPopup.cpp"
