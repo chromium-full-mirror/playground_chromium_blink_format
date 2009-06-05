@@ -68,7 +68,6 @@ class QNetworkReplyHandler : public QObject {
   LoadMode m_loadMode;
   QNetworkAccessManager::Operation m_method;
   QNetworkRequest m_request;
-  uint m_startTime;
 
   // defer state holding
   bool m_shouldStart;
