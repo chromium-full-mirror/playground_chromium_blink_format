@@ -209,11 +209,14 @@ class SimpleFontData : public FontData {
 #endif
 
 #if USE(ATSUI)
+ public:
   mutable ATSUStyle m_ATSUStyle;
   mutable bool m_ATSUStyleInitialized;
   mutable bool m_ATSUMirrors;
   mutable bool m_checkedShapesArabic;
   mutable bool m_shapesArabic;
+
+ private:
 #endif
 
 #if USE(CORE_TEXT)
