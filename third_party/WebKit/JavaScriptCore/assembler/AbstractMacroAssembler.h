@@ -610,17 +610,22 @@ class AbstractMacroAssembler {
   // possibly wrap the later up in an object that can do just that).
   class PatchBuffer : public Noncopyable {
    public:
+    // Note: Initialization sequence is significant, since executablePool is a
+    // PassRefPtr.
+    //       First, executablePool is copied into m_executablePool, then the
+    //       initialization of
+    //       m_code uses m_executablePool, *not* executablePool, since this is
+    //       no longer valid.
     PatchBuffer(AbstractMacroAssembler<AssemblerType>* masm,
                 PassRefPtr<ExecutablePool> executablePool)
-        : m_ref(0, executablePool, masm->m_assembler.size()),
+        : m_executablePool(executablePool),
+          m_code(masm->m_assembler.executableCopy(m_executablePool.get())),
           m_size(masm->m_assembler.size())
 #ifndef NDEBUG
           ,
           m_completed(false)
 #endif
     {
-      m_ref.m_code =
-          masm->m_assembler.executableCopy(m_ref.m_executablePool.get());
     }
 
     ~PatchBuffer() { ASSERT(m_completed); }
@@ -725,7 +730,7 @@ class AbstractMacroAssembler {
     CodeRef finalizeCode() {
       performFinalization();
 
-      return m_ref;
+      return CodeRef(m_code, m_executablePool, m_size);
     }
     CodeLocationLabel finalizeCodeAddendum() {
       performFinalization();
@@ -737,7 +742,7 @@ class AbstractMacroAssembler {
     // Keep this private! - the underlying code should only be obtained
     // externally via
     // finalizeCode() or finalizeCodeAddendum().
-    void* code() { return m_ref.m_code; }
+    void* code() { return m_code; }
 
     void performFinalization() {
 #ifndef NDEBUG
@@ -745,10 +750,11 @@ class AbstractMacroAssembler {
       m_completed = true;
 #endif
 
-      ExecutableAllocator::makeExecutable(m_ref.m_code, m_size);
+      ExecutableAllocator::makeExecutable(m_code, m_size);
     }
 
-    CodeRef m_ref;
+    RefPtr<ExecutablePool> m_executablePool;
+    void* m_code;
     size_t m_size;
 #ifndef NDEBUG
     bool m_completed;
