@@ -161,6 +161,14 @@ void HTMLBodyElement::parseMappedAttribute(MappedAttribute* attr) {
     document()->setWindowAttributeEventListener(
         eventNames().storageEvent,
         createAttributeEventListener(document()->frame(), attr));
+  else if (attr->name() == ononlineAttr)
+    document()->setWindowAttributeEventListener(
+        eventNames().onlineEvent,
+        createAttributeEventListener(document()->frame(), attr));
+  else if (attr->name() == onofflineAttr)
+    document()->setWindowAttributeEventListener(
+        eventNames().offlineEvent,
+        createAttributeEventListener(document()->frame(), attr));
   else
     HTMLElement::parseMappedAttribute(attr);
 }
