@@ -39,7 +39,7 @@ const SimpleFontData* FontCache::getFontDataForCharacters(
 #if defined(USE_FREETYPE)
   FcResult fresult;
   FontPlatformData* prim =
-      const_cast<FontPlatformData*>(&font.primaryFont()->m_font);
+      const_cast<FontPlatformData*>(&font.primaryFont()->platformData());
 
   if (!prim->m_fallbacks)
     prim->m_fallbacks =
