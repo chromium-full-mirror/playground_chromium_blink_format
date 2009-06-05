@@ -639,16 +639,10 @@ class RenderBlock : public RenderBox {
 
   void adjustPositionedBlock(RenderBox* child, const MarginInfo&);
   void adjustFloatingBlock(const MarginInfo&);
-  RenderBox* handleSpecialChild(RenderBox* child,
-                                const MarginInfo&,
-                                bool& handled);
-  RenderBox* handleFloatingChild(RenderBox* child,
-                                 const MarginInfo&,
-                                 bool& handled);
-  RenderBox* handlePositionedChild(RenderBox* child,
-                                   const MarginInfo&,
-                                   bool& handled);
-  RenderBox* handleRunInChild(RenderBox* child, bool& handled);
+  bool handleSpecialChild(RenderBox* child, const MarginInfo&);
+  bool handleFloatingChild(RenderBox* child, const MarginInfo&);
+  bool handlePositionedChild(RenderBox* child, const MarginInfo&);
+  bool handleRunInChild(RenderBox* child);
   int collapseMargins(RenderBox* child, MarginInfo&);
   int clearFloatsIfNeeded(RenderBox* child,
                           MarginInfo&,
