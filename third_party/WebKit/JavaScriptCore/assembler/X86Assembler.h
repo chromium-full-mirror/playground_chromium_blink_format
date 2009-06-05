@@ -1240,14 +1240,6 @@ class X86Assembler {
     patchRel32(code + from.m_offset, code + to.m_offset);
   }
 
-  void linkCall(JmpSrc from, JmpDst to) {
-    ASSERT(from.m_offset != -1);
-    ASSERT(to.m_offset != -1);
-
-    char* code = reinterpret_cast<char*>(m_formatter.data());
-    patchRel32(code + from.m_offset, code + to.m_offset);
-  }
-
   static void linkJump(void* code, JmpSrc from, void* to) {
     ASSERT(from.m_offset != -1);
 
@@ -1263,6 +1255,12 @@ class X86Assembler {
   static void patchPointer(void* where, void* value) {
     reinterpret_cast<void**>(where)[-1] = value;
   }
+
+#if PLATFORM(X86_64)
+  static void patchPointerForCall(void* where, void* value) {
+    reinterpret_cast<void**>(where)[-1] = value;
+  }
+#endif
 
   static void patchPointer(void* code, JmpDst where, void* value) {
     ASSERT(where.m_offset != -1);

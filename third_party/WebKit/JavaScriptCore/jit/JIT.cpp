@@ -46,16 +46,22 @@ using namespace std;
 
 namespace JSC {
 
-void ctiPatchCallByReturnAddress(
-    MacroAssembler::ProcessorReturnAddress returnAddress,
-    void* newCalleeFunction) {
-  returnAddress.relinkCallerToFunction(newCalleeFunction);
-}
-
 void ctiPatchNearCallByReturnAddress(
     MacroAssembler::ProcessorReturnAddress returnAddress,
-    void* newCalleeFunction) {
-  returnAddress.relinkNearCallerToFunction(newCalleeFunction);
+    MacroAssemblerCodePtr newCalleeFunction) {
+  returnAddress.relinkNearCallerToTrampoline(newCalleeFunction);
+}
+
+void ctiPatchCallByReturnAddress(
+    MacroAssembler::ProcessorReturnAddress returnAddress,
+    MacroAssemblerCodePtr newCalleeFunction) {
+  returnAddress.relinkCallerToTrampoline(newCalleeFunction);
+}
+
+void ctiPatchCallByReturnAddress(
+    MacroAssembler::ProcessorReturnAddress returnAddress,
+    FunctionPtr newCalleeFunction) {
+  returnAddress.relinkCallerToFunction(newCalleeFunction);
 }
 
 JIT::JIT(JSGlobalData* globalData, CodeBlock* codeBlock)
@@ -481,7 +487,7 @@ void JIT::privateCompile() {
   for (Vector<CallRecord>::iterator iter = m_calls.begin();
        iter != m_calls.end(); ++iter) {
     if (iter->to)
-      patchBuffer.link(iter->from, iter->to);
+      patchBuffer.link(iter->from, FunctionPtr(iter->to));
   }
 
   if (m_codeBlock->hasExceptionInfo()) {
@@ -541,12 +547,12 @@ void JIT::privateCompile() {
 void JIT::privateCompileCTIMachineTrampolines(
     RefPtr<ExecutablePool>* executablePool,
     JSGlobalData* globalData,
-    void** ctiArrayLengthTrampoline,
-    void** ctiStringLengthTrampoline,
-    void** ctiVirtualCallPreLink,
-    void** ctiVirtualCallLink,
-    void** ctiVirtualCall,
-    void** ctiNativeCallThunk) {
+    CodePtr* ctiArrayLengthTrampoline,
+    CodePtr* ctiStringLengthTrampoline,
+    CodePtr* ctiVirtualCallPreLink,
+    CodePtr* ctiVirtualCallLink,
+    CodePtr* ctiVirtualCall,
+    CodePtr* ctiNativeCallThunk) {
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
   // (1) The first function provides fast property access for array length
   Label arrayLengthBegin = align();
@@ -939,26 +945,34 @@ void JIT::privateCompileCTIMachineTrampolines(
 
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
   patchBuffer.link(array_failureCases1Call,
-                   JITStubs::cti_op_get_by_id_array_fail);
+                   FunctionPtr(JITStubs::cti_op_get_by_id_array_fail));
   patchBuffer.link(array_failureCases2Call,
-                   JITStubs::cti_op_get_by_id_array_fail);
+                   FunctionPtr(JITStubs::cti_op_get_by_id_array_fail));
   patchBuffer.link(array_failureCases3Call,
-                   JITStubs::cti_op_get_by_id_array_fail);
+                   FunctionPtr(JITStubs::cti_op_get_by_id_array_fail));
   patchBuffer.link(string_failureCases1Call,
-                   JITStubs::cti_op_get_by_id_string_fail);
+                   FunctionPtr(JITStubs::cti_op_get_by_id_string_fail));
   patchBuffer.link(string_failureCases2Call,
-                   JITStubs::cti_op_get_by_id_string_fail);
+                   FunctionPtr(JITStubs::cti_op_get_by_id_string_fail));
   patchBuffer.link(string_failureCases3Call,
-                   JITStubs::cti_op_get_by_id_string_fail);
+                   FunctionPtr(JITStubs::cti_op_get_by_id_string_fail));
 #endif
-  patchBuffer.link(callArityCheck1, JITStubs::cti_op_call_arityCheck);
-  patchBuffer.link(callArityCheck2, JITStubs::cti_op_call_arityCheck);
-  patchBuffer.link(callArityCheck3, JITStubs::cti_op_call_arityCheck);
-  patchBuffer.link(callJSFunction1, JITStubs::cti_op_call_JSFunction);
-  patchBuffer.link(callJSFunction2, JITStubs::cti_op_call_JSFunction);
-  patchBuffer.link(callJSFunction3, JITStubs::cti_op_call_JSFunction);
-  patchBuffer.link(callDontLazyLinkCall, JITStubs::cti_vm_dontLazyLinkCall);
-  patchBuffer.link(callLazyLinkCall, JITStubs::cti_vm_lazyLinkCall);
+  patchBuffer.link(callArityCheck1,
+                   FunctionPtr(JITStubs::cti_op_call_arityCheck));
+  patchBuffer.link(callArityCheck2,
+                   FunctionPtr(JITStubs::cti_op_call_arityCheck));
+  patchBuffer.link(callArityCheck3,
+                   FunctionPtr(JITStubs::cti_op_call_arityCheck));
+  patchBuffer.link(callJSFunction1,
+                   FunctionPtr(JITStubs::cti_op_call_JSFunction));
+  patchBuffer.link(callJSFunction2,
+                   FunctionPtr(JITStubs::cti_op_call_JSFunction));
+  patchBuffer.link(callJSFunction3,
+                   FunctionPtr(JITStubs::cti_op_call_JSFunction));
+  patchBuffer.link(callDontLazyLinkCall,
+                   FunctionPtr(JITStubs::cti_vm_dontLazyLinkCall));
+  patchBuffer.link(callLazyLinkCall,
+                   FunctionPtr(JITStubs::cti_vm_lazyLinkCall));
 
   CodeRef finalCode = patchBuffer.finalizeCode();
   *executablePool = finalCode.m_executablePool;

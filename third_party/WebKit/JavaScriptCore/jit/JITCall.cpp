@@ -294,7 +294,7 @@ void JIT::compileOpCall(OpcodeID opcodeID,
 
   // Call to the callee
   m_callStructureStubCompilationInfo[callLinkInfoIndex].hotPathOther =
-      emitNakedCall(reinterpret_cast<void*>(0));
+      emitNakedCall();
 
   if (opcodeID == op_call_eval)
     wasEval.link(this);

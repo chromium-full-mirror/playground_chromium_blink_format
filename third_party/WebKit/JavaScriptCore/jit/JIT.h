@@ -149,12 +149,17 @@ struct MethodCallCompilationInfo {
   unsigned propertyAccessIndex;
 };
 
-void ctiPatchCallByReturnAddress(
-    MacroAssembler::ProcessorReturnAddress returnAddress,
-    void* newCalleeFunction);
+// Near calls can only be patched to other JIT code, regular calls can be
+// patched to JIT code or relinked to stub functions.
 void ctiPatchNearCallByReturnAddress(
     MacroAssembler::ProcessorReturnAddress returnAddress,
-    void* newCalleeFunction);
+    MacroAssemblerCodePtr newCalleeFunction);
+void ctiPatchCallByReturnAddress(
+    MacroAssembler::ProcessorReturnAddress returnAddress,
+    MacroAssemblerCodePtr newCalleeFunction);
+void ctiPatchCallByReturnAddress(
+    MacroAssembler::ProcessorReturnAddress returnAddress,
+    FunctionPtr newCalleeFunction);
 
 class JIT : private MacroAssembler {
   friend class JITStubCall;
@@ -377,12 +382,12 @@ class JIT : private MacroAssembler {
   static void compileCTIMachineTrampolines(
       JSGlobalData* globalData,
       RefPtr<ExecutablePool>* executablePool,
-      void** ctiArrayLengthTrampoline,
-      void** ctiStringLengthTrampoline,
-      void** ctiVirtualCallPreLink,
-      void** ctiVirtualCallLink,
-      void** ctiVirtualCall,
-      void** ctiNativeCallThunk) {
+      CodePtr* ctiArrayLengthTrampoline,
+      CodePtr* ctiStringLengthTrampoline,
+      CodePtr* ctiVirtualCallPreLink,
+      CodePtr* ctiVirtualCallLink,
+      CodePtr* ctiVirtualCall,
+      CodePtr* ctiNativeCallThunk) {
     JIT jit(globalData);
     jit.privateCompileCTIMachineTrampolines(
         executablePool, globalData, ctiArrayLengthTrampoline,
@@ -475,12 +480,12 @@ class JIT : private MacroAssembler {
   void privateCompileCTIMachineTrampolines(
       RefPtr<ExecutablePool>* executablePool,
       JSGlobalData* data,
-      void** ctiArrayLengthTrampoline,
-      void** ctiStringLengthTrampoline,
-      void** ctiVirtualCallPreLink,
-      void** ctiVirtualCallLink,
-      void** ctiVirtualCall,
-      void** ctiNativeCallThunk);
+      CodePtr* ctiArrayLengthTrampoline,
+      CodePtr* ctiStringLengthTrampoline,
+      CodePtr* ctiVirtualCallPreLink,
+      CodePtr* ctiVirtualCallLink,
+      CodePtr* ctiVirtualCall,
+      CodePtr* ctiNativeCallThunk);
   void privateCompilePatchGetArrayLength(ProcessorReturnAddress returnAddress);
 
   void addSlowCase(Jump);
@@ -768,7 +773,7 @@ class JIT : private MacroAssembler {
   void restoreArgumentReference();
   void restoreArgumentReferenceForTrampoline();
 
-  Call emitNakedCall(void* function);
+  Call emitNakedCall(CodePtr function = CodePtr());
   void preverveReturnAddressAfterCall(RegisterID);
   void restoreReturnAddressBeforeReturn(RegisterID);
   void restoreReturnAddressBeforeReturn(Address);

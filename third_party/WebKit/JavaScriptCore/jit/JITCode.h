@@ -42,22 +42,24 @@ class RegisterFile;
 
 class JITCode {
   typedef MacroAssemblerCodeRef CodeRef;
+  typedef MacroAssemblerCodePtr CodePtr;
 
  public:
   JITCode() {}
 
   JITCode(const CodeRef ref) : m_ref(ref) {}
 
-  bool operator!() const { return !m_ref.m_code; }
+  bool operator!() const { return !m_ref.m_code.executableAddress(); }
 
-  void* addressForCall() { return m_ref.m_code; }
+  CodePtr addressForCall() { return m_ref.m_code; }
 
   // This function returns the offset in bytes of 'pointerIntoCode' into
   // this block of code.  The pointer provided must be a pointer into this
   // block of code.  It is ASSERTed that no codeblock >4gb in size.
   unsigned offsetOf(void* pointerIntoCode) {
-    intptr_t result = reinterpret_cast<intptr_t>(pointerIntoCode) -
-                      reinterpret_cast<intptr_t>(m_ref.m_code);
+    intptr_t result =
+        reinterpret_cast<intptr_t>(pointerIntoCode) -
+        reinterpret_cast<intptr_t>(m_ref.m_code.executableAddress());
     ASSERT(static_cast<intptr_t>(static_cast<unsigned>(result)) == result);
     return static_cast<unsigned>(result);
   }
@@ -71,13 +73,13 @@ class JITCode {
 #if PLATFORM(X86_64)
         0, 0, 0, 0, 0, 0,
 #endif
-        m_ref.m_code, registerFile, callFrame, exception,
+        m_ref.m_code.executableAddress(), registerFile, callFrame, exception,
         Profiler::enabledProfilerReference(), globalData));
   }
 
 #ifndef NDEBUG
   size_t size() {
-    ASSERT(m_ref.m_code);
+    ASSERT(m_ref.m_code.executableAddress());
     return m_ref.m_size;
   }
 #endif
@@ -86,7 +88,9 @@ class JITCode {
 
   // Host functions are a bit special; they have a m_code pointer but they
   // do not individully ref the executable pool containing the trampoline.
-  static JITCode HostFunction(void* code) { return JITCode(code, 0, 0); }
+  static JITCode HostFunction(CodePtr code) {
+    return JITCode(code.dataLocation(), 0, 0);
+  }
 
  private:
   JITCode(void* code, PassRefPtr<ExecutablePool> executablePool, size_t size)
