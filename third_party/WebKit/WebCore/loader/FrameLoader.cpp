@@ -670,7 +670,7 @@ void FrameLoader::submitForm(const char* action,
       frameRequest, lockHistory, lockBackForwardList, event, formState);
 }
 
-void FrameLoader::stopLoading(bool sendUnload) {
+void FrameLoader::stopLoading(bool sendUnload, DatabasePolicy databasePolicy) {
   if (m_frame->document() && m_frame->document()->tokenizer())
     m_frame->document()->tokenizer()->stopParsing();
 
@@ -712,7 +712,8 @@ void FrameLoader::stopLoading(bool sendUnload) {
       cache()->loader()->cancelRequests(docLoader);
 
 #if ENABLE(DATABASE)
-    doc->stopDatabases();
+    if (databasePolicy == DatabasePolicyStop)
+      doc->stopDatabases();
 #endif
   }
 
@@ -2903,7 +2904,7 @@ void FrameLoader::stopLoadingSubframes() {
     child->loader()->stopAllLoaders();
 }
 
-void FrameLoader::stopAllLoaders() {
+void FrameLoader::stopAllLoaders(DatabasePolicy databasePolicy) {
   if (m_unloadEventBeingDispatched)
     return;
 
@@ -2918,9 +2919,9 @@ void FrameLoader::stopAllLoaders() {
 
   stopLoadingSubframes();
   if (m_provisionalDocumentLoader)
-    m_provisionalDocumentLoader->stopLoading();
+    m_provisionalDocumentLoader->stopLoading(databasePolicy);
   if (m_documentLoader)
-    m_documentLoader->stopLoading();
+    m_documentLoader->stopLoading(databasePolicy);
 
   setProvisionalDocumentLoader(0);
 
