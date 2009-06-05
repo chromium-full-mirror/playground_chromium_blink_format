@@ -238,6 +238,8 @@ class CachedResource {
   Request* m_request;
 
   ResourceResponse m_response;
+  double m_responseTimestamp;
+
   RefPtr<SharedBuffer> m_data;
   OwnPtr<PurgeableBuffer> m_purgeableData;
 
@@ -251,9 +253,11 @@ class CachedResource {
   void setResourceToRevalidate(CachedResource*);
   void switchClientsToRevalidatedResource();
   void clearResourceToRevalidate();
-  void setExpirationDate(time_t expirationDate) {
-    m_expirationDate = expirationDate;
-  }
+  void updateResponseAfterRevalidation(
+      const ResourceResponse& validatingResponse);
+
+  double currentAge() const;
+  double freshnessLifetime() const;
 
   unsigned m_encodedSize;
   unsigned m_decodedSize;
@@ -270,7 +274,6 @@ class CachedResource {
  protected:
   bool m_inCache;
   bool m_loading;
-  bool m_expireDateChanged;
 #ifndef NDEBUG
   bool m_deleted;
   unsigned m_lruIndex;
@@ -298,8 +301,6 @@ class CachedResource {
   // These handles will need to be updated to point to the
   // m_resourceToRevalidate in case we get 304 response.
   HashSet<CachedResourceHandleBase*> m_handlesToRevalidate;
-
-  time_t m_expirationDate;
 };
 }
 
