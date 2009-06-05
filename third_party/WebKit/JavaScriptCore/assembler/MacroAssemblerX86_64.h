@@ -389,7 +389,7 @@ class MacroAssemblerX86_64 : public MacroAssemblerX86Common {
     return branchPtr(cond, left, scratchRegister);
   }
 
-  DataLabelPtr storePtrWithPatch(Address address) {
+  DataLabelPtr storePtrWithPatch(ImplicitAddress address) {
     DataLabelPtr label = moveWithPatch(ImmPtr(0), scratchRegister);
     storePtr(scratchRegister, address);
     return label;

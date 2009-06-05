@@ -1252,10 +1252,6 @@ class X86Assembler {
     patchRel32(reinterpret_cast<char*>(code) + from.m_offset, to);
   }
 
-  static void patchPointer(void* where, void* value) {
-    reinterpret_cast<void**>(where)[-1] = value;
-  }
-
 #if PLATFORM(X86_64)
   static void patchPointerForCall(void* where, void* value) {
     reinterpret_cast<void**>(where)[-1] = value;
@@ -1334,6 +1330,10 @@ class X86Assembler {
   }
 
  private:
+  static void patchPointer(void* where, void* value) {
+    reinterpret_cast<void**>(where)[-1] = value;
+  }
+
   static void patchInt32(void* where, int32_t value) {
     reinterpret_cast<int32_t*>(where)[-1] = value;
   }
