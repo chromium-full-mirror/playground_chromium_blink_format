@@ -64,7 +64,7 @@ class SimpleFontData : public FontData {
   virtual ~SimpleFontData();
 
  public:
-  const FontPlatformData& platformData() const { return m_font; }
+  const FontPlatformData& platformData() const { return m_platformData; }
   SimpleFontData* smallCapsFontData(
       const FontDescription& fontDescription) const;
 
@@ -80,6 +80,15 @@ class SimpleFontData : public FontData {
 
   float widthForGlyph(Glyph) const;
   float platformWidthForGlyph(Glyph) const;
+
+  float spaceWidth() const { return m_spaceWidth; }
+  float adjustedSpaceWidth() const { return m_adjustedSpaceWidth; }
+
+#if PLATFORM(CG) || PLATFORM(CAIRO)
+  float syntheticBoldOffset() const { return m_syntheticBoldOffset; }
+#endif
+
+  Glyph spaceGlyph() const { return m_spaceGlyph; }
 
   virtual const SimpleFontData* fontDataForCharacter(UChar32) const;
   virtual bool containsCharacters(const UChar*, int length) const;
@@ -103,7 +112,7 @@ class SimpleFontData : public FontData {
   const GlyphData& missingGlyphData() const { return m_missingGlyphData; }
 
 #if PLATFORM(MAC)
-  NSFont* getNSFont() const { return m_font.font(); }
+  NSFont* getNSFont() const { return m_platformData.font(); }
 #endif
 
 #if USE(CORE_TEXT)
@@ -121,7 +130,7 @@ class SimpleFontData : public FontData {
 #endif
 
 #if PLATFORM(QT)
-  QFont getQtFont() const { return m_font.font(); }
+  QFont getQtFont() const { return m_platformData.font(); }
 #endif
 
 #if PLATFORM(WIN)
@@ -138,7 +147,7 @@ class SimpleFontData : public FontData {
 #endif
 
 #if PLATFORM(WX)
-  wxFont* getWxFont() const { return m_font.font(); }
+  wxFont* getWxFont() const { return m_platformData.font(); }
 #endif
 
  private:
@@ -157,7 +166,6 @@ class SimpleFontData : public FontData {
   float widthForGDIGlyph(Glyph glyph) const;
 #endif
 
- public:
   int m_ascent;
   int m_descent;
   int m_lineSpacing;
@@ -167,7 +175,7 @@ class SimpleFontData : public FontData {
   float m_xHeight;
   unsigned m_unitsPerEm;
 
-  FontPlatformData m_font;
+  FontPlatformData m_platformData;
 
   mutable GlyphWidthMap m_glyphToWidthMap;
 

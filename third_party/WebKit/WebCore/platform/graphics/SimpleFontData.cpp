@@ -52,7 +52,7 @@ SimpleFontData::SimpleFontData(const FontPlatformData& f,
                                bool loading,
                                SVGFontData* svgFontData)
     : m_unitsPerEm(defaultUnitsPerEm),
-      m_font(f),
+      m_platformData(f),
       m_treatAsFixedPitch(false)
 #if ENABLE(SVG_FONTS)
       ,

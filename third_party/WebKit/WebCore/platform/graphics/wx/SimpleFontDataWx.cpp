@@ -43,7 +43,7 @@
 namespace WebCore {
 
 void SimpleFontData::platformInit() {
-  wxFont* font = m_font.font();
+  wxFont* font = m_platformData.font();
   if (font && font->IsOk()) {
     wxFontProperties props = wxFontProperties(font);
     m_ascent = props.GetAscent();
@@ -85,8 +85,8 @@ bool SimpleFontData::containsCharacters(const UChar* characters,
 }
 
 void SimpleFontData::determinePitch() {
-  if (m_font.font() && m_font.font()->Ok())
-    m_treatAsFixedPitch = m_font.font()->IsFixedWidth();
+  if (m_platformData.font() && m_platformData.font()->Ok())
+    m_treatAsFixedPitch = m_platformData.font()->IsFixedWidth();
   else
     m_treatAsFixedPitch = false;
 }
@@ -94,7 +94,7 @@ void SimpleFontData::determinePitch() {
 float SimpleFontData::platformWidthForGlyph(Glyph glyph) const {
   // TODO: fix this! Make GetTextExtents a method of wxFont in 2.9
   int width = 10;
-  GetTextExtent(*m_font.font(), (wxChar)glyph, &width, NULL);
+  GetTextExtent(*m_platformData.font(), (wxChar)glyph, &width, NULL);
   return width;
 }
 }

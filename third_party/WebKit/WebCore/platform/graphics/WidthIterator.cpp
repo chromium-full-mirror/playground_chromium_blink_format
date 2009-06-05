@@ -136,10 +136,11 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
       // Second, in fixed-pitch fonts we ensure that all characters that
       // match the width of the space character have the same width as the space
       // character.
-      if (width == fontData->m_spaceWidth &&
-          (fontData->m_treatAsFixedPitch || glyph == fontData->m_spaceGlyph) &&
+      if (width == fontData->spaceWidth() &&
+          (fontData->pitch() == FixedPitch ||
+           glyph == fontData->spaceGlyph()) &&
           m_run.applyWordRounding())
-        width = fontData->m_adjustedSpaceWidth;
+        width = fontData->adjustedSpaceWidth();
     }
 
     if (fontData != lastFontData && width) {

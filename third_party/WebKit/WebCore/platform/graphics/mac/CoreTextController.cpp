@@ -519,7 +519,7 @@ void CoreTextController::adjustGlyphsAndAdvances() {
 
     bool lastRun = r + 1 == runCount;
     const UChar* cp = coreTextRun.characters();
-    CGFloat roundedSpaceWidth = roundCGFloat(fontData->m_spaceWidth);
+    CGFloat roundedSpaceWidth = roundCGFloat(fontData->spaceWidth());
     bool roundsAdvances = !m_font.isPrinterFont() &&
                           fontData->platformData().roundsGlyphAdvances();
     bool hasExtraSpacing =
@@ -540,9 +540,9 @@ void CoreTextController::adjustGlyphsAndAdvances() {
                    m_coreTextRuns[r + 1].indexAt(0));
 
       bool treatAsSpace = Font::treatAsSpace(ch);
-      CGGlyph glyph = treatAsSpace ? fontData->m_spaceGlyph : glyphs[i];
+      CGGlyph glyph = treatAsSpace ? fontData->spaceGlyph() : glyphs[i];
       CGSize advance =
-          treatAsSpace ? CGSizeMake(fontData->m_spaceWidth, advances[i].height)
+          treatAsSpace ? CGSizeMake(fontData->spaceWidth(), advances[i].height)
                        : advances[i];
 
       if (ch == '\t' && m_run.allowTabs()) {
@@ -551,14 +551,14 @@ void CoreTextController::adjustGlyphsAndAdvances() {
       } else if (ch == zeroWidthSpace ||
                  Font::treatAsZeroWidthSpace(ch) && !treatAsSpace) {
         advance.width = 0;
-        glyph = fontData->m_spaceGlyph;
+        glyph = fontData->spaceGlyph();
       }
 
       float roundedAdvanceWidth = roundf(advance.width);
       if (roundsAdvances)
         advance.width = roundedAdvanceWidth;
 
-      advance.width += fontData->m_syntheticBoldOffset;
+      advance.width += fontData->syntheticBoldOffset();
 
       // We special case spaces in two ways when applying word rounding.
       // First, we round spaces to an adjusted width in all fonts.
@@ -566,9 +566,10 @@ void CoreTextController::adjustGlyphsAndAdvances() {
       // match the width of the space glyph have the same width as the space
       // glyph.
       if (roundedAdvanceWidth == roundedSpaceWidth &&
-          (fontData->m_treatAsFixedPitch || glyph == fontData->m_spaceGlyph) &&
+          (fontData->pitch() == FixedPitch ||
+           glyph == fontData->spaceGlyph()) &&
           m_run.applyWordRounding())
-        advance.width = fontData->m_adjustedSpaceWidth;
+        advance.width = fontData->adjustedSpaceWidth();
 
       if (hasExtraSpacing) {
         // If we're a glyph with an advance, go ahead and add in letter-spacing.
@@ -578,7 +579,7 @@ void CoreTextController::adjustGlyphsAndAdvances() {
           advance.width += m_font.letterSpacing();
 
         // Handle justification and word-spacing.
-        if (glyph == fontData->m_spaceGlyph) {
+        if (glyph == fontData->spaceGlyph()) {
           // Account for padding. WebCore uses space padding to justify text.
           // We distribute the specified padding over the available spaces in
           // the run.

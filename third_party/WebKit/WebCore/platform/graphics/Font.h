@@ -131,7 +131,7 @@ class Font {
   float xHeight() const { return primaryFont()->xHeight(); }
   unsigned unitsPerEm() const { return primaryFont()->unitsPerEm(); }
   int spaceWidth() const {
-    return (int)ceilf(primaryFont()->m_adjustedSpaceWidth + m_letterSpacing);
+    return (int)ceilf(primaryFont()->adjustedSpaceWidth() + m_letterSpacing);
   }
   int tabWidth() const { return 8 * spaceWidth(); }
 
