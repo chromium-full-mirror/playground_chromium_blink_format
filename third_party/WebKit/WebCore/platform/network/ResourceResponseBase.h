@@ -79,6 +79,12 @@ class ResourceResponseBase {
 
   bool isAttachment() const;
 
+  // FIXME: These are used by PluginStream on some platforms. Calculations may
+  // differ from just returning plain Last-odified header.
+  // Leaving it for now but this should go away in favor of generic solution.
+  void setLastModifiedDate(time_t);
+  time_t lastModifiedDate() const;
+
   // These functions return parsed values of the corresponding response headers.
   // NaN means that the header was not present or had invalid value.
   bool cacheControlContainsNoCache() const;
@@ -127,6 +133,7 @@ class ResourceResponseBase {
   int m_httpStatusCode;
   String m_httpStatusText;
   HTTPHeaderMap m_httpHeaderFields;
+  time_t m_lastModifiedDate;
 
   bool m_isNull : 1;
 
@@ -165,6 +172,7 @@ struct CrossThreadResourceResponseData {
   int m_httpStatusCode;
   String m_httpStatusText;
   OwnPtr<CrossThreadHTTPHeaderMapData> m_httpHeaders;
+  time_t m_lastModifiedDate;
 };
 
 }  // namespace WebCore

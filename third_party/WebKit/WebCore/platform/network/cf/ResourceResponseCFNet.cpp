@@ -78,6 +78,9 @@ void ResourceResponse::platformLazyInit() {
       CFURLResponseGetExpectedContentLength(m_cfResponse.get());
   m_textEncodingName = CFURLResponseGetTextEncodingName(m_cfResponse.get());
 
+  m_lastModifiedDate =
+      toTimeT(CFURLResponseGetLastModifiedDate(m_cfResponse.get()));
+
   RetainPtr<CFStringRef> suggestedFilename(
       AdoptCF, CFURLResponseCopySuggestedFilename(m_cfResponse.get()));
   m_suggestedFilename = suggestedFilename.get();

@@ -30,6 +30,7 @@
 #include "ResourceResponse.h"
 #include <runtime/DateMath.h>
 #include <wtf/CurrentTime.h>
+#include <wtf/MathExtras.h>
 #include <wtf/StdLibExtras.h>
 
 using namespace std;
@@ -83,6 +84,8 @@ auto_ptr<ResourceResponse> ResourceResponseBase::adopt(
   response->m_httpHeaderFields.adopt(
       std::auto_ptr<CrossThreadHTTPHeaderMapData>(
           data->m_httpHeaders.release()));
+  response->setLastModifiedDate(data->m_lastModifiedDate);
+
   return response;
 }
 
@@ -98,6 +101,7 @@ auto_ptr<CrossThreadResourceResponseData> ResourceResponseBase::copyData()
   data->m_httpStatusCode = httpStatusCode();
   data->m_httpStatusText = httpStatusText().copy();
   data->m_httpHeaders.adopt(httpHeaderFields().copyData());
+  data->m_lastModifiedDate = lastModifiedDate();
   return data;
 }
 
@@ -385,6 +389,18 @@ bool ResourceResponseBase::isAttachment() const {
   value = value.stripWhiteSpace();
   DEFINE_STATIC_LOCAL(const AtomicString, attachmentString, ("attachment"));
   return equalIgnoringCase(value, attachmentString);
+}
+
+void ResourceResponseBase::setLastModifiedDate(time_t lastModifiedDate) {
+  lazyInit();
+
+  m_lastModifiedDate = lastModifiedDate;
+}
+
+time_t ResourceResponseBase::lastModifiedDate() const {
+  lazyInit();
+
+  return m_lastModifiedDate;
 }
 
 void ResourceResponseBase::lazyInit() const {
