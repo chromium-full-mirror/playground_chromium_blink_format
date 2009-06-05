@@ -81,6 +81,8 @@ class CSSParser {
   bool parse4Values(int propId, const int* properties, bool important);
   bool parseContent(int propId, bool important);
 
+  PassRefPtr<CSSValue> parseAttr(CSSParserValueList* args);
+
   PassRefPtr<CSSValue> parseBackgroundColor();
 
   bool parseFillImage(RefPtr<CSSValue>&);
