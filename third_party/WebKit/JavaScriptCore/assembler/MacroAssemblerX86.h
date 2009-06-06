@@ -127,8 +127,9 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
     return Jump(m_assembler.jCC(x86Condition(cond)));
   }
 
-  DataLabelPtr storePtrWithPatch(ImplicitAddress address) {
-    m_assembler.movl_i32m(0, address.offset, address.base);
+  DataLabelPtr storePtrWithPatch(ImmPtr initialValue, ImplicitAddress address) {
+    m_assembler.movl_i32m(initialValue.asIntptr(), address.offset,
+                          address.base);
     return DataLabelPtr(this);
   }
 

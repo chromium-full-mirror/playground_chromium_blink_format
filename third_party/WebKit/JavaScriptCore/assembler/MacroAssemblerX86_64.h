@@ -389,8 +389,8 @@ class MacroAssemblerX86_64 : public MacroAssemblerX86Common {
     return branchPtr(cond, left, scratchRegister);
   }
 
-  DataLabelPtr storePtrWithPatch(ImplicitAddress address) {
-    DataLabelPtr label = moveWithPatch(ImmPtr(0), scratchRegister);
+  DataLabelPtr storePtrWithPatch(ImmPtr initialValue, ImplicitAddress address) {
+    DataLabelPtr label = moveWithPatch(initialValue, scratchRegister);
     storePtr(scratchRegister, address);
     return label;
   }

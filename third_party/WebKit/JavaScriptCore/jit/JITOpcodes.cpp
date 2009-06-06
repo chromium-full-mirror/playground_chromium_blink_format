@@ -545,7 +545,7 @@ void JIT::emit_op_jsr(Instruction* currentInstruction) {
   int retAddrDst = currentInstruction[1].u.operand;
   int target = currentInstruction[2].u.operand;
   DataLabelPtr storeLocation = storePtrWithPatch(
-      Address(callFrameRegister, sizeof(Register) * retAddrDst));
+      ImmPtr(0), Address(callFrameRegister, sizeof(Register) * retAddrDst));
   addJump(jump(), target + 2);
   m_jsrSites.append(JSRInfo(storeLocation, label()));
   killLastResultRegister();
