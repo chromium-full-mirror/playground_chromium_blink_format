@@ -27,6 +27,7 @@
 #include "LocalStorageArea.h"
 
 #include "CString.h"
+#include "DOMWindow.h"
 #include "EventNames.h"
 #include "Frame.h"
 #include "HTMLElement.h"
@@ -234,7 +235,8 @@ void LocalStorageArea::dispatchStorageEvent(const String& key,
   for (unsigned i = 0; i < frames.size(); ++i)
     frames[i]->document()->dispatchWindowEvent(StorageEvent::create(
         eventNames().storageEvent, key, oldValue, newValue,
-        sourceFrame->document()->documentURI(), sourceFrame->domWindow()));
+        sourceFrame->document()->documentURI(), sourceFrame->domWindow(),
+        frames[i]->domWindow()->localStorage()));
 }
 
 void LocalStorageArea::scheduleItemForSync(const String& key,
