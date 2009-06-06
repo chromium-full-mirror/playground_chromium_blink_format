@@ -1306,6 +1306,8 @@ class X86Assembler {
   }
 
   static void* getRelocatedAddress(void* code, JmpSrc jump) {
+    ASSERT(jump.m_offset != -1);
+
     return reinterpret_cast<void*>(reinterpret_cast<ptrdiff_t>(code) +
                                    jump.m_offset);
   }
