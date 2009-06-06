@@ -235,7 +235,6 @@ class JIT : private MacroAssembler {
   static const int patchOffsetPutByIdStructure = 10;
   static const int patchOffsetPutByIdExternalLoad = 20;
   static const int patchLengthPutByIdExternalLoad = 4;
-  static const int patchLengthPutByIdExternalLoadPrefix = 1;
   static const int patchOffsetPutByIdPropertyMapOffset = 31;
   // These architecture specific value are used to enable patching - see comment
   // on op_get_by_id.
@@ -243,7 +242,6 @@ class JIT : private MacroAssembler {
   static const int patchOffsetGetByIdBranchToSlowCase = 20;
   static const int patchOffsetGetByIdExternalLoad = 20;
   static const int patchLengthGetByIdExternalLoad = 4;
-  static const int patchLengthGetByIdExternalLoadPrefix = 1;
   static const int patchOffsetGetByIdPropertyMapOffset = 31;
   static const int patchOffsetGetByIdPutResult = 31;
 #if ENABLE(OPCODE_SAMPLING)
@@ -262,7 +260,6 @@ class JIT : private MacroAssembler {
   static const int patchOffsetPutByIdStructure = 7;
   static const int patchOffsetPutByIdExternalLoad = 13;
   static const int patchLengthPutByIdExternalLoad = 3;
-  static const int patchLengthPutByIdExternalLoadPrefix = 0;
   static const int patchOffsetPutByIdPropertyMapOffset = 22;
   // These architecture specific value are used to enable patching - see comment
   // on op_get_by_id.
@@ -270,7 +267,6 @@ class JIT : private MacroAssembler {
   static const int patchOffsetGetByIdBranchToSlowCase = 13;
   static const int patchOffsetGetByIdExternalLoad = 13;
   static const int patchLengthGetByIdExternalLoad = 3;
-  static const int patchLengthGetByIdExternalLoadPrefix = 0;
   static const int patchOffsetGetByIdPropertyMapOffset = 22;
   static const int patchOffsetGetByIdPutResult = 22;
 #if ENABLE(OPCODE_SAMPLING) && USE(JIT_STUB_ARGUMENT_VA_LIST)

@@ -385,8 +385,8 @@ class AbstractMacroAssembler {
    public:
     CodeLocationInstruction() {}
 
-    void repatchLoadToLEA() {
-      AssemblerType::repatchLoadToLEA(this->dataLocation());
+    void repatchLoadPtrToLEA() {
+      AssemblerType::repatchLoadPtrToLEA(this->dataLocation());
     }
 
    private:
