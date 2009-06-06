@@ -73,7 +73,6 @@ class WMLInputElement : public WMLFormControlElement, public InputElement {
   virtual void copyNonAttributeProperties(const Element* source);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual void attach();
   virtual void detach();
   virtual bool appendFormData(FormDataList&, bool);
   virtual void reset();
@@ -93,7 +92,9 @@ class WMLInputElement : public WMLFormControlElement, public InputElement {
   bool isConformedToInputMask(UChar, unsigned, bool isUserInput = true);
 
  private:
-  void init();
+  friend class WMLCardElement;
+  void initialize();
+
   String validateInputMask(const String&);
   unsigned cursorPositionToMaskIndex(unsigned);
 

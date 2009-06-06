@@ -1198,6 +1198,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
 #if ENABLE(WML)
   void resetWMLPageState();
+  void initializeWMLPageState();
 #endif
 
  protected:
