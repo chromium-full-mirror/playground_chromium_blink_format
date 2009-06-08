@@ -22,8 +22,8 @@
 #include "config.h"
 #include "DateInstance.h"
 
-#include "DateMath.h"
 #include <math.h>
+#include <wtf/DateMath.h>
 #include <wtf/MathExtras.h>
 
 namespace JSC {
@@ -55,14 +55,14 @@ void DateInstance::msToGregorianDateTime(double milli,
 
   if (outputIsUTC) {
     if (m_cache->m_gregorianDateTimeUTCCachedForMS != milli) {
-      JSC::msToGregorianDateTime(milli, true,
+      WTF::msToGregorianDateTime(milli, true,
                                  m_cache->m_cachedGregorianDateTimeUTC);
       m_cache->m_gregorianDateTimeUTCCachedForMS = milli;
     }
     t.copyFrom(m_cache->m_cachedGregorianDateTimeUTC);
   } else {
     if (m_cache->m_gregorianDateTimeCachedForMS != milli) {
-      JSC::msToGregorianDateTime(milli, false,
+      WTF::msToGregorianDateTime(milli, false,
                                  m_cache->m_cachedGregorianDateTime);
       m_cache->m_gregorianDateTimeCachedForMS = milli;
     }

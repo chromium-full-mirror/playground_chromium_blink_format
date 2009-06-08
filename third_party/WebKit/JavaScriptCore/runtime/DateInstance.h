@@ -24,9 +24,11 @@
 
 #include "JSWrapperObject.h"
 
-namespace JSC {
-
+namespace WTF {
 struct GregorianDateTime;
+}
+
+namespace JSC {
 
 class DateInstance : public JSWrapperObject {
  public:
@@ -35,8 +37,8 @@ class DateInstance : public JSWrapperObject {
 
   double internalNumber() const { return internalValue().uncheckedGetNumber(); }
 
-  bool getTime(GregorianDateTime&, int& offset) const;
-  bool getUTCTime(GregorianDateTime&) const;
+  bool getTime(WTF::GregorianDateTime&, int& offset) const;
+  bool getUTCTime(WTF::GregorianDateTime&) const;
   bool getTime(double& milliseconds, int& offset) const;
   bool getUTCTime(double& milliseconds) const;
 
@@ -44,7 +46,7 @@ class DateInstance : public JSWrapperObject {
 
   void msToGregorianDateTime(double,
                              bool outputIsUTC,
-                             GregorianDateTime&) const;
+                             WTF::GregorianDateTime&) const;
 
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
