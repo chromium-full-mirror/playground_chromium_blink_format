@@ -104,6 +104,7 @@ class Color {
   }
   void getRGBA(float& r, float& g, float& b, float& a) const;
   void getRGBA(double& r, double& g, double& b, double& a) const;
+  void getHSL(double& h, double& s, double& l) const;
 
   Color light() const;
   Color dark() const;

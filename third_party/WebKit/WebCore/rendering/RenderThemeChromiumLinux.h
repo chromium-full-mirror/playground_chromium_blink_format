@@ -61,6 +61,7 @@ class RenderThemeChromiumLinux : public RenderTheme {
 
   // System fonts.
   virtual void systemFont(int propId, FontDescription&) const;
+  virtual Color systemColor(int cssValidId) const;
 
   virtual int minimumMenuListSize(RenderStyle*) const;
 
