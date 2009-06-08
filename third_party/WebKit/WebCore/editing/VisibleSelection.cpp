@@ -221,7 +221,8 @@ static PassRefPtr<Range> makeSearchRange(const Position& pos) {
 
 bool VisibleSelection::isAll(
     StayInEditableContent stayInEditableContent) const {
-  return visibleStart().previous(stayInEditableContent).isNull() &&
+  return !shadowTreeRootNode() &&
+         visibleStart().previous(stayInEditableContent).isNull() &&
          visibleEnd().next(stayInEditableContent).isNull();
 }
 
