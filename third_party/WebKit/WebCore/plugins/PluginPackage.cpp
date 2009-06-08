@@ -247,6 +247,7 @@ void PluginPackage::determineModuleVersionFromDescription() {
 }
 #endif
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
 void PluginPackage::initializeBrowserFuncs() {
   memset(&m_browserFuncs, 0, sizeof(m_browserFuncs));
   m_browserFuncs.size = sizeof(m_browserFuncs);
@@ -299,6 +300,7 @@ void PluginPackage::initializeBrowserFuncs() {
   m_browserFuncs.enumerate = _NPN_Enumerate;
   m_browserFuncs.construct = _NPN_Construct;
 }
+#endif
 
 #if ENABLE(PLUGIN_PACKAGE_SIMPLE_HASH)
 unsigned PluginPackage::hash() const {
