@@ -71,7 +71,7 @@ class QWEBKIT_EXPORT QWebHitTestResult {
 
   QPoint pos() const;
   QRect boundingRect() const;
-  QRect enclosingBlock() const;
+  QWebElement enclosingBlockElement() const;
   QString title() const;
 
   QString linkText() const;

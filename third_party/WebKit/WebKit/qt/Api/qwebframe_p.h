@@ -27,6 +27,7 @@
 #include "EventHandler.h"
 #include "KURL.h"
 #include "PlatformString.h"
+#include "qwebelement.h"
 #include "wtf/RefPtr.h"
 #include "Frame.h"
 
@@ -101,7 +102,7 @@ class QWebHitTestResultPrivate {
 
   QPoint pos;
   QRect boundingRect;
-  QRect enclosingBlock;
+  QWebElement enclosingBlock;
   QString title;
   QString linkText;
   QUrl linkUrl;

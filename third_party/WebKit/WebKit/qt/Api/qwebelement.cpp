@@ -115,6 +115,16 @@ QWebElement::QWebElement(WebCore::Element* domElement)
 }
 
 /*!
+    \internal
+*/
+QWebElement::QWebElement(WebCore::Node* node) : d(0), m_element(0) {
+  if (node && node->isHTMLElement()) {
+    m_element = static_cast<HTMLElement*>(node);
+    m_element->ref();
+  }
+}
+
+/*!
     Constructs a copy of \a other.
 */
 QWebElement::QWebElement(const QWebElement& other)
