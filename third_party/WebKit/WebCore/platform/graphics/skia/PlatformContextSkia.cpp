@@ -412,6 +412,10 @@ int PlatformContextSkia::getTextDrawingMode() const {
   return m_state->m_textDrawingMode;
 }
 
+float PlatformContextSkia::getAlpha() const {
+  return m_state->m_alpha;
+}
+
 void PlatformContextSkia::setTextDrawingMode(int mode) {
   // cTextClip is never used, so we assert that it isn't set:
   // https://bugs.webkit.org/show_bug.cgi?id=21898
