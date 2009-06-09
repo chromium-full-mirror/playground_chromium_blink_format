@@ -61,7 +61,8 @@ WorkerThreadableLoader::WorkerThreadableLoader(
     const ResourceRequest& request,
     LoadCallbacks callbacksSetting,
     ContentSniff contentSniff,
-    StoredCredentials storedCredentials)
+    StoredCredentials storedCredentials,
+    RedirectOriginCheck redirectOriginCheck)
     : m_workerContext(workerContext),
       m_workerClientWrapper(ThreadableLoaderClientWrapper::create(client)),
       m_bridge(
@@ -71,7 +72,8 @@ WorkerThreadableLoader::WorkerThreadableLoader(
                                  request,
                                  callbacksSetting,
                                  contentSniff,
-                                 storedCredentials))) {}
+                                 storedCredentials,
+                                 redirectOriginCheck))) {}
 
 WorkerThreadableLoader::~WorkerThreadableLoader() {
   m_bridge.destroy();
@@ -81,7 +83,8 @@ void WorkerThreadableLoader::loadResourceSynchronously(
     WorkerContext* workerContext,
     const ResourceRequest& request,
     ThreadableLoaderClient& client,
-    StoredCredentials storedCredentials) {
+    StoredCredentials storedCredentials,
+    RedirectOriginCheck redirectOriginCheck) {
   WorkerRunLoop& runLoop = workerContext->thread()->runLoop();
 
   // Create a unique mode just for this synchronous resource load.
@@ -92,7 +95,7 @@ void WorkerThreadableLoader::loadResourceSynchronously(
       request.url().isLocalFile() ? SniffContent : DoNotSniffContent;
   RefPtr<WorkerThreadableLoader> loader = WorkerThreadableLoader::create(
       workerContext, &client, mode, request, DoNotSendLoadCallbacks,
-      contentSniff, storedCredentials);
+      contentSniff, storedCredentials, redirectOriginCheck);
 
   MessageQueueWaitResult result = MessageQueueMessageReceived;
   while (!loader->done() && result != MessageQueueTerminated)
@@ -113,14 +116,15 @@ WorkerThreadableLoader::MainThreadBridge::MainThreadBridge(
     const ResourceRequest& request,
     LoadCallbacks callbacksSetting,
     ContentSniff contentSniff,
-    StoredCredentials storedCredentials)
+    StoredCredentials storedCredentials,
+    RedirectOriginCheck redirectOriginCheck)
     : m_workerClientWrapper(workerClientWrapper),
       m_loaderProxy(loaderProxy),
       m_taskMode(taskMode.copy()) {
   ASSERT(m_workerClientWrapper.get());
   m_loaderProxy.postTaskToLoader(createCallbackTask(
       &MainThreadBridge::mainThreadCreateLoader, this, request,
-      callbacksSetting, contentSniff, storedCredentials));
+      callbacksSetting, contentSniff, storedCredentials, redirectOriginCheck));
 }
 
 WorkerThreadableLoader::MainThreadBridge::~MainThreadBridge() {}
@@ -131,7 +135,8 @@ void WorkerThreadableLoader::MainThreadBridge::mainThreadCreateLoader(
     auto_ptr<CrossThreadResourceRequestData> requestData,
     LoadCallbacks callbacksSetting,
     ContentSniff contentSniff,
-    StoredCredentials storedCredentials) {
+    StoredCredentials storedCredentials,
+    RedirectOriginCheck redirectOriginCheck) {
   ASSERT(isMainThread());
   ASSERT(context->isDocument());
 
@@ -147,9 +152,9 @@ void WorkerThreadableLoader::MainThreadBridge::mainThreadCreateLoader(
   // will return a 0 value.  Either this should return 0 or the other code path
   // should do a callback with
   // a failure.
-  thisPtr->m_mainThreadLoader =
-      ThreadableLoader::create(context, thisPtr, *request, callbacksSetting,
-                               contentSniff, storedCredentials);
+  thisPtr->m_mainThreadLoader = ThreadableLoader::create(
+      context, thisPtr, *request, callbacksSetting, contentSniff,
+      storedCredentials, redirectOriginCheck);
   ASSERT(thisPtr->m_mainThreadLoader);
 }
 

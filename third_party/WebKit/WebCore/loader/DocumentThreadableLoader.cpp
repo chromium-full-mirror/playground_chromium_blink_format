@@ -91,11 +91,13 @@ PassRefPtr<DocumentThreadableLoader> DocumentThreadableLoader::create(
     const ResourceRequest& request,
     LoadCallbacks callbacksSetting,
     ContentSniff contentSniff,
-    StoredCredentials storedCredentials) {
+    StoredCredentials storedCredentials,
+    RedirectOriginCheck redirectOriginCheck) {
   ASSERT(document);
-  RefPtr<DocumentThreadableLoader> loader = adoptRef(
-      new DocumentThreadableLoader(document, client, request, callbacksSetting,
-                                   contentSniff, storedCredentials));
+  RefPtr<DocumentThreadableLoader> loader =
+      adoptRef(new DocumentThreadableLoader(
+          document, client, request, callbacksSetting, contentSniff,
+          storedCredentials, redirectOriginCheck));
   if (!loader->m_loader)
     loader = 0;
   return loader.release();
@@ -107,14 +109,20 @@ DocumentThreadableLoader::DocumentThreadableLoader(
     const ResourceRequest& request,
     LoadCallbacks callbacksSetting,
     ContentSniff contentSniff,
-    StoredCredentials storedCredentials)
+    StoredCredentials storedCredentials,
+    RedirectOriginCheck redirectOriginCheck)
     : m_client(client),
       m_document(document),
       m_allowStoredCredentials(storedCredentials == AllowStoredCredentials),
       m_sameOriginRequest(
-          document->securityOrigin()->canRequest(request.url())) {
+          document->securityOrigin()->canRequest(request.url())),
+      m_checkRedirectOrigin(redirectOriginCheck == RequireSameRedirectOrigin) {
   ASSERT(document);
   ASSERT(client);
+  ASSERT(storedCredentials == AllowStoredCredentials ||
+         storedCredentials == DoNotAllowStoredCredentials);
+  ASSERT(redirectOriginCheck == RequireSameRedirectOrigin ||
+         redirectOriginCheck == AllowDifferentRedirectOrigin);
   m_loader = SubresourceLoader::create(document->frame(), this, request, false,
                                        callbacksSetting == SendLoadCallbacks,
                                        contentSniff == SniffContent);
@@ -143,7 +151,8 @@ void DocumentThreadableLoader::willSendRequest(SubresourceLoader* loader,
 
   // FIXME: This needs to be fixed to follow the redirect correctly even for
   // cross-domain requests.
-  if (!m_document->securityOrigin()->canRequest(request.url())) {
+  if (m_checkRedirectOrigin &&
+      !m_document->securityOrigin()->canRequest(request.url())) {
     RefPtr<DocumentThreadableLoader> protect(this);
     m_client->didFailRedirectCheck();
     request = ResourceRequest();

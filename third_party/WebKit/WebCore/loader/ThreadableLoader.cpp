@@ -46,22 +46,23 @@ PassRefPtr<ThreadableLoader> ThreadableLoader::create(
     const ResourceRequest& request,
     LoadCallbacks callbacksSetting,
     ContentSniff contentSniff,
-    StoredCredentials storedCredentials) {
+    StoredCredentials storedCredentials,
+    RedirectOriginCheck redirectOriginCheck) {
   ASSERT(client);
   ASSERT(context);
 
 #if ENABLE(WORKERS)
   if (context->isWorkerContext())
-    return WorkerThreadableLoader::create(static_cast<WorkerContext*>(context),
-                                          client, WorkerRunLoop::defaultMode(),
-                                          request, callbacksSetting,
-                                          contentSniff, storedCredentials);
+    return WorkerThreadableLoader::create(
+        static_cast<WorkerContext*>(context), client,
+        WorkerRunLoop::defaultMode(), request, callbacksSetting, contentSniff,
+        storedCredentials, redirectOriginCheck);
 #endif  // ENABLE(WORKERS)
 
   ASSERT(context->isDocument());
-  return DocumentThreadableLoader::create(static_cast<Document*>(context),
-                                          client, request, callbacksSetting,
-                                          contentSniff, storedCredentials);
+  return DocumentThreadableLoader::create(
+      static_cast<Document*>(context), client, request, callbacksSetting,
+      contentSniff, storedCredentials, redirectOriginCheck);
 }
 
 void ThreadableLoader::loadResourceSynchronously(
@@ -75,7 +76,7 @@ void ThreadableLoader::loadResourceSynchronously(
   if (context->isWorkerContext()) {
     WorkerThreadableLoader::loadResourceSynchronously(
         static_cast<WorkerContext*>(context), request, client,
-        storedCredentials);
+        storedCredentials, RequireSameRedirectOrigin);
     return;
   }
 #endif  // ENABLE(WORKERS)
