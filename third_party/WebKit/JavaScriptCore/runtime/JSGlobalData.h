@@ -82,7 +82,6 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   const HashTable* arrayTable;
   const HashTable* dateTable;
-  const HashTable* jsonTable;
   const HashTable* mathTable;
   const HashTable* numberTable;
   const HashTable* regExpTable;

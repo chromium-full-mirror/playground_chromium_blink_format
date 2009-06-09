@@ -50,7 +50,6 @@
 #include "JSFunction.h"
 #include "JSGlobalObjectFunctions.h"
 #include "JSLock.h"
-#include "JSONObject.h"
 #include "Interpreter.h"
 #include "MathObject.h"
 #include "NativeErrorConstructor.h"
@@ -420,10 +419,6 @@ void JSGlobalObject::reset(JSValue prototype) {
       GlobalPropertyInfo(Identifier(exec, "Infinity"), jsNumber(exec, Inf),
                          DontEnum | DontDelete),
       GlobalPropertyInfo(Identifier(exec, "undefined"), jsUndefined(),
-                         DontEnum | DontDelete),
-      GlobalPropertyInfo(Identifier(exec, "JSON"),
-                         new (exec) JSONObject(
-                             JSONObject::createStructure(d()->objectPrototype)),
                          DontEnum | DontDelete)};
 
   addStaticGlobals(staticGlobals,

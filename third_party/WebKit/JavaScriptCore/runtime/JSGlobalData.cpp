@@ -60,7 +60,6 @@ using namespace WTF;
 namespace JSC {
 
 extern const HashTable arrayTable;
-extern const HashTable jsonTable;
 extern const HashTable dateTable;
 extern const HashTable mathTable;
 extern const HashTable numberTable;
@@ -108,7 +107,6 @@ JSGlobalData::JSGlobalData(bool isShared, const VPtrSet& vptrSet)
       clientData(0),
       arrayTable(fastNew<HashTable>(JSC::arrayTable)),
       dateTable(fastNew<HashTable>(JSC::dateTable)),
-      jsonTable(fastNew<HashTable>(JSC::jsonTable)),
       mathTable(fastNew<HashTable>(JSC::mathTable)),
       numberTable(fastNew<HashTable>(JSC::numberTable)),
       regExpTable(fastNew<HashTable>(JSC::regExpTable)),
@@ -164,7 +162,6 @@ JSGlobalData::~JSGlobalData() {
 
   arrayTable->deleteTable();
   dateTable->deleteTable();
-  jsonTable->deleteTable();
   mathTable->deleteTable();
   numberTable->deleteTable();
   regExpTable->deleteTable();
@@ -176,7 +173,6 @@ JSGlobalData::~JSGlobalData() {
 
   fastDelete(const_cast<HashTable*>(arrayTable));
   fastDelete(const_cast<HashTable*>(dateTable));
-  fastDelete(const_cast<HashTable*>(jsonTable));
   fastDelete(const_cast<HashTable*>(mathTable));
   fastDelete(const_cast<HashTable*>(numberTable));
   fastDelete(const_cast<HashTable*>(regExpTable));
