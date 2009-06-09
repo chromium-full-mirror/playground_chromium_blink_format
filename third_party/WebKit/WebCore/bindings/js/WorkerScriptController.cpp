@@ -111,7 +111,7 @@ ScriptValue WorkerScriptController::evaluate(const ScriptSourceCode& sourceCode,
                     sourceCode.jsSourceCode(), m_workerContextWrapper);
   m_workerContextWrapper->globalData()->timeoutChecker.stop();
 
-  m_workerContext->thread()->workerObjectProxy()->reportPendingActivity(
+  m_workerContext->thread()->workerObjectProxy().reportPendingActivity(
       m_workerContext->hasPendingActivity());
 
   if (comp.complType() == Normal || comp.complType() == ReturnValue)

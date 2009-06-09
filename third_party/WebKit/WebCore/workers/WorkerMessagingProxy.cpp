@@ -57,7 +57,7 @@ class MessageWorkerContextTask : public ScriptExecutionContext::Task {
 
     context->dispatchMessage(m_message);
 
-    context->thread()->workerObjectProxy()->confirmMessageFromWorkerObject(
+    context->thread()->workerObjectProxy().confirmMessageFromWorkerObject(
         context->hasPendingActivity());
   }
 
@@ -203,7 +203,7 @@ void WorkerMessagingProxy::startWorkerContext(const KURL& scriptURL,
                                               const String& userAgent,
                                               const String& sourceCode) {
   RefPtr<WorkerThread> thread =
-      WorkerThread::create(scriptURL, userAgent, sourceCode, this);
+      WorkerThread::create(scriptURL, userAgent, sourceCode, *this, *this);
   workerThreadCreated(thread);
   thread->start();
 }
@@ -224,11 +224,6 @@ void WorkerMessagingProxy::postMessageToWorkerContext(const String& message) {
     m_queuedEarlyTasks.append(MessageWorkerContextTask::create(message));
 }
 
-void WorkerMessagingProxy::postTaskToWorkerContext(
-    PassRefPtr<ScriptExecutionContext::Task> task) {
-  postTaskForModeToWorkerContext(task, WorkerRunLoop::defaultMode());
-}
-
 void WorkerMessagingProxy::postTaskForModeToWorkerContext(
     PassRefPtr<ScriptExecutionContext::Task> task,
     const String& mode) {
@@ -239,8 +234,11 @@ void WorkerMessagingProxy::postTaskForModeToWorkerContext(
   m_workerThread->runLoop().postTaskForMode(task, mode);
 }
 
-void WorkerMessagingProxy::postTaskToWorkerObject(
+void WorkerMessagingProxy::postTaskToLoader(
     PassRefPtr<ScriptExecutionContext::Task> task) {
+  // FIXME: In case of nested workers, this should go directly to the root
+  // Document context.
+  ASSERT(m_scriptExecutionContext->isDocument());
   m_scriptExecutionContext->postTask(task);
 }
 

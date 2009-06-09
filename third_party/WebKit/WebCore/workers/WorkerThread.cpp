@@ -72,16 +72,19 @@ PassRefPtr<WorkerThread> WorkerThread::create(
     const KURL& scriptURL,
     const String& userAgent,
     const String& sourceCode,
-    WorkerObjectProxy* workerObjectProxy) {
-  return adoptRef(
-      new WorkerThread(scriptURL, userAgent, sourceCode, workerObjectProxy));
+    WorkerLoaderProxy& workerLoaderProxy,
+    WorkerObjectProxy& workerObjectProxy) {
+  return adoptRef(new WorkerThread(scriptURL, userAgent, sourceCode,
+                                   workerLoaderProxy, workerObjectProxy));
 }
 
 WorkerThread::WorkerThread(const KURL& scriptURL,
                            const String& userAgent,
                            const String& sourceCode,
-                           WorkerObjectProxy* workerObjectProxy)
+                           WorkerLoaderProxy& workerLoaderProxy,
+                           WorkerObjectProxy& workerObjectProxy)
     : m_threadID(0),
+      m_workerLoaderProxy(workerLoaderProxy),
       m_workerObjectProxy(workerObjectProxy),
       m_startupData(
           WorkerThreadStartupData::create(scriptURL, userAgent, sourceCode)) {}
@@ -130,7 +133,7 @@ void* WorkerThread::workerThread() {
   // created.
   m_startupData.clear();
 
-  m_workerObjectProxy->reportPendingActivity(
+  m_workerObjectProxy.reportPendingActivity(
       m_workerContext->hasPendingActivity());
 
   // Blocks until terminated.

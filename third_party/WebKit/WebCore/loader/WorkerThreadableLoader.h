@@ -49,7 +49,7 @@ namespace WebCore {
 class ResourceError;
 struct ResourceRequest;
 class WorkerContext;
-class WorkerMessagingProxy;
+class WorkerLoaderProxy;
 struct CrossThreadResourceResponseData;
 struct CrossThreadResourceRequestData;
 
@@ -102,7 +102,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
   // case 1. worker.terminate is called.
   //    In this case, no more tasks are posted from the worker object's thread
   //    to the worker
-  //    context's thread -- WorkerMessagingProxy enforces this.
+  //    context's thread -- WorkerContextProxy implementation enforces this.
   //
   // case 2. xhr gets aborted and the worker context continues running.
   //    The ThreadableLoaderClientWrapper has the underlying client cleared, so
@@ -118,7 +118,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
    public:
     // All executed on the worker context's thread.
     MainThreadBridge(PassRefPtr<ThreadableLoaderClientWrapper>,
-                     WorkerMessagingProxy&,
+                     WorkerLoaderProxy&,
                      const String& taskMode,
                      const ResourceRequest&,
                      LoadCallbacks,
@@ -161,7 +161,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
         m_workerClientWrapper;
 
     // May be used on either thread.
-    WorkerMessagingProxy& m_messagingProxy;
+    WorkerLoaderProxy& m_loaderProxy;
 
     // For use on the main thread.
     String m_taskMode;

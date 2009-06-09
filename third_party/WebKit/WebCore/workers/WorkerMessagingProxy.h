@@ -31,6 +31,7 @@
 
 #include "ScriptExecutionContext.h"
 #include "WorkerContextProxy.h"
+#include "WorkerLoaderProxy.h"
 #include "WorkerObjectProxy.h"
 #include <wtf/Noncopyable.h>
 #include <wtf/PassRefPtr.h>
@@ -46,6 +47,7 @@ class WorkerThread;
 
 class WorkerMessagingProxy : public WorkerContextProxy,
                              public WorkerObjectProxy,
+                             public WorkerLoaderProxy,
                              Noncopyable {
  public:
   WorkerMessagingProxy(Worker*);
@@ -76,10 +78,13 @@ class WorkerMessagingProxy : public WorkerContextProxy,
   virtual void reportPendingActivity(bool hasPendingActivity);
   virtual void workerContextDestroyed();
 
-  void postTaskToWorkerObject(PassRefPtr<ScriptExecutionContext::Task>);
-  void postTaskToWorkerContext(PassRefPtr<ScriptExecutionContext::Task>);
-  void postTaskForModeToWorkerContext(PassRefPtr<ScriptExecutionContext::Task>,
-                                      const String& mode);
+  // Implementation of WorkerLoaderProxy.
+  // These methods are called on different threads to schedule loading
+  // requests and to send callbacks back to WorkerContext.
+  virtual void postTaskToLoader(PassRefPtr<ScriptExecutionContext::Task>);
+  virtual void postTaskForModeToWorkerContext(
+      PassRefPtr<ScriptExecutionContext::Task>,
+      const String& mode);
 
   void workerThreadCreated(PassRefPtr<WorkerThread>);
 
