@@ -97,6 +97,7 @@ class LayoutTestController : public QObject {
                                             double time,
                                             const QString& elementId);
   unsigned numberOfActiveAnimations() const;
+  void dispatchPendingLoadRequests();
 
  private slots:
   void processWork();
