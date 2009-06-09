@@ -47,13 +47,14 @@ bool BitmapImage::getHBITMAPOfSize(HBITMAP bmp, LPSIZE size) {
     memset(bmpInfo.bmBits, 255, bufferSize);
   }
 
-  HDC tempDC = CreateCompatibleDC(0);
-  if (!tempDC) {
-    LOG_ERROR("Failed to create in-memory DC for Image::blit()");
-    return false;
-  }
-  SelectObject(tempDC, bmp);
-  GraphicsContext gc(tempDC);
+  cairo_surface_t* image = cairo_image_surface_create_for_data(
+      (unsigned char*)bmpInfo.bmBits, CAIRO_FORMAT_ARGB32, bmpInfo.bmWidth,
+      bmpInfo.bmHeight, bmpInfo.bmWidthBytes);
+
+  cairo_t* targetRef = cairo_create(image);
+  cairo_surface_destroy(image);
+
+  GraphicsContext gc(targetRef);
 
   IntSize imageSize = BitmapImage::size();
   if (size)
@@ -66,7 +67,7 @@ bool BitmapImage::getHBITMAPOfSize(HBITMAP bmp, LPSIZE size) {
          CompositeCopy);
 
   // Do cleanup
-  DeleteDC(tempDC);
+  cairo_destroy(targetRef);
 
   return true;
 }

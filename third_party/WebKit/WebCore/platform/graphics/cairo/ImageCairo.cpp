@@ -113,7 +113,7 @@ void BitmapImage::draw(GraphicsContext* context,
   IntSize selfSize = size();
 
   cairo_t* cr = context->platformContext();
-  cairo_save(cr);
+  context->save();
 
   // Set the compositing operation.
   if (op == CompositeSourceOver && !frameHasAlphaAtIndex(m_currentFrame))
@@ -146,7 +146,7 @@ void BitmapImage::draw(GraphicsContext* context,
   cairo_clip(cr);
   cairo_paint_with_alpha(cr, context->getAlpha());
 
-  cairo_restore(cr);
+  context->restore();
 
   if (imageObserver())
     imageObserver()->didDraw(this);
