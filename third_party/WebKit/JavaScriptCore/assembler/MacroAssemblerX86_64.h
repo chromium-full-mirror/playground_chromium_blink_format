@@ -402,6 +402,8 @@ class MacroAssemblerX86_64 : public MacroAssemblerX86Common {
   }
 
   bool supportsFloatingPoint() const { return true; }
+  // See comment on MacroAssemblerARMv7::supportsFloatingPointTruncate()
+  bool supportsFloatingPointTruncate() const { return true; }
 };
 
 }  // namespace JSC

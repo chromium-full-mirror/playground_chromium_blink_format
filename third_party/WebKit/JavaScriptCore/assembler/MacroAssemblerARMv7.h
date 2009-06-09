@@ -402,28 +402,98 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
 
   // Floating-point operations:
 
-  bool supportsFloatingPoint() const { return false; }
+  bool supportsFloatingPoint() const { return true; }
+  // On x86(_64) the MacroAssembler provides an interface to truncate a double
+  // to an integer.
+  // If a value is not representable as an integer, and possibly for some values
+  // that are,
+  // (on x86 INT_MIN, since this is indistinguishable from results for
+  // out-of-range/NaN input)
+  // a branch will  be taken.  It is not clear whether this interface will be
+  // well suited to
+  // other platforms.  On ARMv7 the hardware truncation operation produces
+  // multiple possible
+  // failure values (saturates to INT_MIN & INT_MAX, NaN reulsts in a value of
+  // 0).  This is a
+  // temporary solution while we work out what this interface should be.  Either
+  // we need to
+  // decide to make this interface work on all platforms, rework the interface
+  // to make it more
+  // generic, or decide that the MacroAssembler cannot practically be used to
+  // abstracted these
+  // operations, and make clients go directly to the m_assembler to plant
+  // truncation instructions.
+  // In short, FIXME:.
+  bool supportsFloatingPointTruncate() const { return false; }
 
-  void loadDouble(ImplicitAddress, FPRegisterID) { ASSERT_NOT_REACHED(); }
+  void loadDouble(ImplicitAddress address, FPRegisterID dest) {
+    RegisterID base = address.base;
+    int32_t offset = address.offset;
 
-  void storeDouble(FPRegisterID, ImplicitAddress) { ASSERT_NOT_REACHED(); }
+    // Arm vfp addresses can be offset by a 9-bit ones-comp immediate, left
+    // shifted by 2.
+    if ((offset & 3) || (offset > (255 * 4)) || (offset < -(255 * 4))) {
+      add32(Imm32(offset), base, addressTempRegister);
+      base = addressTempRegister;
+      offset = 0;
+    }
 
-  void addDouble(FPRegisterID, FPRegisterID) { ASSERT_NOT_REACHED(); }
+    m_assembler.vldr(dest, base, offset);
+  }
 
-  void addDouble(Address, FPRegisterID) { ASSERT_NOT_REACHED(); }
+  void storeDouble(FPRegisterID src, ImplicitAddress address) {
+    RegisterID base = address.base;
+    int32_t offset = address.offset;
 
-  void subDouble(FPRegisterID, FPRegisterID) { ASSERT_NOT_REACHED(); }
+    // Arm vfp addresses can be offset by a 9-bit ones-comp immediate, left
+    // shifted by 2.
+    if ((offset & 3) || (offset > (255 * 4)) || (offset < -(255 * 4))) {
+      add32(Imm32(offset), base, addressTempRegister);
+      base = addressTempRegister;
+      offset = 0;
+    }
 
-  void subDouble(Address, FPRegisterID) { ASSERT_NOT_REACHED(); }
+    m_assembler.vstr(src, base, offset);
+  }
 
-  void mulDouble(FPRegisterID, FPRegisterID) { ASSERT_NOT_REACHED(); }
+  void addDouble(FPRegisterID src, FPRegisterID dest) {
+    m_assembler.vadd_F64(dest, dest, src);
+  }
 
-  void mulDouble(Address, FPRegisterID) { ASSERT_NOT_REACHED(); }
+  void addDouble(Address src, FPRegisterID dest) {
+    loadDouble(src, fpTempRegister);
+    addDouble(fpTempRegister, dest);
+  }
 
-  void convertInt32ToDouble(RegisterID, FPRegisterID) { ASSERT_NOT_REACHED(); }
+  void subDouble(FPRegisterID src, FPRegisterID dest) {
+    m_assembler.vsub_F64(dest, dest, src);
+  }
 
-  Jump branchDouble(DoubleCondition, FPRegisterID, FPRegisterID) {
-    ASSERT_NOT_REACHED();
+  void subDouble(Address src, FPRegisterID dest) {
+    loadDouble(src, fpTempRegister);
+    subDouble(fpTempRegister, dest);
+  }
+
+  void mulDouble(FPRegisterID src, FPRegisterID dest) {
+    m_assembler.vmul_F64(dest, dest, src);
+  }
+
+  void mulDouble(Address src, FPRegisterID dest) {
+    loadDouble(src, fpTempRegister);
+    mulDouble(fpTempRegister, dest);
+  }
+
+  void convertInt32ToDouble(RegisterID src, FPRegisterID dest) {
+    m_assembler.vmov(fpTempRegister, src);
+    m_assembler.vcvt_F64_S32(dest, fpTempRegister);
+  }
+
+  Jump branchDouble(DoubleCondition cond,
+                    FPRegisterID left,
+                    FPRegisterID right) {
+    m_assembler.vcmp_F64(left, right);
+    m_assembler.vmrs_APSR_nzcv_FPSCR();
+    return makeBranch(cond);
   }
 
   Jump branchTruncateDoubleToInt32(FPRegisterID, RegisterID) {

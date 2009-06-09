@@ -140,6 +140,8 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
   }
 
   bool supportsFloatingPoint() const { return m_isSSE2Present; }
+  // See comment on MacroAssemblerARMv7::supportsFloatingPointTruncate()
+  bool supportsFloatingPointTruncate() const { return m_isSSE2Present; }
 
  private:
   const bool m_isSSE2Present;
