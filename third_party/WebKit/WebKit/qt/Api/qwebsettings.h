@@ -62,7 +62,7 @@ class QWEBKIT_EXPORT QWebSettings {
     OfflineStorageDatabaseEnabled,
     OfflineWebApplicationCacheEnabled,
     LocalStorageDatabaseEnabled,
-    AllowUniversalAccessFromFileUrls
+    LocalContentCanAccessRemoteUrls
   };
   enum WebGraphic {
     MissingImageGraphic,
