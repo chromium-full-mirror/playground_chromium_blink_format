@@ -154,6 +154,7 @@ class ExecutableAllocator {
     return pool.release();
   }
 
+#if ENABLE(ASSEMBLER_WX_EXCLUSIVE) || !(PLATFORM(X86) || PLATFORM(X86_64))
   static void makeWritable(void* start, size_t size) {
     reprotectRegion(start, size, Writable);
   }
@@ -163,15 +164,9 @@ class ExecutableAllocator {
     cacheFlush(start, size);
   }
 
-#if !ENABLE(ASSEMBLER_WX_EXCLUSIVE) && (PLATFORM(X86) || PLATFORM(X86_64))
-  // If ASSEMBLER_WX_EXCLUSIVE protection is turned off, and if we're running
-  // on x86, then MakeWritable has nothing to do.  On non-x86 platforms we need
-  // to track start & size so we can cache-flush at the end.
-  class MakeWritable {
-   public:
-    MakeWritable(void*, size_t) {}
-  };
-#else
+  // If ASSEMBLER_WX_EXCLUSIVE protection is turned on, or on non-x86 platforms,
+  // we need to track start & size so we can makeExecutable/cacheFlush at the
+  // end.
   class MakeWritable {
    public:
     MakeWritable(void* start, size_t size) : m_start(start), m_size(size) {
@@ -184,9 +179,19 @@ class ExecutableAllocator {
     void* m_start;
     size_t m_size;
   };
+#else
+  static void makeWritable(void*, size_t) {}
+  static void makeExecutable(void*, size_t) {}
+
+  // On x86, without ASSEMBLER_WX_EXCLUSIVE, there is nothing to do here.
+  class MakeWritable {
+   public:
+    MakeWritable(void*, size_t) {}
+  };
 #endif
 
  private:
+#if ENABLE(ASSEMBLER_WX_EXCLUSIVE) || !(PLATFORM(X86) || PLATFORM(X86_64))
 #if ENABLE(ASSEMBLER_WX_EXCLUSIVE)
   static void reprotectRegion(void*, size_t, ProtectionSeting);
 #else
@@ -204,6 +209,7 @@ class ExecutableAllocator {
 #error "ExecutableAllocator::cacheFlush not implemented on this platform."
 #endif
   }
+#endif
 
   RefPtr<ExecutablePool> m_smallAllocationPool;
   static void intializePageSize();
