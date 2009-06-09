@@ -395,6 +395,12 @@ class MacroAssemblerX86_64 : public MacroAssemblerX86Common {
     return label;
   }
 
+  Label loadPtrWithPatchToLEA(Address address, RegisterID dest) {
+    Label label(this);
+    loadPtr(address, dest);
+    return label;
+  }
+
   bool supportsFloatingPoint() const { return true; }
 };
 

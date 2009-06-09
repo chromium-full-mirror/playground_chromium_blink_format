@@ -133,6 +133,12 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
     return DataLabelPtr(this);
   }
 
+  Label loadPtrWithPatchToLEA(Address address, RegisterID dest) {
+    Label label(this);
+    load32(address, dest);
+    return label;
+  }
+
   bool supportsFloatingPoint() const { return m_isSSE2Present; }
 
  private:

@@ -359,6 +359,13 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
     return label;
   }
 
+  Label loadPtrWithPatchToLEA(Address address, RegisterID dest) {
+    Label label(this);
+    moveFixedWidthEncoding(Imm32(address.offset), dataTempRegister);
+    load32(ArmAddress(address.base, dataTempRegister), dest);
+    return label;
+  }
+
   void load16(BaseIndex address, RegisterID dest) {
     m_assembler.ldrh(dest, makeBaseIndexBase(address), address.index,
                      address.scale);
@@ -458,10 +465,9 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   void move(Imm32 imm, RegisterID dest) {
     uint32_t value = imm.m_value;
 
-    if (imm.m_isPointer) {
-      m_assembler.movT3(dest, ARMThumbImmediate::makeUInt16(value));
-      m_assembler.movt(dest, ARMThumbImmediate::makeUInt16(value >> 16));
-    } else {
+    if (imm.m_isPointer)
+      moveFixedWidthEncoding(imm, dest);
+    else {
       ARMThumbImmediate armImm = ARMThumbImmediate::makeEncodedImm(value);
 
       if (armImm.isValid())
@@ -718,14 +724,12 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   void breakpoint() { m_assembler.bkpt(); }
 
   Call nearCall() {
-    m_assembler.movT3(dataTempRegister, ARMThumbImmediate::makeUInt16(0));
-    m_assembler.movt(dataTempRegister, ARMThumbImmediate::makeUInt16(0));
+    moveFixedWidthEncoding(Imm32(0), dataTempRegister);
     return Call(m_assembler.blx(dataTempRegister), Call::LinkableNear);
   }
 
   Call call() {
-    m_assembler.movT3(dataTempRegister, ARMThumbImmediate::makeUInt16(0));
-    m_assembler.movt(dataTempRegister, ARMThumbImmediate::makeUInt16(0));
+    moveFixedWidthEncoding(Imm32(0), dataTempRegister);
     return Call(m_assembler.blx(dataTempRegister), Call::Linkable);
   }
 
@@ -770,16 +774,12 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   }
 
   DataLabel32 moveWithPatch(Imm32 imm, RegisterID dst) {
-    uint32_t value = imm.m_value;
-    m_assembler.movT3(dst, ARMThumbImmediate::makeUInt16(value & 0xffff));
-    m_assembler.movt(dst, ARMThumbImmediate::makeUInt16(value >> 16));
+    moveFixedWidthEncoding(imm, dst);
     return DataLabel32(this);
   }
 
   DataLabelPtr moveWithPatch(ImmPtr imm, RegisterID dst) {
-    uint32_t value = imm.asIntptr();
-    m_assembler.movT3(dst, ARMThumbImmediate::makeUInt16(value & 0xffff));
-    m_assembler.movt(dst, ARMThumbImmediate::makeUInt16(value >> 16));
+    moveFixedWidthEncoding(imm, dst);
     return DataLabelPtr(this);
   }
 
@@ -811,8 +811,7 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
 
   Call tailRecursiveCall() {
     // Like a normal call, but don't link.
-    m_assembler.movT3(dataTempRegister, ARMThumbImmediate::makeUInt16(0));
-    m_assembler.movt(dataTempRegister, ARMThumbImmediate::makeUInt16(0));
+    moveFixedWidthEncoding(Imm32(0), dst);
     return Call(m_assembler.bx(dataTempRegister), Call::Linkable);
   }
 
@@ -881,6 +880,12 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
     }
 
     return addressTempRegister;
+  }
+
+  DataLabel32 moveFixedWidthEncoding(Imm32 imm, RegisterID dst) {
+    uint32_t value = imm.m_value;
+    m_assembler.movT3(dst, ARMThumbImmediate::makeUInt16(value & 0xffff));
+    m_assembler.movt(dst, ARMThumbImmediate::makeUInt16(value >> 16));
   }
 
   ARMv7Assembler::Condition armV7Condition(Condition cond) {
