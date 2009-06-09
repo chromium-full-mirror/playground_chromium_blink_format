@@ -87,8 +87,7 @@ class LayoutTestController : public QObject {
   QString decodeHostName(const QString& host);
   void dumpSelectionRect() const {}
   void setJavaScriptProfilingEnabled(bool enable);
-  void setFixedLayoutSize(int width, int height);
-  void setUseFixedLayout(bool enable);
+  void setFixedContentsSize(int width, int height);
 
   bool pauseAnimationAtTimeOnElementWithId(const QString& animationName,
                                            double time,

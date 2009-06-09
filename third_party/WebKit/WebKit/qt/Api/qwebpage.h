@@ -66,8 +66,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   Q_PROPERTY(QString selectedText READ selectedText)
   Q_PROPERTY(QSize viewportSize READ viewportSize WRITE setViewportSize)
   Q_PROPERTY(
-      QSize fixedLayoutSize READ fixedLayoutSize WRITE setFixedLayoutSize)
-  Q_PROPERTY(bool useFixedLayout READ useFixedLayout WRITE setUseFixedLayout)
+      QSize fixedContentsSize READ fixedContentsSize WRITE setFixedContentsSize)
   Q_PROPERTY(bool forwardUnsupportedContent READ forwardUnsupportedContent WRITE
                  setForwardUnsupportedContent)
   Q_PROPERTY(LinkDelegationPolicy linkDelegationPolicy READ linkDelegationPolicy
@@ -234,11 +233,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   QSize viewportSize() const;
   void setViewportSize(const QSize& size) const;
 
-  QSize fixedLayoutSize() const;
-  void setFixedLayoutSize(const QSize& size) const;
-
-  bool useFixedLayout() const;
-  void setUseFixedLayout(bool useFixedLayout);
+  QSize fixedContentsSize() const;
+  void setFixedContentsSize(const QSize& size) const;
 
   virtual bool event(QEvent*);
   bool focusNextPrevChild(bool next);

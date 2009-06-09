@@ -252,12 +252,8 @@ void LayoutTestController::setJavaScriptProfilingEnabled(bool enable) {
   qt_drt_setJavaScriptProfilingEnabled(m_topLoadingFrame, enable);
 }
 
-void LayoutTestController::setFixedLayoutSize(int width, int height) {
-  m_topLoadingFrame->page()->setFixedLayoutSize(QSize(width, height));
-}
-
-void LayoutTestController::setUseFixedLayout(bool enable) {
-  m_topLoadingFrame->page()->setUseFixedLayout(enable);
+void LayoutTestController::setFixedContentsSize(int width, int height) {
+  m_topLoadingFrame->page()->setFixedContentsSize(QSize(width, height));
 }
 
 bool LayoutTestController::pauseAnimationAtTimeOnElementWithId(
