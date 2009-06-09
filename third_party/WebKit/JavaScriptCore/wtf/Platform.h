@@ -518,9 +518,7 @@
 /* Under development, temporarily disabled until 16Mb link range limit in
  * assembler is fixed. */
 #define ENABLE_JIT 0
-#define ENABLE_JIT_OPTIMIZE_CALL 0
 #define ENABLE_JIT_OPTIMIZE_NATIVE_CALL 0
-#define ENABLE_JIT_OPTIMIZE_METHOD_CALLS 0
 /* The JIT is tested & working on x86 Windows */
 #elif PLATFORM(X86) && PLATFORM(WIN)
 #define ENABLE_JIT 1
