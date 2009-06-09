@@ -348,7 +348,7 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   }
 
   void load32(void* address, RegisterID dest) {
-    move(Imm32(reinterpret_cast<intptr_t>(address)), addressTempRegister);
+    move(ImmPtr(address), addressTempRegister);
     m_assembler.ldr(dest, addressTempRegister,
                     ARMThumbImmediate::makeUInt16(0));
   }
@@ -384,7 +384,7 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   }
 
   void store32(RegisterID src, void* address) {
-    move(Imm32(reinterpret_cast<intptr_t>(address)), addressTempRegister);
+    move(ImmPtr(address), addressTempRegister);
     m_assembler.str(src, addressTempRegister, ARMThumbImmediate::makeUInt16(0));
   }
 
@@ -459,7 +459,7 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
     uint32_t value = imm.m_value;
 
     if (imm.m_isPointer) {
-      m_assembler.mov(dest, ARMThumbImmediate::makeUInt16(value));
+      m_assembler.movT3(dest, ARMThumbImmediate::makeUInt16(value));
       m_assembler.movt(dest, ARMThumbImmediate::makeUInt16(value >> 16));
     } else {
       ARMThumbImmediate armImm = ARMThumbImmediate::makeEncodedImm(value);
