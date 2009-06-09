@@ -63,9 +63,12 @@ class Loader : Noncopyable {
 
   void requestTimerFired(Timer<Loader>*);
 
-  class Host : private SubresourceLoaderClient {
+  class Host : public RefCounted<Host>, private SubresourceLoaderClient {
    public:
-    Host(const AtomicString& name, unsigned maxRequestsInFlight);
+    static PassRefPtr<Host> create(const AtomicString& name,
+                                   unsigned maxRequestsInFlight) {
+      return adoptRef(new Host(name, maxRequestsInFlight));
+    }
     ~Host();
 
     const AtomicString& name() const { return m_name; }
@@ -77,17 +80,7 @@ class Loader : Noncopyable {
     bool processingResource() const { return m_numResourcesProcessing != 0; }
 
    private:
-    class ProcessingResource {
-     public:
-      ProcessingResource(Host* host) : m_host(host) {
-        m_host->m_numResourcesProcessing++;
-      }
-
-      ~ProcessingResource() { m_host->m_numResourcesProcessing--; }
-
-     private:
-      Host* m_host;
-    };
+    Host(const AtomicString&, unsigned);
 
     virtual void didReceiveResponse(SubresourceLoader*,
                                     const ResourceResponse&);
@@ -108,9 +101,9 @@ class Loader : Noncopyable {
     const int m_maxRequestsInFlight;
     int m_numResourcesProcessing;
   };
-  typedef HashMap<AtomicStringImpl*, Host*> HostMap;
+  typedef HashMap<AtomicStringImpl*, RefPtr<Host>> HostMap;
   HostMap m_hosts;
-  Host m_nonHTTPProtocolHost;
+  RefPtr<Host> m_nonHTTPProtocolHost;
 
   Timer<Loader> m_requestTimer;
 
