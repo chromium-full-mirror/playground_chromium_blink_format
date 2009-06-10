@@ -798,8 +798,7 @@ bool BMPImageReader::processNonRLEData(SharedBuffer* data,
         } else {
           m_seenNonZeroAlphaPixel = true;
           if (m_seenZeroAlphaPixel) {
-            // The eraseARGB() call here also sets "hasAlpha" true.
-            m_frameBufferCache.first().bitmap().eraseARGB(0, 0, 0, 0);
+            m_frameBufferCache.first().zeroFill();
             m_seenZeroAlphaPixel = false;
           } else if (alpha != 255)
             m_frameBufferCache.first().setHasAlpha(true);
