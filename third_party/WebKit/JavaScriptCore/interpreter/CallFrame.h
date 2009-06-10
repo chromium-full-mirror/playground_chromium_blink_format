@@ -99,6 +99,9 @@ class ExecState : private Register {
   static const HashTable* dateTable(CallFrame* callFrame) {
     return callFrame->globalData().dateTable;
   }
+  static const HashTable* jsonTable(CallFrame* callFrame) {
+    return callFrame->globalData().jsonTable;
+  }
   static const HashTable* mathTable(CallFrame* callFrame) {
     return callFrame->globalData().mathTable;
   }
