@@ -356,6 +356,7 @@ class InspectorController : public RefCounted<InspectorController>
 
   void addResource(InspectorResource*);
   void removeResource(InspectorResource*);
+  InspectorResource* getTrackedResource(long long identifier);
 
   void pruneResources(ResourcesMap*, DocumentLoader* loaderToKeep = 0);
   void removeAllResources(ResourcesMap* map) { pruneResources(map); }
