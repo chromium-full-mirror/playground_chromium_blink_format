@@ -813,8 +813,8 @@ void InspectorController::didLoadResourceFromMemoryCache(
     return;
 
   ASSERT(m_inspectedPage);
-  bool isMainResource = loader->frame() == m_inspectedPage->mainFrame() &&
-                        cachedResource->url() == loader->requestURL();
+  bool isMainResource =
+      isMainResourceLoader(loader, KURL(cachedResource->url()));
   ensureResourceTrackingSettingsLoaded();
   if (!isMainResource && !m_resourceTrackingEnabled)
     return;
@@ -841,8 +841,7 @@ void InspectorController::identifierForInitialRequest(
     return;
   ASSERT(m_inspectedPage);
 
-  bool isMainResource =
-      m_inspectedPage->mainFrame() && request.url() == loader->requestURL();
+  bool isMainResource = isMainResourceLoader(loader, request.url());
   ensureResourceTrackingSettingsLoaded();
   if (!isMainResource && !m_resourceTrackingEnabled)
     return;
@@ -862,6 +861,12 @@ void InspectorController::identifierForInitialRequest(
   if (windowVisible() && loader->isLoadingFromCachedPage() &&
       resource == m_mainResource)
     resource->createScriptObject(m_frontend.get());
+}
+
+bool InspectorController::isMainResourceLoader(DocumentLoader* loader,
+                                               const KURL& requestUrl) {
+  return loader->frame() == m_inspectedPage->mainFrame() &&
+         requestUrl == loader->requestURL();
 }
 
 void InspectorController::willSendRequest(
