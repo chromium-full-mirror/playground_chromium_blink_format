@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -906,7 +906,7 @@ class ARMv7Assembler {
     m_formatter.twoWordOp5i6Imm4Reg4EncodedImm(OP_EOR_imm_T1, rn, rd, imm);
   }
 
-  // What is wrong with you people?, xor is not spelled with an 'e'. :-(
+  // xor is not spelled with an 'e'. :-(
   void eor(RegisterID rd,
            RegisterID rn,
            RegisterID rm,
@@ -918,7 +918,7 @@ class ARMv7Assembler {
         OP_EOR_reg_T2, rn, FourFours(shift.hi4(), rd, shift.lo4(), rm));
   }
 
-  // What is wrong with you people?, xor is not spelled with an 'e'. :-(
+  // xor is not spelled with an 'e'. :-(
   void eor(RegisterID rd, RegisterID rn, RegisterID rm) {
     if ((rd == rn) && !((rd | rm) & 8))
       m_formatter.oneWordOp10Reg3Reg3(OP_EOR_reg_T1, rm, rd);
