@@ -137,7 +137,7 @@ class QWEBKIT_EXPORT QWebElement {
 
   enum ResolveRule { IgnoreCascadingStyles, RespectCascadingStyles };
   QString styleProperty(const QString& name,
-                        const ResolveRule = IgnoreCascadingStyles) const;
+                        ResolveRule = IgnoreCascadingStyles) const;
 
   enum StylePriority {
     NormalStylePriority,
@@ -146,7 +146,7 @@ class QWEBKIT_EXPORT QWebElement {
   };
   void setStyleProperty(const QString& name,
                         const QString& value,
-                        const StylePriority = DeclaredStylePriority);
+                        StylePriority = DeclaredStylePriority);
 
   QString computedStyleProperty(const QString& name) const;
 
