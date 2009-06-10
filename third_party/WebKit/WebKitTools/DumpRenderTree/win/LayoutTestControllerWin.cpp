@@ -645,6 +645,10 @@ void LayoutTestController::execCommand(JSStringRef name, JSStringRef value) {
   SysFreeString(valueBSTR);
 }
 
+void LayoutTestController::setCacheModel(int) {
+  // FIXME: Implement
+}
+
 bool LayoutTestController::isCommandEnabled(JSStringRef /*name*/) {
   printf("ERROR: LayoutTestController::isCommandEnabled() not implemented\n");
   return false;
