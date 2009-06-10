@@ -684,4 +684,8 @@ NPError PluginView::handlePostReadFile(Vector<char>& buffer,
 
 }  // namespace WebCore
 
+#else
+
+#include "../PluginViewNone.cpp"
+
 #endif  // !__LP64__
