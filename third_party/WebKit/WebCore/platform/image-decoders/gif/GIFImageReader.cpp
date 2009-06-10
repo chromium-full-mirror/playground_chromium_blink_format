@@ -312,9 +312,13 @@ int GIFImageReader::do_lzw(const unsigned char* q) {
       }
 
       while (code >= clear_code) {
-        if (code == prefix[code])
+        if (code >= MAX_BITS || code == prefix[code])
           return -1;
 
+        // Even though suffix[] only holds characters through suffix[avail - 1],
+        // allowing code >= avail here lets us be more tolerant of malformed
+        // data. As long as code < MAX_BITS, the only risk is a garbled image,
+        // which is no worse than refusing to display it.
         *stackp++ = suffix[code];
         code = prefix[code];
 
@@ -445,7 +449,11 @@ bool GIFImageReader::read(const unsigned char* buf,
       case gif_lzw_start: {
         /* Initialize LZW parser/decoder */
         int datasize = *q;
-        if (datasize > MAX_LZW_BITS) {
+        // Since we use a codesize of 1 more than the datasize, we need to
+        // ensure
+        // that our datasize is strictly less than the MAX_LZW_BITS value (12).
+        // This sets the largest possible codemask correctly at 4095.
+        if (datasize >= MAX_LZW_BITS) {
           state = gif_error;
           break;
         }
@@ -468,6 +476,9 @@ bool GIFImageReader::read(const unsigned char* buf,
           /* init the tables */
           if (!frame_reader->suffix)
             frame_reader->suffix = new unsigned char[MAX_BITS];
+          // Clearing the whole suffix table lets us be more tolerant of bad
+          // data.
+          memset(frame_reader->suffix, 0, MAX_BITS);
           for (int i = 0; i < frame_reader->clear_code; i++)
             frame_reader->suffix[i] = i;
 
@@ -504,8 +515,9 @@ bool GIFImageReader::read(const unsigned char* buf,
         screen_height = GETINT16(q + 2);
 
         // CALLBACK: Inform the decoderplugin of our size.
-        if (clientptr)
-          clientptr->sizeNowAvailable(screen_width, screen_height);
+        if (clientptr &&
+            !clientptr->sizeNowAvailable(screen_width, screen_height))
+          return false;
 
         screen_bgcolor = q[5];
         global_colormap_size = 2 << (q[4] & 0x07);
@@ -720,8 +732,9 @@ bool GIFImageReader::read(const unsigned char* buf,
           y_offset = 0;
 
           // CALLBACK: Inform the decoderplugin of our size.
-          if (clientptr)
-            clientptr->sizeNowAvailable(screen_width, screen_height);
+          if (clientptr &&
+              !clientptr->sizeNowAvailable(screen_width, screen_height))
+            return false;
         }
 
         /* Work around more broken GIF files that have zero image
