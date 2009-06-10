@@ -623,8 +623,12 @@ static gint webkit_accessible_text_get_offset_at_point(AtkText* text,
 }
 
 static gint webkit_accessible_text_get_n_selections(AtkText* text) {
-  notImplemented();
-  return 0;
+  AccessibilityObject* coreObject = core(text);
+  VisibleSelection selection = coreObject->selection();
+
+  // We don't support multiple selections for now, so there's only
+  // two possibilities
+  return selection.isNone() ? 0 : 1;
 }
 
 static gchar* webkit_accessible_text_get_selection(AtkText* text,
