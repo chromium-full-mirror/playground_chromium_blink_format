@@ -84,7 +84,7 @@ class Stringifier {
   // <https://bugs.webkit.org/show_bug.cgi?id=26276> arbitrary limits for
   // recursion
   // are bad
-  enum { MaxObjectDepth = 1600 };
+  enum { MaxObjectDepth = 512 };
 
  public:
   Stringifier(ExecState* exec, JSValue replacer, const UString& gap)
