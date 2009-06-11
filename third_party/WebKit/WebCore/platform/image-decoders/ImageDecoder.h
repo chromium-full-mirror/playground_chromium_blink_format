@@ -227,8 +227,6 @@ class ImageDecoder {
   RefPtr<SharedBuffer> m_data;  // The encoded data.
   Vector<RGBA32Buffer> m_frameBufferCache;
   mutable bool m_failed;
-  IntSize m_size;
-  bool m_sizeAvailable;
 
  private:
   // Some code paths compute the size of the image as "width * height * 4"
@@ -240,6 +238,9 @@ class ImageDecoder {
                                     static_cast<unsigned long long>(height);
     return total_size > ((1 << 29) - 1);
   }
+
+  IntSize m_size;
+  bool m_sizeAvailable;
 };
 
 }  // namespace WebCore
