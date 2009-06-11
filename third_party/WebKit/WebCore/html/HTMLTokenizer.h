@@ -183,7 +183,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   State parseDoctype(SegmentedString&, State);
   State parseServer(SegmentedString&, State);
   State parseText(SegmentedString&, State);
-  State parseSpecial(SegmentedString&, State);
+  State parseNonHTMLText(SegmentedString&, State);
   State parseTag(SegmentedString&, State);
   State parseEntity(SegmentedString&,
                     UChar*& dest,
@@ -311,7 +311,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
     bool forceSynchronous() const { return testBit(ForceSynchronous); }
     void setForceSynchronous(bool v) { setBit(ForceSynchronous, v); }
 
-    bool inAnySpecial() const {
+    bool inAnyNonHTMLText() const {
       return m_bits &
              (InScript | InStyle | InXmp | InTextArea | InTitle | InIFrame);
     }
