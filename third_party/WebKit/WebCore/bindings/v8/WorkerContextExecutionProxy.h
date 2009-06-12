@@ -52,7 +52,7 @@ class WorkerContextExecutionProxy {
   WorkerContextExecutionProxy(WorkerContext*);
   ~WorkerContextExecutionProxy();
 
-  // FIXME: following function sshould have camelCased names once V8
+  // FIXME: following function should have camelCased names once V8
   // code-generating script is migrated.
   v8::Local<v8::Context> GetContext() {
     return v8::Local<v8::Context>::New(m_context);
