@@ -537,6 +537,17 @@ static bool webViewNavigationPolicyDecisionRequested(
   return TRUE;
 }
 
+static void webViewStatusBarTextChanged(WebKitWebView* view,
+                                        const gchar* message,
+                                        gpointer data) {
+  // Are we doing anything wrong? One test that does not call
+  // dumpStatusCallbacks gets true here
+  if (gLayoutTestController->dumpStatusCallbacks()) {
+    if (message && strcmp(message, ""))
+      printf("UI DELEGATE STATUS CALLBACK: setStatusText:%s\n", message);
+  }
+}
+
 int main(int argc, char* argv[]) {
   g_thread_init(NULL);
   gtk_init(&argc, &argv);
@@ -587,6 +598,8 @@ int main(int argc, char* argv[]) {
                    G_CALLBACK(webViewTitleChanged), 0);
   g_signal_connect(G_OBJECT(webView), "navigation-policy-decision-requested",
                    G_CALLBACK(webViewNavigationPolicyDecisionRequested), 0);
+  g_signal_connect(G_OBJECT(webView), "status-bar-text-changed",
+                   G_CALLBACK(webViewStatusBarTextChanged), 0);
 
   setDefaultsToConsistentStateValuesForTesting();
 
