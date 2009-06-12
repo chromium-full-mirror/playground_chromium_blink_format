@@ -33,11 +33,11 @@
 #include "SharedBuffer.h"
 
 #include "GIFImageDecoder.h"
+#include "ICOImageDecoder.h"
 #include "JPEGImageDecoder.h"
 #include "PNGImageDecoder.h"
 #include "BMPImageDecoder.h"
 #include "XBMImageDecoder.h"
-#include "ICOImageDecoder.h"
 
 #include "SkBitmap.h"
 
