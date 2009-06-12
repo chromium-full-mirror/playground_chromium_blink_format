@@ -981,7 +981,6 @@ void RenderLayer::panScrollFromPoint(const IntPoint& sourcePoint) {
   const int speedReducer =
       2;  // Within this square we divide the scrolling speed by 2
 
-  const int iconRadius = 10;
   Frame* frame = renderer()->document()->frame();
   if (!frame)
     return;
@@ -999,9 +998,10 @@ void RenderLayer::panScrollFromPoint(const IntPoint& sourcePoint) {
   int xDelta = currentMousePosition.x() - sourcePoint.x();
   int yDelta = currentMousePosition.y() - sourcePoint.y();
 
-  if (abs(xDelta) < iconRadius)  // at the center we let the space for the icon
+  if (abs(xDelta) < ScrollView::noPanScrollRadius)  // at the center we let the
+                                                    // space for the icon
     xDelta = 0;
-  if (abs(yDelta) < iconRadius)
+  if (abs(yDelta) < ScrollView::noPanScrollRadius)
     yDelta = 0;
 
   // Let's attenuate the speed for the short distances
