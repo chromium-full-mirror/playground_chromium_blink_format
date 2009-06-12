@@ -162,6 +162,12 @@ class EmptyChromeClient : public ChromeClient {
   virtual void scrollRectIntoView(const IntRect&, const ScrollView*) const {}
 
   virtual void requestGeolocationPermissionForFrame(Frame*, Geolocation*) {}
+
+#if USE(ACCELERATED_COMPOSITING)
+  virtual void attachRootGraphicsLayer(Frame*, GraphicsLayer*){};
+  virtual void setNeedsOneShotDrawingSynchronization(){};
+  virtual void scheduleViewUpdate(){};
+#endif
 };
 
 class EmptyFrameLoaderClient : public FrameLoaderClient {
