@@ -152,4 +152,6 @@ FontPlatformData::FontPlatformData(HFONT hfont,
       m_syntheticBold(bold),
       m_syntheticOblique(oblique),
       m_useGDI(useGDI) {}
+
+FontPlatformData::~FontPlatformData() {}
 }
