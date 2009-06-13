@@ -72,16 +72,19 @@ void RenderLayerBacking::createGraphicsLayer() {
   m_graphicsLayer = GraphicsLayer::createGraphicsLayer(this);
 
 #ifndef NDEBUG
-  if (renderer()->node()->isDocumentNode())
-    m_graphicsLayer->setName("Document Node");
-  else {
-    if (renderer()->node()->isHTMLElement() && renderer()->node()->hasID())
-      m_graphicsLayer->setName(
-          renderer()->renderName() + String(" ") +
-          static_cast<HTMLElement*>(renderer()->node())->id());
-    else
-      m_graphicsLayer->setName(renderer()->renderName());
-  }
+  if (renderer()->node()) {
+    if (renderer()->node()->isDocumentNode())
+      m_graphicsLayer->setName("Document Node");
+    else {
+      if (renderer()->node()->isHTMLElement() && renderer()->node()->hasID())
+        m_graphicsLayer->setName(
+            renderer()->renderName() + String(" ") +
+            static_cast<HTMLElement*>(renderer()->node())->id());
+      else
+        m_graphicsLayer->setName(renderer()->renderName());
+    }
+  } else
+    m_graphicsLayer->setName("Anonymous Node");
 #endif  // NDEBUG
 
   updateLayerOpacity();
@@ -439,7 +442,7 @@ static bool hasBoxDecorationsWithBackgroundImage(const RenderStyle* style) {
 
 bool RenderLayerBacking::rendererHasBackground() const {
   // FIXME: share more code here
-  if (renderer()->node()->isDocumentNode()) {
+  if (renderer()->node() && renderer()->node()->isDocumentNode()) {
     RenderObject* htmlObject = renderer()->firstChild();
     if (!htmlObject)
       return false;
@@ -461,7 +464,7 @@ bool RenderLayerBacking::rendererHasBackground() const {
 
 const Color& RenderLayerBacking::rendererBackgroundColor() const {
   // FIXME: share more code here
-  if (renderer()->node()->isDocumentNode()) {
+  if (renderer()->node() && renderer()->node()->isDocumentNode()) {
     RenderObject* htmlObject = renderer()->firstChild();
     RenderStyle* style = htmlObject->style();
     if (style->hasBackground())
@@ -498,7 +501,7 @@ bool RenderLayerBacking::isSimpleContainerCompositingLayer() const {
   if (!renderObject->firstChild())
     return true;
 
-  if (renderObject->node()->isDocumentNode()) {
+  if (renderObject->node() && renderObject->node()->isDocumentNode()) {
     // Look to see if the root object has a non-simple backgound
     RenderObject* rootObject =
         renderObject->document()->documentElement()->renderer();
@@ -804,7 +807,7 @@ void RenderLayerBacking::paintIntoLayer(
     IntRect paintBox = clipRectToApply;
 
     // FIXME: do we need this code?
-    if (renderer()->node()->isDocumentNode() &&
+    if (renderer()->node() && renderer()->node()->isDocumentNode() &&
         renderer()->document()->isHTMLDocument()) {
       RenderBox* box = toRenderBox(renderer());
       int w = box->width();
