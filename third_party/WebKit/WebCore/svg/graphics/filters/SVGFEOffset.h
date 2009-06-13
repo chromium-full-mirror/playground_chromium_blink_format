@@ -38,6 +38,9 @@ class FEOffset : public FilterEffect {
   float dy() const;
   void setDy(float);
 
+  virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
+    return calculateUnionOfChildEffectSubregions(filter, m_in.get());
+  }
   void apply(Filter*);
   void dump();
   TextStream& externalRepresentation(TextStream& ts) const;

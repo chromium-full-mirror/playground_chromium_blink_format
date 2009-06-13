@@ -50,6 +50,10 @@ class FEBlend : public FilterEffect {
   BlendModeType blendMode() const;
   void setBlendMode(BlendModeType);
 
+  virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
+    return calculateUnionOfChildEffectSubregions(filter, m_in.get(),
+                                                 m_in2.get());
+  }
   void apply(Filter*);
   void dump();
 

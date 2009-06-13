@@ -67,21 +67,35 @@ FloatRect SVGResourceFilter::filterBBoxForItemBBox(
 }
 
 void SVGResourceFilter::prepareFilter(GraphicsContext*& context,
-                                      const FloatRect& itemRect) {
+                                      const RenderObject* object) {
+  m_itemBBox = object->objectBoundingBox();
+  m_filterBBox = filterBBoxForItemBBox(m_itemBBox);
+
+  // clip sourceImage to filterRegion
+  FloatRect clippedSourceRect = m_itemBBox;
+  clippedSourceRect.intersect(m_filterBBox);
+
+  // prepare Filters
+  m_filter = SVGFilter::create(m_itemBBox, m_filterBBox, m_effectBBoxMode,
+                               m_filterBBoxMode);
+
+  FilterEffect* lastEffect = m_filterBuilder->lastEffect();
+  if (lastEffect)
+    lastEffect->calculateEffectRect(m_filter.get());
+
   // Draw the content of the current element and it's childs to a imageBuffer to
   // get the SourceGraphic.
-  // The size of the SourceGraphic must match the size of the element, the
-  // filter is aplied to.
-  IntSize bufferSize = IntSize(itemRect.width(), itemRect.height());
-  OwnPtr<ImageBuffer> sourceGraphic(ImageBuffer::create(bufferSize, false));
+  // The size of the SourceGraphic is clipped to the size of the filterRegion.
+  IntRect bufferRect = enclosingIntRect(clippedSourceRect);
+  OwnPtr<ImageBuffer> sourceGraphic(
+      ImageBuffer::create(bufferRect.size(), false));
 
   if (!sourceGraphic.get())
     return;
 
   GraphicsContext* sourceGraphicContext = sourceGraphic->context();
-  sourceGraphicContext->translate(-itemRect.x(), -itemRect.y());
-  sourceGraphicContext->clearRect(
-      FloatRect(0, 0, itemRect.width(), itemRect.height()));
+  sourceGraphicContext->translate(-m_itemBBox.x(), -m_itemBBox.y());
+  sourceGraphicContext->clearRect(FloatRect(FloatPoint(), m_itemBBox.size()));
   m_sourceGraphicBuffer.set(sourceGraphic.release());
   m_savedContext = context;
 
@@ -89,27 +103,19 @@ void SVGResourceFilter::prepareFilter(GraphicsContext*& context,
 }
 
 void SVGResourceFilter::applyFilter(GraphicsContext*& context,
-                                    const FloatRect& itemRect) {
+                                    const RenderObject*) {
   if (!m_savedContext)
     return;
-
-  FloatRect filterRect = filterBBoxForItemBBox(itemRect);
-
-  setFilterBoundingBox(filterRect);
-  setItemBoundingBox(itemRect);
 
   context = m_savedContext;
   m_savedContext = 0;
 
   FilterEffect* lastEffect = m_filterBuilder->lastEffect();
 
-  if (lastEffect && !filterRect.isEmpty()) {
-    RefPtr<Filter> filter = SVGFilter::create(
-        m_itemBBox, m_filterBBox, m_effectBBoxMode, m_filterBBoxMode);
-    filter->setSourceImage(m_sourceGraphicBuffer->image());
-    lastEffect->apply(filter.get());
-
-    context->clip(filterRect);
+  if (lastEffect && !m_filterBBox.isEmpty() &&
+      !lastEffect->subRegion().isEmpty()) {
+    m_filter->setSourceImage(m_sourceGraphicBuffer.release());
+    lastEffect->apply(m_filter.get());
 
     if (lastEffect->resultImage())
       context->drawImage(lastEffect->resultImage()->image(),

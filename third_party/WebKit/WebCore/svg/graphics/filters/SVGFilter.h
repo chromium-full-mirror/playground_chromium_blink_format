@@ -38,6 +38,10 @@ class SVGFilter : public Filter {
                                       bool,
                                       bool);
 
+  bool effectBoundingBoxMode() { return m_effectBBoxMode; }
+
+  FloatRect filterRegion() { return m_filterRect; }
+  FloatRect sourceImageRect() { return m_itemBox; }
   void calculateEffectSubRegion(FilterEffect*);
 
  private:

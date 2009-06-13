@@ -65,6 +65,10 @@ class FEComposite : public FilterEffect {
   float k4() const;
   void setK4(float);
 
+  virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
+    return calculateUnionOfChildEffectSubregions(filter, m_in.get(),
+                                                 m_in2.get());
+  }
   void apply(Filter*);
   void dump();
 

@@ -29,7 +29,9 @@
 namespace WebCore {
 
 FEImage::FEImage(CachedImage* cachedImage)
-    : FilterEffect(), m_cachedImage(cachedImage) {}
+    : FilterEffect(), m_cachedImage(cachedImage) {
+  m_cachedImage->addClient(this);
+}
 
 PassRefPtr<FEImage> FEImage::create(CachedImage* cachedImage) {
   return adoptRef(new FEImage(cachedImage));
