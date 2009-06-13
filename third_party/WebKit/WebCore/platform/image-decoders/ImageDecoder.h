@@ -30,10 +30,13 @@
 #include "ImageSource.h"
 #include "PlatformString.h"
 #include "SharedBuffer.h"
-#include <cairo.h>
 #include <wtf/Assertions.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
+
+#if PLATFORM(CAIRO)
+#include <cairo.h>
+#endif
 
 namespace WebCore {
 
@@ -118,6 +121,7 @@ class RGBA32Buffer {
     return true;
   }
 
+#if PLATFORM(CAIRO)
   // To be used by ImageSource::createFrameAtIndex().  Returns a pointer
   // to the underlying native image data.  This pointer will be owned by
   // the BitmapImage and freed in FrameData::clear().
@@ -127,6 +131,7 @@ class RGBA32Buffer {
             const_cast<PixelData*>(m_bytes.data())),
         CAIRO_FORMAT_ARGB32, width(), height(), width() * sizeof(PixelData));
   }
+#endif
 
   bool hasAlpha() const { return m_hasAlpha; }
   const IntRect& rect() const { return m_rect; }
