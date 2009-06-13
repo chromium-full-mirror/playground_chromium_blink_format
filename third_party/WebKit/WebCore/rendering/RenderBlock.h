@@ -25,7 +25,6 @@
 
 #ifndef RenderBlock_h
 #define RenderBlock_h
-
 #include "DeprecatedPtrList.h"
 #include "GapRects.h"
 #include "RenderBox.h"
@@ -44,7 +43,10 @@ struct BidiRun;
 
 template <class Iterator, class Run>
 class BidiResolver;
+template <class Iterator>
+class MidpointState;
 typedef BidiResolver<InlineIterator, BidiRun> InlineBidiResolver;
+typedef MidpointState<InlineIterator> LineMidpointState;
 
 enum CaretType { CursorCaret, DragCaret };
 
@@ -187,9 +189,12 @@ class RenderBlock : public RenderBox {
     IntRect rect;
   };
 
-  void bidiReorderLine(InlineBidiResolver&, const InlineIterator& end);
+  void bidiReorderLine(InlineBidiResolver&,
+                       const InlineIterator& end,
+                       bool previousLineBrokeCleanly);
   RootInlineBox* determineStartPosition(bool& firstLine,
                                         bool& fullLayout,
+                                        bool& previousLineBrokeCleanly,
                                         InlineBidiResolver&,
                                         Vector<FloatWithRect>& floats,
                                         unsigned& numCleanFloats);
@@ -204,12 +209,21 @@ class RenderBlock : public RenderBox {
                       int& endYPos,
                       int& repaintBottom,
                       int& repaintTop);
-  bool generatesLineBoxesForInlineChild(RenderObject*);
-  void skipTrailingWhitespace(InlineIterator&);
-  int skipLeadingWhitespace(InlineBidiResolver&, bool firstLine);
+  bool generatesLineBoxesForInlineChild(RenderObject*,
+                                        bool isLineEmpty = true,
+                                        bool previousLineBrokeCleanly = true);
+  void skipTrailingWhitespace(InlineIterator&,
+                              bool isLineEmpty,
+                              bool previousLineBrokeCleanly);
+  int skipLeadingWhitespace(InlineBidiResolver&,
+                            bool firstLine,
+                            bool isLineEmpty,
+                            bool previousLineBrokeCleanly);
   void fitBelowFloats(int widthToFit, bool firstLine, int& availableWidth);
   InlineIterator findNextLineBreak(InlineBidiResolver&,
                                    bool firstLine,
+                                   bool& isLineEmpty,
+                                   bool& previousLineBrokeCleanly,
                                    EClear* clear = 0);
   RootInlineBox* constructLine(unsigned runCount,
                                BidiRun* firstRun,
