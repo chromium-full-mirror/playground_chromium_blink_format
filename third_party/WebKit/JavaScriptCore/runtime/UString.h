@@ -104,6 +104,7 @@ class UString {
     // Uses SharedUChar to have joint ownership over the UChar*.
     static PassRefPtr<Rep> create(UChar*, int, PassRefPtr<SharedUChar>);
 
+    SharedUChar* sharedBuffer();
     void destroy();
 
     bool baseIsSelf() const {
@@ -206,7 +207,6 @@ class UString {
   struct BaseString : public Rep {
     bool isShared() { return rc != 1 || isBufferReadOnly(); }
     void setSharedBuffer(PassRefPtr<SharedUChar>);
-    SharedUChar* sharedBuffer();
 
     bool isBufferReadOnly() {
       if (!m_sharedBuffer)
@@ -236,6 +236,7 @@ class UString {
       checkConsistency();
     }
 
+    SharedUChar* sharedBuffer();
     bool slowIsBufferReadOnly();
 
     friend struct Rep;
