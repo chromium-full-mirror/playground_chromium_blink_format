@@ -127,7 +127,7 @@ void BidiRun::operator delete(void* ptr, size_t sz) {
 #ifndef NDEBUG
   bidiRunCounter.decrement();
 #endif
-  // ASSERT(inBidiRunDestroy);
+  ASSERT(inBidiRunDestroy);
 
   // Stash size where destroy() can find it.
   *(size_t*)ptr = sz;
@@ -315,13 +315,13 @@ ALWAYS_INLINE Direction InlineIterator::direction() const {
 static void chopMidpointsAt(LineMidpointState& lineMidpointState,
                             RenderObject* obj,
                             unsigned pos) {
-  if (!lineMidpointState.m_numMidpoints)
+  if (!lineMidpointState.numMidpoints)
     return;
-  InlineIterator* midpoints = lineMidpointState.m_midpoints.data();
-  for (int i = lineMidpointState.m_numMidpoints - 1; i >= 0; i--) {
+  InlineIterator* midpoints = lineMidpointState.midpoints.data();
+  for (int i = lineMidpointState.numMidpoints - 1; i >= 0; i--) {
     const InlineIterator& point = midpoints[i];
     if (point.obj == obj && point.pos == pos) {
-      lineMidpointState.m_numMidpoints = i;
+      lineMidpointState.numMidpoints = i;
       break;
     }
   }
@@ -334,19 +334,19 @@ static void checkMidpoints(LineMidpointState& lineMidpointState,
   // shave it off the list, and shave off a trailing space if the previous end
   // point doesn't
   // preserve whitespace.
-  if (lBreak.obj && lineMidpointState.m_numMidpoints &&
-      !(lineMidpointState.m_numMidpoints % 2)) {
-    InlineIterator* midpoints = lineMidpointState.m_midpoints.data();
-    InlineIterator& endpoint = midpoints[lineMidpointState.m_numMidpoints - 2];
+  if (lBreak.obj && lineMidpointState.numMidpoints &&
+      !(lineMidpointState.numMidpoints % 2)) {
+    InlineIterator* midpoints = lineMidpointState.midpoints.data();
+    InlineIterator& endpoint = midpoints[lineMidpointState.numMidpoints - 2];
     const InlineIterator& startpoint =
-        midpoints[lineMidpointState.m_numMidpoints - 1];
+        midpoints[lineMidpointState.numMidpoints - 1];
     InlineIterator currpoint = endpoint;
     while (!currpoint.atEnd() && currpoint != startpoint && currpoint != lBreak)
       currpoint.increment();
     if (currpoint == lBreak) {
       // We hit the line break before the start point.  Shave off the start
       // point.
-      lineMidpointState.m_numMidpoints--;
+      lineMidpointState.numMidpoints--;
       if (endpoint.obj->style()->collapseWhiteSpace()) {
         if (endpoint.obj->isText()) {
           // Don't shave a character off the endpoint if it was from a soft
@@ -370,11 +370,11 @@ static void checkMidpoints(LineMidpointState& lineMidpointState,
 
 static void addMidpoint(LineMidpointState& lineMidpointState,
                         const InlineIterator& midpoint) {
-  if (lineMidpointState.m_midpoints.size() <= lineMidpointState.m_numMidpoints)
-    lineMidpointState.m_midpoints.grow(lineMidpointState.m_numMidpoints + 10);
+  if (lineMidpointState.midpoints.size() <= lineMidpointState.numMidpoints)
+    lineMidpointState.midpoints.grow(lineMidpointState.numMidpoints + 10);
 
-  InlineIterator* midpoints = lineMidpointState.m_midpoints.data();
-  midpoints[lineMidpointState.m_numMidpoints++] = midpoint;
+  InlineIterator* midpoints = lineMidpointState.midpoints.data();
+  midpoints[lineMidpointState.numMidpoints++] = midpoint;
 }
 
 static void appendRunsForObject(int start,
@@ -388,19 +388,19 @@ static void appendRunsForObject(int start,
 
   LineMidpointState& lineMidpointState = resolver.midpointState();
   bool haveNextMidpoint =
-      (lineMidpointState.m_currentMidpoint < lineMidpointState.m_numMidpoints);
+      (lineMidpointState.currentMidpoint < lineMidpointState.numMidpoints);
   InlineIterator nextMidpoint;
   if (haveNextMidpoint)
     nextMidpoint =
-        lineMidpointState.m_midpoints[lineMidpointState.m_currentMidpoint];
-  if (lineMidpointState.m_betweenMidpoints) {
+        lineMidpointState.midpoints[lineMidpointState.currentMidpoint];
+  if (lineMidpointState.betweenMidpoints) {
     if (!(haveNextMidpoint && nextMidpoint.obj == obj))
       return;
     // This is a new start point. Stop ignoring objects and
     // adjust our start.
-    lineMidpointState.m_betweenMidpoints = false;
+    lineMidpointState.betweenMidpoints = false;
     start = nextMidpoint.pos;
-    lineMidpointState.m_currentMidpoint++;
+    lineMidpointState.currentMidpoint++;
     if (start < end)
       return appendRunsForObject(start, end, obj, resolver);
   } else {
@@ -413,8 +413,8 @@ static void appendRunsForObject(int start,
     // An end midpoint has been encountered within our object.  We
     // need to go ahead and append a run with our endpoint.
     if (static_cast<int>(nextMidpoint.pos + 1) <= end) {
-      lineMidpointState.m_betweenMidpoints = true;
-      lineMidpointState.m_currentMidpoint++;
+      lineMidpointState.betweenMidpoints = true;
+      lineMidpointState.currentMidpoint++;
       if (nextMidpoint.pos != UINT_MAX) {  // UINT_MAX means stop at the object
                                            // and don't include any of it.
         if (static_cast<int>(nextMidpoint.pos + 1) > start)
@@ -2043,14 +2043,12 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
                   0, last,
                   last->isText() ? toRenderText(last)->textLength() - 1 : 0);
             // Two consecutive soft hyphens. Avoid overlapping midpoints.
-            if (lineMidpointState.m_numMidpoints &&
-                lineMidpointState
-                        .m_midpoints[lineMidpointState.m_numMidpoints - 1]
+            if (lineMidpointState.numMidpoints &&
+                lineMidpointState.midpoints[lineMidpointState.numMidpoints - 1]
                         .obj == o &&
-                lineMidpointState
-                        .m_midpoints[lineMidpointState.m_numMidpoints - 1]
+                lineMidpointState.midpoints[lineMidpointState.numMidpoints - 1]
                         .pos == pos)
-              lineMidpointState.m_numMidpoints--;
+              lineMidpointState.numMidpoints--;
             else
               addMidpoint(lineMidpointState, beforeSoftHyphen);
 
@@ -2420,9 +2418,9 @@ end:
     // level to
     // exclude the space, allowing it to - in effect - collapse into the
     // newline.
-    if (lineMidpointState.m_numMidpoints % 2) {
-      InlineIterator* midpoints = lineMidpointState.m_midpoints.data();
-      midpoints[lineMidpointState.m_numMidpoints - 1].pos--;
+    if (lineMidpointState.numMidpoints % 2) {
+      InlineIterator* midpoints = lineMidpointState.midpoints.data();
+      midpoints[lineMidpointState.numMidpoints - 1].pos--;
     }
     // else if (lBreak.pos > 0)
     //    lBreak.pos--;

@@ -25,6 +25,7 @@
 
 #ifndef RenderBlock_h
 #define RenderBlock_h
+
 #include "DeprecatedPtrList.h"
 #include "GapRects.h"
 #include "RenderBox.h"
