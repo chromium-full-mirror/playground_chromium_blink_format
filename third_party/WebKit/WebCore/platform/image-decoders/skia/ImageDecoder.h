@@ -104,7 +104,7 @@ class RGBA32Buffer {
     const int rowBytes = (endX - startX) * sizeof(PixelData);
     const PixelData* const startAddr = getAddr(startX, startY);
     for (int destY = startY + 1; destY < endY; ++destY)
-      memcpy(getAddr(startX, startY), startAddr, rowBytes);
+      memcpy(getAddr(startX, destY), startAddr, rowBytes);
   }
 
   // Must be called before any pixels are written. Will return true on
