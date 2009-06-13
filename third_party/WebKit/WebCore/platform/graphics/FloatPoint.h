@@ -51,10 +51,6 @@ class QPointF;
 QT_END_NAMESPACE
 #endif
 
-#if PLATFORM(SYMBIAN)
-class TPoint;
-#endif
-
 #if PLATFORM(SKIA)
 struct SkPoint;
 #endif
@@ -95,11 +91,6 @@ class FloatPoint {
 #if PLATFORM(QT)
   FloatPoint(const QPointF&);
   operator QPointF() const;
-#endif
-
-#if PLATFORM(SYMBIAN)
-  operator TPoint() const;
-  FloatPoint(const TPoint&);
 #endif
 
 #if PLATFORM(SKIA)

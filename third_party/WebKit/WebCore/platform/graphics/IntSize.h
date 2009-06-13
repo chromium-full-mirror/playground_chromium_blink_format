@@ -49,9 +49,6 @@ QT_BEGIN_NAMESPACE
 class QSize;
 QT_END_NAMESPACE
 #endif
-#if PLATFORM(SYMBIAN)
-class TSize;
-#endif
 
 namespace WebCore {
 
@@ -108,10 +105,6 @@ class IntSize {
 #if PLATFORM(QT)
   IntSize(const QSize&);
   operator QSize() const;
-#endif
-#if PLATFORM(SYMBIAN)
-  IntSize(const TSize&);
-  operator TSize() const;
 #endif
 
  private:
