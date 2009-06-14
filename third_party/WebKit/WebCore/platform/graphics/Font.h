@@ -135,13 +135,7 @@ class Font {
   }
   int tabWidth() const { return 8 * spaceWidth(); }
 
-  const SimpleFontData* primaryFont() const {
-    ASSERT(isMainThread());
-    if (!m_cachedPrimaryFont)
-      cachePrimaryFont();
-    return m_cachedPrimaryFont;
-  }
-
+  const SimpleFontData* primaryFont() const;
   const FontData* fontDataAt(unsigned) const;
   GlyphData glyphDataForCharacter(UChar32,
                                   bool mirror,
@@ -227,7 +221,6 @@ class Font {
                                         int h,
                                         int from,
                                         int to) const;
-  void cachePrimaryFont() const;
 
   friend struct WidthIterator;
 
@@ -262,9 +255,6 @@ class Font {
  private:
   FontDescription m_fontDescription;
   mutable RefPtr<FontFallbackList> m_fontList;
-  mutable HashMap<int, GlyphPageTreeNode*> m_pages;
-  mutable GlyphPageTreeNode* m_pageZero;
-  mutable const SimpleFontData* m_cachedPrimaryFont;
   short m_letterSpacing;
   short m_wordSpacing;
   bool m_isPlatformFont;

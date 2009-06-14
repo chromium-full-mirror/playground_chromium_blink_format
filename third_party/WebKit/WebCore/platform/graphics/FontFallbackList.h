@@ -34,6 +34,7 @@
 namespace WebCore {
 
 class Font;
+class GlyphPageTreeNode;
 class GraphicsContext;
 class IntRect;
 class FontDescription;
@@ -66,7 +67,17 @@ class FontFallbackList : public RefCounted<FontFallbackList> {
  private:
   FontFallbackList();
 
-  const FontData* primaryFont(const Font* f) const { return fontDataAt(f, 0); }
+  const SimpleFontData* primarySimpleFontData(const Font* f) {
+    ASSERT(isMainThread());
+    if (!m_cachedPrimarySimpleFontData)
+      m_cachedPrimarySimpleFontData =
+          primaryFontData(f)->fontDataForCharacter(' ');
+    return m_cachedPrimarySimpleFontData;
+  }
+
+  const FontData* primaryFontData(const Font* f) const {
+    return fontDataAt(f, 0);
+  }
   const FontData* fontDataAt(const Font*, unsigned index) const;
   const FontData* fontDataForCharacters(const Font*,
                                         const UChar*,
@@ -77,6 +88,9 @@ class FontFallbackList : public RefCounted<FontFallbackList> {
   void releaseFontData();
 
   mutable Vector<pair<const FontData*, bool>, 1> m_fontList;
+  mutable HashMap<int, GlyphPageTreeNode*> m_pages;
+  mutable GlyphPageTreeNode* m_pageZero;
+  mutable const SimpleFontData* m_cachedPrimarySimpleFontData;
   RefPtr<FontSelector> m_fontSelector;
   mutable int m_familyIndex;
   mutable Pitch m_pitch;

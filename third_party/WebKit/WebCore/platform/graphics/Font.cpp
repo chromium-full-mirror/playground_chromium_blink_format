@@ -86,25 +86,16 @@ Font::CodePath Font::s_codePath = Auto;
 // Font Implementation (Cross-Platform Portion)
 // ============================================================================================
 
-Font::Font()
-    : m_pageZero(0),
-      m_cachedPrimaryFont(0),
-      m_letterSpacing(0),
-      m_wordSpacing(0),
-      m_isPlatformFont(false) {}
+Font::Font() : m_letterSpacing(0), m_wordSpacing(0), m_isPlatformFont(false) {}
 
 Font::Font(const FontDescription& fd, short letterSpacing, short wordSpacing)
     : m_fontDescription(fd),
-      m_pageZero(0),
-      m_cachedPrimaryFont(0),
       m_letterSpacing(letterSpacing),
       m_wordSpacing(wordSpacing),
       m_isPlatformFont(false) {}
 
 Font::Font(const FontPlatformData& fontData, bool isPrinterFont)
     : m_fontList(FontFallbackList::create()),
-      m_pageZero(0),
-      m_cachedPrimaryFont(0),
       m_letterSpacing(0),
       m_wordSpacing(0),
       m_isPlatformFont(true) {
@@ -115,9 +106,6 @@ Font::Font(const FontPlatformData& fontData, bool isPrinterFont)
 Font::Font(const Font& other)
     : m_fontDescription(other.m_fontDescription),
       m_fontList(other.m_fontList),
-      m_pages(other.m_pages),
-      m_pageZero(other.m_pageZero),
-      m_cachedPrimaryFont(other.m_cachedPrimaryFont),
       m_letterSpacing(other.m_letterSpacing),
       m_wordSpacing(other.m_wordSpacing),
       m_isPlatformFont(other.m_isPlatformFont) {}
@@ -125,9 +113,6 @@ Font::Font(const Font& other)
 Font& Font::operator=(const Font& other) {
   m_fontDescription = other.m_fontDescription;
   m_fontList = other.m_fontList;
-  m_pages = other.m_pages;
-  m_pageZero = other.m_pageZero;
-  m_cachedPrimaryFont = other.m_cachedPrimaryFont;
   m_letterSpacing = other.m_letterSpacing;
   m_wordSpacing = other.m_wordSpacing;
   m_isPlatformFont = other.m_isPlatformFont;
@@ -156,11 +141,9 @@ bool Font::operator==(const Font& other) const {
              (other.m_fontList ? other.m_fontList->generation() : 0);
 }
 
-void Font::cachePrimaryFont() const {
+const SimpleFontData* Font::primaryFont() const {
   ASSERT(m_fontList);
-  ASSERT(!m_cachedPrimaryFont);
-  m_cachedPrimaryFont =
-      m_fontList->primaryFont(this)->fontDataForCharacter(' ');
+  return m_fontList->primarySimpleFontData(this);
 }
 
 const FontData* Font::fontDataAt(unsigned index) const {
@@ -187,9 +170,6 @@ void Font::update(PassRefPtr<FontSelector> fontSelector) const {
   if (!m_fontList)
     m_fontList = FontFallbackList::create();
   m_fontList->invalidate(fontSelector);
-  m_cachedPrimaryFont = 0;
-  m_pageZero = 0;
-  m_pages.clear();
 }
 
 bool Font::isFixedPitch() const {
