@@ -26,6 +26,8 @@
 #ifndef StorageMap_h
 #define StorageMap_h
 
+#if ENABLE(DOM_STORAGE)
+
 #include "PlatformString.h"
 #include "StringHash.h"
 
@@ -63,5 +65,7 @@ class StorageMap : public RefCounted<StorageMap> {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(DOM_STORAGE)
 
 #endif  // StorageMap_h

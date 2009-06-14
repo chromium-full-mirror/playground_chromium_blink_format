@@ -26,6 +26,8 @@
 #include "config.h"
 #include "Storage.h"
 
+#if ENABLE(DOM_STORAGE)
+
 #include "StorageArea.h"
 #include "PlatformString.h"
 #include <wtf/PassRefPtr.h>
@@ -96,3 +98,5 @@ bool Storage::contains(const String& key) const {
   return m_storageArea->contains(key);
 }
 }
+
+#endif  // ENABLE(DOM_STORAGE)

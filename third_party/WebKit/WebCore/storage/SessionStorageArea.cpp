@@ -26,6 +26,8 @@
 #include "config.h"
 #include "SessionStorageArea.h"
 
+#if ENABLE(DOM_STORAGE)
+
 #include "DOMWindow.h"
 #include "EventNames.h"
 #include "Frame.h"
@@ -94,3 +96,5 @@ void SessionStorageArea::dispatchStorageEvent(const String& key,
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(DOM_STORAGE)

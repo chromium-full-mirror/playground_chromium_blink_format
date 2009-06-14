@@ -26,6 +26,8 @@
 #include "config.h"
 #include "LocalStorage.h"
 
+#if ENABLE(DOM_STORAGE)
+
 #include "CString.h"
 #include "EventNames.h"
 #include "FileSystem.h"
@@ -169,3 +171,5 @@ void LocalStorage::scheduleSync(PassRefPtr<LocalStorageArea> area) {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(DOM_STORAGE)

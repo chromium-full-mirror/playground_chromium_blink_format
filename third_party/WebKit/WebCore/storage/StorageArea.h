@@ -26,6 +26,8 @@
 #ifndef StorageArea_h
 #define StorageArea_h
 
+#if ENABLE(DOM_STORAGE)
+
 #include "PlatformString.h"
 
 #include <wtf/Forward.h>
@@ -101,5 +103,7 @@ class StorageArea : public RefCounted<StorageArea> {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(DOM_STORAGE)
 
 #endif  // StorageArea_h

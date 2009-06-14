@@ -26,6 +26,8 @@
 #include "config.h"
 #include "SessionStorage.h"
 
+#if ENABLE(DOM_STORAGE)
+
 #include "EventNames.h"
 #include "Frame.h"
 #include "FrameTree.h"
@@ -69,3 +71,5 @@ PassRefPtr<StorageArea> SessionStorage::storageArea(SecurityOrigin* origin) {
   return storageArea.release();
 }
 }
+
+#endif  // ENABLE(DOM_STORAGE)

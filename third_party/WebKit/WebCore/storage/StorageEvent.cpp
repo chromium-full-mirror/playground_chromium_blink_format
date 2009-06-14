@@ -26,6 +26,8 @@
 #include "config.h"
 #include "StorageEvent.h"
 
+#if ENABLE(DOM_STORAGE)
+
 #include "DOMWindow.h"
 #include "Storage.h"
 
@@ -69,3 +71,5 @@ void StorageEvent::initStorageEvent(const AtomicString& type,
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(DOM_STORAGE)

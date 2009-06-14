@@ -26,6 +26,8 @@
 #ifndef SessionStorage_h
 #define SessionStorage_h
 
+#if ENABLE(DOM_STORAGE)
+
 #include "SecurityOriginHash.h"
 #include "SessionStorageArea.h"
 
@@ -67,5 +69,7 @@ class SessionStorage : public RefCounted<SessionStorage> {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(DOM_STORAGE)
 
 #endif  // SessionStorage_h

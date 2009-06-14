@@ -26,6 +26,8 @@
 #ifndef LocalStorageTask_h
 #define LocalStorageTask_h
 
+#if ENABLE(DOM_STORAGE)
+
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Threading.h>
@@ -81,5 +83,7 @@ class LocalStorageTask : public ThreadSafeShared<LocalStorageTask> {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(DOM_STORAGE)
 
 #endif  // LocalStorageTask_h

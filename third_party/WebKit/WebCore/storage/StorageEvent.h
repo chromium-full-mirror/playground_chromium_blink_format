@@ -26,6 +26,8 @@
 #ifndef StorageEvent_h
 #define StorageEvent_h
 
+#if ENABLE(DOM_STORAGE)
+
 #include "Event.h"
 #include "Storage.h"
 
@@ -93,5 +95,7 @@ class StorageEvent : public Event {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(DOM_STORAGE)
 
 #endif  // StorageEvent_h
