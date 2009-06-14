@@ -58,11 +58,11 @@ void RGBA32Buffer::copyBitmapData(const RGBA32Buffer& other) {
   setHasAlpha(other.m_hasAlpha);
 }
 
-bool RGBA32Buffer::setSize(int width, int height) {
+bool RGBA32Buffer::setSize(int newWidth, int newHeight) {
   // NOTE: This has no way to check for allocation failure if the
   // requested size was too big...
-  m_bytes.resize(width * height);
-  m_size = IntSize(width, height);
+  m_bytes.resize(newWidth * newHeight);
+  m_size = IntSize(newWidth, newHeight);
 
   // Zero the image.
   zeroFill();
@@ -82,6 +82,10 @@ bool RGBA32Buffer::hasAlpha() const {
 
 void RGBA32Buffer::setHasAlpha(bool alpha) {
   m_hasAlpha = alpha;
+}
+
+void setStatus(FrameStatus status) {
+  m_status = status;
 }
 
 RGBA32Buffer& RGBA32Buffer::operator=(const RGBA32Buffer& other) {
