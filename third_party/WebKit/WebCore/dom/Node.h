@@ -114,7 +114,7 @@ class Node : public EventTarget, public TreeShared<Node> {
   static void dumpStatistics();
 
   enum StyleChange { NoChange, NoInherit, Inherit, Detach, Force };
-  static StyleChange diff(RenderStyle*, RenderStyle*);
+  static StyleChange diff(const RenderStyle*, const RenderStyle*);
 
   Node(Document*,
        bool isElement = false,
