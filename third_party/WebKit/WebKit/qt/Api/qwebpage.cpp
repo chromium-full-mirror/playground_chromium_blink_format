@@ -1693,8 +1693,8 @@ void QWebPage::setFixedContentsSize(const QSize& size) const {
       view->setUseFixedLayout(true);
       view->setFixedLayoutSize(size);
       view->forceLayout();
-    } else if (!view->useFixedLayout()) {
-      view->setUseFixedLayout(true);
+    } else if (view->useFixedLayout()) {
+      view->setUseFixedLayout(false);
       view->forceLayout();
     }
   }
