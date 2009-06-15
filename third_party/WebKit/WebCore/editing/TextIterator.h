@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -55,6 +55,21 @@ PassRefPtr<Range> findPlainText(const Range*,
                                 bool forward,
                                 bool caseSensitive);
 
+class BitStack {
+ public:
+  BitStack();
+
+  void push(bool);
+  void pop();
+
+  bool top() const;
+  unsigned size() const;
+
+ private:
+  unsigned m_size;
+  Vector<unsigned, 1> m_words;
+};
+
 // Iterates through the DOM range, returning all the text, and 0-length
 // boundaries
 // at points where replaced elements break up the text flow.  The text comes
@@ -109,7 +124,7 @@ class TextIterator {
   int m_offset;
   bool m_handledNode;
   bool m_handledChildren;
-  bool m_inShadowContent;
+  BitStack m_fullyClippedStack;
 
   // The range.
   Node* m_startContainer;
@@ -162,8 +177,8 @@ class TextIterator {
 
 // Iterates through the DOM range, returning all the text, and 0-length
 // boundaries
-// at points where replaced elements break up the text flow.  The text comes
-// back in
+// at points where replaced elements break up the text flow. The text comes back
+// in
 // chunks so as to optimize for performance of the iteration.
 class SimplifiedBackwardsTextIterator {
  public:
@@ -183,7 +198,7 @@ class SimplifiedBackwardsTextIterator {
   bool handleTextNode();
   bool handleReplacedElement();
   bool handleNonTextNode();
-  void emitCharacter(UChar, Node* Node, int startOffset, int endOffset);
+  void emitCharacter(UChar, Node*, int startOffset, int endOffset);
 
   // Current position, not necessarily of the text being returned, but position
   // as we walk through the DOM tree.
@@ -191,6 +206,7 @@ class SimplifiedBackwardsTextIterator {
   int m_offset;
   bool m_handledNode;
   bool m_handledChildren;
+  BitStack m_fullyClippedStack;
 
   // End of the range.
   Node* m_startNode;
@@ -225,7 +241,7 @@ class CharacterIterator {
  public:
   CharacterIterator();
   explicit CharacterIterator(
-      const Range* r,
+      const Range*,
       bool emitCharactersBetweenAllVisiblePositions = false,
       bool enterTextControls = false);
 
@@ -277,7 +293,7 @@ class BackwardsCharacterIterator {
 class WordAwareIterator {
  public:
   WordAwareIterator();
-  explicit WordAwareIterator(const Range* r);
+  explicit WordAwareIterator(const Range*);
 
   bool atEnd() const { return !m_didLookAhead && m_textIterator.atEnd(); }
   void advance();
