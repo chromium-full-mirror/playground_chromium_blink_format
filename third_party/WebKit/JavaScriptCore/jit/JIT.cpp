@@ -524,8 +524,6 @@ void JIT::privateCompile() {
         m_callStructureStubCompilationInfo[i].hotPathBegin);
     info.hotPathOther = patchBuffer.locationOfNearCall(
         m_callStructureStubCompilationInfo[i].hotPathOther);
-    info.coldPathOther = patchBuffer.locationOf(
-        m_callStructureStubCompilationInfo[i].coldPathOther);
   }
 #endif
   unsigned methodCallCount = m_methodCallCompilationInfo.size();
@@ -1029,7 +1027,8 @@ void JIT::linkCall(JSFunction* callee,
                    CodeBlock* calleeCodeBlock,
                    JITCode& code,
                    CallLinkInfo* callLinkInfo,
-                   int callerArgCount) {
+                   int callerArgCount,
+                   JSGlobalData* globalData) {
   // Currently we only link calls with the exact number of arguments.
   // If this is a native call calleeCodeBlock is null so the number of
   // parameters is unimportant
@@ -1043,10 +1042,9 @@ void JIT::linkCall(JSFunction* callee,
     callLinkInfo->hotPathOther.relink(code.addressForCall());
   }
 
-  // patch the instruction that jumps out to the cold path, so that we only try
-  // to link once.
-  callLinkInfo->hotPathBegin.jumpAtOffset(patchOffsetOpCallCompareToJump)
-      .relink(callLinkInfo->coldPathOther);
+  // patch the call so we do not continue to try to link.
+  callLinkInfo->callReturnLocation.relink(
+      globalData->jitStubs.ctiVirtualCall());
 }
 
 }  // namespace JSC

@@ -1366,7 +1366,7 @@ DEFINE_STUB_FUNCTION(void*, vm_lazyLinkCall) {
       &stackFrame.callFrame->callerFrame()->codeBlock()->getCallLinkInfo(
           stackFrame.args[1].returnAddress());
   JIT::linkCall(callee, codeBlock, jitCode, callLinkInfo,
-                stackFrame.args[2].int32());
+                stackFrame.args[2].int32(), stackFrame.globalData);
 
   return jitCode.addressForCall().executableAddress();
 }

@@ -138,7 +138,6 @@ struct StructureStubCompilationInfo {
   MacroAssembler::DataLabelPtr hotPathBegin;
   MacroAssembler::Call hotPathOther;
   MacroAssembler::Call callReturnLocation;
-  MacroAssembler::Label coldPathOther;
 };
 
 struct MethodCallCompilationInfo {
@@ -456,7 +455,8 @@ class JIT : private MacroAssembler {
                        CodeBlock* calleeCodeBlock,
                        JITCode&,
                        CallLinkInfo*,
-                       int callerArgCount);
+                       int callerArgCount,
+                       JSGlobalData*);
   static void unlinkCall(CallLinkInfo*);
 
  private:

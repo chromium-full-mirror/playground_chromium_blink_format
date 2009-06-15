@@ -94,7 +94,6 @@ struct CallLinkInfo {
   MacroAssembler::CodeLocationNearCall callReturnLocation;
   MacroAssembler::CodeLocationDataLabelPtr hotPathBegin;
   MacroAssembler::CodeLocationNearCall hotPathOther;
-  MacroAssembler::CodeLocationLabel coldPathOther;
   CodeBlock* callee;
   unsigned position;
 
