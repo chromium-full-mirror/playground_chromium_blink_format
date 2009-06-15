@@ -1024,6 +1024,10 @@ QWebHitTestResult QWebFrame::hitTestContent(const QPoint& pos) const {
   HitTestResult result = d->frame->eventHandler()->hitTestResultAtPoint(
       d->frame->view()->windowToContents(pos), /*allowShadowContent*/ false,
       /*ignoreClipping*/ true);
+
+  if (result.scrollbar())
+    return QWebHitTestResult();
+
   return QWebHitTestResult(new QWebHitTestResultPrivate(result));
 }
 
@@ -1487,14 +1491,4 @@ QWebFrame* QWebHitTestResult::frame() const {
   if (!d)
     return 0;
   return d->frame;
-}
-
-/*!
-    \since 4.6
-    Returns true if the test includes a scrollbar.
-*/
-bool QWebHitTestResult::isScrollBar() const {
-  if (!d)
-    return false;
-  return d->isScrollBar;
 }

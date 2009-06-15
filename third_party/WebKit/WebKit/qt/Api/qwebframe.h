@@ -92,8 +92,6 @@ class QWEBKIT_EXPORT QWebHitTestResult {
 
   QWebFrame* frame() const;
 
-  bool isScrollBar() const;
-
  private:
   QWebHitTestResult(QWebHitTestResultPrivate* priv);
   QWebHitTestResultPrivate* d;
