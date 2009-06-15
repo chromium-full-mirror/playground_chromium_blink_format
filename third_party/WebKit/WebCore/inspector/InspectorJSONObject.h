@@ -27,57 +27,34 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "JSONObject.h"
+#ifndef InspectorJSONObject_h
+#define InspectorJSONObject_h
 
-#include "PlatformString.h"
 #include "ScriptObject.h"
 #include "ScriptState.h"
 
 namespace WebCore {
+class String;
 
-JSONObject::JSONObject(ScriptState* scriptState) : m_scriptState(scriptState) {
-  m_scriptObject = ScriptObject::createNew(scriptState);
+class InspectorJSONObject {
+ public:
+  bool set(const String& name, const String&);
+  bool set(const char* name, const InspectorJSONObject&);
+  bool set(const char* name, const ScriptObject&);
+  bool set(const char* name, const String&);
+  bool set(const char* name, double);
+  bool set(const char* name, long long);
+  bool set(const char* name, int);
+  bool set(const char* name, bool);
+  ScriptObject scriptObject() const;
+
+  static InspectorJSONObject createNew(ScriptState* scriptState);
+
+ private:
+  InspectorJSONObject(ScriptState* scriptState);
+  ScriptState* m_scriptState;
+  ScriptObject m_scriptObject;
+};
 }
 
-bool JSONObject::set(const String& name, const String& value) {
-  return m_scriptObject.set(m_scriptState, name, value);
-}
-
-bool JSONObject::set(const char* name, const ScriptObject& value) {
-  return m_scriptObject.set(m_scriptState, name, value);
-}
-
-bool JSONObject::set(const char* name, const JSONObject& value) {
-  return set(name, value.scriptObject());
-}
-
-bool JSONObject::set(const char* name, const String& value) {
-  return m_scriptObject.set(m_scriptState, name, value);
-}
-
-bool JSONObject::set(const char* name, double value) {
-  return m_scriptObject.set(m_scriptState, name, value);
-}
-
-bool JSONObject::set(const char* name, long long value) {
-  return m_scriptObject.set(m_scriptState, name, value);
-}
-
-bool JSONObject::set(const char* name, int value) {
-  return m_scriptObject.set(m_scriptState, name, value);
-}
-
-bool JSONObject::set(const char* name, bool value) {
-  return m_scriptObject.set(m_scriptState, name, value);
-}
-
-ScriptObject JSONObject::scriptObject() const {
-  return m_scriptObject;
-}
-
-JSONObject JSONObject::createNew(ScriptState* scriptState) {
-  return JSONObject(scriptState);
-}
-
-}  // namespace WebCore
+#endif  // InspectorJSONObject.h

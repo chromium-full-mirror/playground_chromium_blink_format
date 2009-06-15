@@ -32,7 +32,7 @@
 #include "ConsoleMessage.h"
 
 #include "InspectorFrontend.h"
-#include "JSONObject.h"
+#include "InspectorJSONObject.h"
 #include "ScriptCallStack.h"
 #include "ScriptObjectQuarantine.h"
 
@@ -81,7 +81,7 @@ ConsoleMessage::ConsoleMessage(MessageSource s,
 }
 
 void ConsoleMessage::addToConsole(InspectorFrontend* frontend) {
-  JSONObject jsonObj = frontend->newJSONObject();
+  InspectorJSONObject jsonObj = frontend->newInspectorJSONObject();
   jsonObj.set("source", static_cast<int>(m_source));
   jsonObj.set("level", static_cast<int>(m_level));
   jsonObj.set("line", static_cast<int>(m_line));
