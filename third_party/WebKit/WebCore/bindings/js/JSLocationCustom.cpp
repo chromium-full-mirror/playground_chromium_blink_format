@@ -62,9 +62,9 @@ static JSValue nonCachingStaticAssignFunctionGetter(
                                       jsLocationPrototypeFunctionAssign);
 }
 
-bool JSLocation::customGetOwnPropertySlot(ExecState* exec,
-                                          const Identifier& propertyName,
-                                          PropertySlot& slot) {
+bool JSLocation::getOwnPropertySlotDelegate(ExecState* exec,
+                                            const Identifier& propertyName,
+                                            PropertySlot& slot) {
   Frame* frame = impl()->frame();
   if (!frame) {
     slot.setUndefined();
@@ -73,7 +73,7 @@ bool JSLocation::customGetOwnPropertySlot(ExecState* exec,
 
   // When accessing Location cross-domain, functions are always the native
   // built-in ones.
-  // See JSDOMWindow::customGetOwnPropertySlot for additional details.
+  // See JSDOMWindow::getOwnPropertySlotDelegate for additional details.
 
   // Our custom code is only needed to implement the Window cross-domain scheme,
   // so if access is
@@ -110,10 +110,10 @@ bool JSLocation::customGetOwnPropertySlot(ExecState* exec,
   return true;
 }
 
-bool JSLocation::customPut(ExecState* exec,
-                           const Identifier& propertyName,
-                           JSValue value,
-                           PutPropertySlot& slot) {
+bool JSLocation::putDelegate(ExecState* exec,
+                             const Identifier& propertyName,
+                             JSValue value,
+                             PutPropertySlot& slot) {
   Frame* frame = impl()->frame();
   if (!frame)
     return true;
@@ -338,10 +338,10 @@ JSValue JSLocation::toString(ExecState* exec, const ArgList&) {
   return jsString(exec, impl()->toString());
 }
 
-bool JSLocationPrototype::customPut(ExecState* exec,
-                                    const Identifier& propertyName,
-                                    JSValue,
-                                    PutPropertySlot&) {
+bool JSLocationPrototype::putDelegate(ExecState* exec,
+                                      const Identifier& propertyName,
+                                      JSValue,
+                                      PutPropertySlot&) {
   return (propertyName == exec->propertyNames().toString ||
           propertyName == exec->propertyNames().valueOf);
 }

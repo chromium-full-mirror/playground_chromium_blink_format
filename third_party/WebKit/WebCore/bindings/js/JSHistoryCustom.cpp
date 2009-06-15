@@ -60,12 +60,12 @@ static JSValue nonCachingStaticGoFunctionGetter(ExecState* exec,
       PrototypeFunction(exec, 1, propertyName, jsHistoryPrototypeFunctionGo);
 }
 
-bool JSHistory::customGetOwnPropertySlot(ExecState* exec,
-                                         const Identifier& propertyName,
-                                         PropertySlot& slot) {
+bool JSHistory::getOwnPropertySlotDelegate(ExecState* exec,
+                                           const Identifier& propertyName,
+                                           PropertySlot& slot) {
   // When accessing History cross-domain, functions are always the native
   // built-in ones.
-  // See JSDOMWindow::customGetOwnPropertySlot for additional details.
+  // See JSDOMWindow::getOwnPropertySlotDelegate for additional details.
 
   // Our custom code is only needed to implement the Window cross-domain scheme,
   // so if access is
@@ -104,10 +104,10 @@ bool JSHistory::customGetOwnPropertySlot(ExecState* exec,
   return true;
 }
 
-bool JSHistory::customPut(ExecState* exec,
-                          const Identifier&,
-                          JSValue,
-                          PutPropertySlot&) {
+bool JSHistory::putDelegate(ExecState* exec,
+                            const Identifier&,
+                            JSValue,
+                            PutPropertySlot&) {
   // Only allow putting by frames in the same origin.
   if (!allowsAccessFromFrame(exec, impl()->frame()))
     return true;

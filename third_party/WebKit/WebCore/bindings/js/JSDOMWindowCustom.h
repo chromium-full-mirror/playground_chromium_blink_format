@@ -44,7 +44,7 @@ JSC::JSValue nonCachingStaticFunctionGetter(JSC::ExecState* exec,
       JSC::PrototypeFunction(exec, length, propertyName, nativeFunction);
 }
 
-ALWAYS_INLINE bool JSDOMWindow::customGetOwnPropertySlot(
+ALWAYS_INLINE bool JSDOMWindow::getOwnPropertySlotDelegate(
     JSC::ExecState* exec,
     const JSC::Identifier& propertyName,
     JSC::PropertySlot& slot) {
@@ -156,10 +156,10 @@ ALWAYS_INLINE bool JSDOMWindow::customGetOwnPropertySlot(
   return false;
 }
 
-inline bool JSDOMWindow::customPut(JSC::ExecState* exec,
-                                   const JSC::Identifier& propertyName,
-                                   JSC::JSValue value,
-                                   JSC::PutPropertySlot& slot) {
+inline bool JSDOMWindow::putDelegate(JSC::ExecState* exec,
+                                     const JSC::Identifier& propertyName,
+                                     JSC::JSValue value,
+                                     JSC::PutPropertySlot& slot) {
   if (!impl()->frame())
     return true;
 
