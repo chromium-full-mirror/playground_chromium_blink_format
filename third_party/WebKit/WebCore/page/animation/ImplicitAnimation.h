@@ -77,6 +77,9 @@ class ImplicitAnimation : public AnimationBase {
 
   virtual double timeToNextService();
 
+  bool active() const { return m_active; }
+  void setActive(bool b) { m_active = b; }
+
  protected:
   bool shouldSendEventForListener(Document::ListenerType) const;
   bool sendTransitionEvent(const AtomicString&, double elapsedTime);
@@ -96,6 +99,7 @@ class ImplicitAnimation : public AnimationBase {
   int m_animatingProperty;   // Specific property for this ImplicitAnimation
   bool m_overridden;  // true when there is a keyframe animation that overrides
                       // the transitioning property
+  bool m_active;      // used for culling the list of transitions
 
   // The two styles that we are blending.
   RefPtr<RenderStyle> m_fromStyle;

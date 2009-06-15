@@ -49,6 +49,7 @@ ImplicitAnimation::ImplicitAnimation(const Animation* transition,
       m_transitionProperty(transition->property()),
       m_animatingProperty(animatingProperty),
       m_overridden(false),
+      m_active(true),
       m_fromStyle(fromStyle) {
   ASSERT(animatingProperty != cAnimateAll);
 }
