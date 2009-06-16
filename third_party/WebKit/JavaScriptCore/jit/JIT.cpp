@@ -433,7 +433,7 @@ void JIT::privateCompile() {
 
   ASSERT(m_jmpTable.isEmpty());
 
-  PatchBuffer patchBuffer(
+  LinkBuffer patchBuffer(
       this, m_globalData->executableAllocator.poolForSize(m_assembler.size()));
 
   // Translate vPC offsets into addresses in JIT generated code, for switch
@@ -942,7 +942,7 @@ void JIT::privateCompileCTIMachineTrampolines(
 
   // All trampolines constructed! copy the code, link up calls, and set the
   // pointers on the Machine object.
-  PatchBuffer patchBuffer(
+  LinkBuffer patchBuffer(
       this, m_globalData->executableAllocator.poolForSize(m_assembler.size()));
 
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)

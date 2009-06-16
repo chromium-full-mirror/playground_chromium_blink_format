@@ -1514,7 +1514,7 @@ class ARMv7Assembler {
   }
 
   // bah, this mathod should really be static, since it is used by the
-  // PatchBuffer.
+  // LinkBuffer.
   // return a bool saying whether the link was successful?
   static void linkCall(void* code, JmpSrc from, void* to) {
     ASSERT(!(reinterpret_cast<intptr_t>(code) & 1));

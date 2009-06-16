@@ -1467,8 +1467,8 @@ class RegexGenerator : private MacroAssembler {
   void compile(JSGlobalData* globalData, RegexCodeBlock& jitObject) {
     generate();
 
-    PatchBuffer patchBuffer(
-        this, globalData->executableAllocator.poolForSize(size()));
+    LinkBuffer patchBuffer(this,
+                           globalData->executableAllocator.poolForSize(size()));
 
     for (unsigned i = 0; i < m_backtrackRecords.size(); ++i)
       patchBuffer.patch(

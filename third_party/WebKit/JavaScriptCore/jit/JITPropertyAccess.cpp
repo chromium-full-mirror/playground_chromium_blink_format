@@ -612,7 +612,7 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
   restoreArgumentReferenceForTrampoline();
   Call failureCall = tailRecursiveCall();
 
-  PatchBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
 
   patchBuffer.link(failureCall, FunctionPtr(JITStubs::cti_op_put_by_id_fail));
 
@@ -734,7 +734,7 @@ void JIT::privateCompilePatchGetArrayLength(ReturnAddressPtr returnAddress) {
   emitFastArithIntToImmNoCheck(regT2, regT0);
   Jump success = jump();
 
-  PatchBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
 
   // Use the patch information to link the failure cases back to the original
   // slow case routine.
@@ -797,7 +797,7 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
 
   Jump success = jump();
 
-  PatchBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
 
   // Use the patch information to link the failure cases back to the original
   // slow case routine.
@@ -838,7 +838,7 @@ void JIT::privateCompileGetByIdSelfList(
   compileGetDirectOffset(regT0, regT0, structure, cachedOffset);
   Jump success = jump();
 
-  PatchBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
 
   // Use the patch information to link the failure cases back to the original
   // slow case routine.
@@ -902,7 +902,7 @@ void JIT::privateCompileGetByIdProtoList(
 
   Jump success = jump();
 
-  PatchBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
 
   // Use the patch information to link the failure cases back to the original
   // slow case routine.
@@ -972,7 +972,7 @@ void JIT::privateCompileGetByIdChainList(
   compileGetDirectOffset(protoObject, regT0, cachedOffset);
   Jump success = jump();
 
-  PatchBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
 
   // Use the patch information to link the failure cases back to the original
   // slow case routine.
@@ -1039,7 +1039,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
   compileGetDirectOffset(protoObject, regT0, cachedOffset);
   Jump success = jump();
 
-  PatchBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
 
   // Use the patch information to link the failure cases back to the original
   // slow case routine.
