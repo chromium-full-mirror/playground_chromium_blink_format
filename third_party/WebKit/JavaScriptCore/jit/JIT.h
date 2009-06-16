@@ -337,6 +337,10 @@ class JIT : private MacroAssembler {
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
+#if ENABLE(OPCODE_SAMPLING)
+    jit->m_bytecodeIndex =
+        jit->m_codeBlock->getCallReturnOffset(returnAddress.value());
+#endif
     jit.privateCompileGetByIdProto(stubInfo, structure, prototypeStructure,
                                    cachedOffset, returnAddress, callFrame);
   }
@@ -350,6 +354,10 @@ class JIT : private MacroAssembler {
       Structure* structure,
       size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
+#if ENABLE(OPCODE_SAMPLING)
+    jit->m_bytecodeIndex =
+        jit->m_codeBlock->getCallReturnOffset(returnAddress.value());
+#endif
     jit.privateCompileGetByIdSelfList(stubInfo, polymorphicStructures,
                                       currentIndex, structure, cachedOffset);
   }
@@ -364,6 +372,10 @@ class JIT : private MacroAssembler {
       Structure* prototypeStructure,
       size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
+#if ENABLE(OPCODE_SAMPLING)
+    jit->m_bytecodeIndex =
+        jit->m_codeBlock->getCallReturnOffset(returnAddress.value());
+#endif
     jit.privateCompileGetByIdProtoList(
         stubInfo, prototypeStructureList, currentIndex, structure,
         prototypeStructure, cachedOffset, callFrame);
@@ -380,6 +392,10 @@ class JIT : private MacroAssembler {
       size_t count,
       size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
+#if ENABLE(OPCODE_SAMPLING)
+    jit->m_bytecodeIndex =
+        jit->m_codeBlock->getCallReturnOffset(returnAddress.value());
+#endif
     jit.privateCompileGetByIdChainList(stubInfo, prototypeStructureList,
                                        currentIndex, structure, chain, count,
                                        cachedOffset, callFrame);
@@ -395,6 +411,10 @@ class JIT : private MacroAssembler {
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
+#if ENABLE(OPCODE_SAMPLING)
+    jit->m_bytecodeIndex =
+        jit->m_codeBlock->getCallReturnOffset(returnAddress.value());
+#endif
     jit.privateCompileGetByIdChain(stubInfo, structure, chain, count,
                                    cachedOffset, returnAddress, callFrame);
   }
@@ -408,6 +428,10 @@ class JIT : private MacroAssembler {
                                        StructureChain* chain,
                                        ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
+#if ENABLE(OPCODE_SAMPLING)
+    jit->m_bytecodeIndex =
+        jit->m_codeBlock->getCallReturnOffset(returnAddress.value());
+#endif
     jit.privateCompilePutByIdTransition(stubInfo, oldStructure, newStructure,
                                         cachedOffset, chain, returnAddress);
   }
@@ -422,6 +446,10 @@ class JIT : private MacroAssembler {
       CodePtr* ctiVirtualCall,
       CodePtr* ctiNativeCallThunk) {
     JIT jit(globalData);
+#if ENABLE(OPCODE_SAMPLING)
+    jit->m_bytecodeIndex =
+        jit->m_codeBlock->getCallReturnOffset(returnAddress.value());
+#endif
     jit.privateCompileCTIMachineTrampolines(
         executablePool, globalData, ctiArrayLengthTrampoline,
         ctiStringLengthTrampoline, ctiVirtualCallPreLink, ctiVirtualCallLink,
@@ -445,6 +473,10 @@ class JIT : private MacroAssembler {
                                          CodeBlock* codeBlock,
                                          ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
+#if ENABLE(OPCODE_SAMPLING)
+    jit->m_bytecodeIndex =
+        jit->m_codeBlock->getCallReturnOffset(returnAddress.value());
+#endif
     return jit.privateCompilePatchGetArrayLength(returnAddress);
   }
 

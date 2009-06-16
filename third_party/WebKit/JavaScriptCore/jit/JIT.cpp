@@ -73,6 +73,7 @@ JIT::JIT(JSGlobalData* globalData, CodeBlock* codeBlock)
           codeBlock ? codeBlock->numberOfStructureStubInfos() : 0),
       m_callStructureStubCompilationInfo(
           codeBlock ? codeBlock->numberOfCallLinkInfos() : 0),
+      m_bytecodeIndex(-1),
       m_lastResultBytecodeRegister(std::numeric_limits<int>::max()),
       m_jumpTargetsPosition(0) {}
 
