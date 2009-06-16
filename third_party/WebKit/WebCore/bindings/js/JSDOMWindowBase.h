@@ -42,7 +42,6 @@ class SecurityOrigin;
 
 class JSDOMWindowBasePrivate;
 
-// This is the only WebCore JS binding which does not inherit from DOMObject
 class JSDOMWindowBase : public JSDOMGlobalObject {
   typedef JSDOMGlobalObject Base;
 
