@@ -5233,7 +5233,8 @@ class EnumTextMatches : public IEnumTextMatches {
   }
 
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppv) {
-    if (riid == IID_IUnknown || riid == IID_IEnumTextMatches) {
+    if (IsEqualGUID(riid, IID_IUnknown) ||
+        IsEqualGUID(riid, IID_IEnumTextMatches)) {
       *ppv = this;
       AddRef();
     }

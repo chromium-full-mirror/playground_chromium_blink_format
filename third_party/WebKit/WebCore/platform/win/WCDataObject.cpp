@@ -158,8 +158,9 @@ WCDataObject::~WCDataObject() {
 
 STDMETHODIMP WCDataObject::QueryInterface(REFIID riid, void** ppvObject) {
   *ppvObject = 0;
-  if (IID_IUnknown == riid || IID_IDataObject == riid)
+  if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IDataObject)) {
     *ppvObject = this;
+  }
   if (*ppvObject) {
     AddRef();
     return S_OK;
