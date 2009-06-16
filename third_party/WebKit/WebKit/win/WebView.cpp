@@ -1425,9 +1425,9 @@ bool WebView::mouseWheel(WPARAM wParam, LPARAM lParam, bool isMouseHWheel) {
   if (wParam & MK_CONTROL) {
     short delta = short(HIWORD(wParam));
     if (delta < 0)
-      makeTextLarger(0);
-    else
       makeTextSmaller(0);
+    else
+      makeTextLarger(0);
     return true;
   }
 
