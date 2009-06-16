@@ -1926,10 +1926,9 @@ RegisterID* BytecodeGenerator::emitCatch(RegisterID* targetRegister,
                                          Label* start,
                                          Label* end) {
 #if ENABLE(JIT)
-  HandlerInfo info = {start->offsetFrom(0), end->offsetFrom(0),
-                      instructions().size(),
-                      m_dynamicScopeDepth + m_baseScopeDepth,
-                      MacroAssembler::CodeLocationLabel()};
+  HandlerInfo info = {
+      start->offsetFrom(0), end->offsetFrom(0), instructions().size(),
+      m_dynamicScopeDepth + m_baseScopeDepth, CodeLocationLabel()};
 #else
   HandlerInfo info = {start->offsetFrom(0), end->offsetFrom(0),
                       instructions().size(),

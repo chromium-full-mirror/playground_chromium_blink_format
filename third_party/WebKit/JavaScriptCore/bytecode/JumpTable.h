@@ -40,7 +40,7 @@ namespace JSC {
 struct OffsetLocation {
   int32_t branchOffset;
 #if ENABLE(JIT)
-  MacroAssembler::CodeLocationLabel ctiOffset;
+  CodeLocationLabel ctiOffset;
 #endif
 };
 
@@ -48,7 +48,7 @@ struct StringJumpTable {
   typedef HashMap<RefPtr<UString::Rep>, OffsetLocation> StringOffsetTable;
   StringOffsetTable offsetTable;
 #if ENABLE(JIT)
-  MacroAssembler::CodeLocationLabel
+  CodeLocationLabel
       ctiDefault;  // FIXME: it should not be necessary to store this.
 #endif
 
@@ -61,7 +61,7 @@ struct StringJumpTable {
   }
 
 #if ENABLE(JIT)
-  inline MacroAssembler::CodeLocationLabel ctiForValue(UString::Rep* value) {
+  inline CodeLocationLabel ctiForValue(UString::Rep* value) {
     StringOffsetTable::const_iterator end = offsetTable.end();
     StringOffsetTable::const_iterator loc = offsetTable.find(value);
     if (loc == end)
@@ -76,8 +76,8 @@ struct SimpleJumpTable {
   Vector<int32_t> branchOffsets;
   int32_t min;
 #if ENABLE(JIT)
-  Vector<MacroAssembler::CodeLocationLabel> ctiOffsets;
-  MacroAssembler::CodeLocationLabel ctiDefault;
+  Vector<CodeLocationLabel> ctiOffsets;
+  CodeLocationLabel ctiDefault;
 #endif
 
   int32_t offsetForValue(int32_t value, int32_t defaultOffset);
@@ -87,7 +87,7 @@ struct SimpleJumpTable {
   }
 
 #if ENABLE(JIT)
-  inline MacroAssembler::CodeLocationLabel ctiForValue(int32_t value) {
+  inline CodeLocationLabel ctiForValue(int32_t value) {
     if (value >= min && static_cast<uint32_t>(value - min) < ctiOffsets.size())
       return ctiOffsets[value - min];
     return ctiDefault;

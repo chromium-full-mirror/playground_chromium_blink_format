@@ -504,7 +504,7 @@ void JIT::privateCompile() {
   for (Vector<JSRInfo>::iterator iter = m_jsrSites.begin();
        iter != m_jsrSites.end(); ++iter)
     patchBuffer.patch(iter->storeLocation,
-                      patchBuffer.locationOf(iter->target).addressForJSR());
+                      patchBuffer.locationOf(iter->target).executableAddress());
 
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
   for (unsigned i = 0; i < m_codeBlock->numberOfStructureStubInfos(); ++i) {

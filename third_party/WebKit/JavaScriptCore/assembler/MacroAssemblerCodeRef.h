@@ -52,8 +52,11 @@
 #define ASSERT_VALID_CODE_POINTER(ptr)          \
   ASSERT(reinterpret_cast<intptr_t>(ptr) & ~1); \
   ASSERT(reinterpret_cast<intptr_t>(ptr) & 1)
+#define ASSERT_VALID_CODE_OFFSET(offset) \
+  ASSERT(!(offset & 1))  // Must be multiple of 2.
 #else
 #define ASSERT_VALID_CODE_POINTER(ptr) ASSERT(ptr)
+#define ASSERT_VALID_CODE_OFFSET(offset)  // Anything goes!
 #endif
 
 namespace JSC {
@@ -139,6 +142,8 @@ class MacroAssemblerCodePtr {
     return m_value;
   }
 #endif
+
+  bool operator!() { return !m_value; }
 
  private:
   void* m_value;

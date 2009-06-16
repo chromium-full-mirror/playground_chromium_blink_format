@@ -139,9 +139,9 @@ struct StructureStubInfo {
     } putByIdReplace;
   } u;
 
-  MacroAssembler::CodeLocationLabel stubRoutine;
-  MacroAssembler::CodeLocationCall callReturnLocation;
-  MacroAssembler::CodeLocationLabel hotPathBegin;
+  CodeLocationLabel stubRoutine;
+  CodeLocationCall callReturnLocation;
+  CodeLocationLabel hotPathBegin;
 };
 
 }  // namespace JSC

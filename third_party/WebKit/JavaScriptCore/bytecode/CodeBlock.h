@@ -61,7 +61,7 @@ struct HandlerInfo {
   uint32_t target;
   uint32_t scopeDepth;
 #if ENABLE(JIT)
-  MacroAssembler::CodeLocationLabel nativeCode;
+  CodeLocationLabel nativeCode;
 #endif
 };
 
@@ -91,9 +91,9 @@ struct CallLinkInfo {
   CallLinkInfo() : callee(0) {}
 
   unsigned bytecodeIndex;
-  MacroAssembler::CodeLocationNearCall callReturnLocation;
-  MacroAssembler::CodeLocationDataLabelPtr hotPathBegin;
-  MacroAssembler::CodeLocationNearCall hotPathOther;
+  CodeLocationNearCall callReturnLocation;
+  CodeLocationDataLabelPtr hotPathBegin;
+  CodeLocationNearCall hotPathOther;
   CodeBlock* callee;
   unsigned position;
 
@@ -104,8 +104,8 @@ struct CallLinkInfo {
 struct MethodCallLinkInfo {
   MethodCallLinkInfo() : cachedStructure(0) {}
 
-  MacroAssembler::CodeLocationCall callReturnLocation;
-  MacroAssembler::CodeLocationDataLabelPtr structureLabel;
+  CodeLocationCall callReturnLocation;
+  CodeLocationDataLabelPtr structureLabel;
   Structure* cachedStructure;
 };
 
@@ -144,16 +144,16 @@ struct CallReturnOffsetToBytecodeIndex {
 
 inline void* getStructureStubInfoReturnLocation(
     StructureStubInfo* structureStubInfo) {
-  return structureStubInfo->callReturnLocation.calleeReturnAddressValue();
+  return structureStubInfo->callReturnLocation.executableAddress();
 }
 
 inline void* getCallLinkInfoReturnLocation(CallLinkInfo* callLinkInfo) {
-  return callLinkInfo->callReturnLocation.calleeReturnAddressValue();
+  return callLinkInfo->callReturnLocation.executableAddress();
 }
 
 inline void* getMethodCallLinkInfoReturnLocation(
     MethodCallLinkInfo* methodCallLinkInfo) {
-  return methodCallLinkInfo->callReturnLocation.calleeReturnAddressValue();
+  return methodCallLinkInfo->callReturnLocation.executableAddress();
 }
 
 inline unsigned getCallReturnOffset(CallReturnOffsetToBytecodeIndex* pc) {

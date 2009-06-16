@@ -1009,8 +1009,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_self_fail) {
     if (stubInfo->opcodeID == op_get_by_id_self) {
       ASSERT(!stubInfo->stubRoutine);
       polymorphicStructureList = new PolymorphicAccessStructureList(
-          MacroAssembler::CodeLocationLabel(),
-          stubInfo->u.getByIdSelf.baseObjectStructure);
+          CodeLocationLabel(), stubInfo->u.getByIdSelf.baseObjectStructure);
       stubInfo->initGetByIdSelfList(polymorphicStructureList, 2);
     } else {
       polymorphicStructureList = stubInfo->u.getByIdSelfList.structureList;
@@ -1044,14 +1043,14 @@ static PolymorphicAccessStructureList* getPolymorphicAccessStructureListSlot(
       prototypeStructureList = new PolymorphicAccessStructureList(
           stubInfo->stubRoutine, stubInfo->u.getByIdProto.baseObjectStructure,
           stubInfo->u.getByIdProto.prototypeStructure);
-      stubInfo->stubRoutine.reset();
+      stubInfo->stubRoutine = CodeLocationLabel();
       stubInfo->initGetByIdProtoList(prototypeStructureList, 2);
       break;
     case op_get_by_id_chain:
       prototypeStructureList = new PolymorphicAccessStructureList(
           stubInfo->stubRoutine, stubInfo->u.getByIdChain.baseObjectStructure,
           stubInfo->u.getByIdChain.chain);
-      stubInfo->stubRoutine.reset();
+      stubInfo->stubRoutine = CodeLocationLabel();
       stubInfo->initGetByIdProtoList(prototypeStructureList, 2);
       break;
     case op_get_by_id_proto_list:
@@ -2523,7 +2522,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_throw) {
   }
 
   stackFrame.callFrame = callFrame;
-  void* catchRoutine = handler->nativeCode.addressForExceptionHandler();
+  void* catchRoutine = handler->nativeCode.executableAddress();
   ASSERT(catchRoutine);
   STUB_SET_RETURN_ADDRESS(catchRoutine);
   return JSValue::encode(exceptionValue);
@@ -2730,7 +2729,7 @@ DEFINE_STUB_FUNCTION(void*, op_switch_imm) {
   if (scrutinee.isInt32Fast())
     return codeBlock->immediateSwitchJumpTable(tableIndex)
         .ctiForValue(scrutinee.getInt32Fast())
-        .addressForSwitch();
+        .executableAddress();
   else {
     double value;
     int32_t intValue;
@@ -2738,10 +2737,10 @@ DEFINE_STUB_FUNCTION(void*, op_switch_imm) {
         ((intValue = static_cast<int32_t>(value)) == value))
       return codeBlock->immediateSwitchJumpTable(tableIndex)
           .ctiForValue(intValue)
-          .addressForSwitch();
+          .executableAddress();
     else
       return codeBlock->immediateSwitchJumpTable(tableIndex)
-          .ctiDefault.addressForSwitch();
+          .ctiDefault.executableAddress();
   }
 }
 
@@ -2754,14 +2753,14 @@ DEFINE_STUB_FUNCTION(void*, op_switch_char) {
   CodeBlock* codeBlock = callFrame->codeBlock();
 
   void* result = codeBlock->characterSwitchJumpTable(tableIndex)
-                     .ctiDefault.addressForSwitch();
+                     .ctiDefault.executableAddress();
 
   if (scrutinee.isString()) {
     UString::Rep* value = asString(scrutinee)->value().rep();
     if (value->size() == 1)
       result = codeBlock->characterSwitchJumpTable(tableIndex)
                    .ctiForValue(value->data()[0])
-                   .addressForSwitch();
+                   .executableAddress();
   }
 
   return result;
@@ -2776,13 +2775,13 @@ DEFINE_STUB_FUNCTION(void*, op_switch_string) {
   CodeBlock* codeBlock = callFrame->codeBlock();
 
   void* result = codeBlock->stringSwitchJumpTable(tableIndex)
-                     .ctiDefault.addressForSwitch();
+                     .ctiDefault.executableAddress();
 
   if (scrutinee.isString()) {
     UString::Rep* value = asString(scrutinee)->value().rep();
     result = codeBlock->stringSwitchJumpTable(tableIndex)
                  .ctiForValue(value)
-                 .addressForSwitch();
+                 .executableAddress();
   }
 
   return result;
@@ -2889,7 +2888,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, vm_throw) {
   }
 
   stackFrame.callFrame = callFrame;
-  void* catchRoutine = handler->nativeCode.addressForExceptionHandler();
+  void* catchRoutine = handler->nativeCode.executableAddress();
   ASSERT(catchRoutine);
   STUB_SET_RETURN_ADDRESS(catchRoutine);
   return JSValue::encode(exceptionValue);
