@@ -626,19 +626,22 @@ void JIT::privateCompilePutByIdTransition(
 
   CodeLocationLabel entryLabel = patchBuffer.finalizeCodeAddendum();
   stubInfo->stubRoutine = entryLabel;
-  returnAddress.relinkCallerToTrampoline(entryLabel);
+  RepatchBuffer repatchBuffer;
+  repatchBuffer.relinkCallerToTrampoline(returnAddress, entryLabel);
 }
 
 void JIT::patchGetByIdSelf(StructureStubInfo* stubInfo,
                            Structure* structure,
                            size_t cachedOffset,
                            ProcessorReturnAddress returnAddress) {
+  RepatchBuffer repatchBuffer;
+
   // We don't want to patch more than once - in future go to
   // cti_op_get_by_id_generic.
   // Should probably go to JITStubs::cti_op_get_by_id_fail, but that doesn't do
   // anything interesting right now.
-  returnAddress.relinkCallerToFunction(
-      FunctionPtr(JITStubs::cti_op_get_by_id_self_fail));
+  repatchBuffer.relinkCallerToFunction(
+      returnAddress, FunctionPtr(JITStubs::cti_op_get_by_id_self_fail));
 
   int offset = sizeof(JSValue) * cachedOffset;
 
@@ -646,48 +649,54 @@ void JIT::patchGetByIdSelf(StructureStubInfo* stubInfo,
   // this avoids the extra load
   // and makes the subsequent load's offset automatically correct
   if (structure->isUsingInlineStorage())
-    stubInfo->hotPathBegin.instructionAtOffset(patchOffsetGetByIdExternalLoad)
-        .repatchLoadPtrToLEA();
+    repatchBuffer.repatchLoadPtrToLEA(
+        stubInfo->hotPathBegin.instructionAtOffset(
+            patchOffsetGetByIdExternalLoad));
 
   // Patch the offset into the propoerty map to load from, then patch the
   // Structure to look for.
-  stubInfo->hotPathBegin.dataLabelPtrAtOffset(patchOffsetGetByIdStructure)
-      .repatch(structure);
-  stubInfo->hotPathBegin
-      .dataLabel32AtOffset(patchOffsetGetByIdPropertyMapOffset)
-      .repatch(offset);
+  repatchBuffer.repatch(
+      stubInfo->hotPathBegin.dataLabelPtrAtOffset(patchOffsetGetByIdStructure),
+      structure);
+  repatchBuffer.repatch(stubInfo->hotPathBegin.dataLabel32AtOffset(
+                            patchOffsetGetByIdPropertyMapOffset),
+                        offset);
 }
 
 void JIT::patchMethodCallProto(MethodCallLinkInfo& methodCallLinkInfo,
                                JSFunction* callee,
                                Structure* structure,
                                JSObject* proto) {
+  RepatchBuffer repatchBuffer;
+
   ASSERT(!methodCallLinkInfo.cachedStructure);
   methodCallLinkInfo.cachedStructure = structure;
   structure->ref();
 
-  methodCallLinkInfo.structureLabel.repatch(structure);
-  methodCallLinkInfo.structureLabel
-      .dataLabelPtrAtOffset(patchOffsetMethodCheckProtoObj)
-      .repatch(proto);
-  methodCallLinkInfo.structureLabel
-      .dataLabelPtrAtOffset(patchOffsetMethodCheckProtoStruct)
-      .repatch(proto->structure());
-  methodCallLinkInfo.structureLabel
-      .dataLabelPtrAtOffset(patchOffsetMethodCheckPutFunction)
-      .repatch(callee);
+  repatchBuffer.repatch(methodCallLinkInfo.structureLabel, structure);
+  repatchBuffer.repatch(methodCallLinkInfo.structureLabel.dataLabelPtrAtOffset(
+                            patchOffsetMethodCheckProtoObj),
+                        proto);
+  repatchBuffer.repatch(methodCallLinkInfo.structureLabel.dataLabelPtrAtOffset(
+                            patchOffsetMethodCheckProtoStruct),
+                        proto->structure());
+  repatchBuffer.repatch(methodCallLinkInfo.structureLabel.dataLabelPtrAtOffset(
+                            patchOffsetMethodCheckPutFunction),
+                        callee);
 }
 
 void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
                               Structure* structure,
                               size_t cachedOffset,
                               ProcessorReturnAddress returnAddress) {
+  RepatchBuffer repatchBuffer;
+
   // We don't want to patch more than once - in future go to
   // cti_op_put_by_id_generic.
   // Should probably go to JITStubs::cti_op_put_by_id_fail, but that doesn't do
   // anything interesting right now.
-  returnAddress.relinkCallerToFunction(
-      FunctionPtr(JITStubs::cti_op_put_by_id_generic));
+  repatchBuffer.relinkCallerToFunction(
+      returnAddress, FunctionPtr(JITStubs::cti_op_put_by_id_generic));
 
   int offset = sizeof(JSValue) * cachedOffset;
 
@@ -695,27 +704,24 @@ void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
   // this avoids the extra load
   // and makes the subsequent load's offset automatically correct
   if (structure->isUsingInlineStorage())
-    stubInfo->hotPathBegin.instructionAtOffset(patchOffsetPutByIdExternalLoad)
-        .repatchLoadPtrToLEA();
+    repatchBuffer.repatchLoadPtrToLEA(
+        stubInfo->hotPathBegin.instructionAtOffset(
+            patchOffsetPutByIdExternalLoad));
 
   // Patch the offset into the propoerty map to load from, then patch the
   // Structure to look for.
-  stubInfo->hotPathBegin.dataLabelPtrAtOffset(patchOffsetPutByIdStructure)
-      .repatch(structure);
-  stubInfo->hotPathBegin
-      .dataLabel32AtOffset(patchOffsetPutByIdPropertyMapOffset)
-      .repatch(offset);
+  repatchBuffer.repatch(
+      stubInfo->hotPathBegin.dataLabelPtrAtOffset(patchOffsetPutByIdStructure),
+      structure);
+  repatchBuffer.repatch(stubInfo->hotPathBegin.dataLabel32AtOffset(
+                            patchOffsetPutByIdPropertyMapOffset),
+                        offset);
 }
 
 void JIT::privateCompilePatchGetArrayLength(
     ProcessorReturnAddress returnAddress) {
   StructureStubInfo* stubInfo =
       &m_codeBlock->getStubInfo(returnAddress.addressForLookup());
-
-  // We don't want to patch more than once - in future go to
-  // cti_op_put_by_id_generic.
-  returnAddress.relinkCallerToFunction(
-      FunctionPtr(JITStubs::cti_op_get_by_id_array_fail));
 
   // Check eax is an array
   Jump failureCases1 =
@@ -753,7 +759,13 @@ void JIT::privateCompilePatchGetArrayLength(
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  jumpLocation.relink(entryLabel);
+  RepatchBuffer repatchBuffer;
+  repatchBuffer.relink(jumpLocation, entryLabel);
+
+  // We don't want to patch more than once - in future go to
+  // cti_op_put_by_id_generic.
+  repatchBuffer.relinkCallerToFunction(
+      returnAddress, FunctionPtr(JITStubs::cti_op_get_by_id_array_fail));
 }
 
 void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
@@ -762,11 +774,6 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
                                      size_t cachedOffset,
                                      ProcessorReturnAddress returnAddress,
                                      CallFrame* callFrame) {
-  // We don't want to patch more than once - in future go to
-  // cti_op_put_by_id_generic.
-  returnAddress.relinkCallerToFunction(
-      FunctionPtr(JITStubs::cti_op_get_by_id_proto_list));
-
   // The prototype object definitely exists (if this stub exists the CodeBlock
   // is referencing a Structure that is
   // referencing the prototype object - let's speculatively load it's table nice
@@ -815,7 +822,13 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  jumpLocation.relink(entryLabel);
+  RepatchBuffer repatchBuffer;
+  repatchBuffer.relink(jumpLocation, entryLabel);
+
+  // We don't want to patch more than once - in future go to
+  // cti_op_put_by_id_generic.
+  repatchBuffer.relinkCallerToFunction(
+      returnAddress, FunctionPtr(JITStubs::cti_op_get_by_id_proto_list));
 }
 
 void JIT::privateCompileGetByIdSelfList(
@@ -854,7 +867,8 @@ void JIT::privateCompileGetByIdSelfList(
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  jumpLocation.relink(entryLabel);
+  RepatchBuffer repatchBuffer;
+  repatchBuffer.relink(jumpLocation, entryLabel);
 }
 
 void JIT::privateCompileGetByIdProtoList(
@@ -916,7 +930,8 @@ void JIT::privateCompileGetByIdProtoList(
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  jumpLocation.relink(entryLabel);
+  RepatchBuffer repatchBuffer;
+  repatchBuffer.relink(jumpLocation, entryLabel);
 }
 
 void JIT::privateCompileGetByIdChainList(
@@ -985,7 +1000,8 @@ void JIT::privateCompileGetByIdChainList(
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  jumpLocation.relink(entryLabel);
+  RepatchBuffer repatchBuffer;
+  repatchBuffer.relink(jumpLocation, entryLabel);
 }
 
 void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
@@ -995,11 +1011,6 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
                                      size_t cachedOffset,
                                      ProcessorReturnAddress returnAddress,
                                      CallFrame* callFrame) {
-  // We don't want to patch more than once - in future go to
-  // cti_op_put_by_id_generic.
-  returnAddress.relinkCallerToFunction(
-      FunctionPtr(JITStubs::cti_op_get_by_id_proto_list));
-
   ASSERT(count);
 
   JumpList bucketsOfFail;
@@ -1051,7 +1062,13 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  jumpLocation.relink(entryLabel);
+  RepatchBuffer repatchBuffer;
+  repatchBuffer.relink(jumpLocation, entryLabel);
+
+  // We don't want to patch more than once - in future go to
+  // cti_op_put_by_id_generic.
+  repatchBuffer.relinkCallerToFunction(
+      returnAddress, FunctionPtr(JITStubs::cti_op_get_by_id_proto_list));
 }
 
 /* ------------------------------ END: !ENABLE /
