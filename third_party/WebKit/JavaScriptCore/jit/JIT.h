@@ -150,15 +150,12 @@ struct MethodCallCompilationInfo {
 
 // Near calls can only be patched to other JIT code, regular calls can be
 // patched to JIT code or relinked to stub functions.
-void ctiPatchNearCallByReturnAddress(
-    MacroAssembler::ProcessorReturnAddress returnAddress,
-    MacroAssemblerCodePtr newCalleeFunction);
-void ctiPatchCallByReturnAddress(
-    MacroAssembler::ProcessorReturnAddress returnAddress,
-    MacroAssemblerCodePtr newCalleeFunction);
-void ctiPatchCallByReturnAddress(
-    MacroAssembler::ProcessorReturnAddress returnAddress,
-    FunctionPtr newCalleeFunction);
+void ctiPatchNearCallByReturnAddress(ReturnAddressPtr returnAddress,
+                                     MacroAssemblerCodePtr newCalleeFunction);
+void ctiPatchCallByReturnAddress(ReturnAddressPtr returnAddress,
+                                 MacroAssemblerCodePtr newCalleeFunction);
+void ctiPatchCallByReturnAddress(ReturnAddressPtr returnAddress,
+                                 FunctionPtr newCalleeFunction);
 
 class JIT : private MacroAssembler {
   friend class JITStubCall;
@@ -338,7 +335,7 @@ class JIT : private MacroAssembler {
                                   Structure* structure,
                                   Structure* prototypeStructure,
                                   size_t cachedOffset,
-                                  ProcessorReturnAddress returnAddress) {
+                                  ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdProto(stubInfo, structure, prototypeStructure,
                                    cachedOffset, returnAddress, callFrame);
@@ -396,7 +393,7 @@ class JIT : private MacroAssembler {
                                   StructureChain* chain,
                                   size_t count,
                                   size_t cachedOffset,
-                                  ProcessorReturnAddress returnAddress) {
+                                  ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdChain(stubInfo, structure, chain, count,
                                    cachedOffset, returnAddress, callFrame);
@@ -409,7 +406,7 @@ class JIT : private MacroAssembler {
                                        Structure* newStructure,
                                        size_t cachedOffset,
                                        StructureChain* chain,
-                                       ProcessorReturnAddress returnAddress) {
+                                       ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
     jit.privateCompilePutByIdTransition(stubInfo, oldStructure, newStructure,
                                         cachedOffset, chain, returnAddress);
@@ -434,11 +431,11 @@ class JIT : private MacroAssembler {
   static void patchGetByIdSelf(StructureStubInfo*,
                                Structure*,
                                size_t cachedOffset,
-                               ProcessorReturnAddress returnAddress);
+                               ReturnAddressPtr returnAddress);
   static void patchPutByIdReplace(StructureStubInfo*,
                                   Structure*,
                                   size_t cachedOffset,
-                                  ProcessorReturnAddress returnAddress);
+                                  ReturnAddressPtr returnAddress);
   static void patchMethodCallProto(MethodCallLinkInfo&,
                                    JSFunction*,
                                    Structure*,
@@ -446,7 +443,7 @@ class JIT : private MacroAssembler {
 
   static void compilePatchGetArrayLength(JSGlobalData* globalData,
                                          CodeBlock* codeBlock,
-                                         ProcessorReturnAddress returnAddress) {
+                                         ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
     return jit.privateCompilePatchGetArrayLength(returnAddress);
   }
@@ -478,7 +475,7 @@ class JIT : private MacroAssembler {
                                   Structure*,
                                   Structure* prototypeStructure,
                                   size_t cachedOffset,
-                                  ProcessorReturnAddress returnAddress,
+                                  ReturnAddressPtr returnAddress,
                                   CallFrame* callFrame);
   void privateCompileGetByIdSelfList(StructureStubInfo*,
                                      PolymorphicAccessStructureList*,
@@ -505,14 +502,14 @@ class JIT : private MacroAssembler {
                                   StructureChain*,
                                   size_t count,
                                   size_t cachedOffset,
-                                  ProcessorReturnAddress returnAddress,
+                                  ReturnAddressPtr returnAddress,
                                   CallFrame* callFrame);
   void privateCompilePutByIdTransition(StructureStubInfo*,
                                        Structure*,
                                        Structure*,
                                        size_t cachedOffset,
                                        StructureChain*,
-                                       ProcessorReturnAddress returnAddress);
+                                       ReturnAddressPtr returnAddress);
 
   void privateCompileCTIMachineTrampolines(
       RefPtr<ExecutablePool>* executablePool,
@@ -523,7 +520,7 @@ class JIT : private MacroAssembler {
       CodePtr* ctiVirtualCallLink,
       CodePtr* ctiVirtualCall,
       CodePtr* ctiNativeCallThunk);
-  void privateCompilePatchGetArrayLength(ProcessorReturnAddress returnAddress);
+  void privateCompilePatchGetArrayLength(ReturnAddressPtr returnAddress);
 
   void addSlowCase(Jump);
   void addJump(Jump, int);

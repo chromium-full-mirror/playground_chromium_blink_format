@@ -134,7 +134,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   JSValue exception;
 #if ENABLE(JIT)
-  void* exceptionLocation;
+  ReturnAddressPtr exceptionLocation;
 #endif
 
   const Vector<Instruction>& numericCompareFunction(ExecState*);

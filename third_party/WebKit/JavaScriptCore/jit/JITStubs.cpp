@@ -345,7 +345,7 @@ JITThunks::JITThunks(JSGlobalData* globalData) {
 
 NEVER_INLINE void JITThunks::tryCachePutByID(CallFrame* callFrame,
                                              CodeBlock* codeBlock,
-                                             void* returnAddress,
+                                             ReturnAddressPtr returnAddress,
                                              JSValue baseValue,
                                              const PutPropertySlot& slot) {
   // The interpreter checks for recursion here; I do not believe this can occur
@@ -401,7 +401,7 @@ NEVER_INLINE void JITThunks::tryCachePutByID(CallFrame* callFrame,
 
 NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
                                              CodeBlock* codeBlock,
-                                             void* returnAddress,
+                                             ReturnAddressPtr returnAddress,
                                              JSValue baseValue,
                                              const Identifier& propertyName,
                                              const PropertySlot& slot) {
@@ -528,7 +528,7 @@ struct StackHack {
       : stackFrame(stackFrame),
         savedReturnAddress(*stackFrame.returnAddressSlot()) {
     *stackFrame.returnAddressSlot() =
-        reinterpret_cast<void*>(jscGeneratedNativeCode);
+        ReturnAddressPtr(FunctionPtr(jscGeneratedNativeCode));
   }
 
   ALWAYS_INLINE ~StackHack() {
@@ -536,7 +536,7 @@ struct StackHack {
   }
 
   JITStackFrame& stackFrame;
-  void* savedReturnAddress;
+  ReturnAddressPtr savedReturnAddress;
 };
 
 #define STUB_INIT_STACK_FRAME(stackFrame)                                   \
@@ -544,7 +544,7 @@ struct StackHack {
   JITStackFrame& stackFrame = *reinterpret_cast<JITStackFrame*>(STUB_ARGS); \
   StackHack stackHack(stackFrame)
 #define STUB_SET_RETURN_ADDRESS(returnAddress) \
-  stackHack.savedReturnAddress = returnAddress
+  stackHack.savedReturnAddress = ReturnAddressPtr(returnAddress)
 #define STUB_RETURN_ADDRESS stackHack.savedReturnAddress
 
 #else
@@ -553,7 +553,7 @@ struct StackHack {
   SETUP_VA_LISTL_ARGS;                    \
   JITStackFrame& stackFrame = *reinterpret_cast<JITStackFrame*>(STUB_ARGS)
 #define STUB_SET_RETURN_ADDRESS(returnAddress) \
-  *stackFrame.returnAddressSlot() = returnAddress
+  *stackFrame.returnAddressSlot() = ReturnAddressPtr(returnAddress)
 #define STUB_RETURN_ADDRESS *stackFrame.returnAddressSlot()
 
 #endif
@@ -562,18 +562,20 @@ struct StackHack {
 // to get the address of the ctiVMThrowTrampoline function. It's also
 // good to keep the code size down by leaving as much of the exception
 // handling code out of line as possible.
-static NEVER_INLINE void returnToThrowTrampoline(JSGlobalData* globalData,
-                                                 void* exceptionLocation,
-                                                 void*& returnAddressSlot) {
+static NEVER_INLINE void returnToThrowTrampoline(
+    JSGlobalData* globalData,
+    ReturnAddressPtr exceptionLocation,
+    ReturnAddressPtr& returnAddressSlot) {
   ASSERT(globalData->exception);
   globalData->exceptionLocation = exceptionLocation;
-  returnAddressSlot = reinterpret_cast<void*>(ctiVMThrowTrampoline);
+  returnAddressSlot = ReturnAddressPtr(FunctionPtr(ctiVMThrowTrampoline));
 }
 
-static NEVER_INLINE void throwStackOverflowError(CallFrame* callFrame,
-                                                 JSGlobalData* globalData,
-                                                 void* exceptionLocation,
-                                                 void*& returnAddressSlot) {
+static NEVER_INLINE void throwStackOverflowError(
+    CallFrame* callFrame,
+    JSGlobalData* globalData,
+    ReturnAddressPtr exceptionLocation,
+    ReturnAddressPtr& returnAddressSlot) {
   globalData->exception = createStackOverflowError(callFrame);
   returnToThrowTrampoline(globalData, exceptionLocation, returnAddressSlot);
 }
@@ -738,7 +740,8 @@ DEFINE_STUB_FUNCTION(void, register_file_check) {
   CallFrame* oldCallFrame = stackFrame.callFrame->callerFrame();
   stackFrame.callFrame = oldCallFrame;
   throwStackOverflowError(oldCallFrame, stackFrame.globalData,
-                          oldCallFrame->returnPC(), STUB_RETURN_ADDRESS);
+                          ReturnAddressPtr(oldCallFrame->returnPC()),
+                          STUB_RETURN_ADDRESS);
 }
 
 DEFINE_STUB_FUNCTION(int, op_loop_if_less) {
@@ -1400,7 +1403,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_call_NotJSFunction) {
     CallFrame* callFrame =
         CallFrame::create(previousCallFrame->registers() + registerOffset);
 
-    callFrame->init(0, static_cast<Instruction*>(STUB_RETURN_ADDRESS),
+    callFrame->init(0, static_cast<Instruction*>((STUB_RETURN_ADDRESS).value()),
                     previousCallFrame->scopeChain(), previousCallFrame, 0,
                     argCount, 0);
     stackFrame.callFrame = callFrame;

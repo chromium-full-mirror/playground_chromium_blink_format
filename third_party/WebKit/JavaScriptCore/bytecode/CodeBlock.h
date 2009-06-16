@@ -278,32 +278,34 @@ class CodeBlock {
     m_linkedCallerList.shrink(lastPos);
   }
 
-  StructureStubInfo& getStubInfo(void* returnAddress) {
+  StructureStubInfo& getStubInfo(ReturnAddressPtr returnAddress) {
     return *(binaryChop<StructureStubInfo, void*,
                         getStructureStubInfoReturnLocation>(
         m_structureStubInfos.begin(), m_structureStubInfos.size(),
-        returnAddress));
+        returnAddress.value()));
   }
 
-  CallLinkInfo& getCallLinkInfo(void* returnAddress) {
+  CallLinkInfo& getCallLinkInfo(ReturnAddressPtr returnAddress) {
     return *(binaryChop<CallLinkInfo, void*, getCallLinkInfoReturnLocation>(
-        m_callLinkInfos.begin(), m_callLinkInfos.size(), returnAddress));
+        m_callLinkInfos.begin(), m_callLinkInfos.size(),
+        returnAddress.value()));
   }
 
-  MethodCallLinkInfo& getMethodCallLinkInfo(void* returnAddress) {
+  MethodCallLinkInfo& getMethodCallLinkInfo(ReturnAddressPtr returnAddress) {
     return *(binaryChop<MethodCallLinkInfo, void*,
                         getMethodCallLinkInfoReturnLocation>(
         m_methodCallLinkInfos.begin(), m_methodCallLinkInfos.size(),
-        returnAddress));
+        returnAddress.value()));
   }
 
-  unsigned getBytecodeIndex(CallFrame* callFrame, void* nativePC) {
+  unsigned getBytecodeIndex(CallFrame* callFrame,
+                            ReturnAddressPtr returnAddress) {
     reparseForExceptionInfoIfNecessary(callFrame);
     return binaryChop<CallReturnOffsetToBytecodeIndex, unsigned,
                       getCallReturnOffset>(
                m_exceptionInfo->m_callReturnIndexVector.begin(),
                m_exceptionInfo->m_callReturnIndexVector.size(),
-               ownerNode()->generatedJITCode().offsetOf(nativePC))
+               ownerNode()->generatedJITCode().offsetOf(returnAddress.value()))
         ->bytecodeIndex;
   }
 

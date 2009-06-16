@@ -525,13 +525,12 @@ void JIT::compileGetDirectOffset(JSObject* base,
     loadPtr(static_cast<void*>(&base->m_externalStorage[cachedOffset]), result);
 }
 
-void JIT::privateCompilePutByIdTransition(
-    StructureStubInfo* stubInfo,
-    Structure* oldStructure,
-    Structure* newStructure,
-    size_t cachedOffset,
-    StructureChain* chain,
-    ProcessorReturnAddress returnAddress) {
+void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
+                                          Structure* oldStructure,
+                                          Structure* newStructure,
+                                          size_t cachedOffset,
+                                          StructureChain* chain,
+                                          ReturnAddressPtr returnAddress) {
   JumpList failureCases;
   // Check eax is an object of the right Structure.
   failureCases.append(emitJumpIfNotJSCell(regT0));
@@ -633,7 +632,7 @@ void JIT::privateCompilePutByIdTransition(
 void JIT::patchGetByIdSelf(StructureStubInfo* stubInfo,
                            Structure* structure,
                            size_t cachedOffset,
-                           ProcessorReturnAddress returnAddress) {
+                           ReturnAddressPtr returnAddress) {
   RepatchBuffer repatchBuffer;
 
   // We don't want to patch more than once - in future go to
@@ -688,7 +687,7 @@ void JIT::patchMethodCallProto(MethodCallLinkInfo& methodCallLinkInfo,
 void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
                               Structure* structure,
                               size_t cachedOffset,
-                              ProcessorReturnAddress returnAddress) {
+                              ReturnAddressPtr returnAddress) {
   RepatchBuffer repatchBuffer;
 
   // We don't want to patch more than once - in future go to
@@ -718,10 +717,8 @@ void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
                         offset);
 }
 
-void JIT::privateCompilePatchGetArrayLength(
-    ProcessorReturnAddress returnAddress) {
-  StructureStubInfo* stubInfo =
-      &m_codeBlock->getStubInfo(returnAddress.addressForLookup());
+void JIT::privateCompilePatchGetArrayLength(ReturnAddressPtr returnAddress) {
+  StructureStubInfo* stubInfo = &m_codeBlock->getStubInfo(returnAddress);
 
   // Check eax is an array
   Jump failureCases1 =
@@ -772,7 +769,7 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
                                      Structure* structure,
                                      Structure* prototypeStructure,
                                      size_t cachedOffset,
-                                     ProcessorReturnAddress returnAddress,
+                                     ReturnAddressPtr returnAddress,
                                      CallFrame* callFrame) {
   // The prototype object definitely exists (if this stub exists the CodeBlock
   // is referencing a Structure that is
@@ -1009,7 +1006,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
                                      StructureChain* chain,
                                      size_t count,
                                      size_t cachedOffset,
-                                     ProcessorReturnAddress returnAddress,
+                                     ReturnAddressPtr returnAddress,
                                      CallFrame* callFrame) {
   ASSERT(count);
 

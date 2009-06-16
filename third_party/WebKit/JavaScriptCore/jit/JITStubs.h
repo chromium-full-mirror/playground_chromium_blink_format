@@ -70,7 +70,7 @@ union JITStubArg {
   JSPropertyNameIterator* propertyNameIterator() {
     return static_cast<JSPropertyNameIterator*>(asPointer);
   }
-  void* returnAddress() { return asPointer; }
+  ReturnAddressPtr returnAddress() { return ReturnAddressPtr(asPointer); }
 };
 
 #if PLATFORM(X86_64)
@@ -95,7 +95,9 @@ struct JITStackFrame {
 
   // When JIT code makes a call, it pushes its return address just below the
   // rest of the stack.
-  void** returnAddressSlot() { return reinterpret_cast<void**>(this) - 1; }
+  ReturnAddressPtr* returnAddressSlot() {
+    return reinterpret_cast<ReturnAddressPtr*>(this) - 1;
+  }
 };
 #elif PLATFORM(X86)
 struct JITStackFrame {
@@ -117,14 +119,16 @@ struct JITStackFrame {
 
   // When JIT code makes a call, it pushes its return address just below the
   // rest of the stack.
-  void** returnAddressSlot() { return reinterpret_cast<void**>(this) - 1; }
+  ReturnAddressPtr* returnAddressSlot() {
+    return reinterpret_cast<ReturnAddressPtr*>(this) - 1;
+  }
 };
 #elif PLATFORM(ARM_V7)
 struct JITStackFrame {
   JITStubArg padding;  // Unused
   JITStubArg args[6];
 
-  void* thunkReturnAddress;
+  ReturnAddressPtr thunkReturnAddress;
 
   void* preservedReturnAddress;
   void* preservedR4;
@@ -141,7 +145,7 @@ struct JITStackFrame {
   Profiler** enabledProfilerReference;
   JSGlobalData* globalData;
 
-  void** returnAddressSlot() { return &thunkReturnAddress; }
+  ReturnAddressPtr* returnAddressSlot() { return &thunkReturnAddress; }
 };
 #else
 #error "JITStackFrame not defined for this platform."
@@ -221,13 +225,13 @@ class JITThunks {
 
   static void tryCacheGetByID(CallFrame*,
                               CodeBlock*,
-                              void* returnAddress,
+                              ReturnAddressPtr returnAddress,
                               JSValue baseValue,
                               const Identifier& propertyName,
                               const PropertySlot&);
   static void tryCachePutByID(CallFrame*,
                               CodeBlock*,
-                              void* returnAddress,
+                              ReturnAddressPtr returnAddress,
                               JSValue baseValue,
                               const PutPropertySlot&);
 
