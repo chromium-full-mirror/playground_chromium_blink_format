@@ -694,7 +694,7 @@ void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
 
   m_loader = ThreadableLoader::create(
       scriptExecutionContext(), this, request, callbacks, DoNotSniffContent,
-      storedCredentials, RequireSameRedirectOrigin);
+      storedCredentials, DenyCrossOriginRedirect);
 
   if (m_loader) {
     // Neither this object nor the JavaScript wrapper should be deleted while

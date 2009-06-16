@@ -46,20 +46,20 @@ WorkerScriptLoader::WorkerScriptLoader()
 void WorkerScriptLoader::loadSynchronously(
     ScriptExecutionContext* scriptExecutionContext,
     const String& url,
-    RedirectOriginCheck redirectOriginCheck) {
+    CrossOriginRedirectPolicy crossOriginRedirectPolicy) {
   ResourceRequest request(url);
   request.setHTTPMethod("GET");
 
   ASSERT(scriptExecutionContext->isWorkerContext());
   WorkerThreadableLoader::loadResourceSynchronously(
       static_cast<WorkerContext*>(scriptExecutionContext), request, *this,
-      AllowStoredCredentials, redirectOriginCheck);
+      AllowStoredCredentials, crossOriginRedirectPolicy);
 }
 
 void WorkerScriptLoader::loadAsynchronously(
     ScriptExecutionContext* scriptExecutionContext,
     const String& url,
-    RedirectOriginCheck redirectOriginCheck,
+    CrossOriginRedirectPolicy crossOriginRedirectPolicy,
     WorkerScriptLoaderClient* client) {
   ASSERT(client);
   m_client = client;
@@ -69,7 +69,7 @@ void WorkerScriptLoader::loadAsynchronously(
 
   m_threadableLoader = ThreadableLoader::create(
       scriptExecutionContext, this, request, DoNotSendLoadCallbacks,
-      DoNotSniffContent, AllowStoredCredentials, redirectOriginCheck);
+      DoNotSniffContent, AllowStoredCredentials, crossOriginRedirectPolicy);
 }
 
 void WorkerScriptLoader::didReceiveResponse(const ResourceResponse& response) {

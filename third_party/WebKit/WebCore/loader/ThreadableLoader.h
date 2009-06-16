@@ -49,9 +49,9 @@ enum ContentSniff { SniffContent, DoNotSniffContent };
 
 enum StoredCredentials { AllowStoredCredentials, DoNotAllowStoredCredentials };
 
-enum RedirectOriginCheck {
-  RequireSameRedirectOrigin,
-  AllowDifferentRedirectOrigin
+enum CrossOriginRedirectPolicy {
+  DenyCrossOriginRedirect,
+  AllowCrossOriginRedirect
 };
 
 // Useful for doing loader operations from any thread (not threadsafe,
@@ -68,7 +68,7 @@ class ThreadableLoader : Noncopyable {
                                              LoadCallbacks,
                                              ContentSniff,
                                              StoredCredentials,
-                                             RedirectOriginCheck);
+                                             CrossOriginRedirectPolicy);
 
   virtual void cancel() = 0;
   void ref() { refThreadableLoader(); }

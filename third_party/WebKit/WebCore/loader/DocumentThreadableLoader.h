@@ -56,7 +56,7 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
                                                      LoadCallbacks,
                                                      ContentSniff,
                                                      StoredCredentials,
-                                                     RedirectOriginCheck);
+                                                     CrossOriginRedirectPolicy);
   virtual ~DocumentThreadableLoader();
 
   virtual void cancel();
@@ -75,7 +75,7 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
                            LoadCallbacks,
                            ContentSniff,
                            StoredCredentials,
-                           RedirectOriginCheck);
+                           CrossOriginRedirectPolicy);
   virtual void willSendRequest(SubresourceLoader*,
                                ResourceRequest&,
                                const ResourceResponse& redirectResponse);
@@ -103,7 +103,7 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
   Document* m_document;
   bool m_allowStoredCredentials;
   bool m_sameOriginRequest;
-  bool m_checkRedirectOrigin;
+  bool m_denyCrossOriginRedirect;
 };
 
 }  // namespace WebCore

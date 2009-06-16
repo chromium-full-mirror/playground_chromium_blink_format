@@ -60,7 +60,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
                                         const ResourceRequest&,
                                         ThreadableLoaderClient&,
                                         StoredCredentials,
-                                        RedirectOriginCheck);
+                                        CrossOriginRedirectPolicy);
   static PassRefPtr<WorkerThreadableLoader> create(
       WorkerContext* workerContext,
       ThreadableLoaderClient* client,
@@ -69,10 +69,10 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
       LoadCallbacks callbacksSetting,
       ContentSniff contentSniff,
       StoredCredentials storedCredentials,
-      RedirectOriginCheck redirectOriginCheck) {
+      CrossOriginRedirectPolicy crossOriginRedirectPolicy) {
     return adoptRef(new WorkerThreadableLoader(
         workerContext, client, taskMode, request, callbacksSetting,
-        contentSniff, storedCredentials, redirectOriginCheck));
+        contentSniff, storedCredentials, crossOriginRedirectPolicy));
   }
 
   ~WorkerThreadableLoader();
@@ -126,7 +126,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
                      LoadCallbacks,
                      ContentSniff,
                      StoredCredentials,
-                     RedirectOriginCheck);
+                     CrossOriginRedirectPolicy);
     void cancel();
     void destroy();
 
@@ -145,7 +145,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
         LoadCallbacks,
         ContentSniff,
         StoredCredentials,
-        RedirectOriginCheck);
+        CrossOriginRedirectPolicy);
     static void mainThreadCancel(ScriptExecutionContext*, MainThreadBridge*);
     virtual void didSendData(unsigned long long bytesSent,
                              unsigned long long totalBytesToBeSent);
@@ -178,7 +178,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
                          LoadCallbacks,
                          ContentSniff,
                          StoredCredentials,
-                         RedirectOriginCheck);
+                         CrossOriginRedirectPolicy);
 
   RefPtr<WorkerContext> m_workerContext;
   RefPtr<ThreadableLoaderClientWrapper> m_workerClientWrapper;

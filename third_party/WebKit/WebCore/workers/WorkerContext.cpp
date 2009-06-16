@@ -277,7 +277,7 @@ void WorkerContext::importScripts(const Vector<String>& urls,
        ++it) {
     WorkerScriptLoader scriptLoader;
     scriptLoader.loadSynchronously(scriptExecutionContext(), *it,
-                                   AllowDifferentRedirectOrigin);
+                                   AllowCrossOriginRedirect);
 
     // If the fetching attempt failed, throw a NETWORK_ERR exception and abort
     // all these steps.

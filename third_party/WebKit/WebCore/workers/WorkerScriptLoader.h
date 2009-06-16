@@ -47,10 +47,10 @@ class WorkerScriptLoader : public ThreadableLoaderClient {
 
   void loadSynchronously(ScriptExecutionContext*,
                          const String& url,
-                         RedirectOriginCheck);
+                         CrossOriginRedirectPolicy);
   void loadAsynchronously(ScriptExecutionContext*,
                           const String& url,
-                          RedirectOriginCheck,
+                          CrossOriginRedirectPolicy,
                           WorkerScriptLoaderClient*);
 
   const String& script() const { return m_script; }

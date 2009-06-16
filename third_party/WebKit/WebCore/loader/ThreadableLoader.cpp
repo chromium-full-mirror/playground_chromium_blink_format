@@ -47,7 +47,7 @@ PassRefPtr<ThreadableLoader> ThreadableLoader::create(
     LoadCallbacks callbacksSetting,
     ContentSniff contentSniff,
     StoredCredentials storedCredentials,
-    RedirectOriginCheck redirectOriginCheck) {
+    CrossOriginRedirectPolicy crossOriginRedirectPolicy) {
   ASSERT(client);
   ASSERT(context);
 
@@ -56,13 +56,13 @@ PassRefPtr<ThreadableLoader> ThreadableLoader::create(
     return WorkerThreadableLoader::create(
         static_cast<WorkerContext*>(context), client,
         WorkerRunLoop::defaultMode(), request, callbacksSetting, contentSniff,
-        storedCredentials, redirectOriginCheck);
+        storedCredentials, crossOriginRedirectPolicy);
 #endif  // ENABLE(WORKERS)
 
   ASSERT(context->isDocument());
   return DocumentThreadableLoader::create(
       static_cast<Document*>(context), client, request, callbacksSetting,
-      contentSniff, storedCredentials, redirectOriginCheck);
+      contentSniff, storedCredentials, crossOriginRedirectPolicy);
 }
 
 void ThreadableLoader::loadResourceSynchronously(
@@ -76,7 +76,7 @@ void ThreadableLoader::loadResourceSynchronously(
   if (context->isWorkerContext()) {
     WorkerThreadableLoader::loadResourceSynchronously(
         static_cast<WorkerContext*>(context), request, client,
-        storedCredentials, RequireSameRedirectOrigin);
+        storedCredentials, DenyCrossOriginRedirect);
     return;
   }
 #endif  // ENABLE(WORKERS)
