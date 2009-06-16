@@ -209,6 +209,9 @@ void GraphicsContextPlatformPrivate::concatCTM(
 }
 
 void GraphicsContextPlatformPrivate::syncContext(PlatformGraphicsContext* cr) {
+  if (!cr)
+    return;
+
   cairo_surface_t* surface = cairo_get_target(cr);
   m_hdc = cairo_win32_surface_get_dc(surface);
 
