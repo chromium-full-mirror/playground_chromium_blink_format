@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2009 Google Inc. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,53 +25,23 @@
  *
  */
 
-#ifndef WorkerImportScriptsClient_h
-#define WorkerImportScriptsClient_h
+#ifndef WorkerScriptLoaderClient_h
+#define WorkerScriptLoaderClient_h
 
 #if ENABLE(WORKERS)
 
-#include "ResourceResponse.h"
-#include "ScriptString.h"
-#include "TextResourceDecoder.h"
-#include "ThreadableLoaderClient.h"
-
 namespace WebCore {
 
-class ScriptExecutionContext;
-
-class WorkerImportScriptsClient : public ThreadableLoaderClient {
+class WorkerScriptLoaderClient {
  public:
-  WorkerImportScriptsClient(ScriptExecutionContext* scriptExecutionContext,
-                            const String& url,
-                            const String& callerURL,
-                            int callerLineNumber)
-      : m_scriptExecutionContext(scriptExecutionContext),
-        m_url(url),
-        m_callerURL(callerURL),
-        m_callerLineNumber(callerLineNumber),
-        m_failed(false) {}
+  virtual void notifyFinished() {}
 
-  const String& script() const { return m_script; }
-  bool failed() const { return m_failed; }
-
-  virtual void didReceiveResponse(const ResourceResponse& response);
-  virtual void didReceiveData(const char* data, int lengthReceived);
-  virtual void didFinishLoading(unsigned long identifier);
-  virtual void didFail(const ResourceError&);
-  virtual void didFailRedirectCheck();
-  virtual void didReceiveAuthenticationCancellation(const ResourceResponse&);
-
- private:
-  ScriptExecutionContext* m_scriptExecutionContext;
-  String m_url;
-  String m_callerURL;
-  int m_callerLineNumber;
-  String m_responseEncoding;
-  RefPtr<TextResourceDecoder> m_decoder;
-  String m_script;
-  bool m_failed;
+ protected:
+  virtual ~WorkerScriptLoaderClient() {}
 };
-}
+
+}  // namespace WebCore
 
 #endif  // ENABLE(WORKERS)
-#endif
+
+#endif  // WorkerScriptLoaderClient_h
