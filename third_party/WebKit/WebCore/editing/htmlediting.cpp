@@ -77,7 +77,7 @@ bool canHaveChildrenForEditing(const Node* node) {
          !node->hasTagName(inputTag) && !node->hasTagName(textareaTag) &&
          !node->hasTagName(objectTag) && !node->hasTagName(iframeTag) &&
          !node->hasTagName(embedTag) && !node->hasTagName(appletTag) &&
-         !node->hasTagName(selectTag) &&
+         !node->hasTagName(selectTag) && !node->hasTagName(datagridTag) &&
 #if ENABLE(WML)
          !node->hasTagName(WMLNames::doTag) &&
 #endif

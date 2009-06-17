@@ -85,6 +85,7 @@
 #include "JSHTMLButtonElement.cpp"
 #include "JSHTMLCanvasElement.cpp"
 #include "JSHTMLCollection.cpp"
+#include "JSHTMLDataGridElement.cpp"
 #include "JSHTMLDirectoryElement.cpp"
 #include "JSHTMLDivElement.cpp"
 #include "JSHTMLDListElement.cpp"
