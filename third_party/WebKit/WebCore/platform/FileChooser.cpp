@@ -64,6 +64,8 @@ void FileChooser::chooseFile(const String& filename) {
 }
 
 void FileChooser::chooseFiles(const Vector<String>& filenames) {
+  if (m_filenames == filenames)
+    return;
   m_filenames = filenames;
   m_icon = chooseIcon(filenames);
   if (m_client)
@@ -75,6 +77,8 @@ PassRefPtr<Icon> FileChooser::chooseIcon(const String& filename) {
 }
 
 PassRefPtr<Icon> FileChooser::chooseIcon(Vector<String> filenames) {
+  if (filenames.isEmpty())
+    return 0;
   if (filenames.size() == 1)
     return Icon::createIconForFile(filenames[0]);
   return Icon::createIconForFiles(filenames);
