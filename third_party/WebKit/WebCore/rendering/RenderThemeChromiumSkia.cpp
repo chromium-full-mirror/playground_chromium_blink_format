@@ -94,7 +94,7 @@ static HTMLMediaElement* mediaElementParent(Node* node) {
 // IE uses MS Shell Dlg there, which we render incorrectly at certain pixel
 // sizes (e.g. 15px). So, for now we just use Arial.
 const String& RenderThemeChromiumSkia::defaultGUIFont() {
-  DEFINE_STATIC_LOCAL(String, fontface, ("Arial"));
+  DEFINE_STATIC_LOCAL(String, fontFace, ("Arial"));
   return fontFace;
 }
 
