@@ -49,8 +49,7 @@ SOFT_LINK_OPTIONAL(SafariTheme,
                    STCopyThemeColor,
                    CGColorRef,
                    APIENTRY,
-                   (unsigned color, SafariTheme::ThemeControlState state),
-                   (color, state));
+                   (unsigned color, SafariTheme::ThemeControlState));
 
 static const unsigned stFocusRingColorID = 4;
 

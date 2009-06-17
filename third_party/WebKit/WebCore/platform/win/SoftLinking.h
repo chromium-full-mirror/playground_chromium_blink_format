@@ -64,8 +64,7 @@
   }
 
 #define SOFT_LINK_OPTIONAL(library, functionName, resultType,        \
-                           callingConvention, parameterDeclarations, \
-                           parameterNames)                           \
+                           callingConvention, parameterDeclarations) \
   typedef resultType(callingConvention* functionName##PtrType)       \
       parameterDeclarations;                                         \
   static functionName##PtrType functionName##Ptr() {                 \
