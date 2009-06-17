@@ -99,7 +99,7 @@ MediaTextDisplayElement::MediaTextDisplayElement(Document* doc,
 
 void MediaTextDisplayElement::attachToParent(Element* parent) {
   parent->addChild(this);
-  if (renderer())
+  if (renderer() && parent->renderer())
     parent->renderer()->addChild(renderer());
 }
 
@@ -152,7 +152,8 @@ MediaControlInputElement::MediaControlInputElement(
 
 void MediaControlInputElement::attachToParent(Element* parent) {
   parent->addChild(this);
-  parent->renderer()->addChild(renderer());
+  if (renderer() && parent->renderer())
+    parent->renderer()->addChild(renderer());
 }
 
 void MediaControlInputElement::update() {
