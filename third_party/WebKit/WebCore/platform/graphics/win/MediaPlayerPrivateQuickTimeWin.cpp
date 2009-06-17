@@ -233,8 +233,7 @@ void MediaPlayerPrivate::setVolume(float volume) {
 void MediaPlayerPrivate::setRate(float rate) {
   if (!m_qtMovie)
     return;
-  if (!paused())
-    m_qtMovie->setRate(rate);
+  m_qtMovie->setRate(rate);
 }
 
 int MediaPlayerPrivate::dataRate() const {
