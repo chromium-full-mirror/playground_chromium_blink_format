@@ -106,8 +106,8 @@ class RenderThemeChromiumWin : public RenderThemeChromiumSkia {
   virtual double caretBlinkIntervalInternal() const;
 
  private:
-  RenderThemeChromiumWin();
-  virtual ~RenderThemeChromiumWin();
+  RenderThemeChromiumWin() {}
+  virtual ~RenderThemeChromiumWin() {}
 
   unsigned determineState(RenderObject*);
   unsigned determineSliderThumbState(RenderObject*);
