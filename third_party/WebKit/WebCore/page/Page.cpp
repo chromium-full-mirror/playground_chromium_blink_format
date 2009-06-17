@@ -113,6 +113,7 @@ Page::Page(ChromeClient* chromeClient,
       m_settings(new Settings(this)),
       m_progress(new ProgressTracker),
       m_backForwardList(BackForwardList::create(this)),
+      m_theme(RenderTheme::themeForPage(this)),
       m_editorClient(editorClient),
       m_frameCount(0),
       m_tabKeyCyclesThroughElements(true),
@@ -128,8 +129,7 @@ Page::Page(ChromeClient* chromeClient,
       m_group(0),
       m_debugger(0),
       m_customHTMLTokenizerTimeDelay(-1),
-      m_customHTMLTokenizerChunkSize(-1),
-      m_theme(RenderTheme::themeForPage(this)) {
+      m_customHTMLTokenizerChunkSize(-1) {
   if (!allPages) {
     allPages = new HashSet<Page*>;
 
