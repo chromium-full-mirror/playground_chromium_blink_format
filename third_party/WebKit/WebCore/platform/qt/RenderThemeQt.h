@@ -38,7 +38,7 @@ class HTMLMediaElement;
 
 class RenderThemeQt : public RenderTheme {
  private:
-  RenderThemeQt();
+  RenderThemeQt(Page* page);
   virtual ~RenderThemeQt();
 
  public:
@@ -201,15 +201,17 @@ class RenderThemeQt : public RenderTheme {
   void setButtonPadding(RenderStyle*) const;
   void setPopupPadding(RenderStyle*) const;
 
+  QStyle* qStyle() const;
+  QStyle* fallbackStyle();
+
+  Page* m_page;
+
 #ifdef Q_WS_MAC
   int m_buttonFontPixelSize;
 #endif
   QString m_buttonFontFamily;
 
   QStyle* m_fallbackStyle;
-  QStyle* fallbackStyle();
-
-  int m_frameLineWidth;
 };
 
 class StylePainter {
