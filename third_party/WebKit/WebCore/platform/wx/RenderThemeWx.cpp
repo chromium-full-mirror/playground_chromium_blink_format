@@ -44,8 +44,12 @@
 namespace WebCore {
 
 class RenderThemeWx : public RenderTheme {
- public:
+ private:
   RenderThemeWx() : RenderTheme() {}
+  virtual ~RenderThemeWx();
+
+ public:
+  static PassRefPtr<RenderTheme> create();
 
   // A method asking if the theme's controls actually care about redrawing when
   // hovered.
@@ -139,9 +143,13 @@ class RenderThemeWx : public RenderTheme {
 #define POPUP_INTERNAL_PADDING_RIGHT 20
 #endif
 
-RenderTheme* theme() {
-  static RenderThemeWx rt;
-  return &rt;
+PassRefPtr<RenderTheme> RenderThemeWx::create() {
+  return adoptRef(new RenderThemeWx());
+}
+
+PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
+  static RenderTheme* rt = RenderThemeWx().create().releaseRef();
+  return rt;
 }
 
 bool RenderThemeWx::isControlStyled(const RenderStyle* style,

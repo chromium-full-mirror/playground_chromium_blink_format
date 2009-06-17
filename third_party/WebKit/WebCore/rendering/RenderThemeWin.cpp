@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006, 2007 Apple Inc.
+ * Copyright (C) 2009 Kenneth Rohde Christiansen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -152,10 +153,14 @@ void RenderThemeWin::setWebKitIsBeingUnloaded() {
   gWebKitIsBeingUnloaded = true;
 }
 
+PassRefPtr<RenderTheme> RenderThemeWin::create() {
+  return adoptRef(new RenderThemeWin);
+}
+
 #if !USE(SAFARI_THEME)
-RenderTheme* theme() {
-  static RenderThemeWin winTheme;
-  return &winTheme;
+PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
+  static RenderThemeWin* winTheme = RenderThemeWin::create().releaseRef();
+  return winTheme;
 }
 #endif
 

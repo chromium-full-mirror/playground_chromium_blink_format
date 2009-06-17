@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2006 Apple Computer, Inc.
  * Copyright (C) 2008, 2009 Google, Inc.
+ * Copyright (C) 2009 Kenneth Rohde Christiansen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -254,10 +255,13 @@ static HTMLMediaElement* mediaElementParent(Node* node) {
 }
 #endif
 
-// Implement WebCore::theme() for getting the global RenderTheme.
-RenderTheme* theme() {
-  static RenderThemeChromiumWin winTheme;
-  return &winTheme;
+PassRefPtr<RenderTheme> RenderThemeChromiumWin::create() {
+  return adoptRef(new RenderThemeChromiumWin);
+}
+
+PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
+  static RenderTheme* rt = RenderThemeChromiumWin::create().releaseRef();
+  return rt;
 }
 
 String RenderThemeChromiumWin::extraDefaultStyleSheet() {

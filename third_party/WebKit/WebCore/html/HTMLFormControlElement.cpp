@@ -70,7 +70,7 @@ void HTMLFormControlElement::parseMappedAttribute(MappedAttribute* attr) {
     if (oldDisabled != m_disabled) {
       setNeedsStyleRecalc();
       if (renderer() && renderer()->style()->hasAppearance())
-        theme()->stateChanged(renderer(), EnabledState);
+        renderer()->theme()->stateChanged(renderer(), EnabledState);
     }
   } else if (attr->name() == readonlyAttr) {
     bool oldReadOnly = m_readOnly;
@@ -78,7 +78,7 @@ void HTMLFormControlElement::parseMappedAttribute(MappedAttribute* attr) {
     if (oldReadOnly != m_readOnly) {
       setNeedsStyleRecalc();
       if (renderer() && renderer()->style()->hasAppearance())
-        theme()->stateChanged(renderer(), ReadOnlyState);
+        renderer()->theme()->stateChanged(renderer(), ReadOnlyState);
     }
   } else
     HTMLElement::parseMappedAttribute(attr);

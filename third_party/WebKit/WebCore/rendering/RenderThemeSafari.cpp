@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007, 2008 Apple Inc.
+ * Copyright (C) 2009 Kenneth Rohde Christiansen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -56,12 +57,16 @@ enum { topMargin, rightMargin, bottomMargin, leftMargin };
 
 enum { topPadding, rightPadding, bottomPadding, leftPadding };
 
-RenderTheme* theme() {
-  static RenderThemeSafari safariTheme;
-  static RenderThemeWin windowsTheme;
+PassRefPtr<RenderTheme> RenderThemeSafari::create() {
+  return adoptRef(new RenderThemeSafari);
+}
+
+PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
+  static RenderTheme* safariTheme = RenderThemeSafari::create().releaseRef();
+  static RenderTheme* windowsTheme = RenderThemeWin::create().releaseRef();
   if (Settings::shouldPaintNativeControls())
-    return &windowsTheme;
-  return &safariTheme;
+    return windowsTheme;  // keep the reference of one.
+  return safariTheme;     // keep the reference of one.
 }
 
 #if !defined(NDEBUG) && defined(USE_DEBUG_SAFARI_THEME)

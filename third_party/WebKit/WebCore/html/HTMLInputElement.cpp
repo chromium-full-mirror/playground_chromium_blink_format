@@ -863,7 +863,7 @@ void HTMLInputElement::setChecked(bool nowChecked, bool sendChangeEvent) {
   checkedRadioButtons(this).addButton(this);
 
   if (renderer() && renderer()->style()->hasAppearance())
-    theme()->stateChanged(renderer(), CheckedState);
+    renderer()->theme()->stateChanged(renderer(), CheckedState);
 
   // Only send a change event for items in the document (avoid firing during
   // parsing) and don't send a change event for a radio button that's getting
@@ -884,7 +884,7 @@ void HTMLInputElement::setIndeterminate(bool _indeterminate) {
   setNeedsStyleRecalc();
 
   if (renderer() && renderer()->style()->hasAppearance())
-    theme()->stateChanged(renderer(), CheckedState);
+    renderer()->theme()->stateChanged(renderer(), CheckedState);
 }
 
 int HTMLInputElement::size() const {

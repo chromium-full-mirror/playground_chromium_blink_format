@@ -49,6 +49,7 @@ class RenderInline;
 class RenderBlock;
 class RenderFlow;
 class RenderLayer;
+class RenderTheme;
 class TransformState;
 class VisiblePosition;
 
@@ -133,6 +134,8 @@ class RenderObject : public CachedResourceClient {
   // marked as anonymous in the constructor.
   RenderObject(Node*);
   virtual ~RenderObject();
+
+  RenderTheme* theme() const;
 
   virtual const char* renderName() const = 0;
 

@@ -102,9 +102,16 @@ StylePainter::~StylePainter() {
   }
 }
 
-RenderTheme* theme() {
-  static RenderThemeQt rt;
-  return &rt;
+PassRefPtr<RenderTheme> RenderThemeQt::create(Page* page) {
+  return adoptRef(new RenderThemeQt(page));
+}
+
+PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
+  if (page)
+    return RenderThemeQt::create(page);
+
+  static RenderTheme* fallback = RenderThemeQt::create(0).releaseRef();
+  return fallback;
 }
 
 RenderThemeQt::RenderThemeQt() : RenderTheme() {

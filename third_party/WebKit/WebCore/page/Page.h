@@ -28,6 +28,7 @@
 #include "FrameLoaderTypes.h"
 #include "LinkHash.h"
 #include "PlatformString.h"
+#include "RenderTheme.h"
 #include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 
@@ -84,6 +85,8 @@ class Page : Noncopyable {
        DragClient*,
        InspectorClient*);
   ~Page();
+
+  RenderTheme* theme() const { return m_theme.get(); };
 
   static void refreshPlugins(bool reload);
   PluginData* pluginData() const;
@@ -267,6 +270,8 @@ class Page : Noncopyable {
   RefPtr<HistoryItem> m_globalHistoryItem;
 
   mutable RefPtr<PluginData> m_pluginData;
+
+  RefPtr<RenderTheme> m_theme;
 
   EditorClient* m_editorClient;
 

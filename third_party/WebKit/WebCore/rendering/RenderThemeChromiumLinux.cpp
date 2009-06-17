@@ -3,6 +3,7 @@
  * Copyright (C) 2007 Alp Toker <alp@atoker.com>
  * Copyright (C) 2008 Collabora Ltd.
  * Copyright (C) 2008, 2009 Google Inc.
+ * Copyright (C) 2009 Kenneth Rohde Christiansen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -107,9 +108,13 @@ static HTMLMediaElement* mediaElementParent(Node* node) {
 }
 #endif
 
-RenderTheme* theme() {
-  static RenderThemeChromiumLinux theme;
-  return &theme;
+PassRefPtr<RenderTheme> RenderThemeChromiumLinux::create() {
+  return adoptRef(new RenderThemeChromiumLinux());
+}
+
+PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
+  static RenderTheme* rt = RenderThemeChromiumLinux::create().releaseRef();
+  return rt;
 }
 
 RenderThemeChromiumLinux::RenderThemeChromiumLinux() {}

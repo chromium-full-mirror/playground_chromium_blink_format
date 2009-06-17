@@ -1282,7 +1282,8 @@ void FrameView::updateControlTints() {
   if (!m_frame || m_frame->loader()->url().isEmpty())
     return;
 
-  if (theme()->supportsControlTints() && m_frame->contentRenderer()) {
+  if (m_frame->contentRenderer() &&
+      m_frame->contentRenderer()->theme()->supportsControlTints()) {
     if (needsLayout())
       layout();
     PlatformGraphicsContext* const noContext = 0;

@@ -760,8 +760,10 @@ void PopupListBox::paintRow(GraphicsContext* gc,
   // Paint background
   Color backColor, textColor;
   if (rowIndex == m_selectedIndex) {
-    backColor = theme()->activeListBoxSelectionBackgroundColor();
-    textColor = theme()->activeListBoxSelectionForegroundColor();
+    backColor =
+        RenderTheme::defaultTheme()->activeListBoxSelectionBackgroundColor();
+    textColor =
+        RenderTheme::defaultTheme()->activeListBoxSelectionForegroundColor();
   } else {
     backColor = style.backgroundColor();
     textColor = style.foregroundColor();

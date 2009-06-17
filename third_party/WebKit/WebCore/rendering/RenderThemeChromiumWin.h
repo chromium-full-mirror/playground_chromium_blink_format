@@ -44,8 +44,7 @@ struct ThemeData {
 
 class RenderThemeChromiumWin : public RenderTheme {
  public:
-  RenderThemeChromiumWin() {}
-  ~RenderThemeChromiumWin() {}
+  static PassRefPtr<RenderTheme> create();
 
   virtual String extraDefaultStyleSheet();
   virtual String extraQuirksStyleSheet();
@@ -194,6 +193,9 @@ class RenderThemeChromiumWin : public RenderTheme {
   static void setDefaultFontSize(int);
 
  private:
+  RenderThemeChromiumWin() {}
+  ~RenderThemeChromiumWin() {}
+
   unsigned determineState(RenderObject*);
   unsigned determineSliderThumbState(RenderObject*);
   unsigned determineClassicState(RenderObject*);
