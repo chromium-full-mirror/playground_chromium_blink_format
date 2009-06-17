@@ -55,7 +55,6 @@ class RenderThemeChromiumSkia : public RenderTheme {
   virtual Color platformInactiveSelectionBackgroundColor() const;
   virtual Color platformActiveSelectionForegroundColor() const;
   virtual Color platformInactiveSelectionForegroundColor() const;
-  virtual Color platformTextSearchHighlightColor() const;
 
   // To change the blink interval, override caretBlinkIntervalInternal instead
   // of this one so that we may share layout test code an intercepts.
@@ -156,9 +155,6 @@ class RenderThemeChromiumSkia : public RenderTheme {
   virtual int buttonInternalPaddingRight() const;
   virtual int buttonInternalPaddingTop() const;
   virtual int buttonInternalPaddingBottom() const;
-
-  // A general method asking if any control tinting is supported at all.
-  virtual bool supportsControlTints() const { return true; }
 
  protected:
   static const String& defaultGUIFont();

@@ -30,7 +30,6 @@
 #include <vssym32.h>
 
 #include "ChromiumBridge.h"
-#include "CSSStyleSheet.h"
 #include "CSSValueKeywords.h"
 #include "FontSelector.h"
 #include "FontUtilsChromiumWin.h"
@@ -41,9 +40,7 @@
 #include "RenderBox.h"
 #include "RenderSlider.h"
 #include "ScrollbarTheme.h"
-#include "SkiaUtils.h"
 #include "TransparencyWin.h"
-#include "UserAgentStyleSheets.h"
 #include "WindowsVersion.h"
 
 // FIXME: This dependency should eventually be removed.
@@ -57,29 +54,6 @@
 namespace WebCore {
 
 namespace {
-
-// The background for the media player controls should be a 60% opaque black
-// rectangle. This
-// matches the UI mockups for the default UI theme.
-static const float defaultMediaControlOpacity = 0.6f;
-
-// These values all match Safari/Win.
-static const float defaultControlFontPixelSize = 13;
-static const float defaultCancelButtonSize = 9;
-static const float minCancelButtonSize = 5;
-static const float maxCancelButtonSize = 21;
-static const float defaultSearchFieldResultsDecorationSize = 13;
-static const float minSearchFieldResultsDecorationSize = 9;
-static const float maxSearchFieldResultsDecorationSize = 30;
-static const float defaultSearchFieldResultsButtonWidth = 18;
-
-bool canvasHasMultipleLayers(const SkCanvas* canvas) {
-  SkCanvas::LayerIter iter(const_cast<SkCanvas*>(canvas), false);
-  iter.next();          // There is always at least one layer.
-  return !iter.done();  // There is > 1 layer if the the iterator can stil
-                        // advance.
-}
-
 class ThemePainter : public TransparencyWin {
  public:
   ThemePainter(GraphicsContext* context, const IntRect& r) {
@@ -90,6 +64,13 @@ class ThemePainter : public TransparencyWin {
   ~ThemePainter() { composite(); }
 
  private:
+  static bool canvasHasMultipleLayers(const SkCanvas* canvas) {
+    SkCanvas::LayerIter iter(const_cast<SkCanvas*>(canvas), false);
+    iter.next();          // There is always at least one layer.
+    return !iter.done();  // There is > 1 layer if the the iterator can stil
+                          // advance.
+  }
+
   static LayerMode getLayerMode(GraphicsContext* context,
                                 TransformMode transformMode) {
     if (context->platformContext()
@@ -125,15 +106,6 @@ static void getNonClientMetrics(NONCLIENTMETRICS* metrics) {
   ASSERT(success);
 }
 
-enum PaddingType { TopPadding, RightPadding, BottomPadding, LeftPadding };
-
-static const int styledMenuListInternalPadding[4] = {1, 4, 1, 4};
-
-// The default variable-width font size.  We use this as the default font
-// size for the "system font", and as a base size (which we then shrink) for
-// form control fonts.
-static float defaultFontSize = 16.0;
-
 static FontDescription smallSystemFont;
 static FontDescription menuFont;
 static FontDescription labelFont;
@@ -152,13 +124,6 @@ static bool supportsFocus(ControlPart appearance) {
       return true;
   }
   return false;
-}
-
-static void setFixedPadding(RenderStyle* style, const int padding[4]) {
-  style->setPaddingLeft(Length(padding[LeftPadding], Fixed));
-  style->setPaddingRight(Length(padding[RightPadding], Fixed));
-  style->setPaddingTop(Length(padding[TopPadding], Fixed));
-  style->setPaddingBottom(Length(padding[BottomPadding], Fixed));
 }
 
 // Return the height of system font |font| in pixels.  We use this size by
@@ -194,19 +159,6 @@ static float systemFontSize(const LOGFONT& font) {
   return ((size < 12.0f) && (GetACP() == 936)) ? 12.0f : size;
 }
 
-// We aim to match IE here.
-// -IE uses a font based on the encoding as the default font for form controls.
-// -Gecko uses MS Shell Dlg (actually calls GetStockObject(DEFAULT_GUI_FONT),
-// which returns MS Shell Dlg)
-// -Safari uses Lucida Grande.
-//
-// FIXME: The only case where we know we don't match IE is for ANSI encodings.
-// IE uses MS Shell Dlg there, which we render incorrectly at certain pixel
-// sizes (e.g. 15px). So, for now we just use Arial.
-static wchar_t* defaultGUIFont() {
-  return L"Arial";
-}
-
 // Converts |points| to pixels.  One point is 1/72 of an inch.
 static float pointsToPixels(float points) {
   static float pixelsPerInch = 0.0f;
@@ -224,13 +176,6 @@ static float pointsToPixels(float points) {
   return points / pointsPerInch * pixelsPerInch;
 }
 
-static void setSizeIfAuto(RenderStyle* style, const IntSize& size) {
-  if (style->width().isIntrinsicOrAuto())
-    style->setWidth(Length(size.width(), Fixed));
-  if (style->height().isAuto())
-    style->setHeight(Length(size.height(), Fixed));
-}
-
 static double querySystemBlinkInterval(double defaultInterval) {
   UINT blinkTime = GetCaretBlinkTime();
   if (blinkTime == 0)
@@ -240,21 +185,6 @@ static double querySystemBlinkInterval(double defaultInterval) {
   return blinkTime / 1000.0;
 }
 
-#if ENABLE(VIDEO)
-// Attempt to retrieve a HTMLMediaElement from a Node. Returns NULL if one
-// cannot be found.
-static HTMLMediaElement* mediaElementParent(Node* node) {
-  if (!node)
-    return 0;
-  Node* mediaNode = node->shadowAncestorNode();
-  if (!mediaNode || (!mediaNode->hasTagName(HTMLNames::videoTag) &&
-                     !mediaNode->hasTagName(HTMLNames::audioTag)))
-    return 0;
-
-  return static_cast<HTMLMediaElement*>(mediaNode);
-}
-#endif
-
 PassRefPtr<RenderTheme> RenderThemeChromiumWin::create() {
   return adoptRef(new RenderThemeChromiumWin);
 }
@@ -263,23 +193,6 @@ PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
   static RenderTheme* rt = RenderThemeChromiumWin::create().releaseRef();
   return rt;
 }
-
-String RenderThemeChromiumWin::extraDefaultStyleSheet() {
-  return String(themeWinUserAgentStyleSheet,
-                sizeof(themeWinUserAgentStyleSheet));
-}
-
-String RenderThemeChromiumWin::extraQuirksStyleSheet() {
-  return String(themeWinQuirksUserAgentStyleSheet,
-                sizeof(themeWinQuirksUserAgentStyleSheet));
-}
-
-#if ENABLE(VIDEO)
-String RenderThemeChromiumWin::extraMediaControlsStyleSheet() {
-  return String(mediaControlsChromiumUserAgentStyleSheet,
-                sizeof(mediaControlsChromiumUserAgentStyleSheet));
-}
-#endif
 
 bool RenderThemeChromiumWin::supportsFocusRing(const RenderStyle* style) const {
   // Let webkit draw one of its halo rings around any focused element,
@@ -322,24 +235,12 @@ Color RenderThemeChromiumWin::platformInactiveTextSearchHighlightColor() const {
   return Color(0xff, 0xff, 0x96);  // Yellow.
 }
 
-double RenderThemeChromiumWin::caretBlinkInterval() const {
-  // Disable the blinking caret in layout test mode, as it introduces
-  // a race condition for the pixel tests. http://b/1198440
-  if (ChromiumBridge::layoutTestMode())
-    return 0;
-
-  // This involves a system call, so we cache the result.
-  static double blinkInterval =
-      querySystemBlinkInterval(RenderTheme::caretBlinkInterval());
-  return blinkInterval;
-}
-
 void RenderThemeChromiumWin::systemFont(
     int propId,
     FontDescription& fontDescription) const {
   // This logic owes much to RenderThemeSafari.cpp.
-  FontDescription* cachedDesc = NULL;
-  wchar_t* faceName = 0;
+  FontDescription* cachedDesc = 0;
+  AtomicString faceName;
   float fontSize = 0;
   switch (propId) {
     case CSSValueSmallCaption:
@@ -347,7 +248,8 @@ void RenderThemeChromiumWin::systemFont(
       if (!smallSystemFont.isAbsoluteSize()) {
         NONCLIENTMETRICS metrics;
         getNonClientMetrics(&metrics);
-        faceName = metrics.lfSmCaptionFont.lfFaceName;
+        faceName = AtomicString(metrics.lfSmCaptionFont.lfFaceName,
+                                wcslen(metrics.lfSmCaptionFont.lfFaceName));
         fontSize = systemFontSize(metrics.lfSmCaptionFont);
       }
       break;
@@ -356,7 +258,8 @@ void RenderThemeChromiumWin::systemFont(
       if (!menuFont.isAbsoluteSize()) {
         NONCLIENTMETRICS metrics;
         getNonClientMetrics(&metrics);
-        faceName = metrics.lfMenuFont.lfFaceName;
+        faceName = AtomicString(metrics.lfMenuFont.lfFaceName,
+                                wcslen(metrics.lfMenuFont.lfFaceName));
         fontSize = systemFontSize(metrics.lfMenuFont);
       }
       break;
@@ -386,9 +289,7 @@ void RenderThemeChromiumWin::systemFont(
     cachedDesc = &fontDescription;
 
   if (fontSize) {
-    ASSERT(faceName);
-    cachedDesc->firstFamily().setFamily(
-        AtomicString(faceName, wcslen(faceName)));
+    cachedDesc->firstFamily().setFamily(faceName);
     cachedDesc->setIsAbsoluteSize(true);
     cachedDesc->setGenericFamily(FontDescription::NoFamily);
     cachedDesc->setSpecifiedSize(fontSize);
@@ -396,10 +297,6 @@ void RenderThemeChromiumWin::systemFont(
     cachedDesc->setItalic(false);
   }
   fontDescription = *cachedDesc;
-}
-
-int RenderThemeChromiumWin::minimumMenuListSize(RenderStyle* style) const {
-  return 0;
 }
 
 void RenderThemeChromiumWin::adjustSliderThumbSize(RenderObject* o) const {
@@ -416,23 +313,15 @@ void RenderThemeChromiumWin::adjustSliderThumbSize(RenderObject* o) const {
   }
 }
 
-void RenderThemeChromiumWin::setCheckboxSize(RenderStyle* style) const {
-  // If the width and height are both specified, then we have nothing to do.
-  if (!style->width().isIntrinsicOrAuto() && !style->height().isAuto())
-    return;
-
-  // FIXME:  A hard-coded size of 13 is used.  This is wrong but necessary
-  // for now.  It matches Firefox.  At different DPI settings on Windows,
-  // querying the theme gives you a larger size that accounts for the higher
-  // DPI.  Until our entire engine honors a DPI setting other than 96, we
-  // can't rely on the theme's metrics.
-  const IntSize size(13, 13);
-  setSizeIfAuto(style, size);
+bool RenderThemeChromiumWin::paintCheckbox(RenderObject* o,
+                                           const RenderObject::PaintInfo& i,
+                                           const IntRect& r) {
+  return paintButton(o, i, r);
 }
-
-void RenderThemeChromiumWin::setRadioSize(RenderStyle* style) const {
-  // Use same sizing for radio box as checkbox.
-  setCheckboxSize(style);
+bool RenderThemeChromiumWin::paintRadio(RenderObject* o,
+                                        const RenderObject::PaintInfo& i,
+                                        const IntRect& r) {
+  return paintButton(o, i, r);
 }
 
 bool RenderThemeChromiumWin::paintButton(RenderObject* o,
@@ -465,229 +354,10 @@ bool RenderThemeChromiumWin::paintSliderTrack(RenderObject* o,
   return false;
 }
 
-void RenderThemeChromiumWin::adjustSearchFieldCancelButtonStyle(
-    CSSStyleSelector*,
-    RenderStyle* style,
-    Element*) const {
-  // Scale the button size based on the font size
-  float fontScale = style->fontSize() / defaultControlFontPixelSize;
-  int cancelButtonSize = lroundf(std::min(
-      std::max(minCancelButtonSize, defaultCancelButtonSize * fontScale),
-      maxCancelButtonSize));
-  style->setWidth(Length(cancelButtonSize, Fixed));
-  style->setHeight(Length(cancelButtonSize, Fixed));
-}
-
-bool RenderThemeChromiumWin::paintSearchFieldCancelButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& r) {
-  IntRect bounds = r;
-  ASSERT(o->parent());
-  if (!o->parent() || !o->parent()->isBox())
-    return false;
-
-  RenderBox* parentRenderBox = toRenderBox(o->parent());
-
-  IntRect parentBox = parentRenderBox->absoluteContentBox();
-
-  // Make sure the scaled button stays square and will fit in its parent's box
-  bounds.setHeight(std::min(parentBox.width(),
-                            std::min(parentBox.height(), bounds.height())));
-  bounds.setWidth(bounds.height());
-
-  // Center the button vertically.  Round up though, so if it has to be one
-  // pixel off-center, it will
-  // be one pixel closer to the bottom of the field.  This tends to look better
-  // with the text.
-  bounds.setY(parentBox.y() + (parentBox.height() - bounds.height() + 1) / 2);
-
-  static Image* cancelImage =
-      Image::loadPlatformResource("searchCancel").releaseRef();
-  static Image* cancelPressedImage =
-      Image::loadPlatformResource("searchCancelPressed").releaseRef();
-  i.context->drawImage(isPressed(o) ? cancelPressedImage : cancelImage, bounds);
-  return false;
-}
-
-void RenderThemeChromiumWin::adjustSearchFieldDecorationStyle(
-    CSSStyleSelector*,
-    RenderStyle* style,
-    Element*) const {
-  IntSize emptySize(1, 11);
-  style->setWidth(Length(emptySize.width(), Fixed));
-  style->setHeight(Length(emptySize.height(), Fixed));
-}
-
-void RenderThemeChromiumWin::adjustSearchFieldResultsDecorationStyle(
-    CSSStyleSelector*,
-    RenderStyle* style,
-    Element*) const {
-  // Scale the decoration size based on the font size
-  float fontScale = style->fontSize() / defaultControlFontPixelSize;
-  int magnifierSize = lroundf(
-      std::min(std::max(minSearchFieldResultsDecorationSize,
-                        defaultSearchFieldResultsDecorationSize * fontScale),
-               maxSearchFieldResultsDecorationSize));
-  style->setWidth(Length(magnifierSize, Fixed));
-  style->setHeight(Length(magnifierSize, Fixed));
-}
-
-bool RenderThemeChromiumWin::paintSearchFieldResultsDecoration(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& r) {
-  IntRect bounds = r;
-  ASSERT(o->parent());
-  if (!o->parent() || !o->parent()->isBox())
-    return false;
-
-  RenderBox* parentRenderBox = toRenderBox(o->parent());
-  IntRect parentBox = parentRenderBox->absoluteContentBox();
-
-  // Make sure the scaled decoration stays square and will fit in its parent's
-  // box
-  bounds.setHeight(std::min(parentBox.width(),
-                            std::min(parentBox.height(), bounds.height())));
-  bounds.setWidth(bounds.height());
-
-  // Center the decoration vertically.  Round up though, so if it has to be one
-  // pixel off-center, it will
-  // be one pixel closer to the bottom of the field.  This tends to look better
-  // with the text.
-  bounds.setY(parentBox.y() + (parentBox.height() - bounds.height() + 1) / 2);
-
-  static Image* magnifierImage =
-      Image::loadPlatformResource("searchMagnifier").releaseRef();
-  i.context->drawImage(magnifierImage, bounds);
-  return false;
-}
-
-void RenderThemeChromiumWin::adjustSearchFieldResultsButtonStyle(
-    CSSStyleSelector*,
-    RenderStyle* style,
-    Element*) const {
-  // Scale the button size based on the font size
-  float fontScale = style->fontSize() / defaultControlFontPixelSize;
-  int magnifierHeight = lroundf(
-      std::min(std::max(minSearchFieldResultsDecorationSize,
-                        defaultSearchFieldResultsDecorationSize * fontScale),
-               maxSearchFieldResultsDecorationSize));
-  int magnifierWidth =
-      lroundf(magnifierHeight * defaultSearchFieldResultsButtonWidth /
-              defaultSearchFieldResultsDecorationSize);
-  style->setWidth(Length(magnifierWidth, Fixed));
-  style->setHeight(Length(magnifierHeight, Fixed));
-}
-
-bool RenderThemeChromiumWin::paintSearchFieldResultsButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& r) {
-  IntRect bounds = r;
-  ASSERT(o->parent());
-  if (!o->parent())
-    return false;
-  if (!o->parent() || !o->parent()->isBox())
-    return false;
-
-  RenderBox* parentRenderBox = toRenderBox(o->parent());
-  IntRect parentBox = parentRenderBox->absoluteContentBox();
-
-  // Make sure the scaled decoration will fit in its parent's box
-  bounds.setHeight(std::min(parentBox.height(), bounds.height()));
-  bounds.setWidth(std::min(
-      parentBox.width(),
-      static_cast<int>(bounds.height() * defaultSearchFieldResultsButtonWidth /
-                       defaultSearchFieldResultsDecorationSize)));
-
-  // Center the button vertically.  Round up though, so if it has to be one
-  // pixel off-center, it will
-  // be one pixel closer to the bottom of the field.  This tends to look better
-  // with the text.
-  bounds.setY(parentBox.y() + (parentBox.height() - bounds.height() + 1) / 2);
-
-  static Image* magnifierImage =
-      Image::loadPlatformResource("searchMagnifierResults").releaseRef();
-  i.context->drawImage(magnifierImage, bounds);
-  return false;
-}
-
-bool RenderThemeChromiumWin::paintMediaButtonInternal(GraphicsContext* context,
-                                                      const IntRect& rect,
-                                                      Image* image) {
-  context->beginTransparencyLayer(defaultMediaControlOpacity);
-
-  // Draw background.
-  Color oldFill = context->fillColor();
-  Color oldStroke = context->strokeColor();
-
-  context->setFillColor(Color::black);
-  context->setStrokeColor(Color::black);
-  context->drawRect(rect);
-
-  context->setFillColor(oldFill);
-  context->setStrokeColor(oldStroke);
-
-  // Create a destination rectangle for the image that is centered in the
-  // drawing rectangle, rounded left, and down.
-  IntRect imageRect = image->rect();
-  imageRect.setY(rect.y() + (rect.height() - image->height() + 1) / 2);
-  imageRect.setX(rect.x() + (rect.width() - image->width() + 1) / 2);
-
-  context->drawImage(image, imageRect, CompositeSourceAtop);
-  context->endTransparencyLayer();
-
-  return false;
-}
-
-bool RenderThemeChromiumWin::paintMediaPlayButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& rect) {
-#if ENABLE(VIDEO)
-  HTMLMediaElement* mediaElement = mediaElementParent(o->node());
-  if (!mediaElement)
-    return false;
-
-  static Image* mediaPlay =
-      Image::loadPlatformResource("mediaPlay").releaseRef();
-  static Image* mediaPause =
-      Image::loadPlatformResource("mediaPause").releaseRef();
-
-  return paintMediaButtonInternal(
-      paintInfo.context, rect, mediaElement->paused() ? mediaPlay : mediaPause);
-#else
-  return false;
-#endif
-}
-
-bool RenderThemeChromiumWin::paintMediaMuteButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& rect) {
-#if ENABLE(VIDEO)
-  HTMLMediaElement* mediaElement = mediaElementParent(o->node());
-  if (!mediaElement)
-    return false;
-
-  static Image* soundFull =
-      Image::loadPlatformResource("mediaSoundFull").releaseRef();
-  static Image* soundNone =
-      Image::loadPlatformResource("mediaSoundNone").releaseRef();
-
-  return paintMediaButtonInternal(
-      paintInfo.context, rect, mediaElement->muted() ? soundNone : soundFull);
-#else
-  return false;
-#endif
-}
-
-void RenderThemeChromiumWin::adjustMenuListStyle(CSSStyleSelector* selector,
-                                                 RenderStyle* style,
-                                                 Element* e) const {
-  // Height is locked to auto on all browsers.
-  style->setLineHeight(RenderStyle::initialLineHeight());
+bool RenderThemeChromiumWin::paintSliderThumb(RenderObject* o,
+                                              const RenderObject::PaintInfo& i,
+                                              const IntRect& r) {
+  return paintSliderTrack(o, i, r);
 }
 
 // Used to paint unstyled menulists (i.e. with the default border)
@@ -743,61 +413,19 @@ bool RenderThemeChromiumWin::paintMenuList(RenderObject* o,
   return false;
 }
 
-void RenderThemeChromiumWin::adjustMenuListButtonStyle(
-    CSSStyleSelector* selector,
-    RenderStyle* style,
-    Element* e) const {
-  adjustMenuListStyle(selector, style, e);
-}
-
-// Used to paint styled menulists (i.e. with a non-default border)
-bool RenderThemeChromiumWin::paintMenuListButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& r) {
-  return paintMenuList(o, i, r);
-}
-
-int RenderThemeChromiumWin::popupInternalPaddingLeft(RenderStyle* style) const {
-  return menuListInternalPadding(style, LeftPadding);
-}
-
-int RenderThemeChromiumWin::popupInternalPaddingRight(
-    RenderStyle* style) const {
-  return menuListInternalPadding(style, RightPadding);
-}
-
-int RenderThemeChromiumWin::popupInternalPaddingTop(RenderStyle* style) const {
-  return menuListInternalPadding(style, TopPadding);
-}
-
-int RenderThemeChromiumWin::popupInternalPaddingBottom(
-    RenderStyle* style) const {
-  return menuListInternalPadding(style, BottomPadding);
-}
-
-int RenderThemeChromiumWin::buttonInternalPaddingLeft() const {
-  return 3;
-}
-
-int RenderThemeChromiumWin::buttonInternalPaddingRight() const {
-  return 3;
-}
-
-int RenderThemeChromiumWin::buttonInternalPaddingTop() const {
-  return 1;
-}
-
-int RenderThemeChromiumWin::buttonInternalPaddingBottom() const {
-  return 1;
-}
-
 // static
 void RenderThemeChromiumWin::setDefaultFontSize(int fontSize) {
   defaultFontSize = static_cast<float>(fontSize);
 
   // Reset cached fonts.
   smallSystemFont = menuFont = labelFont = FontDescription();
+}
+
+double RenderThemeChromiumWin::caretBlinkIntervalInternal() const {
+  // This involves a system call, so we cache the result.
+  static double blinkInterval =
+      querySystemBlinkInterval(RenderTheme::caretBlinkInterval());
+  return blinkInterval;
 }
 
 unsigned RenderThemeChromiumWin::determineState(RenderObject* o) {
@@ -933,24 +561,6 @@ bool RenderThemeChromiumWin::paintTextFieldInternal(
                                  painter.drawRect(), backgroundColor,
                                  fillContentArea, drawEdges);
   return false;
-}
-
-int RenderThemeChromiumWin::menuListInternalPadding(RenderStyle* style,
-                                                    int paddingType) const {
-  // This internal padding is in addition to the user-supplied padding.
-  // Matches the FF behavior.
-  int padding = styledMenuListInternalPadding[paddingType];
-
-  // Reserve the space for right arrow here. The rest of the padding is set
-  // by adjustMenuListStyle, since PopupMenuChromium.cpp uses the padding
-  // from RenderMenuList to lay out the individual items in the popup.  If
-  // the MenuList actually has appearance "NoAppearance", then that means we
-  // don't draw a button, so don't reserve space for it.
-  const int barType = style->direction() == LTR ? RightPadding : LeftPadding;
-  if (paddingType == barType && style->appearance() != NoControlPart)
-    padding += ScrollbarTheme::nativeTheme()->scrollbarThickness();
-
-  return padding;
 }
 
 }  // namespace WebCore
