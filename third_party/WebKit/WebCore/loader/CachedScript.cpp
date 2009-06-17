@@ -48,8 +48,7 @@ CachedScript::CachedScript(const String& url, const String& charset)
 
 CachedScript::~CachedScript() {}
 
-void CachedScript::addClient(CachedResourceClient* c) {
-  CachedResource::addClient(c);
+void CachedScript::didAddClient(CachedResourceClient* c) {
   if (!m_loading)
     c->notifyFinished(this);
 }

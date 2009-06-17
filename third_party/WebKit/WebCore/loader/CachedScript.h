@@ -42,7 +42,7 @@ class CachedScript : public CachedResource {
 
   const String& script();
 
-  virtual void addClient(CachedResourceClient*);
+  virtual void didAddClient(CachedResourceClient*);
   virtual void allClientsRemoved();
 
   virtual void setEncoding(const String&);

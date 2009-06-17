@@ -48,9 +48,7 @@ CachedXSLStyleSheet::CachedXSLStyleSheet(const String& url)
       "application/rss+xml, application/atom+xml");
 }
 
-void CachedXSLStyleSheet::addClient(CachedResourceClient* c) {
-  CachedResource::addClient(c);
-
+void CachedXSLStyleSheet::didAddClient(CachedResourceClient* c) {
   if (!m_loading)
     c->setXSLStyleSheet(m_url, m_sheet);
 }

@@ -42,7 +42,7 @@ class CachedXSLStyleSheet : public CachedResource {
 
   const String& sheet() const { return m_sheet; }
 
-  virtual void addClient(CachedResourceClient*);
+  virtual void didAddClient(CachedResourceClient*);
 
   virtual void setEncoding(const String&);
   virtual String encoding() const;
