@@ -109,7 +109,6 @@ class FrameView : public ScrollView, public RefCounted<FrameView> {
   void willMoveOffscreen();
 
   void resetScrollbars();
-  void detachCustomScrollbars();
 
   void clear();
 

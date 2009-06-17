@@ -7,7 +7,7 @@
  * reserved.
  * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
- * Copyright (C) 2008, 2009 Google Inc. All rights reserved.
+ * Copyright (C) 2008 David Levin (levin@chromium.org)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -1393,12 +1393,6 @@ void Document::detach() {
   ContainerNode::detach();
 
   unscheduleStyleRecalc();
-
-  if (m_frame) {
-    FrameView* view = m_frame->view();
-    if (view)
-      view->detachCustomScrollbars();
-  }
 
   if (render)
     render->destroy();
