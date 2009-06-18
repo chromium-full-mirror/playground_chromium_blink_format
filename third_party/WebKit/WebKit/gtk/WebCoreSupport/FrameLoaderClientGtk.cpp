@@ -179,6 +179,12 @@ static void notifyStatus(WebKitWebFrame* frame, WebKitLoadStatus loadStatus) {
   }
 }
 
+static void loadDone(WebKitWebFrame* frame, bool didSucceed) {
+  // FIXME: load-done is deprecated. Please remove when signal's been removed.
+  g_signal_emit_by_name(frame, "load-done", didSucceed);
+  notifyStatus(frame, WEBKIT_LOAD_FINISHED);
+}
+
 WTF::PassRefPtr<WebCore::DocumentLoader>
 FrameLoaderClient::createDocumentLoader(const WebCore::ResourceRequest& request,
                                         const SubstituteData& substituteData) {
@@ -633,9 +639,7 @@ bool FrameLoaderClient::hasWebView() const {
 }
 
 void FrameLoaderClient::dispatchDidFinishLoad() {
-  g_signal_emit_by_name(m_frame, "load-done", true);
-
-  notifyStatus(m_frame, WEBKIT_LOAD_FINISHED);
+  loadDone(m_frame, true);
 }
 
 void FrameLoaderClient::frameLoadCompleted() {
@@ -899,8 +903,7 @@ void FrameLoaderClient::dispatchDidFailProvisionalLoad(
     const ResourceError& error) {
   dispatchDidFailLoad(error);
 
-  // FIXME: load-done is deprecated. Please remove when signal's been removed.
-  g_signal_emit_by_name(m_frame, "load-done", false);
+  loadDone(m_frame, false);
 }
 
 void FrameLoaderClient::dispatchDidFailLoad(const ResourceError& error) {
@@ -919,8 +922,7 @@ void FrameLoaderClient::dispatchDidFailLoad(const ResourceError& error) {
 
   if (!shouldFallBack(error)) {
     g_error_free(webError);
-    // FIXME: load-done is deprecated. Please remove when signal's been removed.
-    g_signal_emit_by_name(m_frame, "load-done", false);
+    loadDone(m_frame, false);
     return;
   }
 
@@ -953,8 +955,7 @@ void FrameLoaderClient::dispatchDidFailLoad(const ResourceError& error) {
 
   g_error_free(webError);
 
-  // FIXME: load-done is deprecated. Please remove when signal's been removed.
-  g_signal_emit_by_name(m_frame, "load-done", false);
+  loadDone(m_frame, false);
 }
 
 void FrameLoaderClient::download(ResourceHandle* handle,
