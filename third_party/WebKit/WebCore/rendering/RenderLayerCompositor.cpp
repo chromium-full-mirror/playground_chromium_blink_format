@@ -38,6 +38,7 @@
 #include "HitTestResult.h"
 #include "Page.h"
 #include "RenderLayerBacking.h"
+#include "RenderVideo.h"
 #include "RenderView.h"
 
 #if PROFILE_LAYER_REBUILD
@@ -200,6 +201,14 @@ bool RenderLayerCompositor::updateLayerCompositingState(
         repaintOnCompositingChange(layer);
     }
   }
+
+#if ENABLE(VIDEO)
+  if (layerChanged && layer->renderer()->isVideo()) {
+    // If it's a video, give the media player a chance to hook up to the layer.
+    RenderVideo* video = static_cast<RenderVideo*>(layer->renderer());
+    video->acceleratedRenderingStateChanged();
+  }
+#endif
 
   // See if we need content or clipping layers. Methods called here should
   // assume
@@ -374,6 +383,17 @@ void RenderLayerCompositor::computeCompositingRequirements(
   // a compositing layer among them, so start by assuming false.
   childState.m_subtreeIsCompositing = false;
 
+#if ENABLE(VIDEO)
+  // Video is special. It's a replaced element with a content layer, but has
+  // shadow content
+  // for the controller that must render in front. Without this, the controls
+  // fail to show
+  // when the video element is a stacking context (e.g. due to opacity or
+  // transform).
+  if (willBeComposited && layer->renderer()->isVideo())
+    childState.m_subtreeIsCompositing = true;
+#endif
+
 #ifndef NDEBUG
   ++childState.m_depth;
 #endif
@@ -473,6 +493,18 @@ void RenderLayerCompositor::parentInRootLayer(RenderLayer* layer) {
       m_rootPlatformLayer->addChild(layerAnchor);
   }
 }
+
+#if ENABLE(VIDEO)
+bool RenderLayerCompositor::canAccelerateVideoRendering(RenderVideo* o) const {
+  // FIXME: ideally we need to look at all ancestors for mask or video. But for
+  // now,
+  // just bail on the obvious cases.
+  if (o->hasMask() || o->hasReflection())
+    return false;
+
+  return o->supportsAcceleratedRendering();
+}
+#endif
 
 void RenderLayerCompositor::rebuildCompositingLayerTree(
     RenderLayer* layer,
@@ -700,7 +732,14 @@ bool RenderLayerCompositor::requiresCompositingLayer(
   if (!gotReason && requiresCompositingForTransform(layer->renderer())) {
     fprintf(stderr,
             "RenderLayer %p requires compositing layer because: it has 3d "
-            "transform, perspective, backface, or animating transform\n",
+            "transform, perspective or backface-hidden\n",
+            layer);
+    gotReason = true;
+  }
+
+  if (!gotReason && requiresCompositingForVideo(layer->renderer())) {
+    fprintf(stderr,
+            "RenderLayer %p requires compositing layer because: it is video\n",
             layer);
     gotReason = true;
   }
@@ -739,6 +778,7 @@ bool RenderLayerCompositor::requiresCompositingLayer(
   // The root layer always has a compositing layer, but it may not have backing.
   return (inCompositingMode() && layer->isRootLayer()) ||
          requiresCompositingForTransform(layer->renderer()) ||
+         requiresCompositingForVideo(layer->renderer()) ||
          layer->renderer()->style()->backfaceVisibility() ==
              BackfaceVisibilityHidden ||
          clipsCompositingDescendants(layer) ||
@@ -809,6 +849,17 @@ bool RenderLayerCompositor::requiresCompositingForTransform(
          (style->transform().has3DOperation() ||
           style->transformStyle3D() == TransformStyle3DPreserve3D ||
           style->hasPerspective());
+}
+
+bool RenderLayerCompositor::requiresCompositingForVideo(
+    RenderObject* renderer) const {
+#if ENABLE(VIDEO)
+  if (renderer->isVideo()) {
+    RenderVideo* video = static_cast<RenderVideo*>(renderer);
+    return canAccelerateVideoRendering(video);
+  }
+#endif
+  return false;
 }
 
 bool RenderLayerCompositor::requiresCompositingForAnimation(

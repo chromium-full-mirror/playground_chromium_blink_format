@@ -33,6 +33,9 @@
 namespace WebCore {
 
 class HTMLMediaElement;
+#if USE(ACCELERATED_COMPOSITING)
+class GraphicsLayer;
+#endif
 
 class RenderVideo : public RenderMedia {
  public:
@@ -54,8 +57,15 @@ class RenderVideo : public RenderMedia {
   virtual void calcPrefWidths();
 
   void videoSizeChanged();
+  IntRect videoBox() const;
 
   void updateFromElement();
+
+#if USE(ACCELERATED_COMPOSITING)
+  bool supportsAcceleratedRendering() const;
+  virtual void acceleratedRenderingStateChanged();
+  GraphicsLayer* videoGraphicsLayer() const;
+#endif
 
  protected:
   virtual void intrinsicSizeChanged() { videoSizeChanged(); }
@@ -66,8 +76,6 @@ class RenderVideo : public RenderMedia {
 
   bool isWidthSpecified() const;
   bool isHeightSpecified() const;
-
-  IntRect videoBox() const;
 
   void updatePlayer();
 };

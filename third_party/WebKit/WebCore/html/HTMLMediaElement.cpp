@@ -57,6 +57,11 @@
 #include <wtf/CurrentTime.h>
 #include <wtf/MathExtras.h>
 
+#if USE(ACCELERATED_COMPOSITING)
+#include "RenderView.h"
+#include "RenderLayerCompositor.h"
+#endif
+
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
 #include "RenderPartObject.h"
 #include "Widget.h"
@@ -1204,13 +1209,6 @@ void HTMLMediaElement::mediaPlayerTimeChanged(MediaPlayer*) {
   endProcessingMediaPlayerCallback();
 }
 
-void HTMLMediaElement::mediaPlayerRepaint(MediaPlayer*) {
-  beginProcessingMediaPlayerCallback();
-  if (renderer())
-    renderer()->repaint();
-  endProcessingMediaPlayerCallback();
-}
-
 void HTMLMediaElement::mediaPlayerVolumeChanged(MediaPlayer*) {
   beginProcessingMediaPlayerCallback();
   updateVolume();
@@ -1238,15 +1236,6 @@ void HTMLMediaElement::mediaPlayerRateChanged(MediaPlayer*) {
   endProcessingMediaPlayerCallback();
 }
 
-void HTMLMediaElement::mediaPlayerSizeChanged(MediaPlayer*) {
-  beginProcessingMediaPlayerCallback();
-#if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-  if (renderer() && renderer()->isVideo())
-    static_cast<RenderVideo*>(renderer())->videoSizeChanged();
-#endif
-  endProcessingMediaPlayerCallback();
-}
-
 void HTMLMediaElement::mediaPlayerSawUnsupportedTracks(MediaPlayer*) {
   // The MediaPlayer came across content it cannot completely handle.
   // This is normally acceptable except when we are in a standalone
@@ -1256,6 +1245,40 @@ void HTMLMediaElement::mediaPlayerSawUnsupportedTracks(MediaPlayer*) {
     mediaDocument->mediaElementSawUnsupportedTracks();
   }
 }
+
+// MediaPlayerPresentation methods
+void HTMLMediaElement::mediaPlayerRepaint(MediaPlayer*) {
+  beginProcessingMediaPlayerCallback();
+  if (renderer())
+    renderer()->repaint();
+  endProcessingMediaPlayerCallback();
+}
+
+void HTMLMediaElement::mediaPlayerSizeChanged(MediaPlayer*) {
+  beginProcessingMediaPlayerCallback();
+#if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  if (renderer() && renderer()->isVideo())
+    static_cast<RenderVideo*>(renderer())->videoSizeChanged();
+#endif
+  endProcessingMediaPlayerCallback();
+}
+
+#if USE(ACCELERATED_COMPOSITING)
+bool HTMLMediaElement::mediaPlayerRenderingCanBeAccelerated(MediaPlayer*) {
+  if (renderer() && renderer()->isVideo()) {
+    ASSERT(renderer()->view());
+    return renderer()->view()->compositor()->canAccelerateVideoRendering(
+        static_cast<RenderVideo*>(renderer()));
+  }
+  return false;
+}
+
+GraphicsLayer* HTMLMediaElement::mediaPlayerGraphicsLayer(MediaPlayer*) {
+  if (renderer() && renderer()->isVideo())
+    return static_cast<RenderVideo*>(renderer())->videoGraphicsLayer();
+  return 0;
+}
+#endif
 
 PassRefPtr<TimeRanges> HTMLMediaElement::buffered() const {
   // FIXME real ranges support
