@@ -92,6 +92,12 @@ void SVGDocument::updatePan(const FloatPoint& pos) const {
       renderer()->repaint();
   }
 }
+
+bool SVGDocument::childShouldCreateRenderer(Node* node) const {
+  if (node->hasTagName(SVGNames::svgTag))
+    return static_cast<SVGSVGElement*>(node)->isValid();
+  return true;
+}
 }
 
 // vim:ts=4:noet
