@@ -106,8 +106,6 @@ SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
     "movl %esp, %ecx" "\n"
 #endif
     "call " SYMBOL_STRING(cti_vm_throw) "\n"
-".globl " SYMBOL_STRING(ctiOpThrowNotCaught) "\n"
-SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "addl $0x1c, %esp" "\n"
     "popl %ebx" "\n"
     "popl %edi" "\n"
@@ -162,8 +160,6 @@ asm(
 SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
     "movq %rsp, %rdi" "\n"
     "call " SYMBOL_STRING(cti_vm_throw) "\n"
-".globl " SYMBOL_STRING(ctiOpThrowNotCaught) "\n"
-SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "addq $0x48, %rsp" "\n"
     "popq %rbx" "\n"
     "popq %r15" "\n"
@@ -305,17 +301,6 @@ __declspec(naked) void ctiVMThrowTrampoline() {
   __asm {
             mov ecx, esp;
             call JITStubs::cti_vm_throw;
-            add esp, 0x1c;
-            pop ebx;
-            pop edi;
-            pop esi;
-            pop ebp;
-            ret;
-  }
-}
-
-__declspec(naked) void ctiOpThrowNotCaught() {
-  __asm {
             add esp, 0x1c;
             pop ebx;
             pop edi;
@@ -2517,10 +2502,6 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_throw) {
 
   if (!handler) {
     *stackFrame.exception = exceptionValue;
-#if !(PLATFORM(x86) || PLATFORM(x86_64))
-    // Termporarily disable this on x86 platforms.
-    STUB_SET_RETURN_ADDRESS(reinterpret_cast<void*>(ctiOpThrowNotCaught));
-#endif
     return JSValue::encode(jsNull());
   }
 
