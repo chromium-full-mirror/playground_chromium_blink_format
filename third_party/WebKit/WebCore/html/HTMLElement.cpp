@@ -252,6 +252,9 @@ void HTMLElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == onwebkittransitionendAttr) {
     setAttributeEventListener(eventNames().webkitTransitionEndEvent,
                               createAttributeEventListener(this, attr));
+  } else if (attr->name() == oninputAttr) {
+    setAttributeEventListener(eventNames().inputEvent,
+                              createAttributeEventListener(this, attr));
   }
 }
 
