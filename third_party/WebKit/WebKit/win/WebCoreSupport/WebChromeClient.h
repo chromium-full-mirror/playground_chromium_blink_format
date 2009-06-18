@@ -33,9 +33,6 @@
 class WebView;
 
 interface IWebUIDelegate;
-interface IWebUIDelegate2;
-interface IWebUIDelegate3;
-interface IWebUIDelegate4;
 
 class WebChromeClient : public WebCore::ChromeClient {
  public:
@@ -160,9 +157,6 @@ class WebChromeClient : public WebCore::ChromeClient {
 
  private:
   COMPtr<IWebUIDelegate> uiDelegate();
-  COMPtr<IWebUIDelegate2> uiDelegate2();
-  COMPtr<IWebUIDelegate3> uiDelegate3();
-  COMPtr<IWebUIDelegate4> uiDelegate4();
 
   WebView* m_webView;
 };

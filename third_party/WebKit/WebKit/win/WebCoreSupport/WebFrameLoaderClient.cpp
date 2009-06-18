@@ -116,9 +116,9 @@ bool WebFrameLoaderClient::shouldUseCredentialStorage(
   if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return true;
 
-  COMPtr<IWebResourceLoadDelegatePrivate2> resourceLoadDelegatePrivate;
+  COMPtr<IWebResourceLoadDelegatePrivate> resourceLoadDelegatePrivate;
   if (FAILED(resourceLoadDelegate->QueryInterface(
-          IID_IWebResourceLoadDelegatePrivate2,
+          IID_IWebResourceLoadDelegatePrivate,
           reinterpret_cast<void**>(&resourceLoadDelegatePrivate))))
     return true;
 
@@ -272,7 +272,7 @@ bool WebFrameLoaderClient::shouldCacheResponse(
   if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return true;
 
-  COMPtr<IWebResourceLoadDelegatePrivate3> resourceLoadDelegatePrivate(
+  COMPtr<IWebResourceLoadDelegatePrivate> resourceLoadDelegatePrivate(
       Query, resourceLoadDelegate);
   if (!resourceLoadDelegatePrivate)
     return true;
@@ -389,13 +389,9 @@ void WebFrameLoaderClient::dispatchDidFirstVisuallyNonEmptyLayout() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegatePrivate> frameLoadDelegatePrivate;
   if (SUCCEEDED(webView->frameLoadDelegatePrivate(&frameLoadDelegatePrivate)) &&
-      frameLoadDelegatePrivate) {
-    COMPtr<IWebFrameLoadDelegatePrivate2> frameLoadDelegatePrivate2(
-        Query, frameLoadDelegatePrivate);
-    if (frameLoadDelegatePrivate2)
-      frameLoadDelegatePrivate2->didFirstVisuallyNonEmptyLayoutInFrame(
-          webView, m_webFrame);
-  }
+      frameLoadDelegatePrivate)
+    frameLoadDelegatePrivate->didFirstVisuallyNonEmptyLayoutInFrame(webView,
+                                                                    m_webFrame);
 }
 
 Frame* WebFrameLoaderClient::dispatchCreatePage() {
@@ -690,7 +686,7 @@ Widget* WebFrameLoaderClient::createPlugin(const IntSize& pluginSize,
 
   COMPtr<IWebUIDelegate> ui;
   if (SUCCEEDED(webView->uiDelegate(&ui)) && ui) {
-    COMPtr<IWebUIDelegatePrivate4> uiPrivate(Query, ui);
+    COMPtr<IWebUIDelegatePrivate> uiPrivate(Query, ui);
 
     if (uiPrivate) {
       // Assemble the view arguments in a property bag.

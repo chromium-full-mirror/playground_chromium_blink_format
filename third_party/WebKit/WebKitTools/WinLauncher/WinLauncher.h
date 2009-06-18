@@ -126,6 +126,14 @@ class WinLauncherWebHost : public IWebFrameLoadDelegate {
     return S_OK;
   }
 
+  virtual /* [local] */ HRESULT STDMETHODCALLTYPE didClearWindowObject(
+      /* [in] */ IWebView* webView,
+      /* [in] */ JSContextRef context,
+      /* [in] */ JSObjectRef windowScriptObject,
+      /* [in] */ IWebFrame* frame) {
+    return S_OK;
+  }
+
   // WinLauncherWebHost
 
  protected:

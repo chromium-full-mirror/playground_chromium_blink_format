@@ -610,12 +610,8 @@ HRESULT STDMETHODCALLTYPE WebView::close() {
 
   m_didClose = true;
 
-  if (m_uiDelegatePrivate) {
-    COMPtr<IWebUIDelegatePrivate5> uiDelegatePrivate5(Query,
-                                                      m_uiDelegatePrivate);
-    if (uiDelegatePrivate5)
-      uiDelegatePrivate5->webViewClosing(this);
-  }
+  if (m_uiDelegatePrivate)
+    m_uiDelegatePrivate->webViewClosing(this);
 
   removeFromAllWebViewsSet();
 
@@ -754,9 +750,8 @@ void WebView::addToDirtyRegion(HRGN newRegion) {
   } else
     m_backingStoreDirtyRegion.set(newRegion);
 
-  COMPtr<IWebUIDelegatePrivate5> delegate(Query, m_uiDelegatePrivate);
-  if (delegate)
-    delegate->webViewDidInvalidate(this);
+  if (m_uiDelegatePrivate)
+    m_uiDelegatePrivate->webViewDidInvalidate(this);
 }
 
 void WebView::scrollBackingStore(FrameView* frameView,
@@ -887,12 +882,8 @@ void WebView::updateBackingStore(FrameView* frameView,
     for (unsigned i = 0; i < paintRects.size(); ++i)
       paintIntoBackingStore(frameView, bitmapDC, paintRects[i], windowsToPaint);
 
-    if (m_uiDelegatePrivate) {
-      COMPtr<IWebUIDelegatePrivate2> uiDelegatePrivate2(Query,
-                                                        m_uiDelegatePrivate);
-      if (uiDelegatePrivate2)
-        uiDelegatePrivate2->webViewPainted(this);
-    }
+    if (m_uiDelegatePrivate)
+      m_uiDelegatePrivate->webViewPainted(this);
 
     m_backingStoreDirtyRegion.clear();
   }
@@ -1345,12 +1336,8 @@ bool WebView::handleMouseEvent(UINT message, WPARAM wParam, LPARAM lParam) {
   LONG messageTime = ::GetMessageTime();
 
   if (inResizer(position)) {
-    if (m_uiDelegate) {
-      COMPtr<IWebUIDelegatePrivate4> uiPrivate(Query, m_uiDelegate);
-
-      if (uiPrivate)
-        uiPrivate->webViewSendResizeMessage(message, wParam, position);
-    }
+    if (m_uiDelegatePrivate)
+      m_uiDelegatePrivate->webViewSendResizeMessage(message, wParam, position);
     return true;
   }
 
@@ -2305,15 +2292,11 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
   }
 
   if (m_uiDelegate) {
-    COMPtr<IWebUIDelegate2> uiDelegate2;
-    if (SUCCEEDED(m_uiDelegate->QueryInterface(IID_IWebUIDelegate2,
-                                               (void**)&uiDelegate2))) {
-      BSTR path;
-      if (SUCCEEDED(uiDelegate2->ftpDirectoryTemplatePath(this, &path))) {
-        m_page->settings()->setFTPDirectoryTemplatePath(
-            String(path, SysStringLen(path)));
-        SysFreeString(path);
-      }
+    BSTR path;
+    if (SUCCEEDED(m_uiDelegate->ftpDirectoryTemplatePath(this, &path))) {
+      m_page->settings()->setFTPDirectoryTemplatePath(
+          String(path, SysStringLen(path)));
+      SysFreeString(path);
     }
   }
 
