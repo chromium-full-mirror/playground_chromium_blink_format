@@ -1109,8 +1109,7 @@ String createMarkup(const Range* range,
   // Add a wrapper span with the styles that all of the nodes in the markup
   // inherit.
   Node* parentOfLastClosed = lastClosed ? lastClosed->parentNode() : 0;
-  if (!specialCommonAncestor && parentOfLastClosed &&
-      parentOfLastClosed->renderer()) {
+  if (parentOfLastClosed && parentOfLastClosed->renderer()) {
     RefPtr<CSSMutableStyleDeclaration> style =
         computedStyle(parentOfLastClosed)->copyInheritableProperties();
 
