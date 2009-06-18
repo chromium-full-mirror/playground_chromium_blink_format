@@ -52,7 +52,7 @@ class ICOImageDecoder : public BMPImageReader {
   virtual RGBA32Buffer* frameBufferAtIndex(size_t index);
 
   // ImageDecoder
-  virtual bool isSizeAvailable() const;
+  virtual bool isSizeAvailable();
   virtual IntSize size() const;
 
  private:

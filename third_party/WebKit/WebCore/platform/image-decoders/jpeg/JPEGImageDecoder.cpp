@@ -386,17 +386,9 @@ void JPEGImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
 }
 
 // Whether or not the size information has been decoded yet.
-bool JPEGImageDecoder::isSizeAvailable() const {
-  // If we have pending data to decode, send it to the JPEG reader now.
-  if (!ImageDecoder::isSizeAvailable() && m_reader) {
-    if (m_failed)
-      return false;
-
-    // The decoder will go ahead and aggressively consume everything up until
-    // the
-    // size is encountered.
+bool JPEGImageDecoder::isSizeAvailable() {
+  if (!ImageDecoder::isSizeAvailable() && !failed() && m_reader)
     decode(true);
-  }
 
   return ImageDecoder::isSizeAvailable();
 }
@@ -416,7 +408,7 @@ RGBA32Buffer* JPEGImageDecoder::frameBufferAtIndex(size_t index) {
 }
 
 // Feed data to the JPEG reader.
-void JPEGImageDecoder::decode(bool sizeOnly) const {
+void JPEGImageDecoder::decode(bool sizeOnly) {
   if (m_failed)
     return;
 
