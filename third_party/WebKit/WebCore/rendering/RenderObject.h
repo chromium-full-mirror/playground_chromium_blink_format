@@ -287,6 +287,7 @@ class RenderObject : public CachedResourceClient {
   virtual bool isTextControl() const { return false; }
   virtual bool isTextArea() const { return false; }
   virtual bool isTextField() const { return false; }
+  virtual bool isVideo() const { return false; }
   virtual bool isWidget() const { return false; }
 
   bool isRoot() const { return document()->documentElement() == m_node; }

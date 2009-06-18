@@ -41,6 +41,9 @@ class RenderVideo : public RenderMedia {
 
   virtual const char* renderName() const { return "RenderVideo"; }
 
+  virtual bool requiresLayer() const { return true; }
+  virtual bool isVideo() const { return true; }
+
   virtual void paintReplaced(PaintInfo& paintInfo, int tx, int ty);
 
   virtual void layout();

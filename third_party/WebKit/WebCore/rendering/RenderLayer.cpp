@@ -3349,14 +3349,15 @@ void RenderLayer::repaintIncludingNonCompositingDescendants(
 
 bool RenderLayer::shouldBeNormalFlowOnly() const {
   return (renderer()->hasOverflowClip() || renderer()->hasReflection() ||
-          renderer()->hasMask()) &&
+          renderer()->hasMask() || renderer()->isVideo()) &&
          !renderer()->isPositioned() && !renderer()->isRelPositioned() &&
          !renderer()->hasTransform() && !isTransparent();
 }
 
 bool RenderLayer::isSelfPaintingLayer() const {
   return !isNormalFlowOnly() || renderer()->hasReflection() ||
-         renderer()->hasMask() || renderer()->isTableRow();
+         renderer()->hasMask() || renderer()->isTableRow() ||
+         renderer()->isVideo();
 }
 
 void RenderLayer::styleChanged(StyleDifference diff, const RenderStyle*) {
