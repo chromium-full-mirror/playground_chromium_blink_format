@@ -192,7 +192,7 @@ class CSSPrimitiveValue : public CSSValue {
 
   int getIdent();
   template <typename T>
-  operator T() const;  // Defined in CSSPrimitiveValueMappings.h
+  inline operator T() const;  // Defined in CSSPrimitiveValueMappings.h
 
   virtual bool parseString(const String&, bool = false);
   virtual String cssText() const;
