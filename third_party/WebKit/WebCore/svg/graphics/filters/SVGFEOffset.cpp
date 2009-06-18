@@ -61,11 +61,8 @@ void FEOffset::apply(Filter* filter) {
   if (!m_in->resultImage())
     return;
 
-  IntRect bufferRect = enclosingIntRect(subRegion());
-  OwnPtr<ImageBuffer> filterGraphic(
-      ImageBuffer::create(bufferRect.size(), false));
-
-  if (!filterGraphic)
+  GraphicsContext* filterContext = getEffectContext();
+  if (!filterContext)
     return;
 
   FloatRect dstRect =
@@ -73,9 +70,7 @@ void FEOffset::apply(Filter* filter) {
                 dy() + m_in->subRegion().y() - subRegion().y(),
                 m_in->subRegion().width(), m_in->subRegion().height());
 
-  GraphicsContext* filterContext = filterGraphic->context();
   filterContext->drawImage(m_in->resultImage()->image(), dstRect);
-  setEffectBuffer(filterGraphic.release());
 }
 
 void FEOffset::dump() {}

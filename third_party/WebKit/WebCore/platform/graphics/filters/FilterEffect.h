@@ -24,6 +24,7 @@
 #if ENABLE(FILTERS)
 #include "Filter.h"
 #include "FloatRect.h"
+#include "GraphicsContext.h"
 #include "ImageBuffer.h"
 #include "TextStream.h"
 
@@ -81,6 +82,9 @@ class FilterEffect : public RefCounted<FilterEffect> {
                                                   FilterEffect*,
                                                   FilterEffect*);
   FloatRect calculateUnionOfChildEffectSubregions(Filter*, FilterEffect*);
+
+  GraphicsContext* getEffectContext();
+  FloatRect calculateDrawingRect(const FloatRect&);
 
   virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
     return filter->filterRegion();
