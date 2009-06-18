@@ -66,6 +66,7 @@ class GraphicsContextPlatformPrivate {
   // right place.
   void save();
   void restore();
+  void flush();
   void clip(const FloatRect&);
   void clip(const Path&);
   void scale(const FloatSize&);
@@ -79,6 +80,7 @@ class GraphicsContextPlatformPrivate {
   // On everything else, we do nothing.
   void save() {}
   void restore() {}
+  void flush() {}
   void clip(const FloatRect&) {}
   void clip(const Path&) {}
   void scale(const FloatSize&) {}
