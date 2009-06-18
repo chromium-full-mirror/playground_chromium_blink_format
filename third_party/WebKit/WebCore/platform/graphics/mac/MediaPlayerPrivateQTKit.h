@@ -141,10 +141,9 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   void createQTVideoRenderer();
   void destroyQTVideoRenderer();
 
-#if USE(ACCELERATED_COMPOSITING)
   void createQTMovieLayer();
   void destroyQTMovieLayer();
-#endif
+
   QTTime createQTTime(float time) const;
 
   void updateStates();
@@ -178,9 +177,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   unsigned m_totalTrackCount;
   bool m_hasUnsupportedTracks;
   float m_duration;
-#if USE(ACCELERATED_COMPOSITING)
   RetainPtr<QTMovieLayer> m_qtVideoLayer;
-#endif
 #if DRAW_FRAME_RATE
   int m_frameCountWhilePlaying;
   double m_timeStartedPlaying;
