@@ -145,7 +145,8 @@ JSGlobalData::JSGlobalData(bool isShared, const VPtrSet& vptrSet)
       initializingLazyNumericCompareFunction(false),
       head(0),
       dynamicGlobalObject(0),
-      scopeNodeBeingReparsed(0) {
+      scopeNodeBeingReparsed(0),
+      firstStringifierToMark(0) {
 #if PLATFORM(MAC)
   startProfilerServerIfNeeded();
 #endif
