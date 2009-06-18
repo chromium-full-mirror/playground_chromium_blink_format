@@ -592,6 +592,7 @@ class JIT : private MacroAssembler {
                               Structure* structure,
                               size_t cachedOffset);
   void compileGetDirectOffset(JSObject* base,
+                              RegisterID temp,
                               RegisterID result,
                               size_t cachedOffset);
   void compilePutDirectOffset(RegisterID base,
