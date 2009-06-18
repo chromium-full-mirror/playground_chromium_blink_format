@@ -251,7 +251,7 @@ void ClipboardQt::declareAndWriteDragImage(Element* element,
 #endif
 }
 
-void ClipboardQt::writeURL(const KURL& url, const String&, Frame* frame) {
+void ClipboardQt::writeURL(const KURL& url, const String& title, Frame* frame) {
   ASSERT(frame);
 
   QList<QUrl> urls;
@@ -259,6 +259,7 @@ void ClipboardQt::writeURL(const KURL& url, const String&, Frame* frame) {
   if (!m_writableData)
     m_writableData = new QMimeData;
   m_writableData->setUrls(urls);
+  m_writableData->setText(title);
 #ifndef QT_NO_CLIPBOARD
   if (!isForDragging())
     QApplication::clipboard()->setMimeData(m_writableData);
