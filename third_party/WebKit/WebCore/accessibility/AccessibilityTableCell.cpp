@@ -126,6 +126,12 @@ AccessibilityObject* AccessibilityTableCell::titleUIElement() const {
   if (isTableCell() || !m_renderer || !m_renderer->isTableCell())
     return 0;
 
+  // Table cells that are th cannot have title ui elements, since by definition
+  // they are title ui elements
+  Node* node = m_renderer->node();
+  if (node && node->hasTagName(thTag))
+    return 0;
+
   RenderTableCell* renderCell = static_cast<RenderTableCell*>(m_renderer);
 
   // If this cell is in the first column, there is no need to continue.
