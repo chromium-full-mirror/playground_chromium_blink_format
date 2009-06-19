@@ -47,6 +47,7 @@
 #include "ScriptSourceCode.h"
 #include "ScriptState.h"
 #include "Widget.h"
+#include "XSSAuditor.h"
 
 #include "V8Binding.h"
 #include "V8NPObject.h"
@@ -89,7 +90,8 @@ ScriptController::ScriptController(Frame* frame)
       ,
       m_windowScriptNPObject(0)
 #endif
-{
+      ,
+      m_XSSAuditor(new XSSAuditor(frame)) {
 }
 
 ScriptController::~ScriptController() {
@@ -184,6 +186,11 @@ void ScriptController::evaluateInNewContext(
 
 // Evaluate a script file in the environment of this proxy.
 ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode) {
+  if (!m_XSSAuditor->canEvaluate(sourceCode)) {
+    // This script is not safe to be evaluated.
+    return JSValue();
+  }
+
   v8::HandleScope handleScope;
   v8::Handle<v8::Context> context = V8Proxy::GetContext(m_proxy->frame());
   if (context.IsEmpty())
