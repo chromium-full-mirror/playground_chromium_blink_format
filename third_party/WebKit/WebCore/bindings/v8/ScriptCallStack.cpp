@@ -44,7 +44,8 @@ ScriptCallStack::ScriptCallStack(const v8::Arguments& arguments,
                    V8Proxy::GetSourceName(),
                    V8Proxy::GetSourceLineNumber() + 1,
                    arguments,
-                   skipArgumentCount) {}
+                   skipArgumentCount),
+      m_scriptState(new ScriptState(V8Proxy::retrieveFrame())) {}
 
 ScriptCallStack::~ScriptCallStack() {}
 
