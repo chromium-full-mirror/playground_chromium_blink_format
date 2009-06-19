@@ -358,6 +358,12 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setAllowUniversalAccessFromFileURLs(
       /* [in] */ BOOL allowAccess);
 
+  virtual HRESULT STDMETHODCALLTYPE isXSSAuditorEnabled(
+      /* [retval][out] */ BOOL* enabled);
+
+  virtual HRESULT STDMETHODCALLTYPE setXSSAuditorEnabled(
+      /* [in] */ BOOL enabled);
+
   // WebPreferences
 
   // This method accesses a different preference key than

@@ -108,7 +108,8 @@ Settings::Settings(Page* page)
       // they can't use by. Leaving enabled for now to not change existing
       // behavior.
       ,
-      m_downloadableBinaryFontsEnabled(true) {
+      m_downloadableBinaryFontsEnabled(true),
+      m_xssAuditorEnabled(false) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
@@ -423,6 +424,10 @@ void Settings::setCaretBrowsingEnabled(bool caretBrowsingEnabled) {
 void Settings::setDownloadableBinaryFontsEnabled(
     bool downloadableBinaryFontsEnabled) {
   m_downloadableBinaryFontsEnabled = downloadableBinaryFontsEnabled;
+}
+
+void Settings::setXSSAuditorEnabled(bool xssAuditorEnabled) {
+  m_xssAuditorEnabled = xssAuditorEnabled;
 }
 
 }  // namespace WebCore

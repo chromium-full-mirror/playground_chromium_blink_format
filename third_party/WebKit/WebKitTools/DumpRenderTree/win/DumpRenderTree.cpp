@@ -670,6 +670,7 @@ static void resetWebViewToConsistentStateBeforeTesting() {
   if (SUCCEEDED(webView->preferences(&preferences))) {
     preferences->setPrivateBrowsingEnabled(FALSE);
     preferences->setJavaScriptCanOpenWindowsAutomatically(TRUE);
+    preferences->setXSSAuditorEnabled(FALSE);
 
     if (persistentUserStyleSheetLocation) {
       Vector<wchar_t> urlCharacters(

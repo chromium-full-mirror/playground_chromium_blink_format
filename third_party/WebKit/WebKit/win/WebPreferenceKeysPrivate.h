@@ -155,3 +155,5 @@
 #define WebKitPaintNativeControlsPreferenceKey "WebKitPaintNativeControls"
 
 #define WebKitZoomsTextOnlyPreferenceKey "WebKitZoomsTextOnly"
+
+#define WebKitXSSAuditorEnabledPreferenceKey "WebKitXSSAuditorEnabled"
