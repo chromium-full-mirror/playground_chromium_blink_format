@@ -171,9 +171,6 @@ JSGlobalData::~JSGlobalData() {
   regExpTable->deleteTable();
   regExpConstructorTable->deleteTable();
   stringTable->deleteTable();
-#if ENABLE(JIT)
-  lazyNativeFunctionThunk.clear();
-#endif
 
   fastDelete(const_cast<HashTable*>(arrayTable));
   fastDelete(const_cast<HashTable*>(dateTable));
@@ -228,14 +225,6 @@ JSGlobalData*& JSGlobalData::sharedInstanceInternal() {
   static JSGlobalData* sharedInstance;
   return sharedInstance;
 }
-
-#if ENABLE(JIT)
-
-void JSGlobalData::createNativeThunk() {
-  lazyNativeFunctionThunk = FunctionBodyNode::createNativeThunk(this);
-}
-
-#endif
 
 // FIXME: We can also detect forms like v1 < v2 ? -1 : 0, reverse comparison,
 // etc.

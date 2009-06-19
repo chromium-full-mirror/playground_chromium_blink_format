@@ -54,7 +54,7 @@ JSFunction::JSFunction(ExecState* exec,
     : Base(&exec->globalData(), structure, name)
 #if ENABLE(JIT)
       ,
-      m_body(exec->globalData().nativeFunctionThunk())
+      m_body(FunctionBodyNode::createNativeThunk(&exec->globalData()))
 #else
       ,
       m_body(0)
@@ -90,21 +90,18 @@ JSFunction::~JSFunction() {
   // will no longer be valid once
   // this memory is freed and may be reused (potentially for another, different
   // JSFunction).
-  if (!isHostFunction()) {
-    if (m_body && m_body->isGenerated())
-      m_body->generatedBytecode().unlinkCallers();
+  if (m_body && m_body->isGenerated())
+    m_body->generatedBytecode().unlinkCallers();
+  if (!isHostFunction())
     scopeChain().~ScopeChain();
-  }
-
 #endif
 }
 
 void JSFunction::mark() {
   Base::mark();
-  if (!isHostFunction()) {
-    m_body->mark();
+  m_body->mark();
+  if (!isHostFunction())
     scopeChain().mark();
-  }
 }
 
 CallType JSFunction::getCallData(CallData& callData) {

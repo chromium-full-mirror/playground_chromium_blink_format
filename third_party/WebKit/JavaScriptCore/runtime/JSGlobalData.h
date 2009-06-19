@@ -124,12 +124,6 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   Interpreter* interpreter;
 #if ENABLE(JIT)
   JITThunks jitStubs;
-  FunctionBodyNode* nativeFunctionThunk() {
-    if (!lazyNativeFunctionThunk)
-      createNativeThunk();
-    return lazyNativeFunctionThunk.get();
-  }
-  RefPtr<FunctionBodyNode> lazyNativeFunctionThunk;
 #endif
   TimeoutChecker timeoutChecker;
   Heap heap;
