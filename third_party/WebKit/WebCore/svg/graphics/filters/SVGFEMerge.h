@@ -36,7 +36,7 @@ class FEMerge : public FilterEffect {
   const Vector<FilterEffect*>& mergeInputs() const;
   void setMergeInputs(const Vector<FilterEffect*>& mergeInputs);
 
-  virtual FloatRect uniteEffectRect(Filter*);
+  virtual FloatRect uniteChildEffectSubregions(Filter*);
   void apply(Filter*);
   void dump();
   TextStream& externalRepresentation(TextStream& ts) const;
