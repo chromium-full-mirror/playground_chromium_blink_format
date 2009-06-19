@@ -193,7 +193,11 @@ inline RegisterFile::RegisterFile(size_t capacity, size_t maxGlobals)
       mmap(0, bufferLength, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON,
            VM_TAG_FOR_REGISTERFILE_MEMORY, 0));
   if (m_buffer == MAP_FAILED) {
+#if PLATFORM(WINCE)
+    fprintf(stderr, "Could not allocate register file: %d\n", GetLastError());
+#else
     fprintf(stderr, "Could not allocate register file: %d\n", errno);
+#endif
     CRASH();
   }
 #elif HAVE(VIRTUALALLOC)
@@ -201,7 +205,11 @@ inline RegisterFile::RegisterFile(size_t capacity, size_t maxGlobals)
       VirtualAlloc(0, roundUpAllocationSize(bufferLength, commitSize),
                    MEM_RESERVE, PAGE_READWRITE));
   if (!m_buffer) {
+#if PLATFORM(WINCE)
+    fprintf(stderr, "Could not allocate register file: %d\n", GetLastError());
+#else
     fprintf(stderr, "Could not allocate register file: %d\n", errno);
+#endif
     CRASH();
   }
   size_t committedSize =
@@ -209,7 +217,11 @@ inline RegisterFile::RegisterFile(size_t capacity, size_t maxGlobals)
   void* commitCheck =
       VirtualAlloc(m_buffer, committedSize, MEM_COMMIT, PAGE_READWRITE);
   if (commitCheck != m_buffer) {
+#if PLATFORM(WINCE)
+    fprintf(stderr, "Could not allocate register file: %d\n", GetLastError());
+#else
     fprintf(stderr, "Could not allocate register file: %d\n", errno);
+#endif
     CRASH();
   }
   m_commitEnd = reinterpret_cast<Register*>(reinterpret_cast<char*>(m_buffer) +
@@ -244,7 +256,11 @@ inline bool RegisterFile::grow(Register* newEnd) {
         reinterpret_cast<char*>(newEnd) - reinterpret_cast<char*>(m_commitEnd),
         commitSize);
     if (!VirtualAlloc(m_commitEnd, size, MEM_COMMIT, PAGE_READWRITE)) {
+#if PLATFORM(WINCE)
+      fprintf(stderr, "Could not allocate register file: %d\n", GetLastError());
+#else
       fprintf(stderr, "Could not allocate register file: %d\n", errno);
+#endif
       CRASH();
     }
     m_commitEnd = reinterpret_cast<Register*>(
