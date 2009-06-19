@@ -93,6 +93,8 @@ class FilterEffect : public RefCounted<FilterEffect> {
   virtual void apply(Filter*) = 0;
   virtual void dump() = 0;
 
+  virtual bool isSourceInput() { return false; }
+
   virtual TextStream& externalRepresentation(TextStream&) const;
 
  protected:

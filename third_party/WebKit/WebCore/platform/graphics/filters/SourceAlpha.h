@@ -34,6 +34,7 @@ class SourceAlpha : public FilterEffect {
 
   static const AtomicString& effectName();
 
+  virtual bool isSourceInput() { return true; }
   virtual FloatRect calculateEffectRect(Filter* filter) {
     return filter->sourceImageRect();
   }
