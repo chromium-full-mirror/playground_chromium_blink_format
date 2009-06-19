@@ -52,6 +52,9 @@ class ScriptSourceCode {
 
   const JSC::SourceCode& jsSourceCode() const { return m_code; }
 
+  // Note the memcpy!
+  String source() const { return String(m_code.data(), m_code.length()); }
+
  private:
   JSC::SourceCode m_code;
 };

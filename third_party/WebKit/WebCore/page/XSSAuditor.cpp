@@ -27,9 +27,12 @@
 #include "config.h"
 #include "XSSAuditor.h"
 
+#include <wtf/StdLibExtras.h>
+
 #include "Console.h"
 #include "CString.h"
 #include "DocumentLoader.h"
+#include "DOMWindow.h"
 #include "Frame.h"
 #include "KURL.h"
 #include "ScriptSourceCode.h"
@@ -49,14 +52,6 @@ XSSAuditor::XSSAuditor(Frame* frame) : m_isEnabled(false), m_frame(frame) {
 }
 
 XSSAuditor::~XSSAuditor() {}
-
-bool XSSAuditor::canEvaluate(const ScriptSourceCode& sourceCode) const {
-  if (!m_isEnabled)
-    return true;
-
-  return canEvaluate(String(sourceCode.jsSourceCode().data(),
-                            sourceCode.jsSourceCode().length()));
-}
 
 bool XSSAuditor::canEvaluate(const String& sourceCode) const {
   if (!m_isEnabled)

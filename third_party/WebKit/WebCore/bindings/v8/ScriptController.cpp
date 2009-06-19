@@ -186,7 +186,7 @@ void ScriptController::evaluateInNewContext(
 
 // Evaluate a script file in the environment of this proxy.
 ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode) {
-  if (!m_XSSAuditor->canEvaluate(sourceCode)) {
+  if (!m_XSSAuditor->canEvaluate(sourceCode.source())) {
     // This script is not safe to be evaluated.
     return ScriptValue();
   }
