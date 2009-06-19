@@ -1039,9 +1039,6 @@ void FrameLoader::begin(const KURL& url,
 
   document->implicitOpen();
 
-  // Associate the XSSAuditor with the tokenizer.
-  document->tokenizer()->setXSSAuditor(m_frame->script()->xssAuditor());
-
   if (m_frame->view())
     m_frame->view()->setContentsSize(IntSize());
 }
