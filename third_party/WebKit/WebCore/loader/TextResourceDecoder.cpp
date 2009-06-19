@@ -512,11 +512,13 @@ bool TextResourceDecoder::checkForCSSCharset(const char* data,
 // It's important not to look for tags inside the comments.
 static inline void skipComment(const char*& ptr, const char* pEnd) {
   const char* p = ptr;
+  if (p == pEnd)
+    return;
   // Allow <!-->; other browsers do.
   if (*p == '>') {
     p++;
   } else {
-    while (p != pEnd) {
+    while (p + 2 < pEnd) {
       if (*p == '-') {
         // This is the real end of comment, "-->".
         if (p[1] == '-' && p[2] == '>') {
@@ -525,7 +527,7 @@ static inline void skipComment(const char*& ptr, const char* pEnd) {
         }
         // This is the incorrect end of comment that other browsers allow,
         // "--!>".
-        if (p[1] == '-' && p[2] == '!' && p[3] == '>') {
+        if (p + 3 < pEnd && p[1] == '-' && p[2] == '!' && p[3] == '>') {
           p += 4;
           break;
         }
