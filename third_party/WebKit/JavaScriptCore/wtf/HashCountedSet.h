@@ -22,6 +22,7 @@
 #define WTF_HashCountedSet_h
 
 #include "Assertions.h"
+#include "FastAllocBase.h"
 #include "HashMap.h"
 #include "Vector.h"
 
@@ -30,7 +31,7 @@ namespace WTF {
 template <typename Value,
           typename HashFunctions = typename DefaultHash<Value>::Hash,
           typename Traits = HashTraits<Value>>
-class HashCountedSet {
+class HashCountedSet : public FastAllocBase {
  private:
   typedef HashMap<Value, unsigned, HashFunctions, Traits> ImplType;
 
