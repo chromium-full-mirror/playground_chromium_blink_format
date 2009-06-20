@@ -123,7 +123,7 @@ struct JITStackFrame {
     return reinterpret_cast<ReturnAddressPtr*>(this) - 1;
   }
 };
-#elif PLATFORM(ARM_V7)
+#elif PLATFORM_ARM_ARCH(7)
 struct JITStackFrame {
   JITStubArg padding;  // Unused
   JITStubArg args[6];

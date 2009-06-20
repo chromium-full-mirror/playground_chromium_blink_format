@@ -153,7 +153,7 @@ class AbstractMacroAssembler {
   struct Imm32 {
     explicit Imm32(int32_t value)
         : m_value(value)
-#if PLATFORM(ARM_V7)
+#if PLATFORM_ARM_ARCH(7)
           ,
           m_isPointer(false)
 #endif
@@ -163,7 +163,7 @@ class AbstractMacroAssembler {
 #if !PLATFORM(X86_64)
     explicit Imm32(ImmPtr ptr)
         : m_value(ptr.asIntptr())
-#if PLATFORM(ARM_V7)
+#if PLATFORM_ARM_ARCH(7)
           ,
           m_isPointer(true)
 #endif
@@ -172,7 +172,7 @@ class AbstractMacroAssembler {
 #endif
 
     int32_t m_value;
-#if PLATFORM(ARM_V7)
+#if PLATFORM_ARM_ARCH(7)
     // We rely on being able to regenerate code to recover exception handling
     // information.  Since ARMv7 supports 16-bit immediates there is a danger
     // that if pointer values change the layout of the generated code will

@@ -28,7 +28,7 @@
 
 #include <wtf/Platform.h>
 
-#if ENABLE(ASSEMBLER) && PLATFORM(ARM_V7)
+#if ENABLE(ASSEMBLER) && PLATFORM_ARM_ARCH(7)
 
 #include "AssemblerBuffer.h"
 #include <wtf/Assertions.h>
@@ -1749,6 +1749,6 @@ class ARMv7Assembler {
 
 }  // namespace JSC
 
-#endif  // ENABLE(ASSEMBLER) && PLATFORM(ARM_V7)
+#endif  // ENABLE(ASSEMBLER) && PLATFORM_ARM_ARCH(7)
 
 #endif  // ARMAssembler_h
