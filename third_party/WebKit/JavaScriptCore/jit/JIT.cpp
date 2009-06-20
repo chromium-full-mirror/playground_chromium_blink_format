@@ -929,7 +929,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   move(ImmPtr(reinterpret_cast<void*>(ctiVMThrowTrampoline)), regT2);
   emitGetFromCallFrameHeaderPtr(RegisterFile::CallerFrame, callFrameRegister);
   poke(callFrameRegister,
-       offsetof(struct JITStackFrame, callFrame) / sizeof(void*));
+       FIELD_OFFSET(struct JITStackFrame, callFrame) / sizeof(void*));
   restoreReturnAddressBeforeReturn(regT2);
   ret();
 
