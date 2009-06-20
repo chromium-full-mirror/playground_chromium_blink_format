@@ -220,6 +220,6 @@ class SegmentedVector {
   Vector<Segment*, 32> m_segments;
 };
 
-}  // namespace JSC
+}  // namespace WTF
 
 #endif  // SegmentedVector_h
