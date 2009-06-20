@@ -163,25 +163,25 @@ void JIT::emit_op_instanceof(Instruction* currentInstruction) {
 
   // Check that baseVal is an object, that it 'ImplementsHasInstance' but that
   // it does not 'OverridesHasInstance'.
-  loadPtr(Address(regT0, FIELD_OFFSET(JSCell, m_structure)), regT0);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT0);
   addSlowCase(branch32(
-      NotEqual, Address(regT0, FIELD_OFFSET(Structure, m_typeInfo.m_type)),
+      NotEqual, Address(regT0, OBJECT_OFFSETOF(Structure, m_typeInfo.m_type)),
       Imm32(ObjectType)));
   addSlowCase(branchTest32(
-      Zero, Address(regT0, FIELD_OFFSET(Structure, m_typeInfo.m_flags)),
+      Zero, Address(regT0, OBJECT_OFFSETOF(Structure, m_typeInfo.m_flags)),
       Imm32(ImplementsDefaultHasInstance)));
 
   // If value is not an Object, return false.
   Jump valueIsImmediate = emitJumpIfNotJSCell(regT2);
-  loadPtr(Address(regT2, FIELD_OFFSET(JSCell, m_structure)), regT0);
+  loadPtr(Address(regT2, OBJECT_OFFSETOF(JSCell, m_structure)), regT0);
   Jump valueIsNotObject = branch32(
-      NotEqual, Address(regT0, FIELD_OFFSET(Structure, m_typeInfo.m_type)),
+      NotEqual, Address(regT0, OBJECT_OFFSETOF(Structure, m_typeInfo.m_type)),
       Imm32(ObjectType));
 
   // Check proto is object.
-  loadPtr(Address(regT1, FIELD_OFFSET(JSCell, m_structure)), regT0);
+  loadPtr(Address(regT1, OBJECT_OFFSETOF(JSCell, m_structure)), regT0);
   addSlowCase(branch32(
-      NotEqual, Address(regT0, FIELD_OFFSET(Structure, m_typeInfo.m_type)),
+      NotEqual, Address(regT0, OBJECT_OFFSETOF(Structure, m_typeInfo.m_type)),
       Imm32(ObjectType)));
 
   // Optimistically load the result true, and start looping.
@@ -195,8 +195,8 @@ void JIT::emit_op_instanceof(Instruction* currentInstruction) {
   // WIN!
   // Otherwise, check if we've hit null - if we have then drop out of the loop,
   // if not go again.
-  loadPtr(Address(regT2, FIELD_OFFSET(JSCell, m_structure)), regT2);
-  loadPtr(Address(regT2, FIELD_OFFSET(Structure, m_prototype)), regT2);
+  loadPtr(Address(regT2, OBJECT_OFFSETOF(JSCell, m_structure)), regT2);
+  loadPtr(Address(regT2, OBJECT_OFFSETOF(Structure, m_prototype)), regT2);
   Jump isInstance = branchPtr(Equal, regT2, regT1);
   branchPtr(NotEqual, regT2, ImmPtr(JSValue::encode(jsNull())), loop);
 
@@ -263,9 +263,9 @@ void JIT::emit_op_get_scoped_var(Instruction* currentInstruction) {
 
   emitGetFromCallFrameHeaderPtr(RegisterFile::ScopeChain, regT0);
   while (skip--)
-    loadPtr(Address(regT0, FIELD_OFFSET(ScopeChainNode, next)), regT0);
+    loadPtr(Address(regT0, OBJECT_OFFSETOF(ScopeChainNode, next)), regT0);
 
-  loadPtr(Address(regT0, FIELD_OFFSET(ScopeChainNode, object)), regT0);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(ScopeChainNode, object)), regT0);
   emitGetVariableObjectRegister(regT0, currentInstruction[2].u.operand, regT0);
   emitPutVirtualRegister(currentInstruction[1].u.operand);
 }
@@ -277,9 +277,9 @@ void JIT::emit_op_put_scoped_var(Instruction* currentInstruction) {
   emitGetFromCallFrameHeaderPtr(RegisterFile::ScopeChain, regT1);
   emitGetVirtualRegister(currentInstruction[3].u.operand, regT0);
   while (skip--)
-    loadPtr(Address(regT1, FIELD_OFFSET(ScopeChainNode, next)), regT1);
+    loadPtr(Address(regT1, OBJECT_OFFSETOF(ScopeChainNode, next)), regT1);
 
-  loadPtr(Address(regT1, FIELD_OFFSET(ScopeChainNode, object)), regT1);
+  loadPtr(Address(regT1, OBJECT_OFFSETOF(ScopeChainNode, object)), regT1);
   emitPutVariableObjectRegister(regT0, regT1, currentInstruction[1].u.operand);
 }
 
@@ -335,10 +335,10 @@ void JIT::emit_op_construct_verify(Instruction* currentInstruction) {
   emitGetVirtualRegister(currentInstruction[1].u.operand, regT0);
 
   emitJumpSlowCaseIfNotJSCell(regT0);
-  loadPtr(Address(regT0, FIELD_OFFSET(JSCell, m_structure)), regT2);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT2);
   addSlowCase(branch32(NotEqual,
-                       Address(regT2, FIELD_OFFSET(Structure, m_typeInfo) +
-                                          FIELD_OFFSET(TypeInfo, m_type)),
+                       Address(regT2, OBJECT_OFFSETOF(Structure, m_typeInfo) +
+                                          OBJECT_OFFSETOF(TypeInfo, m_type)),
                        Imm32(ObjectType)));
 }
 
@@ -421,11 +421,11 @@ void JIT::emit_op_resolve_global(Instruction* currentInstruction) {
   Jump noMatch = branchPtr(
       NotEqual, regT1,
       Address(regT0,
-              FIELD_OFFSET(JSCell, m_structure)));  // Structures don't match
+              OBJECT_OFFSETOF(JSCell, m_structure)));  // Structures don't match
 
   // Load cached property
   // Assume that the global object always uses external storage.
-  loadPtr(Address(regT0, FIELD_OFFSET(JSGlobalObject, m_externalStorage)),
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSGlobalObject, m_externalStorage)),
           regT0);
   load32(offsetAddr, regT1);
   loadPtr(BaseIndex(regT0, regT1, ScalePtr), regT0);
@@ -480,12 +480,12 @@ void JIT::emit_op_jeq_null(Instruction* currentInstruction) {
 
   // First, handle JSCell cases - check MasqueradesAsUndefined bit on the
   // structure.
-  loadPtr(Address(regT0, FIELD_OFFSET(JSCell, m_structure)), regT2);
-  addJump(
-      branchTest32(NonZero,
-                   Address(regT2, FIELD_OFFSET(Structure, m_typeInfo.m_flags)),
-                   Imm32(MasqueradesAsUndefined)),
-      target + 2);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT2);
+  addJump(branchTest32(
+              NonZero,
+              Address(regT2, OBJECT_OFFSETOF(Structure, m_typeInfo.m_flags)),
+              Imm32(MasqueradesAsUndefined)),
+          target + 2);
   Jump wasNotImmediate = jump();
 
   // Now handle the immediate cases - undefined & null
@@ -506,10 +506,10 @@ void JIT::emit_op_jneq_null(Instruction* currentInstruction) {
 
   // First, handle JSCell cases - check MasqueradesAsUndefined bit on the
   // structure.
-  loadPtr(Address(regT0, FIELD_OFFSET(JSCell, m_structure)), regT2);
-  addJump(branchTest32(
-              Zero, Address(regT2, FIELD_OFFSET(Structure, m_typeInfo.m_flags)),
-              Imm32(MasqueradesAsUndefined)),
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT2);
+  addJump(branchTest32(Zero, Address(regT2, OBJECT_OFFSETOF(
+                                                Structure, m_typeInfo.m_flags)),
+                       Imm32(MasqueradesAsUndefined)),
           target + 2);
   Jump wasNotImmediate = jump();
 
@@ -692,9 +692,9 @@ void JIT::emit_op_to_jsnumber(Instruction* currentInstruction) {
   Jump wasImmediate = emitJumpIfImmediateInteger(regT0);
 
   emitJumpSlowCaseIfNotJSCell(regT0, srcVReg);
-  loadPtr(Address(regT0, FIELD_OFFSET(JSCell, m_structure)), regT2);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT2);
   addSlowCase(branch32(
-      NotEqual, Address(regT2, FIELD_OFFSET(Structure, m_typeInfo.m_type)),
+      NotEqual, Address(regT2, OBJECT_OFFSETOF(Structure, m_typeInfo.m_type)),
       Imm32(NumberType)));
 
   wasImmediate.link(this);
@@ -714,7 +714,7 @@ void JIT::emit_op_catch(Instruction* currentInstruction) {
   killLastResultRegister();  // FIXME: Implicitly treat op_catch as a labeled
                              // statement, and remove this line of code.
   peek(callFrameRegister,
-       FIELD_OFFSET(struct JITStackFrame, callFrame) / sizeof(void*));
+       OBJECT_OFFSETOF(struct JITStackFrame, callFrame) / sizeof(void*));
   emitPutVirtualRegister(currentInstruction[1].u.operand);
 }
 
@@ -804,9 +804,9 @@ void JIT::emit_op_eq_null(Instruction* currentInstruction) {
   emitGetVirtualRegister(src1, regT0);
   Jump isImmediate = emitJumpIfNotJSCell(regT0);
 
-  loadPtr(Address(regT0, FIELD_OFFSET(JSCell, m_structure)), regT2);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT2);
   setTest32(NonZero,
-            Address(regT2, FIELD_OFFSET(Structure, m_typeInfo.m_flags)),
+            Address(regT2, OBJECT_OFFSETOF(Structure, m_typeInfo.m_flags)),
             Imm32(MasqueradesAsUndefined), regT0);
 
   Jump wasNotImmediate = jump();
@@ -829,8 +829,9 @@ void JIT::emit_op_neq_null(Instruction* currentInstruction) {
   emitGetVirtualRegister(src1, regT0);
   Jump isImmediate = emitJumpIfNotJSCell(regT0);
 
-  loadPtr(Address(regT0, FIELD_OFFSET(JSCell, m_structure)), regT2);
-  setTest32(Zero, Address(regT2, FIELD_OFFSET(Structure, m_typeInfo.m_flags)),
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT2);
+  setTest32(Zero,
+            Address(regT2, OBJECT_OFFSETOF(Structure, m_typeInfo.m_flags)),
             Imm32(MasqueradesAsUndefined), regT0);
 
   Jump wasNotImmediate = jump();
@@ -890,15 +891,15 @@ void JIT::emit_op_convert_this(Instruction* currentInstruction) {
   emitGetVirtualRegister(currentInstruction[1].u.operand, regT0);
 
   emitJumpSlowCaseIfNotJSCell(regT0);
-  loadPtr(Address(regT0, FIELD_OFFSET(JSCell, m_structure)), regT1);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT1);
   addSlowCase(branchTest32(
-      NonZero, Address(regT1, FIELD_OFFSET(Structure, m_typeInfo.m_flags)),
+      NonZero, Address(regT1, OBJECT_OFFSETOF(Structure, m_typeInfo.m_flags)),
       Imm32(NeedsThisConversion)));
 }
 
 void JIT::emit_op_profile_will_call(Instruction* currentInstruction) {
-  peek(regT1,
-       FIELD_OFFSET(JITStackFrame, enabledProfilerReference) / sizeof(void*));
+  peek(regT1, OBJECT_OFFSETOF(JITStackFrame, enabledProfilerReference) /
+                  sizeof(void*));
   Jump noProfiler = branchTestPtr(Zero, Address(regT1));
 
   JITStubCall stubCall(this, JITStubs::cti_op_profile_will_call);
@@ -908,8 +909,8 @@ void JIT::emit_op_profile_will_call(Instruction* currentInstruction) {
 }
 
 void JIT::emit_op_profile_did_call(Instruction* currentInstruction) {
-  peek(regT1,
-       FIELD_OFFSET(JITStackFrame, enabledProfilerReference) / sizeof(void*));
+  peek(regT1, OBJECT_OFFSETOF(JITStackFrame, enabledProfilerReference) /
+                  sizeof(void*));
   Jump noProfiler = branchTestPtr(Zero, Address(regT1));
 
   JITStubCall stubCall(this, JITStubs::cti_op_profile_did_call);
@@ -969,13 +970,13 @@ void JIT::emitSlow_op_get_by_val(Instruction* currentInstruction,
   // First, check if this is an access to the vector
   linkSlowCase(iter);
   branch32(AboveOrEqual, regT1,
-           Address(regT2, FIELD_OFFSET(ArrayStorage, m_vectorLength)),
+           Address(regT2, OBJECT_OFFSETOF(ArrayStorage, m_vectorLength)),
            beginGetByValSlow);
 
   // okay, missed the fast region, but it is still in the vector.  Get the
   // value.
   loadPtr(BaseIndex(regT2, regT1, ScalePtr,
-                    FIELD_OFFSET(ArrayStorage, m_vector[0])),
+                    OBJECT_OFFSETOF(ArrayStorage, m_vector[0])),
           regT2);
   // Check whether the value loaded is zero; if so we need to return undefined.
   branchTestPtr(Zero, regT2, beginGetByValSlow);

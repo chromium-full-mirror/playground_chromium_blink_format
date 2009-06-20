@@ -50,8 +50,8 @@ void JIT::compileOpCallInitializeCallFrame() {
           Address(callFrameRegister, RegisterFile::ArgumentCount *
                                          static_cast<int>(sizeof(Register))));
 
-  loadPtr(Address(regT2, FIELD_OFFSET(JSFunction, m_data) +
-                             FIELD_OFFSET(ScopeChain, m_node)),
+  loadPtr(Address(regT2, OBJECT_OFFSETOF(JSFunction, m_data) +
+                             OBJECT_OFFSETOF(ScopeChain, m_node)),
           regT1);  // newScopeChain
 
   storePtr(ImmPtr(JSValue::encode(JSValue())),
@@ -276,8 +276,8 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   storePtr(regT2,
            Address(callFrameRegister, (registerOffset + RegisterFile::Callee) *
                                           static_cast<int>(sizeof(Register))));
-  loadPtr(Address(regT2, FIELD_OFFSET(JSFunction, m_data) +
-                             FIELD_OFFSET(ScopeChain, m_node)),
+  loadPtr(Address(regT2, OBJECT_OFFSETOF(JSFunction, m_data) +
+                             OBJECT_OFFSETOF(ScopeChain, m_node)),
           regT1);  // newScopeChain
   store32(Imm32(argCount),
           Address(callFrameRegister,
