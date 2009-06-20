@@ -24,9 +24,9 @@
 #define Lexer_h
 
 #include "Lookup.h"
-#include "SegmentedVector.h"
 #include "SourceCode.h"
 #include <wtf/ASCIICType.h>
+#include <wtf/SegmentedVector.h>
 #include <wtf/Vector.h>
 #include <wtf/unicode/Unicode.h>
 
@@ -110,7 +110,7 @@ class Lexer : Noncopyable {
   int m_next2;
   int m_next3;
 
-  SegmentedVector<JSC::Identifier, initialIdentifierTableCapacity>
+  WTF::SegmentedVector<JSC::Identifier, initialIdentifierTableCapacity>
       m_identifiers;
 
   JSGlobalData* m_globalData;

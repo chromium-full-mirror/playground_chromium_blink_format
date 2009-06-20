@@ -31,7 +31,7 @@
 
 #include <wtf/Vector.h>
 
-namespace JSC {
+namespace WTF {
 
 // SegmentedVector is just like Vector, but it doesn't move the values
 // stored in its buffer when it grows. Therefore, it is safe to keep
