@@ -45,6 +45,7 @@ class StringSourceProvider : public JSC::SourceProvider {
   }
   const UChar* data() const { return m_source.characters(); }
   int length() const { return m_source.length(); }
+  const String& source() const { return m_source; }
 
  private:
   StringSourceProvider(const String& source, const String& url)
