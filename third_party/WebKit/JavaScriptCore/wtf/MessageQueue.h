@@ -51,6 +51,7 @@ class MessageQueue : Noncopyable {
   MessageQueue() : m_killed(false) {}
 
   void append(const DataType&);
+  bool appendAndCheckEmpty(const DataType&);
   void prepend(const DataType&);
   bool waitForMessage(DataType&);
   template <typename Predicate>
@@ -82,6 +83,17 @@ inline void MessageQueue<DataType>::append(const DataType& message) {
   MutexLocker lock(m_mutex);
   m_queue.append(message);
   m_condition.signal();
+}
+
+// Returns true if the queue was empty before the item was added.
+template <typename DataType>
+inline bool MessageQueue<DataType>::appendAndCheckEmpty(
+    const DataType& message) {
+  MutexLocker lock(m_mutex);
+  bool wasEmpty = m_queue.isEmpty();
+  m_queue.append(message);
+  m_condition.signal();
+  return wasEmpty;
 }
 
 template <typename DataType>
