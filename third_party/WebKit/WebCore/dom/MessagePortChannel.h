@@ -43,6 +43,7 @@ namespace WebCore {
 
 class MessagePort;
 class PlatformMessagePortChannel;
+class ScriptExecutionContext;
 class String;
 
 // MessagePortChannel is a platform-independent interface to the remote side of
@@ -75,8 +76,7 @@ class MessagePortChannel : Noncopyable {
   // own entangled port.
   bool isConnectedTo(MessagePort*);
 
-  // Returns true if the channel currently contains messages for this port, or
-  // may receive messages in the future (is open).
+  // Returns true if the proxy currently contains messages for this port.
   bool hasPendingActivity();
 
   class EventData {
@@ -98,6 +98,10 @@ class MessagePortChannel : Noncopyable {
 
   // Extracts a message from the message queue for this port.
   bool tryGetMessageFromRemote(OwnPtr<EventData>&);
+
+  // Returns the entangled port if run by the same thread (see
+  // MessagePort::locallyEntangledPort() for more details).
+  MessagePort* locallyEntangledPort(const ScriptExecutionContext*);
 
   ~MessagePortChannel();
 
