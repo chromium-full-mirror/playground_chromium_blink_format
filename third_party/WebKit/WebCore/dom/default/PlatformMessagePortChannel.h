@@ -73,7 +73,7 @@ class PlatformMessagePortChannel
     }
 
     bool tryGetMessage(OwnPtr<MessagePortChannel::EventData>& message) {
-      MessagePortChannel::EventData* holder;
+      MessagePortChannel::EventData* holder = 0;
       bool messageAvailable = m_queue.tryGetMessage(holder);
       if (messageAvailable)
         message.set(holder);
