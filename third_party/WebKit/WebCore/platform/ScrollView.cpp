@@ -276,7 +276,8 @@ void ScrollView::scrollRectIntoViewRecursively(const IntRect& r) {
   // This rect is not clamped, since Mail actually relies on receiving an
   // unclamped rect with negative coordinates in order to
   // expose the headers.
-  hostWindow()->scrollRectIntoView(rect, this);
+  if (hostWindow())
+    hostWindow()->scrollRectIntoView(rect, this);
 }
 
 void ScrollView::setScrollPosition(const IntPoint& scrollPoint) {
@@ -570,12 +571,16 @@ IntRect ScrollView::contentsToWindow(const IntRect& contentsRect) const {
 IntRect ScrollView::contentsToScreen(const IntRect& rect) const {
   if (platformWidget())
     return platformContentsToScreen(rect);
+  if (!hostWindow())
+    return IntRect();
   return hostWindow()->windowToScreen(contentsToWindow(rect));
 }
 
 IntPoint ScrollView::screenToContents(const IntPoint& point) const {
   if (platformWidget())
     return platformScreenToContents(point);
+  if (!hostWindow())
+    return IntPoint();
   return windowToContents(hostWindow()->screenToWindow(point));
 }
 
@@ -745,7 +750,8 @@ void ScrollView::repaintContentRectangle(const IntRect& rect, bool now) {
     return;
   }
 
-  hostWindow()->repaint(contentsToWindow(rect), true, now);
+  if (hostWindow())
+    hostWindow()->repaint(contentsToWindow(rect), true, now);
 }
 
 void ScrollView::paint(GraphicsContext* context, const IntRect& rect) {
@@ -880,6 +886,8 @@ bool ScrollView::isOffscreen() const {
 }
 
 void ScrollView::addPanScrollIcon(const IntPoint& iconPosition) {
+  if (!hostWindow())
+    return;
   m_drawPanScrollIcon = true;
   m_panScrollIconPoint = IntPoint(iconPosition.x() - panIconSizeLength / 2,
                                   iconPosition.y() - panIconSizeLength / 2);
@@ -889,6 +897,8 @@ void ScrollView::addPanScrollIcon(const IntPoint& iconPosition) {
 }
 
 void ScrollView::removePanScrollIcon() {
+  if (!hostWindow())
+    return;
   m_drawPanScrollIcon = false;
   hostWindow()->repaint(IntRect(m_panScrollIconPoint,
                                 IntSize(panIconSizeLength, panIconSizeLength)),
