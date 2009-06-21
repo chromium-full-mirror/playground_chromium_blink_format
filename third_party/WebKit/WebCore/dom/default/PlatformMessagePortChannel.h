@@ -90,7 +90,7 @@ class PlatformMessagePortChannel
     ~MessagePortQueue() {
       // Manually free any items left in the queue, since we can't use OwnPtr
       // internally.
-      MessagePortChannel::EventData* data;
+      MessagePortChannel::EventData* data = 0;
       while (m_queue.tryGetMessage(data))
         delete data;
     }
