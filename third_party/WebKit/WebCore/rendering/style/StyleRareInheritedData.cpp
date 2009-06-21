@@ -69,7 +69,8 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const {
          userModify == o.userModify && wordBreak == o.wordBreak &&
          wordWrap == o.wordWrap && nbspMode == o.nbspMode &&
          khtmlLineBreak == o.khtmlLineBreak &&
-         textSizeAdjust == o.textSizeAdjust && userSelect == o.userSelect;
+         textSizeAdjust == o.textSizeAdjust && resize == o.resize &&
+         userSelect == o.userSelect;
 }
 
 bool StyleRareInheritedData::shadowDataEquivalent(
