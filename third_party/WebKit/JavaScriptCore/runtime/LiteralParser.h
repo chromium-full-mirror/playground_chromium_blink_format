@@ -34,11 +34,14 @@ namespace JSC {
 
 class LiteralParser {
  public:
-  LiteralParser(ExecState* exec, const UString& s) : m_exec(exec), m_lexer(s) {}
+  typedef enum { StrictJSON, NonStrictJSON } ParserMode;
+  LiteralParser(ExecState* exec, const UString& s, ParserMode mode)
+      : m_exec(exec), m_lexer(s, mode), m_mode(mode) {}
 
   JSValue tryLiteralParse() {
     m_lexer.next();
-    JSValue result = parse(StartParseStatement);
+    JSValue result = parse(m_mode == StrictJSON ? StartParseExpression
+                                                : StartParseStatement);
     if (m_lexer.currentToken().type != TokEnd)
       return JSValue();
     return result;
@@ -68,6 +71,9 @@ class LiteralParser {
     TokLParen,
     TokRParen,
     TokComma,
+    TokTrue,
+    TokFalse,
+    TokNull,
     TokEnd,
     TokError
   };
@@ -78,9 +84,13 @@ class LiteralParser {
       TokenType type;
       const UChar* start;
       const UChar* end;
+      UString stringToken;
     };
-    Lexer(const UString& s)
-        : m_string(s), m_ptr(s.data()), m_end(s.data() + s.size()) {}
+    Lexer(const UString& s, ParserMode mode)
+        : m_string(s),
+          m_mode(mode),
+          m_ptr(s.data()),
+          m_end(s.data() + s.size()) {}
 
     TokenType next() { return lex(m_currentToken); }
 
@@ -88,10 +98,12 @@ class LiteralParser {
 
    private:
     TokenType lex(LiteralParserToken&);
+    template <ParserMode parserMode>
     TokenType lexString(LiteralParserToken&);
     TokenType lexNumber(LiteralParserToken&);
     LiteralParserToken m_currentToken;
     UString m_string;
+    ParserMode m_mode;
     const UChar* m_ptr;
     const UChar* m_end;
   };
@@ -101,6 +113,7 @@ class LiteralParser {
 
   ExecState* m_exec;
   LiteralParser::Lexer m_lexer;
+  ParserMode m_mode;
 };
 }
 
