@@ -27,7 +27,6 @@
 #ifndef XSSAuditor_h
 #define XSSAuditor_h
 
-#include "config.h"
 #include "PlatformString.h"
 #include "TextEncoding.h"
 
@@ -70,8 +69,7 @@ class XSSAuditor {
   XSSAuditor(Frame*);
   ~XSSAuditor();
 
-  bool isEnabled() const { return m_isEnabled; }
-  void setXSSAuditorEnabled(bool enabled) { m_isEnabled = enabled; }
+  bool isEnabled() const;
 
   // Determines whether the script should be allowed or denied execution
   // based on the content of any user-submitted data.
@@ -98,9 +96,6 @@ class XSSAuditor {
                           bool allowNullCharacters = false);
 
   bool findInRequest(const String&) const;
-
-  // Whether to audit scripts.
-  bool m_isEnabled;
 
   // The frame to audit.
   Frame* m_frame;

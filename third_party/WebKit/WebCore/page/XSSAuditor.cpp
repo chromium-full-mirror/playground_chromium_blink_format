@@ -46,15 +46,17 @@ static bool isControlCharacter(UChar c) {
   return c < ' ' || c == 127;
 }
 
-XSSAuditor::XSSAuditor(Frame* frame) : m_isEnabled(false), m_frame(frame) {
-  if (Settings* settings = frame->settings())
-    m_isEnabled = settings->xssAuditorEnabled();
-}
+XSSAuditor::XSSAuditor(Frame* frame) : m_frame(frame) {}
 
 XSSAuditor::~XSSAuditor() {}
 
+bool XSSAuditor::isEnabled() const {
+  Settings* settings = m_frame->settings();
+  return (settings && settings->xssAuditorEnabled());
+}
+
 bool XSSAuditor::canEvaluate(const String& sourceCode) const {
-  if (!m_isEnabled)
+  if (!isEnabled())
     return true;
 
   if (findInRequest(sourceCode)) {
@@ -70,14 +72,14 @@ bool XSSAuditor::canEvaluate(const String& sourceCode) const {
 
 bool XSSAuditor::canCreateInlineEventListener(const String&,
                                               const String& code) const {
-  if (!m_isEnabled)
+  if (!isEnabled())
     return true;
 
   return canEvaluate(code);
 }
 
 bool XSSAuditor::canLoadExternalScriptFromSrc(const String& url) const {
-  if (!m_isEnabled)
+  if (!isEnabled())
     return true;
 
   if (findInRequest(url)) {
@@ -92,7 +94,7 @@ bool XSSAuditor::canLoadExternalScriptFromSrc(const String& url) const {
 }
 
 bool XSSAuditor::canLoadObject(const String& url) const {
-  if (!m_isEnabled)
+  if (!isEnabled())
     return true;
 
   if (findInRequest(url)) {
