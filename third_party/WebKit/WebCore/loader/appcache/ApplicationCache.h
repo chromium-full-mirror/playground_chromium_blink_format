@@ -67,12 +67,6 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   ApplicationCacheResource* resourceForRequest(const ResourceRequest&);
   ApplicationCacheResource* resourceForURL(const String& url);
 
-  unsigned numDynamicEntries() const;
-  String dynamicEntry(unsigned index) const;
-
-  bool addDynamicEntry(const String& url);
-  void removeDynamicEntry(const String& url);
-
   void setOnlineWhitelist(const Vector<KURL>& onlineWhitelist);
   const Vector<KURL>& onlineWhitelist() const { return m_onlineWhitelist; }
   bool isURLInOnlineWhitelist(const KURL&);  // There is an entry in online
@@ -108,10 +102,6 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
 
   Vector<KURL> m_onlineWhitelist;
   FallbackURLVector m_fallbackURLs;
-
-  // While an update is in progress, changes in dynamic entries are queued for
-  // later execution.
-  Vector<std::pair<KURL, bool>> m_pendingDynamicEntryActions;
 
   unsigned m_storageID;
 };

@@ -866,7 +866,7 @@ bool DocumentLoader::shouldLoadResourceFromApplicationCache(
     return false;
 
   // If the resource's URL is an master entry, the manifest, an explicit entry,
-  // a fallback entry, or a dynamic entry
+  // or a fallback entry
   // in the application cache, then get the resource from the cache (instead of
   // fetching it).
   resource = cache->resourceForURL(request.url());

@@ -63,7 +63,6 @@
 #include "JSDOMImplementation.cpp"
 #include "JSDOMParser.cpp"
 #include "JSDOMSelection.cpp"
-#include "JSDOMStringList.cpp"
 #include "JSDOMWindow.cpp"
 #include "JSElement.cpp"
 #include "JSEntity.cpp"

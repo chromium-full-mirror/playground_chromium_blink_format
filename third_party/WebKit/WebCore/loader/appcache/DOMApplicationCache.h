@@ -40,7 +40,6 @@ namespace WebCore {
 
 class ApplicationCache;
 class AtomicStringImpl;
-class DOMStringList;
 class Frame;
 class KURL;
 class String;
@@ -66,11 +65,6 @@ class DOMApplicationCache : public RefCounted<DOMApplicationCache>,
 
   void update(ExceptionCode&);
   void swapCache(ExceptionCode&);
-
-  PassRefPtr<DOMStringList> items();
-  bool hasItem(const KURL&, ExceptionCode&);
-  void add(const KURL&, ExceptionCode&);
-  void remove(const KURL&, ExceptionCode&);
 
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,

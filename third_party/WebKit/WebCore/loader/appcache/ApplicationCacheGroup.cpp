@@ -709,8 +709,7 @@ void ApplicationCacheGroup::didFinishLoadingManifest() {
              m_newestCache->begin();
          it != end; ++it) {
       unsigned type = it->second->type();
-      if (type & (ApplicationCacheResource::Master |
-                  ApplicationCacheResource::Dynamic))
+      if (type & ApplicationCacheResource::Master)
         addEntry(it->first, type);
     }
   }
