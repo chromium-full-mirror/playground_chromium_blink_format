@@ -37,6 +37,7 @@
 #include "Page.h"
 #include "PageGroup.h"
 #include "StorageArea.h"
+#include "StorageSyncManager.h"
 #include <wtf/StdLibExtras.h>
 
 namespace WebCore {
@@ -61,16 +62,8 @@ PassRefPtr<LocalStorage> LocalStorage::localStorage(const String& path) {
 }
 
 LocalStorage::LocalStorage(const String& path) : m_path(path.copy()) {
-  // If the path is empty, we know we're never going to be using the thread for
-  // anything, so don't start it.
-  // In the future, we might also want to consider removing it from the DOM in
-  // that case - <rdar://problem/5960470>
-  if (path.isEmpty())
-    return;
-
-  m_thread = LocalStorageThread::create();
-  m_thread->start();
-  m_thread->scheduleImport(this);
+  if (!m_path.isEmpty())
+    m_syncManager = StorageSyncManager::create(m_path);
 }
 
 LocalStorage::~LocalStorage() {
@@ -99,46 +92,9 @@ PassRefPtr<StorageArea> LocalStorage::storageArea(SecurityOrigin* origin) {
   if (storageArea = m_storageAreaMap.get(origin))
     return storageArea.release();
 
-  storageArea = LocalStorageArea::create(origin, this);
+  storageArea = LocalStorageArea::create(origin, m_syncManager);
   m_storageAreaMap.set(origin, storageArea);
   return storageArea.release();
-}
-
-String LocalStorage::fullDatabaseFilename(SecurityOrigin* origin) {
-  // FIXME: Once we actually track origin/quota entries to see which origins
-  // have local storage established,
-  // we will return an empty path name if the origin isn't allowed to have
-  // LocalStorage.
-  // We'll need to wait here until the AreaImport task to complete before making
-  // that decision.
-
-  if (m_path.isEmpty())
-    return String();
-
-  ASSERT(origin);
-  if (!origin)
-    return String();
-
-  if (!makeAllDirectories(m_path)) {
-    LOG_ERROR("Unabled to create LocalStorage database path %s",
-              m_path.utf8().data());
-    return String();
-  }
-
-  return pathByAppendingComponent(
-      m_path, origin->databaseIdentifier() + ".localstorage");
-}
-
-void LocalStorage::performImport() {
-  ASSERT(!isMainThread());
-
-  // FIXME: Import all known local storage origins here along with their quotas
-}
-
-void LocalStorage::performSync() {
-  ASSERT(!isMainThread());
-
-  // FIXME: Write out new origins and quotas here
 }
 
 void LocalStorage::close() {
@@ -149,25 +105,7 @@ void LocalStorage::close() {
        ++it)
     it->second->scheduleFinalSync();
 
-  if (m_thread) {
-    m_thread->terminate();
-    m_thread = 0;
-  }
-}
-
-bool LocalStorage::scheduleImport(PassRefPtr<LocalStorageArea> area) {
-  ASSERT(isMainThread());
-
-  if (m_thread)
-    m_thread->scheduleImport(area);
-
-  return m_thread;
-}
-
-void LocalStorage::scheduleSync(PassRefPtr<LocalStorageArea> area) {
-  ASSERT(isMainThread());
-  if (m_thread)
-    m_thread->scheduleSync(area);
+  m_syncManager = 0;
 }
 
 }  // namespace WebCore

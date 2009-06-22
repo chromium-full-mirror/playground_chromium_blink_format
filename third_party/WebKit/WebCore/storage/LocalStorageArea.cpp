@@ -49,18 +49,16 @@ namespace WebCore {
 static const double LocalStorageSyncInterval = 1.0;
 
 LocalStorageArea::LocalStorageArea(SecurityOrigin* origin,
-                                   LocalStorage* localStorage)
+                                   PassRefPtr<StorageSyncManager> syncManager)
     : StorageArea(origin),
       m_syncTimer(this, &LocalStorageArea::syncTimerFired),
       m_itemsCleared(false),
       m_finalSyncScheduled(false),
-      m_localStorage(localStorage),
+      m_syncManager(syncManager),
       m_clearItemsWhileSyncing(false),
       m_syncScheduled(false),
       m_importComplete(false) {
-  ASSERT(m_localStorage);
-
-  if (!m_localStorage->scheduleImport(this))
+  if (!m_syncManager || !m_syncManager->scheduleImport(this))
     m_importComplete = true;
 }
 
@@ -69,6 +67,10 @@ LocalStorageArea::~LocalStorageArea() {
 }
 
 void LocalStorageArea::scheduleFinalSync() {
+  ASSERT(isMainThread());
+  if (!m_syncManager)
+    return;
+
   if (m_syncTimer.isActive())
     m_syncTimer.stop();
   else {
@@ -273,6 +275,8 @@ void LocalStorageArea::scheduleClear() {
 
 void LocalStorageArea::syncTimerFired(Timer<LocalStorageArea>*) {
   ASSERT(isMainThread());
+  if (!m_syncManager)
+    return;
 
   HashMap<String, String>::iterator it = m_changedItems.begin();
   HashMap<String, String>::iterator end = m_changedItems.end();
@@ -296,7 +300,7 @@ void LocalStorageArea::syncTimerFired(Timer<LocalStorageArea>*) {
       // performSync function.
       disableSuddenTermination();
 
-      m_localStorage->scheduleSync(this);
+      m_syncManager->scheduleSync(this);
     }
   }
 
@@ -310,9 +314,11 @@ void LocalStorageArea::syncTimerFired(Timer<LocalStorageArea>*) {
 void LocalStorageArea::performImport() {
   ASSERT(!isMainThread());
   ASSERT(!m_database.isOpen());
+  if (!m_syncManager)
+    return;
 
   String databaseFilename =
-      m_localStorage->fullDatabaseFilename(securityOrigin());
+      m_syncManager->fullDatabaseFilename(securityOrigin());
 
   if (databaseFilename.isEmpty()) {
     LOG_ERROR(
