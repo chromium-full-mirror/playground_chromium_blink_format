@@ -69,11 +69,11 @@ void HTMLDataGridColElement::setSortDirection(const String& sortDirection) {
   setAttribute(sortdirectionAttr, sortDirection);
 }
 
-bool HTMLDataGridColElement::selected() const {
-  return hasAttribute(selectedAttr);
+bool HTMLDataGridColElement::primary() const {
+  return hasAttribute(primaryAttr);
 }
 
-void HTMLDataGridColElement::setSelected(bool selected) {
-  setAttribute(selectedAttr, selected ? "" : 0);
+void HTMLDataGridColElement::setPrimary(bool primary) {
+  setAttribute(primaryAttr, primary ? "" : 0);
 }
 }

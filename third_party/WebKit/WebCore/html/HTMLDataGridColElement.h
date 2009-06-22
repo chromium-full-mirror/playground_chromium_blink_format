@@ -49,8 +49,8 @@ class HTMLDataGridColElement : public HTMLElement {
   String sortDirection() const;
   void setSortDirection(const String&);
 
-  bool selected() const;
-  void setSelected(bool);
+  bool primary() const;
+  void setPrimary(bool);
 };
 
 }  // namespace
