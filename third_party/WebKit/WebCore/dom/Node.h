@@ -685,10 +685,19 @@ class Node : public EventTarget, public TreeShared<Node> {
 
   const RegisteredEventListenerVector& eventListeners() const;
 
+  // These 4 attribute event handler attributes are overrided by HTMLBodyElement
+  // to forward to the DOMWindow.
+  virtual EventListener* onblur() const;
+  virtual void setOnblur(PassRefPtr<EventListener>);
+  virtual EventListener* onerror() const;
+  virtual void setOnerror(PassRefPtr<EventListener>);
+  virtual EventListener* onfocus() const;
+  virtual void setOnfocus(PassRefPtr<EventListener>);
+  virtual EventListener* onload() const;
+  virtual void setOnload(PassRefPtr<EventListener>);
+
   EventListener* onabort() const;
   void setOnabort(PassRefPtr<EventListener>);
-  EventListener* onblur() const;
-  void setOnblur(PassRefPtr<EventListener>);
   EventListener* onchange() const;
   void setOnchange(PassRefPtr<EventListener>);
   EventListener* onclick() const;
@@ -697,10 +706,6 @@ class Node : public EventTarget, public TreeShared<Node> {
   void setOncontextmenu(PassRefPtr<EventListener>);
   EventListener* ondblclick() const;
   void setOndblclick(PassRefPtr<EventListener>);
-  EventListener* onerror() const;
-  void setOnerror(PassRefPtr<EventListener>);
-  EventListener* onfocus() const;
-  void setOnfocus(PassRefPtr<EventListener>);
   EventListener* oninput() const;
   void setOninput(PassRefPtr<EventListener>);
   EventListener* onkeydown() const;
@@ -709,8 +714,6 @@ class Node : public EventTarget, public TreeShared<Node> {
   void setOnkeypress(PassRefPtr<EventListener>);
   EventListener* onkeyup() const;
   void setOnkeyup(PassRefPtr<EventListener>);
-  EventListener* onload() const;
-  void setOnload(PassRefPtr<EventListener>);
   EventListener* onmousedown() const;
   void setOnmousedown(PassRefPtr<EventListener>);
   EventListener* onmousemove() const;
@@ -759,14 +762,10 @@ class Node : public EventTarget, public TreeShared<Node> {
   void setOnpaste(PassRefPtr<EventListener>);
   EventListener* onreset() const;
   void setOnreset(PassRefPtr<EventListener>);
-  EventListener* onresize() const;
-  void setOnresize(PassRefPtr<EventListener>);
   EventListener* onsearch() const;
   void setOnsearch(PassRefPtr<EventListener>);
   EventListener* onselectstart() const;
   void setOnselectstart(PassRefPtr<EventListener>);
-  EventListener* onunload() const;
-  void setOnunload(PassRefPtr<EventListener>);
 
   using TreeShared<Node>::ref;
   using TreeShared<Node>::deref;
