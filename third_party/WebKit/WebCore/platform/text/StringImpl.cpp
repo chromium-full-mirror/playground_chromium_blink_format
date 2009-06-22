@@ -999,7 +999,7 @@ PassRefPtr<StringImpl> StringImpl::create(const JSC::UString& str) {
 }
 
 JSC::UString StringImpl::ustring() {
-  SharedUChar* sharedBuffer = StringImpl::sharedBuffer();
+  SharedUChar* sharedBuffer = this->sharedBuffer();
   if (sharedBuffer)
     return JSC::UString::Rep::create(const_cast<UChar*>(m_data), m_length,
                                      sharedBuffer);
@@ -1014,7 +1014,9 @@ PassRefPtr<StringImpl> StringImpl::createWithTerminatingNullCharacter(
 }
 
 PassRefPtr<StringImpl> StringImpl::copy() {
-  return create(m_data, m_length);
+  // Using the constructor directly to make sure that per-thread empty string
+  // instance isn't returned.
+  return adoptRef(new StringImpl(m_data, m_length));
 }
 
 StringImpl::SharedUChar* StringImpl::sharedBuffer() {
