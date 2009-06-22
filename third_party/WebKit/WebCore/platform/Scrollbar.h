@@ -66,6 +66,7 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   void setClient(ScrollbarClient* client) { m_client = client; }
   ScrollbarClient* client() const { return m_client; }
 
+  virtual bool isCustomScrollbar() const { return false; }
   ScrollbarOrientation orientation() const { return m_orientation; }
 
   int value() const { return lroundf(m_currentPos); }

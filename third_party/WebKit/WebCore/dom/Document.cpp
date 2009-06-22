@@ -7,7 +7,7 @@
  * reserved.
  * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
- * Copyright (C) 2008 David Levin (levin@chromium.org)
+ * Copyright (C) 2008, 2009 Google Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -1382,6 +1382,12 @@ void Document::detach() {
   // Send out documentWillBecomeInactive() notifications to registered elements,
   // in order to stop media elements
   documentWillBecomeInactive();
+
+  if (m_frame) {
+    FrameView* view = m_frame->view();
+    if (view)
+      view->detachCustomScrollbars();
+  }
 
   // indicate destruction mode,  i.e. attached() but renderer == 0
   setRenderer(0);
