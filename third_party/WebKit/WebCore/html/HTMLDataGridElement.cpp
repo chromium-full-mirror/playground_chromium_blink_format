@@ -27,6 +27,7 @@
 #include "HTMLDataGridElement.h"
 
 #include "HTMLNames.h"
+#include "RenderDataGrid.h"
 #include "Text.h"
 
 namespace WebCore {
@@ -41,6 +42,11 @@ bool HTMLDataGridElement::checkDTD(const Node* newChild) {
   if (newChild->isTextNode())
     return static_cast<const Text*>(newChild)->containsOnlyWhitespace();
   return newChild->hasTagName(dcolTag) || newChild->hasTagName(drowTag);
+}
+
+RenderObject* HTMLDataGridElement::createRenderer(RenderArena* arena,
+                                                  RenderStyle*) {
+  return new (arena) RenderDataGrid(this);
 }
 
 bool HTMLDataGridElement::autofocus() const {
@@ -65,13 +71,5 @@ bool HTMLDataGridElement::multiple() const {
 
 void HTMLDataGridElement::setMultiple(bool multiple) {
   setAttribute(multipleAttr, multiple ? "" : 0);
-}
-
-int HTMLDataGridElement::size() const {
-  return getAttribute(sizeAttr).toInt();
-}
-
-void HTMLDataGridElement::setSize(int size) {
-  setAttribute(sizeAttr, String::number(size));
 }
 }
