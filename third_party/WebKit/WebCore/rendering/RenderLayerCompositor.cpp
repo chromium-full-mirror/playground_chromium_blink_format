@@ -175,13 +175,12 @@ void RenderLayerCompositor::updateCompositingLayers(RenderLayer* updateRoot) {
   ASSERT(updateRoot || !m_compositingLayersNeedUpdate);
 }
 
-bool RenderLayerCompositor::updateLayerCompositingState(
+bool RenderLayerCompositor::updateBacking(
     RenderLayer* layer,
     CompositingChangeRepaint shouldRepaint) {
-  bool needsLayer = needsToBeComposited(layer);
   bool layerChanged = false;
 
-  if (needsLayer) {
+  if (needsToBeComposited(layer)) {
     enableCompositingMode();
     if (!layer->backing()) {
       // If we need to repaint, do so before making backing
@@ -209,6 +208,13 @@ bool RenderLayerCompositor::updateLayerCompositingState(
     video->acceleratedRenderingStateChanged();
   }
 #endif
+  return layerChanged;
+}
+
+bool RenderLayerCompositor::updateLayerCompositingState(
+    RenderLayer* layer,
+    CompositingChangeRepaint shouldRepaint) {
+  bool layerChanged = updateBacking(layer, shouldRepaint);
 
   // See if we need content or clipping layers. Methods called here should
   // assume
@@ -239,8 +245,7 @@ void RenderLayerCompositor::repaintOnCompositingChange(RenderLayer* layer) {
 // RenderLayers that are rendered by the composited RenderLayer.
 IntRect RenderLayerCompositor::calculateCompositedBounds(
     const RenderLayer* layer,
-    const RenderLayer* ancestorLayer,
-    IntRect* layerBoundingBox) {
+    const RenderLayer* ancestorLayer) {
   IntRect boundingBoxRect, unionBounds;
   boundingBoxRect = unionBounds = layer->localBoundingBox();
 
@@ -293,11 +298,6 @@ IntRect RenderLayerCompositor::calculateCompositedBounds(
   layer->convertToLayerCoords(ancestorLayer, ancestorRelX, ancestorRelY);
   unionBounds.move(ancestorRelX, ancestorRelY);
 
-  if (layerBoundingBox) {
-    boundingBoxRect.move(ancestorRelX, ancestorRelY);
-    *layerBoundingBox = boundingBoxRect;
-  }
-
   return unionBounds;
 }
 
@@ -308,19 +308,22 @@ void RenderLayerCompositor::layerWasAdded(RenderLayer* /*parent*/,
 
 void RenderLayerCompositor::layerWillBeRemoved(RenderLayer* parent,
                                                RenderLayer* child) {
-  if (child->isComposited())
-    setCompositingParent(child, 0);
-
-  // If the document is being torn down (document's renderer() is null), then
-  // there's
-  // no need to do any layer updating.
-  if (parent->renderer()->documentBeingDestroyed())
+  if (!child->isComposited() || parent->renderer()->documentBeingDestroyed())
     return;
+
+  setCompositingParent(child, 0);
 
   RenderLayer* compLayer = parent->enclosingCompositingLayer();
   if (compLayer) {
-    IntRect ancestorRect = calculateCompositedBounds(child, compLayer);
-    compLayer->setBackingNeedsRepaintInRect(ancestorRect);
+    ASSERT(compLayer->backing());
+    IntRect compBounds = child->backing()->compositedBounds();
+
+    int offsetX = 0, offsetY = 0;
+    child->convertToLayerCoords(compLayer, offsetX, offsetY);
+    compBounds.move(offsetX, offsetY);
+
+    compLayer->setBackingNeedsRepaintInRect(compBounds);
+
     // The contents of this layer may be moving from a GraphicsLayer to the
     // window,
     // so we need to make sure the window system synchronizes those changes on
@@ -459,6 +462,10 @@ void RenderLayerCompositor::computeCompositingRequirements(
   // this can affect the answer to needsToBeComposited() when clipping,
   // but that's ok here.
   layer->setHasCompositingDescendant(childState.m_subtreeIsCompositing);
+
+  // Update backing now, so that we can use isComposited() reliably during tree
+  // traversal in rebuildCompositingLayerTree().
+  updateBacking(layer, CompositingChangeRepaintNow);
 }
 
 void RenderLayerCompositor::setCompositingParent(RenderLayer* childLayer,
@@ -516,15 +523,28 @@ bool RenderLayerCompositor::canAccelerateVideoRendering(RenderVideo* o) const {
 void RenderLayerCompositor::rebuildCompositingLayerTree(
     RenderLayer* layer,
     struct CompositingState& ioCompState) {
-  bool wasComposited = layer->isComposited();
-
   // Make the layer compositing if necessary, and set up clipping and content
   // layers.
   // Note that we can only do work here that is independent of whether the
   // descendant layers
   // have been processed. computeCompositingRequirements() will already have
   // done the repaint if necessary.
-  updateLayerCompositingState(layer, CompositingChangeWillRepaintLater);
+  RenderLayerBacking* layerBacking = layer->backing();
+  if (layerBacking) {
+    // The compositing state of all our children has been updated already, so
+    // now
+    // we can compute and cache the composited bounds for this layer.
+    layerBacking->setCompositedBounds(calculateCompositedBounds(layer, layer));
+
+    layerBacking->updateGraphicsLayerConfiguration();
+    layerBacking->updateGraphicsLayerGeometry();
+
+    if (!layer->parent())
+      updateRootLayerPosition();
+
+    // FIXME: make this more incremental
+    layerBacking->parentForSublayers()->removeAllChildren();
+  }
 
   // host the document layer in the RenderView's root layer
   if (layer->isRootLayer())
@@ -537,14 +557,6 @@ void RenderLayerCompositor::rebuildCompositingLayerTree(
 #ifndef NDEBUG
   ++childState.m_depth;
 #endif
-
-  RenderLayerBacking* layerBacking = layer->backing();
-
-  // FIXME: make this more incremental
-  if (layerBacking) {
-    layerBacking->parentForSublayers()->removeAllChildren();
-    layerBacking->updateInternalHierarchy();
-  }
 
   // The children of this stacking context don't need to composite, unless there
   // is
@@ -600,16 +612,45 @@ void RenderLayerCompositor::rebuildCompositingLayerTree(
       }
     }
   }
+}
 
-  if (layerBacking) {
-    // Do work here that requires that we've processed all of the descendant
-    // layers
-    layerBacking->updateGraphicsLayerGeometry();
-  } else if (wasComposited) {
-    // We stopped being a compositing layer. Now that our descendants have been
-    // udated, we can
-    // repaint our new rendering destination.
-    repaintOnCompositingChange(layer);
+// Recurs down the RenderLayer tree until its finds the compositing descendants
+// of compositingAncestor and updates their geometry.
+void RenderLayerCompositor::updateCompositingChildrenGeometry(
+    RenderLayer* compositingAncestor,
+    RenderLayer* layer) {
+  if (layer != compositingAncestor) {
+    if (RenderLayerBacking* layerBacking = layer->backing()) {
+      layerBacking->setCompositedBounds(
+          calculateCompositedBounds(layer, layer));
+      layerBacking->updateGraphicsLayerGeometry();
+      return;
+    }
+  }
+
+  if (!layer->hasCompositingDescendant())
+    return;
+
+  if (layer->isStackingContext()) {
+    if (Vector<RenderLayer*>* negZOrderList = layer->negZOrderList()) {
+      for (size_t i = 0; i < negZOrderList->size(); ++i)
+        updateCompositingChildrenGeometry(compositingAncestor,
+                                          negZOrderList->at(i));
+    }
+  }
+
+  if (Vector<RenderLayer*>* normalFlowList = layer->normalFlowList()) {
+    for (size_t i = 0; i < normalFlowList->size(); ++i)
+      updateCompositingChildrenGeometry(compositingAncestor,
+                                        normalFlowList->at(i));
+  }
+
+  if (layer->isStackingContext()) {
+    if (Vector<RenderLayer*>* posZOrderList = layer->posZOrderList()) {
+      for (size_t i = 0; i < posZOrderList->size(); ++i)
+        updateCompositingChildrenGeometry(compositingAncestor,
+                                          posZOrderList->at(i));
+    }
   }
 }
 

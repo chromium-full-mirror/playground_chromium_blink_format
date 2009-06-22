@@ -59,8 +59,10 @@ class RenderLayerBacking : public GraphicsLayerClient {
 
   // Returns true if layer configuration changed.
   bool updateGraphicsLayerConfiguration();
-  void updateGraphicsLayerGeometry();
-  void updateInternalHierarchy();
+  // Update graphics layer position and bounds.
+  void updateGraphicsLayerGeometry();  // make private
+  // Update contents and clipping structure.
+  void updateInternalHierarchy();  // make private
 
   GraphicsLayer* graphicsLayer() const { return m_graphicsLayer; }
 
@@ -117,6 +119,9 @@ class RenderLayerBacking : public GraphicsLayerClient {
 
   void suspendAnimations();
   void resumeAnimations();
+
+  IntRect compositedBounds() const;
+  void setCompositedBounds(const IntRect&);
 
   FloatPoint graphicsLayerToContentsCoordinates(const GraphicsLayer*,
                                                 const FloatPoint&);
@@ -196,10 +201,9 @@ class RenderLayerBacking : public GraphicsLayerClient {
                                    // stacking context, with compositing
                                    // children
 
-  IntSize m_compositingContentOffset;
+  IntRect m_compositedBounds;
 
-  bool m_hasDirectlyCompositedContent : 1;
-  bool m_compositingContentOffsetDirty : 1;
+  bool m_hasDirectlyCompositedContent;
 };
 
 }  // namespace WebCore

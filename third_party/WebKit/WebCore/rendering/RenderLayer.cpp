@@ -312,9 +312,6 @@ void RenderLayer::updateLayerPositions(bool doFullRepaint,
     child->updateLayerPositions(doFullRepaint, checkForRepaint);
 
 #if USE(ACCELERATED_COMPOSITING)
-  if (!parent())
-    compositor()->updateRootLayerPosition();
-
   if (isComposited())
     backing()->updateAfterLayout();
 #endif
@@ -2537,7 +2534,7 @@ RenderLayer* RenderLayer::hitTestLayer(
     if (isComposited()) {
       // It doesn't make sense to project hitTestRect into the plane of this
       // layer, so use the same bounds we use for painting.
-      localHitTestRect = compositor()->calculateCompositedBounds(this, this);
+      localHitTestRect = backing()->compositedBounds();
     } else
 #endif
       localHitTestRect = newTransformState->mappedQuad().enclosingBoundingBox();
