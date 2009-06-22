@@ -326,6 +326,7 @@ class V8Custom {
   DECLARE_CALLBACK(DOMWindowClearInterval);
 
   DECLARE_CALLBACK(DOMParserConstructor);
+  DECLARE_CALLBACK(HTMLAudioElementConstructor);
   DECLARE_CALLBACK(HTMLImageElementConstructor);
   DECLARE_CALLBACK(HTMLOptionElementConstructor);
   DECLARE_CALLBACK(MessageChannelConstructor);
