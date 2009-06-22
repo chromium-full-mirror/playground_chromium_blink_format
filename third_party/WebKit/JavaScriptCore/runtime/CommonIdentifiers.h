@@ -37,10 +37,11 @@
                       macro(now) macro(parse) macro(propertyIsEnumerable)      \
                           macro(prototype) macro(source) macro(test)           \
                               macro(toExponential) macro(toFixed)              \
-                                  macro(toJSON) macro(toLocaleString)          \
-                                      macro(toPrecision) macro(toString)       \
-                                          macro(UTC) macro(valueOf)            \
-                                              macro(displayName)
+                                  macro(toISOString) macro(toJSON)             \
+                                      macro(toLocaleString) macro(toPrecision) \
+                                          macro(toString) macro(UTC)           \
+                                              macro(valueOf)                   \
+                                                  macro(displayName)
 
 namespace JSC {
 
