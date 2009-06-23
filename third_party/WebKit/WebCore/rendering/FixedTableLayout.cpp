@@ -126,6 +126,7 @@ int FixedTableLayout::calcWidthArray(int) {
           currentEffectiveColumn++;
         }
       }
+      static_cast<RenderTableCol*>(child)->calcPrefWidths();
     } else
       break;
 

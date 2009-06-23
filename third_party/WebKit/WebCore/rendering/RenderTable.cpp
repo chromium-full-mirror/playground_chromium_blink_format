@@ -299,6 +299,9 @@ void RenderTable::layout() {
       if (collapsing)
         section->recalcOuterBorder();
       ASSERT(!section->needsLayout());
+    } else if (child->isTableCol()) {
+      child->layoutIfNeeded();
+      ASSERT(!child->needsLayout());
     }
   }
 

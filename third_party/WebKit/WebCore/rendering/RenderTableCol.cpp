@@ -72,11 +72,8 @@ IntRect RenderTableCol::clippedOverflowRectForRepaint(
   // that we
   // might have propagated a background color or borders into.
   // FIXME: check for repaintContainer each time here?
-  RenderObject* table = parent();
-  if (table && !table->isTable())
-    table = table->parent();
-  if (table && table->isTable())
-    return table->clippedOverflowRectForRepaint(repaintContainer);
+  if (RenderObject* parentTable = table())
+    return parentTable->clippedOverflowRectForRepaint(repaintContainer);
 
   return IntRect();
 }
@@ -84,5 +81,19 @@ IntRect RenderTableCol::clippedOverflowRectForRepaint(
 void RenderTableCol::imageChanged(WrappedImagePtr, const IntRect*) {
   // FIXME: Repaint only the rect the image paints in.
   repaint();
+}
+
+void RenderTableCol::calcPrefWidths() {
+  setPrefWidthsDirty(false);
+
+  for (RenderObject* child = firstChild(); child; child = child->nextSibling())
+    child->setPrefWidthsDirty(false);
+}
+
+RenderTable* RenderTableCol::table() const {
+  RenderObject* table = parent();
+  if (table && !table->isTable())
+    table = table->parent();
+  return table && table->isTable() ? static_cast<RenderTable*>(table) : 0;
 }
 }
