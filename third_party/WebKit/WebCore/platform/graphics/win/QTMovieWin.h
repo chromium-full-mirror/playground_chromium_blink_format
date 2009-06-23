@@ -53,6 +53,8 @@ enum {
   QTMovieLoadStateComplete = 100000L
 };
 
+typedef const struct __CFURL* CFURLRef;
+
 class QTMOVIEWIN_API QTMovieWin {
  public:
   static bool initializeQuickTime();
@@ -60,7 +62,7 @@ class QTMOVIEWIN_API QTMovieWin {
   QTMovieWin(QTMovieWinClient*);
   ~QTMovieWin();
 
-  void load(const UChar* url, int len);
+  void load(const UChar* url, int len, bool preservesPitch);
   long loadState() const;
   float maxTimeLoaded() const;
 
@@ -75,6 +77,7 @@ class QTMOVIEWIN_API QTMovieWin {
   void setCurrentTime(float) const;
 
   void setVolume(float);
+  void setPreservesPitch(bool);
 
   unsigned dataSize() const;
 
@@ -96,6 +99,8 @@ class QTMOVIEWIN_API QTMovieWin {
                                unsigned& len);
 
  private:
+  void load(CFURLRef, bool preservesPitch);
+
   QTMovieWinPrivate* m_private;
   bool m_disabled;
   friend class QTMovieWinPrivate;
