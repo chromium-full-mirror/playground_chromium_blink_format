@@ -227,7 +227,8 @@ class UIDelegate : public IWebUIDelegate, IWebUIDelegatePrivate {
       /* [in] */ IWebView* webView,
       /* [in] */ WebDragSourceAction action,
       /* [in] */ LPPOINT point,
-      /* [in] */ IDataObject* pasteboard) {
+      /* [in] */ IDataObject* pasteboard,
+      /* [retval][out] */ IDataObject** newPasteboard) {
     return E_NOTIMPL;
   }
 

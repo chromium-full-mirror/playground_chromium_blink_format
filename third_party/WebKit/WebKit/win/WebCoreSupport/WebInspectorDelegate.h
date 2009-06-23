@@ -249,7 +249,8 @@ class WebInspectorDelegate : public IWebUIDelegate {
       /* [in] */ IWebView*,
       /* [in] */ WebDragSourceAction,
       /* [in] */ LPPOINT,
-      /* [in] */ IDataObject*) {
+      /* [in] */ IDataObject*,
+      /* [retval][out] */ IDataObject**) {
     return E_NOTIMPL;
   }
 
