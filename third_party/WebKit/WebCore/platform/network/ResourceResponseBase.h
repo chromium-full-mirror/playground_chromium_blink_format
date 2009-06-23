@@ -88,6 +88,7 @@ class ResourceResponseBase {
   // These functions return parsed values of the corresponding response headers.
   // NaN means that the header was not present or had invalid value.
   bool cacheControlContainsNoCache() const;
+  bool cacheControlContainsNoStore() const;
   bool cacheControlContainsMustRevalidate() const;
   double cacheControlMaxAge() const;
   double date() const;
@@ -147,6 +148,7 @@ class ResourceResponseBase {
   mutable bool m_haveParsedLastModifiedHeader : 1;
 
   mutable bool m_cacheControlContainsNoCache : 1;
+  mutable bool m_cacheControlContainsNoStore : 1;
   mutable bool m_cacheControlContainsMustRevalidate : 1;
   mutable double m_cacheControlMaxAge;
 
