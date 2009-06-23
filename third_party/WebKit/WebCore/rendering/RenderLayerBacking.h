@@ -180,7 +180,6 @@ class RenderLayerBacking : public GraphicsLayerClient {
   void paintIntoLayer(RenderLayer* rootLayer,
                       GraphicsContext*,
                       const IntRect& paintDirtyRect,
-                      bool haveTransparency,
                       PaintRestriction paintRestriction,
                       GraphicsLayerPaintingPhase,
                       RenderObject* paintingRoot);

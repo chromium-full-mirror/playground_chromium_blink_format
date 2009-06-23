@@ -787,7 +787,6 @@ void RenderLayerBacking::paintIntoLayer(
     RenderLayer* rootLayer,
     GraphicsContext* context,
     const IntRect& paintDirtyRect,  // in the coords of rootLayer
-    bool haveTransparency,
     PaintRestriction paintRestriction,
     GraphicsLayerPaintingPhase paintingPhase,
     RenderObject* paintingRoot) {
@@ -880,8 +879,8 @@ void RenderLayerBacking::paintIntoLayer(
     if (negZOrderList) {
       for (Vector<RenderLayer*>::iterator it = negZOrderList->begin();
            it != negZOrderList->end(); ++it)
-        it[0]->paintLayer(rootLayer, context, paintDirtyRect, haveTransparency,
-                          paintRestriction, paintingRoot);
+        it[0]->paintLayer(rootLayer, context, paintDirtyRect, paintRestriction,
+                          paintingRoot);
     }
 
     bool forceBlackText =
@@ -927,8 +926,8 @@ void RenderLayerBacking::paintIntoLayer(
     if (normalFlowList) {
       for (Vector<RenderLayer*>::iterator it = normalFlowList->begin();
            it != normalFlowList->end(); ++it)
-        it[0]->paintLayer(rootLayer, context, paintDirtyRect, haveTransparency,
-                          paintRestriction, paintingRoot);
+        it[0]->paintLayer(rootLayer, context, paintDirtyRect, paintRestriction,
+                          paintingRoot);
     }
 
     // Now walk the sorted list of children with positive z-indices.
@@ -936,8 +935,8 @@ void RenderLayerBacking::paintIntoLayer(
     if (posZOrderList) {
       for (Vector<RenderLayer*>::iterator it = posZOrderList->begin();
            it != posZOrderList->end(); ++it)
-        it[0]->paintLayer(rootLayer, context, paintDirtyRect, haveTransparency,
-                          paintRestriction, paintingRoot);
+        it[0]->paintLayer(rootLayer, context, paintDirtyRect, paintRestriction,
+                          paintingRoot);
     }
 
     if (renderer()->hasMask() && !selectionOnly && !damageRect.isEmpty()) {
@@ -977,8 +976,8 @@ void RenderLayerBacking::paintContents(const GraphicsLayer*,
   IntRect dirtyRect = enclosingBBox;
   dirtyRect.intersect(clipRect);
 
-  paintIntoLayer(m_owningLayer, &context, dirtyRect, false,
-                 PaintRestrictionNone, drawingPhase, renderer());
+  paintIntoLayer(m_owningLayer, &context, dirtyRect, PaintRestrictionNone,
+                 drawingPhase, renderer());
 }
 
 bool RenderLayerBacking::startAnimation(double beginTime,

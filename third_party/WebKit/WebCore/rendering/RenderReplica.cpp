@@ -72,9 +72,10 @@ void RenderReplica::paint(PaintInfo& paintInfo, int tx, int ty) {
     layer()->parent()->paintLayer(
         layer()->transform() ? layer()->parent()
                              : layer()->enclosingTransformedAncestor(),
-        paintInfo.context, paintInfo.rect, true, PaintRestrictionNone, 0, 0,
-        true,   // appliedTransform
-        true);  // temporaryClipRects
+        paintInfo.context, paintInfo.rect, PaintRestrictionNone, 0, 0,
+        RenderLayer::PaintLayerHaveTransparency |
+            RenderLayer::PaintLayerAppliedTransform |
+            RenderLayer::PaintLayerTemporaryClipRects);
   else if (paintInfo.phase == PaintPhaseMask)
     paintMask(paintInfo, tx, ty);
 }

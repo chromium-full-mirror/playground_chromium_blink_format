@@ -495,15 +495,21 @@ class RenderLayer : public ScrollbarClient {
 
   void updateLayerListsIfNeeded();
 
+  enum PaintLayerFlag {
+    PaintLayerHaveTransparency = 1,
+    PaintLayerAppliedTransform = 1 << 1,
+    PaintLayerTemporaryClipRects = 1 << 2
+  };
+
+  typedef unsigned PaintLayerFlags;
+
   void paintLayer(RenderLayer* rootLayer,
                   GraphicsContext*,
                   const IntRect& paintDirtyRect,
-                  bool haveTransparency,
                   PaintRestriction,
                   RenderObject* paintingRoot,
                   RenderObject::OverlapTestRequestMap* = 0,
-                  bool appliedTransform = false,
-                  bool temporaryClipRects = false);
+                  PaintLayerFlags paintFlags = 0);
 
   RenderLayer* hitTestLayer(RenderLayer* rootLayer,
                             RenderLayer* containerLayer,
