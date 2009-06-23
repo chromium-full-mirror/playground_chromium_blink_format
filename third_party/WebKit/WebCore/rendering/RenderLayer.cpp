@@ -2087,10 +2087,12 @@ static void performOverlapTests(
     overlapTestRequests.remove(overlappedRequestClients[i]);
 }
 
+#if USE(ACCELERATED_COMPOSITING)
 static bool shouldDoSoftwarePaint(const RenderLayer* layer,
                                   bool paintingReflection) {
   return paintingReflection && !layer->has3DTransform();
 }
+#endif
 
 void RenderLayer::paintLayer(
     RenderLayer* rootLayer,
