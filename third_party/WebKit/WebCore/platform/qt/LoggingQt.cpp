@@ -56,8 +56,8 @@ static WTFLogChannel* getChannelFromName(const QString& channelName) {
     return &LogPageCache;
   if (channelName == QLatin1String("PlatformLeaks"))
     return &LogPlatformLeaks;
-  if (channelName == QLatin1String("Plugin"))
-    return &LogPlugin;
+  if (channelName == QLatin1String("Plugins"))
+    return &LogPlugins;
   if (channelName == QLatin1String("PopupBlocking"))
     return &LogPopupBlocking;
   if (channelName == QLatin1String("SpellingAndGrammar"))

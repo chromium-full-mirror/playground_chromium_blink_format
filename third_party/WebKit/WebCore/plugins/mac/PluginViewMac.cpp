@@ -217,7 +217,7 @@ void PluginView::stop() {
 }
 
 NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
-  LOG(Plugin, "PluginView::getValueStatic(%d)", variable);
+  LOG(Plugins, "PluginView::getValueStatic(%d)", variable);
 
   switch (variable) {
     case NPNVToolkit:
@@ -234,7 +234,7 @@ NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
 }
 
 NPError PluginView::getValue(NPNVariable variable, void* value) {
-  LOG(Plugin, "PluginView::getValue(%d)", variable);
+  LOG(Plugins, "PluginView::getValue(%d)", variable);
 
   switch (variable) {
     case NPNVWindowNPObject: {
@@ -295,7 +295,7 @@ void PluginView::setParent(ScrollView* parent) {
 // -------------- Geometry and painting ----------------
 
 void PluginView::show() {
-  LOG(Plugin, "PluginView::show()");
+  LOG(Plugins, "PluginView::show()");
 
   setSelfVisible(true);
 
@@ -303,7 +303,7 @@ void PluginView::show() {
 }
 
 void PluginView::hide() {
-  LOG(Plugin, "PluginView::hide()");
+  LOG(Plugins, "PluginView::hide()");
 
   setSelfVisible(false);
 
@@ -311,7 +311,7 @@ void PluginView::hide() {
 }
 
 void PluginView::setFocus() {
-  LOG(Plugin, "PluginView::setFocus()");
+  LOG(Plugins, "PluginView::setFocus()");
 
   if (platformPluginWidget())
     platformPluginWidget()->setFocus(Qt::OtherFocusReason);
@@ -495,9 +495,9 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
 }
 
 void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
-  LOG(Plugin, "PluginView::handleKeyboardEvent() ----------------- ");
+  LOG(Plugins, "PluginView::handleKeyboardEvent() ----------------- ");
 
-  LOG(Plugin, "PV::hKE(): KE.keyCode: 0x%02X, KE.charCode: %d",
+  LOG(Plugins, "PV::hKE(): KE.keyCode: 0x%02X, KE.charCode: %d",
       event->keyCode(), event->charCode());
 
   EventRecord record;
@@ -533,7 +533,7 @@ void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
 
   WTF::RetainPtr<CFStringRef> cfText(WTF::AdoptCF, text.createCFString());
 
-  LOG(Plugin,
+  LOG(Plugins,
       "PV::hKE(): PKE.text: %s, PKE.unmodifiedText: %s, PKE.keyIdentifier: %s",
       text.ascii().data(), platformEvent->unmodifiedText().ascii().data(),
       platformEvent->keyIdentifier().ascii().data());
@@ -551,9 +551,9 @@ void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
   record.message = ((keyCode & 0xFF) << 8) | (charCodes[0] & 0xFF);
   record.when = TickCount();
 
-  LOG(Plugin, "PV::hKE(): record.modifiers: %d", record.modifiers);
+  LOG(Plugins, "PV::hKE(): record.modifiers: %d", record.modifiers);
 
-  LOG(Plugin,
+  LOG(Plugins,
       "PV::hKE(): PKE.qtEvent()->nativeVirtualKey: 0x%02X, charCode: %d",
       keyCode, int(uchar(charCodes[0])));
 

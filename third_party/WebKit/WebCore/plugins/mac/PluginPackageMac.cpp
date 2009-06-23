@@ -50,7 +50,7 @@ void PluginPackage::determineQuirks(const String& mimeType) {
   if (MIMETypeRegistry::isJavaAppletMIMEType(mimeType)) {
     // Because a single process cannot create multiple VMs, and we cannot
     // reliably unload a
-    // Java VM, we cannot unload the Java plugin, or we'll lose reference to our
+    // Java VM, we cannot unload the Java Plugin, or we'll lose reference to our
     // only VM
     m_quirks.add(PluginQuirkDontUnloadPlugin);
 
@@ -262,10 +262,10 @@ bool PluginPackage::fetchInfo() {
     CFBundleCloseBundleResourceMap(m_module, resFile);
   }
 
-  LOG(Plugin, "PluginPackage::fetchInfo(): Found plug-in '%s'",
+  LOG(Plugins, "PluginPackage::fetchInfo(): Found plug-in '%s'",
       m_name.utf8().data());
   if (isPluginBlacklisted()) {
-    LOG(Plugin, "\tPlug-in is blacklisted!");
+    LOG(Plugins, "\tPlug-in is blacklisted!");
     return false;
   }
 
@@ -291,7 +291,7 @@ bool PluginPackage::load() {
                                              kCFURLPOSIXPathStyle, false));
   m_module = CFBundleCreate(NULL, url.get());
   if (!m_module || !CFBundleLoadExecutable(m_module)) {
-    LOG(Plugin, "%s not loaded", m_path.utf8().data());
+    LOG(Plugins, "%s not loaded", m_path.utf8().data());
     return false;
   }
 
