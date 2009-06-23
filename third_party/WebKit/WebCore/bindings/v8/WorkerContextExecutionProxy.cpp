@@ -36,7 +36,11 @@
 
 #include "V8Binding.h"
 #include "V8Proxy.h"
+#include "DOMCoreException.h"
 #include "Event.h"
+#include "EventException.h"
+#include "RangeException.h"
+#include "XMLHttpRequestException.h"
 #include "V8WorkerContextEventListener.h"
 #include "V8WorkerContextObjectEventListener.h"
 #include "Worker.h"
@@ -244,6 +248,18 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::ToV8Object(
           break;
         case V8ClassIndex::WORKERNAVIGATOR:
           static_cast<WorkerNavigator*>(impl)->ref();
+          break;
+        case V8ClassIndex::DOMCOREEXCEPTION:
+          static_cast<DOMCoreException*>(impl)->ref();
+          break;
+        case V8ClassIndex::RANGEEXCEPTION:
+          static_cast<RangeException*>(impl)->ref();
+          break;
+        case V8ClassIndex::EVENTEXCEPTION:
+          static_cast<EventException*>(impl)->ref();
+          break;
+        case V8ClassIndex::XMLHTTPREQUESTEXCEPTION:
+          static_cast<XMLHttpRequestException*>(impl)->ref();
           break;
         default:
           ASSERT(false);
