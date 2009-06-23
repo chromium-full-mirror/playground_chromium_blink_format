@@ -1115,6 +1115,10 @@ Position CompositeEditCommand::positionAvoidingSpecialElementBoundary(
   VisiblePosition visiblePos(original);
   Node* enclosingAnchor = enclosingAnchorElement(original);
   Position result = original;
+
+  if (!enclosingAnchor)
+    return result;
+
   // Don't avoid block level anchors, because that would insert content into the
   // wrong paragraph.
   if (enclosingAnchor && !isBlock(enclosingAnchor)) {
