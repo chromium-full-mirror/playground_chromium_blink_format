@@ -498,7 +498,8 @@ class RenderLayer : public ScrollbarClient {
   enum PaintLayerFlag {
     PaintLayerHaveTransparency = 1,
     PaintLayerAppliedTransform = 1 << 1,
-    PaintLayerTemporaryClipRects = 1 << 2
+    PaintLayerTemporaryClipRects = 1 << 2,
+    PaintLayerPaintingReflection = 1 << 3
   };
 
   typedef unsigned PaintLayerFlags;
@@ -567,6 +568,7 @@ class RenderLayer : public ScrollbarClient {
   void createReflection();
   void updateReflectionStyle();
   bool paintingInsideReflection() const { return m_paintingInsideReflection; }
+  void setPaintingInsideReflection(bool b) { m_paintingInsideReflection = b; }
 
   void parentClipRects(const RenderLayer* rootLayer,
                        ClipRects&,

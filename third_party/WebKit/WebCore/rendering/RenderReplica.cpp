@@ -75,7 +75,8 @@ void RenderReplica::paint(PaintInfo& paintInfo, int tx, int ty) {
         paintInfo.context, paintInfo.rect, PaintRestrictionNone, 0, 0,
         RenderLayer::PaintLayerHaveTransparency |
             RenderLayer::PaintLayerAppliedTransform |
-            RenderLayer::PaintLayerTemporaryClipRects);
+            RenderLayer::PaintLayerTemporaryClipRects |
+            RenderLayer::PaintLayerPaintingReflection);
   else if (paintInfo.phase == PaintPhaseMask)
     paintMask(paintInfo, tx, ty);
 }
