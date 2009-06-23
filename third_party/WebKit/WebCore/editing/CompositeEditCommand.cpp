@@ -1161,6 +1161,9 @@ Position CompositeEditCommand::positionAvoidingSpecialElementBoundary(
         pushAnchorElementDown(enclosingAnchor);
         enclosingAnchor = enclosingAnchorElement(original);
       }
+      if (!enclosingAnchor)
+        return original;
+
       result = positionBeforeNode(enclosingAnchor);
     }
   }
