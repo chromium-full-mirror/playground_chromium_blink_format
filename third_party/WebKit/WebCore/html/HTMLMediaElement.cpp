@@ -1515,6 +1515,9 @@ void HTMLMediaElement::documentWillBecomeInactive() {
 
   if (renderer())
     renderer()->updateFromElement();
+
+  stopPeriodicTimers();
+  cancelPendingEventsAndCallbacks();
 }
 
 void HTMLMediaElement::documentDidBecomeActive() {
