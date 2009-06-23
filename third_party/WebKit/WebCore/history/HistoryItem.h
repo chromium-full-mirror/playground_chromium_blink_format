@@ -128,6 +128,8 @@ class HistoryItem : public RefCounted<HistoryItem> {
   void setIsTargetItem(bool);
 
   void setFormInfoFromRequest(const ResourceRequest&);
+  void setFormData(PassRefPtr<FormData>);
+  void setFormContentType(const String&);
 
   void recordInitialVisit();
 
@@ -145,6 +147,7 @@ class HistoryItem : public RefCounted<HistoryItem> {
   HistoryItem* targetItem();
   const HistoryItemVector& children() const;
   bool hasChildren() const;
+  void clearChildren();
 
   // This should not be called directly for HistoryItems that are already
   // included
