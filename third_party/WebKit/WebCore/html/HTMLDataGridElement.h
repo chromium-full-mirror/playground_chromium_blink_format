@@ -26,13 +26,16 @@
 #ifndef HTMLDataGridElement_h
 #define HTMLDataGridElement_h
 
+#include "DataGridDataSource.h"
 #include "HTMLElement.h"
+#include "Timer.h"
 
 namespace WebCore {
 
 class HTMLDataGridElement : public HTMLElement {
  public:
   HTMLDataGridElement(const QualifiedName&, Document*);
+  virtual ~HTMLDataGridElement();
 
   virtual int tagPriority() const { return 6; }  // Same as <select>s
   virtual bool checkDTD(const Node*);
@@ -47,8 +50,17 @@ class HTMLDataGridElement : public HTMLElement {
 
   bool multiple() const;
   void setMultiple(bool);
+
+  void setDataSource(PassRefPtr<DataGridDataSource>);
+  DataGridDataSource* dataSource() const { return m_dataSource.get(); }
+
+ private:
+  void initializationTimerFired(Timer<HTMLDataGridElement>*);
+
+  Timer<HTMLDataGridElement> m_initializationTimer;
+  RefPtr<DataGridDataSource> m_dataSource;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // HTMLDataGridElement_h
