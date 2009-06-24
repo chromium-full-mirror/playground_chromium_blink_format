@@ -96,8 +96,6 @@ void WMLDoElement::parseMappedAttribute(MappedAttribute* attr) {
     m_type = parseValueForbiddingVariableReferences(attr->value());
   else if (attr->name() == HTMLNames::nameAttr)
     m_name = parseValueForbiddingVariableReferences(attr->value());
-  else if (attr->name() == HTMLNames::labelAttr)
-    m_label = parseValueSubstitutingVariableReferences(attr->value());
   else if (attr->name() == optionalAttr)
     m_isOptional = (attr->value() == "true");
   else
@@ -140,6 +138,11 @@ void WMLDoElement::recalcStyle(StyleChange change) {
 
   if (renderer())
     renderer()->updateFromElement();
+}
+
+String WMLDoElement::label() const {
+  return parseValueSubstitutingVariableReferences(
+      getAttribute(HTMLNames::labelAttr));
 }
 }
 

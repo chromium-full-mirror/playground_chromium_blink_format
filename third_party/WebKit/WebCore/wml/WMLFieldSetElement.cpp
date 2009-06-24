@@ -41,17 +41,12 @@ WMLFieldSetElement::WMLFieldSetElement(const QualifiedName& tagName,
 
 WMLFieldSetElement::~WMLFieldSetElement() {}
 
-void WMLFieldSetElement::parseMappedAttribute(MappedAttribute* attr) {
-  if (attr->name() == HTMLNames::titleAttr)
-    m_title = parseValueSubstitutingVariableReferences(attr->value());
-  else
-    WMLElement::parseMappedAttribute(attr);
-}
-
 void WMLFieldSetElement::insertedIntoDocument() {
   WMLElement::insertedIntoDocument();
 
-  if (m_title.isEmpty())
+  String title = parseValueSubstitutingVariableReferences(
+      getAttribute(HTMLNames::titleAttr));
+  if (title.isEmpty())
     return;
 
   m_insertedLegendElement =
@@ -64,7 +59,7 @@ void WMLFieldSetElement::insertedIntoDocument() {
   ASSERT(ec == 0);
 
   // Create text node holding the 'title' attribute value
-  m_insertedLegendElement->appendChild(document()->createTextNode(m_title), ec);
+  m_insertedLegendElement->appendChild(document()->createTextNode(title), ec);
   ASSERT(ec == 0);
 }
 
