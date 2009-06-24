@@ -202,7 +202,7 @@ inline ArrayType* binaryChop(ArrayType* array, size_t size, KeyType key) {
 }
 #endif
 
-class CodeBlock {
+class CodeBlock : public FastAllocBase {
   friend class JIT;
 
  public:
