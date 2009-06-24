@@ -57,7 +57,7 @@ struct PlatformContextSkia::State {
 
   // Common shader state.
   float m_alpha;
-  SkPorterDuff::Mode m_porterDuffMode;
+  SkXfermode::Mode m_xferMode;
   SkShader* m_gradient;
   SkShader* m_pattern;
   bool m_useAntialiasing;
@@ -99,7 +99,7 @@ struct PlatformContextSkia::State {
 // Note: Keep theses default values in sync with GraphicsContextState.
 PlatformContextSkia::State::State()
     : m_alpha(1),
-      m_porterDuffMode(SkPorterDuff::kSrcOver_Mode),
+      m_xferMode(SkXfermode::kSrcOver_Mode),
       m_gradient(0),
       m_pattern(0),
       m_useAntialiasing(true),
@@ -117,7 +117,7 @@ PlatformContextSkia::State::State()
 
 PlatformContextSkia::State::State(const State& other)
     : m_alpha(other.m_alpha),
-      m_porterDuffMode(other.m_porterDuffMode),
+      m_xferMode(other.m_xferMode),
       m_gradient(other.m_gradient),
       m_pattern(other.m_pattern),
       m_useAntialiasing(other.m_useAntialiasing),
@@ -296,7 +296,7 @@ void PlatformContextSkia::setupPaintCommon(SkPaint* paint) const {
 #endif
 
   paint->setAntiAlias(m_state->m_useAntialiasing);
-  paint->setPorterDuffXfermode(m_state->m_porterDuffMode);
+  paint->setXfermodeMode(m_state->m_xferMode);
   paint->setLooper(m_state->m_looper);
 
   if (m_state->m_gradient)
@@ -375,8 +375,8 @@ void PlatformContextSkia::setLineJoin(SkPaint::Join lj) {
   m_state->m_lineJoin = lj;
 }
 
-void PlatformContextSkia::setPorterDuffMode(SkPorterDuff::Mode pdm) {
-  m_state->m_porterDuffMode = pdm;
+void PlatformContextSkia::setXfermodeMode(SkXfermode::Mode pdm) {
+  m_state->m_xferMode = pdm;
 }
 
 void PlatformContextSkia::setFillColor(SkColor color) {
@@ -497,7 +497,7 @@ void PlatformContextSkia::applyClipFromImage(const WebCore::FloatRect& rect,
   // only look at the alpha when compositing. I'm not 100% sure this is what
   // WebKit expects for image clipping.
   SkPaint paint;
-  paint.setPorterDuffXfermode(SkPorterDuff::kDstIn_Mode);
+  paint.setXfermodeMode(SkXfermode::kDstIn_Mode);
   m_canvas->drawBitmap(imageBuffer, SkFloatToScalar(rect.x()),
                        SkFloatToScalar(rect.y()), &paint);
 }
