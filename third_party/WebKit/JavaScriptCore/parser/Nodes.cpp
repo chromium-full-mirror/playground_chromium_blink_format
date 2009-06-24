@@ -2241,9 +2241,10 @@ void ProgramNode::generateBytecode(ScopeChainNode* scopeChainNode) {
   m_code.set(new ProgramCodeBlock(this, GlobalCode, globalObject,
                                   source().provider()));
 
-  BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
-                              &globalObject->symbolTable(), m_code.get());
-  generator.generate();
+  OwnPtr<BytecodeGenerator> generator(
+      new BytecodeGenerator(this, globalObject->debugger(), scopeChain,
+                            &globalObject->symbolTable(), m_code.get()));
+  generator->generate();
 
   destroyData();
 }
@@ -2312,9 +2313,10 @@ void EvalNode::generateBytecode(ScopeChainNode* scopeChainNode) {
   m_code.set(new EvalCodeBlock(this, globalObject, source().provider(),
                                scopeChain.localDepth()));
 
-  BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
-                              &m_code->symbolTable(), m_code.get());
-  generator.generate();
+  OwnPtr<BytecodeGenerator> generator(
+      new BytecodeGenerator(this, globalObject->debugger(), scopeChain,
+                            &m_code->symbolTable(), m_code.get()));
+  generator->generate();
 
   // Eval code needs to hang on to its declaration stacks to keep declaration
   // info alive until Interpreter::execute time,
@@ -2333,10 +2335,11 @@ EvalCodeBlock& EvalNode::bytecodeForExceptionInfoReparse(
   m_code.set(new EvalCodeBlock(this, globalObject, source().provider(),
                                scopeChain.localDepth()));
 
-  BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
-                              &m_code->symbolTable(), m_code.get());
-  generator.setRegeneratingForExceptionInfo(codeBlockBeingRegeneratedFrom);
-  generator.generate();
+  OwnPtr<BytecodeGenerator> generator(
+      new BytecodeGenerator(this, globalObject->debugger(), scopeChain,
+                            &m_code->symbolTable(), m_code.get()));
+  generator->setRegeneratingForExceptionInfo(codeBlockBeingRegeneratedFrom);
+  generator->generate();
 
   return *m_code;
 }
@@ -2463,9 +2466,10 @@ void FunctionBodyNode::generateBytecode(ScopeChainNode* scopeChainNode) {
   m_code.set(new CodeBlock(this, FunctionCode, source().provider(),
                            source().startOffset()));
 
-  BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
-                              &m_code->symbolTable(), m_code.get());
-  generator.generate();
+  OwnPtr<BytecodeGenerator> generator(
+      new BytecodeGenerator(this, globalObject->debugger(), scopeChain,
+                            &m_code->symbolTable(), m_code.get()));
+  generator->generate();
 
   destroyData();
 }
@@ -2491,10 +2495,11 @@ CodeBlock& FunctionBodyNode::bytecodeForExceptionInfoReparse(
   m_code.set(new CodeBlock(this, FunctionCode, source().provider(),
                            source().startOffset()));
 
-  BytecodeGenerator generator(this, globalObject->debugger(), scopeChain,
-                              &m_code->symbolTable(), m_code.get());
-  generator.setRegeneratingForExceptionInfo(codeBlockBeingRegeneratedFrom);
-  generator.generate();
+  OwnPtr<BytecodeGenerator> generator(
+      new BytecodeGenerator(this, globalObject->debugger(), scopeChain,
+                            &m_code->symbolTable(), m_code.get()));
+  generator->setRegeneratingForExceptionInfo(codeBlockBeingRegeneratedFrom);
+  generator->generate();
 
   return *m_code;
 }
