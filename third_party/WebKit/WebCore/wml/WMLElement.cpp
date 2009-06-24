@@ -88,7 +88,7 @@ RenderObject* WMLElement::createRenderer(RenderArena*, RenderStyle* style) {
 
 String WMLElement::parseValueSubstitutingVariableReferences(
     const AtomicString& value,
-    WMLErrorCode defaultErrorCode) {
+    WMLErrorCode defaultErrorCode) const {
   bool isValid = false;
   if (!containsVariableReference(value, isValid))
     return value;
@@ -102,7 +102,7 @@ String WMLElement::parseValueSubstitutingVariableReferences(
 }
 
 String WMLElement::parseValueForbiddingVariableReferences(
-    const AtomicString& value) {
+    const AtomicString& value) const {
   bool isValid = false;
   if (containsVariableReference(value, isValid)) {
     reportWMLError(document(), WMLErrorInvalidVariableReferenceLocation);
