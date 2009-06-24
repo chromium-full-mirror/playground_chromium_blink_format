@@ -40,6 +40,12 @@
 #include "markup.h"
 #include "webkitprivate.h"
 
+// Arbitrary depth limit for the undo stack, to keep it from using
+// unbounded memory.  This is the maximum number of distinct undoable
+// actions -- unbroken stretches of typed characters are coalesced
+// into a single action.
+#define maximumUndoStackDepth 1000
+
 using namespace WebCore;
 
 namespace WebKit {
@@ -252,35 +258,52 @@ bool EditorClient::isEditable() {
 }
 
 void EditorClient::registerCommandForUndo(
-    WTF::PassRefPtr<WebCore::EditCommand>) {
-  notImplemented();
+    WTF::PassRefPtr<WebCore::EditCommand> command) {
+  if (undoStack.size() == maximumUndoStackDepth)
+    undoStack.removeFirst();
+  if (!m_isInRedo)
+    redoStack.clear();
+  undoStack.append(command);
 }
 
 void EditorClient::registerCommandForRedo(
-    WTF::PassRefPtr<WebCore::EditCommand>) {
-  notImplemented();
+    WTF::PassRefPtr<WebCore::EditCommand> command) {
+  redoStack.append(command);
 }
 
 void EditorClient::clearUndoRedoOperations() {
-  notImplemented();
+  undoStack.clear();
+  redoStack.clear();
 }
 
 bool EditorClient::canUndo() const {
-  notImplemented();
-  return false;
+  return !undoStack.isEmpty();
 }
 
 bool EditorClient::canRedo() const {
-  notImplemented();
-  return false;
+  return !redoStack.isEmpty();
 }
 
 void EditorClient::undo() {
-  notImplemented();
+  if (canUndo()) {
+    RefPtr<WebCore::EditCommand> command(*(--undoStack.end()));
+    undoStack.remove(--undoStack.end());
+    // unapply will call us back to push this command onto the redo stack.
+    command->unapply();
+  }
 }
 
 void EditorClient::redo() {
-  notImplemented();
+  if (canRedo()) {
+    RefPtr<WebCore::EditCommand> command(*(--redoStack.end()));
+    redoStack.remove(--redoStack.end());
+
+    ASSERT(!m_isInRedo);
+    m_isInRedo = true;
+    // reapply will call us back to push this command onto the undo stack.
+    command->reapply();
+    m_isInRedo = false;
+  }
 }
 
 bool EditorClient::shouldInsertNode(Node*, Range*, EditorInsertAction) {
@@ -513,7 +536,8 @@ void EditorClient::handleInputMethodKeydown(KeyboardEvent* event) {
     event->setDefaultHandled();
 }
 
-EditorClient::EditorClient(WebKitWebView* webView) : m_webView(webView) {
+EditorClient::EditorClient(WebKitWebView* webView)
+    : m_isInRedo(false), m_webView(webView) {
   WebKitWebViewPrivate* priv = m_webView->priv;
   g_signal_connect(priv->imContext, "commit", G_CALLBACK(imContextCommitted),
                    this);
