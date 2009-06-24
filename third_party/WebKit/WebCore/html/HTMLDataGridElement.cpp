@@ -38,7 +38,9 @@ HTMLDataGridElement::HTMLDataGridElement(const QualifiedName& tagName,
                                          Document* document)
     : HTMLElement(tagName, document),
       m_initializationTimer(this,
-                            &HTMLDataGridElement::initializationTimerFired) {}
+                            &HTMLDataGridElement::initializationTimerFired) {
+  m_columns = DataGridColumnList::create();
+}
 
 HTMLDataGridElement::~HTMLDataGridElement() {}
 
