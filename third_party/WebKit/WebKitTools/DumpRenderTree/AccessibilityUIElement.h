@@ -85,6 +85,7 @@ class AccessibilityUIElement {
   JSStringRef role();
   JSStringRef title();
   JSStringRef description();
+  JSStringRef language();
   double x();
   double y();
   double width();

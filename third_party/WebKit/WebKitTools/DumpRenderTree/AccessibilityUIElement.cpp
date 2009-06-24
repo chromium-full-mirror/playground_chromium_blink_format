@@ -364,6 +364,14 @@ static JSValueRef getDescriptionCallback(JSContextRef context,
   return JSValueMakeString(context, description.get());
 }
 
+static JSValueRef getLanguageCallback(JSContextRef context,
+                                      JSObjectRef thisObject,
+                                      JSStringRef propertyName,
+                                      JSValueRef* exception) {
+  JSRetainPtr<JSStringRef> language(Adopt, toAXElement(thisObject)->language());
+  return JSValueMakeString(context, language.get());
+}
+
 static JSValueRef getChildrenCountCallback(JSContextRef context,
                                            JSObjectRef thisObject,
                                            JSStringRef propertyName,
@@ -467,6 +475,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"title", getTitleCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"description", getDescriptionCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"language", getLanguageCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"x", getXCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
