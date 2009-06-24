@@ -372,7 +372,7 @@ void CachedResource::updateResponseAfterRevalidation(
 }
 
 bool CachedResource::canUseCacheValidator() const {
-  if (m_loading)
+  if (m_loading || m_errorOccurred)
     return false;
 
   if (m_response.cacheControlContainsNoStore())
@@ -386,6 +386,9 @@ bool CachedResource::canUseCacheValidator() const {
 }
 
 bool CachedResource::mustRevalidate(CachePolicy cachePolicy) const {
+  if (m_errorOccurred)
+    return true;
+
   if (m_loading)
     return false;
 
