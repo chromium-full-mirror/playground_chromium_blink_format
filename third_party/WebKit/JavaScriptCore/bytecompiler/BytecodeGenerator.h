@@ -60,7 +60,7 @@ struct ControlFlowContext {
   FinallyContext finallyContext;
 };
 
-class BytecodeGenerator {
+class BytecodeGenerator : public FastAllocBase {
  public:
   typedef DeclarationStacks::VarStack VarStack;
   typedef DeclarationStacks::FunctionStack FunctionStack;
