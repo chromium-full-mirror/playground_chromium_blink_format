@@ -35,7 +35,7 @@
 #include "FrameTree.h"
 #include "Page.h"
 #include "PageGroup.h"
-#include "StorageArea.h"
+#include "StorageAreaSync.h"
 #include <wtf/StdLibExtras.h>
 
 namespace WebCore {
@@ -72,7 +72,7 @@ void StorageSyncManager::close() {
   }
 }
 
-bool StorageSyncManager::scheduleImport(PassRefPtr<LocalStorageArea> area) {
+bool StorageSyncManager::scheduleImport(PassRefPtr<StorageAreaSync> area) {
   ASSERT(isMainThread());
 
   if (m_thread)
@@ -81,7 +81,7 @@ bool StorageSyncManager::scheduleImport(PassRefPtr<LocalStorageArea> area) {
   return m_thread;
 }
 
-void StorageSyncManager::scheduleSync(PassRefPtr<LocalStorageArea> area) {
+void StorageSyncManager::scheduleSync(PassRefPtr<StorageAreaSync> area) {
   ASSERT(isMainThread());
 
   if (m_thread)

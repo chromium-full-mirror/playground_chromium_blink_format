@@ -42,8 +42,6 @@ class SessionStorageArea : public StorageArea {
   }
   PassRefPtr<SessionStorageArea> copy(SecurityOrigin*, Page*);
 
-  Page* page() { return m_page; }
-
  private:
   SessionStorageArea(SecurityOrigin*, Page*);
   SessionStorageArea(SecurityOrigin*, Page*, SessionStorageArea*);
@@ -56,6 +54,7 @@ class SessionStorageArea : public StorageArea {
                            const String& oldValue,
                            Frame* sourceFrame);
   virtual void areaCleared(Frame* sourceFrame);
+  virtual void blockUntilImportComplete() const;
 
   void dispatchStorageEvent(const String& key,
                             const String& oldValue,
