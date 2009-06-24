@@ -858,7 +858,10 @@ inline AssignErrorNode::AssignErrorNode(JSGlobalData* globalData,
 inline CommaNode::CommaNode(JSGlobalData* globalData,
                             ExpressionNode* expr1,
                             ExpressionNode* expr2)
-    : ExpressionNode(globalData), m_expr1(expr1), m_expr2(expr2) {}
+    : ExpressionNode(globalData) {
+  m_expressions.append(expr1);
+  m_expressions.append(expr2);
+}
 
 inline ConstStatementNode::ConstStatementNode(JSGlobalData* globalData,
                                               ConstDeclNode* next)
