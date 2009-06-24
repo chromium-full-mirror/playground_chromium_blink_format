@@ -455,6 +455,8 @@ class V8Custom {
 
   DECLARE_CALLBACK(NodeFilterAcceptNode);
 
+  DECLARE_PROPERTY_ACCESSOR(HTMLDataGridElementDataSource);
+
   DECLARE_CALLBACK(HTMLFormElementSubmit);
 
   DECLARE_NAMED_PROPERTY_GETTER(DOMWindow);
