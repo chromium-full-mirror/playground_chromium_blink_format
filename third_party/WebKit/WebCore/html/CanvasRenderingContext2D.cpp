@@ -933,11 +933,13 @@ static IntSize size(HTMLImageElement* image) {
   return IntSize();
 }
 
+#if ENABLE(VIDEO)
 static IntSize size(HTMLVideoElement* video) {
   if (MediaPlayer* player = video->player())
     return player->naturalSize();
   return IntSize();
 }
+#endif
 
 static inline FloatRect normalizeRect(const FloatRect& rect) {
   return FloatRect(min(rect.x(), rect.right()), min(rect.y(), rect.bottom()),
@@ -1077,6 +1079,7 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* canvas,
   // calls and not before them to avoid problems like this.
 }
 
+#if ENABLE(VIDEO)
 void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
                                          float x,
                                          float y) {
@@ -1140,6 +1143,7 @@ void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
   video->paint(c, IntRect(IntPoint(), size(video)));
   c->restore();
 }
+#endif
 
 // FIXME: Why isn't this just another overload of drawImage? Why have a
 // different name?

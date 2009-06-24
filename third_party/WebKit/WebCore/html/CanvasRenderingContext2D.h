@@ -223,6 +223,7 @@ class CanvasRenderingContext2D : Noncopyable {
                  const FloatRect& srcRect,
                  const FloatRect& dstRect,
                  ExceptionCode&);
+#if ENABLE(VIDEO)
   void drawImage(HTMLVideoElement*, float x, float y);
   void drawImage(HTMLVideoElement*,
                  float x,
@@ -234,6 +235,7 @@ class CanvasRenderingContext2D : Noncopyable {
                  const FloatRect& srcRect,
                  const FloatRect& dstRect,
                  ExceptionCode&);
+#endif
 
   void drawImageFromRect(HTMLImageElement*,
                          float sx,
