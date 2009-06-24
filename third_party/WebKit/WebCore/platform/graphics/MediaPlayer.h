@@ -211,6 +211,8 @@ class MediaPlayer : Noncopyable {
   void acceleratedRenderingStateChanged();
 #endif
 
+  bool hasSingleSecurityOrigin() const;
+
  private:
   static void initializeMediaEngines();
 

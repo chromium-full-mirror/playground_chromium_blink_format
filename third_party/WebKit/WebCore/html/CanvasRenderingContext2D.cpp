@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
+ * reserved.
  * Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
  * Copyright (C) 2007 Alp Toker <alp@atoker.com>
  * Copyright (C) 2008 Eric Seidel <eric@webkit.org>
@@ -56,6 +57,7 @@
 #include "Settings.h"
 #include "StrokeStyleApplier.h"
 #include "TextMetrics.h"
+#include "HTMLVideoElement.h"
 #include <stdio.h>
 
 #include <wtf/ByteArray.h>
@@ -931,10 +933,22 @@ static IntSize size(HTMLImageElement* image) {
   return IntSize();
 }
 
+static IntSize size(HTMLVideoElement* video) {
+  if (MediaPlayer* player = video->player())
+    return player->naturalSize();
+  return IntSize();
+}
+
 static inline FloatRect normalizeRect(const FloatRect& rect) {
   return FloatRect(min(rect.x(), rect.right()), min(rect.y(), rect.bottom()),
                    max(rect.width(), -rect.width()),
                    max(rect.height(), -rect.height()));
+}
+
+void CanvasRenderingContext2D::checkOrigin(const KURL& url) {
+  RefPtr<SecurityOrigin> origin = SecurityOrigin::create(url);
+  if (!m_canvas->document()->securityOrigin()->canAccess(origin.get()))
+    m_canvas->setOriginTainted();
 }
 
 void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
@@ -956,12 +970,6 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
   IntSize s = size(image);
   drawImage(image, FloatRect(0, 0, s.width(), s.height()),
             FloatRect(x, y, width, height), ec);
-}
-
-void CanvasRenderingContext2D::checkOrigin(const KURL& url) {
-  RefPtr<SecurityOrigin> origin = SecurityOrigin::create(url);
-  if (!m_canvas->document()->securityOrigin()->canAccess(origin.get()))
-    m_canvas->setOriginTainted();
 }
 
 void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
@@ -1067,6 +1075,70 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* canvas,
                        // is dirty.
   // FIXME: Arguably willDraw should become didDraw and occur after drawing
   // calls and not before them to avoid problems like this.
+}
+
+void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
+                                         float x,
+                                         float y) {
+  ASSERT(video);
+  IntSize s = size(video);
+  ExceptionCode ec;
+  drawImage(video, x, y, s.width(), s.height(), ec);
+}
+
+void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
+                                         float x,
+                                         float y,
+                                         float width,
+                                         float height,
+                                         ExceptionCode& ec) {
+  ASSERT(video);
+  IntSize s = size(video);
+  drawImage(video, FloatRect(0, 0, s.width(), s.height()),
+            FloatRect(x, y, width, height), ec);
+}
+
+void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
+                                         const FloatRect& srcRect,
+                                         const FloatRect& dstRect,
+                                         ExceptionCode& ec) {
+  ASSERT(video);
+
+  ec = 0;
+  FloatRect videoRect = FloatRect(FloatPoint(), size(video));
+  if (!videoRect.contains(normalizeRect(srcRect)) || srcRect.width() == 0 ||
+      srcRect.height() == 0) {
+    ec = INDEX_SIZE_ERR;
+    return;
+  }
+
+  if (!dstRect.width() || !dstRect.height())
+    return;
+
+  GraphicsContext* c = drawingContext();
+  if (!c)
+    return;
+  if (!state().m_invertibleCTM)
+    return;
+
+  if (m_canvas->originClean())
+    checkOrigin(video->src());
+
+  if (m_canvas->originClean() && !video->hasSingleSecurityOrigin())
+    m_canvas->setOriginTainted();
+
+  FloatRect sourceRect = c->roundToDevicePixels(srcRect);
+  FloatRect destRect = c->roundToDevicePixels(dstRect);
+  willDraw(destRect);
+
+  c->save();
+  c->clip(destRect);
+  c->translate(destRect.x(), destRect.y());
+  c->scale(FloatSize(destRect.width() / sourceRect.width(),
+                     destRect.height() / sourceRect.height()));
+  c->translate(-sourceRect.x(), -sourceRect.y());
+  video->paint(c, IntRect(IntPoint(), size(video)));
+  c->restore();
 }
 
 // FIXME: Why isn't this just another overload of drawImage? Why have a

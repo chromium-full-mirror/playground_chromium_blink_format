@@ -101,6 +101,8 @@ class MediaPlayerPrivateInterface {
   // rendering mode.
   virtual void acceleratedRenderingStateChanged() {}
 #endif
+
+  virtual bool hasSingleSecurityOrigin() const { return false; }
 };
 }
 

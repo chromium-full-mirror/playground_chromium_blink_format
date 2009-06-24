@@ -91,6 +91,8 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface,
 
   void paint(GraphicsContext*, const IntRect&);
 
+  bool hasSingleSecurityOrigin() const;
+
  private:
   MediaPlayerPrivate(MediaPlayer*);
 

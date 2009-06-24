@@ -157,6 +157,10 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   virtual void finishParsingChildren();
 #endif
 
+  bool hasSingleSecurityOrigin() const {
+    return !m_player || m_player->hasSingleSecurityOrigin();
+  }
+
  protected:
   float getTimeOffsetAttribute(const QualifiedName&, float valueOnError) const;
   void setTimeOffsetAttribute(const QualifiedName&, float value);

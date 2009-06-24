@@ -68,6 +68,8 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   void timeChanged();
   void didEnd();
 
+  bool hasSingleSecurityOrigin() const;
+
  private:
   MediaPlayerPrivate(MediaPlayer*);
 
