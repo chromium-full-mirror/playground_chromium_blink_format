@@ -12,6 +12,8 @@ namespace WebCore {
 class AtomicString;
 
 class DataGridColumnList : public RefCounted<DataGridColumnList> {
+  friend class DataGridColumn;
+
  public:
   static PassRefPtr<DataGridColumnList> create() {
     return new DataGridColumnList();
@@ -42,12 +44,9 @@ class DataGridColumnList : public RefCounted<DataGridColumnList> {
  private:
   void primaryColumnChanged(DataGridColumn* col);
 
- private:
   Vector<RefPtr<DataGridColumn>> m_columns;
   RefPtr<DataGridColumn> m_primaryColumn;
   RefPtr<DataGridColumn> m_sortColumn;
-
-  friend class DataGridColumn;
 };
 
 }  // namespace WebCore

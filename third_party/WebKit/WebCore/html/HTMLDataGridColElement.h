@@ -53,6 +53,6 @@ class HTMLDataGridColElement : public HTMLElement {
   void setPrimary(bool);
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // HTMLDataGridColElement_h

@@ -87,4 +87,5 @@ bool HTMLDataGridColElement::primary() const {
 void HTMLDataGridColElement::setPrimary(bool primary) {
   setAttribute(primaryAttr, primary ? "" : 0);
 }
-}
+
+}  // namespace WebCore

@@ -25,6 +25,7 @@
 
 #include "config.h"
 #include "DataGridColumn.h"
+
 #include "DataGridColumnList.h"
 
 namespace WebCore {
@@ -36,4 +37,5 @@ void DataGridColumn::setPrimary(bool primary) {
       m_columns->primaryColumnChanged(this);
   }
 }
-}
+
+}  // namespace WebCore

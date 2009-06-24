@@ -83,7 +83,6 @@ class DataGridColumn : public RefCounted<DataGridColumn> {
         m_sortable(sortable),
         m_sortDirection(0) {}
 
- private:
   DataGridColumnList* m_columns;  // Not refcounted.  The columns list will null
                                   // out our reference when it goes away.
 
@@ -97,6 +96,6 @@ class DataGridColumn : public RefCounted<DataGridColumn> {
   unsigned short m_sortDirection;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // DataGridColumn_h
