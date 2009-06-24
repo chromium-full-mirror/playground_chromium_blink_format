@@ -21,6 +21,7 @@
 #ifndef WTF_HashSet_h
 #define WTF_HashSet_h
 
+#include "FastAllocBase.h"
 #include "HashTable.h"
 
 namespace WTF {
@@ -36,7 +37,7 @@ struct IdentityExtractor;
 template <typename ValueArg,
           typename HashArg = typename DefaultHash<ValueArg>::Hash,
           typename TraitsArg = HashTraits<ValueArg>>
-class HashSet {
+class HashSet : public FastAllocBase {
  private:
   typedef HashArg HashFunctions;
   typedef TraitsArg ValueTraits;
