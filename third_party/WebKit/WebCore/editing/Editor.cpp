@@ -2453,7 +2453,7 @@ void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition& p) {
                                              EditorInsertActionTyped))
       return;
     frame()->editor()->replaceSelectionWithText(autocorrectedString, false,
-                                                true);
+                                                false);
 
     // Reset the charet one character further.
     frame()->selection()->moveTo(frame()->selection()->end());
