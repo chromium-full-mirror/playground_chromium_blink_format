@@ -33,7 +33,7 @@ template <typename KeyArg,
           typename HashArg = typename DefaultHash<KeyArg>::Hash,
           typename KeyTraitsArg = HashTraits<KeyArg>,
           typename MappedTraitsArg = HashTraits<MappedArg>>
-class HashMap {
+class HashMap : public FastAllocBase {
  private:
   typedef KeyTraitsArg KeyTraits;
   typedef MappedTraitsArg MappedTraits;
