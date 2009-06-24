@@ -41,6 +41,7 @@ class StructureChain : public RefCounted<StructureChain> {
     return adoptRef(new StructureChain(head));
   }
   RefPtr<Structure>* head() { return m_vector.get(); }
+  bool isCacheable() const;
 
  private:
   StructureChain(Structure* head);
