@@ -93,6 +93,9 @@ class ChromiumBridge {
 #if PLATFORM(WIN_OS)
   static bool ensureFontLoaded(HFONT font);
 #endif
+#if PLATFORM(LINUX)
+  static String getFontFamilyForCharacters(const UChar*, size_t numCharacters);
+#endif
 
   // Forms --------------------------------------------------------------
   static void notifyFormStateChanged(const Document*);
