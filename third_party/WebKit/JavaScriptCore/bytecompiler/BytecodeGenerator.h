@@ -40,6 +40,7 @@
 #include "SymbolTable.h"
 #include "Debugger.h"
 #include "Nodes.h"
+#include <wtf/FastAllocBase.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/SegmentedVector.h>
 #include <wtf/Vector.h>
@@ -60,7 +61,7 @@ struct ControlFlowContext {
   FinallyContext finallyContext;
 };
 
-class BytecodeGenerator : public FastAllocBase {
+class BytecodeGenerator : public WTF::FastAllocBase {
  public:
   typedef DeclarationStacks::VarStack VarStack;
   typedef DeclarationStacks::FunctionStack FunctionStack;
