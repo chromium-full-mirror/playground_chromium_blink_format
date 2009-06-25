@@ -477,13 +477,11 @@ bool RenderImage::nodeAtPoint(const HitTestRequest& request,
     int tx = _tx + x();
     int ty = _ty + y();
 
-    HTMLMapElement* map = imageMap();
-    if (map) {
-      // we're a client side image map
-      inside = map->mapMouseEvent(_x - tx, _y - ty,
-                                  IntSize(contentWidth(), contentHeight()),
-                                  tempResult);
-      tempResult.setInnerNonSharedNode(node());
+    if (HTMLMapElement* map = imageMap()) {
+      if (map->mapMouseEvent(_x - tx, _y - ty,
+                             IntSize(contentWidth(), contentHeight()),
+                             tempResult))
+        tempResult.setInnerNonSharedNode(node());
     }
   }
 
