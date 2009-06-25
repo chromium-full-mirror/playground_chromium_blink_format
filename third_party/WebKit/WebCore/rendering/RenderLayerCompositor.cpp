@@ -40,6 +40,7 @@
 #include "RenderLayerBacking.h"
 #include "RenderVideo.h"
 #include "RenderView.h"
+#include "Settings.h"
 
 #if PROFILE_LAYER_REBUILD
 #include <wtf/CurrentTime.h>
@@ -87,7 +88,8 @@ RenderLayerCompositor::RenderLayerCompositor(RenderView* renderView)
       m_rootPlatformLayer(0),
       m_compositing(false),
       m_rootLayerAttached(false),
-      m_compositingLayersNeedUpdate(false)
+      m_compositingLayersNeedUpdate(false),
+      m_hasAcceleratedCompositing(true)
 #if PROFILE_LAYER_REBUILD
       ,
       m_rootLayerUpdateCount(0)
@@ -109,7 +111,23 @@ void RenderLayerCompositor::enableCompositingMode(bool enable /* = true */) {
     // the empty root layer, which has minimal overhead.
     if (m_compositing)
       ensureRootPlatformLayer();
+    else
+      destroyRootPlatformLayer();
   }
+}
+
+void RenderLayerCompositor::cacheAcceleratedCompositingEnabledFlag() {
+  bool hasAcceleratedCompositing = m_renderView->document()->settings() &&
+                                   m_renderView->frameView()
+                                       ->frame()
+                                       ->page()
+                                       ->settings()
+                                       ->acceleratedCompositingEnabled();
+
+  if (hasAcceleratedCompositing != m_hasAcceleratedCompositing)
+    setCompositingLayersNeedUpdate();
+
+  m_hasAcceleratedCompositing = hasAcceleratedCompositing;
 }
 
 void RenderLayerCompositor::setCompositingLayersNeedUpdate(bool needUpdate) {
@@ -173,6 +191,9 @@ void RenderLayerCompositor::updateCompositingLayers(RenderLayer* updateRoot) {
         m_rootLayerUpdateCount, 1000.0 * (endTime - startTime));
 #endif
   ASSERT(updateRoot || !m_compositingLayersNeedUpdate);
+
+  if (!hasAcceleratedCompositing())
+    enableCompositingMode(false);
 }
 
 bool RenderLayerCompositor::updateBacking(
@@ -513,7 +534,7 @@ bool RenderLayerCompositor::canAccelerateVideoRendering(RenderVideo* o) const {
   // FIXME: ideally we need to look at all ancestors for mask or video. But for
   // now,
   // just bail on the obvious cases.
-  if (o->hasMask() || o->hasReflection())
+  if (o->hasMask() || o->hasReflection() || !m_hasAcceleratedCompositing)
     return false;
 
   return o->supportsAcceleratedRendering();
@@ -547,7 +568,7 @@ void RenderLayerCompositor::rebuildCompositingLayerTree(
   }
 
   // host the document layer in the RenderView's root layer
-  if (layer->isRootLayer())
+  if (layer->isRootLayer() && layer->isComposited())
     parentInRootLayer(layer);
 
   CompositingState childState = ioCompState;
@@ -752,8 +773,8 @@ bool RenderLayerCompositor::has3DContent() const {
 
 bool RenderLayerCompositor::needsToBeComposited(
     const RenderLayer* layer) const {
-  return requiresCompositingLayer(layer) ||
-         layer->mustOverlayCompositedLayers();
+  return m_hasAcceleratedCompositing && (requiresCompositingLayer(layer) ||
+                                         layer->mustOverlayCompositedLayers());
 }
 
 #define VERBOSE_COMPOSITINGLAYER 0
@@ -948,6 +969,15 @@ void RenderLayerCompositor::ensureRootPlatformLayer() {
   m_rootPlatformLayer->setMasksToBounds(true);
 
   didMoveOnscreen();
+}
+
+void RenderLayerCompositor::destroyRootPlatformLayer() {
+  if (!m_rootPlatformLayer)
+    return;
+
+  willMoveOffscreen();
+  delete m_rootPlatformLayer;
+  m_rootPlatformLayer = 0;
 }
 
 bool RenderLayerCompositor::layerHas3DContent(const RenderLayer* layer) const {

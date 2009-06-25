@@ -422,6 +422,12 @@ void FrameView::applyOverflowToViewport(RenderObject* o,
 #if USE(ACCELERATED_COMPOSITING)
 void FrameView::updateCompositingLayers(CompositingUpdate updateType) {
   RenderView* view = m_frame->contentRenderer();
+  if (view && view->compositor()) {
+    // This call will make sure the cached hasAcceleratedCompositing is updated
+    // from the pref
+    view->compositor()->cacheAcceleratedCompositingEnabledFlag();
+  }
+
   if (!view || !view->usesCompositing())
     return;
 

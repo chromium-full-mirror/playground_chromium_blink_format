@@ -58,6 +58,12 @@ class RenderLayerCompositor {
   // the native view/window system.
   void enableCompositingMode(bool enable = true);
 
+  // Returns true if the accelerated compositing is enabled
+  bool hasAcceleratedCompositing() { return m_hasAcceleratedCompositing; }
+
+  // Copy the acceleratedCompositingEnabledFlag from Settings
+  void cacheAcceleratedCompositingEnabledFlag();
+
   void setCompositingLayersNeedUpdate(bool needUpdate = true);
   bool compositingLayersNeedUpdate() const {
     return m_compositingLayersNeedUpdate;
@@ -160,6 +166,7 @@ class RenderLayerCompositor {
   bool layerHas3DContent(const RenderLayer*) const;
 
   void ensureRootPlatformLayer();
+  void destroyRootPlatformLayer();
 
   // Whether a running transition or animation enforces the need for a
   // compositing layer.
@@ -173,6 +180,8 @@ class RenderLayerCompositor {
   bool m_compositing;
   bool m_rootLayerAttached;
   bool m_compositingLayersNeedUpdate;
+  bool m_hasAcceleratedCompositing;
+
 #if PROFILE_LAYER_REBUILD
   int m_rootLayerUpdateCount;
 #endif
