@@ -281,6 +281,11 @@ class FrameLoaderClient {
                                                        // in the back/forward
                                                        // list.
 
+#if USE(V8)
+  virtual void didCreateScriptContext() = 0;
+  virtual void didDestroyScriptContext() = 0;
+#endif
+
   virtual void registerForIconNotification(bool listen = true) = 0;
 
 #if PLATFORM(MAC)

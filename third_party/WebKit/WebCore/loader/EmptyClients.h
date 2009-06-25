@@ -389,6 +389,11 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
 
   virtual void registerForIconNotification(bool) {}
 
+#if USE(V8)
+  virtual void didCreateScriptContext() {}
+  virtual void didDestroyScriptContext() {}
+#endif
+
 #if PLATFORM(MAC)
   virtual NSCachedURLResponse* willCacheResponse(
       DocumentLoader*,
