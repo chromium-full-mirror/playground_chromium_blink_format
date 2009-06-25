@@ -18,6 +18,7 @@
 #include "config.h"
 #include "ClipboardGtk.h"
 
+#include "FileList.h"
 #include "NotImplemented.h"
 #include "StringHash.h"
 
