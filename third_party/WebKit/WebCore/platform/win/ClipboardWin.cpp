@@ -615,6 +615,11 @@ HashSet<String> ClipboardWin::types() const {
   return results;
 }
 
+PassRefPtr<FileList> ClipboardWin::files() const {
+  notImplemented();
+  return 0;
+}
+
 void ClipboardWin::setDragImage(CachedImage* image,
                                 Node* node,
                                 const IntPoint& loc) {

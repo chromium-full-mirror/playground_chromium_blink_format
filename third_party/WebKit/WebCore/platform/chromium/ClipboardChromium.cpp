@@ -173,6 +173,11 @@ HashSet<String> ClipboardChromium::types() const {
   return results;
 }
 
+PassRefPtr<FileList> ClipboardChromium::files() const {
+  notImplemented();
+  return 0;
+}
+
 void ClipboardChromium::setDragImage(CachedImage* image,
                                      Node* node,
                                      const IntPoint& loc) {

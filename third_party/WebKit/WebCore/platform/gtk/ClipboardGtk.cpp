@@ -63,6 +63,11 @@ HashSet<String> ClipboardGtk::types() const {
   return HashSet<String>();
 }
 
+PassRefPtr<FileList> ClipboardGtk::files() const {
+  notImplemented();
+  return 0;
+}
+
 IntPoint ClipboardGtk::dragLocation() const {
   notImplemented();
   return IntPoint(0, 0);

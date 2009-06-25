@@ -61,7 +61,8 @@ class ClipboardChromium : public Clipboard, public CachedResourceClient {
   bool setData(const String& type, const String& data);
 
   // extensions beyond IE's API
-  HashSet<String> types() const;
+  virtual HashSet<String> types() const;
+  virtual PassRefPtr<FileList> files() const;
 
   void setDragImage(CachedImage*, const IntPoint&);
   void setDragImageElement(Node*, const IntPoint&);
