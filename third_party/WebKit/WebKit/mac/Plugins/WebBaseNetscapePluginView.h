@@ -52,6 +52,7 @@ class HTMLPlugInElement;
 
   int _mode;
 
+  BOOL _triedAndFailedToCreatePlugin;
   BOOL _loadManually;
   BOOL _shouldFireTimers;
   BOOL _isStarted;
