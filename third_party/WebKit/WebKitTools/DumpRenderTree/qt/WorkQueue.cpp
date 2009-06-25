@@ -31,7 +31,6 @@
 #include "WorkQueue.h"
 
 #include "WorkQueueItem.h"
-#include <wtf/Assertions.h>
 
 static const unsigned queueLength = 1024;
 
@@ -47,8 +46,8 @@ WorkQueue* WorkQueue::shared() {
 WorkQueue::WorkQueue() : m_frozen(false) {}
 
 void WorkQueue::queue(WorkQueueItem* item) {
-  ASSERT(endOfQueue < queueLength);
-  ASSERT(endOfQueue >= startOfQueue);
+  Q_ASSERT(endOfQueue < queueLength);
+  Q_ASSERT(endOfQueue >= startOfQueue);
 
   if (m_frozen) {
     delete item;
@@ -59,7 +58,7 @@ void WorkQueue::queue(WorkQueueItem* item) {
 }
 
 WorkQueueItem* WorkQueue::dequeue() {
-  ASSERT(endOfQueue >= startOfQueue);
+  Q_ASSERT(endOfQueue >= startOfQueue);
 
   if (startOfQueue == endOfQueue)
     return 0;
