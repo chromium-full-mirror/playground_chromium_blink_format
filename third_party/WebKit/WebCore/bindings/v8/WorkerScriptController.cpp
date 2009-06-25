@@ -73,9 +73,15 @@ ScriptValue WorkerScriptController::evaluate(
 }
 
 ScriptValue WorkerScriptController::evaluate(const ScriptSourceCode& sourceCode,
-                                             ScriptValue* /* exception */) {
-  // FIXME: Need to return an exception.
-  return evaluate(sourceCode);
+                                             ScriptValue* exception) {
+  v8::TryCatch exceptionCatcher;
+  ScriptValue result = evaluate(sourceCode);
+  if (exceptionCatcher.HasCaught()) {
+    *exception = ScriptValue(exceptionCatcher.Exception());
+    throwError(exceptionCatcher.Exception());
+    return ScriptValue();
+  } else
+    return result;
 }
 
 void WorkerScriptController::forbidExecution() {
