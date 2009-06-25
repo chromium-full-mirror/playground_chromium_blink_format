@@ -29,7 +29,7 @@
 #if ENABLE(DOM_STORAGE)
 
 #include "SecurityOriginHash.h"
-#include "StorageArea.h"
+#include "SessionStorageArea.h"
 
 #include <wtf/HashMap.h>
 #include <wtf/RefCounted.h>
@@ -61,7 +61,7 @@ class SessionStorage : public RefCounted<SessionStorage> {
   Page* m_page;
 
   typedef HashMap<RefPtr<SecurityOrigin>,
-                  RefPtr<StorageArea>,
+                  RefPtr<SessionStorageArea>,
                   SecurityOriginHash>
       SessionStorageAreaMap;
   SessionStorageAreaMap m_storageAreaMap;

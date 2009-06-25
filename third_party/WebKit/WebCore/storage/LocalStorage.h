@@ -28,6 +28,7 @@
 
 #if ENABLE(DOM_STORAGE)
 
+#include "LocalStorageArea.h"
 #include "SecurityOriginHash.h"
 
 #include <wtf/HashMap.h>
@@ -52,7 +53,7 @@ class LocalStorage : public RefCounted<LocalStorage> {
   LocalStorage(const String& path);
 
   typedef HashMap<RefPtr<SecurityOrigin>,
-                  RefPtr<StorageArea>,
+                  RefPtr<LocalStorageArea>,
                   SecurityOriginHash>
       LocalStorageAreaMap;
   LocalStorageAreaMap m_storageAreaMap;
