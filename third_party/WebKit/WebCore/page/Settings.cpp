@@ -42,11 +42,8 @@ static void setNeedsReapplyStylesInAllFrames(
     Page* page,
     bool /*updateCompositingLayers*/ = false) {
   for (Frame* frame = page->mainFrame(); frame;
-       frame = frame->tree()->traverseNext()) {
-    // if (updateCompositingLayers)
-    //    frame->view()->updateCompositingLayers(FrameView::ForcedCompositingUpdate);
+       frame = frame->tree()->traverseNext())
     frame->setNeedsReapplyStyles();
-  }
 }
 
 #if USE(SAFARI_THEME)
@@ -115,8 +112,15 @@ Settings::Settings(Page* page)
       // behavior.
       ,
       m_downloadableBinaryFontsEnabled(true),
-      m_xssAuditorEnabled(false),
-      m_acceleratedCompositingEnabled(true) {
+      m_xssAuditorEnabled(false)
+#if USE(ACCELERATED_COMPOSITING)
+      ,
+      m_acceleratedCompositingEnabled(true)
+#else
+      ,
+      m_acceleratedCompositingEnabled(false)
+#endif
+{
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
