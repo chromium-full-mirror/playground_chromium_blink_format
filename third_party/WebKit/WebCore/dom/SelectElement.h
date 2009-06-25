@@ -58,9 +58,10 @@ class SelectElement {
   virtual int optionToListIndex(int optionIndex) const = 0;
 
   virtual int selectedIndex() const = 0;
-  virtual void setSelectedIndex(int index,
-                                bool deselect = true,
-                                bool fireOnChange = false) = 0;
+  virtual void setSelectedIndex(int index, bool deselect = true) = 0;
+  virtual void setSelectedIndexByUser(int index,
+                                      bool deselect = true,
+                                      bool fireOnChangeNow = false) = 0;
 
  protected:
   virtual ~SelectElement() {}
@@ -95,7 +96,8 @@ class SelectElement {
                                Element*,
                                int optionIndex,
                                bool deselect = true,
-                               bool fireOnChange = false);
+                               bool fireOnChangeNow = false,
+                               bool userDrivenChange = true);
   static int optionToListIndex(const SelectElementData&,
                                const Element*,
                                int optionIndex);
@@ -157,6 +159,9 @@ class SelectElementData {
   int lastOnChangeIndex() const { return m_lastOnChangeIndex; }
   void setLastOnChangeIndex(int value) { m_lastOnChangeIndex = value; }
 
+  bool userDrivenChange() const { return m_userDrivenChange; }
+  void setUserDrivenChange(bool value) { m_userDrivenChange = value; }
+
   Vector<bool>& lastOnChangeSelection() { return m_lastOnChangeSelection; }
 
   bool activeSelectionState() const { return m_activeSelectionState; }
@@ -202,6 +207,7 @@ class SelectElementData {
 
   int m_lastOnChangeIndex;
   Vector<bool> m_lastOnChangeSelection;
+  bool m_userDrivenChange;
 
   bool m_activeSelectionState;
   int m_activeSelectionAnchorIndex;

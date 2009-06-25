@@ -77,11 +77,16 @@ void HTMLSelectElement::deselectItems(HTMLOptionElement* excludeElement) {
   SelectElement::deselectItems(m_data, this, excludeElement);
 }
 
-void HTMLSelectElement::setSelectedIndex(int optionIndex,
-                                         bool deselect,
-                                         bool fireOnChange) {
+void HTMLSelectElement::setSelectedIndex(int optionIndex, bool deselect) {
+  SelectElement::setSelectedIndex(m_data, this, optionIndex, deselect, false,
+                                  false);
+}
+
+void HTMLSelectElement::setSelectedIndexByUser(int optionIndex,
+                                               bool deselect,
+                                               bool fireOnChangeNow) {
   SelectElement::setSelectedIndex(m_data, this, optionIndex, deselect,
-                                  fireOnChange);
+                                  fireOnChangeNow, true);
 }
 
 int HTMLSelectElement::activeSelectionStartListIndex() const {

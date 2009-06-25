@@ -40,9 +40,10 @@ class HTMLSelectElement : public HTMLFormControlElementWithState,
   HTMLSelectElement(const QualifiedName&, Document*, HTMLFormElement* = 0);
 
   virtual int selectedIndex() const;
-  virtual void setSelectedIndex(int index,
-                                bool deselect = true,
-                                bool fireOnChange = false);
+  virtual void setSelectedIndex(int index, bool deselect = true);
+  virtual void setSelectedIndexByUser(int index,
+                                      bool deselect = true,
+                                      bool fireOnChangeNow = false);
 
   unsigned length() const;
 
