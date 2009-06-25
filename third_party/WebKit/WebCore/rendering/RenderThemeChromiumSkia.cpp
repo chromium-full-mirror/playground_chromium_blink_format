@@ -631,6 +631,11 @@ int RenderThemeChromiumSkia::buttonInternalPaddingBottom() const {
   return 1;
 }
 
+// static
+void RenderThemeChromiumSkia::setDefaultFontSize(int fontSize) {
+  defaultFontSize = static_cast<float>(fontSize);
+}
+
 double RenderThemeChromiumSkia::caretBlinkIntervalInternal() const {
   return RenderTheme::caretBlinkInterval();
 }

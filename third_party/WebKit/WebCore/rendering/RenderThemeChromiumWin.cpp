@@ -415,7 +415,7 @@ bool RenderThemeChromiumWin::paintMenuList(RenderObject* o,
 
 // static
 void RenderThemeChromiumWin::setDefaultFontSize(int fontSize) {
-  defaultFontSize = static_cast<float>(fontSize);
+  RenderThemeChromiumSkia::setDefaultFontSize(fontSize);
 
   // Reset cached fonts.
   smallSystemFont = menuFont = labelFont = FontDescription();
