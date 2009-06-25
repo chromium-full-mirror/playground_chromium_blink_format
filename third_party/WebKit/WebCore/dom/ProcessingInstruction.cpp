@@ -253,8 +253,7 @@ void ProcessingInstruction::insertedIntoDocument() {
 void ProcessingInstruction::removedFromDocument() {
   ContainerNode::removedFromDocument();
 
-  if (document()->renderer())
-    document()->removeStyleSheetCandidateNode(this);
+  document()->removeStyleSheetCandidateNode(this);
 
   // FIXME: It's terrible to do a synchronous update of the style selector just
   // because a <style> or <link> element got removed.
