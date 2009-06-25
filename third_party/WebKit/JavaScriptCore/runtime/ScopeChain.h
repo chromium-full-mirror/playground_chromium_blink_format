@@ -30,7 +30,7 @@ class JSGlobalObject;
 class JSObject;
 class ScopeChainIterator;
 
-class ScopeChainNode : public WTF::FastAllocBase {
+class ScopeChainNode : public FastAllocBase {
  public:
   ScopeChainNode(ScopeChainNode* next,
                  JSObject* object,
