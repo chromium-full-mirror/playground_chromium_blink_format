@@ -34,7 +34,7 @@ namespace JSC {
 typedef HashMap<const char*, RefPtr<UString::Rep>, PtrHash<const char*>>
     LiteralIdentifierTable;
 
-class IdentifierTable {
+class IdentifierTable : public FastAllocBase {
  public:
   ~IdentifierTable() {
     HashSet<UString::Rep*>::iterator end = m_table.end();

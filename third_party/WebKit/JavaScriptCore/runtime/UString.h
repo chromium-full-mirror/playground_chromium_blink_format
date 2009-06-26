@@ -71,7 +71,7 @@ class CString {
 
 typedef Vector<char, 32> CStringBuffer;
 
-class UString {
+class UString : public FastAllocBase {
   friend class JIT;
 
  public:
