@@ -110,15 +110,8 @@ Settings::Settings(Page* page)
       // behavior.
       ,
       m_downloadableBinaryFontsEnabled(true),
-      m_xssAuditorEnabled(false)
-#if USE(ACCELERATED_COMPOSITING)
-      ,
-      m_acceleratedCompositingEnabled(true)
-#else
-      ,
-      m_acceleratedCompositingEnabled(false)
-#endif
-{
+      m_xssAuditorEnabled(false),
+      m_acceleratedCompositingEnabled(true) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
