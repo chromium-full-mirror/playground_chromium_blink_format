@@ -368,6 +368,8 @@ bool EventHandler::handleMousePressEvent(
 
   m_mouseDownWasSingleClickInSelection = false;
 
+  m_mouseDown = event.event();
+
   if (event.isOverWidget() && passWidgetMouseDownEventToWidget(event))
     return true;
 
