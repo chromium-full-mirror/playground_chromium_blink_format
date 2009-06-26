@@ -61,7 +61,7 @@ class RegExpObject : public JSObject {
 
   virtual CallType getCallData(CallData&);
 
-  struct RegExpObjectData : public FastAllocBase {
+  struct RegExpObjectData {
     RegExpObjectData(PassRefPtr<RegExp> regExp, double lastIndex)
         : regExp(regExp), lastIndex(lastIndex) {}
 

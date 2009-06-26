@@ -45,7 +45,7 @@ struct HashTableValue {
 typedef PropertySlot::GetValueFunc GetFunction;
 typedef void (*PutFunction)(ExecState*, JSObject* baseObject, JSValue value);
 
-class HashEntry : public FastAllocBase {
+class HashEntry {
  public:
   void initialize(UString::Rep* key,
                   unsigned char attributes,
