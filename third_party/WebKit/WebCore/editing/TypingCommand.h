@@ -104,10 +104,11 @@ class TypingCommand : public CompositeEditCommand {
   virtual void doApply();
   virtual EditAction editingAction() const;
   virtual bool isTypingCommand() const;
-  virtual bool preservesTypingStyle() const;
+  virtual bool preservesTypingStyle() const { return m_preservesTypingStyle; }
 
+  void updatePreservesTypingStyle(ETypingCommand);
   void markMisspellingsAfterTyping();
-  void typingAddedToOpenCommand();
+  void typingAddedToOpenCommand(ETypingCommand);
   bool makeEditableRootEmpty();
 
   ETypingCommand m_commandType;
@@ -117,6 +118,7 @@ class TypingCommand : public CompositeEditCommand {
   bool m_smartDelete;
   TextGranularity m_granularity;
   bool m_killRing;
+  bool m_preservesTypingStyle;
 
   // Undoing a series of backward deletes will restore a selection around all of
   // the
