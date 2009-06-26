@@ -106,6 +106,7 @@ void MediaTextDisplayElement::attachToParent(Element* parent) {
 void MediaTextDisplayElement::update() {
   if (renderer())
     renderer()->updateFromElement();
+  updateStyle();
 }
 
 void MediaTextDisplayElement::updateStyle() {
@@ -138,15 +139,7 @@ MediaControlInputElement::MediaControlInputElement(
       m_pseudoStyleId(pseudo),
       m_displayType(displayType) {
   setInputType(type);
-  RenderStyle* style =
-      m_mediaElement->renderer()->getCachedPseudoStyle(m_pseudoStyleId);
-  RenderObject* renderer =
-      createRenderer(m_mediaElement->renderer()->renderArena(), style);
-  if (renderer) {
-    setRenderer(renderer);
-    renderer->setStyle(style);
-  }
-  setAttached();
+  updateStyle();
   setInDocument(true);
 }
 
@@ -160,14 +153,37 @@ void MediaControlInputElement::update() {
   updateDisplayType();
   if (renderer())
     renderer()->updateFromElement();
+  updateStyle();
 }
 
 void MediaControlInputElement::updateStyle() {
-  if (renderer() && m_mediaElement->renderer()) {
-    RenderStyle* style =
-        m_mediaElement->renderer()->getCachedPseudoStyle(m_pseudoStyleId);
+  if (!m_mediaElement || !m_mediaElement->renderer())
+    return;
+
+  RenderStyle* style =
+      m_mediaElement->renderer()->getCachedPseudoStyle(m_pseudoStyleId);
+
+  bool needsRenderer = rendererIsNeeded(style);
+  if (renderer() && !needsRenderer)
+    detach();
+  else if (!renderer() && needsRenderer) {
+    RenderObject* renderer =
+        createRenderer(m_mediaElement->renderer()->renderArena(), style);
+    if (!renderer)
+      return;
+    renderer->setStyle(style);
+    setRenderer(renderer);
+    setAttached();
+    if (parent() && parent()->renderer()) {
+      // Find next sibling with a renderer to determine where to insert.
+      Node* sibling = nextSibling();
+      while (sibling && !sibling->renderer())
+        sibling = sibling->nextSibling();
+      parent()->renderer()->addChild(renderer,
+                                     sibling ? sibling->renderer() : 0);
+    }
+  } else if (renderer())
     renderer()->setStyle(style);
-  }
 }
 
 bool MediaControlInputElement::hitTest(const IntPoint& absPoint) {

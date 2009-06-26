@@ -104,7 +104,7 @@ class MediaControlInputElement : public HTMLInputElement {
                            MediaControlElementType);
   void attachToParent(Element*);
   void update();
-  void updateStyle();
+  virtual void updateStyle();
   bool hitTest(const IntPoint& absPoint);
   MediaControlElementType displayType() const { return m_displayType; }
 
