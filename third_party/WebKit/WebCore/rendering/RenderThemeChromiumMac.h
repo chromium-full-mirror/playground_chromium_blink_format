@@ -69,6 +69,8 @@ class RenderThemeChromiumMac : public RenderTheme {
   virtual Color platformInactiveSelectionBackgroundColor() const;
   virtual Color activeListBoxSelectionBackgroundColor() const;
 
+  virtual Color focusRingColor() const;
+
   virtual void platformColorsDidChange();
 
   // System fonts.

@@ -163,10 +163,6 @@ void GraphicsContext::setAlpha(float) {
   notImplemented();
 }
 
-Color WebCore::focusRingColor() {
-  return 0xFF0000FF;
-}
-
 void Image::drawPattern(GraphicsContext*,
                         const FloatRect& srcRect,
                         const TransformationMatrix& patternTransform,

@@ -76,6 +76,8 @@ class RenderThemeSafari : public RenderTheme {
   virtual Color platformInactiveSelectionBackgroundColor() const;
   virtual Color activeListBoxSelectionBackgroundColor() const;
 
+  virtual Color focusRingColor() const;
+
   // System fonts.
   virtual void systemFont(int propId, FontDescription&) const;
 

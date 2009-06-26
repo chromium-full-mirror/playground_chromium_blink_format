@@ -170,6 +170,8 @@ class RenderTheme : public RefCounted<RenderTheme> {
   virtual Color platformActiveTextSearchHighlightColor() const;
   virtual Color platformInactiveTextSearchHighlightColor() const;
 
+  virtual Color focusRingColor() const;
+
   virtual void platformColorsDidChange();
 
   virtual double caretBlinkInterval() const { return 0.5; }
