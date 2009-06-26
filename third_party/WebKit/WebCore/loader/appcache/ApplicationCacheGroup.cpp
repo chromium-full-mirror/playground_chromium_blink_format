@@ -497,6 +497,7 @@ void ApplicationCacheGroup::didReceiveResponse(
           newestCachedResource->data()));
       m_currentHandle->cancel();
       m_currentHandle = 0;
+      m_pendingEntries.remove(handle->request().url());
       // Load the next resource, if any.
       startLoadingEntry();
       return;
