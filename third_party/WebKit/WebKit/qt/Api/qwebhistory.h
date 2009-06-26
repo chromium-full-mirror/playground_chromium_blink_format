@@ -41,6 +41,10 @@ class QWEBKIT_EXPORT QWebHistoryItem {
   QWebHistoryItem& operator=(const QWebHistoryItem& other);
   ~QWebHistoryItem();
 
+  // bool restoreState(QByteArray& buffer);
+  // QByteArray saveState(QWebHistory::HistoryStateVersion version =
+  // DefaultHistoryVersion) const;
+
   QUrl originalUrl() const;
   QUrl url() const;
 
@@ -59,12 +63,31 @@ class QWEBKIT_EXPORT QWebHistoryItem {
   friend class QWebHistory;
   friend class QWebPage;
   friend class WebCore::FrameLoaderClientQt;
+  friend class QWebHistoryItemPrivate;
+  // friend QDataStream & operator<<(QDataStream& out,const QWebHistoryItem&
+  // hist);
+  // friend QDataStream & operator>>(QDataStream& in,QWebHistoryItem& hist);
   QExplicitlySharedDataPointer<QWebHistoryItemPrivate> d;
 };
+
+// QWEBKIT_EXPORT QDataStream & operator<<(QDataStream& out,const
+// QWebHistoryItem& hist);
+// QWEBKIT_EXPORT QDataStream & operator>>(QDataStream& in,QWebHistoryItem&
+// hist);
 
 class QWebHistoryPrivate;
 class QWEBKIT_EXPORT QWebHistory {
  public:
+  enum HistoryStateVersion {
+    HistoryVersion_1,
+    /*, HistoryVersion_2, */
+    DefaultHistoryVersion = HistoryVersion_1
+  };
+
+  bool restoreState(const QByteArray& buffer);
+  QByteArray saveState(
+      HistoryStateVersion version = DefaultHistoryVersion) const;
+
   void clear();
 
   QList<QWebHistoryItem> items() const;
@@ -96,10 +119,17 @@ class QWEBKIT_EXPORT QWebHistory {
 
   friend class QWebPage;
   friend class QWebPagePrivate;
+  friend QDataStream& operator>>(QDataStream&, QWebHistory&);
+  friend QDataStream& operator<<(QDataStream&, const QWebHistory&);
 
   Q_DISABLE_COPY(QWebHistory)
 
   QWebHistoryPrivate* d;
 };
+
+QWEBKIT_EXPORT QDataStream& operator<<(QDataStream& stream,
+                                       const QWebHistory& history);
+QWEBKIT_EXPORT QDataStream& operator>>(QDataStream& stream,
+                                       QWebHistory& history);
 
 #endif

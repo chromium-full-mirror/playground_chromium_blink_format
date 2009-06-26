@@ -50,11 +50,12 @@ class tst_QWebHistory : public QObject {
   void itemAt();
   void goToItem();
   void items();
-  /*
-  void serialize_1(); //QWebHistory countity
-  void serialize_2(); //QWebHistory index
-  void serialize_3(); //QWebHistoryItem
-  */
+  void serialize_1();       // QWebHistory countity
+  void serialize_2();       // QWebHistory index
+  void serialize_3();       // QWebHistoryItem
+  void saveAndRestore_1();  // simple checks saveState and restoreState
+  void saveAndRestore_2();  // bad parameters saveState and restoreState
+  void saveAndRestore_3();  // try use different version
 
  private:
   QWebPage* page;
@@ -134,7 +135,11 @@ void tst_QWebHistory::forward() {
 void tst_QWebHistory::itemAt() {
   for (int i = 1; i < histsize; i++) {
     QCOMPARE(hist->itemAt(i - 1).title(), QString("page") + QString::number(i));
+    QVERIFY(hist->itemAt(i - 1).isValid());
   }
+  // check out of range values
+  QVERIFY(!hist->itemAt(-1).isValid());
+  QVERIFY(!hist->itemAt(histsize).isValid());
 }
 
 /**
@@ -169,98 +174,135 @@ void tst_QWebHistory::items() {
 /**
   * Check history state after serialization (pickle, persistent..) method
   * Checks history size, history order
-void tst_QWebHistory::serialize_1()
-{
-    QByteArray tmp;  //buffer
-    QDataStream save(&tmp,QIODevice::WriteOnly); //here data will be saved
-    QDataStream load(&tmp,QIODevice::ReadOnly);  //from here data will be loaded
+  */
+void tst_QWebHistory::serialize_1() {
+  QByteArray tmp;                                // buffer
+  QDataStream save(&tmp, QIODevice::WriteOnly);  // here data will be saved
+  QDataStream load(&tmp, QIODevice::ReadOnly);  // from here data will be loaded
 
-    hist->operator<<(save);
-    QCOMPARE(hist->count(),histsize);
+  save << *hist;
+  QVERIFY(save.status() == QDataStream::Ok);
+  QCOMPARE(hist->count(), histsize);
 
-    //check size of history
-    //load next page to find differences
-    loadPage(6);
-    QCOMPARE(hist->count(),histsize+1);
-    hist->operator>>(load);
-    QCOMPARE(hist->count(),histsize);
+  // check size of history
+  // load next page to find differences
+  loadPage(6);
+  QCOMPARE(hist->count(), histsize + 1);
+  load >> *hist;
+  QVERIFY(load.status() == QDataStream::Ok);
+  QCOMPARE(hist->count(), histsize);
 
-    //check order of historyItems
-    QList<QWebHistoryItem> items = hist->items();
-    for(int i=1;i<=histsize;i++){
-        QCOMPARE(items.at(i-1).title(),QString("page")+QString::number(i));
-    }
+  // check order of historyItems
+  QList<QWebHistoryItem> items = hist->items();
+  for (int i = 1; i <= histsize; i++) {
+    QCOMPARE(items.at(i - 1).title(), QString("page") + QString::number(i));
+  }
 }
 
 /**
   * Check history state after serialization (pickle, persistent..) method
   * Checks history currentIndex value
-void tst_QWebHistory::serialize_2()
-{
-    QByteArray tmp;  //buffer
-    QDataStream save(&tmp,QIODevice::WriteOnly); //here data will be saved
-    QDataStream load(&tmp,QIODevice::ReadOnly);  //from here data will be loaded
+  */
+void tst_QWebHistory::serialize_2() {
+  QByteArray tmp;                                // buffer
+  QDataStream save(&tmp, QIODevice::WriteOnly);  // here data will be saved
+  QDataStream load(&tmp, QIODevice::ReadOnly);  // from here data will be loaded
 
-    int oldCurrentIndex=hist->currentItemIndex();
+  int oldCurrentIndex = hist->currentItemIndex();
 
-    hist->back();
-    waitForLoadFinished.exec();
-    hist->back();
-    waitForLoadFinished.exec();
-    //check if current index was changed (make sure that it is not last item)
-    QVERIFY(hist->currentItemIndex()!=oldCurrentIndex);
-    //save current index
-    oldCurrentIndex=hist->currentItemIndex();
+  hist->back();
+  waitForLoadFinished.exec();
+  hist->back();
+  waitForLoadFinished.exec();
+  // check if current index was changed (make sure that it is not last item)
+  QVERIFY(hist->currentItemIndex() != oldCurrentIndex);
+  // save current index
+  oldCurrentIndex = hist->currentItemIndex();
 
-    hist->operator<<(save);
-    hist->operator>>(load);
+  save << *hist;
+  QVERIFY(save.status() == QDataStream::Ok);
+  load >> *hist;
+  QVERIFY(load.status() == QDataStream::Ok);
 
-    //check current index
-    QCOMPARE(hist->currentItemIndex(),oldCurrentIndex);
+  // check current index
+  QCOMPARE(hist->currentItemIndex(), oldCurrentIndex);
 }
 
 /**
   * Check history state after serialization (pickle, persistent..) method
   * Checks QWebHistoryItem public property after serialization
-void tst_QWebHistory::serialize_3()
-{
-    QByteArray tmp;  //buffer
-    QDataStream save(&tmp,QIODevice::WriteOnly); //here data will be saved
-    QDataStream load(&tmp,QIODevice::ReadOnly);  //from here data will be loaded
+  */
+void tst_QWebHistory::serialize_3() {
+  QByteArray tmp;                                // buffer
+  QDataStream save(&tmp, QIODevice::WriteOnly);  // here data will be saved
+  QDataStream load(&tmp, QIODevice::ReadOnly);  // from here data will be loaded
 
-    //prepare two different history items
-    QWebHistoryItem a=hist->currentItem();
-    hist->back();
-    waitForLoadFinished.exec();
-    QWebHistoryItem b=hist->currentItem();
-    a.setUserData("A - user data");
-    b.setUserData("B - user data");
+  // prepare two different history items
+  QWebHistoryItem a = hist->currentItem();
+  a.setUserData("A - user data");
 
-    //check properties BEFORE serialization
-    QVERIFY(a.title()!=b.title());
-    //there is no way to set lastVisited without visiting :-) (from public
-interface)
-    QVERIFY(a.originalUrl()!=b.originalUrl());
-    QVERIFY(a.url()!=b.url());
-    QVERIFY(a.userData()!=b.userData());
+  // check properties BEFORE serialization
+  QString title(a.title());
+  QDateTime lastVisited(a.lastVisited());
+  QUrl originalUrl(a.originalUrl());
+  QUrl url(a.url());
+  QVariant userData(a.userData());
 
-    a.operator<<(save);
-    QVERIFY(save.status()==QDataStream::Ok);
-    QVERIFY(!load.atEnd());
-    b.operator>>(load);
-    QVERIFY(load.status()==QDataStream::Ok);
+  save << *hist;
+  QVERIFY(save.status() == QDataStream::Ok);
+  QVERIFY(!load.atEnd());
+  hist->clear();
+  QVERIFY(hist->count() == 1);
+  load >> *hist;
+  QVERIFY(load.status() == QDataStream::Ok);
+  QWebHistoryItem b = hist->currentItem();
 
-    //check properties AFTER serialization
-    QCOMPARE(a.title(),b.title());
-    QCOMPARE(a.lastVisited(),b.lastVisited());
-    QCOMPARE(a.originalUrl(),b.originalUrl());
-    QCOMPARE(a.url(),b.url());
-    QCOMPARE(a.userData(),b.userData());
+  // check properties AFTER serialization
+  QCOMPARE(b.title(), title);
+  QCOMPARE(b.lastVisited(), lastVisited);
+  QCOMPARE(b.originalUrl(), originalUrl);
+  QCOMPARE(b.url(), url);
+  QCOMPARE(b.userData(), userData);
 
-    //Check if all data was read
-    QVERIFY(load.atEnd());
+  // Check if all data was read
+  QVERIFY(load.atEnd());
 }
-*/
+
+/** Simple checks should be a bit redundant to streaming operators */
+void tst_QWebHistory::saveAndRestore_1() {
+  hist->back();
+  waitForLoadFinished.exec();
+  QByteArray buffer(hist->saveState());
+  hist->clear();
+  QVERIFY(hist->count() == 1);
+  hist->restoreState(buffer);
+
+  // check only few values, do not make full test
+  // because most of the code is shared with streaming operators
+  // and these are checked before
+  QCOMPARE(hist->count(), histsize);
+  QCOMPARE(hist->currentItemIndex(), histsize - 2);
+  QCOMPARE(hist->itemAt(0).title(), QString("page1"));
+  QCOMPARE(hist->itemAt(histsize - 1).title(),
+           QString("page") + QString::number(histsize));
+}
+
+/** Check returns value if there are bad parameters. Actually, result
+  * is no so importent. The test shouldn't crash :-) */
+void tst_QWebHistory::saveAndRestore_2() {
+  QByteArray buffer;
+  hist->restoreState(buffer);
+  QVERIFY(hist->count() == 1);
+  QVERIFY(hist->itemAt(0).isValid());
+}
+
+/** Try to use bad version value */
+void tst_QWebHistory::saveAndRestore_3() {
+  QByteArray tmp = hist->saveState((QWebHistory::HistoryStateVersion)29999);
+  QVERIFY(hist->saveState((QWebHistory::HistoryStateVersion)29999).isEmpty());
+  QVERIFY(hist->count() == histsize);
+  QVERIFY(hist->itemAt(3).isValid());
+}
 
 QTEST_MAIN(tst_QWebHistory)
 #include "tst_qwebhistory.moc"
