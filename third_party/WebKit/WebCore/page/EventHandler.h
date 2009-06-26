@@ -113,6 +113,8 @@ class EventHandler : Noncopyable {
 
   bool scrollOverflow(ScrollDirection, ScrollGranularity);
 
+  bool scrollRecursively(ScrollDirection, ScrollGranularity);
+
   bool shouldDragAutoNode(Node*,
                           const IntPoint&) const;  // -webkit-user-drag == auto
 

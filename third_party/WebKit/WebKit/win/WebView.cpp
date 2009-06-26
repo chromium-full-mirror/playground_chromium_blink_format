@@ -1837,15 +1837,7 @@ bool WebView::keyDown(WPARAM virtualKeyCode,
       return false;
   }
 
-  if (!frame->eventHandler()->scrollOverflow(direction, granularity)) {
-    handled = frame->view()->scroll(direction, granularity);
-    Frame* parent = frame->tree()->parent();
-    while (!handled && parent) {
-      handled = parent->view()->scroll(direction, granularity);
-      parent = parent->tree()->parent();
-    }
-  }
-  return handled;
+  return frame->eventHandler()->scrollRecursively(direction, granularity);
 }
 
 bool WebView::keyPress(WPARAM charCode, LPARAM keyData, bool systemKeyDown) {

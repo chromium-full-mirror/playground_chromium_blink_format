@@ -44,6 +44,7 @@ class EditorClientQt;
 class Element;
 class Node;
 class Page;
+class Frame;
 
 #ifndef QT_NO_CURSOR
 class SetCursorEvent : public QEvent {
@@ -114,7 +115,7 @@ class QWebPagePrivate {
 
   void shortcutOverrideEvent(QKeyEvent*);
   void leaveEvent(QEvent*);
-  bool handleScrolling(QKeyEvent*);
+  bool handleScrolling(QKeyEvent*, WebCore::Frame*);
 
 #ifndef QT_NO_SHORTCUT
   static QWebPage::WebAction editorActionForKeyEvent(QKeyEvent* event);
