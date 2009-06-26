@@ -47,7 +47,7 @@ class tst_QWebHistory : public QObject {
   void count();
   void back();
   void forward();
-  // void itemAt();
+  void itemAt();
   void goToItem();
   void items();
   /*
@@ -130,13 +130,12 @@ void tst_QWebHistory::forward() {
 
 /**
   * Check QWebHistory::itemAt() method
-void tst_QWebHistory::itemAt()
-{
-    for(int i=1;i<histsize;i++) {
-        QCOMPARE(hist->itemAt(i-1).title(),QString("page")+QString::number(i));
-    }
+  */
+void tst_QWebHistory::itemAt() {
+  for (int i = 1; i < histsize; i++) {
+    QCOMPARE(hist->itemAt(i - 1).title(), QString("page") + QString::number(i));
+  }
 }
-*/
 
 /**
   * Check QWebHistory::goToItem() method
