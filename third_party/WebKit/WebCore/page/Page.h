@@ -65,10 +65,10 @@ class ProgressTracker;
 class RenderTheme;
 class VisibleSelection;
 class SelectionController;
-#if ENABLE(DOM_STORAGE)
-class SessionStorage;
-#endif
 class Settings;
+#if ENABLE(DOM_STORAGE)
+class StorageNamespace;
+#endif
 #if ENABLE(WML)
 class WMLPageState;
 #endif
@@ -218,8 +218,8 @@ class Page : Noncopyable {
   static void visitedStateChanged(PageGroup*, LinkHash visitedHash);
 
 #if ENABLE(DOM_STORAGE)
-  SessionStorage* sessionStorage(bool optionalCreate = true);
-  void setSessionStorage(PassRefPtr<SessionStorage>);
+  StorageNamespace* sessionStorage(bool optionalCreate = true);
+  void setSessionStorage(PassRefPtr<StorageNamespace>);
 #endif
 
 #if ENABLE(WML)
@@ -304,7 +304,7 @@ class Page : Noncopyable {
   int m_customHTMLTokenizerChunkSize;
 
 #if ENABLE(DOM_STORAGE)
-  RefPtr<SessionStorage> m_sessionStorage;
+  RefPtr<StorageNamespace> m_sessionStorage;
 #endif
 
 #if PLATFORM(WIN) || (PLATFORM(WX) && defined(__WXMSW__)) || \
