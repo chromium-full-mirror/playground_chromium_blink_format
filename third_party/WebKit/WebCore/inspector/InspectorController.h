@@ -312,6 +312,7 @@ class InspectorController : public RefCounted<InspectorController>
     return m_recordingUserInitiatedProfile;
   }
 
+  JSC::UString getCurrentUserInitiatedProfileName(bool incrementProfileNumber);
   void startUserInitiatedProfilingSoon();
   void startUserInitiatedProfiling(Timer<InspectorController>* = 0);
   void stopUserInitiatedProfiling();

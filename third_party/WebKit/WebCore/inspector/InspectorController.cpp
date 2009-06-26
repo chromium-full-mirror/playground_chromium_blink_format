@@ -728,7 +728,7 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
     m_counts.clear();
 #if ENABLE(JAVASCRIPT_DEBUGGER)
     m_profiles.clear();
-    m_currentUserInitiatedProfileNumber = -1;
+    m_currentUserInitiatedProfileNumber = 1;
     m_nextUserInitiatedProfileNumber = 1;
 #endif
 #if ENABLE(DATABASE)
@@ -1144,6 +1144,18 @@ void InspectorController::addScriptProfile(Profile* profile) {
   m_frontend->addProfile(toJS(m_scriptState, profile));
 }
 
+UString InspectorController::getCurrentUserInitiatedProfileName(
+    bool incrementProfileNumber = false) {
+  if (incrementProfileNumber)
+    m_currentUserInitiatedProfileNumber = m_nextUserInitiatedProfileNumber++;
+
+  UString title = UserInitiatedProfileName;
+  title += ".";
+  title += UString::from(m_currentUserInitiatedProfileNumber);
+
+  return title;
+}
+
 void InspectorController::startUserInitiatedProfilingSoon() {
   m_startProfiling.startOneShot(0);
 }
@@ -1159,11 +1171,8 @@ void InspectorController::startUserInitiatedProfiling(
   }
 
   m_recordingUserInitiatedProfile = true;
-  m_currentUserInitiatedProfileNumber = m_nextUserInitiatedProfileNumber++;
 
-  UString title = UserInitiatedProfileName;
-  title += ".";
-  title += UString::from(m_currentUserInitiatedProfileNumber);
+  UString title = getCurrentUserInitiatedProfileName(true);
 
   ExecState* scriptState =
       toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
@@ -1180,9 +1189,7 @@ void InspectorController::stopUserInitiatedProfiling() {
 
   m_recordingUserInitiatedProfile = false;
 
-  UString title = UserInitiatedProfileName;
-  title += ".";
-  title += UString::from(m_currentUserInitiatedProfileNumber);
+  UString title = getCurrentUserInitiatedProfileName();
 
   ExecState* scriptState =
       toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
