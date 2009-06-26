@@ -39,6 +39,7 @@ class HTMLViewSourceDocument : public HTMLDocument {
     return new HTMLViewSourceDocument(frame, mimeType);
   }
 
+  // Returns HTMLTokenizer or TextTokenizer based on m_type.
   virtual Tokenizer* createTokenizer();
 
   void addViewSourceToken(Token*);        // Used by the HTML tokenizer.
