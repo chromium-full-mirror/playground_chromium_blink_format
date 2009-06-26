@@ -30,6 +30,8 @@
 
 #include "config.h"
 
+#if ENABLE(DOM_STORAGE)
+
 #include "Storage.h"
 #include "V8Binding.h"
 #include "V8CustomBinding.h"
@@ -141,3 +143,5 @@ NAMED_PROPERTY_DELETER(Storage) {
 }
 
 }  // namespace WebCore
+
+#endif
