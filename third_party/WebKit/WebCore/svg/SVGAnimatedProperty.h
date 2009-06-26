@@ -618,11 +618,8 @@ void synchronizeProperty(const OwnerElement* ownerElement,
   if (old && value.isNull())
     namedAttrMap->removeAttribute(old->name());
   else if (!old && !value.isNull())
-    namedAttrMap->addAttribute(
-        const_cast<OwnerElement*>(ownerElement)
-            ->createAttribute(
-                QualifiedName(nullAtom, attributeName.localName(), nullAtom),
-                value));
+    namedAttrMap->addAttribute(const_cast<OwnerElement*>(ownerElement)
+                                   ->createAttribute(attributeName, value));
   else if (old && !value.isNull())
     old->setValue(value);
 }
