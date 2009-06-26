@@ -29,6 +29,10 @@
 #include "IntSize.h"
 #include <wtf/Platform.h>
 
+#if PLATFORM(QT)
+#include <QDataStream>
+#endif
+
 #if PLATFORM(CG)
 typedef struct CGPoint CGPoint;
 #endif
@@ -162,6 +166,21 @@ inline bool operator==(const IntPoint& a, const IntPoint& b) {
 inline bool operator!=(const IntPoint& a, const IntPoint& b) {
   return a.x() != b.x() || a.y() != b.y();
 }
+
+#if PLATFORM(QT)
+inline QDataStream& operator<<(QDataStream& stream, const IntPoint& point) {
+  stream << point.x() << point.y();
+  return stream;
+}
+
+inline QDataStream& operator>>(QDataStream& stream, IntPoint& point) {
+  int x, y;
+  stream >> x >> y;
+  point.setX(x);
+  point.setY(y);
+  return stream;
+}
+#endif
 
 }  // namespace WebCore
 
