@@ -43,13 +43,13 @@ namespace WebCore {
 
 INDEXED_PROPERTY_GETTER(ClientRectList) {
   INC_STATS("DOM.ClientRectList.IndexedPropertyGetter");
-  ClientRectList* imp = V8Proxy::ToNativeObject<ClientRectList>(
+  ClientRectList* imp = V8Proxy::convertToNativeObject<ClientRectList>(
       V8ClassIndex::CLIENTRECTLIST, info.Holder());
   RefPtr<ClientRect> result = imp->item(index);
   if (!result)
     return notHandledByInterceptor();
 
-  return V8Proxy::ToV8Object(V8ClassIndex::CLIENTRECT, result.get());
+  return V8Proxy::convertToV8Object(V8ClassIndex::CLIENTRECT, result.get());
 }
 
 }  // namespace WebCore

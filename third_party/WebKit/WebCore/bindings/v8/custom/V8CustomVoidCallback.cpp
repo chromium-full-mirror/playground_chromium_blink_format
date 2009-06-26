@@ -46,7 +46,7 @@ V8CustomVoidCallback::~V8CustomVoidCallback() {
 void V8CustomVoidCallback::handleEvent() {
   v8::HandleScope handleScope;
 
-  v8::Handle<v8::Context> context = V8Proxy::GetContext(m_frame.get());
+  v8::Handle<v8::Context> context = V8Proxy::context(m_frame.get());
   if (context.IsEmpty())
     return;
 
@@ -88,7 +88,7 @@ bool invokeCallback(v8::Persistent<v8::Object> callback,
   ASSERT(proxy);
 
   v8::Handle<v8::Value> result =
-      proxy->CallFunction(callbackFunction, thisObject, argc, argv);
+      proxy->callFunction(callbackFunction, thisObject, argc, argv);
 
   callbackReturnValue =
       result.IsEmpty() && result->IsBoolean() && result->BooleanValue();

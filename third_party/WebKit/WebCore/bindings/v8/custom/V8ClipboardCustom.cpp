@@ -46,7 +46,7 @@ namespace WebCore {
 
 ACCESSOR_GETTER(ClipboardTypes) {
   INC_STATS("DOM.Clipboard.types()");
-  Clipboard* clipboard = V8Proxy::ToNativeObject<Clipboard>(
+  Clipboard* clipboard = V8Proxy::convertToNativeObject<Clipboard>(
       V8ClassIndex::CLIPBOARD, info.Holder());
 
   HashSet<String> types = clipboard->types();
@@ -65,7 +65,7 @@ ACCESSOR_GETTER(ClipboardTypes) {
 
 CALLBACK_FUNC_DECL(ClipboardClearData) {
   INC_STATS("DOM.Clipboard.clearData()");
-  Clipboard* clipboard = V8Proxy::ToNativeObject<Clipboard>(
+  Clipboard* clipboard = V8Proxy::convertToNativeObject<Clipboard>(
       V8ClassIndex::CLIPBOARD, args.Holder());
 
   if (!args.Length()) {
@@ -75,7 +75,7 @@ CALLBACK_FUNC_DECL(ClipboardClearData) {
 
   if (args.Length() != 1)
     return throwError("clearData: Invalid number of arguments",
-                      V8Proxy::SYNTAX_ERROR);
+                      V8Proxy::SyntaxError);
 
   String type = toWebCoreString(args[0]);
   clipboard->clearData(type);
@@ -84,12 +84,12 @@ CALLBACK_FUNC_DECL(ClipboardClearData) {
 
 CALLBACK_FUNC_DECL(ClipboardGetData) {
   INC_STATS("DOM.Clipboard.getData()");
-  Clipboard* clipboard = V8Proxy::ToNativeObject<Clipboard>(
+  Clipboard* clipboard = V8Proxy::convertToNativeObject<Clipboard>(
       V8ClassIndex::CLIPBOARD, args.Holder());
 
   if (args.Length() != 1)
     return throwError("getData: Invalid number of arguments",
-                      V8Proxy::SYNTAX_ERROR);
+                      V8Proxy::SyntaxError);
 
   bool success;
   String result = clipboard->getData(toWebCoreString(args[0]), success);
@@ -101,12 +101,12 @@ CALLBACK_FUNC_DECL(ClipboardGetData) {
 
 CALLBACK_FUNC_DECL(ClipboardSetData) {
   INC_STATS("DOM.Clipboard.setData()");
-  Clipboard* clipboard = V8Proxy::ToNativeObject<Clipboard>(
+  Clipboard* clipboard = V8Proxy::convertToNativeObject<Clipboard>(
       V8ClassIndex::CLIPBOARD, args.Holder());
 
   if (args.Length() != 2)
     return throwError("setData: Invalid number of arguments",
-                      V8Proxy::SYNTAX_ERROR);
+                      V8Proxy::SyntaxError);
 
   String type = toWebCoreString(args[0]);
   String data = toWebCoreString(args[1]);
@@ -115,7 +115,7 @@ CALLBACK_FUNC_DECL(ClipboardSetData) {
 
 CALLBACK_FUNC_DECL(ClipboardSetDragImage) {
   INC_STATS("DOM.Clipboard.setDragImage()");
-  Clipboard* clipboard = V8Proxy::ToNativeObject<Clipboard>(
+  Clipboard* clipboard = V8Proxy::convertToNativeObject<Clipboard>(
       V8ClassIndex::CLIPBOARD, args.Holder());
 
   if (!clipboard->isForDragging())
@@ -123,14 +123,14 @@ CALLBACK_FUNC_DECL(ClipboardSetDragImage) {
 
   if (args.Length() != 3)
     return throwError("setDragImage: Invalid number of arguments",
-                      V8Proxy::SYNTAX_ERROR);
+                      V8Proxy::SyntaxError);
 
   int x = toInt32(args[1]);
   int y = toInt32(args[2]);
 
   Node* node = 0;
   if (V8Node::HasInstance(args[0]))
-    node = V8Proxy::DOMWrapperToNode<Node>(args[0]);
+    node = V8Proxy::convertDOMWrapperToNode<Node>(args[0]);
 
   if (!node || !node->isElementNode())
     return throwError("setDragImageFromElement: Invalid first argument");

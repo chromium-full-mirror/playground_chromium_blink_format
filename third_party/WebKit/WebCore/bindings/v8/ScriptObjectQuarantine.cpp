@@ -78,10 +78,10 @@ bool getQuarantinedScriptObject(Node* node, ScriptObject& quarantinedObject) {
 
   v8::HandleScope handleScope;
   v8::Local<v8::Context> context =
-      V8Proxy::GetContext(node->document()->page()->mainFrame());
+      V8Proxy::context(node->document()->page()->mainFrame());
   v8::Context::Scope scope(context);
 
-  v8::Handle<v8::Value> v8Node = V8Proxy::NodeToV8Object(node);
+  v8::Handle<v8::Value> v8Node = V8Proxy::convertNodeToV8Object(node);
   quarantinedObject =
       ScriptObject(v8::Local<v8::Object>(v8::Object::Cast(*v8Node)));
 
@@ -93,11 +93,11 @@ bool getQuarantinedScriptObject(DOMWindow* domWindow,
   ASSERT(domWindow);
 
   v8::HandleScope handleScope;
-  v8::Local<v8::Context> context = V8Proxy::GetContext(domWindow->frame());
+  v8::Local<v8::Context> context = V8Proxy::context(domWindow->frame());
   v8::Context::Scope scope(context);
 
   v8::Handle<v8::Value> v8DomWindow =
-      V8Proxy::ToV8Object(V8ClassIndex::DOMWINDOW, domWindow);
+      V8Proxy::convertToV8Object(V8ClassIndex::DOMWINDOW, domWindow);
   quarantinedObject =
       ScriptObject(v8::Local<v8::Object>(v8::Object::Cast(*v8DomWindow)));
 

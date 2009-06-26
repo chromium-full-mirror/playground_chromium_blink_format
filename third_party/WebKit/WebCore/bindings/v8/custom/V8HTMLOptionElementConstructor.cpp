@@ -52,7 +52,7 @@ CALLBACK_FUNC_DECL(HTMLOptionElementConstructor) {
   Document* document = V8Proxy::retrieveFrame()->document();
   if (!document)
     return throwError("Option constructor associated document is unavailable",
-                      V8Proxy::REFERENCE_ERROR);
+                      V8Proxy::ReferenceError);
 
   RefPtr<HTMLOptionElement> option = new HTMLOptionElement(
       HTMLNames::optionTag, V8Proxy::retrieveFrame()->document());
@@ -82,10 +82,10 @@ CALLBACK_FUNC_DECL(HTMLOptionElementConstructor) {
     }
   }
 
-  V8Proxy::SetDOMWrapper(args.Holder(), V8ClassIndex::ToInt(V8ClassIndex::NODE),
+  V8Proxy::setDOMWrapper(args.Holder(), V8ClassIndex::ToInt(V8ClassIndex::NODE),
                          option.get());
   option->ref();
-  V8Proxy::SetJSWrapperForDOMNode(
+  V8Proxy::setJSWrapperForDOMNode(
       option.get(), v8::Persistent<v8::Object>::New(args.Holder()));
   return args.Holder();
 }

@@ -160,8 +160,9 @@ NAMED_PROPERTY_GETTER(CSSStyleDeclaration) {
     return notHandledByInterceptor();
 
   // Search the style declaration.
-  CSSStyleDeclaration* imp = V8Proxy::ToNativeObject<CSSStyleDeclaration>(
-      V8ClassIndex::CSSSTYLEDECLARATION, info.Holder());
+  CSSStyleDeclaration* imp =
+      V8Proxy::convertToNativeObject<CSSStyleDeclaration>(
+          V8ClassIndex::CSSSTYLEDECLARATION, info.Holder());
   CSSPropertyInfo* propInfo = cssPropertyInfo(name);
 
   // Do not handle non-property names.
@@ -192,8 +193,9 @@ NAMED_PROPERTY_GETTER(CSSStyleDeclaration) {
 
 NAMED_PROPERTY_SETTER(CSSStyleDeclaration) {
   INC_STATS("DOM.CSSStyleDeclaration.NamedPropertySetter");
-  CSSStyleDeclaration* imp = V8Proxy::ToNativeObject<CSSStyleDeclaration>(
-      V8ClassIndex::CSSSTYLEDECLARATION, info.Holder());
+  CSSStyleDeclaration* imp =
+      V8Proxy::convertToNativeObject<CSSStyleDeclaration>(
+          V8ClassIndex::CSSSTYLEDECLARATION, info.Holder());
   CSSPropertyInfo* propInfo = cssPropertyInfo(name);
   if (!propInfo)
     return notHandledByInterceptor();

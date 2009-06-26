@@ -469,7 +469,7 @@ void DOMData::handleWeakObject(DOMDataStore::DOMWrapperMapType mapType,
     if (*wrapper == *v8Object) {
       // Clear the JS reference.
       domMap->forgetOnly(domObject);
-      store->domData()->ensureDeref(V8Proxy::GetDOMWrapperType(v8Object),
+      store->domData()->ensureDeref(V8Proxy::domWrapperType(v8Object),
                                     domObject);
     }
   }
@@ -606,7 +606,7 @@ void DOMData::removeObjectsFromWrapperMap(DOMWrapperMap<T>& domMap) {
     v8::Persistent<v8::Object> v8Object(iter->second);
 
     V8ClassIndex::V8WrapperType type =
-        V8Proxy::GetDOMWrapperType(v8::Handle<v8::Object>::Cast(v8Object));
+        V8Proxy::domWrapperType(v8::Handle<v8::Object>::Cast(v8Object));
 
     // Deref the DOM object.
     derefObject(type, domObject);

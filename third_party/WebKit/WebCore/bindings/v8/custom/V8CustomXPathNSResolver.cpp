@@ -60,9 +60,8 @@ String V8CustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
 
   if (lookupNamespaceURIFunc.IsEmpty() && !m_resolver->IsFunction()) {
     Frame* frame = V8Proxy::retrieveFrameForEnteredContext();
-    log_info(frame,
-             "XPathNSResolver does not have a lookupNamespaceURI method.",
-             String());
+    logInfo(frame, "XPathNSResolver does not have a lookupNamespaceURI method.",
+            String());
     return String();
   }
 
@@ -79,7 +78,7 @@ String V8CustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
 
   V8Proxy* proxy = V8Proxy::retrieve();
   v8::Handle<v8::Value> retval =
-      proxy->CallFunction(function, m_resolver, argc, argv);
+      proxy->callFunction(function, m_resolver, argc, argv);
 
   // Eat exceptions from namespace resolver and return an empty string. This
   // will most likely cause NAMESPACE_ERR.

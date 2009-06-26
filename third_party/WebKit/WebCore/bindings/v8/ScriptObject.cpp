@@ -122,7 +122,7 @@ bool ScriptGlobalObject::set(ScriptState* scriptState,
   ScriptScope scope(scriptState);
   scope.global()->Set(
       v8::String::New(name),
-      V8Proxy::ToV8Object(V8ClassIndex::INSPECTORCONTROLLER, value));
+      V8Proxy::convertToV8Object(V8ClassIndex::INSPECTORCONTROLLER, value));
   return scope.success();
 }
 

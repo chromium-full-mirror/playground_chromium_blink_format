@@ -55,7 +55,7 @@ V8AbstractEventListener::V8AbstractEventListener(Frame* frame, bool isAttribute)
 }
 
 void V8AbstractEventListener::invokeEventHandler(
-    v8::Handle<v8::Context> context,
+    v8::Handle<v8::Context> v8Context,
     Event* event,
     v8::Handle<v8::Value> jsEvent,
     bool isWindowEvent) {
@@ -72,12 +72,12 @@ void V8AbstractEventListener::invokeEventHandler(
 
     // Save the old 'event' property so we can restore it later.
     v8::Local<v8::Value> savedEvent =
-        context->Global()->GetHiddenValue(eventSymbol);
+        v8Context->Global()->GetHiddenValue(eventSymbol);
     tryCatch.Reset();
 
     // Make the event available in the global object, so DOMWindow can expose
     // it.
-    context->Global()->SetHiddenValue(eventSymbol, jsEvent);
+    v8Context->Global()->SetHiddenValue(eventSymbol, jsEvent);
     tryCatch.Reset();
 
     // Call the event handler.
@@ -87,13 +87,13 @@ void V8AbstractEventListener::invokeEventHandler(
     // Restore the old event. This must be done for all exit paths through this
     // method.
     if (savedEvent.IsEmpty())
-      context->Global()->SetHiddenValue(eventSymbol, v8::Undefined());
+      v8Context->Global()->SetHiddenValue(eventSymbol, v8::Undefined());
     else
-      context->Global()->SetHiddenValue(eventSymbol, savedEvent);
+      v8Context->Global()->SetHiddenValue(eventSymbol, savedEvent);
     tryCatch.Reset();
   }
 
-  ASSERT(!V8Proxy::HandleOutOfMemory() || returnValue.IsEmpty());
+  ASSERT(!V8Proxy::handleOutOfMemory() || returnValue.IsEmpty());
 
   if (returnValue.IsEmpty())
     return;
@@ -120,8 +120,8 @@ void V8AbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
 
   v8::HandleScope handleScope;
 
-  v8::Handle<v8::Context> context = V8Proxy::GetContext(m_frame);
-  if (context.IsEmpty())
+  v8::Handle<v8::Context> v8Context = V8Proxy::context(m_frame);
+  if (v8Context.IsEmpty())
     return;
 
   // m_frame can removed by the callback function, protect it until the callback
@@ -129,12 +129,12 @@ void V8AbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
   RefPtr<Frame> protectFrame(m_frame);
 
   // Enter the V8 context in which to perform the event handling.
-  v8::Context::Scope scope(context);
+  v8::Context::Scope scope(v8Context);
 
   // Get the V8 wrapper for the event object.
-  v8::Handle<v8::Value> jsEvent = V8Proxy::EventToV8Object(event);
+  v8::Handle<v8::Value> jsEvent = V8Proxy::convertEventToV8Object(event);
 
-  invokeEventHandler(context, event, jsEvent, isWindowEvent);
+  invokeEventHandler(v8Context, event, jsEvent, isWindowEvent);
 
   Document::updateStyleForAllDocuments();
 }
@@ -142,7 +142,7 @@ void V8AbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
 void V8AbstractEventListener::disposeListenerObject() {
   if (!m_listener.IsEmpty()) {
 #ifndef NDEBUG
-    V8Proxy::UnregisterGlobalHandle(this, m_listener);
+    V8Proxy::unregisterGlobalHandle(this, m_listener);
 #endif
     m_listener.Dispose();
     m_listener.Clear();
@@ -159,7 +159,7 @@ v8::Local<v8::Object> V8AbstractEventListener::getReceiverObject(
     return v8::Context::GetCurrent()->Global();
 
   EventTarget* target = event->currentTarget();
-  v8::Handle<v8::Value> value = V8Proxy::EventTargetToV8Object(target);
+  v8::Handle<v8::Value> value = V8Proxy::convertEventTargetToV8Object(target);
   if (value.IsEmpty())
     return v8::Local<v8::Object>();
   return v8::Local<v8::Object>::New(v8::Handle<v8::Object>::Cast(value));

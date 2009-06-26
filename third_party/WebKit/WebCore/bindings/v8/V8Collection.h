@@ -50,8 +50,8 @@ static v8::Handle<v8::Value> getV8Object(
   V8ClassIndex::V8WrapperType type =
       V8ClassIndex::FromInt(implementationType->Int32Value());
   if (type == V8ClassIndex::NODE)
-    return V8Proxy::NodeToV8Object(static_cast<Node*>(implementation));
-  return V8Proxy::ToV8Object(type, implementation);
+    return V8Proxy::convertNodeToV8Object(static_cast<Node*>(implementation));
+  return V8Proxy::convertToV8Object(type, implementation);
 }
 
 template <class T>
@@ -68,11 +68,11 @@ static v8::Handle<v8::Value> getNamedPropertyOfCollection(
     v8::Local<v8::Object> object,
     v8::Local<v8::Value> implementationType) {
   // FIXME: assert object is a collection type
-  ASSERT(V8Proxy::MaybeDOMWrapper(object));
-  V8ClassIndex::V8WrapperType wrapperType = V8Proxy::GetDOMWrapperType(object);
+  ASSERT(V8Proxy::maybeDOMWrapper(object));
+  V8ClassIndex::V8WrapperType wrapperType = V8Proxy::domWrapperType(object);
   ASSERT(wrapperType != V8ClassIndex::NODE);
   Collection* collection =
-      V8Proxy::ToNativeObject<Collection>(wrapperType, object);
+      V8Proxy::convertToNativeObject<Collection>(wrapperType, object);
   String propertyName = toWebCoreString(name);
   return getV8Object<ItemType>(collection->namedItem(propertyName),
                                implementationType);
@@ -103,8 +103,8 @@ template <class Collection>
 static v8::Handle<v8::Value> nodeCollectionNamedPropertyGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
-  ASSERT(V8Proxy::MaybeDOMWrapper(info.Holder()));
-  ASSERT(V8Proxy::GetDOMWrapperType(info.Holder()) == V8ClassIndex::NODE);
+  ASSERT(V8Proxy::maybeDOMWrapper(info.Holder()));
+  ASSERT(V8Proxy::domWrapperType(info.Holder()) == V8ClassIndex::NODE);
   v8::Handle<v8::Value> value =
       info.Holder()->GetRealNamedPropertyInPrototypeChain(name);
 
@@ -128,11 +128,11 @@ static v8::Handle<v8::Value> getIndexedPropertyOfCollection(
     v8::Local<v8::Object> object,
     v8::Local<v8::Value> implementationType) {
   // FIXME: Assert that object must be a collection type.
-  ASSERT(V8Proxy::MaybeDOMWrapper(object));
-  V8ClassIndex::V8WrapperType wrapperType = V8Proxy::GetDOMWrapperType(object);
+  ASSERT(V8Proxy::maybeDOMWrapper(object));
+  V8ClassIndex::V8WrapperType wrapperType = V8Proxy::domWrapperType(object);
   ASSERT(wrapperType != V8ClassIndex::NODE);
   Collection* collection =
-      V8Proxy::ToNativeObject<Collection>(wrapperType, object);
+      V8Proxy::convertToNativeObject<Collection>(wrapperType, object);
   return getV8Object<ItemType>(collection->item(index), implementationType);
 }
 
@@ -150,9 +150,10 @@ template <class Collection>
 static v8::Handle<v8::Value> nodeCollectionIndexedPropertyGetter(
     uint32_t index,
     const v8::AccessorInfo& info) {
-  ASSERT(V8Proxy::MaybeDOMWrapper(info.Holder()));
-  ASSERT(V8Proxy::GetDOMWrapperType(info.Holder()) == V8ClassIndex::NODE);
-  Collection* collection = V8Proxy::DOMWrapperToNode<Collection>(info.Holder());
+  ASSERT(V8Proxy::maybeDOMWrapper(info.Holder()));
+  ASSERT(V8Proxy::domWrapperType(info.Holder()) == V8ClassIndex::NODE);
+  Collection* collection =
+      V8Proxy::convertDOMWrapperToNode<Collection>(info.Holder());
   void* implementation = collection->item(index);
   return getV8Object(implementation, info.Data());
 }
@@ -162,9 +163,10 @@ static v8::Handle<v8::Value> nodeCollectionIndexedPropertyGetter(
 template <class Collection>
 static v8::Handle<v8::Array> nodeCollectionIndexedPropertyEnumerator(
     const v8::AccessorInfo& info) {
-  ASSERT(V8Proxy::MaybeDOMWrapper(info.Holder()));
-  ASSERT(V8Proxy::GetDOMWrapperType(info.Holder()) == V8ClassIndex::NODE);
-  Collection* collection = V8Proxy::DOMWrapperToNode<Collection>(info.Holder());
+  ASSERT(V8Proxy::maybeDOMWrapper(info.Holder()));
+  ASSERT(V8Proxy::domWrapperType(info.Holder()) == V8ClassIndex::NODE);
+  Collection* collection =
+      V8Proxy::convertDOMWrapperToNode<Collection>(info.Holder());
   int length = collection->length();
   v8::Handle<v8::Array> properties = v8::Array::New(length);
   for (int i = 0; i < length; ++i) {
@@ -180,11 +182,11 @@ static v8::Handle<v8::Array> nodeCollectionIndexedPropertyEnumerator(
 template <class Collection>
 static v8::Handle<v8::Array> collectionIndexedPropertyEnumerator(
     const v8::AccessorInfo& info) {
-  ASSERT(V8Proxy::MaybeDOMWrapper(info.Holder()));
+  ASSERT(V8Proxy::maybeDOMWrapper(info.Holder()));
   V8ClassIndex::V8WrapperType wrapperType =
-      V8Proxy::GetDOMWrapperType(info.Holder());
+      V8Proxy::domWrapperType(info.Holder());
   Collection* collection =
-      V8Proxy::ToNativeObject<Collection>(wrapperType, info.Holder());
+      V8Proxy::convertToNativeObject<Collection>(wrapperType, info.Holder());
   int length = collection->length();
   v8::Handle<v8::Array> properties = v8::Array::New(length);
   for (int i = 0; i < length; ++i) {
@@ -203,11 +205,11 @@ static v8::Handle<v8::Value> collectionStringOrNullIndexedPropertyGetter(
     uint32_t index,
     const v8::AccessorInfo& info) {
   // FIXME: assert that object must be a collection type
-  ASSERT(V8Proxy::MaybeDOMWrapper(info.Holder()));
+  ASSERT(V8Proxy::maybeDOMWrapper(info.Holder()));
   V8ClassIndex::V8WrapperType wrapperType =
-      V8Proxy::GetDOMWrapperType(info.Holder());
+      V8Proxy::domWrapperType(info.Holder());
   Collection* collection =
-      V8Proxy::ToNativeObject<Collection>(wrapperType, info.Holder());
+      V8Proxy::convertToNativeObject<Collection>(wrapperType, info.Holder());
   String result = collection->item(index);
   return v8StringOrNull(result);
 }

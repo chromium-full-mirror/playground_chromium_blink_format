@@ -40,7 +40,8 @@ namespace WebCore {
 ACCESSOR_GETTER(HTMLInputElementSelectionStart) {
   INC_STATS("DOM.HTMLInputElement.selectionStart._get");
   v8::Handle<v8::Object> holder = info.Holder();
-  HTMLInputElement* imp = V8Proxy::DOMWrapperToNode<HTMLInputElement>(holder);
+  HTMLInputElement* imp =
+      V8Proxy::convertDOMWrapperToNode<HTMLInputElement>(holder);
 
   if (!imp->canHaveSelection())
     return throwError(
@@ -54,7 +55,8 @@ ACCESSOR_GETTER(HTMLInputElementSelectionStart) {
 ACCESSOR_SETTER(HTMLInputElementSelectionStart) {
   INC_STATS("DOM.HTMLInputElement.selectionStart._set");
   v8::Handle<v8::Object> holder = info.Holder();
-  HTMLInputElement* imp = V8Proxy::DOMWrapperToNode<HTMLInputElement>(holder);
+  HTMLInputElement* imp =
+      V8Proxy::convertDOMWrapperToNode<HTMLInputElement>(holder);
 
   if (!imp->canHaveSelection()) {
     throwError(
@@ -68,7 +70,8 @@ ACCESSOR_SETTER(HTMLInputElementSelectionStart) {
 ACCESSOR_GETTER(HTMLInputElementSelectionEnd) {
   INC_STATS("DOM.HTMLInputElement.selectionEnd._get");
   v8::Handle<v8::Object> holder = info.Holder();
-  HTMLInputElement* imp = V8Proxy::DOMWrapperToNode<HTMLInputElement>(holder);
+  HTMLInputElement* imp =
+      V8Proxy::convertDOMWrapperToNode<HTMLInputElement>(holder);
 
   if (!imp->canHaveSelection())
     return throwError(
@@ -82,7 +85,8 @@ ACCESSOR_GETTER(HTMLInputElementSelectionEnd) {
 ACCESSOR_SETTER(HTMLInputElementSelectionEnd) {
   INC_STATS("DOM.HTMLInputElement.selectionEnd._set");
   v8::Handle<v8::Object> holder = info.Holder();
-  HTMLInputElement* imp = V8Proxy::DOMWrapperToNode<HTMLInputElement>(holder);
+  HTMLInputElement* imp =
+      V8Proxy::convertDOMWrapperToNode<HTMLInputElement>(holder);
 
   if (!imp->canHaveSelection()) {
     throwError(
@@ -97,7 +101,8 @@ ACCESSOR_SETTER(HTMLInputElementSelectionEnd) {
 CALLBACK_FUNC_DECL(HTMLInputElementSetSelectionRange) {
   INC_STATS("DOM.HTMLInputElement.setSelectionRange");
   v8::Handle<v8::Object> holder = args.Holder();
-  HTMLInputElement* imp = V8Proxy::DOMWrapperToNode<HTMLInputElement>(holder);
+  HTMLInputElement* imp =
+      V8Proxy::convertDOMWrapperToNode<HTMLInputElement>(holder);
 
   if (!imp->canHaveSelection())
     return throwError(

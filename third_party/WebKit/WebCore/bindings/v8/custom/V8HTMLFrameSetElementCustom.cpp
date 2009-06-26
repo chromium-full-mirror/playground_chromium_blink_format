@@ -47,7 +47,7 @@ namespace WebCore {
 NAMED_PROPERTY_GETTER(HTMLFrameSetElement) {
   INC_STATS("DOM.HTMLFrameSetElement.NamedPropertyGetter");
   HTMLFrameSetElement* imp =
-      V8Proxy::DOMWrapperToNode<HTMLFrameSetElement>(info.Holder());
+      V8Proxy::convertDOMWrapperToNode<HTMLFrameSetElement>(info.Holder());
   Node* frameNode =
       imp->children()->namedItem(v8StringToAtomicWebCoreString(name));
   if (frameNode && frameNode->hasTagName(HTMLNames::frameTag)) {
@@ -56,7 +56,8 @@ NAMED_PROPERTY_GETTER(HTMLFrameSetElement) {
     if (!doc)
       return v8::Undefined();
     if (Frame* frame = doc->frame())
-      return V8Proxy::ToV8Object(V8ClassIndex::DOMWINDOW, frame->domWindow());
+      return V8Proxy::convertToV8Object(V8ClassIndex::DOMWINDOW,
+                                        frame->domWindow());
   }
   return notHandledByInterceptor();
 }
