@@ -2652,7 +2652,7 @@ bool Node::dispatchMouseEvent(const PlatformMouseEvent& event,
   return dispatchMouseEvent(eventType, button, detail, contentsPos.x(),
                             contentsPos.y(), event.globalX(), event.globalY(),
                             event.ctrlKey(), event.altKey(), event.shiftKey(),
-                            event.metaKey(), false, relatedTarget);
+                            event.metaKey(), false, relatedTarget, 0);
 }
 
 void Node::dispatchSimulatedMouseEvent(const AtomicString& eventType,

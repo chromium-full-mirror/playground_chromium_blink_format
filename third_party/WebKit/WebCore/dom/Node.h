@@ -620,8 +620,8 @@ class Node : public EventTarget, public TreeShared<Node> {
 
   void dispatchSubtreeModifiedEvent();
   void dispatchUIEvent(const AtomicString& eventType,
-                       int detail = 0,
-                       PassRefPtr<Event> underlyingEvent = 0);
+                       int detail,
+                       PassRefPtr<Event> underlyingEvent);
   bool dispatchKeyEvent(const PlatformKeyboardEvent&);
   void dispatchWheelEvent(PlatformWheelEvent&);
   bool dispatchMouseEvent(const PlatformMouseEvent&,
@@ -639,11 +639,11 @@ class Node : public EventTarget, public TreeShared<Node> {
                           bool altKey,
                           bool shiftKey,
                           bool metaKey,
-                          bool isSimulated = false,
-                          Node* relatedTarget = 0,
-                          PassRefPtr<Event> underlyingEvent = 0);
+                          bool isSimulated,
+                          Node* relatedTarget,
+                          PassRefPtr<Event> underlyingEvent);
   void dispatchSimulatedMouseEvent(const AtomicString& eventType,
-                                   PassRefPtr<Event> underlyingEvent = 0);
+                                   PassRefPtr<Event> underlyingEvent);
   void dispatchSimulatedClick(PassRefPtr<Event> underlyingEvent,
                               bool sendMouseEvents = false,
                               bool showPressedLook = true);
