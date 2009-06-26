@@ -49,6 +49,9 @@ class HTMLVideoElement : public HTMLMediaElement {
   virtual void parseMappedAttribute(MappedAttribute* attr);
   virtual bool isVideo() const { return true; }
   virtual bool hasVideo() const { return player() && player()->hasVideo(); }
+  virtual bool supportsFullscreen() const {
+    return player() && player()->supportsFullscreen();
+  }
   virtual bool isURLAttribute(Attribute*) const;
   virtual const QualifiedName& imageSourceAttributeName() const;
 

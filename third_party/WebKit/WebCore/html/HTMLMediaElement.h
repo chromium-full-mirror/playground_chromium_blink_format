@@ -66,6 +66,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   virtual bool isVideo() const { return false; }
   virtual bool hasVideo() const { return false; }
 
+  virtual bool supportsFullscreen() const { return false; }
+
   void scheduleLoad();
 
   virtual void defaultEventHandler(Event*);
