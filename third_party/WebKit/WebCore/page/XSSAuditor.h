@@ -93,9 +93,11 @@ class XSSAuditor {
  private:
   static String decodeURL(const String& url,
                           const TextEncoding& encoding = UTF8Encoding(),
-                          bool allowNullCharacters = false);
+                          bool allowControlCharacters = false);
 
   bool findInRequest(const String&) const;
+
+  bool findInRequest(Frame*, const String&) const;
 
   // The frame to audit.
   Frame* m_frame;
