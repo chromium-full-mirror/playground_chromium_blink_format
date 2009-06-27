@@ -170,8 +170,8 @@ class RenderLayerCompositor {
 
   // Whether a running transition or animation enforces the need for a
   // compositing layer.
-  static bool requiresCompositingForAnimation(RenderObject*);
-  static bool requiresCompositingForTransform(RenderObject*);
+  bool requiresCompositingForAnimation(RenderObject*) const;
+  bool requiresCompositingForTransform(RenderObject*) const;
   bool requiresCompositingForVideo(RenderObject*) const;
 
  private:
