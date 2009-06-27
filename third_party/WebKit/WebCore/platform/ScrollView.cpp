@@ -664,12 +664,11 @@ void ScrollView::setScrollbarsSuppressed(bool suppressed,
   }
 }
 
-Scrollbar* ScrollView::scrollbarUnderMouse(
-    const PlatformMouseEvent& mouseEvent) {
+Scrollbar* ScrollView::scrollbarUnderPoint(const IntPoint& windowPoint) {
   if (platformWidget())
     return 0;
 
-  IntPoint viewPoint = convertFromContainingWindow(mouseEvent.pos());
+  IntPoint viewPoint = convertFromContainingWindow(windowPoint);
   if (m_horizontalScrollbar &&
       m_horizontalScrollbar->frameRect().contains(viewPoint))
     return m_horizontalScrollbar.get();

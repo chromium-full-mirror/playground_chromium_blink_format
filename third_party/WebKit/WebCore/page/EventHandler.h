@@ -67,6 +67,8 @@ extern const int ImageDragHysteresis;
 extern const int TextDragHysteresis;
 extern const int GeneralDragHysteresis;
 
+enum HitTestScrollbars { ShouldHitTestScrollbars, DontHitTestScrollbars };
+
 class EventHandler : Noncopyable {
  public:
   EventHandler(Frame*);
@@ -88,9 +90,11 @@ class EventHandler : Noncopyable {
   RenderObject* autoscrollRenderer() const;
   void updateAutoscrollRenderer();
 
-  HitTestResult hitTestResultAtPoint(const IntPoint&,
-                                     bool allowShadowContent,
-                                     bool ignoreClipping = false);
+  HitTestResult hitTestResultAtPoint(
+      const IntPoint&,
+      bool allowShadowContent,
+      bool ignoreClipping = false,
+      HitTestScrollbars scrollbars = DontHitTestScrollbars);
 
   bool mousePressed() const { return m_mousePressed; }
   void setMousePressed(bool pressed) { m_mousePressed = pressed; }

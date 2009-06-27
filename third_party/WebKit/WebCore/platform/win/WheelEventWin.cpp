@@ -23,8 +23,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
 #include "PlatformWheelEvent.h"
 
+#include "FloatPoint.h"
+#include "FloatSize.h"
 #include <windows.h>
 #include <windowsx.h>
 
@@ -61,23 +64,21 @@ static int verticalScrollLines() {
 }
 
 PlatformWheelEvent::PlatformWheelEvent(HWND hWnd,
-                                       float deltaX,
-                                       float deltaY,
-                                       float xLoc,
-                                       float yLoc)
+                                       const FloatSize& delta,
+                                       const FloatPoint& location)
     : m_isAccepted(false),
       m_shiftKey(false),
       m_ctrlKey(false),
       m_altKey(false),
       m_metaKey(false) {
-  m_deltaX = deltaX;
-  m_deltaY = deltaY;
+  m_deltaX = delta.width();
+  m_deltaY = delta.height();
 
   m_wheelTicksX = m_deltaX;
   m_wheelTicksY = m_deltaY;
 
   // Global Position is just x, y location of event
-  POINT point = {xLoc, yLoc};
+  POINT point = {location.x(), location.y()};
   m_globalPosition = point;
 
   // Position needs to be translated to our client
