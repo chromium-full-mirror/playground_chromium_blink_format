@@ -119,8 +119,9 @@ class QWEBKIT_EXPORT QWebHistory {
 
   friend class QWebPage;
   friend class QWebPagePrivate;
-  friend QDataStream& operator>>(QDataStream&, QWebHistory&);
-  friend QDataStream& operator<<(QDataStream&, const QWebHistory&);
+  friend QWEBKIT_EXPORT QDataStream& operator>>(QDataStream&, QWebHistory&);
+  friend QWEBKIT_EXPORT QDataStream& operator<<(QDataStream&,
+                                                const QWebHistory&);
 
   Q_DISABLE_COPY(QWebHistory)
 
