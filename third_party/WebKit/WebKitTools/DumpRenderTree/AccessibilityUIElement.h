@@ -96,6 +96,7 @@ class AccessibilityUIElement {
   int insertionPointLineNumber();
   JSStringRef selectedTextRange();
   bool supportsPressAction();
+  bool isEnabled();
 
   // Table-specific attributes
   JSStringRef attributesOfColumnHeaders();
