@@ -1289,7 +1289,7 @@ NEVER_INLINE void Interpreter::tryCacheGetByID(CallFrame* callFrame,
 
   StructureChain* protoChain = structure->prototypeChain(callFrame);
   if (!protoChain->isCacheable()) {
-    vPC[0] = getOpcode(op_put_by_id_generic);
+    vPC[0] = getOpcode(op_get_by_id_generic);
     return;
   }
 
