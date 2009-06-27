@@ -157,6 +157,7 @@ bool ScrollView::canBlitOnScroll() const {
   return m_canBlitOnScroll;
 }
 
+#if !PLATFORM(GTK)
 IntRect ScrollView::visibleContentRect(bool includeScrollbars) const {
   if (platformWidget())
     return platformVisibleContentRect(includeScrollbars);
@@ -169,6 +170,7 @@ IntRect ScrollView::visibleContentRect(bool includeScrollbars) const {
                                      ? horizontalScrollbar()->height()
                                      : 0))));
 }
+#endif
 
 int ScrollView::layoutWidth() const {
   return m_fixedLayoutSize.isEmpty() || !m_useFixedLayout
