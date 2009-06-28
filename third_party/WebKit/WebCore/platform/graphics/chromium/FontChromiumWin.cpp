@@ -398,7 +398,9 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
       break;
     }
 
-    ASSERT(success);
+    if (!success)
+      LOG_ERROR("Unable to draw the glyphs after second attempt");
+
     curAdvance += curWidth;
   }
 }
