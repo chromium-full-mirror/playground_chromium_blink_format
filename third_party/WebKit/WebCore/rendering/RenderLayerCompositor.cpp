@@ -61,8 +61,8 @@ namespace WebCore {
 
 struct CompositingState {
   CompositingState(RenderLayer* compAncestor)
-      : m_subtreeIsCompositing(false),
-        m_compositingAncestor(compAncestor)
+      : m_compositingAncestor(compAncestor),
+        m_subtreeIsCompositing(false)
 #ifndef NDEBUG
         ,
         m_depth(0)
@@ -70,8 +70,8 @@ struct CompositingState {
   {
   }
 
-  bool m_subtreeIsCompositing;
   RenderLayer* m_compositingAncestor;
+  bool m_subtreeIsCompositing;
 #ifndef NDEBUG
   int m_depth;
 #endif
@@ -386,16 +386,21 @@ void RenderLayerCompositor::computeCompositingRequirements(
   layer->setMustOverlayCompositedLayers(
       compositingState.m_subtreeIsCompositing);
 
-  const bool willBeComposited = needsToBeComposited(layer);
-
-  CompositingState childState = compositingState;
   // The children of this layer don't need to composite, unless there is
-  // a compositing layer among them, so start by assuming false.
-  childState.m_subtreeIsCompositing = false;
+  // a compositing layer among them, so start by inheriting the compositing
+  // ancestor with m_subtreeIsCompositing set to false.
+  CompositingState childState(compositingState.m_compositingAncestor);
+#ifndef NDEBUG
+  ++childState.m_depth;
+#endif
 
-  // If this layer is compositing, it acts at the ancestor for kids.
-  if (willBeComposited)
+  const bool willBeComposited = needsToBeComposited(layer);
+  if (willBeComposited) {
+    // Tell the parent it has compositing descendants.
+    compositingState.m_subtreeIsCompositing = true;
+    // This layer now acts as the ancestor for kids.
     childState.m_compositingAncestor = layer;
+  }
 
 #if ENABLE(VIDEO)
   // Video is special. It's a replaced element with a content layer, but has
@@ -406,10 +411,6 @@ void RenderLayerCompositor::computeCompositingRequirements(
   // transform).
   if (willBeComposited && layer->renderer()->isVideo())
     childState.m_subtreeIsCompositing = true;
-#endif
-
-#ifndef NDEBUG
-  ++childState.m_depth;
 #endif
 
   if (layer->isStackingContext()) {
