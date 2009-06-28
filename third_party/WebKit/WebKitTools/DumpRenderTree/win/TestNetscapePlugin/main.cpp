@@ -107,6 +107,11 @@ NPError NPP_New(NPMIMEType pluginType,
         obj->onStreamDestroy = _strdup(argv[i]);
       else if (_stricmp(argn[i], "onURLNotify") == 0 && !obj->onURLNotify)
         obj->onURLNotify = _strdup(argv[i]);
+      else if (_stricmp(argn[i], "logSrc") == 0) {
+        for (int i = 0; i < argc; i++)
+          if (_stricmp(argn[i], "src") == 0)
+            pluginLog(instance, "src: %s", argv[i]);
+      }
     }
 
     instance->pdata = obj;
