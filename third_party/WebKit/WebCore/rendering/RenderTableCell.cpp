@@ -932,10 +932,6 @@ void RenderTableCell::paintBackgroundsBehindCell(
   int w = width();
   int h = height();
 
-  int my = max(ty, paintInfo.rect.y());
-  int end = min(paintInfo.rect.bottom(), ty + h);
-  int mh = end - my;
-
   Color c = backgroundObject->style()->backgroundColor();
   const FillLayer* bgLayer = backgroundObject->style()->backgroundLayers();
 
@@ -953,7 +949,7 @@ void RenderTableCell::paintBackgroundsBehindCell(
       paintInfo.context->save();
       paintInfo.context->clip(clipRect);
     }
-    paintFillLayers(paintInfo, c, bgLayer, my, mh, tx, ty, w, h);
+    paintFillLayers(paintInfo, c, bgLayer, tx, ty, w, h);
     if (shouldClip)
       paintInfo.context->restore();
   }
@@ -994,11 +990,7 @@ void RenderTableCell::paintMask(PaintInfo& paintInfo, int tx, int ty) {
   int w = width();
   int h = height();
 
-  int my = max(ty, paintInfo.rect.y());
-  int end = min(paintInfo.rect.bottom(), ty + h);
-  int mh = end - my;
-
-  paintMaskImages(paintInfo, my, mh, tx, ty, w, h);
+  paintMaskImages(paintInfo, tx, ty, w, h);
 }
 
 }  // namespace WebCore

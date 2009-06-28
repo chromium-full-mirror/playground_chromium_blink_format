@@ -745,8 +745,6 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 void InlineFlowBox::paintFillLayers(const RenderObject::PaintInfo& paintInfo,
                                     const Color& c,
                                     const FillLayer* fillLayer,
-                                    int my,
-                                    int mh,
                                     int _tx,
                                     int _ty,
                                     int w,
@@ -754,15 +752,13 @@ void InlineFlowBox::paintFillLayers(const RenderObject::PaintInfo& paintInfo,
                                     CompositeOperator op) {
   if (!fillLayer)
     return;
-  paintFillLayers(paintInfo, c, fillLayer->next(), my, mh, _tx, _ty, w, h, op);
-  paintFillLayer(paintInfo, c, fillLayer, my, mh, _tx, _ty, w, h, op);
+  paintFillLayers(paintInfo, c, fillLayer->next(), _tx, _ty, w, h, op);
+  paintFillLayer(paintInfo, c, fillLayer, _tx, _ty, w, h, op);
 }
 
 void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
                                    const Color& c,
                                    const FillLayer* fillLayer,
-                                   int my,
-                                   int mh,
                                    int tx,
                                    int ty,
                                    int w,
@@ -773,8 +769,8 @@ void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
       img && img->canRender(renderer()->style()->effectiveZoom());
   if ((!hasFillImage && !renderer()->style()->hasBorderRadius()) ||
       (!prevLineBox() && !nextLineBox()) || !parent())
-    boxModelObject()->paintFillLayerExtended(paintInfo, c, fillLayer, my, mh,
-                                             tx, ty, w, h, this, op);
+    boxModelObject()->paintFillLayerExtended(paintInfo, c, fillLayer, tx, ty, w,
+                                             h, this, op);
   else {
     // We have a fill image that spans multiple lines.
     // We need to adjust _tx and _ty by the width of all previous lines.
@@ -797,8 +793,8 @@ void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
       totalWidth += curr->width();
     paintInfo.context->save();
     paintInfo.context->clip(IntRect(tx, ty, width(), height()));
-    boxModelObject()->paintFillLayerExtended(
-        paintInfo, c, fillLayer, my, mh, startX, ty, totalWidth, h, this, op);
+    boxModelObject()->paintFillLayerExtended(paintInfo, c, fillLayer, startX,
+                                             ty, totalWidth, h, this, op);
     paintInfo.context->restore();
   }
 }
@@ -836,13 +832,6 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
   int w = width();
   int h = height();
 
-  int my = max(ty, paintInfo.rect.y());
-  int mh;
-  if (ty < paintInfo.rect.y())
-    mh = max(0, h - (paintInfo.rect.y() - ty));
-  else
-    mh = min(paintInfo.rect.height(), h);
-
   GraphicsContext* context = paintInfo.context;
 
   // You can use p::first-line to specify a background. If so, the root line
@@ -856,8 +845,7 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
       paintBoxShadow(context, styleToUse, tx, ty, w, h);
 
     Color c = styleToUse->backgroundColor();
-    paintFillLayers(paintInfo, c, styleToUse->backgroundLayers(), my, mh, tx,
-                    ty, w, h);
+    paintFillLayers(paintInfo, c, styleToUse->backgroundLayers(), tx, ty, w, h);
 
     // :first-line cannot be used to put borders on a line. Always paint borders
     // with our
@@ -922,13 +910,6 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
   int w = width();
   int h = height();
 
-  int my = max(ty, paintInfo.rect.y());
-  int mh;
-  if (ty < paintInfo.rect.y())
-    mh = max(0, h - (paintInfo.rect.y() - ty));
-  else
-    mh = min(paintInfo.rect.height(), h);
-
   // Figure out if we need to push a transparency layer to render our mask.
   bool pushTransparencyLayer = false;
   const NinePieceImage& maskNinePieceImage =
@@ -945,8 +926,8 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
     compositeOp = CompositeSourceOver;
   }
 
-  paintFillLayers(paintInfo, Color(), renderer()->style()->maskLayers(), my, mh,
-                  tx, ty, w, h, compositeOp);
+  paintFillLayers(paintInfo, Color(), renderer()->style()->maskLayers(), tx, ty,
+                  w, h, compositeOp);
 
   bool hasBoxImage =
       maskBoxImage &&
