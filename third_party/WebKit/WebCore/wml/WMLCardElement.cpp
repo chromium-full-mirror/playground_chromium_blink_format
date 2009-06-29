@@ -35,6 +35,7 @@
 #include "WMLInputElement.h"
 #include "WMLIntrinsicEventHandler.h"
 #include "WMLNames.h"
+#include "WMLSelectElement.h"
 #include "WMLTemplateElement.h"
 #include "WMLTimerElement.h"
 #include "WMLVariables.h"
@@ -158,7 +159,6 @@ void WMLCardElement::handleIntrinsicEventIfNeeded() {
   if (m_eventTimer)
     m_eventTimer->start();
 
-  // FIXME: Initialize select elements in this card
   for (Node* node = traverseNextNode(); node != 0;
        node = node->traverseNextNode()) {
     if (!node->isElementNode())
@@ -166,10 +166,8 @@ void WMLCardElement::handleIntrinsicEventIfNeeded() {
 
     if (node->hasTagName(inputTag))
       static_cast<WMLInputElement*>(node)->initialize();
-    /*
     else if (node->hasTagName(selectTag))
-        static_cast<WMLSelectElement*>(node)->selectInitialOptions();
-    */
+      static_cast<WMLSelectElement*>(node)->selectInitialOptions();
   }
 }
 

@@ -130,6 +130,7 @@ class SelectElement {
   static void accessKeySetSelectedIndex(SelectElementData&,
                                         Element*,
                                         int index);
+  static unsigned optionCount(const SelectElementData&, const Element*);
 
  private:
   static void menuListDefaultEventHandler(SelectElementData&,
