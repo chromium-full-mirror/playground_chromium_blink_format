@@ -115,7 +115,8 @@ static v8::Handle<v8::Value> nodeCollectionNamedPropertyGetter(
   // properties.
   if (info.Holder()->HasRealNamedCallbackProperty(name))
     return notHandledByInterceptor();
-  Collection* collection = V8Proxy::DOMWrapperToNode<Collection>(info.Holder());
+  Collection* collection =
+      V8Proxy::convertDOMWrapperToNode<Collection>(info.Holder());
   String propertyName = toWebCoreString(name);
   void* implementation = collection->namedItem(propertyName);
   return getV8Object(implementation, info.Data());

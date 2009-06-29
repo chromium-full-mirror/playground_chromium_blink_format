@@ -2245,19 +2245,16 @@ void V8Proxy::setDOMException(int exceptionCode) {
                             SVGException::create(description));
       break;
 #endif
-    default:
-      ASSERT_NOT_REACHED();
-      break;
 #if ENABLE(XPATH)
     case XPathExceptionType:
       exception = convertToV8Object(V8ClassIndex::XPATHEXCEPTION,
                                     XPathException::create(description));
       break;
 #endif
+    default:
+      ASSERT_NOT_REACHED();
+      break;
   }
-
-  ASSERT(!exception.IsEmpty());
-  v8::ThrowException(exception);
 }
 
 v8::Handle<v8::Value> V8Proxy::throwError(ErrorType type, const char* message) {
