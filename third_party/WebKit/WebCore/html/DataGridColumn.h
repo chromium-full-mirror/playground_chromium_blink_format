@@ -44,8 +44,8 @@ class DataGridColumn : public RefCounted<DataGridColumn> {
                                            const String& type,
                                            bool primary,
                                            unsigned short sortable) {
-    return new DataGridColumn(columns, columnID, label, type, primary,
-                              sortable);
+    return adoptRef(
+        new DataGridColumn(columns, columnID, label, type, primary, sortable));
   }
 
   const AtomicString& id() const { return m_id; }
