@@ -63,6 +63,11 @@ void ContextMenuClientQt::speak(const String&) {
   notImplemented();
 }
 
+bool ContextMenuClientQt::isSpeaking() {
+  notImplemented();
+  return false;
+}
+
 void ContextMenuClientQt::stopSpeaking() {
   notImplemented();
 }
