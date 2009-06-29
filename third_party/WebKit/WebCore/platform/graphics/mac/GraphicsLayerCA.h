@@ -109,6 +109,9 @@ class GraphicsLayerCA : public GraphicsLayer {
   virtual void setZPosition(float);
 #endif
 
+  virtual void setGeometryOrientation(CompositingCoordinatesOrientation);
+  virtual CompositingCoordinatesOrientation geometryOrientation() const;
+
  private:
   WebLayer* primaryLayer() const {
     return m_transformLayer.get() ? m_transformLayer.get() : m_layer.get();
