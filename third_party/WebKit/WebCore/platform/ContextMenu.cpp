@@ -28,6 +28,7 @@
 #include "ContextMenu.h"
 
 #include "ContextMenuController.h"
+#include "ContextMenuClient.h"
 #include "CSSComputedStyleDeclaration.h"
 #include "CSSProperty.h"
 #include "CSSPropertyNames.h"
@@ -413,6 +414,14 @@ void ContextMenu::populate() {
 #endif
         }
         appendItem(CopyItem);
+#if PLATFORM(MAC)
+        appendItem(*separatorItem());
+        ContextMenuItem SpeechMenuItem(SubmenuType,
+                                       ContextMenuItemTagSpeechMenu,
+                                       contextMenuItemTagSpeechMenu());
+        createAndAppendSpeechSubMenu(m_hitTestResult, SpeechMenuItem);
+        appendItem(SpeechMenuItem);
+#endif
       } else {
 #if PLATFORM(GTK)
         appendItem(BackItem);
@@ -813,7 +822,11 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
       shouldCheck = frame->editor()->isAutomaticTextReplacementEnabled();
 #endif
       break;
-#endif
+    case ContextMenuItemTagStopSpeaking:
+      shouldEnable = controller() && controller()->client() &&
+                     controller()->client()->isSpeaking();
+      break;
+#endif  // PLATFORM(MAC)
 #if PLATFORM(GTK)
     case ContextMenuItemTagGoBack:
       shouldEnable = frame->loader()->canGoBackOrForward(-1);
@@ -867,7 +880,6 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
     case ContextMenuItemTagShowColors:
     case ContextMenuItemTagSpeechMenu:
     case ContextMenuItemTagStartSpeaking:
-    case ContextMenuItemTagStopSpeaking:
     case ContextMenuItemTagWritingDirectionMenu:
     case ContextMenuItemTagTextDirectionMenu:
     case ContextMenuItemTagPDFSinglePageScrolling:
