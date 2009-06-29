@@ -121,9 +121,20 @@ HDC WINAPI PluginView::hookedBeginPaint(HWND hWnd, PAINTSTRUCT* lpPaint) {
     return pluginView->m_wmPrintHDC;
   }
 
+#if COMPILER(GCC)
+  HDC result;
+  asm("push    %2\n"
+      "push    %3\n"
+      "call    *%4\n"
+      : "=a"(result)
+      : "a"(beginPaintSysCall), "g"(lpPaint), "g"(hWnd), "m"(*beginPaint)
+      : "memory");
+  return result;
+#else
   // Call through to the original BeginPaint.
   __asm mov eax,
       beginPaintSysCall __asm push lpPaint __asm push hWnd __asm call beginPaint
+#endif
 }
 
 BOOL WINAPI PluginView::hookedEndPaint(HWND hWnd, const PAINTSTRUCT* lpPaint) {
@@ -135,9 +146,19 @@ BOOL WINAPI PluginView::hookedEndPaint(HWND hWnd, const PAINTSTRUCT* lpPaint) {
     return TRUE;
   }
 
+#if COMPILER(GCC)
+  BOOL result;
+  asm("push   %2\n"
+      "push   %3\n"
+      "call   *%4\n"
+      : "=a"(result)
+      : "a"(endPaintSysCall), "g"(lpPaint), "g"(hWnd), "g"(*endPaint));
+  return result;
+#else
   // Call through to the original EndPaint.
   __asm mov eax,
       endPaintSysCall __asm push lpPaint __asm push hWnd __asm call endPaint
+#endif
 }
 
 static void hook(const char* module,
@@ -150,7 +171,8 @@ static void hook(const char* module,
 
   HINSTANCE hMod = GetModuleHandleA(module);
 
-  pProc = reinterpret_cast<BYTE*>(GetProcAddress(hMod, proc));
+  pProc = reinterpret_cast<BYTE*>(
+      reinterpret_cast<ptrdiff_t>(GetProcAddress(hMod, proc)));
 
   if (pProc[0] != 0xB8)
     return;
@@ -184,8 +206,11 @@ static void setUpOffscreenPaintingHooks(
   // to draw into a given HDC. Note that this hooking affects the entire
   // process.
   hook("user32.dll", "BeginPaint", beginPaintSysCall, beginPaint,
-       hookedBeginPaint);
-  hook("user32.dll", "EndPaint", endPaintSysCall, endPaint, hookedEndPaint);
+       reinterpret_cast<const void*>(
+           reinterpret_cast<ptrdiff_t>(hookedBeginPaint)));
+  hook("user32.dll", "EndPaint", endPaintSysCall, endPaint,
+       reinterpret_cast<const void*>(
+           reinterpret_cast<ptrdiff_t>(hookedEndPaint)));
 }
 
 static bool registerPluginView() {
