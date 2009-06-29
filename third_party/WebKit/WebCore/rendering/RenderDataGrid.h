@@ -26,6 +26,8 @@
 #ifndef RenderDataGrid_h
 #define RenderDataGrid_h
 
+#if ENABLE(DATAGRID)
+
 #include "HTMLDataGridElement.h"
 #include "RenderBlock.h"
 #include "ScrollbarClient.h"
@@ -70,5 +72,7 @@ class RenderDataGrid : public RenderBlock, private ScrollbarClient {
   RefPtr<Scrollbar> m_vBar;
 };
 }
+
+#endif
 
 #endif  // RenderDataGrid_h

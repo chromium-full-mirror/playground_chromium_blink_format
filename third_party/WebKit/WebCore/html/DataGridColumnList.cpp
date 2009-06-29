@@ -24,6 +24,9 @@
  */
 
 #include "config.h"
+
+#if ENABLE(DATAGRID)
+
 #include "DataGridColumnList.h"
 
 #include "AtomicString.h"
@@ -95,3 +98,5 @@ void DataGridColumnList::primaryColumnChanged(DataGridColumn* col) {
 }
 
 }  // namespace WebCore
+
+#endif

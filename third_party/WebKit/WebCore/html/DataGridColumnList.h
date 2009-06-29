@@ -1,6 +1,8 @@
 #ifndef DataGridColumnList_h
 #define DataGridColumnList_h
 
+#if ENABLE(DATAGRID)
+
 #include "DataGridColumn.h"
 
 #include <wtf/PassRefPtr.h>
@@ -48,5 +50,7 @@ class DataGridColumnList : public RefCounted<DataGridColumnList> {
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // DataGridColumnList_h

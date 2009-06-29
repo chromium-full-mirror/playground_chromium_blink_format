@@ -24,6 +24,8 @@
  */
 
 #include "config.h"
+
+#if ENABLE(DATAGRID)
 #include "HTMLDataGridElement.h"
 
 #include "HTMLNames.h"
@@ -94,3 +96,5 @@ void HTMLDataGridElement::initializationTimerFired(
 }
 
 }  // namespace WebCore
+
+#endif

@@ -24,6 +24,9 @@
  */
 
 #include "config.h"
+
+#if ENABLE(DATAGRID)
+
 #include "HTMLDataGridColElement.h"
 
 #include "HTMLNames.h"
@@ -89,3 +92,5 @@ void HTMLDataGridColElement::setPrimary(bool primary) {
 }
 
 }  // namespace WebCore
+
+#endif

@@ -26,6 +26,8 @@
 #ifndef HTMLDataGridElement_h
 #define HTMLDataGridElement_h
 
+#if ENABLE(DATAGRID)
+
 #include "DataGridColumnList.h"
 #include "DataGridDataSource.h"
 #include "HTMLElement.h"
@@ -67,5 +69,7 @@ class HTMLDataGridElement : public HTMLElement {
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // HTMLDataGridElement_h

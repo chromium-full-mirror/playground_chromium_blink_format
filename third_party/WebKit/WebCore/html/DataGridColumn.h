@@ -26,6 +26,8 @@
 #ifndef DataGridColumn_h
 #define DataGridColumn_h
 
+#if ENABLE(DATAGRID)
+
 #include "AtomicString.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -97,5 +99,7 @@ class DataGridColumn : public RefCounted<DataGridColumn> {
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // DataGridColumn_h

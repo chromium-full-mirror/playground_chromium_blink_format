@@ -24,6 +24,9 @@
  */
 
 #include "config.h"
+
+#if ENABLE(DATAGRID)
+
 #include "RenderDataGrid.h"
 
 #include "FocusController.h"
@@ -112,3 +115,5 @@ bool RenderDataGrid::isActive() const {
   return page && page->focusController()->isActive();
 }
 }
+
+#endif

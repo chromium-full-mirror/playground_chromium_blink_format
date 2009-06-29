@@ -26,6 +26,8 @@
 #ifndef HTMLDataGridCellElement_h
 #define HTMLDataGridCellElement_h
 
+#if ENABLE(DATAGRID)
+
 #include "HTMLElement.h"
 
 namespace WebCore {
@@ -54,5 +56,7 @@ class HTMLDataGridCellElement : public HTMLElement {
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // HTMLDataGridCellElement_h
