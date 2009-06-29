@@ -94,10 +94,6 @@ class WorkerContextExecutionProxy {
   // worker context.
   static WorkerContextExecutionProxy* retrieve();
 
-  // Enables HTML5 worker support.
-  static bool isWebWorkersEnabled();
-  static void setIsWebWorkersEnabled(bool);
-
  private:
   void initV8IfNeeded();
   void initContextIfNeeded();
