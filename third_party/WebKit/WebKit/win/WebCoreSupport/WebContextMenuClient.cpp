@@ -162,3 +162,8 @@ void WebContextMenuClient::speak(const String&) {
 void WebContextMenuClient::stopSpeaking() {
   notImplemented();
 }
+
+bool WebContextMenuClient::isSpeaking() {
+  notImplemented();
+  return false;
+}
