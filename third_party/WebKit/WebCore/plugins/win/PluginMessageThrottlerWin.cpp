@@ -91,10 +91,16 @@ void PluginMessageThrottlerWin::messageThrottleTimerFired(
   ::CallWindowProc(m_pluginView->pluginWndProc(), message->hWnd, message->msg,
                    message->wParam, message->lParam);
 
-  freeMessage(message);
+  // the PluginView could have been deleted during execution of its wndProc.
+    if (!::IsWindow(message->hWnd) {
+    delete message;
+    return;
+    }
 
-  if (m_front)
-    m_messageThrottleTimer.startOneShot(MessageThrottleTimeInterval);
+    freeMessage(message);
+
+    if (m_front)
+        m_messageThrottleTimer.startOneShot(MessageThrottleTimeInterval);
 }
 
 PluginMessage* PluginMessageThrottlerWin::allocateMessage() {
