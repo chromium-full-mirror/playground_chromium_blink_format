@@ -459,6 +459,15 @@ bool MediaPlayer::supportsAcceleratedRendering() const {
 }
 #endif  // USE(ACCELERATED_COMPOSITING)
 
+bool MediaPlayer::hasSingleSecurityOrigin() const {
+  return m_private->hasSingleSecurityOrigin();
+}
+
+MediaPlayer::MovieLoadType MediaPlayer::movieLoadType() const {
+  return m_private->movieLoadType();
+}
+
+// Client callbacks.
 void MediaPlayer::networkStateChanged() {
   if (m_mediaPlayerClient)
     m_mediaPlayerClient->mediaPlayerNetworkStateChanged(this);
@@ -498,9 +507,6 @@ void MediaPlayer::rateChanged() {
   if (m_mediaPlayerClient)
     m_mediaPlayerClient->mediaPlayerRateChanged(this);
 }
+}
 
-bool MediaPlayer::hasSingleSecurityOrigin() const {
-  return m_private->hasSingleSecurityOrigin();
-}
-}
 #endif

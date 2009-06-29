@@ -185,6 +185,9 @@ class MediaPlayer : Noncopyable {
   };
   ReadyState readyState();
 
+  enum MovieLoadType { Unknown, Download, StoredStream, LiveStream };
+  MovieLoadType movieLoadType() const;
+
   void networkStateChanged();
   void readyStateChanged();
   void volumeChanged();

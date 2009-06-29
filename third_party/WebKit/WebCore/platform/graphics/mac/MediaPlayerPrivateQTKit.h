@@ -68,8 +68,6 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   void timeChanged();
   void didEnd();
 
-  bool hasSingleSecurityOrigin() const;
-
  private:
   MediaPlayerPrivate(MediaPlayer*);
 
@@ -122,6 +120,9 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   bool supportsAcceleratedRendering() const;
   void acceleratedRenderingStateChanged();
 #endif
+
+  bool hasSingleSecurityOrigin() const;
+  MediaPlayer::MovieLoadType movieLoadType() const;
 
   void createQTMovie(const String& url);
   void createQTMovie(NSURL*, NSDictionary* movieAttributes);

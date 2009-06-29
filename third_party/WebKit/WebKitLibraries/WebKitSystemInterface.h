@@ -221,6 +221,15 @@ void WKGetWheelEventDeltas(NSEvent*,
 
 BOOL WKAppVersionCheckLessThan(NSString*, int, double);
 
+typedef enum {
+  WKMovieTypeUnknown,
+  WKMovieTypeDownload,
+  WKMovieTypeStoredStream,
+  WKMovieTypeLiveStream
+} WKMovieType;
+
+int WKQTMovieGetType(QTMovie* movie);
+
 unsigned WKQTIncludeOnlyModernMediaFileTypes(void);
 int WKQTMovieDataRate(QTMovie* movie);
 float WKQTMovieMaxTimeLoaded(QTMovie* movie);
