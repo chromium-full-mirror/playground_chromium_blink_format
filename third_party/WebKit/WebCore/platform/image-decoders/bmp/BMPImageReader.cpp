@@ -42,7 +42,6 @@ BMPImageReader::BMPImageReader(ImageDecoder* parent,
       m_decodedOffset(decodedAndHeaderOffset),
       m_headerOffset(decodedAndHeaderOffset),
       m_imgDataOffset(imgDataOffset),
-      m_andMaskState(usesAndMask ? NotYetDecoded : None),
       m_isOS21x(false),
       m_isOS22x(false),
       m_isTopDown(false),
@@ -50,7 +49,8 @@ BMPImageReader::BMPImageReader(ImageDecoder* parent,
       m_needToProcessColorTable(false),
       m_tableSizeInBytes(0),
       m_seenNonZeroAlphaPixel(false),
-      m_seenZeroAlphaPixel(false) {
+      m_seenZeroAlphaPixel(false),
+      m_andMaskState(usesAndMask ? NotYetDecoded : None) {
   // Clue-in decodeBMP() that we need to detect the correct info header size.
   memset(&m_infoHeader, 0, sizeof(m_infoHeader));
 }
