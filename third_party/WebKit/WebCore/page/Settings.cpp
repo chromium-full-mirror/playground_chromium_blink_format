@@ -78,6 +78,7 @@ Settings::Settings(Page* page)
       ,
       m_needsAdobeFrameReloadingQuirk(false),
       m_needsKeyboardEventDisambiguationQuirks(false),
+      m_treatsAnyTextCSSLinkAsStylesheet(false),
       m_needsLeopardMailQuirks(false),
       m_needsTigerMailQuirks(false),
       m_isDOMPasteAllowed(false),
@@ -300,6 +301,11 @@ void Settings::setNeedsAdobeFrameReloadingQuirk(
 // and getting keypress dispatched in more cases.
 void Settings::setNeedsKeyboardEventDisambiguationQuirks(bool needsQuirks) {
   m_needsKeyboardEventDisambiguationQuirks = needsQuirks;
+}
+
+void Settings::setTreatsAnyTextCSSLinkAsStylesheet(
+    bool treatsAnyTextCSSLinkAsStylesheet) {
+  m_treatsAnyTextCSSLinkAsStylesheet = treatsAnyTextCSSLinkAsStylesheet;
 }
 
 void Settings::setNeedsLeopardMailQuirks(bool needsQuirks) {
