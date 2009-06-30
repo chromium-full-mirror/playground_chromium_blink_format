@@ -34,12 +34,14 @@
 #include "WorkerLoaderProxy.h"
 #include "WorkerObjectProxy.h"
 #include <wtf/Noncopyable.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
 
+class MessagePortChannel;
 class ScriptExecutionContext;
 class String;
 class Worker;
@@ -58,13 +60,15 @@ class WorkerMessagingProxy : public WorkerContextProxy,
                                   const String& userAgent,
                                   const String& sourceCode);
   virtual void terminateWorkerContext();
-  virtual void postMessageToWorkerContext(const String& message);
+  virtual void postMessageToWorkerContext(const String&,
+                                          PassOwnPtr<MessagePortChannel>);
   virtual bool hasPendingActivity() const;
   virtual void workerObjectDestroyed();
 
   // Implementations of WorkerObjectProxy.
   // (Only use these methods in the worker context thread.)
-  virtual void postMessageToWorkerObject(const String& message);
+  virtual void postMessageToWorkerObject(const String&,
+                                         PassOwnPtr<MessagePortChannel>);
   virtual void postExceptionToWorkerObject(const String& errorMessage,
                                            int lineNumber,
                                            const String& sourceURL);

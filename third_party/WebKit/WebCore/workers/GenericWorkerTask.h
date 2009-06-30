@@ -36,6 +36,7 @@
 #include "CrossThreadCopier.h"
 #include "ScriptExecutionContext.h"
 #include <memory>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/TypeTraits.h>
 
@@ -60,6 +61,11 @@ struct GenericWorkerTaskTraits<std::auto_ptr<T>> {
 template <typename T>
 struct GenericWorkerTaskTraits<PassRefPtr<T>> {
   typedef PassRefPtr<T> ParamType;
+};
+
+template <typename T>
+struct GenericWorkerTaskTraits<PassOwnPtr<T>> {
+  typedef PassOwnPtr<T> ParamType;
 };
 
 template <typename P1, typename MP1>

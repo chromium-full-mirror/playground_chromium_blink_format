@@ -107,7 +107,8 @@ class WorkerContext : public RefCounted<WorkerContext>,
   WorkerNavigator* navigator() const;
 
   // DedicatedWorkerGlobalScope
-  void postMessage(const String& message);
+  void postMessage(const String&, ExceptionCode&);
+  void postMessage(const String&, MessagePort*, ExceptionCode&);
   void setOnmessage(PassRefPtr<EventListener> eventListener) {
     m_onmessageListener = eventListener;
   }
@@ -132,7 +133,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
   typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
   EventListenersMap& eventListeners() { return m_eventListeners; }
 
-  void dispatchMessage(const String&);
+  void dispatchMessage(const String&, PassRefPtr<MessagePort>);
 
   // These methods are used for GC marking. See JSWorkerContext::mark() in
   // JSWorkerContextCustom.cpp.

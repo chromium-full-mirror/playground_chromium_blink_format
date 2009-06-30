@@ -83,8 +83,19 @@ Worker::~Worker() {
   m_contextProxy->workerObjectDestroyed();
 }
 
-void Worker::postMessage(const String& message) {
-  m_contextProxy->postMessageToWorkerContext(message);
+void Worker::postMessage(const String& message, ExceptionCode& ec) {
+  postMessage(message, 0, ec);
+}
+
+void Worker::postMessage(const String& message,
+                         MessagePort* messagePort,
+                         ExceptionCode& ec) {
+  // Disentangle the port in preparation for sending it to the remote context.
+  OwnPtr<MessagePortChannel> channel =
+      messagePort ? messagePort->disentangle(ec) : 0;
+  if (ec)
+    return;
+  m_contextProxy->postMessageToWorkerContext(message, channel.release());
 }
 
 void Worker::terminate() {
@@ -187,8 +198,9 @@ bool Worker::dispatchEvent(PassRefPtr<Event> event, ExceptionCode& ec) {
   return !event->defaultPrevented();
 }
 
-void Worker::dispatchMessage(const String& message) {
-  RefPtr<Event> evt = MessageEvent::create(message, "", "", 0, 0);
+void Worker::dispatchMessage(const String& message,
+                             PassRefPtr<MessagePort> port) {
+  RefPtr<Event> evt = MessageEvent::create(message, "", "", 0, port);
 
   if (m_onMessageListener.get()) {
     evt->setTarget(this);
