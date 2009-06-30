@@ -37,6 +37,7 @@ class DataGridColumnList : public RefCounted<DataGridColumnList> {
                       const String& type,
                       bool primary,
                       unsigned short sortable);
+  DataGridColumn* add(DataGridColumn*);
   void remove(DataGridColumn*);
   void move(DataGridColumn*, unsigned long index);
   void clear();
