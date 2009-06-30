@@ -436,22 +436,6 @@ QMenu* QWebPagePrivate::createContextMenu(
 }
 #endif  // QT_NO_CONTEXTMENU
 
-QWebFrame* QWebPagePrivate::frameAt(const QPoint& pos) const {
-  QWebFrame* frame = mainFrame;
-
-redo:
-  QList<QWebFrame*> children = frame->childFrames();
-  for (int i = 0; i < children.size(); ++i) {
-    if (children.at(i)->geometry().contains(pos)) {
-      frame = children.at(i);
-      goto redo;
-    }
-  }
-  if (frame->geometry().contains(pos))
-    return frame;
-  return 0;
-}
-
 void QWebPagePrivate::_q_webActionTriggered(bool checked) {
   QAction* a = qobject_cast<QAction*>(q->sender());
   if (!a)
@@ -1372,6 +1356,19 @@ QWebFrame* QWebPage::currentFrame() const {
 }
 
 /*!
+    Returns the frame at the given point.
+
+    \sa mainFrame(), currentFrame()
+*/
+QWebFrame* QWebPage::frameAt(const QPoint& pos) const {
+  QWebFrame* webFrame = mainFrame();
+  if (!webFrame->geometry().contains(pos))
+    return 0;
+  QWebHitTestResult hitTestResult = webFrame->hitTestContent(pos);
+  return hitTestResult.frame();
+}
+
+/*!
     Returns a pointer to the view's history of navigated web pages.
 */
 QWebHistory* QWebPage::history() const {
@@ -2260,7 +2257,7 @@ QWebPage::LinkDelegationPolicy QWebPage::linkDelegationPolicy() const {
 bool QWebPage::swallowContextMenuEvent(QContextMenuEvent* event) {
   d->page->contextMenuController()->clearContextMenu();
 
-  if (QWebFrame* webFrame = d->frameAt(event->pos())) {
+  if (QWebFrame* webFrame = frameAt(event->pos())) {
     Frame* frame = QWebFramePrivate::core(webFrame);
     if (Scrollbar* scrollbar = frame->view()->scrollbarUnderPoint(
             PlatformMouseEvent(event, 1).pos())) {

@@ -76,9 +76,6 @@ class QWebPagePrivate {
                            const QList<WebCore::ContextMenuItem>* items,
                            QBitArray* visitedWebActions);
 #endif
-
-  QWebFrame* frameAt(const QPoint& pos) const;
-
   void _q_onLoadProgressChanged(int);
   void _q_webActionTriggered(bool checked);
 #ifndef NDEBUG
