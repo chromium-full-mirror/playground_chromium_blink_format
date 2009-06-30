@@ -363,7 +363,7 @@ class GCPrologueVisitor : public DOMWrapperMap<void>::Visitor {
       if (port1->isEntangled() && !port2)
         wrapper.ClearWeak();
 
-      if (!port2) {
+      if (port2) {
         // As ports are always entangled in pairs only perform the entanglement
         // once for each pair (see ASSERT in MessagePort::unentangle()).
         if (port1 < port2) {
