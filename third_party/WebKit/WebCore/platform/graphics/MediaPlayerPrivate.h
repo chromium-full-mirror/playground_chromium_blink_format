@@ -87,6 +87,11 @@ class MediaPlayerPrivateInterface {
 
   virtual void paint(GraphicsContext*, const IntRect&) = 0;
 
+  virtual void paintCurrentFrameInContext(GraphicsContext* c,
+                                          const IntRect& r) {
+    paint(c, r);
+  }
+
   virtual void setAutobuffer(bool){};
 
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)

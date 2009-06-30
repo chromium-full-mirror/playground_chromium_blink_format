@@ -1146,7 +1146,7 @@ void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
   c->scale(FloatSize(destRect.width() / sourceRect.width(),
                      destRect.height() / sourceRect.height()));
   c->translate(-sourceRect.x(), -sourceRect.y());
-  video->paint(c, IntRect(IntPoint(), size(video)));
+  video->paintCurrentFrameInContext(c, IntRect(IntPoint(), size(video)));
   c->restore();
 }
 #endif

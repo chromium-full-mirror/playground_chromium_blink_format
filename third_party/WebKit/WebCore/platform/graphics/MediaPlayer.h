@@ -164,6 +164,7 @@ class MediaPlayer : Noncopyable {
   void setAutobuffer(bool);
 
   void paint(GraphicsContext*, const IntRect&);
+  void paintCurrentFrameInContext(GraphicsContext*, const IntRect&);
 
   enum NetworkState {
     Empty,

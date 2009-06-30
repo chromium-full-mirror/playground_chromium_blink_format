@@ -115,6 +115,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   void setSize(const IntSize&);
 
   void paint(GraphicsContext*, const IntRect&);
+  void paintCurrentFrameInContext(GraphicsContext*, const IntRect&);
 
 #if USE(ACCELERATED_COMPOSITING)
   bool supportsAcceleratedRendering() const;
@@ -143,7 +144,11 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   void createQTMovieView();
   void detachQTMovieView();
 
-  void createQTVideoRenderer();
+  enum QTVideoRendererMode {
+    QTVideoRendererModeDefault,
+    QTVideoRendererModeListensForNewImages
+  };
+  void createQTVideoRenderer(QTVideoRendererMode rendererMode);
   void destroyQTVideoRenderer();
 
   void createQTMovieLayer();
