@@ -124,7 +124,7 @@ void RenderLayerBacking::updateLayerTransform() {
   m_graphicsLayer->setTransform(t);
 }
 
-void RenderLayerBacking::updateAfterLayout() {
+void RenderLayerBacking::updateAfterLayout(UpdateDepth updateDepth) {
   RenderLayerCompositor* layerCompositor = compositor();
   if (!layerCompositor->compositingLayersNeedUpdate()) {
     // Calling updateGraphicsLayerGeometry() here gives incorrect results,
@@ -140,8 +140,8 @@ void RenderLayerBacking::updateAfterLayout() {
     // via updateCompositingChildrenGeometry().
     setCompositedBounds(layerCompositor->calculateCompositedBounds(
         m_owningLayer, m_owningLayer));
-    layerCompositor->updateCompositingChildrenGeometry(m_owningLayer,
-                                                       m_owningLayer);
+    layerCompositor->updateCompositingDescendantGeometry(
+        m_owningLayer, m_owningLayer, updateDepth);
 
     if (!m_owningLayer->parent())
       layerCompositor->updateRootLayerPosition();

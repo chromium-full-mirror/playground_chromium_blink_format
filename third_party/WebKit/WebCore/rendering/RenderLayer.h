@@ -319,10 +319,11 @@ class RenderLayer : public ScrollbarClient {
   enum UpdateLayerPositionsFlag {
     DoFullRepaint = 1,
     CheckForRepaint = 1 << 1,
-    FullUpdate = 1 << 2,
+    UpdateCompositingLayers = 1 << 2,
   };
   typedef unsigned UpdateLayerPositionsFlags;
-  void updateLayerPositions(UpdateLayerPositionsFlags = DoFullRepaint);
+  void updateLayerPositions(
+      UpdateLayerPositionsFlags = DoFullRepaint | UpdateCompositingLayers);
 
   void updateTransform();
 

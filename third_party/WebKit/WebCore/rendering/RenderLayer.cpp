@@ -319,8 +319,8 @@ void RenderLayer::updateLayerPositions(UpdateLayerPositionsFlags flags) {
     child->updateLayerPositions(flags);
 
 #if USE(ACCELERATED_COMPOSITING)
-  if (isComposited())
-    backing()->updateAfterLayout();
+  if ((flags & UpdateCompositingLayers) && isComposited())
+    backing()->updateAfterLayout(RenderLayerBacking::CompositingChildren);
 #endif
 
   // With all our children positioned, now update our marquee if we need to.
@@ -1093,14 +1093,18 @@ void RenderLayer::scrollToOffset(int x,
   m_scrollX = newScrollX;
   m_scrollY = y;
 
-  // Update the positions of our child layers.
+  // Update the positions of our child layers. Don't have updateLayerPositions()
+  // update
+  // compositing layers, because we need to do a deep update from the
+  // compositing ancestor.
   for (RenderLayer* child = firstChild(); child; child = child->nextSibling())
     child->updateLayerPositions(0);
 
 #if USE(ACCELERATED_COMPOSITING)
   if (compositor()->inCompositingMode()) {
     if (RenderLayer* compositingAncestor = ancestorCompositingLayer())
-      compositingAncestor->backing()->updateAfterLayout();
+      compositingAncestor->backing()->updateAfterLayout(
+          RenderLayerBacking::AllDescendants);
   }
 #endif
 
