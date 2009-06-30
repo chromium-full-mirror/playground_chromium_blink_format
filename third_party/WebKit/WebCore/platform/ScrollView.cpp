@@ -666,7 +666,7 @@ void ScrollView::setScrollbarsSuppressed(bool suppressed,
   }
 }
 
-Scrollbar* ScrollView::scrollbarUnderPoint(const IntPoint& windowPoint) {
+Scrollbar* ScrollView::scrollbarAtPoint(const IntPoint& windowPoint) {
   if (platformWidget())
     return 0;
 

@@ -236,7 +236,7 @@ class ScrollView : public Widget, public ScrollbarClient {
 
   // For platforms that need to hit test scrollbars from within the engine's
   // event handlers (like Win32).
-  Scrollbar* scrollbarUnderPoint(const IntPoint& windowPoint);
+  Scrollbar* scrollbarAtPoint(const IntPoint& windowPoint);
 
   // This method exists for scrollviews that need to handle wheel events
   // manually.
