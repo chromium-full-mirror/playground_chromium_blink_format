@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Google Inc. All rights reserved.
+ * Copyright (C) 2009 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -55,10 +55,17 @@ class PtrAndFlags {
   void set(T* ptr) {
     ASSERT(!(reinterpret_cast<intptr_t>(ptr) & 3));
     m_ptrAndFlags = reinterpret_cast<intptr_t>(ptr) | (m_ptrAndFlags & 3);
+#ifndef NDEBUG
+    m_leaksPtr = ptr;
+#endif
   }
 
  private:
   intptr_t m_ptrAndFlags;
+#ifndef NDEBUG
+  void* m_leaksPtr;  // Only used to allow tools like leaks on OSX to detect
+                     // that the memory is referenced.
+#endif
 };
 }  // namespace WTF
 
