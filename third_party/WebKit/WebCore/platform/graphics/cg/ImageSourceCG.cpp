@@ -83,7 +83,7 @@ static CFDictionaryRef imageSourceOptions() {
   static CFDictionaryRef options;
 
   if (!options) {
-    unsigned numOptions = 2;
+    const unsigned numOptions = 2;
     const void* keys[numOptions] = {kCGImageSourceShouldCache,
                                     kCGImageSourceShouldPreferRGB32};
     const void* values[numOptions] = {kCFBooleanTrue, kCFBooleanTrue};
