@@ -27,12 +27,16 @@
 
 #if ENABLE(DATAGRID)
 
-#include "DataGridColumnList.h"
-
 #include "AtomicString.h"
+#include "DataGridColumnList.h"
+#include "HTMLDataGridElement.h"
 #include "PlatformString.h"
+#include "RenderObject.h"
 
 namespace WebCore {
+
+DataGridColumnList::DataGridColumnList(HTMLDataGridElement* dataGrid)
+    : m_dataGrid(dataGrid) {}
 
 DataGridColumnList::~DataGridColumnList() {
   clear();
@@ -48,6 +52,12 @@ DataGridColumn* DataGridColumnList::itemWithName(
   return 0;
 }
 
+void DataGridColumnList::setDataGridNeedsLayout() {
+  // Mark the datagrid as needing layout.
+  if (dataGrid() && dataGrid()->renderer())
+    dataGrid()->renderer()->setNeedsLayout(true);
+}
+
 DataGridColumn* DataGridColumnList::add(const String& id,
                                         const String& label,
                                         const String& type,
@@ -61,6 +71,7 @@ DataGridColumn* DataGridColumnList::add(DataGridColumn* column) {
     m_primaryColumn = column;
   m_columns.append(column);
   column->setColumnList(this);
+  setDataGridNeedsLayout();
   return column;
 }
 
@@ -74,6 +85,7 @@ void DataGridColumnList::remove(DataGridColumn* col) {
   if (col == m_sortColumn)
     m_sortColumn = 0;
   col->setColumnList(0);
+  setDataGridNeedsLayout();
 }
 
 void DataGridColumnList::move(DataGridColumn* col, unsigned long index) {
@@ -81,6 +93,7 @@ void DataGridColumnList::move(DataGridColumn* col, unsigned long index) {
   if (colIndex == notFound)
     return;
   m_columns.insert(index, col);
+  setDataGridNeedsLayout();
 }
 
 void DataGridColumnList::clear() {
@@ -90,6 +103,7 @@ void DataGridColumnList::clear() {
   m_columns.clear();
   m_primaryColumn = 0;
   m_sortColumn = 0;
+  setDataGridNeedsLayout();
 }
 
 void DataGridColumnList::primaryColumnChanged(DataGridColumn* col) {
@@ -98,7 +112,7 @@ void DataGridColumnList::primaryColumnChanged(DataGridColumn* col) {
   else if (m_primaryColumn = col)
     m_primaryColumn = 0;
 
-  // FIXME: Invalidate the tree.
+  setDataGridNeedsLayout();
 }
 
 }  // namespace WebCore

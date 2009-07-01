@@ -40,9 +40,9 @@ using namespace HTMLNames;
 
 HTMLDataGridColElement::HTMLDataGridColElement(const QualifiedName& name,
                                                Document* doc)
-    : HTMLElement(name, doc), m_datagrid(0) {}
+    : HTMLElement(name, doc), m_dataGrid(0) {}
 
-HTMLDataGridElement* HTMLDataGridColElement::findDatagridAncestor() const {
+HTMLDataGridElement* HTMLDataGridColElement::findDataGridAncestor() const {
   if (parent() && parent()->hasTagName(datagridTag))
     return static_cast<HTMLDataGridElement*>(parent());
   return 0;
@@ -57,12 +57,12 @@ void HTMLDataGridColElement::ensureColumn() {
 
 void HTMLDataGridColElement::insertedIntoTree(bool deep) {
   HTMLElement::insertedIntoTree(deep);
-  if (datagrid())  // We're connected to a datagrid already.
+  if (dataGrid())  // We're connected to a datagrid already.
     return;
-  m_datagrid = findDatagridAncestor();
-  if (datagrid() && datagrid()->dataSource()->isDOMDataGridDataSource()) {
+  m_dataGrid = findDataGridAncestor();
+  if (dataGrid() && dataGrid()->dataSource()->isDOMDataGridDataSource()) {
     ensureColumn();
-    m_datagrid->columns()->add(column());  // FIXME: Deal with ordering issues
+    m_dataGrid->columns()->add(column());  // FIXME: Deal with ordering issues
                                            // (complicated, since columns can be
                                            // made outside the DOM).
   }
@@ -70,11 +70,11 @@ void HTMLDataGridColElement::insertedIntoTree(bool deep) {
 
 void HTMLDataGridColElement::removedFromTree(bool deep) {
   HTMLElement::removedFromTree(deep);
-  if (datagrid() && datagrid()->dataSource()->isDOMDataGridDataSource()) {
-    HTMLDataGridElement* grid = findDatagridAncestor();
+  if (dataGrid() && dataGrid()->dataSource()->isDOMDataGridDataSource()) {
+    HTMLDataGridElement* grid = findDataGridAncestor();
     if (!grid && column()) {
-      datagrid()->columns()->remove(column());
-      m_datagrid = 0;
+      dataGrid()->columns()->remove(column());
+      m_dataGrid = 0;
     }
   }
 }

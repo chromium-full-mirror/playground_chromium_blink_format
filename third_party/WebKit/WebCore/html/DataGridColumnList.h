@@ -12,13 +12,14 @@
 namespace WebCore {
 
 class AtomicString;
+class HTMLDataGridElement;
 
 class DataGridColumnList : public RefCounted<DataGridColumnList> {
   friend class DataGridColumn;
 
  public:
-  static PassRefPtr<DataGridColumnList> create() {
-    return adoptRef(new DataGridColumnList);
+  static PassRefPtr<DataGridColumnList> create(HTMLDataGridElement* grid) {
+    return adoptRef(new DataGridColumnList(grid));
   }
 
   ~DataGridColumnList();
@@ -42,8 +43,18 @@ class DataGridColumnList : public RefCounted<DataGridColumnList> {
   void move(DataGridColumn*, unsigned long index);
   void clear();
 
+  HTMLDataGridElement* dataGrid() const { return m_dataGrid; }
+  void clearDataGrid() { m_dataGrid = 0; }
+
+  void setDataGridNeedsLayout();
+
  private:
-  void primaryColumnChanged(DataGridColumn* col);
+  DataGridColumnList(HTMLDataGridElement*);
+
+  void primaryColumnChanged(DataGridColumn*);
+
+  HTMLDataGridElement* m_dataGrid;  // Weak reference.  Will be nulled out when
+                                    // our tree goes away.
 
   Vector<RefPtr<DataGridColumn>> m_columns;
   RefPtr<DataGridColumn> m_primaryColumn;
