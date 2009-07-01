@@ -217,11 +217,11 @@ static NPError webkit_test_plugin_get_value(NPP instance,
 
   switch (variable) {
     case NPPVpluginNameString:
-      *((char**)value) = "WebKit Test PlugIn";
+      *((char**)value) = const_cast<char*>("WebKit Test PlugIn");
       break;
     case NPPVpluginDescriptionString:
-      *((char**)value) =
-          "Simple Netscape plug-in that handles test content for WebKit";
+      *((char**)value) = const_cast<char*>(
+          "Simple Netscape plug-in that handles test content for WebKit");
       break;
     case NPPVpluginNeedsXEmbed:
       *((NPBool*)value) = TRUE;
@@ -255,8 +255,8 @@ static NPError webkit_test_plugin_set_value(NPP instance,
 }
 
 char* NP_GetMIMEDescription(void) {
-  return "application/x-webkit-test-netscape:testnetscape:test netscape "
-         "content";
+  return const_cast<char*>(
+      "application/x-webkit-test-netscape:testnetscape:test netscape content");
 }
 
 NPError NP_Initialize(NPNetscapeFuncs* aMozillaVTable,
