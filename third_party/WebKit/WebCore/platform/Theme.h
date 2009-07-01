@@ -147,7 +147,7 @@ class Theme {
 
   // This method is called once, from RenderTheme::adjustDefaultStyleSheet(), to
   // let each platform adjust
-  // the default CSS rules in html4.css.
+  // the default CSS rules in html.css.
   static String defaultStyleSheet();
 
  private:

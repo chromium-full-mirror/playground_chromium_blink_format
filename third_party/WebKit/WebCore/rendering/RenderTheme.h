@@ -98,7 +98,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
 
   // These methods return the theme's extra style sheets rules, to let each
   // platform
-  // adjust the default CSS rules in html4.css, quirks.css, or mediaControls.css
+  // adjust the default CSS rules in html.css, quirks.css, or mediaControls.css
   virtual String extraDefaultStyleSheet() { return String(); }
   virtual String extraQuirksStyleSheet() { return String(); }
 #if ENABLE(VIDEO)
