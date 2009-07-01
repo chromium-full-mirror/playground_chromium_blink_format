@@ -45,7 +45,6 @@ class SVGTransformList : public SVGPODList<SVGTransform> {
 
   // Internal use only
   SVGTransform concatenate() const;
-  SVGTransform concatenateForType(SVGTransform::SVGTransformType) const;
 
   String valueAsString() const;
 

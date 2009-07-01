@@ -33,7 +33,10 @@
 namespace WebCore {
 
 SVGTransformDistance::SVGTransformDistance()
-    : m_type(SVGTransform::SVG_TRANSFORM_UNKNOWN), m_angle(0) {}
+    : m_type(SVGTransform::SVG_TRANSFORM_UNKNOWN),
+      m_angle(0),
+      m_cx(0),
+      m_cy(0) {}
 
 SVGTransformDistance::SVGTransformDistance(
     SVGTransform::SVGTransformType type,
