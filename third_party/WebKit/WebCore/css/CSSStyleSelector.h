@@ -51,6 +51,7 @@ class CSSStyleSheet;
 class CSSValue;
 class CSSVariableDependentValue;
 class CSSVariablesRule;
+class DataGridColumn;
 class Document;
 class Element;
 class Frame;
@@ -101,6 +102,16 @@ class CSSStyleSelector : Noncopyable {
   PassRefPtr<RenderStyle> pseudoStyleForElement(PseudoId,
                                                 Element*,
                                                 RenderStyle* parentStyle = 0);
+
+#if ENABLE(DATAGRID)
+  // Datagrid style computation (uses unique pseudo elements and structures)
+  PassRefPtr<RenderStyle> pseudoStyleForDataGridColumn(
+      DataGridColumn*,
+      RenderStyle* parentStyle);
+  PassRefPtr<RenderStyle> pseudoStyleForDataGridColumnHeader(
+      DataGridColumn*,
+      RenderStyle* parentStyle);
+#endif
 
  private:
   RenderStyle* locateSharedStyle();

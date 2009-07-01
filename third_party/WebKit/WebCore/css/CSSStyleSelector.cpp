@@ -1518,6 +1518,24 @@ PassRefPtr<RenderStyle> CSSStyleSelector::pseudoStyleForElement(
   return m_style.release();
 }
 
+#if ENABLE(DATAGRID)
+
+PassRefPtr<RenderStyle> CSSStyleSelector::pseudoStyleForDataGridColumn(
+    DataGridColumn*,
+    RenderStyle*) {
+  // FIXME: Implement
+  return 0;
+}
+
+PassRefPtr<RenderStyle> CSSStyleSelector::pseudoStyleForDataGridColumnHeader(
+    DataGridColumn*,
+    RenderStyle*) {
+  // FIXME: Implement
+  return 0;
+}
+
+#endif
+
 static void addIntrinsicMargins(RenderStyle* style) {
   // Intrinsic margin value.
   const int intrinsicMargin = 2 * style->effectiveZoom();
