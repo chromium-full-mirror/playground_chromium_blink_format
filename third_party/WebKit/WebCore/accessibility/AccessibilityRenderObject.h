@@ -148,6 +148,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual IntRect boundingBoxRect() const;
   virtual IntRect elementRect() const;
   virtual IntSize size() const;
+  virtual IntPoint clickPoint() const;
 
   void setRenderer(RenderObject* renderer) { m_renderer = renderer; }
   RenderObject* renderer() const { return m_renderer; }

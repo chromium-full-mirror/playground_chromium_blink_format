@@ -407,6 +407,20 @@ static JSValueRef getHeightCallback(JSContextRef context,
   return JSValueMakeNumber(context, toAXElement(thisObject)->height());
 }
 
+static JSValueRef getClickPointXCallback(JSContextRef context,
+                                         JSObjectRef thisObject,
+                                         JSStringRef propertyName,
+                                         JSValueRef* exception) {
+  return JSValueMakeNumber(context, toAXElement(thisObject)->clickPointX());
+}
+
+static JSValueRef getClickPointYCallback(JSContextRef context,
+                                         JSObjectRef thisObject,
+                                         JSStringRef propertyName,
+                                         JSValueRef* exception) {
+  return JSValueMakeNumber(context, toAXElement(thisObject)->clickPointY());
+}
+
 static JSValueRef getIntValueCallback(JSContextRef context,
                                       JSObjectRef thisObject,
                                       JSStringRef propertyName,
@@ -492,6 +506,10 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"width", getWidthCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"height", getHeightCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"clickPointX", getClickPointXCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"clickPointY", getClickPointYCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"intValue", getIntValueCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
