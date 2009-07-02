@@ -93,7 +93,7 @@ class XSSAuditor {
  private:
   static String decodeURL(const String& url,
                           const TextEncoding& encoding = UTF8Encoding(),
-                          bool allowControlCharacters = false);
+                          bool allowNullCharacters = false);
 
   bool findInRequest(const String&) const;
 

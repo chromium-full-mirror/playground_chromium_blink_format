@@ -108,17 +108,18 @@ bool XSSAuditor::canLoadObject(const String& url) const {
 
 String XSSAuditor::decodeURL(const String& str,
                              const TextEncoding& encoding,
-                             bool allowControlCharacters) {
+                             bool allowNullCharacters) {
   String result;
   String url = str;
 
   url.replace('+', ' ');
   result = decodeURLEscapeSequences(url);
-  if (!allowControlCharacters)
-    result.removeCharacters(&isControlCharacter);
-  result = encoding.decode(result.utf8().data(), result.length());
-  if (!allowControlCharacters)
-    result.removeCharacters(&isControlCharacter);
+  String decodedResult = encoding.decode(result.utf8().data(), result.length());
+  if (!decodedResult.isEmpty())
+    result = decodedResult;
+  if (!allowNullCharacters)
+    result = StringImpl::createStrippingNullCharacters(result.characters(),
+                                                       result.length());
   return result;
 }
 
