@@ -145,7 +145,8 @@ TransparencyWin::TransparencyWin()
       m_drawContext(0),
       m_savedOnDrawContext(false),
       m_layerBuffer(0),
-      m_referenceBitmap(0) {}
+      m_referenceBitmap(0),
+      m_validLayer(false) {}
 
 TransparencyWin::~TransparencyWin() {
   // This should be false, since calling composite() is mandatory.
@@ -224,10 +225,13 @@ void TransparencyWin::setupLayer() {
 
 void TransparencyWin::setupLayerForNoLayer() {
   m_drawContext = m_destContext;  // Draw to the source context.
+  m_validLayer = true;
 }
 
 void TransparencyWin::setupLayerForOpaqueCompositeLayer() {
   initializeNewContext();
+  if (!m_validLayer)
+    return;
 
   TransformationMatrix mapping;
   mapping.translate(-m_transformedSourceRect.x(), -m_transformedSourceRect.y());
@@ -252,6 +256,9 @@ void TransparencyWin::setupLayerForTextComposite() {
 
 void TransparencyWin::setupLayerForWhiteLayer() {
   initializeNewContext();
+  if (!m_validLayer)
+    return;
+
   m_drawContext->fillRect(IntRect(IntPoint(0, 0), m_layerSize), Color::white);
   // Layer rect represents the part of the original layer.
 }
@@ -271,6 +278,9 @@ void TransparencyWin::setupTransform(const IntRect& region) {
 }
 
 void TransparencyWin::setupTransformForKeepTransform(const IntRect& region) {
+  if (!m_validLayer)
+    return;
+
   if (m_layerMode != NoLayer) {
     // Need to save things since we're modifying the transform.
     m_drawContext->save();
@@ -299,6 +309,9 @@ void TransparencyWin::setupTransformForUntransform() {
 }
 
 void TransparencyWin::setupTransformForScaleTransform() {
+  if (!m_validLayer)
+    return;
+
   if (m_layerMode == NoLayer) {
     // Need to save things since we're modifying the layer.
     m_drawContext->save();
@@ -323,16 +336,22 @@ void TransparencyWin::setTextCompositeColor(Color color) {
 
 void TransparencyWin::initializeNewContext() {
   int pixelSize = m_layerSize.width() * m_layerSize.height();
+  if (pixelSize <= 0)
+    return;
+
   if (pixelSize > maxCachedBufferPixelSize) {
     // Create a 1-off buffer for drawing into. We only need the reference
     // buffer if we're making an OpaqueCompositeLayer.
     bool needReferenceBitmap = m_layerMode == OpaqueCompositeLayer;
     m_ownedBuffers.set(new OwnedBuffers(m_layerSize, needReferenceBitmap));
-
     m_layerBuffer = m_ownedBuffers->destBitmap();
+    if (!m_layerBuffer)
+      return;
+
     m_drawContext = m_layerBuffer->context();
     if (needReferenceBitmap)
       m_referenceBitmap = m_ownedBuffers->referenceBitmap();
+    m_validLayer = true;
     return;
   }
 
@@ -344,6 +363,7 @@ void TransparencyWin::initializeNewContext() {
     bitmapForContext(*m_drawContext).eraseARGB(0, 0, 0, 0);
     m_referenceBitmap = m_cachedBuffers->referenceBitmap();
     m_referenceBitmap->eraseARGB(0, 0, 0, 0);
+    m_validLayer = true;
     return;
   }
 
@@ -355,9 +375,13 @@ void TransparencyWin::initializeNewContext() {
   m_layerBuffer = m_cachedBuffers->destBitmap();
   m_drawContext = m_cachedBuffers->destBitmap()->context();
   m_referenceBitmap = m_cachedBuffers->referenceBitmap();
+  m_validLayer = true;
 }
 
 void TransparencyWin::compositeOpaqueComposite() {
+  if (!m_validLayer)
+    return;
+
   SkCanvas* destCanvas = canvasForContext(*m_destContext);
   destCanvas->save();
 
@@ -415,6 +439,9 @@ void TransparencyWin::compositeOpaqueComposite() {
 }
 
 void TransparencyWin::compositeTextComposite() {
+  if (!m_validLayer)
+    return;
+
   const SkBitmap& bitmap = m_layerBuffer->context()
                                ->platformContext()
                                ->canvas()
@@ -436,7 +463,6 @@ void TransparencyWin::compositeTextComposite() {
 
   // Now the layer has text with the proper color and opacity.
   SkCanvas* destCanvas = canvasForContext(*m_destContext);
-  destCanvas->save();
 
   // We want to use Untransformed space (see above)
   SkMatrix identity;
@@ -454,6 +480,9 @@ void TransparencyWin::compositeTextComposite() {
 }
 
 void TransparencyWin::makeLayerOpaque() {
+  if (!m_validLayer)
+    return;
+
   SkBitmap& bitmap = const_cast<SkBitmap&>(m_drawContext->platformContext()
                                                ->canvas()
                                                ->getTopPlatformDevice()

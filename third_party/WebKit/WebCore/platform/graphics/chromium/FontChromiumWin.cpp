@@ -145,17 +145,22 @@ void TransparencyAwareFontPainter::initializeForGDI() {
     // know everything is opaque so don't need to do anything special.
     layerMode = TransparencyWin::NoLayer;
   }
+
+  // Bug 26088 - init() might fail if layerRect is invalid. Given this, we
+  // need to be careful to check for null pointers everywhere after this call
   m_transparency.init(m_graphicsContext, layerMode,
                       TransparencyWin::KeepTransform, layerRect);
 
   // Set up the DC, using the one from the transparency helper.
-  m_hdc = m_transparency.platformContext()->canvas()->beginPlatformPaint();
-  SetTextColor(m_hdc, skia::SkColorToCOLORREF(color));
-  SetBkMode(m_hdc, TRANSPARENT);
+  if (m_transparency.platformContext()) {
+    m_hdc = m_transparency.platformContext()->canvas()->beginPlatformPaint();
+    SetTextColor(m_hdc, skia::SkColorToCOLORREF(color));
+    SetBkMode(m_hdc, TRANSPARENT);
+  }
 }
 
 TransparencyAwareFontPainter::~TransparencyAwareFontPainter() {
-  if (!m_useGDI)
+  if (!m_useGDI || !m_graphicsContext || !m_platformContext)
     return;  // Nothing to do.
   m_transparency.composite();
   if (m_createdTransparencyLayer)
@@ -211,11 +216,12 @@ TransparencyAwareGlyphPainter::TransparencyAwareGlyphPainter(
       m_oldFont(0) {
   init();
 
-  m_oldFont = ::SelectObject(m_hdc, m_font->platformData().hfont());
+  if (m_hdc)
+    m_oldFont = ::SelectObject(m_hdc, m_font->platformData().hfont());
 }
 
 TransparencyAwareGlyphPainter::~TransparencyAwareGlyphPainter() {
-  if (m_useGDI)
+  if (m_useGDI && m_hdc)
     ::SelectObject(m_hdc, m_oldFont);
 }
 
@@ -243,6 +249,9 @@ bool TransparencyAwareGlyphPainter::drawGlyphs(int numGlyphs,
     return paintSkiaText(m_graphicsContext, m_font->platformData().hfont(),
                          numGlyphs, glyphs, advances, 0, &origin);
   }
+
+  if (!m_graphicsContext || !m_hdc)
+    return true;
 
   // Windows' origin is the top-left of the bounding box, so we have
   // to subtract off the font ascent to get it.
@@ -382,6 +391,18 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
     for (int i = 0; i < curLen; ++i, ++glyphIndex) {
       glyphs[i] = glyphBuffer.glyphAt(from + glyphIndex);
       advances[i] = static_cast<int>(glyphBuffer.advanceAt(from + glyphIndex));
+
+      // Bug 26088 - very large positive or negative runs can fail to
+      // render so we clamp the size here. In the specs, negative
+      // letter-spacing is implementation-defined, so this should be
+      // fine, and it matches Safari's implementation. The call actually
+      // seems to crash if kMaxNegativeRun is set to somewhere around
+      // -32830, so we give ourselves a little breathing room.
+      const int maxNegativeRun = -32768;
+      const int maxPositiveRun = 32768;
+      if ((curWidth + advances[i] < maxNegativeRun) ||
+          (curWidth + advances[i] > maxPositiveRun))
+        advances[i] = 0;
       curWidth += advances[i];
     }
 
@@ -442,6 +463,8 @@ void Font::drawComplexText(GraphicsContext* graphicsContext,
                                             to, point);
 
   HDC hdc = painter.hdc();
+  if (!hdc)
+    return;
 
   // TODO(maruel): http://b/700464 SetTextColor doesn't support transparency.
   // Enforce non-transparent color.

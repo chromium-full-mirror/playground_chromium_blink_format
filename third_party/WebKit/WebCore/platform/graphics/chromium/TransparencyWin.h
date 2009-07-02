@@ -145,7 +145,7 @@ class TransparencyWin : public Noncopyable {
   GraphicsContext* context() const { return m_drawContext; }
 
   PlatformGraphicsContext* platformContext() const {
-    return m_drawContext->platformContext();
+    return m_drawContext ? m_drawContext->platformContext() : 0;
   }
 
   // When the mode is TextComposite, this sets the color that the text will
@@ -250,6 +250,12 @@ class TransparencyWin : public Noncopyable {
   // m_layerBuffer, which will either point to this object, or the statically
   // cached one. Don't access directly.
   OwnPtr<OwnedBuffers> m_ownedBuffers;
+
+  // Sometimes we're asked to create layers that have negative dimensions.
+  // This API is not designed to fail to initialize, so we hide the fact
+  // that they are illegal and can't be rendered (failing silently, drawing
+  // nothing).
+  bool m_validLayer;
 };
 
 }  // namespace WebCore
