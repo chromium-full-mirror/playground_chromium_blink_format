@@ -3684,14 +3684,14 @@ void RenderBlock::addVisualOverflow(const IntRect& r) {
 }
 
 bool RenderBlock::isPointInOverflowControl(HitTestResult& result,
-                                           int,
-                                           int,
-                                           int,
-                                           int) {
+                                           int _x,
+                                           int _y,
+                                           int _tx,
+                                           int _ty) {
   if (!scrollsOverflow())
     return false;
 
-  return layer()->hitTestOverflowControls(result);
+  return layer()->hitTestOverflowControls(result, IntPoint(_x - _tx, _y - _ty));
 }
 
 bool RenderBlock::nodeAtPoint(const HitTestRequest& request,

@@ -122,11 +122,6 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   bool contextMenu(const PlatformMouseEvent& event);
 #endif
 
-  // Takes an event and accounts for any transforms that might occur on the
-  // scrollbar.  Returns
-  // a new event that has had all of the transforms applied.
-  PlatformMouseEvent transformEvent(const PlatformMouseEvent&);
-
   ScrollbarTheme* theme() const { return m_theme; }
 
   virtual void setParent(ScrollView*);
@@ -138,6 +133,12 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   void setSuppressInvalidation(bool s) { m_suppressInvalidation = s; }
 
   virtual void styleChanged() {}
+
+  virtual IntRect convertToContainingView(const IntRect&) const;
+  virtual IntRect convertFromContainingView(const IntRect&) const;
+
+  virtual IntPoint convertToContainingView(const IntPoint&) const;
+  virtual IntPoint convertFromContainingView(const IntPoint&) const;
 
  private:
   virtual bool isScrollbar() const { return true; }

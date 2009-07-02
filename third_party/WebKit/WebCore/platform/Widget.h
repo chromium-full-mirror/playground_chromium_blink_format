@@ -81,7 +81,6 @@ class Font;
 class GraphicsContext;
 class PlatformMouseEvent;
 class ScrollView;
-class WidgetClient;
 class WidgetPrivate;
 
 // The Widget class serves as a base class for three kinds of objects:
@@ -177,10 +176,10 @@ class Widget {
   // convertFromContainingWindow method
   // when converting window rects.
   IntRect convertToContainingWindow(const IntRect&) const;
-  IntPoint convertToContainingWindow(const IntPoint&) const;
-  IntPoint convertFromContainingWindow(const IntPoint&)
-      const;  // See comment above about when not to use this method.
   IntRect convertFromContainingWindow(const IntRect&) const;
+
+  IntPoint convertToContainingWindow(const IntPoint&) const;
+  IntPoint convertFromContainingWindow(const IntPoint&) const;
 
   virtual void frameRectsChanged() {}
 
@@ -193,12 +192,32 @@ class Widget {
   void removeFromSuperview();
 #endif
 
+  // Virtual methods to convert points to/from the containing ScrollView
+  virtual IntRect convertToContainingView(const IntRect&) const;
+  virtual IntRect convertFromContainingView(const IntRect&) const;
+  virtual IntPoint convertToContainingView(const IntPoint&) const;
+  virtual IntPoint convertFromContainingView(const IntPoint&) const;
+
  private:
   void init(PlatformWidget);  // Must be called by all Widget constructors to
                               // initialize cross-platform data.
 
   void releasePlatformWidget();
   void retainPlatformWidget();
+
+  // These methods are used to convert from the root widget to the containing
+  // window,
+  // which has behavior that may differ between platforms (e.g. Mac uses flipped
+  // window coordinates).
+  static IntRect convertFromRootToContainingWindow(const Widget* rootWidget,
+                                                   const IntRect&);
+  static IntRect convertFromContainingWindowToRoot(const Widget* rootWidget,
+                                                   const IntRect&);
+
+  static IntPoint convertFromRootToContainingWindow(const Widget* rootWidget,
+                                                    const IntPoint&);
+  static IntPoint convertFromContainingWindowToRoot(const Widget* rootWidget,
+                                                    const IntPoint&);
 
  private:
   ScrollView* m_parent;
