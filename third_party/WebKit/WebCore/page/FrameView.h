@@ -247,14 +247,6 @@ class FrameView : public ScrollView, public RefCounted<FrameView> {
   virtual void invalidateScrollbarRect(Scrollbar*, const IntRect&);
   virtual bool isActive() const;
   virtual void getTickmarks(Vector<IntRect>&) const;
-  virtual IntRect convertFromScrollbarToContainingView(const Scrollbar*,
-                                                       const IntRect&) const;
-  virtual IntRect convertFromContainingViewToScrollbar(const Scrollbar*,
-                                                       const IntRect&) const;
-  virtual IntPoint convertFromScrollbarToContainingView(const Scrollbar*,
-                                                        const IntPoint&) const;
-  virtual IntPoint convertFromContainingViewToScrollbar(const Scrollbar*,
-                                                        const IntPoint&) const;
 
   void deferredRepaintTimerFired(Timer<FrameView>*);
   void doDeferredRepaints();
