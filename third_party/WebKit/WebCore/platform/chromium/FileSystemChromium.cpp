@@ -31,6 +31,7 @@
 #include "config.h"
 #include "FileSystem.h"
 
+#include "ChromiumBridge.h"
 #include "NotImplemented.h"
 #include "PlatformString.h"
 
@@ -46,9 +47,8 @@ bool deleteEmptyDirectory(const String&) {
   return false;
 }
 
-bool getFileSize(const String&, long long& result) {
-  notImplemented();
-  return false;
+bool getFileSize(const String& path, long long& result) {
+  return ChromiumBridge::getFileSize(path, result);
 }
 
 bool getFileModificationTime(const String&, time_t& result) {
