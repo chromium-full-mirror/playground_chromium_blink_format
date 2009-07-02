@@ -290,6 +290,16 @@ String WebCore::allFilesText() {
   return String(LPCTSTR_UI_STRING(
       "All Files", "(Windows) Form submit file upload all files pop-up"));
 }
+String WebCore::mediaElementLoadingStateText() {
+  return String(LPCTSTR_UI_STRING(
+      "Loading...",
+      "Media controller status message when the media is loading"));
+}
+String WebCore::mediaElementLiveBroadcastStateText() {
+  return String(LPCTSTR_UI_STRING(
+      "Live Broadcast",
+      "Media controller status message when watching a live broadcast"));
+}
 
 String WebCore::imageTitle(const String& filename, const IntSize& size) {
   static RetainPtr<CFStringRef> format(
