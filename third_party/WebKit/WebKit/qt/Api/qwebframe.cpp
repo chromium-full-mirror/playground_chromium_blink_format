@@ -323,6 +323,8 @@ QWebFrame::~QWebFrame() {
     new URL, you should add them in a slot connected to the
     javaScriptWindowObjectCleared() signal.
 
+    If Javascript is not enabled for this page, then this method does nothing.
+
     The \a object will never be explicitly deleted by QtWebKit.
 */
 void QWebFrame::addToJavaScriptWindowObject(const QString& name,
@@ -346,12 +348,17 @@ void QWebFrame::addToJavaScriptWindowObject(const QString& name,
     new URL, you should add them in a slot connected to the
     javaScriptWindowObjectCleared() signal.
 
+    If Javascript is not enabled for this page, then this method does nothing.
+
     The ownership of \a object is specified using \a own.
 */
 void QWebFrame::addToJavaScriptWindowObject(
     const QString& name,
     QObject* object,
     QScriptEngine::ValueOwnership ownership) {
+  if (!page()->settings()->testAttribute(QWebSettings::JavascriptEnabled))
+    return;
+
   JSC::JSLock lock(false);
   JSDOMWindow* window = toJSDOMWindow(d->frame);
   JSC::Bindings::RootObject* root = d->frame->script()->bindingRootObject();
