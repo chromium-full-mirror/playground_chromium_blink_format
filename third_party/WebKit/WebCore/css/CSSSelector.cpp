@@ -116,6 +116,12 @@ void CSSSelector::extractPseudoType() const {
                       ("-webkit-media-controls-seek-back-button"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsSeekForwardButton,
                       ("-webkit-media-controls-seek-forward-button"));
+  DEFINE_STATIC_LOCAL(AtomicString, mediaControlsRewindButton,
+                      ("-webkit-media-controls-rewind-button"));
+  DEFINE_STATIC_LOCAL(AtomicString, mediaControlsReturnToRealtimeButton,
+                      ("-webkit-media-controls-return-to-realtime-button"));
+  DEFINE_STATIC_LOCAL(AtomicString, mediaControlsStatusDisplay,
+                      ("-webkit-media-controls-status-display"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsFullscreenButton,
                       ("-webkit-media-controls-fullscreen-button"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsTimelineContainer,
@@ -257,6 +263,15 @@ void CSSSelector::extractPseudoType() const {
     element = true;
   } else if (m_value == mediaControlsSeekForwardButton) {
     m_pseudoType = PseudoMediaControlsSeekForwardButton;
+    element = true;
+  } else if (m_value == mediaControlsRewindButton) {
+    m_pseudoType = PseudoMediaControlsRewindButton;
+    element = true;
+  } else if (m_value == mediaControlsReturnToRealtimeButton) {
+    m_pseudoType = PseudoMediaControlsReturnToRealtimeButton;
+    element = true;
+  } else if (m_value == mediaControlsStatusDisplay) {
+    m_pseudoType = PseudoMediaControlsStatusDisplay;
     element = true;
   } else if (m_value == mediaControlsFullscreenButton) {
     m_pseudoType = PseudoMediaControlsFullscreenButton;

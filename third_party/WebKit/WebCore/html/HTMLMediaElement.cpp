@@ -856,6 +856,16 @@ void HTMLMediaElement::progressEventTimerFired(Timer<HTMLMediaElement>*) {
   }
 }
 
+void HTMLMediaElement::rewind(float timeDelta) {
+  ExceptionCode e;
+  setCurrentTime(max(currentTime() - timeDelta, minTimeSeekable()), e);
+}
+
+void HTMLMediaElement::returnToRealtime() {
+  ExceptionCode e;
+  setCurrentTime(maxTimeSeekable(), e);
+}
+
 void HTMLMediaElement::seek(float time, ExceptionCode& ec) {
   // 4.8.10.10. Seeking
   // 1
@@ -906,6 +916,12 @@ void HTMLMediaElement::seek(float time, ExceptionCode& ec) {
 
 HTMLMediaElement::ReadyState HTMLMediaElement::readyState() const {
   return m_readyState;
+}
+
+bool HTMLMediaElement::isStreaming() const {
+  MediaPlayer::MovieLoadType loadType =
+      m_player ? m_player->movieLoadType() : MediaPlayer::Unknown;
+  return loadType == MediaPlayer::LiveStream;
 }
 
 bool HTMLMediaElement::seeking() const {
@@ -1387,9 +1403,9 @@ PassRefPtr<TimeRanges> HTMLMediaElement::played() const {
 
 PassRefPtr<TimeRanges> HTMLMediaElement::seekable() const {
   // FIXME real ranges support
-  if (!m_player || !m_player->maxTimeSeekable())
+  if (!maxTimeSeekable())
     return TimeRanges::create();
-  return TimeRanges::create(0, m_player->maxTimeSeekable());
+  return TimeRanges::create(minTimeSeekable(), maxTimeSeekable());
 }
 
 bool HTMLMediaElement::potentiallyPlaying() const {
@@ -1419,6 +1435,14 @@ bool HTMLMediaElement::pausedForUserInteraction() const {
   //    return !paused() && m_readyState >= HAVE_FUTURE_DATA && [UA requires a
   //    decitions from the user]
   return false;
+}
+
+float HTMLMediaElement::minTimeSeekable() const {
+  return 0;
+}
+
+float HTMLMediaElement::maxTimeSeekable() const {
+  return m_player ? m_player->maxTimeSeekable() : 0;
 }
 
 void HTMLMediaElement::updateVolume() {

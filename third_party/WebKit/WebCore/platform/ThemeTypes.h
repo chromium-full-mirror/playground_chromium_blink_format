@@ -43,6 +43,7 @@ enum ControlState {
 
 typedef unsigned ControlStates;
 
+// Must follow CSSValueKeywords.in order
 enum ControlPart {
   NoControlPart,
   CheckboxPart,
@@ -59,9 +60,11 @@ enum ControlPart {
   MediaPlayButtonPart,
   MediaSeekBackButtonPart,
   MediaSeekForwardButtonPart,
+  MediaRewindButtonPart,
+  MediaReturnToRealtimeButtonPart,
   MediaSliderPart,
   MediaSliderThumbPart,
-  MediaTimelineContainerPart,
+  MediaControlsBackgroundPart,
   MediaCurrentTimePart,
   MediaTimeRemainingPart,
   MenulistPart,

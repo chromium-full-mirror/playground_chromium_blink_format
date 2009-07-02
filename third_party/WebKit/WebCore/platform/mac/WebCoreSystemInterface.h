@@ -124,7 +124,7 @@ extern void (*wkDrawMediaUIPart)(int part,
                                  int themeStyle,
                                  CGContextRef context,
                                  CGRect rect,
-                                 BOOL active);
+                                 int state);
 extern NSString* (*wkGetPreferredExtensionForMIMEType)(NSString*);
 extern NSArray* (*wkGetExtensionsForMIMEType)(NSString*);
 extern NSString* (*wkGetMIMETypeForExtension)(NSString*);

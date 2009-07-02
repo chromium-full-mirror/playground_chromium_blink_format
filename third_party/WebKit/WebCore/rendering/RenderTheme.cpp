@@ -286,6 +286,10 @@ bool RenderTheme::paint(RenderObject* o,
       return paintMediaSeekBackButton(o, paintInfo, r);
     case MediaSeekForwardButtonPart:
       return paintMediaSeekForwardButton(o, paintInfo, r);
+    case MediaRewindButtonPart:
+      return paintMediaRewindButton(o, paintInfo, r);
+    case MediaReturnToRealtimeButtonPart:
+      return paintMediaReturnToRealtimeButton(o, paintInfo, r);
     case MediaSliderPart:
       return paintMediaSliderTrack(o, paintInfo, r);
     case MediaSliderThumbPart:
@@ -296,8 +300,8 @@ bool RenderTheme::paint(RenderObject* o,
       return paintMediaTimeRemaining(o, paintInfo, r);
     case MediaCurrentTimePart:
       return paintMediaCurrentTime(o, paintInfo, r);
-    case MediaTimelineContainerPart:
-      return paintMediaTimelineContainer(o, paintInfo, r);
+    case MediaControlsBackgroundPart:
+      return paintMediaControlsBackground(o, paintInfo, r);
     case MenulistButtonPart:
     case TextFieldPart:
     case TextAreaPart:

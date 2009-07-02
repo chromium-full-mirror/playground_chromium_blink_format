@@ -132,6 +132,9 @@ String allFilesText();
 #endif
 
 String imageTitle(const String& filename, const IntSize& size);
+
+String mediaElementLoadingStateText();
+String mediaElementLiveBroadcastStateText();
 }
 
 #endif

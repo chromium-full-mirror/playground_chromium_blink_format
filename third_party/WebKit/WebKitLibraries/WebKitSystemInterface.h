@@ -241,23 +241,31 @@ CFStringRef WKCopyFoundationCacheDirectory(void);
 
 typedef enum {
   WKMediaUIPartFullscreenButton = 0,
-  WKMediaUIPartMuteButton = 1,
-  WKMediaUIPartPlayButton = 2,
-  WKMediaUIPartSeekBackButton = 3,
-  WKMediaUIPartSeekForwardButton = 4,
-  WKMediaUIPartSlider = 5,
-  WKMediaUIPartSliderThumb = 6,
-  WKMediaUIPartUnMuteButton = 7,
-  WKMediaUIPartPauseButton = 8,
-  WKMediaUIPartTimelineContainer = 9,
-  WKMediaUIPartCurrentTimeDisplay = 10,
-  WKMediaUIPartTimeRemainingDisplay = 11
+  WKMediaUIPartMuteButton,
+  WKMediaUIPartPlayButton,
+  WKMediaUIPartSeekBackButton,
+  WKMediaUIPartSeekForwardButton,
+  WKMediaUIPartSlider,
+  WKMediaUIPartSliderThumb,
+  WKMediaUIPartRewindButton,
+  WKMediaUIPartSeekToRealtimeButton,
+  WKMediaUIPartUnMuteButton,
+  WKMediaUIPartPauseButton,
+  WKMediaUIPartBackground,
+  WKMediaUIPartCurrentTimeDisplay,
+  WKMediaUIPartTimeRemainingDisplay
 } WKMediaUIPart;
 
 typedef enum {
   WKMediaControllerThemeClassic = 1,
   WKMediaControllerThemeQT = 2
 } WKMediaControllerThemeStyle;
+
+typedef enum {
+  WKMediaControllerStateNormal = 0,
+  WKMediaControllerStateActivated = 1,
+  WKMediaControllerStateDisabled = 2
+} WKMediaControllerThemeState;
 
 BOOL WKHitTestMediaUIPart(int part,
                           int themeStyle,
@@ -271,7 +279,7 @@ void WKDrawMediaUIPart(int part,
                        int themeStyle,
                        CGContextRef context,
                        CGRect rect,
-                       BOOL active);
+                       int state);
 void WKDrawMediaSliderTrack(int themeStyle,
                             CGContextRef context,
                             CGRect rect,

@@ -393,9 +393,19 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                      const IntRect&) {
     return true;
   }
-  virtual bool paintMediaTimelineContainer(RenderObject*,
-                                           const RenderObject::PaintInfo&,
-                                           const IntRect&) {
+  virtual bool paintMediaRewindButton(RenderObject*,
+                                      const RenderObject::PaintInfo&,
+                                      const IntRect&) {
+    return true;
+  }
+  virtual bool paintMediaReturnToRealtimeButton(RenderObject*,
+                                                const RenderObject::PaintInfo&,
+                                                const IntRect&) {
+    return true;
+  }
+  virtual bool paintMediaControlsBackground(RenderObject*,
+                                            const RenderObject::PaintInfo&,
+                                            const IntRect&) {
     return true;
   }
   virtual bool paintMediaCurrentTime(RenderObject*,

@@ -43,19 +43,23 @@ namespace WebCore {
 class Event;
 class Frame;
 
+// Must match WebKitSystemInterface.h
 enum MediaControlElementType {
-  MediaFullscreenButton,
+  MediaFullscreenButton = 0,
   MediaMuteButton,
   MediaPlayButton,
   MediaSeekBackButton,
   MediaSeekForwardButton,
   MediaSlider,
   MediaSliderThumb,
+  MediaRewindButton,
+  MediaReturnToRealtimeButton,
   MediaUnMuteButton,
   MediaPauseButton,
   MediaTimelineContainer,
   MediaCurrentTimeDisplay,
   MediaTimeRemainingDisplay,
+  MediaStatusDisplay,
   MediaControlsPanel
 };
 
@@ -74,9 +78,9 @@ class MediaControlShadowRootElement : public HTMLDivElement {
 
 // ----------------------------
 
-class MediaTextDisplayElement : public HTMLDivElement {
+class MediaControlElement : public HTMLDivElement {
  public:
-  MediaTextDisplayElement(Document*, PseudoId, HTMLMediaElement*);
+  MediaControlElement(Document*, PseudoId, HTMLMediaElement*);
   void attachToParent(Element*);
   void update();
   void updateStyle();
@@ -88,9 +92,23 @@ class MediaTextDisplayElement : public HTMLDivElement {
 
 // ----------------------------
 
-class MediaTimeDisplayElement : public MediaTextDisplayElement {
+class MediaControlTimelineContainerElement : public MediaControlElement {
  public:
-  MediaTimeDisplayElement(Document*, HTMLMediaElement*, bool currentTime);
+  MediaControlTimelineContainerElement(Document*, HTMLMediaElement*);
+  virtual bool rendererIsNeeded(RenderStyle* style);
+};
+
+// ----------------------------
+
+class MediaControlStatusDisplayElement : public MediaControlElement {
+ public:
+  MediaControlStatusDisplayElement(Document*, HTMLMediaElement*);
+  virtual void update();
+  virtual bool rendererIsNeeded(RenderStyle* style);
+
+ private:
+  enum StateBeingDisplayed { Nothing, Loading, LiveBroadcast };
+  StateBeingDisplayed m_stateBeingDisplayed;
 };
 
 // ----------------------------
@@ -149,6 +167,24 @@ class MediaControlSeekButtonElement : public MediaControlInputElement {
   bool m_seeking;
   bool m_capturing;
   Timer<MediaControlSeekButtonElement> m_seekTimer;
+};
+
+// ----------------------------
+
+class MediaControlRewindButtonElement : public MediaControlInputElement {
+ public:
+  MediaControlRewindButtonElement(Document*, HTMLMediaElement*);
+  virtual void defaultEventHandler(Event*);
+};
+
+// ----------------------------
+
+class MediaControlReturnToRealtimeButtonElement
+    : public MediaControlInputElement {
+ public:
+  MediaControlReturnToRealtimeButtonElement(Document*, HTMLMediaElement*);
+  virtual void defaultEventHandler(Event*);
+  virtual bool rendererIsNeeded(RenderStyle*);
 };
 
 // ----------------------------

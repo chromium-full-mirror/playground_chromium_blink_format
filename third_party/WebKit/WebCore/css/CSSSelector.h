@@ -168,6 +168,9 @@ class CSSSelector : Noncopyable {
     PseudoMediaControlsTimeline,
     PseudoMediaControlsSeekBackButton,
     PseudoMediaControlsSeekForwardButton,
+    PseudoMediaControlsRewindButton,
+    PseudoMediaControlsReturnToRealtimeButton,
+    PseudoMediaControlsStatusDisplay,
     PseudoMediaControlsFullscreenButton
   };
 
