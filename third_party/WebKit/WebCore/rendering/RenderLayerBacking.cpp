@@ -143,8 +143,10 @@ void RenderLayerBacking::updateAfterLayout(UpdateDepth updateDepth) {
     layerCompositor->updateCompositingDescendantGeometry(
         m_owningLayer, m_owningLayer, updateDepth);
 
-    if (!m_owningLayer->parent())
+    if (!m_owningLayer->parent()) {
+      updateGraphicsLayerGeometry();
       layerCompositor->updateRootLayerPosition();
+    }
   }
 }
 
