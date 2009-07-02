@@ -100,6 +100,8 @@
   @"WebKitApplicationChromeModeEnabledPreferenceKey"
 #define WebKitWebArchiveDebugModeEnabledPreferenceKey \
   @"WebKitWebArchiveDebugModeEnabledPreferenceKey"
+#define WebKitLocalFileContentSniffingEnabledPreferenceKey \
+  @"WebKitLocalFileContentSniffingEnabledPreferenceKey"
 #define WebKitLocalStorageDatabasePathPreferenceKey \
   @"WebKitLocalStorageDatabasePathPreferenceKey"
 #define WebKitEnableFullDocumentTeardownPreferenceKey \

@@ -83,6 +83,10 @@ extern NSString* WebPreferencesRemovedNotification;
 - (BOOL)webArchiveDebugModeEnabled;
 - (void)setWebArchiveDebugModeEnabled:(BOOL)webArchiveDebugModeEnabled;
 
+- (BOOL)localFileContentSniffingEnabled;
+- (void)setLocalFileContentSniffingEnabled:
+    (BOOL)localFileContentSniffingEnabled;
+
 - (BOOL)offlineWebApplicationCacheEnabled;
 - (void)setOfflineWebApplicationCacheEnabled:
     (BOOL)offlineWebApplicationCacheEnabled;
