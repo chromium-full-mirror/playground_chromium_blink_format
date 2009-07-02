@@ -161,6 +161,13 @@ void ScrollbarThemeChromiumLinux::paintThumb(GraphicsContext* gc,
   }
 }
 
+bool ScrollbarThemeChromiumLinux::shouldCenterOnThumb(
+    Scrollbar*,
+    const PlatformMouseEvent& evt) {
+  return (evt.shiftKey() && evt.button() == LeftButton) ||
+         (evt.button() == MiddleButton);
+}
+
 IntSize ScrollbarThemeChromiumLinux::buttonSize(Scrollbar* scrollbar) {
   // On Linux, we don't use buttons
   return IntSize(0, 0);

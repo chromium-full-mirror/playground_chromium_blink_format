@@ -134,10 +134,4 @@ void ScrollbarThemeChromium::paintScrollCorner(ScrollView* view,
   ScrollbarTheme::paintScrollCorner(view, context, cornerRect);
 }
 
-bool ScrollbarThemeChromium::shouldCenterOnThumb(
-    Scrollbar*,
-    const PlatformMouseEvent& evt) {
-  return evt.shiftKey() && evt.button() == LeftButton;
-}
-
 }  // namespace WebCore

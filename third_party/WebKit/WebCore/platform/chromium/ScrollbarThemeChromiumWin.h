@@ -51,6 +51,7 @@ class ScrollbarThemeChromiumWin : public ScrollbarThemeChromium {
                            const IntRect&,
                            ScrollbarPart);
   virtual void paintThumb(GraphicsContext*, Scrollbar*, const IntRect&);
+  virtual bool shouldCenterOnThumb(Scrollbar*, const PlatformMouseEvent&);
   virtual IntSize buttonSize(Scrollbar*);
 
  private:
