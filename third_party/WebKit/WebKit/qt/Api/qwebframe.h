@@ -178,6 +178,9 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   qreal zoomFactor() const;
   void setZoomFactor(qreal factor);
 
+  bool hasFocus() const;
+  void setFocus();
+
   QPoint pos() const;
   QRect geometry() const;
   QSize contentsSize() const;
