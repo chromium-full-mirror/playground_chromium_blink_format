@@ -114,6 +114,8 @@ class HTMLPlugInElement;
 - (WebCore::CString)resolvedURLStringForURL:(const char*)url
                                      target:(const char*)target;
 
+- (void)invalidatePluginContentRect:(NSRect)rect;
+
 @end
 
 namespace WebKit {
