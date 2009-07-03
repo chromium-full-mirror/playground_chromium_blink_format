@@ -104,9 +104,6 @@ struct _WebKitWebViewPrivate {
   WebKitWebWindowFeatures* webWindowFeatures;
 
   WebKitWebFrame* mainFrame;
-  WebCore::String applicationNameForUserAgent;
-  WebCore::String* userAgent;
-
   WebKitWebBackForwardList* backForwardList;
 
   gint lastPopupXPosition;
