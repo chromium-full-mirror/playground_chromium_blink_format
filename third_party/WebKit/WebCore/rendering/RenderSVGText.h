@@ -85,7 +85,7 @@ class RenderSVGText : public RenderSVGBlock {
     return m_localTransform;
   }
 
-  virtual RootInlineBox* createRootBox();
+  virtual RootInlineBox* createRootInlineBox();
 
   TransformationMatrix m_localTransform;
 };

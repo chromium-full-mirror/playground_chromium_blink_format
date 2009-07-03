@@ -40,7 +40,7 @@ class RenderSVGInline : public RenderInline {
   virtual void absoluteQuads(Vector<FloatQuad>&);
 
  private:
-  virtual InlineFlowBox* createFlowBox();
+  virtual InlineFlowBox* createInlineFlowBox();
 };
 }
 

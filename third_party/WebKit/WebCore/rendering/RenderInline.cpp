@@ -808,12 +808,12 @@ void RenderInline::dirtyLineBoxes(bool fullLayout) {
     m_lineBoxes.dirtyLineBoxes();
 }
 
-InlineFlowBox* RenderInline::createFlowBox() {
+InlineFlowBox* RenderInline::createInlineFlowBox() {
   return new (renderArena()) InlineFlowBox(this);
 }
 
-InlineFlowBox* RenderInline::createInlineFlowBox() {
-  InlineFlowBox* flowBox = createFlowBox();
+InlineFlowBox* RenderInline::createAndAppendInlineFlowBox() {
+  InlineFlowBox* flowBox = createInlineFlowBox();
   m_lineBoxes.appendLineBox(flowBox);
   return flowBox;
 }

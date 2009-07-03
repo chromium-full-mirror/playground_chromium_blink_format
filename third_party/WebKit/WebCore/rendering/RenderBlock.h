@@ -172,7 +172,8 @@ class RenderBlock : public RenderBox {
 
   virtual void updateBeforeAfterContent(PseudoId);
 
-  RootInlineBox* createRootInlineBox();
+  RootInlineBox* createAndAppendRootInlineBox();
+  virtual RootInlineBox* createRootInlineBox();  // Subclassed by SVG and Ruby.
 
   // Called to lay out the legend for a fieldset.
   virtual RenderObject* layoutLegend(bool /*relayoutChildren*/) { return 0; }
@@ -513,8 +514,6 @@ class RenderBlock : public RenderBox {
   void newLine(EClear);
   virtual bool hasLineIfEmpty() const;
   bool layoutOnlyPositionedObjects();
-
-  virtual RootInlineBox* createRootBox();  // Subclassed by SVG.
 
  private:
   Position positionForBox(InlineBox*, bool start = true) const;

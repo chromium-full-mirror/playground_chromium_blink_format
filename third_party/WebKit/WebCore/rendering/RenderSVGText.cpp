@@ -92,7 +92,7 @@ void RenderSVGText::layout() {
   setNeedsLayout(false);
 }
 
-RootInlineBox* RenderSVGText::createRootBox() {
+RootInlineBox* RenderSVGText::createRootInlineBox() {
   RootInlineBox* box = new (renderArena()) SVGRootInlineBox(this);
   box->setIsSVG(true);
   return box;

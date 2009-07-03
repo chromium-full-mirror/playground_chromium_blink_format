@@ -36,7 +36,7 @@ namespace WebCore {
 
 RenderSVGInline::RenderSVGInline(Node* n) : RenderInline(n) {}
 
-InlineFlowBox* RenderSVGInline::createFlowBox() {
+InlineFlowBox* RenderSVGInline::createInlineFlowBox() {
   InlineFlowBox* box = new (renderArena()) SVGInlineFlowBox(this);
   box->setIsSVG(true);
   return box;

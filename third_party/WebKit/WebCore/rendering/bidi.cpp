@@ -463,7 +463,7 @@ static inline InlineBox* createInlineBoxForRenderer(RenderObject* obj,
                                                     bool isRootLineBox,
                                                     bool isOnlyRun = false) {
   if (isRootLineBox)
-    return toRenderBlock(obj)->createRootInlineBox();
+    return toRenderBlock(obj)->createAndAppendRootInlineBox();
 
   if (obj->isText()) {
     InlineTextBox* textBox = toRenderText(obj)->createInlineTextBox();
@@ -479,7 +479,7 @@ static inline InlineBox* createInlineBoxForRenderer(RenderObject* obj,
   if (obj->isBox())
     return toRenderBox(obj)->createInlineBox();
 
-  return toRenderInline(obj)->createInlineFlowBox();
+  return toRenderInline(obj)->createAndAppendInlineFlowBox();
 }
 
 static inline void dirtyLineBoxesForRenderer(RenderObject* o, bool fullLayout) {

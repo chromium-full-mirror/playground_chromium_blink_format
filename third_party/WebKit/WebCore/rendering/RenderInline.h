@@ -114,7 +114,9 @@ class RenderInline : public RenderBoxModelObject {
     return IntRect(0, 0, boundingBox.width(), boundingBox.height());
   }
 
-  InlineFlowBox* createInlineFlowBox();
+  InlineFlowBox* createAndAppendInlineFlowBox();
+  virtual InlineFlowBox* createInlineFlowBox();  // Subclassed by SVG and Ruby
+
   void dirtyLineBoxes(bool fullLayout);
   virtual void dirtyLinesFromChangedChild(RenderObject* child) {
     m_lineBoxes.dirtyLinesFromChangedChild(this, child);
@@ -155,7 +157,6 @@ class RenderInline : public RenderBoxModelObject {
  protected:
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
   virtual void updateBoxModelInfoFromStyle();
-  virtual InlineFlowBox* createFlowBox();  // Subclassed by SVG
 
   static RenderInline* cloneInline(RenderInline* src);
 

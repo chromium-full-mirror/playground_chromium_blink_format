@@ -437,12 +437,12 @@ void RenderBlock::deleteLineBoxTree() {
   m_lineBoxes.deleteLineBoxTree(renderArena());
 }
 
-RootInlineBox* RenderBlock::createRootBox() {
+RootInlineBox* RenderBlock::createRootInlineBox() {
   return new (renderArena()) RootInlineBox(this);
 }
 
-RootInlineBox* RenderBlock::createRootInlineBox() {
-  RootInlineBox* rootBox = createRootBox();
+RootInlineBox* RenderBlock::createAndAppendRootInlineBox() {
+  RootInlineBox* rootBox = createRootInlineBox();
   m_lineBoxes.appendLineBox(rootBox);
   return rootBox;
 }
