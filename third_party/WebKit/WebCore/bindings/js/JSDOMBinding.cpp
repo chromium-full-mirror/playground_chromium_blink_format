@@ -35,6 +35,7 @@
 #include "EventException.h"
 #include "ExceptionCode.h"
 #include "Frame.h"
+#include "HTMLAudioElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLScriptElement.h"
 #include "HTMLNames.h"
@@ -281,6 +282,11 @@ static inline bool isObservableThroughDOM(JSNode* jsNode) {
     if (node->hasTagName(scriptTag) &&
         !static_cast<HTMLScriptElement*>(node)->haveFiredLoadEvent())
       return true;
+#if ENABLE(VIDEO)
+    if (node->hasTagName(audioTag) &&
+        !static_cast<HTMLAudioElement*>(node)->paused())
+      return true;
+#endif
   }
 
   return false;
