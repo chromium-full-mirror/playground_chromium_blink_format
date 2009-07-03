@@ -205,8 +205,6 @@ class RenderThemeMac : public RenderTheme {
                                        const RenderObject::PaintInfo&,
                                        const IntRect&);
 
-  // Media controls
-  virtual bool hitTestMediaControlPart(RenderObject*, const IntPoint& absPoint);
   virtual String extraMediaControlsStyleSheet();
 #endif
 
