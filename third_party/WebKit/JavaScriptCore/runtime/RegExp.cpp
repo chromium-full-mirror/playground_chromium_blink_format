@@ -1,6 +1,7 @@
 /*
  *  Copyright (C) 1999-2001, 2004 Harri Porten (porten@kde.org)
  *  Copyright (c) 2007, 2008 Apple Inc. All rights reserved.
+ *  Copyright (C) 2009 Torch Mobile, Inc.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -113,9 +114,7 @@ void RegExp::compile(JSGlobalData* globalData) {
 #endif
 }
 
-int RegExp::match(const UString& s,
-                  int startOffset,
-                  OwnArrayPtr<int>* ovector) {
+int RegExp::match(const UString& s, int startOffset, Vector<int, 32>* ovector) {
   if (startOffset < 0)
     startOffset = 0;
   if (ovector)
@@ -132,16 +131,19 @@ int RegExp::match(const UString& s,
     int offsetVectorSize =
         (m_numSubpatterns + 1) *
         3;  // FIXME: should be 2 - but adding temporary fallback to pcre.
-    int* offsetVector = new int[offsetVectorSize];
+    int* offsetVector;
+    Vector<int, 32> nonReturnedOvector;
+    if (ovector) {
+      ovector->resize(offsetVectorSize);
+      offsetVector = ovector->data();
+    } else {
+      nonReturnedOvector.resize(offsetVectorSize);
+      offsetVector = nonReturnedOvector.data();
+    }
+
     ASSERT(offsetVector);
     for (int j = 0; j < offsetVectorSize; ++j)
       offsetVector[j] = -1;
-
-    OwnArrayPtr<int> nonReturnedOvector;
-    if (!ovector)
-      nonReturnedOvector.set(offsetVector);
-    else
-      ovector->set(offsetVector);
 
 #if ENABLE(YARR_JIT)
     int result = Yarr::executeRegex(m_regExpJITCode, s.data(), startOffset,
@@ -191,9 +193,7 @@ void RegExp::compile(JSGlobalData* globalData) {
                       &m_numSubpatterns, &m_constructionError);
 }
 
-int RegExp::match(const UString& s,
-                  int startOffset,
-                  OwnArrayPtr<int>* ovector) {
+int RegExp::match(const UString& s, int startOffset, Vector<int, 32>* ovector) {
   if (startOffset < 0)
     startOffset = 0;
   if (ovector)
@@ -205,16 +205,18 @@ int RegExp::match(const UString& s,
 #if ENABLE(WREC)
   if (m_wrecFunction) {
     int offsetVectorSize = (m_numSubpatterns + 1) * 2;
-    int* offsetVector = new int[offsetVectorSize];
+    int* offsetVector;
+    Vector<int, 32> nonReturnedOvector;
+    if (ovector) {
+      ovector->resize(offsetVectorSize);
+      offsetVector = ovector->data();
+    } else {
+      nonReturnedOvector.resize(offsetVectorSize);
+      offsetVector = nonReturnedOvector.data();
+    }
     ASSERT(offsetVector);
     for (int j = 0; j < offsetVectorSize; ++j)
       offsetVector[j] = -1;
-
-    OwnArrayPtr<int> nonReturnedOvector;
-    if (!ovector)
-      nonReturnedOvector.set(offsetVector);
-    else
-      ovector->set(offsetVector);
 
     int result = m_wrecFunction(s.data(), startOffset, s.size(), offsetVector);
 
@@ -241,8 +243,8 @@ int RegExp::match(const UString& s,
       offsetVector = fixedSizeOffsetVector;
     } else {
       offsetVectorSize = (m_numSubpatterns + 1) * 3;
-      offsetVector = new int[offsetVectorSize];
-      ovector->set(offsetVector);
+      ovector->resize(offsetVectorSize);
+      offsetVector = ovector->data();
     }
 
     int numMatches =
