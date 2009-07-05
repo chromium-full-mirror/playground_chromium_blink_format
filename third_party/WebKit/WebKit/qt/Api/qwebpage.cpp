@@ -1353,7 +1353,7 @@ QWebFrame* QWebPage::currentFrame() const {
 }
 
 /*!
-    Returns the frame at the given point.
+    Returns the frame at the given point \a pos.
 
     \sa mainFrame(), currentFrame()
 */
