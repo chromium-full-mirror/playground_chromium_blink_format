@@ -91,6 +91,8 @@ static void webkit_web_back_forward_list_class_init(
 
   object_class->dispose = webkit_web_back_forward_list_dispose;
 
+  webkit_init();
+
   g_type_class_add_private(klass, sizeof(WebKitWebBackForwardListPrivate));
 }
 

@@ -127,6 +127,8 @@ static void webkit_network_request_class_init(
   objectClass->get_property = webkit_network_request_get_property;
   objectClass->set_property = webkit_network_request_set_property;
 
+  webkit_init();
+
   /**
    * WebKitNetworkRequest:uri:
    *
