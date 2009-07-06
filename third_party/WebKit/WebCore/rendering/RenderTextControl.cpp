@@ -333,9 +333,6 @@ String RenderTextControl::text() {
   if (!m_innerText)
     return "";
 
-  Frame* frame = document()->frame();
-  Text* compositionNode = frame ? frame->editor()->compositionNode() : 0;
-
   Vector<UChar> result;
 
   for (Node* n = m_innerText.get(); n;
@@ -343,20 +340,8 @@ String RenderTextControl::text() {
     if (n->hasTagName(brTag))
       result.append(&newlineCharacter, 1);
     else if (n->isTextNode()) {
-      Text* text = static_cast<Text*>(n);
-      String data = text->data();
-      unsigned length = data.length();
-      if (text != compositionNode)
-        result.append(data.characters(), length);
-      else {
-        unsigned compositionStart =
-            min(frame->editor()->compositionStart(), length);
-        unsigned compositionEnd = min(
-            max(compositionStart, frame->editor()->compositionEnd()), length);
-        result.append(data.characters(), compositionStart);
-        result.append(data.characters() + compositionEnd,
-                      length - compositionEnd);
-      }
+      String data = static_cast<Text*>(n)->data();
+      result.append(data.characters(), data.length());
     }
   }
 
@@ -400,9 +385,6 @@ String RenderTextControl::textWithHardLineBreaks() {
   if (!box)
     return "";
 
-  Frame* frame = document()->frame();
-  Text* compositionNode = frame ? frame->editor()->compositionNode() : 0;
-
   Node* breakNode;
   unsigned breakOffset;
   RootInlineBox* line = box->root();
@@ -417,24 +399,7 @@ String RenderTextControl::textWithHardLineBreaks() {
       Text* text = static_cast<Text*>(n);
       String data = text->data();
       unsigned length = data.length();
-      unsigned compositionStart =
-          (text == compositionNode)
-              ? min(frame->editor()->compositionStart(), length)
-              : 0;
-      unsigned compositionEnd =
-          (text == compositionNode)
-              ? min(max(compositionStart, frame->editor()->compositionEnd()),
-                    length)
-              : 0;
       unsigned position = 0;
-      while (breakNode == n && breakOffset < compositionStart) {
-        result.append(data.characters() + position, breakOffset - position);
-        position = breakOffset;
-        result.append(&newlineCharacter, 1);
-        getNextSoftBreak(line, breakNode, breakOffset);
-      }
-      result.append(data.characters() + position, compositionStart - position);
-      position = compositionEnd;
       while (breakNode == n && breakOffset <= length) {
         if (breakOffset > position) {
           result.append(data.characters() + position, breakOffset - position);
