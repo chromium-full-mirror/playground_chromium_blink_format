@@ -171,6 +171,7 @@ extern void (*wkSignalCFReadStreamError)(CFReadStreamRef stream,
 extern void (*wkSignalCFReadStreamHasBytes)(CFReadStreamRef stream);
 extern unsigned (*wkInitializeMaximumHTTPConnectionCountPerHost)(
     unsigned preferredConnectionCount);
+extern BOOL (*wkIsLatchingWheelEvent)(NSEvent*);
 
 #ifndef BUILDING_ON_TIGER
 extern void (*wkGetGlyphsForCharacters)(CGFontRef,
