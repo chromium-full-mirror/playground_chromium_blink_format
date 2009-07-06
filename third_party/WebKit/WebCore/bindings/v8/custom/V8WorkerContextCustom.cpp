@@ -113,7 +113,7 @@ v8::Handle<v8::Value> SetTimeoutOrInterval(const v8::Arguments& args,
   int timerId;
 
   if (function->IsString()) {
-    WebCore::String stringFunction = ToWebCoreString(function);
+    WebCore::String stringFunction = toWebCoreString(function);
     timerId = DOMTimer::install(
         workerContext,
         new ScheduledAction(stringFunction, workerContext->url()), timeout,
