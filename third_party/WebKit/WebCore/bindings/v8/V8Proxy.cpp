@@ -713,12 +713,12 @@ static void handleConsoleMessage(v8::Handle<v8::Message> message,
 
   v8::Handle<v8::String> errorMessageString = message->Get();
   ASSERT(!errorMessageString.IsEmpty());
-  String errorMessage = toWebCoreString(errorMessageString);
+  String errorMessage = ToWebCoreString(errorMessageString);
 
   v8::Handle<v8::Value> resourceName = message->GetScriptResourceName();
   bool useURL = resourceName.IsEmpty() || !resourceName->IsString();
   String resourceNameString =
-      useURL ? frame->document()->url() : toWebCoreString(resourceName);
+      useURL ? frame->document()->url() : ToWebCoreString(resourceName);
   JavaScriptConsoleMessage consoleMessage(errorMessage, resourceNameString,
                                           message->GetLineNumber());
   ConsoleMessageManager::addMessage(page, consoleMessage);
@@ -971,7 +971,7 @@ void V8Proxy::disconnectEventListeners() {
 v8::Handle<v8::Script> V8Proxy::compileScript(v8::Handle<v8::String> code,
                                               const String& fileName,
                                               int baseLine) {
-  const uint16_t* fileNameString = fromWebCoreString(fileName);
+  const uint16_t* fileNameString = FromWebCoreString(fileName);
   v8::Handle<v8::String> name =
       v8::String::New(fileNameString, fileName.length());
   v8::Handle<v8::Integer> line = v8::Integer::New(baseLine);
@@ -3315,7 +3315,7 @@ String V8Proxy::sourceName() {
       v8UtilityContext->Global()->Get(v8::String::New("frameSourceName")));
   if (frameSourceName.IsEmpty())
     return String();
-  return toWebCoreString(v8::Debug::Call(frameSourceName));
+  return ToWebCoreString(v8::Debug::Call(frameSourceName));
 }
 
 void V8Proxy::registerExtension(v8::Extension* extension,

@@ -57,7 +57,7 @@ v8::Handle<v8::Value> removeElement(HTMLSelectElement* imp,
     return v8::Undefined();
   }
 
-  imp->remove(toInt32(args[0]));
+  imp->remove(ToInt32(args[0]));
   return v8::Undefined();
 }
 
