@@ -33,7 +33,7 @@ class SVGInlineFlowBox : public InlineFlowBox {
  public:
   SVGInlineFlowBox(RenderObject* obj) : InlineFlowBox(obj), m_height(0) {}
 
-  virtual int svgBoxHeight() const { return m_height; }
+  virtual int virtualHeight() const { return m_height; }
   void setHeight(int h) { m_height = h; }
 
   virtual void paint(RenderObject::PaintInfo&, int tx, int ty);

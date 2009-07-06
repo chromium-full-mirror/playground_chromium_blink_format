@@ -133,7 +133,7 @@ FloatQuad RenderSVGInlineText::computeRepaintQuadForRange(
 
 InlineTextBox* RenderSVGInlineText::createTextBox() {
   InlineTextBox* box = new (renderArena()) SVGInlineTextBox(this);
-  box->setIsSVG(true);
+  box->setHasVirtualHeight();
   return box;
 }
 
