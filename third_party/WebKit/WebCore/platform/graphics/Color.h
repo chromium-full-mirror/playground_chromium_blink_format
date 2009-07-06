@@ -153,7 +153,6 @@ inline bool operator!=(const Color& a, const Color& b) {
   return !(a == b);
 }
 
-Color focusRingColor();
 Color colorFromPremultipliedARGB(unsigned);
 unsigned premultipliedARGBFromColor(const Color&);
 

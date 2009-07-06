@@ -150,7 +150,7 @@ Color RenderThemeChromiumSkia::platformInactiveSelectionForegroundColor()
   return Color(0x32, 0x32, 0x32);
 }
 
-Color RenderThemeChromiumSkia::focusRingColor() const {
+Color RenderThemeChromiumSkia::platformFocusRingColor() const {
   static Color focusRingColor(229, 151, 0, 255);
   return focusRingColor;
 }

@@ -170,7 +170,9 @@ class RenderTheme : public RefCounted<RenderTheme> {
   virtual Color platformActiveTextSearchHighlightColor() const;
   virtual Color platformInactiveTextSearchHighlightColor() const;
 
-  virtual Color focusRingColor() const;
+  static Color focusRingColor();
+  virtual Color platformFocusRingColor() const { return Color(0, 0, 0); }
+  static void setCustomFocusRingColor(const Color&);
 
   virtual void platformColorsDidChange();
 

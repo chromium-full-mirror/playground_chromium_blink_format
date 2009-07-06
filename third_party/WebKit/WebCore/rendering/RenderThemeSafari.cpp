@@ -69,9 +69,11 @@ PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
   // will return a
   // potentially wrong answer the very first time it's called (see
   // <https://bugs.webkit.org/show_bug.cgi?id=26493>).
-  if (Settings::shouldPaintNativeControls())
+  if (Settings::shouldPaintNativeControls()) {
+    RenderTheme::setCustomFocusRingColor(safariTheme->platformFocusRingColor());
     return windowsTheme;  // keep the reference of one.
-  return safariTheme;     // keep the reference of one.
+  }
+  return safariTheme;  // keep the reference of one.
 }
 
 #if !defined(NDEBUG) && defined(USE_DEBUG_SAFARI_THEME)
@@ -166,7 +168,7 @@ Color RenderThemeSafari::activeListBoxSelectionBackgroundColor() const {
   return Color(56, 117, 215);
 }
 
-Color RenderThemeSafari::focusRingColor() const {
+Color RenderThemeSafari::platformFocusRingColor() const {
   static Color focusRingColor;
 
   if (!focusRingColor.isValid()) {

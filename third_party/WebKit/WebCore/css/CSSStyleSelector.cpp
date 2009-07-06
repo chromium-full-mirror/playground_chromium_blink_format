@@ -6252,7 +6252,7 @@ Color CSSStyleSelector::getColorFromPrimitiveValue(
     } else if (ident == CSSValueWebkitActivelink)
       col = m_element->document()->activeLinkColor();
     else if (ident == CSSValueWebkitFocusRingColor)
-      col = RenderTheme::defaultTheme()->focusRingColor();
+      col = RenderTheme::focusRingColor();
     else if (ident == CSSValueCurrentcolor)
       col = m_style->color();
     else
