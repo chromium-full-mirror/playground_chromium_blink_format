@@ -119,12 +119,13 @@ extern void (*wkDrawMediaSliderTrack)(int themeStyle,
                                       CGRect rect,
                                       float timeLoaded,
                                       float currentTime,
-                                      float duration);
+                                      float duration,
+                                      unsigned state);
 extern void (*wkDrawMediaUIPart)(int part,
                                  int themeStyle,
                                  CGContextRef context,
                                  CGRect rect,
-                                 int state);
+                                 unsigned state);
 extern NSString* (*wkGetPreferredExtensionForMIMEType)(NSString*);
 extern NSArray* (*wkGetExtensionsForMIMEType)(NSString*);
 extern NSString* (*wkGetMIMETypeForExtension)(NSString*);

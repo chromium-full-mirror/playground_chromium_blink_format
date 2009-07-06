@@ -64,7 +64,8 @@ RenderMedia::RenderMedia(HTMLMediaElement* video, const IntSize& intrinsicSize)
       m_mouseOver(false),
       m_opacityAnimationStartTime(0),
       m_opacityAnimationFrom(0),
-      m_opacityAnimationTo(1.0f) {}
+      m_opacityAnimationTo(1.0f),
+      m_previousVisible(VISIBLE) {}
 
 RenderMedia::~RenderMedia() {}
 
@@ -122,6 +123,12 @@ void RenderMedia::layout() {
     return;
   IntSize newSize = contentBoxRect().size();
   if (newSize != oldSize || controlsRenderer->needsLayout()) {
+    if (m_currentTimeDisplay && m_timeRemainingDisplay) {
+      bool shouldShowTimeDisplays = shouldShowTimeDisplayControls();
+      m_currentTimeDisplay->setVisible(shouldShowTimeDisplays);
+      m_timeRemainingDisplay->setVisible(shouldShowTimeDisplays);
+    }
+
     controlsRenderer->setLocation(borderLeft() + paddingLeft(),
                                   borderTop() + paddingTop());
     controlsRenderer->style()->setHeight(Length(newSize.height(), Fixed));
@@ -209,14 +216,14 @@ void RenderMedia::createTimeline() {
 
 void RenderMedia::createCurrentTimeDisplay() {
   ASSERT(!m_currentTimeDisplay);
-  m_currentTimeDisplay = new MediaControlElement(
+  m_currentTimeDisplay = new MediaControlTimeDisplayElement(
       document(), MEDIA_CONTROLS_CURRENT_TIME_DISPLAY, mediaElement());
   m_currentTimeDisplay->attachToParent(m_timelineContainer.get());
 }
 
 void RenderMedia::createTimeRemainingDisplay() {
   ASSERT(!m_timeRemainingDisplay);
-  m_timeRemainingDisplay = new MediaControlElement(
+  m_timeRemainingDisplay = new MediaControlTimeDisplayElement(
       document(), MEDIA_CONTROLS_TIME_REMAINING_DISPLAY, mediaElement());
   m_timeRemainingDisplay->attachToParent(m_timelineContainer.get());
 }
@@ -500,6 +507,18 @@ int RenderMedia::leftmostPosition(bool includeOverflowInterior,
   return min(left, m_controlsShadowRoot->renderBox()->x() +
                        m_controlsShadowRoot->renderBox()->leftmostPosition(
                            includeOverflowInterior, includeSelf));
+}
+
+// We want the timeline slider to be at least 100 pixels wide.
+static const int minWidthToDisplayTimeDisplays =
+    16 + 16 + 45 + 100 + 45 + 16 + 1;
+
+bool RenderMedia::shouldShowTimeDisplayControls() const {
+  if (!m_currentTimeDisplay && !m_timeRemainingDisplay)
+    return false;
+
+  int width = mediaElement()->renderBox()->width();
+  return width >= minWidthToDisplayTimeDisplays;
 }
 
 }  // namespace WebCore

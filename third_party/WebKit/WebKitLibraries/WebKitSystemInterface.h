@@ -262,9 +262,9 @@ typedef enum {
 } WKMediaControllerThemeStyle;
 
 typedef enum {
-  WKMediaControllerStateNormal = 0,
-  WKMediaControllerStateActivated = 1,
-  WKMediaControllerStateDisabled = 2
+  WKMediaControllerFlagDisbled = 1 << 0,
+  WKMediaControllerFlagPressed = 1 << 1,
+  WKMediaControllerFlagDrawEndCaps = 1 << 3,
 } WKMediaControllerThemeState;
 
 BOOL WKHitTestMediaUIPart(int part,
@@ -279,13 +279,14 @@ void WKDrawMediaUIPart(int part,
                        int themeStyle,
                        CGContextRef context,
                        CGRect rect,
-                       int state);
+                       unsigned state);
 void WKDrawMediaSliderTrack(int themeStyle,
                             CGContextRef context,
                             CGRect rect,
                             float timeLoaded,
                             float currentTime,
-                            float duration);
+                            float duration,
+                            unsigned state);
 
 #if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD) && \
     defined(__x86_64__)
