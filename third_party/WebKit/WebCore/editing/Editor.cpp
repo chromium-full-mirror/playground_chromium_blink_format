@@ -700,22 +700,22 @@ PassRefPtr<Node> Editor::increaseSelectionListLevelOrdered() {
   if (!canEditRichly() || m_frame->selection()->isNone())
     return 0;
 
-  PassRefPtr<Node> newList =
+  RefPtr<Node> newList =
       IncreaseSelectionListLevelCommand::increaseSelectionListLevelOrdered(
           m_frame->document());
   revealSelectionAfterEditingOperation();
-  return newList;
+  return newList.release();
 }
 
 PassRefPtr<Node> Editor::increaseSelectionListLevelUnordered() {
   if (!canEditRichly() || m_frame->selection()->isNone())
     return 0;
 
-  PassRefPtr<Node> newList =
+  RefPtr<Node> newList =
       IncreaseSelectionListLevelCommand::increaseSelectionListLevelUnordered(
           m_frame->document());
   revealSelectionAfterEditingOperation();
-  return newList;
+  return newList.release();
 }
 
 void Editor::decreaseSelectionListLevel() {
