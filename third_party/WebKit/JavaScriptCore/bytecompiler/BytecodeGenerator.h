@@ -272,9 +272,6 @@ class BytecodeGenerator : public WTF::FastAllocBase {
   RegisterID* emitLoad(RegisterID* dst, double);
   RegisterID* emitLoad(RegisterID* dst, const Identifier&);
   RegisterID* emitLoad(RegisterID* dst, JSValue);
-  RegisterID* emitUnexpectedLoad(RegisterID* dst, bool);
-  RegisterID* emitUnexpectedLoad(RegisterID* dst, double);
-  RegisterID* emitLoadGlobalObject(RegisterID* dst, JSObject* globalObject);
 
   RegisterID* emitUnaryOp(OpcodeID, RegisterID* dst, RegisterID* src);
   RegisterID* emitBinaryOp(OpcodeID,
@@ -523,7 +520,7 @@ class BytecodeGenerator : public WTF::FastAllocBase {
 
   RegisterID* addParameter(const Identifier&);
 
-  void allocateConstants(size_t);
+  void preserveLastVar();
 
   RegisterID& registerFor(int index) {
     if (index >= 0)
@@ -544,8 +541,7 @@ class BytecodeGenerator : public WTF::FastAllocBase {
   unsigned addConstant(FuncDeclNode*);
   unsigned addConstant(FuncExprNode*);
   unsigned addConstant(const Identifier&);
-  RegisterID* addConstant(JSValue);
-  unsigned addUnexpectedConstant(JSValue);
+  RegisterID* addConstantValue(JSValue);
   unsigned addRegExp(RegExp*);
 
   Vector<Instruction>& instructions() { return m_codeBlock->instructions(); }
@@ -579,12 +575,13 @@ class BytecodeGenerator : public WTF::FastAllocBase {
   RegisterID m_thisRegister;
   RegisterID m_argumentsRegister;
   int m_activationRegisterIndex;
+  WTF::SegmentedVector<RegisterID, 32> m_constantPoolRegisters;
   WTF::SegmentedVector<RegisterID, 32> m_calleeRegisters;
   WTF::SegmentedVector<RegisterID, 32> m_parameters;
   WTF::SegmentedVector<RegisterID, 32> m_globals;
   WTF::SegmentedVector<Label, 32> m_labels;
   WTF::SegmentedVector<LabelScope, 8> m_labelScopes;
-  RefPtr<RegisterID> m_lastConstant;
+  RefPtr<RegisterID> m_lastVar;
   int m_finallyDepth;
   int m_dynamicScopeDepth;
   int m_baseScopeDepth;
@@ -595,7 +592,8 @@ class BytecodeGenerator : public WTF::FastAllocBase {
 
   int m_nextGlobalIndex;
   int m_nextParameterIndex;
-  int m_nextConstantIndex;
+  int m_firstConstantIndex;
+  int m_nextConstantOffset;
   unsigned m_globalConstantIndex;
 
   int m_globalVarStorageOffset;
