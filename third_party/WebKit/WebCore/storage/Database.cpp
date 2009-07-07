@@ -60,6 +60,9 @@
 
 namespace WebCore {
 
+// If we sleep for more the 30 seconds while blocked on SQLITE_BUSY, give up.
+static const int maxSqliteBusyWaitTime = 30000;
+
 const String& Database::databaseInfoTableName() {
   DEFINE_STATIC_LOCAL(String, name, ("__WebKitDatabaseInfoTable__"));
   return name;
@@ -143,7 +146,8 @@ Database::Database(Document* document,
       m_guid(0),
       m_expectedVersion(expectedVersion),
       m_deleted(false),
-      m_stopped(false) {
+      m_stopped(false),
+      m_opened(false) {
   ASSERT(document);
   m_securityOrigin = document->securityOrigin();
 
@@ -341,7 +345,13 @@ void Database::markAsDeletedAndClose() {
 }
 
 void Database::close() {
-  m_sqliteDatabase.close();
+  if (m_opened) {
+    ASSERT(m_document->databaseThread());
+    ASSERT(currentThread() == document()->databaseThread()->getThreadID());
+    m_sqliteDatabase.close();
+    m_document->databaseThread()->recordDatabaseClosed(this);
+    m_opened = false;
+  }
 }
 
 void Database::stop() {
@@ -446,8 +456,13 @@ bool Database::performOpenAndVerify(ExceptionCode& e) {
     return false;
   }
 
+  m_opened = true;
+  if (m_document->databaseThread())
+    m_document->databaseThread()->recordDatabaseOpen(this);
+
   ASSERT(m_databaseAuthorizer);
   m_sqliteDatabase.setAuthorizer(m_databaseAuthorizer);
+  m_sqliteDatabase.setBusyTimeout(maxSqliteBusyWaitTime);
 
   if (!m_sqliteDatabase.tableExists(databaseInfoTableName())) {
     if (!m_sqliteDatabase.executeCommand(

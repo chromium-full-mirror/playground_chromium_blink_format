@@ -66,6 +66,10 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
                                                          // completion.
   void unscheduleDatabaseTasks(Database*);
 
+  void recordDatabaseOpen(Database*);
+  void recordDatabaseClosed(Database*);
+  ThreadIdentifier getThreadID() { return m_threadID; }
+
  private:
   DatabaseThread();
 
@@ -77,6 +81,11 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
   RefPtr<DatabaseThread> m_selfRef;
 
   MessageQueue<RefPtr<DatabaseTask>> m_queue;
+
+  // This set keeps track of the open databases that have been used on this
+  // thread.
+  typedef HashSet<RefPtr<Database>> DatabaseSet;
+  DatabaseSet m_openDatabaseSet;
 };
 
 }  // namespace WebCore
