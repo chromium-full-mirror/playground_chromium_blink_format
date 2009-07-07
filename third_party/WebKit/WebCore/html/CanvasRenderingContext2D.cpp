@@ -59,10 +59,10 @@
 #include "TextMetrics.h"
 #include "HTMLVideoElement.h"
 #include <stdio.h>
-
 #include <wtf/ByteArray.h>
 #include <wtf/MathExtras.h>
 #include <wtf/OwnPtr.h>
+#include <wtf/UnusedParam.h>
 
 using namespace std;
 
@@ -1207,6 +1207,8 @@ void CanvasRenderingContext2D::prepareGradientForDashboard(
   if (Settings* settings = m_canvas->document()->settings())
     if (settings->usesDashboardBackwardCompatibilityMode())
       gradient->setDashboardCompatibilityMode();
+#else
+  UNUSED_PARAM(gradient);
 #endif
 }
 
