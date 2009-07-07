@@ -192,6 +192,7 @@ class V8Proxy {
 
   explicit V8Proxy(Frame* frame)
       : m_frame(frame),
+        m_domNodeMap(getDOMNodeMap()),
         m_inlineCode(false),
         m_timerCallback(false),
         m_recursion(0) {}
@@ -594,7 +595,15 @@ class V8Proxy {
   // but always
   // use NODE as the second V8WrapperType. JS wrapper stores the second
   // V8WrapperType and the void* as internal fields.
-  static v8::Local<v8::Object> instantiateV8Object(V8ClassIndex::V8WrapperType,
+  static v8::Local<v8::Object> instantiateV8Object(
+      V8ClassIndex::V8WrapperType descType,
+      V8ClassIndex::V8WrapperType cptrType,
+      void* impl) {
+    return instantiateV8Object(NULL, descType, cptrType, impl);
+  }
+
+  static v8::Local<v8::Object> instantiateV8Object(V8Proxy*,
+                                                   V8ClassIndex::V8WrapperType,
                                                    V8ClassIndex::V8WrapperType,
                                                    void*);
 
@@ -633,6 +642,8 @@ class V8Proxy {
 
   v8::Persistent<v8::Object> m_global;
   v8::Persistent<v8::Value> m_document;
+
+  DOMWrapperMap<Node>& m_domNodeMap;
 
   // Utility context holding JavaScript functions used internally.
   static v8::Persistent<v8::Context> m_utilityContext;
