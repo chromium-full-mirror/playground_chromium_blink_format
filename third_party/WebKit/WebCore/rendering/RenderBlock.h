@@ -185,10 +185,12 @@ class RenderBlock : public RenderBox {
           rect(IntRect(f->x() - f->marginLeft(),
                        f->y() - f->marginTop(),
                        f->width() + f->marginLeft() + f->marginRight(),
-                       f->height() + f->marginTop() + f->marginBottom())) {}
+                       f->height() + f->marginTop() + f->marginBottom())),
+          everHadLayout(f->m_everHadLayout) {}
 
     RenderBox* object;
     IntRect rect;
+    bool everHadLayout;
   };
 
   void bidiReorderLine(InlineBidiResolver&,

@@ -1663,8 +1663,10 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
         child->repaintDuringLayoutIfMoved(oldRect);
     }
 
-    if (!childHadLayout && child->checkForRepaintDuringLayout())
+    if (!childHadLayout && child->checkForRepaintDuringLayout()) {
       child->repaint();
+      child->repaintOverhangingFloats(true);
+    }
 
     ASSERT(oldLayoutDelta == view()->layoutDelta());
   }
