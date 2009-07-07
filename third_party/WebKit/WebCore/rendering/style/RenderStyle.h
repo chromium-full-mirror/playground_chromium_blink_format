@@ -320,6 +320,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   RenderStyle* getCachedPseudoStyle(PseudoId) const;
   RenderStyle* addCachedPseudoStyle(PassRefPtr<RenderStyle>);
 
+  typedef Vector<RenderStyle*, 10> PseudoStyleCache;
+  void getPseudoStyleCache(PseudoStyleCache&) const;
+
   bool affectedByHoverRules() const {
     return noninherited_flags._affectedByHover;
   }

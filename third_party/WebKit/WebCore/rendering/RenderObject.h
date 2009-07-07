@@ -448,7 +448,8 @@ class RenderObject : public CachedResourceClient {
                                     RenderStyle* parentStyle = 0) const;
   PassRefPtr<RenderStyle> getUncachedPseudoStyle(
       PseudoId,
-      RenderStyle* parentStyle = 0) const;
+      RenderStyle* parentStyle = 0,
+      RenderStyle* ownStyle = 0) const;
 
   virtual void updateDragState(bool dragOn);
 
@@ -664,6 +665,11 @@ class RenderObject : public CachedResourceClient {
   RenderStyle* style(bool firstLine) const {
     return firstLine ? firstLineStyle() : style();
   }
+
+  // Used only by Element::pseudoStyleCacheIsInvalid to get a first line style
+  // based off of a
+  // given new style, without accessing the cache.
+  PassRefPtr<RenderStyle> uncachedFirstLineStyle(RenderStyle*) const;
 
   // Anonymous blocks that are part of of a continuation chain will return their
   // inline continuation's outline style instead.
