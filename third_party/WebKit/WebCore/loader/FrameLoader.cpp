@@ -622,24 +622,6 @@ void FrameLoader::submitForm(const char* action,
   frameRequest.resourceRequest().setURL(u);
   addHTTPOriginIfNeeded(frameRequest.resourceRequest(), outgoingOrigin());
 
-  // Navigation of a subframe during loading of the main frame does not create a
-  // new back/forward item.
-  // Strangely, we only implement this rule for form submission; time will tell
-  // if we need it for other types of navigation.
-  // The definition of "during load" is any time before the load event has been
-  // handled.
-  // See https://bugs.webkit.org/show_bug.cgi?id=14957 for the original
-  // motivation for this.
-  if (Page* targetPage = targetFrame->page()) {
-    Frame* mainFrame = targetPage->mainFrame();
-    if (mainFrame != targetFrame) {
-      Document* document = mainFrame->document();
-      if (!mainFrame->loader()->isComplete() ||
-          document && document->processingLoadEvent())
-        lockBackForwardList = true;
-    }
-  }
-
   targetFrame->loader()->scheduleFormSubmission(
       frameRequest, lockHistory, lockBackForwardList, event, formState);
 }
@@ -1422,6 +1404,24 @@ void FrameLoader::scheduleHTTPRedirection(double delay, const String& url) {
         new ScheduledRedirection(delay, url, true, delay <= 1, false, false));
 }
 
+static bool mustLockBackForwardList(Frame* targetFrame) {
+  // Navigation of a subframe during loading of an ancestor frame does not
+  // create a new back/forward item.
+  // The definition of "during load" is any time before all handlers for the
+  // load event have been run.
+  // See https://bugs.webkit.org/show_bug.cgi?id=14957 for the original
+  // motivation for this.
+
+  for (Frame* ancestor = targetFrame->tree()->parent(); ancestor;
+       ancestor = ancestor->tree()->parent()) {
+    Document* document = ancestor->document();
+    if (!ancestor->loader()->isComplete() ||
+        document && document->processingLoadEvent())
+      return true;
+  }
+  return false;
+}
+
 void FrameLoader::scheduleLocationChange(const String& url,
                                          const String& referrer,
                                          bool lockHistory,
@@ -1432,6 +1432,8 @@ void FrameLoader::scheduleLocationChange(const String& url,
 
   if (url.isEmpty())
     return;
+
+  lockBackForwardList = lockBackForwardList || mustLockBackForwardList(m_frame);
 
   // If the URL we're going to navigate to is the same as the current one,
   // except for the
@@ -1464,6 +1466,8 @@ void FrameLoader::scheduleFormSubmission(const FrameLoadRequest& frameRequest,
   // the same
   // as the current one except for the fragment part? See scheduleLocationChange
   // above.
+
+  lockBackForwardList = lockBackForwardList || mustLockBackForwardList(m_frame);
 
   // Handle a location change of a page with no document as a special case.
   // This may happen when a frame changes the location of another frame.
