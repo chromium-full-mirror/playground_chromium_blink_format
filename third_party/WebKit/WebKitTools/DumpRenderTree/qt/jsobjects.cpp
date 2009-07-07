@@ -105,7 +105,6 @@ void BackForwardItem::invoke() const {
 
 LayoutTestController::LayoutTestController(WebCore::DumpRenderTree* drt)
     : QObject(), m_drt(drt) {
-  m_timeoutTimer = 0;
   reset();
 }
 
@@ -117,10 +116,7 @@ void LayoutTestController::reset() {
   m_canOpenWindows = false;
   m_waitForDone = false;
   m_dumpTitleChanges = false;
-  if (m_timeoutTimer) {
-    killTimer(m_timeoutTimer);
-    m_timeoutTimer = 0;
-  }
+  m_timeoutTimer.stop();
   m_topLoadingFrame = 0;
   qt_dump_editing_callbacks(false);
   qt_dump_resource_load_callbacks(false);
@@ -163,15 +159,14 @@ void LayoutTestController::maybeDump(bool) {
 void LayoutTestController::waitUntilDone() {
   // qDebug() << ">>>>waitForDone";
   m_waitForDone = true;
-  m_timeoutTimer = startTimer(11000);
+  m_timeoutTimer.start(11000, this);
 }
 
 void LayoutTestController::notifyDone() {
   // qDebug() << ">>>>notifyDone";
-  if (!m_timeoutTimer)
+  if (!m_timeoutTimer.isActive())
     return;
-  killTimer(m_timeoutTimer);
-  m_timeoutTimer = 0;
+  m_timeoutTimer.stop();
   emit done();
   m_isLoading = false;
 }
@@ -228,9 +223,13 @@ void LayoutTestController::provisionalLoad() {
     m_topLoadingFrame = frame;
 }
 
-void LayoutTestController::timerEvent(QTimerEvent*) {
-  qDebug() << ">>>>>>>>>>>>> timeout";
-  notifyDone();
+void LayoutTestController::timerEvent(QTimerEvent* ev) {
+  if (ev->timerId() == m_timeoutTimer.timerId()) {
+    qDebug() << ">>>>>>>>>>>>> timeout";
+    notifyDone();
+  } else {
+    QObject::timerEvent(ev);
+  }
 }
 
 QString LayoutTestController::encodeHostName(const QString& host) {

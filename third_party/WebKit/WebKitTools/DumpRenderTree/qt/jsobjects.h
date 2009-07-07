@@ -34,6 +34,7 @@
 #include <qpoint.h>
 #include <qstringlist.h>
 #include <qsize.h>
+#include <qbasictimer.h>
 
 class QWebFrame;
 namespace WebCore {
@@ -109,7 +110,7 @@ class LayoutTestController : public QObject {
   bool m_canOpenWindows;
   bool m_waitForDone;
   bool m_dumpTitleChanges;
-  int m_timeoutTimer;
+  QBasicTimer m_timeoutTimer;
   QWebFrame* m_topLoadingFrame;
   WebCore::DumpRenderTree* m_drt;
 };
