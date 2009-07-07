@@ -1704,6 +1704,7 @@ void Document::implicitClose() {
   }
 
   frame()->loader()->checkCallImplicitClose();
+  RenderObject* renderObject = renderer();
 
   // We used to force a synchronous display and flush here.  This really isn't
   // necessary and can in fact be actively harmful if pages are loading at a
@@ -1715,15 +1716,24 @@ void Document::implicitClose() {
     updateStyleIfNeeded();
 
     // Always do a layout after loading if needed.
-    if (view() && renderer() &&
-        (!renderer()->firstChild() || renderer()->needsLayout()))
+    if (view() && renderObject &&
+        (!renderObject->firstChild() || renderObject->needsLayout()))
       view()->layout();
   }
 
 #if PLATFORM(MAC)
-  if (f && renderer() && this == topDocument() &&
+  if (f && renderObject && this == topDocument() &&
       AXObjectCache::accessibilityEnabled())
-    axObjectCache()->postNotification(renderer(), "AXLoadComplete", true);
+    // The AX cache may have been cleared at this point, but we need to make
+    // sure it contains an
+    // AX object to send the notification to. getOrCreate will make sure that an
+    // valid AX object
+    // exists in the cache (we ignore the return value because we don't need it
+    // here). This is
+    // only safe to call when a layout is not in progress, so it can not be used
+    // in postNotification.
+    axObjectCache()->getOrCreate(renderObject);
+  axObjectCache()->postNotification(renderObject, "AXLoadComplete", true);
 #endif
 
 #if ENABLE(SVG)
