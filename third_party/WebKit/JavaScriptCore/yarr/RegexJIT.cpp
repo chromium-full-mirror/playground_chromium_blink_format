@@ -1405,6 +1405,7 @@ class RegexGenerator : private MacroAssembler {
 #if PLATFORM(X86_64)
     push(X86::ebp);
     move(stackPointerRegister, X86::ebp);
+    push(X86::ebx);
 #elif PLATFORM(X86)
     push(X86::ebp);
     move(stackPointerRegister, X86::ebp);
@@ -1432,6 +1433,7 @@ class RegexGenerator : private MacroAssembler {
 
   void generateReturn() {
 #if PLATFORM(X86_64)
+    pop(X86::ebx);
     pop(X86::ebp);
 #elif PLATFORM(X86)
     pop(X86::esi);
