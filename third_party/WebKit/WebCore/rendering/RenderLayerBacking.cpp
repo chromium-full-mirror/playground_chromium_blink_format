@@ -126,7 +126,7 @@ void RenderLayerBacking::updateLayerTransform() {
 
 void RenderLayerBacking::updateAfterLayout(UpdateDepth updateDepth) {
   RenderLayerCompositor* layerCompositor = compositor();
-  if (!layerCompositor->compositingLayersNeedUpdate()) {
+  if (!layerCompositor->compositingLayersNeedRebuild()) {
     // Calling updateGraphicsLayerGeometry() here gives incorrect results,
     // because the
     // position of this layer's GraphicsLayer depends on the position of our
@@ -1059,7 +1059,11 @@ bool RenderLayerBacking::startAnimation(double beginTime,
                                     anim, beginTime))
     didAnimateOpacity = true;
 
-  return didAnimateTransform && didAnimateOpacity;
+  bool runningAcceleratedAnimation = didAnimateTransform && didAnimateOpacity;
+  if (runningAcceleratedAnimation)
+    compositor()->didStartAcceleratedAnimation();
+
+  return runningAcceleratedAnimation;
 }
 
 bool RenderLayerBacking::startTransition(double beginTime,
@@ -1105,6 +1109,9 @@ bool RenderLayerBacking::startTransition(double beginTime,
         didAnimate = true;
     }
   }
+
+  if (didAnimate)
+    compositor()->didStartAcceleratedAnimation();
 
   return didAnimate;
 }

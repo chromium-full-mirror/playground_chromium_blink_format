@@ -608,11 +608,11 @@ class RenderLayer : public ScrollbarClient {
   bool hasCompositingDescendant() const { return m_hasCompositingDescendant; }
   void setHasCompositingDescendant(bool b) { m_hasCompositingDescendant = b; }
 
-  bool mustOverlayCompositedLayers() const {
-    return m_mustOverlayCompositedLayers;
+  bool mustOverlapCompositedLayers() const {
+    return m_mustOverlapCompositedLayers;
   }
-  void setMustOverlayCompositedLayers(bool b) {
-    m_mustOverlayCompositedLayers = b;
+  void setMustOverlapCompositedLayers(bool b) {
+    m_mustOverlapCompositedLayers = b;
   }
 #endif
 
@@ -715,7 +715,7 @@ class RenderLayer : public ScrollbarClient {
 // in a preserves3D hierarchy. Hint to do 3D-aware hit testing.
 #if USE(ACCELERATED_COMPOSITING)
   bool m_hasCompositingDescendant : 1;
-  bool m_mustOverlayCompositedLayers : 1;
+  bool m_mustOverlapCompositedLayers : 1;
 #endif
 
   RenderMarquee* m_marquee;  // Used by layers with overflow:marquee

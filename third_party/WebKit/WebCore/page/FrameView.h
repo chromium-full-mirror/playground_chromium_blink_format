@@ -95,9 +95,7 @@ class FrameView : public ScrollView, public RefCounted<FrameView> {
   bool needsFullRepaint() const { return m_doFullRepaint; }
 
 #if USE(ACCELERATED_COMPOSITING)
-  enum CompositingUpdate { NormalCompositingUpdate, ForcedCompositingUpdate };
-  void updateCompositingLayers(
-      CompositingUpdate updateType = NormalCompositingUpdate);
+  void updateCompositingLayers();
 
   // Called when changes to the GraphicsLayer hierarchy have to be synchronized
   // with
