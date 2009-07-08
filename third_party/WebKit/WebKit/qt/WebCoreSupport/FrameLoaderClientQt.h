@@ -62,7 +62,6 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
  private slots:
   void slotCallPolicyFunction(int);
  signals:
-  void sigCallPolicyFunction(int);
   void loadStarted();
   void loadProgress(int d);
   void loadFinished(bool);
@@ -270,7 +269,6 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   QWebFrame* m_webFrame;
   ResourceResponse m_response;
   bool m_firstData;
-  FramePolicyFunction m_policyFunction;
 
   // Plugin view to redirect data to
   WebCore::PluginView* m_pluginView;

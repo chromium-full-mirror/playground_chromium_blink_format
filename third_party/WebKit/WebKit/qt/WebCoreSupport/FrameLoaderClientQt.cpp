@@ -141,11 +141,7 @@ FrameLoaderClientQt::FrameLoaderClientQt()
       m_pluginView(0),
       m_hasSentResponseToPlugin(false),
       m_firstData(false),
-      m_policyFunction(0),
-      m_loadSucceeded(false) {
-  connect(this, SIGNAL(sigCallPolicyFunction(int)), this,
-          SLOT(slotCallPolicyFunction(int)), Qt::QueuedConnection);
-}
+      m_loadSucceeded(false) {}
 
 FrameLoaderClientQt::~FrameLoaderClientQt() {}
 
@@ -173,19 +169,7 @@ QWebFrame* FrameLoaderClientQt::webFrame() const {
 
 void FrameLoaderClientQt::callPolicyFunction(FramePolicyFunction function,
                                              PolicyAction action) {
-  ASSERT(!m_policyFunction);
-  ASSERT(function);
-
-  m_policyFunction = function;
-  emit sigCallPolicyFunction(action);
-}
-
-void FrameLoaderClientQt::slotCallPolicyFunction(int action) {
-  if (!m_frame || !m_policyFunction)
-    return;
-  FramePolicyFunction function = m_policyFunction;
-  m_policyFunction = 0;
-  (m_frame->loader()->*function)(WebCore::PolicyAction(action));
+  (m_frame->loader()->*function)(action);
 }
 
 bool FrameLoaderClientQt::hasWebView() const {
@@ -374,13 +358,11 @@ void FrameLoaderClientQt::dispatchShow() {
 
 void FrameLoaderClientQt::cancelPolicyCheck() {
   //    qDebug() << "FrameLoaderClientQt::cancelPolicyCheck";
-  m_policyFunction = 0;
 }
 
 void FrameLoaderClientQt::dispatchWillSubmitForm(FramePolicyFunction function,
                                                  PassRefPtr<FormState>) {
   notImplemented();
-  Q_ASSERT(!m_policyFunction);
   // FIXME: This is surely too simple
   callPolicyFunction(function, PolicyUse);
 }
@@ -848,12 +830,10 @@ void FrameLoaderClientQt::dispatchDecidePolicyForMIMEType(
     const WebCore::String& MIMEType,
     const WebCore::ResourceRequest&) {
   // we need to call directly here
-  Q_ASSERT(!m_policyFunction);
-  m_policyFunction = function;
   if (canShowMIMEType(MIMEType))
-    slotCallPolicyFunction(PolicyUse);
+    callPolicyFunction(function, PolicyUse);
   else
-    slotCallPolicyFunction(PolicyDownload);
+    callPolicyFunction(function, PolicyDownload);
 }
 
 void FrameLoaderClientQt::dispatchDecidePolicyForNewWindowAction(
@@ -862,9 +842,7 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNewWindowAction(
     const WebCore::ResourceRequest& request,
     PassRefPtr<WebCore::FormState>,
     const WebCore::String&) {
-  Q_ASSERT(!m_policyFunction);
   Q_ASSERT(m_webFrame);
-  m_policyFunction = function;
 #if QT_VERSION < 0x040400
   QWebNetworkRequest r(request);
 #else
@@ -884,10 +862,10 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNewWindowAction(
           emptyRequest);
     }
 
-    slotCallPolicyFunction(PolicyIgnore);
+    callPolicyFunction(function, PolicyIgnore);
     return;
   }
-  slotCallPolicyFunction(PolicyUse);
+  callPolicyFunction(function, PolicyUse);
 }
 
 void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
@@ -895,9 +873,7 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
     const WebCore::NavigationAction& action,
     const WebCore::ResourceRequest& request,
     PassRefPtr<WebCore::FormState>) {
-  Q_ASSERT(!m_policyFunction);
   Q_ASSERT(m_webFrame);
-  m_policyFunction = function;
 #if QT_VERSION < 0x040400
   QWebNetworkRequest r(request);
 #else
@@ -917,10 +893,10 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
           emptyRequest);
     }
 
-    slotCallPolicyFunction(PolicyIgnore);
+    callPolicyFunction(function, PolicyIgnore);
     return;
   }
-  slotCallPolicyFunction(PolicyUse);
+  callPolicyFunction(function, PolicyUse);
 }
 
 void FrameLoaderClientQt::dispatchUnableToImplementPolicy(
