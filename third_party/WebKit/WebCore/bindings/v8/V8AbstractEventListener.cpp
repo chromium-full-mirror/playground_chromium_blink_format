@@ -142,7 +142,7 @@ void V8AbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
 void V8AbstractEventListener::disposeListenerObject() {
   if (!m_listener.IsEmpty()) {
 #ifndef NDEBUG
-    V8Proxy::unregisterGlobalHandle(this, m_listener);
+    V8GCController::unregisterGlobalHandle(this, m_listener);
 #endif
     m_listener.Dispose();
     m_listener.Clear();

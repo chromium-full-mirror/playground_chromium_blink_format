@@ -105,34 +105,6 @@ class V8ObjectEventListener;
 // FIXME: use standard logging facilities in WebCore.
 void logInfo(Frame*, const String& message, const String& url);
 
-#ifndef NDEBUG
-
-#define GlobalHandleTypeList(V) \
-  V(PROXY)                      \
-  V(NPOBJECT)                   \
-  V(SCHEDULED_ACTION)           \
-  V(EVENT_LISTENER)             \
-  V(NODE_FILTER)                \
-  V(SCRIPTINSTANCE)             \
-  V(SCRIPTVALUE)
-
-// Host information of persistent handles.
-enum GlobalHandleType {
-#define ENUM(name) name,
-  GlobalHandleTypeList(ENUM)
-#undef ENUM
-};
-
-class GlobalHandleInfo {
- public:
-  GlobalHandleInfo(void* host, GlobalHandleType type)
-      : m_host(host), m_type(type) {}
-  void* m_host;
-  GlobalHandleType m_type;
-};
-
-#endif  // NDEBUG
-
 // The following Batch structs and methods are used for setting multiple
 // properties on an ObjectTemplate, used from the generated bindings
 // initialization (ConfigureXXXTemplate). This greatly reduces the binary
@@ -249,10 +221,6 @@ class V8Proxy {
 
   void removeV8EventListener(V8EventListener*);
   void removeObjectEventListener(V8ObjectEventListener*);
-
-  // Protect/Unprotect JS wrappers of a DOM object.
-  static void gcProtect(void* domObject);
-  static void gcUnprotect(void* domObject);
 
 #if ENABLE(SVG)
   static void setSVGContext(void*, SVGElement*);
@@ -492,14 +460,6 @@ class V8Proxy {
   // Process any pending JavaScript console messages.
   static void processConsoleMessages();
 
-#ifndef NDEBUG
-  // For debugging and leak detection purpose.
-  static void registerGlobalHandle(GlobalHandleType,
-                                   void*,
-                                   v8::Persistent<v8::Value>);
-  static void unregisterGlobalHandle(void*, v8::Persistent<v8::Value>);
-#endif
-
   // Check whether a V8 value is a wrapper of type |classType|.
   static bool isWrapperOfType(v8::Handle<v8::Value>,
                               V8ClassIndex::V8WrapperType);
@@ -725,6 +685,56 @@ inline v8::Handle<v8::Object> toV8(PassRefPtr<T> object,
                                     v8::Persistent<v8::Object>::New(holder));
   return holder;
 }
+
+// Begin V8GCController.h
+
+#ifndef NDEBUG
+
+#define GlobalHandleTypeList(V) \
+  V(PROXY)                      \
+  V(NPOBJECT)                   \
+  V(SCHEDULED_ACTION)           \
+  V(EVENT_LISTENER)             \
+  V(NODE_FILTER)                \
+  V(SCRIPTINSTANCE)             \
+  V(SCRIPTVALUE)
+
+// Host information of persistent handles.
+enum GlobalHandleType {
+#define ENUM(name) name,
+  GlobalHandleTypeList(ENUM)
+#undef ENUM
+};
+
+class GlobalHandleInfo {
+ public:
+  GlobalHandleInfo(void* host, GlobalHandleType type)
+      : m_host(host), m_type(type) {}
+  void* m_host;
+  GlobalHandleType m_type;
+};
+
+#endif  // NDEBUG
+
+class V8GCController {
+ public:
+  // Protect/Unprotect JS wrappers of a DOM object.
+  static void gcProtect(void* domObject);
+  static void gcUnprotect(void* domObject);
+
+#ifndef NDEBUG
+  // For debugging and leak detection purpose.
+  static void registerGlobalHandle(GlobalHandleType,
+                                   void*,
+                                   v8::Persistent<v8::Value>);
+  static void unregisterGlobalHandle(void*, v8::Persistent<v8::Value>);
+#endif
+
+  static void gcPrologue();
+  static void gcEpilogue();
+};
+
+// End V8GCController.h
 }
 
 #endif  // V8Proxy_h

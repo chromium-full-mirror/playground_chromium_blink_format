@@ -41,7 +41,7 @@ V8EventListener::V8EventListener(Frame* frame,
     : V8AbstractEventListener(frame, isAttribute) {
   m_listener = v8::Persistent<v8::Object>::New(listener);
 #ifndef NDEBUG
-  V8Proxy::registerGlobalHandle(EVENT_LISTENER, this, m_listener);
+  V8GCController::registerGlobalHandle(EVENT_LISTENER, this, m_listener);
 #endif
 }
 
