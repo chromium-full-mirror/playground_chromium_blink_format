@@ -90,6 +90,12 @@ class XSSAuditor {
   // This method is called by FrameLoader::requestObject.
   bool canLoadObject(const String& url) const;
 
+  // Determines whether the base URL should be changed based on the content
+  // of any user-submitted data.
+  //
+  // This method is called by HTMLBaseElement::process.
+  bool canSetBaseElementURL(const String& url) const;
+
  private:
   static String decodeURL(const String& url,
                           const TextEncoding& encoding = UTF8Encoding(),
