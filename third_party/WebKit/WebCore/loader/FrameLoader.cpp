@@ -464,7 +464,8 @@ bool FrameLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
   Frame* frame = ownerElement->contentFrame();
   if (frame)
     frame->loader()->scheduleLocationChange(url.string(), m_outgoingReferrer,
-                                            true, true, userGestureHint());
+                                            true, true,
+                                            isProcessingUserGesture());
   else
     frame = loadSubframe(ownerElement, url, frameName, m_outgoingReferrer);
 
@@ -1902,7 +1903,7 @@ void FrameLoader::provisionalLoadStarted() {
   m_client->provisionalLoadStarted();
 }
 
-bool FrameLoader::userGestureHint() {
+bool FrameLoader::isProcessingUserGesture() {
   Frame* frame = m_frame->tree()->top();
   if (!frame->script()->isEnabled())
     return true;  // If JavaScript is disabled, a user gesture must have

@@ -295,6 +295,9 @@ backforward list.
 // until callers can be weaned off of it.
 - (void)_close;
 
+// Indicates if the WebView is in the midst of a user gesture.
+- (BOOL)_isProcessingUserGesture;
+
 // SPI for DumpRenderTree
 - (void)_updateActiveState;
 

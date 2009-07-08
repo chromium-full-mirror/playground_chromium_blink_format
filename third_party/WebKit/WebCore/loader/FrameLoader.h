@@ -397,7 +397,7 @@ class FrameLoader : Noncopyable {
   bool openedByDOM() const;
   void setOpenedByDOM();
 
-  bool userGestureHint();
+  bool isProcessingUserGesture();
 
   void resetMultipleFormSubmissionProtection();
 
