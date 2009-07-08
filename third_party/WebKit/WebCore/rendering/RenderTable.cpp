@@ -938,8 +938,8 @@ int RenderTable::outerBorderBottom() const {
   else {
     RenderObject* child;
     for (child = lastChild(); child && !child->isTableSection();
-         child = child->previousSibling())
-      ;
+         child = child->previousSibling()) {
+    }
     bottomSection = child ? static_cast<RenderTableSection*>(child) : 0;
   }
   if (bottomSection) {

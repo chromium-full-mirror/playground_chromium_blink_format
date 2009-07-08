@@ -607,7 +607,8 @@ void AutoTableLayout::layout() {
           // the lines below might look inconsistent, but that's the way it's
           // handled in mozilla
           excess -= reduction;
-          int newWidth = max(int(m_layoutStruct[i].effMinWidth), w - reduction);
+          int newWidth = max(static_cast<int>(m_layoutStruct[i].effMinWidth),
+                             w - reduction);
           available += w - newWidth;
           m_layoutStruct[i].calcWidth = newWidth;
         }
