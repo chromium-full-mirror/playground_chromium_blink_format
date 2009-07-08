@@ -66,8 +66,7 @@ JSValue JSHTMLFormElement::submit(ExecState* exec, const ArgList&) {
   if (!activeFrame)
     return jsUndefined();
   static_cast<HTMLFormElement*>(impl())->submit(
-      0, false, !activeFrame->script()->anyPageIsProcessingUserGesture(),
-      false);
+      0, false, !activeFrame->script()->anyPageIsProcessingUserGesture());
   return jsUndefined();
 }
 }

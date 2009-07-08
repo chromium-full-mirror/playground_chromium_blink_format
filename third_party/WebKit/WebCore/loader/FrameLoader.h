@@ -330,7 +330,6 @@ class FrameLoader : Noncopyable {
                   const String& contentType,
                   const String& boundary,
                   bool lockHistory,
-                  bool lockBackForwardList,
                   PassRefPtr<Event>,
                   PassRefPtr<FormState>);
 
@@ -626,7 +625,6 @@ class FrameLoader : Noncopyable {
   static bool isLocationChange(const ScheduledRedirection&);
   void scheduleFormSubmission(const FrameLoadRequest&,
                               bool lockHistory,
-                              bool lockBackForwardList,
                               PassRefPtr<Event>,
                               PassRefPtr<FormState>);
 
