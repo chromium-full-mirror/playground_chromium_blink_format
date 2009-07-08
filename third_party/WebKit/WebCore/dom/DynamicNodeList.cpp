@@ -29,7 +29,7 @@
 namespace WebCore {
 
 DynamicNodeList::DynamicNodeList(PassRefPtr<Node> rootNode)
-    : m_rootNode(rootNode), m_caches(new Caches), m_ownsCaches(true) {
+    : m_rootNode(rootNode), m_caches(Caches::create()), m_ownsCaches(true) {
   m_rootNode->registerDynamicNodeList(this);
 }
 
@@ -37,15 +37,10 @@ DynamicNodeList::DynamicNodeList(PassRefPtr<Node> rootNode,
                                  DynamicNodeList::Caches* caches)
     : m_rootNode(rootNode), m_caches(caches), m_ownsCaches(false) {
   m_rootNode->registerDynamicNodeList(this);
-  ++caches->refCount;
 }
 
 DynamicNodeList::~DynamicNodeList() {
   m_rootNode->unregisterDynamicNodeList(this);
-  if (m_ownsCaches)
-    delete m_caches;
-  else
-    --m_caches->refCount;
 }
 
 unsigned DynamicNodeList::length() const {
@@ -150,10 +145,11 @@ void DynamicNodeList::invalidateCache() {
 }
 
 DynamicNodeList::Caches::Caches()
-    : lastItem(0),
-      isLengthCacheValid(false),
-      isItemCacheValid(false),
-      refCount(0) {}
+    : lastItem(0), isLengthCacheValid(false), isItemCacheValid(false) {}
+
+PassRefPtr<DynamicNodeList::Caches> DynamicNodeList::Caches::create() {
+  return adoptRef(new Caches());
+}
 
 void DynamicNodeList::Caches::reset() {
   lastItem = 0;
