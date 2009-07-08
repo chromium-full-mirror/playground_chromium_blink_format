@@ -32,7 +32,7 @@
 #include "EventNames.h"
 #include "HTMLElement.h"
 #include "SQLiteStatement.h"
-#include "StorageAreaImpl.h"
+#include "StorageArea.h"
 #include "SuddenTermination.h"
 
 namespace WebCore {
@@ -44,13 +44,13 @@ static const double StorageSyncInterval = 1.0;
 
 PassRefPtr<StorageAreaSync> StorageAreaSync::create(
     PassRefPtr<StorageSyncManager> storageSyncManager,
-    PassRefPtr<StorageAreaImpl> storageArea) {
+    PassRefPtr<StorageArea> storageArea) {
   return adoptRef(new StorageAreaSync(storageSyncManager, storageArea));
 }
 
 StorageAreaSync::StorageAreaSync(
     PassRefPtr<StorageSyncManager> storageSyncManager,
-    PassRefPtr<StorageAreaImpl> storageArea)
+    PassRefPtr<StorageArea> storageArea)
     : m_syncTimer(this, &StorageAreaSync::syncTimerFired),
       m_itemsCleared(false),
       m_finalSyncScheduled(false),
