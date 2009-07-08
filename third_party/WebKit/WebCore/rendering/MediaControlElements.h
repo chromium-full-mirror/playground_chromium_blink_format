@@ -81,9 +81,13 @@ class MediaControlShadowRootElement : public HTMLDivElement {
 class MediaControlElement : public HTMLDivElement {
  public:
   MediaControlElement(Document*, PseudoId, HTMLMediaElement*);
+  virtual void attach();
+  virtual bool rendererIsNeeded(RenderStyle*);
+
+  RenderStyle* styleForElement();
   void attachToParent(Element*);
   void update();
-  void updateStyle();
+  virtual void updateStyle();
 
  protected:
   HTMLMediaElement* m_mediaElement;
@@ -95,7 +99,7 @@ class MediaControlElement : public HTMLDivElement {
 class MediaControlTimelineContainerElement : public MediaControlElement {
  public:
   MediaControlTimelineContainerElement(Document*, HTMLMediaElement*);
-  virtual bool rendererIsNeeded(RenderStyle* style);
+  virtual bool rendererIsNeeded(RenderStyle*);
 };
 
 // ----------------------------
@@ -104,7 +108,7 @@ class MediaControlStatusDisplayElement : public MediaControlElement {
  public:
   MediaControlStatusDisplayElement(Document*, HTMLMediaElement*);
   virtual void update();
-  virtual bool rendererIsNeeded(RenderStyle* style);
+  virtual bool rendererIsNeeded(RenderStyle*);
 
  private:
   enum StateBeingDisplayed { Nothing, Loading, LiveBroadcast };
@@ -120,9 +124,14 @@ class MediaControlInputElement : public HTMLInputElement {
                            const String& type,
                            HTMLMediaElement*,
                            MediaControlElementType);
+  virtual void attach();
+  virtual bool rendererIsNeeded(RenderStyle*);
+
+  RenderStyle* styleForElement();
   void attachToParent(Element*);
   void update();
-  virtual void updateStyle();
+  void updateStyle();
+
   bool hitTest(const IntPoint& absPoint);
   MediaControlElementType displayType() const { return m_displayType; }
 
