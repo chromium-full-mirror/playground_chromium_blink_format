@@ -520,7 +520,7 @@ class ObjectGrouperVisitor : public DOMWrapperMap<Node>::Visitor {
 };
 
 // Create object groups for DOM tree nodes.
-static void gcPrologue() {
+void V8GCController::gcPrologue() {
   v8::HandleScope scope;
 
 #ifndef NDEBUG
@@ -561,7 +561,7 @@ class GCEpilogueVisitor : public DOMWrapperMap<void>::Visitor {
   }
 };
 
-static void gcEpilogue() {
+void V8GCController::gcEpilogue() {
   v8::HandleScope scope;
 
   // Run through all objects with pending activity making their wrappers weak
