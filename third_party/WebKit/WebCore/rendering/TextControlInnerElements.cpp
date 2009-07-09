@@ -191,6 +191,14 @@ void SearchFieldResultsButtonElement::defaultEventHandler(Event* evt) {
 SearchFieldCancelButtonElement::SearchFieldCancelButtonElement(Document* doc)
     : TextControlInnerElement(doc), m_capturing(false) {}
 
+void SearchFieldCancelButtonElement::detach() {
+  if (m_capturing) {
+    if (Frame* frame = document()->frame())
+      frame->eventHandler()->setCapturingMouseEventsNode(0);
+  }
+  TextControlInnerElement::detach();
+}
+
 void SearchFieldCancelButtonElement::defaultEventHandler(Event* evt) {
   // If the element is visible, on mouseup, clear the value, and set selection
   HTMLInputElement* input =
