@@ -33,8 +33,8 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
  public:
   virtual ~RenderWidget();
 
-  Widget* widget() const { return m_widget; }
-  virtual void setWidget(Widget*);
+  Widget* widget() const { return m_widget.get(); }
+  virtual void setWidget(PassRefPtr<Widget>);
 
   static RenderWidget* find(const Widget*);
 
@@ -63,7 +63,6 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
                            int tx,
                            int ty,
                            HitTestAction);
-  virtual void deleteWidget(Widget*);
   virtual void setOverlapTestResult(bool);
 
   void setWidgetGeometry(const IntRect&);
@@ -74,7 +73,7 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
   }
   void deref(RenderArena*);
 
-  Widget* m_widget;
+  RefPtr<Widget> m_widget;
   FrameView* m_frameView;
   int m_refCount;
 };

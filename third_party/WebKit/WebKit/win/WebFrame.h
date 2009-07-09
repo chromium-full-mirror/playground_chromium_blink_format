@@ -323,7 +323,7 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual void dispatchDidFailLoad(const WebCore::ResourceError&);
   virtual void startDownload(const WebCore::ResourceRequest&);
 
-  virtual WebCore::Widget* createJavaAppletWidget(
+  virtual PassRefPtr<WebCore::Widget> createJavaAppletWidget(
       const WebCore::IntSize&,
       WebCore::HTMLAppletElement*,
       const WebCore::KURL& baseURL,

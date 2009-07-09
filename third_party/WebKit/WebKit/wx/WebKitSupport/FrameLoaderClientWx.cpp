@@ -737,13 +737,13 @@ ObjectContentType FrameLoaderClientWx::objectContentType(
   return ObjectContentType();
 }
 
-Widget* FrameLoaderClientWx::createPlugin(const IntSize&,
-                                          HTMLPlugInElement*,
-                                          const KURL&,
-                                          const Vector<String>&,
-                                          const Vector<String>&,
-                                          const String&,
-                                          bool loadManually) {
+PassRefPtr<Widget> FrameLoaderClientWx::createPlugin(const IntSize&,
+                                                     HTMLPlugInElement*,
+                                                     const KURL&,
+                                                     const Vector<String>&,
+                                                     const Vector<String>&,
+                                                     const String&,
+                                                     bool loadManually) {
   notImplemented();
   return 0;
 }
@@ -760,7 +760,7 @@ ResourceError FrameLoaderClientWx::pluginWillHandleLoadError(
                        response.url().string(), String());
 }
 
-Widget* FrameLoaderClientWx::createJavaAppletWidget(
+PassRefPtr<Widget> FrameLoaderClientWx::createJavaAppletWidget(
     const IntSize&,
     HTMLAppletElement*,
     const KURL& baseURL,

@@ -685,13 +685,14 @@ PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
   return childFrame.release();
 }
 
-Widget* WebFrameLoaderClient::createPlugin(const IntSize& pluginSize,
-                                           HTMLPlugInElement* element,
-                                           const KURL& url,
-                                           const Vector<String>& paramNames,
-                                           const Vector<String>& paramValues,
-                                           const String& mimeType,
-                                           bool loadManually) {
+PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
+    const IntSize& pluginSize,
+    HTMLPlugInElement* element,
+    const KURL& url,
+    const Vector<String>& paramNames,
+    const Vector<String>& paramValues,
+    const String& mimeType,
+    bool loadManually) {
   WebView* webView = m_webFrame->webView();
 
   COMPtr<IWebUIDelegate> ui;
@@ -733,7 +734,7 @@ Widget* WebFrameLoaderClient::createPlugin(const IntSize& pluginSize,
   }
 
   Frame* frame = core(m_webFrame);
-  PluginView* pluginView =
+  RefPtr<PluginView> pluginView =
       PluginView::create(frame, pluginSize, element, url, paramNames,
                          paramValues, mimeType, loadManually);
 

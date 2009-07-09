@@ -50,7 +50,7 @@ class String;
 template <typename T>
 class Timer;
 
-class FrameView : public ScrollView, public RefCounted<FrameView> {
+class FrameView : public ScrollView {
  public:
   friend class RenderView;
 

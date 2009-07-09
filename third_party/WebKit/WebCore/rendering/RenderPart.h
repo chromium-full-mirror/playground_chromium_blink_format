@@ -34,7 +34,7 @@ class RenderPart : public RenderWidget {
 
   bool hasFallbackContent() const { return m_hasFallbackContent; }
 
-  virtual void setWidget(Widget*);
+  virtual void setWidget(PassRefPtr<Widget>);
   virtual void viewCleared();
 
  protected:
@@ -43,8 +43,6 @@ class RenderPart : public RenderWidget {
  private:
   virtual bool isRenderPart() const { return true; }
   virtual const char* renderName() const { return "RenderPart"; }
-
-  virtual void deleteWidget(Widget*);
 };
 }
 

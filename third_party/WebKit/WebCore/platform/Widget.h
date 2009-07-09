@@ -73,6 +73,8 @@ typedef wxWindow* PlatformWidget;
 #include "IntRect.h"
 #include "IntSize.h"
 
+#include <wtf/RefCounted.h>
+
 namespace WebCore {
 
 class Cursor;
@@ -103,7 +105,7 @@ class WidgetPrivate;
 // Plugin - Mac, Windows (windowed only), Qt (windowed only, widget is an HWND
 // on windows), Gtk (windowed only)
 //
-class Widget {
+class Widget : public RefCounted<Widget> {
  public:
   Widget(PlatformWidget = 0);
   virtual ~Widget();

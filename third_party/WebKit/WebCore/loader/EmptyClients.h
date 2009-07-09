@@ -360,20 +360,20 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
                                         int) {
     return 0;
   }
-  virtual Widget* createPlugin(const IntSize&,
-                               HTMLPlugInElement*,
-                               const KURL&,
-                               const Vector<String>&,
-                               const Vector<String>&,
-                               const String&,
-                               bool) {
+  virtual PassRefPtr<Widget> createPlugin(const IntSize&,
+                                          HTMLPlugInElement*,
+                                          const KURL&,
+                                          const Vector<String>&,
+                                          const Vector<String>&,
+                                          const String&,
+                                          bool) {
     return 0;
   }
-  virtual Widget* createJavaAppletWidget(const IntSize&,
-                                         HTMLAppletElement*,
-                                         const KURL&,
-                                         const Vector<String>&,
-                                         const Vector<String>&) {
+  virtual PassRefPtr<Widget> createJavaAppletWidget(const IntSize&,
+                                                    HTMLAppletElement*,
+                                                    const KURL&,
+                                                    const Vector<String>&,
+                                                    const Vector<String>&) {
     return 0;
   }
 

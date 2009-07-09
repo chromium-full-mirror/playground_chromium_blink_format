@@ -1040,13 +1040,14 @@ class QtPluginWidget : public Widget {
   }
 };
 
-Widget* FrameLoaderClientQt::createPlugin(const IntSize& pluginSize,
-                                          HTMLPlugInElement* element,
-                                          const KURL& url,
-                                          const Vector<String>& paramNames,
-                                          const Vector<String>& paramValues,
-                                          const String& mimeType,
-                                          bool loadManually) {
+PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
+    const IntSize& pluginSize,
+    HTMLPlugInElement* element,
+    const KURL& url,
+    const Vector<String>& paramNames,
+    const Vector<String>& paramValues,
+    const String& mimeType,
+    bool loadManually) {
   //     qDebug()<<"------ Creating plugin in FrameLoaderClientQt::createPlugin
   //     for "<<url.prettyURL() << mimeType;
   //     qDebug()<<"------\t url = "<<url.prettyURL();
@@ -1109,7 +1110,7 @@ Widget* FrameLoaderClientQt::createPlugin(const IntSize& pluginSize,
       QWidget* view = m_webFrame->page()->view();
       if (view)
         widget->setParent(view);
-      QtPluginWidget* w = new QtPluginWidget();
+      RefPtr<QtPluginWidget> w = adoptRef(new QtPluginWidget());
       w->setPlatformWidget(widget);
       // Make sure it's invisible until properly placed into the layout
       w->setFrameRect(IntRect(0, 0, 0, 0));
@@ -1118,7 +1119,7 @@ Widget* FrameLoaderClientQt::createPlugin(const IntSize& pluginSize,
     // FIXME: make things work for widgetless plugins as well
     delete object;
   } else {  // NPAPI Plugins
-    PluginView* pluginView =
+    RefPtr<PluginView> pluginView =
         PluginView::create(m_frame, pluginSize, element, url, paramNames,
                            paramValues, mimeType, loadManually);
     return pluginView;
@@ -1133,7 +1134,7 @@ void FrameLoaderClientQt::redirectDataToPlugin(Widget* pluginWidget) {
   m_hasSentResponseToPlugin = false;
 }
 
-Widget* FrameLoaderClientQt::createJavaAppletWidget(
+PassRefPtr<Widget> FrameLoaderClientQt::createJavaAppletWidget(
     const IntSize&,
     HTMLAppletElement*,
     const KURL& baseURL,

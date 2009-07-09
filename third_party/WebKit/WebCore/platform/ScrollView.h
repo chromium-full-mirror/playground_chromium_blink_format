@@ -55,7 +55,6 @@ class Scrollbar;
 
 class ScrollView : public Widget, public ScrollbarClient {
  public:
-  ScrollView();
   ~ScrollView();
 
   // ScrollbarClient method.  FrameView overrides the other two.
@@ -71,8 +70,8 @@ class ScrollView : public Widget, public ScrollbarClient {
   virtual IntRect windowClipRect(bool clipToContents = true) const = 0;
 
   // Methods for child manipulation and inspection.
-  const HashSet<Widget*>* children() const { return &m_children; }
-  void addChild(Widget*);
+  const HashSet<RefPtr<Widget>>* children() const { return &m_children; }
+  void addChild(PassRefPtr<Widget>);
   void removeChild(Widget*);
 
   // If the scroll view does not use a native widget, then it will have
@@ -290,6 +289,8 @@ class ScrollView : public Widget, public ScrollbarClient {
                                                         const IntPoint&) const;
 
  protected:
+  ScrollView();
+
   virtual void repaintContentRectangle(const IntRect&, bool now = false);
   virtual void paintContents(GraphicsContext*, const IntRect& damageRect) = 0;
 
@@ -307,7 +308,7 @@ class ScrollView : public Widget, public ScrollbarClient {
   ScrollbarMode m_verticalScrollbarMode;
   bool m_prohibitsScrolling;
 
-  HashSet<Widget*> m_children;
+  HashSet<RefPtr<Widget>> m_children;
 
   // This bool is unused on Mac OS because we directly ask the platform widget
   // whether it is safe to blit on scroll.

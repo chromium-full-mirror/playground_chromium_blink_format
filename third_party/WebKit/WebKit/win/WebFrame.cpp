@@ -1590,12 +1590,13 @@ void WebFrame::startDownload(const ResourceRequest& request) {
   d->webView->downloadURL(request.url());
 }
 
-Widget* WebFrame::createJavaAppletWidget(const IntSize& pluginSize,
-                                         HTMLAppletElement* element,
-                                         const KURL& /*baseURL*/,
-                                         const Vector<String>& paramNames,
-                                         const Vector<String>& paramValues) {
-  PluginView* pluginView =
+PassRefPtr<Widget> WebFrame::createJavaAppletWidget(
+    const IntSize& pluginSize,
+    HTMLAppletElement* element,
+    const KURL& /*baseURL*/,
+    const Vector<String>& paramNames,
+    const Vector<String>& paramValues) {
+  RefPtr<PluginView> pluginView =
       PluginView::create(core(this), pluginSize, element, KURL(), paramNames,
                          paramValues, "application/x-java-applet", false);
 
