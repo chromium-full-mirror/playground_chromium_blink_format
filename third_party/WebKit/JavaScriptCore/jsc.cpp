@@ -48,7 +48,7 @@
 #include <sys/time.h>
 #endif
 
-#if PLATFORM(UNIX)
+#if HAVE(SIGNAL_H)
 #include <signal.h>
 #endif
 
@@ -592,9 +592,11 @@ static NO_RETURN void printUsageStatement(JSGlobalData* globalData,
   fprintf(stderr,
           "  -i         Enables interactive mode (default if no files are "
           "specified)\n");
+#if HAVE(SIGNAL_H)
   fprintf(stderr,
           "  -s         Installs signal handlers that exit on a crash (Unix "
           "platforms only)\n");
+#endif
 
   cleanupGlobalData(globalData);
   exit(help ? EXIT_SUCCESS : EXIT_FAILURE);
@@ -631,7 +633,7 @@ static void parseArguments(int argc,
       continue;
     }
     if (strcmp(arg, "-s") == 0) {
-#if PLATFORM(UNIX)
+#if HAVE(SIGNAL_H)
       signal(SIGILL, _exit);
       signal(SIGFPE, _exit);
       signal(SIGBUS, _exit);
