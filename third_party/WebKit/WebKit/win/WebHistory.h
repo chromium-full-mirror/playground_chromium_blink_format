@@ -123,7 +123,8 @@ class WebHistory : public IWebHistory, public IWebHistoryPrivate {
   void visitedURL(const WebCore::KURL&,
                   const WebCore::String& title,
                   const WebCore::String& httpMethod,
-                  bool wasFailure);
+                  bool wasFailure,
+                  bool increaseVisitCount);
   void addVisitedLinksToPageGroup(WebCore::PageGroup&);
 
   COMPtr<IWebHistoryItem> itemForURLString(const WebCore::String&) const;

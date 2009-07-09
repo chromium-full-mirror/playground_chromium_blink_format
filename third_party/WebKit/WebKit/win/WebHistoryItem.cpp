@@ -503,8 +503,11 @@ HRESULT STDMETHODCALLTYPE WebHistoryItem::redirectURLs(IEnumVARIANT** urls) {
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebHistoryItem::visitedWithTitle(BSTR title) {
-  m_historyItem->visited(title, CFAbsoluteTimeGetCurrent());
+HRESULT STDMETHODCALLTYPE
+WebHistoryItem::visitedWithTitle(BSTR title, BOOL increaseVisitCount) {
+  m_historyItem->visited(
+      title, CFAbsoluteTimeGetCurrent(),
+      increaseVisitCount ? IncreaseVisitCount : DoNotIncreaseVisitCount);
   return S_OK;
 }
 

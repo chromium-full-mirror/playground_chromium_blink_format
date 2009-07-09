@@ -723,7 +723,8 @@ HRESULT WebHistory::addItem(IWebHistoryItem* entry,
 void WebHistory::visitedURL(const KURL& url,
                             const String& title,
                             const String& httpMethod,
-                            bool wasFailure) {
+                            bool wasFailure,
+                            bool increaseVisitCount) {
   RetainPtr<CFStringRef> urlString(AdoptCF, url.string().createCFString());
 
   IWebHistoryItem* entry = (IWebHistoryItem*)CFDictionaryGetValue(
@@ -737,7 +738,7 @@ void WebHistory::visitedURL(const KURL& url,
     // Otherwise we might get duplicate entries
     // as seen in <rdar://problem/6570573>.
     removeItemFromDateCaches(entry);
-    entryPrivate->visitedWithTitle(BString(title));
+    entryPrivate->visitedWithTitle(BString(title), increaseVisitCount);
   } else {
     COMPtr<WebHistoryItem> item(AdoptCOM, WebHistoryItem::createInstance());
     if (!item)
