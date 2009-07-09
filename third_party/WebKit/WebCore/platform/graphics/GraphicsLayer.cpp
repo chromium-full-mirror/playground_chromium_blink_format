@@ -214,6 +214,7 @@ GraphicsLayer::GraphicsLayer(GraphicsLayerClient* client)
       m_masksToBounds(false),
       m_drawsContent(false),
       m_paintingPhase(GraphicsLayerPaintAllMask),
+      m_contentsOrientation(CompositingCoordinatesTopDown),
       m_parent(0)
 #ifndef NDEBUG
       ,

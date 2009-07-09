@@ -331,6 +331,16 @@ class GraphicsLayer {
     return CompositingCoordinatesTopDown;
   }
 
+  // Flippedness of the contents of this layer. Does not affect sublayer
+  // geometry.
+  virtual void setContentsOrientation(
+      CompositingCoordinatesOrientation orientation) {
+    m_contentsOrientation = orientation;
+  }
+  virtual CompositingCoordinatesOrientation contentsOrientation() const {
+    return m_contentsOrientation;
+  }
+
 #ifndef NDEBUG
   static bool showDebugBorders();
   static bool showRepaintCounter();
@@ -390,6 +400,7 @@ class GraphicsLayer {
   bool m_drawsContent : 1;
 
   GraphicsLayerPaintingPhase m_paintingPhase;
+  CompositingCoordinatesOrientation m_contentsOrientation;
 
   Vector<GraphicsLayer*> m_children;
   GraphicsLayer* m_parent;

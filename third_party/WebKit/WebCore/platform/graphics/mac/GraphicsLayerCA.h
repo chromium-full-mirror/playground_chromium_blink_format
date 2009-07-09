@@ -147,6 +147,9 @@ class GraphicsLayerCA : public GraphicsLayer {
   bool requiresTiledLayer(const FloatSize&) const;
   void swapFromOrToTiledLayer(bool useTiledLayer);
 
+  CompositingCoordinatesOrientation defaultContentsOrientation() const;
+  void updateContentsTransform();
+
   void setContentsLayer(WebLayer*);
   WebLayer* contentsLayer() const { return m_contentsLayer.get(); }
 
