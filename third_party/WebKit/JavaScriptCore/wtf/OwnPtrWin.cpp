@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Torch Mobile, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,6 +39,11 @@ void deleteOwnedPtr(HBITMAP ptr) {
 void deleteOwnedPtr(HBRUSH ptr) {
   if (ptr)
     DeleteObject(ptr);
+}
+
+void deleteOwnedPtr(HDC ptr) {
+  if (ptr)
+    DeleteDC(ptr);
 }
 
 void deleteOwnedPtr(HFONT ptr) {
