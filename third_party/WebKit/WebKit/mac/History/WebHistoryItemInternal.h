@@ -57,7 +57,8 @@ extern void WKNotifyHistoryItemChanged();
 
 - (void)_mergeAutoCompleteHints:(WebHistoryItem*)otherItem;
 - (void)setTitle:(NSString*)title;
-- (void)_visitedWithTitle:(NSString*)title;
+- (void)_visitedWithTitle:(NSString*)title
+       increaseVisitCount:(BOOL)increaseVisitCount;
 - (void)_recordInitialVisit;
 
 @end

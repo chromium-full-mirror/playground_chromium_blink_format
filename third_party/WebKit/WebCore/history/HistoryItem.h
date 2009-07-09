@@ -56,6 +56,8 @@ typedef Vector<RefPtr<HistoryItem>> HistoryItemVector;
 
 extern void (*notifyHistoryItemChanged)();
 
+enum VisitCountBehavior { IncreaseVisitCount, DoNotIncreaseVisitCount };
+
 class HistoryItem : public RefCounted<HistoryItem> {
   friend class PageCache;
 
@@ -156,7 +158,7 @@ class HistoryItem : public RefCounted<HistoryItem> {
   // in GlobalHistory. The WebKit api for this is to use -[WebHistory
   // setLastVisitedTimeInterval:forItem:] instead.
   void setLastVisitedTime(double);
-  void visited(const String& title, double time);
+  void visited(const String& title, double time, VisitCountBehavior);
 
   void addRedirectURL(const String&);
   Vector<String>* redirectURLs() const;
@@ -209,7 +211,7 @@ class HistoryItem : public RefCounted<HistoryItem> {
 
   void padDailyCountsForNewVisit(double time);
   void collapseDailyVisitsToWeekly();
-  void recordVisitAtTime(double);
+  void recordVisitAtTime(double, VisitCountBehavior = IncreaseVisitCount);
 
   HistoryItem* findTargetItem();
 
