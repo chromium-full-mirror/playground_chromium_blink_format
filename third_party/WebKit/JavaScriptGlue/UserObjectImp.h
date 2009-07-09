@@ -53,7 +53,7 @@ class UserObjectImp : public JSObject {
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    JSValue value,
-                   int attr = None);
+                   PutPropertySlot&);
 
   JSValue toPrimitive(ExecState*, JSType preferredType = UnspecifiedType) const;
   virtual bool toBoolean(ExecState* exec) const;

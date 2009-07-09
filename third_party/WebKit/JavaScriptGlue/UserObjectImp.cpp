@@ -152,7 +152,7 @@ bool UserObjectImp::getOwnPropertySlot(ExecState* exec,
 void UserObjectImp::put(ExecState* exec,
                         const Identifier& propertyName,
                         JSValue value,
-                        int attr) {
+                        PutPropertySlot&) {
   if (!fJSUserObject)
     return;
 
