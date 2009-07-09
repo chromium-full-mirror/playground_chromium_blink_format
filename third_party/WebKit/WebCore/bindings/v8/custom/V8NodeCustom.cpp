@@ -46,7 +46,7 @@ namespace WebCore {
 
 CALLBACK_FUNC_DECL(NodeAddEventListener) {
   INC_STATS("DOM.Node.addEventListener()");
-  Node* node = V8Proxy::convertDOMWrapperToNode<Node>(args.Holder());
+  Node* node = V8DOMWrapper::convertDOMWrapperToNode<Node>(args.Holder());
 
   V8Proxy* proxy = V8Proxy::retrieve(node->document()->frame());
   if (!proxy)
@@ -64,7 +64,7 @@ CALLBACK_FUNC_DECL(NodeAddEventListener) {
 
 CALLBACK_FUNC_DECL(NodeRemoveEventListener) {
   INC_STATS("DOM.Node.removeEventListener()");
-  Node* node = V8Proxy::convertDOMWrapperToNode<Node>(args.Holder());
+  Node* node = V8DOMWrapper::convertDOMWrapperToNode<Node>(args.Holder());
 
   V8Proxy* proxy = V8Proxy::retrieve(node->document()->frame());
   // It is possbile that the owner document of the node is detached
@@ -88,13 +88,13 @@ CALLBACK_FUNC_DECL(NodeRemoveEventListener) {
 CALLBACK_FUNC_DECL(NodeInsertBefore) {
   INC_STATS("DOM.Node.insertBefore");
   v8::Handle<v8::Value> holder = args.Holder();
-  Node* imp = V8Proxy::convertDOMWrapperToNode<Node>(holder);
+  Node* imp = V8DOMWrapper::convertDOMWrapperToNode<Node>(holder);
   ExceptionCode ec = 0;
   Node* newChild = V8Node::HasInstance(args[0])
-                       ? V8Proxy::convertDOMWrapperToNode<Node>(args[0])
+                       ? V8DOMWrapper::convertDOMWrapperToNode<Node>(args[0])
                        : 0;
   Node* refChild = V8Node::HasInstance(args[1])
-                       ? V8Proxy::convertDOMWrapperToNode<Node>(args[1])
+                       ? V8DOMWrapper::convertDOMWrapperToNode<Node>(args[1])
                        : 0;
   bool success = imp->insertBefore(newChild, refChild, ec, true);
   if (ec) {
@@ -111,13 +111,13 @@ CALLBACK_FUNC_DECL(NodeInsertBefore) {
 CALLBACK_FUNC_DECL(NodeReplaceChild) {
   INC_STATS("DOM.Node.replaceChild");
   v8::Handle<v8::Value> holder = args.Holder();
-  Node* imp = V8Proxy::convertDOMWrapperToNode<Node>(holder);
+  Node* imp = V8DOMWrapper::convertDOMWrapperToNode<Node>(holder);
   ExceptionCode ec = 0;
   Node* newChild = V8Node::HasInstance(args[0])
-                       ? V8Proxy::convertDOMWrapperToNode<Node>(args[0])
+                       ? V8DOMWrapper::convertDOMWrapperToNode<Node>(args[0])
                        : 0;
   Node* oldChild = V8Node::HasInstance(args[1])
-                       ? V8Proxy::convertDOMWrapperToNode<Node>(args[1])
+                       ? V8DOMWrapper::convertDOMWrapperToNode<Node>(args[1])
                        : 0;
   bool success = imp->replaceChild(newChild, oldChild, ec, true);
   if (ec) {
@@ -132,10 +132,10 @@ CALLBACK_FUNC_DECL(NodeReplaceChild) {
 CALLBACK_FUNC_DECL(NodeRemoveChild) {
   INC_STATS("DOM.Node.removeChild");
   v8::Handle<v8::Value> holder = args.Holder();
-  Node* imp = V8Proxy::convertDOMWrapperToNode<Node>(holder);
+  Node* imp = V8DOMWrapper::convertDOMWrapperToNode<Node>(holder);
   ExceptionCode ec = 0;
   Node* oldChild = V8Node::HasInstance(args[0])
-                       ? V8Proxy::convertDOMWrapperToNode<Node>(args[0])
+                       ? V8DOMWrapper::convertDOMWrapperToNode<Node>(args[0])
                        : 0;
   bool success = imp->removeChild(oldChild, ec);
   if (ec) {
@@ -152,10 +152,10 @@ CALLBACK_FUNC_DECL(NodeRemoveChild) {
 CALLBACK_FUNC_DECL(NodeAppendChild) {
   INC_STATS("DOM.Node.appendChild");
   v8::Handle<v8::Value> holder = args.Holder();
-  Node* imp = V8Proxy::convertDOMWrapperToNode<Node>(holder);
+  Node* imp = V8DOMWrapper::convertDOMWrapperToNode<Node>(holder);
   ExceptionCode ec = 0;
   Node* newChild = V8Node::HasInstance(args[0])
-                       ? V8Proxy::convertDOMWrapperToNode<Node>(args[0])
+                       ? V8DOMWrapper::convertDOMWrapperToNode<Node>(args[0])
                        : 0;
   bool success = imp->appendChild(newChild, ec, true);
   if (ec) {

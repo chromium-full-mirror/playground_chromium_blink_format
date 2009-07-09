@@ -47,7 +47,8 @@ namespace WebCore {
 CALLBACK_FUNC_DECL(SVGElementInstanceAddEventListener) {
   INC_STATS("DOM.SVGElementInstance.AddEventListener()");
   SVGElementInstance* instance =
-      V8Proxy::convertDOMWrapperToNative<SVGElementInstance>(args.Holder());
+      V8DOMWrapper::convertDOMWrapperToNative<SVGElementInstance>(
+          args.Holder());
 
   V8Proxy* proxy = V8Proxy::retrieve(instance->scriptExecutionContext());
   if (!proxy)
@@ -67,7 +68,8 @@ CALLBACK_FUNC_DECL(SVGElementInstanceAddEventListener) {
 CALLBACK_FUNC_DECL(SVGElementInstanceRemoveEventListener) {
   INC_STATS("DOM.SVGElementInstance.RemoveEventListener()");
   SVGElementInstance* instance =
-      V8Proxy::convertDOMWrapperToNative<SVGElementInstance>(args.Holder());
+      V8DOMWrapper::convertDOMWrapperToNative<SVGElementInstance>(
+          args.Holder());
 
   V8Proxy* proxy = V8Proxy::retrieve(instance->scriptExecutionContext());
   if (!proxy)

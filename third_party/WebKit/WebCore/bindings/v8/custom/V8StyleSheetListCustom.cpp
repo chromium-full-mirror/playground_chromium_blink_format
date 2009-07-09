@@ -44,13 +44,13 @@ NAMED_PROPERTY_GETTER(StyleSheetList) {
     return notHandledByInterceptor();
 
   // Search style sheet.
-  StyleSheetList* imp = V8Proxy::convertToNativeObject<StyleSheetList>(
+  StyleSheetList* imp = V8DOMWrapper::convertToNativeObject<StyleSheetList>(
       V8ClassIndex::STYLESHEETLIST, info.Holder());
   HTMLStyleElement* item = imp->getNamedItem(toWebCoreString(name));
   if (!item)
     return notHandledByInterceptor();
 
-  return V8Proxy::convertToV8Object(V8ClassIndex::HTMLSTYLEELEMENT, item);
+  return V8DOMWrapper::convertToV8Object(V8ClassIndex::HTMLSTYLEELEMENT, item);
 }
 
 }  // namespace WebCore

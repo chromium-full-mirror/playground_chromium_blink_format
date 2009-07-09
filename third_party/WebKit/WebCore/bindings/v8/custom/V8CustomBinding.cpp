@@ -88,9 +88,10 @@ ACCESSOR_GETTER(DocumentImplementation) {
 
   // Generate a wrapper.
   Document* document =
-      V8Proxy::convertDOMWrapperToNative<Document>(info.Holder());
+      V8DOMWrapper::convertDOMWrapperToNative<Document>(info.Holder());
   v8::Handle<v8::Value> wrapper =
-      V8Proxy::convertDOMImplementationToV8Object(document->implementation());
+      V8DOMWrapper::convertDOMImplementationToV8Object(
+          document->implementation());
 
   // Store the wrapper in the internal field.
   info.Holder()->SetInternalField(kDocumentImplementationIndex, wrapper);
@@ -103,7 +104,7 @@ INDEXED_ACCESS_CHECK(History) {
   ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::HISTORY);
   // Only allow same origin access.
   History* history =
-      V8Proxy::convertToNativeObject<History>(V8ClassIndex::HISTORY, host);
+      V8DOMWrapper::convertToNativeObject<History>(V8ClassIndex::HISTORY, host);
   return V8Proxy::canAccessFrame(history->frame(), false);
 }
 
@@ -111,7 +112,7 @@ NAMED_ACCESS_CHECK(History) {
   ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::HISTORY);
   // Only allow same origin access.
   History* history =
-      V8Proxy::convertToNativeObject<History>(V8ClassIndex::HISTORY, host);
+      V8DOMWrapper::convertToNativeObject<History>(V8ClassIndex::HISTORY, host);
   return V8Proxy::canAccessFrame(history->frame(), false);
 }
 
@@ -126,23 +127,23 @@ Frame* V8Custom::GetTargetFrame(v8::Local<v8::Object> host,
   switch (V8ClassIndex::FromInt(data->Int32Value())) {
     case V8ClassIndex::DOMWINDOW: {
       v8::Handle<v8::Value> window =
-          V8Proxy::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, host);
+          V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, host);
       if (window.IsEmpty())
         return target;
 
-      DOMWindow* targetWindow = V8Proxy::convertToNativeObject<DOMWindow>(
+      DOMWindow* targetWindow = V8DOMWrapper::convertToNativeObject<DOMWindow>(
           V8ClassIndex::DOMWINDOW, window);
       target = targetWindow->frame();
       break;
     }
     case V8ClassIndex::LOCATION: {
-      History* history =
-          V8Proxy::convertToNativeObject<History>(V8ClassIndex::HISTORY, host);
+      History* history = V8DOMWrapper::convertToNativeObject<History>(
+          V8ClassIndex::HISTORY, host);
       target = history->frame();
       break;
     }
     case V8ClassIndex::HISTORY: {
-      Location* location = V8Proxy::convertToNativeObject<Location>(
+      Location* location = V8DOMWrapper::convertToNativeObject<Location>(
           V8ClassIndex::LOCATION, host);
       target = location->frame();
       break;

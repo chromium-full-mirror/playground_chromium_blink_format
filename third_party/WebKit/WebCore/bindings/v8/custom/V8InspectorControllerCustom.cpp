@@ -55,12 +55,12 @@ CALLBACK_FUNC_DECL(InspectorControllerHighlightDOMNode) {
   if (args.Length() < 1)
     return v8::Undefined();
 
-  Node* node = V8Proxy::convertDOMWrapperToNode<Node>(args[0]);
+  Node* node = V8DOMWrapper::convertDOMWrapperToNode<Node>(args[0]);
   if (!node)
     return v8::Undefined();
 
   InspectorController* inspectorController =
-      V8Proxy::convertToNativeObject<InspectorController>(
+      V8DOMWrapper::convertToNativeObject<InspectorController>(
           V8ClassIndex::INSPECTORCONTROLLER, args.Holder());
   inspectorController->highlight(node);
 
@@ -79,7 +79,7 @@ CALLBACK_FUNC_DECL(InspectorControllerGetResourceDocumentNode) {
   unsigned identifier = args[1]->Int32Value();
 
   InspectorController* inspectorController =
-      V8Proxy::convertToNativeObject<InspectorController>(
+      V8DOMWrapper::convertToNativeObject<InspectorController>(
           V8ClassIndex::INSPECTORCONTROLLER, args.Holder());
   RefPtr<InspectorResource> resource =
       inspectorController->resources().get(identifier);
@@ -94,7 +94,7 @@ CALLBACK_FUNC_DECL(InspectorControllerGetResourceDocumentNode) {
       document->isMediaDocument())
     return v8::Undefined();
 
-  return V8Proxy::convertToV8Object(V8ClassIndex::DOCUMENT, document);
+  return V8DOMWrapper::convertToV8Object(V8ClassIndex::DOCUMENT, document);
 }
 
 CALLBACK_FUNC_DECL(InspectorControllerSearch) {
@@ -103,7 +103,7 @@ CALLBACK_FUNC_DECL(InspectorControllerSearch) {
   if (args.Length() < 2)
     return v8::Undefined();
 
-  Node* node = V8Proxy::convertDOMWrapperToNode<Node>(args[0]);
+  Node* node = V8DOMWrapper::convertDOMWrapperToNode<Node>(args[0]);
   if (!node)
     return v8::Undefined();
 
@@ -131,8 +131,8 @@ CALLBACK_FUNC_DECL(InspectorControllerSearch) {
       break;
 
     result->Set(v8::Number::New(index++),
-                V8Proxy::convertToV8Object<Range>(V8ClassIndex::RANGE,
-                                                  resultRange.get()));
+                V8DOMWrapper::convertToV8Object<Range>(V8ClassIndex::RANGE,
+                                                       resultRange.get()));
 
     setStart(searchRange.get(), newStart);
   } while (true);
@@ -152,9 +152,9 @@ CALLBACK_FUNC_DECL(InspectorControllerInspectedWindow) {
   INC_STATS("InspectorController.inspectedWindow()");
 
   InspectorController* inspectorController =
-      V8Proxy::convertToNativeObject<InspectorController>(
+      V8DOMWrapper::convertToNativeObject<InspectorController>(
           V8ClassIndex::INSPECTORCONTROLLER, args.Holder());
-  return V8Proxy::convertToV8Object<DOMWindow>(
+  return V8DOMWrapper::convertToV8Object<DOMWindow>(
       V8ClassIndex::DOMWINDOW,
       inspectorController->inspectedPage()->mainFrame()->domWindow());
 }
@@ -170,7 +170,7 @@ CALLBACK_FUNC_DECL(InspectorControllerSetting) {
     return v8::Undefined();
 
   InspectorController* inspectorController =
-      V8Proxy::convertToNativeObject<InspectorController>(
+      V8DOMWrapper::convertToNativeObject<InspectorController>(
           V8ClassIndex::INSPECTORCONTROLLER, args.Holder());
   const InspectorController::Setting& setting =
       inspectorController->setting(key);
@@ -233,7 +233,7 @@ CALLBACK_FUNC_DECL(InspectorControllerSetSetting) {
     return v8::Undefined();
 
   InspectorController* inspectorController =
-      V8Proxy::convertToNativeObject<InspectorController>(
+      V8DOMWrapper::convertToNativeObject<InspectorController>(
           V8ClassIndex::INSPECTORCONTROLLER, args.Holder());
   inspectorController->setSetting(key, setting);
 

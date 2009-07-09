@@ -55,7 +55,7 @@ v8::Handle<v8::Value> toOptionsCollectionSetter(uint32_t index,
   }
 
   HTMLOptionElement* element =
-      V8Proxy::convertDOMWrapperToNode<HTMLOptionElement>(
+      V8DOMWrapper::convertDOMWrapperToNode<HTMLOptionElement>(
           v8::Handle<v8::Object>::Cast(value));
   base->setOption(index, element, ec);
 

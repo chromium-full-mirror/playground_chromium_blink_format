@@ -43,7 +43,7 @@ namespace WebCore {
 INDEXED_PROPERTY_GETTER(CanvasPixelArray) {
   INC_STATS("DOM.CanvasPixelArray.IndexedPropertyGetter");
   CanvasPixelArray* pixelBuffer =
-      V8Proxy::convertToNativeObject<CanvasPixelArray>(
+      V8DOMWrapper::convertToNativeObject<CanvasPixelArray>(
           V8ClassIndex::CANVASPIXELARRAY, info.Holder());
 
   if ((index < 0) || (index >= pixelBuffer->length()))
@@ -59,7 +59,7 @@ INDEXED_PROPERTY_GETTER(CanvasPixelArray) {
 INDEXED_PROPERTY_SETTER(CanvasPixelArray) {
   INC_STATS("DOM.CanvasPixelArray.IndexedPropertySetter");
   CanvasPixelArray* pixelBuffer =
-      V8Proxy::convertToNativeObject<CanvasPixelArray>(
+      V8DOMWrapper::convertToNativeObject<CanvasPixelArray>(
           V8ClassIndex::CANVASPIXELARRAY, info.Holder());
 
   if ((index >= 0) && (index < pixelBuffer->length()))

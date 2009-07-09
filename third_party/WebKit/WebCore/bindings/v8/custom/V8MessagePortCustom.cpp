@@ -42,14 +42,14 @@ namespace WebCore {
 
 ACCESSOR_GETTER(MessagePortOnmessage) {
   INC_STATS("DOM.MessagePort.onmessage._get");
-  MessagePort* messagePort = V8Proxy::convertToNativeObject<MessagePort>(
+  MessagePort* messagePort = V8DOMWrapper::convertToNativeObject<MessagePort>(
       V8ClassIndex::MESSAGEPORT, info.Holder());
-  return V8Proxy::convertEventListenerToV8Object(messagePort->onmessage());
+  return V8DOMWrapper::convertEventListenerToV8Object(messagePort->onmessage());
 }
 
 ACCESSOR_SETTER(MessagePortOnmessage) {
   INC_STATS("DOM.MessagePort.onmessage._set");
-  MessagePort* messagePort = V8Proxy::convertToNativeObject<MessagePort>(
+  MessagePort* messagePort = V8DOMWrapper::convertToNativeObject<MessagePort>(
       V8ClassIndex::MESSAGEPORT, info.Holder());
   if (value->IsNull()) {
     if (messagePort->onmessage()) {
@@ -79,7 +79,7 @@ ACCESSOR_SETTER(MessagePortOnmessage) {
 
 CALLBACK_FUNC_DECL(MessagePortAddEventListener) {
   INC_STATS("DOM.MessagePort.AddEventListener()");
-  MessagePort* messagePort = V8Proxy::convertToNativeObject<MessagePort>(
+  MessagePort* messagePort = V8DOMWrapper::convertToNativeObject<MessagePort>(
       V8ClassIndex::MESSAGEPORT, args.Holder());
 
   V8Proxy* proxy = V8Proxy::retrieve(messagePort->scriptExecutionContext());
@@ -101,7 +101,7 @@ CALLBACK_FUNC_DECL(MessagePortAddEventListener) {
 
 CALLBACK_FUNC_DECL(MessagePortRemoveEventListener) {
   INC_STATS("DOM.MessagePort.RemoveEventListener()");
-  MessagePort* messagePort = V8Proxy::convertToNativeObject<MessagePort>(
+  MessagePort* messagePort = V8DOMWrapper::convertToNativeObject<MessagePort>(
       V8ClassIndex::MESSAGEPORT, args.Holder());
 
   V8Proxy* proxy = V8Proxy::retrieve(messagePort->scriptExecutionContext());

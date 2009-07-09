@@ -41,7 +41,7 @@ namespace WebCore {
 
 NAMED_PROPERTY_GETTER(NodeList) {
   INC_STATS("DOM.NodeList.NamedPropertyGetter");
-  NodeList* list = V8Proxy::convertToNativeObject<NodeList>(
+  NodeList* list = V8DOMWrapper::convertToNativeObject<NodeList>(
       V8ClassIndex::NODELIST, info.Holder());
   String key = toWebCoreString(name);
 
@@ -53,7 +53,7 @@ NAMED_PROPERTY_GETTER(NodeList) {
   if (!result)
     return notHandledByInterceptor();
 
-  return V8Proxy::convertNodeToV8Object(result.get());
+  return V8DOMWrapper::convertNodeToV8Object(result.get());
 }
 
 }  // namespace WebCore

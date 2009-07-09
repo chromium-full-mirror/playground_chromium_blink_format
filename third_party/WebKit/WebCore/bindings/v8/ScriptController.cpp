@@ -147,7 +147,7 @@ bool ScriptController::processingUserGesture() const {
 
   v8::Handle<v8::Object> global = v8Context->Global();
   v8::Handle<v8::Value> jsEvent = global->Get(v8::String::NewSymbol("event"));
-  Event* event = V8Proxy::convertToNativeEvent(jsEvent);
+  Event* event = V8DOMWrapper::convertToNativeEvent(jsEvent);
 
   // Based on code from kjs_bindings.cpp.
   // Note: This is more liberal than Firefox's implementation.
@@ -331,7 +331,7 @@ static NPObject* createScriptObject(Frame* frame) {
   v8::Context::Scope scope(v8Context);
   DOMWindow* window = frame->domWindow();
   v8::Handle<v8::Value> global =
-      V8Proxy::convertToV8Object(V8ClassIndex::DOMWINDOW, window);
+      V8DOMWrapper::convertToV8Object(V8ClassIndex::DOMWINDOW, window);
   ASSERT(global->IsObject());
   return npCreateV8ScriptObject(0, v8::Handle<v8::Object>::Cast(global),
                                 window);
@@ -369,7 +369,7 @@ NPObject* ScriptController::createScriptObjectForPluginElement(
 
   DOMWindow* window = m_frame->domWindow();
   v8::Handle<v8::Value> v8plugin =
-      V8Proxy::convertToV8Object(V8ClassIndex::HTMLEMBEDELEMENT, plugin);
+      V8DOMWrapper::convertToV8Object(V8ClassIndex::HTMLEMBEDELEMENT, plugin);
   if (!v8plugin->IsObject())
     return createNoScriptObject();
 

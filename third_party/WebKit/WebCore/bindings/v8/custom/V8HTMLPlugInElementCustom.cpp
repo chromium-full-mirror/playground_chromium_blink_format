@@ -45,7 +45,7 @@ namespace WebCore {
 NAMED_PROPERTY_GETTER(HTMLPlugInElement) {
   INC_STATS("DOM.HTMLPlugInElement.NamedPropertyGetter");
   HTMLPlugInElement* imp =
-      V8Proxy::convertDOMWrapperToNode<HTMLPlugInElement>(info.Holder());
+      V8DOMWrapper::convertDOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
     return notHandledByInterceptor();
@@ -61,7 +61,7 @@ NAMED_PROPERTY_GETTER(HTMLPlugInElement) {
 NAMED_PROPERTY_SETTER(HTMLPlugInElement) {
   INC_STATS("DOM.HTMLPlugInElement.NamedPropertySetter");
   HTMLPlugInElement* imp =
-      V8Proxy::convertDOMWrapperToNode<HTMLPlugInElement>(info.Holder());
+      V8DOMWrapper::convertDOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
     return notHandledByInterceptor();
@@ -82,7 +82,7 @@ CALLBACK_FUNC_DECL(HTMLPlugInElement) {
 INDEXED_PROPERTY_GETTER(HTMLPlugInElement) {
   INC_STATS("DOM.HTMLPlugInElement.IndexedPropertyGetter");
   HTMLPlugInElement* imp =
-      V8Proxy::convertDOMWrapperToNode<HTMLPlugInElement>(info.Holder());
+      V8DOMWrapper::convertDOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
     return notHandledByInterceptor();
@@ -98,7 +98,7 @@ INDEXED_PROPERTY_GETTER(HTMLPlugInElement) {
 INDEXED_PROPERTY_SETTER(HTMLPlugInElement) {
   INC_STATS("DOM.HTMLPlugInElement.IndexedPropertySetter");
   HTMLPlugInElement* imp =
-      V8Proxy::convertDOMWrapperToNode<HTMLPlugInElement>(info.Holder());
+      V8DOMWrapper::convertDOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
   if (!scriptInstance)
     return notHandledByInterceptor();

@@ -64,7 +64,7 @@ v8::Handle<v8::Value> V8Custom::WindowSetTimeoutImpl(const v8::Arguments& args,
   if (argumentCount < 1)
     return v8::Undefined();
 
-  DOMWindow* imp = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
   if (!imp->frame())
@@ -162,17 +162,17 @@ ACCESSOR_GETTER(DOMWindowCrypto) {
 
 ACCESSOR_SETTER(DOMWindowLocation) {
   v8::Handle<v8::Object> holder =
-      V8Proxy::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, info.This());
+      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, info.This());
   if (holder.IsEmpty())
     return;
 
-  DOMWindow* imp = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, holder);
   WindowSetLocation(imp, toWebCoreString(value));
 }
 
 ACCESSOR_SETTER(DOMWindowOpener) {
-  DOMWindow* imp = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, info.Holder());
 
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
@@ -197,7 +197,7 @@ ACCESSOR_SETTER(DOMWindowOpener) {
 
 CALLBACK_FUNC_DECL(DOMWindowAddEventListener) {
   INC_STATS("DOM.DOMWindow.addEventListener()");
-  DOMWindow* imp = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
@@ -229,7 +229,7 @@ CALLBACK_FUNC_DECL(DOMWindowAddEventListener) {
 
 CALLBACK_FUNC_DECL(DOMWindowRemoveEventListener) {
   INC_STATS("DOM.DOMWindow.removeEventListener()");
-  DOMWindow* imp = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
@@ -259,7 +259,7 @@ CALLBACK_FUNC_DECL(DOMWindowRemoveEventListener) {
 
 CALLBACK_FUNC_DECL(DOMWindowPostMessage) {
   INC_STATS("DOM.DOMWindow.postMessage()");
-  DOMWindow* window = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
   DOMWindow* source = V8Proxy::retrieveFrameForCallingContext()->domWindow();
@@ -276,8 +276,8 @@ CALLBACK_FUNC_DECL(DOMWindowPostMessage) {
   // or
   //   postMessage(message, targetOrigin);
   if (args.Length() > 2) {
-    if (V8Proxy::isWrapperOfType(args[1], V8ClassIndex::MESSAGEPORT))
-      port = V8Proxy::convertToNativeObject<MessagePort>(
+    if (V8DOMWrapper::isWrapperOfType(args[1], V8ClassIndex::MESSAGEPORT))
+      port = V8DOMWrapper::convertToNativeObject<MessagePort>(
           V8ClassIndex::MESSAGEPORT, args[1]);
     targetOrigin = toWebCoreStringWithNullOrUndefinedCheck(args[2]);
   } else {
@@ -297,7 +297,7 @@ CALLBACK_FUNC_DECL(DOMWindowPostMessage) {
 
 CALLBACK_FUNC_DECL(DOMWindowAtob) {
   INC_STATS("DOM.DOMWindow.atob()");
-  DOMWindow* imp = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
@@ -315,7 +315,7 @@ CALLBACK_FUNC_DECL(DOMWindowAtob) {
 
 CALLBACK_FUNC_DECL(DOMWindowBtoa) {
   INC_STATS("DOM.DOMWindow.btoa()");
-  DOMWindow* imp = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
@@ -372,11 +372,11 @@ static String eventNameFromAttributeName(const String& name) {
 
 ACCESSOR_SETTER(DOMWindowEventHandler) {
   v8::Handle<v8::Object> holder =
-      V8Proxy::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, info.This());
+      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, info.This());
   if (holder.IsEmpty())
     return;
 
-  DOMWindow* imp = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, holder);
   if (!imp->frame())
     return;
@@ -405,11 +405,11 @@ ACCESSOR_SETTER(DOMWindowEventHandler) {
 
 ACCESSOR_GETTER(DOMWindowEventHandler) {
   v8::Handle<v8::Object> holder =
-      V8Proxy::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, info.This());
+      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, info.This());
   if (holder.IsEmpty())
     return v8::Undefined();
 
-  DOMWindow* imp = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, holder);
   if (!imp->frame())
     return v8::Undefined();
@@ -422,7 +422,7 @@ ACCESSOR_GETTER(DOMWindowEventHandler) {
   String eventType = eventNameFromAttributeName(key);
 
   EventListener* listener = imp->getAttributeEventListener(eventType);
-  return V8Proxy::convertEventListenerToV8Object(listener);
+  return V8DOMWrapper::convertEventListenerToV8Object(listener);
 }
 
 static bool canShowModalDialogNow(const Frame* frame) {
@@ -541,7 +541,7 @@ static Frame* createWindow(Frame* callingFrame,
 
 CALLBACK_FUNC_DECL(DOMWindowShowModalDialog) {
   INC_STATS("DOM.DOMWindow.showModalDialog()");
-  DOMWindow* window = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
   Frame* frame = window->frame();
 
@@ -640,7 +640,7 @@ CALLBACK_FUNC_DECL(DOMWindowShowModalDialog) {
 
 CALLBACK_FUNC_DECL(DOMWindowOpen) {
   INC_STATS("DOM.DOMWindow.open()");
-  DOMWindow* parent = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* parent = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
   Frame* frame = parent->frame();
 
@@ -702,8 +702,8 @@ CALLBACK_FUNC_DECL(DOMWindowOpen) {
       frame->loader()->scheduleLocationChange(completedUrl, referrer, false,
                                               userGesture);
     }
-    return V8Proxy::convertToV8Object(V8ClassIndex::DOMWINDOW,
-                                      frame->domWindow());
+    return V8DOMWrapper::convertToV8Object(V8ClassIndex::DOMWINDOW,
+                                           frame->domWindow());
   }
 
   // In the case of a named frame or a new window, we'll use the
@@ -765,18 +765,18 @@ CALLBACK_FUNC_DECL(DOMWindowOpen) {
   if (!frame)
     return v8::Undefined();
 
-  return V8Proxy::convertToV8Object(V8ClassIndex::DOMWINDOW,
-                                    frame->domWindow());
+  return V8DOMWrapper::convertToV8Object(V8ClassIndex::DOMWINDOW,
+                                         frame->domWindow());
 }
 
 INDEXED_PROPERTY_GETTER(DOMWindow) {
   INC_STATS("DOM.DOMWindow.IndexedPropertyGetter");
   v8::Handle<v8::Object> holder =
-      V8Proxy::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, info.This());
+      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, info.This());
   if (holder.IsEmpty())
     return notHandledByInterceptor();
 
-  DOMWindow* window = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, holder);
   if (!window)
     return notHandledByInterceptor();
@@ -787,8 +787,8 @@ INDEXED_PROPERTY_GETTER(DOMWindow) {
 
   Frame* child = frame->tree()->child(index);
   if (child)
-    return V8Proxy::convertToV8Object(V8ClassIndex::DOMWINDOW,
-                                      child->domWindow());
+    return V8DOMWrapper::convertToV8Object(V8ClassIndex::DOMWINDOW,
+                                           child->domWindow());
 
   return notHandledByInterceptor();
 }
@@ -797,11 +797,11 @@ NAMED_PROPERTY_GETTER(DOMWindow) {
   INC_STATS("DOM.DOMWindow.NamedPropertyGetter");
 
   v8::Handle<v8::Object> holder =
-      V8Proxy::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, info.This());
+      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, info.This());
   if (holder.IsEmpty())
     return notHandledByInterceptor();
 
-  DOMWindow* window = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, holder);
   if (!window)
     return notHandledByInterceptor();
@@ -815,8 +815,8 @@ NAMED_PROPERTY_GETTER(DOMWindow) {
   AtomicString propName = v8StringToAtomicWebCoreString(name);
   Frame* child = frame->tree()->child(propName);
   if (child)
-    return V8Proxy::convertToV8Object(V8ClassIndex::DOMWINDOW,
-                                      child->domWindow());
+    return V8DOMWrapper::convertToV8Object(V8ClassIndex::DOMWINDOW,
+                                           child->domWindow());
 
   // Search IDL functions defined in the prototype
   v8::Handle<v8::Value> result =
@@ -830,10 +830,10 @@ NAMED_PROPERTY_GETTER(DOMWindow) {
     RefPtr<HTMLCollection> items = doc->windowNamedItems(propName);
     if (items->length() >= 1) {
       if (items->length() == 1)
-        return V8Proxy::convertNodeToV8Object(items->firstItem());
+        return V8DOMWrapper::convertNodeToV8Object(items->firstItem());
       else
-        return V8Proxy::convertToV8Object(V8ClassIndex::HTMLCOLLECTION,
-                                          items.get());
+        return V8DOMWrapper::convertToV8Object(V8ClassIndex::HTMLCOLLECTION,
+                                               items.get());
     }
   }
 
@@ -867,7 +867,7 @@ CALLBACK_FUNC_DECL(DOMWindowSetInterval) {
 
 void V8Custom::ClearTimeoutImpl(const v8::Arguments& args) {
   v8::Handle<v8::Value> holder = args.Holder();
-  DOMWindow* imp = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, holder);
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
     return;
@@ -892,11 +892,11 @@ CALLBACK_FUNC_DECL(DOMWindowClearInterval) {
 NAMED_ACCESS_CHECK(DOMWindow) {
   ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::DOMWINDOW);
   v8::Handle<v8::Value> window =
-      V8Proxy::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, host);
+      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, host);
   if (window.IsEmpty())
     return false;  // the frame is gone.
 
-  DOMWindow* targetWindow = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* targetWindow = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, window);
 
   ASSERT(targetWindow);
@@ -920,11 +920,11 @@ NAMED_ACCESS_CHECK(DOMWindow) {
 INDEXED_ACCESS_CHECK(DOMWindow) {
   ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::DOMWINDOW);
   v8::Handle<v8::Value> window =
-      V8Proxy::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, host);
+      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, host);
   if (window.IsEmpty())
     return false;
 
-  DOMWindow* targetWindow = V8Proxy::convertToNativeObject<DOMWindow>(
+  DOMWindow* targetWindow = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, window);
 
   ASSERT(targetWindow);
