@@ -35,6 +35,7 @@ namespace WebCore {
 
 class CachedResource;
 class DocLoader;
+class KURL;
 class Request;
 
 class Loader : Noncopyable {
@@ -57,6 +58,9 @@ class Loader : Noncopyable {
   void suspendPendingRequests();
   void resumePendingRequests();
 
+  void nonCacheRequestInFlight(const KURL&);
+  void nonCacheRequestComplete(const KURL&);
+
  private:
   Priority determinePriority(const CachedResource*) const;
   void scheduleServePendingRequests();
@@ -73,11 +77,15 @@ class Loader : Noncopyable {
 
     const AtomicString& name() const { return m_name; }
     void addRequest(Request*, Priority);
+    void nonCacheRequestInFlight();
+    void nonCacheRequestComplete();
     void servePendingRequests(Priority minimumPriority = Low);
     void cancelRequests(DocLoader*);
     bool hasRequests() const;
 
-    bool processingResource() const { return m_numResourcesProcessing != 0; }
+    bool processingResource() const {
+      return m_numResourcesProcessing != 0 || m_nonCachedRequestsInFlight != 0;
+    }
 
    private:
     Host(const AtomicString&, unsigned);
@@ -100,6 +108,7 @@ class Loader : Noncopyable {
     const AtomicString m_name;
     const int m_maxRequestsInFlight;
     int m_numResourcesProcessing;
+    int m_nonCachedRequestsInFlight;
   };
   typedef HashMap<AtomicStringImpl*, RefPtr<Host>> HostMap;
   HostMap m_hosts;

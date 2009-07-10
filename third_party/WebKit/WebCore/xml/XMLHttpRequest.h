@@ -273,6 +273,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   bool m_sameOriginRequest;
   bool m_allowAccess;
   bool m_inPreflight;
+  bool m_didTellLoaderAboutRequest;
 
   // Used for onprogress tracking
   long long m_receivedLength;
