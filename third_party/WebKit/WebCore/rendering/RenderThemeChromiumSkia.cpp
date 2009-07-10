@@ -201,8 +201,18 @@ bool RenderThemeChromiumSkia::paintCheckbox(RenderObject* o,
       Image::loadPlatformResource("linuxCheckboxOn").releaseRef();
   static Image* const uncheckedImage =
       Image::loadPlatformResource("linuxCheckboxOff").releaseRef();
+  static Image* const disabledCheckedImage =
+      Image::loadPlatformResource("linuxCheckboxDisabledOn").releaseRef();
+  static Image* const disabledUncheckedImage =
+      Image::loadPlatformResource("linuxCheckboxDisabledOff").releaseRef();
 
-  Image* image = this->isChecked(o) ? checkedImage : uncheckedImage;
+  Image* image;
+
+  if (this->isEnabled(o))
+    image = this->isChecked(o) ? checkedImage : uncheckedImage;
+  else
+    image = this->isChecked(o) ? disabledCheckedImage : disabledUncheckedImage;
+
   i.context->drawImage(image, rect);
   return false;
 }
@@ -228,8 +238,17 @@ bool RenderThemeChromiumSkia::paintRadio(RenderObject* o,
       Image::loadPlatformResource("linuxRadioOn").releaseRef();
   static Image* const uncheckedImage =
       Image::loadPlatformResource("linuxRadioOff").releaseRef();
+  static Image* const disabledCheckedImage =
+      Image::loadPlatformResource("linuxRadioDisabledOn").releaseRef();
+  static Image* const disabledUncheckedImage =
+      Image::loadPlatformResource("linuxRadioDisabledOff").releaseRef();
 
-  Image* image = this->isChecked(o) ? checkedImage : uncheckedImage;
+  Image* image;
+  if (this->isEnabled(o))
+    image = this->isChecked(o) ? checkedImage : uncheckedImage;
+  else
+    image = this->isChecked(o) ? disabledCheckedImage : disabledUncheckedImage;
+
   i.context->drawImage(image, rect);
   return false;
 }
