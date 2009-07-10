@@ -116,6 +116,8 @@ class ParserArenaDeletable {
   // deleted.
   // Other arrangements must be made.
   void* operator new(size_t);
+
+  void operator delete(void*);
 };
 
 class ParserArenaRefCounted : public RefCounted<ParserArenaRefCounted> {
