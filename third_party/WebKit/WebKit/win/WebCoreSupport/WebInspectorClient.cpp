@@ -51,6 +51,9 @@
 
 using namespace WebCore;
 
+static const char* const inspectorStartsAttachedName =
+    "inspectorStartsAttached";
+
 static LPCTSTR kWebInspectorWindowClassName = TEXT("WebInspectorWindowClass");
 static ATOM registerWindowClass();
 static LPCTSTR kWebInspectorPointerProp = TEXT("WebInspectorPointer");
@@ -217,12 +220,14 @@ String WebInspectorClient::hiddenPanels() {
 
 void WebInspectorClient::showWindow() {
   showWindowWithoutNotifications();
-  m_inspectedWebView->page()->inspectorController()->setWindowVisible(true);
+  m_inspectedWebView->page()->inspectorController()->setWindowVisible(
+      true, m_shouldAttachWhenShown);
 }
 
 void WebInspectorClient::closeWindow() {
   closeWindowWithoutNotifications();
-  m_inspectedWebView->page()->inspectorController()->setWindowVisible(false);
+  m_inspectedWebView->page()->inspectorController()->setWindowVisible(
+      false, m_shouldAttachWhenShown);
 }
 
 bool WebInspectorClient::windowVisible() {
@@ -233,7 +238,8 @@ void WebInspectorClient::attachWindow() {
   if (m_attached)
     return;
 
-  m_shouldAttachWhenShown = true;
+  m_inspectedWebView->page()->inspectorController()->setSetting(
+      inspectorStartsAttachedName, InspectorController::Setting(true));
 
   closeWindowWithoutNotifications();
   showWindowWithoutNotifications();
@@ -243,7 +249,8 @@ void WebInspectorClient::detachWindow() {
   if (!m_attached)
     return;
 
-  m_shouldAttachWhenShown = false;
+  m_inspectedWebView->page()->inspectorController()->setSetting(
+      inspectorStartsAttachedName, InspectorController::Setting(false));
 
   closeWindowWithoutNotifications();
   showWindowWithoutNotifications();
@@ -314,6 +321,14 @@ void WebInspectorClient::showWindowWithoutNotifications() {
   ASSERT(m_webView);
   ASSERT(m_inspectedWebViewHwnd);
 
+  InspectorController::Setting shouldAttach =
+      m_inspectedWebView->page()->inspectorController()->setting(
+          inspectorStartsAttachedName);
+  m_shouldAttachWhenShown =
+      shouldAttach.type() == InspectorController::Setting::BooleanType
+          ? shouldAttach.booleanValue()
+          : false;
+
   if (!m_shouldAttachWhenShown) {
     // Put the Inspector's WebView inside our window and show it.
     m_webView->setHostWindow(reinterpret_cast<OLE_HANDLE>(m_hwnd));
@@ -377,7 +392,8 @@ LRESULT WebInspectorClient::onSize(WPARAM, LPARAM) {
 
 LRESULT WebInspectorClient::onClose(WPARAM, LPARAM) {
   ::ShowWindow(m_hwnd, SW_HIDE);
-  m_inspectedWebView->page()->inspectorController()->setWindowVisible(false);
+  m_inspectedWebView->page()->inspectorController()->setWindowVisible(
+      false, m_shouldAttachWhenShown);
 
   hideHighlight();
 
