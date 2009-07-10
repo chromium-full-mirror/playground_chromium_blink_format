@@ -238,20 +238,24 @@ bool InlineBox::prevOnLineExists() const {
   return m_prevOnLineExists;
 }
 
-InlineBox* InlineBox::firstLeafChild() {
-  return this;
+InlineBox* InlineBox::nextLeafChild() const {
+  InlineBox* leaf = 0;
+  for (InlineBox* box = nextOnLine(); box && !leaf; box = box->nextOnLine())
+    leaf = box->isLeaf() ? box
+                         : static_cast<InlineFlowBox*>(box)->firstLeafChild();
+  if (!leaf && parent())
+    leaf = parent()->nextLeafChild();
+  return leaf;
 }
 
-InlineBox* InlineBox::lastLeafChild() {
-  return this;
-}
-
-InlineBox* InlineBox::nextLeafChild() {
-  return parent() ? parent()->firstLeafChildAfterBox(this) : 0;
-}
-
-InlineBox* InlineBox::prevLeafChild() {
-  return parent() ? parent()->lastLeafChildBeforeBox(this) : 0;
+InlineBox* InlineBox::prevLeafChild() const {
+  InlineBox* leaf = 0;
+  for (InlineBox* box = prevOnLine(); box && !leaf; box = box->prevOnLine())
+    leaf =
+        box->isLeaf() ? box : static_cast<InlineFlowBox*>(box)->lastLeafChild();
+  if (!leaf && parent())
+    leaf = parent()->prevLeafChild();
+  return leaf;
 }
 
 RenderObject::SelectionState InlineBox::selectionState() {
