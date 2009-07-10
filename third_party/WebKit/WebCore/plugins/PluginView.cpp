@@ -236,6 +236,10 @@ void PluginView::performRequest(PluginRequest* request) {
       m_streams.add(stream);
       stream->start();
     } else {
+      // If the target frame is our frame, we could destroy the
+      // PluginView, so we protect it. <rdar://problem/6991251>
+      RefPtr<PluginView> protect(this);
+
       m_parentFrame->loader()->load(
           request->frameLoadRequest().resourceRequest(), targetFrameName,
           false);
