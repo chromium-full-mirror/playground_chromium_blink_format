@@ -86,8 +86,7 @@ struct PopupContainerSettings {
   bool loopSelectionNavigation;
 };
 
-class PopupContainer : public FramelessScrollView,
-                       public RefCounted<PopupContainer> {
+class PopupContainer : public FramelessScrollView {
  public:
   static PassRefPtr<PopupContainer> create(PopupMenuClient*,
                                            const PopupContainerSettings&);
