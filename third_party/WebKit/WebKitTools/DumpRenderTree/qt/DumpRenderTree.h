@@ -74,6 +74,10 @@ class DumpRenderTree : public QObject {
 
   QWebPage* webPage() const { return m_page; }
 
+#if defined(Q_WS_X11)
+  static void initializeFonts();
+#endif
+
  public Q_SLOTS:
   void initJSObjects();
   void readStdin(int);
