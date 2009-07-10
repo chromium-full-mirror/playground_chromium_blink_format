@@ -107,6 +107,9 @@ class HTMLFormControlElement : public HTMLElement {
 
   void formDestroyed() { m_form = 0; }
 
+  virtual void dispatchFocusEvent();
+  virtual void dispatchBlurEvent();
+
  protected:
   void removeFromForm();
 

@@ -156,6 +156,10 @@ enum {
     requestGeolocationPermission:(WebGeolocation*)geolocation
                   securityOrigin:(WebSecurityOrigin*)origin;
 
+- (void)webView:(WebView*)formStateDidChangeForNode:(DOMNode*)node;
+- (void)webView:(WebView*)formStateDidFocusNode:(DOMNode*)node;
+- (void)webView:(WebView*)formStateDidBlurNode:(DOMNode*)node;
+
 /*!
     @method webView:printFrame:
     @abstract Informs that a WebFrame needs to be printed

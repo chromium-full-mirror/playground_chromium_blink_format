@@ -202,6 +202,9 @@ class ChromeClient {
   // will be called frequently, so handling should be very fast.
   virtual void formStateDidChange(const Node*) = 0;
 
+  virtual void formDidFocus(const Node*) = 0;
+  virtual void formDidBlur(const Node*) = 0;
+
   virtual PassOwnPtr<HTMLParserQuirks> createHTMLParserQuirks() = 0;
 
 #if USE(ACCELERATED_COMPOSITING)
