@@ -3436,7 +3436,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int argsOffset = (++vPC)->u.operand;
 
       JSValue arguments = callFrame->r(argsOffset).jsValue();
-      uint32_t argCount = 0;
+      int32_t argCount = 0;
       if (!arguments) {
         argCount = (uint32_t)(callFrame->argumentCount()) - 1;
         int32_t sizeDelta =
@@ -3447,9 +3447,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           exceptionValue = createStackOverflowError(callFrame);
           goto vm_throw;
         }
-        uint32_t expectedParams = callFrame->callee()->body()->parameterCount();
-        uint32_t inplaceArgs = min(argCount, expectedParams);
-        uint32_t i = 0;
+        int32_t expectedParams = callFrame->callee()->body()->parameterCount();
+        int32_t inplaceArgs = min(argCount, expectedParams);
+        int32_t i = 0;
         Register* argStore = callFrame->registers() + argsOffset;
 
         // First step is to copy the "expected" parameters from their normal
