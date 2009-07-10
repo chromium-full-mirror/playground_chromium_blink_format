@@ -39,7 +39,7 @@ class Debugger {
   virtual ~Debugger();
 
   void attach(JSGlobalObject*);
-  void detach(JSGlobalObject*);
+  virtual void detach(JSGlobalObject*);
 
   virtual void sourceParsed(ExecState*,
                             const SourceCode&,
