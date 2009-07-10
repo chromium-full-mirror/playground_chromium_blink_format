@@ -2217,7 +2217,8 @@ static const ARIARoleMap& createARIARoleMap() {
       {"range", SliderRole},
       {"slider", SliderRole},
       {"spinbutton", ProgressIndicatorRole},
-      {"textbox", TextAreaRole}};
+      {"textbox", TextAreaRole},
+      {"toolbar", ToolbarRole}};
   ARIARoleMap& roleMap = *new ARIARoleMap;
 
   const unsigned numRoles = sizeof(roles) / sizeof(roles[0]);
