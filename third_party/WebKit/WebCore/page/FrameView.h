@@ -190,10 +190,7 @@ class FrameView : public ScrollView {
                         float oldBottom,
                         float bottomLimit);
 
-  bool lockedToAnchor() { return m_lockedToAnchor; }
-  void setLockedToAnchor(bool lockedToAnchor) {
-    m_lockedToAnchor = lockedToAnchor;
-  }
+  void maintainScrollPositionAtAnchor(Node*);
 
   // Methods to convert points and rects between the coordinate space of the
   // renderer, and this view.
@@ -252,6 +249,7 @@ class FrameView : public ScrollView {
   double adjustedDeferredRepaintDelay() const;
 
   bool updateWidgets();
+  void scrollToAnchor();
 
   static double sCurrentPaintTimeStamp;  // used for detecting decoded resource
                                          // thrash in the cache
@@ -322,7 +320,7 @@ class FrameView : public ScrollView {
   bool m_isVisuallyNonEmpty;
   bool m_firstVisuallyNonEmptyLayoutCallbackPending;
 
-  bool m_lockedToAnchor;
+  RefPtr<Node> m_maintainScrollPositionAnchor;
 };
 
 }  // namespace WebCore
