@@ -505,6 +505,7 @@ class RenderLayer : public ScrollbarClient {
   void collectLayers(Vector<RenderLayer*>*&, Vector<RenderLayer*>*&);
 
   void updateLayerListsIfNeeded();
+  void updateCompositingAndLayerListsIfNeeded();
 
   enum PaintLayerFlag {
     PaintLayerHaveTransparency = 1,
