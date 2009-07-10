@@ -46,7 +46,10 @@ const ClassInfo JSNamedNodesCollection::s_info = {"Collection", 0, 0, 0};
 JSNamedNodesCollection::JSNamedNodesCollection(
     ExecState* exec,
     const Vector<RefPtr<Node>>& nodes)
-    : DOMObject(getDOMStructure<JSNamedNodesCollection>(exec)),
+    // FIXME: deprecatedGetDOMStructure uses the prototype off of the wrong
+    // global object
+    // we should use the global object from the nodes.
+    : DOMObject(deprecatedGetDOMStructure<JSNamedNodesCollection>(exec)),
       m_nodes(new Vector<RefPtr<Node>>(nodes)) {}
 
 JSValue JSNamedNodesCollection::lengthGetter(ExecState* exec,

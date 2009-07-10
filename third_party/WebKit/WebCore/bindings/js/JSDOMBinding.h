@@ -100,7 +100,9 @@ inline JSC::Structure* getDOMStructure(JSC::ExecState* exec,
       &WrapperClass::s_info);
 }
 template <class WrapperClass>
-inline JSC::Structure* getDOMStructure(JSC::ExecState* exec) {
+inline JSC::Structure* deprecatedGetDOMStructure(JSC::ExecState* exec) {
+  // FIXME: This function is wrong.  It uses the wrong global object for
+  // creating the prototype structure.
   return getDOMStructure<WrapperClass>(
       exec, static_cast<JSDOMGlobalObject*>(exec->lexicalGlobalObject()));
 }
@@ -119,8 +121,10 @@ inline DOMObject* createDOMObjectWrapper(JSC::ExecState* exec,
                                          DOMClass* object) {
   ASSERT(object);
   ASSERT(!getCachedDOMObjectWrapper(exec->globalData(), object));
-  WrapperClass* wrapper =
-      new (exec) WrapperClass(getDOMStructure<WrapperClass>(exec), object);
+  // FIXME: new (exec) could use a different globalData than the globalData this
+  // wrapper is cached on.
+  WrapperClass* wrapper = new (exec)
+      WrapperClass(deprecatedGetDOMStructure<WrapperClass>(exec), object);
   cacheDOMObjectWrapper(exec->globalData(), object, wrapper);
   return wrapper;
 }
@@ -145,8 +149,8 @@ inline DOMObject* createDOMObjectWrapper(JSC::ExecState* exec,
                                          SVGElement* context) {
   ASSERT(object);
   ASSERT(!getCachedDOMObjectWrapper(exec->globalData(), object));
-  WrapperClass* wrapper = new (exec)
-      WrapperClass(getDOMStructure<WrapperClass>(exec), object, context);
+  WrapperClass* wrapper = new (exec) WrapperClass(
+      deprecatedGetDOMStructure<WrapperClass>(exec), object, context);
   cacheDOMObjectWrapper(exec->globalData(), object, wrapper);
   return wrapper;
 }
@@ -169,8 +173,11 @@ template <class WrapperClass, class DOMClass>
 inline JSNode* createDOMNodeWrapper(JSC::ExecState* exec, DOMClass* node) {
   ASSERT(node);
   ASSERT(!getCachedDOMNodeWrapper(node->document(), node));
-  WrapperClass* wrapper =
-      new (exec) WrapperClass(getDOMStructure<WrapperClass>(exec), node);
+  WrapperClass* wrapper = new (exec)
+      WrapperClass(deprecatedGetDOMStructure<WrapperClass>(exec), node);
+  // FIXME: The entire function can be removed, once we fix caching.
+  // This function is a one-off hack to make Nodes cache in the right global
+  // object.
   cacheDOMNodeWrapper(node->document(), node, wrapper);
   return wrapper;
 }
