@@ -84,7 +84,7 @@ class MediaControlElement : public HTMLDivElement {
   virtual void attach();
   virtual bool rendererIsNeeded(RenderStyle*);
 
-  RenderStyle* styleForElement();
+  virtual PassRefPtr<RenderStyle> styleForElement();
   void attachToParent(Element*);
   void update();
   virtual void updateStyle();
@@ -127,7 +127,7 @@ class MediaControlInputElement : public HTMLInputElement {
   virtual void attach();
   virtual bool rendererIsNeeded(RenderStyle*);
 
-  RenderStyle* styleForElement();
+  virtual PassRefPtr<RenderStyle> styleForElement();
   void attachToParent(Element*);
   void update();
   void updateStyle();
@@ -221,9 +221,10 @@ class MediaControlTimeDisplayElement : public MediaControlElement {
  public:
   MediaControlTimeDisplayElement(Document*, PseudoId, HTMLMediaElement*);
   void setVisible(bool);
+  virtual PassRefPtr<RenderStyle> styleForElement();
 
  private:
-  Length m_cachedWidth;
+  bool m_isVisible;
 };
 
 // ----------------------------
