@@ -238,7 +238,7 @@ void WebPreferences::initializeDefaultSettings() {
       defaults, CFSTR(WebKitAllowUniversalAccessFromFileURLsPreferenceKey),
       kCFBooleanTrue);
   CFDictionaryAddValue(defaults, CFSTR(WebKitXSSAuditorEnabledPreferenceKey),
-                       kCFBooleanFalse);
+                       kCFBooleanTrue);
   CFDictionaryAddValue(
       defaults, CFSTR(WebKitJavaScriptCanOpenWindowsAutomaticallyPreferenceKey),
       kCFBooleanTrue);
