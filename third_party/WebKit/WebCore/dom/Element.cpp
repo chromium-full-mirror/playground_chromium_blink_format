@@ -1045,7 +1045,7 @@ void Element::dispatchAttrAdditionEvent(Attribute*) {
         return;
     ExceptionCode ec = 0;
     dispatchEvent(new MutationEvent(DOMAttrModifiedEvent, true, false, attr, attr->value(),
-        attr->value(),document()->attrName(attr->id()), MutationEvent::ADDITION), ec);
+        attr->value(), document()->attrName(attr->id()), MutationEvent::ADDITION), ec);
 #endif
 }
 
