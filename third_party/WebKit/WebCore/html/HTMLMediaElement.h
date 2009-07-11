@@ -78,6 +78,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   // Pauses playback without changing any states or generating events
   void setPausedInternal(bool);
 
+  MediaPlayer::MovieLoadType movieLoadType() const;
+
   bool inActiveDocument() const { return m_inActiveDocument; }
 
   // DOM API
@@ -103,8 +105,6 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   PassRefPtr<TimeRanges> buffered() const;
   void load(ExceptionCode&);
   String canPlayType(const String& mimeType) const;
-
-  bool isStreaming() const;
 
   // ready state
   enum ReadyState {

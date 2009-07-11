@@ -174,7 +174,7 @@ MediaControlTimelineContainerElement::MediaControlTimelineContainerElement(
 
 bool MediaControlTimelineContainerElement::rendererIsNeeded(
     RenderStyle* style) {
-  if (!HTMLDivElement::rendererIsNeeded(style))
+  if (!MediaControlElement::rendererIsNeeded(style))
     return false;
 
   // This is for MediaControllerThemeClassic:
@@ -205,7 +205,7 @@ void MediaControlStatusDisplayElement::update() {
   if (m_mediaElement->readyState() != HTMLMediaElement::HAVE_ENOUGH_DATA &&
       !m_mediaElement->currentSrc().isEmpty())
     newStateToDisplay = Loading;
-  else if (m_mediaElement->isStreaming())
+  else if (m_mediaElement->movieLoadType() == MediaPlayer::LiveStream)
     newStateToDisplay = LiveBroadcast;
 
   // Propagate only if needed.
@@ -228,7 +228,7 @@ void MediaControlStatusDisplayElement::update() {
 }
 
 bool MediaControlStatusDisplayElement::rendererIsNeeded(RenderStyle* style) {
-  if (!HTMLDivElement::rendererIsNeeded(style))
+  if (!MediaControlElement::rendererIsNeeded(style))
     return false;
   float duration = m_mediaElement->duration();
   return (isnan(duration) || isinf(duration));
@@ -461,6 +461,11 @@ void MediaControlRewindButtonElement::defaultEventHandler(Event* event) {
   HTMLInputElement::defaultEventHandler(event);
 }
 
+bool MediaControlRewindButtonElement::rendererIsNeeded(RenderStyle* style) {
+  return MediaControlInputElement::rendererIsNeeded(style) &&
+         m_mediaElement->movieLoadType() != MediaPlayer::LiveStream;
+}
+
 // ----------------------------
 
 MediaControlReturnToRealtimeButtonElement::
@@ -483,8 +488,8 @@ void MediaControlReturnToRealtimeButtonElement::defaultEventHandler(
 
 bool MediaControlReturnToRealtimeButtonElement::rendererIsNeeded(
     RenderStyle* style) {
-  return HTMLInputElement::rendererIsNeeded(style) &&
-         m_mediaElement->isStreaming();
+  return MediaControlInputElement::rendererIsNeeded(style) &&
+         m_mediaElement->movieLoadType() == MediaPlayer::LiveStream;
 }
 
 // ----------------------------

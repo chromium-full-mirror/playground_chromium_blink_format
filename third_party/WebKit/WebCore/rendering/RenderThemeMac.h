@@ -205,6 +205,7 @@ class RenderThemeMac : public RenderTheme {
                                        const RenderObject::PaintInfo&,
                                        const IntRect&);
 
+  // Media controls
   virtual String extraMediaControlsStyleSheet();
 #endif
 
