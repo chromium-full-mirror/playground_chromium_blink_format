@@ -76,9 +76,10 @@ const ClassInfo QtRuntimeObjectImp::s_info = {"QtRuntimeObject",
 
 QtRuntimeObjectImp::QtRuntimeObjectImp(ExecState* exec,
                                        PassRefPtr<Instance> instance)
-    : RuntimeObjectImp(exec,
-                       WebCore::getDOMStructure<QtRuntimeObjectImp>(exec),
-                       instance) {}
+    : RuntimeObjectImp(
+          exec,
+          WebCore::deprecatedGetDOMStructure<QtRuntimeObjectImp>(exec),
+          instance) {}
 
 QtRuntimeObjectImp::~QtRuntimeObjectImp() {
   removeFromCache();

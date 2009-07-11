@@ -951,7 +951,7 @@ QtRuntimeMethod::QtRuntimeMethod(QtRuntimeMethodData* dd,
                                  const Identifier& ident,
                                  PassRefPtr<QtInstance> inst)
     : InternalFunction(&exec->globalData(),
-                       getDOMStructure<QtRuntimeMethod>(exec),
+                       deprecatedGetDOMStructure<QtRuntimeMethod>(exec),
                        ident),
       d_ptr(dd) {
   QW_D(QtRuntimeMethod);
