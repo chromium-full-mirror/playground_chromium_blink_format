@@ -27,6 +27,8 @@
 #include "config.h"
 #include "IconDatabase.h"
 
+#if ENABLE(ICONDATABASE)
+
 #include "AutodrainedPool.h"
 #include "DocumentLoader.h"
 #include "FileSystem.h"
@@ -2367,3 +2369,5 @@ void IconDatabase::writeIconSnapshotToSQLDatabase(
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(ICONDATABASE)
