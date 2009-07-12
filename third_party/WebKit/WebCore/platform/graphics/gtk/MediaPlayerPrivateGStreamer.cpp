@@ -570,8 +570,8 @@ MediaPlayer::SupportsType MediaPlayerPrivate::supportsType(
   // FIXME: query the engine to see what types are supported
   notImplemented();
   return type == "video/x-theora+ogg"
-             ? (!codecs.isEmpty() ? MediaPlayer::MayBeSupported
-                                  : MediaPlayer::IsSupported)
+             ? (codecs.isEmpty() ? MediaPlayer::MayBeSupported
+                                 : MediaPlayer::IsSupported)
              : MediaPlayer::IsNotSupported;
 }
 

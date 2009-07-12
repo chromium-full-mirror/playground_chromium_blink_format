@@ -493,8 +493,8 @@ MediaPlayer::SupportsType MediaPlayerPrivate::supportsType(
   // is no way to ask QT if it supports an
   //  extended MIME type
   return mimeTypeCache().contains(type)
-             ? (!codecs.isEmpty() ? MediaPlayer::MayBeSupported
-                                  : MediaPlayer::IsSupported)
+             ? (codecs.isEmpty() ? MediaPlayer::MayBeSupported
+                                 : MediaPlayer::IsSupported)
              : MediaPlayer::IsNotSupported;
 }
 
