@@ -140,8 +140,7 @@ bool XSSAuditor::canSetBaseElementURL(const String& url) const {
     return true;
 
   KURL baseElementURL(m_frame->document()->url(), url);
-  if (m_frame->document()->url().baseAsString() !=
-          baseElementURL.baseAsString() &&
+  if (m_frame->document()->url().host() != baseElementURL.host() &&
       findInRequest(url)) {
     DEFINE_STATIC_LOCAL(String, consoleMessage,
                         ("Refused to execute a JavaScript script. Source code "
