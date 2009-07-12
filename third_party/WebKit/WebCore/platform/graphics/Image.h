@@ -31,9 +31,9 @@
 #include "GraphicsTypes.h"
 #include "ImageSource.h"
 #include "IntRect.h"
-#include <wtf/RefPtr.h>
-#include <wtf/PassRefPtr.h>
 #include "SharedBuffer.h"
+#include <wtf/PassRefPtr.h>
+#include <wtf/RefPtr.h>
 
 #if PLATFORM(MAC)
 #ifdef __OBJC__
@@ -67,13 +67,13 @@ typedef struct _GdkPixbuf GdkPixbuf;
 
 namespace WebCore {
 
-class TransformationMatrix;
 class FloatPoint;
 class FloatRect;
 class FloatSize;
 class GraphicsContext;
 class SharedBuffer;
 class String;
+class TransformationMatrix;
 
 // This class gets notified when an image creates or destroys decoded frames and
 // when it advances animation frames.
@@ -196,14 +196,8 @@ class Image : public RefCounted<Image> {
                            const FloatPoint& phase,
                            CompositeOperator,
                            const FloatRect& destRect);
-#if PLATFORM(CG)
-  // These are private to CG.  Ideally they would be only in the .cpp file, but
-  // the callback requires access
-  // to the private function nativeImageForCurrentFrame()
-  static void drawPatternCallback(void* info, CGContext*);
-#endif
 
- protected:
+ private:
   RefPtr<SharedBuffer> m_data;  // The encoded raw data for the image.
   ImageObserver* m_imageObserver;
 };
