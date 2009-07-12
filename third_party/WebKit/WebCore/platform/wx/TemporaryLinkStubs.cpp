@@ -254,6 +254,10 @@ String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
                                          const KURL& url) {
   return String();
 }
+const char* currentSearchLocaleID() {
+  notImplemented();
+  return "";
+}
 const char* currentTextBreakLocaleID() {
   notImplemented();
   return "en_us";
