@@ -227,6 +227,9 @@ WEBKIT_API void webkit_web_frame_clear_main_frame_name(WebKitWebFrame* frame);
 
 WEBKIT_API gchar* webkit_web_view_get_selected_text(WebKitWebView* web_view);
 
+WEBKIT_API void webkit_web_view_set_group_name(WebKitWebView* web_view,
+                                               const gchar* group_name);
+
 WEBKIT_API void webkit_web_settings_add_extra_plugin_directory(
     WebKitWebView* web_view,
     const gchar* directory);
