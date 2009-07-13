@@ -559,10 +559,11 @@ PassRefPtr<LabelScope> BytecodeGenerator::newLabelScope(
     m_labelScopes.removeLast();
 
   // Allocate new label scope.
-  LabelScope scope(type, name, scopeDepth(), newLabel(),
-                   type == LabelScope::Loop
-                       ? newLabel()
-                       : 0);  // Only loops have continue targets.
+  LabelScope scope(
+      type, name, scopeDepth(), newLabel(),
+      type == LabelScope::Loop
+          ? newLabel()
+          : PassRefPtr<Label>());  // Only loops have continue targets.
   m_labelScopes.append(scope);
   return &m_labelScopes.last();
 }
