@@ -84,6 +84,12 @@ WorkerContext* EventTarget::toWorkerContext() {
 }
 #endif
 
+#if ENABLE(SHARED_WORKERS)
+SharedWorker* EventTarget::toSharedWorker() {
+  return 0;
+}
+#endif
+
 #ifndef NDEBUG
 void forbidEventDispatch() {
   ++gEventDispatchForbidden;
