@@ -391,17 +391,19 @@ void InspectorController::setWindowVisible(bool visible, bool attached) {
 }
 
 void InspectorController::addMessageToConsole(MessageSource source,
+                                              MessageType type,
                                               MessageLevel level,
                                               ScriptCallStack* callStack) {
   if (!enabled())
     return;
 
   addConsoleMessage(callStack->state(),
-                    new ConsoleMessage(source, level, callStack, m_groupLevel,
-                                       level == TraceMessageLevel));
+                    new ConsoleMessage(source, type, level, callStack,
+                                       m_groupLevel, type == TraceMessageType));
 }
 
 void InspectorController::addMessageToConsole(MessageSource source,
+                                              MessageType type,
                                               MessageLevel level,
                                               const String& message,
                                               unsigned lineNumber,
@@ -409,8 +411,8 @@ void InspectorController::addMessageToConsole(MessageSource source,
   if (!enabled())
     return;
 
-  addConsoleMessage(0, new ConsoleMessage(source, level, message, lineNumber,
-                                          sourceID, m_groupLevel));
+  addConsoleMessage(0, new ConsoleMessage(source, type, level, message,
+                                          lineNumber, sourceID, m_groupLevel));
 }
 
 void InspectorController::addConsoleMessage(ScriptState* scriptState,
@@ -442,9 +444,10 @@ void InspectorController::startGroup(MessageSource source,
                                      ScriptCallStack* callStack) {
   ++m_groupLevel;
 
-  addConsoleMessage(callStack->state(),
-                    new ConsoleMessage(source, StartGroupMessageLevel,
-                                       callStack, m_groupLevel));
+  addConsoleMessage(
+      callStack->state(),
+      new ConsoleMessage(source, StartGroupMessageType, LogMessageLevel,
+                         callStack, m_groupLevel));
 }
 
 void InspectorController::endGroup(MessageSource source,
@@ -456,8 +459,8 @@ void InspectorController::endGroup(MessageSource source,
   --m_groupLevel;
 
   addConsoleMessage(
-      0, new ConsoleMessage(source, EndGroupMessageLevel, String(), lineNumber,
-                            sourceURL, m_groupLevel));
+      0, new ConsoleMessage(source, EndGroupMessageType, LogMessageLevel,
+                            String(), lineNumber, sourceURL, m_groupLevel));
 }
 
 void InspectorController::attachWindow() {
@@ -1121,8 +1124,8 @@ void InspectorController::addProfileFinishedMessageToConsole(
   message += "/";
   message += UString::from(profile->uid());
   message += "\" finished.";
-  addMessageToConsole(JSMessageSource, LogMessageLevel, message, lineNumber,
-                      sourceURL);
+  addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel, message,
+                      lineNumber, sourceURL);
 }
 
 void InspectorController::addStartProfilingMessageToConsole(
@@ -1132,8 +1135,8 @@ void InspectorController::addStartProfilingMessageToConsole(
   UString message = "Profile \"webkit-profile://";
   message += encodeWithURLEscapeSequences(title);
   message += "/0\" started.";
-  addMessageToConsole(JSMessageSource, LogMessageLevel, message, lineNumber,
-                      sourceURL);
+  addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel, message,
+                      lineNumber, sourceURL);
 }
 
 void InspectorController::addScriptProfile(Profile* profile) {
@@ -1544,8 +1547,8 @@ void InspectorController::count(const String& title,
   m_counts.add(identifier, count);
 
   String message = String::format("%s: %d", title.utf8().data(), count);
-  addMessageToConsole(JSMessageSource, LogMessageLevel, message, lineNumber,
-                      sourceID);
+  addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel, message,
+                      lineNumber, sourceID);
 }
 
 void InspectorController::startTiming(const String& title) {

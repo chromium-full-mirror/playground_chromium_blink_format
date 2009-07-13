@@ -107,7 +107,7 @@ void JSDOMWindowBase::printErrorMessage(const String& message) const {
     return;
 
   impl()->console()->addMessage(
-      JSMessageSource, ErrorMessageLevel, message, 1,
+      JSMessageSource, LogMessageType, ErrorMessageLevel, message, 1,
       String());  // FIXME: provide a real line number and source URL.
 }
 

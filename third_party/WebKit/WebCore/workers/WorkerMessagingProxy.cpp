@@ -279,26 +279,28 @@ static void postConsoleMessageTask(ScriptExecutionContext* context,
                                    WorkerMessagingProxy* messagingProxy,
                                    MessageDestination destination,
                                    MessageSource source,
+                                   MessageType type,
                                    MessageLevel level,
                                    const String& message,
                                    unsigned lineNumber,
                                    const String& sourceURL) {
   if (messagingProxy->askedToTerminate())
     return;
-  context->addMessage(destination, source, level, message, lineNumber,
+  context->addMessage(destination, source, type, level, message, lineNumber,
                       sourceURL);
 }
 
 void WorkerMessagingProxy::postConsoleMessageToWorkerObject(
     MessageDestination destination,
     MessageSource source,
+    MessageType type,
     MessageLevel level,
     const String& message,
     int lineNumber,
     const String& sourceURL) {
   m_scriptExecutionContext->postTask(
       createCallbackTask(&postConsoleMessageTask, this, destination, source,
-                         level, message, lineNumber, sourceURL));
+                         type, level, message, lineNumber, sourceURL));
 }
 
 void WorkerMessagingProxy::workerThreadCreated(

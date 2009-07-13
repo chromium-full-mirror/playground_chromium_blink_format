@@ -106,6 +106,7 @@ class ChromeClient {
   virtual void setResizable(bool) = 0;
 
   virtual void addMessageToConsole(MessageSource,
+                                   MessageType,
                                    MessageLevel,
                                    const String& message,
                                    unsigned int lineNumber,

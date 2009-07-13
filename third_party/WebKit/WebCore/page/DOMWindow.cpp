@@ -632,8 +632,8 @@ void DOMWindow::postMessageTimerFired(PostMessageTimer* t) {
           "Unable to post message to %s. Recipient has origin %s.\n",
           timer->targetOrigin()->toString().utf8().data(),
           document()->securityOrigin()->toString().utf8().data());
-      console()->addMessage(JSMessageSource, ErrorMessageLevel, message, 0,
-                            String());
+      console()->addMessage(JSMessageSource, LogMessageType, ErrorMessageLevel,
+                            message, 0, String());
       return;
     }
   }

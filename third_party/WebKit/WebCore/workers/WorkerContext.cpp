@@ -145,12 +145,13 @@ void WorkerContext::reportException(const String& errorMessage,
 
 void WorkerContext::addMessage(MessageDestination destination,
                                MessageSource source,
+                               MessageType type,
                                MessageLevel level,
                                const String& message,
                                unsigned lineNumber,
                                const String& sourceURL) {
   m_thread->workerObjectProxy().postConsoleMessageToWorkerObject(
-      destination, source, level, message, lineNumber, sourceURL);
+      destination, source, type, level, message, lineNumber, sourceURL);
 }
 
 void WorkerContext::resourceRetrievedByXMLHttpRequest(unsigned long,
@@ -311,8 +312,9 @@ void WorkerContext::importScripts(const Vector<String>& urls,
     scriptExecutionContext()->scriptImported(scriptLoader.identifier(),
                                              scriptLoader.script());
     scriptExecutionContext()->addMessage(
-        InspectorControllerDestination, JSMessageSource, LogMessageLevel,
-        "Worker script imported: \"" + *it + "\".", callerLine, callerURL);
+        InspectorControllerDestination, JSMessageSource, LogMessageType,
+        LogMessageLevel, "Worker script imported: \"" + *it + "\".", callerLine,
+        callerURL);
 
     ScriptValue exception;
     m_script->evaluate(ScriptSourceCode(scriptLoader.script(), *it),

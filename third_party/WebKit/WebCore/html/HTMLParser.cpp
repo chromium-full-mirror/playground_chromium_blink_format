@@ -1794,7 +1794,7 @@ void HTMLParser::reportErrorToConsole(HTMLParserErrorCode errorCode,
   message.replace("%tag2", tag2);
 
   frame->domWindow()->console()->addMessage(
-      HTMLMessageSource,
+      HTMLMessageSource, LogMessageType,
       isWarning(errorCode) ? WarningMessageLevel : ErrorMessageLevel, message,
       lineNumber, m_document->url().string());
 }

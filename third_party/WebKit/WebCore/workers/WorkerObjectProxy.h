@@ -56,6 +56,7 @@ class WorkerObjectProxy {
 
   virtual void postConsoleMessageToWorkerObject(MessageDestination,
                                                 MessageSource,
+                                                MessageType,
                                                 MessageLevel,
                                                 const String& message,
                                                 int lineNumber,

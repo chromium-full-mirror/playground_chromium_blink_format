@@ -39,12 +39,14 @@
 namespace WebCore {
 
 ConsoleMessage::ConsoleMessage(MessageSource s,
+                               MessageType t,
                                MessageLevel l,
                                const String& m,
                                unsigned li,
                                const String& u,
                                unsigned g)
     : m_source(s),
+      m_type(t),
       m_level(l),
       m_message(m),
       m_line(li),
@@ -53,11 +55,13 @@ ConsoleMessage::ConsoleMessage(MessageSource s,
       m_repeatCount(1) {}
 
 ConsoleMessage::ConsoleMessage(MessageSource s,
+                               MessageType t,
                                MessageLevel l,
                                ScriptCallStack* callStack,
                                unsigned g,
                                bool storeTrace)
     : m_source(s),
+      m_type(t),
       m_level(l),
       m_wrappedArguments(callStack->at(0).argumentCount()),
       m_frames(storeTrace ? callStack->size() : 0),
@@ -83,6 +87,7 @@ ConsoleMessage::ConsoleMessage(MessageSource s,
 void ConsoleMessage::addToConsole(InspectorFrontend* frontend) {
   InspectorJSONObject jsonObj = frontend->newInspectorJSONObject();
   jsonObj.set("source", static_cast<int>(m_source));
+  jsonObj.set("type", static_cast<int>(m_type));
   jsonObj.set("level", static_cast<int>(m_level));
   jsonObj.set("line", static_cast<int>(m_line));
   jsonObj.set("url", m_url);
@@ -114,9 +119,10 @@ bool ConsoleMessage::isEqual(ScriptState* state, ConsoleMessage* msg) const {
       return false;
   }
 
-  return msg->m_source == m_source && msg->m_level == m_level &&
-         msg->m_message == m_message && msg->m_line == m_line &&
-         msg->m_url == m_url && msg->m_groupLevel == m_groupLevel;
+  return msg->m_source == m_source && msg->m_type == m_type &&
+         msg->m_level == m_level && msg->m_message == m_message &&
+         msg->m_line == m_line && msg->m_url == m_url &&
+         msg->m_groupLevel == m_groupLevel;
 }
 
 }  // namespace WebCore

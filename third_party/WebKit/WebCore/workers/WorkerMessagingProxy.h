@@ -74,6 +74,7 @@ class WorkerMessagingProxy : public WorkerContextProxy,
                                            const String& sourceURL);
   virtual void postConsoleMessageToWorkerObject(MessageDestination,
                                                 MessageSource,
+                                                MessageType,
                                                 MessageLevel,
                                                 const String& message,
                                                 int lineNumber,

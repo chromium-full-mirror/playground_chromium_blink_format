@@ -843,8 +843,8 @@ static void reportUnsafeUsage(ScriptExecutionContext* context,
   // line it came from.
   // We should pass additional parameters so we can tell the console where the
   // mistake occurred.
-  context->addMessage(ConsoleDestination, JSMessageSource, ErrorMessageLevel,
-                      message, 1, String());
+  context->addMessage(ConsoleDestination, JSMessageSource, LogMessageType,
+                      ErrorMessageLevel, message, 1, String());
 }
 
 void XMLHttpRequest::setRequestHeader(const AtomicString& name,
@@ -1054,9 +1054,9 @@ void XMLHttpRequest::didFinishLoading(unsigned long identifier) {
   scriptExecutionContext()->resourceRetrievedByXMLHttpRequest(identifier,
                                                               m_responseText);
   scriptExecutionContext()->addMessage(
-      InspectorControllerDestination, JSMessageSource, LogMessageLevel,
-      "XHR finished loading: \"" + m_url + "\".", m_lastSendLineNumber,
-      m_lastSendURL);
+      InspectorControllerDestination, JSMessageSource, LogMessageType,
+      LogMessageLevel, "XHR finished loading: \"" + m_url + "\".",
+      m_lastSendLineNumber, m_lastSendURL);
 
   bool hadLoader = m_loader;
   m_loader = 0;

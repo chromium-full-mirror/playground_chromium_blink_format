@@ -45,12 +45,14 @@ class ScriptString;
 class ConsoleMessage {
  public:
   ConsoleMessage(MessageSource,
+                 MessageType,
                  MessageLevel,
                  const String& m,
                  unsigned li,
                  const String& u,
                  unsigned g);
   ConsoleMessage(MessageSource,
+                 MessageType,
                  MessageLevel,
                  ScriptCallStack*,
                  unsigned g,
@@ -62,6 +64,7 @@ class ConsoleMessage {
 
  private:
   MessageSource m_source;
+  MessageType m_type;
   MessageLevel m_level;
   String m_message;
   Vector<ScriptValue> m_wrappedArguments;

@@ -205,8 +205,12 @@ class InspectorController : public RefCounted<InspectorController>
 
   void addResourceSourceToFrame(long identifier, Node* frame);
   bool addSourceToFrame(const String& mimeType, const String& source, Node*);
-  void addMessageToConsole(MessageSource, MessageLevel, ScriptCallStack*);
   void addMessageToConsole(MessageSource,
+                           MessageType,
+                           MessageLevel,
+                           ScriptCallStack*);
+  void addMessageToConsole(MessageSource,
+                           MessageType,
                            MessageLevel,
                            const String& message,
                            unsigned lineNumber,

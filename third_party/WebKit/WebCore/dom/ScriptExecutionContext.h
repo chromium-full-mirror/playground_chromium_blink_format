@@ -68,6 +68,7 @@ class ScriptExecutionContext {
                                const String& sourceURL) = 0;
   virtual void addMessage(MessageDestination,
                           MessageSource,
+                          MessageType,
                           MessageLevel,
                           const String& message,
                           unsigned lineNumber,

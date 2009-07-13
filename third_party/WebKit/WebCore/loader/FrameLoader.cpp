@@ -2613,7 +2613,7 @@ void FrameLoader::reportLocalLoadFailed(Frame* frame, const String& url) {
     return;
 
   frame->domWindow()->console()->addMessage(
-      JSMessageSource, ErrorMessageLevel,
+      JSMessageSource, LogMessageType, ErrorMessageLevel,
       "Not allowed to load local resource: " + url, 0, String());
 }
 
@@ -2850,7 +2850,8 @@ bool FrameLoader::shouldAllowNavigation(Frame* targetFrame) const {
 
     // FIXME: should we print to the console of the activeFrame as well?
     targetFrame->domWindow()->console()->addMessage(
-        JSMessageSource, ErrorMessageLevel, message, 1, String());
+        JSMessageSource, LogMessageType, ErrorMessageLevel, message, 1,
+        String());
   }
 
   return false;

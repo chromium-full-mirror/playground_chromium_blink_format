@@ -4403,12 +4403,14 @@ void Document::reportException(const String& errorMessage,
                                int lineNumber,
                                const String& sourceURL) {
   if (DOMWindow* window = domWindow())
-    window->console()->addMessage(JSMessageSource, ErrorMessageLevel,
-                                  errorMessage, lineNumber, sourceURL);
+    window->console()->addMessage(JSMessageSource, LogMessageType,
+                                  ErrorMessageLevel, errorMessage, lineNumber,
+                                  sourceURL);
 }
 
 void Document::addMessage(MessageDestination destination,
                           MessageSource source,
+                          MessageType type,
                           MessageLevel level,
                           const String& message,
                           unsigned lineNumber,
@@ -4417,11 +4419,11 @@ void Document::addMessage(MessageDestination destination,
     case InspectorControllerDestination:
       if (page())
         page()->inspectorController()->addMessageToConsole(
-            source, level, message, lineNumber, sourceURL);
+            source, type, level, message, lineNumber, sourceURL);
       return;
     case ConsoleDestination:
       if (DOMWindow* window = domWindow())
-        window->console()->addMessage(source, level, message, lineNumber,
+        window->console()->addMessage(source, type, level, message, lineNumber,
                                       sourceURL);
       return;
   }

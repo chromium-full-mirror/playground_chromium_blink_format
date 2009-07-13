@@ -59,16 +59,19 @@ enum MessageSource {
   OtherMessageSource
 };
 
+enum MessageType {
+  LogMessageType,
+  ObjectMessageType,
+  TraceMessageType,
+  StartGroupMessageType,
+  EndGroupMessageType
+};
+
 enum MessageLevel {
   TipMessageLevel,
   LogMessageLevel,
   WarningMessageLevel,
-  ErrorMessageLevel,
-  // FIXME: the remaining levels should become a new MessageType enum.
-  ObjectMessageLevel,
-  TraceMessageLevel,
-  StartGroupMessageLevel,
-  EndGroupMessageLevel
+  ErrorMessageLevel
 };
 
 class Console : public RefCounted<Console> {
@@ -81,6 +84,7 @@ class Console : public RefCounted<Console> {
   void disconnectFrame();
 
   void addMessage(MessageSource,
+                  MessageType,
                   MessageLevel,
                   const String& message,
                   unsigned lineNumber,
@@ -114,7 +118,8 @@ class Console : public RefCounted<Console> {
 
  private:
   inline Page* page() const;
-  void addMessage(MessageLevel,
+  void addMessage(MessageType,
+                  MessageLevel,
                   ScriptCallStack*,
                   bool acceptNoArguments = false);
 

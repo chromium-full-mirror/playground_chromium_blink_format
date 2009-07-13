@@ -103,6 +103,7 @@ class EmptyChromeClient : public ChromeClient {
   virtual void setResizable(bool) {}
 
   virtual void addMessageToConsole(MessageSource,
+                                   MessageType,
                                    MessageLevel,
                                    const String&,
                                    unsigned,

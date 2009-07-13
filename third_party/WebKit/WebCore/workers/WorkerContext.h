@@ -81,6 +81,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
                                const String& sourceURL);
   virtual void addMessage(MessageDestination,
                           MessageSource,
+                          MessageType,
                           MessageLevel,
                           const String& message,
                           unsigned lineNumber,

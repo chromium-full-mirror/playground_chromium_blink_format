@@ -62,8 +62,8 @@ void reportWMLError(Document* doc, WMLErrorCode error) {
     if (!console)
       return;
 
-    console->addMessage(WMLMessageSource, ErrorMessageLevel, errorMessage, 0,
-                        String());
+    console->addMessage(WMLMessageSource, LogMessageType, ErrorMessageLevel,
+                        errorMessage, 0, String());
   }
 }
 
