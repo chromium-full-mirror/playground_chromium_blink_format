@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004, 2006, 2007, 2008 Apple Inc. All right reserved.
+ * Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009 Apple Inc. All right
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,17 +21,13 @@
  */
 
 #include "config.h"
-#include "bidi.h"
 
+#include "BidiResolver.h"
 #include "CharacterNames.h"
-#include "Document.h"
-#include "Element.h"
-#include "FrameView.h"
 #include "InlineTextBox.h"
 #include "Logging.h"
 #include "RenderArena.h"
 #include "RenderInline.h"
-#include "RenderLayer.h"
 #include "RenderListMarker.h"
 #include "RenderView.h"
 #include "break_lines.h"
@@ -59,7 +56,7 @@ class InlineIterator {
   bool atEnd() const;
 
   UChar current() const;
-  WTF::Unicode::Direction direction() const;
+  Direction direction() const;
 
   RenderBlock* block;
   RenderObject* obj;
@@ -96,8 +93,37 @@ static int inlineWidth(RenderObject* child,
   return extraWidth;
 }
 
+struct BidiRun : BidiCharacterRun {
+  BidiRun(int start,
+          int stop,
+          RenderObject* object,
+          BidiContext* context,
+          Direction dir)
+      : BidiCharacterRun(start, stop, context, dir),
+        m_object(object),
+        m_box(0) {}
+
+  void destroy();
+
+  // Overloaded new operator.
+  void* operator new(size_t, RenderArena*) throw();
+
+  // Overridden to prevent the normal delete from being called.
+  void operator delete(void*, size_t);
+
+  BidiRun* next() { return static_cast<BidiRun*>(m_next); }
+
+ private:
+  // The normal operator new is disallowed.
+  void* operator new(size_t) throw();
+
+ public:
+  RenderObject* m_object;
+  InlineBox* m_box;
+};
+
 #ifndef NDEBUG
-static WTF::RefCountedLeakCounter bidiRunCounter("BidiRun");
+static RefCountedLeakCounter bidiRunCounter("BidiRun");
 
 static bool inBidiRunDestroy;
 #endif
@@ -856,7 +882,6 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
   // Figure out if we should clear out our line boxes.
   // FIXME: Handle resize eventually!
-  // FIXME: Do something better when floats are present.
   bool fullLayout =
       !firstLineBox() || !firstChild() || selfNeedsLayout() || relayoutChildren;
   if (fullLayout)

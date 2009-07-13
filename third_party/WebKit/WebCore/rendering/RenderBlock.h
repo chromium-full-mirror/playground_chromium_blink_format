@@ -36,7 +36,6 @@
 namespace WebCore {
 
 class InlineIterator;
-class Position;
 class RenderInline;
 class RootInlineBox;
 
@@ -178,7 +177,6 @@ class RenderBlock : public RenderBox {
   // Called to lay out the legend for a fieldset.
   virtual RenderObject* layoutLegend(bool /*relayoutChildren*/) { return 0; }
 
-  // the implementation of the following functions is in bidi.cpp
   struct FloatWithRect {
     FloatWithRect(RenderBox* f)
         : object(f),
@@ -193,6 +191,7 @@ class RenderBlock : public RenderBox {
     bool everHadLayout;
   };
 
+  // The following functions' implementations are in RenderBlockLineLayout.cpp.
   void bidiReorderLine(InlineBidiResolver&,
                        const InlineIterator& end,
                        bool previousLineBrokeCleanly);
@@ -245,7 +244,7 @@ class RenderBlock : public RenderBox {
   void checkLinesForOverflow();
   void deleteEllipsisLineBoxes();
   void checkLinesForTextOverflow();
-  // end bidi.cpp functions
+  // End of functions defined in RenderBlockLineLayout.cpp.
 
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void paintObject(PaintInfo&, int tx, int ty);
