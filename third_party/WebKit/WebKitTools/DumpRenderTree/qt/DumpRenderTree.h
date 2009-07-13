@@ -85,6 +85,7 @@ class DumpRenderTree : public QObject {
   void dump();
   void titleChanged(const QString& s);
   void connectFrame(QWebFrame* frame);
+  void dumpDatabaseQuota(QWebFrame* frame, const QString& dbName);
 
  Q_SIGNALS:
   void quit();
