@@ -990,10 +990,6 @@ void V8Proxy::clearForNavigation() {
     m_context->DetachGlobal();
 
     disposeContextHandles();
-
-    // Reinitialize the context so the global object points to
-    // the new DOM window.
-    initContextIfNeeded();
   }
 }
 
@@ -1036,10 +1032,8 @@ void V8Proxy::updateDocument() {
   if (!m_frame->document())
     return;
 
-  if (m_global.IsEmpty()) {
-    ASSERT(m_context.IsEmpty());
+  if (m_context.IsEmpty())
     return;
-  }
 
   // We have a new document and we need to update the cache.
   updateDocumentWrapperCache();
