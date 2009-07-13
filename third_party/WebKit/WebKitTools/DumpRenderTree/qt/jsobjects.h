@@ -91,6 +91,7 @@ class LayoutTestController : public QObject {
   void dumpSelectionRect() const {}
   void setJavaScriptProfilingEnabled(bool enable);
   void setFixedContentsSize(int width, int height);
+  void setPrivateBrowsingEnabled(bool enable);
 
   bool pauseAnimationAtTimeOnElementWithId(const QString& animationName,
                                            double time,

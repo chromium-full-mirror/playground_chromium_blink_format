@@ -123,6 +123,8 @@ void LayoutTestController::reset() {
   m_topLoadingFrame = 0;
   qt_dump_editing_callbacks(false);
   qt_dump_resource_load_callbacks(false);
+  QWebSettings::globalSettings()->setAttribute(
+      QWebSettings::PrivateBrowsingEnabled, false);
 }
 
 void LayoutTestController::processWork() {
@@ -256,6 +258,11 @@ void LayoutTestController::setJavaScriptProfilingEnabled(bool enable) {
 
 void LayoutTestController::setFixedContentsSize(int width, int height) {
   m_topLoadingFrame->page()->setFixedContentsSize(QSize(width, height));
+}
+
+void LayoutTestController::setPrivateBrowsingEnabled(bool enable) {
+  QWebSettings::globalSettings()->setAttribute(
+      QWebSettings::PrivateBrowsingEnabled, enable);
 }
 
 bool LayoutTestController::pauseAnimationAtTimeOnElementWithId(
