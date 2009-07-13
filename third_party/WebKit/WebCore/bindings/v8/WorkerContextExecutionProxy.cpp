@@ -77,7 +77,7 @@ static void handleConsoleMessage(v8::Handle<v8::Message> message,
   String resourceNameString =
       useURL ? workerContext->url() : toWebCoreString(resourceName);
 
-  workerContext->addMessage(ConsoleDestination, JSMessageSource,
+  workerContext->addMessage(ConsoleDestination, JSMessageSource, LogMessageType,
                             ErrorMessageLevel, errorMessage,
                             message->GetLineNumber(), resourceNameString);
 }
