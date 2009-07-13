@@ -192,6 +192,7 @@ void ChromeClientQt::setResizable(bool) {
 }
 
 void ChromeClientQt::addMessageToConsole(MessageSource,
+                                         MessageType,
                                          MessageLevel,
                                          const String& message,
                                          unsigned int lineNumber,

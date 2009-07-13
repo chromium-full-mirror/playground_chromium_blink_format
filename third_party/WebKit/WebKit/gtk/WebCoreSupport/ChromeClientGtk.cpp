@@ -226,6 +226,7 @@ bool ChromeClient::runBeforeUnloadConfirmPanel(const WebCore::String& message,
 }
 
 void ChromeClient::addMessageToConsole(WebCore::MessageSource source,
+                                       WebCore::MessageType type,
                                        WebCore::MessageLevel level,
                                        const WebCore::String& message,
                                        unsigned int lineNumber,
