@@ -49,12 +49,12 @@ class WeakReferenceMap {
  public:
   WeakReferenceMap(v8::WeakReferenceCallback callback)
       : m_weakReferenceCallback(callback) {}
-#ifndef NDEBUG
   virtual ~WeakReferenceMap() {
+#ifndef NDEBUG
     if (m_map.size() > 0)
       fprintf(stderr, "Leak %d JS wrappers.\n", m_map.size());
-  }
 #endif
+  }
 
   // Get the JS wrapper object of an object.
   virtual v8::Persistent<ValueType> get(KeyType* obj) {
