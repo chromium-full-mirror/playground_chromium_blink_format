@@ -274,6 +274,7 @@ void WebChromeClient::setResizable(bool resizable) {
 }
 
 void WebChromeClient::addMessageToConsole(MessageSource source,
+                                          MessageType type,
                                           MessageLevel level,
                                           const String& message,
                                           unsigned line,
