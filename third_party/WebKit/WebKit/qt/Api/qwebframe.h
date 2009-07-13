@@ -215,6 +215,9 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
 
   void contentsSizeChanged(const QSize& size);
 
+  void loadStarted();
+  void loadFinished(bool ok);
+
  private:
   friend class QWebPage;
   friend class QWebPagePrivate;
