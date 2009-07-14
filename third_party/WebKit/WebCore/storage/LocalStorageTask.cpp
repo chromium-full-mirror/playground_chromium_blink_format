@@ -46,8 +46,6 @@ LocalStorageTask::LocalStorageTask(Type type,
   ASSERT(m_type == TerminateThread);
 }
 
-LocalStorageTask::~LocalStorageTask() {}
-
 void LocalStorageTask::performTask() {
   switch (m_type) {
     case AreaImport:

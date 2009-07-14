@@ -28,9 +28,9 @@
 
 #if ENABLE(DOM_STORAGE)
 
-#include "PlatformString.h"
 #include "SQLiteDatabase.h"
 #include "StringHash.h"
+#include "StorageSyncManager.h"
 #include "Timer.h"
 #include <wtf/HashMap.h>
 
@@ -42,6 +42,10 @@ class StorageSyncManager;
 
 class StorageAreaSync : public RefCounted<StorageAreaSync> {
  public:
+#ifndef NDEBUG
+  ~StorageAreaSync();
+#endif
+
   static PassRefPtr<StorageAreaSync> create(
       PassRefPtr<StorageSyncManager> storageSyncManager,
       PassRefPtr<StorageArea> storageArea);
@@ -53,9 +57,6 @@ class StorageAreaSync : public RefCounted<StorageAreaSync> {
   void scheduleClear();
 
  private:
-  friend class RefCounted<StorageAreaSync>;
-  ~StorageAreaSync();
-
   StorageAreaSync(PassRefPtr<StorageSyncManager> storageSyncManager,
                   PassRefPtr<StorageArea> storageArea);
 

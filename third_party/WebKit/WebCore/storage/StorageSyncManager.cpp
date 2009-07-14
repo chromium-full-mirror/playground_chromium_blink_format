@@ -33,8 +33,6 @@
 #include "FileSystem.h"
 #include "Frame.h"
 #include "FrameTree.h"
-#include "LocalStorageTask.h"
-#include "LocalStorageThread.h"
 #include "Page.h"
 #include "PageGroup.h"
 #include "StorageAreaSync.h"
@@ -52,8 +50,6 @@ StorageSyncManager::StorageSyncManager(const String& path)
   m_thread = LocalStorageThread::create();
   m_thread->start();
 }
-
-StorageSyncManager::~StorageSyncManager() {}
 
 String StorageSyncManager::fullDatabaseFilename(SecurityOrigin* origin) {
   ASSERT(origin);
