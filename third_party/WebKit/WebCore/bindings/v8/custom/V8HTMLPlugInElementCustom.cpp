@@ -35,10 +35,8 @@
 
 #include "V8Binding.h"
 #include "V8CustomBinding.h"
+#include "V8NPObject.h"
 #include "V8Proxy.h"
-
-// FIXME: The name of this file will change once refactoring is complete
-#include "v8_npobject.h"
 
 namespace WebCore {
 
@@ -55,7 +53,7 @@ NAMED_PROPERTY_GETTER(HTMLPlugInElement) {
   if (instance.IsEmpty())
     return notHandledByInterceptor();
 
-  return NPObjectGetNamedProperty(instance, name);
+  return npObjectGetNamedProperty(instance, name);
 }
 
 NAMED_PROPERTY_SETTER(HTMLPlugInElement) {
@@ -71,12 +69,12 @@ NAMED_PROPERTY_SETTER(HTMLPlugInElement) {
   if (instance.IsEmpty())
     return notHandledByInterceptor();
 
-  return NPObjectSetNamedProperty(instance, name, value);
+  return npObjectSetNamedProperty(instance, name, value);
 }
 
 CALLBACK_FUNC_DECL(HTMLPlugInElement) {
   INC_STATS("DOM.HTMLPluginElement()");
-  return NPObjectInvokeDefaultHandler(args);
+  return npObjectInvokeDefaultHandler(args);
 }
 
 INDEXED_PROPERTY_GETTER(HTMLPlugInElement) {
@@ -92,7 +90,7 @@ INDEXED_PROPERTY_GETTER(HTMLPlugInElement) {
   if (instance.IsEmpty())
     return notHandledByInterceptor();
 
-  return NPObjectGetIndexedProperty(instance, index);
+  return npObjectGetIndexedProperty(instance, index);
 }
 
 INDEXED_PROPERTY_SETTER(HTMLPlugInElement) {
@@ -108,7 +106,7 @@ INDEXED_PROPERTY_SETTER(HTMLPlugInElement) {
   if (instance.IsEmpty())
     return notHandledByInterceptor();
 
-  return NPObjectSetIndexedProperty(instance, index, value);
+  return npObjectSetIndexedProperty(instance, index, value);
 }
 
 }  // namespace WebCore
