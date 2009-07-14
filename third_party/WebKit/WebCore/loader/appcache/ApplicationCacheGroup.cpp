@@ -82,8 +82,11 @@ ApplicationCache* ApplicationCacheGroup::cacheForMainRequest(
   if (!ApplicationCache::requestIsHTTPOrHTTPSGet(request))
     return 0;
 
-  if (ApplicationCacheGroup* group =
-          cacheStorage().cacheGroupForURL(request.url())) {
+  KURL url(request.url());
+  if (url.hasRef())
+    url.removeRef();
+
+  if (ApplicationCacheGroup* group = cacheStorage().cacheGroupForURL(url)) {
     ASSERT(group->newestCache());
     ASSERT(!group->isObsolete());
 
@@ -99,8 +102,12 @@ ApplicationCache* ApplicationCacheGroup::fallbackCacheForMainRequest(
   if (!ApplicationCache::requestIsHTTPOrHTTPSGet(request))
     return 0;
 
+  KURL url(request.url());
+  if (url.hasRef())
+    url.removeRef();
+
   if (ApplicationCacheGroup* group =
-          cacheStorage().fallbackCacheGroupForURL(request.url())) {
+          cacheStorage().fallbackCacheGroupForURL(url)) {
     ASSERT(group->newestCache());
     ASSERT(!group->isObsolete());
 
@@ -110,7 +117,8 @@ ApplicationCache* ApplicationCacheGroup::fallbackCacheForMainRequest(
   return 0;
 }
 
-void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
+void ApplicationCacheGroup::selectCache(Frame* frame,
+                                        const KURL& passedManifestURL) {
   ASSERT(frame && frame->page());
 
   if (!frame->settings()->offlineWebApplicationCacheEnabled())
@@ -119,10 +127,14 @@ void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
   DocumentLoader* documentLoader = frame->loader()->documentLoader();
   ASSERT(!documentLoader->applicationCache());
 
-  if (manifestURL.isNull()) {
+  if (passedManifestURL.isNull()) {
     selectCacheWithoutManifestURL(frame);
     return;
   }
+
+  KURL manifestURL(passedManifestURL);
+  if (manifestURL.hasRef())
+    manifestURL.removeRef();
 
   ApplicationCache* mainResourceCache =
       documentLoader->mainResourceApplicationCache();
@@ -136,8 +148,11 @@ void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
     } else {
       // The main resource was loaded from cache, so the cache must have an
       // entry for it. Mark it as foreign.
+      KURL documentURL(documentLoader->url());
+      if (documentURL.hasRef())
+        documentURL.removeRef();
       ApplicationCacheResource* resource =
-          mainResourceCache->resourceForURL(documentLoader->url());
+          mainResourceCache->resourceForURL(documentURL);
       bool inStorage = resource->storageID();
       resource->addType(ApplicationCacheResource::Foreign);
       if (inStorage)
@@ -208,7 +223,9 @@ void ApplicationCacheGroup::finishedLoadingMainResource(
     DocumentLoader* loader) {
   ASSERT(m_pendingMasterResourceLoaders.contains(loader));
   ASSERT(m_completionType == None || m_pendingEntries.isEmpty());
-  const KURL& url = loader->url();
+  KURL url = loader->url();
+  if (url.hasRef())
+    url.removeRef();
 
   switch (m_completionType) {
     case None:
@@ -476,7 +493,9 @@ void ApplicationCacheGroup::didReceiveResponse(
 
   ASSERT(handle == m_currentHandle);
 
-  const KURL& url = handle->request().url();
+  KURL url(handle->request().url());
+  if (url.hasRef())
+    url.removeRef();
 
   ASSERT(!m_currentResource);
   ASSERT(m_pendingEntries.contains(url));
@@ -490,7 +509,7 @@ void ApplicationCacheGroup::didReceiveResponse(
 
   if (m_newestCache && response.httpStatusCode() == 304) {  // Not modified.
     ApplicationCacheResource* newestCachedResource =
-        m_newestCache->resourceForURL(handle->request().url());
+        m_newestCache->resourceForURL(url);
     if (newestCachedResource) {
       m_cacheBeingUpdated->addResource(ApplicationCacheResource::create(
           url, newestCachedResource->response(), type,
@@ -517,7 +536,7 @@ void ApplicationCacheGroup::didReceiveResponse(
       // Skip this resource. It is dropped from the cache.
       m_currentHandle->cancel();
       m_currentHandle = 0;
-      m_pendingEntries.remove(handle->request().url());
+      m_pendingEntries.remove(url);
       // Load the next resource, if any.
       startLoadingEntry();
     } else {
@@ -589,7 +608,9 @@ void ApplicationCacheGroup::didFail(ResourceHandle* handle,
   unsigned type = m_currentResource
                       ? m_currentResource->type()
                       : m_pendingEntries.get(handle->request().url());
-  const KURL& url = handle->request().url();
+  KURL url(handle->request().url());
+  if (url.hasRef())
+    url.removeRef();
 
   ASSERT(!m_currentResource || !m_pendingEntries.contains(url));
   m_currentResource = 0;
@@ -918,6 +939,7 @@ void ApplicationCacheGroup::deliverDelayedMainResources() {
 
 void ApplicationCacheGroup::addEntry(const String& url, unsigned type) {
   ASSERT(m_cacheBeingUpdated);
+  ASSERT(!KURL(url).hasRef());
 
   // Don't add the URL if we already have an master resource in the cache
   // (i.e., the main resource finished loading before the manifest).
