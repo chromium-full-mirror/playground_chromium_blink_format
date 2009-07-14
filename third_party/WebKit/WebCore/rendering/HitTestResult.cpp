@@ -26,6 +26,7 @@
 #include "HTMLAnchorElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLInputElement.h"
+#include "HTMLMediaElement.h"
 #include "HTMLNames.h"
 #include "RenderImage.h"
 #include "Scrollbar.h"
@@ -253,6 +254,26 @@ KURL HitTestResult::absoluteImageURL() const {
           ) {
     Element* element = static_cast<Element*>(m_innerNonSharedNode.get());
     urlString = element->getAttribute(element->imageSourceAttributeName());
+  } else
+    return KURL();
+
+  return m_innerNonSharedNode->document()->completeURL(parseURL(urlString));
+}
+
+KURL HitTestResult::absoluteMediaURL() const {
+  if (!(m_innerNonSharedNode && m_innerNonSharedNode->document()))
+    return KURL();
+
+  if (!(m_innerNonSharedNode->renderer() &&
+        m_innerNonSharedNode->renderer()->isMedia()))
+    return KURL();
+
+  AtomicString urlString;
+  if (m_innerNonSharedNode->hasTagName(HTMLNames::videoTag) ||
+      m_innerNonSharedNode->hasTagName(HTMLNames::audioTag)) {
+    HTMLMediaElement* mediaElement =
+        static_cast<HTMLMediaElement*>(m_innerNonSharedNode.get());
+    urlString = mediaElement->currentSrc();
   } else
     return KURL();
 

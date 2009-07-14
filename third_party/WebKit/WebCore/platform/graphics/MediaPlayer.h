@@ -112,6 +112,7 @@ class MediaPlayer : Noncopyable {
   static bool isAvailable();
 
   bool supportsFullscreen() const;
+  bool supportsSave() const;
   IntSize naturalSize();
   bool hasVideo();
 

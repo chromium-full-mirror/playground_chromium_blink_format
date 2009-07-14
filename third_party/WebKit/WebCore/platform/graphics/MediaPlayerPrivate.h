@@ -46,7 +46,8 @@ class MediaPlayerPrivateInterface {
   virtual void play() = 0;
   virtual void pause() = 0;
 
-  virtual bool supportsFullscreen() const { return false; };
+  virtual bool supportsFullscreen() const { return false; }
+  virtual bool supportsSave() const { return false; }
 
   virtual IntSize naturalSize() const = 0;
 

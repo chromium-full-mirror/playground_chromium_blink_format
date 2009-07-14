@@ -866,6 +866,14 @@ void HTMLMediaElement::returnToRealtime() {
   setCurrentTime(maxTimeSeekable(), e);
 }
 
+bool HTMLMediaElement::supportsFullscreen() const {
+  return m_player->supportsFullscreen();
+}
+
+bool HTMLMediaElement::supportsSave() const {
+  return m_player->supportsSave();
+}
+
 void HTMLMediaElement::seek(float time, ExceptionCode& ec) {
   // 4.8.10.10. Seeking
   // 1
