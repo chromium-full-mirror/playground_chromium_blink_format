@@ -33,6 +33,7 @@
 #include "HTMLElement.h"
 #include "SQLiteStatement.h"
 #include "StorageArea.h"
+#include "StorageSyncManager.h"
 #include "SuddenTermination.h"
 
 namespace WebCore {
@@ -69,11 +70,9 @@ StorageAreaSync::StorageAreaSync(
     m_importComplete = true;
 }
 
-#ifndef NDEBUG
 StorageAreaSync::~StorageAreaSync() {
   ASSERT(!m_syncTimer.isActive());
 }
-#endif
 
 void StorageAreaSync::scheduleFinalSync() {
   ASSERT(isMainThread());
