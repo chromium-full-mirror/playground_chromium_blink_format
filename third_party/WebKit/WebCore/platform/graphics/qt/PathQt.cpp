@@ -298,6 +298,10 @@ bool Path::isEmpty() const {
   return m_path->elementCount() == 0;
 }
 
+bool Path::hasCurrentPoint() const {
+  return !isEmpty();
+}
+
 String Path::debugString() const {
   QString ret;
   for (int i = 0; i < m_path->elementCount(); ++i) {

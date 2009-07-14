@@ -63,6 +63,10 @@ bool Path::isEmpty() const {
   return m_path->isEmpty();
 }
 
+bool Path::hasCurrentPoint() const {
+  return true;
+}
+
 bool Path::contains(const FloatPoint& point, WindRule rule) const {
   return SkPathContainsPoint(m_path, point, rule == RULE_NONZERO
                                                 ? SkPath::kWinding_FillType

@@ -80,6 +80,10 @@ bool Path::isEmpty() const {
 #endif
 }
 
+bool Path::hasCurrentPoint() const {
+  return !isEmpty();
+}
+
 void Path::translate(const FloatSize& p) {
   cairo_t* cr = platformPath()->m_cr;
   cairo_translate(cr, p.width(), p.height());

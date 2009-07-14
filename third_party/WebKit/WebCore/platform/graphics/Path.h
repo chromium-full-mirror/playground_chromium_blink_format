@@ -100,6 +100,11 @@ class Path {
 
   void clear();
   bool isEmpty() const;
+  // Gets the current point of the current path, which is conceptually the final
+  // point reached by the path so far.
+  // Note the Path can be empty (isEmpty() == true) and still have a current
+  // point.
+  bool hasCurrentPoint() const;
 
   void moveTo(const FloatPoint&);
   void addLineTo(const FloatPoint&);
