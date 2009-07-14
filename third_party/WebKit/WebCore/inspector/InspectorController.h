@@ -114,6 +114,10 @@ class InspectorController : public RefCounted<InspectorController>
       m_simpleContent.m_boolean = value;
     }
 
+    explicit Setting(const String& value) : m_type(StringType) {
+      m_string = value;
+    }
+
     Type type() const { return m_type; }
 
     String string() const {
@@ -222,6 +226,8 @@ class InspectorController : public RefCounted<InspectorController>
 
   void setAttachedWindow(bool);
   void setAttachedWindowHeight(unsigned height);
+
+  void storeLastActivePanel(const String& panelName);
 
   void toggleSearchForNodeInPage();
   bool searchingForNodeInPage() { return m_searchingForNode; };
@@ -372,6 +378,8 @@ class InspectorController : public RefCounted<InspectorController>
   void showWindow();
 
   bool isMainResourceLoader(DocumentLoader* loader, const KURL& requestUrl);
+
+  SpecialPanels specialPanelForJSName(const String& panelName);
 
   Page* m_inspectedPage;
   InspectorClient* m_client;
