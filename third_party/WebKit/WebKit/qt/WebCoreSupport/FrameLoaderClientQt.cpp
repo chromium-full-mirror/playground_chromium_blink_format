@@ -199,7 +199,9 @@ void FrameLoaderClientQt::transitionToCommittedForNewPage() {
 
   m_frame->createView(
       m_webFrame->page()->viewportSize(), backgroundColor,
-      !backgroundColor.alpha(), fixedLayoutSize, fixedLayoutSize.isValid(),
+      !backgroundColor.alpha(),
+      fixedLayoutSize.isValid() ? IntSize(fixedLayoutSize) : IntSize(),
+      fixedLayoutSize.isValid(),
       (ScrollbarMode)m_webFrame->scrollBarPolicy(Qt::Horizontal),
       (ScrollbarMode)m_webFrame->scrollBarPolicy(Qt::Vertical));
 }
