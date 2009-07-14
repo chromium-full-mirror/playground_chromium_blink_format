@@ -166,7 +166,6 @@ class V8Proxy {
 
   explicit V8Proxy(Frame* frame)
       : m_frame(frame),
-        m_domNodeMap(getDOMNodeMap()),
         m_inlineCode(false),
         m_timerCallback(false),
         m_recursion(0) {}
@@ -390,7 +389,6 @@ class V8Proxy {
   bool installDOMWindow(v8::Handle<v8::Context> context, DOMWindow* window);
 
   void initContextIfNeeded();
-  DOMWrapperMap<Node>& domNodeMap() { return m_domNodeMap; }
   void updateDocumentWrapper(v8::Handle<v8::Value> wrapper);
 
  private:
@@ -447,8 +445,6 @@ class V8Proxy {
 
   v8::Persistent<v8::Object> m_global;
   v8::Persistent<v8::Value> m_document;
-
-  DOMWrapperMap<Node>& m_domNodeMap;
 
   // Utility context holding JavaScript functions used internally.
   static v8::Persistent<v8::Context> m_utilityContext;
