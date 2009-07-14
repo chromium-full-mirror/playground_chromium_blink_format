@@ -266,7 +266,6 @@ CALLBACK_FUNC_DECL(DOMWindowPostMessage) {
   ASSERT(source->frame());
 
   v8::TryCatch tryCatch;
-
   String message = toWebCoreString(args[0]);
   MessagePort* port = 0;
   String targetOrigin;
@@ -278,7 +277,7 @@ CALLBACK_FUNC_DECL(DOMWindowPostMessage) {
   if (args.Length() > 2) {
     if (V8DOMWrapper::isWrapperOfType(args[1], V8ClassIndex::MESSAGEPORT))
       port = V8DOMWrapper::convertToNativeObject<MessagePort>(
-          V8ClassIndex::MESSAGEPORT, args[1]);
+          V8ClassIndex::MESSAGEPORT, v8::Handle<v8::Object>::Cast(args[1]));
     targetOrigin = toWebCoreStringWithNullOrUndefinedCheck(args[2]);
   } else {
     targetOrigin = toWebCoreStringWithNullOrUndefinedCheck(args[1]);
@@ -866,7 +865,7 @@ CALLBACK_FUNC_DECL(DOMWindowSetInterval) {
 }
 
 void V8Custom::ClearTimeoutImpl(const v8::Arguments& args) {
-  v8::Handle<v8::Value> holder = args.Holder();
+  v8::Handle<v8::Object> holder = args.Holder();
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, holder);
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
@@ -891,7 +890,7 @@ CALLBACK_FUNC_DECL(DOMWindowClearInterval) {
 
 NAMED_ACCESS_CHECK(DOMWindow) {
   ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::DOMWINDOW);
-  v8::Handle<v8::Value> window =
+  v8::Handle<v8::Object> window =
       V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, host);
   if (window.IsEmpty())
     return false;  // the frame is gone.
@@ -919,7 +918,7 @@ NAMED_ACCESS_CHECK(DOMWindow) {
 
 INDEXED_ACCESS_CHECK(DOMWindow) {
   ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::DOMWINDOW);
-  v8::Handle<v8::Value> window =
+  v8::Handle<v8::Object> window =
       V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, host);
   if (window.IsEmpty())
     return false;

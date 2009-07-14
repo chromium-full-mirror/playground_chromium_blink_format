@@ -65,11 +65,13 @@ static PassRefPtr<CanvasStyle> toCanvasStyle(v8::Handle<v8::Value> value) {
 
   if (V8CanvasGradient::HasInstance(value))
     return CanvasStyle::create(
-        V8DOMWrapper::convertDOMWrapperToNative<CanvasGradient>(value));
+        V8DOMWrapper::convertDOMWrapperToNative<CanvasGradient>(
+            v8::Handle<v8::Object>::Cast(value)));
 
   if (V8CanvasPattern::HasInstance(value))
     return CanvasStyle::create(
-        V8DOMWrapper::convertDOMWrapperToNative<CanvasPattern>(value));
+        V8DOMWrapper::convertDOMWrapperToNative<CanvasPattern>(
+            v8::Handle<v8::Object>::Cast(value)));
 
   return 0;
 }
@@ -463,7 +465,7 @@ CALLBACK_FUNC_DECL(CanvasRenderingContext2DPutImageData) {
   // (TYPE_MISMATCH_ERR).
   if (V8DOMWrapper::isWrapperOfType(args[0], V8ClassIndex::IMAGEDATA))
     imageData = V8DOMWrapper::convertToNativeObject<ImageData>(
-        V8ClassIndex::IMAGEDATA, args[0]);
+        V8ClassIndex::IMAGEDATA, v8::Handle<v8::Object>::Cast(args[0]));
 
   ExceptionCode ec = 0;
 

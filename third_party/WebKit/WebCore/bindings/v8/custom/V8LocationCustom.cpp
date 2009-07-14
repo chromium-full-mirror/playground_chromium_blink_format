@@ -285,7 +285,7 @@ CALLBACK_FUNC_DECL(LocationReload) {
   // FIXME: we ignore the "forceget" parameter.
 
   INC_STATS("DOM.Location.reload");
-  v8::Handle<v8::Value> holder = args.Holder();
+  v8::Handle<v8::Object> holder = args.Holder();
   Location* imp = V8DOMWrapper::convertToNativeObject<Location>(
       V8ClassIndex::LOCATION, holder);
 
@@ -300,7 +300,7 @@ CALLBACK_FUNC_DECL(LocationReload) {
 
 CALLBACK_FUNC_DECL(LocationReplace) {
   INC_STATS("DOM.Location.replace");
-  v8::Handle<v8::Value> holder = args.Holder();
+  v8::Handle<v8::Object> holder = args.Holder();
   Location* imp = V8DOMWrapper::convertToNativeObject<Location>(
       V8ClassIndex::LOCATION, holder);
 
@@ -321,7 +321,7 @@ CALLBACK_FUNC_DECL(LocationReplace) {
 
 CALLBACK_FUNC_DECL(LocationAssign) {
   INC_STATS("DOM.Location.assign");
-  v8::Handle<v8::Value> holder = args.Holder();
+  v8::Handle<v8::Object> holder = args.Holder();
   Location* imp = V8DOMWrapper::convertToNativeObject<Location>(
       V8ClassIndex::LOCATION, holder);
 
@@ -351,7 +351,7 @@ CALLBACK_FUNC_DECL(LocationValueOf) {
 
 CALLBACK_FUNC_DECL(LocationToString) {
   INC_STATS("DOM.Location.toString");
-  v8::Handle<v8::Value> holder = args.Holder();
+  v8::Handle<v8::Object> holder = args.Holder();
   Location* imp = V8DOMWrapper::convertToNativeObject<Location>(
       V8ClassIndex::LOCATION, holder);
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
