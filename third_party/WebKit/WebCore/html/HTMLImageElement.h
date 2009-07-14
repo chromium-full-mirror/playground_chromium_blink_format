@@ -85,6 +85,8 @@ class HTMLImageElement : public HTMLElement {
   String border() const;
   void setBorder(const String&);
 
+  virtual bool draggable() const;
+
   void setHeight(int);
 
   int hspace() const;

@@ -86,6 +86,9 @@ class HTMLElement : public StyledElement {
   virtual void setContentEditable(MappedAttribute*);
   virtual void setContentEditable(const String&);
 
+  virtual bool draggable() const;
+  void setDraggable(bool);
+
   void click();
 
   virtual void accessKeyAction(bool sendToAnyElement);
