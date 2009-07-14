@@ -283,8 +283,9 @@ class FrameLoaderClient {
                                                        // list.
 
 #if USE(V8)
-  virtual void didCreateScriptContext() = 0;
-  virtual void didDestroyScriptContext() = 0;
+  virtual void didCreateScriptContextForFrame() = 0;
+  virtual void didDestroyScriptContextForFrame() = 0;
+  virtual void didCreateIsolatedScriptContext() = 0;
 #endif
 
   virtual void registerForIconNotification(bool listen = true) = 0;
