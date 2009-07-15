@@ -230,7 +230,6 @@ class CSSParser {
     return &m_reusableSelectorVector;
   }
 
- public:
   bool m_strict;
   bool m_important;
   int m_id;
@@ -256,7 +255,6 @@ class CSSParser {
   AtomicString m_defaultNamespace;
 
   // tokenizer methods and data
- public:
   int lex(void* yylval);
   int token() { return yyTok; }
   UChar* text(int* length);
