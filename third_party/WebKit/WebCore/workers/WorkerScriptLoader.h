@@ -30,6 +30,7 @@
 
 #if ENABLE(WORKERS)
 
+#include "KURL.h"
 #include "ResourceResponse.h"
 #include "ScriptString.h"
 #include "TextResourceDecoder.h"
@@ -41,19 +42,28 @@ namespace WebCore {
 class ScriptExecutionContext;
 class WorkerScriptLoaderClient;
 
+enum URLCompletionPolicy { CompleteURL, DoNotCompleteURL };
+
+enum CrossOriginLoadPolicy { DenyCrossOriginLoad, AllowCrossOriginLoad };
+
 class WorkerScriptLoader : public ThreadableLoaderClient {
  public:
   WorkerScriptLoader();
 
   void loadSynchronously(ScriptExecutionContext*,
                          const String& url,
-                         CrossOriginRedirectPolicy);
+                         URLCompletionPolicy,
+                         CrossOriginLoadPolicy);
   void loadAsynchronously(ScriptExecutionContext*,
                           const String& url,
-                          CrossOriginRedirectPolicy,
+                          URLCompletionPolicy,
+                          CrossOriginLoadPolicy,
                           WorkerScriptLoaderClient*);
 
+  void notifyError();
+
   const String& script() const { return m_script; }
+  const KURL& url() const { return m_url; }
   bool failed() const { return m_failed; }
   unsigned long identifier() const { return m_identifier; }
 
@@ -65,6 +75,10 @@ class WorkerScriptLoader : public ThreadableLoaderClient {
   virtual void didReceiveAuthenticationCancellation(const ResourceResponse&);
 
  private:
+  PassOwnPtr<ResourceRequest> createResourceRequest(ScriptExecutionContext*,
+                                                    const String& url,
+                                                    URLCompletionPolicy,
+                                                    CrossOriginLoadPolicy);
   void notifyFinished();
 
   WorkerScriptLoaderClient* m_client;
@@ -72,6 +86,7 @@ class WorkerScriptLoader : public ThreadableLoaderClient {
   String m_responseEncoding;
   RefPtr<TextResourceDecoder> m_decoder;
   String m_script;
+  KURL m_url;
   bool m_failed;
   unsigned long m_identifier;
 };
