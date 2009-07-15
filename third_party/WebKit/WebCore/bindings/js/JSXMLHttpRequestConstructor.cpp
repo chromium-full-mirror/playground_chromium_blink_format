@@ -37,7 +37,7 @@ const ClassInfo JSXMLHttpRequestConstructor::s_info = {
 JSXMLHttpRequestConstructor::JSXMLHttpRequestConstructor(
     ExecState* exec,
     JSDOMGlobalObject* globalObject)
-    : DOMObject(JSXMLHttpRequestConstructor::createStructure(
+    : DOMConstructorObject(JSXMLHttpRequestConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())),
       m_globalObject(globalObject) {
   putDirect(exec->propertyNames().prototype,

@@ -36,7 +36,7 @@ const ClassInfo JSOptionConstructor::s_info = {"OptionConstructor", 0, 0, 0};
 
 JSOptionConstructor::JSOptionConstructor(ExecState* exec,
                                          JSDOMGlobalObject* globalObject)
-    : DOMObject(JSOptionConstructor::createStructure(
+    : DOMConstructorObject(JSOptionConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())),
       m_globalObject(globalObject) {
   ASSERT(globalObject->scriptExecutionContext());

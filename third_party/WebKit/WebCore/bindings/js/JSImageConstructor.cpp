@@ -37,7 +37,7 @@ const ClassInfo JSImageConstructor::s_info = {"ImageConstructor", 0, 0, 0};
 
 JSImageConstructor::JSImageConstructor(ExecState* exec,
                                        JSDOMGlobalObject* globalObject)
-    : DOMObject(JSImageConstructor::createStructure(
+    : DOMConstructorObject(JSImageConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())),
       m_globalObject(globalObject) {
   ASSERT(globalObject->scriptExecutionContext());

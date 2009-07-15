@@ -38,7 +38,7 @@ const ClassInfo JSWebKitPointConstructor::s_info = {"WebKitPointConstructor", 0,
                                                     0, 0};
 
 JSWebKitPointConstructor::JSWebKitPointConstructor(ExecState* exec)
-    : DOMObject(JSWebKitPointConstructor::createStructure(
+    : DOMConstructorObject(JSWebKitPointConstructor::createStructure(
           exec->lexicalGlobalObject()->objectPrototype())) {
   putDirect(exec->propertyNames().prototype,
             JSWebKitPointPrototype::self(exec, exec->lexicalGlobalObject()),
