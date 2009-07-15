@@ -29,27 +29,23 @@
 #if ENABLE(DOM_STORAGE)
 
 #include "Event.h"
-#include "Storage.h"
+#include "PlatformString.h"
 
 namespace WebCore {
 
 class DOMWindow;
+class Storage;
 
 class StorageEvent : public Event {
  public:
-  static PassRefPtr<StorageEvent> create() {
-    return adoptRef(new StorageEvent);
-  }
+  static PassRefPtr<StorageEvent> create();
   static PassRefPtr<StorageEvent> create(const AtomicString& type,
                                          const String& key,
                                          const String& oldValue,
                                          const String& newValue,
                                          const String& uri,
                                          PassRefPtr<DOMWindow> source,
-                                         Storage* storageArea) {
-    return adoptRef(new StorageEvent(type, key, oldValue, newValue, uri, source,
-                                     storageArea));
-  }
+                                         Storage* storageArea);
 
   const String& key() const { return m_key; }
   const String& oldValue() const { return m_oldValue; }
@@ -77,7 +73,7 @@ class StorageEvent : public Event {
   virtual bool isStorageEvent() const { return true; }
 
  private:
-  StorageEvent() {}
+  StorageEvent();
   StorageEvent(const AtomicString& type,
                const String& key,
                const String& oldValue,

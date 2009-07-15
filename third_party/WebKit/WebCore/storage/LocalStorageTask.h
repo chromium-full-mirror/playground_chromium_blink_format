@@ -42,6 +42,8 @@ class LocalStorageTask : public ThreadSafeShared<LocalStorageTask> {
  public:
   enum Type { AreaImport, AreaSync, TerminateThread };
 
+  ~LocalStorageTask();
+
   static PassRefPtr<LocalStorageTask> createImport(
       PassRefPtr<StorageAreaSync> area) {
     return adoptRef(new LocalStorageTask(AreaImport, area));
