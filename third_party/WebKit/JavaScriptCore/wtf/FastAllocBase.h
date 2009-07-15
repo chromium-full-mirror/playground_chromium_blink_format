@@ -81,9 +81,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Assertions.h"
 #include "FastMalloc.h"
 #include "TypeTraits.h"
-#include <wtf/Assertions.h>
 
 namespace WTF {
 
