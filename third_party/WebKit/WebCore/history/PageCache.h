@@ -53,6 +53,10 @@ class PageCache : public Noncopyable {
 
   void releaseAutoreleasedPagesNow();
 
+  int pageCount() const { return m_size; }
+  int frameCount() const;
+  int autoreleasedPageCount() const;
+
  private:
   typedef HashSet<RefPtr<CachedPage>> CachedPageSet;
 
