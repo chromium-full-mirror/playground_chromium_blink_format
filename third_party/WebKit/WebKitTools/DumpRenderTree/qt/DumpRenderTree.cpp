@@ -84,6 +84,9 @@ class WebPage : public QWebPage {
                         const QString& defaultValue,
                         QString* result);
 
+ public slots:
+  bool shouldInterruptJavaScript() { return false; }
+
  private slots:
   void setViewGeometry(const QRect& r) {
     QWidget* v = view();
