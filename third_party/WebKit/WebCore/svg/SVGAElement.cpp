@@ -134,7 +134,7 @@ void SVGAElement::defaultEventHandler(Event* evt) {
           (getAttribute(XLinkNames::showAttr) == "new") ? "_blank" : "_self";
 
     if (!evt->defaultPrevented()) {
-      String url = parseURL(href());
+      String url = deprecatedParseURL(href());
 #if ENABLE(SVG_ANIMATION)
       if (url.startsWith("#")) {
         Element* targetElement = document()->getElementById(url.substring(1));

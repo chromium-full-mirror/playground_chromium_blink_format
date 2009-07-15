@@ -755,7 +755,7 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
   for (size_t i = 0; i < size; i++) {
     if (paramNames[i] == "pluginspage") {
       KURL pluginPageURL =
-          frame->document()->completeURL(parseURL(paramValues[i]));
+          frame->document()->completeURL(deprecatedParseURL(paramValues[i]));
       if (pluginPageURL.protocolInHTTPFamily()) {
         static CFStringRef key = MarshallingHelpers::LPCOLESTRToCFStringRef(
             WebKitErrorPlugInPageURLStringKey);

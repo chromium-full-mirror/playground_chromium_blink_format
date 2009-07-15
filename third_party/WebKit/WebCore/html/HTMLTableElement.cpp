@@ -342,7 +342,7 @@ void HTMLTableElement::parseMappedAttribute(MappedAttribute* attr) {
       m_borderColorAttr = true;
     }
   } else if (attr->name() == backgroundAttr) {
-    String url = parseURL(attr->value());
+    String url = deprecatedParseURL(attr->value());
     if (!url.isEmpty())
       addCSSImageProperty(attr, CSSPropertyBackgroundImage,
                           document()->completeURL(url).string());

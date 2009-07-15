@@ -1580,7 +1580,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
             if (m_doc->frame() && m_doc->frame()->script()->isEnabled()) {
               if ((a = m_currentToken.attrs->getAttributeItem(srcAttr)))
                 m_scriptTagSrcAttrValue =
-                    m_doc->completeURL(parseURL(a->value())).string();
+                    m_doc->completeURL(deprecatedParseURL(a->value())).string();
             }
           }
         }

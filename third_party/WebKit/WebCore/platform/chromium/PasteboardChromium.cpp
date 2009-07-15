@@ -125,7 +125,7 @@ void Pasteboard::writeImage(Node* node, const KURL&, const String& title) {
   }
   KURL url = urlString.isEmpty()
                  ? KURL()
-                 : node->document()->completeURL(parseURL(urlString));
+                 : node->document()->completeURL(deprecatedParseURL(urlString));
 
   NativeImageSkia* bitmap = 0;
 #if !PLATFORM(CG)

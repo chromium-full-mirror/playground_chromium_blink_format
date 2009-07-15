@@ -298,7 +298,7 @@ void ClipboardChromium::declareAndWriteDragImage(Element* element,
   if (imageURL.isEmpty())
     return;
 
-  String fullURL = frame->document()->completeURL(parseURL(imageURL));
+  String fullURL = frame->document()->completeURL(deprecatedParseURL(imageURL));
   if (fullURL.isEmpty())
     return;
 

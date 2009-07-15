@@ -48,7 +48,7 @@ void JSAttr::setValue(ExecState* exec, JSValue value) {
   if (ownerElement && (ownerElement->hasTagName(iframeTag) ||
                        ownerElement->hasTagName(frameTag))) {
     if (equalIgnoringCase(imp->name(), "src") &&
-        protocolIsJavaScript(parseURL(attrValue))) {
+        protocolIsJavaScript(deprecatedParseURL(attrValue))) {
       if (!checkNodeSecurity(exec,
                              static_cast<HTMLFrameElementBase*>(ownerElement)
                                  ->contentDocument()))

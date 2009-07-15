@@ -79,7 +79,7 @@ bool HTMLBodyElement::mapToEntry(const QualifiedName& attrName,
 
 void HTMLBodyElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == backgroundAttr) {
-    String url = parseURL(attr->value());
+    String url = deprecatedParseURL(attr->value());
     if (!url.isEmpty())
       addCSSImageProperty(attr, CSSPropertyBackgroundImage,
                           document()->completeURL(url).string());

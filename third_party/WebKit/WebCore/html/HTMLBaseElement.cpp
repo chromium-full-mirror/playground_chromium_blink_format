@@ -42,7 +42,7 @@ HTMLBaseElement::HTMLBaseElement(const QualifiedName& qName, Document* document)
 void HTMLBaseElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == hrefAttr) {
     m_hrefAttrValue = attr->value();
-    m_href = parseURL(attr->value());
+    m_href = deprecatedParseURL(attr->value());
     process();
   } else if (attr->name() == targetAttr) {
     m_target = attr->value();
