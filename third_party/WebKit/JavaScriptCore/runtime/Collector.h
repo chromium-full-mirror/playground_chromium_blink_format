@@ -67,7 +67,7 @@ struct CollectorHeap {
   OperationInProgress operationInProgress;
 };
 
-class Heap : Noncopyable {
+class Heap : public Noncopyable {
  public:
   class Thread;
   typedef CollectorHeapIterator<PrimaryHeap> iterator;

@@ -37,7 +37,7 @@ class KURL;
 class Page;
 class StorageNamespace;
 
-class PageGroup : Noncopyable {
+class PageGroup : public Noncopyable {
  public:
   PageGroup(const String& name);
   PageGroup(Page*);

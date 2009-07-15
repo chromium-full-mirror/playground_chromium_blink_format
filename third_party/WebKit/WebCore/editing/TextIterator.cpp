@@ -59,7 +59,7 @@ using namespace HTMLNames;
 // more.
 // Non-breaking spaces are always equal to normal spaces.
 // Case folding is also done if <isCaseSensitive> is false.
-class SearchBuffer : Noncopyable {
+class SearchBuffer : public Noncopyable {
  public:
   SearchBuffer(const String& target, bool isCaseSensitive);
   ~SearchBuffer();

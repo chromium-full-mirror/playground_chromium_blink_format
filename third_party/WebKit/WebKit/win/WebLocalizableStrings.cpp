@@ -49,7 +49,7 @@ WebLocalizableStringsBundle WebKitLocalizableStringsBundle = {
 static HashMap<String, LocalizedString*> mainBundleLocStrings;
 static HashMap<String, LocalizedString*> frameworkLocStrings;
 
-class LocalizedString : Noncopyable {
+class LocalizedString : public Noncopyable {
  public:
   LocalizedString(CFStringRef string) : m_cfString(string) {
     ASSERT_ARG(string, string);

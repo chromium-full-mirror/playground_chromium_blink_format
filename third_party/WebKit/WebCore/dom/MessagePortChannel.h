@@ -51,7 +51,7 @@ class String;
 // It acts as a wrapper around the platform-dependent PlatformMessagePortChannel
 // implementation which ensures that the platform-dependent close() method is
 // invoked before destruction.
-class MessagePortChannel : Noncopyable {
+class MessagePortChannel : public Noncopyable {
  public:
   static void createChannel(PassRefPtr<MessagePort>, PassRefPtr<MessagePort>);
 

@@ -36,7 +36,7 @@ class JSString;
 
 class SmallStringsStorage;
 
-class SmallStrings : Noncopyable {
+class SmallStrings : public Noncopyable {
  public:
   SmallStrings();
   ~SmallStrings();

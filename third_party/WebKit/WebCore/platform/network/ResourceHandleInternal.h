@@ -75,7 +75,7 @@ class NSURLConnection;
 namespace WebCore {
 class ResourceHandleClient;
 
-class ResourceHandleInternal : Noncopyable {
+class ResourceHandleInternal : public Noncopyable {
  public:
   ResourceHandleInternal(ResourceHandle* loader,
                          const ResourceRequest& request,

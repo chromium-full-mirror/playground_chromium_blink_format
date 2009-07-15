@@ -61,7 +61,7 @@ class KURL;
 // -------|-----+++++++++++++++|
 // -------|-----+++++++++++++++|+++++
 
-class Cache : Noncopyable {
+class Cache : public Noncopyable {
  public:
   friend Cache* cache();
 

@@ -28,7 +28,7 @@
 namespace WTF {
 
 template <class T>
-class OwnFastMallocPtr : Noncopyable {
+class OwnFastMallocPtr : public Noncopyable {
  public:
   explicit OwnFastMallocPtr(T* ptr) : m_ptr(ptr) {}
 

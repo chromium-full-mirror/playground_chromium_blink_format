@@ -49,7 +49,7 @@ class PageURLSnapshot {
   String iconURL;
 };
 
-class PageURLRecord : Noncopyable {
+class PageURLRecord : public Noncopyable {
  public:
   PageURLRecord(const String& pageURL);
   ~PageURLRecord();

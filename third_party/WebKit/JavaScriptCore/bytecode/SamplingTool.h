@@ -129,7 +129,7 @@ class SamplingTool {
   friend class HostCallRecord;
 
 #if ENABLE(OPCODE_SAMPLING)
-  class CallRecord : Noncopyable {
+  class CallRecord : public Noncopyable {
    public:
     CallRecord(SamplingTool* samplingTool)
         : m_samplingTool(samplingTool),
@@ -154,7 +154,7 @@ class SamplingTool {
     }
   };
 #else
-  class CallRecord : Noncopyable {
+  class CallRecord : public Noncopyable {
    public:
     CallRecord(SamplingTool*) {}
   };

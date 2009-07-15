@@ -128,7 +128,7 @@ enum InterpolationQuality {
   InterpolationHigh
 };
 
-class GraphicsContext : Noncopyable {
+class GraphicsContext : public Noncopyable {
  public:
   GraphicsContext(PlatformGraphicsContext*);
   ~GraphicsContext();

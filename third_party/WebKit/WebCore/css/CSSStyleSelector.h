@@ -77,7 +77,7 @@ class MediaQueryResult {
 
 // This class selects a RenderStyle for a given element based on a collection of
 // stylesheets.
-class CSSStyleSelector : Noncopyable {
+class CSSStyleSelector : public Noncopyable {
  public:
   CSSStyleSelector(Document*,
                    const String& userStyleSheet,

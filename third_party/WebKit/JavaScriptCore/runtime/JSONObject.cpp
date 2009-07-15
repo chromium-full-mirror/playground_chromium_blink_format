@@ -67,7 +67,7 @@ class PropertyNameForFunctionCall {
   mutable JSValue m_value;
 };
 
-class Stringifier : Noncopyable {
+class Stringifier : public Noncopyable {
  public:
   Stringifier(ExecState*, JSValue replacer, JSValue space);
   ~Stringifier();

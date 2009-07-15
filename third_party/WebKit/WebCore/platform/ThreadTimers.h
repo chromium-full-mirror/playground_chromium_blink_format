@@ -37,7 +37,7 @@ class SharedTimer;
 class TimerBase;
 
 // A collection of timers per thread. Kept in ThreadGlobalData.
-class ThreadTimers : Noncopyable {
+class ThreadTimers : public Noncopyable {
  public:
   ThreadTimers();
 

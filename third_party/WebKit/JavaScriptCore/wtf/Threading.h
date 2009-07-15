@@ -167,7 +167,7 @@ typedef void* PlatformReadWriteLock;
 typedef void* PlatformCondition;
 #endif
 
-class Mutex : Noncopyable {
+class Mutex : public Noncopyable {
  public:
   Mutex();
   ~Mutex();
@@ -185,7 +185,7 @@ class Mutex : Noncopyable {
 
 typedef Locker<Mutex> MutexLocker;
 
-class ReadWriteLock : Noncopyable {
+class ReadWriteLock : public Noncopyable {
  public:
   ReadWriteLock();
   ~ReadWriteLock();
@@ -202,7 +202,7 @@ class ReadWriteLock : Noncopyable {
   PlatformReadWriteLock m_readWriteLock;
 };
 
-class ThreadCondition : Noncopyable {
+class ThreadCondition : public Noncopyable {
  public:
   ThreadCondition();
   ~ThreadCondition();
@@ -261,7 +261,7 @@ inline int atomicDecrement(int volatile* addend) {
 
 #endif
 
-class ThreadSafeSharedBase : Noncopyable {
+class ThreadSafeSharedBase : public Noncopyable {
  public:
   ThreadSafeSharedBase(int initialRefCount = 1) : m_refCount(initialRefCount) {}
 

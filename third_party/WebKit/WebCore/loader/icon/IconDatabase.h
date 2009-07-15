@@ -58,7 +58,7 @@ class SQLTransaction;
 
 enum IconLoadDecision { IconLoadYes, IconLoadNo, IconLoadUnknown };
 
-class IconDatabase : Noncopyable {
+class IconDatabase : public Noncopyable {
   // *** Main Thread Only ***
  public:
   void setClient(IconDatabaseClient*);

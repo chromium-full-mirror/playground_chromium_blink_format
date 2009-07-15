@@ -42,7 +42,7 @@ struct ParserArenaData : ParserArenaDeletable {
   T data;
 };
 
-class Parser : Noncopyable {
+class Parser : public Noncopyable {
  public:
   template <class ParsedNode>
   PassRefPtr<ParsedNode> parse(ExecState*,

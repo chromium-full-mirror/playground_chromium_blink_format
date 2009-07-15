@@ -57,7 +57,7 @@ namespace WTF {
 // jointly
 // owned by the original instance and all copies.
 template <class T>
-class CrossThreadRefCounted : Noncopyable {
+class CrossThreadRefCounted : public Noncopyable {
  public:
   static PassRefPtr<CrossThreadRefCounted<T>> create(T* data) {
     return adoptRef(new CrossThreadRefCounted<T>(data, 0));

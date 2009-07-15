@@ -269,7 +269,7 @@ struct VectorTypeOperations {
 };
 
 template <typename T>
-class VectorBufferBase : Noncopyable {
+class VectorBufferBase : public Noncopyable {
  public:
   void allocateBuffer(size_t newCapacity) {
     m_capacity = newCapacity;

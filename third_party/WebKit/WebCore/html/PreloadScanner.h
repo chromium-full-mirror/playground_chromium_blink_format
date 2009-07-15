@@ -37,7 +37,7 @@ class CachedResource;
 class CachedResourceClient;
 class Document;
 
-class PreloadScanner : Noncopyable {
+class PreloadScanner : public Noncopyable {
  public:
   PreloadScanner(Document*);
   ~PreloadScanner();

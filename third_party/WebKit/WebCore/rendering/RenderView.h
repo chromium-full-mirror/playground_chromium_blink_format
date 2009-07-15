@@ -251,7 +251,7 @@ inline const RenderView* toRenderView(const RenderObject* o) {
 void toRenderView(const RenderView*);
 
 // Stack-based class to assist with LayoutState push/pop
-class LayoutStateMaintainer : Noncopyable {
+class LayoutStateMaintainer : public Noncopyable {
  public:
   // ctor to push now
   LayoutStateMaintainer(RenderView* view,

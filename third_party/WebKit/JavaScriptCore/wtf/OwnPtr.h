@@ -37,7 +37,7 @@ template <typename T>
 class PassOwnPtr;
 
 template <typename T>
-class OwnPtr : Noncopyable {
+class OwnPtr : public Noncopyable {
  public:
   typedef typename RemovePointer<T>::Type ValueType;
   typedef ValueType* PtrType;

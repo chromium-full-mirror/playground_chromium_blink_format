@@ -75,7 +75,7 @@ class WMLPageState;
 
 enum FindDirection { FindDirectionForward, FindDirectionBackward };
 
-class Page : Noncopyable {
+class Page : public Noncopyable {
  public:
   static void setNeedsReapplyStyles();
 

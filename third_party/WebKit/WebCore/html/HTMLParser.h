@@ -51,7 +51,7 @@ struct Token;
  * and
  * builds up the Document structure from it.
  */
-class HTMLParser : Noncopyable {
+class HTMLParser : public Noncopyable {
  public:
   HTMLParser(HTMLDocument*, bool reportErrors);
   HTMLParser(DocumentFragment*);

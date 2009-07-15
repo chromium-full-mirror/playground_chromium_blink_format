@@ -56,7 +56,7 @@ enum CrossOriginRedirectPolicy {
 
 // Useful for doing loader operations from any thread (not threadsafe,
 // just able to run on threads other than the main thread).
-class ThreadableLoader : Noncopyable {
+class ThreadableLoader : public Noncopyable {
  public:
   static void loadResourceSynchronously(ScriptExecutionContext*,
                                         const ResourceRequest&,

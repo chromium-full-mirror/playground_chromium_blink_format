@@ -100,7 +100,7 @@ class MediaPlayerClient {
 #endif
 };
 
-class MediaPlayer : Noncopyable {
+class MediaPlayer : public Noncopyable {
  public:
   MediaPlayer(MediaPlayerClient*);
   virtual ~MediaPlayer();

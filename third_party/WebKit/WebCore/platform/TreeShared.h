@@ -27,7 +27,7 @@
 namespace WebCore {
 
 template <class T>
-class TreeShared : Noncopyable {
+class TreeShared : public Noncopyable {
  public:
   TreeShared() : m_refCount(0), m_parent(0) {
 #ifndef NDEBUG

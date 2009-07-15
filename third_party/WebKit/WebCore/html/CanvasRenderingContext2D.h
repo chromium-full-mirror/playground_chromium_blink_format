@@ -54,7 +54,7 @@ class TextMetrics;
 
 typedef int ExceptionCode;
 
-class CanvasRenderingContext2D : Noncopyable {
+class CanvasRenderingContext2D : public Noncopyable {
  public:
   CanvasRenderingContext2D(HTMLCanvasElement*);
 

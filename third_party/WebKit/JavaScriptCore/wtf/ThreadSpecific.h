@@ -61,7 +61,7 @@ void ThreadSpecificThreadExit();
 #endif
 
 template <typename T>
-class ThreadSpecific : Noncopyable {
+class ThreadSpecific : public Noncopyable {
  public:
   ThreadSpecific();
   T* operator->();

@@ -108,7 +108,7 @@ class Union : public Expression {
   virtual Value::Type resultType() const { return Value::NodeSetValue; }
 };
 
-class Predicate : Noncopyable {
+class Predicate : public Noncopyable {
  public:
   Predicate(Expression*);
   ~Predicate();

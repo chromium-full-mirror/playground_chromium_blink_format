@@ -58,7 +58,7 @@ struct Token {
   Token(int t, EqTestOp::Opcode v) : type(t), eqop(v) {}
 };
 
-class Parser : Noncopyable {
+class Parser : public Noncopyable {
  public:
   Parser();
 

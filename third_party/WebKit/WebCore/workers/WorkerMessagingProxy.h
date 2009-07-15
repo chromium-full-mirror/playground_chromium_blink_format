@@ -50,7 +50,7 @@ class WorkerThread;
 class WorkerMessagingProxy : public WorkerContextProxy,
                              public WorkerObjectProxy,
                              public WorkerLoaderProxy,
-                             Noncopyable {
+                             public Noncopyable {
  public:
   WorkerMessagingProxy(Worker*);
 

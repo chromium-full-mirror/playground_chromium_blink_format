@@ -88,7 +88,7 @@ void synchronizeProperty(const OwnerElement* ownerElement,
                          DecoratedType baseValue);
 
 // Abstract base class
-class SVGAnimatedPropertyBase : Noncopyable {
+class SVGAnimatedPropertyBase : public Noncopyable {
  public:
   virtual ~SVGAnimatedPropertyBase() {}
   virtual void synchronize() const = 0;

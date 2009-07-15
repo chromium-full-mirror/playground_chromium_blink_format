@@ -121,7 +121,7 @@ typedef WTF::Vector<DOMDataStore*> DOMDataList;
 // This class doesn't manage the lifetime of the store.  The data store
 // lifetime is managed by subclasses.
 //
-class DOMDataStore : Noncopyable {
+class DOMDataStore : public Noncopyable {
  public:
   enum DOMWrapperMapType {
     DOMNodeMap,
@@ -299,7 +299,7 @@ typedef WTF::Vector<DOMDataStore*> DOMDataStoreList;
 // thread.  The DOMData for the main thread and the DOMData for child threads
 // use different subclasses.
 //
-class DOMData : Noncopyable {
+class DOMData : public Noncopyable {
  public:
   DOMData()
       : m_delayedProcessingScheduled(false),
