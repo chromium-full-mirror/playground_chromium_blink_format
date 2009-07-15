@@ -261,6 +261,7 @@ KURL HitTestResult::absoluteImageURL() const {
 }
 
 KURL HitTestResult::absoluteMediaURL() const {
+#if ENABLE(VIDEO)
   if (!(m_innerNonSharedNode && m_innerNonSharedNode->document()))
     return KURL();
 
@@ -278,6 +279,9 @@ KURL HitTestResult::absoluteMediaURL() const {
     return KURL();
 
   return m_innerNonSharedNode->document()->completeURL(parseURL(urlString));
+#else
+  return KURL();
+#endif
 }
 
 KURL HitTestResult::absoluteLinkURL() const {
