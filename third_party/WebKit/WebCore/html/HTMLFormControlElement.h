@@ -30,6 +30,7 @@ namespace WebCore {
 
 class FormDataList;
 class HTMLFormElement;
+class ValidityState;
 
 class HTMLFormControlElement : public HTMLElement {
  public:
@@ -42,6 +43,7 @@ class HTMLFormControlElement : public HTMLElement {
   virtual int tagPriority() const { return 1; }
 
   HTMLFormElement* form() const { return m_form; }
+  virtual ValidityState* validity();
 
   virtual bool isTextFormControl() const { return false; }
   virtual bool isEnabledFormControl() const { return !disabled(); }
@@ -117,6 +119,7 @@ class HTMLFormControlElement : public HTMLElement {
   virtual HTMLFormElement* virtualForm() const;
 
   HTMLFormElement* m_form;
+  RefPtr<ValidityState> m_validityState;
   bool m_disabled;
   bool m_readOnly;
   bool m_valueMatchesRenderer;
