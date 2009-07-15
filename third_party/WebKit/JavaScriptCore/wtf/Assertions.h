@@ -170,9 +170,9 @@ void WTFLogVerbose(const char* file,
 #undef ERROR
 #endif
 
-#if PLATFORM(WIN_OS)
+#if PLATFORM(WIN_OS) || PLATFORM(SYMBIAN)
 /* FIXME: Change to use something other than ASSERT to avoid this conflict with
- * win32. */
+ * the underlying platform */
 #undef ASSERT
 #endif
 
