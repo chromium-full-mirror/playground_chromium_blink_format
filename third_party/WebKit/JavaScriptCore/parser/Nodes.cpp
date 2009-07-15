@@ -583,6 +583,8 @@ static RegisterID* emitPostIncOrDec(BytecodeGenerator& generator,
                                     RegisterID* dst,
                                     RegisterID* srcDst,
                                     Operator oper) {
+  if (srcDst == dst)
+    return generator.emitToJSNumber(dst, srcDst);
   return (oper == OpPlusPlus) ? generator.emitPostInc(dst, srcDst)
                               : generator.emitPostDec(dst, srcDst);
 }
