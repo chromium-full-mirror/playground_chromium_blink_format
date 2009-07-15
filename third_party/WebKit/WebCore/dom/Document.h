@@ -421,6 +421,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void setUsesFirstLetterRules(bool b) { m_usesFirstLetterRules = b; }
   bool usesBeforeAfterRules() const { return m_usesBeforeAfterRules; }
   void setUsesBeforeAfterRules(bool b) { m_usesBeforeAfterRules = b; }
+  bool usesRemUnits() const { return m_usesRemUnits; }
+  void setUsesRemUnits(bool b) { m_usesRemUnits = b; }
 
   // Machinery for saving and restoring state when you leave and then go back to
   // a page.
@@ -1062,6 +1064,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_usesFirstLineRules;
   bool m_usesFirstLetterRules;
   bool m_usesBeforeAfterRules;
+  bool m_usesRemUnits;
   bool m_gotoAnchorNeededAfterStylesheetsLoad;
   bool m_isDNSPrefetchEnabled;
   bool m_haveExplicitlyDisabledDNSPrefetch;

@@ -62,7 +62,7 @@ void WebKitCSSMatrix::setMatrixValue(const String& string, ExceptionCode& ec) {
     PassRefPtr<CSSValue> val =
         styleDeclaration->getPropertyCSSValue(CSSPropertyWebkitTransform);
     TransformOperations operations;
-    if (!CSSStyleSelector::createTransformOperations(val.get(), 0,
+    if (!CSSStyleSelector::createTransformOperations(val.get(), 0, 0,
                                                      operations)) {
       ec = SYNTAX_ERR;
       return;

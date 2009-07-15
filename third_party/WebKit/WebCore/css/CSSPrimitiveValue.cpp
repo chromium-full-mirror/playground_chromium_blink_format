@@ -302,8 +302,9 @@ void CSSPrimitiveValue::cleanup() {
   m_type = 0;
 }
 
-int CSSPrimitiveValue::computeLengthInt(RenderStyle* style) {
-  double result = computeLengthDouble(style);
+int CSSPrimitiveValue::computeLengthInt(RenderStyle* style,
+                                        RenderStyle* rootStyle) {
+  double result = computeLengthDouble(style, rootStyle);
 
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -315,8 +316,10 @@ int CSSPrimitiveValue::computeLengthInt(RenderStyle* style) {
   return static_cast<int>(result);
 }
 
-int CSSPrimitiveValue::computeLengthInt(RenderStyle* style, double multiplier) {
-  double result = computeLengthDouble(style, multiplier);
+int CSSPrimitiveValue::computeLengthInt(RenderStyle* style,
+                                        RenderStyle* rootStyle,
+                                        double multiplier) {
+  double result = computeLengthDouble(style, rootStyle, multiplier);
 
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -333,8 +336,9 @@ const int intMinForLength = (-0x7ffffff - 1);  // min value for a 28-bit int
 
 // Lengths expect an int that is only 28-bits, so we have to check for a
 // different overflow.
-int CSSPrimitiveValue::computeLengthIntForLength(RenderStyle* style) {
-  double result = computeLengthDouble(style);
+int CSSPrimitiveValue::computeLengthIntForLength(RenderStyle* style,
+                                                 RenderStyle* rootStyle) {
+  double result = computeLengthDouble(style, rootStyle);
 
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -349,8 +353,9 @@ int CSSPrimitiveValue::computeLengthIntForLength(RenderStyle* style) {
 // Lengths expect an int that is only 28-bits, so we have to check for a
 // different overflow.
 int CSSPrimitiveValue::computeLengthIntForLength(RenderStyle* style,
+                                                 RenderStyle* rootStyle,
                                                  double multiplier) {
-  double result = computeLengthDouble(style, multiplier);
+  double result = computeLengthDouble(style, rootStyle, multiplier);
 
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -362,8 +367,9 @@ int CSSPrimitiveValue::computeLengthIntForLength(RenderStyle* style,
   return static_cast<int>(result);
 }
 
-short CSSPrimitiveValue::computeLengthShort(RenderStyle* style) {
-  double result = computeLengthDouble(style);
+short CSSPrimitiveValue::computeLengthShort(RenderStyle* style,
+                                            RenderStyle* rootStyle) {
+  double result = computeLengthDouble(style, rootStyle);
 
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -376,8 +382,9 @@ short CSSPrimitiveValue::computeLengthShort(RenderStyle* style) {
 }
 
 short CSSPrimitiveValue::computeLengthShort(RenderStyle* style,
+                                            RenderStyle* rootStyle,
                                             double multiplier) {
-  double result = computeLengthDouble(style, multiplier);
+  double result = computeLengthDouble(style, rootStyle, multiplier);
 
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -390,18 +397,22 @@ short CSSPrimitiveValue::computeLengthShort(RenderStyle* style,
 }
 
 float CSSPrimitiveValue::computeLengthFloat(RenderStyle* style,
+                                            RenderStyle* rootStyle,
                                             bool computingFontSize) {
-  return static_cast<float>(computeLengthDouble(style, 1.0, computingFontSize));
+  return static_cast<float>(
+      computeLengthDouble(style, rootStyle, 1.0, computingFontSize));
 }
 
 float CSSPrimitiveValue::computeLengthFloat(RenderStyle* style,
+                                            RenderStyle* rootStyle,
                                             double multiplier,
                                             bool computingFontSize) {
   return static_cast<float>(
-      computeLengthDouble(style, multiplier, computingFontSize));
+      computeLengthDouble(style, rootStyle, multiplier, computingFontSize));
 }
 
 double CSSPrimitiveValue::computeLengthDouble(RenderStyle* style,
+                                              RenderStyle* rootStyle,
                                               double multiplier,
                                               bool computingFontSize) {
   unsigned short type = primitiveType();
@@ -431,6 +442,11 @@ double CSSPrimitiveValue::computeLengthDouble(RenderStyle* style,
       // our actual constructed rendering font.
       applyZoomMultiplier = false;
       factor = style->font().xHeight();
+      break;
+    case CSS_REMS:
+      applyZoomMultiplier = false;
+      factor = computingFontSize ? rootStyle->fontDescription().specifiedSize()
+                                 : rootStyle->fontDescription().computedSize();
       break;
     case CSS_PX:
       break;
@@ -690,6 +706,9 @@ String CSSPrimitiveValue::cssText() const {
     case CSS_EXS:
       text = String::format("%.6lgex", m_value.num);
       break;
+    case CSS_REMS:
+      text = String::format("%.6lgrem", m_value.num);
+      break;
     case CSS_PX:
       text = String::format("%.6lgpx", m_value.num);
       break;
@@ -884,6 +903,7 @@ CSSParserValue CSSPrimitiveValue::parserValue() const {
     case CSS_PERCENTAGE:
     case CSS_EMS:
     case CSS_EXS:
+    case CSS_REMS:
     case CSS_PX:
     case CSS_CM:
     case CSS_MM:

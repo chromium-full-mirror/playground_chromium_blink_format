@@ -130,7 +130,9 @@ float SVGRenderStyle::cssPrimitiveToLength(const RenderObject* item,
     }
   }
 
-  return primitive->computeLengthFloat(const_cast<RenderStyle*>(item->style()));
+  return primitive->computeLengthFloat(
+      const_cast<RenderStyle*>(item->style()),
+      item->document()->documentElement()->renderStyle());
 }
 }
 

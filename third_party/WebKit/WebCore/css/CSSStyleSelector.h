@@ -184,6 +184,7 @@ class CSSStyleSelector : public Noncopyable {
 
   static bool createTransformOperations(CSSValue* inValue,
                                         RenderStyle* inStyle,
+                                        RenderStyle* rootStyle,
                                         TransformOperations& outOperations);
 
  private:
@@ -327,6 +328,7 @@ class CSSStyleSelector : public Noncopyable {
 
   RefPtr<RenderStyle> m_style;
   RenderStyle* m_parentStyle;
+  RenderStyle* m_rootElementStyle;
   Element* m_element;
   StyledElement* m_styledElement;
   Node* m_parentNode;

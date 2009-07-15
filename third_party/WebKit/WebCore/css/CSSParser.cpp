@@ -431,6 +431,7 @@ bool CSSParser::validUnit(CSSParserValue* value, Units unitflags, bool strict) {
       break;
     case CSSParserValue::Q_EMS:
     case CSSPrimitiveValue::CSS_EMS:
+    case CSSPrimitiveValue::CSS_REMS:
     case CSSPrimitiveValue::CSS_EXS:
     case CSSPrimitiveValue::CSS_PX:
     case CSSPrimitiveValue::CSS_CM:
@@ -465,6 +466,8 @@ static int unitFromString(CSSParserValue* value) {
 
   if (equal(value->string, "em"))
     return CSSPrimitiveValue::CSS_EMS;
+  if (equal(value->string, "rem"))
+    return CSSPrimitiveValue::CSS_REMS;
   if (equal(value->string, "ex"))
     return CSSPrimitiveValue::CSS_EXS;
   if (equal(value->string, "px"))
@@ -1759,6 +1762,10 @@ bool CSSParser::parseValue(int propId, bool important) {
           value->string, (CSSPrimitiveValue::UnitTypes)value->unit);
     else if (value->unit >= CSSPrimitiveValue::CSS_NUMBER &&
              value->unit <= CSSPrimitiveValue::CSS_KHZ)
+      parsedValue = CSSPrimitiveValue::create(
+          value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit);
+    else if (value->unit >= CSSPrimitiveValue::CSS_TURN &&
+             value->unit <= CSSPrimitiveValue::CSS_REMS)
       parsedValue = CSSPrimitiveValue::create(
           value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit);
     else if (value->unit >= CSSParserValue::Q_EMS)
@@ -4618,6 +4625,7 @@ int CSSParser::lex(void* yylvalWithoutType) {
     case DEGS:
     case RADS:
     case KHERZ:
+    case REMS:
       length--;
     case MSECS:
     case HERZ:

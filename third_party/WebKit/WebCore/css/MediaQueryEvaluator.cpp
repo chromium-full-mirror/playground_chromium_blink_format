@@ -324,10 +324,13 @@ static bool device_heightMediaFeatureEval(CSSValue* value,
                                           MediaFeaturePrefix op) {
   if (value) {
     FloatRect sg = screenRect(frame->page()->mainFrame()->view());
+    RenderStyle* rootStyle =
+        frame->document()->documentElement()->renderStyle();
     return value->isPrimitiveValue() &&
            compareValue(
                static_cast<int>(sg.height()),
-               static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(style),
+               static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(
+                   style, rootStyle),
                op);
   }
   // ({,min-,max-}device-height)
@@ -341,10 +344,13 @@ static bool device_widthMediaFeatureEval(CSSValue* value,
                                          MediaFeaturePrefix op) {
   if (value) {
     FloatRect sg = screenRect(frame->page()->mainFrame()->view());
+    RenderStyle* rootStyle =
+        frame->document()->documentElement()->renderStyle();
     return value->isPrimitiveValue() &&
            compareValue(
                static_cast<int>(sg.width()),
-               static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(style),
+               static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(
+                   style, rootStyle),
                op);
   }
   // ({,min-,max-}device-width)
@@ -357,12 +363,14 @@ static bool heightMediaFeatureEval(CSSValue* value,
                                    Frame* frame,
                                    MediaFeaturePrefix op) {
   FrameView* view = frame->view();
+  RenderStyle* rootStyle = frame->document()->documentElement()->renderStyle();
 
   if (value)
     return value->isPrimitiveValue() &&
            compareValue(
                view->layoutHeight(),
-               static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(style),
+               static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(
+                   style, rootStyle),
                op);
 
   return view->layoutHeight() != 0;
@@ -373,12 +381,14 @@ static bool widthMediaFeatureEval(CSSValue* value,
                                   Frame* frame,
                                   MediaFeaturePrefix op) {
   FrameView* view = frame->view();
+  RenderStyle* rootStyle = frame->document()->documentElement()->renderStyle();
 
   if (value)
     return value->isPrimitiveValue() &&
            compareValue(
                view->layoutWidth(),
-               static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(style),
+               static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(
+                   style, rootStyle),
                op);
 
   return view->layoutWidth() != 0;
