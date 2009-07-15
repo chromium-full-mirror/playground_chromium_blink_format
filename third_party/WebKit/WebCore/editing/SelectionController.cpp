@@ -113,6 +113,8 @@ void SelectionController::setSelection(const VisibleSelection& s,
                                        bool closeTyping,
                                        bool clearTypingStyle,
                                        bool userTriggered) {
+  m_lastChangeWasHorizontalExtension = false;
+
   if (m_isDragCaretController) {
     invalidateCaretRect();
     m_sel = s;
@@ -247,29 +249,25 @@ void SelectionController::nodeWillBeRemoved(Node* node) {
 
 void SelectionController::willBeModified(EAlteration alter,
                                          EDirection direction) {
-  switch (alter) {
-    case MOVE:
-      m_lastChangeWasHorizontalExtension = false;
+  if (alter != EXTEND)
+    return;
+  if (m_lastChangeWasHorizontalExtension)
+    return;
+
+  Position start = m_sel.start();
+  Position end = m_sel.end();
+  // FIXME: This is probably not correct for right and left when the direction
+  // is RTL.
+  switch (direction) {
+    case RIGHT:
+    case FORWARD:
+      m_sel.setBase(start);
+      m_sel.setExtent(end);
       break;
-    case EXTEND:
-      if (!m_lastChangeWasHorizontalExtension) {
-        m_lastChangeWasHorizontalExtension = true;
-        Position start = m_sel.start();
-        Position end = m_sel.end();
-        switch (direction) {
-          // FIXME: right for bidi?
-          case RIGHT:
-          case FORWARD:
-            m_sel.setBase(start);
-            m_sel.setExtent(end);
-            break;
-          case LEFT:
-          case BACKWARD:
-            m_sel.setBase(end);
-            m_sel.setExtent(start);
-            break;
-        }
-      }
+    case LEFT:
+    case BACKWARD:
+      m_sel.setBase(end);
+      m_sel.setExtent(start);
       break;
   }
 }
@@ -603,9 +601,9 @@ bool SelectionController::modify(EAlteration alter,
                                  bool userTriggered) {
   if (userTriggered) {
     SelectionController trialSelectionController;
+    trialSelectionController.setSelection(m_sel);
     trialSelectionController.setLastChangeWasHorizontalExtension(
         m_lastChangeWasHorizontalExtension);
-    trialSelectionController.setSelection(m_sel);
     trialSelectionController.modify(alter, dir, granularity, false);
 
     bool change =
@@ -685,6 +683,8 @@ bool SelectionController::modify(EAlteration alter,
 
   setNeedsLayout();
 
+  m_lastChangeWasHorizontalExtension = alter == EXTEND;
+
   return true;
 }
 
@@ -706,6 +706,8 @@ bool SelectionController::modify(EAlteration alter,
   if (userTriggered) {
     SelectionController trialSelectionController;
     trialSelectionController.setSelection(m_sel);
+    trialSelectionController.setLastChangeWasHorizontalExtension(
+        m_lastChangeWasHorizontalExtension);
     trialSelectionController.modify(alter, verticalDistance, false);
 
     bool change =
