@@ -286,6 +286,11 @@ static void paintTextWithShadows(GraphicsContext* context,
                                  int h,
                                  ShadowData* shadow,
                                  bool stroked) {
+  Color fillColor = context->fillColor();
+  bool opaque = fillColor.alpha() == 255;
+  if (!opaque)
+    context->setFillColor(Color::black);
+
   do {
     IntSize extraOffset;
 
@@ -294,7 +299,7 @@ static void paintTextWithShadows(GraphicsContext* context,
       int shadowBlur = shadow->blur;
       const Color& shadowColor = shadow->color;
 
-      if (shadow->next || stroked) {
+      if (shadow->next || stroked || !opaque) {
         IntRect shadowRect(x, y, w, h);
         shadowRect.inflate(shadowBlur);
         shadowRect.move(shadowOffset);
@@ -306,7 +311,8 @@ static void paintTextWithShadows(GraphicsContext* context,
         shadowOffset -= extraOffset;
       }
       context->setShadow(shadowOffset, shadowBlur, shadowColor);
-    }
+    } else if (!opaque)
+      context->setFillColor(fillColor);
 
     if (startOffset <= endOffset)
       context->drawText(font, textRun, textOrigin + extraOffset, startOffset,
@@ -322,13 +328,13 @@ static void paintTextWithShadows(GraphicsContext* context,
     if (!shadow)
       break;
 
-    if (shadow->next || stroked)
+    if (shadow->next || stroked || !opaque)
       context->restore();
     else
       context->clearShadow();
 
     shadow = shadow->next;
-  } while (shadow || stroked);
+  } while (shadow || stroked || !opaque);
 }
 
 void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
