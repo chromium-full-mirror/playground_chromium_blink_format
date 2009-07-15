@@ -266,7 +266,7 @@ class V8DOMWrapper {
                                                    V8ClassIndex::V8WrapperType,
                                                    void*);
 
-  static v8::Handle<v8::Context> V8DOMWrapper::getWrapperContext(Frame*);
+  static v8::Handle<v8::Context> getWrapperContext(Frame*);
 };
 }
 
