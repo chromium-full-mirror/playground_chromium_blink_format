@@ -824,8 +824,6 @@ v8::Local<v8::Object> V8DOMWrapper::instantiateV8Object(
       static_cast<HTMLCollection*>(impl)->type() == DocAll)
     descriptorType = V8ClassIndex::HTMLALLCOLLECTION;
 
-  if (!proxy)
-    V8Proxy* proxy = V8Proxy::retrieve();
   if (V8IsolatedWorld::getEntered()) {
     // This effectively disables the wrapper cache for isolated worlds.
     proxy = 0;
