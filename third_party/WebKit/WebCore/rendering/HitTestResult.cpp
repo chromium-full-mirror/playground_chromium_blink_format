@@ -130,7 +130,8 @@ bool HitTestResult::isSelected() const {
   return frame->selection()->contains(m_point);
 }
 
-String HitTestResult::spellingToolTip() const {
+String HitTestResult::spellingToolTip(TextDirection& dir) const {
+  dir = LTR;
   // Return the tool tip string associated with this point, if any. Only markers
   // associated with bad grammar
   // currently supply strings, but maybe someday markers associated with
@@ -144,6 +145,8 @@ String HitTestResult::spellingToolTip() const {
   if (!marker)
     return String();
 
+  if (RenderObject* renderer = m_innerNonSharedNode->renderer())
+    dir = renderer->style()->direction();
   return marker->description;
 }
 
@@ -164,7 +167,8 @@ String HitTestResult::replacedString() const {
   return marker->description;
 }
 
-String HitTestResult::title() const {
+String HitTestResult::title(TextDirection& dir) const {
+  dir = LTR;
   // Find the title in the nearest enclosing DOM node.
   // For <area> tags in image maps, walk the tree for the <area>, not the <img>
   // using it.
@@ -172,8 +176,11 @@ String HitTestResult::title() const {
        titleNode = titleNode->parentNode()) {
     if (titleNode->isElementNode()) {
       String title = static_cast<Element*>(titleNode)->title();
-      if (!title.isEmpty())
+      if (!title.isEmpty()) {
+        if (RenderObject* renderer = titleNode->renderer())
+          dir = renderer->style()->direction();
         return title;
+      }
     }
   }
   return String();

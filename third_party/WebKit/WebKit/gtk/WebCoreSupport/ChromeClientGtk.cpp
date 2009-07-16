@@ -418,7 +418,7 @@ void ChromeClient::mouseDidMoveOverElement(const HitTestResult& hit,
   }
 }
 
-void ChromeClient::setToolTip(const String& toolTip) {
+void ChromeClient::setToolTip(const String& toolTip, TextDirection) {
 #if GTK_CHECK_VERSION(2, 12, 0)
   if (toolTip.isEmpty())
     g_object_set(m_webView, "has-tooltip", FALSE, NULL);

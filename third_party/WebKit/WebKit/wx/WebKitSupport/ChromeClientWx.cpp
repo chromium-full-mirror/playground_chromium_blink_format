@@ -328,7 +328,7 @@ void ChromeClientWx::mouseDidMoveOverElement(const HitTestResult&,
   notImplemented();
 }
 
-void ChromeClientWx::setToolTip(const String& tip) {
+void ChromeClientWx::setToolTip(const String& tip, TextDirection) {
   wxToolTip* tooltip = m_webView->GetToolTip();
   if (!tooltip || tooltip->GetTip() != wxString(tip))
     m_webView->SetToolTip(tip);

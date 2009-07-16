@@ -124,7 +124,7 @@ class ChromeClientQt : public ChromeClient {
   virtual void mouseDidMoveOverElement(const HitTestResult&,
                                        unsigned modifierFlags);
 
-  virtual void setToolTip(const String&);
+  virtual void setToolTip(const String&, TextDirection);
 
   virtual void print(Frame*);
 #if ENABLE(DATABASE)
