@@ -1031,6 +1031,13 @@ void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
   repatchBuffer.repatch(callLinkInfo->hotPathBegin, JSValue::encode(JSValue()));
 }
 
+void JIT::unlinkMethodCall(MethodCallLinkInfo* methodCallLinkInfo) {
+  // see the comment above.
+  RepatchBuffer repatchBuffer;
+  repatchBuffer.repatch(methodCallLinkInfo->structureLabel,
+                        reinterpret_cast<void*>(patchGetByIdDefaultStructure));
+}
+
 void JIT::linkCall(JSFunction* callee,
                    CodeBlock* calleeCodeBlock,
                    JITCode& code,
