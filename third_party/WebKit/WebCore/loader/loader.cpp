@@ -284,7 +284,7 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
     // to the networking layer.
     bool parsedAndStylesheetsKnown = !docLoader->doc()->parsing() &&
                                      docLoader->doc()->haveStylesheetsLoaded();
-    if (!parsedAndStylesheetsKnown && !resourceIsCacheValidator &&
+    if (!parsedAndStylesheetsKnown &&
         m_requestsLoading.size() + m_nonCachedRequestsInFlight >=
             m_maxRequestsInFlight) {
       serveLowerPriority = false;
