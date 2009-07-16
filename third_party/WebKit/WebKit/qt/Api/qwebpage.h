@@ -152,6 +152,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
     InsertLineSeparator,
 
     SelectAll,
+    ReloadAndBypassCache,
 
     PasteAndMatchStyle,
     RemoveFormat,
