@@ -106,8 +106,8 @@ static const char* const inspectorAttachedHeightName =
 static const char* const lastActivePanelSettingName = "lastActivePanel";
 
 static const unsigned defaultAttachedHeight = 300;
-static const float minimumAttachedHeight = 250.0;
-static const float maximumAttachedHeightRatio = 0.75;
+static const float minimumAttachedHeight = 250.0f;
+static const float maximumAttachedHeightRatio = 0.75f;
 
 bool InspectorController::addSourceToFrame(const String& mimeType,
                                            const String& source,
@@ -480,9 +480,10 @@ void InspectorController::endGroup(MessageSource source,
 
 static unsigned constrainedAttachedWindowHeight(unsigned preferredHeight,
                                                 unsigned totalWindowHeight) {
-  return round(max(minimumAttachedHeight,
-                   min(static_cast<float>(preferredHeight),
-                       totalWindowHeight * maximumAttachedHeightRatio)));
+  return roundf(
+      max(minimumAttachedHeight,
+          min<float>(preferredHeight,
+                     totalWindowHeight * maximumAttachedHeightRatio)));
 }
 
 void InspectorController::attachWindow() {
