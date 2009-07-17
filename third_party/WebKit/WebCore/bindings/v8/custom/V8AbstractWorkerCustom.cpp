@@ -30,7 +30,7 @@
 
 #include "config.h"
 
-#if ENABLE(SHARED_WORKERS)
+#if ENABLE(WORKERS)
 
 #include "AbstractWorker.h"
 
@@ -66,7 +66,7 @@ PassRefPtr<EventListener> getEventListener(AbstractWorker* worker,
 
 ACCESSOR_GETTER(AbstractWorkerOnerror) {
   INC_STATS(L"DOM.AbstractWorker.onerror._get");
-  AbstractWorker* worker = V8Proxy::convertToNativeObject<AbstractWorker>(
+  AbstractWorker* worker = V8DOMWrapper::convertToNativeObject<AbstractWorker>(
       V8ClassIndex::ABSTRACTWORKER, info.Holder());
   if (worker->onerror()) {
     V8ObjectEventListener* listener =
@@ -79,7 +79,7 @@ ACCESSOR_GETTER(AbstractWorkerOnerror) {
 
 ACCESSOR_SETTER(AbstractWorkerOnerror) {
   INC_STATS(L"DOM.AbstractWorker.onerror._set");
-  AbstractWorker* worker = V8Proxy::convertToNativeObject<AbstractWorker>(
+  AbstractWorker* worker = V8DOMWrapper::convertToNativeObject<AbstractWorker>(
       V8ClassIndex::ABSTRACTWORKER, info.Holder());
   V8ObjectEventListener* oldListener =
       static_cast<V8ObjectEventListener*>(worker->onerror());
@@ -110,7 +110,7 @@ ACCESSOR_SETTER(AbstractWorkerOnerror) {
 
 CALLBACK_FUNC_DECL(AbstractWorkerAddEventListener) {
   INC_STATS(L"DOM.AbstractWorker.addEventListener()");
-  AbstractWorker* worker = V8Proxy::convertToNativeObject<AbstractWorker>(
+  AbstractWorker* worker = V8DOMWrapper::convertToNativeObject<AbstractWorker>(
       V8ClassIndex::ABSTRACTWORKER, args.Holder());
 
   RefPtr<EventListener> listener = getEventListener(worker, args[1], false);
@@ -127,7 +127,7 @@ CALLBACK_FUNC_DECL(AbstractWorkerAddEventListener) {
 
 CALLBACK_FUNC_DECL(AbstractWorkerRemoveEventListener) {
   INC_STATS(L"DOM.AbstractWorker.removeEventListener()");
-  AbstractWorker* worker = V8Proxy::convertToNativeObject<AbstractWorker>(
+  AbstractWorker* worker = V8DOMWrapper::convertToNativeObject<AbstractWorker>(
       V8ClassIndex::ABSTRACTWORKER, args.Holder());
 
   RefPtr<EventListener> listener = getEventListener(worker, args[1], true);
@@ -145,4 +145,4 @@ CALLBACK_FUNC_DECL(AbstractWorkerRemoveEventListener) {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SHARED_WORKERS)
+#endif  // ENABLE(WORKERS)

@@ -30,7 +30,7 @@
 
 #include "config.h"
 
-#if ENABLE(SHARED_WORKERS)
+#if ENABLE(WORKERS)
 
 #include "AbstractWorker.h"
 
@@ -122,4 +122,4 @@ void AbstractWorker::dispatchScriptErrorEvent(const String&,
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SHARED_WORKERS)
+#endif  // ENABLE(WORKERS)

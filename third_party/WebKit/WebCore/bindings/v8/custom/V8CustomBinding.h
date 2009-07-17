@@ -148,9 +148,7 @@ class V8Custom {
       kDefaultWrapperInternalFieldCount + 0;
   static const int kWorkerContextInternalFieldCount =
       kDefaultWrapperInternalFieldCount + 1;
-#endif
 
-#if ENABLE(SHARED_WORKERS)
   static const int kAbstractWorkerRequestCacheIndex =
       kDefaultWrapperInternalFieldCount + 0;
   static const int kAbstractWorkerInternalFieldCount =
@@ -530,11 +528,12 @@ class V8Custom {
 #endif
 
 #if ENABLE(WORKERS)
+  DECLARE_PROPERTY_ACCESSOR(AbstractWorkerOnerror);
+  DECLARE_CALLBACK(AbstractWorkerAddEventListener);
+  DECLARE_CALLBACK(AbstractWorkerRemoveEventListener);
+
   DECLARE_PROPERTY_ACCESSOR(WorkerOnmessage);
-  DECLARE_PROPERTY_ACCESSOR(WorkerOnerror);
   DECLARE_CALLBACK(WorkerConstructor);
-  DECLARE_CALLBACK(WorkerAddEventListener);
-  DECLARE_CALLBACK(WorkerRemoveEventListener);
 
   DECLARE_PROPERTY_ACCESSOR_GETTER(WorkerContextSelf);
   DECLARE_PROPERTY_ACCESSOR(WorkerContextOnmessage);
@@ -548,9 +547,6 @@ class V8Custom {
 #endif
 
 #if ENABLE(SHARED_WORKERS)
-  DECLARE_PROPERTY_ACCESSOR(AbstractWorkerOnerror);
-  DECLARE_CALLBACK(AbstractWorkerAddEventListener);
-  DECLARE_CALLBACK(AbstractWorkerRemoveEventListener);
   DECLARE_CALLBACK(SharedWorkerConstructor);
 #endif
 

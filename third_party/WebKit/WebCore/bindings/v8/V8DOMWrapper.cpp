@@ -476,6 +476,15 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
     }
 
 #if ENABLE(WORKERS)
+    case V8ClassIndex::ABSTRACTWORKER: {
+      // Reserve one more internal field for keeping event listeners.
+      v8::Local<v8::ObjectTemplate> instanceTemplate =
+          descriptor->InstanceTemplate();
+      instanceTemplate->SetInternalFieldCount(
+          V8Custom::kAbstractWorkerInternalFieldCount);
+      break;
+    }
+
     case V8ClassIndex::WORKER: {
       // Reserve one more internal field for keeping event listeners.
       v8::Local<v8::ObjectTemplate> instanceTemplate =

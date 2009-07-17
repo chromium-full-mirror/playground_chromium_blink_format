@@ -31,7 +31,7 @@
 #ifndef AbstractWorker_h
 #define AbstractWorker_h
 
-#if ENABLE(SHARED_WORKERS)
+#if ENABLE(WORKERS)
 
 #include "ActiveDOMObject.h"
 #include "AtomicStringHash.h"
@@ -93,6 +93,6 @@ class AbstractWorker : public RefCounted<AbstractWorker>,
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SHARED_WORKERS)
+#endif  // ENABLE(WORKERS)
 
 #endif  // AbstractWorker_h
