@@ -1336,7 +1336,8 @@ QWebHitTestResultPrivate::QWebHitTestResultPrivate(
     return;
   pos = hitTest.point();
   boundingRect = hitTest.boundingBox();
-  title = hitTest.title();
+  WebCore::TextDirection dir;
+  title = hitTest.title(dir);
   linkText = hitTest.textContent();
   linkUrl = hitTest.absoluteLinkURL();
   linkTitle = hitTest.titleDisplayString();
