@@ -475,6 +475,8 @@ class ARMv7Assembler {
    public:
     JmpSrc() : m_offset(-1) {}
 
+    void enableLatePatch() {}
+
    private:
     JmpSrc(int offset) : m_offset(offset) {}
 
