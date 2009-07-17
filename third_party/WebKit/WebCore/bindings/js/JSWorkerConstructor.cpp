@@ -41,11 +41,12 @@ namespace WebCore {
 
 const ClassInfo JSWorkerConstructor::s_info = {"WorkerConstructor", 0, 0, 0};
 
-JSWorkerConstructor::JSWorkerConstructor(ExecState* exec)
+JSWorkerConstructor::JSWorkerConstructor(ExecState* exec,
+                                         JSDOMGlobalObject* globalObject)
     : DOMConstructorObject(JSWorkerConstructor::createStructure(
-          exec->lexicalGlobalObject()->objectPrototype())) {
+          globalObject->objectPrototype())) {
   putDirect(exec->propertyNames().prototype,
-            JSWorkerPrototype::self(exec, exec->lexicalGlobalObject()), None);
+            JSWorkerPrototype::self(exec, globalObject), None);
   putDirect(exec->propertyNames().length, jsNumber(exec, 1),
             ReadOnly | DontDelete | DontEnum);
 }

@@ -103,6 +103,16 @@ void cacheDOMConstructor(JSC::ExecState*,
                          const JSC::ClassInfo*,
                          JSC::JSObject* constructor);
 
+inline JSDOMGlobalObject* deprecatedGlobalObjectForPrototype(
+    JSC::ExecState* exec) {
+  // FIXME: Callers to this function should be using the global object
+  // from which the object is being created, instead of assuming the lexical
+  // one.
+  // e.g. subframe.document.body should use the subframe's global object, not
+  // the lexical one.
+  return static_cast<JSDOMGlobalObject*>(exec->lexicalGlobalObject());
+}
+
 template <class WrapperClass>
 inline JSC::Structure* getDOMStructure(JSC::ExecState* exec,
                                        JSDOMGlobalObject* globalObject) {
@@ -119,7 +129,7 @@ inline JSC::Structure* deprecatedGetDOMStructure(JSC::ExecState* exec) {
   // FIXME: This function is wrong.  It uses the wrong global object for
   // creating the prototype structure.
   return getDOMStructure<WrapperClass>(
-      exec, static_cast<JSDOMGlobalObject*>(exec->lexicalGlobalObject()));
+      exec, deprecatedGlobalObjectForPrototype(exec));
 }
 template <class WrapperClass>
 inline JSC::JSObject* getDOMPrototype(JSC::ExecState* exec,
