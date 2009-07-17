@@ -166,7 +166,8 @@ TextBreakIterator* cursorMovementIterator(const UChar* string, int length) {
       "$Control = [\\p{Grapheme_Cluster_Break = Control}];"
       "$VoiceMarks = [\\uFF9E\\uFF9F];"  // Japanese half-width katakana voiced
                                          // marks
-      "$Extend  = [\\p{Grapheme_Cluster_Break = Extend} $VoiceMarks];"
+      "$Extend  = [\\p{Grapheme_Cluster_Break = Extend} $VoiceMarks - [\\u0E30 "
+      "\\u0E32 \\u0E45 \\u0EB0 \\u0EB2]];"
       "$SpacingMark = [[\\p{General_Category = Spacing Mark}] - $Extend];"
       "$L       = [\\p{Grapheme_Cluster_Break = L}];"
       "$V       = [\\p{Grapheme_Cluster_Break = V}];"
