@@ -356,6 +356,9 @@ NPError PluginView::handlePostReadFile(Vector<char>& buffer,
 }
 
 NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
+  LOG(Plugins, "PluginView::getValueStatic(%s)",
+      prettyNameForNPNVariable(variable).data());
+
   switch (variable) {
     case NPNVToolkit:
 #if PLATFORM(GTK)
@@ -383,6 +386,9 @@ NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
 }
 
 NPError PluginView::getValue(NPNVariable variable, void* value) {
+  LOG(Plugins, "PluginView::getValue(%s)",
+      prettyNameForNPNVariable(variable).data());
+
   switch (variable) {
     case NPNVxDisplay:
 #if PLATFORM(X11)
