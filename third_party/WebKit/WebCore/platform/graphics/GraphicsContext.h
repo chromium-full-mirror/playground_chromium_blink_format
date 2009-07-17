@@ -420,8 +420,12 @@ class GraphicsContext : public Noncopyable {
   void setPlatformStrokeColor(const Color&);
   void setPlatformStrokeStyle(const StrokeStyle&);
   void setPlatformStrokeThickness(float);
+  void setPlatformStrokeGradient(Gradient*);
+  void setPlatformStrokePattern(Pattern*);
 
   void setPlatformFillColor(const Color&);
+  void setPlatformFillGradient(Gradient*);
+  void setPlatformFillPattern(Pattern*);
 
   void setPlatformShouldAntialias(bool b);
 
