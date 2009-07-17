@@ -465,7 +465,6 @@ class JIT : private MacroAssembler {
                        int callerArgCount,
                        JSGlobalData*);
   static void unlinkCall(CallLinkInfo*);
-  static void unlinkMethodCall(MethodCallLinkInfo*);
 
  private:
   struct JSRInfo {
