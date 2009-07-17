@@ -514,9 +514,9 @@ void ApplicationCacheGroup::didReceiveResponse(
       m_cacheBeingUpdated->addResource(ApplicationCacheResource::create(
           url, newestCachedResource->response(), type,
           newestCachedResource->data()));
+      m_pendingEntries.remove(m_currentHandle->request().url());
       m_currentHandle->cancel();
       m_currentHandle = 0;
-      m_pendingEntries.remove(handle->request().url());
       // Load the next resource, if any.
       startLoadingEntry();
       return;
@@ -551,9 +551,9 @@ void ApplicationCacheGroup::didReceiveResponse(
       m_cacheBeingUpdated->addResource(ApplicationCacheResource::create(
           url, newestCachedResource->response(), type,
           newestCachedResource->data()));
+      m_pendingEntries.remove(m_currentHandle->request().url());
       m_currentHandle->cancel();
       m_currentHandle = 0;
-      m_pendingEntries.remove(handle->request().url());
       // Load the next resource, if any.
       startLoadingEntry();
     }
