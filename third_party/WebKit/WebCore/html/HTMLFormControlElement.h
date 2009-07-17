@@ -80,6 +80,11 @@ class HTMLFormControlElement : public HTMLElement {
   virtual bool autofocus() const;
   void setAutofocus(bool);
 
+  bool required() const;
+  void setRequired(bool);
+
+  virtual bool valueMissing() const { return false; }
+
   virtual void recalcStyle(StyleChange);
 
   virtual const AtomicString& formControlName() const;

@@ -90,6 +90,8 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
 
   virtual bool isTextFormControl() const { return isTextField(); }
 
+  virtual bool valueMissing() const;
+
   bool isTextButton() const {
     return m_type == SUBMIT || m_type == RESET || m_type == BUTTON;
   }
@@ -244,6 +246,11 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   bool needsActivationCallback();
   void registerForActivationCallbackIfNeeded();
   void unregisterForActivationCallbackIfNeeded();
+
+  virtual bool isOptionalFormControl() const {
+    return !isRequiredFormControl();
+  }
+  virtual bool isRequiredFormControl() const;
 
   InputElementData m_data;
   int m_xPos;

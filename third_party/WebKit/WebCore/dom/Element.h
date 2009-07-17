@@ -239,6 +239,8 @@ class Element : public ContainerNode {
   virtual bool isEnabledFormControl() const { return true; }
   virtual bool isReadOnlyFormControl() const { return false; }
   virtual bool isTextFormControl() const { return false; }
+  virtual bool isOptionalFormControl() const { return false; }
+  virtual bool isRequiredFormControl() const { return false; }
 
   virtual bool formControlValueMatchesRenderer() const { return false; }
   virtual void setFormControlValueMatchesRenderer(bool) {}

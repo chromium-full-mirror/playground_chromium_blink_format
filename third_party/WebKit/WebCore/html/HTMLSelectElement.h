@@ -138,6 +138,8 @@ class HTMLSelectElement : public HTMLFormControlElementWithState,
 
   virtual void insertedIntoTree(bool);
 
+  virtual bool isOptionalFormControl() const { return true; }
+
   SelectElementData m_data;
   CollectionCache m_collectionInfo;
 };

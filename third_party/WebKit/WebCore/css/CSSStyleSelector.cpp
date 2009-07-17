@@ -2621,6 +2621,10 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
           return false;
         return e->isTextFormControl() && !e->isReadOnlyFormControl();
       }
+      case CSSSelector::PseudoOptional:
+        return e && e->isOptionalFormControl();
+      case CSSSelector::PseudoRequired:
+        return e && e->isRequiredFormControl();
       case CSSSelector::PseudoChecked: {
         if (!e || !e->isFormControlElement())
           break;
