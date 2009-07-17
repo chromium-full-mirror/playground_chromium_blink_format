@@ -986,9 +986,8 @@ void QWebPagePrivate::shortcutOverrideEvent(QKeyEvent* event) {
       }
     }
 #ifndef QT_NO_SHORTCUT
-    else if (editorActionForKeyEvent(event) != QWebPage::NoWebAction) {
+    else if (editorActionForKeyEvent(event) != QWebPage::NoWebAction)
       event->accept();
-    }
 #endif
   }
 }
@@ -1059,9 +1058,8 @@ QVariant QWebPage::inputMethodQuery(Qt::InputMethodQuery property) const {
   switch (property) {
     case Qt::ImMicroFocus: {
       Frame* frame = d->page->focusController()->focusedFrame();
-      if (frame) {
+      if (frame)
         return QVariant(frame->selection()->absoluteCaretBounds());
-      }
       return QVariant();
     }
     case Qt::ImFont: {
@@ -1074,9 +1072,8 @@ QVariant QWebPage::inputMethodQuery(Qt::InputMethodQuery property) const {
       Frame* frame = d->page->focusController()->focusedFrame();
       if (frame) {
         VisibleSelection selection = frame->selection()->selection();
-        if (selection.isCaret()) {
+        if (selection.isCaret())
           return QVariant(selection.start().deprecatedEditingOffset());
-        }
       }
       return QVariant();
     }
@@ -1084,9 +1081,8 @@ QVariant QWebPage::inputMethodQuery(Qt::InputMethodQuery property) const {
       Frame* frame = d->page->focusController()->focusedFrame();
       if (frame) {
         Document* document = frame->document();
-        if (document->focusedNode()) {
+        if (document->focusedNode())
           return QVariant(document->focusedNode()->nodeValue());
-        }
       }
       return QVariant();
     }
@@ -1479,9 +1475,8 @@ bool QWebPage::javaScriptPrompt(QWebFrame* frame,
   QString x = QInputDialog::getText(
       d->view, tr("JavaScript Prompt - %1").arg(mainFrame()->url().host()), msg,
       QLineEdit::Normal, defaultValue, &ok);
-  if (ok && result) {
+  if (ok && result)
     *result = x;
-  }
 #endif
   return ok;
 }
@@ -2378,9 +2373,8 @@ void QWebPage::updatePositionDependentActions(const QPoint& pos) {
                                                       // of the menu)
   for (int i = 0; i < QWebPage::WebActionCount; ++i) {
     if (originallyEnabledWebActions.at(i)) {
-      if (QAction* a = this->action(QWebPage::WebAction(i))) {
+      if (QAction* a = this->action(QWebPage::WebAction(i)))
         a->setEnabled(true);
-      }
     }
   }
 

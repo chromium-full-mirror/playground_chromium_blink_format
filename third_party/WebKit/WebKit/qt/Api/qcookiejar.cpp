@@ -77,8 +77,8 @@ void QCookieJar::setCookieJar(QCookieJar* jar) {
 }
 
 QCookieJar* QCookieJar::cookieJar() {
-  if (!gJar) {
+  if (!gJar)
     setCookieJar(new QCookieJar);
-  }
+
   return gJar;
 }

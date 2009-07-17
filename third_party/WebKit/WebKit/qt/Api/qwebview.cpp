@@ -973,9 +973,8 @@ void QWebView::inputMethodEvent(QInputMethodEvent* e) {
 /*!\reimp
 */
 void QWebView::changeEvent(QEvent* e) {
-  if (d->page && e->type() == QEvent::PaletteChange) {
+  if (d->page && e->type() == QEvent::PaletteChange)
     d->page->setPalette(palette());
-  }
   QWidget::changeEvent(e);
 }
 

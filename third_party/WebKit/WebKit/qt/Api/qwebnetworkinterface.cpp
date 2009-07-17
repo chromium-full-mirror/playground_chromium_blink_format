@@ -81,11 +81,10 @@ static QByteArray decodePercentEncoding(const QByteArray& input) {
 
   for (int i = 0; i < input.length(); ++i)
     if (state == State_Begin) {
-      if (input.at(i) == '%') {
+      if (input.at(i) == '%')
         state = State_FirstChar;
-      } else {
+      else
         output[actualLength++] = input[i];
-      }
     } else if (state == State_FirstChar) {
       state = State_SecondChar;
       tmpVal[0] = input[i];
@@ -390,11 +389,10 @@ QWebNetworkInterface* QWebNetworkJob::networkInterface() const {
    Returns the network interface that is associated with this job.
 */
 QWebFrame* QWebNetworkJob::frame() const {
-  if (d->resourceHandle) {
+  if (!d->resourceHandle) {
     ResourceHandleInternal* rhi = d->resourceHandle->getInternal();
-    if (rhi) {
+    if (rhi)
       return rhi->m_frame;
-    }
   }
   return 0;
 }
@@ -478,22 +476,23 @@ void QWebNetworkManager::started(QWebNetworkJob* job) {
 
   job->setStatus(QWebNetworkJob::JobStarted);
   ResourceHandleClient* client = 0;
-  if (job->d->resourceHandle) {
-    client = job->d->resourceHandle->client();
-    if (!client)
-      return;
-  } else {
+
+  if (!job->d->resourceHandle)
     return;
-  }
+
+  client = job->d->resourceHandle->client();
+  if (!client)
+    return;
 
   DEBUG() << "ResourceHandleManager::receivedResponse:";
   DEBUG() << job->d->response.toString();
 
   QStringList cookies = job->d->response.allValues("Set-Cookie");
   KURL url(job->url());
-  foreach (QString c, cookies) {
+
+  foreach (QString c, cookies)
     QCookieJar::cookieJar()->setCookies(url, url, c);
-  }
+
   QString contentType = job->d->response.value("Content-Type");
   QString encoding;
   int idx = contentType.indexOf(QLatin1Char(';'));
@@ -574,21 +573,20 @@ void QWebNetworkManager::data(QWebNetworkJob* job, const QByteArray& data) {
 
   job->setStatus(QWebNetworkJob::JobReceivingData);
   ResourceHandleClient* client = 0;
-  if (job->d->resourceHandle) {
-    client = job->d->resourceHandle->client();
-    if (!client)
-      return;
-  } else {
+
+  if (!job->d->resourceHandle)
     return;
-  }
+
+  client = job->d->resourceHandle->client();
+  if (!client)
+    return;
 
   if (job->d->redirected)
     return;  // don't emit the "Document has moved here" type of HTML
 
   DEBUG() << "receivedData" << job->d->request.url.path();
-  if (client)
-    client->didReceiveData(job->d->resourceHandle, data.constData(),
-                           data.length(), data.length() /*FixMe*/);
+  client->didReceiveData(job->d->resourceHandle, data.constData(),
+                         data.length(), data.length() /*FixMe*/);
 }
 
 void QWebNetworkManager::finished(QWebNetworkJob* job, int errorCode) {
@@ -713,11 +711,10 @@ void QWebNetworkInterfacePrivate::parseDataUrl(QWebNetworkJob* job) {
     data = QByteArray();
   }
 
-  if (base64) {
+  if (base64)
     data = QByteArray::fromBase64(data);
-  } else {
+  else
     data = decodePercentEncoding(data);
-  }
 
   if (header.isEmpty())
     header = "text/plain;charset=US-ASCII";
@@ -812,7 +809,7 @@ void QWebNetworkManager::doWork() {
   }
 
   m_queueMutex.lock();
-  if (hasSyncJobs && m_synchronousJobs.size() == 0)
+  if (hasSyncJobs && !m_synchronousJobs.size())
     doScheduleWork();
   m_queueMutex.unlock();
 }
@@ -865,9 +862,9 @@ void QWebNetworkInterface::setDefaultInterface(
   QWebNetworkInterface to do the work.
 */
 QWebNetworkInterface* QWebNetworkInterface::defaultInterface() {
-  if (!s_default_interface) {
+  if (!s_default_interface)
     setDefaultInterface(new QWebNetworkInterface);
-  }
+
   return s_default_interface;
 }
 
@@ -1153,9 +1150,8 @@ void WebCoreHttp::onReadyRead() {
 
 void WebCoreHttp::onRequestFinished(int id, bool error) {
   int c = getConnection();
-  if (connection[c].id != id) {
+  if (connection[c].id != id)
     return;
-  }
 
   QWebNetworkJob* job = connection[c].current;
   if (!job) {

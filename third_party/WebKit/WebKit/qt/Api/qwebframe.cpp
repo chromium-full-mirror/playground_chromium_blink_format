@@ -829,9 +829,8 @@ int QWebFrame::scrollBarValue(Qt::Orientation orientation) const {
   Scrollbar* sb;
   sb = (orientation == Qt::Horizontal) ? d->horizontalScrollBar()
                                        : d->verticalScrollBar();
-  if (sb) {
+  if (sb)
     return sb->value();
-  }
   return 0;
 }
 
@@ -1128,7 +1127,7 @@ void QWebFrame::print(QPrinter* printer) const {
 
   int docCopies;
   int pageCopies;
-  if (printer->collateCopies() == true) {
+  if (printer->collateCopies()) {
     docCopies = 1;
     pageCopies = printer->numCopies();
   } else {

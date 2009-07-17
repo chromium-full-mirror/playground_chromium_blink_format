@@ -563,13 +563,13 @@ void QWebSettings::clearIconDatabase() {
 QIcon QWebSettings::iconForUrl(const QUrl& url) {
   WebCore::Image* image = WebCore::iconDatabase()->iconForPageURL(
       WebCore::KURL(url).string(), WebCore::IntSize(16, 16));
-  if (!image) {
+  if (!image)
     return QPixmap();
-  }
+
   QPixmap* icon = image->nativeImageForCurrentFrame();
-  if (!icon) {
+  if (!icon)
     return QPixmap();
-  }
+
   return *icon;
 }
 
@@ -669,8 +669,7 @@ int QWebSettings::maximumPagesInCache() {
 void QWebSettings::setObjectCacheCapacities(int cacheMinDeadCapacity,
                                             int cacheMaxDead,
                                             int totalCapacity) {
-  bool disableCache =
-      cacheMinDeadCapacity == 0 && cacheMaxDead == 0 && totalCapacity == 0;
+  bool disableCache = !cacheMinDeadCapacity && !cacheMaxDead && !totalCapacity;
   WebCore::cache()->setDisabled(disableCache);
 
   WebCore::cache()->setCapacities(qMax(0, cacheMinDeadCapacity),
