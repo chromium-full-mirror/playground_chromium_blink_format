@@ -34,13 +34,16 @@
 
 namespace WebCore {
 
-PluginDatabase* PluginDatabase::installedPlugins() {
+PluginDatabase* PluginDatabase::installedPlugins(bool populate) {
   static PluginDatabase* plugins = 0;
 
   if (!plugins) {
     plugins = new PluginDatabase;
-    plugins->setPluginDirectories(PluginDatabase::defaultPluginDirectories());
-    plugins->refresh();
+
+    if (populate) {
+      plugins->setPluginDirectories(PluginDatabase::defaultPluginDirectories());
+      plugins->refresh();
+    }
   }
 
   return plugins;
@@ -267,6 +270,13 @@ bool PluginDatabase::add(PassRefPtr<PluginPackage> prpPackage) {
 void PluginDatabase::remove(PluginPackage* package) {
   m_plugins.remove(package);
   m_pluginsByPath.remove(package->path());
+}
+
+void PluginDatabase::clear() {
+  m_plugins.clear();
+  m_pluginsByPath.clear();
+
+  m_registeredMIMETypes.clear();
 }
 
 #if !PLATFORM(WIN_OS) || PLATFORM(WX)
