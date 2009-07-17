@@ -119,8 +119,6 @@ void Image::drawTiled(GraphicsContext* ctxt,
 
   FloatSize scale(scaledTileSize.width() / intrinsicTileSize.width(),
                   scaledTileSize.height() / intrinsicTileSize.height());
-  TransformationMatrix patternTransform =
-      TransformationMatrix().scaleNonUniform(scale.width(), scale.height());
 
   FloatRect oneTileRect;
   oneTileRect.setX(destRect.x() +
@@ -145,6 +143,8 @@ void Image::drawTiled(GraphicsContext* ctxt,
     return;
   }
 
+  TransformationMatrix patternTransform =
+      TransformationMatrix().scaleNonUniform(scale.width(), scale.height());
   FloatRect tileRect(FloatPoint(), intrinsicTileSize);
   drawPattern(ctxt, tileRect, patternTransform, oneTileRect.location(), op,
               destRect);

@@ -175,26 +175,37 @@ void BitmapImage::draw(GraphicsContext* ctxt,
     shouldUseSubimage = (interpolationQuality == kCGInterpolationHigh ||
                          interpolationQuality == kCGInterpolationDefault) &&
                         srcRect.size() != destRect.size();
+    float xScale = srcRect.width() / destRect.width();
+    float yScale = srcRect.height() / destRect.height();
     if (shouldUseSubimage) {
-      image = CGImageCreateWithImageInRect(image, srcRect);
+      FloatRect subimageRect = srcRect;
+      float leftPadding = srcRect.x() - floorf(srcRect.x());
+      float topPadding = srcRect.y() - floorf(srcRect.y());
+
+      subimageRect.move(-leftPadding, -topPadding);
+      adjustedDestRect.move(-leftPadding / xScale, -topPadding / yScale);
+
+      subimageRect.setWidth(ceilf(subimageRect.width() + leftPadding));
+      adjustedDestRect.setWidth(subimageRect.width() / xScale);
+
+      subimageRect.setHeight(ceilf(subimageRect.height() + topPadding));
+      adjustedDestRect.setHeight(subimageRect.height() / yScale);
+
+      image = CGImageCreateWithImageInRect(image, subimageRect);
       if (currHeight < srcRect.bottom()) {
         ASSERT(CGImageGetHeight(image) ==
                currHeight - CGRectIntegral(srcRect).origin.y);
-        adjustedDestRect.setHeight(destRect.height() / srcRect.height() *
-                                   CGImageGetHeight(image));
+        adjustedDestRect.setHeight(CGImageGetHeight(image) / yScale);
       }
     } else {
-      float xScale = srcRect.width() / destRect.width();
-      float yScale = srcRect.height() / destRect.height();
-
       adjustedDestRect.setLocation(
           FloatPoint(destRect.x() - srcRect.x() / xScale,
                      destRect.y() - srcRect.y() / yScale));
       adjustedDestRect.setSize(
           FloatSize(selfSize.width() / xScale, selfSize.height() / yScale));
-
-      CGContextClipToRect(context, destRect);
     }
+
+    CGContextClipToRect(context, destRect);
   }
 
   // If the image is only partially loaded, then shrink the destination rect
@@ -203,12 +214,11 @@ void BitmapImage::draw(GraphicsContext* ctxt,
     adjustedDestRect.setHeight(adjustedDestRect.height() * currHeight /
                                selfSize.height());
 
-  // Flip the coords.
   ctxt->setCompositeOperation(compositeOp);
-  CGContextTranslateCTM(context, adjustedDestRect.x(),
-                        adjustedDestRect.bottom());
+
+  // Flip the coords.
   CGContextScaleCTM(context, 1, -1);
-  adjustedDestRect.setLocation(FloatPoint());
+  adjustedDestRect.setY(-adjustedDestRect.bottom());
 
   // Draw the image.
   CGContextDrawImage(context, adjustedDestRect, image);
