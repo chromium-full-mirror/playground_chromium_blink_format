@@ -556,14 +556,6 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
       descriptor->InstanceTemplate()->SetIndexedPropertyHandler(
           USE_INDEXED_PROPERTY_GETTER(ClientRectList));
       break;
-#if ENABLE(DATAGRID)
-    case V8ClassIndex::DATAGRIDCOLUMNLIST:
-      descriptor->InstanceTemplate()->SetIndexedPropertyHandler(
-          USE_INDEXED_PROPERTY_GETTER(DataGridColumnList));
-      descriptor->InstanceTemplate()->SetNamedPropertyHandler(
-          USE_NAMED_PROPERTY_GETTER(DataGridColumnList));
-      break;
-#endif
     default:
       break;
   }
@@ -938,16 +930,7 @@ bool V8DOMWrapper::isWrapperOfType(v8::Handle<v8::Value> value,
 #define FOR_EACH_VIDEO_TAG(macro)
 #endif
 
-#if ENABLE(DATAGRID)
-#define FOR_EACH_DATAGRID_TAG(macro)                   \
-  macro(datagrid, DATAGRID) macro(dcell, DATAGRIDCELL) \
-      macro(dcol, DATAGRIDCOL) macro(drow, DATAGRIDROW)
-#else
-#define FOR_EACH_DATAGRID_TAG(macro)
-#endif
-
 #define FOR_EACH_TAG(macro)                                                                    \
-  FOR_EACH_DATAGRID_TAG(macro)                                                                 \
   macro(a, ANCHOR) macro(applet, APPLET) macro(area, AREA) macro(                              \
       base, BASE) macro(basefont, BASEFONT) macro(blockquote, BLOCKQUOTE)                      \
       macro(body, BODY) macro(br, BR) macro(button, BUTTON) macro(                             \
