@@ -43,13 +43,6 @@
 
 namespace WebCore {
 
-PassRefPtr<StorageArea> StorageAreaImpl::create(
-    StorageType storageType,
-    SecurityOrigin* origin,
-    PassRefPtr<StorageSyncManager> syncManager) {
-  return adoptRef(new StorageAreaImpl(storageType, origin, syncManager));
-}
-
 StorageAreaImpl::~StorageAreaImpl() {}
 
 StorageAreaImpl::StorageAreaImpl(StorageType storageType,
@@ -76,7 +69,7 @@ StorageAreaImpl::StorageAreaImpl(StorageType storageType,
   }
 }
 
-PassRefPtr<StorageArea> StorageAreaImpl::copy(SecurityOrigin* origin) {
+PassRefPtr<StorageAreaImpl> StorageAreaImpl::copy(SecurityOrigin* origin) {
   ASSERT(!m_isShutdown);
   return adoptRef(new StorageAreaImpl(origin, this));
 }
