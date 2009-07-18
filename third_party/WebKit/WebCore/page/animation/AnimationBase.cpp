@@ -140,6 +140,7 @@ static inline ShadowData* blendFunc(const AnimationBase* anim,
   return new ShadowData(blendFunc(anim, from->x, to->x, progress),
                         blendFunc(anim, from->y, to->y, progress),
                         blendFunc(anim, from->blur, to->blur, progress),
+                        blendFunc(anim, from->spread, to->spread, progress),
                         blendFunc(anim, from->color, to->color, progress));
 }
 
@@ -351,7 +352,7 @@ class PropertyWrapperShadow : public PropertyWrapperGetter<ShadowData*> {
                      double progress) const {
     ShadowData* shadowA = (a->*m_getter)();
     ShadowData* shadowB = (b->*m_getter)();
-    ShadowData defaultShadowData(0, 0, 0, Color::transparent);
+    ShadowData defaultShadowData(0, 0, 0, 0, Color::transparent);
 
     if (!shadowA)
       shadowA = &defaultShadowData;

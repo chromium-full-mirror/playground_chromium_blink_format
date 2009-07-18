@@ -31,8 +31,9 @@ namespace WebCore {
 ShadowValue::ShadowValue(PassRefPtr<CSSPrimitiveValue> _x,
                          PassRefPtr<CSSPrimitiveValue> _y,
                          PassRefPtr<CSSPrimitiveValue> _blur,
+                         PassRefPtr<CSSPrimitiveValue> _spread,
                          PassRefPtr<CSSPrimitiveValue> _color)
-    : x(_x), y(_y), blur(_blur), color(_color) {}
+    : x(_x), y(_y), blur(_blur), spread(_spread), color(_color) {}
 
 String ShadowValue::cssText() const {
   String text("");
@@ -53,6 +54,11 @@ String ShadowValue::cssText() const {
     if (!text.isEmpty())
       text += " ";
     text += blur->cssText();
+  }
+  if (spread) {
+    if (!text.isEmpty())
+      text += " ";
+    text += spread->cssText();
   }
 
   return text;

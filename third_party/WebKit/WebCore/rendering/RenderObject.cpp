@@ -1309,7 +1309,7 @@ bool RenderObject::repaintAfterLayoutIfNeeded(
   if (width) {
     int shadowRight = 0;
     for (ShadowData* shadow = boxShadow; shadow; shadow = shadow->next)
-      shadowRight = max(shadow->x + shadow->blur, shadowRight);
+      shadowRight = max(shadow->x + shadow->blur + shadow->spread, shadowRight);
 
     int borderRight = isBox() ? toRenderBox(this)->borderRight() : 0;
     int borderWidth =
@@ -1332,7 +1332,8 @@ bool RenderObject::repaintAfterLayoutIfNeeded(
   if (height) {
     int shadowBottom = 0;
     for (ShadowData* shadow = boxShadow; shadow; shadow = shadow->next)
-      shadowBottom = max(shadow->y + shadow->blur, shadowBottom);
+      shadowBottom =
+          max(shadow->y + shadow->blur + shadow->spread, shadowBottom);
 
     int borderBottom = isBox() ? toRenderBox(this)->borderBottom() : 0;
     int borderHeight =
@@ -2415,12 +2416,17 @@ void RenderObject::adjustRectForOutlineAndShadow(IntRect& rect) const {
 
     do {
       shadowLeft =
-          min(boxShadow->x - boxShadow->blur - outlineSize, shadowLeft);
+          min(boxShadow->x - boxShadow->blur - boxShadow->spread - outlineSize,
+              shadowLeft);
       shadowRight =
-          max(boxShadow->x + boxShadow->blur + outlineSize, shadowRight);
-      shadowTop = min(boxShadow->y - boxShadow->blur - outlineSize, shadowTop);
+          max(boxShadow->x + boxShadow->blur + boxShadow->spread + outlineSize,
+              shadowRight);
+      shadowTop =
+          min(boxShadow->y - boxShadow->blur - boxShadow->spread - outlineSize,
+              shadowTop);
       shadowBottom =
-          max(boxShadow->y + boxShadow->blur + outlineSize, shadowBottom);
+          max(boxShadow->y + boxShadow->blur + boxShadow->spread + outlineSize,
+              shadowBottom);
 
       boxShadow = boxShadow->next;
     } while (boxShadow);

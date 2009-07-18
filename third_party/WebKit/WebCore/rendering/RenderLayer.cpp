@@ -3000,7 +3000,7 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
       do {
         IntRect shadowRect = layerBounds;
         shadowRect.move(boxShadow->x, boxShadow->y);
-        shadowRect.inflate(boxShadow->blur);
+        shadowRect.inflate(boxShadow->blur + boxShadow->spread);
         overflow.unite(shadowRect);
         boxShadow = boxShadow->next;
       } while (boxShadow);

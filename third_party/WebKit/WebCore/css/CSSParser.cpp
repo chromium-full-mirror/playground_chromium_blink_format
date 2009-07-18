@@ -3661,30 +3661,42 @@ bool CSSParser::parseColorFromValue(CSSParserValue* value,
 // without the allowBreak bit being set, then it will clean up all of the
 // objects and destroy them.
 struct ShadowParseContext {
-  ShadowParseContext()
-      : allowX(true),
+  ShadowParseContext(CSSPropertyID prop)
+      : property(prop),
+        allowX(true),
         allowY(false),
         allowBlur(false),
+        allowSpread(false),
         allowColor(true),
         allowBreak(true) {}
 
-  bool allowLength() { return allowX || allowY || allowBlur; }
+  bool allowLength() { return allowX || allowY || allowBlur || allowSpread; }
 
   void commitValue() {
     // Handle the ,, case gracefully by doing nothing.
-    if (x || y || blur || color) {
+    if (x || y || blur || spread || color) {
       if (!values)
         values = CSSValueList::createCommaSeparated();
 
       // Construct the current shadow value and add it to the list.
       values->append(ShadowValue::create(x.release(), y.release(),
-                                         blur.release(), color.release()));
+                                         blur.release(), spread.release(),
+                                         color.release()));
     }
 
     // Now reset for the next shadow value.
-    x = y = blur = color = 0;
-    allowX = allowColor = allowBreak = true;
-    allowY = allowBlur = false;
+    x = 0;
+    y = 0;
+    blur = 0;
+    spread = 0;
+    color = 0;
+
+    allowX = true;
+    allowColor = true;
+    allowBreak = true;
+    allowY = false;
+    allowBlur = false;
+    allowSpread = false;
   }
 
   void commitLength(CSSParserValue* v) {
@@ -3706,6 +3718,10 @@ struct ShadowParseContext {
     } else if (allowBlur) {
       blur = val.release();
       allowBlur = false;
+      allowSpread = property == CSSPropertyWebkitBoxShadow;
+    } else if (allowSpread) {
+      spread = val.release();
+      allowSpread = false;
     }
   }
 
@@ -3714,25 +3730,31 @@ struct ShadowParseContext {
     allowColor = false;
     if (allowX)
       allowBreak = false;
-    else
+    else {
       allowBlur = false;
+      allowSpread = false;
+    }
   }
+
+  CSSPropertyID property;
 
   RefPtr<CSSValueList> values;
   RefPtr<CSSPrimitiveValue> x;
   RefPtr<CSSPrimitiveValue> y;
   RefPtr<CSSPrimitiveValue> blur;
+  RefPtr<CSSPrimitiveValue> spread;
   RefPtr<CSSPrimitiveValue> color;
 
   bool allowX;
   bool allowY;
   bool allowBlur;
+  bool allowSpread;
   bool allowColor;
   bool allowBreak;
 };
 
 bool CSSParser::parseShadow(int propId, bool important) {
-  ShadowParseContext context;
+  ShadowParseContext context(static_cast<CSSPropertyID>(propId));
   CSSParserValue* val;
   while ((val = m_valueList->current())) {
     // Check for a comma break first.
@@ -3745,9 +3767,7 @@ bool CSSParser::parseShadow(int propId, bool important) {
 
       // The value is good.  Commit it.
       context.commitValue();
-    }
-    // Check to see if we're a length.
-    else if (validUnit(val, FLength, true)) {
+    } else if (validUnit(val, FLength, true)) {
       // We required a length and didn't get one. Invalid.
       if (!context.allowLength())
         return false;
