@@ -791,28 +791,28 @@ bool FrameLoader::executeIfJavaScriptURL(const KURL& url,
   if (m_frame->page() && !m_frame->page()->javaScriptURLsAreAllowed())
     return true;
 
-  String script =
-      decodeURLEscapeSequences(url.string().substring(strlen("javascript:")));
-  ScriptValue result = executeScript(script, userGesture);
+  const int javascriptSchemeLength = sizeof("javascript:") - 1;
 
-  String scriptResult;
-  if (!result.getString(scriptResult))
-    return true;
+    String script = decodeURLEscapeSequences(url.string().substring(javascriptSchemeLength);
+    ScriptValue result = executeScript(script, userGesture);
 
-  SecurityOrigin* currentSecurityOrigin = 0;
-  currentSecurityOrigin = m_frame->document()->securityOrigin();
+    String scriptResult;
+    if (!result.getString(scriptResult))
+        return true;
 
-  // FIXME: We should always replace the document, but doing so
-  //        synchronously can cause crashes:
-  //        http://bugs.webkit.org/show_bug.cgi?id=16782
-  if (replaceDocument) {
+    SecurityOrigin* currentSecurityOrigin = m_frame->document()->securityOrigin();
+
+    // FIXME: We should always replace the document, but doing so
+    //        synchronously can cause crashes:
+    //        http://bugs.webkit.org/show_bug.cgi?id=16782
+    if (replaceDocument) {
     stopAllLoaders();
     begin(m_URL, true, currentSecurityOrigin);
     write(scriptResult);
     end();
-  }
+    }
 
-  return true;
+    return true;
 }
 
 ScriptValue FrameLoader::executeScript(const String& script,
