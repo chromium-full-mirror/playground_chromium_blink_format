@@ -57,6 +57,7 @@ class RenderButton : public RenderFlexibleBox {
   virtual IntRect controlClipRect(int /*tx*/, int /*ty*/) const;
 
   void setText(const String&);
+  String text() const;
 
   virtual bool canHaveChildren() const;
 
