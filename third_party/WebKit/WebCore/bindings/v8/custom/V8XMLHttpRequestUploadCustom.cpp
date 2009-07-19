@@ -82,7 +82,8 @@ ACCESSOR_SETTER(XMLHttpRequestUploadOnabort) {
       return;
 
     RefPtr<EventListener> listener =
-        proxy->findOrCreateObjectEventListener(value, false);
+        proxy->objectListeners()->findOrCreateWrapper<V8ObjectEventListener>(
+            proxy->frame(), value, false);
     if (listener) {
       xmlHttpRequestUpload->setOnabort(listener);
       createHiddenDependency(info.Holder(), value,
@@ -130,7 +131,8 @@ ACCESSOR_SETTER(XMLHttpRequestUploadOnerror) {
       return;
 
     RefPtr<EventListener> listener =
-        proxy->findOrCreateObjectEventListener(value, false);
+        proxy->objectListeners()->findOrCreateWrapper<V8ObjectEventListener>(
+            proxy->frame(), value, false);
     if (listener) {
       xmlHttpRequestUpload->setOnerror(listener);
       createHiddenDependency(info.Holder(), value,
@@ -178,7 +180,8 @@ ACCESSOR_SETTER(XMLHttpRequestUploadOnload) {
       return;
 
     RefPtr<EventListener> listener =
-        proxy->findOrCreateObjectEventListener(value, false);
+        proxy->objectListeners()->findOrCreateWrapper<V8ObjectEventListener>(
+            proxy->frame(), value, false);
     if (listener) {
       xmlHttpRequestUpload->setOnload(listener);
       createHiddenDependency(info.Holder(), value,
@@ -226,7 +229,8 @@ ACCESSOR_SETTER(XMLHttpRequestUploadOnloadstart) {
       return;
 
     RefPtr<EventListener> listener =
-        proxy->findOrCreateObjectEventListener(value, false);
+        proxy->objectListeners()->findOrCreateWrapper<V8ObjectEventListener>(
+            proxy->frame(), value, false);
     if (listener) {
       xmlHttpRequestUpload->setOnloadstart(listener);
       createHiddenDependency(info.Holder(), value,
@@ -274,7 +278,8 @@ ACCESSOR_SETTER(XMLHttpRequestUploadOnprogress) {
       return;
 
     RefPtr<EventListener> listener =
-        proxy->findOrCreateObjectEventListener(value, false);
+        proxy->objectListeners()->findOrCreateWrapper<V8ObjectEventListener>(
+            proxy->frame(), value, false);
     if (listener) {
       xmlHttpRequestUpload->setOnprogress(listener);
       createHiddenDependency(info.Holder(), value,
@@ -296,7 +301,8 @@ CALLBACK_FUNC_DECL(XMLHttpRequestUploadAddEventListener) {
     return v8::Undefined();
 
   RefPtr<EventListener> listener =
-      proxy->findOrCreateObjectEventListener(args[1], false);
+      proxy->objectListeners()->findOrCreateWrapper<V8ObjectEventListener>(
+          proxy->frame(), args[1], false);
   if (listener) {
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
@@ -321,7 +327,7 @@ CALLBACK_FUNC_DECL(XMLHttpRequestUploadRemoveEventListener) {
     return v8::Undefined();  // Probably leaked.
 
   RefPtr<EventListener> listener =
-      proxy->findObjectEventListener(args[1], false);
+      proxy->objectListeners()->findWrapper(args[1], false);
 
   if (listener) {
     String type = toWebCoreString(args[0]);

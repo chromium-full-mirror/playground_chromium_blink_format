@@ -216,7 +216,8 @@ CALLBACK_FUNC_DECL(DOMWindowAddEventListener) {
     return v8::Undefined();
 
   RefPtr<EventListener> listener =
-      proxy->findOrCreateV8EventListener(args[1], false);
+      proxy->eventListeners()->findOrCreateWrapper<V8EventListener>(
+          proxy->frame(), args[1], false);
 
   if (listener) {
     String eventType = toWebCoreString(args[0]);
@@ -246,7 +247,8 @@ CALLBACK_FUNC_DECL(DOMWindowRemoveEventListener) {
   if (!proxy)
     return v8::Undefined();
 
-  RefPtr<EventListener> listener = proxy->findV8EventListener(args[1], false);
+  RefPtr<EventListener> listener =
+      proxy->eventListeners()->findWrapper(args[1], false);
 
   if (listener) {
     String eventType = toWebCoreString(args[0]);
@@ -396,7 +398,8 @@ ACCESSOR_SETTER(DOMWindowEventHandler) {
       return;
 
     RefPtr<EventListener> listener =
-        proxy->findOrCreateV8EventListener(value, true);
+        proxy->eventListeners()->findOrCreateWrapper<V8EventListener>(
+            proxy->frame(), value, true);
     if (listener)
       imp->setAttributeEventListener(eventType, listener);
   }

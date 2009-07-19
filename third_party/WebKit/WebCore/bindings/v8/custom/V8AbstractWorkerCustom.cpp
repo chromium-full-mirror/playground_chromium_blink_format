@@ -57,9 +57,12 @@ PassRefPtr<EventListener> getEventListener(AbstractWorker* worker,
   }
 
   V8Proxy* proxy = V8Proxy::retrieve(worker->scriptExecutionContext());
-  if (proxy)
-    return findOnly ? proxy->findObjectEventListener(value, false)
-                    : proxy->findOrCreateObjectEventListener(value, false);
+  if (proxy) {
+    V8EventListenerList* list = proxy->objectListeners();
+    return findOnly ? list->findWrapper(value, false)
+                    : list->findOrCreateWrapper<V8ObjectEventListener>(
+                          proxy->frame(), value, false);
+  }
 
   return 0;
 }

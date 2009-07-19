@@ -152,7 +152,8 @@ ACCESSOR_SETTER(ElementEventHandler) {
       return;
 
     if (RefPtr<EventListener> listener =
-            proxy->findOrCreateV8EventListener(value, true))
+            proxy->eventListeners()->findOrCreateWrapper<V8EventListener>(
+                proxy->frame(), value, true))
       node->setAttributeEventListener(eventType, listener);
   } else
     node->clearAttributeEventListener(eventType);
