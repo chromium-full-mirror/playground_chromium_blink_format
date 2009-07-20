@@ -41,7 +41,9 @@
 #include <QPrintPreviewDialog>
 #endif
 
+#ifndef QT_NO_UITOOLS
 #include <QtUiTools/QUiLoader>
+#endif
 
 #include <QVector>
 #include <QTextStream>
@@ -326,8 +328,13 @@ QObject* WebPage::createPlugin(const QString& classId,
   Q_UNUSED(url);
   Q_UNUSED(paramNames);
   Q_UNUSED(paramValues);
+#ifndef QT_NO_UITOOLS
   QUiLoader loader;
   return loader.createWidget(classId, view());
+#else
+  Q_UNUSED(classId);
+  return 0;
+#endif
 }
 
 class URLLoader : public QObject {
