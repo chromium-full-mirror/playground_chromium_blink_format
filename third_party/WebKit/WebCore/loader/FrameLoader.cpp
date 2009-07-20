@@ -71,6 +71,7 @@
 #include "Page.h"
 #include "PageCache.h"
 #include "PageGroup.h"
+#include "PlaceholderDocument.h"
 #include "PluginData.h"
 #include "PluginDocument.h"
 #include "ProgressTracker.h"
@@ -960,6 +961,8 @@ void FrameLoader::begin(const KURL& url,
   if (!m_isDisplayingInitialEmptyDocument &&
       m_client->shouldUsePluginDocument(m_responseMIMEType))
     document = PluginDocument::create(m_frame);
+  else if (!m_client->hasHTMLView())
+    document = PlaceholderDocument::create(m_frame);
   else
     document = DOMImplementation::createDocument(m_responseMIMEType, m_frame,
                                                  m_frame->inViewSourceMode());
@@ -1021,7 +1024,7 @@ void FrameLoader::begin(const KURL& url,
 
   document->implicitOpen();
 
-  if (m_frame->view())
+  if (m_frame->view() && m_client->hasHTMLView())
     m_frame->view()->setContentsSize(IntSize());
 }
 
@@ -3183,8 +3186,11 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
 
   m_committedFirstRealDocumentLoad = true;
 
-  // For non-cached HTML pages, these methods are called in FrameLoader::begin.
-  if (cachedPage || !m_client->hasHTMLView()) {
+  if (!m_client->hasHTMLView())
+    receivedFirstData();
+  else if (cachedPage) {
+    // For non-cached HTML pages, these methods are called in
+    // receivedFirstData().
     dispatchDidCommitLoad();
 
     // If we have a title let the WebView know about it.
