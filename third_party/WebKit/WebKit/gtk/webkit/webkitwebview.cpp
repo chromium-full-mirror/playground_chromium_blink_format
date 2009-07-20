@@ -583,6 +583,21 @@ static gboolean webkit_web_view_scroll_event(GtkWidget* widget,
   return frame->eventHandler()->handleWheelEvent(wheelEvent);
 }
 
+static void webkit_web_view_size_request(GtkWidget* widget,
+                                         GtkRequisition* requisition) {
+  WebKitWebView* web_view = WEBKIT_WEB_VIEW(widget);
+  Frame* coreFrame = core(webkit_web_view_get_main_frame(web_view));
+  if (!coreFrame)
+    return;
+
+  FrameView* view = coreFrame->view();
+  if (!view)
+    return;
+
+  requisition->width = view->contentsWidth();
+  requisition->height = view->contentsHeight();
+}
+
 static void webkit_web_view_size_allocate(GtkWidget* widget,
                                           GtkAllocation* allocation) {
   GTK_WIDGET_CLASS(webkit_web_view_parent_class)
@@ -1750,6 +1765,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
   widgetClass->motion_notify_event = webkit_web_view_motion_event;
   widgetClass->scroll_event = webkit_web_view_scroll_event;
   widgetClass->size_allocate = webkit_web_view_size_allocate;
+  widgetClass->size_request = webkit_web_view_size_request;
   widgetClass->popup_menu = webkit_web_view_popup_menu_handler;
   widgetClass->grab_focus = webkit_web_view_grab_focus;
   widgetClass->focus_in_event = webkit_web_view_focus_in_event;
