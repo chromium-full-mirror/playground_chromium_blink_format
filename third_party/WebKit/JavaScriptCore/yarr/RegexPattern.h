@@ -56,7 +56,7 @@ struct CharacterRange {
   CharacterRange(UChar begin, UChar end) : begin(begin), end(end) {}
 };
 
-struct CharacterClass {
+struct CharacterClass : FastAllocBase {
   Vector<UChar> m_matches;
   Vector<CharacterRange> m_ranges;
   Vector<UChar> m_matchesUnicode;
@@ -158,7 +158,7 @@ struct PatternTerm {
   }
 };
 
-struct PatternAlternative {
+struct PatternAlternative : FastAllocBase {
   PatternAlternative(PatternDisjunction* disjunction) : m_parent(disjunction) {}
 
   PatternTerm& lastTerm() {
@@ -177,7 +177,7 @@ struct PatternAlternative {
   bool m_hasFixedSize;
 };
 
-struct PatternDisjunction {
+struct PatternDisjunction : FastAllocBase {
   PatternDisjunction(PatternAlternative* parent = 0) : m_parent(parent) {}
 
   ~PatternDisjunction() { deleteAllValues(m_alternatives); }
