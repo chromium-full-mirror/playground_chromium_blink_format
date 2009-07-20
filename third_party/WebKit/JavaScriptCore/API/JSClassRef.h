@@ -34,7 +34,7 @@
 #include <wtf/HashMap.h>
 #include <wtf/RefCounted.h>
 
-struct StaticValueEntry {
+struct StaticValueEntry : FastAllocBase {
   StaticValueEntry(JSObjectGetPropertyCallback _getProperty,
                    JSObjectSetPropertyCallback _setProperty,
                    JSPropertyAttributes _attributes)
@@ -47,7 +47,7 @@ struct StaticValueEntry {
   JSPropertyAttributes attributes;
 };
 
-struct StaticFunctionEntry {
+struct StaticFunctionEntry : FastAllocBase {
   StaticFunctionEntry(JSObjectCallAsFunctionCallback _callAsFunction,
                       JSPropertyAttributes _attributes)
       : callAsFunction(_callAsFunction), attributes(_attributes) {}
