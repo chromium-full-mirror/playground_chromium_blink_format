@@ -112,7 +112,12 @@ class GraphicsLayerCA : public GraphicsLayer {
   virtual void setGeometryOrientation(CompositingCoordinatesOrientation);
   virtual CompositingCoordinatesOrientation geometryOrientation() const;
 
+ protected:
+  virtual void setOpacityInternal(float);
+
  private:
+  void updateOpacityOnLayer();
+
   WebLayer* primaryLayer() const {
     return m_transformLayer.get() ? m_transformLayer.get() : m_layer.get();
   }
