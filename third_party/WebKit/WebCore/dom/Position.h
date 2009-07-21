@@ -69,7 +69,9 @@ class Position {
   // For creating offset positions:
   Position(PassRefPtr<Node> anchorNode, int offset, AnchorType);
 
-  AnchorType anchorType() const { return m_anchorType; }
+  AnchorType anchorType() const {
+    return static_cast<AnchorType>(m_anchorType);
+  }
 
   void clear() {
     m_anchorNode.clear();
@@ -198,7 +200,7 @@ class Position {
   // and m_offset > 0 as "after the anchor node".  See rangeCompliantEquivalent
   // for more info.
   int m_offset;
-  AnchorType m_anchorType : 2;
+  unsigned m_anchorType : 2;
   bool m_isLegacyEditingPosition : 1;
 };
 
