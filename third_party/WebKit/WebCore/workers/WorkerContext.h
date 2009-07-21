@@ -99,6 +99,10 @@ class WorkerContext : public RefCounted<WorkerContext>,
   WorkerContext* self() { return this; }
   WorkerLocation* location() const;
   void close();
+  void setOnerror(PassRefPtr<EventListener> eventListener) {
+    m_onErrorListener = eventListener;
+  }
+  EventListener* onerror() const { return m_onErrorListener.get(); }
 
   // WorkerUtils
   void importScripts(const Vector<String>& urls,
@@ -164,6 +168,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
   OwnPtr<WorkerScriptController> m_script;
   WorkerThread* m_thread;
 
+  RefPtr<EventListener> m_onErrorListener;
   RefPtr<EventListener> m_onmessageListener;
   EventListenersMap m_eventListeners;
 
