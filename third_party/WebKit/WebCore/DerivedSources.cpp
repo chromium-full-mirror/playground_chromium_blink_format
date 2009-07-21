@@ -70,6 +70,7 @@
 #include "JSElement.cpp"
 #include "JSEntity.cpp"
 #include "JSEntityReference.cpp"
+#include "JSErrorEvent.cpp"
 #include "JSEvent.cpp"
 #include "JSEventException.cpp"
 #include "JSFile.cpp"
