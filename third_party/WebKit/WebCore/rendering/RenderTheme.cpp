@@ -344,6 +344,7 @@ bool RenderTheme::paintBorderOnly(RenderObject* o,
     case TextAreaPart:
       return paintTextArea(o, paintInfo, r);
     case MenulistButtonPart:
+    case SearchFieldPart:
       return true;
     case CheckboxPart:
     case RadioPart:
@@ -356,7 +357,6 @@ bool RenderTheme::paintBorderOnly(RenderObject* o,
     case SliderVerticalPart:
     case SliderThumbHorizontalPart:
     case SliderThumbVerticalPart:
-    case SearchFieldPart:
     case SearchFieldCancelButtonPart:
     case SearchFieldDecorationPart:
     case SearchFieldResultsDecorationPart:
