@@ -38,15 +38,10 @@ JSXMLHttpRequestConstructor::JSXMLHttpRequestConstructor(
     ExecState* exec,
     JSDOMGlobalObject* globalObject)
     : DOMConstructorObject(JSXMLHttpRequestConstructor::createStructure(
-          globalObject->objectPrototype())),
-      m_globalObject(globalObject) {
+                               globalObject->objectPrototype()),
+                           globalObject) {
   putDirect(exec->propertyNames().prototype,
             JSXMLHttpRequestPrototype::self(exec, globalObject), None);
-}
-
-ScriptExecutionContext* JSXMLHttpRequestConstructor::scriptExecutionContext()
-    const {
-  return m_globalObject->scriptExecutionContext();
 }
 
 static JSObject* constructXMLHttpRequest(ExecState* exec,
@@ -68,12 +63,6 @@ ConstructType JSXMLHttpRequestConstructor::getConstructData(
     ConstructData& constructData) {
   constructData.native.function = constructXMLHttpRequest;
   return ConstructTypeHost;
-}
-
-void JSXMLHttpRequestConstructor::mark() {
-  DOMObject::mark();
-  if (!m_globalObject->marked())
-    m_globalObject->mark();
 }
 
 }  // namespace WebCore

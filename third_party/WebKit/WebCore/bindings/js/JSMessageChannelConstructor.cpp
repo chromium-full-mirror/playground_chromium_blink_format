@@ -42,18 +42,13 @@ JSMessageChannelConstructor::JSMessageChannelConstructor(
     ExecState* exec,
     JSDOMGlobalObject* globalObject)
     : DOMConstructorObject(JSMessageChannelConstructor::createStructure(
-          globalObject->objectPrototype())),
-      m_globalObject(globalObject) {
+                               globalObject->objectPrototype()),
+                           globalObject) {
   putDirect(exec->propertyNames().prototype,
             JSMessageChannelPrototype::self(exec, globalObject), None);
 }
 
 JSMessageChannelConstructor::~JSMessageChannelConstructor() {}
-
-ScriptExecutionContext* JSMessageChannelConstructor::scriptExecutionContext()
-    const {
-  return m_globalObject->scriptExecutionContext();
-}
 
 ConstructType JSMessageChannelConstructor::getConstructData(
     ConstructData& constructData) {
@@ -73,12 +68,6 @@ JSObject* JSMessageChannelConstructor::construct(ExecState* exec,
         "MessageChannel constructor associated document is unavailable");
 
   return asObject(toJS(exec, MessageChannel::create(context)));
-}
-
-void JSMessageChannelConstructor::mark() {
-  DOMObject::mark();
-  if (!m_globalObject->marked())
-    m_globalObject->mark();
 }
 
 }  // namespace WebCore

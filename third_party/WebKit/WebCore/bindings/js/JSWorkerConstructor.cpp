@@ -43,8 +43,9 @@ const ClassInfo JSWorkerConstructor::s_info = {"WorkerConstructor", 0, 0, 0};
 
 JSWorkerConstructor::JSWorkerConstructor(ExecState* exec,
                                          JSDOMGlobalObject* globalObject)
-    : DOMConstructorObject(JSWorkerConstructor::createStructure(
-          globalObject->objectPrototype())) {
+    : DOMConstructorObject(
+          JSWorkerConstructor::createStructure(globalObject->objectPrototype()),
+          globalObject) {
   putDirect(exec->propertyNames().prototype,
             JSWorkerPrototype::self(exec, globalObject), None);
   putDirect(exec->propertyNames().length, jsNumber(exec, 1),

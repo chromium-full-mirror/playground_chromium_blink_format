@@ -36,20 +36,13 @@ const ClassInfo JSOptionConstructor::s_info = {"OptionConstructor", 0, 0, 0};
 
 JSOptionConstructor::JSOptionConstructor(ExecState* exec,
                                          JSDOMGlobalObject* globalObject)
-    : DOMConstructorObject(JSOptionConstructor::createStructure(
-          globalObject->objectPrototype())),
-      m_globalObject(globalObject) {
-  ASSERT(globalObject->scriptExecutionContext());
-  ASSERT(globalObject->scriptExecutionContext()->isDocument());
-
+    : DOMConstructorWithDocument(
+          JSOptionConstructor::createStructure(globalObject->objectPrototype()),
+          globalObject) {
   putDirect(exec->propertyNames().prototype,
             JSHTMLOptionElementPrototype::self(exec, globalObject), None);
   putDirect(exec->propertyNames().length, jsNumber(exec, 4),
             ReadOnly | DontDelete | DontEnum);
-}
-
-Document* JSOptionConstructor::document() const {
-  return static_cast<Document*>(m_globalObject->scriptExecutionContext());
 }
 
 static JSObject* constructHTMLOptionElement(ExecState* exec,
@@ -89,12 +82,6 @@ ConstructType JSOptionConstructor::getConstructData(
     ConstructData& constructData) {
   constructData.native.function = constructHTMLOptionElement;
   return ConstructTypeHost;
-}
-
-void JSOptionConstructor::mark() {
-  DOMObject::mark();
-  if (!m_globalObject->marked())
-    m_globalObject->mark();
 }
 
 }  // namespace WebCore

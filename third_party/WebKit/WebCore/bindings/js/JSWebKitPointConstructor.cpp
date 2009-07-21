@@ -41,7 +41,8 @@ JSWebKitPointConstructor::JSWebKitPointConstructor(
     ExecState* exec,
     JSDOMGlobalObject* globalObject)
     : DOMConstructorObject(JSWebKitPointConstructor::createStructure(
-          globalObject->objectPrototype())) {
+                               globalObject->objectPrototype()),
+                           globalObject) {
   putDirect(exec->propertyNames().prototype,
             JSWebKitPointPrototype::self(exec, globalObject), None);
   putDirect(exec->propertyNames().length, jsNumber(exec, 2),

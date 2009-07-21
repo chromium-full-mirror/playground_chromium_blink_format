@@ -46,7 +46,8 @@ JSXSLTProcessorConstructor::JSXSLTProcessorConstructor(
     ExecState* exec,
     JSDOMGlobalObject* globalObject)
     : DOMConstructorObject(JSXSLTProcessorConstructor::createStructure(
-          globalObject->objectPrototype())) {
+                               globalObject->objectPrototype()),
+                           globalObject) {
   putDirect(exec->propertyNames().prototype,
             JSXSLTProcessorPrototype::self(exec, globalObject), None);
 }
