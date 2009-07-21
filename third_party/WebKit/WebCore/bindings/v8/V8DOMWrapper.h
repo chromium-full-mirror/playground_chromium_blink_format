@@ -102,17 +102,11 @@ class V8DOMWrapper {
   // A helper function extract native object pointer from a DOM wrapper
   // and cast to the specified type.
   template <class C>
-  static C* convertDOMWrapperToNative(v8::Handle<v8::Value> object) {
+  static C* convertDOMWrapperToNative(v8::Handle<v8::Object> object) {
     ASSERT(maybeDOMWrapper(object));
-    v8::Handle<v8::Value> ptr =
-        v8::Handle<v8::Object>::Cast(object)->GetInternalField(
-            V8Custom::kDOMWrapperObjectIndex);
-    return extractCPointer<C>(ptr);
+    return reinterpret_cast<C*>(
+        object->GetPointerFromInternalField(V8Custom::kDOMWrapperObjectIndex));
   }
-
-  // A help function extract a node type pointer from a DOM wrapper.
-  // Wrapped pointer must be cast to Node* first.
-  static void* convertDOMWrapperToNodeHelper(v8::Handle<v8::Value>);
 
   // Create a V8 wrapper for a C pointer
   static v8::Handle<v8::Value> wrapCPointer(void* cptr) {
@@ -129,8 +123,10 @@ class V8DOMWrapper {
   }
 
   template <class C>
-  static C* convertDOMWrapperToNode(v8::Handle<v8::Value> value) {
-    return static_cast<C*>(convertDOMWrapperToNodeHelper(value));
+  static C* convertDOMWrapperToNode(v8::Handle<v8::Object> object) {
+    ASSERT(maybeDOMWrapper(object));
+    ASSERT(domWrapperType(object) == V8ClassIndex::NODE);
+    return convertDOMWrapperToNative<C>(object);
   }
 
   template <typename T>
@@ -148,7 +144,7 @@ class V8DOMWrapper {
 
   template <class C>
   static C* convertToNativeObject(V8ClassIndex::V8WrapperType type,
-                                  v8::Handle<v8::Value> object) {
+                                  v8::Handle<v8::Object> object) {
     // Native event listener is per frame, it cannot be handled by this generic
     // function.
     ASSERT(type != V8ClassIndex::EVENTLISTENER);
@@ -178,7 +174,8 @@ class V8DOMWrapper {
   static Event* convertToNativeEvent(v8::Handle<v8::Value> jsEvent) {
     if (!isDOMEventWrapper(jsEvent))
       return 0;
-    return convertDOMWrapperToNative<Event>(jsEvent);
+    return convertDOMWrapperToNative<Event>(
+        v8::Handle<v8::Object>::Cast(jsEvent));
   }
 
   static v8::Handle<v8::Value> convertEventTargetToV8Object(EventTarget*);

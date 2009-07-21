@@ -55,7 +55,8 @@ CALLBACK_FUNC_DECL(InspectorControllerHighlightDOMNode) {
   if (args.Length() < 1)
     return v8::Undefined();
 
-  Node* node = V8DOMWrapper::convertDOMWrapperToNode<Node>(args[0]);
+  Node* node = V8DOMWrapper::convertDOMWrapperToNode<Node>(
+      v8::Handle<v8::Object>::Cast(args[0]));
   if (!node)
     return v8::Undefined();
 
@@ -103,7 +104,8 @@ CALLBACK_FUNC_DECL(InspectorControllerSearch) {
   if (args.Length() < 2)
     return v8::Undefined();
 
-  Node* node = V8DOMWrapper::convertDOMWrapperToNode<Node>(args[0]);
+  Node* node = V8DOMWrapper::convertDOMWrapperToNode<Node>(
+      v8::Handle<v8::Object>::Cast(args[0]));
   if (!node)
     return v8::Undefined();
 

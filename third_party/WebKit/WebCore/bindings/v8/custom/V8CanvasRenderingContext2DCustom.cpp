@@ -251,7 +251,8 @@ CALLBACK_FUNC_DECL(CanvasRenderingContext2DDrawImage) {
   if (V8HTMLImageElement::HasInstance(arg)) {
     ExceptionCode ec = 0;
     HTMLImageElement* image_element =
-        V8DOMWrapper::convertDOMWrapperToNode<HTMLImageElement>(arg);
+        V8DOMWrapper::convertDOMWrapperToNode<HTMLImageElement>(
+            v8::Handle<v8::Object>::Cast(arg));
     switch (args.Length()) {
       case 3:
         context->drawImage(image_element, toFloat(args[1]), toFloat(args[2]));
@@ -287,7 +288,8 @@ CALLBACK_FUNC_DECL(CanvasRenderingContext2DDrawImage) {
   if (V8HTMLCanvasElement::HasInstance(arg)) {
     ExceptionCode ec = 0;
     HTMLCanvasElement* canvas_element =
-        V8DOMWrapper::convertDOMWrapperToNode<HTMLCanvasElement>(arg);
+        V8DOMWrapper::convertDOMWrapperToNode<HTMLCanvasElement>(
+            v8::Handle<v8::Object>::Cast(arg));
     switch (args.Length()) {
       case 3:
         context->drawImage(canvas_element, toFloat(args[1]), toFloat(args[2]));
@@ -324,7 +326,8 @@ CALLBACK_FUNC_DECL(CanvasRenderingContext2DDrawImage) {
   if (V8HTMLVideoElement::HasInstance(arg)) {
     ExceptionCode ec = 0;
     HTMLVideoElement* video_element =
-        V8DOMWrapper::convertDOMWrapperToNode<HTMLVideoElement>(arg);
+        V8DOMWrapper::convertDOMWrapperToNode<HTMLVideoElement>(
+            v8::Handle<v8::Object>::Cast(arg));
     switch (args.Length()) {
       case 3:
         context->drawImage(video_element, toFloat(args[1]), toFloat(args[2]));
@@ -371,7 +374,8 @@ CALLBACK_FUNC_DECL(CanvasRenderingContext2DDrawImageFromRect) {
 
   if (V8HTMLImageElement::HasInstance(arg)) {
     HTMLImageElement* image_element =
-        V8DOMWrapper::convertDOMWrapperToNode<HTMLImageElement>(arg);
+        V8DOMWrapper::convertDOMWrapperToNode<HTMLImageElement>(
+            v8::Handle<v8::Object>::Cast(arg));
     context->drawImageFromRect(
         image_element, toFloat(args[1]), toFloat(args[2]), toFloat(args[3]),
         toFloat(args[4]), toFloat(args[5]), toFloat(args[6]), toFloat(args[7]),
@@ -393,7 +397,8 @@ CALLBACK_FUNC_DECL(CanvasRenderingContext2DCreatePattern) {
 
   if (V8HTMLImageElement::HasInstance(arg)) {
     HTMLImageElement* image_element =
-        V8DOMWrapper::convertDOMWrapperToNode<HTMLImageElement>(arg);
+        V8DOMWrapper::convertDOMWrapperToNode<HTMLImageElement>(
+            v8::Handle<v8::Object>::Cast(arg));
     ExceptionCode ec = 0;
     RefPtr<CanvasPattern> pattern = context->createPattern(
         image_element, toWebCoreStringWithNullCheck(args[1]), ec);
@@ -407,7 +412,8 @@ CALLBACK_FUNC_DECL(CanvasRenderingContext2DCreatePattern) {
 
   if (V8HTMLCanvasElement::HasInstance(arg)) {
     HTMLCanvasElement* canvas_element =
-        V8DOMWrapper::convertDOMWrapperToNode<HTMLCanvasElement>(arg);
+        V8DOMWrapper::convertDOMWrapperToNode<HTMLCanvasElement>(
+            v8::Handle<v8::Object>::Cast(arg));
     ExceptionCode ec = 0;
     RefPtr<CanvasPattern> pattern = context->createPattern(
         canvas_element, toWebCoreStringWithNullCheck(args[1]), ec);

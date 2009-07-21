@@ -773,8 +773,10 @@ V8ClassIndex::V8WrapperType V8DOMWrapper::domWrapperType(
 
 void* V8DOMWrapper::convertToSVGPODTypeImpl(V8ClassIndex::V8WrapperType type,
                                             v8::Handle<v8::Value> object) {
-  return isWrapperOfType(object, type) ? convertDOMWrapperToNative<void>(object)
-                                       : 0;
+  return isWrapperOfType(object, type)
+             ? convertDOMWrapperToNative<void>(
+                   v8::Handle<v8::Object>::Cast(object))
+             : 0;
 }
 
 v8::Handle<v8::Object> V8DOMWrapper::lookupDOMWrapper(
@@ -792,18 +794,6 @@ v8::Handle<v8::Object> V8DOMWrapper::lookupDOMWrapper(
     value = object->GetPrototype();
   }
   return notHandledByInterceptor();
-}
-
-void* V8DOMWrapper::convertDOMWrapperToNodeHelper(v8::Handle<v8::Value> value) {
-  ASSERT(maybeDOMWrapper(value));
-
-  v8::Handle<v8::Object> object = v8::Handle<v8::Object>::Cast(value);
-
-  ASSERT(domWrapperType(object) == V8ClassIndex::NODE);
-
-  v8::Handle<v8::Value> wrapper =
-      object->GetInternalField(V8Custom::kDOMWrapperObjectIndex);
-  return extractCPointer<Node>(wrapper);
 }
 
 PassRefPtr<NodeFilter> V8DOMWrapper::wrapNativeNodeFilter(
@@ -860,8 +850,7 @@ void V8DOMWrapper::setDOMWrapper(v8::Handle<v8::Object> object,
                                  int type,
                                  void* cptr) {
   ASSERT(object->InternalFieldCount() >= 2);
-  object->SetInternalField(V8Custom::kDOMWrapperObjectIndex,
-                           wrapCPointer(cptr));
+  object->SetPointerInInternalField(V8Custom::kDOMWrapperObjectIndex, cptr);
   object->SetInternalField(V8Custom::kDOMWrapperTypeIndex,
                            v8::Integer::New(type));
 }
