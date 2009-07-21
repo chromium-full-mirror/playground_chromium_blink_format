@@ -50,9 +50,8 @@ PassRefPtr<Icon> Icon::createIconForFiles(const Vector<String>& filenames) {
 void Icon::paint(GraphicsContext* ctx, const IntRect& rect) {
   QPixmap px = m_icon.pixmap(rect.size());
   QPainter* p = static_cast<QPainter*>(ctx->platformContext());
-  if (p && !px.isNull()) {
+  if (p && !px.isNull())
     p->drawPixmap(rect.x(), rect.y(), px);
-  }
 }
 }
 

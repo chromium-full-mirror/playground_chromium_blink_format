@@ -552,9 +552,9 @@ void QWebNetworkManager::started(QWebNetworkJob* job) {
         // with a 302 which must be GET'ed
         method = "GET";
         job->d->request.httpHeader.setContentLength(0);
-      } else {
+      } else
         method = job->d->request.httpHeader.method();
-      }
+
       job->d->request.httpHeader.setRequest(
           method, newUrl.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority));
       job->d->request.setURL(newUrl);
@@ -627,9 +627,8 @@ void QWebNetworkManager::finished(QWebNetworkJob* job, int errorCode) {
           ResourceError(job->d->request.url.host(),
                         job->d->response.statusCode(),
                         job->d->request.url.toString(), job->d->errorString));
-    } else {
+    } else
       client->didFinishLoading(job->d->resourceHandle);
-    }
   }
 
   DEBUG() << "receivedFinished done" << job->d->request.url;
@@ -707,9 +706,8 @@ void QWebNetworkInterfacePrivate::parseDataUrl(QWebNetworkJob* job) {
       header = header.left(header.length() - 7);
       // qDebug() << "mime=" << header;
     }
-  } else {
+  } else
     data = QByteArray();
-  }
 
   if (base64)
     data = QByteArray::fromBase64(data);
@@ -943,9 +941,8 @@ void QWebNetworkInterface::addJob(QWebNetworkJob* job) {
       response.setStatusLine(200);
       job->setResponse(response);
       data = f.readAll();
-    } else {
+    } else
       statusCode = 404;
-    }
   }
 
   if (statusCode == 404) {
@@ -1117,7 +1114,7 @@ int WebCoreHttp::getConnection() {
 
 void WebCoreHttp::onResponseHeaderReceived(const QHttpResponseHeader& resp) {
   QHttp* http = qobject_cast<QHttp*>(sender());
-  if (http->currentId() == 0) {
+  if (!http->currentId()) {
     qDebug() << "ERROR!  Invalid job id.  Why?";  // foxnews.com triggers this
     return;
   }
@@ -1133,7 +1130,7 @@ void WebCoreHttp::onResponseHeaderReceived(const QHttpResponseHeader& resp) {
 
 void WebCoreHttp::onReadyRead() {
   QHttp* http = qobject_cast<QHttp*>(sender());
-  if (http->currentId() == 0) {
+  if (!http->currentId()) {
     qDebug() << "ERROR!  Invalid job id.  Why?";  // foxnews.com triggers this
     return;
   }

@@ -123,7 +123,7 @@ class QWEBKIT_EXPORT QWebView : public QWidget {
   void forward();
   void reload();
 
-  void print(QPrinter* printer) const;
+  void print(QPrinter*) const;
 
  Q_SIGNALS:
   void loadStarted();
@@ -131,14 +131,14 @@ class QWEBKIT_EXPORT QWebView : public QWidget {
   void loadFinished(bool);
   void titleChanged(const QString& title);
   void statusBarMessage(const QString& text);
-  void linkClicked(const QUrl& url);
+  void linkClicked(const QUrl&);
   void selectionChanged();
   void iconChanged();
-  void urlChanged(const QUrl& url);
+  void urlChanged(const QUrl&);
 
  protected:
-  void resizeEvent(QResizeEvent* e);
-  void paintEvent(QPaintEvent* ev);
+  void resizeEvent(QResizeEvent*);
+  void paintEvent(QPaintEvent*);
 
   virtual QWebView* createWindow(QWebPage::WebWindowType type);
 

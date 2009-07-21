@@ -234,9 +234,8 @@ GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate(QPainter* p) {
         painter->testRenderHint(QPainter::Antialiasing);
     // FIXME: Maybe only enable in SVG mode?
     painter->setRenderHint(QPainter::Antialiasing, true);
-  } else {
+  } else
     antiAliasingForRectsAndLines = false;
-  }
 }
 
 GraphicsContextPlatformPrivate::~GraphicsContextPlatformPrivate() {}
@@ -1117,8 +1116,8 @@ void GraphicsContext::concatCTM(const TransformationMatrix& transform) {
   m_data->p()->setWorldTransform(transform, true);
 
   // Transformations to the context shouldn't transform the currentPath.
-  // We have to undo every change made to the context from the currentPath to
-  // avoid wrong drawings.
+  // We have to undo every change made to the context from the currentPath
+  // to avoid wrong drawings.
   if (!m_data->currentPath.isEmpty() && transform.isInvertible()) {
     QTransform matrix = transform.inverse();
     m_data->currentPath = m_data->currentPath * matrix;
@@ -1198,7 +1197,7 @@ HDC GraphicsContext::getWindowsContext(const IntRect& dstRect,
 
   void* pixels = 0;
   HBITMAP bitmap =
-      ::CreateDIBSection(NULL, &bitmapInfo, DIB_RGB_COLORS, &pixels, 0, 0);
+      ::CreateDIBSection(0, &bitmapInfo, DIB_RGB_COLORS, &pixels, 0, 0);
   if (!bitmap)
     return 0;
 

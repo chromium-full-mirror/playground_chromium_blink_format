@@ -534,12 +534,10 @@ void QWebSettings::setIconDatabasePath(const QString& path) {
     \sa setIconDatabasePath(), clearIconDatabase()
 */
 QString QWebSettings::iconDatabasePath() {
-  if (WebCore::iconDatabase()->isEnabled() &&
-      WebCore::iconDatabase()->isOpen()) {
+  if (WebCore::iconDatabase()->isEnabled() && WebCore::iconDatabase()->isOpen())
     return WebCore::iconDatabase()->databasePath();
-  } else {
+  else
     return QString();
-  }
 }
 
 /*!

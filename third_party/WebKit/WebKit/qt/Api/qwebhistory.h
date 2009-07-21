@@ -35,6 +35,7 @@ class FrameLoaderClientQt;
 }
 
 class QWebHistoryItemPrivate;
+
 class QWEBKIT_EXPORT QWebHistoryItem {
  public:
   QWebHistoryItem(const QWebHistoryItem& other);

@@ -98,9 +98,8 @@ MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
 
   // Make sure we get updates for each frame
   m_videoWidget->installEventFilter(this);
-  foreach (QWidget* widget, qFindChildren<QWidget*>(m_videoWidget)) {
+  foreach (QWidget* widget, qFindChildren<QWidget*>(m_videoWidget))
     widget->installEventFilter(this);
-  }
 
   connect(m_mediaObject, SIGNAL(stateChanged(Phonon::State, Phonon::State)),
           this, SLOT(stateChanged(Phonon::State, Phonon::State)));
@@ -329,9 +328,8 @@ void MediaPlayerPrivate::updateStates() {
       m_networkState = MediaPlayer::NetworkError;
       m_readyState = MediaPlayer::HaveNothing;
       cancelLoad();
-    } else {
+    } else
       m_mediaObject->pause();
-    }
   }
 
   if (seeking())

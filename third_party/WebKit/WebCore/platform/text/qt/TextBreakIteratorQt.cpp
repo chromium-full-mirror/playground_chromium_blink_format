@@ -188,6 +188,7 @@ int WordBreakIteratorQt::next() {
   }
   return currentPos;
 }
+
 int WordBreakIteratorQt::previous() {
   if (currentPos <= 0) {
     currentPos = -1;
@@ -215,6 +216,7 @@ int CharBreakIteratorQt::next() {
   currentPos = layout.nextCursorPosition(currentPos);
   return currentPos;
 }
+
 int CharBreakIteratorQt::previous() {
   if (currentPos <= 0)
     return -1;

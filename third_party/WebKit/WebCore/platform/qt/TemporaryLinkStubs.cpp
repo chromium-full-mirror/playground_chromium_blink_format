@@ -79,9 +79,11 @@ Vector<String> PluginDatabase::defaultPluginDirectories() {
   notImplemented();
   return Vector<String>();
 }
+
 void PluginDatabase::getPluginPathsInDirectories(HashSet<String>& paths) const {
   notImplemented();
 }
+
 bool PluginDatabase::isPreferredPluginDirectory(const String& directory) {
   notImplemented();
   return false;
@@ -93,6 +95,7 @@ namespace WebCore {
 void getSupportedKeySizes(Vector<String>&) {
   notImplemented();
 }
+
 String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
                                          const String& challengeString,
                                          const KURL& url) {
@@ -103,9 +106,9 @@ String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
 // defined in win/SystemTimeWin.cpp, which is compiled for the Qt/Windows port
 float userIdleTime() {
   notImplemented();
-  return FLT_MAX;
-}  // return an arbitrarily high userIdleTime so that releasing pages from the
-   // page cache isn't postponed
+  return FLT_MAX;  // return an arbitrarily high userIdleTime so that releasing
+                   // pages from the page cache isn't postponed
+}
 #endif
 
 void prefetchDNS(const String& hostname) {

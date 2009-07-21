@@ -297,7 +297,7 @@ NPError PluginView::handlePostReadFile(Vector<char>& buffer,
   // FIXME - read the file data into buffer
   FILE* fileHandle = fopen((filename.utf8()).data(), "r");
 
-  if (fileHandle == 0)
+  if (!fileHandle)
     return NPERR_FILE_NOT_FOUND;
 
   // buffer.resize();

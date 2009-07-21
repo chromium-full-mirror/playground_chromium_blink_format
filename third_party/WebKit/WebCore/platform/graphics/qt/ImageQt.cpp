@@ -102,9 +102,8 @@ void Image::drawPattern(GraphicsContext* ctxt,
   QPixmap pixmap = *framePixmap;
   QRect tr = QRectF(tileRect).toRect();
   if (tr.x() || tr.y() || tr.width() != pixmap.width() ||
-      tr.height() != pixmap.height()) {
+      tr.height() != pixmap.height())
     pixmap = pixmap.copy(tr);
-  }
 
   QBrush b(pixmap);
   b.setTransform(patternTransform);

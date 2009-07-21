@@ -217,7 +217,6 @@ const char* QWebPagePrivate::editorCommandForWebActions(
   if ((action > QWebPage::NoWebAction) &&
       (action < int(sizeof(editorCommandWebActions) / sizeof(const char*))))
     return editorCommandWebActions[action];
-
   return 0;
 }
 
@@ -434,9 +433,8 @@ QMenu* QWebPagePrivate::createContextMenu(
         if (anyEnabledAction) {
           subMenu->setTitle(item.title());
           menu->addAction(subMenu->menuAction());
-        } else {
+        } else
           delete subMenu;
-        }
         break;
       }
     }
@@ -841,11 +839,10 @@ void QWebPagePrivate::focusInEvent(QFocusEvent* ev) {
   FocusController* focusController = page->focusController();
   Frame* frame = focusController->focusedFrame();
   focusController->setActive(true);
-  if (frame) {
+  if (frame)
     focusController->setFocused(true);
-  } else {
+  else
     focusController->setFocusedFrame(QWebFramePrivate::core(mainFrame));
-  }
 }
 
 void QWebPagePrivate::focusOutEvent(QFocusEvent* ev) {
@@ -1712,9 +1709,8 @@ QSize QWebPage::fixedContentsSize() const {
   QWebFrame* frame = d->mainFrame;
   if (frame) {
     WebCore::FrameView* view = frame->d->frame->view();
-    if (view && view->useFixedLayout()) {
+    if (view && view->useFixedLayout())
       return d->mainFrame->d->frame->view()->fixedLayoutSize();
-    }
   }
 
   return d->fixedLayoutSize;
@@ -2231,9 +2227,8 @@ void QWebPage::setContentEditable(bool editable) {
         frame->applyEditingStyleToBodyElement();
         // FIXME: mac port calls this if there is no selectedDOMRange
         // frame->setSelectionFromNone();
-      } else {
+      } else
         frame->removeEditingStyleFromBodyElement();
-      }
     }
 
     d->updateEditorActions();
@@ -2300,10 +2295,9 @@ bool QWebPage::swallowContextMenuEvent(QContextMenuEvent* event) {
 
   if (QWebFrame* webFrame = frameAt(event->pos())) {
     Frame* frame = QWebFramePrivate::core(webFrame);
-    if (Scrollbar* scrollbar = frame->view()->scrollbarAtPoint(
-            PlatformMouseEvent(event, 1).pos())) {
+    if (Scrollbar* scrollbar =
+            frame->view()->scrollbarAtPoint(PlatformMouseEvent(event, 1).pos()))
       return scrollbar->contextMenu(PlatformMouseEvent(event, 1));
-    }
   }
 
   WebCore::Frame* focusedFrame =
@@ -2515,10 +2509,9 @@ bool QWebPage::findText(const QString& subString, FindFlags options) {
     if (subString.isEmpty()) {
       d->page->unmarkAllTextMatches();
       return true;
-    } else {
+    } else
       return d->page->markAllMatchesForText(subString, caseSensitivity, true,
                                             0);
-    }
   } else {
     ::FindDirection direction = ::FindDirectionForward;
     if (options & FindBackward)

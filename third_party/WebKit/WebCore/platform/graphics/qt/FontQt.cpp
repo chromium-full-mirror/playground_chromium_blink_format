@@ -47,7 +47,8 @@ namespace WebCore {
 
 static const QString qstring(const TextRun& run) {
   // We don't detach
-  return QString::fromRawData((const QChar*)run.characters(), run.length());
+  return QString::fromRawData(reinterpret_cast<const QChar*>(run.characters()),
+                              run.length());
 }
 
 static const QString fixSpacing(const QString& string) {
@@ -55,12 +56,10 @@ static const QString fixSpacing(const QString& string) {
   QString possiblyDetached = string;
   for (int i = 0; i < string.length(); ++i) {
     const QChar c = string.at(i);
-    if (c.unicode() != 0x20 && Font::treatAsSpace(c.unicode())) {
+    if (c.unicode() != 0x20 && Font::treatAsSpace(c.unicode()))
       possiblyDetached[i] = 0x20;  // detach
-    } else if (c.unicode() != 0x200c &&
-               Font::treatAsZeroWidthSpace(c.unicode())) {
+    else if (c.unicode() != 0x200c && Font::treatAsZeroWidthSpace(c.unicode()))
       possiblyDetached[i] = 0x200c;  // detach
-    }
   }
   return possiblyDetached;
 }

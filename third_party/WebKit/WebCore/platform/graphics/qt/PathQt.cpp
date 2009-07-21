@@ -295,7 +295,7 @@ bool Path::isEmpty() const {
   // Don't use QPainterPath::isEmpty(), as that also returns true if there's
   // only
   // one initial MoveTo element in the path.
-  return m_path->elementCount() == 0;
+  return !m_path->elementCount();
 }
 
 bool Path::hasCurrentPoint() const {

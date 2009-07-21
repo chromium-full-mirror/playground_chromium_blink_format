@@ -134,7 +134,7 @@ bool ImageSource::frameHasAlphaAtIndex(size_t index) {
 }
 
 bool ImageSource::frameIsCompleteAtIndex(size_t index) {
-  return (m_decoder && m_decoder->imageAtIndex(index) != 0);
+  return (m_decoder && m_decoder->imageAtIndex(index));
 }
 
 void ImageSource::clear(bool destroyAll,

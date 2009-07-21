@@ -151,8 +151,8 @@ class QWEBKIT_EXPORT QWebElement {
   QString computedStyleProperty(const QString& name) const;
 
  private:
-  explicit QWebElement(WebCore::Element* domElement);
-  explicit QWebElement(WebCore::Node* node);
+  explicit QWebElement(WebCore::Element*);
+  explicit QWebElement(WebCore::Node*);
 
   friend class QWebFrame;
   friend class QWebHitTestResult;

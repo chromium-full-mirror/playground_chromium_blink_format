@@ -84,9 +84,8 @@ bool Scrollbar::contextMenu(const PlatformMouseEvent& event) {
   const QPoint globalPos = QPoint(event.globalX(), event.globalY());
   QAction* actionSelected = menu.exec(globalPos);
 
-  if (actionSelected == 0)
-    /* Do nothing */;
-  else if (actionSelected == actScrollHere) {
+  if (!actionSelected) { /* Do nothing */
+  } else if (actionSelected == actScrollHere) {
     const QPoint pos = convertFromContainingWindow(event.pos());
     moveThumb(horizontal ? pos.x() : pos.y());
   } else if (actionSelected == actScrollTop)

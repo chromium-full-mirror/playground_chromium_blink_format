@@ -212,9 +212,8 @@ static QRect inflateButtonRect(const QRect& originalRect, QStyle* style) {
 
     return originalRect.adjusted(-paddingLeft, -paddingTop, paddingRight,
                                  paddingBottom);
-  } else {
+  } else
     return originalRect;
-  }
 }
 
 void RenderThemeQt::adjustRepaintRect(const RenderObject* o, IntRect& rect) {
@@ -310,11 +309,10 @@ void RenderThemeQt::computeSizeBasedOnStyle(RenderStyle* renderStyle) const {
       // If the style supports layout rects we use that, and  compensate
       // accordingly
       // in paintButton() below.
-      if (!layoutRect.isNull()) {
+      if (!layoutRect.isNull())
         size.setHeight(layoutRect.height());
-      } else {
+      else
         size.setHeight(pushButtonSize.height());
-      }
 
       break;
     }
@@ -469,11 +467,10 @@ bool RenderThemeQt::paintButton(RenderObject* o,
   if (appearance == PushButtonPart || appearance == ButtonPart) {
     option.rect = inflateButtonRect(option.rect, qStyle());
     p.drawControl(QStyle::CE_PushButton, option);
-  } else if (appearance == RadioPart) {
+  } else if (appearance == RadioPart)
     p.drawControl(QStyle::CE_RadioButton, option);
-  } else if (appearance == CheckboxPart) {
+  else if (appearance == CheckboxPart)
     p.drawControl(QStyle::CE_CheckBox, option);
-  }
 
   return false;
 }

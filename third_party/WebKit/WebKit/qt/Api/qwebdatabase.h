@@ -44,7 +44,7 @@ class QWEBKIT_EXPORT QWebDatabase {
   QString fileName() const;
   QWebSecurityOrigin origin() const;
 
-  static void removeDatabase(const QWebDatabase& db);
+  static void removeDatabase(const QWebDatabase&);
   static void removeAllDatabases();
 
  private:

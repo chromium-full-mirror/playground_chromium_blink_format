@@ -446,8 +446,7 @@ QString QWebFrame::renderTreeDump() const {
 QString QWebFrame::title() const {
   if (d->frame->document())
     return d->frame->loader()->documentLoader()->title();
-  else
-    return QString();
+  return QString();
 }
 
 /*!
@@ -1121,8 +1120,8 @@ void QWebFrame::print(QPrinter* printer) const {
 
   printContext.begin(pageRect.width());
 
-  printContext.computePageRects(pageRect, /*headerHeight*/ 0,
-                                /*footerHeight*/ 0, /*userScaleFactor*/ 1.0,
+  printContext.computePageRects(pageRect, /* headerHeight */ 0,
+                                /* footerHeight */ 0, /* userScaleFactor */ 1.0,
                                 pageHeight);
 
   int docCopies;

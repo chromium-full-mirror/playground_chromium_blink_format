@@ -84,7 +84,6 @@ String DragData::asPlainText() const {
     return text;
 
   // FIXME: Should handle rich text here
-
   return asURL(0);
 }
 

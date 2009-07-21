@@ -111,10 +111,10 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
       offset += add + letterSpacing + components->last().width;
       start = 1;
       //         qDebug() << "space at 0" << offset;
-    } else if (smallCaps) {
+    } else if (smallCaps)
       f = (QChar::category(run[0]) == QChar::Letter_Lowercase ? &font.scFont()
                                                               : &font.font());
-    }
+
     for (int i = 1; i < run.length(); ++i) {
       uint ch = run[i];
       if (QChar(ch).isHighSurrogate() && QChar(run[i - 1]).isLowSurrogate())
@@ -293,9 +293,8 @@ int Font::offsetForPositionForComplexText(const TextRun& run,
         if (cursor > 1)
           --cursor;
         return offset + cursor;
-      } else {
+      } else
         offset += components.at(i).string.length() - 1;
-      }
     }
   } else {
     for (int i = 0; i < components.size(); ++i) {
@@ -317,9 +316,8 @@ int Font::offsetForPositionForComplexText(const TextRun& run,
         if (cursor > 1)
           --cursor;
         return offset + cursor;
-      } else {
+      } else
         offset += components.at(i).string.length() - 1;
-      }
     }
   }
   return run.length();

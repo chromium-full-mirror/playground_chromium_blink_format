@@ -32,7 +32,7 @@ static QWebHistoryInterface* default_interface;
 static bool gRoutineAdded;
 
 static void gCleanupInterface() {
-  if (default_interface && default_interface->parent() == 0)
+  if (default_interface && !default_interface->parent())
     delete default_interface;
   default_interface = 0;
 }
@@ -51,7 +51,8 @@ void QWebHistoryInterface::setDefaultInterface(
     QWebHistoryInterface* defaultInterface) {
   if (default_interface == defaultInterface)
     return;
-  if (default_interface && default_interface->parent() == 0)
+
+  if (default_interface && !default_interface->parent())
     delete default_interface;
 
   default_interface = defaultInterface;

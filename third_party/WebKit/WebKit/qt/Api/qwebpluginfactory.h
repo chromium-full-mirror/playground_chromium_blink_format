@@ -53,7 +53,7 @@ class QWEBKIT_EXPORT QWebPluginFactory : public QObject {
   virtual void refreshPlugins();
 
   virtual QObject* create(const QString& mimeType,
-                          const QUrl& url,
+                          const QUrl&,
                           const QStringList& argumentNames,
                           const QStringList& argumentValues) const = 0;
 
