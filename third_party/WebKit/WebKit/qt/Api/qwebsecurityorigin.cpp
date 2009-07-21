@@ -39,11 +39,9 @@ using namespace WebCore;
     QWebSecurityOrigin provides access to the security domains defined by web
    sites.
     An origin consists of a host name, a scheme, and a port number. Web sites
-   with the same
-    security origin can access each other's resources for client-side scripting
-   or databases.
-
-    ### diagram
+    with the same security origin can access each other's resources for
+   client-side
+    scripting or databases.
 
     For example the site \c{http://www.example.com/my/page.html} is allowed to
    share the same
@@ -55,8 +53,16 @@ using namespace WebCore;
    \c{http://www.example.com/}'s resources,
     because they are of a different security origin.
 
-    QWebSecurity also provides access to all databases defined within a security
+    Call QWebFrame::securityOrigin() to get the QWebSecurityOrigin for a frame
+   in a
+    web page, and use host(), scheme() and port() to identify the security
    origin.
+
+    Use databases() to access the databases defined within a security origin.
+   The
+    disk usage of the origin's databases can be limited with setDatabaseQuota().
+    databaseQuota() and databaseUsage() report the current limit as well as the
+    current usage.
 
     For more information refer to the
     \l{http://en.wikipedia.org/wiki/Same_origin_policy}{"Same origin policy"
