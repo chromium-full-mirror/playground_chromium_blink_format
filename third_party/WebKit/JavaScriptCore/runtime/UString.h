@@ -87,8 +87,7 @@ class UString {
     static PassRefPtr<Rep> createEmptyBuffer(size_t size) {
       // Guard against integer overflow
       if (size < (std::numeric_limits<size_t>::max() / sizeof(UChar))) {
-        void* buf = 0;
-        if (tryFastMalloc(size * sizeof(UChar)).getValue(buf))
+        if (void* buf = tryFastMalloc(size * sizeof(UChar)))
           return adoptRef(new BaseString(static_cast<UChar*>(buf), 0, size));
       }
       return adoptRef(new BaseString(0, 0, 0));
