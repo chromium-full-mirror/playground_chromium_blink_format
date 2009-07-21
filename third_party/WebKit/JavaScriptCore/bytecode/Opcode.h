@@ -165,7 +165,7 @@ const int numOpcodeIDs = op_end + 1;
 
 #define OPCODE_ID_LENGTHS(id, length) const int id##_length = length;
 FOR_EACH_OPCODE_ID(OPCODE_ID_LENGTHS);
-#undef OPCODE_ID_SIZES
+#undef OPCODE_ID_LENGTHS
 
 #define OPCODE_LENGTH(opcode) opcode##_length
 
