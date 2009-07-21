@@ -536,6 +536,7 @@ class V8Custom {
   DECLARE_CALLBACK(WorkerConstructor);
 
   DECLARE_PROPERTY_ACCESSOR_GETTER(WorkerContextSelf);
+  DECLARE_PROPERTY_ACCESSOR(WorkerContextOnerror);
   DECLARE_PROPERTY_ACCESSOR(WorkerContextOnmessage);
   DECLARE_CALLBACK(WorkerContextImportScripts);
   DECLARE_CALLBACK(WorkerContextSetTimeout);
