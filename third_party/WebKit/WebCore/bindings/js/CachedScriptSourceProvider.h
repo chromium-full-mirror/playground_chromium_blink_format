@@ -29,11 +29,12 @@
 #include "CachedResourceClient.h"
 #include "CachedResourceHandle.h"
 #include "CachedScript.h"
+#include "ScriptSourceProvider.h"
 #include <parser/SourceCode.h>
 
 namespace WebCore {
 
-class CachedScriptSourceProvider : public JSC::SourceProvider,
+class CachedScriptSourceProvider : public ScriptSourceProvider,
                                    public CachedResourceClient {
  public:
   static PassRefPtr<CachedScriptSourceProvider> create(
@@ -49,10 +50,12 @@ class CachedScriptSourceProvider : public JSC::SourceProvider,
   }
   const UChar* data() const { return m_cachedScript->script().characters(); }
   int length() const { return m_cachedScript->script().length(); }
+  const String& source() const { return m_cachedScript->script(); }
 
  private:
   CachedScriptSourceProvider(CachedScript* cachedScript)
-      : SourceProvider(cachedScript->url()), m_cachedScript(cachedScript) {
+      : ScriptSourceProvider(cachedScript->url()),
+        m_cachedScript(cachedScript) {
     m_cachedScript->addClient(this);
   }
 
