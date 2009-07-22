@@ -6312,7 +6312,7 @@ Color CSSStyleSelector::getColorFromPrimitiveValue(
     else
       col = colorForCSSValue(ident);
   } else if (primitiveValue->primitiveType() == CSSPrimitiveValue::CSS_RGBCOLOR)
-    col.setRGB(primitiveValue->getRGBColorValue());
+    col.setRGB(primitiveValue->getRGBA32Value());
   return col;
 }
 
