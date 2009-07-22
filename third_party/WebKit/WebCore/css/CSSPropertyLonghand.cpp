@@ -130,10 +130,10 @@ static void initShorthandMap(ShorthandMap& shorthandMap) {
                           textStrokeProperties);
 
   static const int backgroundProperties[] = {
-      CSSPropertyBackgroundAttachment,   CSSPropertyWebkitBackgroundClip,
-      CSSPropertyBackgroundColor,        CSSPropertyBackgroundImage,
-      CSSPropertyWebkitBackgroundOrigin, CSSPropertyBackgroundPositionX,
-      CSSPropertyBackgroundPositionY,    CSSPropertyBackgroundRepeat,
+      CSSPropertyBackgroundAttachment, CSSPropertyBackgroundClip,
+      CSSPropertyBackgroundColor,      CSSPropertyBackgroundImage,
+      CSSPropertyBackgroundOrigin,     CSSPropertyBackgroundPositionX,
+      CSSPropertyBackgroundPositionY,  CSSPropertyBackgroundRepeat,
   };
   SET_SHORTHAND_MAP_ENTRY(shorthandMap, CSSPropertyBackground,
                           backgroundProperties);

@@ -908,9 +908,11 @@ bool CSSParser::parseValue(int propId, bool important) {
     }
 
     case CSSPropertyBackgroundAttachment:
+    case CSSPropertyBackgroundClip:
     case CSSPropertyWebkitBackgroundClip:
     case CSSPropertyWebkitBackgroundComposite:
     case CSSPropertyBackgroundImage:
+    case CSSPropertyBackgroundOrigin:
     case CSSPropertyWebkitBackgroundOrigin:
     case CSSPropertyBackgroundPosition:
     case CSSPropertyBackgroundPositionX:
@@ -1613,16 +1615,15 @@ bool CSSParser::parseValue(int propId, bool important) {
       const int properties[] = {
           CSSPropertyBackgroundImage,      CSSPropertyBackgroundRepeat,
           CSSPropertyBackgroundAttachment, CSSPropertyBackgroundPosition,
-          CSSPropertyWebkitBackgroundClip, CSSPropertyWebkitBackgroundOrigin,
-          CSSPropertyBackgroundColor};
-      return parseFillShorthand(propId, properties, 7, important);
+          CSSPropertyBackgroundOrigin,     CSSPropertyBackgroundColor};
+      return parseFillShorthand(propId, properties, 6, important);
     }
     case CSSPropertyWebkitMask: {
       const int properties[] = {
-          CSSPropertyWebkitMaskImage,      CSSPropertyWebkitMaskRepeat,
+          CSSPropertyWebkitMaskImage, CSSPropertyWebkitMaskRepeat,
           CSSPropertyWebkitMaskAttachment, CSSPropertyWebkitMaskPosition,
-          CSSPropertyWebkitMaskClip,       CSSPropertyWebkitMaskOrigin};
-      return parseFillShorthand(propId, properties, 6, important);
+          CSSPropertyWebkitMaskOrigin};
+      return parseFillShorthand(propId, properties, 5, important);
     }
     case CSSPropertyBorder:
       // [ 'border-width' || 'border-style' || <color> ] | inherit
@@ -1821,6 +1822,7 @@ bool CSSParser::parseFillShorthand(int propId,
 
   bool parsedProperty[cMaxFillProperties] = {false};
   RefPtr<CSSValue> values[cMaxFillProperties];
+  RefPtr<CSSValue> clipValue;
   RefPtr<CSSValue> positionYValue;
   int i;
 
@@ -1841,6 +1843,13 @@ bool CSSParser::parseFillShorthand(int propId,
           if (properties[i] == CSSPropertyBackgroundPosition ||
               properties[i] == CSSPropertyWebkitMaskPosition)
             addFillValue(positionYValue, CSSInitialValue::createImplicit());
+          if ((properties[i] == CSSPropertyBackgroundOrigin ||
+               properties[i] == CSSPropertyWebkitMaskOrigin) &&
+              !parsedProperty[i]) {
+            // If background-origin wasn't present, then reset background-clip
+            // also.
+            addFillValue(clipValue, CSSInitialValue::createImplicit());
+          }
         }
         parsedProperty[i] = false;
       }
@@ -1860,6 +1869,23 @@ bool CSSParser::parseFillShorthand(int propId,
           if (properties[i] == CSSPropertyBackgroundPosition ||
               properties[i] == CSSPropertyWebkitMaskPosition)
             addFillValue(positionYValue, val2.release());
+          if (properties[i] == CSSPropertyBackgroundOrigin ||
+              properties[i] == CSSPropertyWebkitMaskOrigin) {
+            // Reparse the value as a clip, and see if we succeed.
+            if (parseFillProperty(CSSPropertyBackgroundClip, propId1, propId2,
+                                  val1, val2))
+              addFillValue(
+                  clipValue,
+                  val1.release());  // The property parsed successfully.
+            else
+              addFillValue(
+                  clipValue,
+                  CSSInitialValue::createImplicit());  // Some value was used
+                                                       // for origin that is not
+                                                       // supported by clip.
+                                                       // Just reset clip
+                                                       // instead.
+          }
         }
       }
     }
@@ -1877,6 +1903,12 @@ bool CSSParser::parseFillShorthand(int propId,
       if (properties[i] == CSSPropertyBackgroundPosition ||
           properties[i] == CSSPropertyWebkitMaskPosition)
         addFillValue(positionYValue, CSSInitialValue::createImplicit());
+      if ((properties[i] == CSSPropertyBackgroundOrigin ||
+           properties[i] == CSSPropertyWebkitMaskOrigin) &&
+          !parsedProperty[i]) {
+        // If background-origin wasn't present, then reset background-clip also.
+        addFillValue(clipValue, CSSInitialValue::createImplicit());
+      }
     }
   }
 
@@ -1898,6 +1930,12 @@ bool CSSParser::parseFillShorthand(int propId,
                   important);
     } else
       addProperty(properties[i], values[i].release(), important);
+
+    // Add in clip values when we hit the corresponding origin property.
+    if (properties[i] == CSSPropertyBackgroundOrigin)
+      addProperty(CSSPropertyBackgroundClip, clipValue.release(), important);
+    else if (properties[i] == CSSPropertyWebkitMaskOrigin)
+      addProperty(CSSPropertyWebkitMaskClip, clipValue.release(), important);
   }
 
   return true;
@@ -2441,13 +2479,29 @@ bool CSSParser::parseFillProperty(int propId,
         case CSSPropertyWebkitBackgroundOrigin:
         case CSSPropertyWebkitMaskClip:
         case CSSPropertyWebkitMaskOrigin:
-          // The first three values here are deprecated and should not be
-          // allowed to apply when we drop the -webkit-
-          // from the property names.
+          // The first three values here are deprecated and do not apply to the
+          // version of the property that has
+          // the -webkit- prefix removed.
           if (val->id == CSSValueBorder || val->id == CSSValuePadding ||
               val->id == CSSValueContent || val->id == CSSValueBorderBox ||
               val->id == CSSValuePaddingBox || val->id == CSSValueContentBox ||
-              val->id == CSSValueText) {
+              ((propId == CSSPropertyWebkitBackgroundClip ||
+                propId == CSSPropertyWebkitMaskClip) &&
+               (val->id == CSSValueText || val->id == CSSValueWebkitText))) {
+            currValue = CSSPrimitiveValue::createIdentifier(val->id);
+            m_valueList->next();
+          }
+          break;
+        case CSSPropertyBackgroundClip:
+          if (val->id == CSSValueBorderBox || val->id == CSSValuePaddingBox ||
+              val->id == CSSValueWebkitText) {
+            currValue = CSSPrimitiveValue::createIdentifier(val->id);
+            m_valueList->next();
+          }
+          break;
+        case CSSPropertyBackgroundOrigin:
+          if (val->id == CSSValueBorderBox || val->id == CSSValuePaddingBox ||
+              val->id == CSSValueContentBox) {
             currValue = CSSPrimitiveValue::createIdentifier(val->id);
             m_valueList->next();
           }

@@ -127,7 +127,7 @@ String CSSMutableStyleDeclaration::getPropertyValue(int propertyID) const {
       const int properties[7] = {
           CSSPropertyBackgroundImage,      CSSPropertyBackgroundRepeat,
           CSSPropertyBackgroundAttachment, CSSPropertyBackgroundPosition,
-          CSSPropertyWebkitBackgroundClip, CSSPropertyWebkitBackgroundOrigin,
+          CSSPropertyBackgroundClip,       CSSPropertyBackgroundOrigin,
           CSSPropertyBackgroundColor};
       return getLayeredShorthandValue(properties, 7);
     }
