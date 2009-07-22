@@ -1264,27 +1264,15 @@ class X86Assembler {
     setPointer(reinterpret_cast<char*>(code) + where.m_offset, value);
   }
 
-  static void relinkJump(void* from, void* to) {
-    ExecutableAllocator::MakeWritable unprotect(
-        reinterpret_cast<char*>(from) - sizeof(int32_t), sizeof(int32_t));
-    setRel32(from, to);
-  }
+  static void relinkJump(void* from, void* to) { setRel32(from, to); }
 
-  static void relinkCall(void* from, void* to) {
-    ExecutableAllocator::MakeWritable unprotect(
-        reinterpret_cast<char*>(from) - sizeof(int32_t), sizeof(int32_t));
-    setRel32(from, to);
-  }
+  static void relinkCall(void* from, void* to) { setRel32(from, to); }
 
   static void repatchInt32(void* where, int32_t value) {
-    ExecutableAllocator::MakeWritable unprotect(
-        reinterpret_cast<char*>(where) - sizeof(int32_t), sizeof(int32_t));
     setInt32(where, value);
   }
 
   static void repatchPointer(void* where, void* value) {
-    ExecutableAllocator::MakeWritable unprotect(
-        reinterpret_cast<char*>(where) - sizeof(void*), sizeof(void*));
     setPointer(where, value);
   }
 
@@ -1295,7 +1283,6 @@ class X86Assembler {
     // Skip over the prefix byte.
     where = reinterpret_cast<char*>(where) + 1;
 #endif
-    ExecutableAllocator::MakeWritable unprotect(where, 1);
     *reinterpret_cast<unsigned char*>(where) =
         static_cast<unsigned char>(OP_LEA);
   }

@@ -632,15 +632,16 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
 
   CodeLocationLabel entryLabel = patchBuffer.finalizeCodeAddendum();
   stubInfo->stubRoutine = entryLabel;
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(m_codeBlock);
   repatchBuffer.relinkCallerToTrampoline(returnAddress, entryLabel);
 }
 
-void JIT::patchGetByIdSelf(StructureStubInfo* stubInfo,
+void JIT::patchGetByIdSelf(CodeBlock* codeBlock,
+                           StructureStubInfo* stubInfo,
                            Structure* structure,
                            size_t cachedOffset,
                            ReturnAddressPtr returnAddress) {
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(codeBlock);
 
   // We don't want to patch more than once - in future go to
   // cti_op_get_by_id_generic.
@@ -669,11 +670,12 @@ void JIT::patchGetByIdSelf(StructureStubInfo* stubInfo,
                         offset);
 }
 
-void JIT::patchMethodCallProto(MethodCallLinkInfo& methodCallLinkInfo,
+void JIT::patchMethodCallProto(CodeBlock* codeBlock,
+                               MethodCallLinkInfo& methodCallLinkInfo,
                                JSFunction* callee,
                                Structure* structure,
                                JSObject* proto) {
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(codeBlock);
 
   ASSERT(!methodCallLinkInfo.cachedStructure);
   methodCallLinkInfo.cachedStructure = structure;
@@ -696,11 +698,12 @@ void JIT::patchMethodCallProto(MethodCallLinkInfo& methodCallLinkInfo,
                         callee);
 }
 
-void JIT::patchPutByIdReplace(StructureStubInfo* stubInfo,
+void JIT::patchPutByIdReplace(CodeBlock* codeBlock,
+                              StructureStubInfo* stubInfo,
                               Structure* structure,
                               size_t cachedOffset,
                               ReturnAddressPtr returnAddress) {
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(codeBlock);
 
   // We don't want to patch more than once - in future go to
   // cti_op_put_by_id_generic.
@@ -768,7 +771,7 @@ void JIT::privateCompilePatchGetArrayLength(ReturnAddressPtr returnAddress) {
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(m_codeBlock);
   repatchBuffer.relink(jumpLocation, entryLabel);
 
   // We don't want to patch more than once - in future go to
@@ -831,7 +834,7 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(m_codeBlock);
   repatchBuffer.relink(jumpLocation, entryLabel);
 
   // We don't want to patch more than once - in future go to
@@ -876,7 +879,7 @@ void JIT::privateCompileGetByIdSelfList(
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(m_codeBlock);
   repatchBuffer.relink(jumpLocation, entryLabel);
 }
 
@@ -939,7 +942,7 @@ void JIT::privateCompileGetByIdProtoList(
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(m_codeBlock);
   repatchBuffer.relink(jumpLocation, entryLabel);
 }
 
@@ -1009,7 +1012,7 @@ void JIT::privateCompileGetByIdChainList(
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(m_codeBlock);
   repatchBuffer.relink(jumpLocation, entryLabel);
 }
 
@@ -1071,7 +1074,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
   // instead.
   CodeLocationJump jumpLocation =
       stubInfo->hotPathBegin.jumpAtOffset(patchOffsetGetByIdBranchToSlowCase);
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(m_codeBlock);
   repatchBuffer.relink(jumpLocation, entryLabel);
 
   // We don't want to patch more than once - in future go to

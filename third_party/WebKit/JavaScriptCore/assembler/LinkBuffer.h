@@ -176,6 +176,7 @@ class LinkBuffer : public Noncopyable {
 #endif
 
     ExecutableAllocator::makeExecutable(code(), m_size);
+    ExecutableAllocator::cacheFlush(code(), m_size);
   }
 
   RefPtr<ExecutablePool> m_executablePool;

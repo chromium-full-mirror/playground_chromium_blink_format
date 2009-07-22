@@ -160,11 +160,14 @@ struct MethodCallCompilationInfo {
 
 // Near calls can only be patched to other JIT code, regular calls can be
 // patched to JIT code or relinked to stub functions.
-void ctiPatchNearCallByReturnAddress(ReturnAddressPtr returnAddress,
+void ctiPatchNearCallByReturnAddress(CodeBlock* codeblock,
+                                     ReturnAddressPtr returnAddress,
                                      MacroAssemblerCodePtr newCalleeFunction);
-void ctiPatchCallByReturnAddress(ReturnAddressPtr returnAddress,
+void ctiPatchCallByReturnAddress(CodeBlock* codeblock,
+                                 ReturnAddressPtr returnAddress,
                                  MacroAssemblerCodePtr newCalleeFunction);
-void ctiPatchCallByReturnAddress(ReturnAddressPtr returnAddress,
+void ctiPatchCallByReturnAddress(CodeBlock* codeblock,
+                                 ReturnAddressPtr returnAddress,
                                  FunctionPtr newCalleeFunction);
 
 class JIT : private MacroAssembler {
@@ -438,15 +441,18 @@ class JIT : private MacroAssembler {
         ctiVirtualCall, ctiNativeCallThunk);
   }
 
-  static void patchGetByIdSelf(StructureStubInfo*,
+  static void patchGetByIdSelf(CodeBlock* codeblock,
+                               StructureStubInfo*,
                                Structure*,
                                size_t cachedOffset,
                                ReturnAddressPtr returnAddress);
-  static void patchPutByIdReplace(StructureStubInfo*,
+  static void patchPutByIdReplace(CodeBlock* codeblock,
+                                  StructureStubInfo*,
                                   Structure*,
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress);
-  static void patchMethodCallProto(MethodCallLinkInfo&,
+  static void patchMethodCallProto(CodeBlock* codeblock,
+                                   MethodCallLinkInfo&,
                                    JSFunction*,
                                    Structure*,
                                    JSObject*);
@@ -459,6 +465,7 @@ class JIT : private MacroAssembler {
   }
 
   static void linkCall(JSFunction* callee,
+                       CodeBlock* callerCodeBlock,
                        CodeBlock* calleeCodeBlock,
                        JITCode&,
                        CallLinkInfo*,

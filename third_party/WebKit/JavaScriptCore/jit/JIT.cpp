@@ -47,21 +47,24 @@ using namespace std;
 
 namespace JSC {
 
-void ctiPatchNearCallByReturnAddress(ReturnAddressPtr returnAddress,
+void ctiPatchNearCallByReturnAddress(CodeBlock* codeblock,
+                                     ReturnAddressPtr returnAddress,
                                      MacroAssemblerCodePtr newCalleeFunction) {
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(codeblock);
   repatchBuffer.relinkNearCallerToTrampoline(returnAddress, newCalleeFunction);
 }
 
-void ctiPatchCallByReturnAddress(ReturnAddressPtr returnAddress,
+void ctiPatchCallByReturnAddress(CodeBlock* codeblock,
+                                 ReturnAddressPtr returnAddress,
                                  MacroAssemblerCodePtr newCalleeFunction) {
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(codeblock);
   repatchBuffer.relinkCallerToTrampoline(returnAddress, newCalleeFunction);
 }
 
-void ctiPatchCallByReturnAddress(ReturnAddressPtr returnAddress,
+void ctiPatchCallByReturnAddress(CodeBlock* codeblock,
+                                 ReturnAddressPtr returnAddress,
                                  FunctionPtr newCalleeFunction) {
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(codeblock);
   repatchBuffer.relinkCallerToFunction(returnAddress, newCalleeFunction);
 }
 
@@ -519,6 +522,7 @@ void JIT::privateCompile() {
 #if ENABLE(JIT_OPTIMIZE_CALL)
   for (unsigned i = 0; i < m_codeBlock->numberOfCallLinkInfos(); ++i) {
     CallLinkInfo& info = m_codeBlock->callLinkInfo(i);
+    info.ownerCodeBlock = m_codeBlock;
     info.callReturnLocation = patchBuffer.locationOfNearCall(
         m_callStructureStubCompilationInfo[i].callReturnLocation);
     info.hotPathBegin = patchBuffer.locationOf(
@@ -1029,18 +1033,19 @@ void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
   // (and, if a new JSFunction happened to be constructed at the same location,
   // we could get a false positive
   // match).  Reset the check so it no longer matches.
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(callLinkInfo->ownerCodeBlock);
   repatchBuffer.repatch(callLinkInfo->hotPathBegin, JSValue::encode(JSValue()));
 }
 
 void JIT::linkCall(JSFunction* callee,
+                   CodeBlock* callerCodeBlock,
                    CodeBlock* calleeCodeBlock,
                    JITCode& code,
                    CallLinkInfo* callLinkInfo,
                    int callerArgCount,
                    JSGlobalData* globalData) {
   ASSERT(calleeCodeBlock);
-  RepatchBuffer repatchBuffer;
+  RepatchBuffer repatchBuffer(callerCodeBlock);
 
   // Currently we only link calls with the exact number of arguments.
   // If this is a native call calleeCodeBlock is null so the number of

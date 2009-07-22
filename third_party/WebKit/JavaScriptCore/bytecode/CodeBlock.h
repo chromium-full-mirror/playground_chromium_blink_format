@@ -105,6 +105,7 @@ struct CallLinkInfo {
   CodeLocationNearCall callReturnLocation;
   CodeLocationDataLabelPtr hotPathBegin;
   CodeLocationNearCall hotPathOther;
+  CodeBlock* ownerCodeBlock;
   CodeBlock* callee;
   unsigned position;
 
@@ -331,6 +332,7 @@ class CodeBlock : public FastAllocBase {
 #endif
 
 #if ENABLE(JIT)
+  JITCode& getJITCode() { return ownerNode()->generatedJITCode(); }
   void setJITCode(JITCode);
   ExecutablePool* executablePool() { return ownerNode()->getExecutablePool(); }
 #endif

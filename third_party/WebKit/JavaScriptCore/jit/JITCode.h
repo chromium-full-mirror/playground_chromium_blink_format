@@ -77,12 +77,12 @@ class JITCode {
         Profiler::enabledProfilerReference(), globalData));
   }
 
-#ifndef NDEBUG
+  void* start() { return m_ref.m_code.dataLocation(); }
+
   size_t size() {
     ASSERT(m_ref.m_code.executableAddress());
     return m_ref.m_size;
   }
-#endif
 
   ExecutablePool* getExecutablePool() { return m_ref.m_executablePool.get(); }
 

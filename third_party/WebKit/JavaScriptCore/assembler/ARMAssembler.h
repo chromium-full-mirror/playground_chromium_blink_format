@@ -481,8 +481,8 @@ class ARMAssembler {
   static void patchPointerInternal(intptr_t from, void* to) {
     ARMWord* insn = reinterpret_cast<ARMWord*>(from);
     ARMWord* addr = getLdrImmAddress(insn);
-    ExecutableAllocator::MakeWritable unprotect(addr, sizeof(ARMWord));
     *addr = reinterpret_cast<ARMWord>(to);
+    ExecutableAllocator::cacheFlush(addr, sizeof(ARMWord));
   }
 
   static ARMWord patchConstantPoolLoad(ARMWord load, ARMWord value) {
@@ -514,8 +514,8 @@ class ARMAssembler {
     ARMWord* insn = reinterpret_cast<ARMWord*>(from);
     ASSERT((*insn & 0x0ff00f00) == 0x05900000);
 
-    ExecutableAllocator::MakeWritable unprotect(insn, sizeof(ARMWord));
     *insn = (*insn & 0xf00ff0ff) | 0x02800000;
+    ExecutableAllocator::cacheFlush(insn, sizeof(ARMWord));
   }
 
   // Linkers
