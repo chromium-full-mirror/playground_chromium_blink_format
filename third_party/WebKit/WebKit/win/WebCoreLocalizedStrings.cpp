@@ -303,7 +303,7 @@ String WebCore::mediaElementLiveBroadcastStateText() {
 
 String WebCore::imageTitle(const String& filename, const IntSize& size) {
   static RetainPtr<CFStringRef> format(
-      AdoptCF, UI_STRING("%@ %d×%d pixels",
+      AdoptCF, UI_STRING("%@ %d\xC3\x97%d pixels",
                          "window title for a standalone image (uses "
                          "multiplication symbol, not x)"));
 
