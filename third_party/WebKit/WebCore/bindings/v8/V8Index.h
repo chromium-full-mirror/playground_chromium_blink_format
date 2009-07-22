@@ -38,6 +38,20 @@ namespace WebCore {
 
 typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
 
+#if ENABLE(DATAGRID)
+#define DATAGRID_HTMLELEMENT_TYPES(V)                 \
+  V(HTMLDATAGRIDCELLELEMENT, HTMLDataGridCellElement) \
+  V(HTMLDATAGRIDCOLELEMENT, HTMLDataGridColElement)   \
+  V(HTMLDATAGRIDELEMENT, HTMLDataGridElement)         \
+  V(HTMLDATAGRIDROWELEMENT, HTMLDataGridRowElement)
+#define DATAGRID_NONNODE_TYPES(V)   \
+  V(DATAGRIDCOLUMN, DataGridColumn) \
+  V(DATAGRIDCOLUMNLIST, DataGridColumnList)
+#else
+#define DATAGRID_HTMLELEMENT_TYPES(V)
+#define DATAGRID_NONNODE_TYPES(V)
+#endif
+
 #if ENABLE(VIDEO)
 #define VIDEO_HTMLELEMENT_TYPES(V)        \
   V(HTMLAUDIOELEMENT, HTMLAudioElement)   \
@@ -79,8 +93,6 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
   V(CHARACTERDATA, CharacterData)                     \
   V(CDATASECTION, CDATASection)                       \
   V(COMMENT, Comment)                                 \
-  V(DATAGRIDCOLUMN, DataGridColumn)                   \
-  V(DATAGRIDCOLUMNLIST, DataGridColumnList)           \
   V(DOCUMENT, Document)                               \
   V(DOCUMENTFRAGMENT, DocumentFragment)               \
   V(DOCUMENTTYPE, DocumentType)                       \
@@ -102,10 +114,6 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
   V(HTMLBRELEMENT, HTMLBRElement)                     \
   V(HTMLBUTTONELEMENT, HTMLButtonElement)             \
   V(HTMLCANVASELEMENT, HTMLCanvasElement)             \
-  V(HTMLDATAGRIDCELLELEMENT, HTMLDataGridCellElement) \
-  V(HTMLDATAGRIDCOLELEMENT, HTMLDataGridColElement)   \
-  V(HTMLDATAGRIDELEMENT, HTMLDataGridElement)         \
-  V(HTMLDATAGRIDROWELEMENT, HTMLDataGridRowElement)   \
   V(HTMLDIRECTORYELEMENT, HTMLDirectoryElement)       \
   V(HTMLDIVELEMENT, HTMLDivElement)                   \
   V(HTMLDLISTELEMENT, HTMLDListElement)               \
@@ -153,6 +161,7 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
   V(HTMLTITLEELEMENT, HTMLTitleElement)               \
   V(HTMLULISTELEMENT, HTMLUListElement)               \
   V(HTMLELEMENT, HTMLElement)                         \
+  DATAGRID_HTMLELEMENT_TYPES(V)                       \
   VIDEO_HTMLELEMENT_TYPES(V)
 
 #if ENABLE(SVG_ANIMATION)
@@ -373,6 +382,7 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
   V(XPATHRESULT, XPathResult)                                 \
   V(XSLTPROCESSOR, XSLTProcessor)                             \
   ACTIVE_DOM_OBJECT_TYPES(V)                                  \
+  DATAGRID_NONNODE_TYPES(V)                                   \
   VIDEO_NONNODE_TYPES(V)                                      \
   SHARED_WORKER_NONNODE_WRAPPER_TYPES(V)                      \
   WORKER_NONNODE_WRAPPER_TYPES(V)
