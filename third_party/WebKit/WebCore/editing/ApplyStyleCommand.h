@@ -101,7 +101,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   PassRefPtr<CSSMutableStyleDeclaration> extractAndNegateTextDecorationStyle(
       Node*);
   void applyTextDecorationStyle(Node*, CSSMutableStyleDeclaration* style);
-  void pushDownTextDecorationStyleAroundNode(Node*, bool force);
+  void pushDownTextDecorationStyleAroundNode(Node*, bool forceNegate);
   void pushDownTextDecorationStyleAtBoundaries(const Position& start,
                                                const Position& end);
 

@@ -1265,35 +1265,41 @@ void ApplyStyleCommand::applyTextDecorationStyle(
   }
 }
 
-void ApplyStyleCommand::pushDownTextDecorationStyleAroundNode(Node* node,
-                                                              bool force) {
-  Node* highestAncestor = highestAncestorWithTextDecoration(node);
+void ApplyStyleCommand::pushDownTextDecorationStyleAroundNode(
+    Node* targetNode,
+    bool forceNegate) {
+  ASSERT(targetNode);
+  Node* highestAncestor = highestAncestorWithTextDecoration(targetNode);
+  if (!highestAncestor)
+    return;
 
-  if (highestAncestor) {
-    Node* nextCurrent;
-    Node* nextChild;
-    for (Node* current = highestAncestor; current != node;
-         current = nextCurrent) {
-      ASSERT(current);
+  // The outer loop is traversing the tree vertically from highestAncestor to
+  // targetNode
+  Node* current = highestAncestor;
+  while (current != targetNode) {
+    ASSERT(current);
+    ASSERT(current->contains(targetNode));
+    RefPtr<CSSMutableStyleDeclaration> decoration =
+        forceNegate ? extractAndNegateTextDecorationStyle(current)
+                    : extractTextDecorationStyle(current);
 
-      nextCurrent = NULL;
+    // The inner loop will go through children on each level
+    Node* child = current->firstChild();
+    while (child) {
+      Node* nextChild = child->nextSibling();
 
-      RefPtr<CSSMutableStyleDeclaration> decoration =
-          force ? extractAndNegateTextDecorationStyle(current)
-                : extractTextDecorationStyle(current);
+      // Apply text decoration to all nodes containing targetNode and their
+      // siblings but NOT to targetNode
+      if (child != targetNode)
+        applyTextDecorationStyle(child, decoration.get());
 
-      for (Node* child = current->firstChild(); child; child = nextChild) {
-        nextChild = child->nextSibling();
+      // We found the next node for the outer loop (contains targetNode)
+      // When reached targetNode, stop the outer loop upon the completion of the
+      // current inner loop
+      if (child == targetNode || child->contains(targetNode))
+        current = child;
 
-        if (node == child) {
-          nextCurrent = child;
-        } else if (node->isDescendantOf(child)) {
-          applyTextDecorationStyle(child, decoration.get());
-          nextCurrent = child;
-        } else {
-          applyTextDecorationStyle(child, decoration.get());
-        }
-      }
+      child = nextChild;
     }
   }
 }
