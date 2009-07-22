@@ -73,7 +73,7 @@ class XSSAuditor {
 
   // Determines whether the script should be allowed or denied execution
   // based on the content of any user-submitted data.
-  bool canEvaluate(const String& sourceCode) const;
+  bool canEvaluate(const String& code) const;
 
   // Determines whether the JavaScript URL should be allowed or denied execution
   // based on the content of any user-submitted data.
@@ -102,29 +102,21 @@ class XSSAuditor {
   bool canSetBaseElementURL(const String& url) const;
 
  private:
+  static String canonicalize(const String&);
+
   static String decodeURL(const String& url,
                           const TextEncoding& encoding = UTF8Encoding(),
-                          bool allowNullCharacters = false,
-                          bool allowNonNullControlCharacters = true,
-                          bool decodeHTMLentities = true,
-                          bool leaveUndecodableHTMLEntitiesUntouched = false);
+                          bool decodeHTMLentities = true);
 
   static String decodeHTMLEntities(
       const String&,
-      bool leaveUndecodableHTMLEntitiesUntouched = false);
+      bool leaveUndecodableHTMLEntitiesUntouched = true);
 
-  bool findInRequest(const String&,
-                     bool matchNullCharacters = true,
-                     bool matchNonNullControlCharacters = true,
-                     bool decodeHTMLentities = true,
-                     bool leaveUndecodableHTMLEntitiesUntouched = false) const;
+  bool findInRequest(const String&, bool decodeHTMLentities = true) const;
 
   bool findInRequest(Frame*,
                      const String&,
-                     bool matchNullCharacters = true,
-                     bool matchNonNullControlCharacters = true,
-                     bool decodeHTMLentities = true,
-                     bool leaveUndecodableHTMLEntitiesUntouched = false) const;
+                     bool decodeHTMLentities = true) const;
 
   // The frame to audit.
   Frame* m_frame;
