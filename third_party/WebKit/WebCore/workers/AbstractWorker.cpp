@@ -34,6 +34,7 @@
 
 #include "AbstractWorker.h"
 
+#include "ErrorEvent.h"
 #include "Event.h"
 #include "EventException.h"
 #include "EventNames.h"
@@ -113,11 +114,20 @@ void AbstractWorker::dispatchLoadErrorEvent() {
   ASSERT(!ec);
 }
 
-void AbstractWorker::dispatchScriptErrorEvent(const String&,
-                                              const String&,
-                                              int) {
-  // FIXME: Generate an ErrorEvent instead of a simple event
-  dispatchLoadErrorEvent();
+void AbstractWorker::dispatchScriptErrorEvent(const String& message,
+                                              const String& sourceURL,
+                                              int lineNumber) {
+  RefPtr<ErrorEvent> event =
+      ErrorEvent::create(message, sourceURL, static_cast<unsigned>(lineNumber));
+  if (m_onErrorListener) {
+    event->setTarget(this);
+    event->setCurrentTarget(this);
+    m_onErrorListener->handleEvent(event.get(), true);
+  }
+
+  ExceptionCode ec = 0;
+  dispatchEvent(event.release(), ec);
+  ASSERT(!ec);
 }
 
 }  // namespace WebCore
