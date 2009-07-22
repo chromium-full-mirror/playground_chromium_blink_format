@@ -145,6 +145,24 @@ class MacroAssemblerX86 : public MacroAssemblerX86Common {
 
  private:
   const bool m_isSSE2Present;
+
+  friend class LinkBuffer;
+  friend class RepatchBuffer;
+
+  static void linkCall(void* code, Call call, FunctionPtr function) {
+    X86Assembler::linkCall(code, call.m_jmp, function.value());
+  }
+
+  static void repatchCall(CodeLocationCall call,
+                          CodeLocationLabel destination) {
+    X86Assembler::relinkCall(call.dataLocation(),
+                             destination.executableAddress());
+  }
+
+  static void repatchCall(CodeLocationCall call, FunctionPtr destination) {
+    X86Assembler::relinkCall(call.dataLocation(),
+                             destination.executableAddress());
+  }
 };
 
 }  // namespace JSC
