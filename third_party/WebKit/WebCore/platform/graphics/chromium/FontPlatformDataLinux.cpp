@@ -40,6 +40,21 @@
 
 namespace WebCore {
 
+static SkPaint::Hinting skiaHinting = SkPaint::kNormal_Hinting;
+static bool isSkiaAntiAlias = true, isSkiaSubpixelGlyphs;
+
+void FontPlatformData::setHinting(SkPaint::Hinting hinting) {
+  skiaHinting = hinting;
+}
+
+void FontPlatformData::setAntiAlias(bool isAntiAlias) {
+  isSkiaAntiAlias = isAntiAlias;
+}
+
+void FontPlatformData::setSubpixelGlyphs(bool isSubpixelGlyphs) {
+  isSkiaSubpixelGlyphs = isSubpixelGlyphs;
+}
+
 FontPlatformData::RefCountedHarfbuzzFace::~RefCountedHarfbuzzFace() {
   HB_FreeFace(m_harfbuzzFace);
 }
@@ -91,8 +106,9 @@ FontPlatformData& FontPlatformData::operator=(const FontPlatformData& src) {
 void FontPlatformData::setupPaint(SkPaint* paint) const {
   const float ts = m_textSize > 0 ? m_textSize : 12;
 
-  paint->setAntiAlias(true);
-  paint->setSubpixelText(false);
+  paint->setAntiAlias(isSkiaAntiAlias);
+  paint->setHinting(skiaHinting);
+  paint->setLCDRenderText(isSkiaSubpixelGlyphs);
   paint->setTextSize(SkFloatToScalar(ts));
   paint->setTypeface(m_typeface);
   paint->setFakeBoldText(m_fakeBold);
