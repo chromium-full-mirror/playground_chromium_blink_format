@@ -1523,14 +1523,14 @@ class ARMv7Assembler {
     ASSERT(from.m_offset != -1);
     ASSERT(reinterpret_cast<intptr_t>(to) & 1);
 
-    patchPointer(reinterpret_cast<uint16_t*>(reinterpret_cast<intptr_t>(code) +
-                                             from.m_offset) -
-                     1,
-                 to);
+    setPointer(reinterpret_cast<uint16_t*>(reinterpret_cast<intptr_t>(code) +
+                                           from.m_offset) -
+                   1,
+               to);
   }
 
-  static void patchPointer(void* code, JmpDst where, void* value) {
-    patchPointer(reinterpret_cast<char*>(code) + where.m_offset, value);
+  static void linkPointer(void* code, JmpDst where, void* value) {
+    setPointer(reinterpret_cast<char*>(code) + where.m_offset, value);
   }
 
   static void relinkJump(void* from, void* to) {
@@ -1552,7 +1552,7 @@ class ARMv7Assembler {
     ASSERT(!(reinterpret_cast<intptr_t>(from) & 1));
     ASSERT(reinterpret_cast<intptr_t>(to) & 1);
 
-    patchPointer(reinterpret_cast<uint16_t*>(from) - 1, to);
+    setPointer(reinterpret_cast<uint16_t*>(from) - 1, to);
   }
 
   static void repatchInt32(void* where, int32_t value) {
@@ -1561,7 +1561,7 @@ class ARMv7Assembler {
 
     ASSERT(!(reinterpret_cast<intptr_t>(where) & 1));
 
-    patchInt32(where, value);
+    setInt32(where, value);
   }
 
   static void repatchPointer(void* where, void* value) {
@@ -1570,7 +1570,7 @@ class ARMv7Assembler {
 
     ASSERT(!(reinterpret_cast<intptr_t>(where) & 1));
 
-    patchPointer(where, value);
+    setPointer(where, value);
   }
 
   static void repatchLoadPtrToLEA(void* where) {
@@ -1609,7 +1609,7 @@ class ARMv7Assembler {
                       doubleRegisterMask(rd, 6, 28) | rn);
   }
 
-  static void patchInt32(void* code, uint32_t value) {
+  static void setInt32(void* code, uint32_t value) {
     uint16_t* location = reinterpret_cast<uint16_t*>(code);
 
     ExecutableAllocator::MakeWritable unprotect(location - 4,
@@ -1624,8 +1624,8 @@ class ARMv7Assembler {
     spliceLo11(location - 1, hi16);
   }
 
-  static void patchPointer(void* code, void* value) {
-    patchInt32(code, reinterpret_cast<uint32_t>(value));
+  static void setPointer(void* code, void* value) {
+    setInt32(code, reinterpret_cast<uint32_t>(value));
   }
 
   // Linking & patching:
