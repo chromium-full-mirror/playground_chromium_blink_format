@@ -679,13 +679,18 @@ void JIT::patchMethodCallProto(MethodCallLinkInfo& methodCallLinkInfo,
   methodCallLinkInfo.cachedStructure = structure;
   structure->ref();
 
+  Structure* prototypeStructure = proto->structure();
+  ASSERT(!methodCallLinkInfo.cachedPrototypeStructure);
+  methodCallLinkInfo.cachedPrototypeStructure = prototypeStructure;
+  prototypeStructure->ref();
+
   repatchBuffer.repatch(methodCallLinkInfo.structureLabel, structure);
   repatchBuffer.repatch(methodCallLinkInfo.structureLabel.dataLabelPtrAtOffset(
                             patchOffsetMethodCheckProtoObj),
                         proto);
   repatchBuffer.repatch(methodCallLinkInfo.structureLabel.dataLabelPtrAtOffset(
                             patchOffsetMethodCheckProtoStruct),
-                        proto->structure());
+                        prototypeStructure);
   repatchBuffer.repatch(methodCallLinkInfo.structureLabel.dataLabelPtrAtOffset(
                             patchOffsetMethodCheckPutFunction),
                         callee);
