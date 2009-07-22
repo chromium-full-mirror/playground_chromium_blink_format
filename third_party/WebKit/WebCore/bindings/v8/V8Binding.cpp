@@ -45,10 +45,13 @@ namespace WebCore {
 // to manage the life-cycle of the underlying buffer of the external string.
 class WebCoreStringResource : public v8::String::ExternalStringResource {
  public:
-  explicit WebCoreStringResource(const String& string)
-      : m_impl(string.impl()) {}
+  explicit WebCoreStringResource(const String& string) : m_impl(string.impl()) {
+    v8::V8::AdjustAmountOfExternalAllocatedMemory(2 * length());
+  }
 
-  virtual ~WebCoreStringResource() {}
+  virtual ~WebCoreStringResource() {
+    v8::V8::AdjustAmountOfExternalAllocatedMemory(-2 * length());
+  }
 
   const uint16_t* data() const {
     return reinterpret_cast<const uint16_t*>(m_impl.characters());
