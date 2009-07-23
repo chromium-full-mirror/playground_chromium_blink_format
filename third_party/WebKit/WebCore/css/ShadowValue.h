@@ -1,6 +1,6 @@
 /*
  * (C) 1999-2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2008, 2009 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -36,8 +36,9 @@ class ShadowValue : public CSSValue {
                                         PassRefPtr<CSSPrimitiveValue> y,
                                         PassRefPtr<CSSPrimitiveValue> blur,
                                         PassRefPtr<CSSPrimitiveValue> spread,
+                                        PassRefPtr<CSSPrimitiveValue> style,
                                         PassRefPtr<CSSPrimitiveValue> color) {
-    return adoptRef(new ShadowValue(x, y, blur, spread, color));
+    return adoptRef(new ShadowValue(x, y, blur, spread, style, color));
   }
 
   virtual String cssText() const;
@@ -46,6 +47,7 @@ class ShadowValue : public CSSValue {
   RefPtr<CSSPrimitiveValue> y;
   RefPtr<CSSPrimitiveValue> blur;
   RefPtr<CSSPrimitiveValue> spread;
+  RefPtr<CSSPrimitiveValue> style;
   RefPtr<CSSPrimitiveValue> color;
 
  private:
@@ -53,6 +55,7 @@ class ShadowValue : public CSSValue {
               PassRefPtr<CSSPrimitiveValue> y,
               PassRefPtr<CSSPrimitiveValue> blur,
               PassRefPtr<CSSPrimitiveValue> spread,
+              PassRefPtr<CSSPrimitiveValue> style,
               PassRefPtr<CSSPrimitiveValue> color);
 };
 

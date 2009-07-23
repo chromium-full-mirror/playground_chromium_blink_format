@@ -124,6 +124,7 @@ class RenderBoxModelObject : public RenderObject {
                       int w,
                       int h,
                       const RenderStyle*,
+                      ShadowStyle,
                       bool begin = true,
                       bool end = true);
   void paintFillLayerExtended(const PaintInfo&,

@@ -119,6 +119,7 @@ class InlineFlowBox : public InlineRunBox {
                       CompositeOperator = CompositeSourceOver);
   void paintBoxShadow(GraphicsContext*,
                       RenderStyle*,
+                      ShadowStyle,
                       int tx,
                       int ty,
                       int w,

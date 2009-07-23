@@ -128,10 +128,11 @@ void RenderFieldset::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
   h -= yOff;
   ty += yOff;
 
-  paintBoxShadow(paintInfo.context, tx, ty, w, h, style());
+  paintBoxShadow(paintInfo.context, tx, ty, w, h, style(), Normal);
 
   paintFillLayers(paintInfo, style()->backgroundColor(),
                   style()->backgroundLayers(), tx, ty, w, h);
+  paintBoxShadow(paintInfo.context, tx, ty, w, h, style(), Inset);
 
   if (!style()->hasBorder())
     return;

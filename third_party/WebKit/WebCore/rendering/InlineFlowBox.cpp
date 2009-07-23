@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -806,18 +807,19 @@ void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
 
 void InlineFlowBox::paintBoxShadow(GraphicsContext* context,
                                    RenderStyle* s,
+                                   ShadowStyle shadowStyle,
                                    int tx,
                                    int ty,
                                    int w,
                                    int h) {
   if ((!prevLineBox() && !nextLineBox()) || !parent())
-    boxModelObject()->paintBoxShadow(context, tx, ty, w, h, s);
+    boxModelObject()->paintBoxShadow(context, tx, ty, w, h, s, shadowStyle);
   else {
     // FIXME: We can do better here in the multi-line case. We want to push a
     // clip so that the shadow doesn't
     // protrude incorrectly at the edges, and we want to possibly include
     // shadows cast from the previous/following lines
-    boxModelObject()->paintBoxShadow(context, tx, ty, w, h, s,
+    boxModelObject()->paintBoxShadow(context, tx, ty, w, h, s, shadowStyle,
                                      includeLeftEdge(), includeRightEdge());
   }
 }
@@ -847,10 +849,13 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
       (parent() && renderer()->hasBoxDecorations())) {
     // Shadow comes first and is behind the background and border.
     if (styleToUse->boxShadow())
-      paintBoxShadow(context, styleToUse, tx, ty, w, h);
+      paintBoxShadow(context, styleToUse, Normal, tx, ty, w, h);
 
     Color c = styleToUse->backgroundColor();
     paintFillLayers(paintInfo, c, styleToUse->backgroundLayers(), tx, ty, w, h);
+
+    if (styleToUse->boxShadow())
+      paintBoxShadow(context, styleToUse, Inset, tx, ty, w, h);
 
     // :first-line cannot be used to put borders on a line. Always paint borders
     // with our
