@@ -646,9 +646,9 @@ static void ensurePropertyMap() {
         &RenderStyle::setOutlineColor));
 
     // These are for shadows
-    gPropertyWrappers->append(new PropertyWrapperShadow(
-        CSSPropertyWebkitBoxShadow, &RenderStyle::boxShadow,
-        &RenderStyle::setBoxShadow));
+    gPropertyWrappers->append(
+        new PropertyWrapperShadow(CSSPropertyBoxShadow, &RenderStyle::boxShadow,
+                                  &RenderStyle::setBoxShadow));
     gPropertyWrappers->append(new PropertyWrapperShadow(
         CSSPropertyTextShadow, &RenderStyle::textShadow,
         &RenderStyle::setTextShadow));

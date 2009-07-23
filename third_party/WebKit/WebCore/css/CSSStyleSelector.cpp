@@ -4973,7 +4973,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       return;
 
     case CSSPropertyTextShadow:
-    case CSSPropertyWebkitBoxShadow: {
+    case CSSPropertyBoxShadow: {
       if (isInherit) {
         if (id == CSSPropertyTextShadow)
           return m_style->setTextShadow(

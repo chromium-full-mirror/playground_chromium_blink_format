@@ -64,20 +64,20 @@ static const int computedProperties[] = {
     CSSPropertyBorderRightColor, CSSPropertyBorderRightStyle,
     CSSPropertyBorderRightWidth, CSSPropertyBorderTopColor,
     CSSPropertyBorderTopStyle, CSSPropertyBorderTopWidth, CSSPropertyBottom,
-    CSSPropertyCaptionSide, CSSPropertyClear, CSSPropertyClip, CSSPropertyColor,
-    CSSPropertyCursor, CSSPropertyDirection, CSSPropertyDisplay,
-    CSSPropertyEmptyCells, CSSPropertyFloat, CSSPropertyFontFamily,
-    CSSPropertyFontSize, CSSPropertyFontStyle, CSSPropertyFontVariant,
-    CSSPropertyFontWeight, CSSPropertyHeight, CSSPropertyLeft,
-    CSSPropertyLetterSpacing, CSSPropertyLineHeight, CSSPropertyListStyleImage,
-    CSSPropertyListStylePosition, CSSPropertyListStyleType,
-    CSSPropertyMarginBottom, CSSPropertyMarginLeft, CSSPropertyMarginRight,
-    CSSPropertyMarginTop, CSSPropertyMaxHeight, CSSPropertyMaxWidth,
-    CSSPropertyMinHeight, CSSPropertyMinWidth, CSSPropertyOpacity,
-    CSSPropertyOrphans, CSSPropertyOutlineColor, CSSPropertyOutlineStyle,
-    CSSPropertyOutlineWidth, CSSPropertyOverflowX, CSSPropertyOverflowY,
-    CSSPropertyPaddingBottom, CSSPropertyPaddingLeft, CSSPropertyPaddingRight,
-    CSSPropertyPaddingTop, CSSPropertyPageBreakAfter,
+    CSSPropertyBoxShadow, CSSPropertyCaptionSide, CSSPropertyClear,
+    CSSPropertyClip, CSSPropertyColor, CSSPropertyCursor, CSSPropertyDirection,
+    CSSPropertyDisplay, CSSPropertyEmptyCells, CSSPropertyFloat,
+    CSSPropertyFontFamily, CSSPropertyFontSize, CSSPropertyFontStyle,
+    CSSPropertyFontVariant, CSSPropertyFontWeight, CSSPropertyHeight,
+    CSSPropertyLeft, CSSPropertyLetterSpacing, CSSPropertyLineHeight,
+    CSSPropertyListStyleImage, CSSPropertyListStylePosition,
+    CSSPropertyListStyleType, CSSPropertyMarginBottom, CSSPropertyMarginLeft,
+    CSSPropertyMarginRight, CSSPropertyMarginTop, CSSPropertyMaxHeight,
+    CSSPropertyMaxWidth, CSSPropertyMinHeight, CSSPropertyMinWidth,
+    CSSPropertyOpacity, CSSPropertyOrphans, CSSPropertyOutlineColor,
+    CSSPropertyOutlineStyle, CSSPropertyOutlineWidth, CSSPropertyOverflowX,
+    CSSPropertyOverflowY, CSSPropertyPaddingBottom, CSSPropertyPaddingLeft,
+    CSSPropertyPaddingRight, CSSPropertyPaddingTop, CSSPropertyPageBreakAfter,
     CSSPropertyPageBreakBefore, CSSPropertyPageBreakInside,
     CSSPropertyPointerEvents, CSSPropertyPosition, CSSPropertyResize,
     CSSPropertyRight, CSSPropertyTableLayout, CSSPropertyTextAlign,
@@ -103,12 +103,11 @@ static const int computedProperties[] = {
     CSSPropertyWebkitBoxFlexGroup, CSSPropertyWebkitBoxLines,
     CSSPropertyWebkitBoxOrdinalGroup, CSSPropertyWebkitBoxOrient,
     CSSPropertyWebkitBoxPack, CSSPropertyWebkitBoxReflect,
-    CSSPropertyWebkitBoxShadow, CSSPropertyWebkitBoxSizing,
-    CSSPropertyWebkitColumnBreakAfter, CSSPropertyWebkitColumnBreakBefore,
-    CSSPropertyWebkitColumnBreakInside, CSSPropertyWebkitColumnCount,
-    CSSPropertyWebkitColumnGap, CSSPropertyWebkitColumnRuleColor,
-    CSSPropertyWebkitColumnRuleStyle, CSSPropertyWebkitColumnRuleWidth,
-    CSSPropertyWebkitColumnWidth,
+    CSSPropertyWebkitBoxSizing, CSSPropertyWebkitColumnBreakAfter,
+    CSSPropertyWebkitColumnBreakBefore, CSSPropertyWebkitColumnBreakInside,
+    CSSPropertyWebkitColumnCount, CSSPropertyWebkitColumnGap,
+    CSSPropertyWebkitColumnRuleColor, CSSPropertyWebkitColumnRuleStyle,
+    CSSPropertyWebkitColumnRuleWidth, CSSPropertyWebkitColumnWidth,
 #if ENABLE(DASHBOARD_SUPPORT)
     CSSPropertyWebkitDashboardRegion,
 #endif
@@ -708,7 +707,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     }
     case CSSPropertyWebkitBoxReflect:
       return valueForReflection(style->boxReflect());
-    case CSSPropertyWebkitBoxShadow:
+    case CSSPropertyBoxShadow:
       return valueForShadow(style->boxShadow(),
                             static_cast<CSSPropertyID>(propertyID));
     case CSSPropertyCaptionSide:
