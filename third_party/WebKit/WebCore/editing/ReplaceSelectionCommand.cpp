@@ -601,7 +601,7 @@ static bool handleStyleSpansBeforeInsertion(ReplacementFragment& fragment,
   RefPtr<CSSMutableStyleDeclaration> styleAtInsertionPos =
       rangeCompliantEquivalent(insertionPos)
           .computedStyle()
-          ->copyInheritableProperties();
+          ->deprecatedCopyInheritableProperties();
   String styleText = styleAtInsertionPos->cssText();
 
   if (styleText ==
@@ -679,10 +679,10 @@ void ReplaceSelectionCommand::handleStyleSpans() {
                              : nearestMailBlockquote(context);
   if (blockquoteNode) {
     RefPtr<CSSMutableStyleDeclaration> blockquoteStyle =
-        computedStyle(blockquoteNode)->copyInheritableProperties();
+        computedStyle(blockquoteNode)->deprecatedCopyInheritableProperties();
     RefPtr<CSSMutableStyleDeclaration> parentStyle =
         computedStyle(blockquoteNode->parentNode())
-            ->copyInheritableProperties();
+            ->deprecatedCopyInheritableProperties();
     parentStyle->diff(blockquoteStyle.get());
 
     CSSMutableStyleDeclaration::const_iterator end = blockquoteStyle->end();
@@ -697,7 +697,7 @@ void ReplaceSelectionCommand::handleStyleSpans() {
   }
 
   RefPtr<CSSMutableStyleDeclaration> contextStyle =
-      computedStyle(context)->copyInheritableProperties();
+      computedStyle(context)->deprecatedCopyInheritableProperties();
   contextStyle->diff(sourceDocumentStyle.get());
 
   // Remove block properties in the span's style. This prevents properties that
@@ -744,7 +744,7 @@ void ReplaceSelectionCommand::handleStyleSpans() {
 
   // Remove redundant styles.
   context = copiedRangeStyleSpan->parentNode();
-  contextStyle = computedStyle(context)->copyInheritableProperties();
+  contextStyle = computedStyle(context)->deprecatedCopyInheritableProperties();
   contextStyle->diff(copiedRangeStyle.get());
 
   // See the comments above about removing block properties.

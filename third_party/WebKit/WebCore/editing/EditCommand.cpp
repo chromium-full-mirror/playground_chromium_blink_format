@@ -205,7 +205,9 @@ bool EditCommand::isTypingCommand() const {
 PassRefPtr<CSSMutableStyleDeclaration> EditCommand::styleAtPosition(
     const Position& pos) {
   RefPtr<CSSMutableStyleDeclaration> style =
-      positionBeforeTabSpan(pos).computedStyle()->copyInheritableProperties();
+      positionBeforeTabSpan(pos)
+          .computedStyle()
+          ->deprecatedCopyInheritableProperties();
 
   // FIXME: It seems misleading to also include the typing style when returning
   // the style at some arbitrary
