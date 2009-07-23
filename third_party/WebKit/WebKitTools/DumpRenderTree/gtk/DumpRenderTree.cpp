@@ -269,7 +269,7 @@ static void resetWebViewToConsistentStateBeforeTesting() {
   g_object_set(G_OBJECT(settings), "enable-private-browsing", FALSE,
                "enable-developer-extras", FALSE, "enable-spell-checking", TRUE,
                "enable-html5-database", TRUE, "enable-html5-local-storage",
-               TRUE, "enable-xss-auditor", TRUE,
+               TRUE, "enable-xss-auditor", FALSE,
                "javascript-can-open-windows-automatically", TRUE, NULL);
 
   webkit_web_frame_clear_main_frame_name(mainFrame);
