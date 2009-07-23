@@ -57,7 +57,7 @@ class ErrorEvent : public Event {
 
   const String& message() const { return m_message; }
   const String& filename() const { return m_fileName; }
-  const unsigned lineno() const { return m_lineNumber; }
+  unsigned lineno() const { return m_lineNumber; }
 
   virtual bool isErrorEvent() const;
 
