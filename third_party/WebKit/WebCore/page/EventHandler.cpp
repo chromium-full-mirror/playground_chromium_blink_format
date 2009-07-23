@@ -1267,8 +1267,12 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   if (swallowEvent) {
     // scrollbars should get events anyway, even disabled controls might be
     // scrollable
-    if (mev.scrollbar())
-      passMousePressEventToScrollbar(mev, mev.scrollbar());
+    Scrollbar* scrollbar = mev.scrollbar();
+
+    updateLastScrollbarUnderMouse(scrollbar, true);
+
+    if (scrollbar)
+      passMousePressEventToScrollbar(mev, scrollbar);
   } else {
     // Refetch the event target node if it currently is the shadow node inside
     // an <input> element.
@@ -1288,6 +1292,9 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
     Scrollbar* scrollbar = view ? view->scrollbarAtPoint(mouseEvent.pos()) : 0;
     if (!scrollbar)
       scrollbar = mev.scrollbar();
+
+    updateLastScrollbarUnderMouse(scrollbar, true);
+
     if (scrollbar && passMousePressEventToScrollbar(mev, scrollbar))
       swallowEvent = true;
     else
@@ -1413,12 +1420,7 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent,
     if (!scrollbar)
       scrollbar = mev.scrollbar();
 
-    if (m_lastScrollbarUnderMouse != scrollbar) {
-      // Send mouse exited to the old scrollbar.
-      if (m_lastScrollbarUnderMouse)
-        m_lastScrollbarUnderMouse->mouseExited();
-      m_lastScrollbarUnderMouse = m_mousePressed ? 0 : scrollbar;
-    }
+    updateLastScrollbarUnderMouse(scrollbar, !m_mousePressed);
   }
 
   bool swallowEvent = false;
@@ -2646,5 +2648,17 @@ bool EventHandler::passMousePressEventToScrollbar(
   if (!scrollbar || !scrollbar->enabled())
     return false;
   return scrollbar->mouseDown(mev.event());
+}
+
+// If scrollbar (under mouse) is different from last, send a mouse exited. Set
+// last to scrollbar if setLast is true; else set last to 0.
+void EventHandler::updateLastScrollbarUnderMouse(Scrollbar* scrollbar,
+                                                 bool setLast) {
+  if (m_lastScrollbarUnderMouse != scrollbar) {
+    // Send mouse exited to the old scrollbar.
+    if (m_lastScrollbarUnderMouse)
+      m_lastScrollbarUnderMouse->mouseExited();
+    m_lastScrollbarUnderMouse = setLast ? scrollbar : 0;
+  }
 }
 }
