@@ -82,11 +82,11 @@ static const int computedProperties[] = {
     CSSPropertyPointerEvents, CSSPropertyPosition, CSSPropertyResize,
     CSSPropertyRight, CSSPropertyTableLayout, CSSPropertyTextAlign,
     CSSPropertyTextDecoration, CSSPropertyTextIndent, CSSPropertyTextShadow,
-    CSSPropertyTextTransform, CSSPropertyTop, CSSPropertyUnicodeBidi,
-    CSSPropertyVerticalAlign, CSSPropertyVisibility, CSSPropertyWhiteSpace,
-    CSSPropertyWidows, CSSPropertyWidth, CSSPropertyWordBreak,
-    CSSPropertyWordSpacing, CSSPropertyWordWrap, CSSPropertyZIndex,
-    CSSPropertyZoom,
+    CSSPropertyTextOverflow, CSSPropertyTextTransform, CSSPropertyTop,
+    CSSPropertyUnicodeBidi, CSSPropertyVerticalAlign, CSSPropertyVisibility,
+    CSSPropertyWhiteSpace, CSSPropertyWidows, CSSPropertyWidth,
+    CSSPropertyWordBreak, CSSPropertyWordSpacing, CSSPropertyWordWrap,
+    CSSPropertyZIndex, CSSPropertyZoom,
 
     CSSPropertyWebkitAnimationDelay, CSSPropertyWebkitAnimationDirection,
     CSSPropertyWebkitAnimationDuration,
@@ -1032,6 +1032,10 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyTextShadow:
       return valueForShadow(style->textShadow(),
                             static_cast<CSSPropertyID>(propertyID));
+    case CSSPropertyTextOverflow:
+      if (style->textOverflow())
+        return CSSPrimitiveValue::createIdentifier(CSSValueEllipsis);
+      return CSSPrimitiveValue::createIdentifier(CSSValueClip);
     case CSSPropertyWebkitTextSecurity:
       return CSSPrimitiveValue::create(style->textSecurity());
     case CSSPropertyWebkitTextSizeAdjust:
@@ -1353,7 +1357,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyTextLineThroughMode:
     case CSSPropertyTextLineThroughStyle:
     case CSSPropertyTextLineThroughWidth:
-    case CSSPropertyTextOverflow:
     case CSSPropertyTextOverline:
     case CSSPropertyTextOverlineColor:
     case CSSPropertyTextOverlineMode:
