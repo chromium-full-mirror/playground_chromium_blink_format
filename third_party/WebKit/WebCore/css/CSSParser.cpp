@@ -2465,7 +2465,8 @@ bool CSSParser::parseFillProperty(int propId,
           break;
         case CSSPropertyBackgroundAttachment:
         case CSSPropertyWebkitMaskAttachment:
-          if (val->id == CSSValueScroll || val->id == CSSValueFixed) {
+          if (val->id == CSSValueScroll || val->id == CSSValueFixed ||
+              val->id == CSSValueLocal) {
             currValue = CSSPrimitiveValue::createIdentifier(val->id);
             m_valueList->next();
           }

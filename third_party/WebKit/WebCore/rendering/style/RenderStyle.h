@@ -614,8 +614,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
   CompositeOperator backgroundComposite() const {
     return static_cast<CompositeOperator>(background->m_background.m_composite);
   }
-  bool backgroundAttachment() const {
-    return background->m_background.m_attachment;
+  EFillAttachment backgroundAttachment() const {
+    return static_cast<EFillAttachment>(background->m_background.m_attachment);
   }
   EFillBox backgroundClip() const {
     return static_cast<EFillBox>(background->m_background.m_clip);
@@ -647,8 +647,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return static_cast<CompositeOperator>(
         rareNonInheritedData->m_mask.m_composite);
   }
-  bool maskAttachment() const {
-    return rareNonInheritedData->m_mask.m_attachment;
+  EFillAttachment maskAttachment() const {
+    return static_cast<EFillAttachment>(
+        rareNonInheritedData->m_mask.m_attachment);
   }
   EFillBox maskClip() const {
     return static_cast<EFillBox>(rareNonInheritedData->m_mask.m_clip);

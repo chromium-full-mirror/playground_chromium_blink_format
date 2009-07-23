@@ -180,6 +180,12 @@ enum ETableLayout { TAUTO, TFIXED };
 
 enum EUnicodeBidi { UBNormal, Embed, Override };
 
+enum EFillAttachment {
+  ScrollBackgroundAttachment,
+  LocalBackgroundAttachment,
+  FixedBackgroundAttachment
+};
+
 enum EFillBox { BorderFillBox, PaddingFillBox, ContentFillBox, TextFillBox };
 
 enum EFillRepeat { RepeatFill, RepeatXFill, RepeatYFill, NoRepeatFill };

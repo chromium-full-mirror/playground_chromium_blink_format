@@ -42,7 +42,9 @@ struct FillLayer {
   StyleImage* image() const { return m_image.get(); }
   Length xPosition() const { return m_xPosition; }
   Length yPosition() const { return m_yPosition; }
-  bool attachment() const { return m_attachment; }
+  EFillAttachment attachment() const {
+    return static_cast<EFillAttachment>(m_attachment);
+  }
   EFillBox clip() const { return static_cast<EFillBox>(m_clip); }
   EFillBox origin() const { return static_cast<EFillBox>(m_origin); }
   EFillRepeat repeat() const { return static_cast<EFillRepeat>(m_repeat); }
@@ -76,8 +78,8 @@ struct FillLayer {
     m_yPosition = l;
     m_yPosSet = true;
   }
-  void setAttachment(bool b) {
-    m_attachment = b;
+  void setAttachment(EFillAttachment attachment) {
+    m_attachment = attachment;
     m_attachmentSet = true;
   }
   void setClip(EFillBox b) {
@@ -133,7 +135,7 @@ struct FillLayer {
   }
 
   bool hasFixedImage() const {
-    if (m_image && !m_attachment)
+    if (m_image && m_attachment == FixedBackgroundAttachment)
       return true;
     return m_next ? m_next->hasFixedImage() : false;
   }
@@ -143,7 +145,9 @@ struct FillLayer {
   void fillUnsetProperties();
   void cullEmptyLayers();
 
-  static bool initialFillAttachment(EFillLayerType) { return true; }
+  static EFillAttachment initialFillAttachment(EFillLayerType) {
+    return ScrollBackgroundAttachment;
+  }
   static EFillBox initialFillClip(EFillLayerType) { return BorderFillBox; }
   static EFillBox initialFillOrigin(EFillLayerType type) {
     return type == BackgroundFillLayer ? PaddingFillBox : BorderFillBox;
@@ -170,11 +174,11 @@ struct FillLayer {
   Length m_xPosition;
   Length m_yPosition;
 
-  bool m_attachment : 1;
-  unsigned m_clip : 2;       // EFillBox
-  unsigned m_origin : 2;     // EFillBox
-  unsigned m_repeat : 2;     // EFillRepeat
-  unsigned m_composite : 4;  // CompositeOperator
+  unsigned m_attachment : 2;  // EFillAttachment
+  unsigned m_clip : 2;        // EFillBox
+  unsigned m_origin : 2;      // EFillBox
+  unsigned m_repeat : 2;      // EFillRepeat
+  unsigned m_composite : 4;   // CompositeOperator
 
   LengthSize m_size;
 
