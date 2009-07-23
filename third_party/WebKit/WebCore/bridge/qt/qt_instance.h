@@ -76,6 +76,8 @@ class QtInstance : public Instance {
                    JSValue,
                    PutPropertySlot&);
 
+  void removeCachedMethod(JSObject*);
+
   static QtInstance* getInstance(JSObject*);
 
  private:
@@ -97,7 +99,6 @@ class QtInstance : public Instance {
   QObject* m_hashkey;
   mutable QHash<QByteArray, JSObject*> m_methods;
   mutable QHash<QString, QtField*> m_fields;
-  mutable QSet<JSValue> m_children;
   mutable QtRuntimeMetaMethod* m_defaultMethod;
   QScriptEngine::ValueOwnership m_ownership;
 };

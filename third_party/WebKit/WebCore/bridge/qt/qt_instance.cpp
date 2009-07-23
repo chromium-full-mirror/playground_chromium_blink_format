@@ -117,7 +117,7 @@ QtInstance::~QtInstance() {
   // clean up (unprotect from gc) the JSValues we've created
   m_methods.clear();
 
-  foreach (QtField* f, m_fields.values()) { delete f; }
+  qDeleteAll(m_fields);
   m_fields.clear();
 
   if (m_object) {
@@ -167,6 +167,19 @@ void QtInstance::put(JSObject* object,
   object->JSObject::put(exec, propertyName, value, slot);
 }
 
+void QtInstance::removeCachedMethod(JSObject* method) {
+  if (m_defaultMethod == method)
+    m_defaultMethod = 0;
+
+  for (QHash<QByteArray, JSObject *>::Iterator it = m_methods.begin(),
+                                               end = m_methods.end();
+       it != end; ++it)
+    if (it.value() == method) {
+      m_methods.erase(it);
+      return;
+    }
+}
+
 QtInstance* QtInstance::getInstance(JSObject* object) {
   if (!object)
     return 0;
@@ -195,15 +208,11 @@ RuntimeObjectImp* QtInstance::createRuntimeObject(ExecState* exec) {
 }
 
 void QtInstance::mark() {
-  if (m_defaultMethod)
+  if (m_defaultMethod && !m_defaultMethod->marked())
     m_defaultMethod->mark();
   foreach (JSObject* val, m_methods.values()) {
     if (val && !val->marked())
       val->mark();
-  }
-  foreach (JSValue val, m_children.values()) {
-    if (val && !val.marked())
-      val.mark();
   }
 }
 
@@ -358,13 +367,7 @@ JSValue QtField::valueFromInstance(ExecState* exec,
     else if (m_type == DynamicProperty)
       val = obj->property(m_dynamicProperty);
 
-    JSValue ret = convertQVariantToValue(exec, inst->rootObject(), val);
-
-    // Need to save children so we can mark them
-    if (m_type == ChildObject)
-      instance->m_children.insert(ret);
-
-    return ret;
+    return convertQVariantToValue(exec, inst->rootObject(), val);
   } else {
     QString msg =
         QString(QLatin1String("cannot access member `%1' of deleted QObject"))
