@@ -40,8 +40,6 @@ class ScriptSourceProvider : public JSC::SourceProvider {
       JSC::SourceBOMPresence hasBOMs = JSC::SourceCouldHaveBOMs)
       : SourceProvider(url, hasBOMs) {}
 
-  virtual ~ScriptSourceProvider() {}
-
   virtual const String& source() const = 0;
 };
 
