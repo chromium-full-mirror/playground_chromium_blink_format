@@ -37,6 +37,7 @@
 
 #include <QtGui>
 #include <QDebug>
+#include <QtNetwork/QNetworkProxy>
 #if QT_VERSION >= 0x040400 && !defined(QT_NO_PRINTER)
 #include <QPrintPreviewDialog>
 #endif
@@ -70,7 +71,8 @@ class MainWindow : public QMainWindow {
     view = new QWebView(this);
     setCentralWidget(view);
 
-    view->setPage(new WebPage(view));
+    WebPage* page = new WebPage(view);
+    view->setPage(page);
 
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished()));
     connect(view, SIGNAL(titleChanged(const QString&)), this,
@@ -81,6 +83,14 @@ class MainWindow : public QMainWindow {
     connect(view->page(), SIGNAL(windowCloseRequested()), this, SLOT(close()));
 
     setupUI();
+
+    // set the proxy to the http_proxy env variable - if present
+    QUrl proxyUrl = view->guessUrlFromString(qgetenv("http_proxy"));
+    if (proxyUrl.isValid() && !proxyUrl.host().isEmpty()) {
+      int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
+      page->networkAccessManager()->setProxy(
+          QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
+    }
 
     QUrl qurl = view->guessUrlFromString(url);
     if (qurl.isValid()) {
