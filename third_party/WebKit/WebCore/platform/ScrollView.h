@@ -277,6 +277,7 @@ class ScrollView : public Widget, public ScrollbarClient {
   void addPanScrollIcon(const IntPoint&);
   void removePanScrollIcon();
 
+  virtual bool isPointInScrollbarCorner(const IntPoint&);
   virtual bool scrollbarCornerPresent() const;
 
   virtual IntRect convertFromScrollbarToContainingView(const Scrollbar*,
