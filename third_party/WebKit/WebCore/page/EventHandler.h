@@ -223,7 +223,7 @@ class EventHandler : public Noncopyable {
 
   Cursor selectCursor(const MouseEventWithHitTestResults&, Scrollbar*);
 #if ENABLE(PAN_SCROLLING)
-  void setPanScrollCursor();
+  void updatePanScrollState();
 #endif
 
   void hoverTimerFired(Timer<EventHandler>*);
@@ -334,6 +334,9 @@ class EventHandler : public Noncopyable {
 
   IntPoint m_panScrollStartPos;
   bool m_panScrollInProgress;
+
+  bool m_panScrollButtonPressed;
+  bool m_springLoadedPanScrollInProgress;
 
   Timer<EventHandler> m_hoverTimer;
 
