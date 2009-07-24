@@ -144,7 +144,7 @@ void JSNode::mark() {
   // the document, we need to mark the document, but we don't need to explicitly
   // mark any other nodes.
   if (node->inDocument()) {
-    DOMObject::mark();
+    Base::mark();
     markEventListeners(node->eventListeners());
     if (Document* doc = node->ownerDocument())
       if (DOMObject* docWrapper =
@@ -164,7 +164,7 @@ void JSNode::mark() {
   // already
   // marking the tree, we don't need to explicitly mark any other nodes.
   if (root->inSubtreeMark()) {
-    DOMObject::mark();
+    Base::mark();
     markEventListeners(node->eventListeners());
     return;
   }

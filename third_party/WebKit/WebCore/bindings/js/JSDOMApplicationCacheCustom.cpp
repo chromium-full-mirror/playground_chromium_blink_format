@@ -43,7 +43,7 @@ using namespace JSC;
 namespace WebCore {
 
 void JSDOMApplicationCache::mark() {
-  DOMObject::mark();
+  Base::mark();
 
   markIfNotNull(m_impl->onchecking());
   markIfNotNull(m_impl->onerror());

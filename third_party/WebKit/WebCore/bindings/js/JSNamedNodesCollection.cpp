@@ -96,7 +96,8 @@ bool JSNamedNodesCollection::getOwnPropertySlot(ExecState* exec,
     }
   }
 
-  return DOMObject::getOwnPropertySlot(exec, propertyName, slot);
+  return DOMObjectWithGlobalPointer::getOwnPropertySlot(exec, propertyName,
+                                                        slot);
 }
 
 }  // namespace WebCore

@@ -44,7 +44,7 @@ using namespace JSC;
 namespace WebCore {
 
 void JSAbstractWorker::mark() {
-  DOMObject::mark();
+  Base::mark();
 
   markIfNotNull(m_impl->onerror());
 
