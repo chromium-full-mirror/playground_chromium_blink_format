@@ -63,9 +63,7 @@ WorkerContext::WorkerContext(const KURL& url,
   setSecurityOrigin(SecurityOrigin::create(url));
 }
 
-WorkerContext::~WorkerContext() {
-  ASSERT(currentThread() == m_thread->threadID());
-}
+WorkerContext::~WorkerContext() {}
 
 ScriptExecutionContext* WorkerContext::scriptExecutionContext() const {
   return const_cast<WorkerContext*>(this);

@@ -47,7 +47,9 @@ DedicatedWorkerContext::DedicatedWorkerContext(const KURL& url,
     : WorkerContext(url, userAgent, thread) {}
 
 DedicatedWorkerContext::~DedicatedWorkerContext() {
-  // Notify parent worker we are going away.
+  ASSERT(currentThread() == thread()->threadID());
+  // Notify parent worker we are going away. This can free the WorkerThread
+  // object, so do not access it after this.
   thread()->workerObjectProxy().workerContextDestroyed();
 }
 
