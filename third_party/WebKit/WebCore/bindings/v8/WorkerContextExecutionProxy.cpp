@@ -34,6 +34,7 @@
 
 #include "WorkerContextExecutionProxy.h"
 
+#include "DedicatedWorkerContext.h"
 #include "DOMCoreException.h"
 #include "Event.h"
 #include "EventException.h"
@@ -165,7 +166,7 @@ void WorkerContextExecutionProxy::initContextIfNeeded() {
   // Create a new JS object and use it as the prototype for the shadow global
   // object.
   v8::Handle<v8::Function> workerContextConstructor =
-      GetConstructor(V8ClassIndex::WORKERCONTEXT);
+      GetConstructor(V8ClassIndex::DEDICATEDWORKERCONTEXT);
   v8::Local<v8::Object> jsWorkerContext =
       SafeAllocation::newInstance(workerContextConstructor);
   // Bail out if allocation failed.
@@ -175,9 +176,10 @@ void WorkerContextExecutionProxy::initContextIfNeeded() {
   }
 
   // Wrap the object.
-  V8DOMWrapper::setDOMWrapper(jsWorkerContext,
-                              V8ClassIndex::ToInt(V8ClassIndex::WORKERCONTEXT),
-                              m_workerContext);
+  V8DOMWrapper::setDOMWrapper(
+      jsWorkerContext,
+      V8ClassIndex::ToInt(V8ClassIndex::DEDICATEDWORKERCONTEXT),
+      m_workerContext);
 
   V8DOMWrapper::setJSWrapperForDOMObject(
       m_workerContext, v8::Persistent<v8::Object>::New(jsWorkerContext));
@@ -213,7 +215,7 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::ToV8Object(
   if (!impl)
     return v8::Null();
 
-  if (type == V8ClassIndex::WORKERCONTEXT)
+  if (type == V8ClassIndex::DEDICATEDWORKERCONTEXT)
     return WorkerContextToV8Object(static_cast<WorkerContext*>(impl));
 
   if (type == V8ClassIndex::WORKER || type == V8ClassIndex::XMLHTTPREQUEST) {
@@ -299,7 +301,7 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::EventTargetToV8Object(
   if (!target)
     return v8::Null();
 
-  WorkerContext* workerContext = target->toWorkerContext();
+  DedicatedWorkerContext* workerContext = target->toDedicatedWorkerContext();
   if (workerContext)
     return WorkerContextToV8Object(workerContext);
 

@@ -69,10 +69,11 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
 #if ENABLE(WORKERS)
 #define WORKER_ACTIVE_OBJECT_WRAPPER_TYPES(V) V(WORKER, Worker)
 
-#define WORKER_NONNODE_WRAPPER_TYPES(V) \
-  V(ABSTRACTWORKER, AbstractWorker)     \
-  V(WORKERCONTEXT, WorkerContext)       \
-  V(WORKERLOCATION, WorkerLocation)     \
+#define WORKER_NONNODE_WRAPPER_TYPES(V)             \
+  V(ABSTRACTWORKER, AbstractWorker)                 \
+  V(DEDICATEDWORKERCONTEXT, DedicatedWorkerContext) \
+  V(WORKERCONTEXT, WorkerContext)                   \
+  V(WORKERLOCATION, WorkerLocation)                 \
   V(WORKERNAVIGATOR, WorkerNavigator)
 #else
 #define WORKER_ACTIVE_OBJECT_WRAPPER_TYPES(V)

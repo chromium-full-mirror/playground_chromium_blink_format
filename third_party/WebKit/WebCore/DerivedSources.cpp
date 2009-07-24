@@ -58,6 +58,7 @@
 #include "JSDatabase.cpp"
 #include "JSDataGridColumn.cpp"
 #include "JSDataGridColumnList.cpp"
+#include "JSDedicatedWorkerContext.cpp"
 #include "JSDocument.cpp"
 #include "JSDocumentFragment.cpp"
 #include "JSDocumentType.cpp"
