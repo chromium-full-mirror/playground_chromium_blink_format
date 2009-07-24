@@ -105,7 +105,7 @@ NAMED_PROPERTY_GETTER(HTMLDocument) {
   }
 
   return V8DOMWrapper::convertToV8Object(V8ClassIndex::HTMLCOLLECTION,
-                                         items.get());
+                                         items.release());
 }
 
 // HTMLDocument ----------------------------------------------------------------
@@ -189,9 +189,8 @@ ACCESSOR_GETTER(HTMLDocumentAll) {
   v8::Handle<v8::Object> holder = info.Holder();
   HTMLDocument* htmlDocument =
       V8DOMWrapper::convertDOMWrapperToNode<HTMLDocument>(holder);
-  RefPtr<HTMLCollection> collection = WTF::getPtr(htmlDocument->all());
   return V8DOMWrapper::convertToV8Object(V8ClassIndex::HTMLCOLLECTION,
-                                         WTF::getPtr(collection));
+                                         htmlDocument->all());
 }
 
 ACCESSOR_SETTER(HTMLDocumentAll) {

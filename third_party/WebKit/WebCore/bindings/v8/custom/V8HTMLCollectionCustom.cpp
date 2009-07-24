@@ -47,7 +47,7 @@ static v8::Handle<v8::Value> getNamedItems(HTMLCollection* collection,
     return v8::Handle<v8::Value>();
 
   if (namedItems.size() == 1)
-    return V8DOMWrapper::convertNodeToV8Object(namedItems.at(0).get());
+    return V8DOMWrapper::convertNodeToV8Object(namedItems.at(0).release());
 
   NodeList* list = new V8NamedNodesCollection(namedItems);
   return V8DOMWrapper::convertToV8Object(V8ClassIndex::NODELIST, list);
@@ -67,7 +67,7 @@ static v8::Handle<v8::Value> getItem(HTMLCollection* collection,
   }
 
   RefPtr<Node> result = collection->item(index->Uint32Value());
-  return V8DOMWrapper::convertNodeToV8Object(result.get());
+  return V8DOMWrapper::convertNodeToV8Object(result.release());
 }
 
 NAMED_PROPERTY_GETTER(HTMLCollection) {

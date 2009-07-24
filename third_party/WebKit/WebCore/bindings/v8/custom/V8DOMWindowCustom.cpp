@@ -835,7 +835,7 @@ NAMED_PROPERTY_GETTER(DOMWindow) {
         return V8DOMWrapper::convertNodeToV8Object(items->firstItem());
       else
         return V8DOMWrapper::convertToV8Object(V8ClassIndex::HTMLCOLLECTION,
-                                               items.get());
+                                               items.release());
     }
   }
 

@@ -87,7 +87,7 @@ CALLBACK_FUNC_DECL(ElementSetAttributeNode) {
   if (ec)
     throwError(ec);
 
-  return V8DOMWrapper::convertNodeToV8Object(result.get());
+  return V8DOMWrapper::convertNodeToV8Object(result.release());
 }
 
 CALLBACK_FUNC_DECL(ElementSetAttributeNS) {
@@ -128,7 +128,7 @@ CALLBACK_FUNC_DECL(ElementSetAttributeNodeNS) {
   if (ec)
     throwError(ec);
 
-  return V8DOMWrapper::convertNodeToV8Object(result.get());
+  return V8DOMWrapper::convertNodeToV8Object(result.release());
 }
 
 static inline String toEventType(v8::Local<v8::String> value) {

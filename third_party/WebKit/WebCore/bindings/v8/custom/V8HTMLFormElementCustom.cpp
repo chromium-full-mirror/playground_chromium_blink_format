@@ -47,7 +47,7 @@ INDEXED_PROPERTY_GETTER(HTMLFormElement) {
   RefPtr<Node> formElement = form->elements()->item(index);
   if (!formElement)
     return notHandledByInterceptor();
-  return V8DOMWrapper::convertNodeToV8Object(formElement.get());
+  return V8DOMWrapper::convertNodeToV8Object(formElement.release());
 }
 
 NAMED_PROPERTY_GETTER(HTMLFormElement) {
@@ -73,7 +73,7 @@ NAMED_PROPERTY_GETTER(HTMLFormElement) {
   ASSERT(!elements.isEmpty());
 
   if (elements.size() == 1)
-    return V8DOMWrapper::convertNodeToV8Object(elements.at(0).get());
+    return V8DOMWrapper::convertNodeToV8Object(elements.at(0).release());
 
   NodeList* collection = new V8NamedNodesCollection(elements);
   return V8DOMWrapper::convertToV8Object(V8ClassIndex::NODELIST, collection);

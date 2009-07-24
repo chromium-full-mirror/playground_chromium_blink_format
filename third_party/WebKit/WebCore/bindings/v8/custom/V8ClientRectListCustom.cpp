@@ -50,7 +50,7 @@ INDEXED_PROPERTY_GETTER(ClientRectList) {
     return notHandledByInterceptor();
 
   return V8DOMWrapper::convertToV8Object(V8ClassIndex::CLIENTRECT,
-                                         result.get());
+                                         result.release());
 }
 
 }  // namespace WebCore

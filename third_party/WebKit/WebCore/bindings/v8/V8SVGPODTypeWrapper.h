@@ -53,18 +53,16 @@ class V8SVGPODTypeWrapper : public RefCounted<V8SVGPODTypeWrapper<PODType>> {
 template <typename PODType>
 class V8SVGPODTypeWrapperCreatorForList : public V8SVGPODTypeWrapper<PODType> {
  public:
+  typedef SVGPODListItem<PODType> PODListItemPtrType;
+
   typedef PODType (SVGPODListItem<PODType>::*GetterMethod)() const;
   typedef void (SVGPODListItem<PODType>::*SetterMethod)(PODType);
 
-  V8SVGPODTypeWrapperCreatorForList(SVGPODListItem<PODType>* creator,
-                                    const QualifiedName& attributeName)
-      : m_creator(creator),
-        m_getter(&SVGPODListItem<PODType>::value),
-        m_setter(&SVGPODListItem<PODType>::setValue),
-        m_associatedAttributeName(attributeName) {
-    ASSERT(m_creator);
-    ASSERT(m_getter);
-    ASSERT(m_setter);
+  static PassRefPtr<V8SVGPODTypeWrapperCreatorForList> create(
+      PassRefPtr<PODListItemPtrType> creator,
+      const QualifiedName& attributeName) {
+    return adoptRef(
+        new V8SVGPODTypeWrapperCreatorForList(creator, attributeName));
   }
 
   virtual ~V8SVGPODTypeWrapperCreatorForList() {}
@@ -84,6 +82,17 @@ class V8SVGPODTypeWrapperCreatorForList : public V8SVGPODTypeWrapper<PODType> {
   }
 
  private:
+  V8SVGPODTypeWrapperCreatorForList(PassRefPtr<PODListItemPtrType> creator,
+                                    const QualifiedName& attributeName)
+      : m_creator(creator),
+        m_getter(&SVGPODListItem<PODType>::value),
+        m_setter(&SVGPODListItem<PODType>::setValue),
+        m_associatedAttributeName(attributeName) {
+    ASSERT(m_creator);
+    ASSERT(m_getter);
+    ASSERT(m_setter);
+  }
+
   // Update callbacks
   RefPtr<SVGPODListItem<PODType>> m_creator;
   GetterMethod m_getter;
@@ -94,7 +103,9 @@ class V8SVGPODTypeWrapperCreatorForList : public V8SVGPODTypeWrapper<PODType> {
 template <typename PODType>
 class V8SVGStaticPODTypeWrapper : public V8SVGPODTypeWrapper<PODType> {
  public:
-  V8SVGStaticPODTypeWrapper(PODType type) : m_podType(type) {}
+  static PassRefPtr<V8SVGStaticPODTypeWrapper> create(PODType type) {
+    return adoptRef(new V8SVGStaticPODTypeWrapper(type));
+  }
 
   virtual ~V8SVGStaticPODTypeWrapper() {}
 
@@ -104,7 +115,9 @@ class V8SVGStaticPODTypeWrapper : public V8SVGPODTypeWrapper<PODType> {
   // Setter wrapper
   virtual void commitChange(PODType type, SVGElement*) { m_podType = type; }
 
- private:
+ protected:
+  V8SVGStaticPODTypeWrapper(PODType type) : m_podType(type) {}
+
   PODType m_podType;
 };
 
@@ -114,8 +127,12 @@ class V8SVGStaticPODTypeWrapperWithPODTypeParent
  public:
   typedef V8SVGPODTypeWrapper<ParentTypeArg> ParentType;
 
-  V8SVGStaticPODTypeWrapperWithPODTypeParent(PODType type, ParentType* parent)
-      : V8SVGStaticPODTypeWrapper<PODType>(type), m_parentType(parent) {}
+  static PassRefPtr<V8SVGStaticPODTypeWrapperWithPODTypeParent> create(
+      PODType type,
+      PassRefPtr<ParentType> parent) {
+    return adoptRef(
+        new V8SVGStaticPODTypeWrapperWithPODTypeParent(type, parent));
+  }
 
   virtual void commitChange(PODType type, SVGElement* context) {
     V8SVGStaticPODTypeWrapper<PODType>::commitChange(type, context);
@@ -123,6 +140,10 @@ class V8SVGStaticPODTypeWrapperWithPODTypeParent
   }
 
  private:
+  V8SVGStaticPODTypeWrapperWithPODTypeParent(PODType type,
+                                             PassRefPtr<ParentType> parent)
+      : V8SVGStaticPODTypeWrapper<PODType>(type), m_parentType(parent) {}
+
   RefPtr<ParentType> m_parentType;
 };
 
@@ -133,13 +154,12 @@ class V8SVGStaticPODTypeWrapperWithParent
   typedef PODType (ParentType::*GetterMethod)() const;
   typedef void (ParentType::*SetterMethod)(const PODType&);
 
-  V8SVGStaticPODTypeWrapperWithParent(ParentType* parent,
-                                      GetterMethod getter,
-                                      SetterMethod setter)
-      : m_parent(parent), m_getter(getter), m_setter(setter) {
-    ASSERT(m_parent);
-    ASSERT(m_getter);
-    ASSERT(m_setter);
+  static PassRefPtr<V8SVGStaticPODTypeWrapperWithParent> create(
+      PassRefPtr<ParentType> parent,
+      GetterMethod getter,
+      SetterMethod setter) {
+    return adoptRef(
+        new V8SVGStaticPODTypeWrapperWithParent(parent, getter, setter));
   }
 
   virtual operator PODType() { return (m_parent.get()->*m_getter)(); }
@@ -149,6 +169,15 @@ class V8SVGStaticPODTypeWrapperWithParent
   }
 
  private:
+  V8SVGStaticPODTypeWrapperWithParent(PassRefPtr<ParentType> parent,
+                                      GetterMethod getter,
+                                      SetterMethod setter)
+      : m_parent(parent), m_getter(getter), m_setter(setter) {
+    ASSERT(m_parent);
+    ASSERT(m_getter);
+    ASSERT(m_setter);
+  }
+
   RefPtr<ParentType> m_parent;
   GetterMethod m_getter;
   SetterMethod m_setter;
@@ -161,18 +190,13 @@ class V8SVGDynamicPODTypeWrapper : public V8SVGPODTypeWrapper<PODType> {
   typedef void (PODTypeCreator::*SetterMethod)(PODType);
   typedef void (*CacheRemovalCallback)(V8SVGPODTypeWrapper<PODType>*);
 
-  V8SVGDynamicPODTypeWrapper(PODTypeCreator* creator,
-                             GetterMethod getter,
-                             SetterMethod setter,
-                             CacheRemovalCallback cacheRemovalCallback)
-      : m_creator(creator),
-        m_getter(getter),
-        m_setter(setter),
-        m_cacheRemovalCallback(cacheRemovalCallback) {
-    ASSERT(creator);
-    ASSERT(getter);
-    ASSERT(setter);
-    ASSERT(cacheRemovalCallback);
+  static PassRefPtr<V8SVGDynamicPODTypeWrapper> create(
+      PassRefPtr<PODTypeCreator> creator,
+      GetterMethod getter,
+      SetterMethod setter,
+      CacheRemovalCallback cacheRemovalCallback) {
+    return adoptRef(new V8SVGDynamicPODTypeWrapper(creator, getter, setter,
+                                                   cacheRemovalCallback));
   }
 
   virtual ~V8SVGDynamicPODTypeWrapper() {
@@ -193,6 +217,20 @@ class V8SVGDynamicPODTypeWrapper : public V8SVGPODTypeWrapper<PODType> {
   }
 
  private:
+  V8SVGDynamicPODTypeWrapper(PassRefPtr<PODTypeCreator> creator,
+                             GetterMethod getter,
+                             SetterMethod setter,
+                             CacheRemovalCallback cacheRemovalCallback)
+      : m_creator(creator),
+        m_getter(getter),
+        m_setter(setter),
+        m_cacheRemovalCallback(cacheRemovalCallback) {
+    ASSERT(creator);
+    ASSERT(getter);
+    ASSERT(setter);
+    ASSERT(cacheRemovalCallback);
+  }
+
   // Update callbacks
   RefPtr<PODTypeCreator> m_creator;
   GetterMethod m_getter;
@@ -300,20 +338,20 @@ class V8SVGDynamicPODTypeWrapperCache {
   }
 
   // Used for readwrite attributes only
-  static WrapperBase* lookupOrCreateWrapper(PODTypeCreator* creator,
-                                            GetterMethod getter,
-                                            SetterMethod setter) {
+  static PassRefPtr<WrapperBase> lookupOrCreateWrapper(PODTypeCreator* creator,
+                                                       GetterMethod getter,
+                                                       SetterMethod setter) {
     DynamicWrapperHashMap& map(dynamicWrapperHashMap());
     CacheInfo info(creator, getter, setter);
 
     if (map.contains(info))
       return map.get(info);
 
-    DynamicWrapper* wrapper =
-        new V8SVGDynamicPODTypeWrapper<PODType, PODTypeCreator>(
+    RefPtr<DynamicWrapper> wrapper =
+        V8SVGDynamicPODTypeWrapper<PODType, PODTypeCreator>::create(
             creator, getter, setter, forgetWrapper);
-    map.set(info, wrapper);
-    return wrapper;
+    map.set(info, wrapper.get());
+    return wrapper.release();
   }
 
   static void forgetWrapper(V8SVGPODTypeWrapper<PODType>* wrapper) {
