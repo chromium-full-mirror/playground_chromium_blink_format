@@ -131,6 +131,9 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
   ResourceRequest request(cfRequest);
   handle->willSendRequest(request, cfRedirectResponse);
 
+  if (request.isNull())
+    return 0;
+
   cfRequest = request.cfURLRequest();
 
   CFRetain(cfRequest);
