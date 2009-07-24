@@ -616,7 +616,7 @@ static void prepareClipboardForImageDrag(Frame* src,
   RefPtr<Range> range = src->document()->createRange();
   ExceptionCode ec = 0;
   range->selectNode(node, ec);
-  ASSERT(ec == 0);
+  ASSERT(!ec);
   src->selection()->setSelection(VisibleSelection(range.get(), DOWNSTREAM));
   clipboard->declareAndWriteDragImage(
       node, !linkURL.isEmpty() ? linkURL : imageURL, label, src);
