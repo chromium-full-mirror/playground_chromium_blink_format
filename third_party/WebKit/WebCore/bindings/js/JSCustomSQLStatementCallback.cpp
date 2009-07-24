@@ -53,6 +53,8 @@ void JSCustomSQLStatementCallback::handleEvent(SQLTransaction* transaction,
   if (!m_frame->script()->isEnabled())
     return;
 
+  // FIXME: This is likely the wrong globalObject (for prototype chains at
+  // least)
   JSGlobalObject* globalObject = m_frame->script()->globalObject();
   ExecState* exec = globalObject->globalExec();
 
@@ -73,8 +75,9 @@ void JSCustomSQLStatementCallback::handleEvent(SQLTransaction* transaction,
   RefPtr<JSCustomSQLStatementCallback> protect(this);
 
   MarkedArgumentBuffer args;
-  args.append(toJS(exec, transaction));
-  args.append(toJS(exec, resultSet));
+  args.append(
+      toJS(exec, deprecatedGlobalObjectForPrototype(exec), transaction));
+  args.append(toJS(exec, deprecatedGlobalObjectForPrototype(exec), resultSet));
 
   globalObject->globalData()->timeoutChecker.start();
   call(exec, function, callType, callData, m_callback, args);
