@@ -88,7 +88,7 @@ JSValue JSAbstractWorker::removeEventListener(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue toJS(ExecState* exec, AbstractWorker* baseObject) {
+static JSValue toJS(ExecState* exec, AbstractWorker* baseObject) {
   // Just call the JSEventTarget implementation of toJS(), which already
   // differentiates between the different implementations.
   return toJS(exec, static_cast<EventTarget*>(baseObject));
