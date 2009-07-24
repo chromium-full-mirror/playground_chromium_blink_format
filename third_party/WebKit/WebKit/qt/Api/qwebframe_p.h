@@ -70,7 +70,8 @@ class QWebFramePrivate {
         page(0),
         allowsScrolling(true),
         marginWidth(-1),
-        marginHeight(-1) {}
+        marginHeight(-1),
+        clipRenderToViewport(true) {}
   void init(QWebFrame* qframe, QWebFrameData* frameData);
 
   inline QWebFrame* parentFrame() {
@@ -86,9 +87,7 @@ class QWebFramePrivate {
   static WebCore::Frame* core(QWebFrame*);
   static QWebFrame* kit(WebCore::Frame*);
 
-  void renderPrivate(QPainter* painter,
-                     const QRegion& clip,
-                     bool contents = false);
+  void renderPrivate(QPainter* painter, const QRegion& clip);
 
   QWebFrame* q;
   WebCore::FrameLoaderClientQt* frameLoaderClient;
@@ -98,6 +97,7 @@ class QWebFramePrivate {
   bool allowsScrolling;
   int marginWidth;
   int marginHeight;
+  bool clipRenderToViewport;
 };
 
 class QWebHitTestResultPrivate {
