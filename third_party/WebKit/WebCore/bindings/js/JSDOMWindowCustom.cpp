@@ -412,9 +412,9 @@ JSValue JSDOMWindow::history(ExecState* exec) const {
           getCachedDOMObjectWrapper(exec->globalData(), history))
     return wrapper;
 
-  JSHistory* jsHistory = new (exec) JSHistory(
-      getDOMStructure<JSHistory>(exec, const_cast<JSDOMWindow*>(this)),
-      history);
+  JSDOMWindow* window = const_cast<JSDOMWindow*>(this);
+  JSHistory* jsHistory = new (exec)
+      JSHistory(getDOMStructure<JSHistory>(exec, window), window, history);
   cacheDOMObjectWrapper(exec->globalData(), history, jsHistory);
   return jsHistory;
 }
@@ -425,9 +425,9 @@ JSValue JSDOMWindow::location(ExecState* exec) const {
           getCachedDOMObjectWrapper(exec->globalData(), location))
     return wrapper;
 
-  JSLocation* jsLocation = new (exec) JSLocation(
-      getDOMStructure<JSLocation>(exec, const_cast<JSDOMWindow*>(this)),
-      location);
+  JSDOMWindow* window = const_cast<JSDOMWindow*>(this);
+  JSLocation* jsLocation = new (exec)
+      JSLocation(getDOMStructure<JSLocation>(exec, window), window, location);
   cacheDOMObjectWrapper(exec->globalData(), location, jsLocation);
   return jsLocation;
 }

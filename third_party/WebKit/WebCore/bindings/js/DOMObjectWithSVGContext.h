@@ -41,9 +41,10 @@ class DOMObjectWithSVGContext : public DOMObject {
 
  protected:
   DOMObjectWithSVGContext(PassRefPtr<JSC::Structure> structure,
+                          JSDOMGlobalObject*,
                           SVGElement* context)
       : DOMObject(structure), m_context(context) {
-    // No space to store the globalObject w/o hitting the CELL_SIZE limit.
+    // No space to store the JSDOMGlobalObject w/o hitting the CELL_SIZE limit.
   }
 
  protected:  // FIXME: Many custom bindings use m_context directly.  Making this

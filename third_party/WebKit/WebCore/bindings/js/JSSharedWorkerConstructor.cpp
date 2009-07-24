@@ -48,7 +48,7 @@ const ClassInfo JSSharedWorkerConstructor::s_info = {"SharedWorkerConstructor",
 JSSharedWorkerConstructor::JSSharedWorkerConstructor(
     ExecState* exec,
     JSDOMGlobalObject* globalObject)
-    : DOMObject(JSSharedWorkerConstructor::createStructure(
+    : DOMConstructorObject(JSSharedWorkerConstructor::createStructure(
           globalObject->objectPrototype())) {
   putDirect(exec->propertyNames().prototype,
             JSSharedWorkerPrototype::self(exec, globalObject), None);
