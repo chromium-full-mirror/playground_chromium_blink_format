@@ -1726,7 +1726,7 @@ void Document::implicitClose() {
 
 #if PLATFORM(MAC)
   if (f && renderObject && this == topDocument() &&
-      AXObjectCache::accessibilityEnabled())
+      AXObjectCache::accessibilityEnabled()) {
     // The AX cache may have been cleared at this point, but we need to make
     // sure it contains an
     // AX object to send the notification to. getOrCreate will make sure that an
@@ -1736,7 +1736,8 @@ void Document::implicitClose() {
     // only safe to call when a layout is not in progress, so it can not be used
     // in postNotification.
     axObjectCache()->getOrCreate(renderObject);
-  axObjectCache()->postNotification(renderObject, "AXLoadComplete", true);
+    axObjectCache()->postNotification(renderObject, "AXLoadComplete", true);
+  }
 #endif
 
 #if ENABLE(SVG)
