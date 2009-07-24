@@ -35,8 +35,9 @@ class ExecState;
 namespace WebCore {
 
 class EventTarget;
+class JSDOMGlobalObject;
 
-JSC::JSValue toJS(JSC::ExecState*, EventTarget*);
+JSC::JSValue toJS(JSC::ExecState*, JSDOMGlobalObject*, EventTarget*);
 EventTarget* toEventTarget(JSC::JSValue);
 
 }  // namespace WebCore

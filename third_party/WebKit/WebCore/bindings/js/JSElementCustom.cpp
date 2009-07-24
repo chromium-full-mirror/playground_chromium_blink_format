@@ -130,7 +130,9 @@ JSValue JSElement::setAttributeNodeNS(ExecState* exec, const ArgList& args) {
   return result;
 }
 
-JSValue toJSNewlyCreated(ExecState* exec, Element* element) {
+JSValue toJSNewlyCreated(ExecState* exec,
+                         JSDOMGlobalObject*,
+                         Element* element) {
   if (!element)
     return jsNull();
 

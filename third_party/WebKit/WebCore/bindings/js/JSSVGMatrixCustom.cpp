@@ -32,7 +32,7 @@ namespace WebCore {
 JSValue JSSVGMatrix::inverse(ExecState* exec, const ArgList&) {
   TransformationMatrix imp(*impl());
   JSC::JSValue result = toJS(
-      exec,
+      exec, deprecatedGlobalObjectForPrototype(exec),
       JSSVGStaticPODTypeWrapper<TransformationMatrix>::create(imp.inverse())
           .get(),
       m_context.get());
@@ -50,9 +50,10 @@ JSValue JSSVGMatrix::rotateFromVector(ExecState* exec, const ArgList& args) {
   float y = args.at(1).toFloat(exec);
 
   JSC::JSValue result =
-      toJS(exec, JSSVGStaticPODTypeWrapper<TransformationMatrix>::create(
-                     imp.rotateFromVector(x, y))
-                     .get(),
+      toJS(exec, deprecatedGlobalObjectForPrototype(exec),
+           JSSVGStaticPODTypeWrapper<TransformationMatrix>::create(
+               imp.rotateFromVector(x, y))
+               .get(),
            m_context.get());
 
   if (x == 0.0 || y == 0.0)

@@ -83,7 +83,7 @@ void JSDocument::setLocation(ExecState* exec, JSValue value) {
       userGesture);
 }
 
-JSValue toJS(ExecState* exec, Document* document) {
+JSValue toJS(ExecState* exec, JSDOMGlobalObject*, Document* document) {
   if (!document)
     return jsNull();
 

@@ -79,7 +79,7 @@ JSValue JSEvent::clipboardData(ExecState* exec) const {
                                     : jsUndefined();
 }
 
-JSValue toJS(ExecState* exec, Event* event) {
+JSValue toJS(ExecState* exec, JSDOMGlobalObject*, Event* event) {
   JSLock lock(false);
 
   if (!event)

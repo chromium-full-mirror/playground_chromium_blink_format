@@ -81,8 +81,11 @@ JSValue JSSVGElementInstance::removeEventListener(ExecState* exec,
 void JSSVGElementInstance::pushEventHandlerScope(ExecState*,
                                                  ScopeChain&) const {}
 
-JSC::JSValue toJS(JSC::ExecState* exec, SVGElementInstance* object) {
-  JSValue result = getDOMObjectWrapper<JSSVGElementInstance>(exec, object);
+JSC::JSValue toJS(JSC::ExecState* exec,
+                  JSDOMGlobalObject* globalObject,
+                  SVGElementInstance* object) {
+  JSValue result =
+      getDOMObjectWrapper<JSSVGElementInstance>(exec, globalObject, object);
 
   // Ensure that our corresponding element has a JavaScript wrapper to keep its
   // event handlers alive.
