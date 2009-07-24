@@ -34,6 +34,7 @@
 #if ENABLE(WORKERS)
 
 #include <v8.h>
+#include "ScriptValue.h"
 #include "V8EventListenerList.h"
 #include "V8Index.h"
 #include <wtf/OwnPtr.h>
@@ -46,6 +47,16 @@ class EventTarget;
 class V8EventListener;
 class V8WorkerContextEventListener;
 class WorkerContext;
+
+struct WorkerContextExecutionState {
+  WorkerContextExecutionState() : hadException(false), lineNumber(0) {}
+
+  bool hadException;
+  ScriptValue exception;
+  String errorMessage;
+  int lineNumber;
+  String sourceURL;
+};
 
 class WorkerContextExecutionProxy {
  public:
@@ -82,9 +93,10 @@ class WorkerContextExecutionProxy {
   void trackEvent(Event*);
 
   // Evaluate a script file in the current execution environment.
-  v8::Local<v8::Value> evaluate(const String& script,
-                                const String& fileName,
-                                int baseLine);
+  ScriptValue evaluate(const String& script,
+                       const String& fileName,
+                       int baseLine,
+                       WorkerContextExecutionState*);
 
   // Returns WorkerContext object.
   WorkerContext* workerContext() { return m_workerContext; }
