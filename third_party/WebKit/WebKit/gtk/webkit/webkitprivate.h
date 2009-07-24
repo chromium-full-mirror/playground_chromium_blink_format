@@ -239,6 +239,13 @@ GSList* webkit_web_settings_get_spell_languages(WebKitWebView* web_view);
 bool webkit_web_view_use_primary_for_paste(WebKitWebView* web_view);
 
 GHashTable* webkit_history_items(void);
+
+WEBKIT_API void webkit_gc_collect_javascript_objects();
+
+WEBKIT_API void webkit_gc_collect_javascript_objects_on_alternate_thread(
+    gboolean waitUntilDone);
+
+WEBKIT_API gsize webkit_gc_count_javascript_objects();
 }
 
 #endif
