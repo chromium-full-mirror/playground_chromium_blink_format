@@ -48,8 +48,9 @@ JSOptionConstructor::JSOptionConstructor(ExecState* exec,
 static JSObject* constructHTMLOptionElement(ExecState* exec,
                                             JSObject* constructor,
                                             const ArgList& args) {
-  Document* document =
-      static_cast<JSOptionConstructor*>(constructor)->document();
+  JSOptionConstructor* jsConstructor =
+      static_cast<JSOptionConstructor*>(constructor);
+  Document* document = jsConstructor->document();
   if (!document)
     return throwError(exec, ReferenceError,
                       "Option constructor associated document is unavailable");
@@ -75,7 +76,7 @@ static JSObject* constructHTMLOptionElement(ExecState* exec,
     return 0;
   }
 
-  return asObject(toJS(exec, element.release()));
+  return asObject(toJS(exec, jsConstructor->globalObject(), element.release()));
 }
 
 ConstructType JSOptionConstructor::getConstructData(

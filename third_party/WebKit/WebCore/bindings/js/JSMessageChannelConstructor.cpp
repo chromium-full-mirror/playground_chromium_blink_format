@@ -59,15 +59,16 @@ ConstructType JSMessageChannelConstructor::getConstructData(
 JSObject* JSMessageChannelConstructor::construct(ExecState* exec,
                                                  JSObject* constructor,
                                                  const ArgList&) {
-  ScriptExecutionContext* context =
-      static_cast<JSMessageChannelConstructor*>(constructor)
-          ->scriptExecutionContext();
+  JSMessageChannelConstructor* jsConstructor =
+      static_cast<JSMessageChannelConstructor*>(constructor);
+  ScriptExecutionContext* context = jsConstructor->scriptExecutionContext();
   if (!context)
     return throwError(
         exec, ReferenceError,
         "MessageChannel constructor associated document is unavailable");
 
-  return asObject(toJS(exec, MessageChannel::create(context)));
+  return asObject(toJS(exec, jsConstructor->globalObject(),
+                       MessageChannel::create(context)));
 }
 
 }  // namespace WebCore

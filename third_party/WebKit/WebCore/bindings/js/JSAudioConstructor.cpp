@@ -55,11 +55,10 @@ JSAudioConstructor::JSAudioConstructor(ExecState* exec,
 static JSObject* constructAudio(ExecState* exec,
                                 JSObject* constructor,
                                 const ArgList& args) {
+  JSAudioConstructor* jsAudio = static_cast<JSAudioConstructor*>(constructor);
   // FIXME: Why doesn't this need the call toJS on the document like
   // JSImageConstructor?
-
-  Document* document =
-      static_cast<JSAudioConstructor*>(constructor)->document();
+  Document* document = jsAudio->document();
   if (!document)
     return throwError(exec, ReferenceError,
                       "Audio constructor associated document is unavailable");
@@ -71,7 +70,7 @@ static JSObject* constructAudio(ExecState* exec,
     audio->setSrc(args.at(0).toString(exec));
     audio->scheduleLoad();
   }
-  return asObject(toJS(exec, audio.release()));
+  return asObject(toJS(exec, jsAudio->globalObject(), audio.release()));
 }
 
 ConstructType JSAudioConstructor::getConstructData(

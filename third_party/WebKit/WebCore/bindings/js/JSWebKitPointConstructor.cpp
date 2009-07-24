@@ -50,8 +50,11 @@ JSWebKitPointConstructor::JSWebKitPointConstructor(
 }
 
 static JSObject* constructWebKitPoint(ExecState* exec,
-                                      JSObject*,
+                                      JSObject* constructor,
                                       const ArgList& args) {
+  JSWebKitPointConstructor* jsConstructor =
+      static_cast<JSWebKitPointConstructor*>(constructor);
+
   float x = 0;
   float y = 0;
   if (args.size() >= 2) {
@@ -62,7 +65,8 @@ static JSObject* constructWebKitPoint(ExecState* exec,
     if (isnan(y))
       y = 0;
   }
-  return asObject(toJS(exec, WebKitPoint::create(x, y)));
+  return asObject(
+      toJS(exec, jsConstructor->globalObject(), WebKitPoint::create(x, y)));
 }
 
 JSC::ConstructType JSWebKitPointConstructor::getConstructData(

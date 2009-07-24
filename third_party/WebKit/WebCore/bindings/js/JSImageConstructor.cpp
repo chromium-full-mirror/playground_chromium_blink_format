@@ -60,8 +60,9 @@ static JSObject* constructImage(ExecState* exec,
     height = args.at(1).toInt32(exec);
   }
 
-  Document* document =
-      static_cast<JSImageConstructor*>(constructor)->document();
+  JSImageConstructor* jsConstructor =
+      static_cast<JSImageConstructor*>(constructor);
+  Document* document = jsConstructor->document();
   if (!document)
     return throwError(exec, ReferenceError,
                       "Image constructor associated document is unavailable");
@@ -70,7 +71,7 @@ static JSObject* constructImage(ExecState* exec,
   // added to the window object. This is done to ensure that JSDocument::mark
   // will be called (which will cause the image element to be marked if
   // necessary).
-  toJS(exec, document);
+  toJS(exec, jsConstructor->globalObject(), document);
 
   RefPtr<HTMLImageElement> image =
       new HTMLImageElement(HTMLNames::imgTag, document);
@@ -78,7 +79,7 @@ static JSObject* constructImage(ExecState* exec,
     image->setWidth(width);
   if (heightSet)
     image->setHeight(height);
-  return asObject(toJS(exec, image.release()));
+  return asObject(toJS(exec, jsConstructor->globalObject(), image.release()));
 }
 
 ConstructType JSImageConstructor::getConstructData(
