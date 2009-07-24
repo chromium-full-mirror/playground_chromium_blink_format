@@ -31,12 +31,12 @@
 
 #include "ExceptionCode.h"
 #include "Frame.h"
-#include "htmlediting.h"
 #include "Node.h"
 #include "PlatformString.h"
 #include "Range.h"
 #include "SelectionController.h"
 #include "TextIterator.h"
+#include "htmlediting.h"
 
 namespace WebCore {
 
