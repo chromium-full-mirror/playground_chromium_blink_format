@@ -77,9 +77,8 @@ DOMTimer::DOMTimer(ScriptExecutionContext* context,
 }
 
 DOMTimer::~DOMTimer() {
-  if (scriptExecutionContext()) {
+  if (scriptExecutionContext())
     scriptExecutionContext()->removeTimeout(m_timeoutId);
-  }
 }
 
 int DOMTimer::install(ScriptExecutionContext* context,
@@ -151,7 +150,7 @@ void DOMTimer::stop() {
 }
 
 void DOMTimer::suspend() {
-  ASSERT(m_nextFireInterval == 0 && m_repeatInterval == 0);
+  ASSERT(!m_nextFireInterval && !m_repeatInterval);
   m_nextFireInterval = nextFireInterval();
   m_repeatInterval = repeatInterval();
   TimerBase::stop();
