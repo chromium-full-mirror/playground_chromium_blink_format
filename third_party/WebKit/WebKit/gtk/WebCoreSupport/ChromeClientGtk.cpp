@@ -461,6 +461,13 @@ void ChromeClient::exceededDatabaseQuota(Frame* frame, const String&) {
 }
 #endif
 
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+void ChromeClient::reachedMaxAppCacheSize(int64_t spaceNeeded) {
+  // FIXME: Free some space.
+  notImplemented();
+}
+#endif
+
 void ChromeClient::runOpenPanel(Frame*,
                                 PassRefPtr<FileChooser> prpFileChooser) {
   RefPtr<FileChooser> chooser = prpFileChooser;

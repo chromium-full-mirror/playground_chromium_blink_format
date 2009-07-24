@@ -37,7 +37,7 @@
 namespace WebCore {
 
 ApplicationCache::ApplicationCache()
-    : m_group(0), m_manifest(0), m_storageID(0) {}
+    : m_group(0), m_manifest(0), m_estimatedSizeInStorage(0), m_storageID(0) {}
 
 ApplicationCache::~ApplicationCache() {
   if (m_group && !m_group->isCopy())
@@ -80,6 +80,8 @@ void ApplicationCache::addResource(
     cacheStorage().store(resource.get(), this);
   }
 
+  m_estimatedSizeInStorage += resource->estimatedSizeInStorage();
+
   m_resources.set(url, resource);
 }
 
@@ -93,6 +95,8 @@ unsigned ApplicationCache::removeResource(const String& url) {
   unsigned type = it->second->type();
 
   m_resources.remove(it);
+
+  m_estimatedSizeInStorage -= it->second->estimatedSizeInStorage();
 
   return type;
 }

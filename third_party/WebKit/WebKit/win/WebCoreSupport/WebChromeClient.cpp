@@ -548,6 +548,14 @@ void WebChromeClient::exceededDatabaseQuota(Frame* frame,
 }
 #endif
 
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+#include "ApplicationCacheStorage.h"
+void WebChromeClient::reachedMaxAppCacheSize(int64_t spaceNeeded) {
+  // FIXME: Free some space.
+  notImplemented();
+}
+#endif
+
 void WebChromeClient::populateVisitedLinks() {
   WebHistory* history = WebHistory::sharedHistory();
   if (!history)
