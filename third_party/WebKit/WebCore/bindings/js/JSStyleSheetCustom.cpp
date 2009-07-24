@@ -35,7 +35,9 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSValue toJS(ExecState* exec, JSDOMGlobalObject*, StyleSheet* styleSheet) {
+JSValue toJS(ExecState* exec,
+             JSDOMGlobalObject* globalObject,
+             StyleSheet* styleSheet) {
   if (!styleSheet)
     return jsNull();
 
@@ -45,9 +47,11 @@ JSValue toJS(ExecState* exec, JSDOMGlobalObject*, StyleSheet* styleSheet) {
     return wrapper;
 
   if (styleSheet->isCSSStyleSheet())
-    wrapper = CREATE_DOM_OBJECT_WRAPPER(exec, CSSStyleSheet, styleSheet);
+    wrapper = CREATE_DOM_OBJECT_WRAPPER(exec, globalObject, CSSStyleSheet,
+                                        styleSheet);
   else
-    wrapper = CREATE_DOM_OBJECT_WRAPPER(exec, StyleSheet, styleSheet);
+    wrapper =
+        CREATE_DOM_OBJECT_WRAPPER(exec, globalObject, StyleSheet, styleSheet);
 
   return wrapper;
 }

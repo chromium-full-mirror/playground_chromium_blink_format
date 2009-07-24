@@ -53,9 +53,12 @@ JSXSLTProcessorConstructor::JSXSLTProcessorConstructor(
 }
 
 static JSObject* constructXSLTProcessor(ExecState* exec,
-                                        JSObject*,
+                                        JSObject* constructor,
                                         const ArgList&) {
-  return CREATE_DOM_OBJECT_WRAPPER(exec, XSLTProcessor,
+  JSXSLTProcessorConstructor* jsConstructor =
+      static_cast<JSXSLTProcessorConstructor*>(constructor);
+  return CREATE_DOM_OBJECT_WRAPPER(exec, jsConstructor->globalObject(),
+                                   XSLTProcessor,
                                    XSLTProcessor::create().get());
 }
 

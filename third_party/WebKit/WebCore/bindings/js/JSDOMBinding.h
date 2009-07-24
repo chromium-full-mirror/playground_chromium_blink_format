@@ -192,10 +192,9 @@ inline JSC::JSObject* getDOMPrototype(JSC::ExecState* exec,
                    exec, static_cast<JSDOMGlobalObject*>(globalObject))
                    ->storedPrototype()));
 }
-#define CREATE_DOM_OBJECT_WRAPPER(exec, className, object) \
-  createDOMObjectWrapper<JS##className>(                   \
-      exec, deprecatedGlobalObjectForPrototype(exec),      \
-      static_cast<className*>(object))
+#define CREATE_DOM_OBJECT_WRAPPER(exec, globalObject, className, object) \
+  createDOMObjectWrapper<JS##className>(exec, globalObject,              \
+                                        static_cast<className*>(object))
 template <class WrapperClass, class DOMClass>
 inline DOMObject* createDOMObjectWrapper(JSC::ExecState* exec,
                                          JSDOMGlobalObject* globalObject,
@@ -222,10 +221,10 @@ inline JSC::JSValue getDOMObjectWrapper(JSC::ExecState* exec,
 }
 
 #if ENABLE(SVG)
-#define CREATE_SVG_OBJECT_WRAPPER(exec, className, object, context) \
-  createDOMObjectWrapper<JS##className>(                            \
-      exec, deprecatedGlobalObjectForPrototype(exec),               \
-      static_cast<className*>(object), context)
+#define CREATE_SVG_OBJECT_WRAPPER(exec, globalObject, className, object, \
+                                  context)                               \
+  createDOMObjectWrapper<JS##className>(                                 \
+      exec, globalObject, static_cast<className*>(object), context)
 template <class WrapperClass, class DOMClass>
 inline DOMObject* createDOMObjectWrapper(JSC::ExecState* exec,
                                          JSDOMGlobalObject* globalObject,
@@ -254,10 +253,9 @@ inline JSC::JSValue getDOMObjectWrapper(JSC::ExecState* exec,
 }
 #endif
 
-#define CREATE_DOM_NODE_WRAPPER(exec, className, object) \
-  createDOMNodeWrapper<JS##className>(                   \
-      exec, deprecatedGlobalObjectForPrototype(exec),    \
-      static_cast<className*>(object))
+#define CREATE_DOM_NODE_WRAPPER(exec, globalObject, className, object) \
+  createDOMNodeWrapper<JS##className>(exec, globalObject,              \
+                                      static_cast<className*>(object))
 template <class WrapperClass, class DOMClass>
 inline JSNode* createDOMNodeWrapper(JSC::ExecState* exec,
                                     JSDOMGlobalObject* globalObject,

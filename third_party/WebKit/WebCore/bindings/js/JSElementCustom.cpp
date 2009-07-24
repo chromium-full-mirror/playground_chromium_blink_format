@@ -91,7 +91,8 @@ JSValue JSElement::setAttributeNode(ExecState* exec, const ArgList& args) {
                                       newAttr->value()))
     return jsUndefined();
 
-  JSValue result = toJS(exec, WTF::getPtr(imp->setAttributeNode(newAttr, ec)));
+  JSValue result = toJS(exec, globalObject(),
+                        WTF::getPtr(imp->setAttributeNode(newAttr, ec)));
   setDOMException(exec, ec);
   return result;
 }
@@ -124,14 +125,14 @@ JSValue JSElement::setAttributeNodeNS(ExecState* exec, const ArgList& args) {
                                       newAttr->value()))
     return jsUndefined();
 
-  JSValue result =
-      toJS(exec, WTF::getPtr(imp->setAttributeNodeNS(newAttr, ec)));
+  JSValue result = toJS(exec, globalObject(),
+                        WTF::getPtr(imp->setAttributeNodeNS(newAttr, ec)));
   setDOMException(exec, ec);
   return result;
 }
 
 JSValue toJSNewlyCreated(ExecState* exec,
-                         JSDOMGlobalObject*,
+                         JSDOMGlobalObject* globalObject,
                          Element* element) {
   if (!element)
     return jsNull();
@@ -140,13 +141,15 @@ JSValue toJSNewlyCreated(ExecState* exec,
 
   JSNode* wrapper;
   if (element->isHTMLElement())
-    wrapper = createJSHTMLWrapper(exec, static_cast<HTMLElement*>(element));
+    wrapper = createJSHTMLWrapper(exec, globalObject,
+                                  static_cast<HTMLElement*>(element));
 #if ENABLE(SVG)
   else if (element->isSVGElement())
-    wrapper = createJSSVGWrapper(exec, static_cast<SVGElement*>(element));
+    wrapper = createJSSVGWrapper(exec, globalObject,
+                                 static_cast<SVGElement*>(element));
 #endif
   else
-    wrapper = CREATE_DOM_NODE_WRAPPER(exec, Element, element);
+    wrapper = CREATE_DOM_NODE_WRAPPER(exec, globalObject, Element, element);
 
   return wrapper;
 }

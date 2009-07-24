@@ -49,8 +49,10 @@ JSWebKitCSSMatrixConstructor::JSWebKitCSSMatrixConstructor(
 }
 
 static JSObject* constructWebKitCSSMatrix(ExecState* exec,
-                                          JSObject*,
+                                          JSObject* constructor,
                                           const ArgList& args) {
+  JSWebKitCSSMatrixConstructor* jsConstructor =
+      static_cast<JSWebKitCSSMatrixConstructor*>(constructor);
   String s;
   if (args.size() >= 1)
     s = args.at(0).toString(exec);
@@ -58,7 +60,8 @@ static JSObject* constructWebKitCSSMatrix(ExecState* exec,
   ExceptionCode ec = 0;
   RefPtr<WebKitCSSMatrix> matrix = WebKitCSSMatrix::create(s, ec);
   setDOMException(exec, ec);
-  return CREATE_DOM_OBJECT_WRAPPER(exec, WebKitCSSMatrix, matrix.get());
+  return CREATE_DOM_OBJECT_WRAPPER(exec, jsConstructor->globalObject(),
+                                   WebKitCSSMatrix, matrix.get());
 }
 
 ConstructType JSWebKitCSSMatrixConstructor::getConstructData(
