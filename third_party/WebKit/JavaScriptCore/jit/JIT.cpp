@@ -26,7 +26,13 @@
 #include "config.h"
 #include "JIT.h"
 
-#include "MacroAssemblerX86Common.h"
+// This probably does not belong here; adding here for now as a quick Windows
+// build fix.
+#if ENABLE(ASSEMBLER) && PLATFORM(X86) && !PLATFORM(MAC)
+#include "MacroAssembler.h"
+JSC::MacroAssemblerX86Common::SSE2CheckState
+    JSC::MacroAssemblerX86Common::s_sse2CheckState = NotCheckedSSE2;
+#endif
 
 #if ENABLE(JIT)
 
@@ -1071,14 +1077,3 @@ void JIT::linkCall(JSFunction* callee,
 }  // namespace JSC
 
 #endif  // ENABLE(JIT)
-
-// This probably does not belong here; adding here for now as a quick Windows
-// build fix.
-#if ENABLE(ASSEMBLER)
-
-#if PLATFORM(X86) && !PLATFORM(MAC)
-JSC::MacroAssemblerX86Common::SSE2CheckState
-    JSC::MacroAssemblerX86Common::s_sse2CheckState = NotCheckedSSE2;
-#endif
-
-#endif
