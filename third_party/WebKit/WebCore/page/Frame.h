@@ -38,8 +38,8 @@
 #include "FrameLoader.h"
 #include "FrameTree.h"
 #include "Range.h"
-#include "ScrollBehavior.h"
 #include "ScriptController.h"
+#include "ScrollBehavior.h"
 #include "SelectionController.h"
 #include "TextGranularity.h"
 

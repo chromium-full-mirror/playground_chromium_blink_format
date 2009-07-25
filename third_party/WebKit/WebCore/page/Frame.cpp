@@ -43,21 +43,20 @@
 #include "EditingText.h"
 #include "EditorClient.h"
 #include "EventNames.h"
-#include "FocusController.h"
 #include "FloatQuad.h"
+#include "FocusController.h"
 #include "FrameLoader.h"
 #include "FrameLoaderClient.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
 #include "HTMLDocument.h"
+#include "HTMLFormControlElement.h"
 #include "HTMLFormElement.h"
 #include "HTMLFrameElementBase.h"
-#include "HTMLFormControlElement.h"
 #include "HTMLNames.h"
 #include "HTMLTableCellElement.h"
 #include "HitTestResult.h"
 #include "Logging.h"
-#include "markup.h"
 #include "MediaFeatureNames.h"
 #include "Navigator.h"
 #include "NodeList.h"
@@ -68,12 +67,13 @@
 #include "RenderTextControl.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
+#include "ScriptController.h"
 #include "Settings.h"
 #include "TextIterator.h"
 #include "TextResourceDecoder.h"
 #include "XMLNames.h"
-#include "ScriptController.h"
 #include "htmlediting.h"
+#include "markup.h"
 #include "npruntime_impl.h"
 #include "visible_units.h"
 #include <wtf/RefCountedLeakCounter.h>
@@ -362,26 +362,24 @@ static RegularExpression* createRegExpForLabels(const Vector<String>& labels) {
 
     bool startsWithWordChar = false;
     bool endsWithWordChar = false;
-    if (label.length() != 0) {
+    if (label.length()) {
       startsWithWordChar = wordRegExp.match(label.substring(0, 1)) >= 0;
       endsWithWordChar =
           wordRegExp.match(label.substring(label.length() - 1, 1)) >= 0;
     }
 
-    if (i != 0)
+    if (i)
       pattern.append("|");
     // Search for word boundaries only if label starts/ends with "word
     // characters".
     // If we always searched for word boundaries, this wouldn't work for
     // languages
     // such as Japanese.
-    if (startsWithWordChar) {
+    if (startsWithWordChar)
       pattern.append("\\b");
-    }
     pattern.append(label);
-    if (endsWithWordChar) {
+    if (endsWithWordChar)
       pattern.append("\\b");
-    }
   }
   pattern.append(")");
   return new RegularExpression(pattern, TextCaseInsensitive);
@@ -470,9 +468,8 @@ String Frame::searchForLabelsBeforeElement(const Vector<String>& labels,
   // or the
   // previous element, we still might need to search the row above us for a
   // label.
-  if (startingTableCell && !searchedCellAbove) {
+  if (startingTableCell && !searchedCellAbove)
     return searchForLabelsAboveCell(regExp.get(), startingTableCell);
-  }
   return String();
 }
 
@@ -914,7 +911,7 @@ void Frame::clearTypingStyle() {
 
 void Frame::computeAndSetTypingStyle(CSSStyleDeclaration* style,
                                      EditAction editingAction) {
-  if (!style || style->length() == 0) {
+  if (!style || !style->length()) {
     clearTypingStyle();
     return;
   }
@@ -973,7 +970,7 @@ String Frame::selectionStartStylePropertyValue(int stylePropertyID) const {
   if (nodeToRemove) {
     ExceptionCode ec = 0;
     nodeToRemove->remove(ec);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
   }
 
   return value;
@@ -1000,10 +997,10 @@ PassRefPtr<CSSComputedStyleDeclaration> Frame::selectionComputedStyle(
     styleElement = document()->createElement(spanTag, false);
 
     styleElement->setAttribute(styleAttr, m_typingStyle->cssText().impl(), ec);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
 
     styleElement->appendChild(document()->createEditingTextNode(""), ec);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
 
     if (elem->renderer() && elem->renderer()->canHaveChildren()) {
       elem->appendChild(styleElement, ec);
@@ -1011,13 +1008,12 @@ PassRefPtr<CSSComputedStyleDeclaration> Frame::selectionComputedStyle(
       Node* parent = elem->parent();
       Node* next = elem->nextSibling();
 
-      if (next) {
+      if (next)
         parent->insertBefore(styleElement, next, ec);
-      } else {
+      else
         parent->appendChild(styleElement, ec);
-      }
     }
-    ASSERT(ec == 0);
+    ASSERT(!ec);
 
     nodeToRemove = styleElement.get();
   }
@@ -1060,17 +1056,15 @@ void Frame::textDidChangeInTextArea(Element* e) {
 void Frame::applyEditingStyleToBodyElement() const {
   RefPtr<NodeList> list = m_doc->getElementsByTagName("body");
   unsigned len = list->length();
-  for (unsigned i = 0; i < len; i++) {
+  for (unsigned i = 0; i < len; i++)
     applyEditingStyleToElement(static_cast<Element*>(list->item(i)));
-  }
 }
 
 void Frame::removeEditingStyleFromBodyElement() const {
   RefPtr<NodeList> list = m_doc->getElementsByTagName("body");
   unsigned len = list->length();
-  for (unsigned i = 0; i < len; i++) {
+  for (unsigned i = 0; i < len; i++)
     removeEditingStyleFromElement(static_cast<Element*>(list->item(i)));
-  }
 }
 
 void Frame::applyEditingStyleToElement(Element* element) const {
@@ -1082,12 +1076,12 @@ void Frame::applyEditingStyleToElement(Element* element) const {
 
   ExceptionCode ec = 0;
   style->setProperty(CSSPropertyWordWrap, "break-word", false, ec);
-  ASSERT(ec == 0);
+  ASSERT(!ec);
   style->setProperty(CSSPropertyWebkitNbspMode, "space", false, ec);
-  ASSERT(ec == 0);
+  ASSERT(!ec);
   style->setProperty(CSSPropertyWebkitLineBreak, "after-white-space", false,
                      ec);
-  ASSERT(ec == 0);
+  ASSERT(!ec);
 }
 
 void Frame::removeEditingStyleFromElement(Element*) const {}
@@ -1333,13 +1327,13 @@ RenderStyle* Frame::styleForSelectionStart(Node*& nodeToRemove) const {
   ExceptionCode ec = 0;
   String styleText = m_typingStyle->cssText() + " display: inline";
   styleElement->setAttribute(styleAttr, styleText.impl(), ec);
-  ASSERT(ec == 0);
+  ASSERT(!ec);
 
   styleElement->appendChild(document()->createEditingTextNode(""), ec);
-  ASSERT(ec == 0);
+  ASSERT(!ec);
 
   node->parentNode()->appendChild(styleElement, ec);
-  ASSERT(ec == 0);
+  ASSERT(!ec);
 
   nodeToRemove = styleElement.get();
   return styleElement->renderer() ? styleElement->renderer()->style() : 0;
@@ -1710,10 +1704,9 @@ void Frame::respondToChangedSelection(const VisibleSelection& oldSelection,
           editor()->markMisspellingsAndBadGrammar(
               oldAdjacentWords, oldSelectedSentence != newSelectedSentence,
               oldSelectedSentence);
-        } else {
+        } else
           editor()->markMisspellingsAndBadGrammar(oldAdjacentWords, false,
                                                   oldAdjacentWords);
-        }
       }
     }
 
