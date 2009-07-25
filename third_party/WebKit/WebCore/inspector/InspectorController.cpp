@@ -47,6 +47,7 @@
 #include "GraphicsContext.h"
 #include "HTMLFrameOwnerElement.h"
 #include "HitTestResult.h"
+#include "InspectorBackend.h"
 #include "InspectorClient.h"
 #include "InspectorFrontend.h"
 #include "InspectorDatabaseResource.h"
@@ -109,66 +110,6 @@ static const unsigned defaultAttachedHeight = 300;
 static const float minimumAttachedHeight = 250.0f;
 static const float maximumAttachedHeightRatio = 0.75f;
 
-bool InspectorController::addSourceToFrame(const String& mimeType,
-                                           const String& source,
-                                           Node* frameNode) {
-  ASSERT_ARG(frameNode, frameNode);
-
-  if (!frameNode)
-    return false;
-
-  if (!frameNode->attached()) {
-    ASSERT_NOT_REACHED();
-    return false;
-  }
-
-  ASSERT(frameNode->isElementNode());
-  if (!frameNode->isElementNode())
-    return false;
-
-  Element* element = static_cast<Element*>(frameNode);
-  ASSERT(element->isFrameOwnerElement());
-  if (!element->isFrameOwnerElement())
-    return false;
-
-  HTMLFrameOwnerElement* frameOwner =
-      static_cast<HTMLFrameOwnerElement*>(element);
-  ASSERT(frameOwner->contentFrame());
-  if (!frameOwner->contentFrame())
-    return false;
-
-  FrameLoader* loader = frameOwner->contentFrame()->loader();
-
-  loader->setResponseMIMEType(mimeType);
-  loader->begin();
-  loader->write(source);
-  loader->end();
-
-  return true;
-}
-
-const String& InspectorController::platform() const {
-#if PLATFORM(MAC)
-#ifdef BUILDING_ON_TIGER
-  DEFINE_STATIC_LOCAL(const String, platform, ("mac-tiger"));
-#else
-  DEFINE_STATIC_LOCAL(const String, platform, ("mac-leopard"));
-#endif
-#elif PLATFORM(WIN_OS)
-  DEFINE_STATIC_LOCAL(const String, platform, ("windows"));
-#elif PLATFORM(QT)
-  DEFINE_STATIC_LOCAL(const String, platform, ("qt"));
-#elif PLATFORM(GTK)
-  DEFINE_STATIC_LOCAL(const String, platform, ("gtk"));
-#elif PLATFORM(WX)
-  DEFINE_STATIC_LOCAL(const String, platform, ("wx"));
-#else
-  DEFINE_STATIC_LOCAL(const String, platform, ("unknown"));
-#endif
-
-  return platform;
-}
-
 static unsigned s_inspectorControllerCount;
 static HashMap<String, InspectorController::Setting*>* s_settingCache;
 
@@ -184,7 +125,8 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
       m_searchingForNode(false),
       m_previousMessage(0),
       m_resourceTrackingEnabled(false),
-      m_resourceTrackingSettingsLoaded(false)
+      m_resourceTrackingSettingsLoaded(false),
+      m_inspectorBackend(InspectorBackend::create(this, client))
 #if ENABLE(JAVASCRIPT_DEBUGGER)
       ,
       m_debuggerEnabled(false),
@@ -219,6 +161,8 @@ InspectorController::~InspectorController() {
     delete s_settingCache;
     s_settingCache = 0;
   }
+
+  m_inspectorBackend->disconnectController();
 }
 
 void InspectorController::inspectedPageDestroyed() {
@@ -285,18 +229,6 @@ void InspectorController::setSetting(const String& key,
     s_settingCache->set(key, new Setting(setting));
 
   m_client->storeSetting(key, setting);
-}
-
-String InspectorController::localizedStringsURL() {
-  if (!enabled())
-    return String();
-  return m_client->localizedStringsURL();
-}
-
-String InspectorController::hiddenPanels() {
-  if (!enabled())
-    return String();
-  return m_client->hiddenPanels();
 }
 
 // Trying to inspect something in a frame with JavaScript disabled would later
@@ -552,19 +484,6 @@ void InspectorController::toggleSearchForNodeInPage() {
     hideHighlight();
 }
 
-void InspectorController::addResourceSourceToFrame(long identifier,
-                                                   Node* frame) {
-  if (!enabled() || !m_frontend)
-    return;
-
-  RefPtr<InspectorResource> resource = resources().get(identifier);
-  if (resource) {
-    String sourceString = resource->sourceString();
-    if (!sourceString.isEmpty())
-      addSourceToFrame(resource->mimeType(), sourceString, frame);
-  }
-}
-
 void InspectorController::mouseDidMoveOverElement(const HitTestResult& result,
                                                   unsigned) {
   if (!enabled() || !m_searchingForNode)
@@ -604,7 +523,8 @@ void InspectorController::windowScriptObjectAvailable() {
   m_page->mainFrame()->document()->securityOrigin()->grantUniversalAccess();
 
   m_scriptState = scriptStateFromPage(m_page);
-  ScriptGlobalObject::set(m_scriptState, "InspectorController", this);
+  ScriptGlobalObject::set(m_scriptState, "InspectorController",
+                          m_inspectorBackend.get());
 }
 
 void InspectorController::scriptObjectReady() {
@@ -1362,58 +1282,10 @@ void InspectorController::disableDebugger(bool always) {
     m_frontend->debuggerWasDisabled();
 }
 
-JavaScriptCallFrame* InspectorController::currentCallFrame() const {
-  return JavaScriptDebugServer::shared().currentCallFrame();
-}
-
-bool InspectorController::pauseOnExceptions() {
-  return JavaScriptDebugServer::shared().pauseOnExceptions();
-}
-
-void InspectorController::setPauseOnExceptions(bool pause) {
-  JavaScriptDebugServer::shared().setPauseOnExceptions(pause);
-}
-
-void InspectorController::pauseInDebugger() {
-  if (!m_debuggerEnabled)
-    return;
-  JavaScriptDebugServer::shared().pauseProgram();
-}
-
 void InspectorController::resumeDebugger() {
   if (!m_debuggerEnabled)
     return;
   JavaScriptDebugServer::shared().continueProgram();
-}
-
-void InspectorController::stepOverStatementInDebugger() {
-  if (!m_debuggerEnabled)
-    return;
-  JavaScriptDebugServer::shared().stepOverStatement();
-}
-
-void InspectorController::stepIntoStatementInDebugger() {
-  if (!m_debuggerEnabled)
-    return;
-  JavaScriptDebugServer::shared().stepIntoStatement();
-}
-
-void InspectorController::stepOutOfFunctionInDebugger() {
-  if (!m_debuggerEnabled)
-    return;
-  JavaScriptDebugServer::shared().stepOutOfFunction();
-}
-
-void InspectorController::addBreakpoint(const String& sourceID,
-                                        unsigned lineNumber) {
-  intptr_t sourceIDValue = sourceID.toIntPtr();
-  JavaScriptDebugServer::shared().addBreakpoint(sourceIDValue, lineNumber);
-}
-
-void InspectorController::removeBreakpoint(const String& sourceID,
-                                           unsigned lineNumber) {
-  intptr_t sourceIDValue = sourceID.toIntPtr();
-  JavaScriptDebugServer::shared().removeBreakpoint(sourceIDValue, lineNumber);
 }
 
 // JavaScriptDebugListener functions

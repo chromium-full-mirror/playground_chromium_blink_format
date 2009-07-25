@@ -32,7 +32,7 @@
 #include "ScriptObject.h"
 
 #include "JSDOMBinding.h"
-#include "JSInspectorController.h"
+#include "JSInspectorBackend.h"
 
 #include <runtime/JSLock.h>
 
@@ -132,7 +132,7 @@ bool ScriptGlobalObject::set(ScriptState* scriptState,
 
 bool ScriptGlobalObject::set(ScriptState* scriptState,
                              const char* name,
-                             InspectorController* value) {
+                             InspectorBackend* value) {
   JSLock lock(false);
   scriptState->lexicalGlobalObject()->putDirect(Identifier(scriptState, name),
                                                 toJS(scriptState, value));

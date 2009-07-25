@@ -118,11 +118,11 @@ bool ScriptGlobalObject::set(ScriptState* scriptState,
 
 bool ScriptGlobalObject::set(ScriptState* scriptState,
                              const char* name,
-                             InspectorController* value) {
+                             InspectorBackend* value) {
   ScriptScope scope(scriptState);
-  scope.global()->Set(v8::String::New(name),
-                      V8DOMWrapper::convertToV8Object(
-                          V8ClassIndex::INSPECTORCONTROLLER, value));
+  scope.global()->Set(
+      v8::String::New(name),
+      V8DOMWrapper::convertToV8Object(V8ClassIndex::INSPECTORBACKEND, value));
   return scope.success();
 }
 
