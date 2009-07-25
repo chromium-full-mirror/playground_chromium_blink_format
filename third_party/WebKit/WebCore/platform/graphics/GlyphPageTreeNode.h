@@ -35,6 +35,11 @@
 #include <wtf/RefCounted.h>
 #include <wtf/unicode/Unicode.h>
 
+#ifndef NDEBUG
+void showGlyphPageTrees();
+void showGlyphPageTree(unsigned pageNumber);
+#endif
+
 namespace WebCore {
 
 class FontData;
@@ -202,6 +207,10 @@ class GlyphPageTreeNode {
   static GlyphPageTreeNode* getRoot(unsigned pageNumber);
   void initializePage(const FontData*, unsigned pageNumber);
 
+#ifndef NDEBUG
+  void showSubtree();
+#endif
+
   GlyphPageTreeNode* m_parent;
   RefPtr<GlyphPage> m_page;
   unsigned m_level;
@@ -212,6 +221,8 @@ class GlyphPageTreeNode {
 
 #ifndef NDEBUG
   unsigned m_pageNumber;
+
+  friend void ::showGlyphPageTree(unsigned pageNumber);
 #endif
 };
 

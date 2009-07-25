@@ -36,6 +36,7 @@ typedef struct tagLOGFONTW LOGFONT;
 namespace WebCore {
 
 class FontPlatformPrivateData;
+class String;
 
 class FontPlatformData {
  public:
@@ -79,6 +80,10 @@ class FontPlatformData {
   static DWORD getKnownFontCodePages(const wchar_t* family);
   static const String& defaultFontFamily();
   static LONG adjustedGDIFontWeight(LONG gdiFontWeight, const String& family);
+
+#ifndef NDEBUG
+  String description() const;
+#endif
 
  private:
   FontPlatformPrivateData* m_private;

@@ -111,6 +111,10 @@ class SimpleFontData : public FontData {
 
   const GlyphData& missingGlyphData() const { return m_missingGlyphData; }
 
+#ifndef NDEBUG
+  virtual String description() const;
+#endif
+
 #if PLATFORM(MAC)
   NSFont* getNSFont() const { return m_platformData.font(); }
 #endif

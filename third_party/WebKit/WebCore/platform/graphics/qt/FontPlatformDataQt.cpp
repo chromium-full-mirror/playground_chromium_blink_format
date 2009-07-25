@@ -21,6 +21,8 @@
 #include "config.h"
 #include "FontPlatformData.h"
 
+#include "PlatformString.h"
+
 namespace WebCore {
 
 FontPlatformData::FontPlatformData(const FontDescription& description,
@@ -63,4 +65,10 @@ FontPlatformData::FontPlatformData(float size, bool bold, bool oblique)
 
 FontPlatformData::FontPlatformData()
     : m_size(0.0f), m_bold(false), m_oblique(false) {}
+
+#ifndef NDEBUG
+String FontPlatformData::description() const {
+  return String();
+}
+#endif
 }

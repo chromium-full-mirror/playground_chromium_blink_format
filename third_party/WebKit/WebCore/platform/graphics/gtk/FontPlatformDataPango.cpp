@@ -273,4 +273,10 @@ bool FontPlatformData::operator==(const FontPlatformData& other) const {
   pango_font_description_free(thisDesc);
   return result;
 }
+
+#ifndef NDEBUG
+String FontPlatformData::description() const {
+  return String();
+}
+#endif
 }

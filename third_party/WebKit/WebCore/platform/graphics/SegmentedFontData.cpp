@@ -26,6 +26,7 @@
 #include "config.h"
 #include "SegmentedFontData.h"
 
+#include "PlatformString.h"
 #include "SimpleFontData.h"
 #include <wtf/Assertions.h>
 
@@ -82,5 +83,11 @@ bool SegmentedFontData::isLoading() const {
 bool SegmentedFontData::isSegmented() const {
   return true;
 }
+
+#ifndef NDEBUG
+String SegmentedFontData::description() const {
+  return "[segmented font]";
+}
+#endif
 
 }  // namespace WebCore

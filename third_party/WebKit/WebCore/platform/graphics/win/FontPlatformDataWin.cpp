@@ -95,4 +95,10 @@ FontPlatformData::FontPlatformData(float size, bool bold, bool oblique)
       m_syntheticOblique(oblique),
       m_useGDI(false) {
 }
+
+#ifndef NDEBUG
+String FontPlatformData::description() const {
+  return String();
+}
+#endif
 }

@@ -40,6 +40,7 @@ typedef struct CGFont* CGFontRef;
 namespace WebCore {
 
 class FontDescription;
+class String;
 
 class FontPlatformData {
  public:
@@ -109,6 +110,10 @@ class FontPlatformData {
            m_syntheticOblique == other.m_syntheticOblique &&
            m_useGDI == other.m_useGDI;
   }
+
+#ifndef NDEBUG
+  String description() const;
+#endif
 
  private:
   class RefCountedHFONT : public RefCounted<RefCountedHFONT> {
