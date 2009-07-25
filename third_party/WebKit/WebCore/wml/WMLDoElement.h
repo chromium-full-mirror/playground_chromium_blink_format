@@ -37,6 +37,7 @@ class WMLDoElement : public WMLElement {
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void insertedIntoDocument();
 
+  virtual void attach();
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange);
 
