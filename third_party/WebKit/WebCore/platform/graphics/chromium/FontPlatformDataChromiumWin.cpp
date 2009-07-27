@@ -132,4 +132,10 @@ SCRIPT_FONTPROPERTIES* FontPlatformData::scriptFontProperties() const {
   }
   return m_scriptFontProperties;
 }
+
+#ifndef NDEBUG
+String FontPlatformData::description() const {
+  return String();
+}
+#endif
 }
