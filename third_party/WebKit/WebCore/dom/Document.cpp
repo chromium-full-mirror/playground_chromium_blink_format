@@ -359,7 +359,12 @@ Document::Document(Frame* frame, bool isXHTML)
       m_hasOpenDatabases(false)
 #endif
       ,
-      m_usingGeolocation(false) {
+      m_usingGeolocation(false)
+#if ENABLE(WML)
+      ,
+      m_containsWMLContent(false)
+#endif
+{
   m_document.resetSkippingRef(this);
 
   m_printing = false;

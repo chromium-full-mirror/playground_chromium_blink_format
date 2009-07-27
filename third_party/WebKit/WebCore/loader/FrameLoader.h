@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
- * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  *
  * Redistribution and use in source and binary forms, with or without
@@ -287,10 +287,6 @@ class FrameLoader : public Noncopyable {
   bool firstLayoutDone() const;
 
   void didFirstVisuallyNonEmptyLayout();
-
-#if ENABLE(WML)
-  void setForceReloadWmlDeck(bool);
-#endif
 
   void loadedResourceFromMemoryCache(const CachedResource*);
   void tellClientAboutPastMemoryCacheLoads();
@@ -798,10 +794,6 @@ class FrameLoader : public Noncopyable {
 
 #ifndef NDEBUG
   bool m_didDispatchDidCommitLoad;
-#endif
-
-#if ENABLE(WML)
-  bool m_forceReloadWmlDeck;
 #endif
 };
 

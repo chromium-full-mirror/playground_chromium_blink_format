@@ -1206,6 +1206,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool usingGeolocation() const { return m_usingGeolocation; };
 
 #if ENABLE(WML)
+  void setContainsWMLContent(bool value) { m_containsWMLContent = value; }
+  bool containsWMLContent() const { return m_containsWMLContent; }
+
   void resetWMLPageState();
   void initializeWMLPageState();
 #endif
@@ -1293,6 +1296,10 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 #endif
 
   bool m_usingGeolocation;
+
+#if ENABLE(WML)
+  bool m_containsWMLContent;
+#endif
 };
 
 inline bool Document::hasElementWithId(AtomicStringImpl* id) const {

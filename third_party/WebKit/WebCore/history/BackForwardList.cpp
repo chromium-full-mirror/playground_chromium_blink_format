@@ -245,10 +245,9 @@ bool BackForwardList::containsItem(HistoryItem* entry) {
 }
 
 #if ENABLE(WML)
-void BackForwardList::clearWmlPageHistory() {
-  PassRefPtr<HistoryItem> cur = currentItem();
-
-  for (unsigned i = 0; i < m_entries.size(); ++i)
+void BackForwardList::clearWMLPageHistory() {
+  int size = m_entries.size();
+  for (int i = 0; i < size; ++i)
     pageCache()->remove(m_entries[i].get());
 
   m_entries.clear();
