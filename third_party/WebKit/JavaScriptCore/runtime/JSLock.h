@@ -68,7 +68,7 @@ class JSLock : public Noncopyable {
   ~JSLock() {
 #ifdef NDEBUG
     // Locking "not for real" is a debug-only feature.
-    if (lockBehavior == SilenceAssertionsOnly)
+    if (m_lockBehavior == SilenceAssertionsOnly)
       return;
 #endif
     unlock(m_lockBehavior);
