@@ -112,7 +112,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
-#if defined(__APPLE__)
+#ifdef WTF_PLATFORM_CG
 #include <CoreServices/CoreServices.h>
 #endif
 
