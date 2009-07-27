@@ -129,6 +129,8 @@ void InputElement::updateSelectionRange(InputElement* inputElement,
   if (!inputElement->isTextField())
     return;
 
+  element->document()->updateLayoutIgnorePendingStylesheets();
+
   if (RenderTextControl* renderer = toRenderTextControl(element->renderer()))
     renderer->setSelectionRange(start, end);
 }

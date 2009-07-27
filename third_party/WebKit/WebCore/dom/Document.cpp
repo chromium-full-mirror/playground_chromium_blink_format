@@ -1175,6 +1175,10 @@ void Document::styleRecalcTimerFired(Timer<Document>*) {
   updateStyleIfNeeded();
 }
 
+bool Document::childNeedsAndNotInStyleRecalc() {
+  return childNeedsStyleRecalc() && !m_inStyleRecalc;
+}
+
 void Document::recalcStyle(StyleChange change) {
   // we should not enter style recalc while painting
   if (view() && view()->isPainting()) {
