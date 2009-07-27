@@ -198,10 +198,6 @@ void PluginView::setParent(ScrollView* parent) {
 
   if (parent)
     init();
-  else {
-    if (!platformPluginWidget())
-      return;
-  }
 }
 
 void PluginView::setNPWindowRect(const IntRect&) {
