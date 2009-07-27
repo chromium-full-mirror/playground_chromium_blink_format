@@ -70,7 +70,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
 
   virtual void reportException(const String& errorMessage,
                                int lineNumber,
-                               const String& sourceURL);
+                               const String& sourceURL) = 0;
   virtual void addMessage(MessageDestination,
                           MessageSource,
                           MessageType,

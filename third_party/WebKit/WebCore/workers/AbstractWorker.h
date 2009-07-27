@@ -65,7 +65,7 @@ class AbstractWorker : public RefCounted<AbstractWorker>,
   // Utility routines to generate appropriate error events for loading and
   // script exceptions.
   void dispatchLoadErrorEvent();
-  void dispatchScriptErrorEvent(const String& errorMessage,
+  bool dispatchScriptErrorEvent(const String& errorMessage,
                                 const String& sourceURL,
                                 int);
 

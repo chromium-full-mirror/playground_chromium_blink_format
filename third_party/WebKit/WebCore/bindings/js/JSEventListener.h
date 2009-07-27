@@ -48,6 +48,9 @@ class JSEventListener : public EventListener {
  private:
   virtual void markJSFunction();
   virtual void handleEvent(Event*, bool isWindowEvent);
+  virtual bool reportError(const String& message,
+                           const String& url,
+                           int lineNumber);
   virtual bool virtualisAttribute() const;
   void clearJSFunctionInline();
 
