@@ -848,6 +848,6 @@ void webkit_gc_collect_javascript_objects_on_alternate_thread(
 }
 
 gsize webkit_gc_count_javascript_objects() {
-  JSC::JSLock lock(SilenceAssertionsOnly);
+  JSC::JSLock lock(JSC::SilenceAssertionsOnly);
   return JSDOMWindow::commonJSGlobalData()->heap.objectCount();
 }
