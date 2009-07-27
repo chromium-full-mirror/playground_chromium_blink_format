@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Collabora, Ltd.  All rights reserved.
+ * Copyright (C) 2009 Torch Mobile, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -268,6 +269,7 @@ bool PluginPackage::load() {
     m_loadCount++;
     return true;
   } else {
+#if !PLATFORM(WINCE)
     WCHAR currentPath[MAX_PATH];
 
     if (!::GetCurrentDirectoryW(MAX_PATH, currentPath))
@@ -277,16 +279,19 @@ bool PluginPackage::load() {
 
     if (!::SetCurrentDirectoryW(path.charactersWithNullTermination()))
       return false;
+#endif
 
     // Load the library
     m_module = ::LoadLibraryExW(m_path.charactersWithNullTermination(), 0,
                                 LOAD_WITH_ALTERED_SEARCH_PATH);
 
+#if !PLATFORM(WINCE)
     if (!::SetCurrentDirectoryW(currentPath)) {
       if (m_module)
         ::FreeLibrary(m_module);
       return false;
     }
+#endif
   }
 
   if (!m_module)
@@ -299,10 +304,11 @@ bool PluginPackage::load() {
   NPError npErr;
 
   NP_Initialize =
-      (NP_InitializeFuncPtr)GetProcAddress(m_module, "NP_Initialize");
-  NP_GetEntryPoints =
-      (NP_GetEntryPointsFuncPtr)GetProcAddress(m_module, "NP_GetEntryPoints");
-  m_NPP_Shutdown = (NPP_ShutdownProcPtr)GetProcAddress(m_module, "NP_Shutdown");
+      (NP_InitializeFuncPtr)GetProcAddress(m_module, _T("NP_Initialize"));
+  NP_GetEntryPoints = (NP_GetEntryPointsFuncPtr)GetProcAddress(
+      m_module, _T("NP_GetEntryPoints"));
+  m_NPP_Shutdown =
+      (NPP_ShutdownProcPtr)GetProcAddress(m_module, _T("NP_Shutdown"));
 
   if (!NP_Initialize || !NP_GetEntryPoints || !m_NPP_Shutdown)
     goto abort;
