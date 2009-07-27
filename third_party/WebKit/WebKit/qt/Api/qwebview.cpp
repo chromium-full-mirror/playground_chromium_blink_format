@@ -610,6 +610,8 @@ qreal QWebView::textSizeMultiplier() const {
     These hints are used to initialize QPainter before painting the web page.
 
     QPainter::TextAntialiasing is enabled by default.
+
+    \sa QPainter::renderHints()
 */
 QPainter::RenderHints QWebView::renderHints() const {
   return d->renderHints;

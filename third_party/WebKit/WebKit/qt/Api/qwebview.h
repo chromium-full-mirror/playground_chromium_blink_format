@@ -111,7 +111,7 @@ class QWEBKIT_EXPORT QWebView : public QWidget {
 
   QPainter::RenderHints renderHints() const;
   void setRenderHints(QPainter::RenderHints hints);
-  void setRenderHint(QPainter::RenderHint hint, bool enabled);
+  void setRenderHint(QPainter::RenderHint hint, bool enabled = true);
 
   bool findText(const QString& subString, QWebPage::FindFlags options = 0);
 
