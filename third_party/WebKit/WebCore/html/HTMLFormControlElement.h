@@ -112,6 +112,8 @@ class HTMLFormControlElement : public HTMLElement {
 
   virtual bool willValidate() const;
 
+  virtual bool patternMismatch() const { return false; }
+
   void formDestroyed() { m_form = 0; }
 
   virtual void dispatchFocusEvent();
