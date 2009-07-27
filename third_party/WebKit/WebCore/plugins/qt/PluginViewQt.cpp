@@ -200,7 +200,7 @@ void PluginView::setNPWindowIfNeeded() {
   m_npWindow.clipRect.bottom = m_clipRect.height();
 
   PluginView::setCurrentPluginView(this);
-  JSC::JSLock::DropAllLocks dropAllLocks(false);
+  JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
   setCallingPlugin(true);
   m_plugin->pluginFuncs()->setwindow(m_instance, &m_npWindow);
   setCallingPlugin(false);
@@ -233,7 +233,7 @@ void PluginView::stop() {
 
   m_isStarted = false;
 
-  JSC::JSLock::DropAllLocks dropAllLocks(false);
+  JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
 
   PluginMainThreadScheduler::scheduler().unregisterPlugin(m_instance);
 
@@ -475,7 +475,7 @@ void PluginView::init() {
 
   if (m_plugin->pluginFuncs()->getvalue) {
     PluginView::setCurrentPluginView(this);
-    JSC::JSLock::DropAllLocks dropAllLocks(false);
+    JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
     setCallingPlugin(true);
     m_plugin->pluginFuncs()->getvalue(m_instance, NPPVpluginNeedsXEmbed,
                                       &m_needsXEmbed);

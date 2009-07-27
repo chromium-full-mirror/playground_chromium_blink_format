@@ -473,7 +473,7 @@ jvalue convertValueToJValue(ExecState* exec,
                             JSValue value,
                             JNIType _JNIType,
                             const char* javaClassName) {
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
 
   jvalue result;
 

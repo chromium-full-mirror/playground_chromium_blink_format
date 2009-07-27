@@ -73,7 +73,7 @@ static String convertUTF8ToUTF16WithLatin1Fallback(const NPUTF8* UTF8Chars,
 void convertValueToNPVariant(ExecState* exec,
                              JSValue value,
                              NPVariant* result) {
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
 
   VOID_TO_NPVARIANT(*result);
 
@@ -114,7 +114,7 @@ void convertValueToNPVariant(ExecState* exec,
 JSValue convertNPVariantToValue(ExecState* exec,
                                 const NPVariant* variant,
                                 RootObject* rootObject) {
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
 
   NPVariantType type = variant->type;
 

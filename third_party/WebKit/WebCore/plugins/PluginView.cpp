@@ -156,7 +156,7 @@ bool PluginView::start() {
   NPError npErr;
   {
     PluginView::setCurrentPluginView(this);
-    JSC::JSLock::DropAllLocks dropAllLocks(false);
+    JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
     setCallingPlugin(true);
     npErr = m_plugin->pluginFuncs()->newp((NPMIMEType)m_mimeType.data(),
                                           m_instance, m_mode, m_paramCount,
@@ -201,7 +201,7 @@ static char* createUTF8String(const String& str) {
 static bool getString(ScriptController* proxy, JSValue result, String& string) {
   if (!proxy || !result || result.isUndefined())
     return false;
-  JSLock lock(false);
+  JSLock lock(JSC::SilenceAssertionsOnly);
 
   ExecState* exec = proxy->globalObject()->globalExec();
   UString ustring = result.toString(exec);
@@ -248,7 +248,7 @@ void PluginView::performRequest(PluginRequest* request) {
       // has finished loading
       if (request->sendNotification()) {
         PluginView::setCurrentPluginView(this);
-        JSC::JSLock::DropAllLocks dropAllLocks(false);
+        JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
         setCallingPlugin(true);
         m_plugin->pluginFuncs()->urlnotify(m_instance,
                                            requestURL.string().utf8().data(),
@@ -545,7 +545,7 @@ PassRefPtr<JSC::Bindings::Instance> PluginView::bindingInstance() {
   NPError npErr;
   {
     PluginView::setCurrentPluginView(this);
-    JSC::JSLock::DropAllLocks dropAllLocks(false);
+    JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
     setCallingPlugin(true);
     npErr = m_plugin->pluginFuncs()->getvalue(
         m_instance, NPPVpluginScriptableNPObject, &object);

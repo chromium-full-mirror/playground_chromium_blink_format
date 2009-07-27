@@ -58,21 +58,23 @@ static void setLockCount(intptr_t count) {
 }
 
 JSLock::JSLock(ExecState* exec)
-    : m_lockingForReal(exec->globalData().isSharedInstance) {
-  lock(m_lockingForReal);
+    : m_lockBehavior(exec->globalData().isSharedInstance
+                         ? LockForReal
+                         : SilenceAssertionsOnly) {
+  lock(m_lockBehavior);
 }
 
-void JSLock::lock(bool lockForReal) {
+void JSLock::lock(JSLockBehavior lockBehavior) {
 #ifdef NDEBUG
   // Locking "not for real" is a debug-only feature.
-  if (!lockForReal)
+  if (lockBehavior == SilenceAssertionsOnly)
     return;
 #endif
 
   pthread_once(&createJSLockCountOnce, createJSLockCount);
 
   intptr_t currentLockCount = lockCount();
-  if (!currentLockCount && lockForReal) {
+  if (!currentLockCount && lockBehavior == LockForReal) {
     int result;
     result = pthread_mutex_lock(&JSMutex);
     ASSERT(!result);
@@ -80,18 +82,18 @@ void JSLock::lock(bool lockForReal) {
   setLockCount(currentLockCount + 1);
 }
 
-void JSLock::unlock(bool lockForReal) {
+void JSLock::unlock(JSLockBehavior lockBehavior) {
   ASSERT(lockCount());
 
 #ifdef NDEBUG
   // Locking "not for real" is a debug-only feature.
-  if (!lockForReal)
+  if (lockBehavior == SilenceAssertionsOnly)
     return;
 #endif
 
   intptr_t newLockCount = lockCount() - 1;
   setLockCount(newLockCount);
-  if (!newLockCount && lockForReal) {
+  if (!newLockCount && lockBehavior == LockForReal) {
     int result;
     result = pthread_mutex_unlock(&JSMutex);
     ASSERT(!result);
@@ -99,11 +101,13 @@ void JSLock::unlock(bool lockForReal) {
 }
 
 void JSLock::lock(ExecState* exec) {
-  lock(exec->globalData().isSharedInstance);
+  lock(exec->globalData().isSharedInstance ? LockForReal
+                                           : SilenceAssertionsOnly);
 }
 
 void JSLock::unlock(ExecState* exec) {
-  unlock(exec->globalData().isSharedInstance);
+  unlock(exec->globalData().isSharedInstance ? LockForReal
+                                             : SilenceAssertionsOnly);
 }
 
 bool JSLock::currentThreadIsHoldingLock() {
@@ -160,7 +164,9 @@ bool JSLock::currentThreadIsHoldingLock() {
 static unsigned lockDropDepth = 0;
 
 JSLock::DropAllLocks::DropAllLocks(ExecState* exec)
-    : m_lockingForReal(exec->globalData().isSharedInstance) {
+    : m_lockBehavior(exec->globalData().isSharedInstance
+                         ? LockForReal
+                         : SilenceAssertionsOnly) {
   pthread_once(&createJSLockCountOnce, createJSLockCount);
 
   if (lockDropDepth++) {
@@ -170,11 +176,11 @@ JSLock::DropAllLocks::DropAllLocks(ExecState* exec)
 
   m_lockCount = JSLock::lockCount();
   for (intptr_t i = 0; i < m_lockCount; i++)
-    JSLock::unlock(m_lockingForReal);
+    JSLock::unlock(m_lockBehavior);
 }
 
-JSLock::DropAllLocks::DropAllLocks(bool lockingForReal)
-    : m_lockingForReal(lockingForReal) {
+JSLock::DropAllLocks::DropAllLocks(JSLockBehavior JSLockBehavior)
+    : m_lockBehavior(JSLockBehavior) {
   pthread_once(&createJSLockCountOnce, createJSLockCount);
 
   if (lockDropDepth++) {
@@ -188,19 +194,19 @@ JSLock::DropAllLocks::DropAllLocks(bool lockingForReal)
 
   m_lockCount = JSLock::lockCount();
   for (intptr_t i = 0; i < m_lockCount; i++)
-    JSLock::unlock(m_lockingForReal);
+    JSLock::unlock(m_lockBehavior);
 }
 
 JSLock::DropAllLocks::~DropAllLocks() {
   for (intptr_t i = 0; i < m_lockCount; i++)
-    JSLock::lock(m_lockingForReal);
+    JSLock::lock(m_lockBehavior);
 
   --lockDropDepth;
 }
 
 #else
 
-JSLock::JSLock(ExecState*) : m_lockingForReal(false) {}
+JSLock::JSLock(ExecState*) : m_lockBehavior(false) {}
 
 // If threading support is off, set the lock count to a constant value of 1 so
 // ssertions
@@ -213,9 +219,9 @@ bool JSLock::currentThreadIsHoldingLock() {
   return true;
 }
 
-void JSLock::lock(bool) {}
+void JSLock::lock(JSLockBehavior) {}
 
-void JSLock::unlock(bool) {}
+void JSLock::unlock(JSLockBehavior) {}
 
 void JSLock::lock(ExecState*) {}
 
@@ -223,7 +229,7 @@ void JSLock::unlock(ExecState*) {}
 
 JSLock::DropAllLocks::DropAllLocks(ExecState*) {}
 
-JSLock::DropAllLocks::DropAllLocks(bool) {}
+JSLock::DropAllLocks::DropAllLocks(JSLockBehavior) {}
 
 JSLock::DropAllLocks::~DropAllLocks() {}
 

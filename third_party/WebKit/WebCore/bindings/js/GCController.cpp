@@ -43,7 +43,7 @@ namespace WebCore {
 #if USE(PTHREADS)
 
 static void* collect(void*) {
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
   JSDOMWindow::commonJSGlobalData()->heap.collect();
   return 0;
 }
@@ -63,12 +63,12 @@ void GCController::garbageCollectSoon() {
 }
 
 void GCController::gcTimerFired(Timer<GCController>*) {
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
   JSDOMWindow::commonJSGlobalData()->heap.collect();
 }
 
 void GCController::garbageCollectNow() {
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
   JSDOMWindow::commonJSGlobalData()->heap.collect();
 }
 

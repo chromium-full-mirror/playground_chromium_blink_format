@@ -56,7 +56,7 @@ namespace WebCore {
 
 ScriptValue quarantineValue(ScriptState* scriptState,
                             const ScriptValue& value) {
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
   return ScriptValue(
       JSInspectedObjectWrapper::wrap(scriptState, value.jsValue()));
 }
@@ -72,7 +72,7 @@ bool getQuarantinedScriptObject(Database* database,
 
   ExecState* exec = toJSDOMWindow(frame)->globalExec();
 
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
   quarantinedObject = ScriptObject(
       asObject(JSInspectedObjectWrapper::wrap(exec, toJS(exec, database))));
 
@@ -89,7 +89,7 @@ bool getQuarantinedScriptObject(Frame* frame,
 
   ExecState* exec = toJSDOMWindow(frame)->globalExec();
 
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
   quarantinedObject = ScriptObject(
       asObject(JSInspectedObjectWrapper::wrap(exec, toJS(exec, storage))));
 
@@ -102,7 +102,7 @@ bool getQuarantinedScriptObject(Node* node, ScriptObject& quarantinedObject) {
   if (!exec)
     return false;
 
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
   quarantinedObject = ScriptObject(
       asObject(JSInspectedObjectWrapper::wrap(exec, toJS(exec, node))));
 
@@ -116,7 +116,7 @@ bool getQuarantinedScriptObject(DOMWindow* domWindow,
   JSDOMWindow* window = toJSDOMWindow(domWindow->frame());
   ExecState* exec = window->globalExec();
 
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
   quarantinedObject =
       ScriptObject(asObject(JSInspectedObjectWrapper::wrap(exec, window)));
 

@@ -67,7 +67,7 @@ void CInstance::moveGlobalExceptionToExecState(ExecState* exec) {
     return;
 
   {
-    JSLock lock(false);
+    JSLock lock(SilenceAssertionsOnly);
     throwError(exec, GeneralError, globalExceptionString());
   }
 
@@ -119,7 +119,7 @@ JSValue CInstance::invokeMethod(ExecState* exec,
   VOID_TO_NPVARIANT(resultVariant);
 
   {
-    JSLock::DropAllLocks dropAllLocks(false);
+    JSLock::DropAllLocks dropAllLocks(SilenceAssertionsOnly);
     ASSERT(globalExceptionString().isNull());
     _object->_class->invoke(_object, ident, cArgs.data(), count,
                             &resultVariant);
@@ -150,7 +150,7 @@ JSValue CInstance::invokeDefaultMethod(ExecState* exec, const ArgList& args) {
   NPVariant resultVariant;
   VOID_TO_NPVARIANT(resultVariant);
   {
-    JSLock::DropAllLocks dropAllLocks(false);
+    JSLock::DropAllLocks dropAllLocks(SilenceAssertionsOnly);
     ASSERT(globalExceptionString().isNull());
     _object->_class->invokeDefault(_object, cArgs.data(), count,
                                    &resultVariant);
@@ -185,7 +185,7 @@ JSValue CInstance::invokeConstruct(ExecState* exec, const ArgList& args) {
   NPVariant resultVariant;
   VOID_TO_NPVARIANT(resultVariant);
   {
-    JSLock::DropAllLocks dropAllLocks(false);
+    JSLock::DropAllLocks dropAllLocks(SilenceAssertionsOnly);
     ASSERT(globalExceptionString().isNull());
     _object->_class->construct(_object, cArgs.data(), count, &resultVariant);
     moveGlobalExceptionToExecState(exec);
@@ -240,7 +240,7 @@ void CInstance::getPropertyNames(ExecState* exec,
   NPIdentifier* identifiers;
 
   {
-    JSLock::DropAllLocks dropAllLocks(false);
+    JSLock::DropAllLocks dropAllLocks(SilenceAssertionsOnly);
     ASSERT(globalExceptionString().isNull());
     bool ok = _object->_class->enumerate(_object, &identifiers, &count);
     moveGlobalExceptionToExecState(exec);

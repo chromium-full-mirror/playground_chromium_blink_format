@@ -43,7 +43,7 @@ namespace WebCore {
 bool ScriptValue::getString(String& result) const {
   if (!m_value)
     return false;
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
   UString ustring;
   if (!m_value.get().getString(ustring))
     return false;

@@ -1138,7 +1138,7 @@ void InspectorController::addScriptProfile(Profile* profile) {
   if (!m_frontend)
     return;
 
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
   m_frontend->addProfile(toJS(m_scriptState, profile));
 }
 

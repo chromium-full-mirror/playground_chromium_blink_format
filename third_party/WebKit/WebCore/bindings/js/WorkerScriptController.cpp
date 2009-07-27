@@ -61,7 +61,7 @@ WorkerScriptController::~WorkerScriptController() {
 void WorkerScriptController::initScript() {
   ASSERT(!m_workerContextWrapper);
 
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
 
   // Explicitly protect the global object's prototype so it isn't collected
   // when we allocate the global object. (Once the global object is fully
@@ -97,7 +97,7 @@ ScriptValue WorkerScriptController::evaluate(
   ScriptValue exception;
   ScriptValue result = evaluate(sourceCode, &exception);
   if (exception.jsValue()) {
-    JSLock lock(false);
+    JSLock lock(SilenceAssertionsOnly);
     reportException(m_workerContextWrapper->globalExec(), exception.jsValue());
   }
   return result;
@@ -112,7 +112,7 @@ ScriptValue WorkerScriptController::evaluate(const ScriptSourceCode& sourceCode,
   }
 
   initScriptIfNeeded();
-  JSLock lock(false);
+  JSLock lock(SilenceAssertionsOnly);
 
   ExecState* exec = m_workerContextWrapper->globalExec();
   m_workerContextWrapper->globalData()->timeoutChecker.start();

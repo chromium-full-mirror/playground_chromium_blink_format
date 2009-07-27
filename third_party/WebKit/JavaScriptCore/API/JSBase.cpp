@@ -111,7 +111,8 @@ void JSGarbageCollect(JSContextRef ctx) {
   ExecState* exec = toJS(ctx);
   JSGlobalData& globalData = exec->globalData();
 
-  JSLock lock(globalData.isSharedInstance);
+  JSLock lock(globalData.isSharedInstance ? LockForReal
+                                          : SilenceAssertionsOnly);
 
   if (!globalData.heap.isBusy())
     globalData.heap.collect();

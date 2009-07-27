@@ -102,7 +102,7 @@ void JSCustomSQLTransactionCallback::handleEvent(SQLTransaction* transaction,
   JSGlobalObject* globalObject = m_data->frame()->script()->globalObject();
   ExecState* exec = globalObject->globalExec();
 
-  JSC::JSLock lock(false);
+  JSC::JSLock lock(SilenceAssertionsOnly);
 
   JSValue handleEventFunction =
       m_data->callback()->get(exec, Identifier(exec, "handleEvent"));
