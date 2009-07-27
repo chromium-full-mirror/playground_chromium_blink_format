@@ -587,7 +587,7 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
     // again we need to
     // remove the return address from the stack, to prevent the stack from
     // becoming misaligned.
-    preverveReturnAddressAfterCall(regT3);
+    preserveReturnAddressAfterCall(regT3);
 
     JITStubCall stubCall(this, JITStubs::cti_op_put_by_id_transition_realloc);
     stubCall.addArgument(regT0);
