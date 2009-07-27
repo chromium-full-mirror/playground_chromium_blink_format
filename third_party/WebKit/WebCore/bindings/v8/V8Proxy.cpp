@@ -501,13 +501,6 @@ bool V8Proxy::isContextInitialized() {
   return !m_context.IsEmpty();
 }
 
-DOMWindow* V8Proxy::retrieveWindow() {
-  // FIXME: This seems very fragile. How do we know that the global object
-  // from the current context is something sensible? Do we need to use the
-  // last entered here? Who calls this?
-  return retrieveWindow(v8::Context::GetCurrent());
-}
-
 DOMWindow* V8Proxy::retrieveWindow(v8::Handle<v8::Context> context) {
   v8::Handle<v8::Object> global = context->Global();
   ASSERT(!global.IsEmpty());
@@ -542,13 +535,8 @@ Frame* V8Proxy::retrieveFrameForCallingContext() {
   return retrieveFrame(context);
 }
 
-Frame* V8Proxy::retrieveFrame() {
-  DOMWindow* window = retrieveWindow();
-  return window ? window->frame() : 0;
-}
-
 V8Proxy* V8Proxy::retrieve() {
-  DOMWindow* window = retrieveWindow();
+  DOMWindow* window = retrieveWindow(currentContext());
   ASSERT(window);
   return retrieve(window->frame());
 }
@@ -811,7 +799,7 @@ bool V8Proxy::canAccessPrivate(DOMWindow* targetWindow) {
 
   String message;
 
-  DOMWindow* originWindow = retrieveWindow();
+  DOMWindow* originWindow = retrieveWindow(currentContext());
   if (originWindow == targetWindow)
     return true;
 

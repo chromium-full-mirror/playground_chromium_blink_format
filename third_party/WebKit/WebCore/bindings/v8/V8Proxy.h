@@ -254,8 +254,6 @@ class V8Proxy {
   // This is faster than going through the full object creation process.
   v8::Local<v8::Object> createWrapperFromCache(V8ClassIndex::V8WrapperType);
 
-  // Returns the window object of the currently executing context.
-  static DOMWindow* retrieveWindow();
   // Returns the window object associated with a context.
   static DOMWindow* retrieveWindow(v8::Handle<v8::Context>);
   // Returns V8Proxy object of the currently executing context.
@@ -265,9 +263,6 @@ class V8Proxy {
   // Returns V8Proxy object associated with a script execution context.
   static V8Proxy* retrieve(ScriptExecutionContext*);
 
-  // Returns the frame object of the window object associated
-  // with the currently executing context.
-  static Frame* retrieveFrame();
   // Returns the frame object of the window object associated with
   // a context.
   static Frame* retrieveFrame(v8::Handle<v8::Context>);
