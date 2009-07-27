@@ -206,7 +206,7 @@ JSLock::DropAllLocks::~DropAllLocks() {
 
 #else
 
-JSLock::JSLock(ExecState*) : m_lockBehavior(false) {}
+JSLock::JSLock(ExecState*) : m_lockBehavior(SilenceAssertionsOnly) {}
 
 // If threading support is off, set the lock count to a constant value of 1 so
 // ssertions
