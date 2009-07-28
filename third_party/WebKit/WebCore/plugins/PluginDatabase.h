@@ -32,8 +32,8 @@
 #include "PluginPackage.h"
 #include "StringHash.h"
 
-#include <wtf/Vector.h>
 #include <wtf/HashSet.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 class Element;

@@ -46,7 +46,7 @@ PluginPackage::~PluginPackage() {
   // course would cause a crash, so we check to call unload before we
   // ASSERT.
   // FIXME: There is probably a better way to fix this.
-  if (m_loadCount == 0)
+  if (!m_loadCount)
     unloadWithoutShutdown();
   else
     unload();
@@ -57,14 +57,14 @@ PluginPackage::~PluginPackage() {
 void PluginPackage::freeLibrarySoon() {
   ASSERT(!m_freeLibraryTimer.isActive());
   ASSERT(m_module);
-  ASSERT(m_loadCount == 0);
+  ASSERT(!m_loadCount);
 
   m_freeLibraryTimer.startOneShot(0);
 }
 
 void PluginPackage::freeLibraryTimerFired(Timer<PluginPackage>*) {
   ASSERT(m_module);
-  ASSERT(m_loadCount == 0);
+  ASSERT(!m_loadCount);
 
   unloadModule(m_module);
   m_module = 0;
@@ -127,7 +127,7 @@ void PluginPackage::unloadWithoutShutdown() {
   if (!m_isLoaded)
     return;
 
-  ASSERT(m_loadCount == 0);
+  ASSERT(!m_loadCount);
   ASSERT(m_module);
 
   // <rdar://5530519>: Crash when closing tab with pdf file (Reader 7 only)

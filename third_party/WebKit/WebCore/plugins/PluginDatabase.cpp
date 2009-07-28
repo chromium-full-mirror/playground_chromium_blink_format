@@ -131,13 +131,12 @@ bool PluginDatabase::refresh() {
   PluginSet::const_iterator end = m_plugins.end();
   for (PluginSet::const_iterator it = m_plugins.begin(); it != end; ++it) {
     // Get MIME types
+    MIMEToDescriptionsMap::const_iterator map_it =
+        (*it)->mimeToDescriptions().begin();
     MIMEToDescriptionsMap::const_iterator map_end =
         (*it)->mimeToDescriptions().end();
-    for (MIMEToDescriptionsMap::const_iterator map_it =
-             (*it)->mimeToDescriptions().begin();
-         map_it != map_end; ++map_it) {
+    for (; map_it != map_end; ++map_it)
       m_registeredMIMETypes.add(map_it->first);
-    }
   }
 
   return true;
