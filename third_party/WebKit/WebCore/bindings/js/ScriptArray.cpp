@@ -37,7 +37,8 @@ using namespace JSC;
 
 namespace WebCore {
 
-ScriptArray::ScriptArray(JSArray* object) : ScriptObject(object) {}
+ScriptArray::ScriptArray(ScriptState* scriptState, JSArray* object)
+    : ScriptObject(scriptState, object) {}
 
 static bool handleException(ScriptState* scriptState) {
   if (!scriptState->hadException())
@@ -47,55 +48,50 @@ static bool handleException(ScriptState* scriptState) {
   return false;
 }
 
-bool ScriptArray::set(ScriptState* scriptState,
-                      unsigned index,
-                      const ScriptObject& value) {
+bool ScriptArray::set(unsigned index, const ScriptObject& value) {
   JSLock lock(SilenceAssertionsOnly);
-  jsArray()->put(scriptState, index, value.jsObject());
-  return handleException(scriptState);
+  jsArray()->put(m_scriptState, index, value.jsObject());
+  return handleException(m_scriptState);
 }
 
-bool ScriptArray::set(ScriptState* scriptState,
-                      unsigned index,
-                      const String& value) {
+bool ScriptArray::set(unsigned index, const String& value) {
   JSLock lock(SilenceAssertionsOnly);
-  jsArray()->put(scriptState, index, jsString(scriptState, value));
-  return handleException(scriptState);
+  jsArray()->put(m_scriptState, index, jsString(m_scriptState, value));
+  return handleException(m_scriptState);
 }
 
-bool ScriptArray::set(ScriptState* scriptState, unsigned index, double value) {
+bool ScriptArray::set(unsigned index, double value) {
   JSLock lock(SilenceAssertionsOnly);
-  jsArray()->put(scriptState, index, jsNumber(scriptState, value));
-  return handleException(scriptState);
+  jsArray()->put(m_scriptState, index, jsNumber(m_scriptState, value));
+  return handleException(m_scriptState);
 }
 
-bool ScriptArray::set(ScriptState* scriptState,
-                      unsigned index,
-                      long long value) {
+bool ScriptArray::set(unsigned index, long long value) {
   JSLock lock(SilenceAssertionsOnly);
-  jsArray()->put(scriptState, index, jsNumber(scriptState, value));
-  return handleException(scriptState);
+  jsArray()->put(m_scriptState, index, jsNumber(m_scriptState, value));
+  return handleException(m_scriptState);
 }
 
-bool ScriptArray::set(ScriptState* scriptState, unsigned index, int value) {
+bool ScriptArray::set(unsigned index, int value) {
   JSLock lock(SilenceAssertionsOnly);
-  jsArray()->put(scriptState, index, jsNumber(scriptState, value));
-  return handleException(scriptState);
+  jsArray()->put(m_scriptState, index, jsNumber(m_scriptState, value));
+  return handleException(m_scriptState);
 }
 
-bool ScriptArray::set(ScriptState* scriptState, unsigned index, bool value) {
+bool ScriptArray::set(unsigned index, bool value) {
   JSLock lock(SilenceAssertionsOnly);
-  jsArray()->put(scriptState, index, jsBoolean(value));
-  return handleException(scriptState);
+  jsArray()->put(m_scriptState, index, jsBoolean(value));
+  return handleException(m_scriptState);
 }
 
-unsigned ScriptArray::length(ScriptState*) {
+unsigned ScriptArray::length() {
+  JSLock lock(SilenceAssertionsOnly);
   return jsArray()->length();
 }
 
 ScriptArray ScriptArray::createNew(ScriptState* scriptState) {
   JSLock lock(SilenceAssertionsOnly);
-  return ScriptArray(constructEmptyArray(scriptState));
+  return ScriptArray(scriptState, constructEmptyArray(scriptState));
 }
 
 }  // namespace WebCore

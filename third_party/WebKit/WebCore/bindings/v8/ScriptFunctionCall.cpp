@@ -157,7 +157,7 @@ ScriptObject ScriptFunctionCall::construct(bool& hadException,
     return ScriptObject();
   }
 
-  return ScriptObject(result);
+  return ScriptObject(m_scriptState, result);
 }
 
 }  // namespace WebCore

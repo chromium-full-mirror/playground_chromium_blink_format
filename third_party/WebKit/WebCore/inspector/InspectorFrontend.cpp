@@ -33,7 +33,6 @@
 #include "ConsoleMessage.h"
 #include "Frame.h"
 #include "InspectorController.h"  // TODO(pfeldman): Extract SpecialPanels to remove include.
-#include "InspectorJSONObject.h"
 #include "Node.h"
 #include "ScriptFunctionCall.h"
 #include "ScriptObject.h"
@@ -58,17 +57,21 @@ InspectorFrontend::~InspectorFrontend() {
   m_webInspector = ScriptObject();
 }
 
-InspectorJSONObject InspectorFrontend::newInspectorJSONObject() {
-  return InspectorJSONObject::createNew(m_scriptState);
+ScriptArray InspectorFrontend::newScriptArray() {
+  return ScriptArray::createNew(m_scriptState);
+}
+
+ScriptObject InspectorFrontend::newScriptObject() {
+  return ScriptObject::createNew(m_scriptState);
 }
 
 void InspectorFrontend::addMessageToConsole(
-    const InspectorJSONObject& messageObj,
+    const ScriptObject& messageObj,
     const Vector<ScriptString>& frames,
     const Vector<ScriptValue> wrappedArguments,
     const String& message) {
   OwnPtr<ScriptFunctionCall> function(newFunctionCall("addMessageToConsole"));
-  function->appendArgument(messageObj.scriptObject());
+  function->appendArgument(messageObj);
   if (!frames.isEmpty()) {
     for (unsigned i = 0; i < frames.size(); ++i)
       function->appendArgument(frames[i]);
@@ -81,20 +84,20 @@ void InspectorFrontend::addMessageToConsole(
 }
 
 bool InspectorFrontend::addResource(long long identifier,
-                                    const InspectorJSONObject& resourceObj) {
+                                    const ScriptObject& resourceObj) {
   OwnPtr<ScriptFunctionCall> function(newFunctionCall("addResource"));
   function->appendArgument(identifier);
-  function->appendArgument(resourceObj.scriptObject());
+  function->appendArgument(resourceObj);
   bool hadException = false;
   function->call(hadException);
   return !hadException;
 }
 
 bool InspectorFrontend::updateResource(long long identifier,
-                                       const InspectorJSONObject& resourceObj) {
+                                       const ScriptObject& resourceObj) {
   OwnPtr<ScriptFunctionCall> function(newFunctionCall("updateResource"));
   function->appendArgument(identifier);
-  function->appendArgument(resourceObj.scriptObject());
+  function->appendArgument(resourceObj);
   bool hadException = false;
   function->call(hadException);
   return !hadException;
@@ -246,9 +249,9 @@ void InspectorFrontend::resumedScript() {
 #endif
 
 #if ENABLE(DATABASE)
-bool InspectorFrontend::addDatabase(const InspectorJSONObject& dbObject) {
+bool InspectorFrontend::addDatabase(const ScriptObject& dbObject) {
   OwnPtr<ScriptFunctionCall> function(newFunctionCall("addDatabase"));
-  function->appendArgument(dbObject.scriptObject());
+  function->appendArgument(dbObject);
   bool hadException = false;
   function->call(hadException);
   return !hadException;
@@ -256,10 +259,9 @@ bool InspectorFrontend::addDatabase(const InspectorJSONObject& dbObject) {
 #endif
 
 #if ENABLE(DOM_STORAGE)
-bool InspectorFrontend::addDOMStorage(
-    const InspectorJSONObject& domStorageObj) {
+bool InspectorFrontend::addDOMStorage(const ScriptObject& domStorageObj) {
   OwnPtr<ScriptFunctionCall> function(newFunctionCall("addDOMStorage"));
-  function->appendArgument(domStorageObj.scriptObject());
+  function->appendArgument(domStorageObj);
   bool hadException = false;
   function->call(hadException);
   return !hadException;
