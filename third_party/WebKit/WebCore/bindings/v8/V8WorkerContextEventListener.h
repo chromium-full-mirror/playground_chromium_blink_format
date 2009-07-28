@@ -57,6 +57,9 @@ class V8WorkerContextEventListener : public V8EventListener {
 
   virtual ~V8WorkerContextEventListener();
   virtual void handleEvent(Event*, bool isWindowEvent);
+  virtual bool reportError(const String& message,
+                           const String& url,
+                           int lineNumber);
   virtual bool disconnected() const { return !m_proxy; }
 
   WorkerContextExecutionProxy* proxy() const { return m_proxy; }
