@@ -120,6 +120,8 @@ void WebCoreSynchronousLoader::run() {
 }
 
 static void cleanupGioOperation(ResourceHandleInternal* handle);
+static bool startData(ResourceHandle* handle, String urlString);
+static bool startGio(ResourceHandle* handle, KURL url);
 
 ResourceHandleInternal::~ResourceHandleInternal() {
   if (m_msg) {
@@ -434,14 +436,16 @@ static gboolean parseDataUrl(gpointer callback_data) {
   return false;
 }
 
-bool ResourceHandle::startData(String urlString) {
-  ResourceHandleInternal* d = this->getInternal();
+static bool startData(ResourceHandle* handle, String urlString) {
+  ASSERT(handle);
+
+  ResourceHandleInternal* d = handle->getInternal();
 
   // If parseDataUrl is called synchronously the job is not yet effectively
   // started
   // and webkit won't never know that the data has been parsed even
   // didFinishLoading is called.
-  d->m_idleHandler = g_idle_add(parseDataUrl, this);
+  d->m_idleHandler = g_idle_add(parseDataUrl, handle);
   return true;
 }
 
@@ -472,20 +476,25 @@ static void ensureSessionIsInitialized(SoupSession* session) {
                     reinterpret_cast<void*>(0xdeadbeef));
 }
 
-bool ResourceHandle::startHttp(String urlString) {
-  SoupSession* session = defaultSession();
+static bool startHttp(ResourceHandle* handle, String urlString) {
+  ASSERT(handle);
+
+  SoupSession* session = handle->defaultSession();
   ensureSessionIsInitialized(session);
 
-  d->m_msg = request().toSoupMessage();
-  g_signal_connect(d->m_msg, "restarted", G_CALLBACK(restartedCallback), this);
+  ResourceHandleInternal* d = handle->getInternal();
+
+  d->m_msg = handle->request().toSoupMessage();
+  g_signal_connect(d->m_msg, "restarted", G_CALLBACK(restartedCallback),
+                   handle);
   g_signal_connect(d->m_msg, "got-headers", G_CALLBACK(gotHeadersCallback),
-                   this);
+                   handle);
   g_signal_connect(d->m_msg, "content-sniffed",
-                   G_CALLBACK(contentSniffedCallback), this);
-  g_signal_connect(d->m_msg, "got-chunk", G_CALLBACK(gotChunkCallback), this);
+                   G_CALLBACK(contentSniffedCallback), handle);
+  g_signal_connect(d->m_msg, "got-chunk", G_CALLBACK(gotChunkCallback), handle);
 
   g_object_set_data(G_OBJECT(d->m_msg), "resourceHandle",
-                    reinterpret_cast<void*>(this));
+                    reinterpret_cast<void*>(handle));
 
   FormData* httpBody = d->m_request.httpBody();
   if (httpBody && !httpBody->isEmpty()) {
@@ -530,10 +539,10 @@ bool ResourceHandle::startHttp(String urlString) {
                                         String::fromUTF8(error->message));
             g_error_free(error);
 
-            d->client()->didFail(this, resourceError);
+            d->client()->didFail(handle, resourceError);
 
             g_signal_handlers_disconnect_matched(d->m_msg, G_SIGNAL_MATCH_DATA,
-                                                 0, 0, 0, 0, this);
+                                                 0, 0, 0, 0, handle);
             g_object_unref(d->m_msg);
             d->m_msg = 0;
 
@@ -556,7 +565,7 @@ bool ResourceHandle::startHttp(String urlString) {
   }
 
   // balanced by a deref() in finishedCallback, which should always run
-  ref();
+  handle->ref();
 
   // FIXME: For now, we cannot accept content encoded in anything
   // other than identity, so force servers to do it our way. When
@@ -569,7 +578,7 @@ bool ResourceHandle::startHttp(String urlString) {
   // keep our own ref, because after queueing the message, the
   // session owns the initial reference.
   g_object_ref(d->m_msg);
-  soup_session_queue_message(session, d->m_msg, finishedCallback, this);
+  soup_session_queue_message(session, d->m_msg, finishedCallback, handle);
 
   return true;
 }
@@ -592,7 +601,7 @@ bool ResourceHandle::start(Frame* frame) {
   d->m_frame = frame;
 
   if (equalIgnoringCase(protocol, "data"))
-    return startData(urlString);
+    return startData(this, urlString);
 
   SoupURI* uri = soup_uri_new(urlString.utf8().data());
   bool isHTTPOrHTTPS = (equalIgnoringCase(protocol, "http") ||
@@ -601,12 +610,12 @@ bool ResourceHandle::start(Frame* frame) {
   soup_uri_free(uri);
 
   if (isHTTPOrHTTPS)
-    return startHttp(urlString);
+    return startHttp(this, urlString);
 
   if (equalIgnoringCase(protocol, "file") ||
       equalIgnoringCase(protocol, "ftp") || equalIgnoringCase(protocol, "ftps"))
     // FIXME: should we be doing any other protocols here?
-    return startGio(url);
+    return startGio(this, url);
 
   // Error must not be reported immediately
   this->scheduleFailure(InvalidURLFailure);
@@ -849,13 +858,17 @@ static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
   g_file_read_async(d->m_gfile, G_PRIORITY_DEFAULT, d->m_cancellable,
                     openCallback, 0);
 }
+static bool startGio(ResourceHandle* handle, KURL url) {
+  ASSERT(handle);
 
-bool ResourceHandle::startGio(KURL url) {
-  if (request().httpMethod() != "GET" && request().httpMethod() != "POST") {
+  ResourceHandleInternal* d = handle->getInternal();
+
+  if (handle->request().httpMethod() != "GET" &&
+      handle->request().httpMethod() != "POST") {
     ResourceError error(g_quark_to_string(SOUP_HTTP_ERROR),
                         SOUP_STATUS_METHOD_NOT_ALLOWED, url.string(),
-                        request().httpMethod());
-    d->client()->didFail(this, error);
+                        handle->request().httpMethod());
+    d->client()->didFail(handle, error);
     return false;
   }
 
@@ -876,7 +889,7 @@ bool ResourceHandle::startGio(KURL url) {
   else
 #endif
     d->m_gfile = g_file_new_for_uri(url.string().utf8().data());
-  g_object_set_data(G_OBJECT(d->m_gfile), "webkit-resource", this);
+  g_object_set_data(G_OBJECT(d->m_gfile), "webkit-resource", handle);
   d->m_cancellable = g_cancellable_new();
   g_file_query_info_async(d->m_gfile, G_FILE_ATTRIBUTE_STANDARD_TYPE
                           "," G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE
