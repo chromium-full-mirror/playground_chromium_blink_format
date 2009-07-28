@@ -25,6 +25,7 @@
 #include <qwebpage.h>
 #include <qnetworkrequest.h>
 #include <qdiriterator.h>
+#include <qwebkitversion.h>
 
 class tst_QWebView : public QObject {
   Q_OBJECT
@@ -39,6 +40,7 @@ class tst_QWebView : public QObject {
   void renderHints();
   void guessUrlFromString_data();
   void guessUrlFromString();
+  void getWebKitVersion();
 };
 
 // This will be called before the first test function is executed.
@@ -157,6 +159,10 @@ void tst_QWebView::guessUrlFromString() {
 
   QUrl url = QWebView::guessUrlFromString(string);
   QCOMPARE(url, guessUrlFromString);
+}
+
+void tst_QWebView::getWebKitVersion() {
+  QVERIFY(qWebKitVersion().toDouble() > 0);
 }
 
 QTEST_MAIN(tst_QWebView)
