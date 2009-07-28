@@ -65,7 +65,7 @@ class WebPage : public QWebPage {
 class MainWindow : public QMainWindow {
   Q_OBJECT
  public:
-  MainWindow(const QString& url = QString()) : currentZoom(100) {
+  MainWindow(QString url = QString()) : currentZoom(100) {
     setAttribute(Qt::WA_DeleteOnClose);
 
     view = new QWebView(this);
@@ -91,6 +91,10 @@ class MainWindow : public QMainWindow {
       page->networkAccessManager()->setProxy(
           QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
     }
+
+    QFileInfo fi(url);
+    if (fi.exists() && fi.isRelative())
+      url = fi.absoluteFilePath();
 
     QUrl qurl = view->guessUrlFromString(url);
     if (qurl.isValid()) {
