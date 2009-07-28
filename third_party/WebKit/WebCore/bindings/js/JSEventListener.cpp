@@ -72,6 +72,7 @@ void JSEventListener::handleEvent(Event* event, bool isWindowEvent) {
   // xmlhttprequest objects. See http://bugs.webkit.org/show_bug.cgi?id=13275
   // FIXME: Is this check still necessary? Requests are supposed to be stopped
   // before clearGlobalObject() is called.
+  ASSERT(globalObject);
   if (!globalObject)
     return;
 
@@ -112,7 +113,7 @@ void JSEventListener::handleEvent(Event* event, bool isWindowEvent) {
     ref();
 
     MarkedArgumentBuffer args;
-    args.append(toJS(exec, event));
+    args.append(toJS(exec, globalObject, event));
 
     Event* savedEvent = globalObject->currentEvent();
     globalObject->setCurrentEvent(event);
@@ -135,7 +136,7 @@ void JSEventListener::handleEvent(Event* event, bool isWindowEvent) {
       if (isWindowEvent)
         thisValue = globalObject->toThisObject(exec);
       else
-        thisValue = toJS(exec, event->currentTarget());
+        thisValue = toJS(exec, globalObject, event->currentTarget());
       globalObject->globalData()->timeoutChecker.start();
       retval = call(exec, jsFunction, callType, callData, thisValue, args);
     }

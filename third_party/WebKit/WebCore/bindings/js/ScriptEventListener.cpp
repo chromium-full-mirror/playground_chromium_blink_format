@@ -73,7 +73,8 @@ PassRefPtr<JSLazyEventListener> createAttributeEventListener(Node* node,
   // we're creating.
   {
     JSLock lock(SilenceAssertionsOnly);
-    toJS(globalObject->globalExec(), node);
+    // FIXME: Should pass the global object associated with the node
+    toJS(globalObject->globalExec(), globalObject, node);
   }
 
   return JSLazyEventListener::create(

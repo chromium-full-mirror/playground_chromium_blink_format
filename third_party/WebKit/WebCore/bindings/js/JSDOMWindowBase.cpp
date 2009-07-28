@@ -68,7 +68,7 @@ void JSDOMWindowBase::updateDocument() {
   ASSERT(d()->impl->document());
   ExecState* exec = globalExec();
   symbolTablePutWithAttributes(Identifier(exec, "document"),
-                               toJS(exec, d()->impl->document()),
+                               toJS(exec, this, d()->impl->document()),
                                DontDelete | ReadOnly);
 }
 

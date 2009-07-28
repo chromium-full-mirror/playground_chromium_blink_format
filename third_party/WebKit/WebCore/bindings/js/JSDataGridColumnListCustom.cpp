@@ -49,7 +49,8 @@ JSValue JSDataGridColumnList::nameGetter(ExecState* exec,
                                          const PropertySlot& slot) {
   JSDataGridColumnList* thisObj =
       static_cast<JSDataGridColumnList*>(asObject(slot.slotBase()));
-  return toJS(exec, thisObj->impl()->itemWithName(propertyName));
+  return toJS(exec, thisObj->globalObject(),
+              thisObj->impl()->itemWithName(propertyName));
 }
 
 }  // namespace WebCore
