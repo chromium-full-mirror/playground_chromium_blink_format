@@ -65,7 +65,8 @@ PassRefPtr<StorageNamespace> StorageNamespaceImpl::sessionStorageNamespace() {
 StorageNamespaceImpl::StorageNamespaceImpl(StorageType storageType,
                                            const String& path)
     : m_storageType(storageType),
-      m_path(path.copy())  // FIXME: Is the .copy necessary?
+      m_path(path.copy())  // Copy makes it safe for our other thread to access
+                           // the path.
       ,
       m_syncManager(0)
 #ifndef NDEBUG
@@ -89,6 +90,7 @@ StorageNamespaceImpl::~StorageNamespaceImpl() {
 PassRefPtr<StorageNamespace> StorageNamespaceImpl::copy() {
   ASSERT(isMainThread());
   ASSERT(!m_isShutdown);
+  ASSERT(m_storageType == SessionStorage);
 
   StorageNamespaceImpl* newNamespace =
       new StorageNamespaceImpl(m_storageType, m_path);

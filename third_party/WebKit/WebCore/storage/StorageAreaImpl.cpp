@@ -89,6 +89,19 @@ StorageAreaImpl::StorageAreaImpl(SecurityOrigin* origin, StorageAreaImpl* area)
   ASSERT(!m_isShutdown);
 }
 
+static bool privateBrowsingEnabled(Frame* frame) {
+#if PLATFORM(CHROMIUM)
+  // The frame pointer can be NULL in Chromium since this call is made in a
+  // different
+  // process from where the Frame object exists.  Luckily, private browseing is
+  // implemented differently in Chromium, so it'd never return true anyway.
+  ASSERT(!frame);
+  return false;
+#else
+  return frame->page()->settings()->privateBrowsingEnabled();
+#endif
+}
+
 unsigned StorageAreaImpl::length() const {
   ASSERT(!m_isShutdown);
   return m_storageMap->length();
@@ -123,7 +136,7 @@ void StorageAreaImpl::setItem(const String& key,
   ASSERT(!value.isNull());
   blockUntilImportComplete();
 
-  if (frame->page()->settings()->privateBrowsingEnabled()) {
+  if (privateBrowsingEnabled(frame)) {
     ec = QUOTA_EXCEEDED_ERR;
     return;
   }
@@ -155,7 +168,7 @@ void StorageAreaImpl::removeItem(const String& key, Frame* frame) {
   ASSERT(!m_isShutdown);
   blockUntilImportComplete();
 
-  if (frame->page()->settings()->privateBrowsingEnabled())
+  if (privateBrowsingEnabled(frame))
     return;
 
   String oldValue;
@@ -175,7 +188,7 @@ void StorageAreaImpl::clear(Frame* frame) {
   ASSERT(!m_isShutdown);
   blockUntilImportComplete();
 
-  if (frame->page()->settings()->privateBrowsingEnabled())
+  if (privateBrowsingEnabled(frame))
     return;
 
   m_storageMap = StorageMap::create();
@@ -219,16 +232,19 @@ void StorageAreaImpl::dispatchStorageEvent(const String& key,
                                            const String& oldValue,
                                            const String& newValue,
                                            Frame* sourceFrame) {
-  // We need to copy all relevant frames from every page to a vector since
-  // sending the event to one frame might mutate the frame tree
-  // of any given page in the group or mutate the page group itself.
-  Vector<RefPtr<Frame>> frames;
+#if PLATFORM(CHROMIUM)
+  // FIXME: Events are currently broken in Chromium.
+  return;
+#endif
 
-  // FIXME: When can this occur?
   Page* page = sourceFrame->page();
   if (!page)
     return;
 
+  // We need to copy all relevant frames from every page to a vector since
+  // sending the event to one frame might mutate the frame tree
+  // of any given page in the group or mutate the page group itself.
+  Vector<RefPtr<Frame>> frames;
   if (m_storageType == SessionStorage) {
     // Send events only to our page.
     for (Frame* frame = page->mainFrame(); frame;
