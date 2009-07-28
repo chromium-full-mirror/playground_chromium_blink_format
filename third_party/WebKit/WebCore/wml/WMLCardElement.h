@@ -48,7 +48,6 @@ class WMLCardElement : public WMLElement, public WMLEventHandlingElement {
   void handleIntrinsicEventIfNeeded();
   void handleDeckLevelTaskOverridesIfNeeded();
 
-  virtual String title() const;
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void insertedIntoDocument();
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);

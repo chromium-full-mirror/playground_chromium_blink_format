@@ -44,11 +44,6 @@ WMLSelectElement::WMLSelectElement(const QualifiedName& tagName,
 
 WMLSelectElement::~WMLSelectElement() {}
 
-String WMLSelectElement::title() const {
-  return substituteVariableReferences(getAttribute(HTMLNames::titleAttr),
-                                      document());
-}
-
 const AtomicString& WMLSelectElement::formControlName() const {
   AtomicString name = this->name();
   return name.isNull() ? emptyAtom : name;

@@ -34,8 +34,6 @@ class WMLOptGroupElement : public WMLFormControlElement,
   WMLOptGroupElement(const QualifiedName& tagName, Document*);
   virtual ~WMLOptGroupElement();
 
-  String title() const;
-
   virtual const AtomicString& formControlType() const;
 
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
