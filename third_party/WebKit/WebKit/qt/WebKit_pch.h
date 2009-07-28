@@ -76,7 +76,4 @@
 #include <wtf/UnusedParam.h>
 #include <wtf/AlwaysInline.h>
 #include <wtf/GetPtr.h>
-
-#include "../../WebCore/bindings/js/JSDOMBinding.h"
-#include "../../JavaScriptCore/runtime/MathObject.h"
 #endif
