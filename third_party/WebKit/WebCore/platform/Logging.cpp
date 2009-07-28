@@ -72,45 +72,64 @@ WTFLogChannel* getChannelFromName(const String& channelName) {
   if (!(channelName.length() >= 2))
     return 0;
 
-  if (channelName == String("BackForward"))
+  if (equalIgnoringCase(channelName, String("BackForward")))
     return &LogBackForward;
-  if (channelName == String("Editing"))
+
+  if (equalIgnoringCase(channelName, String("Editing")))
     return &LogEditing;
-  if (channelName == String("Events"))
+
+  if (equalIgnoringCase(channelName, String("Events")))
     return &LogEvents;
-  if (channelName == String("Frames"))
+
+  if (equalIgnoringCase(channelName, String("Frames")))
     return &LogFrames;
-  if (channelName == String("FTP"))
+
+  if (equalIgnoringCase(channelName, String("FTP")))
     return &LogFTP;
-  if (channelName == String("History"))
+
+  if (equalIgnoringCase(channelName, String("History")))
     return &LogHistory;
-  if (channelName == String("IconDatabase"))
+
+  if (equalIgnoringCase(channelName, String("IconDatabase")))
     return &LogIconDatabase;
-  if (channelName == String("Loading"))
+
+  if (equalIgnoringCase(channelName, String("Loading")))
     return &LogLoading;
-  if (channelName == String("Media"))
+
+  if (equalIgnoringCase(channelName, String("Media")))
     return &LogMedia;
-  if (channelName == String("Network"))
+
+  if (equalIgnoringCase(channelName, String("Network")))
     return &LogNetwork;
-  if (channelName == String("NotYetImplemented"))
+
+  if (equalIgnoringCase(channelName, String("NotYetImplemented")))
     return &LogNotYetImplemented;
-  if (channelName == String("PageCache"))
+
+  if (equalIgnoringCase(channelName, String("PageCache")))
     return &LogPageCache;
-  if (channelName == String("PlatformLeaks"))
+
+  if (equalIgnoringCase(channelName, String("PlatformLeaks")))
     return &LogPlatformLeaks;
-  if (channelName == String("Plugins"))
+
+  if (equalIgnoringCase(channelName, String("Plugins")))
     return &LogPlugins;
-  if (channelName == String("PopupBlocking"))
+
+  if (equalIgnoringCase(channelName, String("PopupBlocking")))
     return &LogPopupBlocking;
-  if (channelName == String("SpellingAndGrammar"))
+
+  if (equalIgnoringCase(channelName, String("SpellingAndGrammar")))
     return &LogSpellingAndGrammar;
-  if (channelName == String("SQLDatabase"))
+
+  if (equalIgnoringCase(channelName, String("SQLDatabase")))
     return &LogSQLDatabase;
-  if (channelName == String("StorageAPI"))
+
+  if (equalIgnoringCase(channelName, String("StorageAPI")))
     return &LogStorageAPI;
-  if (channelName == String("TextConversion"))
+
+  if (equalIgnoringCase(channelName, String("TextConversion")))
     return &LogTextConversion;
-  if (channelName == String("Threading"))
+
+  if (equalIgnoringCase(channelName, String("Threading")))
     return &LogThreading;
 
   return 0;
