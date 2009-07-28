@@ -2272,7 +2272,7 @@ class FakeReply : public QNetworkReply {
   virtual void close() {}
 
  protected:
-  qint64 readData(char* data, qint64 maxSize) { return 0; }
+  qint64 readData(char*, qint64) { return 0; }
  private slots:
   void timeout() {
     if (request().url() == QUrl("qrc://test1.html"))
