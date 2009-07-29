@@ -39,11 +39,11 @@
 #include "EventNames.h"
 #include "FormState.h"
 #include "Frame.h"
-#include "FrameLoader.h"
 #include "FrameLoadRequest.h"
+#include "FrameLoader.h"
+#include "HTMLFormElement.h"
 #include "HitTestRequest.h"
 #include "HitTestResult.h"
-#include "HTMLFormElement.h"
 #include "InspectorController.h"
 #include "MouseEvent.h"
 #include "Node.h"
@@ -213,12 +213,12 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
       m_client->lookUpInDictionary(frame);
       break;
     case ContextMenuItemTagOpenLink:
-      if (Frame* targetFrame = result.targetFrame()) {
+      if (Frame* targetFrame = result.targetFrame())
         targetFrame->loader()->loadFrameRequest(
             FrameLoadRequest(ResourceRequest(
                 result.absoluteLinkURL(), frame->loader()->outgoingReferrer())),
             false, false, 0, 0);
-      } else
+      else
         openNewWindow(result.absoluteLinkURL(), frame);
       break;
     case ContextMenuItemTagBold:
