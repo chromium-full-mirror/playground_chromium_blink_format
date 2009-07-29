@@ -288,6 +288,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   unsigned axObjectID() const { return m_id; }
   void setAXObjectID(unsigned axObjectID) { m_id = axObjectID; }
 
+  static AccessibilityObject* anchorElementForNode(Node*);
   virtual Element* anchorElement() const { return 0; }
   virtual Element* actionElement() const { return 0; }
   virtual IntRect boundingBoxRect() const { return IntRect(); }
@@ -387,8 +388,8 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   VisiblePosition previousSentenceStartPosition(const VisiblePosition&) const;
   VisiblePosition nextParagraphEndPosition(const VisiblePosition&) const;
   VisiblePosition previousParagraphStartPosition(const VisiblePosition&) const;
-  virtual VisiblePosition visiblePositionForIndex(unsigned, bool /*
-lastIndexOK */) const {
+  virtual VisiblePosition visiblePositionForIndex(unsigned,
+                                                  bool /*lastIndexOK */) const {
     return VisiblePosition();
   }
 
