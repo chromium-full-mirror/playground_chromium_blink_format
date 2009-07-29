@@ -46,6 +46,7 @@ class WMLIntrinsicEventHandler {
 
   bool registerIntrinsicEvent(WMLIntrinsicEventType,
                               PassRefPtr<WMLIntrinsicEvent>);
+  void deregisterIntrinsicEvent(WMLIntrinsicEventType);
   void triggerIntrinsicEvent(WMLIntrinsicEventType) const;
   bool hasIntrinsicEvent(WMLIntrinsicEventType) const;
 

@@ -34,6 +34,7 @@ class WMLSetvarElement : public WMLElement {
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
 
   String name() const;
   String value() const;

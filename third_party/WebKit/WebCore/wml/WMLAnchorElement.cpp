@@ -63,6 +63,16 @@ void WMLAnchorElement::defaultEventHandler(Event* event) {
   // needs to be handled.
   WMLElement::defaultEventHandler(event);
 }
+
+void WMLAnchorElement::registerTask(WMLTaskElement* task) {
+  ASSERT(!m_task);
+  m_task = task;
+}
+
+void WMLAnchorElement::deregisterTask(WMLTaskElement* task) {
+  ASSERT(m_task == task);
+  m_task = 0;
+}
 }
 
 #endif

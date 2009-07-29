@@ -36,6 +36,7 @@ class WMLTimerElement : public WMLElement {
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
 
   void timerFired(Timer<WMLTimerElement>*);
 
