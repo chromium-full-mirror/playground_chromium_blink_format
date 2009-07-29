@@ -261,6 +261,10 @@ bool RenderLayerCompositor::updateLayerCompositingState(
 }
 
 void RenderLayerCompositor::repaintOnCompositingChange(RenderLayer* layer) {
+  // If the renderer is not attached yet, no need to repaint.
+  if (!layer->renderer()->parent())
+    return;
+
   RenderBoxModelObject* repaintContainer =
       layer->renderer()->containerForRepaint();
   if (!repaintContainer)
