@@ -777,9 +777,14 @@ class RenderStyle : public RefCounted<RenderStyle> {
   EBoxAlignment boxPack() const {
     return static_cast<EBoxAlignment>(rareNonInheritedData->flexibleBox->pack);
   }
+
   ShadowData* boxShadow() const {
     return rareNonInheritedData->m_boxShadow.get();
   }
+  void getBoxShadowExtent(int& top, int& right, int& bottom, int& left) const;
+  void getBoxShadowHorizontalExtent(int& left, int& right) const;
+  void getBoxShadowVerticalExtent(int& top, int& bottom) const;
+
   StyleReflection* boxReflect() const {
     return rareNonInheritedData->m_boxReflect.get();
   }

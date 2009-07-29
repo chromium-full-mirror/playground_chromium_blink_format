@@ -1304,12 +1304,11 @@ bool RenderObject::repaintAfterLayoutIfNeeded(
   // two rectangles (but typically only one).
   RenderStyle* outlineStyle = outlineStyleForRepaint();
   int ow = outlineStyle->outlineSize();
-  ShadowData* boxShadow = style()->boxShadow();
   int width = abs(newOutlineBox.width() - oldOutlineBox.width());
   if (width) {
-    int shadowRight = 0;
-    for (ShadowData* shadow = boxShadow; shadow; shadow = shadow->next)
-      shadowRight = max(shadow->x + shadow->blur + shadow->spread, shadowRight);
+    int shadowLeft;
+    int shadowRight;
+    style()->getBoxShadowHorizontalExtent(shadowLeft, shadowRight);
 
     int borderRight = isBox() ? toRenderBox(this)->borderRight() : 0;
     int borderWidth =
@@ -1330,10 +1329,9 @@ bool RenderObject::repaintAfterLayoutIfNeeded(
   }
   int height = abs(newOutlineBox.height() - oldOutlineBox.height());
   if (height) {
-    int shadowBottom = 0;
-    for (ShadowData* shadow = boxShadow; shadow; shadow = shadow->next)
-      shadowBottom =
-          max(shadow->y + shadow->blur + shadow->spread, shadowBottom);
+    int shadowTop;
+    int shadowBottom;
+    style()->getBoxShadowVerticalExtent(shadowTop, shadowBottom);
 
     int borderBottom = isBox() ? toRenderBox(this)->borderBottom() : 0;
     int borderHeight =
@@ -2415,18 +2413,20 @@ void RenderObject::adjustRectForOutlineAndShadow(IntRect& rect) const {
     int shadowBottom = 0;
 
     do {
-      shadowLeft =
-          min(boxShadow->x - boxShadow->blur - boxShadow->spread - outlineSize,
-              shadowLeft);
-      shadowRight =
-          max(boxShadow->x + boxShadow->blur + boxShadow->spread + outlineSize,
-              shadowRight);
-      shadowTop =
-          min(boxShadow->y - boxShadow->blur - boxShadow->spread - outlineSize,
-              shadowTop);
-      shadowBottom =
-          max(boxShadow->y + boxShadow->blur + boxShadow->spread + outlineSize,
-              shadowBottom);
+      if (boxShadow->style == Normal) {
+        shadowLeft = min(
+            boxShadow->x - boxShadow->blur - boxShadow->spread - outlineSize,
+            shadowLeft);
+        shadowRight = max(
+            boxShadow->x + boxShadow->blur + boxShadow->spread + outlineSize,
+            shadowRight);
+        shadowTop = min(
+            boxShadow->y - boxShadow->blur - boxShadow->spread - outlineSize,
+            shadowTop);
+        shadowBottom = max(
+            boxShadow->y + boxShadow->blur + boxShadow->spread + outlineSize,
+            shadowBottom);
+      }
 
       boxShadow = boxShadow->next;
     } while (boxShadow);
