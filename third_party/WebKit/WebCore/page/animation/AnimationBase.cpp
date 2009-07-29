@@ -603,18 +603,16 @@ static void ensurePropertyMap() {
         CSSPropertyWebkitTransformOriginZ, &RenderStyle::transformOriginZ,
         &RenderStyle::setTransformOriginZ));
     gPropertyWrappers->append(new PropertyWrapper<const IntSize&>(
-        CSSPropertyWebkitBorderTopLeftRadius, &RenderStyle::borderTopLeftRadius,
+        CSSPropertyBorderTopLeftRadius, &RenderStyle::borderTopLeftRadius,
         &RenderStyle::setBorderTopLeftRadius));
     gPropertyWrappers->append(new PropertyWrapper<const IntSize&>(
-        CSSPropertyWebkitBorderTopRightRadius,
-        &RenderStyle::borderTopRightRadius,
+        CSSPropertyBorderTopRightRadius, &RenderStyle::borderTopRightRadius,
         &RenderStyle::setBorderTopRightRadius));
     gPropertyWrappers->append(new PropertyWrapper<const IntSize&>(
-        CSSPropertyWebkitBorderBottomLeftRadius,
-        &RenderStyle::borderBottomLeftRadius,
+        CSSPropertyBorderBottomLeftRadius, &RenderStyle::borderBottomLeftRadius,
         &RenderStyle::setBorderBottomLeftRadius));
     gPropertyWrappers->append(new PropertyWrapper<const IntSize&>(
-        CSSPropertyWebkitBorderBottomRightRadius,
+        CSSPropertyBorderBottomRightRadius,
         &RenderStyle::borderBottomRightRadius,
         &RenderStyle::setBorderBottomRightRadius));
     gPropertyWrappers->append(new PropertyWrapper<EVisibility>(

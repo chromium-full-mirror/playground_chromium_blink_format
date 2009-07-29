@@ -4883,6 +4883,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       return;
     }
 
+    case CSSPropertyBorderRadius:
     case CSSPropertyWebkitBorderRadius:
       if (isInherit) {
         m_style->setBorderTopLeftRadius(m_parentStyle->borderTopLeftRadius());
@@ -4898,30 +4899,30 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         return;
       }
     // Fall through
-    case CSSPropertyWebkitBorderTopLeftRadius:
-    case CSSPropertyWebkitBorderTopRightRadius:
-    case CSSPropertyWebkitBorderBottomLeftRadius:
-    case CSSPropertyWebkitBorderBottomRightRadius: {
+    case CSSPropertyBorderTopLeftRadius:
+    case CSSPropertyBorderTopRightRadius:
+    case CSSPropertyBorderBottomLeftRadius:
+    case CSSPropertyBorderBottomRightRadius: {
       if (isInherit) {
-        HANDLE_INHERIT_COND(CSSPropertyWebkitBorderTopLeftRadius,
-                            borderTopLeftRadius, BorderTopLeftRadius)
-        HANDLE_INHERIT_COND(CSSPropertyWebkitBorderTopRightRadius,
+        HANDLE_INHERIT_COND(CSSPropertyBorderTopLeftRadius, borderTopLeftRadius,
+                            BorderTopLeftRadius)
+        HANDLE_INHERIT_COND(CSSPropertyBorderTopRightRadius,
                             borderTopRightRadius, BorderTopRightRadius)
-        HANDLE_INHERIT_COND(CSSPropertyWebkitBorderBottomLeftRadius,
+        HANDLE_INHERIT_COND(CSSPropertyBorderBottomLeftRadius,
                             borderBottomLeftRadius, BorderBottomLeftRadius)
-        HANDLE_INHERIT_COND(CSSPropertyWebkitBorderBottomRightRadius,
+        HANDLE_INHERIT_COND(CSSPropertyBorderBottomRightRadius,
                             borderBottomRightRadius, BorderBottomRightRadius)
         return;
       }
 
       if (isInitial) {
-        HANDLE_INITIAL_COND_WITH_VALUE(CSSPropertyWebkitBorderTopLeftRadius,
+        HANDLE_INITIAL_COND_WITH_VALUE(CSSPropertyBorderTopLeftRadius,
                                        BorderTopLeftRadius, BorderRadius)
-        HANDLE_INITIAL_COND_WITH_VALUE(CSSPropertyWebkitBorderTopRightRadius,
+        HANDLE_INITIAL_COND_WITH_VALUE(CSSPropertyBorderTopRightRadius,
                                        BorderTopRightRadius, BorderRadius)
-        HANDLE_INITIAL_COND_WITH_VALUE(CSSPropertyWebkitBorderBottomLeftRadius,
+        HANDLE_INITIAL_COND_WITH_VALUE(CSSPropertyBorderBottomLeftRadius,
                                        BorderBottomLeftRadius, BorderRadius)
-        HANDLE_INITIAL_COND_WITH_VALUE(CSSPropertyWebkitBorderBottomRightRadius,
+        HANDLE_INITIAL_COND_WITH_VALUE(CSSPropertyBorderBottomRightRadius,
                                        BorderBottomRightRadius, BorderRadius)
         return;
       }
@@ -4947,16 +4948,16 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
 
       IntSize size(width, height);
       switch (id) {
-        case CSSPropertyWebkitBorderTopLeftRadius:
+        case CSSPropertyBorderTopLeftRadius:
           m_style->setBorderTopLeftRadius(size);
           break;
-        case CSSPropertyWebkitBorderTopRightRadius:
+        case CSSPropertyBorderTopRightRadius:
           m_style->setBorderTopRightRadius(size);
           break;
-        case CSSPropertyWebkitBorderBottomLeftRadius:
+        case CSSPropertyBorderBottomLeftRadius:
           m_style->setBorderBottomLeftRadius(size);
           break;
-        case CSSPropertyWebkitBorderBottomRightRadius:
+        case CSSPropertyBorderBottomRightRadius:
           m_style->setBorderBottomRightRadius(size);
           break;
         default:

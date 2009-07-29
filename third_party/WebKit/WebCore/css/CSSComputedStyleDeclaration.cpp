@@ -58,11 +58,13 @@ static const int computedProperties[] = {
     CSSPropertyBackgroundPosition,  // more-specific background-position-x/y are
                                     // non-standard
     CSSPropertyBackgroundRepeat, CSSPropertyBorderBottomColor,
+    CSSPropertyBorderBottomLeftRadius, CSSPropertyBorderBottomRightRadius,
     CSSPropertyBorderBottomStyle, CSSPropertyBorderBottomWidth,
     CSSPropertyBorderCollapse, CSSPropertyBorderLeftColor,
     CSSPropertyBorderLeftStyle, CSSPropertyBorderLeftWidth,
     CSSPropertyBorderRightColor, CSSPropertyBorderRightStyle,
     CSSPropertyBorderRightWidth, CSSPropertyBorderTopColor,
+    CSSPropertyBorderTopLeftRadius, CSSPropertyBorderTopRightRadius,
     CSSPropertyBorderTopStyle, CSSPropertyBorderTopWidth, CSSPropertyBottom,
     CSSPropertyBoxShadow, CSSPropertyCaptionSide, CSSPropertyClear,
     CSSPropertyClip, CSSPropertyColor, CSSPropertyCursor, CSSPropertyDirection,
@@ -94,10 +96,8 @@ static const int computedProperties[] = {
     CSSPropertyWebkitAnimationTimingFunction, CSSPropertyWebkitAppearance,
     CSSPropertyWebkitBackfaceVisibility, CSSPropertyWebkitBackgroundClip,
     CSSPropertyWebkitBackgroundComposite, CSSPropertyWebkitBackgroundOrigin,
-    CSSPropertyWebkitBackgroundSize, CSSPropertyWebkitBorderBottomLeftRadius,
-    CSSPropertyWebkitBorderBottomRightRadius, CSSPropertyWebkitBorderFit,
+    CSSPropertyWebkitBackgroundSize, CSSPropertyWebkitBorderFit,
     CSSPropertyWebkitBorderHorizontalSpacing, CSSPropertyWebkitBorderImage,
-    CSSPropertyWebkitBorderTopLeftRadius, CSSPropertyWebkitBorderTopRightRadius,
     CSSPropertyWebkitBorderVerticalSpacing, CSSPropertyWebkitBoxAlign,
     CSSPropertyWebkitBoxDirection, CSSPropertyWebkitBoxFlex,
     CSSPropertyWebkitBoxFlexGroup, CSSPropertyWebkitBoxLines,
@@ -1259,13 +1259,13 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return CSSPrimitiveValue::create(style->userDrag());
     case CSSPropertyWebkitUserSelect:
       return CSSPrimitiveValue::create(style->userSelect());
-    case CSSPropertyWebkitBorderBottomLeftRadius:
+    case CSSPropertyBorderBottomLeftRadius:
       return getBorderRadiusCornerValue(style->borderBottomLeftRadius());
-    case CSSPropertyWebkitBorderBottomRightRadius:
+    case CSSPropertyBorderBottomRightRadius:
       return getBorderRadiusCornerValue(style->borderBottomRightRadius());
-    case CSSPropertyWebkitBorderTopLeftRadius:
+    case CSSPropertyBorderTopLeftRadius:
       return getBorderRadiusCornerValue(style->borderTopLeftRadius());
-    case CSSPropertyWebkitBorderTopRightRadius:
+    case CSSPropertyBorderTopRightRadius:
       return getBorderRadiusCornerValue(style->borderTopRightRadius());
     case CSSPropertyClip: {
       if (!style->hasClip())
@@ -1346,6 +1346,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyBorderBottom:
     case CSSPropertyBorderColor:
     case CSSPropertyBorderLeft:
+    case CSSPropertyBorderRadius:
     case CSSPropertyBorderRight:
     case CSSPropertyBorderStyle:
     case CSSPropertyBorderTop:
