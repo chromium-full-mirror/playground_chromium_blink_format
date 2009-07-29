@@ -32,6 +32,7 @@
 #define V8AbstractEventListener_h
 
 #include "EventListener.h"
+#include "OwnHandle.h"
 #include <v8.h>
 
 namespace WebCore {
@@ -39,14 +40,14 @@ namespace WebCore {
 class Event;
 class Frame;
 
-// There are two kinds of event listeners: HTML or non-HMTL. onload, onfocus,
-// etc (attributes) are always HTML event handler type;
-// Event listeners added by Window.addEventListener or
+// There are two kinds of event listeners: HTML or non-HMTL. onload,
+// onfocus, etc (attributes) are always HTML event handler type; Event
+// listeners added by Window.addEventListener or
 // EventTargetNode::addEventListener are non-HTML type.
 //
 // Why does this matter?
-// WebKit does not allow duplicated HTML event handlers of the same type, but
-// ALLOWs duplicated non-HTML event handlers.
+// WebKit does not allow duplicated HTML event handlers of the same type,
+// but ALLOWs duplicated non-HTML event handlers.
 class V8AbstractEventListener : public EventListener {
  public:
   virtual ~V8AbstractEventListener() {}
@@ -92,6 +93,7 @@ class V8AbstractEventListener : public EventListener {
   // deleted. See fast/dom/replaceChild.html
   // FIXME: this could hold m_frame live until the event listener is deleted.
   Frame* m_frame;
+  OwnHandle<v8::Context> m_context;
 
   // Position in the HTML source for HTML event listeners.
   int m_lineNumber;
