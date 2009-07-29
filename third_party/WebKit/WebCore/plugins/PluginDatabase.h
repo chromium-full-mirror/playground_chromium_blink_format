@@ -63,6 +63,7 @@ class PluginDatabase {
   static int preferredPluginCompare(const void*, const void*);
 
   PluginPackage* findPlugin(const KURL&, String& mimeType);
+  PluginPackage* pluginForMIMEType(const String& mimeType);
 
   void setPluginDirectories(const Vector<String>& directories) {
     clear();
@@ -78,7 +79,6 @@ class PluginDatabase {
   bool add(PassRefPtr<PluginPackage>);
   void remove(PluginPackage*);
 
-  PluginPackage* pluginForMIMEType(const String& mimeType);
   String MIMETypeForExtension(const String& extension) const;
 
   static Vector<String> defaultPluginDirectories();
