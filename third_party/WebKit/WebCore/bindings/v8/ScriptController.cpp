@@ -136,7 +136,7 @@ bool ScriptController::processingUserGesture() const {
   V8Proxy* activeProxy = activeFrame->script()->proxy();
 
   v8::HandleScope handleScope;
-  v8::Handle<v8::Context> v8Context = V8Proxy::context(activeFrame);
+  v8::Handle<v8::Context> v8Context = V8Proxy::mainWorldContext(activeFrame);
   // FIXME: find all cases context can be empty:
   //  1) JS is disabled;
   //  2) page is NULL;
@@ -205,7 +205,8 @@ ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode) {
   }
 
   v8::HandleScope handleScope;
-  v8::Handle<v8::Context> v8Context = V8Proxy::context(m_proxy->frame());
+  v8::Handle<v8::Context> v8Context =
+      V8Proxy::mainWorldContext(m_proxy->frame());
   if (v8Context.IsEmpty())
     return ScriptValue();
 
@@ -239,7 +240,7 @@ void ScriptController::bindToWindowObject(Frame* frame,
                                           NPObject* object) {
   v8::HandleScope handleScope;
 
-  v8::Handle<v8::Context> v8Context = V8Proxy::context(frame);
+  v8::Handle<v8::Context> v8Context = V8Proxy::mainWorldContext(frame);
   if (v8Context.IsEmpty())
     return;
 
@@ -254,7 +255,8 @@ void ScriptController::bindToWindowObject(Frame* frame,
 
 void ScriptController::collectGarbage() {
   v8::HandleScope handleScope;
-  v8::Handle<v8::Context> v8Context = V8Proxy::context(m_proxy->frame());
+  v8::Handle<v8::Context> v8Context =
+      V8Proxy::mainWorldContext(m_proxy->frame());
   if (v8Context.IsEmpty())
     return;
 
@@ -332,7 +334,7 @@ static NPObject* createNoScriptObject() {
 
 static NPObject* createScriptObject(Frame* frame) {
   v8::HandleScope handleScope;
-  v8::Handle<v8::Context> v8Context = V8Proxy::context(frame);
+  v8::Handle<v8::Context> v8Context = V8Proxy::mainWorldContext(frame);
   if (v8Context.IsEmpty())
     return createNoScriptObject();
 
@@ -370,7 +372,7 @@ NPObject* ScriptController::createScriptObjectForPluginElement(
     return createNoScriptObject();
 
   v8::HandleScope handleScope;
-  v8::Handle<v8::Context> v8Context = V8Proxy::context(m_frame);
+  v8::Handle<v8::Context> v8Context = V8Proxy::mainWorldContext(m_frame);
   if (v8Context.IsEmpty())
     return createNoScriptObject();
   v8::Context::Scope scope(v8Context);

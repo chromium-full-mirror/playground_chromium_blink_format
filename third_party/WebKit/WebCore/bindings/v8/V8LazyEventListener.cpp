@@ -79,7 +79,7 @@ v8::Local<v8::Function> V8LazyEventListener::getListenerFunction() {
     v8::HandleScope handleScope;
 
     // Use the outer scope to hold context.
-    v8::Handle<v8::Context> v8Context = V8Proxy::context(m_frame);
+    v8::Handle<v8::Context> v8Context = V8Proxy::mainWorldContext(m_frame);
     // Bail out if we could not get the context.
     if (v8Context.IsEmpty())
       return v8::Local<v8::Function>();
@@ -170,7 +170,7 @@ v8::Local<v8::Function> V8LazyEventListener::getWrappedListenerFunction() {
     v8::HandleScope handleScope;
 
     // Use the outer scope to hold context.
-    v8::Handle<v8::Context> v8Context = V8Proxy::context(m_frame);
+    v8::Handle<v8::Context> v8Context = V8Proxy::mainWorldContext(m_frame);
     // Bail out if we cannot get the context.
     if (v8Context.IsEmpty())
       return v8::Local<v8::Function>();
