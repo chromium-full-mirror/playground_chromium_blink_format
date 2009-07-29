@@ -61,7 +61,7 @@ typedef HashMap<RefPtr<JSC::UString::Rep>, StaticValueEntry*>
 typedef HashMap<RefPtr<JSC::UString::Rep>, StaticFunctionEntry*>
     OpaqueJSClassStaticFunctionsTable;
 
-class OpaqueJSClass;
+struct OpaqueJSClass;
 
 // An OpaqueJSClass (JSClass) is created without a context, so it can be used
 // with any context, even across context groups.

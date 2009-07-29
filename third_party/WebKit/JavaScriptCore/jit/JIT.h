@@ -71,14 +71,14 @@ class Interpreter;
 class Register;
 class RegisterFile;
 class ScopeChainNode;
-class SimpleJumpTable;
-class StringJumpTable;
 class StructureChain;
 
 struct CallLinkInfo;
 struct Instruction;
 struct OperandTypes;
 struct PolymorphicAccessStructureList;
+struct SimpleJumpTable;
+struct StringJumpTable;
 struct StructureStubInfo;
 
 struct CallRecord {

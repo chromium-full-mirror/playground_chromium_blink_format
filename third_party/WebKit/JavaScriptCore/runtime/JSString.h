@@ -75,7 +75,7 @@ JSString* jsOwnedString(ExecState*, const UString&);
 
 class JSString : public JSCell {
   friend class JIT;
-  friend class VPtrSet;
+  friend struct VPtrSet;
 
  public:
   JSString(JSGlobalData* globalData, const UString& value)

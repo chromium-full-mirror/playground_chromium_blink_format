@@ -40,7 +40,7 @@ class JSCell : public NoncopyableCustomAllocated {
   friend class JSPropertyNameIterator;
   friend class JSString;
   friend class JSValue;
-  friend class VPtrSet;
+  friend struct VPtrSet;
 
  private:
   explicit JSCell(Structure*);
