@@ -117,7 +117,7 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
                                         ResourceResponse&,
                                         Vector<char>& data,
                                         Frame* frame);
-  static bool willLoadFromCache(ResourceRequest&);
+  static bool willLoadFromCache(ResourceRequest&, Frame*);
 #if PLATFORM(MAC)
   static bool didSendBodyDataDelegateExists();
 #endif

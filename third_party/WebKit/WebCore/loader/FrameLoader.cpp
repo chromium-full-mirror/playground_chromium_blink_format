@@ -4955,7 +4955,7 @@ void FrameLoader::loadItem(HistoryItem* item, FrameLoadType loadType) {
         // extremely rare, but in that case the user will get an error on the
         // navigation.
 
-        if (ResourceHandle::willLoadFromCache(request))
+        if (ResourceHandle::willLoadFromCache(request, m_frame))
           action = NavigationAction(itemURL, loadType, false);
         else {
           request.setCachePolicy(ReloadIgnoringCacheData);

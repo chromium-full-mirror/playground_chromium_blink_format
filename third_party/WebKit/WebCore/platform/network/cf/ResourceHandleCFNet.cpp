@@ -650,7 +650,7 @@ bool ResourceHandle::loadsBlocked() {
   return false;
 }
 
-bool ResourceHandle::willLoadFromCache(ResourceRequest& request) {
+bool ResourceHandle::willLoadFromCache(ResourceRequest& request, Frame* frame) {
   request.setCachePolicy(ReturnCacheDataDontLoad);
 
   CFURLResponseRef cfResponse = 0;
