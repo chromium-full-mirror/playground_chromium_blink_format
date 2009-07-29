@@ -365,7 +365,7 @@ void AXObjectCache::textMarkerDataForVisiblePosition(
   // for byte-equivalence.
   // This also allows callers to check for failure by looking at textMarkerData
   // upon return.
-  bzero(&textMarkerData, sizeof(TextMarkerData));
+  memset(&textMarkerData, 0, sizeof(TextMarkerData));
 
   if (visiblePos.isNull())
     return;
