@@ -41,11 +41,11 @@
 
 namespace WebCore {
 
+class DedicatedWorkerThread;
 class MessagePortChannel;
 class ScriptExecutionContext;
 class String;
 class Worker;
-class WorkerThread;
 
 class WorkerMessagingProxy : public WorkerContextProxy,
                              public WorkerObjectProxy,
@@ -91,7 +91,7 @@ class WorkerMessagingProxy : public WorkerContextProxy,
       PassRefPtr<ScriptExecutionContext::Task>,
       const String& mode);
 
-  void workerThreadCreated(PassRefPtr<WorkerThread>);
+  void workerThreadCreated(PassRefPtr<DedicatedWorkerThread>);
 
   // Only use this method on the worker object thread.
   bool askedToTerminate() const { return m_askedToTerminate; }
@@ -111,7 +111,7 @@ class WorkerMessagingProxy : public WorkerContextProxy,
 
   RefPtr<ScriptExecutionContext> m_scriptExecutionContext;
   Worker* m_workerObject;
-  RefPtr<WorkerThread> m_workerThread;
+  RefPtr<DedicatedWorkerThread> m_workerThread;
 
   unsigned m_unconfirmedMessageCount;     // Unconfirmed messages from worker
                                           // object to worker thread.

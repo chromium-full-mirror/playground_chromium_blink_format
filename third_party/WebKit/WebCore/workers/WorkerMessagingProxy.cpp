@@ -32,13 +32,13 @@
 #include "WorkerMessagingProxy.h"
 
 #include "DedicatedWorkerContext.h"
+#include "DedicatedWorkerThread.h"
 #include "DOMWindow.h"
 #include "Document.h"
 #include "GenericWorkerTask.h"
 #include "MessageEvent.h"
 #include "ScriptExecutionContext.h"
 #include "Worker.h"
-#include "WorkerThread.h"
 
 namespace WebCore {
 
@@ -231,8 +231,8 @@ WorkerMessagingProxy::~WorkerMessagingProxy() {
 void WorkerMessagingProxy::startWorkerContext(const KURL& scriptURL,
                                               const String& userAgent,
                                               const String& sourceCode) {
-  RefPtr<WorkerThread> thread =
-      WorkerThread::create(scriptURL, userAgent, sourceCode, *this, *this);
+  RefPtr<DedicatedWorkerThread> thread = DedicatedWorkerThread::create(
+      scriptURL, userAgent, sourceCode, *this, *this);
   workerThreadCreated(thread);
   thread->start();
 }
@@ -314,7 +314,7 @@ void WorkerMessagingProxy::postConsoleMessageToWorkerObject(
 }
 
 void WorkerMessagingProxy::workerThreadCreated(
-    PassRefPtr<WorkerThread> workerThread) {
+    PassRefPtr<DedicatedWorkerThread> workerThread) {
   m_workerThread = workerThread;
 
   if (m_askedToTerminate) {

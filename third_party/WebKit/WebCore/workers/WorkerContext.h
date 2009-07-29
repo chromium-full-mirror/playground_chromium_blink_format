@@ -68,16 +68,6 @@ class WorkerContext : public RefCounted<WorkerContext>,
 
   bool hasPendingActivity() const;
 
-  virtual void reportException(const String& errorMessage,
-                               int lineNumber,
-                               const String& sourceURL) = 0;
-  virtual void addMessage(MessageDestination,
-                          MessageSource,
-                          MessageType,
-                          MessageLevel,
-                          const String& message,
-                          unsigned lineNumber,
-                          const String& sourceURL);
   virtual void resourceRetrievedByXMLHttpRequest(
       unsigned long identifier,
       const ScriptString& sourceString);
@@ -97,10 +87,10 @@ class WorkerContext : public RefCounted<WorkerContext>,
   EventListener* onerror() const { return m_onerrorListener.get(); }
 
   // WorkerUtils
-  void importScripts(const Vector<String>& urls,
-                     const String& callerURL,
-                     int callerLine,
-                     ExceptionCode&);
+  virtual void importScripts(const Vector<String>& urls,
+                             const String& callerURL,
+                             int callerLine,
+                             ExceptionCode&);
   WorkerNavigator* navigator() const;
 
   // Timers
