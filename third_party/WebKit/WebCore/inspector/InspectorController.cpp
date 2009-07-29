@@ -550,6 +550,8 @@ void InspectorController::scriptObjectReady() {
 
   // Make sure our window is visible now that the page loaded
   showWindow();
+
+  m_client->inspectorWindowObjectCleared();
 }
 
 void InspectorController::setFrontendProxyObject(ScriptState* scriptState,

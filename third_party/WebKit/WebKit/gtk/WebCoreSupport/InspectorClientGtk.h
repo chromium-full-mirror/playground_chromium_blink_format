@@ -72,6 +72,8 @@ class InspectorClient : public WebCore::InspectorClient {
                             const WebCore::InspectorController::Setting&);
   virtual void removeSetting(const WebCore::String& key);
 
+  virtual void inspectorWindowObjectCleared();
+
  private:
   WebKitWebView* m_webView;
   WebKitWebView* m_inspectedWebView;

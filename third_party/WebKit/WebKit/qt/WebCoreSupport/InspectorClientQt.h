@@ -73,6 +73,8 @@ class InspectorClientQt : public InspectorClient {
                             const InspectorController::Setting&);
   virtual void removeSetting(const String& key);
 
+  virtual void inspectorWindowObjectCleared();
+
  private:
   void updateWindowTitle();
   QWebPage* m_inspectedWebPage;

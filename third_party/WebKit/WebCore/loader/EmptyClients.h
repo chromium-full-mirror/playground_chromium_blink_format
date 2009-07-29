@@ -625,6 +625,8 @@ class EmptyInspectorClient : public InspectorClient {
   virtual void storeSetting(const String&,
                             const InspectorController::Setting&) {}
   virtual void removeSetting(const String&) {}
+
+  virtual void inspectorWindowObjectCleared() {}
 };
 }
 

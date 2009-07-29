@@ -598,6 +598,11 @@ backforward list.
 - (void)webView:(WebView*)sender
     didFirstVisuallyNonEmptyLayoutInFrame:(WebFrame*)frame;
 
+// For implementing the WebInspector's test harness
+- (void)webView:(WebView*)webView
+    didClearInspectorWindowObject:(WebScriptObject*)windowObject
+                         forFrame:(WebFrame*)frame;
+
 @end
 
 @interface NSObject (WebResourceLoadDelegatePrivate)

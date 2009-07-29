@@ -164,6 +164,10 @@ void InspectorClientQt::inspectedURLChanged(const String& newURL) {
   updateWindowTitle();
 }
 
+void InspectorClientQt::inspectorWindowObjectCleared() {
+  notImplemented();
+}
+
 void InspectorClientQt::updateWindowTitle() {
   if (!m_webPage)
     return;

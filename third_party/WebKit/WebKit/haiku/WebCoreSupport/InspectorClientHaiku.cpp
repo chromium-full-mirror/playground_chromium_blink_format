@@ -87,6 +87,10 @@ void InspectorClientHaiku::inspectedURLChanged(const String&) {
   notImplemented();
 }
 
+void InspectorClientHaiku::inspectorWindowObjectCleared() {
+  notImplemented();
+}
+
 void InspectorClientHaiku::populateSetting(const String& key,
                                            InspectorController::Setting&) {
   notImplemented();
