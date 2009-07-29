@@ -40,6 +40,13 @@ namespace WebCore {
 static const CFStringRef kCGImageSourceShouldPreferRGB32 =
     CFSTR("kCGImageSourceShouldPreferRGB32");
 
+#if !PLATFORM(MAC)
+static void sharedBufferDerefCallback(void*, void* info) {
+  SharedBuffer* sharedBuffer = static_cast<SharedBuffer*>(info);
+  sharedBuffer->deref();
+}
+#endif
+
 ImageSource::ImageSource() : m_decoder(0) {}
 
 ImageSource::~ImageSource() {
@@ -110,10 +117,17 @@ void ImageSource::setData(SharedBuffer* data, bool allDataReceived) {
 #else
   // If no NSData is available, then we know SharedBuffer will always just be a
   // vector.  That means no secret changes can occur to it behind the
-  // scenes.  We use CFDataCreateWithBytesNoCopy in that case.
+  // scenes.  We use CFDataCreateWithBytesNoCopy in that case. Ensure that the
+  // SharedBuffer lives as long as the CFDataRef.
+  data->ref();
+  CFAllocatorContext context = {
+      0, data, 0, 0, 0, 0, 0, &sharedBufferDerefCallback, 0};
+  CFAllocatorRef derefAllocator =
+      CFAllocatorCreate(kCFAllocatorDefault, &context);
   CFDataRef cfData = CFDataCreateWithBytesNoCopy(
       0, reinterpret_cast<const UInt8*>(data->data()), data->size(),
-      kCFAllocatorNull);
+      derefAllocator);
+  CFRelease(derefAllocator);
 #endif
   CGImageSourceUpdateData(m_decoder, cfData, allDataReceived);
   CFRelease(cfData);
