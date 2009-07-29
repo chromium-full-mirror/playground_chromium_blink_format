@@ -41,8 +41,6 @@ void WMLNoopElement::insertedIntoDocument() {
   WMLElement::insertedIntoDocument();
 
   Node* parent = parentNode();
-  ASSERT(parent);
-
   if (!parent || !parent->isWMLElement())
     return;
 
