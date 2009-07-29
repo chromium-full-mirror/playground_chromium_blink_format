@@ -273,6 +273,8 @@ enum StyleContentType {
 
 enum EBorderFit { BorderFitBorder, BorderFitLines };
 
+enum EAnimPlayState { AnimPlayStatePlaying = 0x0, AnimPlayStatePaused = 0x1 };
+
 enum ETimingFunctionType { LinearTimingFunction, CubicBezierTimingFunction };
 
 enum EWhiteSpace { NORMAL, PRE, PRE_WRAP, PRE_LINE, NOWRAP, KHTML_NOWRAP };

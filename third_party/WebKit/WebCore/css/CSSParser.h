@@ -109,6 +109,7 @@ class CSSParser {
   PassRefPtr<CSSValue> parseAnimationDuration();
   PassRefPtr<CSSValue> parseAnimationIterationCount();
   PassRefPtr<CSSValue> parseAnimationName();
+  PassRefPtr<CSSValue> parseAnimationPlayState();
   PassRefPtr<CSSValue> parseAnimationProperty();
   PassRefPtr<CSSValue> parseAnimationTimingFunction();
 
