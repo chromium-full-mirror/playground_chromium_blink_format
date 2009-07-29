@@ -67,6 +67,9 @@ class PluginPackage : public RefCounted<PluginPackage> {
   void unload();
   void unloadWithoutShutdown();
 
+  bool isEnabled() const { return m_isEnabled; }
+  void setEnabled(bool);
+
   const NPPluginFuncs* pluginFuncs() const { return &m_pluginFuncs; }
   int compareFileVersion(const PlatformModuleVersion&) const;
   int compare(const PluginPackage&) const;
@@ -82,6 +85,7 @@ class PluginPackage : public RefCounted<PluginPackage> {
   void determineModuleVersionFromDescription();
   void initializeBrowserFuncs();
 
+  bool m_isEnabled;
   bool m_isLoaded;
   int m_loadCount;
 
