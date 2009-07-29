@@ -272,7 +272,8 @@ static void resetWebViewToConsistentStateBeforeTesting() {
                "enable-developer-extras", FALSE, "enable-spell-checking", TRUE,
                "enable-html5-database", TRUE, "enable-html5-local-storage",
                TRUE, "enable-xss-auditor", FALSE,
-               "javascript-can-open-windows-automatically", TRUE, NULL);
+               "javascript-can-open-windows-automatically", TRUE,
+               "enable-offline-web-application-cache", TRUE, NULL);
 
   webkit_web_frame_clear_main_frame_name(mainFrame);
 

@@ -54,6 +54,7 @@ bool webkit_web_frame_pause_transition(WebKitWebFrame* frame,
                                        const gchar* element);
 unsigned int webkit_web_frame_number_of_active_animations(
     WebKitWebFrame* frame);
+void webkit_application_cache_set_maximum_size(unsigned long long size);
 }
 
 LayoutTestController::~LayoutTestController() {
@@ -309,7 +310,7 @@ void LayoutTestController::setDatabaseQuota(unsigned long long quota) {
 }
 
 void LayoutTestController::setAppCacheMaximumSize(unsigned long long size) {
-  // FIXME: implement
+  webkit_application_cache_set_maximum_size(size);
 }
 
 bool LayoutTestController::pauseAnimationAtTimeOnElementWithId(

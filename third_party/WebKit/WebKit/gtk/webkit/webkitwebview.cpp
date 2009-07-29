@@ -2045,7 +2045,8 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   gboolean autoLoadImages, autoShrinkImages, printBackgrounds, enableScripts,
       enablePlugins, enableDeveloperExtras, resizableTextAreas,
       enablePrivateBrowsing, enableCaretBrowsing, enableHTML5Database,
-      enableHTML5LocalStorage, enableXSSAuditor, javascriptCanOpenWindows;
+      enableHTML5LocalStorage, enableXSSAuditor, javascriptCanOpenWindows,
+      enableOfflineWebAppCache;
 
   g_object_get(
       webSettings, "default-encoding", &defaultEncoding, "cursive-font-family",
@@ -2063,7 +2064,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       &enableHTML5Database, "enable-html5-local-storage",
       &enableHTML5LocalStorage, "enable-xss-auditor", &enableXSSAuditor,
       "javascript-can-open-windows-automatically", &javascriptCanOpenWindows,
-      NULL);
+      "enable-offline-web-application-cache", &enableOfflineWebAppCache, NULL);
 
   settings->setDefaultTextEncodingName(defaultEncoding);
   settings->setCursiveFontFamily(cursiveFontFamily);
@@ -2086,6 +2087,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setLocalStorageEnabled(enableHTML5LocalStorage);
   settings->setXSSAuditorEnabled(enableXSSAuditor);
   settings->setJavaScriptCanOpenWindowsAutomatically(javascriptCanOpenWindows);
+  settings->setOfflineWebApplicationCacheEnabled(enableOfflineWebAppCache);
 
   g_free(defaultEncoding);
   g_free(cursiveFontFamily);
@@ -2172,6 +2174,8 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
   else if (name == g_intern_string("javascript-can-open-windows-automatically"))
     settings->setJavaScriptCanOpenWindowsAutomatically(
         g_value_get_boolean(&value));
+  else if (name == g_intern_string("enable-offline-web-application-cache"))
+    settings->setOfflineWebApplicationCacheEnabled(g_value_get_boolean(&value));
   else if (!g_object_class_find_property(G_OBJECT_GET_CLASS(webSettings), name))
     g_warning("Unexpected setting '%s'", name);
   g_value_unset(&value);

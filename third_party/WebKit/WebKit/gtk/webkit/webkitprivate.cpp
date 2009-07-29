@@ -22,6 +22,7 @@
 
 #include "webkitsoupauthdialog.h"
 #include "webkitprivate.h"
+#include "ApplicationCacheStorage.h"
 #include "ChromeClientGtk.h"
 #include "Frame.h"
 #include "FrameLoader.h"
@@ -158,6 +159,7 @@ void webkit_init() {
       g_build_filename(g_get_user_data_dir(), "webkit", "databases", NULL);
   WebCore::DatabaseTracker::tracker().setDatabaseDirectoryPath(
       databaseDirectory);
+  WebCore::cacheStorage().setCacheDirectory(databaseDirectory);
   g_free(databaseDirectory);
 #endif
 
