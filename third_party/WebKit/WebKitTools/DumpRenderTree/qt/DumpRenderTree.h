@@ -62,6 +62,8 @@ class DumpRenderTree : public QObject {
   // Initialize in single-file mode.
   void open(const QUrl& url);
 
+  void setDumpPixels(bool);
+
   void resetJSObjects();
 
   LayoutTestController* layoutTestController() const { return m_controller; }
@@ -94,6 +96,9 @@ class DumpRenderTree : public QObject {
   QString dumpFramesAsText(QWebFrame* frame);
   QString dumpBackForwardList();
   LayoutTestController* m_controller;
+
+  bool m_dumpPixels;
+  QString m_expectedHash;
 
   QWebPage* m_page;
 
