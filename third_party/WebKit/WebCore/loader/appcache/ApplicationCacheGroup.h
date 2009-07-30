@@ -32,6 +32,7 @@
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 
+#include "DOMApplicationCache.h"
 #include "KURL.h"
 #include "PlatformString.h"
 #include "ResourceHandle.h"
@@ -42,7 +43,6 @@ namespace WebCore {
 
 class ApplicationCache;
 class ApplicationCacheResource;
-class DOMApplicationCache;
 class Document;
 class DocumentLoader;
 class Frame;
@@ -99,11 +99,9 @@ class ApplicationCacheGroup : public Noncopyable, ResourceHandleClient {
 
  private:
   typedef void (DOMApplicationCache::*ListenerFunction)();
-  static void postListenerTask(ListenerFunction,
+  static void postListenerTask(DOMApplicationCache::EventType,
                                const HashSet<DocumentLoader*>&);
-  static void postListenerTask(ListenerFunction,
-                               const Vector<RefPtr<DocumentLoader>>& loaders);
-  static void postListenerTask(ListenerFunction, DocumentLoader*);
+  static void postListenerTask(DOMApplicationCache::EventType, DocumentLoader*);
   void scheduleReachedMaxAppCacheSizeCallback();
 
   PassRefPtr<ResourceHandle> createResourceHandle(

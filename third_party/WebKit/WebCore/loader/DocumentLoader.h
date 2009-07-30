@@ -29,6 +29,10 @@
 #ifndef DocumentLoader_h
 #define DocumentLoader_h
 
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+#include "ApplicationCacheHost.h"
+#endif
+
 #include "NavigationAction.h"
 #include "ResourceError.h"
 #include "ResourceRequest.h"
@@ -38,9 +42,6 @@
 
 namespace WebCore {
 
-class ApplicationCache;
-class ApplicationCacheGroup;
-class ApplicationCacheResource;
 class Archive;
 class ArchiveResource;
 class ArchiveResourceCollection;
@@ -241,29 +242,9 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   void takeMemoryCacheLoadsForClientNotification(Vector<String>& loads);
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
-  bool scheduleApplicationCacheLoad(ResourceLoader*,
-                                    const ResourceRequest&,
-                                    const KURL& originalURL);
-  bool scheduleLoadFallbackResourceFromApplicationCache(ResourceLoader*,
-                                                        const ResourceRequest&,
-                                                        ApplicationCache* = 0);
-  bool shouldLoadResourceFromApplicationCache(const ResourceRequest&,
-                                              ApplicationCacheResource*&);
-  bool getApplicationCacheFallbackResource(const ResourceRequest&,
-                                           ApplicationCacheResource*&,
-                                           ApplicationCache* = 0);
-
-  void setCandidateApplicationCacheGroup(ApplicationCacheGroup* group);
-  ApplicationCacheGroup* candidateApplicationCacheGroup() const {
-    return m_candidateApplicationCacheGroup;
+  ApplicationCacheHost* applicationCacheHost() {
+    return &m_applicationCacheHost;
   }
-
-  void setApplicationCache(PassRefPtr<ApplicationCache> applicationCache);
-  ApplicationCache* applicationCache() const {
-    return m_applicationCache.get();
-  }
-
-  ApplicationCache* mainResourceApplicationCache() const;
 #endif
 
  protected:
@@ -353,17 +334,8 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   bool m_didCreateGlobalHistoryEntry;
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
-  // The application cache that the document loader is associated with (if any).
-  RefPtr<ApplicationCache> m_applicationCache;
-
-  // Before an application cache has finished loading, this will be the
-  // candidate application
-  // group that the document loader is associated with.
-  ApplicationCacheGroup* m_candidateApplicationCacheGroup;
-
-  // Once the main resource has finished loading, this is the application cache
-  // it was loaded from (if any).
-  RefPtr<ApplicationCache> m_mainResourceApplicationCache;
+  friend class ApplicationCacheHost;  // for substitute resource delivery
+  ApplicationCacheHost m_applicationCacheHost;
 #endif
 };
 

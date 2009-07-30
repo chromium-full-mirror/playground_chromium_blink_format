@@ -96,8 +96,7 @@
 #include <wtf/StdLibExtras.h>
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
-#include "ApplicationCache.h"
-#include "ApplicationCacheResource.h"
+#include "ApplicationCacheHost.h"
 #endif
 
 #if ENABLE(SVG)
@@ -1944,8 +1943,7 @@ bool FrameLoader::canCachePageContainingThisFrame() {
          // FIXME: We should investigating caching frames that have an
          // associated
          // application cache. <rdar://problem/5917899> tracks that work.
-         && !m_documentLoader->applicationCache() &&
-         !m_documentLoader->candidateApplicationCacheGroup()
+         && m_documentLoader->applicationCacheHost()->canCacheInPageCache()
 #endif
 #if ENABLE(WML)
          && !frameContainsWMLContent(m_frame)
@@ -2135,12 +2133,8 @@ bool FrameLoader::logCanCacheFrameDecision(int indentLevel) {
       cannotCache = true;
     }
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
-    if (m_documentLoader->applicationCache()) {
-      PCLOG("   -The DocumentLoader has an active application cache");
-      cannotCache = true;
-    }
-    if (m_documentLoader->candidateApplicationCacheGroup()) {
-      PCLOG("   -The DocumentLoader has a candidateApplicationCacheGroup");
+    if (!m_documentLoader->applicationCacheHost()->canCacheInPageCache()) {
+      PCLOG("   -The DocumentLoader uses an application cache");
       cannotCache = true;
     }
 #endif
@@ -3980,38 +3974,14 @@ unsigned long FrameLoader::loadResourceSynchronously(
     ASSERT(!newRequest.isNull());
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
-    ApplicationCacheResource* resource;
-    if (documentLoader()->shouldLoadResourceFromApplicationCache(newRequest,
-                                                                 resource)) {
-      if (resource) {
-        response = resource->response();
-        data.append(resource->data()->data(), resource->data()->size());
-      } else
-        error = cannotShowURLError(newRequest);
-    } else {
+    if (!documentLoader()->applicationCacheHost()->maybeLoadSynchronously(
+            newRequest, error, response, data)) {
 #endif
       ResourceHandle::loadResourceSynchronously(newRequest, storedCredentials,
                                                 error, response, data, m_frame);
-
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
-      // If normal loading results in a redirect to a resource with another
-      // origin (indicative of a captive portal), or a 4xx or 5xx status code or
-      // equivalent,
-      // or if there were network errors (but not if the user canceled the
-      // download), then instead get, from the cache, the resource of the
-      // fallback entry
-      // corresponding to the matched namespace.
-      if ((!error.isNull() && !error.isCancellation()) ||
-          response.httpStatusCode() / 100 == 4 ||
-          response.httpStatusCode() / 100 == 5 ||
-          !protocolHostAndPortAreEqual(newRequest.url(), response.url())) {
-        if (documentLoader()->getApplicationCacheFallbackResource(newRequest,
-                                                                  resource)) {
-          response = resource->response();
-          data.clear();
-          data.append(resource->data()->data(), resource->data()->size());
-        }
-      }
+      documentLoader()->applicationCacheHost()->maybeLoadFallbackSynchronously(
+          newRequest, error, response, data);
     }
 #endif
   }
