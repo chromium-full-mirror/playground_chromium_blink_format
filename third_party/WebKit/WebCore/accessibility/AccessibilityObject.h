@@ -40,7 +40,7 @@
 
 #if PLATFORM(MAC)
 #include <wtf/RetainPtr.h>
-#elif PLATFORM(WIN)
+#elif PLATFORM(WIN) && !PLATFORM(WINCE)
 #include "AccessibilityObjectWrapperWin.h"
 #include "COMPtr.h"
 #elif PLATFORM(CHROMIUM)
@@ -456,7 +456,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
 
 #if PLATFORM(MAC)
   RetainPtr<AccessibilityObjectWrapper> m_wrapper;
-#elif PLATFORM(WIN)
+#elif PLATFORM(WIN) && !PLATFORM(WINCE)
   COMPtr<AccessibilityObjectWrapper> m_wrapper;
 #elif PLATFORM(GTK)
   AtkObject* m_wrapper;
