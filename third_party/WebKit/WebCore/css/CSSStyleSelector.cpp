@@ -1433,7 +1433,7 @@ void CSSStyleSelector::keyframeStylesForAnimation(
       // animated; it just
       // describes the timing function between this keyframe and the next.
       if (property != CSSPropertyWebkitAnimationTimingFunction)
-        list.addProperty((*it).id());
+        list.addProperty(property);
     }
 
     // Add this keyframe style to all the indicated key times
