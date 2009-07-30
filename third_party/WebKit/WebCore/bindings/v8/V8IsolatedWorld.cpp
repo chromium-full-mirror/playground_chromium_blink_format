@@ -53,10 +53,11 @@ static void contextWeakReferenceCallback(v8::Persistent<v8::Value> object,
 }
 
 void V8IsolatedWorld::evaluate(const Vector<ScriptSourceCode>& sources,
-                               V8Proxy* proxy) {
+                               V8Proxy* proxy,
+                               int extensionGroup) {
   v8::HandleScope scope;
   v8::Persistent<v8::Context> context =
-      proxy->createNewContext(v8::Handle<v8::Object>());
+      proxy->createNewContext(v8::Handle<v8::Object>(), extensionGroup);
 
   // Run code in the new context.
   v8::Context::Scope context_scope(context);

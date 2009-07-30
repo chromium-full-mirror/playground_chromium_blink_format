@@ -277,12 +277,14 @@ bool V8Proxy::handleOutOfMemory() {
   return true;
 }
 
-void V8Proxy::evaluateInNewWorld(const Vector<ScriptSourceCode>& sources) {
+void V8Proxy::evaluateInNewWorld(const Vector<ScriptSourceCode>& sources,
+                                 int extensionGroup) {
   initContextIfNeeded();
-  V8IsolatedWorld::evaluate(sources, this);
+  V8IsolatedWorld::evaluate(sources, this, extensionGroup);
 }
 
-void V8Proxy::evaluateInNewContext(const Vector<ScriptSourceCode>& sources) {
+void V8Proxy::evaluateInNewContext(const Vector<ScriptSourceCode>& sources,
+                                   int extensionGroup) {
   initContextIfNeeded();
 
   v8::HandleScope handleScope;
@@ -297,7 +299,7 @@ void V8Proxy::evaluateInNewContext(const Vector<ScriptSourceCode>& sources) {
          m_frame->domWindow());
 
   v8::Persistent<v8::Context> context =
-      createNewContext(v8::Handle<v8::Object>());
+      createNewContext(v8::Handle<v8::Object>(), extensionGroup);
   v8::Context::Scope contextScope(context);
 
   // Setup context id for JS debugger.
@@ -852,7 +854,8 @@ bool V8Proxy::checkNodeSecurity(Node* node) {
 }
 
 v8::Persistent<v8::Context> V8Proxy::createNewContext(
-    v8::Handle<v8::Object> global) {
+    v8::Handle<v8::Object> global,
+    int extensionGroup) {
   v8::Persistent<v8::Context> result;
 
   // The activeDocumentLoader pointer could be NULL during frame shutdown.
@@ -877,6 +880,9 @@ v8::Persistent<v8::Context> V8Proxy::createNewContext(
   int index = 0;
   for (V8ExtensionList::iterator it = m_extensions.begin();
        it != m_extensions.end(); ++it) {
+    if (it->group && it->group != extensionGroup)
+      continue;
+
     // Note: we check the loader URL here instead of the document URL
     // because we might be currently loading an URL into a blank page.
     // See http://code.google.com/p/chromium/issues/detail?id=10924
@@ -992,7 +998,7 @@ void V8Proxy::initContextIfNeeded() {
     isV8Initialized = true;
   }
 
-  m_context = createNewContext(m_global);
+  m_context = createNewContext(m_global, 0);
   if (m_context.IsEmpty())
     return;
 
@@ -1230,10 +1236,27 @@ String V8Proxy::sourceName() {
   return toWebCoreString(v8::Debug::Call(frameSourceName));
 }
 
+void V8Proxy::registerExtensionWithV8(v8::Extension* extension) {
+  // If the extension exists in our list, it was already registered with V8.
+  for (V8ExtensionList::iterator it = m_extensions.begin();
+       it != m_extensions.end(); ++it) {
+    if (it->extension == extension)
+      return;
+  }
+
+  v8::RegisterExtension(extension);
+}
+
 void V8Proxy::registerExtension(v8::Extension* extension,
                                 const String& schemeRestriction) {
-  v8::RegisterExtension(extension);
-  V8ExtensionInfo info = {schemeRestriction, extension};
+  registerExtensionWithV8(extension);
+  V8ExtensionInfo info = {schemeRestriction, 0, extension};
+  m_extensions.push_back(info);
+}
+
+void V8Proxy::registerExtension(v8::Extension* extension, int extensionGroup) {
+  registerExtensionWithV8(extension);
+  V8ExtensionInfo info = {String(), extensionGroup, extension};
   m_extensions.push_back(info);
 }
 
