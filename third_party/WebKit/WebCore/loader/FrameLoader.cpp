@@ -509,7 +509,7 @@ Frame* FrameLoader::loadSubframe(HTMLFrameOwnerElement* ownerElement,
   RenderObject* renderer = ownerElement->renderer();
   FrameView* view = frame->view();
   if (renderer && renderer->isWidget() && view)
-    static_cast<RenderWidget*>(renderer)->setWidget(view);
+    toRenderWidget(renderer)->setWidget(view);
 
   checkCallImplicitClose();
 

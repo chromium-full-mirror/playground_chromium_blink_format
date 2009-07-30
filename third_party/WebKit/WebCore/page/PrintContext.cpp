@@ -52,7 +52,7 @@ void PrintContext::computePageRects(const FloatRect& printRect,
       !m_frame->document()->renderer())
     return;
 
-  RenderView* root = static_cast<RenderView*>(m_frame->document()->renderer());
+  RenderView* root = toRenderView(m_frame->document()->renderer());
 
   if (!root) {
     LOG_ERROR("document to be printed has no renderer");

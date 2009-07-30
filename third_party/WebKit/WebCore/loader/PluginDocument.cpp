@@ -104,8 +104,7 @@ bool PluginTokenizer::writeRawData(const char*, int) {
     if (settings && settings->arePluginsEnabled()) {
       m_doc->updateLayout();
 
-      if (RenderWidget* renderer =
-              static_cast<RenderWidget*>(m_embedElement->renderer())) {
+      if (RenderWidget* renderer = toRenderWidget(m_embedElement->renderer())) {
         frame->loader()->client()->redirectDataToPlugin(renderer->widget());
         frame->loader()
             ->activeDocumentLoader()

@@ -51,7 +51,7 @@ void computePageRectsForFrame(Frame* frame,
   if (!frame->document() || !frame->view() || !frame->document()->renderer())
     return;
 
-  RenderView* root = static_cast<RenderView*>(frame->document()->renderer());
+  RenderView* root = toRenderView(frame->document()->renderer());
 
   if (!root) {
     LOG_ERROR("document to be printed has no renderer");

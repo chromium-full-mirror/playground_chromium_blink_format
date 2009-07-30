@@ -643,7 +643,7 @@ void RenderLayerBacking::rendererContentChanged() {
 
 void RenderLayerBacking::updateImageContents() {
   ASSERT(renderer()->isImage());
-  RenderImage* imageRenderer = static_cast<RenderImage*>(renderer());
+  RenderImage* imageRenderer = toRenderImage(renderer());
 
   CachedImage* cachedImage = imageRenderer->cachedImage();
   if (!cachedImage)

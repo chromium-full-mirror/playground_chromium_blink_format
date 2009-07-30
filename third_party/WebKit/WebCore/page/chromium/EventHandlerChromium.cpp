@@ -113,9 +113,8 @@ bool EventHandler::passWidgetMouseDownEventToWidget(
   if (!event.targetNode() || !event.targetNode()->renderer() ||
       !event.targetNode()->renderer()->isWidget())
     return false;
-
   return passMouseDownEventToWidget(
-      static_cast<RenderWidget*>(event.targetNode()->renderer())->widget());
+      toRenderWidget(event.targetNode()->renderer())->widget());
 }
 
 bool EventHandler::passMouseDownEventToWidget(Widget* widget) {

@@ -69,7 +69,7 @@ bool EventHandler::passWidgetMouseDownEventToWidget(
     return false;
 
   return passMouseDownEventToWidget(
-      static_cast<RenderWidget*>(event.targetNode()->renderer())->widget());
+      toRenderWidget(event.targetNode()->renderer())->widget());
 }
 
 bool EventHandler::passWidgetMouseDownEventToWidget(

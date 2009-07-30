@@ -282,7 +282,7 @@ class InlineBox {
   // Use with caution! The type is not checked!
   RenderBoxModelObject* boxModelObject() const {
     if (!m_renderer->isText())
-      return static_cast<RenderBoxModelObject*>(m_renderer);
+      return toRenderBoxModelObject(m_renderer);
     return 0;
   }
 
