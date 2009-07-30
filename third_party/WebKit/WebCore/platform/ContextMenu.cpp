@@ -826,7 +826,9 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
       shouldEnable = controller() && controller()->client() &&
                      controller()->client()->isSpeaking();
       break;
-#endif  // PLATFORM(MAC)
+#else  // PLATFORM(MAC)
+    case ContextMenuItemTagStopSpeaking:
+#endif
 #if PLATFORM(GTK)
     case ContextMenuItemTagGoBack:
       shouldEnable = frame->loader()->canGoBackOrForward(-1);
@@ -880,7 +882,6 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
     case ContextMenuItemTagShowColors:
     case ContextMenuItemTagSpeechMenu:
     case ContextMenuItemTagStartSpeaking:
-    case ContextMenuItemTagStopSpeaking:
     case ContextMenuItemTagWritingDirectionMenu:
     case ContextMenuItemTagTextDirectionMenu:
     case ContextMenuItemTagPDFSinglePageScrolling:
