@@ -64,6 +64,8 @@ class PluginDatabase {
 
   PluginPackage* findPlugin(const KURL&, String& mimeType);
   PluginPackage* pluginForMIMEType(const String& mimeType);
+  void setPreferredPluginForMIMEType(const String& mimeType,
+                                     PluginPackage* plugin);
 
   void setPluginDirectories(const Vector<String>& directories) {
     clear();
@@ -89,6 +91,7 @@ class PluginDatabase {
   PluginSet m_plugins;
   HashMap<String, RefPtr<PluginPackage>> m_pluginsByPath;
   HashMap<String, time_t> m_pluginPathsWithTimes;
+  HashMap<String, RefPtr<PluginPackage>> m_preferredPlugins;
 };
 
 }  // namespace WebCore

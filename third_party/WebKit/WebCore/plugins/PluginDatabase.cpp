@@ -165,6 +165,11 @@ PluginPackage* PluginDatabase::pluginForMIMEType(const String& mimeType) {
 
   String key = mimeType.lower();
   PluginSet::const_iterator end = m_plugins.end();
+  PluginPackage* preferredPlugin = m_preferredPlugins.get(key).get();
+  if (preferredPlugin && preferredPlugin->isEnabled() &&
+      preferredPlugin->mimeToDescriptions().contains(key)) {
+    return preferredPlugin;
+  }
 
   Vector<PluginPackage*, 2> pluginChoices;
 
@@ -206,13 +211,20 @@ String PluginDatabase::MIMETypeForExtension(const String& extension) const {
     for (MIMEToExtensionsMap::const_iterator mime_it =
              (*it)->mimeToExtensions().begin();
          mime_it != mime_end; ++mime_it) {
+      mimeType = mime_it->first;
+      PluginPackage* preferredPlugin = m_preferredPlugins.get(mimeType).get();
       const Vector<String>& extensions = mime_it->second;
       bool foundMapping = false;
       for (unsigned i = 0; i < extensions.size(); i++) {
         if (equalIgnoringCase(extensions[i], extension)) {
           PluginPackage* plugin = (*it).get();
+
+          if (preferredPlugin &&
+              PluginPackage::equal(*plugin, *preferredPlugin))
+            return mimeType;
+
           pluginChoices.append(plugin);
-          mimeTypeForPlugin.add(plugin, mime_it->first);
+          mimeTypeForPlugin.add(plugin, mimeType);
           foundMapping = true;
           break;
         }
@@ -254,6 +266,12 @@ PluginPackage* PluginDatabase::findPlugin(const KURL& url, String& mimeType) {
   return plugin;
 }
 
+void PluginDatabase::setPreferredPluginForMIMEType(const String& mimeType,
+                                                   PluginPackage* plugin) {
+  if (!plugin || plugin->mimeToExtensions().contains(mimeType))
+    m_preferredPlugins.set(mimeType.lower(), plugin);
+}
+
 void PluginDatabase::getDeletedPlugins(PluginSet& plugins) const {
   PluginSet::const_iterator end = m_plugins.end();
   for (PluginSet::const_iterator it = m_plugins.begin(); it != end; ++it) {
@@ -275,6 +293,14 @@ bool PluginDatabase::add(PassRefPtr<PluginPackage> prpPackage) {
 }
 
 void PluginDatabase::remove(PluginPackage* package) {
+  MIMEToExtensionsMap::const_iterator it = package->mimeToExtensions().begin();
+  MIMEToExtensionsMap::const_iterator end = package->mimeToExtensions().end();
+  for (; it != end; ++it) {
+    if (m_preferredPlugins.contains(it->first) &&
+        m_preferredPlugins.get(it->first) == package)
+      m_preferredPlugins.remove(it->first);
+  }
+
   m_plugins.remove(package);
   m_pluginsByPath.remove(package->path());
 }
@@ -284,6 +310,7 @@ void PluginDatabase::clear() {
   m_pluginsByPath.clear();
   m_pluginPathsWithTimes.clear();
   m_registeredMIMETypes.clear();
+  m_preferredPlugins.clear();
 }
 
 #if !PLATFORM(WIN_OS) || PLATFORM(WX)
