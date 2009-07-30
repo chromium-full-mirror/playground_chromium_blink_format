@@ -104,7 +104,7 @@ static gboolean webkit_video_sink_idle_func(gpointer data) {
     return FALSE;
 
   buffer = (GstBuffer*)g_async_queue_try_pop(priv->async_queue);
-  if (buffer == NULL || G_UNLIKELY(!GST_IS_BUFFER(buffer)))
+  if (!buffer || G_UNLIKELY(!GST_IS_BUFFER(buffer)))
     return FALSE;
 
   // TODO: consider priv->rgb_ordering?
@@ -134,8 +134,7 @@ static GstFlowReturn webkit_video_sink_render(GstBaseSink* bsink,
   WebKitVideoSinkPrivate* priv = sink->priv;
 
   g_async_queue_push(priv->async_queue, gst_buffer_ref(buffer));
-  g_idle_add_full(G_PRIORITY_HIGH_IDLE, webkit_video_sink_idle_func, sink,
-                  NULL);
+  g_idle_add_full(G_PRIORITY_HIGH_IDLE, webkit_video_sink_idle_func, sink, 0);
 
   return GST_FLOW_OK;
 }
@@ -163,7 +162,7 @@ static gboolean webkit_video_sink_set_caps(GstBaseSink* bsink, GstCaps* caps) {
   ret = gst_structure_get_int(structure, "width", &width);
   ret &= gst_structure_get_int(structure, "height", &height);
   fps = gst_structure_get_value(structure, "framerate");
-  ret &= (fps != NULL);
+  ret &= (fps != 0);
 
   par = gst_structure_get_value(structure, "pixel-aspect-ratio");
 
@@ -195,12 +194,12 @@ static void webkit_video_sink_dispose(GObject* object) {
 
   if (priv->surface) {
     cairo_surface_destroy(priv->surface);
-    priv->surface = NULL;
+    priv->surface = 0;
   }
 
   if (priv->async_queue) {
     g_async_queue_unref(priv->async_queue);
-    priv->async_queue = NULL;
+    priv->async_queue = 0;
   }
 
   G_OBJECT_CLASS(parent_class)->dispose(object);
@@ -280,8 +279,8 @@ static void webkit_video_sink_class_init(WebKitVideoSinkClass* klass) {
 
   webkit_video_sink_signals[REPAINT_REQUESTED] =
       g_signal_new("repaint-requested", G_TYPE_FROM_CLASS(klass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
-                   NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, 0, 0,
+                   g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   g_object_class_install_property(
       gobject_class, PROP_SURFACE,
@@ -300,7 +299,7 @@ static void webkit_video_sink_class_init(WebKitVideoSinkClass* klass) {
  */
 GstElement* webkit_video_sink_new(cairo_surface_t* surface) {
   return (GstElement*)g_object_new(WEBKIT_TYPE_VIDEO_SINK, "surface", surface,
-                                   NULL);
+                                   0);
 }
 
 void webkit_video_sink_set_surface(WebKitVideoSink* sink,

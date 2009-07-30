@@ -24,7 +24,6 @@
 #if ENABLE(VIDEO)
 
 #include "MediaPlayerPrivateGStreamer.h"
-#include "VideoSinkGStreamer.h"
 
 #include "CString.h"
 #include "GraphicsContext.h"
@@ -34,8 +33,8 @@
 #include "MediaPlayer.h"
 #include "NotImplemented.h"
 #include "ScrollView.h"
+#include "VideoSinkGStreamer.h"
 #include "Widget.h"
-#include <wtf/GOwnPtr.h>
 
 #include <gdk/gdkx.h>
 #include <gst/base/gstbasesrc.h>
@@ -45,6 +44,7 @@
 #include <gst/video/video.h>
 #include <limits>
 #include <math.h>
+#include <wtf/GOwnPtr.h>
 
 using namespace std;
 
@@ -134,7 +134,7 @@ MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
   static bool gstInitialized = false;
   // FIXME: We should pass the arguments from the command line
   if (!gstInitialized) {
-    gst_init(0, NULL);
+    gst_init(0, 0);
     gstInitialized = true;
   }
 
@@ -221,7 +221,7 @@ float MediaPlayerPrivate::currentTime() const {
   GstQuery* query = gst_query_new_position(GST_FORMAT_TIME);
   if (gst_element_query(m_playBin, query)) {
     gint64 position;
-    gst_query_parse_position(query, NULL, &position);
+    gst_query_parse_position(query, 0, &position);
     ret = (float)(position / 1000000000.0);
     LOG_VERBOSE(Media, "Position %" GST_TIME_FORMAT, GST_TIME_ARGS(position));
   } else {
@@ -323,9 +323,8 @@ void MediaPlayerPrivate::setMuted(bool b) {
   if (b) {
     g_object_get(G_OBJECT(m_playBin), "volume", &m_volume, NULL);
     g_object_set(G_OBJECT(m_playBin), "volume", (double)0.0, NULL);
-  } else {
+  } else
     g_object_set(G_OBJECT(m_playBin), "volume", m_volume, NULL);
-  }
 }
 
 void MediaPlayerPrivate::setRate(float rate) {
@@ -442,14 +441,14 @@ void MediaPlayerPrivate::updateStates() {
 
       if (state == GST_STATE_READY) {
         m_readyState = MediaPlayer::HaveEnoughData;
-      } else if (state == GST_STATE_PAUSED) {
+      } else if (state == GST_STATE_PAUSED)
         m_readyState = MediaPlayer::HaveEnoughData;
-      }
+
       m_networkState = MediaPlayer::Loaded;
 
       g_object_get(m_playBin, "source", &m_source, NULL);
       if (!m_source)
-        LOG_VERBOSE(Media, "m_source is NULL");
+        LOG_VERBOSE(Media, "m_source is 0");
       break;
     case GST_STATE_CHANGE_ASYNC:
       LOG_VERBOSE(Media, "Async: State: %s, pending: %s",
@@ -464,9 +463,9 @@ void MediaPlayerPrivate::updateStates() {
                   gst_element_state_get_name(pending));
       if (state == GST_STATE_READY) {
         m_readyState = MediaPlayer::HaveFutureData;
-      } else if (state == GST_STATE_PAUSED) {
+      } else if (state == GST_STATE_PAUSED)
         m_readyState = MediaPlayer::HaveCurrentData;
-      }
+
       m_networkState = MediaPlayer::Loading;
       break;
     default:
@@ -593,7 +592,7 @@ void MediaPlayerPrivate::createGSTPlayBin(String url) {
 
   g_object_set(G_OBJECT(m_playBin), "uri", url.utf8().data(), NULL);
 
-  GstElement* audioSink = gst_element_factory_make("gconfaudiosink", NULL);
+  GstElement* audioSink = gst_element_factory_make("gconfaudiosink", 0);
   m_videoSink = webkit_video_sink_new(m_surface);
 
   g_object_set(m_playBin, "audio-sink", audioSink, NULL);
