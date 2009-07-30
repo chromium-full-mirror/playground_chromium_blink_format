@@ -136,7 +136,7 @@ class ExecState : private Register {
   }
   Instruction* returnPC() const { return this[RegisterFile::ReturnPC].vPC(); }
 
-  void setCalleeArguments(Arguments* arguments) {
+  void setCalleeArguments(JSValue arguments) {
     this[RegisterFile::OptionalCalleeArguments] = arguments;
   }
   void setCallerFrame(CallFrame* callerFrame) {
@@ -162,11 +162,12 @@ class ExecState : private Register {
     this[RegisterFile::ReturnPC] = vPC;  // This is either an Instruction* or a
                                          // pointer into JIT generated code
                                          // stored as an Instruction*.
-    this[RegisterFile::ReturnValueRegister] = returnValueRegister;
+    this[RegisterFile::ReturnValueRegister] =
+        Register::withInt(returnValueRegister);
     setArgumentCount(argc);  // original argument count (for the sake of the
                              // "arguments" object)
     setCallee(function);
-    setCalleeArguments(0);
+    setCalleeArguments(JSValue());
   }
 
   // Read a register from the codeframe (or constant from the CodeBlock).
@@ -193,7 +194,7 @@ class ExecState : private Register {
 
  private:
   void setArgumentCount(int count) {
-    this[RegisterFile::ArgumentCount] = count;
+    this[RegisterFile::ArgumentCount] = Register::withInt(count);
   }
   void setCallee(JSFunction* callee) { this[RegisterFile::Callee] = callee; }
   void setCodeBlock(CodeBlock* codeBlock) {

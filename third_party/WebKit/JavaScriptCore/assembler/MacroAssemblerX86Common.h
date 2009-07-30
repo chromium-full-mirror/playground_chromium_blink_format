@@ -56,6 +56,7 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
 
   enum DoubleCondition {
     DoubleEqual = X86Assembler::ConditionE,
+    DoubleNotEqual = X86Assembler::ConditionNE,
     DoubleGreaterThan = X86Assembler::ConditionA,
     DoubleGreaterThanOrEqual = X86Assembler::ConditionAE,
     DoubleLessThan = X86Assembler::ConditionB,
@@ -87,12 +88,24 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     m_assembler.addl_mr(src.offset, src.base, dest);
   }
 
+  void add32(RegisterID src, Address dest) {
+    m_assembler.addl_rm(src, dest.offset, dest.base);
+  }
+
   void and32(RegisterID src, RegisterID dest) {
     m_assembler.andl_rr(src, dest);
   }
 
   void and32(Imm32 imm, RegisterID dest) {
     m_assembler.andl_ir(imm.m_value, dest);
+  }
+
+  void and32(RegisterID src, Address dest) {
+    m_assembler.andl_rm(src, dest.offset, dest.base);
+  }
+
+  void and32(Address src, RegisterID dest) {
+    m_assembler.andl_mr(src.offset, src.base, dest);
   }
 
   void and32(Imm32 imm, Address address) {
@@ -133,16 +146,38 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     m_assembler.imull_rr(src, dest);
   }
 
+  void mul32(Address src, RegisterID dest) {
+    m_assembler.imull_mr(src.offset, src.base, dest);
+  }
+
   void mul32(Imm32 imm, RegisterID src, RegisterID dest) {
     m_assembler.imull_i32r(src, imm.m_value, dest);
   }
 
+  void neg32(RegisterID srcDest) { m_assembler.negl_r(srcDest); }
+
+  void neg32(Address srcDest) {
+    m_assembler.negl_m(srcDest.offset, srcDest.base);
+  }
+
   void not32(RegisterID srcDest) { m_assembler.notl_r(srcDest); }
+
+  void not32(Address srcDest) {
+    m_assembler.notl_m(srcDest.offset, srcDest.base);
+  }
 
   void or32(RegisterID src, RegisterID dest) { m_assembler.orl_rr(src, dest); }
 
   void or32(Imm32 imm, RegisterID dest) {
     m_assembler.orl_ir(imm.m_value, dest);
+  }
+
+  void or32(RegisterID src, Address dest) {
+    m_assembler.orl_rm(src, dest.offset, dest.base);
+  }
+
+  void or32(Address src, RegisterID dest) {
+    m_assembler.orl_mr(src.offset, src.base, dest);
   }
 
   void or32(Imm32 imm, Address address) {
@@ -195,12 +230,28 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     m_assembler.subl_mr(src.offset, src.base, dest);
   }
 
+  void sub32(RegisterID src, Address dest) {
+    m_assembler.subl_rm(src, dest.offset, dest.base);
+  }
+
   void xor32(RegisterID src, RegisterID dest) {
     m_assembler.xorl_rr(src, dest);
   }
 
-  void xor32(Imm32 imm, RegisterID srcDest) {
-    m_assembler.xorl_ir(imm.m_value, srcDest);
+  void xor32(Imm32 imm, Address dest) {
+    m_assembler.xorl_im(imm.m_value, dest.offset, dest.base);
+  }
+
+  void xor32(Imm32 imm, RegisterID dest) {
+    m_assembler.xorl_ir(imm.m_value, dest);
+  }
+
+  void xor32(RegisterID src, Address dest) {
+    m_assembler.xorl_rm(src, dest.offset, dest.base);
+  }
+
+  void xor32(Address src, RegisterID dest) {
+    m_assembler.xorl_mr(src.offset, src.base, dest);
   }
 
   // Memory access operations:
@@ -271,6 +322,16 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     m_assembler.addsd_mr(src.offset, src.base, dest);
   }
 
+  void divDouble(FPRegisterID src, FPRegisterID dest) {
+    ASSERT(isSSE2Present());
+    m_assembler.divsd_rr(src, dest);
+  }
+
+  void divDouble(Address src, FPRegisterID dest) {
+    ASSERT(isSSE2Present());
+    m_assembler.divsd_mr(src.offset, src.base, dest);
+  }
+
   void subDouble(FPRegisterID src, FPRegisterID dest) {
     ASSERT(isSSE2Present());
     m_assembler.subsd_rr(src, dest);
@@ -296,11 +357,20 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     m_assembler.cvtsi2sd_rr(src, dest);
   }
 
+  void convertInt32ToDouble(Address src, FPRegisterID dest) {
+    m_assembler.cvtsi2sd_mr(src.offset, src.base, dest);
+  }
+
   Jump branchDouble(DoubleCondition cond,
                     FPRegisterID left,
                     FPRegisterID right) {
     ASSERT(isSSE2Present());
     m_assembler.ucomisd_rr(right, left);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
+  Jump branchDouble(DoubleCondition cond, FPRegisterID left, Address right) {
+    m_assembler.ucomisd_mr(right.offset, right.base, left);
     return Jump(m_assembler.jCC(x86Condition(cond)));
   }
 
@@ -312,6 +382,11 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     ASSERT(isSSE2Present());
     m_assembler.cvttsd2si_rr(src, dest);
     return branch32(Equal, dest, Imm32(0x80000000));
+  }
+
+  void zeroDouble(FPRegisterID srcDest) {
+    ASSERT(isSSE2Present());
+    m_assembler.xorpd_rr(srcDest, srcDest);
   }
 
   // Stack manipulation operations:
@@ -349,7 +424,8 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
   void move(RegisterID src, RegisterID dest) {
     // Note: on 64-bit this is is a full register move; perhaps it would be
     // useful to have separate move32 & movePtr, with move32 zero extending?
-    m_assembler.movq_rr(src, dest);
+    if (src != dest)
+      m_assembler.movq_rr(src, dest);
   }
 
   void move(ImmPtr imm, RegisterID dest) {
@@ -528,8 +604,32 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     return Jump(m_assembler.jCC(x86Condition(cond)));
   }
 
+  Jump branchAdd32(Condition cond, Imm32 src, Address dest) {
+    ASSERT((cond == Overflow) || (cond == Zero) || (cond == NonZero));
+    add32(src, dest);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
+  Jump branchAdd32(Condition cond, RegisterID src, Address dest) {
+    ASSERT((cond == Overflow) || (cond == Zero) || (cond == NonZero));
+    add32(src, dest);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
+  Jump branchAdd32(Condition cond, Address src, RegisterID dest) {
+    ASSERT((cond == Overflow) || (cond == Zero) || (cond == NonZero));
+    add32(src, dest);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
   Jump branchMul32(Condition cond, RegisterID src, RegisterID dest) {
     ASSERT(cond == Overflow);
+    mul32(src, dest);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
+  Jump branchMul32(Condition cond, Address src, RegisterID dest) {
+    ASSERT((cond == Overflow) || (cond == Zero) || (cond == NonZero));
     mul32(src, dest);
     return Jump(m_assembler.jCC(x86Condition(cond)));
   }
@@ -554,6 +654,30 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     return Jump(m_assembler.jCC(x86Condition(cond)));
   }
 
+  Jump branchSub32(Condition cond, Imm32 imm, Address dest) {
+    ASSERT((cond == Overflow) || (cond == Zero) || (cond == NonZero));
+    sub32(imm, dest);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
+  Jump branchSub32(Condition cond, RegisterID src, Address dest) {
+    ASSERT((cond == Overflow) || (cond == Zero) || (cond == NonZero));
+    sub32(src, dest);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
+  Jump branchSub32(Condition cond, Address src, RegisterID dest) {
+    ASSERT((cond == Overflow) || (cond == Zero) || (cond == NonZero));
+    sub32(src, dest);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
+  Jump branchOr32(Condition cond, RegisterID src, RegisterID dest) {
+    ASSERT((cond == Signed) || (cond == Zero) || (cond == NonZero));
+    or32(src, dest);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
   // Miscellaneous operations:
 
   void breakpoint() { m_assembler.int3(); }
@@ -569,6 +693,27 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
   }
 
   void ret() { m_assembler.ret(); }
+
+  void set8(Condition cond,
+            RegisterID left,
+            RegisterID right,
+            RegisterID dest) {
+    m_assembler.cmpl_rr(right, left);
+    m_assembler.setCC_r(x86Condition(cond), dest);
+  }
+
+  void set8(Condition cond, Address left, RegisterID right, RegisterID dest) {
+    m_assembler.cmpl_mr(left.offset, left.base, right);
+    m_assembler.setCC_r(x86Condition(cond), dest);
+  }
+
+  void set8(Condition cond, RegisterID left, Imm32 right, RegisterID dest) {
+    if (((cond == Equal) || (cond == NotEqual)) && !right.m_value)
+      m_assembler.testl_rr(left, left);
+    else
+      m_assembler.cmpl_ir(right.m_value, left);
+    m_assembler.setCC_r(x86Condition(cond), dest);
+  }
 
   void set32(Condition cond,
              RegisterID left,
@@ -592,6 +737,15 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
   // The mask should be optional... paerhaps the argument order should be
   // dest-src, operations always have a dest? ... possibly not true, considering
   // asm ops like test, or pseudo ops like pop().
+
+  void setTest8(Condition cond, Address address, Imm32 mask, RegisterID dest) {
+    if (mask.m_value == -1)
+      m_assembler.cmpl_im(0, address.offset, address.base);
+    else
+      m_assembler.testl_i32m(mask.m_value, address.offset, address.base);
+    m_assembler.setCC_r(x86Condition(cond), dest);
+  }
+
   void setTest32(Condition cond, Address address, Imm32 mask, RegisterID dest) {
     if (mask.m_value == -1)
       m_assembler.cmpl_im(0, address.offset, address.base);

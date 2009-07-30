@@ -229,7 +229,7 @@ class CodeBlock : public FastAllocBase {
   void mark();
   void refStructures(Instruction* vPC) const;
   void derefStructures(Instruction* vPC) const;
-#if ENABLE(JIT)
+#if ENABLE(JIT_OPTIMIZE_CALL)
   void unlinkCallers();
 #endif
 

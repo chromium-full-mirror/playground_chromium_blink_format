@@ -34,6 +34,7 @@
 #include "ScopeChain.h"
 #include "Structure.h"
 #include "JSGlobalData.h"
+#include <wtf/StdLibExtras.h>
 
 namespace JSC {
 
@@ -252,7 +253,8 @@ class JSObject : public JSCell {
     return m_structure->isUsingInlineStorage();
   }
 
-  static const size_t inlineStorageCapacity = 3;
+  static const size_t inlineStorageCapacity =
+      sizeof(EncodedJSValue) == 2 * sizeof(void*) ? 4 : 3;
   static const size_t nonInlineBaseStorageCapacity = 16;
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
@@ -301,15 +303,13 @@ class JSObject : public JSCell {
                                          const Identifier& propertyName) const;
   Structure* createInheritorID();
 
-  RefPtr<Structure> m_inheritorID;
-
   union {
     PropertyStorage m_externalStorage;
     EncodedJSValue m_inlineStorage[inlineStorageCapacity];
   };
-};
 
-JSObject* asObject(JSValue);
+  RefPtr<Structure> m_inheritorID;
+};
 
 JSObject* constructEmptyObject(ExecState*);
 
@@ -325,6 +325,9 @@ inline JSObject::JSObject(PassRefPtr<Structure> structure)
   ASSERT(m_structure->propertyStorageCapacity() == inlineStorageCapacity);
   ASSERT(m_structure->isEmpty());
   ASSERT(prototype().isNull() || Heap::heap(this) == Heap::heap(prototype()));
+#if USE(JSVALUE64) || USE(JSVALUE32_64)
+  ASSERT(OBJECT_OFFSETOF(JSObject, m_inlineStorage) % sizeof(double) == 0);
+#endif
 }
 
 inline JSObject::~JSObject() {
@@ -665,7 +668,7 @@ inline JSValue JSValue::get(ExecState* exec,
                             const Identifier& propertyName,
                             PropertySlot& slot) const {
   if (UNLIKELY(!isCell())) {
-    JSObject* prototype = JSImmediate::prototype(asValue(), exec);
+    JSObject* prototype = synthesizePrototype(exec);
     if (propertyName == exec->propertyNames().underscoreProto)
       return prototype;
     if (!prototype->getPropertySlot(exec, propertyName, slot))
@@ -693,7 +696,7 @@ inline JSValue JSValue::get(ExecState* exec,
                             unsigned propertyName,
                             PropertySlot& slot) const {
   if (UNLIKELY(!isCell())) {
-    JSObject* prototype = JSImmediate::prototype(asValue(), exec);
+    JSObject* prototype = synthesizePrototype(exec);
     if (!prototype->getPropertySlot(exec, propertyName, slot))
       return jsUndefined();
     return slot.getValue(exec, propertyName);
@@ -715,8 +718,7 @@ inline void JSValue::put(ExecState* exec,
                          JSValue value,
                          PutPropertySlot& slot) {
   if (UNLIKELY(!isCell())) {
-    JSImmediate::toObject(asValue(), exec)
-        ->put(exec, propertyName, value, slot);
+    synthesizeObject(exec)->put(exec, propertyName, value, slot);
     return;
   }
   asCell()->put(exec, propertyName, value, slot);
@@ -726,7 +728,7 @@ inline void JSValue::put(ExecState* exec,
                          unsigned propertyName,
                          JSValue value) {
   if (UNLIKELY(!isCell())) {
-    JSImmediate::toObject(asValue(), exec)->put(exec, propertyName, value);
+    synthesizeObject(exec)->put(exec, propertyName, value);
     return;
   }
   asCell()->put(exec, propertyName, value);

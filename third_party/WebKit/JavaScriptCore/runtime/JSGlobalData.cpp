@@ -121,7 +121,7 @@ JSGlobalData::JSGlobalData(bool isShared, const VPtrSet& vptrSet)
       notAnObjectErrorStubStructure(
           JSNotAnObjectErrorStub::createStructure(jsNull())),
       notAnObjectStructure(JSNotAnObject::createStructure(jsNull()))
-#if !USE(ALTERNATE_JSIMMEDIATE)
+#if USE(JSVALUE32)
       ,
       numberStructure(JSNumberCell::createStructure(jsNull()))
 #endif

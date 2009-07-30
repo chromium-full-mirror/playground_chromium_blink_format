@@ -899,9 +899,9 @@ RegisterID* BytecodeGenerator::emitBinaryOp(OpcodeID opcodeID,
   instructions().append(src2->index());
 
   if (opcodeID == op_bitor || opcodeID == op_bitand || opcodeID == op_bitxor ||
-      opcodeID == op_add || opcodeID == op_mul || opcodeID == op_sub) {
+      opcodeID == op_add || opcodeID == op_mul || opcodeID == op_sub ||
+      opcodeID == op_div)
     instructions().append(types.toInt());
-  }
 
   return dst;
 }
@@ -1243,16 +1243,6 @@ RegisterID* BytecodeGenerator::emitResolveWithBase(RegisterID* baseDst,
   instructions().append(addConstant(property));
   instructions().append(0);
   instructions().append(0);
-  return baseDst;
-}
-
-RegisterID* BytecodeGenerator::emitResolveFunction(RegisterID* baseDst,
-                                                   RegisterID* funcDst,
-                                                   const Identifier& property) {
-  emitOpcode(op_resolve_func);
-  instructions().append(baseDst->index());
-  instructions().append(funcDst->index());
-  instructions().append(addConstant(property));
   return baseDst;
 }
 
@@ -1921,6 +1911,9 @@ PassRefPtr<Label> BytecodeGenerator::emitJumpSubroutine(RegisterID* retAddrDst,
   emitOpcode(op_jsr);
   instructions().append(retAddrDst->index());
   instructions().append(finally->offsetFrom(instructions().size()));
+  emitLabel(newLabel().get());  // Record the fact that the next instruction is
+                                // implicitly labeled, because op_sret will
+                                // return to it.
   return finally;
 }
 
@@ -1975,8 +1968,6 @@ static int32_t keyForImmediateSwitch(ExpressionNode* node,
   ASSERT(node->isNumber());
   double value = static_cast<NumberNode*>(node)->value();
   int32_t key = static_cast<int32_t>(value);
-  ASSERT(JSValue::makeInt32Fast(key) &&
-         (JSValue::makeInt32Fast(key).getInt32Fast() == value));
   ASSERT(key == value);
   ASSERT(key >= min);
   ASSERT(key <= max);

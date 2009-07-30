@@ -23,7 +23,6 @@
 
 #include "Identifier.h"
 #include "JSValue.h"
-#include "JSImmediate.h"
 #include "Register.h"
 #include <wtf/Assertions.h>
 #include <wtf/NotFound.h>
@@ -38,13 +37,14 @@ class JSObject;
 
 class PropertySlot {
  public:
-  PropertySlot() : m_offset(WTF::notFound) {
+  PropertySlot() {
     clearBase();
+    clearOffset();
     clearValue();
   }
 
-  explicit PropertySlot(const JSValue base)
-      : m_slotBase(base), m_offset(WTF::notFound) {
+  explicit PropertySlot(const JSValue base) : m_slotBase(base) {
+    clearOffset();
     clearValue();
   }
 
@@ -76,8 +76,9 @@ class PropertySlot {
 
   void setValueSlot(JSValue* valueSlot) {
     ASSERT(valueSlot);
-    m_getValue = JSC_VALUE_SLOT_MARKER;
     clearBase();
+    clearOffset();
+    m_getValue = JSC_VALUE_SLOT_MARKER;
     m_data.valueSlot = valueSlot;
   }
 
@@ -98,16 +99,18 @@ class PropertySlot {
 
   void setValue(JSValue value) {
     ASSERT(value);
-    m_getValue = JSC_VALUE_SLOT_MARKER;
     clearBase();
+    clearOffset();
+    m_getValue = JSC_VALUE_SLOT_MARKER;
     m_value = value;
     m_data.valueSlot = &m_value;
   }
 
   void setRegisterSlot(Register* registerSlot) {
     ASSERT(registerSlot);
-    m_getValue = JSC_REGISTER_SLOT_MARKER;
     clearBase();
+    clearOffset();
+    m_getValue = JSC_REGISTER_SLOT_MARKER;
     m_data.registerSlot = registerSlot;
   }
 
@@ -132,15 +135,9 @@ class PropertySlot {
     m_data.getterFunc = getterFunc;
   }
 
-  void setUndefined() {
-    clearBase();
-    setValue(jsUndefined());
-  }
+  void setUndefined() { setValue(jsUndefined()); }
 
-  JSValue slotBase() const {
-    ASSERT(m_slotBase);
-    return m_slotBase;
-  }
+  JSValue slotBase() const { return m_slotBase; }
 
   void setBase(JSValue base) {
     ASSERT(m_slotBase);
@@ -158,6 +155,14 @@ class PropertySlot {
 #ifndef NDEBUG
     m_value = JSValue();
 #endif
+  }
+
+  void clearOffset() {
+    // Clear offset even in release builds, in case this PropertySlot has been
+    // used before.
+    // (For other data members, we don't need to clear anything because reuse
+    // would meaningfully overwrite them.)
+    m_offset = WTF::notFound;
   }
 
   unsigned index() const { return m_data.index; }

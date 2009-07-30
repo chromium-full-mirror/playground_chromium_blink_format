@@ -328,9 +328,6 @@ class BytecodeGenerator : public WTF::FastAllocBase {
   RegisterID* emitResolveWithBase(RegisterID* baseDst,
                                   RegisterID* propDst,
                                   const Identifier& property);
-  RegisterID* emitResolveFunction(RegisterID* baseDst,
-                                  RegisterID* funcDst,
-                                  const Identifier& property);
 
   void emitMethodCheck();
 
@@ -464,8 +461,8 @@ class BytecodeGenerator : public WTF::FastAllocBase {
 
   typedef HashMap<EncodedJSValue,
                   unsigned,
-                  PtrHash<EncodedJSValue>,
-                  JSValueHashTraits>
+                  EncodedJSValueHash,
+                  EncodedJSValueHashTraits>
       JSValueMap;
 
   struct IdentifierMapIndexHashTraits {

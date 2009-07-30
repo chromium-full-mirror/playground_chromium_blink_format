@@ -393,7 +393,7 @@ RegisterID* FunctionCallResolveNode::emitBytecode(BytecodeGenerator& generator,
   int identifierStart = divot() - startOffset();
   generator.emitExpressionInfo(identifierStart + m_ident.size(), m_ident.size(),
                                0);
-  generator.emitResolveFunction(thisRegister.get(), func.get(), m_ident);
+  generator.emitResolveWithBase(thisRegister.get(), func.get(), m_ident);
   return generator.emitCall(generator.finalDestination(dst, func.get()),
                             func.get(), thisRegister.get(), m_args, divot(),
                             startOffset(), endOffset());
@@ -423,15 +423,14 @@ RegisterID* FunctionCallBracketNode::emitBytecode(BytecodeGenerator& generator,
 
 RegisterID* FunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
                                               RegisterID* dst) {
-  RefPtr<RegisterID> base = generator.emitNode(m_base);
+  RefPtr<RegisterID> function = generator.tempDestination(dst);
+  RefPtr<RegisterID> thisRegister = generator.newTemporary();
+  generator.emitNode(thisRegister.get(), m_base);
   generator.emitExpressionInfo(divot() - m_subexpressionDivotOffset,
                                startOffset() - m_subexpressionDivotOffset,
                                m_subexpressionEndOffset);
   generator.emitMethodCheck();
-  RefPtr<RegisterID> function = generator.emitGetById(
-      generator.tempDestination(dst), base.get(), m_ident);
-  RefPtr<RegisterID> thisRegister =
-      generator.emitMove(generator.newTemporary(), base.get());
+  generator.emitGetById(function.get(), thisRegister.get(), m_ident);
   return generator.emitCall(generator.finalDestination(dst, function.get()),
                             function.get(), thisRegister.get(), m_args, divot(),
                             startOffset(), endOffset());
@@ -1657,9 +1656,6 @@ RegisterID* WhileNode::emitBytecode(BytecodeGenerator& generator,
 
 RegisterID* ForNode::emitBytecode(BytecodeGenerator& generator,
                                   RegisterID* dst) {
-  if (dst == generator.ignoredResult())
-    dst = 0;
-
   RefPtr<LabelScope> scope = generator.newLabelScope(LabelScope::Loop);
 
   generator.emitDebugHook(WillExecuteStatement, firstLine(), lastLine());
@@ -1863,14 +1859,11 @@ static void processClauseList(ClauseListNode* list,
     literalVector.append(clauseExpression);
     if (clauseExpression->isNumber()) {
       double value = static_cast<NumberNode*>(clauseExpression)->value();
-      JSValue jsValue = JSValue::makeInt32Fast(static_cast<int32_t>(value));
-      if ((typeForTable & ~SwitchNumber) || !jsValue ||
-          (jsValue.getInt32Fast() != value)) {
+      int32_t intVal = static_cast<int32_t>(value);
+      if ((typeForTable & ~SwitchNumber) || (intVal != value)) {
         typeForTable = SwitchNeither;
         break;
       }
-      int32_t intVal = static_cast<int32_t>(value);
-      ASSERT(intVal == value);
       if (intVal < min_num)
         min_num = intVal;
       if (intVal > max_num)
@@ -2058,10 +2051,12 @@ RegisterID* ThrowNode::emitBytecode(BytecodeGenerator& generator,
 
 RegisterID* TryNode::emitBytecode(BytecodeGenerator& generator,
                                   RegisterID* dst) {
+  // NOTE: The catch and finally blocks must be labeled explicitly, so the
+  // optimizer knows they may be jumped to from anywhere.
+
   generator.emitDebugHook(WillExecuteStatement, firstLine(), lastLine());
 
   RefPtr<Label> tryStartLabel = generator.newLabel();
-  RefPtr<Label> tryEndLabel = generator.newLabel();
   RefPtr<Label> finallyStart;
   RefPtr<RegisterID> finallyReturnAddr;
   if (m_finallyBlock) {
@@ -2069,15 +2064,20 @@ RegisterID* TryNode::emitBytecode(BytecodeGenerator& generator,
     finallyReturnAddr = generator.newTemporary();
     generator.pushFinallyContext(finallyStart.get(), finallyReturnAddr.get());
   }
+
   generator.emitLabel(tryStartLabel.get());
   generator.emitNode(dst, m_tryBlock);
-  generator.emitLabel(tryEndLabel.get());
 
   if (m_catchBlock) {
-    RefPtr<Label> handlerEndLabel = generator.newLabel();
-    generator.emitJump(handlerEndLabel.get());
+    RefPtr<Label> catchEndLabel = generator.newLabel();
+
+    // Normal path: jump over the catch block.
+    generator.emitJump(catchEndLabel.get());
+
+    // Uncaught exception path: the catch block.
+    RefPtr<Label> here = generator.emitLabel(generator.newLabel().get());
     RefPtr<RegisterID> exceptionRegister = generator.emitCatch(
-        generator.newTemporary(), tryStartLabel.get(), tryEndLabel.get());
+        generator.newTemporary(), tryStartLabel.get(), here.get());
     if (m_catchHasEval) {
       RefPtr<RegisterID> dynamicScopeObject =
           generator.emitNewObject(generator.newTemporary());
@@ -2090,7 +2090,7 @@ RegisterID* TryNode::emitBytecode(BytecodeGenerator& generator,
                                  exceptionRegister.get());
     generator.emitNode(dst, m_catchBlock);
     generator.emitPopScope();
-    generator.emitLabel(handlerEndLabel.get());
+    generator.emitLabel(catchEndLabel.get());
   }
 
   if (m_finallyBlock) {
@@ -2101,23 +2101,20 @@ RegisterID* TryNode::emitBytecode(BytecodeGenerator& generator,
     // approach to not clobbering anything important
     RefPtr<RegisterID> highestUsedRegister = generator.highestUsedRegister();
     RefPtr<Label> finallyEndLabel = generator.newLabel();
+
+    // Normal path: invoke the finally block, then jump over it.
     generator.emitJumpSubroutine(finallyReturnAddr.get(), finallyStart.get());
-    // Use a label to record the subtle fact that sret will return to the
-    // next instruction. sret is the only way to jump without an explicit label.
-    generator.emitLabel(generator.newLabel().get());
     generator.emitJump(finallyEndLabel.get());
 
-    // Finally block for exception path
+    // Uncaught exception path: invoke the finally block, then re-throw the
+    // exception.
+    RefPtr<Label> here = generator.emitLabel(generator.newLabel().get());
     RefPtr<RegisterID> tempExceptionRegister = generator.emitCatch(
-        generator.newTemporary(), tryStartLabel.get(),
-        generator.emitLabel(generator.newLabel().get()).get());
+        generator.newTemporary(), tryStartLabel.get(), here.get());
     generator.emitJumpSubroutine(finallyReturnAddr.get(), finallyStart.get());
-    // Use a label to record the subtle fact that sret will return to the
-    // next instruction. sret is the only way to jump without an explicit label.
-    generator.emitLabel(generator.newLabel().get());
     generator.emitThrow(tempExceptionRegister.get());
 
-    // emit the finally block itself
+    // The finally block.
     generator.emitLabel(finallyStart.get());
     generator.emitNode(dst, m_finallyBlock);
     generator.emitSubroutineReturn(finallyReturnAddr.get());

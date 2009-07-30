@@ -35,10 +35,8 @@ namespace JSC {
 extern const double NaN;
 extern const double Inf;
 
+#if USE(JSVALUE32)
 JSValue jsNumberCell(ExecState*, double);
-JSValue jsAPIMangledNumber(ExecState*, double);
-
-#if !USE(ALTERNATE_JSIMMEDIATE)
 
 class Identifier;
 class JSCell;
@@ -53,7 +51,6 @@ class JSNumberCell : public JSCell {
   friend class JIT;
   friend JSValue jsNumberCell(JSGlobalData*, double);
   friend JSValue jsNumberCell(ExecState*, double);
-  friend JSValue jsAPIMangledNumber(ExecState*, double);
 
  public:
   double value() const { return m_value; }
@@ -68,11 +65,6 @@ class JSNumberCell : public JSCell {
   virtual UString toThisString(ExecState*) const;
   virtual JSObject* toThisObject(ExecState*) const;
   virtual JSValue getJSNumber();
-
-  static const uintptr_t JSAPIMangledMagicNumber = 0xbbadbeef;
-  bool isAPIMangledNumber() const {
-    return m_structure == reinterpret_cast<Structure*>(JSAPIMangledMagicNumber);
-  }
 
   void* operator new(size_t size, ExecState* exec) {
 #ifdef JAVASCRIPTCORE_BUILDING_ALL_IN_ONE_FILE
@@ -101,14 +93,7 @@ class JSNumberCell : public JSCell {
   JSNumberCell(ExecState* exec, double value)
       : JSCell(exec->globalData().numberStructure.get()), m_value(value) {}
 
-  enum APIMangledTag { APIMangled };
-  JSNumberCell(APIMangledTag, double value)
-      : JSCell(reinterpret_cast<Structure*>(JSAPIMangledMagicNumber)),
-        m_value(value) {}
-
   virtual bool getUInt32(uint32_t&) const;
-  virtual bool getTruncatedInt32(int32_t&) const;
-  virtual bool getTruncatedUInt32(uint32_t&) const;
 
   double m_value;
 };
@@ -174,53 +159,27 @@ inline JSValue::JSValue(JSGlobalData* globalData, unsigned i) {
   *this = v ? v : jsNumberCell(globalData, i);
 }
 
-inline JSValue::JSValue(JSGlobalData* globalData, long i) {
-  JSValue v = JSImmediate::from(i);
-  *this = v ? v : jsNumberCell(globalData, i);
-}
-
-inline JSValue::JSValue(JSGlobalData* globalData, unsigned long i) {
-  JSValue v = JSImmediate::from(i);
-  *this = v ? v : jsNumberCell(globalData, i);
-}
-
-inline JSValue::JSValue(JSGlobalData* globalData, long long i) {
-  JSValue v = JSImmediate::from(i);
-  *this = v ? v : jsNumberCell(globalData, static_cast<double>(i));
-}
-
-inline JSValue::JSValue(JSGlobalData* globalData, unsigned long long i) {
-  JSValue v = JSImmediate::from(i);
-  *this = v ? v : jsNumberCell(globalData, static_cast<double>(i));
-}
-
-inline bool JSValue::isDoubleNumber() const {
+inline bool JSValue::isDouble() const {
   return isNumberCell(asValue());
 }
 
-inline double JSValue::getDoubleNumber() const {
+inline double JSValue::asDouble() const {
   return asNumberCell(asValue())->value();
 }
 
 inline bool JSValue::isNumber() const {
-  return JSImmediate::isNumber(asValue()) || isDoubleNumber();
+  return JSImmediate::isNumber(asValue()) || isDouble();
 }
 
 inline double JSValue::uncheckedGetNumber() const {
   ASSERT(isNumber());
   return JSImmediate::isImmediate(asValue()) ? JSImmediate::toDouble(asValue())
-                                             : getDoubleNumber();
+                                             : asDouble();
 }
 
-inline bool JSValue::isAPIMangledNumber() {
-  ASSERT(isNumber());
-  return JSImmediate::isImmediate(asValue())
-             ? false
-             : asNumberCell(asValue())->isAPIMangledNumber();
-}
+#endif  // USE(JSVALUE32)
 
-#else
-
+#if USE(JSVALUE64)
 inline JSValue::JSValue(ExecState*, double d) {
   JSValue v = JSImmediate::from(d);
   ASSERT(v);
@@ -281,35 +240,11 @@ inline JSValue::JSValue(JSGlobalData*, unsigned i) {
   *this = v;
 }
 
-inline JSValue::JSValue(JSGlobalData*, long i) {
-  JSValue v = JSImmediate::from(i);
-  ASSERT(v);
-  *this = v;
+inline bool JSValue::isDouble() const {
+  return JSImmediate::isDouble(asValue());
 }
 
-inline JSValue::JSValue(JSGlobalData*, unsigned long i) {
-  JSValue v = JSImmediate::from(i);
-  ASSERT(v);
-  *this = v;
-}
-
-inline JSValue::JSValue(JSGlobalData*, long long i) {
-  JSValue v = JSImmediate::from(static_cast<double>(i));
-  ASSERT(v);
-  *this = v;
-}
-
-inline JSValue::JSValue(JSGlobalData*, unsigned long long i) {
-  JSValue v = JSImmediate::from(static_cast<double>(i));
-  ASSERT(v);
-  *this = v;
-}
-
-inline bool JSValue::isDoubleNumber() const {
-  return JSImmediate::isDoubleNumber(asValue());
-}
-
-inline double JSValue::getDoubleNumber() const {
+inline double JSValue::asDouble() const {
   return JSImmediate::doubleValue(asValue());
 }
 
@@ -322,7 +257,9 @@ inline double JSValue::uncheckedGetNumber() const {
   return JSImmediate::toDouble(asValue());
 }
 
-#endif
+#endif  // USE(JSVALUE64)
+
+#if USE(JSVALUE32) || USE(JSVALUE64)
 
 inline JSValue::JSValue(ExecState*, char i) {
   ASSERT(JSImmediate::from(i));
@@ -344,26 +281,6 @@ inline JSValue::JSValue(ExecState*, unsigned short i) {
   *this = JSImmediate::from(i);
 }
 
-inline JSValue::JSValue(JSGlobalData*, char i) {
-  ASSERT(JSImmediate::from(i));
-  *this = JSImmediate::from(i);
-}
-
-inline JSValue::JSValue(JSGlobalData*, unsigned char i) {
-  ASSERT(JSImmediate::from(i));
-  *this = JSImmediate::from(i);
-}
-
-inline JSValue::JSValue(JSGlobalData*, short i) {
-  ASSERT(JSImmediate::from(i));
-  *this = JSImmediate::from(i);
-}
-
-inline JSValue::JSValue(JSGlobalData*, unsigned short i) {
-  ASSERT(JSImmediate::from(i));
-  *this = JSImmediate::from(i);
-}
-
 inline JSValue jsNaN(ExecState* exec) {
   return jsNumber(exec, NaN);
 }
@@ -379,10 +296,10 @@ ALWAYS_INLINE JSValue JSValue::toJSNumber(ExecState* exec) const {
 }
 
 inline bool JSValue::getNumber(double& result) const {
-  if (isInt32Fast())
-    result = getInt32Fast();
-  else if (LIKELY(isDoubleNumber()))
-    result = getDoubleNumber();
+  if (isInt32())
+    result = asInt32();
+  else if (LIKELY(isDouble()))
+    result = asDouble();
   else {
     ASSERT(!isNumber());
     return false;
@@ -390,35 +307,7 @@ inline bool JSValue::getNumber(double& result) const {
   return true;
 }
 
-inline bool JSValue::numberToInt32(int32_t& arg) {
-  if (isInt32Fast())
-    arg = getInt32Fast();
-  else if (LIKELY(isDoubleNumber()))
-    arg = JSC::toInt32(getDoubleNumber());
-  else {
-    ASSERT(!isNumber());
-    return false;
-  }
-  return true;
-}
-
-inline bool JSValue::numberToUInt32(uint32_t& arg) {
-  if (isUInt32Fast())
-    arg = getUInt32Fast();
-  else if (LIKELY(isDoubleNumber()))
-    arg = JSC::toUInt32(getDoubleNumber());
-  else if (isInt32Fast()) {
-    // FIXME: I think this case can be merged with the uint case;
-    // toUInt32SlowCase
-    // on a negative value is equivalent to simple static_casting.
-    bool ignored;
-    arg = toUInt32SlowCase(getInt32Fast(), ignored);
-  } else {
-    ASSERT(!isNumber());
-    return false;
-  }
-  return true;
-}
+#endif  // USE(JSVALUE32) || USE(JSVALUE64)
 
 }  // namespace JSC
 

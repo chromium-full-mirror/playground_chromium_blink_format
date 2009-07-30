@@ -182,14 +182,22 @@ struct CellSize;
 
 // cell size needs to be a power of two for certain optimizations in
 // collector.cpp
+#if USE(JSVALUE32)
 template <>
 struct CellSize<sizeof(uint32_t)> {
   static const size_t m_value = 32;
-};  // 32-bit
+};
+#else
+template <>
+struct CellSize<sizeof(uint32_t)> {
+  static const size_t m_value = 64;
+};
+#endif
 template <>
 struct CellSize<sizeof(uint64_t)> {
   static const size_t m_value = 64;
-};                                    // 64-bit
+};
+
 const size_t BLOCK_SIZE = 16 * 4096;  // 64k
 
 // derived constants

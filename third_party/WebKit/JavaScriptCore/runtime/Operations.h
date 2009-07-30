@@ -38,7 +38,7 @@ bool jsIsFunctionType(JSValue);
 
 // ECMA 11.9.3
 inline bool JSValue::equal(ExecState* exec, JSValue v1, JSValue v2) {
-  if (JSImmediate::areBothImmediateIntegerNumbers(v1, v2))
+  if (v1.isInt32() && v2.isInt32())
     return v1 == v2;
 
   return equalSlowCase(exec, v1, v2);
@@ -47,8 +47,6 @@ inline bool JSValue::equal(ExecState* exec, JSValue v1, JSValue v2) {
 ALWAYS_INLINE bool JSValue::equalSlowCaseInline(ExecState* exec,
                                                 JSValue v1,
                                                 JSValue v2) {
-  ASSERT(!JSImmediate::areBothImmediateIntegerNumbers(v1, v2));
-
   do {
     if (v1.isNumber() && v2.isNumber())
       return v1.uncheckedGetNumber() == v2.uncheckedGetNumber();
@@ -61,13 +59,13 @@ ALWAYS_INLINE bool JSValue::equalSlowCaseInline(ExecState* exec,
     if (v1.isUndefinedOrNull()) {
       if (v2.isUndefinedOrNull())
         return true;
-      if (JSImmediate::isImmediate(v2))
+      if (!v2.isCell())
         return false;
       return v2.asCell()->structure()->typeInfo().masqueradesAsUndefined();
     }
 
     if (v2.isUndefinedOrNull()) {
-      if (JSImmediate::isImmediate(v1))
+      if (!v1.isCell())
         return false;
       return v1.asCell()->structure()->typeInfo().masqueradesAsUndefined();
     }
@@ -79,7 +77,7 @@ ALWAYS_INLINE bool JSValue::equalSlowCaseInline(ExecState* exec,
       if (exec->hadException())
         return false;
       v1 = p1;
-      if (JSImmediate::areBothImmediateIntegerNumbers(v1, v2))
+      if (v1.isInt32() && v2.isInt32())
         return v1 == v2;
       continue;
     }
@@ -89,7 +87,7 @@ ALWAYS_INLINE bool JSValue::equalSlowCaseInline(ExecState* exec,
       if (exec->hadException())
         return false;
       v2 = p2;
-      if (JSImmediate::areBothImmediateIntegerNumbers(v1, v2))
+      if (v1.isInt32() && v2.isInt32())
         return v1 == v2;
       continue;
     }
@@ -114,7 +112,7 @@ ALWAYS_INLINE bool JSValue::equalSlowCaseInline(ExecState* exec,
 
 // ECMA 11.9.3
 ALWAYS_INLINE bool JSValue::strictEqualSlowCaseInline(JSValue v1, JSValue v2) {
-  ASSERT(!JSImmediate::isEitherImmediate(v1, v2));
+  ASSERT(v1.isCell() && v2.isCell());
 
   if (v1.asCell()->isString() && v2.asCell()->isString())
     return asString(v1)->value() == asString(v2)->value();
@@ -123,21 +121,21 @@ ALWAYS_INLINE bool JSValue::strictEqualSlowCaseInline(JSValue v1, JSValue v2) {
 }
 
 inline bool JSValue::strictEqual(JSValue v1, JSValue v2) {
-  if (JSImmediate::areBothImmediateIntegerNumbers(v1, v2))
+  if (v1.isInt32() && v2.isInt32())
     return v1 == v2;
 
   if (v1.isNumber() && v2.isNumber())
     return v1.uncheckedGetNumber() == v2.uncheckedGetNumber();
 
-  if (JSImmediate::isEitherImmediate(v1, v2))
+  if (!v1.isCell() || !v2.isCell())
     return v1 == v2;
 
   return strictEqualSlowCaseInline(v1, v2);
 }
 
 inline bool jsLess(CallFrame* callFrame, JSValue v1, JSValue v2) {
-  if (JSValue::areBothInt32Fast(v1, v2))
-    return v1.getInt32Fast() < v2.getInt32Fast();
+  if (v1.isInt32() && v2.isInt32())
+    return v1.asInt32() < v2.asInt32();
 
   double n1;
   double n2;
@@ -160,8 +158,8 @@ inline bool jsLess(CallFrame* callFrame, JSValue v1, JSValue v2) {
 }
 
 inline bool jsLessEq(CallFrame* callFrame, JSValue v1, JSValue v2) {
-  if (JSValue::areBothInt32Fast(v1, v2))
-    return v1.getInt32Fast() <= v2.getInt32Fast();
+  if (v1.isInt32() && v2.isInt32())
+    return v1.asInt32() <= v2.asInt32();
 
   double n1;
   double n2;
@@ -211,9 +209,8 @@ ALWAYS_INLINE JSValue jsAdd(CallFrame* callFrame, JSValue v1, JSValue v2) {
 
   if (rightIsNumber & leftIsString) {
     RefPtr<UString::Rep> value =
-        v2.isInt32Fast()
-            ? concatenate(asString(v1)->value().rep(), v2.getInt32Fast())
-            : concatenate(asString(v1)->value().rep(), right);
+        v2.isInt32() ? concatenate(asString(v1)->value().rep(), v2.asInt32())
+                     : concatenate(asString(v1)->value().rep(), right);
 
     if (!value)
       return throwOutOfMemoryError(callFrame);
@@ -322,8 +319,8 @@ ALWAYS_INLINE JSValue concatenateStrings(CallFrame* callFrame,
     JSValue v = strings[i].jsValue();
     if (LIKELY(v.isString()))
       result.append(asString(v)->value());
-    else if (v.isInt32Fast())
-      result.appendNumeric(v.getInt32Fast());
+    else if (v.isInt32())
+      result.appendNumeric(v.asInt32());
     else {
       double d;
       if (v.getNumber(d))
