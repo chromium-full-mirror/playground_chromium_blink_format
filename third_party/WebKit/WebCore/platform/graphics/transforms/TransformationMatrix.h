@@ -341,7 +341,7 @@ class TransformationMatrix {
   }
 
   // result = *this * t (i.e., a multRight)
-  TransformationMatrix operator*(const TransformationMatrix& t) {
+  TransformationMatrix operator*(const TransformationMatrix& t) const {
     TransformationMatrix result = t;
     result.multLeft(*this);
     return result;

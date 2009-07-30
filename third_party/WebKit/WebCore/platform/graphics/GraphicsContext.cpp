@@ -295,6 +295,7 @@ void GraphicsContext::drawImage(Image* image,
   drawImage(image, FloatRect(dest), srcRect, op, useLowQualityScale);
 }
 
+#if !PLATFORM(WINCE) || PLATFORM(QT)
 void GraphicsContext::drawText(const Font& font,
                                const TextRun& run,
                                const IntPoint& point,
@@ -305,6 +306,7 @@ void GraphicsContext::drawText(const Font& font,
 
   font.drawText(this, run, point, from, to);
 }
+#endif
 
 void GraphicsContext::drawBidiText(const Font& font,
                                    const TextRun& run,
