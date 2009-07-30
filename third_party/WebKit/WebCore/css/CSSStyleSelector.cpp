@@ -1427,8 +1427,14 @@ void CSSStyleSelector::keyframeStylesForAnimation(
     // Add all the animating properties to the list
     CSSMutableStyleDeclaration::const_iterator end = kf->style()->end();
     for (CSSMutableStyleDeclaration::const_iterator it = kf->style()->begin();
-         it != end; ++it)
-      list.addProperty((*it).id());
+         it != end; ++it) {
+      int property = (*it).id();
+      // Timing-function within keyframes is special, because it is not
+      // animated; it just
+      // describes the timing function between this keyframe and the next.
+      if (property != CSSPropertyWebkitAnimationTimingFunction)
+        list.addProperty((*it).id());
+    }
 
     // Add this keyframe style to all the indicated key times
     Vector<float> keys;
