@@ -42,22 +42,16 @@ namespace WebCore {
 class ScriptExecutionContext;
 class WorkerScriptLoaderClient;
 
-enum URLCompletionPolicy { CompleteURL, DoNotCompleteURL };
-
-enum CrossOriginLoadPolicy { DenyCrossOriginLoad, AllowCrossOriginLoad };
-
 class WorkerScriptLoader : public ThreadableLoaderClient {
  public:
   WorkerScriptLoader();
 
   void loadSynchronously(ScriptExecutionContext*,
-                         const String& url,
-                         URLCompletionPolicy,
-                         CrossOriginLoadPolicy);
+                         const KURL&,
+                         CrossOriginRedirectPolicy);
   void loadAsynchronously(ScriptExecutionContext*,
-                          const String& url,
-                          URLCompletionPolicy,
-                          CrossOriginLoadPolicy,
+                          const KURL&,
+                          CrossOriginRedirectPolicy,
                           WorkerScriptLoaderClient*);
 
   void notifyError();
@@ -75,10 +69,7 @@ class WorkerScriptLoader : public ThreadableLoaderClient {
   virtual void didReceiveAuthenticationCancellation(const ResourceResponse&);
 
  private:
-  PassOwnPtr<ResourceRequest> createResourceRequest(ScriptExecutionContext*,
-                                                    const String& url,
-                                                    URLCompletionPolicy,
-                                                    CrossOriginLoadPolicy);
+  PassOwnPtr<ResourceRequest> createResourceRequest();
   void notifyFinished();
 
   WorkerScriptLoaderClient* m_client;
