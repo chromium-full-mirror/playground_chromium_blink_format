@@ -2483,7 +2483,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_post_inc) {
 
 #if USE(JSVALUE32_64)
 
-DEFINE_STUB_FUNCTION(bool, op_eq) {
+DEFINE_STUB_FUNCTION(int, op_eq) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   JSValue src1 = stackFrame.args[0].jsValue();
@@ -2583,7 +2583,7 @@ start:
   goto start;
 }
 
-DEFINE_STUB_FUNCTION(bool, op_eq_strings) {
+DEFINE_STUB_FUNCTION(int, op_eq_strings) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   JSString* string1 = stackFrame.args[0].jsString();
@@ -2596,7 +2596,7 @@ DEFINE_STUB_FUNCTION(bool, op_eq_strings) {
 
 #else  // USE(JSVALUE32_64)
 
-DEFINE_STUB_FUNCTION(bool, op_eq) {
+DEFINE_STUB_FUNCTION(int, op_eq) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   JSValue src1 = stackFrame.args[0].jsValue();
