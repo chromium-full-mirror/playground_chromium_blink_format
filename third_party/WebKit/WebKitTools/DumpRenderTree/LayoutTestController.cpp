@@ -428,6 +428,20 @@ static JSValueRef decodeHostNameCallback(JSContextRef context,
   return JSValueMakeString(context, decodedHostName.get());
 }
 
+static JSValueRef disableImageLoadingCallback(JSContextRef context,
+                                              JSObjectRef function,
+                                              JSObjectRef thisObject,
+                                              size_t argumentCount,
+                                              const JSValueRef arguments[],
+                                              JSValueRef* exception) {
+  // Has mac implementation, needs windows implementation
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->disableImageLoading();
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef dispatchPendingLoadRequestsCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -1325,6 +1339,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"clearPersistentUserStyleSheet", clearPersistentUserStyleSheetCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"decodeHostName", decodeHostNameCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"disableImageLoading", disableImageLoadingCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dispatchPendingLoadRequests", dispatchPendingLoadRequestsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
