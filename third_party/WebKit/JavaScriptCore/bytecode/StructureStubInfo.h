@@ -35,11 +35,25 @@
 
 namespace JSC {
 
+static const int access_get_by_id_self = 0;
+static const int access_get_by_id_proto = 1;
+static const int access_get_by_id_chain = 2;
+static const int access_get_by_id_self_list = 3;
+static const int access_get_by_id_proto_list = 4;
+static const int access_put_by_id_transition = 5;
+static const int access_put_by_id_replace = 6;
+static const int access_get_by_id = 7;
+static const int access_put_by_id = 8;
+static const int access_get_by_id_generic = 9;
+static const int access_put_by_id_generic = 10;
+static const int access_get_array_length = 11;
+static const int access_get_string_length = 12;
+
 struct StructureStubInfo {
-  StructureStubInfo(OpcodeID opcodeID) : opcodeID(opcodeID) {}
+  StructureStubInfo(int accessType) : accessType(accessType), seen(false) {}
 
   void initGetByIdSelf(Structure* baseObjectStructure) {
-    opcodeID = op_get_by_id_self;
+    accessType = access_get_by_id_self;
 
     u.getByIdSelf.baseObjectStructure = baseObjectStructure;
     baseObjectStructure->ref();
@@ -47,7 +61,7 @@ struct StructureStubInfo {
 
   void initGetByIdProto(Structure* baseObjectStructure,
                         Structure* prototypeStructure) {
-    opcodeID = op_get_by_id_proto;
+    accessType = access_get_by_id_proto;
 
     u.getByIdProto.baseObjectStructure = baseObjectStructure;
     baseObjectStructure->ref();
@@ -57,7 +71,7 @@ struct StructureStubInfo {
   }
 
   void initGetByIdChain(Structure* baseObjectStructure, StructureChain* chain) {
-    opcodeID = op_get_by_id_chain;
+    accessType = access_get_by_id_chain;
 
     u.getByIdChain.baseObjectStructure = baseObjectStructure;
     baseObjectStructure->ref();
@@ -68,7 +82,7 @@ struct StructureStubInfo {
 
   void initGetByIdSelfList(PolymorphicAccessStructureList* structureList,
                            int listSize) {
-    opcodeID = op_get_by_id_self_list;
+    accessType = access_get_by_id_self_list;
 
     u.getByIdProtoList.structureList = structureList;
     u.getByIdProtoList.listSize = listSize;
@@ -76,7 +90,7 @@ struct StructureStubInfo {
 
   void initGetByIdProtoList(PolymorphicAccessStructureList* structureList,
                             int listSize) {
-    opcodeID = op_get_by_id_proto_list;
+    accessType = access_get_by_id_proto_list;
 
     u.getByIdProtoList.structureList = structureList;
     u.getByIdProtoList.listSize = listSize;
@@ -87,7 +101,7 @@ struct StructureStubInfo {
   void initPutByIdTransition(Structure* previousStructure,
                              Structure* structure,
                              StructureChain* chain) {
-    opcodeID = op_put_by_id_transition;
+    accessType = access_put_by_id_transition;
 
     u.putByIdTransition.previousStructure = previousStructure;
     previousStructure->ref();
@@ -100,7 +114,7 @@ struct StructureStubInfo {
   }
 
   void initPutByIdReplace(Structure* baseObjectStructure) {
-    opcodeID = op_put_by_id_replace;
+    accessType = access_put_by_id_replace;
 
     u.putByIdReplace.baseObjectStructure = baseObjectStructure;
     baseObjectStructure->ref();
@@ -108,7 +122,13 @@ struct StructureStubInfo {
 
   void deref();
 
-  OpcodeID opcodeID;
+  bool seenOnce() { return seen; }
+
+  void setSeen() { seen = true; }
+
+  int accessType : 31;
+  int seen : 1;
+
   union {
     struct {
       Structure* baseObjectStructure;
