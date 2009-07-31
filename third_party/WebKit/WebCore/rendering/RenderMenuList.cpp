@@ -326,6 +326,12 @@ String RenderMenuList::itemText(unsigned listIndex) const {
   return String();
 }
 
+String RenderMenuList::itemToolTip(unsigned listIndex) const {
+  SelectElement* select = toSelectElement(static_cast<Element*>(node()));
+  Element* element = select->listItems()[listIndex];
+  return element->title();
+}
+
 bool RenderMenuList::itemIsEnabled(unsigned listIndex) const {
   SelectElement* select = toSelectElement(static_cast<Element*>(node()));
   Element* element = select->listItems()[listIndex];
