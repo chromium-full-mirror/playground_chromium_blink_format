@@ -29,6 +29,10 @@
 
 #include <string.h>
 
+static void webkit_web_navigation_action_set_target_frame(
+    WebKitWebNavigationAction* navigationAction,
+    const gchar* targetFrame);
+
 /**
  * SECTION:webkitwebnavigationaction
  * @short_description: Object used to report details of navigation actions
@@ -43,6 +47,7 @@ struct _WebKitWebNavigationActionPrivate {
   gchar* originalUri;
   gint button;
   gint modifier_state;
+  gchar* targetFrame;
 };
 
 #define WEBKIT_WEB_NAVIGATION_ACTION_GET_PRIVATE(obj)                    \
@@ -55,7 +60,8 @@ enum {
   PROP_REASON,
   PROP_ORIGINAL_URI,
   PROP_BUTTON,
-  PROP_MODIFIER_STATE
+  PROP_MODIFIER_STATE,
+  PROP_TARGET_FRAME
 };
 
 G_DEFINE_TYPE(WebKitWebNavigationAction,
@@ -86,6 +92,10 @@ static void webkit_web_navigation_action_get_property(GObject* object,
       g_value_set_int(value, webkit_web_navigation_action_get_modifier_state(
                                  navigationAction));
       break;
+    case PROP_TARGET_FRAME:
+      g_value_set_string(value, webkit_web_navigation_action_get_target_frame(
+                                    navigationAction));
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, propertyId, pspec);
       break;
@@ -114,6 +124,10 @@ static void webkit_web_navigation_action_set_property(GObject* object,
       break;
     case PROP_MODIFIER_STATE:
       priv->modifier_state = g_value_get_int(value);
+      break;
+    case PROP_TARGET_FRAME:
+      webkit_web_navigation_action_set_target_frame(navigationAction,
+                                                    g_value_get_string(value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, propertyId, pspec);
@@ -220,6 +234,20 @@ static void webkit_web_navigation_action_class_init(
           "modifier-state", _("Modifier state"),
           _("A bitmask representing the state of the modifier keys"), 0,
           G_MAXINT, 0,
+          (GParamFlags)(WEBKIT_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY)));
+
+  /**
+   * WebKitWebNavigationAction:target-frame:
+   *
+   * The target frame for the navigation.
+   *
+   * Since: 1.1.13
+   */
+  g_object_class_install_property(
+      objectClass, PROP_TARGET_FRAME,
+      g_param_spec_string(
+          "target-frame", _("Target frame"),
+          _("The target frame for the navigation"), NULL,
           (GParamFlags)(WEBKIT_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY)));
 
   g_type_class_add_private(requestClass,
@@ -341,4 +369,33 @@ gint webkit_web_navigation_action_get_modifier_state(
   g_return_val_if_fail(WEBKIT_IS_WEB_NAVIGATION_ACTION(navigationAction), 0);
 
   return navigationAction->priv->modifier_state;
+}
+
+/**
+ * webkit_web_navigation_action_get_target_frame:
+ * @navigationAction: a #WebKitWebNavigationAction
+ *
+ * Returns the target frame of the action.
+ *
+ * Return value: the target frame of the action or NULL
+ * if there is no target.
+ *
+ * Since: 1.1.13
+ */
+G_CONST_RETURN gchar* webkit_web_navigation_action_get_target_frame(
+    WebKitWebNavigationAction* navigationAction) {
+  g_return_val_if_fail(WEBKIT_IS_WEB_NAVIGATION_ACTION(navigationAction), NULL);
+
+  return navigationAction->priv->targetFrame;
+}
+
+static void webkit_web_navigation_action_set_target_frame(
+    WebKitWebNavigationAction* navigationAction,
+    const gchar* targetFrame) {
+  if (!g_strcmp0(navigationAction->priv->targetFrame, targetFrame))
+    return;
+
+  g_free(navigationAction->priv->targetFrame);
+  navigationAction->priv->targetFrame = g_strdup(targetFrame);
+  g_object_notify(G_OBJECT(navigationAction), "target-frame");
 }
