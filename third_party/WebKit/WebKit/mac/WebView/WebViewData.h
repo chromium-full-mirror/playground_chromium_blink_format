@@ -143,7 +143,7 @@ extern int pluginDatabaseClientCount;
   int acceleratedFramesCount;
   // Run loop observer used to implement the compositing equivalent of
   // -viewWillDraw
-  CFRunLoopObserverRef viewUpdateRunLoopObserver;
+  CFRunLoopObserverRef layerSyncRunLoopObserver;
 #endif
 
   NSPasteboard* insertionPasteboard;

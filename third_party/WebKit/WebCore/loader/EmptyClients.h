@@ -174,7 +174,7 @@ class EmptyChromeClient : public ChromeClient {
 #if USE(ACCELERATED_COMPOSITING)
   virtual void attachRootGraphicsLayer(Frame*, GraphicsLayer*){};
   virtual void setNeedsOneShotDrawingSynchronization(){};
-  virtual void scheduleViewUpdate(){};
+  virtual void scheduleCompositingLayerSync(){};
 #endif
 };
 

@@ -65,7 +65,7 @@ class RenderLayerCompositor {
   // Copy the acceleratedCompositingEnabledFlag from Settings
   void cacheAcceleratedCompositingEnabledFlag();
 
-  // Called when the layer hierarchy needs to be udpated (compositing layers
+  // Called when the layer hierarchy needs to be updated (compositing layers
   // have been
   // created, destroyed or re-parented).
   void setCompositingLayersNeedRebuild(bool needRebuild = true);
@@ -82,7 +82,7 @@ class RenderLayerCompositor {
     return m_compositingConsultsOverlap;
   }
 
-  void scheduleViewUpdate();
+  void scheduleSync();
 
   // Rebuild the tree of compositing layers
   void updateCompositingLayers(RenderLayer* updateRoot = 0);

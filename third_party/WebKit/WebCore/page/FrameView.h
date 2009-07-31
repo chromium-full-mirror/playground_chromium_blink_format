@@ -102,6 +102,10 @@ class FrameView : public ScrollView {
   // content rendered via the normal painting path.
   void setNeedsOneShotDrawingSynchronization();
 #endif
+  // Only used with accelerated compositing, but outside the #ifdef to make
+  // linkage easier.
+  // Returns true if the sync was completed.
+  bool syncCompositingStateRecursive();
 
   void didMoveOnscreen();
   void willMoveOffscreen();
