@@ -116,6 +116,11 @@ class QWEBKIT_EXPORT QWebSettings {
   static void setOfflineStorageDefaultQuota(qint64 maximumSize);
   static qint64 offlineStorageDefaultQuota();
 
+  static void setOfflineWebApplicationCachePath(const QString& path);
+  static QString offlineWebApplicationCachePath();
+  static void setOfflineWebApplicationCacheQuota(qint64 maximumSize);
+  static qint64 offlineWebApplicationCacheQuota();
+
   static void clearMemoryCaches();
 
   inline QWebSettingsPrivate* handle() const { return d; }
