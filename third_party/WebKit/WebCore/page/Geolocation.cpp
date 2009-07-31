@@ -145,13 +145,11 @@ void Geolocation::setIsAllowed(bool allowed) {
   }
 }
 
-void Geolocation::sendErrorToOneShots(PositionError* error) {
-  Vector<RefPtr<GeoNotifier>> copy;
-  copyToVector(m_oneShots, copy);
-
-  Vector<RefPtr<GeoNotifier>>::const_iterator end = copy.end();
-  for (Vector<RefPtr<GeoNotifier>>::const_iterator it = copy.begin(); it != end;
-       ++it) {
+void Geolocation::sendError(Vector<RefPtr<GeoNotifier>>& notifiers,
+                            PositionError* error) {
+  Vector<RefPtr<GeoNotifier>>::const_iterator end = notifiers.end();
+  for (Vector<RefPtr<GeoNotifier>>::const_iterator it = notifiers.begin();
+       it != end; ++it) {
     RefPtr<GeoNotifier> notifier = *it;
 
     if (notifier->m_errorCallback)
@@ -159,17 +157,36 @@ void Geolocation::sendErrorToOneShots(PositionError* error) {
   }
 }
 
+void Geolocation::sendErrorToOneShots(PositionError* error) {
+  Vector<RefPtr<GeoNotifier>> copy;
+  copyToVector(m_oneShots, copy);
+
+  sendError(copy, error);
+}
+
 void Geolocation::sendErrorToWatchers(PositionError* error) {
   Vector<RefPtr<GeoNotifier>> copy;
   copyValuesToVector(m_watchers, copy);
 
-  Vector<RefPtr<GeoNotifier>>::const_iterator end = copy.end();
-  for (Vector<RefPtr<GeoNotifier>>::const_iterator it = copy.begin(); it != end;
-       ++it) {
-    RefPtr<GeoNotifier> notifier = *it;
+  sendError(copy, error);
+}
 
-    if (notifier->m_errorCallback)
-      notifier->m_errorCallback->handleEvent(error);
+void Geolocation::sendPosition(Vector<RefPtr<GeoNotifier>>& notifiers,
+                               Geoposition* position) {
+  Vector<RefPtr<GeoNotifier>>::const_iterator end = notifiers.end();
+  for (Vector<RefPtr<GeoNotifier>>::const_iterator it = notifiers.begin();
+       it != end; ++it) {
+    RefPtr<GeoNotifier> notifier = *it;
+    ASSERT(notifier->m_successCallback);
+
+    notifier->m_timer.stop();
+    bool shouldCallErrorCallback = false;
+    notifier->m_successCallback->handleEvent(position, shouldCallErrorCallback);
+    if (shouldCallErrorCallback) {
+      RefPtr<PositionError> error = PositionError::create(
+          PositionError::UNKNOWN_ERROR, "An exception was thrown");
+      handleError(error.get());
+    }
   }
 }
 
@@ -177,42 +194,14 @@ void Geolocation::sendPositionToOneShots(Geoposition* position) {
   Vector<RefPtr<GeoNotifier>> copy;
   copyToVector(m_oneShots, copy);
 
-  Vector<RefPtr<GeoNotifier>>::const_iterator end = copy.end();
-  for (Vector<RefPtr<GeoNotifier>>::const_iterator it = copy.begin(); it != end;
-       ++it) {
-    RefPtr<GeoNotifier> notifier = *it;
-    ASSERT(notifier->m_successCallback);
-
-    notifier->m_timer.stop();
-    bool shouldCallErrorCallback = false;
-    notifier->m_successCallback->handleEvent(position, shouldCallErrorCallback);
-    if (shouldCallErrorCallback) {
-      RefPtr<PositionError> error = PositionError::create(
-          PositionError::UNKNOWN_ERROR, "An exception was thrown");
-      handleError(error.get());
-    }
-  }
+  sendPosition(copy, position);
 }
 
 void Geolocation::sendPositionToWatchers(Geoposition* position) {
   Vector<RefPtr<GeoNotifier>> copy;
   copyValuesToVector(m_watchers, copy);
 
-  Vector<RefPtr<GeoNotifier>>::const_iterator end = copy.end();
-  for (Vector<RefPtr<GeoNotifier>>::const_iterator it = copy.begin(); it != end;
-       ++it) {
-    RefPtr<GeoNotifier> notifier = *it;
-    ASSERT(notifier->m_successCallback);
-
-    notifier->m_timer.stop();
-    bool shouldCallErrorCallback = false;
-    notifier->m_successCallback->handleEvent(position, shouldCallErrorCallback);
-    if (shouldCallErrorCallback) {
-      RefPtr<PositionError> error = PositionError::create(
-          PositionError::UNKNOWN_ERROR, "An exception was thrown");
-      handleError(error.get());
-    }
-  }
+  sendPosition(copy, position);
 }
 
 void Geolocation::startTimer(Vector<RefPtr<GeoNotifier>>& notifiers) {
