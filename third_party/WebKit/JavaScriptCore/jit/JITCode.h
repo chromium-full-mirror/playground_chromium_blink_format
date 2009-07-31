@@ -70,9 +70,6 @@ class JITCode {
                          JSGlobalData* globalData,
                          JSValue* exception) {
     return JSValue::decode(ctiTrampoline(
-#if PLATFORM(X86_64)
-        0, 0, 0, 0, 0, 0,
-#endif
         m_ref.m_code.executableAddress(), registerFile, callFrame, exception,
         Profiler::enabledProfilerReference(), globalData));
   }

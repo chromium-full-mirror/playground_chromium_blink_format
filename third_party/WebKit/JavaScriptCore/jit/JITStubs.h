@@ -84,6 +84,13 @@ struct JITStackFrame {
   JITStubArg args[6];
   void* padding[2];  // Maintain 32-byte stack alignment (possibly overkill).
 
+  void* code;
+  RegisterFile* registerFile;
+  CallFrame* callFrame;
+  JSValue* exception;
+  Profiler** enabledProfilerReference;
+  JSGlobalData* globalData;
+
   void* savedRBX;
   void* savedR15;
   void* savedR14;
@@ -91,13 +98,6 @@ struct JITStackFrame {
   void* savedR12;
   void* savedRBP;
   void* savedRIP;
-
-  void* code;
-  RegisterFile* registerFile;
-  CallFrame* callFrame;
-  JSValue* exception;
-  Profiler** enabledProfilerReference;
-  JSGlobalData* globalData;
 
   // When JIT code makes a call, it pushes its return address just below the
   // rest of the stack.
@@ -218,25 +218,12 @@ union VoidPtrPairUnion {
 
 extern "C" void ctiVMThrowTrampoline();
 extern "C" void ctiOpThrowNotCaught();
-extern "C" EncodedJSValue ctiTrampoline(
-#if PLATFORM(X86_64)
-    // FIXME: (bug #22910) this will force all arguments onto the stack
-    // (regparm(0) does not appear to have any effect).
-    // We can allow register passing here, and move the writes of these values
-    // into the trampoline.
-    void*,
-    void*,
-    void*,
-    void*,
-    void*,
-    void*,
-#endif
-    void* code,
-    RegisterFile*,
-    CallFrame*,
-    JSValue* exception,
-    Profiler**,
-    JSGlobalData*);
+extern "C" EncodedJSValue ctiTrampoline(void* code,
+                                        RegisterFile*,
+                                        CallFrame*,
+                                        JSValue* exception,
+                                        Profiler**,
+                                        JSGlobalData*);
 
 class JITThunks {
  public:
