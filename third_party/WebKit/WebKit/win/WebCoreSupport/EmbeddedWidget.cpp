@@ -37,14 +37,14 @@
 
 using namespace WebCore;
 
-EmbeddedWidget* EmbeddedWidget::create(IWebEmbeddedView* view,
-                                       Element* element,
-                                       HWND parentWindow,
-                                       const IntSize& size) {
-  EmbeddedWidget* widget = new EmbeddedWidget(view, element);
+PassRefPtr<EmbeddedWidget> EmbeddedWidget::create(IWebEmbeddedView* view,
+                                                  Element* element,
+                                                  HWND parentWindow,
+                                                  const IntSize& size) {
+  RefPtr<EmbeddedWidget> widget = adoptRef(new EmbeddedWidget(view, element));
 
   widget->createWindow(parentWindow, size);
-  return widget;
+  return widget.release();
 }
 
 EmbeddedWidget::~EmbeddedWidget() {
