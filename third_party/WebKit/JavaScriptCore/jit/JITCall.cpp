@@ -457,7 +457,7 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
   move(Imm32(argCount), regT1);
 
   m_callStructureStubCompilationInfo[callLinkInfoIndex].callReturnLocation =
-      emitNakedCall(m_globalData->jitStubs.ctiVirtualCallLink());
+      emitNakedCall(m_globalData->jitStubs.ctiVirtualCallPreLink());
 
   // Put the return value in dst.
   emitStore(dst, regT1, regT0);
@@ -799,7 +799,7 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
   move(Imm32(argCount), regT1);
 
   m_callStructureStubCompilationInfo[callLinkInfoIndex].callReturnLocation =
-      emitNakedCall(m_globalData->jitStubs.ctiVirtualCallLink());
+      emitNakedCall(m_globalData->jitStubs.ctiVirtualCallPreLink());
 
   // Put the return value in dst.
   emitPutVirtualRegister(dst);

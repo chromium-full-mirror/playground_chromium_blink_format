@@ -632,7 +632,7 @@ void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
   // (and, if a new JSFunction happened to be constructed at the same location,
   // we could get a false positive
   // match).  Reset the check so it no longer matches.
-  RepatchBuffer repatchBuffer(callLinkInfo->ownerCodeBlock.get());
+  RepatchBuffer repatchBuffer(callLinkInfo->ownerCodeBlock);
 #if USE(JSVALUE32_64)
   repatchBuffer.repatch(callLinkInfo->hotPathBegin, 0);
 #else

@@ -1254,7 +1254,7 @@ RegisterID* BytecodeGenerator::emitGetById(RegisterID* dst,
                                            RegisterID* base,
                                            const Identifier& property) {
 #if ENABLE(JIT)
-  m_codeBlock->addStructureStubInfo(StructureStubInfo(access_get_by_id));
+  m_codeBlock->addStructureStubInfo(StructureStubInfo(op_get_by_id));
 #else
   m_codeBlock->addPropertyAccessInstruction(instructions().size());
 #endif
@@ -1274,7 +1274,7 @@ RegisterID* BytecodeGenerator::emitPutById(RegisterID* base,
                                            const Identifier& property,
                                            RegisterID* value) {
 #if ENABLE(JIT)
-  m_codeBlock->addStructureStubInfo(StructureStubInfo(access_put_by_id));
+  m_codeBlock->addStructureStubInfo(StructureStubInfo(op_put_by_id));
 #else
   m_codeBlock->addPropertyAccessInstruction(instructions().size());
 #endif

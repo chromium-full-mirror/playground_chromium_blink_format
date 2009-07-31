@@ -36,7 +36,6 @@
 #include "JSGlobalObject.h"
 #include "JumpTable.h"
 #include "Nodes.h"
-#include "PtrAndFlags.h"
 #include "RegExp.h"
 #include "UString.h"
 #include <wtf/FastAllocBase.h>
@@ -58,8 +57,6 @@
 static const int FirstConstantRegisterIndex = 0x40000000;
 
 namespace JSC {
-
-enum HasSeenShouldRepatch { hasSeenShouldRepatch };
 
 class ExecState;
 
@@ -108,31 +105,21 @@ struct CallLinkInfo {
   CodeLocationNearCall callReturnLocation;
   CodeLocationDataLabelPtr hotPathBegin;
   CodeLocationNearCall hotPathOther;
-  PtrAndFlags<CodeBlock, HasSeenShouldRepatch> ownerCodeBlock;
+  CodeBlock* ownerCodeBlock;
   CodeBlock* callee;
   unsigned position;
 
   void setUnlinked() { callee = 0; }
   bool isLinked() { return callee; }
-
-  bool seenOnce() { return ownerCodeBlock.isFlagSet(hasSeenShouldRepatch); }
-
-  void setSeen() { ownerCodeBlock.setFlag(hasSeenShouldRepatch); }
 };
 
 struct MethodCallLinkInfo {
   MethodCallLinkInfo() : cachedStructure(0), cachedPrototypeStructure(0) {}
 
-  bool seenOnce() {
-    return cachedPrototypeStructure.isFlagSet(hasSeenShouldRepatch);
-  }
-
-  void setSeen() { cachedPrototypeStructure.setFlag(hasSeenShouldRepatch); }
-
   CodeLocationCall callReturnLocation;
   CodeLocationDataLabelPtr structureLabel;
   Structure* cachedStructure;
-  PtrAndFlags<Structure, HasSeenShouldRepatch> cachedPrototypeStructure;
+  Structure* cachedPrototypeStructure;
 };
 
 struct FunctionRegisterInfo {
