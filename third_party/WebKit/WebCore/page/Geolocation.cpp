@@ -71,6 +71,8 @@ Geolocation::Geolocation(Frame* frame)
 
 void Geolocation::disconnectFrame() {
   m_service->stopUpdating();
+  if (m_frame && m_frame->document())
+    m_frame->document()->setUsingGeolocation(false);
   m_frame = 0;
 }
 
@@ -239,6 +241,9 @@ void Geolocation::handleError(PositionError* error) {
   sendErrorToWatchers(error);
 
   m_oneShots.clear();
+
+  if (!hasListeners())
+    m_service->stopUpdating();
 }
 
 void Geolocation::requestPermission() {
