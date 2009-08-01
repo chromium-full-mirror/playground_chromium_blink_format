@@ -101,6 +101,7 @@ class LayoutTestController : public QObject {
                                             const QString& elementId);
   unsigned numberOfActiveAnimations() const;
   void dispatchPendingLoadRequests();
+  void disableImageLoading();
 
   void setDatabaseQuota(int size);
   void clearAllDatabases();
