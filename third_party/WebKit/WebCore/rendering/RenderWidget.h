@@ -78,14 +78,14 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
   int m_refCount;
 };
 
-inline RenderWidget* toRenderWidget(RenderObject* o) {
-  ASSERT(!o || o->isWidget());
-  return static_cast<RenderWidget*>(o);
+inline RenderWidget* toRenderWidget(RenderObject* object) {
+  ASSERT(!object || object->isWidget());
+  return static_cast<RenderWidget*>(object);
 }
 
-inline const RenderWidget* toRenderWidget(const RenderObject* o) {
-  ASSERT(!o || o->isWidget());
-  return static_cast<const RenderWidget*>(o);
+inline const RenderWidget* toRenderWidget(const RenderObject* object) {
+  ASSERT(!object || object->isWidget());
+  return static_cast<const RenderWidget*>(object);
 }
 
 // This will catch anyone doing an unnecessary cast.

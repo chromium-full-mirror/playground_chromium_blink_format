@@ -237,14 +237,14 @@ class RenderView : public RenderBlock {
 #endif
 };
 
-inline RenderView* toRenderView(RenderObject* o) {
-  ASSERT(!o || o->isRenderView());
-  return static_cast<RenderView*>(o);
+inline RenderView* toRenderView(RenderObject* object) {
+  ASSERT(!object || object->isRenderView());
+  return static_cast<RenderView*>(object);
 }
 
-inline const RenderView* toRenderView(const RenderObject* o) {
-  ASSERT(!o || o->isRenderView());
-  return static_cast<const RenderView*>(o);
+inline const RenderView* toRenderView(const RenderObject* object) {
+  ASSERT(!object || object->isRenderView());
+  return static_cast<const RenderView*>(object);
 }
 
 // This will catch anyone doing an unnecessary cast.

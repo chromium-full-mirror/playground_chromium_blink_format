@@ -89,7 +89,7 @@ int FixedTableLayout::calcWidthArray(int) {
   Length grpWidth;
   while (child) {
     if (child->isTableCol()) {
-      RenderTableCol* col = static_cast<RenderTableCol*>(child);
+      RenderTableCol* col = toRenderTableCol(child);
       if (col->firstChild())
         grpWidth = col->style()->width();
       else {
@@ -126,7 +126,7 @@ int FixedTableLayout::calcWidthArray(int) {
           currentEffectiveColumn++;
         }
       }
-      static_cast<RenderTableCol*>(child)->calcPrefWidths();
+      toRenderTableCol(child)->calcPrefWidths();
     } else
       break;
 
@@ -154,7 +154,7 @@ int FixedTableLayout::calcWidthArray(int) {
     child = firstRow->firstChild();
     while (child) {
       if (child->isTableCell()) {
-        RenderTableCell* cell = static_cast<RenderTableCell*>(child);
+        RenderTableCell* cell = toRenderTableCell(child);
         if (cell->prefWidthsDirty())
           cell->calcPrefWidths();
 

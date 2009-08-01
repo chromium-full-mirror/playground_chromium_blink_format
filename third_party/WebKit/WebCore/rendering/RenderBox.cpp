@@ -1679,7 +1679,7 @@ int RenderBox::calcPercentageHeight(const Length& height) {
       // cases, but it is
       // preferable to the alternative (sizing intrinsically and making the row
       // end up too big).
-      RenderTableCell* cell = static_cast<RenderTableCell*>(cb);
+      RenderTableCell* cell = toRenderTableCell(cb);
       if (scrollsOverflowY() && (!cell->style()->height().isAuto() ||
                                  !cell->table()->style()->height().isAuto()))
         return 0;

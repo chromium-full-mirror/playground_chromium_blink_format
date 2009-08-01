@@ -170,15 +170,15 @@ class RenderBoxModelObject : public RenderObject {
   static bool s_layerWasSelfPainting;
 };
 
-inline RenderBoxModelObject* toRenderBoxModelObject(RenderObject* o) {
-  ASSERT(!o || o->isBoxModelObject());
-  return static_cast<RenderBoxModelObject*>(o);
+inline RenderBoxModelObject* toRenderBoxModelObject(RenderObject* object) {
+  ASSERT(!object || object->isBoxModelObject());
+  return static_cast<RenderBoxModelObject*>(object);
 }
 
 inline const RenderBoxModelObject* toRenderBoxModelObject(
-    const RenderObject* o) {
-  ASSERT(!o || o->isBoxModelObject());
-  return static_cast<const RenderBoxModelObject*>(o);
+    const RenderObject* object) {
+  ASSERT(!object || object->isBoxModelObject());
+  return static_cast<const RenderBoxModelObject*>(object);
 }
 
 // This will catch anyone doing an unnecessary cast.

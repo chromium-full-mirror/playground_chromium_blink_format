@@ -76,14 +76,14 @@ class RenderButton : public RenderFlexibleBox {
   bool m_default;
 };
 
-inline RenderButton* toRenderButton(RenderObject* o) {
-  ASSERT(!o || o->isRenderButton());
-  return static_cast<RenderButton*>(o);
+inline RenderButton* toRenderButton(RenderObject* object) {
+  ASSERT(!object || object->isRenderButton());
+  return static_cast<RenderButton*>(object);
 }
 
-inline const RenderButton* toRenderButton(const RenderObject* o) {
-  ASSERT(!o || o->isRenderButton());
-  return static_cast<const RenderButton*>(o);
+inline const RenderButton* toRenderButton(const RenderObject* object) {
+  ASSERT(!object || object->isRenderButton());
+  return static_cast<const RenderButton*>(object);
 }
 
 // This will catch anyone doing an unnecessary cast.

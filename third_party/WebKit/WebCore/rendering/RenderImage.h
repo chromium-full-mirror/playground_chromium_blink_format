@@ -124,14 +124,14 @@ class RenderImage : public RenderReplaced {
   friend class RenderImageScaleObserver;
 };
 
-inline RenderImage* toRenderImage(RenderObject* o) {
-  ASSERT(!o || o->isRenderImage());
-  return static_cast<RenderImage*>(o);
+inline RenderImage* toRenderImage(RenderObject* object) {
+  ASSERT(!object || object->isRenderImage());
+  return static_cast<RenderImage*>(object);
 }
 
-inline const RenderImage* toRenderImage(const RenderObject* o) {
-  ASSERT(!o || o->isRenderImage());
-  return static_cast<const RenderImage*>(o);
+inline const RenderImage* toRenderImage(const RenderObject* object) {
+  ASSERT(!object || object->isRenderImage());
+  return static_cast<const RenderImage*>(object);
 }
 
 // This will catch anyone doing an unnecessary cast.

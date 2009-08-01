@@ -498,14 +498,14 @@ class RenderBox : public RenderBoxModelObject {
   static bool s_hadOverflowClip;
 };
 
-inline RenderBox* toRenderBox(RenderObject* o) {
-  ASSERT(!o || o->isBox());
-  return static_cast<RenderBox*>(o);
+inline RenderBox* toRenderBox(RenderObject* object) {
+  ASSERT(!object || object->isBox());
+  return static_cast<RenderBox*>(object);
 }
 
-inline const RenderBox* toRenderBox(const RenderObject* o) {
-  ASSERT(!o || o->isBox());
-  return static_cast<const RenderBox*>(o);
+inline const RenderBox* toRenderBox(const RenderObject* object) {
+  ASSERT(!object || object->isBox());
+  return static_cast<const RenderBox*>(object);
 }
 
 // This will catch anyone doing an unnecessary cast.

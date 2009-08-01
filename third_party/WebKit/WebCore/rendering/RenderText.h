@@ -231,14 +231,14 @@ class RenderText : public RenderObject {
   mutable bool m_knownNotToUseFallbackFonts : 1;
 };
 
-inline RenderText* toRenderText(RenderObject* o) {
-  ASSERT(!o || o->isText());
-  return static_cast<RenderText*>(o);
+inline RenderText* toRenderText(RenderObject* object) {
+  ASSERT(!object || object->isText());
+  return static_cast<RenderText*>(object);
 }
 
-inline const RenderText* toRenderText(const RenderObject* o) {
-  ASSERT(!o || o->isText());
-  return static_cast<const RenderText*>(o);
+inline const RenderText* toRenderText(const RenderObject* object) {
+  ASSERT(!object || object->isText());
+  return static_cast<const RenderText*>(object);
 }
 
 // This will catch anyone doing an unnecessary cast.

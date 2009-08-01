@@ -387,12 +387,12 @@ static RegularExpression* createRegExpForLabels(const Vector<String>& labels) {
 
 String Frame::searchForLabelsAboveCell(RegularExpression* regExp,
                                        HTMLTableCellElement* cell) {
-  RenderTableCell* cellRenderer =
-      static_cast<RenderTableCell*>(cell->renderer());
+  RenderObject* cellRenderer = cell->renderer();
 
   if (cellRenderer && cellRenderer->isTableCell()) {
+    RenderTableCell* tableCellRenderer = toRenderTableCell(cellRenderer);
     RenderTableCell* cellAboveRenderer =
-        cellRenderer->table()->cellAbove(cellRenderer);
+        tableCellRenderer->table()->cellAbove(tableCellRenderer);
 
     if (cellAboveRenderer) {
       HTMLTableCellElement* aboveCell =

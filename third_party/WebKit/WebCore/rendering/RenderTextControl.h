@@ -106,14 +106,15 @@ class RenderTextControl : public RenderBlock {
   RefPtr<TextControlInnerTextElement> m_innerText;
 };
 
-inline RenderTextControl* toRenderTextControl(RenderObject* o) {
-  ASSERT(!o || o->isTextControl());
-  return static_cast<RenderTextControl*>(o);
+inline RenderTextControl* toRenderTextControl(RenderObject* object) {
+  ASSERT(!object || object->isTextControl());
+  return static_cast<RenderTextControl*>(object);
 }
 
-inline const RenderTextControl* toRenderTextControl(const RenderObject* o) {
-  ASSERT(!o || o->isTextControl());
-  return static_cast<const RenderTextControl*>(o);
+inline const RenderTextControl* toRenderTextControl(
+    const RenderObject* object) {
+  ASSERT(!object || object->isTextControl());
+  return static_cast<const RenderTextControl*>(object);
 }
 
 // This will catch anyone doing an unnecessary cast.
