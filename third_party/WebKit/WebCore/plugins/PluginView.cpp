@@ -158,7 +158,7 @@ bool PluginView::start() {
     PluginView::setCurrentPluginView(this);
     JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
     setCallingPlugin(true);
-    npErr = m_plugin->pluginFuncs()->newp((NPMIMEType)m_mimeType.data(),
+    npErr = m_plugin->pluginFuncs()->newp((NPMIMEType)m_mimeType.utf8().data(),
                                           m_instance, m_mode, m_paramCount,
                                           m_paramNames, m_paramValues, NULL);
     setCallingPlugin(false);
@@ -166,8 +166,10 @@ bool PluginView::start() {
     PluginView::setCurrentPluginView(0);
   }
 
-  if (npErr != NPERR_NO_ERROR)
+  if (npErr != NPERR_NO_ERROR) {
+    m_status = PluginStatusCanNotLoadPlugin;
     return false;
+  }
 
   m_isStarted = true;
 
@@ -177,6 +179,10 @@ bool PluginView::start() {
     frameLoadRequest.resourceRequest().setURL(m_url);
     load(frameLoadRequest, false, 0);
   }
+
+  m_status = PluginStatusLoadedSuccessfully;
+
+  platformStart();
 
   return true;
 }
@@ -209,6 +215,28 @@ static bool getString(ScriptController* proxy, JSValue result, String& string) {
 
   string = ustring;
   return true;
+}
+
+bool PluginView::startOrAddToUnstartedList() {
+  if (!m_parentFrame->page())
+    return false;
+
+  if (!m_parentFrame->page()->canStartPlugins()) {
+    m_parentFrame->page()->addUnstartedPlugin(this);
+    return true;
+  }
+
+  return start();
+}
+
+void PluginView::removeFromUnstartedListIfNecessary() {
+  if (m_isStarted)
+    return;
+
+  if (!m_parentFrame->page())
+    return;
+
+  m_parentFrame->page()->removeUnstartedPlugin(this);
 }
 
 void PluginView::performRequest(PluginRequest* request) {
@@ -534,7 +562,7 @@ PassRefPtr<JSC::Bindings::Instance> PluginView::bindingInstance() {
 #if ENABLE(NETSCAPE_PLUGIN_API)
   NPObject* object = 0;
 
-  if (!m_plugin || !m_plugin->pluginFuncs()->getvalue)
+  if (!m_isStarted || !m_plugin || !m_plugin->pluginFuncs()->getvalue)
     return 0;
 
   // On Windows, calling Java's NPN_GetValue can allow the message loop to
@@ -597,6 +625,9 @@ void PluginView::setParameters(const Vector<String>& paramNames,
         equalIgnoringCase(paramNames[i], "windowlessvideo"))
       continue;
 
+    if (paramNames[i] == "pluginspage")
+      m_pluginsPage = paramValues[i];
+
     m_paramNames[paramCount] = createUTF8String(paramNames[i]);
     m_paramValues[paramCount] = createUTF8String(paramValues[i]);
 
@@ -647,7 +678,8 @@ PluginView::PluginView(Frame* parentFrame,
       m_pluginWndProc(0),
       m_lastMessage(0),
       m_isCallingPluginWndProc(false),
-      m_wmPrintHDC(0)
+      m_wmPrintHDC(0),
+      m_haveUpdatedPluginWidget(false)
 #endif
 #if (PLATFORM(QT) && PLATFORM(WIN_OS)) || defined(XP_MACOSX)
       ,
@@ -661,7 +693,8 @@ PluginView::PluginView(Frame* parentFrame,
       ,
       m_loadManually(loadManually),
       m_manualStream(0),
-      m_isJavaScriptPaused(false) {
+      m_isJavaScriptPaused(false),
+      m_mimeType(mimeType) {
   if (!m_plugin) {
     m_status = PluginStatusCanNotFindPlugin;
     return;
@@ -670,8 +703,6 @@ PluginView::PluginView(Frame* parentFrame,
   m_instance = &m_instanceStruct;
   m_instance->ndata = this;
   m_instance->pdata = 0;
-
-  m_mimeType = mimeType.utf8();
 
   setParameters(paramNames, paramValues);
 

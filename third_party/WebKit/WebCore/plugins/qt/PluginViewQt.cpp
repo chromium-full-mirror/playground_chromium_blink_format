@@ -516,4 +516,6 @@ void PluginView::init() {
   m_status = PluginStatusLoadedSuccessfully;
 }
 
+void PluginView::platformStart() {}
+
 }  // namespace WebCore

@@ -59,6 +59,7 @@ class HTMLPlugInElement;
 class IntSize;
 class KURL;
 class NavigationAction;
+class PluginView;
 class ResourceError;
 class ResourceHandle;
 class ResourceLoader;
@@ -268,6 +269,8 @@ class FrameLoaderClient {
       const KURL& baseURL,
       const Vector<String>& paramNames,
       const Vector<String>& paramValues) = 0;
+
+  virtual void dispatchDidFailToStartPlugin(const PluginView*) const {}
 
   virtual ObjectContentType objectContentType(const KURL& url,
                                               const String& mimeType) = 0;

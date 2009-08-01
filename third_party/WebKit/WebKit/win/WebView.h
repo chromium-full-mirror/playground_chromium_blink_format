@@ -736,6 +736,9 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE setJavaScriptURLsAreAllowed(
       /* [in] */ BOOL areAllowed);
 
+  virtual HRESULT STDMETHODCALLTYPE setCanStartPlugins(
+      /* [in] */ BOOL canStartPlugins);
+
   // WebView
   bool shouldUseEmbeddedView(const WebCore::String& mimeType) const;
 

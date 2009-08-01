@@ -35,6 +35,7 @@
 
 namespace WebCore {
 class PluginManualLoader;
+class PluginView;
 }
 
 template <typename T>
@@ -152,6 +153,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void redirectDataToPlugin(WebCore::Widget* pluginWidget);
 
   virtual bool shouldUsePluginDocument(const WebCore::String& mimeType) const;
+
+  virtual void dispatchDidFailToStartPlugin(const WebCore::PluginView*) const;
 
  protected:
   WebFrameLoaderClient(WebFrame*);

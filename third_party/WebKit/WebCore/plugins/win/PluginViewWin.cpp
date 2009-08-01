@@ -378,7 +378,8 @@ void PluginView::updatePluginWidget() {
   m_clipRect.move(-m_windowRect.x(), -m_windowRect.y());
 
   if (platformPluginWidget() &&
-      (m_windowRect != oldWindowRect || m_clipRect != oldClipRect)) {
+      (!m_haveUpdatedPluginWidget || m_windowRect != oldWindowRect ||
+       m_clipRect != oldClipRect)) {
     HRGN rgn;
 
     setCallingPlugin(true);
@@ -398,7 +399,7 @@ void PluginView::updatePluginWidget() {
       ::SetWindowRgn(platformPluginWidget(), rgn, TRUE);
     }
 
-    if (m_windowRect != oldWindowRect)
+    if (!m_haveUpdatedPluginWidget || m_windowRect != oldWindowRect)
       ::MoveWindow(platformPluginWidget(), m_windowRect.x(), m_windowRect.y(),
                    m_windowRect.width(), m_windowRect.height(), TRUE);
 
@@ -409,6 +410,8 @@ void PluginView::updatePluginWidget() {
     }
 
     setCallingPlugin(false);
+
+    m_haveUpdatedPluginWidget = true;
   }
 }
 
@@ -1024,6 +1027,8 @@ void PluginView::forceRedraw() {
 }
 
 PluginView::~PluginView() {
+  removeFromUnstartedListIfNecessary();
+
   stop();
 
   deleteAllValues(m_requests);
@@ -1056,10 +1061,17 @@ void PluginView::init() {
     return;
   }
 
-  if (!start()) {
+  if (!startOrAddToUnstartedList()) {
     m_status = PluginStatusCanNotLoadPlugin;
     return;
   }
+
+  m_status = PluginStatusLoadedSuccessfully;
+}
+
+void PluginView::platformStart() {
+  ASSERT(m_isStarted);
+  ASSERT(m_status == PluginStatusLoadedSuccessfully);
 
   if (m_isWindowed) {
     registerPluginView();
@@ -1104,10 +1116,10 @@ void PluginView::init() {
     m_npWindow.window = 0;
   }
 
+  updatePluginWidget();
+
   if (!m_plugin->quirks().contains(PluginQuirkDeferFirstSetWindowCall))
     setNPWindowRect(frameRect());
-
-  m_status = PluginStatusLoadedSuccessfully;
 }
 
 }  // namespace WebCore
