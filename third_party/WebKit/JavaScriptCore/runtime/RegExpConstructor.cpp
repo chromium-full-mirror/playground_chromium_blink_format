@@ -121,7 +121,7 @@ const ClassInfo RegExpConstructor::info = {
 @end
 */
 
-struct RegExpConstructorPrivate {
+struct RegExpConstructorPrivate : FastAllocBase {
   // Global search cache / settings
   RegExpConstructorPrivate()
       : lastNumSubPatterns(0), multiline(false), lastOvectorIndex(0) {}
