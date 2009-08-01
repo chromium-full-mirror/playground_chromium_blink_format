@@ -163,7 +163,7 @@ inline ScopeChainIterator ScopeChainNode::end() const {
 
 class NoScopeChain {};
 
-class ScopeChain : public FastAllocBase {
+class ScopeChain {
   friend class JIT;
 
  public:
