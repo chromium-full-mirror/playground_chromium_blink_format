@@ -51,6 +51,7 @@
 #include "InspectorClient.h"
 #include "InspectorFrontend.h"
 #include "InspectorDatabaseResource.h"
+#include "InspectorDOMAgent.h"
 #include "InspectorDOMStorageResource.h"
 #include "InspectorResource.h"
 #include "JavaScriptProfile.h"
@@ -521,13 +522,12 @@ void InspectorController::windowScriptObjectAvailable() {
 
   // Grant the inspector the ability to script the inspected page.
   m_page->mainFrame()->document()->securityOrigin()->grantUniversalAccess();
-
   m_scriptState = scriptStateFromPage(m_page);
   ScriptGlobalObject::set(m_scriptState, "InspectorController",
                           m_inspectorBackend.get());
 }
 
-void InspectorController::scriptObjectReady() {
+void InspectorController::scriptObjectReady(bool enableDOMAgent) {
   ASSERT(m_scriptState);
   if (!m_scriptState)
     return;
@@ -536,6 +536,8 @@ void InspectorController::scriptObjectReady() {
   if (!ScriptGlobalObject::get(m_scriptState, "WebInspector", webInspectorObj))
     return;
   setFrontendProxyObject(m_scriptState, webInspectorObj);
+  if (enableDOMAgent)
+    m_domAgent = new InspectorDOMAgent(m_frontend.get());
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   Setting debuggerEnabled = setting(debuggerEnabledSettingName);
@@ -607,6 +609,10 @@ void InspectorController::close() {
   closeWindow();
 
   m_frontend.set(0);
+  if (m_domAgent) {
+    m_domAgent->setDocument(0);
+    m_domAgent = 0;
+  }
   m_scriptState = 0;
 }
 
@@ -664,6 +670,8 @@ void InspectorController::populateScriptObjects() {
     (*it)->bind(m_frontend.get());
 #endif
 
+  if (m_domAgent)
+    m_domAgent->setDocument(m_inspectedPage->mainFrame()->document());
   m_frontend->populateInterface();
 }
 
@@ -753,6 +761,9 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
         m_mainResource = 0;
       }
     }
+
+    if (m_domAgent)
+      m_domAgent->setDocument(m_inspectedPage->mainFrame()->document());
   }
 
   for (Frame* frame = loader->frame(); frame;
