@@ -35,6 +35,7 @@
 #include "Nodes.h"
 #include "Tracing.h"
 #include <algorithm>
+#include <limits.h>
 #include <setjmp.h>
 #include <stdlib.h>
 #include <wtf/FastMalloc.h>
