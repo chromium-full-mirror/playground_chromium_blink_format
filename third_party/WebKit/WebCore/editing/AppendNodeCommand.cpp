@@ -37,8 +37,7 @@ AppendNodeCommand::AppendNodeCommand(PassRefPtr<Element> parent,
   ASSERT(m_node);
   ASSERT(!m_node->parent());
 
-  ASSERT(enclosingNodeOfType(Position(m_parent.get(), 0), isContentEditable) ||
-         !m_parent->attached());
+  ASSERT(m_parent->isContentEditable() || !m_parent->attached());
 }
 
 void AppendNodeCommand::doApply() {

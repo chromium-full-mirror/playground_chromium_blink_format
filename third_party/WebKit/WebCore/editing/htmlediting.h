@@ -56,7 +56,6 @@ VisiblePosition lastEditablePositionBeforePositionInRoot(const Position&,
 int comparePositions(const Position&, const Position&);
 int comparePositions(const VisiblePosition&, const VisiblePosition&);
 Node* lowestEditableAncestor(Node*);
-bool isContentEditable(const Node*);
 Position nextCandidate(const Position&);
 Position nextVisuallyDistinctCandidate(const Position&);
 Position previousCandidate(const Position&);

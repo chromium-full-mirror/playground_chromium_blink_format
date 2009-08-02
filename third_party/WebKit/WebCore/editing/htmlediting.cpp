@@ -210,10 +210,6 @@ Element* unsplittableElementForPosition(const Position& p) {
   return editableRootForPosition(p);
 }
 
-bool isContentEditable(const Node* node) {
-  return node->isContentEditable();
-}
-
 Position nextCandidate(const Position& position) {
   PositionIterator p = position;
   while (!p.atEnd()) {
@@ -678,7 +674,7 @@ Node* enclosingNodeWithTag(const Position& p, const QualifiedName& tagName) {
 
   Node* root = highestEditableRoot(p);
   for (Node* n = p.node(); n; n = n->parentNode()) {
-    if (root && !isContentEditable(n))
+    if (root && !n->isContentEditable())
       continue;
     if (n->hasTagName(tagName))
       return n;
@@ -701,7 +697,7 @@ Node* enclosingNodeOfType(const Position& p,
     // since
     // the callers from editing will no doubt want to perform editing inside the
     // returned node.
-    if (root && !isContentEditable(n) && onlyReturnEditableNodes)
+    if (root && !n->isContentEditable() && onlyReturnEditableNodes)
       continue;
     if ((*nodeIsOfType)(n))
       return n;
@@ -837,8 +833,8 @@ bool canMergeLists(Element* firstList, Element* secondList) {
   return firstList->hasTagName(
              secondList
                  ->tagQName())  // make sure the list types match (ol vs. ul)
-         && isContentEditable(firstList) &&
-         isContentEditable(secondList)  // both lists are editable
+         && firstList->isContentEditable() &&
+         secondList->isContentEditable()  // both lists are editable
          &&
          firstList->rootEditableElement() ==
              secondList

@@ -295,9 +295,9 @@ void IndentOutdentCommand::outdentParagraph() {
   Node* enclosingNode = enclosingNodeOfType(
       visibleStartOfParagraph.deepEquivalent(), &isListOrIndentBlockquote);
   if (!enclosingNode ||
-      !isContentEditable(
-          enclosingNode
-              ->parentNode()))  // We can't outdent if there is no place to go!
+      !enclosingNode->parentNode()->isContentEditable())  // We can't outdent if
+                                                          // there is no place
+                                                          // to go!
     return;
 
   // Use InsertListCommand to remove the selection from the list
@@ -336,10 +336,11 @@ void IndentOutdentCommand::outdentParagraph() {
       if (Node* splitPointParent = splitPoint->parentNode()) {
         if (splitPointParent->hasTagName(blockquoteTag) &&
             !splitPoint->hasTagName(blockquoteTag) &&
-            isContentEditable(splitPointParent->parentNode()))  // We can't
-                                                                // outdent if
-                                                                // there is no
-                                                                // place to go!
+            splitPointParent->parentNode()->isContentEditable())  // We can't
+                                                                  // outdent if
+                                                                  // there is no
+                                                                  // place to
+                                                                  // go!
           splitElement(static_cast<Element*>(splitPointParent), splitPoint);
       }
     }
