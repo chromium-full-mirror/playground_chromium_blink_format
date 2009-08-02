@@ -66,10 +66,6 @@ void PluginView::setNPWindowRect(const IntRect&) {
   notImplemented();
 }
 
-void PluginView::stop() {
-  notImplemented();
-}
-
 const char* PluginView::userAgent() {
   notImplemented();
   return 0;
