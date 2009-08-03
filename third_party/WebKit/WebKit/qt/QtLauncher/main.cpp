@@ -415,6 +415,17 @@ class URLLoader : public QObject {
 
 #include "main.moc"
 
+int launcherMain(const QApplication& app) {
+#ifndef NDEBUG
+  int retVal = app.exec();
+  qt_drt_garbageCollector_collect();
+  QWebSettings::clearMemoryCaches();
+  return retVal;
+#else
+  return app.exec();
+#endif
+}
+
 int main(int argc, char** argv) {
   QApplication app(argc, argv);
   QString url =
@@ -451,7 +462,7 @@ int main(int argc, char** argv) {
                      SLOT(loadNext()));
     loader.loadNext();
     window->show();
-    return app.exec();
+    launcherMain(app);
   } else {
     if (args.count() > 1)
       url = args.at(1);
@@ -463,13 +474,6 @@ int main(int argc, char** argv) {
       window->newWindow(args.at(i));
 
     window->show();
-#ifndef NDEBUG
-    int retVal = app.exec();
-    qt_drt_garbageCollector_collect();
-    QWebSettings::clearMemoryCaches();
-    return retVal;
-#else
-    return app.exec();
-#endif
+    launcherMain(app);
   }
 }
