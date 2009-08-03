@@ -31,6 +31,7 @@
 
 namespace WebCore {
 
+class Document;
 class Event;
 class JSLazyEventListener;
 class JSEventListener;
@@ -113,6 +114,7 @@ inline JSC::JSObject* getDOMConstructor(JSC::ExecState* exec,
   return constructor;
 }
 
+JSDOMGlobalObject* toJSDOMGlobalObject(Document*);
 JSDOMGlobalObject* toJSDOMGlobalObject(ScriptExecutionContext*);
 
 }  // namespace WebCore
