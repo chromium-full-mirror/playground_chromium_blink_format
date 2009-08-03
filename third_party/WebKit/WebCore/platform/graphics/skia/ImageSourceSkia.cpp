@@ -143,9 +143,11 @@ IntSize ImageSource::size() const {
   return m_decoder->size();
 }
 
-IntSize ImageSource::frameSizeAtIndex(size_t) const {
-  // TODO(brettw) do we need anything here?
-  return size();
+IntSize ImageSource::frameSizeAtIndex(size_t index) const {
+  if (!m_decoder)
+    return IntSize();
+
+  return m_decoder->frameSizeAtIndex(index);
 }
 
 int ImageSource::repetitionCount() {
