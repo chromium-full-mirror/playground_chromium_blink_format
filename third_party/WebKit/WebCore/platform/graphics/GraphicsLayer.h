@@ -259,7 +259,7 @@ class GraphicsLayer {
   }
   virtual void pauseAnimation(const String& /* keyframesName */) {}
 
-  virtual void suspendAnimations();
+  virtual void suspendAnimations(double time);
   virtual void resumeAnimations();
 
   // Layer contents

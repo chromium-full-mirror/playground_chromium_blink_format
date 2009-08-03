@@ -185,7 +185,8 @@ class AnimationBase : public RefCounted<AnimationBase> {
     return m_transformFunctionListValid;
   }
 
-  void pauseAtTime(double t);
+  // Freeze the animation; used by DumpRenderTree.
+  void freezeAtTime(double t);
 
   double beginAnimationUpdateTime() const;
 

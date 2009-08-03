@@ -119,7 +119,7 @@ class RenderLayerBacking : public GraphicsLayerClient {
   void animationPaused(const String& name);
   void transitionFinished(int property);
 
-  void suspendAnimations();
+  void suspendAnimations(double time = 0);
   void resumeAnimations();
 
   IntRect compositedBounds() const;

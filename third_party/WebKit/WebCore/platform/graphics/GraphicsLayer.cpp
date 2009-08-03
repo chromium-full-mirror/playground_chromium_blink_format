@@ -205,7 +205,7 @@ void GraphicsLayer::paintGraphicsLayerContents(GraphicsContext& context,
     m_client->paintContents(this, context, m_paintingPhase, clip);
 }
 
-void GraphicsLayer::suspendAnimations() {}
+void GraphicsLayer::suspendAnimations(double) {}
 
 void GraphicsLayer::resumeAnimations() {}
 

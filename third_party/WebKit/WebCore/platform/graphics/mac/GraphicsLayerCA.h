@@ -87,7 +87,7 @@ class GraphicsLayerCA : public GraphicsLayer {
 
   virtual void setContentsRect(const IntRect&);
 
-  virtual void suspendAnimations();
+  virtual void suspendAnimations(double time);
   virtual void resumeAnimations();
 
   virtual bool addAnimation(const KeyframeValueList&,
