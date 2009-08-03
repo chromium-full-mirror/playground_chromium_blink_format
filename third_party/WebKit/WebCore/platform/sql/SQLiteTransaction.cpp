@@ -42,7 +42,7 @@ void SQLiteTransaction::begin() {
   if (!m_inProgress) {
     ASSERT(!m_db.m_transactionInProgress);
     m_inProgress = m_db.executeCommand("BEGIN;");
-    m_db.m_transactionInProgress = true;
+    m_db.m_transactionInProgress = m_inProgress;
   }
 }
 
