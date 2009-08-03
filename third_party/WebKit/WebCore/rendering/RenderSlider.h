@@ -36,6 +36,7 @@ class RenderSlider : public RenderBlock {
 
   void forwardEvent(Event*);
   bool inDragMode() const;
+  IntRect thumbRect();
 
  private:
   virtual const char* renderName() const { return "RenderSlider"; }

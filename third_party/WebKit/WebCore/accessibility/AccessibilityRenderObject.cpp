@@ -2376,8 +2376,8 @@ bool AccessibilityRenderObject::canSetFocusAttribute() const {
 
   // NOTE: It would be more accurate to ask the document whether
   // setFocusedNode() would
-  // do anything.  For example, it setFocusedNode() will do nothing if the
-  // current focused
+  // do anything.  For example, setFocusedNode() will do nothing if the current
+  // focused
   // node will not relinquish the focus.
   if (!node || !node->isElementNode())
     return false;

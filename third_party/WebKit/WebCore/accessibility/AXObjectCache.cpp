@@ -37,6 +37,7 @@
 #include "AccessibilityListBoxOption.h"
 #include "AccessibilityImageMapLink.h"
 #include "AccessibilityRenderObject.h"
+#include "AccessibilitySlider.h"
 #include "AccessibilityTable.h"
 #include "AccessibilityTableCell.h"
 #include "AccessibilityTableColumn.h"
@@ -127,6 +128,10 @@ AccessibilityObject* AXObjectCache::getOrCreate(RenderObject* renderer) {
     else if (renderer->isTableCell())
       newObj = AccessibilityTableCell::create(renderer);
 
+    // input type=range
+    else if (renderer->isSlider())
+      newObj = AccessibilitySlider::create(renderer);
+
     else
       newObj = AccessibilityRenderObject::create(renderer);
 
@@ -158,6 +163,9 @@ AccessibilityObject* AXObjectCache::getOrCreate(AccessibilityRole role) {
       break;
     case TableHeaderContainerRole:
       obj = AccessibilityTableHeaderContainer::create();
+      break;
+    case SliderThumbRole:
+      obj = AccessibilitySliderThumb::create();
       break;
     default:
       obj = 0;

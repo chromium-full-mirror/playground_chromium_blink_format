@@ -337,6 +337,26 @@ static JSValueRef setSelectedTextRangeCallback(JSContextRef context,
   return 0;
 }
 
+static JSValueRef incrementCallback(JSContextRef context,
+                                    JSObjectRef function,
+                                    JSObjectRef thisObject,
+                                    size_t argumentCount,
+                                    const JSValueRef arguments[],
+                                    JSValueRef* exception) {
+  toAXElement(thisObject)->increment();
+  return 0;
+}
+
+static JSValueRef decrementCallback(JSContextRef context,
+                                    JSObjectRef function,
+                                    JSObjectRef thisObject,
+                                    size_t argumentCount,
+                                    const JSValueRef arguments[],
+                                    JSValueRef* exception) {
+  toAXElement(thisObject)->decrement();
+  return 0;
+}
+
 // Static Value Getters
 
 static JSValueRef getRoleCallback(JSContextRef context,
@@ -577,6 +597,10 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"isAttributeSettable", isAttributeSettableCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"parentElement", parentElementCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"increment", incrementCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"decrement", decrementCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0}};
 

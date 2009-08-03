@@ -156,7 +156,8 @@ enum AccessibilityRole {
   TableHeaderContainerRole,
   DefinitionListTermRole,
   DefinitionListDefinitionRole,
-  AnnotationRole
+  AnnotationRole,
+  SliderThumbRole
 };
 
 struct VisiblePositionRange {
@@ -327,6 +328,9 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual void makeRangeVisible(const PlainTextRange&) {}
   virtual bool press() const;
   bool performDefaultAction() const { return press(); }
+
+  virtual void increment(){};
+  virtual void decrement(){};
 
   virtual void childrenChanged() {}
   virtual const AccessibilityChildrenVector& children() { return m_children; }

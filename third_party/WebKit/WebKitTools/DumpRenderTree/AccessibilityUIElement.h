@@ -78,6 +78,8 @@ class AccessibilityUIElement {
   JSStringRef attributesOfDocumentLinks();
   JSStringRef attributesOfChildren();
   JSStringRef parameterizedAttributeNames();
+  void increment();
+  void decrement();
 
   // Attributes - platform-independent implementations
   JSStringRef attributeValue(JSStringRef attribute);
