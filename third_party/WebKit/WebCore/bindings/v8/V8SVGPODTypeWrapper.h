@@ -228,7 +228,7 @@ class V8SVGDynamicPODTypeWrapper : public V8SVGPODTypeWrapper<PODType> {
         m_getter(getter),
         m_setter(setter),
         m_cacheRemovalCallback(cacheRemovalCallback) {
-    ASSERT(creator);
+    ASSERT(m_creator);  // |creator|'s pointer was taken by m_creator.
     ASSERT(getter);
     ASSERT(setter);
     ASSERT(cacheRemovalCallback);
