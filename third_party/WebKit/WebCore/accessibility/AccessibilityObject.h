@@ -224,6 +224,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool isTableCell() const { return false; };
   virtual bool isFieldset() const { return false; };
   virtual bool isGroup() const { return false; };
+  bool isRadioGroup() const { return roleValue() == RadioGroupRole; }
 
   virtual bool isChecked() const { return false; };
   virtual bool isEnabled() const { return false; };
@@ -253,6 +254,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual float valueForRange() const { return 0.0f; }
   virtual float maxValueForRange() const { return 0.0f; }
   virtual float minValueForRange() const { return 0.0f; }
+  virtual AccessibilityObject* selectedRadioButton() { return 0; }
   virtual int layoutCount() const { return 0; }
   static bool isARIAControl(AccessibilityRole);
   static bool isARIAInput(AccessibilityRole);

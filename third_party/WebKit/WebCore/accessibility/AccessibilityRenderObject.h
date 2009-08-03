@@ -117,6 +117,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual float valueForRange() const;
   virtual float maxValueForRange() const;
   virtual float minValueForRange() const;
+  virtual AccessibilityObject* selectedRadioButton();
   virtual int layoutCount() const;
 
   virtual AccessibilityObject* doAccessibilityHitTest(const IntPoint&) const;
