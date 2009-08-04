@@ -480,10 +480,25 @@ static void ensurePropertyMap() {
         CSSPropertyTop, &RenderStyle::top, &RenderStyle::setTop));
     gPropertyWrappers->append(new PropertyWrapper<Length>(
         CSSPropertyBottom, &RenderStyle::bottom, &RenderStyle::setBottom));
+
     gPropertyWrappers->append(new PropertyWrapper<Length>(
         CSSPropertyWidth, &RenderStyle::width, &RenderStyle::setWidth));
+    gPropertyWrappers->append(
+        new PropertyWrapper<Length>(CSSPropertyMinWidth, &RenderStyle::minWidth,
+                                    &RenderStyle::setMinWidth));
+    gPropertyWrappers->append(
+        new PropertyWrapper<Length>(CSSPropertyMaxWidth, &RenderStyle::maxWidth,
+                                    &RenderStyle::setMaxWidth));
+
     gPropertyWrappers->append(new PropertyWrapper<Length>(
         CSSPropertyHeight, &RenderStyle::height, &RenderStyle::setHeight));
+    gPropertyWrappers->append(new PropertyWrapper<Length>(
+        CSSPropertyMinHeight, &RenderStyle::minHeight,
+        &RenderStyle::setMinHeight));
+    gPropertyWrappers->append(new PropertyWrapper<Length>(
+        CSSPropertyMaxHeight, &RenderStyle::maxHeight,
+        &RenderStyle::setMaxHeight));
+
     gPropertyWrappers->append(new PropertyWrapper<unsigned short>(
         CSSPropertyBorderLeftWidth, &RenderStyle::borderLeftWidth,
         &RenderStyle::setBorderLeftWidth));
@@ -681,8 +696,6 @@ static void ensurePropertyMap() {
 
     // TODO:
     //
-    //  CSSPropertyMinWidth, CSSPropertyMaxWidth, CSSPropertyMinHeight,
-    //  CSSPropertyMaxHeight
     //  CSSPropertyTextIndent
     //  CSSPropertyVerticalAlign
     //
