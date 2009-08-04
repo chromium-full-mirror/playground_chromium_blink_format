@@ -22,6 +22,7 @@
 
 #include "qwebpage.h"
 #include "qwebpage_p.h"
+#include "qwebplugindatabase.h"
 
 #include "Cache.h"
 #include "CrossOriginPreflightResultCache.h"
@@ -569,6 +570,16 @@ QIcon QWebSettings::iconForUrl(const QUrl& url) {
     return QPixmap();
 
   return *icon;
+}
+
+/*!
+    Returns the plugin database object.
+*/
+QWebPluginDatabase* QWebSettings::pluginDatabase() {
+  static QWebPluginDatabase* database = 0;
+  if (!database)
+    database = new QWebPluginDatabase();
+  return database;
 }
 
 /*!
