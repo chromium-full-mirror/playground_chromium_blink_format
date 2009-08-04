@@ -35,6 +35,7 @@ namespace WebCore {
 
 void SQLiteFileSystem::registerSQLiteVFS() {
   // stub for registering Chromium's SQLite VFS for Linux
+  ASSERT_NOT_REACHED();
 }
 
 }  // namespace WebCore

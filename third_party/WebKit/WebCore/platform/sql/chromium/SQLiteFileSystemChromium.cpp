@@ -47,6 +47,11 @@ namespace WebCore {
 SQLiteFileSystem::SQLiteFileSystem() {}
 
 int SQLiteFileSystem::openDatabase(const String& fileName, sqlite3** database) {
+  if (!ChromiumBridge::sandboxEnabled()) {
+    String path = fileName;
+    return sqlite3_open16(path.charactersWithNullTermination(), database);
+  }
+
   // open databases using Chromium's VFS
   return sqlite3_open_v2(
       fileName.utf8().data(), database,
