@@ -148,8 +148,7 @@ static v8::Handle<v8::Value> convertBase64(const String& str, bool encode) {
 ACCESSOR_GETTER(DOMWindowEvent) {
   v8::Local<v8::String> eventSymbol = v8::String::NewSymbol("event");
   v8::Local<v8::Context> context = v8::Context::GetCurrent();
-  v8::Handle<v8::Value> jsEvent =
-      context->Global()->GetHiddenValue(eventSymbol);
+  v8::Handle<v8::Value> jsEvent = context->Global()->Get(eventSymbol);
   if (jsEvent.IsEmpty())
     return v8::Undefined();
   return jsEvent;
