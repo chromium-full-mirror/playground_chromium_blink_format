@@ -102,6 +102,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool isPressed() const;
   virtual bool isReadOnly() const;
   virtual bool isVisited() const;
+  virtual bool isRequired() const;
 
   const AtomicString& getAttribute(const QualifiedName&) const;
   virtual bool canSetFocusAttribute() const;

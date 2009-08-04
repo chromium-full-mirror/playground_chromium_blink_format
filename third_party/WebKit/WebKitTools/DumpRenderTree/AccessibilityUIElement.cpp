@@ -494,6 +494,13 @@ static JSValueRef getIsEnabledCallback(JSContextRef context,
   return JSValueMakeBoolean(context, toAXElement(thisObject)->isEnabled());
 }
 
+static JSValueRef getIsRequiredCallback(JSContextRef context,
+                                        JSObjectRef thisObject,
+                                        JSStringRef,
+                                        JSValueRef*) {
+  return JSValueMakeBoolean(context, toAXElement(thisObject)->isRequired());
+}
+
 // Destruction
 
 static void finalize(JSObjectRef thisObject) {
@@ -546,6 +553,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"supportsPressAction", getSupportsPressActionCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isEnabled", getIsEnabledCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"isRequired", getIsRequiredCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0, 0}};
 
