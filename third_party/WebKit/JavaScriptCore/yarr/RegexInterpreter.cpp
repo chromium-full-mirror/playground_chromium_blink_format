@@ -98,14 +98,12 @@ class Interpreter {
   };
 
   DisjunctionContext* allocDisjunctionContext(ByteDisjunction* disjunction) {
-    return new (fastMalloc(sizeof(DisjunctionContext) +
-                           (disjunction->m_frameSize - 1) * sizeof(uintptr_t)))
+    return new (malloc(sizeof(DisjunctionContext) +
+                       (disjunction->m_frameSize - 1) * sizeof(uintptr_t)))
         DisjunctionContext();
   }
 
-  void freeDisjunctionContext(DisjunctionContext* context) {
-    fastFree(context);
-  }
+  void freeDisjunctionContext(DisjunctionContext* context) { free(context); }
 
   struct ParenthesesDisjunctionContext {
     ParenthesesDisjunctionContext(int* output, ByteTerm& term) : next(0) {
@@ -144,7 +142,7 @@ class Interpreter {
       ByteDisjunction* disjunction,
       int* output,
       ByteTerm& term) {
-    return new (fastMalloc(
+    return new (malloc(
         sizeof(ParenthesesDisjunctionContext) +
         (((term.atom.parenthesesDisjunction->m_numSubpatterns << 1) - 1) *
          sizeof(int)) +
@@ -155,7 +153,7 @@ class Interpreter {
 
   void freeParenthesesDisjunctionContext(
       ParenthesesDisjunctionContext* context) {
-    fastFree(context);
+    free(context);
   }
 
   class InputStream {
