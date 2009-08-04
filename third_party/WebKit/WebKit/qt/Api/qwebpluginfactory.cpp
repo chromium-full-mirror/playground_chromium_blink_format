@@ -72,6 +72,11 @@
    supported by a plugin.
 */
 
+bool QWebPluginFactory::MimeType::operator==(const MimeType& other) const {
+  return name == other.name && description == other.description &&
+         fileExtensions == other.fileExtensions;
+}
+
 /*!
     \variable QWebPluginFactory::MimeType::name
 
