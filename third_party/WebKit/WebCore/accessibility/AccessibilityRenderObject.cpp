@@ -811,7 +811,7 @@ static String accessibleNameForNode(Node* node) {
   return String();
 }
 
-String AccessibilityRenderObject::ariaAccessiblityName(const String& s) const {
+String AccessibilityRenderObject::ariaAccessibilityName(const String& s) const {
   Document* document = m_renderer->document();
   if (!document)
     return String();
@@ -834,7 +834,9 @@ String AccessibilityRenderObject::ariaAccessiblityName(const String& s) const {
         nameFragment = accessibleNameForNode(n);
         ariaLabel.append(nameFragment.characters(), nameFragment.length());
       }
-      ariaLabel.append(' ');
+
+      if (i != size - 1)
+        ariaLabel.append(' ');
     }
   }
   return String::adopt(ariaLabel);
@@ -858,7 +860,7 @@ String AccessibilityRenderObject::ariaLabeledByAttribute() const {
       return String();
   }
 
-  return ariaAccessiblityName(idList);
+  return ariaAccessibilityName(idList);
 }
 
 static HTMLLabelElement* labelForElement(Element* element) {
@@ -929,7 +931,8 @@ String AccessibilityRenderObject::title() const {
   }
 
   if (roleValue() == ButtonRole || ariaRole == ListBoxOptionRole ||
-      ariaRole == MenuItemRole || ariaRole == MenuButtonRole || isHeading())
+      ariaRole == MenuItemRole || ariaRole == MenuButtonRole ||
+      ariaRole == RadioButtonRole || isHeading())
     return textUnderElement();
 
   if (isLink())
@@ -943,7 +946,7 @@ String AccessibilityRenderObject::ariaDescribedByAttribute() const {
   if (idList.isEmpty())
     return String();
 
-  return ariaAccessiblityName(idList);
+  return ariaAccessibilityName(idList);
 }
 
 String AccessibilityRenderObject::accessibilityDescription() const {
