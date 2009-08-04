@@ -29,9 +29,9 @@ class PluginPackage;
 class PluginDatabase;
 };
 
-class QWebPluginPrivate {
+class QWebPluginInfoPrivate {
  public:
-  QWebPluginPrivate(RefPtr<WebCore::PluginPackage> pluginPackage);
+  QWebPluginInfoPrivate(RefPtr<WebCore::PluginPackage> pluginPackage);
 
   RefPtr<WebCore::PluginPackage> plugin;
 };

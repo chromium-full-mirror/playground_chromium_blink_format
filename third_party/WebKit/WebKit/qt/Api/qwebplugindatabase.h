@@ -30,15 +30,16 @@ namespace WebCore {
 class PluginPackage;
 }
 
-class QWebPluginPrivate;
-class QWEBKIT_EXPORT QWebPlugin {
+class QWebPluginInfoPrivate;
+class QWEBKIT_EXPORT QWebPluginInfo {
  public:
-  QWebPlugin();
-  QWebPlugin(const QWebPlugin& other);
-  ~QWebPlugin();
+  QWebPluginInfo();
+  QWebPluginInfo(const QWebPluginInfo& other);
+  QWebPluginInfo& operator=(const QWebPluginInfo& other);
+  ~QWebPluginInfo();
 
  private:
-  QWebPlugin(WebCore::PluginPackage* plugin);
+  QWebPluginInfo(WebCore::PluginPackage* plugin);
 
  public:
   typedef QWebPluginFactory::MimeType MimeType;
@@ -54,14 +55,13 @@ class QWEBKIT_EXPORT QWebPlugin {
   void setEnabled(bool enabled);
   bool isEnabled() const;
 
-  bool operator==(const QWebPlugin& other) const;
-  bool operator!=(const QWebPlugin& other) const;
-  QWebPlugin operator=(const QWebPlugin& other);
+  bool operator==(const QWebPluginInfo& other) const;
+  bool operator!=(const QWebPluginInfo& other) const;
 
   friend class QWebPluginDatabase;
 
  private:
-  QWebPluginPrivate* d;
+  QWebPluginInfoPrivate* d;
 };
 
 class QWebPluginDatabasePrivate;
@@ -73,7 +73,7 @@ class QWEBKIT_EXPORT QWebPluginDatabase : public QObject {
   ~QWebPluginDatabase();
 
  public:
-  QList<QWebPlugin> plugins() const;
+  QList<QWebPluginInfo> plugins() const;
 
   static QStringList defaultSearchPaths();
   QStringList searchPaths() const;
@@ -82,9 +82,9 @@ class QWEBKIT_EXPORT QWebPluginDatabase : public QObject {
 
   void refresh();
 
-  QWebPlugin pluginForMimeType(const QString& mimeType);
+  QWebPluginInfo pluginForMimeType(const QString& mimeType);
   void setPreferredPluginForMimeType(const QString& mimeType,
-                                     const QWebPlugin& plugin);
+                                     const QWebPluginInfo& plugin);
 
   friend class QWebSettings;
 

@@ -27,27 +27,28 @@
 using namespace WebCore;
 
 /*!
-    \class QWebPlugin::MimeType
+    \class QWebPluginInfo::MimeType
     \since 4.6
     \brief Represents a single MIME type supported by a plugin.
 */
 
 /*!
-    \variable QWebPlugin::MimeType::name
+    \variable QWebPluginInfo::MimeType::name
     \brief the name of the MIME type e.g. text/plain
 */
 
 /*!
-    \variable QWebPlugin::MimeType::description
+    \variable QWebPluginInfo::MimeType::description
     \brief the description of the MIME type
 */
 
 /*!
-    \variable QWebPlugin::MimeType::fileExtensions
+    \variable QWebPluginInfo::MimeType::fileExtensions
     \brief a list of file extensions that are associated with the mime type
 */
 
-QWebPluginPrivate::QWebPluginPrivate(RefPtr<PluginPackage> pluginPackage)
+QWebPluginInfoPrivate::QWebPluginInfoPrivate(
+    RefPtr<PluginPackage> pluginPackage)
     : plugin(pluginPackage) {}
 
 QWebPluginDatabasePrivate::QWebPluginDatabasePrivate(
@@ -55,11 +56,11 @@ QWebPluginDatabasePrivate::QWebPluginDatabasePrivate(
     : database(pluginDatabase) {}
 
 /*!
-    \class QWebPlugin
+    \class QWebPluginInfo
     \since 4.6
-    \brief The QWebPlugin class represents a single Netscape plugin.
+    \brief The QWebPluginInfo class represents a single Netscape plugin.
 
-    The QWebPlugin represents a Netscape plugin, that is picked up by WebKit
+    The QWebPluginInfo represents a Netscape plugin, that is picked up by WebKit
     and included in the plugin database. The class contains information about
     the plugin: its name(), description(), a list of MIME types that it
    supports:
@@ -72,20 +73,20 @@ QWebPluginDatabasePrivate::QWebPluginDatabasePrivate(
 */
 
 /*!
-    Constructs a null QWebPlugin.
+    Constructs a null QWebPluginInfo.
 */
-QWebPlugin::QWebPlugin() : d(new QWebPluginPrivate(0)) {}
+QWebPluginInfo::QWebPluginInfo() : d(new QWebPluginInfoPrivate(0)) {}
 
-QWebPlugin::QWebPlugin(PluginPackage* plugin)
-    : d(new QWebPluginPrivate(plugin)) {}
+QWebPluginInfo::QWebPluginInfo(PluginPackage* plugin)
+    : d(new QWebPluginInfoPrivate(plugin)) {}
 
 /*!
     Contructs a copy of \a other.
 */
-QWebPlugin::QWebPlugin(const QWebPlugin& other)
-    : d(new QWebPluginPrivate(other.d->plugin)) {}
+QWebPluginInfo::QWebPluginInfo(const QWebPluginInfo& other)
+    : d(new QWebPluginInfoPrivate(other.d->plugin)) {}
 
-QWebPlugin::~QWebPlugin() {
+QWebPluginInfo::~QWebPluginInfo() {
   delete d;
 }
 
@@ -94,7 +95,7 @@ QWebPlugin::~QWebPlugin() {
 
     \sa description()
 */
-QString QWebPlugin::name() const {
+QString QWebPluginInfo::name() const {
   if (!d->plugin)
     return QString();
   return d->plugin->name();
@@ -105,7 +106,7 @@ QString QWebPlugin::name() const {
 
     \sa name()
 */
-QString QWebPlugin::description() const {
+QString QWebPluginInfo::description() const {
   if (!d->plugin)
     return QString();
   return d->plugin->description();
@@ -116,7 +117,7 @@ QString QWebPlugin::description() const {
 
     \sa supportsMimeType()
 */
-QList<QWebPlugin::MimeType> QWebPlugin::mimeTypes() const {
+QList<QWebPluginInfo::MimeType> QWebPluginInfo::mimeTypes() const {
   if (!d->plugin)
     return QList<MimeType>();
 
@@ -149,7 +150,7 @@ QList<QWebPlugin::MimeType> QWebPlugin::mimeTypes() const {
 
     \sa mimeTypes()
 */
-bool QWebPlugin::supportsMimeType(const QString& mimeType) const {
+bool QWebPluginInfo::supportsMimeType(const QString& mimeType) const {
   QList<MimeType> types = mimeTypes();
   foreach (const MimeType& type, types) {
     if (type.name == mimeType)
@@ -162,7 +163,7 @@ bool QWebPlugin::supportsMimeType(const QString& mimeType) const {
 /*!
     Returns an absolute path to the plugin file.
 */
-QString QWebPlugin::path() const {
+QString QWebPluginInfo::path() const {
   if (!d->plugin)
     return QString();
   return d->plugin->path();
@@ -171,7 +172,7 @@ QString QWebPlugin::path() const {
 /*!
     Returns true if the plugin is a null plugin, false otherwise.
 */
-bool QWebPlugin::isNull() const {
+bool QWebPluginInfo::isNull() const {
   return !d->plugin;
 }
 
@@ -184,7 +185,7 @@ bool QWebPlugin::isNull() const {
 
     \sa isEnabled()
 */
-void QWebPlugin::setEnabled(bool enabled) {
+void QWebPluginInfo::setEnabled(bool enabled) {
   if (!d->plugin)
     return;
   d->plugin->setEnabled(enabled);
@@ -195,21 +196,21 @@ void QWebPlugin::setEnabled(bool enabled) {
 
     \sa setEnabled()
 */
-bool QWebPlugin::isEnabled() const {
+bool QWebPluginInfo::isEnabled() const {
   if (!d->plugin)
     return false;
   return d->plugin->isEnabled();
 }
 
-bool QWebPlugin::operator==(const QWebPlugin& other) const {
+bool QWebPluginInfo::operator==(const QWebPluginInfo& other) const {
   return d->plugin == other.d->plugin;
 }
 
-bool QWebPlugin::operator!=(const QWebPlugin& other) const {
+bool QWebPluginInfo::operator!=(const QWebPluginInfo& other) const {
   return d->plugin != other.d->plugin;
 }
 
-QWebPlugin QWebPlugin::operator=(const QWebPlugin& other) {
+QWebPluginInfo& QWebPluginInfo::operator=(const QWebPluginInfo& other) {
   if (this == &other)
     return *this;
 
@@ -262,13 +263,13 @@ QWebPluginDatabase::~QWebPluginDatabase() {
 
     \sa pluginForMimeType()
 */
-QList<QWebPlugin> QWebPluginDatabase::plugins() const {
-  QList<QWebPlugin> qwebplugins;
+QList<QWebPluginInfo> QWebPluginDatabase::plugins() const {
+  QList<QWebPluginInfo> qwebplugins;
   const Vector<PluginPackage*>& plugins = d->database->plugins();
 
   for (unsigned int i = 0; i < plugins.size(); ++i) {
     PluginPackage* plugin = plugins[i];
-    qwebplugins.append(QWebPlugin(plugin));
+    qwebplugins.append(QWebPluginInfo(plugin));
   }
 
   return qwebplugins;
@@ -352,8 +353,8 @@ void QWebPluginDatabase::refresh() {
 
     \sa setPreferredPluginForMimeType()
 */
-QWebPlugin QWebPluginDatabase::pluginForMimeType(const QString& mimeType) {
-  return QWebPlugin(d->database->pluginForMIMEType(mimeType));
+QWebPluginInfo QWebPluginDatabase::pluginForMimeType(const QString& mimeType) {
+  return QWebPluginInfo(d->database->pluginForMIMEType(mimeType));
 }
 
 /*!
@@ -368,6 +369,6 @@ QWebPlugin QWebPluginDatabase::pluginForMimeType(const QString& mimeType) {
 */
 void QWebPluginDatabase::setPreferredPluginForMimeType(
     const QString& mimeType,
-    const QWebPlugin& plugin) {
+    const QWebPluginInfo& plugin) {
   d->database->setPreferredPluginForMIMEType(mimeType, plugin.d->plugin.get());
 }
