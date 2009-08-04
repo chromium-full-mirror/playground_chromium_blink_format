@@ -65,6 +65,8 @@ class InspectorClientWx : public InspectorClient {
   virtual void storeSetting(const String& key,
                             const InspectorController::Setting&);
   virtual void removeSetting(const String& key);
+
+  virtual void inspectorWindowObjectCleared();
 };
 
 }  // namespace WebCore
