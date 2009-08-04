@@ -160,6 +160,11 @@ enum AccessibilityRole {
   SliderThumbRole
 };
 
+enum AccessibilityOrientation {
+  AccessibilityOrientationVertical,
+  AccessibilityOrientationHorizontal,
+};
+
 struct VisiblePositionRange {
   VisiblePosition start;
   VisiblePosition end;
@@ -332,6 +337,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool press() const;
   bool performDefaultAction() const { return press(); }
 
+  virtual AccessibilityOrientation orientation() const;
   virtual void increment(){};
   virtual void decrement(){};
 

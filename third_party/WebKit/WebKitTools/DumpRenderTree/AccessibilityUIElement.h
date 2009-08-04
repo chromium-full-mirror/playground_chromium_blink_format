@@ -84,6 +84,7 @@ class AccessibilityUIElement {
   // Attributes - platform-independent implementations
   JSStringRef attributeValue(JSStringRef attribute);
   bool isAttributeSettable(JSStringRef attribute);
+  bool isActionSupported(JSStringRef action);
   JSStringRef role();
   JSStringRef title();
   JSStringRef description();
@@ -97,7 +98,6 @@ class AccessibilityUIElement {
   double maxValue();
   int insertionPointLineNumber();
   JSStringRef selectedTextRange();
-  bool supportsPressAction();
   bool isEnabled();
   bool isRequired() const;
   double clickPointX();

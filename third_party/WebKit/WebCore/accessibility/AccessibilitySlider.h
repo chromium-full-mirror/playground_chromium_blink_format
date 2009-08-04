@@ -55,6 +55,7 @@ class AccessibilitySlider : public AccessibilityRenderObject {
   virtual float valueForRange() const;
   virtual float maxValueForRange() const;
   virtual float minValueForRange() const;
+  virtual AccessibilityOrientation orientation() const;
 
   virtual void increment();
   virtual void decrement();

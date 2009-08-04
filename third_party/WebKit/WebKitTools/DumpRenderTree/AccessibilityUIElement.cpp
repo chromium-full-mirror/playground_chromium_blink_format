@@ -269,6 +269,22 @@ static JSValueRef isAttributeSettableCallback(JSContextRef context,
   return result;
 }
 
+static JSValueRef isActionSupportedCallback(JSContextRef context,
+                                            JSObjectRef function,
+                                            JSObjectRef thisObject,
+                                            size_t argumentCount,
+                                            const JSValueRef arguments[],
+                                            JSValueRef* exception) {
+  JSStringRef action = 0;
+  if (argumentCount == 1)
+    action = JSValueToStringCopy(context, arguments[0], exception);
+  JSValueRef result = JSValueMakeNumber(
+      context, toAXElement(thisObject)->isActionSupported(action));
+  if (action)
+    JSStringRelease(action);
+  return result;
+}
+
 static JSValueRef attributeValueCallback(JSContextRef context,
                                          JSObjectRef function,
                                          JSObjectRef thisObject,
@@ -479,14 +495,6 @@ static JSValueRef getSelectedTextRangeCallback(JSContextRef context,
   return JSValueMakeString(context, selectedTextRange.get());
 }
 
-static JSValueRef getSupportsPressActionCallback(JSContextRef context,
-                                                 JSObjectRef thisObject,
-                                                 JSStringRef propertyName,
-                                                 JSValueRef* exception) {
-  return JSValueMakeBoolean(context,
-                            toAXElement(thisObject)->supportsPressAction());
-}
-
 static JSValueRef getIsEnabledCallback(JSContextRef context,
                                        JSObjectRef thisObject,
                                        JSStringRef propertyName,
@@ -550,8 +558,6 @@ JSClassRef AccessibilityUIElement::getJSClass() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"selectedTextRange", getSelectedTextRangeCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"supportsPressAction", getSupportsPressActionCallback, 0,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isEnabled", getIsEnabledCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isRequired", getIsRequiredCallback, 0,
@@ -604,6 +610,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"attributeValue", attributeValueCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isAttributeSettable", isAttributeSettableCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"isActionSupported", isActionSupportedCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"parentElement", parentElementCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
