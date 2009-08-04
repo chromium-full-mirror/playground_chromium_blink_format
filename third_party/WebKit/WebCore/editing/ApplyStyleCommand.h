@@ -155,6 +155,9 @@ class ApplyStyleCommand : public CompositeEditCommand {
 
 bool isStyleSpan(const Node*);
 PassRefPtr<HTMLElement> createStyleSpanElement(Document*);
+RefPtr<CSSMutableStyleDeclaration> getPropertiesNotInComputedStyle(
+    CSSStyleDeclaration* style,
+    CSSComputedStyleDeclaration* computedStyle);
 
 }  // namespace WebCore
 
