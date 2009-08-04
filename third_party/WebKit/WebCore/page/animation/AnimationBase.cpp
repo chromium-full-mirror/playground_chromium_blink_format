@@ -601,6 +601,10 @@ static void ensurePropertyMap() {
     gPropertyWrappers->append(new PropertyWrapper<int>(
         CSSPropertyWordSpacing, &RenderStyle::wordSpacing,
         &RenderStyle::setWordSpacing));
+    gPropertyWrappers->append(new PropertyWrapper<Length>(
+        CSSPropertyTextIndent, &RenderStyle::textIndent,
+        &RenderStyle::setTextIndent));
+
     gPropertyWrappers->append(new PropertyWrapper<float>(
         CSSPropertyWebkitPerspective, &RenderStyle::perspective,
         &RenderStyle::setPerspective));
@@ -696,7 +700,6 @@ static void ensurePropertyMap() {
 
     // TODO:
     //
-    //  CSSPropertyTextIndent
     //  CSSPropertyVerticalAlign
     //
     // Compound properties that have components that should be animatable:
