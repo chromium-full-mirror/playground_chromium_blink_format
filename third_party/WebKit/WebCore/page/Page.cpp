@@ -305,6 +305,7 @@ void Page::addUnstartedPlugin(PluginView* view) {
 
 void Page::removeUnstartedPlugin(PluginView* view) {
   ASSERT(!m_canStartPlugins);
+  ASSERT(m_unstartedPlugins.contains(view));
   m_unstartedPlugins.remove(view);
 }
 

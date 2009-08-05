@@ -148,6 +148,8 @@ bool PluginView::start() {
   if (m_isStarted)
     return false;
 
+  m_isWaitingToStart = false;
+
   PluginMainThreadScheduler::scheduler().registerPlugin(m_instance);
 
   ASSERT(m_plugin);
@@ -309,6 +311,7 @@ bool PluginView::startOrAddToUnstartedList() {
 
   if (!m_parentFrame->page()->canStartPlugins()) {
     m_parentFrame->page()->addUnstartedPlugin(this);
+    m_isWaitingToStart = true;
     return true;
   }
 
@@ -316,7 +319,7 @@ bool PluginView::startOrAddToUnstartedList() {
 }
 
 void PluginView::removeFromUnstartedListIfNecessary() {
-  if (m_isStarted)
+  if (!m_isWaitingToStart)
     return;
 
   if (!m_parentFrame->page())
@@ -755,7 +758,8 @@ PluginView::PluginView(Frame* parentFrame,
 #endif
       ,
       m_isTransparent(false),
-      m_haveInitialized(false)
+      m_haveInitialized(false),
+      m_isWaitingToStart(false)
 #if PLATFORM(GTK) || defined(Q_WS_X11)
       ,
       m_needsXEmbed(false)
