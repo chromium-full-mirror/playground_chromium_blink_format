@@ -38,7 +38,7 @@ class WorkQueueItem {
  public:
   WorkQueueItem(QWebPage* page) : m_webPage(page) {}
   virtual ~WorkQueueItem() {}
-  virtual void invoke() const = 0;
+  virtual bool invoke() const = 0;
 
  protected:
   QPointer<QWebPage> m_webPage;
@@ -52,7 +52,7 @@ class LoadItem : public WorkQueueItem {
   QString url() const { return m_url; }
   QString target() const { return m_target; }
 
-  virtual void invoke() const;
+  virtual bool invoke() const;
 
  private:
   QString m_url;
@@ -62,7 +62,7 @@ class LoadItem : public WorkQueueItem {
 class ReloadItem : public WorkQueueItem {
  public:
   ReloadItem(QWebPage* page) : WorkQueueItem(page) {}
-  virtual void invoke() const;
+  virtual bool invoke() const;
 };
 
 class ScriptItem : public WorkQueueItem {
@@ -72,7 +72,7 @@ class ScriptItem : public WorkQueueItem {
 
   QString script() const { return m_script; }
 
-  virtual void invoke() const;
+  virtual bool invoke() const;
 
  private:
   QString m_script;
@@ -80,7 +80,7 @@ class ScriptItem : public WorkQueueItem {
 
 class BackForwardItem : public WorkQueueItem {
  public:
-  virtual void invoke() const;
+  virtual bool invoke() const;
 
  protected:
   BackForwardItem(int howFar, QWebPage* page)
