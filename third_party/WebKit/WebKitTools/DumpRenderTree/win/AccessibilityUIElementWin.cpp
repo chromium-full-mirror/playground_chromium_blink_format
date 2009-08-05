@@ -200,6 +200,10 @@ double AccessibilityUIElement::clickPointY() {
   return 0;
 }
 
+JSStringRef AccessibilityUIElement::valueDescription() {
+  return 0;
+}
+
 double AccessibilityUIElement::intValue() {
   BSTR valueBSTR;
   if (FAILED(m_element->get_accValue(self(), &valueBSTR)) || !valueBSTR)

@@ -257,6 +257,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool accessibilityIsIgnored() const { return true; };
 
   virtual int intValue() const { return 0; }
+  virtual String valueDescription() const { return String(); }
   virtual float valueForRange() const { return 0.0f; }
   virtual float maxValueForRange() const { return 0.0f; }
   virtual float minValueForRange() const { return 0.0f; }
