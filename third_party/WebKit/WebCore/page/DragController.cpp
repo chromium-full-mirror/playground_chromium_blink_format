@@ -292,10 +292,8 @@ bool DragController::tryDocumentDrag(DragData* dragData,
   if (m_isHandlingDrag) {
     m_page->dragCaretController()->clear();
     return true;
-  }
-
-  if ((actionMask & DragDestinationActionEdit) && !m_isHandlingDrag &&
-      canProcessDrag(dragData)) {
+  } else if ((actionMask & DragDestinationActionEdit) &&
+             canProcessDrag(dragData)) {
     if (dragData->containsColor()) {
       operation = DragOperationGeneric;
       return true;
@@ -317,6 +315,9 @@ bool DragController::tryDocumentDrag(DragData* dragData,
                                                     : DragOperationCopy;
     return true;
   }
+  // If we're not over an editable region, make sure we're clearing any prior
+  // drag cursor.
+  m_page->dragCaretController()->clear();
   return false;
 }
 
