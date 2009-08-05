@@ -531,8 +531,8 @@ bool SelectElement::appendFormData(SelectElementData& data,
 }
 
 void SelectElement::reset(SelectElementData& data, Element* element) {
-  bool optionSelected = false;
   OptionElement* firstOption = 0;
+  OptionElement* selectedOption = 0;
 
   const Vector<Element*>& items = data.listItems(element);
   for (unsigned i = 0; i < items.size(); ++i) {
@@ -541,8 +541,10 @@ void SelectElement::reset(SelectElementData& data, Element* element) {
       continue;
 
     if (!items[i]->getAttribute(HTMLNames::selectedAttr).isNull()) {
+      if (selectedOption && !data.multiple())
+        selectedOption->setSelectedState(false);
       optionElement->setSelectedState(true);
-      optionSelected = true;
+      selectedOption = optionElement;
     } else
       optionElement->setSelectedState(false);
 
@@ -550,7 +552,7 @@ void SelectElement::reset(SelectElementData& data, Element* element) {
       firstOption = optionElement;
   }
 
-  if (!optionSelected && firstOption && data.usesMenuList())
+  if (!selectedOption && firstOption && data.usesMenuList())
     firstOption->setSelectedState(true);
 
   element->setNeedsStyleRecalc();
