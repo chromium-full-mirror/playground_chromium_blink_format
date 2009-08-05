@@ -29,10 +29,6 @@
 #ifndef DocumentLoader_h
 #define DocumentLoader_h
 
-#if ENABLE(OFFLINE_WEB_APPLICATIONS)
-#include "ApplicationCacheHost.h"
-#endif
-
 #include "NavigationAction.h"
 #include "ResourceError.h"
 #include "ResourceRequest.h"
@@ -42,6 +38,7 @@
 
 namespace WebCore {
 
+class ApplicationCacheHost;
 class Archive;
 class ArchiveResource;
 class ArchiveResourceCollection;
@@ -242,8 +239,8 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   void takeMemoryCacheLoadsForClientNotification(Vector<String>& loads);
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
-  ApplicationCacheHost* applicationCacheHost() {
-    return &m_applicationCacheHost;
+  ApplicationCacheHost* applicationCacheHost() const {
+    return m_applicationCacheHost.get();
   }
 #endif
 
@@ -335,7 +332,7 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   friend class ApplicationCacheHost;  // for substitute resource delivery
-  ApplicationCacheHost m_applicationCacheHost;
+  OwnPtr<ApplicationCacheHost> m_applicationCacheHost;
 #endif
 };
 

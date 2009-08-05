@@ -33,7 +33,7 @@
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
 
-#include "DOMApplicationCache.h"
+#include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
@@ -43,16 +43,38 @@ class ApplicationCache;
 class ApplicationCacheGroup;
 class ApplicationCacheResource;
 class ApplicationCacheStorage;
+class DOMApplicationCache;
 class DocumentLoader;
 class KURL;
 class ResourceLoader;
 class ResourceError;
-class ResourceRequest;
+struct ResourceRequest;
 class ResourceResponse;
 class SubstituteData;
 
 class ApplicationCacheHost {
  public:
+  // The Status numeric values are specified in the HTML5 spec.
+  enum Status {
+    UNCACHED = 0,
+    IDLE = 1,
+    CHECKING = 2,
+    DOWNLOADING = 3,
+    UPDATEREADY = 4,
+    OBSOLETE = 5
+  };
+
+  enum EventID {
+    CHECKING_EVENT = 0,
+    ERROR_EVENT,
+    NOUPDATE_EVENT,
+    DOWNLOADING_EVENT,
+    PROGRESS_EVENT,
+    UPDATEREADY_EVENT,
+    CACHED_EVENT,
+    OBSOLETE_EVENT  // Must remain the last value, this is used to size arrays.
+  };
+
   ApplicationCacheHost(DocumentLoader*);
   ~ApplicationCacheHost();
 
@@ -91,19 +113,12 @@ class ApplicationCacheHost {
 
   bool canCacheInPageCache() const;
 
-  DOMApplicationCache::Status status() const;
+  Status status() const;
   bool update();
   bool swapCache();
 
-  void setDOMApplicationCache(DOMApplicationCache* domApplicationCache) {
-    ASSERT(!m_DOMApplicationCache || !domApplicationCache);
-    m_DOMApplicationCache = domApplicationCache;
-  }
-
-  void notifyEventListener(DOMApplicationCache::EventType eventType) {
-    if (m_DOMApplicationCache)
-      m_DOMApplicationCache->callEventListener(eventType);
-  }
+  void setDOMApplicationCache(DOMApplicationCache* domApplicationCache);
+  void notifyEventListener(EventID id);
 
  private:
   friend class ApplicationCacheGroup;
@@ -131,7 +146,7 @@ class ApplicationCacheHost {
   bool isApplicationCacheEnabled();
   DocumentLoader* documentLoader() { return m_documentLoader; }
 
-  DOMApplicationCache* m_DOMApplicationCache;
+  DOMApplicationCache* m_domApplicationCache;
   DocumentLoader* m_documentLoader;
 
   // The application cache that the document loader is associated with (if any).

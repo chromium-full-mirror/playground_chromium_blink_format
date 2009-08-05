@@ -1015,17 +1015,13 @@ void ApplicationCacheStorage::empty() {
     it->second->clearStorageID();
 }
 
-bool ApplicationCacheStorage::transferApplicationCache(
+bool ApplicationCacheStorage::storeCopyOfCache(
     const String& cacheDirectory,
     ApplicationCacheHost* cacheHost) {
   ApplicationCache* cache = cacheHost->applicationCache();
   if (!cache)
     return true;
-  return ApplicationCacheStorage::storeCopyOfCache(cacheDirectory, cache);
-}
 
-bool ApplicationCacheStorage::storeCopyOfCache(const String& cacheDirectory,
-                                               ApplicationCache* cache) {
   // Create a new cache.
   RefPtr<ApplicationCache> cacheCopy = ApplicationCache::create();
 
