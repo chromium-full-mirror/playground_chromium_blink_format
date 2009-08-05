@@ -158,6 +158,11 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
     m_dumpResourceResponseMIMETypes = dumpResourceResponseMIMETypes;
   }
 
+  bool dumpWillCacheResponse() const { return m_dumpWillCacheResponse; }
+  void setDumpWillCacheResponse(bool dumpWillCacheResponse) {
+    m_dumpWillCacheResponse = dumpWillCacheResponse;
+  }
+
   bool dumpFrameLoadCallbacks() const { return m_dumpFrameLoadCallbacks; }
   void setDumpFrameLoadCallbacks(bool dumpFrameLoadCallbacks) {
     m_dumpFrameLoadCallbacks = dumpFrameLoadCallbacks;
@@ -241,6 +246,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool m_dumpEditingCallbacks;
   bool m_dumpResourceLoadCallbacks;
   bool m_dumpResourceResponseMIMETypes;
+  bool m_dumpWillCacheResponse;
   bool m_dumpFrameLoadCallbacks;
   bool m_callCloseOnWebViews;
   bool m_canOpenWindows;
