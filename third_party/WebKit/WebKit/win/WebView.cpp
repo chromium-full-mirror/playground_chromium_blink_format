@@ -1671,6 +1671,7 @@ static const KeyDownEntry keyDownEntries[] = {
     {VK_RETURN, 0, "InsertNewline"},
     {VK_RETURN, CtrlKey, "InsertNewline"},
     {VK_RETURN, AltKey, "InsertNewline"},
+    {VK_RETURN, ShiftKey, "InsertNewline"},
     {VK_RETURN, AltKey | ShiftKey, "InsertNewline"},
 
     // It's not quite clear whether clipboard shortcuts and Undo/Redo should be
@@ -1688,9 +1689,13 @@ static const KeyDownEntry keyDownEntries[] = {
 };
 
 static const KeyPressEntry keyPressEntries[] = {
-    {'\t', 0, "InsertTab"},          {'\t', ShiftKey, "InsertBacktab"},
-    {'\r', 0, "InsertNewline"},      {'\r', CtrlKey, "InsertNewline"},
-    {'\r', AltKey, "InsertNewline"}, {'\r', AltKey | ShiftKey, "InsertNewline"},
+    {'\t', 0, "InsertTab"},
+    {'\t', ShiftKey, "InsertBacktab"},
+    {'\r', 0, "InsertNewline"},
+    {'\r', CtrlKey, "InsertNewline"},
+    {'\r', AltKey, "InsertNewline"},
+    {'\r', ShiftKey, "InsertNewline"},
+    {'\r', AltKey | ShiftKey, "InsertNewline"},
 };
 
 const char* WebView::interpretKeyEvent(const KeyboardEvent* evt) {
