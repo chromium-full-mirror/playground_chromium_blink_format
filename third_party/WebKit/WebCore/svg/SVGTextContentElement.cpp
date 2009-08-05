@@ -348,7 +348,7 @@ static inline SVGRootInlineBox* rootInlineBoxForTextContentElement(
   if (!object || !object->isSVGText() || object->isText())
     return 0;
 
-  RenderSVGText* svgText = static_cast<RenderSVGText*>(object);
+  RenderBlock* svgText = toRenderBlock(object);
 
   // Find root inline box
   SVGRootInlineBox* rootBox =

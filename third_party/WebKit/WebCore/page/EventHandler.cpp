@@ -992,10 +992,10 @@ Cursor EventHandler::selectCursor(const MouseEventWithHitTestResults& event,
   RenderStyle* style = renderer ? renderer->style() : 0;
 
   if (renderer && renderer->isFrameSet()) {
-    RenderFrameSet* fs = static_cast<RenderFrameSet*>(renderer);
-    if (fs->canResizeRow(event.localPoint()))
+    RenderFrameSet* frameSetRenderer = toRenderFrameSet(renderer);
+    if (frameSetRenderer->canResizeRow(event.localPoint()))
       return rowResizeCursor();
-    if (fs->canResizeColumn(event.localPoint()))
+    if (frameSetRenderer->canResizeColumn(event.localPoint()))
       return columnResizeCursor();
   }
 
@@ -2639,8 +2639,7 @@ void EventHandler::capsLockStateMayHaveChanged() {
   if (Node* node = d->focusedNode()) {
     if (RenderObject* r = node->renderer()) {
       if (r->isTextField())
-        static_cast<RenderTextControlSingleLine*>(r)
-            ->capsLockStateMayHaveChanged();
+        toRenderTextControlSingleLine(r)->capsLockStateMayHaveChanged();
     }
   }
 }

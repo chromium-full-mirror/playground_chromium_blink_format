@@ -2,6 +2,7 @@
     Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2007 Rob Buis <buis@kde.org>
     Copyright (C) 2009 Google, Inc.  All rights reserved.
+    Copyright (C) 2009 Apple Inc. All rights reserved.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -35,14 +36,15 @@ class TransformationMatrix;
 class RenderSVGRoot : public RenderBox, SVGRenderBase {
  public:
   RenderSVGRoot(SVGStyledElement*);
-  ~RenderSVGRoot();
 
+  const RenderObjectChildList* children() const { return &m_children; }
+  RenderObjectChildList* children() { return &m_children; }
+
+ private:
   virtual RenderObjectChildList* virtualChildren() { return children(); }
   virtual const RenderObjectChildList* virtualChildren() const {
     return children();
   }
-  const RenderObjectChildList* children() const { return &m_children; }
-  RenderObjectChildList* children() { return &m_children; }
 
   virtual bool isSVGRoot() const { return true; }
   virtual const char* renderName() const { return "RenderSVGRoot"; }
@@ -83,7 +85,6 @@ class RenderSVGRoot : public RenderBox, SVGRenderBase {
                                    bool fixed,
                                    TransformState&) const;
 
- private:
   void calcViewport();
   const FloatSize& viewportSize() const;
 
@@ -98,6 +99,19 @@ class RenderSVGRoot : public RenderBox, SVGRenderBase {
   RenderObjectChildList m_children;
   FloatSize m_viewportSize;
 };
+
+inline RenderSVGRoot* toRenderSVGRoot(RenderObject* object) {
+  ASSERT(!object || object->isSVGRoot());
+  return static_cast<RenderSVGRoot*>(object);
+}
+
+inline const RenderSVGRoot* toRenderSVGRoot(const RenderObject* object) {
+  ASSERT(!object || object->isSVGRoot());
+  return static_cast<const RenderSVGRoot*>(object);
+}
+
+// This will catch anyone doing an unnecessary cast.
+void toRenderSVGRoot(const RenderSVGRoot*);
 
 }  // namespace WebCore
 

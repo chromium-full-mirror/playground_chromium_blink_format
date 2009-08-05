@@ -323,7 +323,7 @@ int InlineFlowBox::placeBoxesHorizontally(int xPos,
                                             needsWordSpacing);
         xPos += flow->marginRight();
       } else if (!curr->renderer()->isListMarker() ||
-                 static_cast<RenderListMarker*>(curr->renderer())->isInside()) {
+                 toRenderListMarker(curr->renderer())->isInside()) {
         xPos += curr->boxModelObject()->marginLeft();
         curr->setX(xPos);
         leftPosition =

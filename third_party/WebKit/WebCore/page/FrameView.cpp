@@ -243,14 +243,12 @@ void FrameView::detachCustomScrollbars() {
 
   Scrollbar* horizontalBar = horizontalScrollbar();
   if (horizontalBar && horizontalBar->isCustomScrollbar() &&
-      reinterpret_cast<RenderScrollbar*>(horizontalBar)->owningRenderer() ==
-          renderBox)
+      toRenderScrollbar(horizontalBar)->owningRenderer() == renderBox)
     setHasHorizontalScrollbar(false);
 
   Scrollbar* verticalBar = verticalScrollbar();
   if (verticalBar && verticalBar->isCustomScrollbar() &&
-      reinterpret_cast<RenderScrollbar*>(verticalBar)->owningRenderer() ==
-          renderBox)
+      toRenderScrollbar(verticalBar)->owningRenderer() == renderBox)
     setHasVerticalScrollbar(false);
 }
 

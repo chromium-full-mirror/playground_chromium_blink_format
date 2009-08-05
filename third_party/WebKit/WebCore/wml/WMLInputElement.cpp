@@ -288,7 +288,7 @@ void WMLInputElement::defaultEventHandler(Event* evt) {
       (evt->isMouseEvent() || evt->isDragEvent() || evt->isWheelEvent() ||
        evt->type() == eventNames().blurEvent ||
        evt->type() == eventNames().focusEvent))
-    static_cast<RenderTextControlSingleLine*>(renderer())->forwardEvent(evt);
+    toRenderTextControlSingleLine(renderer())->forwardEvent(evt);
 }
 
 void WMLInputElement::cacheSelection(int start, int end) {

@@ -33,8 +33,6 @@ namespace WebCore {
 RenderSVGHiddenContainer::RenderSVGHiddenContainer(SVGStyledElement* element)
     : RenderSVGContainer(element) {}
 
-RenderSVGHiddenContainer::~RenderSVGHiddenContainer() {}
-
 void RenderSVGHiddenContainer::layout() {
   ASSERT(needsLayout());
 

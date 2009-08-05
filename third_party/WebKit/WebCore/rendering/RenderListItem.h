@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -33,12 +34,6 @@ class RenderListItem : public RenderBlock {
  public:
   RenderListItem(Node*);
 
-  virtual const char* renderName() const { return "RenderListItem"; }
-
-  virtual bool isListItem() const { return true; }
-
-  virtual void destroy();
-
   int value() const {
     if (!m_isValueUpToDate)
       updateValueNow();
@@ -51,6 +46,16 @@ class RenderListItem : public RenderBlock {
   void setExplicitValue(int value);
   void clearExplicitValue();
 
+  void setNotInList(bool notInList) { m_notInList = notInList; }
+  bool notInList() const { return m_notInList; }
+
+ private:
+  virtual const char* renderName() const { return "RenderListItem"; }
+
+  virtual bool isListItem() const { return true; }
+
+  virtual void destroy();
+
   virtual bool isEmpty() const;
   virtual void paint(PaintInfo&, int tx, int ty);
 
@@ -59,15 +64,10 @@ class RenderListItem : public RenderBlock {
 
   virtual void positionListMarker();
 
-  void setNotInList(bool notInList) { m_notInList = notInList; }
-  bool notInList() const { return m_notInList; }
-
   const String& markerText() const;
 
- protected:
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
- private:
   void updateMarkerLocation();
   inline int calcValue() const;
   void updateValueNow() const;
@@ -81,6 +81,14 @@ class RenderListItem : public RenderBlock {
   mutable bool m_isValueUpToDate : 1;
   bool m_notInList : 1;
 };
+
+inline RenderListItem* toRenderListItem(RenderObject* object) {
+  ASSERT(!object || object->isListItem());
+  return static_cast<RenderListItem*>(object);
+}
+
+// This will catch anyone doing an unnecessary cast.
+void toRenderListItem(const RenderListItem*);
 
 }  // namespace WebCore
 

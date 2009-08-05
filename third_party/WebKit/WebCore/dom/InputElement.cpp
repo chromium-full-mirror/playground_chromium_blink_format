@@ -100,7 +100,7 @@ void InputElement::updatePlaceholderVisibility(InputElementData& data,
   if ((oldPlaceholderShouldBeVisible != data.placeholderShouldBeVisible() ||
        placeholderValueChanged) &&
       element->renderer())
-    static_cast<RenderTextControlSingleLine*>(element->renderer())
+    toRenderTextControlSingleLine(element->renderer())
         ->updatePlaceholderVisibility();
 }
 

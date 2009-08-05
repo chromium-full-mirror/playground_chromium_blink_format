@@ -1307,7 +1307,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
         m_activeSubmit = false;
       }
     } else if (inputType() == FILE && renderer())
-      static_cast<RenderFileUploadControl*>(renderer())->click();
+      toRenderFileUploadControl(renderer())->click();
   }
 
   // Use key press event here since sending simulated mouse events
@@ -1509,11 +1509,11 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
       (evt->isMouseEvent() || evt->isDragEvent() || evt->isWheelEvent() ||
        evt->type() == eventNames().blurEvent ||
        evt->type() == eventNames().focusEvent))
-    static_cast<RenderTextControlSingleLine*>(renderer())->forwardEvent(evt);
+    toRenderTextControlSingleLine(renderer())->forwardEvent(evt);
 
   if (inputType() == RANGE && renderer() &&
       (evt->isMouseEvent() || evt->isDragEvent() || evt->isWheelEvent()))
-    static_cast<RenderSlider*>(renderer())->forwardEvent(evt);
+    toRenderSlider(renderer())->forwardEvent(evt);
 
   if (!callBaseClassEarly && !evt->defaultHandled())
     HTMLFormControlElementWithState::defaultEventHandler(evt);
@@ -1681,14 +1681,13 @@ void HTMLInputElement::cacheSelection(int start, int end) {
 void HTMLInputElement::addSearchResult() {
   ASSERT(isSearchField());
   if (renderer())
-    static_cast<RenderTextControlSingleLine*>(renderer())->addSearchResult();
+    toRenderTextControlSingleLine(renderer())->addSearchResult();
 }
 
 void HTMLInputElement::onSearch() {
   ASSERT(isSearchField());
   if (renderer())
-    static_cast<RenderTextControlSingleLine*>(renderer())
-        ->stopSearchEventTimer();
+    toRenderTextControlSingleLine(renderer())->stopSearchEventTimer();
   dispatchEvent(eventNames().searchEvent, true, false);
 }
 

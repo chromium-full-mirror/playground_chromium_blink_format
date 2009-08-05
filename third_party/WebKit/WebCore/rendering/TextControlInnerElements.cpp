@@ -69,8 +69,8 @@ bool RenderTextControlInnerBlock::nodeAtPoint(const HitTestRequest& request,
 
   bool placeholderIsVisible = false;
   if (renderer->isTextField())
-    placeholderIsVisible = static_cast<RenderTextControlSingleLine*>(renderer)
-                               ->placeholderIsVisible();
+    placeholderIsVisible =
+        toRenderTextControlSingleLine(renderer)->placeholderIsVisible();
 
   return RenderBlock::nodeAtPoint(
       request, result, x, y, tx, ty,
@@ -177,7 +177,7 @@ void SearchFieldResultsButtonElement::defaultEventHandler(Event* evt) {
     input->focus();
     input->select();
     RenderTextControlSingleLine* renderer =
-        static_cast<RenderTextControlSingleLine*>(input->renderer());
+        toRenderTextControlSingleLine(input->renderer());
     if (renderer->popupIsVisible())
       renderer->hidePopup();
     else if (input->maxResults() > 0)

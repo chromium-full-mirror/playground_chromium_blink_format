@@ -44,8 +44,6 @@ namespace WebCore {
 
 RenderSVGImage::RenderSVGImage(SVGImageElement* impl) : RenderImage(impl) {}
 
-RenderSVGImage::~RenderSVGImage() {}
-
 void RenderSVGImage::adjustRectsForAspectRatio(
     FloatRect& destRect,
     FloatRect& srcRect,

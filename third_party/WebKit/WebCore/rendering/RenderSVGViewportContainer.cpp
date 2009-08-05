@@ -36,14 +36,18 @@ namespace WebCore {
 RenderSVGViewportContainer::RenderSVGViewportContainer(SVGStyledElement* node)
     : RenderSVGContainer(node) {}
 
-RenderSVGViewportContainer::~RenderSVGViewportContainer() {}
-
 void RenderSVGViewportContainer::paint(PaintInfo& paintInfo,
                                        int parentX,
                                        int parentY) {
+  // FIXME: The if statement here evaluates to false. isEmpty() is exactly the
+  // same
+  // as what is on the right side, so it's basically !isEmpty && isEmpty. So
+  // this
+  // function does nothing.
+
   // A value of zero disables rendering of the element.
-  if (!viewport().isEmpty() &&
-      (viewport().width() <= 0. || viewport().height() <= 0.))
+  if (!m_viewport.isEmpty() &&
+      (m_viewport.width() <= 0. || m_viewport.height() <= 0.))
     return;
 
   RenderSVGContainer::paint(paintInfo, parentX, parentY);
@@ -52,11 +56,7 @@ void RenderSVGViewportContainer::paint(PaintInfo& paintInfo,
 void RenderSVGViewportContainer::applyViewportClip(PaintInfo& paintInfo) {
   if (style()->overflowX() != OVISIBLE)
     paintInfo.context->clip(enclosingIntRect(
-        viewport()));  // FIXME: Eventually we'll want float-precision clipping
-}
-
-FloatRect RenderSVGViewportContainer::viewport() const {
-  return m_viewport;
+        m_viewport));  // FIXME: Eventually we'll want float-precision clipping
 }
 
 void RenderSVGViewportContainer::calcViewport() {
@@ -86,11 +86,11 @@ void RenderSVGViewportContainer::calcViewport() {
 TransformationMatrix RenderSVGViewportContainer::viewportTransform() const {
   if (node()->hasTagName(SVGNames::svgTag)) {
     SVGSVGElement* svg = static_cast<SVGSVGElement*>(node());
-    return svg->viewBoxToViewTransform(viewport().width(), viewport().height());
+    return svg->viewBoxToViewTransform(m_viewport.width(), m_viewport.height());
   } else if (node()->hasTagName(SVGNames::markerTag)) {
     SVGMarkerElement* marker = static_cast<SVGMarkerElement*>(node());
-    return marker->viewBoxToViewTransform(viewport().width(),
-                                          viewport().height());
+    return marker->viewBoxToViewTransform(m_viewport.width(),
+                                          m_viewport.height());
   }
 
   return TransformationMatrix();
@@ -99,7 +99,7 @@ TransformationMatrix RenderSVGViewportContainer::viewportTransform() const {
 TransformationMatrix RenderSVGViewportContainer::localToParentTransform()
     const {
   TransformationMatrix viewportTranslation;
-  viewportTranslation.translate(viewport().x(), viewport().y());
+  viewportTranslation.translate(m_viewport.x(), m_viewport.y());
   return viewportTransform() * viewportTranslation;
   // If this class were ever given a localTransform(), then the above would
   // read:
@@ -120,7 +120,7 @@ bool RenderSVGViewportContainer::pointIsInsideViewportClip(
   // support separate x/y overflow rules.
   if (style()->overflowX() == OHIDDEN) {
     ASSERT(style()->overflowY() == OHIDDEN);
-    if (!viewport().contains(pointInParent))
+    if (!m_viewport.contains(pointInParent))
       return false;
   }
   return true;

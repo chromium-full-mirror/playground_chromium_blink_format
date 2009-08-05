@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2006, 2007, 2009 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  *
@@ -40,9 +41,6 @@ class RenderTextControlSingleLine : public RenderTextControl,
   RenderTextControlSingleLine(Node*);
   virtual ~RenderTextControlSingleLine();
 
-  virtual bool hasControlClip() const { return m_cancelButton; }
-  virtual bool isTextField() const { return true; }
-
   bool placeholderIsVisible() const { return m_placeholderVisible; }
   bool placeholderShouldBeVisible() const;
   void updatePlaceholderVisibility();
@@ -53,6 +51,14 @@ class RenderTextControlSingleLine : public RenderTextControl,
   bool popupIsVisible() const { return m_searchPopupIsVisible; }
   void showPopup();
   virtual void hidePopup();  // PopupMenuClient method
+
+  void forwardEvent(Event*);
+
+  void capsLockStateMayHaveChanged();
+
+ private:
+  virtual bool hasControlClip() const { return m_cancelButton; }
+  virtual bool isTextField() const { return true; }
 
   virtual void subtreeHasChanged();
   virtual void paint(PaintInfo&, int tx, int ty);
@@ -65,9 +71,6 @@ class RenderTextControlSingleLine : public RenderTextControl,
                            int tx,
                            int ty,
                            HitTestAction);
-  void forwardEvent(Event*);
-
-  void capsLockStateMayHaveChanged();
 
   virtual void autoscroll();
 
@@ -82,7 +85,6 @@ class RenderTextControlSingleLine : public RenderTextControl,
                       ScrollGranularity,
                       float multiplier = 1.0f);
 
- private:
   int textBlockWidth() const;
   virtual int preferredContentWidth(float charWidth) const;
   virtual void adjustControlHeightBasedOnLineHeight(int lineHeight);
@@ -108,7 +110,6 @@ class RenderTextControlSingleLine : public RenderTextControl,
   void startSearchEventTimer();
   void searchEventTimerFired(Timer<RenderTextControlSingleLine>*);
 
- private:
   // PopupMenuClient methods
   virtual void valueChanged(unsigned listIndex, bool fireEvents = true);
   virtual String itemText(unsigned listIndex) const;
@@ -136,7 +137,6 @@ class RenderTextControlSingleLine : public RenderTextControl,
 
   InputElement* inputElement() const;
 
- private:
   bool m_placeholderVisible;
   bool m_searchPopupIsVisible;
   bool m_shouldDrawCapsLockIndicator;
@@ -149,6 +149,15 @@ class RenderTextControlSingleLine : public RenderTextControl,
   RefPtr<SearchPopupMenu> m_searchPopup;
   Vector<String> m_recentSearches;
 };
+
+inline RenderTextControlSingleLine* toRenderTextControlSingleLine(
+    RenderObject* object) {
+  ASSERT(!object || object->isTextField());
+  return static_cast<RenderTextControlSingleLine*>(object);
+}
+
+// This will catch anyone doing an unnecessary cast.
+void toRenderTextControlSingleLine(const RenderTextControlSingleLine*);
 }
 
 #endif

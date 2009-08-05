@@ -235,16 +235,16 @@ void SelectElement::scrollToSelection(SelectElementData& data,
     return;
 
   if (RenderObject* renderer = element->renderer())
-    static_cast<RenderListBox*>(renderer)->selectionChanged();
+    toRenderListBox(renderer)->selectionChanged();
 }
 
 void SelectElement::recalcStyle(SelectElementData& data, Element* element) {
   RenderObject* renderer = element->renderer();
   if (element->childNeedsStyleRecalc() && renderer) {
     if (data.usesMenuList())
-      static_cast<RenderMenuList*>(renderer)->setOptionsChanged(true);
+      toRenderMenuList(renderer)->setOptionsChanged(true);
     else
-      static_cast<RenderListBox*>(renderer)->setOptionsChanged(true);
+      toRenderListBox(renderer)->setOptionsChanged(true);
   } else if (data.shouldRecalcListItems())
     recalcListItems(data, element);
 }
@@ -257,9 +257,9 @@ void SelectElement::setRecalcListItems(SelectElementData& data,
                                            // programmatically.
   if (RenderObject* renderer = element->renderer()) {
     if (data.usesMenuList())
-      static_cast<RenderMenuList*>(renderer)->setOptionsChanged(true);
+      toRenderMenuList(renderer)->setOptionsChanged(true);
     else
-      static_cast<RenderListBox*>(renderer)->setOptionsChanged(true);
+      toRenderListBox(renderer)->setOptionsChanged(true);
   }
   element->setNeedsStyleRecalc();
 }
@@ -606,8 +606,7 @@ void SelectElement::menuListDefaultEventHandler(SelectElementData& data,
       // which gets called from RenderMenuList::valueChanged, which gets called
       // after the user makes a selection from the menu.
       saveLastSelection(data, element);
-      if (RenderMenuList* menuList =
-              static_cast<RenderMenuList*>(element->renderer()))
+      if (RenderMenuList* menuList = toRenderMenuList(element->renderer()))
         menuList->showPopup();
       handled = true;
     }
@@ -661,8 +660,7 @@ void SelectElement::menuListDefaultEventHandler(SelectElementData& data,
       // which gets called from RenderMenuList::valueChanged, which gets called
       // after the user makes a selection from the menu.
       saveLastSelection(data, element);
-      if (RenderMenuList* menuList =
-              static_cast<RenderMenuList*>(element->renderer()))
+      if (RenderMenuList* menuList = toRenderMenuList(element->renderer()))
         menuList->showPopup();
       handled = true;
     }
@@ -674,8 +672,7 @@ void SelectElement::menuListDefaultEventHandler(SelectElementData& data,
       // which gets called from RenderMenuList::valueChanged, which gets called
       // after the user makes a selection from the menu.
       saveLastSelection(data, element);
-      if (RenderMenuList* menuList =
-              static_cast<RenderMenuList*>(element->renderer()))
+      if (RenderMenuList* menuList = toRenderMenuList(element->renderer()))
         menuList->showPopup();
       handled = true;
     } else if (keyCode == '\r') {
@@ -702,8 +699,7 @@ void SelectElement::menuListDefaultEventHandler(SelectElementData& data,
   if (event->type() == eventNames().mousedownEvent && event->isMouseEvent() &&
       static_cast<MouseEvent*>(event)->button() == LeftButton) {
     element->focus();
-    if (RenderMenuList* menuList =
-            static_cast<RenderMenuList*>(element->renderer())) {
+    if (RenderMenuList* menuList = toRenderMenuList(element->renderer())) {
       if (menuList->popupIsVisible())
         menuList->hidePopup();
       else {
@@ -733,7 +729,7 @@ void SelectElement::listBoxDefaultEventHandler(SelectElementData& data,
     MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
     IntPoint localOffset = roundedIntPoint(element->renderer()->absoluteToLocal(
         mouseEvent->absoluteLocation(), false, true));
-    int listIndex = static_cast<RenderListBox*>(element->renderer())
+    int listIndex = toRenderListBox(element->renderer())
                         ->listIndexAtOffset(localOffset.x(), localOffset.y());
     if (listIndex >= 0) {
       // Save the selection so it can be compared to the new selection when
@@ -855,7 +851,7 @@ void SelectElement::listBoxDefaultEventHandler(SelectElementData& data,
                                       data.activeSelectionEndIndex());
       }
 
-      static_cast<RenderListBox*>(element->renderer())
+      toRenderListBox(element->renderer())
           ->scrollToRevealElementAtListIndex(endIndex);
       updateListBoxSelection(data, element, deselectOthers);
       listBoxOnChange(data, element);

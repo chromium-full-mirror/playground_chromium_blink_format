@@ -2,6 +2,7 @@
     Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2007 Rob Buis <buis@kde.org>
                   2009 Google, Inc.
+    Copyright (C) 2009 Apple Inc. All rights reserved.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -35,14 +36,18 @@ namespace WebCore {
 class RenderSVGViewportContainer : public RenderSVGContainer {
  public:
   RenderSVGViewportContainer(SVGStyledElement*);
-  ~RenderSVGViewportContainer();
 
+  // FIXME: This is only public for SVGResourceMarker::draw, likely the callsite
+  // should be changed.
+  TransformationMatrix viewportTransform() const;
+
+  virtual void paint(PaintInfo&, int parentX, int parentY);
+
+ private:
   virtual bool isSVGContainer() const { return true; }
   virtual const char* renderName() const {
     return "RenderSVGViewportContainer";
   }
-
-  virtual void paint(PaintInfo&, int parentX, int parentY);
 
   virtual TransformationMatrix localToParentTransform() const;
 
@@ -50,13 +55,6 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
   // RenderBox::absoluteTransform() can be removed.
   virtual TransformationMatrix absoluteTransform() const;
 
-  FloatRect viewport() const;
-
-  // FIXME: This is only public for SVGResourceMarker::draw, likely the callsite
-  // should be changed.
-  TransformationMatrix viewportTransform() const;
-
- private:
   virtual void calcViewport();
 
   virtual void applyViewportClip(PaintInfo&);
@@ -64,6 +62,16 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
 
   FloatRect m_viewport;
 };
+
+inline RenderSVGViewportContainer* toRenderSVGViewportContainer(
+    RenderObject* object) {
+  ASSERT(!object ||
+         !strcmp(object->renderName(), "RenderSVGViewportContainer"));
+  return static_cast<RenderSVGViewportContainer*>(object);
+}
+
+// This will catch anyone doing an unnecessary cast.
+void toRenderSVGViewportContainer(const RenderSVGViewportContainer*);
 
 }  // namespace WebCore
 

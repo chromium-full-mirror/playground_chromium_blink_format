@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2006 Alexander Kellett <lypanov@kde.org>
-    Copyright (C) 2006 Apple Computer, Inc.
+    Copyright (C) 2006, 2009 Apple Inc. All rights reserved.
     Copyright (C) 2007 Rob Buis <buis@kde.org>
     Copyright (C) 2009 Google, Inc.
 
@@ -38,8 +38,8 @@ class SVGPreserveAspectRatio;
 class RenderSVGImage : public RenderImage, SVGRenderBase {
  public:
   RenderSVGImage(SVGImageElement*);
-  virtual ~RenderSVGImage();
 
+ private:
   virtual const char* renderName() const { return "RenderSVGImage"; }
   virtual bool isSVGImage() const { return true; }
 
@@ -73,7 +73,7 @@ class RenderSVGImage : public RenderImage, SVGRenderBase {
   virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
-  bool requiresLayer() const { return false; }
+  virtual bool requiresLayer() const { return false; }
 
   virtual bool nodeAtFloatPoint(const HitTestRequest&,
                                 HitTestResult&,
@@ -81,13 +81,12 @@ class RenderSVGImage : public RenderImage, SVGRenderBase {
                                 HitTestAction);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
-                           int _x,
-                           int _y,
-                           int _tx,
-                           int _ty,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty,
                            HitTestAction);
 
- private:
   virtual TransformationMatrix localTransform() const {
     return m_localTransform;
   }

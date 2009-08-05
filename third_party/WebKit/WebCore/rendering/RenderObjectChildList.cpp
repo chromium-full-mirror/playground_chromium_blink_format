@@ -40,9 +40,10 @@
 namespace WebCore {
 
 static void updateListMarkerNumbers(RenderObject* child) {
-  for (RenderObject* r = child; r; r = r->nextSibling()) {
-    if (r->isListItem())
-      static_cast<RenderListItem*>(r)->updateValue();
+  for (RenderObject* sibling = child; sibling;
+       sibling = sibling->nextSibling()) {
+    if (sibling->isListItem())
+      toRenderListItem(sibling)->updateValue();
   }
 }
 
@@ -310,7 +311,7 @@ static void invalidateCountersInContainer(RenderObject* container) {
   for (RenderObject* content = container->firstChild(); content;
        content = content->nextSibling()) {
     if (content->isCounter())
-      static_cast<RenderCounter*>(content)->invalidate();
+      toRenderCounter(content)->invalidate();
   }
 }
 

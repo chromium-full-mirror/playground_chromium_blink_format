@@ -94,7 +94,7 @@ IntRect AccessibilityListBoxOption::elementRect() const {
                            ->boundingBoxRect();
   int index = listBoxOptionIndex();
   if (index != -1)
-    rect = static_cast<RenderListBox*>(listBoxRenderer)
+    rect = toRenderListBox(listBoxRenderer)
                ->itemBoundingBoxRect(parentRect.x(), parentRect.y(), index);
 
   return rect;

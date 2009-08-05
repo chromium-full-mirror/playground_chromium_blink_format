@@ -269,7 +269,7 @@ void HTMLTextAreaElement::defaultEventHandler(Event* event) {
   if (renderer() &&
       (event->isMouseEvent() || event->isDragEvent() || event->isWheelEvent() ||
        event->type() == eventNames().blurEvent))
-    static_cast<RenderTextControlMultiLine*>(renderer())->forwardEvent(event);
+    toRenderTextControlMultiLine(renderer())->forwardEvent(event);
 
   HTMLFormControlElementWithState::defaultEventHandler(event);
 }

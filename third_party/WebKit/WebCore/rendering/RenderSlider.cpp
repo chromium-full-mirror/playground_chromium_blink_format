@@ -150,7 +150,7 @@ void SliderThumbElement::defaultEventHandler(Event* event) {
 
   if (eventType == eventNames().mousedownEvent && isLeftButton) {
     if (document()->frame() && renderer()) {
-      RenderSlider* slider = static_cast<RenderSlider*>(renderer()->parent());
+      RenderSlider* slider = toRenderSlider(renderer()->parent());
       if (slider) {
         if (slider->mouseEventIsInThumb(mouseEvent)) {
           // We selected the thumb, we want the cursor to always stay at
@@ -180,7 +180,7 @@ void SliderThumbElement::defaultEventHandler(Event* event) {
     }
   } else if (eventType == eventNames().mousemoveEvent) {
     if (m_inDragMode && renderer() && renderer()->parent()) {
-      RenderSlider* slider = static_cast<RenderSlider*>(renderer()->parent());
+      RenderSlider* slider = toRenderSlider(renderer()->parent());
       if (slider) {
         FloatPoint curPoint = slider->absoluteToLocal(
             mouseEvent->absoluteLocation(), false, true);
