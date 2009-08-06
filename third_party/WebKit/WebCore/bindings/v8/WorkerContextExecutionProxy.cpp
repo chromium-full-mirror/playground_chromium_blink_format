@@ -34,8 +34,8 @@
 
 #include "WorkerContextExecutionProxy.h"
 
-#include "DedicatedWorkerContext.h"
 #include "DOMCoreException.h"
+#include "DedicatedWorkerContext.h"
 #include "Event.h"
 #include "EventException.h"
 #include "MessagePort.h"
@@ -172,7 +172,8 @@ void WorkerContextExecutionProxy::initContextIfNeeded() {
   // Create a new JS object and use it as the prototype for the shadow global
   // object.
   v8::Handle<v8::Function> workerContextConstructor =
-      GetConstructor(V8ClassIndex::DEDICATEDWORKERCONTEXT);
+      V8DOMWrapper::getConstructorForContext(
+          V8ClassIndex::DEDICATEDWORKERCONTEXT, context);
   v8::Local<v8::Object> jsWorkerContext =
       SafeAllocation::newInstance(workerContextConstructor);
   // Bail out if allocation failed.
@@ -198,31 +199,14 @@ void WorkerContextExecutionProxy::initContextIfNeeded() {
   m_listeners.set(new V8EventListenerList());
 }
 
-v8::Local<v8::Function> WorkerContextExecutionProxy::GetConstructor(
-    V8ClassIndex::V8WrapperType type) {
-  // Enter the context of the proxy to make sure that the function is
-  // constructed in the context corresponding to this proxy.
-  v8::Context::Scope scope(m_context);
-  v8::Handle<v8::FunctionTemplate> functionTemplate =
-      V8DOMWrapper::getTemplate(type);
-
-  // Getting the function might fail if we're running out of stack or memory.
-  v8::TryCatch tryCatch;
-  v8::Local<v8::Function> value = functionTemplate->GetFunction();
-  if (value.IsEmpty())
-    return v8::Local<v8::Function>();
-
-  return value;
-}
-
-v8::Handle<v8::Value> WorkerContextExecutionProxy::ToV8Object(
+v8::Handle<v8::Value> WorkerContextExecutionProxy::convertToV8Object(
     V8ClassIndex::V8WrapperType type,
     void* impl) {
   if (!impl)
     return v8::Null();
 
   if (type == V8ClassIndex::DEDICATEDWORKERCONTEXT)
-    return WorkerContextToV8Object(static_cast<WorkerContext*>(impl));
+    return convertWorkerContextToV8Object(static_cast<WorkerContext*>(impl));
 
   bool isActiveDomObject = false;
   switch (type) {
@@ -291,7 +275,7 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::ToV8Object(
   return result;
 }
 
-v8::Handle<v8::Value> WorkerContextExecutionProxy::EventToV8Object(
+v8::Handle<v8::Value> WorkerContextExecutionProxy::convertEventToV8Object(
     Event* event) {
   if (!event)
     return v8::Null();
@@ -309,7 +293,7 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::EventToV8Object(
   if (result.IsEmpty()) {
     // Instantiation failed. Avoid updating the DOM object map and return null
     // which
-    // is already handled by callers of this function in case the event is NULL.
+    // is already handled by callers of this function in case the event is null.
     return v8::Null();
   }
 
@@ -320,38 +304,38 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::EventToV8Object(
   return result;
 }
 
-v8::Handle<v8::Value> WorkerContextExecutionProxy::EventTargetToV8Object(
+v8::Handle<v8::Value> WorkerContextExecutionProxy::convertEventTargetToV8Object(
     EventTarget* target) {
   if (!target)
     return v8::Null();
 
   DedicatedWorkerContext* workerContext = target->toDedicatedWorkerContext();
   if (workerContext)
-    return WorkerContextToV8Object(workerContext);
+    return convertWorkerContextToV8Object(workerContext);
 
   Worker* worker = target->toWorker();
   if (worker)
-    return ToV8Object(V8ClassIndex::WORKER, worker);
+    return convertToV8Object(V8ClassIndex::WORKER, worker);
 
   XMLHttpRequest* xhr = target->toXMLHttpRequest();
   if (xhr)
-    return ToV8Object(V8ClassIndex::XMLHTTPREQUEST, xhr);
+    return convertToV8Object(V8ClassIndex::XMLHTTPREQUEST, xhr);
 
   MessagePort* mp = target->toMessagePort();
   if (mp)
-    return ToV8Object(V8ClassIndex::MESSAGEPORT, mp);
+    return convertToV8Object(V8ClassIndex::MESSAGEPORT, mp);
 
   ASSERT_NOT_REACHED();
   return v8::Handle<v8::Value>();
 }
 
-v8::Handle<v8::Value> WorkerContextExecutionProxy::WorkerContextToV8Object(
+v8::Handle<v8::Value>
+WorkerContextExecutionProxy::convertWorkerContextToV8Object(
     WorkerContext* workerContext) {
   if (!workerContext)
     return v8::Null();
 
-  v8::Handle<v8::Context> context =
-      workerContext->script()->proxy()->GetContext();
+  v8::Handle<v8::Context> context = workerContext->script()->proxy()->context();
 
   v8::Handle<v8::Object> global = context->Global();
   ASSERT(!global.IsEmpty());
@@ -359,21 +343,21 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::WorkerContextToV8Object(
 }
 
 v8::Local<v8::Object> WorkerContextExecutionProxy::toV8(
-    V8ClassIndex::V8WrapperType descType,
+    V8ClassIndex::V8WrapperType descriptorType,
     V8ClassIndex::V8WrapperType cptrType,
     void* impl) {
   v8::Local<v8::Function> function;
   WorkerContextExecutionProxy* proxy = retrieve();
   if (proxy)
-    function = proxy->GetConstructor(descType);
+    function =
+        V8DOMWrapper::getConstructor(descriptorType, proxy->workerContext());
   else
-    function = V8DOMWrapper::getTemplate(descType)->GetFunction();
+    function = V8DOMWrapper::getTemplate(descriptorType)->GetFunction();
 
   v8::Local<v8::Object> instance = SafeAllocation::newInstance(function);
-  if (!instance.IsEmpty()) {
+  if (!instance.IsEmpty())
     // Avoid setting the DOM wrapper for failed allocations.
     V8DOMWrapper::setDOMWrapper(instance, V8ClassIndex::ToInt(cptrType), impl);
-  }
   return instance;
 }
 
@@ -381,8 +365,8 @@ bool WorkerContextExecutionProxy::forgetV8EventObject(Event* event) {
   if (getDOMObjectMap().contains(event)) {
     getDOMObjectMap().forget(event);
     return true;
-  } else
-    return false;
+  }
+  return false;
 }
 
 ScriptValue WorkerContextExecutionProxy::evaluate(
@@ -494,7 +478,7 @@ WorkerContextExecutionProxy::findOrCreateObjectEventListener(
   return findOrCreateEventListenerHelper(object, isInline, findOnly, true);
 }
 
-void WorkerContextExecutionProxy::RemoveEventListener(
+void WorkerContextExecutionProxy::removeEventListener(
     V8EventListener* listener) {
   m_listeners->remove(listener);
 }

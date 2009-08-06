@@ -44,7 +44,7 @@ static void weakObjectEventListenerCallback(v8::Persistent<v8::Value>,
       static_cast<V8WorkerContextObjectEventListener*>(parameter);
 
   // Remove the wrapper
-  listener->proxy()->RemoveEventListener(listener);
+  listener->proxy()->removeEventListener(listener);
 
   listener->disposeListenerObject();
 }

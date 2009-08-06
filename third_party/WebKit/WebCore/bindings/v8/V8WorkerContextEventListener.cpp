@@ -48,7 +48,7 @@ V8WorkerContextEventListener::V8WorkerContextEventListener(
 
 V8WorkerContextEventListener::~V8WorkerContextEventListener() {
   if (m_proxy)
-    m_proxy->RemoveEventListener(this);
+    m_proxy->removeEventListener(this);
   disposeListenerObject();
 }
 
@@ -65,7 +65,7 @@ void V8WorkerContextEventListener::handleEvent(Event* event,
 
   v8::HandleScope handleScope;
 
-  v8::Handle<v8::Context> context = m_proxy->GetContext();
+  v8::Handle<v8::Context> context = m_proxy->context();
   if (context.IsEmpty())
     return;
 
@@ -74,7 +74,7 @@ void V8WorkerContextEventListener::handleEvent(Event* event,
 
   // Get the V8 wrapper for the event object.
   v8::Handle<v8::Value> jsEvent =
-      WorkerContextExecutionProxy::EventToV8Object(event);
+      WorkerContextExecutionProxy::convertEventToV8Object(event);
 
   invokeEventHandler(context, event, jsEvent, isWindowEvent);
 }
@@ -92,7 +92,7 @@ bool V8WorkerContextEventListener::reportError(const String& message,
 
   v8::HandleScope handleScope;
 
-  v8::Handle<v8::Context> context = m_proxy->GetContext();
+  v8::Handle<v8::Context> context = m_proxy->context();
   if (context.IsEmpty())
     return false;
 
@@ -160,7 +160,7 @@ v8::Local<v8::Object> V8WorkerContextEventListener::getReceiverObject(
 
   EventTarget* target = event->currentTarget();
   v8::Handle<v8::Value> value =
-      WorkerContextExecutionProxy::EventTargetToV8Object(target);
+      WorkerContextExecutionProxy::convertEventTargetToV8Object(target);
   if (value.IsEmpty())
     return v8::Local<v8::Object>();
   return v8::Local<v8::Object>::New(v8::Handle<v8::Object>::Cast(value));
