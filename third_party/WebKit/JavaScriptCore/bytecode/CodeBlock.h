@@ -309,8 +309,7 @@ class CodeBlock : public FastAllocBase {
     reparseForExceptionInfoIfNecessary(callFrame);
     return binaryChop<CallReturnOffsetToBytecodeIndex, unsigned,
                       getCallReturnOffset>(
-               m_exceptionInfo->m_callReturnIndexVector.begin(),
-               m_exceptionInfo->m_callReturnIndexVector.size(),
+               callReturnIndexVector().begin(), callReturnIndexVector().size(),
                ownerNode()->generatedJITCode().offsetOf(returnAddress.value()))
         ->bytecodeIndex;
   }
