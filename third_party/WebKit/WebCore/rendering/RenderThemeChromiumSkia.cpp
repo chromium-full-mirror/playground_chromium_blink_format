@@ -603,8 +603,11 @@ bool RenderThemeChromiumSkia::paintMediaSliderTrack(
     paint.reset();
     paint.setShader(gradient);
     paint.setAntiAlias(true);
-    canvas->drawRoundRect(bufferedRect, borderRadius.width(),
-                          borderRadius.height(), paint);
+    // Check for round rect with zero width or height, otherwise Skia will
+    // assert
+    if (bufferedRect.width() > 0 && bufferedRect.height() > 0)
+      canvas->drawRoundRect(bufferedRect, borderRadius.width(),
+                            borderRadius.height(), paint);
     gradient->unref();
   }
   return true;
