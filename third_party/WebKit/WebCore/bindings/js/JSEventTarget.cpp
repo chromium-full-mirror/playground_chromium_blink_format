@@ -33,9 +33,13 @@
 #include "JSEventListener.h"
 #include "JSMessagePort.h"
 #include "JSNode.h"
+#include "JSSharedWorker.h"
+#include "JSSharedWorkerContext.h"
 #include "JSXMLHttpRequest.h"
 #include "JSXMLHttpRequestUpload.h"
 #include "MessagePort.h"
+#include "SharedWorker.h"
+#include "SharedWorkerContext.h"
 #include "XMLHttpRequest.h"
 #include "XMLHttpRequestUpload.h"
 
@@ -54,11 +58,6 @@
 #include "JSDedicatedWorkerContext.h"
 #include "JSWorker.h"
 #include "Worker.h"
-#endif
-
-#if ENABLE(SHARED_WORKERS)
-#include "JSSharedWorker.h"
-#include "SharedWorker.h"
 #endif
 
 using namespace JSC;
@@ -110,6 +109,9 @@ JSValue toJS(ExecState* exec,
 #if ENABLE(SHARED_WORKERS)
   if (SharedWorker* sharedWorker = target->toSharedWorker())
     return toJS(exec, globalObject, sharedWorker);
+
+  if (SharedWorkerContext* workerContext = target->toSharedWorkerContext())
+    return toJSDOMGlobalObject(workerContext);
 #endif
 
   ASSERT_NOT_REACHED();
@@ -144,6 +146,7 @@ EventTarget* toEventTarget(JSC::JSValue value) {
 
 #if ENABLE(SHARED_WORKERS)
   CONVERT_TO_EVENT_TARGET(SharedWorker)
+  CONVERT_TO_EVENT_TARGET(SharedWorkerContext)
 #endif
 
   return 0;

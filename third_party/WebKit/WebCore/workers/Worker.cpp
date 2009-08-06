@@ -41,7 +41,6 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "MessageEvent.h"
-#include "SecurityOrigin.h"
 #include "TextEncoding.h"
 #include "WorkerContextProxy.h"
 #include "WorkerScriptLoader.h"
@@ -55,22 +54,9 @@ Worker::Worker(const String& url,
                ExceptionCode& ec)
     : AbstractWorker(context),
       m_contextProxy(WorkerContextProxy::create(this)) {
-  if (url.isEmpty()) {
-    ec = SYNTAX_ERR;
+  KURL scriptURL = resolveURL(url, ec);
+  if (ec)
     return;
-  }
-
-  KURL scriptURL = context->completeURL(url);
-  if (!scriptURL.isValid()) {
-    ec = SYNTAX_ERR;
-    return;
-  }
-
-  if (!context->securityOrigin()->canAccess(
-          SecurityOrigin::create(scriptURL).get())) {
-    ec = SECURITY_ERR;
-    return;
-  }
 
   m_scriptLoader = new WorkerScriptLoader();
   m_scriptLoader->loadAsynchronously(scriptExecutionContext(), scriptURL,

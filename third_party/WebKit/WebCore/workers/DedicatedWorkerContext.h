@@ -31,6 +31,8 @@
 #ifndef DedicatedWorkerContext_h
 #define DedicatedWorkerContext_h
 
+#if ENABLE(WORKERS)
+
 #include "WorkerContext.h"
 
 namespace WebCore {
@@ -48,16 +50,16 @@ class DedicatedWorkerContext : public WorkerContext {
   }
   virtual ~DedicatedWorkerContext();
 
-  // WorkerUtils
+  virtual bool isDedicatedWorkerContext() const { return true; }
+
+  // Overridden to allow us to check our pending activity after executing
+  // imported script.
   virtual void importScripts(const Vector<String>& urls,
                              const String& callerURL,
                              int callerLine,
                              ExceptionCode&);
 
   // ScriptExecutionContext
-  virtual void reportException(const String& errorMessage,
-                               int lineNumber,
-                               const String& sourceURL);
   virtual void addMessage(MessageDestination,
                           MessageSource,
                           MessageType,
@@ -65,6 +67,10 @@ class DedicatedWorkerContext : public WorkerContext {
                           const String& message,
                           unsigned lineNumber,
                           const String& sourceURL);
+
+  virtual void forwardException(const String& errorMessage,
+                                int lineNumber,
+                                const String& sourceURL);
 
   // EventTarget
   virtual DedicatedWorkerContext* toDedicatedWorkerContext() { return this; }
@@ -85,5 +91,7 @@ class DedicatedWorkerContext : public WorkerContext {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(WORKERS)
 
 #endif  // DedicatedWorkerContext_h

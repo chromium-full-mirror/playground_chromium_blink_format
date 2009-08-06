@@ -36,6 +36,8 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 
+#if ENABLE(SHARED_WORKERS)
+
 namespace WebCore {
 
 class SharedWorker : public AbstractWorker {
@@ -61,5 +63,7 @@ class SharedWorker : public AbstractWorker {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(SHARED_WORKERS)
 
 #endif  // SharedWorker_h

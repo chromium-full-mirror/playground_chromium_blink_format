@@ -48,6 +48,7 @@ class Node;
 class SVGElementInstance;
 class ScriptExecutionContext;
 class SharedWorker;
+class SharedWorkerContext;
 class Worker;
 class XMLHttpRequest;
 class XMLHttpRequestUpload;
@@ -74,6 +75,7 @@ class EventTarget {
 
 #if ENABLE(SHARED_WORKERS)
   virtual SharedWorker* toSharedWorker();
+  virtual SharedWorkerContext* toSharedWorkerContext();
 #endif
 
   virtual ScriptExecutionContext* scriptExecutionContext() const = 0;
