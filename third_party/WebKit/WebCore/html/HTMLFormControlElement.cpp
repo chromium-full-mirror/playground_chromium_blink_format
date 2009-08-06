@@ -246,6 +246,10 @@ bool HTMLFormControlElement::willValidate() const {
   return form() && name().length() && !disabled() && !isReadOnlyFormControl();
 }
 
+void HTMLFormControlElement::setCustomValidity(const String& error) {
+  validity()->setCustomErrorMessage(error);
+}
+
 void HTMLFormControlElement::dispatchFocusEvent() {
   if (document()->frame() && document()->frame()->page())
     document()->frame()->page()->chrome()->client()->formDidFocus(this);
