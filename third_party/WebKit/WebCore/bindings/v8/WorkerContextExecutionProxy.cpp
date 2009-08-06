@@ -122,6 +122,9 @@ void WorkerContextExecutionProxy::dispose() {
 }
 
 WorkerContextExecutionProxy* WorkerContextExecutionProxy::retrieve() {
+  // Happens on frame destruction, check otherwise GetCurrent() will crash.
+  if (!v8::Context::InContext())
+    return 0;
   v8::Handle<v8::Context> context = v8::Context::GetCurrent();
   v8::Handle<v8::Object> global = context->Global();
   global = V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::WORKERCONTEXT, global);
@@ -317,8 +320,6 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::EventToV8Object(
   return result;
 }
 
-// A JS object of type EventTarget in the worker context can only be Worker or
-// WorkerContext.
 v8::Handle<v8::Value> WorkerContextExecutionProxy::EventTargetToV8Object(
     EventTarget* target) {
   if (!target)
@@ -335,6 +336,10 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::EventTargetToV8Object(
   XMLHttpRequest* xhr = target->toXMLHttpRequest();
   if (xhr)
     return ToV8Object(V8ClassIndex::XMLHTTPREQUEST, xhr);
+
+  MessagePort* mp = target->toMessagePort();
+  if (mp)
+    return ToV8Object(V8ClassIndex::MESSAGEPORT, mp);
 
   ASSERT_NOT_REACHED();
   return v8::Handle<v8::Value>();
