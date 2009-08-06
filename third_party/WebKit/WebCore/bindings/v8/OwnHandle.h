@@ -61,8 +61,6 @@ class OwnHandle {
     m_handle = handle;
   }
 
-  void swap(OwnHandle& other) { std::swap(m_handle, other.m_handle); }
-
   // Note: This is clear in the OwnPtr sense, not the v8::Handle sense.
   void clear() {
     if (m_handle.IsEmpty())
