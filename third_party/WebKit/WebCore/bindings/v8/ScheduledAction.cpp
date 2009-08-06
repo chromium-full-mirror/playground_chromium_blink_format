@@ -44,10 +44,12 @@
 
 namespace WebCore {
 
-ScheduledAction::ScheduledAction(v8::Handle<v8::Function> func,
+ScheduledAction::ScheduledAction(v8::Handle<v8::Context> context,
+                                 v8::Handle<v8::Function> func,
                                  int argc,
                                  v8::Handle<v8::Value> argv[])
-    : m_code(String(), KURL(), 0) {
+    : m_context(context), m_code(String(), KURL(), 0) {
+  m_context.makeWeak();
   m_function = v8::Persistent<v8::Function>::New(func);
 
 #ifndef NDEBUG
@@ -104,7 +106,7 @@ void ScheduledAction::execute(V8Proxy* proxy) {
   ASSERT(proxy);
 
   v8::HandleScope handleScope;
-  v8::Local<v8::Context> v8Context = proxy->context();
+  v8::Handle<v8::Context> v8Context = m_context.get();
   if (v8Context.IsEmpty())
     return;  // JS may not be enabled.
 
@@ -128,16 +130,16 @@ void ScheduledAction::execute(WorkerContext* workerContext) {
   // In a Worker, the execution should always happen on a worker thread.
   ASSERT(workerContext->thread()->threadID() == currentThread());
 
-  WorkerScriptController* scriptController = workerContext->script();
-
   if (!m_function.IsEmpty() && m_function->IsFunction()) {
     v8::HandleScope handleScope;
-    v8::Local<v8::Context> v8Context = scriptController->proxy()->GetContext();
+    v8::Handle<v8::Context> v8Context = m_context.get();
     ASSERT(!v8Context.IsEmpty());
     v8::Context::Scope scope(v8Context);
     m_function->Call(v8Context->Global(), m_argc, m_argv);
-  } else
+  } else {
+    WorkerScriptController* scriptController = workerContext->script();
     scriptController->evaluate(m_code);
+  }
 }
 #endif
 

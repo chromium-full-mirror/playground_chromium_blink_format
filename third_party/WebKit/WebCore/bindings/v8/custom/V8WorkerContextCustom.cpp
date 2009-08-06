@@ -106,6 +106,10 @@ v8::Handle<v8::Value> SetTimeoutOrInterval(const v8::Arguments& args,
   WorkerContext* workerContext =
       V8DOMWrapper::convertDOMWrapperToNative<WorkerContext>(args.Holder());
 
+  v8::Handle<v8::Context> v8Context =
+      workerContext->script()->proxy()->GetContext();
+  ASSERT(!v8Context.IsEmpty());
+
   int argumentCount = args.Length();
   if (argumentCount < 1)
     return v8::Undefined();
@@ -118,8 +122,8 @@ v8::Handle<v8::Value> SetTimeoutOrInterval(const v8::Arguments& args,
     WebCore::String stringFunction = toWebCoreString(function);
     timerId = DOMTimer::install(
         workerContext,
-        new ScheduledAction(stringFunction, workerContext->url()), timeout,
-        singleShot);
+        new ScheduledAction(v8Context, stringFunction, workerContext->url()),
+        timeout, singleShot);
   } else if (function->IsFunction()) {
     size_t paramCount = argumentCount >= 2 ? argumentCount - 2 : 0;
     v8::Local<v8::Value>* params = 0;
@@ -130,8 +134,9 @@ v8::Handle<v8::Value> SetTimeoutOrInterval(const v8::Arguments& args,
     }
     // ScheduledAction takes ownership of actual params and releases them in its
     // destructor.
-    ScheduledAction* action = new ScheduledAction(
-        v8::Handle<v8::Function>::Cast(function), paramCount, params);
+    ScheduledAction* action =
+        new ScheduledAction(v8Context, v8::Handle<v8::Function>::Cast(function),
+                            paramCount, params);
     delete[] params;
     timerId = DOMTimer::install(workerContext, action, timeout, singleShot);
   } else
