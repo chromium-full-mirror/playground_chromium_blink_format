@@ -57,9 +57,7 @@ class FrameLoadDelegate : public IWebFrameLoadDelegate,
   virtual HRESULT STDMETHODCALLTYPE
   didReceiveServerRedirectForProvisionalLoadForFrame(
       /* [in] */ IWebView* webView,
-      /* [in] */ IWebFrame* frame) {
-    return E_NOTIMPL;
-  }
+      /* [in] */ IWebFrame* frame);
 
   virtual HRESULT STDMETHODCALLTYPE didFailProvisionalLoadWithError(
       /* [in] */ IWebView* webView,
@@ -102,15 +100,11 @@ class FrameLoadDelegate : public IWebFrameLoadDelegate,
       /* [in] */ BSTR url,
       /* [in] */ double delaySeconds,
       /* [in] */ DATE fireDate,
-      /* [in] */ IWebFrame* frame) {
-    return E_NOTIMPL;
-  }
+      /* [in] */ IWebFrame* frame);
 
   virtual HRESULT STDMETHODCALLTYPE didCancelClientRedirectForFrame(
       /* [in] */ IWebView* webView,
-      /* [in] */ IWebFrame* frame) {
-    return E_NOTIMPL;
-  }
+      /* [in] */ IWebFrame* frame);
 
   virtual HRESULT STDMETHODCALLTYPE willCloseFrame(
       /* [in] */ IWebView* webView,

@@ -133,6 +133,17 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didStartProvisionalLoadForFrame(
   return S_OK;
 }
 
+HRESULT STDMETHODCALLTYPE
+FrameLoadDelegate::didReceiveServerRedirectForProvisionalLoadForFrame(
+    /* [in] */ IWebView* webView,
+    /* [in] */ IWebFrame* frame) {
+  if (!done && gLayoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didReceiveServerRedirectForProvisionalLoadForFrame\n",
+           descriptionSuitableForTestResult(frame).c_str());
+
+  return S_OK;
+}
+
 HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didFailProvisionalLoadWithError(
     /* [in] */ IWebView* webView,
     /* [in] */ IWebError* error,
@@ -227,6 +238,31 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didFailLoadWithError(
            descriptionSuitableForTestResult(frame).c_str());
 
   locationChangeDone(error, frame);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE FrameLoadDelegate::willPerformClientRedirectToURL(
+    /* [in] */ IWebView* webView,
+    /* [in] */ BSTR url,
+    /* [in] */ double delaySeconds,
+    /* [in] */ DATE fireDate,
+    /* [in] */ IWebFrame* frame) {
+  if (!done && gLayoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - willPerformClientRedirectToURL: %S \n",
+           descriptionSuitableForTestResult(frame).c_str(),
+           urlSuitableForTestResult(std::wstring(url, ::SysStringLen(url)))
+               .c_str());
+
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didCancelClientRedirectForFrame(
+    /* [in] */ IWebView* webView,
+    /* [in] */ IWebFrame* frame) {
+  if (!done && gLayoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didCancelClientRedirectForFrame\n",
+           descriptionSuitableForTestResult(frame).c_str());
+
   return S_OK;
 }
 
