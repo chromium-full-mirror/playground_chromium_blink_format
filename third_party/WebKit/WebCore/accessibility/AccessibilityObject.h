@@ -256,6 +256,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   bool accessibilityShouldUseUniqueId() const { return true; };
   virtual bool accessibilityIsIgnored() const { return true; };
 
+  virtual int headingLevel() const { return 0; }
   virtual int intValue() const { return 0; }
   virtual String valueDescription() const { return String(); }
   virtual float valueForRange() const { return 0.0f; }
@@ -287,7 +288,9 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual AccessibilityRole ariaRoleAttribute() const { return UnknownRole; }
   virtual bool isPresentationalChildOfAriaRole() const { return false; }
   virtual bool ariaRoleHasPresentationalChildren() const { return false; }
-  virtual AccessibilityRole roleValue() const { return UnknownRole; }
+
+  void setRoleValue(AccessibilityRole role) { m_role = role; }
+  virtual AccessibilityRole roleValue() const { return m_role; }
   virtual String ariaAccessibilityName(const String&) const { return String(); }
   virtual String ariaLabeledByAttribute() const { return String(); }
   virtual String ariaDescribedByAttribute() const { return String(); }
@@ -464,6 +467,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   unsigned m_id;
   AccessibilityChildrenVector m_children;
   mutable bool m_haveChildren;
+  AccessibilityRole m_role;
 
   virtual void clearChildren();
   virtual bool isDetached() const { return true; }
