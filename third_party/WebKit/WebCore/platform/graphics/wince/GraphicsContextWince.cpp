@@ -442,7 +442,7 @@ static void rotateBitmap(SharedBitmap* destBmp,
     _rotateBitmap<unsigned, false>(destBmp, sourceBmp, transform);
 }
 
-class TransparentLayerDC : Noncopyable {
+class TransparentLayerDC : public Noncopyable {
  public:
   TransparentLayerDC(GraphicsContextPlatformPrivate* data,
                      IntRect& origRect,
@@ -583,7 +583,7 @@ void TransparentLayerDC::fillAlphaChannel() {
   }
 }
 
-class ScopeDCProvider : Noncopyable {
+class ScopeDCProvider : public Noncopyable {
  public:
   explicit ScopeDCProvider(GraphicsContextPlatformPrivate* data)
       : m_data(data) {
