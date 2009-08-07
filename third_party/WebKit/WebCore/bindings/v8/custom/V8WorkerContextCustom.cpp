@@ -86,7 +86,7 @@ ACCESSOR_SETTER(WorkerContextOnerror) {
   } else {
     RefPtr<V8EventListener> listener =
         workerContext->script()->proxy()->findOrCreateEventListener(
-            v8::Local<v8::Object>::Cast(value), false, false);
+            v8::Local<v8::Object>::Cast(value), true, false);
     if (listener) {
       if (oldListener) {
         v8::Local<v8::Object> oldV8Listener = oldListener->getListenerObject();

@@ -47,21 +47,22 @@ namespace WebCore {
 
 PassRefPtr<EventListener> getEventListener(AbstractWorker* worker,
                                            v8::Local<v8::Value> value,
+                                           bool isAttribute,
                                            bool findOnly) {
   if (worker->scriptExecutionContext()->isWorkerContext()) {
     WorkerContextExecutionProxy* workerContextProxy =
         WorkerContextExecutionProxy::retrieve();
     ASSERT(workerContextProxy);
-    return workerContextProxy->findOrCreateObjectEventListener(value, false,
-                                                               findOnly);
+    return workerContextProxy->findOrCreateObjectEventListener(
+        value, isAttribute, findOnly);
   }
 
   V8Proxy* proxy = V8Proxy::retrieve(worker->scriptExecutionContext());
   if (proxy) {
     V8EventListenerList* list = proxy->objectListeners();
-    return findOnly ? list->findWrapper(value, false)
+    return findOnly ? list->findWrapper(value, isAttribute)
                     : list->findOrCreateWrapper<V8ObjectEventListener>(
-                          proxy->frame(), value, false);
+                          proxy->frame(), value, isAttribute);
   }
 
   return 0;
@@ -96,7 +97,8 @@ ACCESSOR_SETTER(AbstractWorkerOnerror) {
     // Clear the listener.
     worker->setOnerror(0);
   } else {
-    RefPtr<EventListener> listener = getEventListener(worker, value, false);
+    RefPtr<EventListener> listener =
+        getEventListener(worker, value, true, false);
     if (listener) {
       if (oldListener) {
         v8::Local<v8::Object> oldV8Listener = oldListener->getListenerObject();
@@ -116,7 +118,8 @@ CALLBACK_FUNC_DECL(AbstractWorkerAddEventListener) {
   AbstractWorker* worker = V8DOMWrapper::convertToNativeObject<AbstractWorker>(
       V8ClassIndex::ABSTRACTWORKER, args.Holder());
 
-  RefPtr<EventListener> listener = getEventListener(worker, args[1], false);
+  RefPtr<EventListener> listener =
+      getEventListener(worker, args[1], false, false);
   if (listener) {
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
@@ -133,7 +136,8 @@ CALLBACK_FUNC_DECL(AbstractWorkerRemoveEventListener) {
   AbstractWorker* worker = V8DOMWrapper::convertToNativeObject<AbstractWorker>(
       V8ClassIndex::ABSTRACTWORKER, args.Holder());
 
-  RefPtr<EventListener> listener = getEventListener(worker, args[1], true);
+  RefPtr<EventListener> listener =
+      getEventListener(worker, args[1], false, true);
   if (listener) {
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
