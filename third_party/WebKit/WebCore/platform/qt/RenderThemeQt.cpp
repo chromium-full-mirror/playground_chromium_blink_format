@@ -28,36 +28,35 @@
  */
 
 #include "config.h"
-
-#include "qwebpage.h"
 #include "RenderThemeQt.h"
+
+#include "CSSStyleSelector.h"
+#include "CSSStyleSheet.h"
 #include "ChromeClientQt.h"
+#include "Color.h"
+#include "Document.h"
+#include "Font.h"
+#include "FontSelector.h"
+#include "GraphicsContext.h"
+#include "HTMLMediaElement.h"
+#include "HTMLNames.h"
 #include "NotImplemented.h"
+#include "Page.h"
+#include "RenderBox.h"
+#include "RenderTheme.h"
+#include "qwebpage.h"
 
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
 #include <QFile>
-#include <QWidget>
+#include <QLineEdit>
 #include <QPainter>
 #include <QPushButton>
-#include <QLineEdit>
 #include <QStyleFactory>
 #include <QStyleOptionButton>
 #include <QStyleOptionFrameV2>
-
-#include "Color.h"
-#include "CSSStyleSelector.h"
-#include "CSSStyleSheet.h"
-#include "FontSelector.h"
-#include "Document.h"
-#include "Page.h"
-#include "Font.h"
-#include "RenderTheme.h"
-#include "GraphicsContext.h"
-#include "HTMLMediaElement.h"
-#include "HTMLNames.h"
-#include "RenderBox.h"
+#include <QWidget>
 
 namespace WebCore {
 
@@ -212,8 +211,8 @@ static QRect inflateButtonRect(const QRect& originalRect, QStyle* style) {
 
     return originalRect.adjusted(-paddingLeft, -paddingTop, paddingRight,
                                  paddingBottom);
-  } else
-    return originalRect;
+  }
+  return originalRect;
 }
 
 void RenderThemeQt::adjustRepaintRect(const RenderObject* o, IntRect& rect) {
