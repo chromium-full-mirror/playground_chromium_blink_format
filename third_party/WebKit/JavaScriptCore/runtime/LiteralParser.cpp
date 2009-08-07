@@ -133,8 +133,10 @@ static inline bool isSafeStringCharacter(UChar c) {
          c == '\t';
 }
 
+// "inline" is required here to help WINSCW compiler resolve specialized
+// argument in templated functions.
 template <LiteralParser::ParserMode mode>
-LiteralParser::TokenType LiteralParser::Lexer::lexString(
+inline LiteralParser::TokenType LiteralParser::Lexer::lexString(
     LiteralParserToken& token) {
   ++m_ptr;
   const UChar* runStart;
