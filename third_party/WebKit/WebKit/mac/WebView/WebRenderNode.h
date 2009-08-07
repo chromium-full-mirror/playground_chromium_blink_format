@@ -28,7 +28,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class WebFrameView;
+@class WebFrame;
 
 @interface WebRenderNode : NSObject {
   NSArray* children;
@@ -37,7 +37,7 @@
   NSPoint absolutePosition;
 }
 
-- (id)initWithWebFrameView:(WebFrameView*)view;
+- (id)initWithWebFrame:(WebFrame*)frame;
 
 - (NSArray*)children;
 
