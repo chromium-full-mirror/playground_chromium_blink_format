@@ -159,6 +159,14 @@ RefPtr<CSSMutableStyleDeclaration> getPropertiesNotInComputedStyle(
     CSSStyleDeclaration* style,
     CSSComputedStyleDeclaration* computedStyle);
 
+enum ShouldIncludeTypingStyle { IncludeTypingStyle, IgnoreTypingStyle };
+
+PassRefPtr<CSSMutableStyleDeclaration> editingStyleAtPosition(
+    Position,
+    ShouldIncludeTypingStyle = IgnoreTypingStyle);
+void prepareEditingStyleToApplyAt(CSSMutableStyleDeclaration*, Position);
+void removeStylesAddedByNode(CSSMutableStyleDeclaration*, Node*);
+
 }  // namespace WebCore
 
 #endif

@@ -59,6 +59,7 @@
 #include "htmlediting.h"
 #include "visible_units.h"
 #include <wtf/StdLibExtras.h>
+#include "ApplyStyleCommand.h"
 
 using namespace std;
 
@@ -294,16 +295,7 @@ static void removeEnclosingMailBlockquoteStyle(
   if (!blockquote || !blockquote->parentNode())
     return;
 
-  RefPtr<CSSMutableStyleDeclaration> parentStyle =
-      Position(blockquote->parentNode(), 0)
-          .computedStyle()
-          ->deprecatedCopyInheritableProperties();
-  RefPtr<CSSMutableStyleDeclaration> blockquoteStyle =
-      Position(blockquote, 0)
-          .computedStyle()
-          ->deprecatedCopyInheritableProperties();
-  parentStyle->diff(blockquoteStyle.get());
-  blockquoteStyle->diff(style);
+  removeStylesAddedByNode(style, blockquote);
 }
 
 static void removeDefaultStyles(CSSMutableStyleDeclaration* style,
@@ -311,10 +303,7 @@ static void removeDefaultStyles(CSSMutableStyleDeclaration* style,
   if (!document || !document->documentElement())
     return;
 
-  RefPtr<CSSMutableStyleDeclaration> documentStyle =
-      computedStyle(document->documentElement())
-          ->deprecatedCopyInheritableProperties();
-  documentStyle->diff(style);
+  prepareEditingStyleToApplyAt(style, Position(document->documentElement(), 0));
 }
 
 static bool shouldAddNamespaceElem(const Element* elem) {
@@ -1128,8 +1117,7 @@ String createMarkup(const Range* range,
   Node* parentOfLastClosed = lastClosed ? lastClosed->parentNode() : 0;
   if (parentOfLastClosed && parentOfLastClosed->renderer()) {
     RefPtr<CSSMutableStyleDeclaration> style =
-        computedStyle(parentOfLastClosed)
-            ->deprecatedCopyInheritableProperties();
+        editingStyleAtPosition(Position(parentOfLastClosed, 0));
 
     // Styles that Mail blockquotes contribute should only be placed on the Mail
     // blockquote, to help
@@ -1161,8 +1149,7 @@ String createMarkup(const Range* range,
     // and user
     // applied styles.
     RefPtr<CSSMutableStyleDeclaration> defaultStyle =
-        computedStyle(document->documentElement())
-            ->deprecatedCopyInheritableProperties();
+        editingStyleAtPosition(Position(document->documentElement(), 0));
 
     if (defaultStyle->length() > 0)
       addStyleMarkup(preMarkups, markups, defaultStyle.get(), document);

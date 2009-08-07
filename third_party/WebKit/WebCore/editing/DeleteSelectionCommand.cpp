@@ -44,6 +44,7 @@
 #include "Text.h"
 #include "TextIterator.h"
 #include "visible_units.h"
+#include "ApplyStyleCommand.h"
 
 namespace WebCore {
 
@@ -313,16 +314,7 @@ static void removeEnclosingAnchorStyle(CSSMutableStyleDeclaration* style,
   if (!enclosingAnchor || !enclosingAnchor->parentNode())
     return;
 
-  RefPtr<CSSMutableStyleDeclaration> parentStyle =
-      Position(enclosingAnchor->parentNode(), 0)
-          .computedStyle()
-          ->deprecatedCopyInheritableProperties();
-  RefPtr<CSSMutableStyleDeclaration> anchorStyle =
-      Position(enclosingAnchor, 0)
-          .computedStyle()
-          ->deprecatedCopyInheritableProperties();
-  parentStyle->diff(anchorStyle.get());
-  anchorStyle->diff(style);
+  removeStylesAddedByNode(style, enclosingAnchor);
 }
 
 void DeleteSelectionCommand::saveTypingStyleState() {
@@ -340,9 +332,8 @@ void DeleteSelectionCommand::saveTypingStyleState() {
     return;
 
   // Figure out the typing style in effect before the delete is done.
-  RefPtr<CSSComputedStyleDeclaration> computedStyle =
-      positionBeforeTabSpan(m_selectionToDelete.start()).computedStyle();
-  m_typingStyle = computedStyle->deprecatedCopyInheritableProperties();
+  m_typingStyle = editingStyleAtPosition(
+      positionBeforeTabSpan(m_selectionToDelete.start()));
 
   removeEnclosingAnchorStyle(m_typingStyle.get(), m_selectionToDelete.start());
 
@@ -350,11 +341,10 @@ void DeleteSelectionCommand::saveTypingStyleState() {
   // of start()
   // We'll use this later in computeTypingStyleAfterDelete if we end up outside
   // of a Mail blockquote
-  if (nearestMailBlockquote(m_selectionToDelete.start().node())) {
-    computedStyle = m_selectionToDelete.end().computedStyle();
+  if (nearestMailBlockquote(m_selectionToDelete.start().node()))
     m_deleteIntoBlockquoteStyle =
-        computedStyle->deprecatedCopyInheritableProperties();
-  } else
+        editingStyleAtPosition(m_selectionToDelete.end());
+  else
     m_deleteIntoBlockquoteStyle = 0;
 }
 
@@ -816,9 +806,7 @@ void DeleteSelectionCommand::calculateTypingStyleAfterDelete() {
     m_typingStyle = m_deleteIntoBlockquoteStyle;
   m_deleteIntoBlockquoteStyle = 0;
 
-  RefPtr<CSSComputedStyleDeclaration> endingStyle =
-      computedStyle(m_endingPosition.node());
-  endingStyle->diff(m_typingStyle.get());
+  prepareEditingStyleToApplyAt(m_typingStyle.get(), m_endingPosition);
   if (!m_typingStyle->length())
     m_typingStyle = 0;
   VisiblePosition visibleEnd(m_endingPosition);

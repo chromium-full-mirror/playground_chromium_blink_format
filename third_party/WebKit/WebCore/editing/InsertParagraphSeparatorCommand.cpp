@@ -38,6 +38,7 @@
 #include "Text.h"
 #include "htmlediting.h"
 #include "visible_units.h"
+#include "ApplyStyleCommand.h"
 
 namespace WebCore {
 
@@ -64,7 +65,7 @@ void InsertParagraphSeparatorCommand::calculateStyleBeforeInsertion(
   if (!isStartOfParagraph(visiblePos) && !isEndOfParagraph(visiblePos))
     return;
 
-  m_style = styleAtPosition(pos);
+  m_style = editingStyleAtPosition(pos, IncludeTypingStyle);
 }
 
 void InsertParagraphSeparatorCommand::applyStyleAfterInsertion(
@@ -82,7 +83,8 @@ void InsertParagraphSeparatorCommand::applyStyleAfterInsertion(
   if (!m_style)
     return;
 
-  computedStyle(endingSelection().start().node())->diff(m_style.get());
+  prepareEditingStyleToApplyAt(m_style.get(), endingSelection().start());
+
   if (m_style->length() > 0)
     applyStyle(m_style.get());
 }
