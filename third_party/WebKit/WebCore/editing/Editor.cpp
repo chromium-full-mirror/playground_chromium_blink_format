@@ -822,11 +822,25 @@ bool Editor::clientIsEditable() const {
   return client() && client()->isEditable();
 }
 
+// CSS properties that only has a visual difference when applied to text.
+static const int textOnlyProperties[] = {
+    CSSPropertyTextDecoration, CSSPropertyWebkitTextDecorationsInEffect,
+    CSSPropertyFontStyle,      CSSPropertyFontWeight,
+    CSSPropertyColor,
+};
+
 static TriState triStateOfStyleInComputedStyle(
     CSSStyleDeclaration* desiredStyle,
-    CSSComputedStyleDeclaration* computedStyle) {
+    CSSComputedStyleDeclaration* computedStyle,
+    bool ignoreTextOnlyProperties = false) {
   RefPtr<CSSMutableStyleDeclaration> diff =
       getPropertiesNotInComputedStyle(desiredStyle, computedStyle);
+
+  if (ignoreTextOnlyProperties)
+    diff->removePropertiesInSet(
+        textOnlyProperties,
+        sizeof(textOnlyProperties) / sizeof(textOnlyProperties[0]));
+
   if (!diff->length())
     return TrueTriState;
   else if (diff->length() == desiredStyle->length())
@@ -869,8 +883,8 @@ TriState Editor::selectionHasStyle(CSSStyleDeclaration* style) const {
          node = node->traverseNextNode()) {
       RefPtr<CSSComputedStyleDeclaration> nodeStyle = computedStyle(node);
       if (nodeStyle) {
-        TriState nodeState =
-            triStateOfStyleInComputedStyle(style, nodeStyle.get());
+        TriState nodeState = triStateOfStyleInComputedStyle(
+            style, nodeStyle.get(), !node->isTextNode());
         if (node == m_frame->selection()->start().node())
           state = nodeState;
         else if (state != nodeState) {

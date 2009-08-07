@@ -322,7 +322,7 @@ RefPtr<CSSMutableStyleDeclaration> getPropertiesNotInComputedStyle(
     CSSComputedStyleDeclaration* computedStyle) {
   ASSERT(style);
   ASSERT(computedStyle);
-  RefPtr<CSSMutableStyleDeclaration> result = style->makeMutable();
+  RefPtr<CSSMutableStyleDeclaration> result = style->copy();
   computedStyle->diff(result.get());
 
   // If text decorations in effect is not present in the computed style, then
