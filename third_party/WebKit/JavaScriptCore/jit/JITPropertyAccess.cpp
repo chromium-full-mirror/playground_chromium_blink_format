@@ -768,7 +768,8 @@ void JIT::patchMethodCallProto(CodeBlock* codeBlock,
                                MethodCallLinkInfo& methodCallLinkInfo,
                                JSFunction* callee,
                                Structure* structure,
-                               JSObject* proto) {
+                               JSObject* proto,
+                               ReturnAddressPtr returnAddress) {
   RepatchBuffer repatchBuffer(codeBlock);
 
   ASSERT(!methodCallLinkInfo.cachedStructure);
@@ -790,6 +791,9 @@ void JIT::patchMethodCallProto(CodeBlock* codeBlock,
   repatchBuffer.repatch(methodCallLinkInfo.structureLabel.dataLabelPtrAtOffset(
                             patchOffsetMethodCheckPutFunction),
                         callee);
+
+  repatchBuffer.relinkCallerToFunction(returnAddress,
+                                       FunctionPtr(cti_op_get_by_id));
 }
 
 void JIT::patchPutByIdReplace(CodeBlock* codeBlock,
@@ -1817,7 +1821,8 @@ void JIT::patchMethodCallProto(CodeBlock* codeBlock,
                                MethodCallLinkInfo& methodCallLinkInfo,
                                JSFunction* callee,
                                Structure* structure,
-                               JSObject* proto) {
+                               JSObject* proto,
+                               ReturnAddressPtr returnAddress) {
   RepatchBuffer repatchBuffer(codeBlock);
 
   ASSERT(!methodCallLinkInfo.cachedStructure);
@@ -1839,6 +1844,9 @@ void JIT::patchMethodCallProto(CodeBlock* codeBlock,
   repatchBuffer.repatch(methodCallLinkInfo.structureLabel.dataLabelPtrAtOffset(
                             patchOffsetMethodCheckPutFunction),
                         callee);
+
+  repatchBuffer.relinkCallerToFunction(returnAddress,
+                                       FunctionPtr(cti_op_get_by_id));
 }
 
 void JIT::patchPutByIdReplace(CodeBlock* codeBlock,

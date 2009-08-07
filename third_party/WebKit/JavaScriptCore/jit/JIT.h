@@ -362,15 +362,13 @@ class JIT : private MacroAssembler {
       JSGlobalData* globalData,
       RefPtr<ExecutablePool>* executablePool,
       CodePtr* ctiStringLengthTrampoline,
-      CodePtr* ctiVirtualCallPreLink,
       CodePtr* ctiVirtualCallLink,
       CodePtr* ctiVirtualCall,
       CodePtr* ctiNativeCallThunk) {
     JIT jit(globalData);
     jit.privateCompileCTIMachineTrampolines(
         executablePool, globalData, ctiStringLengthTrampoline,
-        ctiVirtualCallPreLink, ctiVirtualCallLink, ctiVirtualCall,
-        ctiNativeCallThunk);
+        ctiVirtualCallLink, ctiVirtualCall, ctiNativeCallThunk);
   }
 
   static void patchGetByIdSelf(CodeBlock* codeblock,
@@ -387,7 +385,8 @@ class JIT : private MacroAssembler {
                                    MethodCallLinkInfo&,
                                    JSFunction*,
                                    Structure*,
-                                   JSObject*);
+                                   JSObject*,
+                                   ReturnAddressPtr);
 
   static void compilePatchGetArrayLength(JSGlobalData* globalData,
                                          CodeBlock* codeBlock,
@@ -464,7 +463,6 @@ class JIT : private MacroAssembler {
       RefPtr<ExecutablePool>* executablePool,
       JSGlobalData* data,
       CodePtr* ctiStringLengthTrampoline,
-      CodePtr* ctiVirtualCallPreLink,
       CodePtr* ctiVirtualCallLink,
       CodePtr* ctiVirtualCall,
       CodePtr* ctiNativeCallThunk);
