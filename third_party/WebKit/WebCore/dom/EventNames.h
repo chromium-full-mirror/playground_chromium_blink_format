@@ -34,10 +34,10 @@ namespace WebCore {
       macro(close) macro(connect) macro(contextmenu) macro(copy) macro(cut) macro(                          \
           dblclick) macro(downloading) macro(drag) macro(dragend) macro(dragenter)                          \
           macro(dragleave) macro(dragover) macro(dragstart) macro(drop) macro(                              \
-              error) macro(focus) macro(input) macro(keydown) macro(keypress)                               \
-              macro(keyup) macro(load) macro(loadstart) macro(message) macro(                               \
-                  mousedown) macro(mousemove) macro(mouseout) macro(mouseover)                              \
-                  macro(mouseup) macro(mousewheel) macro(noupdate) macro(                                   \
+              error) macro(focus) macro(hashchange) macro(input) macro(keydown)                             \
+              macro(keypress) macro(keyup) macro(load) macro(loadstart) macro(                              \
+                  message) macro(mousedown) macro(mousemove) macro(mouseout)                                \
+                  macro(mouseover) macro(mouseup) macro(mousewheel) macro(noupdate) macro(                  \
                       obsolete) macro(offline) macro(online) macro(overflowchanged)                         \
                       macro(paste) macro(readystatechange) macro(reset) macro(                              \
                           resize) macro(scroll) macro(search) macro(select)                                 \
@@ -54,19 +54,18 @@ namespace WebCore {
                                           macro(webkitBeforeTextInserted) macro(                            \
                                               webkitEditableContentChanged)                                 \
                                                                                                             \
-                                              macro(canplay) macro(                                         \
-                                                  canplaythrough) macro(durationchange)                     \
-                                                  macro(emptied) macro(ended) macro(                        \
-                                                      loadeddata) macro(loadedmetadata)                     \
-                                                      macro(pause) macro(play) macro(                       \
-                                                          playing) macro(ratechange)                        \
-                                                          macro(seeked) macro(                              \
-                                                              seeking) macro(timeupdate)                    \
-                                                              macro(volumechange) macro(                    \
-                                                                  waiting)                                  \
+                                              macro(canplay) macro(canplaythrough) macro(                   \
+                                                  durationchange) macro(emptied)                            \
+                                                  macro(ended) macro(loadeddata) macro(                     \
+                                                      loadedmetadata) macro(pause)                          \
+                                                      macro(play) macro(playing) macro(                     \
+                                                          ratechange) macro(seeked)                         \
+                                                          macro(seeking) macro(timeupdate) macro(           \
+                                                              volumechange) macro(waiting)                  \
                                                                                                             \
-                                                                  macro(progress) macro(                    \
-                                                                      stalled) macro(suspend)               \
+                                                              macro(progress)                               \
+                                                                  macro(stalled) macro(                     \
+                                                                      suspend)                              \
                                                                                                             \
                                                                       macro(                                \
                                                                           webkitAnimationEnd)               \

@@ -349,6 +349,10 @@ inline bool equalIgnoringCase(const char* a, const String& b) {
   return equalIgnoringCase(a, b.impl());
 }
 
+inline bool equalIgnoringNullity(const String& a, const String& b) {
+  return equalIgnoringNullity(a.impl(), b.impl());
+}
+
 inline bool operator!(const String& str) {
   return str.isNull();
 }
