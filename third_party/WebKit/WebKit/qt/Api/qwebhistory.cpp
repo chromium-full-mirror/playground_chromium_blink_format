@@ -32,7 +32,6 @@
 
 /*!
   \class QWebHistoryItem
-  \ingroup explicitly-shared
   \since 4.4
   \brief The QWebHistoryItem class represents one item in the history of a
   QWebPage
@@ -59,18 +58,26 @@
   history item.
   \endtable
 
-  \note QWebHistoryItem objects are value based and \l{explicitly shared}.
+  \note QWebHistoryItem objects are value based, but \e{explicitly shared}.
+  Changing
+  a QWebHistoryItem instance by calling setUserData() will change all copies of
+  that
+  instance.
 
   \sa QWebHistory, QWebPage::history(), QWebHistoryInterface
 */
 
 /*!
-  Constructs a history item from \a other.
+  Constructs a history item from \a other. The new item and \a other
+  will share their data, and modifying either this item or \a other will
+  modify both instances.
 */
 QWebHistoryItem::QWebHistoryItem(const QWebHistoryItem& other) : d(other.d) {}
 
 /*!
-  Assigns the \a other history item to this.
+  Assigns the \a other history item to this. This item and \a other
+  will share their data, and modifying either this item or \a other will
+  modify both instances.
 */
 QWebHistoryItem& QWebHistoryItem::operator=(const QWebHistoryItem& other) {
   d = other.d;
@@ -156,6 +163,8 @@ QVariant QWebHistoryItem::userData() const {
   \since 4.5
 
  Stores user specific data \a userData with the history item.
+
+ \note All copies of this item will be modified.
 
  \sa userData()
 */
