@@ -170,8 +170,7 @@ void Image::drawPattern(GraphicsContext* context,
   context->save();
 
   IntRect imageSize = enclosingIntRect(tileRect);
-  OwnPtr<ImageBuffer> imageSurface =
-      ImageBuffer::create(imageSize.size(), false);
+  OwnPtr<ImageBuffer> imageSurface = ImageBuffer::create(imageSize.size());
 
   if (!imageSurface)
     return;

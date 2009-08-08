@@ -115,7 +115,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
     int tileWidth = static_cast<int>(patternBoundaries().width() + 0.5f);
     int tileHeight = static_cast<int>(patternBoundaries().height() + 0.5f);
     OwnPtr<ImageBuffer> tileImage =
-        ImageBuffer::create(IntSize(tileWidth, tileHeight), false);
+        ImageBuffer::create(IntSize(tileWidth, tileHeight));
 
     GraphicsContext* tileImageContext = tileImage->context();
 

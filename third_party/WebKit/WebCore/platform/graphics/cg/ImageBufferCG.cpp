@@ -38,6 +38,7 @@
 #include <wtf/Assertions.h>
 #include <wtf/OwnArrayPtr.h>
 #include <wtf/RetainPtr.h>
+#include <math.h>
 
 using namespace std;
 
@@ -45,14 +46,16 @@ namespace WebCore {
 
 ImageBufferData::ImageBufferData(const IntSize&) : m_data(0) {}
 
-ImageBuffer::ImageBuffer(const IntSize& size, bool grayScale, bool& success)
+ImageBuffer::ImageBuffer(const IntSize& size,
+                         ImageColorSpace imageColorSpace,
+                         bool& success)
     : m_data(size), m_size(size) {
   success = false;  // Make early return mean failure.
   unsigned bytesPerRow;
   if (size.width() < 0 || size.height() < 0)
     return;
   bytesPerRow = size.width();
-  if (!grayScale) {
+  if (imageColorSpace != GrayScale) {
     // Protect against overflow
     if (bytesPerRow > 0x3FFFFFFF)
       return;
@@ -62,11 +65,26 @@ ImageBuffer::ImageBuffer(const IntSize& size, bool grayScale, bool& success)
   m_data.m_data = tryFastCalloc(size.height(), bytesPerRow);
   ASSERT((reinterpret_cast<size_t>(m_data.m_data) & 2) == 0);
 
-  CGColorSpaceRef colorSpace = grayScale ? CGColorSpaceCreateDeviceGray()
-                                         : CGColorSpaceCreateDeviceRGB();
+  CGColorSpaceRef colorSpace;
+  switch (imageColorSpace) {
+    case DeviceRGB:
+      colorSpace = CGColorSpaceCreateDeviceRGB();
+      break;
+    case GrayScale:
+      colorSpace = CGColorSpaceCreateDeviceGray();
+      break;
+    case LinearRGB:
+      colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGBLinear);
+      break;
+    default:
+      colorSpace = CGColorSpaceCreateDeviceRGB();
+      break;
+  }
+
   CGContextRef cgContext = CGBitmapContextCreate(
       m_data.m_data, size.width(), size.height(), 8, bytesPerRow, colorSpace,
-      grayScale ? kCGImageAlphaNone : kCGImageAlphaPremultipliedLast);
+      (imageColorSpace == GrayScale) ? kCGImageAlphaNone
+                                     : kCGImageAlphaPremultipliedLast);
   CGColorSpaceRelease(colorSpace);
   if (!cgContext)
     return;

@@ -66,7 +66,7 @@ void SVGResourceMasker::applyMask(GraphicsContext* context,
   IntRect intImageRect(0, 0, imageSize.width(), imageSize.height());
 
   // Create new ImageBuffer to apply luminance
-  OwnPtr<ImageBuffer> luminancedImage = ImageBuffer::create(imageSize, false);
+  OwnPtr<ImageBuffer> luminancedImage = ImageBuffer::create(imageSize);
   if (!luminancedImage)
     return;
 

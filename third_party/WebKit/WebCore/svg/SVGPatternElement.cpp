@@ -236,7 +236,7 @@ void SVGPatternElement::buildPattern(const FloatRect& targetRect) const {
                     lroundf(patternBoundariesIncludingOverflow.height()));
   clampImageBufferSizeToViewport(document()->view(), imageSize);
 
-  OwnPtr<ImageBuffer> patternImage = ImageBuffer::create(imageSize, false);
+  OwnPtr<ImageBuffer> patternImage = ImageBuffer::create(imageSize);
 
   if (!patternImage)
     return;

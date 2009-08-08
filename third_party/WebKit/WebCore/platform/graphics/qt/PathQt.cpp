@@ -85,7 +85,7 @@ bool Path::strokeContains(StrokeStyleApplier* applier,
   // FIXME: We should try to use a 'shared Context' instead of creating a new
   // ImageBuffer
   // on each call.
-  OwnPtr<ImageBuffer> scratchImage = ImageBuffer::create(IntSize(1, 1), false);
+  OwnPtr<ImageBuffer> scratchImage = ImageBuffer::create(IntSize(1, 1));
   GraphicsContext* gc = scratchImage->context();
   QPainterPathStroker stroke;
   applier->strokeStyle(gc);
@@ -115,7 +115,7 @@ FloatRect Path::strokeBoundingRect(StrokeStyleApplier* applier) {
   // FIXME: We should try to use a 'shared Context' instead of creating a new
   // ImageBuffer
   // on each call.
-  OwnPtr<ImageBuffer> scratchImage = ImageBuffer::create(IntSize(1, 1), false);
+  OwnPtr<ImageBuffer> scratchImage = ImageBuffer::create(IntSize(1, 1));
   GraphicsContext* gc = scratchImage->context();
   QPainterPathStroker stroke;
   if (applier) {

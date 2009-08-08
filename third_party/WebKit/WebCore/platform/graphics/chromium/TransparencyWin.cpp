@@ -102,7 +102,7 @@ void compositeToCopy(const GraphicsContext& sourceLayers,
 class TransparencyWin::OwnedBuffers {
  public:
   OwnedBuffers(const IntSize& size, bool needReferenceBuffer) {
-    m_destBitmap = ImageBuffer::create(size, false);
+    m_destBitmap = ImageBuffer::create(size);
 
     if (needReferenceBuffer) {
       m_referenceBitmap.setConfig(SkBitmap::kARGB_8888_Config, size.width(),

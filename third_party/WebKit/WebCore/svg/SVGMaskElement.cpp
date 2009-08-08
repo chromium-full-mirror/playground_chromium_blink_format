@@ -161,7 +161,7 @@ PassOwnPtr<ImageBuffer> SVGMaskElement::drawMaskerContent(
   if (imageSize.height() < static_cast<int>(heightValue))
     heightValue = imageSize.height();
 
-  OwnPtr<ImageBuffer> maskImage = ImageBuffer::create(imageSize, false);
+  OwnPtr<ImageBuffer> maskImage = ImageBuffer::create(imageSize);
   if (!maskImage)
     return 0;
 

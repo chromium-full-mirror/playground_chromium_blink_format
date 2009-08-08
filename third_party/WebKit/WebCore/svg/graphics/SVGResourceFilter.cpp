@@ -88,7 +88,7 @@ void SVGResourceFilter::prepareFilter(GraphicsContext*& context,
   // The size of the SourceGraphic is clipped to the size of the filterRegion.
   IntRect bufferRect = enclosingIntRect(clippedSourceRect);
   OwnPtr<ImageBuffer> sourceGraphic(
-      ImageBuffer::create(bufferRect.size(), false));
+      ImageBuffer::create(bufferRect.size(), LinearRGB));
 
   if (!sourceGraphic.get())
     return;
@@ -109,6 +109,9 @@ void SVGResourceFilter::applyFilter(GraphicsContext*& context,
 
   context = m_savedContext;
   m_savedContext = 0;
+#if !PLATFORM(CG)
+  m_sourceGraphicBuffer->transformColorSpace(DeviceRGB, LinearRGB);
+#endif
 
   FilterEffect* lastEffect = m_filterBuilder->lastEffect();
 
@@ -117,9 +120,13 @@ void SVGResourceFilter::applyFilter(GraphicsContext*& context,
     m_filter->setSourceImage(m_sourceGraphicBuffer.release());
     lastEffect->apply(m_filter.get());
 
-    if (lastEffect->resultImage())
-      context->drawImage(lastEffect->resultImage()->image(),
-                         lastEffect->subRegion());
+    ImageBuffer* resultImage = lastEffect->resultImage();
+    if (resultImage) {
+#if !PLATFORM(CG)
+      resultImage->transformColorSpace(LinearRGB, DeviceRGB);
+#endif
+      context->drawImage(resultImage->image(), lastEffect->subRegion());
+    }
   }
 
   m_sourceGraphicBuffer.clear();
