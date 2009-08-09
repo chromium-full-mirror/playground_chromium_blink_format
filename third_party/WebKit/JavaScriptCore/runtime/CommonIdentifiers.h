@@ -31,17 +31,16 @@
   macro(__defineGetter__) macro(__defineSetter__) macro(__lookupGetter__)      \
       macro(__lookupSetter__) macro(apply) macro(arguments) macro(call) macro( \
           callee) macro(caller) macro(compile) macro(constructor) macro(eval)  \
-          macro(exec) macro(fromCharCode) macro(global) macro(hasOwnProperty)  \
-              macro(ignoreCase) macro(index) macro(input) macro(isPrototypeOf) \
-                  macro(length) macro(message) macro(multiline) macro(name)    \
-                      macro(now) macro(parse) macro(propertyIsEnumerable)      \
-                          macro(prototype) macro(source) macro(test)           \
-                              macro(toExponential) macro(toFixed)              \
-                                  macro(toISOString) macro(toJSON)             \
-                                      macro(toLocaleString) macro(toPrecision) \
-                                          macro(toString) macro(UTC)           \
-                                              macro(valueOf)                   \
-                                                  macro(displayName)
+          macro(exec) macro(fromCharCode) macro(global) macro(getPrototypeOf)  \
+              macro(hasOwnProperty) macro(ignoreCase) macro(index) macro(      \
+                  input) macro(isPrototypeOf) macro(length) macro(message)     \
+                  macro(multiline) macro(name) macro(now) macro(parse)         \
+                      macro(propertyIsEnumerable) macro(prototype)             \
+                          macro(source) macro(test) macro(toExponential)       \
+                              macro(toFixed) macro(toISOString) macro(toJSON)  \
+                                  macro(toLocaleString) macro(toPrecision)     \
+                                      macro(toString) macro(UTC)               \
+                                          macro(valueOf) macro(displayName)
 
 namespace JSC {
 

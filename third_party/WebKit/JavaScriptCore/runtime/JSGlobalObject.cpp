@@ -297,7 +297,7 @@ void JSGlobalObject::reset(JSValue prototype) {
 
   JSCell* objectConstructor = new (exec) ObjectConstructor(
       exec, ObjectConstructor::createStructure(d()->functionPrototype),
-      d()->objectPrototype);
+      d()->objectPrototype, d()->prototypeFunctionStructure.get());
   JSCell* functionConstructor = new (exec) FunctionConstructor(
       exec, FunctionConstructor::createStructure(d()->functionPrototype),
       d()->functionPrototype);
