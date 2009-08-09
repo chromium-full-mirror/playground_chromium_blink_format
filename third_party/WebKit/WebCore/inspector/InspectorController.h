@@ -217,6 +217,9 @@ class InspectorController
                            unsigned lineNumber,
                            const String& sourceID);
   void clearConsoleMessages();
+  const Vector<ConsoleMessage*>& consoleMessages() const {
+    return m_consoleMessages;
+  }
 
   void attachWindow();
   void detachWindow();

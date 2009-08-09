@@ -33,6 +33,10 @@ class WMLAccessElement : public WMLElement {
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void insertedIntoDocument();
+
+ private:
+  String m_domain;
+  String m_path;
 };
 }
 

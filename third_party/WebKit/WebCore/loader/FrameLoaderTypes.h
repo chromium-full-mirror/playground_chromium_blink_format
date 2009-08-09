@@ -65,7 +65,8 @@ enum FrameLoadType {
                                                    // single concept of
                                                    // redirect.
   FrameLoadTypeReplace,
-  FrameLoadTypeReloadFromOrigin
+  FrameLoadTypeReloadFromOrigin,
+  FrameLoadTypeBackWMLDeckNotAccessible
 };
 
 enum NavigationType {
