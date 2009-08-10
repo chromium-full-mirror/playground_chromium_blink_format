@@ -36,7 +36,7 @@
 #include <wtf/MathExtras.h>
 
 #if PLATFORM(WINCE) && !PLATFORM(QT)
-extern "C" time_t time(time_t* timer);  // provided by libce
+extern "C" time_t time(time_t* timer);  // Provided by libce.
 #endif
 
 #if HAVE(SYS_TIME_H)
@@ -50,8 +50,6 @@ extern "C" time_t time(time_t* timer);  // provided by libce
 using namespace WTF;
 
 namespace JSC {
-
-// TODO: MakeTime (15.9.11.1) etc. ?
 
 ASSERT_CLASS_FITS_IN_CELL(DateConstructor);
 
