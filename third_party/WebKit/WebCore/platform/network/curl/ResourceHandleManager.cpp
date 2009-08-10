@@ -598,7 +598,7 @@ void ResourceHandleManager::initializeHandle(ResourceHandle* job) {
 
   // Remove any fragment part, otherwise curl will send it as part of the
   // request.
-  kurl.removeRef();
+  kurl.removeFragmentIdentifier();
 
   ResourceHandleInternal* d = job->getInternal();
   String url = kurl.string();
