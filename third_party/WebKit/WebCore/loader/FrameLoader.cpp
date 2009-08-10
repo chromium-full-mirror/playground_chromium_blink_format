@@ -976,7 +976,7 @@ void FrameLoader::begin(const KURL& url,
   KURL ref(url);
   ref.setUser(String());
   ref.setPass(String());
-  ref.setRef(String());
+  ref.removeFragmentIdentifier();
   m_outgoingReferrer = ref.string();
   m_URL = url;
 
@@ -1268,16 +1268,17 @@ void FrameLoader::gotoAnchor() {
   // OTOH If CSS target was set previously, we want to set it to 0, recalc
   // and possibly repaint because :target pseudo class may have been
   // set (see bug 11321).
-  if (!m_URL.hasRef() && !m_frame->document()->cssTarget())
+  if (!m_URL.hasFragmentIdentifier() && !m_frame->document()->cssTarget())
     return;
 
-  String ref = m_URL.ref();
-  if (gotoAnchor(ref))
+  String fragmentIdentifier = m_URL.fragmentIdentifier();
+  if (gotoAnchor(fragmentIdentifier))
     return;
 
   // Try again after decoding the ref, based on the document's encoding.
   if (m_decoder)
-    gotoAnchor(decodeURLEscapeSequences(ref, m_decoder->encoding()));
+    gotoAnchor(
+        decodeURLEscapeSequences(fragmentIdentifier, m_decoder->encoding()));
 }
 
 void FrameLoader::finishedParsing() {
@@ -1444,7 +1445,8 @@ void FrameLoader::scheduleLocationChange(const String& url,
   // except for the
   // fragment part, we don't need to schedule the location change.
   KURL parsedURL(url);
-  if (parsedURL.hasRef() && equalIgnoringRef(m_URL, parsedURL)) {
+  if (parsedURL.hasFragmentIdentifier() &&
+      equalIgnoringFragmentIdentifier(m_URL, parsedURL)) {
     changeLocation(completeURL(url), referrer, lockHistory, lockBackForwardList,
                    wasUserGesture);
     return;
@@ -2202,9 +2204,10 @@ class HashChangeEventTask : public ScriptExecutionContext::Task {
 // that a higher level already checked that the URLs match and the scrolling is
 // the right thing to do.
 void FrameLoader::scrollToAnchor(const KURL& url) {
-  ASSERT(equalIgnoringRef(url, m_URL));
-  if (equalIgnoringRef(url, m_URL) &&
-      !equalIgnoringNullity(url.ref(), m_URL.ref())) {
+  ASSERT(equalIgnoringFragmentIdentifier(url, m_URL));
+  if (equalIgnoringFragmentIdentifier(url, m_URL) &&
+      !equalIgnoringNullity(url.fragmentIdentifier(),
+                            m_URL.fragmentIdentifier())) {
     Document* currentDocument = frame()->document();
     currentDocument->postTask(HashChangeEventTask::create(currentDocument));
   }
@@ -3288,9 +3291,9 @@ bool FrameLoader::shouldReload(const KURL& currentURL,
   // the same URL, but do reload if going to a new URL or to the same URL with
   // no
   // fragment identifier at all."
-  if (!destinationURL.hasRef())
+  if (!destinationURL.hasFragmentIdentifier())
     return true;
-  return !equalIgnoringRef(currentURL, destinationURL);
+  return !equalIgnoringFragmentIdentifier(currentURL, destinationURL);
 }
 
 void FrameLoader::closeOldDataSources() {
@@ -5000,7 +5003,7 @@ void FrameLoader::loadItem(HistoryItem* item, FrameLoadType loadType) {
 // Walk the frame tree and ensure that the URLs match the URLs in the item.
 bool FrameLoader::urlsMatchItem(HistoryItem* item) const {
   const KURL& currentURL = documentLoader()->url();
-  if (!equalIgnoringRef(currentURL, item->url()))
+  if (!equalIgnoringFragmentIdentifier(currentURL, item->url()))
     return false;
 
   const HistoryItemVector& childItems = item->children();

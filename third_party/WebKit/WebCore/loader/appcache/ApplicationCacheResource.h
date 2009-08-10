@@ -47,7 +47,7 @@ class ApplicationCacheResource : public SubstituteResource {
       const ResourceResponse& response,
       unsigned type,
       PassRefPtr<SharedBuffer> buffer = SharedBuffer::create()) {
-    ASSERT(!url.hasRef());
+    ASSERT(!url.hasFragmentIdentifier());
     return adoptRef(new ApplicationCacheResource(url, response, type, buffer));
   }
 

@@ -86,8 +86,8 @@ ApplicationCache* ApplicationCacheGroup::cacheForMainRequest(
     return 0;
 
   KURL url(request.url());
-  if (url.hasRef())
-    url.removeRef();
+  if (url.hasFragmentIdentifier())
+    url.removeFragmentIdentifier();
 
   if (ApplicationCacheGroup* group = cacheStorage().cacheGroupForURL(url)) {
     ASSERT(group->newestCache());
@@ -106,8 +106,8 @@ ApplicationCache* ApplicationCacheGroup::fallbackCacheForMainRequest(
     return 0;
 
   KURL url(request.url());
-  if (url.hasRef())
-    url.removeRef();
+  if (url.hasFragmentIdentifier())
+    url.removeFragmentIdentifier();
 
   if (ApplicationCacheGroup* group =
           cacheStorage().fallbackCacheGroupForURL(url)) {
@@ -136,8 +136,8 @@ void ApplicationCacheGroup::selectCache(Frame* frame,
   }
 
   KURL manifestURL(passedManifestURL);
-  if (manifestURL.hasRef())
-    manifestURL.removeRef();
+  if (manifestURL.hasFragmentIdentifier())
+    manifestURL.removeFragmentIdentifier();
 
   ApplicationCache* mainResourceCache =
       documentLoader->applicationCacheHost()->mainResourceApplicationCache();
@@ -152,8 +152,8 @@ void ApplicationCacheGroup::selectCache(Frame* frame,
       // The main resource was loaded from cache, so the cache must have an
       // entry for it. Mark it as foreign.
       KURL documentURL(documentLoader->url());
-      if (documentURL.hasRef())
-        documentURL.removeRef();
+      if (documentURL.hasFragmentIdentifier())
+        documentURL.removeFragmentIdentifier();
       ApplicationCacheResource* resource =
           mainResourceCache->resourceForURL(documentURL);
       bool inStorage = resource->storageID();
@@ -227,8 +227,8 @@ void ApplicationCacheGroup::finishedLoadingMainResource(
   ASSERT(m_pendingMasterResourceLoaders.contains(loader));
   ASSERT(m_completionType == None || m_pendingEntries.isEmpty());
   KURL url = loader->url();
-  if (url.hasRef())
-    url.removeRef();
+  if (url.hasFragmentIdentifier())
+    url.removeFragmentIdentifier();
 
   switch (m_completionType) {
     case None:
@@ -502,8 +502,8 @@ void ApplicationCacheGroup::didReceiveResponse(
   ASSERT(handle == m_currentHandle);
 
   KURL url(handle->request().url());
-  if (url.hasRef())
-    url.removeRef();
+  if (url.hasFragmentIdentifier())
+    url.removeFragmentIdentifier();
 
   ASSERT(!m_currentResource);
   ASSERT(m_pendingEntries.contains(url));
@@ -617,8 +617,8 @@ void ApplicationCacheGroup::didFail(ResourceHandle* handle,
                       ? m_currentResource->type()
                       : m_pendingEntries.get(handle->request().url());
   KURL url(handle->request().url());
-  if (url.hasRef())
-    url.removeRef();
+  if (url.hasFragmentIdentifier())
+    url.removeFragmentIdentifier();
 
   ASSERT(!m_currentResource || !m_pendingEntries.contains(url));
   m_currentResource = 0;
@@ -986,7 +986,7 @@ void ApplicationCacheGroup::deliverDelayedMainResources() {
 
 void ApplicationCacheGroup::addEntry(const String& url, unsigned type) {
   ASSERT(m_cacheBeingUpdated);
-  ASSERT(!KURL(url).hasRef());
+  ASSERT(!KURL(url).hasFragmentIdentifier());
 
   // Don't add the URL if we already have an master resource in the cache
   // (i.e., the main resource finished loading before the manifest).

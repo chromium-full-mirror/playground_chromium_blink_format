@@ -56,11 +56,6 @@ namespace WebCore {
 class TextEncoding;
 struct KURLHash;
 
-// FIXME: Our terminology here is a bit inconsistent. We refer to the part
-// after the "#" as the "fragment" in some places and the "ref" in others.
-// We should fix the terminology to match the URL and URI RFCs as closely
-// as possible to resolve this.
-
 class KURL {
  public:
   // Generates a URL which contains a null string.
@@ -122,8 +117,8 @@ class KURL {
   String path() const;
   String lastPathComponent() const;
   String query() const;
-  String ref() const;
-  bool hasRef() const;
+  String fragmentIdentifier() const;
+  bool hasFragmentIdentifier() const;
 
   String baseAsString() const;
 
@@ -157,10 +152,10 @@ class KURL {
   // URL (with nothing after it). To clear the query, pass a null string.
   void setQuery(const String&);
 
-  void setRef(const String&);
-  void removeRef();
+  void setFragmentIdentifier(const String&);
+  void removeFragmentIdentifier();
 
-  friend bool equalIgnoringRef(const KURL&, const KURL&);
+  friend bool equalIgnoringFragmentIdentifier(const KURL&, const KURL&);
 
   friend bool protocolHostAndPortAreEqual(const KURL&, const KURL&);
 
@@ -247,7 +242,7 @@ bool operator!=(const KURL&, const KURL&);
 bool operator!=(const KURL&, const String&);
 bool operator!=(const String&, const KURL&);
 
-bool equalIgnoringRef(const KURL&, const KURL&);
+bool equalIgnoringFragmentIdentifier(const KURL&, const KURL&);
 bool protocolHostAndPortAreEqual(const KURL&, const KURL&);
 
 const KURL& blankURL();

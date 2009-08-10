@@ -66,7 +66,9 @@ String WorkerLocation::search() const {
 }
 
 String WorkerLocation::hash() const {
-  return m_url.ref().isEmpty() ? "" : "#" + m_url.ref();
+  return m_url.fragmentIdentifier().isEmpty()
+             ? ""
+             : "#" + m_url.fragmentIdentifier();
 }
 
 String WorkerLocation::toString() const {

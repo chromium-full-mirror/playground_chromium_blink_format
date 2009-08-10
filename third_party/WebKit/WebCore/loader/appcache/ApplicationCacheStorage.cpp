@@ -126,7 +126,7 @@ ApplicationCacheGroup* ApplicationCacheStorage::loadCacheGroup(
 
 ApplicationCacheGroup* ApplicationCacheStorage::findOrCreateCacheGroup(
     const KURL& manifestURL) {
-  ASSERT(!manifestURL.hasRef());
+  ASSERT(!manifestURL.hasFragmentIdentifier());
 
   std::pair<CacheGroupMap::iterator, bool> result =
       m_cachesInMemory.add(manifestURL, 0);
@@ -177,7 +177,7 @@ void ApplicationCacheStorage::loadManifestHostHashes() {
 
 ApplicationCacheGroup* ApplicationCacheStorage::cacheGroupForURL(
     const KURL& url) {
-  ASSERT(!url.hasRef());
+  ASSERT(!url.hasFragmentIdentifier());
 
   loadManifestHostHashes();
 
@@ -259,7 +259,7 @@ ApplicationCacheGroup* ApplicationCacheStorage::cacheGroupForURL(
 
 ApplicationCacheGroup* ApplicationCacheStorage::fallbackCacheGroupForURL(
     const KURL& url) {
-  ASSERT(!url.hasRef());
+  ASSERT(!url.hasFragmentIdentifier());
 
   // Check if an appropriate cache already exists in memory.
   CacheGroupMap::const_iterator end = m_cachesInMemory.end();
