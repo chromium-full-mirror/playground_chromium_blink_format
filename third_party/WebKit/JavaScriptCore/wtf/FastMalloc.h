@@ -189,7 +189,7 @@ using WTF::fastMallocAllow;
 // new by accident.
 
 WTF_PRIVATE_INLINE void* operator new(size_t size) {
-  return fastMalloc(s);
+  return fastMalloc(size);
 }
 WTF_PRIVATE_INLINE void* operator new(size_t size,
                                       const std::nothrow_t&) throw() {
