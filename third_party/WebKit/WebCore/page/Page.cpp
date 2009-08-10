@@ -512,7 +512,9 @@ void Page::removeAllVisitedLinks() {
 
 void Page::allVisitedStateChanged(PageGroup* group) {
   ASSERT(group);
-  ASSERT(allPages);
+  if (!allPages)
+    return;
+
   HashSet<Page*>::iterator pagesEnd = allPages->end();
   for (HashSet<Page*>::iterator it = allPages->begin(); it != pagesEnd; ++it) {
     Page* page = *it;
@@ -528,7 +530,9 @@ void Page::allVisitedStateChanged(PageGroup* group) {
 
 void Page::visitedStateChanged(PageGroup* group, LinkHash visitedLinkHash) {
   ASSERT(group);
-  ASSERT(allPages);
+  if (!allPages)
+    return;
+
   HashSet<Page*>::iterator pagesEnd = allPages->end();
   for (HashSet<Page*>::iterator it = allPages->begin(); it != pagesEnd; ++it) {
     Page* page = *it;
