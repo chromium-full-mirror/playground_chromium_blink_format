@@ -361,32 +361,20 @@ RefPtr<CSSMutableStyleDeclaration> getPropertiesNotInComputedStyle(
 // Editing style properties must be preserved during editing operation.
 // e.g. when a user inserts a new paragraph, all properties listed here must be
 // copied to the new paragraph.
-// FIXME: The current editingStyleProperties is identical to
-// inheritableProperties but we may not need to preserve all inheritable
-// properties
+// FIXME: The current editingStyleProperties contains all inheritableProperties
+// but we may not need to preserve all inheritable properties
 static const int editingStyleProperties[] = {
-    CSSPropertyBorderCollapse,
-    CSSPropertyColor,
-    CSSPropertyFontFamily,
-    CSSPropertyFontSize,
-    CSSPropertyFontStyle,
-    CSSPropertyFontVariant,
-    CSSPropertyFontWeight,
-    CSSPropertyLetterSpacing,
-    CSSPropertyLineHeight,
-    CSSPropertyOrphans,
-    CSSPropertyTextAlign,
-    CSSPropertyTextIndent,
-    CSSPropertyTextTransform,
-    CSSPropertyWhiteSpace,
-    CSSPropertyWidows,
-    CSSPropertyWordSpacing,
-    CSSPropertyWebkitBorderHorizontalSpacing,
+    CSSPropertyBackgroundColor,
+    // CSS inheritable properties
+    CSSPropertyBorderCollapse, CSSPropertyColor, CSSPropertyFontFamily,
+    CSSPropertyFontSize, CSSPropertyFontStyle, CSSPropertyFontVariant,
+    CSSPropertyFontWeight, CSSPropertyLetterSpacing, CSSPropertyLineHeight,
+    CSSPropertyOrphans, CSSPropertyTextAlign, CSSPropertyTextIndent,
+    CSSPropertyTextTransform, CSSPropertyWhiteSpace, CSSPropertyWidows,
+    CSSPropertyWordSpacing, CSSPropertyWebkitBorderHorizontalSpacing,
     CSSPropertyWebkitBorderVerticalSpacing,
-    CSSPropertyWebkitTextDecorationsInEffect,
-    CSSPropertyWebkitTextFillColor,
-    CSSPropertyWebkitTextSizeAdjust,
-    CSSPropertyWebkitTextStrokeColor,
+    CSSPropertyWebkitTextDecorationsInEffect, CSSPropertyWebkitTextFillColor,
+    CSSPropertyWebkitTextSizeAdjust, CSSPropertyWebkitTextStrokeColor,
     CSSPropertyWebkitTextStrokeWidth,
 };
 size_t numEditingStyleProperties =
