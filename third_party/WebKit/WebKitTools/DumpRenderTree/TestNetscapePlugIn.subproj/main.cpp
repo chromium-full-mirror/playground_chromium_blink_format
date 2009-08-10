@@ -111,7 +111,9 @@ NPError NPP_New(NPMIMEType pluginType,
     }
   }
 
+#ifndef NP_NO_CARBON
   NPBool supportsCarbon = false;
+#endif
   NPBool supportsCocoa = false;
 
 #ifndef NP_NO_CARBON
