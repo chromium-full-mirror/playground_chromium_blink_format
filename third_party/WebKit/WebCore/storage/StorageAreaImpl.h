@@ -40,7 +40,9 @@ class StorageAreaSync;
 
 class StorageAreaImpl : public StorageArea {
  public:
-  StorageAreaImpl(StorageType, SecurityOrigin*, PassRefPtr<StorageSyncManager>);
+  StorageAreaImpl(StorageType,
+                  PassRefPtr<SecurityOrigin>,
+                  PassRefPtr<StorageSyncManager>);
   virtual ~StorageAreaImpl();
 
   // The HTML5 DOM Storage API (and contains)
@@ -55,7 +57,7 @@ class StorageAreaImpl : public StorageArea {
   virtual void clear(Frame* sourceFrame);
   virtual bool contains(const String& key) const;
 
-  PassRefPtr<StorageAreaImpl> copy(SecurityOrigin*);
+  PassRefPtr<StorageAreaImpl> copy();
   void close();
 
   // Could be called from a background thread.
@@ -63,7 +65,7 @@ class StorageAreaImpl : public StorageArea {
   SecurityOrigin* securityOrigin();
 
  private:
-  StorageAreaImpl(SecurityOrigin*, StorageAreaImpl*);
+  StorageAreaImpl(StorageAreaImpl*);
 
   void blockUntilImportComplete() const;
 

@@ -66,9 +66,7 @@ class StorageNamespaceImpl : public StorageNamespace {
   String m_path;
   RefPtr<StorageSyncManager> m_syncManager;
 
-#ifndef NDEBUG
   bool m_isShutdown;
-#endif
 };
 
 }  // namespace WebCore
