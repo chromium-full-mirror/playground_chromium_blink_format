@@ -48,6 +48,8 @@ class V8ObjectEventListener : public V8EventListener {
     return adoptRef(new V8ObjectEventListener(frame, listener, isInline));
   }
 
+  virtual bool isObjectListener() const { return true; }
+
  private:
   V8ObjectEventListener(Frame*, v8::Local<v8::Object> listener, bool isInline);
   virtual ~V8ObjectEventListener();

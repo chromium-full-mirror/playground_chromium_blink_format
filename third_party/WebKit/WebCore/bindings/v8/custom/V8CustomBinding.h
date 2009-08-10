@@ -107,10 +107,15 @@ class V8Custom {
   static const int kNPObjectInternalFieldCount =
       kDefaultWrapperInternalFieldCount + 0;
 
-  static const int kDocumentImplementationIndex =
+  static const int kNodeEventListenerCacheIndex =
       kDefaultWrapperInternalFieldCount + 0;
-  static const int kDocumentMinimumInternalFieldCount =
+  static const int kNodeMinimumInternalFieldCount =
       kDefaultWrapperInternalFieldCount + 1;
+
+  static const int kDocumentImplementationIndex =
+      kNodeMinimumInternalFieldCount + 0;
+  static const int kDocumentMinimumInternalFieldCount =
+      kNodeMinimumInternalFieldCount + 1;
 
   static const int kHTMLDocumentMarkerIndex =
       kDocumentMinimumInternalFieldCount + 0;
@@ -286,7 +291,7 @@ class V8Custom {
   DECLARE_PROPERTY_ACCESSOR_GETTER(EventClipboardData);
 
   DECLARE_PROPERTY_ACCESSOR(DOMWindowEventHandler);
-  DECLARE_PROPERTY_ACCESSOR(ElementEventHandler);
+  DECLARE_PROPERTY_ACCESSOR(NodeEventHandler);
 
   DECLARE_CALLBACK(HTMLCanvasElementGetContext);
 

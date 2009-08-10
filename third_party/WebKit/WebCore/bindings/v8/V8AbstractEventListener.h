@@ -71,6 +71,8 @@ class V8AbstractEventListener : public EventListener {
 
   virtual bool disconnected() const { return !m_frame; }
 
+  virtual bool isObjectListener() const { return false; }
+
  protected:
   v8::Persistent<v8::Object> m_listener;
 

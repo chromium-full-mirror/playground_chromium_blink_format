@@ -294,7 +294,7 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
       v8::Local<v8::ObjectTemplate> instanceTemplate =
           descriptor->InstanceTemplate();
       ASSERT(instanceTemplate->InternalFieldCount() ==
-             V8Custom::kDefaultWrapperInternalFieldCount);
+             V8Custom::kNodeMinimumInternalFieldCount);
       instanceTemplate->SetInternalFieldCount(
           V8Custom::kHTMLDocumentInternalFieldCount);
       break;
@@ -308,7 +308,7 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
       v8::Local<v8::ObjectTemplate> instanceTemplate =
           descriptor->InstanceTemplate();
       ASSERT(instanceTemplate->InternalFieldCount() ==
-             V8Custom::kDefaultWrapperInternalFieldCount);
+             V8Custom::kNodeMinimumInternalFieldCount);
       instanceTemplate->SetInternalFieldCount(
           V8Custom::kDocumentMinimumInternalFieldCount);
       break;

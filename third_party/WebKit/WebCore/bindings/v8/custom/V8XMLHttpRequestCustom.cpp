@@ -44,9 +44,10 @@
 
 namespace WebCore {
 
-PassRefPtr<EventListener> getEventListener(XMLHttpRequest* xmlHttpRequest,
-                                           v8::Local<v8::Value> value,
-                                           bool findOnly) {
+static PassRefPtr<EventListener> getEventListener(
+    XMLHttpRequest* xmlHttpRequest,
+    v8::Local<v8::Value> value,
+    bool findOnly) {
 #if ENABLE(WORKERS)
   WorkerContextExecutionProxy* workerContextProxy =
       WorkerContextExecutionProxy::retrieve();
