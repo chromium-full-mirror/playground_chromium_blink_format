@@ -1371,13 +1371,13 @@ QtRuntimeMetaMethod::QtRuntimeMetaMethod(ExecState* exec,
   d->m_allowPrivate = allowPrivate;
 }
 
-void QtRuntimeMetaMethod::mark() {
-  QtRuntimeMethod::mark();
+void QtRuntimeMetaMethod::markChildren(MarkStack& markStack) {
+  QtRuntimeMethod::markChildren(markStack);
   QW_D(QtRuntimeMetaMethod);
   if (d->m_connect)
-    d->m_connect->mark();
+    markStack.append(d->m_connect);
   if (d->m_disconnect)
-    d->m_disconnect->mark();
+    markStack.append(d->m_disconnect);
 }
 
 JSValue QtRuntimeMetaMethod::call(ExecState* exec,

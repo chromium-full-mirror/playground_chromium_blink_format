@@ -164,7 +164,7 @@ class QtRuntimeMetaMethod : public QtRuntimeMethod {
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
 
-  virtual void mark();
+  virtual void markChildren(MarkStack& markStack);
 
  protected:
   QtRuntimeMetaMethodData* d_func() const {

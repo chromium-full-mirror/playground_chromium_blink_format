@@ -49,7 +49,7 @@ class QtInstance : public Instance {
   virtual JSValue valueOf(ExecState*) const;
   virtual JSValue defaultValue(ExecState*, PreferredPrimitiveType) const;
 
-  virtual void mark();  // This isn't inherited
+  void markAggregate(MarkStack&);
 
   virtual JSValue invokeMethod(ExecState*, const MethodList&, const ArgList&);
 
