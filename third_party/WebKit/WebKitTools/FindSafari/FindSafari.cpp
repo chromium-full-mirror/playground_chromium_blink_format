@@ -127,6 +127,8 @@ int _tmain(int argc, TCHAR* argv[]) {
       TEXT("mkdir 2>NUL \"%%TMP%%\\WebKitNightly\\WebKit.resources\""),
       TEXT("mkdir 2>NUL \"%%TMP%%\\WebKitNightly\\JavaScriptCore.resources\""),
       TEXT("xcopy /y /i /d \"%sSafari.exe\" \"%%TMP%%\\WebKitNightly\""),
+      TEXT("if exist \"%sSafari.dll\" xcopy /y /i /d \"%sSafari.dll\" "
+           "\"%%TMP%%\\WebKitNightly\""),
       TEXT("xcopy /y /i /d /e \"%sSafari.resources\" "
            "\"%%TMP%%\\WebKitNightly\\Safari.resources\""),
       TEXT("xcopy /y /i /d /e \"%splugins\" "
@@ -157,7 +159,7 @@ int _tmain(int argc, TCHAR* argv[]) {
   };
 
   for (int i = 0; i < ARRAYSIZE(lines); ++i) {
-    _tprintf(lines[i], path);
+    _tprintf(lines[i], path, path);
     _tprintf(TEXT("\n"));
   }
 
