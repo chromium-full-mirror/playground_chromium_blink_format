@@ -116,11 +116,6 @@ class Page;
 - (id)_policyDelegateForwarder;
 - (void)_pushPerformingProgrammaticFocus;
 - (void)_popPerformingProgrammaticFocus;
-- (void)_incrementProgressForIdentifier:(id)identifier
-                               response:(NSURLResponse*)response;
-- (void)_incrementProgressForIdentifier:(id)identifier length:(int)length;
-- (void)_completeProgressForIdentifier:(id)identifer;
-- (void)_progressStarted:(WebFrame*)frame;
 - (void)_didStartProvisionalLoadForFrame:(WebFrame*)frame;
 + (BOOL)_viewClass:(Class*)vClass
     andRepresentationClass:(Class*)rClass
@@ -155,7 +150,6 @@ class Page;
 - (void)_didChangeValueForKey:(NSString*)key;
 - (WebBasePluginPackage*)_pluginForMIMEType:(NSString*)MIMEType;
 - (WebBasePluginPackage*)_pluginForExtension:(NSString*)extension;
-- (BOOL)_isMIMETypeRegisteredAsPlugin:(NSString*)MIMEType;
 
 - (void)setCurrentNodeHighlight:(WebNodeHighlight*)nodeHighlight;
 - (WebNodeHighlight*)currentNodeHighlight;
