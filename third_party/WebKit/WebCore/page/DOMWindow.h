@@ -56,6 +56,7 @@ class Media;
 class MessagePort;
 class Navigator;
 class Node;
+class NotificationCenter;
 class PostMessageTimer;
 class ScheduledAction;
 class Screen;
@@ -226,6 +227,10 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   DOMApplicationCache* applicationCache() const;
+#endif
+
+#if ENABLE(NOTIFICATIONS)
+  NotificationCenter* webkitNotifications() const;
 #endif
 
   void postMessage(const String& message,
@@ -470,6 +475,9 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
 #endif
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   mutable RefPtr<DOMApplicationCache> m_applicationCache;
+#endif
+#if ENABLE(NOTIFICATIONS)
+  mutable RefPtr<NotificationCenter> m_notifications;
 #endif
 
   RegisteredEventListenerVector m_eventListeners;

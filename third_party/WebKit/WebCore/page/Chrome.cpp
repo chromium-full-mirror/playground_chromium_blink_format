@@ -384,6 +384,12 @@ bool Chrome::setCursor(PlatformCursorHandle cursor) {
   return m_client->setCursor(cursor);
 }
 
+#if ENABLE(NOTIFICATIONS)
+NotificationPresenter* Chrome::notificationPresenter() const {
+  return m_client->notificationPresenter();
+}
+#endif
+
 // --------
 
 #if ENABLE(DASHBOARD_SUPPORT)

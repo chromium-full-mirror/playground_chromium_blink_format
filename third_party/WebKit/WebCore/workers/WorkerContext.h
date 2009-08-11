@@ -41,6 +41,7 @@
 
 namespace WebCore {
 
+class NotificationCenter;
 class ScheduledAction;
 class WorkerLocation;
 class WorkerNavigator;
@@ -127,6 +128,10 @@ class WorkerContext : public RefCounted<WorkerContext>,
                           unsigned lineNumber,
                           const String& sourceURL);
 
+#if ENABLE(NOTIFICATIONS)
+  NotificationCenter* webkitNotifications() const;
+#endif
+
   // These methods are used for GC marking. See
   // JSWorkerContext::markChildren(MarkStack&) in
   // JSWorkerContextCustom.cpp.
@@ -161,6 +166,9 @@ class WorkerContext : public RefCounted<WorkerContext>,
   RefPtr<EventListener> m_onerrorListener;
   EventListenersMap m_eventListeners;
 
+#if ENABLE_NOTIFICATIONS
+  mutable RefPtr<NotificationCenter> m_notifications;
+#endif
   bool m_closing;
 };
 

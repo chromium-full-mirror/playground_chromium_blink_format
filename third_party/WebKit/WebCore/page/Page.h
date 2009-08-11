@@ -73,6 +73,9 @@ class StorageNamespace;
 #if ENABLE(WML)
 class WMLPageState;
 #endif
+#if ENABLE(NOTIFICATIONS)
+class NotificationPresenter;
+#endif
 
 enum FindDirection { FindDirectionForward, FindDirectionBackward };
 
@@ -323,6 +326,10 @@ class Page : public Noncopyable {
 
 #if ENABLE(WML)
   OwnPtr<WMLPageState> m_wmlPageState;
+#endif
+
+#if ENABLE(NOTIFICATIONS)
+  NotificationPresenter* m_notificationPresenter;
 #endif
 };
 

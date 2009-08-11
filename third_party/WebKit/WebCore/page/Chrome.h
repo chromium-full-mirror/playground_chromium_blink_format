@@ -44,6 +44,9 @@ class HitTestResult;
 class IntRect;
 class Page;
 class String;
+#if ENABLE(NOTIFICATIONS)
+class NotificationPresenter;
+#endif
 
 struct FrameLoadRequest;
 struct WindowFeatures;
@@ -136,6 +139,10 @@ class Chrome : public HostWindow {
 
 #if PLATFORM(MAC)
   void focusNSView(NSView*);
+#endif
+
+#if ENABLE(NOTIFICATIONS)
+  NotificationPresenter* notificationPresenter() const;
 #endif
 
  private:

@@ -446,6 +446,11 @@ class WebInspectorDelegate : public IWebUIDelegate {
     return E_NOTIMPL;
   }
 
+  virtual HRESULT STDMETHODCALLTYPE desktopNotificationsDelegate(
+      /* [retval][out] */ IWebDesktopNotificationsDelegate** result) {
+    return E_NOTIMPL;
+  }
+
  private:
   WebInspectorDelegate();
 

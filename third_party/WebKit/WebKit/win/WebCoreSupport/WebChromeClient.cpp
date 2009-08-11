@@ -30,6 +30,7 @@
 #include "WebFrame.h"
 #include "WebHistory.h"
 #include "WebMutableURLRequest.h"
+#include "WebDesktopNotificationsDelegate.h"
 #include "WebSecurityOrigin.h"
 #include "WebView.h"
 #pragma warning(push, 0)
@@ -58,7 +59,14 @@ using namespace WebCore;
 // short.
 static const size_t maxFilePathsListSize = USHRT_MAX;
 
-WebChromeClient::WebChromeClient(WebView* webView) : m_webView(webView) {}
+WebChromeClient::WebChromeClient(WebView* webView)
+    : m_webView(webView)
+#if ENABLE(NOTIFICATIONS)
+      ,
+      m_notificationsDelegate(new WebDesktopNotificationsDelegate(webView))
+#endif
+{
+}
 
 void WebChromeClient::chromeDestroyed() {
   delete this;

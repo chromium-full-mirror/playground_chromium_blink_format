@@ -32,6 +32,7 @@
 #include <JavaScriptCore/JSObjectRef.h>
 #include <wtf/RefCounted.h>
 #include <string>
+#include <vector>
 
 class LayoutTestController : public RefCounted<LayoutTestController> {
  public:
@@ -86,6 +87,9 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void waitForPolicyDelegate();
   size_t webHistoryItemCount();
   int windowCount();
+
+  void grantDesktopNotificationPermission(JSStringRef origin);
+  bool checkDesktopNotificationPermission(JSStringRef origin);
 
   bool elementDoesAutoCompleteForElementWithId(JSStringRef id);
 
@@ -265,6 +269,9 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
 
   std::string m_testPathOrURL;
   std::string m_expectedPixelHash;  // empty string if no hash
+
+  // origins which have been granted desktop notification access
+  std::vector<JSStringRef> m_desktopNotificationAllowedOrigins;
 
   static JSClassRef getJSClass();
   static JSStaticValue* staticValues();
