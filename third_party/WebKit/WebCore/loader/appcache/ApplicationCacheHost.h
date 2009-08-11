@@ -33,16 +33,13 @@
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
 
+#include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
 
-class ApplicationCache;
-class ApplicationCacheGroup;
-class ApplicationCacheResource;
-class ApplicationCacheStorage;
 class DOMApplicationCache;
 class DocumentLoader;
 class KURL;
@@ -51,6 +48,14 @@ class ResourceError;
 struct ResourceRequest;
 class ResourceResponse;
 class SubstituteData;
+#if PLATFORM(CHROMIUM)
+class ApplicationCacheHostInternal;
+#else
+class ApplicationCache;
+class ApplicationCacheGroup;
+class ApplicationCacheResource;
+class ApplicationCacheStorage;
+#endif
 
 class ApplicationCacheHost {
  public:
@@ -121,6 +126,16 @@ class ApplicationCacheHost {
   void notifyEventListener(EventID id);
 
  private:
+  bool isApplicationCacheEnabled();
+  DocumentLoader* documentLoader() { return m_documentLoader; }
+
+  DOMApplicationCache* m_domApplicationCache;
+  DocumentLoader* m_documentLoader;
+
+#if PLATFORM(CHROMIUM)
+  friend class ApplicationCacheHostInternal;
+  OwnPtr<ApplicationCacheHostInternal> m_internal;
+#else
   friend class ApplicationCacheGroup;
   friend class ApplicationCacheStorage;
 
@@ -143,12 +158,6 @@ class ApplicationCacheHost {
     return m_mainResourceApplicationCache.get();
   }
 
-  bool isApplicationCacheEnabled();
-  DocumentLoader* documentLoader() { return m_documentLoader; }
-
-  DOMApplicationCache* m_domApplicationCache;
-  DocumentLoader* m_documentLoader;
-
   // The application cache that the document loader is associated with (if any).
   RefPtr<ApplicationCache> m_applicationCache;
 
@@ -159,9 +168,10 @@ class ApplicationCacheHost {
 
   // This is the application cache the main resource was loaded from (if any).
   RefPtr<ApplicationCache> m_mainResourceApplicationCache;
+#endif
 };
 
 }  // namespace WebCore
 
-#endif  // ENABLE(APPLICATION_CACHE)
-#endif  // ApplicationCacheFrontend_h
+#endif  // ENABLE(OFFLINE_WEB_APPLICATIONS)
+#endif  // ApplicationCacheHost_h

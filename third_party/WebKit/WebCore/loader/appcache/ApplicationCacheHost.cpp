@@ -419,4 +419,4 @@ bool ApplicationCacheHost::isApplicationCacheEnabled() {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(APPLICATION_CACHE)
+#endif  // ENABLE(OFFLINE_WEB_APPLICATIONS)
