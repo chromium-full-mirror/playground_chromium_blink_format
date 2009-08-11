@@ -557,29 +557,6 @@ static JSValueRef isCommandEnabledCallback(JSContextRef context,
   return JSValueMakeBoolean(context, controller->isCommandEnabled(name.get()));
 }
 
-static JSValueRef overridePreferenceCallback(JSContextRef context,
-                                             JSObjectRef function,
-                                             JSObjectRef thisObject,
-                                             size_t argumentCount,
-                                             const JSValueRef arguments[],
-                                             JSValueRef* exception) {
-  if (argumentCount < 2)
-    return JSValueMakeUndefined(context);
-
-  JSRetainPtr<JSStringRef> key(
-      Adopt, JSValueToStringCopy(context, arguments[0], exception));
-  ASSERT(!*exception);
-  JSRetainPtr<JSStringRef> value(
-      Adopt, JSValueToStringCopy(context, arguments[1], exception));
-  ASSERT(!*exception);
-
-  LayoutTestController* controller =
-      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->overridePreference(key.get(), value.get());
-
-  return JSValueMakeUndefined(context);
-}
-
 static JSValueRef keepWebHistoryCallback(JSContextRef context,
                                          JSObjectRef function,
                                          JSObjectRef thisObject,
@@ -1424,8 +1401,6 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"notifyDone", notifyDoneCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"numberOfActiveAnimations", numberOfActiveAnimationsCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"overridePreference", overridePreferenceCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"pathToLocalResource", pathToLocalResourceCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

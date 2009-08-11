@@ -340,8 +340,3 @@ bool LayoutTestController::pauseTransitionAtTimeOnElementWithId(
 unsigned LayoutTestController::numberOfActiveAnimations() const {
   return webkit_web_frame_number_of_active_animations(mainFrame);
 }
-
-void LayoutTestController::overridePreference(JSStringRef /* key */,
-                                              JSStringRef /* value */) {
-  // FIXME: implement
-}
