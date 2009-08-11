@@ -42,7 +42,7 @@ class StorageMap : public RefCounted<StorageMap> {
   static PassRefPtr<StorageMap> create();
 
   unsigned length() const;
-  bool key(unsigned index, String& key) const;
+  String key(unsigned index) const;
   String getItem(const String&) const;
   PassRefPtr<StorageMap> setItem(const String& key,
                                  const String& value,

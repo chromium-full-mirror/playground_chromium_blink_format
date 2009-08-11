@@ -49,7 +49,7 @@ class StorageArea : public ThreadSafeShared<StorageArea> {
 
   // The HTML5 DOM Storage API
   virtual unsigned length() const = 0;
-  virtual String key(unsigned index, ExceptionCode& ec) const = 0;
+  virtual String key(unsigned index) const = 0;
   virtual String getItem(const String& key) const = 0;
   virtual void setItem(const String& key,
                        const String& value,

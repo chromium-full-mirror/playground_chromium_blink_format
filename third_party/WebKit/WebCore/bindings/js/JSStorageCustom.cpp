@@ -72,10 +72,9 @@ bool JSStorage::deleteProperty(ExecState* exec,
 
 void JSStorage::getPropertyNames(ExecState* exec,
                                  PropertyNameArray& propertyNames) {
-  ExceptionCode ec;
   unsigned length = m_impl->length();
   for (unsigned i = 0; i < length; ++i)
-    propertyNames.add(Identifier(exec, m_impl->key(i, ec)));
+    propertyNames.add(Identifier(exec, m_impl->key(i)));
 
   Base::getPropertyNames(exec, propertyNames);
 }
