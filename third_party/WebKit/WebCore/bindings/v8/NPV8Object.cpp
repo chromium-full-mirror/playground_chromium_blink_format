@@ -40,6 +40,7 @@
 #include "V8NPUtils.h"
 #include "V8Proxy.h"
 #include "bindings/npruntime.h"
+#include "npruntime_impl.h"
 #include "npruntime_priv.h"
 
 #include <stdio.h>
@@ -118,13 +119,13 @@ NPObject* npCreateV8ScriptObject(NPP npp,
         typeIndex->Uint32Value() == V8ClassIndex::NPOBJECT) {
       NPObject* returnValue = V8DOMWrapper::convertToNativeObject<NPObject>(
           V8ClassIndex::NPOBJECT, object);
-      NPN_RetainObject(returnValue);
+      _NPN_RetainObject(returnValue);
       return returnValue;
     }
   }
 
   V8NPObject* v8npObject =
-      reinterpret_cast<V8NPObject*>(NPN_CreateObject(npp, &V8NPObjectClass));
+      reinterpret_cast<V8NPObject*>(_NPN_CreateObject(npp, &V8NPObjectClass));
   v8npObject->v8Object = v8::Persistent<v8::Object>::New(object);
 #ifndef NDEBUG
   V8GCController::registerGlobalHandle(WebCore::NPOBJECT, v8npObject,
@@ -134,12 +135,12 @@ NPObject* npCreateV8ScriptObject(NPP npp,
   return reinterpret_cast<NPObject*>(v8npObject);
 }
 
-bool NPN_Invoke(NPP npp,
-                NPObject* npObject,
-                NPIdentifier methodName,
-                const NPVariant* arguments,
-                uint32_t argumentCount,
-                NPVariant* result) {
+bool _NPN_Invoke(NPP npp,
+                 NPObject* npObject,
+                 NPIdentifier methodName,
+                 const NPVariant* arguments,
+                 uint32_t argumentCount,
+                 NPVariant* result) {
   if (!npObject)
     return false;
 
@@ -166,14 +167,14 @@ bool NPN_Invoke(NPP npp,
 
   v8::Context::Scope scope(context);
 
-  if (methodName == NPN_GetStringIdentifier("eval")) {
+  if (methodName == _NPN_GetStringIdentifier("eval")) {
     if (argumentCount != 1)
       return false;
     if (arguments[0].type != NPVariantType_String)
       return false;
-    return NPN_Evaluate(npp, npObject,
-                        const_cast<NPString*>(&arguments[0].value.stringValue),
-                        result);
+    return _NPN_Evaluate(npp, npObject,
+                         const_cast<NPString*>(&arguments[0].value.stringValue),
+                         result);
   }
 
   v8::Handle<v8::Value> functionObject =
@@ -209,12 +210,12 @@ bool NPN_Invoke(NPP npp,
   return true;
 }
 
-// FIXME: Fix it same as NPN_Invoke (HandleScope and such).
-bool NPN_InvokeDefault(NPP npp,
-                       NPObject* npObject,
-                       const NPVariant* arguments,
-                       uint32_t argumentCount,
-                       NPVariant* result) {
+// FIXME: Fix it same as _NPN_Invoke (HandleScope and such).
+bool _NPN_InvokeDefault(NPP npp,
+                        NPObject* npObject,
+                        const NPVariant* arguments,
+                        uint32_t argumentCount,
+                        NPVariant* result) {
   if (!npObject)
     return false;
 
@@ -265,19 +266,19 @@ bool NPN_InvokeDefault(NPP npp,
   return true;
 }
 
-bool NPN_Evaluate(NPP npp,
-                  NPObject* npObject,
-                  NPString* npScript,
-                  NPVariant* result) {
+bool _NPN_Evaluate(NPP npp,
+                   NPObject* npObject,
+                   NPString* npScript,
+                   NPVariant* result) {
   bool popupsAllowed = WebCore::ChromiumBridge::popupsAllowed(npp);
-  return NPN_EvaluateHelper(npp, popupsAllowed, npObject, npScript, result);
+  return _NPN_EvaluateHelper(npp, popupsAllowed, npObject, npScript, result);
 }
 
-bool NPN_EvaluateHelper(NPP npp,
-                        bool popupsAllowed,
-                        NPObject* npObject,
-                        NPString* npScript,
-                        NPVariant* result) {
+bool _NPN_EvaluateHelper(NPP npp,
+                         bool popupsAllowed,
+                         NPObject* npObject,
+                         NPString* npScript,
+                         NPVariant* result) {
   VOID_TO_NPVARIANT(*result);
   if (!npObject)
     return false;
@@ -311,10 +312,10 @@ bool NPN_EvaluateHelper(NPP npp,
   return true;
 }
 
-bool NPN_GetProperty(NPP npp,
-                     NPObject* npObject,
-                     NPIdentifier propertyName,
-                     NPVariant* result) {
+bool _NPN_GetProperty(NPP npp,
+                      NPObject* npObject,
+                      NPIdentifier propertyName,
+                      NPVariant* result) {
   if (!npObject)
     return false;
 
@@ -345,10 +346,10 @@ bool NPN_GetProperty(NPP npp,
   return false;
 }
 
-bool NPN_SetProperty(NPP npp,
-                     NPObject* npObject,
-                     NPIdentifier propertyName,
-                     const NPVariant* value) {
+bool _NPN_SetProperty(NPP npp,
+                      NPObject* npObject,
+                      NPIdentifier propertyName,
+                      const NPVariant* value) {
   if (!npObject)
     return false;
 
@@ -377,9 +378,9 @@ bool NPN_SetProperty(NPP npp,
   return false;
 }
 
-bool NPN_RemoveProperty(NPP npp,
-                        NPObject* npObject,
-                        NPIdentifier propertyName) {
+bool _NPN_RemoveProperty(NPP npp,
+                         NPObject* npObject,
+                         NPIdentifier propertyName) {
   if (!npObject)
     return false;
   if (npObject->_class != npScriptObjectClass)
@@ -399,7 +400,7 @@ bool NPN_RemoveProperty(NPP npp,
   return true;
 }
 
-bool NPN_HasProperty(NPP npp, NPObject* npObject, NPIdentifier propertyName) {
+bool _NPN_HasProperty(NPP npp, NPObject* npObject, NPIdentifier propertyName) {
   if (!npObject)
     return false;
 
@@ -421,7 +422,7 @@ bool NPN_HasProperty(NPP npp, NPObject* npObject, NPIdentifier propertyName) {
   return false;
 }
 
-bool NPN_HasMethod(NPP npp, NPObject* npObject, NPIdentifier methodName) {
+bool _NPN_HasMethod(NPP npp, NPObject* npObject, NPIdentifier methodName) {
   if (!npObject)
     return false;
 
@@ -445,7 +446,7 @@ bool NPN_HasMethod(NPP npp, NPObject* npObject, NPIdentifier methodName) {
   return false;
 }
 
-void NPN_SetException(NPObject* npObject, const NPUTF8* message) {
+void _NPN_SetException(NPObject* npObject, const NPUTF8* message) {
   if (npObject->_class != npScriptObjectClass)
     return;
   v8::HandleScope handleScope;
@@ -457,10 +458,10 @@ void NPN_SetException(NPObject* npObject, const NPUTF8* message) {
   V8Proxy::throwError(V8Proxy::GeneralError, message);
 }
 
-bool NPN_Enumerate(NPP npp,
-                   NPObject* npObject,
-                   NPIdentifier** identifier,
-                   uint32_t* count) {
+bool _NPN_Enumerate(NPP npp,
+                    NPObject* npObject,
+                    NPIdentifier** identifier,
+                    uint32_t* count) {
   if (!npObject)
     return false;
 
@@ -520,11 +521,11 @@ bool NPN_Enumerate(NPP npp,
   return false;
 }
 
-bool NPN_Construct(NPP npp,
-                   NPObject* npObject,
-                   const NPVariant* arguments,
-                   uint32_t argumentCount,
-                   NPVariant* result) {
+bool _NPN_Construct(NPP npp,
+                    NPObject* npObject,
+                    const NPVariant* arguments,
+                    uint32_t argumentCount,
+                    NPVariant* result) {
   if (!npObject)
     return false;
 
