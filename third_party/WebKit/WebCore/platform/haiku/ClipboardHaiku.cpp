@@ -27,8 +27,8 @@
 #include "config.h"
 #include "ClipboardHaiku.h"
 
-#include "IntPoint.h"
 #include "FileList.h"
+#include "IntPoint.h"
 #include "NotImplemented.h"
 #include "PlatformString.h"
 #include "StringHash.h"
