@@ -83,9 +83,10 @@ class MarkStack : Noncopyable {
   static void* allocateStack(size_t size);
   static void releaseStack(void* addr, size_t size);
 
+  static void initializePagesize();
   static size_t pageSize() {
     if (!s_pageSize)
-      s_pageSize = getpagesize();
+      initializePagesize();
     return s_pageSize;
   }
 
