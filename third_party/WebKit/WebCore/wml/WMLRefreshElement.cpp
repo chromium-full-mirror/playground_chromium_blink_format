@@ -40,11 +40,14 @@ WMLRefreshElement::WMLRefreshElement(const QualifiedName& tagName,
 WMLRefreshElement::~WMLRefreshElement() {}
 
 void WMLRefreshElement::executeTask(Event*) {
-  WMLPageState* pageState = wmlPageStateForDocument(document());
+  ASSERT(document()->isWMLDocument());
+  WMLDocument* document = static_cast<WMLDocument*>(this->document());
+
+  WMLPageState* pageState = wmlPageStateForDocument(document);
   if (!pageState)
     return;
 
-  WMLCardElement* card = pageState->activeCard();
+  WMLCardElement* card = document->activeCard();
   if (!card)
     return;
 
@@ -59,7 +62,7 @@ void WMLRefreshElement::executeTask(Event*) {
   storeVariableState(pageState);
 
   // Redisplay curremt card with current variable state
-  if (Frame* frame = document()->frame()) {
+  if (Frame* frame = document->frame()) {
     if (FrameLoader* loader = frame->loader())
       loader->reload();
   }

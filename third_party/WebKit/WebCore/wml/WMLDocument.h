@@ -44,6 +44,8 @@ class WMLDocument : public Document {
 
   bool initialize(bool aboutToFinishParsing = false);
 
+  WMLCardElement* activeCard() const { return m_activeCard; }
+
  private:
   WMLDocument(Frame*);
   WMLCardElement* m_activeCard;
