@@ -1173,6 +1173,8 @@ int main(int argc, char* argv[]) {
   if (FAILED(standardPreferences->QueryInterface(&standardPreferencesPrivate)))
     return -1;
   standardPreferencesPrivate->setShouldPaintNativeControls(FALSE);
+  standardPreferences->setJavaScriptEnabled(TRUE);
+  standardPreferences->setDefaultFontSize(16);
 
   COMPtr<IWebView> webView(AdoptCOM,
                            createWebViewAndOffscreenWindow(&webViewWindow));
