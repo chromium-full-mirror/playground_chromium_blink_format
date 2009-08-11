@@ -42,7 +42,8 @@ class SharedWorkerThread : public WorkerThread {
                                                const KURL&,
                                                const String& userAgent,
                                                const String& sourceCode,
-                                               WorkerLoaderProxy&);
+                                               WorkerLoaderProxy&,
+                                               WorkerReportingProxy&);
   ~SharedWorkerThread();
 
  protected:
@@ -54,7 +55,8 @@ class SharedWorkerThread : public WorkerThread {
                      const KURL&,
                      const String& userAgent,
                      const String& sourceCode,
-                     WorkerLoaderProxy&);
+                     WorkerLoaderProxy&,
+                     WorkerReportingProxy&);
 
   String m_name;
 };

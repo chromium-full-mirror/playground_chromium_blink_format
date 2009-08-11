@@ -55,7 +55,11 @@ DedicatedWorkerThread::DedicatedWorkerThread(
     const String& sourceCode,
     WorkerLoaderProxy& workerLoaderProxy,
     WorkerObjectProxy& workerObjectProxy)
-    : WorkerThread(url, userAgent, sourceCode, workerLoaderProxy),
+    : WorkerThread(url,
+                   userAgent,
+                   sourceCode,
+                   workerLoaderProxy,
+                   workerObjectProxy),
       m_workerObjectProxy(workerObjectProxy) {}
 
 DedicatedWorkerThread::~DedicatedWorkerThread() {}

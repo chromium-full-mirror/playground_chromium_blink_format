@@ -63,7 +63,12 @@ WorkerContext::WorkerContext(const KURL& url,
   setSecurityOrigin(SecurityOrigin::create(url));
 }
 
-WorkerContext::~WorkerContext() {}
+WorkerContext::~WorkerContext() {
+  ASSERT(currentThread() == thread()->threadID());
+  // Notify proxy that we are going away. This can free the WorkerThread object,
+  // so do not access it after this.
+  thread()->workerReportingProxy().workerContextDestroyed();
+}
 
 ScriptExecutionContext* WorkerContext::scriptExecutionContext() const {
   return const_cast<WorkerContext*>(this);
@@ -101,6 +106,8 @@ void WorkerContext::close() {
     return;
 
   m_closing = true;
+  // Notify parent that this context is closed.
+  thread()->workerReportingProxy().workerContextClosed();
   m_thread->stop();
 }
 
@@ -277,7 +284,19 @@ void WorkerContext::reportException(const String& errorMessage,
     errorHandled = onerror()->reportError(errorMessage, sourceURL, lineNumber);
 
   if (!errorHandled)
-    forwardException(errorMessage, lineNumber, sourceURL);
+    thread()->workerReportingProxy().postExceptionToWorkerObject(
+        errorMessage, lineNumber, sourceURL);
+}
+
+void WorkerContext::addMessage(MessageDestination destination,
+                               MessageSource source,
+                               MessageType type,
+                               MessageLevel level,
+                               const String& message,
+                               unsigned lineNumber,
+                               const String& sourceURL) {
+  thread()->workerReportingProxy().postConsoleMessageToWorkerObject(
+      destination, source, type, level, message, lineNumber, sourceURL);
 }
 
 }  // namespace WebCore

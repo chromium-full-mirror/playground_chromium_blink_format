@@ -70,9 +70,11 @@ WorkerThreadStartupData::WorkerThreadStartupData(const KURL& scriptURL,
 WorkerThread::WorkerThread(const KURL& scriptURL,
                            const String& userAgent,
                            const String& sourceCode,
-                           WorkerLoaderProxy& workerLoaderProxy)
+                           WorkerLoaderProxy& workerLoaderProxy,
+                           WorkerReportingProxy& workerReportingProxy)
     : m_threadID(0),
       m_workerLoaderProxy(workerLoaderProxy),
+      m_workerReportingProxy(workerReportingProxy),
       m_startupData(
           WorkerThreadStartupData::create(scriptURL, userAgent, sourceCode)) {}
 

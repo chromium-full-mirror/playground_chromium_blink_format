@@ -43,17 +43,25 @@ PassRefPtr<SharedWorkerThread> SharedWorkerThread::create(
     const KURL& scriptURL,
     const String& userAgent,
     const String& sourceCode,
-    WorkerLoaderProxy& workerLoaderProxy) {
+    WorkerLoaderProxy& workerLoaderProxy,
+    WorkerReportingProxy& workerReportingProxy) {
   return adoptRef(new SharedWorkerThread(name, scriptURL, userAgent, sourceCode,
-                                         workerLoaderProxy));
+                                         workerLoaderProxy,
+                                         workerReportingProxy));
 }
 
-SharedWorkerThread::SharedWorkerThread(const String& name,
-                                       const KURL& url,
-                                       const String& userAgent,
-                                       const String& sourceCode,
-                                       WorkerLoaderProxy& workerLoaderProxy)
-    : WorkerThread(url, userAgent, sourceCode, workerLoaderProxy),
+SharedWorkerThread::SharedWorkerThread(
+    const String& name,
+    const KURL& url,
+    const String& userAgent,
+    const String& sourceCode,
+    WorkerLoaderProxy& workerLoaderProxy,
+    WorkerReportingProxy& workerReportingProxy)
+    : WorkerThread(url,
+                   userAgent,
+                   sourceCode,
+                   workerLoaderProxy,
+                   workerReportingProxy),
       m_name(name.copy()) {}
 
 SharedWorkerThread::~SharedWorkerThread() {}

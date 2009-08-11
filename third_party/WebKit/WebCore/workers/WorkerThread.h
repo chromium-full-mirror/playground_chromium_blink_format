@@ -40,6 +40,7 @@ class KURL;
 class String;
 class WorkerContext;
 class WorkerLoaderProxy;
+class WorkerReportingProxy;
 struct WorkerThreadStartupData;
 
 class WorkerThread : public RefCounted<WorkerThread> {
@@ -52,12 +53,16 @@ class WorkerThread : public RefCounted<WorkerThread> {
   ThreadIdentifier threadID() const { return m_threadID; }
   WorkerRunLoop& runLoop() { return m_runLoop; }
   WorkerLoaderProxy& workerLoaderProxy() const { return m_workerLoaderProxy; }
+  WorkerReportingProxy& workerReportingProxy() const {
+    return m_workerReportingProxy;
+  }
 
  protected:
   WorkerThread(const KURL&,
                const String& userAgent,
                const String& sourceCode,
-               WorkerLoaderProxy&);
+               WorkerLoaderProxy&,
+               WorkerReportingProxy&);
 
   // Factory method for creating a new worker context for the thread.
   virtual PassRefPtr<WorkerContext> createWorkerContext(
@@ -79,6 +84,7 @@ class WorkerThread : public RefCounted<WorkerThread> {
   ThreadIdentifier m_threadID;
   WorkerRunLoop m_runLoop;
   WorkerLoaderProxy& m_workerLoaderProxy;
+  WorkerReportingProxy& m_workerReportingProxy;
 
   RefPtr<WorkerContext> m_workerContext;
   Mutex m_threadCreationMutex;

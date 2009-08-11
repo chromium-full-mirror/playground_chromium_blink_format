@@ -39,7 +39,6 @@
 #include "MessageEvent.h"
 #include "NotImplemented.h"
 #include "SharedWorkerThread.h"
-#include "WorkerObjectProxy.h"
 
 namespace WebCore {
 
@@ -50,21 +49,6 @@ SharedWorkerContext::SharedWorkerContext(const String& name,
     : WorkerContext(url, userAgent, thread), m_name(name) {}
 
 SharedWorkerContext::~SharedWorkerContext() {}
-
-void SharedWorkerContext::forwardException(const String&, int, const String&) {
-  // FIXME: forward to console (do not need to report to parent context).
-}
-
-void SharedWorkerContext::addMessage(MessageDestination,
-                                     MessageSource,
-                                     MessageType,
-                                     MessageLevel,
-                                     const String&,
-                                     unsigned,
-                                     const String&) {
-  // FIXME: forward to console.
-  notImplemented();
-}
 
 void SharedWorkerContext::dispatchConnect(PassRefPtr<MessagePort> port) {
   // Since close() stops the thread event loop, this should not ever get called

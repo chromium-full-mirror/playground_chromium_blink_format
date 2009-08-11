@@ -52,19 +52,6 @@ class SharedWorkerContext : public WorkerContext {
 
   virtual bool isSharedWorkerContext() const { return true; }
 
-  // ScriptExecutionContext
-  virtual void addMessage(MessageDestination,
-                          MessageSource,
-                          MessageType,
-                          MessageLevel,
-                          const String& message,
-                          unsigned lineNumber,
-                          const String& sourceURL);
-
-  virtual void forwardException(const String& errorMessage,
-                                int lineNumber,
-                                const String& sourceURL);
-
   // EventTarget
   virtual SharedWorkerContext* toSharedWorkerContext() { return this; }
 

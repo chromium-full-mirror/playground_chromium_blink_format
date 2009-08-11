@@ -119,10 +119,13 @@ class WorkerContext : public RefCounted<WorkerContext>,
   virtual void reportException(const String& errorMessage,
                                int lineNumber,
                                const String& sourceURL);
-
-  virtual void forwardException(const String& errorMessage,
-                                int lineNumber,
-                                const String& sourceURL) = 0;
+  virtual void addMessage(MessageDestination,
+                          MessageSource,
+                          MessageType,
+                          MessageLevel,
+                          const String& message,
+                          unsigned lineNumber,
+                          const String& sourceURL);
 
   // These methods are used for GC marking. See
   // JSWorkerContext::markChildren(MarkStack&) in
