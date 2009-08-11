@@ -2,7 +2,8 @@
  * Copyright (C) 2001 Peter Kelly (pmk@post.com)
  * Copyright (C) 2001 Tobias Anton (anton@stud.fbi.fh-darmstadt.de)
  * Copyright (C) 2006 Samuel Weinig (sam.weinig@gmail.com)
- * Copyright (C) 2003, 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2008, 2009 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -60,9 +61,10 @@ class RegisteredEventListener : public RefCounted<RegisteredEventListener> {
 typedef Vector<RefPtr<RegisteredEventListener>> RegisteredEventListenerVector;
 
 #if USE(JSC)
-inline void markEventListeners(const RegisteredEventListenerVector& listeners) {
+inline void markEventListeners(JSC::MarkStack& markStack,
+                               const RegisteredEventListenerVector& listeners) {
   for (size_t i = 0; i < listeners.size(); ++i)
-    listeners[i]->listener()->markJSFunction();
+    listeners[i]->listener()->markJSFunction(markStack);
 }
 
 inline void invalidateEventListeners(

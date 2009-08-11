@@ -63,7 +63,7 @@ class JSDOMWindowShell : public DOMObject {
   }
 
  private:
-  virtual void mark();
+  virtual void markChildren(JSC::MarkStack&);
   virtual JSC::UString className() const;
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   const JSC::Identifier& propertyName,

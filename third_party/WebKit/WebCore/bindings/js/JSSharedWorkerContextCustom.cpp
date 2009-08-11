@@ -38,10 +38,10 @@ using namespace JSC;
 
 namespace WebCore {
 
-void JSSharedWorkerContext::mark() {
-  Base::mark();
+void JSSharedWorkerContext::markChildren(MarkStack& markStack) {
+  Base::markChildren(markStack);
 
-  markIfNotNull(impl()->onconnect());
+  markIfNotNull(markStack, impl()->onconnect());
 }
 
 }  // namespace WebCore

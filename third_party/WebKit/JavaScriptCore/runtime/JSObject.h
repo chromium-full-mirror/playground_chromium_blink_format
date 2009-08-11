@@ -1,7 +1,7 @@
 /*
  *  Copyright (C) 1999-2001 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -73,7 +73,7 @@ class JSObject : public JSCell {
  public:
   explicit JSObject(PassRefPtr<Structure>);
 
-  virtual void mark();
+  virtual void markChildren(MarkStack&);
 
   // The inline virtual destructor cannot be the first virtual function declared
   // in the class as it results in the vtable being generated as a weak symbol

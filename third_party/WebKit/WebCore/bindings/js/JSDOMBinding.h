@@ -1,6 +1,7 @@
 /*
  *  Copyright (C) 1999-2001 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003, 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2008, 2009 Apple Inc. All rights
+ * reserved.
  *  Copyright (C) 2007 Samuel Weinig <sam@webkit.org>
  *  Copyright (C) 2009 Google, Inc. All rights reserved.
  *
@@ -84,10 +85,9 @@ class DOMObjectWithGlobalPointer : public DOMObject {
   }
   virtual ~DOMObjectWithGlobalPointer() {}
 
-  void mark() {
-    DOMObject::mark();
-    if (!m_globalObject->marked())
-      m_globalObject->mark();
+  void markChildren(JSC::MarkStack& markStack) {
+    DOMObject::markChildren(markStack);
+    markStack.append(m_globalObject);
   }
 
  private:
@@ -137,9 +137,13 @@ void cacheDOMNodeWrapper(Document*, Node*, JSNode* wrapper);
 void forgetDOMNode(Document*, Node*);
 void forgetAllDOMNodesForDocument(Document*);
 void updateDOMNodeDocument(Node*, Document* oldDocument, Document* newDocument);
-void markDOMNodesForDocument(Document*);
-void markActiveObjectsForContext(JSC::JSGlobalData&, ScriptExecutionContext*);
-void markDOMObjectWrapper(JSC::JSGlobalData& globalData, void* object);
+void markDOMNodesForDocument(JSC::MarkStack&, Document*);
+void markActiveObjectsForContext(JSC::MarkStack&,
+                                 JSC::JSGlobalData&,
+                                 ScriptExecutionContext*);
+void markDOMObjectWrapper(JSC::MarkStack&,
+                          JSC::JSGlobalData& globalData,
+                          void* object);
 
 JSC::Structure* getCachedDOMStructure(JSDOMGlobalObject*,
                                       const JSC::ClassInfo*);

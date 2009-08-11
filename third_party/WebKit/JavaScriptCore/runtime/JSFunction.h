@@ -73,7 +73,7 @@ class JSFunction : public InternalFunction {
   void setBody(PassRefPtr<FunctionBodyNode> body) { m_body = body; }
   FunctionBodyNode* body() const { return m_body.get(); }
 
-  virtual void mark();
+  virtual void markChildren(MarkStack&);
 
   static JS_EXPORTDATA const ClassInfo info;
 

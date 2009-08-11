@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
  *  Copyright (C) 2007 Eric Seidel <eric@webkit.org>
  *
@@ -32,6 +32,7 @@
 #include "JSONObject.h"
 #include "JSString.h"
 #include "JSValue.h"
+#include "MarkStack.h"
 #include "Nodes.h"
 #include "Tracing.h"
 #include <algorithm>
@@ -654,7 +655,7 @@ void Heap::registerThread() {}
 // cell size needs to be a power of two for this to be valid
 #define IS_HALF_CELL_ALIGNED(p) (((intptr_t)(p) & (CELL_MASK >> 1)) == 0)
 
-void Heap::markConservatively(void* start, void* end) {
+void Heap::markConservatively(MarkStack& markStack, void* start, void* end) {
   if (start > end) {
     void* tmp = start;
     start = end;
@@ -697,9 +698,8 @@ void Heap::markConservatively(void* start, void* end) {
         if ((primaryBlocks[block] == blockAddr) & (offset <= lastCellOffset)) {
           if (reinterpret_cast<CollectorCell*>(xAsBits)
                   ->u.freeCell.zeroIfFree != 0) {
-            JSCell* imp = reinterpret_cast<JSCell*>(xAsBits);
-            if (!imp->marked())
-              imp->mark();
+            markStack.append(reinterpret_cast<JSCell*>(xAsBits));
+            markStack.drain();
           }
           break;
         }
@@ -709,14 +709,15 @@ void Heap::markConservatively(void* start, void* end) {
   }
 }
 
-void NEVER_INLINE Heap::markCurrentThreadConservativelyInternal() {
+void NEVER_INLINE
+Heap::markCurrentThreadConservativelyInternal(MarkStack& markStack) {
   void* dummy;
   void* stackPointer = &dummy;
   void* stackBase = currentThreadStackBase();
-  markConservatively(stackPointer, stackBase);
+  markConservatively(markStack, stackPointer, stackBase);
 }
 
-void Heap::markCurrentThreadConservatively() {
+void Heap::markCurrentThreadConservatively(MarkStack& markStack) {
   // setjmp forces volatile registers onto the stack
   jmp_buf registers;
 #if COMPILER(MSVC)
@@ -728,7 +729,7 @@ void Heap::markCurrentThreadConservatively() {
 #pragma warning(pop)
 #endif
 
-  markCurrentThreadConservativelyInternal();
+  markCurrentThreadConservativelyInternal(markStack);
 }
 
 #if ENABLE(JSC_MULTIPLE_THREADS)
@@ -863,7 +864,7 @@ static inline void* otherThreadStackPointer(
 #endif
 }
 
-void Heap::markOtherThreadConservatively(Thread* thread) {
+void Heap::markOtherThreadConservatively(MarkStack& markStack, Thread* thread) {
   suspendThread(thread->platformThread);
 
   PlatformThreadRegisters regs;
@@ -871,19 +872,19 @@ void Heap::markOtherThreadConservatively(Thread* thread) {
 
   // mark the thread's registers
   markConservatively(
-      static_cast<void*>(&regs),
+      markStack, static_cast<void*>(&regs),
       static_cast<void*>(reinterpret_cast<char*>(&regs) + regSize));
 
   void* stackPointer = otherThreadStackPointer(regs);
-  markConservatively(stackPointer, thread->stackBase);
+  markConservatively(markStack, stackPointer, thread->stackBase);
 
   resumeThread(thread->platformThread);
 }
 
 #endif
 
-void Heap::markStackObjectsConservatively() {
-  markCurrentThreadConservatively();
+void Heap::markStackObjectsConservatively(MarkStack& markStack) {
+  markCurrentThreadConservatively(markStack);
 
 #if ENABLE(JSC_MULTIPLE_THREADS)
 
@@ -892,7 +893,8 @@ void Heap::markStackObjectsConservatively() {
 
 #ifndef NDEBUG
     // Forbid malloc during the mark phase. Marking a thread suspends it, so
-    // a malloc inside mark() would risk a deadlock with a thread that had been
+    // a malloc inside markChildren() would risk a deadlock with a thread that
+    // had been
     // suspended while holding the malloc lock.
     fastMallocForbid();
 #endif
@@ -901,7 +903,7 @@ void Heap::markStackObjectsConservatively() {
     // and since this is a shared heap, they are real locks.
     for (Thread* thread = m_registeredThreads; thread; thread = thread->next) {
       if (!pthread_equal(thread->posixThread, pthread_self()))
-        markOtherThreadConservatively(thread);
+        markOtherThreadConservatively(markStack, thread);
     }
 #ifndef NDEBUG
     fastMallocAllow();
@@ -961,7 +963,7 @@ Heap* Heap::heap(JSValue v) {
   return Heap::cellBlock(v.asCell())->heap;
 }
 
-void Heap::markProtectedObjects() {
+void Heap::markProtectedObjects(MarkStack& markStack) {
   if (m_protectedValuesMutex)
     m_protectedValuesMutex->lock();
 
@@ -969,8 +971,10 @@ void Heap::markProtectedObjects() {
   for (ProtectCountSet::iterator it = m_protectedValues.begin(); it != end;
        ++it) {
     JSCell* val = it->first;
-    if (!val->marked())
-      val->mark();
+    if (!val->marked()) {
+      markStack.append(val);
+      markStack.drain();
+    }
   }
 
   if (m_protectedValuesMutex)
@@ -1104,20 +1108,23 @@ bool Heap::collect() {
 
   // MARK: first mark all referenced objects recursively starting out from the
   // set of root objects
-
-  markStackObjectsConservatively();
-  markProtectedObjects();
+  MarkStack& markStack = m_globalData->markStack;
+  markStackObjectsConservatively(markStack);
+  markProtectedObjects(markStack);
   if (m_markListSet && m_markListSet->size())
-    MarkedArgumentBuffer::markLists(*m_markListSet);
+    MarkedArgumentBuffer::markLists(markStack, *m_markListSet);
   if (m_globalData->exception && !m_globalData->exception.marked())
-    m_globalData->exception.mark();
-  m_globalData->interpreter->registerFile().markCallFrames(this);
+    markStack.append(m_globalData->exception);
+  m_globalData->interpreter->registerFile().markCallFrames(markStack, this);
   m_globalData->smallStrings.mark();
   if (m_globalData->scopeNodeBeingReparsed)
-    m_globalData->scopeNodeBeingReparsed->mark();
+    m_globalData->scopeNodeBeingReparsed->markAggregate(markStack);
   if (m_globalData->firstStringifierToMark)
-    JSONObject::markStringifiers(m_globalData->firstStringifierToMark);
+    JSONObject::markStringifiers(markStack,
+                                 m_globalData->firstStringifierToMark);
 
+  markStack.drain();
+  markStack.compact();
   JAVASCRIPTCORE_GC_MARKED();
 
   size_t originalLiveObjects =

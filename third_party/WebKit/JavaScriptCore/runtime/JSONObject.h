@@ -40,7 +40,7 @@ class JSONObject : public JSObject {
     return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
-  static void markStringifiers(Stringifier*);
+  static void markStringifiers(MarkStack&, Stringifier*);
 
  private:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);

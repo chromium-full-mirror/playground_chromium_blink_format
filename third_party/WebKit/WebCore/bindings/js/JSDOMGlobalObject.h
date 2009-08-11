@@ -80,7 +80,7 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
   void setCurrentEvent(Event*);
   Event* currentEvent() const;
 
-  virtual void mark();
+  virtual void markChildren(JSC::MarkStack&);
 
  protected:
   struct JSDOMGlobalObjectData

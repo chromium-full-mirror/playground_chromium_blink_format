@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -95,13 +95,11 @@ void JSQuarantinedObjectWrapper::transferExceptionToExecState(
   exec->setException(wrapOutgoingValue(unwrappedExecState(), exception));
 }
 
-void JSQuarantinedObjectWrapper::mark() {
-  JSObject::mark();
+void JSQuarantinedObjectWrapper::markChildren(MarkStack& markStack) {
+  JSObject::markChildren(markStack);
 
-  if (!m_unwrappedObject->marked())
-    m_unwrappedObject->mark();
-  if (!m_unwrappedGlobalObject->marked())
-    m_unwrappedGlobalObject->mark();
+  markStack.append(m_unwrappedObject);
+  markStack.append(m_unwrappedGlobalObject);
 }
 
 bool JSQuarantinedObjectWrapper::getOwnPropertySlot(

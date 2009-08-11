@@ -26,6 +26,7 @@
 
 namespace JSC {
 class JSObject;
+class MarkStack;
 }
 
 namespace WebCore {
@@ -46,7 +47,7 @@ class EventListener : public RefCounted<EventListener> {
 
 #if USE(JSC)
   virtual JSC::JSObject* jsFunction() const { return 0; }
-  virtual void markJSFunction() {}
+  virtual void markJSFunction(JSC::MarkStack&) {}
 #endif
 
   bool isAttribute() const { return virtualisAttribute(); }
@@ -56,9 +57,9 @@ class EventListener : public RefCounted<EventListener> {
 };
 
 #if USE(JSC)
-inline void markIfNotNull(EventListener* listener) {
+inline void markIfNotNull(JSC::MarkStack& markStack, EventListener* listener) {
   if (listener)
-    listener->markJSFunction();
+    listener->markJSFunction(markStack);
 }
 #endif
 }

@@ -1,7 +1,7 @@
 /*
  *  Copyright (C) 1999-2002 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
  *  Copyright (C) 2007 Cameron Zwarich (cwzwarich@uwaterloo.ca)
  *  Copyright (C) 2007 Maks Orlovich
@@ -98,11 +98,11 @@ JSFunction::~JSFunction() {
                                  // interpreter too?
 }
 
-void JSFunction::mark() {
-  Base::mark();
-  m_body->mark();
+void JSFunction::markChildren(MarkStack& markStack) {
+  Base::markChildren(markStack);
+  m_body->markAggregate(markStack);
   if (!isHostFunction())
-    scopeChain().mark();
+    scopeChain().markAggregate(markStack);
 }
 
 CallType JSFunction::getCallData(CallData& callData) {

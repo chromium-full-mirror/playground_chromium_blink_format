@@ -47,17 +47,17 @@ using namespace JSC;
 
 namespace WebCore {
 
-void JSWorkerContext::mark() {
-  Base::mark();
+void JSWorkerContext::markChildren(MarkStack& markStack) {
+  Base::markChildren(markStack);
 
   JSGlobalData& globalData = *this->globalData();
 
-  markActiveObjectsForContext(globalData, scriptExecutionContext());
+  markActiveObjectsForContext(markStack, globalData, scriptExecutionContext());
 
-  markDOMObjectWrapper(globalData, impl()->optionalLocation());
-  markDOMObjectWrapper(globalData, impl()->optionalNavigator());
+  markDOMObjectWrapper(markStack, globalData, impl()->optionalLocation());
+  markDOMObjectWrapper(markStack, globalData, impl()->optionalNavigator());
 
-  markIfNotNull(impl()->onerror());
+  markIfNotNull(markStack, impl()->onerror());
 
   typedef WorkerContext::EventListenersMap EventListenersMap;
   typedef WorkerContext::ListenerVector ListenerVector;
@@ -66,7 +66,7 @@ void JSWorkerContext::mark() {
        mapIter != eventListeners.end(); ++mapIter) {
     for (ListenerVector::iterator vecIter = mapIter->second.begin();
          vecIter != mapIter->second.end(); ++vecIter)
-      (*vecIter)->markJSFunction();
+      (*vecIter)->markJSFunction(markStack);
   }
 }
 

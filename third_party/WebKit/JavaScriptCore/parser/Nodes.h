@@ -1698,7 +1698,7 @@ struct ScopeNodeData : FastAllocBase {
   int m_numConstants;
   StatementVector m_children;
 
-  void mark();
+  void markAggregate(MarkStack&);
 };
 
 class ScopeNode : public StatementNode, public ParserArenaRefCounted {
@@ -1760,7 +1760,7 @@ class ScopeNode : public StatementNode, public ParserArenaRefCounted {
     return m_data->m_numConstants + 2;
   }
 
-  virtual void mark() {}
+  virtual void markAggregate(MarkStack&) {}
 
 #if ENABLE(JIT)
   JITCode& generatedJITCode() {
@@ -1847,7 +1847,7 @@ class EvalNode : public ScopeNode {
 
   EvalCodeBlock& bytecodeForExceptionInfoReparse(ScopeChainNode*, CodeBlock*);
 
-  virtual void mark();
+  virtual void markAggregate(MarkStack&);
 
 #if ENABLE(JIT)
   JITCode& jitCode(ScopeChainNode* scopeChain) {
@@ -1904,7 +1904,7 @@ class FunctionBodyNode : public ScopeNode {
 
   bool isHostFunction() const;
 
-  virtual void mark();
+  virtual void markAggregate(MarkStack&);
 
   void finishParsing(const SourceCode&, ParameterNode*);
   void finishParsing(Identifier* parameters, size_t parameterCount);

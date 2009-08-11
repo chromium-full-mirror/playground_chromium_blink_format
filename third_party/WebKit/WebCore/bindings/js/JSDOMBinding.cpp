@@ -286,18 +286,19 @@ static inline bool isObservableThroughDOM(JSNode* jsNode) {
   return false;
 }
 
-void markDOMNodesForDocument(Document* doc) {
+void markDOMNodesForDocument(MarkStack& markStack, Document* doc) {
   JSWrapperCache& nodeDict = doc->wrapperCache();
   JSWrapperCache::iterator nodeEnd = nodeDict.end();
   for (JSWrapperCache::iterator nodeIt = nodeDict.begin(); nodeIt != nodeEnd;
        ++nodeIt) {
     JSNode* jsNode = nodeIt->second;
-    if (!jsNode->marked() && isObservableThroughDOM(jsNode))
-      jsNode->mark();
+    if (isObservableThroughDOM(jsNode))
+      markStack.append(jsNode);
   }
 }
 
 void markActiveObjectsForContext(
+    MarkStack& markStack,
     JSGlobalData& globalData,
     ScriptExecutionContext* scriptExecutionContext) {
   // If an element has pending activity that may result in event listeners being
@@ -318,8 +319,8 @@ void markActiveObjectsForContext(
       // However, some ActiveDOMObjects don't have JS wrappers (timers created
       // by setTimeout is one example).
       // FIXME: perhaps need to make sure even timers have a markable 'wrapper'.
-      if (wrapper && !wrapper->marked())
-        wrapper->mark();
+      if (wrapper)
+        markStack.append(wrapper);
     }
   }
 
@@ -332,8 +333,8 @@ void markActiveObjectsForContext(
     // because we can't determine reachability across threads.
     if (!(*iter)->locallyEntangledPort() || (*iter)->hasPendingActivity()) {
       DOMObject* wrapper = getCachedDOMObjectWrapper(globalData, *iter);
-      if (wrapper && !wrapper->marked())
-        wrapper->mark();
+      if (wrapper)
+        markStack.append(wrapper);
     }
   }
 }
@@ -351,13 +352,15 @@ void updateDOMNodeDocument(Node* node,
   addWrapper(wrapper);
 }
 
-void markDOMObjectWrapper(JSGlobalData& globalData, void* object) {
+void markDOMObjectWrapper(MarkStack& markStack,
+                          JSGlobalData& globalData,
+                          void* object) {
   if (!object)
     return;
   DOMObject* wrapper = getCachedDOMObjectWrapper(globalData, object);
-  if (!wrapper || wrapper->marked())
+  if (!wrapper)
     return;
-  wrapper->mark();
+  markStack.append(wrapper);
 }
 
 JSValue jsStringOrNull(ExecState* exec, const String& s) {

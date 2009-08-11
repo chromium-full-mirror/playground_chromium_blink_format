@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,10 +37,11 @@ DebuggerActivation::DebuggerActivation(JSObject* activation)
   m_activation = static_cast<JSActivation*>(activation);
 }
 
-void DebuggerActivation::mark() {
-  JSObject::mark();
-  if (m_activation && !m_activation->marked())
-    m_activation->mark();
+void DebuggerActivation::markChildren(MarkStack& markStack) {
+  JSObject::markChildren(markStack);
+
+  if (m_activation)
+    markStack.append(m_activation);
 }
 
 UString DebuggerActivation::className() const {

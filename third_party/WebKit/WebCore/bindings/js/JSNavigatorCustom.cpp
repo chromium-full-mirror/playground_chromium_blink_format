@@ -31,11 +31,11 @@ namespace WebCore {
 
 using namespace JSC;
 
-void JSNavigator::mark() {
-  Base::mark();
+void JSNavigator::markChildren(MarkStack& markStack) {
+  Base::markChildren(markStack);
 
   JSGlobalData& globalData = *Heap::heap(this)->globalData();
 
-  markDOMObjectWrapper(globalData, impl()->optionalGeolocation());
+  markDOMObjectWrapper(markStack, globalData, impl()->optionalGeolocation());
 }
 }

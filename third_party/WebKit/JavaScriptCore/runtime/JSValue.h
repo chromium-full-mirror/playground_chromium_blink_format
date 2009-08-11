@@ -1,7 +1,8 @@
 /*
  *  Copyright (C) 1999-2001 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2003, 2004, 2005, 2007, 2008 Apple Inc. All rights reserved.
+ *  Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 Apple Inc. All rights
+ * reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -42,6 +43,7 @@ class JSGlobalData;
 class JSImmediate;
 class JSObject;
 class JSString;
+class MarkStack;
 class PropertySlot;
 class PutPropertySlot;
 class UString;
@@ -176,8 +178,10 @@ class JSValue {
   }
 
   // Garbage collection.
-  void mark();
+  void markChildren(MarkStack&);
+  bool hasChildren() const;
   bool marked() const;
+  void markDirect();
 
   // Object operations, with the toObject operation included.
   JSValue get(ExecState*, const Identifier& propertyName) const;

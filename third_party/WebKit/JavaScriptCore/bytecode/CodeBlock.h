@@ -239,7 +239,7 @@ class CodeBlock : public FastAllocBase {
             unsigned sourceOffset);
   ~CodeBlock();
 
-  void mark();
+  void markAggregate(MarkStack&);
   void refStructures(Instruction* vPC) const;
   void derefStructures(Instruction* vPC) const;
 #if ENABLE(JIT_OPTIMIZE_CALL)

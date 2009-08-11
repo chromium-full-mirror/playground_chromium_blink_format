@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,8 +56,8 @@ JSValue toJS(ExecState* exec,
   return wrapper;
 }
 
-void JSStyleSheet::mark() {
-  Base::mark();
+void JSStyleSheet::markChildren(MarkStack& markStack) {
+  Base::markChildren(markStack);
 
   // This prevents us from having a style sheet with a dangling ownerNode
   // pointer.
@@ -71,10 +71,8 @@ void JSStyleSheet::mark() {
   // first.
   if (Node* ownerNode = impl()->ownerNode()) {
     if (JSNode* ownerNodeWrapper =
-            getCachedDOMNodeWrapper(ownerNode->document(), ownerNode)) {
-      if (!ownerNodeWrapper->marked())
-        ownerNodeWrapper->mark();
-    }
+            getCachedDOMNodeWrapper(ownerNode->document(), ownerNode))
+      markStack.append(ownerNodeWrapper);
   }
 }
 

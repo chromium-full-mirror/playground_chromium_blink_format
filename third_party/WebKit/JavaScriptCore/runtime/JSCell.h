@@ -1,7 +1,8 @@
 /*
  *  Copyright (C) 1999-2001 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2003, 2004, 2005, 2007, 2008 Apple Inc. All rights reserved.
+ *  Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 Apple Inc. All rights
+ * reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -88,7 +89,9 @@ class JSCell : public NoncopyableCustomAllocated {
   void* operator new(size_t, void* placementNewDestination) {
     return placementNewDestination;
   }
-  virtual void mark();
+
+  void markCellDirect();
+  virtual void markChildren(MarkStack&);
   bool marked() const;
 
   // Object operations, with the toObject operation included.
@@ -154,8 +157,12 @@ inline bool JSCell::marked() const {
   return Heap::isCellMarked(this);
 }
 
-inline void JSCell::mark() {
-  return Heap::markCell(this);
+inline void JSCell::markCellDirect() {
+  Heap::markCell(this);
+}
+
+inline void JSCell::markChildren(MarkStack&) {
+  ASSERT(marked());
 }
 
 inline void* JSCell::operator new(size_t size, JSGlobalData* globalData) {
@@ -215,9 +222,14 @@ ALWAYS_INLINE bool JSValue::getUInt32(uint32_t& v) const {
   return false;
 }
 
-inline void JSValue::mark() {
-  asCell()->mark();  // callers should check !marked() before calling mark(), so
-                     // this should only be called with cells
+inline void JSValue::markDirect() {
+  ASSERT(!marked());
+  asCell()->markCellDirect();
+}
+
+inline void JSValue::markChildren(MarkStack& markStack) {
+  ASSERT(marked());
+  asCell()->markChildren(markStack);
 }
 
 inline bool JSValue::marked() const {
@@ -326,6 +338,10 @@ inline JSValue JSValue::getJSNumber() {
   return JSValue();
 }
 
+inline bool JSValue::hasChildren() const {
+  return asCell()->structure()->typeInfo().type() >= CompoundType;
+}
+
 inline JSObject* JSValue::toObject(ExecState* exec) const {
   return isCell() ? asCell()->toObject(exec) : toObjectSlowCase(exec);
 }
@@ -334,6 +350,38 @@ inline JSObject* JSValue::toThisObject(ExecState* exec) const {
   return isCell() ? asCell()->toThisObject(exec) : toThisObjectSlowCase(exec);
 }
 
+ALWAYS_INLINE void MarkStack::append(JSCell* cell) {
+  ASSERT(cell);
+  if (cell->marked())
+    return;
+  cell->markCellDirect();
+  if (cell->structure()->typeInfo().type() >= CompoundType)
+    m_values.append(cell);
+}
+
+inline void MarkStack::drain() {
+  while (!m_markSets.isEmpty() || !m_values.isEmpty()) {
+    while ((!m_markSets.isEmpty()) && m_values.size() < 50) {
+      const MarkSet& current = m_markSets.removeLast();
+      JSValue* ptr = current.m_values;
+      JSValue* end = current.m_end;
+      if (current.m_properties == NoNullValues) {
+        while (ptr != end)
+          append(*ptr++);
+      } else {
+        while (ptr != end) {
+          if (JSValue value = *ptr++)
+            append(value);
+        }
+      }
+    }
+    while (!m_values.isEmpty()) {
+      JSCell* current = m_values.removeLast();
+      ASSERT(current->marked());
+      current->markChildren(*this);
+    }
+  }
+}
 }  // namespace JSC
 
 #endif  // JSCell_h

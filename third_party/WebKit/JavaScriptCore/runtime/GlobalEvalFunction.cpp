@@ -1,7 +1,7 @@
 /*
  *  Copyright (C) 1999-2002 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
  *  Copyright (C) 2007 Cameron Zwarich (cwzwarich@uwaterloo.ca)
  *  Copyright (C) 2007 Maks Orlovich
@@ -44,10 +44,9 @@ GlobalEvalFunction::GlobalEvalFunction(ExecState* exec,
   ASSERT_ARG(cachedGlobalObject, cachedGlobalObject);
 }
 
-void GlobalEvalFunction::mark() {
-  PrototypeFunction::mark();
-  if (!m_cachedGlobalObject->marked())
-    m_cachedGlobalObject->mark();
+void GlobalEvalFunction::markChildren(MarkStack& markStack) {
+  PrototypeFunction::markChildren(markStack);
+  markStack.append(m_cachedGlobalObject);
 }
 
 }  // namespace JSC

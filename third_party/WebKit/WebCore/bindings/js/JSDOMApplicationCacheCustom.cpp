@@ -42,17 +42,17 @@ using namespace JSC;
 
 namespace WebCore {
 
-void JSDOMApplicationCache::mark() {
-  Base::mark();
+void JSDOMApplicationCache::markChildren(MarkStack& markStack) {
+  Base::markChildren(markStack);
 
-  markIfNotNull(m_impl->onchecking());
-  markIfNotNull(m_impl->onerror());
-  markIfNotNull(m_impl->onnoupdate());
-  markIfNotNull(m_impl->ondownloading());
-  markIfNotNull(m_impl->onprogress());
-  markIfNotNull(m_impl->onupdateready());
-  markIfNotNull(m_impl->oncached());
-  markIfNotNull(m_impl->onobsolete());
+  markIfNotNull(markStack, m_impl->onchecking());
+  markIfNotNull(markStack, m_impl->onerror());
+  markIfNotNull(markStack, m_impl->onnoupdate());
+  markIfNotNull(markStack, m_impl->ondownloading());
+  markIfNotNull(markStack, m_impl->onprogress());
+  markIfNotNull(markStack, m_impl->onupdateready());
+  markIfNotNull(markStack, m_impl->oncached());
+  markIfNotNull(markStack, m_impl->onobsolete());
 
   typedef DOMApplicationCache::EventListenersMap EventListenersMap;
   typedef DOMApplicationCache::ListenerVector ListenerVector;
@@ -61,7 +61,7 @@ void JSDOMApplicationCache::mark() {
        mapIter != eventListeners.end(); ++mapIter) {
     for (ListenerVector::iterator vecIter = mapIter->second.begin();
          vecIter != mapIter->second.end(); ++vecIter)
-      (*vecIter)->markJSFunction();
+      (*vecIter)->markJSFunction(markStack);
   }
 }
 
