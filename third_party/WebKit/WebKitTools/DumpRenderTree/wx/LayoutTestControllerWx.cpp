@@ -219,3 +219,8 @@ size_t LayoutTestController::webHistoryItemCount() {
 void LayoutTestController::waitForPolicyDelegate() {
   // FIXME: Implement this.
 }
+
+void LayoutTestController::overridePreference(JSStringRef /* key */,
+                                              JSStringRef /* value */) {
+  // FIXME: implement
+}
