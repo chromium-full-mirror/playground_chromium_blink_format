@@ -170,7 +170,31 @@ static JSValueRef mouseDownCallback(JSContextRef context,
     framePrivate->layout();
 
   down = true;
-  MSG msg = makeMsg(webViewWindow, WM_LBUTTONDOWN, 0,
+  int mouseType = WM_LBUTTONDOWN;
+  if (argumentCount == 1) {
+    int mouseNumber = JSValueToNumber(context, arguments[0], exception);
+    switch (mouseNumber) {
+      case 0:
+        mouseType = WM_LBUTTONDOWN;
+        break;
+      case 1:
+        mouseType = WM_MBUTTONDOWN;
+        break;
+      case 2:
+        mouseType = WM_RBUTTONDOWN;
+        break;
+      case 3:
+        // fast/events/mouse-click-events expects the 4th button has
+        // event.button = 1, so send an WM_BUTTONDOWN
+        mouseType = WM_MBUTTONDOWN;
+        break;
+      default:
+        mouseType = WM_LBUTTONDOWN;
+        break;
+    }
+  }
+
+  MSG msg = makeMsg(webViewWindow, mouseType, 0,
                     MAKELPARAM(lastMousePosition.x, lastMousePosition.y));
   if (!msgQueue[endOfQueue].delay)
     dispatchMessage(&msg);
@@ -233,7 +257,31 @@ static JSValueRef mouseUpCallback(JSContextRef context,
                                   size_t argumentCount,
                                   const JSValueRef arguments[],
                                   JSValueRef* exception) {
-  MSG msg = makeMsg(webViewWindow, WM_LBUTTONUP, 0,
+  int mouseType = WM_LBUTTONUP;
+  if (argumentCount == 1) {
+    int mouseNumber = JSValueToNumber(context, arguments[0], exception);
+    switch (mouseNumber) {
+      case 0:
+        mouseType = WM_LBUTTONUP;
+        break;
+      case 1:
+        mouseType = WM_MBUTTONUP;
+        break;
+      case 2:
+        mouseType = WM_RBUTTONUP;
+        break;
+      case 3:
+        // fast/events/mouse-click-events expects the 4th button has
+        // event.button = 1, so send an WM_MBUTTONUP
+        mouseType = WM_MBUTTONUP;
+        break;
+      default:
+        mouseType = WM_LBUTTONUP;
+        break;
+    }
+  }
+
+  MSG msg = makeMsg(webViewWindow, mouseType, 0,
                     MAKELPARAM(lastMousePosition.x, lastMousePosition.y));
 
   if ((dragMode && !replayingSavedEvents) || msgQueue[endOfQueue].delay) {
@@ -310,12 +358,16 @@ void replaySavedEvents() {
     msg = msgQueue[startOfQueue++].msg;
     switch (msg.message) {
       case WM_LBUTTONUP:
+      case WM_RBUTTONUP:
+      case WM_MBUTTONUP:
         doMouseUp(msg);
         break;
       case WM_MOUSEMOVE:
         doMouseMove(msg);
         break;
       case WM_LBUTTONDOWN:
+      case WM_RBUTTONDOWN:
+      case WM_MBUTTONDOWN:
         dispatchMessage(&msg);
         break;
       default:
@@ -350,12 +402,16 @@ void replaySavedEvents() {
     msg = msgQueue[startOfQueue++].msg;
     switch (msg.message) {
       case WM_LBUTTONUP:
+      case WM_RBUTTONUP:
+      case WM_MBUTTONUP:
         doMouseUp(msg);
         break;
       case WM_MOUSEMOVE:
         doMouseMove(msg);
         break;
       case WM_LBUTTONDOWN:
+      case WM_RBUTTONDOWN:
+      case WM_MBUTTONDOWN:
         dispatchMessage(&msg);
         break;
       default:
