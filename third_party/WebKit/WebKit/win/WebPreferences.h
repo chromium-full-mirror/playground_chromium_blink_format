@@ -364,6 +364,10 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setXSSAuditorEnabled(
       /* [in] */ BOOL enabled);
 
+  virtual HRESULT STDMETHODCALLTYPE setPreferenceForTest(
+      /* [in] */ BSTR key,
+      /* [in] */ BSTR value);
+
   // WebPreferences
 
   // This method accesses a different preference key than
