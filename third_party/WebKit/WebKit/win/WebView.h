@@ -73,10 +73,6 @@ class WebView : public IWebView,
 
   // IWebView
 
-  virtual HRESULT STDMETHODCALLTYPE MIMETypeForExtension(
-      /* [in] */ BSTR extension,
-      /* [retval][out] */ BSTR* mimeType);
-
   virtual HRESULT STDMETHODCALLTYPE canShowMIMEType(
       /* [in] */ BSTR mimeType,
       /* [retval][out] */ BOOL* canShow);
@@ -571,6 +567,11 @@ class WebView : public IWebView,
       /* [in] */ IWebNotification* notification);
 
   // IWebViewPrivate
+
+  virtual HRESULT STDMETHODCALLTYPE MIMETypeForExtension(
+      /* [in] */ BSTR extension,
+      /* [retval][out] */ BSTR* mimeType);
+
   virtual HRESULT STDMETHODCALLTYPE setCustomDropTarget(
       /* [in] */ IDropTarget* dt);
 
