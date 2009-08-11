@@ -46,13 +46,13 @@ NPError NP_GetValue(void* future, NPPVariable variable, void* value);
 char* NP_GetMIMEDescription(void);
 }
 
-static NPError webkit_test_plugin_new_instance(NPMIMEType mimetype,
+static NPError webkit_test_plugin_new_instance(NPMIMEType /*mimetype*/,
                                                NPP instance,
-                                               uint16_t mode,
+                                               uint16_t /*mode*/,
                                                int16_t argc,
                                                char* argn[],
                                                char* argv[],
-                                               NPSavedData* savedData) {
+                                               NPSavedData* /*savedData*/) {
   if (browser->version >= 14) {
     PluginObject* obj =
         (PluginObject*)browser->createobject(instance, getPluginClass());
@@ -89,7 +89,7 @@ static NPError webkit_test_plugin_new_instance(NPMIMEType mimetype,
 }
 
 static NPError webkit_test_plugin_destroy_instance(NPP instance,
-                                                   NPSavedData** save) {
+                                                   NPSavedData** /*save*/) {
   PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
   if (obj) {
     if (obj->onStreamLoad)
@@ -138,9 +138,9 @@ static void executeScript(const PluginObject* obj, const char* script) {
 }
 
 static NPError webkit_test_plugin_new_stream(NPP instance,
-                                             NPMIMEType type,
+                                             NPMIMEType /*type*/,
                                              NPStream* stream,
-                                             NPBool seekable,
+                                             NPBool /*seekable*/,
                                              uint16* stype) {
   PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
   obj->stream = stream;
@@ -159,8 +159,8 @@ static NPError webkit_test_plugin_new_stream(NPP instance,
 }
 
 static NPError webkit_test_plugin_destroy_stream(NPP instance,
-                                                 NPStream* stream,
-                                                 NPError reason) {
+                                                 NPStream* /*stream*/,
+                                                 NPError /*reason*/) {
   PluginObject* obj = (PluginObject*)instance->pdata;
 
   if (obj->onStreamDestroy)
@@ -169,23 +169,25 @@ static NPError webkit_test_plugin_destroy_stream(NPP instance,
   return NPERR_NO_ERROR;
 }
 
-static void webkit_test_plugin_stream_as_file(NPP instance,
-                                              NPStream* stream,
-                                              const char* fname) {}
+static void webkit_test_plugin_stream_as_file(NPP /*instance*/,
+                                              NPStream* /*stream*/,
+                                              const char* /*fname*/) {}
 
-static int32 webkit_test_plugin_write_ready(NPP instance, NPStream* stream) {
+static int32 webkit_test_plugin_write_ready(NPP /*instance*/,
+                                            NPStream* /*stream*/) {
   return 0;
 }
 
-static int32 webkit_test_plugin_write(NPP instance,
-                                      NPStream* stream,
-                                      int32_t offset,
-                                      int32_t len,
-                                      void* buffer) {
+static int32 webkit_test_plugin_write(NPP /*instance*/,
+                                      NPStream* /*stream*/,
+                                      int32_t /*offset*/,
+                                      int32_t /*len*/,
+                                      void* /*buffer*/) {
   return 0;
 }
 
-static void webkit_test_plugin_print(NPP instance, NPPrint* platformPrint) {}
+static void webkit_test_plugin_print(NPP /*instance*/,
+                                     NPPrint* /*platformPrint*/) {}
 
 static int16_t webkit_test_plugin_handle_event(NPP instance, void* event) {
   PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
@@ -248,9 +250,9 @@ static NPError webkit_test_plugin_get_value(NPP instance,
   return err;
 }
 
-static NPError webkit_test_plugin_set_value(NPP instance,
-                                            NPNVariable variable,
-                                            void* value) {
+static NPError webkit_test_plugin_set_value(NPP /*instance*/,
+                                            NPNVariable /*variable*/,
+                                            void* /*value*/) {
   return NPERR_NO_ERROR;
 }
 
@@ -296,6 +298,6 @@ NPError NP_Shutdown(void) {
   return NPERR_NO_ERROR;
 }
 
-NPError NP_GetValue(void* future, NPPVariable variable, void* value) {
+NPError NP_GetValue(void* /*future*/, NPPVariable variable, void* value) {
   return webkit_test_plugin_get_value(NULL, variable, value);
 }

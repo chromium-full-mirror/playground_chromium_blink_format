@@ -92,7 +92,7 @@ static void initializeIdentifiers(void) {
                                 NUM_METHOD_IDENTIFIERS, testMethodIdentifiers);
 }
 
-static NPObject* testAllocate(NPP npp, NPClass* theClass) {
+static NPObject* testAllocate(NPP /*npp*/, NPClass* /*theClass*/) {
   NPObject* newInstance = static_cast<NPObject*>(malloc(sizeof(NPObject)));
 
   if (!identifiersInitialized) {
@@ -117,9 +117,9 @@ static bool testHasMethod(NPObject*, NPIdentifier name) {
 
 static bool testInvoke(NPObject* header,
                        NPIdentifier name,
-                       const NPVariant* args,
-                       uint32_t argCount,
-                       NPVariant* result) {
+                       const NPVariant* /*args*/,
+                       uint32_t /*argCount*/,
+                       NPVariant* /*result*/) {
   if (name == testMethodIdentifiers[ID_THROW_EXCEPTION_METHOD]) {
     browser->setexception(header, "test object throwException SUCCESS");
     return true;
@@ -150,7 +150,7 @@ static bool testGetProperty(NPObject* npobj,
   return false;
 }
 
-static bool testEnumerate(NPObject* npobj,
+static bool testEnumerate(NPObject* /*npobj*/,
                           NPIdentifier** value,
                           uint32_t* count) {
   *count = NUM_ENUMERATABLE_TEST_IDENTIFIERS;
@@ -164,8 +164,8 @@ static bool testEnumerate(NPObject* npobj,
 }
 
 static bool testConstruct(NPObject* npobj,
-                          const NPVariant* args,
-                          uint32_t argCount,
+                          const NPVariant* /*args*/,
+                          uint32_t /*argCount*/,
                           NPVariant* result) {
   browser->retainobject(npobj);
 
