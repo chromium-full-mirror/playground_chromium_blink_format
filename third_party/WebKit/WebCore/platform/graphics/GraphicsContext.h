@@ -384,6 +384,12 @@ class GraphicsContext : public Noncopyable {
       bool supportAlphaBlend = false,
       bool mayCreateBitmap = true);  // The passed in HDC should be the one
                                      // handed back by getWindowsContext.
+  void drawRoundCorner(bool newClip,
+                       RECT clipRect,
+                       RECT rectWin,
+                       HDC dc,
+                       int width,
+                       int height);
 #elif PLATFORM(WIN)
   GraphicsContext(HDC, bool hasAlpha = false);  // FIXME: To be removed.
   bool inTransparencyLayer() const;
