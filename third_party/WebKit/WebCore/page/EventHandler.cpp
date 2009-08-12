@@ -2548,7 +2548,7 @@ bool EventHandler::handleTextInputEvent(const String& text,
   return event->defaultHandled();
 }
 
-#if !PLATFORM(MAC) && !PLATFORM(QT)
+#if !PLATFORM(MAC) && !PLATFORM(QT) && !PLATFORM(HAIKU)
 bool EventHandler::invertSenseOfTabsToLinks(KeyboardEvent*) const {
   return false;
 }
