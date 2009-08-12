@@ -112,6 +112,8 @@ class HTMLFormElement : public HTMLElement {
   virtual String target() const;
   void setTarget(const String&);
 
+  HTMLFormControlElement* defaultButton() const;
+
   PassRefPtr<HTMLFormControlElement> elementForAlias(const AtomicString&);
   void addElementAlias(HTMLFormControlElement*, const AtomicString& alias);
 

@@ -121,6 +121,7 @@ class CSSSelector : public Noncopyable {
     PseudoChecked,
     PseudoEnabled,
     PseudoFullPageMedia,
+    PseudoDefault,
     PseudoDisabled,
     PseudoInputPlaceholder,
     PseudoOptional,

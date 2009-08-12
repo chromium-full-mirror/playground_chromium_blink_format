@@ -1064,6 +1064,9 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
 
         if (s->isEnabledFormControl() != m_element->isEnabledFormControl())
           return false;
+
+        if (s->isDefaultButtonForForm() != m_element->isDefaultButtonForForm())
+          return false;
       }
 
       if (style->transitions() || style->animations())
@@ -2603,6 +2606,8 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
       case CSSSelector::PseudoFullPageMedia:
         return e && e->document() && e->document()->isMediaDocument();
         break;
+      case CSSSelector::PseudoDefault:
+        return e && e->isDefaultButtonForForm();
       case CSSSelector::PseudoDisabled:
         if (e && e->isFormControlElement()) {
           InputElement* inputElement = toInputElement(e);
