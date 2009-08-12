@@ -49,6 +49,8 @@ class RenderListItem : public RenderBlock {
   void setNotInList(bool notInList) { m_notInList = notInList; }
   bool notInList() const { return m_notInList; }
 
+  const String& markerText() const;
+
  private:
   virtual const char* renderName() const { return "RenderListItem"; }
 
@@ -63,8 +65,6 @@ class RenderListItem : public RenderBlock {
   virtual void calcPrefWidths();
 
   virtual void positionListMarker();
-
-  const String& markerText() const;
 
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 

@@ -86,6 +86,7 @@ class IntPoint;
 class IntSize;
 class Node;
 class RenderObject;
+class RenderListItem;
 class VisibleSelection;
 class String;
 class Widget;
@@ -439,6 +440,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual IntRect doAXBoundsForRange(const PlainTextRange&) const {
     return IntRect();
   }
+  String listMarkerTextForNodeAndPosition(Node*, const VisiblePosition&) const;
 
   unsigned doAXLineForIndex(unsigned);
 
@@ -471,6 +473,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
 
   virtual void clearChildren();
   virtual bool isDetached() const { return true; }
+  RenderListItem* renderListItemContainerForNode(Node* node) const;
 
 #if PLATFORM(MAC)
   RetainPtr<AccessibilityObjectWrapper> m_wrapper;
