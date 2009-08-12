@@ -983,9 +983,6 @@ void FrameLoader::begin(const KURL& url,
 
   m_frame->setDocument(document);
 
-  if (dispatch)
-    dispatchWindowObjectAvailable();
-
   document->setURL(m_URL);
   if (m_decoder)
     document->setDecoder(m_decoder.get());
@@ -994,6 +991,9 @@ void FrameLoader::begin(const KURL& url,
 
   m_frame->domWindow()->setURL(document->url());
   m_frame->domWindow()->setSecurityOrigin(document->securityOrigin());
+
+  if (dispatch)
+    dispatchWindowObjectAvailable();
 
   updateFirstPartyForCookies();
 
