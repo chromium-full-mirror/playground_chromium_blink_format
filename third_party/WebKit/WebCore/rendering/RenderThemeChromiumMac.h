@@ -240,6 +240,7 @@ class RenderThemeChromiumMac : public RenderTheme {
                               RenderStyle*,
                               NSControlSize) const;
 
+  void updateActiveState(NSCell*, const RenderObject*);
   void updateCheckedState(NSCell*, const RenderObject*);
   void updateEnabledState(NSCell*, const RenderObject*);
   void updateFocusedState(NSCell*, const RenderObject*);
