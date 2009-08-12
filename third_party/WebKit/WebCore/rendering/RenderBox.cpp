@@ -414,6 +414,11 @@ bool RenderBox::scroll(ScrollDirection direction,
   return false;
 }
 
+bool RenderBox::canBeScrolledAndHasScrollableArea() const {
+  return canBeProgramaticallyScrolled(false) &&
+         (scrollHeight() != clientHeight() || scrollWidth() != clientWidth());
+}
+
 bool RenderBox::canBeProgramaticallyScrolled(bool) const {
   return (hasOverflowClip() &&
           (scrollsOverflow() || (node() && node()->isContentEditable()))) ||

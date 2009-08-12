@@ -293,6 +293,7 @@ class RenderBox : public RenderBoxModelObject {
   virtual bool scroll(ScrollDirection,
                       ScrollGranularity,
                       float multiplier = 1.0f);
+  bool canBeScrolledAndHasScrollableArea() const;
   virtual bool canBeProgramaticallyScrolled(bool) const;
   virtual void autoscroll();
   virtual void stopAutoscroll() {}

@@ -451,7 +451,7 @@ bool EventHandler::handleMouseDraggedEvent(
     RenderObject* renderer = targetNode->renderer();
     while (renderer &&
            (!renderer->isBox() ||
-            !toRenderBox(renderer)->canBeProgramaticallyScrolled(false))) {
+            !toRenderBox(renderer)->canBeScrolledAndHasScrollableArea())) {
       if (!renderer->parent() && renderer->node() == renderer->document() &&
           renderer->document()->ownerElement())
         renderer = renderer->document()->ownerElement()->renderer();
@@ -756,7 +756,7 @@ void EventHandler::updateAutoscrollRenderer() {
   while (
       m_autoscrollRenderer &&
       (!m_autoscrollRenderer->isBox() ||
-       !toRenderBox(m_autoscrollRenderer)->canBeProgramaticallyScrolled(false)))
+       !toRenderBox(m_autoscrollRenderer)->canBeScrolledAndHasScrollableArea()))
     m_autoscrollRenderer = m_autoscrollRenderer->parent();
 }
 
@@ -1223,7 +1223,7 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
 
     while (renderer &&
            (!renderer->isBox() ||
-            !toRenderBox(renderer)->canBeProgramaticallyScrolled(false))) {
+            !toRenderBox(renderer)->canBeScrolledAndHasScrollableArea())) {
       if (!renderer->parent() && renderer->node() == renderer->document() &&
           renderer->document()->ownerElement())
         renderer = renderer->document()->ownerElement()->renderer();
