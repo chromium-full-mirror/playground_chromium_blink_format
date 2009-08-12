@@ -609,8 +609,8 @@ void JavaScriptDebugServer::recompileAllJSFunctions(
     RefPtr<FunctionBodyNode> newBody =
         globalData->parser->parse<FunctionBodyNode>(exec, 0, sourceCode);
     ASSERT(newBody);
-    newBody->finishParsing(oldBody->copyParameters(),
-                           oldBody->parameterCount());
+    newBody->finishParsing(oldBody->copyParameters(), oldBody->parameterCount(),
+                           oldBody->ident());
 
     result.first->second = newBody;
     function->setBody(newBody.release());

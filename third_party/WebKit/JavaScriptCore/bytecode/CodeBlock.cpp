@@ -33,6 +33,8 @@
 #include "JIT.h"
 #include "JSValue.h"
 #include "Interpreter.h"
+#include "JSFunction.h"
+#include "JSStaticScopeObject.h"
 #include "Debugger.h"
 #include "BytecodeGenerator.h"
 #include <stdio.h>
@@ -1631,15 +1633,11 @@ void CodeBlock::markAggregate(MarkStack& markStack) {
       markStack.append(m_constantRegisters[i].jsValue());
   }
 
-  for (size_t i = 0; i < m_functionExpressions.size(); ++i)
-    m_functionExpressions[i]->body()->markAggregate(markStack);
+  for (size_t i = 0; i < m_functions.size(); ++i)
+    m_functions[i]->markAggregate(markStack);
 
-  if (m_rareData) {
-    for (size_t i = 0; i < m_rareData->m_functions.size(); ++i)
-      m_rareData->m_functions[i]->body()->markAggregate(markStack);
-
+  if (m_rareData)
     m_rareData->m_evalCodeCache.markAggregate(markStack);
-  }
 }
 
 void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
@@ -1670,7 +1668,8 @@ void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
               m_globalData, ownerFunctionBodyNode);
       ASSERT(newFunctionBody);
       newFunctionBody->finishParsing(ownerFunctionBodyNode->copyParameters(),
-                                     ownerFunctionBodyNode->parameterCount());
+                                     ownerFunctionBodyNode->parameterCount(),
+                                     ownerFunctionBodyNode->ident());
 
       m_globalData->scopeNodeBeingReparsed = newFunctionBody.get();
 
@@ -1946,7 +1945,7 @@ void CodeBlock::shrinkToFit() {
 #endif
 
   m_identifiers.shrinkToFit();
-  m_functionExpressions.shrinkToFit();
+  m_functions.shrinkToFit();
   m_constantRegisters.shrinkToFit();
 
   if (m_exceptionInfo) {
@@ -1957,7 +1956,6 @@ void CodeBlock::shrinkToFit() {
 
   if (m_rareData) {
     m_rareData->m_exceptionHandlers.shrinkToFit();
-    m_rareData->m_functions.shrinkToFit();
     m_rareData->m_regexps.shrinkToFit();
     m_rareData->m_immediateSwitchJumpTables.shrinkToFit();
     m_rareData->m_characterSwitchJumpTables.shrinkToFit();

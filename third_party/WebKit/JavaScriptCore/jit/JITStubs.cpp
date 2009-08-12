@@ -1593,7 +1593,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_mul) {
 DEFINE_STUB_FUNCTION(JSObject*, op_new_func) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
-  return stackFrame.args[0].funcDeclNode()->makeFunction(
+  return stackFrame.args[0].function()->make(
       stackFrame.callFrame, stackFrame.callFrame->scopeChain());
 }
 
@@ -2704,9 +2704,26 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_resolve_with_base) {
 
 DEFINE_STUB_FUNCTION(JSObject*, op_new_func_exp) {
   STUB_INIT_STACK_FRAME(stackFrame);
+  CallFrame* callFrame = stackFrame.callFrame;
 
-  return stackFrame.args[0].funcExprNode()->makeFunction(
-      stackFrame.callFrame, stackFrame.callFrame->scopeChain());
+  FunctionBodyNode* body = stackFrame.args[0].function();
+  JSFunction* func = body->make(callFrame, callFrame->scopeChain());
+
+  /*
+      The Identifier in a FunctionExpression can be referenced from inside
+      the FunctionExpression's FunctionBody to allow the function to call
+      itself recursively. However, unlike in a FunctionDeclaration, the
+      Identifier in a FunctionExpression cannot be referenced from and
+      does not affect the scope enclosing the FunctionExpression.
+   */
+  if (!body->ident().isNull()) {
+    JSStaticScopeObject* functionScopeObject =
+        new (callFrame) JSStaticScopeObject(callFrame, body->ident(), func,
+                                            ReadOnly | DontDelete);
+    func->scope().push(functionScopeObject);
+  }
+
+  return func;
 }
 
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_mod) {

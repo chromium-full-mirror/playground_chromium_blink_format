@@ -986,11 +986,8 @@ inline FuncExprNode::FuncExprNode(JSGlobalData* globalData,
                                   FunctionBodyNode* body,
                                   const SourceCode& source,
                                   ParameterNode* parameter)
-    : ExpressionNode(globalData),
-      ParserArenaRefCounted(globalData),
-      m_ident(ident),
-      m_body(body) {
-  m_body->finishParsing(source, parameter);
+    : ExpressionNode(globalData), m_body(body) {
+  m_body->finishParsing(source, parameter, ident);
 }
 
 inline FuncDeclNode::FuncDeclNode(JSGlobalData* globalData,
@@ -998,11 +995,8 @@ inline FuncDeclNode::FuncDeclNode(JSGlobalData* globalData,
                                   FunctionBodyNode* body,
                                   const SourceCode& source,
                                   ParameterNode* parameter)
-    : StatementNode(globalData),
-      ParserArenaRefCounted(globalData),
-      m_ident(ident),
-      m_body(body) {
-  m_body->finishParsing(source, parameter);
+    : StatementNode(globalData), m_body(body) {
+  m_body->finishParsing(source, parameter, ident);
 }
 
 inline CaseClauseNode::CaseClauseNode(JSGlobalData*, ExpressionNode* expr)

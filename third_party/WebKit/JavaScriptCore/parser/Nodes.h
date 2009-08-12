@@ -87,7 +87,7 @@ enum LogicalOperator { OpLogicalAnd, OpLogicalOr };
 namespace DeclarationStacks {
 enum VarAttrs { IsConstant = 1, HasInitializer = 2 };
 typedef Vector<std::pair<Identifier, unsigned>> VarStack;
-typedef Vector<FuncDeclNode*> FunctionStack;
+typedef Vector<FunctionBodyNode*> FunctionStack;
 }
 
 struct SwitchInfo {
@@ -1906,8 +1906,12 @@ class FunctionBodyNode : public ScopeNode {
 
   virtual void markAggregate(MarkStack&);
 
-  void finishParsing(const SourceCode&, ParameterNode*);
-  void finishParsing(Identifier* parameters, size_t parameterCount);
+  void finishParsing(const SourceCode&,
+                     ParameterNode*,
+                     const Identifier& ident);
+  void finishParsing(Identifier* parameters,
+                     size_t parameterCount,
+                     const Identifier& ident);
 
   UString toSourceString() const { return source().toString(); }
 
@@ -1932,6 +1936,10 @@ class FunctionBodyNode : public ScopeNode {
     return *m_code;
   }
 
+  const Identifier& ident() { return m_ident; }
+
+  JSFunction* make(ExecState*, ScopeChainNode*);
+
  private:
   FunctionBodyNode(JSGlobalData*);
   FunctionBodyNode(JSGlobalData*,
@@ -1946,20 +1954,19 @@ class FunctionBodyNode : public ScopeNode {
 #if ENABLE(JIT)
   void generateJITCode(ScopeChainNode*);
 #endif
+  Identifier m_ident;
   Identifier* m_parameters;
   size_t m_parameterCount;
   OwnPtr<CodeBlock> m_code;
 };
 
-class FuncExprNode : public ExpressionNode, public ParserArenaRefCounted {
+class FuncExprNode : public ExpressionNode {
  public:
   FuncExprNode(JSGlobalData*,
                const Identifier&,
                FunctionBodyNode* body,
                const SourceCode& source,
                ParameterNode* parameter = 0);
-
-  JSFunction* makeFunction(ExecState*, ScopeChainNode*);
 
   FunctionBodyNode* body() { return m_body.get(); }
 
@@ -1968,21 +1975,16 @@ class FuncExprNode : public ExpressionNode, public ParserArenaRefCounted {
 
   virtual bool isFuncExprNode() const { return true; }
 
-  Identifier m_ident;
   RefPtr<FunctionBodyNode> m_body;
 };
 
-class FuncDeclNode : public StatementNode, public ParserArenaRefCounted {
+class FuncDeclNode : public StatementNode {
  public:
   FuncDeclNode(JSGlobalData*,
                const Identifier&,
                FunctionBodyNode*,
                const SourceCode&,
                ParameterNode* = 0);
-
-  JSFunction* makeFunction(ExecState*, ScopeChainNode*);
-
-  Identifier m_ident;
 
   FunctionBodyNode* body() { return m_body.get(); }
 

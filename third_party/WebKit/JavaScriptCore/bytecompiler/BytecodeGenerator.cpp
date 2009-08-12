@@ -279,12 +279,12 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
     m_nextGlobalIndex -= symbolTable->size();
 
     for (size_t i = 0; i < functionStack.size(); ++i) {
-      FuncDeclNode* funcDecl = functionStack[i];
-      globalObject->removeDirect(funcDecl->m_ident);  // Make sure our new
+      FunctionBodyNode* function = functionStack[i];
+      globalObject->removeDirect(function->ident());  // Make sure our new
                                                       // function is not
                                                       // shadowed by an old
                                                       // property.
-      emitNewFunction(addGlobalVar(funcDecl->m_ident, false), funcDecl);
+      emitNewFunction(addGlobalVar(function->ident(), false), function);
     }
 
     Vector<RegisterID*, 32> newVars;
@@ -300,10 +300,10 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
       emitLoad(newVars[i], jsUndefined());
   } else {
     for (size_t i = 0; i < functionStack.size(); ++i) {
-      FuncDeclNode* funcDecl = functionStack[i];
-      globalObject->putWithAttributes(
-          exec, funcDecl->m_ident,
-          funcDecl->makeFunction(exec, scopeChain.node()), DontDelete);
+      FunctionBodyNode* function = functionStack[i];
+      globalObject->putWithAttributes(exec, function->ident(),
+                                      function->make(exec, scopeChain.node()),
+                                      DontDelete);
     }
     for (size_t i = 0; i < varStack.size(); ++i) {
       if (globalObject->hasProperty(exec, varStack[i].first))
@@ -377,10 +377,10 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
   const DeclarationStacks::FunctionStack& functionStack =
       functionBody->functionStack();
   for (size_t i = 0; i < functionStack.size(); ++i) {
-    FuncDeclNode* funcDecl = functionStack[i];
-    const Identifier& ident = funcDecl->m_ident;
+    FunctionBodyNode* function = functionStack[i];
+    const Identifier& ident = function->ident();
     m_functions.add(ident.ustring().rep());
-    emitNewFunction(addVar(ident, false), funcDecl);
+    emitNewFunction(addVar(ident, false), function);
   }
 
   const DeclarationStacks::VarStack& varStack = functionBody->varStack();
@@ -804,15 +804,9 @@ PassRefPtr<Label> BytecodeGenerator::emitJumpIfNotFunctionApply(
   return target;
 }
 
-unsigned BytecodeGenerator::addConstant(FuncDeclNode* n) {
+unsigned BytecodeGenerator::addConstant(FunctionBodyNode* n) {
   // No need to explicitly unique function body nodes -- they're unique already.
   return m_codeBlock->addFunction(n);
-}
-
-unsigned BytecodeGenerator::addConstant(FuncExprNode* n) {
-  // No need to explicitly unique function expression nodes -- they're unique
-  // already.
-  return m_codeBlock->addFunctionExpression(n);
 }
 
 unsigned BytecodeGenerator::addConstant(const Identifier& ident) {
@@ -1389,10 +1383,10 @@ RegisterID* BytecodeGenerator::emitNewArray(RegisterID* dst,
 }
 
 RegisterID* BytecodeGenerator::emitNewFunction(RegisterID* dst,
-                                               FuncDeclNode* n) {
+                                               FunctionBodyNode* body) {
   emitOpcode(op_new_func);
   instructions().append(dst->index());
-  instructions().append(addConstant(n));
+  instructions().append(addConstant(body));
   return dst;
 }
 
@@ -1407,7 +1401,7 @@ RegisterID* BytecodeGenerator::emitNewFunctionExpression(RegisterID* r0,
                                                          FuncExprNode* n) {
   emitOpcode(op_new_func_exp);
   instructions().append(r0->index());
-  instructions().append(addConstant(n));
+  instructions().append(addConstant(n->body()));
   return r0;
 }
 
