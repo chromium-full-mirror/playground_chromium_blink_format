@@ -40,24 +40,24 @@
 #include <windows.h>
 #endif
 
-#include "TransformationMatrix.h"
 #include "Color.h"
 #include "FloatConversion.h"
 #include "Font.h"
 #include "GraphicsContext.h"
 #include "GraphicsContextPrivate.h"
 #include "ImageBuffer.h"
+#include "NotImplemented.h"
 #include "Path.h"
 #include "Pattern.h"
 #include "Pen.h"
-#include "NotImplemented.h"
+#include "TransformationMatrix.h"
 
 #include <QBrush>
 #include <QDebug>
 #include <QGradient>
-#include <QPainter>
 #include <QPaintDevice>
 #include <QPaintEngine>
+#include <QPainter>
 #include <QPainterPath>
 #include <QPixmap>
 #include <QPolygonF>
@@ -205,8 +205,8 @@ class GraphicsContextPlatformPrivate {
         return redirect;
 
       return painter;
-    } else
-      return &layers.top()->painter;
+    }
+    return &layers.top()->painter;
   }
 
   bool antiAliasingForRectsAndLines;
@@ -500,10 +500,10 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
     case SolidStroke:
       break;
     case DottedStroke:
-      patWidth = (int)width;
+      patWidth = static_cast<int>(width);
       break;
     case DashedStroke:
-      patWidth = 3 * (int)width;
+      patWidth = 3 * static_cast<int>(width);
       break;
   }
 
@@ -540,7 +540,7 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
     if (patWidth == 1)
       patternOffset = 1.0f;
     else {
-      bool evenNumberOfSegments = numSegments % 2 == 0;
+      bool evenNumberOfSegments = !(numSegments % 2);
       if (remainder)
         evenNumberOfSegments = !evenNumberOfSegments;
       if (evenNumberOfSegments) {
@@ -803,7 +803,7 @@ void GraphicsContext::drawFocusRing(const Color& color) {
   const Vector<IntRect>& rects = focusRingRects();
   unsigned rectCount = rects.size();
 
-  if (rects.size() == 0)
+  if (!rects.size())
     return;
 
   QPainter* p = m_data->p();
