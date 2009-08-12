@@ -50,6 +50,7 @@ class WebDesktopNotificationsDelegate : public WebCore::NotificationPresenter {
       WebCore::SecurityOrigin* origin);
 
  private:
+  bool hasNotificationDelegate();
   COMPtr<IWebDesktopNotificationsDelegate> notificationDelegate();
 
   WebView* m_webView;
