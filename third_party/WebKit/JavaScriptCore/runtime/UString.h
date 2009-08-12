@@ -261,6 +261,7 @@ class UString {
   UString(PlacementNewAdoptType) : m_rep(PlacementNewAdopt) {}
 
   static UString from(int);
+  static UString from(long long);
   static UString from(unsigned int);
   static UString from(long);
   static UString from(double);
