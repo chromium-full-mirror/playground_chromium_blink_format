@@ -59,6 +59,13 @@ JSValue toJS(ExecState* exec,
 void JSStyleSheet::markChildren(MarkStack& markStack) {
   Base::markChildren(markStack);
 
+  StyleSheet* sheet = impl();
+  JSGlobalData& globalData = *Heap::heap(this)->globalData();
+
+  unsigned length = sheet->length();
+  for (unsigned i = 0; i < length; ++i)
+    markDOMObjectWrapper(markStack, globalData, sheet->item(i));
+
   // This prevents us from having a style sheet with a dangling ownerNode
   // pointer.
   // A better solution would be to handle this on the DOM side -- if the style
@@ -69,7 +76,7 @@ void JSStyleSheet::markChildren(MarkStack& markStack) {
   // there's
   // a lot of disentangling of the CSS DOM objects that would need to happen
   // first.
-  if (Node* ownerNode = impl()->ownerNode()) {
+  if (Node* ownerNode = sheet->ownerNode()) {
     if (JSNode* ownerNodeWrapper =
             getCachedDOMNodeWrapper(ownerNode->document(), ownerNode))
       markStack.append(ownerNodeWrapper);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -49,6 +49,19 @@ using namespace JSC;
 namespace WebCore {
 
 using namespace HTMLNames;
+
+void JSElement::markChildren(MarkStack& markStack) {
+  Base::markChildren(markStack);
+
+  Element* element = impl();
+  JSGlobalData& globalData = *Heap::heap(this)->globalData();
+
+  markDOMObjectWrapper(markStack, globalData, element->attributeMap());
+  if (element->isStyledElement())
+    markDOMObjectWrapper(
+        markStack, globalData,
+        static_cast<StyledElement*>(element)->inlineStyleDecl());
+}
 
 static inline bool allowSettingSrcToJavascriptURL(ExecState* exec,
                                                   Element* element,

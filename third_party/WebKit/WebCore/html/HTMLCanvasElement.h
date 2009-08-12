@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006, 2009 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Alp Toker <alp@atoker.com>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,6 @@
 namespace WebCore {
 
 class CanvasRenderingContext2D;
-typedef CanvasRenderingContext2D CanvasRenderingContext;
 class FloatPoint;
 class FloatRect;
 class FloatSize;
@@ -45,9 +44,11 @@ class ImageBuffer;
 class IntPoint;
 class IntSize;
 
+typedef CanvasRenderingContext2D CanvasRenderingContext;
+
 class CanvasObserver {
  public:
-  virtual ~CanvasObserver(){};
+  virtual ~CanvasObserver() {}
 
   virtual void canvasChanged(HTMLCanvasElement*,
                              const FloatRect& changedRect) = 0;
@@ -60,11 +61,6 @@ class HTMLCanvasElement : public HTMLElement {
   HTMLCanvasElement(const QualifiedName&, Document*);
   virtual ~HTMLCanvasElement();
 
-#if ENABLE(DASHBOARD_SUPPORT)
-  virtual HTMLTagStatus endTagRequirement() const;
-  virtual int tagPriority() const;
-#endif
-
   int width() const { return m_size.width(); }
   int height() const { return m_size.height(); }
   void setWidth(int);
@@ -74,10 +70,7 @@ class HTMLCanvasElement : public HTMLElement {
 
   CanvasRenderingContext* getContext(const String&);
 
-  virtual void parseMappedAttribute(MappedAttribute*);
-  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-
-  IntSize size() const { return m_size; }
+  const IntSize& size() const { return m_size; }
   void setSize(const IntSize& size) {
     if (size == m_size)
       return;
@@ -103,15 +96,25 @@ class HTMLCanvasElement : public HTMLElement {
   void setOriginTainted() { m_originClean = false; }
   bool originClean() const { return m_originClean; }
 
-  static const float MaxCanvasArea;
-
-  void setObserver(CanvasObserver* o) { m_observer = o; }
+  void setObserver(CanvasObserver* observer) { m_observer = observer; }
 
   TransformationMatrix baseTransform() const;
 
+  CanvasRenderingContext2D* renderingContext2D() { return m_2DContext.get(); }
+
  private:
+#if ENABLE(DASHBOARD_SUPPORT)
+  virtual HTMLTagStatus endTagRequirement() const;
+  virtual int tagPriority() const;
+#endif
+
+  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+
   void createImageBuffer() const;
   void reset();
+
+  static const float MaxCanvasArea;
 
   bool m_rendererIsCanvas;
 

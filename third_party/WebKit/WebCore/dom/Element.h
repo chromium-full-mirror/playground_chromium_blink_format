@@ -3,7 +3,7 @@
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ class IntSize;
 class Element : public ContainerNode {
  public:
   Element(const QualifiedName&, Document*);
-  ~Element();
+  virtual ~Element();
 
   const AtomicString& getIDAttribute() const;
   bool hasAttribute(const QualifiedName&) const;
@@ -74,7 +74,6 @@ class Element : public ContainerNode {
   void scrollIntoView(bool alignToTop = true);
   void scrollIntoViewIfNeeded(bool centerIfNeeded = true);
 
-  void scrollByUnits(int units, ScrollGranularity);
   void scrollByLines(int lines);
   void scrollByPages(int pages);
 
@@ -127,20 +126,11 @@ class Element : public ContainerNode {
 
   const AtomicString& localName() const { return m_tagName.localName(); }
   const AtomicString& prefix() const { return m_tagName.prefix(); }
-  virtual void setPrefix(const AtomicString&, ExceptionCode&);
   const AtomicString& namespaceURI() const { return m_tagName.namespaceURI(); }
 
   virtual KURL baseURI() const;
 
-  // DOM methods overridden from parent classes
-  virtual NodeType nodeType() const;
   virtual String nodeName() const;
-  virtual void insertedIntoDocument();
-  virtual void removedFromDocument();
-  virtual void childrenChanged(bool changedByParser = false,
-                               Node* beforeChange = 0,
-                               Node* afterChange = 0,
-                               int childCountDelta = 0);
 
   PassRefPtr<Element> cloneElementWithChildren();
   PassRefPtr<Element> cloneElementWithoutChildren();
@@ -158,15 +148,9 @@ class Element : public ContainerNode {
   // This method is called whenever an attribute is added, changed or removed.
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
 
-  // The implementation of Element::attributeChanged() calls the following two
-  // functions.
-  // They are separated to allow a different flow of control in
-  // StyledElement::attributeChanged().
-  void recalcStyleIfNeededAfterAttributeChanged(Attribute*);
-  void updateAfterAttributeChanged(Attribute*);
-
   // not part of the DOM
   void setAttributeMap(PassRefPtr<NamedNodeMap>);
+  NamedNodeMap* attributeMap() const { return namedAttrMap.get(); }
 
   virtual void copyNonAttributeProperties(const Element* /*source*/) {}
 
@@ -176,11 +160,6 @@ class Element : public ContainerNode {
   virtual void recalcStyle(StyleChange = NoChange);
 
   virtual RenderStyle* computedStyle();
-
-  virtual bool childTypeAllowed(NodeType);
-
-  virtual PassRefPtr<Attribute> createAttribute(const QualifiedName&,
-                                                const AtomicString& value);
 
   void dispatchAttrRemovalEvent(Attribute*);
   void dispatchAttrAdditionEvent(Attribute*);
@@ -195,13 +174,6 @@ class Element : public ContainerNode {
   virtual void focus(bool restorePreviousSelection = true);
   virtual void updateFocusAppearance(bool restorePreviousSelection);
   void blur();
-
-#ifndef NDEBUG
-  virtual void formatForDebugger(char* buffer, unsigned length) const;
-#endif
-
-  bool pseudoStyleCacheIsInvalid(const RenderStyle* currentStyle,
-                                 RenderStyle* newStyle);
 
   String innerText() const;
   String outerText() const;
@@ -234,7 +206,6 @@ class Element : public ContainerNode {
   Element* nextElementSibling() const;
   unsigned childElementCount() const;
 
-  // FormControlElement API
   virtual bool isFormControlElement() const { return false; }
   virtual bool isEnabledFormControl() const { return true; }
   virtual bool isReadOnlyFormControl() const { return false; }
@@ -254,7 +225,38 @@ class Element : public ContainerNode {
 
   virtual void dispatchFormControlChangeEvent() {}
 
+ protected:
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
+  virtual void childrenChanged(bool changedByParser = false,
+                               Node* beforeChange = 0,
+                               Node* afterChange = 0,
+                               int childCountDelta = 0);
+
+  // The implementation of Element::attributeChanged() calls the following two
+  // functions.
+  // They are separated to allow a different flow of control in
+  // StyledElement::attributeChanged().
+  void recalcStyleIfNeededAfterAttributeChanged(Attribute*);
+  void updateAfterAttributeChanged(Attribute*);
+
  private:
+  void scrollByUnits(int units, ScrollGranularity);
+
+  virtual void setPrefix(const AtomicString&, ExceptionCode&);
+  virtual NodeType nodeType() const;
+  virtual bool childTypeAllowed(NodeType);
+
+  virtual PassRefPtr<Attribute> createAttribute(const QualifiedName&,
+                                                const AtomicString& value);
+
+#ifndef NDEBUG
+  virtual void formatForDebugger(char* buffer, unsigned length) const;
+#endif
+
+  bool pseudoStyleCacheIsInvalid(const RenderStyle* currentStyle,
+                                 RenderStyle* newStyle);
+
   virtual void createAttributeMap() const;
 
   virtual void updateStyleAttribute() const {}
@@ -280,10 +282,10 @@ class Element : public ContainerNode {
   QualifiedName m_tagName;
   virtual NodeRareData* createRareData();
 
- protected:
   ElementRareData* rareData() const;
   ElementRareData* ensureRareData();
 
+ protected:
   mutable RefPtr<NamedNodeMap> namedAttrMap;
 };
 
