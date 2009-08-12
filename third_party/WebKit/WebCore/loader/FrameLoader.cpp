@@ -88,6 +88,7 @@
 #include "SecurityOrigin.h"
 #include "SegmentedString.h"
 #include "Settings.h"
+#include "SharedWorkerRepository.h"
 #include "TextResourceDecoder.h"
 #include "WindowFeatures.h"
 #include "XMLHttpRequest.h"
@@ -1944,6 +1945,9 @@ bool FrameLoader::canCachePageContainingThisFrame() {
 #if ENABLE(DATABASE)
          && !m_frame->document()->hasOpenDatabases()
 #endif
+#if ENABLE(SHARED_WORKERS)
+         && !SharedWorkerRepository::hasSharedWorkers(m_frame->document())
+#endif
          && !m_frame->document()->usingGeolocation() && m_currentHistoryItem &&
          !m_quickRedirectComing && !m_documentLoader->isLoadingInAPISense() &&
          !m_documentLoader->isStopping() &&
@@ -2114,6 +2118,12 @@ bool FrameLoader::logCanCacheFrameDecision(int indentLevel) {
 #if ENABLE(DATABASE)
     if (m_frame->document()->hasOpenDatabases()) {
       PCLOG("   -Frame has open database handles");
+      cannotCache = true;
+    }
+#endif
+#if ENABLE(SHARED_WORKERS)
+    if (SharedWorkerRepository::hasSharedWorkers(m_frame->document())) {
+      PCLOG("   -Frame has associated SharedWorkers");
       cannotCache = true;
     }
 #endif

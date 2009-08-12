@@ -110,6 +110,7 @@
 #include "SegmentedString.h"
 #include "SelectionController.h"
 #include "Settings.h"
+#include "SharedWorkerRepository.h"
 #include "StyleSheetList.h"
 #include "TextEvent.h"
 #include "TextIterator.h"
@@ -1394,6 +1395,10 @@ void Document::detach() {
   // Send out documentWillBecomeInactive() notifications to registered elements,
   // in order to stop media elements
   documentWillBecomeInactive();
+
+#if ENABLE(SHARED_WORKERS)
+  SharedWorkerRepository::documentDetached(this);
+#endif
 
   if (m_frame) {
     FrameView* view = m_frame->view();

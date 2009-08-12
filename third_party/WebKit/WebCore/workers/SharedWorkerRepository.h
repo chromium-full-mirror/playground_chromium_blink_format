@@ -34,12 +34,12 @@
 #if ENABLE(SHARED_WORKERS)
 
 #include "ExceptionCode.h"
-
 #include <wtf/PassOwnPtr.h>
 #include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
+class Document;
 class KURL;
 class MessagePortChannel;
 class SharedWorker;
@@ -56,6 +56,12 @@ class SharedWorkerRepository {
                       const KURL&,
                       const String& name,
                       ExceptionCode&);
+
+  // Invoked when a document has been detached.
+  static void documentDetached(Document*);
+
+  // Returns true if the passed document is associated with any SharedWorkers.
+  static bool hasSharedWorkers(Document*);
 
  private:
   SharedWorkerRepository() {}
