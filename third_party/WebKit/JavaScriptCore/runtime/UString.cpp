@@ -75,18 +75,18 @@ static inline size_t maxUChars() {
   return std::numeric_limits<size_t>::max() / sizeof(UChar);
 }
 
-static inline UChar* allocChars(size_t length) {
+static inline PossiblyNull<UChar*> allocChars(size_t length) {
   ASSERT(length);
   if (length > maxUChars())
     return 0;
-  return static_cast<UChar*>(tryFastMalloc(sizeof(UChar) * length));
+  return tryFastMalloc(sizeof(UChar) * length);
 }
 
-static inline UChar* reallocChars(UChar* buffer, size_t length) {
+static inline PossiblyNull<UChar*> reallocChars(UChar* buffer, size_t length) {
   ASSERT(length);
   if (length > maxUChars())
     return 0;
-  return static_cast<UChar*>(tryFastRealloc(buffer, sizeof(UChar) * length));
+  return tryFastRealloc(buffer, sizeof(UChar) * length);
 }
 
 static inline void copyChars(UChar* destination,
@@ -479,8 +479,7 @@ static inline bool expandCapacity(UString::Rep* rep, int requiredLength) {
   if (requiredLength > base->capacity) {
     size_t newCapacity = expandedSize(requiredLength, base->preCapacity);
     UChar* oldBuf = base->buf;
-    base->buf = reallocChars(base->buf, newCapacity);
-    if (!base->buf) {
+    if (!reallocChars(base->buf, newCapacity).getValue(base->buf)) {
       base->buf = oldBuf;
       return false;
     }
@@ -513,8 +512,7 @@ bool UString::Rep::reserveCapacity(int capacity) {
 
   size_t newCapacity = expandedSize(capacity, base->preCapacity);
   UChar* oldBuf = base->buf;
-  base->buf = reallocChars(base->buf, newCapacity);
-  if (!base->buf) {
+  if (!reallocChars(base->buf, newCapacity).getValue(base->buf)) {
     base->buf = oldBuf;
     return false;
   }
@@ -539,8 +537,8 @@ void UString::expandPreCapacity(int requiredPreCap) {
     size_t newCapacity = expandedSize(requiredPreCap, base->capacity);
     int delta = newCapacity - base->capacity - base->preCapacity;
 
-    UChar* newBuf = allocChars(newCapacity);
-    if (!newBuf) {
+    UChar* newBuf;
+    if (!allocChars(newCapacity).getValue(newBuf)) {
       makeNull();
       return;
     }
@@ -564,8 +562,8 @@ static PassRefPtr<UString::Rep> createRep(const char* c) {
     return &UString::Rep::empty();
 
   size_t length = strlen(c);
-  UChar* d = allocChars(length);
-  if (!d)
+  UChar* d;
+  if (!allocChars(length).getValue(d))
     return &UString::Rep::null();
   else {
     for (size_t i = 0; i < length; i++)
@@ -656,8 +654,8 @@ concatenate(PassRefPtr<UString::Rep> r, const UChar* tData, int tSize) {
     // This is shared in some way that prevents us from modifying base, so we
     // must make a whole new string.
     size_t newCapacity = expandedSize(length, 0);
-    UChar* d = allocChars(newCapacity);
-    if (!d)
+    UChar* d;
+    if (!allocChars(newCapacity).getValue(d))
       rep = &UString::Rep::null();
     else {
       copyChars(d, rep->data(), thisSize);
@@ -717,8 +715,8 @@ static ALWAYS_INLINE PassRefPtr<UString::Rep> concatenate(
     // This is shared in some way that prevents us from modifying base, so we
     // must make a whole new string.
     size_t newCapacity = expandedSize(length, 0);
-    UChar* d = allocChars(newCapacity);
-    if (!d)
+    UChar* d;
+    if (!allocChars(newCapacity).getValue(d))
       rep = &UString::Rep::null();
     else {
       copyChars(d, rep->data(), thisSize);
@@ -814,8 +812,8 @@ PassRefPtr<UString::Rep> concatenate(UString::Rep* a, UString::Rep* b) {
   // a does not qualify for append, and b does not qualify for prepend, gotta
   // make a whole new string
   size_t newCapacity = expandedSize(length, 0);
-  UChar* d = allocChars(newCapacity);
-  if (!d)
+  UChar* d;
+  if (!allocChars(newCapacity).getValue(d))
     return 0;
   copyChars(d, a->data(), aSize);
   copyChars(d + aSize, b->data(), bSize);
@@ -1085,8 +1083,8 @@ UString UString::spliceSubstringsWithSeparators(const Range* substringRanges,
   if (totalLength == 0)
     return "";
 
-  UChar* buffer = allocChars(totalLength);
-  if (!buffer)
+  UChar* buffer;
+  if (!allocChars(totalLength).getValue(buffer))
     return null();
 
   int maxCount = max(rangeCount, separatorCount);
@@ -1116,8 +1114,8 @@ UString UString::replaceRange(int rangeStart,
   if (totalLength == 0)
     return "";
 
-  UChar* buffer = allocChars(totalLength);
-  if (!buffer)
+  UChar* buffer;
+  if (!allocChars(totalLength).getValue(buffer))
     return null();
 
   copyChars(buffer, data(), rangeStart);
@@ -1166,8 +1164,8 @@ UString& UString::append(const UString& t) {
     // This is shared in some way that prevents us from modifying base, so we
     // must make a whole new string.
     size_t newCapacity = expandedSize(length, 0);
-    UChar* d = allocChars(newCapacity);
-    if (!d)
+    UChar* d;
+    if (!allocChars(newCapacity).getValue(d))
       makeNull();
     else {
       copyChars(d, data(), thisSize);
@@ -1215,8 +1213,8 @@ UString& UString::append(UChar c) {
     // this is empty - must make a new m_rep because we don't want to pollute
     // the shared empty one
     size_t newCapacity = expandedSize(1, 0);
-    UChar* d = allocChars(newCapacity);
-    if (!d)
+    UChar* d;
+    if (!allocChars(newCapacity).getValue(d))
       makeNull();
     else {
       d[0] = c;
@@ -1245,8 +1243,8 @@ UString& UString::append(UChar c) {
     // This is shared in some way that prevents us from modifying base, so we
     // must make a whole new string.
     size_t newCapacity = expandedSize(length + 1, 0);
-    UChar* d = allocChars(newCapacity);
-    if (!d)
+    UChar* d;
+    if (!allocChars(newCapacity).getValue(d))
       makeNull();
     else {
       copyChars(d, data(), length);
@@ -1322,8 +1320,7 @@ UString& UString::operator=(const char* c) {
     m_rep->_hash = 0;
     m_rep->len = l;
   } else {
-    d = allocChars(l);
-    if (!d) {
+    if (!allocChars(l).getValue(d)) {
       makeNull();
       return *this;
     }
