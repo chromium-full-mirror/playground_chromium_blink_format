@@ -334,6 +334,11 @@ JSStringRef AccessibilityUIElement::boundsForRange(unsigned location,
   return JSStringCreateWithCharacters(0, 0);
 }
 
+JSStringRef AccessibilityUIElement::stringForRange(unsigned, unsigned) {
+  // FIXME: implement
+  return JSStringCreateWithCharacters(0, 0);
+}
+
 AccessibilityUIElement AccessibilityUIElement::cellForColumnAndRow(
     unsigned column,
     unsigned row) {
