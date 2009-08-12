@@ -121,6 +121,7 @@ class Geolocation : public RefCounted<Geolocation>,
   void startTimersForWatchers();
   void startTimers();
 
+  void makeSuccessCallbacks();
   void handleError(PositionError*);
 
   void requestPermission();
