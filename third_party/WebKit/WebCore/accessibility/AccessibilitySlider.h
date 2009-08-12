@@ -60,10 +60,8 @@ class AccessibilitySlider : public AccessibilityRenderObject {
   virtual void increment();
   virtual void decrement();
 
- protected:
-  AccessibilitySlider(RenderObject*);
-
  private:
+  AccessibilitySlider(RenderObject*);
   void changeValue(float /*percentChange*/);
   HTMLInputElement* element() const;
 };
