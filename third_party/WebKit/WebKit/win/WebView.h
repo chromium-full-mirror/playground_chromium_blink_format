@@ -763,7 +763,6 @@ class WebView : public IWebView,
   bool keyDown(WPARAM, LPARAM, bool systemKeyDown = false);
   bool keyUp(WPARAM, LPARAM, bool systemKeyDown = false);
   bool keyPress(WPARAM, LPARAM, bool systemKeyDown = false);
-  bool inResizer(LPARAM lParam);
   void paint(HDC, LPARAM);
   void paintIntoWindow(HDC bitmapDC,
                        HDC windowDC,
