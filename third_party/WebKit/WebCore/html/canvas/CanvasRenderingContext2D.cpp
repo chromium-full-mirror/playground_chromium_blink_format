@@ -1377,7 +1377,7 @@ PassRefPtr<ImageData> CanvasRenderingContext2D::getImageData(
   ImageBuffer* buffer = m_canvas ? m_canvas->buffer() : 0;
   if (!buffer)
     return createEmptyImageData(scaledRect.size());
-  return buffer->getImageData(scaledRect);
+  return buffer->getUnmultipliedImageData(scaledRect);
 }
 
 void CanvasRenderingContext2D::putImageData(ImageData* data,
@@ -1435,7 +1435,7 @@ void CanvasRenderingContext2D::putImageData(ImageData* data,
   sourceRect.move(-destOffset);
   IntPoint destPoint(destOffset.width(), destOffset.height());
 
-  buffer->putImageData(data, sourceRect, destPoint);
+  buffer->putUnmultipliedImageData(data, sourceRect, destPoint);
 }
 
 String CanvasRenderingContext2D::font() const {
