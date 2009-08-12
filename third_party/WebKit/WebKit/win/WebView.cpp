@@ -1567,7 +1567,7 @@ bool WebView::mouseWheel(WPARAM wParam, LPARAM lParam, bool isMouseHWheel) {
     TCHAR className[256];
 
     // Make sure truncation won't affect the comparison.
-    ASSERT(ARRAYSIZE(className) > _tcslen(PopupMenu::popupClassName));
+    ASSERT(ARRAYSIZE(className) > _tcslen(PopupMenu::popupClassName()));
 
     if (GetClassName(focusedWindow, className, ARRAYSIZE(className)) &&
         !_tcscmp(className, PopupMenu::popupClassName())) {
