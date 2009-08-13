@@ -651,7 +651,8 @@ Rect* CSSPrimitiveValue::getRectValue(ExceptionCode& ec) const {
   return m_value.rect;
 }
 
-RGBColor* CSSPrimitiveValue::getRGBColorValue(ExceptionCode& ec) const {
+PassRefPtr<RGBColor> CSSPrimitiveValue::getRGBColorValue(
+    ExceptionCode& ec) const {
   ec = 0;
   if (m_type != CSS_RGBCOLOR) {
     ec = INVALID_ACCESS_ERR;
@@ -659,7 +660,7 @@ RGBColor* CSSPrimitiveValue::getRGBColorValue(ExceptionCode& ec) const {
   }
 
   // FIMXE: This should not return a new object for each invocation.
-  return RGBColor::create(m_value.rgbcolor).releaseRef();
+  return RGBColor::create(m_value.rgbcolor);
 }
 
 Pair* CSSPrimitiveValue::getPairValue(ExceptionCode& ec) const {
