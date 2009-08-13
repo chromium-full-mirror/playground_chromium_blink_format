@@ -26,6 +26,7 @@
 #include "config.h"
 #include "CookieJar.h"
 
+#include "Cookie.h"
 #include "CookieStorageWin.h"
 #include "Document.h"
 #include "KURL.h"
@@ -125,5 +126,10 @@ bool cookiesEnabled(const Document* /*document*/) {
     policy = CFHTTPCookieStorageGetCookieAcceptPolicy(cookieStorage);
   return policy == CFHTTPCookieStorageAcceptPolicyOnlyFromMainDocumentDomain ||
          policy == CFHTTPCookieStorageAcceptPolicyAlways;
+}
+
+void getRawCookies(const Document*, const KURL&, Vector<Cookie>& rawCookies) {
+  // FIXME: Not yet implemented
+  rawCookies.clear();
 }
 }
