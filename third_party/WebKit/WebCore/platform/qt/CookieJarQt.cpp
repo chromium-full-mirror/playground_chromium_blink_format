@@ -28,7 +28,6 @@
 #include "config.h"
 #include "CookieJar.h"
 
-#include "Cookie.h"
 #include "Document.h"
 #include "KURL.h"
 #include "PlatformString.h"
@@ -125,11 +124,6 @@ bool cookiesEnabled(const Document* document) {
 #else
   return QCookieJar::cookieJar()->isEnabled();
 #endif
-}
-
-void getRawCookies(const Document*, const KURL&, Vector<Cookie>& rawCookies) {
-  // FIXME: Not yet implemented
-  rawCookies.clear();
 }
 }
 
