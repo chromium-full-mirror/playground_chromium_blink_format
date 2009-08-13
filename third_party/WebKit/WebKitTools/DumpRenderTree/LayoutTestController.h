@@ -211,6 +211,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
 
   bool waitToDump() const { return m_waitToDump; }
   void setWaitToDump(bool waitToDump);
+  void waitToDumpWatchdogTimerFired();
 
   bool willSendRequestReturnsNullOnRedirect() const {
     return m_willSendRequestReturnsNullOnRedirect;
