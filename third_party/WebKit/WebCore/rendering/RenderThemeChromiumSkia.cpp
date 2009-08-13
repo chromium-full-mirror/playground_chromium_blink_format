@@ -667,6 +667,11 @@ bool RenderThemeChromiumSkia::paintMediaPlayButton(
       Image::loadPlatformResource("mediaPlay").releaseRef();
   static Image* mediaPause =
       Image::loadPlatformResource("mediaPause").releaseRef();
+  static Image* mediaPlayDisabled =
+      Image::loadPlatformResource("mediaPlayDisabled").releaseRef();
+
+  if (mediaElement->networkState() == HTMLMediaElement::NETWORK_NO_SOURCE)
+    return paintMediaButtonInternal(paintInfo.context, rect, mediaPlayDisabled);
 
   return paintMediaButtonInternal(
       paintInfo.context, rect, mediaElement->paused() ? mediaPlay : mediaPause);
