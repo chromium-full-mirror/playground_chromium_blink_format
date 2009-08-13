@@ -57,6 +57,8 @@ class HTMLBodyElement : public HTMLElement {
   void setOnbeforeunload(PassRefPtr<EventListener>);
   EventListener* onmessage() const;
   void setOnmessage(PassRefPtr<EventListener>);
+  EventListener* onhashchange() const;
+  void setOnhashchange(PassRefPtr<EventListener>);
   EventListener* onoffline() const;
   void setOnoffline(PassRefPtr<EventListener>);
   EventListener* ononline() const;

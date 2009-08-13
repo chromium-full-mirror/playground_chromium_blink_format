@@ -1520,6 +1520,14 @@ void DOMWindow::setOnfocus(PassRefPtr<EventListener> eventListener) {
   setAttributeEventListener(eventNames().focusEvent, eventListener);
 }
 
+EventListener* DOMWindow::onhashchange() const {
+  return getAttributeEventListener(eventNames().hashchangeEvent);
+}
+
+void DOMWindow::setOnhashchange(PassRefPtr<EventListener> eventListener) {
+  setAttributeEventListener(eventNames().hashchangeEvent, eventListener);
+}
+
 EventListener* DOMWindow::onkeydown() const {
   return getAttributeEventListener(eventNames().keydownEvent);
 }
