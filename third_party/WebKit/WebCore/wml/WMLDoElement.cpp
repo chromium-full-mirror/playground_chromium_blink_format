@@ -170,6 +170,7 @@ void WMLDoElement::registerTask(WMLTaskElement* task) {
 
 void WMLDoElement::deregisterTask(WMLTaskElement* task) {
   ASSERT(m_task == task);
+  UNUSED_PARAM(task);
   m_task = 0;
 }
 
