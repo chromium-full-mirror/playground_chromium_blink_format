@@ -273,6 +273,8 @@ class RenderBlock : public RenderBox {
   virtual bool hasLineIfEmpty() const;
   bool layoutOnlyPositionedObjects();
 
+  void updateOverflowWithShadowAndReflection();
+
  private:
   virtual RenderObjectChildList* virtualChildren() { return children(); }
   virtual const RenderObjectChildList* virtualChildren() const {
