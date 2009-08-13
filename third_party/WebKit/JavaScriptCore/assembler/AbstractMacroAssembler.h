@@ -282,8 +282,6 @@ class AbstractMacroAssembler {
 
     static Call fromTailJump(Jump jump) { return Call(jump.m_jmp, Linkable); }
 
-    void enableLatePatch() { m_jmp.enableLatePatch(); }
-
     JmpSrc m_jmp;
 
    private:
@@ -314,8 +312,6 @@ class AbstractMacroAssembler {
     void linkTo(Label label, AbstractMacroAssembler<AssemblerType>* masm) {
       masm->m_assembler.linkJump(m_jmp, label.m_label);
     }
-
-    void enableLatePatch() { m_jmp.enableLatePatch(); }
 
    private:
     JmpSrc m_jmp;

@@ -1396,7 +1396,11 @@ void JIT::emit_op_method_check(Instruction* currentInstruction) {
   m_methodCallCompilationInfo.append(
       MethodCallCompilationInfo(m_propertyAccessInstructionIndex));
   MethodCallCompilationInfo& info = m_methodCallCompilationInfo.last();
+
   Jump notCell = emitJumpIfNotJSCell(regT0);
+
+  BEGIN_UNINTERRUPTED_SEQUENCE(sequenceMethodCheck);
+
   Jump structureCheck = branchPtrWithPatch(
       NotEqual, Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)),
       info.structureToCompare,
@@ -1410,6 +1414,9 @@ void JIT::emit_op_method_check(Instruction* currentInstruction) {
 
   // This will be relinked to load the function without doing a load.
   DataLabelPtr putFunction = moveWithPatch(ImmPtr(0), regT0);
+
+  END_UNINTERRUPTED_SEQUENCE(sequenceMethodCheck);
+
   Jump match = jump();
 
   ASSERT(differenceBetween(info.structureToCompare, protoObj) ==
@@ -1490,6 +1497,8 @@ void JIT::compileGetByIdHotPath(int,
 
   emitJumpSlowCaseIfNotJSCell(regT0, baseVReg);
 
+  BEGIN_UNINTERRUPTED_SEQUENCE(sequenceGetByIdHotPath);
+
   Label hotPathBegin(this);
   m_propertyAccessCompilationInfo[propertyAccessInstructionIndex].hotPathBegin =
       hotPathBegin;
@@ -1519,6 +1528,9 @@ void JIT::compileGetByIdHotPath(int,
          patchOffsetGetByIdPropertyMapOffset);
 
   Label putResult(this);
+
+  END_UNINTERRUPTED_SEQUENCE(sequenceGetByIdHotPath);
+
   ASSERT(differenceBetween(hotPathBegin, putResult) ==
          patchOffsetGetByIdPutResult);
 }
@@ -1551,6 +1563,8 @@ void JIT::compileGetByIdSlowCase(int resultVReg,
   linkSlowCaseIfNotJSCell(iter, baseVReg);
   linkSlowCase(iter);
 
+  BEGIN_UNINTERRUPTED_SEQUENCE(sequenceGetByIdSlowCase);
+
 #ifndef NDEBUG
   Label coldPathBegin(this);
 #endif
@@ -1559,6 +1573,8 @@ void JIT::compileGetByIdSlowCase(int resultVReg,
   stubCall.addArgument(regT0);
   stubCall.addArgument(ImmPtr(ident));
   Call call = stubCall.call(resultVReg);
+
+  END_UNINTERRUPTED_SEQUENCE(sequenceGetByIdSlowCase);
 
   ASSERT(differenceBetween(coldPathBegin, call) ==
          patchOffsetGetByIdSlowCaseCall);
@@ -1588,6 +1604,8 @@ void JIT::emit_op_put_by_id(Instruction* currentInstruction) {
   // Structure does not match.
   emitJumpSlowCaseIfNotJSCell(regT0, baseVReg);
 
+  BEGIN_UNINTERRUPTED_SEQUENCE(sequencePutById);
+
   Label hotPathBegin(this);
   m_propertyAccessCompilationInfo[propertyAccessInstructionIndex].hotPathBegin =
       hotPathBegin;
@@ -1614,6 +1632,9 @@ void JIT::emit_op_put_by_id(Instruction* currentInstruction) {
 
   DataLabel32 displacementLabel = storePtrWithAddressOffsetPatch(
       regT1, Address(regT0, patchGetByIdDefaultOffset));
+
+  END_UNINTERRUPTED_SEQUENCE(sequencePutById);
+
   ASSERT(differenceBetween(hotPathBegin, displacementLabel) ==
          patchOffsetPutByIdPropertyMapOffset);
 }

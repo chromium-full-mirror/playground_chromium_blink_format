@@ -279,18 +279,24 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
       move(src, dest);
   }
 
-  Jump branch32(Condition cond, RegisterID left, RegisterID right) {
+  Jump branch32(Condition cond,
+                RegisterID left,
+                RegisterID right,
+                int useConstantPool = 0) {
     m_assembler.cmp_r(left, right);
-    return Jump(m_assembler.jmp(ARMCondition(cond)));
+    return Jump(m_assembler.jmp(ARMCondition(cond), useConstantPool));
   }
 
-  Jump branch32(Condition cond, RegisterID left, Imm32 right) {
+  Jump branch32(Condition cond,
+                RegisterID left,
+                Imm32 right,
+                int useConstantPool = 0) {
     if (right.m_isPointer) {
       m_assembler.ldr_un_imm(ARM::S0, right.m_value);
       m_assembler.cmp_r(left, ARM::S0);
     } else
       m_assembler.cmp_r(left, m_assembler.getImm(right.m_value, ARM::S0));
-    return Jump(m_assembler.jmp(ARMCondition(cond)));
+    return Jump(m_assembler.jmp(ARMCondition(cond), useConstantPool));
   }
 
   Jump branch32(Condition cond, RegisterID left, Address right) {
@@ -424,7 +430,7 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
 
   Call nearCall() {
     prepareCall();
-    return Call(m_assembler.jmp(), Call::LinkableNear);
+    return Call(m_assembler.jmp(ARMAssembler::AL, true), Call::LinkableNear);
   }
 
   Call call(RegisterID target) {
@@ -500,7 +506,7 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
 
   Call call() {
     prepareCall();
-    return Call(m_assembler.jmp(), Call::Linkable);
+    return Call(m_assembler.jmp(ARMAssembler::AL, true), Call::Linkable);
   }
 
   Call tailRecursiveCall() { return Call::fromTailJump(jump()); }
@@ -521,8 +527,7 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
                           DataLabelPtr& dataLabel,
                           ImmPtr initialRightValue = ImmPtr(0)) {
     dataLabel = moveWithPatch(initialRightValue, ARM::S1);
-    Jump jump = branch32(cond, left, ARM::S1);
-    jump.enableLatePatch();
+    Jump jump = branch32(cond, left, ARM::S1, true);
     return jump;
   }
 
@@ -532,8 +537,7 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
                           ImmPtr initialRightValue = ImmPtr(0)) {
     load32(left, ARM::S1);
     dataLabel = moveWithPatch(initialRightValue, ARM::S0);
-    Jump jump = branch32(cond, ARM::S0, ARM::S1);
-    jump.enableLatePatch();
+    Jump jump = branch32(cond, ARM::S0, ARM::S1, true);
     return jump;
   }
 
@@ -619,8 +623,14 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
     return static_cast<ARMAssembler::Condition>(cond);
   }
 
+  void ensureSpace(int insnSpace, int constSpace) {
+    m_assembler.ensureSpace(insnSpace, constSpace);
+  }
+
+  int sizeOfConstantPool() { return m_assembler.sizeOfConstantPool(); }
+
   void prepareCall() {
-    m_assembler.ensureSpace(3 * sizeof(ARMWord), sizeof(ARMWord));
+    ensureSpace(3 * sizeof(ARMWord), sizeof(ARMWord));
 
     // S0 might be used for parameter passing
     m_assembler.add_r(ARM::S1, ARM::pc, ARMAssembler::OP2_IMM | 0x4);

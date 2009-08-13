@@ -697,9 +697,15 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   // frame below
   emitGetVirtualRegister(callee, regT2);
   DataLabelPtr addressOfLinkedFunctionCheck;
+
+  BEGIN_UNINTERRUPTED_SEQUENCE(sequenceOpCall);
+
   Jump jumpToSlow =
       branchPtrWithPatch(NotEqual, regT2, addressOfLinkedFunctionCheck,
                          ImmPtr(JSValue::encode(JSValue())));
+
+  END_UNINTERRUPTED_SEQUENCE(sequenceOpCall);
+
   addSlowCase(jumpToSlow);
   ASSERT(differenceBetween(addressOfLinkedFunctionCheck, jumpToSlow) ==
          patchOffsetOpCallCompareToJump);

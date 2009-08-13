@@ -34,6 +34,8 @@
 #include "AssemblerBuffer.h"
 #include <wtf/SegmentedVector.h>
 
+#define ASSEMBLER_HAS_CONSTANT_POOL 1
+
 namespace JSC {
 
 /*
@@ -171,6 +173,8 @@ class AssemblerBufferWithConstantPool : public AssemblerBuffer {
     return AssemblerBuffer::size();
   }
 
+  int uncheckedSize() { return AssemblerBuffer::size(); }
+
   void* executableCopy(ExecutablePool* allocator) {
     flushConstantPool(false);
     return AssemblerBuffer::executableCopy(allocator);
@@ -204,14 +208,16 @@ class AssemblerBufferWithConstantPool : public AssemblerBuffer {
   }
 
   // This flushing mechanism can be called after any unconditional jumps.
-  void flushWithoutBarrier() {
+  void flushWithoutBarrier(bool isForced = false) {
     // Flush if constant pool is more than 60% full to avoid overuse of this
     // function.
-    if (5 * m_numConsts > 3 * maxPoolSize / sizeof(uint32_t))
+    if (isForced || 5 * m_numConsts > 3 * maxPoolSize / sizeof(uint32_t))
       flushConstantPool(false);
   }
 
   uint32_t* poolAddress() { return m_pool; }
+
+  int sizeOfConstantPool() { return m_numConsts; }
 
  private:
   void correctDeltas(int insnSize) {
@@ -270,17 +276,19 @@ class AssemblerBufferWithConstantPool : public AssemblerBuffer {
   void flushIfNoSpaceFor(int nextInsnSize) {
     if (m_numConsts == 0)
       return;
+    int lastConstDelta =
+        m_lastConstDelta > nextInsnSize ? m_lastConstDelta - nextInsnSize : 0;
     if ((m_maxDistance <
-         nextInsnSize + m_lastConstDelta + barrierSize + (int)sizeof(uint32_t)))
+         nextInsnSize + lastConstDelta + barrierSize + (int)sizeof(uint32_t)))
       flushConstantPool();
   }
 
   void flushIfNoSpaceFor(int nextInsnSize, int nextConstSize) {
     if (m_numConsts == 0)
       return;
-    if ((m_maxDistance < nextInsnSize + m_lastConstDelta + barrierSize +
-                             (int)sizeof(uint32_t)) ||
-        (m_numConsts + nextConstSize / sizeof(uint32_t) >= maxPoolSize))
+    if ((m_maxDistance < nextInsnSize + m_lastConstDelta + nextConstSize +
+                             barrierSize + (int)sizeof(uint32_t)) ||
+        (m_numConsts * sizeof(uint32_t) + nextConstSize >= maxPoolSize))
       flushConstantPool();
   }
 
