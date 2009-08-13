@@ -145,8 +145,8 @@ RegisterID* StringNode::emitBytecode(BytecodeGenerator& generator,
 
 RegisterID* RegExpNode::emitBytecode(BytecodeGenerator& generator,
                                      RegisterID* dst) {
-  RefPtr<RegExp> regExp =
-      RegExp::create(generator.globalData(), m_pattern, m_flags);
+  RefPtr<RegExp> regExp = RegExp::create(
+      generator.globalData(), m_pattern.ustring(), m_flags.ustring());
   if (!regExp->isValid())
     return emitThrowError(
         generator, SyntaxError,
@@ -2548,6 +2548,11 @@ Identifier* FunctionBodyNode::copyParameters() {
   VectorCopier<false, Identifier>::uninitializedCopy(
       m_parameters, m_parameters + m_parameterCount, parameters);
   return parameters;
+}
+
+JSFunction* FunctionBodyNode::make(ExecState* exec,
+                                   ScopeChainNode* scopeChain) {
+  return new (exec) JSFunction(exec, m_ident, this, scopeChain);
 }
 
 // ------------------------------ FuncDeclNode ---------------------------------

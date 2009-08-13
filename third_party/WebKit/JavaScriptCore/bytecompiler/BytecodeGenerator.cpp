@@ -1918,7 +1918,7 @@ void BytecodeGenerator::emitSubroutineReturn(RegisterID* retAddrSrc) {
 }
 
 void BytecodeGenerator::emitPushNewScope(RegisterID* dst,
-                                         Identifier& property,
+                                         const Identifier& property,
                                          RegisterID* value) {
   ControlFlowContext context;
   context.isFinallyBlock = false;

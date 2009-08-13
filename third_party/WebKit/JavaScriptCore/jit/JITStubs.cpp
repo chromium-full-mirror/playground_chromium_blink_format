@@ -1606,12 +1606,12 @@ DEFINE_STUB_FUNCTION(void*, op_call_JSFunction) {
 #endif
 
   JSFunction* function = asFunction(stackFrame.args[0].jsValue());
-  ASSERT(!function->isHostFunction());
   FunctionBodyNode* body = function->body();
+  ASSERT(!body->isHostFunction());
   ScopeChainNode* callDataScopeChain = function->scope().node();
   body->jitCode(callDataScopeChain);
 
-  return &(body->generatedBytecode());
+  return &body->generatedBytecode();
 }
 
 DEFINE_STUB_FUNCTION(VoidPtrPair, op_call_arityCheck) {
@@ -1667,13 +1667,14 @@ DEFINE_STUB_FUNCTION(VoidPtrPair, op_call_arityCheck) {
 DEFINE_STUB_FUNCTION(void*, vm_lazyLinkCall) {
   STUB_INIT_STACK_FRAME(stackFrame);
   JSFunction* callee = asFunction(stackFrame.args[0].jsValue());
-  JITCode& jitCode = callee->body()->generatedJITCode();
+  FunctionBodyNode* body = callee->body();
+  JITCode& jitCode = body->generatedJITCode();
 
   CodeBlock* codeBlock = 0;
-  if (!callee->isHostFunction())
-    codeBlock = &callee->body()->bytecode(callee->scope().node());
+  if (!body->isHostFunction())
+    codeBlock = &body->bytecode(callee->scope().node());
   else
-    codeBlock = &callee->body()->generatedBytecode();
+    codeBlock = &body->generatedBytecode();
   CallLinkInfo* callLinkInfo =
       &stackFrame.callFrame->callerFrame()->codeBlock()->getCallLinkInfo(
           stackFrame.args[1].returnAddress());
@@ -1857,7 +1858,8 @@ DEFINE_STUB_FUNCTION(JSObject*, op_construct_JSConstruct) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   JSFunction* constructor = asFunction(stackFrame.args[0].jsValue());
-  if (constructor->isHostFunction()) {
+  FunctionBodyNode* body = constructor->body();
+  if (body && body->isHostFunction()) {
     CallFrame* callFrame = stackFrame.callFrame;
     CodeBlock* codeBlock = callFrame->codeBlock();
     unsigned vPCIndex =

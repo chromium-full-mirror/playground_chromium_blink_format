@@ -416,7 +416,7 @@ class BytecodeGenerator : public WTF::FastAllocBase {
   void emitThrow(RegisterID* exc) { emitUnaryNoDstOp(op_throw, exc); }
   RegisterID* emitNewError(RegisterID* dst, ErrorType type, JSValue message);
   void emitPushNewScope(RegisterID* dst,
-                        Identifier& property,
+                        const Identifier& property,
                         RegisterID* value);
 
   RegisterID* emitPushScope(RegisterID* scope);

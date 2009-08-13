@@ -70,8 +70,8 @@ inline StringNode::StringNode(JSGlobalData* globalData, const Identifier& v)
     : ExpressionNode(globalData, ResultType::stringType()), m_value(v) {}
 
 inline RegExpNode::RegExpNode(JSGlobalData* globalData,
-                              const UString& pattern,
-                              const UString& flags)
+                              const Identifier& pattern,
+                              const Identifier& flags)
     : ExpressionNode(globalData), m_pattern(pattern), m_flags(flags) {}
 
 inline ThisNode::ThisNode(JSGlobalData* globalData)
