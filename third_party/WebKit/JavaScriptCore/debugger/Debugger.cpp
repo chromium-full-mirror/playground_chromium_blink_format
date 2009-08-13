@@ -24,9 +24,12 @@
 #include "Debugger.h"
 
 #include "CollectorHeapIterator.h"
+#include "Error.h"
 #include "Interpreter.h"
+#include "JSFunction.h"
 #include "JSGlobalObject.h"
 #include "Parser.h"
+#include "Protect.h"
 
 namespace JSC {
 

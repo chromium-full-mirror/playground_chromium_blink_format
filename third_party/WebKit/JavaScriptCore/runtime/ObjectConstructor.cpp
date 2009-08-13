@@ -22,6 +22,7 @@
 #include "config.h"
 #include "ObjectConstructor.h"
 
+#include "Error.h"
 #include "JSFunction.h"
 #include "JSGlobalObject.h"
 #include "ObjectPrototype.h"
