@@ -53,10 +53,13 @@ void RenderHTMLCanvas::canvasSizeChanged() {
   IntSize zoomedSize(canvasSize.width() * style()->effectiveZoom(),
                      canvasSize.height() * style()->effectiveZoom());
 
-  if (canvasSize == intrinsicSize())
+  if (zoomedSize == intrinsicSize())
     return;
 
-  setIntrinsicSize(canvasSize);
+  setIntrinsicSize(zoomedSize);
+
+  if (!parent())
+    return;
 
   if (!prefWidthsDirty())
     setPrefWidthsDirty(true);
