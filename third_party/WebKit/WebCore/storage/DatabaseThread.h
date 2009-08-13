@@ -33,6 +33,7 @@
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/MessageQueue.h>
+#include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Threading.h>
@@ -42,6 +43,7 @@ namespace WebCore {
 class Database;
 class DatabaseTask;
 class Document;
+class SQLTransactionCoordinator;
 
 class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
  public:
@@ -70,6 +72,10 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
   void recordDatabaseClosed(Database*);
   ThreadIdentifier getThreadID() { return m_threadID; }
 
+  SQLTransactionCoordinator* transactionCoordinator() {
+    return m_transactionCoordinator.get();
+  }
+
  private:
   DatabaseThread();
 
@@ -86,6 +92,8 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
   // thread.
   typedef HashSet<RefPtr<Database>> DatabaseSet;
   DatabaseSet m_openDatabaseSet;
+
+  OwnPtr<SQLTransactionCoordinator> m_transactionCoordinator;
 };
 
 }  // namespace WebCore

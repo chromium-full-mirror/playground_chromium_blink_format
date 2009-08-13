@@ -50,6 +50,7 @@
 #include "SQLStatement.h"
 #include "SQLStatementCallback.h"
 #include "SQLStatementErrorCallback.h"
+#include "SQLTransactionCoordinator.h"
 #include "SQLValue.h"
 
 // There's no way of knowing exactly how much more space will be required when a
@@ -77,7 +78,7 @@ SQLTransaction::SQLTransaction(
     PassRefPtr<SQLTransactionErrorCallback> errorCallback,
     PassRefPtr<VoidCallback> successCallback,
     PassRefPtr<SQLTransactionWrapper> wrapper)
-    : m_nextStep(&SQLTransaction::openTransactionAndPreflight),
+    : m_nextStep(&SQLTransaction::acquireLock),
       m_executeSqlAllowed(false),
       m_database(db),
       m_wrapper(wrapper),
@@ -85,7 +86,8 @@ SQLTransaction::SQLTransaction(
       m_successCallback(successCallback),
       m_errorCallback(errorCallback),
       m_shouldRetryCurrentStatement(false),
-      m_modifiedDatabase(false) {
+      m_modifiedDatabase(false),
+      m_lockAcquired(false) {
   ASSERT(m_database);
 }
 
@@ -127,7 +129,9 @@ void SQLTransaction::enqueueStatement(PassRefPtr<SQLStatement> statement) {
 #ifndef NDEBUG
 const char* SQLTransaction::debugStepName(
     SQLTransaction::TransactionStepMethod step) {
-  if (step == &SQLTransaction::openTransactionAndPreflight)
+  if (step == &SQLTransaction::acquireLock)
+    return "acquireLock";
+  else if (step == &SQLTransaction::openTransactionAndPreflight)
     return "openTransactionAndPreflight";
   else if (step == &SQLTransaction::runStatements)
     return "runStatements";
@@ -168,12 +172,16 @@ void SQLTransaction::checkAndHandleClosedDatabase() {
     m_sqliteTransaction->stop();
     m_sqliteTransaction.clear();
   }
+
+  if (m_lockAcquired)
+    m_database->transactionCoordinator()->releaseLock(this);
 }
 
 bool SQLTransaction::performNextStep() {
   LOG(StorageAPI, "Step %s\n", debugStepName(m_nextStep));
 
-  ASSERT(m_nextStep == &SQLTransaction::openTransactionAndPreflight ||
+  ASSERT(m_nextStep == &SQLTransaction::acquireLock ||
+         m_nextStep == &SQLTransaction::openTransactionAndPreflight ||
          m_nextStep == &SQLTransaction::runStatements ||
          m_nextStep == &SQLTransaction::postflightAndCommit ||
          m_nextStep == &SQLTransaction::cleanupAfterSuccessCallback ||
@@ -204,8 +212,22 @@ void SQLTransaction::performPendingCallback() {
     (this->*m_nextStep)();
 }
 
+void SQLTransaction::acquireLock() {
+  m_database->transactionCoordinator()->acquireLock(this);
+}
+
+void SQLTransaction::lockAcquired() {
+  m_lockAcquired = true;
+  m_nextStep = &SQLTransaction::openTransactionAndPreflight;
+  LOG(StorageAPI,
+      "Scheduling openTransactionAndPreflight immediately for transaction %p\n",
+      this);
+  m_database->scheduleTransactionStep(this, true);
+}
+
 void SQLTransaction::openTransactionAndPreflight() {
   ASSERT(!m_database->m_sqliteDatabase.transactionInProgress());
+  ASSERT(m_lockAcquired);
 
   LOG(StorageAPI, "Opening and preflighting transaction %p", this);
 
@@ -288,6 +310,8 @@ void SQLTransaction::scheduleToRunStatements() {
 }
 
 void SQLTransaction::runStatements() {
+  ASSERT(m_lockAcquired);
+
   // If there is a series of statements queued up that are all successful and
   // have no associated
   // SQLStatementCallback objects, then we can burn through the queue
@@ -442,6 +466,8 @@ void SQLTransaction::deliverQuotaIncreaseCallback() {
 }
 
 void SQLTransaction::postflightAndCommit() {
+  ASSERT(m_lockAcquired);
+
   // Transaction Step 7 - Peform postflight steps, jumping to the error callback
   // if they fail
   if (m_wrapper && !m_wrapper->performPostflight(this)) {
@@ -507,11 +533,16 @@ void SQLTransaction::deliverSuccessCallback() {
 }
 
 void SQLTransaction::cleanupAfterSuccessCallback() {
+  ASSERT(m_lockAcquired);
+
   // Transaction Step 11 - End transaction steps
   // There is no next step
   LOG(StorageAPI, "Transaction %p is complete\n", this);
   ASSERT(!m_database->m_sqliteDatabase.transactionInProgress());
   m_nextStep = 0;
+
+  // Release the lock on this database
+  m_database->transactionCoordinator()->releaseLock(this);
 }
 
 void SQLTransaction::handleTransactionError(bool inCallback) {
@@ -557,6 +588,8 @@ void SQLTransaction::deliverTransactionErrorCallback() {
 }
 
 void SQLTransaction::cleanupAfterTransactionErrorCallback() {
+  ASSERT(m_lockAcquired);
+
   m_database->m_databaseAuthorizer->disable();
   if (m_sqliteTransaction) {
     // Transaction Step 12 - Rollback the transaction.
@@ -582,6 +615,9 @@ void SQLTransaction::cleanupAfterTransactionErrorCallback() {
   // Now release our callbacks, to break reference cycles.
   m_callback = 0;
   m_errorCallback = 0;
+
+  // Now release the lock on this database
+  m_database->transactionCoordinator()->releaseLock(this);
 }
 
 }  // namespace WebCore

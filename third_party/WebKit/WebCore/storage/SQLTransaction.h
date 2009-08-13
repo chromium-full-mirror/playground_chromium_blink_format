@@ -81,6 +81,7 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
                   PassRefPtr<SQLStatementErrorCallback> callbackError,
                   ExceptionCode& e);
 
+  void lockAcquired();
   bool performNextStep();
   void performPendingCallback();
 
@@ -100,6 +101,7 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
 
   void checkAndHandleClosedDatabase();
 
+  void acquireLock();
   void openTransactionAndPreflight();
   void deliverTransactionCallback();
   void scheduleToRunStatements();
@@ -132,6 +134,7 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
   RefPtr<SQLError> m_transactionError;
   bool m_shouldRetryCurrentStatement;
   bool m_modifiedDatabase;
+  bool m_lockAcquired;
 
   Mutex m_statementMutex;
   Deque<RefPtr<SQLStatement>> m_statementQueue;

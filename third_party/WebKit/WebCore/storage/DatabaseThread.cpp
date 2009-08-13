@@ -35,10 +35,12 @@
 #include "Database.h"
 #include "DatabaseTask.h"
 #include "Logging.h"
+#include "SQLTransactionCoordinator.h"
 
 namespace WebCore {
 
-DatabaseThread::DatabaseThread() : m_threadID(0) {
+DatabaseThread::DatabaseThread()
+    : m_threadID(0), m_transactionCoordinator(new SQLTransactionCoordinator()) {
   m_selfRef = this;
 }
 
@@ -90,6 +92,9 @@ void* DatabaseThread::databaseThread() {
 
     pool.cycle();
   }
+
+  // Clean up the list of all pending transactions on this database thread
+  m_transactionCoordinator->shutdown();
 
   LOG(StorageAPI,
       "About to detach thread %i and clear the ref to DatabaseThread %p, which "

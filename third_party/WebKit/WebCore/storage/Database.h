@@ -57,6 +57,7 @@ class DatabaseThread;
 class Document;
 class SQLResultSet;
 class SQLTransactionCallback;
+class SQLTransactionCoordinator;
 class SQLTransactionErrorCallback;
 class SQLValue;
 
@@ -126,6 +127,8 @@ class Database : public ThreadSafeShared<Database> {
 
   Vector<String> performGetTableNames();
 
+  SQLTransactionCoordinator* transactionCoordinator() const;
+
  private:
   Database(Document* document,
            const String& name,
@@ -135,7 +138,8 @@ class Database : public ThreadSafeShared<Database> {
 
   void scheduleTransaction();
   void scheduleTransactionCallback(SQLTransaction*);
-  void scheduleTransactionStep(SQLTransaction* transaction);
+  void scheduleTransactionStep(SQLTransaction* transaction,
+                               bool immediately = false);
 
   MessageQueue<RefPtr<SQLTransaction>> m_transactionQueue;
   Mutex m_transactionInProgressMutex;
