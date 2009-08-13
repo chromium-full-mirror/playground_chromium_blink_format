@@ -54,7 +54,7 @@ class SVGColor : public CSSValue {
   // 'SVGColor' functions
   unsigned short colorType() const;
 
-  RGBColor* rgbColor() const;
+  PassRefPtr<RGBColor> rgbColor() const;
 
   static Color colorFromRGBColorString(const String&);
 
