@@ -31,7 +31,9 @@
 
 #include "Console.h"
 #include "PlatformString.h"
+#include "ScriptObject.h"
 #include "ScriptState.h"
+#include "ScriptValue.h"
 #include "StringHash.h"
 #include "Timer.h"
 
@@ -62,7 +64,6 @@ class InspectorClient;
 class InspectorDOMAgent;
 class InspectorFrontend;
 class JavaScriptCallFrame;
-class StorageArea;
 class KURL;
 class Node;
 class Page;
@@ -70,9 +71,9 @@ struct ResourceRequest;
 class ResourceResponse;
 class ResourceError;
 class ScriptCallStack;
-class ScriptObject;
 class ScriptString;
 class SharedBuffer;
+class StorageArea;
 
 class ConsoleMessage;
 class InspectorDatabaseResource;
@@ -216,7 +217,7 @@ class InspectorController
                            const String& message,
                            unsigned lineNumber,
                            const String& sourceID);
-  void clearConsoleMessages();
+  void clearConsoleMessages(bool clearUI);
   const Vector<ConsoleMessage*>& consoleMessages() const {
     return m_consoleMessages;
   }
@@ -232,7 +233,9 @@ class InspectorController
   void inspectedWindowScriptObjectCleared(Frame*);
   void windowScriptObjectAvailable();
 
-  void setFrontendProxyObject(ScriptState* state, ScriptObject object);
+  void setFrontendProxyObject(ScriptState* state,
+                              ScriptObject webInspectorObj,
+                              ScriptObject injectedScriptObj = ScriptObject());
 
   void populateScriptObjects();
   void resetScriptObjects();
@@ -338,13 +341,15 @@ class InspectorController
   friend class InspectorBackend;
 
   // Following are used from InspectorBackend and internally.
-  void scriptObjectReady(bool enableDOMAgent);
+  void scriptObjectReady();
   void moveWindowBy(float x, float y) const;
   void setAttachedWindow(bool);
   void setAttachedWindowHeight(unsigned height);
   void storeLastActivePanel(const String& panelName);
   void closeWindow();
   InspectorDOMAgent* domAgent() { return m_domAgent.get(); }
+  ScriptValue wrapObject(const ScriptValue& object);
+  ScriptValue unwrapObject(const String& objectId);
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   void startUserInitiatedProfilingSoon();
@@ -373,6 +378,7 @@ class InspectorController
   InspectorClient* m_client;
   OwnPtr<InspectorFrontend> m_frontend;
   RefPtr<InspectorDOMAgent> m_domAgent;
+  ScriptObject m_injectedScriptObj;
   Page* m_page;
   RefPtr<Node> m_nodeToFocus;
   RefPtr<InspectorResource> m_mainResource;
@@ -399,6 +405,8 @@ class InspectorController
   bool m_resourceTrackingEnabled;
   bool m_resourceTrackingSettingsLoaded;
   RefPtr<InspectorBackend> m_inspectorBackend;
+  HashMap<String, ScriptValue> m_idToConsoleObject;
+  long m_lastBoundObjectId;
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   bool m_debuggerEnabled;
   bool m_attachDebuggerWhenShown;

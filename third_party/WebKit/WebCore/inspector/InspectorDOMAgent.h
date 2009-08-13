@@ -42,6 +42,7 @@
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
+class ContainerNode;
 class Element;
 class Event;
 class Document;
@@ -80,12 +81,13 @@ class InspectorDOMAgent : public EventListener {
   long bind(Node* node);
   void unbind(Node* node);
 
-  void pushDocumentElementToFrontend();
+  void pushDocumentToFrontend();
   void pushChildNodesToFrontend(long elementId);
 
   ScriptObject buildObjectForNode(Node* node, int depth);
-  ScriptArray buildArrayForElementAttributes(Element* elemen);
-  ScriptArray buildArrayForElementChildren(Element* element, int depth);
+  ScriptArray buildArrayForElementAttributes(Element* element);
+  ScriptArray buildArrayForContainerChildren(ContainerNode* container,
+                                             int depth);
 
   // We represent embedded doms as a part of the same hierarchy. Hence we treat
   // children of frame owners differently.

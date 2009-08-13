@@ -31,6 +31,7 @@
 #include "InspectorDOMAgent.h"
 
 #include "AtomicString.h"
+#include "ContainerNode.h"
 #include "DOMWindow.h"
 #include "Document.h"
 #include "Event.h"
@@ -73,7 +74,7 @@ void InspectorDOMAgent::setDocument(Document* doc) {
   if (doc) {
     startListening(doc);
     if (doc->documentElement()) {
-      pushDocumentElementToFrontend();
+      pushDocumentToFrontend();
     }
   } else {
     discardBindings();
@@ -164,7 +165,7 @@ void InspectorDOMAgent::handleEvent(Event* event, bool) {
   } else if (type == eventNames().DOMContentLoadedEvent) {
     // Re-push document once it is loaded.
     discardBindings();
-    pushDocumentElementToFrontend();
+    pushDocumentToFrontend();
   }
 }
 
@@ -193,23 +194,24 @@ void InspectorDOMAgent::unbind(Node* node) {
   }
 }
 
-void InspectorDOMAgent::pushDocumentElementToFrontend() {
-  Element* docElem = mainFrameDocument()->documentElement();
-  if (!m_nodeToId.contains(docElem))
-    m_frontend->setDocumentElement(buildObjectForNode(docElem, 0));
+void InspectorDOMAgent::pushDocumentToFrontend() {
+  Document* document = mainFrameDocument();
+  if (!m_nodeToId.contains(document))
+    m_frontend->setDocument(buildObjectForNode(document, 2));
 }
 
-void InspectorDOMAgent::pushChildNodesToFrontend(long elementId) {
-  Node* node = nodeForId(elementId);
-  if (!node || (node->nodeType() != Node::ELEMENT_NODE))
+void InspectorDOMAgent::pushChildNodesToFrontend(long nodeId) {
+  Node* node = nodeForId(nodeId);
+  if (!node || (node->nodeType() != Node::ELEMENT_NODE &&
+                node->nodeType() != Node::DOCUMENT_NODE))
     return;
-  if (m_childrenRequested.contains(elementId))
+  if (m_childrenRequested.contains(nodeId))
     return;
 
-  Element* element = static_cast<Element*>(node);
-  ScriptArray children = buildArrayForElementChildren(element, 1);
-  m_childrenRequested.add(elementId);
-  m_frontend->setChildNodes(elementId, children);
+  ContainerNode* container = static_cast<ContainerNode*>(node);
+  ScriptArray children = buildArrayForContainerChildren(container, 1);
+  m_childrenRequested.add(nodeId);
+  m_frontend->setChildNodes(nodeId, children);
 }
 
 void InspectorDOMAgent::discardBindings() {
@@ -219,6 +221,9 @@ void InspectorDOMAgent::discardBindings() {
 }
 
 Node* InspectorDOMAgent::nodeForId(long id) {
+  if (!id)
+    return mainFrameDocument();
+
   HashMap<long, Node*>::iterator it = m_idToNode.find(id);
   if (it != m_idToNode.end())
     return it->second;
@@ -244,7 +249,7 @@ long InspectorDOMAgent::pushNodePathToFrontend(Node* nodeToPush) {
 
   // If we are sending information to the client that is currently being
   // created. Send root node first.
-  pushDocumentElementToFrontend();
+  pushDocumentToFrontend();
 
   // Return id in case the node is known.
   long result = idForNode(nodeToPush);
@@ -327,9 +332,9 @@ ScriptObject InspectorDOMAgent::buildObjectForNode(Node* node, int depth) {
       nodeValue = node->nodeValue();
       break;
     case Node::ATTRIBUTE_NODE:
-    case Node::DOCUMENT_NODE:
     case Node::DOCUMENT_FRAGMENT_NODE:
       break;
+    case Node::DOCUMENT_NODE:
     case Node::ELEMENT_NODE:
     default:
       nodeName = node->nodeName();
@@ -344,10 +349,13 @@ ScriptObject InspectorDOMAgent::buildObjectForNode(Node* node, int depth) {
   if (node->nodeType() == Node::ELEMENT_NODE) {
     Element* element = static_cast<Element*>(node);
     value.set("attributes", buildArrayForElementAttributes(element));
-    int nodeCount = innerChildNodeCount(element);
+  }
+  if (node->nodeType() == Node::ELEMENT_NODE ||
+      node->nodeType() == Node::DOCUMENT_NODE) {
+    ContainerNode* container = static_cast<ContainerNode*>(node);
+    int nodeCount = innerChildNodeCount(container);
     value.set("childNodeCount", nodeCount);
-
-    ScriptArray children = buildArrayForElementChildren(element, depth);
+    ScriptArray children = buildArrayForContainerChildren(container, depth);
     if (children.length() > 0)
       value.set("children", children);
   }
@@ -372,14 +380,15 @@ ScriptArray InspectorDOMAgent::buildArrayForElementAttributes(
   return attributesValue;
 }
 
-ScriptArray InspectorDOMAgent::buildArrayForElementChildren(Element* element,
-                                                            int depth) {
+ScriptArray InspectorDOMAgent::buildArrayForContainerChildren(
+    ContainerNode* container,
+    int depth) {
   ScriptArray children = m_frontend->newScriptArray();
   if (depth == 0) {
     int index = 0;
     // Special case the_only text child.
-    if (innerChildNodeCount(element) == 1) {
-      Node* child = innerFirstChild(element);
+    if (innerChildNodeCount(container) == 1) {
+      Node* child = innerFirstChild(container);
       if (child->nodeType() == Node::TEXT_NODE)
         children.set(index++, buildObjectForNode(child, 0));
     }
@@ -389,7 +398,7 @@ ScriptArray InspectorDOMAgent::buildArrayForElementChildren(Element* element,
   }
 
   int index = 0;
-  for (Node* child = innerFirstChild(element); child;
+  for (Node* child = innerFirstChild(container); child;
        child = innerNextSibling(child))
     children.set(index++, buildObjectForNode(child, depth));
   return children;
@@ -437,7 +446,7 @@ int InspectorDOMAgent::innerChildNodeCount(Node* node) {
 
 Element* InspectorDOMAgent::innerParentElement(Node* node) {
   Element* element = node->parentElement();
-  if (!element)
+  if (!element && node->ownerDocument())
     return node->ownerDocument()->ownerElement();
   return element;
 }

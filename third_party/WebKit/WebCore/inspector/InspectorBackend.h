@@ -38,10 +38,12 @@
 namespace WebCore {
 
 class CachedResource;
+class Database;
 class InspectorClient;
 class InspectorDOMAgent;
 class JavaScriptCallFrame;
 class Node;
+class Storage;
 
 class InspectorBackend : public RefCounted<InspectorBackend> {
  public:
@@ -71,7 +73,7 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
                         const String& source,
                         Node* frame);
 
-  void clearMessages();
+  void clearMessages(bool clearUI);
 
   void toggleNodeSearch();
 
@@ -84,7 +86,7 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   bool searchingForNode();
 
-  void loaded(bool enableDOMAgent);
+  void loaded();
 
   void enableResourceTracking(bool always);
   void disableResourceTracking(bool always);
@@ -134,7 +136,19 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void setTextNodeValue(long callId, long elementId, const String& value);
 
   // Generic code called from custom implementations.
-  void highlight(Node* node);
+  void highlight(long nodeId);
+  Node* nodeForId(long nodeId);
+  long idForNode(Node* node);
+  ScriptValue wrapObject(const ScriptValue& object);
+  ScriptValue unwrapObject(const String& objectId);
+  long pushNodePathToFrontend(Node* node, bool selectInUI);
+  void addNodesToSearchResult(const String& nodeIds);
+#if ENABLE(DATABASE)
+  void selectDatabase(Database* database);
+#endif
+#if ENABLE(DOM_STORAGE)
+  void selectDOMStorage(Storage* storage);
+#endif
 
  private:
   InspectorBackend(InspectorController* inspectorController,

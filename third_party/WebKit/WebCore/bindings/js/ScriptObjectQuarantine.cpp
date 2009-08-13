@@ -38,6 +38,7 @@
 #include "JSNode.h"
 #include "ScriptObject.h"
 #include "ScriptValue.h"
+#include "Storage.h"
 
 #include <runtime/JSLock.h>
 
@@ -83,11 +84,11 @@ bool getQuarantinedScriptObject(Database* database,
 #endif
 
 #if ENABLE(DOM_STORAGE)
-bool getQuarantinedScriptObject(Frame* frame,
-                                Storage* storage,
+bool getQuarantinedScriptObject(Storage* storage,
                                 ScriptObject& quarantinedObject) {
-  ASSERT(frame);
   ASSERT(storage);
+  Frame* frame = storage->frame();
+  ASSERT(frame);
 
   JSDOMGlobalObject* globalObject = toJSDOMWindow(frame);
   ExecState* exec = globalObject->globalExec();

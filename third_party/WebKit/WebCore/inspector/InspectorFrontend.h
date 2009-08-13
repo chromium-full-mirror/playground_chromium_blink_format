@@ -45,10 +45,13 @@ class UString;
 
 namespace WebCore {
 class ConsoleMessage;
+class Database;
+class Frame;
 class InspectorResource;
 class Node;
 class ScriptFunctionCall;
 class ScriptString;
+class Storage;
 
 class InspectorFrontend {
  public:
@@ -62,12 +65,13 @@ class InspectorFrontend {
                            const Vector<ScriptString>& frames,
                            const Vector<ScriptValue> wrappedArguments,
                            const String& message);
+  void clearConsoleMessages();
 
   bool addResource(long long identifier, const ScriptObject& resourceObj);
   bool updateResource(long long identifier, const ScriptObject& resourceObj);
   void removeResource(long long identifier);
 
-  void updateFocusedNode(Node* node);
+  void updateFocusedNode(long long nodeId);
   void setAttachedWindow(bool attached);
   void inspectedWindowScriptObjectCleared(Frame* frame);
   void showPanel(int panel);
@@ -95,13 +99,15 @@ class InspectorFrontend {
 
 #if ENABLE(DATABASE)
   bool addDatabase(const ScriptObject& dbObj);
+  void selectDatabase(Database* database);
 #endif
 
 #if ENABLE(DOM_STORAGE)
   bool addDOMStorage(const ScriptObject& domStorageObj);
+  void selectDOMStorage(Storage* storage);
 #endif
 
-  void setDocumentElement(const ScriptObject& root);
+  void setDocument(const ScriptObject& root);
   void setChildNodes(int parentId, const ScriptArray& nodes);
   void hasChildrenUpdated(int id, bool newValue);
   void childNodeInserted(int parentId, int prevId, const ScriptObject& node);
@@ -109,6 +115,8 @@ class InspectorFrontend {
   void attributesUpdated(int id, const ScriptArray& attributes);
   void didGetChildNodes(int callId);
   void didApplyDomChange(int callId, bool success);
+
+  void addNodesToSearchResult(const String& nodeIds);
 
  private:
   PassOwnPtr<ScriptFunctionCall> newFunctionCall(const String& functionName);
