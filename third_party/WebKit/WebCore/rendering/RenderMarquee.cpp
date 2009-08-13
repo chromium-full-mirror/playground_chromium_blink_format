@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2009 Torch Mobile Inc. All rights reserved.
+ * (http://www.torchmobile.com/)
  *
  * Portions are Copyright (C) 1998 Netscape Communications Corporation.
  *
@@ -155,7 +157,12 @@ int RenderMarquee::computePosition(EMarqueeDirection dir,
 
 void RenderMarquee::start() {
   if (m_timer.isActive() ||
-      m_layer->renderer()->style()->marqueeIncrement().isZero())
+      m_layer->renderer()->style()->marqueeIncrement().isZero()
+#if ENABLE(WCSS) && ENABLE(XHTMLMP)
+      || (m_layer->renderer()->document()->isXHTMLMPDocument() &&
+          !m_layer->renderer()->style()->marqueeLoopCount())
+#endif
+          )
     return;
 
   // We may end up propagating a scroll event. It is important that we suspend
