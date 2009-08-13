@@ -4144,8 +4144,6 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
     case CSSPropertyFontSize: {
       FontDescription fontDescription = m_style->fontDescription();
       fontDescription.setKeywordSize(0);
-      bool familyIsFixed =
-          fontDescription.genericFamily() == FontDescription::MonospaceFamily;
       float oldSize = 0;
       float size = 0;
 
@@ -4163,7 +4161,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
               m_parentStyle->fontDescription().keywordSize());
       } else if (isInitial) {
         size = fontSizeForKeyword(CSSValueMedium, m_style->htmlHacks(),
-                                  familyIsFixed);
+                                  fontDescription.useFixedDefaultSize());
         fontDescription.setKeywordSize(CSSValueMedium - CSSValueXxSmall + 1);
       } else if (primitiveValue->getIdent()) {
         // Keywords are being used.
@@ -4177,7 +4175,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           case CSSValueXxLarge:
           case CSSValueWebkitXxxLarge:
             size = fontSizeForKeyword(primitiveValue->getIdent(),
-                                      m_style->htmlHacks(), familyIsFixed);
+                                      m_style->htmlHacks(),
+                                      fontDescription.useFixedDefaultSize());
             fontDescription.setKeywordSize(primitiveValue->getIdent() -
                                            CSSValueXxSmall + 1);
             break;
@@ -4452,7 +4451,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         // from monospace
         // to non-monospace.
         if (fontDescription.keywordSize() &&
-            fontDescription.genericFamily() == FontDescription::MonospaceFamily)
+            fontDescription.useFixedDefaultSize())
           setFontSize(fontDescription,
                       fontSizeForKeyword(
                           CSSValueXxSmall + fontDescription.keywordSize() - 1,
@@ -4475,8 +4474,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
 
       // Before mapping in a new font-family property, we should reset the
       // generic family.
-      bool oldFamilyIsMonospace =
-          fontDescription.genericFamily() == FontDescription::MonospaceFamily;
+      bool oldFamilyUsedFixedDefaultSize =
+          fontDescription.useFixedDefaultSize();
       fontDescription.setGenericFamily(FontDescription::NoFamily);
 
       for (int i = 0; i < len; i++) {
@@ -4523,6 +4522,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           if (!currFamily) {
             // Filling in the first family.
             firstFamily.setFamily(face);
+            firstFamily.appendFamily(
+                0);  // Remove any inherited family-fallback list.
             currFamily = &firstFamily;
           } else {
             RefPtr<SharedFontFamily> newFamily = SharedFontFamily::create();
@@ -4530,18 +4531,25 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
             currFamily->appendFamily(newFamily);
             currFamily = newFamily.get();
           }
-
-          if (fontDescription.keywordSize() &&
-              (fontDescription.genericFamily() ==
-               FontDescription::MonospaceFamily) != oldFamilyIsMonospace)
-            setFontSize(fontDescription,
-                        fontSizeForKeyword(
-                            CSSValueXxSmall + fontDescription.keywordSize() - 1,
-                            m_style->htmlHacks(), !oldFamilyIsMonospace));
-
-          if (m_style->setFontDescription(fontDescription))
-            m_fontDirty = true;
         }
+      }
+
+      // We can't call useFixedDefaultSize() until all new font families have
+      // been added
+      // If currFamily is non-zero then we set at least one family on this
+      // description.
+      if (currFamily) {
+        if (fontDescription.keywordSize() &&
+            fontDescription.useFixedDefaultSize() !=
+                oldFamilyUsedFixedDefaultSize)
+          setFontSize(
+              fontDescription,
+              fontSizeForKeyword(
+                  CSSValueXxSmall + fontDescription.keywordSize() - 1,
+                  m_style->htmlHacks(), !oldFamilyUsedFixedDefaultSize));
+
+        if (m_style->setFontDescription(fontDescription))
+          m_fontDirty = true;
       }
       return;
     }
@@ -6173,8 +6181,7 @@ void CSSStyleSelector::checkForGenericFamilyChange(RenderStyle* style,
     return;
 
   const FontDescription& parentFont = parentStyle->fontDescription();
-
-  if (childFont.genericFamily() == parentFont.genericFamily())
+  if (childFont.useFixedDefaultSize() == parentFont.useFixedDefaultSize())
     return;
 
   // For now, lump all families but monospace together.
@@ -6187,18 +6194,18 @@ void CSSStyleSelector::checkForGenericFamilyChange(RenderStyle* style,
   // If the font uses a keyword size, then we refetch from the table rather than
   // multiplying by our scale factor.
   float size;
-  if (childFont.keywordSize()) {
-    size = fontSizeForKeyword(
-        CSSValueXxSmall + childFont.keywordSize() - 1, style->htmlHacks(),
-        childFont.genericFamily() == FontDescription::MonospaceFamily);
-  } else {
+  if (childFont.keywordSize())
+    size =
+        fontSizeForKeyword(CSSValueXxSmall + childFont.keywordSize() - 1,
+                           style->htmlHacks(), childFont.useFixedDefaultSize());
+  else {
     Settings* settings = m_checker.m_document->settings();
     float fixedScaleFactor =
         settings
             ? static_cast<float>(settings->defaultFixedFontSize()) /
                   settings->defaultFontSize()
             : 1;
-    size = (parentFont.genericFamily() == FontDescription::MonospaceFamily)
+    size = parentFont.useFixedDefaultSize()
                ? childFont.specifiedSize() / fixedScaleFactor
                : childFont.specifiedSize() * fixedScaleFactor;
   }
