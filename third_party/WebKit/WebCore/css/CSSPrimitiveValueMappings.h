@@ -519,6 +519,7 @@ inline CSSPrimitiveValue::operator EBoxOrient() const {
     case CSSValueInlineAxis:
       return HORIZONTAL;
     case CSSValueVertical:
+    case CSSValueBlockAxis:
       return VERTICAL;
     default:
       ASSERT_NOT_REACHED();
