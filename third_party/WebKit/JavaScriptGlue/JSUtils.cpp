@@ -97,7 +97,7 @@ CFStringRef IdentifierToCFString(const Identifier& inIdentifier) {
 JSUserObject* KJSValueToJSObject(JSValue inValue, ExecState* exec) {
   JSUserObject* result = 0;
 
-  if (inValue.isObject(&UserObjectImp::info)) {
+  if (inValue.inherits(&UserObjectImp::info)) {
     UserObjectImp* userObjectImp =
         static_cast<UserObjectImp*>(asObject(inValue));
     result = userObjectImp->GetJSUserObject();
@@ -209,7 +209,7 @@ CFTypeRef KJSValueToCFTypeInternal(JSValue inValue,
   }
 
   if (inValue.isObject()) {
-    if (inValue.isObject(&UserObjectImp::info)) {
+    if (inValue.inherits(&UserObjectImp::info)) {
       UserObjectImp* userObjectImp =
           static_cast<UserObjectImp*>(asObject(inValue));
       JSUserObject* ptr = userObjectImp->GetJSUserObject();
