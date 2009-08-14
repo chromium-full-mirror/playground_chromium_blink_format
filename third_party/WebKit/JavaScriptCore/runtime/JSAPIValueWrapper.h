@@ -50,7 +50,9 @@ class JSAPIValueWrapper : public JSCell {
 
  private:
   JSAPIValueWrapper(ExecState* exec, JSValue value)
-      : JSCell(exec->globalData().apiWrapperStructure.get()), m_value(value) {}
+      : JSCell(exec->globalData().apiWrapperStructure.get()), m_value(value) {
+    ASSERT(!value.isCell());
+  }
 
   JSValue m_value;
 };

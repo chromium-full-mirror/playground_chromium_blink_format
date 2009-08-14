@@ -45,8 +45,8 @@ class StringObjectThatMasqueradesAsUndefined : public StringObject {
       : StringObject(exec, structure, string) {}
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(proto,
-                             TypeInfo(ObjectType, MasqueradesAsUndefined));
+    return Structure::create(
+        proto, TypeInfo(ObjectType, MasqueradesAsUndefined | HasDefaultMark));
   }
 
   virtual bool toBoolean(ExecState*) const { return false; }

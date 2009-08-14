@@ -39,6 +39,7 @@ static const unsigned OverridesHasInstance = 1 << 2;
 static const unsigned ImplementsDefaultHasInstance = 1 << 3;
 static const unsigned NeedsThisConversion = 1 << 4;
 static const unsigned HasStandardGetOwnPropertySlot = 1 << 5;
+static const unsigned HasDefaultMark = 1 << 6;
 
 class TypeInfo {
   friend class JIT;
@@ -65,7 +66,7 @@ class TypeInfo {
   bool hasStandardGetOwnPropertySlot() const {
     return m_flags & HasStandardGetOwnPropertySlot;
   }
-
+  bool hasDefaultMark() const { return m_flags & HasDefaultMark; }
   unsigned flags() const { return m_flags; }
 
  private:

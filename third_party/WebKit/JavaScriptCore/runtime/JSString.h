@@ -104,7 +104,8 @@ class JSString : public JSCell {
   JSString* getIndex(JSGlobalData*, unsigned);
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(proto, TypeInfo(StringType, NeedsThisConversion));
+    return Structure::create(
+        proto, TypeInfo(StringType, NeedsThisConversion | HasDefaultMark));
   }
 
  private:

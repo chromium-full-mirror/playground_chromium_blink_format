@@ -31,13 +31,14 @@
 #include <wtf/Noncopyable.h>
 
 namespace JSC {
+class JSGlobalData;
 class Register;
 
 enum MarkSetProperties { MayContainNullValues, NoNullValues };
 
 class MarkStack : Noncopyable {
  public:
-  MarkStack() : m_markSets(), m_values() {}
+  MarkStack(void* jsArrayVPtr) : m_jsArrayVPtr(jsArrayVPtr) {}
 
   ALWAYS_INLINE void append(JSValue value) {
     ASSERT(value);
@@ -74,7 +75,9 @@ class MarkStack : Noncopyable {
  private:
   struct MarkSet {
     MarkSet(JSValue* values, JSValue* end, MarkSetProperties properties)
-        : m_values(values), m_end(end), m_properties(properties) {}
+        : m_values(values), m_end(end), m_properties(properties) {
+      ASSERT(values);
+    }
     JSValue* m_values;
     JSValue* m_end;
     MarkSetProperties m_properties;
@@ -122,6 +125,11 @@ class MarkStack : Noncopyable {
       return m_data[--m_top];
     }
 
+    inline T& last() {
+      ASSERT(m_top);
+      return m_data[m_top - 1];
+    }
+
     inline bool isEmpty() { return m_top == 0; }
 
     inline size_t size() { return m_top; }
@@ -151,6 +159,7 @@ class MarkStack : Noncopyable {
     T* m_data;
   };
 
+  void* m_jsArrayVPtr;
   MarkStackArray<MarkSet> m_markSets;
   MarkStackArray<JSCell*> m_values;
   static size_t s_pageSize;

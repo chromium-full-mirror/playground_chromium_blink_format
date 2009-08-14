@@ -32,6 +32,12 @@ class NumberObject : public JSWrapperObject {
 
   static const ClassInfo info;
 
+  static PassRefPtr<Structure> createStructure(JSValue prototype) {
+    return Structure::create(
+        prototype,
+        TypeInfo(ObjectType, HasStandardGetOwnPropertySlot | HasDefaultMark));
+  }
+
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
 

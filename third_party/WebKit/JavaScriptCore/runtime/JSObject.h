@@ -28,7 +28,9 @@
 #include "ClassInfo.h"
 #include "CommonIdentifiers.h"
 #include "CallFrame.h"
+#include "JSCell.h"
 #include "JSNumberCell.h"
+#include "MarkStack.h"
 #include "PropertySlot.h"
 #include "PutPropertySlot.h"
 #include "ScopeChain.h"
@@ -74,6 +76,7 @@ class JSObject : public JSCell {
   explicit JSObject(PassRefPtr<Structure>);
 
   virtual void markChildren(MarkStack&);
+  ALWAYS_INLINE void markChildrenDirect(MarkStack& markStack);
 
   // The inline virtual destructor cannot be the first virtual function declared
   // in the class as it results in the vtable being generated as a weak symbol
@@ -259,7 +262,8 @@ class JSObject : public JSCell {
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(
-        prototype, TypeInfo(ObjectType, HasStandardGetOwnPropertySlot));
+        prototype,
+        TypeInfo(ObjectType, HasStandardGetOwnPropertySlot | HasDefaultMark));
   }
 
  private:
@@ -753,6 +757,15 @@ ALWAYS_INLINE void JSObject::allocatePropertyStorageInline(size_t oldSize,
     delete[] oldPropertyStorage;
 
   m_externalStorage = newPropertyStorage;
+}
+
+ALWAYS_INLINE void JSObject::markChildrenDirect(MarkStack& markStack) {
+  JSCell::markChildren(markStack);
+  m_structure->markAggregate(markStack);
+
+  PropertyStorage storage = propertyStorage();
+  size_t storageSize = m_structure->propertyStorageSize();
+  markStack.appendValues(reinterpret_cast<JSValue*>(storage), storageSize);
 }
 
 }  // namespace JSC
