@@ -216,7 +216,6 @@ inline void MarkStack::drain() {
         current->markChildren(*this);
     }
   }
-  // printf("virtual: %d nonvirtual: %d\n", virtualMark, nonVirtualMark);
 }
 
 }  // namespace JSC
