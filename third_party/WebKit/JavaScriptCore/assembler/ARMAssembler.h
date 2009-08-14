@@ -71,7 +71,7 @@ class ARMAssembler {
   typedef ARM::RegisterID RegisterID;
   typedef ARM::FPRegisterID FPRegisterID;
   typedef AssemblerBufferWithConstantPool<2048, 4, 4, ARMAssembler> ARMBuffer;
-  typedef WTF::SegmentedVector<int, 64> Jumps;
+  typedef SegmentedVector<int, 64> Jumps;
 
   ARMAssembler() {}
 

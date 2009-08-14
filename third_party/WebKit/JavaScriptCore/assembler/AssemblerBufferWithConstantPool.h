@@ -92,7 +92,7 @@ template <int maxPoolSize,
           int maxInstructionSize,
           class AssemblerType>
 class AssemblerBufferWithConstantPool : public AssemblerBuffer {
-  typedef WTF::SegmentedVector<uint32_t, 512> LoadOffsets;
+  typedef SegmentedVector<uint32_t, 512> LoadOffsets;
 
  public:
   enum {

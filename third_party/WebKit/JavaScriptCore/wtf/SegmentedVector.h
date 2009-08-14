@@ -223,4 +223,6 @@ class SegmentedVector {
 
 }  // namespace WTF
 
+using WTF::SegmentedVector;
+
 #endif  // SegmentedVector_h
