@@ -30,7 +30,10 @@ class ArrayPrototype;
 
 class ArrayConstructor : public InternalFunction {
  public:
-  ArrayConstructor(ExecState*, PassRefPtr<Structure>, ArrayPrototype*);
+  ArrayConstructor(ExecState*,
+                   PassRefPtr<Structure>,
+                   ArrayPrototype*,
+                   Structure*);
 
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);
