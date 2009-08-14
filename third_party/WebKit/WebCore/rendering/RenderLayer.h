@@ -589,6 +589,8 @@ class RenderLayer : public ScrollbarClient {
   Node* enclosingElement() const;
 
   void createReflection();
+  void removeReflection();
+
   void updateReflectionStyle();
   bool paintingInsideReflection() const { return m_paintingInsideReflection; }
   void setPaintingInsideReflection(bool b) { m_paintingInsideReflection = b; }
