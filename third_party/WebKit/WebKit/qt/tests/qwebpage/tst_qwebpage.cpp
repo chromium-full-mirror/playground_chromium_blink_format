@@ -675,9 +675,6 @@ void tst_QWebPage::createViewlessPlugin() {
 void QWEBKIT_EXPORT qt_webpage_setGroupName(QWebPage* page,
                                             const QString& groupName);
 QString QWEBKIT_EXPORT qt_webpage_groupName(QWebPage* page);
-void QWEBKIT_EXPORT
-qt_websettings_setLocalStorageDatabasePath(QWebSettings* settings,
-                                           const QString& path);
 
 void tst_QWebPage::multiplePageGroupsAndLocalStorage() {
   QDir dir(QDir::currentPath());
@@ -687,12 +684,14 @@ void tst_QWebPage::multiplePageGroupsAndLocalStorage() {
   QWebView view1;
   QWebView view2;
 
-  qt_websettings_setLocalStorageDatabasePath(
-      view1.page()->settings(),
+  view1.page()->settings()->setAttribute(QWebSettings::LocalStorageEnabled,
+                                         true);
+  view1.page()->settings()->setLocalStoragePath(
       QDir::toNativeSeparators(QDir::currentPath() + "/path1"));
   qt_webpage_setGroupName(view1.page(), "group1");
-  qt_websettings_setLocalStorageDatabasePath(
-      view2.page()->settings(),
+  view2.page()->settings()->setAttribute(QWebSettings::LocalStorageEnabled,
+                                         true);
+  view2.page()->settings()->setLocalStoragePath(
       QDir::toNativeSeparators(QDir::currentPath() + "/path2"));
   qt_webpage_setGroupName(view2.page(), "group2");
   QCOMPARE(qt_webpage_groupName(view1.page()), QString("group1"));
