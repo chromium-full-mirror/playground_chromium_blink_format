@@ -54,11 +54,9 @@ class ConsoleMessage {
   ConsoleMessage(MessageSource,
                  MessageType,
                  MessageLevel,
-                 const Vector<ScriptString>& frames,
-                 const Vector<ScriptValue>& wrappedArguments,
-                 unsigned li,
-                 const String& u,
-                 unsigned g);
+                 ScriptCallStack*,
+                 unsigned g,
+                 bool storeTrace = false);
 
   void addToConsole(InspectorFrontend* frontend);
   void incrementCount() { ++m_repeatCount; };
@@ -72,8 +70,8 @@ class ConsoleMessage {
   MessageType m_type;
   MessageLevel m_level;
   String m_message;
-  Vector<ScriptString> m_frames;
   Vector<ScriptValue> m_wrappedArguments;
+  Vector<ScriptString> m_frames;
   unsigned m_line;
   String m_url;
   unsigned m_groupLevel;

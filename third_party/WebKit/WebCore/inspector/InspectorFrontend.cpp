@@ -32,7 +32,7 @@
 
 #include "ConsoleMessage.h"
 #include "Frame.h"
-#include "InspectorController.h"  // TODO(pfeldman): Extract SpecialPanels to remove include.
+#include "InspectorController.h"
 #include "Node.h"
 #include "ScriptFunctionCall.h"
 #include "ScriptObject.h"
@@ -49,9 +49,12 @@
 
 namespace WebCore {
 
-InspectorFrontend::InspectorFrontend(ScriptState* scriptState,
+InspectorFrontend::InspectorFrontend(InspectorController* inspectorController,
+                                     ScriptState* scriptState,
                                      ScriptObject webInspector)
-    : m_scriptState(scriptState), m_webInspector(webInspector) {}
+    : m_inspectorController(inspectorController),
+      m_scriptState(scriptState),
+      m_webInspector(webInspector) {}
 
 InspectorFrontend::~InspectorFrontend() {
   m_webInspector = ScriptObject();
@@ -77,7 +80,8 @@ void InspectorFrontend::addMessageToConsole(
       function->appendArgument(frames[i]);
   } else if (!wrappedArguments.isEmpty()) {
     for (unsigned i = 0; i < wrappedArguments.size(); ++i)
-      function->appendArgument(wrappedArguments[i]);
+      function->appendArgument(
+          m_inspectorController->wrapObject(wrappedArguments[i]));
   } else
     function->appendArgument(message);
   function->call();

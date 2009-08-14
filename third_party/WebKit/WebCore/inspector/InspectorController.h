@@ -339,7 +339,6 @@ class InspectorController
 
  private:
   friend class InspectorBackend;
-
   // Following are used from InspectorBackend and internally.
   void scriptObjectReady();
   void moveWindowBy(float x, float y) const;
@@ -348,6 +347,12 @@ class InspectorController
   void storeLastActivePanel(const String& panelName);
   void closeWindow();
   InspectorDOMAgent* domAgent() { return m_domAgent.get(); }
+
+  friend class InspectorFrontend;
+  // Following are used from InspectorFrontend only. We don't want to expose
+  // them to the
+  // rest of the InspectorController clients.
+  // TODO: extract these into a separate interface.
   ScriptValue wrapObject(const ScriptValue& object);
   ScriptValue unwrapObject(const String& objectId);
 
