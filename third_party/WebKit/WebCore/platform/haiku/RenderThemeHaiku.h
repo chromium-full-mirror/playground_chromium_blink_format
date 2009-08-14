@@ -32,7 +32,7 @@ namespace WebCore {
 class RenderThemeHaiku : public RenderTheme {
  private:
   RenderThemeHaiku();
-  ~RenderThemeHaiku();
+  virtual ~RenderThemeHaiku();
 
  public:
   static PassRefPtr<RenderTheme> create();
@@ -56,9 +56,9 @@ class RenderThemeHaiku : public RenderTheme {
   virtual void systemFont(int propId, FontDescription&) const;
 
  protected:
-  virtual paintCheckbox(RenderObject*,
-                        const RenderObject::PaintInfo&,
-                        const IntRect&);
+  virtual bool paintCheckbox(RenderObject*,
+                             const RenderObject::PaintInfo&,
+                             const IntRect&);
   virtual void setCheckboxSize(RenderStyle*) const;
 
   virtual bool paintRadio(RenderObject*,
@@ -69,9 +69,9 @@ class RenderThemeHaiku : public RenderTheme {
   virtual void adjustMenuListStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
-  virtual bool RenderThemeHaiku::paintMenuList(RenderObject*,
-                                               const RenderObject::PaintInfo&,
-                                               const IntRect&);
+  virtual bool paintMenuList(RenderObject*,
+                             const RenderObject::PaintInfo&,
+                             const IntRect&);
 };
 
 }  // namespace WebCore
