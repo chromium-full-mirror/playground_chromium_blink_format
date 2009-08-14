@@ -121,6 +121,14 @@ inline PropertyNode::PropertyNode(JSGlobalData*,
                                   Type type)
     : m_name(name), m_assign(assign), m_type(type) {}
 
+inline PropertyNode::PropertyNode(JSGlobalData* globalData,
+                                  double name,
+                                  ExpressionNode* assign,
+                                  Type type)
+    : m_name(Identifier(globalData, UString::from(name))),
+      m_assign(assign),
+      m_type(type) {}
+
 inline PropertyListNode::PropertyListNode(JSGlobalData* globalData,
                                           PropertyNode* node)
     : Node(globalData), m_node(node), m_next(0) {}

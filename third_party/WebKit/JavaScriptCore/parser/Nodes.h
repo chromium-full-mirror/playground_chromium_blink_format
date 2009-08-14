@@ -437,6 +437,7 @@ class PropertyNode : public ParserArenaDeletable {
                const Identifier& name,
                ExpressionNode* value,
                Type);
+  PropertyNode(JSGlobalData*, double name, ExpressionNode* value, Type);
 
   const Identifier& name() const { return m_name; }
 
