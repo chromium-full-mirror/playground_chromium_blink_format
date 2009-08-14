@@ -33,6 +33,7 @@
 
 #include "SubresourceLoaderClient.h"
 #include "ThreadableLoader.h"
+#include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -49,14 +50,12 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
   static void loadResourceSynchronously(Document*,
                                         const ResourceRequest&,
                                         ThreadableLoaderClient&,
-                                        StoredCredentials);
-  static PassRefPtr<DocumentThreadableLoader> create(Document*,
-                                                     ThreadableLoaderClient*,
-                                                     const ResourceRequest&,
-                                                     LoadCallbacks,
-                                                     ContentSniff,
-                                                     StoredCredentials,
-                                                     CrossOriginRedirectPolicy);
+                                        const ThreadableLoaderOptions&);
+  static PassRefPtr<DocumentThreadableLoader> create(
+      Document*,
+      ThreadableLoaderClient*,
+      const ResourceRequest&,
+      const ThreadableLoaderOptions&);
   virtual ~DocumentThreadableLoader();
 
   virtual void cancel();
@@ -69,13 +68,14 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
   virtual void derefThreadableLoader() { deref(); }
 
  private:
+  enum BlockingBehavior { LoadSynchronously, LoadAsynchronously };
+
   DocumentThreadableLoader(Document*,
                            ThreadableLoaderClient*,
+                           BlockingBehavior blockingBehavior,
                            const ResourceRequest&,
-                           LoadCallbacks,
-                           ContentSniff,
-                           StoredCredentials,
-                           CrossOriginRedirectPolicy);
+                           const ThreadableLoaderOptions& options);
+
   virtual void willSendRequest(SubresourceLoader*,
                                ResourceRequest&,
                                const ResourceResponse& redirectResponse);
@@ -98,12 +98,23 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
   virtual void receivedCancellation(SubresourceLoader*,
                                     const AuthenticationChallenge&);
 
+  void didFinishLoading(unsigned long identifier);
+  void makeSimpleCrossOriginAccessRequest(const ResourceRequest& request);
+  void makeCrossOriginAccessRequestWithPreflight(
+      const ResourceRequest& request);
+  void preflightSuccess();
+  void preflightFailure();
+
+  void loadRequest(const ResourceRequest&, bool skipCanLoadCheck);
+
   RefPtr<SubresourceLoader> m_loader;
   ThreadableLoaderClient* m_client;
   Document* m_document;
-  bool m_allowStoredCredentials;
+  ThreadableLoaderOptions m_options;
   bool m_sameOriginRequest;
-  bool m_denyCrossOriginRedirect;
+  bool m_async;
+  OwnPtr<ResourceRequest>
+      m_actualRequest;  // non-null during Access Control preflight checks
 };
 
 }  // namespace WebCore

@@ -59,20 +59,15 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
   static void loadResourceSynchronously(WorkerContext*,
                                         const ResourceRequest&,
                                         ThreadableLoaderClient&,
-                                        StoredCredentials,
-                                        CrossOriginRedirectPolicy);
+                                        const ThreadableLoaderOptions&);
   static PassRefPtr<WorkerThreadableLoader> create(
       WorkerContext* workerContext,
       ThreadableLoaderClient* client,
       const String& taskMode,
       const ResourceRequest& request,
-      LoadCallbacks callbacksSetting,
-      ContentSniff contentSniff,
-      StoredCredentials storedCredentials,
-      CrossOriginRedirectPolicy crossOriginRedirectPolicy) {
-    return adoptRef(new WorkerThreadableLoader(
-        workerContext, client, taskMode, request, callbacksSetting,
-        contentSniff, storedCredentials, crossOriginRedirectPolicy));
+      const ThreadableLoaderOptions& options) {
+    return adoptRef(new WorkerThreadableLoader(workerContext, client, taskMode,
+                                               request, options));
   }
 
   ~WorkerThreadableLoader();
@@ -123,10 +118,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
                      WorkerLoaderProxy&,
                      const String& taskMode,
                      const ResourceRequest&,
-                     LoadCallbacks,
-                     ContentSniff,
-                     StoredCredentials,
-                     CrossOriginRedirectPolicy);
+                     const ThreadableLoaderOptions&);
     void cancel();
     void destroy();
 
@@ -142,10 +134,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
         ScriptExecutionContext*,
         MainThreadBridge*,
         std::auto_ptr<CrossThreadResourceRequestData>,
-        LoadCallbacks,
-        ContentSniff,
-        StoredCredentials,
-        CrossOriginRedirectPolicy);
+        ThreadableLoaderOptions);
     static void mainThreadCancel(ScriptExecutionContext*, MainThreadBridge*);
     virtual void didSendData(unsigned long long bytesSent,
                              unsigned long long totalBytesToBeSent);
@@ -175,10 +164,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
                          ThreadableLoaderClient*,
                          const String& taskMode,
                          const ResourceRequest&,
-                         LoadCallbacks,
-                         ContentSniff,
-                         StoredCredentials,
-                         CrossOriginRedirectPolicy);
+                         const ThreadableLoaderOptions&);
 
   RefPtr<WorkerContext> m_workerContext;
   RefPtr<ThreadableLoaderClientWrapper> m_workerClientWrapper;

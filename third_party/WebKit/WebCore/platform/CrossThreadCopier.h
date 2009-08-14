@@ -46,6 +46,7 @@ class ResourceResponse;
 class String;
 struct CrossThreadResourceResponseData;
 struct CrossThreadResourceRequestData;
+struct ThreadableLoaderOptions;
 
 template <typename T>
 struct CrossThreadCopierPassThrough {
@@ -65,6 +66,10 @@ struct CrossThreadCopierBase<true, T> : public CrossThreadCopierPassThrough<T> {
 template <typename T>
 struct CrossThreadCopierBase<false, T*>
     : public CrossThreadCopierPassThrough<T*> {};
+
+template <>
+struct CrossThreadCopierBase<false, ThreadableLoaderOptions>
+    : public CrossThreadCopierPassThrough<ThreadableLoaderOptions> {};
 
 // Custom copy methods.
 template <typename T>

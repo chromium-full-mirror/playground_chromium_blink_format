@@ -57,9 +57,15 @@ void WorkerScriptLoader::loadSynchronously(
     return;
 
   ASSERT(scriptExecutionContext->isWorkerContext());
+
+  ThreadableLoaderOptions options;
+  options.allowCredentials = true;
+  options.crossOriginRequestPolicy = AllowCrossOriginRequests;
+  options.crossOriginRedirectPolicy = crossOriginRedirectPolicy;
+
   WorkerThreadableLoader::loadResourceSynchronously(
       static_cast<WorkerContext*>(scriptExecutionContext), *request, *this,
-      AllowStoredCredentials, crossOriginRedirectPolicy);
+      options);
 }
 
 void WorkerScriptLoader::loadAsynchronously(
@@ -75,9 +81,13 @@ void WorkerScriptLoader::loadAsynchronously(
   if (!request)
     return;
 
-  m_threadableLoader = ThreadableLoader::create(
-      scriptExecutionContext, this, *request, DoNotSendLoadCallbacks,
-      DoNotSniffContent, AllowStoredCredentials, crossOriginRedirectPolicy);
+  ThreadableLoaderOptions options;
+  options.allowCredentials = true;
+  options.crossOriginRequestPolicy = AllowCrossOriginRequests;
+  options.crossOriginRedirectPolicy = crossOriginRedirectPolicy;
+
+  m_threadableLoader =
+      ThreadableLoader::create(scriptExecutionContext, this, *request, options);
 }
 
 PassOwnPtr<ResourceRequest> WorkerScriptLoader::createResourceRequest() {

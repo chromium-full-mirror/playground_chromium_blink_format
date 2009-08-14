@@ -26,7 +26,6 @@
 #include "Cache.h"
 #include "CString.h"
 #include "CrossOriginAccessControl.h"
-#include "CrossOriginPreflightResultCache.h"
 #include "DOMImplementation.h"
 #include "Document.h"
 #include "Event.h"
@@ -138,9 +137,9 @@ XMLHttpRequest::XMLHttpRequest(ScriptExecutionContext* context)
       m_responseText(""),
       m_createdDocument(false),
       m_error(false),
+      m_uploadEventsAllowed(true),
       m_uploadComplete(false),
       m_sameOriginRequest(true),
-      m_inPreflight(false),
       m_didTellLoaderAboutRequest(false),
       m_receivedLength(0),
       m_lastSendLineNumber(0),
@@ -467,17 +466,16 @@ void XMLHttpRequest::send(File* body, ExceptionCode& ec) {
 }
 
 void XMLHttpRequest::createRequest(ExceptionCode& ec) {
-  // Upload event listeners should be disallowed for simple cross-origin
-  // requests, because POSTing to an URL that does not
+  // The presence of upload event listeners forces us to use preflighting
+  // because POSTing to an URL that does not
   // permit cross origin requests should look exactly like POSTing to an URL
-  // that does not respond at all. If a listener exists
-  // when creating the request, it will force preflight.
+  // that does not respond at all.
   // Also, only async requests support upload progress events.
-  m_uploadEventsAllowed = false;
+  bool forcePreflight = false;
   if (m_async) {
     dispatchLoadStartEvent();
     if (m_requestEntityBody && m_upload) {
-      m_uploadEventsAllowed = m_upload->hasListeners();
+      forcePreflight = m_upload->hasListeners();
       m_upload->dispatchLoadStartEvent();
     }
   }
@@ -485,18 +483,11 @@ void XMLHttpRequest::createRequest(ExceptionCode& ec) {
   m_sameOriginRequest =
       scriptExecutionContext()->securityOrigin()->canRequest(m_url);
 
-  if (!m_sameOriginRequest) {
-    makeCrossOriginAccessRequest(ec);
-    return;
-  }
-
-  m_uploadEventsAllowed = true;
-
-  makeSameOriginRequest(ec);
-}
-
-void XMLHttpRequest::makeSameOriginRequest(ExceptionCode& ec) {
-  ASSERT(m_sameOriginRequest);
+  // We also remember whether upload events should be allowed for this request
+  // in case the upload listeners are
+  // added after the request is started.
+  m_uploadEventsAllowed =
+      !isSimpleCrossOriginAccessRequest(m_method, m_requestHeaders);
 
   ResourceRequest request(m_url);
   request.setHTTPMethod(m_method);
@@ -510,216 +501,29 @@ void XMLHttpRequest::makeSameOriginRequest(ExceptionCode& ec) {
   if (m_requestHeaders.size() > 0)
     request.addHTTPHeaderFields(m_requestHeaders);
 
-  if (m_async)
-    loadRequestAsynchronously(request);
-  else
-    loadRequestSynchronously(request, ec);
-}
+  ThreadableLoaderOptions options;
+  options.sendLoadCallbacks = true;
+  options.sniffContent = false;
+  options.forcePreflight = forcePreflight;
+  options.allowCredentials = m_sameOriginRequest || m_includeCredentials;
+  options.crossOriginRequestPolicy = UseAccessControl;
+  options.crossOriginRedirectPolicy = DenyCrossOriginRedirect;
 
-void XMLHttpRequest::makeCrossOriginAccessRequest(ExceptionCode& ec) {
-  ASSERT(!m_sameOriginRequest);
-
-  if (!m_uploadEventsAllowed &&
-      isSimpleCrossOriginAccessRequest(m_method, m_requestHeaders))
-    makeSimpleCrossOriginAccessRequest(ec);
-  else
-    makeCrossOriginAccessRequestWithPreflight(ec);
-}
-
-void XMLHttpRequest::makeSimpleCrossOriginAccessRequest(ExceptionCode& ec) {
-  ASSERT(isSimpleCrossOriginAccessRequest(m_method, m_requestHeaders));
-
-  // Cross-origin requests are only defined for HTTP. We would catch this when
-  // checking response headers later, but there is no reason to send a request
-  // that's guaranteed to be denied.
-  if (!m_url.protocolInHTTPFamily()) {
-    ec = XMLHttpRequestException::NETWORK_ERR;
-    networkError();
-    return;
-  }
-
-  KURL url = m_url;
-  url.setUser(String());
-  url.setPass(String());
-
-  ResourceRequest request(url);
-  request.setHTTPMethod(m_method);
-  request.setAllowHTTPCookies(m_includeCredentials);
-  request.setHTTPOrigin(scriptExecutionContext()->securityOrigin()->toString());
-
-  if (m_requestHeaders.size() > 0)
-    request.addHTTPHeaderFields(m_requestHeaders);
-
-  if (m_requestEntityBody) {
-    ASSERT(m_method != "GET");
-    ASSERT(m_method != "HEAD");
-    request.setHTTPBody(m_requestEntityBody.release());
-  }
-
-  if (m_async)
-    loadRequestAsynchronously(request);
-  else
-    loadRequestSynchronously(request, ec);
-}
-
-void XMLHttpRequest::makeCrossOriginAccessRequestWithPreflight(
-    ExceptionCode& ec) {
-  String origin = scriptExecutionContext()->securityOrigin()->toString();
-  KURL url = m_url;
-  url.setUser(String());
-  url.setPass(String());
-
-  if (!CrossOriginPreflightResultCache::shared().canSkipPreflight(
-          origin, url, m_includeCredentials, m_method, m_requestHeaders)) {
-    m_inPreflight = true;
-    ResourceRequest preflightRequest(url);
-    preflightRequest.setHTTPMethod("OPTIONS");
-    preflightRequest.setHTTPHeaderField("Origin", origin);
-    preflightRequest.setHTTPHeaderField("Access-Control-Request-Method",
-                                        m_method);
-
-    if (m_requestHeaders.size() > 0) {
-      Vector<UChar> headerBuffer;
-      HTTPHeaderMap::const_iterator it = m_requestHeaders.begin();
-      append(headerBuffer, it->first);
-      ++it;
-
-      HTTPHeaderMap::const_iterator end = m_requestHeaders.end();
-      for (; it != end; ++it) {
-        headerBuffer.append(',');
-        headerBuffer.append(' ');
-        append(headerBuffer, it->first);
-      }
-
-      preflightRequest.setHTTPHeaderField("Access-Control-Request-Headers",
-                                          String::adopt(headerBuffer));
-      preflightRequest.addHTTPHeaderFields(m_requestHeaders);
-    }
-
-    if (m_async) {
-      m_uploadEventsAllowed = true;
-      loadRequestAsynchronously(preflightRequest);
-      return;
-    }
-
-    loadRequestSynchronously(preflightRequest, ec);
-    m_inPreflight = false;
-
-    if (ec)
-      return;
-  }
-
-  // Send the actual request.
-  ResourceRequest request(url);
-  request.setHTTPMethod(m_method);
-  request.setAllowHTTPCookies(m_includeCredentials);
-  request.setHTTPHeaderField("Origin", origin);
-
-  if (m_requestHeaders.size() > 0)
-    request.addHTTPHeaderFields(m_requestHeaders);
-
-  if (m_requestEntityBody) {
-    ASSERT(m_method != "GET");
-    ASSERT(m_method != "HEAD");
-    request.setHTTPBody(m_requestEntityBody.release());
-  }
+  m_exceptionCode = 0;
+  m_error = false;
 
   if (m_async) {
-    m_uploadEventsAllowed = true;
-    loadRequestAsynchronously(request);
-    return;
-  }
+    request.setReportUploadProgress(true);
+    setPendingActivity(this);
+    m_loader = ThreadableLoader::create(scriptExecutionContext(), this, request,
+                                        options);
+  } else
+    ThreadableLoader::loadResourceSynchronously(scriptExecutionContext(),
+                                                request, *this, options);
 
-  loadRequestSynchronously(request, ec);
-}
-
-void XMLHttpRequest::handleAsynchronousPreflightResult() {
-  ASSERT(m_inPreflight);
-  ASSERT(m_async);
-
-  m_inPreflight = false;
-
-  KURL url = m_url;
-  url.setUser(String());
-  url.setPass(String());
-
-  ResourceRequest request(url);
-  request.setHTTPMethod(m_method);
-  request.setAllowHTTPCookies(m_includeCredentials);
-  request.setHTTPOrigin(scriptExecutionContext()->securityOrigin()->toString());
-
-  if (m_requestHeaders.size() > 0)
-    request.addHTTPHeaderFields(m_requestHeaders);
-
-  if (m_requestEntityBody) {
-    ASSERT(m_method != "GET");
-    ASSERT(m_method != "HEAD");
-    request.setHTTPBody(m_requestEntityBody.release());
-  }
-
-  m_uploadEventsAllowed = true;
-  loadRequestAsynchronously(request);
-}
-
-void XMLHttpRequest::loadRequestSynchronously(ResourceRequest& request,
-                                              ExceptionCode& ec) {
-  ASSERT(!m_async);
-
-  m_loader = 0;
-  m_exceptionCode = 0;
-  StoredCredentials storedCredentials =
-      (m_sameOriginRequest || m_includeCredentials)
-          ? AllowStoredCredentials
-          : DoNotAllowStoredCredentials;
-
-  ThreadableLoader::loadResourceSynchronously(scriptExecutionContext(), request,
-                                              *this, storedCredentials);
   if (!m_exceptionCode && m_error)
     m_exceptionCode = XMLHttpRequestException::NETWORK_ERR;
   ec = m_exceptionCode;
-}
-
-void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
-  ASSERT(m_async);
-  m_exceptionCode = 0;
-  // SubresourceLoader::create can return null here, for example if we're no
-  // longer attached to a page.
-  // This is true while running onunload handlers.
-  // FIXME: We need to be able to send XMLHttpRequests from onunload,
-  // <http://bugs.webkit.org/show_bug.cgi?id=10904>.
-  // FIXME: Maybe create can return null for other reasons too?
-  LoadCallbacks callbacks =
-      m_inPreflight ? DoNotSendLoadCallbacks : SendLoadCallbacks;
-  StoredCredentials storedCredentials =
-      (m_sameOriginRequest || m_includeCredentials)
-          ? AllowStoredCredentials
-          : DoNotAllowStoredCredentials;
-
-  if (m_upload)
-    request.setReportUploadProgress(true);
-
-  m_loader = ThreadableLoader::create(
-      scriptExecutionContext(), this, request, callbacks, DoNotSniffContent,
-      storedCredentials, DenyCrossOriginRedirect);
-
-  if (m_loader) {
-    // Neither this object nor the JavaScript wrapper should be deleted while
-    // a request is in progress because we need to keep the listeners alive,
-    // and they are referenced by the JavaScript wrapper.
-    setPendingActivity(this);
-
-    // For now we should only balance the nonCached request count for
-    // main-thread XHRs and not
-    // Worker XHRs, as the Cache is not thread-safe.
-    // This will become irrelevant after
-    // https://bugs.webkit.org/show_bug.cgi?id=27165 is resolved.
-    if (!scriptExecutionContext()->isWorkerContext()) {
-      ASSERT(isMainThread());
-      ASSERT(!m_didTellLoaderAboutRequest);
-      cache()->loader()->nonCacheRequestInFlight(m_url);
-      m_didTellLoaderAboutRequest = true;
-    }
-  }
 }
 
 void XMLHttpRequest::abort() {
@@ -1040,11 +844,6 @@ void XMLHttpRequest::didFinishLoading(unsigned long identifier) {
   if (m_error)
     return;
 
-  if (m_inPreflight) {
-    didFinishLoadingPreflight();
-    return;
-  }
-
   if (m_state < HEADERS_RECEIVED)
     changeState(HEADERS_RECEIVED);
 
@@ -1068,18 +867,6 @@ void XMLHttpRequest::didFinishLoading(unsigned long identifier) {
     dropProtection();
 }
 
-void XMLHttpRequest::didFinishLoadingPreflight() {
-  ASSERT(m_inPreflight);
-  ASSERT(!m_sameOriginRequest);
-
-  // FIXME: this can probably be moved to didReceiveResponsePreflight.
-  if (m_async)
-    handleAsynchronousPreflightResult();
-
-  if (m_loader)
-    unsetPendingActivity(this);
-}
-
 void XMLHttpRequest::didSendData(unsigned long long bytesSent,
                                  unsigned long long totalBytesToBeSent) {
   if (!m_upload)
@@ -1096,48 +883,10 @@ void XMLHttpRequest::didSendData(unsigned long long bytesSent,
 }
 
 void XMLHttpRequest::didReceiveResponse(const ResourceResponse& response) {
-  if (m_inPreflight) {
-    didReceiveResponsePreflight(response);
-    return;
-  }
-
-  if (!m_sameOriginRequest) {
-    if (!passesAccessControlCheck(response, m_includeCredentials,
-                                  scriptExecutionContext()->securityOrigin())) {
-      networkError();
-      return;
-    }
-  }
-
   m_response = response;
   m_responseEncoding = extractCharsetFromMediaType(m_mimeTypeOverride);
   if (m_responseEncoding.isEmpty())
     m_responseEncoding = response.textEncodingName();
-}
-
-void XMLHttpRequest::didReceiveResponsePreflight(
-    const ResourceResponse& response) {
-  ASSERT(m_inPreflight);
-  ASSERT(!m_sameOriginRequest);
-
-  if (!passesAccessControlCheck(response, m_includeCredentials,
-                                scriptExecutionContext()->securityOrigin())) {
-    networkError();
-    return;
-  }
-
-  OwnPtr<CrossOriginPreflightResultCacheItem> preflightResult(
-      new CrossOriginPreflightResultCacheItem(m_includeCredentials));
-  if (!preflightResult->parse(response) ||
-      !preflightResult->allowsCrossOriginMethod(m_method) ||
-      !preflightResult->allowsCrossOriginHeaders(m_requestHeaders)) {
-    networkError();
-    return;
-  }
-
-  CrossOriginPreflightResultCache::shared().appendEntry(
-      scriptExecutionContext()->securityOrigin()->toString(), m_url,
-      preflightResult.release());
 }
 
 void XMLHttpRequest::didReceiveAuthenticationCancellation(
@@ -1146,7 +895,7 @@ void XMLHttpRequest::didReceiveAuthenticationCancellation(
 }
 
 void XMLHttpRequest::didReceiveData(const char* data, int len) {
-  if (m_inPreflight || m_error)
+  if (m_error)
     return;
 
   if (m_state < HEADERS_RECEIVED)

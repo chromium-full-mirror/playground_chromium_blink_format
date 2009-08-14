@@ -174,10 +174,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   virtual void didFailRedirectCheck();
   virtual void didReceiveAuthenticationCancellation(const ResourceResponse&);
 
-  // Special versions for the preflight
-  void didReceiveResponsePreflight(const ResourceResponse&);
-  void didFinishLoadingPreflight();
-
   void updateAndDispatchOnProgress(unsigned int len);
 
   String responseMIMEType() const;
@@ -197,16 +193,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   void clearRequest();
 
   void createRequest(ExceptionCode&);
-
-  void makeSameOriginRequest(ExceptionCode&);
-  void makeCrossOriginAccessRequest(ExceptionCode&);
-
-  void makeSimpleCrossOriginAccessRequest(ExceptionCode&);
-  void makeCrossOriginAccessRequestWithPreflight(ExceptionCode&);
-  void handleAsynchronousPreflightResult();
-
-  void loadRequestSynchronously(ResourceRequest&, ExceptionCode&);
-  void loadRequestAsynchronously(ResourceRequest&);
 
   void genericError();
   void networkError();
@@ -271,8 +257,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   bool m_uploadComplete;
 
   bool m_sameOriginRequest;
-  bool m_allowAccess;
-  bool m_inPreflight;
   bool m_didTellLoaderAboutRequest;
 
   // Used for onprogress tracking

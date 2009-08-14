@@ -43,15 +43,35 @@ class ResourceResponse;
 class ScriptExecutionContext;
 class ThreadableLoaderClient;
 
-enum LoadCallbacks { SendLoadCallbacks, DoNotSendLoadCallbacks };
-
-enum ContentSniff { SniffContent, DoNotSniffContent };
-
 enum StoredCredentials { AllowStoredCredentials, DoNotAllowStoredCredentials };
+
+enum CrossOriginRequestPolicy {
+  DenyCrossOriginRequests,
+  UseAccessControl,
+  AllowCrossOriginRequests
+};
 
 enum CrossOriginRedirectPolicy {
   DenyCrossOriginRedirect,
   AllowCrossOriginRedirect
+};
+
+struct ThreadableLoaderOptions {
+  ThreadableLoaderOptions()
+      : sendLoadCallbacks(false),
+        sniffContent(false),
+        allowCredentials(false),
+        forcePreflight(false),
+        crossOriginRequestPolicy(DenyCrossOriginRequests),
+        crossOriginRedirectPolicy(AllowCrossOriginRedirect) {}
+  bool sendLoadCallbacks;
+  bool sniffContent;
+  bool allowCredentials;  // Whether HTTP credentials and cookies are sent with
+                          // the request.
+  bool forcePreflight;    // If AccessControl is used, whether to force a
+                          // preflight.
+  CrossOriginRequestPolicy crossOriginRequestPolicy;
+  CrossOriginRedirectPolicy crossOriginRedirectPolicy;
 };
 
 // Useful for doing loader operations from any thread (not threadsafe,
@@ -61,14 +81,11 @@ class ThreadableLoader : public Noncopyable {
   static void loadResourceSynchronously(ScriptExecutionContext*,
                                         const ResourceRequest&,
                                         ThreadableLoaderClient&,
-                                        StoredCredentials);
+                                        const ThreadableLoaderOptions&);
   static PassRefPtr<ThreadableLoader> create(ScriptExecutionContext*,
                                              ThreadableLoaderClient*,
                                              const ResourceRequest&,
-                                             LoadCallbacks,
-                                             ContentSniff,
-                                             StoredCredentials,
-                                             CrossOriginRedirectPolicy);
+                                             const ThreadableLoaderOptions&);
 
   virtual void cancel() = 0;
   void ref() { refThreadableLoader(); }
