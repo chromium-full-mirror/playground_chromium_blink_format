@@ -29,13 +29,17 @@
 #ifndef SecurityOrigin_h
 #define SecurityOrigin_h
 
+#include <wtf/HashSet.h>
 #include <wtf/RefCounted.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/Threading.h>
 
 #include "PlatformString.h"
+#include "StringHash.h"
 
 namespace WebCore {
+
+typedef HashSet<String, CaseFoldingHash> URLSchemesMap;
 
 class KURL;
 
@@ -130,6 +134,8 @@ class SecurityOrigin : public ThreadSafeShared<SecurityOrigin> {
   bool isSameSchemeHostPort(const SecurityOrigin*) const;
 
   static void registerURLSchemeAsLocal(const String&);
+  static void removeURLSchemeRegisteredAsLocal(const String&);
+  static const URLSchemesMap& localURLSchemes();
   static bool shouldTreatURLAsLocal(const String&);
   static bool shouldTreatURLSchemeAsLocal(const String&);
 
