@@ -162,7 +162,7 @@ JSValue JSActivation::argumentsGetter(ExecState* exec,
     arguments->copyRegisters();
     callFrame->setCalleeArguments(arguments);
   }
-  ASSERT(arguments->isObject(&Arguments::info));
+  ASSERT(arguments->inherits(&Arguments::info));
 
   return arguments;
 }

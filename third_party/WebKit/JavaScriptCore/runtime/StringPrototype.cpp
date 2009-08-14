@@ -320,7 +320,7 @@ JSValue JSC_HOST_CALL stringProtoFuncReplace(ExecState* exec,
   if (callType == CallTypeNone)
     replacementString = replacement.toString(exec);
 
-  if (pattern.isObject(&RegExpObject::info)) {
+  if (pattern.inherits(&RegExpObject::info)) {
     RegExp* reg = asRegExpObject(pattern)->regExp();
     bool global = reg->global();
 
@@ -482,7 +482,7 @@ JSValue JSC_HOST_CALL stringProtoFuncToString(ExecState* exec,
   if (thisValue.isString())
     return thisValue;
 
-  if (thisValue.isObject(&StringObject::info))
+  if (thisValue.inherits(&StringObject::info))
     return asStringObject(thisValue)->internalValue();
 
   return throwError(exec, TypeError);
@@ -595,7 +595,7 @@ JSValue JSC_HOST_CALL stringProtoFuncMatch(ExecState* exec,
   UString u = s;
   RefPtr<RegExp> reg;
   RegExpObject* imp = 0;
-  if (a0.isObject(&RegExpObject::info))
+  if (a0.inherits(&RegExpObject::info))
     reg = asRegExpObject(a0)->regExp();
   else {
     /*
@@ -648,7 +648,7 @@ JSValue JSC_HOST_CALL stringProtoFuncSearch(ExecState* exec,
 
   UString u = s;
   RefPtr<RegExp> reg;
-  if (a0.isObject(&RegExpObject::info))
+  if (a0.inherits(&RegExpObject::info))
     reg = asRegExpObject(a0)->regExp();
   else {
     /*
@@ -706,7 +706,7 @@ JSValue JSC_HOST_CALL stringProtoFuncSplit(ExecState* exec,
   unsigned i = 0;
   int p0 = 0;
   unsigned limit = a1.isUndefined() ? 0xFFFFFFFFU : a1.toUInt32(exec);
-  if (a0.isObject(&RegExpObject::info)) {
+  if (a0.inherits(&RegExpObject::info)) {
     RegExp* reg = asRegExpObject(a0)->regExp();
     if (s.isEmpty() && reg->match(s, 0) >= 0) {
       // empty string matched by regexp -> empty array

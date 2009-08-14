@@ -63,7 +63,7 @@ void Debugger::recompileAllJSFunctions(JSGlobalData* globalData) {
   Heap::iterator heapEnd = globalData->heap.primaryHeapEnd();
   for (Heap::iterator it = globalData->heap.primaryHeapBegin(); it != heapEnd;
        ++it) {
-    if ((*it)->isObject(&JSFunction::info)) {
+    if ((*it)->inherits(&JSFunction::info)) {
       JSFunction* function = asFunction(*it);
       if (!function->body()->isHostFunction())
         functions.append(function);

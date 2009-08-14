@@ -132,7 +132,7 @@ class JSValue {
   bool isString() const;
   bool isGetterSetter() const;
   bool isObject() const;
-  bool isObject(const ClassInfo*) const;
+  bool inherits(const ClassInfo*) const;
 
   // Extracting the value.
   bool getBoolean(bool&) const;

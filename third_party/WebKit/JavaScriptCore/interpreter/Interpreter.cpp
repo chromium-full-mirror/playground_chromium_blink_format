@@ -592,7 +592,7 @@ NEVER_INLINE bool Interpreter::unwindCallFrame(CallFrame*& callFrame,
   // off.
   if (oldCodeBlock->codeType() == FunctionCode &&
       oldCodeBlock->needsFullScopeChain()) {
-    while (!scopeChain->object->isObject(&JSActivation::info))
+    while (!scopeChain->object->inherits(&JSActivation::info))
       scopeChain = scopeChain->pop();
     static_cast<JSActivation*>(scopeChain->object)
         ->copyRegisters(callFrame->optionalCalleeArguments());
