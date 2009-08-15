@@ -43,6 +43,8 @@ class FrameLoadDelegate : public IWebFrameLoadDelegate,
 
   void processWork();
 
+  void resetToConsistentState();
+
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
                                                    void** ppvObject);

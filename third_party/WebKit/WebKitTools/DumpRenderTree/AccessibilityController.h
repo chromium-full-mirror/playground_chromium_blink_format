@@ -46,7 +46,9 @@ class AccessibilityController {
   AccessibilityUIElement rootElement();
   AccessibilityUIElement focusedElement();
 
-  void logFocusEvents();
+  void setLogFocusEvents(bool);
+
+  void resetToConsistentState();
 
  private:
   static JSClassRef getJSClass();

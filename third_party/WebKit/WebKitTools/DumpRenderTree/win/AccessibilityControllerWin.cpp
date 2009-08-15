@@ -39,8 +39,7 @@ using namespace std;
 AccessibilityController::AccessibilityController() : m_focusEventHook(0) {}
 
 AccessibilityController::~AccessibilityController() {
-  if (m_focusEventHook)
-    UnhookWinEvent(m_focusEventHook);
+  setLogFocusEvents(false);
 }
 
 AccessibilityUIElement AccessibilityController::focusedElement() {
@@ -115,8 +114,15 @@ static void CALLBACK logFocusEventProc(HWINEVENTHOOK hWinEventHook,
   printf("Received focus event for object '%S'.\n", name.c_str());
 }
 
-void AccessibilityController::logFocusEvents() {
-  ASSERT(!m_focusEventHook);
+void AccessibilityController::setLogFocusEvents(bool logFocusEvents) {
+  if (!!m_focusEventHook == logFocusEvents)
+    return;
+
+  if (!logFocusEvents) {
+    UnhookWinEvent(m_focusEventHook);
+    m_focusEventHook = 0;
+    return;
+  }
 
   // Ensure that accessibility is initialized for the WebView by querying for
   // the root accessible object.

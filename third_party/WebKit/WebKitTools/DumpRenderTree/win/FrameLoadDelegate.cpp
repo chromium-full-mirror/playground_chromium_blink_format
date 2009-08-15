@@ -191,6 +191,10 @@ void FrameLoadDelegate::processWork() {
     dump();
 }
 
+void FrameLoadDelegate::resetToConsistentState() {
+  m_accessibilityController->resetToConsistentState();
+}
+
 static void CALLBACK processWorkTimer(HWND, UINT, UINT_PTR id, DWORD) {
   ::KillTimer(0, id);
   FrameLoadDelegate* d = g_delegateWaitingOnTimer;
