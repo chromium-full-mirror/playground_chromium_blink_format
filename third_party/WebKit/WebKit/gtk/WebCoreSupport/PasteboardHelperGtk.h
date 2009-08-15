@@ -45,6 +45,7 @@ class PasteboardHelperGtk : public PasteboardHelper {
   virtual GtkClipboard* getPrimary(Frame*) const;
   virtual GtkTargetList* getCopyTargetList(Frame*) const;
   virtual GtkTargetList* getPasteTargetList(Frame*) const;
+  virtual gint getWebViewTargetInfoHtml() const;
 };
 }
 
