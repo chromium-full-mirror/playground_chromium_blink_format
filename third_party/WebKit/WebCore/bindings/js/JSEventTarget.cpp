@@ -43,6 +43,11 @@
 #include "XMLHttpRequest.h"
 #include "XMLHttpRequestUpload.h"
 
+#if ENABLE(EVENTSOURCE)
+#include "EventSource.h"
+#include "JSEventSource.h"
+#endif
+
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
 #include "DOMApplicationCache.h"
 #include "JSDOMApplicationCache.h"
@@ -74,6 +79,11 @@ JSValue toJS(ExecState* exec,
              EventTarget* target) {
   if (!target)
     return jsNull();
+
+#if ENABLE(EVENTSOURCE)
+  if (EventSource* eventSource = target->toEventSource())
+    return toJS(exec, globalObject, eventSource);
+#endif
 
 #if ENABLE(SVG)
   // SVGElementInstance supports both toSVGElementInstance and toNode since so
@@ -140,6 +150,10 @@ EventTarget* toEventTarget(JSC::JSValue value) {
 
   if (value.inherits(&JSDOMWindowShell::s_info))
     return static_cast<JSDOMWindowShell*>(asObject(value))->impl();
+
+#if ENABLE(EVENTSOURCE)
+  CONVERT_TO_EVENT_TARGET(EventSource)
+#endif
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   CONVERT_TO_EVENT_TARGET(DOMApplicationCache)

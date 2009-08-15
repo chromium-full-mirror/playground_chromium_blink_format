@@ -43,6 +43,7 @@ class DOMApplicationCache;
 class DOMWindow;
 class Event;
 class EventListener;
+class EventSource;
 class MessagePort;
 class Node;
 class Notification;
@@ -58,6 +59,7 @@ typedef int ExceptionCode;
 
 class EventTarget {
  public:
+  virtual EventSource* toEventSource();
   virtual MessagePort* toMessagePort();
   virtual Node* toNode();
   virtual DOMWindow* toDOMWindow();

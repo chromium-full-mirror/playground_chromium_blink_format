@@ -38,7 +38,7 @@ namespace WebCore {
               macro(keypress) macro(keyup) macro(load) macro(loadstart) macro(                              \
                   message) macro(mousedown) macro(mousemove) macro(mouseout)                                \
                   macro(mouseover) macro(mouseup) macro(mousewheel) macro(noupdate) macro(                  \
-                      obsolete) macro(offline) macro(online) macro(overflowchanged)                         \
+                      obsolete) macro(offline) macro(online) macro(open) macro(overflowchanged)             \
                       macro(paste) macro(readystatechange) macro(reset) macro(                              \
                           resize) macro(scroll) macro(search) macro(select)                                 \
                           macro(selectstart) macro(storage) macro(submit) macro(                            \
