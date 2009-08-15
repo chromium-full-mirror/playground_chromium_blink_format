@@ -35,8 +35,6 @@ class TemplateExecutable {
  public:
   TemplateExecutable(const SourceCode& source) : m_source(source) {}
 
-  JSObject* parse(ExecState* exec, bool allowDebug = true);
-
   void markAggregate(MarkStack& markStack) { m_node->markAggregate(markStack); }
 
   const UString& sourceURL() const { return m_node->sourceURL(); }
@@ -58,6 +56,8 @@ class EvalExecutable : public TemplateExecutable<EvalNode, EvalCodeBlock>,
  public:
   EvalExecutable(const SourceCode& source)
       : TemplateExecutable<EvalNode, EvalCodeBlock>(source) {}
+
+  JSObject* parse(ExecState* exec, bool allowDebug = true);
 };
 
 class ProgramExecutable
@@ -65,6 +65,8 @@ class ProgramExecutable
  public:
   ProgramExecutable(const SourceCode& source)
       : TemplateExecutable<ProgramNode, ProgramCodeBlock>(source) {}
+
+  JSObject* parse(ExecState* exec, bool allowDebug = true);
 };
 };
 
