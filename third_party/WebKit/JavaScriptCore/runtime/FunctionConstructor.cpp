@@ -76,32 +76,6 @@ CallType FunctionConstructor::getCallData(CallData& callData) {
   return CallTypeHost;
 }
 
-FunctionBodyNode* extractFunctionBody(ProgramNode* program) {
-  if (!program)
-    return 0;
-
-  StatementVector& children = program->children();
-  if (children.size() != 1)
-    return 0;
-
-  StatementNode* exprStatement = children[0];
-  ASSERT(exprStatement);
-  ASSERT(exprStatement->isExprStatement());
-  if (!exprStatement || !exprStatement->isExprStatement())
-    return 0;
-
-  ExpressionNode* funcExpr =
-      static_cast<ExprStatementNode*>(exprStatement)->expr();
-  ASSERT(funcExpr);
-  ASSERT(funcExpr->isFuncExprNode());
-  if (!funcExpr || !funcExpr->isFuncExprNode())
-    return 0;
-
-  FunctionBodyNode* body = static_cast<FuncExprNode*>(funcExpr)->body();
-  ASSERT(body);
-  return body;
-}
-
 // ECMA 15.3.2 The Function Constructor
 JSObject* constructFunction(ExecState* exec,
                             const ArgList& args,
@@ -128,12 +102,10 @@ JSObject* constructFunction(ExecState* exec,
   int errLine;
   UString errMsg;
   SourceCode source = makeSource(program, sourceURL, lineNumber);
-  RefPtr<ProgramNode> programNode =
-      exec->globalData().parser->parse<ProgramNode>(
+  RefPtr<FunctionBodyNode> body =
+      exec->globalData().parser->parseFunctionFromGlobalCode(
           exec, exec->dynamicGlobalObject()->debugger(), source, &errLine,
           &errMsg);
-
-  FunctionBodyNode* body = extractFunctionBody(programNode.get());
   if (!body)
     return throwError(exec, SyntaxError, errMsg, errLine,
                       source.provider()->asID(), source.provider()->url());
@@ -141,7 +113,8 @@ JSObject* constructFunction(ExecState* exec,
   JSGlobalObject* globalObject = exec->lexicalGlobalObject();
   ScopeChain scopeChain(globalObject, globalObject->globalData(),
                         exec->globalThisValue());
-  return new (exec) JSFunction(exec, functionName, body, scopeChain.node());
+  return new (exec)
+      JSFunction(exec, functionName, body.get(), scopeChain.node());
 }
 
 // ECMA 15.3.2 The Function Constructor

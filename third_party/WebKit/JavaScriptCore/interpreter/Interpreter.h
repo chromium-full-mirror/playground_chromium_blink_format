@@ -42,12 +42,12 @@
 namespace JSC {
 
 class CodeBlock;
-class EvalNode;
+class EvalExecutable;
 class FunctionBodyNode;
 class InternalFunction;
 class JSFunction;
 class JSGlobalObject;
-class ProgramNode;
+class ProgramExecutable;
 class Register;
 class ScopeChainNode;
 class SamplingTool;
@@ -94,7 +94,7 @@ class Interpreter : public FastAllocBase {
 
   bool isOpcode(Opcode);
 
-  JSValue execute(ProgramNode*,
+  JSValue execute(ProgramExecutable*,
                   CallFrame*,
                   ScopeChainNode*,
                   JSObject* thisObj,
@@ -106,7 +106,7 @@ class Interpreter : public FastAllocBase {
                   const ArgList& args,
                   ScopeChainNode*,
                   JSValue* exception);
-  JSValue execute(EvalNode* evalNode,
+  JSValue execute(EvalExecutable* evalNode,
                   CallFrame* exec,
                   JSObject* thisObj,
                   ScopeChainNode* scopeChain,
@@ -153,7 +153,7 @@ class Interpreter : public FastAllocBase {
   void endRepeatCall(CallFrameClosure&);
   JSValue execute(CallFrameClosure&, JSValue* exception);
 
-  JSValue execute(EvalNode*,
+  JSValue execute(EvalExecutable*,
                   CallFrame*,
                   JSObject* thisObject,
                   int globalRegisterOffset,

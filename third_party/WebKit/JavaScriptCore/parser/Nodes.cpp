@@ -2427,7 +2427,7 @@ PassRefPtr<FunctionBodyNode> FunctionBodyNode::createNativeThunk(
     JSGlobalData* globalData) {
   RefPtr<FunctionBodyNode> body = new FunctionBodyNode(globalData);
   globalData->parser->arena().reset();
-  body->m_code.set(new CodeBlock(body.get()));
+  body->m_code.set(new NativeCodeBlock(body.get()));
   body->m_jitCode =
       JITCode(JITCode::HostFunction(globalData->jitStubs.ctiNativeCallThunk()));
   return body.release();
@@ -2473,8 +2473,8 @@ void FunctionBodyNode::generateBytecode(ScopeChainNode* scopeChainNode) {
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
-  m_code.set(new CodeBlock(this, FunctionCode, source().provider(),
-                           source().startOffset()));
+  m_code.set(new FunctionCodeBlock(this, FunctionCode, source().provider(),
+                                   source().startOffset()));
 
   OwnPtr<BytecodeGenerator> generator(
       new BytecodeGenerator(this, globalObject->debugger(), scopeChain,
@@ -2502,8 +2502,8 @@ CodeBlock& FunctionBodyNode::bytecodeForExceptionInfoReparse(
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
-  m_code.set(new CodeBlock(this, FunctionCode, source().provider(),
-                           source().startOffset()));
+  m_code.set(new FunctionCodeBlock(this, FunctionCode, source().provider(),
+                                   source().startOffset()));
 
   OwnPtr<BytecodeGenerator> generator(
       new BytecodeGenerator(this, globalObject->debugger(), scopeChain,
