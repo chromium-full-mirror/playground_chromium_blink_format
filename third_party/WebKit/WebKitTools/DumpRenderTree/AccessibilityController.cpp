@@ -66,7 +66,24 @@ void AccessibilityController::makeWindowObject(JSContextRef context,
       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete, exception);
 }
 
+static JSValueRef logFocusEventsCallback(JSContextRef ctx,
+                                         JSObjectRef,
+                                         JSObjectRef thisObject,
+                                         size_t,
+                                         const JSValueRef[],
+                                         JSValueRef*) {
+  AccessibilityController* controller =
+      static_cast<AccessibilityController*>(JSObjectGetPrivate(thisObject));
+  controller->logFocusEvents();
+  return JSValueMakeUndefined(ctx);
+}
+
 JSClassRef AccessibilityController::getJSClass() {
+  static JSStaticFunction staticFunctions[] = {
+      {"logFocusEvents", logFocusEventsCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {0, 0, 0}};
+
   static JSStaticValue staticValues[] = {
       {"focusedElement", getFocusedElementCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
@@ -79,7 +96,7 @@ JSClassRef AccessibilityController::getJSClass() {
                                               "AccessibilityController",
                                               0,
                                               staticValues,
-                                              0,
+                                              staticFunctions,
                                               0,
                                               0,
                                               0,
