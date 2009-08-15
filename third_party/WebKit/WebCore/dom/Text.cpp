@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -38,30 +38,30 @@
 #include "WMLVariables.h"
 #endif
 
+using namespace std;
+
 namespace WebCore {
 
-// DOM Section 1.1.1
+Text::Text(Document* document, const String& data)
+    : CharacterData(document, data, CreateText) {}
 
-Text::Text(Document* document, const String& text)
-    : CharacterData(document, text, true) {}
-
-Text::Text(Document* document) : CharacterData(document, true) {}
-
-Text::~Text() {}
+PassRefPtr<Text> Text::create(Document* document, const String& data) {
+  return adoptRef(new Text(document, data));
+}
 
 PassRefPtr<Text> Text::splitText(unsigned offset, ExceptionCode& ec) {
   ec = 0;
 
   // INDEX_SIZE_ERR: Raised if the specified offset is negative or greater than
   // the number of 16-bit units in data.
-  if (offset > m_data->length()) {
+  if (offset > length()) {
     ec = INDEX_SIZE_ERR;
     return 0;
   }
 
-  RefPtr<StringImpl> oldStr = m_data;
-  RefPtr<Text> newText = createNew(oldStr->substring(offset));
-  m_data = oldStr->substring(0, offset);
+  RefPtr<StringImpl> oldStr = dataImpl();
+  RefPtr<Text> newText = virtualCreate(oldStr->substring(offset));
+  setDataImpl(oldStr->substring(0, offset));
 
   dispatchModifiedEvent(oldStr.get());
 
@@ -74,7 +74,7 @@ PassRefPtr<Text> Text::splitText(unsigned offset, ExceptionCode& ec) {
     document()->textNodeSplit(this);
 
   if (renderer())
-    toRenderText(renderer())->setText(m_data);
+    toRenderText(renderer())->setText(dataImpl());
 
   return newText.release();
 }
@@ -193,7 +193,7 @@ Node::NodeType Text::nodeType() const {
 }
 
 PassRefPtr<Node> Text::cloneNode(bool /*deep*/) {
-  return document()->createTextNode(m_data);
+  return create(document(), data());
 }
 
 bool Text::rendererIsNeeded(RenderStyle* style) {
@@ -246,16 +246,16 @@ RenderObject* Text::createRenderer(RenderArena* arena, RenderStyle*) {
       && !parentNode()->hasTagName(SVGNames::foreignObjectTag)
 #endif
           )
-    return new (arena) RenderSVGInlineText(this, m_data);
+    return new (arena) RenderSVGInlineText(this, dataImpl());
 #endif
 
-  return new (arena) RenderText(this, m_data);
+  return new (arena) RenderText(this, dataImpl());
 }
 
 void Text::attach() {
 #if ENABLE(WML)
   if (document()->isWMLDocument() && !containsOnlyWhitespace()) {
-    String text = m_data;
+    String text = data();
     ASSERT(!text.isEmpty());
 
     text = substituteVariableReferences(text, document());
@@ -278,7 +278,7 @@ void Text::recalcStyle(StyleChange change) {
   if (needsStyleRecalc()) {
     if (renderer()) {
       if (renderer()->isText())
-        toRenderText(renderer())->setText(m_data);
+        toRenderText(renderer())->setText(dataImpl());
     } else {
       if (attached())
         detach();
@@ -288,41 +288,42 @@ void Text::recalcStyle(StyleChange change) {
   setNeedsStyleRecalc(NoStyleChange);
 }
 
-// DOM Section 1.1.1
 bool Text::childTypeAllowed(NodeType) {
   return false;
 }
 
-PassRefPtr<Text> Text::createNew(PassRefPtr<StringImpl> string) {
-  return new Text(document(), string);
+PassRefPtr<Text> Text::virtualCreate(const String& data) {
+  return create(document(), data);
 }
 
-PassRefPtr<Text> Text::createWithLengthLimit(Document* doc,
-                                             const String& text,
+PassRefPtr<Text> Text::createWithLengthLimit(Document* document,
+                                             const String& data,
                                              unsigned& charsLeft,
                                              unsigned maxChars) {
-  if (charsLeft == text.length() && charsLeft <= maxChars) {
+  unsigned dataLength = data.length();
+
+  if (charsLeft == dataLength && charsLeft <= maxChars) {
     charsLeft = 0;
-    return new Text(doc, text);
+    return create(document, data);
   }
 
-  unsigned start = text.length() - charsLeft;
-  unsigned end = start + std::min(charsLeft, maxChars);
+  unsigned start = dataLength - charsLeft;
+  unsigned end = start + min(charsLeft, maxChars);
 
-  // check we are not on an unbreakable boundary
-  TextBreakIterator* it =
-      characterBreakIterator(text.characters(), text.length());
-  if (end < text.length() && !isTextBreak(it, end))
+  // Check we are not on an unbreakable boundary.
+  TextBreakIterator* it = characterBreakIterator(data.characters(), dataLength);
+  if (end < dataLength && !isTextBreak(it, end))
     end = textBreakPreceding(it, end);
 
-  // maxChars of unbreakable characters could lead to infinite loop
+  // If we have maxChars of unbreakable characters the above could lead to
+  // an infinite loop.
+  // FIXME: It would be better to just have the old value of end before calling
+  // textBreakPreceding rather than this, because this exceeds the length limit.
   if (end <= start)
-    end = text.length();
+    end = dataLength;
 
-  String nodeText = text.substring(start, end - start);
-  charsLeft = text.length() - end;
-
-  return new Text(doc, nodeText);
+  charsLeft = dataLength - end;
+  return create(document, data.substring(start, end - start));
 }
 
 #ifndef NDEBUG
@@ -335,7 +336,7 @@ void Text::formatForDebugger(char* buffer, unsigned length) const {
     result += s;
   }
 
-  s = nodeValue();
+  s = data();
   if (s.length() > 0) {
     if (result.length() > 0)
       result += "; ";

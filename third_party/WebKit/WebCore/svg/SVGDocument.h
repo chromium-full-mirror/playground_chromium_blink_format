@@ -34,12 +34,10 @@ class SVGSVGElement;
 class SVGDocument : public Document {
  public:
   static PassRefPtr<SVGDocument> create(Frame* frame) {
-    return new SVGDocument(frame);
+    return adoptRef(new SVGDocument(frame));
   }
 
   virtual ~SVGDocument();
-
-  virtual bool isSVGDocument() const { return true; }
 
   SVGSVGElement* rootElement() const;
 
@@ -51,10 +49,12 @@ class SVGDocument : public Document {
   void startPan(const FloatPoint& start);
   void updatePan(const FloatPoint& pos) const;
 
-  virtual bool childShouldCreateRenderer(Node*) const;
-
  private:
   SVGDocument(Frame*);
+
+  virtual bool isSVGDocument() const { return true; }
+
+  virtual bool childShouldCreateRenderer(Node*) const;
 
   FloatPoint m_translate;
 };

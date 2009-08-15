@@ -342,12 +342,12 @@ static inline RefPtr<DocumentFragment> createFragmentFromSource(
     const String& sourceString,
     const String& sourceMIMEType,
     Document* outputDoc) {
-  RefPtr<DocumentFragment> fragment = new DocumentFragment(outputDoc);
+  RefPtr<DocumentFragment> fragment = DocumentFragment::create(outputDoc);
 
   if (sourceMIMEType == "text/html")
     parseHTMLDocumentFragment(sourceString, fragment.get());
   else if (sourceMIMEType == "text/plain")
-    fragment->addChild(new Text(outputDoc, sourceString));
+    fragment->addChild(Text::create(outputDoc, sourceString));
   else {
     bool successfulParse = parseXMLDocumentFragment(
         sourceString, fragment.get(), outputDoc->documentElement());

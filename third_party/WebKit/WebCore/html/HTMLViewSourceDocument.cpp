@@ -250,7 +250,7 @@ void HTMLViewSourceDocument::addLine(const String& className) {
 
 #ifdef DEBUG_LINE_NUMBERS
   RefPtr<Text> lineNumberText =
-      new Text(this, String::number(tokenizer()->lineNumber() + 1) + " ");
+      Text::create(this, String::number(tokenizer()->lineNumber() + 1) + " ");
   td->addChild(lineNumberText);
   lineNumberText->attach();
 #endif
@@ -282,7 +282,7 @@ void HTMLViewSourceDocument::addText(const String& text,
     }
     if (m_current == m_tbody)
       addLine(className);
-    RefPtr<Text> t = new Text(this, substring);
+    RefPtr<Text> t = Text::create(this, substring);
     m_current->addChild(t);
     t->attach();
     if (i < size - 1)

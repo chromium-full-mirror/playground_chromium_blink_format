@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -31,17 +31,13 @@
 
 namespace WebCore {
 
-CharacterData::CharacterData(Document* doc, bool isText)
-    : Node(doc, false, false, isText), m_data(StringImpl::empty()) {}
-
 CharacterData::CharacterData(Document* document,
                              const String& text,
-                             bool isText)
-    : Node(document, false, false, isText) {
-  m_data = text.impl() ? text.impl() : StringImpl::empty();
+                             ConstructionType type)
+    : Node(document, type),
+      m_data(text.impl() ? text.impl() : StringImpl::empty()) {
+  ASSERT(type == CreateOther || type == CreateText);
 }
-
-CharacterData::~CharacterData() {}
 
 void CharacterData::setData(const String& data, ExceptionCode&) {
   StringImpl* dataImpl = data.impl() ? data.impl() : StringImpl::empty();

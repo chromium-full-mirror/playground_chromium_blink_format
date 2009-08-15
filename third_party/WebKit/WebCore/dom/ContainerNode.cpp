@@ -875,17 +875,17 @@ static void dispatchChildInsertionEvents(Node* child, ExceptionCode& ec) {
   ASSERT(!eventDispatchForbidden());
 
   RefPtr<Node> c = child;
-  DocPtr<Document> doc = child->document();
+  RefPtr<Document> document = child->document();
 
   if (c->parentNode() && c->parentNode()->inDocument())
     c->insertedIntoDocument();
   else
     c->insertedIntoTree(true);
 
-  doc->incDOMTreeVersion();
+  document->incDOMTreeVersion();
 
   if (c->parentNode() &&
-      doc->hasListenerType(Document::DOMNODEINSERTED_LISTENER)) {
+      document->hasListenerType(Document::DOMNODEINSERTED_LISTENER)) {
     ec = 0;
     c->dispatchMutationEvent(eventNames().DOMNodeInsertedEvent, true,
                              c->parentNode(), String(), String(), ec);
@@ -895,7 +895,8 @@ static void dispatchChildInsertionEvents(Node* child, ExceptionCode& ec) {
 
   // dispatch the DOMNodeInsertedIntoDocument event to all descendants
   if (c->inDocument() &&
-      doc->hasListenerType(Document::DOMNODEINSERTEDINTODOCUMENT_LISTENER))
+      document->hasListenerType(
+          Document::DOMNODEINSERTEDINTODOCUMENT_LISTENER)) {
     for (; c; c = c->traverseNextNode(child)) {
       ec = 0;
       c->dispatchMutationEvent(eventNames().DOMNodeInsertedIntoDocumentEvent,
@@ -903,21 +904,22 @@ static void dispatchChildInsertionEvents(Node* child, ExceptionCode& ec) {
       if (ec)
         return;
     }
+  }
 }
 
 static void dispatchChildRemovalEvents(Node* child, ExceptionCode& ec) {
   RefPtr<Node> c = child;
-  DocPtr<Document> doc = child->document();
+  RefPtr<Document> document = child->document();
 
   // update auxiliary doc info (e.g. iterators) to note that node is being
   // removed
-  doc->nodeWillBeRemoved(child);
+  document->nodeWillBeRemoved(child);
 
-  doc->incDOMTreeVersion();
+  document->incDOMTreeVersion();
 
   // dispatch pre-removal mutation events
   if (c->parentNode() &&
-      doc->hasListenerType(Document::DOMNODEREMOVED_LISTENER)) {
+      document->hasListenerType(Document::DOMNODEREMOVED_LISTENER)) {
     ec = 0;
     c->dispatchMutationEvent(eventNames().DOMNodeRemovedEvent, true,
                              c->parentNode(), String(), String(), ec);
@@ -927,7 +929,7 @@ static void dispatchChildRemovalEvents(Node* child, ExceptionCode& ec) {
 
   // dispatch the DOMNodeRemovedFromDocument event to all descendants
   if (c->inDocument() &&
-      doc->hasListenerType(Document::DOMNODEREMOVEDFROMDOCUMENT_LISTENER))
+      document->hasListenerType(Document::DOMNODEREMOVEDFROMDOCUMENT_LISTENER))
     for (; c; c = c->traverseNextNode(child)) {
       ec = 0;
       c->dispatchMutationEvent(eventNames().DOMNodeRemovedFromDocumentEvent,
