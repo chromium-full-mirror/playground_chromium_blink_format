@@ -120,7 +120,6 @@ void InspectorController::resourceRetrievedByXMLHttpRequest(
     unsigned long identifier,
     JSC::UString& sourceString) {}
 
-void InspectorController::inspectedWindowScriptObjectCleared(Frame* frame) {}
 void InspectorController::startGroup(MessageSource source,
                                      JSC::ExecState* exec,
                                      const JSC::ArgList& arguments,

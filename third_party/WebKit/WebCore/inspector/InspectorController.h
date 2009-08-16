@@ -230,7 +230,6 @@ class InspectorController
   void mouseDidMoveOverElement(const HitTestResult&, unsigned modifierFlags);
   void handleMousePressOnNode(Node*);
 
-  void inspectedWindowScriptObjectCleared(Frame*);
   void windowScriptObjectAvailable();
 
   void setFrontendProxyObject(ScriptState* state,

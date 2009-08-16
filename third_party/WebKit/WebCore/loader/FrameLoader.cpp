@@ -5529,8 +5529,6 @@ void FrameLoader::dispatchWindowObjectAvailable() {
   m_client->windowObjectCleared();
 
   if (Page* page = m_frame->page()) {
-    if (InspectorController* inspector = page->inspectorController())
-      inspector->inspectedWindowScriptObjectCleared(m_frame);
     if (InspectorController* inspector = page->parentInspectorController())
       inspector->windowScriptObjectAvailable();
   }

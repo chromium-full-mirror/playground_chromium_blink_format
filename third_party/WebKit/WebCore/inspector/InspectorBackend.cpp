@@ -326,9 +326,9 @@ void InspectorBackend::stepOutOfFunctionInDebugger() {
 
 #endif
 
-void InspectorBackend::getChildNodes(long callId, long elementId) {
+void InspectorBackend::getChildNodes(long callId, long nodeId) {
   if (m_inspectorController)
-    m_inspectorController->domAgent()->getChildNodes(callId, elementId);
+    m_inspectorController->domAgent()->getChildNodes(callId, nodeId);
 }
 
 void InspectorBackend::setAttribute(long callId,
@@ -348,11 +348,10 @@ void InspectorBackend::removeAttribute(long callId,
 }
 
 void InspectorBackend::setTextNodeValue(long callId,
-                                        long elementId,
+                                        long nodeId,
                                         const String& value) {
   if (m_inspectorController)
-    m_inspectorController->domAgent()->setTextNodeValue(callId, elementId,
-                                                        value);
+    m_inspectorController->domAgent()->setTextNodeValue(callId, nodeId, value);
 }
 
 void InspectorBackend::highlight(long nodeId) {
