@@ -42,9 +42,12 @@ class TemplateExecutable {
   CodeBlockType& bytecode(ScopeChainNode* scopeChainNode) {
     return m_node->bytecode(scopeChainNode);
   }
+
+#if ENABLE(JIT)
   JITCode& jitCode(ScopeChainNode* scopeChainNode) {
     return m_node->jitCode(scopeChainNode);
   }
+#endif
 
  protected:
   RefPtr<ASTNodeType> m_node;
