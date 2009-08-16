@@ -40,7 +40,7 @@ class WMLGoElement : public WMLTaskElement {
   void deregisterPostfieldElement(WMLPostfieldElement*);
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual void executeTask(Event*);
+  virtual void executeTask();
 
  private:
   void preparePOSTRequest(ResourceRequest&,

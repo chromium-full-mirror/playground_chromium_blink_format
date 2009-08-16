@@ -32,7 +32,7 @@ class WMLPrevElement : public WMLTaskElement {
   WMLPrevElement(const QualifiedName& tagName, Document*);
   virtual ~WMLPrevElement();
 
-  virtual void executeTask(Event*);
+  virtual void executeTask();
 };
 }
 
