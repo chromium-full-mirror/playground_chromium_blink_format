@@ -70,11 +70,11 @@ struct FillLayer {
     m_image = i;
     m_imageSet = true;
   }
-  void setXPosition(const Length& l) {
+  void setXPosition(Length l) {
     m_xPosition = l;
     m_xPosSet = true;
   }
-  void setYPosition(const Length& l) {
+  void setYPosition(Length l) {
     m_yPosition = l;
     m_yPosSet = true;
   }
@@ -98,7 +98,7 @@ struct FillLayer {
     m_composite = c;
     m_compositeSet = true;
   }
-  void setSize(const LengthSize& b) {
+  void setSize(LengthSize b) {
     m_size = b;
     m_sizeSet = true;
   }
