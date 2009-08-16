@@ -609,8 +609,8 @@ class Interpreter {
         return true;
 
       resetMatches(term, context);
-      freeParenthesesDisjunctionContext(context);
       popParenthesesDisjunctionContext(backTrack);
+      freeParenthesesDisjunctionContext(context);
     }
 
     return false;
@@ -944,8 +944,8 @@ class Interpreter {
           }
         } else {
           resetMatches(term, context);
-          freeParenthesesDisjunctionContext(context);
           popParenthesesDisjunctionContext(backTrack);
+          freeParenthesesDisjunctionContext(context);
         }
 
         if (backTrack->matchAmount) {
@@ -987,8 +987,8 @@ class Interpreter {
 
           // pop a match off the stack
           resetMatches(term, context);
-          freeParenthesesDisjunctionContext(context);
           popParenthesesDisjunctionContext(backTrack);
+          freeParenthesesDisjunctionContext(context);
         }
 
         return false;
