@@ -36,7 +36,7 @@
 #include <wtf/PassOwnPtr.h>
 #include <wtf/Threading.h>
 
-using std::min;
+using namespace std;
 
 namespace WebCore {
 
@@ -140,7 +140,7 @@ OSStatus TextCodecMac::decode(const unsigned char* inputBuffer,
     // available.
     ASSERT(m_numBufferedBytes < sizeof(m_bufferedBytes));
     const int spaceInBuffer = sizeof(m_bufferedBytes) - m_numBufferedBytes;
-    const int bytesToPutInBuffer = MIN(spaceInBuffer, inputBufferLength);
+    const int bytesToPutInBuffer = min(spaceInBuffer, inputBufferLength);
     ASSERT(bytesToPutInBuffer != 0);
     memcpy(m_bufferedBytes + m_numBufferedBytes, inputBuffer,
            bytesToPutInBuffer);
