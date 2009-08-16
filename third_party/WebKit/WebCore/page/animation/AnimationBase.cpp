@@ -354,10 +354,20 @@ class PropertyWrapperShadow : public PropertyWrapperGetter<ShadowData*> {
     ShadowData* shadowA = (a->*m_getter)();
     ShadowData* shadowB = (b->*m_getter)();
 
-    if ((!shadowA && shadowB) || (shadowA && !shadowB))
-      return false;
-    if (shadowA && shadowB && (*shadowA != *shadowB))
-      return false;
+    while (true) {
+      if (!shadowA && !shadowB)  // end of both lists
+        return true;
+
+      if (!shadowA || !shadowB)  // end of just one of the lists
+        return false;
+
+      if (*shadowA != *shadowB)
+        return false;
+
+      shadowA = shadowA->next;
+      shadowB = shadowB->next;
+    }
+
     return true;
   }
 
@@ -370,12 +380,22 @@ class PropertyWrapperShadow : public PropertyWrapperGetter<ShadowData*> {
     ShadowData* shadowB = (b->*m_getter)();
     ShadowData defaultShadowData(0, 0, 0, 0, Normal, Color::transparent);
 
-    if (!shadowA)
-      shadowA = &defaultShadowData;
-    if (!shadowB)
-      shadowB = &defaultShadowData;
+    ShadowData* newShadowData = 0;
 
-    (dst->*m_setter)(blendFunc(anim, shadowA, shadowB, progress), false);
+    while (shadowA || shadowB) {
+      ShadowData* srcShadow = shadowA ? shadowA : &defaultShadowData;
+      ShadowData* dstShadow = shadowB ? shadowB : &defaultShadowData;
+
+      if (!newShadowData)
+        newShadowData = blendFunc(anim, srcShadow, dstShadow, progress);
+      else
+        newShadowData->next = blendFunc(anim, srcShadow, dstShadow, progress);
+
+      shadowA = shadowA ? shadowA->next : 0;
+      shadowB = shadowB ? shadowB->next : 0;
+    }
+
+    (dst->*m_setter)(newShadowData, false);
   }
 
  private:
