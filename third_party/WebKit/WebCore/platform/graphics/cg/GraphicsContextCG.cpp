@@ -28,14 +28,15 @@
 #include "config.h"
 #include "GraphicsContext.h"
 
-#include "TransformationMatrix.h"
 #include "FloatConversion.h"
-#include "GraphicsContextPrivate.h"
 #include "GraphicsContextPlatformPrivateCG.h"
+#include "GraphicsContextPrivate.h"
 #include "ImageBuffer.h"
 #include "KURL.h"
 #include "Path.h"
 #include "Pattern.h"
+#include "TransformationMatrix.h"
+
 #include <CoreGraphics/CGBitmapContext.h>
 #include <CoreGraphics/CGPDFContext.h>
 #include <wtf/MathExtras.h>
@@ -228,7 +229,7 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
     if (patWidth == 1)
       patternOffset = 1.0f;
     else {
-      bool evenNumberOfSegments = numSegments % 2 == 0;
+      bool evenNumberOfSegments = !(numSegments % 2);
       if (remainder)
         evenNumberOfSegments = !evenNumberOfSegments;
       if (evenNumberOfSegments) {
@@ -350,7 +351,7 @@ void GraphicsContext::strokeArc(const IntRect& rect,
     if (patWidth == 1)
       patternOffset = 1.0f;
     else {
-      bool evenNumberOfSegments = numSegments % 2 == 0;
+      bool evenNumberOfSegments = !(numSegments % 2);
       if (remainder)
         evenNumberOfSegments = !evenNumberOfSegments;
       if (evenNumberOfSegments) {
@@ -954,9 +955,9 @@ FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& rect) {
   deviceLowerRight.y = roundf(deviceLowerRight.y);
 
   // Don't let the height or width round to 0 unless either was originally 0
-  if (deviceOrigin.y == deviceLowerRight.y && rect.height() != 0)
+  if (deviceOrigin.y == deviceLowerRight.y && rect.height())
     deviceLowerRight.y += 1;
-  if (deviceOrigin.x == deviceLowerRight.x && rect.width() != 0)
+  if (deviceOrigin.x == deviceLowerRight.x && rect.width())
     deviceLowerRight.x += 1;
 
   FloatPoint roundedOrigin =
