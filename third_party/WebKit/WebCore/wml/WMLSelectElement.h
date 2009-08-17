@@ -93,6 +93,8 @@ class WMLSelectElement : public WMLFormControlElement, public SelectElement {
   void scrollToSelection();
   void selectInitialOptions();
 
+  bool initialized() const { return m_initialized; }
+
  private:
   virtual void insertedIntoTree(bool);
 
@@ -112,6 +114,7 @@ class WMLSelectElement : public WMLFormControlElement, public SelectElement {
   String ivalue() const;
 
   SelectElementData m_data;
+  bool m_initialized;
   Vector<unsigned> m_defaultOptionIndices;
 };
 }
