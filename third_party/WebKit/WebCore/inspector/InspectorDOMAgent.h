@@ -66,7 +66,7 @@ class InspectorDOMAgent : public EventListener {
   void setTextNodeValue(long callId, long nodeId, const String& value);
 
   // Methods called from the InspectorController.
-  void setDocument(Document* document);
+  bool setDocument(Document* document);
 
   Node* nodeForId(long nodeId);
   long idForNode(Node* node);

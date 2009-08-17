@@ -355,6 +355,8 @@ class InspectorController
   ScriptValue wrapObject(const ScriptValue& object);
   ScriptValue unwrapObject(const String& objectId);
 
+  void resetInjectedScript();
+
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   void startUserInitiatedProfilingSoon();
   void toggleRecordButton(bool);

@@ -617,10 +617,7 @@ void InspectorController::close() {
 
   m_frontend.set(0);
   m_injectedScriptObj = ScriptObject();
-  if (m_domAgent) {
-    m_domAgent->setDocument(0);
-    m_domAgent = 0;
-  }
+  m_domAgent = 0;
   m_scriptState = 0;
 }
 
@@ -678,8 +675,8 @@ void InspectorController::populateScriptObjects() {
     (*it)->bind(m_frontend.get());
 #endif
 
-  if (m_domAgent)
-    m_domAgent->setDocument(m_inspectedPage->mainFrame()->document());
+  if (m_domAgent->setDocument(m_inspectedPage->mainFrame()->document()))
+    resetInjectedScript();
   m_frontend->populateInterface();
 }
 
@@ -770,8 +767,9 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
       }
     }
 
-    if (m_domAgent)
-      m_domAgent->setDocument(m_inspectedPage->mainFrame()->document());
+    if (m_domAgent &&
+        m_domAgent->setDocument(m_inspectedPage->mainFrame()->document()))
+      resetInjectedScript();
   }
 
   for (Frame* frame = loader->frame(); frame;
@@ -1559,7 +1557,7 @@ ScriptValue InspectorController::wrapObject(
     m_idToConsoleObject.set(objectId, quarantinedObject);
 
     ScriptFunctionCall function(m_scriptState, m_injectedScriptObj,
-                                "_createProxyObject");
+                                "createProxyObject");
     function.appendArgument(quarantinedObject);
     function.appendArgument(objectId);
     ScriptValue wrapper = function.call();
@@ -1574,6 +1572,11 @@ ScriptValue InspectorController::unwrapObject(const String& objectId) {
   if (it != m_idToConsoleObject.end())
     return it->second;
   return ScriptValue();
+}
+
+void InspectorController::resetInjectedScript() {
+  ScriptFunctionCall function(m_scriptState, m_injectedScriptObj, "reset");
+  function.call();
 }
 
 }  // namespace WebCore
