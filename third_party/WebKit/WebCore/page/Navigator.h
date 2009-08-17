@@ -57,6 +57,11 @@ class Navigator : public NavigatorBase, public RefCounted<Navigator> {
   // This is used for GC marking.
   Geolocation* optionalGeolocation() const { return m_geolocation.get(); }
 
+#if ENABLE(DOM_STORAGE)
+  // Relinquishes the storage lock, if one exists.
+  void getStorageUpdates();
+#endif
+
  private:
   Navigator(Frame*);
   Frame* m_frame;

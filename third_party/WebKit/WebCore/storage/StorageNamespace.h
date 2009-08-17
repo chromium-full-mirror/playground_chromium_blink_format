@@ -49,6 +49,7 @@ class StorageNamespace : public RefCounted<StorageNamespace> {
   virtual PassRefPtr<StorageArea> storageArea(SecurityOrigin*) = 0;
   virtual PassRefPtr<StorageNamespace> copy() = 0;
   virtual void close() = 0;
+  virtual void unlock() = 0;
 };
 
 }  // namespace WebCore
