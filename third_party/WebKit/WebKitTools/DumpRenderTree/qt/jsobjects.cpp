@@ -27,19 +27,20 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <jsobjects.h>
-#include <qwebpage.h>
-#include <qwebhistory.h>
-#include <qwebframe.h>
-#include <qwebsecurityorigin.h>
-#include <qwebdatabase.h>
-#include <qevent.h>
+
+#include "DumpRenderTree.h"
+#include "WorkQueue.h"
+#include "WorkQueueItem.h"
+
 #include <qapplication.h>
 #include <qevent.h>
 #include <qtimer.h>
+#include <qwebdatabase.h>
+#include <qwebframe.h>
+#include <qwebhistory.h>
+#include <qwebpage.h>
+#include <qwebsecurityorigin.h>
 
-#include "DumpRenderTree.h"
-#include "WorkQueueItem.h"
-#include "WorkQueue.h"
 extern void qt_dump_editing_callbacks(bool b);
 extern void qt_dump_resource_load_callbacks(bool b);
 extern void qt_drt_setJavaScriptProfilingEnabled(QWebFrame*, bool enabled);
@@ -242,9 +243,8 @@ void LayoutTestController::timerEvent(QTimerEvent* ev) {
   if (ev->timerId() == m_timeoutTimer.timerId()) {
     qDebug() << ">>>>>>>>>>>>> timeout";
     notifyDone();
-  } else {
+  } else
     QObject::timerEvent(ev);
-  }
 }
 
 QString LayoutTestController::encodeHostName(const QString& host) {
@@ -425,9 +425,8 @@ void EventSender::keyDown(const QString& string, const QStringList& modifiers) {
       s = QString();
       code = Qt::Key_Home;
       modifs = 0;
-    } else {
+    } else
       code = string.unicode()->toUpper().unicode();
-    }
   } else {
     qDebug() << ">>>>>>>>> keyDown" << string;
     // map special keycode strings used by the tests to something that works for
@@ -514,13 +513,13 @@ void TextInputController::doCommand(const QString& command) {
     keycode = Qt::Key_Home;
   } else if (command == "moveToBeginningOfLine:") {
     keycode = Qt::Key_Home;
-    //     } else if(command =="moveToBeginningOfParagraph:") {
+    //     } else if (command =="moveToBeginningOfParagraph:") {
   } else if (command == "moveToEndOfDocument:") {
     modifiers |= Qt::ControlModifier;
     keycode = Qt::Key_End;
   } else if (command == "moveToEndOfLine:") {
     keycode = Qt::Key_End;
-    //     } else if(command =="moveToEndOfParagraph:") {
+    //     } else if (command =="moveToEndOfParagraph:") {
   } else if (command == "moveUp:") {
     keycode = Qt::Key_Up;
   } else if (command == "moveUpAndModifySelection:") {
