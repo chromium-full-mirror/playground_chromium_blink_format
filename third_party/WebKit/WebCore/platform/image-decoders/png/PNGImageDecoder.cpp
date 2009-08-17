@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.
- * Copyright (C) 2007-2009 Torch Mobile, Inc.
  *
  * Portions are Copyright (C) 2001 mozilla.org
  *
@@ -237,9 +236,6 @@ void PNGImageDecoder::headerAvailable() {
       longjmp(png->jmpbuf, 1);
       return;
     }
-#if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
-    prepareScaleDataIfNecessary();
-#endif
   }
 
   int bitDepth, colorType, interlaceType, compressionType, filterType, channels;
@@ -313,14 +309,7 @@ void PNGImageDecoder::rowAvailable(unsigned char* rowBuffer,
   // Initialize the framebuffer if needed.
   RGBA32Buffer& buffer = m_frameBufferCache[0];
   if (buffer.status() == RGBA32Buffer::FrameEmpty) {
-#if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
-    int width = m_scaled ? m_scaledColumns.size() : size().width();
-    int height = m_scaled ? m_scaledRows.size() : size().height();
-#else
-    int width = size().width();
-    int height = size().height();
-#endif
-    if (!buffer.setSize(width, height)) {
+    if (!buffer.setSize(size().width(), size().height())) {
       static_cast<PNGImageDecoder*>(png_get_progressive_ptr(reader()->pngPtr()))
           ->decodingFailed();
       longjmp(reader()->pngPtr()->jmpbuf, 1);
@@ -379,28 +368,9 @@ void PNGImageDecoder::rowAvailable(unsigned char* rowBuffer,
   } else
     row = rowBuffer;
 
-// Copy the data into our buffer.
-#if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
-  if (m_scaled) {
-    int destY = scaledY(rowIndex);
-    if (destY < 0)
-      return;
-    int columns = m_scaledColumns.size();
-    bool sawAlpha = buffer.hasAlpha();
-    for (int x = 0; x < columns; ++x) {
-      png_bytep pixel = row + m_scaledColumns[x] * 4;
-      unsigned alpha = pixel[3];
-      buffer.setRGBA(x, destY, pixel[0], pixel[1], pixel[2], alpha);
-      if (!sawAlpha && alpha < 255) {
-        sawAlpha = true;
-        buffer.setHasAlpha(true);
-      }
-    }
-    return;
-  }
-#endif
+  // Copy the data into our buffer.
   int width = size().width();
-  bool sawAlpha = buffer.hasAlpha();
+  bool sawAlpha = false;
   for (int x = 0; x < width; x++) {
     unsigned red = *row++;
     unsigned green = *row++;
@@ -412,7 +382,6 @@ void PNGImageDecoder::rowAvailable(unsigned char* rowBuffer,
       buffer.setHasAlpha(true);
     }
   }
-#endif
 }
 
 void pngComplete(png_structp png, png_infop info) {
