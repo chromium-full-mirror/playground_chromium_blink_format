@@ -120,7 +120,7 @@ void WebCoreSynchronousLoader::run() {
     g_main_loop_run(m_mainLoop);
 }
 
-static void cleanupGioOperation(ResourceHandleInternal* handle);
+static void cleanupGioOperation(ResourceHandle* handle, bool isDestroying);
 static bool startData(ResourceHandle* handle, String urlString);
 static bool startGio(ResourceHandle* handle, KURL url);
 
@@ -129,8 +129,6 @@ ResourceHandleInternal::~ResourceHandleInternal() {
     g_object_unref(m_msg);
     m_msg = 0;
   }
-
-  cleanupGioOperation(this);
 
   if (m_idleHandler) {
     g_source_remove(m_idleHandler);
@@ -142,6 +140,8 @@ ResourceHandle::~ResourceHandle() {
   if (d->m_msg)
     g_signal_handlers_disconnect_matched(d->m_msg, G_SIGNAL_MATCH_DATA, 0, 0, 0,
                                          0, this);
+
+  cleanupGioOperation(this, true);
 }
 
 static void fillResponseFromMessage(SoupMessage* msg,
@@ -645,7 +645,10 @@ void ResourceHandle::loadResourceSynchronously(
 
 // GIO-based loader
 
-static void cleanupGioOperation(ResourceHandleInternal* d) {
+static void cleanupGioOperation(ResourceHandle* handle,
+                                bool isDestroying = false) {
+  ResourceHandleInternal* d = handle->getInternal();
+
   if (d->m_gfile) {
     g_object_set_data(G_OBJECT(d->m_gfile), "webkit-resource", 0);
     g_object_unref(d->m_gfile);
@@ -667,10 +670,13 @@ static void cleanupGioOperation(ResourceHandleInternal* d) {
     g_free(d->m_buffer);
     d->m_buffer = 0;
   }
+
+  if (!isDestroying)
+    handle->deref();
 }
 
 static void closeCallback(GObject* source, GAsyncResult* res, gpointer) {
-  ResourceHandle* handle = static_cast<ResourceHandle*>(
+  RefPtr<ResourceHandle> handle = static_cast<ResourceHandle*>(
       g_object_get_data(source, "webkit-resource"));
   if (!handle)
     return;
@@ -679,12 +685,11 @@ static void closeCallback(GObject* source, GAsyncResult* res, gpointer) {
   ResourceHandleClient* client = handle->client();
 
   g_input_stream_close_finish(d->m_inputStream, res, 0);
-  cleanupGioOperation(d);
-  client->didFinishLoading(handle);
+  cleanupGioOperation(handle.get());
+  client->didFinishLoading(handle.get());
 }
 
 static void readCallback(GObject* source, GAsyncResult* res, gpointer) {
-  // didReceiveData may cancel the load, which may release the last reference.
   RefPtr<ResourceHandle> handle = static_cast<ResourceHandle*>(
       g_object_get_data(source, "webkit-resource"));
   if (!handle)
@@ -694,7 +699,7 @@ static void readCallback(GObject* source, GAsyncResult* res, gpointer) {
   ResourceHandleClient* client = handle->client();
 
   if (d->m_cancelled || !client) {
-    cleanupGioOperation(d);
+    cleanupGioOperation(handle.get());
     return;
   }
 
@@ -708,7 +713,7 @@ static void readCallback(GObject* source, GAsyncResult* res, gpointer) {
         error ? String::fromUTF8(error->message) : String());
     g_free(uri);
     g_error_free(error);
-    cleanupGioOperation(d);
+    cleanupGioOperation(handle.get());
     client->didFail(handle.get(), resourceError);
     return;
   }
@@ -722,8 +727,9 @@ static void readCallback(GObject* source, GAsyncResult* res, gpointer) {
   d->m_total += bytesRead;
   client->didReceiveData(handle.get(), d->m_buffer, bytesRead, d->m_total);
 
+  // didReceiveData may cancel the load, which may release the last reference.
   if (d->m_cancelled) {
-    cleanupGioOperation(d);
+    cleanupGioOperation(handle.get());
     return;
   }
 
@@ -733,7 +739,7 @@ static void readCallback(GObject* source, GAsyncResult* res, gpointer) {
 }
 
 static void openCallback(GObject* source, GAsyncResult* res, gpointer) {
-  ResourceHandle* handle = static_cast<ResourceHandle*>(
+  RefPtr<ResourceHandle> handle = static_cast<ResourceHandle*>(
       g_object_get_data(source, "webkit-resource"));
   if (!handle)
     return;
@@ -742,7 +748,7 @@ static void openCallback(GObject* source, GAsyncResult* res, gpointer) {
   ResourceHandleClient* client = handle->client();
 
   if (d->m_cancelled || !client) {
-    cleanupGioOperation(d);
+    cleanupGioOperation(handle.get());
     return;
   }
 
@@ -755,8 +761,8 @@ static void openCallback(GObject* source, GAsyncResult* res, gpointer) {
         error ? String::fromUTF8(error->message) : String());
     g_free(uri);
     g_error_free(error);
-    cleanupGioOperation(d);
-    client->didFail(handle, resourceError);
+    cleanupGioOperation(handle.get());
+    client->didFail(handle.get(), resourceError);
     return;
   }
 
@@ -764,14 +770,16 @@ static void openCallback(GObject* source, GAsyncResult* res, gpointer) {
   d->m_bufferSize = 8192;
   d->m_buffer = static_cast<char*>(g_malloc(d->m_bufferSize));
   d->m_total = 0;
-  g_object_set_data(G_OBJECT(d->m_inputStream), "webkit-resource", handle);
+
+  g_object_set_data(G_OBJECT(d->m_inputStream), "webkit-resource",
+                    handle.get());
   g_input_stream_read_async(d->m_inputStream, d->m_buffer, d->m_bufferSize,
                             G_PRIORITY_DEFAULT, d->m_cancellable, readCallback,
                             0);
 }
 
 static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
-  ResourceHandle* handle = static_cast<ResourceHandle*>(
+  RefPtr<ResourceHandle> handle = static_cast<ResourceHandle*>(
       g_object_get_data(source, "webkit-resource"));
   if (!handle)
     return;
@@ -780,7 +788,7 @@ static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
   ResourceHandleClient* client = handle->client();
 
   if (d->m_cancelled) {
-    cleanupGioOperation(d);
+    cleanupGioOperation(handle.get());
     return;
   }
 
@@ -806,8 +814,8 @@ static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
         error ? String::fromUTF8(error->message) : String());
     g_free(uri);
     g_error_free(error);
-    cleanupGioOperation(d);
-    client->didFail(handle, resourceError);
+    cleanupGioOperation(handle.get());
+    client->didFail(handle.get(), resourceError);
     return;
   }
 
@@ -818,8 +826,8 @@ static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
     ResourceError resourceError(g_quark_to_string(G_IO_ERROR),
                                 G_IO_ERROR_FAILED, uri, String());
     g_free(uri);
-    cleanupGioOperation(d);
-    client->didFail(handle, resourceError);
+    cleanupGioOperation(handle.get());
+    client->didFail(handle.get(), resourceError);
     return;
   }
 
@@ -830,7 +838,12 @@ static void queryInfoCallback(GObject* source, GAsyncResult* res, gpointer) {
   g_file_info_get_modification_time(info, &tv);
   response.setLastModifiedDate(tv.tv_sec);
 
-  client->didReceiveResponse(handle, response);
+  client->didReceiveResponse(handle.get(), response);
+
+  if (d->m_cancelled) {
+    cleanupGioOperation(handle.get());
+    return;
+  }
 
   g_file_read_async(d->m_gfile, G_PRIORITY_DEFAULT, d->m_cancellable,
                     openCallback, 0);
@@ -867,6 +880,10 @@ static bool startGio(ResourceHandle* handle, KURL url) {
 #endif
     d->m_gfile = g_file_new_for_uri(url.string().utf8().data());
   g_object_set_data(G_OBJECT(d->m_gfile), "webkit-resource", handle);
+
+  // balanced by a deref() in cleanupGioOperation, which should always run
+  handle->ref();
+
   d->m_cancellable = g_cancellable_new();
   g_file_query_info_async(d->m_gfile, G_FILE_ATTRIBUTE_STANDARD_TYPE
                           "," G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE
