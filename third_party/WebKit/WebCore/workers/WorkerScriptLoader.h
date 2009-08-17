@@ -48,10 +48,10 @@ class WorkerScriptLoader : public ThreadableLoaderClient {
 
   void loadSynchronously(ScriptExecutionContext*,
                          const KURL&,
-                         CrossOriginRedirectPolicy);
+                         CrossOriginRequestPolicy);
   void loadAsynchronously(ScriptExecutionContext*,
                           const KURL&,
-                          CrossOriginRedirectPolicy,
+                          CrossOriginRequestPolicy,
                           WorkerScriptLoaderClient*);
 
   void notifyError();
