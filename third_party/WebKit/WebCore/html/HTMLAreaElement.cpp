@@ -37,16 +37,13 @@ using namespace HTMLNames;
 HTMLAreaElement::HTMLAreaElement(const QualifiedName& tagName,
                                  Document* document)
     : HTMLAnchorElement(tagName, document),
-      m_coords(0),
       m_coordsLen(0),
       m_lastSize(-1, -1),
       m_shape(Unknown) {
   ASSERT(hasTagName(areaTag));
 }
 
-HTMLAreaElement::~HTMLAreaElement() {
-  delete[] m_coords;
-}
+HTMLAreaElement::~HTMLAreaElement() {}
 
 void HTMLAreaElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == shapeAttr) {
@@ -59,8 +56,7 @@ void HTMLAreaElement::parseMappedAttribute(MappedAttribute* attr) {
     else if (equalIgnoringCase(attr->value(), "rect"))
       m_shape = Rect;
   } else if (attr->name() == coordsAttr) {
-    delete[] m_coords;
-    m_coords = newCoordsArray(attr->value().string(), m_coordsLen);
+    m_coords.set(newCoordsArray(attr->value().string(), m_coordsLen));
   } else if (attr->name() == altAttr || attr->name() == accesskeyAttr) {
     // Do nothing.
   } else
