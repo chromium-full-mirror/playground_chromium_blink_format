@@ -38,6 +38,7 @@
 #include "TransformationMatrix.h"
 #include "TransformOperations.h"
 #include <wtf/OwnPtr.h>
+#include <wtf/PassOwnPtr.h>
 
 #if PLATFORM(MAC)
 #ifdef __OBJC__
@@ -143,7 +144,7 @@ class KeyframeValueList : public Noncopyable {
 
 class GraphicsLayer {
  public:
-  static GraphicsLayer* createGraphicsLayer(GraphicsLayerClient*);
+  static PassOwnPtr<GraphicsLayer> create(GraphicsLayerClient*);
 
   virtual ~GraphicsLayer();
 

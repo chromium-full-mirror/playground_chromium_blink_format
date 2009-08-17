@@ -65,26 +65,27 @@ class RenderLayerBacking : public GraphicsLayerClient {
   // Update contents and clipping structure.
   void updateInternalHierarchy();  // make private
 
-  GraphicsLayer* graphicsLayer() const { return m_graphicsLayer; }
+  GraphicsLayer* graphicsLayer() const { return m_graphicsLayer.get(); }
 
   // Layer to clip children
   bool hasClippingLayer() const { return m_clippingLayer != 0; }
-  GraphicsLayer* clippingLayer() const { return m_clippingLayer; }
+  GraphicsLayer* clippingLayer() const { return m_clippingLayer.get(); }
 
   // Layer to get clipped by ancestor
   bool hasAncestorClippingLayer() const { return m_ancestorClippingLayer != 0; }
   GraphicsLayer* ancestorClippingLayer() const {
-    return m_ancestorClippingLayer;
+    return m_ancestorClippingLayer.get();
   }
 
   bool hasContentsLayer() const { return m_foregroundLayer != 0; }
-  GraphicsLayer* foregroundLayer() const { return m_foregroundLayer; }
+  GraphicsLayer* foregroundLayer() const { return m_foregroundLayer.get(); }
 
   GraphicsLayer* parentForSublayers() const {
-    return m_clippingLayer ? m_clippingLayer : m_graphicsLayer;
+    return m_clippingLayer ? m_clippingLayer.get() : m_graphicsLayer.get();
   }
   GraphicsLayer* childForSuperlayers() const {
-    return m_ancestorClippingLayer ? m_ancestorClippingLayer : m_graphicsLayer;
+    return m_ancestorClippingLayer ? m_ancestorClippingLayer.get()
+                                   : m_graphicsLayer.get();
   }
 
   // RenderLayers with backing normally short-circuit paintLayer() because
@@ -193,15 +194,15 @@ class RenderLayerBacking : public GraphicsLayerClient {
  private:
   RenderLayer* m_owningLayer;
 
-  GraphicsLayer* m_ancestorClippingLayer;  // only used if we are clipped by an
-                                           // ancestor which is not a stacking
-                                           // context
-  GraphicsLayer* m_graphicsLayer;
-  GraphicsLayer* m_foregroundLayer;  // only used in cases where we need to draw
-                                     // the foreground separately
-  GraphicsLayer* m_clippingLayer;    // only used if we have clipping on a
-                                     // stacking context, with compositing
-                                     // children
+  OwnPtr<GraphicsLayer> m_ancestorClippingLayer;  // only used if we are clipped
+                                                  // by an ancestor which is not
+                                                  // a stacking context
+  OwnPtr<GraphicsLayer> m_graphicsLayer;
+  OwnPtr<GraphicsLayer> m_foregroundLayer;  // only used in cases where we need
+                                            // to draw the foreground separately
+  OwnPtr<GraphicsLayer> m_clippingLayer;  // only used if we have clipping on a
+                                          // stacking context, with compositing
+                                          // children
 
   IntRect m_compositedBounds;
 
