@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -46,7 +46,7 @@ using namespace HTMLNames;
 
 HTMLViewSourceDocument::HTMLViewSourceDocument(Frame* frame,
                                                const String& mimeType)
-    : HTMLDocument(frame), m_type(mimeType), m_current(0), m_tbody(0), m_td(0) {
+    : HTMLDocument(frame), m_type(mimeType) {
   setUsesBeforeAfterRules(true);
 }
 
@@ -65,17 +65,17 @@ Tokenizer* HTMLViewSourceDocument::createTokenizer() {
 }
 
 void HTMLViewSourceDocument::createContainingTable() {
-  RefPtr<Element> html = new HTMLHtmlElement(htmlTag, this);
+  RefPtr<HTMLHtmlElement> html = new HTMLHtmlElement(htmlTag, this);
   addChild(html);
   html->attach();
-  RefPtr<Element> body = new HTMLBodyElement(bodyTag, this);
+  RefPtr<HTMLBodyElement> body = new HTMLBodyElement(bodyTag, this);
   html->addChild(body);
   body->attach();
 
   // Create a line gutter div that can be used to make sure the gutter extends
   // down the height of the whole
   // document.
-  RefPtr<Element> div = new HTMLDivElement(divTag, this);
+  RefPtr<HTMLDivElement> div = new HTMLDivElement(divTag, this);
   RefPtr<NamedMappedAttrMap> attrs = NamedMappedAttrMap::create();
   attrs->addAttribute(
       MappedAttribute::create(classAttr, "webkit-line-gutter-backdrop"));
@@ -83,7 +83,7 @@ void HTMLViewSourceDocument::createContainingTable() {
   body->addChild(div);
   div->attach();
 
-  RefPtr<Element> table = new HTMLTableElement(tableTag, this);
+  RefPtr<HTMLTableElement> table = new HTMLTableElement(tableTag, this);
   body->addChild(table);
   table->attach();
   m_tbody = new HTMLTableSectionElement(tbodyTag, this);
@@ -208,30 +208,31 @@ void HTMLViewSourceDocument::addViewSourceDoctypeToken(
   addText(text, "webkit-html-doctype");
 }
 
-Element* HTMLViewSourceDocument::addSpanWithClassName(const String& className) {
+PassRefPtr<Element> HTMLViewSourceDocument::addSpanWithClassName(
+    const String& className) {
   if (m_current == m_tbody) {
     addLine(className);
     return m_current;
   }
 
-  Element* span = new HTMLElement(spanTag, this);
+  RefPtr<HTMLElement> span = new HTMLElement(spanTag, this);
   RefPtr<NamedMappedAttrMap> attrs = NamedMappedAttrMap::create();
   attrs->addAttribute(MappedAttribute::create(classAttr, className));
   span->setAttributeMap(attrs.release());
   m_current->addChild(span);
   span->attach();
-  return span;
+  return span.release();
 }
 
 void HTMLViewSourceDocument::addLine(const String& className) {
   // Create a table row.
-  RefPtr<Element> trow = new HTMLTableRowElement(trTag, this);
+  RefPtr<HTMLTableRowElement> trow = new HTMLTableRowElement(trTag, this);
   m_tbody->addChild(trow);
   trow->attach();
 
   // Create a cell that will hold the line number (it is generated in the
   // stylesheet using counters).
-  Element* td = new HTMLTableCellElement(tdTag, this);
+  RefPtr<HTMLTableCellElement> td = new HTMLTableCellElement(tdTag, this);
   RefPtr<NamedMappedAttrMap> attrs = NamedMappedAttrMap::create();
   attrs->addAttribute(MappedAttribute::create(classAttr, "webkit-line-number"));
   td->setAttributeMap(attrs.release());
@@ -294,12 +295,13 @@ void HTMLViewSourceDocument::addText(const String& text,
     m_current = m_tbody;
 }
 
-Element* HTMLViewSourceDocument::addLink(const String& url, bool isAnchor) {
+PassRefPtr<Element> HTMLViewSourceDocument::addLink(const String& url,
+                                                    bool isAnchor) {
   if (m_current == m_tbody)
     addLine("webkit-html-tag");
 
   // Now create a link for the attribute value instead of a span.
-  Element* anchor = new HTMLAnchorElement(aTag, this);
+  RefPtr<HTMLAnchorElement> anchor = new HTMLAnchorElement(this);
   RefPtr<NamedMappedAttrMap> attrs = NamedMappedAttrMap::create();
   const char* classValue;
   if (isAnchor)
@@ -312,6 +314,6 @@ Element* HTMLViewSourceDocument::addLink(const String& url, bool isAnchor) {
   anchor->setAttributeMap(attrs.release());
   m_current->addChild(anchor);
   anchor->attach();
-  return anchor;
+  return anchor.release();
 }
 }
