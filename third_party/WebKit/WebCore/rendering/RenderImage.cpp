@@ -456,7 +456,7 @@ HTMLMapElement* RenderImage::imageMap() {
   HTMLImageElement* i = node() && node()->hasTagName(imgTag)
                             ? static_cast<HTMLImageElement*>(node())
                             : 0;
-  return i ? i->document()->getImageMap(i->useMap()) : 0;
+  return i ? i->document()->getImageMap(i->getAttribute(usemapAttr)) : 0;
 }
 
 bool RenderImage::nodeAtPoint(const HitTestRequest& request,

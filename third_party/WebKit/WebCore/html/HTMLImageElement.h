@@ -73,17 +73,7 @@ class HTMLImageElement : public HTMLElement {
     m_imageLoader.setLoadManually(loadManually);
   }
 
-  String name() const;
-  void setName(const String&);
-
-  String align() const;
-  void setAlign(const String&);
-
-  String alt() const;
-  void setAlt(const String&);
-
-  String border() const;
-  void setBorder(const String&);
+  const AtomicString& alt() const;
 
   virtual bool draggable() const;
 
@@ -103,9 +93,6 @@ class HTMLImageElement : public HTMLElement {
 
   KURL src() const;
   void setSrc(const String&);
-
-  String useMap() const;
-  void setUseMap(const String&);
 
   int vspace() const;
   void setVspace(int);
