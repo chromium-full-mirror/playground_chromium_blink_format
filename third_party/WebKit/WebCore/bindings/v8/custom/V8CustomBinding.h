@@ -463,6 +463,7 @@ class V8Custom {
   DECLARE_CALLBACK(InspectorBackendInspectedWindow);
   DECLARE_CALLBACK(InspectorBackendSetSetting);
   DECLARE_CALLBACK(InspectorBackendCookies);
+  DECLARE_CALLBACK(InspectorBackendDeleteCookie);
   DECLARE_CALLBACK(InspectorBackendCurrentCallFrame);
   DECLARE_CALLBACK(InspectorBackendDebuggerEnabled);
   DECLARE_CALLBACK(InspectorBackendPauseOnExceptions);
