@@ -292,7 +292,7 @@ void PlatformContextSkia::drawRect(SkRect rect) {
 }
 
 void PlatformContextSkia::setupPaintCommon(SkPaint* paint) const {
-#ifdef SK_DEBUGx
+#ifdef SK_DEBUG
   {
     SkPaint defaultPaint;
     SkASSERT(*paint == defaultPaint);
