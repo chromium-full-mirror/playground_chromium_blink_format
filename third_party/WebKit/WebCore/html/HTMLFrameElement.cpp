@@ -38,7 +38,8 @@ HTMLFrameElement::HTMLFrameElement(const QualifiedName& tagName,
                                    Document* document)
     : HTMLFrameElementBase(tagName, document),
       m_frameBorder(true),
-      m_frameBorderSet(false) {
+      m_frameBorderSet(false),
+      m_noResize(false) {
   ASSERT(hasTagName(frameTag));
 }
 
@@ -75,8 +76,19 @@ void HTMLFrameElement::parseMappedAttribute(MappedAttribute* attr) {
     m_frameBorder = attr->value().toInt();
     m_frameBorderSet = !attr->isNull();
     // FIXME: If we are already attached, this has no effect.
+  } else if (attr->name() == noresizeAttr) {
+    m_noResize = true;
+    // FIXME: If we are already attached, this has no effect.
+    // FIXME: Since this does not check attr->isNull(), it can
+    // never reset m_noResize to false if the attribute is removed.
+    // FIXME: There seems to be no code that looks at this
+    // value and prevents resizing.
   } else
     HTMLFrameElementBase::parseMappedAttribute(attr);
+}
+
+void HTMLFrameElement::setNoResize(bool noResize) {
+  setAttribute(noresizeAttr, noResize ? "" : 0);
 }
 
 }  // namespace WebCore
