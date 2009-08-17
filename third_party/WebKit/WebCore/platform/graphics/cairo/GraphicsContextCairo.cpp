@@ -31,7 +31,6 @@
 
 #if PLATFORM(CAIRO)
 
-#include "TransformationMatrix.h"
 #include "CairoPath.h"
 #include "FloatRect.h"
 #include "Font.h"
@@ -41,6 +40,7 @@
 #include "Path.h"
 #include "Pattern.h"
 #include "SimpleFontData.h"
+#include "TransformationMatrix.h"
 
 #include <cairo.h>
 #include <math.h>
@@ -53,8 +53,8 @@
 #elif PLATFORM(WIN)
 #include <cairo-win32.h>
 #endif
-#include "GraphicsContextPrivate.h"
 #include "GraphicsContextPlatformPrivateCairo.h"
+#include "GraphicsContextPrivate.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -246,7 +246,7 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
     if (patWidth == 1)
       patternOffset = 1.0;
     else {
-      bool evenNumberOfSegments = numSegments % 2 == 0;
+      bool evenNumberOfSegments = !(numSegments % 2);
       if (remainder)
         evenNumberOfSegments = !evenNumberOfSegments;
       if (evenNumberOfSegments) {
@@ -366,7 +366,7 @@ void GraphicsContext::strokeArc(const IntRect& rect,
     if (patWidth == 1)
       patternOffset = 1.0;
     else {
-      bool evenNumberOfSegments = numSegments % 2 == 0;
+      bool evenNumberOfSegments = !(numSegments % 2);
       if (remainder)
         evenNumberOfSegments = !evenNumberOfSegments;
       if (evenNumberOfSegments) {

@@ -35,6 +35,7 @@
  */
 
 #include "config.h"
+#include "GraphicsContext.h"
 
 #ifdef Q_WS_WIN
 #include <windows.h>
@@ -43,7 +44,6 @@
 #include "Color.h"
 #include "FloatConversion.h"
 #include "Font.h"
-#include "GraphicsContext.h"
 #include "GraphicsContextPrivate.h"
 #include "ImageBuffer.h"
 #include "NotImplemented.h"
@@ -1208,7 +1208,6 @@ void GraphicsContext::setPlatformShouldAntialias(bool enable) {
 }
 
 #ifdef Q_WS_WIN
-#include <windows.h>
 
 HDC GraphicsContext::getWindowsContext(const IntRect& dstRect,
                                        bool supportAlphaBlend,

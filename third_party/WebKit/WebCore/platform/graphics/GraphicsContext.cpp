@@ -28,9 +28,9 @@
 #include "GraphicsContext.h"
 
 #include "BidiResolver.h"
+#include "Font.h"
 #include "Generator.h"
 #include "GraphicsContextPrivate.h"
-#include "Font.h"
 
 using namespace std;
 
