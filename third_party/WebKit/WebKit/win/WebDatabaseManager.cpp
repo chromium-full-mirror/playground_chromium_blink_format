@@ -345,6 +345,21 @@ void WebDatabaseManager::dispatchDidModifyOrigin(SecurityOrigin* origin) {
                                      securityOrigin.get(), 0);
 }
 
+HRESULT STDMETHODCALLTYPE WebDatabaseManager::setQuota(
+    /* [in] */ BSTR origin,
+    /* [in] */ unsigned long long quota) {
+  if (!origin)
+    return E_POINTER;
+
+  if (this != s_sharedWebDatabaseManager)
+    return E_FAIL;
+
+  DatabaseTracker::tracker().setQuota(
+      SecurityOrigin::createFromString(origin).get(), quota);
+
+  return S_OK;
+}
+
 void WebDatabaseManager::dispatchDidModifyDatabase(SecurityOrigin* origin,
                                                    const String& databaseName) {
   static BSTR databaseDidModifyOriginName =

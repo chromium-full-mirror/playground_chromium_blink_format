@@ -43,6 +43,8 @@
 #include <WebKit/WebKit.h>
 #include <stdio.h>
 
+#include <atlbase.h>
+
 using std::wstring;
 
 class DRTUndoObject {
@@ -518,6 +520,20 @@ HRESULT STDMETHODCALLTYPE UIDelegate::exceededDatabaseQuota(
     /* [in] */ IWebFrame* frame,
     /* [in] */ IWebSecurityOrigin* origin,
     /* [in] */ BSTR databaseIdentifier) {
+  CComBSTR protocol;
+  CComBSTR host;
+  unsigned short port;
+
+  origin->protocol(&protocol);
+  origin->host(&host);
+  origin->port(&port);
+
+  if (!done && gLayoutTestController->dumpDatabaseCallbacks())
+    printf(
+        "UI DELEGATE DATABASE CALLBACK: "
+        "exceededDatabaseQuotaForSecurityOrigin:{%S, %S, %i} database:%S\n",
+        protocol, host, port, databaseIdentifier);
+
   static const unsigned long long defaultQuota = 5 * 1024 * 1024;
   origin->setQuota(defaultQuota);
 

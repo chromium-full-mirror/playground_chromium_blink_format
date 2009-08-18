@@ -723,7 +723,17 @@ void LayoutTestController::overridePreference(JSStringRef key,
 }
 
 void LayoutTestController::setDatabaseQuota(unsigned long long quota) {
-  printf("ERROR: LayoutTestController::setDatabaseQuota() not implemented\n");
+  COMPtr<IWebDatabaseManager> databaseManager;
+  COMPtr<IWebDatabaseManager> tmpDatabaseManager;
+
+  if (FAILED(WebKitCreateInstance(CLSID_WebDatabaseManager, 0,
+                                  IID_IWebDatabaseManager,
+                                  (void**)&tmpDatabaseManager)))
+    return;
+  if (FAILED(tmpDatabaseManager->sharedWebDatabaseManager(&databaseManager)))
+    return;
+
+  databaseManager->setQuota(TEXT("file:///"), quota);
 }
 
 void LayoutTestController::setAppCacheMaximumSize(unsigned long long size) {
