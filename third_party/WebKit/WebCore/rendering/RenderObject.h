@@ -296,6 +296,11 @@ class RenderObject : public CachedResourceClient {
 
   bool isHTMLMarquee() const;
 
+  inline bool isAfterContent() const;
+  static inline bool isAfterContent(const RenderObject* obj) {
+    return obj && obj->isAfterContent();
+  }
+
   bool childrenInline() const { return m_childrenInline; }
   void setChildrenInline(bool b = true) { m_childrenInline = b; }
   bool hasColumns() const { return m_hasColumns; }
@@ -1043,6 +1048,15 @@ class RenderObject : public CachedResourceClient {
 
 inline bool RenderObject::documentBeingDestroyed() const {
   return !document()->renderer();
+}
+
+inline bool RenderObject::isAfterContent() const {
+  if (style()->styleType() != AFTER)
+    return false;
+  // Text nodes don't have their own styles, so ignore the style on a text node.
+  if (isText() && !isBR())
+    return false;
+  return true;
 }
 
 inline void RenderObject::setNeedsLayout(bool b, bool markParents) {
