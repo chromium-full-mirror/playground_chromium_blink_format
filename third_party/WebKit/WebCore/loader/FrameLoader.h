@@ -431,6 +431,7 @@ class FrameLoader : public Noncopyable {
   void setTitle(const String&);
 
   void commitProvisionalLoad(PassRefPtr<CachedPage>);
+  bool isLoadingFromCachedPage() const { return m_loadingFromCachedPage; }
 
   void goToItem(HistoryItem*, FrameLoadType);
   void saveDocumentAndScrollState();
@@ -791,6 +792,7 @@ class FrameLoader : public Noncopyable {
   RefPtr<HistoryItem> m_provisionalHistoryItem;
 
   bool m_didPerformFirstNavigation;
+  bool m_loadingFromCachedPage;
 
 #ifndef NDEBUG
   bool m_didDispatchDidCommitLoad;

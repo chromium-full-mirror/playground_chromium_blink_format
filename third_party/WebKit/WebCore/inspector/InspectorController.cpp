@@ -752,7 +752,7 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
     if (windowVisible()) {
       resetScriptObjects();
 
-      if (!loader->isLoadingFromCachedPage()) {
+      if (!loader->frameLoader()->isLoadingFromCachedPage()) {
         ASSERT(m_mainResource && m_mainResource->isSameLoader(loader));
         // We don't add the main resource until its load is committed. This is
         // needed to keep the load for a user-entered URL from showing up in the
@@ -893,7 +893,7 @@ void InspectorController::identifierForInitialRequest(
 
   addResource(resource.get());
 
-  if (windowVisible() && loader->isLoadingFromCachedPage() &&
+  if (windowVisible() && loader->frameLoader()->isLoadingFromCachedPage() &&
       resource == m_mainResource)
     resource->createScriptObject(m_frontend.get());
 }

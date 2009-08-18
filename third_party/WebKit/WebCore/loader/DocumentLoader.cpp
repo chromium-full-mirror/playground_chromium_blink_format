@@ -146,7 +146,6 @@ DocumentLoader::DocumentLoader(const ResourceRequest& req,
       m_gotFirstByte(false),
       m_primaryLoadComplete(false),
       m_isClientRedirect(false),
-      m_loadingFromCachedPage(false),
       m_stopRecordingResponses(false),
       m_substituteResourceDeliveryTimer(
           this,
@@ -678,17 +677,6 @@ KURL DocumentLoader::urlForHistory() const {
 
 bool DocumentLoader::urlForHistoryReflectsFailure() const {
   return m_substituteData.isValid() || m_response.httpStatusCode() >= 400;
-}
-
-void DocumentLoader::loadFromCachedPage(PassRefPtr<CachedPage> cachedPage) {
-  LOG(PageCache,
-      "WebCorePageCache: DocumentLoader %p loading from cached page %p", this,
-      cachedPage.get());
-
-  prepareForLoadStart();
-  setLoadingFromCachedPage(true);
-  setCommitted(true);
-  frameLoader()->commitProvisionalLoad(cachedPage);
 }
 
 const KURL& DocumentLoader::originalURL() const {

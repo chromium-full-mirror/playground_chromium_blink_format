@@ -42,7 +42,6 @@ class ApplicationCacheHost;
 class Archive;
 class ArchiveResource;
 class ArchiveResourceCollection;
-class CachedPage;
 class Frame;
 class FrameLoader;
 class MainResourceLoader;
@@ -196,12 +195,6 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
     m_didCreateGlobalHistoryEntry = didCreateGlobalHistoryEntry;
   }
 
-  void loadFromCachedPage(PassRefPtr<CachedPage>);
-  void setLoadingFromCachedPage(bool loading) {
-    m_loadingFromCachedPage = loading;
-  }
-  bool isLoadingFromCachedPage() const { return m_loadingFromCachedPage; }
-
   void setDefersLoading(bool);
 
   bool startLoadingMainResource(unsigned long identifier);
@@ -296,7 +289,6 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   bool m_gotFirstByte;
   bool m_primaryLoadComplete;
   bool m_isClientRedirect;
-  bool m_loadingFromCachedPage;
 
   String m_pageTitle;
 
