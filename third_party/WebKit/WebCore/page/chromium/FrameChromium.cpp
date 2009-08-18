@@ -66,7 +66,7 @@ void computePageRectsForFrame(Frame* frame,
   float ratio = static_cast<float>(printRect.height()) /
                 static_cast<float>(printRect.width());
 
-  float pageWidth = static_cast<float>(root->overflowWidth());
+  float pageWidth = static_cast<float>(root->rightLayoutOverflow());
   float pageHeight = pageWidth * ratio;
   outPageHeight = static_cast<int>(
       pageHeight);  // this is the height of the page adjusted by margins
