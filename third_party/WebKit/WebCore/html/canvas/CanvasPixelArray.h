@@ -46,9 +46,13 @@ class CanvasPixelArray : public RefCounted<CanvasPixelArray> {
 
   void set(unsigned index, double value) { m_data->set(index, value); }
 
+  void set(unsigned index, unsigned char value) { m_data->set(index, value); }
+
   bool get(unsigned index, unsigned char& result) const {
     return m_data->get(index, result);
   }
+
+  unsigned char get(unsigned index) const { return m_data->get(index); }
 
  private:
   CanvasPixelArray(unsigned length);
