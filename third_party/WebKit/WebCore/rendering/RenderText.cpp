@@ -342,14 +342,14 @@ VisiblePosition RenderText::positionForPoint(const IntPoint& point) {
 
   // FIXME: We should be able to roll these special cases into the general cases
   // in the loop below.
-  if (firstTextBox() && point.y() < firstTextBox()->root()->bottomOverflow() &&
+  if (firstTextBox() && point.y() < firstTextBox()->root()->lineBottom() &&
       point.x() < firstTextBox()->m_x) {
     // at the y coordinate of the first line or above
     // and the x coordinate is to the left of the first text box left edge
     offset = firstTextBox()->offsetForPosition(point.x());
     return createVisiblePosition(offset + firstTextBox()->start(), DOWNSTREAM);
   }
-  if (lastTextBox() && point.y() >= lastTextBox()->root()->topOverflow() &&
+  if (lastTextBox() && point.y() >= lastTextBox()->root()->lineTop() &&
       point.x() >= lastTextBox()->m_x + lastTextBox()->m_width) {
     // at the y coordinate of the last line or below
     // and the x coordinate is to the right of the last text box right edge
@@ -359,10 +359,10 @@ VisiblePosition RenderText::positionForPoint(const IntPoint& point) {
 
   InlineTextBox* lastBoxAbove = 0;
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox()) {
-    if (point.y() >= box->root()->topOverflow()) {
+    if (point.y() >= box->root()->lineTop()) {
       int bottom = box->root()->nextRootBox()
-                       ? box->root()->nextRootBox()->topOverflow()
-                       : box->root()->bottomOverflow();
+                       ? box->root()->nextRootBox()->lineTop()
+                       : box->root()->lineBottom();
       if (point.y() < bottom) {
         offset = box->offsetForPosition(point.x());
 
@@ -414,8 +414,8 @@ IntRect RenderText::localCaretRect(InlineBox* inlineBox,
 
   InlineTextBox* box = static_cast<InlineTextBox*>(inlineBox);
 
-  int height = box->root()->bottomOverflow() - box->root()->topOverflow();
-  int top = box->root()->topOverflow();
+  int height = box->root()->lineBottom() - box->root()->lineTop();
+  int top = box->root()->lineTop();
 
   int left = box->positionForOffset(caretOffset);
 

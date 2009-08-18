@@ -371,7 +371,8 @@ void FrameView::adjustViewSize() {
   RenderView* root = m_frame->contentRenderer();
   if (!root)
     return;
-  setContentsSize(IntSize(root->overflowWidth(), root->overflowHeight()));
+  setContentsSize(
+      IntSize(root->rightLayoutOverflow(), root->bottomLayoutOverflow()));
 }
 
 void FrameView::applyOverflowToViewport(RenderObject* o,
@@ -1596,7 +1597,7 @@ void FrameView::adjustPageHeight(float* newBottom,
     // Use a context with painting disabled.
     GraphicsContext context((PlatformGraphicsContext*)0);
     root->setTruncatedAt((int)floorf(oldBottom));
-    IntRect dirtyRect(0, (int)floorf(oldTop), root->overflowWidth(),
+    IntRect dirtyRect(0, (int)floorf(oldTop), root->rightLayoutOverflow(),
                       (int)ceilf(oldBottom - oldTop));
     root->layer()->paint(&context, dirtyRect);
     *newBottom = root->bestTruncatedAt();

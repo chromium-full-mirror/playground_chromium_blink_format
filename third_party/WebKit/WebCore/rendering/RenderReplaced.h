@@ -66,12 +66,6 @@ class RenderReplaced : public RenderBox {
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void paintReplaced(PaintInfo&, int /*tx*/, int /*ty*/) {}
 
-  virtual int overflowHeight(bool includeInterior = true) const;
-  virtual int overflowWidth(bool includeInterior = true) const;
-  virtual int overflowLeft(bool includeInterior = true) const;
-  virtual int overflowTop(bool includeInterior = true) const;
-  virtual IntRect overflowRect(bool includeInterior = true) const;
-
   virtual IntRect clippedOverflowRectForRepaint(
       RenderBoxModelObject* repaintContainer);
 

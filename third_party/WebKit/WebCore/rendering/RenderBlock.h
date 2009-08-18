@@ -71,19 +71,6 @@ class RenderBlock : public RenderBox {
 
   void deleteLineBoxTree();
 
-  // The height (and width) of a block when you include overflow spillage out of
-  // the bottom
-  // of the block (e.g., a <div style="height:25px"> that has a 100px tall image
-  // inside
-  // it would have an overflow height of borderTop() + paddingTop() + 100px.
-  virtual int overflowHeight(bool includeInterior = true) const;
-  virtual int overflowWidth(bool includeInterior = true) const;
-  virtual int overflowLeft(bool includeInterior = true) const;
-  virtual int overflowTop(bool includeInterior = true) const;
-  virtual IntRect overflowRect(bool includeInterior = true) const;
-
-  void addVisualOverflow(const IntRect&);
-
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
   virtual void removeChild(RenderObject*);
 
@@ -197,9 +184,6 @@ class RenderBlock : public RenderBox {
   RenderBlock* createAnonymousBlock(bool isFlexibleBox = false) const;
 
  protected:
-  virtual void setOverflowHeight(int h) { m_overflowHeight = h; }
-  virtual void setOverflowWidth(int w) { m_overflowWidth = w; }
-
   int maxTopPosMargin() const {
     return m_maxMargin ? m_maxMargin->m_topPos : MaxMargin::topPosDefault(this);
   }
@@ -272,8 +256,6 @@ class RenderBlock : public RenderBox {
 
   virtual bool hasLineIfEmpty() const;
   bool layoutOnlyPositionedObjects();
-
-  void updateOverflowWithShadowAndReflection();
 
  private:
   virtual RenderObjectChildList* virtualChildren() { return children(); }
@@ -388,10 +370,13 @@ class RenderBlock : public RenderBox {
                                          BidiRun* trailingSpaceRun,
                                          bool reachedEnd);
   void computeVerticalPositionsForLine(RootInlineBox*, BidiRun*);
-  void checkLinesForOverflow();
   void deleteEllipsisLineBoxes();
   void checkLinesForTextOverflow();
+  void addOverflowFromInlineChildren();
   // End of functions defined in RenderBlockLineLayout.cpp.
+
+  void addOverflowFromBlockChildren();
+  void addOverflowFromFloats();
 
   void paintFloats(PaintInfo&, int tx, int ty, bool preservePhase = false);
   void paintContents(PaintInfo&, int tx, int ty);
@@ -741,14 +726,6 @@ class RenderBlock : public RenderBox {
                                   // <div>Hello<br>world.</div> will have two
                                   // total lines for the <div>.
 
- protected:
-  // How much content overflows out of our block vertically or horizontally.
-  int m_overflowHeight;
-  int m_overflowWidth;
-  int m_overflowLeft;
-  int m_overflowTop;
-
- private:
   mutable int m_lineHeight;
 };
 

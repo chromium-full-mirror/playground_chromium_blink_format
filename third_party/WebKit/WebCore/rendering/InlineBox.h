@@ -230,11 +230,6 @@ class InlineBox {
     return renderer()->lineHeight(m_firstLine, isRootLineBox);
   }
 
-  virtual int topOverflow() const { return y(); }
-  virtual int bottomOverflow() const { return y() + height(); }
-  virtual int leftOverflow() const { return x(); }
-  virtual int rightOverflow() const { return x() + width(); }
-
   virtual int caretMinOffset() const;
   virtual int caretMaxOffset() const;
   virtual unsigned caretMaxRenderedOffset() const;

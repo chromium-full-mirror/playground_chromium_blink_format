@@ -168,10 +168,10 @@ void RenderLineBoxList::paint(RenderBoxModelObject* renderer,
   // FIXME: This check is flawed in the following extremely obscure way:
   // if some line in the middle has a huge overflow, it might actually extend
   // below the last line.
-  int yPos = firstLineBox()->root()->topOverflow() -
+  int yPos = firstLineBox()->root()->topCombinedOverflow() -
              renderer->maximalOutlineSize(paintInfo.phase);
   int h = renderer->maximalOutlineSize(paintInfo.phase) +
-          lastLineBox()->root()->bottomOverflow() - yPos;
+          lastLineBox()->root()->bottomCombinedOverflow() - yPos;
   yPos += ty;
   if (yPos >= paintInfo.rect.bottom() || yPos + h <= paintInfo.rect.y())
     return;
@@ -195,21 +195,25 @@ void RenderLineBoxList::paint(RenderBoxModelObject* renderer,
       // Try to avoid splitting a line vertically, but only if it's less than
       // the height
       // of the entire page.
-      if (curr->root()->bottomOverflow() - curr->root()->topOverflow() <=
+      if (curr->root()->bottomCombinedOverflow() -
+              curr->root()->topCombinedOverflow() <=
           v->printRect().height()) {
-        if (ty + curr->root()->bottomOverflow() > v->printRect().bottom()) {
-          if (ty + curr->root()->topOverflow() < v->truncatedAt())
-            v->setBestTruncatedAt(ty + curr->root()->topOverflow(), renderer);
+        if (ty + curr->root()->bottomCombinedOverflow() >
+            v->printRect().bottom()) {
+          if (ty + curr->root()->topCombinedOverflow() < v->truncatedAt())
+            v->setBestTruncatedAt(ty + curr->root()->topCombinedOverflow(),
+                                  renderer);
           // If we were able to truncate, don't paint.
-          if (ty + curr->root()->topOverflow() >= v->truncatedAt())
+          if (ty + curr->root()->topCombinedOverflow() >= v->truncatedAt())
             break;
         }
       }
     }
 
-    int top = min(curr->root()->topOverflow(), curr->root()->selectionTop()) -
-              renderer->maximalOutlineSize(info.phase);
-    int bottom = curr->root()->bottomOverflow() +
+    int top =
+        min(curr->root()->topCombinedOverflow(), curr->root()->selectionTop()) -
+        renderer->maximalOutlineSize(info.phase);
+    int bottom = curr->root()->bottomCombinedOverflow() +
                  renderer->maximalOutlineSize(info.phase);
     h = bottom - top;
     yPos = ty + top;
@@ -255,8 +259,8 @@ bool RenderLineBoxList::hitTest(RenderBoxModelObject* renderer,
   // FIXME: This check is flawed in the following extremely obscure way:
   // if some line in the middle has a huge overflow, it might actually extend
   // below the last line.
-  if ((y >= ty + lastLineBox()->root()->bottomOverflow()) ||
-      (y < ty + firstLineBox()->root()->topOverflow()))
+  if ((y >= ty + lastLineBox()->root()->bottomCombinedOverflow()) ||
+      (y < ty + firstLineBox()->root()->topCombinedOverflow()))
     return false;
 
   // See if our root lines contain the point.  If so, then we hit test
@@ -264,8 +268,8 @@ bool RenderLineBoxList::hitTest(RenderBoxModelObject* renderer,
   // assumptions
   // based off positions of our first line box or our last line box.
   for (InlineFlowBox* curr = lastLineBox(); curr; curr = curr->prevFlowBox()) {
-    if (y >= ty + curr->root()->topOverflow() &&
-        y < ty + curr->root()->bottomOverflow()) {
+    if (y >= ty + curr->root()->topCombinedOverflow() &&
+        y < ty + curr->root()->bottomCombinedOverflow()) {
       bool inside = curr->nodeAtPoint(request, result, x, y, tx, ty);
       if (inside) {
         renderer->updateHitTestResult(result, IntPoint(x - tx, y - ty));

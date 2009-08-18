@@ -589,10 +589,10 @@ void RenderLayer::updateLayerPosition() {
     setHeight(box->height());
 
     if (!box->hasOverflowClip()) {
-      if (box->overflowWidth() > box->width())
-        setWidth(box->overflowWidth());
-      if (box->overflowHeight() > box->height())
-        setHeight(box->overflowHeight());
+      if (box->rightLayoutOverflow() > box->width())
+        setWidth(box->rightLayoutOverflow());
+      if (box->bottomLayoutOverflow() > box->height())
+        setHeight(box->bottomLayoutOverflow());
     }
   }
 }
@@ -778,6 +778,21 @@ static IntRect transparencyClipBox(
         clipRect.unite(
             transparencyClipBox(enclosingTransform, curr, rootLayer));
     }
+  }
+
+  // If we have a reflection, then we need to account for that when we push the
+  // clip.  Reflect our entire
+  // current transparencyClipBox to catch all child layers.
+  // FIXME: Accelerated compositing will eventually want to do something smart
+  // here to avoid incorporating this
+  // size into the parent layer.
+  if (l->renderer()->hasReflection()) {
+    int deltaX = 0;
+    int deltaY = 0;
+    l->convertToLayerCoords(rootLayer, deltaX, deltaY);
+    clipRect.move(-deltaX, -deltaY);
+    clipRect.unite(l->renderBox()->reflectedRect(clipRect));
+    clipRect.move(deltaX, deltaY);
   }
 
   // Now map the clipRect via the enclosing transform
@@ -3079,7 +3094,7 @@ IntRect RenderLayer::localBoundingBox() const {
   // (1) Inline Flows.  For inline flows we will create a bounding box that
   // fully encompasses all of the lines occupied by the
   // inline.  In other words, if some <span> wraps to three lines, we'll create
-  // a bounding box that fully encloses the root
+  // a bounding box that fully encloses the
   // line boxes of all three lines (including overflow on those lines).
   // (2) Left/Top Overflow.  The width/height of layers already includes
   // right/bottom overflow.  However, in the case of left/top
@@ -3097,8 +3112,8 @@ IntRect RenderLayer::localBoundingBox() const {
     InlineFlowBox* firstBox = inlineFlow->firstLineBox();
     if (!firstBox)
       return result;
-    int top = firstBox->root()->topOverflow();
-    int bottom = inlineFlow->lastLineBox()->root()->bottomOverflow();
+    int top = firstBox->topCombinedOverflow();
+    int bottom = inlineFlow->lastLineBox()->bottomCombinedOverflow();
     int left = firstBox->x();
     for (InlineRunBox* curr = firstBox->nextLineBox(); curr;
          curr = curr->nextLineBox())
@@ -3112,7 +3127,7 @@ IntRect RenderLayer::localBoundingBox() const {
       if (child->isTableCell()) {
         IntRect bbox = toRenderBox(child)->borderBoxRect();
         result.unite(bbox);
-        IntRect overflowRect = renderBox()->overflowRect(false);
+        IntRect overflowRect = renderBox()->combinedOverflowRect();
         if (bbox != overflowRect)
           result.unite(overflowRect);
       }
@@ -3125,7 +3140,7 @@ IntRect RenderLayer::localBoundingBox() const {
     else {
       IntRect bbox = box->borderBoxRect();
       result = bbox;
-      IntRect overflowRect = box->overflowRect(false);
+      IntRect overflowRect = box->combinedOverflowRect();
       if (bbox != overflowRect)
         result.unite(overflowRect);
     }

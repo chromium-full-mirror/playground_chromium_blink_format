@@ -811,23 +811,14 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
   // The widths of all runs are now known.  We can now place every inline box
   // (and
   // compute accurate widths for the inline flow boxes).
-  int leftPosition = x;
-  int rightPosition = x;
   needsWordSpacing = false;
-  lineBox->placeBoxesHorizontally(x, leftPosition, rightPosition,
-                                  needsWordSpacing);
-  lineBox->setHorizontalOverflowPositions(leftPosition, rightPosition);
+  lineBox->placeBoxesHorizontally(x, needsWordSpacing);
 }
 
 void RenderBlock::computeVerticalPositionsForLine(RootInlineBox* lineBox,
                                                   BidiRun* firstRun) {
   setHeight(lineBox->verticallyAlignBoxes(height()));
   lineBox->setBlockHeight(height());
-
-  // See if the line spilled out.  If so set overflow height accordingly.
-  int bottomOfLine = lineBox->bottomOverflow();
-  if (bottomOfLine > height() && bottomOfLine > m_overflowHeight)
-    m_overflowHeight = bottomOfLine;
 
   // Now make sure we place replaced render objects correctly.
   for (BidiRun* r = firstRun; r; r = r->next()) {
@@ -875,7 +866,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
                                        int& repaintBottom) {
   bool useRepaintBounds = false;
 
-  m_overflowHeight = 0;
+  m_overflow.clear();
 
   setHeight(borderTop() + paddingTop());
   int toAdd = borderBottom() + paddingBottom() + horizontalScrollbarHeight();
@@ -994,8 +985,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       RenderArena* arena = renderArena();
       RootInlineBox* box = startLine;
       while (box) {
-        repaintTop = min(repaintTop, box->topOverflow());
-        repaintBottom = max(repaintBottom, box->bottomOverflow());
+        repaintTop = min(repaintTop, box->topCombinedOverflow());
+        repaintBottom = max(repaintBottom, box->bottomCombinedOverflow());
         RootInlineBox* next = box->nextRootBox();
         box->deleteLine(arena);
         box = next;
@@ -1150,8 +1141,9 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         if (lineBox) {
           lineBox->setLineBreakInfo(end.obj, end.pos, resolver.status());
           if (useRepaintBounds) {
-            repaintTop = min(repaintTop, lineBox->topOverflow());
-            repaintBottom = max(repaintBottom, lineBox->bottomOverflow());
+            repaintTop = min(repaintTop, lineBox->topCombinedOverflow());
+            repaintBottom =
+                max(repaintBottom, lineBox->bottomCombinedOverflow());
           }
         }
 
@@ -1195,9 +1187,10 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         for (RootInlineBox* line = endLine; line; line = line->nextRootBox()) {
           line->attachLine();
           if (delta) {
-            repaintTop = min(repaintTop, line->topOverflow() + min(delta, 0));
-            repaintBottom =
-                max(repaintBottom, line->bottomOverflow() + max(delta, 0));
+            repaintTop =
+                min(repaintTop, line->topCombinedOverflow() + min(delta, 0));
+            repaintBottom = max(repaintBottom,
+                                line->bottomCombinedOverflow() + max(delta, 0));
             line->adjustPosition(0, delta);
           }
           if (Vector<RenderBox*>* cleanLineFloats = line->floatsPtr()) {
@@ -1214,12 +1207,12 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         setHeight(lastRootBox()->blockHeight());
       } else {
         // Delete all the remaining lines.
-        InlineRunBox* line = endLine;
+        RootInlineBox* line = endLine;
         RenderArena* arena = renderArena();
         while (line) {
-          repaintTop = min(repaintTop, line->topOverflow());
-          repaintBottom = max(repaintBottom, line->bottomOverflow());
-          InlineRunBox* next = line->nextLineBox();
+          repaintTop = min(repaintTop, line->topCombinedOverflow());
+          repaintBottom = max(repaintBottom, line->bottomCombinedOverflow());
+          RootInlineBox* next = line->nextRootBox();
           line->deleteLine(arena);
           line = next;
         }
@@ -1263,13 +1256,6 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
   // Now add in the bottom border/padding.
   setHeight(height() + toAdd);
-
-  // Always make sure this is at least our height.
-  m_overflowHeight = max(height(), m_overflowHeight);
-
-  // See if any lines spill out of the block.  If so, we need to update our
-  // overflow width.
-  checkLinesForOverflow();
 
   if (!firstLineBox() && hasLineIfEmpty())
     setHeight(height() + lineHeight(true, true));
@@ -1532,8 +1518,9 @@ bool RenderBlock::matchedEndLine(const InlineBidiResolver& resolver,
       RootInlineBox* boxToDelete = endLine;
       RenderArena* arena = renderArena();
       while (boxToDelete && boxToDelete != result) {
-        repaintTop = min(repaintTop, boxToDelete->topOverflow());
-        repaintBottom = max(repaintBottom, boxToDelete->bottomOverflow());
+        repaintTop = min(repaintTop, boxToDelete->topCombinedOverflow());
+        repaintBottom =
+            max(repaintBottom, boxToDelete->bottomCombinedOverflow());
         RootInlineBox* next = boxToDelete->nextRootBox();
         boxToDelete->deleteLine(arena);
         boxToDelete = next;
@@ -2492,13 +2479,11 @@ end:
   return lBreak;
 }
 
-void RenderBlock::checkLinesForOverflow() {
-  m_overflowWidth = width();
+void RenderBlock::addOverflowFromInlineChildren() {
   for (RootInlineBox* curr = firstRootBox(); curr; curr = curr->nextRootBox()) {
-    m_overflowLeft = min(curr->leftOverflow(), m_overflowLeft);
-    m_overflowTop = min(curr->topOverflow(), m_overflowTop);
-    m_overflowWidth = max(curr->rightOverflow(), m_overflowWidth);
-    m_overflowHeight = max(curr->bottomOverflow(), m_overflowHeight);
+    addLayoutOverflow(curr->layoutOverflowRect());
+    if (!hasOverflowClip())
+      addVisualOverflow(curr->visualOverflowRect());
   }
 }
 

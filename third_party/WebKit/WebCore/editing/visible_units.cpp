@@ -665,7 +665,7 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
     if (node && editingIgnoresContent(node))
       return Position(node->parent(), node->nodeIndex());
     return renderer->positionForPoint(
-        IntPoint(x - absPos.x(), root->topOverflow()));
+        IntPoint(x - absPos.x(), root->lineTop()));
   }
 
   // Could not find a previous line. This means we must already be on the first
@@ -771,7 +771,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
     if (node && editingIgnoresContent(node))
       return Position(node->parent(), node->nodeIndex());
     return renderer->positionForPoint(
-        IntPoint(x - absPos.x(), root->topOverflow()));
+        IntPoint(x - absPos.x(), root->lineTop()));
   }
 
   // Could not find a next line. This means we must already be on the last line.
