@@ -394,7 +394,7 @@ NEVER_INLINE JSValue Interpreter::callEval(CallFrame* callFrame,
 
   ScopeChainNode* scopeChain = callFrame->scopeChain();
   CodeBlock* codeBlock = callFrame->codeBlock();
-  RefPtr<EvalExecutable> eval = codeBlock->evalCodeCache().get(
+  RefPtr<CacheableEvalExecutable> eval = codeBlock->evalCodeCache().get(
       callFrame, programSource, scopeChain, exceptionValue);
 
   JSValue result = jsUndefined();
