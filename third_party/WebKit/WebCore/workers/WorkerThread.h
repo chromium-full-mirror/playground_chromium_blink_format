@@ -58,6 +58,9 @@ class WorkerThread : public RefCounted<WorkerThread> {
     return m_workerReportingProxy;
   }
 
+  // Number of active worker threads.
+  static unsigned workerThreadCount();
+
  protected:
   WorkerThread(const KURL&,
                const String& userAgent,
@@ -104,6 +107,9 @@ class WorkerThread : public RefCounted<WorkerThread> {
 #if ENABLE(NOTIFICATIONS)
   NotificationPresenter* m_notificationPresenter;
 #endif
+
+  // Track the number of WorkerThread instances for use in layout tests.
+  static unsigned m_threadCount;
 };
 
 }  // namespace WebCore

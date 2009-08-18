@@ -1312,6 +1312,15 @@ static JSValueRef getWebHistoryItemCountCallback(JSContextRef context,
   return JSValueMakeNumber(context, controller->webHistoryItemCount());
 }
 
+static JSValueRef getWorkerThreadCountCallback(JSContextRef context,
+                                               JSObjectRef thisObject,
+                                               JSStringRef propertyName,
+                                               JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  return JSValueMakeNumber(context, controller->workerThreadCount());
+}
+
 static bool setGlobalFlagCallback(JSContextRef context,
                                   JSObjectRef thisObject,
                                   JSStringRef propertyName,
@@ -1380,6 +1389,8 @@ JSStaticValue* LayoutTestController::staticValues() {
       {"globalFlag", getGlobalFlagCallback, setGlobalFlagCallback,
        kJSPropertyAttributeNone},
       {"webHistoryItemCount", getWebHistoryItemCountCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"workerThreadCount", getWorkerThreadCountCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0, 0}};
   return staticValues;

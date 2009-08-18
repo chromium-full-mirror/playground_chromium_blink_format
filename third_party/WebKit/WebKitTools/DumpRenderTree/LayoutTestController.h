@@ -86,6 +86,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void setUserStyleSheetLocation(JSStringRef path);
   void waitForPolicyDelegate();
   size_t webHistoryItemCount();
+  unsigned workerThreadCount() const;
   int windowCount();
 
   void grantDesktopNotificationPermission(JSStringRef origin);

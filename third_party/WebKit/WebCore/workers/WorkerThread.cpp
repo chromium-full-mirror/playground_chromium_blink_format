@@ -40,6 +40,19 @@
 #include <wtf/Noncopyable.h>
 
 namespace WebCore {
+
+static Mutex& threadCountMutex() {
+  AtomicallyInitializedStatic(Mutex&, mutex = *new Mutex);
+  return mutex;
+}
+
+unsigned WorkerThread::m_threadCount = 0;
+
+unsigned WorkerThread::workerThreadCount() {
+  MutexLocker lock(threadCountMutex());
+  return m_threadCount;
+}
+
 struct WorkerThreadStartupData : Noncopyable {
  public:
   static std::auto_ptr<WorkerThreadStartupData> create(
@@ -76,9 +89,16 @@ WorkerThread::WorkerThread(const KURL& scriptURL,
       m_workerLoaderProxy(workerLoaderProxy),
       m_workerReportingProxy(workerReportingProxy),
       m_startupData(
-          WorkerThreadStartupData::create(scriptURL, userAgent, sourceCode)) {}
+          WorkerThreadStartupData::create(scriptURL, userAgent, sourceCode)) {
+  MutexLocker lock(threadCountMutex());
+  m_threadCount++;
+}
 
-WorkerThread::~WorkerThread() {}
+WorkerThread::~WorkerThread() {
+  MutexLocker lock(threadCountMutex());
+  ASSERT(m_threadCount > 0);
+  m_threadCount--;
+}
 
 bool WorkerThread::start() {
   // Mutex protection is necessary to ensure that m_threadID is initialized when
