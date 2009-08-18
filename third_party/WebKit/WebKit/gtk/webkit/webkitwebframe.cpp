@@ -421,7 +421,8 @@ static void webkit_web_frame_load_data(WebKitWebFrame* frame,
       sharedBuffer.release(),
       mimeType ? String::fromUTF8(mimeType) : String::fromUTF8("text/html"),
       encoding ? String::fromUTF8(encoding) : String::fromUTF8("UTF-8"),
-      baseKURL, KURL(KURL(), String::fromUTF8(unreachableURL)));
+      KURL(KURL(), String::fromUTF8(unreachableURL)),
+      KURL(KURL(), String::fromUTF8(unreachableURL)));
 
   coreFrame->loader()->load(request, substituteData, false);
 }
