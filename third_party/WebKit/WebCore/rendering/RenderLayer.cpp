@@ -3184,6 +3184,10 @@ RenderLayerBacking* RenderLayer::ensureBacking() {
 void RenderLayer::clearBacking() {
   m_backing.clear();
 }
+
+bool RenderLayer::hasCompositedMask() const {
+  return m_backing && m_backing->hasMaskLayer();
+}
 #endif
 
 void RenderLayer::setParent(RenderLayer* parent) {

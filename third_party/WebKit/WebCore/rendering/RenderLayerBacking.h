@@ -80,6 +80,8 @@ class RenderLayerBacking : public GraphicsLayerClient {
   bool hasContentsLayer() const { return m_foregroundLayer != 0; }
   GraphicsLayer* foregroundLayer() const { return m_foregroundLayer.get(); }
 
+  bool hasMaskLayer() const { return m_maskLayer != 0; }
+
   GraphicsLayer* parentForSublayers() const {
     return m_clippingLayer ? m_clippingLayer.get() : m_graphicsLayer.get();
   }
@@ -153,6 +155,9 @@ class RenderLayerBacking : public GraphicsLayerClient {
 
   bool updateClippingLayers(bool needsAncestorClip, bool needsDescendantClip);
   bool updateForegroundLayer(bool needsForegroundLayer);
+  bool updateMaskLayer(bool needsMaskLayer);
+
+  GraphicsLayerPaintingPhase paintingPhaseForPrimaryLayer() const;
 
   IntSize contentOffsetInCompostingLayer() const;
   // Result is transform origin in pixels.
@@ -203,6 +208,7 @@ class RenderLayerBacking : public GraphicsLayerClient {
   OwnPtr<GraphicsLayer> m_clippingLayer;  // only used if we have clipping on a
                                           // stacking context, with compositing
                                           // children
+  OwnPtr<GraphicsLayer> m_maskLayer;      // only used if we have a mask
 
   IntRect m_compositedBounds;
 

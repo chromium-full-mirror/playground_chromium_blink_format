@@ -542,8 +542,7 @@ void RenderLayerCompositor::computeCompositingRequirements(
   // that
   // the child layers are opaque, then rendered with opacity on this layer.
   if (childState.m_subtreeIsCompositing &&
-      (layer->renderer()->hasTransform() ||
-       layer->renderer()->style()->opacity() < 1)) {
+      requiresCompositingWhenDescendantsAreCompositing(layer->renderer())) {
     layer->setMustOverlapCompositedLayers(true);
     if (overlapMap)
       addToOverlapMap(*overlapMap, layer, absBounds, haveComputedBounds);
@@ -613,7 +612,7 @@ bool RenderLayerCompositor::canAccelerateVideoRendering(RenderVideo* o) const {
   // FIXME: ideally we need to look at all ancestors for mask or video. But for
   // now,
   // just bail on the obvious cases.
-  if (o->hasMask() || o->hasReflection() || !m_hasAcceleratedCompositing)
+  if (o->hasReflection() || !m_hasAcceleratedCompositing)
     return false;
 
   return o->supportsAcceleratedRendering();
@@ -972,6 +971,12 @@ bool RenderLayerCompositor::requiresCompositingForAnimation(
                renderer, CSSPropertyWebkitTransform);
   }
   return false;
+}
+
+bool RenderLayerCompositor::requiresCompositingWhenDescendantsAreCompositing(
+    RenderObject* renderer) const {
+  return renderer->hasTransform() || renderer->isTransparent() ||
+         renderer->hasMask();
 }
 
 // If an element has negative z-index children, those children render in front

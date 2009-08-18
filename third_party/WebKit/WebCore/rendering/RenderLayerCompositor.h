@@ -201,6 +201,7 @@ class RenderLayerCompositor {
   bool requiresCompositingForAnimation(RenderObject*) const;
   bool requiresCompositingForTransform(RenderObject*) const;
   bool requiresCompositingForVideo(RenderObject*) const;
+  bool requiresCompositingWhenDescendantsAreCompositing(RenderObject*) const;
 
  private:
   RenderView* m_renderView;
