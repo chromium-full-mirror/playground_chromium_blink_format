@@ -38,10 +38,10 @@ class DatePrototype;
 class Debugger;
 class ErrorConstructor;
 class FunctionPrototype;
+class GlobalCodeBlock;
 class GlobalEvalFunction;
 class NativeErrorConstructor;
-class GlobalCodeBlock;
-class ObjectConstructor;
+class ProgramCodeBlock;
 class PrototypeFunction;
 class RegExpConstructor;
 class RegExpPrototype;
@@ -61,7 +61,6 @@ class JSGlobalObject : public JSVariableObject {
         : JSVariableObjectData(&symbolTable, 0),
           registerArraySize(0),
           globalScopeChain(NoScopeChain()),
-          objectConstructor(0),
           regExpConstructor(0),
           errorConstructor(0),
           evalErrorConstructor(0),
@@ -73,8 +72,6 @@ class JSGlobalObject : public JSVariableObject {
           evalFunction(0),
           callFunction(0),
           applyFunction(0),
-          objectToStringFunction(0),
-          objectToLocaleStringFunction(0),
           objectPrototype(0),
           functionPrototype(0),
           arrayPrototype(0),
@@ -99,7 +96,6 @@ class JSGlobalObject : public JSVariableObject {
 
     int recursion;
 
-    ObjectConstructor* objectConstructor;
     RegExpConstructor* regExpConstructor;
     ErrorConstructor* errorConstructor;
     NativeErrorConstructor* evalErrorConstructor;
@@ -112,8 +108,6 @@ class JSGlobalObject : public JSVariableObject {
     GlobalEvalFunction* evalFunction;
     NativeFunctionWrapper* callFunction;
     NativeFunctionWrapper* applyFunction;
-    NativeFunctionWrapper* objectToStringFunction;
-    NativeFunctionWrapper* objectToLocaleStringFunction;
 
     ObjectPrototype* objectPrototype;
     FunctionPrototype* functionPrototype;
@@ -194,9 +188,6 @@ class JSGlobalObject : public JSVariableObject {
   // The following accessors return pristine values, even if a script
   // replaces the global object's associated property.
 
-  ObjectConstructor* objectConstructor() const {
-    return d()->objectConstructor;
-  }
   RegExpConstructor* regExpConstructor() const {
     return d()->regExpConstructor;
   }
@@ -233,13 +224,6 @@ class JSGlobalObject : public JSVariableObject {
   NumberPrototype* numberPrototype() const { return d()->numberPrototype; }
   DatePrototype* datePrototype() const { return d()->datePrototype; }
   RegExpPrototype* regExpPrototype() const { return d()->regExpPrototype; }
-
-  NativeFunctionWrapper* objectToStringFunction() const {
-    return d()->objectToStringFunction;
-  }
-  NativeFunctionWrapper* objectToLocaleStringFunction() const {
-    return d()->objectToLocaleStringFunction;
-  }
 
   JSObject* methodCallDummy() const { return d()->methodCallDummy; }
 

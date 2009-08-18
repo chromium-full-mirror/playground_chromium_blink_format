@@ -30,9 +30,7 @@ class ObjectPrototype : public JSObject {
  public:
   ObjectPrototype(ExecState*,
                   PassRefPtr<Structure>,
-                  Structure* prototypeFunctionStructure,
-                  NativeFunctionWrapper** toStringFunction,
-                  NativeFunctionWrapper** toLocaleStringFunction);
+                  Structure* prototypeFunctionStructure);
 };
 
 JSValue JSC_HOST_CALL objectProtoFuncToString(ExecState*,

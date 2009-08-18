@@ -71,20 +71,19 @@ static JSValue JSC_HOST_CALL objectProtoFuncToLocaleString(ExecState*,
 
 ObjectPrototype::ObjectPrototype(ExecState* exec,
                                  PassRefPtr<Structure> stucture,
-                                 Structure* prototypeFunctionStructure,
-                                 NativeFunctionWrapper** toStringFunction,
-                                 NativeFunctionWrapper** toLocaleStringFunction)
+                                 Structure* prototypeFunctionStructure)
     : JSObject(stucture) {
-  NativeFunctionWrapper* toString = new (exec) NativeFunctionWrapper(
-      exec, prototypeFunctionStructure, 0, exec->propertyNames().toString,
-      objectProtoFuncToString);
-  NativeFunctionWrapper* toLocaleString = new (exec) NativeFunctionWrapper(
-      exec, prototypeFunctionStructure, 0, exec->propertyNames().toLocaleString,
-      objectProtoFuncToLocaleString);
-  *toStringFunction = toString;
-  *toLocaleStringFunction = toLocaleString;
-  putDirectFunctionWithoutTransition(exec, toString, DontEnum);
-  putDirectFunctionWithoutTransition(exec, toLocaleString, DontEnum);
+  putDirectFunctionWithoutTransition(
+      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
+                                             0, exec->propertyNames().toString,
+                                             objectProtoFuncToString),
+      DontEnum);
+  putDirectFunctionWithoutTransition(
+      exec,
+      new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure, 0,
+                                       exec->propertyNames().toLocaleString,
+                                       objectProtoFuncToLocaleString),
+      DontEnum);
   putDirectFunctionWithoutTransition(
       exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
                                              0, exec->propertyNames().valueOf,
