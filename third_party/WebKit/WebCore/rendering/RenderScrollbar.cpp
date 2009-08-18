@@ -45,7 +45,19 @@ RenderScrollbar::RenderScrollbar(ScrollbarClient* client,
                 orientation,
                 RegularScrollbar,
                 RenderScrollbarTheme::renderScrollbarTheme()),
-      m_owner(renderer) {}
+      m_owner(renderer) {
+  // FIXME: We need to do this because RenderScrollbar::styleChanged is called
+  // as soon as the scrollbar is created.
+
+  // Update the scrollbar size.
+  updateScrollbarPart(ScrollbarBGPart);
+  RenderScrollbarPart* part = m_parts.get(ScrollbarBGPart);
+  if (!part)
+    return;
+
+  part->layout();
+  setFrameRect(IntRect(0, 0, part->width(), part->height()));
+}
 
 RenderScrollbar::~RenderScrollbar() {
   ASSERT(m_parts.isEmpty());
