@@ -194,7 +194,7 @@ class RenderBlock : public RenderBox {
   // This function is a convenience helper for creating an anonymous block that
   // inherits its
   // style from this RenderBlock.
-  RenderBlock* createAnonymousBlock() const;
+  RenderBlock* createAnonymousBlock(bool isFlexibleBox = false) const;
 
  protected:
   virtual void setOverflowHeight(int h) { m_overflowHeight = h; }
