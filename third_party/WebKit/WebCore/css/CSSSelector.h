@@ -128,6 +128,8 @@ class CSSSelector : public Noncopyable {
     PseudoRequired,
     PseudoReadOnly,
     PseudoReadWrite,
+    PseudoValid,
+    PseudoInvalid,
     PseudoIndeterminate,
     PseudoTarget,
     PseudoBefore,

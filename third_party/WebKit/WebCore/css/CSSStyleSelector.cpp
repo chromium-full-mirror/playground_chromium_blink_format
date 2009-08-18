@@ -1067,6 +1067,11 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
 
         if (s->isDefaultButtonForForm() != m_element->isDefaultButtonForForm())
           return false;
+
+        if ((s->willValidate() && s->isValidFormControlElement()) !=
+            (m_element->willValidate() &&
+             m_element->isValidFormControlElement()))
+          return false;
       }
 
       if (style->transitions() || style->animations())
@@ -2636,6 +2641,10 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
         return e && e->isOptionalFormControl();
       case CSSSelector::PseudoRequired:
         return e && e->isRequiredFormControl();
+      case CSSSelector::PseudoValid:
+        return e && e->willValidate() && e->isValidFormControlElement();
+      case CSSSelector::PseudoInvalid:
+        return e && e->willValidate() && !e->isValidFormControlElement();
       case CSSSelector::PseudoChecked: {
         if (!e || !e->isFormControlElement())
           break;

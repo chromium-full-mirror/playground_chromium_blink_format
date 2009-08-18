@@ -213,6 +213,8 @@ class Element : public ContainerNode {
   virtual bool isOptionalFormControl() const { return false; }
   virtual bool isRequiredFormControl() const { return false; }
   virtual bool isDefaultButtonForForm() const { return false; }
+  virtual bool willValidate() const { return false; }
+  virtual bool isValidFormControlElement() { return false; }
 
   virtual bool formControlValueMatchesRenderer() const { return false; }
   virtual void setFormControlValueMatchesRenderer(bool) {}
