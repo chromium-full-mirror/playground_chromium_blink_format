@@ -517,7 +517,7 @@ class FillLayersPropertyWrapper : public PropertyWrapperBase {
         m_fillLayerPropertyWrapper = new FillLayerPropertyWrapper<Length>(
             &FillLayer::yPosition, &FillLayer::setYPosition);
         break;
-      case CSSPropertyWebkitBackgroundSize:
+      case CSSPropertyBackgroundSize:
       case CSSPropertyWebkitMaskSize:
         m_fillLayerPropertyWrapper = new FillLayerPropertyWrapper<LengthSize>(
             &FillLayer::size, &FillLayer::setSize);
@@ -695,7 +695,7 @@ static void ensurePropertyMap() {
         CSSPropertyBackgroundPositionY, &RenderStyle::backgroundLayers,
         &RenderStyle::accessBackgroundLayers));
     gPropertyWrappers->append(new FillLayersPropertyWrapper(
-        CSSPropertyWebkitBackgroundSize, &RenderStyle::backgroundLayers,
+        CSSPropertyBackgroundSize, &RenderStyle::backgroundLayers,
         &RenderStyle::accessBackgroundLayers));
 
     gPropertyWrappers->append(new FillLayersPropertyWrapper(
