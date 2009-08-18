@@ -271,7 +271,9 @@ class CanvasRenderingContext2D : public Noncopyable {
                                           const String& repetitionType,
                                           ExceptionCode&);
 
-  PassRefPtr<ImageData> createImageData(float width, float height) const;
+  PassRefPtr<ImageData> createImageData(float width,
+                                        float height,
+                                        ExceptionCode&) const;
   PassRefPtr<ImageData> getImageData(float sx,
                                      float sy,
                                      float sw,
