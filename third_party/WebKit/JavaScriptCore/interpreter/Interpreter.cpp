@@ -571,20 +571,20 @@ NEVER_INLINE bool Interpreter::unwindCallFrame(CallFrame*& callFrame,
     DebuggerCallFrame debuggerCallFrame(callFrame, exceptionValue);
     if (callFrame->callee())
       debugger->returnEvent(debuggerCallFrame,
-                            codeBlock->ownerNode()->sourceID(),
-                            codeBlock->ownerNode()->lastLine());
+                            codeBlock->ownerExecutable()->sourceID(),
+                            codeBlock->ownerExecutable()->lastLine());
     else
       debugger->didExecuteProgram(debuggerCallFrame,
-                                  codeBlock->ownerNode()->sourceID(),
-                                  codeBlock->ownerNode()->lastLine());
+                                  codeBlock->ownerExecutable()->sourceID(),
+                                  codeBlock->ownerExecutable()->lastLine());
   }
 
   if (Profiler* profiler = *Profiler::enabledProfilerReference()) {
     if (callFrame->callee())
       profiler->didExecute(callFrame, callFrame->callee());
     else
-      profiler->didExecute(callFrame, codeBlock->ownerNode()->sourceURL(),
-                           codeBlock->ownerNode()->lineNo());
+      profiler->didExecute(callFrame, codeBlock->ownerExecutable()->sourceURL(),
+                           codeBlock->ownerExecutable()->lineNo());
   }
 
   // If this call frame created an activation or an 'arguments' object, tear it
@@ -672,11 +672,11 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
               ReadOnly | DontDelete);
         exception->putWithAttributes(
             callFrame, Identifier(callFrame, "sourceId"),
-            jsNumber(callFrame, codeBlock->ownerNode()->sourceID()),
+            jsNumber(callFrame, codeBlock->ownerExecutable()->sourceID()),
             ReadOnly | DontDelete);
         exception->putWithAttributes(
             callFrame, Identifier(callFrame, "sourceURL"),
-            jsOwnedString(callFrame, codeBlock->ownerNode()->sourceURL()),
+            jsOwnedString(callFrame, codeBlock->ownerExecutable()->sourceURL()),
             ReadOnly | DontDelete);
       }
 
@@ -694,7 +694,7 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
   if (Debugger* debugger = callFrame->dynamicGlobalObject()->debugger()) {
     DebuggerCallFrame debuggerCallFrame(callFrame, exceptionValue);
     debugger->exception(
-        debuggerCallFrame, codeBlock->ownerNode()->sourceID(),
+        debuggerCallFrame, codeBlock->ownerExecutable()->sourceID(),
         codeBlock->lineNumberForBytecodeOffset(callFrame, bytecodeOffset));
   }
 
@@ -815,7 +815,7 @@ JSValue Interpreter::execute(ProgramExecutable* program,
   return result;
 }
 
-JSValue Interpreter::execute(FunctionBodyNode* functionBodyNode,
+JSValue Interpreter::execute(FunctionExecutable* functionExecutable,
                              CallFrame* callFrame,
                              JSFunction* function,
                              JSObject* thisObj,
@@ -851,7 +851,7 @@ JSValue Interpreter::execute(FunctionBodyNode* functionBodyNode,
   for (ArgList::const_iterator it = args.begin(); it != end; ++it)
     newCallFrame->r(++dst) = *it;
 
-  CodeBlock* codeBlock = &functionBodyNode->bytecode(scopeChain);
+  CodeBlock* codeBlock = &functionExecutable->bytecode(scopeChain);
   newCallFrame = slideRegisterWindowForCall(
       codeBlock, &m_registerFile, newCallFrame,
       argc + RegisterFile::CallFrameHeaderSize, argc);
@@ -874,7 +874,7 @@ JSValue Interpreter::execute(FunctionBodyNode* functionBodyNode,
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    result = functionBodyNode->jitCode(scopeChain)
+    result = functionExecutable->jitCode(scopeChain)
                  .execute(&m_registerFile, newCallFrame, scopeChain->globalData,
                           exception);
 #else
@@ -891,7 +891,7 @@ JSValue Interpreter::execute(FunctionBodyNode* functionBodyNode,
 }
 
 CallFrameClosure Interpreter::prepareForRepeatCall(
-    FunctionBodyNode* functionBodyNode,
+    FunctionExecutable* FunctionExecutable,
     CallFrame* callFrame,
     JSFunction* function,
     int argCount,
@@ -919,7 +919,7 @@ CallFrameClosure Interpreter::prepareForRepeatCall(
   for (int i = 0; i < argc; ++i)
     newCallFrame->r(++dst) = jsUndefined();
 
-  CodeBlock* codeBlock = &functionBodyNode->bytecode(scopeChain);
+  CodeBlock* codeBlock = &FunctionExecutable->bytecode(scopeChain);
   newCallFrame = slideRegisterWindowForCall(
       codeBlock, &m_registerFile, newCallFrame,
       argc + RegisterFile::CallFrameHeaderSize, argc);
@@ -932,13 +932,13 @@ CallFrameClosure Interpreter::prepareForRepeatCall(
   newCallFrame->init(codeBlock, 0, scopeChain,
                      callFrame->addHostCallFrameFlag(), 0, argc, function);
 #if ENABLE(JIT)
-  functionBodyNode->jitCode(scopeChain);
+  FunctionExecutable->jitCode(scopeChain);
 #endif
 
   CallFrameClosure result = {callFrame,
                              newCallFrame,
                              function,
-                             functionBodyNode,
+                             FunctionExecutable,
                              scopeChain->globalData,
                              oldEnd,
                              scopeChain,
@@ -959,7 +959,7 @@ JSValue Interpreter::execute(CallFrameClosure& closure, JSValue* exception) {
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    result = closure.functionBody->generatedJITCode().execute(
+    result = closure.functionExecutable->generatedJITCode().execute(
         &m_registerFile, closure.newCallFrame, closure.globalData, exception);
 #else
     result = privateExecute(Normal, &m_registerFile, closure.newCallFrame,
@@ -1025,7 +1025,7 @@ JSValue Interpreter::execute(EvalExecutable* eval,
     BatchedTransitionOptimizer optimizer(variableObject);
 
     const DeclarationStacks::VarStack& varStack =
-        codeBlock->ownerNode()->varStack();
+        static_cast<EvalExecutable*>(codeBlock->ownerExecutable())->varStack();
     DeclarationStacks::VarStack::const_iterator varStackEnd = varStack.end();
     for (DeclarationStacks::VarStack::const_iterator it = varStack.begin();
          it != varStackEnd; ++it) {
@@ -1036,16 +1036,12 @@ JSValue Interpreter::execute(EvalExecutable* eval,
       }
     }
 
-    const DeclarationStacks::FunctionStack& functionStack =
-        codeBlock->ownerNode()->functionStack();
-    DeclarationStacks::FunctionStack::const_iterator functionStackEnd =
-        functionStack.end();
-    for (DeclarationStacks::FunctionStack::const_iterator it =
-             functionStack.begin();
-         it != functionStackEnd; ++it) {
+    int numFunctions = codeBlock->numberOfFunctionDecls();
+    for (int i = 0; i < numFunctions; ++i) {
+      FunctionExecutable* function = codeBlock->functionDecl(i);
       PutPropertySlot slot;
-      variableObject->put(callFrame, (*it)->ident(),
-                          (*it)->make(callFrame, scopeChain), slot);
+      variableObject->put(callFrame, function->name(),
+                          function->make(callFrame, scopeChain), slot);
     }
   }
 
@@ -1105,30 +1101,33 @@ NEVER_INLINE void Interpreter::debug(CallFrame* callFrame,
   switch (debugHookID) {
     case DidEnterCallFrame:
       debugger->callEvent(callFrame,
-                          callFrame->codeBlock()->ownerNode()->sourceID(),
+                          callFrame->codeBlock()->ownerExecutable()->sourceID(),
                           firstLine);
       return;
     case WillLeaveCallFrame:
       debugger->returnEvent(
-          callFrame, callFrame->codeBlock()->ownerNode()->sourceID(), lastLine);
+          callFrame, callFrame->codeBlock()->ownerExecutable()->sourceID(),
+          lastLine);
       return;
     case WillExecuteStatement:
-      debugger->atStatement(callFrame,
-                            callFrame->codeBlock()->ownerNode()->sourceID(),
-                            firstLine);
+      debugger->atStatement(
+          callFrame, callFrame->codeBlock()->ownerExecutable()->sourceID(),
+          firstLine);
       return;
     case WillExecuteProgram:
       debugger->willExecuteProgram(
-          callFrame, callFrame->codeBlock()->ownerNode()->sourceID(),
+          callFrame, callFrame->codeBlock()->ownerExecutable()->sourceID(),
           firstLine);
       return;
     case DidExecuteProgram:
       debugger->didExecuteProgram(
-          callFrame, callFrame->codeBlock()->ownerNode()->sourceID(), lastLine);
+          callFrame, callFrame->codeBlock()->ownerExecutable()->sourceID(),
+          lastLine);
       return;
     case DidReachBreakpoint:
       debugger->didReachBreakpoint(
-          callFrame, callFrame->codeBlock()->ownerNode()->sourceID(), lastLine);
+          callFrame, callFrame->codeBlock()->ownerExecutable()->sourceID(),
+          lastLine);
       return;
   }
 }
@@ -3265,8 +3264,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int dst = (++vPC)->u.operand;
       int func = (++vPC)->u.operand;
 
-      callFrame->r(dst) = JSValue(callFrame->codeBlock()->function(func)->make(
-          callFrame, callFrame->scopeChain()));
+      callFrame->r(dst) =
+          JSValue(callFrame->codeBlock()->functionDecl(func)->make(
+              callFrame, callFrame->scopeChain()));
 
       ++vPC;
       NEXT_INSTRUCTION();
@@ -3282,8 +3282,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int dst = (++vPC)->u.operand;
       int funcIndex = (++vPC)->u.operand;
 
-      FunctionBodyNode* body = callFrame->codeBlock()->function(funcIndex);
-      JSFunction* func = body->make(callFrame, callFrame->scopeChain());
+      FunctionExecutable* function =
+          callFrame->codeBlock()->functionExpr(funcIndex);
+      JSFunction* func = function->make(callFrame, callFrame->scopeChain());
 
       /*
           The Identifier in a FunctionExpression can be referenced from inside
@@ -3292,10 +3293,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           Identifier in a FunctionExpression cannot be referenced from and
           does not affect the scope enclosing the FunctionExpression.
        */
-      if (!body->ident().isNull()) {
+      if (!function->name().isNull()) {
         JSStaticScopeObject* functionScopeObject =
-            new (callFrame) JSStaticScopeObject(callFrame, body->ident(), func,
-                                                ReadOnly | DontDelete);
+            new (callFrame) JSStaticScopeObject(callFrame, function->name(),
+                                                func, ReadOnly | DontDelete);
         func->scope().push(functionScopeObject);
       }
 
@@ -3368,9 +3369,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       if (callType == CallTypeJS) {
         ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
-        FunctionBodyNode* functionBodyNode = callData.js.functionBody;
         CodeBlock* newCodeBlock =
-            &functionBodyNode->bytecode(callDataScopeChain);
+            &callData.js.functionExecutable->bytecode(callDataScopeChain);
 
         CallFrame* previousCallFrame = callFrame;
 
@@ -3446,7 +3446,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           exceptionValue = createStackOverflowError(callFrame);
           goto vm_throw;
         }
-        int32_t expectedParams = callFrame->callee()->body()->parameterCount();
+        int32_t expectedParams =
+            callFrame->callee()->executable()->parameterCount();
         int32_t inplaceArgs = min(argCount, expectedParams);
         int32_t i = 0;
         Register* argStore = callFrame->registers() + argsOffset;
@@ -3555,9 +3556,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       if (callType == CallTypeJS) {
         ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
-        FunctionBodyNode* functionBodyNode = callData.js.functionBody;
         CodeBlock* newCodeBlock =
-            &functionBodyNode->bytecode(callDataScopeChain);
+            &callData.js.functionExecutable->bytecode(callDataScopeChain);
 
         CallFrame* previousCallFrame = callFrame;
 
@@ -3730,7 +3730,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       int dst = (++vPC)->u.operand;
       JSActivation* activation = new (globalData) JSActivation(
-          callFrame, static_cast<FunctionBodyNode*>(codeBlock->ownerNode()));
+          callFrame,
+          static_cast<FunctionExecutable*>(codeBlock->ownerExecutable()));
       callFrame->r(dst) = JSValue(activation);
       callFrame->setScopeChain(
           callFrame->scopeChain()->copy()->push(activation));
@@ -3818,9 +3819,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       if (constructType == ConstructTypeJS) {
         ScopeChainNode* callDataScopeChain = constructData.js.scopeChain;
-        FunctionBodyNode* functionBodyNode = constructData.js.functionBody;
         CodeBlock* newCodeBlock =
-            &functionBodyNode->bytecode(callDataScopeChain);
+            &constructData.js.functionExecutable->bytecode(callDataScopeChain);
 
         Structure* structure;
         JSValue prototype = callFrame->r(proto).jsValue();
@@ -4088,8 +4088,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
                         callFrame->r(message).jsValue().toString(callFrame),
                         codeBlock->lineNumberForBytecodeOffset(
                             callFrame, vPC - codeBlock->instructions().begin()),
-                        codeBlock->ownerNode()->sourceID(),
-                        codeBlock->ownerNode()->sourceURL()));
+                        codeBlock->ownerExecutable()->sourceID(),
+                        codeBlock->ownerExecutable()->sourceURL()));
 
       ++vPC;
       NEXT_INSTRUCTION();
@@ -4334,8 +4334,8 @@ void Interpreter::retrieveLastCaller(CallFrame* callFrame,
       bytecodeOffsetForPC(callerFrame, callerCodeBlock, callFrame->returnPC());
   lineNumber = callerCodeBlock->lineNumberForBytecodeOffset(callerFrame,
                                                             bytecodeOffset - 1);
-  sourceID = callerCodeBlock->ownerNode()->sourceID();
-  sourceURL = callerCodeBlock->ownerNode()->sourceURL();
+  sourceID = callerCodeBlock->ownerExecutable()->sourceID();
+  sourceURL = callerCodeBlock->ownerExecutable()->sourceURL();
   function = callerFrame->callee();
 }
 

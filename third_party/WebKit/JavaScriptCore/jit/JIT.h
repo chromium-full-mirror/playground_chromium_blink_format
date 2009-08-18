@@ -269,9 +269,8 @@ class JIT : private MacroAssembler {
   static const int patchGetByIdDefaultOffset = 256;
 
  public:
-  static void compile(JSGlobalData* globalData, CodeBlock* codeBlock) {
-    JIT jit(globalData, codeBlock);
-    jit.privateCompile();
+  static JITCode compile(JSGlobalData* globalData, CodeBlock* codeBlock) {
+    return JIT(globalData, codeBlock).privateCompile();
   }
 
   static void compileGetByIdProto(JSGlobalData* globalData,
@@ -418,7 +417,7 @@ class JIT : private MacroAssembler {
   void privateCompileMainPass();
   void privateCompileLinkPass();
   void privateCompileSlowCases();
-  void privateCompile();
+  JITCode privateCompile();
   void privateCompileGetByIdProto(StructureStubInfo*,
                                   Structure*,
                                   Structure* prototypeStructure,

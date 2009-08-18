@@ -128,7 +128,7 @@ ALWAYS_INLINE void Arguments::getArgumentsData(CallFrame* callFrame,
                                                int& argc) {
   function = callFrame->callee();
 
-  CodeBlock* codeBlock = &function->body()->generatedBytecode();
+  CodeBlock* codeBlock = &function->executable()->generatedBytecode();
   int numParameters = codeBlock->m_numParameters;
   argc = callFrame->argumentCount();
 
@@ -153,7 +153,7 @@ inline Arguments::Arguments(CallFrame* callFrame)
   int numArguments;
   getArgumentsData(callFrame, callee, firstParameterIndex, argv, numArguments);
 
-  d->numParameters = callee->body()->parameterCount();
+  d->numParameters = callee->executable()->parameterCount();
   d->firstParameterIndex = firstParameterIndex;
   d->numArguments = numArguments;
 
@@ -184,7 +184,7 @@ inline Arguments::Arguments(CallFrame* callFrame)
 inline Arguments::Arguments(CallFrame* callFrame, NoParametersType)
     : JSObject(callFrame->lexicalGlobalObject()->argumentsStructure()),
       d(new ArgumentsData) {
-  ASSERT(!callFrame->callee()->body()->parameterCount());
+  ASSERT(!callFrame->callee()->executable()->parameterCount());
 
   unsigned numArguments = callFrame->argumentCount() - 1;
 
@@ -232,8 +232,8 @@ inline void JSActivation::copyRegisters(Arguments* arguments) {
   ASSERT(!d()->registerArray);
 
   size_t numParametersMinusThis =
-      d()->functionBody->generatedBytecode().m_numParameters - 1;
-  size_t numVars = d()->functionBody->generatedBytecode().m_numVars;
+      d()->functionExecutable->generatedBytecode().m_numParameters - 1;
+  size_t numVars = d()->functionExecutable->generatedBytecode().m_numVars;
   size_t numLocals = numVars + numParametersMinusThis;
 
   if (!numLocals)

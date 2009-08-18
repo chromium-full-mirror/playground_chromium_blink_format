@@ -42,7 +42,7 @@ struct StructureStubInfo;
 
 class CodeBlock;
 class ExecutablePool;
-class FunctionBodyNode;
+class FunctionExecutable;
 class Identifier;
 class JSGlobalData;
 class JSGlobalData;
@@ -66,8 +66,8 @@ union JITStubArg {
   Identifier& identifier() { return *static_cast<Identifier*>(asPointer); }
   int32_t int32() { return asInt32; }
   CodeBlock* codeBlock() { return static_cast<CodeBlock*>(asPointer); }
-  FunctionBodyNode* function() {
-    return static_cast<FunctionBodyNode*>(asPointer);
+  FunctionExecutable* function() {
+    return static_cast<FunctionExecutable*>(asPointer);
   }
   RegExp* regExp() { return static_cast<RegExp*>(asPointer); }
   JSPropertyNameIterator* propertyNameIterator() {

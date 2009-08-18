@@ -43,7 +43,7 @@ namespace JSC {
 
 class CodeBlock;
 class EvalExecutable;
-class FunctionBodyNode;
+class FunctionExecutable;
 class InternalFunction;
 class JSFunction;
 class JSGlobalObject;
@@ -99,7 +99,7 @@ class Interpreter : public FastAllocBase {
                   ScopeChainNode*,
                   JSObject* thisObj,
                   JSValue* exception);
-  JSValue execute(FunctionBodyNode*,
+  JSValue execute(FunctionExecutable*,
                   CallFrame*,
                   JSFunction*,
                   JSObject* thisObj,
@@ -144,7 +144,7 @@ class Interpreter : public FastAllocBase {
  private:
   enum ExecutionFlag { Normal, InitializeAndReturn };
 
-  CallFrameClosure prepareForRepeatCall(FunctionBodyNode*,
+  CallFrameClosure prepareForRepeatCall(FunctionExecutable*,
                                         CallFrame*,
                                         JSFunction*,
                                         int argCount,

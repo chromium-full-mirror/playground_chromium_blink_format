@@ -47,7 +47,7 @@ ASSERT_CLASS_FITS_IN_CELL(JSFunction);
 const ClassInfo JSFunction::info = {"Function", &InternalFunction::info, 0, 0};
 
 inline bool JSFunction::isHostFunction() const {
-  return m_body && m_body->isHostFunction();
+  return m_executable && m_executable->isHostFunction();
 }
 
 bool JSFunction::isHostFunctionNonInline() const {
@@ -66,7 +66,7 @@ JSFunction::JSFunction(ExecState* exec,
     : Base(&exec->globalData(), structure, name)
 #if ENABLE(JIT)
       ,
-      m_body(FunctionBodyNode::createNativeThunk(&exec->globalData()))
+      m_executable(FunctionExecutable::createNativeThunk(exec))
 #endif
 {
 #if ENABLE(JIT)
@@ -81,13 +81,12 @@ JSFunction::JSFunction(ExecState* exec,
 }
 
 JSFunction::JSFunction(ExecState* exec,
-                       const Identifier& name,
-                       PassRefPtr<FunctionBodyNode> body,
+                       PassRefPtr<FunctionExecutable> executable,
                        ScopeChainNode* scopeChainNode)
     : Base(&exec->globalData(),
            exec->lexicalGlobalObject()->functionStructure(),
-           name),
-      m_body(body) {
+           executable->name()),
+      m_executable(executable) {
   setScopeChain(scopeChainNode);
 }
 
@@ -99,8 +98,8 @@ JSFunction::~JSFunction() {
 // this memory is freed and may be reused (potentially for another, different
 // JSFunction).
 #if ENABLE(JIT_OPTIMIZE_CALL)
-  if (m_body && m_body->isGenerated())
-    m_body->generatedBytecode().unlinkCallers();
+  if (m_executable && m_executable->isGenerated())
+    m_executable->generatedBytecode().unlinkCallers();
 #endif
   if (!isHostFunction())
     scopeChain().~ScopeChain();  // FIXME: Don't we need to do this in the
@@ -109,7 +108,7 @@ JSFunction::~JSFunction() {
 
 void JSFunction::markChildren(MarkStack& markStack) {
   Base::markChildren(markStack);
-  m_body->markAggregate(markStack);
+  m_executable->markAggregate(markStack);
   if (!isHostFunction())
     scopeChain().markAggregate(markStack);
 }
@@ -119,7 +118,7 @@ CallType JSFunction::getCallData(CallData& callData) {
     callData.native.function = nativeFunction();
     return CallTypeHost;
   }
-  callData.js.functionBody = m_body.get();
+  callData.js.functionExecutable = m_executable.get();
   callData.js.scopeChain = scopeChain().node();
   return CallTypeJS;
 }
@@ -129,7 +128,7 @@ JSValue JSFunction::call(ExecState* exec,
                          const ArgList& args) {
   ASSERT(!isHostFunction());
   return exec->interpreter()->execute(
-      m_body.get(), exec, this, thisValue.toThisObject(exec), args,
+      m_executable.get(), exec, this, thisValue.toThisObject(exec), args,
       scopeChain().node(), exec->exceptionSlot());
 }
 
@@ -154,7 +153,7 @@ JSValue JSFunction::lengthGetter(ExecState* exec,
                                  const PropertySlot& slot) {
   JSFunction* thisObj = asFunction(slot.slotBase());
   ASSERT(!thisObj->isHostFunction());
-  return jsNumber(exec, thisObj->m_body->parameterCount());
+  return jsNumber(exec, thisObj->m_executable->parameterCount());
 }
 
 bool JSFunction::getOwnPropertySlot(ExecState* exec,
@@ -223,7 +222,7 @@ bool JSFunction::deleteProperty(ExecState* exec,
 ConstructType JSFunction::getConstructData(ConstructData& constructData) {
   if (isHostFunction())
     return ConstructTypeNone;
-  constructData.js.functionBody = m_body.get();
+  constructData.js.functionExecutable = m_executable.get();
   constructData.js.scopeChain = scopeChain().node();
   return ConstructTypeJS;
 }
@@ -238,16 +237,12 @@ JSObject* JSFunction::construct(ExecState* exec, const ArgList& args) {
     structure = exec->lexicalGlobalObject()->emptyObjectStructure();
   JSObject* thisObj = new (exec) JSObject(structure);
 
-  JSValue result =
-      exec->interpreter()->execute(m_body.get(), exec, this, thisObj, args,
-                                   scopeChain().node(), exec->exceptionSlot());
+  JSValue result = exec->interpreter()->execute(
+      m_executable.get(), exec, this, thisObj, args, scopeChain().node(),
+      exec->exceptionSlot());
   if (exec->hadException() || !result.isObject())
     return thisObj;
   return asObject(result);
-}
-
-void JSFunction::setBody(PassRefPtr<FunctionBodyNode> body) {
-  m_body = body;
 }
 
 }  // namespace JSC

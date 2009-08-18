@@ -228,12 +228,22 @@ inline ArrayType* binaryChop(ArrayType* array, size_t size, KeyType key) {
 }
 #endif
 
+struct ExceptionInfo : FastAllocBase {
+  Vector<ExpressionRangeInfo> m_expressionInfo;
+  Vector<LineInfo> m_lineInfo;
+  Vector<GetByIdExceptionInfo> m_getByIdExceptionInfo;
+
+#if ENABLE(JIT)
+  Vector<CallReturnOffsetToBytecodeIndex> m_callReturnIndexVector;
+#endif
+};
+
 class CodeBlock : public FastAllocBase {
   friend class JIT;
 
  protected:
-  CodeBlock(ScopeNode* ownerNode);
-  CodeBlock(ScopeNode* ownerNode,
+  CodeBlock(ExecutableBase* ownerExecutable);
+  CodeBlock(ExecutableBase* ownerExecutable,
             CodeType,
             PassRefPtr<SourceProvider>,
             unsigned sourceOffset);
@@ -325,7 +335,8 @@ class CodeBlock : public FastAllocBase {
     return binaryChop<CallReturnOffsetToBytecodeIndex, unsigned,
                       getCallReturnOffset>(
                callReturnIndexVector().begin(), callReturnIndexVector().size(),
-               ownerNode()->generatedJITCode().offsetOf(returnAddress.value()))
+               ownerExecutable()->generatedJITCode().offsetOf(
+                   returnAddress.value()))
         ->bytecodeIndex;
   }
 
@@ -339,19 +350,23 @@ class CodeBlock : public FastAllocBase {
   bool isNumericCompareFunction() { return m_isNumericCompareFunction; }
 
   Vector<Instruction>& instructions() { return m_instructions; }
+  void discardBytecode() { m_instructions.clear(); }
+
 #ifndef NDEBUG
+  unsigned instructionCount() { return m_instructionCount; }
   void setInstructionCount(unsigned instructionCount) {
     m_instructionCount = instructionCount;
   }
 #endif
 
 #if ENABLE(JIT)
-  JITCode& getJITCode() { return ownerNode()->generatedJITCode(); }
-  void setJITCode(JITCode);
-  ExecutablePool* executablePool() { return ownerNode()->getExecutablePool(); }
+  JITCode& getJITCode() { return ownerExecutable()->generatedJITCode(); }
+  ExecutablePool* executablePool() {
+    return ownerExecutable()->getExecutablePool();
+  }
 #endif
 
-  ScopeNode* ownerNode() const { return m_ownerNode; }
+  ExecutableBase* ownerExecutable() const { return m_ownerExecutable; }
 
   void setGlobalData(JSGlobalData* globalData) { m_globalData = globalData; }
 
@@ -442,6 +457,10 @@ class CodeBlock : public FastAllocBase {
 
   bool hasExceptionInfo() const { return m_exceptionInfo; }
   void clearExceptionInfo() { m_exceptionInfo.clear(); }
+  ExceptionInfo* extractExceptionInfo() {
+    ASSERT(m_exceptionInfo);
+    return m_exceptionInfo.release();
+  }
 
   void addExpressionInfo(const ExpressionRangeInfo& expressionInfo) {
     ASSERT(m_exceptionInfo);
@@ -494,12 +513,23 @@ class CodeBlock : public FastAllocBase {
     return m_constantRegisters[index - FirstConstantRegisterIndex].jsValue();
   }
 
-  unsigned addFunction(PassRefPtr<FunctionBodyNode> n) {
-    unsigned size = m_functions.size();
-    m_functions.append(n);
+  unsigned addFunctionDecl(PassRefPtr<FunctionExecutable> n) {
+    unsigned size = m_functionDecls.size();
+    m_functionDecls.append(n);
     return size;
   }
-  FunctionBodyNode* function(int index) { return m_functions[index].get(); }
+  FunctionExecutable* functionDecl(int index) {
+    return m_functionDecls[index].get();
+  }
+  int numberOfFunctionDecls() { return m_functionDecls.size(); }
+  unsigned addFunctionExpr(PassRefPtr<FunctionExecutable> n) {
+    unsigned size = m_functionExprs.size();
+    m_functionExprs.append(n);
+    return size;
+  }
+  FunctionExecutable* functionExpr(int index) {
+    return m_functionExprs[index].get();
+  }
 
   unsigned addRegExp(RegExp* r) {
     createRareDataIfNecessary();
@@ -584,7 +614,7 @@ class CodeBlock : public FastAllocBase {
       m_rareData.set(new RareData);
   }
 
-  ScopeNode* m_ownerNode;
+  ExecutableBase* m_ownerExecutable;
   JSGlobalData* m_globalData;
 
   Vector<Instruction> m_instructions;
@@ -620,19 +650,11 @@ class CodeBlock : public FastAllocBase {
   // Constant Pool
   Vector<Identifier> m_identifiers;
   Vector<Register> m_constantRegisters;
-  Vector<RefPtr<FunctionBodyNode>> m_functions;
+  Vector<RefPtr<FunctionExecutable>> m_functionDecls;
+  Vector<RefPtr<FunctionExecutable>> m_functionExprs;
 
   SymbolTable m_symbolTable;
 
-  struct ExceptionInfo : FastAllocBase {
-    Vector<ExpressionRangeInfo> m_expressionInfo;
-    Vector<LineInfo> m_lineInfo;
-    Vector<GetByIdExceptionInfo> m_getByIdExceptionInfo;
-
-#if ENABLE(JIT)
-    Vector<CallReturnOffsetToBytecodeIndex> m_callReturnIndexVector;
-#endif
-  };
   OwnPtr<ExceptionInfo> m_exceptionInfo;
 
   struct RareData : FastAllocBase {
@@ -660,12 +682,12 @@ class CodeBlock : public FastAllocBase {
 
 class GlobalCodeBlock : public CodeBlock {
  public:
-  GlobalCodeBlock(ScopeNode* ownerNode,
+  GlobalCodeBlock(ExecutableBase* ownerExecutable,
                   CodeType codeType,
                   PassRefPtr<SourceProvider> sourceProvider,
                   unsigned sourceOffset,
                   JSGlobalObject* globalObject)
-      : CodeBlock(ownerNode, codeType, sourceProvider, sourceOffset),
+      : CodeBlock(ownerExecutable, codeType, sourceProvider, sourceOffset),
         m_globalObject(globalObject) {
     m_globalObject->codeBlocks().add(this);
   }
@@ -684,20 +706,28 @@ class GlobalCodeBlock : public CodeBlock {
 
 class ProgramCodeBlock : public GlobalCodeBlock {
  public:
-  ProgramCodeBlock(ScopeNode* ownerNode,
+  ProgramCodeBlock(ProgramExecutable* ownerExecutable,
                    CodeType codeType,
                    JSGlobalObject* globalObject,
                    PassRefPtr<SourceProvider> sourceProvider)
-      : GlobalCodeBlock(ownerNode, codeType, sourceProvider, 0, globalObject) {}
+      : GlobalCodeBlock(ownerExecutable,
+                        codeType,
+                        sourceProvider,
+                        0,
+                        globalObject) {}
 };
 
 class EvalCodeBlock : public GlobalCodeBlock {
  public:
-  EvalCodeBlock(ScopeNode* ownerNode,
+  EvalCodeBlock(EvalExecutable* ownerExecutable,
                 JSGlobalObject* globalObject,
                 PassRefPtr<SourceProvider> sourceProvider,
                 int baseScopeDepth)
-      : GlobalCodeBlock(ownerNode, EvalCode, sourceProvider, 0, globalObject),
+      : GlobalCodeBlock(ownerExecutable,
+                        EvalCode,
+                        sourceProvider,
+                        0,
+                        globalObject),
         m_baseScopeDepth(baseScopeDepth) {}
 
   int baseScopeDepth() const { return m_baseScopeDepth; }
@@ -708,16 +738,17 @@ class EvalCodeBlock : public GlobalCodeBlock {
 
 class FunctionCodeBlock : public CodeBlock {
  public:
-  FunctionCodeBlock(ScopeNode* ownerNode,
+  FunctionCodeBlock(FunctionExecutable* ownerExecutable,
                     CodeType codeType,
                     PassRefPtr<SourceProvider> sourceProvider,
                     unsigned sourceOffset)
-      : CodeBlock(ownerNode, codeType, sourceProvider, sourceOffset) {}
+      : CodeBlock(ownerExecutable, codeType, sourceProvider, sourceOffset) {}
 };
 
 class NativeCodeBlock : public CodeBlock {
  public:
-  NativeCodeBlock(ScopeNode* ownerNode) : CodeBlock(ownerNode) {}
+  NativeCodeBlock(FunctionExecutable* ownerExecutable)
+      : CodeBlock(ownerExecutable) {}
 };
 
 inline Register& ExecState::r(int index) {

@@ -74,9 +74,10 @@ JSValue createUndefinedVariableError(ExecState* exec,
       exec, bytecodeOffset, divotPoint, startOffset, endOffset);
   UString message = "Can't find variable: ";
   message.append(ident.ustring());
-  JSObject* exception = Error::create(exec, ReferenceError, message, line,
-                                      codeBlock->ownerNode()->sourceID(),
-                                      codeBlock->ownerNode()->sourceURL());
+  JSObject* exception =
+      Error::create(exec, ReferenceError, message, line,
+                    codeBlock->ownerExecutable()->sourceID(),
+                    codeBlock->ownerExecutable()->sourceURL());
   exception->putWithAttributes(
       exec, Identifier(exec, expressionBeginOffsetPropertyName),
       jsNumber(exec, divotPoint - startOffset), ReadOnly | DontDelete);
@@ -159,9 +160,10 @@ JSObject* createInvalidParamError(ExecState* exec,
   UString errorMessage =
       createErrorMessage(exec, codeBlock, line, divotPoint,
                          divotPoint + endOffset, value, message);
-  JSObject* exception = Error::create(exec, TypeError, errorMessage, line,
-                                      codeBlock->ownerNode()->sourceID(),
-                                      codeBlock->ownerNode()->sourceURL());
+  JSObject* exception =
+      Error::create(exec, TypeError, errorMessage, line,
+                    codeBlock->ownerExecutable()->sourceID(),
+                    codeBlock->ownerExecutable()->sourceURL());
   exception->putWithAttributes(
       exec, Identifier(exec, expressionBeginOffsetPropertyName),
       jsNumber(exec, divotPoint - startOffset), ReadOnly | DontDelete);
@@ -194,9 +196,10 @@ JSObject* createNotAConstructorError(ExecState* exec,
   UString errorMessage =
       createErrorMessage(exec, codeBlock, line, startPoint, divotPoint, value,
                          "not a constructor");
-  JSObject* exception = Error::create(exec, TypeError, errorMessage, line,
-                                      codeBlock->ownerNode()->sourceID(),
-                                      codeBlock->ownerNode()->sourceURL());
+  JSObject* exception =
+      Error::create(exec, TypeError, errorMessage, line,
+                    codeBlock->ownerExecutable()->sourceID(),
+                    codeBlock->ownerExecutable()->sourceURL());
   exception->putWithAttributes(
       exec, Identifier(exec, expressionBeginOffsetPropertyName),
       jsNumber(exec, divotPoint - startOffset), ReadOnly | DontDelete);
@@ -221,9 +224,10 @@ JSValue createNotAFunctionError(ExecState* exec,
   UString errorMessage =
       createErrorMessage(exec, codeBlock, line, divotPoint - startOffset,
                          divotPoint, value, "not a function");
-  JSObject* exception = Error::create(exec, TypeError, errorMessage, line,
-                                      codeBlock->ownerNode()->sourceID(),
-                                      codeBlock->ownerNode()->sourceURL());
+  JSObject* exception =
+      Error::create(exec, TypeError, errorMessage, line,
+                    codeBlock->ownerExecutable()->sourceID(),
+                    codeBlock->ownerExecutable()->sourceURL());
   exception->putWithAttributes(
       exec, Identifier(exec, expressionBeginOffsetPropertyName),
       jsNumber(exec, divotPoint - startOffset), ReadOnly | DontDelete);
@@ -271,9 +275,10 @@ JSObject* createNotAnObjectError(ExecState* exec,
   UString errorMessage = createErrorMessage(
       exec, codeBlock, line, divotPoint - startOffset, divotPoint,
       error->isNull() ? jsNull() : jsUndefined(), "not an object");
-  JSObject* exception = Error::create(exec, TypeError, errorMessage, line,
-                                      codeBlock->ownerNode()->sourceID(),
-                                      codeBlock->ownerNode()->sourceURL());
+  JSObject* exception =
+      Error::create(exec, TypeError, errorMessage, line,
+                    codeBlock->ownerExecutable()->sourceID(),
+                    codeBlock->ownerExecutable()->sourceURL());
   exception->putWithAttributes(
       exec, Identifier(exec, expressionBeginOffsetPropertyName),
       jsNumber(exec, divotPoint - startOffset), ReadOnly | DontDelete);

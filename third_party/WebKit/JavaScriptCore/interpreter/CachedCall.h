@@ -46,7 +46,7 @@ class CachedCall : public Noncopyable {
                                 ? callFrame->globalData().dynamicGlobalObject
                                 : function->scope().node()->globalObject()) {
     m_closure = m_interpreter->prepareForRepeatCall(
-        function->body(), callFrame, function, argCount,
+        function->executable(), callFrame, function, argCount,
         function->scope().node(), exception);
     m_valid = !*exception;
   }
