@@ -110,10 +110,6 @@ float userIdleTime() {
                    // pages from the page cache isn't postponed
 }
 #endif
-
-void prefetchDNS(const String& hostname) {
-  notImplemented();
-}
 }
 
 // vim: ts=4 sw=4 et

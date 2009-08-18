@@ -50,6 +50,7 @@ class QWEBKIT_EXPORT QWebSettings {
   };
   enum WebAttribute {
     AutoLoadImages,
+    DnsPrefetchEnabled,
     JavascriptEnabled,
     JavaEnabled,
     PluginsEnabled,
