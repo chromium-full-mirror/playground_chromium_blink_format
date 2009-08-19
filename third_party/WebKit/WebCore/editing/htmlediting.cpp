@@ -462,11 +462,12 @@ bool isSpecialElement(const Node* n) {
 // Checks if a string is a valid tag for the FormatBlockCommand function of
 // execCommand. Expects lower case strings.
 bool validBlockTag(const String& blockTag) {
+  // FIXME: convert this to a HashSet
   if (blockTag == "address" || blockTag == "blockquote" || blockTag == "dd" ||
       blockTag == "div" || blockTag == "dl" || blockTag == "dt" ||
       blockTag == "h1" || blockTag == "h2" || blockTag == "h3" ||
       blockTag == "h4" || blockTag == "h5" || blockTag == "h6" ||
-      blockTag == "p" || blockTag == "pre")
+      blockTag == "nav" || blockTag == "p" || blockTag == "pre")
     return true;
   return false;
 }

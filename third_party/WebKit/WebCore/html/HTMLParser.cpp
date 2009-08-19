@@ -958,6 +958,8 @@ PassRefPtr<Node> HTMLParser::getNode(Token* t) {
                      &HTMLParser::mapCreateErrorCheck);
     gFunctionMap.set(menuTag.localName().impl(),
                      &HTMLParser::pCloserCreateErrorCheck);
+    gFunctionMap.set(navTag.localName().impl(),
+                     &HTMLParser::pCloserCreateErrorCheck);
     gFunctionMap.set(nobrTag.localName().impl(),
                      &HTMLParser::nestedCreateErrorCheck);
     gFunctionMap.set(noembedTag.localName().impl(),
