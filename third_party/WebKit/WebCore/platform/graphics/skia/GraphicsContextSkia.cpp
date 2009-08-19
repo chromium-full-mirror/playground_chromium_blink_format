@@ -31,11 +31,11 @@
 #include "config.h"
 #include "GraphicsContext.h"
 
-#include "GraphicsContextPlatformPrivate.h"
-#include "GraphicsContextPrivate.h"
 #include "Color.h"
 #include "FloatRect.h"
 #include "Gradient.h"
+#include "GraphicsContextPlatformPrivate.h"
+#include "GraphicsContextPrivate.h"
 #include "ImageBuffer.h"
 #include "IntRect.h"
 #include "NativeImageSkia.h"
@@ -46,9 +46,9 @@
 #include "SkBitmap.h"
 #include "SkBlurDrawLooper.h"
 #include "SkCornerPathEffect.h"
-#include "skia/ext/platform_canvas.h"
-#include "SkiaUtils.h"
 #include "SkShader.h"
+#include "SkiaUtils.h"
+#include "skia/ext/platform_canvas.h"
 
 #include <math.h>
 #include <wtf/Assertions.h>
@@ -461,7 +461,7 @@ void GraphicsContext::drawFocusRing(const Color& color) {
 
   const Vector<IntRect>& rects = focusRingRects();
   unsigned rectCount = rects.size();
-  if (0 == rectCount)
+  if (!rectCount)
     return;
 
   SkRegion focusRingRegion;
@@ -807,9 +807,9 @@ FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& rect) {
   deviceLowerRight.setY(roundf(deviceLowerRight.y()));
 
   // Don't let the height or width round to 0 unless either was originally 0
-  if (deviceOrigin.y() == deviceLowerRight.y() && rect.height() != 0)
+  if (deviceOrigin.y() == deviceLowerRight.y() && rect.height())
     deviceLowerRight.move(0, 1);
-  if (deviceOrigin.x() == deviceLowerRight.x() && rect.width() != 0)
+  if (deviceOrigin.x() == deviceLowerRight.x() && rect.width())
     deviceLowerRight.move(1, 0);
 
   FloatPoint roundedOrigin(deviceOrigin.x() / deviceScaleX,
@@ -876,7 +876,7 @@ void GraphicsContext::setLineDash(const DashArray& dashes, float dashOffset) {
     return;
   }
 
-  size_t count = (dashLength % 2) == 0 ? dashLength : dashLength * 2;
+  size_t count = !(dashLength % 2) ? dashLength : dashLength * 2;
   SkScalar* intervals = new SkScalar[count];
 
   for (unsigned int i = 0; i < count; i++)
@@ -942,8 +942,8 @@ void GraphicsContext::setPlatformShadow(const IntSize& size,
     return;
 
   // Detect when there's no effective shadow and clear the looper.
-  if (size.width() == 0 && size.height() == 0 && blurInt == 0) {
-    platformContext()->setDrawLooper(NULL);
+  if (!size.width() && !size.height() && !blurInt) {
+    platformContext()->setDrawLooper(0);
     return;
   }
 
