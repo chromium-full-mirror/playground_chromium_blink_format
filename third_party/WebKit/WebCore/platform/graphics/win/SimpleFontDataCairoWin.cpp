@@ -120,9 +120,4 @@ float SimpleFontData::platformWidthForGlyph(Glyph glyph) const {
       m_platformData.size();
   return width * metricsMultiplier;
 }
-
-void SimpleFontData::setFont(cairo_t* cr) const {
-  ASSERT(cr);
-  m_platformData.setFont(cr);
-}
 }
