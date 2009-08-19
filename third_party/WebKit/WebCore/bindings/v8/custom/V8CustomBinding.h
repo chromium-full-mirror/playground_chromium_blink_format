@@ -476,7 +476,6 @@ class V8Custom {
   DECLARE_CALLBACK(InspectorBackendPauseOnExceptions);
   DECLARE_CALLBACK(InspectorBackendProfilerEnabled);
   DECLARE_CALLBACK(InspectorBackendNodeForId);
-  DECLARE_CALLBACK(InspectorBackendIdForNode);
   DECLARE_CALLBACK(InspectorBackendWrapObject);
   DECLARE_CALLBACK(InspectorBackendUnwrapObject);
   DECLARE_CALLBACK(InspectorBackendPushNodePathToFrontend);

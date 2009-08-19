@@ -138,7 +138,6 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   // Generic code called from custom implementations.
   void highlight(long nodeId);
   Node* nodeForId(long nodeId);
-  long idForNode(Node* node);
   ScriptValue wrapObject(const ScriptValue& object);
   ScriptValue unwrapObject(const String& objectId);
   long pushNodePathToFrontend(Node* node, bool selectInUI);

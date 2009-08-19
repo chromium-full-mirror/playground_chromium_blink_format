@@ -67,9 +67,9 @@ class InspectorDOMAgent : public EventListener {
 
   // Methods called from the InspectorController.
   bool setDocument(Document* document);
+  void releaseDanglingNodes();
 
   Node* nodeForId(long nodeId);
-  long idForNode(Node* node);
   long pushNodePathToFrontend(Node* node);
 
  private:
@@ -78,15 +78,18 @@ class InspectorDOMAgent : public EventListener {
 
   virtual void handleEvent(Event* event, bool isWindowEvent);
 
-  long bind(Node* node);
-  void unbind(Node* node);
+  typedef HashMap<RefPtr<Node>, long> NodeToIdMap;
+  long bind(Node* node, NodeToIdMap* nodesMap);
+  void unbind(Node* node, NodeToIdMap* nodesMap);
 
   void pushDocumentToFrontend();
   void pushChildNodesToFrontend(long nodeId);
 
-  ScriptObject buildObjectForNode(Node* node, int depth);
+  ScriptObject buildObjectForNode(Node* node, int depth, NodeToIdMap* nodesMap);
   ScriptArray buildArrayForElementAttributes(Element* element);
-  ScriptArray buildArrayForContainerChildren(Node* container, int depth);
+  ScriptArray buildArrayForContainerChildren(Node* container,
+                                             int depth,
+                                             NodeToIdMap* nodesMap);
 
   // We represent embedded doms as a part of the same hierarchy. Hence we treat
   // children of frame owners differently.
@@ -103,8 +106,11 @@ class InspectorDOMAgent : public EventListener {
   void discardBindings();
 
   InspectorFrontend* m_frontend;
-  HashMap<Node*, long> m_nodeToId;
+  NodeToIdMap m_documentNodeToIdMap;
+  // Owns node mappings for dangling nodes.
+  Vector<NodeToIdMap*> m_danglingNodeToIdMaps;
   HashMap<long, Node*> m_idToNode;
+  HashMap<long, NodeToIdMap*> m_idToNodesMap;
   HashSet<long> m_childrenRequested;
   long m_lastNodeId;
   ListHashSet<RefPtr<Document>> m_documents;
