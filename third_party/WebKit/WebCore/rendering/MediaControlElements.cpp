@@ -354,6 +354,14 @@ void MediaControlMuteButtonElement::updateDisplayType() {
   setDisplayType(m_mediaElement->muted() ? MediaUnMuteButton : MediaMuteButton);
 }
 
+bool MediaControlMuteButtonElement::disabled() const {
+  return !m_mediaElement->hasAudio();
+}
+
+bool MediaControlMuteButtonElement::rendererIsNeeded(RenderStyle* style) {
+  return MediaControlInputElement::rendererIsNeeded(style) && !disabled();
+}
+
 // ----------------------------
 
 MediaControlPlayButtonElement::MediaControlPlayButtonElement(

@@ -92,6 +92,7 @@ class QTMOVIEWIN_API QTMovieWin {
   void setDisabled(bool);
 
   bool hasVideo() const;
+  bool hasAudio() const;
 
   static unsigned countSupportedTypes();
   static void getSupportedType(unsigned index,

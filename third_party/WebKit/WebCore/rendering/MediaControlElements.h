@@ -135,6 +135,9 @@ class MediaControlInputElement : public HTMLInputElement {
   bool hitTest(const IntPoint& absPoint);
   MediaControlElementType displayType() const { return m_displayType; }
 
+  // Some elements are disabled by movie state (eg. mute if no audio).
+  virtual bool disabled() const { return false; }
+
  protected:
   virtual void updateDisplayType() {}
   void setDisplayType(MediaControlElementType);
@@ -152,6 +155,8 @@ class MediaControlMuteButtonElement : public MediaControlInputElement {
   MediaControlMuteButtonElement(Document*, HTMLMediaElement*);
   virtual void defaultEventHandler(Event*);
   virtual void updateDisplayType();
+  virtual bool disabled() const;
+  virtual bool rendererIsNeeded(RenderStyle*);
 };
 
 // ----------------------------

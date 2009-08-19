@@ -53,6 +53,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface,
 
   IntSize naturalSize() const;
   bool hasVideo() const;
+  bool hasAudio() const;
 
   void load(const String& url);
   void cancelLoad();
