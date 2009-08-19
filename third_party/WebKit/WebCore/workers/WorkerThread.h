@@ -61,6 +61,15 @@ class WorkerThread : public RefCounted<WorkerThread> {
   // Number of active worker threads.
   static unsigned workerThreadCount();
 
+#if ENABLE(NOTIFICATIONS)
+  NotificationPresenter* getNotificationPresenter() {
+    return m_notificationPresenter;
+  }
+  void setNotificationPresenter(NotificationPresenter* presenter) {
+    m_notificationPresenter = presenter;
+  }
+#endif
+
  protected:
   WorkerThread(const KURL&,
                const String& userAgent,
@@ -78,15 +87,6 @@ class WorkerThread : public RefCounted<WorkerThread> {
   virtual void runEventLoop();
 
   WorkerContext* workerContext() { return m_workerContext.get(); }
-
-#if ENABLE(NOTIFICATIONS)
-  NotificationPresenter* getNotificationPresenter() {
-    return m_notificationPresenter;
-  }
-  void setNotificationPresenter(NotificationPresenter* presenter) {
-    m_notificationPresenter = presenter;
-  }
-#endif
 
  private:
   // Static function executed as the core routine on the new thread. Passed a

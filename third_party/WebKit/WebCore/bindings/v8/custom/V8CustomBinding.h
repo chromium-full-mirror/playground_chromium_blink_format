@@ -165,6 +165,13 @@ class V8Custom {
       kDefaultWrapperInternalFieldCount + 1;
 #endif
 
+#if ENABLE(NOTIFICATIONS)
+  static const int kNotificationRequestCacheIndex =
+      kDefaultWrapperInternalFieldCount + 0;
+  static const int kNotificationInternalFieldCount =
+      kDefaultWrapperInternalFieldCount + 1;
+#endif
+
   static const int kDOMWindowConsoleIndex =
       kDefaultWrapperInternalFieldCount + 0;
   static const int kDOMWindowHistoryIndex =
@@ -577,7 +584,17 @@ class V8Custom {
   DECLARE_CALLBACK(WorkerContextClearInterval);
   DECLARE_CALLBACK(WorkerContextAddEventListener);
   DECLARE_CALLBACK(WorkerContextRemoveEventListener);
-#endif
+#endif  // ENABLE(WORKERS)
+
+#if ENABLE(NOTIFICATIONS)
+  DECLARE_CALLBACK(NotificationCenterRequestPermission);
+  DECLARE_CALLBACK(NotificationCenterCreateNotification);
+  DECLARE_CALLBACK(NotificationCenterCreateHTMLNotification);
+
+  DECLARE_CALLBACK(NotificationAddEventListener);
+  DECLARE_CALLBACK(NotificationRemoveEventListener);
+  DECLARE_PROPERTY_ACCESSOR(NotificationEventHandler);
+#endif  // ENABLE(NOTIFICATIONS)
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   DECLARE_PROPERTY_ACCESSOR(DOMApplicationCacheEventHandler);

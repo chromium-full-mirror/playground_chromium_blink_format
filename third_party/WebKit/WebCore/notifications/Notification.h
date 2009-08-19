@@ -104,6 +104,12 @@ class Notification : public RefCounted<Notification>,
   virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
   virtual Notification* toNotification() { return this; }
 
+  // These methods are for onEvent style listeners.
+  EventListener* getAttributeEventListener(const AtomicString&) const;
+  void setAttributeEventListener(const AtomicString&,
+                                 PassRefPtr<EventListener>);
+  void clearAttributeEventListener(const AtomicString&);
+
  private:
   Notification(const String& url,
                ScriptExecutionContext* context,
@@ -119,10 +125,6 @@ class Notification : public RefCounted<Notification>,
   virtual void derefEventTarget() { deref(); }
 
   void handleEvent(PassRefPtr<Event> event, bool useCapture);
-  EventListener* getAttributeEventListener(const AtomicString&) const;
-  void setAttributeEventListener(const AtomicString&,
-                                 PassRefPtr<EventListener>);
-  void clearAttributeEventListener(const AtomicString&);
 
   bool m_isHTML;
   KURL m_notificationURL;
