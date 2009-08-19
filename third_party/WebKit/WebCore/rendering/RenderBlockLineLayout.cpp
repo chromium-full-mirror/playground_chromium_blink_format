@@ -985,8 +985,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       RenderArena* arena = renderArena();
       RootInlineBox* box = startLine;
       while (box) {
-        repaintTop = min(repaintTop, box->topCombinedOverflow());
-        repaintBottom = max(repaintBottom, box->bottomCombinedOverflow());
+        repaintTop = min(repaintTop, box->topVisibleOverflow());
+        repaintBottom = max(repaintBottom, box->bottomVisibleOverflow());
         RootInlineBox* next = box->nextRootBox();
         box->deleteLine(arena);
         box = next;
@@ -1141,9 +1141,9 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         if (lineBox) {
           lineBox->setLineBreakInfo(end.obj, end.pos, resolver.status());
           if (useRepaintBounds) {
-            repaintTop = min(repaintTop, lineBox->topCombinedOverflow());
+            repaintTop = min(repaintTop, lineBox->topVisibleOverflow());
             repaintBottom =
-                max(repaintBottom, lineBox->bottomCombinedOverflow());
+                max(repaintBottom, lineBox->bottomVisibleOverflow());
           }
         }
 
@@ -1188,9 +1188,9 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
           line->attachLine();
           if (delta) {
             repaintTop =
-                min(repaintTop, line->topCombinedOverflow() + min(delta, 0));
+                min(repaintTop, line->topVisibleOverflow() + min(delta, 0));
             repaintBottom = max(repaintBottom,
-                                line->bottomCombinedOverflow() + max(delta, 0));
+                                line->bottomVisibleOverflow() + max(delta, 0));
             line->adjustPosition(0, delta);
           }
           if (Vector<RenderBox*>* cleanLineFloats = line->floatsPtr()) {
@@ -1210,8 +1210,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         RootInlineBox* line = endLine;
         RenderArena* arena = renderArena();
         while (line) {
-          repaintTop = min(repaintTop, line->topCombinedOverflow());
-          repaintBottom = max(repaintBottom, line->bottomCombinedOverflow());
+          repaintTop = min(repaintTop, line->topVisibleOverflow());
+          repaintBottom = max(repaintBottom, line->bottomVisibleOverflow());
           RootInlineBox* next = line->nextRootBox();
           line->deleteLine(arena);
           line = next;
@@ -1518,9 +1518,9 @@ bool RenderBlock::matchedEndLine(const InlineBidiResolver& resolver,
       RootInlineBox* boxToDelete = endLine;
       RenderArena* arena = renderArena();
       while (boxToDelete && boxToDelete != result) {
-        repaintTop = min(repaintTop, boxToDelete->topCombinedOverflow());
+        repaintTop = min(repaintTop, boxToDelete->topVisibleOverflow());
         repaintBottom =
-            max(repaintBottom, boxToDelete->bottomCombinedOverflow());
+            max(repaintBottom, boxToDelete->bottomVisibleOverflow());
         RootInlineBox* next = boxToDelete->nextRootBox();
         boxToDelete->deleteLine(arena);
         boxToDelete = next;

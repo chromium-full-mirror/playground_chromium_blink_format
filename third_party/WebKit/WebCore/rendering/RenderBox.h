@@ -88,27 +88,27 @@ class RenderBox : public RenderBoxModelObject {
   RenderBox* nextSiblingBox() const;
   RenderBox* parentBox() const;
 
-  IntRect combinedOverflowRect() const {
+  IntRect visibleOverflowRect() const {
     return hasOverflowClip() ? visualOverflowRect()
-                             : (m_overflow ? m_overflow->combinedOverflowRect()
+                             : (m_overflow ? m_overflow->visibleOverflowRect()
                                            : borderBoxRect());
   }
-  int topCombinedOverflow() const {
+  int topVisibleOverflow() const {
     return hasOverflowClip()
                ? topVisualOverflow()
                : std::min(topLayoutOverflow(), topVisualOverflow());
   }
-  int bottomCombinedOverflow() const {
+  int bottomVisibleOverflow() const {
     return hasOverflowClip()
                ? bottomVisualOverflow()
                : std::max(bottomLayoutOverflow(), bottomVisualOverflow());
   }
-  int leftCombinedOverflow() const {
+  int leftVisibleOverflow() const {
     return hasOverflowClip()
                ? leftVisualOverflow()
                : std::min(leftLayoutOverflow(), leftVisualOverflow());
   }
-  int rightCombinedOverflow() const {
+  int rightVisibleOverflow() const {
     return hasOverflowClip()
                ? rightVisualOverflow()
                : std::max(rightLayoutOverflow(), rightVisualOverflow());

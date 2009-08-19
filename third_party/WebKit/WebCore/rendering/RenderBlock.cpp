@@ -862,8 +862,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   if (!didFullRepaint && repaintTop != repaintBottom &&
       (style()->visibility() == VISIBLE ||
        enclosingLayer()->hasVisibleContent())) {
-    IntRect repaintRect(leftCombinedOverflow(), repaintTop,
-                        rightCombinedOverflow() - leftCombinedOverflow(),
+    IntRect repaintRect(leftVisibleOverflow(), repaintTop,
+                        rightVisibleOverflow() - leftVisibleOverflow(),
                         repaintBottom - repaintTop);
 
     // FIXME: Deal with multiple column repainting.  We have to split the
@@ -1683,7 +1683,7 @@ void RenderBlock::paint(PaintInfo& paintInfo, int tx, int ty) {
   // that the RenderView
   // paints the root's background.
   if (!isRoot()) {
-    IntRect overflowBox = combinedOverflowRect();
+    IntRect overflowBox = visibleOverflowRect();
     overflowBox.inflate(maximalOutlineSize(paintInfo.phase));
     overflowBox.move(tx, ty);
     if (!overflowBox.intersects(paintInfo.rect))
@@ -2933,7 +2933,7 @@ IntRect RenderBlock::floatRect() const {
   DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
   for (; (r = it.current()); ++it) {
     if (r->m_shouldPaint && !r->m_renderer->hasSelfPaintingLayer()) {
-      IntRect childRect = r->m_renderer->combinedOverflowRect();
+      IntRect childRect = r->m_renderer->visibleOverflowRect();
       childRect.move(r->m_left + r->m_renderer->marginLeft(),
                      r->m_top + r->m_renderer->marginTop());
       result.unite(childRect);
@@ -3629,7 +3629,7 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
 
   if (!isRenderView()) {
     // Check if we need to do anything at all.
-    IntRect overflowBox = combinedOverflowRect();
+    IntRect overflowBox = visibleOverflowRect();
     overflowBox.move(tx, ty);
     if (!overflowBox.contains(_x, _y))
       return false;

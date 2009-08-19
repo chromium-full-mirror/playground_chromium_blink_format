@@ -225,20 +225,20 @@ class InlineFlowBox : public InlineRunBox {
   void checkConsistency() const;
   void setHasBadChildList();
 
-  int topCombinedOverflow() const {
+  int topVisibleOverflow() const {
     return std::min(topLayoutOverflow(), topVisualOverflow());
   }
-  int bottomCombinedOverflow() const {
+  int bottomVisibleOverflow() const {
     return std::max(bottomLayoutOverflow(), bottomVisualOverflow());
   }
-  int leftCombinedOverflow() const {
+  int leftVisibleOverflow() const {
     return std::min(leftLayoutOverflow(), leftVisualOverflow());
   }
-  int rightCombinedOverflow() const {
+  int rightVisibleOverflow() const {
     return std::max(rightLayoutOverflow(), rightVisualOverflow());
   }
-  IntRect combinedOverflowRect() const {
-    return m_overflow ? m_overflow->combinedOverflowRect()
+  IntRect visibleOverflowRect() const {
+    return m_overflow ? m_overflow->visibleOverflowRect()
                       : IntRect(m_x, m_y, m_width, height());
   }
 
