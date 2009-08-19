@@ -166,7 +166,6 @@ void DocumentThreadableLoader::makeCrossOriginAccessRequestWithPreflight(
 
     preflightRequest.setHTTPHeaderField("Access-Control-Request-Headers",
                                         String::adopt(headerBuffer));
-    preflightRequest.addHTTPHeaderFields(requestHeaderFields);
   }
 
   bool skipCanLoadCheck = false;
