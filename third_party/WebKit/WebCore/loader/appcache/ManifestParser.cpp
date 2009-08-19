@@ -45,6 +45,7 @@ bool parseManifest(const KURL& manifestURL,
   ASSERT(manifest.explicitURLs.isEmpty());
   ASSERT(manifest.onlineWhitelistedURLs.isEmpty());
   ASSERT(manifest.fallbackURLs.isEmpty());
+  manifest.allowAllNetworkRequests = false;
 
   Mode mode = Explicit;
 
@@ -112,6 +113,13 @@ bool parseManifest(const KURL& manifestURL,
       // Look for whitespace separating the URL from subsequent ignored tokens.
       while (p < lineEnd && *p != '\t' && *p != ' ')
         p++;
+
+      if (mode == OnlineWhitelist && p - line.characters() == 1 &&
+          *line.characters() == '*') {
+        // Wildcard was found.
+        manifest.allowAllNetworkRequests = true;
+        continue;
+      }
 
       KURL url(manifestURL, String(line.characters(), p - line.characters()));
 

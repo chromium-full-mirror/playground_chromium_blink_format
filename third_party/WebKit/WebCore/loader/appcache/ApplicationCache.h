@@ -67,6 +67,10 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   ApplicationCacheResource* resourceForRequest(const ResourceRequest&);
   ApplicationCacheResource* resourceForURL(const String& url);
 
+  void setAllowsAllNetworkRequests(bool value) {
+    m_allowAllNetworkRequests = value;
+  }
+  bool allowsAllNetworkRequests() const { return m_allowAllNetworkRequests; }
   void setOnlineWhitelist(const Vector<KURL>& onlineWhitelist);
   const Vector<KURL>& onlineWhitelist() const { return m_onlineWhitelist; }
   bool isURLInOnlineWhitelist(const KURL&);  // There is an entry in online
@@ -102,6 +106,7 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   ResourceMap m_resources;
   ApplicationCacheResource* m_manifest;
 
+  bool m_allowAllNetworkRequests;
   Vector<KURL> m_onlineWhitelist;
   FallbackURLVector m_fallbackURLs;
 

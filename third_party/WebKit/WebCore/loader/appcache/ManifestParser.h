@@ -38,6 +38,7 @@ struct Manifest {
   Vector<KURL> onlineWhitelistedURLs;
   HashSet<String> explicitURLs;
   FallbackURLVector fallbackURLs;
+  bool allowAllNetworkRequests;  // Wildcard found in NETWORK section.
 };
 
 bool parseManifest(const KURL& manifestURL,
