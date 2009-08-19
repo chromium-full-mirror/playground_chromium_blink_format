@@ -35,9 +35,11 @@
 #include "Database.h"
 #include "DatabaseAuthorizer.h"
 #include "DatabaseDetails.h"
+#include "DatabaseTracker.h"
 #include "Document.h"
 #include "ExceptionCode.h"
 #include "Logging.h"
+#include "OriginQuotaManager.h"
 #include "Page.h"
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
@@ -48,7 +50,6 @@
 #include "SQLStatement.h"
 #include "SQLStatementCallback.h"
 #include "SQLStatementErrorCallback.h"
-#include "SQLTransactionClient.h"
 #include "SQLTransactionCoordinator.h"
 #include "SQLValue.h"
 
@@ -370,7 +371,11 @@ bool SQLTransaction::runCurrentStatement() {
       // notification
       m_modifiedDatabase = true;
       // Also dirty the size of this database file for calculating quota usage
-      m_database->transactionClient()->didExecuteStatement(this);
+      OriginQuotaManager& manager(
+          DatabaseTracker::tracker().originQuotaManager());
+      Locker<OriginQuotaManager> locker(manager);
+
+      manager.markDatabase(m_database.get());
     }
 
     if (m_currentStatement->hasStatementCallback()) {
@@ -438,8 +443,22 @@ void SQLTransaction::deliverQuotaIncreaseCallback() {
   ASSERT(m_currentStatement);
   ASSERT(!m_shouldRetryCurrentStatement);
 
-  m_shouldRetryCurrentStatement =
-      m_database->transactionClient()->didExceedQuota(this);
+  Page* page = m_database->document()->page();
+  ASSERT(page);
+
+  RefPtr<SecurityOrigin> origin = m_database->securityOriginCopy();
+
+  unsigned long long currentQuota =
+      DatabaseTracker::tracker().quotaForOrigin(origin.get());
+  page->chrome()->client()->exceededDatabaseQuota(
+      m_database->document()->frame(), m_database->stringIdentifier());
+  unsigned long long newQuota =
+      DatabaseTracker::tracker().quotaForOrigin(origin.get());
+
+  // If the new quota ended up being larger than the old quota, we will retry
+  // the statement.
+  if (newQuota > currentQuota)
+    m_shouldRetryCurrentStatement = true;
 
   m_nextStep = &SQLTransaction::runStatements;
   LOG(StorageAPI, "Scheduling runStatements for transaction %p\n", this);
@@ -479,7 +498,8 @@ void SQLTransaction::postflightAndCommit() {
   // The commit was successful, notify the delegates if the transaction modified
   // this database
   if (m_modifiedDatabase)
-    m_database->transactionClient()->didCommitTransaction(this);
+    DatabaseTracker::tracker().scheduleNotifyDatabaseChanged(
+        m_database->m_securityOrigin.get(), m_database->m_name);
 
   // Now release our unneeded callbacks, to break reference cycles.
   m_callback = 0;

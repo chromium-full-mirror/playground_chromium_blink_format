@@ -41,6 +41,7 @@
 
 #include <wtf/Forward.h>
 #include <wtf/HashSet.h>
+#include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Deque.h>
@@ -56,7 +57,6 @@ class DatabaseThread;
 class Document;
 class SQLResultSet;
 class SQLTransactionCallback;
-class SQLTransactionClient;
 class SQLTransactionCoordinator;
 class SQLTransactionErrorCallback;
 class SQLValue;
@@ -127,7 +127,6 @@ class Database : public ThreadSafeShared<Database> {
 
   Vector<String> performGetTableNames();
 
-  SQLTransactionClient* transactionClient() const;
   SQLTransactionCoordinator* transactionCoordinator() const;
 
  private:
