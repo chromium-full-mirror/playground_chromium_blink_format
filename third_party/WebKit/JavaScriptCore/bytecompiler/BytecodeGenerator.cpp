@@ -451,6 +451,14 @@ BytecodeGenerator::BytecodeGenerator(EvalNode* evalNode,
         adoptRef(new FunctionExecutable(function->ident(), function)));
   }
 
+  const DeclarationStacks::VarStack& varStack = evalNode->varStack();
+  unsigned numVariables = varStack.size();
+  Vector<Identifier> variables;
+  variables.reserveCapacity(numVariables);
+  for (size_t i = 0; i < numVariables; ++i)
+    variables.append(varStack[i].first);
+  codeBlock->adoptVariables(variables);
+
   preserveLastVar();
 }
 

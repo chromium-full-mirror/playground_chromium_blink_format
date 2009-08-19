@@ -59,8 +59,6 @@ class ExecutableBase {
                                               ScopeChainNode*,
                                               CodeBlock*) = 0;
 
-  ScopeNode* astNode() { return m_node.get(); }
-
  protected:
   RefPtr<ScopeNode> m_node;
   SourceCode m_source;
@@ -98,8 +96,6 @@ class EvalExecutable : public ExecutableBase {
       generateBytecode(scopeChainNode);
     return *m_evalCodeBlock;
   }
-
-  DeclarationStacks::VarStack& varStack() { return m_node->varStack(); }
 
   ExceptionInfo* reparseExceptionInfo(JSGlobalData*,
                                       ScopeChainNode*,

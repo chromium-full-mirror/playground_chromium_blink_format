@@ -1804,13 +1804,6 @@ class EvalNode : public ScopeNode {
                                      CodeFeatures,
                                      int numConstants);
 
-  void partialDestroyData() {
-    // Eval code needs to hang on to its declaration stacks to keep declaration
-    // info alive until Interpreter::execute time,
-    // so the entire ScopeNodeData cannot be destoyed.
-    children().clear();
-  }
-
  private:
   EvalNode(JSGlobalData*,
            SourceElements*,

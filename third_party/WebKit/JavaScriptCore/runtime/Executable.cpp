@@ -57,7 +57,7 @@ void EvalExecutable::generateBytecode(ScopeChainNode* scopeChainNode) {
                             &m_evalCodeBlock->symbolTable(), m_evalCodeBlock));
   generator->generate();
 
-  evalNode()->partialDestroyData();
+  evalNode()->destroyData();
 }
 
 void ProgramExecutable::generateBytecode(ScopeChainNode* scopeChainNode) {
