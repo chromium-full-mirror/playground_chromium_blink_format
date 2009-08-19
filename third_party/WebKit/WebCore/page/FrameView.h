@@ -252,6 +252,8 @@ class FrameView : public ScrollView {
   bool updateWidgets();
   void scrollToAnchor();
 
+  bool hasCustomScrollbars() const;
+
   static double sCurrentPaintTimeStamp;  // used for detecting decoded resource
                                          // thrash in the cache
 
