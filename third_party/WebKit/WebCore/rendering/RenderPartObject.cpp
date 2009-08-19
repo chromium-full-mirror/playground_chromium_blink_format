@@ -303,7 +303,7 @@ void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
     }
 
     bool success =
-        frame->loader()->requestObject(this, url, AtomicString(o->name()),
+        frame->loader()->requestObject(this, url, o->getAttribute(nameAttr),
                                        serviceType, paramNames, paramValues);
     if (!success && m_hasFallbackContent)
       o->renderFallbackContent();

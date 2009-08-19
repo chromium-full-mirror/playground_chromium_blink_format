@@ -132,10 +132,6 @@ void StyledElement::removeMappedAttributeDecl(MappedAttributeEntry entryType,
       entryType, attrName.localName().impl(), attrValue.impl()));
 }
 
-void StyledElement::invalidateStyleAttribute() {
-  m_isStyleAttributeValid = false;
-}
-
 void StyledElement::updateStyleAttribute() const {
   ASSERT(!m_isStyleAttributeValid);
   m_isStyleAttributeValid = true;
@@ -316,15 +312,6 @@ void StyledElement::addCSSProperty(MappedAttribute* attr, int id, int value) {
   if (!attr->decl())
     createMappedDecl(attr);
   attr->decl()->setProperty(id, value, false);
-}
-
-void StyledElement::addCSSStringProperty(MappedAttribute* attr,
-                                         int id,
-                                         const String& value,
-                                         CSSPrimitiveValue::UnitTypes type) {
-  if (!attr->decl())
-    createMappedDecl(attr);
-  attr->decl()->setStringProperty(id, value, type, false);
 }
 
 void StyledElement::addCSSImageProperty(MappedAttribute* attr,
