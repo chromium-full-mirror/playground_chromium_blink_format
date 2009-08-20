@@ -41,9 +41,14 @@ class ExecutableBase {
   friend class JIT;
 
  public:
+  enum Mode { NoJITCode, HasJITCode, IsHost };
+  static const int NUM_PARAMETERS_IS_HOST = 0;
+  static const int NUM_PARAMETERS_NOT_COMPILED = -1;
+
   virtual ~ExecutableBase() {}
 
-  ExecutableBase(const SourceCode& source) : m_source(source) {}
+  ExecutableBase(const SourceCode& source)
+      : m_source(source), m_numParameters(NUM_PARAMETERS_NOT_COMPILED) {}
 
   const SourceCode& source() { return m_source; }
   intptr_t sourceID() const { return m_node->sourceID(); }
@@ -62,6 +67,7 @@ class ExecutableBase {
  protected:
   RefPtr<ScopeNode> m_node;
   SourceCode m_source;
+  int m_numParameters;
 
  private:
   // For use making native thunk.
@@ -208,7 +214,9 @@ class FunctionExecutable : public ExecutableBase,
   size_t parameterCount() const { return body()->parameterCount(); }
   UString paramString() const { return body()->paramString(); }
 
-  bool isHostFunction() const;
+  bool isHostFunction() const {
+    return m_numParameters == NUM_PARAMETERS_IS_HOST;
+  }
   bool isGenerated() const { return m_codeBlock; }
 
   void recompile(ExecState* exec);

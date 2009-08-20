@@ -63,7 +63,7 @@ enum HasSeenShouldRepatch { hasSeenShouldRepatch };
 
 class ExecState;
 
-enum CodeType { GlobalCode, EvalCode, FunctionCode, NativeCode };
+enum CodeType { GlobalCode, EvalCode, FunctionCode };
 
 static ALWAYS_INLINE int missingThisObjectMarker() {
   return std::numeric_limits<int>::max();
@@ -242,7 +242,6 @@ class CodeBlock : public FastAllocBase {
   friend class JIT;
 
  protected:
-  CodeBlock(ExecutableBase* ownerExecutable);
   CodeBlock(ExecutableBase* ownerExecutable,
             CodeType,
             PassRefPtr<SourceProvider>,
@@ -384,14 +383,8 @@ class CodeBlock : public FastAllocBase {
 
   CodeType codeType() const { return m_codeType; }
 
-  SourceProvider* source() const {
-    ASSERT(m_codeType != NativeCode);
-    return m_source.get();
-  }
-  unsigned sourceOffset() const {
-    ASSERT(m_codeType != NativeCode);
-    return m_sourceOffset;
-  }
+  SourceProvider* source() const { return m_source.get(); }
+  unsigned sourceOffset() const { return m_sourceOffset; }
 
   size_t numberOfJumpTargets() const { return m_jumpTargets.size(); }
   void addJumpTarget(unsigned jumpTarget) { m_jumpTargets.append(jumpTarget); }
@@ -586,7 +579,6 @@ class CodeBlock : public FastAllocBase {
   SymbolTable& symbolTable() { return m_symbolTable; }
 
   EvalCodeCache& evalCodeCache() {
-    ASSERT(m_codeType != NativeCode);
     createRareDataIfNecessary();
     return m_rareData->m_evalCodeCache;
   }
@@ -609,7 +601,6 @@ class CodeBlock : public FastAllocBase {
   void reparseForExceptionInfoIfNecessary(CallFrame*);
 
   void createRareDataIfNecessary() {
-    ASSERT(m_codeType != NativeCode);
     if (!m_rareData)
       m_rareData.set(new RareData);
   }
@@ -751,12 +742,6 @@ class FunctionCodeBlock : public CodeBlock {
                     PassRefPtr<SourceProvider> sourceProvider,
                     unsigned sourceOffset)
       : CodeBlock(ownerExecutable, codeType, sourceProvider, sourceOffset) {}
-};
-
-class NativeCodeBlock : public CodeBlock {
- public:
-  NativeCodeBlock(FunctionExecutable* ownerExecutable)
-      : CodeBlock(ownerExecutable) {}
 };
 
 inline Register& ExecState::r(int index) {

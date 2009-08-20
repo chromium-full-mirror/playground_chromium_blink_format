@@ -1435,29 +1435,6 @@ void CodeBlock::dumpStatistics() {
 #endif
 }
 
-CodeBlock::CodeBlock(ExecutableBase* ownerExecutable)
-    : m_numCalleeRegisters(0),
-      m_numVars(0),
-      m_numParameters(0),
-      m_ownerExecutable(ownerExecutable),
-      m_globalData(0)
-#ifndef NDEBUG
-      ,
-      m_instructionCount(0)
-#endif
-      ,
-      m_needsFullScopeChain(false),
-      m_usesEval(false),
-      m_isNumericCompareFunction(false),
-      m_codeType(NativeCode),
-      m_source(0),
-      m_sourceOffset(0),
-      m_exceptionInfo(0) {
-#if DUMP_CODE_BLOCK_STATISTICS
-  liveCodeBlockSet.add(this);
-#endif
-}
-
 CodeBlock::CodeBlock(ExecutableBase* ownerExecutable,
                      CodeType codeType,
                      PassRefPtr<SourceProvider> sourceProvider,
@@ -1541,7 +1518,6 @@ void CodeBlock::unlinkCallers() {
 #endif
 
 void CodeBlock::derefStructures(Instruction* vPC) const {
-  ASSERT(m_codeType != NativeCode);
   Interpreter* interpreter = m_globalData->interpreter;
 
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_self)) {
@@ -1592,7 +1568,6 @@ void CodeBlock::derefStructures(Instruction* vPC) const {
 }
 
 void CodeBlock::refStructures(Instruction* vPC) const {
-  ASSERT(m_codeType != NativeCode);
   Interpreter* interpreter = m_globalData->interpreter;
 
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_self)) {
@@ -1640,7 +1615,6 @@ void CodeBlock::markAggregate(MarkStack& markStack) {
 }
 
 void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
-  ASSERT(m_codeType != NativeCode);
   if (m_exceptionInfo)
     return;
 
@@ -1663,7 +1637,6 @@ void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
 }
 
 HandlerInfo* CodeBlock::handlerForBytecodeOffset(unsigned bytecodeOffset) {
-  ASSERT(m_codeType != NativeCode);
   ASSERT(bytecodeOffset < m_instructionCount);
 
   if (!m_rareData)
@@ -1683,7 +1656,6 @@ HandlerInfo* CodeBlock::handlerForBytecodeOffset(unsigned bytecodeOffset) {
 
 int CodeBlock::lineNumberForBytecodeOffset(CallFrame* callFrame,
                                            unsigned bytecodeOffset) {
-  ASSERT(m_codeType != NativeCode);
   ASSERT(bytecodeOffset < m_instructionCount);
 
   reparseForExceptionInfoIfNecessary(callFrame);
@@ -1712,7 +1684,6 @@ int CodeBlock::expressionRangeForBytecodeOffset(CallFrame* callFrame,
                                                 int& divot,
                                                 int& startOffset,
                                                 int& endOffset) {
-  ASSERT(m_codeType != NativeCode);
   ASSERT(bytecodeOffset < m_instructionCount);
 
   reparseForExceptionInfoIfNecessary(callFrame);
@@ -1755,7 +1726,6 @@ int CodeBlock::expressionRangeForBytecodeOffset(CallFrame* callFrame,
 bool CodeBlock::getByIdExceptionInfoForBytecodeOffset(CallFrame* callFrame,
                                                       unsigned bytecodeOffset,
                                                       OpcodeID& opcodeID) {
-  ASSERT(m_codeType != NativeCode);
   ASSERT(bytecodeOffset < m_instructionCount);
 
   reparseForExceptionInfoIfNecessary(callFrame);
@@ -1789,7 +1759,6 @@ bool CodeBlock::getByIdExceptionInfoForBytecodeOffset(CallFrame* callFrame,
 #if ENABLE(JIT)
 bool CodeBlock::functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
                                                   int& functionRegisterIndex) {
-  ASSERT(m_codeType != NativeCode);
   ASSERT(bytecodeOffset < m_instructionCount);
 
   if (!m_rareData || !m_rareData->m_functionRegisterInfos.size())
@@ -1820,7 +1789,6 @@ bool CodeBlock::functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
 #if !ENABLE(JIT)
 bool CodeBlock::hasGlobalResolveInstructionAtBytecodeOffset(
     unsigned bytecodeOffset) {
-  ASSERT(m_codeType != NativeCode);
   if (m_globalResolveInstructions.isEmpty())
     return false;
 
@@ -1840,7 +1808,6 @@ bool CodeBlock::hasGlobalResolveInstructionAtBytecodeOffset(
 }
 #else
 bool CodeBlock::hasGlobalResolveInfoAtBytecodeOffset(unsigned bytecodeOffset) {
-  ASSERT(m_codeType != NativeCode);
   if (m_globalResolveInfos.isEmpty())
     return false;
 
