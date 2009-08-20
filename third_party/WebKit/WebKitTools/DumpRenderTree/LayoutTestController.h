@@ -238,6 +238,11 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                                             JSStringRef elementId);
   unsigned numberOfActiveAnimations() const;
 
+  void whiteListAccessFromOrigin(JSStringRef sourceOrigin,
+                                 JSStringRef destinationProtocol,
+                                 JSStringRef destinationHost,
+                                 bool allowDestinationSubdomains);
+
  private:
   bool m_dumpAsText;
   bool m_dumpAsPDF;

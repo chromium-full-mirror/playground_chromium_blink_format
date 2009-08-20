@@ -319,6 +319,16 @@ void LayoutTestController::clearAllDatabases() {
   QWebDatabase::removeAllDatabases();
 }
 
+void LayoutTestController::whiteListAccessFromOrigin(
+    const QString& sourceOrigin,
+    const QString& destinationProtocol,
+    const QString& destinationHost,
+    bool allowDestinationSubdomains) {
+  SecurityOrigin::whiteListAccessFromOrigin(sourceOrigin, destinationProtocol,
+                                            destinationHost,
+                                            allowDestinationSubdomains);
+}
+
 EventSender::EventSender(QWebPage* parent) : QObject(parent) {
   m_page = parent;
 }

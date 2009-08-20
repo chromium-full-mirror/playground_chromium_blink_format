@@ -37,6 +37,7 @@
 #include "ResourceHandleClient.h"
 #include "ResourceHandleInternal.h"
 #include <runtime/InitializeThreading.h>
+#include "SecurityOrigin.h"
 
 #if ENABLE(DATABASE)
 #include "DatabaseTracker.h"
@@ -180,4 +181,17 @@ void webkit_init() {
       g_object_new(SOUP_TYPE_CONTENT_SNIFFER, NULL));
   soup_session_add_feature(session, sniffer);
   g_object_unref(sniffer);
+}
+
+void webkit_white_list_access_to_origin(const gchar* sourceOrigin,
+                                        const gchar* destinationProtocol,
+                                        const gchar* destinationHost,
+                                        bool allowDestinationSubdomains) {
+  SecurityOrigin::whiteListAccessToOrigin(
+      SecurityOrigin::createFromString(sourceOrigin), destinationProtocol,
+      destinationHost, allowDestinationSubdomains);
+}
+
+void webkit_reset_origin_access_white_lists() {
+  SecurityOrigin::resetOriginAccessWhiteLists();
 }

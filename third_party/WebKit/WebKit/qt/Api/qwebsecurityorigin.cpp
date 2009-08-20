@@ -235,3 +235,17 @@ QStringList QWebSecurityOrigin::localSchemes() {
   }
   return list;
 }
+
+void QWebSecurityOrigin::whiteListAccessFromOrigin(
+    const QString& sourceOrigin,
+    const QString& destinationProtocol,
+    const QString& destinationHost,
+    bool allowDestinationSubdomains) {
+  SecurityOrigin::whiteListAccessFromOrigin(sourceOrigin, destinationProtocol,
+                                            destinationHost,
+                                            allowDestinationSubdomains);
+}
+
+void QWebSecurityOrigin::resetOriginAccessWhiteLists() {
+  SecurityOrigin::resetOriginAccessWhiteLists();
+}
