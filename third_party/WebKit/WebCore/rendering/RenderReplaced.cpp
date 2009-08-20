@@ -69,6 +69,8 @@ void RenderReplaced::layout() {
 
   calcWidth();
   calcHeight();
+
+  m_overflow.clear();
   addShadowOverflow();
 
   repainter.repaintAfterLayout();
