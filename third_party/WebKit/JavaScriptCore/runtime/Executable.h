@@ -26,7 +26,6 @@
 #ifndef Executable_h
 #define Executable_h
 
-#include "JSFunction.h"
 #include "Nodes.h"
 
 namespace JSC {
@@ -90,7 +89,7 @@ class EvalExecutable : public ExecutableBase {
 
   ~EvalExecutable();
 
-  JSObject* parse(ExecState*, bool allowDebug = true);
+  JSObject* parse(ExecState* exec, bool allowDebug = true);
 
   EvalCodeBlock& bytecode(ScopeChainNode* scopeChainNode) {
     if (!m_evalCodeBlock)
@@ -140,7 +139,7 @@ class ProgramExecutable : public ExecutableBase {
 
   ~ProgramExecutable();
 
-  JSObject* parse(ExecState*, bool allowDebug = true);
+  JSObject* parse(ExecState* exec, bool allowDebug = true);
 
   // CodeBlocks for program code are transient and therefore to not gain from
   // from throwing out there exception information.
@@ -191,9 +190,7 @@ class FunctionExecutable : public ExecutableBase,
 
   const Identifier& name() { return m_name; }
 
-  JSFunction* make(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    return new (exec) JSFunction(exec, this, scopeChainNode);
-  }
+  JSFunction* make(ExecState* exec, ScopeChainNode* scopeChain);
 
   CodeBlock& bytecode(ScopeChainNode* scopeChainNode) {
     ASSERT(scopeChainNode);
@@ -214,7 +211,7 @@ class FunctionExecutable : public ExecutableBase,
   bool isHostFunction() const;
   bool isGenerated() const { return m_codeBlock; }
 
-  void recompile(ExecState*);
+  void recompile(ExecState* exec);
 
   ExceptionInfo* reparseExceptionInfo(JSGlobalData*,
                                       ScopeChainNode*,
@@ -245,7 +242,7 @@ class FunctionExecutable : public ExecutableBase,
   }
 
  private:
-  FunctionExecutable(ExecState*);
+  FunctionExecutable(ExecState* exec);
   void generateJITCode(ScopeChainNode*);
 #endif
 };
