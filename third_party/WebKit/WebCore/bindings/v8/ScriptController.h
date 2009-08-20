@@ -148,7 +148,7 @@ class ScriptController {
   void updateSecurityOrigin();
   void clearScriptObjects();
   void updatePlatformScriptObjects();
-  void cleanupScriptObjectsForPlugin(void*);
+  void cleanupScriptObjectsForPlugin(Widget*);
 
 #if ENABLE(NETSCAPE_PLUGIN_API)
   NPObject* createScriptObjectForPluginElement(HTMLPlugInElement*);
@@ -164,7 +164,7 @@ class ScriptController {
 
   OwnPtr<ScriptState> m_scriptState;
   OwnPtr<V8Proxy> m_proxy;
-  typedef HashMap<void*, NPObject*> PluginObjectMap;
+  typedef HashMap<Widget*, NPObject*> PluginObjectMap;
 
   // A mapping between Widgets and their corresponding script object.
   // This list is used so that when the plugin dies, we can immediately
