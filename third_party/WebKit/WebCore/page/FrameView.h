@@ -206,6 +206,11 @@ class FrameView : public ScrollView {
   virtual IntPoint convertToRenderer(const RenderObject*,
                                      const IntPoint&) const;
 
+  bool isFrameViewScrollCorner(RenderScrollbarPart* scrollCorner) const {
+    return m_scrollCorner == scrollCorner;
+  }
+  void invalidateScrollCorner();
+
  private:
   FrameView(Frame*);
 
@@ -253,6 +258,9 @@ class FrameView : public ScrollView {
   void scrollToAnchor();
 
   bool hasCustomScrollbars() const;
+
+  virtual void updateScrollCorner();
+  virtual void paintScrollCorner(GraphicsContext*, const IntRect& cornerRect);
 
   static double sCurrentPaintTimeStamp;  // used for detecting decoded resource
                                          // thrash in the cache
@@ -324,6 +332,9 @@ class FrameView : public ScrollView {
   bool m_firstVisuallyNonEmptyLayoutCallbackPending;
 
   RefPtr<Node> m_maintainScrollPositionAnchor;
+
+  // Renderer to hold our custom scroll corner.
+  RenderScrollbarPart* m_scrollCorner;
 };
 
 }  // namespace WebCore

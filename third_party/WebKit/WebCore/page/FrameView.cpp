@@ -48,6 +48,7 @@
 #include "RenderPart.h"
 #include "RenderPartObject.h"
 #include "RenderScrollbar.h"
+#include "RenderScrollbarPart.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "Settings.h"
@@ -113,7 +114,8 @@ FrameView::FrameView(Frame* frame)
       m_deferredRepaintTimer(this, &FrameView::deferredRepaintTimerFired),
       m_shouldUpdateWhileOffscreen(true),
       m_deferSetNeedsLayouts(0),
-      m_setNeedsLayoutWasDeferred(false) {
+      m_setNeedsLayoutWasDeferred(false),
+      m_scrollCorner(0) {
   init();
 }
 
@@ -143,6 +145,7 @@ FrameView::~FrameView() {
                                      // lose the connection to the HostWindow.
   setHasVerticalScrollbar(false);
 
+  ASSERT(!m_scrollCorner);
   ASSERT(m_scheduledEvents.isEmpty());
   ASSERT(!m_enqueueEvents);
 
@@ -250,6 +253,11 @@ void FrameView::detachCustomScrollbars() {
   if (verticalBar && verticalBar->isCustomScrollbar() &&
       toRenderScrollbar(verticalBar)->owningRenderer() == renderBox)
     setHasVerticalScrollbar(false);
+
+  if (m_scrollCorner) {
+    m_scrollCorner->destroy();
+    m_scrollCorner = 0;
+  }
 }
 
 void FrameView::clear() {
@@ -1381,6 +1389,71 @@ void FrameView::updateDashboardRegions() {
   page->chrome()->client()->dashboardRegionsChanged();
 }
 #endif
+
+void FrameView::invalidateScrollCorner() {
+  invalidateRect(scrollCornerRect());
+}
+
+void FrameView::updateScrollCorner() {
+  RenderObject* renderer = 0;
+  RefPtr<RenderStyle> cornerStyle;
+
+  if (!scrollCornerRect().isEmpty()) {
+    // Try the <body> element first as a scroll corner source.
+    Document* doc = m_frame->document();
+    Element* body = doc ? doc->body() : 0;
+    if (body && body->renderer()) {
+      renderer = body->renderer();
+      cornerStyle =
+          renderer->getUncachedPseudoStyle(SCROLLBAR_CORNER, renderer->style());
+    }
+
+    if (!cornerStyle) {
+      // If the <body> didn't have a custom style, then the root element might.
+      Element* docElement = doc ? doc->documentElement() : 0;
+      if (docElement && docElement->renderer()) {
+        renderer = docElement->renderer();
+        cornerStyle = renderer->getUncachedPseudoStyle(SCROLLBAR_CORNER,
+                                                       renderer->style());
+      }
+    }
+
+    if (!cornerStyle) {
+      // If we have an owning iframe/frame element, then it can set the custom
+      // scrollbar also.
+      if (RenderPart* renderer = m_frame->ownerRenderer())
+        cornerStyle = renderer->getUncachedPseudoStyle(SCROLLBAR_CORNER,
+                                                       renderer->style());
+    }
+  }
+
+  if (cornerStyle) {
+    if (!m_scrollCorner)
+      m_scrollCorner = new (renderer->renderArena())
+          RenderScrollbarPart(renderer->document());
+    m_scrollCorner->setStyle(cornerStyle.release());
+    invalidateRect(scrollCornerRect());
+  } else if (m_scrollCorner) {
+    m_scrollCorner->destroy();
+    m_scrollCorner = 0;
+  }
+}
+
+void FrameView::paintScrollCorner(GraphicsContext* context,
+                                  const IntRect& cornerRect) {
+  if (context->updatingControlTints()) {
+    updateScrollCorner();
+    return;
+  }
+
+  if (m_scrollCorner) {
+    m_scrollCorner->paintIntoRect(context, cornerRect.x(), cornerRect.y(),
+                                  cornerRect);
+    return;
+  }
+
+  ScrollView::paintScrollCorner(context, cornerRect);
+}
 
 bool FrameView::hasCustomScrollbars() const {
   const HashSet<RefPtr<Widget>>* viewChildren = children();
