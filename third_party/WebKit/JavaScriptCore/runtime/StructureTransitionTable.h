@@ -77,9 +77,15 @@ class StructureTransitionTable {
       TransitionTable;
 
  public:
-  inline bool contains(const StructureTransitionTableHash::Key& key,
+  // The contains and get methods accept imprecise matches, so if an
+  // unspecialised transition exists
+  // for the given key they will consider that transition to be a match.  If a
+  // specialised transition
+  // exists and it matches the provided specificValue, get will return the
+  // specific transition.
+  inline bool contains(const StructureTransitionTableHash::Key&,
                        JSCell* specificValue);
-  inline Structure* get(const StructureTransitionTableHash::Key& key,
+  inline Structure* get(const StructureTransitionTableHash::Key&,
                         JSCell* specificValue) const;
   bool hasTransition(const StructureTransitionTableHash::Key& key) {
     return m_table.contains(key);

@@ -129,12 +129,12 @@ class Structure : public RefCounted<Structure> {
              unsigned& attributes,
              JSCell*& specificValue) {
     ASSERT(!propertyName.isNull());
-    return get(propertyName._ustring.rep(), attributes, specificValue);
+    return get(propertyName.ustring().rep(), attributes, specificValue);
   }
   bool transitionedFor(const JSCell* specificValue) {
     return m_specificValueInPrevious == specificValue;
   }
-  bool hasTransition(UString::Rep* rep, unsigned attributes);
+  bool hasTransition(UString::Rep*, unsigned attributes);
   bool hasTransition(const Identifier& propertyName, unsigned attributes) {
     return hasTransition(propertyName._ustring.rep(), attributes);
   }
@@ -275,11 +275,10 @@ inline size_t Structure::get(const Identifier& propertyName) {
 bool StructureTransitionTable::contains(
     const StructureTransitionTableHash::Key& key,
     JSCell* specificValue) {
-  const TransitionTable::iterator find = m_table.find(key);
-  if (find == m_table.end()) {
-    ASSERT(!m_table.contains(key));
+  TransitionTable::iterator find = m_table.find(key);
+  if (find == m_table.end())
     return false;
-  }
+
   return find->second.first ||
          find->second.second->transitionedFor(specificValue);
 }
