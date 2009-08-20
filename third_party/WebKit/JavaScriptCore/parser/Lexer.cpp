@@ -132,7 +132,9 @@ ALWAYS_INLINE void Lexer::shift4() {
   m_code += 4;
 }
 
-void Lexer::setCode(const SourceCode& source) {
+void Lexer::setCode(const SourceCode& source, ParserArena& arena) {
+  m_arena = &arena.identifierArena();
+
   m_lineNumber = source.firstLine();
   m_delimited = false;
   m_lastToken = -1;
@@ -196,10 +198,9 @@ void Lexer::shiftLineTerminator() {
   ++m_lineNumber;
 }
 
-ALWAYS_INLINE Identifier* Lexer::makeIdentifier(const UChar* characters,
-                                                size_t length) {
-  m_identifiers.append(Identifier(m_globalData, characters, length));
-  return &m_identifiers.last();
+ALWAYS_INLINE const Identifier* Lexer::makeIdentifier(const UChar* characters,
+                                                      size_t length) {
+  return &m_arena->makeIdentifier(m_globalData, characters, length);
 }
 
 inline bool Lexer::lastTokenWasRestrKeyword() const {
@@ -1004,7 +1005,7 @@ bool Lexer::skipRegExp() {
 }
 
 void Lexer::clear() {
-  m_identifiers.clear();
+  m_arena = 0;
   m_codeWithoutBOMs.clear();
 
   Vector<char> newBuffer8;
