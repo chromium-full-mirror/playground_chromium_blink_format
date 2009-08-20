@@ -188,7 +188,7 @@ void webkit_white_list_access_to_origin(const gchar* sourceOrigin,
                                         const gchar* destinationHost,
                                         bool allowDestinationSubdomains) {
   SecurityOrigin::whiteListAccessFromOrigin(
-      SecurityOrigin::createFromString(sourceOrigin), destinationProtocol,
+      *SecurityOrigin::createFromString(sourceOrigin), destinationProtocol,
       destinationHost, allowDestinationSubdomains);
 }
 
