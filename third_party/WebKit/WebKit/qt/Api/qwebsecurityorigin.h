@@ -44,7 +44,7 @@ class QWEBKIT_EXPORT QWebSecurityOrigin {
                                         const QString& destinationProtocol,
                                         const QString& destinationHost,
                                         bool allowDestinationSubdomains);
-  static void clearOriginAccessWhiteLists();
+  static void resetOriginAccessWhiteLists();
 
   ~QWebSecurityOrigin();
 
