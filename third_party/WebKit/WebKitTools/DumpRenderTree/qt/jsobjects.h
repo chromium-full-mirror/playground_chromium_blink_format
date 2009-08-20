@@ -100,6 +100,12 @@ class LayoutTestController : public QObject {
                                             double time,
                                             const QString& elementId);
   unsigned numberOfActiveAnimations() const;
+
+  void whiteListAccessFromOrigin(const QString& sourceOrigin,
+                                 const QString& destinationProtocol,
+                                 const QString& destinationHost,
+                                 bool allowDestinationSubdomains);
+
   void dispatchPendingLoadRequests();
   void disableImageLoading();
 

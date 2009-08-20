@@ -324,9 +324,9 @@ void LayoutTestController::whiteListAccessFromOrigin(
     const QString& destinationProtocol,
     const QString& destinationHost,
     bool allowDestinationSubdomains) {
-  SecurityOrigin::whiteListAccessFromOrigin(sourceOrigin, destinationProtocol,
-                                            destinationHost,
-                                            allowDestinationSubdomains);
+  QWebSecurityOrigin::whiteListAccessFromOrigin(
+      sourceOrigin, destinationProtocol, destinationHost,
+      allowDestinationSubdomains);
 }
 
 EventSender::EventSender(QWebPage* parent) : QObject(parent) {
