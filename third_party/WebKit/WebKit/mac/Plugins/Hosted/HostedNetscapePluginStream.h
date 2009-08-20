@@ -61,6 +61,8 @@ class HostedNetscapePluginStream
     return adoptRef(new HostedNetscapePluginStream(instance, frameLoader));
   }
 
+  ~HostedNetscapePluginStream();
+
   uint32_t streamID() const { return m_streamID; }
 
   void startStreamWithResponse(NSURLResponse* response);
