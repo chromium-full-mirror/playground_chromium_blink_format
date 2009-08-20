@@ -99,7 +99,6 @@ using namespace SVGNames;
 // 0.05s to make it smooth
 const double autoscrollInterval = 0.05;
 
-static Frame* subframeForTargetNode(Node*);
 static Frame* subframeForHitTestResult(const MouseEventWithHitTestResults&);
 
 static inline void scrollAndAcceptEvent(float delta,
@@ -948,10 +947,10 @@ Frame* subframeForHitTestResult(
     const MouseEventWithHitTestResults& hitTestResult) {
   if (!hitTestResult.isOverWidget())
     return 0;
-  return subframeForTargetNode(hitTestResult.targetNode());
+  return EventHandler::subframeForTargetNode(hitTestResult.targetNode());
 }
 
-Frame* subframeForTargetNode(Node* node) {
+Frame* EventHandler::subframeForTargetNode(Node* node) {
   if (!node)
     return 0;
 

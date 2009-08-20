@@ -115,6 +115,8 @@ class EventHandler : public Noncopyable {
 
   void setIgnoreWheelEvents(bool);
 
+  static Frame* subframeForTargetNode(Node*);
+
   bool scrollOverflow(ScrollDirection, ScrollGranularity);
 
   bool scrollRecursively(ScrollDirection, ScrollGranularity);
