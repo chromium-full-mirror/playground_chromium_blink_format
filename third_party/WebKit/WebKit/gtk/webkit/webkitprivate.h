@@ -256,7 +256,7 @@ WEBKIT_API void webkit_application_cache_set_maximum_size(
 
 WEBKIT_API unsigned int webkit_worker_thread_count();
 
-WEBKIT_API void webkit_white_list_access_to_origin(
+WEBKIT_API void webkit_white_list_access_from_origin(
     const gchar* sourceOrigin,
     const gchar* destinationProtocol,
     const gchar* destinationHost,
