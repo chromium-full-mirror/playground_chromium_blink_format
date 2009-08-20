@@ -146,11 +146,7 @@ class CachedResource {
   // while still being referenced. This means the object should delete itself
   // if the number of clients observing it ever drops to 0.
   // The resource can be brought back to cache after successful revalidation.
-  void setInCache(bool b) {
-    m_inCache = b;
-    if (b)
-      m_isBeingRevalidated = false;
-  }
+  void setInCache(bool inCache) { m_inCache = inCache; }
   bool inCache() const { return m_inCache; }
 
   void setInLiveDecodedResourcesList(bool b) {
@@ -170,7 +166,7 @@ class CachedResource {
 
   bool canDelete() const {
     return !hasClients() && !m_request && !m_preloadCount && !m_handleCount &&
-           !m_resourceToRevalidate && !m_isBeingRevalidated;
+           !m_resourceToRevalidate && !m_proxyResource;
   }
 
   bool isExpired() const;
@@ -300,7 +296,11 @@ class CachedResource {
   // not, the field is zeroed and this
   // resources becomes normal resource load.
   CachedResource* m_resourceToRevalidate;
-  bool m_isBeingRevalidated;
+
+  // If this field is non-null, the resource has a proxy for checking whether it
+  // is still up to date (see m_resourceToRevalidate).
+  CachedResource* m_proxyResource;
+
   // These handles will need to be updated to point to the
   // m_resourceToRevalidate in case we get 304 response.
   HashSet<CachedResourceHandleBase*> m_handlesToRevalidate;
