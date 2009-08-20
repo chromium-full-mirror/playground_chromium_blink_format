@@ -37,7 +37,7 @@
 
 namespace JSC {
 
-namespace ARM {
+namespace ARMRegisters {
 typedef enum {
   r0,
   r1,
@@ -442,8 +442,8 @@ register writeback
 
 class ARMv7Assembler {
  public:
-  typedef ARM::RegisterID RegisterID;
-  typedef ARM::FPRegisterID FPRegisterID;
+  typedef ARMRegisters::RegisterID RegisterID;
+  typedef ARMRegisters::FPRegisterID FPRegisterID;
 
   // (HS, LO, HI, LS) -> (AE, B, A, BE)
   // (VS, VC) -> (O, NO)
@@ -502,7 +502,9 @@ class ARMv7Assembler {
 
  private:
   // ARMv7, Appx-A.6.3
-  bool BadReg(RegisterID reg) { return (reg == ARM::sp) || (reg == ARM::pc); }
+  bool BadReg(RegisterID reg) {
+    return (reg == ARMRegisters::sp) || (reg == ARMRegisters::pc);
+  }
 
   bool isSingleRegister(FPRegisterID reg) {
     // Check that the high bit isn't set (q16+), and that the low bit isn't (s1,
@@ -701,17 +703,17 @@ class ARMv7Assembler {
  public:
   void add(RegisterID rd, RegisterID rn, ARMThumbImmediate imm) {
     // Rd can only be SP if Rn is also SP.
-    ASSERT((rd != ARM::sp) || (rn == ARM::sp));
-    ASSERT(rd != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT((rd != ARMRegisters::sp) || (rn == ARMRegisters::sp));
+    ASSERT(rd != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(imm.isValid());
 
-    if (rn == ARM::sp) {
+    if (rn == ARMRegisters::sp) {
       if (!(rd & 8) && imm.isUInt10()) {
         m_formatter.oneWordOp5Reg3Imm8(OP_ADD_SP_imm_T1, rd,
                                        imm.getUInt10() >> 2);
         return;
-      } else if ((rd == ARM::sp) && imm.isUInt9()) {
+      } else if ((rd == ARMRegisters::sp) && imm.isUInt9()) {
         m_formatter.oneWordOp9Imm7(OP_ADD_SP_imm_T2, imm.getUInt9() >> 2);
         return;
       }
@@ -738,9 +740,9 @@ class ARMv7Assembler {
            RegisterID rn,
            RegisterID rm,
            ShiftTypeAndAmount shift) {
-    ASSERT((rd != ARM::sp) || (rn == ARM::sp));
-    ASSERT(rd != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT((rd != ARMRegisters::sp) || (rn == ARMRegisters::sp));
+    ASSERT(rd != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(!BadReg(rm));
     m_formatter.twoWordOp12Reg4FourFours(
         OP_ADD_reg_T3, rn, FourFours(shift.hi4(), rd, shift.lo4(), rm));
@@ -761,9 +763,9 @@ class ARMv7Assembler {
   // Not allowed in an IT (if then) block.
   void add_S(RegisterID rd, RegisterID rn, ARMThumbImmediate imm) {
     // Rd can only be SP if Rn is also SP.
-    ASSERT((rd != ARM::sp) || (rn == ARM::sp));
-    ASSERT(rd != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT((rd != ARMRegisters::sp) || (rn == ARMRegisters::sp));
+    ASSERT(rd != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(imm.isEncodedImm());
 
     if (!((rd | rn) & 8)) {
@@ -785,9 +787,9 @@ class ARMv7Assembler {
              RegisterID rn,
              RegisterID rm,
              ShiftTypeAndAmount shift) {
-    ASSERT((rd != ARM::sp) || (rn == ARM::sp));
-    ASSERT(rd != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT((rd != ARMRegisters::sp) || (rn == ARMRegisters::sp));
+    ASSERT(rd != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(!BadReg(rm));
     m_formatter.twoWordOp12Reg4FourFours(
         OP_ADD_S_reg_T3, rn, FourFours(shift.hi4(), rd, shift.lo4(), rm));
@@ -852,7 +854,7 @@ class ARMv7Assembler {
 
   // Only allowed in IT (if then) block if last instruction.
   JmpSrc blx(RegisterID rm) {
-    ASSERT(rm != ARM::pc);
+    ASSERT(rm != ARMRegisters::pc);
     m_formatter.oneWordOp8RegReg143(OP_BLX, rm, (RegisterID)8);
     return JmpSrc(m_formatter.size());
   }
@@ -866,7 +868,7 @@ class ARMv7Assembler {
   void bkpt(uint8_t imm = 0) { m_formatter.oneWordOp8Imm8(OP_BKPT, imm); }
 
   void cmn(RegisterID rn, ARMThumbImmediate imm) {
-    ASSERT(rn != ARM::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(imm.isEncodedImm());
 
     m_formatter.twoWordOp5i6Imm4Reg4EncodedImm(OP_CMN_imm, rn, (RegisterID)0xf,
@@ -874,7 +876,7 @@ class ARMv7Assembler {
   }
 
   void cmp(RegisterID rn, ARMThumbImmediate imm) {
-    ASSERT(rn != ARM::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(imm.isEncodedImm());
 
     if (!(rn & 8) && imm.isUInt8())
@@ -885,7 +887,7 @@ class ARMv7Assembler {
   }
 
   void cmp(RegisterID rn, RegisterID rm, ShiftTypeAndAmount shift) {
-    ASSERT(rn != ARM::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(!BadReg(rm));
     m_formatter.twoWordOp12Reg4FourFours(
         OP_CMP_reg_T2, rn, FourFours(shift.hi4(), 0xf, shift.lo4(), rm));
@@ -945,15 +947,16 @@ class ARMv7Assembler {
                                ifThenElse(cond, inst2if, inst3if, inst4if));
   }
 
-  // rt == ARM::pc only allowed if last instruction in IT (if then) block.
+  // rt == ARMRegisters::pc only allowed if last instruction in IT (if then)
+  // block.
   void ldr(RegisterID rt, RegisterID rn, ARMThumbImmediate imm) {
-    ASSERT(rn != ARM::pc);  // LDR (literal)
+    ASSERT(rn != ARMRegisters::pc);  // LDR (literal)
     ASSERT(imm.isUInt12());
 
     if (!((rt | rn) & 8) && imm.isUInt7())
       m_formatter.oneWordOp5Imm5Reg3Reg3(OP_LDR_imm_T1, imm.getUInt7() >> 2, rn,
                                          rt);
-    else if ((rn == ARM::sp) && !(rt & 8) && imm.isUInt10())
+    else if ((rn == ARMRegisters::sp) && !(rt & 8) && imm.isUInt10())
       m_formatter.oneWordOp5Reg3Imm8(OP_LDR_imm_T2, rt, imm.getUInt10() >> 2);
     else
       m_formatter.twoWordOp12Reg4Reg4Imm12(OP_LDR_imm_T3, rn, rt,
@@ -972,8 +975,8 @@ class ARMv7Assembler {
   // MEM[index ? _tmp : _reg] = REG[rt]
   // if (wback) REG[rn] = _tmp
   void ldr(RegisterID rt, RegisterID rn, int offset, bool index, bool wback) {
-    ASSERT(rt != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT(rt != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(index || wback);
     ASSERT(!wback | (rt != rn));
 
@@ -992,9 +995,10 @@ class ARMv7Assembler {
     m_formatter.twoWordOp12Reg4Reg4Imm12(OP_LDR_imm_T4, rn, rt, offset);
   }
 
-  // rt == ARM::pc only allowed if last instruction in IT (if then) block.
+  // rt == ARMRegisters::pc only allowed if last instruction in IT (if then)
+  // block.
   void ldr(RegisterID rt, RegisterID rn, RegisterID rm, unsigned shift = 0) {
-    ASSERT(rn != ARM::pc);  // LDR (literal)
+    ASSERT(rn != ARMRegisters::pc);  // LDR (literal)
     ASSERT(!BadReg(rm));
     ASSERT(shift <= 3);
 
@@ -1005,9 +1009,10 @@ class ARMv7Assembler {
                                            FourFours(rt, 0, shift, rm));
   }
 
-  // rt == ARM::pc only allowed if last instruction in IT (if then) block.
+  // rt == ARMRegisters::pc only allowed if last instruction in IT (if then)
+  // block.
   void ldrh(RegisterID rt, RegisterID rn, ARMThumbImmediate imm) {
-    ASSERT(rn != ARM::pc);  // LDR (literal)
+    ASSERT(rn != ARMRegisters::pc);  // LDR (literal)
     ASSERT(imm.isUInt12());
 
     if (!((rt | rn) & 8) && imm.isUInt6())
@@ -1030,8 +1035,8 @@ class ARMv7Assembler {
   // MEM[index ? _tmp : _reg] = REG[rt]
   // if (wback) REG[rn] = _tmp
   void ldrh(RegisterID rt, RegisterID rn, int offset, bool index, bool wback) {
-    ASSERT(rt != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT(rt != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(index || wback);
     ASSERT(!wback | (rt != rn));
 
@@ -1051,8 +1056,8 @@ class ARMv7Assembler {
   }
 
   void ldrh(RegisterID rt, RegisterID rn, RegisterID rm, unsigned shift = 0) {
-    ASSERT(!BadReg(rt));    // Memory hint
-    ASSERT(rn != ARM::pc);  // LDRH (literal)
+    ASSERT(!BadReg(rt));             // Memory hint
+    ASSERT(rn != ARMRegisters::pc);  // LDRH (literal)
     ASSERT(!BadReg(rm));
     ASSERT(shift <= 3);
 
@@ -1201,16 +1206,17 @@ class ARMv7Assembler {
                                          FourFours(rdLo, rdHi, 0, rm));
   }
 
-  // rt == ARM::pc only allowed if last instruction in IT (if then) block.
+  // rt == ARMRegisters::pc only allowed if last instruction in IT (if then)
+  // block.
   void str(RegisterID rt, RegisterID rn, ARMThumbImmediate imm) {
-    ASSERT(rt != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT(rt != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(imm.isUInt12());
 
     if (!((rt | rn) & 8) && imm.isUInt7())
       m_formatter.oneWordOp5Imm5Reg3Reg3(OP_STR_imm_T1, imm.getUInt7() >> 2, rn,
                                          rt);
-    else if ((rn == ARM::sp) && !(rt & 8) && imm.isUInt10())
+    else if ((rn == ARMRegisters::sp) && !(rt & 8) && imm.isUInt10())
       m_formatter.oneWordOp5Reg3Imm8(OP_STR_imm_T2, rt, imm.getUInt10() >> 2);
     else
       m_formatter.twoWordOp12Reg4Reg4Imm12(OP_STR_imm_T3, rn, rt,
@@ -1229,8 +1235,8 @@ class ARMv7Assembler {
   // MEM[index ? _tmp : _reg] = REG[rt]
   // if (wback) REG[rn] = _tmp
   void str(RegisterID rt, RegisterID rn, int offset, bool index, bool wback) {
-    ASSERT(rt != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT(rt != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(index || wback);
     ASSERT(!wback | (rt != rn));
 
@@ -1249,9 +1255,10 @@ class ARMv7Assembler {
     m_formatter.twoWordOp12Reg4Reg4Imm12(OP_STR_imm_T4, rn, rt, offset);
   }
 
-  // rt == ARM::pc only allowed if last instruction in IT (if then) block.
+  // rt == ARMRegisters::pc only allowed if last instruction in IT (if then)
+  // block.
   void str(RegisterID rt, RegisterID rn, RegisterID rm, unsigned shift = 0) {
-    ASSERT(rn != ARM::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(!BadReg(rm));
     ASSERT(shift <= 3);
 
@@ -1264,12 +1271,12 @@ class ARMv7Assembler {
 
   void sub(RegisterID rd, RegisterID rn, ARMThumbImmediate imm) {
     // Rd can only be SP if Rn is also SP.
-    ASSERT((rd != ARM::sp) || (rn == ARM::sp));
-    ASSERT(rd != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT((rd != ARMRegisters::sp) || (rn == ARMRegisters::sp));
+    ASSERT(rd != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(imm.isValid());
 
-    if ((rn == ARM::sp) && (rd == ARM::sp) && imm.isUInt9()) {
+    if ((rn == ARMRegisters::sp) && (rd == ARMRegisters::sp) && imm.isUInt9()) {
       m_formatter.oneWordOp9Imm7(OP_SUB_SP_imm_T1, imm.getUInt9() >> 2);
       return;
     } else if (!((rd | rn) & 8)) {
@@ -1295,9 +1302,9 @@ class ARMv7Assembler {
            RegisterID rn,
            RegisterID rm,
            ShiftTypeAndAmount shift) {
-    ASSERT((rd != ARM::sp) || (rn == ARM::sp));
-    ASSERT(rd != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT((rd != ARMRegisters::sp) || (rn == ARMRegisters::sp));
+    ASSERT(rd != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(!BadReg(rm));
     m_formatter.twoWordOp12Reg4FourFours(
         OP_SUB_reg_T2, rn, FourFours(shift.hi4(), rd, shift.lo4(), rm));
@@ -1314,12 +1321,12 @@ class ARMv7Assembler {
   // Not allowed in an IT (if then) block.
   void sub_S(RegisterID rd, RegisterID rn, ARMThumbImmediate imm) {
     // Rd can only be SP if Rn is also SP.
-    ASSERT((rd != ARM::sp) || (rn == ARM::sp));
-    ASSERT(rd != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT((rd != ARMRegisters::sp) || (rn == ARMRegisters::sp));
+    ASSERT(rd != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(imm.isValid());
 
-    if ((rn == ARM::sp) && (rd == ARM::sp) && imm.isUInt9()) {
+    if ((rn == ARMRegisters::sp) && (rd == ARMRegisters::sp) && imm.isUInt9()) {
       m_formatter.oneWordOp9Imm7(OP_SUB_SP_imm_T1, imm.getUInt9() >> 2);
       return;
     } else if (!((rd | rn) & 8)) {
@@ -1341,9 +1348,9 @@ class ARMv7Assembler {
              RegisterID rn,
              RegisterID rm,
              ShiftTypeAndAmount shift) {
-    ASSERT((rd != ARM::sp) || (rn == ARM::sp));
-    ASSERT(rd != ARM::pc);
-    ASSERT(rn != ARM::pc);
+    ASSERT((rd != ARMRegisters::sp) || (rn == ARMRegisters::sp));
+    ASSERT(rd != ARMRegisters::pc);
+    ASSERT(rn != ARMRegisters::pc);
     ASSERT(!BadReg(rm));
     m_formatter.twoWordOp12Reg4FourFours(
         OP_SUB_S_reg_T2, rn, FourFours(shift.hi4(), rd, shift.lo4(), rm));

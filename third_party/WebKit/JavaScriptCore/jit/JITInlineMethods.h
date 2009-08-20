@@ -187,7 +187,7 @@ ALWAYS_INLINE void JIT::restoreArgumentReference() {
   poke(callFrameRegister,
        OBJECT_OFFSETOF(struct JITStackFrame, callFrame) / sizeof(void*));
 #if PLATFORM(ARM) && !PLATFORM_ARM_ARCH(7)
-  move(ctiReturnRegister, ARM::lr);
+  move(ctiReturnRegister, ARMRegisters::lr);
 #endif
 }
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {
@@ -284,10 +284,10 @@ ALWAYS_INLINE void JIT::emitCount(AbstractSamplingCounter& counter,
 #if PLATFORM(X86_64)
 ALWAYS_INLINE void JIT::sampleInstruction(Instruction* instruction,
                                           bool inHostFunction) {
-  move(ImmPtr(m_interpreter->sampler()->sampleSlot()), X86::ecx);
+  move(ImmPtr(m_interpreter->sampler()->sampleSlot()), X86Registers::ecx);
   storePtr(ImmPtr(m_interpreter->sampler()->encodeSample(instruction,
                                                          inHostFunction)),
-           X86::ecx);
+           X86Registers::ecx);
 }
 #else
 ALWAYS_INLINE void JIT::sampleInstruction(Instruction* instruction,
@@ -302,8 +302,8 @@ ALWAYS_INLINE void JIT::sampleInstruction(Instruction* instruction,
 #if ENABLE(CODEBLOCK_SAMPLING)
 #if PLATFORM(X86_64)
 ALWAYS_INLINE void JIT::sampleCodeBlock(CodeBlock* codeBlock) {
-  move(ImmPtr(m_interpreter->sampler()->codeBlockSlot()), X86::ecx);
-  storePtr(ImmPtr(codeBlock), X86::ecx);
+  move(ImmPtr(m_interpreter->sampler()->codeBlockSlot()), X86Registers::ecx);
+  storePtr(ImmPtr(codeBlock), X86Registers::ecx);
 }
 #else
 ALWAYS_INLINE void JIT::sampleCodeBlock(CodeBlock* codeBlock) {

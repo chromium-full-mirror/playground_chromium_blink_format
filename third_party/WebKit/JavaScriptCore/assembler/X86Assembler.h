@@ -49,7 +49,7 @@ inline bool CAN_SIGN_EXTEND_U32_64(intptr_t value) {
 }
 #endif
 
-namespace X86 {
+namespace X86Registers {
 typedef enum {
   eax,
   ecx,
@@ -86,8 +86,8 @@ typedef enum {
 
 class X86Assembler {
  public:
-  typedef X86::RegisterID RegisterID;
-  typedef X86::XMMRegisterID XMMRegisterID;
+  typedef X86Registers::RegisterID RegisterID;
+  typedef X86Registers::XMMRegisterID XMMRegisterID;
   typedef XMMRegisterID FPRegisterID;
 
   typedef enum {
@@ -1028,14 +1028,14 @@ class X86Assembler {
 
 #else
   void movl_rm(RegisterID src, void* addr) {
-    if (src == X86::eax)
+    if (src == X86Registers::eax)
       movl_EAXm(addr);
     else
       m_formatter.oneByteOp(OP_MOV_EvGv, src, addr);
   }
 
   void movl_mr(void* addr, RegisterID dst) {
-    if (dst == X86::eax)
+    if (dst == X86Registers::eax)
       movl_mEAX(addr);
     else
       m_formatter.oneByteOp(OP_MOV_GvEv, dst, addr);
@@ -1744,19 +1744,21 @@ class X86Assembler {
    private:
     // Internals; ModRm and REX formatters.
 
-    static const RegisterID noBase = X86::ebp;
-    static const RegisterID hasSib = X86::esp;
-    static const RegisterID noIndex = X86::esp;
+    static const RegisterID noBase = X86Registers::ebp;
+    static const RegisterID hasSib = X86Registers::esp;
+    static const RegisterID noIndex = X86Registers::esp;
 #if PLATFORM(X86_64)
-    static const RegisterID noBase2 = X86::r13;
-    static const RegisterID hasSib2 = X86::r12;
+    static const RegisterID noBase2 = X86Registers::r13;
+    static const RegisterID hasSib2 = X86Registers::r12;
 
     // Registers r8 & above require a REX prefixe.
-    inline bool regRequiresRex(int reg) { return (reg >= X86::r8); }
+    inline bool regRequiresRex(int reg) { return (reg >= X86Registers::r8); }
 
     // Byte operand register spl & above require a REX prefix (to prevent the
     // 'H' registers be accessed).
-    inline bool byteRegRequiresRex(int reg) { return (reg >= X86::esp); }
+    inline bool byteRegRequiresRex(int reg) {
+      return (reg >= X86Registers::esp);
+    }
 
     // Format a REX prefix byte.
     inline void emitRex(bool w, int r, int x, int b) {
