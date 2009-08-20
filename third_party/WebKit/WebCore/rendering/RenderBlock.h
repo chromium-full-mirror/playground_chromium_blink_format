@@ -663,6 +663,10 @@ class RenderBlock : public RenderBox {
     int margin() const { return m_posMargin - m_negMargin; }
   };
 
+  void layoutBlockChild(RenderBox* child,
+                        MarginInfo&,
+                        int& previousFloatBottom,
+                        int& maxFloatBottom);
   void adjustPositionedBlock(RenderBox* child, const MarginInfo&);
   void adjustFloatingBlock(const MarginInfo&);
   bool handleSpecialChild(RenderBox* child, const MarginInfo&);
