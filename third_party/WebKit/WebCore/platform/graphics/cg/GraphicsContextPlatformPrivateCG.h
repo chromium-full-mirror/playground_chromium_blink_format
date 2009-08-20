@@ -39,10 +39,9 @@ class GraphicsContextPlatformPrivate {
 #endif
         ,
         m_userToDeviceTransformKnownToBeIdentity(false) {
-    CGContextRetain(m_cgContext);
   }
 
-  ~GraphicsContextPlatformPrivate() { CGContextRelease(m_cgContext); }
+  ~GraphicsContextPlatformPrivate() {}
 
 #if PLATFORM(MAC) || PLATFORM(CHROMIUM)
   // These methods do nothing on Mac.
@@ -79,7 +78,7 @@ class GraphicsContextPlatformPrivate {
   bool m_shouldIncludeChildWindows;
 #endif
 
-  CGContextRef m_cgContext;
+  RetainPtr<CGContextRef> m_cgContext;
   bool m_userToDeviceTransformKnownToBeIdentity;
 };
 }
