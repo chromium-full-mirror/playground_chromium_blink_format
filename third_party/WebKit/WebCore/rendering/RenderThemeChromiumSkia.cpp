@@ -696,6 +696,12 @@ bool RenderThemeChromiumSkia::paintMediaMuteButton(
       Image::loadPlatformResource("mediaSoundFull").releaseRef();
   static Image* soundNone =
       Image::loadPlatformResource("mediaSoundNone").releaseRef();
+  static Image* soundDisabled =
+      Image::loadPlatformResource("mediaSoundDisabled").releaseRef();
+
+  if (mediaElement->networkState() == HTMLMediaElement::NETWORK_NO_SOURCE ||
+      !mediaElement->hasAudio())
+    return paintMediaButtonInternal(paintInfo.context, rect, soundDisabled);
 
   return paintMediaButtonInternal(
       paintInfo.context, rect, mediaElement->muted() ? soundNone : soundFull);
