@@ -188,7 +188,10 @@ class FunctionExecutable : public ExecutableBase,
 
  public:
   FunctionExecutable(const Identifier& name, FunctionBodyNode* body)
-      : ExecutableBase(body->source()), m_codeBlock(0), m_name(name) {
+      : ExecutableBase(body->source()),
+        m_codeBlock(0),
+        m_name(name),
+        m_numVariables(0) {
     m_node = body;
   }
 
@@ -212,6 +215,7 @@ class FunctionExecutable : public ExecutableBase,
   bool usesEval() const { return body()->usesEval(); }
   bool usesArguments() const { return body()->usesArguments(); }
   size_t parameterCount() const { return body()->parameterCount(); }
+  size_t variableCount() const { return m_numVariables; }
   UString paramString() const { return body()->paramString(); }
 
   bool isHostFunction() const {
@@ -236,6 +240,7 @@ class FunctionExecutable : public ExecutableBase,
 
   CodeBlock* m_codeBlock;
   const Identifier& m_name;
+  size_t m_numVariables;
 
 #if ENABLE(JIT)
  public:
