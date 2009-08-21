@@ -110,6 +110,9 @@ typedef HashMap<RefPtr<UString::Rep>,
                 SymbolTableIndexHashTraits>
     SymbolTable;
 
+class SharedSymbolTable : public SymbolTable,
+                          public RefCounted<SharedSymbolTable> {};
+
 }  // namespace JSC
 
 #endif  // SymbolTable_h

@@ -76,12 +76,20 @@ class JSActivation : public JSVariableObject {
 
  private:
   struct JSActivationData : public JSVariableObjectData {
-    JSActivationData(PassRefPtr<FunctionExecutable> functionExecutable,
+    JSActivationData(PassRefPtr<FunctionExecutable> _functionExecutable,
                      Register* registers)
         : JSVariableObjectData(
-              &functionExecutable->generatedBytecode().symbolTable(),
+              _functionExecutable->generatedBytecode().symbolTable(),
               registers),
-          functionExecutable(functionExecutable) {}
+          functionExecutable(_functionExecutable) {
+      // We have to manually ref and deref the symbol table as
+      // JSVariableObjectData
+      // doesn't know about SharedSymbolTable
+      functionExecutable->generatedBytecode().sharedSymbolTable()->ref();
+    }
+    ~JSActivationData() {
+      static_cast<SharedSymbolTable*>(symbolTable)->deref();
+    }
 
     RefPtr<FunctionExecutable> functionExecutable;
   };

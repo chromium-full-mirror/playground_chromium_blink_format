@@ -4269,7 +4269,7 @@ JSValue Interpreter::retrieveArguments(CallFrame* callFrame,
   CodeBlock* codeBlock = functionCallFrame->codeBlock();
   if (codeBlock->usesArguments()) {
     ASSERT(codeBlock->codeType() == FunctionCode);
-    SymbolTable& symbolTable = codeBlock->symbolTable();
+    SymbolTable& symbolTable = *codeBlock->symbolTable();
     int argumentsIndex =
         symbolTable
             .get(functionCallFrame->propertyNames().arguments.ustring().rep())

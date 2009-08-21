@@ -54,7 +54,7 @@ void EvalExecutable::generateBytecode(ScopeChainNode* scopeChainNode) {
                                       scopeChain.localDepth());
   OwnPtr<BytecodeGenerator> generator(
       new BytecodeGenerator(evalNode(), globalObject->debugger(), scopeChain,
-                            &m_evalCodeBlock->symbolTable(), m_evalCodeBlock));
+                            m_evalCodeBlock->symbolTable(), m_evalCodeBlock));
   generator->generate();
 
   evalNode()->destroyData();
@@ -86,7 +86,7 @@ void FunctionExecutable::generateBytecode(ScopeChainNode* scopeChainNode) {
                                       source().startOffset());
   OwnPtr<BytecodeGenerator> generator(
       new BytecodeGenerator(body(), globalObject->debugger(), scopeChain,
-                            &m_codeBlock->symbolTable(), m_codeBlock));
+                            m_codeBlock->symbolTable(), m_codeBlock));
   generator->generate();
   m_numParameters = m_codeBlock->m_numParameters;
   ASSERT(m_numParameters);
@@ -153,7 +153,7 @@ ExceptionInfo* FunctionExecutable::reparseExceptionInfo(
 
   OwnPtr<BytecodeGenerator> generator(new BytecodeGenerator(
       newFunctionBody.get(), globalObject->debugger(), scopeChain,
-      &newCodeBlock->symbolTable(), newCodeBlock.get()));
+      newCodeBlock->symbolTable(), newCodeBlock.get()));
   generator->setRegeneratingForExceptionInfo(
       static_cast<FunctionCodeBlock*>(codeBlock));
   generator->generate();
@@ -185,7 +185,7 @@ ExceptionInfo* EvalExecutable::reparseExceptionInfo(
 
   OwnPtr<BytecodeGenerator> generator(new BytecodeGenerator(
       newEvalBody.get(), globalObject->debugger(), scopeChain,
-      &newCodeBlock->symbolTable(), newCodeBlock.get()));
+      newCodeBlock->symbolTable(), newCodeBlock.get()));
   generator->setRegeneratingForExceptionInfo(
       static_cast<EvalCodeBlock*>(codeBlock));
   generator->generate();
