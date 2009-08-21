@@ -1545,8 +1545,8 @@ InspectorController::SpecialPanels InspectorController::specialPanelForJSName(
     return ScriptsPanel;
   else if (panelName == "profiles")
     return ProfilesPanel;
-  else if (panelName == "databases")
-    return DatabasesPanel;
+  else if (panelName == "storage" || panelName == "databases")
+    return StoragePanel;
   else
     return ElementsPanel;
 }

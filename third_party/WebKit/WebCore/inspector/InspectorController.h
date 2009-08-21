@@ -94,11 +94,11 @@ class InspectorController
   typedef enum {
     CurrentPanel,
     ConsolePanel,
-    DatabasesPanel,
     ElementsPanel,
     ProfilesPanel,
     ResourcesPanel,
-    ScriptsPanel
+    ScriptsPanel,
+    StoragePanel
   } SpecialPanels;
 
   struct Setting {

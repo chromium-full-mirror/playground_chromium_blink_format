@@ -135,9 +135,6 @@ void InspectorFrontend::showPanel(int panel) {
     case InspectorController::ConsolePanel:
       showFunctionName = "showConsole";
       break;
-    case InspectorController::DatabasesPanel:
-      showFunctionName = "showDatabasesPanel";
-      break;
     case InspectorController::ElementsPanel:
       showFunctionName = "showElementsPanel";
       break;
@@ -149,6 +146,9 @@ void InspectorFrontend::showPanel(int panel) {
       break;
     case InspectorController::ScriptsPanel:
       showFunctionName = "showScriptsPanel";
+      break;
+    case InspectorController::StoragePanel:
+      showFunctionName = "showStoragePanel";
       break;
     default:
       ASSERT_NOT_REACHED();
