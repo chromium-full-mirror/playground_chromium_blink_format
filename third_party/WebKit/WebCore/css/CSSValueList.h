@@ -54,6 +54,7 @@ class CSSValueList : public CSSValue {
   void prepend(PassRefPtr<CSSValue>);
   bool removeAll(CSSValue*);
   bool hasValue(CSSValue*);
+  PassRefPtr<CSSValueList> copy();
 
   virtual String cssText() const;
 
