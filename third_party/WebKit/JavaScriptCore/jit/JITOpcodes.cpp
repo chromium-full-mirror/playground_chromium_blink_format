@@ -92,7 +92,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   restoreArgumentReference();
   Call callJSFunction2 = call();
   loadPtr(Address(regT0, OBJECT_OFFSETOF(JSFunction, m_executable)), regT2);
-  emitGetJITStubArg(5, regT1);  // argCount
+  emitGetJITStubArg(2, regT1);  // argCount
   restoreReturnAddressBeforeReturn(regT3);
   hasCodeBlock2.link(this);
 
@@ -102,11 +102,11 @@ void JIT::privateCompileCTIMachineTrampolines(
       Address(regT2, OBJECT_OFFSETOF(FunctionExecutable, m_numParameters)),
       regT1);
   preserveReturnAddressAfterCall(regT3);
-  emitPutJITStubArg(regT3, 3);  // return address
+  emitPutJITStubArg(regT3, 1);  // return address
   restoreArgumentReference();
   Call callArityCheck2 = call();
   move(regT1, callFrameRegister);
-  emitGetJITStubArg(5, regT1);  // argCount
+  emitGetJITStubArg(2, regT1);  // argCount
   restoreReturnAddressBeforeReturn(regT3);
   arityCheckOkay2.link(this);
 
@@ -115,7 +115,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   compileOpCallInitializeCallFrame();
 
   preserveReturnAddressAfterCall(regT3);
-  emitPutJITStubArg(regT3, 3);  // return address
+  emitPutJITStubArg(regT3, 1);  // return address
   restoreArgumentReference();
   Call callLazyLinkCall = call();
   restoreReturnAddressBeforeReturn(regT3);
@@ -140,7 +140,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   preserveReturnAddressAfterCall(regT3);
   restoreArgumentReference();
   Call callJSFunction1 = call();
-  emitGetJITStubArg(5, regT1);  // argCount
+  emitGetJITStubArg(2, regT1);  // argCount
   restoreReturnAddressBeforeReturn(regT3);
   loadPtr(Address(regT0, OBJECT_OFFSETOF(JSFunction, m_executable)), regT2);
   hasCodeBlock3.link(this);
@@ -151,11 +151,11 @@ void JIT::privateCompileCTIMachineTrampolines(
       Address(regT2, OBJECT_OFFSETOF(FunctionExecutable, m_numParameters)),
       regT1);
   preserveReturnAddressAfterCall(regT3);
-  emitPutJITStubArg(regT3, 3);  // return address
+  emitPutJITStubArg(regT3, 1);  // return address
   restoreArgumentReference();
   Call callArityCheck1 = call();
   move(regT1, callFrameRegister);
-  emitGetJITStubArg(5, regT1);  // argCount
+  emitGetJITStubArg(2, regT1);  // argCount
   restoreReturnAddressBeforeReturn(regT3);
   loadPtr(Address(regT0, OBJECT_OFFSETOF(JSFunction, m_executable)), regT2);
   arityCheckOkay3.link(this);
@@ -1595,7 +1595,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   restoreArgumentReference();
   Call callJSFunction2 = call();
   loadPtr(Address(regT0, OBJECT_OFFSETOF(JSFunction, m_executable)), regT2);
-  emitGetJITStubArg(3, regT1);  // argCount
+  emitGetJITStubArg(2, regT1);  // argCount
   restoreReturnAddressBeforeReturn(regT3);
   hasCodeBlock2.link(this);
 
@@ -1605,11 +1605,11 @@ void JIT::privateCompileCTIMachineTrampolines(
       Address(regT2, OBJECT_OFFSETOF(FunctionExecutable, m_numParameters)),
       regT1);
   preserveReturnAddressAfterCall(regT3);
-  emitPutJITStubArg(regT3, 2);  // return address
+  emitPutJITStubArg(regT3, 1);  // return address
   restoreArgumentReference();
   Call callArityCheck2 = call();
   move(regT1, callFrameRegister);
-  emitGetJITStubArg(3, regT1);  // argCount
+  emitGetJITStubArg(2, regT1);  // argCount
   restoreReturnAddressBeforeReturn(regT3);
   arityCheckOkay2.link(this);
 
@@ -1617,7 +1617,7 @@ void JIT::privateCompileCTIMachineTrampolines(
 
   compileOpCallInitializeCallFrame();
   preserveReturnAddressAfterCall(regT3);
-  emitPutJITStubArg(regT3, 2);  // return address
+  emitPutJITStubArg(regT3, 1);  // return address
   restoreArgumentReference();
   Call callLazyLinkCall = call();
   restoreReturnAddressBeforeReturn(regT3);
@@ -1641,7 +1641,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   preserveReturnAddressAfterCall(regT3);
   restoreArgumentReference();
   Call callJSFunction1 = call();
-  emitGetJITStubArg(3, regT1);  // argCount
+  emitGetJITStubArg(2, regT1);  // argCount
   restoreReturnAddressBeforeReturn(regT3);
   loadPtr(Address(regT0, OBJECT_OFFSETOF(JSFunction, m_executable)), regT2);
   hasCodeBlock3.link(this);
@@ -1652,11 +1652,11 @@ void JIT::privateCompileCTIMachineTrampolines(
       Address(regT2, OBJECT_OFFSETOF(FunctionExecutable, m_numParameters)),
       regT1);
   preserveReturnAddressAfterCall(regT3);
-  emitPutJITStubArg(regT3, 2);  // return address
+  emitPutJITStubArg(regT3, 1);  // return address
   restoreArgumentReference();
   Call callArityCheck1 = call();
   move(regT1, callFrameRegister);
-  emitGetJITStubArg(3, regT1);  // argCount
+  emitGetJITStubArg(2, regT1);  // argCount
   restoreReturnAddressBeforeReturn(regT3);
   loadPtr(Address(regT0, OBJECT_OFFSETOF(JSFunction, m_executable)), regT2);
   arityCheckOkay3.link(this);
