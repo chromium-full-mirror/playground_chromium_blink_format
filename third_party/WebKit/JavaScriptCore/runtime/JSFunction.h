@@ -24,7 +24,7 @@
 #ifndef JSFunction_h
 #define JSFunction_h
 
-#include "Executable.h"
+//#include "Executable.h"
 #include "InternalFunction.h"
 
 namespace JSC {
@@ -32,6 +32,8 @@ namespace JSC {
 class FunctionPrototype;
 class JSActivation;
 class JSGlobalObject;
+class ExecutableBase;
+class FunctionExecutable;
 
 class JSFunction : public InternalFunction {
   friend class JIT;
@@ -54,7 +56,11 @@ class JSFunction : public InternalFunction {
   void setScope(const ScopeChain& scopeChain) { setScopeChain(scopeChain); }
   ScopeChain& scope() { return scopeChain(); }
 
-  FunctionExecutable* executable() const { return m_executable.get(); }
+  ExecutableBase* executable() const { return m_executable.get(); }
+
+  // To call either of these methods include Executable.h
+  inline bool isHostFunction() const;
+  FunctionExecutable* jsExecutable() const;
 
   static JS_EXPORTDATA const ClassInfo info;
 
@@ -73,7 +79,6 @@ class JSFunction : public InternalFunction {
  private:
   JSFunction(PassRefPtr<Structure>);
 
-  bool isHostFunction() const;
   bool isHostFunctionNonInline() const;
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
@@ -97,7 +102,7 @@ class JSFunction : public InternalFunction {
                               const Identifier&,
                               const PropertySlot&);
 
-  RefPtr<FunctionExecutable> m_executable;
+  RefPtr<ExecutableBase> m_executable;
   ScopeChain& scopeChain() {
     ASSERT(!isHostFunctionNonInline());
     return *reinterpret_cast<ScopeChain*>(m_data);
@@ -125,11 +130,6 @@ JSFunction* asFunction(JSValue);
 inline JSFunction* asFunction(JSValue value) {
   ASSERT(asObject(value)->inherits(&JSFunction::info));
   return static_cast<JSFunction*>(asObject(value));
-}
-
-inline JSFunction* FunctionExecutable::make(ExecState* exec,
-                                            ScopeChainNode* scopeChain) {
-  return new (exec) JSFunction(exec, this, scopeChain);
 }
 
 }  // namespace JSC

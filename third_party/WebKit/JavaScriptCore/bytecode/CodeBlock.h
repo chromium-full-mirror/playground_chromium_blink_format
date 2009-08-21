@@ -242,7 +242,7 @@ class CodeBlock : public FastAllocBase {
   friend class JIT;
 
  protected:
-  CodeBlock(ExecutableBase* ownerExecutable,
+  CodeBlock(ScriptExecutable* ownerExecutable,
             CodeType,
             PassRefPtr<SourceProvider>,
             unsigned sourceOffset,
@@ -366,7 +366,7 @@ class CodeBlock : public FastAllocBase {
   }
 #endif
 
-  ExecutableBase* ownerExecutable() const { return m_ownerExecutable; }
+  ScriptExecutable* ownerExecutable() const { return m_ownerExecutable; }
 
   void setGlobalData(JSGlobalData* globalData) { m_globalData = globalData; }
 
@@ -610,7 +610,7 @@ class CodeBlock : public FastAllocBase {
       m_rareData.set(new RareData);
   }
 
-  ExecutableBase* m_ownerExecutable;
+  ScriptExecutable* m_ownerExecutable;
   JSGlobalData* m_globalData;
 
   Vector<Instruction> m_instructions;
@@ -678,7 +678,7 @@ class CodeBlock : public FastAllocBase {
 
 class GlobalCodeBlock : public CodeBlock {
  public:
-  GlobalCodeBlock(ExecutableBase* ownerExecutable,
+  GlobalCodeBlock(ScriptExecutable* ownerExecutable,
                   CodeType codeType,
                   PassRefPtr<SourceProvider> sourceProvider,
                   unsigned sourceOffset,

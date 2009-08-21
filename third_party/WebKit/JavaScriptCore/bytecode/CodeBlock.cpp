@@ -1435,7 +1435,7 @@ void CodeBlock::dumpStatistics() {
 #endif
 }
 
-CodeBlock::CodeBlock(ExecutableBase* ownerExecutable,
+CodeBlock::CodeBlock(ScriptExecutable* ownerExecutable,
                      CodeType codeType,
                      PassRefPtr<SourceProvider> sourceProvider,
                      unsigned sourceOffset,

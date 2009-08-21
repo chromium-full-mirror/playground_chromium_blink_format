@@ -46,16 +46,17 @@ ASSERT_CLASS_FITS_IN_CELL(JSFunction);
 
 const ClassInfo JSFunction::info = {"Function", &InternalFunction::info, 0, 0};
 
-inline bool JSFunction::isHostFunction() const {
-  return m_executable && m_executable->isHostFunction();
-}
-
 bool JSFunction::isHostFunctionNonInline() const {
   return isHostFunction();
 }
 
-JSFunction::JSFunction(PassRefPtr<Structure> structure) : Base(structure) {
-  clearScopeChain();
+JSFunction::JSFunction(PassRefPtr<Structure> structure)
+    : Base(structure)
+#if ENABLE(JIT)
+      ,
+      m_executable(adoptRef(new VPtrHackExecutable()))
+#endif
+{
 }
 
 JSFunction::JSFunction(ExecState* exec,
@@ -66,7 +67,7 @@ JSFunction::JSFunction(ExecState* exec,
     : Base(&exec->globalData(), structure, name)
 #if ENABLE(JIT)
       ,
-      m_executable(FunctionExecutable::createNativeThunk(exec))
+      m_executable(adoptRef(new NativeExecutable(exec)))
 #endif
 {
 #if ENABLE(JIT)
@@ -99,8 +100,9 @@ JSFunction::~JSFunction() {
   // JSFunction).
   if (!isHostFunction()) {
 #if ENABLE(JIT_OPTIMIZE_CALL)
-    if (m_executable && m_executable->isGenerated())
-      m_executable->generatedBytecode().unlinkCallers();
+    ASSERT(m_executable);
+    if (jsExecutable()->isGenerated())
+      jsExecutable()->generatedBytecode().unlinkCallers();
 #endif
     scopeChain().~ScopeChain();  // FIXME: Don't we need to do this in the
                                  // interpreter too?
@@ -109,9 +111,10 @@ JSFunction::~JSFunction() {
 
 void JSFunction::markChildren(MarkStack& markStack) {
   Base::markChildren(markStack);
-  m_executable->markAggregate(markStack);
-  if (!isHostFunction())
+  if (!isHostFunction()) {
+    jsExecutable()->markAggregate(markStack);
     scopeChain().markAggregate(markStack);
+  }
 }
 
 CallType JSFunction::getCallData(CallData& callData) {
@@ -119,7 +122,7 @@ CallType JSFunction::getCallData(CallData& callData) {
     callData.native.function = nativeFunction();
     return CallTypeHost;
   }
-  callData.js.functionExecutable = m_executable.get();
+  callData.js.functionExecutable = jsExecutable();
   callData.js.scopeChain = scopeChain().node();
   return CallTypeJS;
 }
@@ -129,7 +132,7 @@ JSValue JSFunction::call(ExecState* exec,
                          const ArgList& args) {
   ASSERT(!isHostFunction());
   return exec->interpreter()->execute(
-      m_executable.get(), exec, this, thisValue.toThisObject(exec), args,
+      jsExecutable(), exec, this, thisValue.toThisObject(exec), args,
       scopeChain().node(), exec->exceptionSlot());
 }
 
@@ -154,7 +157,7 @@ JSValue JSFunction::lengthGetter(ExecState* exec,
                                  const PropertySlot& slot) {
   JSFunction* thisObj = asFunction(slot.slotBase());
   ASSERT(!thisObj->isHostFunction());
-  return jsNumber(exec, thisObj->m_executable->parameterCount());
+  return jsNumber(exec, thisObj->jsExecutable()->parameterCount());
 }
 
 bool JSFunction::getOwnPropertySlot(ExecState* exec,
@@ -223,7 +226,7 @@ bool JSFunction::deleteProperty(ExecState* exec,
 ConstructType JSFunction::getConstructData(ConstructData& constructData) {
   if (isHostFunction())
     return ConstructTypeNone;
-  constructData.js.functionExecutable = m_executable.get();
+  constructData.js.functionExecutable = jsExecutable();
   constructData.js.scopeChain = scopeChain().node();
   return ConstructTypeJS;
 }
@@ -238,9 +241,9 @@ JSObject* JSFunction::construct(ExecState* exec, const ArgList& args) {
     structure = exec->lexicalGlobalObject()->emptyObjectStructure();
   JSObject* thisObj = new (exec) JSObject(structure);
 
-  JSValue result = exec->interpreter()->execute(
-      m_executable.get(), exec, this, thisObj, args, scopeChain().node(),
-      exec->exceptionSlot());
+  JSValue result =
+      exec->interpreter()->execute(jsExecutable(), exec, this, thisObj, args,
+                                   scopeChain().node(), exec->exceptionSlot());
   if (exec->hadException() || !result.isObject())
     return thisObj;
   return asObject(result);

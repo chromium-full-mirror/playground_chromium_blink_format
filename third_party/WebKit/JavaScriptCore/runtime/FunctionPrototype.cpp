@@ -116,8 +116,8 @@ JSValue JSC_HOST_CALL functionProtoFuncToString(ExecState* exec,
                                                 const ArgList&) {
   if (thisValue.inherits(&JSFunction::info)) {
     JSFunction* function = asFunction(thisValue);
-    FunctionExecutable* executable = function->executable();
-    if (!executable->isHostFunction()) {
+    if (!function->isHostFunction()) {
+      FunctionExecutable* executable = function->jsExecutable();
       UString sourceString = executable->source().toString();
       insertSemicolonIfNeeded(sourceString);
       return jsString(exec, "function " + function->name(&exec->globalData()) +

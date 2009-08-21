@@ -1606,8 +1606,8 @@ DEFINE_STUB_FUNCTION(void*, op_call_JSFunction) {
 #endif
 
   JSFunction* function = asFunction(stackFrame.args[0].jsValue());
-  FunctionExecutable* executable = function->executable();
-  ASSERT(!executable->isHostFunction());
+  ASSERT(!function->isHostFunction());
+  FunctionExecutable* executable = function->jsExecutable();
   ScopeChainNode* callDataScopeChain = function->scope().node();
   executable->jitCode(callDataScopeChain);
 
@@ -1619,7 +1619,8 @@ DEFINE_STUB_FUNCTION(VoidPtrPair, op_call_arityCheck) {
 
   CallFrame* callFrame = stackFrame.callFrame;
   JSFunction* callee = asFunction(stackFrame.args[0].jsValue());
-  CodeBlock* newCodeBlock = &callee->executable()->generatedBytecode();
+  ASSERT(!callee->isHostFunction());
+  CodeBlock* newCodeBlock = &callee->jsExecutable()->generatedBytecode();
   int argCount = stackFrame.args[2].int32();
 
   ASSERT(argCount != newCodeBlock->m_numParameters);
@@ -1667,12 +1668,13 @@ DEFINE_STUB_FUNCTION(VoidPtrPair, op_call_arityCheck) {
 DEFINE_STUB_FUNCTION(void*, vm_lazyLinkCall) {
   STUB_INIT_STACK_FRAME(stackFrame);
   JSFunction* callee = asFunction(stackFrame.args[0].jsValue());
-  FunctionExecutable* executable = callee->executable();
+  ExecutableBase* executable = callee->executable();
   JITCode& jitCode = executable->generatedJITCode();
 
   CodeBlock* codeBlock = 0;
   if (!executable->isHostFunction())
-    codeBlock = &executable->bytecode(callee->scope().node());
+    codeBlock = &static_cast<FunctionExecutable*>(executable)
+                     ->bytecode(callee->scope().node());
   CallLinkInfo* callLinkInfo =
       &stackFrame.callFrame->callerFrame()->codeBlock()->getCallLinkInfo(
           stackFrame.args[1].returnAddress());
@@ -1856,8 +1858,7 @@ DEFINE_STUB_FUNCTION(JSObject*, op_construct_JSConstruct) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   JSFunction* constructor = asFunction(stackFrame.args[0].jsValue());
-  FunctionExecutable* executable = constructor->executable();
-  if (executable && executable->isHostFunction()) {
+  if (constructor->isHostFunction()) {
     CallFrame* callFrame = stackFrame.callFrame;
     CodeBlock* codeBlock = callFrame->codeBlock();
     unsigned vPCIndex =
@@ -2205,7 +2206,7 @@ DEFINE_STUB_FUNCTION(int, op_load_varargs) {
       VM_THROW_EXCEPTION();
     }
     int32_t expectedParams =
-        callFrame->callee()->executable()->parameterCount();
+        callFrame->callee()->jsExecutable()->parameterCount();
     int32_t inplaceArgs = min(providedParams, expectedParams);
 
     Register* inplaceArgsDst = callFrame->registers() + argsOffset;
