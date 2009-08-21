@@ -292,8 +292,6 @@ class UString {
     return append(static_cast<UChar>(static_cast<unsigned char>(c)));
   }
   UString& append(const UChar*, int size);
-  UString& appendNumeric(int);
-  UString& appendNumeric(double);
 
   bool getCString(CStringBuffer&) const;
 

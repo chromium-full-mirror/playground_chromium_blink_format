@@ -303,23 +303,6 @@ ALWAYS_INLINE double JSValue::toNumber(ExecState* exec) const {
                        : 0;  // null and false both convert to 0.
 }
 
-inline UString JSValue::toString(ExecState* exec) const {
-  if (isCell())
-    return asCell()->toString(exec);
-  if (isInt32())
-    return UString::from(asInt32());
-  if (isDouble())
-    return asDouble() == 0.0 ? "0" : UString::from(asDouble());
-  if (isTrue())
-    return "true";
-  if (isFalse())
-    return "false";
-  if (isNull())
-    return "null";
-  ASSERT(isUndefined());
-  return "undefined";
-}
-
 inline bool JSValue::needsThisConversion() const {
   if (UNLIKELY(!isCell()))
     return true;

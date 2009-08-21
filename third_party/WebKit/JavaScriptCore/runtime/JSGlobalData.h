@@ -34,6 +34,7 @@
 #include "JITStubs.h"
 #include "JSValue.h"
 #include "MarkStack.h"
+#include "NumericStrings.h"
 #include "SmallStrings.h"
 #include "TimeoutChecker.h"
 #include <wtf/Forward.h>
@@ -118,6 +119,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
                                           // case here - but this list has
                                           // nothing to mark.
   SmallStrings smallStrings;
+  NumericStrings numericStrings;
 
 #if ENABLE(ASSEMBLER)
   ExecutableAllocator executableAllocator;
