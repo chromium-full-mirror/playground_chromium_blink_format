@@ -520,7 +520,7 @@ class FillLayersPropertyWrapper : public PropertyWrapperBase {
       case CSSPropertyBackgroundSize:
       case CSSPropertyWebkitMaskSize:
         m_fillLayerPropertyWrapper = new FillLayerPropertyWrapper<LengthSize>(
-            &FillLayer::size, &FillLayer::setSize);
+            &FillLayer::sizeLength, &FillLayer::setSizeLength);
         break;
     }
   }

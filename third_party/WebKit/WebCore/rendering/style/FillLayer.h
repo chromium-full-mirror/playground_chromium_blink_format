@@ -34,6 +34,23 @@
 
 namespace WebCore {
 
+struct FillSize {
+  FillSize() {
+    type = SizeLength;
+    size = LengthSize();
+  }
+
+  FillSize(EFillSizeType t, LengthSize l) : type(t), size(l) {}
+
+  bool operator==(const FillSize& o) const {
+    return type == o.type && size == o.size;
+  }
+  bool operator!=(const FillSize& o) const { return !(*this == o); }
+
+  EFillSizeType type;
+  LengthSize size;
+};
+
 struct FillLayer {
  public:
   FillLayer(EFillLayerType);
@@ -51,7 +68,10 @@ struct FillLayer {
   CompositeOperator composite() const {
     return static_cast<CompositeOperator>(m_composite);
   }
-  LengthSize size() const { return m_size; }
+  LengthSize sizeLength() const { return m_sizeLength; }
+  FillSize size() const {
+    return FillSize(static_cast<EFillSizeType>(m_sizeType), m_sizeLength);
+  }
 
   const FillLayer* next() const { return m_next; }
   FillLayer* next() { return m_next; }
@@ -64,7 +84,7 @@ struct FillLayer {
   bool isOriginSet() const { return m_originSet; }
   bool isRepeatSet() const { return m_repeatSet; }
   bool isCompositeSet() const { return m_compositeSet; }
-  bool isSizeSet() const { return m_sizeSet; }
+  bool isSizeSet() const { return m_sizeType != SizeNone; }
 
   void setImage(StyleImage* i) {
     m_image = i;
@@ -98,9 +118,11 @@ struct FillLayer {
     m_composite = c;
     m_compositeSet = true;
   }
-  void setSize(LengthSize b) {
-    m_size = b;
-    m_sizeSet = true;
+  void setSizeType(EFillSizeType b) { m_sizeType = b; }
+  void setSizeLength(LengthSize l) { m_sizeLength = l; }
+  void setSize(FillSize f) {
+    m_sizeType = f.type;
+    m_sizeLength = f.size;
   }
 
   void clearImage() { m_imageSet = false; }
@@ -111,7 +133,7 @@ struct FillLayer {
   void clearOrigin() { m_originSet = false; }
   void clearRepeat() { m_repeatSet = false; }
   void clearComposite() { m_compositeSet = false; }
-  void clearSize() { m_sizeSet = false; }
+  void clearSize() { m_sizeType = SizeNone; }
 
   void setNext(FillLayer* n) {
     if (m_next != n) {
@@ -156,7 +178,13 @@ struct FillLayer {
   static CompositeOperator initialFillComposite(EFillLayerType) {
     return CompositeSourceOver;
   }
-  static LengthSize initialFillSize(EFillLayerType) { return LengthSize(); }
+  static EFillSizeType initialFillSizeType(EFillLayerType) {
+    return SizeLength;
+  }
+  static LengthSize initialFillSizeLength(EFillLayerType) {
+    return LengthSize();
+  }
+  static FillSize initialFillSize(EFillLayerType) { return FillSize(); }
   static Length initialFillXPosition(EFillLayerType) {
     return Length(0.0, Percent);
   }
@@ -179,8 +207,9 @@ struct FillLayer {
   unsigned m_origin : 2;      // EFillBox
   unsigned m_repeat : 2;      // EFillRepeat
   unsigned m_composite : 4;   // CompositeOperator
+  unsigned m_sizeType : 2;    // EFillSizeType
 
-  LengthSize m_size;
+  LengthSize m_sizeLength;
 
   bool m_imageSet : 1;
   bool m_attachmentSet : 1;
@@ -190,7 +219,6 @@ struct FillLayer {
   bool m_xPosSet : 1;
   bool m_yPosSet : 1;
   bool m_compositeSet : 1;
-  bool m_sizeSet : 1;
 
   unsigned m_type : 1;  // EFillLayerType
 

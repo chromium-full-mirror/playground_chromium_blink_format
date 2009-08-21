@@ -629,7 +629,12 @@ class RenderStyle : public RefCounted<RenderStyle> {
   Length backgroundYPosition() const {
     return background->m_background.m_yPosition;
   }
-  LengthSize backgroundSize() const { return background->m_background.m_size; }
+  EFillSizeType backgroundSizeType() const {
+    return static_cast<EFillSizeType>(background->m_background.m_sizeType);
+  }
+  LengthSize backgroundSizeLength() const {
+    return background->m_background.m_sizeLength;
+  }
   FillLayer* accessBackgroundLayers() {
     return &(background.access()->m_background);
   }
@@ -663,7 +668,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   Length maskYPosition() const {
     return rareNonInheritedData->m_mask.m_yPosition;
   }
-  LengthSize maskSize() const { return rareNonInheritedData->m_mask.m_size; }
+  LengthSize maskSize() const {
+    return rareNonInheritedData->m_mask.m_sizeLength;
+  }
   FillLayer* accessMaskLayers() {
     return &(rareNonInheritedData.access()->m_mask);
   }
@@ -1074,8 +1081,11 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setBackgroundYPosition(Length l) {
     SET_VAR(background, m_background.m_yPosition, l)
   }
-  void setBackgroundSize(LengthSize l) {
-    SET_VAR(background, m_background.m_size, l)
+  void setBackgroundSize(EFillSizeType b) {
+    SET_VAR(background, m_background.m_sizeType, b)
+  }
+  void setBackgroundSizeLength(LengthSize l) {
+    SET_VAR(background, m_background.m_sizeLength, l)
   }
 
   void setBorderImage(const NinePieceImage& b) {
@@ -1253,7 +1263,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     SET_VAR(rareNonInheritedData, m_mask.m_yPosition, l)
   }
   void setMaskSize(LengthSize l) {
-    SET_VAR(rareNonInheritedData, m_mask.m_size, l)
+    SET_VAR(rareNonInheritedData, m_mask.m_sizeLength, l)
   }
 
   void setBorderCollapse(bool collapse) {
