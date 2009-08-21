@@ -90,6 +90,7 @@ class AccessibilityUIElement {
   bool isAttributeSettable(JSStringRef attribute);
   bool isActionSupported(JSStringRef action);
   JSStringRef role();
+  JSStringRef subrole();
   JSStringRef title();
   JSStringRef description();
   JSStringRef language();

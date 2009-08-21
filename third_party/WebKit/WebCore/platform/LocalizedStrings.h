@@ -115,6 +115,7 @@ String AXImageMapText();
 String AXHeadingText();
 String AXDefinitionListTermText();
 String AXDefinitionListDefinitionText();
+String AXARIAContentGroupText(const String& ariaType);
 
 String AXButtonActionVerb();
 String AXRadioButtonActionVerb();

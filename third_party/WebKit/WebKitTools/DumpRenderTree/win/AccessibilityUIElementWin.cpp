@@ -141,6 +141,10 @@ JSStringRef AccessibilityUIElement::role() {
   return JSStringCreateWithCharacters(roleText, _tcslen(roleText));
 }
 
+JSStringRef AccessibilityUIElement::subrole() {
+  return 0;
+}
+
 JSStringRef AccessibilityUIElement::title() {
   BSTR titleBSTR;
   if (FAILED(m_element->get_accName(self(), &titleBSTR)) || !titleBSTR)

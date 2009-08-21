@@ -401,6 +401,14 @@ static JSValueRef getRoleCallback(JSContextRef context,
   return JSValueMakeString(context, role.get());
 }
 
+static JSValueRef getSubroleCallback(JSContextRef context,
+                                     JSObjectRef thisObject,
+                                     JSStringRef propertyName,
+                                     JSValueRef* exception) {
+  JSRetainPtr<JSStringRef> role(Adopt, toAXElement(thisObject)->subrole());
+  return JSValueMakeString(context, role.get());
+}
+
 static JSValueRef getTitleCallback(JSContextRef context,
                                    JSObjectRef thisObject,
                                    JSStringRef propertyName,
@@ -554,6 +562,8 @@ JSObjectRef AccessibilityUIElement::makeJSAccessibilityUIElement(
 JSClassRef AccessibilityUIElement::getJSClass() {
   static JSStaticValue staticValues[] = {
       {"role", getRoleCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"subrole", getSubroleCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"title", getTitleCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
