@@ -321,10 +321,14 @@ void RenderBoxModelObject::paintFillLayerExtended(const PaintInfo& paintInfo,
 
   bool clippedToBorderRadius = false;
   if (style()->hasBorderRadius() && (includeLeftEdge || includeRightEdge)) {
+    IntRect borderRect(tx, ty, w, h);
+
+    if (borderRect.isEmpty())
+      return;
+
     context->save();
 
     IntSize topLeft, topRight, bottomLeft, bottomRight;
-    IntRect borderRect(tx, ty, w, h);
     style()->getBorderRadiiForRect(borderRect, topLeft, topRight, bottomLeft,
                                    bottomRight);
 
