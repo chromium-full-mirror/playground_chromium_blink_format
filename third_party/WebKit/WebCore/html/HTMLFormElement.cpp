@@ -48,6 +48,7 @@
 #include "MappedAttribute.h"
 #include "Page.h"
 #include "RenderTextControl.h"
+#include "ValidityState.h"
 #include <limits>
 #include <wtf/CurrentTime.h>
 #include <wtf/RandomNumber.h>
@@ -588,6 +589,19 @@ HTMLFormControlElement* HTMLFormElement::defaultButton() const {
   }
 
   return 0;
+}
+
+bool HTMLFormElement::checkValidity() {
+  // TODO: Check for unhandled invalid controls, see #27452 for tips.
+
+  bool hasOnlyValidControls = true;
+  for (unsigned i = 0; i < formElements.size(); ++i) {
+    HTMLFormControlElement* control = formElements[i];
+    if (!control->checkValidity())
+      hasOnlyValidControls = false;
+  }
+
+  return hasOnlyValidControls;
 }
 
 PassRefPtr<HTMLFormControlElement> HTMLFormElement::elementForAlias(

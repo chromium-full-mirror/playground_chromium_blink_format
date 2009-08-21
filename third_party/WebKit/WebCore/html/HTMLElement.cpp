@@ -264,6 +264,9 @@ void HTMLElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == oninputAttr) {
     setAttributeEventListener(eventNames().inputEvent,
                               createAttributeEventListener(this, attr));
+  } else if (attr->name() == oninvalidAttr) {
+    setAttributeEventListener(eventNames().invalidEvent,
+                              createAttributeEventListener(this, attr));
   }
 }
 

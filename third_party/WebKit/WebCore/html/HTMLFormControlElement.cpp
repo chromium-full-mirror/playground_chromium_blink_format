@@ -246,6 +246,15 @@ bool HTMLFormControlElement::willValidate() const {
   return form() && !name().isEmpty() && !disabled() && !isReadOnlyFormControl();
 }
 
+bool HTMLFormControlElement::checkValidity() {
+  if (willValidate() && !isValidFormControlElement()) {
+    dispatchEvent(EventNames().invalidEvent, false, true);
+    return false;
+  }
+
+  return true;
+}
+
 void HTMLFormControlElement::setCustomValidity(const String& error) {
   validity()->setCustomErrorMessage(error);
 }
