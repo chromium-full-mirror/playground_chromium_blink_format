@@ -119,6 +119,10 @@ class InspectorFrontend {
   void didGetChildNodes(int callId);
   void didApplyDomChange(int callId, bool success);
 
+  void didGetCookies(int callId,
+                     const ScriptArray& cookies,
+                     const String& cookiesString);
+
   void addNodesToSearchResult(const String& nodeIds);
 
  private:

@@ -97,6 +97,9 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   const String& platform() const;
 
+  void getCookies(long callId);
+  void deleteCookie(const String& cookieName);
+
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   const ProfilesArray& profiles() const;
 

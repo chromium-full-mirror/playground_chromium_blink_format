@@ -34,6 +34,7 @@
 #include "CachedResource.h"
 #include "Console.h"
 #include "ConsoleMessage.h"
+#include "CookieJar.h"
 #include "Document.h"
 #include "DocumentLoader.h"
 #include "Element.h"
@@ -1579,6 +1580,11 @@ ScriptValue InspectorController::unwrapObject(const String& objectId) {
 void InspectorController::resetInjectedScript() {
   ScriptFunctionCall function(m_scriptState, m_injectedScriptObj, "reset");
   function.call();
+}
+
+void InspectorController::deleteCookie(const String& cookieName) {
+  Document* document = m_inspectedPage->mainFrame()->document();
+  WebCore::deleteCookie(document, document->cookieURL(), cookieName);
 }
 
 }  // namespace WebCore
