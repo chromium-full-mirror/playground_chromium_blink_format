@@ -39,10 +39,10 @@ PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(
   String nullifiedPath = filePath;
   FILE* fileDescriptor = 0;
   if (_wfopen_s(&fileDescriptor, nullifiedPath.charactersWithNullTermination(),
-                TEXT("r+b")) ||
+                TEXT("rb")) ||
       !fileDescriptor) {
-    LOG_ERROR("Failed to open file %s to create shared buffer",
-              filePath.ascii().data());
+    LOG_ERROR("Failed to open file %s to create shared buffer, errno(%i)",
+              filePath.ascii().data(), errno);
     return 0;
   }
 
