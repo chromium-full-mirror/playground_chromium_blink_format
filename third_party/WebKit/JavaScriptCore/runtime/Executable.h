@@ -266,7 +266,6 @@ class FunctionExecutable : public ScriptExecutable {
   }
 
  private:
-  FunctionExecutable(ExecState*);
   void generateJITCode(ScopeChainNode*);
 #endif
 };
