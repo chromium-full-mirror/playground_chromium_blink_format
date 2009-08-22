@@ -154,12 +154,12 @@ class RenderBoxModelObject : public RenderObject {
                                         IntRect& destRect,
                                         IntPoint& phase,
                                         IntSize& tileSize);
-  IntSize calculateBackgroundSize(const FillLayer*,
-                                  int scaledWidth,
-                                  int scaledHeight) const;
 
  private:
   virtual bool isBoxModelObject() const { return true; }
+
+  IntSize calculateFillTileSize(const FillLayer*, IntSize scaledSize) const;
+
   friend class RenderView;
 
   RenderLayer* m_layer;
