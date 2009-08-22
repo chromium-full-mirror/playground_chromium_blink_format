@@ -24,6 +24,7 @@
 #define Lexer_h
 
 #include "Lookup.h"
+#include "ParserArena.h"
 #include "SourceCode.h"
 #include <wtf/ASCIICType.h>
 #include <wtf/SegmentedVector.h>
@@ -43,7 +44,7 @@ class Lexer : public Noncopyable {
   static UChar convertUnicode(int c1, int c2, int c3, int c4);
 
   // Functions to set up parsing.
-  void setCode(const SourceCode&);
+  void setCode(const SourceCode&, ParserArena&);
   void setIsReparsing() { m_isReparsing = true; }
 
   // Functions for the parser itself.
@@ -81,12 +82,11 @@ class Lexer : public Noncopyable {
   int currentOffset() const;
   const UChar* currentCharacter() const;
 
-  JSC::Identifier* makeIdentifier(const UChar* buffer, size_t length);
+  const Identifier* makeIdentifier(const UChar* characters, size_t length);
 
   bool lastTokenWasRestrKeyword() const;
 
   static const size_t initialReadBufferCapacity = 32;
-  static const size_t initialIdentifierTableCapacity = 64;
 
   int m_lineNumber;
 
@@ -111,8 +111,7 @@ class Lexer : public Noncopyable {
   int m_next2;
   int m_next3;
 
-  WTF::SegmentedVector<JSC::Identifier, initialIdentifierTableCapacity>
-      m_identifiers;
+  IdentifierArena* m_arena;
 
   JSGlobalData* m_globalData;
 
