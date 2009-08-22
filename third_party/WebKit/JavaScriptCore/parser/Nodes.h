@@ -1350,9 +1350,11 @@ class AssignErrorNode : public ExpressionNode, public ThrowableExpressionData {
 
 typedef Vector<ExpressionNode*, 8> ExpressionVector;
 
-class CommaNode : public ExpressionNode {
+class CommaNode : public ExpressionNode, public ParserArenaDeletable {
  public:
   CommaNode(JSGlobalData*, ExpressionNode* expr1, ExpressionNode* expr2);
+
+  using ParserArenaDeletable::operator new;
 
   void append(ExpressionNode* expr) { m_expressions.append(expr); }
 
