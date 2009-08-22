@@ -64,6 +64,14 @@ HTMLFormControlElement::~HTMLFormControlElement() {
     m_form->removeFormElement(this);
 }
 
+bool HTMLFormControlElement::formNoValidate() const {
+  return !getAttribute(formnovalidateAttr).isNull();
+}
+
+void HTMLFormControlElement::setFormNoValidate(bool formnovalidate) {
+  setAttribute(formnovalidateAttr, formnovalidate ? "" : 0);
+}
+
 ValidityState* HTMLFormControlElement::validity() {
   if (!m_validityState)
     m_validityState = ValidityState::create(this);

@@ -100,6 +100,9 @@ class HTMLFormElement : public HTMLElement {
   String name() const;
   void setName(const String&);
 
+  bool novalidate() const;
+  void setNovalidate(bool);
+
   String acceptCharset() const { return m_formDataBuilder.acceptCharset(); }
   void setAcceptCharset(const String&);
 
