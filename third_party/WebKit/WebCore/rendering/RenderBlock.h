@@ -594,11 +594,6 @@ class RenderBlock : public RenderBox {
     // we're at the bottom of the block.
     bool m_atBottomOfBlock : 1;
 
-    // If our last normal flow child was a self-collapsing block that cleared a
-    // float,
-    // we track it in this variable.
-    bool m_selfCollapsingBlockClearedFloat : 1;
-
     // These variables are used to detect quirky margins that we need to
     // collapse away (in table cells
     // and in the body element).
@@ -616,9 +611,6 @@ class RenderBlock : public RenderBox {
     void setAtTopOfBlock(bool b) { m_atTopOfBlock = b; }
     void setAtBottomOfBlock(bool b) { m_atBottomOfBlock = b; }
     void clearMargin() { m_posMargin = m_negMargin = 0; }
-    void setSelfCollapsingBlockClearedFloat(bool b) {
-      m_selfCollapsingBlockClearedFloat = b;
-    }
     void setTopQuirk(bool b) { m_topQuirk = b; }
     void setBottomQuirk(bool b) { m_bottomQuirk = b; }
     void setDeterminedTopQuirk(bool b) { m_determinedTopQuirk = b; }
@@ -650,9 +642,6 @@ class RenderBlock : public RenderBox {
     }
     bool canCollapseBottomWithChildren() const {
       return m_canCollapseBottomWithChildren;
-    }
-    bool selfCollapsingBlockClearedFloat() const {
-      return m_selfCollapsingBlockClearedFloat;
     }
     bool quirkContainer() const { return m_quirkContainer; }
     bool determinedTopQuirk() const { return m_determinedTopQuirk; }
