@@ -30,6 +30,8 @@
 #include "CrossOriginAccessControl.h"
 #include "ResourceResponse.h"
 #include <wtf/CurrentTime.h>
+#include <wtf/StdLibExtras.h>
+#include <wtf/Threading.h>
 
 namespace WebCore {
 
@@ -68,9 +70,7 @@ static void addToAccessControlAllowList(const String& string,
   while (end && isSpaceOrNewline((*stringImpl)[end]))
     --end;
 
-  // substringCopy() is called on the strings because the cache is accessed on
-  // multiple threads.
-  set.add(string.substringCopy(start, end - start + 1));
+  set.add(string.substring(start, end - start + 1));
 }
 
 template <class HashType>
@@ -149,8 +149,8 @@ bool CrossOriginPreflightResultCacheItem::allowsRequest(
 }
 
 CrossOriginPreflightResultCache& CrossOriginPreflightResultCache::shared() {
-  AtomicallyInitializedStatic(CrossOriginPreflightResultCache&,
-                              cache = *new CrossOriginPreflightResultCache);
+  DEFINE_STATIC_LOCAL(CrossOriginPreflightResultCache, cache, ());
+  ASSERT(isMainThread());
   return cache;
 }
 
@@ -158,11 +158,8 @@ void CrossOriginPreflightResultCache::appendEntry(
     const String& origin,
     const KURL& url,
     CrossOriginPreflightResultCacheItem* preflightResult) {
-  MutexLocker lock(m_mutex);
-  // Note that the entry may already be present in the HashMap if another thread
-  // is accessing the same location.
-  m_preflightHashMap.set(std::make_pair(origin.copy(), url.copy()),
-                         preflightResult);
+  ASSERT(isMainThread());
+  m_preflightHashMap.set(std::make_pair(origin, url), preflightResult);
 }
 
 bool CrossOriginPreflightResultCache::canSkipPreflight(
@@ -171,7 +168,7 @@ bool CrossOriginPreflightResultCache::canSkipPreflight(
     bool includeCredentials,
     const String& method,
     const HTTPHeaderMap& requestHeaders) {
-  MutexLocker lock(m_mutex);
+  ASSERT(isMainThread());
   CrossOriginPreflightResultHashMap::iterator cacheIt =
       m_preflightHashMap.find(std::make_pair(origin, url));
   if (cacheIt == m_preflightHashMap.end())
@@ -187,7 +184,7 @@ bool CrossOriginPreflightResultCache::canSkipPreflight(
 }
 
 void CrossOriginPreflightResultCache::empty() {
-  MutexLocker lock(m_mutex);
+  ASSERT(isMainThread());
   deleteAllValues(m_preflightHashMap);
   m_preflightHashMap.clear();
 }

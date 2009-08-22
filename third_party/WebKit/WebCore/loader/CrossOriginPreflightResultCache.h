@@ -80,7 +80,6 @@ class CrossOriginPreflightResultCache : public Noncopyable {
       CrossOriginPreflightResultHashMap;
 
   CrossOriginPreflightResultHashMap m_preflightHashMap;
-  Mutex m_mutex;
 };
 
 }  // namespace WebCore
