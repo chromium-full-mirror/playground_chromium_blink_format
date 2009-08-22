@@ -71,6 +71,7 @@ class ExecutableBase : public RefCounted<ExecutableBase> {
 #endif
 };
 
+#if ENABLE(JIT)
 class NativeExecutable : public ExecutableBase {
  public:
   NativeExecutable(ExecState* exec) : ExecutableBase(NUM_PARAMETERS_IS_HOST) {
@@ -80,6 +81,7 @@ class NativeExecutable : public ExecutableBase {
 
   ~NativeExecutable();
 };
+#endif
 
 class VPtrHackExecutable : public ExecutableBase {
  public:
