@@ -2215,6 +2215,8 @@ static const ARIARoleMap& createARIARoleMap() {
       {"heading", HeadingRole},
       {"img", ImageRole},
       {"link", WebCoreLinkRole},
+      {"list", ListRole},
+      {"listitem", GroupRole},
       {"listbox", ListBoxRole},
       {"log", ApplicationLogRole},
       // "option" isn't here because it may map to different roles depending on
