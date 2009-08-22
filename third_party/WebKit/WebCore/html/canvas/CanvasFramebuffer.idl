@@ -20,37 +20,10 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#include "config.h"
-
-#if ENABLE(3D_CANVAS)
-
-#include "GraphicsContext3D.h"
-#include "CanvasObject.h"
-
-using namespace std;
-
-namespace WebCore {
-
-void GraphicsContext3D::removeObject(CanvasObject* object) {
-  m_canvasObjects.remove(object);
+module html {
+    interface [Conditional=3D_CANVAS] CanvasFramebuffer {
+    };
 }
-
-void GraphicsContext3D::addObject(CanvasObject* object) {
-  removeObject(object);
-  m_canvasObjects.add(object);
-}
-
-void GraphicsContext3D::detachAndRemoveAllObjects() {
-  HashSet<CanvasObject*>::iterator pend = m_canvasObjects.end();
-  for (HashSet<CanvasObject*>::iterator it = m_canvasObjects.begin();
-       it != pend; ++it)
-    (*it)->detachContext();
-
-  m_canvasObjects.clear();
-}
-}
-
-#endif  // ENABLE(3D_CANVAS)

@@ -44,7 +44,6 @@ namespace WebCore {
 class CanvasBuffer;
 class CanvasFramebuffer;
 class CanvasNumberArray;
-class CanvasObject;
 class CanvasProgram;
 class CanvasRenderbuffer;
 class CanvasShader;
@@ -55,6 +54,8 @@ class WebKitCSSMatrix;
 
 class GraphicsContext3D : Noncopyable {
  public:
+  enum ShaderType { FRAGMENT_SHADER, VERTEX_SHADER };
+
   GraphicsContext3D();
   virtual ~GraphicsContext3D();
 
@@ -63,7 +64,6 @@ class GraphicsContext3D : Noncopyable {
   void checkError() const;
 
   virtual void makeContextCurrent();
-  virtual void removeObject(CanvasObject*);
 
   void glActiveTexture(unsigned long texture);
   void glAttachShader(CanvasProgram* program, CanvasShader* shader);
@@ -224,23 +224,6 @@ class GraphicsContext3D : Noncopyable {
                              CanvasNumberArray*);
   void glViewport(long x, long y, unsigned long width, unsigned long height);
 
-  // Non-GL functions
-  PassRefPtr<CanvasBuffer> createBuffer();
-  PassRefPtr<CanvasFramebuffer> createFramebuffer();
-  PassRefPtr<CanvasProgram> createProgram();  // replaces glCreateProgram
-  PassRefPtr<CanvasRenderbuffer> createRenderbuffer();
-  PassRefPtr<CanvasShader> createShader(
-      unsigned long type);  // replaces glCreateShader
-  PassRefPtr<CanvasTexture> createTexture();
-
-  void deleteBuffer(CanvasBuffer*);            // replaces glDeleteBuffers
-  void deleteFramebuffer(CanvasFramebuffer*);  // replaces glDeleteFramebuffers
-  void deleteProgram(CanvasProgram*);          // replaces glDeleteProgram
-  void deleteRenderbuffer(
-      CanvasRenderbuffer*);            // replaces glDeleteRenderbuffers
-  void deleteShader(CanvasShader*);    // replaces glDeleteShader
-  void deleteTexture(CanvasTexture*);  // replaces glDeleteTextures
-
   PassRefPtr<CanvasNumberArray> get(
       unsigned long pname);  // replaces glGetBooleanv
   PassRefPtr<CanvasNumberArray> getBufferParameter(
@@ -303,14 +286,25 @@ class GraphicsContext3D : Noncopyable {
 
   void reshape(int width, int height);
 
- private:
-  void addObject(CanvasObject*);
-  void detachAndRemoveAllObjects();
+  // Support for buffer creation and deletion
+  unsigned createBuffer();
+  unsigned createFramebuffer();
+  unsigned createProgram();
+  unsigned createRenderbuffer();
+  unsigned createShader(ShaderType);
+  unsigned createTexture();
 
+  void deleteBuffer(unsigned);
+  void deleteFramebuffer(unsigned);
+  void deleteProgram(unsigned);
+  void deleteRenderbuffer(unsigned);
+  void deleteShader(unsigned);
+  void deleteTexture(unsigned);
+
+ private:
   int m_currentWidth, m_currentHeight;
 
   Vector<Vector<float>> m_vertexArray;
-  HashSet<CanvasObject*> m_canvasObjects;
 
 #if PLATFORM(MAC)
   CGLContextObj m_contextObj;

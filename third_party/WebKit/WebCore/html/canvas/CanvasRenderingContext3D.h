@@ -293,6 +293,10 @@ class CanvasRenderingContext3D : public CanvasRenderingContext {
   void reshape(int width, int height);
 
  private:
+  void addObject(CanvasObject*);
+  void removeObject(CanvasObject*);
+  void detachAndRemoveAllObjects();
+
   void markContextChanged();
   void cleanupAfterGraphicsCall(bool changed) {
     m_context.checkError();
@@ -302,6 +306,7 @@ class CanvasRenderingContext3D : public CanvasRenderingContext {
 
   GraphicsContext3D m_context;
   bool m_needsUpdate;
+  HashSet<CanvasObject*> m_canvasObjects;
 };
 
 }  // namespace WebCore
