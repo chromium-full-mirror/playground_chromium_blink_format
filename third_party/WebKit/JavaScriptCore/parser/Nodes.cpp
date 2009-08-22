@@ -2187,11 +2187,11 @@ RegisterID* TryNode::emitBytecode(BytecodeGenerator& generator,
 
 // -----------------------------ScopeNodeData ---------------------------
 
-inline ScopeNodeData::ScopeNodeData(ParserArena& arena,
-                                    SourceElements* statements,
-                                    VarStack* varStack,
-                                    FunctionStack* funcStack,
-                                    int numConstants)
+ScopeNodeData::ScopeNodeData(ParserArena& arena,
+                             SourceElements* statements,
+                             VarStack* varStack,
+                             FunctionStack* funcStack,
+                             int numConstants)
     : m_numConstants(numConstants), m_statements(statements) {
   m_arena.swap(arena);
   if (varStack)
