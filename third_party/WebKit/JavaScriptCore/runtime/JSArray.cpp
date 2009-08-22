@@ -27,6 +27,7 @@
 #include "ArrayPrototype.h"
 #include "CachedCall.h"
 #include "Error.h"
+#include "Executable.h"
 #include "PropertyNameArray.h"
 #include <wtf/AVLTree.h>
 #include <wtf/Assertions.h>
