@@ -409,7 +409,7 @@ QWebSettings::QWebSettings() : d(new QWebSettingsPrivate) {
   d->attributes.insert(QWebSettings::OfflineStorageDatabaseEnabled, true);
   d->attributes.insert(QWebSettings::OfflineWebApplicationCacheEnabled, true);
   d->attributes.insert(QWebSettings::LocalStorageEnabled, false);
-  d->attributes.insert(QWebSettings::LocalContentCanAccessRemoteUrls, true);
+  d->attributes.insert(QWebSettings::LocalContentCanAccessRemoteUrls, false);
   d->offlineStorageDefaultQuota = 5 * 1024 * 1024;
 }
 
