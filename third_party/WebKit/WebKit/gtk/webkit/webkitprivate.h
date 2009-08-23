@@ -77,6 +77,8 @@ WebKitWebNavigationReason kit(WebCore::NavigationType type);
 WebCore::NavigationType core(WebKitWebNavigationReason reason);
 
 WebCore::ResourceRequest core(WebKitNetworkRequest* request);
+
+WebCore::EditingBehavior core(WebKitEditingBehavior type);
 }
 
 typedef struct {

@@ -42,6 +42,11 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS((obj), WEBKIT_TYPE_WEB_SETTINGS, \
                              WebKitWebSettingsClass))
 
+typedef enum {
+  WEBKIT_EDITING_BEHAVIOR_MAC,
+  WEBKIT_EDITING_BEHAVIOR_WINDOWS
+} WebKitEditingBehavior;
+
 typedef struct _WebKitWebSettingsPrivate WebKitWebSettingsPrivate;
 
 struct _WebKitWebSettings {
