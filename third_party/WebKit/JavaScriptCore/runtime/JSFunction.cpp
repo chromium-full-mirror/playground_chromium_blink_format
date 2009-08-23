@@ -51,13 +51,7 @@ bool JSFunction::isHostFunctionNonInline() const {
 }
 
 JSFunction::JSFunction(PassRefPtr<Structure> structure)
-    : Base(structure)
-#if ENABLE(JIT)
-      ,
-      m_executable(adoptRef(new VPtrHackExecutable()))
-#endif
-{
-}
+    : Base(structure), m_executable(adoptRef(new VPtrHackExecutable())) {}
 
 JSFunction::JSFunction(ExecState* exec,
                        PassRefPtr<Structure> structure,
