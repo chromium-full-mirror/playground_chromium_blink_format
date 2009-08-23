@@ -236,7 +236,7 @@ void WebPreferences::initializeDefaultSettings() {
                        kCFBooleanTrue);
   CFDictionaryAddValue(
       defaults, CFSTR(WebKitAllowUniversalAccessFromFileURLsPreferenceKey),
-      kCFBooleanFalse);
+      kCFBooleanTrue);
   CFDictionaryAddValue(defaults, CFSTR(WebKitXSSAuditorEnabledPreferenceKey),
                        kCFBooleanTrue);
   CFDictionaryAddValue(
