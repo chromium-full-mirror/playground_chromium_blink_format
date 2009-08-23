@@ -142,8 +142,10 @@ void StyledElement::updateStyleAttribute() const {
   m_synchronizingStyleAttribute = false;
 }
 
-StyledElement::StyledElement(const QualifiedName& name, Document* doc)
-    : Element(name, doc) {}
+StyledElement::StyledElement(const QualifiedName& name,
+                             Document* document,
+                             ConstructionType type)
+    : Element(name, document, type) {}
 
 StyledElement::~StyledElement() {
   destroyInlineStyleDecl();

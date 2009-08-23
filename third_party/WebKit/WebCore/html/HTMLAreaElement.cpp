@@ -34,8 +34,8 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLAreaElement::HTMLAreaElement(const QualifiedName& tagName,
-                                 Document* document)
+inline HTMLAreaElement::HTMLAreaElement(const QualifiedName& tagName,
+                                        Document* document)
     : HTMLAnchorElement(tagName, document),
       m_coordsLen(0),
       m_lastSize(-1, -1),
@@ -43,7 +43,11 @@ HTMLAreaElement::HTMLAreaElement(const QualifiedName& tagName,
   ASSERT(hasTagName(areaTag));
 }
 
-HTMLAreaElement::~HTMLAreaElement() {}
+PassRefPtr<HTMLAreaElement> HTMLAreaElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return adoptRef(new HTMLAreaElement(tagName, document));
+}
 
 void HTMLAreaElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == shapeAttr) {

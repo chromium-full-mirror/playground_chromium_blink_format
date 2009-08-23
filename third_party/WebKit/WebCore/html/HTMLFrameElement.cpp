@@ -34,13 +34,19 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLFrameElement::HTMLFrameElement(const QualifiedName& tagName,
-                                   Document* document)
+inline HTMLFrameElement::HTMLFrameElement(const QualifiedName& tagName,
+                                          Document* document)
     : HTMLFrameElementBase(tagName, document),
       m_frameBorder(true),
       m_frameBorderSet(false),
       m_noResize(false) {
   ASSERT(hasTagName(frameTag));
+}
+
+PassRefPtr<HTMLFrameElement> HTMLFrameElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return adoptRef(new HTMLFrameElement(tagName, document));
 }
 
 bool HTMLFrameElement::rendererIsNeeded(RenderStyle*) {
@@ -54,9 +60,10 @@ RenderObject* HTMLFrameElement::createRenderer(RenderArena* arena,
 }
 
 static inline HTMLFrameSetElement* containingFrameSetElement(Node* node) {
-  while ((node = node->parentNode()))
+  while ((node = node->parentNode())) {
     if (node->hasTagName(framesetTag))
       return static_cast<HTMLFrameSetElement*>(node);
+  }
   return 0;
 }
 

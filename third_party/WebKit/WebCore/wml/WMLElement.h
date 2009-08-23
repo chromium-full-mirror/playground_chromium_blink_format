@@ -30,7 +30,7 @@ namespace WebCore {
 
 class WMLElement : public StyledElement {
  public:
-  WMLElement(const QualifiedName& tagName, Document*);
+  static PassRefPtr<WMLElement> create(const QualifiedName& tagName, Document*);
 
   virtual bool isWMLElement() const { return true; }
   virtual bool isWMLTaskElement() const { return false; }
@@ -45,6 +45,8 @@ class WMLElement : public StyledElement {
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
  protected:
+  WMLElement(const QualifiedName& tagName, Document*);
+
   // Helper function for derived classes
   String parseValueSubstitutingVariableReferences(
       const AtomicString&,

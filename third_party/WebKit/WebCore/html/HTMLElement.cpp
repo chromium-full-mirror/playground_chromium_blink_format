@@ -57,10 +57,10 @@ using namespace HTMLNames;
 using std::min;
 using std::max;
 
-HTMLElement::HTMLElement(const QualifiedName& tagName, Document* doc)
-    : StyledElement(tagName, doc) {}
-
-HTMLElement::~HTMLElement() {}
+PassRefPtr<HTMLElement> HTMLElement::create(const QualifiedName& tagName,
+                                            Document* document) {
+  return adoptRef(new HTMLElement(tagName, document, CreateElement));
+}
 
 String HTMLElement::nodeName() const {
   // FIXME: Would be nice to have an atomicstring lookup based off uppercase
