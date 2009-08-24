@@ -576,7 +576,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
                         WEBKIT_EDITING_BEHAVIOR_MAC, flags));
 
   /**
-   * WebKitWebSettings:enable-universal-access-from-file-uri
+   * WebKitWebSettings:enable-universal-access-from-file-uris
    *
    * Whether to allow files loaded through file:// URIs universal access to
    * all pages.
@@ -587,7 +587,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
       gobject_class, PROP_ENABLE_UNIVERSAL_ACCESS_FROM_FILE_URIS,
       g_param_spec_boolean(
           "enable-universal-access-from-file-uris",
-          _("Enable universal access from file URI"),
+          _("Enable universal access from file URIs"),
           _("Whether to allow universal access from file URIs"), FALSE, flags));
 
   g_type_class_add_private(klass, sizeof(WebKitWebSettingsPrivate));
