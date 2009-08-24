@@ -2419,8 +2419,13 @@ void CSSParser::parseFillPosition(RefPtr<CSSValue>& value1,
     value1.swap(value2);
 }
 
-PassRefPtr<CSSValue> CSSParser::parseFillSize() {
+PassRefPtr<CSSValue> CSSParser::parseFillSize(bool& allowComma) {
+  allowComma = true;
   CSSParserValue* value = m_valueList->current();
+
+  if (value->id == CSSValueContain || value->id == CSSValueCover)
+    return CSSPrimitiveValue::createIdentifier(value->id);
+
   RefPtr<CSSPrimitiveValue> parsedValue1;
 
   if (value->id == CSSValueAuto)
@@ -2437,6 +2442,8 @@ PassRefPtr<CSSValue> CSSParser::parseFillSize() {
     if (value->id == CSSValueAuto)
       parsedValue2 =
           CSSPrimitiveValue::create(0, CSSPrimitiveValue::CSS_UNKNOWN);
+    else if (value->unit == CSSParserValue::Operator && value->iValue == ',')
+      allowComma = false;
     else {
       if (!validUnit(value, FLength | FPercent, m_strict))
         return 0;
@@ -2483,6 +2490,7 @@ bool CSSParser::parseFillProperty(int propId,
       m_valueList->next();
       allowComma = false;
     } else {
+      allowComma = true;
       switch (propId) {
         case CSSPropertyBackgroundColor:
           currValue = parseBackgroundColor();
@@ -2572,14 +2580,9 @@ bool CSSParser::parseFillProperty(int propId,
           break;
         case CSSPropertyBackgroundSize:
         case CSSPropertyWebkitMaskSize: {
-          if (val->id == CSSValueContain || val->id == CSSValueCover) {
-            currValue = CSSPrimitiveValue::createIdentifier(val->id);
+          currValue = parseFillSize(allowComma);
+          if (currValue)
             m_valueList->next();
-          } else {
-            currValue = parseFillSize();
-            if (currValue)
-              m_valueList->next();
-          }
           break;
         }
       }
@@ -2606,7 +2609,6 @@ bool CSSParser::parseFillProperty(int propId,
         else
           value2 = currValue2.release();
       }
-      allowComma = true;
     }
 
     // When parsing any fill shorthand property, we let it handle building up

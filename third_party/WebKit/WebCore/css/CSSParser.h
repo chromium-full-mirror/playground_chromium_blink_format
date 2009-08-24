@@ -88,7 +88,7 @@ class CSSParser {
   bool parseFillImage(RefPtr<CSSValue>&);
   PassRefPtr<CSSValue> parseFillPositionXY(bool& xFound, bool& yFound);
   void parseFillPosition(RefPtr<CSSValue>&, RefPtr<CSSValue>&);
-  PassRefPtr<CSSValue> parseFillSize();
+  PassRefPtr<CSSValue> parseFillSize(bool& allowComma);
 
   bool parseFillProperty(int propId,
                          int& propId1,
