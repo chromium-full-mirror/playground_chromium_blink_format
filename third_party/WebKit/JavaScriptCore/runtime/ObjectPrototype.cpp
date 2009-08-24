@@ -72,7 +72,7 @@ static JSValue JSC_HOST_CALL objectProtoFuncToLocaleString(ExecState*,
 ObjectPrototype::ObjectPrototype(ExecState* exec,
                                  PassRefPtr<Structure> stucture,
                                  Structure* prototypeFunctionStructure)
-    : JSObject(stucture) {
+    : JSObject(stucture), m_hasNoPropertiesWithUInt32Names(true) {
   putDirectFunctionWithoutTransition(
       exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
                                              0, exec->propertyNames().toString,
@@ -133,6 +133,28 @@ ObjectPrototype::ObjectPrototype(ExecState* exec,
                                        exec->propertyNames().__lookupSetter__,
                                        objectProtoFuncLookupSetter),
       DontEnum);
+}
+
+void ObjectPrototype::put(ExecState* exec,
+                          const Identifier& propertyName,
+                          JSValue value,
+                          PutPropertySlot& slot) {
+  JSObject::put(exec, propertyName, value, slot);
+
+  if (m_hasNoPropertiesWithUInt32Names) {
+    bool isUInt32;
+    propertyName.toStrictUInt32(&isUInt32);
+    if (isUInt32)
+      m_hasNoPropertiesWithUInt32Names = false;
+  }
+}
+
+bool ObjectPrototype::getOwnPropertySlot(ExecState* exec,
+                                         unsigned propertyName,
+                                         PropertySlot& slot) {
+  if (m_hasNoPropertiesWithUInt32Names)
+    return false;
+  return JSObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 // ------------------------------ Functions --------------------------------
