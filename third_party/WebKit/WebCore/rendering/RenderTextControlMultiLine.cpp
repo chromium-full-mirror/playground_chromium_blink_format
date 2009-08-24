@@ -25,13 +25,17 @@
 
 #include "EventNames.h"
 #include "Frame.h"
-#include "HitTestResult.h"
+#include "HTMLNames.h"
 #include "HTMLTextAreaElement.h"
+#include "HitTestResult.h"
 
 namespace WebCore {
 
 RenderTextControlMultiLine::RenderTextControlMultiLine(Node* node)
-    : RenderTextControl(node) {}
+    : RenderTextControl(node) {
+  m_placeholderVisible =
+      static_cast<HTMLTextAreaElement*>(node)->placeholderShouldBeVisible();
+}
 
 RenderTextControlMultiLine::~RenderTextControlMultiLine() {
   if (node())
@@ -63,7 +67,11 @@ bool RenderTextControlMultiLine::nodeAtPoint(const HitTestRequest& request,
                                       hitTestAction))
     return false;
 
-  if (result.innerNode() == node() || result.innerNode() == innerTextElement())
+  bool resultIsTextValueOrPlaceholder =
+      !m_placeholderVisible && result.innerNode() == innerTextElement() ||
+      m_placeholderVisible &&
+          result.innerNode()->isDescendantOf(innerTextElement());
+  if (result.innerNode() == node() || resultIsTextValueOrPlaceholder)
     hitInnerTextElement(result, x, y, tx, ty);
 
   return true;
@@ -92,7 +100,11 @@ void RenderTextControlMultiLine::updateFromElement() {
   createSubtreeIfNeeded(0);
   RenderTextControl::updateFromElement();
 
-  setInnerTextValue(static_cast<HTMLTextAreaElement*>(node())->value());
+  HTMLTextAreaElement* textArea = static_cast<HTMLTextAreaElement*>(node());
+  if (m_placeholderVisible)
+    setInnerTextValue(textArea->getAttribute(HTMLNames::placeholderAttr));
+  else
+    setInnerTextValue(textArea->value());
 }
 
 void RenderTextControlMultiLine::cacheSelection(int start, int end) {
@@ -101,12 +113,23 @@ void RenderTextControlMultiLine::cacheSelection(int start, int end) {
 
 PassRefPtr<RenderStyle> RenderTextControlMultiLine::createInnerTextStyle(
     const RenderStyle* startStyle) const {
-  RefPtr<RenderStyle> textBlockStyle = RenderStyle::create();
-  textBlockStyle->inheritFrom(startStyle);
+  RefPtr<RenderStyle> textBlockStyle;
+  if (m_placeholderVisible) {
+    if (RenderStyle* pseudoStyle = getCachedPseudoStyle(INPUT_PLACEHOLDER))
+      textBlockStyle = RenderStyle::clone(pseudoStyle);
+  }
+  if (!textBlockStyle) {
+    textBlockStyle = RenderStyle::create();
+    textBlockStyle->inheritFrom(startStyle);
+  }
 
   adjustInnerTextStyle(startStyle, textBlockStyle.get());
   textBlockStyle->setDisplay(BLOCK);
 
   return textBlockStyle.release();
+}
+
+RenderStyle* RenderTextControlMultiLine::textBaseStyle() const {
+  return style();
 }
 }

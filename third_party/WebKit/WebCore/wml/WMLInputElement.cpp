@@ -63,7 +63,7 @@ bool WMLInputElement::isMouseFocusable() const {
 }
 
 void WMLInputElement::dispatchFocusEvent() {
-  InputElement::dispatchFocusEvent(m_data, this, this);
+  InputElement::dispatchFocusEvent(this, this);
   WMLElement::dispatchFocusEvent();
 }
 
@@ -80,7 +80,7 @@ void WMLInputElement::dispatchBlurEvent() {
   if (!nameVariable.isEmpty())
     wmlPageStateForDocument(document())->storeVariable(nameVariable, val);
 
-  InputElement::dispatchBlurEvent(m_data, this, this);
+  InputElement::dispatchBlurEvent(this, this);
   WMLElement::dispatchBlurEvent();
 }
 
@@ -121,7 +121,7 @@ String WMLInputElement::value() const {
 }
 
 void WMLInputElement::setValue(const String& value) {
-  InputElement::updatePlaceholderVisibility(m_data, this, this);
+  InputElement::updatePlaceholderVisibility(this, this);
   setFormControlValueMatchesRenderer(false);
   m_data.setValue(constrainValue(value));
   if (inDocument())
@@ -306,7 +306,7 @@ void WMLInputElement::documentDidBecomeActive() {
 }
 
 bool WMLInputElement::placeholderShouldBeVisible() const {
-  return m_data.placeholderShouldBeVisible();
+  return InputElement::placeholderShouldBeVisible(this, this);
 }
 
 void WMLInputElement::willMoveToNewOwnerDocument() {

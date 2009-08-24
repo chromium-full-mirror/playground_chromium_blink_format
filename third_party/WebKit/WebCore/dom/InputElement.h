@@ -65,10 +65,10 @@ class InputElement {
   static const int s_defaultSize;
 
  protected:
-  static void dispatchFocusEvent(InputElementData&, InputElement*, Element*);
-  static void dispatchBlurEvent(InputElementData&, InputElement*, Element*);
-  static void updatePlaceholderVisibility(InputElementData&,
-                                          InputElement*,
+  static void dispatchFocusEvent(InputElement*, Element*);
+  static void dispatchBlurEvent(InputElement*, Element*);
+  static bool placeholderShouldBeVisible(const InputElement*, const Element*);
+  static void updatePlaceholderVisibility(InputElement*,
                                           Element*,
                                           bool placeholderValueChanged = false);
   static void updateFocusAppearance(InputElementData&,
@@ -103,13 +103,6 @@ class InputElementData {
  public:
   InputElementData();
 
-  bool placeholderShouldBeVisible() const {
-    return m_placeholderShouldBeVisible;
-  }
-  void setPlaceholderShouldBeVisible(bool visible) {
-    m_placeholderShouldBeVisible = visible;
-  }
-
   const AtomicString& name() const;
   void setName(const AtomicString& value) { m_name = value; }
 
@@ -129,7 +122,6 @@ class InputElementData {
   void setCachedSelectionEnd(int value) { m_cachedSelectionEnd = value; }
 
  private:
-  bool m_placeholderShouldBeVisible;
   AtomicString m_name;
   String m_value;
   int m_size;

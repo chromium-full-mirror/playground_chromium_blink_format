@@ -43,7 +43,6 @@ class RenderTextControlSingleLine : public RenderTextControl,
 
   bool placeholderIsVisible() const { return m_placeholderVisible; }
   bool placeholderShouldBeVisible() const;
-  void updatePlaceholderVisibility();
 
   void addSearchResult();
   void stopSearchEventTimer();
@@ -94,6 +93,7 @@ class RenderTextControlSingleLine : public RenderTextControl,
   virtual void cacheSelection(int start, int end);
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
+  virtual RenderStyle* textBaseStyle() const;
   virtual PassRefPtr<RenderStyle> createInnerTextStyle(
       const RenderStyle* startStyle) const;
   PassRefPtr<RenderStyle> createInnerBlockStyle(
@@ -137,7 +137,6 @@ class RenderTextControlSingleLine : public RenderTextControl,
 
   InputElement* inputElement() const;
 
-  bool m_placeholderVisible;
   bool m_searchPopupIsVisible;
   bool m_shouldDrawCapsLockIndicator;
 
