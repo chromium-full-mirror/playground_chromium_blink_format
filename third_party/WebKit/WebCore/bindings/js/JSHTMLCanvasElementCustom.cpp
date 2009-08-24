@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Apple Inc. All right reserved.
+ * Copyright (C) 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,10 +27,32 @@
 #include "JSHTMLCanvasElement.h"
 
 #include "HTMLCanvasElement.h"
+#include "JSCanvasRenderingContext2D.h"
+#if ENABLE(3D_CANVAS)
+#include "JSCanvasRenderingContext3D.h"
+#include <wtf/GetPtr.h>
+#endif
 
 using namespace JSC;
 
 namespace WebCore {
+
+#if ENABLE(3D_CANVAS)
+JSValue JSHTMLCanvasElement::getContext(JSC::ExecState* exec,
+                                        JSC::ArgList const& args) {
+  HTMLCanvasElement* imp = static_cast<HTMLCanvasElement*>(impl());
+  const UString& contextId = args.at(0).toString(exec);
+
+  if (contextId == "2d")
+    return toJS(exec, WTF::getPtr(reinterpret_cast<CanvasRenderingContext2D*>(
+                          imp->getContext(contextId))));
+  if (contextId == "webkit-3d")
+    return toJS(exec, WTF::getPtr(reinterpret_cast<CanvasRenderingContext3D*>(
+                          imp->getContext(contextId))));
+
+  return jsUndefined();
+}
+#endif
 
 void JSHTMLCanvasElement::markChildren(MarkStack& markStack) {
   Base::markChildren(markStack);
@@ -40,4 +62,5 @@ void JSHTMLCanvasElement::markChildren(MarkStack& markStack) {
 
   markDOMObjectWrapper(markStack, globalData, canvas->renderingContext2D());
 }
-}
+
+}  // namespace WebCore
