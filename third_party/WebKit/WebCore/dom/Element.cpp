@@ -789,7 +789,9 @@ bool Element::pseudoStyleCacheIsInvalid(const RenderStyle* currentStyle,
 }
 
 void Element::recalcStyle(StyleChange change) {
-  RenderStyle* currentStyle = renderStyle();
+  // Ref currentStyle in case it would otherwise be deleted when
+  // setRenderStyle() is called.
+  RefPtr<RenderStyle> currentStyle(renderStyle());
   bool hasParentStyle = parentNode() ? parentNode()->renderStyle() : false;
   bool hasPositionalRules = needsStyleRecalc() && currentStyle &&
                             currentStyle->childrenAffectedByPositionalRules();
@@ -808,7 +810,7 @@ void Element::recalcStyle(StyleChange change) {
   if (hasParentStyle && (change >= Inherit || needsStyleRecalc())) {
     RefPtr<RenderStyle> newStyle =
         document()->styleSelector()->styleForElement(this);
-    StyleChange ch = diff(currentStyle, newStyle.get());
+    StyleChange ch = diff(currentStyle.get(), newStyle.get());
     if (ch == Detach || !currentStyle) {
       if (attached())
         detach();
@@ -843,7 +845,7 @@ void Element::recalcStyle(StyleChange change) {
     }
 
     if (ch != NoChange ||
-        pseudoStyleCacheIsInvalid(currentStyle, newStyle.get())) {
+        pseudoStyleCacheIsInvalid(currentStyle.get(), newStyle.get())) {
       setRenderStyle(newStyle);
     } else if (needsStyleRecalc() &&
                (styleChangeType() != AnimationStyleChange) &&
