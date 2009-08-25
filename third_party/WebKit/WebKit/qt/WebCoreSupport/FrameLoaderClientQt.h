@@ -273,7 +273,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   WebCore::PluginView* m_pluginView;
   bool m_hasSentResponseToPlugin;
 
-  bool m_loadSucceeded;
+  ResourceError m_loadError;
 };
 }
 

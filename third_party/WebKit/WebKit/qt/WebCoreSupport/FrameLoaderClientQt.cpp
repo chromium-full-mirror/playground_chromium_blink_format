@@ -141,7 +141,7 @@ FrameLoaderClientQt::FrameLoaderClientQt()
       m_pluginView(0),
       m_hasSentResponseToPlugin(false),
       m_firstData(false),
-      m_loadSucceeded(false) {}
+      m_loadError(ResourceError()) {}
 
 FrameLoaderClientQt::~FrameLoaderClientQt() {}
 
@@ -341,7 +341,7 @@ void FrameLoaderClientQt::dispatchDidFinishLoad() {
     printf("%s - didFinishLoadForFrame\n",
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
 
-  m_loadSucceeded = true;
+  m_loadError = ResourceError();  // clears the previous error
 
   if (!m_webFrame)
     return;
@@ -412,7 +412,7 @@ void FrameLoaderClientQt::postProgressFinishedNotification() {
   }
 
   if (m_webFrame && m_frame->page())
-    emit loadFinished(m_loadSucceeded);
+    emit loadFinished(m_loadError.isNull());
 }
 
 void FrameLoaderClientQt::setMainFrameDocumentReady(bool b) {
@@ -811,20 +811,21 @@ void FrameLoaderClientQt::dispatchDidLoadResourceByXMLHttpRequest(
 }
 
 void FrameLoaderClientQt::dispatchDidFailProvisionalLoad(
-    const WebCore::ResourceError&) {
+    const WebCore::ResourceError& error) {
   if (dumpFrameLoaderCallbacks)
     printf("%s - didFailProvisionalLoadWithError\n",
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
 
-  m_loadSucceeded = false;
+  m_loadError = error;
 }
 
-void FrameLoaderClientQt::dispatchDidFailLoad(const WebCore::ResourceError&) {
+void FrameLoaderClientQt::dispatchDidFailLoad(
+    const WebCore::ResourceError& error) {
   if (dumpFrameLoaderCallbacks)
     printf("%s - didFailLoadWithError\n",
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
 
-  m_loadSucceeded = false;
+  m_loadError = error;
 }
 
 WebCore::Frame* FrameLoaderClientQt::dispatchCreatePage() {
