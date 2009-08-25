@@ -586,7 +586,6 @@ IntSize RenderBoxModelObject::calculateFillTileSize(
                      max<int>(1, imageIntrinsicSize.height() * scaleFactor));
     }
     case SizeNone:
-      ASSERT_NOT_REACHED();
       break;
   }
   return image->imageSize(this, style()->effectiveZoom());

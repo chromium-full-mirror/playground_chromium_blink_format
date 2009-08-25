@@ -35,10 +35,7 @@
 namespace WebCore {
 
 struct FillSize {
-  FillSize() {
-    type = SizeLength;
-    size = LengthSize();
-  }
+  FillSize() : type(SizeLength) {}
 
   FillSize(EFillSizeType t, LengthSize l) : type(t), size(l) {}
 
