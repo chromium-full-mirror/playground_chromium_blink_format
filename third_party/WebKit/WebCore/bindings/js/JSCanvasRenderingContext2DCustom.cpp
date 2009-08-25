@@ -64,25 +64,34 @@ static PassRefPtr<CanvasStyle> toHTMLCanvasStyle(ExecState*, JSValue value) {
 }
 
 JSValue JSCanvasRenderingContext2D::strokeStyle(ExecState* exec) const {
-  return toJS(exec, impl()->strokeStyle());
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
+  return toJS(exec, context->strokeStyle());
 }
 
 void JSCanvasRenderingContext2D::setStrokeStyle(ExecState* exec,
                                                 JSValue value) {
-  impl()->setStrokeStyle(toHTMLCanvasStyle(exec, value));
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
+  context->setStrokeStyle(toHTMLCanvasStyle(exec, value));
 }
 
 JSValue JSCanvasRenderingContext2D::fillStyle(ExecState* exec) const {
-  return toJS(exec, impl()->fillStyle());
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
+  return toJS(exec, context->fillStyle());
 }
 
 void JSCanvasRenderingContext2D::setFillStyle(ExecState* exec, JSValue value) {
-  impl()->setFillStyle(toHTMLCanvasStyle(exec, value));
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
+  context->setFillStyle(toHTMLCanvasStyle(exec, value));
 }
 
 JSValue JSCanvasRenderingContext2D::setFillColor(ExecState* exec,
                                                  const ArgList& args) {
-  CanvasRenderingContext2D* context = impl();
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
 
   // string arg = named color
   // number arg = gray color
@@ -122,7 +131,8 @@ JSValue JSCanvasRenderingContext2D::setFillColor(ExecState* exec,
 
 JSValue JSCanvasRenderingContext2D::setStrokeColor(ExecState* exec,
                                                    const ArgList& args) {
-  CanvasRenderingContext2D* context = impl();
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
 
   // string arg = named color
   // number arg = gray color
@@ -165,7 +175,8 @@ JSValue JSCanvasRenderingContext2D::setStrokeColor(ExecState* exec,
 
 JSValue JSCanvasRenderingContext2D::strokeRect(ExecState* exec,
                                                const ArgList& args) {
-  CanvasRenderingContext2D* context = impl();
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
 
   if (args.size() <= 4)
     context->strokeRect(args.at(0).toFloat(exec), args.at(1).toFloat(exec),
@@ -180,7 +191,8 @@ JSValue JSCanvasRenderingContext2D::strokeRect(ExecState* exec,
 
 JSValue JSCanvasRenderingContext2D::drawImage(ExecState* exec,
                                               const ArgList& args) {
-  CanvasRenderingContext2D* context = impl();
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
 
   // DrawImage has three variants:
   //     drawImage(img, dx, dy)
@@ -286,7 +298,8 @@ JSValue JSCanvasRenderingContext2D::drawImage(ExecState* exec,
 
 JSValue JSCanvasRenderingContext2D::drawImageFromRect(ExecState* exec,
                                                       const ArgList& args) {
-  CanvasRenderingContext2D* context = impl();
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
 
   JSValue value = args.at(0);
   if (!value.isObject())
@@ -307,7 +320,8 @@ JSValue JSCanvasRenderingContext2D::drawImageFromRect(ExecState* exec,
 
 JSValue JSCanvasRenderingContext2D::setShadow(ExecState* exec,
                                               const ArgList& args) {
-  CanvasRenderingContext2D* context = impl();
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
 
   switch (args.size()) {
     case 3:
@@ -355,7 +369,8 @@ JSValue JSCanvasRenderingContext2D::setShadow(ExecState* exec,
 
 JSValue JSCanvasRenderingContext2D::createPattern(ExecState* exec,
                                                   const ArgList& args) {
-  CanvasRenderingContext2D* context = impl();
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
 
   JSValue value = args.at(0);
   if (!value.isObject())
@@ -395,7 +410,8 @@ JSValue JSCanvasRenderingContext2D::putImageData(ExecState* exec,
   // putImageData has two variants
   // putImageData(ImageData, x, y)
   // putImageData(ImageData, x, y, dirtyX, dirtyY, dirtyWidth, dirtyHeight)
-  CanvasRenderingContext2D* context = impl();
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
 
   ExceptionCode ec = 0;
   if (args.size() >= 7)
@@ -413,7 +429,8 @@ JSValue JSCanvasRenderingContext2D::putImageData(ExecState* exec,
 
 JSValue JSCanvasRenderingContext2D::fillText(ExecState* exec,
                                              const ArgList& args) {
-  CanvasRenderingContext2D* context = impl();
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
 
   // string arg = text to draw
   // number arg = x
@@ -433,7 +450,8 @@ JSValue JSCanvasRenderingContext2D::fillText(ExecState* exec,
 
 JSValue JSCanvasRenderingContext2D::strokeText(ExecState* exec,
                                                const ArgList& args) {
-  CanvasRenderingContext2D* context = impl();
+  CanvasRenderingContext2D* context =
+      static_cast<CanvasRenderingContext2D*>(impl());
 
   // string arg = text to draw
   // number arg = x

@@ -35,10 +35,7 @@ namespace WebCore {
 CanvasObject::CanvasObject(GraphicsContext3D* context)
     : m_object(0), m_context(context) {}
 
-CanvasObject::~CanvasObject() {
-  if (m_context)
-    m_context->removeObject(this);
-}
+CanvasObject::~CanvasObject() {}
 
 void CanvasObject::setObject(Platform3DObject object) {
   if (object == m_object)
