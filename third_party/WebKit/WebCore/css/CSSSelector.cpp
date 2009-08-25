@@ -115,6 +115,8 @@ void CSSSelector::extractPseudoType() const {
                       ("-webkit-media-controls-play-button"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsTimeline,
                       ("-webkit-media-controls-timeline"));
+  DEFINE_STATIC_LOCAL(AtomicString, mediaControlsVolumeSlider,
+                      ("-webkit-media-controls-volume-slider"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsSeekBackButton,
                       ("-webkit-media-controls-seek-back-button"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsSeekForwardButton,
@@ -129,6 +131,8 @@ void CSSSelector::extractPseudoType() const {
                       ("-webkit-media-controls-fullscreen-button"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsTimelineContainer,
                       ("-webkit-media-controls-timeline-container"));
+  DEFINE_STATIC_LOCAL(AtomicString, mediaControlsVolumeSliderContainer,
+                      ("-webkit-media-controls-volume-slider-container"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsCurrentTimeDisplay,
                       ("-webkit-media-controls-current-time-display"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsTimeRemainingDisplay,
@@ -269,6 +273,9 @@ void CSSSelector::extractPseudoType() const {
   } else if (m_value == mediaControlsTimeline) {
     m_pseudoType = PseudoMediaControlsTimeline;
     element = true;
+  } else if (m_value == mediaControlsVolumeSlider) {
+    m_pseudoType = PseudoMediaControlsVolumeSlider;
+    element = true;
   } else if (m_value == mediaControlsSeekBackButton) {
     m_pseudoType = PseudoMediaControlsSeekBackButton;
     element = true;
@@ -289,6 +296,9 @@ void CSSSelector::extractPseudoType() const {
     element = true;
   } else if (m_value == mediaControlsTimelineContainer) {
     m_pseudoType = PseudoMediaControlsTimelineContainer;
+    element = true;
+  } else if (m_value == mediaControlsVolumeSliderContainer) {
+    m_pseudoType = PseudoMediaControlsVolumeSliderContainer;
     element = true;
   } else if (m_value == notStr)
     m_pseudoType = PseudoNot;

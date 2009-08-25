@@ -395,6 +395,21 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                      const IntRect&) {
     return true;
   }
+  virtual bool paintMediaVolumeSliderContainer(RenderObject*,
+                                               const RenderObject::PaintInfo&,
+                                               const IntRect&) {
+    return true;
+  }
+  virtual bool paintMediaVolumeSliderTrack(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&) {
+    return true;
+  }
+  virtual bool paintMediaVolumeSliderThumb(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&) {
+    return true;
+  }
   virtual bool paintMediaRewindButton(RenderObject*,
                                       const RenderObject::PaintInfo&,
                                       const IntRect&) {

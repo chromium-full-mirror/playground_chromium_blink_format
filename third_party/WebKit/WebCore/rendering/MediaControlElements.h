@@ -60,7 +60,10 @@ enum MediaControlElementType {
   MediaCurrentTimeDisplay,
   MediaTimeRemainingDisplay,
   MediaStatusDisplay,
-  MediaControlsPanel
+  MediaControlsPanel,
+  MediaVolumeSliderContainer,
+  MediaVolumeSlider,
+  MediaVolumeSliderThumb
 };
 
 class MediaControlShadowRootElement : public HTMLDivElement {
@@ -100,6 +103,22 @@ class MediaControlTimelineContainerElement : public MediaControlElement {
  public:
   MediaControlTimelineContainerElement(Document*, HTMLMediaElement*);
   virtual bool rendererIsNeeded(RenderStyle*);
+};
+
+// ----------------------------
+
+class MediaControlVolumeSliderContainerElement : public MediaControlElement {
+ public:
+  MediaControlVolumeSliderContainerElement(Document*, HTMLMediaElement*);
+  virtual PassRefPtr<RenderStyle> styleForElement();
+  void setVisible(bool);
+  bool isVisible() { return m_isVisible; }
+  void setPosition(int x, int y);
+  bool hitTest(const IntPoint& absPoint);
+
+ private:
+  bool m_isVisible;
+  int m_x, m_y;
 };
 
 // ----------------------------
@@ -210,6 +229,14 @@ class MediaControlTimelineElement : public MediaControlInputElement {
   MediaControlTimelineElement(Document*, HTMLMediaElement*);
   virtual void defaultEventHandler(Event*);
   void update(bool updateDuration = true);
+};
+
+// ----------------------------
+
+class MediaControlVolumeSliderElement : public MediaControlInputElement {
+ public:
+  MediaControlVolumeSliderElement(Document*, HTMLMediaElement*);
+  virtual void defaultEventHandler(Event*);
 };
 
 // ----------------------------

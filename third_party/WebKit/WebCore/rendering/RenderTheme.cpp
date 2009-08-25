@@ -201,6 +201,7 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
     case MenulistButtonPart:
       return adjustMenuListButtonStyle(selector, style, e);
     case MediaSliderPart:
+    case MediaVolumeSliderPart:
     case SliderHorizontalPart:
     case SliderVerticalPart:
       return adjustSliderTrackStyle(selector, style, e);
@@ -300,6 +301,14 @@ bool RenderTheme::paint(RenderObject* o,
     case MediaSliderThumbPart:
       if (o->parent()->isSlider())
         return paintMediaSliderThumb(o, paintInfo, r);
+      break;
+    case MediaVolumeSliderContainerPart:
+      return paintMediaVolumeSliderContainer(o, paintInfo, r);
+    case MediaVolumeSliderPart:
+      return paintMediaVolumeSliderTrack(o, paintInfo, r);
+    case MediaVolumeSliderThumbPart:
+      if (o->parent()->isSlider())
+        return paintMediaVolumeSliderThumb(o, paintInfo, r);
       break;
     case MediaTimeRemainingPart:
       return paintMediaTimeRemaining(o, paintInfo, r);
