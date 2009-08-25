@@ -49,9 +49,9 @@ void JSAttr::setValue(ExecState* exec, JSValue value) {
                        ownerElement->hasTagName(frameTag))) {
     if (equalIgnoringCase(imp->name(), "src") &&
         protocolIsJavaScript(deprecatedParseURL(attrValue))) {
-      if (!checkNodeSecurity(exec,
-                             static_cast<HTMLFrameElementBase*>(ownerElement)
-                                 ->contentDocument()))
+      Document* contentDocument =
+          static_cast<HTMLFrameElementBase*>(ownerElement)->contentDocument();
+      if (contentDocument && !checkNodeSecurity(exec, contentDocument))
         return;
     }
   }
