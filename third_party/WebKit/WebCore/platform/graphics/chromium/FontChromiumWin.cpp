@@ -463,7 +463,7 @@ void Font::drawComplexText(GraphicsContext* graphicsContext,
                                             to, point);
 
   HDC hdc = painter.hdc();
-  if (!hdc)
+  if (windowsCanHandleTextDrawing(graphicsContext) && !hdc)
     return;
 
   // TODO(maruel): http://b/700464 SetTextColor doesn't support transparency.
