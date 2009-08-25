@@ -2412,16 +2412,6 @@ PassRefPtr<FunctionBodyNode> FunctionBodyNode::create(
   return node.release();
 }
 
-void FunctionBodyNode::reparseDataIfNecessary(ScopeChainNode* scopeChainNode) {
-  // This branch is only necessary since you can still create a non-stub
-  // FunctionBodyNode by
-  // calling Parser::parse<FunctionBodyNode>().
-  if (!data())
-    scopeChainNode->globalData->parser->reparseInPlace(
-        scopeChainNode->globalData, this);
-  ASSERT(data());
-}
-
 RegisterID* FunctionBodyNode::emitBytecode(BytecodeGenerator& generator,
                                            RegisterID*) {
   generator.emitDebugHook(DidEnterCallFrame, firstLine(), lastLine());
@@ -2438,17 +2428,6 @@ RegisterID* FunctionBodyNode::emitBytecode(BytecodeGenerator& generator,
   generator.emitDebugHook(WillLeaveCallFrame, firstLine(), lastLine());
   generator.emitReturn(r0);
   return 0;
-}
-
-UString FunctionBodyNode::paramString() const {
-  UString s("");
-  for (size_t pos = 0; pos < m_parameterCount; ++pos) {
-    if (!s.isEmpty())
-      s += ", ";
-    s += parameters()[pos].ustring();
-  }
-
-  return s;
 }
 
 Identifier* FunctionBodyNode::copyParameters() {

@@ -758,7 +758,7 @@ JSValue Interpreter::execute(ProgramExecutable* program,
     }
   }
 
-  CodeBlock* codeBlock = &program->bytecode(scopeChain);
+  CodeBlock* codeBlock = &program->bytecode(callFrame, scopeChain);
 
   Register* oldEnd = m_registerFile.end();
   Register* newEnd = oldEnd + codeBlock->m_numParameters +
@@ -795,7 +795,7 @@ JSValue Interpreter::execute(ProgramExecutable* program,
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    result = program->jitCode(scopeChain)
+    result = program->jitCode(newCallFrame, scopeChain)
                  .execute(&m_registerFile, newCallFrame, scopeChain->globalData,
                           exception);
 #else
@@ -851,7 +851,7 @@ JSValue Interpreter::execute(FunctionExecutable* functionExecutable,
   for (ArgList::const_iterator it = args.begin(); it != end; ++it)
     newCallFrame->r(++dst) = *it;
 
-  CodeBlock* codeBlock = &functionExecutable->bytecode(scopeChain);
+  CodeBlock* codeBlock = &functionExecutable->bytecode(callFrame, scopeChain);
   newCallFrame = slideRegisterWindowForCall(
       codeBlock, &m_registerFile, newCallFrame,
       argc + RegisterFile::CallFrameHeaderSize, argc);
@@ -874,7 +874,7 @@ JSValue Interpreter::execute(FunctionExecutable* functionExecutable,
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    result = functionExecutable->jitCode(scopeChain)
+    result = functionExecutable->jitCode(newCallFrame, scopeChain)
                  .execute(&m_registerFile, newCallFrame, scopeChain->globalData,
                           exception);
 #else
@@ -919,7 +919,7 @@ CallFrameClosure Interpreter::prepareForRepeatCall(
   for (int i = 0; i < argc; ++i)
     newCallFrame->r(++dst) = jsUndefined();
 
-  CodeBlock* codeBlock = &FunctionExecutable->bytecode(scopeChain);
+  CodeBlock* codeBlock = &FunctionExecutable->bytecode(callFrame, scopeChain);
   newCallFrame = slideRegisterWindowForCall(
       codeBlock, &m_registerFile, newCallFrame,
       argc + RegisterFile::CallFrameHeaderSize, argc);
@@ -932,7 +932,7 @@ CallFrameClosure Interpreter::prepareForRepeatCall(
   newCallFrame->init(codeBlock, 0, scopeChain,
                      callFrame->addHostCallFrameFlag(), 0, argc, function);
 #if ENABLE(JIT)
-  FunctionExecutable->jitCode(scopeChain);
+  FunctionExecutable->jitCode(newCallFrame, scopeChain);
 #endif
 
   CallFrameClosure result = {callFrame,
@@ -984,7 +984,7 @@ JSValue Interpreter::execute(EvalExecutable* eval,
                              JSValue* exception) {
   return execute(eval, callFrame, thisObj,
                  m_registerFile.size() +
-                     eval->bytecode(scopeChain).m_numParameters +
+                     eval->bytecode(callFrame, scopeChain).m_numParameters +
                      RegisterFile::CallFrameHeaderSize,
                  scopeChain, exception);
 }
@@ -1009,7 +1009,7 @@ JSValue Interpreter::execute(EvalExecutable* eval,
                      ? callFrame->globalData().dynamicGlobalObject
                      : scopeChain->globalObject());
 
-  EvalCodeBlock* codeBlock = &eval->bytecode(scopeChain);
+  EvalCodeBlock* codeBlock = &eval->bytecode(callFrame, scopeChain);
 
   JSVariableObject* variableObject;
   for (ScopeChainNode* node = scopeChain;; node = node->next) {
@@ -1071,7 +1071,7 @@ JSValue Interpreter::execute(EvalExecutable* eval,
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    result = eval->jitCode(scopeChain)
+    result = eval->jitCode(newCallFrame, scopeChain)
                  .execute(&m_registerFile, newCallFrame, scopeChain->globalData,
                           exception);
 #else
@@ -3366,8 +3366,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       if (callType == CallTypeJS) {
         ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
-        CodeBlock* newCodeBlock =
-            &callData.js.functionExecutable->bytecode(callDataScopeChain);
+        CodeBlock* newCodeBlock = &callData.js.functionExecutable->bytecode(
+            callFrame, callDataScopeChain);
 
         CallFrame* previousCallFrame = callFrame;
 
@@ -3554,8 +3554,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       if (callType == CallTypeJS) {
         ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
-        CodeBlock* newCodeBlock =
-            &callData.js.functionExecutable->bytecode(callDataScopeChain);
+        CodeBlock* newCodeBlock = &callData.js.functionExecutable->bytecode(
+            callFrame, callDataScopeChain);
 
         CallFrame* previousCallFrame = callFrame;
 
@@ -3818,7 +3818,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       if (constructType == ConstructTypeJS) {
         ScopeChainNode* callDataScopeChain = constructData.js.scopeChain;
         CodeBlock* newCodeBlock =
-            &constructData.js.functionExecutable->bytecode(callDataScopeChain);
+            &constructData.js.functionExecutable->bytecode(callFrame,
+                                                           callDataScopeChain);
 
         Structure* structure;
         JSValue prototype = callFrame->r(proto).jsValue();

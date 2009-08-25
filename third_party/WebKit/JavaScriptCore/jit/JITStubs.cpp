@@ -1609,7 +1609,7 @@ DEFINE_STUB_FUNCTION(void*, op_call_JSFunction) {
   ASSERT(!function->isHostFunction());
   FunctionExecutable* executable = function->jsExecutable();
   ScopeChainNode* callDataScopeChain = function->scope().node();
-  executable->jitCode(callDataScopeChain);
+  executable->jitCode(stackFrame.callFrame, callDataScopeChain);
 
   return function;
 }
@@ -1674,7 +1674,7 @@ DEFINE_STUB_FUNCTION(void*, vm_lazyLinkCall) {
   CodeBlock* codeBlock = 0;
   if (!executable->isHostFunction())
     codeBlock = &static_cast<FunctionExecutable*>(executable)
-                     ->bytecode(callee->scope().node());
+                     ->bytecode(stackFrame.callFrame, callee->scope().node());
   CallLinkInfo* callLinkInfo =
       &stackFrame.callFrame->callerFrame()->codeBlock()->getCallLinkInfo(
           stackFrame.args[1].returnAddress());

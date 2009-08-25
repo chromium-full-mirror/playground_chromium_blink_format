@@ -1754,6 +1754,8 @@ class ProgramNode : public ScopeNode {
                                         CodeFeatures,
                                         int numConstants);
 
+  static const bool scopeIsFunction = false;
+
  private:
   ProgramNode(JSGlobalData*,
               SourceElements*,
@@ -1775,6 +1777,8 @@ class EvalNode : public ScopeNode {
                                      const SourceCode&,
                                      CodeFeatures,
                                      int numConstants);
+
+  static const bool scopeIsFunction = false;
 
  private:
   EvalNode(JSGlobalData*,
@@ -1804,7 +1808,6 @@ class FunctionBodyNode : public ScopeNode {
 
   const Identifier* parameters() const { return m_parameters; }
   size_t parameterCount() const { return m_parameterCount; }
-  UString paramString() const;
   Identifier* copyParameters();
 
   virtual RegisterID* emitBytecode(BytecodeGenerator&, RegisterID* = 0);
@@ -1818,7 +1821,7 @@ class FunctionBodyNode : public ScopeNode {
 
   const Identifier& ident() { return m_ident; }
 
-  void reparseDataIfNecessary(ScopeChainNode*);
+  static const bool scopeIsFunction = true;
 
  private:
   FunctionBodyNode(JSGlobalData*);

@@ -54,7 +54,7 @@ class EvalCodeCache {
 
     if (!evalExecutable) {
       evalExecutable = EvalExecutable::create(makeSource(evalSource));
-      exceptionValue = evalExecutable->parse(exec);
+      exceptionValue = evalExecutable->compile(exec, scopeChain);
       if (exceptionValue)
         return 0;
 
