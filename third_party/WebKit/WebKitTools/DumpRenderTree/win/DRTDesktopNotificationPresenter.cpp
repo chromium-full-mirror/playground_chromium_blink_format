@@ -124,9 +124,9 @@ DRTDesktopNotificationPresenter::checkNotificationPermission(
       ::gLayoutTestController->checkDesktopNotificationPermission(jsOrigin);
 
   if (allowed)
-    *result = WebCore::NotificationPresenter::PERMISSION_ALLOWED;
+    *result = WebCore::NotificationPresenter::PermissionAllowed;
   else
-    *result = WebCore::NotificationPresenter::PERMISSION_DENIED;
+    *result = WebCore::NotificationPresenter::PermissionDenied;
 
   JSStringRelease(jsOrigin);
 #endif
