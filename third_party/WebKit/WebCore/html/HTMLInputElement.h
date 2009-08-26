@@ -31,7 +31,9 @@
 namespace WebCore {
 
 class FileList;
+class HTMLDataListElement;
 class HTMLImageLoader;
+class HTMLOptionElement;
 class KURL;
 class VisibleSelection;
 
@@ -203,6 +205,11 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   KURL src() const;
   void setSrc(const String&);
 
+#if ENABLE(DATALIST)
+  HTMLDataListElement* list();
+  HTMLOptionElement* selectedOption();
+#endif
+
   int maxLength() const;
   void setMaxLength(int);
 
@@ -269,6 +276,9 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   unsigned m_autocomplete : 2;  // AutoCompleteSetting
   bool m_autofilled : 1;
   bool m_inited : 1;
+#if ENABLE(DATALIST)
+  bool m_hasNonEmptyList : 1;
+#endif
 };
 
 }  // namespace
