@@ -93,6 +93,7 @@ class JSVariableObject : public JSObject {
   void setRegisters(Register* r, Register* registerArray);
 
   bool symbolTableGet(const Identifier&, PropertySlot&);
+  bool symbolTableGet(const Identifier&, PropertyDescriptor&);
   bool symbolTableGet(const Identifier&, PropertySlot&, bool& slotIsWriteable);
   bool symbolTablePut(const Identifier&, JSValue);
   bool symbolTablePutWithAttributes(const Identifier&,

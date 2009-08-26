@@ -40,6 +40,9 @@ class StringObject : public JSWrapperObject {
   virtual bool getOwnPropertySlot(ExecState*,
                                   unsigned propertyName,
                                   PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
 
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,

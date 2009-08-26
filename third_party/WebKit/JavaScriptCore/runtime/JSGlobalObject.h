@@ -167,6 +167,9 @@ class JSGlobalObject : public JSVariableObject {
   virtual void markChildren(MarkStack&);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
   virtual bool hasOwnPropertyForWrite(ExecState*, const Identifier&);
   virtual void put(ExecState*, const Identifier&, JSValue, PutPropertySlot&);
   virtual void putWithAttributes(ExecState*,
@@ -364,6 +367,16 @@ inline bool JSGlobalObject::getOwnPropertySlot(ExecState* exec,
   if (JSVariableObject::getOwnPropertySlot(exec, propertyName, slot))
     return true;
   return symbolTableGet(propertyName, slot);
+}
+
+inline bool JSGlobalObject::getOwnPropertyDescriptor(
+    ExecState* exec,
+    const Identifier& propertyName,
+    PropertyDescriptor& descriptor) {
+  if (symbolTableGet(propertyName, descriptor))
+    return true;
+  return JSVariableObject::getOwnPropertyDescriptor(exec, propertyName,
+                                                    descriptor);
 }
 
 inline bool JSGlobalObject::hasOwnPropertyForWrite(

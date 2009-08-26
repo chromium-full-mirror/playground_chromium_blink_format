@@ -44,6 +44,9 @@ class JSNamedNodesCollection : public DOMObjectWithGlobalPointer {
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   const JSC::Identifier&,
                                   JSC::PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(JSC::ExecState*,
+                                        const JSC::Identifier&,
+                                        JSC::PropertyDescriptor&);
 
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
   static const JSC::ClassInfo s_info;

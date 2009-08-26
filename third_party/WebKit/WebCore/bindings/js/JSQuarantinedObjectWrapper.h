@@ -67,6 +67,9 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   unsigned,
                                   JSC::PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(JSC::ExecState*,
+                                        const JSC::Identifier&,
+                                        JSC::PropertyDescriptor&);
 
   virtual void put(JSC::ExecState*,
                    const JSC::Identifier&,

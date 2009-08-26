@@ -28,6 +28,7 @@
 #include "CommonIdentifiers.h"
 #include "Identifier.h"
 #include "JSNumberCell.h"
+#include "PropertyDescriptor.h"
 #include "PropertySlot.h"
 
 namespace JSC {
@@ -97,6 +98,9 @@ class JSString : public JSCell {
                              const Identifier& propertyName,
                              PropertySlot&);
   bool getStringPropertySlot(ExecState*, unsigned propertyName, PropertySlot&);
+  bool getStringPropertyDescriptor(ExecState*,
+                                   const Identifier& propertyName,
+                                   PropertyDescriptor&);
 
   bool canGetIndex(unsigned i) {
     return i < static_cast<unsigned>(m_value.size());
@@ -130,6 +134,9 @@ class JSString : public JSCell {
   virtual bool getOwnPropertySlot(ExecState*,
                                   unsigned propertyName,
                                   PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
 
   UString m_value;
 };

@@ -77,6 +77,32 @@ bool RuntimeArray::getOwnPropertySlot(ExecState* exec,
   return JSObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
+bool RuntimeArray::getOwnPropertyDescriptor(ExecState* exec,
+                                            const Identifier& propertyName,
+                                            PropertyDescriptor& descriptor) {
+  if (propertyName == exec->propertyNames().length) {
+    PropertySlot slot;
+    slot.setCustom(this, lengthGetter);
+    descriptor.setDescriptor(slot.getValue(exec, propertyName),
+                             ReadOnly | DontDelete | DontEnum);
+    return true;
+  }
+
+  bool ok;
+  unsigned index = propertyName.toArrayIndex(&ok);
+  if (ok) {
+    if (index < getLength()) {
+      PropertySlot slot;
+      slot.setCustomIndex(this, index, indexGetter);
+      descriptor.setDescriptor(slot.getValue(exec, propertyName),
+                               DontDelete | DontEnum);
+      return true;
+    }
+  }
+
+  return JSObject::getOwnPropertyDescriptor(exec, propertyName, descriptor);
+}
+
 bool RuntimeArray::getOwnPropertySlot(ExecState* exec,
                                       unsigned index,
                                       PropertySlot& slot) {

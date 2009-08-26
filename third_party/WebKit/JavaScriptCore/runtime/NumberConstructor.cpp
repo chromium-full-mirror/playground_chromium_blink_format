@@ -88,6 +88,14 @@ bool NumberConstructor::getOwnPropertySlot(ExecState* exec,
       exec, ExecState::numberTable(exec), this, propertyName, slot);
 }
 
+bool NumberConstructor::getOwnPropertyDescriptor(
+    ExecState* exec,
+    const Identifier& propertyName,
+    PropertyDescriptor& descriptor) {
+  return getStaticValueDescriptor<NumberConstructor, InternalFunction>(
+      exec, ExecState::numberTable(exec), this, propertyName, descriptor);
+}
+
 static JSValue numberConstructorNaNValue(ExecState* exec,
                                          const Identifier&,
                                          const PropertySlot&) {

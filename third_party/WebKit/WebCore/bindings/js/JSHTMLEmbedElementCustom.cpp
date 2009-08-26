@@ -40,6 +40,14 @@ bool JSHTMLEmbedElement::getOwnPropertySlotDelegate(
   return runtimeObjectCustomGetOwnPropertySlot(exec, propertyName, slot, this);
 }
 
+bool JSHTMLEmbedElement::getOwnPropertyDescriptorDelegate(
+    ExecState* exec,
+    const Identifier& propertyName,
+    PropertyDescriptor& descriptor) {
+  return runtimeObjectCustomGetOwnPropertyDescriptor(exec, propertyName,
+                                                     descriptor, this);
+}
+
 bool JSHTMLEmbedElement::putDelegate(ExecState* exec,
                                      const Identifier& propertyName,
                                      JSValue value,

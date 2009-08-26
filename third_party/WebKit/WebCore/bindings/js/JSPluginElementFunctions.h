@@ -42,6 +42,10 @@ bool runtimeObjectCustomGetOwnPropertySlot(JSC::ExecState*,
                                            const JSC::Identifier&,
                                            JSC::PropertySlot&,
                                            JSHTMLElement*);
+bool runtimeObjectCustomGetOwnPropertyDescriptor(JSC::ExecState*,
+                                                 const JSC::Identifier&,
+                                                 JSC::PropertyDescriptor&,
+                                                 JSHTMLElement*);
 bool runtimeObjectCustomPut(JSC::ExecState*,
                             const JSC::Identifier&,
                             JSC::JSValue,

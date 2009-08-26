@@ -48,6 +48,9 @@ class RegExpConstructor : public InternalFunction {
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier& propertyName,
                                   PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
 
   static const ClassInfo info;
 

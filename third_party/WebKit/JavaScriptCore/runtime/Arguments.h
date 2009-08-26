@@ -96,6 +96,9 @@ class Arguments : public JSObject {
   virtual bool getOwnPropertySlot(ExecState*,
                                   unsigned propertyName,
                                   PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
                    JSValue,

@@ -81,6 +81,9 @@ class JSFunction : public InternalFunction {
   bool isHostFunctionNonInline() const;
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
                    JSValue,

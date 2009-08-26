@@ -64,6 +64,15 @@ bool StringObject::getOwnPropertySlot(ExecState* exec,
       exec, Identifier::from(exec, propertyName), slot);
 }
 
+bool StringObject::getOwnPropertyDescriptor(ExecState* exec,
+                                            const Identifier& propertyName,
+                                            PropertyDescriptor& descriptor) {
+  if (internalValue()->getStringPropertyDescriptor(exec, propertyName,
+                                                   descriptor))
+    return true;
+  return JSObject::getOwnPropertyDescriptor(exec, propertyName, descriptor);
+}
+
 void StringObject::put(ExecState* exec,
                        const Identifier& propertyName,
                        JSValue value,

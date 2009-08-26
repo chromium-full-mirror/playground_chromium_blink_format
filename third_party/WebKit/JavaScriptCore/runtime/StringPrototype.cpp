@@ -225,6 +225,13 @@ bool StringPrototype::getOwnPropertySlot(ExecState* exec,
                                              this, propertyName, slot);
 }
 
+bool StringPrototype::getOwnPropertyDescriptor(ExecState* exec,
+                                               const Identifier& propertyName,
+                                               PropertyDescriptor& descriptor) {
+  return getStaticFunctionDescriptor<StringObject>(
+      exec, ExecState::stringTable(exec), this, propertyName, descriptor);
+}
+
 // ------------------------------ Functions --------------------------
 
 static inline UString substituteBackreferences(const UString& replacement,

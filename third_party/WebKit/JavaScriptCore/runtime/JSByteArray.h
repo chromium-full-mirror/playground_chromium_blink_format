@@ -82,6 +82,9 @@ class JSByteArray : public JSObject {
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   unsigned propertyName,
                                   JSC::PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
   virtual void put(JSC::ExecState*,
                    const JSC::Identifier& propertyName,
                    JSC::JSValue,

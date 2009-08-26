@@ -48,6 +48,7 @@ inline JSCell* getJSFunction(JSGlobalData& globalData, JSValue value) {
 
 class HashEntry;
 class InternalFunction;
+class PropertyDescriptor;
 class PropertyNameArray;
 class Structure;
 struct HashTable;
@@ -97,6 +98,9 @@ class JSObject : public JSCell {
                        const Identifier& propertyName,
                        PropertySlot&);
   bool getPropertySlot(ExecState*, unsigned propertyName, PropertySlot&);
+  bool getPropertyDescriptor(ExecState*,
+                             const Identifier& propertyName,
+                             PropertyDescriptor&);
 
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier& propertyName,
@@ -104,6 +108,9 @@ class JSObject : public JSCell {
   virtual bool getOwnPropertySlot(ExecState*,
                                   unsigned propertyName,
                                   PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
 
   virtual void put(ExecState*,
                    const Identifier& propertyName,

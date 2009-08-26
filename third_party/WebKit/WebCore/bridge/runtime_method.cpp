@@ -80,6 +80,21 @@ bool RuntimeMethod::getOwnPropertySlot(ExecState* exec,
   return InternalFunction::getOwnPropertySlot(exec, propertyName, slot);
 }
 
+bool RuntimeMethod::getOwnPropertyDescriptor(ExecState* exec,
+                                             const Identifier& propertyName,
+                                             PropertyDescriptor& descriptor) {
+  if (propertyName == exec->propertyNames().length) {
+    PropertySlot slot;
+    slot.setCustom(this, lengthGetter);
+    descriptor.setDescriptor(slot.getValue(exec, propertyName),
+                             ReadOnly | DontDelete | DontEnum);
+    return true;
+  }
+
+  return InternalFunction::getOwnPropertyDescriptor(exec, propertyName,
+                                                    descriptor);
+}
+
 static JSValue JSC_HOST_CALL callRuntimeMethod(ExecState* exec,
                                                JSObject* function,
                                                JSValue thisValue,

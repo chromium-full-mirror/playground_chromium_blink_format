@@ -116,6 +116,9 @@ class ObjcFallbackObjectImp : public JSObject {
 
  private:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
                    JSValue,

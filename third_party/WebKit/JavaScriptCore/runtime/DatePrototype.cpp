@@ -576,6 +576,13 @@ bool DatePrototype::getOwnPropertySlot(ExecState* exec,
                                          propertyName, slot);
 }
 
+bool DatePrototype::getOwnPropertyDescriptor(ExecState* exec,
+                                             const Identifier& propertyName,
+                                             PropertyDescriptor& descriptor) {
+  return getStaticFunctionDescriptor<JSObject>(exec, ExecState::dateTable(exec),
+                                               this, propertyName, descriptor);
+}
+
 // Functions
 
 JSValue JSC_HOST_CALL dateProtoFuncToString(ExecState* exec,
