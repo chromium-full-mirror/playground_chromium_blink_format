@@ -39,13 +39,13 @@ MessageEvent::MessageEvent(const String& data,
                            const String& origin,
                            const String& lastEventId,
                            PassRefPtr<DOMWindow> source,
-                           PassRefPtr<MessagePort> messagePort)
+                           PassOwnPtr<MessagePortArray> ports)
     : Event(eventNames().messageEvent, false, true),
       m_data(data),
       m_origin(origin),
       m_lastEventId(lastEventId),
       m_source(source),
-      m_messagePort(messagePort) {}
+      m_ports(ports) {}
 
 MessageEvent::~MessageEvent() {}
 
@@ -56,7 +56,7 @@ void MessageEvent::initMessageEvent(const AtomicString& type,
                                     const String& origin,
                                     const String& lastEventId,
                                     DOMWindow* source,
-                                    MessagePort* messagePort) {
+                                    PassOwnPtr<MessagePortArray> ports) {
   if (dispatched())
     return;
 
@@ -66,7 +66,32 @@ void MessageEvent::initMessageEvent(const AtomicString& type,
   m_origin = origin;
   m_lastEventId = lastEventId;
   m_source = source;
-  m_messagePort = messagePort;
+  m_ports = ports;
+}
+
+// FIXME: remove this when we update the JS bindings (bug #28460).
+MessagePort* MessageEvent::messagePort() {
+  if (!m_ports)
+    return 0;
+  ASSERT(m_ports->size() == 1);
+  return (*m_ports)[0].get();
+}
+
+void MessageEvent::initMessageEvent(const AtomicString& type,
+                                    bool canBubble,
+                                    bool cancelable,
+                                    const String& data,
+                                    const String& origin,
+                                    const String& lastEventId,
+                                    DOMWindow* source,
+                                    MessagePort* port) {
+  MessagePortArray* ports = 0;
+  if (port) {
+    ports = new MessagePortArray();
+    ports->append(port);
+  }
+  initMessageEvent(type, canBubble, cancelable, data, origin, lastEventId,
+                   source, ports);
 }
 
 bool MessageEvent::isMessageEvent() const {

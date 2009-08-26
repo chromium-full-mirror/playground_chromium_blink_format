@@ -34,7 +34,7 @@
 #if ENABLE(WORKERS)
 
 #include "WorkerReportingProxy.h"
-
+#include "MessagePort.h"
 #include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
@@ -44,8 +44,9 @@ class MessagePortChannel;
 // A proxy to talk to the worker object.
 class WorkerObjectProxy : public WorkerReportingProxy {
  public:
-  virtual void postMessageToWorkerObject(const String&,
-                                         PassOwnPtr<MessagePortChannel>) = 0;
+  virtual void postMessageToWorkerObject(
+      const String&,
+      PassOwnPtr<MessagePortChannelArray>) = 0;
 
   virtual void confirmMessageFromWorkerObject(bool hasPendingActivity) = 0;
   virtual void reportPendingActivity(bool hasPendingActivity) = 0;

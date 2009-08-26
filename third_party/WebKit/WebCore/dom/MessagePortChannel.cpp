@@ -34,12 +34,13 @@ namespace WebCore {
 
 PassOwnPtr<MessagePortChannel::EventData> MessagePortChannel::EventData::create(
     const String& message,
-    PassOwnPtr<MessagePortChannel> channel) {
-  return new EventData(message, channel);
+    PassOwnPtr<MessagePortChannelArray> channels) {
+  return new EventData(message, channels);
 }
 
-MessagePortChannel::EventData::EventData(const String& message,
-                                         PassOwnPtr<MessagePortChannel> channel)
-    : m_message(message.copy()), m_channel(channel) {}
+MessagePortChannel::EventData::EventData(
+    const String& message,
+    PassOwnPtr<MessagePortChannelArray> channels)
+    : m_message(message.copy()), m_channels(channels) {}
 
 }  // namespace WebCore

@@ -95,23 +95,20 @@ class PostMessageTimer : public TimerBase {
                    const String& message,
                    const String& sourceOrigin,
                    PassRefPtr<DOMWindow> source,
-                   PassOwnPtr<MessagePortChannel> channel,
+                   PassOwnPtr<MessagePortChannelArray> channels,
                    SecurityOrigin* targetOrigin)
       : m_window(window),
         m_message(message),
         m_origin(sourceOrigin),
         m_source(source),
-        m_channel(channel),
+        m_channels(channels),
         m_targetOrigin(targetOrigin) {}
 
   PassRefPtr<MessageEvent> event(ScriptExecutionContext* context) {
-    RefPtr<MessagePort> messagePort;
-    if (m_channel) {
-      messagePort = MessagePort::create(*context);
-      messagePort->entangle(m_channel.release());
-    }
+    OwnPtr<MessagePortArray> messagePorts =
+        MessagePort::entanglePorts(*context, m_channels.release());
     return MessageEvent::create(m_message, m_origin, "", m_source,
-                                messagePort.release());
+                                messagePorts.release());
   }
   SecurityOrigin* targetOrigin() const { return m_targetOrigin.get(); }
 
@@ -122,7 +119,7 @@ class PostMessageTimer : public TimerBase {
   String m_message;
   String m_origin;
   RefPtr<DOMWindow> m_source;
-  OwnPtr<MessagePortChannel> m_channel;
+  OwnPtr<MessagePortChannelArray> m_channels;
   RefPtr<SecurityOrigin> m_targetOrigin;
 };
 
@@ -615,7 +612,18 @@ NotificationCenter* DOMWindow::webkitNotifications() const {
 #endif
 
 void DOMWindow::postMessage(const String& message,
-                            MessagePort* messagePort,
+                            MessagePort* port,
+                            const String& targetOrigin,
+                            DOMWindow* source,
+                            ExceptionCode& ec) {
+  MessagePortArray ports;
+  if (port)
+    ports.append(port);
+  postMessage(message, &ports, targetOrigin, source, ec);
+}
+
+void DOMWindow::postMessage(const String& message,
+                            const MessagePortArray* ports,
                             const String& targetOrigin,
                             DOMWindow* source,
                             ExceptionCode& ec) {
@@ -633,9 +641,8 @@ void DOMWindow::postMessage(const String& message,
     }
   }
 
-  OwnPtr<MessagePortChannel> channel;
-  if (messagePort)
-    channel = messagePort->disentangle(ec);
+  OwnPtr<MessagePortChannelArray> channels =
+      MessagePort::disentanglePorts(ports, ec);
   if (ec)
     return;
 
@@ -648,7 +655,7 @@ void DOMWindow::postMessage(const String& message,
 
   // Schedule the message.
   PostMessageTimer* timer = new PostMessageTimer(
-      this, message, sourceOrigin, source, channel.release(), target.get());
+      this, message, sourceOrigin, source, channels.release(), target.get());
   timer->startOneShot(0);
 }
 

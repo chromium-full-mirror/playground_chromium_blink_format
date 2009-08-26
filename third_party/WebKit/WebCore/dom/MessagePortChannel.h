@@ -42,9 +42,14 @@
 namespace WebCore {
 
 class MessagePort;
+class MessagePortChannel;
 class PlatformMessagePortChannel;
 class ScriptExecutionContext;
 class String;
+
+// The overwhelmingly common case is sending a single port, so handle that
+// efficiently with an inline buffer of size 1.
+typedef Vector<OwnPtr<MessagePortChannel>, 1> MessagePortChannelArray;
 
 // MessagePortChannel is a platform-independent interface to the remote side of
 // a message channel.
@@ -84,15 +89,17 @@ class MessagePortChannel : public Noncopyable {
   class EventData {
    public:
     static PassOwnPtr<EventData> create(const String&,
-                                        PassOwnPtr<MessagePortChannel>);
+                                        PassOwnPtr<MessagePortChannelArray>);
 
     const String& message() { return m_message; }
-    PassOwnPtr<MessagePortChannel> channel() { return m_channel.release(); }
+    PassOwnPtr<MessagePortChannelArray> channels() {
+      return m_channels.release();
+    }
 
    private:
-    EventData(const String& message, PassOwnPtr<MessagePortChannel>);
+    EventData(const String& message, PassOwnPtr<MessagePortChannelArray>);
     String m_message;
-    OwnPtr<MessagePortChannel> m_channel;
+    OwnPtr<MessagePortChannelArray> m_channels;
   };
 
   // Sends a message and optional cloned port to the remote port.

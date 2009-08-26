@@ -45,9 +45,8 @@ class MessageEvent : public Event {
                                          const String& origin,
                                          const String& lastEventId,
                                          PassRefPtr<DOMWindow> source,
-                                         PassRefPtr<MessagePort> messagePort) {
-    return adoptRef(
-        new MessageEvent(data, origin, lastEventId, source, messagePort));
+                                         PassOwnPtr<MessagePortArray> ports) {
+    return adoptRef(new MessageEvent(data, origin, lastEventId, source, ports));
   }
   virtual ~MessageEvent();
 
@@ -58,13 +57,25 @@ class MessageEvent : public Event {
                         const String& origin,
                         const String& lastEventId,
                         DOMWindow* source,
-                        MessagePort*);
+                        PassOwnPtr<MessagePortArray>);
 
   const String& data() const { return m_data; }
   const String& origin() const { return m_origin; }
   const String& lastEventId() const { return m_lastEventId; }
   DOMWindow* source() const { return m_source.get(); }
-  MessagePort* messagePort() const { return m_messagePort.get(); }
+  const MessagePortArray& ports() const { return *(m_ports.get()); }
+
+  // FIXME: remove this when we update the JS bindings (bug #28460)
+  MessagePort* messagePort();
+  // FIXME: remove this when we update the JS bindings (bug #28460)
+  void initMessageEvent(const AtomicString& type,
+                        bool canBubble,
+                        bool cancelable,
+                        const String& data,
+                        const String& origin,
+                        const String& lastEventId,
+                        DOMWindow* source,
+                        MessagePort*);
 
   virtual bool isMessageEvent() const;
 
@@ -74,13 +85,13 @@ class MessageEvent : public Event {
                const String& origin,
                const String& lastEventId,
                PassRefPtr<DOMWindow> source,
-               PassRefPtr<MessagePort> messagePort);
+               PassOwnPtr<MessagePortArray>);
 
   String m_data;
   String m_origin;
   String m_lastEventId;
   RefPtr<DOMWindow> m_source;
-  RefPtr<MessagePort> m_messagePort;
+  OwnPtr<MessagePortArray> m_ports;
 };
 
 }  // namespace WebCore

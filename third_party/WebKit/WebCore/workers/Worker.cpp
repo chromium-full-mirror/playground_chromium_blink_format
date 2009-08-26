@@ -74,19 +74,29 @@ Worker::~Worker() {
   m_contextProxy->workerObjectDestroyed();
 }
 
+// FIXME: remove this when we update the JS bindings (bug #28460).
+void Worker::postMessage(const String& message,
+                         MessagePort* port,
+                         ExceptionCode& ec) {
+  MessagePortArray ports;
+  if (port)
+    ports.append(port);
+  postMessage(message, &ports, ec);
+}
+
 void Worker::postMessage(const String& message, ExceptionCode& ec) {
-  postMessage(message, 0, ec);
+  postMessage(message, static_cast<MessagePortArray*>(0), ec);
 }
 
 void Worker::postMessage(const String& message,
-                         MessagePort* messagePort,
+                         const MessagePortArray* ports,
                          ExceptionCode& ec) {
   // Disentangle the port in preparation for sending it to the remote context.
-  OwnPtr<MessagePortChannel> channel =
-      messagePort ? messagePort->disentangle(ec) : 0;
+  OwnPtr<MessagePortChannelArray> channels =
+      MessagePort::disentanglePorts(ports, ec);
   if (ec)
     return;
-  m_contextProxy->postMessageToWorkerContext(message, channel.release());
+  m_contextProxy->postMessageToWorkerContext(message, channels.release());
 }
 
 void Worker::terminate() {
@@ -123,8 +133,8 @@ void Worker::notifyFinished() {
 }
 
 void Worker::dispatchMessage(const String& message,
-                             PassRefPtr<MessagePort> port) {
-  RefPtr<Event> evt = MessageEvent::create(message, "", "", 0, port);
+                             PassOwnPtr<MessagePortArray> ports) {
+  RefPtr<Event> evt = MessageEvent::create(message, "", "", 0, ports);
 
   if (m_onMessageListener.get()) {
     evt->setTarget(this);

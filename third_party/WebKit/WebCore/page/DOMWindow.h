@@ -28,6 +28,7 @@
 
 #include "EventTarget.h"
 #include "KURL.h"
+#include "MessagePort.h"
 #include "PlatformString.h"
 #include "RegisteredEventListener.h"
 #include "SecurityOrigin.h"
@@ -53,7 +54,6 @@ class Frame;
 class History;
 class Location;
 class Media;
-class MessagePort;
 class Navigator;
 class Node;
 class NotificationCenter;
@@ -233,6 +233,12 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   NotificationCenter* webkitNotifications() const;
 #endif
 
+  void postMessage(const String& message,
+                   const MessagePortArray*,
+                   const String& targetOrigin,
+                   DOMWindow* source,
+                   ExceptionCode&);
+  // FIXME: remove this when we update the JS bindings (bug #28460).
   void postMessage(const String& message,
                    MessagePort*,
                    const String& targetOrigin,

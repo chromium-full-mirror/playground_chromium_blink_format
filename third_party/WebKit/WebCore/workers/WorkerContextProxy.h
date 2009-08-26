@@ -33,12 +33,12 @@
 
 #if ENABLE(WORKERS)
 
+#include "MessagePort.h"
 #include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
 
 class KURL;
-class MessagePortChannel;
 class String;
 class Worker;
 
@@ -55,8 +55,9 @@ class WorkerContextProxy {
 
   virtual void terminateWorkerContext() = 0;
 
-  virtual void postMessageToWorkerContext(const String&,
-                                          PassOwnPtr<MessagePortChannel>) = 0;
+  virtual void postMessageToWorkerContext(
+      const String&,
+      PassOwnPtr<MessagePortChannelArray>) = 0;
 
   virtual bool hasPendingActivity() const = 0;
 
