@@ -2341,8 +2341,14 @@ RegisterID* EvalNode::emitBytecode(BytecodeGenerator& generator, RegisterID*) {
 
 // ------------------------------ FunctionBodyNode -----------------------------
 
+FunctionParameters::FunctionParameters(ParameterNode* firstParameter) {
+  for (ParameterNode* parameter = firstParameter; parameter;
+       parameter = parameter->nextParam())
+    append(parameter->ident());
+}
+
 inline FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData)
-    : ScopeNode(globalData), m_parameters(0), m_parameterCount(0) {}
+    : ScopeNode(globalData) {}
 
 inline FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
                                           SourceElements* children,
@@ -2357,35 +2363,19 @@ inline FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
                 varStack,
                 funcStack,
                 features,
-                numConstants),
-      m_parameters(0),
-      m_parameterCount(0) {}
-
-FunctionBodyNode::~FunctionBodyNode() {
-  for (size_t i = 0; i < m_parameterCount; ++i)
-    m_parameters[i].~Identifier();
-  fastFree(m_parameters);
-}
+                numConstants) {}
 
 void FunctionBodyNode::finishParsing(const SourceCode& source,
                                      ParameterNode* firstParameter,
                                      const Identifier& ident) {
-  Vector<Identifier> parameters;
-  for (ParameterNode* parameter = firstParameter; parameter;
-       parameter = parameter->nextParam())
-    parameters.append(parameter->ident());
-  size_t count = parameters.size();
-
   setSource(source);
-  finishParsing(parameters.releaseBuffer(), count, ident);
+  finishParsing(FunctionParameters::create(firstParameter), ident);
 }
 
-void FunctionBodyNode::finishParsing(Identifier* parameters,
-                                     size_t parameterCount,
+void FunctionBodyNode::finishParsing(PassRefPtr<FunctionParameters> parameters,
                                      const Identifier& ident) {
   ASSERT(!source().isNull());
   m_parameters = parameters;
-  m_parameterCount = parameterCount;
   m_ident = ident;
 }
 
@@ -2428,14 +2418,6 @@ RegisterID* FunctionBodyNode::emitBytecode(BytecodeGenerator& generator,
   generator.emitDebugHook(WillLeaveCallFrame, firstLine(), lastLine());
   generator.emitReturn(r0);
   return 0;
-}
-
-Identifier* FunctionBodyNode::copyParameters() {
-  Identifier* parameters = static_cast<Identifier*>(
-      fastMalloc(m_parameterCount * sizeof(Identifier)));
-  VectorCopier<false, Identifier>::uninitializedCopy(
-      m_parameters, m_parameters + m_parameterCount, parameters);
-  return parameters;
 }
 
 // ------------------------------ FuncDeclNode ---------------------------------

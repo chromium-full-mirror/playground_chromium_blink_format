@@ -390,8 +390,8 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
     addVar(*varStack[i].first,
            varStack[i].second & DeclarationStacks::IsConstant);
 
-  const Identifier* parameters = functionBody->parameters();
-  size_t parameterCount = functionBody->parameterCount();
+  FunctionParameters& parameters = *functionBody->parameters();
+  size_t parameterCount = parameters.size();
   m_nextParameterIndex =
       -RegisterFile::CallFrameHeaderSize - parameterCount - 1;
   m_parameters.grow(1 + parameterCount);  // reserve space for "this"
