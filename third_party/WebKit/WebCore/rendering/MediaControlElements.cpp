@@ -644,9 +644,7 @@ MediaControlVolumeSliderElement::MediaControlVolumeSliderElement(
     : MediaControlInputElement(document,
                                MEDIA_CONTROLS_VOLUME_SLIDER,
                                "range",
-                               element) {
-  setAttribute(maxAttr, "1");
-}
+                               element) {}
 
 void MediaControlVolumeSliderElement::defaultEventHandler(Event* event) {
   // Left button is 0. Rejects mouse events not from left button.
