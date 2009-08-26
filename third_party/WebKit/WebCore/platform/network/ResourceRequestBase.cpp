@@ -65,7 +65,7 @@ auto_ptr<ResourceRequest> ResourceRequestBase::adopt(
         encoding1, encoding2, encoding3);
   }
   request->setHTTPBody(data->m_httpBody);
-  request->setAllowHTTPCookies(data->m_allowHTTPCookies);
+  request->setAllowCookies(data->m_allowCookies);
   return request;
 }
 
@@ -90,7 +90,7 @@ auto_ptr<CrossThreadResourceRequestData> ResourceRequestBase::copyData() const {
   }
   if (m_httpBody)
     data->m_httpBody = m_httpBody->deepCopy();
-  data->m_allowHTTPCookies = m_allowHTTPCookies;
+  data->m_allowCookies = m_allowCookies;
   return data;
 }
 
@@ -245,16 +245,16 @@ void ResourceRequestBase::setHTTPBody(PassRefPtr<FormData> httpBody) {
     m_platformRequestUpdated = false;
 }
 
-bool ResourceRequestBase::allowHTTPCookies() const {
+bool ResourceRequestBase::allowCookies() const {
   updateResourceRequest();
 
-  return m_allowHTTPCookies;
+  return m_allowCookies;
 }
 
-void ResourceRequestBase::setAllowHTTPCookies(bool allowHTTPCookies) {
+void ResourceRequestBase::setAllowCookies(bool allowCookies) {
   updateResourceRequest();
 
-  m_allowHTTPCookies = allowHTTPCookies;
+  m_allowCookies = allowCookies;
 
   if (url().protocolInHTTPFamily())
     m_platformRequestUpdated = false;
@@ -293,7 +293,7 @@ bool equalIgnoringHeaderFields(const ResourceRequestBase& a,
   if (a.httpMethod() != b.httpMethod())
     return false;
 
-  if (a.allowHTTPCookies() != b.allowHTTPCookies())
+  if (a.allowCookies() != b.allowCookies())
     return false;
 
   FormData* formDataA = a.httpBody();

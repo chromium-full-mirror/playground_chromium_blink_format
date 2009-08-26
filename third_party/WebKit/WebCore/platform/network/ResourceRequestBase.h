@@ -121,8 +121,8 @@ class ResourceRequestBase {
   FormData* httpBody() const;
   void setHTTPBody(PassRefPtr<FormData> httpBody);
 
-  bool allowHTTPCookies() const;
-  void setAllowHTTPCookies(bool allowHTTPCookies);
+  bool allowCookies() const;
+  void setAllowCookies(bool allowCookies);
 
   bool isConditional() const;
 
@@ -146,7 +146,7 @@ class ResourceRequestBase {
         m_cachePolicy(policy),
         m_timeoutInterval(unspecifiedTimeoutInterval),
         m_httpMethod("GET"),
-        m_allowHTTPCookies(true),
+        m_allowCookies(true),
         m_resourceRequestUpdated(true),
         m_platformRequestUpdated(false),
         m_reportUploadProgress(false) {}
@@ -163,7 +163,7 @@ class ResourceRequestBase {
   HTTPHeaderMap m_httpHeaderFields;
   Vector<String> m_responseContentDispositionEncodingFallbackArray;
   RefPtr<FormData> m_httpBody;
-  bool m_allowHTTPCookies;
+  bool m_allowCookies;
   mutable bool m_resourceRequestUpdated;
   mutable bool m_platformRequestUpdated;
   bool m_reportUploadProgress;
@@ -191,7 +191,7 @@ struct CrossThreadResourceRequestData {
   OwnPtr<CrossThreadHTTPHeaderMapData> m_httpHeaders;
   Vector<String> m_responseContentDispositionEncodingFallbackArray;
   RefPtr<FormData> m_httpBody;
-  bool m_allowHTTPCookies;
+  bool m_allowCookies;
 };
 
 unsigned initializeMaximumHTTPConnectionCountPerHost();
