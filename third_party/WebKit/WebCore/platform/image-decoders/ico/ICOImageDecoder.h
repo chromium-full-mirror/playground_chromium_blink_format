@@ -41,7 +41,6 @@ class PNGImageDecoder;
 class ICOImageDecoder : public ImageDecoder {
  public:
   ICOImageDecoder();
-  virtual ~ICOImageDecoder();
 
   // ImageDecoder
   virtual String filenameExtension() const { return "ico"; }
@@ -130,9 +129,9 @@ class ICOImageDecoder : public ImageDecoder {
   IconDirectoryEntries m_dirEntries;
 
   // The image decoders for the various frames.
-  typedef Vector<BMPImageReader*> BMPReaders;
+  typedef Vector<OwnPtr<BMPImageReader>> BMPReaders;
   BMPReaders m_bmpReaders;
-  typedef Vector<PNGImageDecoder*> PNGDecoders;
+  typedef Vector<OwnPtr<PNGImageDecoder>> PNGDecoders;
   PNGDecoders m_pngDecoders;
 
   // Valid only while a BMPImageReader is decoding, this holds the size
