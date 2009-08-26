@@ -84,6 +84,11 @@ void LayoutTestController::queueLoad(JSStringRef url, JSStringRef target) {
 
 void LayoutTestController::setAcceptsEditing(bool acceptsEditing) {}
 
+void LayoutTestController::setAlwaysAcceptCookies(bool alwaysAcceptCookies) {
+  // FIXME: Implement this (and restore the default value before running each
+  // test in DumpRenderTree.cpp).
+}
+
 void LayoutTestController::setCustomPolicyDelegate(bool, bool) {
   // FIXME: implement
 }

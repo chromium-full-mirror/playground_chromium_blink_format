@@ -224,6 +224,9 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool windowIsKey() const { return m_windowIsKey; }
   void setWindowIsKey(bool windowIsKey);
 
+  bool alwaysAcceptCookies() const { return m_alwaysAcceptCookies; }
+  void setAlwaysAcceptCookies(bool alwaysAcceptCookies);
+
   bool globalFlag() const { return m_globalFlag; }
   void setGlobalFlag(bool globalFlag) { m_globalFlag = globalFlag; }
 
@@ -271,6 +274,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                       // notifyDone() has not yet been called.
   bool m_willSendRequestReturnsNullOnRedirect;
   bool m_windowIsKey;
+  bool m_alwaysAcceptCookies;
 
   bool m_globalFlag;
 
