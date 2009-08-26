@@ -26,37 +26,4 @@
 #include "NumberObject.h"
 #include "UString.h"
 
-namespace JSC {
-
-JSValue JSAPIValueWrapper::toPrimitive(ExecState*,
-                                       PreferredPrimitiveType) const {
-  ASSERT_NOT_REACHED();
-  return JSValue();
-}
-
-bool JSAPIValueWrapper::getPrimitiveNumber(ExecState*, double&, JSValue&) {
-  ASSERT_NOT_REACHED();
-  return false;
-}
-
-bool JSAPIValueWrapper::toBoolean(ExecState*) const {
-  ASSERT_NOT_REACHED();
-  return false;
-}
-
-double JSAPIValueWrapper::toNumber(ExecState*) const {
-  ASSERT_NOT_REACHED();
-  return 0;
-}
-
-UString JSAPIValueWrapper::toString(ExecState*) const {
-  ASSERT_NOT_REACHED();
-  return UString();
-}
-
-JSObject* JSAPIValueWrapper::toObject(ExecState*) const {
-  ASSERT_NOT_REACHED();
-  return 0;
-}
-
-}  // namespace JSC
+namespace JSC {}  // namespace JSC
