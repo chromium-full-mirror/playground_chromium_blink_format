@@ -41,26 +41,6 @@ class Q_AUTOTEST_EXPORT QWebHistoryItemPrivate : public QSharedData {
       item->deref();
   }
 
-  /*   QByteArray
-     saveStateWithoutVersionControl(QWebHistory::HistoryStateVersion version)
-     {
-         QByteArray buffer;
-         switch(version){
-             case QWebHistory::HistoryVersion1:
-                 buffer=item->saveState(version);
-                 break;
-             default:{}
-         }
-         return buffer;
-     }
-
-     bool restoreStateWithoutVersionControl(QWebHistory::HistoryStateVersion
-     version,QDataStream& stream)
-     {
-
-     }
- */
-
   WebCore::HistoryItem* item;
 };
 
