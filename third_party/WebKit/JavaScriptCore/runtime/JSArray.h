@@ -40,6 +40,7 @@ struct ArrayStorage {
 
 class JSArray : public JSObject {
   friend class JIT;
+  friend class Walker;
 
  public:
   explicit JSArray(PassRefPtr<Structure>);
@@ -147,6 +148,9 @@ inline JSArray* asArray(JSValue value) {
 
 inline bool isJSArray(JSGlobalData* globalData, JSValue v) {
   return v.isCell() && v.asCell()->vptr() == globalData->jsArrayVPtr;
+}
+inline bool isJSArray(JSGlobalData* globalData, JSCell* cell) {
+  return cell->vptr() == globalData->jsArrayVPtr;
 }
 
 void JSArray::markChildrenDirect(MarkStack& markStack) {
