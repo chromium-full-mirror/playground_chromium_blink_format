@@ -37,10 +37,10 @@ class CanvasBuffer : public CanvasObject {
  public:
   virtual ~CanvasBuffer() { deleteObject(); }
 
-  static PassRefPtr<CanvasBuffer> create(GraphicsContext3D*);
+  static PassRefPtr<CanvasBuffer> create(CanvasRenderingContext3D*);
 
  protected:
-  CanvasBuffer(GraphicsContext3D*);
+  CanvasBuffer(CanvasRenderingContext3D*);
 
   virtual void _deleteObject(Platform3DObject o);
 };

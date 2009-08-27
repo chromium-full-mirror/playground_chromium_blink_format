@@ -744,7 +744,7 @@ void Node::setNeedsStyleRecalc(StyleChangeType changeType) {
 
   if (!(changeType == InlineStyleChange &&
         (m_styleChange == FullStyleChange ||
-         m_styleChange == AnimationStyleChange)))
+         m_styleChange == SyntheticStyleChange)))
     m_styleChange = changeType;
 
   if (m_styleChange != NoStyleChange) {

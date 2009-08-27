@@ -108,10 +108,6 @@ GraphicsContext3D::~GraphicsContext3D() {
   CGLDestroyContext(m_contextObj);
 }
 
-PlatformGraphicsContext3D GraphicsContext3D::platformGraphicsContext3D() const {
-  return m_contextObj;
-}
-
 void GraphicsContext3D::checkError() const {
   // FIXME: This needs to only be done in the debug context. It will probably
   // throw an exception
@@ -155,7 +151,9 @@ void GraphicsContext3D::reshape(int width, int height) {
     notImplemented();
   }
 
+  ::glViewport(0, 0, m_currentWidth, m_currentHeight);
   ::glClear(GL_COLOR_BUFFER_BIT);
+  ::glFlush();
 }
 
 static inline void ensureContext(CGLContextObj context) {

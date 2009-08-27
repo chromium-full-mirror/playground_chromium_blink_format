@@ -34,8 +34,8 @@
 #include "Frame.h"
 #include "FrameView.h"
 #include "GraphicsLayer.h"
-#include "HitTestRequest.h"
 #include "HitTestResult.h"
+#include "HTMLCanvasElement.h"
 #include "Page.h"
 #include "RenderLayerBacking.h"
 #include "RenderVideo.h"
@@ -879,6 +879,7 @@ bool RenderLayerCompositor::requiresCompositingLayer(
   return (inCompositingMode() && layer->isRootLayer()) ||
          requiresCompositingForTransform(layer->renderer()) ||
          requiresCompositingForVideo(layer->renderer()) ||
+         requiresCompositingForCanvas(layer->renderer()) ||
          layer->renderer()->style()->backfaceVisibility() ==
              BackfaceVisibilityHidden ||
          clipsCompositingDescendants(layer) ||
@@ -958,6 +959,20 @@ bool RenderLayerCompositor::requiresCompositingForVideo(
     RenderVideo* video = toRenderVideo(renderer);
     return canAccelerateVideoRendering(video);
   }
+#endif
+  return false;
+}
+
+bool RenderLayerCompositor::requiresCompositingForCanvas(
+    RenderObject* renderer) const {
+#if ENABLE(3D_CANVAS)
+  if (renderer->isCanvas()) {
+    HTMLCanvasElement* canvas =
+        static_cast<HTMLCanvasElement*>(renderer->node());
+    return canvas->is3D();
+  }
+#else
+  UNUSED_PARAM(renderer);
 #endif
   return false;
 }

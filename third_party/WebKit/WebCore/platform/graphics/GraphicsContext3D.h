@@ -34,10 +34,14 @@
 #include <OpenGL/OpenGL.h>
 
 typedef void* PlatformGraphicsContext3D;
+const PlatformGraphicsContext3D NullPlatformGraphicsContext3D = 0;
 typedef GLuint Platform3DObject;
+const Platform3DObject NullPlatform3DObject = 0;
 #else
 typedef void* PlatformGraphicsContext3D;
+const PlatformGraphicsContext3D NullPlatformGraphicsContext3D = 0;
 typedef int Platform3DObject;
+const Platform3DObject NullPlatform3DObject = 0;
 #endif
 
 namespace WebCore {
@@ -59,8 +63,17 @@ class GraphicsContext3D : Noncopyable {
   GraphicsContext3D();
   virtual ~GraphicsContext3D();
 
-  PlatformGraphicsContext3D platformGraphicsContext3D() const;
-
+#if PLATFORM(MAC)
+  PlatformGraphicsContext3D platformGraphicsContext3D() const {
+    return m_contextObj;
+  }
+  Platform3DObject platformTexture() const { return m_texture; }
+#else
+  PlatformGraphicsContext3D platformGraphicsContext3D() const {
+    return NullPlatformGraphicsContext3D;
+  }
+  Platform3DObject platformTexture() const { return NullPlatform3DObject; }
+#endif
   void checkError() const;
 
   virtual void makeContextCurrent();
@@ -278,11 +291,6 @@ class GraphicsContext3D : Noncopyable {
                     unsigned width,
                     unsigned height,
                     HTMLCanvasElement* canvas);
-
-  PlatformGraphicsContext3D context3D() const { return m_contextObj; }
-  Platform3DObject texture3D() const {
-    return static_cast<Platform3DObject>(m_texture);
-  }
 
   void reshape(int width, int height);
 

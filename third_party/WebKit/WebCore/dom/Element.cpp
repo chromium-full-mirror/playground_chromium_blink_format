@@ -848,7 +848,7 @@ void Element::recalcStyle(StyleChange change) {
         pseudoStyleCacheIsInvalid(currentStyle.get(), newStyle.get())) {
       setRenderStyle(newStyle);
     } else if (needsStyleRecalc() &&
-               (styleChangeType() != AnimationStyleChange) &&
+               (styleChangeType() != SyntheticStyleChange) &&
                (document()->usesSiblingRules() ||
                 document()->usesDescendantRules())) {
       // Although no change occurred, we use the new style so that the cousin
@@ -862,7 +862,7 @@ void Element::recalcStyle(StyleChange change) {
         renderer()->setStyleInternal(newStyle.get());
       else
         setRenderStyle(newStyle);
-    } else if (styleChangeType() == AnimationStyleChange)
+    } else if (styleChangeType() == SyntheticStyleChange)
       setRenderStyle(newStyle);
 
     if (change != Force) {

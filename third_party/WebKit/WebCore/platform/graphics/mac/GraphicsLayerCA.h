@@ -87,6 +87,10 @@ class GraphicsLayerCA : public GraphicsLayer {
   virtual void setNeedsDisplay();
   virtual void setNeedsDisplayInRect(const FloatRect&);
 
+#if ENABLE(3D_CANVAS)
+  virtual void setGraphicsContext3DNeedsDisplay();
+#endif
+
   virtual void setContentsRect(const IntRect&);
 
   virtual void suspendAnimations(double time);
@@ -103,6 +107,9 @@ class GraphicsLayerCA : public GraphicsLayer {
 
   virtual void setContentsToImage(Image*);
   virtual void setContentsToVideo(PlatformLayer*);
+#if ENABLE(3D_CANVAS)
+  virtual void setContentsToGraphicsContext3D(const GraphicsContext3D*);
+#endif
 
   virtual PlatformLayer* platformLayer() const;
 
@@ -206,6 +213,9 @@ class GraphicsLayerCA : public GraphicsLayer {
 
   void updateContentsImage();
   void updateContentsVideo();
+#if ENABLE(3D_CANVAS)
+  void updateContentsGraphicsContext3D();
+#endif
   void updateContentsRect();
   void updateGeometryOrientation();
   void updateMaskLayer();
@@ -240,9 +250,12 @@ class GraphicsLayerCA : public GraphicsLayer {
     DirtyRectsChanged = 1 << 16,
     ContentsImageChanged = 1 << 17,
     ContentsVideoChanged = 1 << 18,
-    ContentsRectChanged = 1 << 19,
-    GeometryOrientationChanged = 1 << 20,
-    MaskLayerChanged = 1 << 21
+#if ENABLE(3D_CANVAS)
+    ContentsGraphicsContext3DChanged = 1 << 19,
+#endif
+    ContentsRectChanged = 1 << 20,
+    GeometryOrientationChanged = 1 << 21,
+    MaskLayerChanged = 1 << 22
   };
   typedef unsigned LayerChangeFlags;
   void noteLayerPropertyChanged(LayerChangeFlags flags);
@@ -257,6 +270,10 @@ class GraphicsLayerCA : public GraphicsLayer {
     NoContentsLayer = 0,
     ContentsLayerForImage,
     ContentsLayerForVideo
+#if ENABLE(3D_CANVAS)
+    ,
+    ContentsLayerForGraphicsLayer3D
+#endif
   };
 
   ContentsLayerPurpose m_contentsLayerPurpose;
@@ -307,6 +324,11 @@ class GraphicsLayerCA : public GraphicsLayer {
   Vector<FloatRect> m_dirtyRects;
 
   LayerChangeFlags m_uncommittedChanges;
+
+#if ENABLE(3D_CANVAS)
+  PlatformGraphicsContext3D m_platformGraphicsContext3D;
+  Platform3DObject m_platformTexture;
+#endif
 };
 
 }  // namespace WebCore

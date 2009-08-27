@@ -1033,7 +1033,7 @@ bool AnimationBase::animationOfPropertyIsAccelerated(int prop) {
 void AnimationBase::setNeedsStyleRecalc(Node* node) {
   ASSERT(!node || (node->document() && !node->document()->inPageCache()));
   if (node)
-    node->setNeedsStyleRecalc(AnimationStyleChange);
+    node->setNeedsStyleRecalc(SyntheticStyleChange);
 }
 
 double AnimationBase::duration() const {

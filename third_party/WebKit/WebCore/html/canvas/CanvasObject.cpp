@@ -28,14 +28,17 @@
 #if ENABLE(3D_CANVAS)
 
 #include "CanvasObject.h"
-#include "CanvasRenderingContext.h"
+#include "CanvasRenderingContext3D.h"
 
 namespace WebCore {
 
-CanvasObject::CanvasObject(GraphicsContext3D* context)
+CanvasObject::CanvasObject(CanvasRenderingContext3D* context)
     : m_object(0), m_context(context) {}
 
-CanvasObject::~CanvasObject() {}
+CanvasObject::~CanvasObject() {
+  if (m_context)
+    m_context->removeObject(this);
+}
 
 void CanvasObject::setObject(Platform3DObject object) {
   if (object == m_object)
@@ -48,7 +51,7 @@ void CanvasObject::setObject(Platform3DObject object) {
 void CanvasObject::deleteObject() {
   if (m_object) {
     if (m_context) {
-      m_context->makeContextCurrent();
+      m_context->graphicsContext3D()->makeContextCurrent();
       _deleteObject(m_object);
     }
     m_object = 0;
