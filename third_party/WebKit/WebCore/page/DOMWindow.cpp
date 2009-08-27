@@ -36,6 +36,7 @@
 #include "Console.h"
 #include "DOMSelection.h"
 #include "DOMTimer.h"
+#include "PageTransitionEvent.h"
 #include "Document.h"
 #include "Element.h"
 #include "EventException.h"
@@ -267,6 +268,7 @@ void DOMWindow::dispatchAllPendingUnloadEvents() {
     if (!listeners)
       continue;
     RegisteredEventListenerVector listenersCopy = *listeners;
+    window->dispatchPageTransitionEvent(EventNames().pagehideEvent, false);
     window->dispatchUnloadEvent(&listenersCopy);
   }
 
@@ -1360,6 +1362,12 @@ PassRefPtr<BeforeUnloadEvent> DOMWindow::dispatchBeforeUnloadEvent(
   return beforeUnloadEvent.release();
 }
 
+void DOMWindow::dispatchPageTransitionEvent(const AtomicString& eventType,
+                                            bool persisted) {
+  dispatchEventWithDocumentAsTarget(
+      PageTransitionEvent::create(eventType, persisted));
+}
+
 void DOMWindow::removeAllEventListeners() {
   size_t size = m_eventListeners.size();
   for (size_t i = 0; i < size; ++i)
@@ -1629,6 +1637,22 @@ EventListener* DOMWindow::ononline() const {
 
 void DOMWindow::setOnonline(PassRefPtr<EventListener> eventListener) {
   setAttributeEventListener(eventNames().onlineEvent, eventListener);
+}
+
+EventListener* DOMWindow::onpagehide() const {
+  return getAttributeEventListener(eventNames().pagehideEvent);
+}
+
+void DOMWindow::setOnpagehide(PassRefPtr<EventListener> eventListener) {
+  setAttributeEventListener(eventNames().pagehideEvent, eventListener);
+}
+
+EventListener* DOMWindow::onpageshow() const {
+  return getAttributeEventListener(eventNames().pageshowEvent);
+}
+
+void DOMWindow::setOnpageshow(PassRefPtr<EventListener> eventListener) {
+  setAttributeEventListener(eventNames().pageshowEvent, eventListener);
 }
 
 EventListener* DOMWindow::onreset() const {

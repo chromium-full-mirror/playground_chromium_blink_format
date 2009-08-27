@@ -281,6 +281,8 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   void dispatchUnloadEvent(RegisteredEventListenerVector* = 0);
   PassRefPtr<BeforeUnloadEvent> dispatchBeforeUnloadEvent(
       RegisteredEventListenerVector* = 0);
+  void dispatchPageTransitionEvent(const AtomicString& eventType,
+                                   bool persisted);
 
   // Used for legacy "onEvent" property APIs.
   void setAttributeEventListener(const AtomicString& eventType,
@@ -348,6 +350,10 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   void setOnoffline(PassRefPtr<EventListener>);
   EventListener* ononline() const;
   void setOnonline(PassRefPtr<EventListener>);
+  EventListener* onpagehide() const;
+  void setOnpagehide(PassRefPtr<EventListener>);
+  EventListener* onpageshow() const;
+  void setOnpageshow(PassRefPtr<EventListener>);
   EventListener* onreset() const;
   void setOnreset(PassRefPtr<EventListener>);
   EventListener* onresize() const;

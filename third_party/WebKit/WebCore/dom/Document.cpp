@@ -95,6 +95,7 @@
 #include "NodeWithIndex.h"
 #include "OverflowEvent.h"
 #include "Page.h"
+#include "PageTransitionEvent.h"
 #include "PlatformKeyboardEvent.h"
 #include "ProcessingInstruction.h"
 #include "ProgressEvent.h"
@@ -1694,6 +1695,7 @@ void Document::implicitClose() {
 
   ImageLoader::dispatchPendingLoadEvents();
   dispatchLoadEvent();
+  dispatchPageTransitionEvent(EventNames().pageshowEvent, false);
   if (f)
     f->loader()->handledOnloadEvents();
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
@@ -2862,6 +2864,15 @@ void Document::dispatchLoadEvent() {
   domWindow->dispatchLoadEvent();
 }
 
+void Document::dispatchPageTransitionEvent(const AtomicString& eventType,
+                                           bool persisted) {
+  ASSERT(!eventDispatchForbidden());
+  DOMWindow* domWindow = this->domWindow();
+  if (!domWindow)
+    return;
+  domWindow->dispatchPageTransitionEvent(eventType, persisted);
+}
+
 PassRefPtr<Event> Document::createEvent(const String& eventType,
                                         ExceptionCode& ec) {
   if (eventType == "Event" || eventType == "Events" ||
@@ -2877,6 +2888,8 @@ PassRefPtr<Event> Document::createEvent(const String& eventType,
     return MutationEvent::create();
   if (eventType == "OverflowEvent")
     return OverflowEvent::create();
+  if (eventType == "PageTransitionEvent")
+    return PageTransitionEvent::create();
   if (eventType == "ProgressEvent")
     return ProgressEvent::create();
 #if ENABLE(DOM_STORAGE)

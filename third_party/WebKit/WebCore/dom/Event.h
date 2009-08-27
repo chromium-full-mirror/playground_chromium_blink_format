@@ -110,6 +110,7 @@ class Event : public RefCounted<Event> {
   virtual bool isWheelEvent() const;
   virtual bool isBeforeTextInsertedEvent() const;
   virtual bool isOverflowEvent() const;
+  virtual bool isPageTransitionEvent() const;
   virtual bool isProgressEvent() const;
   virtual bool isXMLHttpRequestProgressEvent() const;
   virtual bool isWebKitAnimationEvent() const;

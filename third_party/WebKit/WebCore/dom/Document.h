@@ -618,6 +618,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                            bool canBubbleArg,
                            bool cancelableArg);
   void dispatchLoadEvent();
+  void dispatchPageTransitionEvent(const AtomicString& eventType,
+                                   bool persisted);
 
   PassRefPtr<Event> createEvent(const String& eventType, ExceptionCode&);
 
