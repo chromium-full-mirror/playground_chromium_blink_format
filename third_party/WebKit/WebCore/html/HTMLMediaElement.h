@@ -218,6 +218,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   // loading
   void selectMediaResource();
   void loadResource(const KURL&, ContentType&);
+  void scheduleNextSourceChild();
   void loadNextSourceChild();
   void userCancelledLoad();
   bool havePotentialSourceChild();
@@ -233,6 +234,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void loadInternal();
   void playInternal();
   void pauseInternal();
+
+  void prepareForLoad();
 
   bool processingUserGesture() const;
   bool processingMediaPlayerCallback() const {
