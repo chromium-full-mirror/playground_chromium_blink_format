@@ -79,24 +79,19 @@ bool RGBA32Buffer::setSize(int newWidth, int newHeight) {
 }
 
 NativeImagePtr RGBA32Buffer::asNewNativeImage() const {
-  const unsigned char* bytes = (const unsigned char*)m_bytes.data();
-
-  typedef wxPixelData<wxBitmap, wxAlphaPixelFormat> WxPixelData;
-
   wxBitmap* bmp = new wxBitmap(width(), height(), 32);
+  typedef wxPixelData<wxBitmap, wxAlphaPixelFormat> WxPixelData;
   WxPixelData data(*bmp);
-
-  int rowCounter = 0;
-  long pixelCounter = 0;
-
-  WxPixelData::Iterator p(data);
-
-  WxPixelData::Iterator rowStart = p;
 
   // NB: It appears that the data is in BGRA format instead of RGBA format.
   // This code works properly on both ppc and intel, meaning the issue is
   // likely not an issue of byte order getting mixed up on different archs.
-  for (long i = 0; i < m_bytes.size() * sizeof(PixelData);
+  const unsigned char* bytes = (const unsigned char*)m_bytes.data();
+  int rowCounter = 0;
+  long pixelCounter = 0;
+  WxPixelData::Iterator p(data);
+  WxPixelData::Iterator rowStart = p;
+  for (size_t i = 0; i < m_bytes.size() * sizeof(PixelData);
        i += sizeof(PixelData)) {
     p.Red() = bytes[i + 2];
     p.Green() = bytes[i + 1];
