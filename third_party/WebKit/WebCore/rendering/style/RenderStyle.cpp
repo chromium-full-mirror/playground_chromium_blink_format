@@ -317,6 +317,8 @@ StyleDifference RenderStyle::diff(
             *other->rareNonInheritedData->flexibleBox.get())
       return StyleDifferenceLayout;
 
+    // FIXME: We should add an optimized form of layout that just recomputes
+    // visual overflow.
     if (!rareNonInheritedData->shadowDataEquivalent(
             *other->rareNonInheritedData.get()))
       return StyleDifferenceLayout;
@@ -477,6 +479,15 @@ StyleDifference RenderStyle::diff(
 
   if (inherited->m_effectiveZoom != other->inherited->m_effectiveZoom)
     return StyleDifferenceLayout;
+
+  if (rareNonInheritedData->opacity == 1 &&
+          other->rareNonInheritedData->opacity < 1 ||
+      rareNonInheritedData->opacity < 1 &&
+          other->rareNonInheritedData->opacity == 1) {
+    // FIXME: We should add an optimized form of layout that just recomputes
+    // visual overflow.
+    return StyleDifferenceLayout;
+  }
 
   // Make sure these left/top/right/bottom checks stay below all layout checks
   // and above
