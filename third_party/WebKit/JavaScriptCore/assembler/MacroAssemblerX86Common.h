@@ -429,10 +429,7 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
   }
 
   void move(ImmPtr imm, RegisterID dest) {
-    if (CAN_SIGN_EXTEND_U32_64(imm.asIntptr()))
-      m_assembler.movl_i32r(static_cast<int32_t>(imm.asIntptr()), dest);
-    else
-      m_assembler.movq_i64r(imm.asIntptr(), dest);
+    m_assembler.movq_i64r(imm.asIntptr(), dest);
   }
 
   void swap(RegisterID reg1, RegisterID reg2) {
