@@ -235,6 +235,7 @@ class InspectorController
   void setFrontendProxyObject(ScriptState* state,
                               ScriptObject webInspectorObj,
                               ScriptObject injectedScriptObj = ScriptObject());
+  ScriptState* frontendScriptState() const { return m_scriptState; }
 
   void populateScriptObjects();
   void resetScriptObjects();

@@ -112,7 +112,7 @@ class ScriptValue {
     m_value.Clear();
   }
 
-  ~ScriptValue() { clear(); }
+  virtual ~ScriptValue() { clear(); }
 
   v8::Handle<v8::Value> v8Value() const { return m_value; }
   bool getString(String& result) const;
