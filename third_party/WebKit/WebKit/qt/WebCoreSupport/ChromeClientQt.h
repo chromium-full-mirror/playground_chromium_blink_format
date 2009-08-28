@@ -121,6 +121,7 @@ class ChromeClientQt : public ChromeClient {
   virtual PlatformWidget platformWindow() const;
   virtual void contentsSizeChanged(Frame*, const IntSize&) const;
 
+  virtual void scrollbarsModeDidChange() const {}
   virtual void mouseDidMoveOverElement(const HitTestResult&,
                                        unsigned modifierFlags);
 

@@ -115,6 +115,7 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void contentsSizeChanged(WebCore::Frame*,
                                    const WebCore::IntSize&) const;
 
+  virtual void scrollbarsModeDidChange() const {}
   virtual void mouseDidMoveOverElement(const WebCore::HitTestResult&,
                                        unsigned modifierFlags);
 

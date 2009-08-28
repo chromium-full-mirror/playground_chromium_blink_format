@@ -131,6 +131,7 @@ class ChromeClientHaiku : public ChromeClient {
   void scrollBackingStore(int, int, const IntRect&, const IntRect&);
   void updateBackingStore();
 
+  void scrollbarsModeDidChange() const {}
   void mouseDidMoveOverElement(const HitTestResult&, unsigned modifierFlags);
 
   void setToolTip(const String&);

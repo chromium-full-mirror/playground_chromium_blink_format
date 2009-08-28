@@ -146,6 +146,12 @@ WEBKIT_API void webkit_web_frame_print(WebKitWebFrame* frame);
 WEBKIT_API WebKitLoadStatus
 webkit_web_frame_get_load_status(WebKitWebFrame* frame);
 
+WEBKIT_API GtkPolicyType
+webkit_web_frame_get_horizontal_scrollbar_policy(WebKitWebFrame* frame);
+
+WEBKIT_API GtkPolicyType
+webkit_web_frame_get_vertical_scrollbar_policy(WebKitWebFrame* frame);
+
 G_END_DECLS
 
 #endif

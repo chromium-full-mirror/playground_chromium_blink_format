@@ -98,6 +98,10 @@ void Chrome::scrollRectIntoView(const IntRect& rect,
   m_client->scrollRectIntoView(rect, scrollView);
 }
 
+void Chrome::scrollbarsModeDidChange() const {
+  m_client->scrollbarsModeDidChange();
+}
+
 void Chrome::setWindowRect(const FloatRect& rect) const {
   m_client->setWindowRect(rect);
 }

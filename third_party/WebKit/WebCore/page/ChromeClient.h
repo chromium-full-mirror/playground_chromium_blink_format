@@ -150,6 +150,7 @@ class ChromeClient {
       const = 0;  // Currently only Mac has a non empty implementation.
   // End methods used by HostWindow.
 
+  virtual void scrollbarsModeDidChange() const = 0;
   virtual void mouseDidMoveOverElement(const HitTestResult&,
                                        unsigned modifierFlags) = 0;
 

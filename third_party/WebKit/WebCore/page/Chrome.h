@@ -70,6 +70,7 @@ class Chrome : public HostWindow {
   virtual IntRect windowToScreen(const IntRect&) const;
   virtual PlatformWidget platformWindow() const;
   virtual void scrollRectIntoView(const IntRect&, const ScrollView*) const;
+  virtual void scrollbarsModeDidChange() const;
 
   void contentsSizeChanged(Frame*, const IntSize&) const;
 
