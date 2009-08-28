@@ -307,7 +307,6 @@ class InspectorController
   void addStartProfilingMessageToConsole(const JSC::UString& title,
                                          unsigned lineNumber,
                                          const JSC::UString& sourceURL);
-  void addScriptProfile(JSC::Profile*);
   const ProfilesArray& profiles() const { return m_profiles; }
 
   bool isRecordingUserInitiatedProfile() const {

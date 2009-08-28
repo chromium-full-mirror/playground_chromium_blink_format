@@ -264,8 +264,7 @@ void InspectorController::inspect(Node* node) {
     return;
   }
 
-  if (windowVisible())
-    focusNode();
+  focusNode();
 }
 
 void InspectorController::focusNode() {
@@ -387,7 +386,7 @@ void InspectorController::addConsoleMessage(ScriptState* scriptState,
     m_consoleMessages.append(consoleMessage);
   }
 
-  if (windowVisible())
+  if (m_frontend)
     m_previousMessage->addToConsole(m_frontend.get());
 }
 
@@ -620,6 +619,10 @@ void InspectorController::close() {
 
   m_frontend.set(0);
   m_injectedScriptObj = ScriptObject();
+  // m_domAgent is RefPtr. Remove DOM listeners first to ensure that there are
+  // no references to the DOM agent from the DOM tree.
+  if (m_domAgent)
+    m_domAgent->setDocument(0);
   m_domAgent = 0;
   m_scriptState = 0;
 }
@@ -721,7 +724,7 @@ void InspectorController::pruneResources(ResourcesMap* resourceMap,
 
     if (!loaderToKeep || !resource->isSameLoader(loaderToKeep)) {
       removeResource(resource);
-      if (windowVisible())
+      if (m_frontend)
         resource->releaseScriptObject(m_frontend.get(), true);
     }
   }
@@ -752,7 +755,7 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
     m_domStorageResources.clear();
 #endif
 
-    if (windowVisible()) {
+    if (m_frontend) {
       resetScriptObjects();
 
       if (!loader->frameLoader()->isLoadingFromCachedPage()) {
@@ -867,7 +870,7 @@ void InspectorController::didLoadResourceFromMemoryCache(
 
   addResource(resource.get());
 
-  if (windowVisible())
+  if (m_frontend)
     resource->createScriptObject(m_frontend.get());
 }
 
@@ -896,7 +899,7 @@ void InspectorController::identifierForInitialRequest(
 
   addResource(resource.get());
 
-  if (windowVisible() && loader->frameLoader()->isLoadingFromCachedPage() &&
+  if (m_frontend && loader->frameLoader()->isLoadingFromCachedPage() &&
       resource == m_mainResource)
     resource->createScriptObject(m_frontend.get());
 }
@@ -923,7 +926,7 @@ void InspectorController::willSendRequest(
     resource->updateResponse(redirectResponse);
   }
 
-  if (resource != m_mainResource && windowVisible())
+  if (resource != m_mainResource && m_frontend)
     resource->createScriptObject(m_frontend.get());
 }
 
@@ -937,7 +940,7 @@ void InspectorController::didReceiveResponse(DocumentLoader*,
   resource->updateResponse(response);
   resource->markResponseReceivedTime();
 
-  if (windowVisible())
+  if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 }
 
@@ -950,7 +953,7 @@ void InspectorController::didReceiveContentLength(DocumentLoader*,
 
   resource->addLength(lengthReceived);
 
-  if (windowVisible())
+  if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 }
 
@@ -966,7 +969,7 @@ void InspectorController::didFinishLoading(DocumentLoader*,
 
   addResource(resource.get());
 
-  if (windowVisible())
+  if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 }
 
@@ -984,7 +987,7 @@ void InspectorController::didFailLoading(DocumentLoader*,
 
   addResource(resource.get());
 
-  if (windowVisible())
+  if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 }
 
@@ -1000,7 +1003,7 @@ void InspectorController::resourceRetrievedByXMLHttpRequest(
 
   resource->setXMLHttpResponseText(sourceString);
 
-  if (windowVisible())
+  if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 }
 
@@ -1017,7 +1020,7 @@ void InspectorController::scriptImported(unsigned long identifier,
   // thing by the Inspector. They should be made into distinct types.
   resource->setXMLHttpResponseText(ScriptString(sourceString));
 
-  if (windowVisible())
+  if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 }
 
@@ -1076,7 +1079,7 @@ void InspectorController::didOpenDatabase(Database* database,
 
   m_databaseResources.add(resource);
 
-  if (windowVisible())
+  if (m_frontend)
     resource->bind(m_frontend.get());
 }
 #endif
@@ -1100,7 +1103,7 @@ void InspectorController::didUseDOMStorage(StorageArea* storageArea,
                                           frame);
 
   m_domStorageResources.add(resource);
-  if (windowVisible())
+  if (m_frontend)
     resource->bind(m_frontend.get());
 }
 #endif
@@ -1124,8 +1127,10 @@ void InspectorController::addProfile(PassRefPtr<Profile> prpProfile,
   RefPtr<Profile> profile = prpProfile;
   m_profiles.append(profile);
 
-  if (windowVisible())
-    addScriptProfile(profile.get());
+  if (m_frontend) {
+    JSLock lock(SilenceAssertionsOnly);
+    m_frontend->addProfile(toJS(m_scriptState, profile.get()));
+  }
 
   addProfileFinishedMessageToConsole(profile, lineNumber, sourceURL);
 }
@@ -1154,14 +1159,6 @@ void InspectorController::addStartProfilingMessageToConsole(
   message += "/0\" started.";
   addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel, message,
                       lineNumber, sourceURL);
-}
-
-void InspectorController::addScriptProfile(Profile* profile) {
-  if (!m_frontend)
-    return;
-
-  JSLock lock(SilenceAssertionsOnly);
-  m_frontend->addProfile(toJS(m_scriptState, profile));
 }
 
 UString InspectorController::getCurrentUserInitiatedProfileName(
