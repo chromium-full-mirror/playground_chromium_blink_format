@@ -35,6 +35,8 @@
 #include <sqlite3.h>
 #include <windows.h>
 
+using namespace WebCore;
+
 // Defined in Chromium's codebase in third_party/sqlite/src/os_win.c
 extern "C" {
 int chromium_sqlite3_initialize_win_sqlite3_file(sqlite3_file* file,
@@ -56,7 +58,7 @@ int chromiumOpen(sqlite3_vfs*,
                  sqlite3_file* id,
                  int desiredFlags,
                  int* usedFlags) {
-  HANDLE h = WebCore::ChromiumBridge::databaseOpenFile(fileName, desiredFlags);
+  HANDLE h = ChromiumBridge::databaseOpenFile(fileName, desiredFlags);
   if (h == INVALID_HANDLE_VALUE) {
     if (desiredFlags & SQLITE_OPEN_READWRITE) {
       int newFlags =
@@ -83,10 +85,7 @@ int chromiumOpen(sqlite3_vfs*,
 // syncDir - determines if the directory to which this file belongs
 //           should be synched after the file is deleted.
 int chromiumDelete(sqlite3_vfs*, const char* fileName, int) {
-  bool deleted = WebCore::ChromiumBridge::databaseDeleteFile(fileName);
-  DWORD rc = WebCore::ChromiumBridge::databaseGetFileAttributes(fileName);
-  return ((rc == INVALID_FILE_ATTRIBUTES) && deleted ? SQLITE_OK
-                                                     : SQLITE_IOERR_DELETE);
+  return ChromiumBridge::databaseDeleteFile(fileName);
 }
 
 // Check the existance and status of the given file.
@@ -96,7 +95,7 @@ int chromiumDelete(sqlite3_vfs*, const char* fileName, int) {
 // flag - the type of test to make on this file.
 // res - the result.
 int chromiumAccess(sqlite3_vfs*, const char* fileName, int flag, int* res) {
-  DWORD attr = WebCore::ChromiumBridge::databaseGetFileAttributes(fileName);
+  DWORD attr = ChromiumBridge::databaseGetFileAttributes(fileName);
   switch (flag) {
     case SQLITE_ACCESS_READ:
     case SQLITE_ACCESS_EXISTS:
