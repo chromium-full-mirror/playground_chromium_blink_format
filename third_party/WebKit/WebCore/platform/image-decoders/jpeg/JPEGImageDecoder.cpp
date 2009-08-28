@@ -441,7 +441,7 @@ void JPEGImageDecoder::decode(bool sizeOnly) {
 static void convertCMYKToRGBA(RGBA32Buffer& dest,
                               int destY,
                               JSAMPROW src,
-                              int srcWidth
+                              JDIMENSION srcWidth
 #if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
                               ,
                               bool scaled,
@@ -462,7 +462,7 @@ static void convertCMYKToRGBA(RGBA32Buffer& dest,
     return;
   }
 #endif
-  for (unsigned x = 0; x < srcWidth; ++x) {
+  for (JDIMENSION x = 0; x < srcWidth; ++x) {
     unsigned c = *src++;
     unsigned m = *src++;
     unsigned y = *src++;
@@ -493,7 +493,7 @@ static void convertCMYKToRGBA(RGBA32Buffer& dest,
 static void convertRGBToRGBA(RGBA32Buffer& dest,
                              int destY,
                              JSAMPROW src,
-                             int srcWidth
+                             JDIMENSION srcWidth
 #if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
                              ,
                              bool scaled,
@@ -510,7 +510,7 @@ static void convertRGBToRGBA(RGBA32Buffer& dest,
     return;
   }
 #endif
-  for (unsigned x = 0; x < srcWidth; ++x) {
+  for (JDIMENSION x = 0; x < srcWidth; ++x) {
     unsigned r = *src++;
     unsigned g = *src++;
     unsigned b = *src++;
