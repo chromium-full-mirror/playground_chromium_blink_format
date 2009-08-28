@@ -43,7 +43,7 @@ namespace WebCore {
 
 // Use an array to hold dependents. It works like a ref-counted scheme.
 // A value can be added more than once to the DOM object.
-void createHiddenDependency(v8::Local<v8::Object> object,
+void createHiddenDependency(v8::Handle<v8::Object> object,
                             v8::Local<v8::Value> value,
                             int cacheIndex) {
   v8::Local<v8::Value> cache = object->GetInternalField(cacheIndex);
@@ -56,7 +56,7 @@ void createHiddenDependency(v8::Local<v8::Object> object,
   cacheArray->Set(v8::Integer::New(cacheArray->Length()), value);
 }
 
-void removeHiddenDependency(v8::Local<v8::Object> object,
+void removeHiddenDependency(v8::Handle<v8::Object> object,
                             v8::Local<v8::Value> value,
                             int cacheIndex) {
   v8::Local<v8::Value> cache = object->GetInternalField(cacheIndex);
