@@ -52,7 +52,6 @@ CALLBACK_FUNC_DECL(HTMLCanvasElementGetContext) {
   else {
     // FIXME: Add the conversion to CanvasRenderingContext3D when it is hooked
     // up.
-    ASSERT_NOT_REACHED();
     return v8::Handle<v8::Value>();
   }
 }
