@@ -55,7 +55,7 @@ void ImageSource::setData(SharedBuffer* data, bool allDataReceived) {
   // plugin will be
   // made.
   if (!m_decoder)
-    m_decoder = ImageDecoderQt::create(*data);
+    m_decoder = static_cast<NativeImageSourcePtr>(ImageDecoder::create(*data));
 
   if (!m_decoder)
     return;
