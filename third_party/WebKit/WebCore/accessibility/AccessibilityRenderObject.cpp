@@ -2156,7 +2156,7 @@ AccessibilityObject* AccessibilityRenderObject::activeDescendant() const {
 
   AccessibilityObject* obj =
       renderer()->document()->axObjectCache()->getOrCreate(target->renderer());
-  if (obj->isAccessibilityRenderObject())
+  if (obj && obj->isAccessibilityRenderObject())
     // an activedescendant is only useful if it has a renderer, because that's
     // what's needed to post the notification
     return obj;
