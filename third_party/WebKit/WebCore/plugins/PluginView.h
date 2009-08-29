@@ -320,7 +320,7 @@ class PluginView : public Widget,
   bool m_haveInitialized;
   bool m_isWaitingToStart;
 
-#if PLATFORM(GTK) || defined(Q_WS_X11)
+#if defined(XP_UNIX) || defined(Q_WS_X11)
   bool m_needsXEmbed;
 #endif
 
@@ -350,7 +350,7 @@ class PluginView : public Widget,
 #endif
 
  private:
-#if PLATFORM(GTK) || defined(Q_WS_X11)
+#if defined(XP_UNIX) || defined(Q_WS_X11)
   void setNPWindowIfNeeded();
 #elif defined(XP_MACOSX)
   NP_CGContext m_npCgContext;

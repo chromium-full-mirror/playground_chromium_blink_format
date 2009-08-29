@@ -763,7 +763,7 @@ PluginView::PluginView(Frame* parentFrame,
       m_isTransparent(false),
       m_haveInitialized(false),
       m_isWaitingToStart(false)
-#if PLATFORM(GTK) || defined(Q_WS_X11)
+#if defined(XP_UNIX) || defined(Q_WS_X11)
       ,
       m_needsXEmbed(false)
 #endif
@@ -1178,7 +1178,12 @@ static const char* MozillaUserAgent =
 #elif defined(XP_WIN)
     "Windows; U; Windows NT 5.1;"
 #elif defined(XP_UNIX)
+// The Gtk port uses X11 plugins in Mac.
+#if PLATFORM(DARWIN) && PLATFORM(GTK)
+    "X11; U; Intel Mac OS X;"
+#else
     "X11; U; Linux i686;"
+#endif
 #endif
     " en-US; rv:1.8.1) Gecko/20061010 Firefox/2.0";
 
