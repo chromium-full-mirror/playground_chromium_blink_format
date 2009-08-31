@@ -206,8 +206,8 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   void setSrc(const String&);
 
 #if ENABLE(DATALIST)
-  HTMLDataListElement* list();
-  HTMLOptionElement* selectedOption();
+  HTMLElement* list() const;
+  HTMLOptionElement* selectedOption() const;
 #endif
 
   int maxLength() const;
@@ -259,6 +259,10 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
     return !isRequiredFormControl();
   }
   virtual bool isRequiredFormControl() const;
+
+#if ENABLE(DATALIST)
+  HTMLDataListElement* dataList() const;
+#endif
 
   InputElementData m_data;
   int m_xPos;

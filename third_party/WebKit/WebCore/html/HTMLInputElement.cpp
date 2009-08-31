@@ -1747,7 +1747,11 @@ bool HTMLInputElement::placeholderShouldBeVisible() const {
 }
 
 #if ENABLE(DATALIST)
-HTMLDataListElement* HTMLInputElement::list() {
+HTMLElement* HTMLInputElement::list() const {
+  return dataList();
+}
+
+HTMLDataListElement* HTMLInputElement::dataList() const {
   if (!m_hasNonEmptyList)
     return 0;
 
@@ -1779,14 +1783,14 @@ HTMLDataListElement* HTMLInputElement::list() {
   return 0;
 }
 
-HTMLOptionElement* HTMLInputElement::selectedOption() {
+HTMLOptionElement* HTMLInputElement::selectedOption() const {
   String currentValue = value();
   // The empty value never matches to a datalist option because it
   // doesn't represent a suggestion according to the standard.
   if (currentValue.isEmpty())
     return 0;
 
-  HTMLDataListElement* sourceElement = list();
+  HTMLDataListElement* sourceElement = dataList();
   if (!sourceElement)
     return 0;
   RefPtr<HTMLCollection> options = sourceElement->options();
