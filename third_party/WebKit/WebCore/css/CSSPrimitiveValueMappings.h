@@ -383,16 +383,12 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(EFillRepeat e) : m_type(CSS_IDENT) {
     case RepeatFill:
       m_value.ident = CSSValueRepeat;
       break;
-    case RepeatXFill:
-      m_value.ident = CSSValueRepeatX;
-      break;
-    case RepeatYFill:
-      m_value.ident = CSSValueRepeatY;
-      break;
     case NoRepeatFill:
       m_value.ident = CSSValueNoRepeat;
+      break;
     case RoundFill:
       m_value.ident = CSSValueRound;
+      break;
     case SpaceFill:
       m_value.ident = CSSValueSpace;
       break;
@@ -404,10 +400,6 @@ inline CSSPrimitiveValue::operator EFillRepeat() const {
   switch (m_value.ident) {
     case CSSValueRepeat:
       return RepeatFill;
-    case CSSValueRepeatX:
-      return RepeatXFill;
-    case CSSValueRepeatY:
-      return RepeatYFill;
     case CSSValueNoRepeat:
       return NoRepeatFill;
     case CSSValueRound:

@@ -646,11 +646,12 @@ void RenderBoxModelObject::calculateBackgroundImageGeometry(
 
   tileSize = calculateFillTileSize(fillLayer, positioningAreaSize);
 
-  EFillRepeat backgroundRepeat = fillLayer->repeat();
+  EFillRepeat backgroundRepeatX = fillLayer->repeatX();
+  EFillRepeat backgroundRepeatY = fillLayer->repeatY();
 
   int xPosition = fillLayer->xPosition().calcMinValue(
       positioningAreaSize.width() - tileSize.width(), true);
-  if (backgroundRepeat == RepeatFill || backgroundRepeat == RepeatXFill)
+  if (backgroundRepeatX == RepeatFill)
     phase.setX(tileSize.width()
                    ? tileSize.width() - (xPosition + left) % tileSize.width()
                    : 0);
@@ -662,7 +663,7 @@ void RenderBoxModelObject::calculateBackgroundImageGeometry(
 
   int yPosition = fillLayer->yPosition().calcMinValue(
       positioningAreaSize.height() - tileSize.height(), true);
-  if (backgroundRepeat == RepeatFill || backgroundRepeat == RepeatYFill)
+  if (backgroundRepeatY == RepeatFill)
     phase.setY(tileSize.height()
                    ? tileSize.height() - (yPosition + top) % tileSize.height()
                    : 0);

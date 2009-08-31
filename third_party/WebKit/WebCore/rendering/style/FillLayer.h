@@ -61,7 +61,8 @@ struct FillLayer {
   }
   EFillBox clip() const { return static_cast<EFillBox>(m_clip); }
   EFillBox origin() const { return static_cast<EFillBox>(m_origin); }
-  EFillRepeat repeat() const { return static_cast<EFillRepeat>(m_repeat); }
+  EFillRepeat repeatX() const { return static_cast<EFillRepeat>(m_repeatX); }
+  EFillRepeat repeatY() const { return static_cast<EFillRepeat>(m_repeatY); }
   CompositeOperator composite() const {
     return static_cast<CompositeOperator>(m_composite);
   }
@@ -79,7 +80,8 @@ struct FillLayer {
   bool isAttachmentSet() const { return m_attachmentSet; }
   bool isClipSet() const { return m_clipSet; }
   bool isOriginSet() const { return m_originSet; }
-  bool isRepeatSet() const { return m_repeatSet; }
+  bool isRepeatXSet() const { return m_repeatXSet; }
+  bool isRepeatYSet() const { return m_repeatYSet; }
   bool isCompositeSet() const { return m_compositeSet; }
   bool isSizeSet() const { return m_sizeType != SizeNone; }
 
@@ -107,9 +109,13 @@ struct FillLayer {
     m_origin = b;
     m_originSet = true;
   }
-  void setRepeat(EFillRepeat r) {
-    m_repeat = r;
-    m_repeatSet = true;
+  void setRepeatX(EFillRepeat r) {
+    m_repeatX = r;
+    m_repeatXSet = true;
+  }
+  void setRepeatY(EFillRepeat r) {
+    m_repeatY = r;
+    m_repeatYSet = true;
   }
   void setComposite(CompositeOperator c) {
     m_composite = c;
@@ -128,7 +134,8 @@ struct FillLayer {
   void clearAttachment() { m_attachmentSet = false; }
   void clearClip() { m_clipSet = false; }
   void clearOrigin() { m_originSet = false; }
-  void clearRepeat() { m_repeatSet = false; }
+  void clearRepeatX() { m_repeatXSet = false; }
+  void clearRepeatY() { m_repeatYSet = false; }
   void clearComposite() { m_compositeSet = false; }
   void clearSize() { m_sizeType = SizeNone; }
 
@@ -171,7 +178,8 @@ struct FillLayer {
   static EFillBox initialFillOrigin(EFillLayerType type) {
     return type == BackgroundFillLayer ? PaddingFillBox : BorderFillBox;
   }
-  static EFillRepeat initialFillRepeat(EFillLayerType) { return RepeatFill; }
+  static EFillRepeat initialFillRepeatX(EFillLayerType) { return RepeatFill; }
+  static EFillRepeat initialFillRepeatY(EFillLayerType) { return RepeatFill; }
   static CompositeOperator initialFillComposite(EFillLayerType) {
     return CompositeSourceOver;
   }
@@ -202,7 +210,8 @@ struct FillLayer {
   unsigned m_attachment : 2;  // EFillAttachment
   unsigned m_clip : 2;        // EFillBox
   unsigned m_origin : 2;      // EFillBox
-  unsigned m_repeat : 3;      // EFillRepeat
+  unsigned m_repeatX : 3;     // EFillRepeat
+  unsigned m_repeatY : 3;     // EFillRepeat
   unsigned m_composite : 4;   // CompositeOperator
   unsigned m_sizeType : 2;    // EFillSizeType
 
@@ -212,7 +221,8 @@ struct FillLayer {
   bool m_attachmentSet : 1;
   bool m_clipSet : 1;
   bool m_originSet : 1;
-  bool m_repeatSet : 1;
+  bool m_repeatXSet : 1;
+  bool m_repeatYSet : 1;
   bool m_xPosSet : 1;
   bool m_yPosSet : 1;
   bool m_compositeSet : 1;

@@ -608,8 +608,11 @@ class RenderStyle : public RefCounted<RenderStyle> {
   StyleImage* backgroundImage() const {
     return background->m_background.m_image.get();
   }
-  EFillRepeat backgroundRepeat() const {
-    return static_cast<EFillRepeat>(background->m_background.m_repeat);
+  EFillRepeat backgroundRepeatX() const {
+    return static_cast<EFillRepeat>(background->m_background.m_repeatX);
+  }
+  EFillRepeat backgroundRepeatY() const {
+    return static_cast<EFillRepeat>(background->m_background.m_repeatY);
   }
   CompositeOperator backgroundComposite() const {
     return static_cast<CompositeOperator>(background->m_background.m_composite);
@@ -645,8 +648,11 @@ class RenderStyle : public RefCounted<RenderStyle> {
   StyleImage* maskImage() const {
     return rareNonInheritedData->m_mask.m_image.get();
   }
-  EFillRepeat maskRepeat() const {
-    return static_cast<EFillRepeat>(rareNonInheritedData->m_mask.m_repeat);
+  EFillRepeat maskRepeatX() const {
+    return static_cast<EFillRepeat>(rareNonInheritedData->m_mask.m_repeatX);
+  }
+  EFillRepeat maskRepeatY() const {
+    return static_cast<EFillRepeat>(rareNonInheritedData->m_mask.m_repeatY);
   }
   CompositeOperator maskComposite() const {
     return static_cast<CompositeOperator>(

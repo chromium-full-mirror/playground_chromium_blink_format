@@ -192,14 +192,7 @@ enum EFillAttachment {
 
 enum EFillBox { BorderFillBox, PaddingFillBox, ContentFillBox, TextFillBox };
 
-enum EFillRepeat {
-  RepeatFill,
-  RepeatXFill,
-  RepeatYFill,
-  NoRepeatFill,
-  RoundFill,
-  SpaceFill
-};
+enum EFillRepeat { RepeatFill, NoRepeatFill, RoundFill, SpaceFill };
 
 enum EFillLayerType { BackgroundFillLayer, MaskFillLayer };
 

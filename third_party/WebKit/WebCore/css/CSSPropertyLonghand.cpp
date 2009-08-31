@@ -84,6 +84,11 @@ static void initShorthandMap(ShorthandMap& shorthandMap) {
   SET_SHORTHAND_MAP_ENTRY(shorthandMap, CSSPropertyBackgroundPosition,
                           backgroundPositionProperties);
 
+  static const int backgroundRepeatProperties[] = {
+      CSSPropertyBackgroundRepeatX, CSSPropertyBackgroundRepeatY};
+  SET_SHORTHAND_MAP_ENTRY(shorthandMap, CSSPropertyBackgroundRepeat,
+                          backgroundRepeatProperties);
+
   static const int borderSpacingProperties[] = {
       CSSPropertyWebkitBorderHorizontalSpacing,
       CSSPropertyWebkitBorderVerticalSpacing};
@@ -133,8 +138,8 @@ static void initShorthandMap(ShorthandMap& shorthandMap) {
       CSSPropertyBackgroundAttachment, CSSPropertyBackgroundClip,
       CSSPropertyBackgroundColor,      CSSPropertyBackgroundImage,
       CSSPropertyBackgroundOrigin,     CSSPropertyBackgroundPositionX,
-      CSSPropertyBackgroundPositionY,  CSSPropertyBackgroundRepeat,
-  };
+      CSSPropertyBackgroundPositionY,  CSSPropertyBackgroundRepeatX,
+      CSSPropertyBackgroundRepeatY};
   SET_SHORTHAND_MAP_ENTRY(shorthandMap, CSSPropertyBackground,
                           backgroundProperties);
 
@@ -167,12 +172,16 @@ static void initShorthandMap(ShorthandMap& shorthandMap) {
   SET_SHORTHAND_MAP_ENTRY(shorthandMap, CSSPropertyWebkitMaskPosition,
                           maskPositionProperties);
 
+  static const int maskRepeatProperties[] = {CSSPropertyWebkitMaskRepeatX,
+                                             CSSPropertyWebkitMaskRepeatY};
+  SET_SHORTHAND_MAP_ENTRY(shorthandMap, CSSPropertyWebkitMaskRepeat,
+                          maskRepeatProperties);
+
   static const int maskProperties[] = {
       CSSPropertyWebkitMaskAttachment, CSSPropertyWebkitMaskClip,
       CSSPropertyWebkitMaskImage,      CSSPropertyWebkitMaskOrigin,
       CSSPropertyWebkitMaskPositionX,  CSSPropertyWebkitMaskPositionY,
-      CSSPropertyWebkitMaskRepeat,
-  };
+      CSSPropertyWebkitMaskRepeatX,    CSSPropertyWebkitMaskRepeatY};
   SET_SHORTHAND_MAP_ENTRY(shorthandMap, CSSPropertyWebkitMask, maskProperties);
 
   static const int animationProperties[] = {
