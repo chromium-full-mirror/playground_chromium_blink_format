@@ -58,6 +58,18 @@ struct COMVariantSetter<WebCore::String>
 };
 
 template <>
+struct COMVariantSetter<bool> : COMVariantSetterBase<bool> {
+  static const VARENUM VariantType = VT_BOOL;
+
+  static void setVariant(VARIANT* variant, bool value) {
+    ASSERT(V_VT(variant) == VT_EMPTY);
+
+    V_VT(variant) = VariantType;
+    V_BOOL(variant) = value;
+  }
+};
+
+template <>
 struct COMVariantSetter<unsigned long long>
     : COMVariantSetterBase<unsigned long long> {
   static const VARENUM VariantType = VT_UI8;
@@ -79,6 +91,18 @@ struct COMVariantSetter<int> : COMVariantSetterBase<int> {
 
     V_VT(variant) = VariantType;
     V_I4(variant) = value;
+  }
+};
+
+template <>
+struct COMVariantSetter<float> : COMVariantSetterBase<float> {
+  static const VARENUM VariantType = VT_R4;
+
+  static void setVariant(VARIANT* variant, float value) {
+    ASSERT(V_VT(variant) == VT_EMPTY);
+
+    V_VT(variant) = VariantType;
+    V_R4(variant) = value;
   }
 };
 

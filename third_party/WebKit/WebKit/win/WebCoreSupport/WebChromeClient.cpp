@@ -26,6 +26,8 @@
 #include "config.h"
 #include "WebChromeClient.h"
 
+#include "COMPropertyBag.h"
+#include "COMVariantSetter.h"
 #include "WebElementPropertyBag.h"
 #include "WebFrame.h"
 #include "WebHistory.h"
@@ -150,6 +152,28 @@ void WebChromeClient::takeFocus(FocusDirection direction) {
   }
 }
 
+static COMPtr<IPropertyBag> createWindowFeaturesPropertyBag(
+    const WindowFeatures& features) {
+  HashMap<String, COMVariant> map;
+  if (features.xSet)
+    map.set(WebWindowFeaturesXKey, features.x);
+  if (features.ySet)
+    map.set(WebWindowFeaturesYKey, features.y);
+  if (features.widthSet)
+    map.set(WebWindowFeaturesWidthKey, features.width);
+  if (features.heightSet)
+    map.set(WebWindowFeaturesHeightKey, features.height);
+  map.set(WebWindowFeaturesMenuBarVisibleKey, features.menuBarVisible);
+  map.set(WebWindowFeaturesStatusBarVisibleKey, features.statusBarVisible);
+  map.set(WebWindowFeaturesToolBarVisibleKey, features.toolBarVisible);
+  map.set(WebWindowFeaturesScrollbarsVisibleKey, features.scrollbarsVisible);
+  map.set(WebWindowFeaturesResizableKey, features.resizable);
+  map.set(WebWindowFeaturesFullscreenKey, features.fullscreen);
+  map.set(WebWindowFeaturesDialogKey, features.dialog);
+
+  return COMPtr<IPropertyBag>(AdoptCOM, COMPropertyBag<COMVariant>::adopt(map));
+}
+
 Page* WebChromeClient::createWindow(Frame*,
                                     const FrameLoadRequest& frameLoadRequest,
                                     const WindowFeatures& features) {
@@ -160,6 +184,25 @@ Page* WebChromeClient::createWindow(Frame*,
   COMPtr<IWebMutableURLRequest> request(
       AdoptCOM,
       WebMutableURLRequest::createInstance(frameLoadRequest.resourceRequest()));
+
+  COMPtr<IWebUIDelegatePrivate2> delegatePrivate(Query, delegate);
+  if (delegatePrivate) {
+    COMPtr<IWebView> newWebView;
+    HRESULT hr = delegatePrivate->createWebViewWithRequest(
+        m_webView, request.get(),
+        createWindowFeaturesPropertyBag(features).get(), &newWebView);
+
+    if (SUCCEEDED(hr) && newWebView)
+      return core(newWebView.get());
+
+    // If the delegate doesn't implement the IWebUIDelegatePrivate2 version of
+    // the call, fall back
+    // to the old versions (even if they support the IWebUIDelegatePrivate2
+    // interface).
+    if (hr != E_NOTIMPL)
+      return 0;
+  }
+
   COMPtr<IWebView> newWebView;
 
   if (features.dialog) {
