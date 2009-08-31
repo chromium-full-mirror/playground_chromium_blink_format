@@ -141,9 +141,10 @@ class WorkerContext : public RefCounted<WorkerContext>,
   using RefCounted<WorkerContext>::ref;
   using RefCounted<WorkerContext>::deref;
 
+  bool isClosing() { return m_closing; }
+
  protected:
   WorkerContext(const KURL&, const String&, WorkerThread*);
-  bool isClosing() { return m_closing; }
 
  private:
   virtual void refScriptExecutionContext() { ref(); }

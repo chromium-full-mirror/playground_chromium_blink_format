@@ -69,7 +69,6 @@ class SharedWorkerProxy : public ThreadSafeShared<SharedWorkerProxy>,
   void setThread(PassRefPtr<SharedWorkerThread> thread) { m_thread = thread; }
   SharedWorkerThread* thread() { return m_thread.get(); }
   bool isClosing() const { return m_closing; }
-  void close();
   KURL url() const { return m_url.copy(); }
   String name() const { return m_name.copy(); }
   bool matches(const String& name, PassRefPtr<SecurityOrigin> origin) const {
@@ -112,6 +111,8 @@ class SharedWorkerProxy : public ThreadSafeShared<SharedWorkerProxy>,
   SharedWorkerProxy(const String& name,
                     const KURL&,
                     PassRefPtr<SecurityOrigin>);
+  void close();
+
   bool m_closing;
   String m_name;
   KURL m_url;
@@ -211,7 +212,9 @@ void SharedWorkerProxy::postConsoleMessageToWorkerObject(
 }
 
 void SharedWorkerProxy::workerContextClosed() {
-  m_closing = true;
+  if (isClosing())
+    return;
+  close();
 }
 
 void SharedWorkerProxy::workerContextDestroyed() {

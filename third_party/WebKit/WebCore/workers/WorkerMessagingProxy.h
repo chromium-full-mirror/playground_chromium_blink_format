@@ -80,6 +80,7 @@ class WorkerMessagingProxy : public WorkerContextProxy,
                                                 const String& sourceURL);
   virtual void confirmMessageFromWorkerObject(bool hasPendingActivity);
   virtual void reportPendingActivity(bool hasPendingActivity);
+  virtual void workerContextClosed();
   virtual void workerContextDestroyed();
 
   // Implementation of WorkerLoaderProxy.

@@ -160,6 +160,11 @@ MessageQueueWaitResult WorkerRunLoop::runInMode(
       m_messageQueue.waitForMessageFilteredWithTimeout(task, predicate,
                                                        absoluteTime);
 
+  // If the context is closing, don't dispatch any further tasks (per section
+  // 4.1.1 of the Web Workers spec).
+  if (context->isClosing())
+    return result;
+
   switch (result) {
     case MessageQueueTerminated:
       break;
