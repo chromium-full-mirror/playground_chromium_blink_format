@@ -139,7 +139,7 @@ static String filesystemPathFromUrlOrTitle(const String& url,
   }
 
   if (!lstrlen(fsPathBuffer)) {
-    KURL kurl(url);
+    KURL kurl(ParsedURLString, url);
     usedURL = true;
     // The filename for any content based drag or file url should be the last
     // element of
@@ -548,8 +548,9 @@ bool ClipboardWin::setData(const String& type, const String& data) {
   ClipboardDataType winType = clipboardTypeFromMIMEType(type);
 
   if (winType == ClipboardDataTypeURL)
-    return WebCore::writeURL(m_writableDataObject.get(), KURL(data), String(),
-                             false, true);
+    return WebCore::writeURL(m_writableDataObject.get(),
+                             KURL(ParsedURLString, data), String(), false,
+                             true);
 
   if (winType == ClipboardDataTypeText) {
     STGMEDIUM medium = {0};

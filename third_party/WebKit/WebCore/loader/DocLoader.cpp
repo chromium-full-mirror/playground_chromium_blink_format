@@ -221,7 +221,7 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
   if (resource) {
     // Check final URL of resource to catch redirects.
     // See <https://bugs.webkit.org/show_bug.cgi?id=21963>.
-    if (!canRequest(type, KURL(resource->url())))
+    if (!canRequest(type, KURL(ParsedURLString, resource->url())))
       return 0;
 
     m_documentResources.set(resource->url(), resource);

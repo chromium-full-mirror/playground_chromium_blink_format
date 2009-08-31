@@ -314,7 +314,7 @@ PassRefPtr<ArchiveResource> LegacyWebArchive::createResource(
   return ArchiveResource::create(
       SharedBuffer::create(CFDataGetBytePtr(resourceData),
                            CFDataGetLength(resourceData)),
-      KURL(url), mimeType, textEncoding, frameName, response);
+      KURL(ParsedURLString, url), mimeType, textEncoding, frameName, response);
 }
 
 PassRefPtr<LegacyWebArchive> LegacyWebArchive::create() {
@@ -612,7 +612,7 @@ PassRefPtr<LegacyWebArchive> LegacyWebArchive::create(
   // it's possible to have a response without a URL here
   // <rdar://problem/5454935>
   if (responseURL.isNull())
-    responseURL = KURL("");
+    responseURL = KURL(ParsedURLString, "");
 
   PassRefPtr<ArchiveResource> mainResource = ArchiveResource::create(
       utf8Buffer(markupString), responseURL, response.mimeType(), "UTF-8",
@@ -688,7 +688,8 @@ PassRefPtr<LegacyWebArchive> LegacyWebArchive::create(
       if (Image* iconImage =
               iconDatabase()->iconForPageURL(responseURL, IntSize(16, 16))) {
         if (RefPtr<ArchiveResource> resource = ArchiveResource::create(
-                iconImage->data(), KURL(iconURL), "image/x-icon", "", ""))
+                iconImage->data(), KURL(ParsedURLString, iconURL),
+                "image/x-icon", "", ""))
           subresources.append(resource.release());
       }
     }

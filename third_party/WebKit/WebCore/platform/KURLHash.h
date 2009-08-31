@@ -50,7 +50,8 @@ template <>
 struct HashTraits<WebCore::KURL> : GenericHashTraits<WebCore::KURL> {
   static const bool emptyValueIsZero = true;
   static void constructDeletedValue(WebCore::KURL& slot) {
-    new (&slot) WebCore::KURL(WebCore::String(HashTableDeletedValue));
+    new (&slot) WebCore::KURL(WebCore::ParsedURLString,
+                              WebCore::String(HashTableDeletedValue));
   }
   static bool isDeletedValue(const WebCore::KURL& slot) {
     return slot.string().isHashTableDeletedValue();

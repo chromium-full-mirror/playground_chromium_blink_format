@@ -70,7 +70,7 @@ PassRefPtr<InspectorResource> InspectorResource::createCached(
 
   resource->m_finished = true;
 
-  resource->m_requestURL = KURL(cachedResource->url());
+  resource->m_requestURL = KURL(ParsedURLString, cachedResource->url());
   resource->updateResponse(cachedResource->response());
 
   resource->m_length = cachedResource->encodedSize();

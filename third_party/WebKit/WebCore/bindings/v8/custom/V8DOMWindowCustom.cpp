@@ -561,7 +561,8 @@ static Frame* createWindow(Frame* callingFrame,
   }
 
   if (protocolIsJavaScript(url) || ScriptController::isSafeScript(newFrame)) {
-    KURL completedUrl = url.isEmpty() ? KURL("") : completeURL(url);
+    KURL completedUrl =
+        url.isEmpty() ? KURL(ParsedURLString, "") : completeURL(url);
     bool userGesture = processingUserGesture();
 
     if (created)

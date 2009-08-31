@@ -44,7 +44,7 @@ ScriptCallFrame::ScriptCallFrame(const UString& functionName,
                                  const ArgList& args,
                                  unsigned skipArgumentCount)
     : m_functionName(functionName),
-      m_sourceURL(urlString),
+      m_sourceURL(ParsedURLString, urlString),
       m_lineNumber(lineNumber) {
   size_t argumentCount = args.size();
   for (size_t i = skipArgumentCount; i < argumentCount; ++i)

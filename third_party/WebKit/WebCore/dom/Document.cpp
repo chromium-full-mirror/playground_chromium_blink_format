@@ -4193,7 +4193,7 @@ void Document::initSecurityContext() {
   if (!m_frame) {
     // No source for a security context.
     // This can occur via document.implementation.createDocument().
-    m_cookieURL = KURL("");
+    m_cookieURL = KURL(ParsedURLString, "");
     ScriptExecutionContext::setSecurityOrigin(SecurityOrigin::createEmpty());
     return;
   }

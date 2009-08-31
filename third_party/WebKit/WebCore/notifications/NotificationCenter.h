@@ -55,7 +55,8 @@ class NotificationCenter : public RefCounted<NotificationCenter>,
   }
 
   Notification* createHTMLNotification(const String& URI, ExceptionCode& ec) {
-    return Notification::create(KURL(URI), context(), ec, presenter());
+    return Notification::create(KURL(ParsedURLString, URI), context(), ec,
+                                presenter());
   }
 
   Notification* createNotification(const String& iconURI,

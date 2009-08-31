@@ -149,7 +149,7 @@ void wxWebFrame::SetPageSource(const wxString& source,
         WebCore::SharedBuffer::create(contents, strlen(contents));
     WebCore::SubstituteData substituteData(
         sharedBuffer, WebCore::String("text/html"), WebCore::String("UTF-8"),
-        WebCore::KURL("about:blank"), url);
+        WebCore::blankURL(), url);
 
     m_impl->frame->loader()->stop();
     m_impl->frame->loader()->load(WebCore::ResourceRequest(url), substituteData,

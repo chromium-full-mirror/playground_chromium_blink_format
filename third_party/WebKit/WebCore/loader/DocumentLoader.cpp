@@ -556,7 +556,7 @@ void DocumentLoader::getSubresources(
   for (DocLoader::DocumentResourceMap::const_iterator it = allResources.begin();
        it != end; ++it) {
     RefPtr<ArchiveResource> subresource =
-        this->subresource(KURL(it->second->url()));
+        this->subresource(KURL(ParsedURLString, it->second->url()));
     if (subresource)
       subresources.append(subresource.release());
   }
