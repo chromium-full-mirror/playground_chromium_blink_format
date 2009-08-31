@@ -98,7 +98,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   void setCurrentTime(float seconds);
 
   unsigned long suspendRedraw(unsigned long max_wait_milliseconds);
-  void unsuspendRedraw(unsigned long suspend_handle_id, ExceptionCode&);
+  void unsuspendRedraw(unsigned long suspend_handle_id);
   void unsuspendRedrawAll();
   void forceRedraw();
 

@@ -311,9 +311,7 @@ unsigned long SVGSVGElement::suspendRedraw(
   return 0;
 }
 
-void SVGSVGElement::unsuspendRedraw(unsigned long /* suspend_handle_id */,
-                                    ExceptionCode&) {
-  // if suspend_handle_id is not found, throw exception
+void SVGSVGElement::unsuspendRedraw(unsigned long /* suspend_handle_id */) {
   // FIXME: Implement me (see bug 11275)
 }
 
