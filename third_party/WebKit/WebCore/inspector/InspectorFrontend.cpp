@@ -232,8 +232,10 @@ void InspectorFrontend::setRecordingProfile(bool isProfiling) {
   function->call();
 }
 
-void InspectorFrontend::pausedScript() {
-  callSimpleFunction("pausedScript");
+void InspectorFrontend::pausedScript(const ScriptValue& callFrames) {
+  OwnPtr<ScriptFunctionCall> function(newFunctionCall("pausedScript"));
+  function->appendArgument(callFrames);
+  function->call();
 }
 
 void InspectorFrontend::resumedScript() {

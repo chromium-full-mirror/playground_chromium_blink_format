@@ -1321,7 +1321,10 @@ void InspectorController::failedToParseSource(ExecState*,
 }
 
 void InspectorController::didPause() {
-  m_frontend->pausedScript();
+  ScriptFunctionCall function(m_scriptState, m_injectedScriptObj,
+                              "getCallFrames");
+  ScriptValue callFrames = function.call();
+  m_frontend->pausedScript(callFrames);
 }
 
 void InspectorController::didContinue() {

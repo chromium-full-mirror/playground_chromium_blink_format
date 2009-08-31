@@ -95,7 +95,7 @@ class InspectorFrontend {
                                  const JSC::UString& errorMessage);
   void addProfile(const JSC::JSValue& profile);
   void setRecordingProfile(bool isProfiling);
-  void pausedScript();
+  void pausedScript(const ScriptValue& callFrames);
   void resumedScript();
 #endif
 
