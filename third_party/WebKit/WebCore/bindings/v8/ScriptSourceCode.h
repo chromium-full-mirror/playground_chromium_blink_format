@@ -47,7 +47,9 @@ class ScriptSourceCode {
   // We lose the encoding information from CachedScript.
   // Not sure if that matters.
   ScriptSourceCode(CachedScript* cs)
-      : m_source(cs->script()), m_url(cs->url()), m_startLine(1) {}
+      : m_source(cs->script()),
+        m_url(ParsedURLString, cs->url()),
+        m_startLine(1) {}
 
   bool isEmpty() const { return m_source.isEmpty(); }
 
