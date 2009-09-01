@@ -33,6 +33,7 @@
 
 #include "Timer.h"
 #include <debugger/Debugger.h>
+#include <runtime/UString.h>
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/RefPtr.h>
@@ -61,7 +62,12 @@ class JavaScriptDebugServer : JSC::Debugger {
   void addListener(JavaScriptDebugListener*, Page*);
   void removeListener(JavaScriptDebugListener*, Page*);
 
-  void addBreakpoint(intptr_t sourceID, unsigned lineNumber);
+  void addBreakpoint(intptr_t sourceID,
+                     unsigned lineNumber,
+                     const JSC::UString& condition);
+  void updateBreakpoint(intptr_t sourceID,
+                        unsigned lineNumber,
+                        const JSC::UString& condition);
   void removeBreakpoint(intptr_t sourceID, unsigned lineNumber);
   bool hasBreakpoint(intptr_t sourceID, unsigned lineNumber) const;
   void clearBreakpoints();
@@ -86,6 +92,16 @@ class JavaScriptDebugServer : JSC::Debugger {
   typedef void (JavaScriptDebugListener::*JavaScriptExecutionCallback)();
 
  private:
+  class BreakpointInfo {
+   public:
+    BreakpointInfo(const JSC::UString& condition) : m_condition(condition) {}
+    const JSC::UString& condition() const;
+    void setCondition(const JSC::UString& condition);
+
+   private:
+    JSC::UString m_condition;
+  };
+
   JavaScriptDebugServer();
   ~JavaScriptDebugServer();
 
@@ -102,6 +118,9 @@ class JavaScriptDebugServer : JSC::Debugger {
 
   void dispatchFunctionToListeners(JavaScriptExecutionCallback, Page*);
   void pauseIfNeeded(Page*);
+  BreakpointInfo* breakpointInfo(intptr_t sourceID, unsigned lineNumber) const;
+  void updateBreakpointInfo(BreakpointInfo* info,
+                            const JSC::UString& condition);
 
   virtual void detach(JSC::JSGlobalObject*);
 
@@ -136,6 +155,9 @@ class JavaScriptDebugServer : JSC::Debugger {
   void didRemoveLastListener();
 
   typedef HashMap<Page*, ListenerSet*> PageListenersMap;
+  typedef HashMap<unsigned, BreakpointInfo*> LineToBreakpointInfoMap;
+  typedef HashMap<intptr_t, LineToBreakpointInfoMap*> BreakpointsMap;
+
   PageListenersMap m_pageListenersMap;
   ListenerSet m_listeners;
   bool m_callingListeners;
@@ -145,7 +167,7 @@ class JavaScriptDebugServer : JSC::Debugger {
   bool m_doneProcessingDebuggerEvents;
   JavaScriptCallFrame* m_pauseOnCallFrame;
   RefPtr<JavaScriptCallFrame> m_currentCallFrame;
-  HashMap<intptr_t, HashSet<unsigned>*> m_breakpoints;
+  BreakpointsMap m_breakpoints;
   Timer<JavaScriptDebugServer> m_recompileTimer;
 };
 

@@ -116,7 +116,12 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   JavaScriptCallFrame* currentCallFrame() const;
 
-  void addBreakpoint(const String& sourceID, unsigned lineNumber);
+  void addBreakpoint(const String& sourceID,
+                     unsigned lineNumber,
+                     const String& condition);
+  void updateBreakpoint(const String& sourceID,
+                        unsigned lineNumber,
+                        const String& condition);
   void removeBreakpoint(const String& sourceID, unsigned lineNumber);
 
   bool pauseOnExceptions();

@@ -298,9 +298,19 @@ JavaScriptCallFrame* InspectorBackend::currentCallFrame() const {
 }
 
 void InspectorBackend::addBreakpoint(const String& sourceID,
-                                     unsigned lineNumber) {
+                                     unsigned lineNumber,
+                                     const String& condition) {
   intptr_t sourceIDValue = sourceID.toIntPtr();
-  JavaScriptDebugServer::shared().addBreakpoint(sourceIDValue, lineNumber);
+  JavaScriptDebugServer::shared().addBreakpoint(sourceIDValue, lineNumber,
+                                                condition);
+}
+
+void InspectorBackend::updateBreakpoint(const String& sourceID,
+                                        unsigned lineNumber,
+                                        const String& condition) {
+  intptr_t sourceIDValue = sourceID.toIntPtr();
+  JavaScriptDebugServer::shared().updateBreakpoint(sourceIDValue, lineNumber,
+                                                   condition);
 }
 
 void InspectorBackend::removeBreakpoint(const String& sourceID,
