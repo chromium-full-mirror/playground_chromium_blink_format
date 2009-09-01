@@ -80,7 +80,7 @@ class ImageDecoderQt::ReadContext {
     LoadComplete
   };
 
-  ReadContext(const IncomingData& data, LoadMode loadMode, ImageList& target);
+  ReadContext(SharedBuffer* data, LoadMode loadMode, ImageList& target);
 
   enum ReadResult { ReadEOF, ReadFailed, ReadPartial, ReadComplete };
 
@@ -113,11 +113,11 @@ class ImageDecoderQt::ReadContext {
   QSize m_size;
 };
 
-ImageDecoderQt::ReadContext::ReadContext(const IncomingData& data,
+ImageDecoderQt::ReadContext::ReadContext(SharedBuffer* data,
                                          LoadMode loadMode,
                                          ImageList& target)
     : m_loadMode(loadMode),
-      m_data(data.data(), data.size()),
+      m_data(data->data(), data.size()),
       m_buffer(&m_data),
       m_reader(&m_buffer),
       m_target(target),
@@ -218,12 +218,12 @@ void ImageDecoderQt::reset() {
   m_loopCount = cAnimationNone;
 }
 
-void ImageDecoderQt::setData(const IncomingData& data, bool allDataReceived) {
+void ImageDecoderQt::setData(SharedBuffer* data, bool allDataReceived) {
   reset();
   ReadContext readContext(data, ReadContext::LoadComplete, m_imageList);
 
   if (debugImageDecoderQt)
-    qDebug() << " setData " << data.size()
+    qDebug() << " setData " << data->size()
              << " image bytes, complete=" << allDataReceived;
 
   const ReadContext::ReadResult readResult = readContext.read(allDataReceived);
