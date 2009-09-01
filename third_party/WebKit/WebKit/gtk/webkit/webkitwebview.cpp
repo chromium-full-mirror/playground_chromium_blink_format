@@ -2468,10 +2468,16 @@ void webkit_web_view_notify_ready(WebKitWebView* webView) {
 
 void webkit_web_view_request_download(WebKitWebView* webView,
                                       WebKitNetworkRequest* request,
-                                      const ResourceResponse& response) {
+                                      const ResourceResponse& response,
+                                      ResourceHandle* handle) {
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
 
-  WebKitDownload* download = webkit_download_new(request);
+  WebKitDownload* download;
+
+  if (handle)
+    download = webkit_download_new_with_handle(request, handle, response);
+  else
+    download = webkit_download_new(request);
 
   if (!response.isNull() && !response.suggestedFilename().isEmpty())
     webkit_download_set_suggested_filename(
