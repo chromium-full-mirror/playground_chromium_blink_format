@@ -603,6 +603,10 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
       descriptor->InstanceTemplate()->SetIndexedPropertyHandler(
           USE_INDEXED_PROPERTY_GETTER(ClientRectList));
       break;
+    case V8ClassIndex::FILELIST:
+      descriptor->InstanceTemplate()->SetIndexedPropertyHandler(
+          USE_INDEXED_PROPERTY_GETTER(FileList));
+      break;
 #if ENABLE(DATAGRID)
     case V8ClassIndex::DATAGRIDCOLUMNLIST:
       descriptor->InstanceTemplate()->SetIndexedPropertyHandler(
