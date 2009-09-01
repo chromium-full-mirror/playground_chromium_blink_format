@@ -104,6 +104,7 @@ class XSSAuditor {
  private:
   class CachingURLCanonicalizer {
    public:
+    CachingURLCanonicalizer() : m_decodeEntities(false) {}
     String canonicalizeURL(const String& url,
                            const TextEncoding& encoding,
                            bool decodeEntities);
