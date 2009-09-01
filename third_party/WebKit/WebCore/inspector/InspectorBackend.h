@@ -160,6 +160,8 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
  private:
   InspectorBackend(InspectorController* inspectorController,
                    InspectorClient* client);
+  InspectorDOMAgent* inspectorDOMAgent();
+  InspectorFrontend* inspectorFrontend();
 
   InspectorController* m_inspectorController;
   InspectorClient* m_client;
