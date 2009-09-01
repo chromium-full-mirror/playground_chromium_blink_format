@@ -562,6 +562,17 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
     case V8ClassIndex::WEBKITPOINT:
       descriptor->SetCallHandler(USE_CALLBACK(WebKitPointConstructor));
       break;
+#if ENABLE(WEB_SOCKETS)
+    case V8ClassIndex::WEBSOCKET: {
+      // Reserve one more internal field for keeping event listeners.
+      v8::Local<v8::ObjectTemplate> instanceTemplate =
+          descriptor->InstanceTemplate();
+      instanceTemplate->SetInternalFieldCount(
+          V8Custom::kWebSocketInternalFieldCount);
+      descriptor->SetCallHandler(USE_CALLBACK(WebSocketConstructor));
+      break;
+    }
+#endif
     case V8ClassIndex::XMLSERIALIZER:
       descriptor->SetCallHandler(USE_CALLBACK(XMLSerializerConstructor));
       break;
@@ -681,6 +692,7 @@ v8::Handle<v8::Value> V8DOMWrapper::convertToV8Object(
   // need special
   // handling, since if we proceed below V8Proxy::retrieve() will get called and
   // will crash.
+  // TODO(ukai): websocket?
   if ((type == V8ClassIndex::DOMCOREEXCEPTION ||
        type == V8ClassIndex::RANGEEXCEPTION ||
        type == V8ClassIndex::EVENTEXCEPTION ||
@@ -1375,6 +1387,12 @@ v8::Handle<v8::Value> V8DOMWrapper::convertEventTargetToV8Object(
   Notification* notification = target->toNotification();
   if (notification)
     return convertToV8Object(V8ClassIndex::NOTIFICATION, notification);
+#endif
+
+#if ENABLE(WEB_SOCKETS)
+  WebSocket* webSocket = target->toWebSocket();
+  if (webSocket)
+    return convertToV8Object(V8ClassIndex::WEBSOCKET, webSocket);
 #endif
 
   Node* node = target->toNode();
