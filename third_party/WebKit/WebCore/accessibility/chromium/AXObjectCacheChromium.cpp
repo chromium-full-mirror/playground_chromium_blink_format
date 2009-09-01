@@ -44,6 +44,7 @@ void AXObjectCache::attachWrapper(AccessibilityObject*) {
 void AXObjectCache::postPlatformNotification(AccessibilityObject*,
                                              const String&) {}
 
-void AXObjectCache::handleFocusedUIElementChanged() {}
+void AXObjectCache::handleFocusedUIElementChanged(RenderObject*,
+                                                  RenderObject*) {}
 
 }  // namespace WebCore

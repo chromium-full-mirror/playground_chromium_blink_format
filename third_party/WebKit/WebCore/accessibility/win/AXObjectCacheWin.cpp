@@ -29,6 +29,7 @@
 #include "AccessibilityObject.h"
 #include "Document.h"
 #include "Page.h"
+#include "RenderObject.h"
 
 using namespace std;
 
@@ -69,8 +70,13 @@ AXID AXObjectCache::platformGenerateAXID() const {
   return objID;
 }
 
-void AXObjectCache::handleFocusedUIElementChanged() {
-  Page* page = m_document->page();
+void AXObjectCache::handleFocusedUIElementChanged(
+    RenderObject*,
+    RenderObject* newFocusedRenderer) {
+  if (!newFocusedRenderer)
+    return;
+
+  Page* page = newFocusedRenderer->document()->page();
   if (!page || !page->chrome()->platformWindow())
     return;
 

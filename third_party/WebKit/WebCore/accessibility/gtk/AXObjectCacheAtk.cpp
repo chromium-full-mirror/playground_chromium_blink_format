@@ -45,9 +45,7 @@ void AXObjectCache::postPlatformNotification(AccessibilityObject* coreObject,
   }
 }
 
-void AXObjectCache::handleFocusedUIElementChanged() {}
-
-void AXObjectCache::handleFocusedUIElementChangedWithRenderers(
+void AXObjectCache::handleFocusedUIElementChanged(
     RenderObject* oldFocusedRender,
     RenderObject* newFocusedRender) {
   RefPtr<AccessibilityObject> oldObject = getOrCreate(oldFocusedRender);
