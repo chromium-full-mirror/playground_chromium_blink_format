@@ -269,7 +269,7 @@ static void invalidateAnyPreviousWaitToDumpWatchdog() {
   waitForPolicy = false;
 }
 
-static void resetWebViewToConsistentStateBeforeTesting() {
+static void resetDefaultsToConsistentValues() {
   WebKitWebSettings* settings = webkit_web_view_get_settings(webView);
   g_object_set(G_OBJECT(settings), "enable-private-browsing", FALSE,
                "enable-developer-extras", FALSE, "enable-spell-checking", TRUE,
@@ -277,7 +277,11 @@ static void resetWebViewToConsistentStateBeforeTesting() {
                TRUE, "enable-xss-auditor", FALSE,
                "javascript-can-open-windows-automatically", TRUE,
                "enable-offline-web-application-cache", TRUE,
-               "enable-universal-access-from-file-uris", TRUE, NULL);
+               "enable-universal-access-from-file-uris", TRUE, "enable-scripts",
+               TRUE, "default-font-family", "Times", "monospace-font-family",
+               "Courier", "serif-font-family", "Times",
+               "sans-serif-font-family", "Helvetica", "default-font-size", 16,
+               "default-monospace-font-size", 13, "minimum-font-size", 1, NULL);
 
   webkit_web_frame_clear_main_frame_name(mainFrame);
 
@@ -363,11 +367,7 @@ void dump() {
 static void setDefaultsToConsistentStateValuesForTesting() {
   gdk_screen_set_resolution(gdk_screen_get_default(), 72.0);
 
-  WebKitWebSettings* settings = webkit_web_view_get_settings(webView);
-  g_object_set(G_OBJECT(settings), "default-font-family", "Times",
-               "monospace-font-family", "Courier", "serif-font-family", "Times",
-               "sans-serif-font-family", "Helvetica", "default-font-size", 16,
-               "default-monospace-font-size", 13, "minimum-font-size", 1, NULL);
+  resetDefaultsToConsistentValues();
 
   /* Disable the default auth dialog for testing */
   SoupSession* session = webkit_get_default_session();
@@ -395,7 +395,7 @@ static void runTest(const string& testPathOrURL) {
   gchar* url = autocorrectURL(pathOrURL.c_str());
   const string testURL(url);
 
-  resetWebViewToConsistentStateBeforeTesting();
+  resetDefaultsToConsistentValues();
 
   gLayoutTestController = new LayoutTestController(testURL, expectedPixelHash);
   topLoadingFrame = 0;
