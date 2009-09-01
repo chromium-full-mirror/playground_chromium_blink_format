@@ -46,6 +46,7 @@ class CachedPage : public RefCounted<CachedPage> {
 
   void restore(Page*);
   void clear();
+  void destroy();
 
   Document* document() const { return m_cachedMainFrame->document(); }
   DocumentLoader* documentLoader() const {

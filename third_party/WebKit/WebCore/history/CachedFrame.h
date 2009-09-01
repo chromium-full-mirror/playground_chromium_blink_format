@@ -52,6 +52,7 @@ class CachedFrame : public RefCounted<CachedFrame> {
 
   void restore();
   void clear();
+  void destroy();
 
   Document* document() const { return m_document.get(); }
   DocumentLoader* documentLoader() const { return m_documentLoader.get(); }
