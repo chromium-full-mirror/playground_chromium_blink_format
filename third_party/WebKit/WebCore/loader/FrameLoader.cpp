@@ -853,7 +853,9 @@ void FrameLoader::cancelAndClear() {
   m_frame->script()->updatePlatformScriptObjects();
 }
 
-void FrameLoader::clear(bool clearWindowProperties, bool clearScriptObjects) {
+void FrameLoader::clear(bool clearWindowProperties,
+                        bool clearScriptObjects,
+                        bool clearFrameView) {
   m_frame->editor()->clear();
 
   if (!m_needsClear)
@@ -879,7 +881,7 @@ void FrameLoader::clear(bool clearWindowProperties, bool clearScriptObjects) {
 
   m_frame->selection()->clear();
   m_frame->eventHandler()->clear();
-  if (m_frame->view())
+  if (clearFrameView && m_frame->view())
     m_frame->view()->clear();
 
   m_frame->setSelectionGranularity(CharacterGranularity);
@@ -3370,8 +3372,7 @@ void FrameLoader::open(CachedFrame& cachedFrame) {
   m_workingURL = url;
 
   started();
-
-  clear();
+  clear(true, true, cachedFrame.isMainFrame());
 
   Document* document = cachedFrame.document();
   ASSERT(document);

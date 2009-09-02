@@ -599,7 +599,9 @@ class FrameLoader : public Noncopyable {
 
   void updateHistoryAfterClientRedirect();
 
-  void clear(bool clearWindowProperties = true, bool clearScriptObjects = true);
+  void clear(bool clearWindowProperties = true,
+             bool clearScriptObjects = true,
+             bool clearFrameView = true);
 
   bool shouldReloadToHandleUnreachableURL(DocumentLoader*);
   void handleUnimplementablePolicy(const ResourceError&);

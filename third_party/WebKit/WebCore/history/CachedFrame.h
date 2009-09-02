@@ -61,6 +61,8 @@ class CachedFrame : public RefCounted<CachedFrame> {
   const KURL& url() const { return m_url; }
   DOMWindow* domWindow() const { return m_cachedFrameScriptData->domWindow(); }
 
+  bool isMainFrame() { return m_isMainFrame; }
+
   void setCachedFramePlatformData(CachedFramePlatformData*);
   CachedFramePlatformData* cachedFramePlatformData();
 
@@ -76,6 +78,7 @@ class CachedFrame : public RefCounted<CachedFrame> {
   KURL m_url;
   OwnPtr<ScriptCachedFrameData> m_cachedFrameScriptData;
   OwnPtr<CachedFramePlatformData> m_cachedFramePlatformData;
+  bool m_isMainFrame;
 
   CachedFrameVector m_childFrames;
 };
