@@ -287,7 +287,7 @@ class TextRunWalker {
   }
 
   const TextRun& getNormalizedTextRun(const TextRun& originalRun) {
-    UnicodeString normalizedString;
+    icu::UnicodeString normalizedString;
     UErrorCode error = U_ZERO_ERROR;
     icu::Normalizer::normalize(
         icu::UnicodeString(originalRun.characters(), originalRun.length()),
