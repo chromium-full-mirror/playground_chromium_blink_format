@@ -41,7 +41,8 @@ PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
   return rt;
 }
 
-RenderThemeChromiumLinux::RenderThemeChromiumLinux() {}
+RenderThemeChromiumLinux::RenderThemeChromiumLinux()
+    : m_useDefaultFocusRingColor(true) {}
 
 RenderThemeChromiumLinux::~RenderThemeChromiumLinux() {}
 
@@ -80,6 +81,17 @@ Color RenderThemeChromiumLinux::inactiveListBoxSelectionBackgroundColor()
 Color RenderThemeChromiumLinux::inactiveListBoxSelectionForegroundColor()
     const {
   return Color(0x32, 0x32, 0x32);
+}
+
+void RenderThemeChromiumLinux::setFocusRingColor(const Color& color) {
+  m_focusRingColor = color;
+  m_useDefaultFocusRingColor = false;
+}
+
+Color RenderThemeChromiumLinux::platformFocusRingColor() const {
+  if (m_useDefaultFocusRingColor)
+    return RenderThemeChromiumSkia::platformFocusRingColor();
+  return m_focusRingColor;
 }
 
 bool RenderThemeChromiumLinux::supportsControlTints() const {
