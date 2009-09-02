@@ -414,6 +414,10 @@ class V8Proxy {
   // Dispose global handles of m_contexts and friends.
   void disposeContextHandles();
 
+  // If m_recursionCount is 0, let LocalStorage know so we can release
+  // the storage mutex.
+  void releaseStorageMutex();
+
   static bool canAccessPrivate(DOMWindow*);
 
   static const char* rangeExceptionName(int exceptionCode);
