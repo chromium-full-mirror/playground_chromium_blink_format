@@ -61,7 +61,9 @@ SimpleFontData::SimpleFontData(const FontPlatformData& f,
       ,
       m_isCustomFont(customFont),
       m_isLoading(loading),
-      m_smallCapsFontData(0) {
+      m_smallCapsFontData(0),
+      m_avgCharWidth(-1),
+      m_maxCharWidth(-1) {
 #if !ENABLE(SVG_FONTS)
   UNUSED_PARAM(svgFontData);
 #else
