@@ -26,6 +26,7 @@
 
 #include "Color.h"
 #include "DocumentLoader.h"
+#include "DocumentLoaderGtk.h"
 #include "FormState.h"
 #include "FrameLoader.h"
 #include "FrameView.h"
@@ -109,7 +110,15 @@ static void loadDone(WebKitWebFrame* frame, bool didSucceed) {
 WTF::PassRefPtr<WebCore::DocumentLoader>
 FrameLoaderClient::createDocumentLoader(const WebCore::ResourceRequest& request,
                                         const SubstituteData& substituteData) {
-  return DocumentLoader::create(request, substituteData);
+  RefPtr<WebKit::DocumentLoader> loader =
+      WebKit::DocumentLoader::create(request, substituteData);
+
+  WebKitWebDataSource* webDataSource =
+      webkit_web_data_source_new_with_loader(loader.get());
+  loader->setDataSource(webDataSource);
+  g_object_unref(webDataSource);
+
+  return loader.release();
 }
 
 void FrameLoaderClient::dispatchWillSubmitForm(
@@ -122,7 +131,7 @@ void FrameLoaderClient::dispatchWillSubmitForm(
   (core(m_frame)->loader()->*policyFunction)(PolicyUse);
 }
 
-void FrameLoaderClient::committedLoad(DocumentLoader* loader,
+void FrameLoaderClient::committedLoad(WebCore::DocumentLoader* loader,
                                       const char* data,
                                       int length) {
   if (!m_pluginView) {
@@ -158,36 +167,38 @@ void FrameLoaderClient::committedLoad(DocumentLoader* loader,
   }
 }
 
-bool FrameLoaderClient::shouldUseCredentialStorage(DocumentLoader*,
+bool FrameLoaderClient::shouldUseCredentialStorage(WebCore::DocumentLoader*,
                                                    unsigned long identifier) {
   notImplemented();
   return false;
 }
 
 void FrameLoaderClient::dispatchDidReceiveAuthenticationChallenge(
-    DocumentLoader*,
+    WebCore::DocumentLoader*,
     unsigned long identifier,
     const AuthenticationChallenge&) {
   notImplemented();
 }
 
 void FrameLoaderClient::dispatchDidCancelAuthenticationChallenge(
-    DocumentLoader*,
+    WebCore::DocumentLoader*,
     unsigned long identifier,
     const AuthenticationChallenge&) {
   notImplemented();
 }
 
-void FrameLoaderClient::dispatchWillSendRequest(DocumentLoader*,
-                                                unsigned long,
-                                                ResourceRequest&,
-                                                const ResourceResponse&) {
-  notImplemented();
+void FrameLoaderClient::dispatchWillSendRequest(
+    WebCore::DocumentLoader* loader,
+    unsigned long identifier,
+    ResourceRequest& request,
+    const ResourceResponse& redirectResponse) {
+  if (redirectResponse.isNull())
+    static_cast<WebKit::DocumentLoader*>(loader)->increaseLoadCount(identifier);
 }
 
 void FrameLoaderClient::assignIdentifierToInitialRequest(
     unsigned long identifier,
-    DocumentLoader*,
+    WebCore::DocumentLoader*,
     const ResourceRequest&) {
   notImplemented();
 }
@@ -228,7 +239,7 @@ void FrameLoaderClient::frameLoaderDestroyed() {
 }
 
 void FrameLoaderClient::dispatchDidReceiveResponse(
-    DocumentLoader*,
+    WebCore::DocumentLoader*,
     unsigned long,
     const ResourceResponse& response) {
   m_response = response;
@@ -586,7 +597,7 @@ bool FrameLoaderClient::shouldGoToHistoryItem(HistoryItem* item) const {
   return item != 0;
 }
 
-void FrameLoaderClient::makeRepresentation(DocumentLoader*) {
+void FrameLoaderClient::makeRepresentation(WebCore::DocumentLoader*) {
   notImplemented();
 }
 
@@ -725,19 +736,19 @@ void FrameLoaderClient::cancelPolicyCheck() {
     webkit_web_policy_decision_cancel(m_policyDecision);
 }
 
-void FrameLoaderClient::dispatchDidLoadMainResource(DocumentLoader*) {
+void FrameLoaderClient::dispatchDidLoadMainResource(WebCore::DocumentLoader*) {
   notImplemented();
 }
 
-void FrameLoaderClient::revertToProvisionalState(DocumentLoader*) {
+void FrameLoaderClient::revertToProvisionalState(WebCore::DocumentLoader*) {
   notImplemented();
 }
 
-void FrameLoaderClient::willChangeTitle(DocumentLoader*) {
+void FrameLoaderClient::willChangeTitle(WebCore::DocumentLoader*) {
   notImplemented();
 }
 
-void FrameLoaderClient::didChangeTitle(DocumentLoader* l) {
+void FrameLoaderClient::didChangeTitle(WebCore::DocumentLoader* l) {
   setTitle(l->title(), l->url());
 }
 
@@ -762,7 +773,8 @@ String FrameLoaderClient::generatedMIMETypeForURLScheme(const String&) const {
   return String();
 }
 
-void FrameLoaderClient::finishedLoading(DocumentLoader* documentLoader) {
+void FrameLoaderClient::finishedLoading(
+    WebCore::DocumentLoader* documentLoader) {
   if (!m_pluginView)
     committedLoad(documentLoader, 0, 0);
   else {
@@ -791,22 +803,24 @@ void FrameLoaderClient::setTitle(const String& title, const KURL& url) {
 }
 
 void FrameLoaderClient::dispatchDidReceiveContentLength(
-    DocumentLoader*,
+    WebCore::DocumentLoader*,
     unsigned long identifier,
     int lengthReceived) {
   notImplemented();
 }
 
-void FrameLoaderClient::dispatchDidFinishLoading(DocumentLoader*,
-                                                 unsigned long identifier) {
-  notImplemented();
+void FrameLoaderClient::dispatchDidFinishLoading(
+    WebCore::DocumentLoader* loader,
+    unsigned long identifier) {
+  static_cast<WebKit::DocumentLoader*>(loader)->decreaseLoadCount(identifier);
 }
 
-void FrameLoaderClient::dispatchDidFailLoading(DocumentLoader*,
+void FrameLoaderClient::dispatchDidFailLoading(WebCore::DocumentLoader* loader,
                                                unsigned long identifier,
                                                const ResourceError& error) {
   // FIXME: when does this occur and what should happen?
-  notImplemented();
+
+  static_cast<WebKit::DocumentLoader*>(loader)->decreaseLoadCount(identifier);
 }
 
 void FrameLoaderClient::dispatchDidLoadResourceByXMLHttpRequest(
@@ -816,7 +830,7 @@ void FrameLoaderClient::dispatchDidLoadResourceByXMLHttpRequest(
 }
 
 bool FrameLoaderClient::dispatchDidLoadResourceFromMemoryCache(
-    DocumentLoader*,
+    WebCore::DocumentLoader*,
     const ResourceRequest&,
     const ResourceResponse&,
     int length) {
@@ -970,7 +984,7 @@ void FrameLoaderClient::dispatchUnableToImplementPolicy(const ResourceError&) {
   notImplemented();
 }
 
-void FrameLoaderClient::setMainDocumentError(DocumentLoader*,
+void FrameLoaderClient::setMainDocumentError(WebCore::DocumentLoader*,
                                              const ResourceError& error) {
   if (m_pluginView) {
     m_pluginView->didFail(error);
