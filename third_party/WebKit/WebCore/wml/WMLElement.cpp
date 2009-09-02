@@ -42,8 +42,8 @@ using namespace WMLNames;
 WMLElement::WMLElement(const QualifiedName& tagName, Document* document)
     : StyledElement(tagName, document, CreateElementZeroRefCount) {}
 
-static PassRefPtr<WMLElement> WMLElement::create(const QualifiedName& tagName,
-                                                 Document* document) {
+PassRefPtr<WMLElement> WMLElement::create(const QualifiedName& tagName,
+                                          Document* document) {
   return new WMLElement(tagName, document);
 }
 

@@ -178,7 +178,7 @@ void WMLTableElement::joinSuperflousColumns(Vector<WMLElement*>& columnElements,
   ASSERT(lastColumn);
 
   // Merge superflous columns into a single one
-  RefPtr<WMLElement> newCell = new WMLElement(tdTag, document());
+  RefPtr<WMLElement> newCell = WMLElement::create(tdTag, document());
   transferAllChildrenOfElementToTargetElement(lastColumn, newCell.get(), 0);
 
   ExceptionCode ec = 0;
@@ -220,7 +220,7 @@ void WMLTableElement::padWithEmptyColumns(Vector<WMLElement*>& columnElements,
   ExceptionCode ec = 0;
 
   for (unsigned i = columnElements.size(); i < m_columns; ++i) {
-    RefPtr<WMLElement> newCell = new WMLElement(tdTag, document());
+    RefPtr<WMLElement> newCell = WMLElement::create(tdTag, document());
     rowElement->appendChild(newCell.release(), ec);
     ASSERT(ec == 0);
   }
