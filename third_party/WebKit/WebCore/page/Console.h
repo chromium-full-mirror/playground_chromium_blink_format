@@ -71,7 +71,8 @@ enum MessageLevel {
   TipMessageLevel,
   LogMessageLevel,
   WarningMessageLevel,
-  ErrorMessageLevel
+  ErrorMessageLevel,
+  DebugMessageLevel
 };
 
 class Console : public RefCounted<Console> {
