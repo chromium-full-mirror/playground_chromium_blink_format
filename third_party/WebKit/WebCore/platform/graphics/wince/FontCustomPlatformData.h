@@ -32,7 +32,7 @@ class CachedFont;
 
 class CustomFontCache {
  public:
-  virtual bool registerFont(const String& fontName, CachedFont*) = 0;
+  virtual bool registerFont(const String& fontName, const SharedBuffer*) = 0;
   virtual void unregisterFont(const String& fontName) = 0;
 };
 
@@ -48,7 +48,8 @@ struct FontCustomPlatformData : Noncopyable {
   String m_name;
 };
 
-FontCustomPlatformData* createFontCustomPlatformData(CachedFont*);
+FontCustomPlatformData* createFontCustomPlatformData(const SharedBuffer*);
+void setCustomFontCache(CustomFontCache*);
 }
 
 #endif

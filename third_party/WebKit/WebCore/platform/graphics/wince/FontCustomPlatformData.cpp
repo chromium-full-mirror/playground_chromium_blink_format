@@ -33,6 +33,10 @@ static CustomFontCache* g_customFontCache = 0;
 
 bool renameFont(SharedBuffer* fontData, const String& fontName);
 
+void setCustomFontCache(CustomFontCache* cache) {
+  g_customFontCache = cache;
+}
+
 FontCustomPlatformData::~FontCustomPlatformData() {
   if (g_customFontCache && !m_name.isEmpty())
     g_customFontCache->unregisterFont(m_name);
@@ -69,11 +73,14 @@ static String createUniqueFontName() {
   return fontName.replace('/', '_');
 }
 
-FontCustomPlatformData* createFontCustomPlatformData(CachedFont* cachedFont) {
-  if (g_customFontCache && cachedFont->CachedResource::data()) {
+FontCustomPlatformData* createFontCustomPlatformData(
+    const SharedBuffer* buffer) {
+  if (g_customFontCache) {
     String fontName = createUniqueFontName();
-    if (renameFont(cachedFont->CachedResource::data(), fontName) &&
-        g_customFontCache->registerFont(fontName, cachedFont))
+    RefPtr<SharedBuffer> localBuffer =
+        SharedBuffer::create(buffer->data(), buffer->size());
+    if (renameFont(localBuffer.get(), fontName) &&
+        g_customFontCache->registerFont(fontName, localBuffer.get()))
       return new FontCustomPlatformData(fontName);
   }
   return 0;
