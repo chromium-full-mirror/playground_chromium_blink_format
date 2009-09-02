@@ -51,7 +51,9 @@ SimpleFontData::SimpleFontData(const FontPlatformData& f,
                                bool customFont,
                                bool loading,
                                SVGFontData* svgFontData)
-    : m_unitsPerEm(defaultUnitsPerEm),
+    : m_maxCharWidth(-1),
+      m_avgCharWidth(-1),
+      m_unitsPerEm(defaultUnitsPerEm),
       m_platformData(f),
       m_treatAsFixedPitch(false)
 #if ENABLE(SVG_FONTS)
@@ -61,9 +63,7 @@ SimpleFontData::SimpleFontData(const FontPlatformData& f,
       ,
       m_isCustomFont(customFont),
       m_isLoading(loading),
-      m_smallCapsFontData(0),
-      m_avgCharWidth(-1),
-      m_maxCharWidth(-1) {
+      m_smallCapsFontData(0) {
 #if !ENABLE(SVG_FONTS)
   UNUSED_PARAM(svgFontData);
 #else
