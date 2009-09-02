@@ -243,7 +243,7 @@ class PluginView : public Widget,
   bool startOrAddToUnstartedList();
   void removeFromUnstartedListIfNecessary();
   void init();
-  void platformStart();
+  bool platformStart();
   void stop();
   static void setCurrentPluginView(PluginView*);
   NPError load(const FrameLoadRequest&,
