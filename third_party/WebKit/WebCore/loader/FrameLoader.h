@@ -31,8 +31,6 @@
 #ifndef FrameLoader_h
 #define FrameLoader_h
 
-#include "CachedFrame.h"
-#include "CachedPage.h"
 #include "CachePolicy.h"
 #include "FrameLoaderTypes.h"
 #include "ResourceRequest.h"
@@ -43,7 +41,7 @@ namespace WebCore {
 
 class Archive;
 class AuthenticationChallenge;
-class CachedFrame;
+class CachedFrameBase;
 class CachedPage;
 class CachedResource;
 class Document;
@@ -465,6 +463,8 @@ class FrameLoader : public Noncopyable {
 
   bool shouldInterruptLoadForXFrameOptions(const String&, const KURL&);
 
+  void open(CachedFrameBase&);
+
  private:
   PassRefPtr<HistoryItem> createHistoryItem(bool useOriginal);
   PassRefPtr<HistoryItem> createHistoryItemTree(Frame* targetFrame,
@@ -593,9 +593,6 @@ class FrameLoader : public Noncopyable {
 
   void closeOldDataSources();
   void open(CachedPage&);
-  friend void CachedPage::restore(Page* page);
-  friend void CachedFrame::restore();
-  void open(CachedFrame&);
 
   void updateHistoryAfterClientRedirect();
 

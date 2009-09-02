@@ -67,7 +67,7 @@ void CachedPage::restore(Page* page) {
   ASSERT(page && page->mainFrame() &&
          page->mainFrame() == m_cachedMainFrame->view()->frame());
 
-  m_cachedMainFrame->view()->frame()->loader()->open(*m_cachedMainFrame.get());
+  m_cachedMainFrame->openInFrameLoader();
 
   // Restore the focus appearance for the focused element.
   // FIXME: Right now we don't support pages w/ frames in the b/f cache.  This

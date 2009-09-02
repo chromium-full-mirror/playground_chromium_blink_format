@@ -52,9 +52,6 @@ class CachedPage : public RefCounted<CachedPage> {
   DocumentLoader* documentLoader() const {
     return m_cachedMainFrame->documentLoader();
   }
-  FrameView* mainFrameView() const { return m_cachedMainFrame->view(); }
-  const KURL& url() const { return m_cachedMainFrame->url(); }
-  DOMWindow* domWindow() const { return m_cachedMainFrame->domWindow(); }
 
   double timeStamp() const { return m_timeStamp; }
 
