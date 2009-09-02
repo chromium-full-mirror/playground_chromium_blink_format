@@ -513,6 +513,7 @@ class tst_QWebFrame : public QObject {
   void hasSetFocus();
   void render();
   void scrollPosition();
+  void evaluateWillCauseRepaint();
 
  private:
   QString evalJS(const QString& s) {
@@ -2761,6 +2762,24 @@ void tst_QWebFrame::scrollPosition() {
   int y = frame->evaluateJavaScript("window.scrollY").toInt();
   QCOMPARE(x, 23);
   QCOMPARE(y, 29);
+}
+
+void tst_QWebFrame::evaluateWillCauseRepaint() {
+  QWebView view;
+  QString html(
+      "<html><body>top<div id=\"junk\" style=\"display: block;\">"
+      "junk</div>bottom</body></html>");
+  view.setHtml(html);
+  view.show();
+
+  QTest::qWait(200);
+
+  view.page()->mainFrame()->evaluateJavaScript(
+      "document.getElementById('junk').style.display = 'none';");
+
+  ::waitForSignal(view.page(), SIGNAL(repaintRequested(const QRect&)));
+
+  QTest::qWait(2000);
 }
 
 QTEST_MAIN(tst_QWebFrame)
