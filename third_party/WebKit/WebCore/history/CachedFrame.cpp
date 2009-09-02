@@ -93,7 +93,7 @@ void CachedFrameBase::restore() {
 
   // Open the child CachedFrames in their respective FrameLoaders.
   for (unsigned i = 0; i < m_childFrames.size(); ++i)
-    m_childFrames[i]->openInFrameLoader();
+    m_childFrames[i]->open();
 
   m_document->dispatchPageTransitionEvent(EventNames().pageshowEvent, true);
 }
@@ -146,7 +146,7 @@ CachedFrame::CachedFrame(Frame* frame) : CachedFrameBase(frame) {
 #endif
 }
 
-void CachedFrame::openInFrameLoader() {
+void CachedFrame::open() {
   ASSERT(m_view);
   m_view->frame()->loader()->open(*this);
 }

@@ -75,7 +75,7 @@ class CachedFrame : public RefCounted<CachedFrame>, private CachedFrameBase {
     return adoptRef(new CachedFrame(frame));
   }
 
-  void openInFrameLoader();
+  void open();
   void clear();
   void destroy();
 
