@@ -184,22 +184,9 @@ bool PluginView::platformStart() {
   return true;
 }
 
-PluginView::~PluginView() {
-  LOG(Plugins, "PluginView::~PluginView()");
-
-  stop();
-
-  deleteAllValues(m_requests);
-
-  freeStringArray(m_paramNames, m_paramCount);
-  freeStringArray(m_paramValues, m_paramCount);
-
-  m_parentFrame->script()->cleanupScriptObjectsForPlugin(this);
-
-  if (m_plugin && !(m_plugin->quirks().contains(PluginQuirkDontUnloadPlugin)))
-    m_plugin->unload();
-
-  m_window = 0;
+void PluginView::platformDestroy() {
+  if (platformPluginWidget())
+    setPlatformPluginWidget(0);
 }
 
 // Used before the plugin view has been initialized properly, and as a

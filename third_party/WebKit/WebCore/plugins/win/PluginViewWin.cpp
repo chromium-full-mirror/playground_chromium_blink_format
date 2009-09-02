@@ -987,25 +987,6 @@ void PluginView::forceRedraw() {
         parent() ? parent()->hostWindow()->platformWindow() : 0));
 }
 
-PluginView::~PluginView() {
-  removeFromUnstartedListIfNecessary();
-
-  stop();
-
-  deleteAllValues(m_requests);
-
-  freeStringArray(m_paramNames, m_paramCount);
-  freeStringArray(m_paramValues, m_paramCount);
-
-  if (platformPluginWidget())
-    DestroyWindow(platformPluginWidget());
-
-  m_parentFrame->script()->cleanupScriptObjectsForPlugin(this);
-
-  if (m_plugin && !m_plugin->quirks().contains(PluginQuirkDontUnloadPlugin))
-    m_plugin->unload();
-}
-
 bool PluginView::platformStart() {
   ASSERT(m_isStarted);
   ASSERT(m_status == PluginStatusLoadedSuccessfully);
@@ -1059,6 +1040,11 @@ bool PluginView::platformStart() {
     setNPWindowRect(frameRect());
 
   return true;
+}
+
+void PluginView::platformDestroy() {
+  if (platformPluginWidget())
+    DestroyWindow(platformPluginWidget());
 }
 
 }  // namespace WebCore

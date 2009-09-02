@@ -245,6 +245,7 @@ class PluginView : public Widget,
   void init();
   bool platformStart();
   void stop();
+  void platformDestroy();
   static void setCurrentPluginView(PluginView*);
   NPError load(const FrameLoadRequest&,
                bool sendNotification,
