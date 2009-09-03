@@ -67,7 +67,8 @@ class QWEBKIT_EXPORT QWebSettings {
 #ifdef QT_DEPRECATED
     LocalStorageDatabaseEnabled = LocalStorageEnabled,
 #endif
-    LocalContentCanAccessRemoteUrls
+    LocalContentCanAccessRemoteUrls,
+    SessionStorageEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,
