@@ -2928,6 +2928,7 @@ void FrameLoader::stopLoadingSubframes() {
 }
 
 void FrameLoader::stopAllLoaders(DatabasePolicy databasePolicy) {
+  ASSERT(!m_frame->document() || !m_frame->document()->inPageCache());
   if (m_unloadEventBeingDispatched)
     return;
 
@@ -3388,8 +3389,7 @@ void FrameLoader::open(CachedFrameBase& cachedFrame) {
   // When navigating to a CachedFrame its FrameView should never be null.  If it
   // is we'll crash in creative ways downstream.
   ASSERT(view);
-  if (view)
-    view->setWasScrolledByUser(false);
+  view->setWasScrolledByUser(false);
 
   // Use the current ScrollView's frame rect.
   if (m_frame->view())
@@ -3773,7 +3773,7 @@ void FrameLoader::closeAndRemoveChild(Frame* child) {
   child->tree()->detachFromParent();
 
   child->setView(0);
-  if (child->ownerElement())
+  if (child->ownerElement() && child->page())
     child->page()->decrementFrameCount();
   child->pageDestroyed();
 
@@ -3845,9 +3845,8 @@ void FrameLoader::detachFromParent() {
   if (Page* page = m_frame->page())
     page->inspectorController()->frameDetachedFromParent(m_frame);
 
-  m_client->detachedFromParent2();
-  setDocumentLoader(0);
-  m_client->detachedFromParent3();
+  detachViewsAndDocumentLoader();
+
   if (Frame* parent = m_frame->tree()->parent()) {
     parent->loader()->closeAndRemoveChild(m_frame);
     parent->loader()->scheduleCheckCompleted();
@@ -3855,6 +3854,12 @@ void FrameLoader::detachFromParent() {
     m_frame->setView(0);
     m_frame->pageDestroyed();
   }
+}
+
+void FrameLoader::detachViewsAndDocumentLoader() {
+  m_client->detachedFromParent2();
+  setDocumentLoader(0);
+  m_client->detachedFromParent3();
 }
 
 void FrameLoader::addExtraFieldsToSubresourceRequest(ResourceRequest& request) {

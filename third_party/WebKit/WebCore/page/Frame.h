@@ -100,6 +100,7 @@ class Frame : public RefCounted<Frame> {
   void init();
 
   Page* page() const;
+  void detachFromPage();
   HTMLFrameOwnerElement* ownerElement() const;
 
   void pageDestroyed();

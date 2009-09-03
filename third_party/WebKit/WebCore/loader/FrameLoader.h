@@ -293,6 +293,7 @@ class FrameLoader : public Noncopyable {
 
   void checkLoadComplete();
   void detachFromParent();
+  void detachViewsAndDocumentLoader();
 
   void addExtraFieldsToSubresourceRequest(ResourceRequest&);
   void addExtraFieldsToMainResourceRequest(ResourceRequest&);
