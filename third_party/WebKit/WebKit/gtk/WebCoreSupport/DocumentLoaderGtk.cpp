@@ -63,8 +63,6 @@ void DocumentLoader::attachToFrame() {
 void DocumentLoader::detachFromFrame() {
   WebCore::DocumentLoader::detachFromFrame();
 
-  ASSERT(m_loadingResources.isEmpty());
-
   if (m_loadingResources.isEmpty())
     unrefDataSource();
 }
@@ -86,9 +84,6 @@ void DocumentLoader::decreaseLoadCount(unsigned long identifier) {
     return;
 
   m_loadingResources.remove(it);
-
-  ASSERT(!frame());
-  ASSERT(m_loadingResources.isEmpty());
 
   if (m_loadingResources.isEmpty() && !frame())
     unrefDataSource();
