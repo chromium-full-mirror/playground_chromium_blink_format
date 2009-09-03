@@ -132,6 +132,7 @@ QNetworkReplyHandler::QNetworkReplyHandler(ResourceHandle* handle,
       m_reply(0),
       m_redirected(false),
       m_responseSent(false),
+      m_responseDataSent(false),
       m_loadMode(loadMode),
       m_shouldStart(true),
       m_shouldFinish(false),
@@ -218,10 +219,13 @@ void QNetworkReplyHandler::finish() {
     start();
   } else if (m_reply->error() != QNetworkReply::NoError
              // a web page that returns 401/403/404 can still have content
-             &&
-             m_reply->error() !=
-                 QNetworkReply::ContentOperationNotPermittedError &&
-             m_reply->error() != QNetworkReply::ContentNotFoundError &&
+             && ((m_reply->error() !=
+                      QNetworkReply::ContentOperationNotPermittedError &&
+                  m_reply->error() != QNetworkReply::ContentNotFoundError &&
+                  m_reply->error() != QNetworkReply::ProtocolUnknownError &&
+                  m_reply->error() != QNetworkReply::UnknownContentError)
+                 // If the web page sent content, let's give it to the user.
+                 || !m_responseDataSent) &&
              m_reply->error() != QNetworkReply::AuthenticationRequiredError &&
              m_reply->error() !=
                  QNetworkReply::ProxyAuthenticationRequiredError) {
@@ -351,9 +355,11 @@ void QNetworkReplyHandler::forwardData() {
   if (!client)
     return;
 
-  if (!data.isEmpty())
+  if (!data.isEmpty()) {
+    m_responseDataSent = true;
     client->didReceiveData(m_resourceHandle, data.constData(), data.length(),
                            data.length() /*FixMe*/);
+  }
 }
 
 void QNetworkReplyHandler::start() {
@@ -429,6 +435,7 @@ void QNetworkReplyHandler::start() {
 void QNetworkReplyHandler::resetState() {
   m_redirected = false;
   m_responseSent = false;
+  m_responseDataSent = false;
   m_shouldStart = true;
   m_shouldFinish = false;
   m_shouldSendResponse = false;
