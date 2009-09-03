@@ -1948,6 +1948,12 @@ static inline bool frameContainsWMLContent(Frame* frame) {
 #endif
 
 bool FrameLoader::canCachePageContainingThisFrame() {
+  for (Frame* child = m_frame->tree()->firstChild(); child;
+       child = child->tree()->nextSibling()) {
+    if (!child->loader()->canCachePageContainingThisFrame())
+      return false;
+  }
+
   return m_documentLoader && m_documentLoader->mainDocumentError().isNull() &&
          !m_frame->tree()->childCount()
          // FIXME: If we ever change this so that frames with plug-ins will be
