@@ -91,6 +91,12 @@ enum ObjectContentType {
   ObjectContentNetscapePlugin,
   ObjectContentOtherPlugin
 };
+
+enum UnloadEventPolicy {
+  UnloadEventPolicyNone,
+  UnloadEventPolicyUnloadOnly,
+  UnloadEventPolicyUnloadAndPageHide
+};
 }
 
 #endif

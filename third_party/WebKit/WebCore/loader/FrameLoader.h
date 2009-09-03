@@ -331,7 +331,7 @@ class FrameLoader : public Noncopyable {
                   PassRefPtr<FormState>);
 
   void stop();
-  void stopLoading(bool sendUnload, DatabasePolicy = DatabasePolicyStop);
+  void stopLoading(UnloadEventPolicy, DatabasePolicy = DatabasePolicyStop);
   bool closeURL();
 
   void didExplicitOpen();
@@ -518,6 +518,7 @@ class FrameLoader : public Noncopyable {
 
   bool loadProvisionalItemFromCachedPage();
   void cachePageForHistoryItem(HistoryItem*);
+  void pageHidden();
 
   void receivedFirstData();
 
