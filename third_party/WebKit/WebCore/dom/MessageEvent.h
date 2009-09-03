@@ -29,6 +29,7 @@
 #ifndef MessageEvent_h
 #define MessageEvent_h
 
+#include "DOMWindow.h"
 #include "Event.h"
 #include "MessagePort.h"
 
@@ -63,11 +64,11 @@ class MessageEvent : public Event {
   const String& origin() const { return m_origin; }
   const String& lastEventId() const { return m_lastEventId; }
   DOMWindow* source() const { return m_source.get(); }
-  const MessagePortArray& ports() const { return *(m_ports.get()); }
+  MessagePortArray* ports() const { return m_ports.get(); }
 
-  // FIXME: remove this when we update the JS bindings (bug #28460)
+  // FIXME: remove this when we update the ObjC bindings (bug #28774).
   MessagePort* messagePort();
-  // FIXME: remove this when we update the JS bindings (bug #28460)
+  // FIXME: remove this when we update the ObjC bindings (bug #28774).
   void initMessageEvent(const AtomicString& type,
                         bool canBubble,
                         bool cancelable,

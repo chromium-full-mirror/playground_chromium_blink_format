@@ -54,7 +54,7 @@ MessagePort::~MessagePort() {
     m_scriptExecutionContext->destroyedMessagePort(this);
 }
 
-// FIXME: remove this when we update the JS bindings (bug #28460).
+// FIXME: remove this when we update the ObjC bindings (bug #28774).
 void MessagePort::postMessage(const String& message,
                               MessagePort* port,
                               ExceptionCode& ec) {
