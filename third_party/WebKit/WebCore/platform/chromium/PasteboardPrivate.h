@@ -40,6 +40,10 @@ class PasteboardPrivate {
     BookmarkFormat,
     WebSmartPasteFormat,
   };
+  enum ClipboardBuffer {
+    StandardBuffer,
+    SelectionBuffer,
+  };
 };
 
 }  // namespace WebCore

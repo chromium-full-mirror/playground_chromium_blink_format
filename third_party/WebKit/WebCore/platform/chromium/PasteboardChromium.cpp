@@ -57,11 +57,19 @@ Pasteboard* Pasteboard::generalPasteboard() {
   return pasteboard;
 }
 
-Pasteboard::Pasteboard() {}
+Pasteboard::Pasteboard() : m_selectionMode(false) {}
 
 void Pasteboard::clear() {
   // The ScopedClipboardWriter class takes care of clearing the clipboard's
   // previous contents.
+}
+
+bool Pasteboard::isSelectionMode() const {
+  return m_selectionMode;
+}
+
+void Pasteboard::setSelectionMode(bool selectionMode) {
+  m_selectionMode = selectionMode;
 }
 
 void Pasteboard::writeSelection(Range* selectedRange,
@@ -136,11 +144,15 @@ void Pasteboard::writeImage(Node* node, const KURL&, const String& title) {
 
 bool Pasteboard::canSmartReplace() {
   return ChromiumBridge::clipboardIsFormatAvailable(
-      PasteboardPrivate::WebSmartPasteFormat);
+      PasteboardPrivate::WebSmartPasteFormat,
+      m_selectionMode ? PasteboardPrivate::SelectionBuffer
+                      : PasteboardPrivate::StandardBuffer);
 }
 
 String Pasteboard::plainText(Frame* frame) {
-  return ChromiumBridge::clipboardReadPlainText();
+  return ChromiumBridge::clipboardReadPlainText(
+      m_selectionMode ? PasteboardPrivate::SelectionBuffer
+                      : PasteboardPrivate::StandardBuffer);
 }
 
 PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
@@ -149,12 +161,15 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     bool allowPlainText,
     bool& chosePlainText) {
   chosePlainText = false;
+  PasteboardPrivate::ClipboardBuffer buffer =
+      m_selectionMode ? PasteboardPrivate::SelectionBuffer
+                      : PasteboardPrivate::StandardBuffer;
 
-  if (ChromiumBridge::clipboardIsFormatAvailable(
-          PasteboardPrivate::HTMLFormat)) {
+  if (ChromiumBridge::clipboardIsFormatAvailable(PasteboardPrivate::HTMLFormat,
+                                                 buffer)) {
     String markup;
     KURL srcURL;
-    ChromiumBridge::clipboardReadHTML(&markup, &srcURL);
+    ChromiumBridge::clipboardReadHTML(buffer, &markup, &srcURL);
 
     RefPtr<DocumentFragment> fragment =
         createFragmentFromMarkup(frame->document(), markup, srcURL);
@@ -163,7 +178,7 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
   }
 
   if (allowPlainText) {
-    String markup = ChromiumBridge::clipboardReadPlainText();
+    String markup = ChromiumBridge::clipboardReadPlainText(buffer);
     if (!markup.isEmpty()) {
       chosePlainText = true;
 
